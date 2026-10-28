@@ -37,8 +37,8 @@ import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // mixed with new (v-carrying) events on the same log.
 
 import '../helpers/work-store-release.mjs';
-import { fixture, loaderOptions } from '../event-store/phase07-fixture.mjs';
-import { decodeLegacyFiles } from '../../src/event-store/index.mjs';
+import { fixture } from '../event-store/phase07-fixture.mjs';
+import { pinLegacyHistory } from '../helpers/legacy-fence-fixture.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -57,7 +57,7 @@ const FIXTURE_RAW_AT_LOAD = fs.readFileSync(FIXTURE_PATH, 'utf8');
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/ and
 // never write anywhere near the fixture itself.
 function foldFixture(file) {
-  return foldEvents(decodeLegacyFiles({ '': fs.readFileSync(file, 'utf8') }, loaderOptions).map(e => e.event));
+  return foldEvents(fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map(line => JSON.parse(line)));
 }
 
 function tmpDir() {
@@ -137,7 +137,7 @@ test('listWork folds the committed legacy fixture through the facade', t => {
   const f = fixture(t);
   const fgosDir = path.join(f.repo, '.fgos');
   fs.copyFileSync(FIXTURE_PATH, path.join(fgosDir, 'events.jsonl'));
-  f.git('add', '.fgos/events.jsonl'); f.git('commit', '-qm', 'historical Work fixture');
+  pinLegacyHistory(f.repo);
 
   const view = listWork(fgosDir);
   assert.deepEqual(view, EXPECTED_OLD_VIEW);

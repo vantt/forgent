@@ -310,74 +310,6 @@ fn unordered_historical_mapping_records_read_as_no_provenance_until_setup_record
     assert_eq!(facts["provenance"]["url"], url);
 }
 #[test]
-fn head_legacy_ignores_project_files_and_nested_shards() {
-    let f = Fixture::new();
-    let mut h = f.handle();
-    let p = f.port(&mut h, "refs/fgos/events/test-aa");
-    let bad = p.write_blob(&f.repo, b"foreign project data\n").unwrap();
-    let child = p
-        .write_tree(
-            &f.repo,
-            &[TreeEntry {
-                name: b"foreign.jsonl".to_vec(),
-                mode: 0o100644,
-                oid: bad.clone(),
-            }],
-        )
-        .unwrap();
-    let nested = p
-        .write_tree(
-            &f.repo,
-            &[TreeEntry {
-                name: b"nested".to_vec(),
-                mode: 0o040000,
-                oid: child.clone(),
-            }],
-        )
-        .unwrap();
-    let fgos = p
-        .write_tree(
-            &f.repo,
-            &[TreeEntry {
-                name: b"events".to_vec(),
-                mode: 0o040000,
-                oid: nested,
-            }],
-        )
-        .unwrap();
-    let root = p
-        .write_tree(
-            &f.repo,
-            &[
-                TreeEntry {
-                    name: b"events.jsonl".to_vec(),
-                    mode: 0o100644,
-                    oid: bad,
-                },
-                TreeEntry {
-                    name: b"events".to_vec(),
-                    mode: 0o040000,
-                    oid: child,
-                },
-                TreeEntry {
-                    name: b".fgos".to_vec(),
-                    mode: 0o040000,
-                    oid: fgos,
-                },
-            ],
-        )
-        .unwrap();
-    let oid = commit_tree(&p, &f.repo, root);
-    assert!(std::process::Command::new("git")
-        .arg("-C")
-        .arg(f.root.join("repo"))
-        .args(["checkout", "-q", "--detach", oid.as_str()])
-        .status()
-        .unwrap()
-        .success());
-    assert!(read_project(&f, &Cursor::default(), &[]).legacy.is_empty());
-}
-#[test]
 fn ignored_stream_can_advance_after_certification_without_a_false_gap() {
     let f = Fixture::new();
     let mut h = f.handle();
@@ -411,22 +343,22 @@ fn ignored_stream_can_advance_after_certification_without_a_false_gap() {
         .is_empty());
 }
 #[test]
-fn changed_legacy_head_forces_rebuild_even_when_v4_order_is_unchanged() {
+fn a_legacy_history_that_appears_after_a_read_forces_a_rebuild_even_when_v4_order_is_unchanged() {
     let f = Fixture::new();
     let mut h = f.handle();
-    let p = f.port(&mut h, "refs/fgos/events/test-aa");
-    tracked_head(
-        &f,
-        &p,
-        b"events.jsonl",
-        b"{\"ts\":\"2026-01-01T00:00:00.000Z\",\"seq\":1}\n",
-    );
+    {
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        tracked_head(&f, &p, b"note", b"no legacy yet");
+    }
     let first = read_project(&f, &Cursor::default(), &[]);
-    tracked_head(
+    assert!(first.legacy.is_empty());
+    fenced_legacy(
         &f,
-        &p,
-        b"events.jsonl",
-        b"{\"ts\":\"2026-01-01T00:00:00.000Z\",\"seq\":2}\n",
+        &mut h,
+        &[(
+            "events.jsonl",
+            b"{\"ts\":\"2026-01-01T00:00:00.000Z\",\"seq\":1}\n".to_vec(),
+        )],
     );
     let next = read_project(&f, &first.cursor, &first.sequence);
     assert_eq!(

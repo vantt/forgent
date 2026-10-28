@@ -62,8 +62,7 @@ export function checkEventStore(cwd, kind, options = {}) {
     if (kind === 'event-store-machine-id' && facts.machineError) return fail(facts.machineError);
     if (kind === 'event-store-legacy-layout') {
       const result = prepareStore(cwd, { ...context.base, trustedMain: facts.trustedMain, config: { eventStore: config } }).legacyLayout([]);
-      if (result.warning) return warn(result.warning);
-      return result.passed ? pass('legacy fence, ref and sealed tree match; no retired paths') : fail(result.problems.join('; '));
+      return result.passed ? pass('legacy fence, ref and sealed tree match') : fail(result.problems.join('; '));
     }
     const status = context.status();
     switch (kind) {

@@ -9,6 +9,7 @@ import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { prepareStore, openStore } from '../../src/event-store/index.mjs';
 import { withStateTx } from '../../src/state/hot-lock.mjs';
+import { pinLegacyHistory } from '../helpers/legacy-fence-fixture.mjs';
 import { createLockScope } from '../../src/holder-lock/lock-scope.mjs';
 
 const built = ensureGitAddon();
@@ -187,8 +188,7 @@ test('write admission is asked of Git outside the gate and never by a read; a ga
   assert.equal(fresh.store.append('project', [event], {}, 'fixture', []).events.length, 1);
 });
 
-// No other test makes the first admission fail and then lets the failure clear: the migration and
-// gate tests only see answers that stay true for the life of the repository.
+// No other test makes the first admission fail and then lets the failure clear.
 test('a write refused by a transient Git failure is admitted once the failure clears', { skip: process.platform !== 'linux' }, t => {
   const { store, repo } = fixture(t);
   const refs = path.join(repo, '.git/refs');
@@ -200,22 +200,11 @@ test('a write refused by a transient Git failure is admitted once the failure cl
   assert.equal(store.append('project', [event], {}, 'fixture', []).events.length, 1, 'the refusal outlived the failure that caused it');
 });
 
-// Kept on purpose: `fgos events migrate` runs with every writer stopped and the runbook restarts them, so a process that
-// started before the migration never needs to see it clear.
-test('a write refused for a repository state stays refused after that state changes', { skip: process.platform !== 'linux' }, t => {
-  const { store, repo, git } = fixture(t);
-  fs.writeFileSync(path.join(repo, '.fgos/events.jsonl'), JSON.stringify({ ts: '2026-01-01T00:00:00.000Z', seq: 1, type: 'work.add', payload: { id: 'item-1', title: 'legacy' }, v: 4 }) + '\n');
-  git('add', '.fgos/events.jsonl'); git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'tracked legacy');
-  assert.throws(() => store.append('project', [event], {}, 'fixture', []), { message: /event-store-migration-required/ });
-  git('rm', '-q', '.fgos/events.jsonl'); git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'retire legacy');
-  assert.throws(() => store.append('project', [event], {}, 'fixture', []), { message: /event-store-migration-required/ }, 'a settled refusal is kept for the life of the store');
-});
-
 test('a repeat read is not sent the legacy history it already holds, and each read still gets its own events', { skip: process.platform !== 'linux' }, t => {
-  const { store, repo, git } = fixture(t);
+  const { store, repo } = fixture(t);
   const line = (seq) => JSON.stringify({ ts: '2026-01-01T00:00:00.000Z', seq, type: 'work.add', payload: { id: `item-${seq}`, title: 'legacy' }, v: 4 }) + '\n';
   fs.writeFileSync(path.join(repo, '.fgos/events.jsonl'), line(1) + line(2));
-  git('add', '.fgos/events.jsonl'); git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'tracked legacy');
+  pinLegacyHistory(repo);
   const sent = [];
   const original = addon.EventStore.prototype.read;
   addon.EventStore.prototype.read = function spiedRead(...args) {
@@ -235,11 +224,4 @@ test('a repeat read is not sent the legacy history it already holds, and each re
   const third = store.read({ streams: ['project'], cursor: second.cursor, folded: second.sequence }, []);
   assert.equal(third.legacy[0].event.payload.title, 'legacy', 'a caller that edits its copy never alters a later read');
   assert.equal(third.legacy[0].provenance.line, 1);
-
-  // A moved legacy history is sent in full, whatever the caller held.
-  fs.writeFileSync(path.join(repo, '.fgos/events.jsonl'), line(1) + line(2) + line(3));
-  git('add', '.fgos/events.jsonl'); git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'more legacy');
-  const moved = store.read({ streams: ['project'], cursor: third.cursor, folded: third.sequence }, []);
-  assert.equal(moved.legacy.length, 3);
-  assert.deepEqual(sent.at(-1), { records: 3, unchanged: false });
 });

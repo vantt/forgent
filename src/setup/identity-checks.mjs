@@ -6,8 +6,8 @@
 //
 // The checks ask the host (`fgos identity machine|project --json`) instead of
 // reading the files, so the one validator of each id's shape stays in the Rust crate.
-// The fix mints through the Identity N-API door (`mintMachineId`, the one mint
-// `events migrate` also calls), never a second implementation.
+// The fix mints through the Identity N-API door (`mintMachineId`, the one mint),
+// never a second implementation.
 // Levels follow the doctor convention: `passed: false` fails, a message that
 // starts with `warning:` warns, anything else passes.
 

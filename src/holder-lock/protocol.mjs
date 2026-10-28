@@ -4,7 +4,7 @@
 // imports its constants from here, so a protocol bump is one edit.
 //
 // 2 refuses a payload of the first release (`--protocol 1`) on every lock route; `quiesce-scan` keeps its own
-// protocol (SCAN_PROTOCOL in src/verbs/events/migrate.mjs) because its caller pins it separately from this facade.
+// protocol (SCAN_PROTOCOL in packages/holder-lock/rust/src/route.rs) because its callers pin it separately from this facade.
 export const PROTOCOL = 2;
 
 /** The stdio slot a borrowed description is handed to, and the env variable

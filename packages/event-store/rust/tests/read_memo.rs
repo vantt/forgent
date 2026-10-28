@@ -296,11 +296,9 @@ fn a_caller_that_holds_another_history_than_the_memo_gets_a_full_read() {
 fn a_memo_answer_leaves_out_legacy_events_only_for_a_caller_that_holds_them() {
     let f = Fixture::new();
     let mut h = f.handle();
+    let line = "{\"ts\":\"2026-01-01T00:00:00.000Z\",\"seq\":1,\"type\":\"work.add\"}\n";
+    fenced_legacy(&f, &mut h, &[("events.jsonl", line.as_bytes().to_vec())]);
     let p = f.port(&mut h, REF);
-    let line = |seq: u32| {
-        format!("{{\"ts\":\"2026-01-01T00:00:00.000Z\",\"seq\":{seq},\"type\":\"work.add\"}}\n")
-    };
-    tracked_head(&f, &p, b"events.jsonl", line(1).as_bytes());
     let memo = ReadMemo::new();
     let first = read_as(&p, &f, &reader(), None, Some(&memo)).unwrap();
     assert_eq!(first.legacy.len(), 1);
@@ -339,16 +337,4 @@ fn a_memo_answer_leaves_out_legacy_events_only_for_a_caller_that_holds_them() {
     assert!(aware.legacy.is_empty(), "the caller keeps its own copy");
     assert_eq!(aware.cursor.legacy_digest.as_deref(), Some(digest.as_str()));
 
-    // HEAD moves to a commit whose legacy file differs: the read observes it
-    // and answers with the changed history, whatever the caller says it holds.
-    tracked_head(
-        &f,
-        &p,
-        b"events.jsonl",
-        format!("{}{}", line(1), line(2)).as_bytes(),
-    );
-    let moved = read_holding(&p, &f, &reader(), Some(&first), Some(&memo), Some(&digest)).unwrap();
-    assert!(!moved.memoized);
-    assert_eq!(moved.legacy.len(), 2);
-    assert_ne!(moved.cursor.legacy_digest.as_deref(), Some(digest.as_str()));
 }

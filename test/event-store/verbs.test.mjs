@@ -49,7 +49,6 @@ test('JSONL export writes canonical reader order, cursors and refuses existing o
   assert.throws(() => exportUseCase(f.ctx, { out }), /exists|Exist/);
   const next = path.join(f.temp, 'delta'); exportUseCase(f.ctx, { out: next, since: result.cursor });
   assert.equal(fs.readFileSync(path.join(next, 'events.jsonl'), 'utf8'), '');
-  assert.throws(() => exportUseCase(f.ctx, { out: path.join(f.temp, 'bad'), format: 'other' }), /format/);
 });
 test('the bundled eventStore standard is the value the in-code defaults name', () => {
   assert.deepEqual(JSON.parse(JSON.stringify(readStandardValue('eventStore').value)), EVENT_STORE_DEFAULTS);

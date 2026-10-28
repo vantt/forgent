@@ -135,11 +135,49 @@ pub(crate) fn import_fixture(root: &Path, content: &str) {
             fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
         }
     }
-    let head = git(&["rev-parse", "HEAD"]);
-    let mut pin =
-        fgos_event_store::legacy_import::import_legacy(&driver, &repo, &layout, &head, &[], 0)
+    // An earlier release's migration: the legacy file published as a sealed commit at
+    // `refs/fgos/legacy`, then retired from HEAD behind the tracked fence that names it.
+    let git_with = |args: &[&str], input: &[u8]| {
+        use std::io::Write;
+        let mut child = Command::new("git")
+            .arg("-C")
+            .arg(root)
+            .args(args)
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .spawn()
             .unwrap();
-    pin.as_object_mut().unwrap().remove("operationId");
+        child.stdin.take().unwrap().write_all(input).unwrap();
+        let output = child.wait_with_output().unwrap();
+        assert!(output.status.success(), "git {args:?} failed");
+        String::from_utf8(output.stdout).unwrap().trim().to_owned()
+    };
+    let blob_tree = |name: &str, blob: &str| {
+        git_with(&["mktree"], format!("100644 blob {blob}\t{name}\n").as_bytes())
+    };
+    let head = git(&["rev-parse", "HEAD"]);
+    let events_blob = git(&["hash-object", "-w", ".fgos/events.jsonl"]);
+    let data_tree = blob_tree("events.jsonl", &events_blob);
+    let seal = fgos_event_store::envelope::Seal::Legacy {
+        from_commit: head.clone(),
+        tree_of_fgos_events: data_tree,
+    };
+    let seal_blob = git_with(
+        &["hash-object", "-w", "--stdin"],
+        &seal.canonical_line().unwrap(),
+    );
+    let legacy_tree = git_with(
+        &["mktree"],
+        format!("100644 blob {events_blob}\tevents.jsonl\n100644 blob {seal_blob}\tseal.json\n")
+            .as_bytes(),
+    );
+    let legacy_commit = git(&["commit-tree", &legacy_tree, "-m", "fgos-events legacy import"]);
+    git(&["update-ref", "refs/fgos/legacy", &legacy_commit]);
+    let pin = json!({
+        "legacyRefOid": legacy_commit,
+        "sealDigest": seal.digest().unwrap(),
+        "fromCommit": head,
+    });
     // No legacy worktree reader can satisfy these fixtures after import.
     fs::remove_file(root.join(".fgos/events.jsonl")).unwrap();
     fs::write(root.join(".fgos/events"), serde_json::to_vec(&pin).unwrap()).unwrap();

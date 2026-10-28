@@ -413,16 +413,7 @@ fn read_legacy(
         crate::fence::validate_refs(Some(&oid), refs.values())?;
         legacy_files(port, repo, &oid, streams)
     } else {
-        if matches!(head, HeadFact::Unborn { .. }) {
-            return Ok(Vec::new());
-        }
-        crate::legacy_import::read_consumer_at(
-            port,
-            authority,
-            streams,
-            head,
-            refs.get("refs/fgos/legacy"),
-        )
+        Ok(Vec::new())
     }
 }
 /// The tracked legacy files of one commit never change, so one process parses

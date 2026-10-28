@@ -1,17 +1,14 @@
-//! Export uses the verified reader and the frozen legacy order, never a Git driver.
+//! Export uses the verified reader, never a Git driver.
 use crate::{
     cursor::Cursor,
-    envelope::{line, Envelope},
+    envelope::line,
     errors::{invalid, io, Error},
     layout::{Layout, StreamId},
-    legacy::{self, LegacyEvent},
     read::{self, ReadRequest},
-    walk::{blob, git_error},
 };
-use fgos_git::{Inspect, ObjectType, RepoHandle};
+use fgos_git::{Inspect, RepoHandle};
 use serde_json::{json, Value};
 use std::{
-    collections::BTreeMap,
     fs::{self},
     path::{Component, Path},
 };
@@ -156,157 +153,6 @@ pub(crate) fn allowed(path: &str) -> bool {
             || (p.len() == 2 && p[0] == "events" && p[1].strip_suffix(".jsonl").is_some_and(safe))
             || (p.len() >= 2 && p[0] == "porting" && p.last() == Some(&"events.jsonl")))
 }
-fn legacy_value(e: &Envelope) -> Value {
-    // Dropping v4 h is essential: the old reader verifies its own 16-hex hash rule.
-    json!({"seq":e.seq,"ts":e.ts,"type":e.event_type,"payload":e.payload,"v":3,"src":e.src,"eventStoreId":format!("{}:{}:{}",e.origin,e.stream,e.seq)})
-}
-/// Return both orders to the consumer adapter, which alone owns its reducers.
-/// Legacy files are authenticated at the tracked D18 pin and preserved byte for byte.
-pub fn export_legacy_layout(
-    port: &dyn Inspect,
-    repo: &RepoHandle,
-    req: ExportRequest<'_>,
-) -> Result<Value, Error> {
-    if req
-        .streams
-        .iter()
-        .any(|s| s.scope() != crate::envelope::Scope::Project)
-    {
-        return Err(invalid("legacy-layout accepts only project streams"));
-    }
-    let got = query(port, repo, &req)?;
-    if crate::fence::pinned_legacy(port, repo)?.is_none() && !got.legacy.is_empty() {
-        return Err(invalid("legacy-layout requires the tracked legacy pin"));
-    }
-    let mut files = BTreeMap::<String, Vec<u8>>::new();
-    if let Some(pin) = crate::fence::pinned_legacy(port, repo)? {
-        let mut cursor = None;
-        loop {
-            let page = port
-                .list_tree(repo, &pin, b"", cursor, 100_000)
-                .map_err(git_error)?;
-            for entry in page.entries {
-                let path = std::str::from_utf8(&entry.path)
-                    .map_err(|_| invalid("non-UTF8 export path"))?;
-                if entry.kind == ObjectType::Tree
-                    && entry.mode == 0o040000
-                    && (path == "events"
-                        || path == "porting"
-                        || allowed(&format!("{path}/events.jsonl")))
-                {
-                    continue;
-                }
-                if !allowed(path) || entry.mode != 0o100644 || entry.kind != ObjectType::Blob {
-                    return Err(invalid("unsafe legacy tree entry"));
-                }
-                let bytes = blob(port, repo, &pin, &entry.path)?
-                    .ok_or_else(|| invalid("legacy blob missing"))?;
-                files.insert(path.into(), bytes);
-            }
-            if page.complete {
-                break;
-            }
-            cursor = Some(
-                page.next_cursor
-                    .ok_or_else(|| invalid("tree continuation missing"))?,
-            );
-        }
-    }
-    let historical_porting: Vec<_> = files
-        .keys()
-        .filter(|p| p.starts_with("porting/") && p.ends_with("/events.jsonl"))
-        .cloned()
-        .collect();
-    if historical_porting.len() > 1 {
-        return Err(invalid(
-            "multiple historical porting logs; rollback requires owner decision",
-        ));
-    }
-    let porting_target = historical_porting
-        .first()
-        .map(String::as_str)
-        .unwrap_or("porting/events.jsonl");
-    let mut streams = BTreeMap::<String, Vec<u8>>::new();
-    for e in &got.sequence {
-        if e.seq
-            <= req
-                .since
-                .cover
-                .get(&crate::order::stream_key(e))
-                .copied()
-                .unwrap_or(0)
-        {
-            continue;
-        }
-        if !matches!(e.stream.as_str(), "project" | "project:porting") {
-            return Err(invalid("unsupported legacy project stream"));
-        }
-        let name = if e.stream == "project:porting" {
-            porting_target
-        } else {
-            "events/v4-project.jsonl"
-        };
-        streams
-            .entry(name.into())
-            .or_default()
-            .extend(line(&legacy_value(e))?);
-    }
-    for (name, bytes) in streams {
-        if name.starts_with("porting/") {
-            let historical = files.entry(name).or_default();
-            if !historical.is_empty() && !historical.ends_with(b"\n") {
-                historical.push(b'\n');
-            }
-            historical.extend(bytes);
-        } else if files.insert(name, bytes).is_some() {
-            return Err(invalid("v4 export name collides with legacy file"));
-        }
-    }
-    let mut ordered: Vec<LegacyEvent> = Vec::new();
-    for (name, bytes) in &files {
-        if name == "events.jsonl" || name.starts_with("events/") {
-            ordered.extend(legacy::parse_file(
-                if name == "events.jsonl" {
-                    ""
-                } else {
-                    name.rsplit('/').next().unwrap()
-                },
-                std::str::from_utf8(bytes).map_err(|_| invalid("legacy UTF8"))?,
-            )?);
-        }
-    }
-    destination(req.out)?;
-    for (name, bytes) in &files {
-        write(req.out, name, bytes)?;
-    }
-    let modern: Vec<Value> = got
-        .legacy
-        .iter()
-        .filter(|e| e.provenance.file == "events.jsonl" || e.provenance.file.starts_with("events/"))
-        .map(|e| e.event.clone())
-        .chain(
-            got.sequence
-                .iter()
-                .filter(|e| e.stream == "project")
-                .map(legacy_value),
-        )
-        .collect();
-    let modern_porting: Vec<Value> = got
-        .legacy
-        .iter()
-        .filter(|e| e.provenance.file.starts_with("porting/"))
-        .map(|e| e.event.clone())
-        .chain(
-            got.sequence
-                .iter()
-                .filter(|e| e.stream == "project:porting")
-                .map(legacy_value),
-        )
-        .collect();
-    Ok(
-        json!({"v4PortingOrder":modern_porting,"out":req.out,"files":files.keys().collect::<Vec<_>>(),"legacyOrder":legacy::order(ordered).into_iter().map(|e| e.event).collect::<Vec<_>>(),"v4Order":modern,"deferred":got.deferred,"missing":got.missing}),
-    )
-}
 
 #[cfg(test)]
 mod tests {
@@ -326,22 +172,5 @@ mod tests {
         assert!(allowed(
             "porting/docs/distillery/state/porting/events.jsonl"
         ));
-    }
-    #[test]
-    fn converted_origins_keep_distinct_legacy_identities() {
-        let event: Envelope = serde_json::from_value(json!({
-            "v":4,"type":"work.add","scope":"project","origin":"first",
-            "stream":"project","seq":1,"seen":{},"ts":"2026-10-19T00:00:00.000Z",
-            "src":"fixture","schemaVersion":1,"payload":{"id":"one"},"h":"unused"
-        }))
-        .unwrap();
-        let mut other = event.clone();
-        other.origin = "second".into();
-        let mut bytes = line(&legacy_value(&event)).unwrap();
-        bytes.extend(line(&legacy_value(&other)).unwrap());
-        let parsed =
-            legacy::parse_file("v4-project.jsonl", std::str::from_utf8(&bytes).unwrap()).unwrap();
-        assert_eq!(legacy::order(parsed).len(), 2);
-        assert!(legacy_value(&event).get("h").is_none());
     }
 }

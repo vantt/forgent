@@ -4,6 +4,7 @@ import path from 'node:path';
 import { sandboxGit } from '../../scripts/lib/sandbox-git.mjs';
 import { ensureGitAddon } from './git-addon.mjs';
 import { activateGitFixture } from './git-fixture.mjs';
+import { pinLegacyHistory } from './legacy-fence-fixture.mjs';
 
 // Work fixtures run product code against the real native store. Importing this module stages this checkout's
 // addon and host once and points FGOS_HOST_BIN and the active-manifest variables of this process at them, so
@@ -20,9 +21,7 @@ export function initializeWorkRepository(repo) {
   return path.join(repo, '.fgos');
 }
 
-// Legacy readers consume the immutable HEAD inventory, never mutable working files.
+// Legacy readers consume the immutable pinned legacy history, never mutable working files.
 export function freezeLegacyWorkFixture(repo) {
-  const git = sandboxGit(repo);
-  git(['-C', repo, 'add', '.fgos/events.jsonl'], { stdio: 'pipe' });
-  git(['-C', repo, 'commit', '-qm', 'frozen legacy Work fixture'], { stdio: 'pipe' });
+  pinLegacyHistory(repo);
 }
