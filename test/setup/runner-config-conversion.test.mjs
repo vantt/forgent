@@ -235,7 +235,11 @@ test('handles retired keys in both project and global scopes without crashing se
     assert.ok(notice.file.includes('.fgos'), 'notice must identify the global config file');
     assert.ok(notice.edits.length > 0, 'notice must describe the required edits');
     assert.ok(notice.command, 'notice must supply guidance command');
+    assert.match(notice.command, /from a directory outside any fgOS project/);
+    assert.ok(Array.isArray(notice.patch), 'notice must carry patch operations');
+    assert.deepEqual(notice.patch, [{ unset: 'runner.patterns.defaultRule' }]);
     assert.match(notice.message, /global config holds retired keys/, 'notice must format guidance text');
+    assert.match(notice.message, /from a directory outside any fgOS project/);
     assert.match(formatGlobalRetiredNotice(notice), /global config holds retired keys/, 'formatter must output guidance text');
     const result = convertRunnerPatternsConfig(projectDir);
     assert.equal(result.status, 'blocked', 'conversion is honestly reported as blocked by global retired keys refusing snapshot');
@@ -264,7 +268,8 @@ test('stops and reports blocked when config write door refuses without raw write
     });
     assert.equal(result.status, 'blocked', 'door refusal must report blocked');
     assert.ok(result.blocker.includes('config-write-conflict'), 'must report blocker reason');
-
+    assert.ok(result.backup, 'backup must be created when door refuses');
+    assert.ok(fs.existsSync(result.backup), 'backup file must exist on disk');
     const currentText = readRawProjectConfig(projectDir);
     assert.equal(currentText, originalText, 'file must not be rewritten around the door');
   } finally {
@@ -354,7 +359,11 @@ test('blocks conversion without data loss when both retired research-fan-out-gat
     const result = convertRunnerPatternsConfig(projectDir);
     assert.equal(result.status, 'blocked', 'must block conversion when modern destination already exists');
     assert.match(result.blocker, /research-fan-out/, 'blocker must name the colliding pattern key');
+    assert.equal(result.backup, undefined, 'blocked pre-check must create no backup');
 
+    const fgosDir = path.join(projectDir, '.fgos');
+    const backups = fs.readdirSync(fgosDir).filter((name) => name.includes('.pre-patterns-catalog-'));
+    assert.equal(backups.length, 0, 'blocked setup must leave no backup file on disk');
     const currentText = readRawProjectConfig(projectDir);
     assert.equal(currentText, originalText, 'source file must remain untouched');
   } finally {
@@ -387,7 +396,13 @@ test('refuses legacy json project file with retired keys as blocked, leaving ori
     assert.equal(result.status, 'blocked', 'legacy json project file must be reported as blocked');
     assert.ok(result.blocker, 'must report blocker reason');
     assert.match(result.blocker, /config-format-legacy-json/, 'blocker must name config-format-legacy-json cause');
+    assert.match(result.blocker, /runner\.loops\.reviewed\.maxRounds/);
+    assert.match(result.blocker, /edit .*config\.json.*, then run `fgos config migrate`/);
+    assert.equal(result.backup, undefined, 'legacy json refusal must create no backup');
 
+    const fgosDir = path.join(projectDir, '.fgos');
+    const backups = fs.readdirSync(fgosDir).filter((name) => name.includes('.pre-patterns-catalog-'));
+    assert.equal(backups.length, 0, 'blocked legacy json must leave no backup file on disk');
     const currentText = fs.readFileSync(legacyProjectConfigPath(projectDir), 'utf8');
     assert.equal(currentText, originalText, 'original legacy json file must be untouched');
 
@@ -422,9 +437,67 @@ test('setup CLI prints global guidance when both project and global files hold r
     const parsed = JSON.parse(jsonResult.stdout);
     assert.ok(parsed.data?.globalRetiredNotice, 'json data must include globalRetiredNotice');
     assert.match(parsed.data.globalRetiredNotice.message, /global config holds retired keys/);
+    assert.match(parsed.data.globalRetiredNotice.command, /from a directory outside any fgOS project/);
+    assert.ok(Array.isArray(parsed.data.globalRetiredNotice.patch));
     assert.equal(parsed.data?.runnerPatternsConversion?.status, 'blocked');
+
+    const humanResult = spawnSync(process.execPath, [fgosBin, 'setup', '--dir', projectDir], {
+      encoding: 'utf8',
+      env: { ...process.env, HOME: homeDir, USERPROFILE: homeDir },
+    });
+    assert.equal(humanResult.status, 0, humanResult.stderr);
+    assert.match(humanResult.stdout, /from a directory outside any fgOS project/);
+    assert.match(humanResult.stdout, /patch body/);
+    assert.match(humanResult.stdout, /runner\.patterns\.defaultRule/);
   } finally {
     process.env.HOME = prevHome;
     cleanupDirs({ projectDir, homeDir });
+  }
+});
+
+test('global config inspection ignores unrelated errors under reviewed pattern', () => {
+  const { homeDir } = makeTempDirs();
+  try {
+    writeGlobalConfig(homeDir, {
+      runner: {
+        patterns: {
+          reviewed: {
+            unrelatedKey: 'invalid',
+          },
+        },
+      },
+    });
+    const notice = inspectGlobalRunnerConfig(path.join(homeDir, '.fgos'));
+    assert.equal(notice, null, 'unrelated errors under reviewed pattern must not produce retired key notice');
+  } finally {
+    cleanupDirs({ homeDir });
+  }
+});
+
+test('committed door write returns converted with remaining validation diagnostic without restoring old bytes', () => {
+  const { projectDir } = makeTempDirs();
+  try {
+    writeProjectConfig(projectDir, { runner: oldPatternsConfig() });
+    const originalBytes = readRawProjectConfig(projectDir);
+    const writtenContent = 'runner:\n  loops:\n    reviewed:\n      bounds:\n        maxRounds: { min: 10, max: 2 }\n';
+
+    const result = convertRunnerPatternsConfig(projectDir, {
+      patchDoor: () => {
+        // Simulate a successful write door that leaves an invalid bounds state
+        fs.writeFileSync(projectConfigPath(projectDir), writtenContent, 'utf8');
+      },
+    });
+
+    assert.equal(result.status, 'converted', 'must report converted when door write succeeded');
+    assert.ok(result.backup, 'backup path must be present');
+    assert.ok(fs.existsSync(result.backup), 'backup file must exist on disk');
+    assert.equal(fs.readFileSync(result.backup, 'utf8'), originalBytes, 'backup must match original bytes');
+    assert.ok(result.remainingValidation, 'remaining validation diagnostic must be reported');
+    assert.match(result.remainingValidation, /min .* must be <= max/);
+
+    const currentBytes = readRawProjectConfig(projectDir);
+    assert.equal(currentBytes, writtenContent, 'old bytes must never be restored over door write');
+  } finally {
+    cleanupDirs({ projectDir });
   }
 });

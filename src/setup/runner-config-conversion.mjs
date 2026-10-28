@@ -8,6 +8,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { parseYaml } from '../util/yaml.mjs';
 import { retiredKeysIn } from '../runner/dispatch/retired-config-keys.mjs';
+import { detectRetiredPatternKeys } from '../runner/execution/patterns/retired-keys.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import * as facade from '../config/facade.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
@@ -42,6 +43,31 @@ function applyNativeConfigPatch(hostBin, projectDir, edits, reason) {
 }
 
 /**
+ * Shared read-only inspection and advice formatting for a legacy JSON config file.
+ *
+ * @param {string} targetPath
+ * @param {object} [parsed]
+ * @returns {string}
+ */
+export function formatLegacyJsonAdvice(targetPath, parsed = null) {
+  let doc = parsed;
+  if (!doc) {
+    try {
+      const text = fs.readFileSync(targetPath, 'utf8');
+      doc = parseYaml(text, { filename: targetPath });
+    } catch {
+      doc = null;
+    }
+  }
+  const retired = doc ? retiredKeysIn(doc, targetPath) : [];
+  if (retired.length > 0) {
+    const editsText = retired.map((r) => r.baseMessage ?? `${r.key} was retired; ${r.instruction}`).join('; ');
+    return `${targetPath}: config-format-legacy-json: ${editsText}; edit ${targetPath}, then run \`fgos config migrate\``;
+  }
+  return `${targetPath}: config-format-legacy-json: legacy JSON configuration format must be migrated first; edit ${targetPath}, then run \`fgos config migrate\``;
+}
+
+/**
  * Converts a project config file if it holds retired runner.patterns keys.
  * Idempotent: returns 'unchanged' when no retired keys are present.
  *
@@ -56,13 +82,12 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
     return { status: 'absent', written: [] };
   }
 
-  if (typeof options.patchDoor !== 'function') {
-    try {
-      loadRunnerConfigForDir(projectDir);
-      return { status: 'unchanged', written: [] };
-    } catch {
-      // Configuration cannot be cleanly loaded by the runner; inspect file for retired keys.
-    }
+  // Opening load check must always run
+  try {
+    loadRunnerConfigForDir(projectDir);
+    return { status: 'unchanged', written: [] };
+  } catch {
+    // Configuration cannot be cleanly loaded by the runner; inspect file for retired keys.
   }
 
   // Side-read raw config text to extract values of retired keys (maxRounds, checkersByRigor, etc.)
@@ -89,11 +114,24 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
     return { status: 'unchanged', written: [] };
   }
 
-  const now = new Date();
-  const ts = now.toISOString().replace(/[-:.]/g, '');
-  const backupPath = `${targetPath}.pre-patterns-catalog-${ts}`;
-  // Backup copy of the user's config file before applying edits; this and the restore below are the only raw writes in this module.
-  fs.copyFileSync(targetPath, backupPath);
+  // H1: for a .json target, no backup and no door call; return blocked with per-key hand edits
+  if (targetPath.endsWith('.json')) {
+    return {
+      status: 'blocked',
+      blocker: formatLegacyJsonAdvice(targetPath, parsed),
+      written: [],
+    };
+  }
+
+  // Pre-check: collision between retired research-fan-out-gated and modern research-fan-out
+  // Made before backup copy so blocked setup leaves no backup
+  if (patterns['research-fan-out-gated'] !== undefined && patterns['research-fan-out'] !== undefined) {
+    return {
+      status: 'blocked',
+      blocker: 'cannot convert retired key runner.patterns.research-fan-out-gated: modern runner.patterns.research-fan-out already exists; reconcile duplicate pattern entries manually',
+      written: [],
+    };
+  }
 
   const edits = [];
   const written = [];
@@ -103,14 +141,6 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
   }
 
   if (patterns['research-fan-out-gated'] !== undefined) {
-    if (patterns['research-fan-out'] !== undefined) {
-      return {
-        status: 'blocked',
-        backup: backupPath,
-        blocker: 'cannot convert retired key runner.patterns.research-fan-out-gated: modern runner.patterns.research-fan-out already exists; reconcile duplicate pattern entries manually',
-        written: [],
-      };
-    }
     edits.push({ unset: 'runner.patterns.research-fan-out-gated' });
     edits.push({ set: 'runner.patterns.research-fan-out', value: patterns['research-fan-out-gated'] });
     written.push('runner.patterns.research-fan-out');
@@ -145,7 +175,13 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
   written.push('runner.patterns.seatBinding.schema');
   const reason = 'convert retired runner.patterns keys to runner.loops and schema 2';
 
-  // Apply edits through Config write door (Branch A)
+  // Backup copy made immediately before door call, after all pre-checks
+  const now = new Date();
+  const ts = now.toISOString().replace(/[-:.]/g, '');
+  const backupPath = `${targetPath}.pre-patterns-catalog-${ts}`;
+  fs.copyFileSync(targetPath, backupPath);
+
+  // Apply edits through Config write door
   try {
     if (typeof options.patchDoor === 'function') {
       options.patchDoor({
@@ -155,14 +191,6 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
         reason,
         backupPath,
       });
-    } else if (typeof facade.applyPatch === 'function' || typeof facade.patch === 'function') {
-      const door = facade.applyPatch ?? facade.patch;
-      door({
-        projectRoot: projectDir,
-        target: 'project',
-        edits,
-        reason,
-      });
     } else {
       const host = resolveActiveHostBin({ cwd: projectDir });
       if (host?.bin) {
@@ -171,7 +199,7 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
         return {
           status: 'blocked',
           backup: backupPath,
-          blocker: 'config-write-door-unavailable: Config write door (facade.applyPatch or native fgos config patch) is unavailable; question U6 requires Branch A conversion to go through the Config write door and not write around it',
+          blocker: 'config-write-door-unavailable: Config write door (native fgos config patch) is unavailable; conversion must go through the Config write door',
           written: [],
         };
       }
@@ -188,24 +216,11 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
   try {
     loadRunnerConfigForDir(projectDir);
   } catch (err) {
-    const isGlobalOnlyRefusal =
-      (err instanceof facade.ConfigDoorError && err.refusals?.every((r) => r.file?.startsWith('global:'))) ||
-      (typeof err.message === 'string' && (err.message.includes('~/.fgos/') || err.message.includes('global:')));
-    if (isGlobalOnlyRefusal) {
-      return {
-        status: 'converted',
-        backup: backupPath,
-        written,
-        globalPending: true,
-      };
-    }
-    // Restores the user's own bytes from backup after a refused write; this and the backup copy are the only raw writes in this module.
-    fs.copyFileSync(backupPath, targetPath);
     return {
-      status: 'blocked',
+      status: 'converted',
       backup: backupPath,
-      blocker: err.message ?? String(err),
-      written: [],
+      written,
+      remainingValidation: err.message ?? String(err),
     };
   }
 
@@ -224,7 +239,10 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
  */
 export function formatGlobalRetiredNotice(notice) {
   if (!notice) return '';
-  return `global config holds retired keys; edit ${notice.file} (${notice.edits.join('; ')})`;
+  const patchStr = notice.patchBody ?? (notice.patch ? JSON.stringify(notice.patch) : '');
+  const cmdPart = notice.command ? `; ${notice.command}` : '';
+  const patchPart = patchStr ? `; patch body: ${patchStr}` : '';
+  return `global config holds retired keys; edit ${notice.file} (${notice.edits.join('; ')})${cmdPart}${patchPart}`;
 }
 
 /**
@@ -241,29 +259,34 @@ export function inspectGlobalRunnerConfig(globalDir = path.join(os.homedir(), '.
     return null;
   } catch (err) {
     if (err instanceof facade.ConfigDoorError && Array.isArray(err.refusals)) {
-      const retiredRefusals = err.refusals.filter((r) =>
-        r.path && (
-          r.path.startsWith('runner.patterns.defaultRule') ||
-          r.path.startsWith('runner.patterns.reviewed') ||
-          r.path.startsWith('runner.patterns.research-fan-out-gated')
-        )
-      );
+      const retiredRefusals = err.refusals.filter((r) => {
+        if (!r.path) return false;
+        const findings = detectRetiredPatternKeys(r.path);
+        return findings.length > 0;
+      });
       if (retiredRefusals.length === 0) return null;
       const file = retiredRefusals[0].file?.replace(/^(global|machine):/, '') ?? 'config.yaml';
       const edits = [];
-      if (retiredRefusals.some((r) => r.path.startsWith('runner.patterns.defaultRule'))) {
+      const patch = [];
+      if (retiredRefusals.some((r) => detectRetiredPatternKeys(r.path).some((f) => f.classification === 'defaultRule'))) {
         edits.push('delete runner.patterns.defaultRule');
+        patch.push({ unset: 'runner.patterns.defaultRule' });
       }
-      if (retiredRefusals.some((r) => r.path.startsWith('runner.patterns.reviewed'))) {
+      if (retiredRefusals.some((r) => detectRetiredPatternKeys(r.path).some((f) => f.classification === 'tuning'))) {
         edits.push('move runner.patterns.reviewed to runner.loops.reviewed');
+        patch.push({ unset: 'runner.patterns.reviewed' });
       }
-      if (retiredRefusals.some((r) => r.path.startsWith('runner.patterns.research-fan-out-gated'))) {
+      if (retiredRefusals.some((r) => detectRetiredPatternKeys(r.path).some((f) => f.classification === 'gated'))) {
         edits.push('rename runner.patterns.research-fan-out-gated to runner.patterns.research-fan-out');
+        patch.push({ unset: 'runner.patterns.research-fan-out-gated' });
       }
+      const patchBody = JSON.stringify(patch, null, 2);
       const notice = {
         file: path.join(globalDir, file),
         edits,
-        command: 'fgos config patch <patch-file> --global --reason "convert retired keys to runner.loops"',
+        patch,
+        patchBody,
+        command: 'from a directory outside any fgOS project, run: fgos config patch <patch-file> --global --reason "convert retired keys to runner.loops"',
       };
       notice.message = formatGlobalRetiredNotice(notice);
       return notice;

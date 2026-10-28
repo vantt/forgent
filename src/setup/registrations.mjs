@@ -106,6 +106,7 @@ import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '..
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { checkConfig, readConfig, readMachineConfig } from '../config/facade.mjs';
+import { formatLegacyJsonAdvice } from './runner-config-conversion.mjs';
 import { CONFIG_CHECKS, CONFIG_FIXES, isConfigDoorFailure } from './config-checks.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
@@ -517,7 +518,7 @@ export function checkRunnerPatternsConfig(cwd) {
       const display = resolveDisplay(f.file);
 
       if (display.endsWith('.json') || f.row === 'config-format-legacy-json') {
-        const msg = `${display}: legacy JSON configuration format must be migrated first; migrate the file format first`;
+        const msg = formatLegacyJsonAdvice(display);
         if (!problems.includes(msg)) problems.push(msg);
         continue;
       }
@@ -544,7 +545,7 @@ export function checkRunnerPatternsConfig(cwd) {
           display = r.file ?? '<file>';
         }
         if (display.endsWith('.json') || r.id === 'config-format-legacy-json') {
-          const msg = `${display}: legacy JSON configuration format must be migrated first; migrate the file format first`;
+          const msg = formatLegacyJsonAdvice(display);
           if (!problems.includes(msg)) problems.push(msg);
           continue;
         }
@@ -566,20 +567,20 @@ export function checkRunnerPatternsConfig(cwd) {
     cfg = readConfig({
       projectRoot: cwd,
       sections: ['runner'],
-      origins: ['runner.patterns'],
+      origins: ['runner.patterns', 'runner.loops'],
     });
   } catch (err) {
     if (isProjectJson) {
-      return { passed: false, message: `${path.join(cwd, '.fgos', 'config.json')}: legacy JSON configuration format must be migrated first; migrate the file format first` };
+      return { passed: false, message: formatLegacyJsonAdvice(path.join(cwd, '.fgos', 'config.json')) };
     }
     if (isGlobalJson) {
-      return { passed: false, message: `${path.join(globalDir, 'config.json')}: legacy JSON configuration format must be migrated first; migrate the file format first` };
+      return { passed: false, message: formatLegacyJsonAdvice(path.join(globalDir, 'config.json')) };
     }
     if (err.refusals) {
       for (const r of err.refusals) {
         if (r.id === 'config-format-legacy-json' || r.file?.endsWith('.json')) {
           const display = r.file?.startsWith('global:') ? path.join(globalDir, 'config.json') : path.join(cwd, '.fgos', 'config.json');
-          return { passed: false, message: `${display}: legacy JSON configuration format must be migrated first; migrate the file format first` };
+          return { passed: false, message: formatLegacyJsonAdvice(display) };
         }
       }
     }
@@ -611,6 +612,15 @@ export function checkRunnerPatternsConfig(cwd) {
   const info = [];
   const hints = [];
 
+  // M6: Warn if project defines runner.loops.* but marker runner.patterns.seatBinding.schema is below 2 or absent
+  const hasProjectLoops = (cfg?.origins ?? []).some((o) => o.layer === 'project' && o.path.startsWith('runner.loops'));
+  if (hasProjectLoops) {
+    const markerOrigin = (cfg?.origins ?? []).find((o) => o.path === 'runner.patterns.seatBinding.schema' && o.layer === 'project');
+    const markerValue = markerOrigin ? cfg?.value?.runner?.patterns?.seatBinding?.schema : undefined;
+    if (!markerOrigin || typeof markerValue !== 'number' || markerValue < 2) {
+      warnings.push('set `runner.patterns.seatBinding.schema` to 2 so older releases refuse this file');
+    }
+  }
   // 1. Warnings: defaults beyond bounds
   for (const [loopName, loopCfg] of Object.entries(effectiveLoops)) {
     const bounds = loopCfg?.bounds;

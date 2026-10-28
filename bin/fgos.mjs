@@ -4736,6 +4736,14 @@ function renderPretty(verb, data) {
           data.runnerPatternsConversion.backup ? `backup: ${data.runnerPatternsConversion.backup}` : undefined,
         ),
       );
+      if (data.runnerPatternsConversion.remainingValidation) {
+        lines.push(
+          formatCheck(
+            false,
+            `runner config has remaining validation errors (${data.runnerPatternsConversion.remainingValidation})`,
+          ),
+        );
+      }
     } else if (data.runnerPatternsConversion?.status === 'blocked') {
       lines.push(
         formatCheck(
@@ -4745,11 +4753,14 @@ function renderPretty(verb, data) {
       );
     }
     if (data.globalRetiredNotice) {
+      const notice = data.globalRetiredNotice;
+      const patchStr = notice.patchBody ?? (notice.patch ? JSON.stringify(notice.patch) : '');
+      const note = [notice.command, patchStr ? `patch body:\n${patchStr}` : ''].filter(Boolean).join('\n');
       lines.push(
         formatCheck(
           false,
-          `global config holds retired keys; edit ${data.globalRetiredNotice.file} (${data.globalRetiredNotice.edits.join('; ')})`,
-          data.globalRetiredNotice.command,
+          `global config holds retired keys; edit ${notice.file} (${notice.edits.join('; ')})`,
+          note || undefined,
         ),
       );
     }
