@@ -79,7 +79,7 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
     machineId,
     // null means this clone has no local store identity yet (no append).
     get ownOrigin() { return call(() => native.ownOrigin); },
-    /** Settle the store's write admission (the legacy-migration check) outside the gate, where Git may be asked.
+    /** Settle the store's write admission (the check against the tracked legacy fence) outside the gate, where Git may be asked.
      * It never refuses by itself: the append that needs the answer raises it. */
     admitWrites(heldRanks) {
       const ranks = outsideGate(heldRanks);

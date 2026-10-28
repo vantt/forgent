@@ -327,8 +327,8 @@ function currentFgwBranchIfMainCheckout(repoRoot) {
   return /^fgw\//.test(branch) ? branch : null;
 }
 
-// The Event Store cutover fence is the regular file `.fgos/events`, in the index or in HEAD.
-// A migration installed it; once it exists the retired event paths cannot be added back.
+// The tracked legacy fence is the regular file `.fgos/events`, in the index or in HEAD.
+// Once it exists the retired event paths cannot be added back.
 function eventFenceExists(cwd) {
   // A directory is legacy Work; only the indexed/HEAD regular-file fence counts.
   const index = execFileSync('git', ['ls-files', '-s', '--', '.fgos/events'], { cwd, encoding: 'utf8' });

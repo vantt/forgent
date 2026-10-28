@@ -1,7 +1,7 @@
 # Upstream source clones — cursors tracked in docs/distillery/, re-clone as needed
 /upstreams/
 
-# forgent state layer — events.jsonl is truth (committed); everything under
+# forgent state layer — committed event history lives in the Git Event Store; everything under
 # .fgos/cache/ (state.json) is a derived, rebuildable view. First attempt
 # (phase-02, plans/260825-0842-fgos-logs-dir-bucketing) reverted because 21
 # test files hardcoded the old path independently; phase-03 introduced

@@ -149,8 +149,8 @@ function main() {
       'utf8'
     );
 
-    // Retain the frozen Observe migration snapshot. Its retired work.friction type cannot be appended to a
-    // current Work registry, so the legacy journal comes from a committed fixture; new records below still use
+    // Retain the frozen legacy friction journal. Its retired work.friction type cannot be appended to a
+    // current Work registry, so the journal comes from a committed fixture; new records below still use
     // the native writer on top of these real existing journal bytes.
     const frictionDir = path.join(fgosDir, 'observe/friction');
     fs.mkdirSync(frictionDir, { recursive: true });

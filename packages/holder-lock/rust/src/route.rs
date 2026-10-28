@@ -27,8 +27,8 @@ mod hold;
 /// carries 2, so an older facade fails closed on either side.
 pub const PROTOCOL: u64 = 2;
 
-/// The protocol of `quiesce-scan`, a read-only scan its callers (the cutover
-/// fence, `fgctl` activation) pin on their own. It does not move with the
+/// The protocol of `quiesce-scan`, a read-only scan its caller (`fgctl`
+/// activation) pins on its own. It does not move with the
 /// lock-route protocol.
 pub const SCAN_PROTOCOL: u64 = 1;
 
