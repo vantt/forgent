@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { borrowSync, borrowAsync, removeWorkDir, probeSharedSync } from '../../src/holder-lock/hold-transport.mjs';
+import { borrowSync, borrowAsync, removeWorkDir } from '../../src/holder-lock/hold-transport.mjs';
 
 const RESPONDER = `
 const fs = require('node:fs');
@@ -163,39 +163,3 @@ test('sync hold capture honors per-call limits and refuses oversized path lists'
     assert.deepEqual(fs.readdirSync(hold.work).filter((f) => /^(req|started|out|err|result)-/.test(f)), []);
   } finally { endHold(hold); }
 });
-
-// A stand-in host binary for the shared try: it records its argv, answers the
-// way `lock-hold` does through ready.json, and stays alive like a holder until
-// it is terminated.
-function fakeHoldHost(dir, answer) {
-  const bin = path.join(dir, 'fake-host');
-  const body = `#!${process.execPath}
-const fs = require('node:fs');
-const path = require('node:path');
-const argv = process.argv.slice(2);
-const work = argv[argv.indexOf('--work') + 1];
-fs.writeFileSync(path.join(${JSON.stringify(dir)}, 'argv.json'), JSON.stringify(argv));
-fs.writeFileSync(path.join(work, 'ready.tmp'), JSON.stringify(Object.assign({ v: 2, protocol: 2 }, ${JSON.stringify(answer)})));
-fs.renameSync(path.join(work, 'ready.tmp'), path.join(work, 'ready.json'));
-if (${JSON.stringify(answer.result)} === 'acquired') setInterval(() => {}, 1000);
-`;
-  fs.writeFileSync(bin, body, { mode: 0o755 });
-  return bin;
-}
-
-for (const [answer, expected] of [[{ result: 'acquired' }, 'free'], [{ result: 'held', reason: 'kernel-lock-held' }, 'held'], [{ result: 'unavailable', reason: 'unsupported-platform' }, 'unavailable']]) {
-  test(`a shared try through the hold helper reads ${answer.result} as ${expected} and leaves no helper or directory`, () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-probe-shared-'));
-    try {
-      const lockPath = path.join(dir, 'main-checkout.lock');
-      fs.writeFileSync(lockPath, '');
-      const probed = probeSharedSync({ bin: fakeHoldHost(dir, answer), lockPath, env: process.env });
-      assert.equal(probed.result, expected);
-      const argv = JSON.parse(fs.readFileSync(path.join(dir, 'argv.json'), 'utf8'));
-      assert.deepEqual([argv[argv.indexOf('--mode') + 1], argv.includes('--try')], ['sh', true]);
-      assert.equal(fs.existsSync(argv[argv.indexOf('--work') + 1]), false);
-    } finally {
-      fs.rmSync(dir, { recursive: true, force: true });
-    }
-  });
-}

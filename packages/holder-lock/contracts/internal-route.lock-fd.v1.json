@@ -7,7 +7,8 @@
     "mode": {
       "exactlyOne": [
         { "flag": "--borrowed-check <path>", "meaning": "borrower test for hooks: fd 3 must have the same dev:ino as <path> and a non-blocking LOCK_EX on it must succeed (a description that already holds the lock succeeds; a sibling that opened the file itself fails). On Windows it takes no slot and uses FGOS_LOCK_JOB (holder-lock.port.v1.json borrowerCheck)" },
-        { "flag": "--shared-try", "meaning": "one non-blocking LOCK_SH attempt on fd 3; result free or held; the caller closes fd 3 afterwards. It never waits and never obstructs a holder." }
+        { "flag": "--shared-try", "meaning": "one non-blocking LOCK_SH attempt on fd 3; result free or held; the caller closes fd 3 afterwards. It never waits and never obstructs a holder. Windows answers unavailable (unsupported-platform): use --shared-try-path." },
+        { "flag": "--shared-try-path <lockFile>", "meaning": "the same single non-blocking shared try on a fresh description the route opens itself, on every platform; it is how Windows probes. The existing file is opened read-only (never created, truncated or cleaned) and no predecessor admission runs. The lock is released and the handle closed before the answer is written. Answers free, held or unavailable like --shared-try; an unopenable file is an error." }
       ]
     },
     "unknownFlag": "usage error, exit 2"
