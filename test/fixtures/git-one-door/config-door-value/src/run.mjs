@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { readConfig } from './config.mjs';
+import { readConfig } from './config/facade.mjs';
 
 export function runSetup(root) {
   const commands = readConfig({ projectRoot: root, sections: ['setup'] }).value.setup?.commands ?? [];
