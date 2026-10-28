@@ -26,14 +26,13 @@ import { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS, runTimeoutProblem } from './run
 import { parseTierCell, isExtendedTierCell, REASONING_EFFORT_VALUES } from './tier-cell.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ConfigDoorError, readConfig, readStandardValue } from '../../config/facade.mjs';
+import { ConfigDoorError, checkConfig, readConfig, readStandardValue } from '../../config/facade.mjs';
 import { describeYamlError, parseYaml } from '../../util/yaml.mjs';
 import { validateProviderAccountInventory } from './provider-capacity.mjs';
 // EXECUTOR_ADAPTERS lives in ./adapters.mjs (leaf module) so config loading
 // can validate adapter names without importing transport.mjs (cutting the
 // prior config.mjs <-> transport.mjs import cycle).
 import { EXECUTOR_ADAPTERS } from './adapters.mjs';
-import { assertNoRetiredKeys, checkDoorRefusalsForRetiredKeys } from './retired-config-keys.mjs';
 import { detectRetiredPatternKeys } from '../execution/patterns/retired-keys.mjs';
 import { credentialStoreProblem } from './provider-capacity.mjs';
 import {
@@ -198,6 +197,63 @@ function dropGlobalExtendedTierCells(cfg, origins) {
  * and naming every refusal's file and position, never a value. A project with no `runner.executor` set and
  * no assistant CLI on PATH has none to run: the error names the command that sets one.
  */
+/**
+ * Maps a ConfigDoorError's refusals to a RunnerConfigError with code 'config-key-retired'
+ * when the refusal path corresponds to a retired key. Calls checkConfig once on refusal.
+ */
+export function checkDoorRefusalsForRetiredKeys(err, options = {}) {
+  if (!err) return;
+  let checkFindings = [];
+  try {
+    const checkRes = checkConfig({ projectRoot: options.projectRoot });
+    checkFindings = checkRes.findings ?? [];
+  } catch (checkErr) {
+    if (checkErr.refusals) {
+      checkFindings = checkErr.refusals;
+    }
+  }
+
+  const candidates = [...checkFindings, ...(Array.isArray(err.refusals) ? err.refusals : [])];
+  for (const entry of candidates) {
+    if (!entry.path) continue;
+    const detected = detectRetiredPatternKeys(entry.path);
+    for (const item of detected) {
+      if (item.code === 'config-key-retired') {
+        const displayFile = entry.file?.startsWith('global:')
+          ? `~/.fgos/${entry.file.replace(/^global:/, '')}`
+          : (entry.file ?? '<file>');
+        const pos = Number.isInteger(entry.line) ? `:${entry.line}:${entry.column}` : '';
+        const where = `${displayFile}${pos}`;
+        throw new RunnerConfigError(
+          `${where}: ${item.key} was retired; ${item.instruction}.`,
+          { code: 'config-key-retired' },
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Asserts that `runnerRaw` holds no retired keys, throwing RunnerConfigError.
+ * Mixed shape throws a plain config error; pure retired keys throw with code 'config-key-retired'.
+ */
+export function assertNoRetiredKeys(runnerRaw, file) {
+  const fileName = file ?? '<config>';
+  const patterns = runnerRaw?.patterns ?? runnerRaw?.runner?.patterns ?? runnerRaw;
+  const detected = detectRetiredPatternKeys(patterns);
+  for (const item of detected) {
+    if (item.code === 'config-key-retired') {
+      throw new RunnerConfigError(
+        `${fileName}: ${item.key} was retired; ${item.instruction}.`,
+        { code: 'config-key-retired' },
+      );
+    }
+    throw new RunnerConfigError(
+      `runner config (${fileName} patterns.${item.name}) cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${item.name}.`,
+    );
+  }
+}
+
 export function loadRunnerConfigForDir(dir) {
   let runner;
   let origins;
@@ -1282,29 +1338,15 @@ export function validateRunnerPatternsShape(patterns, label) {
 
   // Retired keys via shared leaf detector
   for (const finding of detectRetiredPatternKeys(patterns)) {
-    if (finding.kind === 'both-shapes') {
+    if (finding.code === 'config-key-retired') {
       throw new RunnerConfigError(
-        `runner config (${label}.${finding.name}) cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${finding.name}.`,
-      );
-    }
-    if (finding.kind === 'defaultRule') {
-      throw new RunnerConfigError(
-        `runner config (${label}.defaultRule) was retired; delete the key.`,
+        `runner config (${label}.${finding.name}) was retired; ${finding.instruction}.`,
         { code: 'config-key-retired' },
       );
     }
-    if (finding.kind === 'gated') {
-      throw new RunnerConfigError(
-        `runner config (${label}.${finding.name}) was retired; use runner.patterns.research-fan-out instead.`,
-        { code: 'config-key-retired' },
-      );
-    }
-    if (finding.kind === 'tuning-only') {
-      throw new RunnerConfigError(
-        `runner config (${label}.${finding.name}) was retired; use runner.loops.${finding.name} instead.`,
-        { code: 'config-key-retired' },
-      );
-    }
+    throw new RunnerConfigError(
+      `runner config (${label}.${finding.name}) cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${finding.name}.`,
+    );
   }
 
   const RESERVED_PATTERN_NAMES = new Set(['seatBinding', 'defaultRule']);

@@ -226,6 +226,57 @@ test('retired pattern key in checkCatalog reports config-key-retired with source
   assert.equal(error.source, 'project');
   assert.match(error.message, /source layer: project/);
 });
+test('checkCatalog reports param-unknown without retired advice for tuning under non-reviewed patterns', () => {
+  const shipped = shippedCatalog();
+  const effective = {
+    panel: {
+      maxRounds: 3,
+    },
+  };
+  const layers = { panel: 'project' };
+  const { problems } = checkCatalog({ shipped, effective, layers });
+  const retired = problems.find((p) => p.code === 'config-key-retired');
+  assert.equal(retired, undefined, 'must not classify tuning under non-reviewed pattern as retired');
+  const unknownKey = problems.find((p) => p.code === 'param-unknown');
+  assert.ok(unknownKey, 'must report param-unknown');
+  assert.match(unknownKey.message, /unknown key "maxRounds"/);
+  assert.doesNotMatch(unknownKey.message, /runner\.loops/);
+});
+
+test('checkCatalog reports config-key-retired for reviewed tuning with source layer attribution', () => {
+  const shipped = shippedCatalog();
+  const effective = {
+    reviewed: {
+      maxRounds: 3,
+    },
+  };
+  const layers = { reviewed: 'project' };
+  const { problems } = checkCatalog({ shipped, effective, layers });
+  const retired = problems.find((p) => p.code === 'config-key-retired');
+  assert.ok(retired, 'must report config-key-retired');
+  assert.equal(retired.source, 'project');
+  assert.match(retired.message, /source layer: project/);
+  assert.match(retired.message, /runner\.loops\.reviewed\.maxRounds/);
+  const duplicate = problems.filter((p) => p.code === 'param-unknown' && p.message.includes('maxRounds'));
+  assert.equal(duplicate.length, 0, 'must not duplicate error as param-unknown');
+});
+
+test('checkCatalog reports config-error for reviewed mixing catalog fields with retired tuning', () => {
+  const shipped = shippedCatalog();
+  const effective = {
+    reviewed: {
+      loop: 'reviewed',
+      maxRounds: 3,
+    },
+  };
+  const layers = { reviewed: 'project' };
+  const { problems } = checkCatalog({ shipped, effective, layers });
+  const mixed = problems.find((p) => p.code === 'config-error' && p.message.includes('cannot combine pattern catalog fields'));
+  assert.ok(mixed, 'must report mixed-shape config error');
+  assert.equal(mixed.source, 'project');
+  assert.match(mixed.message, /source layer: project/);
+});
+
 
 test('reserved names used as pattern names are refused as config errors', () => {
   const shipped = shippedCatalog();

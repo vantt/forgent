@@ -420,7 +420,7 @@ export function checkCatalog(options = {}) {
     }
 
     for (const key of Object.keys(entry)) {
-      if (key === 'maxRounds' || key === 'checkersByRigor') continue;
+      if (name === 'reviewed' && (key === 'maxRounds' || key === 'checkersByRigor')) continue;
       if (!ALLOWED_PATTERN_ENTRY_KEYS.has(key)) {
         const src = resolveLayer(layers, name, key) ?? resolveLayer(layers, name);
         problems.push(new CollaborationError(

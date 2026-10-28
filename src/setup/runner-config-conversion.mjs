@@ -81,22 +81,10 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
     throw new Error(`cannot parse config file at ${targetPath}: ${err.message}`);
   }
 
-  let retired = [];
-  try {
-    retired = retiredKeysIn(parsed, targetPath);
-  } catch (err) {
-    const rev = parsed?.runner?.patterns?.reviewed ?? parsed?.patterns?.reviewed;
-    const hasTuning = rev && typeof rev === 'object' && !Array.isArray(rev) && ('maxRounds' in rev || 'checkersByRigor' in rev);
-    if (!hasTuning) {
-      throw err;
-    }
-  }
-
+  const retired = retiredKeysIn(parsed, targetPath);
   const runner = parsed?.runner ?? parsed;
   const patterns = runner?.patterns ?? {};
-  const rev = patterns?.reviewed;
-  const hasReviewedTuning = rev && typeof rev === 'object' && !Array.isArray(rev) && ('maxRounds' in rev || 'checkersByRigor' in rev);
-  const hasRetired = (retired && retired.length > 0) || hasReviewedTuning;
+  const hasRetired = Array.isArray(retired) && retired.length > 0;
   if (!hasRetired) {
     return { status: 'unchanged', written: [] };
   }
@@ -127,8 +115,8 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
     edits.push({ set: 'runner.patterns.research-fan-out', value: patterns['research-fan-out-gated'] });
     written.push('runner.patterns.research-fan-out');
   }
-
   if (patterns.reviewed !== undefined && typeof patterns.reviewed === 'object' && !Array.isArray(patterns.reviewed)) {
+    const rev = patterns.reviewed;
     const hasTuning = 'maxRounds' in rev || 'checkersByRigor' in rev;
     const hasModern = Object.keys(rev).some((k) => k !== 'maxRounds' && k !== 'checkersByRigor');
     if ('maxRounds' in rev) {

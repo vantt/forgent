@@ -363,6 +363,24 @@ test('retired keys refusal: refuses with config-key-retired naming file and repl
     (err) => err instanceof RunnerConfigError && err.code !== 'config-key-retired',
   );
 });
+test('named config with panel holding maxRounds is refused as an unknown key without retired advice', () => {
+  const { configPath } = mkTempConfig({
+    ...BASE,
+    patterns: { panel: { maxRounds: 3 } },
+  });
+  assert.throws(
+    () => loadRunnerConfig(configPath),
+    (err) => {
+      assert.ok(err instanceof RunnerConfigError);
+      assert.notEqual(err.code, 'config-key-retired');
+      assert.match(err.message, /unknown key "maxRounds"/);
+      assert.doesNotMatch(err.message, /retired/i);
+      assert.doesNotMatch(err.message, /runner\.loops\.panel/);
+      return true;
+    },
+  );
+});
+
 
 test('a file holding patterns.reviewed is byte-identical after a refused load', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-byte-identical-test-'));
@@ -407,7 +425,10 @@ test('loadRunnerConfigForDir: refuses global file holding retired keys with conf
   try {
     assert.throws(
       () => loadRunnerConfigForDir(repo),
-      (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired',
+      (err) => err instanceof RunnerConfigError
+        && err.code === 'config-key-retired'
+        && /~\/\.fgos\/config\.yaml:\d+:\d+/.test(err.message)
+        && /runner\.loops\.reviewed\.maxRounds/.test(err.message),
     );
   } finally {
     process.env.HOME = saved.HOME;
@@ -456,9 +477,13 @@ test('loadRunnerConfigForDir: other ConfigDoorError codes pass through unchanged
       },
     },
   });
+  // Project mixed shape at the door is reported with config-key-retired and advice to move tuning
   assert.throws(
     () => loadRunnerConfigForDir(repo),
-    (err) => err instanceof RunnerConfigError && err.code !== 'config-key-retired' && /cannot combine pattern catalog fields with retired loop tuning/.test(err.message),
+    (err) => err instanceof RunnerConfigError
+      && err.code === 'config-key-retired'
+      && /runner\.loops\.reviewed/.test(err.message)
+      && /config\.yaml/.test(err.message),
   );
 
   // Project pure retired key throws config-key-retired

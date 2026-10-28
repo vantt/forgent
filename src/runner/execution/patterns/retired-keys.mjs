@@ -40,21 +40,108 @@ export const RETIRED_CONFIG_KEYS = Object.freeze({
  *   hasCheckersByRigor?: boolean,
  * }>}
  */
-export function detectRetiredPatternKeys(patternsRaw) {
-  if (!patternsRaw || typeof patternsRaw !== 'object' || Array.isArray(patternsRaw)) return [];
+export function detectRetiredPatternKeys(input) {
+  if (!input) return [];
 
+  if (typeof input === 'string') {
+    if (input === 'runner.patterns.defaultRule' || input.startsWith('runner.patterns.defaultRule.')) {
+      const meta = RETIRED_CONFIG_KEYS['runner.patterns.defaultRule'];
+      return [{
+        code: 'config-key-retired',
+        classification: 'defaultRule',
+        kind: 'defaultRule',
+        name: 'defaultRule',
+        key: 'runner.patterns.defaultRule',
+        replacement: meta.replacement,
+        instruction: meta.instruction,
+        baseMessage: `runner.patterns.defaultRule was retired; ${meta.instruction}`,
+      }];
+    }
+    if (input === `runner.patterns.${RETIRED_GATED_NAME}` || input.startsWith(`runner.patterns.${RETIRED_GATED_NAME}.`)) {
+      const key = `runner.patterns.${RETIRED_GATED_NAME}`;
+      const meta = RETIRED_CONFIG_KEYS[key];
+      return [{
+        code: 'config-key-retired',
+        classification: 'gated',
+        kind: 'gated',
+        name: RETIRED_GATED_NAME,
+        key,
+        replacement: meta.replacement,
+        instruction: meta.instruction,
+        baseMessage: `${key} was retired; ${meta.instruction}`,
+      }];
+    }
+    if (input === 'runner.patterns.reviewed.maxRounds' || input.startsWith('runner.patterns.reviewed.maxRounds.')) {
+      const key = 'runner.patterns.reviewed.maxRounds';
+      const meta = RETIRED_CONFIG_KEYS[key];
+      return [{
+        code: 'config-key-retired',
+        classification: 'tuning',
+        kind: 'tuning-only',
+        name: 'reviewed',
+        key,
+        replacement: meta.replacement,
+        instruction: meta.instruction,
+        baseMessage: `${key} was retired; ${meta.instruction}`,
+        hasMaxRounds: true,
+        hasCheckersByRigor: false,
+      }];
+    }
+    if (input === 'runner.patterns.reviewed.checkersByRigor' || input.startsWith('runner.patterns.reviewed.checkersByRigor.')) {
+      const key = 'runner.patterns.reviewed.checkersByRigor';
+      const meta = RETIRED_CONFIG_KEYS[key];
+      return [{
+        code: 'config-key-retired',
+        classification: 'tuning',
+        kind: 'tuning-only',
+        name: 'reviewed',
+        key,
+        replacement: meta.replacement,
+        instruction: meta.instruction,
+        baseMessage: `${key} was retired; ${meta.instruction}`,
+        hasMaxRounds: false,
+        hasCheckersByRigor: true,
+      }];
+    }
+    if (Object.hasOwn(RETIRED_CONFIG_KEYS, input)) {
+      const meta = RETIRED_CONFIG_KEYS[input];
+      return [{
+        code: 'config-key-retired',
+        classification: 'tuning',
+        kind: 'tuning-only',
+        name: input.split('.').pop(),
+        key: input,
+        replacement: meta.replacement,
+        instruction: meta.instruction,
+        baseMessage: `${input} was retired; ${meta.instruction}`,
+      }];
+    }
+    return [];
+  }
+
+  if (Array.isArray(input)) {
+    return input.flatMap((item) => {
+      if (typeof item === 'string') return detectRetiredPatternKeys(item);
+      if (item && typeof item === 'object' && item.path) return detectRetiredPatternKeys(item.path);
+      return [];
+    });
+  }
+
+  const patternsRaw = input.patterns ?? input.runner?.patterns ?? input;
+  if (!patternsRaw || typeof patternsRaw !== 'object' || Array.isArray(patternsRaw)) return [];
   const findings = [];
 
   if (Object.hasOwn(patternsRaw, 'defaultRule')) {
     const meta = RETIRED_CONFIG_KEYS['runner.patterns.defaultRule'];
     findings.push({
-      key: 'runner.patterns.defaultRule',
-      name: 'defaultRule',
       code: 'config-key-retired',
+      classification: 'defaultRule',
       kind: 'defaultRule',
-      replacement: meta?.replacement ?? null,
-      instruction: meta?.instruction ?? 'delete the key',
-      baseMessage: `runner.patterns.defaultRule was retired; ${meta?.instruction ?? 'delete the key'}`,
+      name: 'defaultRule',
+      key: 'runner.patterns.defaultRule',
+      replacement: meta.replacement,
+      instruction: meta.instruction,
+      baseMessage: `runner.patterns.defaultRule was retired; ${meta.instruction}`,
     });
   }
 
@@ -62,50 +149,73 @@ export function detectRetiredPatternKeys(patternsRaw) {
     const key = `runner.patterns.${RETIRED_GATED_NAME}`;
     const meta = RETIRED_CONFIG_KEYS[key];
     findings.push({
-      key,
-      name: RETIRED_GATED_NAME,
       code: 'config-key-retired',
+      classification: 'gated',
       kind: 'gated',
-      replacement: meta?.replacement ?? 'runner.patterns.research-fan-out',
-      instruction: meta?.instruction ?? 'use runner.patterns.research-fan-out instead',
-      baseMessage: `${key} was retired; ${meta?.instruction ?? 'use runner.patterns.research-fan-out instead'}`,
+      name: RETIRED_GATED_NAME,
+      key,
+      replacement: meta.replacement,
+      instruction: meta.instruction,
+      baseMessage: `${key} was retired; ${meta.instruction}`,
     });
   }
 
-  for (const [name, entry] of Object.entries(patternsRaw)) {
-    if (name === 'defaultRule' || name === RETIRED_GATED_NAME || name === 'seatBinding') continue;
-    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
+  if (Object.hasOwn(patternsRaw, 'reviewed')) {
+    const entry = patternsRaw.reviewed;
+    if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+      const hasMaxRounds = Object.hasOwn(entry, 'maxRounds');
+      const hasCheckersByRigor = Object.hasOwn(entry, 'checkersByRigor');
+      const hasTuning = hasMaxRounds || hasCheckersByRigor;
+      const hasCatalog = Object.hasOwn(entry, 'loop')
+        || Object.hasOwn(entry, 'defaults')
+        || Object.hasOwn(entry, 'promise')
+        || Object.hasOwn(entry, 'invariants');
 
-    const hasMaxRounds = Object.hasOwn(entry, 'maxRounds');
-    const hasCheckersByRigor = Object.hasOwn(entry, 'checkersByRigor');
-    const hasTuning = hasMaxRounds || hasCheckersByRigor;
-    const hasCatalog = Object.hasOwn(entry, 'loop')
-      || Object.hasOwn(entry, 'defaults')
-      || Object.hasOwn(entry, 'promise')
-      || Object.hasOwn(entry, 'invariants');
-
-    if (hasTuning && hasCatalog) {
-      findings.push({
-        key: `runner.patterns.${name}`,
-        name,
-        code: 'config-error',
-        kind: 'both-shapes',
-        replacement: null,
-        instruction: `move tuning to runner.loops.${name}`,
-        baseMessage: `pattern "${name}" cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${name}`,
-      });
-    } else if (hasTuning && !hasCatalog) {
-      findings.push({
-        key: `runner.patterns.${name}`,
-        name,
-        code: 'config-key-retired',
-        kind: 'tuning-only',
-        replacement: `runner.loops.${name}`,
-        instruction: `use runner.loops.${name} instead`,
-        baseMessage: `runner.patterns.${name} was retired; use runner.loops.${name} instead`,
-        hasMaxRounds,
-        hasCheckersByRigor,
-      });
+      if (hasTuning && hasCatalog) {
+        findings.push({
+          code: 'config-error',
+          classification: 'mixed',
+          kind: 'both-shapes',
+          name: 'reviewed',
+          key: 'runner.patterns.reviewed',
+          replacement: null,
+          instruction: 'move tuning to runner.loops.reviewed',
+          baseMessage: 'pattern "reviewed" cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.reviewed',
+          hasMaxRounds,
+          hasCheckersByRigor,
+        });
+      } else if (hasTuning) {
+        if (hasMaxRounds) {
+          const meta = RETIRED_CONFIG_KEYS['runner.patterns.reviewed.maxRounds'];
+          findings.push({
+            code: 'config-key-retired',
+            classification: 'tuning',
+            kind: 'tuning-only',
+            name: 'reviewed',
+            key: 'runner.patterns.reviewed.maxRounds',
+            replacement: meta.replacement,
+            instruction: meta.instruction,
+            baseMessage: `runner.patterns.reviewed.maxRounds was retired; ${meta.instruction}`,
+            hasMaxRounds: true,
+            hasCheckersByRigor: false,
+          });
+        }
+        if (hasCheckersByRigor) {
+          const meta = RETIRED_CONFIG_KEYS['runner.patterns.reviewed.checkersByRigor'];
+          findings.push({
+            code: 'config-key-retired',
+            classification: 'tuning',
+            kind: 'tuning-only',
+            name: 'reviewed',
+            key: 'runner.patterns.reviewed.checkersByRigor',
+            replacement: meta.replacement,
+            instruction: meta.instruction,
+            baseMessage: `runner.patterns.reviewed.checkersByRigor was retired; ${meta.instruction}`,
+            hasMaxRounds: false,
+            hasCheckersByRigor: true,
+          });
+        }
+      }
     }
   }
 
