@@ -276,6 +276,22 @@ test('checkCatalog reports config-error for reviewed mixing catalog fields with 
   assert.equal(mixed.source, 'project');
   assert.match(mixed.message, /source layer: project/);
 });
+test('checkCatalog detects retired tuning when a custom pattern named patterns exists', () => {
+  const shipped = shippedCatalog();
+  const patterns = {
+    patterns: { loop: 'solo', promise: 'custom solo' },
+    reviewed: { loop: 'reviewed', maxRounds: 3 },
+  };
+  const { problems, entries } = checkCatalog({
+    shipped,
+    effective: { runner: { patterns } },
+  });
+  const mixed = problems.find((p) => p.code === 'config-error' && p.message.includes('cannot combine pattern catalog fields'));
+  assert.ok(mixed, 'must detect mixed-shape error even when a pattern named patterns exists');
+  assert.ok(entries.patterns, 'custom pattern named patterns must be kept in entries');
+  assert.ok(entries.reviewed, 'reviewed entry must be kept in entries');
+});
+
 
 
 test('reserved names used as pattern names are refused as config errors', () => {

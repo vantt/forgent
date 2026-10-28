@@ -26,13 +26,16 @@ export const RETIRED_CONFIG_KEYS = Object.freeze({
 });
 
 /**
- * Inspects `patternsRaw` for retired keys and incompatible shapes.
+ * Inspects `input` (dotted paths or pattern map object) for retired keys and incompatible shapes.
  * Returns structured findings describing each violation.
  *
- * @param {object} patternsRaw
+ * @param {string | string[] | object} input
  * @returns {Array<{
- *   key: string,
+ *   code: string,
+ *   classification: 'defaultRule' | 'gated' | 'mixed' | 'tuning',
  *   kind: 'defaultRule' | 'gated' | 'both-shapes' | 'tuning-only',
+ *   name: string,
+ *   key: string,
  *   replacement: string | null,
  *   instruction: string,
  *   baseMessage: string,
@@ -127,7 +130,7 @@ export function detectRetiredPatternKeys(input) {
     });
   }
 
-  const patternsRaw = input.patterns ?? input.runner?.patterns ?? input;
+  const patternsRaw = input;
   if (!patternsRaw || typeof patternsRaw !== 'object' || Array.isArray(patternsRaw)) return [];
   const findings = [];
 

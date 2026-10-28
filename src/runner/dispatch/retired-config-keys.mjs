@@ -14,7 +14,8 @@ export { RETIRED_CONFIG_KEYS };
  */
 export function retiredKeysIn(runnerRaw, file) {
   if (!runnerRaw || typeof runnerRaw !== 'object') return [];
-  const patterns = runnerRaw.patterns ?? runnerRaw.runner?.patterns ?? runnerRaw;
+  const patterns = runnerRaw?.runner?.patterns
+    ?? (runnerRaw?.patterns && !('loop' in runnerRaw.patterns || 'promise' in runnerRaw.patterns) ? runnerRaw.patterns : runnerRaw);
   const fileName = file ?? '<config>';
   const detected = detectRetiredPatternKeys(patterns);
   return detected.map((item) => ({

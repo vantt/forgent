@@ -359,15 +359,21 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
  * @param {boolean} [options.throwOnError] - Throw first problem if true
  * @returns {{ entries: object, merged: object, problems: Array<CollaborationError> }}
  */
+function isPatternEntry(obj) {
+  return Boolean(obj && typeof obj === 'object' && !Array.isArray(obj) && ('loop' in obj || 'promise' in obj));
+}
+
 export function checkCatalog(options = {}) {
   const shippedInput = options?.shipped ?? {};
   const effectiveInput = options?.effective ?? {};
   const layers = options?.layers ?? null;
   const throwOnError = Boolean(options?.throwOnError);
 
-  const shippedPatterns = shippedInput?.patterns ?? shippedInput ?? {};
+  const shippedPatterns = (shippedInput?.patterns && !isPatternEntry(shippedInput.patterns))
+    ? shippedInput.patterns
+    : (shippedInput?.patterns ?? shippedInput ?? {});
   const effectivePatterns = effectiveInput?.runner?.patterns
-    ?? effectiveInput?.patterns
+    ?? (effectiveInput?.patterns && !isPatternEntry(effectiveInput.patterns) ? effectiveInput.patterns : null)
     ?? (effectiveInput && typeof effectiveInput === 'object' && ('loops' in effectiveInput || 'runner' in effectiveInput) ? {} : effectiveInput)
     ?? {};
 

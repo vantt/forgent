@@ -239,7 +239,8 @@ export function checkDoorRefusalsForRetiredKeys(err, options = {}) {
  */
 export function assertNoRetiredKeys(runnerRaw, file) {
   const fileName = file ?? '<config>';
-  const patterns = runnerRaw?.patterns ?? runnerRaw?.runner?.patterns ?? runnerRaw;
+  const patterns = runnerRaw?.runner?.patterns
+    ?? (runnerRaw?.patterns && !('loop' in runnerRaw.patterns || 'promise' in runnerRaw.patterns) ? runnerRaw.patterns : runnerRaw);
   const detected = detectRetiredPatternKeys(patterns);
   for (const item of detected) {
     if (item.code === 'config-key-retired') {
