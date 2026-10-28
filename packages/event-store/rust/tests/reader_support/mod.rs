@@ -370,9 +370,14 @@ pub fn tracked_head(f: &Fixture, p: &dyn Publication, path: &[u8], bytes: &[u8])
 }
 
 /// Publishes `files` as the sealed legacy commit at `refs/fgos/legacy` and tracks the fence that names
-/// it at HEAD, as a finished cutover leaves a store. Returns the fence's bytes.
-pub fn fenced_legacy(f: &Fixture, h: &mut Handle, files: &[(&str, Vec<u8>)]) -> Vec<u8> {
-    let (oid, fence) = {
+/// it at HEAD, as a finished cutover leaves a store. Returns the legacy commit, the id of the data tree
+/// its seal names, and the fence's bytes.
+pub fn fenced_legacy(
+    f: &Fixture,
+    h: &mut Handle,
+    files: &[(&str, Vec<u8>)],
+) -> (Oid, String, Vec<u8>) {
+    let (oid, data_tree, fence) = {
         let p = f.port(h, "refs/fgos/events/test-aa");
         let mut entries = Vec::new();
         let mut shards = Vec::new();
@@ -395,21 +400,33 @@ pub fn fenced_legacy(f: &Fixture, h: &mut Handle, files: &[(&str, Vec<u8>)]) -> 
             });
         }
         let source = tracked_head(f, &p, b"events.jsonl", &files[0].1);
+        // Git orders a directory as if its name ended in a slash.
+        let git_order = |entries: &mut Vec<TreeEntry>| {
+            entries.sort_by_key(|e| {
+                let mut key = e.name.clone();
+                if e.mode == 0o040000 {
+                    key.push(b'/');
+                }
+                key
+            })
+        };
+        git_order(&mut entries);
+        let data_tree = p.write_tree(&f.repo, &entries).unwrap();
         let seal = Seal::Legacy {
             from_commit: source.as_str().into(),
-            tree_of_fgos_events: "a".repeat(40),
+            tree_of_fgos_events: data_tree.as_str().into(),
         };
         entries.push(TreeEntry {
             name: b"seal.json".to_vec(),
             mode: 0o100644,
             oid: p.write_blob(&f.repo, &seal.canonical_line().unwrap()).unwrap(),
         });
-        entries.sort_by(|a, b| a.name.cmp(&b.name));
+        git_order(&mut entries);
         let tree = p.write_tree(&f.repo, &entries).unwrap();
         let oid = commit_tree(&p, &f.repo, tree);
         let fence=serde_json::to_vec(&serde_json::json!({"legacyRefOid":oid.as_str(),"sealDigest":seal.digest().unwrap(),"fromCommit":source.as_str()})).unwrap();
         tracked_head(f, &p, b"events", &fence);
-        (oid, fence)
+        (oid, data_tree.as_str().to_string(), fence)
     };
     let path = h.path().to_path_buf();
     let authority = HolderAuthority::legacy_import(&f.repo, h, &path, "reader-test").unwrap();
@@ -418,11 +435,11 @@ pub fn fenced_legacy(f: &Fixture, h: &mut Handle, files: &[(&str, Vec<u8>)]) -> 
             &f.repo,
             &RefName::parse("refs/fgos/legacy").unwrap(),
             &ExpectedTip::Absent,
-            &ExpectedTip::Oid(oid),
+            &ExpectedTip::Oid(oid.clone()),
             "legacy",
         )
         .unwrap();
-    fence
+    (oid, data_tree, fence)
 }
 /// Counts the reads a walk asks its Git port for.
 pub struct CountingPort<'a> {

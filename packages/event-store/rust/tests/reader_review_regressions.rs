@@ -343,6 +343,22 @@ fn ignored_stream_can_advance_after_certification_without_a_false_gap() {
         .is_empty());
 }
 #[test]
+fn a_head_without_a_fence_that_tracks_the_old_event_file_is_admitted_for_writes_and_the_file_is_not_read() {
+    let f = Fixture::new();
+    let mut h = f.handle();
+    {
+        let p = f.port(&mut h, "refs/fgos/events/test-aa");
+        tracked_head(
+            &f,
+            &p,
+            b"events.jsonl",
+            b"{\"ts\":\"2026-01-01T00:00:00.000Z\",\"seq\":1,\"type\":\"work.add\"}\n",
+        );
+    }
+    fgos_event_store::legacy_import::write_readiness(&f.driver, &f.repo, "origin").unwrap();
+    assert!(read_project(&f, &Cursor::default(), &[]).legacy.is_empty());
+}
+#[test]
 fn a_legacy_history_that_appears_after_a_read_forces_a_rebuild_even_when_v4_order_is_unchanged() {
     let f = Fixture::new();
     let mut h = f.handle();

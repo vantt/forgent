@@ -102,7 +102,7 @@ fn the_tracked_fence_is_read_once_per_head_commit_however_often_the_store_reads(
     let f = Fixture::new();
     let mut h = f.handle();
     let line = |seq: u32| format!("{{\"ts\":\"2026-01-01T00:00:00.000Z\",\"seq\":{seq}}}\n");
-    let fence = fenced_legacy(&f, &mut h, &[("events.jsonl", line(1).into_bytes())]);
+    let (_, _, fence) = fenced_legacy(&f, &mut h, &[("events.jsonl", line(1).into_bytes())]);
     let p = f.port(&mut h, "refs/fgos/events/test-aa");
     let counting = CountingPort::new(&p);
     let streams = [StreamId::parse("project").unwrap()];

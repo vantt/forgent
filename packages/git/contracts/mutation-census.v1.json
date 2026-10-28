@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "337089fc864dc8dfed83457af62e09f0e58f6cd6dfc951ecb4e815b0d64345aa",
+  "payloadDigest": "75ba1f85db3b4c5a8be5b2f5e39c7e9d82944f9c1dea8a01dfaa3c8c86914d98",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -326,16 +326,16 @@
     "packages/event-store/rust/tests/distribution_compatibility.rs": "27a73fa86d90395fb62b98bc7dbc5779538cccae607023ee9e1675235d8b6ac9",
     "packages/event-store/rust/tests/framing_prefixes.rs": "f55b6b0377994d8f71841d666d3f84eae63f4655d001f0e3fe4e0e1b688f98ff",
     "packages/event-store/rust/tests/kill_append.rs": "cb2994d5e7c635094828133334a6e16e7e535426491a00e0be7ebc75d793adf7",
-    "packages/event-store/rust/tests/legacy_import.rs": "5cde431565e9959bddeaa3e4e7e2bab5097144a5877a1fe4a6093a5a16306828",
-    "packages/event-store/rust/tests/legacy_reader.rs": "565f57a52a3fa39ae13c796b6721ae94fb03d9e81ec9a157cc7cc3fdba3379a0",
+    "packages/event-store/rust/tests/legacy_import.rs": "1635bf8eaac24eab456a34fcffb3853f330682392937f3de5581ed521829027a",
+    "packages/event-store/rust/tests/legacy_reader.rs": "2e0a026991177cf762c75b72931823b6c206700e143db69b8831d0ac77d314dd",
     "packages/event-store/rust/tests/offline_sync.rs": "3bb91255c19a732217c8cfa92b86a15145dbe0e30dee1f6d3a1629f68c37c658",
     "packages/event-store/rust/tests/order_kahn.rs": "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1",
     "packages/event-store/rust/tests/p02_review.rs": "5a560dd163330beb32cac8881bc37b3cd558471d1aa7ffead138b7b686e23fe3",
     "packages/event-store/rust/tests/read_head_children.rs": "ace4600ac92f23d78a4ec5528f8d0d8e0489c8577e199e90aba5b86f7a6c94b4",
     "packages/event-store/rust/tests/read_memo.rs": "38d11b2c9cf7c153f8eb1ca24b84da0fd1e3e1380e8757af257019cab56555cd",
-    "packages/event-store/rust/tests/reader_review_regressions.rs": "040e0a0454e7398551ca223d504297f2a7aca6584a635bae792f48348d8802c0",
+    "packages/event-store/rust/tests/reader_review_regressions.rs": "c34d8d03bb0f67d212c37b980a8bf48adfaf40b1ccf3e71d14205cc9c3cb1067",
     "packages/event-store/rust/tests/reader_seal_stress.rs": "3fd1a487e4a7e6b6febaed97113d02966de5b085aff4ae10b0059152948f09b2",
-    "packages/event-store/rust/tests/reader_support/mod.rs": "e429614c964a4a962b682adb807a725beeffaa30491159be133d0387ec210d87",
+    "packages/event-store/rust/tests/reader_support/mod.rs": "a19abce9d60866441e61020fb66f48b38e2d75e9fd0338f0b4955f33f18e31b7",
     "packages/event-store/rust/tests/registry_identity_layout.rs": "99f3c965ad57b147123233794298070a75006c4f552becbb5ecffdb5247d2f89",
     "packages/event-store/rust/tests/registry_rows.rs": "4afd0326e26d038e1a2b7962cacc19bc140cd5afbb3416088b2e4798572519bb",
     "packages/event-store/rust/tests/review_fixes.rs": "d3aa5b3493b5f55d8fe3cd8809d63e9abe69598a5d26166addabd63bd1b617bb",
@@ -2159,14 +2159,14 @@
     },
     {
       "path": "packages/event-store/rust/tests/legacy_import.rs",
-      "line": 8,
+      "line": 7,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/event-store/rust/tests/legacy_import.rs",
-      "line": 90,
+      "line": 35,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2187,7 +2187,7 @@
     },
     {
       "path": "packages/event-store/rust/tests/reader_review_regressions.rs",
-      "line": 649,
+      "line": 665,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
