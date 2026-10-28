@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5ec14d2cc2fbde7837dcf9c023b2d3adfb3f2f1a66f96a58f5fa138f0097f623",
+  "payloadDigest": "08a16242b7a82af06fccce5f3325f1e9fbedc64a30a7a697fd423e68ff54333f",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1008,7 +1008,7 @@
     "src/runner/dispatch/run-lock.mjs": "6163eab9be0fa44f6ac4b80d800ddc6fc615a23d698b392df63f427e2356c53d",
     "src/runner/dispatch/run-result.mjs": "9d0bf13cc9f695ae58d60052debbdf446868260b481c6ef036f9acaa611890f9",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
-    "src/runner/dispatch/runtime-inspection.mjs": "9cfb34e1c8b7a78ac3285fb354402d2c7ab014f729b7c3557d847358dbee588b",
+    "src/runner/dispatch/runtime-inspection.mjs": "b59331ff9a15af5d5c9bb4b487285a0f8b0de6621663e6755330bcf9a4530413",
     "src/runner/dispatch/settlement.mjs": "171c6ba0444214c62db034f7ebcfc301e04de77091ea2437139f417262dac780",
     "src/runner/dispatch/shipped-catalog.mjs": "60005cdad73ebf7855294304ebea7e378ee1b1a2a0470918d1d3a25f6845969d",
     "src/runner/dispatch/stop-processes-inside.mjs": "ae37ac4e4b33d235d7da1a3bfca849980ce8816f6db86b9aec285bcccdb58c2b",
@@ -1153,7 +1153,7 @@
     "src/state/runtime-coordination.mjs": "e546b13c02a8ae1c903fe5a0bb0974dcc41f85526a82111b8d82f0c925bb8ca5",
     "src/state/status-fsm.mjs": "6853485189d2e25e6ee2a5997d11f0b2ae4e608cf5ed6332df010b2e703b76b0",
     "src/state/step-fsm.mjs": "bf1e935a355d2fbb7b8a5f0927138dea21b21c6226fe5a442c22bd1875445625",
-    "src/state/store.mjs": "c4f613873f8e635ccf5ca700465bcef994799a5b4668d97ad36c92cde5908aa9",
+    "src/state/store.mjs": "5187e524c5c4d53e932b4e07eacbb0d23e8a69cd65754f8f46e313a7b6218148",
     "src/state/tool-registry.mjs": "dd93124b68c1bc5589481d3a9220d19d25ea0f0eaa3b08e2c72e2098ac5f4991",
     "src/state/work-event-store.mjs": "a1e9476269ed8da9af7defe9d4b8201232276b15d75a7619e7bbabf022cdf22e",
     "src/state/work.mjs": "3298510e4be41ec95ee11ca4a14cb637a618143c92e1423c0e232943a2f01cc2",
