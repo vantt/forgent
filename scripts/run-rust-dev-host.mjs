@@ -65,20 +65,25 @@ export function releaseRunDir(runtimeDir, views = scan({ envKeys: HOST_ENV_KEYS 
   return true;
 }
 
-/** Remove the staged run directories that were kept for a process which has since ended. */
-export function pruneRunDirs(runtimeBase, { now = Date.now(), staleMs = STALE_RUN_DIR_MS } = {}) {
+/**
+ * Remove the staged run directories that were kept for a process which has since ended. `views` is the process scan
+ * (taken here, once, when the first stale directory is found, unless the caller supplies one). A removal that fails
+ * leaves its directory for the next prune and never throws.
+ */
+export function pruneRunDirs(runtimeBase, { now = Date.now(), staleMs = STALE_RUN_DIR_MS, views = null } = {}) {
   let names;
   try { names = fs.readdirSync(runtimeBase); } catch { return; }
-  let views = null; // one process scan for every stale directory, taken when the first one is found
   for (const name of names.filter((n) => n.startsWith('run-'))) {
     const dir = path.join(runtimeBase, name);
     let stat;
     try { stat = fs.lstatSync(dir); } catch { continue; }
     if (!stat.isDirectory() || now - stat.mtimeMs < staleMs) continue;
     views ??= scan({ envKeys: HOST_ENV_KEYS });
-    // Without a scan only age speaks: a directory this old (stale) is removed.
-    if (views === 'unsupported') fs.rmSync(dir, { recursive: true, force: true });
-    else releaseRunDir(dir, views);
+    try {
+      // Without a scan only age speaks: a directory this old (stale) is removed.
+      if (views === 'unsupported') fs.rmSync(dir, { recursive: true, force: true });
+      else releaseRunDir(dir, views);
+    } catch { /* kept for the next prune (a host still running from it holds its files on Windows) */ }
   }
 }
 

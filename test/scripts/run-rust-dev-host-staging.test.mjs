@@ -90,15 +90,13 @@ test('a directory is judged against the scan the caller supplies, not a fresh on
 
 // Where the door cannot scan (Windows, macOS) nothing proves a run directory unused: it is kept at once, and a
 // later prune removes it only when it is stale. `unsupported` is the scan the caller may pass in.
-test('with no process scan a run directory is kept, and removed only once it is stale', () => {
+test('with no process scan a run directory is kept, and a prune removes it only once it is stale', () => {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'dev-host-'));
   const { dir } = stagedRun(base, 'run-unscanned');
   assert.equal(releaseRunDir(dir, 'unsupported'), false);
   assert.ok(fs.existsSync(dir));
-  // pruneRunDirs scans for itself, so the age rule is proven where the scan is supported only through its stale floor:
-  // a young directory is never taken, whatever the scan says.
-  pruneRunDirs(base);
-  assert.ok(fs.existsSync(dir));
+  pruneRunDirs(base, { now: Date.now() + STALE_RUN_DIR_MS + 1000, views: 'unsupported' });
+  assert.equal(fs.existsSync(dir), false);
 });
 
 test('the dev door points FGOS_HOST_BIN at the staged host, replacing any inherited host', () => {
