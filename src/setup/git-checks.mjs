@@ -27,8 +27,9 @@ function context(cwd, loaderOptions) {
 const row = (problems, ok, detail, found = problems.filter(Boolean)) => found.length ? { passed: false, message: found.join('; '), detail } : { passed: true, message: ok, detail };
 
 /**
- * One Git doctor row. With a doctor `run`, rows of the run share one repository inspection (and one for the worktree
- * recovery view), so five rows cost one `inspectGit`; without one the row inspects alone.
+ * One Git doctor row. With a doctor `run`, rows of the run share one inspection of the repository for the configured
+ * remote, and one worktree recovery view; the transport-config row adds one more `inspectGit` only when that remote is
+ * not `origin`. Without a run the row inspects alone.
  */
 export function checkGit(cwd, kind, loaderOptions, portOptions, run) {
   const recovery = kind === 'git-worktree-recovery';
