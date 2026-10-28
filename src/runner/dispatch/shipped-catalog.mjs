@@ -66,5 +66,25 @@ export function catalogLayersOf(mainRoot) {
     layers[name] = layer;
   }
 
+  for (const o of origins) {
+    if (!o?.path || !o?.layer) continue;
+    const layer = o.layer === 'standard' ? 'shipped' : o.layer;
+    layers[o.path] = layer;
+    if (o.path.startsWith('runner.patterns.')) {
+      const fieldPath = o.path.slice('runner.patterns.'.length);
+      if (fieldPath.includes('.')) {
+        layers[fieldPath] = layer;
+      }
+      const parts = o.path.split('.');
+      for (let i = 4; i < parts.length; i++) {
+        const sub = parts.slice(0, i).join('.');
+        if (!layers[sub] || (layer === 'project' && layers[sub] !== 'project')) {
+          layers[sub] = layer;
+          layers[sub.slice('runner.patterns.'.length)] = layer;
+        }
+      }
+    }
+  }
+
   return layers;
 }

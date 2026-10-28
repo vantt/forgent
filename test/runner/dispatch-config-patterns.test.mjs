@@ -14,6 +14,8 @@ import {
 } from '../../src/runner/dispatch/config.mjs';
 import { readStandardValue } from '../../src/config/facade.mjs';
 import { catalogLayersOf, shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
+import { checkCatalog, resolveCollaboration } from '../../src/runner/execution/patterns/catalog.mjs';
+import { resolveLayer } from '../../src/runner/execution/patterns/catalog-entries.mjs';
 
 const standardRunner = (key) => JSON.parse(JSON.stringify(readStandardValue(key ? `runner.${key}` : 'runner').value));
 const BASE = { ...standardRunner(), executor: { command: 'claude', args: ['-p', '{prompt}'] } };
@@ -511,6 +513,67 @@ test('catalogLayersOf: answers per-pattern layer (project only, global only, bot
     assert.equal(layers['shared-pat'], 'project', 'project layer must beat global layer');
     assert.equal(layers.solo, 'shipped', 'unmodified shipped pattern must be shipped');
     assert.equal(layers.reviewed, 'shipped');
+  } finally {
+    process.env.HOME = saved.HOME;
+    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
+    else delete process.env.USERPROFILE;
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('catalogLayersOf: field-path origin reports global when an offending field is global while another field is in project, and the pin layer stays project', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-split-origin-home-'));
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-split-origin-repo-'));
+
+  writeGlobalConfig(home, {
+    runner: {
+      patterns: {
+        reviewed: { loop: 'solo' },
+        'valid-split': { loop: 'solo' },
+      },
+    },
+  });
+
+  writeProjectConfig(repo, {
+    runner: {
+      patterns: {
+        reviewed: { promise: 'custom project promise' },
+        'valid-split': { promise: 'project promise' },
+      },
+    },
+  });
+
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+  try {
+    const layers = catalogLayersOf(repo);
+    assert.equal(layers.reviewed, 'project', 'pattern pin layer must be highest contributing layer');
+    assert.equal(resolveLayer(layers, 'reviewed'), 'project');
+    assert.equal(resolveLayer(layers, 'reviewed', 'loop'), 'global');
+    assert.equal(resolveLayer(layers, 'reviewed', 'promise'), 'project');
+
+    const shipped = shippedCatalog();
+    const effective = {
+      reviewed: {
+        loop: 'solo',
+        promise: 'custom project promise',
+      },
+    };
+
+    const { problems } = checkCatalog({ shipped, effective, layers });
+    const loopProblem = problems.find((p) => p.message.includes('loop'));
+    assert.ok(loopProblem, 'weakened loop must produce a problem');
+    assert.match(loopProblem.message, /source layer: global/, 'offending global field must report source layer global');
+
+    const collab = resolveCollaboration({
+      unit: { pattern: 'valid-split' },
+      runnerConfig: { runner: { patterns: { 'valid-split': { loop: 'solo', promise: 'project promise' } } } },
+      shipped,
+      layers,
+    });
+    assert.equal(collab.pin.pattern.layer, 'project', 'pin layer must remain project');
   } finally {
     process.env.HOME = saved.HOME;
     if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;

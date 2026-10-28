@@ -325,3 +325,37 @@ test('dry bind accepts pre-resolved collaboration and binds project-declared pat
   assert.equal(fromPattern.seats.length, 1);
   assert.equal(fromPattern.seats[0].executor, 'alpha');
 });
+
+test('checkSeatBindingDryBind reports unknown pattern and invalid params in activity units of an activity-only guide', async () => {
+  const unknownPatternWorkflow = `
+id: activity-unknown-pattern-guide
+activities:
+  - id: act-unknown
+    unit:
+      pattern: non-existent-pattern
+`;
+  const unknownResult = await run(unknownPatternWorkflow, { 'fixture:draft': prefer('alpha') });
+  assert.equal(unknownResult.passed, false);
+  assert.match(unknownResult.message, /activity-unknown-pattern-guide\/act-unknown/);
+  assert.match(unknownResult.message, /pattern "non-existent-pattern" is not in the catalog/);
+
+  const badParamsWorkflow = `
+id: activity-bad-params-guide
+activities:
+  - id: act-bad-param
+    unit:
+      pattern: solo
+      params:
+        unsupportedParam: 42
+  - id: act-skipped
+    unit:
+      step: some-step
+      units:
+        - u1
+`;
+  const badParamsResult = await run(badParamsWorkflow, { 'fixture:draft': prefer('alpha') });
+  assert.equal(badParamsResult.passed, false);
+  assert.match(badParamsResult.message, /activity-bad-params-guide\/act-bad-param/);
+  assert.match(badParamsResult.message, /unknown parameter "unsupportedParam" in activity unit for loop "solo"/);
+  assert.doesNotMatch(badParamsResult.message, /act-skipped/);
+});

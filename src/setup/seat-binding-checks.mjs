@@ -1,8 +1,9 @@
 // Doctor row for Seat Binding: `seat-binding-dry-bind` (every seat of every Workflow unit binds under the committed config).
 
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
+import { resolveCollaboration } from '../runner/execution/patterns/catalog.mjs';
+import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
-
 const MAX_LISTED = 8;
 const listed = (items) => (items.length > MAX_LISTED ? `${items.slice(0, MAX_LISTED).join('; ')}; and ${items.length - MAX_LISTED} more` : items.join('; '));
 
@@ -42,9 +43,27 @@ export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConf
   const loaded = loadWorkflowDefinitions(workflowRoots(cwd, packageRoot));
   const problems = [];
   const info = [];
+  const shipped = shippedCatalog();
   let units = 0;
   let bound = 0;
   for (const wf of loaded.workflows.values()) {
+    for (const activity of wf.activities ?? []) {
+      const u = activity?.unit;
+      if (!u || typeof u !== 'object') continue;
+      if ('step' in u && 'units' in u) continue;
+      if (typeof u.pattern !== 'string' || !u.pattern.trim()) continue;
+      const label = `${wf.id}/${activity.id}`;
+      try {
+        resolveCollaboration({
+          selectors: { activityUnit: u },
+          inCase: true,
+          runnerConfig,
+          shipped,
+        });
+      } catch (err) {
+        problems.push(`${label}: ${err.message}`);
+      }
+    }
     for (const step of wf.steps) {
       for (const u of step?.units ?? []) {
         const unit = workflowUnitContract(u);

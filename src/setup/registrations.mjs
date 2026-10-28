@@ -54,6 +54,7 @@ import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { mailboxOptIn, refusedConfigName } from './mailbox-limits.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
+  loadWorkflowDefinitions,
   readWorkflowDefinitionFiles,
   withUnreadableDefinitions,
   workflowRoots,
@@ -82,7 +83,11 @@ import {
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
-import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerPatternsShape, validateRunnerLoopsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { shippedCatalog, catalogLayersOf } from '../runner/dispatch/shipped-catalog.mjs';
+import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
+import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
+import { RETIRED_CONFIG_KEYS } from '../runner/dispatch/retired-config-keys.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
@@ -100,7 +105,7 @@ import { stepById } from '../workflow/steps.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { inspectLauncher, writeLauncher } from './project-launcher.mjs';
-import { readConfig, readMachineConfig } from '../config/facade.mjs';
+import { checkConfig, readConfig, readMachineConfig } from '../config/facade.mjs';
 import { CONFIG_CHECKS, CONFIG_FIXES, isConfigDoorFailure } from './config-checks.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
@@ -474,17 +479,202 @@ export function checkRunnerGeneratedPathsConfig(cwd) {
 }
 
 export function checkRunnerPatternsConfig(cwd) {
-  let runner;
+  const problems = [];
+
+  // Check project and global config for retired keys and legacy format
   try {
-    runner = effectiveSection(cwd, 'runner');
+    const checkRes = checkConfig({ projectRoot: cwd });
+    for (const f of checkRes.findings ?? []) {
+      const display = f.file?.startsWith('global:')
+        ? path.join(process.env.HOME || os.homedir(), '.fgos', f.file.replace(/^global:/, ''))
+        : (f.file?.startsWith('project:') ? path.join(cwd, '.fgos', f.file.replace(/^project:/, '')) : (f.file ?? '<file>'));
+
+      if (f.file && f.file.endsWith('.json')) {
+        if (f.row === 'config-format-legacy-json' || (f.path && (RETIRED_CONFIG_KEYS[f.path] || f.path.startsWith('runner.patterns.')))) {
+          const msg = `${display}: legacy JSON configuration format must be migrated first; migrate the file format first`;
+          if (!problems.includes(msg)) problems.push(msg);
+        }
+      }
+      if (f.path && RETIRED_CONFIG_KEYS[f.path]) {
+        const repl = RETIRED_CONFIG_KEYS[f.path].replacement;
+        const msg = `${display}: ${f.path} was retired; ${repl ? `use ${repl} instead.` : 'delete the key.'}`;
+        if (!problems.includes(msg)) problems.push(msg);
+      } else if (f.path === 'runner.patterns.reviewed') {
+        const alreadyCaught = problems.some((p) => p.startsWith(`${display}: runner.patterns.reviewed.`));
+        if (!alreadyCaught) {
+          const msg = `${display}: runner.patterns.reviewed was retired; use runner.loops.reviewed instead.`;
+          if (!problems.includes(msg)) problems.push(msg);
+        }
+      }
+    }
+  } catch (err) {
+    if (err.refusals) {
+      for (const r of err.refusals) {
+        const display = r.file?.startsWith('global:')
+          ? path.join(process.env.HOME || os.homedir(), '.fgos', r.file.replace(/^global:/, ''))
+          : (r.file?.startsWith('project:') ? path.join(cwd, '.fgos', r.file.replace(/^project:/, '')) : (r.file ?? '<file>'));
+        if (r.path && RETIRED_CONFIG_KEYS[r.path]) {
+          const repl = RETIRED_CONFIG_KEYS[r.path].replacement;
+          const msg = `${display}: ${r.path} was retired; ${repl ? `use ${repl} instead.` : 'delete the key.'}`;
+          if (!problems.includes(msg)) problems.push(msg);
+        } else if (r.path === 'runner.patterns.reviewed') {
+          const msg = `${display}: runner.patterns.reviewed was retired; use runner.loops.reviewed instead.`;
+          if (!problems.includes(msg)) problems.push(msg);
+        }
+      }
+    }
+  }
+
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
+  }
+
+  let cfg;
+  try {
+    cfg = readConfig({
+      projectRoot: cwd,
+      sections: ['runner'],
+      origins: ['runner.patterns'],
+    });
   } catch (err) {
     return { passed: false, message: err.message };
   }
+
+  const runner = cfg?.value?.runner ?? {};
+  const effectivePatterns = runner.patterns ?? {};
+  const effectiveLoops = runner.loops ?? {};
+
   try {
-    validateRunnerPatternsShape(runner?.patterns ?? {}, 'runner.patterns');
-    validateRunnerLoopsShape(runner?.loops ?? {}, 'runner.loops');
+    validateRunnerLoopsShape(effectiveLoops, 'runner.loops');
   } catch (err) {
     return { passed: false, message: err.message };
+  }
+
+  const shipped = shippedCatalog();
+  const layers = catalogLayersOf(cwd);
+  const { entries, problems: catalogProblems } = checkCatalog({
+    shipped,
+    effective: effectivePatterns,
+    layers,
+  });
+  if (catalogProblems.length > 0) {
+    return { passed: false, message: catalogProblems.map((p) => p.message).join('; ') };
+  }
+
+  const warnings = [];
+  const info = [];
+  const hints = [];
+
+  // 1. Warnings: defaults beyond bounds
+  for (const [loopName, loopCfg] of Object.entries(effectiveLoops)) {
+    const bounds = loopCfg?.bounds;
+    if (!bounds || typeof bounds !== 'object') continue;
+    for (const [paramName, bound] of Object.entries(bounds)) {
+      if (!bound || typeof bound !== 'object') continue;
+      const { min, max } = bound;
+      for (const [patName, patEntry] of Object.entries(entries)) {
+        if (patEntry.loop === loopName && patEntry.defaults) {
+          const val = patEntry.defaults[paramName];
+          if (typeof val === 'number') {
+            if ((min !== undefined && val < min) || (max !== undefined && val > max)) {
+              warnings.push(`pattern "${patName}" default ${paramName}=${val} is beyond loop "${loopName}" bounds [${min ?? '-inf'}, ${max ?? '+inf'}] (runs unclamped)`);
+            }
+          }
+        }
+      }
+      try {
+        const packageRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
+        const loaded = loadWorkflowDefinitions(workflowRoots(cwd, packageRoot));
+        for (const wf of loaded.workflows.values()) {
+          for (const activity of wf.activities ?? []) {
+            const u = activity?.unit;
+            if (!u || typeof u !== 'object') continue;
+            const patName = typeof u.pattern === 'string' ? u.pattern : null;
+            if (!patName) continue;
+            const patEntry = entries[patName] ?? shipped.patterns?.[patName];
+            const actLoop = patEntry?.loop ?? 'solo';
+            if (actLoop === loopName && u.params) {
+              const val = u.params[paramName];
+              if (typeof val === 'number') {
+                if ((min !== undefined && val < min) || (max !== undefined && val > max)) {
+                  warnings.push(`workflow "${wf.id}" activity "${activity.id}" default ${paramName}=${val} is beyond loop "${loopName}" bounds [${min ?? '-inf'}, ${max ?? '+inf'}] (runs unclamped)`);
+                }
+              }
+            }
+          }
+        }
+      } catch {
+        // workflow loading skipped if not present
+      }
+    }
+  }
+
+  // 2. Warnings: catalog entries or runner.loops in global file
+  try {
+    const machine = readMachineConfig({ origins: ['runner.patterns', 'runner.loops'] });
+    const hasGlobal = (machine.origins ?? []).some(
+      (o) => o.layer === 'global' && (
+        o.path.startsWith('runner.loops.') ||
+        (o.path.startsWith('runner.patterns.') &&
+          o.path !== 'runner.patterns.seatBinding' &&
+          o.path !== 'runner.patterns.seatBinding.schema' &&
+          o.path !== 'runner.patterns.defaultRule')
+      )
+    );
+    if (hasGlobal) {
+      warnings.push('global config declares pattern catalog entries or runner.loops; older releases refuse that file (compatibility with older releases was not established)');
+    }
+  } catch {
+    // ignore machine read failures if any
+  }
+
+  // 3. Information: capability minCheckers omitting red-team for code/code:*
+  const capabilities = runner.capabilities ?? {};
+  for (const [capName, capDef] of Object.entries(capabilities)) {
+    if (capName === 'code' || capName.startsWith('code:')) {
+      if (capDef && typeof capDef === 'object' && Array.isArray(capDef.minCheckers)) {
+        if (!capDef.minCheckers.includes('red-team')) {
+          info.push(`capability "${capName}" minCheckers explicitly omits red-team`);
+        }
+      }
+    }
+  }
+
+  // 4. Hints: two patterns with identical loop, params and invariants
+  const patternNames = Object.keys(entries).filter((n) => n !== 'seatBinding' && n !== 'defaultRule');
+  for (let i = 0; i < patternNames.length; i++) {
+    for (let j = i + 1; j < patternNames.length; j++) {
+      const a = entries[patternNames[i]];
+      const b = entries[patternNames[j]];
+      if (
+        a.loop === b.loop &&
+        deepEqual(a.defaults ?? {}, b.defaults ?? {}) &&
+        deepEqual(a.invariants ?? {}, b.invariants ?? {})
+      ) {
+        hints.push(`patterns "${patternNames[i]}" and "${patternNames[j]}" have identical loop, params, and invariants`);
+      }
+    }
+  }
+
+  const notes = [];
+  if (warnings.length > 0) {
+    notes.push(`warning: ${warnings.join('; ')}`);
+  }
+  if (info.length > 0) {
+    notes.push(`info: ${info.join('; ')}`);
+  }
+  if (hints.length > 0) {
+    notes.push(`hint: ${hints.join('; ')}`);
+  }
+
+  if (warnings.length > 0) {
+    return { passed: true, message: notes.join('; ') };
+  }
+  if (info.length > 0) {
+    return { passed: true, message: notes.join('; ') };
+  }
+  if (hints.length > 0) {
+    return { passed: true, message: `runner patterns configuration is valid; ${notes.join('; ')}` };
   }
   return { passed: true, message: 'runner patterns configuration is valid and cumulative' };
 }

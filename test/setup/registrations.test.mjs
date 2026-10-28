@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, registerCheck, registerFix, runFixes } from '../../src/setup/checks.mjs';
 import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../../src/setup/registrations.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 
 // tsk-4xg: runFixes() below invokes every registered fix, including the
@@ -794,52 +794,162 @@ test('doctor check runner-generated-paths accepts the standard\'s empty list or 
   assert.match(unknownKey.message, /unknown key "extra"|config-schema/);
 });
 
-test('doctor check runner-patterns-config passes on the standard and on a valid project override, and fails a non-cumulative one', () => {
+test('doctor check runner-patterns-config: passes on the standard', () => {
   const tmpDir = mkTempDir();
-  const fgosDir = path.join(tmpDir, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
   assert.ok(check, 'runner-patterns-config doctor check must be registered');
+  const res = check.check(tmpDir);
+  assert.equal(res.passed, true);
+  assert.match(res.message, /valid/);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
 
-  const standard = check.check(tmpDir);
-  assert.equal(standard.passed, true);
-  assert.match(standard.message, /valid/);
-
-  // Present and valid
+test('doctor check runner-patterns-config: a retired key in the project file fails naming the file and runner.loops.reviewed', () => {
+  const tmpDir = mkTempDir();
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
   writeProjectConfig(tmpDir, {
+    runner: {
+      patterns: {
+        reviewed: { maxRounds: 3 },
+      },
+    },
+  });
+  const res = check.check(tmpDir);
+  assert.equal(res.passed, false);
+  assert.match(res.message, new RegExp(path.join(tmpDir, '.fgos', 'config.yaml').replace(/[/\\?*]/g, '\\$&')));
+  assert.match(res.message, /runner\.loops\.reviewed/);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('doctor check runner-patterns-config: a retired key in the global file fails naming the global path', () => {
+  const home = mkTempDir();
+  const repo = mkTempDir();
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+  try {
+    writeGlobalConfig(home, {
       runner: {
-        loops: {
-          reviewed: {
-            maxRounds: 2,
-            checkersByRigor: {
-              standard: ['reviewer'],
-              high: ['reviewer', 'red-team'],
-              critical: ['reviewer', 'red-team', 'tester'],
-            },
+        patterns: {
+          reviewed: { maxRounds: 3 },
+        },
+      },
+    });
+    const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+    const res = check.check(repo);
+    assert.equal(res.passed, false);
+    assert.match(res.message, new RegExp(path.join(home, '.fgos', 'config.yaml').replace(/[/\\?*]/g, '\\$&')));
+    assert.match(res.message, /runner\.loops\.reviewed/);
+  } finally {
+    process.env.HOME = saved.HOME;
+    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
+    else delete process.env.USERPROFILE;
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('doctor check runner-patterns-config: a default beyond a bound warns', () => {
+  const tmpDir = mkTempDir();
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+  writeProjectConfig(tmpDir, {
+    runner: {
+      loops: {
+        reviewed: {
+          bounds: {
+            maxRounds: { min: 1, max: 2 },
+          },
+        },
+      },
+      patterns: {
+        'heavy-review': {
+          loop: 'reviewed',
+          promise: 'a heavy review',
+          defaults: {
+            maxRounds: 5,
+          },
+        },
+      },
+    },
+  });
+  const res = check.check(tmpDir);
+  assert.equal(res.passed, true);
+  assert.match(res.message, /^warning:/);
+  assert.match(res.message, /beyond.*bound|unclamped/i);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('doctor check runner-patterns-config: a global catalog entry warns', () => {
+  const home = mkTempDir();
+  const repo = mkTempDir();
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+  try {
+    writeGlobalConfig(home, {
+      runner: {
+        patterns: {
+          'global-solo': {
+            loop: 'solo',
+            promise: 'global promise',
           },
         },
       },
     });
-  const validRes = check.check(tmpDir);
-  assert.equal(validRes.passed, true);
-  assert.match(validRes.message, /valid/);
+    const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+    const res = check.check(repo);
+    assert.equal(res.passed, true);
+    assert.match(res.message, /^warning:/);
+    assert.match(res.message, /global.*refuse|older release/i);
+  } finally {
+    process.env.HOME = saved.HOME;
+    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
+    else delete process.env.USERPROFILE;
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
 
-  // Invalid (non-cumulative checkers)
+test('doctor check runner-patterns-config: an explicit code:* minCheckers [reviewer] informs', () => {
+  const tmpDir = mkTempDir();
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
   writeProjectConfig(tmpDir, {
-      runner: {
-        loops: {
-          reviewed: {
-            checkersByRigor: {
-              standard: ['reviewer'],
-              high: ['red-team'],
-            },
-          },
+    runner: {
+      capabilities: {
+        'code:implement': {
+          minCheckers: ['reviewer'],
         },
       },
-    });
-  const invalidRes = check.check(tmpDir);
-  assert.equal(invalidRes.passed, false);
-  assert.match(invalidRes.message, /not cumulative/);
+    },
+  });
+  const res = check.check(tmpDir);
+  assert.equal(res.passed, true);
+  assert.match(res.message, /^info:/);
+  assert.match(res.message, /red-team/);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('doctor check runner-patterns-config: two identical-meaning patterns hint', () => {
+  const tmpDir = mkTempDir();
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+  writeProjectConfig(tmpDir, {
+    runner: {
+      patterns: {
+        'pat-one': {
+          loop: 'solo',
+          promise: 'first promise',
+        },
+        'pat-two': {
+          loop: 'solo',
+          promise: 'second promise',
+        },
+      },
+    },
+  });
+  const res = check.check(tmpDir);
+  assert.equal(res.passed, true);
+  assert.match(res.message, /identical/i);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 test('the mailbox check passes as not enabled until the project opts in, and names the opt-in', () => {
   const check = DOCTOR_CHECKS.find((c) => c.id === 'mailbox-hook');

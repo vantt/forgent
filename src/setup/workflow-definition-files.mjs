@@ -81,7 +81,16 @@ export function loadWorkflowDefinitions(roots) {
   const workflows = new Map();
   for (const { fileId, raw } of files) {
     const id = typeof raw?.id === 'string' && raw.id ? raw.id : fileId;
-    if (!workflows.has(id)) workflows.set(id, { id, steps: Array.isArray(raw?.steps) ? raw.steps : [] });
+    if (!workflows.has(id)) {
+      const activities = Array.isArray(raw?.activities)
+        ? raw.activities
+        : (Array.isArray(raw?.guide?.activities) ? raw.guide.activities : []);
+      workflows.set(id, {
+        id,
+        steps: Array.isArray(raw?.steps) ? raw.steps : [],
+        activities,
+      });
+    }
   }
   return { workflows, unreadable };
 }
