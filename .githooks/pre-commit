@@ -26,7 +26,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
+import { resolveActiveHostBin, routeEnv } from '../src/util/host-bin-path.mjs';
 import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
 import { runLockRouteSync, lockTransport, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
 import { probeSharedSync } from '../src/holder-lock/hold-transport.mjs';
@@ -113,10 +113,8 @@ function resolveTtlMs() {
 const HOST_CALL_TIMEOUT_MS = 20_000;
 
 function hostStdout(bin, args, cwd) {
-  const env = { ...process.env };
-  delete env.FGOS_INVOCATION_RECORD_PATH;
   return execFileSync(bin, args, {
-    env, cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: HOST_CALL_TIMEOUT_MS, killSignal: 'SIGKILL', maxBuffer: 1024 * 1024, windowsHide: true,
+    env: routeEnv(), cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: HOST_CALL_TIMEOUT_MS, killSignal: 'SIGKILL', maxBuffer: 1024 * 1024, windowsHide: true,
   });
 }
 

@@ -3,6 +3,7 @@
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { nativeDoor } from '../native/door.mjs';
+import { routeEnv } from './host-bin-path.mjs';
 
 export class WriterIdentityError extends Error {
   constructor(code, message) {
@@ -48,8 +49,7 @@ export function mintAttemptWriterId(attemptId) {
 
 /** Doctor's probe: asks host binary `bin` (`fgos identity`) for this process's answer. Codes: host-missing, host-version-mismatch, host-error. */
 export function probeIdentity(bin, fgosDir) {
-  const env = { ...process.env };
-  delete env.FGOS_INVOCATION_RECORD_PATH;
+  const env = routeEnv();
   const args = ['identity', '--pid', String(process.pid), ...(fgosDir ? ['--fgos-dir', path.resolve(fgosDir)] : [])];
   let stdout;
   try {

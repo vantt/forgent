@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
-import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
+import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { mintMachineId, mintMachineKey } from '../util/identity-mint.mjs';
 import { FGOS_FILE, resolveFgosFile } from '../state/fgos-file-registry.mjs';
 
@@ -33,8 +33,7 @@ function askIdentity(cwd, verb, { hostBin, missing, missingResult, valid = isIde
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
   const bin = hostBin ?? resolveActiveHostBin({ fgosDir: path.join(root, '.fgos'), cwd }).bin;
   if (!bin) return { result: { passed: true, message: `warning: no host binary to ask for the ${verb} id -- run fgctl init/repair, or set FGOS_HOST_BIN` } };
-  const env = { ...process.env };
-  delete env.FGOS_INVOCATION_RECORD_PATH;
+  const env = routeEnv();
   let stdout;
   try {
     stdout = execFileSync(bin, ['identity', verb, '--json'], {

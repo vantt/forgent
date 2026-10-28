@@ -31,9 +31,9 @@ import { HolderLockError, DEFAULT_KILL_WAIT_MS, LOCK_FD_ENV, LOCK_FD_SLOT, LOCK_
 import { resolveLock, loadLockRegistry, lockEntry } from './registry.mjs';
 import { LockScope, createLockScope, assertLockScope } from './lock-scope.mjs';
 import { resolveStateRoot, resolveLockRoot } from './state-root.mjs';
+import { routeEnv } from '../util/host-bin-path.mjs';
 import {
   hostBin,
-  routeEnv,
   runLockRouteSync,
   assertDriverUsable,
   assertLockDoor,

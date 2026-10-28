@@ -14,10 +14,9 @@
 // ordinary resolution applies and FGOS_HOST_BIN is honoured.
 
 import { spawnSync } from 'node:child_process';
-import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
+import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
 import { OWN_PAYLOAD_ROOT, releasePayloadRoot, realpathOrNull } from '../run-supervisor/payload-root.mjs';
-import { routeEnv } from '../holder-lock/driver.mjs';
 
 export const PROTOCOL = 1;
 /** Same bound as the other short host routes (src/util/host-bin.mjs). */

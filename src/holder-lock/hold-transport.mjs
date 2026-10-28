@@ -23,7 +23,8 @@ import { EventEmitter } from 'node:events';
 import { Readable } from 'node:stream';
 import { spawn } from 'node:child_process';
 import { HolderLockError, PROTOCOL, DEFAULT_KILL_WAIT_MS, parseRouteLine } from './protocol.mjs';
-import { routeLineOrThrow, routeEnv, ROUTE_SLACK_MS } from './driver.mjs';
+import { routeLineOrThrow, ROUTE_SLACK_MS } from './driver.mjs';
+import { routeEnv } from '../util/host-bin-path.mjs';
 import { observe, resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
 
 const WORK_PREFIX = 'fgos-lock-hold-';
