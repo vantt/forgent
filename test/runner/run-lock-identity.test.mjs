@@ -1,8 +1,9 @@
 // Phase 02 H1: acquireRunControl's reclaim decision must be proven-dead
 // identity, not raw PID liveness alone -- a PID reused by an unrelated
 // process after the real holder died must never be mistaken for the same
-// holder. Exercises resolveHolderLiveness's full decision table through the
-// real acquireRunControl entry point (fixtures craft the holder record
+// holder. The liveness verdict table is owned by
+// test/process/process-facts-vectors.test.mjs; this file exercises the reclaim
+// decision through the real acquireRunControl entry point (fixtures craft the holder record
 // directly rather than mocking /proc, since real PID liveness/bootId are
 // the only fs state this depends on).
 

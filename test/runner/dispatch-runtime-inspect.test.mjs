@@ -76,8 +76,7 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   // direct reading: runner/paths.mjs `fgosDirFromRoot` (a path join);
   // dispatch/visibility-session.mjs `readVisibility` (one JSON read);
   // dispatch/run-lock.mjs `listGenerations` and `inspectRunControl` (directory
-  // and JSON reads, plus `isProcessAlive`'s `process.kill(pid, 0)`, which sends
-  // no signal and only asks whether the pid exists). Their writers (acquire,
+  // and JSON reads). Their writers (acquire,
   // release, the visibility session) are not reachable from `inspect.mjs`.
   const isProvenLeaf = (file) => {
     const f = file.replaceAll('\\', '/');
