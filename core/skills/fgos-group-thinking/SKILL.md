@@ -5,13 +5,13 @@ description: >-
   Launch, resume, or render replay for named discussion Workflows
   (`council-lite`, `delphi`, `nominal-group`, `group-cognition`,
   `business-discussion`, `architecture-advisory`)
-  and CollaborationPattern presets (`rfc`, `consult`, `research-fan-out`).
-  This is the execution door for named workflows and discussion presets.
+  and collaboration patterns (`rfc`, `consult`, `research-fan-out`).
+  This is the execution door for named workflows and discussion patterns.
   Use fgos-advise for a person's
   natural-language panel/review/compare/red-team request; use this skill
-  when a preset, workflow, or operator already selected the discussion shape.
+  when a pattern, workflow, or operator already selected the discussion shape.
   Examples: "run the delphi workflow for this decision", "start council-lite
-  with these options", "start nominal-group workflow", "run rfc preset for this
+  with these options", "start nominal-group workflow", "run rfc pattern for this
   proposal", "resume workflow run wf_xyz".
 ---
 
@@ -20,7 +20,7 @@ description: >-
 [`fgos-advise`](../fgos-advise/SKILL.md) chooses the route; this skill executes
 what was already chosen. It is a core-facing execution gate, not the end-user
 vocabulary surface: fgos-advise accepts natural language, infers the request
-kind, and routes to a named Workflow or CollaborationPattern preset. Never ask a person to supply a workflow ID or protocol ID merely because
+kind, and routes to a named Workflow or collaboration pattern. Never ask a person to supply a workflow ID or protocol ID merely because
 this lower layer executes named definitions.
 
 Discussion patterns in fgOS are represented as:
@@ -32,11 +32,12 @@ Discussion patterns in fgOS are represented as:
    - `group-cognition`: Group cognition (sense-making -> dialectical inquiry -> action synthesis)
    - `business-discussion`: Business deliberation (framing -> perspectives -> critique -> synthesis -> approval gate -> roadmap)
    - `architecture-advisory`: Architecture advisory panel (framing -> 3-panelist shaping -> critique with red-team -> synthesis -> explanation)
-2. **Single-Unit CollaborationPattern Presets** in `src/runner/execution/patterns/presets.mjs`:
-   - `rfc`: Reviewed collaboration pattern (1 critique round with red-team)
-   - `consult`: Solo advisor pattern (`pattern: solo`, role: `advisor`)
-   - `research-fan-out`: Panel pattern (`pattern: panel`, 3 members)
-   - `code-change`: Reviewed code implementation pattern
+2. **Single-Unit collaboration patterns** in the effective Config's `runner.patterns`
+   (shipped declarations: `core/config-standard/runner.yaml`):
+   - `rfc` uses the `reviewed` loop, with 1 critique round and reviewer and red-team checkers by default.
+   - `consult` uses the `solo` loop with an advisor seat.
+   - `research-fan-out` uses the `panel` loop with 3 researchers and a synthesizer by default.
+   - `code-change` uses the `reviewed` loop with reviewer and red-team checkers.
 ## Role split: coordinates research, is never the researcher
 
 This skill coordinates multiple contributions — deliberation, independent
@@ -51,7 +52,7 @@ several agents' contributions genuinely need coordinating — e.g. several
 research passes need synthesizing, or the same question needs
 cross-provider review.
 
-## 1. Discover available Workflows & Presets
+## 1. Discover available Workflows & Patterns
 
 Workflows are declared in `core/workflows/*.yaml` and validated by
 `src/workflow/definition.mjs`. Use the Workflow loader to list registered workflows:
@@ -60,8 +61,10 @@ Workflows are declared in `core/workflows/*.yaml` and validated by
 fgos workflow start --help
 ```
 
-Single-unit collaboration pattern presets are defined in
-`src/runner/execution/patterns/presets.mjs` (`consult`, `research-fan-out`, `rfc`, `code-change`).
+Read `fgos config show --path runner.patterns` for the effective single-unit
+collaboration pattern catalog. `core/config-standard/runner.yaml` declares the
+shipped patterns, including `consult`, `research-fan-out`, `rfc` and `code-change`;
+project and global Config may declare more names over the four loops.
 
 ## 2. Start a Discussion Workflow
 
@@ -150,20 +153,23 @@ To resume an interrupted or parked workflow without an explicit answer:
 fgos workflow resume <workflowRunId>
 ```
 
-## 4. Run Single-Unit Collaboration Presets
+## 4. Run Single-Unit Collaboration Patterns
 
-Single-unit presets (`consult`, `research-fan-out`, `rfc`) execute directly
-via their resolved CollaborationPattern:
+Single-unit patterns (`consult`, `research-fan-out`, `rfc`) execute directly
+through the run door. For example:
 
 ```bash
-fgos run --pattern <preset>
+fgos run --pattern rfc --unit <file>
 ```
+
+Put the request and artifact paths in the Unit's `objective`; omit its `pattern`
+or name the same catalog pattern, else the door refuses `selector-conflict`.
 
 ## Invariants and Safety
 
 - **Single Authority:** `src/workflow/runner.mjs` is the sequencer; `src/runner/execution/bind.mjs` is the binding authority; `src/runner/execution/run.mjs` is the unit execution door.
 - **Inputs & Visibility:** Step inputs and pane isolation enforce visibility boundaries (e.g. blind proposals in `delphi` round 1, silent generation in `nominal-group`).
-- **No Protocol IDs:** Presets and routes identify workflows and patterns strictly by their canonical names (`delphi`, `nominal-group`, `group-cognition`, `rfc`, etc.).
+- **No Protocol IDs:** Patterns and routes identify workflows and patterns strictly by their canonical names (`delphi`, `nominal-group`, `group-cognition`, `rfc`, etc.).
 ## The gate, and why it holds
 This gate forwards requests directly to the Workflow Runner or unit execution
 subsystem. It guarantees that:

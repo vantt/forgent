@@ -69,17 +69,29 @@ naming the case:
 
 ```sh
 fgos run "<slice objective, with the plan phase and locked decisions it rests on>" \
-  --case <caseId> --activity <activity> [--route should|may-instead|unlisted --reason "<text>"] \
+  --case <caseId> --activity <activity> [--route should|may-instead|unlisted] [--reason "<text>"] \
   --capability <c> --rigor <r> \
   [--writes <paths> --worktree <path> --verify "<narrow pass/fail command>"] \
-  [--input <plan.md>,<phase file>] [--pattern <name>] [--persona <name>] [--timeout <dur>] --json
+  [--input <plan.md>,<phase file>] \
+  [--pattern <name>] [--params '<json object>'] [--param <key=value>] \
+  [--persona <name>] [--timeout <dur>] --json
 ```
 
-- A writing slice names the case worktree, a `--verify` command and the pattern
-  its activity declares (`--pattern reviewed` for `implement-item`, and for
-  `fix-verify-red`, which declares none). Without `--verify` a reviewed run
-  verifies nothing; without `--pattern` the door runs `solo`. Either way the
-  delivery milestone gets no receipt.
+Changing the degree: the door inherits the activity's `unit`. Pass `--pattern`,
+`--params` or repeatable `--param` only to change the degree for this dispatch.
+A params request in a case and an explicit swap away from the activity's pattern
+require `--reason` (`request-reason-required` otherwise); standalone params do not.
+An identical explicit selector is not automatically a swap. Read the result's pin
+for the effective pattern, loop, params and the request reason: it shows what ran
+and why.
+
+- A writing slice names the case worktree and a `--verify` command. `implement-item`
+  inherits `reviewed`; `fix-verify-red` declares no unit, so it can run `solo`.
+  A solo run with `--verify` verifies once and can leave a receipt; without a
+  command it leaves none, which the milestone then shows. A reviewed run without
+  a verify command also verifies nothing. When driving from an installed release
+  older than this branch, still pass `--pattern reviewed` by hand with a verify
+  command, because an older solo run does not verify.
 - Writes are exactly the files the slice may change after your expansion (see the
   reading guide); a path the worker needs outside them comes back as `needsWrites`,
   and you decide whether to widen this slice or add another.

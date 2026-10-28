@@ -1,8 +1,9 @@
 # Request kinds and routes
 
 The one kind-to-route map for [`fgos-advise`](../SKILL.md). It describes
-selection only. The Workflow YAML (`core/workflows/*.yaml`) or preset
-(`src/runner/execution/patterns/presets.mjs`) stays authoritative for topology,
+selection only. The Workflow YAML (`core/workflows/*.yaml`) or pattern in the
+effective Config's `runner.patterns` (shipped declarations:
+`core/config-standard/runner.yaml`) stays authoritative for topology,
 rounds, blind, and gates, and for the seats of every route except the four
 generic-panel bases, whose seat lenses `--seats` may fill. Every route id below
 exists in one of those two places.
@@ -41,23 +42,24 @@ specialist skill; **"approve, then roadmap" explicitly wanted** routes to
 |---|---|---|---|
 | A | **`council-lite`**, plus `--stance-options` taken verbatim from the person's words | One blind panel with 3 fixed postures (assumptions, ship-maintain, feedback loops); split-first verdict; no gate | Options must first be generated (use C). The person wants to vote (use C). In-repo architecture (use the overlay) |
 | A + architecture | `architecture-advisory` via `fgos-architecture-panel` | Repo framing, 3 lenses, reviewed synthesis, expertise gate | The question is not architectural, or a cheap verdict is enough (use `council-lite`) |
-| B | preset **`rfc`** (reviewed, 1 round, reviewer and red-team) | Attacks one concrete artifact or decision | No artifact (ask question 2). Architecture artifact (use the specialist). Implementation requested (`fgos-run`) |
+| B | pattern **`rfc`** (reviewed, 1 round, reviewer and red-team) | Attacks one concrete artifact or decision | No artifact (ask question 2). Architecture artifact (use the specialist). Implementation requested (`fgos-run`) |
 | C | **`nominal-group`** | Silent generation, consolidation, then a **human vote** at `voting-ranking`; never claims a winner | The person is unattended: run it anyway and report that it parked at the vote. Options already supplied (use A) |
 | D | **`delphi`** | The only route with 2 blind rounds, an anonymized summary, and each seat's own previous answer | One-shot advice is enough (use A). About twice the cost |
 | E | **`group-cognition`** | Blind sense-making, reviewed critique, split-first synthesis | Options already framed (use A). An artifact exists (use B) |
 | "approve + roadmap" overlay | **`business-discussion`** | The only workflow with an approval gate and a roadmap step | The person only wants a verdict or critique (use A or B). Unattended |
-| F | preset **`research-fan-out`** | 3 researchers plus a synthesizer; no verdict rule | A decision is wanted (use A or D) |
-| G | preset **`consult`** | Solo advisor | The person said "panel", "independent" or "several" |
+| F | pattern **`research-fan-out`** | 3 researchers plus a synthesizer; no verdict rule | A decision is wanted (use A or D) |
+| G | pattern **`consult`** | Solo advisor | The person said "panel", "independent" or "several" |
 | Reopen settled architecture | `architecture-advisory-reopen` via the specialist | Revisits the parent reports with no new blind seats | No prior run exists |
 | Implement and review | `fgos-run` | Not advisory | Any advisory request |
 
 Tie-break: pick the narrower, gate-free route.
 
 Launch doors: Workflows start with `fgos workflow start <id> --request ...
-[--context-ref ...] [--stance-options ...] [--seats ...]`; presets run with
-`fgos run --pattern <preset> --unit <file>`, which has no `--request` or
-`--context-ref`, so the request and the artifact path go in the unit's
-`objective`. Both are described in `fgos-group-thinking`.
+[--context-ref ...] [--stance-options ...] [--seats ...]`; patterns use the other
+door, for example `fgos run --pattern rfc --unit <file>`. The Unit must omit
+`pattern` or name the same catalog pattern, else the door refuses `selector-conflict`.
+This door has no `--request` or `--context-ref`, so the request and the artifact
+path go in the unit's `objective`. Both doors are described in `fgos-group-thinking`.
 
 ## council-lite versus nominal-group
 
@@ -98,7 +100,7 @@ attendance, provider, model, executor, tier.
 |---|---|
 | `--request "<verbatim>"` | Always |
 | `--context-ref <path>` | Artifacts or evidence the person named or that are plainly in scope (workflow routes). With `--seats`, every seat and checker receives them, so put domain documents here |
-| `--seats "a\|b\|c"` | Only for `group-cognition`, `business-discussion`, `nominal-group`, `delphi`, and only when the request supports at least 2 distinct angles. 2-4 non-redundant entries (default 3). A lens is a short plain-text concern of 3-160 characters, one line, no braces, no `\|`, distinct; the person's own concerns, never invented standards or facts. An entry `@name` is a persona found as `<name>.yaml` in `fgos/agents/`, `domains/*/agents/` or `core/agents/` (listed with `fgos agents list` and read first, name copied verbatim, never invented, never twice); it applies to that seat alone and an unknown name refuses the start. `council-lite`, `architecture-advisory` and presets refuse it. No seat maximum: more seats than provider families share a family; each is a pane and quota, so say so when asked for more than is sensible |
+| `--seats "a\|b\|c"` | Only for `group-cognition`, `business-discussion`, `nominal-group`, `delphi`, and only when the request supports at least 2 distinct angles. 2-4 non-redundant entries (default 3). A lens is a short plain-text concern of 3-160 characters, one line, no braces, no `\|`, distinct; the person's own concerns, never invented standards or facts. An entry `@name` is a persona found as `<name>.yaml` in `fgos/agents/`, `domains/*/agents/` or `core/agents/` (listed with `fgos agents list` and read first, name copied verbatim, never invented, never twice); it applies to that seat alone and an unknown name refuses the start. `council-lite`, `architecture-advisory` and patterns refuse it. No seat maximum: more seats than provider families share a family; each is a pane and quota, so say so when asked for more than is sensible |
 | `--stance-options "a\|b\|c"` | Only for `council-lite`, `delphi`, `nominal-group`, `group-cognition`, and only when the person's words contain 2-4 mutually exclusive answers. Never paraphrased, never invented. For `nominal-group` the options normally do not exist yet, so omit |
 | `--worktree` / `--dir` | Same meaning as in `fgos-architecture-panel`: target project versus state root |
 

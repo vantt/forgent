@@ -21,9 +21,10 @@ When the user gives a natural language task or ad-hoc request:
 2. **One task → the one-liner.** Run it as one Unit straight from the prompt:
    ```sh
    fgos run "<prompt>" [--provider <id>[,<id>...]] [--persona <name>] [--capability <c>] [--rigor <r>] [--effort <level>]
-   fgos run "<prompt>" --writes <path>[,<path>...] --worktree <linked-worktree> [--pattern code-change] [--input <path>[,<path>...]] [--verify "<cmd>"]
+   fgos run "<prompt>" --writes <path>[,<path>...] --worktree <linked-worktree> [--pattern code-change] [--params '<json object>'] [--param <key=value>] [--reason "<text>"] [--input <path>[,<path>...]] [--verify "<cmd>"]
    ```
-   Without `--writes` the Unit is read-only (sandboxed). `--writes` needs a linked worktree (create one with `fgos worktree create <path> --branch <name>` or `fgos worktree create <path> --detach`); from the main checkout it is refused before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. `--input` hands the Unit repo-relative files to read; `--verify` is the command a reviewed run executes after each producing round (the preset pins none, so a reviewed run without `--verify` says it verified nothing).
+   Without `--writes` the Unit is read-only (sandboxed). `--writes` needs a linked worktree (create one with `fgos worktree create <path> --branch <name>` or `fgos worktree create <path> --detach`); from the main checkout it is refused before anything runs. `--provider` is a soft preference that `bind()` tries first and fails over from; `--capability` defaults to `execute`. `--input` hands the Unit repo-relative files to read. `--verify` runs after each producing round of the `reviewed` loop and once in the `solo` loop; it is refused on the `panel` and `debate` loops (`verify-command-unsupported`). Without a command, a reviewed run says it verified nothing and a solo run leaves no verify receipt.
+   Choose `--pattern` from `runner.patterns` in the effective Config (`fgos config show --path runner.patterns`); `core/config-standard/runner.yaml` declares the shipped patterns: `solo`, `reviewed`, `panel`, `debate`, `code-change`, `consult`, `rfc` and `research-fan-out`. Project and global Config may declare more names over the four loops. Use `--params '<json object>'` for typed request parameters, including lists and maps, or repeatable `--param key=value` for scalars typed by the loop's schema (for example `--param maxRounds=1`); repeated `--param` keys and keys shared with `--params` are refused. In a case, omit selectors to inherit the activity's `unit`; a params request or an explicit swap away from its pattern requires `--reason`, but standalone params do not. Repeating the same selector is not automatically a swap. The result's pin records the effective pattern, loop, params and request reason. A Unit file and `--pattern` must not name different patterns (`selector-conflict`); resume uses the pin and takes no new params.
 3. **Several tasks → `--units`.** Formulate the **Unit** objects (schema: `src/runner/execution/unit.mjs`):
    - `id`: descriptive kebab-case identifier (a safe branch-name segment)
    - `objective`: concise semantic description of what must be done
@@ -31,8 +32,9 @@ When the user gives a natural language task or ad-hoc request:
    - `rigor`: `low` | `standard` | `high` | `critical`
    - `writes`: list of repo-relative paths or `*`/`**` globs the unit may modify (empty = read-only)
    - `dependsOn`: array of prerequisite unit IDs
-   - `pattern`: `solo` | `reviewed` | `panel` (optional, defaults to config rule)
-   - `verify` (optional): shell command a reviewed unit runs after each producing round; `skills` (optional): skill names the work needs, served only by executors whose `supports.skills` lists them
+   - `pattern` (optional): a name in the effective `runner.patterns` catalog, resolved by the run door
+   - `params` (optional): loop parameters merged over the selected pattern's defaults and checked against its invariants and the loop's schema
+   - `verify` (optional): shell command run after each producing round of `reviewed` or once in `solo`; refused on `panel` and `debate` with `verify-command-unsupported`. `skills` (optional): skill names the work needs, served only by executors whose `supports.skills` lists them
    - `prefer` / `persona` (optional, ad-hoc Units only): a soft executor preference and a persona name
 4. Save Units to a temporary or workspace YAML file (`{ id?, title?, units: [...] }` or a list) and start them through the Workflow runner:
    ```sh
@@ -76,7 +78,7 @@ When a workflow step declares a human gate (`gate: { kind: "human" }`) or when a
 
 ## 3. Execution Invariants
 
-- **G2 Non-Infrastructure:** Units, presets, plans, and driver prompts never pin executors, providers, models, tiers, or invocations; an ad-hoc Unit (one-liner `--provider`, `prefer` in a `--units` file) may carry a soft `prefer` that `bind()` tries first and fails over from. Only a human `--override` pins; everything else is resolved by `bind()`.
+- **G2 Non-Infrastructure:** Units, patterns, plans, and driver prompts never pin executors, providers, models, tiers, or invocations; an ad-hoc Unit (one-liner `--provider`, `prefer` in a `--units` file) may carry a soft `prefer` that `bind()` tries first and fails over from. Only a human `--override` pins; everything else is resolved by `bind()`.
 - **Runner Commits, Worker Does Not:** A writing Unit's brief lists its write scope; the worker edits files and stops, never running `git add`/`git commit`. After a passing round the runner commits only paths inside the Unit's `writes` (subject from the first line of the worker's `summary`); a path the worker needs outside that scope goes in `needsWrites`, not on disk.
 - **G7 Herdr Default:** All out-of-process unit runs default to spawning in a watched `herdr` terminal pane when herdr is available, falling back to `cli` when headless.
 - **Fail-Closed Mutating Gate:** Every file mutation runs strictly inside an isolated linked git worktree matching the Unit run specification.

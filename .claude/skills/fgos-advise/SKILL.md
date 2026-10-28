@@ -7,7 +7,7 @@ description: >-
   generation and ranking, or decision red-team, in any domain. Picks the
   registered discussion Workflow (`council-lite`, `delphi`, `nominal-group`,
   `group-cognition`, `business-discussion`, `architecture-advisory`) or
-  collaboration pattern preset (`rfc`, `consult`, `research-fan-out`) from the
+  collaboration pattern (`rfc`, `consult`, `research-fan-out`) from the
   person's purpose and the role they need, without asking for a protocol id.
   Does not implement code; use fgos-run only when the person explicitly
   requests a code change plus review/red-team. This is not the interview-driven

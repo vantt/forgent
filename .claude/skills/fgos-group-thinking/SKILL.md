@@ -5,13 +5,13 @@ description: >-
   Launch, resume, or render replay for named discussion Workflows
   (`council-lite`, `delphi`, `nominal-group`, `group-cognition`,
   `business-discussion`, `architecture-advisory`)
-  and CollaborationPattern presets (`rfc`, `consult`, `research-fan-out`).
-  This is the execution door for named workflows and discussion presets.
+  and collaboration patterns (`rfc`, `consult`, `research-fan-out`).
+  This is the execution door for named workflows and discussion patterns.
   Use fgos-advise for a person's
   natural-language panel/review/compare/red-team request; use this skill
-  when a preset, workflow, or operator already selected the discussion shape.
+  when a pattern, workflow, or operator already selected the discussion shape.
   Examples: "run the delphi workflow for this decision", "start council-lite
-  with these options", "start nominal-group workflow", "run rfc preset for this
+  with these options", "start nominal-group workflow", "run rfc pattern for this
   proposal", "resume workflow run wf_xyz".
 ---
 

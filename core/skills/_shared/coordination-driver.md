@@ -38,13 +38,13 @@ Which activity next, by which route, is the driver's judgment. The guide gives d
 
 Dispatch through one of the two doors, and when the work belongs to a case, name it, read-only Units included:
 - `fgos run "<prompt>" --case <caseId> --activity <activityId> [--route should|may-instead|unlisted] [--reason <text>] [--writes <paths> --worktree <path>]` - one Unit. `--activity` is required with `--case`. A read-only run that names no case is standalone and uncounted; a run that writes needs a worktree no case owns, or the case's authority.
-- `fgos workflow start <preset>|--units <file>` - planned work, one step per Unit (a Playbook case); `fgos workflow resume` and `fgos workflow answer` continue it. A child run nested under your conductor case: `fgos workflow start ... --case <parentCaseId>` (its frame is charged to the parent first).
+- `fgos workflow start <workflow>|--units <file>` - planned work, one step per Unit (a Playbook case); `fgos workflow resume` and `fgos workflow answer` continue it. A child run nested under your conductor case: `fgos workflow start ... --case <parentCaseId>` (its frame is charged to the parent first).
 - Parallel work needs no declaration. Dispatch Units with disjoint write scopes; overlapping reservations are refused and a busy case is retryable.
 
 Run `fgos dispatch decide` before any dispatch out of the current turn.
 
 Case boundaries (what the harness cannot do for you):
-- A Playbook case (a preset such as `council-lite`) is advanced only by its own proposer. Never admit into it with `--case`, and a worker running inside a Playbook Unit never calls a door naming that case. Both are refused.
+- A Playbook case (of a workflow such as `council-lite`) is advanced only by its own proposer. Never admit into it with `--case`, and a worker running inside a Playbook Unit never calls a door naming that case. Both are refused.
 - A worker confined to a sandbox never dispatches a writer. If it needs one, it asks the conductor, who dispatches it.
 - Edits you make in your own session (Edit, Write, a subagent) are outside the ledger; the case does not see them. The approve door still guards landing.
 - Close a conductor case with `fgos workflow close <caseId>` when its closure milestones hold and no consent gate is parked. A Playbook case closes itself when it completes with a pass; a failed, blocked or parked case stays open.
