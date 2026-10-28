@@ -271,6 +271,8 @@ function memoized(key, compute) {
 }
 // How deep one evaluation may nest: a configuration value crosses many modules on its way to a spawn.
 const MAX_DEPTH = 200;
+// The one config door (`docs/platform/config/spec.md`): its `readConfig` result is configured data.
+const CONFIG_DOOR = 'src/config/facade.mjs';
 
 class JsFile {
   constructor(name, source, ctx) {
@@ -461,7 +463,7 @@ class JsFile {
     const narrowed = /^([\s\S]+?)\s*\.\s*(?:filter|slice|concat|reverse|sort)\s*\(/.exec(shape);
     if (narrowed && splitArgs(shape, narrowed[0].length - 1).close === shape.trimEnd().length - 1) return this.elements(expr.slice(0, narrowed[1].length), index, depth + 1);
     if (/^process\.argv\b/.test(expr)) return [{ external: 'command-line arguments' }];
-    if (/^readConfig\s*\(/.test(shape)) return [{ external: `config door value (${expr})` }];
+    if (/^readConfig\s*\(/.test(shape) && this.callsConfigDoor()) return [{ external: `config door value (${expr})` }];
     // `table[key]` and `table[key].list`: the elements of what any element holds there.
     const indexed = /^([A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*)\s*(?:\?\.)?\[[^\[\]]+\]((?:\??\.[A-Za-z_$][\w$]*)*)$/.exec(shape);
     if (indexed) return this.property(expr.slice(0, indexed[1].length), ['*', ...indexed[2].split(/\??\./).filter(Boolean), '*'], index, depth + 1);
@@ -547,6 +549,11 @@ class JsFile {
     return this.evaluate(body.slice(lastOpen + 2, close), index, depth + 1).map((v) => (v.lit !== undefined ? { lit: v.lit + tail } : v));
   }
 
+  /** Whether `readConfig` here is the config door: trusted by where it resolves, not by its name. */
+  callsConfigDoor() {
+    return Boolean(this.ctx) && resolveFunction(this.ctx, this, 'readConfig')?.file.name === CONFIG_DOOR;
+  }
+
   /** Values of `callee(args)`: path joins keep their last segment; local and imported functions return. */
   callValue(callee, expr, open, index, depth) {
     const shapeExpr = lexSource(expr).shape;
@@ -560,7 +567,7 @@ class JsFile {
     if (/^(fileURLToPath|url\.fileURLToPath)$/.test(callee) || callee === 'new URL') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     if (callee === 'JSON.parse') return [{ external: 'configuration file data' }];
     // The config door's result is configured data, like a parsed config file: never the door's own marshalling code.
-    if (callee === 'readConfig') return [{ external: `config door value (${expr})` }];
+    if (callee === 'readConfig' && this.callsConfigDoor()) return [{ external: `config door value (${expr})` }];
     if (/^(fs\.realpathSync|path\.basename|String)$/.test(callee)) return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     if (callee === 'Object.freeze') return argText.length ? this.evaluate(argText[0], index, depth + 1) : [{ unknown: expr }];
     // `registry.get(key)` on a module-private Map: any value the module stores in it.

@@ -11,8 +11,22 @@ import { inspectRepo } from '../../scripts/lib/git-ports.mjs';
 import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { initStore, addWork } from '../../src/state/store.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
+import { pruneRunDirs } from '../../scripts/run-rust-dev-host.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+// A finished dev invocation can leave a detached `events sync` child that still names its staged host, so
+// its run directory is legitimately kept until that child ends and a later invocation prunes it. Wait for
+// that real condition (pruning with no age floor) instead of expecting the directory gone at once.
+async function settledEntries(runtime, expectedRunDirs, timeoutMs = 20000) {
+  const runDirs = () => fs.readdirSync(runtime).filter((name) => name.startsWith('run-'));
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    pruneRunDirs(runtime, { staleMs: 0 });
+    if (runDirs().length <= expectedRunDirs || Date.now() > deadline) return fs.readdirSync(runtime);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+}
+
 const binaryName = process.platform === 'win32' ? 'fgos.exe' : 'fgos';
 const cargoOutput = path.resolve(repoRoot, process.env.CARGO_TARGET_DIR ?? 'target');
 const releaseBinary = path.join(cargoOutput, 'release', binaryName);
@@ -86,7 +100,7 @@ function fixture() {
 }
 
 for (const layout of ['default', 'shared-default', 'relative', 'absolute']) {
-  test(`dev door runs the real Node consumer from INIT_CWD with ${layout} Cargo output`, { skip: process.platform === 'win32' }, () => {
+  test(`dev door runs the real Node consumer from INIT_CWD with ${layout} Cargo output`, { skip: process.platform === 'win32' }, async () => {
     const f = fixture();
     try {
       const extraEnv = { INIT_CWD: f.subdir };
@@ -105,7 +119,7 @@ for (const layout of ['default', 'shared-default', 'relative', 'absolute']) {
       assert.equal(result.status, 0, `${result.error ?? ''}\n${result.stderr}`);
       assert.match(result.stdout, /Workspace selected by runtime cwd/);
       const runtime = path.join(f.checkout, '.fgos/runtime/dev-host');
-      assert.deepEqual(fs.readdirSync(runtime), [], 'completed invocation cleans its artifacts');
+      assert.deepEqual(await settledEntries(runtime, 0), [], 'completed invocation cleans its artifacts once no detached child names its host');
       // No INIT_CWD falls back to the invoking process's actual cwd.
       const fallbackEnv = extraEnv.CARGO_TARGET_DIR === undefined ? {} : { CARGO_TARGET_DIR: extraEnv.CARGO_TARGET_DIR };
       const fallback = f.run(['list', '--id', 'dev-consumer', '--json'], fallbackEnv, f.subdir);
@@ -227,12 +241,13 @@ if (process.argv[1] === path.join(process.env.DEV_TEST_CHECKOUT, 'bin', 'fgos.mj
     const first = await runs[0].done;
     assert.equal(first.status, 0, `${first.error ?? ''}\n${first.stderr}`);
     assert.match(first.stdout, /Workspace selected by runtime cwd/);
+    await settledEntries(runtime, 1);
     assert.equal(fs.readdirSync(runtime).filter((name) => name.startsWith('run-')).length, 1, 'one completed run never cleans the other live consumer');
     fs.writeFileSync(runs[1].release, 'release');
     const second = await runs[1].done;
     assert.equal(second.status, 0, `${second.error ?? ''}\n${second.stderr}`);
     assert.match(second.stdout, /Workspace selected by runtime cwd/);
-    assert.deepEqual(fs.readdirSync(runtime), ['user-owned']);
+    assert.deepEqual(await settledEntries(runtime, 0), ['user-owned']);
     assert.equal(fs.readFileSync(userFile, 'utf8'), 'preserve');
   } finally {
     for (const run of runs) fs.writeFileSync(run.release, 'release');
