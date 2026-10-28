@@ -190,7 +190,7 @@ test('a CLI verb that opens the store runs its triggers on maintenance facts', (
   const seal = cli(['events', 'seal', '--stream', 'project']);
   assert.equal(seal.status, 0, seal.stderr);
   assert.deepEqual(seal.calls, []);
-  assert.match(cli(['events', 'nonsense']).stderr, /events requires sync\|status\|seal\|export\|import-legacy/);
+  assert.match(cli(['events', 'nonsense']).stderr, /events requires sync\|status\|seal\|export/);
 });
 
 test('only a Land verb in a non-dispatched session sweeps retained Land candidates, at the end of the command', (t) => {
