@@ -50,11 +50,16 @@ export const STALE_RUN_DIR_MS = 10 * 60 * 1000;
  * (or its gate) started by the host keeps executing it, and its attempt steps run it again by path. A
  * detached `node bin/fgos.mjs` child (the event-store seal and publish children) runs nothing from it
  * yet, but its FGOS_HOST_BIN names the staged host it will call.
+ * Where the door cannot scan (`unsupported`: Windows, macOS) nothing proves the directory unused, so it is kept;
+ * `pruneRunDirs` removes it once it is stale.
+ * A view the scan could not read (`unreadable`) is not treated as a holder: it belongs to another user (permission
+ * denied; on Linux most views are such), and the detached child of this launcher always runs as our own user.
  * @param {string} runtimeDir
  * @param {object[]|'unsupported'} [views] a scan already taken with `HOST_ENV_KEYS`, shared across directories
  * @returns {boolean} whether the directory was removed
  */
 export function releaseRunDir(runtimeDir, views = scan({ envKeys: HOST_ENV_KEYS })) {
+  if (views === 'unsupported') return false;
   if (processesInside(runtimeDir, { envKeys: HOST_ENV_KEYS, views }).length > 0) return false;
   fs.rmSync(runtimeDir, { recursive: true, force: true });
   return true;
@@ -71,7 +76,9 @@ export function pruneRunDirs(runtimeBase, { now = Date.now(), staleMs = STALE_RU
     try { stat = fs.lstatSync(dir); } catch { continue; }
     if (!stat.isDirectory() || now - stat.mtimeMs < staleMs) continue;
     views ??= scan({ envKeys: HOST_ENV_KEYS });
-    releaseRunDir(dir, views);
+    // Without a scan only age speaks: a directory this old (stale) is removed.
+    if (views === 'unsupported') fs.rmSync(dir, { recursive: true, force: true });
+    else releaseRunDir(dir, views);
   }
 }
 
