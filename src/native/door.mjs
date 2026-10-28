@@ -33,15 +33,11 @@ function ownRelease(bin) {
 export const combinedAbiMatches = (v, napiVersion) => v.napi === napiVersion && typeof v.git === 'string' && typeof v.eventStore === 'string'
   && typeof v.process === 'number' && typeof v.durableFile === 'string' && typeof v.canonicalJson === 'number' && typeof v.holderLock === 'number'
   && typeof v.sessionIdentity === 'number' && typeof v.yaml === 'number' && v.config >= 3;
-/** Load the addon named by `descriptor`, else this payload's own release: FGOS_HOST_BIN, then the cwd's activation, then
- * `native-addon.json`. `hostBin: null` skips the host lookups. A second, different file in one process is refused by name. */
+/** Load the addon named by `descriptor`, else this payload's own release: FGOS_HOST_BIN, then the cwd's activation.
+ * `hostBin: null` skips the host lookups. A second, different file in one process is refused by name. */
 export function loadNativeAddon({ hostBin, descriptor } = {}) {
-  let found = descriptor ?? ownRelease(hostBin === undefined ? resolveActiveHostBin({ cwd: process.cwd() }).bin : hostBin);
-  let packageDescriptor = false;
-  if (!found) {
-    try { found = { manifest: JSON.parse(fs.readFileSync(path.join(OWN_PAYLOAD_ROOT, 'native-addon.json'), 'utf8')), releaseRoot: OWN_PAYLOAD_ROOT }; packageDescriptor = true; } catch (err) { if (err.code !== 'ENOENT') throw unavailable(`invalid descriptor: ${err.message}`); }
-  }
-  if (!found || (!descriptor && !packageDescriptor && !found.manifest.components?.nativeAddon)) throw Object.assign(unavailable('addon not shipped on this channel: onboard this project with `fgctl init`'), { code: 'git-addon-not-shipped' });
+  const found = descriptor ?? ownRelease(hostBin === undefined ? resolveActiveHostBin({ cwd: process.cwd() }).bin : hostBin);
+  if (!found || (!descriptor && !found.manifest.components?.nativeAddon)) throw Object.assign(unavailable('addon not shipped on this channel: onboard this project with `fgctl init`'), { code: 'git-addon-not-shipped' });
   const entry = found.manifest?.components?.nativeAddon;
   if (!entry || !safeRelative(entry.path)) throw unavailable('missing or unsafe addon path');
   if (entry.target !== `${process.platform}-${process.arch}` || entry.napiVersion !== 8 || Number(process.versions.napi) < 8) throw unavailable('target or Node-API mismatch');

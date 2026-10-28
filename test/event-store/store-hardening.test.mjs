@@ -76,7 +76,7 @@ test('store-only benchmark seed retains realistic payloads and explicit history'
 
 test('store-only worker measures append and cache without a Work consumer',t=>{
   const f=fixture(t);f.git('config','fgos.machineId','spawn-benchmark');
-  const manifest=path.join(f.temp,'native-addon.json');
+  const manifest=path.join(f.temp,'addon-descriptor.json');
   fs.writeFileSync(manifest,JSON.stringify(loaderOptions.descriptor.manifest));
   const root=loaderOptions.descriptor.releaseRoot;
   const store=benchmarkStore(f.repo,f.stateRoot,manifest,root);
@@ -143,7 +143,7 @@ test('retained native view rejects edited envelopes and an ordinary copied view 
 
 test('concurrent benchmark sessions advance the own cursor with the in-gate tail',async t=>{
   const f=fixture(t);f.git('config','fgos.machineId','spawn-benchmark');
-  const manifest=path.join(f.temp,'native-addon.json');
+  const manifest=path.join(f.temp,'addon-descriptor.json');
   fs.writeFileSync(manifest,JSON.stringify(loaderOptions.descriptor.manifest));
   const root=loaderOptions.descriptor.releaseRoot;
   const store=benchmarkStore(f.repo,f.stateRoot,manifest,root);
