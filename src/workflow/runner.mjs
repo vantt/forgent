@@ -354,7 +354,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
               const runnerConfig = loadRunnerConfigForDir(mainRoot);
               const loopFn = (name) => loopOf(name, { effective: runnerConfig });
               if (u.template?.acceptOutcomes !== undefined) {
-                const pattern = unitPatternOf(u.template);
+                const pattern = u.template.pattern || 'solo';
                 const loop = loopFn(pattern) ?? (['solo', 'reviewed', 'panel', 'debate'].includes(pattern) ? pattern : 'solo');
                 if (loop !== 'reviewed') {
                   throw new RunnerConfigError(
