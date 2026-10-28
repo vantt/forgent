@@ -18,7 +18,6 @@ const DECISION_CODE_RE =
 const DEFAULT_TEST_DIR = 'test';
 const DEFAULT_BASELINE_PATH =
   'scripts/check-decision-codes.baseline.json';
-const DEFAULT_EXCLUDE = new Set(['next-doc-id.test.mjs']);
 
 export function findDecisionCodeFindings(files) {
   const findings = [];
@@ -79,7 +78,7 @@ export function baselineFromFindings(findings) {
   return baseline;
 }
 
-function collectTestFiles(dir, exclude) {
+function collectTestFiles(dir) {
   const results = [];
   function walk(current) {
     for (const entry of fs.readdirSync(current, {
@@ -88,11 +87,7 @@ function collectTestFiles(dir, exclude) {
       const full = path.join(current, entry.name);
       if (entry.isDirectory()) {
         walk(full);
-      } else if (
-        entry.isFile() &&
-        entry.name.endsWith('.test.mjs') &&
-        !exclude.has(entry.name)
-      ) {
+      } else if (entry.isFile() && entry.name.endsWith('.test.mjs')) {
         results.push(full);
       }
     }
@@ -101,8 +96,8 @@ function collectTestFiles(dir, exclude) {
   return results;
 }
 
-function loadSourceFiles(testDir, cwd, exclude) {
-  return collectTestFiles(testDir, exclude).map((full) => ({
+function loadSourceFiles(testDir, cwd) {
+  return collectTestFiles(testDir).map((full) => ({
     file: path.relative(cwd, full).replaceAll('\\', '/'),
     lines: fs.readFileSync(full, 'utf8').split('\n'),
   }));
@@ -128,11 +123,7 @@ function runCli(argv, cwd) {
   const { testDir, baselinePath, writeBaseline } = parseArgs(argv);
   const resolvedTestDir = path.resolve(cwd, testDir);
   const resolvedBaselinePath = path.resolve(cwd, baselinePath);
-  const sourceFiles = loadSourceFiles(
-    resolvedTestDir,
-    cwd,
-    DEFAULT_EXCLUDE,
-  );
+  const sourceFiles = loadSourceFiles(resolvedTestDir, cwd);
   const findings = findDecisionCodeFindings(sourceFiles);
 
   if (writeBaseline) {

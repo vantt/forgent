@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "72fa17ee1a1b0ff5f53069d7a6d26375d5533bbc1cf1331dd6481a6d73148f1e",
+  "payloadDigest": "3ebda97e1fa1aefe7e74a9694e9260a0ee53f5de14da1af12f11edb64be3ac34",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -793,7 +793,7 @@
     "scripts/build-skill-wrappers.mjs": "ca8b0121333b29830a35553e7360f14c19254d0a157cb5f79c217ad749038242",
     "scripts/check-backlog-reconciliation.mjs": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
     "scripts/check-decision-citation-drift.mjs": "86a668ef22d023a3ac3f4cbd6e9ce4e1ee8d8667fa77206efe0840789c1b3137",
-    "scripts/check-decision-codes.mjs": "14737563df573c4d1181129cadb8b432f0492f8025c57ce1a485effc0fb39bb5",
+    "scripts/check-decision-codes.mjs": "c9f0ae0dbb6f6368eec818de11a785428d4517736f180359a344c73ad789571c",
     "scripts/check-decision-supersession.mjs": "1fc95bddf36b4485338125d5f902e69b95d66b6e34e5e60dc06cc822096a8f90",
     "scripts/check-glibc-ceiling.sh": "6ce52ee1a3197104aded910b937b593153f51915001a5946e2c822702df07e99",
     "scripts/check-hook-registrations-guarded.mjs": "eb287ab7bec0368418f04d650e20cb4a3c6ce348844152a9e6112f9643e551ae",
@@ -855,7 +855,6 @@
     "scripts/measure-coordination-baseline.mjs": "b890da1963fd4ee50ac84cd53e5e9b45aa7ce37a92d51c6a633bdb2374ec6a7a",
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
     "scripts/measure-verify-cost.mjs": "97768198548908742f0687b069fbe77dfc35839a88e4906f3813afbdd5918abc",
-    "scripts/next-doc-id.mjs": "7e88c69cf6c78b4cce5240d3fcc34a1182fc963933435827a58974df5458bc9d",
     "scripts/package-release-assets.mjs": "088b9a0ad108920363ba5b4f540fb0c93b45b2960990981ab4e7558cff5fc59e",
     "scripts/prepare-release.mjs": "66a025419962863905a07726cc68e1f8c510d50e372239a11833d60ce46ab73c",
     "scripts/probe-storytelling-material.mjs": "b2991c1c14879193953d901e9122a9e511136a91907949643b7f1af008590df4",

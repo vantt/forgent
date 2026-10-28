@@ -426,7 +426,6 @@
     "test/scripts/mailbox-live-confined.test.mjs": 7.2,
     "test/scripts/mailbox-role-recorder.test.mjs": 0.2,
     "test/scripts/mailbox-wake-probe.test.mjs": 0.1,
-    "test/scripts/next-doc-id.test.mjs": 0.1,
     "test/scripts/prepare-release.test.mjs": 0.4,
     "test/scripts/probe-storytelling-material.test.mjs": 1.1,
     "test/scripts/project-agents.test.mjs": 0.3,
