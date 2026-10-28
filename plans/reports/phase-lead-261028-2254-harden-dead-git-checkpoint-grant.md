@@ -27,10 +27,20 @@ Kept on purpose: `libc` dependency of `fgos-distribution` (removing it broke `in
 ## WAL compatibility (decided from evidence, no version change)
 
 - `ScopedCommitIntent` is `deny_unknown_fields`, and `Chain::validate` re-serializes each record to recompute its digest (`wal.rs` `record_digest`). Every intent the current release wrote carries `"cutoverGrant": null` (plain `Option`, no skip). Removing the field outright would break both parse and digest, so recovery would refuse interrupted commits.
-- Fix in the existing pattern (as `ConfigChange.config_sequence` / `RemoteFetch.targets` "preserve historical digests"): `#[serde(default, rename = "cutoverGrant", skip_serializing_if = "Option::is_none", deserialize_with = "present_null")] retired_cutover_grant: Option<()>`. `null` reads as `Some(())` and writes back as `null`, so the digest matches; new intents omit the key; a non-null grant is refused (none was ever produced).
+- Fix in the existing pattern (as `ConfigChange.config_sequence` / `RemoteFetch.targets` "preserve historical digests"): `#[serde(default, rename = "cutoverGrant", skip_serializing_if = "Option::is_none", deserialize_with = "present_null")] retired_cutover_grant: Option<()>`. `null` reads as `Some(())` and writes back as `null`, so the digest matches; new intents omit the key. A grant object is refused on purpose: only the retired `fgos events migrate` wrote one (added `10bf3e375`, removed `b6927cce9`), and there is no reader for that dead shape. Corrected in `354f74932` after OPC review (the first commit wrongly said only `null` ever existed).
 - The stored request string inside the intent is already read tolerantly (`StoredCommitRequest`, message only).
 - `recovery_matrix.rs` generates its chains live; there are no on-disk WAL fixtures with the key.
 - Known limit (same as the earlier `legacyEvents` removal): a *same-operationId commit retry* spanning the upgrade compares request digests, and the old digest included `cutoverGrant: null`, so that retry gets `operation-id-reused` instead of the recorded outcome. Recovery (`recover`) still reconciles. Not changed; flagged below.
+
+## Land condition
+
+On each machine, before it runs the new release: no retained operation under `<git-common-dir>/fgos/git/operations` may contain `legacyRefOid`. Check with `grep -rl legacyRefOid <git-common-dir>/fgos/git/operations`. If one is found, resolve that operation with the current release first; the new release refuses its intent. fg-server2 checked by OPC: 0 found among 594 retained operations.
+
+## Review follow-ups (OPC, MERGE with fixes)
+
+- `354f74932`: WAL field comment, schema description and digest test premise corrected (see WAL section).
+- `0a63b3bb4`: `-c fgos.operationId=<id>` removed from `git commit` in ScopedCommit and Sync (`commit_message` lost its `id` parameter). Nothing reads it any more. Retired test: `a_sync_commit_hook_reads_the_operation_id_the_way_a_scoped_commit_hook_does`, because the behaviour was removed.
+- Re-run after the fixes: `fgos-git` 315 passed / 0 failed / 9 ignored (one test fewer: the retired one); `fgos-node-addon` 5/0, `fgos-distribution` 107/0, `fgos` 104/0; clippy `-D warnings` clean on all four; `fgos-git` msvc and aarch64-apple-darwin checks clean; focused Node (the list below plus e2e beacon) 162 tests, 161 pass, 0 fail, 1 Windows skip, no ERROR lines; census regenerated per commit, 0 undeclared.
 
 ## Tests
 
@@ -68,9 +78,13 @@ CHANGELOG: no line. Nothing a user sees changes: the route was internal and unli
 - :765, :801, :846, :938 (item 6), :1249, :1306: G-166/G-223/P-CUTOVER effective rule -> "all tracked `.fgos` deletion refused; cutover grant removed 2026-10-28".
 - :1074 "Kept on purpose" list: optionally add the WAL null-only `cutoverGrant` key.
 
+## Answered questions (OPC)
+
+1. `fgos.operationId` commit config: remove. Done in `0a63b3bb4`.
+2. Same-id commit retry across the upgrade: accepted; `recover` reconciles the retained attempt.
+
 ## Open questions
 
-1. `commit_message` still passes `-c fgos.operationId=<id>` to `git commit`, with the comment "where the hook reads it". The repo hook no longer reads it. A Sync test pins that hooks can see it (`scoped_commit_sync.rs` ~:279). Should it stay as a hook-visible value for consumer hooks, or be removed? OPC to decide. Not changed here.
-2. Same-id commit retry across the upgrade (see WAL limit): accept, as the `legacyEvents` removal did, or teach `CommitRequest::is_recorded_as` the earlier digest form?
+None.
 
-Status: DONE_WITH_CONCERNS
+Status: DONE
