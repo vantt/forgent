@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9f22dd011867413db1bbaf89b515ac122aca0f063e81062675387cbd2e6d7224",
+  "payloadDigest": "d3361ce2c4bec30d845a1ee6212f07296c42434a358a1eedecfc10f18e95e2d1",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1178,7 +1178,7 @@
     "src/util/yaml.mjs": "5ca1154f2c97b3a1727b9f998e2f879642fedc3310cec08150308de97cf8b900",
     "src/verbs/dispatch/inspect.mjs": "f3443611ebef271256a9a52222f87d63703abaf8dd10217b1aec6313c8ad0146",
     "src/verbs/dispatch/reconcile.mjs": "caedd393114d8e85ded4323f2aaafd0f8a24a0603d9dc2e4bf8f88131d8f36e6",
-    "src/verbs/dispatch/recover.mjs": "421bb94bebb9f5b417743382ac28e31a41c2ec5ba34a49b300f584f815bc21f2",
+    "src/verbs/dispatch/recover.mjs": "756d1827e672600eae220592d0e96f78869bac8771d6e351d05e8261bd6e2d7f",
     "src/verbs/dispatch/show-run.mjs": "6ed836d83f8fc71863fc2ce04115b7d0d63f2fb1f42e8bccabc94b812cb179c9",
     "src/verbs/dispatch/watch.mjs": "e82fb8d94c5d76bc64b006bab2742e777f50785a4c4b12c91f15723864e457a3",
     "src/verbs/events/context.mjs": "d987940a160671f4495c07b6bd7c93fe19033c6920c2bab558453a5a2a4a70a5",
@@ -1209,7 +1209,7 @@
     "src/workflow/case-frame.mjs": "2a04c4b7e12046ec6bd5696157a86b973371ac51355f62374033657bcd88f527",
     "src/workflow/case-lock.mjs": "2277fb6db0004b5365c0d5add23a6e72ca67cc407d8d052ed3817364eccd8349",
     "src/workflow/case-projection.mjs": "51b9abf3ec6757c0c36dbe457ee0283a45848c382da0797b75ab75fa37ee2b86",
-    "src/workflow/case-runtime.mjs": "140328e7bc6ab01d52ca2a68d4a1e080895147262a5738d9226ad64ba3b99516",
+    "src/workflow/case-runtime.mjs": "99a7ab44a49de42cfc87e8e209c7c13a41b62c8ef1559a07edd6f0f8678f1ff7",
     "src/workflow/case-start.mjs": "b01f8b7eb5711696d0e27bf1aed4df8dc6d1996079b3ec466aa75f4a09e208cf",
     "src/workflow/case-verbs.mjs": "ad292230aeefbe7da7ae107e14a6aaf024b0a68317f5f2152a0f0c4f781123d2",
     "src/workflow/checked.mjs": "a620d840253269121e89ebb7c4cada29d38752e55f16909edb7e3a92a8dad8bf",

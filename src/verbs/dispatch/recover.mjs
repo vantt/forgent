@@ -27,6 +27,7 @@ import { findCoordinationSessionOwningAssignment } from '../../runner/dispatch/r
 import { classifyRunOutcome } from '../../runner/dispatch/visibility-session.mjs';
 import { acquireSync, createLockScope, resolveLock } from '../../holder-lock/index.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
+import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 
 export class RecoveryError extends Error {
   constructor(code, message, details = {}) {
@@ -197,7 +198,7 @@ function writeRunJsonPatch(runDir, patch) {
   const file = path.join(runDir, RUN_FILE);
   const current = JSON.parse(fs.readFileSync(file, 'utf8'));
   const next = { ...current, ...patch };
-  const tmp = `${file}.tmp-${process.pid}-${Date.now().toString(36)}`;
+  const tmp = `${file}.tmp-${uniqueTmpTag()}`;
   fs.writeFileSync(tmp, `${JSON.stringify(next, null, 2)}\n`);
   fs.renameSync(tmp, file);
   return next;
