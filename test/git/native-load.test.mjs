@@ -203,7 +203,7 @@ test('Publication marshals object writes, reads, ordered walks and receipted CAS
   } finally { port?.close(); fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
-test('staged release and npm-relative manifests resolve their own addon without PATH or cwd fallback', () => {
+test('a staged release resolves its own addon without PATH or cwd fallback, and a payload with only a native-addon.json refuses by name', () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-addon-payload-'));
   try {
     for (const channel of ['release', 'npm']) {
@@ -211,7 +211,7 @@ test('staged release and npm-relative manifests resolve their own addon without 
       const payload = channel === 'release' ? path.join(releaseRoot, 'libexec/legacy-node') : releaseRoot;
       for (const dir of ['src/git', 'src/run-supervisor', 'native']) fs.mkdirSync(path.join(payload, dir), { recursive: true });
       // Stage the actual source payload, including the loader's holder bridge
-      // and its transitive dependencies, as both packaging channels do.
+      // and its transitive dependencies, as the release does.
       fs.cpSync(path.join(root,'src'),path.join(payload,'src'),{recursive:true});
       const nativePath = path.join(payload, 'native/fgos.node');
       fs.copyFileSync(built.addon, nativePath);
@@ -219,21 +219,15 @@ test('staged release and npm-relative manifests resolve their own addon without 
       fs.mkdirSync(path.dirname(host), { recursive: true }); fs.writeFileSync(host, 'fixture host');
       const record = { ...manifest.components.nativeAddon, path: path.relative(releaseRoot, nativePath) };
       fs.writeFileSync(path.join(channel === 'release' ? releaseRoot : payload, channel === 'release' ? 'manifest.json' : 'native-addon.json'), JSON.stringify({ entries: { fgos: 'bin/fgos' }, components: { legacyNode: { root: channel === 'release' ? 'libexec/legacy-node' : '.' }, nativeAddon: record } }));
-      const script = `import {loadNativeAddon, nativeHelperExe} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/git/native.mjs')}`).href)}; const a=loadNativeAddon({hostBin:${JSON.stringify(channel === 'release' ? host : null)}}); console.log(JSON.stringify({version:a.versions().napi,helper:nativeHelperExe(a)}));`;
-      const result = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { cwd: os.tmpdir(), encoding: 'utf8' }));
-      assert.equal(result.version, 8);
-      assert.equal(result.helper, host);
-      if (channel === 'npm') {
-        const descriptorPath = path.join(payload, 'native-addon.json');
+      if (channel === 'release') {
+        const script = `import {loadNativeAddon, nativeHelperExe} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/git/native.mjs')}`).href)}; const a=loadNativeAddon({hostBin:${JSON.stringify(host)}}); console.log(JSON.stringify({version:a.versions().napi,helper:nativeHelperExe(a)}));`;
+        const result = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { cwd: os.tmpdir(), encoding: 'utf8' }));
+        assert.equal(result.version, 8);
+        assert.equal(result.helper, host);
+      } else {
+        // The descriptor beside the payload is not a channel the door reads: it refuses, naming that no addon is shipped.
         const probe = `import {loadNativeAddon} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/git/native.mjs')}`).href)}; try { loadNativeAddon({hostBin:null}); } catch(e) { console.log(e.code); }`;
-        // The door never loads the release another payload's host names (FGOS_HOST_BIN is the staged checkout's here).
         const door = `import {selfRecord} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/runner/dispatch/process-identity.mjs')}`).href)}; try { console.log(typeof selfRecord().pid); } catch(e) { console.log(e.code + ': ' + e.message); }`;
-        assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', door], { cwd: os.tmpdir(), encoding: 'utf8' }).trim(), 'number');
-        for (const value of ['{}', '{broken']) {
-          fs.writeFileSync(descriptorPath, value);
-          assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', probe], { encoding: 'utf8' }).trim(), 'git-addon-unavailable');
-        }
-        fs.rmSync(descriptorPath);
         assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', probe], { encoding: 'utf8' }).trim(), 'git-addon-not-shipped');
         assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', door], { cwd: os.tmpdir(), encoding: 'utf8' }).trim(), 'process-door-not-shipped: process-door-not-shipped: onboard this project with fgctl init');
       }

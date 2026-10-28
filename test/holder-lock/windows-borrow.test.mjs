@@ -12,7 +12,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
-import { acquireSync, runBorrowed, createLockScope, checkBorrowedDescription } from '../../src/holder-lock/index.mjs';
+import { acquireSync, runBorrowed, createLockScope, checkBorrowedDescription, resolveLock } from '../../src/holder-lock/index.mjs';
+import { runLockRouteSync, ROUTE_CALL_TIMEOUT_MS } from '../../src/holder-lock/driver.mjs';
 import { acquireAccountLock } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { runCredentialProbe } from '../../src/runner/dispatch/provider-credential-probe.mjs';
 
@@ -164,6 +165,29 @@ test('kill() cancels a blocked borrowed child within a second, and a probe timeo
     assert.deepEqual(judged, { ok: false, detail: 'the call did not finish in time' });
   } finally {
     account.release();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// The commit hook's probe on Windows: the real host opens the lock file itself, takes one shared try and answers
+// free, then held while another process holds the lock.
+test('the shared try by path answers free on an unheld lock, then held while a holder holds it', { skip: SKIP }, () => {
+  const { dir, fgosDir } = makeProject();
+  try {
+    const held = acquireSync(createLockScope('test'), LOCK, { fgosDir });
+    assert.equal(held.result, 'acquired');
+    held.handle.release();
+    const lockFile = resolveLock(LOCK, { fgosDir }).v3Path;
+    const probeByPath = () => runLockRouteSync({ bin: HOST_BIN, args: ['--shared-try-path', lockFile], timeoutMs: ROUTE_CALL_TIMEOUT_MS });
+    assert.equal(probeByPath().result, 'free');
+    const holder = acquireSync(createLockScope('test'), LOCK, { fgosDir });
+    try {
+      assert.equal(probeByPath().result, 'held');
+    } finally {
+      holder.handle.release();
+    }
+    assert.equal(probeByPath().result, 'free');
+  } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });

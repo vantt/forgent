@@ -26,10 +26,20 @@ function context(cwd, loaderOptions) {
 // A row is its problems joined into one sentence, or its passing text; the facts it judged go under detail.
 const row = (problems, ok, detail, found = problems.filter(Boolean)) => found.length ? { passed: false, message: found.join('; '), detail } : { passed: true, message: ok, detail };
 
-export function checkGit(cwd, kind, loaderOptions, portOptions) {
+/**
+ * One Git doctor row. With a doctor `run`, rows of the run share one inspection of the repository for the configured
+ * remote, and one worktree recovery view; the transport-config row adds one more `inspectGit` only when that remote is
+ * not `origin`. Without a run the row inspects alone.
+ */
+export function checkGit(cwd, kind, loaderOptions, portOptions, run) {
+  const recovery = kind === 'git-worktree-recovery';
+  const inspect = () => {
+    const found = context(cwd, loaderOptions);
+    const { native, stateRoot, root, remote } = found;
+    return { ...found, facts: recovery ? native.inspectGitWorktreeRecovery(stateRoot, cwd, root) : native.inspectGit(stateRoot, cwd, root, remote) };
+  };
   try {
-    const { root, remote, stateRoot, native } = context(cwd, loaderOptions);
-    const facts = kind === 'git-worktree-recovery' ? native.inspectGitWorktreeRecovery(stateRoot, cwd, root) : native.inspectGit(stateRoot, cwd, root, remote);
+    const { root, remote, stateRoot, native, facts } = run ? run.once(`git-${recovery ? 'worktree-recovery' : 'inspect'}:${cwd}`, inspect) : inspect();
     if (facts.notARepository && kind !== 'git-component-compatible') return { passed: true, message: 'info: not a Git repository' };
     switch (kind) {
       case 'git-worktree-recovery': {

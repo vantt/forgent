@@ -172,6 +172,36 @@ pub fn spawn_mapped(request: &MappedSpawn, fd_map: &[(FdSlot, &File)]) -> io::Re
     }
 }
 
+/// Start `argv` as a child nobody waits for: it leads its own session, reads
+/// `/dev/null`, writes its output to `log` (opened append, created `0o600`,
+/// close-on-exec in the caller) or to `/dev/null` without one, and keeps the
+/// caller's environment. Returns the child's pid and drops the handle at once.
+///
+/// The child is never reaped, so the caller must be short-lived (a hook or a
+/// one-shot verb), never a gateway or a supervisor: a long-lived caller would
+/// collect a zombie per call.
+pub fn spawn_detached(
+    argv: &[OsString],
+    cwd: &std::path::Path,
+    env: &[(OsString, OsString)],
+    log: Option<&std::path::Path>,
+) -> io::Result<u32> {
+    use std::os::unix::fs::OpenOptionsExt;
+    let log = log
+        .map(|path| std::fs::OpenOptions::new().append(true).create(true).mode(0o600).open(path))
+        .transpose()?;
+    let sink = log.as_ref().map_or(MappedStdio::Null, MappedStdio::File);
+    let request = MappedSpawn {
+        argv: argv.to_vec(),
+        env: env.to_vec(),
+        clear_env: false,
+        cwd: Some(cwd.to_path_buf()),
+        lead: MappedLead::Session,
+        stdio: [MappedStdio::Null, sink, sink],
+    };
+    spawn_mapped(&request, &[]).map(|child| child.id())
+}
+
 /// The `Command` path: the same request through `spawn_with_fds`.
 #[cfg_attr(all(target_os = "linux", target_env = "gnu"), allow(dead_code))]
 fn with_command(request: &MappedSpawn, fd_map: &[(FdSlot, &File)]) -> io::Result<MappedChild> {

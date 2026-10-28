@@ -29,7 +29,7 @@ test('ScopedCommit requires exact custody, preserves pre-existing dirt and liter
     const baseline=f.port.preflight({},f.held);
     fs.writeFileSync(path.join(f.linked,'a'),'changed');fs.writeFileSync(path.join(f.linked,'[literal]'),'literal');fs.writeFileSync(path.join(f.linked,'outside'),'outside');
     fs.writeFileSync(path.join(f.linked,'sp ace'),'space');fs.mkdirSync(path.join(f.linked,'dir'));fs.writeFileSync(path.join(f.linked,'dir','é'),'accent');
-    const args={operationId:'exact',baseline,request:{writes:['a','[literal]','old-dirt','sp ace','dir/é'],message:'custom subject\n\nbody\n',cutoverGrant:null}};
+    const args={operationId:'exact',baseline,request:{writes:['a','[literal]','old-dirt','sp ace','dir/é'],message:'custom subject\n\nbody\n'}};
     const result=f.port.commit(args,f.held);assert.equal(result.status,'committed');assert.deepEqual(result.files,['[literal]','a','dir/é','sp ace']);
     assert.equal(execFileSync('git',['-C',f.linked,'show','-s','--format=%B'],{encoding:'utf8'}),'custom subject\n\nbody\n\n');
     assert.equal(f.port.commit(args,f.held).oid,result.oid);
@@ -43,7 +43,7 @@ test('ScopedCommit preserves rejection evidence and unstages only its own paths'
   const f=fixture();try {
     const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\necho original-hook-rejection >&2\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
     const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
-    assert.throws(()=>f.port.commit({operationId:'hook-refusal',baseline,request:{writes:['a'],message:'refuse',cutoverGrant:null}},f.held),/commit-rejected/);
+    assert.throws(()=>f.port.commit({operationId:'hook-refusal',baseline,request:{writes:['a'],message:'refuse'}},f.held),/commit-rejected/);
     assert.equal(execFileSync('git',['-C',f.linked,'diff','--cached','--name-only'],{encoding:'utf8'}),'');assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'producer');
   } finally {f.close();}
 });
@@ -53,7 +53,7 @@ test('ScopedCommit receipt replay retains the actual hook-expanded file set',()=
     const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
     fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\nprintf added > hook-added\ngit add hook-added\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
     const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
-    const request={operationId:'hook-expanded',baseline,request:{writes:['a'],message:'hook test',cutoverGrant:null}};
+    const request={operationId:'hook-expanded',baseline,request:{writes:['a'],message:'hook test'}};
     const first=f.port.commit(request,f.held);assert.equal(first.status,'committed-but-contract-violation');assert.deepEqual(first.files,['a','hook-added']);
     assert.deepEqual(f.port.commit(request,f.held),first);
   } finally {f.close();}
@@ -61,7 +61,7 @@ test('ScopedCommit receipt replay retains the actual hook-expanded file set',()=
 test('ScopedCommit refuses a changed baseline and a foreign merge without staging',()=>{
   const f=fixture();try {
     const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
-    const request={operationId:'stale',baseline,request:{writes:['a'],message:'stale',cutoverGrant:null}};
+    const request={operationId:'stale',baseline,request:{writes:['a'],message:'stale'}};
     execFileSync('git',['-C',f.linked,'commit','--allow-empty','-qm','advanced']);
     assert.throws(()=>f.port.commit(request,f.held),/baseline-stale/);
     const gitdir=execFileSync('git',['-C',f.linked,'rev-parse','--absolute-git-dir'],{encoding:'utf8'}).trim();
@@ -92,7 +92,7 @@ for (const escaped of [false,true]) for (const main of [false,true]) test(`Scope
     const port=main?createGitScopedCommit(config,loader):f.port;
     const held=main?[]:f.held;
     const baseline=port.preflight({},held);fs.writeFileSync(path.join(repoPath,'a'),'filtered producer');
-    const result=port.commit({operationId:'borrow-vectors',baseline,request:{writes:['a'],message:'borrow vectors',cutoverGrant:null}},held);
+    const result=port.commit({operationId:'borrow-vectors',baseline,request:{writes:['a'],message:'borrow vectors'}},held);
     assert.equal(result.status,'committed');
     const evidence=fs.readFileSync(hookEvidence,'utf8').trim().split('\n');
     assert.equal(evidence[0],`${main?'main-checkout':'dispatch-cwd'}:3`);assert.equal(evidence[1],'0');
@@ -120,7 +120,7 @@ test('ScopedCommit never reports plain success while a setsid hook child without
     const port=createGitScopedCommit({stateRoot:f.temp,repoPath:f.repo,trustedMain:f.repo,writer:'fixture'},loader);
     const baseline=port.preflight({},[]);fs.writeFileSync(path.join(f.repo,'a'),'escapee producer');
     let outcome;
-    try { outcome=port.commit({operationId:'escapee',baseline,request:{writes:['a'],message:'escapee',cutoverGrant:null}},[]); }
+    try { outcome=port.commit({operationId:'escapee',baseline,request:{writes:['a'],message:'escapee'}},[]); }
     catch(error) { outcome={error:error.message}; }
     pid=Number(fs.readFileSync(pidFile,'utf8'));
     let state;try{state=fs.readFileSync(`/proc/${pid}/stat`,'utf8').split(') ').at(-1)[0];}catch{state='absent';}
@@ -155,7 +155,7 @@ exit 1
     fs.renameSync(path.join(f.linked,'a'),path.join(f.linked,'moved'));
     const bytes=Buffer.from([0,255,1,10]);fs.writeFileSync(path.join(f.linked,'moved'),bytes);fs.chmodSync(path.join(f.linked,'moved'),0o751);
     fs.symlinkSync('moved',path.join(f.linked,'link'));
-    assert.throws(()=>f.port.commit({operationId:'move-reject',baseline,request:{writes:['a','moved','link','clean','extra','old-dirt','scope','ignored'],message:'move',cutoverGrant:null}},f.held),/commit-rejected/);
+    assert.throws(()=>f.port.commit({operationId:'move-reject',baseline,request:{writes:['a','moved','link','clean','extra','old-dirt','scope','ignored'],message:'move'}},f.held),/commit-rejected/);
     assert.equal(fs.existsSync(path.join(f.linked,'a')),false);
     assert.deepEqual(fs.readFileSync(path.join(f.linked,'moved')),bytes);assert.equal(fs.statSync(path.join(f.linked,'moved')).mode&0o777,0o751);
     assert.equal(fs.readlinkSync(path.join(f.linked,'link')),'moved');assert.equal(fs.readFileSync(path.join(f.linked,'clean'),'utf8'),'clean');assert.equal(fs.existsSync(path.join(f.linked,'extra')),false);assert.equal(fs.readFileSync(path.join(f.linked,'old-dirt'),'utf8'),'keep baseline dirt');assert.equal(fs.existsSync(path.join(f.linked,'scope')),false);assert.equal(fs.readFileSync(path.join(f.linked,'ignored/base'),'utf8'),'keep ignored bytes');assert.equal(fs.existsSync(path.join(f.linked,'ignored/new')),false);
@@ -166,7 +166,7 @@ exit 1
 test('ScopedCommit refuses invalid requests, post-preflight staging and replay of a rejected attempt',()=>{
   const f=fixture();try {
     const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
-    const request={operationId:'refusal-cases',baseline,request:{writes:['a'],message:'valid',cutoverGrant:null}};
+    const request={operationId:'refusal-cases',baseline,request:{writes:['a'],message:'valid'}};
     assert.throws(()=>f.port.commit({...request,request:{...request.request,message:''}},f.held),/invalid-commit-message/);
     execFileSync('git',['-C',f.linked,'add','a']);
     assert.throws(()=>f.port.commit(request,f.held),/foreign-staged-index/);
@@ -188,7 +188,7 @@ test('baseline-dirty paths changed by the producer are excluded with an explicit
  const f=fixture();try {
   fs.writeFileSync(path.join(f.linked,'a'),'before producer');const baseline=f.port.preflight({},f.held);
   fs.writeFileSync(path.join(f.linked,'a'),'after producer');fs.writeFileSync(path.join(f.linked,'fresh'),'fresh');
-  const result=f.port.commit({operationId:'baseline-dirty',baseline,request:{writes:['**'],message:'report exclusions',cutoverGrant:null}},f.held);
+  const result=f.port.commit({operationId:'baseline-dirty',baseline,request:{writes:['**'],message:'report exclusions'}},f.held);
   assert.deepEqual(result.preExistingInScope,['a']);assert.deepEqual(result.files,['fresh']);
   assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'after producer');
  }finally{f.close();}
@@ -196,7 +196,7 @@ test('baseline-dirty paths changed by the producer are excluded with an explicit
 for(const name of ['literal*star','control\tname','control\nname']) test(`literal path ${JSON.stringify(name)} commits and replays losslessly`,()=>{
  const f=fixture();try {
   const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,name),'producer');
-  const args={operationId:'literal-path',baseline,request:{writes:['**'],message:'literal path',cutoverGrant:null}};
+  const args={operationId:'literal-path',baseline,request:{writes:['**'],message:'literal path'}};
   const result=f.port.commit(args,f.held);
   assert.equal(result.status,'committed');assert.deepEqual(result.files,[name]);
   assert.deepEqual(f.port.commit(args,f.held).files,[name]);
@@ -211,7 +211,7 @@ test('post-commit compaction failure returns the landed receipt with a warning',
   const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);
   fs.writeFileSync(path.join(hooks,'post-commit'),'#!/bin/sh\nprintf evidence > "$(git rev-parse --git-common-dir)/fgos/git/operations/compaction-warning/.durable-file-orphan.tmp"\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
   const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'landed');
-  const args={operationId:'compaction-warning',baseline,request:{writes:['a'],message:'landed',cutoverGrant:null}};
+  const args={operationId:'compaction-warning',baseline,request:{writes:['a'],message:'landed'}};
   const receipt=f.port.commit(args,f.held);
   assert.equal(receipt.status,'committed');assert.equal(receipt.oid,execFileSync('git',['-C',f.linked,'rev-parse','HEAD'],{encoding:'utf8'}).trim());
   assert.match(receipt.warnings[0],/compaction-deferred/);
@@ -232,7 +232,7 @@ test('rejected hooks restore clean permission bits and leave skip-worktree paths
   fs.chmodSync(path.join(f.linked,'clean'),0o600);
   const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\nprintf changed > clean\nchmod 644 clean\nprintf hook > a\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
   const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
-  assert.throws(()=>f.port.commit({operationId:'clean-modes',baseline,request:{writes:['*'],message:'reject',cutoverGrant:null}},f.held),/commit-rejected/);
+  assert.throws(()=>f.port.commit({operationId:'clean-modes',baseline,request:{writes:['*'],message:'reject'}},f.held),/commit-rejected/);
   assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'producer');assert.equal(fs.readFileSync(path.join(f.linked,'clean'),'utf8'),'clean');
   assert.equal(fs.statSync(path.join(f.linked,'clean')).mode&0o777,0o600);assert.equal(fs.existsSync(path.join(f.linked,'skipped')),false);
  }finally{f.close();}
@@ -244,7 +244,7 @@ test('a clean-path restore failure still restores producer bytes on independent 
   execFileSync('git',['-C',f.linked,'add','blocked/clean']);execFileSync('git',['-C',f.linked,'commit','-qm','restore fixture']);
   const hooks=path.join(f.repo,'hooks');fs.mkdirSync(hooks);fs.writeFileSync(path.join(hooks,'pre-commit'),'#!/bin/sh\nprintf hook > a\nchmod 000 blocked\nexit 1\n',{mode:0o755});f.git('config','core.hooksPath','hooks');
   const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer bytes');
-  assert.throws(()=>f.port.commit({operationId:'restore-failure',baseline,request:{writes:['a','blocked/clean'],message:'reject',cutoverGrant:null}},f.held),/commit-worktree-restore-required/);
+  assert.throws(()=>f.port.commit({operationId:'restore-failure',baseline,request:{writes:['a','blocked/clean'],message:'reject'}},f.held),/commit-worktree-restore-required/);
   assert.equal(fs.readFileSync(path.join(f.linked,'a'),'utf8'),'producer bytes');
   assert.deepEqual(fs.readdirSync(path.join(f.repo,'.git/fgos/git/operations')),[]);
  }finally{if(fs.existsSync(dir))fs.chmodSync(dir,0o700);f.close();}
@@ -277,9 +277,9 @@ test('ScopedCommit refreshes config between calls on the same port',()=>{
     const baseline=f.port.preflight({},f.held);
     f.git('config','filter.evil.clean','touch /unreachable');
     fs.writeFileSync(path.join(f.linked,'a'),'producer');
-    assert.throws(()=>f.port.commit({operationId:'config-changed',baseline,request:{writes:['a'],message:'config',cutoverGrant:null}},f.held),/repository-config-untrusted/);
+    assert.throws(()=>f.port.commit({operationId:'config-changed',baseline,request:{writes:['a'],message:'config'}},f.held),/repository-config-untrusted/);
     f.git('config','--unset','filter.evil.clean');
-    assert.equal(f.port.commit({operationId:'config-repaired',baseline,request:{writes:['a'],message:'config',cutoverGrant:null}},f.held).status,'committed');
+    assert.equal(f.port.commit({operationId:'config-repaired',baseline,request:{writes:['a'],message:'config'}},f.held).status,'committed');
   } finally {f.close();}
 });
 
@@ -289,7 +289,7 @@ for(const rejected of [false,true]) test(`ScopedCommit fences post-hook config c
     fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\ngit config filter.evil.clean 'touch /unreachable'\nexit ${rejected?1:0}\n`,{mode:0o755});
     f.git('config','core.hooksPath','hooks');
     const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
-    assert.throws(()=>f.port.commit({operationId:'hook-config',baseline,request:{writes:['a'],message:'config',cutoverGrant:null}},f.held),/repository-config-untrusted/);
+    assert.throws(()=>f.port.commit({operationId:'hook-config',baseline,request:{writes:['a'],message:'config'}},f.held),/repository-config-untrusted/);
     assert.throws(()=>f.port.preflight({},f.held),/repository-config-untrusted/);
     f.git('config','--unset','filter.evil.clean');
     assert.equal(execFileSync('git',['-C',f.linked,'show','HEAD:a'],{encoding:'utf8'}),rejected?'base':'producer');
@@ -312,7 +312,7 @@ for(const rejected of [false,true]) test(`ScopedCommit refuses post-hook promiso
     fs.writeFileSync(path.join(hooks,'pre-commit'),`#!/bin/sh\ngit config remote.origin.promisor true\nexit ${rejected?1:0}\n`,{mode:0o755});
     f.git('config','core.hooksPath','hooks');
     const baseline=f.port.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'producer');
-    assert.throws(()=>f.port.commit({operationId:'hook-promisor',baseline,request:{writes:['a'],message:'promisor',cutoverGrant:null}},f.held),/repository-promisor-changed/);
+    assert.throws(()=>f.port.commit({operationId:'hook-promisor',baseline,request:{writes:['a'],message:'promisor'}},f.held),/repository-promisor-changed/);
     f.git('config','--unset','remote.origin.promisor');
     assert.equal(execFileSync('git',['-C',f.linked,'show','HEAD:a'],{encoding:'utf8'}),rejected?'base':'producer');
   } finally {f.close();}

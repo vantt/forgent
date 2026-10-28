@@ -125,6 +125,37 @@ fn files_are_versioned_strict_and_loaded_atomically() {
         assert!(registry.load_files(&[&b]).is_err());
     }
 }
+/// The registry native callers take holds every type of every contract the consumer manifest
+/// lists, exactly as loading those files by path does for the payload; no test covered it, since
+/// before it only the payload read the manifest.
+#[test]
+fn shipped_registry_registers_every_manifest_consumer_as_loading_its_files() {
+    let repo = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../..");
+    let manifest: serde_json::Value = serde_json::from_slice(
+        &fs::read(repo.join("packages/event-store/contracts/consumers.v1.json")).unwrap(),
+    )
+    .unwrap();
+    let files: Vec<PathBuf> = manifest["consumers"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|entry| repo.join(entry["contractFile"].as_str().unwrap()))
+        .collect();
+    let mut loaded = Registry::default();
+    loaded.load_files(&files).unwrap();
+    let shipped = Registry::shipped().unwrap();
+    let mut checked = 0;
+    for file in &files {
+        let contract: serde_json::Value = serde_json::from_slice(&fs::read(file).unwrap()).unwrap();
+        for item in contract["types"].as_array().unwrap() {
+            let t = item["type"].as_str().unwrap();
+            assert_eq!(shipped.get(t).unwrap(), loaded.get(t).unwrap(), "{t}");
+            checked += 1;
+        }
+    }
+    assert!(shipped.get("identity.session-published").is_ok());
+    assert!(checked > 0);
+}
 #[test]
 fn machine_identity_precedence_and_validation() {
     let repo = Repo::new();

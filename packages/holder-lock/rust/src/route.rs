@@ -7,8 +7,7 @@
 //! thing [`main`] does is set close-on-exec on that slot.
 
 use std::ffi::OsString;
-#[cfg(not(windows))]
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use std::path::{Path, PathBuf};
 
 use serde_json::{json, Map, Value};
@@ -27,8 +26,8 @@ mod hold;
 /// carries 2, so an older facade fails closed on either side.
 pub const PROTOCOL: u64 = 2;
 
-/// The protocol of `quiesce-scan`, a read-only scan its callers (the cutover
-/// fence, `fgctl` activation) pin on their own. It does not move with the
+/// The protocol of `quiesce-scan`, a read-only scan its caller (`fgctl`
+/// activation) pins on its own. It does not move with the
 /// lock-route protocol.
 pub const SCAN_PROTOCOL: u64 = 1;
 
@@ -88,7 +87,6 @@ fn error_as(protocol: u64, code: &str, message: &str, exit: i32) -> i32 {
     emit_as(protocol, Some("error"), json!({ "code": code, "message": message }), exit)
 }
 
-#[cfg(not(windows))]
 fn error(code: &str, message: &str, exit: i32) -> i32 {
     error_as(PROTOCOL, code, message, exit)
 }
@@ -198,12 +196,12 @@ fn take_slot3() -> std::io::Result<File> {
 /// obstructs a holder. Every other lock operation runs in the caller's process
 /// through the addon's `holderLock`.
 fn lock_fd(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--borrowed-check"], &["--shared-try"]) {
+    let flags = match Flags::parse(args, &["--borrowed-check", "--shared-try-path"], &["--shared-try"]) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
     if flags.items.len() != 1 {
-        return usage("exactly one of --borrowed-check <path>, --shared-try");
+        return usage("exactly one of --borrowed-check <path>, --shared-try, --shared-try-path <path>");
     }
     let drv = driver::current();
     if !drv.supported() {
@@ -211,6 +209,12 @@ fn lock_fd(args: &[String]) -> i32 {
     }
     if flags.has("--shared-try") {
         return shared_try();
+    }
+    if flags.has("--shared-try-path") {
+        return match flags.one("--shared-try-path") {
+            Ok(Some(path)) => shared_try_path(Path::new(path)),
+            _ => usage("--shared-try-path needs a path"),
+        };
     }
     let lock_path = match flags.one("--borrowed-check") {
         Ok(Some(path)) => PathBuf::from(path),
@@ -238,24 +242,56 @@ fn lock_fd(args: &[String]) -> i32 {
 
 #[cfg(windows)]
 fn shared_try() -> i32 {
-    emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": "--shared-try hands a descriptor to the route; Windows probes through the door" }), EXIT_UNAVAILABLE)
+    emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": "--shared-try hands a descriptor to the route; on Windows use --shared-try-path" }), EXIT_UNAVAILABLE)
 }
 
 #[cfg(not(windows))]
 fn shared_try() -> i32 {
-    let file = match take_slot3() {
-        Ok(file) => file,
-        Err(err) => return error("io", &format!("fd 3 is not an open lock file: {err}"), EXIT_INTERNAL),
-    };
-    match driver::current().file_guarantee(&file) {
-        Ok(g) if !g.usable() => return emit(Some("unavailable"), json!({ "reason": "unsupported-filesystem", "detail": g.notes.join("; ") }), EXIT_UNAVAILABLE),
-        Ok(_) => {}
-        Err(err) => return emit(Some("unavailable"), json!({ "reason": "io-error", "detail": format!("fstatfs fd 3: {err}") }), EXIT_UNAVAILABLE),
+    match take_slot3() {
+        Ok(file) => say(shared_probe(&file)),
+        Err(err) => error("io", &format!("fd 3 is not an open lock file: {err}"), EXIT_INTERNAL),
     }
-    match crate::port::lock_description(&file, Mode::Sh, Wait::Try) {
-        Ok(crate::port::DescriptionLock::Locked) => emit(Some("free"), json!({}), EXIT_OK),
-        Ok(_) => emit(Some("held"), json!({ "reason": "kernel-lock-held" }), EXIT_NEGATIVE),
-        Err(err) => error("io", &format!("flock fd 3: {err}"), EXIT_INTERNAL),
+}
+
+/// `--shared-try-path <lockFile>`: the same one non-blocking shared try, on a
+/// fresh description this process opens itself (the form Windows uses, where a
+/// descriptor cannot be handed over). The existing file is opened read-only:
+/// never created, truncated or cleaned, and no predecessor admission runs. The
+/// lock is released and the handle closed before the answer is written.
+fn shared_try_path(path: &Path) -> i32 {
+    let file = match OpenOptions::new().read(true).open(path) {
+        Ok(file) => file,
+        Err(err) => return error("io", &format!("cannot open {}: {err}", path.display()), EXIT_INTERNAL),
+    };
+    let answer = shared_probe(&file);
+    driver::current().unlock_private(&file);
+    drop(file);
+    say(answer)
+}
+
+/// What one shared try found, before anything is written.
+enum Answer {
+    Say(&'static str, Value, i32),
+    Fail(String),
+}
+
+fn say(answer: Answer) -> i32 {
+    match answer {
+        Answer::Say(result, fields, code) => emit(Some(result), fields, code),
+        Answer::Fail(message) => error("io", &message, EXIT_INTERNAL),
+    }
+}
+
+fn shared_probe(file: &File) -> Answer {
+    match driver::current().file_guarantee(file) {
+        Ok(g) if !g.usable() => return Answer::Say("unavailable", json!({ "reason": "unsupported-filesystem", "detail": g.notes.join("; ") }), EXIT_UNAVAILABLE),
+        Ok(_) => {}
+        Err(err) => return Answer::Say("unavailable", json!({ "reason": "io-error", "detail": format!("file guarantee: {err}") }), EXIT_UNAVAILABLE),
+    }
+    match crate::port::lock_description(file, Mode::Sh, Wait::Try) {
+        Ok(crate::port::DescriptionLock::Locked) => Answer::Say("free", json!({}), EXIT_OK),
+        Ok(_) => Answer::Say("held", json!({ "reason": "kernel-lock-held" }), EXIT_NEGATIVE),
+        Err(err) => Answer::Fail(format!("shared lock: {err}")),
     }
 }
 

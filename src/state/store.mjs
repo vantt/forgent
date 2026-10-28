@@ -511,6 +511,10 @@ function checkPlanEvidence(id, work, repoRoot) {
 // The git directory that holds the refs of the checkout at `repoRoot`: its
 // `.git`, or, for a linked worktree (`.git` is a file naming the worktree's own
 // git dir), the common dir that git dir points at. Files only, no child process.
+// It stays outside the Git ports on purpose: the branch-tip compare runs inside
+// the state lock, where the ports refuse (`exec-under-hot-lock`) because their
+// ref read spawns git. It reads only the files ref backend; on a reftable
+// repository both reads return null and the staleness check compares nothing.
 function refsGitDir(repoRoot) {
   const dotGit = path.join(repoRoot, '.git');
   let gitDir = dotGit;

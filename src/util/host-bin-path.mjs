@@ -96,3 +96,10 @@ export function resolveActiveHostBin({ fgosDir, cwd = process.cwd(), ignoreEnv =
   }
   return { bin: null, tried };
 }
+
+/** This process's environment for a child that is a native route of the host: the same, minus the invocation record path, so an internal route never writes a record. */
+export function routeEnv(env = process.env) {
+  const child = { ...env };
+  delete child.FGOS_INVOCATION_RECORD_PATH;
+  return child;
+}

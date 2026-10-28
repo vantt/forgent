@@ -5568,7 +5568,7 @@ for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-repo
     'git-repository-config': 'Repository transport settings refused by Publication/Remote, and the Event Store mirror fetch mappings',
     'git-operation-journal': 'Readable Git WAL with no unresolved operations, under the controller activation fence (`git-fence-missing` when the fence is gone); warns about retained Land candidates awaiting Work acknowledgement',
     'git-native-locks': 'Native Git lock residue (read-only detection)',
-  }[id], check: (cwd) => checkGit(cwd, id) });
+  }[id], check: (cwd, run = createDoctorRun()) => checkGit(cwd, id, undefined, undefined, run) });
 }
 registerCheck({
   id: 'git-mutation-one-door',

@@ -300,7 +300,7 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true, fgosRoot = repo
       const result = scoped.commit({
         operationId: `knowledge-migration-${crypto.randomUUID()}`,
         baseline,
-        request: { writes: [move.oldPath, move.newPath], message: `docs(knowledge): move ${move.oldPath} to ${move.newPath}`, cutoverGrant: null },
+        request: { writes: [move.oldPath, move.newPath], message: `docs(knowledge): move ${move.oldPath} to ${move.newPath}` },
       });
       if (result.status !== 'committed') throw new Error(`ScopedCommit returned ${result.status}${result.oid ? ` (${result.oid})` : ''}`);
     } catch (err) {

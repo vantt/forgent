@@ -15,7 +15,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-import { hostBin, routeEnv } from '../holder-lock/driver.mjs';
+import { hostBin } from '../holder-lock/driver.mjs';
+import { routeEnv } from '../util/host-bin-path.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from '../run-supervisor/protocol.mjs';
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES } from '../run-supervisor/runtime-dir.mjs';
 import { adoptRun, adoptScan, listOpenAttemptDirs } from '../run-supervisor/client.mjs';

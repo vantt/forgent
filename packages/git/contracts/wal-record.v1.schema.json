@@ -539,56 +539,8 @@
                               "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
                             },
                             "cutoverGrant": {
-                              "oneOf": [
-                                {
-                                  "type": "null"
-                                },
-                                {
-                                  "type": "object",
-                                  "additionalProperties": false,
-                                  "properties": {
-                                    "exactPaths": {
-                                      "oneOf": [
-                                        {
-                                          "type": "array",
-                                          "items": {
-                                            "type": "string"
-                                          }
-                                        },
-                                        {
-                                          "type": "object",
-                                          "additionalProperties": false,
-                                          "properties": {
-                                            "count": {
-                                              "type": "integer",
-                                              "minimum": 1
-                                            },
-                                            "sha256": {
-                                              "type": "string",
-                                              "pattern": "^[0-9a-f]{64}$"
-                                            }
-                                          },
-                                          "required": [
-                                            "count",
-                                            "sha256"
-                                          ]
-                                        }
-                                      ]
-                                    },
-                                    "legacyRefOid": {
-                                      "type": "string"
-                                    },
-                                    "sealDigest": {
-                                      "type": "string"
-                                    }
-                                  },
-                                  "required": [
-                                    "exactPaths",
-                                    "legacyRefOid",
-                                    "sealDigest"
-                                  ]
-                                }
-                              ]
+                              "type": "null",
+                              "description": "Retired. Ordinary intents written by earlier releases carry it as null; new intents omit it. A grant object, written only by the retired events migrate, is refused."
                             }
                           },
                           "required": [
@@ -596,8 +548,7 @@
                             "baseline",
                             "request",
                             "paths",
-                            "tree",
-                            "cutoverGrant"
+                            "tree"
                           ]
                         }
                       },

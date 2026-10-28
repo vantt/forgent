@@ -53,7 +53,11 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // The `/tmp/tmp.XXXXXXXX` shape observed in the wild: an unpacked copy with
   // no `.git` of its own. Its path is ephemeral, so writing it into a shell
   // profile leaves a `source` line that outlives the directory.
-  const copyRoot = mkTemp('checks-nongit-copy-');
+  // The copy is the legacy-node payload of a release-shaped tree: the door finds its addon through that
+  // release's manifest, the only channel it reads.
+  const releaseRoot = mkTemp('checks-nongit-release-');
+  const copyRoot = path.join(releaseRoot, 'libexec', 'legacy-node');
+  fs.mkdirSync(copyRoot, { recursive: true });
   const repoRoot = path.resolve(__dirname, '../..');
   // The parts of the npm package `setup` reads; the tier ladder contract loads with the runner config and the config doctor rows with the registry.
   for (const entry of ['bin', 'src', 'scripts', 'domains', 'packages/seat-binding/contracts', 'packages/config/contracts/doctor-rows.v1.json', 'package.json']) {
@@ -62,13 +66,20 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   }
   fs.cpSync(path.join(repoRoot, 'packages/work-state/contracts'), path.join(copyRoot, 'packages/work-state/contracts'), { recursive: true });
   assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);
-  // Setup reads and writes config through the native door, which a payload outside a release finds by its own
-  // `native-addon.json`: give the copy the staged addon the way the npm package ships it.
+  // Setup reads and writes config through the native door: stage the addon and a host beside the copy the way a release lays them out.
   const stagedManifest = JSON.parse(fs.readFileSync(process.env.FGOS_ACTIVE_MANIFEST_PATH, 'utf8'));
   const addonRecord = stagedManifest.components.nativeAddon;
-  fs.mkdirSync(path.join(copyRoot, 'native'));
-  fs.copyFileSync(path.resolve(repoRoot, addonRecord.path), path.join(copyRoot, 'native', 'fgos.node'));
-  fs.writeFileSync(path.join(copyRoot, 'native-addon.json'), JSON.stringify({ components: { nativeAddon: { ...addonRecord, path: 'native/fgos.node' } } }));
+  fs.mkdirSync(path.join(releaseRoot, 'native'));
+  fs.copyFileSync(path.resolve(repoRoot, addonRecord.path), path.join(releaseRoot, 'native', 'fgos.node'));
+  fs.mkdirSync(path.join(releaseRoot, 'bin'));
+  const hostCopy = path.join(releaseRoot, 'bin', 'fgos');
+  fs.copyFileSync(path.resolve(repoRoot, stagedManifest.entries.fgos), hostCopy);
+  fs.chmodSync(hostCopy, 0o755);
+  fs.writeFileSync(path.join(releaseRoot, 'manifest.json'), JSON.stringify({
+    ...stagedManifest,
+    entries: { ...stagedManifest.entries, fgos: 'bin/fgos' },
+    components: { ...stagedManifest.components, legacyNode: { root: 'libexec/legacy-node' }, nativeAddon: { ...addonRecord, path: 'native/fgos.node' } },
+  }));
 
   const homeDir = mkTemp('checks-nongit-home-');
   const rcFile = path.join(homeDir, '.bashrc');
@@ -77,7 +88,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   const result = spawnSync(process.execPath, [path.join(copyRoot, 'bin', 'fgos.mjs'), 'setup'], {
     cwd: copyRoot,
     encoding: 'utf8',
-    env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir },
+    env: { ...NO_CLAUDE_ENV, FGOS_HOST_BIN: hostCopy, HOME: homeDir, USERPROFILE: homeDir },
   });
 
   assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
@@ -95,6 +106,6 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
   // Setup's other work still happened.
   assert.equal(projectConfigExists(copyRoot), true);
 
-  fs.rmSync(copyRoot, { recursive: true, force: true });
+  fs.rmSync(releaseRoot, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });

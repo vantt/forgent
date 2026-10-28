@@ -141,7 +141,6 @@ fn recovery_matrix_child() {
                     &CommitRequest {
                         writes: vec!["b".into()],
                         message: "matrix".into(),
-                        cutover_grant: None,
                     },
                     WRITER,
                     ID,

@@ -13,8 +13,7 @@
 // harmless.
 
 import { spawn, spawnSync } from 'node:child_process';
-import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
-import { routeEnv } from '../holder-lock/driver.mjs';
+import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 
 const PROTOCOL = 1;
 const DEFAULT_TIMEOUT_MS = 60_000;

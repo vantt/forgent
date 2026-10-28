@@ -72,6 +72,33 @@ test('an unused staged host is removed at once, and a young one is never pruned 
   assert.equal(fs.existsSync(young.dir), false);
 });
 
+// The scan is the caller's: pruning many directories takes one process scan, and each directory is judged
+// against it. A holder the supplied scan does not list does not keep its directory, which a rescan inside the
+// call would have seen.
+test('a directory is judged against the scan the caller supplies, not a fresh one', { skip: linuxOnly }, async () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'dev-host-'));
+  const { dir, host } = stagedRun(base, 'run-supplied');
+  const holder = spawn(host, ['300'], { detached: true, stdio: 'ignore' });
+  try {
+    assert.equal(releaseRunDir(dir, []), true);
+    assert.equal(fs.existsSync(dir), false);
+  } finally {
+    holder.kill('SIGKILL');
+    await exited(holder);
+  }
+});
+
+// Where the door cannot scan (Windows, macOS) nothing proves a run directory unused: it is kept at once, and a
+// later prune removes it only when it is stale. `unsupported` is the scan the caller may pass in.
+test('with no process scan a run directory is kept, and a prune removes it only once it is stale', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'dev-host-'));
+  const { dir } = stagedRun(base, 'run-unscanned');
+  assert.equal(releaseRunDir(dir, 'unsupported'), false);
+  assert.ok(fs.existsSync(dir));
+  pruneRunDirs(base, { now: Date.now() + STALE_RUN_DIR_MS + 1000, views: 'unsupported' });
+  assert.equal(fs.existsSync(dir), false);
+});
+
 test('the dev door points FGOS_HOST_BIN at the staged host, replacing any inherited host', () => {
   const env = devHostEnv(
     { FGOS_HOST_BIN: '/activated/bin/fgos', KEEP: '1' },

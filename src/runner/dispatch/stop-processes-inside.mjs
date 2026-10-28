@@ -29,15 +29,14 @@ const withoutDeletedSuffix = (p) => (typeof p === 'string' && p.endsWith(' (dele
  * or whose environment variable named in `envKeys` holds a path inside `dir`.
  * A view is the door's `{pid, tuple, exe, cwd, ...}`; `tuple` is null when the identity could not be read.
  * @param {string} dir
- * @param {{ envKeys?: string[] }} [options]
+ * @param {{ envKeys?: string[], views?: object[]|'unsupported' }} [options] `views` is a scan the caller already took, so one scan serves many directories
  * @returns {object[]}
  */
-export function processesInside(dir, { envKeys = [] } = {}) {
+export function processesInside(dir, { envKeys = [], views = scan({ envKeys }) } = {}) {
   let root;
   try { root = fs.realpathSync(dir); } catch { root = path.resolve(dir); }
   const inside = (p) => typeof p === 'string' && (p === root || p.startsWith(root + path.sep));
 
-  const views = scan({ envKeys });
   if (views === 'unsupported') return [];
   return views.filter((view) => view.pid !== process.pid && view.pid !== process.ppid
     && (inside(withoutDeletedSuffix(view.exe)) || inside(withoutDeletedSuffix(view.cwd))

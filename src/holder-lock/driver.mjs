@@ -13,7 +13,7 @@
 
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
+import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { nativeDoor, nativeHelperExe } from '../native/door.mjs';
 import { HolderLockError, PROTOCOL, parseRouteLine } from './protocol.mjs';
 
@@ -71,25 +71,17 @@ export function hostBin({ fgosDir, cwd } = {}) {
   return bin;
 }
 
-/** The child's environment: this process's own, minus the invocation
- * record path, so an internal route never writes a record. */
-export function routeEnv(env = process.env) {
-  const child = { ...env };
-  delete child.FGOS_INVOCATION_RECORD_PATH;
-  return child;
-}
-
 function unavailable(reason, detail, extra = {}) {
   return new HolderLockError('lock-driver-unavailable', detail, { reason, ...extra });
 }
+
+/** The next step every route failure that is not a version mismatch names. */
+const ROUTE_NEXT_STEP = 'Run `fgos doctor`; if the host binary is stale or broken, rebuild the host from this checkout (`npm run fgos:dev`) or restage the active release.';
 
 /** Turn a finished child (spawnSync result, or the same fields collected
  * from spawn) into the route's parsed line, or throw the named error. A
  * child this process killed on its own deadline comes back as
  * `{ result: 'killed' }`: nothing was acquired, the caller closes its fd. */
-/** The next step every route failure that is not a version mismatch names. */
-const ROUTE_NEXT_STEP = 'Run `fgos doctor`; if the host binary is stale or broken, rebuild the host from this checkout (`npm run fgos:dev`) or restage the active release.';
-
 function interpretRoute({ status, signal, stdout, stderr, error, timedOut }, bin, verb) {
   if (error && (error.code === 'ENOENT' || error.code === 'EACCES')) {
     throw unavailable('no-host-binary', `cannot run ${bin} (${error.code})`, { tried: [bin] });

@@ -60,7 +60,7 @@ test('native ScopedCommit protects a live async sibling and native mint refuses 
   const b=runBorrowed(h,spec,{sync:false});children.push(b);await ready(b);
   // Native Git may fail closed while the sibling stays live, but must never
   // classify that sibling as an escapee and signal it.
-  assert.throws(()=>port.commit({operationId:'native-overlap',baseline,request:{writes:['a'],message:'native',cutoverGrant:null}},[h]),/borrow|holder/i);
+  assert.throws(()=>port.commit({operationId:'native-overlap',baseline,request:{writes:['a'],message:'native'}},[h]),/borrow|holder/i);
   process.kill(b.pid,0);assert.equal(b.signalCode,null);
   const a=runBorrowed(h,spec,{sync:false});children.push(a);await ready(a);
   const rejected=assert.rejects(a.borrowed,err=>err.code==='borrow-leftover-not-killed');
@@ -70,7 +70,7 @@ test('native ScopedCommit protects a live async sibling and native mint refuses 
   await rejected;process.kill(b.pid,0);assert.equal(b.signalCode,null);
   b.stdin.end('go');assert.equal((await b.borrowed).exit,0);
   const fresh=port.preflight({},[h]);fs.writeFileSync(path.join(linked,'fresh'),'fresh producer');
-  assert.equal(port.commit({operationId:'native-after-overlap',baseline:fresh,request:{writes:['fresh'],message:'native after',cutoverGrant:null}},[h]).status,'committed');
+  assert.equal(port.commit({operationId:'native-after-overlap',baseline:fresh,request:{writes:['fresh'],message:'native after'}},[h]).status,'committed');
  }finally{
   for(const child of children)if(child.exitCode===null&&child.signalCode===null)child.kill('SIGKILL');
   await Promise.allSettled(children.map(child=>child.borrowed));h.release();fs.rmSync(temp,{recursive:true,force:true});

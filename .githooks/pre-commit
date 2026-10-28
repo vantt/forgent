@@ -26,9 +26,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
-import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
-import { runLockRouteSync, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
+import { resolveActiveHostBin, routeEnv } from '../src/util/host-bin-path.mjs';
+import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV, LOCK_JOB_ENV } from '../src/holder-lock/index.mjs';
+import { runLockRouteSync, lockTransport, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -112,10 +112,8 @@ function resolveTtlMs() {
 const HOST_CALL_TIMEOUT_MS = 20_000;
 
 function hostStdout(bin, args, cwd) {
-  const env = { ...process.env };
-  delete env.FGOS_INVOCATION_RECORD_PATH;
   return execFileSync(bin, args, {
-    env, cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: HOST_CALL_TIMEOUT_MS, killSignal: 'SIGKILL', maxBuffer: 1024 * 1024, windowsHide: true,
+    env: routeEnv(), cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: HOST_CALL_TIMEOUT_MS, killSignal: 'SIGKILL', maxBuffer: 1024 * 1024, windowsHide: true,
   });
 }
 
@@ -131,15 +129,17 @@ function identityData(bin, args, cwd) {
 // runs, and a land takes the mutex before git's index.lock, so waiting here
 // could deadlock with it; this is an early check, not exclusion).
 //   - 'borrower': fgOS's own commit. git inherited the holder's description
-//     at slot 3 (FGOS_LOCK_FD names it) and the host confirms it is the very
-//     description holding the lock. A sibling that merely shares the env but
+//     at slot 3 (FGOS_LOCK_FD names it; on Windows FGOS_LOCK_JOB names the
+//     holder's job) and the host confirms it is the very description (job
+//     member) holding the lock. A sibling that merely shares the env but
 //     opened the lock file itself is not a borrower. Asked before the probe:
 //     a borrowed commit runs while the holder holds the lock, so the probe
 //     alone would refuse it.
 //   - 'held': another process holds the mutex: refuse.
 //   - 'free': nobody holds it: an ordinary commit.
 // The probe is `fgos internal lock-fd --shared-try` on a fresh description of
-// the lock file: one non-blocking shared try, so it never waits on the lock
+// the lock file (on Windows, `--shared-try-path`, where the route opens the file
+// read-only itself and releases before it answers): one non-blocking shared try, so it never waits on the lock
 // and never obstructs a holder; it is a native route (a process boundary the
 // hook cannot cross in process), a millisecond, not a Node start. Without a
 // host binary no fgOS process can hold the mutex either (every holder runs
@@ -147,7 +147,7 @@ function identityData(bin, args, cwd) {
 // refuses (fail-closed).
 function mainLockVerdict(fgosDir, bin) {
   const lockPath = resolveLock('main-checkout', { fgosDir }).v3Path;
-  if (process.env[LOCK_FD_ENV]) {
+  if (process.env[LOCK_FD_ENV] || process.env[LOCK_JOB_ENV]) {
     try {
       if (checkBorrowedDescription(lockPath, { fgosDir }).result === 'borrower') return { kind: 'borrower' };
     } catch {
@@ -166,7 +166,10 @@ function mainLockVerdict(fgosDir, bin) {
     return err?.code === 'ENOENT' ? { kind: 'free' } : { kind: 'error', message: err?.message ?? String(err) };
   }
   try {
-    const { result, detail } = runLockRouteSync({ bin, args: ['--shared-try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
+    // Windows cannot hand a descriptor to a route: the route opens the lock file itself and takes the same shared try.
+    const { result, detail } = lockTransport() === 'hold'
+      ? runLockRouteSync({ bin, args: ['--shared-try-path', lockPath], timeoutMs: ROUTE_CALL_TIMEOUT_MS })
+      : runLockRouteSync({ bin, args: ['--shared-try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
     if (result === 'free' || result === 'held') return { kind: result };
     return { kind: 'error', message: `the lock route answered ${JSON.stringify(result)}${detail ? `: ${detail}` : ''}` };
   } catch (err) {
@@ -324,8 +327,8 @@ function currentFgwBranchIfMainCheckout(repoRoot) {
   return /^fgw\//.test(branch) ? branch : null;
 }
 
-// The Event Store cutover fence is the regular file `.fgos/events`, in the index or in HEAD.
-// A migration installed it; once it exists the retired event paths cannot be added back.
+// The tracked legacy fence is the regular file `.fgos/events`, in the index or in HEAD.
+// Once it exists the retired event paths cannot be added back.
 function eventFenceExists(cwd) {
   // A directory is legacy Work; only the indexed/HEAD regular-file fence counts.
   const index = execFileSync('git', ['ls-files', '-s', '--', '.fgos/events'], { cwd, encoding: 'utf8' });
@@ -541,19 +544,6 @@ async function warnOnConventionViolations(committingToplevel) {
   }
 }
 
-// The config value only selects an operation. Rust proves the lock, WAL and index.
-// WORK removes legacy-event declarations from the native grant check at Event Store cutover.
-function scopedGrantAllows(committingToplevel) {
-  try {
-    const operation = execFileSync('git', ['config', '--get', 'fgos.operationId'], { cwd: committingToplevel, encoding: 'utf8' }).trim();
-    if (!operation) return false;
-    const { bin } = resolveActiveHostBin({ fgosDir: path.join(committingToplevel, '.fgos'), cwd: committingToplevel });
-    if (!bin) return false;
-    const verdict = JSON.parse(execFileSync(bin, ['internal', 'git-grant-check', '--protocol', '1', '--operation', operation], { cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe', 3] }));
-    return verdict.protocol === 1 && verdict.result === 'allowed';
-  } catch { return false; }
-}
-
 async function main() {
   const eventRefusal = addedEventPathRefusal(process.cwd());
   if (eventRefusal) { console.error(eventRefusal); process.exitCode = 1; return; }
@@ -571,7 +561,7 @@ async function main() {
   const stagedDeletions = stagedFgosDeletions(committingToplevel);
   const carriedDeletions = carriedIn(stagedDeletions);
   const fgosDeletions = stagedDeletions.filter((p) => !carriedDeletions.has(p));
-  if (fgosDeletions.length > 0 && !scopedGrantAllows(committingToplevel)) {
+  if (fgosDeletions.length > 0) {
     refuse(`commit refused: this commit stages a deletion under ".fgos/" (${fgosDeletions.join(', ')}) -- .fgos/ is fgOS's own runner state and must never be committed as deleted. A linked worktree never keeps a working-tree copy of .fgos/ by design (ADR0020); if you ran "git add -A" here, unstage these paths first (e.g. "git restore --staged .fgos").`);
     return;
   }

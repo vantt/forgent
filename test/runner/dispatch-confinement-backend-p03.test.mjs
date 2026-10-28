@@ -272,21 +272,23 @@ test('H1/M5/M6: resolver refuses unsafe state boundaries before creating private
   }
 });
 
-test('R2: resolveWorkspaceGitMetadata resolves worktree gitdir pointers', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gitdir-test-'));
+test('R2: resolveWorkspaceGitMetadata gives a linked worktree its own git dir, a main checkout its .git, and null outside a checkout root', () => {
+  const tmp = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gitdir-test-')));
   try {
-    const commonGitDir = path.join(tmp, 'common', '.git');
-    const worktreeGitDir = path.join(commonGitDir, 'worktrees', 'wt1');
-    const wtDir = path.join(tmp, 'wt1');
+    const main = path.join(tmp, 'main');
+    const wt = path.join(tmp, 'wt1');
+    const git = (cwd, ...args) => cp.execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd, encoding: 'utf8' });
+    fs.mkdirSync(main);
+    git(main, 'init', '-q', '-b', 'main');
+    git(main, 'commit', '-q', '--allow-empty', '-m', 'init');
+    git(main, 'worktree', 'add', '-q', wt, '-b', 'feat');
+    activateGitFixture(main);
 
-    fs.mkdirSync(worktreeGitDir, { recursive: true });
-    fs.mkdirSync(wtDir, { recursive: true });
-
-    // Create .git file in worktree pointing to worktreeGitDir
-    fs.writeFileSync(path.join(wtDir, '.git'), `gitdir: ${worktreeGitDir}\n`, 'utf8');
-
-    const resolved = resolveWorkspaceGitMetadata(wtDir);
-    assert.equal(resolved, fs.realpathSync(worktreeGitDir));
+    assert.equal(resolveWorkspaceGitMetadata(wt), fs.realpathSync(path.join(main, '.git', 'worktrees', 'wt1')));
+    assert.equal(resolveWorkspaceGitMetadata(main), fs.realpathSync(path.join(main, '.git')));
+    const plain = path.join(tmp, 'plain');
+    fs.mkdirSync(plain);
+    assert.equal(resolveWorkspaceGitMetadata(plain), null);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

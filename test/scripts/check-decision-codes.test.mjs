@@ -391,26 +391,3 @@ test(
     assert.match(recheck.stdout, /D7/);
   },
 );
-
-test(
-  'next-doc-id.test.mjs is excluded even when it embeds an ' +
-    'ID-pattern literal as its own test fixture',
-  () => {
-    const dir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'decision-codes-'),
-    );
-    writeFixtureTree(dir, {
-      'test/scripts/next-doc-id.test.mjs':
-        "test('STR pattern against STR1..STR59 returns 60', () => {})\n",
-    });
-
-    const result = spawnSync(
-      process.execPath,
-      [scriptPath, '--test-dir', 'test', '--baseline', 'baseline.json'],
-      { cwd: dir, encoding: 'utf8' },
-    );
-
-    assert.equal(result.status, 0);
-    assert.match(result.stdout, /no new findings/);
-  },
-);

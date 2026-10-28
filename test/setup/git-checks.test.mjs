@@ -12,6 +12,7 @@ import { fixture as landFixture } from '../git/land-fixture.mjs';
 import { ensureGitAddon, root as addonRoot } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { resolveStateRoot } from '../../src/holder-lock/state-root.mjs';
+import { DOCTOR_CHECKS, createDoctorRun } from '../../src/setup/registrations.mjs';
 
 test('combined ABI row checks every contract independently of package versions', () => {
   const versions = { napi: 8, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } };
@@ -72,6 +73,19 @@ test('the repository rows report information, not a failure, outside a Git repos
       assert.deepEqual(checkGit(dir, id, options), { passed: true, message: 'info: not a Git repository' }, id);
     }
   });
+});
+
+test('the five Git rows of one doctor run share one repository inspection', { skip: process.platform === 'win32' }, () => {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-git-run-'));
+  try {
+    execFileSync('git', ['init', '-q', repo], { stdio: 'ignore' });
+    const base = createDoctorRun();
+    const computed = [];
+    const run = { once: (key, compute) => base.once(key, () => { computed.push(key.split(':')[0]); return compute(); }) };
+    const ids = ['git-worktree-recovery', 'git-component-compatible', 'git-repository-config', 'git-operation-journal', 'git-native-locks'];
+    for (const id of ids) assert.equal(typeof DOCTOR_CHECKS.find((row) => row.id === id).check(repo, run).passed, 'boolean', id);
+    assert.deepEqual(computed.sort(), ['git-inspect', 'git-worktree-recovery']);
+  } finally { fs.rmSync(repo, { recursive: true, force: true }); }
 });
 
 test('the journal row fails and names the fix while no Git WAL exists', { skip: process.platform === 'win32' }, () => {

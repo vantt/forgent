@@ -111,7 +111,6 @@ fn literal_scoped_commit_real_hook_and_replay() {
     let request = CommitRequest {
         writes: vec!["[literal]".into()],
         message: "consumer message\n\nbody\n".into(),
-        cutover_grant: None,
     };
     let result = f
         .driver
@@ -147,7 +146,6 @@ fn hook_tree_tampering_reports_real_effect() {
     let request = CommitRequest {
         writes: vec!["a".into()],
         message: "commit".into(),
-        cutover_grant: None,
     };
     let result = f
         .driver
@@ -185,8 +183,7 @@ fn a_hook_refusal_closes_the_operation_with_the_same_cause_on_a_merge_head_as_on
         let request = CommitRequest {
             writes: vec!["a".into()],
             message: "commit".into(),
-            cutover_grant: None,
-        };
+            };
         let error = f
             .driver
             .scoped_commit(
@@ -263,28 +260,6 @@ fn sync_clean_and_conflict_resolution_have_exact_parents() {
             format!("{head} {target}")
         );
     }
-}
-#[test]
-fn a_sync_commit_hook_reads_the_operation_id_the_way_a_scoped_commit_hook_does() {
-    use std::os::unix::fs::PermissionsExt;
-    let f = Fixture::new();
-    fs::write(f.main.join("incoming"), "target\n").unwrap();
-    git(&f.main, &["add", "."]);
-    git(&f.main, &["commit", "-qm", "target"]);
-    let target = Oid::parse(&git(&f.main, &["rev-parse", "HEAD"]), ObjectFormat::Sha1).unwrap();
-    let seen = f.temp.join("seen");
-    let hooks = f.main.join("hooks");
-    fs::create_dir(&hooks).unwrap();
-    let hook = hooks.join("pre-commit");
-    fs::write(&hook, format!("#!/bin/sh\ngit config --get fgos.operationId > '{}'\n", seen.display())).unwrap();
-    fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
-    git(&f.main, &["config", "core.hooksPath", "hooks"]);
-    let done = f
-        .driver
-        .start_sync(&f.repo, f.held(), &target, "consumer sync", "fixture", "sync-hook")
-        .unwrap();
-    assert_eq!(done.state, "done");
-    assert_eq!(fs::read_to_string(seen).unwrap().trim(), "sync-hook");
 }
 #[test]
 fn sync_prepare_applies_declared_bytes_for_a_store_path_the_producer_deleted() {
@@ -376,13 +351,12 @@ fn sync_prepare_applies_declarations_to_skip_worktree_store_paths_in_the_index_o
 }
 
 #[test]
-fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
+fn noop_commit_is_durable_and_a_retry_stays_unchanged() {
     let f = Fixture::new();
     let baseline = f.driver.preflight_commit(&f.repo, f.held(), None).unwrap();
     let request = CommitRequest {
         writes: vec!["a".into()],
         message: "noop".into(),
-        cutover_grant: None,
     };
     assert_eq!(
         f.driver
@@ -400,60 +374,10 @@ fn noop_is_durable_and_checkpoint_selects_only_non_event_tracked_files() {
         ResultCode::Unchanged
     );
     assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), baseline.head);
-    let main = match f.driver.resolve_repo(&f.main, &f.main).unwrap() {
-        ResolveRepo::Repository(r) => r,
-        _ => panic!(),
-    };
-    fs::write(f.main.join("a"), "checkpoint").unwrap();
-    fs::write(f.main.join("untracked"), "leave").unwrap();
-    assert!(f
-        .driver
-        .checkpoint_tracked_files(
-            &main,
-            vec![],
-            CheckpointRequest {
-                files: vec![".fgos/events.jsonl".into()],
-                message: "refuse".into(),
-            },
-            "fixture",
-            "bad-checkpoint"
-        )
-        .is_err());
-    let result = f
-        .driver
-        .checkpoint_tracked_files(
-            &main,
-            vec![],
-            CheckpointRequest {
-                files: vec!["a".into()],
-                message: "consumer checkpoint".into(),
-            },
-            "fixture",
-            "checkpoint",
-        )
-        .unwrap();
-    assert_eq!(result.status, ResultCode::Committed);
-    assert_eq!(result.files, vec!["a"]);
-    assert!(f.main.join("untracked").exists());
 }
 #[test]
-fn cutover_commit_of_a_thousand_legacy_shards_in_a_dirty_worktree_stays_within_the_record_bound() {
-    use sha2::{Digest, Sha256};
+fn commit_of_a_thousand_paths_in_a_dirty_worktree_stays_within_the_record_bound() {
     let f = Fixture::new();
-    fs::create_dir_all(f.main.join(".fgos/events")).unwrap();
-    let deleted: Vec<String> = (0..1000)
-        .map(|n| format!(".fgos/events/01ee0bbf-a05d-4a38-8851-72998ac7{n:04}-20260824T111356014Z.jsonl"))
-        .collect();
-    for p in &deleted {
-        fs::write(f.main.join(p), "legacy\n").unwrap();
-    }
-    fs::write(f.main.join("seal.json"), "sealed\n").unwrap();
-    let mut add = vec!["add", "--", "seal.json"];
-    add.extend(deleted.iter().map(String::as_str));
-    git(&f.main, &add);
-    git(&f.main, &["commit", "-qm", "legacy"]);
-    let legacy = git(&f.main, &["rev-parse", "HEAD"]);
-    git(&f.main, &["update-ref", "refs/fgos/legacy", &legacy]);
     fs::create_dir_all(f.main.join("scratch")).unwrap();
     for n in 0..600 {
         fs::write(f.main.join(format!("scratch/untracked-entry-{n:04}-with-a-realistic-name.md")), "dirt").unwrap();
@@ -464,85 +388,24 @@ fn cutover_commit_of_a_thousand_legacy_shards_in_a_dirty_worktree_stays_within_t
     };
     let baseline = f.driver.preflight_commit(&main, vec![], None).unwrap();
     assert!(baseline.dirty.len() >= 600);
-    for p in &deleted {
-        fs::remove_file(f.main.join(p)).unwrap();
+    fs::create_dir_all(f.main.join("data")).unwrap();
+    for n in 0..1000 {
+        fs::write(
+            f.main.join(format!("data/01ee0bbf-a05d-4a38-8851-72998ac7{n:04}-20260824T111356014Z.jsonl")),
+            "payload\n",
+        )
+        .unwrap();
     }
-    fs::remove_dir(f.main.join(".fgos/events")).unwrap();
-    fs::write(f.main.join(".fgos/events"), "legacy fence\n").unwrap();
     let request = CommitRequest {
-        writes: vec!["logs".into()],
-        message: "cutover".into(),
-        cutover_grant: Some(CutoverGrant {
-            exact_paths: deleted.clone(),
-            legacy_ref_oid: legacy,
-            seal_digest: format!("{:x}", Sha256::digest(b"sealed\n")),
-        }),
+        writes: vec!["data/**".into()],
+        message: "many paths".into(),
     };
     let result = f
         .driver
-        .scoped_commit(&main, vec![], &baseline, &request, "fixture", "cutover-large", &wal::OsFileSystem)
+        .scoped_commit(&main, vec![], &baseline, &request, "fixture", "many-paths", &wal::OsFileSystem)
         .unwrap();
     assert_eq!(result.status, ResultCode::Committed);
-    assert_eq!(result.files.len(), 1001);
-}
-#[test]
-fn baseline_only_cutover_commits_the_event_fence() {
-    use sha2::{Digest, Sha256};
-    for tracked_fence in [false, true] {
-        let f = Fixture::new();
-        let deleted = vec![".fgos/events.jsonl".to_string(), ".fgos/state.json".into()];
-        for p in &deleted {
-            fs::write(f.main.join(p), "legacy\n").unwrap();
-        }
-        fs::write(f.main.join("seal.json"), "sealed\n").unwrap();
-        let mut add = vec!["add", "--", "seal.json"];
-        add.extend(deleted.iter().map(String::as_str));
-        if tracked_fence {
-            fs::write(f.main.join(".fgos/events"), "legacy fence\n").unwrap();
-            add.push(".fgos/events");
-        }
-        git(&f.main, &add);
-        git(&f.main, &["commit", "-qm", "legacy"]);
-        let legacy = git(&f.main, &["rev-parse", "HEAD"]);
-        git(&f.main, &["update-ref", "refs/fgos/legacy", &legacy]);
-        let main = match f.driver.resolve_repo(&f.main, &f.main).unwrap() {
-            ResolveRepo::Repository(r) => r,
-            _ => panic!(),
-        };
-        let baseline = f.driver.preflight_commit(&main, vec![], None).unwrap();
-        for p in &deleted {
-            fs::remove_file(f.main.join(p)).unwrap();
-        }
-        assert_eq!(f.main.join(".fgos/events").exists(), tracked_fence);
-        fs::write(f.main.join(".fgos/events"), "legacy fence\n").unwrap();
-        let request = CommitRequest {
-            writes: vec!["logs".into()],
-            message: "cutover".into(),
-            cutover_grant: Some(CutoverGrant {
-                exact_paths: deleted.clone(),
-                legacy_ref_oid: legacy,
-                seal_digest: format!("{:x}", Sha256::digest(b"sealed\n")),
-            }),
-        };
-        let result = f
-            .driver
-            .scoped_commit(&main, vec![], &baseline, &request, "fixture", "cutover", &wal::OsFileSystem)
-            .unwrap();
-        assert_eq!(result.status, ResultCode::Committed);
-        assert_eq!(
-            result.files,
-            if tracked_fence {
-                vec![".fgos/events.jsonl", ".fgos/state.json"]
-            } else {
-                vec![".fgos/events", ".fgos/events.jsonl", ".fgos/state.json"]
-            }
-        );
-        assert_eq!(git(&f.main, &["show", "HEAD:.fgos/events"]), "legacy fence");
-        assert_eq!(
-            git(&f.main, &["ls-tree", "--name-only", "HEAD", ".fgos/"]),
-            ".fgos/events"
-        );
-    }
+    assert_eq!(result.files.len(), 1000);
 }
 
 /// Construct real durable interruption states under the fixture's held custody.
@@ -594,7 +457,6 @@ fn interrupted_as(
     let request = CommitRequest {
         writes: vec!["a".into()],
         message: "interrupted".into(),
-        cutover_grant: None,
     };
     fs::write(f.tree.join("a"), "interrupted producer").unwrap();
     git(&f.tree, &["add", "a"]);
@@ -617,14 +479,15 @@ fn interrupted_as(
             } else {
                 serde_json::to_string(&baseline).unwrap()
             },
+            // An earlier release also wrote the retired `"cutoverGrant": null` key.
+            retired_cutover_grant: stored_request.as_ref().map(|_| ()),
             request: stored_request.unwrap_or_else(|| serde_json::to_string(&request).unwrap()),
             paths: match bounded {
                 Some(recorded) => PathSet::of(&recorded.iter().map(|p| p.to_string()).collect::<Vec<_>>()).unwrap(),
                 None => vec!["a".into()].into(),
             },
             tree,
-            cutover_grant: None,
-        }))
+            }))
     };
     let intent = Intent {
         request_digest: if sync {
@@ -684,7 +547,6 @@ fn commit_whose_intent_exceeds_the_record_bound_is_refused_before_any_record_and
     let request = |message: String| CommitRequest {
         writes: vec!["fresh".into()],
         message,
-        cutover_grant: None,
     };
     let error = f
         .driver
@@ -708,7 +570,6 @@ fn fresh_commit(f: &Fixture, id: &str) {
     let request = CommitRequest {
         writes: vec!["fresh".into()],
         message: "fresh".into(),
-        cutover_grant: None,
     };
     assert_eq!(
         f.driver
@@ -741,8 +602,7 @@ fn admission_abandons_pre_attempt_commit_and_sync_without_blocking_fresh_ids() {
             let request = CommitRequest {
                 writes: vec!["fresh".into()],
                 message: "fresh".into(),
-                cutover_grant: None,
-            };
+                    };
             assert_eq!(
                 f.driver
                     .scoped_commit(&f.repo, f.held(), &baseline, &request, "fixture", "fresh", &wal::OsFileSystem)
@@ -854,8 +714,7 @@ fn terminal_commit_history_is_bounded_and_compacted_receipts_replay() {
         let request = CommitRequest {
             writes: vec!["a".into()],
             message: "bounded".into(),
-            cutover_grant: None,
-        };
+            };
         let id = format!("bounded-{n}");
         let result = f
             .driver
@@ -1078,8 +937,7 @@ fn legacy_chains_from_a_dead_checkout_are_abandoned_without_replay() {
                 &CommitRequest {
                     writes: vec!["fresh".into()],
                     message: "fresh".into(),
-                    cutover_grant: None,
-                },
+                            },
                 "fixture",
                 "new-checkout",
                 &wal::OsFileSystem,
@@ -1343,8 +1201,7 @@ fn lifecycle_attempts_exclude_commit_and_sync() {
                 &CommitRequest {
                     writes: vec!["a".into()],
                     message: "new".into(),
-                    cutover_grant: None,
-                },
+                            },
                 "fixture",
                 "new",
                 &wal::OsFileSystem,
@@ -1709,7 +1566,6 @@ fn nested_request() -> CommitRequest {
     CommitRequest {
         writes: vec!["deep/er/file".into()],
         message: "nested\n".into(),
-        cutover_grant: None,
     }
 }
 fn objects_of_commit(f: &Fixture, base: &str) -> u64 {

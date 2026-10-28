@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { hostBinFromActivation, resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
+import { hostBinFromActivation, resolveActiveHostBin, routeEnv } from '../../src/util/host-bin-path.mjs';
 
 function tmp(prefix) {
   return fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
@@ -109,4 +109,11 @@ test('resolveActiveHostBin reports where it looked when nothing resolves', () =>
     assert.equal(bin, null);
     assert.ok(tried.some((entry) => entry.includes(path.join(empty, '.fgos', 'installation', 'activation.json'))), tried.join('\n'));
   });
+});
+
+test('a route child gets this environment minus the invocation record path, and the given environment is left whole', () => {
+  const env = { KEEP: '1', FGOS_INVOCATION_RECORD_PATH: '/records.jsonl' };
+  assert.deepEqual(routeEnv(env), { KEEP: '1' });
+  assert.equal(env.FGOS_INVOCATION_RECORD_PATH, '/records.jsonl');
+  assert.equal(routeEnv().FGOS_INVOCATION_RECORD_PATH, undefined);
 });

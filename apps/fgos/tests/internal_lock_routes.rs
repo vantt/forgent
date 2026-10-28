@@ -97,6 +97,34 @@ fn shared_try_answers_free_or_held_on_the_handed_description_and_never_waits() {
 }
 
 #[test]
+fn shared_try_path_answers_free_or_held_without_creating_or_obstructing() {
+    let _serial = serial();
+    let dir = temp_dir("shared-path");
+    let res = Resource::new("shared", dir.join("shared.lock"));
+    drop(open_rw(&res.path));
+    let path = res.path.to_string_lossy().into_owned();
+    let free = route(&["lock-fd", "--protocol", "2", "--shared-try-path", &path]);
+    assert_eq!((free.status.code(), json_line(&free)["result"].clone()), (Some(0), Value::from("free")));
+    let owner = match acquire(&res, Mode::Ex, Wait::Try, 2000) {
+        Acquire::Acquired(h) => h,
+        other => panic!("{other:?}"),
+    };
+    let started = std::time::Instant::now();
+    let held = route(&["lock-fd", "--protocol", "2", "--shared-try-path", &path]);
+    assert!(started.elapsed() < Duration::from_secs(2), "the shared try never waits");
+    let v = json_line(&held);
+    assert_eq!((held.status.code(), v["result"].as_str(), v["reason"].as_str()), (Some(10), Some("held"), Some("kernel-lock-held")));
+    assert_eq!(probe(&res).unwrap(), Probe::Held, "the try left the owner's lock alone");
+    assert!(matches!(release(owner), Release::Released { .. }));
+    // A file that is not there is not the route's business: it is not created.
+    let missing = dir.join("missing.lock");
+    let refused = route(&["lock-fd", "--protocol", "2", "--shared-try-path", &missing.to_string_lossy()]);
+    assert_ne!(refused.status.code(), Some(0));
+    assert!(!missing.exists());
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
 fn borrowed_check_accepts_the_borrowed_description_and_refuses_a_sibling() {
     let _serial = serial();
     let dir = temp_dir("borrow");

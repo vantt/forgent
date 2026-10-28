@@ -7,6 +7,7 @@ import { nativeAddonLibraryName } from './build-rust-distribution.mjs';
 import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
 import { gitAddonDirectory } from './lib/git-addon-stage.mjs';
 import { processesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
+import { scan } from '../src/runner/dispatch/process-identity.mjs';
 
 const checkoutRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -39,6 +40,7 @@ function atomicWrite(destination, writeTemporary) {
     if (created) fs.rmSync(temporary, { force: true });
   }
 }
+const HOST_ENV_KEYS = ['FGOS_HOST_BIN'];
 // A staged run directory left behind is pruned only once it is this old, so a run still being staged
 // by a concurrent invocation (no process runs from it yet) is never taken from under it.
 export const STALE_RUN_DIR_MS = 10 * 60 * 1000;
@@ -48,16 +50,27 @@ export const STALE_RUN_DIR_MS = 10 * 60 * 1000;
  * (or its gate) started by the host keeps executing it, and its attempt steps run it again by path. A
  * detached `node bin/fgos.mjs` child (the event-store seal and publish children) runs nothing from it
  * yet, but its FGOS_HOST_BIN names the staged host it will call.
+ * Where the door cannot scan (`unsupported`: Windows, macOS) nothing proves the directory unused, so it is kept;
+ * `pruneRunDirs` removes it once it is stale.
+ * A view the scan could not read (`unreadable`) is not treated as a holder: it belongs to another user (permission
+ * denied; on Linux most views are such), and the detached child of this launcher always runs as our own user.
+ * @param {string} runtimeDir
+ * @param {object[]|'unsupported'} [views] a scan already taken with `HOST_ENV_KEYS`, shared across directories
  * @returns {boolean} whether the directory was removed
  */
-export function releaseRunDir(runtimeDir) {
-  if (processesInside(runtimeDir, { envKeys: ['FGOS_HOST_BIN'] }).length > 0) return false;
+export function releaseRunDir(runtimeDir, views = scan({ envKeys: HOST_ENV_KEYS })) {
+  if (views === 'unsupported') return false;
+  if (processesInside(runtimeDir, { envKeys: HOST_ENV_KEYS, views }).length > 0) return false;
   fs.rmSync(runtimeDir, { recursive: true, force: true });
   return true;
 }
 
-/** Remove the staged run directories that were kept for a process which has since ended. */
-export function pruneRunDirs(runtimeBase, { now = Date.now(), staleMs = STALE_RUN_DIR_MS } = {}) {
+/**
+ * Remove the staged run directories that were kept for a process which has since ended. `views` is the process scan
+ * (taken here, once, when the first stale directory is found, unless the caller supplies one). A removal that fails
+ * leaves its directory for the next prune and never throws.
+ */
+export function pruneRunDirs(runtimeBase, { now = Date.now(), staleMs = STALE_RUN_DIR_MS, views = null } = {}) {
   let names;
   try { names = fs.readdirSync(runtimeBase); } catch { return; }
   for (const name of names.filter((n) => n.startsWith('run-'))) {
@@ -65,7 +78,12 @@ export function pruneRunDirs(runtimeBase, { now = Date.now(), staleMs = STALE_RU
     let stat;
     try { stat = fs.lstatSync(dir); } catch { continue; }
     if (!stat.isDirectory() || now - stat.mtimeMs < staleMs) continue;
-    releaseRunDir(dir);
+    views ??= scan({ envKeys: HOST_ENV_KEYS });
+    try {
+      // Without a scan only age speaks: a directory this old (stale) is removed.
+      if (views === 'unsupported') fs.rmSync(dir, { recursive: true, force: true });
+      else releaseRunDir(dir, views);
+    } catch { /* kept for the next prune (a host still running from it holds its files on Windows) */ }
   }
 }
 

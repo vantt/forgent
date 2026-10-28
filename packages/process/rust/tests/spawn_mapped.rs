@@ -10,7 +10,7 @@ use std::os::fd::AsRawFd;
 use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 
-use fgos_process::mapped::{spawn_mapped, MappedLead, MappedSpawn, MappedStdio};
+use fgos_process::mapped::{spawn_detached, spawn_mapped, MappedLead, MappedSpawn, MappedStdio};
 use fgos_process::FdSlot;
 
 fn temp_dir(tag: &str) -> PathBuf {
@@ -174,4 +174,37 @@ fn path_lookup_skips_directories_uses_child_cwd_and_runs_scripts_without_shebang
     req.env = vec![("PATH".into(), "".into())];
     assert_eq!(output(req, &[]), ("script:arg".into(), 0));
     fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
+fn a_detached_child_leads_its_own_session_logs_privately_and_is_not_waited_for() {
+    let dir = temp_dir("detached");
+    let leaky = File::create(dir.join("leaky")).unwrap();
+    // SAFETY: clears close-on-exec on a descriptor this test owns.
+    assert_eq!(unsafe { libc::fcntl(leaky.as_raw_fd(), libc::F_SETFD, 0) }, 0);
+    let script = "while [ ! -e go ]; do sleep 0.01; done; echo \"sid=$(ps -o sid= -p $$ | tr -d ' ') pid=$$ probe=$MAPPED_PROBE\"; ls /proc/self/fd | sort -n | tr '\\n' ' '";
+    let argv = vec!["sh".into(), "-c".into(), script.into()];
+    let env = vec![("MAPPED_PROBE".into(), "yes".into())];
+    let log = dir.join("child.log");
+    let pid = spawn_detached(&argv, &dir, &env, Some(&log)).expect("spawn");
+    // The call returned while the child still waits for its go file.
+    assert!(!dir.join("go").exists());
+    assert!(PathBuf::from(format!("/proc/{pid}")).exists(), "the child runs");
+    assert_eq!(fs::metadata(&log).unwrap().mode() & 0o777, 0o600);
+    fs::write(dir.join("go"), "").unwrap();
+    let start = std::time::Instant::now();
+    let text = loop {
+        let text = fs::read_to_string(&log).unwrap();
+        if text.lines().count() >= 2 {
+            break text;
+        }
+        assert!(start.elapsed() < std::time::Duration::from_secs(10), "the child never wrote its log: {text:?}");
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    };
+    let mut lines = text.lines();
+    assert_eq!(lines.next().unwrap(), format!("sid={pid} pid={pid} probe=yes"), "its own session, the given environment");
+    let fds: Vec<u32> = lines.next().unwrap().split_whitespace().map(|n| n.parse().unwrap()).collect();
+    // 0-2 and the directory `ls` itself opens: nothing the caller holds survives.
+    assert!(fds.iter().filter(|fd| **fd >= 3).count() <= 1, "{fds:?}");
+    fs::remove_dir_all(dir).ok();
 }

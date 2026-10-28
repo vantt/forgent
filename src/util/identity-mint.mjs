@@ -3,20 +3,11 @@
 // It decides nothing about an id; no door means WriterIdentityError, never a guessed id.
 import fs from 'node:fs';
 import os from 'node:os';
-import { nativeDoor } from '../native/door.mjs';
-import { WriterIdentityError } from './session-identity.mjs';
-
-function door() {
-  try {
-    return nativeDoor().sessionIdentity;
-  } catch (err) {
-    throw new WriterIdentityError('host-missing', `${err.message}; run through the \`fgos\` command of an activated workspace, or from a checkout through \`npm run fgos:dev\``);
-  }
-}
+import { identityDoor } from './session-identity.mjs';
 
 /** A new work item id, `tsk-<10 base32>`. */
 export function mintWorkId() {
-  return door().mintRandom('work');
+  return identityDoor().mintRandom('work');
 }
 
 /**
@@ -25,7 +16,7 @@ export function mintWorkId() {
  */
 export function mintMachineId(stateRoot) {
   fs.mkdirSync(stateRoot, { recursive: true, mode: 0o700 });
-  return door().mintMachineId(fs.realpathSync(stateRoot), os.hostname());
+  return identityDoor().mintMachineId(fs.realpathSync(stateRoot), os.hostname());
 }
 
 /**
@@ -34,5 +25,5 @@ export function mintMachineId(stateRoot) {
  */
 export function mintMachineKey(stateRoot) {
   fs.mkdirSync(stateRoot, { recursive: true, mode: 0o700 });
-  return door().mintMachineKey(fs.realpathSync(stateRoot));
+  return identityDoor().mintMachineKey(fs.realpathSync(stateRoot));
 }

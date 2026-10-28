@@ -82,7 +82,8 @@ test('a land that waits while another holder has main merges once main is releas
   assert.equal(fs.existsSync(path.join(repoRoot, '.git', 'index.lock')), false);
 });
 
-test('with the hook, the land\'s ref update runs no repository hook, a manual commit attempted while main is held is refused, and the land completes with no manual commit', { skip }, async () => {
+// That the hook refuses a commit while main is held is owned by main-checkout-activity-beacon.test.mjs; this test owns the land itself.
+test('with the hook, the land\'s ref update runs no repository hook and the land completes with no manual commit', { skip }, async () => {
   const repoRoot = initRepo();
   activateGitFixture(repoRoot);
   addBranch(repoRoot, 'fgw/item-a', 'a.txt', 'a\n');
@@ -112,16 +113,6 @@ exit 0
 
   assert.equal(result.outcome, 'merged', JSON.stringify(result));
   assert.equal(fs.existsSync(attemptLog), false, 'the land ran the reference-transaction hook');
-  // The land publishes holding main; a manual commit under that same lock is refused.
-  await withMainCheckout(createLockScope('land'), 'land', async () => {
-    fs.writeFileSync(path.join(repoRoot, 'manual.txt'), 'manual\n');
-    git(repoRoot, ['add', 'manual.txt']);
-    const res = spawnSync('git', ['-c', 'user.name=Manual', '-c', 'user.email=m@example.com', 'commit', '-q', '-m', 'manual commit during land'], { cwd: repoRoot, encoding: 'utf8', env: sessionEnv() });
-    const attempt = `${res.stdout}${res.stderr}exit=${res.status}`;
-    assert.doesNotMatch(attempt, /exit=0/, `the manual commit must be refused while the land holds main:\n${attempt}`);
-    assert.match(attempt, /fgOS is writing the main checkout/);
-    git(repoRoot, ['reset', '-q', 'manual.txt']);
-  }, { fgosDir: path.join(repoRoot, '.fgos') });
   assert.doesNotMatch(git(repoRoot, ['log', '--format=%s', 'main']), /manual commit during land/);
   assert.equal(commitCount(repoRoot), before + 2, 'the merged branch commit and the merge commit, nothing else');
 });

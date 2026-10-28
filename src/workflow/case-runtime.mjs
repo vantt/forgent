@@ -15,6 +15,7 @@ import { gateAnswerFile } from '../runner/execution/handoff-refs.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { unbindWorktree } from './case-bindings.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
+import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
 const caseDir = (mainRoot, caseId) => path.join(mainRoot, '.fgos', 'workflow-runs', caseId);
 
@@ -147,7 +148,7 @@ function renderGateAnswerFile(mainRoot, caseId, stepId) {
   const rounds = roundsOf(mainRoot, caseId, stepId);
   if (rounds.length === 0) return;
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  const tmp = `${file}.${process.pid}.tmp`;
+  const tmp = `${file}.${uniqueTmpTag()}.tmp`;
   fs.writeFileSync(tmp, renderAnswerFile(caseId, stepId, rounds));
   fs.renameSync(tmp, file);
 }
