@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import { runDebate, PARAMS, DEFAULT_REBUTTAL } from '../../../../src/runner/execution/loops/debate.mjs';
 import { patternHistoryOutcome } from '../../../../src/runner/execution/loops/history-outcome.mjs';
 import { resolveSeats, seatLaunchesOf } from '../../../../src/runner/execution/seat-resolver.mjs';
-import { runLoop } from '../../../../src/runner/execution/loops/index.mjs';
 
 const seats = [
   { seat: 'thesis', role: 'producer' },
@@ -165,14 +164,6 @@ test('history outcome: unknown until every seat reported, then the judge\'s', ()
   assert.equal(historyOutcome({ rebuttal: false }, [...full.slice(0, 2), { seat: 'judge', round: 1, outcome: 'pass' }]), 'pass');
 });
 
-test('runLoop dispatches debate loop by name and as effective object', async () => {
-  const { calls, runRole } = recorder();
-  await runLoop('debate', unit, {}, { runRole });
-  assert.equal(calls.length, 5);
-  const second = recorder();
-  await runLoop({ loop: 'debate', params: { rebuttal: false } }, unit, {}, { runRole: second.runRole });
-  assert.equal(second.calls.length, 3);
-});
 
 test('debate module exports its param table and default rebuttal', () => {
   assert.equal(DEFAULT_REBUTTAL, true);

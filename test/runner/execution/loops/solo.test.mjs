@@ -146,21 +146,9 @@ test('verify runs once after a passing producer', async () => {
   assert.equal(result.results.length, 2);
   assert.equal(result.results[0].seat, 'producer');
   assert.equal(result.results[1].seat, 'verify');
+  assert.equal(result.results[1].round, 1);
   assert.equal(result.results[1].outcome, 'pass');
-});
-
-test('pass yields a verify result and a harness receipt by result shape', async () => {
-  const unit = { id: 'u-verify-receipt', objective: 'Verify receipt', verify: 'make test' };
-  const runRole = async (opts) => ({ seat: opts.seat.seat, outcome: 'pass' });
-  const verify = async () => ({ pass: true });
-
-  const result = await runSolo(unit, {}, { runRole, verify });
-  assert.equal(result.results.length, 2);
-  const verifyResult = result.results[1];
-  assert.equal(verifyResult.seat, 'verify');
-  assert.equal(verifyResult.round, 1);
-  assert.equal(verifyResult.outcome, 'pass');
-  assert.ok(isVerifyResult(verifyResult));
+  assert.ok(isVerifyResult(result.results[1]));
 });
 
 test('fail yields findings and no second producer launch', async () => {

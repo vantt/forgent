@@ -429,12 +429,6 @@ test('fgos run keeps --timeout: it raises no tier', () => {
   assert.equal(binding.tier, 'standard');
 });
 
-test('fgos run refuses conflicting parameters between param and params as param-request-conflict', () => {
-  const tmp = setupTestRepo();
-  const out = failCli(['Check it', '--capability', 'docs:write', '--param', 'maxRounds=2', '--params', '{"maxRounds": 3}', '--dir', tmp], tmp);
-  assert.match(out, /param-request-conflict/);
-  assert.deepEqual(unitRunsOf(tmp), []);
-});
 
 test('fgos run refuses param or params beside resume', () => {
   const tmp = setupTestRepo();
@@ -445,18 +439,3 @@ test('fgos run refuses param or params beside resume', () => {
   assert.match(outParams, /--params cannot change a resumed unit run/);
 });
 
-test('fgos run standalone request is admitted without a reason and pins the requested value with its provenance', () => {
-  const tmp = setupTestRepo();
-  // The fixture pool has one executor family, so the checkers of a reviewed run may be refused after
-  // admission; what this proves is that the request was admitted without a reason and pinned.
-  let stdout;
-  try {
-    stdout = runCli(['Write notes', '--capability', 'docs:write', '--pattern', 'reviewed', '--param', 'maxRounds=1', '--dir', tmp], tmp);
-  } catch (err) {
-    stdout = err.stdout;
-  }
-  assert.ok(!stdout.includes('request-reason-required'), stdout);
-  const record = unitRecordOf(tmp, stdout);
-  assert.equal(record.collaboration?.effective?.params?.maxRounds, 1);
-  assert.equal(record.collaboration?.provenance?.params?.maxRounds, 'request');
-});

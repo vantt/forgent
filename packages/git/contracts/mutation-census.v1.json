@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1bc8ef51ad6bd4fb4ab8260763ca6528598c0bcd396df94920ba47ba9d300a58",
+  "payloadDigest": "9a34994882fa7834b5db0b063615d5955ca14912a78fb17bf3be70e4795372d6",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1009,7 +1009,7 @@
     "src/runner/dispatch/recovery.mjs": "4f2b86847289118fbfe50ca261310de18864a2718f6962214bc362569310e5ca",
     "src/runner/dispatch/resolve.mjs": "43f445921ecfe5bfc1e05d139934982b042c3cadcb42ab775188b58e0ab35f44",
     "src/runner/dispatch/result-ladder.mjs": "32f5c419991c663b2b7165951a5d79c5a1f556a70972fea3e511ed530574e9c3",
-    "src/runner/dispatch/retired-config-keys.mjs": "595fe5285b92041f089eb75501cd9481576a587f40bd8ee06e596330d88a6267",
+    "src/runner/dispatch/retired-config-keys.mjs": "d5ccbcedbbccb1340fdc9c200e55db5826e6fa4fb1fdbcafb64a6200dc681be8",
     "src/runner/dispatch/run-lock.mjs": "6163eab9be0fa44f6ac4b80d800ddc6fc615a23d698b392df63f427e2356c53d",
     "src/runner/dispatch/run-result.mjs": "9d0bf13cc9f695ae58d60052debbdf446868260b481c6ef036f9acaa611890f9",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
@@ -1048,8 +1048,9 @@
     "src/runner/execution/loops/solo.mjs": "723a33c888009c58e8bed2cb86e2941f25bd6a67eab397cb5417eb42b181570e",
     "src/runner/execution/loops/verify.mjs": "cd3901a540556757badad15781dd2a9ac86f432bc670891626a8b9bf3767dca7",
     "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",
-    "src/runner/execution/patterns/catalog-entries.mjs": "adcc150e59ed09ae323dc06f9830c84aa62bc2adf31241c459b4325d22e02886",
+    "src/runner/execution/patterns/catalog-entries.mjs": "310b27d2e1456bbd216519fa7cbb82c6d589152b01fc23501e6c7d5f779c40ae",
     "src/runner/execution/patterns/catalog.mjs": "3c7b86a9640a339cbcd62583ac3ff11077687a700534ac63f4b692c0d4eed308",
+    "src/runner/execution/patterns/retired-keys.mjs": "f198d8edc80c3ee7eaabffbc76b744c57be19c9c0c0518c2217cd1e6c7a8e29c",
     "src/runner/execution/run-request.mjs": "b8ba8003a695f457ab1ebdc22808a994c4f3c4dbfc5d05cd1ab88bd65b823645",
     "src/runner/execution/run.mjs": "d39b9c4c4745df7f0ce3c920c0e318ec9d686cdda15349562326a703491031e1",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",

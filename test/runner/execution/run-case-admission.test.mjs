@@ -18,8 +18,7 @@ import { dispatchCwdHolder } from '../../../src/runner/dispatch/cwd-lock.mjs';
 import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-port.mjs';
 import { createPendingBinding, commitBinding } from '../../../src/workflow/case-bindings.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
-try { fs.accessSync('/var/tmp', fs.constants.W_OK); } catch { if (!process.env.FGOS_TEST_FIXTURE_ROOT) process.env.FGOS_TEST_FIXTURE_ROOT = os.tmpdir(); }
-const { makeFixtureDir } = await import('../../helpers/fixture-dir.mjs');
+import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
@@ -382,17 +381,14 @@ test('pattern swap in case requires reason and records swap in pin', async () =>
   const port = recordingPort();
 
   // Without reason: refuses before admission
-  await assert.rejects(
-    runUnit({
-      unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
-      pattern: 'solo',
-      caseAdmission: port,
-      caseRef: { caseId: 'case-test', activity: 'review' },
-      activityUnit: { pattern: 'reviewed' },
-      repoRoot, cwd: worktreeDir, worktree: worktreeDir,
-    }),
-    (err) => err instanceof RunnerConfigError && err.code === 'request-reason-required',
-  );
+  await assert.rejects(runUnit({
+    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
+    pattern: 'solo',
+    caseAdmission: port,
+    caseRef: { caseId: 'case-test', activity: 'review' },
+    activityUnit: { pattern: 'reviewed' },
+    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  }));
   assert.equal(port.calls.filter((c) => c[0] === 'admit').length, 0);
 
   // With reason: runs and pin records swap

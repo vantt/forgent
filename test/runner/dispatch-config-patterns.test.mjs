@@ -45,8 +45,18 @@ test('the standard\'s default patterns and loops pass the runner\'s own checks',
   // Invariants on code-change, consult, rfc
   assert.deepEqual(patterns['code-change'].invariants.minCheckers, { atLeast: ['reviewer', 'red-team'] });
   assert.deepEqual(patterns.consult.invariants.seats, { fixed: [{ seat: 'advisor', role: 'producer' }] });
+  assert.equal(patterns.consult.loop, 'solo');
   assert.deepEqual(patterns.rfc.invariants.minCheckers, { atLeast: ['reviewer', 'red-team'] });
+  assert.equal(patterns.rfc.defaults.maxRounds, 1);
 
+  // research-fan-out seats (3 researchers + synthesizer, no members)
+  assert.deepEqual(patterns['research-fan-out'].defaults.seats, [
+    { seat: 'researcher-1', role: 'producer' },
+    { seat: 'researcher-2', role: 'producer' },
+    { seat: 'researcher-3', role: 'producer' },
+    { seat: 'synthesizer', role: 'synthesizer' },
+  ]);
+  assert.equal(patterns['research-fan-out'].defaults.seats.some((s) => s.seat.includes('member') || s.role === 'member'), false);
   // loops.reviewed tuning
   assert.ok(loops);
   assert.equal(loops.reviewed.maxRounds, 2);
@@ -254,7 +264,7 @@ test('validateRunnerLoopsShape: validates loop tuning and cumulative checkers ac
   }, 'loops'));
 });
 
-test('bounds validity at load (S9): min > max, non-integer, bound on an unread param', () => {
+test('bounds validity at load: min > max, non-integer, bound on an unread param', () => {
   // Bound on unread param for reviewed loop
   assert.throws(
     () => validateRunnerLoopsShape({
@@ -299,7 +309,7 @@ test('bounds validity at load (S9): min > max, non-integer, bound on an unread p
   }, 'loops'));
 });
 
-test('retired keys refusal (S18): refuses with config-key-retired naming file and replacement', () => {
+test('retired keys refusal: refuses with config-key-retired naming file and replacement', () => {
   // 1. Direct validation: defaultRule
   assert.throws(
     () => validateRunnerPatternsShape({ defaultRule: { mutatingMinRigor: 'standard' } }, 'patterns'),

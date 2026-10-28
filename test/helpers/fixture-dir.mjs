@@ -10,8 +10,19 @@ import { watchSealChildrenOf } from './process-tmp-root.mjs';
 
 // The test runner points this at a per-run directory it removes itself, which also covers a file it
 // had to kill with a signal; run alone, fixtures go straight under /var/tmp and clean up at exit.
-export const FIXTURE_ROOT = process.env.FGOS_TEST_FIXTURE_ROOT
-  || (fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir());
+function resolveFixtureRoot() {
+  if (process.env.FGOS_TEST_FIXTURE_ROOT) return process.env.FGOS_TEST_FIXTURE_ROOT;
+  try {
+    fs.accessSync('/var/tmp', fs.constants.W_OK);
+    return '/var/tmp';
+  } catch {
+    return os.tmpdir();
+  }
+}
+export const FIXTURE_ROOT = resolveFixtureRoot();
+if (!process.env.FGOS_TEST_FIXTURE_ROOT) {
+  process.env.FGOS_TEST_FIXTURE_ROOT = FIXTURE_ROOT;
+}
 
 const created = new Set();
 let exitHookInstalled = false;

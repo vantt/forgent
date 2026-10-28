@@ -7,28 +7,12 @@ import os from 'node:os';
 import path from 'node:path';
 import { parseYaml } from '../../util/yaml.mjs';
 import { RunnerConfigError } from './config.mjs';
+import {
+  RETIRED_CONFIG_KEYS,
+  detectRetiredPatternKeys,
+} from '../execution/patterns/retired-keys.mjs';
 
-/**
- * Table of retired configuration keys and their replacements.
- */
-export const RETIRED_CONFIG_KEYS = Object.freeze({
-  'runner.patterns.defaultRule': Object.freeze({
-    replacement: null,
-    instruction: 'delete the key',
-  }),
-  'runner.patterns.reviewed.maxRounds': Object.freeze({
-    replacement: 'runner.loops.reviewed.maxRounds',
-    instruction: 'use runner.loops.reviewed.maxRounds instead',
-  }),
-  'runner.patterns.reviewed.checkersByRigor': Object.freeze({
-    replacement: 'runner.loops.reviewed.checkersByRigor',
-    instruction: 'use runner.loops.reviewed.checkersByRigor instead',
-  }),
-  'runner.patterns.research-fan-out-gated': Object.freeze({
-    replacement: 'runner.patterns.research-fan-out',
-    instruction: 'use runner.patterns.research-fan-out instead',
-  }),
-});
+export { RETIRED_CONFIG_KEYS };
 
 /**
  * Inspects `runnerRaw` (the parsed runner section or config object) for retired keys.
@@ -45,52 +29,43 @@ export function retiredKeysIn(runnerRaw, file) {
 
   const findings = [];
   const fileName = file ?? '<config>';
-
-  if (patterns.defaultRule !== undefined) {
-    findings.push({
-      key: 'runner.patterns.defaultRule',
-      file: fileName,
-      replacement: null,
-      message: `${fileName}: runner.patterns.defaultRule was retired; delete the key.`,
-    });
-  }
-
-  if (patterns['research-fan-out-gated'] !== undefined) {
-    findings.push({
-      key: 'runner.patterns.research-fan-out-gated',
-      file: fileName,
-      replacement: 'runner.patterns.research-fan-out',
-      message: `${fileName}: runner.patterns.research-fan-out-gated was retired; use runner.patterns.research-fan-out instead.`,
-    });
-  }
-
-  if (patterns.reviewed !== undefined) {
-    const entry = patterns.reviewed;
-    if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
-      const hasTuning = 'maxRounds' in entry || 'checkersByRigor' in entry;
-      const hasCatalog = 'loop' in entry || 'defaults' in entry || 'promise' in entry || 'invariants' in entry;
-      if (hasTuning && hasCatalog) {
-        throw new RunnerConfigError(
-          `runner config (${fileName} patterns.reviewed) cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.reviewed.`,
-        );
+  const detected = detectRetiredPatternKeys(patterns);
+  for (const item of detected) {
+    if (item.kind === 'both-shapes') {
+      throw new RunnerConfigError(
+        `runner config (${fileName} patterns.${item.name}) cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${item.name}.`,
+      );
+    }
+    if (item.kind === 'defaultRule') {
+      findings.push({
+        key: 'runner.patterns.defaultRule',
+        file: fileName,
+        replacement: null,
+        message: `${fileName}: runner.patterns.defaultRule was retired; delete the key.`,
+      });
+    } else if (item.kind === 'gated') {
+      findings.push({
+        key: item.key,
+        file: fileName,
+        replacement: item.replacement,
+        message: `${fileName}: ${item.baseMessage}.`,
+      });
+    } else if (item.kind === 'tuning-only') {
+      if (item.hasMaxRounds) {
+        findings.push({
+          key: `runner.patterns.${item.name}.maxRounds`,
+          file: fileName,
+          replacement: `runner.loops.${item.name}.maxRounds`,
+          message: `${fileName}: runner.patterns.${item.name}.maxRounds was retired; use runner.loops.${item.name}.maxRounds instead.`,
+        });
       }
-      if (hasTuning && !hasCatalog) {
-        if ('maxRounds' in entry) {
-          findings.push({
-            key: 'runner.patterns.reviewed.maxRounds',
-            file: fileName,
-            replacement: 'runner.loops.reviewed.maxRounds',
-            message: `${fileName}: runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.`,
-          });
-        }
-        if ('checkersByRigor' in entry) {
-          findings.push({
-            key: 'runner.patterns.reviewed.checkersByRigor',
-            file: fileName,
-            replacement: 'runner.loops.reviewed.checkersByRigor',
-            message: `${fileName}: runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead.`,
-          });
-        }
+      if (item.hasCheckersByRigor) {
+        findings.push({
+          key: `runner.patterns.${item.name}.checkersByRigor`,
+          file: fileName,
+          replacement: `runner.loops.${item.name}.checkersByRigor`,
+          message: `${fileName}: runner.patterns.${item.name}.checkersByRigor was retired; use runner.loops.${item.name}.checkersByRigor instead.`,
+        });
       }
     }
   }

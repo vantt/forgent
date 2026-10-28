@@ -306,6 +306,7 @@
     "src/runner/execution/loops/panel.mjs": "domain",
     "src/runner/execution/patterns/catalog.mjs": "domain",
     "src/runner/execution/patterns/catalog-entries.mjs": "domain",
+    "src/runner/execution/patterns/retired-keys.mjs": "domain",
     "src/runner/execution/loops/reviewed.mjs": "domain",
     "src/runner/execution/loops/role-tasks.mjs": "domain",
     "src/runner/execution/loops/solo.mjs": "domain",

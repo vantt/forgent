@@ -206,19 +206,25 @@ test('changing the execution loop of a shipped pattern is refused with source la
   assert.match(error.message, /panel/);
 });
 
-test('retired pattern name research-fan-out-gated returns null loop and refuses config entry', () => {
+test('retired pattern name research-fan-out-gated returns null loop', () => {
   const shipped = shippedCatalog();
-
   assert.equal(loopOf('research-fan-out-gated', { effective: shipped.patterns }), null);
+});
 
+test('retired pattern key in checkCatalog reports config-key-retired with source layer attribution', () => {
+  const shipped = shippedCatalog();
   const effective = {
     'research-fan-out-gated': {
       promise: 'Retired pattern representation.',
       loop: 'panel',
     },
   };
-  const { problems } = checkCatalog({ shipped, effective });
-  assert.ok(problems.some((p) => p.code === 'config-key-retired'));
+  const layers = { 'research-fan-out-gated': 'project' };
+  const { problems } = checkCatalog({ shipped, effective, layers });
+  const error = problems.find((p) => p.code === 'config-key-retired');
+  assert.ok(error);
+  assert.equal(error.source, 'project');
+  assert.match(error.message, /source layer: project/);
 });
 
 test('reserved names used as pattern names are refused as config errors', () => {
@@ -232,31 +238,6 @@ test('reserved names used as pattern names are refused as config errors', () => 
   };
   const res1 = checkCatalog({ shipped, effective: effectiveSeatBinding });
   assert.ok(res1.problems.some((p) => p.code === 'config-error'));
-
-  const effectiveDefaultRule = {
-    defaultRule: {
-      pattern: 'reviewed',
-    },
-  };
-  const res2 = checkCatalog({ shipped, effective: effectiveDefaultRule });
-  assert.ok(res2.problems.some((p) => p.code === 'config-key-retired'));
-});
-
-test('an entry combining catalog fields with retired loop tuning is refused as a config error', () => {
-  const shipped = shippedCatalog();
-  const effective = {
-    reviewed: {
-      loop: 'reviewed',
-      promise: 'A producer executes followed by review.',
-      maxRounds: 2,
-      checkersByRigor: {
-        standard: ['reviewer'],
-      },
-    },
-  };
-
-  const { problems } = checkCatalog({ shipped, effective });
-  assert.ok(problems.some((p) => p.code === 'config-error'));
 });
 
 test('stray parameter keys not read by the final loop cannot survive', () => {
@@ -893,13 +874,6 @@ test('parameter validation rejects inherited object properties as loop parameter
   assert.strictEqual(res.entries['custom-pattern-inherited-param'].defaults.minCheckers, undefined);
 });
 
-test('shipped pattern lookup does not read inherited properties or mutate global object', () => {
-  const effective = JSON.parse('{"constructor":{"loop":"reviewed","promise":"custom","defaults":{"maxRounds":2}}}');
-  const res = checkCatalog({ shipped: { patterns: {} }, effective });
-  assert.strictEqual(Object.isFrozen(Object), false);
-  assert.strictEqual(res.entries.constructor === Object, false);
-});
-
 test('non-string checker names in minCheckers and seats are rejected with param-invalid', () => {
   const shipped = shippedCatalog();
 
@@ -1088,6 +1062,9 @@ test('cloned and merged entries preserve only own properties and ignore inherite
   assert.deepEqual(resOverride.problems, []);
   assert.strictEqual(resOverride.entries['code-change'].defaults.inheritedTuning, undefined);
   assert.strictEqual(resOverride.entries['code-change'].strayKey, undefined);
+
+  const ctorRes = checkCatalog({ shipped: { patterns: {} }, effective: JSON.parse('{"constructor":{"loop":"reviewed","promise":"custom","defaults":{"maxRounds":2}}}') });
+  assert.strictEqual(ctorRes.entries.constructor !== Object, true);
 });
 
 test('debate pattern with malformed seat ids and roleTasks refuses with param-invalid without escaping as TypeError', () => {
@@ -1766,6 +1743,24 @@ test('case dispatch without selectors inherits activity unit while empty dispatc
   const resEmpty = resolveCollaboration({ shipped });
   assert.equal(resEmpty.loop, 'solo');
   assert.equal(resEmpty.pin.baseline.source, 'solo');
+});
+
+test('resolveCollaboration resolves shipped consult and research-fan-out seat names', () => {
+  const shipped = shippedCatalog();
+
+  const resConsult = resolveCollaboration({ selectors: { callerString: 'consult' }, shipped });
+  assert.equal(resConsult.loop, 'solo');
+  assert.equal(resConsult.params.seats.length, 1);
+  assert.equal(resConsult.params.seats[0].seat, 'advisor');
+  assert.equal(resConsult.params.seats[0].role, 'producer');
+
+  const resResearch = resolveCollaboration({ selectors: { callerString: 'research-fan-out' }, shipped });
+  assert.equal(resResearch.loop, 'panel');
+  assert.deepEqual(
+    resResearch.params.seats.map((s) => s.seat),
+    ['researcher-1', 'researcher-2', 'researcher-3', 'synthesizer'],
+  );
+  assert.equal(resResearch.params.seats.some((s) => s.seat.includes('member') || s.role === 'member'), false);
 });
 
 test('unit declarations shadowed by higher precedence slots are validated for unknown keys and invalid values', () => {

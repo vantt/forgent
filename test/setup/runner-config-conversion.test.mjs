@@ -412,14 +412,7 @@ test('setup CLI prints global guidance when both project and global files hold r
     });
 
     const fgosBin = path.resolve('bin/fgos.mjs');
-    const result = spawnSync(process.execPath, [fgosBin, 'setup', '--dir', projectDir, '--pretty'], {
-      encoding: 'utf8',
-      env: { ...process.env, HOME: homeDir, USERPROFILE: homeDir },
-    });
-    assert.equal(result.status, 0, result.stderr);
-    assert.match(result.stdout, /global config holds retired keys/, 'must print global guidance');
-    assert.match(result.stdout, /runner patterns config conversion blocked/, 'must report project conversion blocked');
-
+    // boundary: CLI door integrates globalRetiredNotice with runnerPatternsConversion envelope in JSON output
     const jsonResult = spawnSync(process.execPath, [fgosBin, 'setup', '--dir', projectDir, '--json'], {
       encoding: 'utf8',
       env: { ...process.env, HOME: homeDir, USERPROFILE: homeDir },

@@ -9,6 +9,7 @@ import {
   LOOP_NAMES,
 } from '../seat-resolver.mjs';
 import { paramTableOf } from '../loops/index.mjs';
+import { detectRetiredPatternKeys } from './retired-keys.mjs';
 
 /**
  * Collaboration error carrying a standard refusal code and optional source layer.
@@ -373,20 +374,12 @@ export function checkCatalog(options = {}) {
   const problems = [];
   const RESERVED_PATTERN_NAMES = new Set(['seatBinding', 'defaultRule']);
   const ALLOWED_PATTERN_ENTRY_KEYS = new Set(['promise', 'loop', 'defaults', 'invariants']);
-  // 1. Retired keys checks
-  if (Object.hasOwn(effectivePatterns, 'defaultRule')) {
-    const src = resolveLayer(layers, 'defaultRule');
+  // 1. Retired keys checks via shared leaf detector
+  for (const finding of detectRetiredPatternKeys(effectivePatterns)) {
+    const src = resolveLayer(layers, finding.name);
     problems.push(new CollaborationError(
-      'config-key-retired',
-      `runner.patterns.defaultRule was retired; delete the key${src ? ` (source layer: ${src})` : ''}`,
-      { source: src },
-    ));
-  }
-  if (Object.hasOwn(effectivePatterns, 'research-fan-out-gated')) {
-    const src = resolveLayer(layers, 'research-fan-out-gated');
-    problems.push(new CollaborationError(
-      'config-key-retired',
-      `runner.patterns.research-fan-out-gated was retired; use runner.patterns.research-fan-out instead${src ? ` (source layer: ${src})` : ''}`,
+      finding.code,
+      `${finding.baseMessage}${src ? ` (source layer: ${src})` : ''}`,
       { source: src },
     ));
   }
@@ -426,23 +419,6 @@ export function checkCatalog(options = {}) {
       continue;
     }
 
-    const hasTuning = Object.hasOwn(entry, 'maxRounds') || Object.hasOwn(entry, 'checkersByRigor');
-    const hasCatalog = Object.hasOwn(entry, 'loop') || Object.hasOwn(entry, 'defaults') || Object.hasOwn(entry, 'promise') || Object.hasOwn(entry, 'invariants');
-    if (hasTuning && hasCatalog) {
-      const src = resolveLayer(layers, name);
-      problems.push(new CollaborationError(
-        'config-error',
-        `pattern "${name}" cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${name}${src ? ` (source layer: ${src})` : ''}`,
-        { source: src },
-      ));
-    } else if (hasTuning && !hasCatalog) {
-      const src = resolveLayer(layers, name);
-      problems.push(new CollaborationError(
-        'config-key-retired',
-        `runner.patterns.${name} was retired; use runner.loops.${name} instead${src ? ` (source layer: ${src})` : ''}`,
-        { source: src },
-      ));
-    }
 
     for (const key of Object.keys(entry)) {
       if (key === 'maxRounds' || key === 'checkersByRigor') continue;

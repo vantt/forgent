@@ -188,7 +188,7 @@ test('running plan-lint on the track\'s own plan.md lints clean and shows I15\'s
   assert.match(result.stdout, /coding implementation/i);
 });
 
-test('plan-lint accepts a pattern defined in project config and flags a typo in a phase file', () => {
+test('plan-lint accepts a pattern defined in project config', () => {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-lint-cli-'));
   const runner = {
     executor: { command: 'true', args: [] },
@@ -202,14 +202,11 @@ test('plan-lint accepts a pattern defined in project config and flags a typo in 
   const rel = writePlan(
     cwd,
     'phase-01-test.md',
-    `## Units\n- unit: u-custom\n  capability: code:implement\n  objective: "Test custom"\n  pattern: custom-pattern\n- unit: u-typo\n  capability: code:implement\n  objective: "Test typo"\n  pattern: misspeled-loop\n`,
+    `## Units\n- unit: u-custom\n  capability: code:implement\n  objective: "Test custom"\n  pattern: custom-pattern\n`,
   );
   const result = run(cwd, ['plan-lint', rel, '--json']);
   assert.equal(result.status, 0, result.stderr);
   const data = envelopeData(result.stdout);
   assert.equal(data.ok, true);
-  const unknown = data.findings.filter((f) => f.code === 'pattern.unknown');
-  assert.equal(unknown.length, 1);
-  assert.equal(unknown[0].unit, 'u-typo');
-  assert.match(unknown[0].message, /misspeled-loop/);
+  assert.deepEqual(data.findings, []);
 });

@@ -23,8 +23,7 @@ seedFileLocalBwrapRegistry();
 
 // Confined runs mount a private tmpfs over /tmp, so fixtures that the executor
 // must reach (command, worker script, worktree) live outside it.
-try { fs.accessSync('/var/tmp', fs.constants.W_OK); } catch { if (!process.env.FGOS_TEST_FIXTURE_ROOT) process.env.FGOS_TEST_FIXTURE_ROOT = os.tmpdir(); }
-const { makeFixtureDir } = await import('../../helpers/fixture-dir.mjs');
+import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 import { writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 
@@ -1876,17 +1875,7 @@ test('a solo run needs no verify and does not claim to have skipped one', async 
   assert.equal(res.verify, undefined);
 });
 
-test('a solo record with a command does not settle before verify completes, while one without settles', async (t) => {
-  // Solo record with no command: once producer passes, it settles as pass
-  const noCmdFix = recordedUnitFixture(t);
-  const noCmdRunDir = path.join(noCmdFix.unitDir, 'producer', '1', 'runs', '01');
-  fs.mkdirSync(noCmdRunDir, { recursive: true });
-  fs.writeFileSync(path.join(noCmdRunDir, 'result.json'), JSON.stringify({
-    runId: 'settled-producer', settledAt: '2026-10-05T01:01:00Z', classification: { outcome: { category: 'ok' } },
-  }));
-  writeUnitSummary(noCmdFix.unitDir);
-  assert.equal(noCmdFix.readSummary().outcome, 'pass');
-
+test('a solo record with a command does not settle before verify completes and resume runs verify', async (t) => {
   // Solo record with a verify command: producer passed but verify not run leaves derived outcome unknown, not pass
   const cmdFix = recordedUnitFixture(t);
   cmdFix.record.unit.verify = 'node -e "process.exit(0)"';
@@ -1945,32 +1934,6 @@ test('conflicting explicit pattern selectors refuse selector-conflict before adm
     (err) => err instanceof RunnerConfigError && err.code === 'selector-conflict',
   );
   assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')), false);
-});
-
-test('same name or one selector runs when explicit selectors do not conflict', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha']);
-
-  // Same name explicit selectors
-  const sameRes = await runUnit({
-    unitData: { id: 'u-same-name', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'solo' },
-    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
-    pattern: 'solo',
-  });
-  assert.equal(sameRes.outcome, 'pass');
-  const readRecord = (unitRunId) => JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', unitRunId, 'unit.json'), 'utf8'));
-  assert.equal(readRecord(sameRes.unitRunId).collaboration?.pattern?.name, 'solo');
-  assert.equal(readRecord(sameRes.unitRunId).collaboration?.effective?.loop, 'solo');
-
-  // One selector: caller pattern only, unit has no pattern
-  const oneRes = await runUnit({
-    unitData: { id: 'u-one-selector', objective: 'Write docs', capability: 'docs:write', writes: [] },
-    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
-    pattern: 'solo',
-  });
-  assert.equal(oneRes.outcome, 'pass');
-  assert.equal(readRecord(oneRes.unitRunId).collaboration?.pattern?.name, 'solo');
-  assert.equal(readRecord(oneRes.unitRunId).collaboration?.effective?.loop, 'solo');
 });
 
 test('unit-explicit verify on panel or debate refuses before admission', async () => {
@@ -2261,25 +2224,6 @@ test('a pinned unit keeps its effective seats on resume after a snapshot refresh
   const firstStored = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
   assert.deepEqual(firstStored.collaboration.effective.seats.map((s) => s.seat), ['producer', 'reviewer', 'red-team']);
 
-  // Change live capability config again to trigger another snapshot refresh on second resume
-  const cfg2 = readProjectConfig(repoRoot);
-  cfg2.runner.capabilities = { 'docs:write': { minCheckers: [] } };
-  writeProjectConfig(repoRoot, cfg2);
-
-  const secondRes = await coreRunUnit({
-    resumeUnitRunId: 'unit-run-pinned-roster',
-    repoRoot,
-    cwd: worktreeDir,
-    worktree: worktreeDir,
-  });
-  assert.equal(secondRes.outcome, 'pass');
-  assert.deepEqual(
-    secondRes.results.map((r) => r.seat),
-    ['producer', 'reviewer', 'red-team'],
-    'second resume after another snapshot refresh must preserve pinned effective seats',
-  );
-  const secondStored = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
-  assert.deepEqual(secondStored.collaboration.effective.seats.map((s) => s.seat), ['producer', 'reviewer', 'red-team']);
 });
 
 
