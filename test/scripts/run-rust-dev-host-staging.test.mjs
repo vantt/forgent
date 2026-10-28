@@ -72,6 +72,22 @@ test('an unused staged host is removed at once, and a young one is never pruned 
   assert.equal(fs.existsSync(young.dir), false);
 });
 
+// The scan is the caller's: pruning many directories takes one process scan, and each directory is judged
+// against it. A holder the supplied scan does not list does not keep its directory, which a rescan inside the
+// call would have seen.
+test('a directory is judged against the scan the caller supplies, not a fresh one', { skip: linuxOnly }, async () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'dev-host-'));
+  const { dir, host } = stagedRun(base, 'run-supplied');
+  const holder = spawn(host, ['300'], { detached: true, stdio: 'ignore' });
+  try {
+    assert.equal(releaseRunDir(dir, []), true);
+    assert.equal(fs.existsSync(dir), false);
+  } finally {
+    holder.kill('SIGKILL');
+    await exited(holder);
+  }
+});
+
 test('the dev door points FGOS_HOST_BIN at the staged host, replacing any inherited host', () => {
   const env = devHostEnv(
     { FGOS_HOST_BIN: '/activated/bin/fgos', KEEP: '1' },

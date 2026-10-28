@@ -7,6 +7,7 @@ import { nativeAddonLibraryName } from './build-rust-distribution.mjs';
 import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
 import { gitAddonDirectory } from './lib/git-addon-stage.mjs';
 import { processesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
+import { scan } from '../src/runner/dispatch/process-identity.mjs';
 
 const checkoutRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -39,6 +40,7 @@ function atomicWrite(destination, writeTemporary) {
     if (created) fs.rmSync(temporary, { force: true });
   }
 }
+const HOST_ENV_KEYS = ['FGOS_HOST_BIN'];
 // A staged run directory left behind is pruned only once it is this old, so a run still being staged
 // by a concurrent invocation (no process runs from it yet) is never taken from under it.
 export const STALE_RUN_DIR_MS = 10 * 60 * 1000;
@@ -48,10 +50,12 @@ export const STALE_RUN_DIR_MS = 10 * 60 * 1000;
  * (or its gate) started by the host keeps executing it, and its attempt steps run it again by path. A
  * detached `node bin/fgos.mjs` child (the event-store seal and publish children) runs nothing from it
  * yet, but its FGOS_HOST_BIN names the staged host it will call.
+ * @param {string} runtimeDir
+ * @param {object[]|'unsupported'} [views] a scan already taken with `HOST_ENV_KEYS`, shared across directories
  * @returns {boolean} whether the directory was removed
  */
-export function releaseRunDir(runtimeDir) {
-  if (processesInside(runtimeDir, { envKeys: ['FGOS_HOST_BIN'] }).length > 0) return false;
+export function releaseRunDir(runtimeDir, views = scan({ envKeys: HOST_ENV_KEYS })) {
+  if (processesInside(runtimeDir, { envKeys: HOST_ENV_KEYS, views }).length > 0) return false;
   fs.rmSync(runtimeDir, { recursive: true, force: true });
   return true;
 }
@@ -60,12 +64,14 @@ export function releaseRunDir(runtimeDir) {
 export function pruneRunDirs(runtimeBase, { now = Date.now(), staleMs = STALE_RUN_DIR_MS } = {}) {
   let names;
   try { names = fs.readdirSync(runtimeBase); } catch { return; }
+  let views = null; // one process scan for every stale directory, taken when the first one is found
   for (const name of names.filter((n) => n.startsWith('run-'))) {
     const dir = path.join(runtimeBase, name);
     let stat;
     try { stat = fs.lstatSync(dir); } catch { continue; }
     if (!stat.isDirectory() || now - stat.mtimeMs < staleMs) continue;
-    releaseRunDir(dir);
+    views ??= scan({ envKeys: HOST_ENV_KEYS });
+    releaseRunDir(dir, views);
   }
 }
 
