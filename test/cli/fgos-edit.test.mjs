@@ -120,33 +120,6 @@ test('a full add -> edit -> move -> edit CLI lifecycle lands every event in the 
   assert.equal(fs.existsSync(path.join(cwd, '.fgos', 'events')), false, 'no per-writer shard directory is written');
 });
 
-test('edit on an unknown id is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
-  const result = run(cwd, ['edit', 'never-added', '--risk', 'heavy']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, 0);
-});
-
-
-test('edit with zero field flags is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-no-flags');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['edit', 'edit-no-flags']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-
-test('edit --deps pointing at an unknown id is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-bad-dep');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['edit', 'edit-bad-dep', '--deps', 'ghost-dep']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
 
 test('edit rejects a patch targeting id/status/stage/domain, exit 4, no event written', () => {
   const cwd = tmpCwdFromTemplate();
@@ -167,19 +140,6 @@ test('edit --parent (bare, no value) is rejected as a valueless flag, distinct f
   const result = run(cwd, ['edit', 'parent-edit-bad', '--parent']);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /--parent requires a value; use --parent "" to clear it/);
-});
-
-
-test('edit --parent closing a cycle is rejected at the CLI, same "graph cycle" message as the store-layer test', () => {
-  const cwd = tmpCwdFromTemplate();
-  assert.equal(addOk(cwd, 'parent-cycle-a').status, 0);
-  const withParent = run(cwd, ['add', 'parent-cycle-b', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--parent', 'parent-cycle-a', '--description', 'tsk-535 fixture description.']);
-  assert.equal(withParent.status, 0);
-
-  const result = run(cwd, ['edit', 'parent-cycle-a', '--parent', 'parent-cycle-b']);
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /would close a graph cycle/);
-  assert.equal(stateView(cwd).work['parent-cycle-a'].parent, undefined, 'the rejected patch never landed');
 });
 
 

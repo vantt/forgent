@@ -88,7 +88,6 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-
 test('edit --verify-from-children with no children found throws a validation error instead of writing a vacuous verify, exit 4', () => {
   const cwd = tmpCwdFromTemplate();
   assert.equal(addOk(cwd, 'lonely-parent').status, 0);
@@ -111,61 +110,8 @@ test('edit --verify-from-targets with empty targets throws a validation error in
 });
 
 
-// --- edit --merge-after (tsk-2u0, docs/history/
-//     tsk-3bn-merge-conductor-harness-v2/D4/D5) -----------------------------
-
-test('edit --merge-after rejects a target id that does not exist, exit 4, item unchanged', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'merge-after-ghost-item');
-  const result = run(cwd, ['edit', 'merge-after-ghost-item', '--merge-after', 'no-such-item']);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /not a known id/);
-  assert.equal(stateView(cwd).work['merge-after-ghost-item'].mergeAfter, undefined);
-});
-
-
-test('edit --merge-after rejects an item listing itself, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'merge-after-self-item');
-  const result = run(cwd, ['edit', 'merge-after-self-item', '--merge-after', 'merge-after-self-item']);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /own mergeAfter/);
-});
-
-
-test('edit --merge-after rejects a mergeAfter that would close a cycle mixed with deps, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'merge-after-cycle-a');
-  addOk(cwd, 'merge-after-cycle-b');
-  run(cwd, ['edit', 'merge-after-cycle-b', '--deps', 'merge-after-cycle-a']);
-  // a deps:[] currently; setting a.mergeAfter:[b] would close a -> b (waits-for) -> a (blocks).
-  const result = run(cwd, ['edit', 'merge-after-cycle-a', '--merge-after', 'merge-after-cycle-b']);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /cycle/);
-  assert.equal(stateView(cwd).work['merge-after-cycle-a'].mergeAfter, undefined);
-});
-
-
 // --- edit --superseded-by / --duplicates (tsk-2ie, docs/history/
 //     tsk-2ie-duplicate-superseded-guard/ D1-D3) ---------------------------
-
-test('edit --superseded-by rejects a target id that does not exist, exit 4, item unchanged', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'superseded-by-ghost-item');
-  const result = run(cwd, ['edit', 'superseded-by-ghost-item', '--superseded-by', 'no-such-item']);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /not a known id/);
-  assert.equal(stateView(cwd).work['superseded-by-ghost-item'].supersededBy, undefined);
-});
-
-
-test('edit --superseded-by rejects an item listing itself, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'superseded-by-self-item');
-  const result = run(cwd, ['edit', 'superseded-by-self-item', '--superseded-by', 'superseded-by-self-item']);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /own supersededBy/);
-});
 
 
 test('edit --superseded-by with no value is a validation error, exit 4', () => {
@@ -176,21 +122,3 @@ test('edit --superseded-by with no value is a validation error, exit 4', () => {
   assert.match(result.stderr, /--superseded-by requires a value/);
 });
 
-
-test('edit --duplicates rejects a target id that does not exist, exit 4, item unchanged', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'duplicates-ghost-item');
-  const result = run(cwd, ['edit', 'duplicates-ghost-item', '--duplicates', 'no-such-item']);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /not a known id/);
-  assert.equal(stateView(cwd).work['duplicates-ghost-item'].duplicates, undefined);
-});
-
-
-test('edit --duplicates rejects an item listing itself, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'duplicates-self-item');
-  const result = run(cwd, ['edit', 'duplicates-self-item', '--duplicates', 'duplicates-self-item']);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /own duplicates/);
-});

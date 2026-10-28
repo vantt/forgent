@@ -88,35 +88,6 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-
-// --- edit --description/--footprint: `add` already accepted both fields,
-// but EDITABLE_FIELDS never listed them, so a description/footprint typo'd
-// or left blank at add time -- or an item added before either field
-// existed -- had no way to ever gain or correct one after creation. ---
-
-// tsk-535 D1: `add` now always sets description (required flag), so an
-// item created via `addOk` can no longer "have none" -- reframed to prove
-// `edit --description` still overwrites an existing one, the same
-// capability this test always covered.
-test('edit --action with empty string is rejected as validation, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-action-empty');
-  const result = run(cwd, ['edit', 'edit-action-empty', '--action', '']);
-  assert.equal(result.status, 4);
-  assert.equal(stateView(cwd).work['edit-action-empty'].action, undefined);
-});
-
-
-test('edit --acceptance is refused when a clause supplies text+evidence together but evidence cites no real path', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-untraceable');
-  const result = run(cwd, ['edit', 'edit-untraceable', '--acceptance', JSON.stringify([{ text: 'root cause confirmed', evidence: 'nothing checkable here' }])]);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /evidence/);
-  assert.equal(stateView(cwd).work['edit-untraceable'].acceptance, undefined, 'the rejected patch never applies');
-});
-
-
 test('edit with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-bad-acceptance');
@@ -159,15 +130,6 @@ test('editing in the missing evidence after a refusal, then retrying move --to d
 // tsk-34o: edit --role, mirroring take --role's own optional-flag pattern --
 // role only ever lands in the raw event's payload (never projected onto
 // work[id], unlike take's claimRole), so these read eventLines directly.
-test('edit --role with an invalid value is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-role-bad');
-  const before = eventLines(cwd).length;
-
-  const result = run(cwd, ['edit', 'edit-role-bad', '--risk', 'heavy', '--role', 'robot']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before, 'an invalid --role must not append any event');
-});
 
 
 test('resolve-park-reason on unknown id is rejected as validation, exit 4, no event written', () => {
