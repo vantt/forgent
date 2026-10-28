@@ -1,0 +1,45 @@
+{
+  "contract": { "id": "mailbox-remote", "version": 1 },
+  "description": "What a mailbox message sent to a head on another machine carries and where it is refused. The stream and its two types are registered in event-streams.v1.json (stream project:mailbox, one scope per type, never changed). This file is the text the sender checks at send time and the receiver checks at ingest; a number here is a limit in force, not a plan figure. A body over the cap is refused, never cut. Bodies are plaintext in the Git remote for good.",
+  "types": [
+    {
+      "type": "mailbox.message-sent",
+      "signingDomain": "fgos-mailbox-message/1\n",
+      "payload": [
+        { "field": "v", "type": "integer", "meaning": "payload version, 1" },
+        { "field": "id", "type": "string", "meaning": "message id, unique per signer machine; the dedupe key is (signer machine, id)" },
+        { "field": "from", "type": "object {id, machine}", "meaning": "sender's full session id and machine id; the receiver derives the frame handle from the verified id, never from payload text" },
+        { "field": "to", "type": "object {id, machine}", "meaning": "recipient's full session id (as published in the shared directory) and machine id" },
+        { "field": "kind", "type": "string", "meaning": "message kind as the same-machine mailbox defines it" },
+        { "field": "body", "type": "string", "meaning": "UTF-8 text, at most limits.maxBodyBytes bytes" },
+        { "field": "reply_to", "type": "string, optional", "meaning": "full id of the message this one answers" },
+        { "field": "sentAt", "type": "RFC 3339 string", "meaning": "display only; never used to order, age or dedupe a message" },
+        { "field": "sig", "type": "string", "meaning": "signature of the canonical payload under the signing domain, by the sender machine's key" }
+      ]
+    },
+    {
+      "type": "mailbox.message-settled",
+      "signingDomain": "fgos-mailbox-settled/1\n",
+      "payload": [
+        { "field": "v", "type": "integer", "meaning": "payload version, 1" },
+        { "field": "id", "type": "string", "meaning": "id of the message being settled" },
+        { "field": "machine", "type": "string", "meaning": "the receiving machine, the signer" },
+        { "field": "outcome", "type": "offered | refused", "meaning": "receiver to sender; without it a refusal on the receiver cannot reach the sender" },
+        { "field": "reason", "type": "string, optional", "meaning": "refusal reason code, same codes as the same-machine mailbox" },
+        { "field": "at", "type": "RFC 3339 string", "meaning": "when the receiver settled it" },
+        { "field": "sig", "type": "string", "meaning": "signature under the settled signing domain" }
+      ]
+    }
+  ],
+  "limits": [
+    { "key": "mailbox.remote.maxBodyBytes", "default": 2048, "unit": "bytes (UTF-8)", "enforcedAt": "send: the sender refuses a larger body and does not cut it; ingest: the receiver drops an event whose body is larger, counted", "source": "owner-approved V8 plan; lead:ES accepted the figure 2026-10-28" },
+    { "key": "mailbox.remote.maxAgeSec", "default": 86400, "unit": "seconds", "enforcedAt": "ingest: an event older than this by the receiver's clock, less skew tolerance, is dropped with a counted reason", "source": "equal to mailbox.record.ttlSec" },
+    { "key": "mailbox.remote.clockSkewSec", "default": 300, "unit": "seconds", "enforcedAt": "ingest: tolerance when ageing an event; measured skew between two machines was 0.77 s on 2026-10-28", "status": "placeholder" },
+    { "key": "mailbox.remote.requireConfirmed", "default": true, "unit": "boolean", "enforcedAt": "ingest: only a machine whose key pin is confirmed is accepted; a seen or re-keyed machine is dropped and counted", "source": "identity spec pins" }
+  ],
+  "perSenderCaps": {
+    "accountedBy": "verified signer machine and sender id; never the shared unregistered bucket",
+    "keys": ["mailbox.session.budget", "mailbox.session.lifetimeCap", "mailbox.queue.perSender"],
+    "meaning": "the same-machine caps of limits.v1.json apply unchanged to each remote sender"
+  }
+}
