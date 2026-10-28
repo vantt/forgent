@@ -72,7 +72,7 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const pin = record.collaboration;
   const pattern = record.pattern ?? record.unit?.pattern ?? null;
   const decoded = (pin || pattern === null) ? null : collaborationOfRecord(record);
-  const loop = pin?.effective?.loop ?? decoded?.effective?.loop ?? null;
+  const loop = pin?.effective?.loop ?? (decoded?.recognized ? decoded.effective.loop : null);
   const params = pin?.effective?.params ?? decoded?.effective?.params ?? {};
   const cfg = record.configSnapshot?.runner ?? {};
   const recordSeats = seatsOfRecord(record);
@@ -143,7 +143,7 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     contract: UNIT_SUMMARY_CONTRACT,
     unitRunId,
     workflow: workflowLink(record.workflow) ?? workflowLink(legacyCompletion?.workflow),
-    pattern: pattern === null || typeof pattern === 'string' ? pattern : pattern.pattern ?? null,
+    pattern: pattern === null || typeof pattern === 'string' ? pattern : decoded?.selector ?? pattern.pattern ?? null,
     capability: record.unit?.capability ?? null,
     outcome,
     startedAt: timestamp(record.createdAt),

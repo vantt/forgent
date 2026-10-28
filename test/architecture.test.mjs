@@ -1558,6 +1558,7 @@ test('pattern vocabulary rename is complete with no live retired aliases or dele
   assert.deepEqual(violations, []);
 
   assert.ok(!fs.existsSync(path.join(root, 'src/runner/execution/patterns/presets.mjs')), 'presets.mjs must not exist');
+  assert.ok(!fs.readFileSync(path.join(root, 'src/runner/execution/loops/history-outcome.mjs'), 'utf8').includes('patternName'), 'history-outcome.mjs must not accept patternName');
 });
 
 test('retired pattern literals appear only in permitted refusal, setup, and decoder paths', () => {

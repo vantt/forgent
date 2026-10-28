@@ -56,7 +56,7 @@ const HISTORICAL_PATTERNS = Object.freeze({
   'research-fan-out': { pattern: 'panel', params: { members: 3, role: 'researcher', synthesizeRole: 'synthesizer' } },
   'research-fan-out-gated': { pattern: 'panel', params: { members: 3, role: 'researcher', synthesizeRole: 'synthesizer', gated: true } },
   'code-change': { pattern: 'reviewed', params: { minCheckers: ['reviewer', 'red-team'] } },
-  rfc: { pattern: 'reviewed', params: {} },
+  rfc: { pattern: 'reviewed', params: { maxRounds: 1, minCheckers: ['reviewer', 'red-team'] } },
 });
 
 function legacyResolve(pattern) {
@@ -140,24 +140,25 @@ export function collaborationOfRecord(record, { shipped } = {}) {
     };
   }
 
-  const rawPattern = record?.pattern ?? record?.unit?.pattern ?? 'solo';
-  let selectorName;
+  const rawPattern = record?.pattern ?? record?.unit?.pattern ?? null;
+  let selectorName = null;
   let selectorParams = {};
   if (typeof rawPattern === 'string') {
     selectorName = rawPattern;
   } else if (rawPattern && typeof rawPattern === 'object') {
-    selectorName = rawPattern.pattern ?? rawPattern.patternName ?? 'solo';
+    selectorName = rawPattern.pattern ?? rawPattern.patternName ?? null;
     selectorParams = rawPattern.params ?? {};
-  } else {
-    selectorName = 'solo';
   }
 
-  const catalogName = selectorName === 'research-fan-out-gated' ? 'research-fan-out' : selectorName;
+  const catalogName = selectorName === 'research-fan-out-gated' ? 'research-fan-out' : (selectorName ?? 'solo');
+
 
   const shippedPatterns = shipped?.patterns ?? shipped ?? {};
   const hist = Object.hasOwn(HISTORICAL_PATTERNS, catalogName) ? HISTORICAL_PATTERNS[catalogName] : null;
   const shippedEntry = shippedPatterns[catalogName] ?? (hist ? { loop: hist.pattern, defaults: hist.params } : {});
-  const loop = shippedEntry.loop ?? (['solo', 'reviewed', 'panel', 'debate'].includes(catalogName) ? catalogName : 'solo');
+  const isBaseLoop = ['solo', 'reviewed', 'panel', 'debate'].includes(catalogName);
+  const recognized = selectorName !== null && Boolean(hist || shippedEntry.loop || isBaseLoop);
+  const loop = shippedEntry.loop ?? (isBaseLoop ? catalogName : 'solo');
   const patternDefaults = { ...(shippedEntry.defaults ?? {}), ...(shippedEntry.params ?? {}) };
 
   const snapshotRunner = record?.configSnapshot?.runner ?? {};
@@ -207,5 +208,7 @@ export function collaborationOfRecord(record, { shipped } = {}) {
     collaboration,
     effective: collaboration.effective,
     runner: runnerView,
+    recognized,
+    selector: selectorName,
   };
 }

@@ -57,9 +57,8 @@ function soloOutcome(unit, cfg, seats, history) {
  * @param {Array<{ seat: string, round: number, outcome: string }>} args.history final settled record per seat/round
  * @returns {string|null}
  */
-export function patternHistoryOutcome({ loop, patternName, params, unit, cfg, seats, history }) {
-  const targetLoop = loop ?? patternName;
-  switch (targetLoop) {
+export function patternHistoryOutcome({ loop, params, unit, cfg, seats, history }) {
+  switch (loop) {
     case 'reviewed': return reviewedHistoryOutcome(unit, cfg, history, params, seats);
     case 'solo': return soloOutcome(unit, cfg, seats, history);
     case 'debate': return debateOutcome(params, seats, history);

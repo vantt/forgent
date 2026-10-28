@@ -524,3 +524,34 @@ test('solo derived outcome derives from verify when configured, and falls back t
   const noCmdSummary = buildUnitSummary(noCmdFix.dir);
   assert.equal(noCmdSummary.outcome, 'pass');
 });
+
+test('historical rfc retains its single-round terminal findings', (t) => {
+  const { dir } = fixture(t, {
+    pattern: 'rfc',
+    unit: { id: 'u-rfc', capability: 'docs:write' },
+  });
+  result(dir, 'producer', '1', '01');
+  result(dir, 'reviewer', '1', '01', { classification: { outcome: { category: 'verdict' }, assessment: { verdict: 'findings' } } });
+  result(dir, 'red-team', '1', '01');
+  const summary = buildUnitSummary(dir);
+  assert.equal(summary.outcome, 'findings');
+});
+
+test('historical patternName selector remains visible in summary', (t) => {
+  const { dir } = fixture(t, {
+    pattern: { patternName: 'reviewed' },
+    unit: { id: 'old-reviewed', capability: 'docs:write' },
+  });
+  const summary = buildUnitSummary(dir);
+  assert.equal(summary.pattern, 'reviewed');
+});
+
+test('unpinned record with unknown non-null custom pattern does not fall back to solo', (t) => {
+  const { dir } = fixture(t, {
+    pattern: 'custom-unknown-pattern',
+    unit: { id: 'custom-u', capability: 'docs:write' },
+  });
+  result(dir, 'producer', '1', '01');
+  const summary = buildUnitSummary(dir);
+  assert.equal(summary.outcome, 'undetermined');
+});

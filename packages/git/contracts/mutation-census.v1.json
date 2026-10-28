@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "dcbb42f39687a699f3176ab096021f9c2d90138aa6c6c9d53a416f767366f42a",
+  "payloadDigest": "f1d395f68026aafd21df2a20e17f419d97945889bef336349d6573e1eedf7c03",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1038,9 +1038,9 @@
     "src/runner/execution/dry-bind.mjs": "7515265f65486bad77a344e923a52c0999caccbcbf75fbe06cc518d8912a8771",
     "src/runner/execution/explain.mjs": "4fd3c5a6ae3b9c0d28ca0c333403d7d10e7b38aa29a4318326d02c6ffd8b1689",
     "src/runner/execution/handoff-refs.mjs": "2514d408d19a7145239025f449b16a308d9a740e9edb8285ed328da941fd1678",
-    "src/runner/execution/legacy-seat-read.mjs": "1b421f627e1fd2d37d45b73a8bc0c771b0022152dd914c2826a501be6a860fee",
+    "src/runner/execution/legacy-seat-read.mjs": "a3f142beb163948e9739fd6eab98c4a620f7aaee133f94ae07f9c9efb96cca6d",
     "src/runner/execution/loops/debate.mjs": "726f3c6cfbb7f71029c2fad96808badf6dbc35c909083bb16cf7862b755686fb",
-    "src/runner/execution/loops/history-outcome.mjs": "4b7f5104566815e29fbae384ee453a76aa68dbbdd48de5bfc1b3527de2fe3021",
+    "src/runner/execution/loops/history-outcome.mjs": "8d60cf2f68d831e98c4418b8c24238577dc4cf0078b4c8c31f9326b531e1ad8f",
     "src/runner/execution/loops/index.mjs": "6600df568eb7b069d0b0918c8a9872dd51b4a195d525eb553f7756adbfdc287a",
     "src/runner/execution/loops/panel.mjs": "f9ca5df5e5f7439fd3a9fb02863baa7ba884c3e9796b32f9e59445333307ed61",
     "src/runner/execution/loops/reviewed.mjs": "6f0d247bee52c9dfa04c93ac488240337b9ba2e080bd45edf286a62a85c0c3fa",
@@ -1058,7 +1058,7 @@
     "src/runner/execution/unit-control.mjs": "7758226c1321bda3cd53e5018c7030b714adf138ba8e3fccbeb8a4f5337f9022",
     "src/runner/execution/unit-run-history.mjs": "245c8bf2fd2221fdd3e801d426e0ee466b75ee408394cac3b104381160691ac7",
     "src/runner/execution/unit-state.mjs": "fa446821758bdebae8ed5d4858c37780796e98352c14641f6a59abf904157e90",
-    "src/runner/execution/unit-summary.mjs": "e03de5e155484584347cf0199091b3bfa59d09877a2ce2efe3e22a2c68a56ac1",
+    "src/runner/execution/unit-summary.mjs": "9d71b167171987cbad32dade49646883958fef73c6a07486510b6f132b5add25",
     "src/runner/execution/unit-sync.mjs": "a5dcbcd15d189d8a943f3e5ee87543a4ffb466f15b1534684b111034d7da89e5",
     "src/runner/execution/unit.mjs": "baf3f340ad844c204185631c9182fa0ef50af75af502653e9acfa698b7fe73d4",
     "src/runner/fanout-batch.mjs": "65a0f3f51015eda1e15c59304517b5b3db2b96872a8b73b1b068ab8e40727a72",
