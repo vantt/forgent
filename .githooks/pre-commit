@@ -28,7 +28,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { resolveActiveHostBin } from '../src/util/host-bin-path.mjs';
 import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
-import { runLockRouteSync, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
+import { runLockRouteSync, lockTransport, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
+import { probeSharedSync } from '../src/holder-lock/hold-transport.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -139,7 +140,8 @@ function identityData(bin, args, cwd) {
 //   - 'held': another process holds the mutex: refuse.
 //   - 'free': nobody holds it: an ordinary commit.
 // The probe is `fgos internal lock-fd --shared-try` on a fresh description of
-// the lock file: one non-blocking shared try, so it never waits on the lock
+// the lock file (on Windows, `lock-hold --mode sh --try`, which opens the file
+// itself): one non-blocking shared try, so it never waits on the lock
 // and never obstructs a holder; it is a native route (a process boundary the
 // hook cannot cross in process), a millisecond, not a Node start. Without a
 // host binary no fgOS process can hold the mutex either (every holder runs
@@ -166,7 +168,10 @@ function mainLockVerdict(fgosDir, bin) {
     return err?.code === 'ENOENT' ? { kind: 'free' } : { kind: 'error', message: err?.message ?? String(err) };
   }
   try {
-    const { result, detail } = runLockRouteSync({ bin, args: ['--shared-try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
+    // Windows cannot hand a descriptor to a route: the lock-hold helper takes the same shared try itself.
+    const { result, detail } = lockTransport() === 'hold'
+      ? probeSharedSync({ bin, lockPath })
+      : runLockRouteSync({ bin, args: ['--shared-try'], fd, timeoutMs: ROUTE_CALL_TIMEOUT_MS });
     if (result === 'free' || result === 'held') return { kind: result };
     return { kind: 'error', message: `the lock route answered ${JSON.stringify(result)}${detail ? `: ${detail}` : ''}` };
   } catch (err) {

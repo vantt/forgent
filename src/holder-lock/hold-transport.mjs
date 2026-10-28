@@ -22,8 +22,8 @@ import path from 'node:path';
 import { EventEmitter } from 'node:events';
 import { Readable } from 'node:stream';
 import { spawn } from 'node:child_process';
-import { HolderLockError, PROTOCOL, parseRouteLine } from './protocol.mjs';
-import { routeLineOrThrow } from './driver.mjs';
+import { HolderLockError, PROTOCOL, DEFAULT_KILL_WAIT_MS, parseRouteLine } from './protocol.mjs';
+import { routeLineOrThrow, routeEnv, ROUTE_SLACK_MS } from './driver.mjs';
 import { observe, resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
 
 const WORK_PREFIX = 'fgos-lock-hold-';
@@ -92,13 +92,13 @@ export function removeWorkDir(work) {
 
 /** Start one helper with a fresh work directory. `{ child, pid, work }`; the
  * work directory is removed again when the helper cannot start. */
-export function startHold({ bin, lockPath, wait, killWaitMs, predecessorKinds, env }) {
+export function startHold({ bin, lockPath, mode, wait, killWaitMs, predecessorKinds, env }) {
   sweepStaleWorkDirs();
   sequence += 1;
   const work = fs.mkdtempSync(path.join(os.tmpdir(), `${WORK_PREFIX}${process.pid}-${sequence}-`));
   let child;
   try {
-    child = spawn(bin, holdArgv({ lockPath, wait, killWaitMs, predecessorKinds, work }), { env, stdio: 'ignore', windowsHide: true });
+    child = spawn(bin, holdArgv({ lockPath, mode, wait, killWaitMs, predecessorKinds, work }), { env, stdio: 'ignore', windowsHide: true });
   } catch (err) {
     removeWorkDir(work);
     throw new HolderLockError('lock-driver-unavailable', `cannot run ${bin}: ${err.message}`, { reason: 'no-host-binary', tried: [bin] });
@@ -197,6 +197,23 @@ export async function waitReady(hold, bin, boundMs) {
     }
     await new Promise((resolve) => setTimeout(resolve, READY_POLL_MS));
   }
+}
+
+/** One non-blocking shared try on `lockPath` through a helper, released at
+ * once: the Windows twin of `lock-fd --shared-try`, which cannot hand a
+ * descriptor across. `{ result: 'free' | 'held' | <the helper's other answer>, detail? }`;
+ * throws when the helper cannot run or does not answer in time. */
+export function probeSharedSync({ bin, lockPath, env = routeEnv() }) {
+  const wait = { kind: 'try' };
+  const hold = startHold({ bin, lockPath, mode: 'sh', wait, killWaitMs: DEFAULT_KILL_WAIT_MS, env });
+  const { line } = waitReadySync(hold, bin, readyBoundMs(wait, DEFAULT_KILL_WAIT_MS, ROUTE_SLACK_MS));
+  if (line === null) throw new HolderLockError('lock-route-bad-output', `${bin} lock-hold did not answer a shared try`, { pid: hold.pid });
+  if (line.result === 'acquired') {
+    releaseHold(hold);
+    return { result: 'free' };
+  }
+  removeWorkDir(hold.work);
+  return { result: line.result, detail: line.reason ?? line.detail };
 }
 
 /** Terminate the helper and wait until it is gone: the lock is free by then.
