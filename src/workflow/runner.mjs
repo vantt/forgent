@@ -20,7 +20,7 @@ import {
 import { PROGRESS_LINE_LIMIT, ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 import { drainCaseInbox } from './case-runtime.mjs';
 import { projectCase } from './case-projection.mjs';
-import { openCaseOnLedger, resolveFrame } from './case-start.mjs';
+import { openCaseOnLedger, resolveFrame, assertUnitAcceptOutcomes } from './case-start.mjs';
 import {
   approvedReportDigests,
   buildUnitHandoff,
@@ -353,15 +353,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
               const fresh = reread();
               const runnerConfig = loadRunnerConfigForDir(mainRoot);
               const loopFn = (name) => loopOf(name, { effective: runnerConfig });
-              if (u.template?.acceptOutcomes !== undefined) {
-                const pattern = u.template.pattern || 'solo';
-                const loop = loopFn(pattern) ?? (['solo', 'reviewed', 'panel', 'debate'].includes(pattern) ? pattern : 'solo');
-                if (loop !== 'reviewed') {
-                  throw new RunnerConfigError(
-                    `workflow "${workflow.id}" step "${step.id}" unit "${u.id}".acceptOutcomes requires a reviewed template and unique pass/findings outcomes`,
-                  );
-                }
-              }
+              assertUnitAcceptOutcomes(workflow, step, u, runnerConfig);
               const runOptions = {
                 unitData,
                 acceptedReports: approvedReportDigests({ events: fresh.events, state: fresh.state, workflow, mainRoot }),

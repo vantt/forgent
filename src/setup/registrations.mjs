@@ -686,7 +686,7 @@ export function checkRunnerPatternsConfig(cwd) {
             ? parsed
             : (Array.isArray(parsed?.releases) ? parsed.releases : null);
           if (releases && releases.length > 1) {
-            olderNote = 'older releases refuse that file (compatibility with older releases was not established)';
+            olderNote = 'older releases installed here may refuse that file (compatibility with older releases was not established)';
           } else if (releases && releases.length <= 1) {
             olderNote = 'older releases may refuse that file if installed (compatibility with older releases was not established)';
           } else {

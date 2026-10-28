@@ -244,20 +244,22 @@ export async function preflightWorkflowSeats(params = {}) {
   return { warnings };
 }
 
+/** Refuses a unit whose `acceptOutcomes` is declared but whose resolved loop is not `reviewed`. */
+export function assertUnitAcceptOutcomes(workflow, step, u, runnerConfig) {
+  if (u.template?.acceptOutcomes === undefined) return;
+  const pattern = u.template.pattern || 'solo';
+  const loop = loopOf(pattern, { effective: runnerConfig })
+    ?? (['solo', 'reviewed', 'panel', 'debate'].includes(pattern) ? pattern : 'solo');
+  if (loop !== 'reviewed') {
+    throw new RunnerConfigError(
+      `workflow "${workflow.id}" step "${step.id}" unit "${u.id}".acceptOutcomes requires a reviewed template and unique pass/findings outcomes`,
+    );
+  }
+}
+
 export function assertWorkflowAcceptOutcomes(workflow, runnerConfig) {
-  const loopFn = (name) => loopOf(name, { effective: runnerConfig });
   for (const step of workflow.steps ?? []) {
-    for (const u of step.units ?? []) {
-      if (u.template?.acceptOutcomes !== undefined) {
-        const pattern = u.template.pattern;
-        const loop = loopFn(pattern) ?? (['solo', 'reviewed', 'panel', 'debate'].includes(pattern) ? pattern : 'solo');
-        if (loop !== 'reviewed') {
-          throw new RunnerConfigError(
-            `workflow "${workflow.id}" step "${step.id}" unit "${u.id}".acceptOutcomes requires a reviewed template and unique pass/findings outcomes`,
-          );
-        }
-      }
-    }
+    for (const u of step.units ?? []) assertUnitAcceptOutcomes(workflow, step, u, runnerConfig);
   }
 }
 
