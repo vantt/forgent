@@ -2,7 +2,7 @@ import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  runReviewed as baseRunReviewed,
+  runReviewed,
   reviewedHistoryOutcome as historyOutcomeOf,
   DEFAULT_MAX_ROUNDS,
   PARAMS,
@@ -15,8 +15,6 @@ import {
 import { shippedCatalog } from '../../../../src/runner/dispatch/shipped-catalog.mjs';
 
 const shippedCheckersByRigor = shippedCatalog().loops.reviewed.checkersByRigor;
-const runReviewed = (unit, cfg, hooks = {}, params = {}) =>
-  baseRunReviewed(unit, cfg, { shippedCheckersByRigor, ...hooks }, params);
 
 // The history outcome of a reviewed unit is read over the seats the unit has.
 const reviewedHistoryOutcome = (unit, cfg, history, params = {}) =>
@@ -39,7 +37,7 @@ test('runReviewed passes on round 1 when all checkers pass', async () => {
     };
   };
 
-  const res = await runReviewed(unit, {}, { runRole });
+  const res = await runReviewed(unit, {}, { runRole, shippedCheckersByRigor });
 
   assert.equal(res.outcome, 'pass');
   assert.equal(res.rounds, 1);
@@ -80,7 +78,7 @@ test('runReviewed runs checkers in parallel (Promise.all)', async () => {
     return { seat: opts.seat.seat, outcome: 'pass' };
   };
 
-  const res = await runReviewed(unit, {}, { runRole });
+  const res = await runReviewed(unit, {}, { runRole, shippedCheckersByRigor });
   assert.equal(res.outcome, 'pass');
   assert.equal(maxConcurrency, 2, 'Reviewer and red-team must execute concurrently in parallel');
 });
@@ -124,7 +122,7 @@ test('runReviewed loops to round 2 when findings exist and passes on fix', async
     throw new Error(`Unexpected role: ${opts.seat.seat}`);
   };
 
-  const res = await runReviewed(unit, {}, { runRole });
+  const res = await runReviewed(unit, {}, { runRole, shippedCheckersByRigor });
 
   assert.equal(res.outcome, 'pass');
   assert.equal(res.rounds, 2);
@@ -171,7 +169,7 @@ test('runReviewed returns findings (NEVER failed) when maxRounds is reached', as
     return { seat: opts.seat.seat, outcome: 'pass' };
   };
 
-  const res = await runReviewed(unit, {}, { runRole });
+  const res = await runReviewed(unit, {}, { runRole, shippedCheckersByRigor });
 
   // Invariant: NEVER report findings as failed
   assert.equal(res.outcome, 'findings');
@@ -211,7 +209,7 @@ test('runReviewed executes deterministic verify hook when configured and treats 
     };
   };
 
-  const res = await runReviewed(unit, {}, { runRole, verify });
+  const res = await runReviewed(unit, {}, { runRole, verify, shippedCheckersByRigor });
 
   assert.equal(res.outcome, 'pass');
   assert.equal(res.rounds, 2);
@@ -231,7 +229,7 @@ test('runReviewed propagates execution-failure and other hard error outcomes', a
       return { seat: 'reviewer', outcome: errOutcome, reason: 'error occurred' };
     };
 
-    const res = await runReviewed(unit, {}, { runRole });
+    const res = await runReviewed(unit, {}, { runRole, shippedCheckersByRigor });
     assert.equal(res.outcome, errOutcome, `Should propagate ${errOutcome}`);
   }
 });
@@ -257,7 +255,7 @@ test('a producer that changed nothing is still reviewed, and the reviewer\'s ver
       if (opts.seat.seat === 'producer') return changedNothing();
       return { seat: 'reviewer', outcome: reviewerOutcome, ...(reviewerOutcome === 'findings' ? { findings: ['wrong'] } : {}) };
     };
-    return { res: await runReviewed(unit, {}, { runRole }, { maxRounds: 1 }), calls };
+    return { res: await runReviewed(unit, {}, { runRole, shippedCheckersByRigor }, { maxRounds: 1 }), calls };
   };
 
   const passed = await run('pass');
@@ -276,6 +274,7 @@ test('a checker that settled with no evidence still ends the round', async () =>
 
   const live = await runReviewed(unit, {}, {
     runRole: async (opts) => (opts.seat.seat === 'producer' ? { seat: 'producer', outcome: 'pass' } : silentReviewer()),
+    shippedCheckersByRigor,
   });
   assert.equal(live.outcome, 'execution-failure');
 
@@ -283,6 +282,7 @@ test('a checker that settled with no evidence still ends the round', async () =>
   const resumed = await runReviewed(unit, {}, {
     history,
     runRole: () => assert.fail('a fully settled history must never dispatch'),
+    shippedCheckersByRigor,
   });
   assert.equal(resumed.outcome, 'execution-failure');
   assert.equal(reviewedHistoryOutcome(unit, {}, history), 'execution-failure');
@@ -295,7 +295,7 @@ test('a producer that crashed stops the round before any reviewer', async () => 
     return { seat: 'producer', outcome: 'execution-failure', posture: { readOnly: false },
       runResult: { classification: { confidence: { level: 'failed', basis: [] }, assessment: { verdict: 'inconclusive' }, failure: { code: 'crash' } } } };
   };
-  const res = await runReviewed({ id: 'u-crash', capability: 'docs:write' }, {}, { runRole });
+  const res = await runReviewed({ id: 'u-crash', capability: 'docs:write' }, {}, { runRole, shippedCheckersByRigor });
   assert.equal(res.outcome, 'execution-failure');
   assert.deepEqual(calls, ['producer']);
 });
@@ -327,7 +327,7 @@ test('runReviewed resumes from history across settled rounds and pending roles',
     throw new Error(`Unexpected rerun of role: ${opts.seat.seat}`);
   };
 
-  const res = await runReviewed(unit, {}, { runRole, history });
+  const res = await runReviewed(unit, {}, { runRole, history, shippedCheckersByRigor });
 
   // "resume giữa vòng 2 không chạy lại vai đã pass"
   assert.equal(calls.length, 1, 'Only pending red-team should have run');
@@ -353,6 +353,7 @@ test('legacy history evaluator shares terminal outcomes with reviewed execution 
       history,
       runRole: () => assert.fail('a fully settled history must never dispatch'),
       verify: () => assert.fail('this fixture has no verify command'),
+      shippedCheckersByRigor,
     });
     assert.equal(reviewedHistoryOutcome(unit, {}, history), actual.outcome);
     assert.equal(actual.outcome, terminal);
@@ -386,6 +387,7 @@ test('reviewed rejection drains every checker and verify before preserving the f
     const run = runReviewed({ id: 'drain-review', capability: 'code:implement', verify: 'check' }, {}, {
       runRole: ({ seat }) => seat.seat === 'producer' ? { seat: seat.seat, outcome: 'pass' } : peer(seat.seat),
       verify: () => peer('verify'),
+      shippedCheckersByRigor,
     });
     const rejection = assert.rejects(run, (error) => {
       finished = true;
@@ -424,6 +426,7 @@ test('a synchronous checker rejection still dispatches and drains its sibling an
       return peer(role);
     },
     verify: () => peer('verify'),
+    shippedCheckersByRigor,
   });
   const rejection = assert.rejects(run, (error) => {
     assert.equal(error, failure);
@@ -445,6 +448,7 @@ test('resume keeps a complete round final but retries every unpassed seat of an 
   const final = await runReviewed(unit, {}, {
     history: settled,
     runRole: ({ seat }) => assert.fail(`a settled round never dispatches ${seat.seat}`),
+    shippedCheckersByRigor,
   });
   assert.equal(final.outcome, 'execution-failure');
   assert.equal(reviewedHistoryOutcome(unit, {}, settled), 'execution-failure');
@@ -459,6 +463,7 @@ test('resume keeps a complete round final but retries every unpassed seat of an 
       dispatched.push(`${seat.seat}/${round}`);
       return { seat: seat.seat, round, outcome: 'pass' };
     },
+    shippedCheckersByRigor,
   });
   // The passed producer is reused; the failed checker is retried beside the missing one.
   assert.deepEqual(dispatched.sort(), ['red-team/1', 'reviewer/1']);
@@ -482,6 +487,7 @@ test('a verify command in pattern params is not a verify: the runner never ran o
     {
       runRole: async (opts) => ({ seat: opts.seat.seat, outcome: 'pass' }),
       verify: () => assert.fail('no unit or capability verify exists, so no verify role runs'),
+      shippedCheckersByRigor,
     },
     { verify: 'npm test' },
   );
@@ -503,7 +509,7 @@ test('reviewed at high or critical rigor makes every checker independent of the 
   for (const rigor of ['high', 'critical']) {
     const seen = [];
     const unit = { id: `u-${rigor}`, objective: 'Do it', capability: 'docs:write', rigor };
-    await runReviewed(unit, {}, { runRole: async (opts) => { seen.push(opts); return { seat: opts.seat.seat, outcome: 'pass' }; } });
+    await runReviewed(unit, {}, { runRole: async (opts) => { seen.push(opts); return { seat: opts.seat.seat, outcome: 'pass' }; }, shippedCheckersByRigor });
     const byRole = Object.fromEntries(seen.map((opts) => [opts.seat.seat, opts.independentOf]));
     if (rigor === 'critical') {
       assert.deepEqual(byRole.reviewer, ['producer', 'red-team', 'tester'], rigor);
@@ -521,7 +527,7 @@ test('reviewed at standard or low rigor keeps checkers independent of the produc
     const seen = [];
     const unit = { id: 'u-standard', objective: 'Do it', capability: 'docs:write', ...(rigor ? { rigor } : {}) };
     const params = { minCheckers: ['reviewer', 'red-team'] };
-    await runReviewed(unit, {}, { runRole: async (opts) => { seen.push(opts); return { seat: opts.seat.seat, outcome: 'pass' }; } }, params);
+    await runReviewed(unit, {}, { runRole: async (opts) => { seen.push(opts); return { seat: opts.seat.seat, outcome: 'pass' }; }, shippedCheckersByRigor }, params);
     for (const opts of seen.filter((o) => o.seat.seat !== 'producer')) {
       assert.deepEqual(opts.independentOf, ['producer'], `${rigor} ${opts.seat.seat}`);
     }
@@ -558,7 +564,7 @@ test('runReviewed reads maxRounds from params and ignores cfg.loops.reviewed.max
     };
   };
   const cfg = { loops: { reviewed: { maxRounds: 3 } } };
-  const res = await runReviewed(unit, cfg, { runRole });
+  const res = await runReviewed(unit, cfg, { runRole, shippedCheckersByRigor });
   assert.equal(res.rounds, DEFAULT_MAX_ROUNDS);
   assert.equal(roundCount, DEFAULT_MAX_ROUNDS);
   assert.equal(res.outcome, 'findings');
@@ -576,7 +582,7 @@ test('runReviewed params.maxRounds takes precedence over default rounds', async 
     };
   };
   const cfg = { loops: { reviewed: { maxRounds: 5 } } };
-  const res = await runReviewed(unit, cfg, { runRole }, { maxRounds: 1 });
+  const res = await runReviewed(unit, cfg, { runRole, shippedCheckersByRigor }, { maxRounds: 1 });
   assert.equal(res.rounds, 1);
   assert.equal(roundCount, 1);
   assert.equal(res.outcome, 'findings');
@@ -594,7 +600,7 @@ test('runReviewed defaults maxRounds to DEFAULT_MAX_ROUNDS when params and cfg o
     };
   };
   const cfg = {};
-  const res = await runReviewed(unit, cfg, { runRole });
+  const res = await runReviewed(unit, cfg, { runRole, shippedCheckersByRigor });
   assert.equal(res.rounds, DEFAULT_MAX_ROUNDS);
   assert.equal(roundCount, DEFAULT_MAX_ROUNDS);
   assert.equal(res.outcome, 'findings');

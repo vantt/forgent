@@ -3,23 +3,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  SEAT_ROLES, resolveSeats as baseResolveSeats, checkDeclaredSeats, effectiveRigorOf, capabilityRigorOf,
-  requiresDistinctFamilies, seatLaunchesOf as baseSeatLaunchesOf, seatKind, assertNoSeatTier, bindSeatOf, PRODUCER_POSTURE,
-  checkerPlanOf as baseCheckerPlanOf, RESERVED_SEAT_IDS, DEFAULT_CAPABILITY_MIN_CHECKERS,
+  SEAT_ROLES, resolveSeats, checkDeclaredSeats, effectiveRigorOf, capabilityRigorOf,
+  requiresDistinctFamilies, seatLaunchesOf, seatKind, assertNoSeatTier, bindSeatOf, PRODUCER_POSTURE,
+  checkerPlanOf, RESERVED_SEAT_IDS, DEFAULT_CAPABILITY_MIN_CHECKERS,
 } from '../../../src/runner/execution/seat-resolver.mjs';
 import { CHECKER_SEATS, VALID_CHECKER_SEATS, MODEL_POLICY_TIERS } from '../../../src/runner/dispatch/config.mjs';
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 
-const shippedCheckersByRigor = {
-  low: ['reviewer'],
-  ...shippedCatalog().loops.reviewed.checkersByRigor,
-};
-const resolveSeats = (opts = {}) => baseResolveSeats({ shippedCheckersByRigor, ...opts });
-const seatLaunchesOf = (opts = {}) => baseSeatLaunchesOf({ shippedCheckersByRigor, ...opts });
-const checkerPlanOf = (unit, cfg, opts = {}) => {
-  const options = Array.isArray(opts) ? { requested: opts } : (typeof opts === 'string' ? { requested: [opts] } : { ...opts });
-  return baseCheckerPlanOf(unit, cfg, { shippedCheckersByRigor, ...options });
-};
+const shippedCheckersByRigor = shippedCatalog().loops.reviewed.checkersByRigor;
 import { isVerdictSeat } from '../../../src/runner/dispatch/agent-result-claim-contract.mjs';
 
 const unit = { id: 'u', capability: 'docs:write', objective: 'x', writes: [] };
@@ -35,7 +26,7 @@ test('solo is one producer seat; reviewed is the producer plus one seat per chec
     { writer: solo.posture.writer, readOnly: solo.posture.readOnly },
     { writer: true, readOnly: false },
   );
-  const seats = resolveSeats({ pattern: 'reviewed', unit: { ...unit, rigor: 'high' }, runnerConfig: {} });
+  const seats = resolveSeats({ pattern: 'reviewed', unit: { ...unit, rigor: 'high' }, runnerConfig: {}, shippedCheckersByRigor });
   assert.deepEqual(seats.map((s) => [s.seat, s.role]), [['producer', 'producer'], ['reviewer', 'reviewer'], ['red-team', 'red-team']]);
   for (const checker of seats.slice(1)) {
     assert.equal(checker.posture.forceOutOfProcess, true);
@@ -46,7 +37,7 @@ test('solo is one producer seat; reviewed is the producer plus one seat per chec
 test('tester is a checker seat whose role is reviewer for taste lookup, and whose result is not a verdict', () => {
   assert.deepEqual([...VALID_CHECKER_SEATS], ['reviewer', 'red-team', 'tester']);
   assert.deepEqual(CHECKER_SEATS.tester, { role: 'reviewer', verdict: false });
-  const seats = resolveSeats({ pattern: { pattern: 'reviewed', params: { minCheckers: ['tester'] } }, unit, runnerConfig: {} });
+  const seats = resolveSeats({ pattern: { pattern: 'reviewed', params: { minCheckers: ['tester'] } }, unit, runnerConfig: {}, shippedCheckersByRigor });
   const tester = seats.find((s) => s.seat === 'tester');
   assert.equal(tester.role, 'reviewer');
   assert.equal(tester.posture.verdict, false);
@@ -61,7 +52,7 @@ test('tester is a checker seat whose role is reviewer for taste lookup, and whos
 
 test('a checker name that is not a checker seat is refused', () => {
   assert.throws(
-    () => checkerPlanOf(unit, {}, { requested: ['planner'] }),
+    () => checkerPlanOf(unit, {}, { requested: ['planner'], shippedCheckersByRigor }),
     (err) => err.code === 'param-invalid' && /not a checker seat/.test(err.message),
   );
 });
@@ -78,7 +69,7 @@ test('effective rigor is the stronger of the unit and the capability, the capabi
   assert.equal(requiresDistinctFamilies({ capability: 'docs:write' }, cfg), true);
   assert.equal(requiresDistinctFamilies({ capability: 'none:none', rigor: 'standard' }, cfg), false);
   // The checker set and the family rule both follow effective rigor, so capability rigor adds checkers.
-  assert.deepEqual(checkerPlanOf({ capability: 'docs:write' }, cfg).map((c) => c.seat), ['reviewer', 'red-team']);
+  assert.deepEqual(checkerPlanOf({ capability: 'docs:write' }, cfg, { shippedCheckersByRigor }).map((c) => c.seat), ['reviewer', 'red-team']);
 });
 
 test('panel and debate need declared seats with the right multiplicities; ids are unique', () => {
@@ -111,16 +102,16 @@ test('panel members carry the panel posture; a reviewed unit refuses declared se
   
   const reviewedUnit = (seats, extra = {}) => ({ ...unit, ...extra, seats });
   const high = { rigor: 'high' };
-  const declaredOk = resolveSeats({ pattern: 'reviewed', runnerConfig: {}, unit: reviewedUnit([
+  const declaredOk = resolveSeats({ pattern: 'reviewed', runnerConfig: {}, shippedCheckersByRigor, unit: reviewedUnit([
     { seat: 'author', role: 'producer' }, { seat: 'security', role: 'red-team' }, { seat: 'quality', role: 'reviewer' },
   ], high) });
   assert.deepEqual(declaredOk.map((s) => [s.seat, s.role, s.posture.verdict]), [['author', 'producer', false], ['security', 'red-team', true], ['quality', 'reviewer', true]]);
   // A tester is a reviewer-role seat whose result is no verdict: declared seats take their posture from the required checker.
-  const withTester = resolveSeats({ pattern: { pattern: 'reviewed', params: { minCheckers: ['tester'] } }, runnerConfig: {}, unit: reviewedUnit([
+  const withTester = resolveSeats({ pattern: { pattern: 'reviewed', params: { minCheckers: ['tester'] } }, runnerConfig: {}, shippedCheckersByRigor, unit: reviewedUnit([
     { seat: 'p', role: 'producer' }, { seat: 'r1', role: 'reviewer' }, { seat: 'r2', role: 'reviewer' },
   ]) });
   assert.deepEqual(withTester.map((s) => s.posture.verdict), [false, true, false]);
-  const refuse = (seats, extra, re) => assert.throws(() => resolveSeats({ pattern: 'reviewed', runnerConfig: {}, unit: reviewedUnit(seats, extra) }), re);
+  const refuse = (seats, extra, re) => assert.throws(() => resolveSeats({ pattern: 'reviewed', runnerConfig: {}, shippedCheckersByRigor, unit: reviewedUnit(seats, extra) }), re);
   refuse([{ seat: 'p', role: 'producer' }], high, /missing \[reviewer, red-team\]/);
   refuse([{ seat: 'p', role: 'producer' }, { seat: 'r', role: 'reviewer' }, { seat: 'j', role: 'judge' }], {}, /extra \[judge\]/);
   refuse([{ seat: 'p', role: 'producer' }, { seat: 'r', role: 'reviewer' }, { seat: 'x', role: 'red-team' }], {}, /extra \[red-team\]/);
@@ -131,14 +122,14 @@ test('panel members carry the panel posture; a reviewed unit refuses declared se
 test('admission counts launches from the same seats the run binds', () => {
   const cfg = { loops: { reviewed: { maxRounds: 2 } } };
   assert.equal(seatLaunchesOf({ pattern: 'solo', unit, runnerConfig: cfg }), 1);
-  assert.equal(seatLaunchesOf({ pattern: 'reviewed', unit: { ...unit, rigor: 'high' }, runnerConfig: cfg }), 6);
+  assert.equal(seatLaunchesOf({ pattern: 'reviewed', unit: { ...unit, rigor: 'high' }, runnerConfig: cfg, shippedCheckersByRigor }), 6);
   assert.equal(seatLaunchesOf({ loop: 'panel', params: { seats: [{ seat: 'm1', role: 'producer' }, { seat: 'm2', role: 'producer' }, { seat: 'm3', role: 'producer' }, { seat: 'synthesizer', role: 'synthesizer' }] }, unit, runnerConfig: cfg }), 4);
   assert.equal(seatLaunchesOf({ pattern: 'research-fan-out', unit, runnerConfig: cfg }), null);
   assert.equal(seatLaunchesOf({ pattern: 'unheard-of', unit, runnerConfig: cfg }), null);
 
   const nonDefaultCfg = { loops: { reviewed: { maxRounds: 5 } } };
   assert.equal(
-    seatLaunchesOf({ pattern: 'reviewed', unit, runnerConfig: nonDefaultCfg }),
+    seatLaunchesOf({ pattern: 'reviewed', unit, runnerConfig: nonDefaultCfg, shippedCheckersByRigor }),
     4,
     'deleted config maxRounds fallback does not take effect without params; uses default 2 rounds',
   );
@@ -155,7 +146,7 @@ test('configured rigor row wins over shipped table', () => {
       },
     },
   };
-  const plan = checkerPlanOf({ capability: 'docs:write', rigor: 'standard' }, customConfig);
+  const plan = checkerPlanOf({ capability: 'docs:write', rigor: 'standard' }, customConfig, { shippedCheckersByRigor });
   assert.deepEqual(plan.map((c) => c.seat), ['tester']);
 });
 
@@ -169,7 +160,7 @@ test('injected shipped row is used when configured row is absent', () => {
       },
     },
   };
-  const plan = checkerPlanOf({ capability: 'docs:write', rigor: 'critical' }, partialConfig);
+  const plan = checkerPlanOf({ capability: 'docs:write', rigor: 'critical' }, partialConfig, { shippedCheckersByRigor });
   assert.deepEqual(plan.map((c) => c.seat), ['reviewer', 'red-team', 'tester']);
 });
 
@@ -194,7 +185,7 @@ test('configured standard row does not shadow shipped low row for low rigor', ()
       },
     },
   };
-  const plan = baseCheckerPlanOf(
+  const plan = checkerPlanOf(
     { capability: 'docs:write', rigor: 'low' },
     customConfig,
     { shippedCheckersByRigor: { low: ['reviewer'] } },
@@ -212,7 +203,7 @@ test('configured low rigor row wins over shipped low row', () => {
       },
     },
   };
-  const plan = baseCheckerPlanOf(
+  const plan = checkerPlanOf(
     { capability: 'docs:write', rigor: 'low' },
     customConfig,
     { shippedCheckersByRigor: { low: ['reviewer'] } },
@@ -220,17 +211,44 @@ test('configured low rigor row wins over shipped low row', () => {
   assert.deepEqual(plan.map((c) => c.seat), ['tester']);
 });
 
-test('a rigor with no row of its own takes the standard row, and only a table with no standard row is a configuration error', () => {
-  const plan = baseCheckerPlanOf(
+test('a rigor ranked below standard with no row of its own takes the standard row, while high or critical with no row is a configuration error', () => {
+  const plan = checkerPlanOf(
     { capability: 'docs:write', rigor: 'low' },
     { loops: { reviewed: { checkersByRigor: { standard: ['tester'] } } } },
     { shippedCheckersByRigor: { standard: ['reviewer'] } },
   );
   assert.deepEqual(plan.map((c) => c.seat), ['tester']);
   assert.throws(
-    () => baseCheckerPlanOf({ capability: 'docs:write', rigor: 'low' }, {}, { shippedCheckersByRigor: { high: ['reviewer'] } }),
+    () => checkerPlanOf({ capability: 'docs:write', rigor: 'low' }, {}, { shippedCheckersByRigor: { high: ['reviewer'] } }),
     (err) => err.code === 'configuration-error' && /missing checkersByRigor for rigor "low"/.test(err.message),
   );
+  const standardConfig = { loops: { reviewed: { checkersByRigor: { standard: ['reviewer'] } } } };
+  assert.throws(
+    () => checkerPlanOf({ capability: 'docs:write', rigor: 'high' }, standardConfig, { shippedCheckersByRigor: {} }),
+    (err) => err.code === 'configuration-error' && /missing checkersByRigor for rigor "high"/.test(err.message),
+  );
+  assert.throws(
+    () => checkerPlanOf({ capability: 'docs:write', rigor: 'critical' }, standardConfig, { shippedCheckersByRigor: {} }),
+    (err) => err.code === 'configuration-error' && /missing checkersByRigor for rigor "critical"/.test(err.message),
+  );
+});
+
+test('shipped high row beats configured standard row for high rigor', () => {
+  const customConfig = {
+    loops: {
+      reviewed: {
+        checkersByRigor: {
+          standard: ['reviewer'],
+        },
+      },
+    },
+  };
+  const plan = checkerPlanOf(
+    { capability: 'docs:write', rigor: 'high' },
+    customConfig,
+    { shippedCheckersByRigor: { high: ['reviewer', 'red-team'] } },
+  );
+  assert.deepEqual(plan.map((c) => c.seat), ['reviewer', 'red-team']);
 });
 
 
@@ -265,11 +283,11 @@ test('reserved seat ids verify and verifier are refused in declared seats', () =
 });
 
 test('checker plan derives checker set from rigor, capability, and requested params', () => {
-  assert.deepEqual(checkerPlanOf({ capability: 'docs:write', rigor: 'low' }, {}).map((c) => c.seat), ['reviewer']);
-  assert.deepEqual(checkerPlanOf({ capability: 'docs:write', rigor: 'standard' }, {}).map((c) => c.seat), ['reviewer']);
-  assert.deepEqual(checkerPlanOf({ capability: 'docs:write', rigor: 'high' }, {}).map((c) => c.seat), ['reviewer', 'red-team']);
+  assert.deepEqual(checkerPlanOf({ capability: 'docs:write', rigor: 'low' }, {}, { shippedCheckersByRigor }).map((c) => c.seat), ['reviewer']);
+  assert.deepEqual(checkerPlanOf({ capability: 'docs:write', rigor: 'standard' }, {}, { shippedCheckersByRigor }).map((c) => c.seat), ['reviewer']);
+  assert.deepEqual(checkerPlanOf({ capability: 'docs:write', rigor: 'high' }, {}, { shippedCheckersByRigor }).map((c) => c.seat), ['reviewer', 'red-team']);
 
-  const codeCheckers = checkerPlanOf({ capability: 'code:implement', rigor: 'low' }, {});
+  const codeCheckers = checkerPlanOf({ capability: 'code:implement', rigor: 'low' }, {}, { shippedCheckersByRigor });
   assert.deepEqual(codeCheckers.map((c) => c.seat), ['reviewer', 'red-team']);
   assert.deepEqual(codeCheckers.find((c) => c.seat === 'red-team').contributions, ['code:default-red-team']);
 
@@ -280,19 +298,19 @@ test('checker plan derives checker set from rigor, capability, and requested par
       },
     },
   };
-  const customCheckers = checkerPlanOf({ capability: 'custom:task', rigor: 'standard' }, cfg);
+  const customCheckers = checkerPlanOf({ capability: 'custom:task', rigor: 'standard' }, cfg, { shippedCheckersByRigor });
   assert.deepEqual(customCheckers.map((c) => c.seat), ['reviewer', 'tester']);
 
   const paramCheckers = checkerPlanOf(
     { capability: 'docs:write', rigor: 'standard' },
     {},
-    { requested: ['red-team'] },
+    { requested: ['red-team'], shippedCheckersByRigor },
   );
   assert.deepEqual(paramCheckers.map((c) => c.seat), ['reviewer', 'red-team']);
 });
 
 test('checker request below a rigor floor is unioned and records the rigor provenance', () => {
-  const plan = checkerPlanOf({ capability: 'docs:write', rigor: 'high' }, {}, { requested: ['reviewer'] });
+  const plan = checkerPlanOf({ capability: 'docs:write', rigor: 'high' }, {}, { requested: ['reviewer'], shippedCheckersByRigor });
   assert.deepEqual(plan, [
     { seat: 'reviewer', contributions: ['rigor:high', 'request'] },
     { seat: 'red-team', contributions: ['rigor:high'] },
@@ -300,25 +318,25 @@ test('checker request below a rigor floor is unioned and records the rigor prove
 });
 
 test('checker request below a capability floor keeps red-team for code implement', () => {
-  const plan = checkerPlanOf({ capability: 'code:implement' }, {}, { requested: ['reviewer'] });
+  const plan = checkerPlanOf({ capability: 'code:implement' }, {}, { requested: ['reviewer'], shippedCheckersByRigor });
   assert.deepEqual(plan.map((c) => c.seat), ['reviewer', 'red-team']);
   assert.deepEqual(plan.find((c) => c.seat === 'red-team').contributions, ['code:default-red-team']);
   assert.deepEqual(plan.find((c) => c.seat === 'reviewer').contributions, ['rigor:standard', 'request']);
 });
 
 test('red-team default applies to code implement with no config, and does not apply to business advise', () => {
-  const codePlan = checkerPlanOf({ capability: 'code:implement' }, {});
+  const codePlan = checkerPlanOf({ capability: 'code:implement' }, {}, { shippedCheckersByRigor });
   assert.deepEqual(codePlan.map((c) => c.seat), ['reviewer', 'red-team']);
   assert.deepEqual(codePlan.find((c) => c.seat === 'red-team').contributions, ['code:default-red-team']);
 
-  const bizPlan = checkerPlanOf({ capability: 'business:advise' }, {});
+  const bizPlan = checkerPlanOf({ capability: 'business:advise' }, {}, { shippedCheckersByRigor });
   assert.deepEqual(bizPlan.map((c) => c.seat), ['reviewer']);
   assert.equal(bizPlan.find((c) => c.seat === 'red-team'), undefined);
 });
 
 test('capability prefix entry replaces default red-team and exact entry beats prefix', () => {
   const prefixCfg = { capabilities: { 'code:*': { minCheckers: ['reviewer'] } } };
-  const planPrefix = checkerPlanOf({ capability: 'code:implement' }, prefixCfg);
+  const planPrefix = checkerPlanOf({ capability: 'code:implement' }, prefixCfg, { shippedCheckersByRigor });
   assert.deepEqual(planPrefix.map((c) => c.seat), ['reviewer']);
   assert.deepEqual(planPrefix.find((c) => c.seat === 'reviewer').contributions, ['rigor:standard', 'capability:code:*']);
 
@@ -328,27 +346,27 @@ test('capability prefix entry replaces default red-team and exact entry beats pr
       'code:implement': { minCheckers: ['tester'] },
     },
   };
-  const planExact = checkerPlanOf({ capability: 'code:implement' }, exactCfg);
+  const planExact = checkerPlanOf({ capability: 'code:implement' }, exactCfg, { shippedCheckersByRigor });
   assert.deepEqual(planExact.map((c) => c.seat), ['reviewer', 'tester']);
   assert.deepEqual(planExact.find((c) => c.seat === 'tester').contributions, ['capability:code:implement']);
 
   const clearCfg = { capabilities: { 'code:implement': { minCheckers: [] } } };
-  const planClear = checkerPlanOf({ capability: 'code:implement' }, clearCfg);
+  const planClear = checkerPlanOf({ capability: 'code:implement' }, clearCfg, { shippedCheckersByRigor });
   assert.deepEqual(planClear.map((c) => c.seat), ['reviewer']);
   assert.equal(planClear.find((c) => c.seat === 'red-team'), undefined);
 
   const prefixOnlyCfg = { capabilities: { 'code:*': { minCheckers: ['reviewer'] } } };
-  const plainCodePlan = checkerPlanOf({ capability: 'code' }, prefixOnlyCfg);
+  const plainCodePlan = checkerPlanOf({ capability: 'code' }, prefixOnlyCfg, { shippedCheckersByRigor });
   assert.deepEqual(plainCodePlan.map((c) => c.seat), ['reviewer', 'red-team']);
   assert.deepEqual(plainCodePlan.find((c) => c.seat === 'red-team').contributions, ['code:default-red-team']);
 
   const exactCodeCfg = { capabilities: { code: { minCheckers: [] } } };
-  const clearedPlainCode = checkerPlanOf({ capability: 'code' }, exactCodeCfg);
+  const clearedPlainCode = checkerPlanOf({ capability: 'code' }, exactCodeCfg, { shippedCheckersByRigor });
   assert.deepEqual(clearedPlainCode.map((c) => c.seat), ['reviewer']);
 });
 
 test('non-request winner of minCheckers records param slot provenance', () => {
-  const plan = checkerPlanOf({ capability: 'docs:write' }, {}, { requested: ['reviewer'], slot: 'pattern' });
+  const plan = checkerPlanOf({ capability: 'docs:write' }, {}, { requested: ['reviewer'], slot: 'pattern', shippedCheckersByRigor });
   assert.deepEqual(plan, [
     { seat: 'reviewer', contributions: ['rigor:standard', 'param:pattern'] },
   ]);
@@ -358,6 +376,7 @@ test('checker plan resolves slot provenance from options provenance or slot when
   const plan = checkerPlanOf({ capability: 'docs:write' }, {}, {
     params: { minCheckers: ['tester'] },
     slot: 'pattern-default',
+    shippedCheckersByRigor,
   });
   assert.deepEqual(plan.find((c) => c.seat === 'tester'), {
     seat: 'tester',
@@ -367,6 +386,7 @@ test('checker plan resolves slot provenance from options provenance or slot when
   const planFromProv = checkerPlanOf({ capability: 'docs:write' }, {}, {
     params: { minCheckers: ['tester'] },
     provenance: { params: { minCheckers: 'activity' } },
+    shippedCheckersByRigor,
   });
   assert.deepEqual(planFromProv.find((c) => c.seat === 'tester'), {
     seat: 'tester',
@@ -381,6 +401,7 @@ test('declared roster omitting a checker required by pattern invariant refuses w
       floors: { minCheckers: [{ name: 'red-team', source: 'pattern-invariant:code-change' }] },
       unit: { ...unit, seats: [{ seat: 'author', role: 'producer' }, { seat: 'qa', role: 'reviewer' }] },
       runnerConfig: {},
+      shippedCheckersByRigor,
     }),
     (err) => err.code === 'pattern-invariant-weakened' && /pattern-invariant:code-change/.test(err.message),
   );
@@ -392,6 +413,7 @@ test('reviewed roster missing a loop-required role with no invariant refuses wit
       loop: 'reviewed',
       unit: { ...unit, rigor: 'high', seats: [{ seat: 'author', role: 'producer' }, { seat: 'qa', role: 'reviewer' }] },
       runnerConfig: {},
+      shippedCheckersByRigor,
     }),
     (err) => err.code === 'seat-multiplicity' && /missing \[red-team\]/.test(err.message),
   );
@@ -410,6 +432,7 @@ test('seat launches calculation computes launch bounds from loop, params and flo
     params: { maxRounds: 3 },
     unit: {},
     runnerConfig: {},
+    shippedCheckersByRigor,
   });
   assert.equal(launches, 6);
 });

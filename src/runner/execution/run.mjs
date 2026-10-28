@@ -1579,6 +1579,7 @@ async function runUnitBody(options, scope) {
       if (!room) scope.ceilingHit = true;
       return room;
     },
+    shippedCheckersByRigor: shippedCatalog().loops?.reviewed?.checkersByRigor,
   });
   executionSettled = true;
   settle(patternResult.outcome);

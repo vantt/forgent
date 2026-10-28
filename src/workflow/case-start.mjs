@@ -136,7 +136,7 @@ export function detachedResult({ mainRoot, workflowRunId, detached }) {
  * (the registered one, or that one rebuilt with `params.seats`), and the shared context refs.
  * A refused request throws here, so it creates no run.
  */
-export function resolveStart(params) {
+function resolveStart(params) {
   const cwd = params.cwd ?? process.cwd();
   const roots = resolveGitRoots(cwd, { allowNoRepository: true });
   const mainRoot = params.repoRoot ? path.resolve(params.repoRoot) : roots.mainCheckoutRoot;
@@ -183,7 +183,7 @@ export function resolveStart(params) {
   }
 
   const contextRefs = normalizeContextRefs(params.contextRefs);
-  const runnerConfig = params.runnerConfig ?? loadRunnerConfigForDir(mainRoot);
+  const runnerConfig = loadRunnerConfigForDir(mainRoot);
   const loopFn = (name) => loopOf(name, { effective: runnerConfig });
   assertWorkflowAcceptOutcomes(workflow, runnerConfig);
   let seats;
@@ -336,5 +336,5 @@ export function prepareWorkflowRun(params) {
   }
   const { workflowRunId, runDir } = created;
 
-  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null, parent, runnerConfig };
+  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null, parent };
 }

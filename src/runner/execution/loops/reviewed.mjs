@@ -167,6 +167,8 @@ export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, sea
  * @param {Function} hooks.runRole - Function to dispatch a role out-of-process.
  * @param {Function} [hooks.verify] - Deterministic verify hook.
  * @param {Function|Array} [hooks.history] - Prior attempts/results.
+ * @param {Function} [hooks.hasLaunchRoom] - Capacity check for further launches.
+ * @param {object} [hooks.shippedCheckersByRigor] - Shipped checkers by rigor table floor.
  * @param {object} [params] - Pattern parameters (from pattern or caller).
  * @returns {Promise<{ outcome: string, rounds: number, results: Array<object>, findings: Array<string> }>}
  */
@@ -174,7 +176,7 @@ export async function runReviewed(unit, cfg, hooks = {}, params = {}) {
   const { runRole, verify, history, hasLaunchRoom } = hooks;
   const maxRounds = params?.maxRounds ?? DEFAULT_MAX_ROUNDS;
   const priorResults = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
-  const shippedCheckersByRigor = hooks?.shippedCheckersByRigor ?? params?.shippedCheckersByRigor ?? cfg?.shippedCheckersByRigor;
+  const shippedCheckersByRigor = hooks?.shippedCheckersByRigor;
 
   const seats = resolveSeats({ loop: 'reviewed', params, unit, runnerConfig: cfg, shippedCheckersByRigor });
   const producerSeat = seats.find((seat) => seat.role === 'producer');

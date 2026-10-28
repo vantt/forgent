@@ -15,7 +15,7 @@
 // This module is also the one authority for effective rigor and checker composition.
 
 import { assertSeatId } from '../../convention/seat-id.mjs';
-import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
+import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
 
 export const SEAT_ROLES = Object.freeze(['producer', 'synthesizer', 'reviewer', 'red-team', 'judge']);
 export const LOOP_NAMES = Object.freeze(['solo', 'reviewed', 'panel', 'debate']);
@@ -143,12 +143,18 @@ export function checkerPlanOf(unit, runnerConfig, options = {}) {
   const shippedRow = shippedCheckers && Object.hasOwn(shippedCheckers, rigor)
     ? shippedCheckers[rigor]
     : undefined;
-  // A rigor with no row of its own (low, or one a project did not declare) takes the standard row of the same tables.
+  // A rigor ranked below standard with no row of its own falls back to the standard row of the same tables.
+  const fallbackStandard = (RIGOR_RANK[rigor] ?? Infinity) < RIGOR_RANK.standard;
   const rowOf = (table, name) => (table && Object.hasOwn(table, name) ? table[name] : undefined);
-  const fromRigor = configuredRow ?? shippedRow ?? rowOf(configuredCheckers, 'standard') ?? rowOf(shippedCheckers, 'standard');
+  const fromRigor = configuredRow
+    ?? shippedRow
+    ?? (fallbackStandard ? (rowOf(configuredCheckers, 'standard') ?? rowOf(shippedCheckers, 'standard')) : undefined);
   if (!fromRigor) {
+    const errorDetail = fallbackStandard
+      ? `(neither runnerConfig nor shippedCheckersByRigor defines it or a standard row)`
+      : `(neither runnerConfig nor shippedCheckersByRigor defines it)`;
     throw new SeatResolutionError(
-      `missing checkersByRigor for rigor "${rigor}" (neither runnerConfig nor shippedCheckersByRigor defines it or a standard row)`,
+      `missing checkersByRigor for rigor "${rigor}" ${errorDetail}`,
       'configuration-error',
     );
   }

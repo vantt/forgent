@@ -22,7 +22,7 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
-import { writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 const { openCase, eventsOf } = await import('../../helpers/workflow-case-fixture.mjs');
 
 seedFileLocalBwrapRegistry();
@@ -312,7 +312,7 @@ test('a reviewed run that cannot launch its next round ends at the last evaluati
   const roles = [];
   const result = await runReviewed(
     { id: 'u', objective: 'x', capability: 'docs:write', writes: [] },
-    { loops: { reviewed: { maxRounds: 2 } } },
+    { loops: { reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } } } },
     {
       runRole: async ({ seat, round = 1 }) => {
         roles.push(`${seat.seat}/${round}`);
@@ -503,4 +503,41 @@ test('case request reason reaches admission proposal and route event', async () 
   assert.equal(optAnswer.admitted, true);
   const optRouteEvents = eventsOf(caseRun).filter((e) => e.type === 'route');
   assert.equal(optRouteEvents.at(-1).payload.reason, 'diverging via options reason');
+});
+
+test('runUnit launches critical reviewed seats with shipped floor when injected config lacks checker rows', async () => {
+  const { repoRoot, worktreeDir } = setup(['alpha', 'beta', 'gamma', 'delta']);
+  const port = recordingPort();
+  const unitData = {
+    id: 'u-crit-floor',
+    objective: 'Critical floor wiring',
+    capability: 'docs:write',
+    writes: [],
+    rigor: 'critical',
+  };
+  const baseCfg = readProjectConfig(repoRoot).runner;
+  const configWithoutCheckers = {
+    ...baseCfg,
+    loops: {
+      reviewed: {
+        maxRounds: 1,
+      },
+    },
+  };
+  const res = await runUnit({
+    unitData,
+    pattern: 'reviewed',
+    reason: 'prove critical floor execution wiring',
+    caseAdmission: port,
+    caseRef: { caseId: 'case-test', activity: 'scout' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    runnerConfig: configWithoutCheckers,
+  });
+  assert.equal(res.outcome, 'pass');
+  assert.deepEqual(
+    res.results.map((r) => r.seat),
+    ['producer', 'reviewer', 'red-team', 'tester'],
+  );
 });
