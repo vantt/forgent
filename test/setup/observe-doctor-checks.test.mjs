@@ -1,5 +1,5 @@
 import '../helpers/process-tmp-root.mjs';
-import { initializeWorkRepository, freezeLegacyWorkFixture } from '../helpers/work-store-release.mjs';
+import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
@@ -8,7 +8,6 @@ import { tmpdir } from 'node:os';
 import {
   DOCTOR_CHECKS,
   checkObserveDirWritable,
-  checkObserveFrictionMigrated,
   checkObserveHostResolvable,
   checkObserveRunCoverage,
 } from '../../src/setup/registrations.mjs';
@@ -22,7 +21,6 @@ function mkTempDir() {
 test('observe doctor checks are registered in DOCTOR_CHECKS', () => {
   const ids = DOCTOR_CHECKS.map((c) => c.id);
   assert.ok(ids.includes('observe-dir-writable'));
-  assert.ok(ids.includes('observe-friction-migrated'));
   assert.ok(ids.includes('observe-host-resolvable'));
 });
 
@@ -32,142 +30,6 @@ test('observe-dir-writable passes and creates .fgos/observe', () => {
     const res = checkObserveDirWritable(cwd);
     assert.equal(res.passed, true);
     assert.ok(fs.existsSync(path.join(cwd, '.fgos', 'observe')));
-  } finally {
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('observe-friction-migrated passes when no legacy friction exists', () => {
-  const cwd = mkTempDir();
-  try {
-    // Empty events.jsonl
-    fs.writeFileSync(path.join(cwd, '.fgos', 'events.jsonl'), '', 'utf8');
-    freezeLegacyWorkFixture(cwd);
-    const res = checkObserveFrictionMigrated(cwd);
-    assert.equal(res.passed, true);
-    assert.match(res.message, /no legacy work\.friction records/);
-  } finally {
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('observe-friction-migrated fails when legacy friction exists but no observe/friction dir', () => {
-  const cwd = mkTempDir();
-  try {
-    const event = {
-      seq: 1,
-      ts: '2026-09-29T10:00:00Z',
-      type: 'work.friction',
-      payload: { id: 'tsk-1', layer: 'state', errorClass: 'err' },
-    };
-    fs.writeFileSync(path.join(cwd, '.fgos', 'events.jsonl'), JSON.stringify(event) + '\n', 'utf8');
-
-    freezeLegacyWorkFixture(cwd);
-    const res = checkObserveFrictionMigrated(cwd);
-    assert.equal(res.passed, false);
-    assert.match(res.message, /friction migration not run/);
-    assert.match(res.message, /friction migrate --dir /);
-  } finally {
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('observe-friction-migrated names the resolved host binary in its fix command', () => {
-  const cwd = mkTempDir();
-  const prev = process.env.FGOS_HOST_BIN;
-  try {
-    // The check names whichever host binary resolves; the Work store it reads needs the real staged one.
-    const hostBin = prev;
-    assert.ok(hostBin, 'the Work fixture stages a host binary');
-    const event = { seq: 1, ts: '2026-09-29T10:00:00Z', type: 'work.friction', payload: { id: 'tsk-1' } };
-    fs.writeFileSync(path.join(cwd, '.fgos', 'events.jsonl'), JSON.stringify(event) + '\n', 'utf8');
-    freezeLegacyWorkFixture(cwd);
-    const res = checkObserveFrictionMigrated(cwd);
-    assert.equal(res.passed, false);
-    assert.ok(res.message.includes(`run: ${hostBin} friction migrate --dir `), res.message);
-  } finally {
-    if (prev === undefined) delete process.env.FGOS_HOST_BIN;
-    else process.env.FGOS_HOST_BIN = prev;
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('observe-friction-migrated fails when unmigrated records exist past cursor', () => {
-  const cwd = mkTempDir();
-  try {
-    const event1 = {
-      seq: 1,
-      ts: '2026-09-29T10:00:00Z',
-      type: 'work.friction',
-      payload: { id: 'tsk-1' },
-    };
-    const event2 = {
-      seq: 2,
-      ts: '2026-09-29T10:05:00Z',
-      type: 'work.friction',
-      payload: { id: 'tsk-2' },
-    };
-    fs.writeFileSync(
-      path.join(cwd, '.fgos', 'events.jsonl'),
-      JSON.stringify(event1) + '\n' + JSON.stringify(event2) + '\n',
-      'utf8'
-    );
-
-    const frictionDir = path.join(cwd, '.fgos', 'observe', 'friction');
-    fs.mkdirSync(frictionDir, { recursive: true });
-
-    // Only seq 1 is migrated
-    const migrationMarker = { v: 1, type: 'migration', from: 'work.friction', count: 1, resolved: 0, ts: '...' };
-    const migratedRecord = {
-      v: 1,
-      type: 'friction-recorded',
-      legacy: { src: 'events.jsonl', seq: 1 },
-    };
-    fs.writeFileSync(
-      path.join(frictionDir, 'shard.jsonl'),
-      JSON.stringify(migrationMarker) + '\n' + JSON.stringify(migratedRecord) + '\n',
-      'utf8'
-    );
-
-    freezeLegacyWorkFixture(cwd);
-    const res = checkObserveFrictionMigrated(cwd);
-    assert.equal(res.passed, false);
-    assert.match(res.message, /1 legacy work\.friction record\(s\) newer than cursor/);
-  } finally {
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('observe-friction-migrated passes when all legacy records are migrated', () => {
-  const cwd = mkTempDir();
-  try {
-    const event1 = {
-      seq: 1,
-      ts: '2026-09-29T10:00:00Z',
-      type: 'work.friction',
-      payload: { id: 'tsk-1' },
-    };
-    fs.writeFileSync(path.join(cwd, '.fgos', 'events.jsonl'), JSON.stringify(event1) + '\n', 'utf8');
-
-    const frictionDir = path.join(cwd, '.fgos', 'observe', 'friction');
-    fs.mkdirSync(frictionDir, { recursive: true });
-
-    const migrationMarker = { v: 1, type: 'migration', from: 'work.friction', count: 1, resolved: 0, ts: '...' };
-    const migratedRecord = {
-      v: 1,
-      type: 'friction-recorded',
-      legacy: { src: 'events.jsonl', seq: 1 },
-    };
-    fs.writeFileSync(
-      path.join(frictionDir, 'shard.jsonl'),
-      JSON.stringify(migrationMarker) + '\n' + JSON.stringify(migratedRecord) + '\n',
-      'utf8'
-    );
-
-    freezeLegacyWorkFixture(cwd);
-    const res = checkObserveFrictionMigrated(cwd);
-    assert.equal(res.passed, true);
-    assert.match(res.message, /all 1 legacy work\.friction record\(s\) migrated/);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }

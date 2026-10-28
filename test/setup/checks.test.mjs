@@ -165,7 +165,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'seat-binding-dry-bind',
       'blind-steps-use-proven-pools',
       'observe-dir-writable',
-      'observe-friction-migrated',
       'observe-host-resolvable',
       'observe-run-coverage',
       'executor-confinement',

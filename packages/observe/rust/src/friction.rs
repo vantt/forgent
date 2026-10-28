@@ -1,13 +1,13 @@
-//! Friction management for Observe: record, resolve, list, show, rank, migrate.
+//! Friction management for Observe: record, resolve, list, show, rank.
 
-use crate::contract::{LegacyFrictionRecord, LegacyFrictionSource, Subject, Window};
+use crate::contract::{Subject, Window};
 use crate::shard::{self, is_session_shard, StoredRecord, TornTail, UnsafeShard};
 use crate::store_lock::acquire_store_lock;
 use crate::time::{now_iso, ParsedWindow};
 use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::path::Path;
 
 pub const PUBLISHED_LAYERS: &[&str] = &[
@@ -122,7 +122,7 @@ pub fn validate_resolve_input(reason: &str, by: &str) -> Result<(), String> {
 /// A friction event with its stamp parsed once and the shard line it came from.
 struct Event {
     value: Value,
-    /// `None` only for a resolve whose stamp is free text (legacy migration).
+    /// `None` only for a resolve whose stamp is free text (written by a past migration).
     millis: Option<i64>,
     shard: String,
     line: usize,
@@ -146,7 +146,7 @@ impl Event {
     }
 }
 
-/// The instant of a stamp. A trailing `~` (written by the legacy migration for a
+/// The instant of a stamp. A trailing `~` (written by a past migration for a
 /// resolve with no stamp of its own) means "just after" the stamp before it.
 fn stamp_millis(ts: &str) -> Option<i64> {
     match ts.strip_suffix('~') {
@@ -200,122 +200,6 @@ fn read_events(root: &Path) -> Result<Vec<Event>, String> {
 fn append_values(root: &Path, values: &[Value]) -> Result<(), String> {
     let lines = values.iter().map(shard::encode_line).collect::<Result<Vec<_>, _>>()?;
     shard::append_lines(root, STORE, TornTail::Heal, &lines).map(drop).map_err(|e| e.to_string())
-}
-
-/// Imports legacy `work.friction` records that the store does not hold yet, as
-/// one append under the store lock. An unreadable store appends nothing; bad
-/// lines are named and skipped, since the dedupe needs only the valid
-/// `legacy.{src,seq}` pairs. Returns how many records were imported.
-pub fn migrate(
-    root: &Path,
-    legacy_sources: &[Box<dyn LegacyFrictionSource>],
-) -> Result<usize, String> {
-    if legacy_sources.is_empty() {
-        return Ok(0);
-    }
-    let _guard = acquire_store_lock(root).map_err(|e| format!("store lock error: {}", e))?;
-
-    let existing = shard::read_store(root, STORE, UnsafeShard::Fail).map_err(|e| e.to_string())?;
-    shard::warn_skipped(STORE, &existing.invalid);
-    let mut already_migrated: HashSet<(String, u64)> = HashSet::new();
-    for rec in &existing.records {
-        if let Some(legacy) = rec.value.get("legacy") {
-            if let (Some(src), Some(seq)) = (
-                legacy.get("src").and_then(|s| s.as_str()),
-                legacy.get("seq").and_then(|s| s.as_u64()),
-            ) {
-                already_migrated.insert((src.to_string(), seq));
-            }
-        }
-    }
-
-    let mut to_migrate: Vec<LegacyFrictionRecord> = Vec::new();
-    for source in legacy_sources {
-        match source.read_legacy_frictions(root, None) {
-            Ok(records) => {
-                for r in records {
-                    if !already_migrated.contains(&(r.src.clone(), r.seq)) {
-                        to_migrate.push(r);
-                    }
-                }
-            }
-            Err(e) => {
-                eprintln!("fgos: warning: legacy friction source failed: {:?}", e);
-            }
-        }
-    }
-
-    if to_migrate.is_empty() {
-        return Ok(0);
-    }
-
-    let count = to_migrate.len();
-    let mut resolved_count = 0;
-    let caller = current_caller();
-    let mut values = Vec::new();
-
-    for r in &to_migrate {
-        values.push(json!({
-            "v": 1,
-            "type": "friction-recorded",
-            "ts": r.ts,
-            "subject": {
-                "kind": "work",
-                "id": r.subject_id
-            },
-            "layer": r.layer,
-            "errorClass": r.error_class,
-            "disposition": r.disposition,
-            "detail": r.detail,
-            "attempts": r.attempts,
-            "docType": r.doc_type,
-            "producer": r.producer,
-            "caller": caller,
-            "legacy": {
-                "src": r.src,
-                "seq": r.seq
-            }
-        }));
-
-        if r.resolved {
-            resolved_count += 1;
-            let (reason, resolve_ts) = match r.resolve_reason.as_deref() {
-                Some(s) if s.contains('@') => {
-                    let (kind, ts) = s.split_once('@').unwrap();
-                    (kind.to_string(), ts.to_string())
-                }
-                Some(s) => (s.to_string(), format!("{}~", r.ts)),
-                None => ("migrated".to_string(), format!("{}~", r.ts)),
-            };
-            values.push(json!({
-                "v": 1,
-                "type": "friction-resolved",
-                "ts": resolve_ts,
-                "subject": {
-                    "kind": "work",
-                    "id": r.subject_id
-                },
-                "reason": reason,
-                "by": "work",
-                "caller": caller,
-                "legacy": {
-                    "src": r.src,
-                    "seq": r.seq
-                }
-            }));
-        }
-    }
-
-    values.push(json!({
-        "v": 1,
-        "type": "migration",
-        "from": "work.friction",
-        "count": count,
-        "resolved": resolved_count,
-        "ts": now_iso()
-    }));
-    append_values(root, &values)?;
-    Ok(count)
 }
 
 /// Records a new friction event.
@@ -545,113 +429,6 @@ mod tests {
         let _ = fs::remove_dir_all(&tmp);
     }
 
-    struct MockLegacySource {
-        records: Vec<LegacyFrictionRecord>,
-    }
-
-    impl LegacyFrictionSource for MockLegacySource {
-        fn source_id(&self) -> &'static str {
-            "mock"
-        }
-        fn read_legacy_frictions(
-            &self,
-            _root: &Path,
-            _since_cursor: Option<(&str, u64)>,
-        ) -> Result<Vec<LegacyFrictionRecord>, crate::contract::SourceError> {
-            Ok(self.records.clone())
-        }
-    }
-
-    #[test]
-    fn migrate_imports_legacy_records_once_and_resolved_ones_stay_settled() {
-        let tmp = std::env::temp_dir().join(format!("fgos-fric-mig-test-{}", std::process::id()));
-        let _ = fs::remove_dir_all(&tmp);
-        fs::create_dir_all(&tmp).unwrap();
-
-        let legacy_records = vec![
-            LegacyFrictionRecord {
-                src: "events.jsonl".to_string(),
-                seq: 10,
-                ts: "2026-07-01T10:00:00Z".to_string(),
-                subject_id: "tsk-mig-1".to_string(),
-                layer: "verification".to_string(),
-                error_class: "verify-miss".to_string(),
-                disposition: "blocked".to_string(),
-                detail: "failed test".to_string(),
-                attempts: Some(1),
-                doc_type: None,
-                producer: Some("runner.loop".to_string()),
-                resolved: true,
-                resolve_reason: Some("done@2026-07-01T10:05:00Z".to_string()),
-            },
-            LegacyFrictionRecord {
-                src: "events.jsonl".to_string(),
-                seq: 11,
-                ts: "2026-07-01T10:10:00Z".to_string(),
-                subject_id: "tsk-mig-2".to_string(),
-                layer: "state".to_string(),
-                error_class: "merge-conflict".to_string(),
-                disposition: "blocked".to_string(),
-                detail: "merge conflict".to_string(),
-                attempts: Some(1),
-                doc_type: None,
-                producer: Some("runner.loop".to_string()),
-                resolved: false,
-                resolve_reason: None,
-            },
-        ];
-
-        let source: Box<dyn LegacyFrictionSource> = Box::new(MockLegacySource {
-            records: legacy_records,
-        });
-        let sources = vec![source];
-
-        // The first migrate imports both legacy records; a record never imports
-        assert_eq!(migrate(&tmp, &sources).unwrap(), 2);
-        let input = FrictionInput {
-            subject: Subject::parse("work:tsk-new").unwrap(),
-            layer: "verification".to_string(),
-            error_class: "verify-miss".to_string(),
-            disposition: "advisory".to_string(),
-            detail: "fresh friction".to_string(),
-            producer: "test".to_string(),
-            attempts: None,
-            doc_type: None,
-        };
-        record(&tmp, input).unwrap();
-
-        // Check rank: tsk-mig-1 was resolved, so only tsk-mig-2 and tsk-new should be in rank!
-        let rank_res = rank(&tmp, None).unwrap();
-        let rarr = rank_res.as_array().unwrap();
-        assert_eq!(rarr.len(), 2);
-        let ids: Vec<&str> = rarr.iter().map(|c| c["id"].as_str().unwrap()).collect();
-        assert!(ids.contains(&"tsk-mig-2"));
-        assert!(ids.contains(&"tsk-new"));
-        assert!(!ids.contains(&"tsk-mig-1"));
-
-        // A second migrate imports nothing new
-        assert_eq!(migrate(&tmp, &sources).unwrap(), 0);
-        let input2 = FrictionInput {
-            subject: Subject::parse("work:tsk-new-2").unwrap(),
-            layer: "environment".to_string(),
-            error_class: "worker-timeout".to_string(),
-            disposition: "halted".to_string(),
-            detail: "timeout".to_string(),
-            producer: "test".to_string(),
-            attempts: None,
-            doc_type: None,
-        };
-        record(&tmp, input2).unwrap();
-
-        // Show tsk-mig-1: totalRecorded = 1, totalResolved = 1, unsettled = 0
-        let show_res = show(&tmp, "work:tsk-mig-1").unwrap();
-        assert_eq!(show_res["unsettled"], 0);
-        assert_eq!(show_res["totalRecorded"], 1);
-        assert_eq!(show_res["totalResolved"], 1);
-
-        let _ = fs::remove_dir_all(&tmp);
-    }
-
     #[test]
     fn test_friction_validation_errors() {
         let tmp = std::env::temp_dir().join(format!("fgos-fric-val-test-{}", std::process::id()));
@@ -741,48 +518,6 @@ mod tests {
         }
     }
 
-    fn one_legacy_source() -> Vec<Box<dyn LegacyFrictionSource>> {
-        vec![Box::new(MockLegacySource {
-            records: vec![LegacyFrictionRecord {
-                src: "events.jsonl".to_string(),
-                seq: 10,
-                ts: "2026-07-01T10:00:00Z".to_string(),
-                subject_id: "tsk-legacy".to_string(),
-                layer: "verification".to_string(),
-                error_class: "verify-miss".to_string(),
-                disposition: "blocked".to_string(),
-                detail: "legacy".to_string(),
-                attempts: Some(1),
-                doc_type: None,
-                producer: Some("runner.loop".to_string()),
-                resolved: false,
-                resolve_reason: None,
-            }],
-        })]
-    }
-
-    /// The already-migrated copy of `one_legacy_source`'s record, as a migration wrote it.
-    fn migrated_legacy_line() -> String {
-        let mut value: Value = serde_json::from_str(&recorded_line("tsk-legacy", "2026-07-01T10:00:00Z")).unwrap();
-        value["legacy"] = json!({ "src": "events.jsonl", "seq": 10 });
-        value.to_string()
-    }
-
-    /// How many shard lines carry the migrated copy of legacy record `seq`, read
-    /// byte-wise so an invalid line cannot hide them.
-    fn migrated_copies(root: &Path, seq: u64) -> usize {
-        let needle = format!("\"legacy\":{{\"src\":\"events.jsonl\",\"seq\":{seq}}}");
-        let mut count = 0;
-        for entry in fs::read_dir(friction_dir(root)).unwrap() {
-            let bytes = fs::read(entry.unwrap().path()).unwrap();
-            count += String::from_utf8_lossy(&bytes)
-                .lines()
-                .filter(|line| line.contains("\"friction-recorded\"") && line.contains(&needle))
-                .count();
-        }
-        count
-    }
-
     fn listed_ids(root: &Path) -> Vec<String> {
         list(root, None, None, None)
             .expect("friction list must succeed")
@@ -791,52 +526,6 @@ mod tests {
             .iter()
             .map(|item| item["subject"]["id"].as_str().unwrap().to_string())
             .collect()
-    }
-
-    fn migrate_request(root: &Path) -> crate::contract::ObserveRequest {
-        crate::contract::ObserveRequest {
-            operation: "observe.friction".into(),
-            sub: "migrate".into(),
-            args: Vec::new(),
-            root: root.to_path_buf(),
-            stdin: None,
-        }
-    }
-
-    #[test]
-    fn an_invalid_line_never_makes_a_write_or_migrate_append_migrated_legacy_records_again() {
-        let tmp = temp_root("bad-utf8-remigrate");
-        let mut bytes = format!("{}\n", migrated_legacy_line()).into_bytes();
-        bytes.extend_from_slice(b"{\"detail\":\"c\xe1\xbb\n");
-        fs::write(friction_dir(&tmp).join("migrated-writer.jsonl"), bytes).unwrap();
-        assert_eq!(migrated_copies(&tmp, 10), 1);
-        let sources = one_legacy_source();
-
-        let _ = record(&tmp, fresh_input("tsk-new"));
-        assert_eq!(migrated_copies(&tmp, 10), 1, "record appended the migrated legacy record again");
-        let _ = resolve(&tmp, Subject::parse("work:tsk-new").unwrap(), "done", "test");
-        assert_eq!(migrated_copies(&tmp, 10), 1, "resolve appended the migrated legacy record again");
-        let _ = crate::friction_cli::dispatch(&migrate_request(&tmp), &sources);
-        assert_eq!(migrated_copies(&tmp, 10), 1, "migrate appended the migrated legacy record again");
-        let _ = fs::remove_dir_all(&tmp);
-    }
-
-    #[test]
-    fn migrate_appends_nothing_while_another_holder_has_the_store_lock() {
-        let tmp = temp_root("migrate-lock");
-        let held = acquire_store_lock(&tmp).expect("test takes the store lock");
-        let root = tmp.clone();
-        let migration = std::thread::spawn(move || {
-            crate::friction_cli::dispatch(&migrate_request(&root), &one_legacy_source())
-        });
-        std::thread::sleep(std::time::Duration::from_millis(300));
-        let while_held = migrated_copies(&tmp, 10);
-        held.release();
-        let answer = migration.join().unwrap();
-        assert_eq!(while_held, 0, "migrate appended while another holder had the store lock");
-        answer.expect("migrate succeeds once the lock is free");
-        assert_eq!(migrated_copies(&tmp, 10), 1);
-        let _ = fs::remove_dir_all(&tmp);
     }
 
     #[test]
@@ -858,34 +547,17 @@ mod tests {
     }
 
     #[test]
-    fn legacy_resolves_settle_by_instant_marker_or_file_order_whatever_their_stamp() {
+    fn a_resolve_stamped_just_after_or_with_no_instant_settles_the_records_already_written_before_it() {
         let tmp = temp_root("legacy-stamps");
-        let legacy = |seq, id: &str, resolve_reason: Option<&str>| LegacyFrictionRecord {
-            src: "events.jsonl".to_string(),
-            seq,
-            ts: "2026-07-01T10:00:00Z".to_string(),
-            subject_id: id.to_string(),
-            layer: "verification".to_string(),
-            error_class: "verify-miss".to_string(),
-            disposition: "blocked".to_string(),
-            detail: "legacy".to_string(),
-            attempts: None,
-            doc_type: None,
-            producer: None,
-            resolved: true,
-            resolve_reason: resolve_reason.map(str::to_string),
-        };
-        let sources: Vec<Box<dyn LegacyFrictionSource>> = vec![Box::new(MockLegacySource {
-            records: vec![
-                legacy(1, "tsk-marker", None),
-                legacy(2, "tsk-reason-marker", Some("wontfix")),
-                legacy(3, "tsk-dated", Some("done@2026-07-01T10:05:00Z")),
-                legacy(4, "tsk-free-text", Some("done@sometime later")),
-            ],
-        })];
-        assert_eq!(migrate(&tmp, &sources).unwrap(), 4);
+        let lines = [
+            recorded_line("tsk-marker", "2026-07-01T10:00:00Z"),
+            resolved_line("tsk-marker", "2026-07-01T10:00:00Z~"),
+            recorded_line("tsk-free-text", "2026-07-01T10:00:00Z"),
+            resolved_line("tsk-free-text", "sometime later"),
+        ];
+        fs::write(friction_dir(&tmp).join("one-writer.jsonl"), format!("{}\n", lines.join("\n"))).unwrap();
 
-        for id in ["tsk-marker", "tsk-reason-marker", "tsk-dated", "tsk-free-text"] {
+        for id in ["tsk-marker", "tsk-free-text"] {
             assert_eq!(show(&tmp, &format!("work:{id}")).unwrap()["unsettled"], 0, "{id} stays unsettled");
         }
         assert_eq!(rank(&tmp, None).unwrap(), json!([]));
@@ -916,23 +588,6 @@ mod tests {
         assert_eq!(listed_ids(&tmp), vec!["tsk-good".to_string()]);
         assert_eq!(show(&tmp, "work:tsk-bad-stamp").unwrap()["totalRecorded"], 0);
         let _ = fs::remove_dir_all(&tmp);
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn migrate_appends_nothing_when_the_store_cannot_be_read() {
-        let tmp = temp_root("migrate-unreadable");
-        let external = temp_root("migrate-unreadable-external");
-        let target = external.join("outside.jsonl");
-        fs::write(&target, "original\n").unwrap();
-        std::os::unix::fs::symlink(&target, friction_dir(&tmp).join("planted.jsonl")).unwrap();
-
-        assert!(migrate(&tmp, &one_legacy_source()).is_err());
-        assert_eq!(migrated_copies(&tmp, 10), 0);
-        assert_eq!(fs::read_to_string(&target).unwrap(), "original\n");
-        assert!(list(&tmp, None, None, None).is_err());
-        let _ = fs::remove_dir_all(&tmp);
-        let _ = fs::remove_dir_all(&external);
     }
 
     #[cfg(unix)]

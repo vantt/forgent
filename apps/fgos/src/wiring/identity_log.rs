@@ -70,8 +70,8 @@ impl LogDoor for StoreLogDoor {
 }
 
 impl StoreLog {
-    /// The write admission every writer of the Event Store passes before it appends: a clone that
-    /// still has retired event files, or whose pinned legacy ref or fetch mapping is missing, is refused.
+    /// The write admission every writer of the Event Store passes before it appends: a clone whose
+    /// pinned legacy ref or fetch mapping is missing is refused.
     fn admit_write(&self) -> Result<(), Refusal> {
         let remote = fgos_config::provider::effective_value(&self.dir, "eventStore.remote")?;
         let remote = match &remote {

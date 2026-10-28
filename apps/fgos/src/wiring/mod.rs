@@ -1,6 +1,5 @@
 //! Source wiring modules for composition root.
 
-pub mod friction_sources;
 #[cfg(unix)]
 pub mod mailbox_config;
 #[cfg(unix)]

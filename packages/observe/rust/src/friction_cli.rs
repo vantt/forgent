@@ -1,17 +1,17 @@
 //! CLI dispatch for `fgos friction <sub>`.
 
-use crate::contract::{LegacyFrictionSource, ObserveRequest, Subject};
+use crate::contract::{ObserveRequest, Subject};
 use crate::flags::Flags;
 use crate::friction::{self, invalid_input, FrictionInput};
 use serde_json::json;
 
 pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
-    "record", "resolve", "list", "show", "rank", "ping", "migrate",
+    "record", "resolve", "list", "show", "rank", "ping",
 ];
 
 /// Whether the verb appends to the friction store.
 pub fn writes(req: &ObserveRequest) -> bool {
-    matches!(req.sub.as_str(), "record" | "resolve" | "migrate")
+    matches!(req.sub.as_str(), "record" | "resolve")
 }
 
 fn required<'a>(flags: &'a Flags, flag: &str) -> Result<&'a str, String> {
@@ -27,10 +27,7 @@ fn subject_of(flags: &Flags) -> Result<Subject, String> {
     })
 }
 
-pub fn dispatch(
-    req: &ObserveRequest,
-    legacy_sources: &[Box<dyn LegacyFrictionSource>],
-) -> Result<serde_json::Value, String> {
+pub fn dispatch(req: &ObserveRequest) -> Result<serde_json::Value, String> {
     let parse = |values: &[&str], switches: &[&str], positional: bool| {
         Flags::parse(&req.args, values, switches, positional).map_err(invalid_input)
     };
@@ -39,14 +36,6 @@ pub fn dispatch(
             "ok": true,
             "root": req.root.to_string_lossy()
         })),
-        "migrate" => {
-            parse(&[], &[], false)?;
-            let count = friction::migrate(&req.root, legacy_sources)?;
-            Ok(json!({
-                "ok": true,
-                "migrated": count,
-            }))
-        }
         "record" => {
             let flags = parse(
                 &[

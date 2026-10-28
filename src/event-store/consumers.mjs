@@ -22,11 +22,16 @@ export function consumers() {
   const files = new Set();
   const caches = new Set();
   const entries = manifest.consumers.map(entry => {
+    // A consumer keeps a rebuildable view (cache plus the module that folds it) or none; a registry-only entry
+    // registers its streams and has nothing to rebuild. Both fields are present together or absent together.
+    const hasView = entry?.cachePath !== undefined;
     if (!entry || typeof entry.id !== 'string' || !/^[a-z][a-z0-9-]*$/.test(entry.id)
       || ids.has(entry.id) || !relativePath(entry.contractFile) || files.has(entry.contractFile)
-      || !relativePath(entry.cachePath) || caches.has(entry.cachePath) || !relativePath(entry.rebuildModule)) throw invalid('invalid or duplicate consumer');
+      || hasView !== (entry.rebuildModule !== undefined)
+      || (hasView && (!relativePath(entry.cachePath) || caches.has(entry.cachePath) || !relativePath(entry.rebuildModule)))) throw invalid('invalid or duplicate consumer');
     ids.add(entry.id);
     files.add(entry.contractFile);
+    if (!hasView) return Object.freeze({ id: entry.id, contractFile: entry.contractFile });
     caches.add(entry.cachePath);
     return Object.freeze({ id: entry.id, contractFile: entry.contractFile, cachePath: entry.cachePath, rebuildModule: entry.rebuildModule });
   });
@@ -43,5 +48,6 @@ export function registryFiles() {
 export function loadRebuildModule(id) {
   const entry = consumers().find(entry => entry.id === id);
   if (!entry) throw invalid(`unknown consumer: ${id}`);
+  if (entry.rebuildModule === undefined) throw invalid(`consumer keeps no view to rebuild: ${id}`);
   return import(pathToFileURL(path.join(OWN_PAYLOAD_ROOT, entry.rebuildModule)).href);
 }

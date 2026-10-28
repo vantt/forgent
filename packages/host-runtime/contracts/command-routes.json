@@ -357,11 +357,6 @@
         "layer",
         "since"
       ],
-      "migrate": [
-        "dir",
-        "help",
-        "json"
-      ],
       "ping": [
         "dir",
         "help",

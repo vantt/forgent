@@ -13,6 +13,13 @@ test('the dormant registry matches the shipped manifest without import-time regi
   assert.throws(() => loadRebuildModule('missing'), { code: 'event-store-consumer-registry' });
 });
 
+test('every contract file the manifest names ships in the release payload', () => {
+  const manifest = JSON.parse(fs.readFileSync(new URL('../../packages/event-store/contracts/consumers.v1.json', import.meta.url)));
+  const { files } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url)));
+  const shipped = file => files.some(entry => file === entry || file.startsWith(`${entry}/`));
+  assert.deepEqual(manifest.consumers.map(entry => entry.contractFile).filter(file => !shipped(file)), []);
+});
+
 test('the manifest is the authority for contracts and lazy rebuilds, and rejects duplicate/unsafe entries', { skip: process.platform !== 'linux' }, async t => {
   const os = await import('node:os');
   const path = await import('node:path');
@@ -37,7 +44,16 @@ test('the manifest is the authority for contracts and lazy rebuilds, and rejects
     assert.equal((await api.loadRebuildModule('example')).rebuild, 42);
     assert.equal(globalThis.consumerLoaded, true);
   `]);
-  for (const consumers of [[entry, entry], [entry, { ...entry, id: 'other', contractFile: 'other.json' }], [{ ...entry, contractFile: '../escape.json' }], [{ ...entry, rebuildModule: '/absolute.mjs' }], [{ ...entry, cachePath: 'a/../b' }]]) {
+  const registryOnly = { id: 'registry-only', contractFile: 'packages/event-store/contracts/registry-only.json' };
+  fs.writeFileSync(file, JSON.stringify({ v: 1, consumers: [entry, registryOnly] }));
+  execFileSync(process.execPath, ['--input-type=module', '-e', `
+    import assert from 'node:assert/strict';
+    const api = await import(${JSON.stringify(url)});
+    assert.deepEqual(api.consumers()[1], ${JSON.stringify(registryOnly)});
+    assert.equal(api.registryFiles().length, 2);
+    assert.throws(() => api.loadRebuildModule('registry-only'), { code: 'event-store-consumer-registry' });
+  `]);
+  for (const consumers of [[{ ...registryOnly, cachePath: '.fgos/only-cache.json' }], [{ ...registryOnly, rebuildModule: 'src/example/rebuild.mjs' }], [entry, entry], [entry, { ...entry, id: 'other', contractFile: 'other.json' }], [{ ...entry, contractFile: '../escape.json' }], [{ ...entry, rebuildModule: '/absolute.mjs' }], [{ ...entry, cachePath: 'a/../b' }]]) {
     fs.writeFileSync(file, JSON.stringify({ v: 1, consumers }));
     execFileSync(process.execPath, ['--input-type=module', '-e', `
       import assert from 'node:assert/strict';

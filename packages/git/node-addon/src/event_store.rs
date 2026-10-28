@@ -59,9 +59,9 @@ pub struct EventStore {
     registry: Registry,
     machine: String,
     resolved: (Arc<GitDriver>, Arc<RepoHandle>),
-    /// Legacy-migration admission: asked by the first write or the pre-gate
-    /// `admit_writes`, never by a read, and kept once the answer is settled.
-    write_refusal: OnceLock<Option<String>>,
+    /// Legacy-fence admission: asked by the first write or the pre-gate
+    /// `admit_writes`, never by a read, and kept once the store is admitted.
+    admitted: OnceLock<()>,
     publication_remote: String,
     /// What this store's last complete read answered; see `ReadMemo`.
     read_memo: fgos_event_store::read::ReadMemo,
@@ -76,12 +76,11 @@ struct Input {
 }
 #[napi]
 impl EventStore {
-    /// Settle write admission outside the Work gate. A refusal is raised by
-    /// the write that needs it; only a failure that may clear is raised here.
+    /// Settle write admission outside the Work gate.
     #[napi]
     pub fn admit_writes(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<()> {
         self.context(&held_ranks, hot_lock_depth)?;
-        self.write_admission(&held_ranks).map(|_| ())
+        self.write_admission(&held_ranks)
     }
     #[napi]
     pub fn append(
@@ -93,9 +92,7 @@ impl EventStore {
         held_ranks: Vec<u32>,
     ) -> Result<Value> {
         available()?;
-        if let Some(reason) = self.write_admission(&held_ranks)? {
-            return Err(error(reason));
-        }
+        self.write_admission(&held_ranks)?;
         let stream = StreamId::parse(&stream).map_err(error)?;
         let events: Vec<Input> = serde_json::from_value(events).map_err(error)?;
         let events: Vec<_> = events
@@ -225,7 +222,7 @@ pub fn open_store(
     let mut registry = Registry::default();
     registry.load_files(&registry_files).map_err(error)?;
     Ok(EventStore {
-        write_refusal: OnceLock::new(),
+        admitted: OnceLock::new(),
         read_memo: fgos_event_store::read::ReadMemo::new(),
         publication_remote: publication_remote.unwrap_or_else(|| "origin".into()),
         layout: Layout::from_common_dir(Some(resolved_root.repo.common_dir())).map_err(error)?,
@@ -246,40 +243,25 @@ fn stream_ids(streams: &[String]) -> Result<Vec<StreamId>> {
         .map(|s| StreamId::parse(s).map_err(error))
         .collect()
 }
-/// A missing pinned legacy ref is not settled: `fgos events sync` fetches it
-/// while a long-lived process keeps running. A required migration is, because
-/// it runs with every writer stopped.
-fn is_settled_refusal(code: fgos_event_store::errors::ErrorCode) -> bool {
-    matches!(code, fgos_event_store::errors::ErrorCode::EventStoreMigrationRequired)
-}
 impl EventStore {
-    /// The reason writes are refused, or `None`. A settled answer is kept per
-    /// store; a failure that may clear is asked again by the next write. Git is
-    /// never asked inside the Work gate (rank 60):
-    /// a write that arrives there before `admit_writes` ran is refused, not
-    /// answered with a process spawn.
-    fn write_admission(&self, held_ranks: &[u32]) -> Result<Option<&str>> {
-        if let Some(known) = self.write_refusal.get() {
-            return Ok(known.as_deref());
+    /// Admits writes once the tracked legacy fence agrees with the legacy refs.
+    /// Only an admitted answer is kept: a refusal (a missing fetch, a Git or I/O
+    /// error) may clear while a long-lived process runs, so the next write asks
+    /// again. Git is never asked inside the Work gate (rank 60): a write that
+    /// arrives there before `admit_writes` ran is refused, not answered with a
+    /// process spawn.
+    fn write_admission(&self, held_ranks: &[u32]) -> Result<()> {
+        if self.admitted.get().is_some() {
+            return Ok(());
         }
         if held_ranks.contains(&60) {
             return Err(error("event-store-admission-required"));
         }
         let (driver, repo) = &self.resolved;
-        match fgos_event_store::legacy_import::write_readiness(
-            driver,
-            repo,
-            &self.publication_remote,
-        ) {
-            Ok(()) => Ok(self.write_refusal.get_or_init(|| None).as_deref()),
-            Err(e) if is_settled_refusal(e.code) => {
-                let asked = Some(e.to_string());
-                Ok(self.write_refusal.get_or_init(|| asked).as_deref())
-            }
-            // Any other failure may clear (a fetch, a Git or I/O error), so it is
-            // returned to this write and the next write asks again.
-            Err(e) => Err(error(e)),
-        }
+        fgos_event_store::legacy_import::write_readiness(driver, repo, &self.publication_remote)
+            .map_err(error)?;
+        let _ = self.admitted.set(());
+        Ok(())
     }
     fn context(&self, ranks: &[u32], depth: u32) -> Result<(&GitDriver, &RepoHandle, &str)> {
         available()?;
@@ -374,9 +356,7 @@ impl EventStore {
         hot_lock_depth: u32,
     ) -> Result<Value> {
         let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
-        if let Some(reason) = self.write_admission(&held_ranks)? {
-            return Err(error(reason));
-        }
+        self.write_admission(&held_ranks)?;
         #[derive(Deserialize)]
         #[serde(rename_all = "camelCase", deny_unknown_fields)]
         struct Request {
@@ -597,31 +577,7 @@ impl EventStore {
         held_ranks: Vec<u32>,
         hot_lock_depth: u32,
     ) -> Result<Value> {
-        self.export(streams, since, out, held_ranks, hot_lock_depth, false)
-    }
-    #[napi]
-    pub fn export_legacy_layout(
-        &self,
-        streams: Vec<String>,
-        since: Value,
-        out: String,
-        held_ranks: Vec<u32>,
-        hot_lock_depth: u32,
-    ) -> Result<Value> {
-        self.export(streams, since, out, held_ranks, hot_lock_depth, true)
-    }
-}
-impl EventStore {
-    fn export(
-        &self,
-        streams: Vec<String>,
-        since: Value,
-        out: String,
-        ranks: Vec<u32>,
-        depth: u32,
-        legacy: bool,
-    ) -> Result<Value> {
-        let (driver, repo, machine) = self.context(&ranks, depth)?;
+        let (driver, repo, machine) = self.context(&held_ranks, hot_lock_depth)?;
         let origin = if self.layout.store().exists() {
             StoreIdentity::open(&self.layout, machine)
                 .map_err(error)?
@@ -646,107 +602,13 @@ impl EventStore {
             since: &since,
             out: Path::new(&out),
         };
-        if legacy {
-            fgos_event_store::export::export_legacy_layout(driver, repo, request)
-        } else {
-            fgos_event_store::export::export_jsonl(driver, repo, request)
-        }
-        .map_err(error)
-    }
-}
-
-#[napi]
-impl EventStore {
-    /// Pure HEAD reads; `check` also refuses dirty/untracked migration inputs.
-    #[napi]
-    pub fn read_legacy_from_head(
-        &self,
-        check: bool,
-        held_ranks: Vec<u32>,
-        hot_lock_depth: u32,
-    ) -> Result<Value> {
-        let (driver, repo, _) = self.context(&held_ranks, hot_lock_depth)?;
-        if check && repo.git_dir() != repo.common_dir() {
-            return Err(error("event-store-migration-main-required"));
-        }
-        let main = match driver
-            .resolve_repo(repo.trusted_main_root(), repo.trusted_main_root())
-            .map_err(operation)?
-        {
-            ResolveRepo::Repository(main) => main,
-            _ => return Err(error("event-store-no-repository")),
-        };
-        let repo = &main;
-        let inv = fgos_event_store::legacy_import::inventory(driver, repo).map_err(error)?;
-        let empty_legacy = if check {
-            fgos_event_store::legacy_import::ensure_clean(driver, repo, &inv).map_err(error)?
-        } else {
-            vec![]
-        };
-        let (data_tree, legacy_oid) =
-            fgos_event_store::legacy_import::import_identity(driver, repo, &inv).map_err(error)?;
-        let existing_legacy = match driver
-            .resolve_ref(
-                repo,
-                &fgos_git::RefName::parse("refs/fgos/legacy").map_err(error)?,
-            )
-            .map_err(operation)?
-        {
-            fgos_git::RefValue::Absent => None,
-            fgos_git::RefValue::Direct(oid) => Some(oid.as_str().to_owned()),
-            _ => return Err(error("event-store-legacy-mismatch: symbolic legacy ref")),
-        };
-        let events = fgos_event_store::legacy_import::events(
-            &inv,
-            &stream_ids(&["project".into(), "project:porting".into()])?,
-        )
-        .map_err(error)?;
-        Ok(
-            json!({"dataTree":data_tree.as_str(),"legacyRefOid":legacy_oid.as_str(),"existingLegacyOid":existing_legacy,"legacyMirrors":fgos_event_store::legacy_import::legacy_mirrors(driver, repo).map_err(error)?.into_iter().map(|r| json!({"name":r.name,"oid": match r.value { fgos_git::RefValue::Direct(oid) => Some(oid.as_str().to_owned()), _ => None }})).collect::<Vec<_>>(),"inventory":inv,"emptyLegacy":empty_legacy,"events":events.into_iter().map(|e|json!({"event":e.event,"raw":e.raw,"provenance":e.provenance})).collect::<Vec<_>>()}),
-        )
-    }
-    #[napi]
-    pub fn import_legacy(
-        &self,
-        expected_head: String,
-        held_ranks: Vec<u32>,
-        hot_lock_depth: u32,
-    ) -> Result<Value> {
-        let (driver, repo, _) = self.context(&held_ranks, hot_lock_depth)?;
-        if repo.git_dir() != repo.common_dir() {
-            return Err(error("event-store-migration-main-required"));
-        }
-        fgos_event_store::legacy_import::import_legacy(
-            driver,
-            repo,
-            &self.layout,
-            &expected_head,
-            &held_ranks,
-            hot_lock_depth,
-        )
-        .map_err(error)
+        fgos_event_store::export::export_jsonl(driver, repo, request).map_err(error)
     }
     #[napi]
     pub fn legacy_layout(&self, held_ranks: Vec<u32>, hot_lock_depth: u32) -> Result<Value> {
         let (driver, repo, _) = self.context(&held_ranks, hot_lock_depth)?;
         fgos_event_store::legacy_import::legacy_layout(driver, repo).map_err(error)
     }
-}
-
-/// Frozen legacy decoding for migration/export proofs; no filesystem discovery.
-#[napi]
-pub fn decode_legacy_files(files: std::collections::BTreeMap<String, String>) -> Result<Value> {
-    available()?;
-    let mut events = Vec::new();
-    for (file, raw) in files {
-        events.extend(fgos_event_store::legacy::parse_file(&file, &raw).map_err(error)?);
-    }
-    Ok(Value::Array(
-        fgos_event_store::legacy::order(events)
-            .into_iter()
-            .map(|e| json!({"raw": e.raw, "provenance": e.provenance}))
-            .collect(),
-    ))
 }
 
 /// The crate owns branch stream naming; adapters must not reimplement it.

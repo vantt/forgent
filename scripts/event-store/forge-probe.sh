@@ -13,8 +13,8 @@ P=$(mktemp -d); trap 'rm -rf "$P"' EXIT
 # The two clones are sandbox repositories under $P: they go through the sandbox door.
 SANDBOX_GIT=(node "$CHECKOUT/scripts/lib/sandbox-git.mjs" --root "$P" --)
 # Fresh repositories with the forge as origin, not clones: a clone of a repository that still
-# tracks the legacy tracked event files would ask for `fgos events migrate` first, which is the Work
-# cutover, not what this probe proves (one event ref through the real forge).
+# tracks the legacy event files is the Work cutover's concern, not what this probe proves (one event
+# ref through the real forge).
 for r in a b; do "${SANDBOX_GIT[@]}" init -q "$P/$r"; "${SANDBOX_GIT[@]}" -C "$P/$r" remote add origin "$FORGE"; done
 cd "$CHECKOUT" && node --input-type=module - "$P" <<'EOF'
 import fs from 'node:fs'; import path from 'node:path';

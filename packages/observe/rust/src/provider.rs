@@ -1,6 +1,6 @@
 //! The operation provider of the Observe component: one provider type for `observe.metrics` and `observe.friction`.
 
-use crate::contract::{LegacyFrictionSource, ObserveRequest};
+use crate::contract::ObserveRequest;
 use crate::{friction_cli, metrics_cli};
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
@@ -64,14 +64,12 @@ pub const OBSERVE_FRICTION_DESCRIPTOR: ProviderDescriptor =
     observe_descriptor("observe.friction", "observe.friction.request", "observe.friction.outcome");
 
 /// What the composition root gives Observe: the observation sources and
-/// scanners the metrics verbs read, the work store they need, and the legacy
-/// friction logs `friction migrate` imports.
+/// scanners the metrics verbs read and the work store they need.
 pub struct ObserveWiring {
     pub sources: Vec<Box<dyn crate::ObservationSource>>,
     pub work_source: Box<dyn crate::WorkObservationSource>,
     pub coverage_scanner: metrics_cli::coverage::CoverageScanner,
     pub unit_summary_scanner: crate::UnitSummaryScanner,
-    pub legacy_friction_sources: Vec<Box<dyn LegacyFrictionSource>>,
 }
 
 /// The provider of one of Observe's two operations; the request's operation id
@@ -123,7 +121,7 @@ impl OperationProvider for ObserveProvider {
                 }
                 "observe.friction" => {
                     let req = rooted(req, friction_cli::writes(req))?;
-                    friction_cli::dispatch(&req, &wiring.legacy_friction_sources)
+                    friction_cli::dispatch(&req)
                 }
                 other => {
                     return Err(ProviderError::SemanticValidation(format!(
@@ -191,7 +189,7 @@ mod tests {
         };
         let friction = |sub| request("observe.friction", sub, &[]);
         let metrics = |sub, args| request("observe.metrics", sub, args);
-        for write in [friction("record"), friction("resolve"), friction("migrate"), metrics("snapshot", &[]), metrics("case", &["open"]), metrics("case", &["close"]), metrics("eval", &["record"])] {
+        for write in [friction("record"), friction("resolve"), metrics("snapshot", &[]), metrics("case", &["open"]), metrics("case", &["close"]), metrics("eval", &["record"])] {
             let writes = if write.operation == "observe.friction" { friction_cli::writes(&write) } else { metrics_cli::writes(&write) };
             assert!(writes && rooted(&write, writes).is_err(), "{} {:?} must resolve the root", write.sub, write.args);
         }

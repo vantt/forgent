@@ -293,12 +293,6 @@ function main() {
       'utf8'
     );
 
-    // Remove any store locks or temporary files
-    const lockFile = path.join(fgosDir, 'observe', '.lock');
-    if (fs.existsSync(lockFile)) {
-      fs.rmSync(lockFile, { force: true });
-    }
-
     // 8. Copy generated .fgos structure into FIXTURES_DIR
     console.log(`Writing golden fixtures to ${FIXTURES_DIR}...`);
     fs.rmSync(FIXTURES_DIR, { recursive: true, force: true });

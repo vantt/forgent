@@ -3,7 +3,6 @@
 //! Native read providers for work/state-owned operations.
 
 mod event_reader;
-pub mod legacy_friction;
 pub mod work_source;
 pub use work_source::{
     LearningChannelData, MissingOutcomeNagData, OutcomeEntry, SettlementChannelData,

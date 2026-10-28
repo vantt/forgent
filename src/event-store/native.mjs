@@ -144,18 +144,6 @@ export function openStore(resolvedRoot, machineId, files, loaderOptions, remote 
       const ranks = outsideGate(heldRanks);
       return call(() => native.exportJsonl(streams, since, out, ranks, hotLockDepth()));
     },
-    exportLegacyLayout({ streams, since = null, out }, heldRanks) {
-      const ranks = outsideGate(heldRanks);
-      return call(() => native.exportLegacyLayout(streams, since, out, ranks, hotLockDepth()));
-    },
-    readLegacyFromHead({ check = false } = {}, heldRanks) {
-      const ranks = outsideGate(heldRanks);
-      return historical(call(() => native.readLegacyFromHead(check, ranks, hotLockDepth())), 'events');
-    },
-    importLegacy({ expectedHead }, heldRanks) {
-      const ranks = outsideGate(heldRanks);
-      return call(() => native.importLegacy(expectedHead, ranks, hotLockDepth()));
-    },
     legacyLayout(heldRanks) {
       const ranks = outsideGate(heldRanks);
       return call(() => native.legacyLayout(ranks, hotLockDepth()));
@@ -177,13 +165,7 @@ export function eventStoreAddonAvailable(loaderOptions) {
   return typeof native.resolveEventStore === 'function' && typeof native.openStore === 'function'
     && typeof native.eventStoreFacts === 'function'
     && typeof native.eventStoreBranchKey === 'function'
-    && ['read', 'append', 'admitWrites', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'exportLegacyLayout', 'readLegacyFromHead', 'importLegacy', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
-}
-
-/** Decode an explicit legacy inventory through the crate's frozen ordering rule. */
-export function decodeLegacyFiles(files, loaderOptions) {
-  return call(() => loadNativeAddon(loaderOptions).decodeLegacyFiles(files))
-    .map(record => ({ ...record, event: JSON.parse(record.raw) }));
+    && ['read', 'append', 'admitWrites', 'promote', 'sync', 'maintenance', 'status', 'exportJsonl', 'legacyLayout'].every(name => typeof native.EventStore?.prototype?.[name] === 'function');
 }
 
 /** Branch stream key, defined and validated by the crate. */
