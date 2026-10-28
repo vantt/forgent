@@ -149,3 +149,12 @@ Accepted as stated risks (not blockers): F-1 the landing fence (risk 1); A-3 the
 6. **U6 (CFG, Branch A only):** answered, see the U6 decision above.
 7. **U7:** doctor cannot enumerate installed releases from Node (Rust has `list_releases` in `packages/distribution`), so "while an older release exists" becomes an unconditional warning for catalog or `runner.loops` entries in the global file.
 8. **U8 (owner):** consent to the landing moment of phase 12, which makes every older activated release refuse the repository's converted config until upgraded.
+
+## After successor-case revalidation of 2026-10-28
+
+The first case ran out of its writing dispatches after phase 9a; the owner approved a larger frame and a successor case (24 dispatches, 14 writing) continues on the same branch. A read-only revalidation of the remaining slices found these corrections, now applied in the briefs and phase text:
+
+- 9b: the field-origin adapter (`shipped-catalog.mjs`) had to keep field paths so a global offending field reports global; the doctor reads activity units through the workflow-definition reader; release compatibility uses the existing `fgctl status --json` inventory and says "not established" when it cannot tell.
+- 10: `acceptOutcomes` is judged on the resolved loop at start and at advance (not only on the `--seats` or account branches); `research-fan-out` does not fix its own seats; S19 allows retired names in the refusal, conversion and historical-decoder sites only.
+- 11: dispatched `reviewed` with a verify command, because the activated release's solo run does not verify; the two how-tos move to phase 12 (they live in `docs/`).
+- 12: the global-file command is the Config write sequence, not `node -e`; legacy JSON conversion waits for the migration-table repair (open CFG item).

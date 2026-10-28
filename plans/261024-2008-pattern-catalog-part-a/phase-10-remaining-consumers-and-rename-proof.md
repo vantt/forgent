@@ -39,7 +39,7 @@ Run as (fgos-cook): one slice. Activity `implement-item`, capability `code:imple
 
 | Risk | L x I | Mitigation |
 |---|---|---|
-| `--seats` now expands a unit whose pattern name resolves to panel, which it did not before | M x M | the only shipped such name has fixed seats and is refused with the existing message; if the owner meant the name-literal rule, phase 10 step 3 reverts to loop-name checks (U2) |
+| `--seats` now expands a unit whose pattern name resolves to panel, which it did not before | M x M | `research-fan-out` declares generic default seats (not fixed ones), so it now expands under the generic rule in `seats.mjs` and curated member personas, tiers or seat-keyed tasks are still refused; if the owner meant the name-literal rule, phase 10 step 3 reverts to loop-name checks (U2) |
 | moving the `acceptOutcomes` check from load time to start time changes when an author sees the error | M x L | same message; start-time dry-bind runs in doctor too (`checkSeatBindingDryBind`) |
 | a sweep hit is a real consumer missed earlier | L x M | the S19 assertions fail the build |
 
