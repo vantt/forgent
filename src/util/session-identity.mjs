@@ -14,7 +14,8 @@ export class WriterIdentityError extends Error {
 const ENV_ORDER = ['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'PI_SESSION_ID', 'CLAUDE_CODE_SESSION_ID']; // what the rule reads: the cache key
 const kept = new Map(); // answers only; a failure is never kept
 
-function door() {
+/** The writer-identity namespace of the native door; a missing door is a `host-missing` WriterIdentityError. Shared with the mint facade. */
+export function identityDoor() {
   try {
     return nativeDoor().sessionIdentity;
   } catch (err) {
@@ -27,7 +28,7 @@ export function resolveWriterIdentity(fgosDir) {
   const dir = fgosDir ? path.resolve(fgosDir) : null, envKey = JSON.stringify(ENV_ORDER.map((key) => process.env[key] ?? null));
   const hit = kept.get(envKey) ?? kept.get(`${envKey}\n${dir}`);
   if (hit) return { ...hit };
-  const answer = door().resolve(dir);
+  const answer = identityDoor().resolve(dir);
   // pid and unresolved answers depend on the env alone; env and registry answers also on the dir.
   kept.set(['pid', 'unresolved'].includes(answer.source) ? envKey : `${envKey}\n${dir}`, answer);
   return { ...answer };
@@ -36,7 +37,7 @@ export function resolveWriterIdentity(fgosDir) {
 /** `att-<attemptId>`, minted by the Rust crate. */
 export function mintAttemptWriterId(attemptId) {
   if (typeof attemptId !== 'string' || attemptId.includes('\0')) throw new WriterIdentityError('invalid-attempt-id', 'the attempt id must be a string without NUL');
-  const { mintAttempt } = door();
+  const { mintAttempt } = identityDoor();
   try {
     return mintAttempt(attemptId);
   } catch (err) {

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d3361ce2c4bec30d845a1ee6212f07296c42434a358a1eedecfc10f18e95e2d1",
+  "payloadDigest": "b338b87540ebde58b2cfd0aeb45c45a2eb14599cb73199422e42c39755c347cc",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1169,11 +1169,11 @@
     "src/util/git-paths.mjs": "fbb0b5af5b149853b9d5279062d417cee88a24ce161f782b5ae6dec3d10f1941",
     "src/util/host-bin-path.mjs": "c9ba4f74f5969a42d3aca4a1583f4c3ecb2eba871f1fcf025ed7d38621f4353d",
     "src/util/host-bin.mjs": "f70cad1f07c7eb0f47bdafc0c766e2351e2310f48232b76ab4d29bab1fbcb826",
-    "src/util/identity-mint.mjs": "43f6fab44e78fd8fda60ad72ce1ce797649ead50b50383059cff2ef2b923187e",
+    "src/util/identity-mint.mjs": "533825271188a6e5dfba4c55e46d2ef69c07c07ae3150bda2872d0ea24a77159",
     "src/util/normalize-path.mjs": "e1519327a67834d6309a0e92e69d5fb46bb671a7ddfbe9ef5c36acc22fc3062a",
     "src/util/release-binary-path.mjs": "f74aefea9a51b750049a9d32b62c2dbd9fb9782f944535b293e9cc352b466f76",
     "src/util/release-targets.mjs": "52157efccc71fa4bc260a47717ab48047792a7057329ab29d9bd6333c322029c",
-    "src/util/session-identity.mjs": "f78b5fedc9a95ead50133002953e39f511874fae79332b2a06f593ba6f394990",
+    "src/util/session-identity.mjs": "02e39922971e06f06cf14df2b75fcd74079d8277622804c45c19388b31381e4d",
     "src/util/unique-tmp-tag.mjs": "712eb59d8753224dc3197af5739a3a01fa4188f0b60e6e8ed22a1854d8b68dde",
     "src/util/yaml.mjs": "5ca1154f2c97b3a1727b9f998e2f879642fedc3310cec08150308de97cf8b900",
     "src/verbs/dispatch/inspect.mjs": "f3443611ebef271256a9a52222f87d63703abaf8dd10217b1aec6313c8ad0146",
@@ -3507,7 +3507,7 @@
     {
       "path": "src/setup/registrations.mjs",
       "line": 5447,
-      "spawn": "probeIdentity -> src/util/session-identity.mjs:55",
+      "spawn": "probeIdentity -> src/util/session-identity.mjs:56",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
