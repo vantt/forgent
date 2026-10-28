@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3d368d47f57510da84d144bcee66123ac69ff094b19bd7b134445b28bde17a44",
+  "payloadDigest": "9e165de21c9f898635c5abd9ad472536af1a2ded05fb48d01b0593aaa556b7ad",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -68,7 +68,7 @@
     ".agents/skills/instruction-audit/references/lane-prompts.md": "adac8362adbb7eb04c163fbcf3cdb16aa566e61a6f4a6a9351c07d4fc4d08d52",
     ".agents/skills/instruction-audit/references/report-template.md": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6",
     ".agents/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
-    ".githooks/pre-commit": "3b96cfd7024cef39ff1d6c3a25c66875e6a583bd746f5a84187248f57dbaced2",
+    ".githooks/pre-commit": "ebc86bf9f1e5b691b3e588692d254ab7ae242d39bb7ba09ec6cc6b0e47dfdc5c",
     "apps/fgctl/src/main.rs": "3f59cfc17cfd6c8268d15dcbeb0649b8cead1d18c387c7b20e14ce55ab26b9ff",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "59d08ca94acbd2af2e283734930e007a7ad28161608c10933e62d0a7268205a1",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c8a6cb7619d9578e02479069fbb0f43a5206583b53a7c6d65373d285d69ca331",
@@ -85,7 +85,7 @@
     "apps/fgos/src/cli_presenter.rs": "2d095e475d3a68fea1c6e078584fdd59a00f889c2c03a2405c2fea27112322af",
     "apps/fgos/src/cli_projector.rs": "3fa24a9ac92790d07161590ff49839e4323091a5302932f7d7495adf503a62fa",
     "apps/fgos/src/legacy_exec.rs": "6aa96ac09b3c577b03317d3b9292104c8af977b2890eb7e5ef45a13598770a22",
-    "apps/fgos/src/main.rs": "1756bae00dc17bab5bcdb3a383810062f3dadba0033512851f962e264fed2527",
+    "apps/fgos/src/main.rs": "c1e3b805b2a7a7dfd13ced045eb9f738ff2a3a72ad5df872ea3e0e2d7a98acd2",
     "apps/fgos/src/wiring/identity_log.rs": "efa3fbe17345fa782a49bde2881fdd82f35cb33e5de70640690b391a432add2e",
     "apps/fgos/src/wiring/mailbox_config.rs": "36b417d911da3ca1bb1985ddd74ed3ffb3db2628f937fd081a90abc893c79725",
     "apps/fgos/src/wiring/mailbox_hook.rs": "c36e424754b1c4e3e6735cbf43ec35b76cd79730ff26ecaba28d27b303c105c1",
@@ -266,9 +266,8 @@
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
     "packages/distribution/rust/src/fetch.rs": "ae1a26554583e297ea2f52bab45be9fe115952203e0413eaec933d71b301fa00",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
-    "packages/distribution/rust/src/git_grant.rs": "f815308e39bf4eee770bdb47073fba60f05aba2cc1f423e165a98a5f035dd38e",
     "packages/distribution/rust/src/init.rs": "1cfecbbe025a6485495b6e76bf5076d1fa3238ae27a01cf755c83c085a4ebf1c",
-    "packages/distribution/rust/src/lib.rs": "f5c75abd8e6178076826eb9baefa6936f97785b5b9f1f50bcb91e354f59f17e0",
+    "packages/distribution/rust/src/lib.rs": "5a0280f10cd28771e3a0757b5beefa07d2d57f420cfe44ab9a28878320a049e7",
     "packages/distribution/rust/src/lock.rs": "e79b03663013f69e83f509bfa2745825ee3a796f979746e419241b54823094b0",
     "packages/distribution/rust/src/manifest.rs": "cc45d293313bf2de2b912293a52dc1f76214eb4c06b56b28f90ab52d640d274a",
     "packages/distribution/rust/src/shim.rs": "079f026604885abc304381ed6fd9df4beb2eeeff718b8994dbe36137df0d6cd8",
@@ -366,7 +365,7 @@
     "packages/git/node-addon/src/git/refs.rs": "d1e1413d7a99cd3d9422927e188ee1a68dbb34ad38df9dec09e3e2d5f6cfcb0b",
     "packages/git/node-addon/src/git/remote.rs": "ad43096be17a576ce1341ab6061d87e05678c8a149acb0076ff0c2b4b9819cec",
     "packages/git/node-addon/src/git/restore.rs": "7782f831c6a59554584c6de0764b6f005dd63926e62044fc5938ee93848017bb",
-    "packages/git/node-addon/src/git/scoped_commit.rs": "57b06dadf85e4485f920997ae3c531e8beb5d4c60595daca6e5443008bf9780b",
+    "packages/git/node-addon/src/git/scoped_commit.rs": "dabf218513ed5965050a84bbbc6322043df22a4fe8f2cdc745a9c14da91699dd",
     "packages/git/node-addon/src/git/sync.rs": "a541edc814725b495011e78e0647062bf7567669d0247a12c05d6f265a38f05a",
     "packages/git/node-addon/src/git/worktree.rs": "d32a6c1337b99ccdb46ee684ae3d774f7410f1e79e18e86297923c8ded7168b1",
     "packages/git/node-addon/src/git/write_scope.rs": "657f168ae337fac9315cd39fc8681bc069c16b5ff7ce2dd607dfef39dc9ce5ee",
@@ -378,11 +377,10 @@
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
-    "packages/git/rust/src/driver.rs": "09b32a4b5cfd96800e190b6b58b26a599337a50e7089eb012876ef4b3044c3fa",
-    "packages/git/rust/src/grant.rs": "9702b8f72ada4502857b9ac9d151ea98d9d9a71773a2802278364476851d68d7",
+    "packages/git/rust/src/driver.rs": "45949deb41c08d1593056b199c38ed7bd8a46f3af9c810a596a84a3fbb1d726e",
     "packages/git/rust/src/inspect.rs": "6ab5154bc6ead447863198f01de88c16a31703f8839b642bf1d6bf2bb372895a",
     "packages/git/rust/src/land.rs": "9205c084d08ef414a0122b8893b981bf9723d363ff1d4bddc3e293dc09f6ad1e",
-    "packages/git/rust/src/lib.rs": "025eafaaf411425f343bd916418a0419a4e6156038914deb98fc70aa7cb07e81",
+    "packages/git/rust/src/lib.rs": "976214383be6669d0e08c352a131803bbacff8ac301a2aff421b40ae290a432c",
     "packages/git/rust/src/native_lock.rs": "080e481d7766c524df885fcf5c15ed5fbab6ad022378866685daa0a34b722da8",
     "packages/git/rust/src/objects.rs": "e0a0d0cc346abb9803ffe6a5005df31448ba64aac48f530c10d714fa368d36f3",
     "packages/git/rust/src/publication.rs": "4d728e123fb218d53a7574b10028c7e67feaa40c7e96e624a269dd5d294c10ec",
@@ -391,10 +389,10 @@
     "packages/git/rust/src/remote.rs": "e53761592bb96509fda62e0362e0f035b991e278aedf54f5c9f4b4740714708a",
     "packages/git/rust/src/repository_config.rs": "40a9792c910b87a3fd8f7756de5a78674a3572cb492e8de8dcfb9bb1ddd46ed9",
     "packages/git/rust/src/restore.rs": "e74165f44133cf722772851a9183121870cac0bcc1b490abdb46a2beb54a0741",
-    "packages/git/rust/src/scoped_commit.rs": "8c344bf314a76706edde9c48d4574d827ba86c6d8d2672e8826b2f0afa246440",
+    "packages/git/rust/src/scoped_commit.rs": "ce9da96151f3f30e098c66a96147e290de0f9e73bd0302487bd0be3d805b48a1",
     "packages/git/rust/src/sequence.rs": "02ca2ff90ac57645df2377e1b7746f88037091a8f1f9b005057be1158e7f28eb",
     "packages/git/rust/src/sync.rs": "7145ac2efdbab252b4418a27fae9668f6db933b799d0ca3d8e27c064cca6f3cd",
-    "packages/git/rust/src/wal.rs": "a485a94ada4faf9b3e22f96a5e28199348f771da8dd5697c236fafd0c271fa4f",
+    "packages/git/rust/src/wal.rs": "04106c6965f60b5508741f8e8212acbf3a83283986f325181a73b8e8bbfb6a19",
     "packages/git/rust/src/worktree.rs": "1448b50a2fbe3bda3cb0738195f86d029f076321f9d91d255af1ab11f55c8123",
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
     "packages/git/rust/tests/contracts.rs": "1a6e7d417ed0254cb4a395035122a35275cdb6364424e65634c8fc2949f298b6",
@@ -406,11 +404,11 @@
     "packages/git/rust/tests/land_crash_matrix.rs": "585fc55c1faa87a3e85185b6d90ed135066891b5f0502d66e13097e361736714",
     "packages/git/rust/tests/publication.rs": "0796d1a22ff1706a41439ed23e44ca96d5c402bb2841b844b9905348563bdd35",
     "packages/git/rust/tests/publication_children.rs": "fffb99d197d27a32b1e3b1b49251d741be57cb8a1e3c0ac8026e6a640bffc5e2",
-    "packages/git/rust/tests/recovery_matrix.rs": "99d4337efb2e3826a4c08573f91962e04346709a7a0fe8efd9e88b3e786bce3c",
+    "packages/git/rust/tests/recovery_matrix.rs": "93ca99f80536f448bff24fdb1340d257ee050568060f09c143ba222be08877ac",
     "packages/git/rust/tests/refs_remote.rs": "0740609cdc54853897a2a67bd753e07ed128b06e7f59ccea1e9735f9df4c64a5",
     "packages/git/rust/tests/repository_config.rs": "71d201335b087e0dae4080e147421618693940a2007f7c6819f10b1a3dc8202a",
     "packages/git/rust/tests/safe_restore.rs": "17d2b23fcfee07473574f3d3f420aba4ca2cbf901480737247fd1f054d792c08",
-    "packages/git/rust/tests/scoped_commit_sync.rs": "6c57cdf0f5faeed53d8782b2ec632e3b3e1872df89306e1be285a5af6ba06ccc",
+    "packages/git/rust/tests/scoped_commit_sync.rs": "128e008c4766901e796975071f1438ec2d43cc1ff8f258da3a4851aab016b937",
     "packages/git/rust/tests/sequence.rs": "40fd63b603f193c20ade1d1dd20bc309c2defc1ce902deda9b4241693f777df1",
     "packages/git/rust/tests/ssh_transport.rs": "0c49c0d61922fc89472a7168711b8d27c1266a50bece8fc200534c1f5b6e8d41",
     "packages/git/rust/tests/support/land.rs": "46bec8c0928eb4b53d6db71204661638b626b6dfe199d39f4890444c1b14ac07",
@@ -813,9 +811,9 @@
     "scripts/fgos-session-start-hook.mjs": "6ec944bb42698570cb5cb860d24bde1229d884f968ce0f6771c05b9c11a93af6",
     "scripts/fgos-shell-integration.sh": "86a79af2d4b583230823974301ef54eaf6cf6fcee353b5618fcf00a7c7be7945",
     "scripts/git-addon.mjs": "67532c2006d74a97cbc40814e82882da1de5d48b5d072670444489e2ed963d71",
-    "scripts/git/e1-power-cut.mjs": "58e093cefe327fc2d7c2dd791185a02c68ee596925d0adb3b9a544abe5d18458",
+    "scripts/git/e1-power-cut.mjs": "73da033846ea409abd7a8b36827aaf0a2caa6e6cd822878b5d332c536169ec9d",
     "scripts/git/e1-power-cut.sh": "be0500b7f99580694cf1ca7418c17ddf6bd70583f3a06686aaab923118e2d1fa",
-    "scripts/git/e3-bench.mjs": "f6872324db293e49fca1e320938f5e19ceb8cbe892672e036967197c41e5ce20",
+    "scripts/git/e3-bench.mjs": "a4ffd336be97291029618f0bd58be61ca0d11f263e3c17ddeb63ab38457d12b1",
     "scripts/git/p-release-checks.sh": "08bb9b3c32e7915b27f645f7aa68d42cba0dbddd2a7dc9adc45d43a75b4d0056",
     "scripts/git/p-space-resource.mjs": "31e12327e2782a769a341cb6819f7e1e24d63e78de732c1ad210e430433aad06",
     "scripts/git/p-space.sh": "ab11ec0d8fc8c5a0c32f0dcc1aa08d26c39356db710a4e395513f87af78decd3",
@@ -825,7 +823,7 @@
     "scripts/knowledge-bootstrap.mjs": "6ffd1b84d5ebf773b52806cd9d47007e60f4999a0f36b43bca4cc50d0f649543",
     "scripts/knowledge-canary.mjs": "3a3cb3dafc17a9128a19ec49e33ebf46f0f157bd3a254e783a693aebe4f5845a",
     "scripts/knowledge-classifier.mjs": "a6560aa2eb34a1245ebd83ee781f033253ff7652df5896dcc205e327d18ef5f4",
-    "scripts/knowledge-migration.mjs": "10193fda8ea6a58e3727847031f372309786ec05f181c4b79a67692791f0ac51",
+    "scripts/knowledge-migration.mjs": "1820158975556a36661d0fbdb43e2e156268336a5d5f39da5ec379fb48cd769c",
     "scripts/lib/codex-auth-guard.mjs": "e7d0ec136014ece7375a545789734203f6c3840cb64aec76a80ecd9f1af198ee",
     "scripts/lib/dev-host-manifest.mjs": "9928ceb97e807bcb02a7fed73153cf21de09d6cc9b6d56492166cb94e48c44bb",
     "scripts/lib/full-suite-queue.mjs": "da176b9ad8a796ec13ede755dd2c2b12e6e29d5b5b12874ca8e6ae06803e3aba",
@@ -906,7 +904,7 @@
     "src/git/refs.mjs": "eb8dfa75531652a19f0c524357d8e1c57d54bf281548f3d0e3a7657a4ee18502",
     "src/git/remote.mjs": "6c5e7396b5c42b11d31db71beb3d9da7b033e08077706d6c913b425c8df6d546",
     "src/git/restore.mjs": "cf45149647d6278e9c5f977a857640b34e64ffd4e2b30c5b20fd70e986a65ae8",
-    "src/git/scoped-commit.mjs": "db173261ee00a062fbc98c0650d77093a5d877153f3d5fcaade7ec6c55ddb6e5",
+    "src/git/scoped-commit.mjs": "848f586403b8d388439cee01cfa08e119ccfc66f8a97d9585c8babf5b3154fa3",
     "src/git/sync.mjs": "c434a1a92d2f1fe3c10bd81b3e2830a4e28765bb4dc53e35ffa166b9b3c534e2",
     "src/git/worktree.mjs": "75e467d3cd210a54c2ef0c83714ec57ab362507dae18a268efd9a5833e1c746d",
     "src/holder-lock/driver.mjs": "dddc0ccd662b80b2fc8dc1891cbcba5eff311ef574d3153f80a58cce2dd8296d",
@@ -1031,7 +1029,7 @@
     "src/runner/execution/account-rotation.mjs": "3f7263e6d0a291ce33aa9c44381138a6ca436f20543565ef857c8f7936388cbe",
     "src/runner/execution/bind.mjs": "c0a251e06f637644443666493bf63405780b6be7db221e5a66577277259008d6",
     "src/runner/execution/case-admission-port.mjs": "e616357c33473e946ccd8db9ff6fe26eb39c7f06a68867112a287cccbc579cda",
-    "src/runner/execution/commit-unit-work.mjs": "c8f585bab5df477ae3c8a6e9a7bc5211723e9c7b75fcda719ce22c9157152117",
+    "src/runner/execution/commit-unit-work.mjs": "a2e0904e351cb6382f84f81f98dd0cd6a2464f15ca48b61f86933479982b8d50",
     "src/runner/execution/dry-bind.mjs": "7515265f65486bad77a344e923a52c0999caccbcbf75fbe06cc518d8912a8771",
     "src/runner/execution/explain.mjs": "4fd3c5a6ae3b9c0d28ca0c333403d7d10e7b38aa29a4318326d02c6ffd8b1689",
     "src/runner/execution/handoff-refs.mjs": "2514d408d19a7145239025f449b16a308d9a740e9edb8285ed328da941fd1678",
@@ -1306,7 +1304,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:574"
+        ".githooks/pre-commit:561"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1358,7 +1356,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:582"
+        ".githooks/pre-commit:569"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1372,7 +1370,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:582"
+        ".githooks/pre-commit:569"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1386,7 +1384,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:617"
+        ".githooks/pre-commit:604"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1400,7 +1398,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:617"
+        ".githooks/pre-commit:604"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1414,7 +1412,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:617"
+        ".githooks/pre-commit:604"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1470,7 +1468,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:561"
+        ".githooks/pre-commit:548"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1484,7 +1482,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:567"
+        ".githooks/pre-commit:554"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1498,7 +1496,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:567"
+        ".githooks/pre-commit:554"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1512,7 +1510,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:567"
+        ".githooks/pre-commit:554"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1526,7 +1524,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:567"
+        ".githooks/pre-commit:554"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1578,7 +1576,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:602"
+        ".githooks/pre-commit:589"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1599,7 +1597,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:608"
+        ".githooks/pre-commit:595"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1608,33 +1606,12 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 551,
+      "line": 552,
       "spawn": "execFileSync",
       "binary": "git",
       "family": "spawn",
       "callers": [
-        ".githooks/pre-commit:577"
-      ],
-      "class": "hook-read-context",
-      "verbs": [
-        "config --get"
-      ]
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 555,
-      "spawn": "execFileSync",
-      "binary": "(env FGOS_HOST_BIN)",
-      "class": "configured-binary"
-    },
-    {
-      "path": ".githooks/pre-commit",
-      "line": 565,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "callers": [
-        ".githooks/pre-commit:682"
+        ".githooks/pre-commit:669"
       ],
       "class": "hook-read-context",
       "verbs": [
@@ -1643,14 +1620,14 @@
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 625,
+      "line": 612,
       "spawn": "mainLockVerdict -> .githooks/pre-commit:172",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": ".githooks/pre-commit",
-      "line": 652,
+      "line": 639,
       "spawn": "identityData -> .githooks/pre-commit:121",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -2276,21 +2253,21 @@
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 1218,
+      "line": 1165,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
       "binary": "? path.to_str() .map(str::to_owned) .ok_or_else(|| failure(\"non-utf8-authority-pat",
       "class": "git-driver"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 2843,
+      "line": 2790,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/src/driver.rs",
-      "line": 3050,
+      "line": 2997,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2304,7 +2281,7 @@
     },
     {
       "path": "packages/git/rust/src/wal.rs",
-      "line": 3284,
+      "line": 3302,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2444,14 +2421,14 @@
     },
     {
       "path": "packages/git/rust/tests/recovery_matrix.rs",
-      "line": 490,
+      "line": 489,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/git/rust/tests/recovery_matrix.rs",
-      "line": 505,
+      "line": 504,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

@@ -134,7 +134,6 @@
     "test/event-store/work-gate.test.mjs": 8.6,
     "test/evolve/iron-law.test.mjs": 0.2,
     "test/git/commit-parent-death.test.mjs": 4.6,
-    "test/git/cutover-grant.test.mjs": 4.7,
     "test/git/e2e-consumer-noncoding.test.mjs": 25.5,
     "test/git/e3-census.test.mjs": 0.1,
     "test/git/github-adapter-contract.test.mjs": 0.6,

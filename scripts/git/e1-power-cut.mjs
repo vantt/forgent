@@ -117,7 +117,7 @@ async function scopedWorkload(args) {
       fs.writeFileSync(path.join(linked, file), `e1 payload ${i}\n`);
       const id = `e1-${i}`;
       appendDurably(args.plan, JSON.stringify({ kind: 'intent', i, id, ref: SCOPED_REF, expected: baseline.head, files: [file] }));
-      const receipt = port.commit({ operationId: id, baseline, request: { writes: [file], message: `e1 ${i}\n`, cutoverGrant: null } }, held);
+      const receipt = port.commit({ operationId: id, baseline, request: { writes: [file], message: `e1 ${i}\n` } }, held);
       if (receipt.status !== 'committed') throw new Error(`${id}: ${JSON.stringify(receipt)}`);
       appendDurably(args.plan, JSON.stringify({ kind: 'ack', i, id, ref: SCOPED_REF, next: receipt.oid, files: receipt.files }));
       if (lines) { process.stdout.write(`ack ${i}\n`); await lines.next(); }

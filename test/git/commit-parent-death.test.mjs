@@ -33,7 +33,7 @@ for (const mode of ['commit', 'sync']) for (const rejected of [false,true]) {
     fs.writeFileSync(path.join(hooks, 'pre-commit'), `#!/bin/sh\necho $$ > '${ready}'\nwhile test ! -f '${go}'; do sleep 0.01; done\nexit ${rejected?1:0}\n`, { mode: 0o755 });
     const params = { fgosDir: path.join(repo, '.fgos'), cwd: linked };
     const config = { stateRoot: temp, repoPath: linked, trustedMain: repo, writer: 'fixture' };
-    const request = { writes: ['a'], message: 'crash commit', cutoverGrant: null };
+    const request = { writes: ['a'], message: 'crash commit' };
     const worker = spawn(process.execPath, ['--input-type=module', '-e', `
       import fs from 'node:fs';
       import {acquireSync,createLockScope} from ${JSON.stringify(pathToFileURL(path.join(root, 'src/holder-lock/index.mjs')).href)};

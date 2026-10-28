@@ -51,8 +51,7 @@
       "preflight",
       "worktreeState",
       "commit",
-      "recover",
-      "checkpointTrackedFiles"
+      "recover"
     ],
     "Sync": [
       "start",

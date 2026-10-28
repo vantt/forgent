@@ -1,7 +1,7 @@
 //! Mechanical transaction transport; custody is an opaque native loan.
 use super::{
     handover::{consume, Loan},
-    operation, strings, text,
+    operation, text,
 };
 use crate::{check, error};
 use fgos_git::*;
@@ -74,19 +74,6 @@ impl GitScopedCommit {
                     )
                     .map_err(operation)?))
             }
-            "checkpointTrackedFiles" => Ok(json!(self
-                .driver
-                .checkpoint_tracked_files(
-                    &self.repo,
-                    held,
-                    CheckpointRequest {
-                        files: strings(&args, "files")?,
-                        message: text(&args, "message")?.into(),
-                    },
-                    &self.writer,
-                    text(&args, "operationId")?
-                )
-                .map_err(operation)?)),
             _ => Err(error("unknown-scoped-commit-method")),
         }
     }

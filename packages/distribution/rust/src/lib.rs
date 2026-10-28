@@ -492,4 +492,3 @@ mod tests {
     }
 }
 
-pub mod git_grant;

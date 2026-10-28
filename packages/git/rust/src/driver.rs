@@ -295,38 +295,6 @@ impl GitDriver {
         }
     }
 
-    /// Only the grant-check host calls this after proving its inherited borrower.
-    #[cfg(unix)]
-    pub(crate) fn hook_deletions(&self, repo: &RepoHandle, index: &Path) -> Result<Vec<String>> {
-        let out = self.invoke_context(
-            Some(repo),
-            repo.work_tree
-                .as_deref()
-                .ok_or_else(|| failure("checkout-required"))?,
-            &[
-                "diff",
-                "--cached",
-                "--name-only",
-                "--no-renames",
-                "--diff-filter=D",
-                "-z",
-            ],
-            Policy::Inspect,
-            None,
-            true,
-            PATH_LIMIT,
-            Duration::from_secs(30),
-            &[],
-            Some(index),
-        )?;
-        if !out.success {
-            return Err(out.error("hook-index-unreadable"));
-        }
-        Ok(crate::scoped_commit::paths(&out.stdout)?
-            .into_iter()
-            .filter(|p| p == ".fgos" || p.starts_with(".fgos/"))
-            .collect())
-    }
     pub(crate) fn require_floor(&self) -> Result<()> {
         if self.git_floor_verdict()?.supported {
             Ok(())
@@ -902,23 +870,6 @@ impl GitDriver {
         self.invoke_input(repo, cwd, args, policy, loan, hardened, limit, timeout, &[])
     }
 
-    #[allow(clippy::too_many_arguments)]
-    pub(crate) fn invoke_input(
-        &self,
-        repo: Option<&RepoHandle>,
-        cwd: &Path,
-        args: &[&str],
-        policy: Policy,
-        loan: Option<&dyn BorrowedSpawn>,
-        hardened: bool,
-        limit: usize,
-        timeout: Duration,
-        input: &[u8],
-    ) -> Result<Output> {
-        self.invoke_context(
-            repo, cwd, args, policy, loan, hardened, limit, timeout, input, None,
-        )
-    }
     /// The hook directory a repository's own policy names, never the
     /// driver's empty one.
     fn repository_hooks(&self, repo: &RepoHandle) -> Result<PathBuf> {
@@ -998,7 +949,7 @@ impl GitDriver {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn invoke_context(
+    pub(crate) fn invoke_input(
         &self,
         repo: Option<&RepoHandle>,
         cwd: &Path,
@@ -1009,7 +960,6 @@ impl GitDriver {
         limit: usize,
         timeout: Duration,
         input: &[u8],
-        hook_index: Option<&Path>,
     ) -> Result<Output> {
         check_hooks(&self.hooks)?;
         let mut argv = vec![text_path(&self.git)?];
@@ -1129,9 +1079,6 @@ impl GitDriver {
             }
         }
         let mut env = Scrubbed::new();
-        if let Some(index) = hook_index {
-            env.0.insert("GIT_INDEX_FILE".into(), text_path(index)?);
-        }
         env.0.insert("LC_ALL".into(), "C".into());
         env.0.insert("LANGUAGE".into(), String::new());
         if policy != Policy::Remote {

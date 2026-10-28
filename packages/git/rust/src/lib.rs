@@ -621,7 +621,7 @@ pub fn require_lock_scope_platform() -> Result<()> {
 }
 
 mod scoped_commit;
-pub use scoped_commit::{CheckpointRequest, CommitBaseline, CommitRequest, CommitResult, CutoverGrant};
+pub use scoped_commit::{CommitBaseline, CommitRequest, CommitResult};
 /// Literal Git path, independent of the declaration grammar. JSON strings
 /// round-trip UTF-8, including star, tab and newline; staging uses NUL input.
 pub(crate) fn literal_repo_path(path: &str) -> Result<()> {
@@ -644,8 +644,6 @@ pub(crate) fn fgos_scope_literal(path: &str) -> Result<()> {
 
 mod sync;
 pub use sync::SyncResult;
-
-mod grant;
 
 mod native_lock;
 pub use native_lock::{NativeLockArtifact, NativeLockReport};

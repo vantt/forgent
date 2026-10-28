@@ -40,7 +40,7 @@ test('Sync abort preserves resolver bytes and only closes its own merge',()=>{
  assert.equal(f.git('rev-parse','trunk'),f.target);
  const commit=createGitScopedCommit({stateRoot:f.temp,repoPath:f.linked,trustedMain:f.repo,writer:'fixture'},loader);
  const baseline=commit.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'fresh'),'fresh');
- assert.equal(commit.commit({operationId:'after-abort',baseline,request:{writes:['fresh'],message:'fresh after abort',cutoverGrant:null}},f.held).status,'committed');
+ assert.equal(commit.commit({operationId:'after-abort',baseline,request:{writes:['fresh'],message:'fresh after abort'}},f.held).status,'committed');
  }finally{f.close();}
 });
 
@@ -66,7 +66,7 @@ test('Sync preserves a rejecting hook cause and never reports its open merge as 
  f.git('config','core.hooksPath','/dev/null');
  const commit=createGitScopedCommit({stateRoot:f.temp,repoPath:f.linked,trustedMain:f.repo,writer:'fixture'},loader);
  const baseline=commit.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'a'),'fresh');
- assert.equal(commit.commit({operationId:'after-rejection',baseline,request:{writes:['a'],message:'fresh',cutoverGrant:null}},f.held).status,'committed');
+ assert.equal(commit.commit({operationId:'after-rejection',baseline,request:{writes:['a'],message:'fresh'}},f.held).status,'committed');
  }finally{f.close();}
 });
 
@@ -83,7 +83,7 @@ test('a recreated worktree does not inherit a rejected Sync from the dead checko
   try {
    const commit=createGitScopedCommit({stateRoot:f.temp,repoPath:f.linked,trustedMain:f.repo,writer:'fixture'},loader);
    const baseline=commit.preflight({},f.held);fs.writeFileSync(path.join(f.linked,'fresh'),'fresh');
-   assert.equal(commit.commit({operationId:'recreated-commit',baseline,request:{writes:['fresh'],message:'fresh',cutoverGrant:null}},f.held).status,'committed');
+   assert.equal(commit.commit({operationId:'recreated-commit',baseline,request:{writes:['fresh'],message:'fresh'}},f.held).status,'committed');
    assert.equal(f.port.start({operationId:'recreated-sync',target:f.target,message:'fresh sync'},f.held).state,'done');
    assert.throws(()=>f.port.inspect({operationId:'dead-sync'},f.held),/authority-mismatch/);
    assert.deepEqual(fs.readdirSync(path.join(f.repo,'.git/fgos/git/operations')),[]);

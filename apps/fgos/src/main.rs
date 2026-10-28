@@ -183,10 +183,6 @@ fn main() {
     // can inherit a descriptor handed to a route; not listed in
     // command-routes.json or help.
     if args.get(1).is_some_and(|a| a == "internal") {
-        if args.get(2).is_some_and(|a| a == "git-grant-check") {
-            let rest: Vec<String> = args[3..].iter().map(|a| a.to_string_lossy().into_owned()).collect();
-            std::process::exit(fgos_distribution::git_grant::main(&rest));
-        }
         // `holder-lock-helper <role>`: the roles a re-executed binary plays
         // for the holder-lock port (see `fgos_holder_lock::helper`).
         if args.get(2).is_some_and(|a| a == "holder-lock-helper") {

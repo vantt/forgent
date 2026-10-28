@@ -544,19 +544,6 @@ async function warnOnConventionViolations(committingToplevel) {
   }
 }
 
-// The config value only selects an operation. Rust proves the lock, WAL and index.
-// WORK removes legacy-event declarations from the native grant check at Event Store cutover.
-function scopedGrantAllows(committingToplevel) {
-  try {
-    const operation = execFileSync('git', ['config', '--get', 'fgos.operationId'], { cwd: committingToplevel, encoding: 'utf8' }).trim();
-    if (!operation) return false;
-    const { bin } = resolveActiveHostBin({ fgosDir: path.join(committingToplevel, '.fgos'), cwd: committingToplevel });
-    if (!bin) return false;
-    const verdict = JSON.parse(execFileSync(bin, ['internal', 'git-grant-check', '--protocol', '1', '--operation', operation], { cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe', 3] }));
-    return verdict.protocol === 1 && verdict.result === 'allowed';
-  } catch { return false; }
-}
-
 async function main() {
   const eventRefusal = addedEventPathRefusal(process.cwd());
   if (eventRefusal) { console.error(eventRefusal); process.exitCode = 1; return; }
@@ -574,7 +561,7 @@ async function main() {
   const stagedDeletions = stagedFgosDeletions(committingToplevel);
   const carriedDeletions = carriedIn(stagedDeletions);
   const fgosDeletions = stagedDeletions.filter((p) => !carriedDeletions.has(p));
-  if (fgosDeletions.length > 0 && !scopedGrantAllows(committingToplevel)) {
+  if (fgosDeletions.length > 0) {
     refuse(`commit refused: this commit stages a deletion under ".fgos/" (${fgosDeletions.join(', ')}) -- .fgos/ is fgOS's own runner state and must never be committed as deleted. A linked worktree never keeps a working-tree copy of .fgos/ by design (ADR0020); if you ran "git add -A" here, unstage these paths first (e.g. "git restore --staged .fgos").`);
     return;
   }

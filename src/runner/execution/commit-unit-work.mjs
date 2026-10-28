@@ -122,7 +122,7 @@ export function commitUnitWork(args) {
     const selection = recovered ? {inScope:args.resumeOperation.expectedPaths, outOfScope:[]} : partitionPaths(candidates, scope);
     base.outOfScope = selection.outOfScope.filter(p => (changedFiles ?? []).includes(p));
     const subject = recovered ? args.resumeOperation.nativeRequest.request.message : subjectFrom(summary, unitId, objective);
-    const nativeRequest = { baseline, request: { writes: scope, message: subject, cutoverGrant: null }, operationId: args.operationId ?? crypto.randomUUID() };
+    const nativeRequest = { baseline, request: { writes: scope, message: subject }, operationId: args.operationId ?? crypto.randomUUID() };
     if (!recovered) args.onPrepared?.({nativeRequest, expectedPaths: selection.inScope, base});
     else Object.assign(base, args.resumeOperation.base);
     const result = recovered ?? port.commit(nativeRequest, held(ctx));

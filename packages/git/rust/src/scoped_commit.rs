@@ -13,19 +13,11 @@ use std::{
     path::Path,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct CutoverGrant {
-    pub exact_paths: Vec<String>,
-    pub legacy_ref_oid: String,
-    pub seal_digest: String,
-}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct CommitRequest {
     pub writes: Vec<String>,
     pub message: String,
-    pub cutover_grant: Option<CutoverGrant>,
 }
 /// Observation-only view of a baseline persisted in the WAL. Recovery needs
 /// the head and the branch; the rest is bound by [`CommitBaseline::record`].
@@ -41,12 +33,6 @@ struct StoredBaseline {
 #[derive(Deserialize)]
 struct StoredCommitRequest {
     message: String,
-}
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct CheckpointRequest {
-    pub files: Vec<String>,
-    pub message: String,
 }
 /// Capture before producer launch. Keep this value for commit-only retry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -814,7 +800,7 @@ impl GitDriver {
                         request: String::new(),
                         paths: wal::PathSet::of(&[]).map_err(failure)?,
                         tree: compact.expected.clone(),
-                        cutover_grant: None,
+                        retired_cutover_grant: None,
                     })),
                     compact.request.clone(),
                 ),
@@ -1339,7 +1325,7 @@ impl GitDriver {
                         request: String::new(),
                         paths: wal::PathSet::of(&[]).map_err(failure)?,
                         tree: baseline.head.clone(),
-                        cutover_grant: None,
+                        retired_cutover_grant: None,
                     })),
                     wal::canonical_digest(&(baseline, request, writer))?,
                 ),
@@ -1427,33 +1413,6 @@ impl GitDriver {
                 selected.push(path);
             }
         }
-        if let Some(grant) = &request.cutover_grant {
-            if root(repo)? != repo.trusted_main_root() {
-                return Err(failure("cutover-main-required"));
-            }
-            self.validate_cutover_seal(repo, scope, grant)?;
-            for path in &grant.exact_paths {
-                if !path.starts_with(".fgos/")
-                    || fgos_write_scope::canonicalize(path).map_err(failure)? != *path
-                    || path.contains('*')
-                    || fs::symlink_metadata(root(repo)?.join(path)).is_ok()
-                {
-                    return Err(failure("cutover-exact-deletions-required"));
-                }
-                selected.push(path.clone());
-            }
-            // The fence marks every cutover, including a baseline-only repository
-            // that never had an event directory to delete.
-            if fs::symlink_metadata(root(repo)?.join(".fgos/events"))
-                .is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
-            {
-                let fence = ".fgos/events".to_string();
-                let tracked = paths(&self.checkout_bytes(repo, scope, &["ls-files", "-z"])?)?;
-                if !tracked.contains(&fence) || dirty_paths.contains(&fence) {
-                    selected.push(fence);
-                }
-            }
-        }
         selected.sort();
         selected.dedup();
         for path in &selected {
@@ -1466,7 +1425,7 @@ impl GitDriver {
                 request: request.record()?,
                 paths: wal::PathSet::of(&[])?,
                 tree: self.checkout_text(repo, scope, &["rev-parse", "HEAD^{tree}"])?,
-                cutover_grant: None,
+                retired_cutover_grant: None,
             }));
             let resources = checkout_resources(repo)?;
             crate::refs::admission(&wal, id, &resources)?;
@@ -1557,11 +1516,7 @@ impl GitDriver {
                 request: request.record()?,
                 paths: wal::PathSet::of(&selected)?,
                 tree: tree.clone(),
-                cutover_grant: request
-                    .cutover_grant
-                    .as_ref()
-                    .map(wal::CutoverGrantRecord::of)
-                    .transpose()?,
+                retired_cutover_grant: None,
             }));
             let resources = checkout_resources(repo)?;
             crate::refs::admission(&wal, id, &resources)?;
@@ -1783,77 +1738,6 @@ impl GitDriver {
             }
         }
         prepared
-    }
-    fn validate_cutover_seal(
-        &self,
-        repo: &RepoHandle,
-        scope: &LockScope<'_>,
-        grant: &CutoverGrant,
-    ) -> Result<()> {
-        let current =
-            self.checkout_text(repo, scope, &["rev-parse", "--verify", "refs/fgos/legacy"])?;
-        if current != grant.legacy_ref_oid {
-            return Err(failure("cutover-legacy-ref-mismatch"));
-        }
-        let bytes = self.checkout_bytes(
-            repo,
-            scope,
-            &["show", &format!("{}:seal.json", grant.legacy_ref_oid)],
-        )?;
-        use sha2::{Digest, Sha256};
-        if format!("{:x}", Sha256::digest(bytes)) != grant.seal_digest {
-            return Err(failure("cutover-seal-digest-mismatch"));
-        }
-        Ok(())
-    }
-    /// Main-only tracked checkpoint of non-`.fgos` files.
-    pub fn checkpoint_tracked_files(
-        &self,
-        repo: &RepoHandle,
-        held: Vec<BorrowedHandle<'_>>,
-        request: CheckpointRequest,
-        writer: &str,
-        id: &str,
-    ) -> Result<CommitResult> {
-        let CheckpointRequest {files, message} = request;
-        if root(repo)? != repo.trusted_main_root()
-            || files.iter().any(|p| is_store_path(p))
-        {
-            return Err(failure("checkpoint-non-event-main-required"));
-        }
-        let operation_repo = self.checkout_repository(repo)?;
-        let repo = &operation_repo;
-        let scope = scope(repo, held)?;
-        let tracked = paths(&self.checkout_bytes(repo, &scope, &["ls-files", "-z"])?)?;
-        if files
-            .iter()
-            .any(|p| p.contains('*') || !tracked.contains(p))
-        {
-            return Err(failure("checkpoint-tracked-literals-required"));
-        }
-        if !self.staged(repo, &scope)?.is_empty() || self.merge_head(repo, &scope)?.is_some() {
-            return Err(failure("checkpoint-foreign-state"));
-        }
-        let baseline = CommitBaseline {
-            head: self.checkout_text(repo, &scope, &["rev-parse", "HEAD"])?,
-            reference: self.checkout_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"])?,
-            worktree: root(repo)?.to_string_lossy().into_owned(),
-            authority: binding(handle(&scope, repo)?)?,
-            dirty: vec![],
-        };
-        self.commit_scoped(
-            repo,
-            &scope,
-            &baseline,
-            &CommitRequest {
-                writes: files,
-                message,
-                cutover_grant: None,
-            },
-            writer,
-            id,
-            &wal::OsFileSystem,
-        )
     }
 }
 fn content_digest(root: &Path, path: &str) -> Result<String> {

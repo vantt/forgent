@@ -150,7 +150,21 @@ pub struct ScopedCommitIntent {
     pub request: String,
     pub paths: PathSet,
     pub tree: String,
-    pub cutover_grant: Option<CutoverGrantRecord>,
+    /// Intents written before the cutover grant was removed carry
+    /// `"cutoverGrant": null`. The key is read back as written so their record
+    /// digests still verify; new intents omit it. Only `null` ever existed.
+    #[serde(
+        default,
+        rename = "cutoverGrant",
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "present_null"
+    )]
+    pub retired_cutover_grant: Option<()>,
+}
+/// A key that is present only as `null`: `Some(())` round-trips it as `null`,
+/// where a plain `Option` would read `null` as absent and drop the key.
+fn present_null<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Option<()>, D::Error> {
+    <()>::deserialize(d).map(Some)
 }
 /// A set of literal repository paths as a record holds it. New records keep
 /// only a digest, so a record stays bounded however many paths an operation
@@ -213,23 +227,6 @@ impl PathSet {
             Self::Digest(_) => {}
         }
         Ok(())
-    }
-}
-/// The cutover grant as a record holds it: the exact deletions as a [`PathSet`].
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct CutoverGrantRecord {
-    pub exact_paths: PathSet,
-    pub legacy_ref_oid: String,
-    pub seal_digest: String,
-}
-impl CutoverGrantRecord {
-    pub fn of(grant: &crate::CutoverGrant) -> WalResult<Self> {
-        Ok(Self {
-            exact_paths: PathSet::of(&grant.exact_paths)?,
-            legacy_ref_oid: grant.legacy_ref_oid.clone(),
-            seal_digest: grant.seal_digest.clone(),
-        })
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -2978,6 +2975,27 @@ mod tests {
             w.begin("too-large", intent(&w), &Authority).unwrap(),
             Begin::Created(_)
         ));
+    }
+    #[test]
+    fn scoped_commit_intent_written_with_a_null_cutover_grant_keeps_its_digest() {
+        // Earlier releases wrote `"cutoverGrant": null` into every intent, and a
+        // record verifies only if re-serializing it reproduces the bytes it was hashed from.
+        let intent = ScopedCommitIntent {
+            worktree: "/w".into(),
+            baseline: "{}".into(),
+            request: "{}".into(),
+            paths: PathSet::of(&[]).unwrap(),
+            tree: "0".repeat(40),
+            retired_cutover_grant: None,
+        };
+        let mut earlier = serde_json::to_value(&intent).unwrap();
+        assert!(earlier.get("cutoverGrant").is_none());
+        earlier["cutoverGrant"] = serde_json::Value::Null;
+        let read: ScopedCommitIntent = serde_json::from_value(earlier.clone()).unwrap();
+        assert_eq!(serde_json::to_value(&read).unwrap(), earlier);
+        assert_eq!(canonical_digest(&read).unwrap(), canonical_digest(&earlier).unwrap());
+        earlier["cutoverGrant"] = serde_json::json!({"exactPaths": [".fgos/x"], "legacyRefOid": "0", "sealDigest": "0"});
+        assert!(serde_json::from_value::<ScopedCommitIntent>(earlier).is_err());
     }
     #[test]
     fn path_set_digest_matches_the_same_paths_in_any_order_and_listed_records_still_read() {

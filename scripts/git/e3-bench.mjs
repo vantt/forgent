@@ -335,7 +335,7 @@ async function typedOperationRows(root, state, index, loader, samples, observer 
         observer.end('scoped-preflight');
         fs.writeFileSync(path.join(linked,'payload'),'producer\n');
         observer.begin('scoped-commit');
-        [elapsed,out] = time(() => port.commit({operationId:`e3-${i}`,baseline,request:{writes:['payload'],message:'E3 commit',cutoverGrant:null}},[claim.handle]));
+        [elapsed,out] = time(() => port.commit({operationId:`e3-${i}`,baseline,request:{writes:['payload'],message:'E3 commit'}},[claim.handle]));
         observer.end('scoped-commit');
         elapsed += preMs;
       }
@@ -568,7 +568,7 @@ async function run(args) {
         for (let n=0;n<samples+20;n++) {
           const [beforeMs, baseline]=time(()=>port.preflight({},[claim.handle]));
           fs.writeFileSync(path.join(linked,'payload'),`producer ${aged} ${n}`);
-          const [commitMs,result]=time(()=>port.commit({operationId:`node-loan-${aged}-${n}`,baseline,request:{writes:['payload'],message:'E3 Node loan',cutoverGrant:null}},[claim.handle]));
+          const [commitMs,result]=time(()=>port.commit({operationId:`node-loan-${aged}-${n}`,baseline,request:{writes:['payload'],message:'E3 Node loan'}},[claim.handle]));
           if(result.status!=='committed') throw new Error(`Node loan commit: ${JSON.stringify(result)}`);
           if(n>=20){changing.push(commitMs);preflight.push(beforeMs);}
         }
