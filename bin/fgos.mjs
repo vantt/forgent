@@ -4020,7 +4020,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
       }
       const globalConfigDir = path.join(os.homedir(), '.fgos');
-      const globalRetiredNotice = inspectGlobalRunnerConfig(globalConfigDir);
+      const globalRetiredNotice = inspectGlobalRunnerConfig({ projectRoot: repoRoot, globalDir: globalConfigDir });
       let runnerPatternsConversion;
       try {
         runnerPatternsConversion = convertRunnerPatternsConfig(repoRoot);
@@ -4751,7 +4751,11 @@ function renderPretty(verb, data) {
     if (data.globalRetiredNotice) {
       const notice = data.globalRetiredNotice;
       const patchStr = notice.patchBody ?? (notice.patch ? JSON.stringify(notice.patch) : '');
-      const note = [notice.command, patchStr ? `patch body:\n${patchStr}` : ''].filter(Boolean).join('\n');
+      const noteParts = [];
+      if (notice.warning) noteParts.push(notice.warning);
+      if (notice.command) noteParts.push(notice.command);
+      if (patchStr) noteParts.push(`patch body:\n${patchStr}`);
+      const note = noteParts.join('\n');
       lines.push(
         formatCheck(
           false,

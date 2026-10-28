@@ -359,33 +359,22 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
  * @param {boolean} [options.throwOnError] - Throw first problem if true
  * @returns {{ entries: object, merged: object, problems: Array<CollaborationError> }}
  */
-function isPatternEntry(obj) {
-  return Boolean(obj && typeof obj === 'object' && !Array.isArray(obj) && ('loop' in obj || 'promise' in obj));
-}
-
 export function checkCatalog(options = {}) {
-  const shippedInput = options?.shipped ?? {};
-  const effectiveInput = options?.effective ?? {};
+  const shippedPatterns = options?.shipped ?? {};
+  const effectivePatterns = options?.effective ?? {};
   const layers = options?.layers ?? null;
   const throwOnError = Boolean(options?.throwOnError);
-
-  const shippedPatterns = (shippedInput?.patterns && !isPatternEntry(shippedInput.patterns))
-    ? shippedInput.patterns
-    : (shippedInput?.patterns ?? shippedInput ?? {});
-  const effectivePatterns = effectiveInput?.runner?.patterns
-    ?? (effectiveInput?.patterns && !isPatternEntry(effectiveInput.patterns) ? effectiveInput.patterns : null)
-    ?? (effectiveInput && typeof effectiveInput === 'object' && ('loops' in effectiveInput || 'runner' in effectiveInput) ? {} : effectiveInput)
-    ?? {};
 
   const problems = [];
   const RESERVED_PATTERN_NAMES = new Set(['seatBinding', 'defaultRule']);
   const ALLOWED_PATTERN_ENTRY_KEYS = new Set(['promise', 'loop', 'defaults', 'invariants']);
   // 1. Retired keys checks via shared leaf detector
   for (const finding of detectRetiredPatternKeys(effectivePatterns)) {
-    const src = resolveLayer(layers, finding.name);
+    const name = finding.key.replace(/^runner\.patterns\./, '').split('.')[0];
+    const src = resolveLayer(layers, name);
     problems.push(new CollaborationError(
-      finding.code,
-      `${finding.baseMessage}${src ? ` (source layer: ${src})` : ''}`,
+      'config-key-retired',
+      `${finding.key} was retired; ${finding.instruction}${src ? ` (source layer: ${src})` : ''}`,
       { source: src },
     ));
   }

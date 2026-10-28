@@ -190,14 +190,6 @@ function dropGlobalExtendedTierCells(cfg, origins) {
 }
 
 /**
- * Reads the runner config of the project at `dir` through the config door: project over global over the
- * standard, the detected executor filled in, accounts from the machine's accounts file. Nothing is created
- * or rewritten by a read. A refusal of the door (a file that does not parse, a key in the wrong scope, a
- * value that breaks its schema) is raised as a RunnerConfigError carrying the door's failure id as `.code`
- * and naming every refusal's file and position, never a value. A project with no `runner.executor` set and
- * no assistant CLI on PATH has none to run: the error names the command that sets one.
- */
-/**
  * Maps a ConfigDoorError's refusals to a RunnerConfigError with code 'config-key-retired'
  * when the refusal path corresponds to a retired key. Calls checkConfig once on refusal.
  */
@@ -214,47 +206,40 @@ export function checkDoorRefusalsForRetiredKeys(err, options = {}) {
   }
 
   const candidates = [...checkFindings, ...(Array.isArray(err.refusals) ? err.refusals : [])];
+  const messages = [];
+  const seen = new Set();
   for (const entry of candidates) {
     if (!entry.path) continue;
     const detected = detectRetiredPatternKeys(entry.path);
     for (const item of detected) {
-      if (item.code === 'config-key-retired') {
-        const displayFile = entry.file?.startsWith('global:')
-          ? `~/.fgos/${entry.file.replace(/^global:/, '')}`
-          : (entry.file ?? '<file>');
-        const pos = Number.isInteger(entry.line) ? `:${entry.line}:${entry.column}` : '';
-        const where = `${displayFile}${pos}`;
-        throw new RunnerConfigError(
-          `${where}: ${item.key} was retired; ${item.instruction}.`,
-          { code: 'config-key-retired' },
-        );
+      const displayFile = entry.file?.startsWith('global:')
+        ? `~/.fgos/${entry.file.replace(/^global:/, '')}`
+        : (entry.file ?? '<file>');
+      const pos = Number.isInteger(entry.line) ? `:${entry.line}:${entry.column}` : '';
+      const where = `${displayFile}${pos}`;
+      const msg = `${where}: ${item.key} was retired; ${item.instruction}.`;
+      if (!seen.has(msg)) {
+        seen.add(msg);
+        messages.push(msg);
       }
     }
   }
-}
-
-/**
- * Asserts that `runnerRaw` holds no retired keys, throwing RunnerConfigError.
- * Mixed shape throws a plain config error; pure retired keys throw with code 'config-key-retired'.
- */
-export function assertNoRetiredKeys(runnerRaw, file) {
-  const fileName = file ?? '<config>';
-  const patterns = runnerRaw?.runner?.patterns
-    ?? (runnerRaw?.patterns && !('loop' in runnerRaw.patterns || 'promise' in runnerRaw.patterns) ? runnerRaw.patterns : runnerRaw);
-  const detected = detectRetiredPatternKeys(patterns);
-  for (const item of detected) {
-    if (item.code === 'config-key-retired') {
-      throw new RunnerConfigError(
-        `${fileName}: ${item.key} was retired; ${item.instruction}.`,
-        { code: 'config-key-retired' },
-      );
-    }
+  if (messages.length > 0) {
     throw new RunnerConfigError(
-      `runner config (${fileName} patterns.${item.name}) cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${item.name}.`,
+      messages.join('\n'),
+      { code: 'config-key-retired' },
     );
   }
 }
 
+/**
+ * Reads the runner config of the project at `dir` through the config door: project over global over the
+ * standard, the detected executor filled in, accounts from the machine's accounts file. Nothing is created
+ * or rewritten by a read. A refusal of the door (a file that does not parse, a key in the wrong scope, a
+ * value that breaks its schema) is raised as a RunnerConfigError carrying the door's failure id as `.code`
+ * and naming every refusal's file and position, never a value. A project with no `runner.executor` set and
+ * no assistant CLI on PATH has none to run: the error names the command that sets one.
+ */
 export function loadRunnerConfigForDir(dir) {
   let runner;
   let origins;
@@ -297,7 +282,6 @@ export function loadRunnerConfig(configPath) {
     throw new RunnerConfigError(`runner config at "${configPath}" is not valid YAML: ${describeYamlError(err)}`);
   }
 
-  assertNoRetiredKeys(cfg.runner ?? cfg, configPath);
   validateRunnerConfigShape(cfg, configPath);
   normalizeConfigConfinement(cfg);
   return cfg;
@@ -1338,15 +1322,20 @@ export function validateRunnerPatternsShape(patterns, label) {
   }
 
   // Retired keys via shared leaf detector
-  for (const finding of detectRetiredPatternKeys(patterns)) {
-    if (finding.code === 'config-key-retired') {
-      throw new RunnerConfigError(
-        `runner config (${label}.${finding.name}) was retired; ${finding.instruction}.`,
-        { code: 'config-key-retired' },
-      );
+  const retiredFindings = detectRetiredPatternKeys(patterns);
+  if (retiredFindings.length > 0) {
+    const messages = [];
+    const seen = new Set();
+    for (const finding of retiredFindings) {
+      const msg = `runner config (${label}): ${finding.key} was retired; ${finding.instruction}.`;
+      if (!seen.has(msg)) {
+        seen.add(msg);
+        messages.push(msg);
+      }
     }
     throw new RunnerConfigError(
-      `runner config (${label}.${finding.name}) cannot combine pattern catalog fields with retired loop tuning; move tuning to runner.loops.${finding.name}.`,
+      messages.join('\n'),
+      { code: 'config-key-retired' },
     );
   }
 

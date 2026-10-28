@@ -1036,6 +1036,36 @@ test('doctor check runner-patterns-config: a global catalog entry warns', () => 
     fs.rmSync(repo, { recursive: true, force: true });
   }
 });
+test('doctor check runner-patterns-config: child-path retired key fails with retired advice and custom patterns named loop and loops are accepted', () => {
+  const tmpDir = mkTempDir();
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+  writeProjectConfig(tmpDir, {
+    runner: {
+      patterns: {
+        'research-fan-out-gated': {
+          loop: 'panel',
+          promise: 'old gated',
+        },
+      },
+    },
+  });
+  const res = check.check(tmpDir);
+  assert.equal(res.passed, false);
+  assert.match(res.message, /runner\.patterns\.research-fan-out/);
+
+  writeProjectConfig(tmpDir, {
+    runner: {
+      patterns: {
+        loop: { loop: 'solo', promise: 'pattern named loop' },
+        loops: { loop: 'solo', promise: 'pattern named loops' },
+      },
+    },
+  });
+  const resValid = check.check(tmpDir);
+  assert.equal(resValid.passed, true);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
 
 test('doctor check runner-patterns-config: an explicit code:* minCheckers [reviewer] informs', () => {
   const tmpDir = mkTempDir();

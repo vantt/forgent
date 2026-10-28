@@ -7,8 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { parseYaml } from '../util/yaml.mjs';
-import { retiredKeysIn } from '../runner/dispatch/retired-config-keys.mjs';
-import { detectRetiredPatternKeys } from '../runner/execution/patterns/retired-keys.mjs';
+import { RETIRED_CONFIG_KEYS, detectRetiredPatternKeys } from '../runner/execution/patterns/retired-keys.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import * as facade from '../config/facade.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
@@ -59,9 +58,11 @@ export function formatLegacyJsonAdvice(targetPath, parsed = null) {
       doc = null;
     }
   }
-  const retired = doc ? retiredKeysIn(doc, targetPath) : [];
+  const runner = doc?.runner ?? doc;
+  const patterns = runner?.patterns ?? {};
+  const retired = doc ? detectRetiredPatternKeys(patterns) : [];
   if (retired.length > 0) {
-    const editsText = retired.map((r) => r.baseMessage ?? `${r.key} was retired; ${r.instruction}`).join('; ');
+    const editsText = retired.map((r) => `${r.key} was retired; ${r.instruction}`).join('; ');
     return `${targetPath}: config-format-legacy-json: ${editsText}; edit ${targetPath}, then run \`fgos config migrate\``;
   }
   return `${targetPath}: config-format-legacy-json: legacy JSON configuration format must be migrated first; edit ${targetPath}, then run \`fgos config migrate\``;
@@ -106,15 +107,15 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
     throw new Error(`cannot parse config file at ${targetPath}: ${err.message}`);
   }
 
-  const retired = retiredKeysIn(parsed, targetPath);
   const runner = parsed?.runner ?? parsed;
   const patterns = runner?.patterns ?? {};
+  const retired = detectRetiredPatternKeys(patterns);
   const hasRetired = Array.isArray(retired) && retired.length > 0;
   if (!hasRetired) {
     return { status: 'unchanged', written: [] };
   }
 
-  // H1: for a .json target, no backup and no door call; return blocked with per-key hand edits
+  // For a .json target, make no backup and do not call the door; return blocked with per-key hand edits
   if (targetPath.endsWith('.json')) {
     return {
       status: 'blocked',
@@ -240,57 +241,150 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
 export function formatGlobalRetiredNotice(notice) {
   if (!notice) return '';
   const patchStr = notice.patchBody ?? (notice.patch ? JSON.stringify(notice.patch) : '');
+  const warnPart = notice.warning ? `; ${notice.warning}` : '';
   const cmdPart = notice.command ? `; ${notice.command}` : '';
   const patchPart = patchStr ? `; patch body: ${patchStr}` : '';
-  return `global config holds retired keys; edit ${notice.file} (${notice.edits.join('; ')})${cmdPart}${patchPart}`;
+  return `global config holds retired keys; edit ${notice.file} (${notice.edits.join('; ')})${warnPart}${cmdPart}${patchPart}`;
 }
 
 /**
  * Inspects the global config file for retired runner.patterns keys without modifying it.
  *
- * @param {string} [globalDir]
- * @returns {{ file: string, edits: string[], command: string, message: string }|null}
+ * @param {string | { projectRoot?: string, globalDir?: string }} [options]
+ * @returns {{ file: string, edits: string[], command: string, message: string, patch: object[], patchBody: string, warning?: string, coverageNote?: string }|null}
  */
-export function inspectGlobalRunnerConfig(globalDir = path.join(os.homedir(), '.fgos')) {
+export function inspectGlobalRunnerConfig(options = {}) {
+  let projectRoot;
+  let globalDir;
+  if (typeof options === 'string') {
+    globalDir = options;
+    projectRoot = process.cwd();
+  } else {
+    projectRoot = options.projectRoot ?? process.cwd();
+    globalDir = options.globalDir ?? path.join(os.homedir(), '.fgos');
+  }
+
   if (!fs.existsSync(globalDir)) return null;
 
+  let checkFindings = [];
   try {
-    facade.readMachineConfig({ globalDir });
-    return null;
+    const res = facade.checkConfig({ projectRoot, globalDir });
+    checkFindings = res.findings ?? [];
   } catch (err) {
     if (err instanceof facade.ConfigDoorError && Array.isArray(err.refusals)) {
-      const retiredRefusals = err.refusals.filter((r) => {
-        if (!r.path) return false;
-        const findings = detectRetiredPatternKeys(r.path);
-        return findings.length > 0;
-      });
-      if (retiredRefusals.length === 0) return null;
-      const file = retiredRefusals[0].file?.replace(/^(global|machine):/, '') ?? 'config.yaml';
-      const edits = [];
-      const patch = [];
-      if (retiredRefusals.some((r) => detectRetiredPatternKeys(r.path).some((f) => f.classification === 'defaultRule'))) {
-        edits.push('delete runner.patterns.defaultRule');
-        patch.push({ unset: 'runner.patterns.defaultRule' });
-      }
-      if (retiredRefusals.some((r) => detectRetiredPatternKeys(r.path).some((f) => f.classification === 'tuning'))) {
-        edits.push('move runner.patterns.reviewed to runner.loops.reviewed');
-        patch.push({ unset: 'runner.patterns.reviewed' });
-      }
-      if (retiredRefusals.some((r) => detectRetiredPatternKeys(r.path).some((f) => f.classification === 'gated'))) {
-        edits.push('rename runner.patterns.research-fan-out-gated to runner.patterns.research-fan-out');
-        patch.push({ unset: 'runner.patterns.research-fan-out-gated' });
-      }
-      const patchBody = JSON.stringify(patch, null, 2);
-      const notice = {
-        file: path.join(globalDir, file),
-        edits,
-        patch,
-        patchBody,
-        command: 'from a directory outside any fgOS project, run: fgos config patch <patch-file> --global --reason "convert retired keys to runner.loops"',
-      };
-      notice.message = formatGlobalRetiredNotice(notice);
-      return notice;
+      checkFindings = err.refusals;
     }
-    return null;
   }
+
+  const globalFindings = checkFindings.filter((f) => {
+    if (!f.file) return false;
+    return f.file.startsWith('global:') || f.file.startsWith('machine:') || path.resolve(f.file).startsWith(path.resolve(globalDir));
+  });
+
+  const retiredKeys = new Set();
+  let globalConfigFile = 'config.yaml';
+
+  for (const f of globalFindings) {
+    if (f.file) {
+      const stripped = f.file.replace(/^(global|machine):/, '');
+      if (stripped) globalConfigFile = stripped;
+    }
+    if (f.path) {
+      const detected = detectRetiredPatternKeys(f.path);
+      for (const item of detected) {
+        retiredKeys.add(item.key);
+      }
+    }
+  }
+
+  // Also check machine snapshot for schema-valid keys with global origin (e.g. fully documented gated pattern)
+  let snapshotValue = null;
+  let snapshotOrigins = null;
+  try {
+    const snapshot = facade.readMachineConfig({
+      globalDir,
+      sections: ['runner'],
+      origins: ['runner.patterns'],
+    });
+    snapshotValue = snapshot?.value;
+    snapshotOrigins = snapshot?.origins;
+  } catch {
+    // Refused snapshot: no partial values available from the door
+  }
+
+  if (Array.isArray(snapshotOrigins)) {
+    for (const origin of snapshotOrigins) {
+      if (origin.layer === 'global' || origin.file?.startsWith('global:')) {
+        const detected = detectRetiredPatternKeys(origin.path);
+        for (const item of detected) {
+          retiredKeys.add(item.key);
+        }
+      }
+    }
+  }
+
+  if (retiredKeys.size === 0) return null;
+
+  const edits = [];
+  const patch = [];
+
+  if (retiredKeys.has('runner.patterns.defaultRule')) {
+    edits.push('delete runner.patterns.defaultRule');
+    patch.push({ unset: 'runner.patterns.defaultRule' });
+  }
+
+  if (retiredKeys.has('runner.patterns.reviewed.maxRounds')) {
+    edits.push('move runner.patterns.reviewed.maxRounds to runner.loops.reviewed.maxRounds');
+    const val = snapshotValue?.runner?.patterns?.reviewed?.maxRounds ?? snapshotValue?.patterns?.reviewed?.maxRounds;
+    if (val !== undefined) {
+      patch.push({ set: 'runner.loops.reviewed.maxRounds', value: val });
+    } else {
+      patch.push({ set: 'runner.loops.reviewed.maxRounds', value: '<value>' });
+    }
+    patch.push({ unset: 'runner.patterns.reviewed.maxRounds' });
+  }
+
+  if (retiredKeys.has('runner.patterns.reviewed.checkersByRigor')) {
+    edits.push('move runner.patterns.reviewed.checkersByRigor to runner.loops.reviewed.checkersByRigor');
+    const val = snapshotValue?.runner?.patterns?.reviewed?.checkersByRigor ?? snapshotValue?.patterns?.reviewed?.checkersByRigor;
+    if (val !== undefined) {
+      patch.push({ set: 'runner.loops.reviewed.checkersByRigor', value: val });
+    } else {
+      patch.push({ set: 'runner.loops.reviewed.checkersByRigor', value: '<value>' });
+    }
+    patch.push({ unset: 'runner.patterns.reviewed.checkersByRigor' });
+  }
+
+  if (retiredKeys.has('runner.patterns.research-fan-out-gated')) {
+    const modernInGlobal = Array.isArray(snapshotOrigins) && snapshotOrigins.some((o) =>
+      (o.layer === 'global' || o.file?.startsWith('global:')) && (o.path === 'runner.patterns.research-fan-out' || o.path?.startsWith('runner.patterns.research-fan-out.')),
+    );
+    if (modernInGlobal) {
+      edits.push('cannot rename retired key runner.patterns.research-fan-out-gated: modern runner.patterns.research-fan-out already exists; reconcile duplicate pattern entries manually');
+    } else {
+      edits.push('rename runner.patterns.research-fan-out-gated to runner.patterns.research-fan-out');
+      const val = snapshotValue?.runner?.patterns?.['research-fan-out-gated'] ?? snapshotValue?.patterns?.['research-fan-out-gated'];
+      if (val !== undefined) {
+        patch.push({ set: 'runner.patterns.research-fan-out', value: val });
+      } else {
+        patch.push({ set: 'runner.patterns.research-fan-out', value: '<value>' });
+      }
+      patch.push({ unset: 'runner.patterns.research-fan-out-gated' });
+    }
+  }
+
+  const isIncomplete = patch.some((p) => p.value === '<value>');
+  const warning = isIncomplete ? 'Copy the existing values to their replacement keys before removing the old keys.' : undefined;
+  const patchBody = JSON.stringify(patch, null, 2);
+  const notice = {
+    file: path.join(globalDir, globalConfigFile),
+    edits,
+    patch,
+    patchBody,
+    command: 'from a directory outside any fgOS project, run: fgos config patch <patch-file> --global --reason "convert retired keys to runner.loops"',
+    warning,
+    coverageNote: 'Refused tuning keys, defaultRule and gated entries are detected. A schema-valid gated entry coexisting with a configuration refusal will be reported after fixing current errors and running setup again.',
+  };
+  notice.message = formatGlobalRetiredNotice(notice);
+  return notice;
 }

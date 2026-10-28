@@ -1564,7 +1564,6 @@ test('pattern vocabulary rename is complete with no live retired aliases or dele
 test('retired pattern literals appear only in permitted refusal, setup, and decoder paths', () => {
   const allowed = new Set([
     'src/runner/dispatch/config.mjs',
-    'src/runner/dispatch/retired-config-keys.mjs',
     'src/runner/execution/legacy-seat-read.mjs',
     'src/runner/execution/patterns/catalog-entries.mjs',
     'src/runner/execution/patterns/retired-keys.mjs',

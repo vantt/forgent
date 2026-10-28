@@ -327,10 +327,10 @@ test('retired keys refusal: refuses with config-key-retired naming file and repl
     () => validateRunnerPatternsShape({ reviewed: { maxRounds: 3 } }, 'patterns'),
     (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /reviewed.*retired/.test(err.message),
   );
-  // 4. Direct validation: mixed shape on reviewed is a plain config error (no config-key-retired code)
+  // 4. Direct validation: mixed shape on reviewed reports per-key retirement finding
   assert.throws(
     () => validateRunnerPatternsShape({ reviewed: { loop: 'reviewed', maxRounds: 3 } }, 'patterns'),
-    (err) => err instanceof RunnerConfigError && err.code !== 'config-key-retired' && /cannot combine pattern catalog fields with retired loop tuning/.test(err.message),
+    (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /reviewed.*retired/.test(err.message),
   );
 
   // 5. Named file door: loadRunnerConfig with defaultRule
@@ -353,15 +353,35 @@ test('retired keys refusal: refuses with config-key-retired naming file and repl
     (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /runner\.loops\.reviewed/.test(err.message),
   );
 
-  // 7. Named file door: loadRunnerConfig with mixed reviewed is plain config error
+  // 7. Named file door: loadRunnerConfig with mixed reviewed reports config-key-retired
   const { configPath: mixedCfg } = mkTempConfig({
     ...BASE,
     patterns: { reviewed: { loop: 'reviewed', maxRounds: 3 } },
   });
   assert.throws(
     () => loadRunnerConfig(mixedCfg),
-    (err) => err instanceof RunnerConfigError && err.code !== 'config-key-retired',
+    (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /runner\.loops\.reviewed/.test(err.message),
   );
+
+  // 8. Direct validation: both tuning findings reported in one error
+  assert.throws(
+    () => validateRunnerPatternsShape({
+      reviewed: {
+        maxRounds: 3,
+        checkersByRigor: { standard: ['reviewer'] },
+      },
+    }, 'patterns'),
+    (err) => err instanceof RunnerConfigError
+      && err.code === 'config-key-retired'
+      && /runner\.patterns\.reviewed\.maxRounds/.test(err.message)
+      && /runner\.patterns\.reviewed\.checkersByRigor/.test(err.message),
+  );
+
+  // 9. Patterns named loop and loops behave like any other pattern name
+  assert.doesNotThrow(() => validateRunnerPatternsShape({
+    loop: { loop: 'solo', promise: 'promise for loop' },
+    loops: { loop: 'solo', promise: 'promise for loops' },
+  }, 'patterns'));
 });
 test('named config with panel holding maxRounds is refused as an unknown key without retired advice', () => {
   const { configPath } = mkTempConfig({
@@ -466,7 +486,7 @@ test('loadRunnerConfigForDir: other ConfigDoorError codes pass through unchanged
     (err) => err instanceof RunnerConfigError && err.code === 'config-schema',
   );
 
-  // Project mixed shape throws plain error without config-key-retired code
+  // Project mixed shape at the door
   writeProjectConfig(repo, {
     runner: {
       patterns: {
@@ -597,7 +617,7 @@ test('catalogLayersOf: field-path origin reports global when an offending field 
       },
     };
 
-    const { problems } = checkCatalog({ shipped, effective, layers });
+    const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
     const loopProblem = problems.find((p) => p.message.includes('loop'));
     assert.ok(loopProblem, 'weakened loop must produce a problem');
     assert.match(loopProblem.message, /source layer: global/, 'offending global field must report source layer global');

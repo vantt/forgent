@@ -37,7 +37,7 @@ test('CollaborationError carries error code, message and optional source layer',
 test('bundled standard patterns pass catalog validation with no problems', () => {
   const shipped = shippedCatalog();
   const { entries, problems } = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: shipped.patterns,
   });
 
@@ -85,7 +85,7 @@ test('project-declared non-coding pattern resolves with plain defaults and no co
     },
   };
 
-  const { entries, problems } = checkCatalog({ shipped, effective });
+  const { entries, problems } = checkCatalog({ shipped: shipped.patterns, effective });
   assert.deepEqual(problems, []);
 
   assert.equal(loopOf('editorial-review', { effective: entries }), 'reviewed');
@@ -107,7 +107,7 @@ test('project override of a shipped pattern merges per key without repeating pro
     },
   };
 
-  const { entries, problems } = checkCatalog({ shipped, effective });
+  const { entries, problems } = checkCatalog({ shipped: shipped.patterns, effective });
   assert.deepEqual(problems, []);
 
   assert.equal(entries.reviewed.loop, 'reviewed');
@@ -127,7 +127,7 @@ test('tightening an invariant by listing a superset is accepted', () => {
     },
   };
 
-  const { entries, problems } = checkCatalog({ shipped, effective });
+  const { entries, problems } = checkCatalog({ shipped: shipped.patterns, effective });
   assert.deepEqual(problems, []);
   assert.deepEqual(
     entries['code-change'].invariants.minCheckers.atLeast,
@@ -148,7 +148,7 @@ test('dropping an atLeast element in a shipped invariant is refused with source 
   };
   const layers = { 'code-change': 'project' };
 
-  const { problems } = checkCatalog({ shipped, effective, layers });
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
   assert.ok(problems.length > 0);
 
   const error = problems.find((p) => p.code === 'pattern-invariant-weakened');
@@ -170,7 +170,7 @@ test('changing or removing a fixed invariant on a shipped pattern is refused wit
   };
   const layers = { consult: 'global' };
 
-  const resChanged = checkCatalog({ shipped, effective: effectiveChanged, layers });
+  const resChanged = checkCatalog({ shipped: shipped.patterns, effective: effectiveChanged, layers });
   assert.ok(resChanged.problems.length > 0);
   const errChanged = resChanged.problems.find((p) => p.code === 'pattern-invariant-weakened');
   assert.ok(errChanged);
@@ -182,7 +182,7 @@ test('changing or removing a fixed invariant on a shipped pattern is refused wit
       invariants: {},
     },
   };
-  const resRemoved = checkCatalog({ shipped, effective: effectiveRemoved, layers });
+  const resRemoved = checkCatalog({ shipped: shipped.patterns, effective: effectiveRemoved, layers });
   assert.ok(resRemoved.problems.length > 0);
   assert.ok(resRemoved.problems.some((p) => p.code === 'pattern-invariant-weakened'));
 });
@@ -196,7 +196,7 @@ test('changing the execution loop of a shipped pattern is refused with source la
   };
   const layers = { solo: 'project' };
 
-  const { problems } = checkCatalog({ shipped, effective, layers });
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
   assert.ok(problems.length > 0);
 
   const error = problems.find((p) => p.code === 'pattern-invariant-weakened');
@@ -220,7 +220,7 @@ test('retired pattern key in checkCatalog reports config-key-retired with source
     },
   };
   const layers = { 'research-fan-out-gated': 'project' };
-  const { problems } = checkCatalog({ shipped, effective, layers });
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
   const error = problems.find((p) => p.code === 'config-key-retired');
   assert.ok(error);
   assert.equal(error.source, 'project');
@@ -234,7 +234,7 @@ test('checkCatalog reports param-unknown without retired advice for tuning under
     },
   };
   const layers = { panel: 'project' };
-  const { problems } = checkCatalog({ shipped, effective, layers });
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
   const retired = problems.find((p) => p.code === 'config-key-retired');
   assert.equal(retired, undefined, 'must not classify tuning under non-reviewed pattern as retired');
   const unknownKey = problems.find((p) => p.code === 'param-unknown');
@@ -251,7 +251,7 @@ test('checkCatalog reports config-key-retired for reviewed tuning with source la
     },
   };
   const layers = { reviewed: 'project' };
-  const { problems } = checkCatalog({ shipped, effective, layers });
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
   const retired = problems.find((p) => p.code === 'config-key-retired');
   assert.ok(retired, 'must report config-key-retired');
   assert.equal(retired.source, 'project');
@@ -261,7 +261,7 @@ test('checkCatalog reports config-key-retired for reviewed tuning with source la
   assert.equal(duplicate.length, 0, 'must not duplicate error as param-unknown');
 });
 
-test('checkCatalog reports config-error for reviewed mixing catalog fields with retired tuning', () => {
+test('checkCatalog reports config-key-retired for reviewed mixing catalog fields with retired tuning', () => {
   const shipped = shippedCatalog();
   const effective = {
     reviewed: {
@@ -270,11 +270,12 @@ test('checkCatalog reports config-error for reviewed mixing catalog fields with 
     },
   };
   const layers = { reviewed: 'project' };
-  const { problems } = checkCatalog({ shipped, effective, layers });
-  const mixed = problems.find((p) => p.code === 'config-error' && p.message.includes('cannot combine pattern catalog fields'));
-  assert.ok(mixed, 'must report mixed-shape config error');
-  assert.equal(mixed.source, 'project');
-  assert.match(mixed.message, /source layer: project/);
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
+  const retired = problems.find((p) => p.code === 'config-key-retired');
+  assert.ok(retired, 'must report config-key-retired');
+  assert.equal(retired.source, 'project');
+  assert.match(retired.message, /source layer: project/);
+  assert.match(retired.message, /runner\.loops\.reviewed\.maxRounds/);
 });
 test('checkCatalog detects retired tuning when a custom pattern named patterns exists', () => {
   const shipped = shippedCatalog();
@@ -283,11 +284,11 @@ test('checkCatalog detects retired tuning when a custom pattern named patterns e
     reviewed: { loop: 'reviewed', maxRounds: 3 },
   };
   const { problems, entries } = checkCatalog({
-    shipped,
-    effective: { runner: { patterns } },
+    shipped: shipped.patterns,
+    effective: patterns,
   });
-  const mixed = problems.find((p) => p.code === 'config-error' && p.message.includes('cannot combine pattern catalog fields'));
-  assert.ok(mixed, 'must detect mixed-shape error even when a pattern named patterns exists');
+  const retired = problems.find((p) => p.code === 'config-key-retired' && p.message.includes('runner.loops.reviewed.maxRounds'));
+  assert.ok(retired, 'must detect retired key even when a pattern named patterns exists');
   assert.ok(entries.patterns, 'custom pattern named patterns must be kept in entries');
   assert.ok(entries.reviewed, 'reviewed entry must be kept in entries');
 });
@@ -303,7 +304,7 @@ test('reserved names used as pattern names are refused as config errors', () => 
       loop: 'solo',
     },
   };
-  const res1 = checkCatalog({ shipped, effective: effectiveSeatBinding });
+  const res1 = checkCatalog({ shipped: shipped.patterns, effective: effectiveSeatBinding });
   assert.ok(res1.problems.some((p) => p.code === 'config-error'));
 });
 
@@ -319,7 +320,7 @@ test('stray parameter keys not read by the final loop cannot survive', () => {
     },
   };
 
-  const res1 = checkCatalog({ shipped, effective: effectiveDefaults });
+  const res1 = checkCatalog({ shipped: shipped.patterns, effective: effectiveDefaults });
   assert.ok(res1.problems.some((p) => p.code === 'param-unknown'));
 
   const effectiveInvariants = {
@@ -333,7 +334,7 @@ test('stray parameter keys not read by the final loop cannot survive', () => {
       },
     },
   };
-  const res2 = checkCatalog({ shipped, effective: effectiveInvariants });
+  const res2 = checkCatalog({ shipped: shipped.patterns, effective: effectiveInvariants });
   assert.ok(res2.problems.some((p) => p.code === 'param-unknown'));
 });
 
@@ -341,7 +342,7 @@ test('parameter domain validation rejects invalid default values', () => {
   const shipped = shippedCatalog();
 
   const resNonInteger = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     layers: { 'custom-reviewed': 'project' },
     effective: {
       'custom-reviewed': {
@@ -356,7 +357,7 @@ test('parameter domain validation rejects invalid default values', () => {
   assert.equal(badMaxRounds.source, 'project');
   assert.match(badMaxRounds.message, /project/);
   const resUnknownChecker = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: {
       'custom-reviewed': {
         promise: 'A reviewed pattern with unknown checker.',
@@ -368,7 +369,7 @@ test('parameter domain validation rejects invalid default values', () => {
   assert.ok(resUnknownChecker.problems.some((p) => p.code === 'param-invalid'));
 
   const resBadRebuttal = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: {
       'custom-debate': {
         promise: 'A debate pattern with non-boolean rebuttal.',
@@ -380,7 +381,7 @@ test('parameter domain validation rejects invalid default values', () => {
   assert.ok(resBadRebuttal.problems.some((p) => p.code === 'param-invalid'));
 
   const resReservedSeat = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: {
       'custom-solo': {
         promise: 'A solo pattern declaring reserved seat id.',
@@ -394,7 +395,7 @@ test('parameter domain validation rejects invalid default values', () => {
   assert.ok(resReservedSeat.problems.some((p) => p.code === 'param-invalid'));
 
   const resSeatMultiplicity = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: {
       'custom-solo': {
         promise: 'A solo pattern with two producers.',
@@ -411,7 +412,7 @@ test('parameter domain validation rejects invalid default values', () => {
   assert.ok(resSeatMultiplicity.problems.some((p) => p.code === 'seat-multiplicity'));
 
   const resBadRoleTask = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: {
       'custom-panel': {
         promise: 'A panel pattern with roleTask targeting unknown role.',
@@ -435,7 +436,7 @@ test('custom pattern missing required promise or loop is rejected', () => {
       loop: 'solo',
     },
   };
-  const res1 = checkCatalog({ shipped, effective: missingPromise });
+  const res1 = checkCatalog({ shipped: shipped.patterns, effective: missingPromise });
   assert.ok(res1.problems.some((p) => p.code === 'param-invalid'));
 
   const missingLoop = {
@@ -443,7 +444,7 @@ test('custom pattern missing required promise or loop is rejected', () => {
       promise: 'Has promise but no loop.',
     },
   };
-  const res2 = checkCatalog({ shipped, effective: missingLoop });
+  const res2 = checkCatalog({ shipped: shipped.patterns, effective: missingLoop });
   assert.ok(res2.problems.some((p) => p.code === 'param-invalid'));
 });
 
@@ -456,7 +457,7 @@ test('checkCatalog with throwOnError throws the first problem encountered', () =
   };
 
   assert.throws(
-    () => checkCatalog({ shipped, effective, throwOnError: true }),
+    () => checkCatalog({ shipped: shipped.patterns, effective, throwOnError: true }),
     (err) => err instanceof CollaborationError && err.code === 'pattern-invariant-weakened',
   );
 });
@@ -471,7 +472,7 @@ test('carrier validity refuses unknown key on pattern entry with param-unknown',
       unexpectedKey: 'not-allowed',
     },
   };
-  const { problems } = checkCatalog({ shipped, effective, layers });
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
   assert.ok(problems.length > 0);
   const err = problems.find((p) => p.code === 'param-unknown');
   assert.ok(err);
@@ -491,7 +492,7 @@ test('tightening a shipped pattern by adding an invariant on another parameter i
       },
     },
   };
-  const { entries, problems } = checkCatalog({ shipped, effective });
+  const { entries, problems } = checkCatalog({ shipped: shipped.patterns, effective });
   assert.deepEqual(problems, []);
   assert.deepEqual(
     entries['code-change'].invariants.minCheckers.atLeast,
@@ -507,7 +508,7 @@ test('invariant form validation requires form fitting the parameter and rejects 
   const shipped = shippedCatalog();
 
   const resListFixed = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: {
       'custom-reviewed': {
         promise: 'List param with fixed form.',
@@ -523,7 +524,7 @@ test('invariant form validation requires form fitting the parameter and rejects 
   assert.ok(resListFixed.problems.some((p) => p.code === 'param-invalid'));
 
   const resScalarAtLeast = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: {
       'custom-debate': {
         promise: 'Boolean param with atLeast form.',
@@ -539,7 +540,7 @@ test('invariant form validation requires form fitting the parameter and rejects 
   assert.ok(resScalarAtLeast.problems.some((p) => p.code === 'param-invalid'));
 
   const resExtraKeys = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: {
       'custom-reviewed': {
         promise: 'Invariant with extra unknown keys.',
@@ -572,7 +573,7 @@ test('declared seats in reviewed allow custom seat ids', () => {
       },
     },
   };
-  const resOk = checkCatalog({ shipped, effective: effectiveOk });
+  const resOk = checkCatalog({ shipped: shipped.patterns, effective: effectiveOk });
   assert.deepEqual(resOk.problems, []);
 });
 
@@ -591,7 +592,7 @@ test('reviewed pattern rejects declared seats with non-checker roles', () => {
       },
     },
   };
-  const resWrongRole = checkCatalog({ shipped, effective: effectiveWrongRole });
+  const resWrongRole = checkCatalog({ shipped: shipped.patterns, effective: effectiveWrongRole });
   assert.ok(resWrongRole.problems.some((p) => p.code === 'seat-multiplicity'));
 });
 
@@ -609,7 +610,7 @@ test('reviewed pattern declaring only a producer seat passes catalog validation'
       },
     },
   };
-  const resProducerOnly = checkCatalog({ shipped, effective: effectiveProducerOnly });
+  const resProducerOnly = checkCatalog({ shipped: shipped.patterns, effective: effectiveProducerOnly });
   assert.deepEqual(resProducerOnly.problems, []);
 });
 
@@ -628,7 +629,7 @@ test('loop seat cardinality checks enforce role multiplicities for panel and deb
       },
     },
   };
-  const resPanel1 = checkCatalog({ shipped, effective: panelNoSynth });
+  const resPanel1 = checkCatalog({ shipped: shipped.patterns, effective: panelNoSynth });
   assert.ok(resPanel1.problems.some((p) => p.code === 'seat-multiplicity'));
 
   const panelInvalidRole = {
@@ -644,7 +645,7 @@ test('loop seat cardinality checks enforce role multiplicities for panel and deb
       },
     },
   };
-  const resPanel2 = checkCatalog({ shipped, effective: panelInvalidRole });
+  const resPanel2 = checkCatalog({ shipped: shipped.patterns, effective: panelInvalidRole });
   assert.ok(resPanel2.problems.some((p) => p.code === 'seat-multiplicity'));
 
   const debateOneProducer = {
@@ -659,7 +660,7 @@ test('loop seat cardinality checks enforce role multiplicities for panel and deb
       },
     },
   };
-  const resDebate1 = checkCatalog({ shipped, effective: debateOneProducer });
+  const resDebate1 = checkCatalog({ shipped: shipped.patterns, effective: debateOneProducer });
   assert.ok(resDebate1.problems.some((p) => p.code === 'seat-multiplicity'));
 
   const debateReservedVerifier = {
@@ -675,7 +676,7 @@ test('loop seat cardinality checks enforce role multiplicities for panel and deb
       },
     },
   };
-  const resDebate2 = checkCatalog({ shipped, effective: debateReservedVerifier });
+  const resDebate2 = checkCatalog({ shipped: shipped.patterns, effective: debateReservedVerifier });
   assert.ok(resDebate2.problems.some((p) => p.code === 'param-invalid'));
 });
 
@@ -699,7 +700,7 @@ test('roleTasks target validation accepts loop kinds and declared seats', () => 
       },
     },
   };
-  const resPanel = checkCatalog({ shipped, effective: effectivePanel });
+  const resPanel = checkCatalog({ shipped: shipped.patterns, effective: effectivePanel });
   assert.deepEqual(resPanel.problems, []);
 
   const effectiveDebate = {
@@ -723,7 +724,7 @@ test('roleTasks target validation accepts loop kinds and declared seats', () => 
       },
     },
   };
-  const resDebate = checkCatalog({ shipped, effective: effectiveDebate });
+  const resDebate = checkCatalog({ shipped: shipped.patterns, effective: effectiveDebate });
   assert.deepEqual(resDebate.problems, []);
 
   const effectiveReviewed = {
@@ -740,7 +741,7 @@ test('roleTasks target validation accepts loop kinds and declared seats', () => 
       },
     },
   };
-  const resReviewed = checkCatalog({ shipped, effective: effectiveReviewed });
+  const resReviewed = checkCatalog({ shipped: shipped.patterns, effective: effectiveReviewed });
   assert.deepEqual(resReviewed.problems, []);
 });
 
@@ -785,7 +786,7 @@ test('roleTasks rejects targets not present in the loop or declared seats', () =
       },
     },
   };
-  const resInvented = checkCatalog({ shipped, effective: effectiveInvented });
+  const resInvented = checkCatalog({ shipped: shipped.patterns, effective: effectiveInvented });
   assert.equal(resInvented.problems.length, 3);
   assert.ok(resInvented.problems.every((p) => p.code === 'param-invalid' && /does not exist for loop/.test(p.message)));
 });
@@ -808,7 +809,7 @@ test('reviewed pattern with declared custom checker seats rejects built-in check
       },
     },
   };
-  const res = checkCatalog({ shipped, effective: effectiveWithCustomCheckers });
+  const res = checkCatalog({ shipped: shipped.patterns, effective: effectiveWithCustomCheckers });
   assert.ok(res.problems.some((p) => p.code === 'param-invalid' && p.message.includes('target "reviewer" does not exist for loop "reviewed"')));
 
   const effectiveWithValidTargets = {
@@ -828,7 +829,7 @@ test('reviewed pattern with declared custom checker seats rejects built-in check
       },
     },
   };
-  const resValid = checkCatalog({ shipped, effective: effectiveWithValidTargets });
+  const resValid = checkCatalog({ shipped: shipped.patterns, effective: effectiveWithValidTargets });
   assert.deepEqual(resValid.problems, []);
 });
 
@@ -846,7 +847,7 @@ test('malformed shipped pattern overrides are rejected with source layer attribu
 
   for (const { override, expectedCode, expectedSnippet } of testCases) {
     const res = checkCatalog({
-      shipped,
+      shipped: shipped.patterns,
       effective: { reviewed: override },
       layers: { 'runner.patterns.reviewed': 'project' },
     });
@@ -862,7 +863,7 @@ test('checker name validation rejects inherited object properties as checker nam
   const shipped = shippedCatalog();
 
   const resDefaults = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: {
       'custom-pattern': {
         promise: 'Custom pattern with inherited property checker name.',
@@ -878,7 +879,7 @@ test('checker name validation rejects inherited object properties as checker nam
   assert.ok(resDefaults.problems.some((p) => p.code === 'param-invalid' && p.message.includes('unknown checker seat "constructor"')));
 
   const resInvariants = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: {
       'custom-pattern-inv': {
         promise: 'Custom pattern with prototype property invariant checker.',
@@ -913,7 +914,7 @@ test('reviewed pattern with producer-only declared seats rejects built-in checke
       },
     },
   };
-  const res = checkCatalog({ shipped, effective });
+  const res = checkCatalog({ shipped: shipped.patterns, effective });
   assert.ok(
     res.problems.some(
       (p) => p.code === 'param-invalid' && p.message.includes('target "reviewer" does not exist for loop "reviewed"'),
@@ -932,7 +933,7 @@ test('parameter validation rejects inherited object properties as loop parameter
       invariants: JSON.parse('{"hasOwnProperty":{"fixed":1},"__proto__":{"fixed":1}}'),
     },
   };
-  const res = checkCatalog({ shipped, effective });
+  const res = checkCatalog({ shipped: shipped.patterns, effective });
   assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('toString')));
   assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('constructor')));
   assert.ok(res.problems.some((p) => p.code === 'param-unknown' && p.message.includes('valueOf')));
@@ -976,7 +977,7 @@ test('non-string checker names in minCheckers and seats are rejected with param-
       },
     },
   };
-  const resMinCheckers = checkCatalog({ shipped, effective: effectiveMinCheckers });
+  const resMinCheckers = checkCatalog({ shipped: shipped.patterns, effective: effectiveMinCheckers });
   assert.ok(resMinCheckers.problems.length >= 4);
   assert.ok(resMinCheckers.problems.every((p) => p.code === 'param-invalid'));
 
@@ -1005,7 +1006,7 @@ test('non-string checker names in minCheckers and seats are rejected with param-
       },
     },
   };
-  const resSeats = checkCatalog({ shipped, effective: effectiveSeats });
+  const resSeats = checkCatalog({ shipped: shipped.patterns, effective: effectiveSeats });
   assert.ok(resSeats.problems.length >= 3);
   assert.ok(resSeats.problems.every((p) => p.code === 'param-invalid'));
 });
@@ -1026,7 +1027,7 @@ test('reviewed pattern with no declared seats accepts only checkers added by min
       },
     },
   };
-  const resNoMin = checkCatalog({ shipped, effective: effectiveNoMin });
+  const resNoMin = checkCatalog({ shipped: shipped.patterns, effective: effectiveNoMin });
   assert.ok(resNoMin.problems.some((p) => p.code === 'param-invalid' && p.message.includes('target "red-team" does not exist for loop "reviewed"')));
 
   const effectiveWithDefaults = {
@@ -1043,7 +1044,7 @@ test('reviewed pattern with no declared seats accepts only checkers added by min
       },
     },
   };
-  const resWithDefaults = checkCatalog({ shipped, effective: effectiveWithDefaults });
+  const resWithDefaults = checkCatalog({ shipped: shipped.patterns, effective: effectiveWithDefaults });
   assert.deepEqual(resWithDefaults.problems, []);
 
   const effectiveRejectsTester = {
@@ -1058,7 +1059,7 @@ test('reviewed pattern with no declared seats accepts only checkers added by min
       },
     },
   };
-  const resRejectsTester = checkCatalog({ shipped, effective: effectiveRejectsTester });
+  const resRejectsTester = checkCatalog({ shipped: shipped.patterns, effective: effectiveRejectsTester });
   assert.ok(resRejectsTester.problems.some((p) => p.code === 'param-invalid' && p.message.includes('target "tester" does not exist for loop "reviewed"')));
 
   const effectiveWithInvariants = {
@@ -1079,7 +1080,7 @@ test('reviewed pattern with no declared seats accepts only checkers added by min
       },
     },
   };
-  const resWithInvariants = checkCatalog({ shipped, effective: effectiveWithInvariants });
+  const resWithInvariants = checkCatalog({ shipped: shipped.patterns, effective: effectiveWithInvariants });
   assert.deepEqual(resWithInvariants.problems, []);
 
   const effectiveInvariantsRejectsTester = {
@@ -1098,7 +1099,7 @@ test('reviewed pattern with no declared seats accepts only checkers added by min
       },
     },
   };
-  const resInvariantsRejectsTester = checkCatalog({ shipped, effective: effectiveInvariantsRejectsTester });
+  const resInvariantsRejectsTester = checkCatalog({ shipped: shipped.patterns, effective: effectiveInvariantsRejectsTester });
   assert.ok(resInvariantsRejectsTester.problems.some((p) => p.code === 'param-invalid' && p.message.includes('target "tester" does not exist for loop "reviewed"')));
 });
 
@@ -1112,7 +1113,7 @@ test('cloned and merged entries preserve only own properties and ignore inherite
   custom.defaults = Object.create({ inheritedNested: 'bad' });
   custom.defaults.seats = [{ seat: 'solo-prod', role: 'producer' }];
 
-  const res = checkCatalog({ shipped, effective: { 'proto-pattern': custom } });
+  const res = checkCatalog({ shipped: shipped.patterns, effective: { 'proto-pattern': custom } });
   assert.deepEqual(res.problems, []);
 
   const entry = res.entries['proto-pattern'];
@@ -1125,19 +1126,19 @@ test('cloned and merged entries preserve only own properties and ignore inherite
   shippedOverride.defaults = Object.create({ inheritedTuning: 123 });
   shippedOverride.defaults.maxRounds = 3;
 
-  const resOverride = checkCatalog({ shipped, effective: { 'code-change': shippedOverride } });
+  const resOverride = checkCatalog({ shipped: shipped.patterns, effective: { 'code-change': shippedOverride } });
   assert.deepEqual(resOverride.problems, []);
   assert.strictEqual(resOverride.entries['code-change'].defaults.inheritedTuning, undefined);
   assert.strictEqual(resOverride.entries['code-change'].strayKey, undefined);
 
-  const ctorRes = checkCatalog({ shipped: { patterns: {} }, effective: JSON.parse('{"constructor":{"loop":"reviewed","promise":"custom","defaults":{"maxRounds":2}}}') });
+  const ctorRes = checkCatalog({ shipped: {}, effective: JSON.parse('{"constructor":{"loop":"reviewed","promise":"custom","defaults":{"maxRounds":2}}}') });
   assert.strictEqual(ctorRes.entries.constructor !== Object, true);
 
   const inheritedRetired = Object.assign(Object.create({ maxRounds: 2 }), {
     loop: 'solo',
     promise: 'Custom',
   });
-  const resInherited = checkCatalog({ shipped: { patterns: {} }, effective: { custom: inheritedRetired } });
+  const resInherited = checkCatalog({ shipped: {}, effective: { custom: inheritedRetired } });
   assert.deepEqual(resInherited.problems, []);
 });
 
@@ -1193,11 +1194,11 @@ test('debate pattern with malformed seat ids and roleTasks refuses with param-in
       },
     };
 
-    const res = checkCatalog({ shipped, effective, throwOnError: false });
+    const res = checkCatalog({ shipped: shipped.patterns, effective, throwOnError: false });
     assert.ok(res.problems.some((p) => p.code === 'param-invalid'));
 
     assert.throws(
-      () => checkCatalog({ shipped, effective, throwOnError: true }),
+      () => checkCatalog({ shipped: shipped.patterns, effective, throwOnError: true }),
       (err) => err.name === 'CollaborationError' && err.code === 'param-invalid',
     );
   }

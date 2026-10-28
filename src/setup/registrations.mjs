@@ -87,7 +87,7 @@ import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPat
 import { shippedCatalog, catalogLayersOf } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
-import { RETIRED_CONFIG_KEYS } from '../runner/dispatch/retired-config-keys.mjs';
+import { RETIRED_CONFIG_KEYS, detectRetiredPatternKeys } from '../runner/execution/patterns/retired-keys.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
@@ -523,10 +523,13 @@ export function checkRunnerPatternsConfig(cwd) {
         continue;
       }
 
-      if (f.path && RETIRED_CONFIG_KEYS[f.path]) {
-        const repl = RETIRED_CONFIG_KEYS[f.path].replacement;
-        const msg = `${display}: ${f.path} was retired; ${repl ? `use ${repl} instead.` : 'delete the key.'}`;
-        if (!problems.includes(msg)) problems.push(msg);
+      if (f.path) {
+        const detected = detectRetiredPatternKeys(f.path);
+        for (const item of detected) {
+          const repl = item.replacement;
+          const msg = `${display}: ${item.key} was retired; ${repl ? `use ${repl} instead.` : 'delete the key.'}`;
+          if (!problems.includes(msg)) problems.push(msg);
+        }
       }
     }
   } catch (err) {
@@ -549,10 +552,13 @@ export function checkRunnerPatternsConfig(cwd) {
           if (!problems.includes(msg)) problems.push(msg);
           continue;
         }
-        if (r.path && RETIRED_CONFIG_KEYS[r.path]) {
-          const repl = RETIRED_CONFIG_KEYS[r.path].replacement;
-          const msg = `${display}: ${r.path} was retired; ${repl ? `use ${repl} instead.` : 'delete the key.'}`;
-          if (!problems.includes(msg)) problems.push(msg);
+        if (r.path) {
+          const detected = detectRetiredPatternKeys(r.path);
+          for (const item of detected) {
+            const repl = item.replacement;
+            const msg = `${display}: ${item.key} was retired; ${repl ? `use ${repl} instead.` : 'delete the key.'}`;
+            if (!problems.includes(msg)) problems.push(msg);
+          }
         }
       }
     }
@@ -600,7 +606,7 @@ export function checkRunnerPatternsConfig(cwd) {
   const shipped = shippedCatalog();
   const layers = catalogLayersOf(cwd);
   const { entries, problems: catalogProblems } = checkCatalog({
-    shipped,
+    shipped: shipped.patterns,
     effective: effectivePatterns,
     layers,
   });
@@ -612,7 +618,7 @@ export function checkRunnerPatternsConfig(cwd) {
   const info = [];
   const hints = [];
 
-  // M6: Warn if project defines runner.loops.* but marker runner.patterns.seatBinding.schema is below 2 or absent
+  // Warn if project defines runner.loops.* but marker runner.patterns.seatBinding.schema is below 2 or absent
   const hasProjectLoops = (cfg?.origins ?? []).some((o) => o.layer === 'project' && o.path.startsWith('runner.loops'));
   if (hasProjectLoops) {
     const markerOrigin = (cfg?.origins ?? []).find((o) => o.path === 'runner.patterns.seatBinding.schema' && o.layer === 'project');

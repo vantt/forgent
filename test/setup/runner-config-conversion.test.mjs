@@ -422,7 +422,7 @@ test('setup CLI prints global guidance when both project and global files hold r
     writeGlobalConfig(homeDir, {
       runner: {
         patterns: {
-          defaultRule: { mutatingMinRigor: 'standard' },
+          reviewed: { maxRounds: 3 },
         },
       },
     });
@@ -438,7 +438,12 @@ test('setup CLI prints global guidance when both project and global files hold r
     assert.ok(parsed.data?.globalRetiredNotice, 'json data must include globalRetiredNotice');
     assert.match(parsed.data.globalRetiredNotice.message, /global config holds retired keys/);
     assert.match(parsed.data.globalRetiredNotice.command, /from a directory outside any fgOS project/);
+    assert.equal(parsed.data.globalRetiredNotice.warning, 'Copy the existing values to their replacement keys before removing the old keys.');
     assert.ok(Array.isArray(parsed.data.globalRetiredNotice.patch));
+    assert.deepEqual(parsed.data.globalRetiredNotice.patch, [
+      { set: 'runner.loops.reviewed.maxRounds', value: '<value>' },
+      { unset: 'runner.patterns.reviewed.maxRounds' },
+    ]);
     assert.equal(parsed.data?.runnerPatternsConversion?.status, 'blocked');
 
     const humanResult = spawnSync(process.execPath, [fgosBin, 'setup', '--dir', projectDir], {
@@ -447,10 +452,106 @@ test('setup CLI prints global guidance when both project and global files hold r
     });
     assert.equal(humanResult.status, 0, humanResult.stderr);
     assert.match(humanResult.stdout, /from a directory outside any fgOS project/);
+    assert.match(humanResult.stdout, /Copy the existing values to their replacement keys before removing the old keys\./);
     assert.match(humanResult.stdout, /patch body/);
-    assert.match(humanResult.stdout, /runner\.patterns\.defaultRule/);
+    assert.match(humanResult.stdout, /runner\.patterns\.reviewed\.maxRounds/);
   } finally {
     process.env.HOME = prevHome;
+    cleanupDirs({ projectDir, homeDir });
+  }
+});
+
+test('global config inspection detects all four retired key families with explicit projectRoot and globalDir wiring', () => {
+  const { projectDir, homeDir } = makeTempDirs();
+  const globalDir = path.join(homeDir, '.fgos');
+  try {
+    writeProjectConfig(projectDir, { runner: { timeoutMs: 1000 } });
+
+    // 1. defaultRule
+    writeGlobalConfig(homeDir, {
+      runner: {
+        patterns: {
+          defaultRule: { mutatingMinRigor: 'standard' },
+        },
+      },
+    });
+    const defaultNotice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir });
+    assert.ok(defaultNotice);
+    assert.deepEqual(defaultNotice.patch, [{ unset: 'runner.patterns.defaultRule' }]);
+    assert.equal(defaultNotice.warning, undefined, 'defaultRule alone needs only an unset without template warning');
+
+    // 2. reviewed.maxRounds with child-only unset preserving catalog fields
+    writeGlobalConfig(homeDir, {
+      runner: {
+        patterns: {
+          reviewed: {
+            loop: 'reviewed',
+            maxRounds: 4,
+          },
+        },
+      },
+    });
+    const maxRoundsNotice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir });
+    assert.ok(maxRoundsNotice);
+    assert.ok(maxRoundsNotice.patch.some((p) => p.unset === 'runner.patterns.reviewed.maxRounds'));
+    assert.ok(!maxRoundsNotice.patch.some((p) => p.unset === 'runner.patterns.reviewed'), 'must unset only child path so catalog fields survive');
+    assert.equal(maxRoundsNotice.warning, 'Copy the existing values to their replacement keys before removing the old keys.');
+
+    // 3. reviewed.checkersByRigor
+    writeGlobalConfig(homeDir, {
+      runner: {
+        patterns: {
+          reviewed: {
+            checkersByRigor: { standard: ['reviewer'] },
+          },
+        },
+      },
+    });
+    const checkersNotice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir });
+    assert.ok(checkersNotice);
+    assert.ok(checkersNotice.patch.some((p) => p.unset === 'runner.patterns.reviewed.checkersByRigor'));
+    assert.equal(checkersNotice.warning, 'Copy the existing values to their replacement keys before removing the old keys.');
+
+    // 4. Fully documented gated pattern: schema-valid snapshot preserves values
+    writeGlobalConfig(homeDir, {
+      runner: {
+        patterns: {
+          'research-fan-out-gated': {
+            loop: 'panel',
+            promise: 'Fully documented gated pattern for research fan out.',
+          },
+        },
+      },
+    });
+    const gatedNotice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir });
+    assert.ok(gatedNotice);
+    const setOp = gatedNotice.patch.find((p) => p.set === 'runner.patterns.research-fan-out');
+    assert.ok(setOp);
+    assert.deepEqual({ ...setOp.value }, {
+      loop: 'panel',
+      promise: 'Fully documented gated pattern for research fan out.',
+    });
+    assert.ok(gatedNotice.patch.some((p) => p.unset === 'runner.patterns.research-fan-out-gated'));
+
+    // 5. Gated pattern collision requires reconciliation
+    writeGlobalConfig(homeDir, {
+      runner: {
+        patterns: {
+          'research-fan-out-gated': {
+            loop: 'panel',
+            promise: 'Old gated representation',
+          },
+          'research-fan-out': {
+            loop: 'panel',
+            promise: 'Modern representation',
+          },
+        },
+      },
+    });
+    const collisionNotice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir });
+    assert.ok(collisionNotice);
+    assert.ok(collisionNotice.edits.some((e) => e.includes('reconcile duplicate pattern entries manually')));
+  } finally {
     cleanupDirs({ projectDir, homeDir });
   }
 });
