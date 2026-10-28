@@ -220,3 +220,15 @@ Status: DONE_WITH_CONCERNS
 Summary: Q1, Q2, Q6 and Q7 pass; append p95 is 62 ms on a quiet machine and about 210 ms under heavy load, the hook spawns a detached child in 0.2 ms, and the Rust door belongs in `packages/process/rust` next to `spawn_with_fds`. The migrated-clone append cost, the real-head hook path and the `sync.json` due check were not measured.
 Concerns/Blockers: (1) the 200 ms p95 only holds on a non-saturated machine, and one confirming run on a `fgos setup`-installed, migrated clone is still needed; (2) the plan's `RemoteMail` name and method set differ from the spec 15.2 ports `MailStore` and `Replication`; (3) hook spawn storms inside the child's startup window are tolerable but should be decided.
 Scope flags: none (no --yagni).
+
+## Q4 addendum: Git latency between machines (lead:MAIL, 2026-10-28 14:05 +07)
+
+Verdict: partial, read-only. The transport costs about 0.8 s; the end-to-end figure is set by the sync interval, and a real probe event was not written.
+
+- Command: `git fetch origin '+refs/fgos/events/*:refs/fgos/remote-events/*'`, five runs on each machine, `/usr/bin/time`.
+  - fg-server2 (commit `417d8abc7`+): 0.76 to 1.10 s, median 0.83 s.
+  - fg-server (HEAD `6cdf1fa85`, over Tailscale SSH): 0.76 to 0.89 s, median 0.81 s.
+- Clock skew measured over SSH: fg-server runs about 0.77 s ahead of fg-server2; any cross-machine timestamp comparison carries that error.
+- The origin serves three event refs (design-lap, fg-server, fg-server2). Their newest seals are 2026-10-25, so no recent traffic exists to derive a seal-to-visible gap from.
+- Consequence for the plan: delivery latency is the sender's seal+push delay plus the receiver's fetch interval (default `eventStore.sync.intervalSec` 300 s) plus about 1 s of transfer. With both sides on the default, the worst case is about two intervals, around 10 minutes, well below the measured receiver-idle wait (p50 about 15 min, p95 about 12 h).
+- Not done: a probe event written on one machine and read on the other. It would add a signed event to the shared project stream. Phase 05 does it against the new `project:mailbox` stream instead.
