@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "584b964e935e43c99d2df4bb2be139f2929aefc1d67c556b2963d919926a0db3",
+  "payloadDigest": "f639191dc5a0556b7532307b6baf7a507c80d4d4f5f4b5d5f147778b3178ca73",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -614,7 +614,7 @@
     "packages/process/rust/src/control.rs": "37359bbc02a2091492ef67eff85b7977619d555ed96ee0134b0edc25c70f099d",
     "packages/process/rust/src/facts.rs": "dc1f0f15a618fff2cc977c13a0c4331f3c55929b61d01419170f71e7d2e600a1",
     "packages/process/rust/src/lib.rs": "ad71de601877e524e4cf019681689f9359a327478acb41a75633319466fba2ef",
-    "packages/process/rust/src/mapped.rs": "070537cbcceea0cc38d10dbd8f662fe361fe22c2904c29e83d2ef6e9b700e71a",
+    "packages/process/rust/src/mapped.rs": "c04666d62699b60f891ef375474b202dc062fbfcc09ae62a4c151dd3bb4f2f46",
     "packages/process/rust/src/platform/linux.rs": "2e62635102eb4efa811ff085613910ecc27d4fcc19f9f361a9479cc036705fcc",
     "packages/process/rust/src/platform/macos.rs": "7c2e2d66b709aaff94e308c6e5aef05a55e170d6ffff9c48d4dffa611ba66f03",
     "packages/process/rust/src/platform/mod.rs": "420415be2f774665a1d61a655d2a0f130d2c6b2ab3f5536563137da82448918a",
@@ -635,7 +635,7 @@
     "packages/process/rust/tests/judge_vectors.rs": "b1633fd4092114d469cba250fbbb8f01724cc5e3a66d85e046b373ed259ef401",
     "packages/process/rust/tests/signal_identity.rs": "7048cb36bffbf0fe9700e4d27460416b908f8169b57843c6c79d69920cfa9c4e",
     "packages/process/rust/tests/spawn_fds_leak.rs": "c6fefe723951b53ad2704a174b6c430a74fabbaf6ba13f7e00ce8aab9dea585f",
-    "packages/process/rust/tests/spawn_mapped.rs": "3cdd6810e8a68ffaffa611a03b6d405bb8856ff69d5250c6f5bcaffea3d39104",
+    "packages/process/rust/tests/spawn_mapped.rs": "9607a3033bcb01c46a77cc948d38d85e098e44bb5df0574d3f2c55a3b748d75a",
     "packages/process/rust/tests/windows_job_domain.rs": "ef43f9d374fb9254ea75dca253c0bd82c8eb3fee5e676d1d14d14da1657b54ba",
     "packages/process/rust/tests/windows_spawn.rs": "5c8eb632a466203a847a2f6f5a57b401ebda7906509bfc62aece0124fee77e54",
     "packages/run-result/rust/src/lib.rs": "c1e91e32b70635407348994f24dafdce723d4cd5803a436c1a9577ad9982af35",
@@ -2095,7 +2095,7 @@
     {
       "path": "packages/distribution/rust/src/init.rs",
       "line": 1115,
-      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
       "binary": "git",
       "class": "production-sandbox-probe",
       "function": "run",
@@ -2279,7 +2279,7 @@
     {
       "path": "packages/git/rust/src/driver.rs",
       "line": 1218,
-      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
       "binary": "? path.to_str() .map(str::to_owned) .ok_or_else(|| failure(\"non-utf8-authority-pat",
       "class": "git-driver"
     },
@@ -2563,7 +2563,7 @@
     {
       "path": "packages/holder-lock/rust/src/route.rs",
       "line": 314,
-      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
       "binary": "git",
       "class": "production-sandbox-probe",
       "function": "run",
@@ -2572,7 +2572,7 @@
     {
       "path": "packages/holder-lock/rust/src/route/hold.rs",
       "line": 193,
-      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
       "binary": "(parsed configuration (request .get(\"argv\") .and_then(Value::as_array) .ok_or(\"argv))",
       "class": "configured-binary"
     },
@@ -2775,7 +2775,14 @@
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
-      "line": 179,
+      "line": 183,
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
+      "binary": "(uncalled spawn_detached)",
+      "class": "uncalled-wrapper"
+    },
+    {
+      "path": "packages/process/rust/src/mapped.rs",
+      "line": 209,
       "spawn": "Command::new",
       "binary": "/bin/bwrap",
       "class": "argv-runner",
@@ -2783,7 +2790,7 @@
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
-      "line": 179,
+      "line": 209,
       "spawn": "Command::new",
       "binary": "/usr/bin/bwrap",
       "class": "argv-runner",
@@ -2791,7 +2798,7 @@
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
-      "line": 179,
+      "line": 209,
       "spawn": "Command::new",
       "binary": "/usr/local/bin/bwrap",
       "class": "argv-runner",
@@ -2828,28 +2835,28 @@
     {
       "path": "packages/run-supervisor/rust/src/supervise.rs",
       "line": 416,
-      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
       "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().and_then(|))",
       "class": "configured-binary"
     },
     {
       "path": "packages/run-supervisor/rust/src/supervise/unix.rs",
       "line": 183,
-      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
       "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().map(|items))",
       "class": "configured-binary"
     },
     {
       "path": "packages/run-supervisor/rust/src/supervise/unix.rs",
       "line": 183,
-      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
       "binary": "(parsed configuration (envelope[\"hostBin\"].as_str().ok_or(\"hostBin missing\")))",
       "class": "configured-binary"
     },
     {
       "path": "packages/run-supervisor/rust/src/supervise/windows.rs",
       "line": 225,
-      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:179",
+      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
       "binary": "(parsed configuration (envelope[\"hostBin\"].as_str().ok_or(\"hostBin missing\")))",
       "class": "configured-binary"
     },
