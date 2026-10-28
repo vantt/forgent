@@ -35,7 +35,8 @@ import { withProviderFamilies } from '../helpers/provider-families.mjs';
 import { acquireSync, createLockScope, probe } from '../../src/holder-lock/index.mjs';
 import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
-import { prepareWorkflowRun, assertUnitAcceptOutcomes } from '../../src/workflow/case-start.mjs';
+import { prepareWorkflowRun, assertUnitAcceptOutcomes, resolveStart } from '../../src/workflow/case-start.mjs';
+import { nativeDoor } from '../../src/native/door.mjs';
 
 // Worktrees created in the default location outlive the test unless removed here.
 const worktreeDirs = [];
@@ -1677,6 +1678,14 @@ test('workflow start enforces acceptOutcomes requires reviewed loop at execution
 test('prepareWorkflowRun reuses runner config from resolveStart', (t) => {
   const tmp = setupTestRepo();
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+
+  let snapshotCalls = 0;
+  const originalSnapshot = nativeDoor().config.snapshot;
+  t.mock.method(nativeDoor().config, 'snapshot', (req) => {
+    snapshotCalls++;
+    return originalSnapshot(req);
+  });
+
   const workflow = {
     id: 'wf-config-reuse',
     steps: [{
@@ -1684,8 +1693,22 @@ test('prepareWorkflowRun reuses runner config from resolveStart', (t) => {
       units: [{ id: 'u1', template: { capability: 'docs:write' } }],
     }],
   };
-  const prepared = prepareWorkflowRun({ workflow, repoRoot: tmp, cwd: tmp });
+
+  const resolved = resolveStart({ workflow, repoRoot: tmp, cwd: tmp });
+  assert.ok(resolved.runnerConfig, 'resolveStart returns the loaded runnerConfig');
+  assert.equal(snapshotCalls, 1, 'resolveStart loads runner config from disk once');
+
+  // prepareWorkflowRun reusing the resolved config does not load config again
+  const prepared = prepareWorkflowRun({ workflow, repoRoot: tmp, cwd: tmp, runnerConfig: resolved.runnerConfig });
   assert.ok(prepared.workflowRunId);
+  assert.equal(prepared.runnerConfig, resolved.runnerConfig, 'prepareWorkflowRun preserves the resolved config instance');
+  assert.equal(snapshotCalls, 1, 'prepareWorkflowRun did not load config again from disk');
+
+  // prepareWorkflowRun without pre-resolved runnerConfig loads config exactly once inside resolveStart
+  snapshotCalls = 0;
+  const preparedFresh = prepareWorkflowRun({ workflow, repoRoot: tmp, cwd: tmp });
+  assert.ok(preparedFresh.workflowRunId);
+  assert.equal(snapshotCalls, 1, 'prepareWorkflowRun loaded config exactly once');
 });
 
 test('workflow root context refs persist and reach only root Units across resume', async (t) => {

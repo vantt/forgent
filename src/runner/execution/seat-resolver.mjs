@@ -135,14 +135,14 @@ export function checkerPlanOf(unit, runnerConfig, options = {}) {
 
   // 1. Rigor floor: checkersByRigor read from runnerConfig.loops.reviewed (fallback options.shippedCheckersByRigor)
   const rigor = effectiveRigorOf(unit, runnerConfig, { fallback: 'standard' });
-  const configuredCheckers = runnerConfig?.loops?.reviewed?.checkersByRigor;
+  const configuredCheckers = runnerConfig?.loops?.reviewed?.checkersByRigor ?? runnerConfig?.runner?.loops?.reviewed?.checkersByRigor;
   const shippedCheckers = options.shippedCheckersByRigor;
   const configuredRow = configuredCheckers && Object.hasOwn(configuredCheckers, rigor)
     ? configuredCheckers[rigor]
-    : (rigor === 'low' && configuredCheckers && Object.hasOwn(configuredCheckers, 'standard') ? configuredCheckers.standard : undefined);
+    : undefined;
   const shippedRow = shippedCheckers && Object.hasOwn(shippedCheckers, rigor)
     ? shippedCheckers[rigor]
-    : (rigor === 'low' && shippedCheckers && Object.hasOwn(shippedCheckers, 'standard') ? shippedCheckers.standard : undefined);
+    : undefined;
   const fromRigor = configuredRow ?? shippedRow;
   if (!fromRigor) {
     throw new SeatResolutionError(

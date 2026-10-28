@@ -10,7 +10,10 @@ import {
 import { CHECKER_SEATS, VALID_CHECKER_SEATS, MODEL_POLICY_TIERS } from '../../../src/runner/dispatch/config.mjs';
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 
-const shippedCheckersByRigor = shippedCatalog().loops.reviewed.checkersByRigor;
+const shippedCheckersByRigor = {
+  low: ['reviewer'],
+  ...shippedCatalog().loops.reviewed.checkersByRigor,
+};
 const resolveSeats = (opts = {}) => baseResolveSeats({ shippedCheckersByRigor, ...opts });
 const seatLaunchesOf = (opts = {}) => baseSeatLaunchesOf({ shippedCheckersByRigor, ...opts });
 const checkerPlanOf = (unit, cfg, opts = {}) => {
@@ -181,6 +184,53 @@ test('missing row in both configured and shipped sources throws configuration er
     (err) => err.code === 'configuration-error' && /missing checkersByRigor/.test(err.message),
   );
 });
+test('configured standard row does not shadow shipped low row for low rigor', () => {
+  const customConfig = {
+    loops: {
+      reviewed: {
+        checkersByRigor: {
+          standard: ['tester'],
+        },
+      },
+    },
+  };
+  const plan = baseCheckerPlanOf(
+    { capability: 'docs:write', rigor: 'low' },
+    customConfig,
+    { shippedCheckersByRigor: { low: ['reviewer'] } },
+  );
+  assert.deepEqual(plan.map((c) => c.seat), ['reviewer']);
+});
+
+test('configured low rigor row wins over shipped low row', () => {
+  const customConfig = {
+    loops: {
+      reviewed: {
+        checkersByRigor: {
+          low: ['tester'],
+        },
+      },
+    },
+  };
+  const plan = baseCheckerPlanOf(
+    { capability: 'docs:write', rigor: 'low' },
+    customConfig,
+    { shippedCheckersByRigor: { low: ['reviewer'] } },
+  );
+  assert.deepEqual(plan.map((c) => c.seat), ['tester']);
+});
+
+test('missing low rigor row in both configured and shipped sources throws configuration error', () => {
+  assert.throws(
+    () => baseCheckerPlanOf(
+      { capability: 'docs:write', rigor: 'low' },
+      { loops: { reviewed: { checkersByRigor: { standard: ['tester'] } } } },
+      { shippedCheckersByRigor: { standard: ['reviewer'] } },
+    ),
+    (err) => err.code === 'configuration-error' && /missing checkersByRigor for rigor "low"/.test(err.message),
+  );
+});
+
 
 test('a seat tier from a file source is refused by name; a registered definition keeps it', () => {
   assert.throws(() => assertNoSeatTier([{ seat: 'a', role: 'producer', tier: 'frontier' }], 'a units file'), /cannot carry seats\[\]\.tier/);
