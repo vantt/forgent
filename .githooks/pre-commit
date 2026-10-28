@@ -27,7 +27,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { resolveActiveHostBin, routeEnv } from '../src/util/host-bin-path.mjs';
-import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV } from '../src/holder-lock/index.mjs';
+import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV, LOCK_JOB_ENV } from '../src/holder-lock/index.mjs';
 import { runLockRouteSync, lockTransport, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
 
@@ -129,8 +129,9 @@ function identityData(bin, args, cwd) {
 // runs, and a land takes the mutex before git's index.lock, so waiting here
 // could deadlock with it; this is an early check, not exclusion).
 //   - 'borrower': fgOS's own commit. git inherited the holder's description
-//     at slot 3 (FGOS_LOCK_FD names it) and the host confirms it is the very
-//     description holding the lock. A sibling that merely shares the env but
+//     at slot 3 (FGOS_LOCK_FD names it; on Windows FGOS_LOCK_JOB names the
+//     holder's job) and the host confirms it is the very description (job
+//     member) holding the lock. A sibling that merely shares the env but
 //     opened the lock file itself is not a borrower. Asked before the probe:
 //     a borrowed commit runs while the holder holds the lock, so the probe
 //     alone would refuse it.
@@ -146,7 +147,7 @@ function identityData(bin, args, cwd) {
 // refuses (fail-closed).
 function mainLockVerdict(fgosDir, bin) {
   const lockPath = resolveLock('main-checkout', { fgosDir }).v3Path;
-  if (process.env[LOCK_FD_ENV]) {
+  if (process.env[LOCK_FD_ENV] || process.env[LOCK_JOB_ENV]) {
     try {
       if (checkBorrowedDescription(lockPath, { fgosDir }).result === 'borrower') return { kind: 'borrower' };
     } catch {
