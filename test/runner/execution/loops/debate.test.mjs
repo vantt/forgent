@@ -13,7 +13,7 @@ const seats = [
 ];
 const unit = { id: 'u-debate', objective: 'Should the cache be write-through?', seats };
 const resolved = (params) => resolveSeats({ loop: 'debate', params, unit, runnerConfig: {} });
-const historyOutcome = (params, history) => patternHistoryOutcome({ patternName: 'debate', params, unit, cfg: {}, seats: resolved(params), history });
+const historyOutcome = (params, history) => patternHistoryOutcome({ loop: 'debate', params, unit, cfg: {}, seats: resolved(params), history });
 
 function recorder(overrides = {}) {
   const calls = [];

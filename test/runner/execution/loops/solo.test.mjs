@@ -209,7 +209,7 @@ test('a producer result with no durable verify yields an incomplete history, not
   const history = [{ seat: 'producer', round: 1, outcome: 'pass' }];
 
   const historyOutcome = patternHistoryOutcome({
-    patternName: 'solo',
+    loop: 'solo',
     unit,
     cfg,
     seats,

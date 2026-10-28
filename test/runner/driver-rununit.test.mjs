@@ -437,7 +437,7 @@ test('a declared operation refuses a non-solo pattern in object form, and no oth
   writePlan(repo);
   const ops = operationsForStep(getDomain('coding'), 'planning');
   const before = fs.existsSync(path.join(repo, '.fgos', 'assignments')) ? fs.readdirSync(path.join(repo, '.fgos', 'assignments')) : [];
-  for (const pattern of [{ pattern: 'reviewed' }, { patternName: 'panel', params: { seats: [{ seat: 'member-1', role: 'producer' }, { seat: 'synthesizer', role: 'synthesizer' }] } }, { pattern: 'code-change' }]) {
+  for (const pattern of [{ pattern: 'reviewed' }, { pattern: 'panel', params: { seats: [{ seat: 'member-1', role: 'producer' }, { seat: 'synthesizer', role: 'synthesizer' }] } }, { pattern: 'code-change' }]) {
     await assert.rejects(
       runUnit({
         unitData: { id: 'u', objective: 'x', capability: 'review', writes: [] },
