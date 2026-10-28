@@ -93,7 +93,10 @@ export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConf
   }
   const notes = info.length > 0 ? `; info (${info.length}): ${listed(info)}` : '';
   if (problems.length > 0) {
-    return withUnreadableDefinitions({ passed: false, message: `${problems.length} seat(s) are refused by policy: ${problems.join(' | ')}${notes}` }, loaded.unreadable);
+    const summary = problems.every((p) => p.includes('refused for'))
+      ? `${problems.length} seat(s) are refused by policy`
+      : `${problems.length} problem(s) found`;
+    return withUnreadableDefinitions({ passed: false, message: `${summary}: ${problems.join(' | ')}${notes}` }, loaded.unreadable);
   }
   return withUnreadableDefinitions({ passed: true, message: units === 0 ? 'no Workflow unit to bind' : `${bound} seat(s) of ${units} Workflow unit(s) bind${notes}` }, loaded.unreadable);
 }

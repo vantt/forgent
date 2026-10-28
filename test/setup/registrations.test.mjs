@@ -14,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, registerCheck, registerFix, runFixes } from '../../src/setup/checks.mjs';
 import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../../src/setup/registrations.mjs';
-import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 
 
 // tsk-4xg: runFixes() below invokes every registered fix, including the
@@ -819,6 +819,46 @@ test('doctor check runner-patterns-config: a retired key in the project file fai
   assert.match(res.message, new RegExp(path.join(tmpDir, '.fgos', 'config.yaml').replace(/[/\\?*]/g, '\\$&')));
   assert.match(res.message, /runner\.loops\.reviewed/);
   fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+test('doctor check runner-patterns-config: legacy json project file gives honest migrate-first instruction', () => {
+  const tmpDir = mkTempDir();
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+  writeRawLegacyProjectConfig(tmpDir, JSON.stringify({
+    runner: {
+      patterns: {
+        reviewed: { maxRounds: 3 },
+      },
+    },
+  }));
+  const res = check.check(tmpDir);
+  assert.equal(res.passed, false);
+  assert.match(res.message, new RegExp(path.join(tmpDir, '.fgos', 'config.json').replace(/[/\\?*]/g, '\\$&')));
+  assert.match(res.message, /legacy JSON configuration format must be migrated first; migrate the file format first/);
+  assert.doesNotMatch(res.message, /config\.yaml/);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('doctor check runner-patterns-config: valid reviewed pattern override passes', () => {
+  const tmpDir = mkTempDir();
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+  writeProjectConfig(tmpDir, {
+    runner: {
+      patterns: {
+        reviewed: {
+          defaults: { maxRounds: 3 },
+        },
+      },
+    },
+  });
+  const res = check.check(tmpDir);
+  assert.equal(res.passed, true);
+  assert.match(res.message, /valid/);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('doctor check runner-patterns-config: registers no automatic fix', () => {
+  const fix = FIX_REGISTRATIONS.find((f) => f.id === 'runner-patterns-config');
+  assert.equal(fix, undefined, 'runner-patterns-config doctor row must register no automatic fix');
 });
 
 test('doctor check runner-patterns-config: a retired key in the global file fails naming the global path', () => {
