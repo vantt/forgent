@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "078ac6b1b6b4e509957530cea3eed0c292298d0981cd2c3451dc0edd63c54dd7",
+  "payloadDigest": "584b964e935e43c99d2df4bb2be139f2929aefc1d67c556b2963d919926a0db3",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -867,7 +867,7 @@
     "scripts/run-tests.mjs": "ef79b8344e01d0856cab3c80508b449a3458c275c45c2bb763632ab71f8d3858",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
-    "scripts/test-proof-inventory.mjs": "b1df922d19a85f4462ece027b949d6a3dad2e3a8f2e5b993ea673e50e9119245",
+    "scripts/test-proof-inventory.mjs": "604568042910988a4745bc51413dc1613ecf3280d0b81fac3de5bc8b0d9b5d26",
     "scripts/test-select-compare.mjs": "45ec5c8f1b192430431127a06133376cd5e5d2a50f8e6865472c1ae341ae1329",
     "scripts/test-select-coverage-map.mjs": "b313d02cce6c8fa7f03dae8acdfd14a37b8f3a04b330ae9b2c144d0287b08e85",
     "scripts/test-select-mutate.mjs": "77d8bc7ae624453d5c50d6f83d3136ef41803f69452cef41c8fd14587cd4df39",

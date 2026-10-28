@@ -252,9 +252,14 @@ export function inventoryProfiledFiles(topFiles, { repoRoot = REPO_ROOT } = {}) 
 const SPAWN_CALL_RE = /\b(?:spawn|spawnSync|execFile|execFileSync|fork)\(/;
 const CLI_TARGET_RE = /\b(?:FGOS|BIN_FGOS|FGOS_BIN|fgosBin|HOST_BIN|FGOS_HOST_BIN|HOST|FGCTL_BIN)\b|bin\/fgos\.mjs|run-rust-dev-host/;
 
+// `run(cwd, [...])` is the CLI harness's spawn (`test/cli/helpers/fgos-cli-harness.mjs`) and the
+// per-file copies of it; a test reaches the CLI through it far more often than through a bare spawn.
+const HARNESS_RUN_RE = /\brun\(\s*[A-Za-z_$][\w$]*\s*,\s*\[/;
+const FIXTURE_INIT_RE = /\brun\(\s*[A-Za-z_$][\w$]*\s*,\s*\[\s*'init'/;
+
 /** A line that starts the CLI, the Rust host or fgctl as a process: the costliest way a test can prove something. */
 export function isCliSpawn(line) {
-  return SPAWN_CALL_RE.test(line) && CLI_TARGET_RE.test(line);
+  return (SPAWN_CALL_RE.test(line) && CLI_TARGET_RE.test(line)) || HARNESS_RUN_RE.test(line);
 }
 
 const hasBoundaryMarker = (line, prevLine) => /\/\/\s*boundary:/.test(line) || /\/\/\s*boundary:/.test(prevLine ?? '');
@@ -264,14 +269,14 @@ const ADMISSION_RULES = [
     id: 'new-fixture-only-init-without-reason',
     // A brand-new `run(cwd, ['init'])`/`run(cwd, ['init', ...])` call with
     // no adjacent `// boundary:` marker comment on the same or previous line.
-    test: (line, prevLine) => /\brun\(\s*[A-Za-z_$][\w$]*\s*,\s*\[\s*'init'/.test(line) && !hasBoundaryMarker(line, prevLine),
+    test: (line, prevLine) => FIXTURE_INIT_RE.test(line) && !hasBoundaryMarker(line, prevLine),
     message: 'new fgos init call site with no `// boundary:` reason marker',
   },
   {
     id: 'new-cli-spawn-without-reason',
     // Design principle 8: a behaviour's owning proof sits at the lowest layer that observes it. A new
     // CLI/host/fgctl process in a test says on its line, or the one above, why no lower layer can.
-    test: (line, prevLine) => isCliSpawn(line) && !hasBoundaryMarker(line, prevLine),
+    test: (line, prevLine) => isCliSpawn(line) && !FIXTURE_INIT_RE.test(line) && !hasBoundaryMarker(line, prevLine),
     message: 'new CLI/host spawn with no `// boundary:` reason saying why a lower layer cannot prove it',
   },
   {
@@ -490,9 +495,10 @@ export function readSuiteBaseline(baselinePath = SUITE_BASELINE_PATH) {
   return { ...empty, ...JSON.parse(fs.readFileSync(baselinePath, 'utf8')) };
 }
 
-// Rust tests are counted by their attribute, as `cargo test` finds them; build output and archived code are not source.
+// Rust tests are counted by their attribute, as `cargo test` finds them; build output, archived code and
+// vendored crates (`third-party`, excluded from the workspace) are not our source.
 const RUST_TEST_ATTRIBUTE = /^\s*#\[(?:tokio::)?test(?:\(.*\))?\]\s*$/gm;
-const NOT_RUST_SOURCE = new Set(['target', 'node_modules', 'archive']);
+const NOT_RUST_SOURCE = new Set(['target', 'node_modules', 'archive', 'third-party']);
 
 /** The number of Rust tests in the source tree under `cwd`. */
 export function countRustTests(cwd = REPO_ROOT) {

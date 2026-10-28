@@ -2,7 +2,7 @@
   "sha": "c1c5b6973af5c23f48f5a996cbb4fbe8e2f49498",
   "files": 612,
   "tests": 8088,
-  "rustTests": 2288,
+  "rustTests": 2204,
   "wallSeconds": 635,
   "cpuSeconds": 6720,
   "fileCpu": {

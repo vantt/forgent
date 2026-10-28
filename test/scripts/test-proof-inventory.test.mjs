@@ -216,6 +216,7 @@ test('checkAdmission does not flag a marker on the line immediately above the vi
 // Built from parts, so this file's own lines are not spawn sites for the rule they test.
 const SPAWN_SYNC = 'spawnSync';
 const SPAWN = 'spawn';
+const RUN = 'run';
 
 test('checkAdmission flags a new CLI, host or fgctl spawn in a test unless the line or the one above gives a boundary reason', () => {
   const marked = '  // boundary: proves the exit code the shell sees';
@@ -224,9 +225,16 @@ test('checkAdmission flags a new CLI, host or fgctl spawn in a test unless the l
     { file: 'test/cli/x.test.mjs', line: 7, text: `  ${SPAWN_SYNC}(process.execPath, [FGOS, 'list'], { cwd });`, prevText: marked },
     { file: 'test/rust-host/y.test.mjs', line: 9, text: `  ${SPAWN}(FGCTL_BIN, ['init']);`, prevText: null },
     { file: 'test/cli/x.test.mjs', line: 12, text: `  ${SPAWN_SYNC}('git', ['status'], { cwd });`, prevText: null },
+    { file: 'test/cli/x.test.mjs', line: 15, text: `  const r = ${RUN}(cwd, ['edit', 'a', '--title', 'b']);`, prevText: null },
+    { file: 'test/cli/x.test.mjs', line: 18, text: `  ${RUN}(cwd, ['init']);`, prevText: null },
   ];
   const violations = checkAdmission(changed);
-  assert.deepEqual(violations.map((v) => [v.ruleId, v.line]), [['new-cli-spawn-without-reason', 3], ['new-cli-spawn-without-reason', 9]]);
+  assert.deepEqual(violations.map((v) => [v.ruleId, v.line]), [
+    ['new-cli-spawn-without-reason', 3],
+    ['new-cli-spawn-without-reason', 9],
+    ['new-cli-spawn-without-reason', 15],
+    ['new-fixture-only-init-without-reason', 18],
+  ], 'the harness CLI runner is a CLI spawn; an init call is reported once, by its own rule');
 });
 
 test('suiteChange counts test() lines added and removed under test/ and the CLI spawn sites among the added lines', () => {
@@ -335,10 +343,11 @@ test('suiteReport prints the size and cost line against the baseline, warns when
   const baselinePath = path.join(dir, 'test', 'suite-baseline.json');
   write('crates/x/src/lib.rs', '#[test]\nfn a() {}\n#[tokio::test]\nasync fn b() {}\n// #[test] in a comment\n');
   write('target/debug/build/gen.rs', '#[test]\nfn built() {}\n');
+  write('packages/x/third-party/dep-1.0.0/src/lib.rs', '#[test]\nfn vendored() {}\n');
   const run = { wallSeconds: 10.2, cpuSeconds: 30, fileCpu: { 'test/b.test.mjs': 10.04, 'test/a.test.mjs': 20 } };
   const baseline = buildSuiteBaseline({ files, cwd: dir, sha: '0123456789abcdef', run });
   assert.equal(baseline.tests, 3);
-  assert.equal(baseline.rustTests, 2, 'test attributes in source count; build output does not');
+  assert.equal(baseline.rustTests, 2, 'test attributes in source count; build output and vendored crates do not');
   assert.equal(baseline.wallSeconds, 10);
   assert.equal(baseline.cpuSeconds, 30);
   assert.deepEqual(baseline.fileCpu, { 'test/a.test.mjs': 20, 'test/b.test.mjs': 10 });
