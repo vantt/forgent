@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "6cf5d7db0a297b4ce841bc2aeebf8f876caf680aa9ad89d985cebd896e289631",
+  "payloadDigest": "0232992614c5136eee6827bf075fe4cefb0ed3c5a1473af5b13aaeffd69fc09c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1048,9 +1048,9 @@
     "src/runner/execution/loops/solo.mjs": "723a33c888009c58e8bed2cb86e2941f25bd6a67eab397cb5417eb42b181570e",
     "src/runner/execution/loops/verify.mjs": "cd3901a540556757badad15781dd2a9ac86f432bc670891626a8b9bf3767dca7",
     "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",
-    "src/runner/execution/patterns/catalog-entries.mjs": "310b27d2e1456bbd216519fa7cbb82c6d589152b01fc23501e6c7d5f779c40ae",
+    "src/runner/execution/patterns/catalog-entries.mjs": "493baf1f52170f5da7bb66dc89fdc80ed2c248985d7b359ffc9bb52f52290857",
     "src/runner/execution/patterns/catalog.mjs": "3c7b86a9640a339cbcd62583ac3ff11077687a700534ac63f4b692c0d4eed308",
-    "src/runner/execution/patterns/retired-keys.mjs": "3454833b39ecf1b863c077135a35f843403ec29c1fd835f30207d470afe870bd",
+    "src/runner/execution/patterns/retired-keys.mjs": "85bc0ed51db6425f43e8caff0c02a77f816e8053519c4afe33bcfc224f08b731",
     "src/runner/execution/run-request.mjs": "b8ba8003a695f457ab1ebdc22808a994c4f3c4dbfc5d05cd1ab88bd65b823645",
     "src/runner/execution/run.mjs": "d39b9c4c4745df7f0ce3c920c0e318ec9d686cdda15349562326a703491031e1",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",

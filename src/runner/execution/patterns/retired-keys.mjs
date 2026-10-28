@@ -1,7 +1,7 @@
 // Pure leaf module in the domain layer for retired runner config keys.
 // Keys that moved or were retired are tracked here in one authoritative place.
 
-const RETIRED_GATED_NAME = ['research-fan-out', 'gated'].join('-');
+const RETIRED_GATED_NAME = 'research-fan-out-gated';
 
 /**
  * Table of retired configuration keys and their replacements.

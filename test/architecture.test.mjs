@@ -1567,6 +1567,7 @@ test('retired pattern literals appear only in permitted refusal, setup, and deco
     'src/runner/dispatch/retired-config-keys.mjs',
     'src/runner/execution/legacy-seat-read.mjs',
     'src/runner/execution/patterns/catalog-entries.mjs',
+    'src/runner/execution/patterns/retired-keys.mjs',
     'src/setup/runner-config-conversion.mjs',
   ]);
 

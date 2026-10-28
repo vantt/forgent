@@ -419,7 +419,6 @@ export function checkCatalog(options = {}) {
       continue;
     }
 
-
     for (const key of Object.keys(entry)) {
       if (key === 'maxRounds' || key === 'checkersByRigor') continue;
       if (!ALLOWED_PATTERN_ENTRY_KEYS.has(key)) {
