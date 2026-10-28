@@ -103,32 +103,6 @@ pub struct UnitSummaryScan {
 pub type UnitSummaryScanner = fn(&Path, &Window) -> Result<UnitSummaryScan, SourceError>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LegacyFrictionRecord {
-    pub src: String,
-    pub seq: u64,
-    pub ts: String,
-    pub subject_id: String,
-    pub layer: String,
-    pub error_class: String,
-    pub disposition: String,
-    pub detail: String,
-    pub attempts: Option<u32>,
-    pub doc_type: Option<String>,
-    pub producer: Option<String>,
-    pub resolved: bool,
-    pub resolve_reason: Option<String>,
-}
-
-pub trait LegacyFrictionSource: Send + Sync {
-    fn source_id(&self) -> &'static str;
-    fn read_legacy_frictions(
-        &self,
-        root: &Path,
-        since_cursor: Option<(&str, u64)>,
-    ) -> Result<Vec<LegacyFrictionRecord>, SourceError>;
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OutcomeEntryRecord {
     pub id: String,
     pub predicted: Option<serde_json::Value>,

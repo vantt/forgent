@@ -269,7 +269,6 @@ fn main() {
         work_source: wiring::metrics_sources::build_work_observation_source(),
         coverage_scanner: fgos_run_result::scan_coverage,
         unit_summary_scanner: wiring::metrics_sources::build_unit_summary_scanner(),
-        legacy_friction_sources: wiring::friction_sources::build_legacy_friction_sources(),
     });
     for descriptor in [
         fgos_observe::OBSERVE_METRICS_DESCRIPTOR,

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos friction migrate` is gone, with the `observe-friction-migrated` doctor row. The one-release fence that imported the old `work.friction` records into the Observe friction store has run on every machine; records already imported stay readable by `friction list|show|rank`.
 - `fgos run --resume` now binds a seat that did not pass again from the config as it is now, so fixing the environment and resuming keeps a stopped run going; a seat that passed, or whose commit or adopt result is still pending, keeps its recorded binding.
 - A command's due publish of Event Store events no longer holds the command open. The end of a command starts one detached `fgos events sync --opportunistic` child and exits, so a read verb answers and returns without waiting for the network. Events reach the remote at most about the child's runtime later (a few seconds, up to about 120 s on a very slow remote); nothing is lost in that window because events are durable locally first.
 - `fgos doctor` has two fewer Event Store rows. `event-store-git-version` is judged by `git-component-compatible` (the same Git floor verdict), and `event-store-orphan-branches` is part of `event-store-unsealed`, which now also warns per orphan branch stream.

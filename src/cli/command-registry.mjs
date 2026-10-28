@@ -315,11 +315,6 @@ export const COMMAND_REGISTRY = [
         parameters: { type: 'object', properties: {}, required: [] },
         examples: ['fgos friction ping'],
       },
-      migrate: {
-        description: 'Migrate legacy friction records into the friction store.',
-        parameters: { type: 'object', properties: {}, required: [] },
-        examples: ['fgos friction migrate'],
-      },
     },
     examples: ['fgos friction ping', 'fgos friction rank --limit 10'],
     touchesState: false,

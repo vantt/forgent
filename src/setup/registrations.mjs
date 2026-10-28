@@ -111,7 +111,6 @@ import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';
-import { prepareWorkStore } from '../state/work-event-store.mjs';
 import { eventStoreDoctor } from './event-store-checks.mjs';
 import { fixEventStoreLockDirs } from './event-store-fixes.mjs';
 import { foldEvents } from '../state/replay.mjs';
@@ -4930,93 +4929,6 @@ export function checkObserveDirWritable(cwd) {
   }
 }
 
-export function checkObserveFrictionMigrated(cwd) {
-  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
-  // `friction` is a Rust host verb: the Node fgos entry refuses it, so the fix is named
-  // against the host binary when one resolves, and by its install location otherwise.
-  const hostBin = resolveHostBin(cwd);
-  const migrateFix = hostBin
-    ? `run: ${hostBin} friction migrate --dir ${root}`
-    : `run \`fgos friction migrate --dir ${root}\` with the Rust host binary (<project>/.fgos/installation/bin/fgos, or FGOS_HOST_BIN); the Node fgos entry has no friction verb and no host binary resolved here`;
-  const fgosDir = path.join(root, '.fgos');
-  if (!fs.existsSync(fgosDir)) {
-    return { passed: true, message: 'no .fgos directory present' };
-  }
-
-  // 1. Legacy work.friction records: the Event Store reader keeps every legacy record with the file it came from,
-  // so records written by the current store are never mistaken for historical migration candidates.
-  let legacyFrictions;
-  try {
-    legacyFrictions = prepareWorkStore(fgosDir, fgosDir).store.read({ streams: ['project'] }, []).legacy
-      .filter(record => record.event.type === 'work.friction')
-      // The migration cursor names the file relative to .fgos, as the Rust migrator records it.
-      .map(record => ({ src: record.provenance.file.replace(/^\.fgos\//, ''), seq: record.event.seq ?? 0 }));
-  } catch (error) {
-    if (error.code !== 'event-store-no-repository') throw error;
-    legacyFrictions = [];
-  }
-
-  if (legacyFrictions.length === 0) {
-    return { passed: true, message: 'no legacy work.friction records to migrate' };
-  }
-
-  // 2. Scan .fgos/observe/friction/*.jsonl for migration record and migrated (src, seq) pairs
-  const frictionDir = path.join(fgosDir, 'observe', 'friction');
-  if (!fs.existsSync(frictionDir) || !fs.statSync(frictionDir).isDirectory()) {
-    return {
-      passed: false,
-      message: `friction migration not run: .fgos/observe/friction directory missing while legacy work.friction records exist -- ${migrateFix}`,
-    };
-  }
-
-  let hasMigrationRecord = false;
-  const migratedPairs = new Set();
-  try {
-    const entries = fs.readdirSync(frictionDir);
-    for (const entry of entries) {
-      if (entry.endsWith('.jsonl')) {
-        const content = fs.readFileSync(path.join(frictionDir, entry), 'utf8');
-        const lines = content.split('\n');
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed) continue;
-          try {
-            const rec = JSON.parse(trimmed);
-            if (rec.type === 'migration') {
-              hasMigrationRecord = true;
-            }
-            if (rec.legacy && typeof rec.legacy.src === 'string' && typeof rec.legacy.seq === 'number') {
-              migratedPairs.add(`${rec.legacy.src}:${rec.legacy.seq}`);
-            }
-          } catch {}
-        }
-      }
-    }
-  } catch (err) {
-    return { passed: false, message: `failed reading .fgos/observe/friction: ${err.message}` };
-  }
-
-  if (!hasMigrationRecord) {
-    return {
-      passed: false,
-      message: `friction migration not run: no migration record found in .fgos/observe/friction/*.jsonl -- ${migrateFix}`,
-    };
-  }
-
-  const unmigrated = legacyFrictions.filter(({ src, seq }) => !migratedPairs.has(`${src}:${seq}`));
-  if (unmigrated.length > 0) {
-    return {
-      passed: false,
-      message: `${unmigrated.length} legacy work.friction record(s) newer than cursor (not migrated) -- ${migrateFix}`,
-    };
-  }
-
-  return {
-    passed: true,
-    message: `all ${legacyFrictions.length} legacy work.friction record(s) migrated to .fgos/observe/friction`,
-  };
-}
-
 export function checkObserveHostResolvable(cwd) {
   const hostBin = resolveHostBin(cwd);
   if (!hostBin) {
@@ -5228,12 +5140,6 @@ registerCheck({
   id: 'observe-dir-writable',
   description: '.fgos/observe directory is writable',
   check: (cwd) => checkObserveDirWritable(cwd),
-});
-
-registerCheck({
-  id: 'observe-friction-migrated',
-  description: 'legacy work.friction records are fully migrated to .fgos/observe/friction with no unmigrated records past cursor',
-  check: (cwd) => checkObserveFrictionMigrated(cwd),
 });
 
 registerCheck({
