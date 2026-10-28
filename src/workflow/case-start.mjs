@@ -205,7 +205,7 @@ function resolveStart(params) {
       && resolveGitRoots(mainRoot).mainCheckoutRoot !== resolveGitRoots(worktreePath).mainCheckoutRoot) {
     throw new RunnerConfigError('Workflow contextRefs cannot use plain paths across repositories; use unit-run:<id>/<role> or gate-answer:<workflowRunId>/<stepId>');
   }
-  return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account };
+  return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account, runnerConfig };
 }
 
 /**
@@ -219,8 +219,7 @@ function resolveStart(params) {
  */
 export async function preflightWorkflowSeats(params = {}) {
   if (params.seats === undefined) return { warnings: [] };
-  const { mainRoot, workflow } = resolveStart(params);
-  const runnerConfig = loadRunnerConfigForDir(mainRoot);
+  const { mainRoot, workflow, runnerConfig } = resolveStart(params);
   const loopFn = (name) => loopOf(name, { effective: runnerConfig });
   const session = { headless: true, herdrPresent: detectHerdrPresent() };
   const warnings = [];
@@ -248,8 +247,13 @@ export async function preflightWorkflowSeats(params = {}) {
 export function assertUnitAcceptOutcomes(workflow, step, u, runnerConfig) {
   if (u.template?.acceptOutcomes === undefined) return;
   const pattern = u.template.pattern || 'solo';
-  const loop = loopOf(pattern, { effective: runnerConfig })
-    ?? (['solo', 'reviewed', 'panel', 'debate'].includes(pattern) ? pattern : 'solo');
+  const loop = loopOf(pattern, { effective: runnerConfig });
+  if (loop === null) {
+    throw new RunnerConfigError(
+      `workflow "${workflow.id}" step "${step.id}" unit "${u.id}".pattern "${pattern}" is unknown: acceptOutcomes requires a known pattern with reviewed loop`,
+      { code: 'unknown-pattern' },
+    );
+  }
   if (loop !== 'reviewed') {
     throw new RunnerConfigError(
       `workflow "${workflow.id}" step "${step.id}" unit "${u.id}".acceptOutcomes requires a reviewed template and unique pass/findings outcomes`,
@@ -290,10 +294,10 @@ export function refundIfNotOpened({ mainRoot, parent, opened }) {
  * handed to a caller before any step executes.
  */
 export function prepareWorkflowRun(params) {
-  const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account } = resolveStart(params);
+  const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account, runnerConfig } = resolveStart(params);
   // A frame flag that widens the guide's defaults refuses here, so it creates no run.
   const frame = resolveFrame(workflow.guide, params.frame);
-  const liveConfig = loadRunnerConfigForDir(mainRoot);
+  const liveConfig = runnerConfig;
   const configSnapshot = snapshotRunnerConfig(mainRoot, liveConfig);
   if (account !== null) {
     const pin = parseAccountPin(account);

@@ -37,13 +37,6 @@ export const SYNC_SEAT = 'sync';
 
 export const RESERVED_SEAT_IDS = Object.freeze([VERIFY_SEAT, `${VERIFY_SEAT.slice(0, -1)}ier`]);
 
-export const DEFAULT_CHECKERS_BY_RIGOR = Object.freeze({
-  low: Object.freeze(['reviewer']),
-  standard: Object.freeze(['reviewer']),
-  high: Object.freeze(['reviewer', 'red-team']),
-  critical: Object.freeze(['reviewer', 'red-team']),
-});
-
 export const DEFAULT_CAPABILITY_MIN_CHECKERS = Object.freeze({
   code: Object.freeze(['red-team']),
   'code:*': Object.freeze(['red-team']),
@@ -140,10 +133,23 @@ export function checkerPlanOf(unit, runnerConfig, options = {}) {
     if (contribution) planMap.get(seat).add(contribution);
   }
 
-  // 1. Rigor floor: checkersByRigor read from runnerConfig.loops.reviewed (fallback DEFAULT_CHECKERS_BY_RIGOR)
+  // 1. Rigor floor: checkersByRigor read from runnerConfig.loops.reviewed (fallback options.shippedCheckersByRigor)
   const rigor = effectiveRigorOf(unit, runnerConfig, { fallback: 'standard' });
-  const checkersByRigor = runnerConfig?.loops?.reviewed?.checkersByRigor || DEFAULT_CHECKERS_BY_RIGOR;
-  const fromRigor = checkersByRigor[rigor] || DEFAULT_CHECKERS_BY_RIGOR[rigor] || ['reviewer'];
+  const configuredCheckers = runnerConfig?.loops?.reviewed?.checkersByRigor;
+  const shippedCheckers = options.shippedCheckersByRigor;
+  const configuredRow = configuredCheckers && Object.hasOwn(configuredCheckers, rigor)
+    ? configuredCheckers[rigor]
+    : (rigor === 'low' && configuredCheckers && Object.hasOwn(configuredCheckers, 'standard') ? configuredCheckers.standard : undefined);
+  const shippedRow = shippedCheckers && Object.hasOwn(shippedCheckers, rigor)
+    ? shippedCheckers[rigor]
+    : (rigor === 'low' && shippedCheckers && Object.hasOwn(shippedCheckers, 'standard') ? shippedCheckers.standard : undefined);
+  const fromRigor = configuredRow ?? shippedRow;
+  if (!fromRigor) {
+    throw new SeatResolutionError(
+      `missing checkersByRigor for rigor "${rigor}" (neither runnerConfig nor shippedCheckersByRigor defines it)`,
+      'configuration-error',
+    );
+  }
   for (const seat of fromRigor) {
     addContribution(seat, `rigor:${rigor}`);
   }
@@ -298,7 +304,7 @@ function requireRoles(loop, declared, expected) {
  * @returns {Array<{ seat: string, role: string, posture: object, persona?: string, tier?: string }>}
  */
 export function resolveSeats(options = {}) {
-  let { loop, pattern, params, floors, unit, runnerConfig } = options;
+  let { loop, pattern, params, floors, unit, runnerConfig, shippedCheckersByRigor } = options;
   let resolvedLoop = loop ?? (typeof pattern === 'string' ? pattern : pattern?.pattern) ?? 'solo';
   if (resolvedLoop === 'research-fan-out') {
     resolvedLoop = 'panel';
@@ -324,7 +330,7 @@ export function resolveSeats(options = {}) {
     }
     case 'reviewed': {
       const slot = options.slot ?? options.minCheckersSlot ?? options.provenance?.params?.minCheckers;
-      const plan = checkerPlanOf(unit, runnerConfig, { requested: params?.minCheckers, floors, slot });
+      const plan = checkerPlanOf(unit, runnerConfig, { requested: params?.minCheckers, floors, slot, shippedCheckersByRigor });
       const required = plan.map((p) => p.seat);
       const checkerPosture = (name) => posture({ readOnly: true, forceOutOfProcess: true, verdict: CHECKER_SEATS[name].verdict });
       const producerPosture = posture({ readOnly, writer: true });
@@ -400,16 +406,13 @@ export function resolveSeats(options = {}) {
  * @returns {number|null} null for a pattern this core does not know
  */
 export function seatLaunchesOf(options = {}) {
-  let { loop, pattern, params, floors, unit, runnerConfig } = options;
+  let { loop, pattern, params, floors, unit, runnerConfig, shippedCheckersByRigor } = options;
   let resolvedLoop = loop ?? (typeof pattern === 'string' ? pattern : pattern?.pattern) ?? 'solo';
-  if (resolvedLoop === 'research-fan-out') {
-    return 4;
-  }
   params = params ?? (typeof pattern === 'object' && pattern !== null ? pattern.params : undefined);
   if (!LOOP_NAMES.includes(resolvedLoop)) return null;
-  const seats = resolveSeats({ loop: resolvedLoop, params, floors, unit, runnerConfig, slot: options.slot });
+  const seats = resolveSeats({ loop: resolvedLoop, params, floors, unit, runnerConfig, slot: options.slot, shippedCheckersByRigor });
   switch (resolvedLoop) {
-    case 'reviewed': return seats.length * (params?.maxRounds ?? runnerConfig?.loops?.reviewed?.maxRounds ?? 2);
+    case 'reviewed': return seats.length * (params?.maxRounds ?? 2);
     case 'debate': return 2 * (params?.rebuttal === false ? 1 : 2) + 1;
     default: return seats.length;
   }

@@ -34,6 +34,8 @@ import { normalizeContextRefs, WorkflowDefinitionError } from '../../src/workflo
 import { withProviderFamilies } from '../helpers/provider-families.mjs';
 import { acquireSync, createLockScope, probe } from '../../src/holder-lock/index.mjs';
 import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { prepareWorkflowRun, assertUnitAcceptOutcomes } from '../../src/workflow/case-start.mjs';
 
 // Worktrees created in the default location outlive the test unless removed here.
 const worktreeDirs = [];
@@ -1655,9 +1657,35 @@ test('workflow start enforces acceptOutcomes requires reviewed loop at execution
     /acceptOutcomes requires a reviewed template/,
   );
 
+  // Unknown pattern typo with acceptOutcomes is refused as unknown-pattern
+  await assert.rejects(
+    () => startWorkflow({ workflow: makeWf('reviwed', ['pass']), repoRoot: tmp, cwd: tmp }),
+    (err) => err instanceof RunnerConfigError && err.code === 'unknown-pattern',
+  );
+
+  // Shared guard assertUnitAcceptOutcomes directly refuses unknown pattern with unknown-pattern
+  assert.throws(
+    () => assertUnitAcceptOutcomes({ id: 'wf' }, { id: 's' }, { id: 'u', template: { pattern: 'reviwed', acceptOutcomes: ['pass'] } }, {}),
+    (err) => err instanceof RunnerConfigError && err.code === 'unknown-pattern',
+  );
+
   // Custom reviewed with acceptOutcomes is accepted at start
   const started = await startWorkflow({ workflow: makeWf('custom-reviewed', ['pass', 'findings']), repoRoot: tmp, cwd: tmp });
   assert.equal(started.workflowId, 'wf-custom-reviewed');
+});
+
+test('prepareWorkflowRun reuses runner config from resolveStart', (t) => {
+  const tmp = setupTestRepo();
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  const workflow = {
+    id: 'wf-config-reuse',
+    steps: [{
+      id: 'step-1',
+      units: [{ id: 'u1', template: { capability: 'docs:write' } }],
+    }],
+  };
+  const prepared = prepareWorkflowRun({ workflow, repoRoot: tmp, cwd: tmp });
+  assert.ok(prepared.workflowRunId);
 });
 
 test('workflow root context refs persist and reach only root Units across resume', async (t) => {

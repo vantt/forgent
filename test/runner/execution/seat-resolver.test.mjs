@@ -3,11 +3,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  SEAT_ROLES, resolveSeats, checkDeclaredSeats, effectiveRigorOf, capabilityRigorOf,
-  requiresDistinctFamilies, seatLaunchesOf, seatKind, assertNoSeatTier, bindSeatOf, PRODUCER_POSTURE,
-  checkerPlanOf, RESERVED_SEAT_IDS, DEFAULT_CAPABILITY_MIN_CHECKERS,
+  SEAT_ROLES, resolveSeats as baseResolveSeats, checkDeclaredSeats, effectiveRigorOf, capabilityRigorOf,
+  requiresDistinctFamilies, seatLaunchesOf as baseSeatLaunchesOf, seatKind, assertNoSeatTier, bindSeatOf, PRODUCER_POSTURE,
+  checkerPlanOf as baseCheckerPlanOf, RESERVED_SEAT_IDS, DEFAULT_CAPABILITY_MIN_CHECKERS,
 } from '../../../src/runner/execution/seat-resolver.mjs';
 import { CHECKER_SEATS, VALID_CHECKER_SEATS, MODEL_POLICY_TIERS } from '../../../src/runner/dispatch/config.mjs';
+import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
+
+const shippedCheckersByRigor = shippedCatalog().loops.reviewed.checkersByRigor;
+const resolveSeats = (opts = {}) => baseResolveSeats({ shippedCheckersByRigor, ...opts });
+const seatLaunchesOf = (opts = {}) => baseSeatLaunchesOf({ shippedCheckersByRigor, ...opts });
+const checkerPlanOf = (unit, cfg, opts = {}) => {
+  const options = Array.isArray(opts) ? { requested: opts } : (typeof opts === 'string' ? { requested: [opts] } : { ...opts });
+  return baseCheckerPlanOf(unit, cfg, { shippedCheckersByRigor, ...options });
+};
 import { isVerdictSeat } from '../../../src/runner/dispatch/agent-result-claim-contract.mjs';
 
 const unit = { id: 'u', capability: 'docs:write', objective: 'x', writes: [] };
@@ -120,8 +129,57 @@ test('admission counts launches from the same seats the run binds', () => {
   const cfg = { loops: { reviewed: { maxRounds: 2 } } };
   assert.equal(seatLaunchesOf({ pattern: 'solo', unit, runnerConfig: cfg }), 1);
   assert.equal(seatLaunchesOf({ pattern: 'reviewed', unit: { ...unit, rigor: 'high' }, runnerConfig: cfg }), 6);
-  assert.equal(seatLaunchesOf({ pattern: 'research-fan-out', unit, runnerConfig: cfg }), 4);
+  assert.equal(seatLaunchesOf({ loop: 'panel', params: { seats: [{ seat: 'm1', role: 'producer' }, { seat: 'm2', role: 'producer' }, { seat: 'm3', role: 'producer' }, { seat: 'synthesizer', role: 'synthesizer' }] }, unit, runnerConfig: cfg }), 4);
+  assert.equal(seatLaunchesOf({ pattern: 'research-fan-out', unit, runnerConfig: cfg }), null);
   assert.equal(seatLaunchesOf({ pattern: 'unheard-of', unit, runnerConfig: cfg }), null);
+
+  const nonDefaultCfg = { loops: { reviewed: { maxRounds: 5 } } };
+  assert.equal(
+    seatLaunchesOf({ pattern: 'reviewed', unit, runnerConfig: nonDefaultCfg }),
+    4,
+    'deleted config maxRounds fallback does not take effect without params; uses default 2 rounds',
+  );
+});
+
+test('configured rigor row wins over shipped table', () => {
+  const customConfig = {
+    loops: {
+      reviewed: {
+        checkersByRigor: {
+          standard: ['tester'],
+          high: ['reviewer'],
+        },
+      },
+    },
+  };
+  const plan = checkerPlanOf({ capability: 'docs:write', rigor: 'standard' }, customConfig);
+  assert.deepEqual(plan.map((c) => c.seat), ['tester']);
+});
+
+test('injected shipped row is used when configured row is absent', () => {
+  const partialConfig = {
+    loops: {
+      reviewed: {
+        checkersByRigor: {
+          standard: ['reviewer'],
+        },
+      },
+    },
+  };
+  const plan = checkerPlanOf({ capability: 'docs:write', rigor: 'critical' }, partialConfig);
+  assert.deepEqual(plan.map((c) => c.seat), ['reviewer', 'red-team', 'tester']);
+});
+
+test('missing row in both configured and shipped sources throws configuration error', () => {
+  const emptyConfig = {};
+  assert.throws(
+    () => checkerPlanOf({ capability: 'docs:write', rigor: 'high' }, emptyConfig, { shippedCheckersByRigor: {} }),
+    (err) => err.code === 'configuration-error' && /missing checkersByRigor/.test(err.message),
+  );
+  assert.throws(
+    () => resolveSeats({ loop: 'reviewed', runnerConfig: emptyConfig, shippedCheckersByRigor: {} }),
+    (err) => err.code === 'configuration-error' && /missing checkersByRigor/.test(err.message),
+  );
 });
 
 test('a seat tier from a file source is refused by name; a registered definition keeps it', () => {

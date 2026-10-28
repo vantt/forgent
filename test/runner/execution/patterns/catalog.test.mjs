@@ -1835,6 +1835,20 @@ test('resolveCollaboration resolves shipped consult and research-fan-out seat na
     ['researcher-1', 'researcher-2', 'researcher-3', 'synthesizer'],
   );
   assert.equal(resResearch.params.seats.some((s) => s.seat.includes('member') || s.role === 'member'), false);
+  assert.equal(resResearch.launchBound, 4);
+});
+
+test('shipped floor propagation: critical rigor propagates tester to seats and launch bound', () => {
+  const shipped = shippedCatalog();
+  const res = resolveCollaboration({
+    selectors: { callerString: 'reviewed' },
+    unit: { id: 'u-crit', capability: 'docs:write', rigor: 'critical' },
+    shipped,
+  });
+  assert.equal(res.loop, 'reviewed');
+  assert.deepEqual(res.seats.map((s) => s.seat), ['producer', 'reviewer', 'red-team', 'tester']);
+  assert.equal(res.launchBound, 8);
+  assert.equal(res.pin.provenance.checkers.tester, 'rigor:critical');
 });
 
 test('unit declarations shadowed by higher precedence slots are validated for unknown keys and invalid values', () => {

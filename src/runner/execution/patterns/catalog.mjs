@@ -485,6 +485,7 @@ export function resolveCollaboration(options = {}) {
     }
   }
 
+  const shippedCheckersByRigor = options.shippedCheckersByRigor ?? shipped?.loops?.reviewed?.checkersByRigor;
   const floors = floorCheckers.length > 0 ? { minCheckers: floorCheckers } : undefined;
   const seats = resolveSeats({
     loop,
@@ -493,6 +494,7 @@ export function resolveCollaboration(options = {}) {
     unit,
     runnerConfig,
     slot: provenanceParams.minCheckers,
+    shippedCheckersByRigor,
   });
 
   const launchBound = seatLaunchesOf({
@@ -502,6 +504,7 @@ export function resolveCollaboration(options = {}) {
     unit,
     runnerConfig,
     slot: provenanceParams.minCheckers,
+    shippedCheckersByRigor,
   });
 
   const postures = Object.create(null);
@@ -515,6 +518,7 @@ export function resolveCollaboration(options = {}) {
       requested: effectiveParams.minCheckers,
       floors,
       slot: provenanceParams.minCheckers,
+      shippedCheckersByRigor,
     });
     for (const p of plan) {
       const inv = p.contributions.find((c) => c.startsWith('pattern-invariant:'));

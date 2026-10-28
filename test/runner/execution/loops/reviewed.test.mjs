@@ -2,21 +2,25 @@ import '../../../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  runReviewed,
+  runReviewed as baseRunReviewed,
   reviewedHistoryOutcome as historyOutcomeOf,
   DEFAULT_MAX_ROUNDS,
   PARAMS,
 } from '../../../../src/runner/execution/loops/reviewed.mjs';
 import { verifyCommandOf } from '../../../../src/runner/execution/loops/verify.mjs';
 import {
-  DEFAULT_CHECKERS_BY_RIGOR,
   requiresDistinctFamilies,
   resolveSeats,
 } from '../../../../src/runner/execution/seat-resolver.mjs';
+import { shippedCatalog } from '../../../../src/runner/dispatch/shipped-catalog.mjs';
+
+const shippedCheckersByRigor = shippedCatalog().loops.reviewed.checkersByRigor;
+const runReviewed = (unit, cfg, hooks = {}, params = {}) =>
+  baseRunReviewed(unit, cfg, { shippedCheckersByRigor, ...hooks }, params);
 
 // The history outcome of a reviewed unit is read over the seats the unit has.
 const reviewedHistoryOutcome = (unit, cfg, history, params = {}) =>
-  historyOutcomeOf(unit, cfg, history, params, resolveSeats({ loop: 'reviewed', params, unit, runnerConfig: cfg }));
+  historyOutcomeOf(unit, cfg, history, params, resolveSeats({ loop: 'reviewed', params, unit, runnerConfig: cfg, shippedCheckersByRigor }));
 
 test('runReviewed passes on round 1 when all checkers pass', async () => {
   const calls = [];
@@ -501,8 +505,14 @@ test('reviewed at high or critical rigor makes every checker independent of the 
     const unit = { id: `u-${rigor}`, objective: 'Do it', capability: 'docs:write', rigor };
     await runReviewed(unit, {}, { runRole: async (opts) => { seen.push(opts); return { seat: opts.seat.seat, outcome: 'pass' }; } });
     const byRole = Object.fromEntries(seen.map((opts) => [opts.seat.seat, opts.independentOf]));
-    assert.deepEqual(byRole.reviewer, ['producer', 'red-team'], rigor);
-    assert.deepEqual(byRole['red-team'], ['producer', 'reviewer'], rigor);
+    if (rigor === 'critical') {
+      assert.deepEqual(byRole.reviewer, ['producer', 'red-team', 'tester'], rigor);
+      assert.deepEqual(byRole['red-team'], ['producer', 'reviewer', 'tester'], rigor);
+      assert.deepEqual(byRole.tester, ['producer', 'reviewer', 'red-team'], rigor);
+    } else {
+      assert.deepEqual(byRole.reviewer, ['producer', 'red-team'], rigor);
+      assert.deepEqual(byRole['red-team'], ['producer', 'reviewer'], rigor);
+    }
   }
 });
 
