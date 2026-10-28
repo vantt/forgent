@@ -11,6 +11,7 @@ import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
 import { runUnit } from '../../../src/runner/execution/run.mjs';
+import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 import { runReviewed } from '../../../src/runner/execution/loops/reviewed.mjs';
 import { seatLaunchesOf, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
@@ -318,6 +319,7 @@ test('a reviewed run that cannot launch its next round ends at the last evaluati
         return { seat: seat.seat, round, outcome: seat.seat === 'producer' ? 'pass' : 'findings', findings: ['fix this'] };
       },
       hasLaunchRoom: (seats) => { roles.push(`room?${seats}`); return false; },
+      shippedCheckersByRigor: shippedCatalog().loops.reviewed.checkersByRigor,
     },
     {},
   );

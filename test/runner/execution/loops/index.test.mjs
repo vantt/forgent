@@ -8,6 +8,7 @@ import {
   loopRunsVerify,
   VERIFY_CAPABILITY,
 } from '../../../../src/runner/execution/loops/index.mjs';
+import { shippedCatalog } from '../../../../src/runner/dispatch/shipped-catalog.mjs';
 import { PARAMS as SOLO_PARAMS } from '../../../../src/runner/execution/loops/solo.mjs';
 import { PARAMS as REVIEWED_PARAMS } from '../../../../src/runner/execution/loops/reviewed.mjs';
 import { PARAMS as PANEL_PARAMS } from '../../../../src/runner/execution/loops/panel.mjs';
@@ -50,7 +51,7 @@ test('runLoop dispatches reviewed loop with parameters', async () => {
     { loop: 'reviewed', params: { minCheckers: ['reviewer', 'red-team'] } },
     { id: 'u-2', objective: 'Reviewed task', capability: 'code:implement' },
     {},
-    { runRole },
+    { runRole, shippedCheckersByRigor: shippedCatalog().loops.reviewed.checkersByRigor },
   );
 
   assert.equal(res.outcome, 'pass');

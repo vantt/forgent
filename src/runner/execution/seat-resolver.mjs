@@ -143,10 +143,12 @@ export function checkerPlanOf(unit, runnerConfig, options = {}) {
   const shippedRow = shippedCheckers && Object.hasOwn(shippedCheckers, rigor)
     ? shippedCheckers[rigor]
     : undefined;
-  const fromRigor = configuredRow ?? shippedRow;
+  // A rigor with no row of its own (low, or one a project did not declare) takes the standard row of the same tables.
+  const rowOf = (table, name) => (table && Object.hasOwn(table, name) ? table[name] : undefined);
+  const fromRigor = configuredRow ?? shippedRow ?? rowOf(configuredCheckers, 'standard') ?? rowOf(shippedCheckers, 'standard');
   if (!fromRigor) {
     throw new SeatResolutionError(
-      `missing checkersByRigor for rigor "${rigor}" (neither runnerConfig nor shippedCheckersByRigor defines it)`,
+      `missing checkersByRigor for rigor "${rigor}" (neither runnerConfig nor shippedCheckersByRigor defines it or a standard row)`,
       'configuration-error',
     );
   }

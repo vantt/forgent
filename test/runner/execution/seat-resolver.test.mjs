@@ -220,13 +220,15 @@ test('configured low rigor row wins over shipped low row', () => {
   assert.deepEqual(plan.map((c) => c.seat), ['tester']);
 });
 
-test('missing low rigor row in both configured and shipped sources throws configuration error', () => {
+test('a rigor with no row of its own takes the standard row, and only a table with no standard row is a configuration error', () => {
+  const plan = baseCheckerPlanOf(
+    { capability: 'docs:write', rigor: 'low' },
+    { loops: { reviewed: { checkersByRigor: { standard: ['tester'] } } } },
+    { shippedCheckersByRigor: { standard: ['reviewer'] } },
+  );
+  assert.deepEqual(plan.map((c) => c.seat), ['tester']);
   assert.throws(
-    () => baseCheckerPlanOf(
-      { capability: 'docs:write', rigor: 'low' },
-      { loops: { reviewed: { checkersByRigor: { standard: ['tester'] } } } },
-      { shippedCheckersByRigor: { standard: ['reviewer'] } },
-    ),
+    () => baseCheckerPlanOf({ capability: 'docs:write', rigor: 'low' }, {}, { shippedCheckersByRigor: { high: ['reviewer'] } }),
     (err) => err.code === 'configuration-error' && /missing checkersByRigor for rigor "low"/.test(err.message),
   );
 });
