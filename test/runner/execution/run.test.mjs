@@ -194,7 +194,7 @@ test('runUnit runs solo read-only unit end-to-end', async () => {
   const record = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
   assert.equal(record.unit.id, 'u-docs-1');
   assert.equal(record.worktree, fs.realpathSync(worktreeDir));
-  assert.equal(record.collaboration?.pin?.pattern?.layer, 'shipped', 'pin pattern layer comes from one config read');
+  assert.equal(record.collaboration?.pattern?.layer, 'shipped', 'pin pattern layer comes from one config read');
   assert.equal(record.configSnapshot?.runner?.origins, undefined, 'config snapshot in unit.json carries no origins provenance');
   assert.equal(JSON.stringify(record).includes('RUNNER_CONFIG_ORIGINS'), false, 'unit.json does not persist provenance symbols');
   const summary = JSON.parse(fs.readFileSync(path.join(path.dirname(unitJsonPath), 'unit-summary.json'), 'utf8'));

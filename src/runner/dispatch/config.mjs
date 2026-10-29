@@ -17,12 +17,11 @@
 // committed (per D2's durability policy) so it is reviewable like any other
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
-import { CHECKER_SEATS, SEAT_ROLES, LOOP_NAMES, checkDeclaredSeats } from '../execution/seat-resolver.mjs';
+import { CHECKER_SEATS, SEAT_ROLES, LOOP_NAMES, RESERVED_SEAT_IDS, checkDeclaredSeats } from '../execution/seat-resolver.mjs';
 import { paramTableOf } from '../execution/loops/index.mjs';
-import { isSeatId, assertSeatId, reservedSeatIds } from '../../convention/seat-id.mjs';
+import { isSeatId, assertSeatId } from '../../convention/seat-id.mjs';
 
 const DECLARED_SEAT_KEYS = new Set(['seat', 'role', 'persona', 'tier']);
-const RESERVED_SEAT_IDS = Object.freeze(reservedSeatIds());
 import { definitionFileName } from '../../convention/definition-names.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
