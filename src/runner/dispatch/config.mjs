@@ -17,7 +17,7 @@
 // committed (per D2's durability policy) so it is reviewable like any other
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
-import { CHECKER_SEATS, SEAT_ROLES, LOOP_NAMES, RESERVED_SEAT_IDS, checkDeclaredSeats, SeatResolutionError } from '../execution/seat-resolver.mjs';
+import { CHECKER_SEATS, SEAT_ROLES, LOOP_NAMES, checkDeclaredSeats, SeatResolutionError } from '../execution/seat-resolver.mjs';
 import { paramTableOf } from '../execution/loops/index.mjs';
 import { isSeatId } from '../../convention/seat-id.mjs';
 import { definitionFileName } from '../../convention/definition-names.mjs';
@@ -34,7 +34,7 @@ import { validateProviderAccountInventory } from './provider-capacity.mjs';
 // can validate adapter names without importing transport.mjs (cutting the
 // prior config.mjs <-> transport.mjs import cycle).
 import { EXECUTOR_ADAPTERS } from './adapters.mjs';
-import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH } from '../execution/patterns/retired-keys.mjs';
+import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES } from '../execution/patterns/retired-keys.mjs';
 import { credentialStoreProblem } from './provider-capacity.mjs';
 import {
   BUILTIN_POLICIES,
@@ -222,7 +222,7 @@ export function deriveSubpath(paths, path) {
 }
 
 export class RunnerConfigError extends Error {
-  constructor(message, { code, phase, path, paths, subpath, detail } = {}) {
+  constructor(message, { code, phase, path, paths, detail } = {}) {
     super(message);
     this.name = 'RunnerConfigError';
     this.category = 'validation';
@@ -231,17 +231,11 @@ export class RunnerConfigError extends Error {
     if (path !== undefined) this.path = path;
     if (paths !== undefined) this.paths = paths;
     else if (path !== undefined) this.paths = [path];
-    if (subpath !== undefined) this._subpath = subpath;
     if (detail !== undefined) this.detail = detail;
   }
 
   get subpath() {
-    if (this._subpath !== undefined) return this._subpath;
     return deriveSubpath(this.paths, this.path);
-  }
-
-  set subpath(v) {
-    this._subpath = v;
   }
 }
 

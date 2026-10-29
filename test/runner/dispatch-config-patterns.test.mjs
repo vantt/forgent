@@ -1006,3 +1006,12 @@ test('resolveLayer matches bracket-indexed descendants under container before fa
   ];
   assert.equal(resolveLayer(origins, 'custom', 'defaults.seats'), 'global');
 });
+
+test('RunnerConfigError derives subpath from paths and stores no own subpath property', () => {
+  const err = new RunnerConfigError('example', { path: 'runner.patterns.custom', subpath: 'stale' });
+  assert.equal(err.subpath, 'patterns.custom');
+  assert.equal(Object.prototype.hasOwnProperty.call(err, '_subpath'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(err, 'subpath'), false);
+  assert.ok(!Object.keys(err).includes('_subpath'));
+  assert.ok(!Object.keys(err).includes('subpath'));
+});

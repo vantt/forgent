@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7db2a3a01d84ea4e1344cc896fbfb831ba83da61c88ce1ccb496ce8acfc1782a",
+  "payloadDigest": "04dca61345607a4e982135a34a53e6c5b001b62f40de044b1058ef3f3d8290d8",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -971,7 +971,7 @@
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "95c9e5ba54705cdcc129234a23096cc033b776010ce351959a15b6628c22e1a9",
-    "src/runner/dispatch/config.mjs": "a187324dc5631871f01506d647762fb948b7e591986e9ce7100bdf19c9ed5033",
+    "src/runner/dispatch/config.mjs": "63dd4e112e0f1d905ef4ff58ea89a182f5afa3f5a7a3a891169d0fdbcaa5707e",
     "src/runner/dispatch/confinement/attestation-store.mjs": "79e413d77b1a92e5f5016fe5c0da789bb6810824c0c747ce7c1e38c70fbea284",
     "src/runner/dispatch/confinement/authority.mjs": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
     "src/runner/dispatch/confinement/backend-registry.mjs": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
@@ -1048,7 +1048,7 @@
     "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",
     "src/runner/execution/patterns/catalog-entries.mjs": "f0bf2ed9be81a5310b4e1e47875076fc2e31e757e4bf3661eb109fa25e9b379c",
     "src/runner/execution/patterns/catalog.mjs": "00fb758491d3d6dfe48df4212cf88db94fc219a847300ee452b86b57262ca815",
-    "src/runner/execution/patterns/retired-keys.mjs": "2c60d0f5a585be627a8b2c4dacd776f633f2853e08f3e561578f901dc71c9f0e",
+    "src/runner/execution/patterns/retired-keys.mjs": "656afad3e0b3a644b83e997c5b2442e69b5168eee9d9b6767369c63423c7f995",
     "src/runner/execution/run-request.mjs": "b8ba8003a695f457ab1ebdc22808a994c4f3c4dbfc5d05cd1ab88bd65b823645",
     "src/runner/execution/run.mjs": "e709a4e9fca7a11de22225f0876c44dbf31c3edb6bd340b46004e07c7ad08093",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
