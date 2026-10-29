@@ -558,8 +558,8 @@ test('setup writes a SessionStart registration row for Claude Code, Codex and ag
   installAllAgentHooks(repoRoot);
   const shim = path.join(fs.realpathSync(repoRoot), '.fgos', 'installation', 'bin', 'fgos');
   const claude = readFile(repoRoot, 'claude').hooks.SessionStart;
-  assert.deepEqual(claude, [{ hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" identity session --register || true`, timeout: 10 }] }]);
-  const command = `'${shim}' identity session --register || true`;
+  assert.deepEqual(claude, [{ hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" identity session --register >/dev/null || true`, timeout: 10 }] }]);
+  const command = `'${shim}' identity session --register >/dev/null || true`;
   assert.deepEqual(readFile(repoRoot, 'codex').hooks.SessionStart, [{ hooks: [{ type: 'command', command, timeout: 10 }] }]);
   assert.deepEqual(readFile(repoRoot, 'agy')['fgos-session-register'], { enabled: true, SessionStart: [{ type: 'command', command, timeout: 10 }] });
   for (const ext of ['.omp/extensions/fgos-hooks.ts', '.pi/extensions/fgos-hooks.ts']) {

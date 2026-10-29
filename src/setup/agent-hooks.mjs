@@ -125,9 +125,9 @@ const hookRows = (repoRoot) => [
   // The CLIs whose recorded hook events name a session start: Claude Code (`SessionStart`, no matcher:
   // every source), Codex (`SessionStart`, measured on 0.162.1) and agy (`SessionStart`, a flat entry,
   // measured on 1.4.2). omp and pi have none in their facts and register at their first fgOS verb.
-  { cli: 'claude', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" ${SESSION_REGISTER_ARGS} || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
-  { cli: 'codex', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
-  { cli: 'agy', kind: HOOK_KINDS.SESSION, event: 'SessionStart', group: 'fgos-session-register', flat: true, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
+  { cli: 'claude', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" ${SESSION_REGISTER_ARGS} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
+  { cli: 'codex', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
+  { cli: 'agy', kind: HOOK_KINDS.SESSION, event: 'SessionStart', group: 'fgos-session-register', flat: true, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
   { cli: 'codex', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide') },
   { cli: 'codex', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'RequestUserInput|ask.*', command: shimCommand(repoRoot, 'hook decision-question') },
   // Codex runs a hook command through the user's `$SHELL -c`: the plain form is exec'd into the
