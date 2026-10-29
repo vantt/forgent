@@ -11,7 +11,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/checks.mjs';
+import { DOCTOR_CHECKS, FIX_REGISTRATIONS, createDoctorRun } from '../../src/setup/checks.mjs';
 import { CONFIG_CHECKS } from '../../src/setup/config-checks.mjs';
 import { nativeDoor } from '../../src/native/door.mjs';
 import { writeProjectConfig, writeRawProjectConfig, statGatewayToken, readGatewayToken } from '../helpers/config-fixture.mjs';
@@ -38,7 +38,10 @@ function withMachine(fn) {
 
 const row = (id) => DOCTOR_CHECKS.find((entry) => entry.id === id);
 /** One doctor run over the config rows, the way `fgos doctor` asks them: every row once, in registration order. */
-const run = (project) => Object.fromEntries(CONFIG_CHECKS.map((entry) => [entry.id, entry.check(project)]));
+const run = (project) => {
+  const doctorRun = createDoctorRun();
+  return Object.fromEntries(CONFIG_CHECKS.map((entry) => [entry.id, entry.check(project, doctorRun)]));
+};
 const fix = (id) => FIX_REGISTRATIONS.find((entry) => entry.id === id);
 
 test('every row of the config crate contract is a registered check and every fix id a registered fix; the machine-files row keeps the gateway token id', () => {

@@ -820,23 +820,15 @@ test('doctor check runner-patterns-config: a retired key in the project file fai
   assert.match(res.message, /runner\.loops\.reviewed/);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
-test('doctor check runner-patterns-config: legacy json project file gives honest edit-then-migrate instruction', () => {
+test('doctor check runner-patterns-config: a legacy json project file is left to the config-format-legacy-json row', () => {
   const tmpDir = mkTempDir();
-  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
-  writeRawLegacyProjectConfig(tmpDir, JSON.stringify({
-    runner: {
-      patterns: {
-        reviewed: { maxRounds: 3 },
-      },
-    },
-  }));
-  const res = check.check(tmpDir);
-  assert.equal(res.passed, false);
-  assert.match(res.message, new RegExp(path.join(tmpDir, '.fgos', 'config.json').replace(/[/\\?*]/g, '\\$&')));
-  assert.match(res.message, /config-format-legacy-json/);
-  assert.match(res.message, /runner\.loops\.reviewed\.maxRounds/);
-  assert.match(res.message, /edit .*config\.json.*, then run `fgos config migrate`/);
-  assert.doesNotMatch(res.message, /config\.yaml/);
+  writeRawLegacyProjectConfig(tmpDir, JSON.stringify({ runner: { patterns: { reviewed: { maxRounds: 3 } } } }));
+  const patterns = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config').check(tmpDir);
+  assert.equal(patterns.passed, true);
+  assert.match(patterns.message, /config-format-legacy-json/);
+  const door = DOCTOR_CHECKS.find((c) => c.id === 'config-format-legacy-json').check(tmpDir);
+  assert.equal(door.passed, false);
+  assert.match(door.message, /project:config\.json/);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
