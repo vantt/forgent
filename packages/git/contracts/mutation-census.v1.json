@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "18cdfa68fd260ba584a764323b22701087f807b7d55d816d7ce6483241a17923",
+  "payloadDigest": "6a57a80b1628a5857d3d8d8349ee67161d288013f9c1e0fdf44a85bee18c9a25",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -229,7 +229,7 @@
     "packages/config/rust/src/write.rs": "b6694c9eb4e205f603dea00e219d3bda560571fa14d12711cc61b619c86d508c",
     "packages/config/rust/tests/authoring_equivalence.rs": "23a7deeab69ddf5e37029e4e17f22fcec441c9256322f40ff1815a7d3a08b1eb",
     "packages/config/rust/tests/cache.rs": "ba9cd4ddbb8d675ec3282627e29aceecc995e73f095dc3b712a7a0a45dc7d852",
-    "packages/config/rust/tests/common/machine_fs.rs": "c8c8bc394393ae8b4ed6096a548d34ccc2f202a873becba0305e17c8e45af627",
+    "packages/config/rust/tests/common/machine_fs.rs": "2f4c2c9d6fab2a8520b7ad9be364deff38cb249861a9a8836fce038a6346c7e3",
     "packages/config/rust/tests/common/mod.rs": "86b167c7e858236e765bcd21ad31d9653c346faef6ba678ea09a5b8ae3ff5eb6",
     "packages/config/rust/tests/detect_path.rs": "f0e84aca639c9c945f1d46b61e5495c475dcc86a700ea8bc4e1d2be7f1d2d85c",
     "packages/config/rust/tests/failure_matrix.rs": "8a2c7f53b474a13d803b4c0bbf12b17f951203a8ffcb4bc367328ee1cb63a853",
@@ -258,7 +258,7 @@
     "packages/config/rust/tests/relocate.rs": "d00047e5cd592a018fece60a4f93f976570bc5ca409b2df7eb776d9e42a16a2f",
     "packages/config/rust/tests/session.rs": "c1416b20738cf191de4360f72c3acd64c7d72a7eda83d82a699e06cfe1a34141",
     "packages/config/rust/tests/validator_acceptance.rs": "4c6dd88dffe93ed119a2c5fab676e11278dd69a13b76ff03b0fc2ef9379a0d52",
-    "packages/config/rust/tests/write_concurrency.rs": "517b15283928317246f9c46d1a3d93ace85b71c94b68c33f111daed4f1890753",
+    "packages/config/rust/tests/write_concurrency.rs": "466b6a6db77e8be51c54a29d5ed57bf3a373b85804648f9fce36dec27606d28f",
     "packages/config/rust/tests/write_golden.rs": "7c3a16685ba06451c6a8d7edd3a28df57c6a29b82c742ebe3c2b88454b599abe",
     "packages/convention/rust/src/lib.rs": "659d829be33a7eceff3e2e1e0a804740b58374e9d5a4b9eefca4c2b9f014496b",
     "packages/convention/rust/src/operations.rs": "4ca00bed057ce292d0f37f5ca15e20ffabab2ebeb35e81ceacff59949b8a9aba",
@@ -2056,7 +2056,7 @@
     },
     {
       "path": "packages/config/rust/tests/write_concurrency.rs",
-      "line": 243,
+      "line": 200,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"

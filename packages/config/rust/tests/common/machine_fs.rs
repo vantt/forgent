@@ -1,5 +1,5 @@
 //! Shared by the runners that lay machine files out on a real disk and hold a real lock from a
-//! child process: `machine_files.rs` and `relocate.rs` include this file by path.
+//! child process: `machine_files.rs`, `relocate.rs` and `write_concurrency.rs` include this file by path.
 #![allow(dead_code)]
 use std::fs;
 use std::os::unix::fs::{symlink, PermissionsExt};
@@ -12,15 +12,16 @@ use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait};
 use serde_json::Value;
 
 const ROLE: &str = "MACHINE_TEST_LOCK";
+const NAME: &str = "MACHINE_TEST_LOCK_NAME";
 const READY: &str = "MACHINE_TEST_READY";
 
-/// The body of the child test `child_entry`: take the `global-config` lock named by the
-/// environment, say so, keep it until killed. Does nothing without the environment.
+/// The body of the child test `child_entry`: take the lock named by the environment, say so, keep
+/// it until killed. Does nothing without the environment.
 pub fn child_body() {
     let Ok(path) = std::env::var(ROLE) else {
         return;
     };
-    let resource = Resource::new("global-config", PathBuf::from(path));
+    let resource = Resource::new(std::env::var(NAME).unwrap(), PathBuf::from(path));
     let Acquire::Acquired(held) = acquire(&resource, Mode::Ex, Wait::Ms(20_000), 2000) else {
         panic!("child could not take the lock");
     };
@@ -32,7 +33,7 @@ pub fn child_body() {
 }
 
 /// A child killed and reaped when dropped.
-pub struct Holder(Child);
+pub struct Holder(pub Child);
 impl Drop for Holder {
     fn drop(&mut self) {
         let _ = self.0.kill();
@@ -42,7 +43,12 @@ impl Drop for Holder {
 
 /// Starts a child of this test binary that holds `global-config` under `dir/locks`.
 pub fn hold(dir: &Path) -> Holder {
-    let (ready, lock) = (dir.join("ready"), dir.join("locks/global-config.lock"));
+    hold_lock(dir, "global-config", &dir.join("locks/global-config.lock"))
+}
+
+/// Starts a child of this test binary that holds the lock `name` at `lock`, and returns once it does.
+pub fn hold_lock(dir: &Path, name: &str, lock: &Path) -> Holder {
+    let ready = dir.join("ready");
     fs::create_dir_all(lock.parent().unwrap()).unwrap();
     let args = [
         "--exact",
@@ -53,15 +59,20 @@ pub fn hold(dir: &Path) -> Holder {
     ];
     let child = Command::new(std::env::current_exe().unwrap())
         .args(args)
-        .env(ROLE, &lock)
+        .env(ROLE, lock)
+        .env(NAME, name)
         .env(READY, &ready)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .spawn()
         .unwrap();
-    let holder = Holder(child);
+    let mut holder = Holder(child);
     let deadline = Instant::now() + Duration::from_secs(30);
     while !ready.exists() {
+        assert!(
+            holder.0.try_wait().unwrap().is_none(),
+            "the holder exited early"
+        );
         assert!(Instant::now() < deadline, "the holder never took the lock");
         std::thread::sleep(Duration::from_millis(5));
     }
