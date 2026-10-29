@@ -57,16 +57,6 @@ impl Reason {
         })?;
         Ok(Reason(reason.to_string()))
     }
-
-    /// The reason of a value `init` or `doctor --fix` suggests: it names its source.
-    pub fn suggested(source: &str) -> Result<Reason, ConfigRefusal> {
-        let source = Reason::parse(source)?;
-        Ok(Reason(format!(
-            "{} {}",
-            text("suggested-source-tag"),
-            source.0
-        )))
-    }
 }
 
 impl Reason {

@@ -4,7 +4,6 @@
   "header": ["@fgos:v1", "see: fgos config standard"],
   "doc-prefix": "@fgos:doc ",
   "why-prefix": "@fgos:why ",
-  "suggested-source-tag": "[setup:suggested]",
   "migrated-source-tag": "[migrate]",
   "forbidden-line-start": "@fgos:",
   "generic-reason-words": ["update", "fix", "change"],

@@ -257,28 +257,6 @@
    }
   },
   {
-   "id": "grammar-reason-suggested",
-   "why": "spec 7: a suggested value's reason names its source",
-   "input": {
-    "kind": "suggested",
-    "text": "this repository's own invariant command"
-   },
-   "expect": {
-    "reason": "[setup:suggested] this repository's own invariant command"
-   }
-  },
-  {
-   "id": "grammar-reason-suggested-refused",
-   "why": "the source goes through the same checks",
-   "input": {
-    "kind": "suggested",
-    "text": "fix"
-   },
-   "expect": {
-    "code": "config-comment-reason-required"
-   }
-  },
-  {
    "id": "grammar-actor-session",
    "why": "D18: the actor is the writer id, or unknown when unfit for a comment line",
    "input": {

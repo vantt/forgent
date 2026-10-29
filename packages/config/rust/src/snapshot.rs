@@ -80,18 +80,6 @@ pub struct Snapshot {
     pub notices: Vec<(&'static str, String)>,
 }
 
-impl Snapshot {
-    /// A verb that leases an account calls this; a confined session is refused by name.
-    pub fn require_accounts(&self) -> Result<(), ConfigRefusal> {
-        match self.accounts {
-            AccountsState::Present => Ok(()),
-            AccountsState::UnavailableConfined => {
-                Err(ConfigRefusal::new("config-accounts-unavailable-confined"))
-            }
-        }
-    }
-}
-
 #[derive(Debug)]
 pub enum SnapshotError {
     Refused(Vec<ConfigRefusal>),

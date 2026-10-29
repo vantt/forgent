@@ -2887,7 +2887,7 @@
   },
   {
    "id": "snapshot-confined-session-has-no-accounts-layer",
-   "why": "spec 9: no accounts source is opened and require_accounts refuses by name",
+   "why": "spec 9: no accounts source is opened and the snapshot reports the accounts layer unavailable",
    "input": {
     "schemas": {
      "s": [

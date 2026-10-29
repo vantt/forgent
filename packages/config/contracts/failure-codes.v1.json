@@ -39,12 +39,6 @@
       "meaning": "An account pool or the gateway token sits in a config file."
     },
     {
-      "id": "config-accounts-unavailable-confined",
-      "origin": "spec",
-      "section": "9, 14",
-      "meaning": "A confined worker called a verb that needs the account pool."
-    },
-    {
       "id": "config-parse",
       "origin": "chosen",
       "section": "14",
@@ -131,10 +125,22 @@
   ],
   "not-produced-here": [
     {
-      "id": "config-addon-missing",
-      "section": "14",
-      "owner": "the Node door",
-      "meaning": "The native addon is missing on the channel; the door names it, this crate never sees it."
+      "id": "config-accounts-unavailable-confined",
+      "section": "9, 14",
+      "owner": "the runner's account lease (src/runner/dispatch/provider-capacity.mjs)",
+      "meaning": "A confined worker called a verb that needs the account pool; the Node caller builds this refusal from the snapshot's accounts state."
+    },
+    {
+      "id": "git-addon-unavailable",
+      "section": "12",
+      "owner": "the Node door (src/native/door.mjs)",
+      "meaning": "The native addon is shipped but cannot be used (missing or unsafe path, target or ABI mismatch); the door names it, this crate never sees it."
+    },
+    {
+      "id": "git-addon-not-shipped",
+      "section": "12",
+      "owner": "the Node door (src/native/door.mjs)",
+      "meaning": "No native addon is shipped on this channel; the door names it, this crate never sees it."
     }
   ]
 }
