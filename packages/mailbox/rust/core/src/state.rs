@@ -132,6 +132,21 @@ pub struct RemoteState {
     /// `<signer machine>\n<message id>` of every message taken or refused,
     /// with the time it was; kept as long as the ingest horizon.
     pub seen: BTreeMap<String, Timestamp>,
+    /// Refusals of messages that never became headers, kept until the
+    /// sender is told: the settlement is written to the shared log after
+    /// the hold that decided it, so a failure there must not lose it.
+    #[serde(default)]
+    pub refusals: Vec<RemoteRefusal>,
+}
+
+/// A refusal of a message from another machine that its sender is yet to be told.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RemoteRefusal {
+    /// The message id its machine gave it.
+    pub id: String,
+    /// The refusal's code, as the same-machine mailbox names it.
+    pub code: String,
 }
 
 fn current_schema_version<'de, D: Deserializer<'de>>(deserializer: D) -> Result<u32, D::Error> {

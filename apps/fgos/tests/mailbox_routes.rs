@@ -1989,7 +1989,7 @@ fn sent_events(state: &Path, main: &Path) -> Vec<serde_json::Value> {
 /// and the sender's status names the refusal, so its owner can see why and confirm the key.
 #[test]
 fn mail_from_a_machine_whose_key_is_not_confirmed_is_not_taken_and_the_sender_is_told_why() {
-    let Cross { alpha, beta, target, .. } = two_machines();
+    let Cross { alpha, beta, alpha_root, target, .. } = two_machines();
     let out = alpha.run(&alpha.main(), Some("sender-a"), &["mailbox", "send", "--to", &target, "unconfirmed hello"], b"");
     assert_eq!(out.status.code(), Some(0), "{out:?}");
     // Beta already folded alpha's published session, so alpha's key is pinned there as seen, never confirmed.
@@ -2004,4 +2004,7 @@ fn mail_from_a_machine_whose_key_is_not_confirmed_is_not_taken_and_the_sender_is
     let counted = beta.run(&beta.main(), Some(WRITER), &["mailbox", "status", "--json"], b"");
     let counted: serde_json::Value = serde_json::from_slice(&counted.stdout).unwrap();
     assert_eq!(counted["data"]["signals"]["refusals"]["remote-unconfirmed"], 1, "{counted}");
+    let alpha_machine = fgos_identity::machine::read(&alpha_root).unwrap();
+    assert_eq!(counted["data"]["crossMachine"]["unconfirmedMachines"], serde_json::json!([alpha_machine]), "{counted}");
+    assert!(String::from_utf8_lossy(&beta.run(&beta.main(), Some(WRITER), &["mailbox", "status"], b"").stdout).contains("seen, not confirmed"));
 }

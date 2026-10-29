@@ -6,8 +6,8 @@ mod common;
 
 use common::limits;
 use common::record::{key, name_of, read_state, register, TempFgos, T0};
-use fgos_mailbox::record::{Reported, Wait};
-use fgos_mailbox_core::{Ingested, RemoteMail};
+use fgos_mailbox::record::{IngestBatch, Reported, Wait};
+use fgos_mailbox_core::{Ingested, Refusal, RemoteMail};
 use std::collections::BTreeMap;
 
 fn mail<'a>(
@@ -41,16 +41,14 @@ fn ingested_mail_is_saved_with_its_body_and_cursor_and_a_replay_after_a_reread_i
     let mut cursor = BTreeMap::new();
     cursor.insert("origin-a".to_string(), 7u64);
 
-    let held = record
-        .ingest(
-            &[mail(&from, "m1", &to, "hello remote")],
-            &[],
-            &cursor,
-            Wait::Try,
-            T0,
-            &limits(),
-        )
-        .unwrap();
+    let mails = [mail(&from, "m1", &to, "hello remote")];
+    let batch = IngestBatch {
+        mails: &mails,
+        drops: &[],
+        refusals: &[],
+        cursor: &cursor,
+    };
+    let held = record.ingest(&batch, Wait::Try, T0, &limits()).unwrap();
     assert!(held.wrote);
     let Ok(Ingested::Recorded(id)) = &held.value.value[0] else {
         panic!("{:?}", held.value.value)
@@ -65,16 +63,49 @@ fn ingested_mail_is_saved_with_its_body_and_cursor_and_a_replay_after_a_reread_i
         Some("hello remote")
     );
 
-    let again = record
-        .ingest(
-            &[mail(&from, "m1", &to, "hello remote")],
-            &[],
-            &cursor,
-            Wait::Try,
-            T0,
-            &limits(),
-        )
-        .unwrap();
+    let again = record.ingest(&batch, Wait::Try, T0, &limits()).unwrap();
     assert_eq!(again.value.value, vec![Ok(Ingested::Duplicate)]);
     assert_eq!(read_state(&record).messages().count(), 1);
+}
+
+#[test]
+fn a_refusal_is_kept_in_the_record_until_its_sender_is_told() {
+    let fgos = TempFgos::new("record-ingest-refusal");
+    let record = fgos.record();
+    let nobody = key("not-a-head");
+    let from = key("sender-1");
+    let cursor = BTreeMap::new();
+    let mails = [mail(&from, "lost", &nobody, "hi")];
+    let early = [("unconfirmed".to_string(), "remote-unconfirmed")];
+    let batch = IngestBatch {
+        mails: &mails,
+        drops: &[],
+        refusals: &early,
+        cursor: &cursor,
+    };
+    let held = record.ingest(&batch, Wait::Try, T0, &limits()).unwrap();
+    assert!(matches!(
+        held.value.value[0],
+        Err(Refusal::UnknownName { .. })
+    ));
+
+    let kept: Vec<(String, String)> = read_state(&record)
+        .pending_remote_refusals()
+        .iter()
+        .map(|r| (r.id.clone(), r.code.clone()))
+        .collect();
+    assert_eq!(
+        kept,
+        vec![
+            ("unconfirmed".to_string(), "remote-unconfirmed".to_string()),
+            ("lost".to_string(), "unknown-name".to_string())
+        ]
+    );
+    record
+        .hold(Wait::Try, T0, &limits(), |state, _| Reported {
+            changed: state.clear_remote_refusals(&["lost".to_string()]),
+            value: (),
+        })
+        .unwrap();
+    assert_eq!(read_state(&record).pending_remote_refusals().len(), 1);
 }

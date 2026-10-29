@@ -21,7 +21,7 @@ use fgos_identity::pins::PinState;
 use fgos_identity::shared::{self, EntryLog};
 use fgos_identity::text::iso_utc_secs;
 use fgos_identity::{signing, Signature};
-use fgos_mailbox::record::{Record, Reported, Wait};
+use fgos_mailbox::record::{IngestBatch, Record, Reported, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{CounterReason, Ingested, Limits, RemoteDrop, RemoteMail, Settlement, Timestamp, WriterKey};
 use serde_json::Value;
@@ -214,19 +214,16 @@ pub fn ingest(fgos_dir: &Path, record: &Record, limits: &Limits, cross: &CrossMa
     }
     let counted: Vec<RemoteDrop<'_>> = drops.iter().map(|(reason, machine)| RemoteDrop { reason: *reason, machine }).collect();
     if !(baselined && mails.is_empty() && counted.is_empty() && reached == cursor) {
-        let held = record.ingest(&mails, &counted, &reached, wait, now, limits).map_err(|e| e.to_string())?;
+        let held = record.ingest(&IngestBatch { mails: &mails, drops: &counted, refusals: &refusals, cursor: &reached }, wait, now, limits).map_err(|e| e.to_string())?;
         for (id, result) in ids.into_iter().zip(held.value.value) {
             match result {
                 Ok(Ingested::Recorded(_)) => report.taken += 1,
                 Ok(Ingested::Duplicate) => {}
-                Err(refused) => {
-                    refusals.push((id.clone(), refused.code()));
-                    report.refused.push((id, refused.code()));
-                }
+                Err(refused) => report.refused.push((id, refused.code())),
             }
         }
     }
-    report.settled = settle(&log, &root, &machine.id, &Hold { record, limits, wait, now }, &refusals).map_err(|e| format!("settle: {e}"))?;
+    report.settled = settle(&log, &root, &machine.id, &Hold { record, limits, wait, now }).map_err(|e| format!("settle: {e}"))?;
     Ok(report)
 }
 
@@ -239,47 +236,50 @@ struct Hold<'a> {
     now: Timestamp,
 }
 
-/// Tells the senders what their messages came to here: a refusal at once, and an offer or a refusal
-/// after the fact for each recorded message not yet told. Each is a signed event of this machine
-/// appended to the shared log; the record marks a recorded message told only after its event is
-/// written, so a failure in between repeats an event the sender folds once.
-fn settle(
-    log: &super::identity_log::StoreLog,
-    root: &Path,
-    machine: &str,
-    hold: &Hold<'_>,
-    refusals: &[(String, &'static str)],
-) -> Result<usize, String> {
+/// Tells the senders what their messages came to here: each refusal the record kept, and an offer or
+/// a refusal after the fact for each recorded message not yet told. Each is a signed event of this
+/// machine appended to the shared log; the record forgets one only after its event is written, so a
+/// failure in between repeats an event the sender folds once, and a failed append is tried again at
+/// the next ingest.
+fn settle(log: &super::identity_log::StoreLog, root: &Path, machine: &str, hold: &Hold<'_>) -> Result<usize, String> {
     let Hold { record, limits, wait, now } = *hold;
-    let mut appended = refusals.len();
     let refusal = |r: fgos_identity::Refusal| format!("{}: {}", r.reason, r.detail);
-    for (id, code) in refusals {
-        let payload = settled_payload(root, id, machine, "refused", Some(code)).map_err(refusal)?;
-        log.append(MESSAGE_SETTLED, payload).map_err(refusal)?;
-    }
     let held = record
-        .hold(wait, now, limits, |state, _| Reported::unchanged(state.unsettled_remote()))
+        .hold(wait, now, limits, |state, _| Reported::unchanged((state.unsettled_remote(), state.pending_remote_refusals().to_vec())))
         .map_err(|e| e.to_string())?;
+    let (unsettled, refused) = held.value.value;
     let mut told = Vec::new();
-    for unsettled in held.value.value {
-        let (outcome, reason) = match unsettled.settlement {
-            Settlement::Offered => ("offered", None),
-            Settlement::Refused(code) => ("refused", Some(code)),
-        };
-        let payload = settled_payload(root, &unsettled.origin.id, machine, outcome, reason).map_err(refusal)?;
-        log.append(MESSAGE_SETTLED, payload).map_err(refusal)?;
-        told.push(unsettled.id);
-        appended += 1;
-    }
-    if !told.is_empty() {
+    let mut told_refusals = Vec::new();
+    let mut appended = 0;
+    // A failure stops at the first event it cannot write: what was written is forgotten below.
+    let outcome = (|| {
+        for pending in &refused {
+            let payload = settled_payload(root, &pending.id, machine, "refused", Some(&pending.code)).map_err(refusal)?;
+            log.append(MESSAGE_SETTLED, payload).map_err(refusal)?;
+            told_refusals.push(pending.id.clone());
+            appended += 1;
+        }
+        for message in unsettled {
+            let (outcome, reason) = match message.settlement {
+                Settlement::Offered => ("offered", None),
+                Settlement::Refused(code) => ("refused", Some(code)),
+            };
+            let payload = settled_payload(root, &message.origin.id, machine, outcome, reason).map_err(refusal)?;
+            log.append(MESSAGE_SETTLED, payload).map_err(refusal)?;
+            told.push(message.id);
+            appended += 1;
+        }
+        Ok::<(), String>(())
+    })();
+    if !told.is_empty() || !told_refusals.is_empty() {
         record
             .hold(wait, now, limits, |state, _| Reported {
-                changed: state.mark_remote_settled(&told),
+                changed: state.mark_remote_settled(&told) | state.clear_remote_refusals(&told_refusals),
                 value: (),
             })
             .map_err(|e| e.to_string())?;
     }
-    Ok(appended)
+    outcome.map(|()| appended)
 }
 
 #[cfg(test)]

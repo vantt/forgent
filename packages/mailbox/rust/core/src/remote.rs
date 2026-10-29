@@ -233,6 +233,33 @@ impl MailboxState {
             .collect()
     }
 
+    /// Keeps a refusal of a message that never became a header until its
+    /// sender is told; the oldest are dropped past the counters' key bound.
+    pub fn queue_remote_refusal(&mut self, id: &str, code: &str, limits: &Limits) {
+        self.remote.refusals.push(crate::state::RemoteRefusal {
+            id: id.to_string(),
+            code: code.to_string(),
+        });
+        let cap = limits.counters.max_keys as usize;
+        if self.remote.refusals.len() > cap {
+            let excess = self.remote.refusals.len() - cap;
+            self.remote.refusals.drain(..excess);
+        }
+    }
+
+    /// The refusals whose senders were not told yet, oldest first.
+    pub fn pending_remote_refusals(&self) -> &[crate::state::RemoteRefusal] {
+        &self.remote.refusals
+    }
+
+    /// Forgets the refusals of the messages `ids`, whose senders were told.
+    /// Returns whether anything changed.
+    pub fn clear_remote_refusals(&mut self, ids: &[String]) -> bool {
+        let before = self.remote.refusals.len();
+        self.remote.refusals.retain(|r| !ids.contains(&r.id));
+        self.remote.refusals.len() != before
+    }
+
     /// Marks the sender of each of `ids` as told. Returns whether anything changed.
     pub fn mark_remote_settled(&mut self, ids: &[MessageId]) -> bool {
         let mut changed = false;

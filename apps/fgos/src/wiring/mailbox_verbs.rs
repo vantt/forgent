@@ -348,6 +348,15 @@ fn status(json: bool) -> MailboxAnswer {
                 }
                 Err(why) => text.push_str(&format!("\ncross-machine: unavailable ({why})")),
             }
+            let unconfirmed = mailbox_remote::unconfirmed_machines(&root);
+            data["crossMachine"]["requireConfirmed"] = Value::from(cross.require_confirmed);
+            data["crossMachine"]["unconfirmedMachines"] = unconfirmed.iter().map(|(id, _)| Value::from(id.as_str())).collect();
+            for (machine, fingerprint) in &unconfirmed {
+                text.push_str(&format!(
+                    "\ncross-machine: key of machine {machine} is seen, not confirmed ({fingerprint}); compare it with the fingerprint that machine reports, then `fgos identity pins --confirm {machine} --fingerprint <fingerprint>`{}",
+                    if cross.require_confirmed { ", or its mail is refused" } else { "" }
+                ));
+            }
         }
     }
     MailboxAnswer {

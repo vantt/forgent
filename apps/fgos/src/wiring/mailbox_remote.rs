@@ -14,7 +14,7 @@
 use super::identity_log::StoreLogDoor;
 use super::mailbox_config::CrossMachine;
 use fgos_identity::current::{current_session, machine_info};
-use fgos_identity::pins::PinState;
+use fgos_identity::pins::{self, PinState};
 use fgos_identity::shared::{self, MachineRef};
 use fgos_identity::text::{iso_utc_now, iso_utc_secs};
 use fgos_identity::{project, signing, Refusal, Signature};
@@ -201,6 +201,18 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
         }
     }
     Ok(summary)
+}
+
+/// The machines whose key this machine pinned as seen and never confirmed: mail from them is
+/// refused while `mailbox.remote.requireConfirmed` holds, so the owner has to confirm each one
+/// (after comparing the fingerprint the machine itself reports) or leave it out.
+pub fn unconfirmed_machines(root: &Path) -> Vec<(String, String)> {
+    pins::list(root)
+        .unwrap_or_default()
+        .into_iter()
+        .filter(|pin| pin.state == PinState::Seen)
+        .map(|pin| (pin.machine_id, pin.fingerprint))
+        .collect()
 }
 
 /// The text a recorded cross-machine send answers with.

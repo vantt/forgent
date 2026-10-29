@@ -56,6 +56,6 @@ pub use report::{
     delivery_report, inbox_text, list_text, record_error_text, record_unavailable_text,
     refusal_text, role_holder_text, ListRow, VersionClause,
 };
-pub use state::{MailboxState, RemoteState, SnapshotVersion, SnapshotVersionError, SNAPSHOT_SCHEMA_VERSION};
+pub use state::{MailboxState, RemoteRefusal, RemoteState, SnapshotVersion, SnapshotVersionError, SNAPSHOT_SCHEMA_VERSION};
 pub use time::Timestamp;
 pub use wake::{Exchange, ExchangeKey, WakeDrop, WakeLifetimeKey};

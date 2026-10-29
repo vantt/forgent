@@ -83,6 +83,16 @@ pub trait ReportsChange {
     fn changed(&self) -> bool;
 }
 
+/// What one ingest hands the record: the verified messages, what was dropped before the core saw it
+/// (only counted), the refusals its senders are yet to be told, and the cursor to move to.
+#[derive(Clone, Copy)]
+pub struct IngestBatch<'a> {
+    pub mails: &'a [RemoteMail<'a>],
+    pub drops: &'a [RemoteDrop<'a>],
+    pub refusals: &'a [(String, &'static str)],
+    pub cursor: &'a BTreeMap<String, u64>,
+}
+
 /// What the core answered for each message of one ingest, in order.
 pub type IngestResults = Vec<Result<Ingested, Refusal>>;
 
@@ -484,9 +494,7 @@ impl Record {
     /// is judged once in the hold, and the record may be refused as full.
     pub fn ingest(
         &self,
-        mails: &[RemoteMail<'_>],
-        drops: &[RemoteDrop<'_>],
-        cursor: &BTreeMap<String, u64>,
+        batch: &IngestBatch<'_>,
         wait: Wait,
         now: Timestamp,
         limits: &Limits,
@@ -497,6 +505,7 @@ impl Record {
             limits,
             |_| Ok(()),
             |state, ids, dead| {
+                let IngestBatch { mails, drops, refusals, cursor } = *batch;
                 let dead = dead.cloned().unwrap_or_default();
                 for drop in drops {
                     state.count_remote_drop(drop, now, limits);
@@ -505,6 +514,15 @@ impl Record {
                     .iter()
                     .map(|mail| state.ingest_remote(mail, &dead, now, limits, ids))
                     .collect();
+                // Every refusal is kept in the same write as the cursor that moves past the message.
+                for (id, code) in refusals {
+                    state.queue_remote_refusal(id, code, limits);
+                }
+                for (mail, result) in mails.iter().zip(&results) {
+                    if let Err(refused) = result {
+                        state.queue_remote_refusal(mail.id, refused.code(), limits);
+                    }
+                }
                 let moved = state.advance_remote_cursor(cursor);
                 let installs = mails
                     .iter()
@@ -516,7 +534,7 @@ impl Record {
                     .collect();
                 // A refusal or a duplicate still changed the state (the id
                 // is remembered, the counters moved), so any mail saves.
-                let changed = moved || !mails.is_empty() || !drops.is_empty();
+                let changed = moved || !mails.is_empty() || !drops.is_empty() || !refusals.is_empty();
                 (
                     Reported {
                         value: results,
