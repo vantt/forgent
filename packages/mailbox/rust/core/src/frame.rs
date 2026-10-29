@@ -225,7 +225,11 @@ fn render_message(
     };
     let attempt = item.attempt.to_string();
     let reply = if sender.has_head {
-        fill(section("message.reply"), &[("from", &from), ("id", &id)])
+        let target = sender
+            .reply_to
+            .as_ref()
+            .map_or_else(|| from.clone(), |name| escape_handle(name, limits));
+        fill(section("message.reply"), &[("from", &target), ("id", &id)])
     } else {
         String::new()
     };
@@ -314,6 +318,10 @@ pub fn bounded_len(item: &ClaimedItem, rendered_body: u64, limits: &Limits) -> u
             let longest = MailFrom {
                 head: None,
                 handle: Some("x".repeat(limits.frame.max_header_chars as usize)),
+                reply_to: from
+                    .reply_to
+                    .as_ref()
+                    .map(|_| "x".repeat(limits.frame.max_header_chars as usize)),
                 ..from.clone()
             };
             let around = render_message(item, &longest, Some(""), limits).len();

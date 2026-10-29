@@ -34,10 +34,10 @@ pub use snapshot::{snapshot_read_cap, snapshot_write_cap};
 use fgos_durable_file::sync_directory;
 use fgos_holder_lock::{Acquire, LockScope, ScopeError};
 use fgos_mailbox_core::{
-    Claim, Finished, IdSource, Limits, MailboxState, MessageId, Refusal, RegisterRefusal,
-    Registered, SendOutcome, SendRequest, SnapshotVersionError, Timestamp, WriterKey,
+    Claim, Finished, IdSource, Ingested, Limits, MailboxState, MessageId, Refusal, RegisterRefusal,
+    Registered, RemoteDrop, RemoteMail, SendOutcome, SendRequest, SnapshotVersionError, Timestamp, WriterKey,
 };
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read};
@@ -82,6 +82,9 @@ pub struct Warning {
 pub trait ReportsChange {
     fn changed(&self) -> bool;
 }
+
+/// What the core answered for each message of one ingest, in order.
+pub type IngestResults = Vec<Result<Ingested, Refusal>>;
 
 /// A closure's value with the change its core operations reported.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -420,7 +423,7 @@ impl Record {
             now,
             limits,
             observe,
-            |state, ids, _| (mutate(state, ids), None),
+            |state, ids, _| (mutate(state, ids), Vec::new()),
             Sweep::No,
         )
     }
@@ -461,8 +464,66 @@ impl Record {
                     ..req
                 };
                 let sent = state.send(req, now, limits, ids);
-                let install = sent.as_ref().ok().map(|outcome| (outcome.id.clone(), body));
+                let install = sent
+                    .as_ref()
+                    .ok()
+                    .map(|outcome| (outcome.id.clone(), body))
+                    .into_iter()
+                    .collect();
                 (sent, install)
+            },
+            Sweep::Yes,
+        )
+    }
+
+    /// One hold that takes verified mail from other machines: each message
+    /// is judged by the core in order (dropped ones only counted), the bodies of those taken are
+    /// installed before the snapshot that names them, and the ingest cursor
+    /// moves to `cursor` in the same write, so a message and the position
+    /// past it are saved together or not at all. Like a send, the head list
+    /// is judged once in the hold, and the record may be refused as full.
+    pub fn ingest(
+        &self,
+        mails: &[RemoteMail<'_>],
+        drops: &[RemoteDrop<'_>],
+        cursor: &BTreeMap<String, u64>,
+        wait: Wait,
+        now: Timestamp,
+        limits: &Limits,
+    ) -> Result<Held<Reported<IngestResults>>, RecordError> {
+        self.run(
+            wait,
+            now,
+            limits,
+            |_| Ok(()),
+            |state, ids, dead| {
+                let dead = dead.cloned().unwrap_or_default();
+                for drop in drops {
+                    state.count_remote_drop(drop, now, limits);
+                }
+                let results: IngestResults = mails
+                    .iter()
+                    .map(|mail| state.ingest_remote(mail, &dead, now, limits, ids))
+                    .collect();
+                let moved = state.advance_remote_cursor(cursor);
+                let installs = mails
+                    .iter()
+                    .zip(&results)
+                    .filter_map(|(mail, result)| match result {
+                        Ok(Ingested::Recorded(id)) => Some((id.clone(), mail.body)),
+                        _ => None,
+                    })
+                    .collect();
+                // A refusal or a duplicate still changed the state (the id
+                // is remembered, the counters moved), so any mail saves.
+                let changed = moved || !mails.is_empty() || !drops.is_empty();
+                (
+                    Reported {
+                        value: results,
+                        changed,
+                    },
+                    installs,
+                )
             },
             Sweep::Yes,
         )
@@ -501,7 +562,7 @@ impl Record {
             &mut MailboxState,
             &mut dyn IdSource,
             Option<&BTreeSet<WriterKey>>,
-        ) -> (R, Option<(MessageId, &'b str)>),
+        ) -> (R, Vec<(MessageId, &'b str)>),
         sweep: Sweep,
     ) -> Result<Held<R>, RecordError> {
         let params = self
@@ -548,8 +609,8 @@ impl Record {
             });
         }
         before_commit(&mut observe, Step::Mutated)?;
-        if let Some((id, text)) = body {
-            bodies::install(&self.paths, &id, text.as_bytes())?;
+        for (id, text) in &body {
+            bodies::install(&self.paths, id, text.as_bytes())?;
             before_commit(&mut observe, Step::BodyInstalled)?;
         }
         let mut warning = snapshot::install(&self.paths, &new, &mut observe)?;

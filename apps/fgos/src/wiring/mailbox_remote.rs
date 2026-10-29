@@ -13,7 +13,7 @@
 //! two can only over-count the sender, never let a cap be passed.
 use super::identity_log::StoreLogDoor;
 use super::mailbox_config::CrossMachine;
-use fgos_identity::current::machine_info;
+use fgos_identity::current::{current_session, machine_info};
 use fgos_identity::pins::PinState;
 use fgos_identity::shared::{self, MachineRef};
 use fgos_identity::text::iso_utc_now;
@@ -70,7 +70,7 @@ pub fn signed_bytes(domain: &str, payload: &Value) -> Result<Vec<u8>, Refusal> {
 }
 
 /// `payload` with this machine's signature under `domain` added as `sig`.
-fn sign_payload(root: &Path, domain: &str, mut payload: Value) -> Result<Value, Refusal> {
+pub fn sign_payload(root: &Path, domain: &str, mut payload: Value) -> Result<Value, Refusal> {
     let signature = signing::sign(root, &signed_bytes(domain, &payload)?)?;
     payload["sig"] = serde_json::to_value(signature).expect("Signature always serializes");
     Ok(payload)
@@ -164,7 +164,10 @@ pub fn send(ctx: &Context<'_>, from: &WriterKey, to: &str, body: &str, reply_to:
     };
     let appended = (|| {
         let machine = MachineRef::from(&machine_info(&root)?);
-        let payload = sent_payload(&root, id.as_str(), from.as_str(), &machine, &target, body, reply_to)?;
+        // The writer key attributes the append; the event names the sender by its full session id,
+        // which the receiver checks against the signer's machine.
+        let session = current_session(&root, std::process::id(), Some(fgos_dir))?;
+        let payload = sent_payload(&root, id.as_str(), &session.info.id, &machine, &target, body, reply_to)?;
         let log = StoreLogDoor
             .open_stream(main, from.as_str(), STREAM)?
             .ok_or_else(|| Refusal { reason: "event-store-unavailable", detail: "this clone has no Event Store".into(), candidates: Vec::new() })?;

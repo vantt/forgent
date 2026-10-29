@@ -27,7 +27,8 @@ fn store_fault(reason: &'static str, error: impl std::fmt::Debug) -> Refusal {
 #[derive(Debug)]
 pub struct StoreLogDoor;
 
-struct StoreLog {
+/// One stream of a clone's Event Store, opened for appends and reads.
+pub struct StoreLog {
     driver: GitDriver,
     repo: fgos_git::RepoHandle,
     layout: Layout,
@@ -49,6 +50,12 @@ impl StoreLogDoor {
     /// The log of `stream` (a registered stream id) of the clone `dir` is in, written as `writer`:
     /// the same admission, cursor and ordering Identity's directory uses, for another stream.
     pub fn open_stream(&self, dir: &Path, writer: &str, stream: &str) -> Result<Option<Box<dyn EntryLog>>, Refusal> {
+        Ok(self.open_store(dir, writer, stream)?.map(|log| Box::new(log) as Box<dyn EntryLog>))
+    }
+
+    /// [`StoreLogDoor::open_stream`] as the concrete log, whose whole envelopes a reader that needs
+    /// positions (a cursor) and store timestamps can read.
+    pub fn open_store(&self, dir: &Path, writer: &str, stream: &str) -> Result<Option<StoreLog>, Refusal> {
         let fault = |e: &dyn std::fmt::Debug| store_fault("event-store-unavailable", e);
         let clone = match super::event_store_clone::open(dir) {
             Ok(Some(clone)) => clone,
@@ -57,11 +64,19 @@ impl StoreLogDoor {
         };
         let stream = StreamId::parse(stream).map_err(|e| fault(&e))?;
         let super::event_store_clone::EventStoreClone { driver, repo, layout, registry, machine } = clone;
-        Ok(Some(Box::new(StoreLog { driver, repo, layout, registry, stream, machine, writer: writer.to_owned(), dir: dir.to_owned() })))
+        Ok(Some(StoreLog { driver, repo, layout, registry, stream, machine, writer: writer.to_owned(), dir: dir.to_owned() }))
     }
 }
 
 impl StoreLog {
+    /// Every envelope of this stream the clone holds, in the store's order, and this store's own
+    /// origin id (empty while the clone has no store yet).
+    pub fn envelopes(&self) -> Result<(Vec<fgos_event_store::envelope::Envelope>, String), Refusal> {
+        let (result, origin) = self.read_stream()?;
+        let stream = self.stream.as_str();
+        Ok((result.sequence.into_iter().filter(|event| event.stream == stream).collect(), origin))
+    }
+
     /// The write admission every writer of the Event Store passes before it appends: a clone whose
     /// pinned legacy ref or fetch mapping is missing is refused.
     fn admit_write(&self) -> Result<(), Refusal> {

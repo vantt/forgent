@@ -1882,12 +1882,40 @@ fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_r
     let payload = sent[0].clone();
     assert_eq!(payload["body"], "hello from alpha");
     assert_eq!(payload["to"]["id"], target.as_str());
+    let machine = fgos_identity::machine::read(&alpha_root).unwrap();
+    let sender = payload["from"]["id"].as_str().unwrap();
+    assert!(sender.starts_with(&format!("{machine}/")), "the sender is named by its full session id: {sender}");
+    assert_eq!(payload["from"]["machine"], machine.as_str());
     let mut unsigned = payload.clone();
     let sig: fgos_identity::Signature = serde_json::from_value(unsigned.as_object_mut().unwrap().remove("sig").unwrap()).unwrap();
     let canonical = fgos_canonical_json::canonical_json(&unsigned).unwrap();
     let bytes = format!("fgos-mailbox-message/1\n{canonical}").into_bytes();
     let verified = fgos_identity::signing::verify(&beta_root, &bytes, &sig).unwrap();
     assert_eq!(verified.machine_id, payload["from"]["machine"].as_str().unwrap(), "the signer is the sender's machine");
+
+    // Alpha's sync child pushes the message; beta's fetches it and takes it into beta's record, where
+    // the head beta registered receives it at its next tool call, once.
+    let sync = |scene: &Scene| {
+        let main = scene.main();
+        let out = scene.run(&main, None, &["hook", "mailbox-sync", "--dir", main.to_str().unwrap(), "--remote", "origin"], b"");
+        assert_eq!(out.status.code(), Some(0), "{out:?}");
+        assert!(out.stderr.is_empty(), "{}", String::from_utf8_lossy(&out.stderr));
+    };
+    // Beta takes mail only from a machine whose key its owner confirmed: alpha's key is pinned as seen
+    // once beta verifies anything of it, and the owner confirms it by the fingerprint alpha reports.
+    let alpha_machine = fgos_identity::machine::read(&alpha_root).unwrap();
+    let probe = fgos_identity::signing::sign(&alpha_root, b"probe").unwrap();
+    fgos_identity::signing::verify(&beta_root, b"probe", &probe).unwrap();
+    let fingerprint = fgos_identity::signing::key_fingerprint(&alpha_root).unwrap().unwrap();
+    fgos_identity::pins::confirm(&beta_root, &alpha_machine, &fingerprint).unwrap();
+    sync(&alpha);
+    sync(&beta);
+    let frame = beta.claude_hook("post-tool-use", &post_tool_use());
+    let frame = String::from_utf8_lossy(&frame.stdout).into_owned();
+    assert!(frame.contains("hello from alpha") && frame.contains("remote_"), "beta's head received the mail: {frame:?}");
+    sync(&beta);
+    let again = beta.claude_hook("post-tool-use", &post_tool_use());
+    assert!(!String::from_utf8_lossy(&again.stdout).contains("hello from alpha"), "the mail is delivered once");
 
     let over = send(&"x".repeat(2049));
     assert_eq!(over.status.code(), Some(1), "{over:?}");

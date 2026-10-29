@@ -29,6 +29,8 @@ const UNREGISTERED_LABEL_CHARS: usize = 8;
 /// The start of the label of a sender with no head. The label holds no
 /// `-`, while every short name holds at least two, so no head's name can
 /// ever equal it.
+const REMOTE_LABEL_CHARS: usize = 24;
+const REMOTE_LABEL: &str = "remote_";
 const UNREGISTERED_LABEL: &str = "unregistered_";
 
 /// A send. The body is borrowed: the core reads only its size, and the
@@ -270,6 +272,10 @@ pub struct MailFrom {
     /// never stored (the core leaves it `None`): it is a function of the
     /// key, the CLI and the machine handle, so a stored copy would go stale.
     pub handle: Option<String>,
+    /// For a sender on another machine: the name a reply goes to (its
+    /// Identity handle, or its full session id), which the store cannot
+    /// derive from a head it does not have; `None` for mail of this machine.
+    pub reply_to: Option<String>,
 }
 
 impl ClaimedItem {
@@ -383,6 +389,24 @@ fn eligible(
         && (checkpoint.takes_all_pending() || header.effective_wake)
 }
 
+/// The label a frame shows for a sender on another machine: its handle or id
+/// in the name alphabet, so a peer on another machine is never labelled as a
+/// head of this record.
+fn remote_label(text: &str) -> String {
+    let part: String = text
+        .chars()
+        .map(|c| {
+            if c != '-' && names::in_name_alphabet(c) {
+                c
+            } else {
+                '_'
+            }
+        })
+        .take(REMOTE_LABEL_CHARS)
+        .collect();
+    format!("{REMOTE_LABEL}{part}")
+}
+
 impl MailboxState {
     fn current_generation(&self, key: &WriterKey) -> Option<Generation> {
         self.binding(key).map(|b| b.generation)
@@ -485,6 +509,7 @@ impl MailboxState {
             offers: 0,
             answered: false,
             state: MessageState::Recorded,
+            origin: None,
         };
         let outcome = SendOutcome {
             id: header.id.clone(),
@@ -663,17 +688,36 @@ impl MailboxState {
     /// The claimed item of a message at offer `attempt`.
     fn mail_item(&self, header: &Header, attempt: u32) -> ClaimedItem {
         let sender = self.binding(&header.from);
-        ClaimedItem {
-            id: header.id.clone(),
-            attempt,
-            what: ClaimedWhat::Mail(MailFrom {
+        let from = match &header.origin {
+            Some(origin) => {
+                let reply_to = origin
+                    .handle
+                    .clone()
+                    .unwrap_or_else(|| format!("{}/{}", origin.machine, header.from.as_str()));
+                MailFrom {
+                    label: remote_label(&reply_to),
+                    cli: None,
+                    has_head: true,
+                    key: header.from.clone(),
+                    head: None,
+                    handle: origin.handle.clone(),
+                    reply_to: Some(reply_to),
+                }
+            }
+            None => MailFrom {
                 label: self.sender_label(&header.from),
                 cli: sender.map(|b| b.cli.clone()),
                 has_head: sender.is_some(),
                 key: header.from.clone(),
                 head: sender.map(|b| b.head.clone()),
                 handle: None,
-            }),
+                reply_to: None,
+            },
+        };
+        ClaimedItem {
+            id: header.id.clone(),
+            attempt,
+            what: ClaimedWhat::Mail(from),
         }
     }
 
@@ -844,7 +888,10 @@ impl MailboxState {
             .map(|h| MessageView {
                 id: h.id.clone(),
                 kind: Kind::Message,
-                from_label: self.sender_label(&h.from),
+                from_label: h.origin.as_ref().map_or_else(
+                    || self.sender_label(&h.from),
+                    |origin| remote_label(origin.handle.as_deref().unwrap_or(h.from.as_str())),
+                ),
                 recorded_at: h.recorded_at,
                 offers: h.offers,
                 in_flight: matches!(h.state, MessageState::InFlight { .. }),

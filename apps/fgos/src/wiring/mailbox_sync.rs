@@ -12,19 +12,22 @@
 //! ends with status 0 on every path: nobody waits for it.
 use super::event_store_clone;
 use super::identity_log::StoreLogDoor;
-use super::mailbox_config::project_mailbox;
+use super::mailbox_config::{project_mailbox, CrossMachine};
+use super::mailbox_ingest;
 use super::mailbox_identity::{session_of, state_root};
 use fgos_event_store::sync::{sync, SyncRequest};
 use fgos_identity::current::machine_info;
 use fgos_identity::directory;
 use fgos_identity::shared::{self, LogDoor};
 use fgos_mailbox::verbs;
-use fgos_mailbox::record::Paths;
-use fgos_mailbox_core::Limits;
+use fgos_mailbox::limits::Loaded;
+use fgos_mailbox::record::{Paths, Record, Wait};
+use fgos_mailbox_core::{Limits, Timestamp};
 use fgos_process::mapped::spawn_detached;
 use fgos_process::facts::judge_here;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Runs one sync and ends the process with status 0.
 pub fn main(args: &[OsString]) -> ! {
@@ -51,8 +54,8 @@ fn run(args: &[OsString]) {
         return;
     };
     let fgos_dir = dir.join(".fgos");
-    let loaded = match project_mailbox(&fgos_dir) {
-        Ok((loaded, cross)) if cross.enabled => loaded,
+    let (loaded, cross) = match project_mailbox(&fgos_dir) {
+        Ok((loaded, cross)) if cross.enabled => (loaded, cross),
         Ok(_) => return,
         Err(failure) => {
             eprintln!("mailbox-sync: {}", failure.reason());
@@ -65,6 +68,24 @@ fn run(args: &[OsString]) {
     if let Err(why) = publish(&dir, &remote) {
         eprintln!("mailbox-sync: {why}");
     }
+    if let Err(why) = take_mail(&fgos_dir, &loaded, &cross) {
+        eprintln!("mailbox-sync: {why}");
+    }
+}
+
+/// Takes the mail the fetch brought into the record. A project that has no record yet takes none:
+/// the record is made by the first hook call of a session, not by the child.
+fn take_mail(fgos_dir: &Path, loaded: &Loaded, cross: &CrossMachine) -> Result<(), String> {
+    let record = Record::open(fgos_dir).map_err(|e| e.to_string())?;
+    let wait = Wait::Ms(loaded.hook.verbs.lock_wait_ms);
+    mailbox_ingest::ingest(fgos_dir, &record, &loaded.limits, cross, wait, now()).map(|_| ())
+}
+
+fn now() -> Timestamp {
+    let millis = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_or(0, |d| u64::try_from(d.as_millis()).unwrap_or(u64::MAX));
+    Timestamp::from_millis(millis)
 }
 
 /// Starts the detached child that publishes the heads of `main`'s mailbox and

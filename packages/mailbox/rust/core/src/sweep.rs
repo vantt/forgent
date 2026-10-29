@@ -19,6 +19,7 @@ impl MailboxState {
         self.refuse_stale_records(now, limits, ids);
         self.retire_settled_messages(now, limits);
         self.forget_old_notice_marks(now, limits);
+        self.forget_old_remote(now, limits);
     }
 
     /// Whether a sweep as of `now` would change anything: some time rule of

@@ -84,3 +84,45 @@ pub fn iso_utc(secs: u64, millis: u32) -> String {
         rem % 60
     )
 }
+
+/// Seconds since the epoch of an `iso_utc`-shaped timestamp
+/// (`YYYY-MM-DDTHH:MM:SS[.fff]Z`); `None` for any other text.
+pub fn iso_utc_secs(text: &str) -> Option<u64> {
+    let (date, time) = text.strip_suffix('Z')?.split_once('T')?;
+    let mut date = date.split('-');
+    let (year, month, day): (i64, i64, i64) =
+        (date.next()?.parse().ok()?, date.next()?.parse().ok()?, date.next()?.parse().ok()?);
+    if date.next().is_some() || !(1..=12).contains(&month) || !(1..=31).contains(&day) {
+        return None;
+    }
+    let time = time.split('.').next()?;
+    let mut time = time.split(':');
+    let (hour, minute, second): (u64, u64, u64) =
+        (time.next()?.parse().ok()?, time.next()?.parse().ok()?, time.next()?.parse().ok()?);
+    if time.next().is_some() || hour > 23 || minute > 59 || second > 60 {
+        return None;
+    }
+    // Days since 1970-01-01 from a civil date (Howard Hinnant's algorithm).
+    let y = year - i64::from(month <= 2);
+    let era = y.div_euclid(400);
+    let yoe = y.rem_euclid(400);
+    let doy = (153 * (if month > 2 { month - 3 } else { month + 9 }) + 2) / 5 + day - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    let days = u64::try_from(era * 146_097 + doe - 719_468).ok()?;
+    Some(days * 86_400 + hour * 3_600 + minute * 60 + second)
+}
+
+#[cfg(test)]
+mod iso_tests {
+    use super::{iso_utc, iso_utc_secs};
+
+    #[test]
+    fn a_timestamp_the_formatter_wrote_parses_back_and_other_text_does_not() {
+        for secs in [0, 86_399, 951_782_400, 1_788_000_123, 4_102_444_800] {
+            assert_eq!(iso_utc_secs(&iso_utc(secs, 456)), Some(secs));
+        }
+        for bad in ["", "2026-10-29", "2026-13-01T00:00:00Z", "2026-10-29T25:00:00Z", "2026-10-29T00:00:00", "x"] {
+            assert_eq!(iso_utc_secs(bad), None, "{bad}");
+        }
+    }
+}

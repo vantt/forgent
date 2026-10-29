@@ -179,25 +179,42 @@ fn the_snapshot_version_check_refuses_a_newer_version_refuses_an_older_one_as_un
         })
     );
 
-    let older = SnapshotVersion {
-        schema_version: SNAPSHOT_SCHEMA_VERSION - 1,
-    };
+    let unreadable = SnapshotVersion { schema_version: 0 };
     assert_eq!(
-        older.check(),
+        unreadable.check(),
         Err(SnapshotVersionError::UnsupportedOlder {
-            found: SNAPSHOT_SCHEMA_VERSION - 1,
+            found: 0,
             supported: SNAPSHOT_SCHEMA_VERSION
         })
     );
+    let previous = SnapshotVersion {
+        schema_version: SNAPSHOT_SCHEMA_VERSION - 1,
+    };
+    assert_eq!(previous.check(), Ok(()), "the version before is still read");
 }
 
 #[test]
 fn a_snapshot_of_another_version_does_not_deserialize_even_when_the_caller_skips_the_version_check()
 {
-    for other in [SNAPSHOT_SCHEMA_VERSION + 1, SNAPSHOT_SCHEMA_VERSION - 1] {
+    for other in [SNAPSHOT_SCHEMA_VERSION + 1, 0] {
         let mut snapshot = serde_json::to_value(populated_state()).unwrap();
         snapshot["schema_version"] = serde_json::json!(other);
         let error = serde_json::from_value::<MailboxState>(snapshot).unwrap_err();
         assert!(error.to_string().contains("snapshot-"), "{error}");
     }
+}
+
+/// A snapshot written before mail could cross machines (no `remote` section,
+/// no header origin) reads as the current version, empty where it is new, and
+/// is written back as the current one.
+#[test]
+fn a_version_1_snapshot_reads_as_the_current_version_with_no_remote_state() {
+    let mut old = serde_json::to_value(populated_state()).unwrap();
+    old["schema_version"] = serde_json::json!(1);
+    old.as_object_mut().unwrap().remove("remote");
+    let state: MailboxState = serde_json::from_value(old).unwrap();
+    assert!(!state.remote_baselined());
+    assert!(state.remote_cursor().is_empty());
+    let written = serde_json::to_value(&state).unwrap();
+    assert_eq!(written["schema_version"], SNAPSHOT_SCHEMA_VERSION);
 }

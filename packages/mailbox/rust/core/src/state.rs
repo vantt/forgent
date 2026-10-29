@@ -26,7 +26,12 @@ use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::{BTreeMap, VecDeque};
 
 /// The version of the snapshot shape this core reads and writes.
-pub const SNAPSHOT_SCHEMA_VERSION: u32 = 1;
+pub const SNAPSHOT_SCHEMA_VERSION: u32 = 2;
+
+/// The oldest version this core still reads; it is read as the current one
+/// and written back as the current one (version 2 only added the `remote`
+/// section and a header's `origin`, both empty in a version 1 snapshot).
+const OLDEST_READABLE_VERSION: u32 = 1;
 
 /// The version field alone, read before the whole snapshot.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -66,13 +71,13 @@ impl std::fmt::Display for SnapshotVersionError {
 impl std::error::Error for SnapshotVersionError {}
 
 impl SnapshotVersion {
-    /// Accepts only the current version.
+    /// Accepts the current version and the one before it.
     pub const fn check(&self) -> Result<(), SnapshotVersionError> {
         let found = self.schema_version;
         let supported = SNAPSHOT_SCHEMA_VERSION;
         if found > supported {
             Err(SnapshotVersionError::Newer { found, supported })
-        } else if found < supported {
+        } else if found < OLDEST_READABLE_VERSION {
             Err(SnapshotVersionError::UnsupportedOlder { found, supported })
         } else {
             Ok(())
@@ -83,8 +88,9 @@ impl SnapshotVersion {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct MailboxState {
-    /// Always [`SNAPSHOT_SCHEMA_VERSION`]: deserialization refuses any
-    /// other, so a caller cannot skip the check.
+    /// Always [`SNAPSHOT_SCHEMA_VERSION`]: deserialization refuses a newer
+    /// or unreadable version and upgrades the readable older one, so a
+    /// caller cannot skip the check.
     #[serde(deserialize_with = "current_schema_version")]
     schema_version: u32,
     /// The latest time any operation has seen. A wall clock that steps back
@@ -108,6 +114,24 @@ pub struct MailboxState {
     pub(crate) exchanges: BTreeMap<ExchangeKey, Exchange>,
     /// Effective wakes per registered sender generation and recipient.
     pub(crate) wake_lifetime: BTreeMap<WakeLifetimeKey, u32>,
+    /// What ingest of mail from other machines keeps.
+    #[serde(default)]
+    pub(crate) remote: RemoteState,
+}
+
+/// Ingest's own state: where it stopped reading the shared mail stream and
+/// which messages it already took, so no message lands twice.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RemoteState {
+    /// Whether the first ingest took its baseline: what the stream held then
+    /// is never delivered.
+    pub baselined: bool,
+    /// The highest sequence number taken from each store origin.
+    pub cursor: BTreeMap<String, u64>,
+    /// `<signer machine>\n<message id>` of every message taken or refused,
+    /// with the time it was; kept as long as the ingest horizon.
+    pub seen: BTreeMap<String, Timestamp>,
 }
 
 fn current_schema_version<'de, D: Deserializer<'de>>(deserializer: D) -> Result<u32, D::Error> {
@@ -115,7 +139,7 @@ fn current_schema_version<'de, D: Deserializer<'de>>(deserializer: D) -> Result<
     SnapshotVersion { schema_version }
         .check()
         .map_err(D::Error::custom)?;
-    Ok(schema_version)
+    Ok(SNAPSHOT_SCHEMA_VERSION)
 }
 
 impl Default for MailboxState {
@@ -132,6 +156,7 @@ impl Default for MailboxState {
             lifetime: BTreeMap::new(),
             exchanges: BTreeMap::new(),
             wake_lifetime: BTreeMap::new(),
+            remote: RemoteState::default(),
         }
     }
 }

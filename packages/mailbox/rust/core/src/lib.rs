@@ -23,6 +23,7 @@ mod names;
 mod notices;
 mod policy;
 mod registry;
+mod remote;
 mod report;
 mod state;
 mod sweep;
@@ -34,7 +35,7 @@ pub use delivery::{
     AliasCandidate, AliasRefusal, Checkpoint, Claim, ClaimedItem, ClaimedWhat, Finished, MailFrom,
     MessageView, NoticeFacts, Recipient, Refusal, SendOutcome, SendRequest,
 };
-pub use envelope::{Header, Kind, MessageState, RefusalReason};
+pub use envelope::{Header, Kind, MessageState, Origin, RefusalReason};
 pub use frame::{
     bounded_len, frame_sections, pointer_reserve, render, rendered_body_len, too_large_pointer,
     worst_case_len, FRAME_SEPARATOR,
@@ -50,10 +51,11 @@ pub use names::{is_group, ResolveRefusal};
 pub use notices::{Notice, NoticeMark, NoticeState};
 pub use policy::{LifetimeKey, RemoteSend};
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
+pub use remote::{Ingested, RemoteDrop, RemoteMail};
 pub use report::{
     delivery_report, inbox_text, list_text, record_error_text, record_unavailable_text,
     refusal_text, role_holder_text, ListRow, VersionClause,
 };
-pub use state::{MailboxState, SnapshotVersion, SnapshotVersionError, SNAPSHOT_SCHEMA_VERSION};
+pub use state::{MailboxState, RemoteState, SnapshotVersion, SnapshotVersionError, SNAPSHOT_SCHEMA_VERSION};
 pub use time::Timestamp;
 pub use wake::{Exchange, ExchangeKey, WakeDrop, WakeLifetimeKey};

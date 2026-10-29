@@ -81,4 +81,21 @@ pub struct Header {
     /// Whether the recipient has replied to it (spec §5.4).
     pub answered: bool,
     pub state: MessageState,
+    /// Where a message that came from another machine was signed; `None` for
+    /// mail of this machine. Its sender is accounted by this origin, never by
+    /// the shared `unregistered` identity.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<Origin>,
+}
+
+/// The verified origin of a message from another machine.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Origin {
+    /// The signer's machine id.
+    pub machine: String,
+    /// The message id the sender's machine gave it; with `machine` the dedupe key.
+    pub id: String,
+    /// The sender's Identity handle, when it passes the frame's label rule.
+    pub handle: Option<String>,
 }

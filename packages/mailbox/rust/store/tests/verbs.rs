@@ -116,7 +116,7 @@ fn a_send_and_an_inbox_whose_record_failed_answer_with_the_record_error_text() {
     let snapshot = fgos.paths().snapshot();
     let mut value: serde_json::Value =
         serde_json::from_slice(&std::fs::read(&snapshot).unwrap()).unwrap();
-    value["schema_version"] = 2.into();
+    value["schema_version"] = (fgos_mailbox_core::SNAPSHOT_SCHEMA_VERSION + 1).into();
     std::fs::write(&snapshot, serde_json::to_vec(&value).unwrap()).unwrap();
     let expected = record_error_text("snapshot-newer");
 

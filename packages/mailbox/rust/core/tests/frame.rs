@@ -19,6 +19,7 @@ fn item(from_label: &str, has_head: bool) -> ClaimedItem {
             key: fgos_mailbox_core::WriterKey::new("sender-key").unwrap(),
             head: None,
             handle: None,
+            reply_to: None,
         }),
     }
 }

@@ -1,7 +1,7 @@
 //! Bounded refusal and notice counters (spec §5.3, §9 signal 2), in two
 //! tiers: per-reason totals that are never evicted, and per-party entries
 //! bounded by `counters.maxKeys`, least recently bumped evicted first.
-use crate::envelope::RefusalReason;
+use crate::envelope::{Header, RefusalReason};
 use crate::ids::WriterKey;
 use crate::limits::Limits;
 use crate::state::MailboxState;
@@ -56,6 +56,17 @@ pub enum CounterReason {
     NoticeUndelivered,
     /// A notice waited past the record TTL or its generation ended.
     NoticeExpired,
+    /// A message from another machine that is not the shape the wire
+    /// contract names, or names a sender its signer does not own.
+    RemoteMalformed,
+    /// A message from another machine whose signature does not verify.
+    RemoteSignature,
+    /// A message from a machine whose key pin is not confirmed.
+    RemoteUnconfirmed,
+    /// A message for a session that is not a head of this record.
+    RemoteMisaddressed,
+    /// A message older than the ingest's maximum age.
+    RemoteStale,
 }
 
 impl CounterReason {
@@ -81,6 +92,11 @@ impl CounterReason {
             Self::NoticeDropped => "notice-dropped",
             Self::NoticeUndelivered => "notice-undelivered",
             Self::NoticeExpired => "notice-expired",
+            Self::RemoteMalformed => "remote-malformed",
+            Self::RemoteSignature => "remote-signature",
+            Self::RemoteUnconfirmed => "remote-unconfirmed",
+            Self::RemoteMisaddressed => "remote-misaddressed",
+            Self::RemoteStale => "remote-stale",
         }
     }
 }
@@ -217,6 +233,16 @@ impl MailboxState {
         }
     }
 
+    /// Whether `header`'s sender has accounting identity `account`: the
+    /// verified signer and session of a message from another machine (never
+    /// the shared `unregistered`), else as [`MailboxState::is_account`].
+    pub(crate) fn header_is_account(&self, header: &Header, account: &Account) -> bool {
+        match &header.origin {
+            Some(origin) => account.0 == remote_account(&origin.machine, &header.from).0,
+            None => self.is_account(&header.from, account),
+        }
+    }
+
     pub(crate) fn count(
         &mut self,
         reason: CounterReason,
@@ -229,4 +255,10 @@ impl MailboxState {
         self.counters
             .bump(reason, from.as_str(), to.as_str(), now, limits);
     }
+}
+
+/// The accounting identity of a sender on another machine: its machine and
+/// session, so each verified sender has its own caps.
+pub(crate) fn remote_account(machine: &str, from: &WriterKey) -> Account {
+    Account(format!("~{machine}/{}", from.as_str()))
 }

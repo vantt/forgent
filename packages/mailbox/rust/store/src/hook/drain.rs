@@ -376,7 +376,8 @@ pub fn render_reply(
                 from.handle = from
                     .cli
                     .as_ref()
-                    .and_then(|cli| handle_of(&from.key, cli, head.as_ref()));
+                    .and_then(|cli| handle_of(&from.key, cli, head.as_ref()))
+                    .or(from.handle.take());
             }
             render(&item, bodies(&item.id).as_deref(), limits)
         })

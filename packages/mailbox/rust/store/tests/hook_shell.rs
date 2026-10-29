@@ -6,6 +6,7 @@
 #![cfg(unix)]
 mod common;
 
+use fgos_mailbox_core::SNAPSHOT_SCHEMA_VERSION;
 use common::record::{self as rec, read_state, send_req, wait_exit, TempFgos, T0};
 use common::{files, fixture, hook_limits, limits};
 use fgos_mailbox::adapters::TestedClis;
@@ -318,7 +319,7 @@ fn a_record_error_makes_the_hook_quiet_and_print_nothing() {
     let snapshot = fgos.paths().snapshot();
     let mut value: serde_json::Value =
         serde_json::from_slice(&std::fs::read(&snapshot).unwrap()).unwrap();
-    value["schema_version"] = 2.into();
+    value["schema_version"] = (SNAPSHOT_SCHEMA_VERSION + 1).into();
     let newer = serde_json::to_vec(&value).unwrap();
     std::fs::write(&snapshot, &newer).unwrap();
     let (stdin, _) = payload(files::POST_TOOL_USE);
@@ -570,7 +571,7 @@ fn break_snapshot(fgos: &TempFgos) {
     let snapshot = fgos.paths().snapshot();
     let mut value: serde_json::Value =
         serde_json::from_slice(&std::fs::read(&snapshot).unwrap()).unwrap();
-    value["schema_version"] = 2.into();
+    value["schema_version"] = (SNAPSHOT_SCHEMA_VERSION + 1).into();
     std::fs::write(&snapshot, serde_json::to_vec(&value).unwrap()).unwrap();
 }
 

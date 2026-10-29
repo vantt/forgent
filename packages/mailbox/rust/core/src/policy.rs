@@ -23,6 +23,11 @@ impl LifetimeKey {
         Self(format!("{}@{}", key.as_str(), generation.get()))
     }
 
+    /// The count of a sender on another machine, which has no generation here.
+    pub(crate) fn remote(machine: &str, from: &WriterKey) -> Self {
+        Self(format!("~{machine}/{}@0", from.as_str()))
+    }
+
     /// Whether this count belongs to `key`, in any generation if `None`.
     pub(crate) fn is_of(&self, key: &WriterKey, generation: Option<Generation>) -> bool {
         match generation {
@@ -83,6 +88,19 @@ impl MailboxState {
         now: Timestamp,
         limits: &Limits,
     ) {
+        let lifetime = from_generation.map(|generation| LifetimeKey::new(from, generation));
+        self.count_attempt_for(account, lifetime, now, limits);
+    }
+
+    /// [`MailboxState::count_attempt`] for a sender whose lifetime count is
+    /// `lifetime` (`None` for the one identity no lifetime cap brakes).
+    pub(crate) fn count_attempt_for(
+        &mut self,
+        account: &Account,
+        lifetime: Option<LifetimeKey>,
+        now: Timestamp,
+        limits: &Limits,
+    ) {
         let attempts = self.budget.entry(account.clone()).or_default();
         attempts.push_back(now);
         while attempts
@@ -94,11 +112,8 @@ impl MailboxState {
         while attempts.len() > limits.session.budget as usize + 1 {
             attempts.pop_front();
         }
-        if let Some(generation) = from_generation {
-            let count = self
-                .lifetime
-                .entry(LifetimeKey::new(from, generation))
-                .or_insert(0);
+        if let Some(key) = lifetime {
+            let count = self.lifetime.entry(key).or_insert(0);
             *count = count.saturating_add(1);
         }
     }
@@ -205,7 +220,7 @@ impl MailboxState {
     }
 
     /// Check 6: attempts inside the rolling window, this one included.
-    fn check_budget(&self, account: &Account, limits: &Limits) -> Result<(), Refusal> {
+    pub(crate) fn check_budget(&self, account: &Account, limits: &Limits) -> Result<(), Refusal> {
         let attempts = self.budget.get(account).map_or(0, VecDeque::len);
         if attempts > limits.session.budget as usize {
             return Err(Refusal::SessionBudget {
@@ -227,11 +242,11 @@ impl MailboxState {
         let Some(generation) = from_generation else {
             return Ok(());
         };
-        let attempts = self
-            .lifetime
-            .get(&LifetimeKey::new(from, generation))
-            .copied()
-            .unwrap_or(0);
+        self.check_lifetime_key(&LifetimeKey::new(from, generation), limits)
+    }
+
+    pub(crate) fn check_lifetime_key(&self, key: &LifetimeKey, limits: &Limits) -> Result<(), Refusal> {
+        let attempts = self.lifetime.get(key).copied().unwrap_or(0);
         if attempts > limits.session.lifetime_cap {
             return Err(Refusal::LifetimeCap {
                 cap: limits.session.lifetime_cap,
@@ -268,7 +283,7 @@ impl MailboxState {
     }
 
     /// Check 9: messages from this account to `to` inside the loop window.
-    fn check_loop(
+    pub(crate) fn check_loop(
         &self,
         account: &Account,
         to: &WriterKey,
@@ -280,7 +295,7 @@ impl MailboxState {
             .messages
             .iter()
             .filter(|h| &h.to == to && !now.is_past(h.recorded_at, window))
-            .filter(|h| self.is_account(&h.from, account))
+            .filter(|h| self.header_is_account(h, account))
             .count();
         if recent >= limits.loop_guard.max_per_window as usize {
             return Err(Refusal::Loop {
@@ -292,7 +307,7 @@ impl MailboxState {
     }
 
     /// Check 10: pending mail to the recipient's current generation.
-    fn check_queue(
+    pub(crate) fn check_queue(
         &self,
         to: &WriterKey,
         generation: Generation,
@@ -312,7 +327,7 @@ impl MailboxState {
     }
 
     /// Check 11: this account's share of that queue.
-    fn check_share(
+    pub(crate) fn check_share(
         &self,
         account: &Account,
         to: &WriterKey,
@@ -323,7 +338,7 @@ impl MailboxState {
             .messages
             .iter()
             .filter(|h| &h.to == to && h.to_generation == generation && pending(h))
-            .filter(|h| self.is_account(&h.from, account))
+            .filter(|h| self.header_is_account(h, account))
             .count();
         if held >= limits.queue.per_sender as usize {
             return Err(Refusal::SenderShareFull {
@@ -336,7 +351,7 @@ impl MailboxState {
 
 /// Check 0: the sender's key fits the header bound, so no unbounded text
 /// reaches a header or the snapshot.
-fn check_sender_key(from: &WriterKey, limits: &Limits) -> Result<(), Refusal> {
+pub(crate) fn check_sender_key(from: &WriterKey, limits: &Limits) -> Result<(), Refusal> {
     let max_chars = limits.frame.max_header_chars;
     if from.as_str().chars().count() > max_chars as usize {
         return Err(Refusal::SenderKeyTooLong { max_chars });
