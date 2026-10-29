@@ -42,24 +42,39 @@ impl Value {
 
     /// JSON view of a value. A non-finite float has no JSON form and becomes null.
     pub fn to_json(&self) -> serde_json::Value {
-        match self {
+        self.json(false).unwrap_or_default()
+    }
+
+    /// The one walk from a value to JSON. With `refuse_non_finite` a float with no JSON form is
+    /// an error; without it the float becomes null and the walk cannot fail.
+    pub(crate) fn json(&self, refuse_non_finite: bool) -> Result<serde_json::Value, ()> {
+        Ok(match self {
             Value::Null => serde_json::Value::Null,
             Value::Bool(b) => serde_json::Value::Bool(*b),
             Value::Int(i) => serde_json::Value::from(*i),
-            Value::Float(f) => serde_json::Number::from_f64(*f)
-                .map(serde_json::Value::Number)
-                .unwrap_or(serde_json::Value::Null),
+            Value::Float(f) => match serde_json::Number::from_f64(*f) {
+                Some(number) => serde_json::Value::Number(number),
+                None if refuse_non_finite => return Err(()),
+                None => serde_json::Value::Null,
+            },
             Value::Str(s) => serde_json::Value::String(s.clone()),
-            Value::Seq(items) => {
-                serde_json::Value::Array(items.iter().map(Value::to_json).collect())
-            }
+            Value::Seq(items) => serde_json::Value::Array(
+                items
+                    .iter()
+                    .map(|item| item.json(refuse_non_finite))
+                    .collect::<Result<_, _>>()?,
+            ),
             Value::Map(entries) => serde_json::Value::Object(
                 entries
                     .iter()
-                    .map(|(k, v)| (k.clone(), v.to_json()))
-                    .collect(),
+                    .map(|(key, value)| {
+                        value
+                            .json(refuse_non_finite)
+                            .map(|json| (key.clone(), json))
+                    })
+                    .collect::<Result<_, _>>()?,
             ),
-        }
+        })
     }
 }
 

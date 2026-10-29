@@ -181,24 +181,97 @@ fn every_guarded_entry_goes_through_guard_and_no_total_one_does_not_need_to() {
     }
 }
 
+fn repo_root() -> std::path::PathBuf {
+    std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..")
+}
+
+/// Every Cargo manifest of the product: the workspace root and each manifest under the product
+/// directories, vendored crates and build output excluded.
+fn product_manifests() -> Vec<std::path::PathBuf> {
+    fn walk(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        let Ok(entries) = std::fs::read_dir(dir) else {
+            return;
+        };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            let name = entry.file_name().to_string_lossy().into_owned();
+            if path.is_dir() {
+                if !matches!(name.as_str(), "target" | "third-party" | "node_modules") {
+                    walk(&path, out);
+                }
+            } else if name == "Cargo.toml" {
+                out.push(path);
+            }
+        }
+    }
+    let root = repo_root();
+    let mut manifests = vec![root.join("Cargo.toml")];
+    for dir in ["apps", "packages", "tools", "herdr-dashboard"] {
+        walk(&root.join(dir), &mut manifests);
+    }
+    manifests.sort();
+    manifests
+}
+
 #[test]
 fn the_release_profiles_unwind_so_the_guard_can_catch() {
-    let root = format!("{}/../../..", env!("CARGO_MANIFEST_DIR"));
-    let manifests = [
-        "Cargo.toml",
-        "apps/fgos-gateway/Cargo.toml",
-        "packages/yaml-doc/rust/Cargo.toml",
-        "packages/git/node-addon/Cargo.toml",
-    ];
+    let manifests = product_manifests();
+    assert!(
+        manifests.len() > 20,
+        "the manifest walk found only {}",
+        manifests.len()
+    );
     for manifest in manifests {
-        let text = std::fs::read_to_string(format!("{root}/{manifest}")).unwrap_or_default();
+        let text = std::fs::read_to_string(&manifest).unwrap_or_default();
         assert!(
             !text
                 .lines()
                 .any(|l| l.trim_start().starts_with("panic") && l.contains("abort")),
-            "{manifest} sets panic = abort: the guard would never run"
+            "{} sets panic = abort: the guard would never run",
+            manifest.display()
         );
     }
+}
+
+#[test]
+fn every_resolution_root_pins_the_vendored_parser() {
+    let vendor = repo_root()
+        .join("packages/yaml-doc/third-party")
+        .canonicalize()
+        .expect("vendored directory");
+    let mut roots = 0;
+    for manifest in product_manifests() {
+        let dir = manifest.parent().expect("manifest directory");
+        let text = std::fs::read_to_string(&manifest).unwrap_or_default();
+        // A manifest outside the root workspace resolves on its own, so the root patch never
+        // reaches it. It reaches the parser when it names the crate or its own lock holds it.
+        let lock = std::fs::read_to_string(dir.join("Cargo.lock")).unwrap_or_default();
+        let own_resolution = text.lines().any(|l| l.trim() == "[workspace]") || !lock.is_empty();
+        if !(own_resolution && (text.contains("fgos-yaml-doc") || lock.contains("saphyr-parser"))) {
+            continue;
+        }
+        roots += 1;
+        for (name, version_dir) in [
+            ("saphyr-parser", "saphyr-parser-0.2.2"),
+            ("arraydeque", "arraydeque-0.5.1"),
+        ] {
+            let patched = text
+                .lines()
+                .find(|l| l.trim_start().starts_with(&format!("{name} = {{ path = ")))
+                .unwrap_or_else(|| panic!("{} does not patch {name}", manifest.display()));
+            let path = patched
+                .split('"')
+                .nth(1)
+                .unwrap_or_else(|| panic!("{}: unreadable patch line", manifest.display()));
+            assert_eq!(
+                dir.join(path).canonicalize().ok(),
+                Some(vendor.join(version_dir)),
+                "{} patches {name} to something other than the vendored copy",
+                manifest.display()
+            );
+        }
+    }
+    assert!(roots >= 4, "found only {roots} resolution roots");
 }
 
 // ---- no value in an error ----
