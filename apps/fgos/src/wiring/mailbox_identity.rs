@@ -108,6 +108,9 @@ fn identity_key<'a>(key: &'a WriterKey, cli: &Cli) -> Option<IdentityKey<'a>> {
 /// found, Identity's `register_writer` door with the key from the payload
 /// and the head process the hook verified, named by its pid and start time
 /// (Identity refuses `head-not-live` when the pid now runs another process).
+/// `clone_dir` is the main checkout the head works in: the entry carries its
+/// project id (when the clone is a registered project), which is what lets
+/// the shared directory carry the head to other machines.
 /// Returns the hook-outcome reason when it did not hold; nothing is retried
 /// in this process.
 ///
@@ -116,7 +119,12 @@ fn identity_key<'a>(key: &'a WriterKey, cli: &Cli) -> Option<IdentityKey<'a>> {
 /// its temporary file in Identity's directory. Identity's scan reads only
 /// `*.json` entries, so the file is never counted or resolved; it only takes
 /// disk space until removed.
-pub fn ensure_registered(state_root: &Path, cli: &Cli, head: &BoundHead) -> Option<String> {
+pub fn ensure_registered(
+    state_root: &Path,
+    clone_dir: Option<&Path>,
+    cli: &Cli,
+    head: &BoundHead,
+) -> Option<String> {
     let refused = |reason: &str| Some(format!("ident:{reason}"));
     let Some(key) = identity_key(&head.writer, cli) else {
         return refused("no-session-variable");
@@ -132,7 +140,7 @@ pub fn ensure_registered(state_root: &Path, cli: &Cli, head: &BoundHead) -> Opti
         Ok(listed) if listed.id == own.id => None,
         Ok(_) => Some("ident-handle-in-use".to_string()),
         Err(refusal) if refusal.reason == "not-found" => {
-            register_writer(state_root, None, &key, &head_ref, &[], false)
+            register_writer(state_root, clone_dir, &key, &head_ref, &[], false)
                 .err()
                 .and_then(|refusal| refused(refusal.reason))
         }
@@ -392,7 +400,7 @@ mod tests {
         // The omp head sorts last among this record's two heads.
         let mut head = bound("zz-omp-session", None);
         head.head.record = omp.record();
-        assert_eq!(ensure_registered(&root, &pi, &head), None);
+        assert_eq!(ensure_registered(&root, None, &pi, &head), None);
         let registered = std::fs::read_dir(fgos_identity::directory::directory(&root))
             .unwrap()
             .map(|e| std::fs::read_to_string(e.unwrap().path()).unwrap())
@@ -438,14 +446,14 @@ mod tests {
         let claude = Cli::new("claude").unwrap();
         let stale = state_root("stale");
         assert_eq!(
-            ensure_registered(&stale, &claude, &bound("wiring-stale-head", Some("1"))).as_deref(),
+            ensure_registered(&stale, None, &claude, &bound("wiring-stale-head", Some("1"))).as_deref(),
             Some("ident:head-not-live")
         );
         assert_eq!(entries(&stale), 0);
         // The falsifier: the same head with its verified start time registers.
         let live = state_root("live");
         assert_eq!(
-            ensure_registered(&live, &claude, &bound("wiring-live-head", None)),
+            ensure_registered(&live, None, &claude, &bound("wiring-live-head", None)),
             None
         );
         assert_eq!(entries(&live), 1);

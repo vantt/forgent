@@ -102,6 +102,12 @@ fn the_sync_child_pushes_an_unsealed_mailbox_event_and_stays_silent() {
     .unwrap();
     assert_eq!(git(&remote, &["for-each-ref", "refs/fgos/"]), "", "nothing is pushed before the child runs");
 
+    // Cross-machine mail is off by default: the child does nothing, whoever started it.
+    let out = child(&state, &root);
+    assert_eq!(out.status.code(), Some(0), "{}", String::from_utf8_lossy(&out.stderr));
+    assert_eq!(git(&remote, &["for-each-ref", "refs/fgos/"]), "", "a project that did not turn cross-machine mail on pushes nothing");
+
+    fs::write(root.join(".fgos/config.json"), r#"{"mailbox":{"crossMachine":{"enabled":true}}}"#).unwrap();
     let out = child(&state, &root);
     assert_eq!(out.status.code(), Some(0), "{}", String::from_utf8_lossy(&out.stderr));
     assert!(out.stdout.is_empty() && out.stderr.is_empty(), "a successful child prints nothing");

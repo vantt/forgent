@@ -167,7 +167,7 @@ fn run(args: &[OsString]) {
     let Some(root) = identity_root.as_deref() else {
         return;
     };
-    match ensure_registered(root, &cli, head) {
+    match ensure_registered(root, fgos_dir.parent(), &cli, head) {
         None if head.registered.is_none() => outcome_log::clear(&paths),
         None => {}
         Some(reason) => {
