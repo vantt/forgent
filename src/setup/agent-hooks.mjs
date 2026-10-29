@@ -23,6 +23,7 @@ export const HOOK_KINDS = {
   DISPATCH: 'dispatch-decide',
   DECISION: 'decision-question',
   MAILBOX: 'mailbox',
+  SESSION: 'session-register',
 };
 
 function readJsonSafe(filePath) {
@@ -102,6 +103,12 @@ const CLAUDE_SHIM = '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"';
 const claudeMailboxCommand = (event) =>
   `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" hook mailbox --cli claude --event ${event} || true`;
 
+/** Registers the agent's session in the identity directory when the CLI starts one. The host runs
+ * it, so the agent takes no step; a failure never reaches the session (`|| true`), and the verb
+ * itself skips a seat the runner started. */
+const SESSION_REGISTER_ARGS = 'identity session --register';
+const SESSION_REGISTER_TIMEOUT_SEC = 10;
+
 /**
  * Every fgOS hook a JSON hook file carries, one row per (cli, kind, event): the file, where the row
  * lives (`hooks.<Event>` entries, or an agy named group), its matcher (null: the entry has none), and
@@ -115,6 +122,12 @@ const hookRows = (repoRoot) => [
   // matcher, PostToolUse for every tool.
   { cli: 'claude', kind: HOOK_KINDS.MAILBOX, args: '--cli claude --event stop', event: 'Stop', matcher: null, command: claudeMailboxCommand('stop'), timeout: mailboxHookTimeoutSec() },
   { cli: 'claude', kind: HOOK_KINDS.MAILBOX, args: '--cli claude --event post-tool-use', event: 'PostToolUse', matcher: '*', command: claudeMailboxCommand('post-tool-use'), timeout: mailboxHookTimeoutSec() },
+  // The CLIs whose recorded hook events name a session start: Claude Code (`SessionStart`, no matcher:
+  // every source), Codex (`SessionStart`, measured on 0.162.1) and agy (`SessionStart`, a flat entry,
+  // measured on 1.4.2). omp and pi have none in their facts and register at their first fgOS verb.
+  { cli: 'claude', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" ${SESSION_REGISTER_ARGS} || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
+  { cli: 'codex', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
+  { cli: 'agy', kind: HOOK_KINDS.SESSION, event: 'SessionStart', group: 'fgos-session-register', flat: true, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
   { cli: 'codex', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide') },
   { cli: 'codex', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'RequestUserInput|ask.*', command: shimCommand(repoRoot, 'hook decision-question') },
   // Codex runs a hook command through the user's `$SHELL -c`: the plain form is exec'd into the
@@ -222,6 +235,12 @@ function installNestedRow(hooks, row) {
   return true;
 }
 
+/** An agy group's entry: the hook object itself for an event agy reads flat, else a matcher entry. */
+const groupEntry = (row) => (row.flat ? hookObject(row) : { matcher: row.matcher, hooks: [hookObject(row)] });
+
+const isGroupEntryOf = (entry, row) =>
+  row.flat ? entry?.command === row.command : entry?.matcher === row.matcher && entry?.hooks?.some((h) => h?.command === row.command);
+
 /** Puts one agy row into its named group, as agy reads them. */
 function installGroupRow(config, row) {
   const existing = config[row.group];
@@ -229,9 +248,9 @@ function installGroupRow(config, row) {
     existing &&
     existing.enabled !== false &&
     Array.isArray(existing[row.event]) &&
-    existing[row.event].some((g) => g?.matcher === row.matcher && g?.hooks?.some((h) => h?.command === row.command));
+    existing[row.event].some((g) => isGroupEntryOf(g, row));
   if (isMatching) return false;
-  config[row.group] = { enabled: true, [row.event]: [{ matcher: row.matcher, hooks: [hookObject(row)] }] };
+  config[row.group] = { enabled: true, [row.event]: [groupEntry(row)] };
   return true;
 }
 
@@ -263,7 +282,7 @@ function rowPresent(config, row) {
   if (row.group) {
     const group = config[row.group];
     return Boolean(group && group.enabled !== false && Array.isArray(group[row.event]) &&
-      group[row.event].some((g) => g?.matcher === row.matcher && g?.hooks?.some((h) => h?.command === row.command)));
+      group[row.event].some((g) => isGroupEntryOf(g, row)));
   }
   const entries = config?.hooks?.[row.event];
   return Array.isArray(entries) && entries.some((e) => sameMatcher(e, row) && Array.isArray(e?.hooks) &&
@@ -274,6 +293,7 @@ function rowPresent(config, row) {
  * instead of an entry with a `hooks` array): such a hook never runs. */
 function rowInWrongShape(config, row) {
   const entries = row.group ? config?.[row.group]?.[row.event] : config?.hooks?.[row.event];
+  if (row.flat) return Array.isArray(entries) && entries.some((e) => Array.isArray(e?.hooks) && e.hooks.some((h) => h?.command === row.command));
   return Array.isArray(entries) && entries.some((e) => !Array.isArray(e?.hooks) && e?.command === row.command);
 }
 

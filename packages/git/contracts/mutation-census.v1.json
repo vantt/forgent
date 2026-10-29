@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "54b65643b6f782fab9208431f08f1542e777955a1173424fb2de5056cf1dc0b9",
+  "payloadDigest": "afbdd09345cd1dbb9af774854cbfdc273d881bdfb3d25a48136da940298e41de",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -881,7 +881,7 @@
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "a8ecea5b3e88edee075579ee256fae18aae2188bd87aea6d9165d89c9e587122",
-    "src/cli/command-registry.mjs": "cce0a48c759f7179269bfad4826773ccf15914eb1c9865811abc6f7fc0f9d0ef",
+    "src/cli/command-registry.mjs": "4b2de8be27387cd039cad9eeca69b61f403487d2fff9cb1b3493cac4d5447adb",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
     "src/cli/detached-child.mjs": "905d006eb7d43212e552a0ef543bbdbc59c4f033b886cb3410ebf3a9681a2e4c",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
@@ -1091,7 +1091,7 @@
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "2716bd10d87c7382677c1f936d6d4eca961be82fc40d498daed82c3482e47e4f",
     "src/setup/agent-cli-trust.mjs": "6a70801d94f369a216d626b240022c5291ab8efdf742d0e1ce63721ac1669537",
-    "src/setup/agent-hooks.mjs": "edc4b97d1c4dd6ec4dee336e69358adf013f2e0466a84eeacc915a0d95446c46",
+    "src/setup/agent-hooks.mjs": "59d9c2af99218fe5293ca12e89a7d35e37e135b1a380bc5b7b8930dbbc2f7536",
     "src/setup/agy-permissions.mjs": "dee3b431b2d84c1bad0eeb107a26981bf348d7d2557c68e288f1fe082f7d2a84",
     "src/setup/ansi.mjs": "02c0e971ac01c71fb7db8d6506debd3c35d55feedceeb93eac7843b83fa0d430",
     "src/setup/bin-discovery.mjs": "d7d3536129adcbe5c6fc5297ef1f6ba1fcdc86d5195b7e968c14480b10e77101",
