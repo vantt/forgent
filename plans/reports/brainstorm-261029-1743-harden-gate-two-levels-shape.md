@@ -97,6 +97,21 @@ Rules:
 - The keyword list is retired from every gate, along with the fanout prose that copies it. A description word may still be shown to the human as a hint, never as a block.
 - Iron Law RUL35 uses the same list. Moving it is a separate supersede of that rule, so it is an owner question.
 
+## Owner answer and HARDEN's challenge (2026-10-30 03:18)
+
+The owner chose 1a, 2a, 3a and 4a, then asked why HARDEN did not challenge the two-level split. HARDEN accepted the split too quickly. Five points weaken the shape as written above and change it.
+
+1. **Two stores drift.** A grant kept "beside the action" and a copy in Work are two records of one fact. If the projection is late or lost, the dashboard shows a question as pending after it was approved, or the reverse.
+   - Change: one log, two roles. The gate door is the only writer of gate events, and Work is a pure, rebuildable projection of them. The split is about who may decide from the record, not about where the record lives.
+2. **Approvals cross machines and outlive agents.** The owner answers from the dashboard on another machine, often hours later, after the asking agent has compacted or ended. A grant kept only with a local run would not reach the agent or would die with it.
+   - Change: gate events ride the Event Store that already syncs between machines. The pending question is durable, and a new session for the same work finds the grant.
+3. **A byte digest asks too often.** A rebase, a typo fix or a reworded plan changes the digest and would ask the human again. That goes against priority 2 (release the human).
+   - Change: a grant binds to an approved frame: the scope (paths and capability), the budget, and the risk class, as the decision-question template already defines. A change inside the frame keeps the grant, and a change outside it asks again. An exact digest is used only where the content is final, such as merge consent.
+4. **The hook channel is Claude-only.** Codex and agy have no `AskUserQuestion` result hook, and a person may answer in plain chat text.
+   - Change: the hook is one channel among three. For other CLIs the answer goes through the dashboard or a human session's CLI. A plain-chat answer is not a grant, and the agent re-asks through a channel that is one.
+5. **Declared writes can be incomplete before work.** The check before work may say `auto`, and the real diff may then touch a risky path.
+   - Change: the merge-time check on the real diff stays mandatory. It may ask late, after work is done. That costs rework, never safety.
+
 ## Owner questions
 
 1. **Where the approval truth lives.**
