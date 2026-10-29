@@ -210,16 +210,33 @@ fn product_manifests() -> Vec<std::path::PathBuf> {
     manifests
 }
 
+/// The manifests that resolve on their own and reach the parser: a manifest outside the root workspace
+/// is not covered by the root patch or the root release profile, and a member's own profile is ignored
+/// by cargo, so these are the places a panic strategy or a parser pin takes effect.
+fn parser_roots() -> Vec<(std::path::PathBuf, String)> {
+    product_manifests()
+        .into_iter()
+        .filter_map(|manifest| {
+            let dir = manifest.parent().expect("manifest directory");
+            let text = std::fs::read_to_string(&manifest).unwrap_or_default();
+            let lock = std::fs::read_to_string(dir.join("Cargo.lock")).unwrap_or_default();
+            let own_resolution =
+                text.lines().any(|l| l.trim() == "[workspace]") || !lock.is_empty();
+            let reaches = text.contains("fgos-yaml-doc") || lock.contains("saphyr-parser");
+            (own_resolution && reaches).then_some((manifest, text))
+        })
+        .collect()
+}
+
 #[test]
 fn the_release_profiles_unwind_so_the_guard_can_catch() {
-    let manifests = product_manifests();
+    let roots = parser_roots();
     assert!(
-        manifests.len() > 20,
-        "the manifest walk found only {}",
-        manifests.len()
+        roots.len() >= 4,
+        "found only {} resolution roots",
+        roots.len()
     );
-    for manifest in manifests {
-        let text = std::fs::read_to_string(&manifest).unwrap_or_default();
+    for (manifest, text) in roots {
         assert!(
             !text
                 .lines()
@@ -236,18 +253,8 @@ fn every_resolution_root_pins_the_vendored_parser() {
         .join("packages/yaml-doc/third-party")
         .canonicalize()
         .expect("vendored directory");
-    let mut roots = 0;
-    for manifest in product_manifests() {
+    for (manifest, text) in parser_roots() {
         let dir = manifest.parent().expect("manifest directory");
-        let text = std::fs::read_to_string(&manifest).unwrap_or_default();
-        // A manifest outside the root workspace resolves on its own, so the root patch never
-        // reaches it. It reaches the parser when it names the crate or its own lock holds it.
-        let lock = std::fs::read_to_string(dir.join("Cargo.lock")).unwrap_or_default();
-        let own_resolution = text.lines().any(|l| l.trim() == "[workspace]") || !lock.is_empty();
-        if !(own_resolution && (text.contains("fgos-yaml-doc") || lock.contains("saphyr-parser"))) {
-            continue;
-        }
-        roots += 1;
         for (name, version_dir) in [
             ("saphyr-parser", "saphyr-parser-0.2.2"),
             ("arraydeque", "arraydeque-0.5.1"),
@@ -268,7 +275,6 @@ fn every_resolution_root_pins_the_vendored_parser() {
             );
         }
     }
-    assert!(roots >= 4, "found only {roots} resolution roots");
 }
 
 // ---- no value in an error ----

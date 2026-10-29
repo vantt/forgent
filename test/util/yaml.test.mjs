@@ -3,7 +3,7 @@
 // runner in packages/yaml-doc/rust/tests/golden_parse.rs over packages/yaml-doc/contracts/fixtures/parse.v1.json.
 // The cases of the earlier Node test now live there as: plain-values, plain-scalar-root, integer-root,
 // syntax-error-position, null-*, multi-doc-*, dup-key-*, core-*, merge-key-*, tag-*, alias-*, flat-*, proto-keys-*,
-// indent-nested, blockscalar-blank-*, anchored-keys. The vendored-parser hash test left with the vendored file. A process without the addon fails with the door error: owned by test/git/native-load.test.mjs.
+// indent-nested, blockscalar-blank-*, anchored-keys. The vendored-parser hash test left with the vendored file. A process without the addon fails with the door error (the loader refusal is owned by test/git/native-load.test.mjs; that the door has no other parser to fall back to is owned by the no-parser-import guard in test/architecture.test.mjs).
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

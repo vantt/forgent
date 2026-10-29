@@ -608,8 +608,8 @@ impl Document {
         src.tail_comment(at, src.line_end(at))
     }
 
-    /// Where an inline comment of the node goes: the byte after the node's text on its line and the
-    /// line end. `None` when the node has no such place.
+    /// Where the inline comment of the node sits (or would sit): the byte after the node's text on
+    /// its line and the line end. `None` when the node has no such place.
     fn inline_slot(&self, chain: &[Step]) -> Option<(usize, usize)> {
         if chain.len() < 2 {
             return None;

@@ -20,9 +20,9 @@ const readSetting = (section, name) => name.split('.').reduce((value, key) => va
 /** The route's flat key of a setting (`layout.minCols` -> `minCols`). */
 const routeKey = (name) => name.replace(/^layout\./, '');
 
-/** A setting nobody set: the core's default, or `null` (keep until a person closes it, as the standard says) for the retain time the route never sees. */
-function defaultOf(name, defaults) {
-  return name === 'retainFailedPaneMs' ? null : defaults?.[routeKey(name)];
+/** A setting nobody set: the core's default, or the standard's value (already in the snapshot) for the retain time the route never sees. */
+function defaultOf(name, defaults, section) {
+  return name === 'retainFailedPaneMs' ? readSetting(section, name) : defaults?.[routeKey(name)];
 }
 
 /**
@@ -46,7 +46,7 @@ export function resolveTerminalConfig(repoRoot, { globalConfigPath, defaults } =
   const entries = SETTINGS.map((name) => {
     const layer = layers.get(`${TERMINAL_CONFIG_KEY}.${name}`);
     if (layer === 'project' || layer === 'global') return { name, value: readSetting(value[TERMINAL_CONFIG_KEY], name), source: layer };
-    return { name, value: defaultOf(name, defaults), source: 'default' };
+    return { name, value: defaultOf(name, defaults, value[TERMINAL_CONFIG_KEY]), source: 'default' };
   });
   return { entries, values: Object.fromEntries(entries.map((e) => [e.name, e.value])) };
 }
