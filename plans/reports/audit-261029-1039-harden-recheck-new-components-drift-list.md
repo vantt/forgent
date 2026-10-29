@@ -58,7 +58,7 @@ One Sonnet lead, one branch, one commit per item. OPC reviews the Git route (C1)
 | C5, C6 | COOK | `runner-config-conversion.mjs` reads through the door; the backup is not left as an unignored file beside the config; delete the uncalled `patchDoor` option. |
 | C11, C12 | Dashboard and gateway (T9, outside HARDEN) | Recorded as an item: one `fgos` command builder, no hard-coded source path, one `fgos list` per refresh with a time limit. |
 
-### Held until MAIL finishes (owner, 2026-10-29 10:4x)
+### Held until MAIL finishes (owner, 2026-10-29 10:4x; refined 10:55, decision 50: record, tell MAIL at once only about a shape badly wrong from the start; none found)
 
 The owner said MAIL is not finished and a deep audit now would get in its way. The mailbox and secrets findings below stay here, unsent; HARDEN does not message MAIL about them and does not touch MAIL's files. When MAIL closes its work, HARDEN re-runs a deep mailbox audit on the then-current main and only then hands over what still holds.
 
@@ -77,7 +77,7 @@ C4 (spec rule 6 matches the code: the caller passes the trusted root), C15, and 
 
 | Question | Item | Change |
 |---|---|---|
-| Q4 | N6 | Retire the signed YAML Document API `insert` and `set_inline_comment`, which have never had a production caller, or keep them. |
+| Q4 | N6 | Retire the signed YAML Document API `insert` and `set_inline_comment`, which have never had a production caller, or keep them. **Owner 10:55: (a) retire; added to batch B.** |
 
 ## Unverified (kept as items)
 
