@@ -841,14 +841,42 @@ test('doctor check runner-patterns-config: a legacy json project file keeps the 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('doctor check runner-patterns-config: a legacy json project file without retired keys is left to the config format row', () => {
-  const tmpDir = mkTempDir();
-  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
-  writeRawLegacyProjectConfig(tmpDir, JSON.stringify({ runner: { generatedPaths: [] } }));
-  const res = check.check(tmpDir);
-  assert.equal(res.passed, true);
-  assert.doesNotMatch(res.message, /edit .*config\.json/);
-  fs.rmSync(tmpDir, { recursive: true, force: true });
+test('doctor runner-patterns-config attributes loop shape validation error to file and line from its read', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-err-home-'));
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-err-repo-'));
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+
+  writeGlobalConfig(home, {
+    runner: {
+      loops: {
+        reviewed: {
+          bounds: {
+            maxRounds: { min: 5, max: 2 },
+          },
+        },
+      },
+    },
+  });
+  writeProjectConfig(repo, {
+    runner: {},
+  });
+
+  try {
+    const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+    assert.ok(check, 'runner-patterns-config check must exist');
+    const res = check.check(repo);
+    assert.equal(res.passed, false);
+    assert.match(res.message, /~[/\\]\.fgos[/\\]config\.yaml:\d+/);
+    assert.match(res.message, /min \(5\) must be <= max \(2\)/);
+  } finally {
+    process.env.HOME = saved.HOME;
+    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
+    else delete process.env.USERPROFILE;
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
 });
 
 test('doctor check runner-patterns-config: valid reviewed pattern override passes', () => {

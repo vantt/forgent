@@ -24,7 +24,7 @@ import { isSeatRecord, collaborationOfRecord } from './legacy-seat-read.mjs';
 import { assertSeatId } from '../../convention/seat-id.mjs';
 import { runLoop, loopRunsVerify, paramTableOf } from './loops/index.mjs';
 import { resolveCollaboration, CollaborationError } from './patterns/catalog.mjs';
-import { shippedCatalog, catalogLayersOf } from '../dispatch/shipped-catalog.mjs';
+import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 import { canonicalJson } from '../../native/door.mjs';
 import { ERROR_OUTCOMES } from './loops/reviewed.mjs';
 import { verifyCommandOf } from './loops/verify.mjs';
@@ -774,7 +774,6 @@ async function runUnitBody(options, scope) {
         runnerConfig: liveConfig(),
         shipped: shippedCatalog(),
         origins: options.runnerConfig ? null : runnerOriginsOf(liveConfig()),
-        layers: options.runnerConfig ? null : catalogLayersOf(runnerOriginsOf(liveConfig()), liveConfig()?.patterns),
       });
     } catch (err) {
       if (err instanceof CollaborationError || err instanceof SeatResolutionError) {

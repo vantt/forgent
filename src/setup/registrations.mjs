@@ -84,7 +84,7 @@ import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/
 import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
-import { shippedCatalog, catalogLayersOf } from '../runner/dispatch/shipped-catalog.mjs';
+import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
 import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH } from '../runner/execution/patterns/retired-keys.mjs';
@@ -535,12 +535,10 @@ export function checkRunnerPatternsConfig(cwd, run) {
 
   const shipped = shippedCatalog();
   const origins = cfg?.origins ?? [];
-  const layers = catalogLayersOf(origins, effectivePatterns);
   const { entries, problems: catalogProblems } = checkCatalog({
     shipped: shipped.patterns,
     effective: effectivePatterns,
     origins,
-    layers,
   });
   if (catalogProblems.length > 0) {
     return { passed: false, message: catalogProblems.map((p) => p.message).join('; ') };

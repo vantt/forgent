@@ -2,7 +2,6 @@
 // Reads the bundled standard {patterns, loops} through the Config facade,
 // caches and deep-freezes it. Also provides catalogLayersOf(origins, patterns).
 import { readStandardValue } from '../../config/facade.mjs';
-import { runnerOriginsOf } from './config.mjs';
 import { RESERVED_PATTERN_NAMES } from '../execution/patterns/retired-keys.mjs';
 
 function deepFreeze(obj) {
@@ -35,13 +34,9 @@ export function shippedCatalog() {
  * Computed from origins without a second door read.
  * Project layer beats global, which beats shipped.
  */
-export function catalogLayersOf(originsOrConfig, patterns = {}) {
-  const origins = Array.isArray(originsOrConfig)
-    ? originsOrConfig
-    : (originsOrConfig?.origins ?? runnerOriginsOf(originsOrConfig) ?? []);
-  const effectivePatterns = (patterns && typeof patterns === 'object' && Object.keys(patterns).length > 0)
-    ? patterns
-    : (originsOrConfig?.patterns ?? originsOrConfig?.value?.runner?.patterns ?? originsOrConfig?.runner?.patterns ?? {});
+export function catalogLayersOf(origins, patterns = {}) {
+  const effectiveOrigins = Array.isArray(origins) ? origins : [];
+  const effectivePatterns = (patterns && typeof patterns === 'object') ? patterns : {};
   const shipped = shippedCatalog().patterns;
 
   const names = new Set([
@@ -55,7 +50,7 @@ export function catalogLayersOf(originsOrConfig, patterns = {}) {
   const layers = {};
   for (const name of names) {
     const prefix = `runner.patterns.${name}`;
-    const matchingOrigins = origins.filter((o) => o?.path === prefix || o?.path?.startsWith(`${prefix}.`) || o?.path?.startsWith(`${prefix}[`));
+    const matchingOrigins = effectiveOrigins.filter((o) => o?.path === prefix || o?.path?.startsWith(`${prefix}.`) || o?.path?.startsWith(`${prefix}[`));
 
     let layer = 'shipped';
     if (matchingOrigins.some((o) => o.layer === 'project')) {

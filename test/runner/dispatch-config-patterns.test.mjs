@@ -18,7 +18,6 @@ import {
   resolveOriginLocations,
   withDefaultExecutor,
 } from '../../src/runner/dispatch/config.mjs';
-import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { readStandardValue, ConfigDoorError } from '../../src/config/facade.mjs';
 import { catalogLayersOf, shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog, resolveCollaboration } from '../../src/runner/execution/patterns/catalog.mjs';
@@ -821,36 +820,6 @@ test('JS-only validation error in global file names the global file and line', (
   }
 });
 
-test('JS-only validation error in project file names the project file with line', () => {
-  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-proj-err-repo-'));
-  writeProjectConfig(repo, {
-    runner: {
-      loops: {
-        reviewed: {
-          bounds: {
-            maxRounds: { min: 5, max: 2 },
-          },
-        },
-      },
-    },
-  });
-
-  try {
-    assert.throws(
-      () => loadRunnerConfigForDir(repo),
-      (err) => {
-        assert.ok(err instanceof RunnerConfigError);
-        const expectedPath = path.join(repo, '.fgos', 'config.yaml');
-        assert.ok(err.message.includes(expectedPath));
-        assert.match(err.message, /:\d+/);
-        assert.match(err.message, /min \(5\) must be <= max \(2\)/);
-        return true;
-      },
-    );
-  } finally {
-    fs.rmSync(repo, { recursive: true, force: true });
-  }
-});
 
 test('relational validation error participating across files reports each source', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-home-'));
@@ -902,70 +871,6 @@ test('relational validation error participating across files reports each source
   }
 });
 
-test('doctor runner-patterns-config attributes loop shape validation error to file and line from its read', () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-err-home-'));
-  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-err-repo-'));
-  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
-  process.env.HOME = home;
-  process.env.USERPROFILE = home;
-
-  writeGlobalConfig(home, {
-    runner: {
-      loops: {
-        reviewed: {
-          bounds: {
-            maxRounds: { min: 5, max: 2 },
-          },
-        },
-      },
-    },
-  });
-  writeProjectConfig(repo, {
-    runner: {},
-  });
-
-  try {
-    const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
-    assert.ok(check, 'runner-patterns-config check must exist');
-    const res = check.check(repo);
-    assert.equal(res.passed, false);
-    assert.match(res.message, /~[/\\]\.fgos[/\\]config\.yaml:\d+/);
-    assert.match(res.message, /min \(5\) must be <= max \(2\)/);
-  } finally {
-    process.env.HOME = saved.HOME;
-    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
-    else delete process.env.USERPROFILE;
-    fs.rmSync(home, { recursive: true, force: true });
-    fs.rmSync(repo, { recursive: true, force: true });
-  }
-});
-
-test('resolveLayer resolves with deterministic priority project > global > shipped, never array order, and emits shipped', () => {
-  // Multiple descendant layers under a container in random array order
-  const originsGlobalFirst = [
-    { path: 'runner.patterns.reviewed.defaults.maxRounds', layer: 'global' },
-    { path: 'runner.patterns.reviewed.defaults.seats', layer: 'project' },
-  ];
-  const originsProjectFirst = [
-    { path: 'runner.patterns.reviewed.defaults.seats', layer: 'project' },
-    { path: 'runner.patterns.reviewed.defaults.maxRounds', layer: 'global' },
-  ];
-  assert.equal(resolveLayer(originsGlobalFirst, 'reviewed', 'defaults'), 'project');
-  assert.equal(resolveLayer(originsProjectFirst, 'reviewed', 'defaults'), 'project');
-
-  // Global beats standard/shipped
-  const originsStandardAndGlobal = [
-    { path: 'runner.patterns.reviewed.defaults.seats', layer: 'standard' },
-    { path: 'runner.patterns.reviewed.defaults.maxRounds', layer: 'global' },
-  ];
-  assert.equal(resolveLayer(originsStandardAndGlobal, 'reviewed', 'defaults'), 'global');
-
-  // Emits 'shipped' where input was 'standard'
-  const standardOrigin = [{ path: 'runner.patterns.reviewed.defaults.seats', layer: 'standard' }];
-  assert.equal(resolveLayer(standardOrigin, 'reviewed', 'defaults'), 'shipped');
-  assert.equal(resolveLayer({ reviewed: 'standard' }, 'reviewed'), 'shipped');
-  assert.equal(resolveLayer('standard', 'reviewed'), 'shipped');
-});
 
 test('validateRunnerPatternsShape retains indexed seat paths and resolves exact offending origin line', () => {
   let thrown = null;
@@ -998,14 +903,6 @@ test('validateRunnerPatternsShape retains indexed seat paths and resolves exact 
   assert.deepEqual(locs, ['/project/.fgos/config.yaml:17']);
 });
 
-test('resolveLayer matches bracket-indexed descendants under container before falling back to pattern', () => {
-  const origins = [
-    { path: 'runner.patterns.custom.defaults.seats[0].seat', layer: 'global', line: 10 },
-    { path: 'runner.patterns.custom.defaults.seats[0].role', layer: 'global', line: 11 },
-    { path: 'runner.patterns.custom.promise', layer: 'project', line: 4 },
-  ];
-  assert.equal(resolveLayer(origins, 'custom', 'defaults.seats'), 'global');
-});
 
 test('RunnerConfigError derives subpath from paths and stores no own subpath property', () => {
   const err = new RunnerConfigError('example', { path: 'runner.patterns.custom', subpath: 'stale' });

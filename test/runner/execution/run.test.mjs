@@ -13,7 +13,6 @@ import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { runUnit as coreRunUnit, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError, loadRunnerConfigForDir, runnerOriginsOf } from '../../../src/runner/dispatch/config.mjs';
-import { catalogLayersOf } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
 import { writeUnitSummary, buildUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -26,7 +25,7 @@ seedFileLocalBwrapRegistry();
 // must reach (command, worker script, worktree) live outside it.
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
-import { writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeProjectConfig, writeGlobalConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 
 function setupGitRepo() {
   const tmp = makeFixtureDir('fgos-run-test-');
@@ -149,23 +148,18 @@ test('runUnit refuses a unit that writes in a directory that is no repository, b
   assert.equal(fs.existsSync(path.join(dir, '.fgos', 'assignments')) && fs.readdirSync(path.join(dir, '.fgos', 'assignments')).some((name) => name.startsWith('unit-run-')), false);
 });
 
-test('snapshotRunnerConfig captures hash and filtered runner config from main checkout without provenance, and pin provenance derives from the same read', () => {
+test('snapshotRunnerConfig captures hash and filtered runner config from main checkout without provenance', () => {
   const { repoRoot } = setupGitRepo();
   const loaded = loadRunnerConfigForDir(repoRoot);
   const origins = runnerOriginsOf(loaded);
-  assert.ok(origins, 'loaded config must carry internal origins metadata');
+  assert.ok(origins && origins.length > 0, 'loaded config must carry internal origins metadata');
   const snap = snapshotRunnerConfig(repoRoot, loaded);
   assert.ok(snap.hash && typeof snap.hash === 'string');
   assert.ok(snap.runner.capabilities['docs:write']);
   const serialized = JSON.stringify(snap.runner);
   assert.equal(JSON.parse(serialized).origins, undefined, 'snapshot runner must persist no provenance in serialized form');
-  assert.equal(Object.keys(snap.runner).includes('origins'), false);
-
-  // Pin provenance and effective settings come from this same loaded read without a second door read
-  const layers = catalogLayersOf(origins, loaded.patterns);
-  assert.ok(layers && typeof layers === 'object');
-  assert.equal(layers.solo, 'shipped');
-  assert.deepEqual(catalogLayersOf(loaded), layers, 'catalogLayersOf directly on loaded config produces identical layer map');
+  assert.equal(Object.keys(snap.runner).includes('origins'), false, 'snapshot of loaded config has no enumerable origins key');
+  assert.equal(Object.prototype.propertyIsEnumerable.call(snap.runner, Symbol.for('fgos.runner.origins')), false);
 });
 
 test('runUnit runs solo read-only unit end-to-end', async () => {
@@ -194,13 +188,70 @@ test('runUnit runs solo read-only unit end-to-end', async () => {
   const record = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
   assert.equal(record.unit.id, 'u-docs-1');
   assert.equal(record.worktree, fs.realpathSync(worktreeDir));
-  assert.equal(record.collaboration?.pattern?.layer, 'shipped', 'pin pattern layer comes from one config read');
-  assert.equal(record.configSnapshot?.runner?.origins, undefined, 'config snapshot in unit.json carries no origins provenance');
-  assert.equal(JSON.stringify(record).includes('RUNNER_CONFIG_ORIGINS'), false, 'unit.json does not persist provenance symbols');
+  const originFiles = runnerOriginsOf(loadRunnerConfigForDir(repoRoot))?.map((o) => o?.file).filter(Boolean) ?? [];
+  assert.ok(originFiles.length > 0, 'repo fixture must have at least one config origin file');
+  for (const originFile of originFiles) {
+    assert.equal(JSON.stringify(record).includes(originFile), false, 'unit.json does not persist origin file paths');
+  }
   const summary = JSON.parse(fs.readFileSync(path.join(path.dirname(unitJsonPath), 'unit-summary.json'), 'utf8'));
   assert.equal(summary.unitRunId, res.unitRunId);
   assert.equal(summary.outcome, res.outcome);
   assert.ok(summary.settledAt);
+});
+
+test('run uses the loaded origins', async () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-run-origins-home-'));
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  writeGlobalConfig(home, {
+    runner: {
+      patterns: {
+        'global-only-pat': {
+          promise: 'custom global promise',
+          loop: 'solo',
+        },
+      },
+    },
+  });
+
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+  try {
+    let unitRunId = null;
+    try {
+      const res = await runUnit({
+        unitData: {
+          id: 'u-global-1',
+          objective: 'Run with global pattern',
+          capability: 'docs:write',
+          writes: [],
+        },
+        repoRoot,
+        cwd: worktreeDir,
+        pattern: 'global-only-pat',
+      });
+      unitRunId = res.unitRunId;
+    } catch (err) {
+      const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
+      if (fs.existsSync(assignmentsDir)) {
+        const runs = fs.readdirSync(assignmentsDir).filter((n) => n.startsWith('unit-run-'));
+        if (runs.length > 0) {
+          unitRunId = runs[0];
+        }
+      }
+      if (!unitRunId) throw err;
+    }
+
+    const unitJsonPath = path.join(repoRoot, '.fgos', 'assignments', unitRunId, 'unit.json');
+    const record = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
+    assert.equal(record.collaboration?.pattern?.layer, 'global', 'global-only custom pattern must pin layer global');
+  } finally {
+    process.env.HOME = saved.HOME;
+    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
+    else delete process.env.USERPROFILE;
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+  }
 });
 
 test('architecture guard: src/runner/execution/run.mjs does NOT import state, coordination, or worktree', () => {

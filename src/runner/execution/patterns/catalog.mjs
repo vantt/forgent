@@ -73,19 +73,16 @@ export function resolveCollaboration(options = {}) {
     reason = null,
     runnerConfig = {},
     shipped = {},
-    layers = null,
     origins = null,
   } = options;
 
   // A runner config without a patterns section declares no patterns of its own; it must never be read as the map itself.
   const effectivePatterns = runnerConfig?.runner?.patterns ?? runnerConfig?.patterns ?? {};
   const shippedPatterns = shipped?.patterns ?? shipped;
-  const effectiveOrigins = origins ?? (Array.isArray(layers) ? layers : null);
   const { entries } = checkCatalog({
     shipped: shippedPatterns,
     effective: effectivePatterns,
-    origins: effectiveOrigins,
-    layers,
+    origins,
     throwOnError: true,
   });
 
@@ -538,8 +535,7 @@ export function resolveCollaboration(options = {}) {
     }
   }
   let layerName = null;
-  if (layers) layerName = resolveLayer(layers, selectedName);
-  if (!layerName && effectiveOrigins) layerName = resolveLayer(effectiveOrigins, selectedName);
+  if (origins) layerName = resolveLayer(origins, selectedName);
   if (!layerName) {
     const shippedEntry = shipped?.patterns?.[selectedName] ?? shipped?.[selectedName];
     layerName = (shippedEntry && deepEqual(entry, shippedEntry)) ? 'shipped' : 'project';

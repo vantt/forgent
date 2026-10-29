@@ -7,6 +7,7 @@ import {
   loopOf,
   resolveCollaboration,
 } from '../../../../src/runner/execution/patterns/catalog.mjs';
+import { resolveLayer } from '../../../../src/runner/execution/patterns/catalog-entries.mjs';
 import { shippedCatalog } from '../../../../src/runner/dispatch/shipped-catalog.mjs';
 import { detectRetiredPatternKeys } from '../../../../src/runner/execution/patterns/retired-keys.mjs';
 
@@ -2155,4 +2156,40 @@ test('checkCatalog attributes indexed seat descendants to field layer rather tha
   assert.ok(seatProb, 'seat-multiplicity problem expected');
   assert.equal(seatProb.source, 'global', 'offending seats are global, source layer must be global');
   assert.match(seatProb.message, /source layer: global/);
+});
+
+test('resolveLayer resolves with deterministic priority project > global > shipped, never array order, and emits shipped', () => {
+  // Multiple descendant layers under a container in random array order
+  const originsGlobalFirst = [
+    { path: 'runner.patterns.reviewed.defaults.maxRounds', layer: 'global' },
+    { path: 'runner.patterns.reviewed.defaults.seats', layer: 'project' },
+  ];
+  const originsProjectFirst = [
+    { path: 'runner.patterns.reviewed.defaults.seats', layer: 'project' },
+    { path: 'runner.patterns.reviewed.defaults.maxRounds', layer: 'global' },
+  ];
+  assert.equal(resolveLayer(originsGlobalFirst, 'reviewed', 'defaults'), 'project');
+  assert.equal(resolveLayer(originsProjectFirst, 'reviewed', 'defaults'), 'project');
+
+  // Global beats standard/shipped
+  const originsStandardAndGlobal = [
+    { path: 'runner.patterns.reviewed.defaults.seats', layer: 'standard' },
+    { path: 'runner.patterns.reviewed.defaults.maxRounds', layer: 'global' },
+  ];
+  assert.equal(resolveLayer(originsStandardAndGlobal, 'reviewed', 'defaults'), 'global');
+
+  // Emits 'shipped' where input was 'standard'
+  const standardOrigin = [{ path: 'runner.patterns.reviewed.defaults.seats', layer: 'standard' }];
+  assert.equal(resolveLayer(standardOrigin, 'reviewed', 'defaults'), 'shipped');
+  assert.equal(resolveLayer({ reviewed: 'standard' }, 'reviewed'), 'shipped');
+  assert.equal(resolveLayer('standard', 'reviewed'), 'shipped');
+});
+
+test('resolveLayer matches bracket-indexed descendants under container before falling back to pattern', () => {
+  const origins = [
+    { path: 'runner.patterns.custom.defaults.seats[0].seat', layer: 'global', line: 10 },
+    { path: 'runner.patterns.custom.defaults.seats[0].role', layer: 'global', line: 11 },
+    { path: 'runner.patterns.custom.promise', layer: 'project', line: 4 },
+  ];
+  assert.equal(resolveLayer(origins, 'custom', 'defaults.seats'), 'global');
 });
