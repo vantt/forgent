@@ -16,6 +16,7 @@ import { DOCTOR_CHECKS, FIX_REGISTRATIONS, registerCheck, registerFix, runFixes 
 import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../../src/setup/registrations.mjs';
 import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 
+import { nativeDoor } from '../../src/native/door.mjs';
 
 // tsk-4xg: runFixes() below invokes every registered fix, including the
 // real `claude-plugin-marketplace` one, which shells out to a real,
@@ -976,11 +977,20 @@ test('doctor check runner-patterns-config: attributes catalog defaults problem t
             },
           },
         });
-        return {
-          once: (_key, fn) => (fn ? fn() : { findings: [] }),
-          filterOrigins: (origins) => origins.filter(
-            (o) => !o.path?.startsWith('runner.patterns.solo') && !targetPath.startsWith(o.path ?? ''),
-          ),
+        const config = nativeDoor().config;
+        const realSnapshot = config.snapshot;
+        config.snapshot = (req) => {
+          const raw = realSnapshot.call(config, req);
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.origins)) {
+            parsed.origins = parsed.origins.filter(
+              (o) => !o.path?.startsWith('runner.patterns.solo') && !targetPath.startsWith(o.path ?? ''),
+            );
+          }
+          return JSON.stringify(parsed);
+        };
+        return () => {
+          config.snapshot = realSnapshot;
         };
       },
       assert: (res) => {
@@ -995,9 +1005,13 @@ test('doctor check runner-patterns-config: attributes catalog defaults problem t
     const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
     assert.ok(check, 'runner-patterns-config check must exist');
     for (const entry of table) {
-      const run = entry.setup();
-      const res = check.check(repo, run);
-      entry.assert(res);
+      const teardown = entry.setup();
+      try {
+        const res = check.check(repo);
+        entry.assert(res);
+      } finally {
+        if (typeof teardown === 'function') teardown();
+      }
     }
   } finally {
     process.env.HOME = saved.HOME;

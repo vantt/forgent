@@ -541,10 +541,7 @@ export function checkRunnerPatternsConfig(cwd, run) {
   }
 
   const shipped = shippedCatalog();
-  const rawOrigins = cfg?.origins ?? [];
-  const origins = typeof run?.filterOrigins === 'function'
-    ? run.filterOrigins(rawOrigins)
-    : (Array.isArray(run?.origins) ? run.origins : rawOrigins);
+  const origins = cfg?.origins ?? [];
   const { entries, problems: catalogProblems } = checkCatalog({
     shipped: shipped.patterns,
     effective: effectivePatterns,

@@ -282,6 +282,7 @@ test('checkCatalog reports config-key-retired for reviewed tuning with source la
   assert.ok(retired, 'must report config-key-retired');
   assert.equal(retired.source, 'project');
   assert.equal(retired.path, 'runner.patterns.reviewed.maxRounds');
+  assert.match(retired.message, /runner\.loops\.reviewed\.maxRounds/);
   assert.match(retired.message, /source layer: project/);
   const duplicate = problems.filter((p) => p.code === 'param-unknown' && p.message.includes('maxRounds'));
   assert.equal(duplicate.length, 0, 'must not duplicate error as param-unknown');
