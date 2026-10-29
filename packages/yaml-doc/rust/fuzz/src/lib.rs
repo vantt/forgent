@@ -10,7 +10,7 @@ pub fn split_profile(data: &[u8]) -> Option<(Profile, &[u8])> {
 }
 
 /// Number of operations `edit_reparse` knows (`op % OPS`).
-pub const OPS: u8 = 7;
+pub const OPS: u8 = 4;
 
 /// Layout of an `edit_reparse` input: `[profile, op, pick, acknowledge]`, the document, a NUL
 /// byte, then the small text the operation writes.

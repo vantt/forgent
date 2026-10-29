@@ -10,12 +10,12 @@ use std::process::Command;
 use std::time::{Duration, Instant};
 
 use common::*;
-use fgos_yaml_doc::comment::{sanitize, sanitize_inline};
+use fgos_yaml_doc::comment::sanitize;
 use fgos_yaml_doc::guard::guard;
 use fgos_yaml_doc::merge::{merge, NoRules};
 use fgos_yaml_doc::path::{format_path, parse_path};
 use fgos_yaml_doc::{
-    parse, prescan, rule, CommentLoss, Document, Position, Profile, Refusal, Segment, Value,
+    parse, prescan, rule, CommentLoss, Document, Profile, Refusal, Segment, Value,
 };
 
 const MARKER: &str = "SECRET-VALUE-7731";
@@ -90,7 +90,6 @@ use Seal::{Guarded, Total};
 /// here fails `the_table_lists_exactly_the_public_functions`.
 const SURFACE: &[(&str, Seal)] = &[
     ("comment::sanitize", Guarded),
-    ("comment::sanitize_inline", Guarded),
     ("document::parse", Guarded),
     ("document::source", Total),
     ("document::profile", Total),
@@ -101,10 +100,8 @@ const SURFACE: &[(&str, Seal)] = &[
     ("document::to_json", Guarded),
     ("edit::to_bytes", Total),
     ("edit::set", Guarded),
-    ("edit::insert", Guarded),
     ("edit::remove", Guarded),
     ("edit::set_comment_block", Guarded),
-    ("edit::set_inline_comment", Guarded),
     ("edit::comments_at", Guarded),
     ("guard::guard", Guarded),
     ("merge::merge", Guarded),
@@ -372,13 +369,8 @@ fn no_refusal_carries_a_value_or_a_snippet_of_the_input() {
     }
     // Text handed to the comment operations is never echoed either.
     let hostile = format!("{MARKER}\u{202e}");
-    for result in [
-        sanitize(&hostile).map(|_| ()),
-        sanitize_inline(&hostile).map(|_| ()),
-    ] {
-        assert_clean("comment", &result.unwrap_err());
-        refusals += 1;
-    }
+    assert_clean("comment", &sanitize(&hostile).unwrap_err());
+    refusals += 1;
     let bad_path = parse_path(&format!("a.{MARKER}.[")).unwrap_err();
     assert_clean("path", &bad_path);
     assert!(refusals > 200, "only {refusals} refusals were looked at");
@@ -408,23 +400,7 @@ fn edit_all(doc: &mut Document, refusals: &mut usize) {
         Value::Seq(vec![Value::Int(1)]),
         CommentLoss::Acknowledge,
     ));
-    note(doc.insert(
-        &[],
-        "added",
-        Value::Int(1),
-        Position::End,
-        CommentLoss::Refuse,
-    ));
-    note(doc.insert(
-        &[],
-        "after",
-        Value::Null,
-        Position::After("added"),
-        CommentLoss::Acknowledge,
-    ));
     note(doc.set_comment_block(&path, &["one".into(), "two\nthree".into()]));
-    note(doc.set_inline_comment(&path, Some("note")));
-    note(doc.set_inline_comment(&path, None));
     note(doc.comments_at(&path).map(|_| ()));
     note(doc.remove(&path, CommentLoss::Refuse));
     path.push(Segment::Key("deeper".into()));
@@ -477,9 +453,6 @@ fn exercise(input: &[u8]) {
         assert_clean("path", &r);
     }
     if let Err(r) = sanitize(&lossy) {
-        assert_clean("comment", &r);
-    }
-    if let Err(r) = sanitize_inline(&lossy) {
         assert_clean("comment", &r);
     }
     for profile in Profile::ALL {

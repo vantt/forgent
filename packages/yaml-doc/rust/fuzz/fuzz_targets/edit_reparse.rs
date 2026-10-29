@@ -2,7 +2,7 @@
 //! the bytes as they were, an accepted edit leaves a document that parses to the same value.
 #![no_main]
 
-use fgos_yaml_doc::{parse, rule, CommentLoss, Position, Segment, Value};
+use fgos_yaml_doc::{parse, rule, CommentLoss, Value};
 use fgos_yaml_doc_fuzz::{decode_edit, paths_of, same_value, value_at};
 use libfuzzer_sys::fuzz_target;
 
@@ -25,11 +25,8 @@ fuzz_target!(|data: &[u8]| {
     let value = Value::Str(text.clone());
     let result = match input.op {
         0 => doc.set(&path, value.clone(), ack),
-        1 => doc.insert(&path, &text, value.clone(), Position::End, ack),
-        2 => doc.remove(&path, ack),
-        3 => doc.set_comment_block(&path, &[text.clone()]),
-        4 => doc.set_inline_comment(&path, Some(&text)),
-        5 => doc.set_inline_comment(&path, None),
+        1 => doc.remove(&path, ack),
+        2 => doc.set_comment_block(&path, &[text.clone()]),
         _ => doc.comments_at(&path).map(|_| ()),
     };
     match result {
@@ -64,16 +61,7 @@ fuzz_target!(|data: &[u8]| {
                     "set did not land"
                 );
             }
-            if input.op == 1 {
-                let mut at: Vec<Segment> = path.clone();
-                at.push(Segment::Key(text.clone()));
-                assert_eq!(
-                    value_at(doc.value(), &at),
-                    Some(&value),
-                    "insert did not land"
-                );
-            }
-            if input.op >= 3 && input.op != 6 {
+            if input.op == 2 {
                 let original = parse(&before, input.profile, "fuzz.yaml")
                     .expect("the document parsed a moment ago");
                 assert!(

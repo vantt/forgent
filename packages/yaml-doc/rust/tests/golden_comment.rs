@@ -2,7 +2,7 @@
 mod common;
 
 use common::*;
-use fgos_yaml_doc::comment::{sanitize, sanitize_inline};
+use fgos_yaml_doc::comment::sanitize;
 
 #[test]
 fn comment_guard_matches_the_golden_cases() {
@@ -21,10 +21,6 @@ fn comment_guard_matches_the_golden_cases() {
                         .collect();
                     assert_eq!(lines, want, "{name}");
                 }
-                Err(refusal) => assert_refusal(name, &refusal, expect),
-            },
-            "inline" => match sanitize_inline(text) {
-                Ok(line) => assert_eq!(line, expect["line"].as_str().expect(name), "{name}"),
                 Err(refusal) => assert_refusal(name, &refusal, expect),
             },
             other => panic!("{name}: unknown kind {other}"),

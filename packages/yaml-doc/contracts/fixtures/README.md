@@ -28,7 +28,7 @@ size claims of generated inputs); it proves no parser behaviour.
 ```
 
 `profiles` lists the profiles the case runs under. A case whose expectation differs per profile is
-two cases. Some files add fields: `kind` (comment), `ops` (edit; an op may carry `acknowledge: true`, and `setInlineComment` takes `text: null` to remove), `old: true` (a case moved from the
+two cases. Some files add fields: `kind` (comment), `ops` (edit; an op may carry `acknowledge: true`), `old: true` (a case moved from the
 Node test) and `max_millis` (a parse case that must finish within that time).
 
 ### `input`
@@ -54,7 +54,7 @@ A generator may claim its size so the claim is checked: `min_bytes`, or `size` o
 | parse, optional extras | `"spans": [{"path", "value", "key"?, "line"?, "column"?}]` next to `value`: the source text the node's value (and key) occupies, and where the value starts; `"revision": "<sha256 hex>"` next to `value` |
 | prescan | `{"ok": true}` |
 | path | `{"segments": [...]}` (a string is a key, a number an index), plus `"canonical"` when the written form differs from the input |
-| comment | `{"lines": [...]}` for kind `block`, `{"line": "..."}` for kind `inline` |
+| comment | `{"lines": [...]}` for kind `block` |
 | edit | `{"output": "..."}` or `{"output": ...}` as the exact result bytes, `{"unchanged": true}`, or `{"comments": {"block": [...], "inline": ...}}` |
 | merge | `{"value": ..., "origins": {"<path text>": <layer index>}}`, one origin per leaf of the result |
 

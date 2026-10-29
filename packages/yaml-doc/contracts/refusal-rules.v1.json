@@ -98,24 +98,12 @@
       "meaning": "A removal would drop a comment block or inline comment and was not acknowledged."
     },
     {
-      "id": "inline-comment-multiline",
-      "meaning": "An inline comment text holds a line break."
-    },
-    {
-      "id": "inline-comment-empty",
-      "meaning": "An inline comment text is the empty string; removing the comment is the absent text, not an empty one."
-    },
-    {
       "id": "edit-changed-meaning",
       "meaning": "The re-parse of an edit result means something other than the intended change."
     },
     {
       "id": "path-not-found",
       "meaning": "An edit addresses a path that does not exist or cannot be created."
-    },
-    {
-      "id": "inline-comment-unplaceable",
-      "meaning": "The node has no line where a trailing comment can sit."
     },
     {
       "id": "merge-type-mismatch",

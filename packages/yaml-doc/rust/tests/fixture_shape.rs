@@ -287,17 +287,9 @@ fn every_fixture_case_is_well_formed() {
                 }
                 "comment" => {
                     assert!(case["input"]["text"].is_string(), "{name}: input.text");
-                    assert!(
-                        ["block", "inline"].contains(&case["kind"].as_str().unwrap_or("")),
-                        "{name}: kind"
-                    );
+                    assert!(case["kind"] == "block", "{name}: kind");
                     if !refused {
-                        let form: &[&str] = if case["kind"] == "block" {
-                            &["lines"]
-                        } else {
-                            &["line"]
-                        };
-                        expect_form(&name, expect, &[form]);
+                        expect_form(&name, expect, &[&["lines"]]);
                     }
                 }
                 "edit" => {
@@ -305,14 +297,7 @@ fn every_fixture_case_is_well_formed() {
                     if !refused {
                         expect_form(&name, expect, &[&["output"], &["unchanged"], &["comments"]]);
                     }
-                    let known = [
-                        "set",
-                        "insert",
-                        "remove",
-                        "setCommentBlock",
-                        "setInlineComment",
-                        "commentsAt",
-                    ];
+                    let known = ["set", "remove", "setCommentBlock", "commentsAt"];
                     for op in case["ops"].as_array().expect("ops") {
                         assert!(
                             known.contains(&op["op"].as_str().unwrap_or("")),

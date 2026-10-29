@@ -437,35 +437,8 @@
       }
     },
     {
-      "id": "insert-after-sibling",
-      "why": "spec section 5: insert after a named sibling",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: 1",
-          "b: 2",
-          "c: 3"
-        ]
-      },
-      "ops": [
-        {
-          "op": "insert",
-          "path": "",
-          "key": "x",
-          "value": 9,
-          "after": "a"
-        }
-      ],
-      "expect": {
-        "output": "a: 1\nx: 9\nb: 2\nc: 3\n"
-      }
-    },
-    {
-      "id": "insert-at-end",
-      "why": "insert with no sibling goes at the end of the mapping",
+      "id": "set-new-key-at-end",
+      "why": "a new key with no sibling goes at the end of the mapping",
       "profiles": [
         "strict-config",
         "tool"
@@ -477,9 +450,8 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "",
-          "key": "x",
+          "op": "set",
+          "path": "x",
           "value": 9
         }
       ],
@@ -488,8 +460,8 @@
       }
     },
     {
-      "id": "insert-follows-indent-unit",
-      "why": "spec section 5: inserted entries use the indentation unit the document uses (four spaces here)",
+      "id": "set-new-key-follows-indent-unit",
+      "why": "spec section 5: a new key takes the indentation unit the document uses (four spaces here)",
       "profiles": [
         "strict-config",
         "tool"
@@ -502,9 +474,8 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "top",
-          "key": "b",
+          "op": "set",
+          "path": "top.b",
           "value": 2
         }
       ],
@@ -513,8 +484,8 @@
       }
     },
     {
-      "id": "insert-follows-quote-style",
-      "why": "spec section 5: inserted strings use the quoting style the document uses (double quotes here)",
+      "id": "set-new-key-follows-quote-style",
+      "why": "spec section 5: a new string takes the quoting style the document uses (double quotes here)",
       "profiles": [
         "strict-config",
         "tool"
@@ -527,9 +498,8 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "",
-          "key": "c",
+          "op": "set",
+          "path": "c",
           "value": "z"
         }
       ],
@@ -538,8 +508,8 @@
       }
     },
     {
-      "id": "insert-into-nested-mapping",
-      "why": "insert into a nested mapping lands inside it, before the next top-level key",
+      "id": "set-new-key-into-nested-mapping",
+      "why": "a new key in a nested mapping lands inside it, before the next top-level key",
       "profiles": [
         "strict-config",
         "tool"
@@ -553,40 +523,13 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "a",
-          "key": "y",
+          "op": "set",
+          "path": "a.y",
           "value": 5
         }
       ],
       "expect": {
         "output": "a:\n  x: 1\n  y: 5\nb: 2\n"
-      }
-    },
-    {
-      "id": "insert-existing-key-refused",
-      "why": "spec section 5: the re-parse check refuses an insert that duplicates a key; the document is left as it was",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: 1"
-        ]
-      },
-      "ops": [
-        {
-          "op": "insert",
-          "path": "",
-          "key": "a",
-          "value": 2
-        }
-      ],
-      "expect": {
-        "refusal": {
-          "rule": "duplicate-key"
-        }
       }
     },
     {
@@ -923,105 +866,6 @@
       }
     },
     {
-      "id": "comment-inline-add",
-      "why": "setInlineComment adds a trailing comment after two spaces",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: 1",
-          "b: 2"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "a",
-          "text": "why"
-        }
-      ],
-      "expect": {
-        "output": "a: 1  # why\nb: 2\n"
-      }
-    },
-    {
-      "id": "comment-inline-replace",
-      "why": "setInlineComment replaces the existing trailing comment and keeps its leading spacing",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: 1   # old",
-          "b: 2"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "a",
-          "text": "new"
-        }
-      ],
-      "expect": {
-        "output": "a: 1   # new\nb: 2\n"
-      }
-    },
-    {
-      "id": "comment-inline-multiline-refused",
-      "why": "spec section 6: an inline comment with a line break is refused",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: 1"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "a",
-          "text": "a\nb"
-        }
-      ],
-      "expect": {
-        "refusal": {
-          "rule": "inline-comment-multiline"
-        }
-      }
-    },
-    {
-      "id": "comment-inline-unplaceable",
-      "why": "a node with no line of its own for a trailing comment (a block scalar body) refuses an inline comment",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: |",
-          "  text"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "a",
-          "text": "x"
-        }
-      ],
-      "expect": {
-        "refusal": {
-          "rule": "inline-comment-unplaceable"
-        }
-      }
-    },
-    {
       "id": "comments-at-read",
       "why": "spec section 5: commentsAt reads the block above and the inline comment as text without the hash",
       "profiles": [
@@ -1185,56 +1029,6 @@
       ],
       "expect": {
         "output": "日本語: 別  # 注\nz: 2\n"
-      }
-    },
-    {
-      "id": "insert-after-non-ascii-sibling",
-      "why": "insert after a sibling whose key, value and comment are multi-byte",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "日本語: 1  # 注",
-          "z: 2"
-        ]
-      },
-      "ops": [
-        {
-          "op": "insert",
-          "path": "",
-          "key": "x",
-          "value": 9,
-          "after": "日本語"
-        }
-      ],
-      "expect": {
-        "output": "日本語: 1  # 注\nx: 9\nz: 2\n"
-      }
-    },
-    {
-      "id": "comment-inline-after-non-ascii-text",
-      "why": "an inline comment with multi-byte text is added after a multi-byte entry above it",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "ключ: значение  # заметка",
-          "другой: 2"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "другой",
-          "text": "ça va"
-        }
-      ],
-      "expect": {
-        "output": "ключ: значение  # заметка\nдругой: 2  # ça va\n"
       }
     },
     {
@@ -1431,31 +1225,6 @@
       }
     },
     {
-      "id": "insert-into-flow-mapping-rewrites-block",
-      "why": "spec section 13: an insert into a flow mapping rewrites it in block style",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "x: {a: 1}",
-          "y: 2"
-        ]
-      },
-      "ops": [
-        {
-          "op": "insert",
-          "path": "x",
-          "key": "b",
-          "value": 5
-        }
-      ],
-      "expect": {
-        "output": "x:\n  a: 1\n  b: 5\ny: 2\n"
-      }
-    },
-    {
       "id": "set-flow-sequence-subtree-keeps-comment-on-key-line",
       "why": "spec section 13: a flow sequence replaced by a longer one is written as a block sequence; its comment moves to the key line",
       "profiles": [
@@ -1533,59 +1302,6 @@
       ],
       "expect": {
         "output": "a:  # n\n  c: 2\n"
-      }
-    },
-    {
-      "id": "comment-inline-in-flow-item-unplaceable",
-      "why": "an item of a flow sequence has more text after it on its line: no place for a trailing comment",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: [1, 2]",
-          "b: 2"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "a[0]",
-          "text": "x"
-        }
-      ],
-      "expect": {
-        "refusal": {
-          "rule": "inline-comment-unplaceable"
-        }
-      }
-    },
-    {
-      "id": "comment-inline-multiline-flow-unplaceable",
-      "why": "a flow collection that spans lines has no single line for a trailing comment",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: [1,",
-          "  2]",
-          "b: 2"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "a",
-          "text": "x"
-        }
-      ],
-      "expect": {
-        "refusal": {
-          "rule": "inline-comment-unplaceable"
-        }
       }
     },
     {
@@ -2127,8 +1843,8 @@
       }
     },
     {
-      "id": "insert-without-trailing-newline",
-      "why": "an insert after a last line with no line break adds the break before the new line only",
+      "id": "set-new-key-without-trailing-newline",
+      "why": "a new key after a last line with no line break adds the break before the new line only",
       "profiles": [
         "strict-config",
         "tool"
@@ -2138,9 +1854,8 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "",
-          "key": "k",
+          "op": "set",
+          "path": "k",
           "value": 2
         }
       ],
@@ -2149,8 +1864,8 @@
       }
     },
     {
-      "id": "insert-keeps-crlf-in-nested-block",
-      "why": "a nested value inserted into a CRLF document is written with CRLF throughout",
+      "id": "set-new-key-keeps-crlf-in-nested-block",
+      "why": "a nested value added as a new key in a CRLF document is written with CRLF throughout",
       "profiles": [
         "strict-config",
         "tool"
@@ -2160,9 +1875,8 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "b",
-          "key": "k",
+          "op": "set",
+          "path": "b.k",
           "value": {
             "x": [
               1
@@ -2175,7 +1889,7 @@
       }
     },
     {
-      "id": "insert-string-needing-quotes-in-single-quote-document",
+      "id": "set-new-key-string-needing-quotes-in-single-quote-document",
       "why": "a string that cannot stay plain takes the single quotes the document uses",
       "profiles": [
         "strict-config",
@@ -2189,9 +1903,8 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "",
-          "key": "k",
+          "op": "set",
+          "path": "k",
           "value": "true"
         }
       ],
@@ -2200,7 +1913,7 @@
       }
     },
     {
-      "id": "insert-string-needing-quotes-defaults-to-double",
+      "id": "set-new-key-string-needing-quotes-defaults-to-double",
       "why": "a string that cannot stay plain is double-quoted when the document has no quoted string",
       "profiles": [
         "strict-config",
@@ -2214,9 +1927,8 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "",
-          "key": "k",
+          "op": "set",
+          "path": "k",
           "value": "a: b # c"
         }
       ],
@@ -2225,7 +1937,7 @@
       }
     },
     {
-      "id": "insert-key-needing-quotes",
+      "id": "set-new-key-key-needing-quotes",
       "why": "a key that would read as another type is quoted",
       "profiles": [
         "strict-config",
@@ -2238,9 +1950,8 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "",
-          "key": "true",
+          "op": "set",
+          "path": "true",
           "value": 2
         }
       ],
@@ -2249,8 +1960,8 @@
       }
     },
     {
-      "id": "insert-after-last-line-before-next-section",
-      "why": "an insert at the end of a nested mapping lands before the comment of the next section",
+      "id": "set-new-key-after-last-line-before-next-section",
+      "why": "a new key at the end of a nested mapping lands before the comment of the next section",
       "profiles": [
         "strict-config",
         "tool"
@@ -2265,9 +1976,8 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "a",
-          "key": "y",
+          "op": "set",
+          "path": "a.y",
           "value": 5
         }
       ],
@@ -2513,104 +2223,6 @@
       }
     },
     {
-      "id": "comment-inline-none-removes",
-      "why": "an absent inline comment text removes the comment and the blanks before it",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: 1  # old",
-          "b: 2"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "a",
-          "text": null
-        }
-      ],
-      "expect": {
-        "output": "a: 1\nb: 2\n"
-      }
-    },
-    {
-      "id": "comment-inline-on-mapping-goes-after-its-key",
-      "why": "an inline comment on a block mapping goes after its key on the key line",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a:",
-          "  b: 1"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "a",
-          "text": "note"
-        }
-      ],
-      "expect": {
-        "output": "a:  # note\n  b: 1\n"
-      }
-    },
-    {
-      "id": "comment-inline-on-sequence-item-mapping-unplaceable",
-      "why": "a mapping item of a block sequence has its first key on the dash line: no place for its own trailing comment",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "l:",
-          "  - a: 1",
-          "    b: 2"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "l[0]",
-          "text": "x"
-        }
-      ],
-      "expect": {
-        "refusal": {
-          "rule": "inline-comment-unplaceable"
-        }
-      }
-    },
-    {
-      "id": "comment-inline-injection-same-line",
-      "why": "text with a space and a colon stays comment text",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: 1"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "a",
-          "text": "x evil: 1"
-        }
-      ],
-      "expect": {
-        "output": "a: 1  # x evil: 1\n"
-      }
-    },
-    {
       "id": "comment-block-delete",
       "why": "no lines delete the comment block above the node",
       "profiles": [
@@ -2721,8 +2333,8 @@
       }
     },
     {
-      "id": "insert-into-flow-with-inner-comment-refused",
-      "why": "insert into a flow mapping rewrites it; a note inside is not dropped without the acknowledgement",
+      "id": "set-new-key-into-flow-with-inner-comment-refused",
+      "why": "a new key in a flow mapping rewrites it; a note inside is not dropped without the acknowledgement",
       "profiles": [
         "strict-config",
         "tool"
@@ -2735,9 +2347,8 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "x",
-          "key": "c",
+          "op": "set",
+          "path": "x.c",
           "value": 3
         }
       ],
@@ -2748,8 +2359,8 @@
       }
     },
     {
-      "id": "insert-into-flow-with-inner-comment-acknowledged",
-      "why": "with the acknowledgement the insert rewrites the flow mapping and the note goes",
+      "id": "set-new-key-into-flow-with-inner-comment-acknowledged",
+      "why": "with the acknowledgement a new key rewrites the flow mapping and the note goes",
       "profiles": [
         "strict-config",
         "tool"
@@ -2762,41 +2373,14 @@
       },
       "ops": [
         {
-          "op": "insert",
-          "path": "x",
-          "key": "c",
+          "op": "set",
+          "path": "x.c",
           "value": 3,
           "acknowledge": true
         }
       ],
       "expect": {
         "output": "x:\n  a: 1\n  b: 2\n  c: 3\n"
-      }
-    },
-    {
-      "id": "comment-inline-empty-text-refused",
-      "why": "an empty inline comment text is invalid; removing is the absent text",
-      "profiles": [
-        "strict-config",
-        "tool"
-      ],
-      "input": {
-        "lines": [
-          "a: 1  # old",
-          "b: 2"
-        ]
-      },
-      "ops": [
-        {
-          "op": "setInlineComment",
-          "path": "a",
-          "text": ""
-        }
-      ],
-      "expect": {
-        "refusal": {
-          "rule": "inline-comment-empty"
-        }
       }
     }
   ]

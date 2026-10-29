@@ -183,17 +183,14 @@ pub mod rule {
     pub const EXPANDED_TOO_LARGE: &str = "expanded-too-large";
     pub const SYNTAX_ERROR: &str = "syntax-error";
     pub const COMMENT_WOULD_BE_LOST: &str = "comment-would-be-lost";
-    pub const INLINE_COMMENT_MULTILINE: &str = "inline-comment-multiline";
-    pub const INLINE_COMMENT_EMPTY: &str = "inline-comment-empty";
     pub const EDIT_CHANGED_MEANING: &str = "edit-changed-meaning";
     pub const PATH_NOT_FOUND: &str = "path-not-found";
-    pub const INLINE_COMMENT_UNPLACEABLE: &str = "inline-comment-unplaceable";
     pub const MERGE_TYPE_MISMATCH: &str = "merge-type-mismatch";
     pub const INVALID_PATH: &str = "invalid-path";
     pub const YAML_INTERNAL_ERROR: &str = "yaml-internal-error";
 
     /// Every rule id, in the order of the contract file.
-    pub const ALL: [&str; 32] = [
+    pub const ALL: [&str; 29] = [
         DUPLICATE_KEY,
         TAG_REFUSED,
         UNKNOWN_TAG,
@@ -218,11 +215,8 @@ pub mod rule {
         EXPANDED_TOO_LARGE,
         SYNTAX_ERROR,
         COMMENT_WOULD_BE_LOST,
-        INLINE_COMMENT_MULTILINE,
-        INLINE_COMMENT_EMPTY,
         EDIT_CHANGED_MEANING,
         PATH_NOT_FOUND,
-        INLINE_COMMENT_UNPLACEABLE,
         MERGE_TYPE_MISMATCH,
         INVALID_PATH,
         YAML_INTERNAL_ERROR,
