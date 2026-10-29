@@ -10,6 +10,8 @@ pub mod mailbox_hook;
 #[cfg(unix)]
 pub mod mailbox_identity;
 #[cfg(unix)]
+pub mod mailbox_remote;
+#[cfg(unix)]
 pub mod mailbox_root;
 pub mod mailbox_surface;
 #[cfg(unix)]

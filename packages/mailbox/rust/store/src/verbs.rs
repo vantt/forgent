@@ -11,8 +11,8 @@ use crate::hook::shell::{claimed_sizes, emit_and_finish, Emit, WriteGate};
 use crate::hook::{claim_inbox, HandleOf, InboxClaim};
 use crate::record::{Record, Reported, Wait};
 use fgos_mailbox_core::{
-    delivery_report, record_error_text, refusal_text, Limits, SendOutcome, SendRequest, Timestamp,
-    VersionClause, WriterKey,
+    delivery_report, record_error_text, refusal_text, Limits, RemoteSend, SendOutcome, SendRequest,
+    Timestamp, VersionClause, WriterKey,
 };
 use fgos_mailbox_core::{inbox_text, Cli, Liveness, MessageId, ShortName};
 use std::collections::BTreeMap;
@@ -54,6 +54,27 @@ pub fn send(
             recorded: false,
         },
     }
+}
+
+/// Admits a message bound for another machine in one hold, so the attempt
+/// is counted (and saved) before the caller writes the event: the new
+/// message id, or the text that says why not (a refusal, or the record
+/// error). Nothing is recorded for the message itself.
+pub fn admit_remote(
+    record: &Record,
+    req: &RemoteSend<'_>,
+    wait: Wait,
+    now: Timestamp,
+    limits: &Limits,
+) -> Result<MessageId, String> {
+    let held = record
+        .hold(wait, now, limits, |state, ids| {
+            Reported::changing(state.admit_remote(req, now, limits, ids))
+        })
+        .map_err(|error| record_error_text(error.code()))?;
+    held.value
+        .value
+        .map_err(|refusal| refusal_text(&refusal, limits))
 }
 
 /// The pending mail of `key`, read in one hold that changes nothing, so it

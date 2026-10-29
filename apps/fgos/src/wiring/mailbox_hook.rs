@@ -26,7 +26,6 @@ use fgos_mailbox::hook::{Adapter, HookEvent};
 use fgos_mailbox::record::Paths;
 use fgos_event_store::{layout::Layout, sync::sync_status};
 use fgos_mailbox_core::{Cli, Timestamp, WriterKey};
-use fgos_process::mapped::spawn_detached;
 use std::ffi::OsString;
 use std::path::Path;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -214,21 +213,7 @@ fn start_sync(fgos_dir: &Path, paths: &Paths, cross: &CrossMachine) {
     if last.remote == cross.remote && now.saturating_sub(last.time) < cross.sync_interval_sec {
         return;
     }
-    let Ok(exe) = std::env::current_exe() else {
-        return;
-    };
-    let argv = [
-        exe.into_os_string(),
-        "hook".into(),
-        "mailbox-sync".into(),
-        "--dir".into(),
-        main.into(),
-        "--remote".into(),
-        cross.remote.as_str().into(),
-    ];
-    let log = paths.sync_log();
-    let log = log.parent().is_some_and(Path::is_dir).then_some(log.as_path());
-    let _ = spawn_detached(&argv, main, &[], log);
+    super::mailbox_sync::spawn(main, paths, &cross.remote);
 }
 
 /// The outcome a registering call leaves when Identity has no machine id

@@ -19,7 +19,9 @@ use fgos_identity::current::machine_info;
 use fgos_identity::directory;
 use fgos_identity::shared::{self, LogDoor};
 use fgos_mailbox::verbs;
+use fgos_mailbox::record::Paths;
 use fgos_mailbox_core::Limits;
+use fgos_process::mapped::spawn_detached;
 use fgos_process::facts::judge_here;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
@@ -63,6 +65,29 @@ fn run(args: &[OsString]) {
     if let Err(why) = publish(&dir, &remote) {
         eprintln!("mailbox-sync: {why}");
     }
+}
+
+/// Starts the detached child that publishes the heads of `main`'s mailbox and
+/// seals, fetches and pushes its clone against `remote`. Nothing is waited
+/// for and nothing is printed; a child that cannot start loses nothing, as
+/// the hook's next due call (or the next send) starts one again. The child's
+/// stderr goes to the mailbox sync log when the record directory exists.
+pub fn spawn(main: &Path, paths: &Paths, remote: &str) {
+    let Ok(exe) = std::env::current_exe() else {
+        return;
+    };
+    let argv = [
+        exe.into_os_string(),
+        "hook".into(),
+        "mailbox-sync".into(),
+        "--dir".into(),
+        main.into(),
+        "--remote".into(),
+        remote.into(),
+    ];
+    let log = paths.sync_log();
+    let log = log.parent().is_some_and(Path::is_dir).then_some(log.as_path());
+    let _ = spawn_detached(&argv, main, &[], log);
 }
 
 /// Publishes each live head of this project's mailbox record that Identity

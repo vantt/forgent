@@ -41,13 +41,21 @@ struct StoreLog {
 
 impl LogDoor for StoreLogDoor {
     fn open(&self, dir: &Path, writer: &str) -> Result<Option<Box<dyn EntryLog>>, Refusal> {
+        self.open_stream(dir, writer, shared::STREAM)
+    }
+}
+
+impl StoreLogDoor {
+    /// The log of `stream` (a registered stream id) of the clone `dir` is in, written as `writer`:
+    /// the same admission, cursor and ordering Identity's directory uses, for another stream.
+    pub fn open_stream(&self, dir: &Path, writer: &str, stream: &str) -> Result<Option<Box<dyn EntryLog>>, Refusal> {
         let fault = |e: &dyn std::fmt::Debug| store_fault("event-store-unavailable", e);
         let clone = match super::event_store_clone::open(dir) {
             Ok(Some(clone)) => clone,
             Ok(None) => return Ok(None),
             Err(failure) => return Err(Refusal { reason: failure.reason, detail: failure.detail, candidates: Vec::new() }),
         };
-        let stream = StreamId::parse(shared::STREAM).map_err(|e| fault(&e))?;
+        let stream = StreamId::parse(stream).map_err(|e| fault(&e))?;
         let super::event_store_clone::EventStoreClone { driver, repo, layout, registry, machine } = clone;
         Ok(Some(Box::new(StoreLog { driver, repo, layout, registry, stream, machine, writer: writer.to_owned(), dir: dir.to_owned() })))
     }
@@ -129,7 +137,7 @@ impl EntryLog for StoreLog {
         let events = result
             .sequence
             .into_iter()
-            .filter(|event| event.stream == shared::STREAM)
+            .filter(|event| event.stream == self.stream.as_str())
             .map(|event| RawEvent { event_type: event.event_type, payload: event.payload })
             .collect();
         let fetched_at = sync_status(&self.layout)

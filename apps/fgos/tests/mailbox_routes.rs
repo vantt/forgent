@@ -1732,12 +1732,17 @@ fn the_hook_starts_the_detached_sync_child_only_when_cross_machine_is_on_and_a_s
 /// The main checkout of `scene` as a clone of a migrated project with a
 /// remote: what the Event Store needs before anything is appended there.
 fn migrate_main(scene: &Scene, state: &Path, project_id: &str) -> fgos_event_store::layout::Layout {
+    let remote = scene.root.join("remote.git");
+    git(&scene.root, &["init", "--bare", "-q", remote.to_str().unwrap()]);
+    migrate_main_to(scene, state, project_id, &remote)
+}
+
+/// [`migrate_main`] with `origin` at an existing bare repository, so two scenes can share one remote.
+fn migrate_main_to(scene: &Scene, state: &Path, project_id: &str, remote: &Path) -> fgos_event_store::layout::Layout {
     use fgos_event_store::layout::Layout;
     use fgos_git::{GitDriver, ResolveRepo};
     use std::os::unix::fs::PermissionsExt;
     let main = scene.main();
-    let remote = scene.root.join("remote.git");
-    git(&scene.root, &["init", "--bare", "-q", remote.to_str().unwrap()]);
     git(&main, &["remote", "add", "origin", remote.to_str().unwrap()]);
     fs::set_permissions(&main, fs::Permissions::from_mode(0o700)).unwrap();
     fs::write(
@@ -1825,4 +1830,101 @@ fn the_sync_child_publishes_a_registered_head_into_the_shared_directory_once() {
     assert_eq!(published(), 1, "the child published the head: {said}");
     child();
     assert_eq!(published(), 1, "an unchanged head is not published again");
+}
+
+/// Two machines sharing one remote: the session machine beta published into
+/// the shared directory is reached from alpha by its full id. A send there is
+/// recorded in the shared log, never delivered locally: the answer says so,
+/// alpha's record gains no message, the event is signed by alpha's key (and
+/// verifies under the domain of `remote.v1.json`), and a body over the wire
+/// cap is refused without writing anything.
+#[test]
+fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_recorded_not_delivered() {
+    const PROJECT: &str = "0123456789abcdef0123456789abcdef";
+    let alpha = Scene::new("xsend-alpha");
+    let beta = Scene::new("xsend-beta");
+    let alpha_root = identity_root(&alpha);
+    let beta_root = identity_root(&beta);
+    for root in [&alpha_root, &beta_root] {
+        fgos_identity::signing::mint_key(root).unwrap();
+    }
+    migrate_main(&alpha, &alpha_root, PROJECT);
+    // Both clones share alpha's bare remote.
+    migrate_main_to(&beta, &beta_root, PROJECT, &alpha.root.join("remote.git"));
+
+    // Beta's head registers with Identity, then beta's sync child publishes and pushes it.
+    let out = beta.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    let target = identity_of(&beta_root, "CLAUDE_CODE_SESSION_ID", WRITER).id;
+    let own = identity_of(&alpha_root, "CLAUDE_CODE_SESSION_ID", WRITER).id;
+    assert_ne!(target, own, "the two machines name their sessions apart");
+    let out = alpha.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    for scene in [&beta, &alpha] {
+        fs::write(scene.main().join(".fgos/config.json"), r#"{"mailbox":{"crossMachine":{"enabled":true}}}"#).unwrap();
+        let main = scene.main();
+        let out = scene.run(&main, None, &["hook", "mailbox-sync", "--dir", main.to_str().unwrap(), "--remote", "origin"], b"");
+        assert_eq!(out.status.code(), Some(0), "{out:?}");
+        assert!(out.stderr.is_empty(), "{}", String::from_utf8_lossy(&out.stderr));
+    }
+
+    let send = |body: &str| alpha.run(&alpha.main(), Some("sender-a"), &["mailbox", "send", "--to", &target, body], b"");
+    let out = send("hello from alpha");
+    let text = String::from_utf8_lossy(&out.stdout).into_owned();
+    assert_eq!(out.status.code(), Some(0), "{text} {}", String::from_utf8_lossy(&out.stderr));
+    assert!(text.starts_with("recorded ") && text.contains("not delivered"), "{text}");
+    assert_eq!(alpha.message_states().len(), 0, "a cross-machine send leaves no header in the local record");
+
+    let sent = || sent_events(&alpha_root, &alpha.main());
+    let sent_now = sent();
+    assert_eq!(sent_now.len(), 1, "{sent_now:?}");
+    let sent = &sent_now;
+    let payload = sent[0].clone();
+    assert_eq!(payload["body"], "hello from alpha");
+    assert_eq!(payload["to"]["id"], target.as_str());
+    let mut unsigned = payload.clone();
+    let sig: fgos_identity::Signature = serde_json::from_value(unsigned.as_object_mut().unwrap().remove("sig").unwrap()).unwrap();
+    let canonical = fgos_canonical_json::canonical_json(&unsigned).unwrap();
+    let bytes = format!("fgos-mailbox-message/1\n{canonical}").into_bytes();
+    let verified = fgos_identity::signing::verify(&beta_root, &bytes, &sig).unwrap();
+    assert_eq!(verified.machine_id, payload["from"]["machine"].as_str().unwrap(), "the signer is the sender's machine");
+
+    let over = send(&"x".repeat(2049));
+    assert_eq!(over.status.code(), Some(1), "{over:?}");
+    assert!(String::from_utf8_lossy(&over.stdout).contains("too-large"), "{over:?}");
+    assert_eq!(sent_events(&alpha_root, &alpha.main()).len(), 1, "a refused send writes no event");
+}
+
+/// The payloads of every `mailbox.message-sent` event the clone at `main` holds, sealed or still open.
+fn sent_events(state: &Path, main: &Path) -> Vec<serde_json::Value> {
+    use fgos_event_store::{
+        identity::StoreIdentity,
+        layout::{Layout, StreamId},
+        read::{read, ReadRequest},
+    };
+    use fgos_git::{GitDriver, ResolveRepo};
+    let driver = GitDriver::new(state).unwrap();
+    let repo = match driver.resolve_repo(main, main).unwrap() {
+        ResolveRepo::Repository(repo) => repo,
+        _ => panic!("the main checkout is a repository"),
+    };
+    let layout = Layout::from_common_dir(Some(repo.common_dir())).unwrap();
+    let machine = fgos_identity::machine::read(state).unwrap();
+    let origin = StoreIdentity::open(&layout, &machine).unwrap().store_id;
+    let stream = StreamId::parse("project:mailbox").unwrap();
+    let result = read(
+        &driver,
+        &repo,
+        ReadRequest {
+            machine: &machine,
+            layout: &layout,
+            origin: &origin,
+            streams: std::slice::from_ref(&stream),
+            cursor: &Default::default(),
+            folded: &[],
+            project: true,
+        },
+    )
+    .unwrap();
+    result.sequence.into_iter().filter(|event| event.event_type == "mailbox.message-sent").map(|event| event.payload).collect()
 }

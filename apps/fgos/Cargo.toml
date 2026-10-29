@@ -11,6 +11,7 @@ fgos-observe = { path = "../../packages/observe/rust" }
 fgos-convention = { path = "../../packages/convention/rust" }
 fgos-identity = { path = "../../packages/identity/rust" }
 fgos-event-store = { path = "../../packages/event-store/rust" }
+fgos-canonical-json = { path = "../../packages/canonical-json/rust" }
 fgos-git = { path = "../../packages/git/rust" }
 fgos-config = { path = "../../packages/config/rust", features = ["host-provider"] }
 fgos-run-result = { path = "../../packages/run-result/rust" }

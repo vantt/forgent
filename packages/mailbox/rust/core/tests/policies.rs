@@ -1,7 +1,7 @@
 mod common;
 
 use common::{key, plain, t, Pair, A_NAME, B_NAME};
-use fgos_mailbox_core::{AliasRefusal, CounterReason, MessageId, Refusal};
+use fgos_mailbox_core::{AliasRefusal, CounterReason, MessageId, Refusal, RemoteSend};
 
 fn code(result: &Result<fgos_mailbox_core::SendOutcome, Refusal>) -> &'static str {
     match result {
@@ -614,4 +614,49 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
         checked.push(expected);
     }
     assert_eq!(checked.len(), 14);
+}
+
+/// A message that leaves the machine is held to the wire's own body cap and
+/// to the same lifetime cap as a local send, counts every attempt (refused
+/// ones too) and leaves no header behind.
+#[test]
+fn a_remote_send_is_held_to_the_wire_cap_and_the_senders_lifetime_cap_and_records_no_header() {
+    let mut pair = Pair::new(t(0));
+    let from = key("a");
+    let wire_cap = 2048;
+    let remote = |bytes: u64| RemoteSend {
+        from: &from,
+        body_bytes: bytes,
+        max_body_bytes: wire_cap,
+        to: "peer@other",
+    };
+
+    let id = pair
+        .state
+        .admit_remote(&remote(wire_cap), t(1), &pair.limits, &mut pair.ids)
+        .expect("a body at the wire cap is admitted");
+    assert!(!id.as_str().is_empty());
+    let over = pair
+        .state
+        .admit_remote(&remote(wire_cap + 1), t(2), &pair.limits, &mut pair.ids);
+    assert!(
+        matches!(over, Err(Refusal::TooLarge { max_bytes: 2048 })),
+        "{over:?}"
+    );
+    assert_eq!(pair.state.counters().total(CounterReason::TooLarge), 1);
+    assert_eq!(pair.state.messages().count(), 0);
+
+    // Two attempts are counted already; the rest of the lifetime cap is spent
+    // by refused remote attempts, after which a local send is refused too.
+    let cap = pair.limits.session.lifetime_cap;
+    for i in 2..cap {
+        let _ = pair.state.admit_remote(
+            &remote(wire_cap + 1),
+            t(3 + u64::from(i)),
+            &pair.limits,
+            &mut pair.ids,
+        );
+    }
+    let local = pair.try_send(plain("a", B_NAME, "small"), t(10_000));
+    assert_eq!(code(&local), "lifetime-cap");
 }

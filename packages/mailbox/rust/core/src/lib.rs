@@ -48,7 +48,7 @@ pub use limits::{
 };
 pub use names::{is_group, ResolveRefusal};
 pub use notices::{Notice, NoticeMark, NoticeState};
-pub use policy::LifetimeKey;
+pub use policy::{LifetimeKey, RemoteSend};
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
 pub use report::{
     delivery_report, inbox_text, list_text, record_error_text, record_unavailable_text,

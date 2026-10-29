@@ -5,7 +5,7 @@
 use crate::counters::Account;
 use crate::delivery::{Recipient, Refusal, SendRequest};
 use crate::envelope::{Header, MessageState};
-use crate::ids::{Cli, Generation, ShortName, WriterKey};
+use crate::ids::{Cli, Generation, IdSource, MessageId, ShortName, WriterKey};
 use crate::limits::Limits;
 use crate::state::MailboxState;
 use crate::time::Timestamp;
@@ -30,6 +30,17 @@ impl LifetimeKey {
             None => self.0.split('@').next() == Some(key.as_str()),
         }
     }
+}
+
+/// A message bound for a session on another machine.
+pub struct RemoteSend<'a> {
+    pub from: &'a WriterKey,
+    pub body_bytes: u64,
+    /// The wire's own body cap; the effective cap is the smaller of this and
+    /// `mailbox.maxBodyBytes`.
+    pub max_body_bytes: u64,
+    /// The label counters use for the recipient, for example `name@machine`.
+    pub to: &'a str,
 }
 
 /// What a send that passed every check records.
@@ -89,6 +100,44 @@ impl MailboxState {
                 .entry(LifetimeKey::new(from, generation))
                 .or_insert(0);
             *count = count.saturating_add(1);
+        }
+    }
+
+    /// Admits a message that leaves this machine: counts the attempt, then
+    /// checks the sender key, the body against the wire's own cap (at most
+    /// `mailbox.maxBodyBytes`), the rolling budget and the lifetime cap, in
+    /// the order of a local send. The message is not recorded here (its
+    /// header lives on the receiving machine); a refusal bumps the counters
+    /// under the label `req.to`. The attempt is counted before the caller
+    /// writes the event, so a crash in between can only over-count the
+    /// sender, never let a cap be passed.
+    pub fn admit_remote(
+        &mut self,
+        req: &RemoteSend<'_>,
+        now: Timestamp,
+        limits: &Limits,
+        ids: &mut dyn IdSource,
+    ) -> Result<MessageId, Refusal> {
+        self.sweep(now, limits, ids);
+        let now = self.last_now;
+        let account = self.account(req.from);
+        let from_generation = self.binding(req.from).map(|b| b.generation);
+        self.count_attempt(&account, req.from, from_generation, now, limits);
+        let max_bytes = req.max_body_bytes.min(limits.max_body_bytes);
+        let verdict = if req.body_bytes > max_bytes {
+            Err(Refusal::TooLarge { max_bytes })
+        } else {
+            check_sender_key(req.from, limits)
+                .and_then(|()| self.check_budget(&account, limits))
+                .and_then(|()| self.check_lifetime(req.from, from_generation, limits))
+        };
+        match verdict {
+            Ok(()) => Ok(MessageId::mint(ids)),
+            Err(refusal) => {
+                self.counters
+                    .bump(refusal.reason(), account.as_str(), req.to, now, limits);
+                Err(refusal)
+            }
         }
     }
 

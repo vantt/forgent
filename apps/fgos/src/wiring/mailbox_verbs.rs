@@ -16,6 +16,8 @@
 //! write-then-finish function, and finishes only after a successful flush;
 //! the presenter then prints nothing more for it (with `--json`, only the
 //! envelope, without the text).
+use super::mailbox_config::project_mailbox;
+use super::mailbox_remote;
 use super::mailbox_identity::{
     address, handle_conflicts, is_alias, session_of, state_root, Addressed,
 };
@@ -374,6 +376,18 @@ fn caller(fgos_dir: &Path) -> Option<WriterKey> {
     .ok()
 }
 
+/// The answer to a send that went (or was refused) on the cross-machine path.
+fn remote_answer(recorded: bool, text: String, json: bool, warning: Option<String>) -> MailboxAnswer {
+    MailboxAnswer {
+        data: json!({ "ok": recorded, "recorded": recorded, "crossMachine": true, "text": text }),
+        text,
+        json,
+        exit: if recorded { EXIT_DONE } else { EXIT_REFUSED },
+        already_written: false,
+        warning,
+    }
+}
+
 /// Runs one mailbox request.
 pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
     match request {
@@ -418,7 +432,30 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 };
                 match address(state_root().as_deref(), to, &heads) {
                     Addressed::Head { key, role_holder } => (Recipient::Key(key), role_holder),
-                    Addressed::Refused(refusal) => (Recipient::Refused(refusal), None),
+                    Addressed::Refused(refusal) => {
+                        // No head of this record answers: a session of another
+                        // machine may, when mail crosses machines here.
+                        if let Ok((_, cross)) = project_mailbox(&fgos_dir) {
+                            let ctx = mailbox_remote::Context {
+                                fgos_dir: &fgos_dir,
+                                record: &record,
+                                limits: &loaded.limits,
+                                cross: &cross,
+                                wait,
+                                now: now(),
+                            };
+                            match mailbox_remote::send(&ctx, &from, to, body, reply_to.as_deref()) {
+                                mailbox_remote::Outcome::NotRemote => {}
+                                mailbox_remote::Outcome::Recorded(text) => {
+                                    return remote_answer(true, text, *json, warning)
+                                }
+                                mailbox_remote::Outcome::Refused(text) => {
+                                    return remote_answer(false, text, *json, warning)
+                                }
+                            }
+                        }
+                        (Recipient::Refused(refusal), None)
+                    }
                 }
             } else {
                 (Recipient::Name(to.clone()), None)
