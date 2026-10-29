@@ -13,7 +13,8 @@ use crate::proc_tree::os_process_tree;
 use crate::pins;
 use crate::project;
 pub use crate::refusal::Refusal;
-use crate::resolve::{resolve, WriterIdentity};
+use crate::attempt::is_attempt_writer_id;
+use crate::resolve::{resolve, WriterId, WriterIdentity};
 use crate::session::PidFacts;
 use crate::shared::{self, LogDoor, SharedView};
 use crate::signing;
@@ -200,6 +201,12 @@ fn resolve_identity(request: &IdentityRequest) -> WriterIdentity {
         caller_pid(request),
         request.fgos_dir.as_deref(),
     )
+}
+
+/// Whether the caller is a seat the runner started: its writer id is an attempt's.
+/// The runner owns that seat's identity, so the directory of live sessions never lists it.
+fn in_runner_seat(request: &IdentityRequest) -> bool {
+    matches!(resolve_identity(request).id, WriterId::Session(id) if is_attempt_writer_id(&id))
 }
 
 fn state_root() -> PathBuf {
@@ -434,6 +441,9 @@ fn answer(request: &IdentityRequest, door: Option<&dyn LogDoor>) -> Result<serde
                     directory::drop_current_role(&root, caller_pid(request), request.fgos_dir.as_deref(), role)?;
                 publish(request, door, &root, Some(&listed));
                 Ok(serde_json::to_value(listed).expect("Listed always serializes"))
+            }
+            SessionAction::Register { .. } if in_runner_seat(request) => {
+                Ok(serde_json::json!({ "registered": false, "reason": "runner-seat" }))
             }
             SessionAction::Register { role, take } => {
                 let cwd = std::env::current_dir().ok();
