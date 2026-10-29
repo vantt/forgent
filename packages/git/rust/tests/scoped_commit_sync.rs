@@ -1724,3 +1724,27 @@ fn a_corrupt_staged_object_that_cannot_be_healed_refuses_before_git_commit() {
     assert_eq!(git(&f.tree, &["diff", "--cached", "--name-only"]), "");
     assert_eq!(fs::read_to_string(f.tree.join("deep/er/file")).unwrap(), "new blob");
 }
+
+#[test]
+fn recovery_from_the_main_checkouts_port_takes_the_linked_checkouts_custody_and_names_a_busy_or_removed_one() {
+    let main = |f: &Fixture| match f.driver.resolve_repo(&f.main, &f.main).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let mut f = Fixture::new();
+    interrupted(&f, "prepared", 1, false);
+    let from_main = main(&f);
+    let busy = f.driver.reconcile_operation(&from_main, vec![], "fixture", "prepared", None).unwrap_err();
+    assert!(format!("{busy:?}").contains("checkout-custody-busy"), "{busy:?}");
+    drop(f.lease.take());
+    f.driver.reconcile_operation(&from_main, vec![], "fixture", "prepared", None).unwrap();
+    assert!(f.driver.inspect_operation(&from_main, "prepared").unwrap()["terminal"].as_bool().unwrap());
+
+    let mut gone = Fixture::new();
+    interrupted(&gone, "gone", 1, false);
+    drop(gone.lease.take());
+    git(&gone.main, &["worktree", "remove", "--force", gone.tree.to_str().unwrap()]);
+    let from_main = main(&gone);
+    let error = gone.driver.reconcile_operation(&from_main, vec![], "fixture", "gone", None).unwrap_err();
+    assert!(format!("{error:?}").contains("scoped-commit-checkout-gone"), "{error:?}");
+}

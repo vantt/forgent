@@ -3,7 +3,7 @@ use crate::{
     wal::{self, OperationKind, Wal},
     *,
 };
-use fgos_holder_lock::{BorrowedHandle, LockScope, Wait};
+use fgos_holder_lock::{BorrowedHandle, Handle, LockScope, Wait};
 use serde::Serialize;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
@@ -158,6 +158,19 @@ impl GitDriver {
         }
         Ok(json!({"candidates":candidates,"complete":scan.complete}))
     }
+    /// The checkout a scoped commit ran in, found from its intent through this
+    /// repository's own topology: Recovery's port sits on the main checkout, the
+    /// operation may have run in a linked one. A checkout removed since is named.
+    fn scoped_commit_checkout(&self, repo: &RepoHandle, worktree: &str) -> Result<RepoHandle> {
+        let path = std::path::Path::new(worktree);
+        if std::fs::symlink_metadata(path).is_err() {
+            return Err(failure("scoped-commit-checkout-gone"));
+        }
+        match self.resolve_repo(path, repo.trusted_main_root())? {
+            ResolveRepo::Repository(checkout) if checkout.common_dir() == repo.common_dir() => Ok(checkout),
+            _ => Err(failure("untrusted-worktree")),
+        }
+    }
     /// Publication delegates through its caller-held seal; it cannot be inferred
     /// from a supervisor lock. No network request is replayed here.
     pub fn reconcile_operation(
@@ -175,8 +188,18 @@ impl GitDriver {
         let c = wal.inspect(id)?;
         match &c.intent().kind {
             OperationKind::Land(_) => value(self.recover_land(repo, held, writer, id)?),
-            OperationKind::ScopedCommit(_) => {
-                value(self.recover_scoped_commit(repo, held, writer, id, &wal::OsFileSystem)?)
+            OperationKind::ScopedCommit(payload) => {
+                let checkout = self.scoped_commit_checkout(repo, &payload.worktree)?;
+                let custody = scoped_commit_custody(&checkout, &held)?;
+                let mut held: Vec<BorrowedHandle<'_>> = held;
+                if let Some(own) = &custody {
+                    held.push(BorrowedHandle::new(own).map_err(|e| failure(format!("{e:?}")))?);
+                }
+                let outcome = self.recover_scoped_commit(&checkout, held, writer, id, &wal::OsFileSystem);
+                if let Some(own) = custody {
+                    let _ = fgos_holder_lock::release(own);
+                }
+                value(outcome?)
             }
             OperationKind::Sync(_) => value(self.inspect_sync(repo, held, writer, id)?),
             OperationKind::Restore(_) => value(self.recover_restore(repo, held, writer, id)?),
@@ -208,6 +231,29 @@ impl GitDriver {
             ),
         }
     }
+}
+
+/// A linked checkout's custody for its scoped commit's recovery, taken once and
+/// never waited for, so a checkout a live writer holds is named busy and kept.
+/// None for the main checkout, whose `main-checkout` lock the recovery takes
+/// itself, and none when the caller lends its own locks.
+fn scoped_commit_custody(checkout: &RepoHandle, held: &[BorrowedHandle<'_>]) -> Result<Option<Handle>> {
+    let root = crate::scoped_commit::root(checkout)?;
+    if root == checkout.trusted_main_root() || !held.is_empty() {
+        return Ok(None);
+    }
+    #[cfg(unix)]
+    {
+        use fgos_holder_lock::{acquire, Acquire, Mode, Resource, DEFAULT_KILL_WAIT_MS};
+        let resource = Resource::new("dispatch-cwd", crate::refs::custody_lock_path(checkout, root)?);
+        match acquire(&resource, Mode::Ex, Wait::Try, DEFAULT_KILL_WAIT_MS) {
+            Acquire::Acquired(handle) => Ok(Some(handle)),
+            Acquire::Held { .. } => Err(failure("checkout-custody-busy")),
+            other => Err(failure(format!("checkout-custody-unavailable: {other:?}"))),
+        }
+    }
+    #[cfg(not(unix))]
+    Ok(None)
 }
 
 #[cfg(test)]
