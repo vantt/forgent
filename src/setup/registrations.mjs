@@ -107,6 +107,7 @@ import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { readConfig, readMachineConfig } from '../config/facade.mjs';
 import { CONFIG_CHECKS, CONFIG_FIXES, checkConfigOnce, isConfigDoorFailure } from './config-checks.mjs';
+import { formatLegacyJsonAdvice } from './runner-config-conversion.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
@@ -485,21 +486,29 @@ export function checkRunnerPatternsConfig(cwd, run) {
     return file ?? '<file>';
   };
 
-  // A legacy JSON file is the door row's finding (config-format-legacy-json); this row judges the YAML files.
+  // The legacy JSON format itself is the door row's finding (config-format-legacy-json); this row adds what that row
+  // cannot say: which retired pattern key to change and what replaces it, in a YAML or a legacy JSON file alike.
   const findings = checkConfigOnce(cwd, run).findings ?? [];
-  if (findings.some((f) => f.row === 'config-format-legacy-json')) {
-    return { passed: true, message: 'not evaluated: a legacy JSON config file is reported by config-format-legacy-json' };
-  }
-
+  const legacy = findings.filter((f) => f.row === 'config-format-legacy-json');
+  const legacyScopes = new Set(legacy.map((f) => f.file?.split(':')[0]));
   const problems = [];
+  const note = (msg) => { if (!problems.includes(msg)) problems.push(msg); };
+  for (const f of legacy) {
+    // The advice names the retired keys of that file; its generic form only repeats the door row, so it is dropped.
+    const advice = formatLegacyJsonAdvice(display(f.file));
+    if (advice.includes(' was retired; ')) note(advice);
+  }
   for (const f of findings) {
+    if (f.row === 'config-format-legacy-json' || legacyScopes.has(f.file?.split(':')[0])) continue;
     for (const item of f.path ? detectRetiredPatternKeys(f.path) : []) {
-      const msg = `${display(f.file)}: ${item.key} was retired; ${item.replacement ? `use ${item.replacement} instead.` : 'delete the key.'}`;
-      if (!problems.includes(msg)) problems.push(msg);
+      note(`${display(f.file)}: ${item.key} was retired; ${item.replacement ? `use ${item.replacement} instead.` : 'delete the key.'}`);
     }
   }
   if (problems.length > 0) {
     return { passed: false, message: problems.join('; ') };
+  }
+  if (legacy.length > 0) {
+    return { passed: true, message: 'not evaluated: a legacy JSON config file is reported by config-format-legacy-json' };
   }
 
   let cfg;

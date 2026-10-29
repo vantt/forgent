@@ -820,15 +820,24 @@ test('doctor check runner-patterns-config: a retired key in the project file fai
   assert.match(res.message, /runner\.loops\.reviewed/);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
-test('doctor check runner-patterns-config: a legacy json project file is left to the config-format-legacy-json row', () => {
+test('doctor check runner-patterns-config: a legacy json project file keeps the retired-key advice and leaves the format failure to config-format-legacy-json', () => {
   const tmpDir = mkTempDir();
   writeRawLegacyProjectConfig(tmpDir, JSON.stringify({ runner: { patterns: { reviewed: { maxRounds: 3 } } } }));
   const patterns = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config').check(tmpDir);
-  assert.equal(patterns.passed, true);
-  assert.match(patterns.message, /config-format-legacy-json/);
+  assert.equal(patterns.passed, false);
+  assert.match(patterns.message, new RegExp(path.join(tmpDir, '.fgos', 'config.json').replace(/[/\\?*]/g, '\\$&')));
+  assert.match(patterns.message, /runner\.loops\.reviewed\.maxRounds/);
+  assert.match(patterns.message, /edit .*config\.json.*, then run `fgos config migrate`/i);
+  assert.doesNotMatch(patterns.message, /config\.yaml/);
   const door = DOCTOR_CHECKS.find((c) => c.id === 'config-format-legacy-json').check(tmpDir);
   assert.equal(door.passed, false);
   assert.match(door.message, /project:config\.json/);
+
+  // With no retired key in the legacy file, the format failure is the door row's alone.
+  writeRawLegacyProjectConfig(tmpDir, JSON.stringify({ runner: {} }));
+  const quiet = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config').check(tmpDir);
+  assert.equal(quiet.passed, true);
+  assert.match(quiet.message, /config-format-legacy-json/);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
