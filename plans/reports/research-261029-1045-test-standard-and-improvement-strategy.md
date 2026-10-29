@@ -149,3 +149,32 @@ Ordered so each step is measured before the next, and so that cost falls where i
 - The 94% figure classes whole files; S-0 gives the per-test split.
 - The 60% fixture share of CLI spawns comes from 11 files in 09-22, before the Rust host and the Event Store cutover. S-0 re-measures it.
 - No estimate yet of wall-time gain; CPU is the stable measure on this shared machine.
+
+## 7. S-0 result (2026-10-29 21:17, main `ba617a077`)
+
+Full `npm test` profile (`scripts/test-timing.mjs profile`, junit per test), then one in-process timing of the fixture doors and single verbs (8 repeats each, idle machine). Per-test times are wall under suite concurrency, so compare them with each other, not with CPU.
+
+| Measure | Value |
+|---|---|
+| Node tests | 8814; summed test time 8577 s; suite wall 619 s, CPU 6396 s |
+| Tests ≥ 1 s | 1749 (20%) hold 7721 s (90%) |
+| Tests < 0.05 s | 4802 (54%) hold 15 s |
+| By file class (static: CLI harness / git / other spawn / pure) | CLI 161 files 59%; git 125 files 26%; spawn 87 files 7%; pure 232 files 8% |
+
+| One call | ms |
+|---|---:|
+| `tmpCwd()` (git init + `fgos init` spawn) | 411 |
+| `tmpCwdFast()` (in-process init) | 130 |
+| `tmpCwdFromTemplate()` (copy) | 49 |
+| `fgos list` spawn | 386 |
+| `fgos add` spawn | 352 |
+| `fgos --help` spawn | 117 |
+
+Findings:
+
+- **The fixture is not the main cost; the verb spawns are.** Static sites: 185 `tmpCwd()` against 1284 CLI `run(...)` calls. Moving every `tmpCwd()` to the template door saves about 185 × 0.36 s ≈ 67 s summed, about 1% of test time. The §6 "60% fixture share" from 09-22 no longer holds. S-1 stays (one door, simpler), but it is not the speed lever.
+- **A real verb costs about 3× a bare spawn** (352–386 ms against 117 ms for `--help`). The extra 240–270 ms per call is product startup work (store, identity, config, git reads), paid by every CLI test and every user command. This is S-5: route to the owning lanes with a startup profile, not a test change.
+- **Cost is concentrated.** One fifth of the tests hold 90% of the time. S-2 works through the ≥ 1 s list file by file, largest first: `runner/loop.test.mjs` 411 s, `run-supervisor/crash-matrix-adopt-resume` 218 s, `runner/execution/run.test.mjs` 198 s, `run-provider-failover` 182 s, `workflow/workflow-runner` 168 s, `cli/fgos-return` 165 s.
+- Revised order: S-2 (cases to their layer, biggest files first) and S-5 (verb startup profile, routed) before S-1.
+
+Data: `.fgos/runtime/tmp/s0-profile-261029-2117/` (junit, analysis) on fg-server2, not committed.
