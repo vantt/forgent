@@ -11,7 +11,7 @@ use fgos_yaml_doc::path::format_path;
 use fgos_yaml_doc::{parse, Profile, Segment};
 use serde_json::{json, Value};
 
-use super::{path_arg, refuse, refused, Bundle, ConfigOutcome, Verb};
+use super::{path_arg, refuse, refused, ConfigOutcome, Verb};
 use crate::doctor::{check, Consumer, Severity};
 use crate::migrate::{self, MigrateOptions, MigrationReport};
 use crate::relocate::{self, Held, MoveRequest};
@@ -41,13 +41,13 @@ fn run_check(ctx: &Context, roots: &SnapshotRequest) -> Result<ConfigOutcome, Re
 
 /// The file a key lives in: an accounts key in the accounts file, a `global-only` key in the global
 /// file, anything else in the project (or, for a `both` key, the global file with `--global`).
-fn target_of(bundle: &Bundle, path: &[Segment], global: bool) -> Result<SourceKind, Refusal> {
+fn target_of(ctx: &Context, path: &[Segment], global: bool) -> Result<SourceKind, Refusal> {
     let chosen = if global {
         SourceKind::Global
     } else {
         SourceKind::Project
     };
-    let Some(node) = bundle.schemas.resolve(path) else {
+    let Some(node) = ctx.schemas.resolve(path) else {
         return Ok(chosen);
     };
     match (node.file, node.scope) {
@@ -183,8 +183,7 @@ fn migration(report: &MigrationReport) -> Value {
     })
 }
 
-fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value, Refusal> {
-    let ctx = bundle.ctx();
+fn write(ctx: &Context, roots: &SnapshotRequest, verb: &Verb) -> Result<Value, Refusal> {
     let dry = matches!(verb, Verb::Migrate { dry_run: true, .. });
     // Refused before any file is opened (spec section 6); the transaction refuses it again itself.
     if roots.class == SessionClass::Confined && !dry {
@@ -193,7 +192,7 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
     let writer = resolve_current(None);
     let one = |kind: SourceKind, edits, reason: &str, ack| -> Result<Value, Refusal> {
         let done =
-            commit(&ctx, &request(roots, kind, edits, reason, ack)?, &writer).map_err(refused)?;
+            commit(ctx, &request(roots, kind, edits, reason, ack)?, &writer).map_err(refused)?;
         Ok(written(kind, &done))
     };
     match verb {
@@ -204,7 +203,7 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
             global,
         } => {
             let path = path_arg(path)?;
-            let kind = target_of(bundle, &path, *global)?;
+            let kind = target_of(ctx, &path, *global)?;
             one(
                 kind,
                 vec![Edit::Set {
@@ -222,7 +221,7 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
             acknowledge,
         } => {
             let path = path_arg(path)?;
-            let kind = target_of(bundle, &path, *global)?;
+            let kind = target_of(ctx, &path, *global)?;
             one(kind, vec![Edit::Unset { path }], reason, *acknowledge)
         }
         Verb::Patch {
@@ -233,7 +232,7 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
             let edits = patch_edits(file)?;
             let kinds: Result<Vec<_>, _> = edits
                 .iter()
-                .map(|e| target_of(bundle, edited_path(e), *global))
+                .map(|e| target_of(ctx, edited_path(e), *global))
                 .collect();
             let kinds = kinds?;
             if kinds.iter().any(|k| *k != kinds[0]) {
@@ -257,7 +256,7 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
                 lock_wait_ms: LOCK_WAIT_MS,
             };
             let report =
-                migrate::project(&ctx, roots, &writer, &opts, |_| Ok(())).map_err(refused)?;
+                migrate::project(ctx, roots, &writer, &opts, |_| Ok(())).map_err(refused)?;
             Ok(migration(&report))
         }
         Verb::Migrate {
@@ -273,7 +272,7 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
                 lock_root: fgos_holder_lock::state_root::lock_root(),
                 lock_wait_ms: LOCK_WAIT_MS,
             };
-            let report = migrate::global(&ctx, roots, &writer, &opts, *machine_checked, |_| Ok(()))
+            let report = migrate::global(ctx, roots, &writer, &opts, *machine_checked, |_| Ok(()))
                 .map_err(refused)?;
             Ok(migration(&report))
         }
@@ -282,7 +281,7 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
             dry_run: true,
             ..
         } => {
-            let pending = relocate::plan(&ctx, &roots.global_dir).map_err(refused)?;
+            let pending = relocate::plan(ctx, &roots.global_dir).map_err(refused)?;
             let held = |h: Held| match h {
                 Held::Missing => "missing",
                 Held::Equal => "equal",
@@ -303,8 +302,8 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
                 lock_wait_ms: LOCK_WAIT_MS,
             };
             let moved = match finish {
-                true => relocate::finish(&ctx, &req, *machine_checked, |_| Ok(())),
-                false => relocate::copy(&ctx, &req, &writer, |_| Ok(())),
+                true => relocate::finish(ctx, &req, *machine_checked, |_| Ok(())),
+                false => relocate::copy(ctx, &req, &writer, |_| Ok(())),
             };
             let moved = moved.map_err(refused)?;
             Ok(
@@ -329,7 +328,7 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
                     other => other.map_err(refused)?,
                 };
                 let done = refresh(
-                    &ctx,
+                    ctx,
                     request(roots, kind, Vec::new(), "", false)?,
                     &writer,
                     |_| Ok(()),
@@ -346,14 +345,14 @@ fn write(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<Value,
 
 /// The verbs that need the write door or the findings engine.
 pub(super) fn run(
-    bundle: &Bundle,
+    ctx: &Context,
     roots: &SnapshotRequest,
     verb: &Verb,
 ) -> Result<ConfigOutcome, Refusal> {
     match verb {
-        Verb::Check => run_check(&bundle.ctx(), roots),
+        Verb::Check => run_check(ctx, roots),
         _ => Ok(ConfigOutcome {
-            data: write(bundle, roots, verb)?,
+            data: write(ctx, roots, verb)?,
             exit: 0,
         }),
     }

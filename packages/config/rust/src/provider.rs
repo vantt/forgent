@@ -24,22 +24,25 @@ use fgos_yaml_doc::path::parse_path;
 use fgos_yaml_doc::{rule, Segment};
 use serde_json::{json, Value};
 
-use crate::detect::NoDetectors;
+use crate::detect::PathDetectors;
 use crate::inspect;
-use crate::schema::Schemas;
+use crate::machine;
 use crate::session::session_class;
 use crate::snapshot::{snapshot, Context, SnapshotError, SnapshotRequest};
-use crate::standard::Standard;
 
 #[cfg(unix)]
 mod unix_verbs;
 /// Where the write verbs and `check` cannot run: they refuse, naming the platform.
 #[cfg(not(unix))]
 mod unix_verbs {
-    use super::{refused, Bundle, ConfigOutcome, Refusal, SnapshotRequest, Verb};
+    use super::{refused, ConfigOutcome, Context, Refusal, SnapshotRequest, Verb};
     use crate::ConfigRefusal;
 
-    pub(super) fn run(_: &Bundle, _: &SnapshotRequest, _: &Verb) -> Result<ConfigOutcome, Refusal> {
+    pub(super) fn run(
+        _: &Context,
+        _: &SnapshotRequest,
+        _: &Verb,
+    ) -> Result<ConfigOutcome, Refusal> {
         Err(refused(ConfigRefusal::new("config-platform-unsupported")))
     }
 }
@@ -204,35 +207,6 @@ fn path_arg(text: &str) -> Result<Vec<Segment>, Refusal> {
     parse_path(text).map_err(|r| refuse("path-invalid", format!("{text}: {}", r.rule)))
 }
 
-/// The bundled schemas and standard, loaded once per verb.
-struct Bundle {
-    schemas: Schemas,
-    standard: Standard,
-    digest: String,
-}
-
-impl Bundle {
-    fn load() -> Result<Bundle, Refusal> {
-        let (schemas, digest) = Schemas::bundled().map_err(refused)?;
-        let standard = Standard::bundled(&schemas).map_err(refused)?;
-        Ok(Bundle {
-            schemas,
-            standard,
-            digest,
-        })
-    }
-
-    /// No detection yet: a detected key shows as absent until the PATH probe lands.
-    fn ctx(&self) -> Context<'_> {
-        Context {
-            schemas: &self.schemas,
-            standard: &self.standard,
-            digest: &self.digest,
-            detectors: &NoDetectors,
-        }
-    }
-}
-
 /// The roots of a verb: the project, its trusted main checkout, `~/.fgos` and the session class.
 fn roots(root: &Path) -> Result<SnapshotRequest, Refusal> {
     let home = std::env::var(HOME_VAR)
@@ -267,23 +241,22 @@ fn optional_path(path: &Option<String>) -> Result<Vec<Segment>, Refusal> {
     path.as_deref().map_or(Ok(Vec::new()), path_arg)
 }
 
-fn read(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<ConfigOutcome, Refusal> {
-    let ctx = bundle.ctx();
+fn read(ctx: &Context, roots: &SnapshotRequest, verb: &Verb) -> Result<ConfigOutcome, Refusal> {
     let data = match verb {
         Verb::Show { path } => {
-            let snap = snapshot(&ctx, roots).map_err(refused)?;
-            inspect::show(&ctx, &snap, &optional_path(path)?)
+            let snap = snapshot(ctx, roots).map_err(refused)?;
+            inspect::show(ctx, &snap, &optional_path(path)?)
         }
         Verb::Explain { path } => {
-            let snap = snapshot(&ctx, roots);
-            let mut out = inspect::explain(&ctx, snap.as_ref().ok(), &path_arg(path)?);
+            let snap = snapshot(ctx, roots);
+            let mut out = inspect::explain(ctx, snap.as_ref().ok(), &path_arg(path)?);
             if let Err(error) = snap {
                 out["snapshotRefused"] = json!(refused(error).detail.lines().collect::<Vec<_>>());
             }
             out
         }
-        Verb::Standard { path: None } => inspect::standard_files(&ctx),
-        Verb::Standard { path: Some(text) } => inspect::standard_fragment(&ctx, &path_arg(text)?)
+        Verb::Standard { path: None } => inspect::standard_files(ctx),
+        Verb::Standard { path: Some(text) } => inspect::standard_fragment(ctx, &path_arg(text)?)
             .map_err(refused)?
             .ok_or_else(|| {
                 refuse(
@@ -297,12 +270,18 @@ fn read(bundle: &Bundle, roots: &SnapshotRequest, verb: &Verb) -> Result<ConfigO
 }
 
 fn answer(req: &ConfigRequest) -> Result<ConfigOutcome, Refusal> {
-    let (bundle, roots) = (Bundle::load()?, roots(&req.root)?);
+    let detectors = PathDetectors {
+        path: std::env::var_os("PATH"),
+    };
+    let (ctx, roots) = (
+        machine::context(&detectors).map_err(refused)?,
+        roots(&req.root)?,
+    );
     match req.verb {
         Verb::Show { .. } | Verb::Explain { .. } | Verb::Standard { .. } => {
-            read(&bundle, &roots, &req.verb)
+            read(&ctx, &roots, &req.verb)
         }
-        _ => unix_verbs::run(&bundle, &roots, &req.verb),
+        _ => unix_verbs::run(&ctx, &roots, &req.verb),
     }
 }
 
