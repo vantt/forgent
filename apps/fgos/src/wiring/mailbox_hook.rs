@@ -191,9 +191,22 @@ fn start_sync(fgos_dir: &Path, paths: &Paths, cross: &CrossMachine) {
     let Some(main) = fgos_dir.parent() else {
         return;
     };
-    let Ok(layout) = Layout::from_common_dir(Some(&main.join(".git"))) else {
+    // Only a main checkout whose Git directory is the `.git` directory has its
+    // sync record there (a gitfile points elsewhere and would read as never
+    // synced on every call), and only a project that migrated its events or
+    // already has a store has anything to sync (the child would end before it
+    // recorded an attempt, so every call would start one).
+    let git_dir = main.join(".git");
+    if !std::fs::symlink_metadata(&git_dir).is_ok_and(|meta| meta.is_dir()) {
+        return;
+    }
+    let Ok(layout) = Layout::from_common_dir(Some(&git_dir)) else {
         return;
     };
+    let fenced = std::fs::symlink_metadata(main.join(".fgos/events")).is_ok_and(|meta| meta.is_file());
+    if !fenced && std::fs::symlink_metadata(layout.store()).is_err() {
+        return;
+    }
     let Ok(last) = sync_status(&layout) else {
         return;
     };
@@ -204,7 +217,15 @@ fn start_sync(fgos_dir: &Path, paths: &Paths, cross: &CrossMachine) {
     let Ok(exe) = std::env::current_exe() else {
         return;
     };
-    let argv = [exe.into_os_string(), "hook".into(), "mailbox-sync".into(), "--dir".into(), main.into()];
+    let argv = [
+        exe.into_os_string(),
+        "hook".into(),
+        "mailbox-sync".into(),
+        "--dir".into(),
+        main.into(),
+        "--remote".into(),
+        cross.remote.as_str().into(),
+    ];
     let log = paths.sync_log();
     let log = log.parent().is_some_and(Path::is_dir).then_some(log.as_path());
     let _ = spawn_detached(&argv, main, &[], log);

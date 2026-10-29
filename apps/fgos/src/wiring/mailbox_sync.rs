@@ -1,4 +1,4 @@
-//! `fgos hook mailbox-sync --dir <project>`: the detached child the mailbox
+//! `fgos hook mailbox-sync --dir <project> --remote <name>`: the detached child the mailbox
 //! hook and the mailbox verbs start (through `fgos_process::mapped::spawn_detached`)
 //! when mail may cross machines and the last sync is older than
 //! `eventStore.sync.intervalSec`. It runs one opportunistic Event Store sync of
@@ -18,34 +18,33 @@ pub fn main(args: &[OsString]) -> ! {
     std::process::exit(0)
 }
 
-/// The one flag: `--dir <project>`.
-fn parse(args: &[OsString]) -> Option<PathBuf> {
+/// The two flags, in this order: `--dir <project> --remote <name>`; the hook
+/// reads both from its config snapshot, so the child reads no config for them.
+fn parse(args: &[OsString]) -> Option<(PathBuf, String)> {
     match args {
-        [flag, dir] if flag == "--dir" && !dir.is_empty() => Some(PathBuf::from(dir)),
+        [dir_flag, dir, remote_flag, remote]
+            if dir_flag == "--dir" && remote_flag == "--remote" && !dir.is_empty() && !remote.is_empty() =>
+        {
+            Some((PathBuf::from(dir), remote.to_str()?.to_owned()))
+        }
         _ => None,
     }
 }
 
 fn run(args: &[OsString]) {
-    let Some(dir) = parse(args) else {
+    let Some((dir, remote)) = parse(args) else {
         return;
     };
-    if let Err(why) = publish(&dir) {
+    if let Err(why) = publish(&dir, &remote) {
         eprintln!("mailbox-sync: {why}");
     }
 }
 
 /// One opportunistic sync of the clone `dir` is in; nothing for a directory
 /// in no repository or a project that never migrated its events.
-fn publish(dir: &Path) -> Result<(), String> {
+fn publish(dir: &Path, remote: &str) -> Result<(), String> {
     let Some(clone) = event_store_clone::open(dir).map_err(|f| format!("{}: {}", f.reason, f.detail))? else {
         return Ok(());
-    };
-    let remote = fgos_config::provider::effective_value(dir, "eventStore.remote")
-        .map_err(|e| format!("event-store-config: {e:?}"))?;
-    let remote = match &remote {
-        Some(value) => value.as_str().ok_or("event-store-config: eventStore.remote is not text")?,
-        None => "origin",
     };
     let request = SyncRequest {
         layout: &clone.layout,
@@ -66,10 +65,22 @@ mod tests {
     use std::path::PathBuf;
 
     #[test]
-    fn only_a_single_dir_flag_with_a_value_names_the_project() {
+    fn only_a_dir_and_a_remote_flag_with_values_name_the_project() {
         let args = |list: &[&str]| list.iter().map(OsString::from).collect::<Vec<_>>();
-        assert_eq!(parse(&args(&["--dir", "/project"])), Some(PathBuf::from("/project")));
-        for bad in [&[][..], &["--dir"], &["--dir", ""], &["--dir", "/a", "/b"], &["/project"], &["--cli", "x"]] {
+        assert_eq!(
+            parse(&args(&["--dir", "/project", "--remote", "origin"])),
+            Some((PathBuf::from("/project"), "origin".to_owned()))
+        );
+        for bad in [
+            &[][..],
+            &["--dir"],
+            &["--dir", "/project"],
+            &["--dir", "", "--remote", "origin"],
+            &["--dir", "/project", "--remote", ""],
+            &["--remote", "origin", "--dir", "/project"],
+            &["/project"],
+            &["--cli", "x"],
+        ] {
             assert_eq!(parse(&args(bad)), None, "{bad:?}");
         }
     }

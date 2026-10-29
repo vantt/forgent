@@ -33,6 +33,7 @@ fn child(state: &Path, dir: &Path) -> Output {
     Command::new(env!("CARGO_BIN_EXE_fgos"))
         .args(["hook", "mailbox-sync", "--dir"])
         .arg(dir)
+        .args(["--remote", "origin"])
         .env("FGOS_STATE_ROOT", state)
         .env("HOME", home)
         .env_remove("XDG_CONFIG_HOME")

@@ -1722,5 +1722,9 @@ fn the_hook_starts_the_detached_sync_child_only_when_cross_machine_is_on_and_a_s
 
     fs::remove_file(layout.root.join("sync.json")).unwrap();
     hook();
+    assert!(!log.exists(), "a project that never migrated its events has nothing to sync: no child");
+
+    fs::write(scene.main().join(".fgos/events"), "fence\n").unwrap();
+    hook();
     assert!(log.exists(), "a due sync with cross-machine mail on starts the child");
 }
