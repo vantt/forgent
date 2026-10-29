@@ -1,7 +1,9 @@
 // Shipped pattern catalog and loop tuning loader.
 // Reads the bundled standard {patterns, loops} through the Config facade,
 // caches and deep-freezes it. Also provides catalogLayersOf(mainRoot) for Branch A.
-import { readConfig, readStandardValue } from '../../config/facade.mjs';
+import { readStandardValue } from '../../config/facade.mjs';
+import { runnerOriginsOf } from './config.mjs';
+import { RESERVED_PATTERN_NAMES } from '../execution/patterns/retired-keys.mjs';
 
 function deepFreeze(obj) {
   if (obj === null || typeof obj !== 'object' || Object.isFrozen(obj)) return obj;
@@ -30,30 +32,30 @@ export function shippedCatalog() {
 
 /**
  * Answers `{ <pattern name>: 'project' | 'global' | 'shipped' }` for the pin:
- * Branch A implementation asks the facade for the origins of `runner.patterns`.
+ * Computed from origins without a second door read.
  * Project layer beats global, which beats shipped.
  */
-export function catalogLayersOf(mainRoot) {
-  const { value, origins = [] } = readConfig({
-    projectRoot: mainRoot,
-    sections: ['runner'],
-    origins: ['runner.patterns'],
-  });
-
-  const patterns = value?.runner?.patterns ?? {};
+export function catalogLayersOf(originsOrConfig, patterns = {}) {
+  const origins = Array.isArray(originsOrConfig)
+    ? originsOrConfig
+    : (originsOrConfig?.origins ?? runnerOriginsOf(originsOrConfig) ?? []);
+  const effectivePatterns = (patterns && typeof patterns === 'object' && Object.keys(patterns).length > 0)
+    ? patterns
+    : (originsOrConfig?.patterns ?? originsOrConfig?.value?.runner?.patterns ?? originsOrConfig?.runner?.patterns ?? {});
   const shipped = shippedCatalog().patterns;
 
   const names = new Set([
-    ...Object.keys(patterns),
+    ...Object.keys(effectivePatterns),
     ...Object.keys(shipped),
   ]);
-  names.delete('seatBinding');
-  names.delete('defaultRule');
+  for (const name of RESERVED_PATTERN_NAMES) {
+    names.delete(name);
+  }
 
   const layers = {};
   for (const name of names) {
     const prefix = `runner.patterns.${name}`;
-    const matchingOrigins = origins.filter((o) => o.path === prefix || o.path.startsWith(`${prefix}.`));
+    const matchingOrigins = origins.filter((o) => o?.path === prefix || o?.path?.startsWith(`${prefix}.`));
 
     let layer = 'shipped';
     if (matchingOrigins.some((o) => o.layer === 'project')) {
@@ -64,26 +66,6 @@ export function catalogLayersOf(mainRoot) {
       layer = 'shipped';
     }
     layers[name] = layer;
-  }
-
-  for (const o of origins) {
-    if (!o?.path || !o?.layer) continue;
-    const layer = o.layer === 'standard' ? 'shipped' : o.layer;
-    layers[o.path] = layer;
-    if (o.path.startsWith('runner.patterns.')) {
-      const fieldPath = o.path.slice('runner.patterns.'.length);
-      if (fieldPath.includes('.')) {
-        layers[fieldPath] = layer;
-      }
-      const parts = o.path.split('.');
-      for (let i = 4; i < parts.length; i++) {
-        const sub = parts.slice(0, i).join('.');
-        if (!layers[sub] || (layer === 'project' && layers[sub] !== 'project')) {
-          layers[sub] = layer;
-          layers[sub.slice('runner.patterns.'.length)] = layer;
-        }
-      }
-    }
   }
 
   return layers;

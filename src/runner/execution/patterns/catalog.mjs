@@ -74,12 +74,20 @@ export function resolveCollaboration(options = {}) {
     runnerConfig = {},
     shipped = {},
     layers = null,
+    origins = null,
   } = options;
 
   // A runner config without a patterns section declares no patterns of its own; it must never be read as the map itself.
   const effectivePatterns = runnerConfig?.runner?.patterns ?? runnerConfig?.patterns ?? {};
   const shippedPatterns = shipped?.patterns ?? shipped;
-  const { entries } = checkCatalog({ shipped: shippedPatterns, effective: effectivePatterns, layers, throwOnError: true });
+  const effectiveOrigins = origins ?? (Array.isArray(layers) ? layers : null);
+  const { entries } = checkCatalog({
+    shipped: shippedPatterns,
+    effective: effectivePatterns,
+    origins: effectiveOrigins,
+    layers,
+    throwOnError: true,
+  });
 
   const callerObjPattern = typeof selectors?.callerObject === 'string'
     ? selectors.callerObject
@@ -529,14 +537,13 @@ export function resolveCollaboration(options = {}) {
       checkersProvenance[p.seat] = inv ?? cap ?? def ?? rig ?? p.contributions[p.contributions.length - 1] ?? 'request';
     }
   }
-
   let layerName = null;
   if (layers) layerName = resolveLayer(layers, selectedName);
+  if (!layerName && effectiveOrigins) layerName = resolveLayer(effectiveOrigins, selectedName);
   if (!layerName) {
     const shippedEntry = shipped?.patterns?.[selectedName] ?? shipped?.[selectedName];
     layerName = (shippedEntry && deepEqual(entry, shippedEntry)) ? 'shipped' : 'project';
   }
-
   const hasRequest = Boolean(isSwap || hasRequestParams);
   const pin = {
     requested: hasRequest ? {

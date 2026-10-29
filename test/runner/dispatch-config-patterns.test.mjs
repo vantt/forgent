@@ -12,7 +12,10 @@ import {
   RunnerConfigError,
   validateRunnerPatternsShape,
   validateRunnerLoopsShape,
+  runnerOriginsOf,
+  withDefaultExecutor,
 } from '../../src/runner/dispatch/config.mjs';
+import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { readStandardValue, ConfigDoorError } from '../../src/config/facade.mjs';
 import { catalogLayersOf, shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog, resolveCollaboration } from '../../src/runner/execution/patterns/catalog.mjs';
@@ -579,7 +582,9 @@ test('catalogLayersOf: answers per-pattern layer (project only, global only, bot
   process.env.HOME = home;
   process.env.USERPROFILE = home;
   try {
-    const layers = catalogLayersOf(repo);
+    const loaded = loadRunnerConfigForDir(repo);
+    const origins = runnerOriginsOf(loaded);
+    const layers = catalogLayersOf(origins, loaded.patterns);
     assert.equal(layers['project-only-pat'], 'project');
     assert.equal(layers['global-only-pat'], 'global');
     assert.equal(layers['shared-pat'], 'project', 'project layer must beat global layer');
@@ -620,11 +625,13 @@ test('catalogLayersOf: field-path origin reports global when an offending field 
   process.env.HOME = home;
   process.env.USERPROFILE = home;
   try {
-    const layers = catalogLayersOf(repo);
+    const loaded = loadRunnerConfigForDir(repo);
+    const origins = runnerOriginsOf(loaded);
+    const layers = catalogLayersOf(origins, loaded.patterns);
     assert.equal(layers.reviewed, 'project', 'pattern pin layer must be highest contributing layer');
     assert.equal(resolveLayer(layers, 'reviewed'), 'project');
-    assert.equal(resolveLayer(layers, 'reviewed', 'loop'), 'global');
-    assert.equal(resolveLayer(layers, 'reviewed', 'promise'), 'project');
+    assert.equal(resolveLayer(origins, 'reviewed', 'loop'), 'global');
+    assert.equal(resolveLayer(origins, 'reviewed', 'promise'), 'project');
 
     const shipped = shippedCatalog();
     const effective = {
@@ -634,20 +641,19 @@ test('catalogLayersOf: field-path origin reports global when an offending field 
       },
     };
 
-    const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
+    const { problems } = checkCatalog({ shipped: shipped.patterns, effective, origins });
     const loopProblem = problems.find((p) => p.message.includes('loop'));
     assert.ok(loopProblem, 'weakened loop must produce a problem');
     assert.match(loopProblem.message, /source layer: global/, 'offending global field must report source layer global');
-
     const collab = resolveCollaboration({
       unit: { pattern: 'valid-split' },
       runnerConfig: { runner: { patterns: { 'valid-split': { loop: 'solo', promise: 'project promise' } } } },
       shipped,
       layers,
+      origins,
     });
     assert.equal(collab.pin.pattern.layer, 'project', 'pin layer must remain project');
   } finally {
-    process.env.HOME = saved.HOME;
     if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
     else delete process.env.USERPROFILE;
     fs.rmSync(home, { recursive: true, force: true });
@@ -683,4 +689,215 @@ test('runner.generatedPaths: malformed entries are refused at load', () => {
     const { configPath } = mkTempConfig({ ...BASE, generatedPaths });
     assert.throws(() => loadRunnerConfig(configPath), (err) => err instanceof RunnerConfigError && pattern.test(err.message), JSON.stringify(generatedPaths));
   }
+});
+
+test('loader internal metadata carries origins, is omitted from serialization, and survives shallow copy', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-loader-meta-test-'));
+  try {
+    writeProjectConfig(tmpDir, {
+      runner: {
+        patterns: { 'meta-test': { loop: 'solo' } },
+      },
+    });
+    const loaded = loadRunnerConfigForDir(tmpDir);
+    const origins = runnerOriginsOf(loaded);
+    assert.ok(Array.isArray(origins), 'origins must be an array');
+    assert.ok(origins.some((o) => o.path.startsWith('runner.patterns')), 'origins must contain runner.patterns');
+
+    const json = JSON.stringify(loaded);
+    assert.equal(JSON.parse(json).origins, undefined, 'origins symbol must not appear in JSON serialization');
+    assert.equal(Object.keys(loaded).includes('origins'), false);
+
+    const withDefault = withDefaultExecutor(loaded);
+    assert.equal(runnerOriginsOf(withDefault), origins, 'origins metadata must survive withDefaultExecutor shallow copy');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('JS-only validation error in global file names the global file and line', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-global-err-home-'));
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-global-err-repo-'));
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+
+  writeGlobalConfig(home, {
+    runner: {
+      loops: {
+        reviewed: {
+          bounds: {
+            maxRounds: { min: 5, max: 2 },
+          },
+        },
+      },
+    },
+  });
+  writeProjectConfig(repo, {
+    runner: {},
+  });
+
+  try {
+    assert.throws(
+      () => loadRunnerConfigForDir(repo),
+      (err) => {
+        assert.ok(err instanceof RunnerConfigError);
+        assert.match(err.message, /~[/\\]\.fgos[/\\]config\.yaml:\d+/);
+        assert.match(err.message, /min \(5\) must be <= max \(2\)/);
+        return true;
+      },
+    );
+  } finally {
+    process.env.HOME = saved.HOME;
+    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
+    else delete process.env.USERPROFILE;
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('JS-only validation error in project file names the project file with line', () => {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-proj-err-repo-'));
+  writeProjectConfig(repo, {
+    runner: {
+      loops: {
+        reviewed: {
+          bounds: {
+            maxRounds: { min: 5, max: 2 },
+          },
+        },
+      },
+    },
+  });
+
+  try {
+    assert.throws(
+      () => loadRunnerConfigForDir(repo),
+      (err) => {
+        assert.ok(err instanceof RunnerConfigError);
+        const expectedPath = path.join(repo, '.fgos', 'config.yaml');
+        assert.ok(err.message.includes(expectedPath));
+        assert.match(err.message, /:\d+/);
+        assert.match(err.message, /min \(5\) must be <= max \(2\)/);
+        return true;
+      },
+    );
+  } finally {
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('relational validation error participating across files reports each source', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-home-'));
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-repo-'));
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+
+  writeGlobalConfig(home, {
+    runner: {
+      loops: {
+        reviewed: {
+          bounds: {
+            maxRounds: { max: 2 },
+          },
+        },
+      },
+    },
+  });
+  writeProjectConfig(repo, {
+    runner: {
+      loops: {
+        reviewed: {
+          bounds: {
+            maxRounds: { min: 5 },
+          },
+        },
+      },
+    },
+  });
+
+  try {
+    assert.throws(
+      () => loadRunnerConfigForDir(repo),
+      (err) => {
+        assert.ok(err instanceof RunnerConfigError);
+        assert.match(err.message, /~[/\\]\.fgos[/\\]config\.yaml:\d+/);
+        assert.ok(err.message.includes(path.join(repo, '.fgos', 'config.yaml')));
+        assert.match(err.message, /min \(5\) must be <= max \(2\)/);
+        return true;
+      },
+    );
+  } finally {
+    process.env.HOME = saved.HOME;
+    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
+    else delete process.env.USERPROFILE;
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('doctor runner-patterns-config attributes loop shape validation error to file and line from its read', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-err-home-'));
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-err-repo-'));
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+
+  writeGlobalConfig(home, {
+    runner: {
+      loops: {
+        reviewed: {
+          bounds: {
+            maxRounds: { min: 5, max: 2 },
+          },
+        },
+      },
+    },
+  });
+  writeProjectConfig(repo, {
+    runner: {},
+  });
+
+  try {
+    const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+    assert.ok(check, 'runner-patterns-config check must exist');
+    const res = check.check(repo);
+    assert.equal(res.passed, false);
+    assert.match(res.message, /~[/\\]\.fgos[/\\]config\.yaml:\d+/);
+    assert.match(res.message, /min \(5\) must be <= max \(2\)/);
+  } finally {
+    process.env.HOME = saved.HOME;
+    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
+    else delete process.env.USERPROFILE;
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
+
+test('resolveLayer resolves with deterministic priority project > global > shipped, never array order, and emits shipped', () => {
+  // Multiple descendant layers under a container in random array order
+  const originsGlobalFirst = [
+    { path: 'runner.patterns.reviewed.defaults.maxRounds', layer: 'global' },
+    { path: 'runner.patterns.reviewed.defaults.seats', layer: 'project' },
+  ];
+  const originsProjectFirst = [
+    { path: 'runner.patterns.reviewed.defaults.seats', layer: 'project' },
+    { path: 'runner.patterns.reviewed.defaults.maxRounds', layer: 'global' },
+  ];
+  assert.equal(resolveLayer(originsGlobalFirst, 'reviewed', 'defaults'), 'project');
+  assert.equal(resolveLayer(originsProjectFirst, 'reviewed', 'defaults'), 'project');
+
+  // Global beats standard/shipped
+  const originsStandardAndGlobal = [
+    { path: 'runner.patterns.reviewed.defaults.seats', layer: 'standard' },
+    { path: 'runner.patterns.reviewed.defaults.maxRounds', layer: 'global' },
+  ];
+  assert.equal(resolveLayer(originsStandardAndGlobal, 'reviewed', 'defaults'), 'global');
+
+  // Emits 'shipped' where input was 'standard'
+  const standardOrigin = [{ path: 'runner.patterns.reviewed.defaults.seats', layer: 'standard' }];
+  assert.equal(resolveLayer(standardOrigin, 'reviewed', 'defaults'), 'shipped');
+  assert.equal(resolveLayer({ reviewed: 'standard' }, 'reviewed'), 'shipped');
+  assert.equal(resolveLayer('standard', 'reviewed'), 'shipped');
 });

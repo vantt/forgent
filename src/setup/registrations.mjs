@@ -83,11 +83,11 @@ import {
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
-import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError, resolveOriginLocations } from '../runner/dispatch/config.mjs';
 import { shippedCatalog, catalogLayersOf } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
-import { detectRetiredPatternKeys } from '../runner/execution/patterns/retired-keys.mjs';
+import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES } from '../runner/execution/patterns/retired-keys.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
@@ -600,14 +600,25 @@ export function checkRunnerPatternsConfig(cwd) {
   try {
     validateRunnerLoopsShape(effectiveLoops, 'runner.loops');
   } catch (err) {
+    if (err instanceof RunnerConfigError && (err.paths?.length || err.path)) {
+      const paths = err.paths ?? [err.path];
+      const locations = resolveOriginLocations(cfg?.origins ?? [], paths, cwd);
+      if (locations.length > 0) {
+        const subpath = err.subpath ? ` ${err.subpath}` : '';
+        const msg = `runner config (${locations.join(', ')}${subpath}) ${err.detail ?? err.message}`;
+        return { passed: false, message: msg };
+      }
+    }
     return { passed: false, message: err.message };
   }
 
   const shipped = shippedCatalog();
-  const layers = catalogLayersOf(cwd);
+  const origins = cfg?.origins ?? [];
+  const layers = catalogLayersOf(origins, effectivePatterns);
   const { entries, problems: catalogProblems } = checkCatalog({
     shipped: shipped.patterns,
     effective: effectivePatterns,
+    origins,
     layers,
   });
   if (catalogProblems.length > 0) {
@@ -678,9 +689,8 @@ export function checkRunnerPatternsConfig(cwd) {
       (o) => o.layer === 'global' && (
         o.path.startsWith('runner.loops.') ||
         (o.path.startsWith('runner.patterns.') &&
-          o.path !== 'runner.patterns.seatBinding' &&
-          o.path !== 'runner.patterns.seatBinding.schema' &&
-          o.path !== 'runner.patterns.defaultRule')
+          !RESERVED_PATTERN_NAMES.has(o.path.slice('runner.patterns.'.length)) &&
+          o.path !== 'runner.patterns.seatBinding.schema')
       )
     );
     if (hasGlobal) {
@@ -730,7 +740,7 @@ export function checkRunnerPatternsConfig(cwd) {
   }
 
   // 4. Hints: two patterns with identical loop, params and invariants
-  const patternNames = Object.keys(entries).filter((n) => n !== 'seatBinding' && n !== 'defaultRule');
+  const patternNames = Object.keys(entries).filter((n) => !RESERVED_PATTERN_NAMES.has(n));
   for (let i = 0; i < patternNames.length; i++) {
     for (let j = i + 1; j < patternNames.length; j++) {
       const a = entries[patternNames[i]];

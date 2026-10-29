@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cb7348382e1ac27ae376730b80a9a59e1f7cbd06679680cc2509e0af7544c377",
+  "payloadDigest": "39976868ecc7bcd0e9e264eff80911f3d4d29d2399f2b9045db2fbf8d9564c45",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -927,7 +927,7 @@
     "src/native/door.mjs": "8d74e82c37b1d8fb9cce777816e96bf5078bb5a9a718f4fc1d48b60627dc3d92",
     "src/observe/friction-client.mjs": "4eead7883481502229574c9f20bee9b0d729fb821d7de25ef2f994c14799a634",
     "src/report/authoritative-match.mjs": "385fd87aaaab0441c290d0203f5903a9b1edc614e7bead7e0970dc6aabd6b596",
-    "src/report/capability-plan-lint.mjs": "ad3e67b0e92956ded57333d68f6119c78d77347efe1b4641535a5747fdfcd501",
+    "src/report/capability-plan-lint.mjs": "731d0dbf617ee1f6c8cb8bd3a5d6ec822437aec4087309c6cbd055f756f23ca1",
     "src/report/context-render.mjs": "21f0d004ecc62a6be3d059f2c4911dd9dd9fcd3c646d348625e8277efb750fdb",
     "src/report/decision-index.mjs": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2",
     "src/report/enduser-index-generate.mjs": "770d3cbb5e2732e2822e7fc823ed4c178599255835e85d936ee0c421c9320938",
@@ -967,7 +967,7 @@
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "95c9e5ba54705cdcc129234a23096cc033b776010ce351959a15b6628c22e1a9",
-    "src/runner/dispatch/config.mjs": "a6dd7a342583815d706e03e410c26601d4004a044cc1646079061ccaaa1d8841",
+    "src/runner/dispatch/config.mjs": "b15727bbf0f9d3758a1827fcbbb597c0312739beb0928025f683ced6f3632ad2",
     "src/runner/dispatch/confinement/attestation-store.mjs": "79e413d77b1a92e5f5016fe5c0da789bb6810824c0c747ce7c1e38c70fbea284",
     "src/runner/dispatch/confinement/authority.mjs": "e618d5997f85e200c50f6459c43f08f31852bbd6cefb6c27c128c4e845c78709",
     "src/runner/dispatch/confinement/backend-registry.mjs": "8c07146b675d4ad1086c88685de4a521c7004bc00de39e20d2dbb99d96bfa1ff",
@@ -1009,7 +1009,7 @@
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runtime-inspection.mjs": "a5160e0f4dcf10d48fd72407dd45d0b84d35e24713dbf99b384b6db6f84e8e5b",
     "src/runner/dispatch/settlement.mjs": "171c6ba0444214c62db034f7ebcfc301e04de77091ea2437139f417262dac780",
-    "src/runner/dispatch/shipped-catalog.mjs": "60005cdad73ebf7855294304ebea7e378ee1b1a2a0470918d1d3a25f6845969d",
+    "src/runner/dispatch/shipped-catalog.mjs": "31c504e4509207f1b5b377f3240a24c6bf3302d8233547b0cb222e9790336c2a",
     "src/runner/dispatch/stop-processes-inside.mjs": "ae37ac4e4b33d235d7da1a3bfca849980ce8816f6db86b9aec285bcccdb58c2b",
     "src/runner/dispatch/stray-writes.mjs": "8ab287ef44a7e731d4c22fb50e820017645d707e9b41b63a75b7fb4bc028f2ff",
     "src/runner/dispatch/terminal-slot.mjs": "82ed4279c054f2486bb8f3223182c9a1043426d0cae2a846449eda29967665df",
@@ -1042,11 +1042,11 @@
     "src/runner/execution/loops/solo.mjs": "723a33c888009c58e8bed2cb86e2941f25bd6a67eab397cb5417eb42b181570e",
     "src/runner/execution/loops/verify.mjs": "cd3901a540556757badad15781dd2a9ac86f432bc670891626a8b9bf3767dca7",
     "src/runner/execution/partial-writes.mjs": "9c7ab4a2f57852b93283b819ed8c4adcac2b71c9241cdd4c760e73960bc1c027",
-    "src/runner/execution/patterns/catalog-entries.mjs": "0b64ae68ab676b9e0d98fa503454e0e8827aa13e33e5dffd87b2389c0cf09ac1",
-    "src/runner/execution/patterns/catalog.mjs": "45a3339bea4786323cde5f99c58028f6ca764a87aa18bf9bd53a34e3b2f751b6",
-    "src/runner/execution/patterns/retired-keys.mjs": "27f5c426c6bfd7a0d9cd5c18f6c2f43bcd2acd95679ad0a48361f08fed2d53aa",
+    "src/runner/execution/patterns/catalog-entries.mjs": "8ba0f7d72a0cc20588c8ab342ea9e4700f2174c0d88ab3f5dec0121e160c87c8",
+    "src/runner/execution/patterns/catalog.mjs": "00fb758491d3d6dfe48df4212cf88db94fc219a847300ee452b86b57262ca815",
+    "src/runner/execution/patterns/retired-keys.mjs": "3c6a734d1d223a5e2054957c6ba1beb003a9815a7086810bdf18d5629c814497",
     "src/runner/execution/run-request.mjs": "b8ba8003a695f457ab1ebdc22808a994c4f3c4dbfc5d05cd1ab88bd65b823645",
-    "src/runner/execution/run.mjs": "dca5920416740be67f68bf5a80084a777677756d466394dd75146198faafedb8",
+    "src/runner/execution/run.mjs": "e709a4e9fca7a11de22225f0876c44dbf31c3edb6bd340b46004e07c7ad08093",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
     "src/runner/execution/seat-resolver.mjs": "bef39c4077b0b240a06f8a6586febb77d1227cb23c10b98acb38fd1dfb57e2da",
@@ -1111,7 +1111,7 @@
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/model-pool-checks.mjs": "a770f17808c6a02cd2d5e50e145711635587f78eddf0639eb5525a7d442a9246",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "eb681062c5f6037aa8d82f1d77b67cd2ab688b71899523e4359ed384a1ea5eda",
+    "src/setup/registrations.mjs": "3f03c04b90fd2b3f957502e6817c056e929d40bb8e6ce7d026adb34d5f03f484",
     "src/setup/run-supervisor-checks.mjs": "44e8b33ffdb5fee2f178549160ba25d94bc698056469852c6306e6352c1bdd3d",
     "src/setup/runner-config-conversion.mjs": "7de1202dd84a25de7d8f66e03a680023cc03c851e32cda10e31dbddad8c3479b",
     "src/setup/seat-binding-checks.mjs": "1620c36971e9f1ba1e113715b334b1b3b326dd62bfd2d557656fade19aa73691",
@@ -3308,14 +3308,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1544,
+      "line": 1545,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1544,
+      "line": 1545,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
@@ -3417,77 +3417,77 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2265,
+      "line": 2275,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2578,
+      "line": 2588,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2592,
+      "line": 2602,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2646,
+      "line": 2656,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2658,
+      "line": 2668,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4913,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1702",
+      "line": 4923,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1712",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4960,
+      "line": 4970,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:826",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5001,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1702",
+      "line": 5011,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1712",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5008,
+      "line": 5018,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5463,
+      "line": 5473,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:56",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5539,
+      "line": 5549,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:127",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

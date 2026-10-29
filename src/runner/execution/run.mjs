@@ -35,7 +35,7 @@ import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { accountInventoryConfigOf, auditLeaseReceipt } from '../dispatch/provider-capacity.mjs';
 import { LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
-import { loadRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs } from '../dispatch/config.mjs';
+import { loadRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs, runnerOriginsOf } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
@@ -773,7 +773,8 @@ async function runUnitBody(options, scope) {
         reason: caseRef?.reason ?? options.reason ?? options.request?.reason ?? null,
         runnerConfig: liveConfig(),
         shipped: shippedCatalog(),
-        layers: options.runnerConfig ? null : catalogLayersOf(mainRoot),
+        origins: options.runnerConfig ? null : runnerOriginsOf(liveConfig()),
+        layers: options.runnerConfig ? null : catalogLayersOf(runnerOriginsOf(liveConfig()), liveConfig()?.patterns),
       });
     } catch (err) {
       if (err instanceof CollaborationError || err instanceof SeatResolutionError) {

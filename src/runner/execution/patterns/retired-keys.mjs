@@ -2,6 +2,8 @@
 // Keys that moved or were retired are tracked here in one authoritative place.
 
 export const RETIRED_GATED_NAME = 'research-fan-out-gated';
+export const RESERVED_PATTERN_NAMES = Object.freeze(new Set(['seatBinding', 'defaultRule']));
+
 
 /**
  * Table of retired configuration keys and their replacements.

@@ -12,7 +12,7 @@ import crypto from 'node:crypto';
 import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { runUnit as coreRunUnit, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
-import { RunnerConfigError, loadRunnerConfigForDir } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError, loadRunnerConfigForDir, runnerOriginsOf } from '../../../src/runner/dispatch/config.mjs';
 import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
 import { writeUnitSummary, buildUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -150,9 +150,14 @@ test('runUnit refuses a unit that writes in a directory that is no repository, b
 
 test('snapshotRunnerConfig captures hash and filtered runner config from main checkout', () => {
   const { repoRoot } = setupGitRepo();
-  const snap = snapshotRunnerConfig(repoRoot);
+  const loaded = loadRunnerConfigForDir(repoRoot);
+  assert.ok(runnerOriginsOf(loaded), 'loaded config must carry internal origins metadata');
+  const snap = snapshotRunnerConfig(repoRoot, loaded);
   assert.ok(snap.hash && typeof snap.hash === 'string');
   assert.ok(snap.runner.capabilities['docs:write']);
+  const serialized = JSON.stringify(snap.runner);
+  assert.equal(JSON.parse(serialized).origins, undefined, 'snapshot runner must persist no provenance in serialized form');
+  assert.equal(Object.keys(snap.runner).includes('origins'), false);
 });
 
 test('runUnit runs solo read-only unit end-to-end', async () => {
