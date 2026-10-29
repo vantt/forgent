@@ -14,7 +14,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createTerminalControl, TerminalControlError } from '../../src/terminal-control/client.mjs';
-import { DEFAULT_TERMINAL_CONFIG } from '../../src/terminal-control/config.mjs';
+import { readStandardValue } from '../../src/config/facade.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -70,8 +70,8 @@ test('every operation of the port answers through the route', () => {
   assert.equal(capabilities.serverIncarnation.pid, process.pid);
   assert.equal(capabilities.endpoint.socketPath, socketPath, 'the socket the caller named is the endpoint');
   assert.match(route('capabilities', {}, { env: { HERDR_SESSION: 'confined-1', HOME: '/home/op' } }).endpoint.socketPath, /\/\.config\/herdr\/sessions\/confined-1\/herdr\.sock$/, 'a named session answers its own socket');
-  // The core's own defaults and policy registry are what setup writes and the contract names.
-  const { layout, allocationGraceMs } = DEFAULT_TERMINAL_CONFIG;
+  // The core's own defaults and policy registry are what the bundled standard holds and the contract names.
+  const { layout, allocationGraceMs } = readStandardValue('terminal').value;
   assert.deepEqual(
     { minCols: layout.minCols, minRows: layout.minRows, maxPanesPerTab: layout.maxPanesPerTab, policy: layout.policy, allocationGraceMs },
     { minCols: capabilities.defaults.minCols, minRows: capabilities.defaults.minRows, maxPanesPerTab: capabilities.defaults.maxPanesPerTab, policy: capabilities.defaults.policy, allocationGraceMs: capabilities.defaults.allocationGraceMs },

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "af32b8105379edf4bbc073a2897ccd291607eac2df8ae9f1cd11034f83ef4cbf",
+  "payloadDigest": "18cdfa68fd260ba584a764323b22701087f807b7d55d816d7ce6483241a17923",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -892,9 +892,9 @@
     "src/convention/definition-names.mjs": "f845b39591111b910bea842945a32c37287cafdd53fb08fc3cd2b64767294678",
     "src/convention/identifier-rules.mjs": "f3b0fed979b522c53be7c6b756b49425723121a587fe056b1bf616deef81b615",
     "src/convention/seat-id.mjs": "034caeb689c869e09acc0a3cd748757742c3f36b2eb331ddd0302515c25b0f83",
-    "src/event-store/config.mjs": "81217ccc8a1e7d45a3ce420a5072fb231033862a3903e7dad113075075e9cb9b",
+    "src/event-store/config.mjs": "166b8e33713b7581bcd523fc9a2967ae6f1dc46edd66c3244e0fcf4e44759803",
     "src/event-store/consumers.mjs": "81cd05ec92cd75056954051715c0778daac2e620bfd578dc9e3a62d70d4057be",
-    "src/event-store/index.mjs": "e347f89ac85f16444f9f1c181858da286b2703586a74653f7244b086d5c00276",
+    "src/event-store/index.mjs": "219b75a4178342a74ff24bb441e92ab6885639d7ddc0694b9b58c73fe38dea72",
     "src/event-store/maintenance.mjs": "bfba47317edcae43436ed59afe23eda3c50ad41c6dfca23b946232cd14845a5c",
     "src/event-store/native.mjs": "196c265cb7c38ebb8c62fa51d5f1e47b56a635d6ab6bd3609abb7e0d584c1282",
     "src/event-store/seal-coalescing.mjs": "84eae01cdf29251f7e50e06ffbac46ea949457adb7b3f4ed20bda542448bd2c3",
@@ -1162,7 +1162,7 @@
     "src/state/work.mjs": "3298510e4be41ec95ee11ca4a14cb637a618143c92e1423c0e232943a2f01cc2",
     "src/state/worker-slots.mjs": "bc37bb0d995fe7339925c209c4e79232bdc5e3c079668f89c8f52313312dbf95",
     "src/terminal-control/client.mjs": "3a6b75ab9163a1c5f3dc9a68b691a9060d2f563a9fd6db3c6bc02a7e5afb47b0",
-    "src/terminal-control/config.mjs": "4c179c7d56bd737ae14dcfeddadb7879c0dab174c5b97f01f5333f0fa1e877e5",
+    "src/terminal-control/config.mjs": "6024c9c6251f3badb82f6fcba05d80a2089b621752aea5d006a753c0bb82c72c",
     "src/util/format-bytes.mjs": "786e381e7581ddd1923305d3bb25e193aba99b84118728574c84280d5290966d",
     "src/util/format-duration.mjs": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
     "src/util/format-lock-duration.mjs": "87e069a71d25348768de8fe5116d2ac3759a2c1e775433a6511750491f874b3e",

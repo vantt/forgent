@@ -8,7 +8,7 @@ import { statusUseCase } from '../../src/verbs/events/status.mjs';
 import { syncUseCase } from '../../src/verbs/events/sync.mjs';
 import { exportUseCase } from '../../src/verbs/events/export.mjs';
 import { rebuildStoreUseCase } from '../../src/verbs/events/rebuild.mjs';
-import { EVENT_STORE_DEFAULTS, eventStoreConfig, readEventStoreConfig } from '../../src/event-store/index.mjs';
+import { eventStoreConfig, readEventStoreConfig } from '../../src/event-store/index.mjs';
 import { readStandardValue } from '../../src/config/facade.mjs';
 import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -50,8 +50,8 @@ test('JSONL export writes canonical reader order, cursors and refuses existing o
   const next = path.join(f.temp, 'delta'); exportUseCase(f.ctx, { out: next, since: result.cursor });
   assert.equal(fs.readFileSync(path.join(next, 'events.jsonl'), 'utf8'), '');
 });
-test('the bundled eventStore standard is the value the in-code defaults name', () => {
-  assert.deepEqual(JSON.parse(JSON.stringify(readStandardValue('eventStore').value)), EVENT_STORE_DEFAULTS);
+test('an unset eventStore key takes the bundled standard value', () => {
+  assert.deepEqual(eventStoreConfig({}), JSON.parse(JSON.stringify(readStandardValue('eventStore').value)));
 });
 test('config merges project over global and validates integer boundaries; the Work consumer rebuilds its cache', async t => {
   const f = fixture(t);
