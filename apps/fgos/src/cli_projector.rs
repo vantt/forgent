@@ -234,7 +234,7 @@ fn project_config_request(
 /// `fgos identity [--pid <n>] [--fgos-dir <dir>] [--json]`, `fgos identity
 /// machine [--alias <name>] [--json]`, `fgos identity project [--init|--new]
 /// [--handle <name>] [--json]`, `fgos identity session [--register] [--role
-/// lead:<LANE>] [--take]`, `fgos identity resolve <query>`, `fgos identity list
+/// lead:<LANE>|work:<name>] [--take]`, `fgos identity resolve <query>`, `fgos identity list
 /// [--project] [--prune] [--machine <handle|id>]`, `fgos identity pins [--forget <machine-id> | --confirm <machine-id> --fingerprint <fp>]`, `fgos identity mint <kind> [--release <number>]
 /// [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
@@ -305,7 +305,7 @@ fn project_identity_request(
                 .get(index)
                 .map(|value| value.to_string_lossy().into_owned())
                 .filter(|value| !value.starts_with('-'))
-                .ok_or_else(|| "resolve requires a handle or a role such as lead:MAIL".to_string())?;
+                .ok_or_else(|| "resolve requires a handle or a role such as lead:MAIL or work:<name>".to_string())?;
             index += 1;
             *query = name;
         }

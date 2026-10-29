@@ -93,10 +93,10 @@ pub enum Verb {
     Writer,
     /// `machine [--alias <name>]`.
     Machine { alias: Option<String> },
-    /// `session [--register [--role lead:<LANE> [--take]] | --drop-role lead:<LANE>]`: this session's
+    /// `session [--register [--role <role> [--take]] | --drop-role <role>]`: this session's
     /// full id and handle, and its entry in the local directory.
     Session(SessionAction),
-    /// `resolve <handle|lead:<LANE>|full id>`: the one live session it names.
+    /// `resolve <handle|role|full id>`: the one live session it names.
     Resolve { query: String },
     /// `list [--project] [--prune] [--machine <handle|id>]`: the sessions the machine knows.
     List { project: bool, prune: bool, machine: Option<String> },
@@ -129,7 +129,7 @@ pub enum SessionAction {
     /// `--register`, or `--role`, which implies it: put this session in the
     /// local directory. `take` moves a role from its live holder.
     Register { role: Option<String>, take: bool },
-    /// `--drop-role lead:<LANE>`: remove that role from this session only.
+    /// `--drop-role <role>`: remove that role from this session only.
     DropRole { role: String },
 }
 

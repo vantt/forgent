@@ -1501,7 +1501,7 @@ fn a_role_and_a_handle_reach_the_head_identity_resolved_among_two_heads_and_the_
         "codex".to_string(),
         None,
         None,
-        vec!["lead:PROBE".to_string()],
+        vec!["lead:PROBE".to_string(), "work:probe-run".to_string()],
         fgos_identity::current::os_record(codex.pid()),
     );
     fgos_identity::directory::register(&root, entry, true, &fgos_process::facts::judge_here)
@@ -1509,8 +1509,12 @@ fn a_role_and_a_handle_reach_the_head_identity_resolved_among_two_heads_and_the_
     let holder = name_of_key(&scene, holder_key);
 
     let by_role = send_to(&scene, "lead:PROBE", false);
+    let by_work_role = send_to(&scene, "work:probe-run", false);
     let by_handle = send_to(&scene, &info.handle, false);
 
+    assert_eq!(by_work_role.status.code(), Some(0), "{by_work_role:?}");
+    let text = String::from_utf8_lossy(&by_work_role.stdout);
+    assert!(text.contains(&format!(" for {holder}\n")), "{text}");
     assert_eq!(by_role.status.code(), Some(0), "{by_role:?}");
     let text = String::from_utf8_lossy(&by_role.stdout);
     assert!(text.contains(&format!(" for {holder}\n")), "{text}");

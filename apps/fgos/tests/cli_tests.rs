@@ -1394,6 +1394,12 @@ fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role(
     identity_data(&run("beta", &["session", "--drop-role", "lead:MAIL", "--json"]));
     assert_eq!(run("alpha", &["resolve", "lead:MAIL"]).status.code(), Some(65));
 
+    identity_data(&run("alpha", &["session", "--role", "work:tsk-4f2a9c1b3d", "--json"]));
+    assert_eq!(identity_data(&run("beta", &["resolve", "work:tsk-4f2a9c1b3d", "--json"]))["handle"], a.as_str());
+    let bad_work = run("beta", &["session", "--role", "work:Tsk-1"]);
+    assert_eq!(bad_work.status.code(), Some(65));
+    assert!(String::from_utf8_lossy(&bad_work.stderr).contains("[invalid-role]"));
+
     let missing = run("alpha", &["resolve", "claude-zzzz@fg-server"]);
     assert_eq!(missing.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&missing.stderr).contains("[not-found]"));

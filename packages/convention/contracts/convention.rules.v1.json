@@ -142,7 +142,7 @@
     },
     {
       "id": "work-item-id",
-      "description": "A work item id, also a branch and directory segment: `tsk-<10 base32>` when minted by Identity (docs/platform/identity/spec.md, section 4a); child items append `-<n>`, and older ids of other lengths keep replaying. Only the character set and the 30-character bound are checked here.",
+      "description": "A work item id, also a branch and directory segment, and the name after `work:` in a role alias (`work:tsk-4f2a9c1b3d`; the `work:` prefix is Identity's, not Convention's): `tsk-<10 base32>` when minted by Identity (docs/platform/identity/spec.md, section 4a); child items append `-<n>`, and older ids of other lengths keep replaying. Only the character set and the 30-character bound are checked here.",
       "first": "abcdefghijklmnopqrstuvwxyz",
       "rest": "abcdefghijklmnopqrstuvwxyz0123456789-",
       "maxLength": 30,

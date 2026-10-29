@@ -15,7 +15,7 @@
 //! resolved session is used only when it is one of this record's heads, a
 //! role delivery names the holder in the report, and candidates are cut to
 //! this record's heads, never the machine's sessions.
-use fgos_identity::directory::{register_writer, resolve, ROLE_PREFIX};
+use fgos_identity::directory::{is_role_alias, register_writer, resolve};
 use fgos_identity::resolve::{HeadRef, WriterKey as IdentityKey, ENV_ORDER};
 use fgos_identity::session::cli_of;
 use fgos_identity::{session_for, Candidate, Liveness as IdentityLiveness, SessionInfo};
@@ -52,7 +52,7 @@ pub enum Addressed {
 /// character, whatever its project folder is called. Text that addresses a
 /// group is left to the core, which refuses it as a group (check 1).
 pub fn is_alias(to: &str) -> bool {
-    (to.contains('@') || to.contains('/') || to.starts_with(ROLE_PREFIX))
+    (to.contains('@') || to.contains('/') || is_role_alias(to))
         && !fgos_mailbox_core::is_group(to)
 }
 
@@ -172,7 +172,7 @@ pub fn address(state_root: Option<&Path>, to: &str, heads: &[HeadView]) -> Addre
             ))
         })
         .collect();
-    let is_role = to.starts_with(ROLE_PREFIX);
+    let is_role = is_role_alias(to);
     let by_handle = to.contains('@');
     if by_handle {
         let same: Vec<&(&HeadView, SessionInfo)> =

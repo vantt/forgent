@@ -210,15 +210,37 @@ fn a_session_drops_only_its_own_role_and_it_then_resolves_not_found() {
 }
 
 #[test]
-fn a_role_must_be_lead_and_a_lane_id() {
+fn a_role_must_be_lead_with_a_lane_id_or_work_with_a_work_item_id() {
     let root = state_root();
     let alive = judge(&[]);
-    for bad in ["lead:mail", "lead:", "boss:MAIL", "MAIL", "lead:1A", "lead:ABCDEFGHIJKLMNOPQ"] {
+    for bad in ["lead:mail", "lead:", "boss:MAIL", "MAIL", "lead:1A", "lead:ABCDEFGHIJKLMNOPQ", "work:", "work:Tsk-1", "work:1abc", "work:a:b", "work:abcdefghijklmnopqrstuvwxyz01234"] {
         let refused = directory::register(&root, entry("aaaa", Some(10), &[bad]), false, &alive).unwrap_err();
         assert_eq!(refused.reason, "invalid-role", "{bad}");
     }
     assert_eq!(files(&root), 0);
     assert!(directory::role_problem("lead:T1-P6").is_none());
+    assert!(directory::role_problem("work:tsk-4f2a9c1b3d").is_none());
+    assert!(directory::role_problem("work:fix-the-login-form").is_none());
+}
+
+#[test]
+fn a_work_role_has_one_live_holder_moves_with_take_and_resolves() {
+    let root = state_root();
+    let alive = judge(&[]);
+    directory::register(&root, entry("aaaa", Some(10), &["work:tsk-4f2a9c1b3d"]), false, &alive).unwrap();
+    assert_eq!(directory::resolve(&root, "work:tsk-4f2a9c1b3d", &alive, None).unwrap().handle, "claude-aaaa@fg");
+
+    let refused = directory::register(&root, entry("bbbb", Some(20), &["work:tsk-4f2a9c1b3d"]), false, &alive).unwrap_err();
+    assert_eq!(refused.reason, "role-held");
+    assert!(refused.detail.contains("claude-aaaa@fg") && refused.detail.contains("--take"));
+
+    directory::register(&root, entry("bbbb", Some(20), &["work:tsk-4f2a9c1b3d"]), true, &alive).unwrap();
+    assert_eq!(directory::resolve(&root, "work:tsk-4f2a9c1b3d", &alive, None).unwrap().handle, "claude-bbbb@fg");
+    assert!(directory::resolve(&root, "claude-aaaa@fg", &alive, None).unwrap().roles.is_empty());
+
+    let after = directory::drop_role(&root, "fg-abc234/bbbb", "work:tsk-4f2a9c1b3d", &alive).unwrap();
+    assert!(after.roles.is_empty());
+    assert_eq!(directory::resolve(&root, "work:tsk-4f2a9c1b3d", &alive, None).unwrap_err().reason, "not-found");
 }
 
 #[test]

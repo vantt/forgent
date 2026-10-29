@@ -30,8 +30,11 @@ use std::path::{Path, PathBuf};
 pub const MAX_ENTRIES: usize = 512;
 /// Files looked at in one scan, so a flooded directory cannot stall a read.
 const MAX_SCAN: usize = 2 * MAX_ENTRIES;
-/// A role alias is this prefix and a Convention `lane-id`.
-pub const ROLE_PREFIX: &str = "lead:";
+/// The role kinds: a role alias is a prefix and a name of the Convention
+/// identifier kind beside it. This list is the one place that knows them.
+pub const ROLE_KINDS: [(&str, &str); 2] = [("lead:", "lane-id"), ("work:", "work-item-id")];
+/// What a refused role is not, for the refusal detail.
+const ROLE_SHAPE: &str = "`lead:<LANE>` with a Convention lane-id or `work:<name>` with a Convention work-item-id";
 const FORMAT_VERSION: u32 = 1;
 const FILE_SUFFIX: &str = ".json";
 const FILE_HASH_LENGTH: usize = 12;
@@ -52,7 +55,7 @@ pub struct Entry {
     /// Working directory the session registered from.
     pub clone: Option<String>,
     pub registered_at: String,
-    /// Role aliases (`lead:MAIL`), sorted.
+    /// Role aliases (`lead:MAIL`, `work:tsk-4f2a9c1b3d`), sorted.
     pub roles: Vec<String>,
     /// The agent head as `Record::to_json`; `None` when the session has no
     /// terminal ancestor, so its liveness is unknown.
@@ -159,14 +162,20 @@ fn file_name(handle: &str) -> String {
 
 /// Why `role` is not a role alias, as a Convention code; `None` when it is.
 pub fn role_problem(role: &str) -> Option<&'static str> {
-    let Some(lane) = role.strip_prefix(ROLE_PREFIX) else {
+    let Some((prefix, kind)) = ROLE_KINDS.iter().find(|(prefix, _)| role.starts_with(prefix)) else {
         return Some("invalid-identifier");
     };
     fgos_convention::rules::packaged_rules()
-        .identifier("lane-id")
-        .expect("the Convention contract carries the lane-id kind")
-        .check(lane)
+        .identifier(kind)
+        .expect("the Convention contract carries every role kind")
+        .check(&role[prefix.len()..])
         .err()
+}
+
+/// Whether `query` is shaped as a role alias (a role kind's prefix) rather
+/// than a handle; the name after the prefix is not checked here.
+pub fn is_role_alias(query: &str) -> bool {
+    ROLE_KINDS.iter().any(|(prefix, _)| query.starts_with(prefix))
 }
 
 /// The agent head's process facts: the highest ancestor of the caller that
@@ -359,7 +368,7 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
         return Err(Refusal {
             candidates: Vec::new(),
             reason: "invalid-role",
-            detail: format!("role {role:?} is not `{ROLE_PREFIX}<LANE>` with a Convention lane-id"),
+            detail: format!("role {role:?} is not {ROLE_SHAPE}"),
         });
     }
     let dir = directory(root);
@@ -515,7 +524,7 @@ pub fn drop_role(root: &Path, own_id: &str, role: &str, judge: Judge) -> Result<
         return Err(Refusal {
             candidates: Vec::new(),
             reason: "invalid-role",
-            detail: format!("role {role:?} is not `{ROLE_PREFIX}<LANE>` with a Convention lane-id"),
+            detail: format!("role {role:?} is not {ROLE_SHAPE}"),
         });
     }
     let Scan { rows, .. } = scan(root, judge)?;
@@ -554,7 +563,7 @@ pub fn drop_current_role(
     drop_role(state_root, &current.info.id, role, &judge_here)
 }
 
-/// The live session `query` names: a handle, a role alias `lead:<LANE>`, or a
+/// The live session `query` names: a handle, a role alias (`lead:<LANE>`, `work:<name>`), or a
 /// full id `<machine-id>/<local id>`. Exactly one, else `ambiguous` or
 /// `not-found` with the candidates in the detail and in `Refusal::candidates`
 /// (Identity's own codes; the mailbox maps them to its names). Local first:
@@ -571,7 +580,7 @@ pub fn resolve(root: &Path, query: &str, judge: Judge, shared: Option<&SharedVie
         .into_iter()
         .filter(|row| row.verdict != Verdict::Dead)
         .collect::<Vec<_>>();
-    let is_role = query.starts_with(ROLE_PREFIX);
+    let is_role = is_role_alias(query);
     let hits: Vec<&Row> = live
         .iter()
         .filter(|row| {

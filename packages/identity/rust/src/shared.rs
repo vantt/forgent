@@ -11,7 +11,7 @@
 //! session is alive; it is as fresh as the last fetch.
 
 use crate::current::MachineInfo;
-use crate::directory::{Listed, ROLE_PREFIX};
+use crate::directory::{is_role_alias, Listed};
 use crate::machine;
 use crate::pins::{self, PinState};
 use crate::refusal::{Candidate, Liveness, Refusal, Remote};
@@ -428,7 +428,7 @@ impl SharedView {
     /// id. Refused `not-found` or `ambiguous` like the local directory.
     pub fn resolve(&self, query: &str) -> Result<Listed, Refusal> {
         let query = query.trim();
-        let is_role = query.starts_with(ROLE_PREFIX);
+        let is_role = is_role_alias(query);
         let by_id = query.contains('/');
         let names = |remote: &RemoteEntry| -> Vec<String> {
             if by_id {
