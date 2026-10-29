@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e294b05e89ed9912adaf5902aff11452b392359b0b0931e8e5e2b4d5d49651ee",
+  "payloadDigest": "cd8fe34671b8525bfe4f5586743f24d0e98c75f9090937bc9d4fa1f7ef0e455d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -998,7 +998,7 @@
     "src/runner/dispatch/process-identity.mjs": "37fd2e1b2fa509428bfe64a962b8716dc7f4952beb7efc84e32212b83d739b2f",
     "src/runner/dispatch/proof-helpers.mjs": "e053aac2167c22a7f48aeccda52ff29b3f2845024d7e9207afb3d19d5265425f",
     "src/runner/dispatch/provider-account-probe.mjs": "bfded5e8a1deeb6bae30950f84ae8a587c4e911892761c50cdab0cf4bfd7e86e",
-    "src/runner/dispatch/provider-adapter.mjs": "a977cb194613266187922324a42d5e36670830283eae2476e575278829abfe3e",
+    "src/runner/dispatch/provider-adapter.mjs": "d750985427a85fd25309d3d54fed014758e6a1a57ebc9c1cd240f4e314103723",
     "src/runner/dispatch/provider-auth-failure.mjs": "d87918a5cabbad7eed60876bd02c976ef1f680c45e28d379338f59effb892dda",
     "src/runner/dispatch/provider-capacity.mjs": "b6d411a87277c2f74ab8ea663b8cd4b44eeb3607979e1333ee414faaafd412b2",
     "src/runner/dispatch/provider-credential-probe.mjs": "b1773175ff065ce80e9bb2b5123de15cc4d9b04a9bc0f249d9a1c971653bae74",
