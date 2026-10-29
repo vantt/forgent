@@ -905,3 +905,16 @@ test('RunnerConfigError derives subpath from paths and stores no own subpath pro
   assert.ok(!Object.keys(err).includes('_subpath'));
   assert.ok(!Object.keys(err).includes('subpath'));
 });
+
+test('resolveOriginLocations falls back to the first line per file of the nearest existing parent entry for a missing key', () => {
+  const origins = [
+    { path: 'runner.patterns.mine.loop', layer: 'project', file: 'project:config.yaml', line: 7 },
+    { path: 'runner.patterns.mine.defaults.maxRounds', layer: 'project', file: 'project:config.yaml', line: 9 },
+    { path: 'runner.patterns.mine.loop', layer: 'global', file: 'global:config.yaml', line: 3 },
+  ];
+  const locs = resolveOriginLocations(origins, ['runner.patterns.mine.promise'], '/project');
+  assert.equal(locs.length, 2);
+  assert.ok(locs.some((l) => /config\.yaml:7/.test(l)));
+  assert.ok(locs.some((l) => /config\.yaml:3/.test(l)));
+  assert.deepEqual(resolveOriginLocations(origins, ['runner.patterns.other.promise'], '/project'), []);
+});

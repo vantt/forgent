@@ -805,6 +805,37 @@ test('doctor check runner-patterns-config: passes on the standard', () => {
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
+test('doctor check runner-patterns-config: a retired key in the project file names the line of the key', () => {
+  const tmpDir = mkTempDir();
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+  writeProjectConfig(tmpDir, { runner: { patterns: { reviewed: { maxRounds: 3 } } } });
+  const res = check.check(tmpDir);
+  assert.equal(res.passed, false);
+  assert.match(res.message, /config\.yaml:\d+: /);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('doctor check runner-patterns-config: a custom pattern missing its promise names the first line of the pattern entry without repeating the layer', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-miss-home-'));
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-miss-repo-'));
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+  try {
+    writeGlobalConfig(home, { runner: {} });
+    writeProjectConfig(repo, { runner: { patterns: { mine: { loop: 'solo' } } } });
+    const res = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config').check(repo);
+    assert.equal(res.passed, false);
+    assert.match(res.message, /^runner config \(.*config\.yaml:\d+/);
+    assert.match(res.message, /custom pattern "mine" must declare a non-empty "promise"/);
+    assert.doesNotMatch(res.message, /source layer/);
+  } finally {
+    for (const [k, v] of Object.entries(saved)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
+
 test('doctor check runner-patterns-config: a retired key in the project file fails naming the file and runner.loops.reviewed', () => {
   const tmpDir = mkTempDir();
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');

@@ -508,7 +508,7 @@ export function checkRunnerPatternsConfig(cwd, run) {
   for (const f of findings) {
     if (f.row === 'config-format-legacy-json' || legacyScopes.has(f.file?.split(':')[0])) continue;
     for (const item of f.path ? detectRetiredPatternKeys(f.path) : []) {
-      note(`${display(f.file)}: ${formatRetiredKeySentence(item)}.`);
+      note(`${display(f.file)}${f.line ? `:${f.line}` : ''}: ${formatRetiredKeySentence(item)}.`);
     }
   }
   if (problems.length > 0) {
@@ -549,7 +549,9 @@ export function checkRunnerPatternsConfig(cwd, run) {
   });
   if (catalogProblems.length > 0) {
     const formatted = catalogProblems.map((p) => {
-      const adapter = new RunnerConfigError(p.message, { code: p.code, path: p.path });
+      const layerSuffix = p.source ? ` (source layer: ${p.source})` : '';
+      const detail = layerSuffix && p.message.endsWith(layerSuffix) ? p.message.slice(0, -layerSuffix.length) : p.message;
+      const adapter = new RunnerConfigError(p.message, { code: p.code, path: p.path, detail });
       const attributed = attributeRunnerConfigError(adapter, origins, cwd);
       return attributed ? attributed.message : p.message;
     });

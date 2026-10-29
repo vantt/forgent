@@ -88,7 +88,6 @@ const LAYER_PRIORITY = Object.freeze({
 });
 
 export function extractLayerName(val) {
-  if (typeof val === 'string') return val === 'standard' ? 'shipped' : val;
   if (val && typeof val === 'object' && typeof val.layer === 'string') {
     return val.layer === 'standard' ? 'shipped' : val.layer;
   }
@@ -100,14 +99,10 @@ export function resolveLayer(origins, name, fieldPath) {
   let candidateOrigins = [];
   if (fieldPath) {
     const fullPath = `runner.patterns.${name}.${fieldPath}`;
-    const shortPath = `${name}.${fieldPath}`;
     candidateOrigins = origins.filter(
       (o) => o?.path === fullPath ||
              o?.path?.startsWith(`${fullPath}.`) ||
-             o?.path?.startsWith(`${fullPath}[`) ||
-             o?.path === shortPath ||
-             o?.path?.startsWith(`${shortPath}.`) ||
-             o?.path?.startsWith(`${shortPath}[`)
+             o?.path?.startsWith(`${fullPath}[`)
     );
   }
   if (candidateOrigins.length === 0) {
@@ -115,10 +110,7 @@ export function resolveLayer(origins, name, fieldPath) {
     candidateOrigins = origins.filter(
       (o) => o?.path === patternPath ||
              o?.path?.startsWith(`${patternPath}.`) ||
-             o?.path?.startsWith(`${patternPath}[`) ||
-             o?.path === name ||
-             o?.path?.startsWith(`${name}.`) ||
-             o?.path?.startsWith(`${name}[`)
+             o?.path?.startsWith(`${patternPath}[`)
     );
   }
   if (candidateOrigins.length === 0) return null;

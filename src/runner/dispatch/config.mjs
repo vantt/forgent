@@ -166,6 +166,20 @@ export function resolveOriginLocations(origins, paths, projectDir) {
           matched = descendants;
         }
       }
+      // 4. A missing key has no line of its own: the first line of its nearest existing parent entry
+      if (matched.length === 0) {
+        let parent = targetPath;
+        while (matched.length === 0 && parent.split('.').length > 3) {
+          parent = parent.slice(0, parent.lastIndexOf('.'));
+          const under = origins.filter((o) => o?.path && (o.path.startsWith(`${parent}.`) || o.path.startsWith(`${parent}[`)));
+          const firstPerFile = new Map();
+          for (const o of under) {
+            const held = firstPerFile.get(o.file);
+            if (!held || (o.line ?? Infinity) < (held.line ?? Infinity)) firstPerFile.set(o.file, o);
+          }
+          matched = [...firstPerFile.values()];
+        }
+      }
     }
 
     for (const entry of matched) {
