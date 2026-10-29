@@ -1633,6 +1633,34 @@ fn identity_register_in_a_repository_without_a_fence_or_a_store_mints_the_store(
     let _ = fs::remove_dir_all(&world);
 }
 
+/// A seat the runner starts (its writer id is `att-...`) is never listed as a live session, whatever
+/// hook or step asks it to register. The attempt-id rule is owned by the identity crate.
+#[test]
+fn identity_session_register_in_a_runner_seat_exits_quietly_and_registers_nothing() {
+    let state = std::env::temp_dir().join(format!("fgos_test_identity_seat_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&state);
+    fs::create_dir_all(&state).unwrap();
+    fs::write(state.join("machine-id"), "fg-server-abc234\n").unwrap();
+    let run = |id: &str| {
+        identity_command(&["session", "--register", "--json"])
+            .env("FGOS_STATE_ROOT", &state)
+            .env("FGOS_SESSION_ID", id)
+            .current_dir(&state)
+            .output()
+            .unwrap()
+    };
+
+    let seat = run("att-unit-7");
+    let answer = identity_data(&seat);
+    assert_eq!(answer, serde_json::json!({ "registered": false, "reason": "runner-seat" }));
+    assert!(seat.stderr.is_empty(), "a skipped registration says nothing on stderr");
+    assert!(!state.join("identity").exists(), "the runner seat left no directory entry");
+
+    identity_data(&run("alpha"));
+    assert!(state.join("identity").exists(), "an ordinary session still registers");
+    let _ = fs::remove_dir_all(&state);
+}
+
 /// `fgos identity machine` over a scratch state root: the wiring of the verb
 /// (route, operation per flag, exit code of a refusal). The id, handle and
 /// alias rules are owned by the identity crate's own tests.

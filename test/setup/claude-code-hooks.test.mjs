@@ -26,7 +26,7 @@ test('installClaudeCodeHook wires the PreToolUse dispatch-decide entry into a re
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
-test('installClaudeCodeHook is fill-only -- a pre-existing SessionStart hook entry is left byte-for-byte untouched', () => {
+test('installClaudeCodeHook is fill-only -- a pre-existing SessionStart hook entry is left byte-for-byte untouched beside ours', () => {
   const repoRoot = mkTempDir('claude-code-hooks-fill-only-');
   fs.mkdirSync(path.join(repoRoot, '.claude'), { recursive: true });
   const before = {
@@ -43,7 +43,7 @@ test('installClaudeCodeHook is fill-only -- a pre-existing SessionStart hook ent
 
   const after = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8'));
   assert.deepEqual(after.enabledPlugins, before.enabledPlugins);
-  assert.deepEqual(after.hooks.SessionStart, before.hooks.SessionStart);
+  assert.deepEqual(after.hooks.SessionStart[0], before.hooks.SessionStart[0]);
   assert.equal(after.hooks.PreToolUse[0].matcher, 'Agent|Task');
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
@@ -111,7 +111,7 @@ test('fgos setup wires the dispatch-decide PreToolUse hook and reports it in the
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos setup leaves a pre-existing SessionStart hook untouched while wiring the dispatch-decide hook alongside it', () => {
+test('fgos setup leaves a pre-existing SessionStart hook untouched while wiring its own hooks alongside it', () => {
   const cwd = mkTempDir('claude-code-hooks-cli-preserve-');
   const homeDir = mkTempDir('claude-code-hooks-cli-preserve-home-');
   execFileSync('git', ['init', '-q'], { cwd });
@@ -123,7 +123,7 @@ test('fgos setup leaves a pre-existing SessionStart hook untouched while wiring 
   assert.equal(result.status, 0, result.stderr);
 
   const after = JSON.parse(fs.readFileSync(path.join(cwd, '.claude', 'settings.json'), 'utf8'));
-  assert.deepEqual(after.hooks.SessionStart, before.hooks.SessionStart);
+  assert.deepEqual(after.hooks.SessionStart[0], before.hooks.SessionStart[0]);
   assert.equal(claudeCodeHookWired(cwd), true);
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });

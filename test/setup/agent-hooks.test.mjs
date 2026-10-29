@@ -539,12 +539,45 @@ test('the hook table is the only source of each CLI\'s rows', () => {
       const found = hooksWith(config, row.command);
       assert.equal(found.length, 1, `${cli} ${row.kind} ${row.event}: exactly once after two installs`);
       const entries = row.group ? config[row.group][row.event] : config.hooks[row.event];
+      if (row.flat) {
+        assert.ok(entries.includes(found[0]), `${cli} ${row.kind} ${row.event}: a flat hook object in its group`);
+        continue;
+      }
       const entry = entries.find((e) => e.hooks?.includes(found[0]));
       assert.ok(entry, `${cli} ${row.kind} ${row.event}: nested in an entry with a hooks array`);
       assert.equal(entry.matcher, row.matcher ?? undefined);
     }
     assert.equal(CHECK[cli](repoRoot).passed, true, CHECK[cli](repoRoot).message);
   }
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('setup writes a SessionStart registration row for Claude Code, Codex and agy, none for omp and pi, and doctor accepts it', () => {
+  const repoRoot = mkTempDir('agent-hooks-session-start-');
+  mockRunnableShim(repoRoot);
+  installAllAgentHooks(repoRoot);
+  const shim = path.join(fs.realpathSync(repoRoot), '.fgos', 'installation', 'bin', 'fgos');
+  const claude = readFile(repoRoot, 'claude').hooks.SessionStart;
+  assert.deepEqual(claude, [{ hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" identity session --register >/dev/null || true`, timeout: 10 }] }]);
+  const command = `'${shim}' identity session --register >/dev/null || true`;
+  assert.deepEqual(readFile(repoRoot, 'codex').hooks.SessionStart, [{ hooks: [{ type: 'command', command, timeout: 10 }] }]);
+  assert.deepEqual(readFile(repoRoot, 'agy')['fgos-session-register'], { enabled: true, SessionStart: [{ type: 'command', command, timeout: 10 }] });
+  for (const ext of ['.omp/extensions/fgos-hooks.ts', '.pi/extensions/fgos-hooks.ts']) {
+    assert.ok(!fs.readFileSync(path.join(repoRoot, ext), 'utf8').includes('--register'), ext);
+  }
+  for (const [cli, result] of Object.entries(checkAllAgentHooks(repoRoot))) assert.equal(result.passed, true, `${cli}: ${result.message}`);
+
+  // Doctor names a missing row; an agy row in the nested shape is not the shape agy reads.
+  const codexFile = path.join(repoRoot, FILES.codex);
+  const codex = readFile(repoRoot, 'codex');
+  delete codex.hooks.SessionStart;
+  fs.writeFileSync(codexFile, JSON.stringify(codex));
+  assert.match(checkCodexHook(repoRoot).message, /missing canonical hook\(s\): session-register/);
+  const agyFile = path.join(repoRoot, FILES.agy);
+  const agy = readFile(repoRoot, 'agy');
+  agy['fgos-session-register'].SessionStart = [{ hooks: agy['fgos-session-register'].SessionStart }];
+  fs.writeFileSync(agyFile, JSON.stringify(agy));
+  assert.match(checkAgyHook(repoRoot).message, /in a shape AGY does not read: session-register SessionStart/);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
