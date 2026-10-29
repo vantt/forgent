@@ -21,7 +21,8 @@ test('CollaborationError carries error code, message and optional source layer',
   assert.ok(errWithSource instanceof CollaborationError);
   assert.equal(errWithSource.name, 'CollaborationError');
   assert.equal(errWithSource.code, 'pattern-invariant-weakened');
-  assert.equal(errWithSource.message, 'pattern invariant was weakened in project layer');
+  assert.equal(errWithSource.message, 'pattern invariant was weakened in project layer (source layer: project)');
+  assert.equal(errWithSource.detail, 'pattern invariant was weakened in project layer');
   assert.equal(errWithSource.source, 'project');
   assert.equal(errWithSource.path, null);
 

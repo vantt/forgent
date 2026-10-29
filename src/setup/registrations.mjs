@@ -549,9 +549,7 @@ export function checkRunnerPatternsConfig(cwd, run) {
   });
   if (catalogProblems.length > 0) {
     const formatted = catalogProblems.map((p) => {
-      const layerSuffix = p.source ? ` (source layer: ${p.source})` : '';
-      const detail = layerSuffix && p.message.endsWith(layerSuffix) ? p.message.slice(0, -layerSuffix.length) : p.message;
-      const adapter = new RunnerConfigError(p.message, { code: p.code, path: p.path, detail });
+      const adapter = new RunnerConfigError(p.message, { code: p.code, path: p.path, detail: p.detail });
       const attributed = attributeRunnerConfigError(adapter, origins, cwd);
       return attributed ? attributed.message : p.message;
     });

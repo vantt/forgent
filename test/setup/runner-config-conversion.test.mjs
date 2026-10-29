@@ -244,8 +244,7 @@ test('handles retired keys in both project and global scopes without crashing se
     const result = convertRunnerPatternsConfig(projectDir);
     assert.equal(result.status, 'blocked', 'conversion is honestly reported as blocked by global retired keys refusing snapshot');
     assert.ok(result.blocker, 'must report blocker reason');
-    assert.ok(result.backup, 'project backup must be preserved');
-    assert.ok(fs.existsSync(result.backup), 'project backup must exist');
+    assert.equal(result.backup, undefined, 'a blocked conversion reports no backup');
 
     const globalBytesAfter = readRawGlobalConfig(homeDir);
     assert.equal(globalBytesAfter, globalBytesBefore, 'global file must not be modified by conversion');
@@ -268,8 +267,12 @@ test('stops and reports blocked when config write door refuses without raw write
     });
     assert.equal(result.status, 'blocked', 'door refusal must report blocked');
     assert.ok(result.blocker.includes('config-write-conflict'), 'must report blocker reason');
-    assert.ok(result.backup, 'backup must be created when door refuses');
-    assert.ok(fs.existsSync(result.backup), 'backup file must exist on disk');
+    assert.equal(result.backup, undefined, 'a refused write reports no backup');
+    assert.deepEqual(
+      fs.readdirSync(path.join(projectDir, '.fgos')).filter((n) => n.includes('.pre-patterns-catalog-')),
+      [],
+      'a refused write leaves no backup copy behind',
+    );
     const currentText = readRawProjectConfig(projectDir);
     assert.equal(currentText, originalText, 'file must not be rewritten around the door');
   } finally {

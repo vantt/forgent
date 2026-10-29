@@ -13,6 +13,7 @@ import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, RETIRED_GATED_NAME, f
 
 /**
  * Collaboration error carrying a standard refusal code and optional source layer.
+ * With a source layer the message ends in "(source layer: <layer>)"; `detail` is the sentence without it.
  */
 export const CollaborationError = new Proxy(
   class CollaborationError extends Error {
@@ -31,9 +32,11 @@ export const CollaborationError = new Proxy(
         finalMessage = code;
       }
 
-      super(finalMessage || finalCode);
+      const detail = finalMessage || finalCode;
+      super(finalSource ? `${detail} (source layer: ${finalSource})` : detail);
       this.name = 'CollaborationError';
       this.code = finalCode;
+      this.detail = detail;
       this.source = finalSource;
       this.path = finalPath;
     }
@@ -264,7 +267,6 @@ function checkLoopSeatCardinality(loop, declaredSeats, label) {
 
 function checkParamDomain(name, loop, param, val, section, src, problems, entry) {
   const at = `pattern "${name}" ${section}.${param}`;
-  const suffix = src ? ` (source layer: ${src})` : '';
   const basePath = section === 'invariants'
     ? `runner.patterns.${name}.invariants.${param}.fixed`
     : `runner.patterns.${name}.defaults.${param}`;
@@ -273,7 +275,7 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
       if (!Number.isInteger(val) || val <= 0) {
         problems.push(new CollaborationError(
           'param-invalid',
-          `${at} must be a positive integer, got ${JSON.stringify(val)}${suffix}`,
+          `${at} must be a positive integer, got ${JSON.stringify(val)}`,
           { source: src, path: basePath },
         ));
       }
@@ -283,7 +285,7 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
       if (!Array.isArray(val) || val.length === 0) {
         problems.push(new CollaborationError(
           'param-invalid',
-          `${at} must be a non-empty list of checker seat names${suffix}`,
+          `${at} must be a non-empty list of checker seat names`,
           { source: src, path: basePath },
         ));
       } else {
@@ -292,13 +294,13 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
           if (typeof chk !== 'string') {
             problems.push(new CollaborationError(
               'param-invalid',
-              `${at} checker seat name must be a string, got ${typeof chk === 'object' ? JSON.stringify(chk) : String(chk)}${suffix}`,
+              `${at} checker seat name must be a string, got ${typeof chk === 'object' ? JSON.stringify(chk) : String(chk)}`,
               { source: src, path: `${basePath}[${i}]` },
             ));
           } else if (!Object.hasOwn(CHECKER_SEATS, chk)) {
             problems.push(new CollaborationError(
               'param-invalid',
-              `${at} contains unknown checker seat "${chk}"; valid: [${Object.keys(CHECKER_SEATS).join(', ')}]${suffix}`,
+              `${at} contains unknown checker seat "${chk}"; valid: [${Object.keys(CHECKER_SEATS).join(', ')}]`,
               { source: src, path: `${basePath}[${i}]` },
             ));
           }
@@ -310,7 +312,7 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
       if (typeof val !== 'boolean') {
         problems.push(new CollaborationError(
           'param-invalid',
-          `${at} must be a boolean, got ${JSON.stringify(val)}${suffix}`,
+          `${at} must be a boolean, got ${JSON.stringify(val)}`,
           { source: src, path: basePath },
         ));
       }
@@ -327,7 +329,7 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
         const seatPath = err.at ? `${basePath}${err.at}` : basePath;
         problems.push(new CollaborationError(
           code,
-          `${err.message}${suffix}`,
+          `${err.message}`,
           { source: src, path: seatPath },
         ));
       }
@@ -337,7 +339,7 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
       if (!val || typeof val !== 'object' || Array.isArray(val)) {
         problems.push(new CollaborationError(
           'param-invalid',
-          `${at} must be an object mapping seat or kind to text${suffix}`,
+          `${at} must be an object mapping seat or kind to text`,
           { source: src, path: basePath },
         ));
       } else {
@@ -346,14 +348,14 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
           if (typeof text !== 'string') {
             problems.push(new CollaborationError(
               'param-invalid',
-              `${at}["${target}"] task text must be a string${suffix}`,
+              `${at}["${target}"] task text must be a string`,
               { source: src, path: `${basePath}.${target}` },
             ));
           }
           if (!allowedTargets.has(target)) {
             problems.push(new CollaborationError(
               'param-invalid',
-              `${at} target "${target}" does not exist for loop "${loop}" (valid targets: [${Array.from(allowedTargets).join(', ')}])${suffix}`,
+              `${at} target "${target}" does not exist for loop "${loop}" (valid targets: [${Array.from(allowedTargets).join(', ')}])`,
               { source: src, path: `${basePath}.${target}` },
             ));
           }
@@ -390,7 +392,7 @@ export function checkCatalog(options = {}) {
     const src = resolveLayer(origins, name);
     problems.push(new CollaborationError(
       'config-key-retired',
-      `${formatRetiredKeySentence(finding)}${src ? ` (source layer: ${src})` : ''}`,
+      `${formatRetiredKeySentence(finding)}`,
       { source: src, path: finding.key },
     ));
   }
@@ -401,7 +403,7 @@ export function checkCatalog(options = {}) {
       const src = resolveLayer(origins, 'seatBinding');
       problems.push(new CollaborationError(
         'config-error',
-        `runner.patterns.seatBinding uses reserved name "seatBinding" as a pattern name${src ? ` (source layer: ${src})` : ''}`,
+        `runner.patterns.seatBinding uses reserved name "seatBinding" as a pattern name`,
         { source: src, path: 'runner.patterns.seatBinding' },
       ));
     }
@@ -414,7 +416,7 @@ export function checkCatalog(options = {}) {
       const src = resolveLayer(origins, name);
       problems.push(new CollaborationError(
         'config-error',
-        `"${name}" is a reserved name and cannot be used as a pattern name${src ? ` (source layer: ${src})` : ''}`,
+        `"${name}" is a reserved name and cannot be used as a pattern name`,
         { source: src, path: `runner.patterns.${name}` },
       ));
     }
@@ -423,7 +425,7 @@ export function checkCatalog(options = {}) {
       const src = resolveLayer(origins, name);
       problems.push(new CollaborationError(
         'param-invalid',
-        `pattern "${name}" must be an object${src ? ` (source layer: ${src})` : ''}`,
+        `pattern "${name}" must be an object`,
         { source: src, path: `runner.patterns.${name}` },
       ));
       continue;
@@ -435,7 +437,7 @@ export function checkCatalog(options = {}) {
         const src = resolveLayer(origins, name, key) ?? resolveLayer(origins, name);
         problems.push(new CollaborationError(
           'param-unknown',
-          `pattern "${name}" has unknown key "${key}"${src ? ` (source layer: ${src})` : ''}`,
+          `pattern "${name}" has unknown key "${key}"`,
           { source: src, path: `runner.patterns.${name}.${key}` },
         ));
       }
@@ -446,7 +448,7 @@ export function checkCatalog(options = {}) {
         const src = resolveLayer(origins, name, 'defaults') ?? resolveLayer(origins, name);
         problems.push(new CollaborationError(
           'param-invalid',
-          `pattern "${name}" defaults must be an object${src ? ` (source layer: ${src})` : ''}`,
+          `pattern "${name}" defaults must be an object`,
           { source: src, path: `runner.patterns.${name}.defaults` },
         ));
       }
@@ -457,7 +459,7 @@ export function checkCatalog(options = {}) {
         const src = resolveLayer(origins, name, 'invariants') ?? resolveLayer(origins, name);
         problems.push(new CollaborationError(
           'param-invalid',
-          `pattern "${name}" invariants must be an object${src ? ` (source layer: ${src})` : ''}`,
+          `pattern "${name}" invariants must be an object`,
           { source: src, path: `runner.patterns.${name}.invariants` },
         ));
       }
@@ -525,7 +527,7 @@ export function checkCatalog(options = {}) {
         const src = resolveLayer(origins, name, 'loop') ?? resolveLayer(origins, name);
         problems.push(new CollaborationError(
           'pattern-invariant-weakened',
-          `pattern "${name}" cannot change shipped loop "${shippedEntry.loop}" to "${effectiveEntry.loop}"${src ? ` (source layer: ${src})` : ''}`,
+          `pattern "${name}" cannot change shipped loop "${shippedEntry.loop}" to "${effectiveEntry.loop}"`,
           { source: src, path: `runner.patterns.${name}.loop` },
         ));
       }
@@ -534,7 +536,7 @@ export function checkCatalog(options = {}) {
         const src = resolveLayer(origins, name, 'promise') ?? resolveLayer(origins, name);
         problems.push(new CollaborationError(
           'pattern-invariant-weakened',
-          `pattern "${name}" cannot change shipped promise${src ? ` (source layer: ${src})` : ''}`,
+          `pattern "${name}" cannot change shipped promise`,
           { source: src, path: `runner.patterns.${name}.promise` },
         ));
       }
@@ -545,8 +547,8 @@ export function checkCatalog(options = {}) {
 
           if (Object.keys(effectiveEntry.invariants).length === 0) {
             const msg = shippedInv.atLeast !== undefined
-              ? `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry${src ? ` (source layer: ${src})` : ''}`
-              : `pattern "${name}" changed or removed fixed invariant for "${param}"${src ? ` (source layer: ${src})` : ''}`;
+              ? `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry`
+              : `pattern "${name}" changed or removed fixed invariant for "${param}"`;
             problems.push(new CollaborationError('pattern-invariant-weakened', msg, { source: src, path: `runner.patterns.${name}.invariants` }));
             continue;
           }
@@ -557,7 +559,7 @@ export function checkCatalog(options = {}) {
               if (!effInv || typeof effInv !== 'object' || !Array.isArray(effInv.atLeast)) {
                 problems.push(new CollaborationError(
                   'pattern-invariant-weakened',
-                  `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry${src ? ` (source layer: ${src})` : ''}`,
+                  `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry`,
                   { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast` },
                 ));
               } else {
@@ -566,7 +568,7 @@ export function checkCatalog(options = {}) {
                   if (!effSet.has(required)) {
                     problems.push(new CollaborationError(
                       'pattern-invariant-weakened',
-                      `pattern "${name}" dropped invariant atLeast element "${required}" for "${param}"${src ? ` (source layer: ${src})` : ''}`,
+                      `pattern "${name}" dropped invariant atLeast element "${required}" for "${param}"`,
                       { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast` },
                     ));
                   }
@@ -578,7 +580,7 @@ export function checkCatalog(options = {}) {
               if (!effInv || typeof effInv !== 'object' || !deepEqual(effInv.fixed, shippedInv.fixed)) {
                 problems.push(new CollaborationError(
                   'pattern-invariant-weakened',
-                  `pattern "${name}" changed or removed fixed invariant for "${param}"${src ? ` (source layer: ${src})` : ''}`,
+                  `pattern "${name}" changed or removed fixed invariant for "${param}"`,
                   { source: src, path: `runner.patterns.${name}.invariants.${param}.fixed` },
                 ));
               }
@@ -594,14 +596,14 @@ export function checkCatalog(options = {}) {
       if (!mergedEntry.promise || typeof mergedEntry.promise !== 'string' || !mergedEntry.promise.trim()) {
         problems.push(new CollaborationError(
           'param-invalid',
-          `custom pattern "${name}" must declare a non-empty "promise"${src ? ` (source layer: ${src})` : ''}`,
+          `custom pattern "${name}" must declare a non-empty "promise"`,
           { source: src, path: `runner.patterns.${name}.promise` },
         ));
       }
       if (!mergedEntry.loop || !LOOP_NAMES.includes(mergedEntry.loop)) {
         problems.push(new CollaborationError(
           'param-invalid',
-          `custom pattern "${name}" must declare a valid "loop" from [${LOOP_NAMES.join(', ')}], got: ${JSON.stringify(mergedEntry.loop)}${src ? ` (source layer: ${src})` : ''}`,
+          `custom pattern "${name}" must declare a valid "loop" from [${LOOP_NAMES.join(', ')}], got: ${JSON.stringify(mergedEntry.loop)}`,
           { source: src, path: `runner.patterns.${name}.loop` },
         ));
       }
@@ -618,7 +620,7 @@ export function checkCatalog(options = {}) {
           const src = resolveLayer(origins, name, 'defaults') ?? resolveLayer(origins, name);
           problems.push(new CollaborationError(
             'param-invalid',
-            `pattern "${name}" defaults must be an object${src ? ` (source layer: ${src})` : ''}`,
+            `pattern "${name}" defaults must be an object`,
             { source: src, path: `runner.patterns.${name}.defaults` },
           ));
         } else {
@@ -627,7 +629,7 @@ export function checkCatalog(options = {}) {
             if (!Object.hasOwn(paramTable, param)) {
               problems.push(new CollaborationError(
                 'param-unknown',
-                `pattern "${name}" default parameter "${param}" is not read by loop "${loop}"${src ? ` (source layer: ${src})` : ''}`,
+                `pattern "${name}" default parameter "${param}" is not read by loop "${loop}"`,
                 { source: src, path: `runner.patterns.${name}.defaults.${param}` },
               ));
               continue;
@@ -643,7 +645,7 @@ export function checkCatalog(options = {}) {
           const src = resolveLayer(origins, name, 'invariants') ?? resolveLayer(origins, name);
           problems.push(new CollaborationError(
             'param-invalid',
-            `pattern "${name}" invariants must be an object${src ? ` (source layer: ${src})` : ''}`,
+            `pattern "${name}" invariants must be an object`,
             { source: src, path: `runner.patterns.${name}.invariants` },
           ));
         } else {
@@ -652,7 +654,7 @@ export function checkCatalog(options = {}) {
             if (!Object.hasOwn(paramTable, param)) {
               problems.push(new CollaborationError(
                 'param-unknown',
-                `pattern "${name}" invariant parameter "${param}" is not read by loop "${loop}"${src ? ` (source layer: ${src})` : ''}`,
+                `pattern "${name}" invariant parameter "${param}" is not read by loop "${loop}"`,
                 { source: src, path: `runner.patterns.${name}.invariants.${param}` },
               ));
               continue;
@@ -661,7 +663,7 @@ export function checkCatalog(options = {}) {
             if (!inv || typeof inv !== 'object' || Array.isArray(inv)) {
               problems.push(new CollaborationError(
                 'param-invalid',
-                `pattern "${name}" invariant for "${param}" must be an object${src ? ` (source layer: ${src})` : ''}`,
+                `pattern "${name}" invariant for "${param}" must be an object`,
                 { source: src, path: `runner.patterns.${name}.invariants.${param}` },
               ));
               continue;
@@ -674,7 +676,7 @@ export function checkCatalog(options = {}) {
             if ((!hasAtLeast && !hasFixed) || (hasAtLeast && hasFixed) || invKeys.length !== 1) {
               problems.push(new CollaborationError(
                 'param-invalid',
-                `pattern "${name}" invariant for "${param}" must declare exactly one form: "atLeast" or "fixed"${src ? ` (source layer: ${src})` : ''}`,
+                `pattern "${name}" invariant for "${param}" must declare exactly one form: "atLeast" or "fixed"`,
                 { source: src, path: `runner.patterns.${name}.invariants.${param}` },
               ));
               continue;
@@ -684,14 +686,14 @@ export function checkCatalog(options = {}) {
               if (param !== 'minCheckers') {
                 problems.push(new CollaborationError(
                   'param-invalid',
-                  `pattern "${name}" invariant "atLeast" is only valid for list parameters, got "${param}"${src ? ` (source layer: ${src})` : ''}`,
+                  `pattern "${name}" invariant "atLeast" is only valid for list parameters, got "${param}"`,
                   { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast` },
                 ));
               } else {
                 if (!Array.isArray(inv.atLeast) || inv.atLeast.length === 0) {
                   problems.push(new CollaborationError(
                     'param-invalid',
-                    `pattern "${name}" invariant atLeast for "${param}" must be a non-empty array of checker seats${src ? ` (source layer: ${src})` : ''}`,
+                    `pattern "${name}" invariant atLeast for "${param}" must be a non-empty array of checker seats`,
                     { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast` },
                   ));
                 } else {
@@ -700,13 +702,13 @@ export function checkCatalog(options = {}) {
                     if (typeof chk !== 'string') {
                       problems.push(new CollaborationError(
                         'param-invalid',
-                        `pattern "${name}" invariant atLeast for "${param}" checker seat name must be a string${src ? ` (source layer: ${src})` : ''}`,
+                        `pattern "${name}" invariant atLeast for "${param}" checker seat name must be a string`,
                         { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast[${i}]` },
                       ));
                     } else if (!Object.hasOwn(CHECKER_SEATS, chk)) {
                       problems.push(new CollaborationError(
                         'param-invalid',
-                        `pattern "${name}" invariant atLeast "${chk}" is not a valid checker seat [${Object.keys(CHECKER_SEATS).join(', ')}]${src ? ` (source layer: ${src})` : ''}`,
+                        `pattern "${name}" invariant atLeast "${chk}" is not a valid checker seat [${Object.keys(CHECKER_SEATS).join(', ')}]`,
                         { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast[${i}]` },
                       ));
                     }
@@ -719,7 +721,7 @@ export function checkCatalog(options = {}) {
               if (param === 'minCheckers') {
                 problems.push(new CollaborationError(
                   'param-invalid',
-                  `pattern "${name}" invariant for list parameter "minCheckers" must use "atLeast", not "fixed"${src ? ` (source layer: ${src})` : ''}`,
+                  `pattern "${name}" invariant for list parameter "minCheckers" must use "atLeast", not "fixed"`,
                   { source: src, path: `runner.patterns.${name}.invariants.${param}.fixed` },
                 ));
               } else {
