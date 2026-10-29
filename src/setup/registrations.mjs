@@ -541,14 +541,22 @@ export function checkRunnerPatternsConfig(cwd, run) {
   }
 
   const shipped = shippedCatalog();
-  const origins = cfg?.origins ?? [];
+  const rawOrigins = cfg?.origins ?? [];
+  const origins = typeof run?.filterOrigins === 'function'
+    ? run.filterOrigins(rawOrigins)
+    : (Array.isArray(run?.origins) ? run.origins : rawOrigins);
   const { entries, problems: catalogProblems } = checkCatalog({
     shipped: shipped.patterns,
     effective: effectivePatterns,
     origins,
   });
   if (catalogProblems.length > 0) {
-    return { passed: false, message: catalogProblems.map((p) => p.message).join('; ') };
+    const formatted = catalogProblems.map((p) => {
+      const adapter = new RunnerConfigError(p.message, { code: p.code, path: p.path });
+      const attributed = attributeRunnerConfigError(adapter, origins, cwd);
+      return attributed ? attributed.message : p.message;
+    });
+    return { passed: false, message: formatted.join('; ') };
   }
 
   const warnings = [];

@@ -907,6 +907,107 @@ test('doctor runner-patterns-config attributes loop shape validation error to fi
   }
 });
 
+test('doctor check runner-patterns-config: attributes catalog defaults problem to file and line or layer text', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-cat-home-'));
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-cat-repo-'));
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+
+  const targetPath = 'runner.patterns.solo.defaults.unknownKey';
+  const table = [
+    {
+      caseName: 'project-only',
+      setup: () => {
+        writeGlobalConfig(home, { runner: {} });
+        writeProjectConfig(repo, {
+          runner: {
+            patterns: {
+              solo: {
+                defaults: { unknownKey: 1 },
+              },
+            },
+          },
+        });
+        return undefined;
+      },
+      assert: (res) => {
+        assert.equal(res.passed, false);
+        assert.match(res.message, /^runner config \(/);
+        assert.match(res.message, new RegExp(path.join(repo, '.fgos', 'config.yaml').replace(/[/\\?*]/g, '\\$&')));
+        assert.match(res.message, /:\d+.*\)/);
+        assert.match(res.message, /pattern "solo" default parameter "unknownKey" is not read by loop "solo"/);
+        assert.doesNotMatch(res.message, /~[/\\]\.fgos[/\\]config\.yaml/);
+      },
+    },
+    {
+      caseName: 'global-only',
+      setup: () => {
+        writeGlobalConfig(home, {
+          runner: {
+            patterns: {
+              solo: {
+                defaults: { unknownKey: 1 },
+              },
+            },
+          },
+        });
+        writeProjectConfig(repo, { runner: {} });
+        return undefined;
+      },
+      assert: (res) => {
+        assert.equal(res.passed, false);
+        assert.match(res.message, /^runner config \(/);
+        assert.match(res.message, /~[/\\]\.fgos[/\\]config\.yaml:\d+/);
+        assert.match(res.message, /pattern "solo" default parameter "unknownKey" is not read by loop "solo"/);
+        assert.doesNotMatch(res.message, new RegExp(repo.replace(/[/\\?*]/g, '\\$&')));
+      },
+    },
+    {
+      caseName: 'no-origin',
+      setup: () => {
+        writeGlobalConfig(home, { runner: {} });
+        writeProjectConfig(repo, {
+          runner: {
+            patterns: {
+              solo: {
+                defaults: { unknownKey: 1 },
+              },
+            },
+          },
+        });
+        return {
+          once: (_key, fn) => (fn ? fn() : { findings: [] }),
+          filterOrigins: (origins) => origins.filter(
+            (o) => !o.path?.startsWith('runner.patterns.solo') && !targetPath.startsWith(o.path ?? ''),
+          ),
+        };
+      },
+      assert: (res) => {
+        assert.equal(res.passed, false);
+        assert.doesNotMatch(res.message, /^runner config \(/);
+        assert.match(res.message, /^pattern "solo" default parameter "unknownKey" is not read by loop "solo"/);
+      },
+    },
+  ];
+
+  try {
+    const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+    assert.ok(check, 'runner-patterns-config check must exist');
+    for (const entry of table) {
+      const run = entry.setup();
+      const res = check.check(repo, run);
+      entry.assert(res);
+    }
+  } finally {
+    process.env.HOME = saved.HOME;
+    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
+    else delete process.env.USERPROFILE;
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
+
 test('doctor check runner-patterns-config: valid reviewed pattern override passes', () => {
   const tmpDir = mkTempDir();
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');

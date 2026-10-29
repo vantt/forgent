@@ -23,7 +23,14 @@ test('CollaborationError carries error code, message and optional source layer',
   assert.equal(errWithSource.code, 'pattern-invariant-weakened');
   assert.equal(errWithSource.message, 'pattern invariant was weakened in project layer');
   assert.equal(errWithSource.source, 'project');
+  assert.equal(errWithSource.path, null);
 
+  const errWithPath = new CollaborationError(
+    'param-invalid',
+    'invalid param value',
+    { source: 'project', path: 'runner.patterns.custom.defaults.seats[0].seat' },
+  );
+  assert.equal(errWithPath.path, 'runner.patterns.custom.defaults.seats[0].seat');
   const errWithoutSource = new CollaborationError(
     'param-unknown',
     'unknown parameter key',
@@ -177,6 +184,7 @@ test('changing or removing a fixed invariant on a shipped pattern is refused wit
   const errChanged = resChanged.problems.find((p) => p.code === 'pattern-invariant-weakened');
   assert.ok(errChanged);
   assert.equal(errChanged.source, 'global');
+  assert.equal(errChanged.path, 'runner.patterns.consult.invariants.seats.fixed');
   assert.match(errChanged.message, /global/);
 
   const effectiveRemoved = {
@@ -187,7 +195,10 @@ test('changing or removing a fixed invariant on a shipped pattern is refused wit
   const originsRemoved = [{ path: 'runner.patterns.consult.invariants', layer: 'global', file: 'global:config.yaml', line: 12 }];
   const resRemoved = checkCatalog({ shipped: shipped.patterns, effective: effectiveRemoved, origins: originsRemoved });
   assert.ok(resRemoved.problems.length > 0);
-  assert.ok(resRemoved.problems.some((p) => p.code === 'pattern-invariant-weakened'));
+  const errRemoved = resRemoved.problems.find((p) => p.code === 'pattern-invariant-weakened');
+  assert.ok(errRemoved);
+  assert.equal(errRemoved.path, 'runner.patterns.consult.invariants');
+  assert.equal(errRemoved.source, 'global');
 });
 
 test('changing the execution loop of a shipped pattern is refused with source layer', () => {
@@ -227,6 +238,7 @@ test('retired pattern key in checkCatalog reports config-key-retired with source
   const error = problems.find((p) => p.code === 'config-key-retired');
   assert.ok(error);
   assert.equal(error.source, 'project');
+  assert.equal(error.path, 'runner.patterns.research-fan-out-gated');
   assert.match(error.message, /source layer: project/);
 });
 
@@ -269,8 +281,8 @@ test('checkCatalog reports config-key-retired for reviewed tuning with source la
   const retired = problems.find((p) => p.code === 'config-key-retired');
   assert.ok(retired, 'must report config-key-retired');
   assert.equal(retired.source, 'project');
+  assert.equal(retired.path, 'runner.patterns.reviewed.maxRounds');
   assert.match(retired.message, /source layer: project/);
-  assert.match(retired.message, /runner\.loops\.reviewed\.maxRounds/);
   const duplicate = problems.filter((p) => p.code === 'param-unknown' && p.message.includes('maxRounds'));
   assert.equal(duplicate.length, 0, 'must not duplicate error as param-unknown');
 });
@@ -437,7 +449,9 @@ test('custom pattern missing required promise or loop is rejected', () => {
     },
   };
   const res1 = checkCatalog({ shipped: shipped.patterns, effective: missingPromise });
-  assert.ok(res1.problems.some((p) => p.code === 'param-invalid'));
+  const prob1 = res1.problems.find((p) => p.code === 'param-invalid');
+  assert.ok(prob1);
+  assert.equal(prob1.path, 'runner.patterns.custom-incomplete.promise');
 
   const missingLoop = {
     'custom-incomplete': {
@@ -445,7 +459,9 @@ test('custom pattern missing required promise or loop is rejected', () => {
     },
   };
   const res2 = checkCatalog({ shipped: shipped.patterns, effective: missingLoop });
-  assert.ok(res2.problems.some((p) => p.code === 'param-invalid'));
+  const prob2 = res2.problems.find((p) => p.code === 'param-invalid');
+  assert.ok(prob2);
+  assert.equal(prob2.path, 'runner.patterns.custom-incomplete.loop');
 });
 
 test('checkCatalog with throwOnError throws the first problem encountered', () => {
@@ -855,6 +871,7 @@ test('malformed shipped pattern overrides are rejected with source layer attribu
     const problem = res.problems.find((p) => p.code === expectedCode && p.message.includes(expectedSnippet));
     assert.ok(problem, `Expected problem with code "${expectedCode}" matching "${expectedSnippet}", got: ${JSON.stringify(res.problems)}`);
     assert.equal(problem.source, 'project');
+    assert.equal(problem.path, offendingPath);
     assert.ok(problem.message.includes('(source layer: project)'));
   }
 });
@@ -2143,6 +2160,29 @@ test('checkCatalog attributes indexed seat descendants to field layer rather tha
   assert.ok(seatProb, 'seat-multiplicity problem expected');
   assert.equal(seatProb.source, 'global', 'offending seats are global, source layer must be global');
   assert.match(seatProb.message, /source layer: global/);
+});
+
+test('nested seat error path selection resolves through relative at', () => {
+  const shipped = shippedCatalog().patterns;
+  const effective = {
+    custom: {
+      loop: 'solo',
+      promise: 'A solo custom pattern.',
+      defaults: {
+        seats: [
+          { seat: 'producer', role: 'producer', extraKey: true },
+        ],
+      },
+    },
+  };
+  const origins = [{ path: 'runner.patterns.custom.defaults.seats[0].extraKey', layer: 'project', file: 'project:config.yaml', line: 15 }];
+  const { problems } = checkCatalog({ shipped, effective, origins });
+  const prob = problems.find((p) => p.code === 'param-invalid');
+  assert.ok(prob);
+  assert.equal(prob.path, 'runner.patterns.custom.defaults.seats[0].extraKey');
+  assert.equal(prob.source, 'project');
+  assert.match(prob.message, /has unknown key "extraKey"/);
+  assert.match(prob.message, /source layer: project/);
 });
 
 test('resolveLayer resolves with deterministic priority project > global > shipped, never array order, and emits shipped', () => {
