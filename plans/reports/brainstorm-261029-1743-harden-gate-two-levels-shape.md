@@ -71,6 +71,32 @@ The grant lives with the action (the run or case it belongs to), like today's wo
 - This is a new shared component plus a contract change across Work, Workflow, the runner and the coding skills, so it is not a HARDEN fix under RUL104. It belongs with the Work batch after T5, as its own plan.
 - A step that fits HARDEN now: move the level reader and `gate-check` into Rust as the first piece of `decide`, deleting the Node twins. This is the owner's "move gate-bypass to Rust". It is still a Work-owned file set, so it waits for WORK's agreement or for the Work batch.
 
+## Risk from facts, not keywords (owner, 18:30)
+
+The owner reports that keyword gates are inaccurate: they block the wrong things and miss others.
+
+The evidence agrees:
+- tsk-224 measured an 83.6% false trigger on plan prose and narrowed the haystack. It kept the word list.
+- One list (`src/intake/risk-keywords.mjs`, 34 EN/VI words) gates five places: submission tiering (`classify.mjs`), Iron Law (`iron-law.mjs`), the heavy-risk park (`plan.mjs`), gate-bypass, and the fanout prose.
+- A word in a description says what someone wrote about the work, not what the work does. "Delete" in "delete a dead helper" blocks. A schema change described as "tidy the store" passes.
+
+Proposal: `decide` reads facts of the action and never words.
+
+| Fact | Where it comes from | Available |
+|---|---|---|
+| Which paths it writes | the Unit's declared `writes` before work; the real diff after | both |
+| Whether a written path is in a risky class (migrations, schema, CI, credentials, public contracts, the Git and lock cores) | one path-class table in config, project over global | both |
+| Whether it deletes tracked files or data | the diff | after |
+| Whether it reaches outside the worktree (network, push, an external API, writes outside the checkout) | the Unit's capability and confinement facts | both |
+| How big it is and how far it reaches | diff size; callers from impact analysis when that tool is present | after |
+
+Rules:
+- The strongest check runs on the real diff, at merge or approve, where facts are certain.
+- Gates before any work exists (context, plan) use the declared `writes` and capability.
+- The agent's own risk judgment may raise a decision to `ask`, never lower it, as tsk-224 already does for reversibility.
+- The keyword list is retired from every gate, along with the fanout prose that copies it. A description word may still be shown to the human as a hint, never as a block.
+- Iron Law RUL35 uses the same list. Moving it is a separate supersede of that rule, so it is an owner question.
+
 ## Owner questions
 
 1. **Where the approval truth lives.**
@@ -82,3 +108,7 @@ The grant lives with the action (the run or case it belongs to), like today's wo
 3. **When.**
    - (a) Write the plan now. Build it with the Work batch after T5. The Rust move of the level reader and `gate-check` goes first. Recommended.
    - (b) Start the Rust move now in agreement with WORK, and design the rest later.
+4. **What risk is decided from.**
+   - (a) Facts of the action: written paths against one path-class table, deletions, reach outside the worktree, and size. Retire the keyword list from every gate, Iron Law included, by superseding RUL35. Recommended.
+   - (b) The same facts for the gates, but Iron Law keeps its words.
+   - (c) Keep the keywords and tune the list.
