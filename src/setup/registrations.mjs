@@ -105,9 +105,9 @@ import { stepById } from '../workflow/steps.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
-import { checkConfig, readConfig, readMachineConfig } from '../config/facade.mjs';
-import { retiredJsonAdvice } from './runner-config-conversion.mjs';
-import { CONFIG_CHECKS, CONFIG_FIXES, isConfigDoorFailure } from './config-checks.mjs';
+import { readConfig, readMachineConfig } from '../config/facade.mjs';
+import { CONFIG_CHECKS, CONFIG_FIXES, checkConfigOnce, isConfigDoorFailure } from './config-checks.mjs';
+import { formatLegacyJsonAdvice } from './runner-config-conversion.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
@@ -478,94 +478,37 @@ export function checkRunnerGeneratedPathsConfig(cwd) {
   return { passed: true, message: `runner.generatedPaths is valid (${generatedPaths.length} mapping(s))` };
 }
 
-export function checkRunnerPatternsConfig(cwd) {
+export function checkRunnerPatternsConfig(cwd, run) {
+  const globalDir = path.join(os.homedir(), '.fgos');
+  const display = (file) => {
+    if (file?.startsWith('global:')) return path.join(globalDir, file.slice('global:'.length));
+    if (file?.startsWith('project:')) return path.join(cwd, '.fgos', file.slice('project:'.length));
+    return file ?? '<file>';
+  };
+
+  // The legacy JSON format itself is the door row's finding (config-format-legacy-json); this row adds what that row
+  // cannot say: which retired pattern key to change and what replaces it, in a YAML or a legacy JSON file alike.
+  const findings = checkConfigOnce(cwd, run).findings ?? [];
+  const legacy = findings.filter((f) => f.row === 'config-format-legacy-json');
+  const legacyScopes = new Set(legacy.map((f) => f.file?.split(':')[0]));
   const problems = [];
-  const globalDir = path.join(process.env.HOME || os.homedir(), '.fgos');
-
-  let isProjectJson = false;
-  let isGlobalJson = false;
-
-  // Check project and global config for retired keys and legacy format
-  try {
-    const checkRes = checkConfig({ projectRoot: cwd });
-    for (const f of checkRes.findings ?? []) {
-      if (f.file === 'project:config.json' || (f.file?.startsWith('project:') && f.row === 'config-format-legacy-json')) {
-        isProjectJson = true;
-      }
-      if (f.file === 'global:config.json' || (f.file?.startsWith('global:') && f.row === 'config-format-legacy-json')) {
-        isGlobalJson = true;
-      }
-    }
-
-    const resolveDisplay = (rawFile) => {
-      if (rawFile?.startsWith('global:')) {
-        const name = isGlobalJson ? 'config.json' : rawFile.replace(/^global:/, '');
-        return path.join(globalDir, name);
-      }
-      if (rawFile?.startsWith('project:')) {
-        const name = isProjectJson ? 'config.json' : rawFile.replace(/^project:/, '');
-        return path.join(cwd, '.fgos', name);
-      }
-      if (rawFile === 'merged' || !rawFile) {
-        if (isProjectJson) return path.join(cwd, '.fgos', 'config.json');
-        if (isGlobalJson) return path.join(globalDir, 'config.json');
-        return rawFile ?? '<file>';
-      }
-      return rawFile;
-    };
-
-    for (const f of checkRes.findings ?? []) {
-      const display = resolveDisplay(f.file);
-
-      if (display.endsWith('.json') || f.row === 'config-format-legacy-json') {
-        const msg = retiredJsonAdvice(display);
-        if (msg && !problems.includes(msg)) problems.push(msg);
-        continue;
-      }
-
-      if (f.path) {
-        const detected = detectRetiredPatternKeys(f.path);
-        for (const item of detected) {
-          const repl = item.replacement;
-          const msg = `${display}: ${item.key} was retired; ${repl ? `use ${repl} instead.` : 'delete the key.'}`;
-          if (!problems.includes(msg)) problems.push(msg);
-        }
-      }
-    }
-  } catch (err) {
-    if (err.refusals) {
-      const isProjectRefusalJson = err.refusals.some((r) => r.file === 'project:config.json' || r.id === 'config-format-legacy-json');
-      const isGlobalRefusalJson = err.refusals.some((r) => r.file === 'global:config.json' || (r.file?.startsWith('global:') && r.id === 'config-format-legacy-json'));
-      if (isProjectRefusalJson) isProjectJson = true;
-      if (isGlobalRefusalJson) isGlobalJson = true;
-      for (const r of err.refusals) {
-        let display;
-        if (r.file?.startsWith('global:')) {
-          display = path.join(globalDir, isGlobalRefusalJson ? 'config.json' : r.file.replace(/^global:/, ''));
-        } else if (r.file?.startsWith('project:')) {
-          display = path.join(cwd, '.fgos', isProjectRefusalJson ? 'config.json' : r.file.replace(/^project:/, ''));
-        } else {
-          display = r.file ?? '<file>';
-        }
-        if (display.endsWith('.json') || r.id === 'config-format-legacy-json') {
-          const msg = retiredJsonAdvice(display);
-          if (msg && !problems.includes(msg)) problems.push(msg);
-          continue;
-        }
-        if (r.path) {
-          const detected = detectRetiredPatternKeys(r.path);
-          for (const item of detected) {
-            const repl = item.replacement;
-            const msg = `${display}: ${item.key} was retired; ${repl ? `use ${repl} instead.` : 'delete the key.'}`;
-            if (!problems.includes(msg)) problems.push(msg);
-          }
-        }
-      }
+  const note = (msg) => { if (!problems.includes(msg)) problems.push(msg); };
+  for (const f of legacy) {
+    // The advice names the retired keys of that file; its generic form only repeats the door row, so it is dropped.
+    const advice = formatLegacyJsonAdvice(display(f.file));
+    if (advice.includes(' was retired; ')) note(advice);
+  }
+  for (const f of findings) {
+    if (f.row === 'config-format-legacy-json' || legacyScopes.has(f.file?.split(':')[0])) continue;
+    for (const item of f.path ? detectRetiredPatternKeys(f.path) : []) {
+      note(`${display(f.file)}: ${item.key} was retired; ${item.replacement ? `use ${item.replacement} instead.` : 'delete the key.'}`);
     }
   }
-
   if (problems.length > 0) {
     return { passed: false, message: problems.join('; ') };
+  }
+  if (legacy.length > 0) {
+    return { passed: true, message: 'not evaluated: a legacy JSON config file is reported by config-format-legacy-json' };
   }
 
   let cfg;
@@ -576,13 +519,6 @@ export function checkRunnerPatternsConfig(cwd) {
       origins: ['runner.patterns', 'runner.loops'],
     });
   } catch (err) {
-    const refusals = err.refusals ?? [];
-    const formatOnly = refusals.length > 0
-      ? refusals.every((r) => r.id === 'config-format-legacy-json' || r.file?.endsWith('.json'))
-      : (isProjectJson || isGlobalJson);
-    if (formatOnly) {
-      return { passed: true, message: 'runner patterns not checked: a config file is legacy JSON, which the config format row reports' };
-    }
     return { passed: false, message: err.message };
   }
 
@@ -1468,7 +1404,7 @@ registerCheck({
 registerCheck({
   id: 'runner-patterns-config',
   description: 'project and global runner patterns configuration is present, well-formed, and cumulative',
-  check: (cwd) => checkRunnerPatternsConfig(cwd),
+  check: (cwd, run) => checkRunnerPatternsConfig(cwd, run),
 });
 
 registerCheck({

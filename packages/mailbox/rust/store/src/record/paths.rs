@@ -3,7 +3,8 @@
 //!
 //! - `<fgosDir>/runtime/mailbox/`: kept for files written without the
 //!   mailbox lock (the breaker file of spec §4.1 and the last hook outcome
-//!   of spec §6.1). The record never lists it.
+//!   of spec §6.1) and the detached sync child's log. The record never
+//!   lists it.
 //! - `<fgosDir>/runtime/mailbox/record/`: written only by a holder of the
 //!   mailbox lock: `snapshot.json` and `bodies/<id>.body`.
 //!
@@ -22,6 +23,7 @@ const BODIES_DIR: &str = "bodies";
 const BODY_SUFFIX: &str = ".body";
 const BREAKER_FILE: &str = "breaker.json";
 const HOOK_OUTCOME_FILE: &str = "hook-outcome.json";
+const SYNC_LOG_FILE: &str = "sync.log";
 /// The holder-lock registry row the record takes.
 const LOCK_NAME: &str = "mailbox";
 /// The registry's template parameter for the `.fgos` directory.
@@ -65,6 +67,12 @@ impl Paths {
     /// `record/`, written without the mailbox lock.
     pub fn hook_outcome(&self) -> PathBuf {
         self.mailbox_dir().join(HOOK_OUTCOME_FILE)
+    }
+
+    /// The output of the detached sync child, beside `record/`, appended
+    /// without the mailbox lock.
+    pub fn sync_log(&self) -> PathBuf {
+        self.mailbox_dir().join(SYNC_LOG_FILE)
     }
 
     /// The hook outcome file's name inside [`Paths::mailbox_dir`].

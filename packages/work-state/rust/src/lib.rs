@@ -203,7 +203,7 @@ mod tests {
             std::fs::write(root.join(".fgos").join(name), text).unwrap();
         }
         let home_dir = dir.join("home").to_string_lossy().into_owned();
-        let got = gate_bypass_level(&root, |k| (home && k == "HOME").then(|| home_dir.clone()));
+        let got = gate_bypass_level(&root, |k| (home && k == fgos_config::machine::HOME_VAR).then(|| home_dir.clone()));
         let _ = std::fs::remove_dir_all(&dir);
         got
     }

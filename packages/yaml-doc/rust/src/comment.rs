@@ -104,14 +104,3 @@ pub fn sanitize(text: &str) -> Result<Vec<String>, Refusal> {
             .collect()
     })
 }
-
-/// The one comment token for an inline comment; text with a line break is refused.
-pub fn sanitize_inline(text: &str) -> Result<String, Refusal> {
-    guard(|| {
-        if let Some((index, _)) = text.chars().enumerate().find(|(_, ch)| is_line_break(*ch)) {
-            return Err(Refusal::new(rule::INLINE_COMMENT_MULTILINE).at(1, index as u32 + 1));
-        }
-        check_hidden(text, 1)?;
-        Ok(render(text))
-    })
-}

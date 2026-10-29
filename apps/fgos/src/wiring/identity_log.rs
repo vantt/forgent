@@ -6,14 +6,14 @@
 
 use fgos_event_store::{
     append::{append, AppendRequest, EventInput},
-    identity::{machine_id, StoreIdentity},
+    identity::StoreIdentity,
     legacy_import::write_readiness,
     layout::{Layout, StreamId},
     read::{read, ReadRequest},
     registry::Registry,
     sync::sync_status,
 };
-use fgos_git::{GitDriver, Inspect, ResolveRepo};
+use fgos_git::GitDriver;
 use fgos_identity::shared::{self, EntryLog, LogDoor, RawEvent};
 use fgos_identity::text::{iso_utc, iso_utc_now};
 use fgos_identity::Refusal;
@@ -42,25 +42,13 @@ struct StoreLog {
 impl LogDoor for StoreLogDoor {
     fn open(&self, dir: &Path, writer: &str) -> Result<Option<Box<dyn EntryLog>>, Refusal> {
         let fault = |e: &dyn std::fmt::Debug| store_fault("event-store-unavailable", e);
-        let (state, _) = fgos_holder_lock::state_root();
-        let driver = GitDriver::new(&state).map_err(|e| fault(&e))?;
-        let repo = match driver.resolve_repo(dir, dir).map_err(|e| fault(&e))? {
-            ResolveRepo::Repository(repo) => repo,
-            ResolveRepo::NotARepository => return Ok(None),
+        let clone = match super::event_store_clone::open(dir) {
+            Ok(Some(clone)) => clone,
+            Ok(None) => return Ok(None),
+            Err(failure) => return Err(Refusal { reason: failure.reason, detail: failure.detail, candidates: Vec::new() }),
         };
-        let layout = Layout::from_common_dir(Some(repo.common_dir())).map_err(|e| fault(&e))?;
-        // A project whose events were never migrated has nothing to share into. Migration commits the
-        // `.fgos/events` fence; the store itself is minted by the first append, so a clone of a migrated
-        // project that never appended still publishes, and this first append creates its store.
-        let migrated = std::fs::symlink_metadata(repo.trusted_main_root().join(".fgos/events")).is_ok_and(|m| m.is_file());
-        if !migrated && std::fs::symlink_metadata(layout.store()).is_err() {
-            return Ok(None);
-        }
-        let configured = driver.machine_id(&repo).map_err(|e| fault(&e))?;
-        let configured = configured.as_ref().map(|fact| std::str::from_utf8(&fact.value)).transpose().map_err(|e| fault(&e))?;
-        let machine = machine_id(configured, &state).map_err(|e| fault(&e))?;
-        let registry = Registry::shipped().map_err(|e| fault(&e))?;
         let stream = StreamId::parse(shared::STREAM).map_err(|e| fault(&e))?;
+        let super::event_store_clone::EventStoreClone { driver, repo, layout, registry, machine } = clone;
         Ok(Some(Box::new(StoreLog { driver, repo, layout, registry, stream, machine, writer: writer.to_owned(), dir: dir.to_owned() })))
     }
 }

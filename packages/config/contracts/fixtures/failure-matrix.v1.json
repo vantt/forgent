@@ -1,9 +1,7 @@
 {
  "version": 1,
  "about": "Where each failure id of failure-codes.v1.json is proven. A producible id is covered when some fixture case expects it; the two lists below name the ids whose owning proof is a Rust test that no fixture drives, with the file that must mention the id. A new id needs a fixture case in the file of the phase that owns the behaviour, never a copy here.",
- "proven-in-rust": {
-  "config-accounts-unavailable-confined": "tests/golden_snapshot.rs"
- },
+ "proven-in-rust": {},
  "unreachable-on-this-platform": {
   "config-platform-unsupported": "src/files.rs"
  }

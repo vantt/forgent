@@ -179,23 +179,6 @@ export function getProviderPolicyShapedFlags(providerFamily, command) {
 }
 
 /**
- * Pure environment variable expansion for strings containing ${VAR}.
- * Resolves ${VAR} placeholders against baseEnv without mutation or side effects.
- */
-export function resolveEnvPatch(rawEnv, baseEnv = process.env) {
-  if (!rawEnv || typeof rawEnv !== 'object') return {};
-  const resolved = {};
-  for (const [k, v] of Object.entries(rawEnv)) {
-    if (typeof v === 'string') {
-      resolved[k] = v.replace(/\$\{([^}]+)\}/g, (_, varName) => baseEnv?.[varName] ?? '');
-    } else {
-      resolved[k] = v;
-    }
-  }
-  return resolved;
-}
-
-/**
  * Extracts policy-shaped flags actually present in rendered argv.
  * Flags encoding runtime policy (model/effort/tool gating/sandbox/approvals)
  * are extracted while pure invocation mechanics (e.g. -p, {prompt}, exec, --new-project)
@@ -527,13 +510,9 @@ export class BaseProviderAdapter {
     // 7. Policy-shaped flags
     const policyShapedFlags = extractPolicyShapedFlags(renderedArgs, this.family);
 
-    // 8. Env patch
-    const envPatch = resolveEnvPatch(executorFacts?.env);
-
     return {
       command: command ?? this.family,
       args: renderedArgs,
-      envPatch,
       applied: {
         model: appliedModel,
         reasoningEffort: appliedEffort,
@@ -635,7 +614,7 @@ export function getProviderAdapter(providerFamily, command) {
  * Canonical entry point translating canonical runtime options and executor facts
  * into provider-specific invocation details.
  *
- * Pure function: returns { command, args, envPatch, applied, warnings, policyShapedFlags }.
+ * Pure function: returns { command, args, applied, warnings, policyShapedFlags }.
  */
 export function renderProviderInvocation(inputs = {}) {
   const adapter = getProviderAdapter(inputs.providerFamily, inputs.command);

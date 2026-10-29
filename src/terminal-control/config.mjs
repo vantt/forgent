@@ -12,13 +12,6 @@ export const TERMINAL_CONFIG_KEY = 'terminal';
 /** How far `allocationGraceMs` must stay above the ready timeout. */
 const GRACE_MARGIN_MS = 30000;
 
-/** The shape `fgos setup` writes; the route test pins that it agrees with the core's defaults. */
-export const DEFAULT_TERMINAL_CONFIG = Object.freeze({
-  allocationGraceMs: 60000,
-  retainFailedPaneMs: null,
-  layout: Object.freeze({ policy: 'even-split', minCols: 80, minRows: 20, maxPanesPerTab: 8 }),
-});
-
 /** Every setting, as its dotted path in the `terminal` section. */
 const SETTINGS = ['allocationGraceMs', 'retainFailedPaneMs', 'layout.policy', 'layout.minCols', 'layout.minRows', 'layout.maxPanesPerTab'];
 
@@ -27,9 +20,9 @@ const readSetting = (section, name) => name.split('.').reduce((value, key) => va
 /** The route's flat key of a setting (`layout.minCols` -> `minCols`). */
 const routeKey = (name) => name.replace(/^layout\./, '');
 
-/** A setting nobody set: the core's default, or Node's own for the retain time the route never sees. */
-function defaultOf(name, defaults) {
-  return name === 'retainFailedPaneMs' ? DEFAULT_TERMINAL_CONFIG.retainFailedPaneMs : defaults?.[routeKey(name)];
+/** A setting nobody set: the core's default, or the standard's value (already in the snapshot) for the retain time the route never sees. */
+function defaultOf(name, defaults, section) {
+  return name === 'retainFailedPaneMs' ? readSetting(section, name) : defaults?.[routeKey(name)];
 }
 
 /**
@@ -53,7 +46,7 @@ export function resolveTerminalConfig(repoRoot, { globalConfigPath, defaults } =
   const entries = SETTINGS.map((name) => {
     const layer = layers.get(`${TERMINAL_CONFIG_KEY}.${name}`);
     if (layer === 'project' || layer === 'global') return { name, value: readSetting(value[TERMINAL_CONFIG_KEY], name), source: layer };
-    return { name, value: defaultOf(name, defaults), source: 'default' };
+    return { name, value: defaultOf(name, defaults, value[TERMINAL_CONFIG_KEY]), source: 'default' };
   });
   return { entries, values: Object.fromEntries(entries.map((e) => [e.name, e.value])) };
 }

@@ -9,22 +9,13 @@
 //! edit would rewrite is never dropped silently (`comment-would-be-lost`).
 
 use crate::backend::{Kind, Node, Style};
-use crate::comment::{sanitize, sanitize_inline};
+use crate::comment::sanitize;
 use crate::document::{parse, Document};
 use crate::guard::guard;
 use crate::model::{rule, Refusal, Segment, Value};
 use crate::profile::{resolve, Resolved};
 
-/// Where `insert` puts the new entry.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Position<'a> {
-    /// After the last entry of the mapping.
-    End,
-    /// Right after the named sibling entry.
-    After(&'a str),
-}
-
-/// Whether an edit may drop a note: `set`, `insert` and `remove` all take it.
+/// Whether an edit may drop a note: `set` and `remove` both take it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CommentLoss {
     /// A note the edit would drop makes it a `comment-would-be-lost` refusal.
@@ -58,20 +49,6 @@ impl Document {
         guard(|| self.set_inner(path, value, ack))
     }
 
-    /// Adds `key: value` to the mapping at `mapping_path` (the empty path is the document root).
-    /// Refuses `comment-would-be-lost` like `set` when the mapping is a flow collection holding a
-    /// note that the rewrite would drop.
-    pub fn insert(
-        &mut self,
-        mapping_path: &[Segment],
-        key: &str,
-        value: Value,
-        position: Position<'_>,
-        ack: CommentLoss,
-    ) -> Result<(), Refusal> {
-        guard(|| self.insert_inner(mapping_path, key, value, position, ack))
-    }
-
     /// Deletes the entry or sequence item at `path`, with its line. A note on the node (above it
     /// or on its lines) makes this refuse unless `ack` is `Acknowledge`.
     pub fn remove(&mut self, path: &[Segment], ack: CommentLoss) -> Result<(), Refusal> {
@@ -82,18 +59,6 @@ impl Document {
     /// an element holding a line break becomes several comment lines. No lines delete the block.
     pub fn set_comment_block(&mut self, path: &[Segment], lines: &[String]) -> Result<(), Refusal> {
         guard(|| self.set_comment_block_inner(path, lines))
-    }
-
-    /// Replaces the comment after the node on its line; `None` removes it, empty text is refused
-    /// `inline-comment-empty`. A node whose last line is not a line of its own (block scalar,
-    /// multi-line value, item of a flow collection with more on the line) is refused
-    /// `inline-comment-unplaceable`.
-    pub fn set_inline_comment(
-        &mut self,
-        path: &[Segment],
-        text: Option<&str>,
-    ) -> Result<(), Refusal> {
-        guard(|| self.set_inline_comment_inner(path, text))
     }
 
     /// The comment lines above the node and the comment on its line, as text without the `#`.
@@ -142,9 +107,7 @@ impl Document {
             let at = chain[chain.len() - 1];
             let parent_path = &path[..matched];
             match &self.node(at.id).kind {
-                Kind::Map(_) => {
-                    self.plan_insert(&chain, parent_path, &key, &below, Position::End)?
-                }
+                Kind::Map(_) => self.plan_insert(&chain, parent_path, &key, &below)?,
                 Kind::Scalar { .. } if self.is_empty_null(at.id) => {
                     let filled = Value::Map(vec![(key, below)]);
                     self.plan_replace(&chain, &filled, allow_loss, parent_path)?
@@ -179,59 +142,6 @@ impl Document {
             }
             _ => self.plan_replace(chain, value, allow_loss, path),
         }
-    }
-
-    fn insert_inner(
-        &mut self,
-        mapping_path: &[Segment],
-        key: &str,
-        value: Value,
-        position: Position<'_>,
-        ack: CommentLoss,
-    ) -> Result<(), Refusal> {
-        let allow_loss = ack == CommentLoss::Acknowledge;
-        self.check_value(&value, mapping_path)?;
-        let (chain, matched) = self.locate(mapping_path);
-        let mut expected = self.value().clone();
-        apply_insert(&mut expected, mapping_path, key, value.clone(), position)
-            .map_err(|()| self.not_found(mapping_path))?;
-        if chain.is_empty() {
-            if matched != mapping_path.len() || !mapping_path.is_empty() {
-                return Err(self.not_found(mapping_path));
-            }
-            let splice = self.plan_append_root(key, &value);
-            return self.commit(splice, expected);
-        }
-        if matched != mapping_path.len() {
-            return Err(self.not_found(mapping_path));
-        }
-        // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
-        // or checked `chain.is_empty()`, or checked `chain.len() >= 2` for the parent).
-        let at = chain[chain.len() - 1];
-        let splice = match (&self.node(at.id).kind, self.flow_index(&chain)) {
-            (_, Some(index)) => {
-                let mut rewritten = value_at(self.value(), &mapping_path[..index])
-                    .cloned()
-                    .ok_or_else(|| self.not_found(mapping_path))?;
-                apply_insert(&mut rewritten, &mapping_path[index..], key, value, position)
-                    .map_err(|()| self.not_found(mapping_path))?;
-                self.plan_replace(
-                    &chain[..=index],
-                    &rewritten,
-                    allow_loss,
-                    &mapping_path[..index],
-                )?
-            }
-            (Kind::Map(_), None) => {
-                self.plan_insert(&chain, mapping_path, key, &value, position)?
-            }
-            (Kind::Scalar { .. }, None) if self.is_empty_null(at.id) => {
-                let filled = Value::Map(vec![(key.to_string(), value)]);
-                self.plan_replace(&chain, &filled, allow_loss, mapping_path)?
-            }
-            _ => return Err(self.not_found(mapping_path)),
-        };
-        self.commit(splice, expected)
     }
 
     fn remove_inner(&mut self, path: &[Segment], ack: CommentLoss) -> Result<(), Refusal> {
@@ -300,44 +210,6 @@ impl Document {
             start: above,
             end: first,
             text,
-        };
-        let expected = self.value().clone();
-        self.commit(splice, expected)
-    }
-
-    fn set_inline_comment_inner(
-        &mut self,
-        path: &[Segment],
-        text: Option<&str>,
-    ) -> Result<(), Refusal> {
-        let token = match text {
-            None => None,
-            Some("") => return Err(Refusal::new(rule::INLINE_COMMENT_EMPTY).with_file(self.file())),
-            Some(text) => Some(sanitize_inline(text).map_err(|r| r.with_file(self.file()))?),
-        };
-        let chain = self.full_chain(path)?;
-        let Some((tail_start, line_end)) = self.inline_slot(&chain) else {
-            return Err(self.refuse_at(rule::INLINE_COMMENT_UNPLACEABLE, path));
-        };
-        let src = self.src();
-        let existing = src.tail_comment(tail_start, line_end);
-        let splice = match (existing, token) {
-            (Some((at, _)), Some(token)) => Splice {
-                start: at,
-                end: line_end,
-                text: token,
-            },
-            (Some(_), None) => Splice {
-                start: tail_start,
-                end: line_end,
-                text: String::new(),
-            },
-            (None, Some(token)) => Splice {
-                start: tail_start,
-                end: line_end,
-                text: format!("  {token}"),
-            },
-            (None, None) => return Ok(()),
         };
         let expected = self.value().clone();
         self.commit(splice, expected)
@@ -736,8 +608,8 @@ impl Document {
         src.tail_comment(at, src.line_end(at))
     }
 
-    /// Where an inline comment of the node goes: the byte after the node's text on its line and the
-    /// line end. `None` when the node has no such place.
+    /// Where the inline comment of the node sits (or would sit): the byte after the node's text on
+    /// its line and the line end. `None` when the node has no such place.
     fn inline_slot(&self, chain: &[Step]) -> Option<(usize, usize)> {
         if chain.len() < 2 {
             return None;
@@ -1453,14 +1325,13 @@ impl Document {
             .map(|line| line.len() - line.trim_start_matches(' ').len())
     }
 
-    /// New entry lines after an existing entry of a block mapping.
+    /// New entry lines after the last entry of a block mapping.
     fn plan_insert(
         &self,
         chain: &[Step],
         mapping_path: &[Segment],
         key: &str,
         value: &Value,
-        position: Position<'_>,
     ) -> Result<Splice, Refusal> {
         let src = self.src();
         // Cannot fail: the chain is never empty here (every caller has taken it from `full_chain`,
@@ -1469,20 +1340,8 @@ impl Document {
         let Kind::Map(entries) = &self.node(map.id).kind else {
             return Err(self.not_found(mapping_path));
         };
-        let index = match position {
-            Position::End => entries.len().checked_sub(1),
-            Position::After(name) => entries.iter().position(|(key_id, _)| {
-                crate::profile::key_scalar(&self.tree, *key_id).is_some_and(
-                    |(_, text, resolved)| crate::profile::key_text(resolved, text) == name,
-                )
-            }),
-        };
-        let Some(index) = index else {
-            let mut path = mapping_path.to_vec();
-            if let Position::After(name) = position {
-                path.push(Segment::Key(name.to_string()));
-            }
-            return Err(self.not_found(&path));
+        let Some(index) = entries.len().checked_sub(1) else {
+            return Err(self.not_found(mapping_path));
         };
         let scope = self.children(map.id);
         let render = self.render_for(&scope, None);
@@ -1654,28 +1513,6 @@ fn apply_set(root: &mut Value, path: &[Segment], new: Value) -> Result<(), ()> {
         }
     }
     *current = new;
-    Ok(())
-}
-
-fn apply_insert(
-    root: &mut Value,
-    path: &[Segment],
-    key: &str,
-    value: Value,
-    position: Position<'_>,
-) -> Result<(), ()> {
-    let target = value_at_mut(root, path).ok_or(())?;
-    if matches!(target, Value::Null) {
-        *target = Value::Map(Vec::new());
-    }
-    let Value::Map(entries) = target else {
-        return Err(());
-    };
-    let at = match position {
-        Position::End => entries.len(),
-        Position::After(name) => entries.iter().position(|(k, _)| k == name).ok_or(())? + 1,
-    };
-    entries.insert(at, (key.to_string(), value));
     Ok(())
 }
 

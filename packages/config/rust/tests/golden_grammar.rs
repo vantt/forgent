@@ -54,13 +54,8 @@ fn grammar_cases_hold() {
         let (id, input, expect) = (&case["id"], &case["input"], &case["expect"]);
         let text = input["text"].as_str().unwrap_or_default();
         let produced: Vec<String> = match input["kind"].as_str().unwrap() {
-            kind @ ("reason" | "suggested") => {
-                let parsed = if kind == "reason" {
-                    Reason::parse(text)
-                } else {
-                    Reason::suggested(text)
-                };
-                match (parsed, expect["code"].as_str()) {
+            "reason" => {
+                match (Reason::parse(text), expect["code"].as_str()) {
                     (Err(refusal), Some(code)) => {
                         assert_eq!(refusal.code, code, "{id}");
                         let yaml = refusal.yaml.map(|y| y.rule.to_string());

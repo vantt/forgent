@@ -16,7 +16,7 @@ use fgos_config::machine::{self, accounts};
 use fgos_config::snapshot::{AccountsState, Context, SessionClass, Snapshot};
 use fgos_config::snapshot::{SnapshotError, SnapshotRequest};
 use fgos_config::ConfigRefusal;
-use fgos_git::{GitDriver, ResolveRepo};
+use fgos_git::GitDriver;
 use fgos_yaml_doc::path::{format_path, parse_path};
 use napi::Result;
 use napi_derive::napi;
@@ -28,8 +28,6 @@ use crate::marshal::{guarded_as, Failure, More};
 
 type Res<T> = std::result::Result<T, Failure>;
 
-/// Main checkouts the door remembers, one per project root.
-const MEMO_SLOTS: usize = 16;
 /// Snapshots the door keeps; each is validated against its files on every read, so a hit is never stale.
 const CACHE_SLOTS: usize = 8;
 
@@ -150,59 +148,16 @@ impl Request {
     }
 }
 
-/// Identity of the repository entry of a project root: what a resolved main checkout was derived from (a
-/// linked worktree's pointer file with its size and mtime, or the main checkout's directory).
-fn stamp_of(project: &Path) -> Option<[i64; 4]> {
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::MetadataExt;
-        let meta = std::fs::symlink_metadata(project.join(".git")).ok()?;
-        let file = meta.is_file();
-        let mtime = if file {
-            meta.mtime() * 1_000_000_000 + meta.mtime_nsec()
-        } else {
-            0
-        };
-        (file || meta.is_dir()).then_some([
-            meta.dev() as i64,
-            meta.ino() as i64,
-            if file { meta.size() as i64 } else { -1 },
-            mtime,
-        ])
-    }
-    #[cfg(not(unix))]
-    None
-}
-
-/// The main checkout of `project` (the project itself outside a repository), memoised per project root while
-/// its repository entry is unchanged: establishing it reads the repository, which a read must not pay every time.
+/// The main checkout of `project` (the project itself outside a repository): the one disk-only topology
+/// check of the Git driver, the same route the CLI provider takes.
 fn trusted_root(project: &Path) -> Res<PathBuf> {
-    static MEMO: Mutex<Vec<(PathBuf, [i64; 4], PathBuf)>> = Mutex::new(Vec::new());
-    let stamp = stamp_of(project);
-    let mut memo = MEMO.lock().unwrap_or_else(PoisonError::into_inner);
-    if let Some((.., main)) = memo
-        .iter()
-        .find(|(root, at, _)| root == project && Some(*at) == stamp)
-    {
-        return Ok(main.clone());
-    }
     let unresolved = |cause: String| failure("config-trusted-root-unresolved", cause);
-    let driver = GitDriver::new(&fgos_holder_lock::state_root::state_root().0)
-        .map_err(|e| unresolved(e.cause))?;
-    let main = match driver
-        .resolve_repo(project, project)
-        .map_err(|e| unresolved(e.cause))?
-    {
-        ResolveRepo::Repository(repo) => std::fs::canonicalize(repo.trusted_main_root())
-            .map_err(|e| unresolved(format!("{:?}", e.kind())))?,
-        ResolveRepo::NotARepository => project.to_path_buf(),
-    };
-    if let Some(stamp) = stamp {
-        memo.retain(|(root, ..)| root != project);
-        memo.truncate(MEMO_SLOTS - 1);
-        memo.push((project.to_path_buf(), stamp, main.clone()));
+    match GitDriver::trusted_root_at(project).map_err(|e| unresolved(e.cause))? {
+        Some(main) => {
+            std::fs::canonicalize(main).map_err(|e| unresolved(format!("{:?}", e.kind())))
+        }
+        None => Ok(project.to_path_buf()),
     }
-    Ok(main)
 }
 
 fn accounts_name(state: AccountsState) -> &'static str {

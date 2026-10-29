@@ -5,7 +5,6 @@
 // registrations.mjs registers the two lists, so this module never imports the registry back.
 
 import fs from 'node:fs';
-import os from 'node:os';
 import { checkConfig, fixConfig, ConfigDoorError } from '../config/facade.mjs';
 
 const contract = JSON.parse(fs.readFileSync(new URL('../../packages/config/contracts/doctor-rows.v1.json', import.meta.url), 'utf8'));
@@ -21,22 +20,12 @@ export const isConfigDoorFailure = (err) => err instanceof ConfigDoorError || (t
 const rowId = (row) => ROW_IDS[row] ?? row;
 const fixId = (fix) => FIX_IDS[fix] ?? `config-${fix}`;
 
-// One door call (about 70 ms) serves every row of a doctor run: the rows come from the same read of the files. A run is
-// the rows asked in turn until each was asked once; a row asked a second time, another project, home or session class,
-// or a memo older than a second (a partial run) reads afresh, so a file changed between two runs is never judged stale.
-const MEMO_MAX_AGE_MS = 1000;
-let memo = null;
+/** The door's findings for a project: one read (about 70 ms) per doctor run, shared by every row that judges the config files. A row called without a run reads for itself. */
+export const checkConfigOnce = (cwd, run) => (run
+  ? run.once(`config-check:${cwd}`, () => checkConfig({ projectRoot: cwd }))
+  : checkConfig({ projectRoot: cwd }));
 
-function findingsOf(cwd, row) {
-  const key = [cwd, os.homedir(), process.env.FGOS_CONFINED ?? ''].join('\0');
-  if (memo === null || memo.key !== key || memo.asked.has(row) || Date.now() - memo.at > MEMO_MAX_AGE_MS) {
-    memo = { key, at: Date.now(), asked: new Set(), findings: checkConfig({ projectRoot: cwd }).findings };
-  }
-  const mine = memo.findings.filter((finding) => finding.row === row);
-  memo.asked.add(row);
-  if (memo.asked.size === contract.rows.length) memo = null;
-  return mine;
-}
+const findingsOf = (cwd, run, row) => checkConfigOnce(cwd, run).findings.filter((finding) => finding.row === row);
 
 // `file:line:column row path`, then the finding's own text; never a value (the door puts none in a finding).
 const describe = ({ row, file, line, column, path, detail }) => [
@@ -59,7 +48,7 @@ function mapFindings(findings, description) {
 export const CONFIG_CHECKS = contract.rows.map((row) => ({
   id: rowId(row.id),
   description: DESCRIPTIONS[row.id] ?? row.description,
-  check: (cwd) => mapFindings(findingsOf(cwd, row.id), row.description),
+  check: (cwd, run) => mapFindings(findingsOf(cwd, run, row.id), row.description),
 }));
 
 /** The doctor fixes: `{ id, fix }`, one per contract fix id; a confined session or a refused file repairs nothing and says why. */

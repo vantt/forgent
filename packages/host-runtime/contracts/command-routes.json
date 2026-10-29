@@ -484,7 +484,8 @@
       "test/rust-host/command-routes.test.mjs"
     ],
     "native_kinds": [
-      "mailbox"
+      "mailbox",
+      "mailbox-sync"
     ]
   },
   "identity": {

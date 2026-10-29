@@ -23,7 +23,6 @@ import {
   getProviderPolicyShapedFlags,
   normalizeProviderFamily,
   extractPolicyShapedFlags,
-  resolveEnvPatch,
   resolveVerifiedProviderArgs,
   KNOWN_POLICY_SHAPED_FLAGS,
   ClaudeProviderAdapter,
@@ -154,19 +153,6 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       const res2 = renderProviderInvocation(inputs);
 
       assert.deepEqual(res1, res2, 'repeated invocations must yield identical results');
-    });
-
-    test('resolveEnvPatch resolves ${VAR} without process.env mutation', () => {
-      const rawEnv = {
-        HOME_COPY: '${HOME}',
-        STATIC_VAL: 'literal',
-      };
-      const customBase = { HOME: '/custom/home' };
-      const patched = resolveEnvPatch(rawEnv, customBase);
-
-      assert.equal(patched.HOME_COPY, '/custom/home');
-      assert.equal(patched.STATIC_VAL, 'literal');
-      assert.deepEqual(rawEnv, { HOME_COPY: '${HOME}', STATIC_VAL: 'literal' }, 'rawEnv must not be mutated');
     });
   });
 
@@ -399,7 +385,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
     });
 
     describe('glm (z-ai via pi and OpenRouter)', () => {
-      test('glm: renders a pi invocation under the z-ai family; a key variable in env is substituted, and the committed invocation carries none (the key lives in its login store)', () => {
+      test('glm: renders a pi invocation under the z-ai family, and the committed invocation carries no key (the key lives in its login store)', () => {
         const inv = cfg.executors['glm'].invocations[0];
         assert.equal(inv.env?.OPENROUTER_API_KEY, undefined, 'the committed invocation leaves the key to the store it reads');
         const res = renderProviderInvocation({
@@ -408,14 +394,11 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
           baseArgs: inv.args,
           promptPlaceholder: '<prompt>',
           model: 'z-ai/glm-5.2',
-          executorFacts: { env: { ...inv.env, OPENROUTER_API_KEY: '${GLM_OPENROUTER_API_KEY}' } },
         });
 
         assert.equal(res.command, 'pi', 'the adapter follows the command, not the vendor family');
         assert.equal(res.applied.model, 'applied');
         assert.equal(res.applied.toolIntent, 'applied-via-tools');
-        assert.ok(Object.hasOwn(res.envPatch, 'OPENROUTER_API_KEY'), 'the key is a substituted environment variable');
-        assert.equal(res.envPatch.ANTHROPIC_BASE_URL, undefined, 'no claude gateway variables remain');
         assert.ok(res.policyShapedFlags.includes('--model'));
         assert.ok(res.policyShapedFlags.includes('--tools'));
         assert.ok(!res.policyShapedFlags.includes('--permission-mode'));

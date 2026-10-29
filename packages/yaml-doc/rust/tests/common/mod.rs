@@ -4,7 +4,7 @@
 use std::path::PathBuf;
 
 use fgos_yaml_doc::path::{format_path, parse_path};
-use fgos_yaml_doc::{CommentLoss, Document, Position, Profile, Refusal, Segment, Value};
+use fgos_yaml_doc::{CommentLoss, Document, Profile, Refusal, Segment, Value};
 use serde_json::Value as Json;
 
 /// `packages/yaml-doc/contracts`, found from the manifest directory of the crate or of the fuzz
@@ -155,15 +155,6 @@ pub fn apply_op(doc: &mut Document, op: &Json) -> Result<Option<Json>, fgos_yaml
     };
     match name {
         "set" => doc.set(&path, value(), ack).map(|()| None),
-        "insert" => {
-            let key = op["key"].as_str().expect("insert key");
-            let position = match op["after"].as_str() {
-                Some(after) => Position::After(after),
-                None => Position::End,
-            };
-            doc.insert(&path, key, value(), position, ack)
-                .map(|()| None)
-        }
         "remove" => doc.remove(&path, ack).map(|()| None),
         "setCommentBlock" => {
             let lines: Vec<String> = op["lines"]
@@ -174,9 +165,6 @@ pub fn apply_op(doc: &mut Document, op: &Json) -> Result<Option<Json>, fgos_yaml
                 .collect();
             doc.set_comment_block(&path, &lines).map(|()| None)
         }
-        "setInlineComment" => doc
-            .set_inline_comment(&path, op["text"].as_str())
-            .map(|()| None),
         "commentsAt" => doc.comments_at(&path).map(|c| {
             Some(serde_json::json!({
                 "block": c.above,

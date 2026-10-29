@@ -26,6 +26,10 @@ export class ConfigDoorError extends Error {
 /** Whether `err` says a config file is unusable (it does not parse, breaks a schema, sits in the wrong scope), as opposed to the door failing: the readers that keep a documented fail-closed value test this, and nothing else swallows an error. */
 export const isConfigRefusal = (err) => err instanceof ConfigDoorError && !DOOR_IDS.has(err.code);
 
+/** Where the door cannot read a config file at all (the file read path exists on Unix only), every snapshot refuses with this id. The readers that keep a default for a refused config then use it, so the process says so once instead of doing it silently. */
+const PLATFORM_UNSUPPORTED = 'config-platform-unsupported';
+let platformWarned = false;
+
 const sessionClass = () => (process.env[CONFINED_MARKER_ENV] === '1' ? 'confined' : 'unconfined');
 
 /** One door call. The defaults are computed here, per call: tests and callers override `HOME` after this module loaded. */
@@ -37,7 +41,12 @@ function call(entry, { globalDir = path.join(os.homedir(), '.fgos'), class: sess
   } catch (err) {
     let failure;
     try { failure = JSON.parse(err.message); } catch { /* the door's own error: the addon is missing or does not match */ }
-    throw typeof failure?.id === 'string' ? new ConfigDoorError(failure) : err;
+    if (typeof failure?.id !== 'string') throw err;
+    if (failure.id === PLATFORM_UNSUPPORTED && !platformWarned) {
+      platformWarned = true;
+      process.emitWarning(`${PLATFORM_UNSUPPORTED}: this platform cannot read config files; where a reader keeps a default for a refused config, it uses that default`, { code: PLATFORM_UNSUPPORTED });
+    }
+    throw new ConfigDoorError(failure);
   }
   return fromDoorJson(text, { nullPrototype: true });
 }

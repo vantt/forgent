@@ -63,8 +63,7 @@ pub trait EntryLog {
 /// Opens the log of the clone a verb runs in. The host implements it over the
 /// Event Store; a provider built without one has no shared directory.
 pub trait LogDoor: Send + Sync + std::fmt::Debug {
-    /// `Ok(None)` when `dir` has no log to use: not in a repository, or its
-    /// Event Store is not migrated. `writer` is the id recorded as the
+    /// `Ok(None)` when `dir` has no log to use: not in a repository. `writer` is the id recorded as the
     /// author of the events appended through the log.
     fn open(&self, dir: &Path, writer: &str) -> Result<Option<Box<dyn EntryLog>>, Refusal>;
 }

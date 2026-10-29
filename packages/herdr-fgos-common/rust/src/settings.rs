@@ -95,7 +95,7 @@ mod tests {
         std::fs::create_dir_all(dir.join("home")).unwrap();
         let home = dir.join("home").to_string_lossy().into_owned();
         (dir.join("project"), move |name: &str| {
-            (name == "HOME").then(|| home.clone())
+            (name == fgos_config::machine::HOME_VAR).then(|| home.clone())
         })
     }
 

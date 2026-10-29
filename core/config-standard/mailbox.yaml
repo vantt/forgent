@@ -86,3 +86,11 @@ mailbox:
     lockWaitMs: 2000
   # @fgos:doc Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. On by default (owner decision 2026-10-28): a project opts out with mailbox.enabled: false. Default: true.
   enabled: true
+  # @fgos:doc Delivery of mail between machines, through the Event Store and the project's Git remote.
+  crossMachine:
+    # @fgos:doc Whether this project's mailbox sends mail to, and takes mail from, sessions on other machines. Off until the two-machine proof has passed on every machine. Default: false.
+    enabled: false
+  # @fgos:doc Rules for mail that arrives from another machine.
+  remote:
+    # @fgos:doc Whether mail from another machine is taken only when the sender's machine is pinned as confirmed (fgos identity pins --confirm); a seen or re-keyed machine is dropped and counted. Default: true.
+    requireConfirmed: true

@@ -152,12 +152,6 @@ fn snapshot_cases() {
         if let Some(state) = want["accounts"].as_str() {
             let confined = snap.accounts == AccountsState::UnavailableConfined;
             assert_eq!(confined, state == "unavailable-confined", "{id}");
-            let required = snap.require_accounts();
-            assert_eq!(
-                required.err().map(|r| r.code),
-                confined.then_some("config-accounts-unavailable-confined"),
-                "{id}"
-            );
         }
         let _ = fs::remove_dir_all(&dir);
     }

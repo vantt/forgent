@@ -42,14 +42,13 @@ function applyNativeConfigPatch(hostBin, projectDir, edits, reason) {
 }
 
 /**
- * Read-only inspection of a legacy JSON config file: the hand edits for the retired runner keys it
- * holds, or null when it holds none (the Config row owns the bare format finding).
+ * Shared read-only inspection and advice formatting for a legacy JSON config file.
  *
  * @param {string} targetPath
  * @param {object} [parsed]
- * @returns {string|null}
+ * @returns {string}
  */
-export function retiredJsonAdvice(targetPath, parsed = null) {
+export function formatLegacyJsonAdvice(targetPath, parsed = null) {
   let doc = parsed;
   if (!doc) {
     try {
@@ -62,22 +61,11 @@ export function retiredJsonAdvice(targetPath, parsed = null) {
   const runner = doc?.runner ?? doc;
   const patterns = runner?.patterns ?? {};
   const retired = doc ? detectRetiredPatternKeys(patterns) : [];
-  if (retired.length === 0) return null;
-  const editsText = retired.map((r) => `${r.key} was retired; ${r.instruction}`).join('; ');
-  return `${targetPath}: config-format-legacy-json: ${editsText}; edit ${targetPath}, then run \`fgos config migrate\``;
-}
-
-/**
- * Advice for a legacy JSON file the converter cannot rewrite: the retired-key edits when present,
- * otherwise the generic migrate instruction.
- *
- * @param {string} targetPath
- * @param {object} [parsed]
- * @returns {string}
- */
-export function formatLegacyJsonAdvice(targetPath, parsed = null) {
-  return retiredJsonAdvice(targetPath, parsed)
-    ?? `${targetPath}: config-format-legacy-json: legacy JSON configuration format must be migrated first; edit ${targetPath}, then run \`fgos config migrate\``;
+  if (retired.length > 0) {
+    const editsText = retired.map((r) => `${r.key} was retired; ${r.instruction}`).join('; ');
+    return `${targetPath}: config-format-legacy-json: ${editsText}; edit ${targetPath}, then run \`fgos config migrate\``;
+  }
+  return `${targetPath}: config-format-legacy-json: legacy JSON configuration format must be migrated first; edit ${targetPath}, then run \`fgos config migrate\``;
 }
 
 /**

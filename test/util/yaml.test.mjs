@@ -3,18 +3,11 @@
 // runner in packages/yaml-doc/rust/tests/golden_parse.rs over packages/yaml-doc/contracts/fixtures/parse.v1.json.
 // The cases of the earlier Node test now live there as: plain-values, plain-scalar-root, integer-root,
 // syntax-error-position, null-*, multi-doc-*, dup-key-*, core-*, merge-key-*, tag-*, alias-*, flat-*, proto-keys-*,
-// indent-nested, blockscalar-blank-*, anchored-keys. The vendored-parser hash test left with the vendored file.
+// indent-nested, blockscalar-blank-*, anchored-keys. The vendored-parser hash test left with the vendored file. A process without the addon fails with the door error (the loader refusal is owned by test/git/native-load.test.mjs; that the door has no other parser to fall back to is owned by the no-parser-import guard in test/architecture.test.mjs).
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
 import { YamlParseError, describeYamlError, parseYaml } from '../../src/util/yaml.mjs';
-
-const door = pathToFileURL(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../src/util/yaml.mjs')).href;
 
 test('a document reaches JavaScript as plain values, own __proto__ keys and restored non-finite floats', () => {
   assert.deepEqual(parseYaml('a: 1\nb: [x, .nan]\nc:\n  - d: true\n  - null\n'), { a: 1, b: ['x', NaN], c: [{ d: true }, null] });
@@ -49,12 +42,4 @@ test('adversarial input is a named refusal and the process keeps running', () =>
   for (let i = 1; i < 9; i++) bomb.push(`l${i}: &l${i} [${Array(9).fill(`*l${i - 1}`).join(', ')}]`);
   assert.throws(() => parseYaml(`${bomb.join('\n')}\n`), (err) => err instanceof YamlParseError && /^(alias-limit|expanded-too-large|node-limit)$/.test(err.rule));
   assert.deepEqual(parseYaml('still: alive'), { still: 'alive' });
-});
-
-test('a process that cannot load the addon fails every read with the door error and never falls back', () => {
-  const { FGOS_HOST_BIN: _host, FGOS_ACTIVE_MANIFEST_PATH: _manifest, FGOS_ACTIVE_RELEASE_PATH: _release, ...env } = process.env;
-  const probe = `import(${JSON.stringify(door)}).then(({ parseYaml }) => { try { parseYaml('a: 1'); console.log('parsed'); } catch (e) { console.log(e.code); } });`;
-  const res = spawnSync(process.execPath, ['--input-type=module', '-e', probe], { cwd: os.tmpdir(), env, encoding: 'utf8', timeout: 20_000 });
-  assert.equal(res.status, 0, res.stderr);
-  assert.equal(res.stdout.trim(), 'git-addon-not-shipped');
 });

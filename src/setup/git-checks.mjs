@@ -6,7 +6,6 @@ import { loadNativeAddon, nativeError } from '../git/native.mjs';
 import { createGitRecovery } from '../git/recovery.mjs';
 import { gitPortOptions } from '../git/inspect.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
-import { acquireSync, createLockScope } from '../holder-lock/index.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import fs from 'node:fs';
 import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
@@ -144,32 +143,22 @@ const RECOVERABLE_KINDS = ['Land', 'ScopedCommit'];
 const AUTHORITY_MISMATCH_CAUSES = ['land-authority-mismatch', 'commit-authority-mismatch'];
 /**
  * Recover every interrupted Land and ScopedCommit through the one Recovery door, under each kind's own locks (Git spec §9, §10 rule 4b).
- * A chain without a TargetAttempt closes `abandonedBeforeAttempt` whoever runs it; an attempted chain is recovered
- * only by the writer that started it. Nothing is merged, re-published or deleted: candidates stay until Work acknowledges them.
+ * Rust finds a scoped commit's checkout and takes its custody without waiting, so a gone or busy checkout comes back as a
+ * cause. An attempted chain is recovered only by the writer that started it. Nothing is merged, re-published or deleted.
  */
 export function fixGitOperationRecovery(cwd, loaderOptions, portOptions) {
   return attemptFix(cwd, () => {
     const recovery = recoveryPort(cwd, loaderOptions, portOptions);
     const recovered = [];
     const kept = [];
-    const keep = (operation, reason) => kept.push(`${operation.operationId} (${reason})`);
     for (const operation of recovery.listPending().operations.filter(o => RECOVERABLE_KINDS.includes(o.kind))) {
-      let custody = null;
       try {
-        if (operation.kind === 'ScopedCommit') {
-          // A scoped commit recovers only while its checkout's custody is held: taken here per operation, never waited for.
-          const { worktree } = operation.intent.kind.ScopedCommit;
-          if (!fs.existsSync(worktree)) { keep(operation, `checkout ${worktree} is gone`); continue; }
-          const answer = acquireSync(createLockScope(), 'dispatch-cwd', { fgosDir: path.join(resolveMainCheckoutRoot(cwd) ?? cwd, '.fgos'), cwd: worktree });
-          if (answer.result !== 'acquired') { keep(operation, `checkout busy: ${worktree}`); continue; }
-          custody = answer.handle;
-        }
-        recovery.reconcile({ operationId: operation.operationId }, custody ? [custody] : []);
+        recovery.reconcile({ operationId: operation.operationId });
         recovered.push(operation.operationId);
       } catch (err) {
         const { cause } = nativeError(err);
-        keep(operation, `${cause}${AUTHORITY_MISMATCH_CAUSES.includes(cause) ? `; only its writer ${operation.intent.writerIdentity} can recover it` : ''}`);
-      } finally { custody?.release(); }
+        kept.push(`${operation.operationId} (${cause}${AUTHORITY_MISMATCH_CAUSES.includes(cause) ? `; only its writer ${operation.intent.writerIdentity} can recover it` : ''})`);
+      }
     }
     if (!recovered.length && !kept.length) return { changed: false, message: 'no interrupted Land or ScopedCommit operation' };
     return { changed: recovered.length > 0, message: [recovered.length && `recovered interrupted Git operations: ${recovered.join(', ')}`, kept.length && `warning: Git operations kept for recovery: ${kept.join('; ')}`].filter(Boolean).join('; ') };

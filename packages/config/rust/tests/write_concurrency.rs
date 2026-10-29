@@ -6,9 +6,8 @@ mod common;
 
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process::{Child, Command, Stdio};
+use std::process::Command;
 use std::sync::Mutex;
-use std::time::{Duration, Instant};
 
 use common::{files, refs};
 use fgos_config::detect::NoDetectors;
@@ -16,13 +15,19 @@ use fgos_config::scope::SourceKind;
 use fgos_config::snapshot::{Context, SessionClass, SnapshotError, SnapshotRequest};
 use fgos_config::write::{commit, commit_observed, Edit, Step, WriteRequest};
 use fgos_config::{schema::Schemas, standard::Standard};
-use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait};
 use fgos_yaml_doc::path::parse_path;
 use serde_json::json;
 use sha2::{Digest, Sha256};
 
-const ROLE: &str = "CONFIG_TEST_LOCK";
-const READY: &str = "CONFIG_TEST_READY";
+#[path = "common/machine_fs.rs"]
+mod machine_fs;
+use machine_fs::hold_lock;
+
+/// The child process of the held-lock case runs this test of the same binary.
+#[test]
+fn child_entry() {
+    machine_fs::child_body();
+}
 
 /// Tests of one binary run on parallel threads and a fork copies every open description until the
 /// child execs, so each test that takes a lock runs alone.
@@ -33,60 +38,12 @@ fn serial() -> std::sync::MutexGuard<'static, ()> {
         .unwrap_or_else(|poisoned| poisoned.into_inner())
 }
 
-/// The body of the child: take the lock named by the environment, say so, keep it until killed.
-#[test]
-fn child_entry() {
-    let Ok(path) = std::env::var(ROLE) else {
-        return;
-    };
-    let resource = Resource::new("project-config", PathBuf::from(path));
-    let Acquire::Acquired(held) = acquire(&resource, Mode::Ex, Wait::Ms(20_000), 2000) else {
-        panic!("child could not take the lock");
-    };
-    fs::write(std::env::var(READY).unwrap(), "held").unwrap();
-    let _keep = held;
-    loop {
-        std::thread::sleep(Duration::from_secs(3600));
-    }
-}
-
-/// A child killed and reaped when dropped.
-struct Holder(Child);
-impl Drop for Holder {
-    fn drop(&mut self) {
-        let _ = self.0.kill();
-        let _ = self.0.wait();
-    }
-}
-
-fn hold(dir: &Path) -> Holder {
-    let ready = dir.join("ready");
-    let lock = dir.join("project/.fgos/locks/project-config.lock");
-    fs::create_dir_all(lock.parent().unwrap()).unwrap();
-    let mut child = Command::new(std::env::current_exe().unwrap())
-        .args([
-            "--exact",
-            "child_entry",
-            "--nocapture",
-            "--test-threads",
-            "1",
-        ])
-        .env(ROLE, &lock)
-        .env(READY, &ready)
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .spawn()
-        .unwrap();
-    let deadline = Instant::now() + Duration::from_secs(30);
-    while !ready.exists() {
-        assert!(
-            child.try_wait().unwrap().is_none(),
-            "the holder exited early"
-        );
-        assert!(Instant::now() < deadline, "the holder never took the lock");
-        std::thread::sleep(Duration::from_millis(5));
-    }
-    Holder(child)
+fn hold(dir: &Path) -> machine_fs::Holder {
+    hold_lock(
+        dir,
+        "project-config",
+        &dir.join("project/.fgos/locks/project-config.lock"),
+    )
 }
 
 struct Fixture {

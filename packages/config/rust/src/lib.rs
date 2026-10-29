@@ -22,7 +22,6 @@ macro_rules! contract {
 
 pub mod error;
 pub mod locks;
-// Modules below are stubs; each names the phase that fills it.
 pub mod bundle;
 pub mod cache;
 pub mod detect;
@@ -35,7 +34,6 @@ pub mod scope;
 pub mod snapshot;
 pub mod standard;
 pub mod validate;
-// Slice D modules, declared here so later phases never edit this file; each stub names its phase.
 pub mod docs;
 #[cfg(unix)]
 pub mod doctor;

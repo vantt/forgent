@@ -116,7 +116,7 @@ fn a_project_snapshot_finds_the_global_directory_and_class_from_the_environment_
     let env = |confined: bool| {
         let home = home.clone();
         move |name: &str| match name {
-            "HOME" => Some(home.clone()),
+            fgos_config::machine::HOME_VAR => Some(home.clone()),
             "FGOS_CONFINED" => confined.then(|| "1".to_string()),
             _ => None,
         }
@@ -129,6 +129,12 @@ fn a_project_snapshot_finds_the_global_directory_and_class_from_the_environment_
     assert_eq!(confined.accounts, AccountsState::UnavailableConfined);
     assert!(matches!(
         fgos_config::machine::project_snapshot(&root, |_| None),
+        Err(SnapshotError::Io(_))
+    ));
+    assert!(matches!(
+        fgos_config::machine::project_snapshot(&root, |name| {
+            (name == fgos_config::machine::HOME_VAR).then(|| "  ".to_string())
+        }),
         Err(SnapshotError::Io(_))
     ));
 }

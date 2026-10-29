@@ -1680,3 +1680,149 @@ fn a_send_racing_a_hook_that_holds_the_lock_longer_than_the_hooks_skip_budget_wa
         "{refused:?}"
     );
 }
+
+/// The hook starts its detached sync child only when the project turned
+/// cross-machine mail on and the clone's last sync attempt is older than the
+/// interval. The child's own start leaves its log file beside the record.
+#[test]
+fn the_hook_starts_the_detached_sync_child_only_when_cross_machine_is_on_and_a_sync_is_due() {
+    use fgos_event_store::layout::Layout;
+    let scene = Scene::new("sync-child");
+    fs::create_dir_all(scene.mailbox_dir()).unwrap();
+    let log = scene.mailbox_dir().join("sync.log");
+    let hook = || {
+        let out = scene.run(
+            &scene.main(),
+            Some("writer"),
+            &["hook", "mailbox", "--cli", "claude", "--event", "post-tool-use"],
+            &post_tool_use(),
+        );
+        assert_eq!(out.status.code(), Some(0));
+    };
+    hook();
+    assert!(!log.exists(), "cross-machine mail is off by default: no child");
+
+    fs::write(
+        scene.main().join(".fgos/config.json"),
+        r#"{"mailbox":{"crossMachine":{"enabled":true}}}"#,
+    )
+    .unwrap();
+    let layout = Layout::from_common_dir(Some(&scene.main().join(".git"))).unwrap();
+    let recent = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    fs::create_dir_all(&layout.root).unwrap();
+    let attempt = format!(
+        r#"{{"v":1,"time":{recent},"remote":"origin","tips":{{}},"error":null,"warnings":[],"unpublishedSince":null}}"#
+    );
+    fs::write(layout.root.join("sync.json"), attempt).unwrap();
+    hook();
+    assert!(!log.exists(), "a sync attempted inside the interval is not due: no child");
+
+    fs::remove_file(layout.root.join("sync.json")).unwrap();
+    hook();
+    assert!(!log.exists(), "a project that never migrated its events has nothing to sync: no child");
+
+    fs::write(scene.main().join(".fgos/events"), "fence\n").unwrap();
+    hook();
+    assert!(log.exists(), "a due sync with cross-machine mail on starts the child");
+}
+
+/// The main checkout of `scene` as a clone of a migrated project with a
+/// remote: what the Event Store needs before anything is appended there.
+fn migrate_main(scene: &Scene, state: &Path, project_id: &str) -> fgos_event_store::layout::Layout {
+    use fgos_event_store::layout::Layout;
+    use fgos_git::{GitDriver, ResolveRepo};
+    use std::os::unix::fs::PermissionsExt;
+    let main = scene.main();
+    let remote = scene.root.join("remote.git");
+    git(&scene.root, &["init", "--bare", "-q", remote.to_str().unwrap()]);
+    git(&main, &["remote", "add", "origin", remote.to_str().unwrap()]);
+    fs::set_permissions(&main, fs::Permissions::from_mode(0o700)).unwrap();
+    fs::write(
+        main.join(".fgos/project.json"),
+        format!(r#"{{"v":1,"projectId":"{project_id}","handle":"demo","createdAt":"2026-10-24T00:00:00.000Z"}}"#),
+    )
+    .unwrap();
+    let fence = main.join(".fgos/locks/activation.lock");
+    fs::create_dir_all(&fence).unwrap();
+    fs::write(
+        fence.join("TOMBSTONE"),
+        "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
+    )
+    .unwrap();
+    fs::write(main.join(".fgos/events"), "fence\n").unwrap();
+    fs::set_permissions(state, fs::Permissions::from_mode(0o700)).unwrap();
+    let driver = GitDriver::new(state).unwrap();
+    let repo = match driver.resolve_repo(&main, &main).unwrap() {
+        ResolveRepo::Repository(repo) => repo,
+        _ => panic!("the main checkout is a repository"),
+    };
+    let layout = Layout::from_common_dir(Some(repo.common_dir())).unwrap();
+    fs::create_dir_all(layout.root.join("locks")).unwrap();
+    for dir in [layout.common_dir.join("fgos"), layout.root.join("locks")] {
+        fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    fgos_git::RepositoryConfig::ensure_fetch_mapping(
+        &driver,
+        &repo,
+        "origin",
+        &fgos_git::publication_fetch_mappings("origin").unwrap(),
+        "test-mapping-setup",
+    )
+    .unwrap();
+    layout
+}
+
+/// A head the hook registered in a project's clone reaches the shared
+/// directory only through the sync child, and only once: the entry carries
+/// the project id the hook found in the clone, the child appends one signed
+/// `identity.session-published`, and a second child appends nothing.
+#[test]
+fn the_sync_child_publishes_a_registered_head_into_the_shared_directory_once() {
+    use fgos_event_store::layout::StreamId;
+    let scene = Scene::new("publish-head");
+    let root = identity_root(&scene);
+    fgos_identity::signing::mint_key(&root).unwrap();
+    let layout = migrate_main(&scene, &root, "0123456789abcdef0123456789abcdef");
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    let own = identity_of(&root, "CLAUDE_CODE_SESSION_ID", WRITER);
+    let entry = fgos_identity::directory::list(&root, None, false, &fgos_process::facts::judge_here, None)
+        .unwrap()
+        .sessions
+        .into_iter()
+        .find(|listed| listed.id == own.id)
+        .expect("the hook registered the head");
+    assert_eq!(
+        entry.project_id.as_deref(),
+        Some("0123456789abcdef0123456789abcdef"),
+        "the entry carries the project of the clone the hook ran in"
+    );
+    // Cross-machine mail goes on only now, so the hook above started no child of its own.
+    fs::write(
+        scene.main().join(".fgos/config.json"),
+        r#"{"mailbox":{"crossMachine":{"enabled":true}}}"#,
+    )
+    .unwrap();
+
+    // The child's sync seals the stream, so the events are the sealed ones plus those still open.
+    let stream = layout.stream(&StreamId::parse("project:identity").unwrap());
+    let published = || {
+        let sealed = fgos_event_store::receipt::Receipt::read(&stream.sealed()).map_or(0, |receipt| receipt.last_seq as usize);
+        let open = fs::read_to_string(stream.active()).map_or(0, |text| text.matches("identity.session-published").count());
+        sealed + open
+    };
+    let child = || {
+        let main = scene.main();
+        let out = scene.run(&main, None, &["hook", "mailbox-sync", "--dir", main.to_str().unwrap(), "--remote", "origin"], b"");
+        assert_eq!(out.status.code(), Some(0), "{out:?}");
+        String::from_utf8_lossy(&out.stderr).into_owned()
+    };
+    assert_eq!(published(), 0, "the hook publishes nothing");
+    let said = child();
+    assert_eq!(published(), 1, "the child published the head: {said}");
+    child();
+    assert_eq!(published(), 1, "an unchanged head is not published again");
+}

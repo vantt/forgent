@@ -10,12 +10,12 @@ use std::process::Command;
 use std::time::{Duration, Instant};
 
 use common::*;
-use fgos_yaml_doc::comment::{sanitize, sanitize_inline};
+use fgos_yaml_doc::comment::sanitize;
 use fgos_yaml_doc::guard::guard;
 use fgos_yaml_doc::merge::{merge, NoRules};
 use fgos_yaml_doc::path::{format_path, parse_path};
 use fgos_yaml_doc::{
-    parse, prescan, rule, CommentLoss, Document, Position, Profile, Refusal, Segment, Value,
+    parse, prescan, rule, CommentLoss, Document, Profile, Refusal, Segment, Value,
 };
 
 const MARKER: &str = "SECRET-VALUE-7731";
@@ -90,7 +90,6 @@ use Seal::{Guarded, Total};
 /// here fails `the_table_lists_exactly_the_public_functions`.
 const SURFACE: &[(&str, Seal)] = &[
     ("comment::sanitize", Guarded),
-    ("comment::sanitize_inline", Guarded),
     ("document::parse", Guarded),
     ("document::source", Total),
     ("document::profile", Total),
@@ -101,10 +100,8 @@ const SURFACE: &[(&str, Seal)] = &[
     ("document::to_json", Guarded),
     ("edit::to_bytes", Total),
     ("edit::set", Guarded),
-    ("edit::insert", Guarded),
     ("edit::remove", Guarded),
     ("edit::set_comment_block", Guarded),
-    ("edit::set_inline_comment", Guarded),
     ("edit::comments_at", Guarded),
     ("guard::guard", Guarded),
     ("merge::merge", Guarded),
@@ -181,23 +178,102 @@ fn every_guarded_entry_goes_through_guard_and_no_total_one_does_not_need_to() {
     }
 }
 
+fn repo_root() -> std::path::PathBuf {
+    std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..")
+}
+
+/// Every Cargo manifest of the product: the workspace root and each manifest under the product
+/// directories, vendored crates and build output excluded.
+fn product_manifests() -> Vec<std::path::PathBuf> {
+    fn walk(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        let Ok(entries) = std::fs::read_dir(dir) else {
+            return;
+        };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            let name = entry.file_name().to_string_lossy().into_owned();
+            if path.is_dir() {
+                if !matches!(name.as_str(), "target" | "third-party" | "node_modules") {
+                    walk(&path, out);
+                }
+            } else if name == "Cargo.toml" {
+                out.push(path);
+            }
+        }
+    }
+    let root = repo_root();
+    let mut manifests = vec![root.join("Cargo.toml")];
+    for dir in ["apps", "packages", "tools", "herdr-dashboard"] {
+        walk(&root.join(dir), &mut manifests);
+    }
+    manifests.sort();
+    manifests
+}
+
+/// The manifests that resolve on their own and reach the parser: a manifest outside the root workspace
+/// is not covered by the root patch or the root release profile, and a member's own profile is ignored
+/// by cargo, so these are the places a panic strategy or a parser pin takes effect.
+fn parser_roots() -> Vec<(std::path::PathBuf, String)> {
+    product_manifests()
+        .into_iter()
+        .filter_map(|manifest| {
+            let dir = manifest.parent().expect("manifest directory");
+            let text = std::fs::read_to_string(&manifest).unwrap_or_default();
+            let lock = std::fs::read_to_string(dir.join("Cargo.lock")).unwrap_or_default();
+            let own_resolution =
+                text.lines().any(|l| l.trim() == "[workspace]") || !lock.is_empty();
+            let reaches = text.contains("fgos-yaml-doc") || lock.contains("saphyr-parser");
+            (own_resolution && reaches).then_some((manifest, text))
+        })
+        .collect()
+}
+
 #[test]
 fn the_release_profiles_unwind_so_the_guard_can_catch() {
-    let root = format!("{}/../../..", env!("CARGO_MANIFEST_DIR"));
-    let manifests = [
-        "Cargo.toml",
-        "apps/fgos-gateway/Cargo.toml",
-        "packages/yaml-doc/rust/Cargo.toml",
-        "packages/git/node-addon/Cargo.toml",
-    ];
-    for manifest in manifests {
-        let text = std::fs::read_to_string(format!("{root}/{manifest}")).unwrap_or_default();
+    let roots = parser_roots();
+    assert!(
+        roots.len() >= 4,
+        "found only {} resolution roots",
+        roots.len()
+    );
+    for (manifest, text) in roots {
         assert!(
             !text
                 .lines()
                 .any(|l| l.trim_start().starts_with("panic") && l.contains("abort")),
-            "{manifest} sets panic = abort: the guard would never run"
+            "{} sets panic = abort: the guard would never run",
+            manifest.display()
         );
+    }
+}
+
+#[test]
+fn every_resolution_root_pins_the_vendored_parser() {
+    let vendor = repo_root()
+        .join("packages/yaml-doc/third-party")
+        .canonicalize()
+        .expect("vendored directory");
+    for (manifest, text) in parser_roots() {
+        let dir = manifest.parent().expect("manifest directory");
+        for (name, version_dir) in [
+            ("saphyr-parser", "saphyr-parser-0.2.2"),
+            ("arraydeque", "arraydeque-0.5.1"),
+        ] {
+            let patched = text
+                .lines()
+                .find(|l| l.trim_start().starts_with(&format!("{name} = {{ path = ")))
+                .unwrap_or_else(|| panic!("{} does not patch {name}", manifest.display()));
+            let path = patched
+                .split('"')
+                .nth(1)
+                .unwrap_or_else(|| panic!("{}: unreadable patch line", manifest.display()));
+            assert_eq!(
+                dir.join(path).canonicalize().ok(),
+                Some(vendor.join(version_dir)),
+                "{} patches {name} to something other than the vendored copy",
+                manifest.display()
+            );
+        }
     }
 }
 
@@ -299,13 +375,8 @@ fn no_refusal_carries_a_value_or_a_snippet_of_the_input() {
     }
     // Text handed to the comment operations is never echoed either.
     let hostile = format!("{MARKER}\u{202e}");
-    for result in [
-        sanitize(&hostile).map(|_| ()),
-        sanitize_inline(&hostile).map(|_| ()),
-    ] {
-        assert_clean("comment", &result.unwrap_err());
-        refusals += 1;
-    }
+    assert_clean("comment", &sanitize(&hostile).unwrap_err());
+    refusals += 1;
     let bad_path = parse_path(&format!("a.{MARKER}.[")).unwrap_err();
     assert_clean("path", &bad_path);
     assert!(refusals > 200, "only {refusals} refusals were looked at");
@@ -335,23 +406,7 @@ fn edit_all(doc: &mut Document, refusals: &mut usize) {
         Value::Seq(vec![Value::Int(1)]),
         CommentLoss::Acknowledge,
     ));
-    note(doc.insert(
-        &[],
-        "added",
-        Value::Int(1),
-        Position::End,
-        CommentLoss::Refuse,
-    ));
-    note(doc.insert(
-        &[],
-        "after",
-        Value::Null,
-        Position::After("added"),
-        CommentLoss::Acknowledge,
-    ));
     note(doc.set_comment_block(&path, &["one".into(), "two\nthree".into()]));
-    note(doc.set_inline_comment(&path, Some("note")));
-    note(doc.set_inline_comment(&path, None));
     note(doc.comments_at(&path).map(|_| ()));
     note(doc.remove(&path, CommentLoss::Refuse));
     path.push(Segment::Key("deeper".into()));
@@ -404,9 +459,6 @@ fn exercise(input: &[u8]) {
         assert_clean("path", &r);
     }
     if let Err(r) = sanitize(&lossy) {
-        assert_clean("comment", &r);
-    }
-    if let Err(r) = sanitize_inline(&lossy) {
         assert_clean("comment", &r);
     }
     for profile in Profile::ALL {

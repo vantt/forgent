@@ -226,32 +226,11 @@ impl Document {
     /// `.inf`; only the `tool` profile allows them) is refused.
     pub fn to_json(&self) -> Result<serde_json::Value, Refusal> {
         guard(|| {
-            json_of(&self.value).map_err(|()| {
+            self.value.json(true).map_err(|()| {
                 Refusal::new(rule::NON_FINITE_NUMBER)
                     .with_file(&self.file)
                     .with_detail("a float with no JSON form")
             })
         })
     }
-}
-
-fn json_of(value: &Value) -> Result<serde_json::Value, ()> {
-    Ok(match value {
-        Value::Null => serde_json::Value::Null,
-        Value::Bool(b) => serde_json::Value::Bool(*b),
-        Value::Int(i) => serde_json::Value::from(*i),
-        Value::Float(f) => serde_json::Number::from_f64(*f)
-            .map(serde_json::Value::Number)
-            .ok_or(())?,
-        Value::Str(s) => serde_json::Value::String(s.clone()),
-        Value::Seq(items) => {
-            serde_json::Value::Array(items.iter().map(json_of).collect::<Result<_, _>>()?)
-        }
-        Value::Map(entries) => serde_json::Value::Object(
-            entries
-                .iter()
-                .map(|(key, value)| json_of(value).map(|json| (key.clone(), json)))
-                .collect::<Result<_, _>>()?,
-        ),
-    })
 }

@@ -25,7 +25,8 @@
   "hook": {
     "route_kind": "legacy-cli",
     "native_kinds": [
-      "mailbox"
+      "mailbox",
+      "mailbox-sync"
     ]
   },
   "identity": {
