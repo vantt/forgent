@@ -1,5 +1,9 @@
 # Settle-fault host proof on current main
 
+**Rerun:** `node scripts/event-store/settle-host-proof.mjs --host` (Linux x86_64, needs ptrace and python3).
+
+**D13 closed by lead:ES on 2026-10-29: run recorded, scripts kept.** No suite test owns the mid-write settle fault.
+
 - **Asked by:** lead:ES (`forgent-c4`), 2026-10-29: is the §23.2 candidate run that D13 waits for possible now?
 - **Run by:** lead:HARDEN (`claude-p74h@fg-server2`), 2026-10-29 10:51 (Asia/Saigon).
 - **Tree:** main checkout at `bbf4c16c0`, fg-server2, Linux x86_64, Python 3.14.4.
