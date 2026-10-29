@@ -327,8 +327,9 @@ for (const cli of ['omp', 'pi']) {
     const install = cli === 'omp' ? installOmpHook : installPiHook;
     const check = cli === 'omp' ? checkOmpHook : checkPiHook;
     const extFile = path.join(repoRoot, `.${cli}`, 'extensions', 'fgos-hooks.ts');
+    writeMailboxOptIn(repoRoot, false);
     install(repoRoot);
-    assert.ok(!fs.readFileSync(extFile, 'utf8').includes("'mailbox'"), 'not opted in: no mailbox handler');
+    assert.ok(!fs.readFileSync(extFile, 'utf8').includes("'mailbox'"), 'opted out: no mailbox handler');
     assert.equal(check(repoRoot).passed, true);
 
     writeMailboxOptIn(repoRoot, true);
@@ -616,7 +617,8 @@ test('mailbox rows install only when the project opts in, and opting out removes
   const ours = agentHookRows(repoRoot).filter((row) => row.kind === 'mailbox');
   const mailboxIn = (cli) => ours.filter((row) => row.cli === cli).filter((row) => hooksWith(readFile(repoRoot, cli), row.command).length).length;
 
-  // Absent section: no mailbox rows, and the checks do not ask for them.
+  // Opted out (the section defaults to on): no mailbox rows, and the checks do not ask for them.
+  writeMailboxOptIn(repoRoot, false);
   installClaudeHook(repoRoot);
   installCodexHook(repoRoot);
   assert.equal(mailboxIn('claude') + mailboxIn('codex'), 0);
