@@ -102,15 +102,23 @@ export function resolveLayer(layers, name, fieldPath) {
       const fullPath = `runner.patterns.${name}.${fieldPath}`;
       const shortPath = `${name}.${fieldPath}`;
       candidateOrigins = layers.filter(
-        (o) => o?.path === fullPath || o?.path?.startsWith(`${fullPath}.`) ||
-               o?.path === shortPath || o?.path?.startsWith(`${shortPath}.`)
+        (o) => o?.path === fullPath ||
+               o?.path?.startsWith(`${fullPath}.`) ||
+               o?.path?.startsWith(`${fullPath}[`) ||
+               o?.path === shortPath ||
+               o?.path?.startsWith(`${shortPath}.`) ||
+               o?.path?.startsWith(`${shortPath}[`)
       );
     }
     if (candidateOrigins.length === 0) {
       const patternPath = `runner.patterns.${name}`;
       candidateOrigins = layers.filter(
-        (o) => o?.path === patternPath || o?.path?.startsWith(`${patternPath}.`) ||
-               o?.path === name || o?.path?.startsWith(`${name}.`)
+        (o) => o?.path === patternPath ||
+               o?.path?.startsWith(`${patternPath}.`) ||
+               o?.path?.startsWith(`${patternPath}[`) ||
+               o?.path === name ||
+               o?.path?.startsWith(`${name}.`) ||
+               o?.path?.startsWith(`${name}[`)
       );
     }
     if (candidateOrigins.length === 0) return null;

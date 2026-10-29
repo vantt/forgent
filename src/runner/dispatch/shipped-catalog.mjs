@@ -1,6 +1,6 @@
 // Shipped pattern catalog and loop tuning loader.
 // Reads the bundled standard {patterns, loops} through the Config facade,
-// caches and deep-freezes it. Also provides catalogLayersOf(mainRoot) for Branch A.
+// caches and deep-freezes it. Also provides catalogLayersOf(origins, patterns).
 import { readStandardValue } from '../../config/facade.mjs';
 import { runnerOriginsOf } from './config.mjs';
 import { RESERVED_PATTERN_NAMES } from '../execution/patterns/retired-keys.mjs';
@@ -55,7 +55,7 @@ export function catalogLayersOf(originsOrConfig, patterns = {}) {
   const layers = {};
   for (const name of names) {
     const prefix = `runner.patterns.${name}`;
-    const matchingOrigins = origins.filter((o) => o?.path === prefix || o?.path?.startsWith(`${prefix}.`));
+    const matchingOrigins = origins.filter((o) => o?.path === prefix || o?.path?.startsWith(`${prefix}.`) || o?.path?.startsWith(`${prefix}[`));
 
     let layer = 'shipped';
     if (matchingOrigins.some((o) => o.layer === 'project')) {

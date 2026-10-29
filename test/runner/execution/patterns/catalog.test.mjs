@@ -2135,3 +2135,24 @@ test('a runner config with no patterns section resolves against the shipped cata
   assert.equal(resolved.loop, 'reviewed');
   assert.equal(resolved.pin.pattern.name, 'reviewed');
 });
+
+test('checkCatalog attributes indexed seat descendants to field layer rather than falling back to pattern layer', () => {
+  const shipped = shippedCatalog().patterns;
+  const effective = {
+    custom: {
+      loop: 'panel',
+      promise: 'x',
+      defaults: { seats: [{ seat: 'member', role: 'producer' }] },
+    },
+  };
+  const origins = [
+    { path: 'runner.patterns.custom.defaults.seats[0].seat', layer: 'global', line: 10 },
+    { path: 'runner.patterns.custom.defaults.seats[0].role', layer: 'global', line: 11 },
+    { path: 'runner.patterns.custom.promise', layer: 'project', line: 4 },
+  ];
+  const { problems } = checkCatalog({ shipped, effective, origins });
+  const seatProb = problems.find((p) => p.code === 'seat-multiplicity');
+  assert.ok(seatProb, 'seat-multiplicity problem expected');
+  assert.equal(seatProb.source, 'global', 'offending seats are global, source layer must be global');
+  assert.match(seatProb.message, /source layer: global/);
+});

@@ -13,6 +13,7 @@ import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { runUnit as coreRunUnit, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError, loadRunnerConfigForDir, runnerOriginsOf } from '../../../src/runner/dispatch/config.mjs';
+import { catalogLayersOf } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
 import { writeUnitSummary, buildUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
@@ -148,16 +149,23 @@ test('runUnit refuses a unit that writes in a directory that is no repository, b
   assert.equal(fs.existsSync(path.join(dir, '.fgos', 'assignments')) && fs.readdirSync(path.join(dir, '.fgos', 'assignments')).some((name) => name.startsWith('unit-run-')), false);
 });
 
-test('snapshotRunnerConfig captures hash and filtered runner config from main checkout', () => {
+test('snapshotRunnerConfig captures hash and filtered runner config from main checkout without provenance, and pin provenance derives from the same read', () => {
   const { repoRoot } = setupGitRepo();
   const loaded = loadRunnerConfigForDir(repoRoot);
-  assert.ok(runnerOriginsOf(loaded), 'loaded config must carry internal origins metadata');
+  const origins = runnerOriginsOf(loaded);
+  assert.ok(origins, 'loaded config must carry internal origins metadata');
   const snap = snapshotRunnerConfig(repoRoot, loaded);
   assert.ok(snap.hash && typeof snap.hash === 'string');
   assert.ok(snap.runner.capabilities['docs:write']);
   const serialized = JSON.stringify(snap.runner);
   assert.equal(JSON.parse(serialized).origins, undefined, 'snapshot runner must persist no provenance in serialized form');
   assert.equal(Object.keys(snap.runner).includes('origins'), false);
+
+  // Pin provenance and effective settings come from this same loaded read without a second door read
+  const layers = catalogLayersOf(origins, loaded.patterns);
+  assert.ok(layers && typeof layers === 'object');
+  assert.equal(layers.solo, 'shipped');
+  assert.deepEqual(catalogLayersOf(loaded), layers, 'catalogLayersOf directly on loaded config produces identical layer map');
 });
 
 test('runUnit runs solo read-only unit end-to-end', async () => {
@@ -186,6 +194,9 @@ test('runUnit runs solo read-only unit end-to-end', async () => {
   const record = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
   assert.equal(record.unit.id, 'u-docs-1');
   assert.equal(record.worktree, fs.realpathSync(worktreeDir));
+  assert.equal(record.collaboration?.pin?.pattern?.layer, 'shipped', 'pin pattern layer comes from one config read');
+  assert.equal(record.configSnapshot?.runner?.origins, undefined, 'config snapshot in unit.json carries no origins provenance');
+  assert.equal(JSON.stringify(record).includes('RUNNER_CONFIG_ORIGINS'), false, 'unit.json does not persist provenance symbols');
   const summary = JSON.parse(fs.readFileSync(path.join(path.dirname(unitJsonPath), 'unit-summary.json'), 'utf8'));
   assert.equal(summary.unitRunId, res.unitRunId);
   assert.equal(summary.outcome, res.outcome);

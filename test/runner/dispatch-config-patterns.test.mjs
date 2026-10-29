@@ -13,6 +13,7 @@ import {
   validateRunnerPatternsShape,
   validateRunnerLoopsShape,
   runnerOriginsOf,
+  resolveOriginLocations,
   withDefaultExecutor,
 } from '../../src/runner/dispatch/config.mjs';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
@@ -654,6 +655,7 @@ test('catalogLayersOf: field-path origin reports global when an offending field 
     });
     assert.equal(collab.pin.pattern.layer, 'project', 'pin layer must remain project');
   } finally {
+    process.env.HOME = saved.HOME;
     if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
     else delete process.env.USERPROFILE;
     fs.rmSync(home, { recursive: true, force: true });
@@ -900,4 +902,44 @@ test('resolveLayer resolves with deterministic priority project > global > shipp
   assert.equal(resolveLayer(standardOrigin, 'reviewed', 'defaults'), 'shipped');
   assert.equal(resolveLayer({ reviewed: 'standard' }, 'reviewed'), 'shipped');
   assert.equal(resolveLayer('standard', 'reviewed'), 'shipped');
+});
+
+test('validateRunnerPatternsShape retains indexed seat paths and resolves exact offending origin line', () => {
+  let thrown = null;
+  try {
+    validateRunnerPatternsShape({
+      custom: {
+        loop: 'panel',
+        promise: 'x',
+        defaults: {
+          seats: [
+            { seat: 'first', role: 'producer' },
+            { seat: 'second', role: 'bogus' },
+          ],
+        },
+      },
+    });
+  } catch (err) {
+    thrown = err;
+  }
+  assert.ok(thrown, 'must throw RunnerConfigError');
+  assert.equal(thrown.path, 'runner.patterns.custom.defaults.seats[1].role');
+  assert.deepEqual(thrown.paths, ['runner.patterns.custom.defaults.seats[1].role']);
+  assert.equal(thrown.subpath, 'patterns.custom.defaults.seats[1].role');
+
+  const origins = [
+    { path: 'runner.patterns.custom.defaults.seats[0].seat', layer: 'global', line: 9 },
+    { path: 'runner.patterns.custom.defaults.seats[1].role', layer: 'project', line: 17 },
+  ];
+  const locs = resolveOriginLocations(origins, thrown.paths, '/project');
+  assert.deepEqual(locs, ['/project/.fgos/config.yaml:17']);
+});
+
+test('resolveLayer matches bracket-indexed descendants under container before falling back to pattern', () => {
+  const origins = [
+    { path: 'runner.patterns.custom.defaults.seats[0].seat', layer: 'global', line: 10 },
+    { path: 'runner.patterns.custom.defaults.seats[0].role', layer: 'global', line: 11 },
+    { path: 'runner.patterns.custom.promise', layer: 'project', line: 4 },
+  ];
+  assert.equal(resolveLayer(origins, 'custom', 'defaults.seats'), 'global');
 });

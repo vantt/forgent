@@ -19,7 +19,10 @@
 // only apply it from a checkout you already trust.
 import { CHECKER_SEATS, SEAT_ROLES, LOOP_NAMES, checkDeclaredSeats } from '../execution/seat-resolver.mjs';
 import { paramTableOf } from '../execution/loops/index.mjs';
-import { isSeatId } from '../../convention/seat-id.mjs';
+import { isSeatId, assertSeatId, reservedSeatIds } from '../../convention/seat-id.mjs';
+
+const DECLARED_SEAT_KEYS = new Set(['seat', 'role', 'persona', 'tier']);
+const RESERVED_SEAT_IDS = Object.freeze(reservedSeatIds());
 import { definitionFileName } from '../../convention/definition-names.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
@@ -123,16 +126,21 @@ export function resolveOriginLocations(origins, paths, projectDir) {
       matched = exact;
     } else {
       // 2. Nearest available ancestor
-      const segments = targetPath.split('.');
-      for (let i = segments.length - 1; i >= 1; i--) {
-        const ancestorPath = segments.slice(0, i).join('.');
-        const ancestorOrigins = origins.filter((o) => o?.path === ancestorPath);
+      let cur = targetPath;
+      while (cur.includes('.') || cur.includes('[')) {
+        if (cur.endsWith(']')) {
+          cur = cur.slice(0, cur.lastIndexOf('['));
+        } else {
+          const dotIdx = cur.lastIndexOf('.');
+          if (dotIdx === -1) break;
+          cur = cur.slice(0, dotIdx);
+        }
+        const ancestorOrigins = origins.filter((o) => o?.path === cur);
         if (ancestorOrigins.length > 0) {
           matched = ancestorOrigins;
           break;
         }
       }
-
       // 3. Descendant origins under the failing container
       if (matched.length === 0) {
         const prefixDot = `${targetPath}.`;
@@ -1568,6 +1576,81 @@ export function validateRunnerPatternsShape(patterns, label = 'patterns', option
             subpath: `patterns.${name}.defaults.seats`,
             detail: 'must be an array.',
           });
+        }
+        if (entry.defaults.seats.length === 0) {
+          throw new RunnerConfigError(`${label}.${name}.defaults.seats must be a non-empty array of { seat, role }`, {
+            path: `${canonicalPrefix}.${name}.defaults.seats`,
+            subpath: `patterns.${name}.defaults.seats`,
+            detail: 'must be a non-empty array of { seat, role }',
+          });
+        }
+        const seen = new Set();
+        for (let idx = 0; idx < entry.defaults.seats.length; idx++) {
+          const seatEntry = entry.defaults.seats[idx];
+          const at = `${label}.${name}.defaults.seats[${idx}]`;
+          const seatPath = `${canonicalPrefix}.${name}.defaults.seats[${idx}]`;
+          const seatSubpath = `patterns.${name}.defaults.seats[${idx}]`;
+          if (!seatEntry || typeof seatEntry !== 'object' || Array.isArray(seatEntry)) {
+            throw new RunnerConfigError(`${at} must be an object { seat, role, persona?, tier? }`, {
+              path: seatPath,
+              subpath: seatSubpath,
+              detail: 'must be an object { seat, role, persona?, tier? }',
+            });
+          }
+          for (const key of Object.keys(seatEntry)) {
+            if (!DECLARED_SEAT_KEYS.has(key)) {
+              throw new RunnerConfigError(`${at} has unknown key "${key}"; a seat declares only seat, role, persona and tier`, {
+                path: `${seatPath}.${key}`,
+                subpath: `${seatSubpath}.${key}`,
+                detail: `has unknown key "${key}"; a seat declares only seat, role, persona and tier`,
+              });
+            }
+          }
+          if (RESERVED_SEAT_IDS.includes(seatEntry.seat)) {
+            throw new RunnerConfigError(`${at}.seat "${seatEntry.seat}" is a reserved seat id; reserved: [${RESERVED_SEAT_IDS.join(', ')}]`, {
+              path: `${seatPath}.seat`,
+              subpath: `${seatSubpath}.seat`,
+              detail: `"${seatEntry.seat}" is a reserved seat id; reserved: [${RESERVED_SEAT_IDS.join(', ')}]`,
+            });
+          }
+          try {
+            assertSeatId(seatEntry.seat, `${at}.seat`);
+          } catch (error) {
+            throw new RunnerConfigError(error.message, {
+              path: `${seatPath}.seat`,
+              subpath: `${seatSubpath}.seat`,
+              detail: error.message,
+            });
+          }
+          if (seen.has(seatEntry.seat)) {
+            throw new RunnerConfigError(`${at}.seat "${seatEntry.seat}" is declared twice in this unit`, {
+              path: `${seatPath}.seat`,
+              subpath: `${seatSubpath}.seat`,
+              detail: `"${seatEntry.seat}" is declared twice in this unit`,
+            });
+          }
+          seen.add(seatEntry.seat);
+          if (!SEAT_ROLES.includes(seatEntry.role)) {
+            throw new RunnerConfigError(`${at}.role must be one of [${SEAT_ROLES.join(', ')}], got ${JSON.stringify(seatEntry.role)}`, {
+              path: `${seatPath}.role`,
+              subpath: `${seatSubpath}.role`,
+              detail: `must be one of [${SEAT_ROLES.join(', ')}], got ${JSON.stringify(seatEntry.role)}`,
+            });
+          }
+          if (seatEntry.persona !== undefined && (typeof seatEntry.persona !== 'string' || !seatEntry.persona.trim())) {
+            throw new RunnerConfigError(`${at}.persona must be a non-empty string`, {
+              path: `${seatPath}.persona`,
+              subpath: `${seatSubpath}.persona`,
+              detail: 'must be a non-empty string',
+            });
+          }
+          if (seatEntry.tier !== undefined && (typeof seatEntry.tier !== 'string' || !seatEntry.tier.trim())) {
+            throw new RunnerConfigError(`${at}.tier must be a non-empty string`, {
+              path: `${seatPath}.tier`,
+              subpath: `${seatSubpath}.tier`,
+              detail: 'must be a non-empty string',
+            });
+          }
         }
         try {
           checkDeclaredSeats(entry.defaults.seats, `${label}.${name}.defaults.seats`);
