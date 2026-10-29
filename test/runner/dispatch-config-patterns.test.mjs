@@ -13,6 +13,8 @@ import {
   validateRunnerPatternsShape,
   validateRunnerLoopsShape,
   runnerOriginsOf,
+  withRunnerOrigins,
+  RUNNER_CONFIG_ORIGINS,
   resolveOriginLocations,
   withDefaultExecutor,
 } from '../../src/runner/dispatch/config.mjs';
@@ -706,14 +708,75 @@ test('loader internal metadata carries origins, is omitted from serialization, a
     assert.ok(Array.isArray(origins), 'origins must be an array');
     assert.ok(origins.some((o) => o.path.startsWith('runner.patterns')), 'origins must contain runner.patterns');
 
+    const desc = Object.getOwnPropertyDescriptor(loaded, RUNNER_CONFIG_ORIGINS);
+    assert.equal(desc?.enumerable, false, 'origins property descriptor must be non-enumerable');
+
+    assert.equal(runnerOriginsOf({ ...loaded }), null, 'spread must not carry non-enumerable origins');
+    assert.equal(runnerOriginsOf(Object.assign({}, loaded)), null, 'Object.assign must not carry non-enumerable origins');
+
     const json = JSON.stringify(loaded);
     assert.equal(JSON.parse(json).origins, undefined, 'origins symbol must not appear in JSON serialization');
     assert.equal(Object.keys(loaded).includes('origins'), false);
 
+    // withDefaultExecutor preserves with executor
     const withDefault = withDefaultExecutor(loaded);
-    assert.equal(runnerOriginsOf(withDefault), origins, 'origins metadata must survive withDefaultExecutor shallow copy');
+    assert.equal(runnerOriginsOf(withDefault), origins, 'origins metadata must survive withDefaultExecutor shallow copy with executor');
+
+    // withDefaultExecutor preserves without executor
+    const loadedWithoutExec = { ...loaded };
+    delete loadedWithoutExec.executor;
+    withRunnerOrigins(loadedWithoutExec, origins);
+    const withDefaultNoExec = withDefaultExecutor(loadedWithoutExec);
+    assert.equal(runnerOriginsOf(withDefaultNoExec), origins, 'origins metadata must survive withDefaultExecutor shallow copy without executor');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('bad seat id in global file names only the origin file and line', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-global-bad-seat-home-'));
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-global-bad-seat-repo-'));
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+
+  writeGlobalConfig(home, {
+    runner: {
+      patterns: {
+        custom: {
+          loop: 'panel',
+          defaults: {
+            seats: [
+              { seat: 'Bad Id!', role: 'producer' },
+            ],
+          },
+        },
+      },
+    },
+  });
+  writeProjectConfig(repo, {
+    runner: {},
+  });
+
+  try {
+    assert.throws(
+      () => loadRunnerConfigForDir(repo),
+      (err) => {
+        assert.ok(err instanceof RunnerConfigError);
+        assert.match(err.message, /~[/\\]\.fgos[/\\]config\.yaml:\d+/);
+        assert.match(err.message, /patterns\.custom\.defaults\.seats\[0\]\.seat/);
+        assert.match(err.message, /"Bad Id!" must be 1-\d+ characters/);
+        const repoFgos = path.join(repo, '.fgos');
+        assert.equal(err.message.includes(repoFgos), false, 'message must not re-embed project label');
+        return true;
+      },
+    );
+  } finally {
+    process.env.HOME = saved.HOME;
+    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
+    else delete process.env.USERPROFILE;
+    fs.rmSync(home, { recursive: true, force: true });
+    fs.rmSync(repo, { recursive: true, force: true });
   }
 });
 

@@ -83,11 +83,11 @@ import {
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
-import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError, resolveOriginLocations } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
 import { shippedCatalog, catalogLayersOf } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
-import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES } from '../runner/execution/patterns/retired-keys.mjs';
+import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH } from '../runner/execution/patterns/retired-keys.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
@@ -529,16 +529,8 @@ export function checkRunnerPatternsConfig(cwd, run) {
   try {
     validateRunnerLoopsShape(effectiveLoops, 'runner.loops');
   } catch (err) {
-    if (err instanceof RunnerConfigError && (err.paths?.length || err.path)) {
-      const paths = err.paths ?? [err.path];
-      const locations = resolveOriginLocations(cfg?.origins ?? [], paths, cwd);
-      if (locations.length > 0) {
-        const subpath = err.subpath ? ` ${err.subpath}` : '';
-        const msg = `runner config (${locations.join(', ')}${subpath}) ${err.detail ?? err.message}`;
-        return { passed: false, message: msg };
-      }
-    }
-    return { passed: false, message: err.message };
+    const attributed = attributeRunnerConfigError(err, cfg?.origins ?? [], cwd);
+    return { passed: false, message: attributed ? attributed.message : err.message };
   }
 
   const shipped = shippedCatalog();
@@ -561,10 +553,10 @@ export function checkRunnerPatternsConfig(cwd, run) {
   // Warn if project defines runner.loops.* but marker runner.patterns.seatBinding.schema is below 2 or absent
   const hasProjectLoops = (cfg?.origins ?? []).some((o) => o.layer === 'project' && o.path.startsWith('runner.loops'));
   if (hasProjectLoops) {
-    const markerOrigin = (cfg?.origins ?? []).find((o) => o.path === 'runner.patterns.seatBinding.schema' && o.layer === 'project');
+    const markerOrigin = (cfg?.origins ?? []).find((o) => o.path === SEAT_BINDING_MARKER_PATH && o.layer === 'project');
     const markerValue = markerOrigin ? cfg?.value?.runner?.patterns?.seatBinding?.schema : undefined;
     if (!markerOrigin || typeof markerValue !== 'number' || markerValue < 2) {
-      warnings.push('set `runner.patterns.seatBinding.schema` to 2 so older releases refuse this file');
+      warnings.push(`set \`${SEAT_BINDING_MARKER_PATH}\` to 2 so older releases refuse this file`);
     }
   }
   // 1. Warnings: defaults beyond bounds
@@ -619,7 +611,7 @@ export function checkRunnerPatternsConfig(cwd, run) {
         o.path.startsWith('runner.loops.') ||
         (o.path.startsWith('runner.patterns.') &&
           !RESERVED_PATTERN_NAMES.has(o.path.slice('runner.patterns.'.length)) &&
-          o.path !== 'runner.patterns.seatBinding.schema')
+          o.path !== SEAT_BINDING_MARKER_PATH)
       )
     );
     if (hasGlobal) {

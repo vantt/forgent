@@ -9,7 +9,7 @@ import {
   LOOP_NAMES,
 } from '../seat-resolver.mjs';
 import { paramTableOf } from '../loops/index.mjs';
-import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES } from './retired-keys.mjs';
+import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, RETIRED_GATED_NAME } from './retired-keys.mjs';
 
 /**
  * Collaboration error carrying a standard refusal code and optional source layer.
@@ -489,7 +489,7 @@ export function checkCatalog(options = {}) {
   for (const n of RESERVED_PATTERN_NAMES) {
     allNames.delete(n);
   }
-  allNames.delete('research-fan-out-gated');
+  allNames.delete(RETIRED_GATED_NAME);
 
   const mergedEntries = Object.create(null);
 

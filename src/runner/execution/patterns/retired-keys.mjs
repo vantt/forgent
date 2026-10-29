@@ -3,6 +3,8 @@
 
 export const RETIRED_GATED_NAME = 'research-fan-out-gated';
 export const RESERVED_PATTERN_NAMES = Object.freeze(new Set(['seatBinding', 'defaultRule']));
+export const SEAT_BINDING_MARKER_PATH = 'runner.patterns.seatBinding.schema';
+export const MARKER_PATH = SEAT_BINDING_MARKER_PATH;
 
 
 /**

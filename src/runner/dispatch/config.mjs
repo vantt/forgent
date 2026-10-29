@@ -17,11 +17,9 @@
 // committed (per D2's durability policy) so it is reviewable like any other
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
-import { CHECKER_SEATS, SEAT_ROLES, LOOP_NAMES, RESERVED_SEAT_IDS, checkDeclaredSeats } from '../execution/seat-resolver.mjs';
+import { CHECKER_SEATS, SEAT_ROLES, LOOP_NAMES, RESERVED_SEAT_IDS, checkDeclaredSeats, SeatResolutionError } from '../execution/seat-resolver.mjs';
 import { paramTableOf } from '../execution/loops/index.mjs';
-import { isSeatId, assertSeatId } from '../../convention/seat-id.mjs';
-
-const DECLARED_SEAT_KEYS = new Set(['seat', 'role', 'persona', 'tier']);
+import { isSeatId } from '../../convention/seat-id.mjs';
 import { definitionFileName } from '../../convention/definition-names.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { canonicalizeWriteEntry } from './write-scope.mjs';
@@ -36,7 +34,7 @@ import { validateProviderAccountInventory } from './provider-capacity.mjs';
 // can validate adapter names without importing transport.mjs (cutting the
 // prior config.mjs <-> transport.mjs import cycle).
 import { EXECUTOR_ADAPTERS } from './adapters.mjs';
-import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES } from '../execution/patterns/retired-keys.mjs';
+import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH } from '../execution/patterns/retired-keys.mjs';
 import { credentialStoreProblem } from './provider-capacity.mjs';
 import {
   BUILTIN_POLICIES,
@@ -77,9 +75,13 @@ export {
  * `command`/`args` come from the default; when it runs another program, the
  * entry's invocations describe a different CLI and the default replaces it. */
 export function withDefaultExecutor(rawCfg) {
+  const origins = runnerOriginsOf(rawCfg);
   const cfg = { ...rawCfg };
-  const defaultExec = rawCfg.executor;
-  if (!defaultExec) return cfg;
+  const defaultExec = rawCfg?.executor;
+  if (!defaultExec) {
+    if (origins) withRunnerOrigins(cfg, origins);
+    return cfg;
+  }
   const executors = { ...(rawCfg.executors || {}) };
   const ids = new Set(['claude', ...(defaultExec.command ? [defaultExec.command] : [])]);
   const program = defaultExec.command ? path.basename(String(defaultExec.command)) : null;
@@ -88,6 +90,7 @@ export function withDefaultExecutor(rawCfg) {
   }
   cfg.executor = { ...defaultExec };
   cfg.executors = executors;
+  if (origins) withRunnerOrigins(cfg, origins);
   return cfg;
 }
 
@@ -109,6 +112,18 @@ export const RUNNER_CONFIG_ORIGINS = Symbol.for('fgos.runner.origins');
 
 export function runnerOriginsOf(cfg) {
   return cfg?.[RUNNER_CONFIG_ORIGINS] ?? null;
+}
+
+export function withRunnerOrigins(cfg, origins) {
+  if (cfg && origins) {
+    Object.defineProperty(cfg, RUNNER_CONFIG_ORIGINS, {
+      value: Object.isFrozen(origins) ? origins : Object.freeze([...origins]),
+      writable: false,
+      enumerable: false,
+      configurable: true,
+    });
+  }
+  return cfg;
 }
 
 export function resolveOriginLocations(origins, paths, projectDir) {
@@ -179,6 +194,33 @@ export function resolveOriginLocations(origins, paths, projectDir) {
   return locations;
 }
 
+export function commonDottedParent(paths) {
+  if (!Array.isArray(paths) || paths.length === 0) return '';
+  if (paths.length === 1) return paths[0];
+  const split = paths.map((p) => p.split('.'));
+  const first = split[0];
+  const common = [];
+  for (let i = 0; i < first.length; i++) {
+    const seg = first[i];
+    if (split.every((p) => p[i] === seg)) {
+      common.push(seg);
+    } else {
+      break;
+    }
+  }
+  return common.join('.');
+}
+
+export function deriveSubpath(paths, path) {
+  const allPaths = paths?.length ? paths : (path ? [path] : []);
+  if (allPaths.length === 0) return undefined;
+  if (allPaths.length === 1) {
+    return allPaths[0].replace(/^runner\./, '');
+  }
+  const common = commonDottedParent(allPaths);
+  return common.replace(/^runner\./, '') || undefined;
+}
+
 export class RunnerConfigError extends Error {
   constructor(message, { code, phase, path, paths, subpath, detail } = {}) {
     super(message);
@@ -189,9 +231,61 @@ export class RunnerConfigError extends Error {
     if (path !== undefined) this.path = path;
     if (paths !== undefined) this.paths = paths;
     else if (path !== undefined) this.paths = [path];
-    if (subpath !== undefined) this.subpath = subpath;
+    if (subpath !== undefined) this._subpath = subpath;
     if (detail !== undefined) this.detail = detail;
   }
+
+  get subpath() {
+    if (this._subpath !== undefined) return this._subpath;
+    return deriveSubpath(this.paths, this.path);
+  }
+
+  set subpath(v) {
+    this._subpath = v;
+  }
+}
+
+export function attributeRunnerConfigError(err, origins, projectDir) {
+  if (err instanceof RunnerConfigError && (err.paths?.length || err.path)) {
+    const paths = err.paths ?? [err.path];
+    const locations = resolveOriginLocations(origins, paths, projectDir);
+    if (locations.length > 0) {
+      const subpath = err.subpath ? ` ${err.subpath}` : '';
+      const msg = `runner config (${locations.join(', ')}${subpath}) ${err.detail ?? err.message}`;
+      return new RunnerConfigError(msg, {
+        code: err.code,
+        phase: err.phase,
+        path: err.path,
+        paths: err.paths,
+        detail: err.detail,
+      });
+    }
+  }
+  return null;
+}
+
+function makeFail(label, canonicalPrefix) {
+  return function fail(relPath, detail, options = {}) {
+    let msgLabel;
+    let paths;
+    let path;
+    if (Array.isArray(relPath)) {
+      const parent = commonDottedParent(relPath);
+      msgLabel = parent ? `${label}.${parent}` : label;
+      paths = relPath.map((r) => (r ? `${canonicalPrefix}.${r}` : canonicalPrefix));
+    } else {
+      msgLabel = relPath ? `${label}.${relPath}` : label;
+      path = relPath ? `${canonicalPrefix}.${relPath}` : canonicalPrefix;
+      paths = [path];
+    }
+    const message = `runner config (${msgLabel}) ${detail}`;
+    throw new RunnerConfigError(message, {
+      code: options.code,
+      path,
+      paths: options.paths ?? paths,
+      detail,
+    });
+  };
 }
 
 /**
@@ -346,28 +440,11 @@ export function loadRunnerConfigForDir(dir) {
   try {
     validateRunnerConfigShape(cfg, `${path.join(dir, '.fgos')} runner`);
   } catch (err) {
-    if (err instanceof RunnerConfigError && (err.paths?.length || err.path)) {
-      const paths = err.paths ?? [err.path];
-      const locations = resolveOriginLocations(origins, paths, dir);
-      if (locations.length > 0) {
-        const subpath = err.subpath ? ` ${err.subpath}` : '';
-        const msg = `runner config (${locations.join(', ')}${subpath}) ${err.detail ?? err.message}`;
-        throw new RunnerConfigError(msg, {
-          code: err.code,
-          phase: err.phase,
-          path: err.path,
-          paths: err.paths,
-        });
-      }
-    }
+    const attributed = attributeRunnerConfigError(err, origins, dir);
+    if (attributed) throw attributed;
     throw err;
   }
-  Object.defineProperty(cfg, RUNNER_CONFIG_ORIGINS, {
-    value: Object.freeze(origins),
-    writable: false,
-    enumerable: true,
-    configurable: true,
-  });
+  withRunnerOrigins(cfg, origins);
   return normalizeConfigConfinement(cfg);
 }
 
@@ -1408,43 +1485,46 @@ export { CHECKER_SEATS };
 
 export const VALID_CHECKER_SEATS = Object.freeze(new Set(Object.keys(CHECKER_SEATS)));
 
+const LOOP_TUNING_KEYS = Object.freeze({
+  reviewed: Object.freeze(['maxRounds', 'checkersByRigor', 'bounds']),
+});
+
+const ALLOWED_DEFAULT_KEYS = Object.freeze(
+  Array.from(
+    new Set(LOOP_NAMES.flatMap((name) => Object.keys(paramTableOf(name) ?? {}))),
+  ),
+);
+
+function boundedParamsForLoop(loopName) {
+  const table = paramTableOf(loopName);
+  if (!table) return [];
+  return Object.entries(table)
+    .filter(([_, meta]) => meta.type === 'integer')
+    .map(([param]) => param);
+}
+
 export function validateRunnerPatternsShape(patterns, label = 'patterns', options = {}) {
   const canonicalPrefix = options.canonicalPrefix ?? 'runner.patterns';
+  const fail = makeFail(label, canonicalPrefix);
   if (!patterns || typeof patterns !== 'object' || Array.isArray(patterns)) {
-    throw new RunnerConfigError(`runner config (${label}) must be an object when present.`, {
-      path: canonicalPrefix,
-      subpath: 'patterns',
-      detail: 'must be an object when present.',
-    });
+    fail('', 'must be an object when present.');
   }
 
   // Schema marker
   if (patterns.seatBinding !== undefined) {
     const marker = patterns.seatBinding;
     if (!marker || typeof marker !== 'object' || Array.isArray(marker)) {
-      throw new RunnerConfigError(`runner config (${label}.seatBinding) must be an object {schema: ${SEAT_BINDING_SCHEMA_VERSION}}.`, {
-        path: `${canonicalPrefix}.seatBinding`,
-        subpath: 'patterns.seatBinding',
-        detail: `must be an object {schema: ${SEAT_BINDING_SCHEMA_VERSION}}.`,
-      });
+      fail('seatBinding', `must be an object {schema: ${SEAT_BINDING_SCHEMA_VERSION}}.`);
     }
     for (const key of Object.keys(marker)) {
       if (key !== 'schema') {
-        throw new RunnerConfigError(`runner config (${label}.seatBinding) contains unknown key "${key}". Allowed keys: schema.`, {
-          path: `${canonicalPrefix}.seatBinding.${key}`,
-          subpath: `patterns.seatBinding.${key}`,
-          detail: `contains unknown key "${key}". Allowed keys: schema.`,
-        });
+        fail(`seatBinding.${key}`, `contains unknown key "${key}". Allowed keys: schema.`);
       }
     }
     if (!READABLE_SEAT_BINDING_SCHEMA_VERSIONS.has(marker.schema)) {
-      throw new RunnerConfigError(
-        `runner config (${label}.seatBinding.schema) must be one of [${Array.from(READABLE_SEAT_BINDING_SCHEMA_VERSIONS).join(', ')}], got: ${JSON.stringify(marker.schema)}.`,
-        {
-          path: `${canonicalPrefix}.seatBinding.schema`,
-          subpath: 'patterns.seatBinding.schema',
-          detail: `must be one of [${Array.from(READABLE_SEAT_BINDING_SCHEMA_VERSIONS).join(', ')}], got: ${JSON.stringify(marker.schema)}.`,
-        }
+      fail(
+        'seatBinding.schema',
+        `must be one of [${Array.from(READABLE_SEAT_BINDING_SCHEMA_VERSIONS).join(', ')}], got: ${JSON.stringify(marker.schema)}.`,
       );
     }
   }
@@ -1466,7 +1546,6 @@ export function validateRunnerPatternsShape(patterns, label = 'patterns', option
       {
         code: 'config-key-retired',
         paths: retiredFindings.map((f) => f.key),
-        subpath: 'patterns',
         detail: messages.join('\n'),
       },
     );
@@ -1476,261 +1555,100 @@ export function validateRunnerPatternsShape(patterns, label = 'patterns', option
     if (name === 'seatBinding') continue;
 
     if (RESERVED_PATTERN_NAMES.has(name)) {
-      throw new RunnerConfigError(`runner config (${label}.${name}) uses reserved name "${name}" as a pattern name.`, {
-        path: `${canonicalPrefix}.${name}`,
-        subpath: `patterns.${name}`,
-        detail: `uses reserved name "${name}" as a pattern name.`,
-      });
+      fail(name, `uses reserved name "${name}" as a pattern name.`);
     }
 
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-      throw new RunnerConfigError(`runner config (${label}.${name}) must be an object.`, {
-        path: `${canonicalPrefix}.${name}`,
-        subpath: `patterns.${name}`,
-        detail: 'must be an object.',
-      });
+      fail(name, 'must be an object.');
     }
 
     const ALLOWED_ENTRY_KEYS = ['promise', 'loop', 'defaults', 'invariants'];
     for (const key of Object.keys(entry)) {
       if (!ALLOWED_ENTRY_KEYS.includes(key)) {
-        throw new RunnerConfigError(
-          `runner config (${label}.${name}) contains unknown key "${key}". Allowed keys: ${ALLOWED_ENTRY_KEYS.join(', ')}.`,
-          {
-            path: `${canonicalPrefix}.${name}.${key}`,
-            subpath: `patterns.${name}.${key}`,
-            detail: `contains unknown key "${key}". Allowed keys: ${ALLOWED_ENTRY_KEYS.join(', ')}.`,
-          }
-        );
+        fail(`${name}.${key}`, `contains unknown key "${key}". Allowed keys: ${ALLOWED_ENTRY_KEYS.join(', ')}.`);
       }
     }
 
     if (entry.promise !== undefined && (typeof entry.promise !== 'string' || !entry.promise.trim())) {
-      throw new RunnerConfigError(`runner config (${label}.${name}.promise) must be a non-empty string when present.`, {
-        path: `${canonicalPrefix}.${name}.promise`,
-        subpath: `patterns.${name}.promise`,
-        detail: 'must be a non-empty string when present.',
-      });
+      fail(`${name}.promise`, 'must be a non-empty string when present.');
     }
 
     if (entry.loop !== undefined) {
       if (!LOOP_NAMES.includes(entry.loop)) {
-        throw new RunnerConfigError(
-          `runner config (${label}.${name}.loop) must be one of ${LOOP_NAMES.join('/')}, got: ${JSON.stringify(entry.loop)}.`,
-          {
-            path: `${canonicalPrefix}.${name}.loop`,
-            subpath: `patterns.${name}.loop`,
-            detail: `must be one of ${LOOP_NAMES.join('/')}, got: ${JSON.stringify(entry.loop)}.`,
-          }
-        );
+        fail(`${name}.loop`, `must be one of ${LOOP_NAMES.join('/')}, got: ${JSON.stringify(entry.loop)}.`);
       }
     }
 
     if (entry.defaults !== undefined) {
       if (!entry.defaults || typeof entry.defaults !== 'object' || Array.isArray(entry.defaults)) {
-        throw new RunnerConfigError(`runner config (${label}.${name}.defaults) must be an object when present.`, {
-          path: `${canonicalPrefix}.${name}.defaults`,
-          subpath: `patterns.${name}.defaults`,
-          detail: 'must be an object when present.',
-        });
+        fail(`${name}.defaults`, 'must be an object when present.');
       }
-      const ALLOWED_DEFAULT_KEYS = ['maxRounds', 'minCheckers', 'seats', 'roleTasks', 'rebuttal'];
       for (const dKey of Object.keys(entry.defaults)) {
         if (!ALLOWED_DEFAULT_KEYS.includes(dKey)) {
-          throw new RunnerConfigError(
-            `runner config (${label}.${name}.defaults) contains unknown key "${dKey}". Allowed keys: ${ALLOWED_DEFAULT_KEYS.join(', ')}.`,
-            {
-              path: `${canonicalPrefix}.${name}.defaults.${dKey}`,
-              subpath: `patterns.${name}.defaults.${dKey}`,
-              detail: `contains unknown key "${dKey}". Allowed keys: ${ALLOWED_DEFAULT_KEYS.join(', ')}.`,
-            }
-          );
+          fail(`${name}.defaults.${dKey}`, `contains unknown key "${dKey}". Allowed keys: ${ALLOWED_DEFAULT_KEYS.join(', ')}.`);
         }
       }
       if (entry.defaults.maxRounds !== undefined) {
         if (!Number.isInteger(entry.defaults.maxRounds) || entry.defaults.maxRounds <= 0) {
-          throw new RunnerConfigError(`runner config (${label}.${name}.defaults.maxRounds) must be a positive integer.`, {
-            path: `${canonicalPrefix}.${name}.defaults.maxRounds`,
-            subpath: `patterns.${name}.defaults.maxRounds`,
-            detail: 'must be a positive integer.',
-          });
+          fail(`${name}.defaults.maxRounds`, 'must be a positive integer.');
         }
       }
       if (entry.defaults.minCheckers !== undefined) {
         if (!Array.isArray(entry.defaults.minCheckers) || !entry.defaults.minCheckers.every((c) => VALID_CHECKER_SEATS.has(c))) {
-          throw new RunnerConfigError(
-            `runner config (${label}.${name}.defaults.minCheckers) must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`,
-            {
-              path: `${canonicalPrefix}.${name}.defaults.minCheckers`,
-              subpath: `patterns.${name}.defaults.minCheckers`,
-              detail: `must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`,
-            }
-          );
+          fail(`${name}.defaults.minCheckers`, `must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`);
         }
       }
       if (entry.defaults.seats !== undefined) {
         if (!Array.isArray(entry.defaults.seats)) {
-          throw new RunnerConfigError(`runner config (${label}.${name}.defaults.seats) must be an array.`, {
-            path: `${canonicalPrefix}.${name}.defaults.seats`,
-            subpath: `patterns.${name}.defaults.seats`,
-            detail: 'must be an array.',
-          });
-        }
-        if (entry.defaults.seats.length === 0) {
-          throw new RunnerConfigError(`${label}.${name}.defaults.seats must be a non-empty array of { seat, role }`, {
-            path: `${canonicalPrefix}.${name}.defaults.seats`,
-            subpath: `patterns.${name}.defaults.seats`,
-            detail: 'must be a non-empty array of { seat, role }',
-          });
-        }
-        const seen = new Set();
-        for (let idx = 0; idx < entry.defaults.seats.length; idx++) {
-          const seatEntry = entry.defaults.seats[idx];
-          const at = `${label}.${name}.defaults.seats[${idx}]`;
-          const seatPath = `${canonicalPrefix}.${name}.defaults.seats[${idx}]`;
-          const seatSubpath = `patterns.${name}.defaults.seats[${idx}]`;
-          if (!seatEntry || typeof seatEntry !== 'object' || Array.isArray(seatEntry)) {
-            throw new RunnerConfigError(`${at} must be an object { seat, role, persona?, tier? }`, {
-              path: seatPath,
-              subpath: seatSubpath,
-              detail: 'must be an object { seat, role, persona?, tier? }',
-            });
-          }
-          for (const key of Object.keys(seatEntry)) {
-            if (!DECLARED_SEAT_KEYS.has(key)) {
-              throw new RunnerConfigError(`${at} has unknown key "${key}"; a seat declares only seat, role, persona and tier`, {
-                path: `${seatPath}.${key}`,
-                subpath: `${seatSubpath}.${key}`,
-                detail: `has unknown key "${key}"; a seat declares only seat, role, persona and tier`,
-              });
-            }
-          }
-          if (RESERVED_SEAT_IDS.includes(seatEntry.seat)) {
-            throw new RunnerConfigError(`${at}.seat "${seatEntry.seat}" is a reserved seat id; reserved: [${RESERVED_SEAT_IDS.join(', ')}]`, {
-              path: `${seatPath}.seat`,
-              subpath: `${seatSubpath}.seat`,
-              detail: `"${seatEntry.seat}" is a reserved seat id; reserved: [${RESERVED_SEAT_IDS.join(', ')}]`,
-            });
-          }
-          try {
-            assertSeatId(seatEntry.seat, `${at}.seat`);
-          } catch (error) {
-            throw new RunnerConfigError(error.message, {
-              path: `${seatPath}.seat`,
-              subpath: `${seatSubpath}.seat`,
-              detail: error.message,
-            });
-          }
-          if (seen.has(seatEntry.seat)) {
-            throw new RunnerConfigError(`${at}.seat "${seatEntry.seat}" is declared twice in this unit`, {
-              path: `${seatPath}.seat`,
-              subpath: `${seatSubpath}.seat`,
-              detail: `"${seatEntry.seat}" is declared twice in this unit`,
-            });
-          }
-          seen.add(seatEntry.seat);
-          if (!SEAT_ROLES.includes(seatEntry.role)) {
-            throw new RunnerConfigError(`${at}.role must be one of [${SEAT_ROLES.join(', ')}], got ${JSON.stringify(seatEntry.role)}`, {
-              path: `${seatPath}.role`,
-              subpath: `${seatSubpath}.role`,
-              detail: `must be one of [${SEAT_ROLES.join(', ')}], got ${JSON.stringify(seatEntry.role)}`,
-            });
-          }
-          if (seatEntry.persona !== undefined && (typeof seatEntry.persona !== 'string' || !seatEntry.persona.trim())) {
-            throw new RunnerConfigError(`${at}.persona must be a non-empty string`, {
-              path: `${seatPath}.persona`,
-              subpath: `${seatSubpath}.persona`,
-              detail: 'must be a non-empty string',
-            });
-          }
-          if (seatEntry.tier !== undefined && (typeof seatEntry.tier !== 'string' || !seatEntry.tier.trim())) {
-            throw new RunnerConfigError(`${at}.tier must be a non-empty string`, {
-              path: `${seatPath}.tier`,
-              subpath: `${seatSubpath}.tier`,
-              detail: 'must be a non-empty string',
-            });
-          }
+          fail(`${name}.defaults.seats`, 'must be an array.');
         }
         try {
           checkDeclaredSeats(entry.defaults.seats, `${label}.${name}.defaults.seats`);
         } catch (err) {
-          throw new RunnerConfigError(err.message, {
-            path: `${canonicalPrefix}.${name}.defaults.seats`,
-            subpath: `patterns.${name}.defaults.seats`,
-            detail: err.message,
-          });
+          if (err instanceof SeatResolutionError) {
+            fail(`${name}.defaults.seats${err.at ?? ''}`, err.detail ?? err.message, { code: err.code });
+          }
+          throw err;
         }
       }
       if (entry.defaults.roleTasks !== undefined) {
         if (!entry.defaults.roleTasks || typeof entry.defaults.roleTasks !== 'object' || Array.isArray(entry.defaults.roleTasks)) {
-          throw new RunnerConfigError(`runner config (${label}.${name}.defaults.roleTasks) must be an object.`, {
-            path: `${canonicalPrefix}.${name}.defaults.roleTasks`,
-            subpath: `patterns.${name}.defaults.roleTasks`,
-            detail: 'must be an object.',
-          });
+          fail(`${name}.defaults.roleTasks`, 'must be an object.');
         }
         for (const [k, v] of Object.entries(entry.defaults.roleTasks)) {
           if (typeof v !== 'string' || !v.trim()) {
-            throw new RunnerConfigError(`runner config (${label}.${name}.defaults.roleTasks.${k}) must be a non-empty string.`, {
-              path: `${canonicalPrefix}.${name}.defaults.roleTasks.${k}`,
-              subpath: `patterns.${name}.defaults.roleTasks.${k}`,
-              detail: `must be a non-empty string.`,
-            });
+            fail(`${name}.defaults.roleTasks.${k}`, 'must be a non-empty string.');
           }
         }
       }
       if (entry.defaults.rebuttal !== undefined && typeof entry.defaults.rebuttal !== 'boolean') {
-        throw new RunnerConfigError(`runner config (${label}.${name}.defaults.rebuttal) must be a boolean.`, {
-          path: `${canonicalPrefix}.${name}.defaults.rebuttal`,
-          subpath: `patterns.${name}.defaults.rebuttal`,
-          detail: 'must be a boolean.',
-        });
+        fail(`${name}.defaults.rebuttal`, 'must be a boolean.');
       }
     }
 
     if (entry.invariants !== undefined) {
       if (!entry.invariants || typeof entry.invariants !== 'object' || Array.isArray(entry.invariants)) {
-        throw new RunnerConfigError(`runner config (${label}.${name}.invariants) must be an object when present.`, {
-          path: `${canonicalPrefix}.${name}.invariants`,
-          subpath: `patterns.${name}.invariants`,
-          detail: 'must be an object when present.',
-        });
+        fail(`${name}.invariants`, 'must be an object when present.');
       }
       for (const [param, inv] of Object.entries(entry.invariants)) {
-        const invLabel = `${label}.${name}.invariants.${param}`;
+        const invRel = `${name}.invariants.${param}`;
         if (!inv || typeof inv !== 'object' || Array.isArray(inv)) {
-          throw new RunnerConfigError(`runner config (${invLabel}) must be an object.`, {
-            path: `${canonicalPrefix}.${name}.invariants.${param}`,
-            subpath: `patterns.${name}.invariants.${param}`,
-            detail: 'must be an object.',
-          });
+          fail(invRel, 'must be an object.');
         }
         const hasAtLeast = inv.atLeast !== undefined;
         const hasFixed = inv.fixed !== undefined;
         if ((hasAtLeast && hasFixed) || (!hasAtLeast && !hasFixed)) {
-          throw new RunnerConfigError(`runner config (${invLabel}) must declare exactly one of "atLeast" or "fixed".`, {
-            path: `${canonicalPrefix}.${name}.invariants.${param}`,
-            subpath: `patterns.${name}.invariants.${param}`,
-            detail: 'must declare exactly one of "atLeast" or "fixed".',
-          });
+          fail(invRel, 'must declare exactly one of "atLeast" or "fixed".');
         }
         const ALLOWED_INV_KEYS = ['atLeast', 'fixed'];
         for (const k of Object.keys(inv)) {
           if (!ALLOWED_INV_KEYS.includes(k)) {
-            throw new RunnerConfigError(`runner config (${invLabel}) contains unknown key "${k}". Allowed keys: atLeast, fixed.`, {
-              path: `${canonicalPrefix}.${name}.invariants.${param}.${k}`,
-              subpath: `patterns.${name}.invariants.${param}.${k}`,
-              detail: `contains unknown key "${k}". Allowed keys: atLeast, fixed.`,
-            });
+            fail(`${invRel}.${k}`, `contains unknown key "${k}". Allowed keys: atLeast, fixed.`);
           }
         }
         if (hasAtLeast) {
           if (!Array.isArray(inv.atLeast) || !inv.atLeast.every((item) => typeof item === 'string' && item.trim())) {
-            throw new RunnerConfigError(`runner config (${invLabel}.atLeast) must be an array of non-empty strings.`, {
-              path: `${canonicalPrefix}.${name}.invariants.${param}.atLeast`,
-              subpath: `patterns.${name}.invariants.${param}.atLeast`,
-              detail: 'must be an array of non-empty strings.',
-            });
+            fail(`${invRel}.atLeast`, 'must be an array of non-empty strings.');
           }
         }
       }
@@ -1738,58 +1656,25 @@ export function validateRunnerPatternsShape(patterns, label = 'patterns', option
   }
 }
 
-export const LOOP_TUNING_KEYS = Object.freeze({
-  reviewed: Object.freeze(['maxRounds', 'checkersByRigor', 'bounds']),
-});
-
-function boundedParamsForLoop(loopName) {
-  const table = paramTableOf(loopName);
-  if (!table) return [];
-  return Object.entries(table)
-    .filter(([_, meta]) => meta.type === 'integer')
-    .map(([param]) => param);
-}
-
 export function validateRunnerLoopsShape(loops, label = 'loops', options = {}) {
   const canonicalPrefix = options.canonicalPrefix ?? 'runner.loops';
+  const fail = makeFail(label, canonicalPrefix);
   if (!loops || typeof loops !== 'object' || Array.isArray(loops)) {
-    throw new RunnerConfigError(`runner config (${label}) must be an object when present.`, {
-      path: canonicalPrefix,
-      subpath: 'loops',
-      detail: 'must be an object when present.',
-    });
+    fail('', 'must be an object when present.');
   }
 
   for (const [loopName, loopEntry] of Object.entries(loops)) {
     if (!LOOP_NAMES.includes(loopName)) {
-      throw new RunnerConfigError(
-        `runner config (${label}) contains unknown loop "${loopName}". Allowed loops: ${LOOP_NAMES.join(', ')}.`,
-        {
-          path: `${canonicalPrefix}.${loopName}`,
-          subpath: `loops.${loopName}`,
-          detail: `contains unknown loop "${loopName}". Allowed loops: ${LOOP_NAMES.join(', ')}.`,
-        }
-      );
+      fail(loopName, `contains unknown loop "${loopName}". Allowed loops: ${LOOP_NAMES.join(', ')}.`);
     }
     if (!loopEntry || typeof loopEntry !== 'object' || Array.isArray(loopEntry)) {
-      throw new RunnerConfigError(`runner config (${label}.${loopName}) must be an object.`, {
-        path: `${canonicalPrefix}.${loopName}`,
-        subpath: `loops.${loopName}`,
-        detail: 'must be an object.',
-      });
+      fail(loopName, 'must be an object.');
     }
 
     const allowedKeys = Object.hasOwn(LOOP_TUNING_KEYS, loopName) ? LOOP_TUNING_KEYS[loopName] : ['bounds'];
     for (const key of Object.keys(loopEntry)) {
       if (!allowedKeys.includes(key)) {
-        throw new RunnerConfigError(
-          `runner config (${label}.${loopName}) contains unknown key "${key}". Allowed keys: ${allowedKeys.join(', ')}.`,
-          {
-            path: `${canonicalPrefix}.${loopName}.${key}`,
-            subpath: `loops.${loopName}.${key}`,
-            detail: `contains unknown key "${key}". Allowed keys: ${allowedKeys.join(', ')}.`,
-          }
-        );
+        fail(`${loopName}.${key}`, `contains unknown key "${key}". Allowed keys: ${allowedKeys.join(', ')}.`);
       }
     }
 
@@ -1797,39 +1682,20 @@ export function validateRunnerLoopsShape(loops, label = 'loops', options = {}) {
       if (loopEntry.maxRounds !== undefined) {
         const maxRounds = loopEntry.maxRounds;
         if (!Number.isInteger(maxRounds) || maxRounds <= 0) {
-          throw new RunnerConfigError(`runner config (${label}.reviewed.maxRounds) must be a positive integer.`, {
-            path: `${canonicalPrefix}.reviewed.maxRounds`,
-            subpath: 'loops.reviewed.maxRounds',
-            detail: 'must be a positive integer.',
-          });
+          fail('reviewed.maxRounds', 'must be a positive integer.');
         }
       }
       if (loopEntry.checkersByRigor !== undefined) {
         const cbr = loopEntry.checkersByRigor;
         if (!cbr || typeof cbr !== 'object' || Array.isArray(cbr)) {
-          throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) must be an object.`, {
-            path: `${canonicalPrefix}.reviewed.checkersByRigor`,
-            subpath: 'loops.reviewed.checkersByRigor',
-            detail: 'must be an object.',
-          });
+          fail('reviewed.checkersByRigor', 'must be an object.');
         }
         for (const [rigor, checkers] of Object.entries(cbr)) {
           if (!RIGOR_VALUES.includes(rigor)) {
-            throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) contains unknown rigor "${rigor}".`, {
-              path: `${canonicalPrefix}.reviewed.checkersByRigor.${rigor}`,
-              subpath: `loops.reviewed.checkersByRigor.${rigor}`,
-              detail: `contains unknown rigor "${rigor}".`,
-            });
+            fail(`reviewed.checkersByRigor.${rigor}`, `contains unknown rigor "${rigor}".`);
           }
           if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_SEATS.has(c))) {
-            throw new RunnerConfigError(
-              `runner config (${label}.reviewed.checkersByRigor.${rigor}) must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`,
-              {
-                path: `${canonicalPrefix}.reviewed.checkersByRigor.${rigor}`,
-                subpath: `loops.reviewed.checkersByRigor.${rigor}`,
-                detail: `must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`,
-              }
-            );
+            fail(`reviewed.checkersByRigor.${rigor}`, `must be an array of strings in [${Array.from(VALID_CHECKER_SEATS).join(', ')}].`);
           }
         }
         const orderedRigors = RIGOR_VALUES.filter((r) => r in cbr);
@@ -1840,16 +1706,9 @@ export function validateRunnerLoopsShape(loops, label = 'loops', options = {}) {
           const strongerSet = new Set(cbr[stronger]);
           for (const checker of weakerSet) {
             if (!strongerSet.has(checker)) {
-              throw new RunnerConfigError(
-                `runner config (${label}.reviewed.checkersByRigor) is not cumulative: "${stronger}" does not include checker "${checker}" from weaker rigor "${weaker}".`,
-                {
-                  paths: [
-                    `${canonicalPrefix}.reviewed.checkersByRigor.${weaker}`,
-                    `${canonicalPrefix}.reviewed.checkersByRigor.${stronger}`,
-                  ],
-                  subpath: 'loops.reviewed.checkersByRigor',
-                  detail: `is not cumulative: "${stronger}" does not include checker "${checker}" from weaker rigor "${weaker}".`,
-                }
+              fail(
+                [`reviewed.checkersByRigor.${weaker}`, `reviewed.checkersByRigor.${stronger}`],
+                `is not cumulative: "${stronger}" does not include checker "${checker}" from weaker rigor "${weaker}".`,
               );
             }
           }
@@ -1860,69 +1719,32 @@ export function validateRunnerLoopsShape(loops, label = 'loops', options = {}) {
     if (loopEntry.bounds !== undefined) {
       const bounds = loopEntry.bounds;
       if (!bounds || typeof bounds !== 'object' || Array.isArray(bounds)) {
-        throw new RunnerConfigError(`runner config (${label}.${loopName}.bounds) must be an object.`, {
-          path: `${canonicalPrefix}.${loopName}.bounds`,
-          subpath: `loops.${loopName}.bounds`,
-          detail: 'must be an object.',
-        });
+        fail(`${loopName}.bounds`, 'must be an object.');
       }
       const loopReadableParams = boundedParamsForLoop(loopName);
       for (const [param, bound] of Object.entries(bounds)) {
         if (!loopReadableParams.includes(param)) {
-          throw new RunnerConfigError(
-            `runner config (${label}.${loopName}.bounds.${param}) is not a parameter read by the "${loopName}" loop.`,
-            {
-              path: `${canonicalPrefix}.${loopName}.bounds.${param}`,
-              subpath: `loops.${loopName}.bounds.${param}`,
-              detail: `is not a parameter read by the "${loopName}" loop.`,
-            }
-          );
+          fail(`${loopName}.bounds.${param}`, `is not a parameter read by the "${loopName}" loop.`);
         }
         if (!bound || typeof bound !== 'object' || Array.isArray(bound)) {
-          throw new RunnerConfigError(`runner config (${label}.${loopName}.bounds.${param}) must be an object {min?, max?}.`, {
-            path: `${canonicalPrefix}.${loopName}.bounds.${param}`,
-            subpath: `loops.${loopName}.bounds.${param}`,
-            detail: 'must be an object {min?, max?}.',
-          });
+          fail(`${loopName}.bounds.${param}`, 'must be an object {min?, max?}.');
         }
         const ALLOWED_BOUND_KEYS = ['min', 'max'];
         for (const k of Object.keys(bound)) {
           if (!ALLOWED_BOUND_KEYS.includes(k)) {
-            throw new RunnerConfigError(
-              `runner config (${label}.${loopName}.bounds.${param}) contains unknown key "${k}". Allowed keys: min, max.`,
-              {
-                path: `${canonicalPrefix}.${loopName}.bounds.${param}.${k}`,
-                subpath: `loops.${loopName}.bounds.${param}.${k}`,
-                detail: `contains unknown key "${k}". Allowed keys: min, max.`,
-              }
-            );
+            fail(`${loopName}.bounds.${param}.${k}`, `contains unknown key "${k}". Allowed keys: min, max.`);
           }
         }
         if (bound.min !== undefined && !Number.isInteger(bound.min)) {
-          throw new RunnerConfigError(`runner config (${label}.${loopName}.bounds.${param}.min) must be an integer.`, {
-            path: `${canonicalPrefix}.${loopName}.bounds.${param}.min`,
-            subpath: `loops.${loopName}.bounds.${param}.min`,
-            detail: 'must be an integer.',
-          });
+          fail(`${loopName}.bounds.${param}.min`, 'must be an integer.');
         }
         if (bound.max !== undefined && !Number.isInteger(bound.max)) {
-          throw new RunnerConfigError(`runner config (${label}.${loopName}.bounds.${param}.max) must be an integer.`, {
-            path: `${canonicalPrefix}.${loopName}.bounds.${param}.max`,
-            subpath: `loops.${loopName}.bounds.${param}.max`,
-            detail: 'must be an integer.',
-          });
+          fail(`${loopName}.bounds.${param}.max`, 'must be an integer.');
         }
         if (bound.min !== undefined && bound.max !== undefined && bound.min > bound.max) {
-          throw new RunnerConfigError(
-            `runner config (${label}.${loopName}.bounds.${param}) min (${bound.min}) must be <= max (${bound.max}).`,
-            {
-              paths: [
-                `${canonicalPrefix}.${loopName}.bounds.${param}.min`,
-                `${canonicalPrefix}.${loopName}.bounds.${param}.max`,
-              ],
-              subpath: `loops.${loopName}.bounds.${param}`,
-              detail: `min (${bound.min}) must be <= max (${bound.max}).`,
-            }
+          fail(
+            [`${loopName}.bounds.${param}.min`, `${loopName}.bounds.${param}.max`],
+            `min (${bound.min}) must be <= max (${bound.max}).`,
           );
         }
       }
