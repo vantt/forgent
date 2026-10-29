@@ -43,3 +43,15 @@ Q1 (migrate on a hand-edited JSON file), the project-file location label, one ba
 ## Rollback
 
 Revert the three slice commits.
+
+## Amendments adopted after the decision lock (binding; they replace the matching text above)
+
+Source: the lock report (`unit-run-1793252792869-004fc648`, producer/1).
+
+- F4 has three string-form callers, not two: `test/setup/runner-config-conversion.test.mjs:233,390,608`; migrate all three to an explicit isolated project root and global dir.
+- F5 dedupes retired findings per key and file (descendant and position duplicates collapse; a second source file keeps its own diagnostic). Not key-only.
+- N1: the resolver is the door. The inline copy refused an empty or non-string tier without a tier list; the resolver validates tier only when a tier list is supplied. The resolver's behaviour stays and the copy's extra refusal goes; the schema already refuses non-string tiers. Keep the resolver's pinned wording (`seat-resolver.test.mjs:80-86`: declared twice, role must be one of, unknown key, tier validation, persona and tier normalization) and the indexed-role assertions at `dispatch-config-patterns.test.mjs:907-935` (`path`, `paths`, `subpath` derived).
+- N2: validator labels already contain `runner.patterns` or `runner.loops`; define one relative-path convention so the helper never repeats a segment; keep the pinned texts (`contains unknown key "extraKey"`, `"minCheckers" must be an array of strings`, the retired-key texts at `dispatch-config-patterns.test.mjs:317-449`).
+- N3: `resolveCollaboration` takes `origins` only (the run path passes only origins; `layers` derived inside); `checkCatalog` keeps its `layers` input (map or origins array) because its domain tests drive synthetic inputs (`catalog.test.mjs` about :150-200, :864, :888, :906); production callers that pass neither keep their fallback.
+- F2: an empty patch is not printed as a command in either render path: the notice (`command`) and the CLI fallback that re-serializes `notice.patch` (`bin/fgos.mjs` about :4753-4758); the conversion tests at :440-456 keep their non-empty behaviour.
+- Callers to migrate with the changes: `checkDeclaredSeats` (config, unit admission, `workflow/checked`, catalog parameter validation, `catalog-entries`, the resolver's `declaredSeatsOf`, the resolver tests); `catalogLayersOf` (`run.mjs:777`, `registrations.mjs:546`, `dispatch-config-patterns` tests, `run.test.mjs:165,168`); `resolveCollaboration` production callers (run, `workflow/runner`, `workflow/case-start`, dry-bind, seat-binding-checks): only the run caller passes origins.
