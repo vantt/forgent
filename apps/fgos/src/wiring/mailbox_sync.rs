@@ -100,7 +100,8 @@ fn publish_heads(main: &Path, fgos_dir: &Path, limits: &Limits) -> Result<(), St
 }
 
 /// One opportunistic sync of the clone `dir` is in; nothing for a directory
-/// in no repository or a project that never migrated its events.
+/// in no repository. The hook starts this child only for a clone with a store
+/// or a migrated-events fence.
 fn publish(dir: &Path, remote: &str) -> Result<(), String> {
     let Some(clone) = event_store_clone::open(dir).map_err(|f| format!("{}: {}", f.reason, f.detail))? else {
         return Ok(());

@@ -1570,6 +1570,69 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
     let _ = fs::remove_dir_all(&world);
 }
 
+/// A repository created after the Event Store cutover carries no `.fgos/events` fence and has no
+/// store: the first identity registration still opens the log and mints the store.
+#[test]
+fn identity_register_in_a_repository_without_a_fence_or_a_store_mints_the_store() {
+    use fgos_event_store::layout::{Layout, StreamId};
+    use fgos_git::{GitDriver, ResolveRepo};
+    use std::os::unix::fs::PermissionsExt;
+
+    let world = std::env::temp_dir().join(format!("fgos_test_identity_unfenced_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&world);
+    fs::create_dir_all(&world).unwrap();
+    fs::set_permissions(&world, fs::Permissions::from_mode(0o700)).unwrap();
+    let git = |dir: &std::path::Path, args: &[&str]| {
+        let out = Command::new("git").arg("-C").arg(dir).args(args).output().unwrap();
+        assert!(out.status.success(), "git {args:?}: {}", String::from_utf8_lossy(&out.stderr));
+    };
+    let state = world.join("state");
+    fs::create_dir_all(&state).unwrap();
+    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    fs::write(state.join("machine-id"), "alpha-aaaaaa\n").unwrap();
+    fgos_identity::signing::mint_key(&state).unwrap();
+
+    let root = world.join("project");
+    fs::create_dir_all(&root).unwrap();
+    git(&root, &["init", "-q"]);
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    fs::create_dir_all(root.join(".fgos")).unwrap();
+    fs::write(
+        root.join(".fgos/project.json"),
+        r#"{"v":1,"projectId":"0123456789abcdef0123456789abcdef","handle":"demo","createdAt":"2026-10-24T00:00:00.000Z"}"#,
+    )
+    .unwrap();
+    let activation = root.join(".fgos/locks/activation.lock");
+    fs::create_dir_all(&activation).unwrap();
+    fs::write(activation.join("TOMBSTONE"), "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n").unwrap();
+    git(&root, &["-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-q", "--allow-empty", "-m", "init"]);
+
+    let driver = GitDriver::new(&world).unwrap();
+    let repo = match driver.resolve_repo(&root, &root).unwrap() {
+        ResolveRepo::Repository(repo) => repo,
+        _ => panic!("the project is a repository"),
+    };
+    let layout = Layout::from_common_dir(Some(repo.common_dir())).unwrap();
+    fs::create_dir_all(layout.root.join("locks")).unwrap();
+    for dir in [layout.common_dir.join("fgos"), layout.root.join("locks")] {
+        fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    assert!(!root.join(".fgos/events").exists() && !layout.store().exists(), "no fence and no store");
+
+    let output = identity_command(&["session", "--register", "--role", "lead:WORK", "--json"])
+        .env("FGOS_STATE_ROOT", &state)
+        .env("FGOS_SESSION_ID", "alpha-session")
+        .current_dir(&root)
+        .output()
+        .unwrap();
+    identity_data(&output);
+    assert!(layout.store().exists(), "the first append minted the store");
+    let active = layout.stream(&StreamId::parse("project:identity").unwrap()).active();
+    assert_eq!(fs::read_to_string(active).unwrap().matches("identity.session-published").count(), 1);
+
+    let _ = fs::remove_dir_all(&world);
+}
+
 /// `fgos identity machine` over a scratch state root: the wiring of the verb
 /// (route, operation per flag, exit code of a refusal). The id, handle and
 /// alias rules are owned by the identity crate's own tests.

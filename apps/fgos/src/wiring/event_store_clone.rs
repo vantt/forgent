@@ -27,11 +27,9 @@ pub struct EventStoreClone {
     pub machine: String,
 }
 
-/// The store of the clone `dir` is in, or `None` when `dir` is in no repository
-/// or its project never migrated its events: migration commits the
-/// `.fgos/events` fence, the store itself is minted by the first append, so a
-/// clone of a migrated project that never appended still opens, and that first
-/// append creates its store.
+/// The store of the clone `dir` is in, or `None` when `dir` is in no repository.
+/// Any repository opens: the store itself is minted by the first append, so a
+/// clone that never appended still opens and its first append creates the store.
 pub fn open(dir: &Path) -> Result<Option<EventStoreClone>, OpenFault> {
     let (state, _) = fgos_holder_lock::state_root();
     let driver = GitDriver::new(&state).map_err(|e| fault(&e))?;
@@ -40,10 +38,6 @@ pub fn open(dir: &Path) -> Result<Option<EventStoreClone>, OpenFault> {
         ResolveRepo::NotARepository => return Ok(None),
     };
     let layout = Layout::from_common_dir(Some(repo.common_dir())).map_err(|e| fault(&e))?;
-    let migrated = std::fs::symlink_metadata(repo.trusted_main_root().join(".fgos/events")).is_ok_and(|m| m.is_file());
-    if !migrated && std::fs::symlink_metadata(layout.store()).is_err() {
-        return Ok(None);
-    }
     let configured = driver.machine_id(&repo).map_err(|e| fault(&e))?;
     let configured = configured.as_ref().map(|fact| std::str::from_utf8(&fact.value)).transpose().map_err(|e| fault(&e))?;
     let machine = machine_id(configured, &state).map_err(|e| fault(&e))?;
