@@ -651,7 +651,6 @@ test('catalogLayersOf: field-path origin reports global when an offending field 
       unit: { pattern: 'valid-split' },
       runnerConfig: { runner: { patterns: { 'valid-split': { loop: 'solo', promise: 'project promise' } } } },
       shipped,
-      layers,
       origins,
     });
     assert.equal(collab.pin.pattern.layer, 'project', 'pin layer must remain project');
