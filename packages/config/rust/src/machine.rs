@@ -92,19 +92,32 @@ pub fn snapshot(
     build(ctx, &req, &machine_sources(&req)?)
 }
 
+/// The variable the home directory comes from: `HOME`, and `USERPROFILE` where there is no `HOME`
+/// convention (Windows).
+pub const HOME_VAR: &str = if cfg!(unix) { "HOME" } else { "USERPROFILE" };
+
+/// The home directory the process environment names (`lookup`, like `session_class`); `None` when it
+/// is unset or blank. The one home rule every snapshot builder shares.
+pub fn home_dir(lookup: impl Fn(&str) -> Option<String>) -> Option<PathBuf> {
+    lookup(HOME_VAR)
+        .filter(|home| !home.trim().is_empty())
+        .map(PathBuf::from)
+}
+
 /// The effective value for one project, for an in-process reader that holds only its root and the
-/// process environment (`lookup`, like `session_class`): the global directory is `$HOME/.fgos` and the
+/// process environment (`lookup`, like `session_class`): the global directory is `<home>/.fgos` and the
 /// class comes from the confined marker. The root is also the trusted root: the caller passes the
 /// main checkout.
 pub fn project_snapshot(
     root: &Path,
     lookup: impl Fn(&str) -> Option<String>,
 ) -> Result<Snapshot, SnapshotError> {
-    let home = lookup("HOME").ok_or_else(|| std::io::Error::other("HOME is not set"))?;
+    let home = home_dir(&lookup)
+        .ok_or_else(|| std::io::Error::other(format!("{HOME_VAR} is not set")))?;
     let req = SnapshotRequest {
         project_root: root.into(),
         trusted_root: root.into(),
-        global_dir: Path::new(&home).join(".fgos"),
+        global_dir: home.join(".fgos"),
         class: session_class(lookup),
     };
     crate::snapshot::snapshot(&context(&NoDetectors)?, &req)

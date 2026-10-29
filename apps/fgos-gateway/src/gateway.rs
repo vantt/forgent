@@ -106,8 +106,7 @@ pub fn load_gateway_config(home_dir: Option<&Path>) -> Result<GatewayConfig, Gat
     use fgos_config::{detect::NoDetectors, machine, snapshot::SessionClass};
     let home = match home_dir {
         Some(p) => p.to_path_buf(),
-        None => std::env::var_os("HOME")
-            .map(PathBuf::from)
+        None => machine::home_dir(|key| std::env::var(key).ok())
             .ok_or(GatewayConfigError::NoHomeDir)?,
     };
     let global = home.join(".fgos");
