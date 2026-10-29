@@ -68,17 +68,26 @@ fn run(args: &[OsString]) {
     if let Err(why) = publish(&dir, &remote) {
         eprintln!("mailbox-sync: {why}");
     }
-    if let Err(why) = take_mail(&fgos_dir, &loaded, &cross) {
-        eprintln!("mailbox-sync: {why}");
+    // The mail taken may leave settlements for the senders in the log; one more sync pushes them now
+    // instead of at the next interval.
+    match take_mail(&fgos_dir, &loaded, &cross) {
+        Ok(true) => {
+            if let Err(why) = publish(&dir, &remote) {
+                eprintln!("mailbox-sync: {why}");
+            }
+        }
+        Ok(false) => {}
+        Err(why) => eprintln!("mailbox-sync: {why}"),
     }
 }
 
 /// Takes the mail the fetch brought into the record. A project that has no record yet takes none:
-/// the record is made by the first hook call of a session, not by the child.
-fn take_mail(fgos_dir: &Path, loaded: &Loaded, cross: &CrossMachine) -> Result<(), String> {
+/// the record is made by the first hook call of a session, not by the child. Whether settlements
+/// were appended.
+fn take_mail(fgos_dir: &Path, loaded: &Loaded, cross: &CrossMachine) -> Result<bool, String> {
     let record = Record::open(fgos_dir).map_err(|e| e.to_string())?;
     let wait = Wait::Ms(loaded.hook.verbs.lock_wait_ms);
-    mailbox_ingest::ingest(fgos_dir, &record, &loaded.limits, cross, wait, now()).map(|_| ())
+    mailbox_ingest::ingest(fgos_dir, &record, &loaded.limits, cross, wait, now()).map(|report| report.settled > 0)
 }
 
 fn now() -> Timestamp {

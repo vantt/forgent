@@ -15,15 +15,15 @@
 use super::identity_log::StoreLogDoor;
 use super::mailbox_config::CrossMachine;
 use super::mailbox_identity::{session_of, state_root};
-use super::mailbox_remote::{signed_bytes, MESSAGE_SENT, SENT_DOMAIN, STREAM, WIRE_MAX_BODY_BYTES};
+use super::mailbox_remote::{settled_payload, signed_bytes, MESSAGE_SENT, MESSAGE_SETTLED, SENT_DOMAIN, STREAM, WIRE_MAX_BODY_BYTES};
 use fgos_identity::current::machine_info;
 use fgos_identity::pins::PinState;
-use fgos_identity::shared;
+use fgos_identity::shared::{self, EntryLog};
 use fgos_identity::text::iso_utc_secs;
 use fgos_identity::{signing, Signature};
 use fgos_mailbox::record::{Record, Reported, Wait};
 use fgos_mailbox::verbs;
-use fgos_mailbox_core::{CounterReason, Ingested, Limits, RemoteDrop, RemoteMail, Timestamp, WriterKey};
+use fgos_mailbox_core::{CounterReason, Ingested, Limits, RemoteDrop, RemoteMail, Settlement, Timestamp, WriterKey};
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -43,6 +43,8 @@ pub struct Report {
     pub dropped: usize,
     /// Whether this run only took the baseline.
     pub baseline: bool,
+    /// Settlement events appended to the shared log, which still have to be pushed.
+    pub settled: usize,
 }
 
 /// A message that passed verification, owned so the record can borrow it.
@@ -151,6 +153,10 @@ pub fn ingest(fgos_dir: &Path, record: &Record, limits: &Limits, cross: &CrossMa
     let mut reached: BTreeMap<String, u64> = BTreeMap::new();
     let mut verified = Vec::new();
     let mut drops: Vec<(CounterReason, String)> = Vec::new();
+    // What the receiver tells a sender at once: a message that passed verification and was refused,
+    // and one whose signature held but whose machine the owner has not confirmed here, so the
+    // sender's owner can see why it did not arrive.
+    let mut refusals: Vec<(String, &'static str)> = Vec::new();
     let now_secs = now.as_millis() / 1000;
     for event in &envelopes {
         let top = reached.entry(event.origin.clone()).or_insert(0);
@@ -166,7 +172,14 @@ pub fn ingest(fgos_dir: &Path, record: &Record, limits: &Limits, cross: &CrossMa
         }
         match verify(&root, &event.payload, &event.ts, now_secs, cross) {
             Ok(mail) => verified.push(mail),
-            Err(drop) => drops.push(drop),
+            Err(drop) => {
+                if drop.0 == CounterReason::RemoteUnconfirmed {
+                    if let Some(id) = event.payload["id"].as_str() {
+                        refusals.push((id.to_owned(), CounterReason::RemoteUnconfirmed.code()));
+                    }
+                }
+                drops.push(drop);
+            }
         }
     }
     report.baseline = !baselined;
@@ -184,6 +197,7 @@ pub fn ingest(fgos_dir: &Path, record: &Record, limits: &Limits, cross: &CrossMa
     for (mail, handle) in verified.iter().zip(&handles) {
         let Some((_, to)) = owners.iter().find(|(id, _)| *id == mail.to_id) else {
             drops.push((CounterReason::RemoteMisaddressed, mail.machine.clone()));
+            refusals.push((mail.id.clone(), CounterReason::UnknownName.code()));
             report.dropped += 1;
             continue;
         };
@@ -199,18 +213,73 @@ pub fn ingest(fgos_dir: &Path, record: &Record, limits: &Limits, cross: &CrossMa
         ids.push(mail.id.clone());
     }
     let counted: Vec<RemoteDrop<'_>> = drops.iter().map(|(reason, machine)| RemoteDrop { reason: *reason, machine }).collect();
-    if baselined && mails.is_empty() && counted.is_empty() && reached == cursor {
-        return Ok(report);
-    }
-    let held = record.ingest(&mails, &counted, &reached, wait, now, limits).map_err(|e| e.to_string())?;
-    for (id, result) in ids.into_iter().zip(held.value.value) {
-        match result {
-            Ok(Ingested::Recorded(_)) => report.taken += 1,
-            Ok(Ingested::Duplicate) => {}
-            Err(refused) => report.refused.push((id, refused.code())),
+    if !(baselined && mails.is_empty() && counted.is_empty() && reached == cursor) {
+        let held = record.ingest(&mails, &counted, &reached, wait, now, limits).map_err(|e| e.to_string())?;
+        for (id, result) in ids.into_iter().zip(held.value.value) {
+            match result {
+                Ok(Ingested::Recorded(_)) => report.taken += 1,
+                Ok(Ingested::Duplicate) => {}
+                Err(refused) => {
+                    refusals.push((id.clone(), refused.code()));
+                    report.refused.push((id, refused.code()));
+                }
+            }
         }
     }
+    report.settled = settle(&log, &root, &machine.id, &Hold { record, limits, wait, now }, &refusals).map_err(|e| format!("settle: {e}"))?;
     Ok(report)
+}
+
+/// What one hold of the record is asked with.
+#[derive(Clone, Copy)]
+struct Hold<'a> {
+    record: &'a Record,
+    limits: &'a Limits,
+    wait: Wait,
+    now: Timestamp,
+}
+
+/// Tells the senders what their messages came to here: a refusal at once, and an offer or a refusal
+/// after the fact for each recorded message not yet told. Each is a signed event of this machine
+/// appended to the shared log; the record marks a recorded message told only after its event is
+/// written, so a failure in between repeats an event the sender folds once.
+fn settle(
+    log: &super::identity_log::StoreLog,
+    root: &Path,
+    machine: &str,
+    hold: &Hold<'_>,
+    refusals: &[(String, &'static str)],
+) -> Result<usize, String> {
+    let Hold { record, limits, wait, now } = *hold;
+    let mut appended = refusals.len();
+    let refusal = |r: fgos_identity::Refusal| format!("{}: {}", r.reason, r.detail);
+    for (id, code) in refusals {
+        let payload = settled_payload(root, id, machine, "refused", Some(code)).map_err(refusal)?;
+        log.append(MESSAGE_SETTLED, payload).map_err(refusal)?;
+    }
+    let held = record
+        .hold(wait, now, limits, |state, _| Reported::unchanged(state.unsettled_remote()))
+        .map_err(|e| e.to_string())?;
+    let mut told = Vec::new();
+    for unsettled in held.value.value {
+        let (outcome, reason) = match unsettled.settlement {
+            Settlement::Offered => ("offered", None),
+            Settlement::Refused(code) => ("refused", Some(code)),
+        };
+        let payload = settled_payload(root, &unsettled.origin.id, machine, outcome, reason).map_err(refusal)?;
+        log.append(MESSAGE_SETTLED, payload).map_err(refusal)?;
+        told.push(unsettled.id);
+        appended += 1;
+    }
+    if !told.is_empty() {
+        record
+            .hold(wait, now, limits, |state, _| Reported {
+                changed: state.mark_remote_settled(&told),
+                value: (),
+            })
+            .map_err(|e| e.to_string())?;
+    }
+    Ok(appended)
 }
 
 #[cfg(test)]

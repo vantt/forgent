@@ -51,7 +51,7 @@ pub use names::{is_group, ResolveRefusal};
 pub use notices::{Notice, NoticeMark, NoticeState};
 pub use policy::{LifetimeKey, RemoteSend};
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
-pub use remote::{Ingested, RemoteDrop, RemoteMail};
+pub use remote::{Ingested, RemoteDrop, RemoteMail, Settlement, Unsettled};
 pub use report::{
     delivery_report, inbox_text, list_text, record_error_text, record_unavailable_text,
     refusal_text, role_holder_text, ListRow, VersionClause,

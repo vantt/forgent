@@ -52,6 +52,24 @@ pub struct RemoteDrop<'a> {
     pub machine: &'a str,
 }
 
+/// What a message from another machine came to, for its sender.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Settlement {
+    /// The recipient's head was offered it.
+    Offered,
+    /// Refused after it was recorded (it expired, or was offered too often),
+    /// with the refusal's code.
+    Refused(&'static str),
+}
+
+/// A recorded message from another machine whose sender was not told yet.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Unsettled {
+    pub id: MessageId,
+    pub origin: Origin,
+    pub settlement: Settlement,
+}
+
 /// What ingest did with one message.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Ingested {
@@ -182,10 +200,51 @@ impl MailboxState {
             origin: Some(Origin {
                 machine: mail.machine.to_string(),
                 id: mail.id.to_string(),
-                handle: mail.handle.filter(|h| usable_handle(h, limits)).map(str::to_string),
+                handle: mail
+                    .handle
+                    .filter(|h| usable_handle(h, limits))
+                    .map(str::to_string),
+                settled: false,
             }),
         });
         Ok(Ingested::Recorded(id))
+    }
+
+    /// The messages from other machines that were offered or refused since
+    /// their sender was last told, oldest first.
+    pub fn unsettled_remote(&self) -> Vec<Unsettled> {
+        self.messages
+            .iter()
+            .filter_map(|header| {
+                let origin = header.origin.as_ref().filter(|origin| !origin.settled)?;
+                let settlement = match &header.state {
+                    MessageState::Offered { .. } => Settlement::Offered,
+                    MessageState::Refused { reason, .. } => {
+                        Settlement::Refused(CounterReason::from(*reason).code())
+                    }
+                    _ => return None,
+                };
+                Some(Unsettled {
+                    id: header.id.clone(),
+                    origin: origin.clone(),
+                    settlement,
+                })
+            })
+            .collect()
+    }
+
+    /// Marks the sender of each of `ids` as told. Returns whether anything changed.
+    pub fn mark_remote_settled(&mut self, ids: &[MessageId]) -> bool {
+        let mut changed = false;
+        for header in &mut self.messages {
+            if let Some(origin) = header.origin.as_mut() {
+                if !origin.settled && ids.contains(&header.id) {
+                    origin.settled = true;
+                    changed = true;
+                }
+            }
+        }
+        changed
     }
 
     /// Forgets the ids of taken messages past the ingest horizon, and the

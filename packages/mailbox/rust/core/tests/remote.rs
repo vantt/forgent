@@ -1,7 +1,7 @@
 mod common;
 
 use common::{key, t, Pair, B_NAME};
-use fgos_mailbox_core::{CounterReason, Ingested, MessageState, Refusal, RemoteMail};
+use fgos_mailbox_core::{CounterReason, Ingested, MessageState, Refusal, RemoteMail, Settlement};
 use std::collections::BTreeSet;
 
 const WIRE_CAP: u64 = 2048;
@@ -137,4 +137,35 @@ fn the_ingest_cursor_only_moves_forward_and_the_first_move_takes_the_baseline() 
         "a lower position changes nothing"
     );
     assert_eq!(pair.state.remote_cursor().get("origin-a"), Some(&5));
+}
+
+#[test]
+fn a_remote_message_is_unsettled_once_offered_or_refused_and_settled_marks_only_the_ones_given() {
+    let mut pair = Pair::new(t(0));
+    let from = key("session-1");
+    let to = key("b");
+    let Ingested::Recorded(id) = ingest(&mut pair, &mail(&from, "m1", &to, "hi"), 1).unwrap()
+    else {
+        panic!("recorded")
+    };
+    assert!(
+        pair.state.unsettled_remote().is_empty(),
+        "a message nobody offered yet has no settlement"
+    );
+
+    pair.deliver("b", t(2));
+    let waiting = pair.state.unsettled_remote();
+    assert_eq!(waiting.len(), 1);
+    assert_eq!(
+        (waiting[0].id.clone(), waiting[0].settlement.clone()),
+        (id.clone(), Settlement::Offered)
+    );
+    assert_eq!(waiting[0].origin.id, "m1");
+
+    assert!(pair.state.mark_remote_settled(std::slice::from_ref(&id)));
+    assert!(pair.state.unsettled_remote().is_empty());
+    assert!(
+        !pair.state.mark_remote_settled(&[id]),
+        "a second mark changes nothing"
+    );
 }

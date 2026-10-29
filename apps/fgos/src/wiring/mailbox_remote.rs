@@ -16,8 +16,8 @@ use super::mailbox_config::CrossMachine;
 use fgos_identity::current::{current_session, machine_info};
 use fgos_identity::pins::PinState;
 use fgos_identity::shared::{self, MachineRef};
-use fgos_identity::text::iso_utc_now;
-use fgos_identity::{project, signing, Refusal};
+use fgos_identity::text::{iso_utc_now, iso_utc_secs};
+use fgos_identity::{project, signing, Refusal, Signature};
 use fgos_mailbox::record::{Paths, Record, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{Limits, RemoteSend, Timestamp, WriterKey};
@@ -27,8 +27,10 @@ use std::path::Path;
 /// The stream of cross-machine mail and the type of the event a send appends.
 pub const STREAM: &str = "project:mailbox";
 pub const MESSAGE_SENT: &str = "mailbox.message-sent";
+pub const MESSAGE_SETTLED: &str = "mailbox.message-settled";
 /// Prefix of the signed bytes, so a mail signature is never valid for another purpose.
 pub const SENT_DOMAIN: &str = "fgos-mailbox-message/1\n";
+pub const SETTLED_DOMAIN: &str = "fgos-mailbox-settled/1\n";
 /// `mailbox.remote.maxBodyBytes` of the wire contract.
 pub const WIRE_MAX_BODY_BYTES: u64 = 2048;
 /// The kind a message of the same-machine mailbox has.
@@ -115,6 +117,92 @@ fn sent_payload(root: &Path, id: &str, from: &str, machine: &MachineRef, target:
     sign_payload(root, SENT_DOMAIN, payload)
 }
 
+/// The signed event that tells a sender what its message came to on this machine: `outcome` is
+/// `offered`, or `refused` with the refusal's code.
+pub fn settled_payload(root: &Path, id: &str, machine: &str, outcome: &str, reason: Option<&str>) -> Result<Value, Refusal> {
+    let mut payload = json!({ "v": 1, "id": id, "machine": machine, "outcome": outcome, "at": iso_utc_now() });
+    if let Some(reason) = reason {
+        payload["reason"] = Value::String(reason.to_owned());
+    }
+    sign_payload(root, SETTLED_DOMAIN, payload)
+}
+
+/// What this machine's recent cross-machine sends came to, folded from the shared log: each send
+/// is `waiting` until its recipient's machine signed a settlement for it.
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct SentSummary {
+    pub sent: usize,
+    pub offered: usize,
+    pub waiting: usize,
+    /// Refusals by the receiver's reason code.
+    pub refused: std::collections::BTreeMap<String, usize>,
+}
+
+impl SentSummary {
+    pub fn text(&self) -> String {
+        let refused: usize = self.refused.values().sum();
+        let reasons: Vec<String> = self.refused.iter().map(|(reason, n)| format!("{reason} {n}")).collect();
+        let tail = if reasons.is_empty() { String::new() } else { format!(" ({})", reasons.join(", ")) };
+        format!(
+            "cross-machine: {} sent in the last 24 hours; {} offered, {} refused{tail}, {} waiting for the receiver's fetch",
+            self.sent, self.offered, refused, self.waiting
+        )
+    }
+}
+
+/// This machine's sends of the last day and their settlements, read from the shared log. A send
+/// counts only when it is in this machine's own origin; a settlement counts only when it verifies
+/// under the settled domain and its signer is the machine the send went to. The latest settlement
+/// of a message in the store's order decides.
+pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSummary, String> {
+    let refusal = |r: Refusal| format!("{}: {}", r.reason, r.detail);
+    let machine = machine_info(root).map_err(refusal)?.id;
+    let Some(log) = StoreLogDoor.open_store(main, &machine, STREAM).map_err(refusal)? else {
+        return Ok(SentSummary::default());
+    };
+    let (events, own_origin) = log.envelopes().map_err(refusal)?;
+    let recent = |ts: &str| iso_utc_secs(ts).is_some_and(|at| now_secs.saturating_sub(at) <= 86_400);
+    // id -> the machine it went to, and what the latest settlement of it says.
+    let mut sent: std::collections::BTreeMap<String, (String, Option<Result<(), String>>)> = Default::default();
+    for event in events.iter().filter(|e| e.event_type == MESSAGE_SENT && e.origin == own_origin && recent(&e.ts)) {
+        let payload = &event.payload;
+        if let (Some(id), Some(to)) = (payload["id"].as_str(), payload["to"]["machine"].as_str()) {
+            sent.insert(id.to_owned(), (to.to_owned(), None));
+        }
+    }
+    for event in events.iter().filter(|e| e.event_type == MESSAGE_SETTLED) {
+        let payload = &event.payload;
+        let (Some(id), Some(by), Some(outcome)) = (payload["id"].as_str(), payload["machine"].as_str(), payload["outcome"].as_str()) else {
+            continue;
+        };
+        let Some((to, settled)) = sent.get_mut(id) else { continue };
+        if to != by {
+            continue;
+        }
+        let mut unsigned = payload.clone();
+        let signature: Option<Signature> =
+            unsigned.as_object_mut().and_then(|o| o.remove("sig")).and_then(|sig| serde_json::from_value(sig).ok());
+        let verified = signature.as_ref().and_then(|sig| signed_bytes(SETTLED_DOMAIN, &unsigned).ok().and_then(|bytes| signing::verify(root, &bytes, sig).ok()));
+        if verified.is_none_or(|v| v.machine_id != by) {
+            continue;
+        }
+        *settled = match outcome {
+            "offered" => Some(Ok(())),
+            "refused" => Some(Err(payload["reason"].as_str().unwrap_or("unknown").to_owned())),
+            _ => continue,
+        };
+    }
+    let mut summary = SentSummary { sent: sent.len(), ..Default::default() };
+    for (_, settled) in sent.into_values() {
+        match settled {
+            None => summary.waiting += 1,
+            Some(Ok(())) => summary.offered += 1,
+            Some(Err(reason)) => *summary.refused.entry(reason).or_default() += 1,
+        }
+    }
+    Ok(summary)
+}
+
 /// The text a recorded cross-machine send answers with.
 fn recorded_text(id: &str, target: &Target, cross: &CrossMachine) -> String {
     let pin = match target.pin {
@@ -184,7 +272,7 @@ pub fn send(ctx: &Context<'_>, from: &WriterKey, to: &str, body: &str, reply_to:
 
 #[cfg(test)]
 mod tests {
-    use super::{SENT_DOMAIN, WIRE_MAX_BODY_BYTES};
+    use super::{SENT_DOMAIN, SETTLED_DOMAIN, WIRE_MAX_BODY_BYTES};
 
     #[test]
     fn the_wire_cap_and_signing_domain_equal_the_remote_contract() {
@@ -199,5 +287,7 @@ mod tests {
         assert_eq!(cap["default"], WIRE_MAX_BODY_BYTES);
         let domain = contract["types"].as_array().unwrap().iter().find(|t| t["type"] == "mailbox.message-sent").unwrap();
         assert_eq!(domain["signingDomain"], SENT_DOMAIN);
+        let settled = contract["types"].as_array().unwrap().iter().find(|t| t["type"] == "mailbox.message-settled").unwrap();
+        assert_eq!(settled["signingDomain"], SETTLED_DOMAIN);
     }
 }

@@ -98,4 +98,8 @@ pub struct Origin {
     pub id: String,
     /// The sender's Identity handle, when it passes the frame's label rule.
     pub handle: Option<String>,
+    /// Whether the settlement of this message (offered, or refused) was
+    /// already appended to the shared log for its sender.
+    #[serde(default)]
+    pub settled: bool,
 }

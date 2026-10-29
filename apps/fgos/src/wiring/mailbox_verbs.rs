@@ -332,6 +332,24 @@ fn status(json: bool) -> MailboxAnswer {
             ));
         }
     }
+    // Mail that crosses machines: what this machine's recent sends came to, when the project turned it on.
+    if let (Ok((_, cross)), Some(root), Some(main)) = (project_mailbox(&fgos_dir), state_root(), fgos_dir.parent()) {
+        if cross.enabled {
+            let secs = now().as_millis() / 1000;
+            match mailbox_remote::sent_summary(main, &root, secs) {
+                Ok(summary) => {
+                    data["crossMachine"] = json!({
+                        "sent": summary.sent,
+                        "offered": summary.offered,
+                        "waiting": summary.waiting,
+                        "refused": summary.refused,
+                    });
+                    text.push_str(&format!("\n{}", summary.text()));
+                }
+                Err(why) => text.push_str(&format!("\ncross-machine: unavailable ({why})")),
+            }
+        }
+    }
     MailboxAnswer {
         data,
         text,
