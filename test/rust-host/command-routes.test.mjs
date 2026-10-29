@@ -90,11 +90,11 @@ test('all COMMAND_REGISTRY selectors appear exactly once in generated output', (
   assert.equal(routes.convention.subcommands, true);
 });
 
-test('only the hook selector declares native_kinds and it lists exactly mailbox', () => {
+test('only the hook selector declares native_kinds and it lists exactly the mailbox hook and its sync child', () => {
   const routes = JSON.parse(fs.readFileSync(DEFAULT_ROUTES_PATH, 'utf8'));
   const declaring = Object.values(routes).filter((r) => r.native_kinds !== undefined).map((r) => r.selector);
   assert.deepEqual(declaring, ['hook']);
-  assert.deepEqual(routes.hook.native_kinds, ['mailbox']);
+  assert.deepEqual(routes.hook.native_kinds, ['mailbox', 'mailbox-sync']);
   assert.equal(routes.hook.route_kind, 'legacy-cli', 'every other hook kind still reaches the legacy payload');
   assert.throws(
     () => generateCommandRoutes({ annotations: { version: { route_kind: 'native', operation_id: 'distribution.build.show', owner_path: 'packages/distribution/rust', native_kinds: ['x'] } } }),

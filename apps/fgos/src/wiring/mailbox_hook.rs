@@ -15,7 +15,7 @@
 //! then the shell, which reads the breaker before stdin, opens the record
 //! only after the caller check, and takes the mailbox lock with nothing
 //! else held: this process holds no other `LockScope` at any point.
-use super::mailbox_config::{is_config_reason, project_limits};
+use super::mailbox_config::{is_config_reason, project_mailbox, CrossMachine};
 use super::mailbox_identity::{ensure_registered, session_of, state_root};
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::ancestry::ancestry_of;
@@ -24,8 +24,11 @@ use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
 use fgos_mailbox::hook::shell::{self, GateState, ShellInput, WriteGate};
 use fgos_mailbox::hook::{Adapter, HookEvent};
 use fgos_mailbox::record::Paths;
+use fgos_event_store::{layout::Layout, sync::sync_status};
 use fgos_mailbox_core::{Cli, Timestamp, WriterKey};
+use fgos_process::mapped::spawn_detached;
 use std::ffi::OsString;
+use std::path::Path;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 /// Runs one hook call and ends the process with status 0.
@@ -91,8 +94,8 @@ fn run(args: &[OsString]) {
     // A config error is quiet on the CLI's channel and never counted by the
     // breaker, but its reason is left for `status`; once the config reads
     // again, that reason is cleared.
-    let loaded = match project_limits(&fgos_dir) {
-        Ok(loaded) => loaded,
+    let (loaded, cross) = match project_mailbox(&fgos_dir) {
+        Ok(read) => read,
         Err(failure) => {
             outcome_log::record_reason(&paths, adapter, event, &failure.reason(), now());
             return;
@@ -143,6 +146,11 @@ fn run(args: &[OsString]) {
         &mut std::io::stdout().lock(),
     );
     outcome_log::record(&paths, adapter, event, &outcome, now());
+    // The mailbox lock is released here; the child is started past it and
+    // only while the watchdog has not fired.
+    if gate_idle.state() == GateState::Idle {
+        start_sync(&fgos_dir, &paths, &cross);
+    }
     // Make sure Identity knows the head: on the call that bound it to a new
     // generation (quiet by construction), and again on a later quiet call
     // while the latest outcome says Identity had no machine id yet, so a
@@ -166,6 +174,40 @@ fn run(args: &[OsString]) {
             outcome_log::record_reason(&paths, adapter, event, &reason, now());
         }
     }
+}
+
+/// Starts the one detached `hook mailbox-sync` child when mail may cross
+/// machines and the clone's last sync attempt is older than the interval (or
+/// went to another remote, or was never made). The due test only reads
+/// `sync.json` from the main checkout's Git directory, with no Git process;
+/// the attempt itself is recorded by the child's sync, the Event Store's one
+/// writer of that file, so a rare second child finds the seal lock busy and
+/// ends. A call that cannot start the child loses nothing: the next call
+/// tries again. Nothing is printed.
+fn start_sync(fgos_dir: &Path, paths: &Paths, cross: &CrossMachine) {
+    if !cross.enabled || cross.sync_interval_sec == 0 {
+        return;
+    }
+    let Some(main) = fgos_dir.parent() else {
+        return;
+    };
+    let Ok(layout) = Layout::from_common_dir(Some(&main.join(".git"))) else {
+        return;
+    };
+    let Ok(last) = sync_status(&layout) else {
+        return;
+    };
+    let now = now().as_millis() / 1000;
+    if last.remote == cross.remote && now.saturating_sub(last.time) < cross.sync_interval_sec {
+        return;
+    }
+    let Ok(exe) = std::env::current_exe() else {
+        return;
+    };
+    let argv = [exe.into_os_string(), "hook".into(), "mailbox-sync".into(), "--dir".into(), main.into()];
+    let log = paths.sync_log();
+    let log = log.parent().is_some_and(Path::is_dir).then_some(log.as_path());
+    let _ = spawn_detached(&argv, main, &[], log);
 }
 
 /// The outcome a registering call leaves when Identity has no machine id

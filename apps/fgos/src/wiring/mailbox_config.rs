@@ -58,16 +58,58 @@ pub fn is_config_reason(reason: &str) -> bool {
     reason.starts_with("config:")
 }
 
-/// The mailbox limits of the project whose main checkout's `.fgos` is `fgos_dir`.
-pub fn project_limits(fgos_dir: &Path) -> Result<Loaded, ConfigFailure> {
-    let section = effective_section(fgos_dir)?;
-    let config = section.map(|section| json!({ SECTION: section }));
-    load(config.as_ref()).map_err(ConfigFailure::Invalid)
+/// What the host wiring reads past the mailbox crates' limits (the contract's
+/// `host` readers): whether mail crosses machines at all, the trust it takes
+/// from another machine, and the Event Store's sync schedule the detached
+/// child follows.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CrossMachine {
+    pub enabled: bool,
+    pub require_confirmed: bool,
+    /// `eventStore.remote`; the Event Store's own default when unset.
+    pub remote: String,
+    /// `eventStore.sync.intervalSec`; 0 turns the scheduled sync off.
+    pub sync_interval_sec: u64,
 }
 
-/// The effective `mailbox` section of one snapshot of the project whose main
-/// checkout's `.fgos` is `fgos_dir`; `None` when no layer holds it.
-fn effective_section(fgos_dir: &Path) -> Result<Option<Value>, ConfigFailure> {
+impl CrossMachine {
+    /// Every value comes from the snapshot, whose bundled standard layer holds
+    /// each key: a missing or mistyped one is a refusal, never a default here.
+    fn read(snapshot: &Value) -> Result<Self, ConfigFailure> {
+        let refused = |path: &[&str], what: &str| ConfigFailure::Refused {
+            code: "config-schema",
+            detail: format!("{} is not {what}", path.join(".")),
+        };
+        let at = |path: &[&str]| path.iter().try_fold(snapshot, |value, name| value.get(*name));
+        let flag = |path: &[&str]| at(path).and_then(Value::as_bool).ok_or_else(|| refused(path, "a boolean"));
+        let remote = ["eventStore", "remote"];
+        let interval = ["eventStore", "sync", "intervalSec"];
+        Ok(Self {
+            enabled: flag(&["mailbox", "crossMachine", "enabled"])?,
+            require_confirmed: flag(&["mailbox", "remote", "requireConfirmed"])?,
+            remote: at(&remote).and_then(Value::as_str).ok_or_else(|| refused(&remote, "text"))?.to_owned(),
+            sync_interval_sec: at(&interval).and_then(Value::as_u64).ok_or_else(|| refused(&interval, "a whole number"))?,
+        })
+    }
+}
+
+/// The mailbox limits of the project whose main checkout's `.fgos` is `fgos_dir`.
+pub fn project_limits(fgos_dir: &Path) -> Result<Loaded, ConfigFailure> {
+    project_mailbox(fgos_dir).map(|(loaded, _)| loaded)
+}
+
+/// The limits and the cross-machine settings of one snapshot of the project.
+pub fn project_mailbox(fgos_dir: &Path) -> Result<(Loaded, CrossMachine), ConfigFailure> {
+    let snapshot = effective_snapshot(fgos_dir)?;
+    let cross = CrossMachine::read(&snapshot)?;
+    let config = snapshot.get(SECTION).cloned().map(|section| json!({ SECTION: section }));
+    let loaded = load(config.as_ref()).map_err(ConfigFailure::Invalid)?;
+    Ok((loaded, cross))
+}
+
+/// The effective config of one snapshot of the project whose main checkout's
+/// `.fgos` is `fgos_dir` (project over global over the bundled standard).
+fn effective_snapshot(fgos_dir: &Path) -> Result<Value, ConfigFailure> {
     let refused = |code: &'static str, detail: String| ConfigFailure::Refused { code, detail };
     let home = std::env::var_os("HOME")
         .filter(|home| !home.is_empty())
@@ -99,7 +141,7 @@ fn effective_section(fgos_dir: &Path) -> Result<Option<Value>, ConfigFailure> {
         class: session_class(|key| std::env::var(key).ok()),
     };
     let snap = snapshot(&ctx, &request).map_err(from_snapshot)?;
-    Ok(snap.value.get(SECTION).cloned())
+    Ok(snap.value)
 }
 
 /// A refused snapshot as the mailbox names it: the first refusal's code, every
@@ -123,6 +165,7 @@ fn from_snapshot(error: SnapshotError) -> ConfigFailure {
 
 #[cfg(test)]
 mod tests {
+    use super::CrossMachine;
     use fgos_config::schema::Schemas;
     use fgos_config::standard::Standard;
     use serde_json::Value;
@@ -152,5 +195,24 @@ mod tests {
             checked += 1;
         }
         assert!(checked > 20, "only {checked} keys checked");
+    }
+
+    /// What the snapshot says is read as it is; a key it lacks or holds in
+    /// the wrong type is refused instead of guessed.
+    #[test]
+    fn the_cross_machine_settings_are_read_from_the_snapshot_and_a_missing_or_mistyped_key_is_refused() {
+        let snapshot = |enabled: Value, interval: Value| {
+            serde_json::json!({
+                "mailbox": { "crossMachine": { "enabled": enabled }, "remote": { "requireConfirmed": true } },
+                "eventStore": { "remote": "upstream", "sync": { "intervalSec": interval } },
+            })
+        };
+        assert_eq!(
+            CrossMachine::read(&snapshot(true.into(), 0.into())),
+            Ok(CrossMachine { enabled: true, require_confirmed: true, remote: "upstream".into(), sync_interval_sec: 0 })
+        );
+        for bad in [snapshot("yes".into(), 300.into()), snapshot(true.into(), "soon".into()), serde_json::json!({})] {
+            assert!(CrossMachine::read(&bad).is_err(), "{bad}");
+        }
     }
 }

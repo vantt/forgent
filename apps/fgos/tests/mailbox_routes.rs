@@ -1680,3 +1680,47 @@ fn a_send_racing_a_hook_that_holds_the_lock_longer_than_the_hooks_skip_budget_wa
         "{refused:?}"
     );
 }
+
+/// The hook starts its detached sync child only when the project turned
+/// cross-machine mail on and the clone's last sync attempt is older than the
+/// interval. The child's own start leaves its log file beside the record.
+#[test]
+fn the_hook_starts_the_detached_sync_child_only_when_cross_machine_is_on_and_a_sync_is_due() {
+    use fgos_event_store::layout::Layout;
+    let scene = Scene::new("sync-child");
+    fs::create_dir_all(scene.mailbox_dir()).unwrap();
+    let log = scene.mailbox_dir().join("sync.log");
+    let hook = || {
+        let out = scene.run(
+            &scene.main(),
+            Some("writer"),
+            &["hook", "mailbox", "--cli", "claude", "--event", "post-tool-use"],
+            &post_tool_use(),
+        );
+        assert_eq!(out.status.code(), Some(0));
+    };
+    hook();
+    assert!(!log.exists(), "cross-machine mail is off by default: no child");
+
+    fs::write(
+        scene.main().join(".fgos/config.json"),
+        r#"{"mailbox":{"crossMachine":{"enabled":true}}}"#,
+    )
+    .unwrap();
+    let layout = Layout::from_common_dir(Some(&scene.main().join(".git"))).unwrap();
+    let recent = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    fs::create_dir_all(&layout.root).unwrap();
+    let attempt = format!(
+        r#"{{"v":1,"time":{recent},"remote":"origin","tips":{{}},"error":null,"warnings":[],"unpublishedSince":null}}"#
+    );
+    fs::write(layout.root.join("sync.json"), attempt).unwrap();
+    hook();
+    assert!(!log.exists(), "a sync attempted inside the interval is not due: no child");
+
+    fs::remove_file(layout.root.join("sync.json")).unwrap();
+    hook();
+    assert!(log.exists(), "a due sync with cross-machine mail on starts the child");
+}

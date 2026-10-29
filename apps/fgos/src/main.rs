@@ -251,7 +251,10 @@ fn main() {
     // bytes, exit 0 on every path, and no snapshot or async runtime on its
     // hot path. A help request falls through to legacy, which owns help.
     if native_kind(route, cli_args) && !wants_help_token(cli_args) {
-        wiring::mailbox_hook::main(&cli_args[2..]);
+        match cli_args.get(1).and_then(|a| a.to_str()) {
+            Some("mailbox-sync") => wiring::mailbox_sync::main(&cli_args[2..]),
+            _ => wiring::mailbox_hook::main(&cli_args[2..]),
+        }
     }
 
     // Composition root: build snapshot and InvocationService.
