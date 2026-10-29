@@ -70,3 +70,8 @@ Detached worktree at c4f8530ea, through `runChosenTests` (not `npm test`, not `c
 Status: DONE
 Summary: Verdict PASS. All round-three findings and F1 to F5 are fixed with evidence, the L4 wiring test fails when the wiring is removed, and 315 of 315 focused tests pass; only three Low cleanup items remain (message and detail duplicated in the seat resolver, dead `catalogLayersOf` and `layers` shapes, one retired test with no named owner).
 Concerns/Blockers: None. The detached worktree was removed and the report is the only file written.
+
+## Follow-up from COOK (2026-10-29)
+
+- Low 3 is closed. The retired-tuning behaviour is owned by two tests in `test/runner/execution/patterns/catalog.test.mjs`: "checkCatalog reports config-key-retired for reviewed tuning with source layer attribution" and "checkCatalog reports config-key-retired for reviewed mixing catalog fields with retired tuning". A custom pattern named `patterns` is no longer a special case, because one table-driven matcher replaced the shape sniffing, so that behaviour was removed.
+- Lows 1 and 2 stay on COOK's open list for the owner to choose; they are a small separate cleanup in `seat-resolver.mjs` and `shipped-catalog.mjs`.
