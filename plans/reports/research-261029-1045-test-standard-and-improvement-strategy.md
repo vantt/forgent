@@ -178,3 +178,29 @@ Findings:
 - Revised order: S-2 (cases to their layer, biggest files first) and S-5 (verb startup profile, routed) before S-1.
 
 Data: `.fgos/runtime/tmp/s0-profile-261029-2117/` (junit, analysis) on fg-server2, not committed.
+
+## 8. Where a run and a verb spend their time (2026-10-30 03:30)
+
+Measured in-process on the idle machine, with `child_process` wrapped to time each child, and with a file timeline of one run directory.
+
+**One `runUnit` with one attempt (failover fixture, warm process): about 1.9–2.1 s.** Fixture setup is 42 ms. Timeline of one attempt:
+
+| ms | Event |
+|---:|---|
+| 0–750 | in-process admission, bind, dispatch plan, envelope (about 15 durable writes) |
+| 750 | `fgos internal supervise` starts |
+| 817 | fake worker finished (outbox written) |
+| 912 | receipt |
+| 912–1474 | step `settle-attempt`: a new `fgos internal attempt-step` process, about 400 ms of it before its first write |
+| 1474–1841 | step `finalize-home`: another new process, about 290 ms before its first write |
+| 1876 | supervise exits |
+
+The first run in a process also pays the bwrap falsification probe suite once per fingerprint (11 bwrap launches, about 0.9 s). It is cached in memory and on disk, so it is not per test.
+
+**Node CLI startup.** `node -e 0` takes 20 ms; `node bin/fgos.mjs --help` takes 200–240 ms. `bin/fgos.mjs` has 111 static imports, and importing it costs about 180 ms before any verb runs; `src/state/store.mjs` alone takes about 108 ms. An `attempt-step` needs only about 63 ms of modules, but it enters through the same entry and loads all of them.
+
+So one cost explains three findings: the 240–270 ms a verb pays over `--help` (§7), the two dead gaps in every attempt, and part of the `runUnit` time in `run.test.mjs`, `run-provider-failover.test.mjs` and `loop.test.mjs`. Every user command and every real attempt pays it too.
+
+**Proposal (S-5, product, routed, not TEST's to build):** load each verb's modules when that verb runs, not at entry, so a process pays only for the verb it serves. Rough upper bound, not measured: about 150 ms per CLI call and about 300 ms per attempt. Owner of `bin/fgos.mjs` decides; TEST measures before and after with the same scratch probes.
+
+`run-provider-failover.test.mjs` itself is not a duplicate: `account-rotation.test.mjs` already owns the pure rotation rules (9 cheap tests), and the 29 run-level tests check rotation inside a real attempt. Some cases could move down (for example the two "refused before any unit run exists" tests), but the bigger lever for this file is the per-attempt cost above.
