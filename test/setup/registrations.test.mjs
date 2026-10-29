@@ -840,6 +840,16 @@ test('doctor check runner-patterns-config: legacy json project file gives honest
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
+test('doctor check runner-patterns-config: a legacy json project file without retired keys is left to the config format row', () => {
+  const tmpDir = mkTempDir();
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+  writeRawLegacyProjectConfig(tmpDir, JSON.stringify({ runner: { generatedPaths: [] } }));
+  const res = check.check(tmpDir);
+  assert.equal(res.passed, true);
+  assert.doesNotMatch(res.message, /edit .*config\.json/);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
 test('doctor check runner-patterns-config: valid reviewed pattern override passes', () => {
   const tmpDir = mkTempDir();
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');

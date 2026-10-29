@@ -57,12 +57,7 @@ const DISALLOWED_G2_FIELDS = Object.freeze([
 ]);
 
 function effectivePatternNames(config) {
-  let shipped = {};
-  try {
-    shipped = shippedCatalog()?.patterns ?? {};
-  } catch {
-    shipped = {};
-  }
+  const shipped = shippedCatalog()?.patterns ?? {};
   const configPatterns = config?.runner?.patterns ?? config?.patterns ?? {};
   const names = new Set([
     ...Object.keys(shipped),
@@ -506,7 +501,7 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
       }
     }
 
-    if (u.pattern && knownPatterns.size > 0 && !knownPatterns.has(u.pattern)) {
+    if (u.pattern && !knownPatterns.has(u.pattern)) {
       pushFinding({
         line: u.line,
         unit: u.id,

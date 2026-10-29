@@ -106,7 +106,7 @@ import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '..
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { checkConfig, readConfig, readMachineConfig } from '../config/facade.mjs';
-import { formatLegacyJsonAdvice } from './runner-config-conversion.mjs';
+import { retiredJsonAdvice } from './runner-config-conversion.mjs';
 import { CONFIG_CHECKS, CONFIG_FIXES, isConfigDoorFailure } from './config-checks.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
@@ -518,8 +518,8 @@ export function checkRunnerPatternsConfig(cwd) {
       const display = resolveDisplay(f.file);
 
       if (display.endsWith('.json') || f.row === 'config-format-legacy-json') {
-        const msg = formatLegacyJsonAdvice(display);
-        if (!problems.includes(msg)) problems.push(msg);
+        const msg = retiredJsonAdvice(display);
+        if (msg && !problems.includes(msg)) problems.push(msg);
         continue;
       }
 
@@ -548,8 +548,8 @@ export function checkRunnerPatternsConfig(cwd) {
           display = r.file ?? '<file>';
         }
         if (display.endsWith('.json') || r.id === 'config-format-legacy-json') {
-          const msg = formatLegacyJsonAdvice(display);
-          if (!problems.includes(msg)) problems.push(msg);
+          const msg = retiredJsonAdvice(display);
+          if (msg && !problems.includes(msg)) problems.push(msg);
           continue;
         }
         if (r.path) {
@@ -576,19 +576,12 @@ export function checkRunnerPatternsConfig(cwd) {
       origins: ['runner.patterns', 'runner.loops'],
     });
   } catch (err) {
-    if (isProjectJson) {
-      return { passed: false, message: formatLegacyJsonAdvice(path.join(cwd, '.fgos', 'config.json')) };
-    }
-    if (isGlobalJson) {
-      return { passed: false, message: formatLegacyJsonAdvice(path.join(globalDir, 'config.json')) };
-    }
-    if (err.refusals) {
-      for (const r of err.refusals) {
-        if (r.id === 'config-format-legacy-json' || r.file?.endsWith('.json')) {
-          const display = r.file?.startsWith('global:') ? path.join(globalDir, 'config.json') : path.join(cwd, '.fgos', 'config.json');
-          return { passed: false, message: formatLegacyJsonAdvice(display) };
-        }
-      }
+    const refusals = err.refusals ?? [];
+    const formatOnly = refusals.length > 0
+      ? refusals.every((r) => r.id === 'config-format-legacy-json' || r.file?.endsWith('.json'))
+      : (isProjectJson || isGlobalJson);
+    if (formatOnly) {
+      return { passed: true, message: 'runner patterns not checked: a config file is legacy JSON, which the config format row reports' };
     }
     return { passed: false, message: err.message };
   }

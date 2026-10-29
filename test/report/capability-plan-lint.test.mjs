@@ -14,7 +14,7 @@ import {
   pathsOverlap,
 } from '../../src/report/capability-plan-lint.mjs';
 import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import os from 'node:os';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -656,6 +656,14 @@ test('lintPhaseUnits warns on unknown pattern', () => {
   const unknownPattern = result.findings.filter((f) => f.code === 'pattern.unknown');
   assert.equal(unknownPattern.length, 1);
   assert.equal(unknownPattern[0].severity, 'warn');
+});
+
+test('lintPhaseUnits throws when the shipped catalog cannot be read instead of skipping the pattern check', () => {
+  const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('FGOS_')));
+  const modulePath = path.join(__dirname, '..', '..', 'src', 'report', 'capability-plan-lint.mjs');
+  const script = `import(${JSON.stringify(modulePath)}).then((m) => { try { m.lintPhaseUnits('## Units\\n- unit: u1\\n  capability: docs:write\\n  objective: x\\n  pattern: unearthly-ritual\\n'); console.log('LINTED'); } catch (e) { console.log('THROWN ' + e.message.slice(0, 80)); } });`;
+  const res = spawnSync(process.execPath, ['-e', script], { cwd: os.tmpdir(), env, encoding: 'utf8' });
+  assert.match(res.stdout, /^THROWN /m, res.stderr);
 });
 
 test('lintPhaseUnits accepts a pattern defined in the project catalog and flags a typo', () => {
