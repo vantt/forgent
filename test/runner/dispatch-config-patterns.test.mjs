@@ -19,7 +19,7 @@ import {
   withDefaultExecutor,
 } from '../../src/runner/dispatch/config.mjs';
 import { readStandardValue, ConfigDoorError } from '../../src/config/facade.mjs';
-import { catalogLayersOf, shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
+import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog, resolveCollaboration } from '../../src/runner/execution/patterns/catalog.mjs';
 import { resolveLayer } from '../../src/runner/execution/patterns/catalog-entries.mjs';
 
@@ -597,50 +597,8 @@ test('shippedCatalog: returns frozen { patterns, loops } and is cached per proce
   assert.ok(catalog1.loops.reviewed);
 });
 
-test('catalogLayersOf: answers per-pattern layer (project only, global only, both with project winning, neither = shipped)', () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-catalog-layers-home-'));
-  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-catalog-layers-repo-'));
 
-  writeGlobalConfig(home, {
-    runner: {
-      patterns: {
-        'global-only-pat': { promise: 'global only', loop: 'solo' },
-        'shared-pat': { promise: 'shared from global', loop: 'solo' },
-      },
-    },
-  });
-
-  writeProjectConfig(repo, {
-    runner: {
-      patterns: {
-        'project-only-pat': { promise: 'project only', loop: 'solo' },
-        'shared-pat': { promise: 'shared from project', loop: 'solo' },
-      },
-    },
-  });
-
-  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
-  process.env.HOME = home;
-  process.env.USERPROFILE = home;
-  try {
-    const loaded = loadRunnerConfigForDir(repo);
-    const origins = runnerOriginsOf(loaded);
-    const layers = catalogLayersOf(origins, loaded.patterns);
-    assert.equal(layers['project-only-pat'], 'project');
-    assert.equal(layers['global-only-pat'], 'global');
-    assert.equal(layers['shared-pat'], 'project', 'project layer must beat global layer');
-    assert.equal(layers.solo, 'shipped', 'unmodified shipped pattern must be shipped');
-    assert.equal(layers.reviewed, 'shipped');
-  } finally {
-    process.env.HOME = saved.HOME;
-    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
-    else delete process.env.USERPROFILE;
-    fs.rmSync(home, { recursive: true, force: true });
-    fs.rmSync(repo, { recursive: true, force: true });
-  }
-});
-
-test('catalogLayersOf: field-path origin reports global when an offending field is global while another field is in project, and the pin layer stays project', () => {
+test('a global bad loop and a project promise report global for the offending field, the valid split pattern pins project', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-split-origin-home-'));
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-split-origin-repo-'));
 
@@ -668,12 +626,9 @@ test('catalogLayersOf: field-path origin reports global when an offending field 
   try {
     const loaded = loadRunnerConfigForDir(repo);
     const origins = runnerOriginsOf(loaded);
-    const layers = catalogLayersOf(origins, loaded.patterns);
-    assert.equal(layers.reviewed, 'project', 'pattern pin layer must be highest contributing layer');
-    assert.equal(resolveLayer(layers, 'reviewed'), 'project');
+    assert.equal(resolveLayer(origins, 'reviewed'), 'project');
     assert.equal(resolveLayer(origins, 'reviewed', 'loop'), 'global');
     assert.equal(resolveLayer(origins, 'reviewed', 'promise'), 'project');
-
     const shipped = shippedCatalog();
     const effective = {
       reviewed: {

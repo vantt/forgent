@@ -253,73 +253,46 @@ export function requiresDistinctFamilies(unit, runnerConfig) {
  * caller that owns the tier ladder passes it as `tiers` to have each seat's `tier` checked against it.
  */
 export function checkDeclaredSeats(raw, label = 'seats', { tiers } = {}) {
-  if (!Array.isArray(raw) || raw.length === 0) {
-    throw new SeatResolutionError(`${label} must be a non-empty array of { seat, role }`, 'invalid-seats', {
-      at: '',
-      detail: 'must be a non-empty array of { seat, role }',
+  const fail = (displayed, relativeAt, detail, code = 'invalid-seats') => {
+    throw new SeatResolutionError(`${displayed} ${detail}`, code, {
+      at: relativeAt,
+      detail,
     });
+  };
+  if (!Array.isArray(raw) || raw.length === 0) {
+    fail(label, '', 'must be a non-empty array of { seat, role }');
   }
   const seen = new Set();
   return raw.map((entry, index) => {
     const at = `${label}[${index}]`;
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-      throw new SeatResolutionError(`${at} must be an object { seat, role, persona?, tier? }`, 'invalid-seats', {
-        at: `[${index}]`,
-        detail: 'must be an object { seat, role, persona?, tier? }',
-      });
+      fail(at, `[${index}]`, 'must be an object { seat, role, persona?, tier? }');
     }
     for (const key of Object.keys(entry)) {
       if (!DECLARED_KEYS.has(key)) {
-        throw new SeatResolutionError(`${at} has unknown key "${key}"; a seat declares only seat, role, persona and tier`, 'invalid-seats', {
-          at: `[${index}].${key}`,
-          detail: `has unknown key "${key}"; a seat declares only seat, role, persona and tier`,
-        });
+        fail(at, `[${index}].${key}`, `has unknown key "${key}"; a seat declares only seat, role, persona and tier`);
       }
     }
     if (RESERVED_SEAT_IDS.includes(entry.seat)) {
-      throw new SeatResolutionError(`${at}.seat "${entry.seat}" is a reserved seat id; reserved: [${RESERVED_SEAT_IDS.join(', ')}]`, 'param-invalid', {
-        at: `[${index}].seat`,
-        detail: `"${entry.seat}" is a reserved seat id; reserved: [${RESERVED_SEAT_IDS.join(', ')}]`,
-      });
+      fail(`${at}.seat`, `[${index}].seat`, `"${entry.seat}" is a reserved seat id; reserved: [${RESERVED_SEAT_IDS.join(', ')}]`, 'param-invalid');
     }
     try {
-      assertSeatId(entry.seat, `${at}.seat`);
-    } catch (error) {
-      let detail;
-      try {
-        assertSeatId(entry.seat, '');
-      } catch (unlabelled) {
-        detail = unlabelled.message.trimStart();
-      }
-      throw new SeatResolutionError(error.message, 'invalid-seat-id', {
-        at: `[${index}].seat`,
-        detail: detail ?? error.message,
-      });
+      assertSeatId(entry.seat, '');
+    } catch (unlabelled) {
+      fail(`${at}.seat`, `[${index}].seat`, unlabelled.message.trimStart(), 'invalid-seat-id');
     }
     if (seen.has(entry.seat)) {
-      throw new SeatResolutionError(`${at}.seat "${entry.seat}" is declared twice in this unit`, 'duplicate-seat', {
-        at: `[${index}].seat`,
-        detail: `"${entry.seat}" is declared twice in this unit`,
-      });
+      fail(`${at}.seat`, `[${index}].seat`, `"${entry.seat}" is declared twice in this unit`, 'duplicate-seat');
     }
     seen.add(entry.seat);
     if (!SEAT_ROLES.includes(entry.role)) {
-      throw new SeatResolutionError(`${at}.role must be one of [${SEAT_ROLES.join(', ')}], got ${JSON.stringify(entry.role)}`, 'invalid-seat-role', {
-        at: `[${index}].role`,
-        detail: `must be one of [${SEAT_ROLES.join(', ')}], got ${JSON.stringify(entry.role)}`,
-      });
+      fail(`${at}.role`, `[${index}].role`, `must be one of [${SEAT_ROLES.join(', ')}], got ${JSON.stringify(entry.role)}`, 'invalid-seat-role');
     }
     if (entry.persona !== undefined && (typeof entry.persona !== 'string' || !entry.persona.trim())) {
-      throw new SeatResolutionError(`${at}.persona must be a non-empty string`, 'invalid-seats', {
-        at: `[${index}].persona`,
-        detail: 'must be a non-empty string',
-      });
+      fail(`${at}.persona`, `[${index}].persona`, 'must be a non-empty string');
     }
     if (entry.tier !== undefined && tiers && !tiers.includes(entry.tier)) {
-      throw new SeatResolutionError(`${at}.tier must be one of [${tiers.join(', ')}], got ${JSON.stringify(entry.tier)}`, 'invalid-seat-tier', {
-        at: `[${index}].tier`,
-        detail: `must be one of [${tiers.join(', ')}], got ${JSON.stringify(entry.tier)}`,
-      });
+      fail(`${at}.tier`, `[${index}].tier`, `must be one of [${tiers.join(', ')}], got ${JSON.stringify(entry.tier)}`, 'invalid-seat-tier');
     }
     return Object.freeze({ seat: entry.seat, role: entry.role, ...(entry.persona ? { persona: entry.persona.trim() } : {}), ...(entry.tier ? { tier: entry.tier } : {}) });
   });

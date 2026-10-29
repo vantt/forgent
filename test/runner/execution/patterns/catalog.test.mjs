@@ -148,9 +148,9 @@ test('dropping an atLeast element in a shipped invariant is refused with source 
       },
     },
   };
-  const layers = { 'code-change': 'project' };
+  const origins = [{ path: 'runner.patterns.code-change.invariants.minCheckers', layer: 'project', file: 'project:config.yaml', line: 10 }];
 
-  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, origins });
   assert.ok(problems.length > 0);
 
   const error = problems.find((p) => p.code === 'pattern-invariant-weakened');
@@ -170,9 +170,9 @@ test('changing or removing a fixed invariant on a shipped pattern is refused wit
       },
     },
   };
-  const layers = { consult: 'global' };
+  const originsChanged = [{ path: 'runner.patterns.consult.invariants.seats', layer: 'global', file: 'global:config.yaml', line: 12 }];
 
-  const resChanged = checkCatalog({ shipped: shipped.patterns, effective: effectiveChanged, layers });
+  const resChanged = checkCatalog({ shipped: shipped.patterns, effective: effectiveChanged, origins: originsChanged });
   assert.ok(resChanged.problems.length > 0);
   const errChanged = resChanged.problems.find((p) => p.code === 'pattern-invariant-weakened');
   assert.ok(errChanged);
@@ -184,7 +184,8 @@ test('changing or removing a fixed invariant on a shipped pattern is refused wit
       invariants: {},
     },
   };
-  const resRemoved = checkCatalog({ shipped: shipped.patterns, effective: effectiveRemoved, layers });
+  const originsRemoved = [{ path: 'runner.patterns.consult.invariants', layer: 'global', file: 'global:config.yaml', line: 12 }];
+  const resRemoved = checkCatalog({ shipped: shipped.patterns, effective: effectiveRemoved, origins: originsRemoved });
   assert.ok(resRemoved.problems.length > 0);
   assert.ok(resRemoved.problems.some((p) => p.code === 'pattern-invariant-weakened'));
 });
@@ -196,9 +197,9 @@ test('changing the execution loop of a shipped pattern is refused with source la
       loop: 'panel',
     },
   };
-  const layers = { solo: 'project' };
+  const origins = [{ path: 'runner.patterns.solo.loop', layer: 'project', file: 'project:config.yaml', line: 10 }];
 
-  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, origins });
   assert.ok(problems.length > 0);
 
   const error = problems.find((p) => p.code === 'pattern-invariant-weakened');
@@ -221,8 +222,8 @@ test('retired pattern key in checkCatalog reports config-key-retired with source
       loop: 'panel',
     },
   };
-  const layers = { 'research-fan-out-gated': 'project' };
-  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
+  const origins = [{ path: 'runner.patterns.research-fan-out-gated', layer: 'project', file: 'project:config.yaml', line: 10 }];
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, origins });
   const error = problems.find((p) => p.code === 'config-key-retired');
   assert.ok(error);
   assert.equal(error.source, 'project');
@@ -246,8 +247,8 @@ test('checkCatalog reports param-unknown without retired advice for tuning under
       maxRounds: 3,
     },
   };
-  const layers = { panel: 'project' };
-  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
+  const origins = [{ path: 'runner.patterns.panel.maxRounds', layer: 'project', file: 'project:config.yaml', line: 10 }];
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, origins });
   const retired = problems.find((p) => p.code === 'config-key-retired');
   assert.equal(retired, undefined, 'must not classify tuning under non-reviewed pattern as retired');
   const unknownKey = problems.find((p) => p.code === 'param-unknown');
@@ -263,8 +264,8 @@ test('checkCatalog reports config-key-retired for reviewed tuning with source la
       maxRounds: 3,
     },
   };
-  const layers = { reviewed: 'project' };
-  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
+  const origins = [{ path: 'runner.patterns.reviewed.maxRounds', layer: 'project', file: 'project:config.yaml', line: 10 }];
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, origins });
   const retired = problems.find((p) => p.code === 'config-key-retired');
   assert.ok(retired, 'must report config-key-retired');
   assert.equal(retired.source, 'project');
@@ -282,8 +283,8 @@ test('checkCatalog reports config-key-retired for reviewed mixing catalog fields
       maxRounds: 3,
     },
   };
-  const layers = { reviewed: 'project' };
-  const { problems, entries } = checkCatalog({ shipped: shipped.patterns, effective, layers });
+  const origins = [{ path: 'runner.patterns.reviewed.maxRounds', layer: 'project', file: 'project:config.yaml', line: 10 }];
+  const { problems, entries } = checkCatalog({ shipped: shipped.patterns, effective, origins });
   const retired = problems.find((p) => p.code === 'config-key-retired');
   assert.ok(retired, 'must report config-key-retired');
   assert.equal(retired.source, 'project');
@@ -342,7 +343,7 @@ test('parameter domain validation rejects invalid default values', () => {
 
   const resNonInteger = checkCatalog({
     shipped: shipped.patterns,
-    layers: { 'custom-reviewed': 'project' },
+    origins: [{ path: 'runner.patterns.custom-reviewed.defaults.maxRounds', layer: 'project', file: 'project:config.yaml', line: 10 }],
     effective: {
       'custom-reviewed': {
         promise: 'A reviewed pattern with bad maxRounds.',
@@ -463,7 +464,7 @@ test('checkCatalog with throwOnError throws the first problem encountered', () =
 
 test('carrier validity refuses unknown key on pattern entry with param-unknown', () => {
   const shipped = shippedCatalog();
-  const layers = [{ path: 'runner.patterns.custom-pattern.unexpectedKey', layer: 'project' }];
+  const origins = [{ path: 'runner.patterns.custom-pattern.unexpectedKey', layer: 'project', file: 'project:config.yaml', line: 10 }];
   const effective = {
     'custom-pattern': {
       promise: 'A custom pattern with an unexpected key.',
@@ -471,7 +472,7 @@ test('carrier validity refuses unknown key on pattern entry with param-unknown',
       unexpectedKey: 'not-allowed',
     },
   };
-  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, origins });
   assert.ok(problems.length > 0);
   const err = problems.find((p) => p.code === 'param-unknown');
   assert.ok(err);
@@ -836,19 +837,19 @@ test('malformed shipped pattern overrides are rejected with source layer attribu
   const shipped = shippedCatalog();
 
   const testCases = [
-    { override: null, expectedCode: 'param-invalid', expectedSnippet: 'must be an object' },
-    { override: false, expectedCode: 'param-invalid', expectedSnippet: 'must be an object' },
-    { override: { defaults: null }, expectedCode: 'param-invalid', expectedSnippet: 'defaults must be an object' },
-    { override: { defaults: [] }, expectedCode: 'param-invalid', expectedSnippet: 'defaults must be an object' },
-    { override: { invariants: null }, expectedCode: 'param-invalid', expectedSnippet: 'invariants must be an object' },
-    { override: { invariants: [] }, expectedCode: 'param-invalid', expectedSnippet: 'invariants must be an object' },
+    { override: null, path: 'runner.patterns.reviewed', expectedCode: 'param-invalid', expectedSnippet: 'must be an object' },
+    { override: false, path: 'runner.patterns.reviewed', expectedCode: 'param-invalid', expectedSnippet: 'must be an object' },
+    { override: { defaults: null }, path: 'runner.patterns.reviewed.defaults', expectedCode: 'param-invalid', expectedSnippet: 'defaults must be an object' },
+    { override: { defaults: [] }, path: 'runner.patterns.reviewed.defaults', expectedCode: 'param-invalid', expectedSnippet: 'defaults must be an object' },
+    { override: { invariants: null }, path: 'runner.patterns.reviewed.invariants', expectedCode: 'param-invalid', expectedSnippet: 'invariants must be an object' },
+    { override: { invariants: [] }, path: 'runner.patterns.reviewed.invariants', expectedCode: 'param-invalid', expectedSnippet: 'invariants must be an object' },
   ];
 
-  for (const { override, expectedCode, expectedSnippet } of testCases) {
+  for (const { override, path: offendingPath, expectedCode, expectedSnippet } of testCases) {
     const res = checkCatalog({
       shipped: shipped.patterns,
       effective: { reviewed: override },
-      layers: { 'runner.patterns.reviewed': 'project' },
+      origins: [{ path: offendingPath, layer: 'project', file: 'project:config.yaml', line: 10 }],
     });
     assert.ok(res.problems.length > 0, `Expected problem for override ${JSON.stringify(override)}`);
     const problem = res.problems.find((p) => p.code === expectedCode && p.message.includes(expectedSnippet));
@@ -872,7 +873,7 @@ test('checker name validation rejects inherited object properties as checker nam
         },
       },
     },
-    layers: 'project',
+    origins: [{ path: 'runner.patterns.custom-pattern.defaults.minCheckers', layer: 'project', file: 'project:config.yaml', line: 10 }],
   });
   assert.ok(resDefaults.problems.some((p) => p.code === 'param-invalid' && p.message.includes('unknown checker seat "toString"')));
   assert.ok(resDefaults.problems.some((p) => p.code === 'param-invalid' && p.message.includes('unknown checker seat "constructor"')));
@@ -890,7 +891,7 @@ test('checker name validation rejects inherited object properties as checker nam
         },
       },
     },
-    layers: 'project',
+    origins: [{ path: 'runner.patterns.custom-pattern-inv.invariants.minCheckers', layer: 'project', file: 'project:config.yaml', line: 10 }],
   });
   assert.ok(resInvariants.problems.some((p) => p.code === 'param-invalid' && p.message.includes('not a valid checker seat')));
 });
@@ -2167,8 +2168,6 @@ test('resolveLayer resolves with deterministic priority project > global > shipp
   // Emits 'shipped' where input was 'standard'
   const standardOrigin = [{ path: 'runner.patterns.reviewed.defaults.seats', layer: 'standard' }];
   assert.equal(resolveLayer(standardOrigin, 'reviewed', 'defaults'), 'shipped');
-  assert.equal(resolveLayer({ reviewed: 'standard' }, 'reviewed'), 'shipped');
-  assert.equal(resolveLayer('standard', 'reviewed'), 'shipped');
 });
 
 test('resolveLayer matches bracket-indexed descendants under container before falling back to pattern', () => {

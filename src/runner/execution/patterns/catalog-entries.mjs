@@ -93,61 +93,45 @@ export function extractLayerName(val) {
   return null;
 }
 
-export function resolveLayer(layers, name, fieldPath) {
-  if (!layers) return null;
-  if (typeof layers === 'string') return extractLayerName(layers);
-  if (Array.isArray(layers)) {
-    let candidateOrigins = [];
-    if (fieldPath) {
-      const fullPath = `runner.patterns.${name}.${fieldPath}`;
-      const shortPath = `${name}.${fieldPath}`;
-      candidateOrigins = layers.filter(
-        (o) => o?.path === fullPath ||
-               o?.path?.startsWith(`${fullPath}.`) ||
-               o?.path?.startsWith(`${fullPath}[`) ||
-               o?.path === shortPath ||
-               o?.path?.startsWith(`${shortPath}.`) ||
-               o?.path?.startsWith(`${shortPath}[`)
-      );
-    }
-    if (candidateOrigins.length === 0) {
-      const patternPath = `runner.patterns.${name}`;
-      candidateOrigins = layers.filter(
-        (o) => o?.path === patternPath ||
-               o?.path?.startsWith(`${patternPath}.`) ||
-               o?.path?.startsWith(`${patternPath}[`) ||
-               o?.path === name ||
-               o?.path?.startsWith(`${name}.`) ||
-               o?.path?.startsWith(`${name}[`)
-      );
-    }
-    if (candidateOrigins.length === 0) return null;
-
-    let bestLayer = null;
-    let bestPriority = 0;
-    for (const o of candidateOrigins) {
-      const norm = extractLayerName(o);
-      const prio = LAYER_PRIORITY[norm] ?? 0;
-      if (prio > bestPriority) {
-        bestPriority = prio;
-        bestLayer = norm;
-      }
-    }
-    return bestLayer;
-  }
-  if (typeof layers !== 'object') return null;
-
+export function resolveLayer(origins, name, fieldPath) {
+  if (!Array.isArray(origins)) return null;
+  let candidateOrigins = [];
   if (fieldPath) {
     const fullPath = `runner.patterns.${name}.${fieldPath}`;
-    if (Object.hasOwn(layers, fullPath) && layers[fullPath]) return extractLayerName(layers[fullPath]);
     const shortPath = `${name}.${fieldPath}`;
-    if (Object.hasOwn(layers, shortPath) && layers[shortPath]) return extractLayerName(layers[shortPath]);
+    candidateOrigins = origins.filter(
+      (o) => o?.path === fullPath ||
+             o?.path?.startsWith(`${fullPath}.`) ||
+             o?.path?.startsWith(`${fullPath}[`) ||
+             o?.path === shortPath ||
+             o?.path?.startsWith(`${shortPath}.`) ||
+             o?.path?.startsWith(`${shortPath}[`)
+    );
   }
-  const patternPath = `runner.patterns.${name}`;
-  if (Object.hasOwn(layers, patternPath) && layers[patternPath]) return extractLayerName(layers[patternPath]);
-  if (Object.hasOwn(layers, name) && layers[name]) return extractLayerName(layers[name]);
+  if (candidateOrigins.length === 0) {
+    const patternPath = `runner.patterns.${name}`;
+    candidateOrigins = origins.filter(
+      (o) => o?.path === patternPath ||
+             o?.path?.startsWith(`${patternPath}.`) ||
+             o?.path?.startsWith(`${patternPath}[`) ||
+             o?.path === name ||
+             o?.path?.startsWith(`${name}.`) ||
+             o?.path?.startsWith(`${name}[`)
+    );
+  }
+  if (candidateOrigins.length === 0) return null;
 
-  return null;
+  let bestLayer = null;
+  let bestPriority = 0;
+  for (const o of candidateOrigins) {
+    const norm = extractLayerName(o);
+    const prio = LAYER_PRIORITY[norm] ?? 0;
+    if (prio > bestPriority) {
+      bestPriority = prio;
+      bestLayer = norm;
+    }
+  }
+  return bestLayer;
 }
 
 function allowedRoleTaskTargets(loop, entry) {
@@ -387,7 +371,7 @@ function checkParamDomain(name, loop, param, val, section, src, problems, entry)
  * @param {object} options
  * @param {object} options.shipped - Explicit shipped patterns map
  * @param {object} options.effective - Explicit effective patterns map
- * @param {object} [options.layers] - Origin layer map per pattern or field path
+ * @param {Array<object>} [options.origins] - Origin list
  * @param {boolean} [options.throwOnError] - Throw first problem if true
  * @returns {{ entries: object, merged: object, problems: Array<CollaborationError> }}
  */
@@ -395,8 +379,6 @@ export function checkCatalog(options = {}) {
   const shippedPatterns = options?.shipped ?? {};
   const effectivePatterns = options?.effective ?? {};
   const origins = options?.origins ?? null;
-  const layers = options?.layers ?? null;
-  const layerSource = origins ?? layers;
   const throwOnError = Boolean(options?.throwOnError);
 
   const problems = [];
@@ -406,7 +388,7 @@ export function checkCatalog(options = {}) {
   const retiredKeysSet = new Set(retiredFindings.map((f) => f.key.replace(/^runner\.patterns\./, '')));
   for (const finding of retiredFindings) {
     const name = finding.key.replace(/^runner\.patterns\./, '').split('.')[0];
-    const src = resolveLayer(layerSource, name);
+    const src = resolveLayer(origins, name);
     problems.push(new CollaborationError(
       'config-key-retired',
       `${formatRetiredKeySentence(finding)}${src ? ` (source layer: ${src})` : ''}`,
@@ -417,7 +399,7 @@ export function checkCatalog(options = {}) {
   if (Object.hasOwn(effectivePatterns, 'seatBinding')) {
     const sb = effectivePatterns.seatBinding;
     if (sb && typeof sb === 'object' && (Object.hasOwn(sb, 'loop') || Object.hasOwn(sb, 'promise') || Object.hasOwn(sb, 'defaults') || Object.hasOwn(sb, 'invariants'))) {
-      const src = resolveLayer(layerSource, 'seatBinding');
+      const src = resolveLayer(origins, 'seatBinding');
       problems.push(new CollaborationError(
         'config-error',
         `runner.patterns.seatBinding uses reserved name "seatBinding" as a pattern name${src ? ` (source layer: ${src})` : ''}`,
@@ -430,7 +412,7 @@ export function checkCatalog(options = {}) {
     if (name === 'seatBinding') continue;
 
     if (RESERVED_PATTERN_NAMES.has(name)) {
-      const src = resolveLayer(layerSource, name);
+      const src = resolveLayer(origins, name);
       problems.push(new CollaborationError(
         'config-error',
         `"${name}" is a reserved name and cannot be used as a pattern name${src ? ` (source layer: ${src})` : ''}`,
@@ -439,7 +421,7 @@ export function checkCatalog(options = {}) {
     }
 
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-      const src = resolveLayer(layerSource, name);
+      const src = resolveLayer(origins, name);
       problems.push(new CollaborationError(
         'param-invalid',
         `pattern "${name}" must be an object${src ? ` (source layer: ${src})` : ''}`,
@@ -451,7 +433,7 @@ export function checkCatalog(options = {}) {
     for (const key of Object.keys(entry)) {
       if (retiredKeysSet.has(`${name}.${key}`)) continue;
       if (!ALLOWED_PATTERN_ENTRY_KEYS.has(key)) {
-        const src = resolveLayer(layerSource, name, key) ?? resolveLayer(layerSource, name);
+        const src = resolveLayer(origins, name, key) ?? resolveLayer(origins, name);
         problems.push(new CollaborationError(
           'param-unknown',
           `pattern "${name}" has unknown key "${key}"${src ? ` (source layer: ${src})` : ''}`,
@@ -462,7 +444,7 @@ export function checkCatalog(options = {}) {
 
     if (Object.hasOwn(entry, 'defaults')) {
       if (!entry.defaults || typeof entry.defaults !== 'object' || Array.isArray(entry.defaults)) {
-        const src = resolveLayer(layerSource, name, 'defaults') ?? resolveLayer(layerSource, name);
+        const src = resolveLayer(origins, name, 'defaults') ?? resolveLayer(origins, name);
         problems.push(new CollaborationError(
           'param-invalid',
           `pattern "${name}" defaults must be an object${src ? ` (source layer: ${src})` : ''}`,
@@ -473,7 +455,7 @@ export function checkCatalog(options = {}) {
 
     if (Object.hasOwn(entry, 'invariants')) {
       if (!entry.invariants || typeof entry.invariants !== 'object' || Array.isArray(entry.invariants)) {
-        const src = resolveLayer(layerSource, name, 'invariants') ?? resolveLayer(layerSource, name);
+        const src = resolveLayer(origins, name, 'invariants') ?? resolveLayer(origins, name);
         problems.push(new CollaborationError(
           'param-invalid',
           `pattern "${name}" invariants must be an object${src ? ` (source layer: ${src})` : ''}`,
@@ -541,7 +523,7 @@ export function checkCatalog(options = {}) {
     // Shipped entry override weakening checks
     if (shippedEntry && hasEffective) {
       if (Object.hasOwn(effectiveEntry, 'loop') && effectiveEntry.loop !== shippedEntry.loop) {
-        const src = resolveLayer(layerSource, name, 'loop') ?? resolveLayer(layerSource, name);
+        const src = resolveLayer(origins, name, 'loop') ?? resolveLayer(origins, name);
         problems.push(new CollaborationError(
           'pattern-invariant-weakened',
           `pattern "${name}" cannot change shipped loop "${shippedEntry.loop}" to "${effectiveEntry.loop}"${src ? ` (source layer: ${src})` : ''}`,
@@ -550,7 +532,7 @@ export function checkCatalog(options = {}) {
       }
 
       if (Object.hasOwn(effectiveEntry, 'promise') && effectiveEntry.promise !== shippedEntry.promise) {
-        const src = resolveLayer(layerSource, name, 'promise') ?? resolveLayer(layerSource, name);
+        const src = resolveLayer(origins, name, 'promise') ?? resolveLayer(origins, name);
         problems.push(new CollaborationError(
           'pattern-invariant-weakened',
           `pattern "${name}" cannot change shipped promise${src ? ` (source layer: ${src})` : ''}`,
@@ -560,7 +542,7 @@ export function checkCatalog(options = {}) {
 
       if (shippedEntry.invariants && Object.hasOwn(effectiveEntry, 'invariants') && typeof effectiveEntry.invariants === 'object' && effectiveEntry.invariants !== null && !Array.isArray(effectiveEntry.invariants)) {
         for (const [param, shippedInv] of Object.entries(shippedEntry.invariants)) {
-          const src = resolveLayer(layerSource, name, `invariants.${param}`) ?? resolveLayer(layerSource, name, 'invariants') ?? resolveLayer(layerSource, name);
+          const src = resolveLayer(origins, name, `invariants.${param}`) ?? resolveLayer(origins, name, 'invariants') ?? resolveLayer(origins, name);
 
           if (Object.keys(effectiveEntry.invariants).length === 0) {
             const msg = shippedInv.atLeast !== undefined
@@ -609,7 +591,7 @@ export function checkCatalog(options = {}) {
 
     // Custom pattern checks
     if (!shippedEntry) {
-      const src = resolveLayer(layerSource, name);
+      const src = resolveLayer(origins, name);
       if (!mergedEntry.promise || typeof mergedEntry.promise !== 'string' || !mergedEntry.promise.trim()) {
         problems.push(new CollaborationError(
           'param-invalid',
@@ -634,7 +616,7 @@ export function checkCatalog(options = {}) {
       // Validate defaults
       if (mergedEntry.defaults !== undefined) {
         if (!mergedEntry.defaults || typeof mergedEntry.defaults !== 'object' || Array.isArray(mergedEntry.defaults)) {
-          const src = resolveLayer(layerSource, name, 'defaults') ?? resolveLayer(layerSource, name);
+          const src = resolveLayer(origins, name, 'defaults') ?? resolveLayer(origins, name);
           problems.push(new CollaborationError(
             'param-invalid',
             `pattern "${name}" defaults must be an object${src ? ` (source layer: ${src})` : ''}`,
@@ -642,7 +624,7 @@ export function checkCatalog(options = {}) {
           ));
         } else {
           for (const [param, val] of Object.entries(mergedEntry.defaults)) {
-            const src = resolveLayer(layerSource, name, `defaults.${param}`) ?? resolveLayer(layerSource, name);
+            const src = resolveLayer(origins, name, `defaults.${param}`) ?? resolveLayer(origins, name);
             if (!Object.hasOwn(paramTable, param)) {
               problems.push(new CollaborationError(
                 'param-unknown',
@@ -659,7 +641,7 @@ export function checkCatalog(options = {}) {
       // Validate invariants
       if (mergedEntry.invariants !== undefined) {
         if (!mergedEntry.invariants || typeof mergedEntry.invariants !== 'object' || Array.isArray(mergedEntry.invariants)) {
-          const src = resolveLayer(layerSource, name, 'invariants') ?? resolveLayer(layerSource, name);
+          const src = resolveLayer(origins, name, 'invariants') ?? resolveLayer(origins, name);
           problems.push(new CollaborationError(
             'param-invalid',
             `pattern "${name}" invariants must be an object${src ? ` (source layer: ${src})` : ''}`,
@@ -667,7 +649,7 @@ export function checkCatalog(options = {}) {
           ));
         } else {
           for (const [param, inv] of Object.entries(mergedEntry.invariants)) {
-            const src = resolveLayer(layerSource, name, `invariants.${param}`) ?? resolveLayer(layerSource, name);
+            const src = resolveLayer(origins, name, `invariants.${param}`) ?? resolveLayer(origins, name);
             if (!Object.hasOwn(paramTable, param)) {
               problems.push(new CollaborationError(
                 'param-unknown',

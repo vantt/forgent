@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  SEAT_ROLES, resolveSeats, checkDeclaredSeats, effectiveRigorOf, capabilityRigorOf,
+  SEAT_ROLES, resolveSeats, checkDeclaredSeats, SeatResolutionError, effectiveRigorOf, capabilityRigorOf,
   requiresDistinctFamilies, seatLaunchesOf, seatKind, assertNoSeatTier, bindSeatOf, PRODUCER_POSTURE,
   checkerPlanOf, RESERVED_SEAT_IDS, DEFAULT_CAPABILITY_MIN_CHECKERS,
 } from '../../../src/runner/execution/seat-resolver.mjs';
@@ -84,6 +84,91 @@ test('panel and debate need declared seats with the right multiplicities; ids ar
   assert.throws(() => checkDeclaredSeats([{ seat: 'a', role: 'producer', tier: 'huge' }], 'seats', { tiers: MODEL_POLICY_TIERS }), /tier must be one of/);
   const [ok] = checkDeclaredSeats([{ seat: 'a', role: 'producer', persona: 'p', tier: 'frontier' }]);
   assert.deepEqual(ok, { seat: 'a', role: 'producer', persona: 'p', tier: 'frontier' });
+});
+
+test('checkDeclaredSeats validates seats against nine distinct failure cases with exact error attributes', () => {
+  const check = (fn, { code, at, detail, message }) => {
+    assert.throws(fn, (err) => {
+      assert.ok(err instanceof SeatResolutionError);
+      assert.equal(err.code, code);
+      assert.equal(err.at, at);
+      assert.equal(err.detail, detail);
+      assert.equal(err.message, message);
+      return true;
+    });
+  };
+
+  // 1. non-array or empty
+  check(() => checkDeclaredSeats([], 'unit.seats'), {
+    code: 'invalid-seats',
+    at: '',
+    detail: 'must be a non-empty array of { seat, role }',
+    message: 'unit.seats must be a non-empty array of { seat, role }',
+  });
+
+  // 2. non-object entry
+  check(() => checkDeclaredSeats([null], 'unit.seats'), {
+    code: 'invalid-seats',
+    at: '[0]',
+    detail: 'must be an object { seat, role, persona?, tier? }',
+    message: 'unit.seats[0] must be an object { seat, role, persona?, tier? }',
+  });
+
+  // 3. unknown key
+  check(() => checkDeclaredSeats([{ seat: 'a', role: 'producer', unknownProp: true }], 'unit.seats'), {
+    code: 'invalid-seats',
+    at: '[0].unknownProp',
+    detail: 'has unknown key "unknownProp"; a seat declares only seat, role, persona and tier',
+    message: 'unit.seats[0] has unknown key "unknownProp"; a seat declares only seat, role, persona and tier',
+  });
+
+  // 4. reserved seat id
+  check(() => checkDeclaredSeats([{ seat: 'verify', role: 'producer' }], 'unit.seats'), {
+    code: 'param-invalid',
+    at: '[0].seat',
+    detail: '"verify" is a reserved seat id; reserved: [verify, verifier]',
+    message: 'unit.seats[0].seat "verify" is a reserved seat id; reserved: [verify, verifier]',
+  });
+
+  // 5. invalid seat id
+  check(() => checkDeclaredSeats([{ seat: 'Bad-Seat!', role: 'producer' }], 'unit.seats'), {
+    code: 'invalid-seat-id',
+    at: '[0].seat',
+    detail: '"Bad-Seat!" must be 1-40 characters: a lowercase letter, then lowercase letters, digits or "-"',
+    message: 'unit.seats[0].seat "Bad-Seat!" must be 1-40 characters: a lowercase letter, then lowercase letters, digits or "-"',
+  });
+
+  // 6. duplicate seat
+  check(() => checkDeclaredSeats([{ seat: 'a', role: 'producer' }, { seat: 'a', role: 'reviewer' }], 'unit.seats'), {
+    code: 'duplicate-seat',
+    at: '[1].seat',
+    detail: '"a" is declared twice in this unit',
+    message: 'unit.seats[1].seat "a" is declared twice in this unit',
+  });
+
+  // 7. invalid role
+  check(() => checkDeclaredSeats([{ seat: 'a', role: 'bogus' }], 'unit.seats'), {
+    code: 'invalid-seat-role',
+    at: '[0].role',
+    detail: 'must be one of [producer, synthesizer, reviewer, red-team, judge], got "bogus"',
+    message: 'unit.seats[0].role must be one of [producer, synthesizer, reviewer, red-team, judge], got "bogus"',
+  });
+
+  // 8. invalid persona
+  check(() => checkDeclaredSeats([{ seat: 'a', role: 'producer', persona: '' }], 'unit.seats'), {
+    code: 'invalid-seats',
+    at: '[0].persona',
+    detail: 'must be a non-empty string',
+    message: 'unit.seats[0].persona must be a non-empty string',
+  });
+
+  // 9. invalid tier
+  check(() => checkDeclaredSeats([{ seat: 'a', role: 'producer', tier: 'invalid-tier' }], 'unit.seats', { tiers: ['frontier'] }), {
+    code: 'invalid-seat-tier',
+    at: '[0].tier',
+    detail: 'must be one of [frontier], got "invalid-tier"',
+    message: 'unit.seats[0].tier must be one of [frontier], got "invalid-tier"',
+  });
 });
 
 test('panel members carry the panel posture; a reviewed unit refuses declared seats', () => {
