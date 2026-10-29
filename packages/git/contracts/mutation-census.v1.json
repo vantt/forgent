@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5d13b234e55dd9ccb586619f676e5e373fc2b8e2e91729d3481aa11cac299f74",
+  "payloadDigest": "c044af1e98034a8f228fd999cdba46654e7b44ad1ca5846e070135da7f5607b5",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -887,7 +887,7 @@
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/invocation-fault-log.mjs": "d082dfa9e1a4b5b053b6f2c6bcfc08f252fa5e22ccc1cffcf7e57055f88d7e91",
     "src/cli/version.mjs": "ccccc691aa2e9a844d7724cf38da60fe05b7cac96134e01e825ef2392a353146",
-    "src/config/facade.mjs": "e94edc83560023e6f32c369774fc2183e2298bfa44df3c6dc2b2af54705d9c97",
+    "src/config/facade.mjs": "1c4b1b19618aa311a7c7e65d49f2fd191e60d6adf51d3a4f8514fb9bb72f475f",
     "src/convention/convention-client.mjs": "b1b4a89e4f28f0c67a7e62f0b1f5ac760fff238b5a84dd9e01634f7b517b60da",
     "src/convention/definition-names.mjs": "f845b39591111b910bea842945a32c37287cafdd53fb08fc3cd2b64767294678",
     "src/convention/identifier-rules.mjs": "f3b0fed979b522c53be7c6b756b49425723121a587fe056b1bf616deef81b615",

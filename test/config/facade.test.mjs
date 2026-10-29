@@ -124,3 +124,23 @@ test('a process that cannot load the addon fails every call with the door error 
   assert.equal(res.status, 0, res.stderr);
   assert.equal(res.stdout.trim(), 'Error git-addon-not-shipped');
 });
+
+test('a platform that cannot read config files refuses by name and warns once that fail-closed readers use their default', async () => {
+  const { nativeDoor } = await import('../../src/native/door.mjs');
+  const config = nativeDoor().config;
+  const real = config.snapshot;
+  config.snapshot = () => { throw new Error(JSON.stringify({ id: 'config-platform-unsupported' })); };
+  const warnings = [];
+  const onWarning = (warning) => warnings.push(warning.code);
+  process.on('warning', onWarning);
+  try {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      assert.throws(() => readMachineConfig({}), (err) => err instanceof ConfigDoorError && err.code === 'config-platform-unsupported' && isConfigRefusal(err));
+    }
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.deepEqual(warnings, ['config-platform-unsupported']);
+  } finally {
+    process.off('warning', onWarning);
+    config.snapshot = real;
+  }
+});
