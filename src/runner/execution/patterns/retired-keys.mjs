@@ -28,6 +28,23 @@ export const RETIRED_CONFIG_KEYS = Object.freeze({
   }),
 });
 
+/**
+ * Shared leaf formatter for the retired-key sentence.
+ *
+ * @param {string | { key: string, instruction?: string }} item
+ * @param {string} [instructionOverride]
+ * @returns {string}
+ */
+export function formatRetiredKeySentence(item, instructionOverride) {
+  if (!item) return '';
+  const key = typeof item === 'string' ? item : item.key;
+  const instruction = instructionOverride
+    ?? (typeof item === 'object' && item.instruction ? item.instruction : null)
+    ?? RETIRED_CONFIG_KEYS[key]?.instruction
+    ?? 'delete the key';
+  return `${key} was retired; ${instruction}`;
+}
+
 function matchDottedPath(path) {
   if (typeof path !== 'string') return [];
   for (const [retiredKey, meta] of Object.entries(RETIRED_CONFIG_KEYS)) {
@@ -43,10 +60,10 @@ function matchDottedPath(path) {
 }
 
 /**
- * Inspects `input` (dotted paths, findings, or explicit pattern map object) for retired keys.
+ * Inspects `input` (dotted paths or explicit pattern map object) for retired keys.
  * Returns structured findings `{ key, replacement, instruction }` describing each violation.
  *
- * @param {string | Array<string | { path?: string }> | object} input
+ * @param {string | object} input
  * @returns {Array<{ key: string, replacement: string | null, instruction: string }>}
  */
 export function detectRetiredPatternKeys(input) {
@@ -56,24 +73,7 @@ export function detectRetiredPatternKeys(input) {
     return matchDottedPath(input);
   }
 
-  if (Array.isArray(input)) {
-    const findings = [];
-    const seen = new Set();
-    for (const item of input) {
-      const p = typeof item === 'string' ? item : item?.path;
-      if (typeof p === 'string') {
-        for (const f of matchDottedPath(p)) {
-          if (!seen.has(f.key)) {
-            seen.add(f.key);
-            findings.push(f);
-          }
-        }
-      }
-    }
-    return findings;
-  }
-
-  if (typeof input !== 'object') return [];
+  if (typeof input !== 'object' || Array.isArray(input)) return [];
 
   const findings = [];
   const seen = new Set();
@@ -89,31 +89,26 @@ export function detectRetiredPatternKeys(input) {
     }
   };
 
-  // Check top-level retired keys on patterns-map
-  if (Object.hasOwn(input, 'defaultRule')) {
-    add('runner.patterns.defaultRule');
-  }
-
-  if (Object.hasOwn(input, RETIRED_GATED_NAME)) {
-    add(`runner.patterns.${RETIRED_GATED_NAME}`);
-  }
-
-  if (Object.hasOwn(input, 'reviewed')) {
-    const rev = input.reviewed;
-    if (rev && typeof rev === 'object' && !Array.isArray(rev)) {
-      if (Object.hasOwn(rev, 'maxRounds')) {
-        add('runner.patterns.reviewed.maxRounds');
-      }
-      if (Object.hasOwn(rev, 'checkersByRigor')) {
-        add('runner.patterns.reviewed.checkersByRigor');
+  for (const retiredKey of Object.keys(RETIRED_CONFIG_KEYS)) {
+    if (!retiredKey.startsWith('runner.patterns.')) continue;
+    const subpath = retiredKey.slice('runner.patterns.'.length);
+    const segments = subpath.split('.');
+    let curr = input;
+    let matched = true;
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i];
+      if (curr !== null && typeof curr === 'object' && !Array.isArray(curr) && Object.hasOwn(curr, seg)) {
+        if (i === segments.length - 1) {
+          break;
+        }
+        curr = curr[seg];
+      } else {
+        matched = false;
+        break;
       }
     }
-  }
-
-  // Also support objects directly keyed by full path
-  for (const k of Object.keys(RETIRED_CONFIG_KEYS)) {
-    if (Object.hasOwn(input, k)) {
-      add(k);
+    if (matched) {
+      add(retiredKey);
     }
   }
 

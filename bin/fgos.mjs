@@ -4750,11 +4750,11 @@ function renderPretty(verb, data) {
     }
     if (data.globalRetiredNotice) {
       const notice = data.globalRetiredNotice;
-      const patchStr = notice.patchBody ?? (notice.patch ? JSON.stringify(notice.patch) : '');
+      const hasPatch = Array.isArray(notice.patch) ? notice.patch.length > 0 : Boolean(notice.patch);
+      const patchStr = hasPatch ? (notice.patchBody ?? JSON.stringify(notice.patch)) : '';
       const noteParts = [];
       if (notice.warning) noteParts.push(notice.warning);
-      if (notice.coverageNote) noteParts.push(notice.coverageNote);
-      if (notice.command) noteParts.push(notice.command);
+      if (hasPatch && notice.command) noteParts.push(notice.command);
       if (patchStr) noteParts.push(`patch body:\n${patchStr}`);
       const note = noteParts.join('\n');
       lines.push(

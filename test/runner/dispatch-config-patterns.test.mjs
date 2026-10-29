@@ -545,6 +545,45 @@ test('loadRunnerConfigForDir: other ConfigDoorError codes pass through unchanged
 
   fs.rmSync(repo, { recursive: true, force: true });
 });
+test('retired key door refusals collapse parent and descendant in one file and report distinct files', () => {
+  const errSingle = new ConfigDoorError({
+    refusals: [
+      { path: 'runner.patterns.reviewed.checkersByRigor', file: 'project:config.yaml', line: 4, column: 10 },
+      { path: 'runner.patterns.reviewed.checkersByRigor.standard', file: 'project:config.yaml', line: 5, column: 12 },
+    ],
+  });
+  assert.throws(
+    () => checkDoorRefusalsForRetiredKeys(errSingle),
+    (err) => {
+      assert.equal(err instanceof RunnerConfigError, true);
+      assert.equal(err.code, 'config-key-retired');
+      const lines = err.message.trim().split('\n');
+      assert.equal(lines.length, 1, 'parent and descendant in the same file must collapse to one diagnostic');
+      assert.match(lines[0], /runner\.patterns\.reviewed\.checkersByRigor was retired/);
+      return true;
+    },
+  );
+
+  const errMulti = new ConfigDoorError({
+    refusals: [
+      { path: 'runner.patterns.reviewed.maxRounds', file: 'project:config.yaml', line: 10, column: 5 },
+      { path: 'runner.patterns.reviewed.maxRounds', file: 'global:config.yaml', line: 20, column: 5 },
+    ],
+  });
+  assert.throws(
+    () => checkDoorRefusalsForRetiredKeys(errMulti),
+    (err) => {
+      assert.equal(err instanceof RunnerConfigError, true);
+      assert.equal(err.code, 'config-key-retired');
+      const lines = err.message.trim().split('\n');
+      assert.equal(lines.length, 2, 'two files with the same key must produce two diagnostics');
+      assert.match(lines[0], /project:config\.yaml/);
+      assert.match(lines[1], /~[/\\]\.fgos[/\\]config\.yaml/);
+      return true;
+    },
+  );
+});
+
 
 test('shippedCatalog: returns frozen { patterns, loops } and is cached per process', () => {
   const catalog1 = shippedCatalog();

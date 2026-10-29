@@ -34,7 +34,7 @@ import { validateProviderAccountInventory } from './provider-capacity.mjs';
 // can validate adapter names without importing transport.mjs (cutting the
 // prior config.mjs <-> transport.mjs import cycle).
 import { EXECUTOR_ADAPTERS } from './adapters.mjs';
-import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES } from '../execution/patterns/retired-keys.mjs';
+import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, formatRetiredKeySentence } from '../execution/patterns/retired-keys.mjs';
 import { credentialStoreProblem } from './provider-capacity.mjs';
 import {
   BUILTIN_POLICIES,
@@ -387,9 +387,10 @@ export function checkDoorRefusalsForRetiredKeys(err, options = {}) {
         : (entry.file ?? '<file>');
       const pos = Number.isInteger(entry.line) ? `:${entry.line}:${entry.column}` : '';
       const where = `${displayFile}${pos}`;
-      const msg = `${where}: ${item.key} was retired; ${item.instruction}.`;
-      if (!seen.has(msg)) {
-        seen.add(msg);
+      const msg = `${where}: ${formatRetiredKeySentence(item)}.`;
+      const dedupeKey = `${item.key}@${entry.file ?? ''}`;
+      if (!seen.has(dedupeKey)) {
+        seen.add(dedupeKey);
         messages.push(msg);
       }
     }
@@ -1529,7 +1530,7 @@ export function validateRunnerPatternsShape(patterns, label = 'patterns', option
     const messages = [];
     const seen = new Set();
     for (const finding of retiredFindings) {
-      const msg = `runner config (${label}): ${finding.key} was retired; ${finding.instruction}.`;
+      const msg = `runner config (${label}): ${formatRetiredKeySentence(finding)}.`;
       if (!seen.has(msg)) {
         seen.add(msg);
         messages.push(msg);

@@ -78,7 +78,7 @@ export function resolveCollaboration(options = {}) {
 
   // A runner config without a patterns section declares no patterns of its own; it must never be read as the map itself.
   const effectivePatterns = runnerConfig?.runner?.patterns ?? runnerConfig?.patterns ?? {};
-  const shippedPatterns = shipped?.patterns ?? shipped;
+  const shippedPatterns = shipped?.patterns;
   const { entries } = checkCatalog({
     shipped: shippedPatterns,
     effective: effectivePatterns,
@@ -491,7 +491,7 @@ export function resolveCollaboration(options = {}) {
     }
   }
 
-  const shippedCheckersByRigor = options.shippedCheckersByRigor ?? shipped?.loops?.reviewed?.checkersByRigor;
+  const shippedCheckersByRigor = shipped?.loops?.reviewed?.checkersByRigor;
   const floors = floorCheckers.length > 0 ? { minCheckers: floorCheckers } : undefined;
   const seats = resolveSeats({
     loop,
@@ -537,7 +537,7 @@ export function resolveCollaboration(options = {}) {
   let layerName = null;
   if (origins) layerName = resolveLayer(origins, selectedName);
   if (!layerName) {
-    const shippedEntry = shipped?.patterns?.[selectedName] ?? shipped?.[selectedName];
+    const shippedEntry = shipped?.patterns?.[selectedName];
     layerName = (shippedEntry && deepEqual(entry, shippedEntry)) ? 'shipped' : 'project';
   }
   const hasRequest = Boolean(isSwap || hasRequestParams);

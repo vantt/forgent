@@ -230,7 +230,7 @@ test('handles retired keys in both project and global scopes without crashing se
     });
     const globalBytesBefore = readRawGlobalConfig(homeDir);
 
-    const notice = inspectGlobalRunnerConfig(path.join(homeDir, '.fgos'));
+    const notice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir: path.join(homeDir, '.fgos') });
     assert.ok(notice, 'must return notice for retired keys in global config');
     assert.ok(notice.file.includes('.fgos'), 'notice must identify the global config file');
     assert.ok(notice.edits.length > 0, 'notice must describe the required edits');
@@ -387,7 +387,7 @@ test('refuses legacy json project file with retired keys as blocked, leaving ori
       },
     });
 
-    const notice = inspectGlobalRunnerConfig(path.join(homeDir, '.fgos'));
+    const notice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir: path.join(homeDir, '.fgos') });
     assert.ok(notice, 'must return notice for retired keys in global config');
     assert.ok(notice.file.includes('.fgos'), 'notice must identify the global config file');
     assert.ok(notice.command, 'notice must supply guidance command');
@@ -454,7 +454,7 @@ test('setup CLI prints global guidance when both project and global files hold r
     assert.match(humanResult.stdout, /from a directory outside any fgOS project/);
     assert.match(humanResult.stdout, /Copy the existing values to their replacement keys before removing the old keys\./);
     assert.match(humanResult.stdout, /patch body/);
-    assert.match(humanResult.stdout, /Refused tuning keys, defaultRule and gated entries are detected/);
+    assert.doesNotMatch(humanResult.stdout, /Refused tuning keys, defaultRule and gated entries are detected/);
     assert.match(humanResult.stdout, /runner\.patterns\.reviewed\.maxRounds/);
   } finally {
     process.env.HOME = prevHome;
@@ -594,7 +594,7 @@ test('global config inspection detects all four retired key families with explic
 });
 
 test('global config inspection ignores unrelated errors under reviewed pattern', () => {
-  const { homeDir } = makeTempDirs();
+  const { projectDir, homeDir } = makeTempDirs();
   try {
     writeGlobalConfig(homeDir, {
       runner: {
@@ -605,10 +605,61 @@ test('global config inspection ignores unrelated errors under reviewed pattern',
         },
       },
     });
-    const notice = inspectGlobalRunnerConfig(path.join(homeDir, '.fgos'));
+    const notice = inspectGlobalRunnerConfig({ projectRoot: projectDir, globalDir: path.join(homeDir, '.fgos') });
     assert.equal(notice, null, 'unrelated errors under reviewed pattern must not produce retired key notice');
   } finally {
-    cleanupDirs({ homeDir });
+    cleanupDirs({ projectDir, homeDir });
+  }
+});
+
+test('empty-patch notice in formatGlobalRetiredNotice prints neither a command nor a patch body', () => {
+  const notice = {
+    file: '/some/path/config.yaml',
+    edits: ['cannot move retired key runner.patterns.reviewed.maxRounds: modern runner.loops.reviewed.maxRounds already exists; reconcile duplicate entries manually'],
+    patch: [],
+    patchBody: '[]',
+    command: 'from a directory outside any fgOS project, run: fgos config patch <patch-file> --global',
+  };
+  const text = formatGlobalRetiredNotice(notice);
+  assert.doesNotMatch(text, /from a directory outside any fgOS project/);
+  assert.doesNotMatch(text, /patch body/);
+});
+
+test('empty-patch notice in CLI setup prints neither a command nor a patch body', () => {
+  const { projectDir, homeDir } = makeTempDirs();
+  const prevHome = process.env.HOME;
+  try {
+    process.env.HOME = homeDir;
+    process.env.USERPROFILE = homeDir;
+    writeProjectConfig(projectDir, {
+      runner: {
+        patterns: {
+          reviewed: { maxRounds: 3 },
+        },
+      },
+    });
+    writeGlobalConfig(homeDir, {
+      runner: {
+        loops: {
+          reviewed: { maxRounds: 7 },
+        },
+        patterns: {
+          reviewed: { maxRounds: 3 },
+        },
+      },
+    });
+    const fgosBin = path.resolve('bin/fgos.mjs');
+    const humanResult = spawnSync(process.execPath, [fgosBin, 'setup', '--pretty', '--dir', projectDir], {
+      encoding: 'utf8',
+      env: { ...process.env, HOME: homeDir, USERPROFILE: homeDir },
+    });
+    assert.equal(humanResult.status, 0, humanResult.stderr);
+    assert.match(humanResult.stdout, /global config holds retired keys/);
+    assert.doesNotMatch(humanResult.stdout, /from a directory outside any fgOS project/);
+    assert.doesNotMatch(humanResult.stdout, /patch body/);
+  } finally {
+    process.env.HOME = prevHome;
+    cleanupDirs({ projectDir, homeDir });
   }
 });
 

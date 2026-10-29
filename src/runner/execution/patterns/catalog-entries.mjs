@@ -9,7 +9,7 @@ import {
   LOOP_NAMES,
 } from '../seat-resolver.mjs';
 import { paramTableOf } from '../loops/index.mjs';
-import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, RETIRED_GATED_NAME } from './retired-keys.mjs';
+import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, RETIRED_GATED_NAME, formatRetiredKeySentence } from './retired-keys.mjs';
 
 /**
  * Collaboration error carrying a standard refusal code and optional source layer.
@@ -402,16 +402,18 @@ export function checkCatalog(options = {}) {
   const problems = [];
   const ALLOWED_PATTERN_ENTRY_KEYS = new Set(['promise', 'loop', 'defaults', 'invariants']);
   // 1. Retired keys checks via shared leaf detector
-  for (const finding of detectRetiredPatternKeys(effectivePatterns)) {
+  const retiredFindings = detectRetiredPatternKeys(effectivePatterns);
+  const retiredKeysSet = new Set(retiredFindings.map((f) => f.key.replace(/^runner\.patterns\./, '')));
+  for (const finding of retiredFindings) {
     const name = finding.key.replace(/^runner\.patterns\./, '').split('.')[0];
     const src = resolveLayer(layerSource, name);
     problems.push(new CollaborationError(
       'config-key-retired',
-      `${finding.key} was retired; ${finding.instruction}${src ? ` (source layer: ${src})` : ''}`,
+      `${formatRetiredKeySentence(finding)}${src ? ` (source layer: ${src})` : ''}`,
       { source: src },
     ));
   }
-  // 2. Reserved names and both-shapes check
+  // 2. Reserved names check
   if (Object.hasOwn(effectivePatterns, 'seatBinding')) {
     const sb = effectivePatterns.seatBinding;
     if (sb && typeof sb === 'object' && (Object.hasOwn(sb, 'loop') || Object.hasOwn(sb, 'promise') || Object.hasOwn(sb, 'defaults') || Object.hasOwn(sb, 'invariants'))) {
@@ -447,7 +449,7 @@ export function checkCatalog(options = {}) {
     }
 
     for (const key of Object.keys(entry)) {
-      if (name === 'reviewed' && (key === 'maxRounds' || key === 'checkersByRigor')) continue;
+      if (retiredKeysSet.has(`${name}.${key}`)) continue;
       if (!ALLOWED_PATTERN_ENTRY_KEYS.has(key)) {
         const src = resolveLayer(layerSource, name, key) ?? resolveLayer(layerSource, name);
         problems.push(new CollaborationError(

@@ -87,7 +87,7 @@ import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPat
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
-import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH } from '../runner/execution/patterns/retired-keys.mjs';
+import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH, formatRetiredKeySentence } from '../runner/execution/patterns/retired-keys.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
@@ -107,7 +107,7 @@ import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { firstOnPath, inspectLauncher, writeLauncher } from './project-launcher.mjs';
 import { readConfig, readMachineConfig } from '../config/facade.mjs';
 import { CONFIG_CHECKS, CONFIG_FIXES, checkConfigOnce, isConfigDoorFailure } from './config-checks.mjs';
-import { formatLegacyJsonAdvice } from './runner-config-conversion.mjs';
+import { retiredJsonAdvice } from './runner-config-conversion.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
@@ -494,14 +494,21 @@ export function checkRunnerPatternsConfig(cwd, run) {
   const problems = [];
   const note = (msg) => { if (!problems.includes(msg)) problems.push(msg); };
   for (const f of legacy) {
-    // The advice names the retired keys of that file; its generic form only repeats the door row, so it is dropped.
-    const advice = formatLegacyJsonAdvice(display(f.file));
-    if (advice.includes(' was retired; ')) note(advice);
+    const targetPath = display(f.file);
+    try {
+      const retired = retiredJsonAdvice(targetPath);
+      if (retired.length > 0) {
+        const editsText = retired.map((r) => formatRetiredKeySentence(r)).join('; ');
+        note(`${targetPath}: config-format-legacy-json: ${editsText}; edit ${targetPath}, then run \`fgos config migrate\``);
+      }
+    } catch (err) {
+      note(`${targetPath}: ${err.message}`);
+    }
   }
   for (const f of findings) {
     if (f.row === 'config-format-legacy-json' || legacyScopes.has(f.file?.split(':')[0])) continue;
     for (const item of f.path ? detectRetiredPatternKeys(f.path) : []) {
-      note(`${display(f.file)}: ${item.key} was retired; ${item.replacement ? `use ${item.replacement} instead.` : 'delete the key.'}`);
+      note(`${display(f.file)}: ${formatRetiredKeySentence(item)}.`);
     }
   }
   if (problems.length > 0) {

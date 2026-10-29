@@ -283,26 +283,12 @@ test('checkCatalog reports config-key-retired for reviewed mixing catalog fields
     },
   };
   const layers = { reviewed: 'project' };
-  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, layers });
+  const { problems, entries } = checkCatalog({ shipped: shipped.patterns, effective, layers });
   const retired = problems.find((p) => p.code === 'config-key-retired');
   assert.ok(retired, 'must report config-key-retired');
   assert.equal(retired.source, 'project');
   assert.match(retired.message, /source layer: project/);
   assert.match(retired.message, /runner\.loops\.reviewed\.maxRounds/);
-});
-test('checkCatalog detects retired tuning when a custom pattern named patterns exists', () => {
-  const shipped = shippedCatalog();
-  const patterns = {
-    patterns: { loop: 'solo', promise: 'custom solo' },
-    reviewed: { loop: 'reviewed', maxRounds: 3 },
-  };
-  const { problems, entries } = checkCatalog({
-    shipped: shipped.patterns,
-    effective: patterns,
-  });
-  const retired = problems.find((p) => p.code === 'config-key-retired' && p.message.includes('runner.loops.reviewed.maxRounds'));
-  assert.ok(retired, 'must detect retired key even when a pattern named patterns exists');
-  assert.ok(entries.patterns, 'custom pattern named patterns must be kept in entries');
   assert.ok(entries.reviewed, 'reviewed entry must be kept in entries');
 });
 

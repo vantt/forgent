@@ -840,6 +840,34 @@ test('doctor check runner-patterns-config: a legacy json project file keeps the 
   assert.match(quiet.message, /config-format-legacy-json/);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+test('doctor check runner-patterns-config: clean legacy json in a directory containing was retired passes', () => {
+  const tmpBase = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos- was retired; -base-'));
+  const tmpDir = path.join(tmpBase, 'project');
+  fs.mkdirSync(tmpDir, { recursive: true });
+  try {
+    writeRawLegacyProjectConfig(tmpDir, JSON.stringify({ runner: {} }));
+    const quiet = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config').check(tmpDir);
+    assert.equal(quiet.passed, true);
+    assert.match(quiet.message, /config-format-legacy-json/);
+  } finally {
+    fs.rmSync(tmpBase, { recursive: true, force: true });
+  }
+});
+
+test('doctor check runner-patterns-config: malformed legacy json file fails naming the file and parse failure', () => {
+  const tmpDir = mkTempDir();
+  try {
+    writeRawLegacyProjectConfig(tmpDir, '{ invalid json:');
+    const run = { once: () => ({ findings: [{ row: 'config-format-legacy-json', file: 'project:config.json' }] }) };
+    const res = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config').check(tmpDir, run);
+    assert.equal(res.passed, false);
+    assert.match(res.message, new RegExp(path.join(tmpDir, '.fgos', 'config.json').replace(/[/\\?*]/g, '\\$&')));
+    assert.match(res.message, /syntax|parse|error/i);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
 
 test('doctor runner-patterns-config attributes loop shape validation error to file and line from its read', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-err-home-'));
