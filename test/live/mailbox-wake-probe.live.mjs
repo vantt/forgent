@@ -287,9 +287,10 @@ async function cmdRun(id, { dry, watched, keep, attempt = null }) {
     for (const p of [old.dir, old.settings, old.extension, old.ompOff]) fs.rmSync(p, { recursive: true, force: true });
   }
   const { host, shimFile } = buildHost(REPO_ROOT, targetDir(REPO_ROOT), path.join(base, 'release'));
+  // Laying out the run project reads config through this checkout's own door, so it runs before the host below replaces FGOS_HOST_BIN.
+  const laid = layOut(probe, { dry, base, release: path.dirname(path.dirname(host)), shim: fs.readFileSync(shimFile, 'utf8') });
   // Terminal Control's internal route (and a dry herdr session) are reached through the private release's host, never an activated one.
   process.env.FGOS_HOST_BIN = host;
-  const laid = layOut(probe, { dry, base, release: path.dirname(path.dirname(host)), shim: fs.readFileSync(shimFile, 'utf8') });
   const { paths } = laid;
   const recorder = dry && ['pi', 'omp'].includes(probe.cli) ? await dryModel(probe, paths) : null;
   let herdrEnv = {};
