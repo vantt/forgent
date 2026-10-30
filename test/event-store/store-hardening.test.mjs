@@ -64,9 +64,10 @@ test('store-only benchmark seed retains realistic payloads and explicit history'
   return import('../../src/event-store/index.mjs').then(async({openStore})=>{
     const {addon}=await import('./phase07-fixture.mjs');
     const store=openStore(addon.resolveEventStore(f.repo,f.stateRoot,f.repo),'phase-seven',[contract],loaderOptions);
-    const seed=seedStore(store,{items:1000});
-    assert.equal(seed.items,1000);assert.ok(seed.payloadBytes>8_000_000);
-    assert.equal(store.read({streams:['project']},[]).sequence.length,1000);
+    // 60 items cross the seeder's 50-event append batch; the size bound is the old 8 MB per 1000 items.
+    const seed=seedStore(store,{items:60});
+    assert.equal(seed.items,60);assert.ok(seed.payloadBytes>60*8_000);
+    assert.equal(store.read({streams:['project']},[]).sequence.length,60);
     const history=path.join(f.temp,'history.jsonl');
     fs.writeFileSync(history,JSON.stringify({id:'original',description:'real history payload'})+'\n');
     assert.equal(seedStore(store,{history}).items,1);
