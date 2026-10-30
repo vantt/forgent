@@ -204,3 +204,26 @@ So one cost explains three findings: the 240–270 ms a verb pays over `--help` 
 **Proposal (S-5, product, routed, not TEST's to build):** load each verb's modules when that verb runs, not at entry, so a process pays only for the verb it serves. Rough upper bound, not measured: about 150 ms per CLI call and about 300 ms per attempt. Owner of `bin/fgos.mjs` decides; TEST measures before and after with the same scratch probes.
 
 `run-provider-failover.test.mjs` itself is not a duplicate: `account-rotation.test.mjs` already owns the pure rotation rules (9 cheap tests), and the 29 run-level tests check rotation inside a real attempt. Some cases could move down (for example the two "refused before any unit run exists" tests), but the bigger lever for this file is the per-attempt cost above.
+
+## 9. Spawn census of one full run (2026-10-30, main `493d59339`)
+
+A `--import` preload wrapped `child_process` in every Node process of the suite and logged each child: command and wall time from spawn to exit, under full suite load. 77,517 children. Limits: Rust-spawned children (the supervisor's `attempt-step` processes) are not seen; the preload made confined workers fail to start (sandbox cannot read it), so attempt counts are a floor and this run's test results are void. Rows below are host-side and complete.
+
+| Kind | Calls | Child wall s | Share | Avg |
+|---|---:|---:|---:|---:|
+| `node bin/fgos.mjs` (test harness CLI calls) | 2,726 | 2,724 | 35% | 999 ms |
+| other node scripts (fake agents, helpers) | 1,064 | 2,595 | 34% | 2,439 ms |
+| `fgctl` (install/upgrade tests) | 131 | 447 | 6% | 3.4 s |
+| `sleep` (fake agents that wait) | 149 | 395 | 5% | 2.6 s |
+| `git` | 25,538 | 368 | 5% | 14 ms |
+| `fgos <verb>` through the host | 2,197 | 326 | 4% | 149 ms |
+| `bwrap` (probes and launches) | 7,990 | 292 | 4% | 37 ms |
+| `fgos internal seat-binding` | 34,226 | 244 | 3% | 7 ms |
+| `fgos internal supervise` | 303 | 108 | 1% | 357 ms |
+
+Findings:
+
+- **CLI calls through `node bin/fgos.mjs` are the largest single block** (2,726 calls, 35% of child time). Each pays the full entry import (about 180 ms idle, more under load). Per-verb loading (§8, proposed to HARDEN) would save roughly 2,726 × 150 ms ≈ 400 s of child time, about 7% of the suite's 6,000 s CPU, plus the two attempt steps per attempt (≥ 300 attempts, not seen here). Moving CLI cases to in-process use-case tests (S-2) removes the call altogether, which is the larger lever for tests.
+- **Seat binding execs the host 34,226 times** (7 ms each, 244 s). One test process made 411 calls. Each bind is a separate process by design (`src/seat-binding/client.mjs` `spawnSync` per call). Cheap per call, but the count is high; a candidate for the Seat Binding owner (one host call per bind batch, or the in-process addon door the Git and Config components already use). Not measured further.
+- **`git` is 25,538 calls but only 5%**: the git cost is in count, not per call (14 ms). Not a priority.
+- **Fixed waits:** 149 `sleep` children hold 395 s, and `crash-matrix-adopt-resume` sleeps 4 s for a delivery state no file records (`packages/run-supervisor/rust/src/supervise/terminal.rs`, frame `BRIEF_DELIVERED` lives only in the gate's memory). Replacing time waits with observable rendezvous needs that state written somewhere; routed with the run-supervisor finding, not built by TEST.
