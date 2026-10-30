@@ -15,7 +15,7 @@ import {
   path,
   spawnSync,
 } from './helpers/setup-checks-harness.mjs';
-import { checkAgySubHomesConfigured, findAgySubHomes } from '../../src/setup/agy-permissions.mjs';
+import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, findAgySubHomes, fixAgyPermissionsConfigured } from '../../src/setup/agy-permissions.mjs';
 
 function agySettingsPath(homeDir) {
   return path.join(homeDir, '.gemini', 'antigravity-cli', 'settings.json');
@@ -28,19 +28,13 @@ function doctorCheck(result, id) {
   return entry;
 }
 
-test('fgos doctor reports agy-permissions-configured as failing when agy has no settings.json yet', () => {
-  const cwd = mkTemp('agy-perms-fresh-cwd-');
+test('agy-permissions-configured fails when agy has no settings.json yet', () => {
   const homeDir = mkTemp('agy-perms-fresh-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const check = doctorCheck(result, 'agy-permissions-configured');
-  assert.equal(check.passed, false);
-
-  fs.rmSync(cwd, { recursive: true, force: true });
+  assert.equal(checkAgyPermissionsConfigured(homeDir).passed, false);
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos doctor --fix provisions toolPermission always-proceed + a non-empty permissions.deny, then the check passes', () => {
+test('fgos doctor --fix provisions toolPermission always-proceed + a non-empty permissions.deny, then the check passes, and reports the sub-HOME row', () => {
   const cwd = mkTemp('agy-perms-fix-cwd-');
   const homeDir = mkTemp('agy-perms-fix-home-');
   const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
@@ -49,6 +43,8 @@ test('fgos doctor --fix provisions toolPermission always-proceed + a non-empty p
   assert.equal(fixed.status, 0, fixed.stderr);
   const fixedCheck = doctorCheck(fixed, 'agy-permissions-configured');
   assert.equal(fixedCheck.passed, true);
+  // The sub-HOME row is registered too; with no executor config it has nothing to check.
+  assert.equal(doctorCheck(fixed, 'agy-sub-homes-configured').passed, true);
 
   const settings = JSON.parse(fs.readFileSync(agySettingsPath(homeDir), 'utf8'));
   assert.equal(settings.toolPermission, 'always-proceed');
@@ -58,27 +54,18 @@ test('fgos doctor --fix provisions toolPermission always-proceed + a non-empty p
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos doctor --fix run twice does not rewrite an already-configured agy settings.json (fill-missing-only)', () => {
-  const cwd = mkTemp('agy-perms-idempotent-cwd-');
+test('the agy permissions fix run twice does not rewrite an already-configured settings.json (fill-missing-only)', () => {
   const homeDir = mkTemp('agy-perms-idempotent-home-');
-  const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
-
-  const first = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env });
-  assert.equal(first.status, 0, first.stderr);
+  assert.equal(fixAgyPermissionsConfigured(homeDir).changed, true);
   const mtimeBefore = fs.statSync(agySettingsPath(homeDir)).mtimeMs;
 
-  const second = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env });
-  assert.equal(second.status, 0, second.stderr);
-  const secondFixEntry = JSON.parse(second.stdout).data.fixed.find((f) => f.id === 'agy-permissions-configured');
-  assert.equal(secondFixEntry.changed, false);
+  assert.equal(fixAgyPermissionsConfigured(homeDir).changed, false);
   assert.equal(fs.statSync(agySettingsPath(homeDir)).mtimeMs, mtimeBefore, 'must not rewrite a file that already has both keys');
 
-  fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos doctor --fix never touches an existing trustedWorkspaces list or an already-customized denylist', () => {
-  const cwd = mkTemp('agy-perms-preserve-cwd-');
+test('the agy permissions fix never touches an existing trustedWorkspaces list or an already-customized denylist', () => {
   const homeDir = mkTemp('agy-perms-preserve-home-');
   const settingsPath = agySettingsPath(homeDir);
   fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
@@ -89,16 +76,13 @@ test('fgos doctor --fix never touches an existing trustedWorkspaces list or an a
   };
   fs.writeFileSync(settingsPath, JSON.stringify(customSettings, null, 2));
 
-  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const check = doctorCheck(result, 'agy-permissions-configured');
-  assert.equal(check.passed, true);
+  fixAgyPermissionsConfigured(homeDir);
+  assert.equal(checkAgyPermissionsConfigured(homeDir).passed, true);
 
   const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
   assert.deepEqual(settings.trustedWorkspaces, ['/home/example/my-project']);
   assert.deepEqual(settings.permissions.deny, ['command(regex:^my-own-custom-rule)']);
 
-  fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
@@ -268,16 +252,4 @@ test('checkAgySubHomesConfigured passes when no agy sub-HOMEs are referenced in 
   const res = checkAgySubHomesConfigured('/dummy', { config });
   assert.equal(res.passed, true);
   assert.match(res.message, /no agy sub-HOMEs referenced/);
-});
-
-test('fgos doctor CLI reports agy-sub-homes-configured check', () => {
-  const cwd = mkTemp('agy-sub-cli-cwd-');
-  const homeDir = mkTemp('agy-sub-cli-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const check = doctorCheck(result, 'agy-sub-homes-configured');
-  assert.equal(check.passed, true);
-
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
 });
