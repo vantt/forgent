@@ -253,3 +253,12 @@ Proposal (product, Git component; routed to HARDEN with OPC as Git reviewer): re
 - `parseAcceptanceFlag` exists twice, `bin/fgos.mjs:571` and `src/verbs/state/edit.mjs:16`.
 - `return` and `take` have no use case; extracting them (as approve, move and edit already are) lets their CLI cases move in process (`test/cli/fgos-return.test.mjs` alone: 165 s, 124 CLI calls; plus the claim files).
 - `docs/explanation/approve-cas-mismatch-block.md:56` names `test/cli/fgos-approve-2.test.mjs`, now deleted; the CAS cases are in `test/verbs/merge/approve.test.mjs`. For DOC (docs freeze).
+
+**Landed after approve (10-31):** edit and resolve-park-reason (64 → 47 tests, CPU 48.7 → 25.6 s), move (14 → 10, 23 → 15.5 s), catchup (57 → 50, 92 → 74 s; most of its time is the merge and verify inside catchup, not CLI starts), and two duplicate retirements: 18 CLI copies of status FSM edges (owner `test/state/fsm.test.mjs`) and 4 copies of the acceptance close gate (owner `test/state/store.test.mjs`). Suite CPU 5,628 s → 5,509 s over these gates.
+
+**A Work state write is slow in process too.** In a fresh fixture store, `addWork` takes about 75 ms, but each `moveWork` through `moveUseCase` takes 300–480 ms; one move (to delivered) starts about 76 `git` children, 29 of them in `bwrap` (`for-each-ref` 21, `cat-file` 24, `rev-list` 9, `symbolic-ref` 8). Same pattern as Land: one process per ref or object read. Sent to lead:ES.
+
+**Bug found by the edit move:** `fgos resolve-park-reason` prints `type` and `seq` as undefined; `bin/fgos.mjs` reads them off `resolveParkReason`'s `{ event, view }` result. Sent to lead:ES.
+
+**Still blocked on the Work batch:** `add`, `submit`, `take`, `return` and `cleanup` are written inline in `bin/fgos.mjs`; their CLI cases (most of the intake and claim files, `fgos-return`) can only move once each has a use case.
+
