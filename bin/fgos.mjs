@@ -48,8 +48,7 @@ import { foldEvents, conflictsFor } from '../src/state/replay.mjs';
 import { deriveTitle, classify } from '../src/intake/classify.mjs';
 import { mintMachineId, mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfigForDir, RunnerConfigError, runDispatchCli, runDoorHint, DispatchError } from '../src/runner/dispatch.mjs';
-import { resolveWorkForDispatch } from '../src/runner/work-dispatch.mjs';
+import { loadRunnerConfigForDir, RunnerConfigError } from '../src/runner/dispatch/config.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
@@ -80,7 +79,7 @@ import { readClaim, releaseClaim, getMainFgosDir } from '../src/state/runtime-co
 import { maintainEventStore } from '../src/event-store/maintenance.mjs';
 import { processSealCoalescer } from '../src/event-store/seal-coalescing.mjs';
 import { spawnDetachedCli } from '../src/cli/detached-child.mjs';
-import { currentDispatchDepth } from '../src/runner/dispatch/transport.mjs';
+import { currentDispatchDepth, DispatchError } from '../src/runner/dispatch/transport.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
@@ -89,14 +88,6 @@ import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
 import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet, readInvariantCheckCommands, releaseRecordedLand } from '../src/runner/merge.mjs';
 import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
-import { rejectUseCase } from '../src/verbs/merge/reject.mjs';
-import { reviewUseCase } from '../src/verbs/merge/review.mjs';
-import { syncRootUseCase } from '../src/verbs/merge/sync-root.mjs';
-import { promoteToComponentUseCase } from '../src/verbs/merge/promote-to-component.mjs';
-import { approveUseCase } from '../src/verbs/merge/approve.mjs';
-import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
-import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
-import { discoverUseCase, planUseCase } from '../src/verbs/state/step.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
 import { unknownFlagMessage } from '../src/cli/flag-check.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
@@ -106,7 +97,6 @@ import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mj
 import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcile.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
-import { unreleasedHasEntries, pathExistsAt, commitAt } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, gitWorktrees, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
@@ -121,11 +111,8 @@ import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn, readBeacon } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
-import { createWorktreeUseCase } from '../src/verbs/worktree/create.mjs';
-import { removeWorktreeUseCase } from '../src/verbs/worktree/remove.mjs';
 import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-root.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
-import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
@@ -133,17 +120,11 @@ import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
-import { DOCTOR_CHECKS, createDoctorRun, integrationScriptPath, runFixes } from '../src/setup/checks.mjs';
 import { readConfig, initConfigFile } from '../src/config/facade.mjs';
 import { fixEventStoreLockDirs } from '../src/setup/event-store-fixes.mjs';
 import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
-import { installGitHooks, uninstallGitHooks } from '../src/setup/git-hooks.mjs';
-import { installClaudeCodeHook } from '../src/setup/claude-code-hooks.mjs';
-import { detectRcFiles, insertSourceLine, hasSourceLine } from '../src/setup/shell-rc.mjs';
-import { materializeSkillsIntoProject } from '../src/setup/skill-wrappers.mjs';
 import { formatCheck, bold } from '../src/setup/ansi.mjs';
-import { convertRunnerPatternsConfig, inspectGlobalRunnerConfig } from '../src/setup/runner-config-conversion.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
 // free-text submission has no verification plan yet — that is P15's job. The
@@ -242,7 +223,8 @@ function changedFilesSince(cwd, from, to) {
 
 // Whether HEAD of `repoRoot` holds `relativePath` (a blob or a tree); false outside a repository or
 // before the first commit.
-function existsAtHead(repoRoot, relativePath) {
+async function existsAtHead(repoRoot, relativePath) {
+  const { pathExistsAt, commitAt } = await import('../src/setup/registrations.mjs');
   try { return pathExistsAt(repoRoot, commitAt(repoRoot, 'HEAD'), relativePath); } catch { return false; }
 }
 
@@ -1019,12 +1001,13 @@ function submitWork(dir, text, opts = {}) {
 // The dispatch doors that ran one task straight through dispatch are gone; each now has a
 // runUnit door. This is the one place that says which: every caller of `fgos dispatch`
 // (shell, gateway, scripts) gets the same validation error, before anything runs.
-function retiredDispatchDoorMessage(sub, positional, flags) {
+async function retiredDispatchDoorMessage(sub, positional, flags) {
   if (sub === 'execute') {
     if (flags.assignment !== undefined) {
       return 'fgos dispatch execute --assignment was removed: run the unit with `fgos run --unit <file>`, or planned work with `fgos workflow start <preset>|--units <file>`.';
     }
     const executorId = positional[1] && !String(positional[1]).startsWith('--') ? positional[1] : undefined;
+    const { runDoorHint } = await import('../src/runner/dispatch/cli.mjs');
     const hint = runDoorHint({
       cwd: typeof flags.cwd === 'string' ? flags.cwd : process.cwd(),
       executorId,
@@ -1281,6 +1264,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           step: runState.status,
         };
       }
+      const { discoverUseCase } = await import('../src/verbs/state/step.mjs');
       return discoverUseCase({ dir, runnerConfig: cfg }, { id, callerVerdict, role: 'session' });
     }
 
@@ -1316,6 +1300,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           step: runState.status,
         };
       }
+      const { planUseCase } = await import('../src/verbs/state/step.mjs');
       return planUseCase(
         { dir, repoRoot, runnerConfig: cfg },
         { id, callerVerdict, validate: Boolean(flags.validate), direct: Boolean(flags.direct), role: 'session' },
@@ -1635,7 +1620,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
 
         const repoRoot = path.dirname(dir);
-        if (!existsAtHead(repoRoot, targetDoc.currentPath)) {
+        if (!(await existsAtHead(repoRoot, targetDoc.currentPath))) {
           throw new StoreError(
             'validation',
             `doc promote: file '${targetDoc.currentPath}' is not committed at git HEAD. Remedy: commit file '${targetDoc.currentPath}' to git HEAD before promoting.`
@@ -1696,7 +1681,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const resolved = resolveDocPath(view, docPath);
 
         const repoRoot = path.dirname(dir);
-        if (!existsAtHead(repoRoot, docPath)) {
+        if (!(await existsAtHead(repoRoot, docPath))) {
           throw new StoreError('validation', `knowledge attest: path '${docPath}' is not committed at git HEAD. Remedy: commit file '${docPath}' to git HEAD first.`);
         }
 
@@ -1790,7 +1775,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // while their tags still claimed they existed.
       if (docPath !== undefined) {
         const repoRoot = path.dirname(dir);
-        if (!existsAtHead(repoRoot, docPath)) {
+        if (!(await existsAtHead(repoRoot, docPath))) {
           throw new StoreError('validation', `compound: --doc-path "${docPath}" is not committed at the main checkout's HEAD ("${repoRoot}") — write and commit the document there before tagging it.`);
         }
         // docs/architect/knowledge-registry-redesign.md §8: "The new
@@ -2594,6 +2579,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'merge': {
       const sub = requireField(positional[0], 'merge requires a sub-verb: fgos merge <list|next>');
       if (sub === 'list') {
+        const { mergeList } = await import('../src/verbs/merge/merge.mjs');
         return mergeList({ dir, cwd: process.cwd() });
       }
       if (sub === 'next') {
@@ -2606,6 +2592,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // that is the whole point of parseMergeClusterOptions (tsk-49i
         // D3). Building them only on this branch keeps `merge list` free
         // of the timeout/wait parsing it never did before.
+        const { mergeNext } = await import('../src/verbs/merge/merge.mjs');
         return await mergeNext(
           { dir, cwd: process.cwd(), repoRoot: mergeRepoRoot },
           {
@@ -2629,7 +2616,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // this case to sending anything into a pane.
     case 'dispatch': {
       const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|explain|probe-account>');
-      const retired = retiredDispatchDoorMessage(sub, positional, flags);
+      const retired = await retiredDispatchDoorMessage(sub, positional, flags);
       if (retired) throw new StoreError('validation', retired);
       const KNOWN_DISPATCH_SUBVERBS = [
         'show-run',
@@ -2645,10 +2632,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw new StoreError('validation', `unknown dispatch sub-verb "${sub}": expected ${KNOWN_DISPATCH_SUBVERBS.join(', ')}`);
       }
       if (sub === 'probe-account') {
+        const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
         return await runDispatchCli(rawArgv, { returnResult: true });
       }
       if (sub === 'decide') {
         // Dispatch holds no Work store: `decide --work` gets its Work lookup from here.
+        const { runDispatchCli } = await import('../src/runner/dispatch/cli.mjs');
+        const { resolveWorkForDispatch } = await import('../src/runner/work-dispatch.mjs');
         try {
           return await runDispatchCli(rawArgv, { returnResult: true, resolveWork: resolveWorkForDispatch });
         } catch (err) {
@@ -3663,6 +3653,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // and would turn a stray `--pr` without `--github` — ignored before —
       // into a new validation error. `approve` already keeps its own `--pr`
       // check inside its use case for the same reason.
+      const { reviewUseCase } = await import('../src/verbs/merge/review.mjs');
       return await reviewUseCase(
         { dir, cwd: process.cwd() },
         { id, github: Boolean(flags.github), prNumber: flags.pr, ...ghCommandOpts() },
@@ -3685,6 +3676,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // behavior silently. Byte-identical to today when the flag is
       // omitted.
       const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
+      const { approveUseCase } = await import('../src/verbs/merge/approve.mjs');
       return await approveUseCase(
         { dir, repoRoot },
         parseMergeClusterOptions('approve', flags, dir, { id }),
@@ -3714,6 +3706,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // rather than getting the relaxed behavior silently. Byte-identical
       // to today when the flag is omitted.
       const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
+      const { syncRootUseCase } = await import('../src/verbs/merge/sync-root.mjs');
       return await syncRootUseCase({ dir, repoRoot }, parseMergeClusterOptions('sync-root', flags, dir, { id }));
     }
 
@@ -3751,6 +3744,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // has never read the runner config's verify timeout, and keeping it
       // that way is the only way this stays a pure move.
       const timeoutMs = flags.timeout !== undefined ? Number(flags.timeout) : undefined;
+      const { promoteToComponentUseCase } = await import('../src/verbs/merge/promote-to-component.mjs');
       return await promoteToComponentUseCase(
         { dir, repoRoot },
         { ids, rootId: flags['root-id'], rootTitle: flags['root-title'], timeoutMs },
@@ -3765,6 +3759,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'reject': {
       const id = requireField(positional[0] ?? flags.id, 'reject requires an id: fgos reject <id> --reason "..."');
       const reason = requireField(flags.reason, 'reject requires --reason "..."');
+      const { rejectUseCase } = await import('../src/verbs/merge/reject.mjs');
       return rejectUseCase({ dir }, { id, reason });
     }
 
@@ -3783,6 +3778,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // in that case). This verb has no `--trust-dir` gate, unlike
       // approve/sync-root/promote-to-component — a real per-verb
       // difference the adapter owns.
+      const { catchupUseCase } = await import('../src/verbs/merge/catchup.mjs');
       return await catchupUseCase({ dir, repoRoot: path.dirname(dir) }, { id, timeoutMs });
     }
 
@@ -3802,6 +3798,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
         const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
         const writer = gitWriter(path.join(repoRoot, '.fgos'));
+        const { createWorktreeUseCase } = await import('../src/verbs/worktree/create.mjs');
         return createWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
           path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),
           detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),
@@ -3813,6 +3810,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
         const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
         const writer = gitWriter(path.join(repoRoot, '.fgos'));
+        const { removeWorktreeUseCase } = await import('../src/verbs/worktree/remove.mjs');
         return removeWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
           path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),
         });
@@ -3888,6 +3886,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'gateway': {
       const sub = requireField(positional[0], 'gateway requires a sub-verb: fgos gateway <start|stop|status>');
       const repoRoot = path.dirname(dir);
+      const { startGateway, stopGateway, gatewayStatus, GatewayControlError } = await import('../src/runner/gateway-control.mjs');
       try {
         if (sub === 'start') {
           return startGateway(repoRoot, dir);
@@ -3998,6 +3997,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // so run from a linked worktree this used to materialize .fgos/config.json
       // INSIDE the worktree (ADR0020 violation), not just report wrong.
       const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const { integrationScriptPath, runFixes } = await import('../src/setup/checks.mjs');
+      const { installGitHooks } = await import('../src/setup/git-hooks.mjs');
+      const { installClaudeCodeHook } = await import('../src/setup/claude-code-hooks.mjs');
+      const { detectRcFiles, insertSourceLine } = await import('../src/setup/shell-rc.mjs');
+      const { materializeSkillsIntoProject } = await import('../src/setup/skill-wrappers.mjs');
+      const { convertRunnerPatternsConfig, inspectGlobalRunnerConfig } = await import('../src/setup/runner-config-conversion.mjs');
       const scriptPath = integrationScriptPath();
       const rcFiles = detectRcFiles(os.homedir());
       const rcFilesInserted = [];
@@ -4134,6 +4139,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       // tsk-2xj: same --dir resolution as `doctor`/`setup` above.
       const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const { integrationScriptPath } = await import('../src/setup/checks.mjs');
+      const { uninstallGitHooks } = await import('../src/setup/git-hooks.mjs');
+      const { detectRcFiles, hasSourceLine } = await import('../src/setup/shell-rc.mjs');
       const scriptPath = integrationScriptPath();
       const shellRcSourceLinesFound = scriptPath === null
         ? []
@@ -4210,6 +4218,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // worktree never carries its own .fgos/, so process.cwd() there was
       // silently checking/writing the wrong tree).
       const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      const { DOCTOR_CHECKS, createDoctorRun, runFixes } = await import('../src/setup/checks.mjs');
       const fixed = flags.fix ? runFixes(repoRoot) : undefined;
       // A check may return its result directly or as a promise (one drives promise-based runner code).
       const checks = [];
@@ -5036,7 +5045,7 @@ async function handleHook(rest) {
           process.stdout.write(
             JSON.stringify({
               decision: 'deny',
-              reason: `BLOCKED: this subagent call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). Run it through ${runDoorHint({ cwd: payloadCwd, executorId: decided.executorId, capability: subagentType })} instead.`,
+              reason: `BLOCKED: this subagent call resolves to out-of-process dispatch (no native in-process handler for "${subagentType}"). Run it through ${(await import('../src/runner/dispatch/cli.mjs')).runDoorHint({ cwd: payloadCwd, executorId: decided.executorId, capability: subagentType })} instead.`,
             }) + '\n',
           );
           process.exit(0);

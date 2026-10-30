@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "278ecf2cf55b746b5d777b15f1f2b1cfbfd61b08284ab5ca58d17d3742ab44e8",
+  "payloadDigest": "fb402656e99b7d37cd625e2f5485d481b091324025a9a525cf4529b2db8f005e",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -112,7 +112,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "fe8cac0ffb92d6bf8c6f8c001df35b66aeea4518192b2e22df060cd3266f9f83",
-    "bin/fgos.mjs": "df8fe908ed945aa7fa49c1cd9e8f7ed8d8d458f511a14b891663b5765ce67fcd",
+    "bin/fgos.mjs": "163a269e9cb43ea9bcad41bac8cddb413b7e390552f4c84c09908fc4c4bfb4f1",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -1994,14 +1994,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3456,
+      "line": 3446,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3600,
+      "line": 3590,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"

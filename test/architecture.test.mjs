@@ -144,10 +144,15 @@ test('import một chiều xuống: không file nào import ngược lên tầng
   const violations = [];
   for (const file of inManifest) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
-    // Bắt cả import nhiều dòng: `import {\n ... \n} from './x.mjs';`
-    for (const m of source.matchAll(/^import\s[^;]*?from\s+['"](\.[^'"]+)['"]/gms)) {
+    // Bắt cả import nhiều dòng: `import {\n ... \n} from './x.mjs';`, và import động
+    // `import('./x.mjs')` với specifier là string literal (cạnh lazy cũng phải theo luật tầng).
+    const specifiers = [
+      ...[...source.matchAll(/^import\s[^;]*?from\s+['"](\.[^'"]+)['"]/gms)].map((m) => m[1]),
+      ...[...source.matchAll(/\bimport\(\s*['"](\.[^'"]+)['"]\s*\)/g)].map((m) => m[1]),
+    ];
+    for (const specifier of specifiers) {
       const target = path
-        .relative(root, path.resolve(root, path.dirname(file), m[1]))
+        .relative(root, path.resolve(root, path.dirname(file), specifier))
         .split(path.sep)
         .join('/');
       // The manifest only covers src/ + bin/ (per "đủ sổ" above) — a
