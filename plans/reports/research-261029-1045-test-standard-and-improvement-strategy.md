@@ -235,3 +235,21 @@ The `rust-host/fgctl-*` files hold about 430 s of test time. One `fgctl init --f
 Proposal (product, routed; the SEAT lane is closed): bind a whole batch in one host call (the route already reads JSON on stdin), or bind through the in-process native door as Config, Process and YAML already do. Expected: most of the 718 process starts per init go away, roughly half of an init's time; the suite's 34,226 seat-binding launches (§9) shrink with it. Not measured until built.
 
 Test-side change landed on the TEST branch: `checks-doctor-config.test.mjs` runs `fgos doctor` three times instead of six (47 s to 31 s), retiring two tests whose cases moved into the remaining CLI wiring tests.
+
+## 11. Work CLI tests in process, and what one approve costs (2026-10-30 23:40)
+
+Owner chose (a) at 23:15: move Work verb test cases in process now, test-only. Work has run on the Event Store since the 10-24 cutover.
+
+**Which verbs can move.** `approve`, `move`, `edit`, `merge`, `review`, `sync-root`, `promote-to-component` already call a use case (`src/verbs/**`). `return` (365 lines) and `take` (100 lines) are written inline in `bin/fgos.mjs`'s switch, with no function to call; their cases can only move after the use case is extracted, which is a Work product change (routed to the Work batch, below). Started with approve.
+
+**Approve result** (commit `cce1d9eae` on `test/f14-slowdown`): 72 approve tests → 45 (8 CLI wiring, 37 in process across `test/verbs/merge/approve.test.mjs` and `approve-leaf-and-worktree.test.mjs`); CPU of the approve files 176 s → 55 s, wall 34 s → 31 s. The shared harness now claims in process (`takeOk` through `claimWork`), which also cut 12% from the old files before the move.
+
+**Why an approve is slow even in process.** One in-process `approveUseCase` of a trivial runner item takes about 2 s; the CLI spawn adds only about 0.4 s. An `strace -f -e execve` of that single call shows **228 `git` children, 151 of them each inside its own `bwrap`** (the Git driver's containment, `packages/git/rust/src/driver.rs`), plus one `sh -c true` for the verify. By subcommand: 50 `for-each-ref` (36 of them the single-ref read `read_ref_value`, `driver.rs:1541`), 23 `symbolic-ref`, 19 `cat-file --batch`, 11 `cat-file -t`, 9 `cat-file --batch-check`, 18 `update-ref`, 8 `hash-object -w`, 6 `worktree list`, 4 `status --porcelain=v2`. At about 7 ms per child that is the whole 2 s. Every user pays it on every `approve`, `sync-root` and `merge next`, not only the tests.
+
+Proposal (product, Git component; routed to HARDEN with OPC as Git reviewer): read the refs one Land step needs in one `for-each-ref` snapshot instead of one call per ref; keep one `cat-file --batch` process for the operation instead of starting one per lookup; run read-only queries outside containment if containment is only needed for writes. Not measured until built.
+
+**Work batch findings from this move (not fixed, test-only lane):**
+- `approveUseCase` throws on `--github` at `src/verbs/merge/approve.mjs:402` before any branch runs, yet still imports `mergeGitHubPR` and takes `prNumber`/`ghCommand`, and its comments describe the GitHub transport as live. Dead path; delete with its parameters (L10).
+- `parseAcceptanceFlag` exists twice, `bin/fgos.mjs:571` and `src/verbs/state/edit.mjs:16`.
+- `return` and `take` have no use case; extracting them (as approve, move and edit already are) lets their CLI cases move in process (`test/cli/fgos-return.test.mjs` alone: 165 s, 124 CLI calls; plus the claim files).
+- `docs/explanation/approve-cas-mismatch-block.md:56` names `test/cli/fgos-approve-2.test.mjs`, now deleted; the CAS cases are in `test/verbs/merge/approve.test.mjs`. For DOC (docs freeze).
