@@ -5,8 +5,6 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
   ADD_BAD_FLAG_CASES,
-  EDIT_BAD_FLAG_CASES,
-  EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES,
   FGOS,
   MOVE_BAD_FLAG_CASES,
   REAL_REPO_ROOT,

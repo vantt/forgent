@@ -408,28 +408,6 @@ const MOVE_BAD_FLAG_CASES = [
   ['a valid --to plus an empty --expect ""', ['--to', 'doing', '--expect', '']],
 ];
 
-// tsk-34y: same invariant as ADD_BAD_FLAG_CASES/SUBMIT_BAD_FLAG_CASES/
-// MOVE_BAD_FLAG_CASES above -- a bad, bare, or empty value on one `edit`
-// flag is rejected as validation (exit 4), appends no event, and leaves the
-// target field unset (never silently coerced). Includes the --docs-ref
-// empty-string case that used to sit far below near the other --docs-ref
-// tests (D1, docs/history/test-suite-dry-consolidation/CONTEXT.md).
-const EDIT_BAD_FLAG_CASES = [
-  ['a negative --priority (priority must be non-negative)', ['--priority', '-1'], 'priority'],
-  ['a bare --priority (no following value)', ['--priority'], 'priority'],
-  ['a non-numeric --intent', ['--intent', 'notanumber'], 'intent'],
-  ['a bare --intent (no following value)', ['--intent'], 'intent'],
-  ['an empty --docs-ref ""', ['--docs-ref', ''], 'docsRef'],
-];
-
-const EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES = [
-  ['an out-of-domain --urgent', ['--urgent', 'extreme'], 'urgent'],
-  ['a negative --impact', ['--impact', '-1'], 'impact'],
-  ['a bare --impact (no following value)', ['--impact'], 'impact'],
-  ['a non-numeric --effort', ['--effort', 'notanumber'], 'effort'],
-  ['a bare --effort (no following value)', ['--effort'], 'effort'],
-];
-
 // tsk-34y: these `add` flag-value rejections shared one invariant -- an
 // otherwise-valid `add` invocation with one flag given a bad or bare value
 // is rejected as validation (exit 4) and appends no event. Each row below
@@ -1181,8 +1159,6 @@ function writeCleanupTtlConfig(cwd, ttlDays) {
 }
 export {
   ADD_BAD_FLAG_CASES,
-  EDIT_BAD_FLAG_CASES,
-  EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES,
   FGOS,
   MOVE_BAD_FLAG_CASES,
   REAL_REPO_ROOT,

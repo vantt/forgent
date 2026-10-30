@@ -8,8 +8,6 @@ import { appendWorkEvent } from '../helpers/work-event-fixture.mjs';
 import { writeBeacon, beaconPath } from '../../src/runner/main-checkout-activity.mjs';
 import {
   ADD_BAD_FLAG_CASES,
-  EDIT_BAD_FLAG_CASES,
-  EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES,
   FGOS,
   MOVE_BAD_FLAG_CASES,
   REAL_REPO_ROOT,

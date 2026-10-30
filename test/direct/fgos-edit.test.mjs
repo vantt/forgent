@@ -2,7 +2,8 @@ import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { tmpCwdFast } from '../cli/helpers/fgos-cli-harness.mjs';
+import { spawnSync } from 'node:child_process';
+import { initGitCwdFast, initGitCwdWithWorktree, linkFgosBinInto, moveOk, tmpCwdFast, toProposed } from '../cli/helpers/fgos-cli-harness.mjs';
 import { addWork, listWork, editWork, readRawEvents, StoreError } from '../../src/state/store.mjs';
 import { WorkValidationError } from '../../src/state/work.mjs';
 import {
@@ -446,4 +447,89 @@ test('generateVerifyFromChildren and generateVerifyFromTargets generate jq comma
     () => generateVerifyFromTargets(dir, 'targetless-mvp', { cwd, repoRoot: cwd }),
     /no targets/i,
   );
+});
+
+test('edit refuses a malformed flag value as validation, writes no event and leaves the field unset', () => {
+  const cwd = tmpCwdFast();
+  const dir = path.join(cwd, '.fgos');
+  addTestWork(dir, 'edit-bad-flag');
+  const before = eventLines(dir).length;
+  // Flags as the CLI parser hands them over: a value string, or `true` for a flag given with no value.
+  const cases = [
+    [{ priority: '-1' }, 'priority'],
+    [{ priority: true }, 'priority'],
+    [{ intent: 'notanumber' }, 'intent'],
+    [{ intent: true }, 'intent'],
+    [{ 'docs-ref': '' }, 'docsRef'],
+    [{ urgent: 'extreme' }, 'urgent'],
+    [{ impact: '-1' }, 'impact'],
+    [{ impact: true }, 'impact'],
+    [{ effort: 'notanumber' }, 'effort'],
+    [{ effort: true }, 'effort'],
+    [{ parent: true }, 'parent', /--parent requires a value; use --parent "" to clear it/],
+    [{ 'superseded-by': true }, 'supersededBy', /--superseded-by requires a value/],
+    [{ acceptance: 'not json' }, 'acceptance'],
+    [{ acceptance: JSON.stringify({ text: 'x' }) }, 'acceptance'],
+    [{ acceptance: JSON.stringify([{ evidence: 'e' }]) }, 'acceptance'],
+    [{ acceptance: JSON.stringify([{ text: '' }]) }, 'acceptance'],
+  ];
+  for (const [flags, field, message = /./] of cases) {
+    assert.throws(
+      () => editUseCase({ dir }, { id: 'edit-bad-flag', patch: parseEditFlags(flags, { id: 'edit-bad-flag', dir, cwd }) }),
+      (err) => (err instanceof StoreError || err instanceof WorkValidationError) && err.category === 'validation' && message.test(err.message),
+      JSON.stringify(flags),
+    );
+    assert.equal(listWork(dir).work['edit-bad-flag'][field], undefined, `${JSON.stringify(flags)} leaves ${field} unset`);
+  }
+  assert.equal(eventLines(dir).length, before);
+});
+
+test('edit --verify-from-children/--verify-from-targets run from a linked worktree bake the main checkout into --dir, never the worktree', () => {
+  const { cwd, worktreePath } = initGitCwdWithWorktree();
+  const dir = path.join(cwd, '.fgos');
+  addTestWork(dir, 'parent-x');
+  addTestWork(dir, 'child-1', { parent: 'parent-x' });
+  addTestWork(dir, 'target-1');
+  addTestWork(dir, 'mvp-x', { goalTier: 'mvp', targets: ['target-1'] });
+
+  for (const [id, flags] of [['parent-x', { 'verify-from-children': true }], ['mvp-x', { 'verify-from-targets': true }]]) {
+    const { verify } = parseEditFlags(flags, { id, dir, cwd: worktreePath });
+    assert.ok(verify.includes(`--dir ${cwd}`), `expected --dir "${cwd}" in: ${verify}`);
+    assert.ok(!verify.includes(worktreePath), `verify must not bake in the worktree's own path: ${verify}`);
+  }
+});
+
+test("edit --verify-from-children's generated command, really run, passes only when every child is in the resolved set", () => {
+  const cwd = initGitCwdFast();
+  const dir = path.join(cwd, '.fgos');
+  linkFgosBinInto(cwd);
+  addTestWork(dir, 'parent-all-resolved');
+  addTestWork(dir, 'child-r1', { parent: 'parent-all-resolved' });
+  addTestWork(dir, 'child-r2', { parent: 'parent-all-resolved' });
+  addTestWork(dir, 'parent-partial');
+  addTestWork(dir, 'child-p1', { parent: 'parent-partial' });
+  addTestWork(dir, 'child-p2', { parent: 'parent-partial' });
+  // Resolved without being strictly done: delivered, and cleanup. child-p2 stays todo.
+  for (const [id, path_] of [['child-r1', ['blocked', 'delivered']], ['child-r2', ['blocked', 'delivered', 'retrospective', 'cleanup']], ['child-p1', ['blocked', 'delivered']]]) {
+    for (const to of path_) assert.equal(moveOk(cwd, id, to).status, 0, `${id} -> ${to}`);
+  }
+
+  const run = (verify) => spawnSync(verify, { cwd, shell: true, encoding: 'utf8' });
+  const allResolved = run(generateVerifyFromChildren(dir, 'parent-all-resolved', { cwd }));
+  assert.equal(allResolved.status, 0, `every child resolved must pass: ${allResolved.stderr}`);
+  assert.notEqual(run(generateVerifyFromChildren(dir, 'parent-partial', { cwd })).status, 0, 'a child still todo must fail, never pass vacuously');
+});
+
+test('editing in the missing evidence after a refused move to delivered lets the retry succeed: no cached verdict', () => {
+  const cwd = tmpCwdFast();
+  const dir = path.join(cwd, '.fgos');
+  toProposed(cwd, 'cos-retry');
+  editUseCase({ dir }, { id: 'cos-retry', patch: { acceptance: [{ text: 'ship it' }] } });
+  assert.equal(moveOk(cwd, 'cos-retry', 'delivered').status, 2);
+  assert.equal(listWork(dir).work['cos-retry'].status, 'awaiting-approval');
+
+  // Evidence must cite a real path under the repo root.
+  editUseCase({ dir }, { id: 'cos-retry', patch: { acceptance: [{ text: 'ship it', evidence: '.fgos/coexistence.json' }] } });
+  assert.equal(moveOk(cwd, 'cos-retry', 'delivered').status, 0, 'the retry re-reads the edited evidence');
+  assert.equal(listWork(dir).work['cos-retry'].status, 'delivered');
 });
