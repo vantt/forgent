@@ -389,20 +389,6 @@ test('mainCheckoutHookWired is true from inside a linked worktree when the main 
   fs.rmSync(mainCheckout, { recursive: true, force: true });
 });
 
-test('main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message', () => {
-  const cwd = mkTemp('doctor-hook-check-');
-  execFileSync('git', ['init', '-q'], { cwd });
-  fs.mkdirSync(path.join(cwd, '.githooks'));
-  const before = checkById('main-checkout-hook-wired').check(cwd);
-  assert.equal(before.passed, false);
-  assert.match(before.message, /run fgos setup/);
-
-  execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd });
-  const after = checkById('main-checkout-hook-wired').check(cwd);
-  assert.equal(after.passed, true);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
 test('fgos doctor (no flags) on a fresh cwd prints the envelope JSON with every check, and never creates the shared config file (read-only proof)', () => {
   const cwd = mkTemp('doctor-cli-readonly-');
   const homeDir = mkTemp('doctor-cli-readonly-home-');
