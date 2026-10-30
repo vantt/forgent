@@ -262,3 +262,8 @@ mailbox:
   # @fgos:doc Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. On by default (owner decision 2026-10-28): a project opts out with mailbox.enabled: false. Default: true.
   # @fgos:why [9514b261-1778-4cbd-a231-bec51e3e04d9] owner 2026-10-25: turn the agent mailbox on for the forgent project
   enabled: true
+  # @fgos:doc Delivery of mail between machines, through the Event Store and the project's Git remote.
+  crossMachine:
+    # @fgos:doc Whether this project's mailbox sends mail to, and takes mail from, sessions on other machines. Off until the two-machine proof has passed on every machine. Default: false.
+    # @fgos:why [9514b261-1778-4cbd-a231-bec51e3e04d9] cross-machine mail live proof (owner: install through fg-server, guide 261030-0331)
+    enabled: true
