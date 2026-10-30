@@ -320,6 +320,8 @@ test('the orphan sweep kills a run the harness did not finish, even one whose la
   assert.equal(fs.existsSync(entries[1].login.copy), false, 'an unchanged copy is removed');
   assert.ok(fs.existsSync(path.dirname(entries[1].login.copy)), 'only the copy, never its home');
   for (const entry of entries) {
+    // The kill has landed when the sweep returns, but under load the process may not have exited yet.
+    for (let waited = 0; processesOfRun(entry.dir, entry.pidNs).length > 0 && waited < 5000; waited += 50) await sleep(50);
     assert.deepEqual(processesOfRun(entry.dir, entry.pidNs), [], entry.runId);
     const recorded = JSON.parse(fs.readFileSync(path.join(w.base, 'ledger', `${entry.runId}.json`), 'utf8'));
     assert.equal(recorded.outcome, 'error');
