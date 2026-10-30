@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos mailbox send` can now nudge a Codex session that is idle: after the mail is recorded it runs `codex queue` with one fixed line ("You have mail. Read it with: fgos mailbox inbox --claim"), never the message body, and the send report says whether the nudge was sent, is already outstanding, or was refused. The nudge only runs on Codex versions the adapters contract lists as tested for it (0.161.0 today); on any other version the report says `version-not-tested` and the mail waits for the session's next tool call as before.
 - `fgos setup` no longer leaves a `.pre-patterns-catalog-*` backup copy when the config write door refuses the conversion; the file is unchanged in that case, so the copy only piled up with every run.
 - In `fgos setup`, the global retired key notice omits the guidance command and empty patch body when no patch operations remain, and removes the superseded coverage note.
 - A runner config error that only the runner's own checks catch (an inverted `bounds` range, a checker list that does not grow with rigor, an unknown key under a pattern's `defaults`) now names the file and line of the field in the project or global file that holds it, in the runner and in `fgos doctor`. `fgos plan-lint` now fails when the shipped pattern catalog cannot be read instead of skipping the unknown-pattern check.

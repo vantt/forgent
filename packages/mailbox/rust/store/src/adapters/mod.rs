@@ -112,6 +112,23 @@ pub struct AdapterFacts {
     /// a `Stop` only registers the head, and a wake toward this CLI has no
     /// channel.
     pub stop_delivers: bool,
+    /// The nudge channel of this CLI and the versions it was measured on;
+    /// `None`: the mailbox never nudges it.
+    pub nudge: Option<NudgeFacts>,
+}
+
+/// A measured wake channel (spec §6.2 `Nudge`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NudgeFacts {
+    pub channel: NudgeChannel,
+    pub versions: Vec<String>,
+}
+
+/// The wake channels an adapters contract may name.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NudgeChannel {
+    /// `codex queue --thread <id> --message <line>` to the shared app server.
+    CodexQueue,
 }
 
 /// Why an adapters contract was refused; names the offending entry.
@@ -159,6 +176,18 @@ struct RawFacts {
     head_comm: Option<String>,
     post_tool_use_context_max_bytes: Option<u64>,
     channels: RawChannels,
+    #[serde(default)]
+    nudge: Option<RawNudge>,
+}
+
+/// The wake channel a CLI was measured to have, besides its hooks.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RawNudge {
+    channel: String,
+    versions: Vec<String>,
+    #[serde(rename = "source")]
+    _source: String,
 }
 
 #[derive(Deserialize)]
@@ -344,6 +373,26 @@ impl TestedClis {
         }
     }
 
+    /// The CLIs whose idle head the mailbox can nudge, by the facts usable on
+    /// this platform: what `send` passes the core.
+    pub fn nudge_clis(&self) -> BTreeSet<Cli> {
+        self.clis
+            .iter()
+            .filter(|cli| self.facts_here(cli).is_some_and(|f| f.nudge.is_some()))
+            .filter_map(|cli| Cli::new(cli).ok())
+            .collect()
+    }
+
+    /// The nudge channel of `cli` when `version` is one it was measured on.
+    pub fn nudge_for(&self, cli: &str, version: &str) -> Option<NudgeChannel> {
+        let nudge = self.facts_here(cli)?.nudge.as_ref()?;
+        nudge
+            .versions
+            .iter()
+            .any(|v| v == version)
+            .then_some(nudge.channel)
+    }
+
     /// The CLIs whose `Stop` takes mail, by the facts usable on this
     /// platform: what `send` passes the core, so a wake toward any other
     /// CLI, or one the contract does not know, has no channel.
@@ -393,6 +442,29 @@ fn facts_of(cli: &str, raw: RawFacts) -> Result<AdapterFacts, ContractError> {
     if raw.channels.post_tool_use.deliver != raw.post_tool_use_context_max_bytes.is_some() {
         return refuse("channels.postToolUse.deliver disagrees with postToolUseContextMaxBytes");
     }
+    let nudge = match raw.nudge {
+        None => None,
+        Some(nudge) => {
+            let channel = match (cli, nudge.channel.as_str()) {
+                ("codex", "codex-queue") => NudgeChannel::CodexQueue,
+                _ => return refuse(&format!("nudge.channel {:?} is not one {cli} has", nudge.channel)),
+            };
+            if nudge.versions.is_empty() {
+                return refuse("nudge names the versions it was measured on");
+            }
+            if let Some(bad) = nudge
+                .versions
+                .iter()
+                .find(|v| !raw.measured_on.versions.contains(v))
+            {
+                return refuse(&format!("nudge version {bad} is not under measuredOn"));
+            }
+            Some(NudgeFacts {
+                channel,
+                versions: nudge.versions,
+            })
+        }
+    };
     Ok(AdapterFacts {
         topology,
         hook_shell,
@@ -400,6 +472,7 @@ fn facts_of(cli: &str, raw: RawFacts) -> Result<AdapterFacts, ContractError> {
         head_comm: raw.head_comm,
         post_tool_use_max_bytes: raw.post_tool_use_context_max_bytes,
         stop_delivers: raw.channels.stop.deliver,
+        nudge,
     })
 }
 

@@ -983,7 +983,7 @@ fn a_hook_payload_over_the_read_cap_leaves_its_reason_in_the_hook_outcome_file()
 }
 
 #[test]
-fn a_send_with_wake_to_a_codex_head_answers_that_it_takes_no_mail_at_its_turn_end_and_the_wake_was_not_used(
+fn a_send_with_wake_to_a_codex_head_on_an_untested_version_says_it_could_not_be_nudged_and_never_promises_its_turn_end(
 ) {
     let scene = Scene::new("codex-no-stop");
     let _head = CodexHead::start(&scene, WRITER);
@@ -998,13 +998,11 @@ fn a_send_with_wake_to_a_codex_head_answers_that_it_takes_no_mail_at_its_turn_en
     assert_eq!(sent.status.code(), Some(0), "{sent:?}");
     let text = String::from_utf8_lossy(&sent.stdout);
     assert!(
-        text.contains(
-            "queued: it sees it at its next tool call. This CLI takes no mail when its turn ends"
-        ),
+        text.contains("queued: it sees it at its next tool call."),
         "{text}"
     );
     assert!(
-        text.contains("Its CLI has no channel that can wake it; the wake was not used."),
+        text.contains("It could not be nudged (version-not-tested)"),
         "{text}"
     );
     assert!(!text.contains("or when its turn ends."), "{text}");
@@ -1698,13 +1696,23 @@ fn the_hook_starts_the_detached_sync_child_only_when_cross_machine_is_on_and_a_s
         let out = scene.run(
             &scene.main(),
             Some("writer"),
-            &["hook", "mailbox", "--cli", "claude", "--event", "post-tool-use"],
+            &[
+                "hook",
+                "mailbox",
+                "--cli",
+                "claude",
+                "--event",
+                "post-tool-use",
+            ],
             &post_tool_use(),
         );
         assert_eq!(out.status.code(), Some(0));
     };
     hook();
-    assert!(!log.exists(), "cross-machine mail is off by default: no child");
+    assert!(
+        !log.exists(),
+        "cross-machine mail is off by default: no child"
+    );
 
     fs::write(
         scene.main().join(".fgos/config.json"),
@@ -1722,32 +1730,52 @@ fn the_hook_starts_the_detached_sync_child_only_when_cross_machine_is_on_and_a_s
     );
     fs::write(layout.root.join("sync.json"), attempt).unwrap();
     hook();
-    assert!(!log.exists(), "a sync attempted inside the interval is not due: no child");
+    assert!(
+        !log.exists(),
+        "a sync attempted inside the interval is not due: no child"
+    );
 
     fs::remove_file(layout.root.join("sync.json")).unwrap();
     hook();
-    assert!(!log.exists(), "a project that never migrated its events has nothing to sync: no child");
+    assert!(
+        !log.exists(),
+        "a project that never migrated its events has nothing to sync: no child"
+    );
 
     fs::write(scene.main().join(".fgos/events"), "fence\n").unwrap();
     hook();
-    assert!(log.exists(), "a due sync with cross-machine mail on starts the child");
+    assert!(
+        log.exists(),
+        "a due sync with cross-machine mail on starts the child"
+    );
 }
 
 /// The main checkout of `scene` as a clone of a migrated project with a
 /// remote: what the Event Store needs before anything is appended there.
 fn migrate_main(scene: &Scene, state: &Path, project_id: &str) -> fgos_event_store::layout::Layout {
     let remote = scene.root.join("remote.git");
-    git(&scene.root, &["init", "--bare", "-q", remote.to_str().unwrap()]);
+    git(
+        &scene.root,
+        &["init", "--bare", "-q", remote.to_str().unwrap()],
+    );
     migrate_main_to(scene, state, project_id, &remote)
 }
 
 /// [`migrate_main`] with `origin` at an existing bare repository, so two scenes can share one remote.
-fn migrate_main_to(scene: &Scene, state: &Path, project_id: &str, remote: &Path) -> fgos_event_store::layout::Layout {
+fn migrate_main_to(
+    scene: &Scene,
+    state: &Path,
+    project_id: &str,
+    remote: &Path,
+) -> fgos_event_store::layout::Layout {
     use fgos_event_store::layout::Layout;
     use fgos_git::{GitDriver, ResolveRepo};
     use std::os::unix::fs::PermissionsExt;
     let main = scene.main();
-    git(&main, &["remote", "add", "origin", remote.to_str().unwrap()]);
+    git(
+        &main,
+        &["remote", "add", "origin", remote.to_str().unwrap()],
+    );
     fs::set_permissions(&main, fs::Permissions::from_mode(0o700)).unwrap();
     fs::write(
         main.join(".fgos/project.json"),
@@ -1798,12 +1826,13 @@ fn the_sync_child_publishes_a_registered_head_into_the_shared_directory_once() {
     let out = scene.claude_hook("post-tool-use", &post_tool_use());
     assert_eq!(out.status.code(), Some(0), "{out:?}");
     let own = identity_of(&root, "CLAUDE_CODE_SESSION_ID", WRITER);
-    let entry = fgos_identity::directory::list(&root, None, false, &fgos_process::facts::judge_here, None)
-        .unwrap()
-        .sessions
-        .into_iter()
-        .find(|listed| listed.id == own.id)
-        .expect("the hook registered the head");
+    let entry =
+        fgos_identity::directory::list(&root, None, false, &fgos_process::facts::judge_here, None)
+            .unwrap()
+            .sessions
+            .into_iter()
+            .find(|listed| listed.id == own.id)
+            .expect("the hook registered the head");
     assert_eq!(
         entry.project_id.as_deref(),
         Some("0123456789abcdef0123456789abcdef"),
@@ -1819,13 +1848,27 @@ fn the_sync_child_publishes_a_registered_head_into_the_shared_directory_once() {
     // The child's sync seals the stream, so the events are the sealed ones plus those still open.
     let stream = layout.stream(&StreamId::parse("project:identity").unwrap());
     let published = || {
-        let sealed = fgos_event_store::receipt::Receipt::read(&stream.sealed()).map_or(0, |receipt| receipt.last_seq as usize);
-        let open = fs::read_to_string(stream.active()).map_or(0, |text| text.matches("identity.session-published").count());
+        let sealed = fgos_event_store::receipt::Receipt::read(&stream.sealed())
+            .map_or(0, |receipt| receipt.last_seq as usize);
+        let open = fs::read_to_string(stream.active())
+            .map_or(0, |text| text.matches("identity.session-published").count());
         sealed + open
     };
     let child = || {
         let main = scene.main();
-        let out = scene.run(&main, None, &["hook", "mailbox-sync", "--dir", main.to_str().unwrap(), "--remote", "origin"], b"");
+        let out = scene.run(
+            &main,
+            None,
+            &[
+                "hook",
+                "mailbox-sync",
+                "--dir",
+                main.to_str().unwrap(),
+                "--remote",
+                "origin",
+            ],
+            b"",
+        );
         assert_eq!(out.status.code(), Some(0), "{out:?}");
         String::from_utf8_lossy(&out.stderr).into_owned()
     };
@@ -1869,19 +1912,45 @@ fn two_machines() -> Cross {
     let out = alpha.claude_hook("post-tool-use", &post_tool_use());
     assert_eq!(out.status.code(), Some(0), "{out:?}");
     for scene in [&beta, &alpha] {
-        fs::write(scene.main().join(".fgos/config.json"), r#"{"mailbox":{"crossMachine":{"enabled":true}}}"#).unwrap();
+        fs::write(
+            scene.main().join(".fgos/config.json"),
+            r#"{"mailbox":{"crossMachine":{"enabled":true}}}"#,
+        )
+        .unwrap();
         sync_child(scene);
     }
 
-    Cross { alpha, beta, alpha_root, beta_root, target }
+    Cross {
+        alpha,
+        beta,
+        alpha_root,
+        beta_root,
+        target,
+    }
 }
 
 /// One run of `scene`'s detached sync child, in the foreground; it must stay silent.
 fn sync_child(scene: &Scene) {
     let main = scene.main();
-    let out = scene.run(&main, None, &["hook", "mailbox-sync", "--dir", main.to_str().unwrap(), "--remote", "origin"], b"");
+    let out = scene.run(
+        &main,
+        None,
+        &[
+            "hook",
+            "mailbox-sync",
+            "--dir",
+            main.to_str().unwrap(),
+            "--remote",
+            "origin",
+        ],
+        b"",
+    );
     assert_eq!(out.status.code(), Some(0), "{out:?}");
-    assert!(out.stderr.is_empty(), "{}", String::from_utf8_lossy(&out.stderr));
+    assert!(
+        out.stderr.is_empty(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
 }
 
 /// Two machines sharing one remote: the session machine beta published into
@@ -1891,14 +1960,40 @@ fn sync_child(scene: &Scene) {
 /// verifies under the domain of `remote.v1.json`), and a body over the wire
 /// cap is refused without writing anything.
 #[test]
-fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_recorded_not_delivered() {
-    let Cross { alpha, beta, alpha_root, beta_root, target } = two_machines();
-    let send = |body: &str| alpha.run(&alpha.main(), Some("sender-a"), &["mailbox", "send", "--to", &target, body], b"");
+fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_recorded_not_delivered(
+) {
+    let Cross {
+        alpha,
+        beta,
+        alpha_root,
+        beta_root,
+        target,
+    } = two_machines();
+    let send = |body: &str| {
+        alpha.run(
+            &alpha.main(),
+            Some("sender-a"),
+            &["mailbox", "send", "--to", &target, body],
+            b"",
+        )
+    };
     let out = send("hello from alpha");
     let text = String::from_utf8_lossy(&out.stdout).into_owned();
-    assert_eq!(out.status.code(), Some(0), "{text} {}", String::from_utf8_lossy(&out.stderr));
-    assert!(text.starts_with("recorded ") && text.contains("not delivered"), "{text}");
-    assert_eq!(alpha.message_states().len(), 0, "a cross-machine send leaves no header in the local record");
+    assert_eq!(
+        out.status.code(),
+        Some(0),
+        "{text} {}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert!(
+        text.starts_with("recorded ") && text.contains("not delivered"),
+        "{text}"
+    );
+    assert_eq!(
+        alpha.message_states().len(),
+        0,
+        "a cross-machine send leaves no header in the local record"
+    );
 
     let sent = || sent_events(&alpha_root, &alpha.main());
     let sent_now = sent();
@@ -1909,14 +2004,22 @@ fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_r
     assert_eq!(payload["to"]["id"], target.as_str());
     let machine = fgos_identity::machine::read(&alpha_root).unwrap();
     let sender = payload["from"]["id"].as_str().unwrap();
-    assert!(sender.starts_with(&format!("{machine}/")), "the sender is named by its full session id: {sender}");
+    assert!(
+        sender.starts_with(&format!("{machine}/")),
+        "the sender is named by its full session id: {sender}"
+    );
     assert_eq!(payload["from"]["machine"], machine.as_str());
     let mut unsigned = payload.clone();
-    let sig: fgos_identity::Signature = serde_json::from_value(unsigned.as_object_mut().unwrap().remove("sig").unwrap()).unwrap();
+    let sig: fgos_identity::Signature =
+        serde_json::from_value(unsigned.as_object_mut().unwrap().remove("sig").unwrap()).unwrap();
     let canonical = fgos_canonical_json::canonical_json(&unsigned).unwrap();
     let bytes = format!("fgos-mailbox-message/1\n{canonical}").into_bytes();
     let verified = fgos_identity::signing::verify(&beta_root, &bytes, &sig).unwrap();
-    assert_eq!(verified.machine_id, payload["from"]["machine"].as_str().unwrap(), "the signer is the sender's machine");
+    assert_eq!(
+        verified.machine_id,
+        payload["from"]["machine"].as_str().unwrap(),
+        "the signer is the sender's machine"
+    );
 
     // Alpha's sync child pushes the message; beta's fetches it and takes it into beta's record, where
     // the head beta registered receives it at its next tool call, once.
@@ -1926,33 +2029,62 @@ fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_r
     let alpha_machine = fgos_identity::machine::read(&alpha_root).unwrap();
     let probe = fgos_identity::signing::sign(&alpha_root, b"probe").unwrap();
     fgos_identity::signing::verify(&beta_root, b"probe", &probe).unwrap();
-    let fingerprint = fgos_identity::signing::key_fingerprint(&alpha_root).unwrap().unwrap();
+    let fingerprint = fgos_identity::signing::key_fingerprint(&alpha_root)
+        .unwrap()
+        .unwrap();
     fgos_identity::pins::confirm(&beta_root, &alpha_machine, &fingerprint).unwrap();
     sync(&alpha);
     sync(&beta);
     let frame = beta.claude_hook("post-tool-use", &post_tool_use());
     let frame = String::from_utf8_lossy(&frame.stdout).into_owned();
-    assert!(frame.contains("hello from alpha") && frame.contains("remote_"), "beta's head received the mail: {frame:?}");
+    assert!(
+        frame.contains("hello from alpha") && frame.contains("remote_"),
+        "beta's head received the mail: {frame:?}"
+    );
     sync(&beta);
     let again = beta.claude_hook("post-tool-use", &post_tool_use());
-    assert!(!String::from_utf8_lossy(&again.stdout).contains("hello from alpha"), "the mail is delivered once");
+    assert!(
+        !String::from_utf8_lossy(&again.stdout).contains("hello from alpha"),
+        "the mail is delivered once"
+    );
 
     // Until beta settles it, alpha shows the send as waiting; once beta's child tells alpha it was
     // offered (the head took it above), alpha's status folds that settlement, signed by beta.
     let status = || {
-        let out = alpha.run(&alpha.main(), Some("sender-a"), &["mailbox", "status", "--json"], b"");
-        serde_json::from_slice::<serde_json::Value>(&out.stdout).unwrap()["data"]["crossMachine"].clone()
+        let out = alpha.run(
+            &alpha.main(),
+            Some("sender-a"),
+            &["mailbox", "status", "--json"],
+            b"",
+        );
+        serde_json::from_slice::<serde_json::Value>(&out.stdout).unwrap()["data"]["crossMachine"]
+            .clone()
     };
     assert_eq!(status()["waiting"], 1, "no settlement yet: {}", status());
     sync(&beta);
     sync(&alpha);
     let folded = status();
-    assert_eq!((folded["sent"].clone(), folded["offered"].clone(), folded["waiting"].clone()), (1.into(), 1.into(), 0.into()), "{folded}");
+    assert_eq!(
+        (
+            folded["sent"].clone(),
+            folded["offered"].clone(),
+            folded["waiting"].clone()
+        ),
+        (1.into(), 1.into(), 0.into()),
+        "{folded}"
+    );
 
     let over = send(&"x".repeat(2049));
     assert_eq!(over.status.code(), Some(1), "{over:?}");
-    assert!(String::from_utf8_lossy(&over.stdout).contains("too-large"), "{over:?}");
-    assert_eq!(sent_events(&alpha_root, &alpha.main()).len(), 1, "a refused send writes no event");
+    assert!(
+        String::from_utf8_lossy(&over.stdout).contains("too-large"),
+        "{over:?}"
+    );
+    assert_eq!(
+        sent_events(&alpha_root, &alpha.main()).len(),
+        1,
+        "a refused send writes no event"
+    );
 }
 
 /// The payloads of every `mailbox.message-sent` event the clone at `main` holds, sealed or still open.
@@ -1986,29 +2118,73 @@ fn sent_events(state: &Path, main: &Path) -> Vec<serde_json::Value> {
         },
     )
     .unwrap();
-    result.sequence.into_iter().filter(|event| event.event_type == "mailbox.message-sent").map(|event| event.payload).collect()
+    result
+        .sequence
+        .into_iter()
+        .filter(|event| event.event_type == "mailbox.message-sent")
+        .map(|event| event.payload)
+        .collect()
 }
 
 /// Mail from a machine whose key the owner did not confirm is not taken: the head receives nothing,
 /// and the sender's status names the refusal, so its owner can see why and confirm the key.
 #[test]
 fn mail_from_a_machine_whose_key_is_not_confirmed_is_not_taken_and_the_sender_is_told_why() {
-    let Cross { alpha, beta, alpha_root, target, .. } = two_machines();
-    let out = alpha.run(&alpha.main(), Some("sender-a"), &["mailbox", "send", "--to", &target, "unconfirmed hello"], b"");
+    let Cross {
+        alpha,
+        beta,
+        alpha_root,
+        target,
+        ..
+    } = two_machines();
+    let out = alpha.run(
+        &alpha.main(),
+        Some("sender-a"),
+        &["mailbox", "send", "--to", &target, "unconfirmed hello"],
+        b"",
+    );
     assert_eq!(out.status.code(), Some(0), "{out:?}");
     // Beta already folded alpha's published session, so alpha's key is pinned there as seen, never confirmed.
     for scene in [&alpha, &beta, &beta, &alpha] {
         sync_child(scene);
     }
     let frame = beta.claude_hook("post-tool-use", &post_tool_use());
-    assert!(!String::from_utf8_lossy(&frame.stdout).contains("unconfirmed hello"), "{frame:?}");
-    let status = alpha.run(&alpha.main(), Some("sender-a"), &["mailbox", "status", "--json"], b"");
+    assert!(
+        !String::from_utf8_lossy(&frame.stdout).contains("unconfirmed hello"),
+        "{frame:?}"
+    );
+    let status = alpha.run(
+        &alpha.main(),
+        Some("sender-a"),
+        &["mailbox", "status", "--json"],
+        b"",
+    );
     let status: serde_json::Value = serde_json::from_slice(&status.stdout).unwrap();
-    assert_eq!(status["data"]["crossMachine"]["refused"]["remote-unconfirmed"], 1, "{status}");
-    let counted = beta.run(&beta.main(), Some(WRITER), &["mailbox", "status", "--json"], b"");
+    assert_eq!(
+        status["data"]["crossMachine"]["refused"]["remote-unconfirmed"], 1,
+        "{status}"
+    );
+    let counted = beta.run(
+        &beta.main(),
+        Some(WRITER),
+        &["mailbox", "status", "--json"],
+        b"",
+    );
     let counted: serde_json::Value = serde_json::from_slice(&counted.stdout).unwrap();
-    assert_eq!(counted["data"]["signals"]["refusals"]["remote-unconfirmed"], 1, "{counted}");
+    assert_eq!(
+        counted["data"]["signals"]["refusals"]["remote-unconfirmed"], 1,
+        "{counted}"
+    );
     let alpha_machine = fgos_identity::machine::read(&alpha_root).unwrap();
-    assert_eq!(counted["data"]["crossMachine"]["unconfirmedMachines"], serde_json::json!([alpha_machine]), "{counted}");
-    assert!(String::from_utf8_lossy(&beta.run(&beta.main(), Some(WRITER), &["mailbox", "status"], b"").stdout).contains("seen, not confirmed"));
+    assert_eq!(
+        counted["data"]["crossMachine"]["unconfirmedMachines"],
+        serde_json::json!([alpha_machine]),
+        "{counted}"
+    );
+    assert!(String::from_utf8_lossy(
+        &beta
+            .run(&beta.main(), Some(WRITER), &["mailbox", "status"], b"")
+            .stdout
+    )
+    .contains("seen, not confirmed"));
 }

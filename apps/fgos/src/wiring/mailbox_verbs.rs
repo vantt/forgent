@@ -17,10 +17,10 @@
 //! the presenter then prints nothing more for it (with `--json`, only the
 //! envelope, without the text).
 use super::mailbox_config::project_mailbox;
-use super::mailbox_remote;
 use super::mailbox_identity::{
     address, handle_conflicts, is_alias, session_of, state_root, Addressed,
 };
+use super::mailbox_remote;
 use fgos_host_runtime::{
     EventSink, HostInvocation, InvocationControl, OperationProvider, OperationRequest,
     ProviderDescriptor, ProviderError, ProviderOutcome,
@@ -29,6 +29,7 @@ use fgos_identity::cli_dirs::claude_config_dir;
 use fgos_mailbox::adapters::version::VersionSources;
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::limits::{load, Loaded};
+use fgos_mailbox::nudge::SystemNudge;
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{
@@ -311,7 +312,11 @@ fn status(json: bool) -> MailboxAnswer {
     data["ok"] = Value::from(ok);
     if let Some(failure) = &config_failure {
         data["config"] = Value::from(failure.reason());
-        text = format!("config: {} ({})\n{text}", failure.reason(), failure.detail());
+        text = format!(
+            "config: {} ({})\n{text}",
+            failure.reason(),
+            failure.detail()
+        );
     }
     // A head whose handle does not name it alone (Identity holds it for
     // another session, or another head derives it too) is named with the
@@ -333,7 +338,9 @@ fn status(json: bool) -> MailboxAnswer {
         }
     }
     // Mail that crosses machines: what this machine's recent sends came to, when the project turned it on.
-    if let (Ok((_, cross)), Some(root), Some(main)) = (project_mailbox(&fgos_dir), state_root(), fgos_dir.parent()) {
+    if let (Ok((_, cross)), Some(root), Some(main)) =
+        (project_mailbox(&fgos_dir), state_root(), fgos_dir.parent())
+    {
         if cross.enabled {
             let secs = now().as_millis() / 1000;
             match mailbox_remote::sent_summary(main, &root, secs) {
@@ -350,7 +357,10 @@ fn status(json: bool) -> MailboxAnswer {
             }
             let unconfirmed = mailbox_remote::unconfirmed_machines(&root);
             data["crossMachine"]["requireConfirmed"] = Value::from(cross.require_confirmed);
-            data["crossMachine"]["unconfirmedMachines"] = unconfirmed.iter().map(|(id, _)| Value::from(id.as_str())).collect();
+            data["crossMachine"]["unconfirmedMachines"] = unconfirmed
+                .iter()
+                .map(|(id, _)| Value::from(id.as_str()))
+                .collect();
             for (machine, fingerprint) in &unconfirmed {
                 text.push_str(&format!(
                     "\ncross-machine: key of machine {machine} is seen, not confirmed ({fingerprint}); compare it with the fingerprint that machine reports, then `fgos identity pins --confirm {machine} --fingerprint <fingerprint>`{}",
@@ -404,7 +414,12 @@ fn caller(fgos_dir: &Path) -> Option<WriterKey> {
 }
 
 /// The answer to a send that went (or was refused) on the cross-machine path.
-fn remote_answer(recorded: bool, text: String, json: bool, warning: Option<String>) -> MailboxAnswer {
+fn remote_answer(
+    recorded: bool,
+    text: String,
+    json: bool,
+    warning: Option<String>,
+) -> MailboxAnswer {
     MailboxAnswer {
         data: json!({ "ok": recorded, "recorded": recorded, "crossMachine": true, "text": text }),
         text,
@@ -499,8 +514,14 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 reply_to: reply_to.as_deref().map(MessageId::from_text),
                 dead_keys: Default::default(),
                 stop_drains: TestedClis::embedded().stop_drains(),
+                nudge_clis: TestedClis::embedded().nudge_clis(),
             };
-            let mut sent = verbs::send(&record, req, wait, now(), &loaded.limits, &versions);
+            let nudge = SystemNudge {
+                codex_program: versions.codex_program.clone(),
+                timeout: std::time::Duration::from_secs(5),
+            };
+            let mut sent =
+                verbs::send(&record, req, wait, now(), &loaded.limits, &versions, &nudge);
             if let (true, Some((role, handle))) = (sent.recorded, role_holder) {
                 sent.text = format!(
                     "{}\n{}",

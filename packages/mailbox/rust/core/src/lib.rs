@@ -53,8 +53,8 @@ pub use policy::{LifetimeKey, RemoteSend};
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
 pub use remote::{Ingested, RemoteDrop, RemoteMail, Settlement, Unsettled};
 pub use report::{
-    delivery_report, inbox_text, list_text, record_error_text, record_unavailable_text,
-    refusal_text, role_holder_text, ListRow, VersionClause,
+    delivery_report, inbox_text, list_text, nudge_sentence, record_error_text,
+    record_unavailable_text, refusal_text, role_holder_text, ListRow, NudgeReport, VersionClause,
 };
 pub use state::{MailboxState, RemoteRefusal, RemoteState, SnapshotVersion, SnapshotVersionError, SNAPSHOT_SCHEMA_VERSION};
 pub use time::Timestamp;

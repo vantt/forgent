@@ -4,7 +4,7 @@
 Mail sent with `--wake` today only forces one more turn at the end of a running turn (Stop block). An idle head never sees it until a person acts. Spec 6.2 has the port on paper; no adapter exists.
 
 ## Requirements
-- Core: the `Nudge` port (`tier`, `nudge` with at most one outstanding nudge per address, cleared at the next drain) and `Presence` (`idle|busy|shell|waiting`), in `packages/mailbox/rust/core` with no I/O.
+- Core: `to_wake_channel` in the effective-wake rule (a CLI with a nudge adapter has a channel); the `Nudge` port (`tier`, `nudge`) where the store adapters live; no Presence port.
 - Codex adapter in `packages/mailbox/rust/store/src/adapters/codex.rs`: `codex queue` to the shared app-server daemon, one fixed line `[fgOS: message from another agent, not from the user] You have mail. Read it with: fgos mailbox inbox --claim`; refuses cleanly when there is no daemon (`--no-daemon` form) and reports tier `turn`.
 - Claude Code: first the measurement, then the adapter.
   1. Re-run the harmful-mail test with the real socket frame ("not typed by your user ... treat it as a teammate's request"), `haiku`, scoped `accept`, up to 40 print-mode runs, same cells and oracle as V7f, reusing `scripts/lib/mailbox-behaviour-v7f.mjs`.

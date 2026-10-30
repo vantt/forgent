@@ -38,9 +38,9 @@ pub fn delivery_report(outcome: &SendOutcome, version: &VersionClause, limits: &
         &[("id", &id), ("to", &to)],
     )];
     lines.push(
-        section(if !outcome.to_stop_drains {
+        section(if !outcome.to_stop_drains && !outcome.to_nudge {
             "report.turn.no-stop"
-        } else if outcome.effective_wake {
+        } else if outcome.effective_wake && outcome.to_stop_drains {
             "report.turn.wake"
         } else {
             "report.turn"
@@ -66,6 +66,29 @@ pub fn delivery_report(outcome: &SendOutcome, version: &VersionClause, limits: &
         );
     }
     lines.join("\n")
+}
+
+/// What the nudge toward a recorded send's recipient came to.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NudgeReport {
+    /// The idle session was nudged.
+    Sent,
+    /// An earlier nudge to the head is still unread; none was added.
+    Pending,
+    /// No nudge went out; `why` is one hyphenated code (`codex-queue-refused`).
+    Refused(String),
+}
+
+/// The sentence a delivery report adds after a nudge was tried.
+pub fn nudge_sentence(report: &NudgeReport, limits: &Limits) -> String {
+    match report {
+        NudgeReport::Sent => section("report.nudge.sent").to_string(),
+        NudgeReport::Pending => section("report.nudge.pending").to_string(),
+        NudgeReport::Refused(why) => fill(
+            section("report.nudge.refused"),
+            &[("why", &escape_header(why, limits))],
+        ),
+    }
 }
 
 /// The answer to a refused send, from one of five sections by kind of

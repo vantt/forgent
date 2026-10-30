@@ -61,6 +61,12 @@ queued: it sees it at its next tool call.
 queued: it sees it at its next tool call or when its turn ends.
 [report.turn.no-stop]
 queued: it sees it at its next tool call. This CLI takes no mail when its turn ends, so an idle session sees it only when it next runs a tool.
+[report.nudge.sent]
+Its idle session was nudged to read it now.
+[report.nudge.pending]
+An earlier nudge to it is still unread, so none was added.
+[report.nudge.refused]
+It could not be nudged ({{why}}); it sees this at its next tool call.
 [report.untested-version]
 Its CLI version {{version}} is not one this mailbox was tested against; the hook still delivers, but nothing beyond that is verified.
 [report.version-unknown]

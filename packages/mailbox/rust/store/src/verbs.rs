@@ -9,10 +9,11 @@ use crate::adapters::TestedClis;
 use crate::head::stored_liveness;
 use crate::hook::shell::{claimed_sizes, emit_and_finish, Emit, WriteGate};
 use crate::hook::{claim_inbox, HandleOf, InboxClaim};
+use crate::nudge::Nudge;
 use crate::record::{Record, Reported, Wait};
 use fgos_mailbox_core::{
-    delivery_report, record_error_text, refusal_text, Limits, RemoteSend, SendOutcome, SendRequest,
-    Timestamp, VersionClause, WriterKey,
+    delivery_report, nudge_sentence, record_error_text, refusal_text, Limits, NudgeReport,
+    RemoteSend, SendOutcome, SendRequest, Timestamp, VersionClause, WriterKey,
 };
 use fgos_mailbox_core::{inbox_text, Cli, Liveness, MessageId, ShortName};
 use std::collections::BTreeMap;
@@ -37,13 +38,22 @@ pub fn send(
     now: Timestamp,
     limits: &Limits,
     versions: &VersionSources,
+    nudge: &dyn Nudge,
 ) -> SendAnswer {
     match record.send(req, wait, now, limits) {
         Ok(held) => match held.value {
-            Ok(outcome) => SendAnswer {
-                text: delivery_report(&outcome, &version_clause(&outcome, versions), limits),
-                recorded: true,
-            },
+            Ok(outcome) => {
+                let mut text =
+                    delivery_report(&outcome, &version_clause(&outcome, versions), limits);
+                if let Some(report) = nudge_report(&outcome, versions, nudge) {
+                    text.push('\n');
+                    text.push_str(&nudge_sentence(&report, limits));
+                }
+                SendAnswer {
+                    text,
+                    recorded: true,
+                }
+            }
             Err(refusal) => SendAnswer {
                 text: refusal_text(&refusal, limits),
                 recorded: false,
@@ -134,6 +144,33 @@ fn live_heads(state: &fgos_mailbox_core::MailboxState) -> Vec<HeadView> {
         })
         .filter(|h| h.liveness != Liveness::Dead)
         .collect()
+}
+
+/// The nudge a recorded send came to, or `None` when it asked for none that
+/// took effect. Runs after the record's hold is released.
+fn nudge_report(
+    outcome: &SendOutcome,
+    versions: &VersionSources,
+    nudge: &dyn Nudge,
+) -> Option<NudgeReport> {
+    if !(outcome.effective_wake && outcome.to_nudge) {
+        return None;
+    }
+    if outcome.nudge_outstanding {
+        return Some(NudgeReport::Pending);
+    }
+    let cli = outcome.to_cli.as_str();
+    let Some(version) = recipient_version(outcome, versions) else {
+        return Some(NudgeReport::Refused("version-unreadable".into()));
+    };
+    let Some(channel) = TestedClis::embedded().nudge_for(cli, &version) else {
+        return Some(NudgeReport::Refused("version-not-tested".into()));
+    };
+    let head = crate::head::record_of_head_text(&outcome.to_head);
+    Some(match nudge.nudge(channel, &outcome.to_key, &head) {
+        Ok(()) => NudgeReport::Sent,
+        Err(why) => NudgeReport::Refused(why),
+    })
 }
 
 /// What the delivery report says of the recipient's CLI version.

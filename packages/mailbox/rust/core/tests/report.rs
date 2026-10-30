@@ -2,7 +2,8 @@ mod common;
 
 use common::{spec_limits, t};
 use fgos_mailbox_core::{
-    delivery_report, inbox_text, record_error_text, record_unavailable_text, refusal_text,
+    delivery_report, inbox_text, nudge_sentence, record_error_text, record_unavailable_text,
+    refusal_text, NudgeReport,
     Generation, Kind, MessageId, MessageView, Refusal, SendOutcome, ShortName, VersionClause,
     WakeDrop,
 };
@@ -25,6 +26,9 @@ fn outcome(effective_wake: bool, wake_dropped: Option<WakeDrop>) -> SendOutcome 
         effective_wake,
         wake_dropped,
         to_stop_drains: true,
+        to_nudge: false,
+        to_key: fgos_mailbox_core::WriterKey::new("to-key").unwrap(),
+        nudge_outstanding: false,
     }
 }
 
@@ -66,6 +70,25 @@ fn the_report_for_a_recipient_with_no_stop_drain_never_says_when_its_turn_ends_a
     assert_eq!(text.lines().count(), 2, "{text}");
     assert!(!text.contains("when its turn ends."), "{text}");
     assert!(!text.contains("wake"), "{text}");
+}
+
+#[test]
+fn a_wake_to_a_cli_with_only_a_nudge_channel_never_promises_the_end_of_its_turn() {
+    let mut nudged = outcome(true, None);
+    nudged.to_stop_drains = false;
+    nudged.to_nudge = true;
+    assert_eq!(
+        delivery_report(&nudged, &VersionClause::Tested, &spec_limits()),
+        "recorded a1b2 for forgent-claude-7f\nqueued: it sees it at its next tool call."
+    );
+    assert_eq!(
+        nudge_sentence(&NudgeReport::Sent, &spec_limits()),
+        "Its idle session was nudged to read it now."
+    );
+    assert_eq!(
+        nudge_sentence(&NudgeReport::Refused("codex-queue-refused".into()), &spec_limits()),
+        "It could not be nudged (codex-queue-refused); it sees this at its next tool call."
+    );
 }
 
 #[test]

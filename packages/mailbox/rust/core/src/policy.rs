@@ -70,7 +70,7 @@ fn offered_to(
     &header.from == to && &header.to == from && Some(header.to_generation) == from_generation
 }
 
-fn pending(header: &Header) -> bool {
+pub(crate) fn pending(header: &Header) -> bool {
     matches!(
         header.state,
         MessageState::Recorded | MessageState::InFlight { .. }

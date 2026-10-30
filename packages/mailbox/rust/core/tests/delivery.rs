@@ -691,6 +691,29 @@ fn a_send_with_wake_to_a_recipient_whose_cli_has_no_stop_drain_records_no_effect
 }
 
 #[test]
+fn a_wake_toward_a_cli_with_only_a_nudge_channel_takes_effect_and_one_unread_wake_per_head_holds_the_nudge(
+) {
+    let mut pair = Pair::new(t(100));
+    let mut req = plain("a", B_NAME, "wake up");
+    req.wake = true;
+    req.stop_drains.remove(&common::cli("codex"));
+    req.nudge_clis.insert(common::cli("codex"));
+    let first = pair.try_send(req.clone(), t(100)).unwrap();
+    assert!(first.effective_wake, "the nudge is a channel");
+    assert!(first.to_nudge && !first.to_stop_drains);
+    assert_eq!(first.wake_dropped, None);
+    assert!(!first.nudge_outstanding);
+    assert_eq!(first.to_key, common::key("b"));
+
+    let second = pair.try_send(req, t(101)).unwrap();
+    assert!(second.effective_wake);
+    assert!(
+        second.nudge_outstanding,
+        "the first wake is still unread, its nudge is the outstanding one"
+    );
+}
+
+#[test]
 fn mail_recorded_with_an_effective_wake_before_the_stop_channel_was_turned_off_is_claimed_at_the_next_bounded_step(
 ) {
     let mut pair = Pair::new(t(100));

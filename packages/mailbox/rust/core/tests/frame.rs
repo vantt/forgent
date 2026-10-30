@@ -393,6 +393,9 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
             "message.too-large-for-channel",
             &["{{count}}", "fgos mailbox inbox --claim"][..],
         ),
+        ("report.nudge.sent", &["nudged"][..]),
+        ("report.nudge.pending", &["still unread"][..]),
+        ("report.nudge.refused", &["{{why}}", "next tool call"][..]),
         ("report.untested-version", &["{{version}}"][..]),
         ("report.version-unknown", &[][..]),
     ];

@@ -206,6 +206,7 @@ impl Drain {
                     reply_to: None,
                     dead_keys: Default::default(),
                     stop_drains: self.stop_drains.clone(),
+                    nudge_clis: Default::default(),
                 },
                 now,
                 &limits(),

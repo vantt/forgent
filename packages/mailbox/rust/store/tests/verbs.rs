@@ -5,6 +5,8 @@ mod common;
 use common::limits;
 use common::record::{key, name_of, register, send_req, TempFgos, T0};
 use fgos_mailbox::adapters::version::VersionSources;
+use fgos_mailbox::adapters::NudgeChannel;
+use fgos_mailbox::nudge::Nudge;
 use fgos_mailbox::record::{Reported, Wait};
 use fgos_mailbox::verbs::{inbox, inbox_claim, send};
 use fgos_mailbox_core::record_error_text;
@@ -16,6 +18,20 @@ fn no_versions() -> VersionSources {
         claude_sessions: None,
         codex_program: "/nonexistent/codex".into(),
         max_read_bytes: common::hook_limits().hook.max_read_bytes,
+    }
+}
+
+/// A nudge channel that never delivers: these tests are about the report.
+struct NeverNudge;
+
+impl Nudge for NeverNudge {
+    fn nudge(
+        &self,
+        _: NudgeChannel,
+        _: &fgos_mailbox_core::WriterKey,
+        _: &fgos_process::facts::Record,
+    ) -> Result<(), String> {
+        Err("no channel in this test".to_string())
     }
 }
 
@@ -42,6 +58,7 @@ fn send_records_the_message_and_answers_with_the_delivery_report() {
         T0,
         &limits(),
         &no_versions(),
+        &NeverNudge,
     );
 
     assert!(answer.recorded);
@@ -64,6 +81,7 @@ fn a_refused_send_records_no_message_and_answers_with_the_refusal_text() {
         T0,
         &limits(),
         &no_versions(),
+        &NeverNudge,
     );
 
     assert!(!answer.recorded);
@@ -85,6 +103,7 @@ fn inbox_lists_pending_mail_with_its_state_and_never_writes_the_snapshot() {
         T0,
         &limits(),
         &no_versions(),
+        &NeverNudge,
     );
     assert!(sent.recorded);
     let snapshot = fgos.paths().snapshot();
@@ -127,6 +146,7 @@ fn a_send_and_an_inbox_whose_record_failed_answer_with_the_record_error_text() {
         T0,
         &limits(),
         &no_versions(),
+        &NeverNudge,
     );
     assert!(!answer.recorded);
     assert_eq!(answer.text, expected);
@@ -201,6 +221,7 @@ fn report_of(fgos: &TempFgos, to: &str, versions: &VersionSources) -> Vec<String
         T0,
         &limits(),
         versions,
+        &NeverNudge,
     );
     assert!(answer.recorded, "{}", answer.text);
     answer.text.lines().map(String::from).collect()
@@ -319,6 +340,7 @@ fn inbox_claim_claims_emits_and_finishes_like_a_drain_and_a_failed_write_never_f
         T0,
         &limits(),
         &no_versions(),
+        &NeverNudge,
     );
     let second = send(
         &fgos.record(),
@@ -327,6 +349,7 @@ fn inbox_claim_claims_emits_and_finishes_like_a_drain_and_a_failed_write_never_f
         T0,
         &limits(),
         &no_versions(),
+        &NeverNudge,
     );
     assert!(first.recorded && second.recorded);
     let clock = || T0;
@@ -409,6 +432,7 @@ fn inbox_claim_offers_every_pending_message_once() {
                 T0,
                 &limits(),
                 &no_versions(),
+                &NeverNudge,
             )
             .recorded
         );
@@ -630,4 +654,108 @@ fn status_reports_each_signal_from_a_record_seeded_through_the_stores_own_holds_
         before,
         "status wrote nothing"
     );
+}
+
+/// A nudge that records the keys it was asked for and succeeds.
+#[derive(Default)]
+struct RecordingNudge(std::sync::Mutex<Vec<String>>);
+
+impl Nudge for RecordingNudge {
+    fn nudge(
+        &self,
+        channel: NudgeChannel,
+        key: &fgos_mailbox_core::WriterKey,
+        _: &fgos_process::facts::Record,
+    ) -> Result<(), String> {
+        assert_eq!(channel, NudgeChannel::CodexQueue);
+        self.0.lock().unwrap().push(key.as_str().to_string());
+        Ok(())
+    }
+}
+
+/// A record holding one registered Codex head; returns its name.
+fn with_codex_head(fgos: &TempFgos, writer: &str) -> String {
+    let record = fgos.record();
+    let held = record
+        .hold(Wait::Try, T0, &limits(), |state, ids| {
+            let req = fgos_mailbox_core::RegisterRequest {
+                key: key(writer),
+                cli: fgos_mailbox_core::Cli::new("codex").unwrap(),
+                project: "forgent".to_string(),
+                own_suffix: None,
+                head: format!("head-of-{writer}"),
+                handle: None,
+            };
+            Reported::changing(state.register(req, None, T0, &limits(), ids).unwrap())
+        })
+        .unwrap();
+    name_of(&held.value.value)
+}
+
+fn wake_req<'a>(to: &str, body: &'a str) -> fgos_mailbox_core::SendRequest<'a> {
+    let mut req = send_req("sender-x", to, body);
+    req.wake = true;
+    req.nudge_clis = [fgos_mailbox_core::Cli::new("codex").unwrap()]
+        .into_iter()
+        .collect();
+    req
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn a_wake_to_a_codex_head_nudges_it_once_and_an_unread_wake_adds_no_second_nudge() {
+    use std::os::unix::fs::PermissionsExt;
+    let fgos = TempFgos::new("verb-nudge");
+    let name = with_codex_head(&fgos, "head-c");
+    let program = fgos.fgos_dir().join("codex-version");
+    std::fs::write(&program, "#!/bin/sh\necho 'codex-cli 0.161.0'\n").unwrap();
+    std::fs::set_permissions(&program, std::fs::Permissions::from_mode(0o755)).unwrap();
+    let versions = VersionSources {
+        codex_program: program,
+        ..no_versions()
+    };
+    let nudge = RecordingNudge::default();
+    let go = |body: &str| {
+        send(
+            &fgos.record(),
+            wake_req(&name, body),
+            Wait::Try,
+            T0,
+            &limits(),
+            &versions,
+            &nudge,
+        )
+    };
+
+    let first = go("one");
+    let second = go("two");
+
+    assert!(first.text.ends_with("Its idle session was nudged to read it now."), "{}", first.text);
+    assert!(second.text.ends_with("An earlier nudge to it is still unread, so none was added."), "{}", second.text);
+    assert_eq!(*nudge.0.lock().unwrap(), ["head-c"], "one nudge for two unread wakes");
+}
+
+#[test]
+fn a_wake_whose_recipient_version_is_unreadable_is_not_nudged_and_says_why() {
+    let fgos = TempFgos::new("verb-nudge-version");
+    let name = with_codex_head(&fgos, "head-c");
+    let nudge = RecordingNudge::default();
+
+    let answer = send(
+        &fgos.record(),
+        wake_req(&name, "hi"),
+        Wait::Try,
+        T0,
+        &limits(),
+        &no_versions(),
+        &nudge,
+    );
+
+    assert!(answer.recorded);
+    assert!(
+        answer.text.contains("could not be nudged (version-unreadable)"),
+        "{}",
+        answer.text
+    );
+    assert!(nudge.0.lock().unwrap().is_empty());
 }

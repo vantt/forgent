@@ -86,8 +86,9 @@ pub(crate) struct WakeParties<'a> {
     pub from: &'a WriterKey,
     pub from_generation: Option<Generation>,
     pub to: &'a WriterKey,
-    /// Whether the recipient's CLI takes mail at its `Stop`.
-    pub to_stop_drains: bool,
+    /// Whether the recipient's CLI has a channel a wake can use: it takes
+    /// mail at its `Stop`, or its idle head can be nudged.
+    pub to_wake_channel: bool,
 }
 
 impl MailboxState {
@@ -118,7 +119,7 @@ impl MailboxState {
         // Checked before any allowance: the exchange quota is per pair, so
         // spending it toward a recipient with no wake channel would drop the
         // other side's real wakes.
-        if !parties.to_stop_drains {
+        if !parties.to_wake_channel {
             return (false, Some(WakeDrop::NoChannel));
         }
         if exchange.wakes_spent >= limits.wake.max_per_exchange {

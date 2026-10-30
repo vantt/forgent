@@ -51,6 +51,10 @@ pub struct SendRequest<'a> {
     /// `channels.stop.deliver`). A recipient of any other CLI has no channel
     /// a wake could use: its wake takes no effect and spends no allowance.
     pub stop_drains: BTreeSet<Cli>,
+    /// The CLIs whose idle head the store can nudge (the `Nudge` port has an
+    /// adapter for it): a wake toward one of them has a channel even though
+    /// its `Stop` takes no mail.
+    pub nudge_clis: BTreeSet<Cli>,
 }
 
 /// Who a send is for (check 2 of spec §5.3).
@@ -107,6 +111,14 @@ pub struct SendOutcome {
     /// Whether the recipient's CLI takes mail when its turn ends; when not,
     /// it sees mail only at its next tool call.
     pub to_stop_drains: bool,
+    /// Whether the store can nudge the recipient's idle head.
+    pub to_nudge: bool,
+    /// The recipient head's key: the address a nudge names.
+    pub to_key: WriterKey,
+    /// Whether an earlier wake to this head is still unread: its nudge is
+    /// the outstanding one (at most one per head until the mail is seen),
+    /// so this send adds none.
+    pub nudge_outstanding: bool,
 }
 
 /// A refused send: answered to the sender, never recorded (spec §5.3).
@@ -477,6 +489,14 @@ impl MailboxState {
             });
         let to_account = self.account(&admitted.to);
         let to_stop_drains = req.stop_drains.contains(&admitted.to_cli);
+        let to_nudge = req.nudge_clis.contains(&admitted.to_cli);
+        let nudge_outstanding = self.messages.iter().any(|m| {
+            m.to == admitted.to
+                && m.to_generation == admitted.to_generation
+                && m.effective_wake
+                && crate::policy::pending(m)
+        });
+        let to_key = admitted.to.clone();
         let (effective_wake, wake_dropped) = self.effective_wake(
             &WakeParties {
                 account: &account,
@@ -484,7 +504,7 @@ impl MailboxState {
                 from: &req.from,
                 from_generation,
                 to: &admitted.to,
-                to_stop_drains,
+                to_wake_channel: to_stop_drains || to_nudge,
             },
             req.wake,
             now,
@@ -522,6 +542,9 @@ impl MailboxState {
             effective_wake,
             wake_dropped,
             to_stop_drains,
+            to_nudge,
+            to_key,
+            nudge_outstanding,
         };
         self.messages.push(header);
         Ok(outcome)
