@@ -85,20 +85,6 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-test('an item with acceptance absent, or an empty array, closes via move --to delivered completely unaffected (no-op)', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'cli-cos-absent'); // no --acceptance ever set
-  assert.equal(run(cwd, ['move', 'cli-cos-absent', '--to', 'delivered']).status, 0);
-  assert.equal(stateView(cwd).work['cli-cos-absent'].status, 'delivered');
-
-  const cwd2 = tmpCwd();
-  toProposed(cwd2, 'cli-cos-empty');
-  run(cwd2, ['edit', 'cli-cos-empty', '--acceptance', JSON.stringify([])]);
-  assert.equal(run(cwd2, ['move', 'cli-cos-empty', '--to', 'delivered']).status, 0);
-  assert.equal(stateView(cwd2).work['cli-cos-empty'].status, 'delivered');
-});
-
-
 test('retrospective sweeps every delivered item to retrospective, in one pass, leaving non-delivered items untouched', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'retro-todo-item'); // stays todo

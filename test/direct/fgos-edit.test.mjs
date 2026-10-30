@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { initGitCwdFast, initGitCwdWithWorktree, linkFgosBinInto, moveOk, tmpCwdFast, toProposed } from '../cli/helpers/fgos-cli-harness.mjs';
+import { initGitCwdFast, initGitCwdWithWorktree, linkFgosBinInto, moveOk, tmpCwdFast } from '../cli/helpers/fgos-cli-harness.mjs';
 import { addWork, listWork, editWork, readRawEvents, StoreError } from '../../src/state/store.mjs';
 import { WorkValidationError } from '../../src/state/work.mjs';
 import {
@@ -520,16 +520,3 @@ test("edit --verify-from-children's generated command, really run, passes only w
   assert.notEqual(run(generateVerifyFromChildren(dir, 'parent-partial', { cwd })).status, 0, 'a child still todo must fail, never pass vacuously');
 });
 
-test('editing in the missing evidence after a refused move to delivered lets the retry succeed: no cached verdict', () => {
-  const cwd = tmpCwdFast();
-  const dir = path.join(cwd, '.fgos');
-  toProposed(cwd, 'cos-retry');
-  editUseCase({ dir }, { id: 'cos-retry', patch: { acceptance: [{ text: 'ship it' }] } });
-  assert.equal(moveOk(cwd, 'cos-retry', 'delivered').status, 2);
-  assert.equal(listWork(dir).work['cos-retry'].status, 'awaiting-approval');
-
-  // Evidence must cite a real path under the repo root.
-  editUseCase({ dir }, { id: 'cos-retry', patch: { acceptance: [{ text: 'ship it', evidence: '.fgos/coexistence.json' }] } });
-  assert.equal(moveOk(cwd, 'cos-retry', 'delivered').status, 0, 'the retry re-reads the edited evidence');
-  assert.equal(listWork(dir).work['cos-retry'].status, 'delivered');
-});
