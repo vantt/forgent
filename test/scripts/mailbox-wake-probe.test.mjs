@@ -21,7 +21,9 @@ test('the probes stay within the owner\'s ten sessions, each with an expected re
   assert.equal(wake.sessionsStarted(), 9, 'nine of the owner\'s ten');
   for (const p of wake.PROBES) assert.ok(p.question && p.expected && p.stop, p.id);
   assert.throws(() => wake.probeOf('W4'), /starts no session; it reads W1, W2, W3/);
-  assert.throws(() => wake.probeOf('W11'), /no probe W11/);
+  assert.throws(() => wake.probeOf('W13'), /no probe W13/);
+  assert.deepEqual(wake.USER_LEVEL_PROBES.map((p) => p.settingAt), ['user', 'user-late'], 'the user-level probes sit outside the ten');
+  assert.equal(wake.probeOf('W12').settingAt, 'user-late');
   assert.equal(wake.probeOf('W7').replaces.includes('--no-daemon'), true, 'the replaced probe says why');
 });
 
@@ -36,6 +38,9 @@ test('each probe has its own pane key and label, and a dry pane never shares the
 test('Claude Code\'s inbound setting is scoped to the probe\'s own settings file, only where the probe names one, and the prompting probe asks no bypass', () => {
   assert.equal(wake.claudeSettings(wake.probeOf('W1'), {}).crossSessionInbound, 'accept');
   assert.equal('crossSessionInbound' in wake.claudeSettings(wake.probeOf('W2'), {}), false);
+  assert.equal('crossSessionInbound' in wake.claudeSettings(wake.probeOf('W11'), {}), false, 'a user-level probe leaves the scoped file without the setting');
+  assert.deepEqual(wake.userSettingsOf(wake.probeOf('W11')), { crossSessionInbound: 'accept' });
+  assert.equal(wake.claudeArgs(wake.probeOf('W11'), { settings: '/p/s.json', noMcp: [] }).includes('user,project'), true, 'the user source is read only where the probe puts the setting there');
   const bypass = wake.claudeArgs(wake.probeOf('W1'), { settings: '/p/s.json', noMcp: ['--strict-mcp-config'] });
   assert.equal(bypass[0], wake.firstPrompt(wake.probeOf('W1')), 'the prompt comes before every option');
   assert.deepEqual(bypass.slice(1, 10), ['--model', 'haiku', '--effort', 'medium', '--setting-sources', 'project', '--settings', '/p/s.json', '--strict-mcp-config']);

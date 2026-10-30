@@ -19,7 +19,7 @@
  *
  * Subcommands
  *   plan                       every probe: question, expected result, stop condition, pane, command
- *   run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep] [--attempt <n>]
+ *   run <W1|W2|W2b|W3|W5|W6|W7|W9|W10|W11|W12> [--dry | --watched] [--keep] [--attempt <n>]
  *   close <probe> [--dry]      a retained probe once a person is done with it: ends its head (what
  *                              may hold the login copy) and settles the copy; Terminal Control
  *                              keeps a retained pane for a person to close, so the pane's shell stays
@@ -33,6 +33,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { ensureAddonForScript } from '../../scripts/lib/git-addon-stage.mjs';
 import * as live from '../../scripts/lib/mailbox-live-cli.mjs';
 import * as confined from '../../scripts/lib/mailbox-live-confined.mjs';
 import * as runs from '../../scripts/lib/mailbox-behaviour-run.mjs';
@@ -144,6 +145,7 @@ function layOut(probe, { dry, base, release, shim }) {
     }
     live.seedClaudeState({ home: paths.home, version: dry ? 'stub' : live.semver(spawnSync(bin, ['--version'], { encoding: 'utf8' }).stdout), trusted: [paths.ws] });
     writeJson(paths.settings, wake.claudeSettings(probe, hooks));
+    if (probe.settingAt === 'user') writeJson(path.join(paths.home, '.claude', 'settings.json'), wake.userSettingsOf(probe));
     args = wake.claudeArgs(probe, { settings: paths.settings, noMcp: runs.CLAUDE_NO_MCP });
     if (dry) [bin, args] = [process.execPath, [STUB, 'claude', ...args]];
   } else if (probe.cli === 'codex') {
@@ -344,6 +346,11 @@ async function cmdRun(id, { dry, watched, keep, attempt = null }) {
     const sent = runs.harnessSend(paths.ws, binding.name, wake.HELLO, { sender: SENDER });
     result.sent = { status: sent.status, id: sent.id, text: sent.text.split('\n')[0] };
     result.focusBefore = wake.focusedPanes(herdr(['pane', 'list'], herdrEnv));
+    if (probe.settingAt === 'user-late') {
+      writeJson(path.join(paths.home, '.claude', 'settings.json'), wake.userSettingsOf(probe));
+      await sleep(3_000);
+      note('user-level setting written to the running session\'s home');
+    }
     if (probe.channel === 'socket') {
       const socket = wake.socketOf(claudeSession(paths.home), paths.dir);
       const line = wake.socketLine(wake.NUDGE, { fromMode: probe.fromMode ?? null });
@@ -487,10 +494,12 @@ function cmdReport(dry) {
 const [command, ...rest] = process.argv.slice(2);
 if (process.argv[1] === SCRIPT) {
   const flag = (name) => rest.includes(name);
+  // The run project's hook rows read config through the native door, which a checkout loads only through a staged manifest.
+  if (command === 'run') ensureAddonForScript(process.env, REPO_ROOT);
   if (command === 'plan') cmdPlan();
   else if (command === 'run') await cmdRun(rest[0], { dry: flag('--dry'), watched: flag('--watched'), keep: flag('--keep'), attempt: rest.includes('--attempt') ? rest[rest.indexOf('--attempt') + 1] : null });
   else if (command === 'close') await cmdClose(rest[0], { dry: flag('--dry') });
   else if (command === 'report') cmdReport(flag('--dry'));
-  else die('usage: plan | run <W1|W2|W2b|W3|W5|W6|W7|W9|W10> [--dry | --watched] [--keep] [--attempt <n>] | close <probe> [--dry] | report [--dry]', 2);
+  else die('usage: plan | run <W1|W2|W2b|W3|W5|W6|W7|W9|W10|W11|W12> [--dry | --watched] [--keep] [--attempt <n>] | close <probe> [--dry] | report [--dry]', 2);
 }
 

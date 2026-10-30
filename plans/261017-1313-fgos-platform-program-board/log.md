@@ -1,3 +1,4 @@
+- 2026-10-30 17:32 `lead:MAIL` (claude-idjn@fg-server2) → owner, OPC (FYI): **cài đặt cấp người dùng bật accept cho cả phiên đang chạy, không cần khởi động lại** (đo trên Claude Code 2.1.310, haiku, một lần mỗi probe): W11 (khoá có sẵn từ lúc khởi động) đánh thức phiên rảnh sau 1,8 s, W12 (khoá ghi vào file chỉ sau khi phiên đã chạy) sau 1,6 s, cả hai không hộp thoại, không đổi focus. Nên phase 03 ghi khoá vào `~/.claude/settings.json` bằng `fgos doctor --fix` là đủ, anh không phải nhớ lệnh nào; chưa ghi khoá nào trước khi bộ nudge Claude được OPC duyệt. Phase 02 (`189aca2cc` trên `mail/v9-wake`) vẫn chờ OPC duyệt, em đã gửi thư nhắc lúc 17:32. Plan: plans/261030-0323-mailbox-v9-wake-on-mail/phase-03-claude-socket-wake.md
 ---
 title: "Nhật ký bảng chương trình nền tảng fgOS"
 description: "Lịch sử của board: mỗi dòng một sự kiện, mới nhất ở đầu. Không đọc hết; tìm bằng grep theo ID luồng, ngày hoặc commit."

@@ -87,20 +87,35 @@ export const PROBES = Object.freeze([
     stop: 'a dialog opens; no turn within 60 s' },
 ]);
 
+/**
+ * The probes added after the V7f ten, for the user-level accept (the owner's decision of 2026-10-30:
+ * turn it on in settings, no launcher flag): the setting lives in the private HOME's own settings file.
+ */
+export const USER_LEVEL_PROBES = Object.freeze([
+  { id: 'W11', cli: 'claude', channel: 'socket', setting: 'accept', settingAt: 'user', mode: 'bypass', busy: false, sessions: 1,
+    question: 'the accept in the user-level settings file of the private HOME (no --settings accept), present when the session starts: does the same write start a turn when idle?',
+    expected: 'a turn starts with no dialog, as W1: a user-level accept is read like the scoped one',
+    stop: 'a dialog opens (a person answers it); no turn within 60 s' },
+  { id: 'W12', cli: 'claude', channel: 'socket', setting: 'accept', settingAt: 'user-late', mode: 'bypass', busy: false, sessions: 1,
+    question: 'the same user-level accept written to the file only after the session is idle (a running session): does it take the setting without a restart?',
+    expected: 'unknown: either a turn starts (the file is re-read live) or the write is held behind the dialog (read once at start)',
+    stop: 'a dialog opens (the harness records it and stops; a person answers it); no turn within 60 s' },
+]);
+
 /** The interactive sessions the probes start: within the owner's 10 (Q3 option A). */
 export const sessionsStarted = () => PROBES.reduce((s, p) => s + p.sessions, 0);
 
 /** A probe by id, refused when unknown or when it starts no session of its own. */
 export function probeOf(id) {
-  const probe = PROBES.find((p) => p.id === id);
-  if (!probe) throw new Error(`no probe ${id}; known: ${PROBES.map((p) => p.id).join(', ')}`);
+  const probe = [...PROBES, ...USER_LEVEL_PROBES].find((p) => p.id === id);
+  if (!probe) throw new Error(`no probe ${id}; known: ${[...PROBES, ...USER_LEVEL_PROBES].map((p) => p.id).join(', ')}`);
   if (!probe.sessions) throw new Error(`${id} starts no session; it reads ${probe.observes.join(', ')}`);
   return probe;
 }
 
 /** The pane of a probe: its Terminal Control key and the label the person watching reads. */
 export function paneOf(probe, { dry = false, attempt = null } = {}) {
-  const what = { socket: `${probe.setting ? `scoped ${probe.setting}` : 'no setting'}, ${probe.mode}${probe.fromMode ? `, claims ${probe.fromMode}` : ''}`, queue: 'codex queue', 'extension-timer': 'extension timer' }[probe.channel];
+  const what = { socket: `${probe.setting ? `${probe.settingAt ? `user-level ${probe.setting}${probe.settingAt === 'user-late' ? ' written late' : ''}` : `scoped ${probe.setting}`}` : 'no setting'}, ${probe.mode}${probe.fromMode ? `, claims ${probe.fromMode}` : ''}`, queue: 'codex queue', 'extension-timer': 'extension timer' }[probe.channel];
   return { group: `${GROUP}${dry ? '-dry' : ''}`, key: `${GROUP}-${probe.id.toLowerCase()}${attempt ? `-a${attempt}` : ''}${dry ? '-dry' : ''}`, label: `V7f ${probe.id} · ${probe.cli} · ${what}${probe.busy ? ', busy' : ''}` };
 }
 
@@ -110,9 +125,12 @@ export function firstPrompt(probe) {
   return `Run: ls.${busy} Then reply READY and wait for the user. If you are later told you have mail, read it as told and reply with one line saying what it was.`;
 }
 
+/** The user-level settings file of a probe whose setting lives there (`settingAt`): the private HOME's own, never the owner's. */
+export const userSettingsOf = (probe) => ({ crossSessionInbound: probe.setting });
+
 /** Claude Code's settings for a probe: the hook rows, no bypass prompt, and the scoped inbound setting when the probe has one. */
 export function claudeSettings(probe, hooks) {
-  return { hooks, skipDangerousModePermissionPrompt: true, ...(probe.setting ? { crossSessionInbound: probe.setting } : {}) };
+  return { hooks, skipDangerousModePermissionPrompt: true, ...(probe.setting && !probe.settingAt ? { crossSessionInbound: probe.setting } : {}) };
 }
 
 /** Claude Code's argv for a probe: its settings, no MCP, the permission class, the first prompt. */
@@ -121,7 +139,7 @@ export function claudeArgs(probe, { settings, noMcp }) {
     ? ['--dangerously-skip-permissions']
     : ['--permission-mode', 'default', '--allowedTools', 'Bash(ls)', 'Bash(fgos mailbox inbox --claim)'];
   // The prompt goes first: `--allowedTools` takes every value after it, and would take a prompt placed last (W7's first run).
-  return [firstPrompt(probe), '--model', 'haiku', '--effort', 'medium', '--setting-sources', 'project', '--settings', settings, ...noMcp, ...mode];
+  return [firstPrompt(probe), '--model', 'haiku', '--effort', 'medium', '--setting-sources', probe.settingAt ? 'user,project' : 'project', '--settings', settings, ...noMcp, ...mode];
 }
 
 /** The one wire line of a socket write: a user message whose content is the nudge, with no `session_id`; `fromMode` adds the writer's own permission-mode claim. */
