@@ -1,7 +1,7 @@
 ---
 title: "Human gates in two levels: one Rust gate door decides, Work only shows"
 description: "Move gate-bypass and gate-check to Rust, then build one gate door (decide, ask, grant, require) on the Event Store, decide risk from facts, and retire self-declared approvals and the risk-keyword gates."
-status: pending
+status: approved
 priority: P2
 effort: 12d
 branch: main
@@ -115,7 +115,11 @@ Node (`src/`, `bin/`): about -650. Rust (`packages/`, `apps/`): about +1,360 (th
 | Previous release breaks on the new stream | L x H | Rollback rehearsal above before landing |
 | Owner-machine workspaces with only `.fgos/gate-bypass.json` drop to `off` | M x L | Q1; fail direction is toward asking |
 
-## Open questions for the owner
+## Owner answers (2026-10-30 17:26)
+
+The owner chose «1a 2a 3a 4a» (HARDEN plan decision 56). Every recommendation below stands as written: Q1 (a) delete the legacy file fallback in phase 01; Q2 (a) the heavy list moves into `classify.mjs` as a non-gating hint; Q3 (a) accept the same-user limit and record channel and session on every grant; Q4 (a) ship the small generic `riskPaths` set. No question is open.
+
+## Questions put to the owner (answered above)
 
 Only questions decision 55 does not answer. Each follows `core/skills/_shared/decision-question.md`.
 
