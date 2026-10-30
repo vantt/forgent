@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos` verbs start about 40 ms sooner: the CLI loads the modules of the dispatch, merge, discover/plan, worktree, gateway, setup and doctor verbs only when one of those verbs runs (`--help` took about 115 ms and now about 75 ms on an idle machine).
 - `fgos mailbox send` can now nudge a Codex session that is idle: after the mail is recorded it runs `codex queue` with one fixed line ("You have mail. Read it with: fgos mailbox inbox --claim"), never the message body, and the send report says whether the nudge was sent, is already outstanding, or was refused. The nudge only runs on Codex versions the adapters contract lists as tested for it (0.161.0 and 0.162.1 today); on any other version the report says `version-not-tested` and the mail waits for the session's next tool call as before.
 - `fgos doctor`'s mailbox row now also reports cross-machine mail when `mailbox.crossMachine.enabled` is on: how many messages were sent, offered, still waiting for the receiving machine and refused, and a warning that names the machine key to confirm when mail from another machine is held for it.
 - `fgos setup` no longer leaves a `.pre-patterns-catalog-*` backup copy when the config write door refuses the conversion; the file is unchanged in that case, so the copy only piled up with every run.
