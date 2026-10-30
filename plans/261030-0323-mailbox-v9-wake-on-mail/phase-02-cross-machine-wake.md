@@ -12,7 +12,7 @@ Owner approval: 2026-10-30 13:15 ("ok luôn qua giai đoạn 2"). Status: detail
 
 ## Requirements
 
-1. **The sender asks, signed.** `fgos mailbox send --wake --to <remote session>` signs the event as payload `v: 2` under a new domain `fgos-mailbox-message/2\n` and adds `"wake": true`. A send without `--wake` stays `v: 1` under domain 1, byte for byte as today, so receivers that have not upgraded keep taking plain mail. A receiver that does not know domain 2 fails the signature and drops the event with the counted reason `remote-signature`; it never reads the message without its wake flag. The sender's report says "wake requested; the receiver decides".
+1. **The sender asks, signed.** `fgos mailbox send --wake --to <remote session>` signs the event as payload `v: 2` under a new domain `fgos-mailbox-message/2\n` and adds `"wake": true`. A send without `--wake` stays `v: 1` under domain 1, byte for byte as today, so receivers that have not upgraded keep taking plain mail. A receiver that does not know version 2 drops the event at its shape check (`v` must be 1) with the counted reason `remote-malformed`; it never reads the message without its wake flag. The sender's report says "wake requested; the receiver decides".
 2. **The receiver decides, with its own budget.** A verified remote message takes an effective wake only if all hold: the signature verified, the signer machine's pin is `confirmed` (the existing check; `requireConfirmed` stays true for a wake even if an owner sets it false for plain mail), the recipient head's CLI is nudge-eligible on its tested version (`to_nudge`), the exchange quota of `effective_wake` is not spent, and a **remote wake cap** per verified sender session is not spent. The cap is a new limit `mailbox.remote.wakeCap`, default 5 effective wakes per (signer machine, sender session) in total, never reset, placeholder until measured; entries are bounded like `remote.seen` (oldest dropped past `counters.maxKeys`). It is smaller than the local `mailbox.wake.lifetimeCap` (50) and than the sender's mail cap (200). A dropped wake never refuses the message; it is recorded as plain mail.
 3. **Idle is not asked.** Phase 01 decided there is no presence check: `codex queue` queues behind a running turn safely (W6). A head with older pending effective-wake mail is not nudged again (`nudge_outstanding`, same stateless rule as a local send).
 4. **The line is fixed.** The sync child sends the phase 01 line only (`You have mail. Read it with: fgos mailbox inbox --claim`); the body and the sender's text never travel with it. The nudge is sent after the record write, from the sync child, never from the hook (the hook's 50 ms budget is untouched), through the one construction of `SystemNudge`.
@@ -30,7 +30,7 @@ Owner approval: 2026-10-30 13:15 ("ok luôn qua giai đoạn 2"). Status: detail
 ## Steps
 
 1. Core first: lifetime rule parameter in `effective_wake`, remote wake count, `ingest_remote` wake, unit tests (red then green).
-2. Contract and limits, then `send --wake` signing and `verify` of version 2, with the old-reader behaviour proved: a v2 event verified by a function that only knows domain 1 is a signature drop.
+2. Contract and limits, then `send --wake` signing and `verify` of version 2, with the old-reader behaviour proved: a version 2 event given to today's `verify` is a `remote-malformed` drop (kept as a test before the function changes).
 3. The nudge step in the sync child with the stand-in `codex`; the baseline answer.
 4. OPC review of the new call site (the sync child's nudge call) before it lands; census regenerated in the same commit, 0 undeclared; rebase onto origin/main; msvc check, clippy `-D warnings` and the darwin check before landing Rust.
 5. Release to fg-server2 and fg-server through their windows; live proof (below). design-lap only with the owner's go.
@@ -44,7 +44,7 @@ Owner approval: 2026-10-30 13:15 ("ok luôn qua giai đoạn 2"). Status: detail
 ## Risk and rollback
 
 - A machine whose key is confirmed can start a turn on another machine. Bounded by: the confirmed pin, the fixed line, the tested-version gate, the exchange quota and the per-sender cap of 5. The line carries no body; the mail is read only through `inbox --claim` under the receiver instruction.
-- Receiver and sender must both run the new release for a wake to cross; a sender on the old release sends plain mail, a receiver on the old release drops a wake mail with a counted signature reason (the sender sees nothing sooner than the next settlement; document it in the guide).
+- Receiver and sender must both run the new release for a wake to cross; a sender on the old release sends plain mail, a receiver on the old release drops a wake mail with the counted reason `remote-malformed` (the sender sees nothing sooner than the next settlement; document it in the guide).
 - Rollback: set `mailbox.crossMachine.enabled` false to stop all cross-machine mail, or send without `--wake`; delivery of plain mail is unaffected. The wake count in the record is additive and ignored by an older reader of the version-2 record.
 
 ## Not decided here
