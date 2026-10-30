@@ -51,8 +51,10 @@ export function proposeLegacy(cwd, id, extra = {}) {
  * in process, so it runs as the CLI, and so does the take it settles: a claim settles only as its own writer. */
 export function proposePull(cwd, id) {
   assert.equal(addOk(cwd, id, { verify: 'test -f proof.txt' }).status, 0);
+  // boundary: `return` has no use case to call in process, and a claim settles only as the writer that took it.
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
   commitFile(cwd, 'proof.txt');
+  // boundary: `return` is written inline in bin/fgos.mjs, with no use case to call in process.
   const returned = run(cwd, ['return', id]);
   assert.equal(returned.status, 0, returned.stderr);
 }

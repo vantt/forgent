@@ -32,6 +32,7 @@ test('fgos approve of a runner item prints the fgos.v1 envelope of the delivered
   await makeRunnerProposedItem(cwd, 'cli-approve-runner', { verify: 'test -f cli-approve-runner-produced.txt' });
   commitPendingBeforeApprove(cwd, 'cli-approve-runner');
 
+  // boundary: the envelope and exit code are written by bin/fgos.mjs's dispatcher, not by the use case.
   const result = run(cwd, ['approve', 'cli-approve-runner']);
   assert.equal(result.status, 0, result.stderr);
   const data = envelopeData(result.stdout);
@@ -44,6 +45,7 @@ test('fgos approve of an item not awaiting approval exits 2, the precondition co
   const cwd = tmpCwdFast();
   addOk(cwd, 'cli-approve-not-proposed');
 
+  // boundary: the exit code a refusal maps to is decided by the CLI process.
   const result = run(cwd, ['approve', 'cli-approve-not-proposed']);
   assert.equal(result.status, 2);
   assert.match(result.stderr, /not "awaiting-approval"/);
@@ -54,6 +56,7 @@ test('approve --timeout and --no-timeout together are rejected as validation, ex
   addOk(cwd, 'approve-timeout-conflict', { verify: 'true' });
   assert.equal(moveOk(cwd, 'approve-timeout-conflict', 'awaiting-approval', SKIP_RETURN_GUARD).status, 0);
 
+  // boundary: the flag pair is parsed by bin/fgos.mjs before the use case is called.
   const result = run(cwd, ['approve', 'approve-timeout-conflict', '--timeout', '1000', '--no-timeout']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /mutually exclusive/);
@@ -65,6 +68,7 @@ test('approve --acknowledge-iron-law false (a value, not the bare flag) still re
   await makeRunnerProposedItemTouching(cwd, 'iron-ack-false-item', 'src/runner/probe.mjs', { verify: 'test -f src/runner/probe.mjs' });
 
   const headBefore = gitHead(cwd);
+  // boundary: the bare-flag-only rule is bin/fgos.mjs's flag parsing.
   const result = run(cwd, ['approve', 'iron-ack-false-item', '--acknowledge-iron-law', 'false']);
   assert.equal(result.status, 4, `a value form must refuse exactly like no flag at all: ${result.stdout}${result.stderr}`);
   assert.match(result.stderr, /Iron Law/);
@@ -79,6 +83,7 @@ test('approve --acknowledge-drift is forwarded: a leaf whose root is already del
   assert.equal(moveOk(cwd, 'cli-resolved-root', 'delivered').status, 0);
   commitPending(cwd, 'state: resolve cli-resolved-root');
 
+  // boundary: the flag is forwarded by bin/fgos.mjs's option parsing.
   const result = run(cwd, ['approve', 'cli-resolved-root-leaf', '--acknowledge-drift']);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(envelopeData(result.stdout).target, 'fgw/cli-resolved-root');
@@ -90,6 +95,7 @@ test('approve --no-wait fails at once while another process holds the trunk\'s m
   commitPendingBeforeApprove(cwd, 'wait-no-wait-approve');
   const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: encodeURIComponent('refs/heads/main') });
   try {
+    // boundary: the flag is forwarded by bin/fgos.mjs, and exit 9 is the CLI's code for a merge failure.
     const result = run(cwd, ['approve', 'wait-no-wait-approve', '--no-wait']);
     // 9 is the merge-fail code: every MergeError carries that category.
     assert.equal(result.status, 9, result.stderr);
@@ -110,11 +116,13 @@ test('approve --trust-dir with --dir approves from inside an ad-hoc worktree; wi
 
   const worktreePath = addAdHocWorktree(cwd, 'adhoc-trust-dir-branch');
   try {
+    // boundary: --trust-dir picks the repo root from --dir or the process cwd, which only a CLI process has.
     const refused = run(worktreePath, ['approve', 'approve-trust-dir', '--trust-dir']);
     assert.equal(refused.status, 4, `expected a clean validation refusal, not a merge on an unregistered worktree: ${refused.stdout}${refused.stderr}`);
     assert.equal(stateView(cwd).work['approve-trust-dir'].status, 'awaiting-approval');
     assert.equal(gitHead(cwd), headBefore, 'nothing landed on main');
 
+    // boundary: --trust-dir picks the repo root from --dir or the process cwd, which only a CLI process has.
     const result = run(worktreePath, ['approve', 'approve-trust-dir', '--trust-dir', '--dir', cwd]);
     assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
     assert.equal(stateView(cwd).work['approve-trust-dir'].status, 'delivered');
@@ -127,6 +135,7 @@ test('approve --github is forwarded and refused, exit 4', async () => {
   const cwd = initGitCwdMainFast();
   await makeRunnerProposedItem(cwd, 'cli-approve-github');
 
+  // boundary: the flag is forwarded by bin/fgos.mjs's option parsing.
   const result = run(cwd, ['approve', 'cli-approve-github', '--github', '--pr', '42']);
   assert.equal(result.status, 4, result.stderr);
   assert.match(result.stderr, /approve --github is explicitly forbidden/);
