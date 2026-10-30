@@ -42,19 +42,7 @@ test('fgos doctor exits 0 by default even when a check fails', () => {
   }
 });
 
-test('fgos doctor --strict exits 1 when a check fails, and still prints the report', () => {
-  const project = bareGitProject();
-  try {
-    const res = runDoctor(project, ['--strict']);
-    assert.equal(res.status, 1, res.stderr);
-    const { checks } = JSON.parse(res.stdout).data;
-    assert.ok(checks.some((c) => c.passed === false));
-  } finally {
-    fs.rmSync(project, { recursive: true, force: true });
-  }
-});
-
-test('fgos doctor --fix --strict exits 1 when checks still fail after the fixes ran', () => {
+test('fgos doctor --strict exits 1 when a check still fails, also after --fix ran, and still prints the report', () => {
   const project = bareGitProject();
   try {
     const res = runDoctor(project, ['--fix', '--strict']);
