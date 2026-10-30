@@ -35,8 +35,8 @@ export function refusal(exitCode, ...patterns) {
   return (err) => err instanceof StoreError && EXIT_CODES[err.category] === exitCode && patterns.every((pattern) => pattern.test(err.message));
 }
 
-export function moveFixture(cwd, id, to) {
-  const options = to === 'awaiting-approval' ? { skipReturnGuard: "test fixture setup, not exercising return's own guard" } : {};
+export function moveFixture(cwd, id, to, extra = {}) {
+  const options = to === 'awaiting-approval' ? { skipReturnGuard: "test fixture setup, not exercising return's own guard", ...extra } : extra;
   const result = moveOk(cwd, id, to, options);
   assert.equal(result.status, 0, `fixture move of ${id} to ${to}: ${result.stderr}`);
 }

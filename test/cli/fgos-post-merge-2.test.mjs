@@ -87,7 +87,6 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-
 test('a mutation (add) attempted on an already-corrupt log is refused as corrupt-log, exit 5, no event written', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'before-corruption');
@@ -139,7 +138,7 @@ test('a corrupt trailing line in the event log is reported as corrupt-log, exit 
 });
 
 
-test('an unknown verb is rejected as validation, exit 4', () => {
+test('an unknown verb is rejected as validation, exit 4, printing no stdout envelope, and its usage lists the verbs of the surface', () => {
   const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['bogus-verb']);
   assert.equal(result.status, 4);
@@ -147,6 +146,8 @@ test('an unknown verb is rejected as validation, exit 4', () => {
   // go to stderr only, so a consumer can trust "stdout parses" as "success".
   assert.equal(result.stdout, '', 'a failing verb prints no stdout envelope');
   assert.throws(() => JSON.parse(result.stdout), 'stdout is not parseable JSON on the error path');
+  assert.match(result.stderr, /review\|approve\|sync-root\|reject/);
+  assert.match(result.stderr, /catchup/);
 });
 
 
@@ -264,13 +265,3 @@ test('two submits of the same text get different ids, both persist, no duplicate
 });
 
 
-
-
-
-
-test('the CLI usage message for an unknown verb lists review/approve/sync-root/reject in the surface', () => {
-  const cwd = tmpCwdFromTemplate();
-  const result = run(cwd, ['bogus-verb']);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /review\|approve\|sync-root\|reject/);
-});
