@@ -124,6 +124,10 @@ fn only_codex_has_a_nudge_channel_and_only_on_the_versions_it_was_measured_on() 
         tested.nudge_for("codex", "0.161.0"),
         Some(NudgeChannel::CodexQueue)
     );
+    assert_eq!(
+        tested.nudge_for("codex", "0.162.1"),
+        Some(NudgeChannel::CodexQueue)
+    );
     assert_eq!(tested.nudge_for("codex", "9.9.9"), None);
     assert_eq!(tested.nudge_for("claude", "2.1.309"), None);
 }

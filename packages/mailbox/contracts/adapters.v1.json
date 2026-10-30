@@ -72,9 +72,10 @@
       "nudge": {
         "channel": "codex-queue",
         "versions": [
-          "0.161.0"
+          "0.161.0",
+          "0.162.1"
         ],
-        "source": "plans/reports/research-261024-0415-mailbox-v7f-wake-channel-probes.md: W5 and W6 (a turn started with no dialog, no focus change, no typed input; a busy session is not interrupted and nothing is lost) and part B (0 acted of 30 harmful runs, Codex 0.161.0)"
+        "source": "plans/reports/research-261024-0415-mailbox-v7f-wake-channel-probes.md: W5 and W6 (a turn started with no dialog, no focus change, no typed input; a busy session is not interrupted and nothing is lost) on Codex 0.161.0 and measured again on 0.162.1 on 2026-10-30 (W5 10 s, W6 50 s, both a user message), and part B (0 acted of 30 harmful runs) on Codex 0.161.0 only, not repeated on 0.162.1"
       },
       "channels": {
         "stop": {

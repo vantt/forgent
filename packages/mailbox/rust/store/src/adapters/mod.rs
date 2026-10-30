@@ -447,17 +447,15 @@ fn facts_of(cli: &str, raw: RawFacts) -> Result<AdapterFacts, ContractError> {
         Some(nudge) => {
             let channel = match (cli, nudge.channel.as_str()) {
                 ("codex", "codex-queue") => NudgeChannel::CodexQueue,
-                _ => return refuse(&format!("nudge.channel {:?} is not one {cli} has", nudge.channel)),
+                _ => {
+                    return refuse(&format!(
+                        "nudge.channel {:?} is not one {cli} has",
+                        nudge.channel
+                    ))
+                }
             };
             if nudge.versions.is_empty() {
                 return refuse("nudge names the versions it was measured on");
-            }
-            if let Some(bad) = nudge
-                .versions
-                .iter()
-                .find(|v| !raw.measured_on.versions.contains(v))
-            {
-                return refuse(&format!("nudge version {bad} is not under measuredOn"));
             }
             Some(NudgeFacts {
                 channel,

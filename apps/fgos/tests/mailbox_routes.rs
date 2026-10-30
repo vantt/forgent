@@ -989,11 +989,26 @@ fn a_send_with_wake_to_a_codex_head_on_an_untested_version_says_it_could_not_be_
     let _head = CodexHead::start(&scene, WRITER);
     let name = scene.head_name();
 
-    let sent = scene.run(
+    // The version the send reads is the `codex` first on PATH: a stand-in that names a version no contract lists.
+    let bin = scene.root.join("untested-codex-bin");
+    fs::create_dir_all(&bin).unwrap();
+    let program = bin.join("codex");
+    fs::write(&program, "#!/bin/sh\necho 'codex-cli 9.9.9'\n").unwrap();
+    fs::set_permissions(
+        &program,
+        std::os::unix::fs::PermissionsExt::from_mode(0o755),
+    )
+    .unwrap();
+    let path = std::env::join_paths(std::iter::once(bin).chain(std::env::split_paths(
+        &std::env::var_os("PATH").unwrap_or_default(),
+    )))
+    .unwrap();
+    let sent = scene.run_env(
         &scene.main(),
         Some("sender-a"),
         &["mailbox", "send", "--wake", "--to", &name, "wake up"],
         b"",
+        &[("PATH", Path::new(&path))],
     );
     assert_eq!(sent.status.code(), Some(0), "{sent:?}");
     let text = String::from_utf8_lossy(&sent.stdout);
