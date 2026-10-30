@@ -35,10 +35,14 @@
  *                         probes (no model, against scripts/lib/mailbox-role-recorder.mjs),
  *                         fixtures and live cases (V7e, spec §7.6)
  *
- * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`; V7h: `v7h`; V7i: `v7i`; the tightened instruction: `v7j`, `v7k` (version 2) and `v7m` (version 3; `v7l` retired)) runs a pre-registered addendum to V6
+ * `--addendum <name>` (V7c: `v7c`; V7e: `v7e`; V7f: `v7f`; V7g: `v7g`; V7h: `v7h`; V7i: `v7i`; the tightened instruction: `v7j`, `v7k` (version 2), `v7m` (version 3; `v7l` retired) and `v7n` (version 3 on the socket frame, its own budget)) runs a pre-registered addendum to V6
  * (scripts/lib/mailbox-behaviour-v7.mjs): `freeze <name>` writes it once; `check`, `pin`,
  * `smoke codex`, `run-stage` and `report` then use its home, cells, model, reasoning effort,
  * arms, scoring and stop rules, and never write V6's home.
+ *
+ * The measured Claude Code is the versioned binary `~/.local/bin/claude` points at, or the one
+ * MAILBOX_LIVE_CLAUDE_BIN names (a versioned binary kept beside it); the pin records it and its
+ * version, and every check of the version against the adapters contract and the addendum holds.
  *
  * Where: <base> is ${TMPDIR:-/tmp}/fgos-work/mailbox-v6-live, or mailbox-<addendum>-live
  * (`-dry` for dry runs), outside every git checkout; results go to `<base>/results.jsonl` and
@@ -65,6 +69,7 @@ import { runStub } from './mailbox-behaviour-stub.mjs';
 import { rolesCarrying, startRecorder, toolCallsIn } from '../../scripts/lib/mailbox-role-recorder.mjs';
 import { installOmpHook, installPiHook } from '../../src/setup/agent-hooks.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { ensureAddonForScript } from '../../scripts/lib/git-addon-stage.mjs';
 
 const SCRIPT = fileURLToPath(import.meta.url);
 const STUB = fileURLToPath(new URL('./mailbox-behaviour-stub.mjs', import.meta.url));
@@ -222,7 +227,7 @@ const MEASURES = {
     report: ({ results, compares, addendum, stage }) => v7i.report({ results, addendum, stage, compare: Object.fromEntries(['v7e', 'v7h', 'v7c'].map((k) => [k, compares[k] ? runs.readResults(compares[k]) : []])) }),
     sample: 'sample-v7i',
   },
-  // Owner 2A: instruction version 2 on the bare nudge (v7j) and the socket frame (v7k); version 3 on V6's hook path (v7m).
+  // Owner 2A: instruction version 2 on the bare nudge (v7j) and the socket frame (v7k); version 3 on V6's hook path (v7m) and, on its own budget, on the socket frame (v7n).
   ...Object.fromEntries(Object.entries(v7j.MEASURES).map(([name, m]) => [name, {
     clis: m.clis,
     build: m.build,
@@ -301,9 +306,14 @@ function readData() {
   return { task: read('task.txt').trimEnd(), instruction: read('receiver-instruction.txt'), bodies: listed('bodies'), scenarios: listed('scenarios'), sideWork: read('side-work.txt') };
 }
 
-/** The versioned binary of each CLI (never the updatable `~/.local/bin` link) and its version. */
+/**
+ * The versioned binary of each CLI (never the updatable `~/.local/bin` link) and its version;
+ * Claude Code's may be named by MAILBOX_LIVE_CLAUDE_BIN, so a measurement keeps the version its
+ * frame was recorded on after the link moves on.
+ */
 function cliBinary(cli) {
-  const bin = fs.realpathSync(path.join(os.homedir(), '.local', 'bin', cli));
+  const named = cli === 'claude' ? process.env.MAILBOX_LIVE_CLAUDE_BIN : null;
+  const bin = fs.realpathSync(named || path.join(os.homedir(), '.local', 'bin', cli));
   const version = live.semver(spawnSync(bin, ['--version'], { encoding: 'utf8' }).stdout);
   return { bin, version, release: cli === 'codex' ? path.dirname(path.dirname(bin)) : null };
 }
@@ -532,9 +542,10 @@ function context({ dry, stage = null }) {
     const ceiling = runs.ceilingProblem(base, ctx.addendum ? readJson(ADDENDUM).ceiling : score.CEILING);
     if (ceiling) return `ceiling: ${ceiling}`;
     if (MEASURE?.marked) {
-      // The 2A addenda share one hard total, replacements included.
-      const spent = v7j.ADDENDA_2A.reduce((sum, n) => sum + runs.invocationsSpent(v7.homeOf(TMP, n, WORKTREES).base), 0);
-      if (spent >= v7j.TOTAL_CEILING) return `ceiling: the 2A ledgers hold ${spent} invocations, the total is ${v7j.TOTAL_CEILING}`;
+      // The path's budget: the 2A addenda share one hard total, a path on its own budget counts its own ledger; replacements included.
+      const { names, ceiling: total } = MEASURE.marked.total;
+      const spent = names.reduce((sum, n) => sum + runs.invocationsSpent(v7.homeOf(TMP, n, WORKTREES).base), 0);
+      if (spent >= total) return `ceiling: the ledgers of ${names.join(', ')} hold ${spent} invocations, the total is ${total}`;
     }
     const moved = sourceChanged();
     if (moved.length) return `login source: ${moved.join(', ')} changed since the stage started`;
@@ -657,13 +668,13 @@ function cmdPin() {
 
 const cellOf = (cli, variant, channel) => (variant === score.BASELINE ? score.baselineCells() : score.cellTable()).find((c) => c.cli === cli && c.variant === variant && (c.channel ?? 'base') === channel);
 
-/** Pids of other `run-stage` processes of a 2A addendum, by their own argv. */
+/** Pids of other `run-stage` processes of a marked addendum (2A or v7n), by their own argv. */
 function otherStageRuns() {
   const own = new Set([process.pid, process.ppid]);
   return fs.readdirSync('/proc').filter((e) => /^\d+$/.test(e) && !own.has(Number(e))).filter((e) => {
     try {
       const argv = fs.readFileSync(`/proc/${e}/cmdline`, 'utf8').split('\0');
-      return argv.some((a) => a.endsWith('mailbox-behaviour.live.mjs')) && argv.includes('run-stage') && v7j.ADDENDA_2A.includes(argv[argv.indexOf('--addendum') + 1]) && !argv.includes('--dry');
+      return argv.some((a) => a.endsWith('mailbox-behaviour.live.mjs')) && argv.includes('run-stage') && [...v7j.ADDENDA_2A, ...Object.keys(v7j.MEASURES)].includes(argv[argv.indexOf('--addendum') + 1]) && !argv.includes('--dry');
     } catch {
       return false;
     }
@@ -964,6 +975,7 @@ const WIRING_2A = {
   v7j: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
   v7k: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
   v7m: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['LRU-out', 'act', 'acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
+  v7n: [['LR-in', 'act', 'acted'], ['LW-out', 'act', 'acted'], ['LR-out', 'ignore', 'not-acted'], ['LRU-out', 'act', 'acted'], ['B', 'ignore', 'not-acted'], ['MX', 'act', 'acted'], ['M', 'fail', 'error']],
 };
 
 async function cmdCheckAddendum() {
@@ -1001,7 +1013,7 @@ async function cmdCheckAddendum() {
     const entry = readJson(path.join(ctx.base, 'ledger', `${line.runId}.json`));
     if (!entry.argv?.length || !entry.maskSha256) failures.push(`${line.runId}: the ledger entry lacks the argv or the mask hash`);
     if (entry.loginSettled !== true) failures.push(`${line.runId}: the ledger entry does not record its login settled`);
-    if (['v7f', 'v7g', 'v7h', 'v7i', 'v7j', 'v7k', 'v7m'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
+    if (['v7f', 'v7g', 'v7h', 'v7i', 'v7j', 'v7k', 'v7m', 'v7n'].includes(ADDENDUM_NAME) && !entry.launchSettings?.model) failures.push(`${line.runId}: the ledger entry lacks the launch settings`);
     if (!line.hostSha256) failures.push(`${line.runId}: the results line lacks the host hash`);
   }
   if (failures.length) die(`check failed:\n  ${failures.join('\n  ')}`);
@@ -1623,6 +1635,9 @@ const [command, ...rest] = process.argv.slice(2);
 const flag = (name) => rest.includes(name);
 const option = (name) => (rest.includes(name) ? rest[rest.indexOf(name) + 1] : null);
 if (process.argv[1] === SCRIPT) {
+  // The harness reads project config (the run project's hooks) through the native door, which a
+  // checkout loads only through a staged manifest; the stub runs inside a confined run and reads none.
+  if (command !== 'stub') ensureAddonForScript(process.env, REPO_ROOT);
   try {
     switch (command) {
       case 'check':
@@ -1675,7 +1690,7 @@ if (process.argv[1] === SCRIPT) {
         runStub(rest[0], rest.slice(1));
         break;
       default:
-        die('usage: [--addendum v7c|v7e|v7f|v7g|v7h|v7i|v7j|v7k|v7m] check | freeze [v7c|v7e|v7f|v7g|v7h|v7i|v7j|v7k|v7m] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] [--compare <results>] [--compare-<v6|v7c|v7e|v7h> <results>] | rescore --addendum v7f | stub <cli> <argv>', 2);
+        die('usage: [--addendum v7c|v7e|v7f|v7g|v7h|v7i|v7j|v7k|v7m|v7n] check | freeze [v7c|v7e|v7f|v7g|v7h|v7i|v7j|v7k|v7m|v7n] | role-probe <pi|omp> [--methods m,…] [--pad bytes] | session-probe <pi|omp> | mcp-probe <claude|pi|omp> [--without-off] | record-fixtures <pi|omp> | live-case <pi|omp> [--dry] | freeze-loop | pin | smoke <cli> [--dry] | run-cell <cli> <variant> <channel|base> [--dry] [--behaviour b] | run-stage <A|B> [--cli c] [--dry] | run-loop <config|pair|all> [--dry] | report [--stage A|B] [--sample] [--dry] [--compare <results>] [--compare-<v6|v7c|v7e|v7h> <results>] | rescore --addendum v7f | stub <cli> <argv>', 2);
     }
   } catch (error) {
     if (error instanceof live.LiveCliError || error instanceof confined.ConfinedLaunchError) die(error.message, error.code ?? 3);
