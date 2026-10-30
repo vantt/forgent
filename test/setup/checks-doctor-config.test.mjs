@@ -26,7 +26,7 @@ import {
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { writeLocalStatus } from '../../src/state/tool-registry.mjs';
-import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig, readProjectConfig, statGatewayToken } from '../helpers/config-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig, readProjectConfig, statGatewayToken, gatewayTokenPath } from '../helpers/config-fixture.mjs';
 
 // tsk-in1-1 D1: a tool provider is declared directly in
 // `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
@@ -309,16 +309,19 @@ test('fgos doctor --fix (CLI e2e) creates the gateway token file through the rea
 // "broken". `renderPretty`'s doctor `fixed` lines must render green
 // regardless of `changed`, never key that color off `changed` the way a
 // `checks` line keys it off `passed`.
-test('fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when the fix found nothing to change', () => {
+test('fgos doctor --fix --pretty (CLI e2e) prints ANSI text, not JSON, and renders a fix line green even when the fix found nothing to change', () => {
   const cwd = mkTemp('doctor-cli-fix-pretty-noop-');
   const homeDir = mkTemp('doctor-cli-fix-pretty-noop-home-');
   const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
   execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
-  const first = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env });
-  assert.equal(first.status, 0, `fgos doctor --fix failed: ${first.stderr}`);
+  // The token file as the fix leaves it, so this run's fix has nothing to change; the fix creating it is the test above.
+  const tokenFile = gatewayTokenPath(path.join(homeDir, '.fgos'));
+  fs.mkdirSync(path.dirname(tokenFile), { recursive: true, mode: 0o700 });
+  fs.writeFileSync(tokenFile, `${'a'.repeat(64)}\n`, { mode: 0o600 });
 
   const second = spawnSync(process.execPath, [FGOS, 'doctor', '--fix', '--pretty'], { cwd, encoding: 'utf8', env });
   assert.equal(second.status, 0, `fgos doctor --fix --pretty failed: ${second.stderr}`);
+  assert.throws(() => JSON.parse(second.stdout), 'expected --pretty output to NOT be valid JSON');
   const lines = second.stdout.split('\n');
   const fixLine = lines.find((l) => l.includes('fix: gateway-token-configured'));
   assert.ok(fixLine, 'expected a "fix: gateway-token-configured" line in --pretty output');
@@ -400,31 +403,7 @@ test('main-checkout-hook-wired doctor check reports passed/failed matching mainC
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout', () => {
-  const cwd = mkTemp('doctor-cli-json-');
-  const homeDir = mkTemp('doctor-cli-json-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(typeof envelope.contract, 'string');
-  assert.ok(Array.isArray(envelope.data.checks));
-  assert.equal(envelope.data.checks.length, DOCTOR_CHECKS.length);
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos doctor --pretty prints colored ANSI text, not JSON', () => {
-  const cwd = mkTemp('doctor-cli-pretty-');
-  const homeDir = mkTemp('doctor-cli-pretty-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--pretty'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
-  assert.equal(result.status, 0, result.stderr);
-  assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
-  assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof)', () => {
+test('fgos doctor (no flags) on a fresh cwd prints the envelope JSON with every check, and never creates the shared config file (read-only proof)', () => {
   const cwd = mkTemp('doctor-cli-readonly-');
   const homeDir = mkTemp('doctor-cli-readonly-home-');
   const configFiles = ['config.json', 'config.yaml'].map((name) => path.join(cwd, '.fgos', name));
@@ -432,6 +411,8 @@ test('fgos doctor against a fresh cwd with no runner config never creates the sh
   assert.equal(result.status, 0, result.stderr);
   for (const file of configFiles) assert.equal(fs.existsSync(file), false, `fgos doctor must never create ${file}`);
   const envelope = JSON.parse(result.stdout);
+  assert.equal(typeof envelope.contract, 'string');
+  assert.equal(envelope.data.checks.length, DOCTOR_CHECKS.length);
   assert.equal(envelope.data.checks.find((c) => c.id === 'config-parse').passed, true);
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
