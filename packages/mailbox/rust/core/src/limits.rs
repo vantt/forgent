@@ -102,6 +102,7 @@ pub struct WakeLimits {
     pub exchange_gap_sec: u64,
     pub max_per_exchange: u32,
     pub lifetime_cap: u32,
+    pub remote_lifetime_cap: u32,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

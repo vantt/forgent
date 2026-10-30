@@ -52,6 +52,8 @@ mailbox:
     maxPerExchange: 5
     # @fgos:doc Wake sends that took effect by one sender generation to one recipient, never reset. In wakes. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 50.
     lifetimeCap: 50
+    # @fgos:doc Wake sends that took effect by one verified sender session on another machine to one recipient, never reset. In wakes. Smaller than the local cap because a confirmed machine key is all that stands behind it; a starting value, not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 5.
+    remoteLifetimeCap: 5
   # @fgos:doc Notice limits per address.
   notices:
     # @fgos:doc Notices held per address; the oldest is dropped on overflow. In notices. Borrowed from mailbox.queue.perSender, not yet measured. Minimum: 0. Maximum: 4294967295. Default: 10.

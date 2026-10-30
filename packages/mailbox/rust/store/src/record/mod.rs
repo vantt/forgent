@@ -528,7 +528,7 @@ impl Record {
                     .iter()
                     .zip(&results)
                     .filter_map(|(mail, result)| match result {
-                        Ok(Ingested::Recorded(id)) => Some((id.clone(), mail.body)),
+                        Ok(Ingested::Recorded { id, .. }) => Some((id.clone(), mail.body)),
                         _ => None,
                     })
                     .collect();

@@ -5,7 +5,7 @@
 //! never a refused send.
 use crate::head::record_of_head_text;
 use crate::record::read_regular_capped;
-use fgos_mailbox_core::SendOutcome;
+use fgos_mailbox_core::Cli;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -30,13 +30,13 @@ pub struct VersionSources {
     pub max_read_bytes: u64,
 }
 
-/// The version of the CLI the recipient of `outcome` runs, when it can be
-/// read.
-pub fn recipient_version(outcome: &SendOutcome, sources: &VersionSources) -> Option<String> {
-    match outcome.to_cli.as_str() {
+/// The version of `cli` the head with process identity `head` runs, when it
+/// can be read.
+pub fn recipient_version(cli: &Cli, head: &str, sources: &VersionSources) -> Option<String> {
+    match cli.as_str() {
         "claude" => claude_session_version(
             sources.claude_sessions.as_deref()?,
-            &outcome.to_head,
+            head,
             sources.max_read_bytes,
         ),
         "codex" => codex_installed_version(&sources.codex_program, CODEX_VERSION_TIMEOUT),

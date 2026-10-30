@@ -3,19 +3,22 @@
 //! published id): the core only decides whether this record takes it, under
 //! the caps the same-machine mailbox has, applied to each verified sender on
 //! its own (`remote.v1.json`, `perSenderCaps`). A taken message becomes a
-//! header like any other, marked with its [`Origin`]; it never wakes, never
-//! has a parent, and a refusal of it reaches its sender through the Event
-//! Store, not as a local notice (the sender has no head here).
+//! header like any other, marked with its [`Origin`]; it never has a parent,
+//! and a refusal of it reaches its sender through the Event Store, not as a
+//! local notice (the sender has no head here). It wakes only when its signed
+//! sender asked and the wake rules allow it, with a wake budget of its own
+//! per verified sender (`mailbox.wake.remoteLifetimeCap`).
 use crate::counters::remote_account;
 use crate::counters::CounterReason;
 use crate::delivery::Refusal;
 use crate::envelope::{Header, MessageState, Origin};
 use crate::frame;
-use crate::ids::{IdSource, MessageId, WriterKey};
+use crate::ids::{Cli, IdSource, MessageId, WriterKey};
 use crate::limits::Limits;
 use crate::policy::{check_sender_key, LifetimeKey};
 use crate::state::MailboxState;
 use crate::time::Timestamp;
+use crate::wake::{WakeDrop, WakeParties, WakeSender};
 use std::collections::{BTreeMap, BTreeSet};
 
 /// How long past the header horizon a taken message's id is remembered, so
@@ -42,6 +45,13 @@ pub struct RemoteMail<'a> {
     /// The wire's own body cap; the effective cap is the smaller of this and
     /// `mailbox.maxBodyBytes`.
     pub max_body_bytes: u64,
+    /// Whether the signed event asked for a wake. Whether it takes effect is
+    /// decided here, never by the sender.
+    pub wake: bool,
+    /// The CLIs whose `Stop` takes mail, and those whose idle head can be
+    /// nudged, as for a same-machine send.
+    pub stop_drains: &'a BTreeSet<Cli>,
+    pub nudge_clis: &'a BTreeSet<Cli>,
 }
 
 /// A message from another machine the host dropped before the core saw it:
@@ -70,11 +80,28 @@ pub struct Unsettled {
     pub settlement: Settlement,
 }
 
+/// What a taken message's wake came to, for the host to nudge on.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RemoteWake {
+    pub effective: bool,
+    /// Why the wake the sender asked for did not take effect.
+    pub dropped: Option<WakeDrop>,
+    /// The head the message is for, and its CLI.
+    pub to_key: WriterKey,
+    pub to_cli: Cli,
+    /// The head's process identity, as the binding stores it.
+    pub to_head: String,
+    /// Whether that head's CLI can be nudged.
+    pub to_nudge: bool,
+    /// Whether an earlier wake to the head is still unread.
+    pub outstanding: bool,
+}
+
 /// What ingest did with one message.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Ingested {
     /// Recorded here under this local id.
-    Recorded(MessageId),
+    Recorded { id: MessageId, wake: RemoteWake },
     /// Already taken or refused before; nothing changed.
     Duplicate,
 }
@@ -162,13 +189,13 @@ impl MailboxState {
             self.check_budget(&account, limits)?;
             self.check_lifetime_key(&LifetimeKey::remote(mail.machine, mail.from), limits)?;
             let recipient = self.resolve_key(mail.to, dead)?;
-            let (to, generation) = (recipient.key.clone(), recipient.generation);
+            let (to, generation, cli, head) = (recipient.key.clone(), recipient.generation, recipient.cli.clone(), recipient.head.clone());
             self.check_loop(&account, &to, now, limits)?;
             self.check_queue(&to, generation, limits)?;
             self.check_share(&account, &to, generation, limits)?;
-            Ok((to, generation))
+            Ok((to, generation, cli, head))
         })();
-        let (to, to_generation) = match recorded {
+        let (to, to_generation, to_cli, to_head) = match recorded {
             Ok(found) => found,
             Err(refusal) => {
                 let to = self.account(mail.to);
@@ -177,7 +204,34 @@ impl MailboxState {
                 return Err(refusal);
             }
         };
+        let to_account = self.account(&to);
+        let to_nudge = mail.nudge_clis.contains(&to_cli);
+        let outstanding = self.wake_outstanding(&to, to_generation);
+        let (effective, dropped) = self.effective_wake(
+            &WakeParties {
+                account: &account,
+                to_account: &to_account,
+                sender: WakeSender::Remote {
+                    machine: mail.machine,
+                    from: mail.from,
+                },
+                to: &to,
+                to_wake_channel: mail.stop_drains.contains(&to_cli) || to_nudge,
+            },
+            mail.wake,
+            now,
+            limits,
+        );
         let id = MessageId::mint(ids);
+        let wake = RemoteWake {
+            effective,
+            dropped,
+            to_key: to.clone(),
+            to_cli,
+            to_head,
+            to_nudge,
+            outstanding,
+        };
         self.messages.push(Header {
             id: id.clone(),
             from: mail.from.clone(),
@@ -187,8 +241,8 @@ impl MailboxState {
             reply_to: None,
             reply_to_hint: None,
             depth: 0,
-            wake: false,
-            effective_wake: false,
+            wake: mail.wake,
+            effective_wake: effective,
             body_bytes: mail.body.len() as u64,
             body_rendered_bytes: Some(frame::rendered_body_len(mail.body)),
             body_kept: true,
@@ -207,7 +261,7 @@ impl MailboxState {
                 settled: false,
             }),
         });
-        Ok(Ingested::Recorded(id))
+        Ok(Ingested::Recorded { id, wake })
     }
 
     /// The messages from other machines that were offered or refused since

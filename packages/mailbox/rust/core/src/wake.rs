@@ -77,14 +77,37 @@ impl WakeLifetimeKey {
             to.as_str()
         ))
     }
+
+    /// `~<machine>/<session>|<to>`: effective wakes of one verified sender on
+    /// another machine to one recipient. The leading `~` is the remote
+    /// account prefix, which no local key has, so no local head's records
+    /// ever match it.
+    fn remote(machine: &str, from: &WriterKey, to: &WriterKey) -> Self {
+        Self(format!("~{machine}/{}|{}", from.as_str(), to.as_str()))
+    }
+}
+
+/// Who sent a message, as far as its wake budget goes.
+pub(crate) enum WakeSender<'a> {
+    /// A head of this record; `generation` is `None` for the shared sender
+    /// with no head, which no lifetime cap brakes (owner decision Q3).
+    Head {
+        from: &'a WriterKey,
+        generation: Option<Generation>,
+    },
+    /// A verified session on another machine. It has no generation here, and
+    /// it is never exempt: its own cap is `wake.remoteLifetimeCap`.
+    Remote {
+        machine: &'a str,
+        from: &'a WriterKey,
+    },
 }
 
 /// The parties of one recorded message, as the wake rules see them.
 pub(crate) struct WakeParties<'a> {
     pub account: &'a Account,
     pub to_account: &'a Account,
-    pub from: &'a WriterKey,
-    pub from_generation: Option<Generation>,
+    pub sender: WakeSender<'a>,
     pub to: &'a WriterKey,
     /// Whether the recipient's CLI has a channel a wake can use: it takes
     /// mail at its `Stop`, or its idle head can be nudged.
@@ -125,13 +148,24 @@ impl MailboxState {
         if exchange.wakes_spent >= limits.wake.max_per_exchange {
             return (false, Some(WakeDrop::ExchangeQuota));
         }
-        // A sender with no head has no generation and is exempt (owner
-        // decision Q3).
-        let lifetime = parties
-            .from_generation
-            .map(|generation| WakeLifetimeKey::new(parties.from, generation, parties.to));
-        if let Some(key) = &lifetime {
-            if self.wake_lifetime.get(key).copied().unwrap_or(0) >= limits.wake.lifetime_cap {
+        let lifetime = match parties.sender {
+            WakeSender::Head {
+                from,
+                generation: Some(generation),
+            } => Some((
+                WakeLifetimeKey::new(from, generation, parties.to),
+                limits.wake.lifetime_cap,
+            )),
+            // A sender with no head has no generation and is exempt (owner
+            // decision Q3).
+            WakeSender::Head { generation: None, .. } => None,
+            WakeSender::Remote { machine, from } => Some((
+                WakeLifetimeKey::remote(machine, from, parties.to),
+                limits.wake.remote_lifetime_cap,
+            )),
+        };
+        if let Some((key, cap)) = &lifetime {
+            if self.wake_lifetime.get(key).copied().unwrap_or(0) >= *cap {
                 return (false, Some(WakeDrop::LifetimeCap));
             }
         }
@@ -141,7 +175,7 @@ impl MailboxState {
         {
             exchange.wakes_spent += 1;
         }
-        if let Some(key) = lifetime {
+        if let Some((key, _)) = lifetime {
             let count = self.wake_lifetime.entry(key).or_insert(0);
             *count = count.saturating_add(1);
         }

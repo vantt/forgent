@@ -87,7 +87,17 @@ fn run(args: &[OsString]) {
 fn take_mail(fgos_dir: &Path, loaded: &Loaded, cross: &CrossMachine) -> Result<bool, String> {
     let record = Record::open(fgos_dir).map_err(|e| e.to_string())?;
     let wait = Wait::Ms(loaded.hook.verbs.lock_wait_ms);
-    mailbox_ingest::ingest(fgos_dir, &record, &loaded.limits, cross, wait, now()).map(|report| report.settled > 0)
+    // The wake of mail from another machine runs here, after the record's hold is released and
+    // never in the hook, through the same nudge as a send on this machine.
+    let versions = super::mailbox_verbs::version_sources(loaded.hook.hook.max_read_bytes);
+    let nudge = super::mailbox_verbs::system_nudge(&versions);
+    let wake = |wake: &fgos_mailbox_core::RemoteWake| fgos_mailbox::verbs::nudge_remote(wake, &versions, &nudge);
+    mailbox_ingest::ingest(fgos_dir, &record, &loaded.limits, cross, wait, now(), &wake).map(|report| {
+        for (id, sent) in &report.nudges {
+            eprintln!("mailbox-sync: nudge for {id}: {sent:?}");
+        }
+        report.settled > 0
+    })
 }
 
 fn now() -> Timestamp {

@@ -9,7 +9,7 @@ use crate::notices::{Notice, NoticeState};
 use crate::registry::Liveness;
 use crate::state::MailboxState;
 use crate::time::Timestamp;
-use crate::wake::{WakeDrop, WakeParties};
+use crate::wake::{WakeDrop, WakeParties, WakeSender};
 use std::collections::BTreeSet;
 use std::fmt;
 
@@ -490,19 +490,16 @@ impl MailboxState {
         let to_account = self.account(&admitted.to);
         let to_stop_drains = req.stop_drains.contains(&admitted.to_cli);
         let to_nudge = req.nudge_clis.contains(&admitted.to_cli);
-        let nudge_outstanding = self.messages.iter().any(|m| {
-            m.to == admitted.to
-                && m.to_generation == admitted.to_generation
-                && m.effective_wake
-                && crate::policy::pending(m)
-        });
+        let nudge_outstanding = self.wake_outstanding(&admitted.to, admitted.to_generation);
         let to_key = admitted.to.clone();
         let (effective_wake, wake_dropped) = self.effective_wake(
             &WakeParties {
                 account: &account,
                 to_account: &to_account,
-                from: &req.from,
-                from_generation,
+                sender: WakeSender::Head {
+                    from: &req.from,
+                    generation: from_generation,
+                },
                 to: &admitted.to,
                 to_wake_channel: to_stop_drains || to_nudge,
             },
@@ -548,6 +545,17 @@ impl MailboxState {
         };
         self.messages.push(header);
         Ok(outcome)
+    }
+
+    /// Whether an earlier wake to this generation of `to` is still pending:
+    /// its nudge is not repeated (the stateless "one outstanding nudge").
+    pub(crate) fn wake_outstanding(&self, to: &WriterKey, generation: Generation) -> bool {
+        self.messages.iter().any(|m| {
+            &m.to == to
+                && m.to_generation == generation
+                && m.effective_wake
+                && crate::policy::pending(m)
+        })
     }
 
     /// Claims the eligible messages to `key`, oldest first, then its

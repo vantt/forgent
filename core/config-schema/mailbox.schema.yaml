@@ -164,6 +164,13 @@ properties:
         maximum: 4294967295
         x-fgos-scope: both
         x-fgos-file: config
+      remoteLifetimeCap:
+        description: "Wake sends that took effect by one verified sender session on another machine to one recipient, never reset. In wakes. Smaller than the local cap because a confirmed machine key is all that stands behind it; a starting value, not yet measured on fgOS."
+        type: integer
+        minimum: 0
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config
   notices:
     description: "Notice limits per address."
     type: object

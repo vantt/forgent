@@ -8,7 +8,9 @@ use common::limits;
 use common::record::{key, name_of, read_state, register, TempFgos, T0};
 use fgos_mailbox::record::{IngestBatch, Reported, Wait};
 use fgos_mailbox_core::{Ingested, Refusal, RemoteMail};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
+
+static NO_CLIS: BTreeSet<fgos_mailbox_core::Cli> = BTreeSet::new();
 
 fn mail<'a>(
     from: &'a fgos_mailbox_core::WriterKey,
@@ -24,6 +26,9 @@ fn mail<'a>(
         to,
         body,
         max_body_bytes: 2048,
+        wake: false,
+        stop_drains: &NO_CLIS,
+        nudge_clis: &NO_CLIS,
     }
 }
 
@@ -50,7 +55,7 @@ fn ingested_mail_is_saved_with_its_body_and_cursor_and_a_replay_after_a_reread_i
     };
     let held = record.ingest(&batch, Wait::Try, T0, &limits()).unwrap();
     assert!(held.wrote);
-    let Ok(Ingested::Recorded(id)) = &held.value.value[0] else {
+    let Ok(Ingested::Recorded { id, .. }) = &held.value.value[0] else {
         panic!("{:?}", held.value.value)
     };
 

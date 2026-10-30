@@ -30,6 +30,10 @@ pub const MESSAGE_SENT: &str = "mailbox.message-sent";
 pub const MESSAGE_SETTLED: &str = "mailbox.message-settled";
 /// Prefix of the signed bytes, so a mail signature is never valid for another purpose.
 pub const SENT_DOMAIN: &str = "fgos-mailbox-message/1\n";
+/// Only a send that asks for a wake is signed under this domain, as payload version 2; every other
+/// send stays version 1, so a receiver that does not know version 2 still takes plain mail and
+/// never reads a wake mail without its wake flag.
+pub const SENT_DOMAIN_WAKE: &str = "fgos-mailbox-message/2\n";
 pub const SETTLED_DOMAIN: &str = "fgos-mailbox-settled/1\n";
 /// `mailbox.remote.maxBodyBytes` of the wire contract.
 pub const WIRE_MAX_BODY_BYTES: u64 = 2048;
@@ -100,21 +104,36 @@ fn resolve(main: &Path, root: &Path, writer: &str, to: &str) -> Result<Option<Re
     })))
 }
 
-/// The event payload of one message, signed.
-fn sent_payload(root: &Path, id: &str, from: &str, machine: &MachineRef, target: &Target, body: &str, reply_to: Option<&str>) -> Result<Value, Refusal> {
+/// What one message says, apart from who it is for.
+struct Outgoing<'a> {
+    id: &'a str,
+    /// The sender's full session id.
+    from: &'a str,
+    body: &'a str,
+    reply_to: Option<&'a str>,
+    wake: bool,
+}
+
+/// The event payload of one message, signed. A message that asks for a wake is version 2 under
+/// its own domain; any other is version 1.
+fn sent_payload(root: &Path, msg: &Outgoing<'_>, machine: &MachineRef, target: &Target) -> Result<Value, Refusal> {
+    let wake = msg.wake;
     let mut payload = json!({
-        "v": 1,
-        "id": id,
-        "from": { "id": from, "machine": machine.id },
+        "v": if wake { 2 } else { 1 },
+        "id": msg.id,
+        "from": { "id": msg.from, "machine": machine.id },
         "to": { "id": target.id, "machine": target.machine.id },
         "kind": KIND,
-        "body": body,
+        "body": msg.body,
         "sentAt": iso_utc_now(),
     });
-    if let Some(reply_to) = reply_to {
+    if let Some(reply_to) = msg.reply_to {
         payload["reply_to"] = Value::String(reply_to.to_owned());
     }
-    sign_payload(root, SENT_DOMAIN, payload)
+    if wake {
+        payload["wake"] = Value::Bool(true);
+    }
+    sign_payload(root, if wake { SENT_DOMAIN_WAKE } else { SENT_DOMAIN }, payload)
 }
 
 /// The signed event that tells a sender what its message came to on this machine: `outcome` is
@@ -216,13 +235,18 @@ pub fn unconfirmed_machines(root: &Path) -> Vec<(String, String)> {
 }
 
 /// The text a recorded cross-machine send answers with.
-fn recorded_text(id: &str, target: &Target, cross: &CrossMachine) -> String {
+fn recorded_text(id: &str, target: &Target, cross: &CrossMachine, wake: bool) -> String {
     let pin = match target.pin {
         PinState::Confirmed => String::new(),
         PinState::Seen => " That machine's key is only seen, not confirmed here; the owner confirms it with `fgos identity pins`, and a receiver that requires confirmed keys drops mail from an unconfirmed machine.".to_owned(),
     };
+    let wake = if wake {
+        " Wake requested: that machine decides whether to nudge the session when the mail arrives, within its own wake limits; if not, the session sees the mail at its next tool call."
+    } else {
+        ""
+    };
     format!(
-        "recorded {id} for {} on {}. It crosses machines: written to the project's shared log and pushed in the background, so it is recorded, not delivered. It reaches {} after that machine's next fetch, about every {} seconds while an fgOS process runs there and later when none does.{pin}",
+        "recorded {id} for {} on {}. It crosses machines: written to the project's shared log and pushed in the background, so it is recorded, not delivered. It reaches {} after that machine's next fetch, about every {} seconds while an fgOS process runs there and later when none does.{wake}{pin}",
         target.handle, target.machine.handle, target.handle, cross.sync_interval_sec
     )
 }
@@ -240,7 +264,7 @@ pub struct Context<'a> {
 
 /// Sends `body` to the session `to` names on another machine, when one
 /// does; see the module's comment. `from` is the caller's full session id.
-pub fn send(ctx: &Context<'_>, from: &WriterKey, to: &str, body: &str, reply_to: Option<&str>) -> Outcome {
+pub fn send(ctx: &Context<'_>, from: &WriterKey, to: &str, body: &str, reply_to: Option<&str>, wake: bool) -> Outcome {
     let Context { fgos_dir, record, limits, cross, wait, now } = *ctx;
     if !cross.enabled {
         return Outcome::NotRemote;
@@ -267,7 +291,8 @@ pub fn send(ctx: &Context<'_>, from: &WriterKey, to: &str, body: &str, reply_to:
         // The writer key attributes the append; the event names the sender by its full session id,
         // which the receiver checks against the signer's machine.
         let session = current_session(&root, std::process::id(), Some(fgos_dir))?;
-        let payload = sent_payload(&root, id.as_str(), &session.info.id, &machine, &target, body, reply_to)?;
+        let msg = Outgoing { id: id.as_str(), from: &session.info.id, body, reply_to, wake };
+        let payload = sent_payload(&root, &msg, &machine, &target)?;
         let log = StoreLogDoor
             .open_stream(main, from.as_str(), STREAM)?
             .ok_or_else(|| Refusal { reason: "event-store-unavailable", detail: "this clone has no Event Store".into(), candidates: Vec::new() })?;
@@ -276,7 +301,7 @@ pub fn send(ctx: &Context<'_>, from: &WriterKey, to: &str, body: &str, reply_to:
     match appended {
         Ok(()) => {
             super::mailbox_sync::spawn(main, &Paths::new(fgos_dir), &cross.remote);
-            Outcome::Recorded(recorded_text(id.as_str(), &target, cross))
+            Outcome::Recorded(recorded_text(id.as_str(), &target, cross, wake))
         }
         Err(refusal) => Outcome::Refused(format!("not recorded: {}", refusal_line(&refusal))),
     }
@@ -284,7 +309,7 @@ pub fn send(ctx: &Context<'_>, from: &WriterKey, to: &str, body: &str, reply_to:
 
 #[cfg(test)]
 mod tests {
-    use super::{SENT_DOMAIN, SETTLED_DOMAIN, WIRE_MAX_BODY_BYTES};
+    use super::{SENT_DOMAIN, SENT_DOMAIN_WAKE, SETTLED_DOMAIN, WIRE_MAX_BODY_BYTES};
 
     #[test]
     fn the_wire_cap_and_signing_domain_equal_the_remote_contract() {
@@ -299,6 +324,8 @@ mod tests {
         assert_eq!(cap["default"], WIRE_MAX_BODY_BYTES);
         let domain = contract["types"].as_array().unwrap().iter().find(|t| t["type"] == "mailbox.message-sent").unwrap();
         assert_eq!(domain["signingDomain"], SENT_DOMAIN);
+        assert_eq!(domain["wakeVersion"]["signingDomain"], SENT_DOMAIN_WAKE);
+        assert_eq!(domain["wakeVersion"]["v"], 2);
         let settled = contract["types"].as_array().unwrap().iter().find(|t| t["type"] == "mailbox.message-settled").unwrap();
         assert_eq!(settled["signingDomain"], SETTLED_DOMAIN);
     }

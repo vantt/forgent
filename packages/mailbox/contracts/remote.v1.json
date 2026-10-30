@@ -15,7 +15,16 @@
         { "field": "reply_to", "type": "string, optional", "meaning": "full id of the message this one answers" },
         { "field": "sentAt", "type": "RFC 3339 string", "meaning": "display only; never used to order, age or dedupe a message" },
         { "field": "sig", "type": "string", "meaning": "signature of the canonical payload under the signing domain, by the sender machine's key" }
-      ]
+      ],
+      "wakeVersion": {
+        "v": 2,
+        "signingDomain": "fgos-mailbox-message/2\n",
+        "when": "only a send that asks for a wake (`fgos mailbox send --wake`); every other send stays version 1 under the domain above, byte for byte, so a receiver that does not know version 2 still takes plain mail",
+        "adds": [
+          { "field": "wake", "type": "boolean, always true", "meaning": "the sender asks for the recipient's session to be woken; the receiver decides, under its own limits, whether it takes effect, and never wakes for a machine whose key is not confirmed" }
+        ],
+        "olderReaders": "a receiver that does not know version 2 drops the event at its shape check with the counted reason remote-malformed; it never takes the message without its wake flag"
+      }
     },
     {
       "type": "mailbox.message-settled",
@@ -37,9 +46,12 @@
     { "key": "mailbox.remote.clockSkewSec", "default": 300, "unit": "seconds", "enforcedAt": "ingest: tolerance when ageing an event; measured skew between two machines was 0.77 s on 2026-10-28", "status": "placeholder" },
     { "key": "mailbox.remote.requireConfirmed", "default": true, "unit": "boolean", "enforcedAt": "ingest: only a machine whose key pin is confirmed is accepted; a seen or re-keyed machine is dropped and counted", "source": "identity spec pins" }
   ],
+  "refusalsToSender": [
+    { "reason": "before-first-sync", "meaning": "the message was in the shared log before this machine's first ingest, which takes a baseline and delivers nothing older; the receiver answers it at that ingest so the sender stops waiting" }
+  ],
   "perSenderCaps": {
     "accountedBy": "verified signer machine and sender id; never the shared unregistered bucket",
-    "keys": ["mailbox.session.budget", "mailbox.session.lifetimeCap", "mailbox.queue.perSender"],
-    "meaning": "the same-machine caps of limits.v1.json apply unchanged to each remote sender"
+    "keys": ["mailbox.session.budget", "mailbox.session.lifetimeCap", "mailbox.queue.perSender", "mailbox.wake.remoteLifetimeCap"],
+    "meaning": "the same-machine caps of limits.v1.json apply unchanged to each remote sender; its wake budget is its own and smaller (mailbox.wake.remoteLifetimeCap), never the exemption a sender with no head has"
   }
 }

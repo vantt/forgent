@@ -15,15 +15,16 @@
 use super::identity_log::StoreLogDoor;
 use super::mailbox_config::CrossMachine;
 use super::mailbox_identity::{session_of, state_root};
-use super::mailbox_remote::{settled_payload, signed_bytes, MESSAGE_SENT, MESSAGE_SETTLED, SENT_DOMAIN, STREAM, WIRE_MAX_BODY_BYTES};
+use super::mailbox_remote::{settled_payload, signed_bytes, MESSAGE_SENT, MESSAGE_SETTLED, SENT_DOMAIN, SENT_DOMAIN_WAKE, STREAM, WIRE_MAX_BODY_BYTES};
 use fgos_identity::current::machine_info;
 use fgos_identity::pins::PinState;
 use fgos_identity::shared::{self, EntryLog};
 use fgos_identity::text::iso_utc_secs;
 use fgos_identity::{signing, Signature};
+use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::record::{IngestBatch, Record, Reported, Wait};
 use fgos_mailbox::verbs;
-use fgos_mailbox_core::{CounterReason, Ingested, Limits, RemoteDrop, RemoteMail, Settlement, Timestamp, WriterKey};
+use fgos_mailbox_core::{CounterReason, Ingested, Limits, NudgeReport, RemoteDrop, RemoteMail, RemoteWake, Settlement, Timestamp, WriterKey};
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -31,6 +32,8 @@ use std::path::Path;
 /// `mailbox.remote.maxAgeSec` and `mailbox.remote.clockSkewSec` of the wire contract.
 const MAX_AGE_SEC: u64 = 86_400;
 const CLOCK_SKEW_SEC: u64 = 300;
+/// The refusal code a sender is given for mail that was in the log before this machine's first ingest.
+const BEFORE_FIRST_SYNC: &str = "before-first-sync";
 
 /// What one ingest did, for the child's stderr when something went wrong and for tests.
 #[derive(Debug, Default, PartialEq, Eq)]
@@ -45,6 +48,8 @@ pub struct Report {
     pub baseline: bool,
     /// Settlement events appended to the shared log, which still have to be pushed.
     pub settled: usize,
+    /// What the nudge for each recorded wake mail came to, by the local id of the message.
+    pub nudges: Vec<(String, NudgeReport)>,
 }
 
 /// A message that passed verification, owned so the record can borrow it.
@@ -55,6 +60,8 @@ struct Verified {
     from_id: String,
     to_id: String,
     body: String,
+    /// The signed event asked for a wake and its machine's key is confirmed here.
+    wake: bool,
 }
 
 fn text<'a>(object: &'a Value, key: &str) -> Option<&'a str> {
@@ -65,8 +72,15 @@ fn text<'a>(object: &'a Value, key: &str) -> Option<&'a str> {
 fn verify(root: &Path, payload: &Value, ts: &str, now_secs: u64, cross: &CrossMachine) -> Result<Verified, (CounterReason, String)> {
     let malformed = |machine: &str| (CounterReason::RemoteMalformed, machine.to_owned());
     let claimed = payload["from"]["machine"].as_str().unwrap_or("?").to_owned();
+    // Version 1 is a plain message; version 2 is the same with a signed `wake: true` under its own
+    // domain. Any other version, or a version 2 without the flag, is malformed.
+    let wake_asked = match payload.get("v").and_then(Value::as_u64) {
+        Some(1) if payload.get("wake").is_none() => false,
+        Some(2) if payload.get("wake") == Some(&Value::Bool(true)) => true,
+        _ => return Err(malformed(&claimed)),
+    };
     let shape = || -> Option<(String, String, String, String, String)> {
-        if payload.get("v")?.as_u64()? != 1 || text(payload, "kind")? != "message" {
+        if text(payload, "kind")? != "message" {
             return None;
         }
         let from = payload.get("from")?;
@@ -100,7 +114,7 @@ fn verify(root: &Path, payload: &Value, ts: &str, now_secs: u64, cross: &CrossMa
     let verified = signature
         .as_ref()
         .and_then(|signature| {
-            let bytes = signed_bytes(SENT_DOMAIN, &unsigned).ok()?;
+            let bytes = signed_bytes(if wake_asked { SENT_DOMAIN_WAKE } else { SENT_DOMAIN }, &unsigned).ok()?;
             signing::verify(root, &bytes, signature).ok()
         })
         .filter(|verified| verified.machine_id == machine);
@@ -116,7 +130,9 @@ fn verify(root: &Path, payload: &Value, ts: &str, now_secs: u64, cross: &CrossMa
     if now_secs.saturating_sub(sent_at) > MAX_AGE_SEC + CLOCK_SKEW_SEC {
         return Err((CounterReason::RemoteStale, machine));
     }
-    Ok(Verified { machine, id, from, from_id, to_id, body })
+    // A wake never rests on a key that is only seen, even where plain mail from one is taken.
+    let wake = wake_asked && verified.state == PinState::Confirmed;
+    Ok(Verified { machine, id, from, from_id, to_id, body, wake })
 }
 
 /// The Identity handle the shared directory publishes for the session `full_id`.
@@ -130,7 +146,15 @@ fn handle_of(main: &Path, root: &Path, writer: &str, full_id: &str) -> Option<St
 
 /// Takes the new verified mail from the shared log into the record. `Ok` with an empty report when
 /// nothing is to be read (no store, cross-machine mail off).
-pub fn ingest(fgos_dir: &Path, record: &Record, limits: &Limits, cross: &CrossMachine, wait: Wait, now: Timestamp) -> Result<Report, String> {
+pub fn ingest(
+    fgos_dir: &Path,
+    record: &Record,
+    limits: &Limits,
+    cross: &CrossMachine,
+    wait: Wait,
+    now: Timestamp,
+    nudge: &dyn Fn(&RemoteWake) -> Option<NudgeReport>,
+) -> Result<Report, String> {
     let mut report = Report::default();
     let (Some(main), Some(root)) = (fgos_dir.parent(), state_root()) else {
         return Ok(report);
@@ -161,7 +185,18 @@ pub fn ingest(fgos_dir: &Path, record: &Record, limits: &Limits, cross: &CrossMa
     for event in &envelopes {
         let top = reached.entry(event.origin.clone()).or_insert(0);
         *top = (*top).max(event.seq);
-        if !baselined || event.origin == own_origin || event.event_type != MESSAGE_SENT {
+        if event.origin == own_origin || event.event_type != MESSAGE_SENT {
+            continue;
+        }
+        if !baselined {
+            // The baseline delivers nothing the stream already held; a sender whose message is
+            // still young is told so, instead of waiting for a fetch that will never offer it.
+            let young = iso_utc_secs(&event.ts).is_some_and(|at| now_secs.saturating_sub(at) <= MAX_AGE_SEC);
+            if young && event.payload["to"]["machine"].as_str() == Some(machine.id.as_str()) {
+                if let Some(id) = event.payload["id"].as_str() {
+                    refusals.push((id.to_owned(), BEFORE_FIRST_SYNC));
+                }
+            }
             continue;
         }
         if event.seq <= cursor.get(&event.origin).copied().unwrap_or(0) {
@@ -191,6 +226,7 @@ pub fn ingest(fgos_dir: &Path, record: &Record, limits: &Limits, cross: &CrossMa
         .iter()
         .filter_map(|head| Some((session_of(&root, &head.key, &head.cli, Some(&head.head))?.id, head.key.clone())))
         .collect();
+    let (stop_drains, nudge_clis) = (TestedClis::embedded().stop_drains(), TestedClis::embedded().nudge_clis());
     let handles: Vec<Option<String>> = verified.iter().map(|mail| handle_of(main, &root, &machine.id, &mail.from_id)).collect();
     let mut mails = Vec::new();
     let mut ids = Vec::new();
@@ -209,6 +245,9 @@ pub fn ingest(fgos_dir: &Path, record: &Record, limits: &Limits, cross: &CrossMa
             to,
             body: &mail.body,
             max_body_bytes: WIRE_MAX_BODY_BYTES,
+            wake: mail.wake,
+            stop_drains: &stop_drains,
+            nudge_clis: &nudge_clis,
         });
         ids.push(mail.id.clone());
     }
@@ -217,7 +256,12 @@ pub fn ingest(fgos_dir: &Path, record: &Record, limits: &Limits, cross: &CrossMa
         let held = record.ingest(&IngestBatch { mails: &mails, drops: &counted, refusals: &refusals, cursor: &reached }, wait, now, limits).map_err(|e| e.to_string())?;
         for (id, result) in ids.into_iter().zip(held.value.value) {
             match result {
-                Ok(Ingested::Recorded(_)) => report.taken += 1,
+                Ok(Ingested::Recorded { id: local, wake }) => {
+                    report.taken += 1;
+                    if let Some(sent) = nudge(&wake) {
+                        report.nudges.push((local.to_string(), sent));
+                    }
+                }
                 Ok(Ingested::Duplicate) => {}
                 Err(refused) => report.refused.push((id, refused.code())),
             }
@@ -286,7 +330,7 @@ fn settle(log: &super::identity_log::StoreLog, root: &Path, machine: &str, hold:
 mod tests {
     use super::{verify, MAX_AGE_SEC};
     use crate::wiring::mailbox_config::CrossMachine;
-    use crate::wiring::mailbox_remote::{sign_payload, SENT_DOMAIN};
+    use crate::wiring::mailbox_remote::{sign_payload, SENT_DOMAIN, SENT_DOMAIN_WAKE};
     use fgos_identity::{machine, pins, signing};
     use fgos_mailbox_core::CounterReason;
     use serde_json::{json, Value};
@@ -358,5 +402,46 @@ mod tests {
         let impostor = state_root("impostor");
         let claimed = signed(&impostor, &format!("{machine}/s1"), &machine, "hi");
         assert_eq!(reason(verify(&receiver, &claimed, TS, NOW, &cross(true))), Some(CounterReason::RemoteSignature));
+    }
+
+    #[test]
+    fn a_wake_is_signed_as_version_two_under_its_own_domain_and_only_a_confirmed_machine_ever_wakes() {
+        let sender = state_root("wake-sender");
+        let receiver = state_root("wake-receiver");
+        let machine = machine::read(&sender).unwrap();
+        let from_id = format!("{machine}/s1");
+        let reason = |result: Result<_, (CounterReason, String)>| result.err().map(|(reason, _)| reason);
+        let wake_payload = |v: u64, domain: &str| {
+            let payload = json!({
+                "v": v, "id": "w1", "from": { "id": from_id, "machine": machine },
+                "to": { "id": "recv/abc", "machine": "recv" }, "kind": "message", "body": "hi",
+                "sentAt": "2026-10-29T00:00:00.000Z", "wake": true,
+            });
+            sign_payload(&sender, domain, payload).unwrap()
+        };
+        let wake_v2 = wake_payload(2, SENT_DOMAIN_WAKE);
+
+        // Seen, not confirmed, with confirmation not required: the mail is taken, its wake is not.
+        let seen = verify(&receiver, &wake_v2, TS, NOW, &cross(false)).expect("plain mail from a seen machine is taken");
+        assert!(!seen.wake);
+        let fingerprint = signing::key_fingerprint(&sender).unwrap().unwrap();
+        pins::confirm(&receiver, &machine, &fingerprint).unwrap();
+        let confirmed = verify(&receiver, &wake_v2, TS, NOW, &cross(true)).expect("a confirmed machine's wake mail is taken");
+        assert!(confirmed.wake);
+
+        // Version 1 never carries a wake, and a version 2 event is signed under the wake domain only.
+        let plain = signed(&sender, &from_id, &machine, "hi");
+        assert!(!verify(&receiver, &plain, TS, NOW, &cross(true)).unwrap().wake);
+        let mut flagged = plain.clone();
+        flagged["wake"] = json!(true);
+        assert_eq!(reason(verify(&receiver, &flagged, TS, NOW, &cross(true))), Some(CounterReason::RemoteMalformed));
+        let wrong_domain = wake_payload(2, SENT_DOMAIN);
+        assert_eq!(reason(verify(&receiver, &wrong_domain, TS, NOW, &cross(true))), Some(CounterReason::RemoteSignature));
+        let mut no_flag = wake_v2.clone();
+        no_flag.as_object_mut().unwrap().remove("wake");
+        assert_eq!(reason(verify(&receiver, &no_flag, TS, NOW, &cross(true))), Some(CounterReason::RemoteMalformed));
+        let mut v3 = wake_payload(3, SENT_DOMAIN_WAKE);
+        v3["v"] = json!(3);
+        assert_eq!(reason(verify(&receiver, &v3, TS, NOW, &cross(true))), Some(CounterReason::RemoteMalformed));
     }
 }

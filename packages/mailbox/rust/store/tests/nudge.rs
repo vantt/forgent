@@ -3,7 +3,7 @@
 //! three ways it fails (refused, too slow, head unknown).
 use fgos_mailbox::adapters::{NudgeChannel, TestedClis};
 use fgos_mailbox::nudge::{Nudge, SystemNudge, NUDGE_LINE};
-use fgos_mailbox_core::{Cli, WriterKey};
+use fgos_mailbox_core::{Cli, NudgeReport, RemoteWake, WriterKey};
 use fgos_process::facts::Record;
 use fgos_process::ProcId;
 use std::os::unix::fs::PermissionsExt;
@@ -130,4 +130,66 @@ fn only_codex_has_a_nudge_channel_and_only_on_the_versions_it_was_measured_on() 
     );
     assert_eq!(tested.nudge_for("codex", "9.9.9"), None);
     assert_eq!(tested.nudge_for("claude", "2.1.309"), None);
+}
+
+/// Counts what it is asked to send; never sends.
+#[derive(Default)]
+struct Counting(std::cell::RefCell<Vec<(NudgeChannel, String)>>);
+
+impl Nudge for Counting {
+    fn nudge(&self, channel: NudgeChannel, key: &WriterKey, _head: &Record) -> Result<(), String> {
+        self.0.borrow_mut().push((channel, key.as_str().to_string()));
+        Ok(())
+    }
+}
+
+fn remote_wake(effective: bool, to_nudge: bool, outstanding: bool) -> RemoteWake {
+    RemoteWake {
+        effective,
+        dropped: None,
+        to_key: key(),
+        to_cli: Cli::new("codex").expect("cli"),
+        to_head: String::new(),
+        to_nudge,
+        outstanding,
+    }
+}
+
+#[test]
+fn a_wake_taken_from_another_machine_is_nudged_through_the_same_gates_as_a_send_here() {
+    let dir = scratch("remote");
+    let versions = |program: PathBuf| fgos_mailbox::adapters::version::VersionSources {
+        claude_sessions: None,
+        codex_program: program,
+        max_read_bytes: 65536,
+    };
+    let tested = versions(program(&dir, "echo 'codex-cli 0.162.1'"));
+    let stub = Counting::default();
+
+    // No wake that took effect, or a recipient with no channel: nothing is asked of anyone.
+    assert_eq!(fgos_mailbox::verbs::nudge_remote(&remote_wake(false, true, false), &tested, &stub), None);
+    assert_eq!(fgos_mailbox::verbs::nudge_remote(&remote_wake(true, false, false), &tested, &stub), None);
+    // An earlier wake is still unread: it is not repeated.
+    assert_eq!(fgos_mailbox::verbs::nudge_remote(&remote_wake(true, true, true), &tested, &stub), Some(NudgeReport::Pending));
+    assert!(stub.0.borrow().is_empty());
+
+    // A version no contract lists, or one that cannot be read, is refused by name.
+    let untested = versions(program(&scratch("remote-untested"), "echo 'codex-cli 9.9.9'"));
+    assert_eq!(
+        fgos_mailbox::verbs::nudge_remote(&remote_wake(true, true, false), &untested, &stub),
+        Some(NudgeReport::Refused("version-not-tested".into()))
+    );
+    let missing = versions(dir.join("no-such-codex"));
+    assert_eq!(
+        fgos_mailbox::verbs::nudge_remote(&remote_wake(true, true, false), &missing, &stub),
+        Some(NudgeReport::Refused("version-unreadable".into()))
+    );
+    assert!(stub.0.borrow().is_empty());
+
+    // On a tested version the head's channel is asked once, for the head's own key.
+    assert_eq!(
+        fgos_mailbox::verbs::nudge_remote(&remote_wake(true, true, false), &tested, &stub),
+        Some(NudgeReport::Sent)
+    );
+    assert_eq!(*stub.0.borrow(), vec![(NudgeChannel::CodexQueue, "019a-thread".to_string())]);
 }

@@ -403,6 +403,28 @@ fn typed_candidates(refusal: &AliasRefusal) -> Value {
         .collect()
 }
 
+/// Where the recipient's CLI version can be read on this machine; the one place the host builds it,
+/// for a send here and for the sync child's wake of mail from another machine.
+pub(crate) fn version_sources(max_read_bytes: u64) -> VersionSources {
+    VersionSources {
+        claude_sessions: claude_config_dir(
+            std::env::var_os("HOME").as_deref(),
+            std::env::var_os("CLAUDE_CONFIG_DIR").as_deref(),
+        )
+        .map(|dir| dir.join("sessions")),
+        codex_program: PathBuf::from("codex"),
+        max_read_bytes,
+    }
+}
+
+/// The host's nudge, run with the program the version gate read.
+pub(crate) fn system_nudge(versions: &VersionSources) -> SystemNudge {
+    SystemNudge {
+        codex_program: versions.codex_program.clone(),
+        timeout: std::time::Duration::from_secs(5),
+    }
+}
+
 /// The caller's writer key: session identity's, attribution only.
 fn caller(fgos_dir: &Path) -> Option<WriterKey> {
     WriterKey::new(
@@ -457,15 +479,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             let Some(from) = caller(&fgos_dir) else {
                 return failed(record_error_text("caller-unknown"), *json, warning);
             };
-            let versions = VersionSources {
-                claude_sessions: claude_config_dir(
-                    std::env::var_os("HOME").as_deref(),
-                    std::env::var_os("CLAUDE_CONFIG_DIR").as_deref(),
-                )
-                .map(|dir| dir.join("sessions")),
-                codex_program: PathBuf::from("codex"),
-                max_read_bytes: loaded.hook.hook.max_read_bytes,
-            };
+            let versions = version_sources(loaded.hook.hook.max_read_bytes);
             let wait = Wait::Ms(loaded.hook.verbs.lock_wait_ms);
             let (recipient, role_holder) = if is_alias(to) {
                 let heads = match verbs::heads(&fgos_dir, &loaded.limits) {
@@ -486,7 +500,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                                 wait,
                                 now: now(),
                             };
-                            match mailbox_remote::send(&ctx, &from, to, body, reply_to.as_deref()) {
+                            match mailbox_remote::send(&ctx, &from, to, body, reply_to.as_deref(), *wake) {
                                 mailbox_remote::Outcome::NotRemote => {}
                                 mailbox_remote::Outcome::Recorded(text) => {
                                     return remote_answer(true, text, *json, warning)
@@ -516,10 +530,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 stop_drains: TestedClis::embedded().stop_drains(),
                 nudge_clis: TestedClis::embedded().nudge_clis(),
             };
-            let nudge = SystemNudge {
-                codex_program: versions.codex_program.clone(),
-                timeout: std::time::Duration::from_secs(5),
-            };
+            let nudge = system_nudge(&versions);
             let mut sent =
                 verbs::send(&record, req, wait, now(), &loaded.limits, &versions, &nudge);
             if let (true, Some((role, handle))) = (sent.recorded, role_holder) {

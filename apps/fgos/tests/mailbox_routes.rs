@@ -2102,6 +2102,106 @@ fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_r
     );
 }
 
+/// Beta takes mail only from a machine whose key its owner confirmed; this is that confirmation.
+fn confirm_alpha_on_beta(cross: &Cross) {
+    let alpha_machine = fgos_identity::machine::read(&cross.alpha_root).unwrap();
+    let probe = fgos_identity::signing::sign(&cross.alpha_root, b"probe").unwrap();
+    fgos_identity::signing::verify(&cross.beta_root, b"probe", &probe).unwrap();
+    let fingerprint = fgos_identity::signing::key_fingerprint(&cross.alpha_root)
+        .unwrap()
+        .unwrap();
+    fgos_identity::pins::confirm(&cross.beta_root, &alpha_machine, &fingerprint).unwrap();
+}
+
+/// The `wake` and `effective_wake` of each message in `scene`'s record, oldest first.
+fn recorded_wakes(scene: &Scene) -> Vec<(bool, bool)> {
+    let snapshot: serde_json::Value = serde_json::from_slice(
+        &fs::read(scene.mailbox_dir().join("record/snapshot.json")).unwrap(),
+    )
+    .unwrap();
+    snapshot["messages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|m| (m["wake"].as_bool().unwrap(), m["effective_wake"].as_bool().unwrap()))
+        .collect()
+}
+
+/// A send with `--wake` to a session on another machine is signed as version 2 with its flag, a send
+/// without it stays version 1, and the receiver decides: each verified sender session wakes up to the
+/// receiver's own remote cap (set to 2 here), after which its mail still lands, as plain mail.
+#[test]
+fn a_wake_asked_from_another_machine_is_signed_as_version_two_and_takes_effect_only_up_to_the_receivers_own_cap(
+) {
+    let cross = two_machines();
+    confirm_alpha_on_beta(&cross);
+    fs::write(
+        cross.beta.main().join(".fgos/config.json"),
+        r#"{"mailbox":{"crossMachine":{"enabled":true},"wake":{"remoteLifetimeCap":2}}}"#,
+    )
+    .unwrap();
+    let send = |args: &[&str]| {
+        let mut argv = vec!["mailbox", "send"];
+        argv.extend_from_slice(args);
+        let out = cross.alpha.run(&cross.alpha.main(), Some("sender-a"), &argv, b"");
+        assert_eq!(out.status.code(), Some(0), "{out:?}");
+        String::from_utf8_lossy(&out.stdout).into_owned()
+    };
+    for body in ["wake one", "wake two", "wake three"] {
+        let text = send(&["--wake", "--to", &cross.target, body]);
+        assert!(text.contains("Wake requested"), "{text}");
+    }
+    let text = send(&["--to", &cross.target, "plain one"]);
+    assert!(!text.contains("Wake requested"), "{text}");
+
+    let events = sent_events(&cross.alpha_root, &cross.alpha.main());
+    let shape = |body: &str| {
+        let event = events.iter().find(|e| e["body"] == body).unwrap();
+        (event["v"].clone(), event.get("wake").cloned())
+    };
+    assert_eq!(shape("wake one"), (2.into(), Some(true.into())));
+    assert_eq!(shape("plain one"), (1.into(), None), "a send without --wake is unchanged");
+
+    sync_child(&cross.alpha);
+    sync_child(&cross.beta);
+    assert_eq!(
+        recorded_wakes(&cross.beta),
+        vec![(true, true), (true, true), (true, false), (false, false)],
+        "the third wake is over the receiver's cap and its mail landed anyway"
+    );
+}
+
+/// Mail that was already in the shared log when a machine took its first baseline is never delivered
+/// there, and its sender is told so by a refusal it can read instead of waiting for good.
+#[test]
+fn mail_sent_before_the_receivers_first_sync_is_refused_to_its_sender_by_name() {
+    let cross = two_machines();
+    confirm_alpha_on_beta(&cross);
+    // Beta's first ingest is still to come: take back the baseline its setup syncs took.
+    let snapshot_path = cross.beta.mailbox_dir().join("record/snapshot.json");
+    let mut snapshot: serde_json::Value = serde_json::from_slice(&fs::read(&snapshot_path).unwrap()).unwrap();
+    snapshot["remote"]["baselined"] = false.into();
+    snapshot["remote"]["cursor"] = serde_json::json!({});
+    fs::write(&snapshot_path, serde_json::to_vec(&snapshot).unwrap()).unwrap();
+
+    let out = cross.alpha.run(
+        &cross.alpha.main(),
+        Some("sender-a"),
+        &["mailbox", "send", "--to", &cross.target, "sent before your first sync"],
+        b"",
+    );
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    sync_child(&cross.alpha);
+    sync_child(&cross.beta);
+    sync_child(&cross.alpha);
+
+    assert_eq!(cross.beta.message_states().len(), 0, "the baseline delivers nothing older");
+    let status = cross.alpha.run(&cross.alpha.main(), Some("sender-a"), &["mailbox", "status", "--json"], b"");
+    let folded = serde_json::from_slice::<serde_json::Value>(&status.stdout).unwrap()["data"]["crossMachine"].clone();
+    assert_eq!(folded["refused"]["before-first-sync"], 1, "{folded}");
+    assert_eq!(folded["waiting"], 0, "{folded}");
+}
+
 /// The payloads of every `mailbox.message-sent` event the clone at `main` holds, sealed or still open.
 fn sent_events(state: &Path, main: &Path) -> Vec<serde_json::Value> {
     use fgos_event_store::{

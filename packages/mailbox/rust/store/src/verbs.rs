@@ -13,7 +13,7 @@ use crate::nudge::Nudge;
 use crate::record::{Record, Reported, Wait};
 use fgos_mailbox_core::{
     delivery_report, nudge_sentence, record_error_text, refusal_text, Limits, NudgeReport,
-    RemoteSend, SendOutcome, SendRequest, Timestamp, VersionClause, WriterKey,
+    RemoteSend, RemoteWake, SendOutcome, SendRequest, Timestamp, VersionClause, WriterKey,
 };
 use fgos_mailbox_core::{inbox_text, Cli, Liveness, MessageId, ShortName};
 use std::collections::BTreeMap;
@@ -153,21 +153,71 @@ fn nudge_report(
     versions: &VersionSources,
     nudge: &dyn Nudge,
 ) -> Option<NudgeReport> {
-    if !(outcome.effective_wake && outcome.to_nudge) {
+    nudge_target(
+        &NudgeTarget {
+            effective_wake: outcome.effective_wake,
+            to_nudge: outcome.to_nudge,
+            outstanding: outcome.nudge_outstanding,
+            cli: &outcome.to_cli,
+            key: &outcome.to_key,
+            head: &outcome.to_head,
+        },
+        versions,
+        nudge,
+    )
+}
+
+/// The nudge a message taken from another machine came to, or `None` when
+/// its wake did not take effect or its recipient cannot be nudged. Runs after
+/// the record's hold is released, in the sync child.
+pub fn nudge_remote(
+    wake: &RemoteWake,
+    versions: &VersionSources,
+    nudge: &dyn Nudge,
+) -> Option<NudgeReport> {
+    nudge_target(
+        &NudgeTarget {
+            effective_wake: wake.effective,
+            to_nudge: wake.to_nudge,
+            outstanding: wake.outstanding,
+            cli: &wake.to_cli,
+            key: &wake.to_key,
+            head: &wake.to_head,
+        },
+        versions,
+        nudge,
+    )
+}
+
+/// The head a nudge is for, and whether one is due.
+struct NudgeTarget<'a> {
+    effective_wake: bool,
+    to_nudge: bool,
+    outstanding: bool,
+    cli: &'a Cli,
+    key: &'a WriterKey,
+    head: &'a str,
+}
+
+fn nudge_target(
+    target: &NudgeTarget<'_>,
+    versions: &VersionSources,
+    nudge: &dyn Nudge,
+) -> Option<NudgeReport> {
+    if !(target.effective_wake && target.to_nudge) {
         return None;
     }
-    if outcome.nudge_outstanding {
+    if target.outstanding {
         return Some(NudgeReport::Pending);
     }
-    let cli = outcome.to_cli.as_str();
-    let Some(version) = recipient_version(outcome, versions) else {
+    let Some(version) = recipient_version(target.cli, target.head, versions) else {
         return Some(NudgeReport::Refused("version-unreadable".into()));
     };
-    let Some(channel) = TestedClis::embedded().nudge_for(cli, &version) else {
+    let Some(channel) = TestedClis::embedded().nudge_for(target.cli.as_str(), &version) else {
         return Some(NudgeReport::Refused("version-not-tested".into()));
     };
-    let head = crate::head::record_of_head_text(&outcome.to_head);
-    Some(match nudge.nudge(channel, &outcome.to_key, &head) {
+    let head = crate::head::record_of_head_text(target.head);
+    Some(match nudge.nudge(channel, target.key, &head) {
         Ok(()) => NudgeReport::Sent,
         Err(why) => NudgeReport::Refused(why),
     })
@@ -175,7 +225,7 @@ fn nudge_report(
 
 /// What the delivery report says of the recipient's CLI version.
 fn version_clause(outcome: &SendOutcome, versions: &VersionSources) -> VersionClause {
-    match recipient_version(outcome, versions) {
+    match recipient_version(&outcome.to_cli, &outcome.to_head, versions) {
         Some(v) if TestedClis::embedded().lists_version(outcome.to_cli.as_str(), &v) => {
             VersionClause::Tested
         }
