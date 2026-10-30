@@ -308,13 +308,22 @@ test('integration: a real mutant (m-edit-1) is applied and classified inside a r
     // step is stubbed: running `npm test` from inside `npm test` would recurse
     // into this very test; runFullSuite's own contract is covered by the
     // runNightlyMutations test above and exercised for real by the nightly job.
+    // The rule's own file (direct/fgos-edit, about 14 s a run) is swapped for a
+    // one-second file that imports the same module: this test proves the wiring,
+    // and any real classification outcome is accepted below.
     let relatedRuns = 0;
-    const runRelated = (files, opts) => { relatedRuns++; return realRunRelated(files, opts); };
+    const requested = [];
+    const runRelated = (files, opts) => {
+      relatedRuns++;
+      requested.push(...files.map((f) => path.relative(worktreePath, f)));
+      return realRunRelated([path.join(worktreePath, 'test/state/work-size-rigor.test.mjs')], opts);
+    };
     const { classification } = classifyOneMutant({
       mutant, rule, worktreePath, runRelated,
       runFull: () => ({ ran: true, failed: new Set() }),
     });
     assert.equal(relatedRuns, 2, 'baseline and mutated related runs both really executed');
+    assert.deepEqual([...new Set(requested)], rule.directTests, 'the related runs ask for the rule\'s own files');
     // A real mutant against real code: any outcome other than 'invalid'/'infra-error'
     // proves the wire-up (baseline, mutation, related run) executed real processes.
     assert.ok(
