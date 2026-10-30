@@ -51,7 +51,7 @@ import {
   installPiHook,
 } from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
-import { mailboxOptIn, refusedConfigName } from './mailbox-limits.mjs';
+import { crossMachineNote, mailboxOptIn, refusedConfigName } from './mailbox-limits.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
   loadWorkflowDefinitions,
@@ -2236,7 +2236,7 @@ function checkMailboxHook(cwd) {
   if (data.record === 'none') return { passed: true, message: `${enabled}; record: none yet (no hook has run in this project)` };
   if (data.record !== 'ok') return { passed: false, message: `enabled, but the mailbox record cannot be read: ${data.record} (fgos mailbox status names it)` };
   const outcome = data.hookOutcome?.reason ? `, last hook outcome ${data.hookOutcome.reason}` : '';
-  return { passed: true, message: `${enabled}; record: ok (${data.heads} head(s), ${data.signals?.queue?.pending ?? 0} pending${outcome})` };
+  return { passed: true, message: `${enabled}; record: ok (${data.heads} head(s), ${data.signals?.queue?.pending ?? 0} pending${outcome})${crossMachineNote(data.crossMachine)}` };
 }
 
 registerCheck({

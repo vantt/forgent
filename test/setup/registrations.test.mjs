@@ -1341,6 +1341,19 @@ test('the mailbox check is enabled by default, passes as not enabled once the pr
   } finally { fs.rmSync(temp, { recursive: true, force: true }); }
 });
 
+test('the cross-machine note counts the mail and names a machine key that is still unconfirmed', async () => {
+  const { crossMachineNote } = await import('../../src/setup/mailbox-limits.mjs');
+  assert.equal(crossMachineNote(undefined), '');
+  assert.equal(
+    crossMachineNote({ sent: 2, offered: 1, waiting: 1, refused: { 'unknown-name': 1 }, unconfirmedMachines: [] }),
+    '; cross-machine: 2 sent, 1 offered, 1 waiting for the receiver, 1 refused',
+  );
+  assert.match(
+    crossMachineNote({ sent: 0, offered: 0, waiting: 0, refused: {}, unconfirmedMachines: ['fg-server-sqs7es'] }),
+    /warning: mail from fg-server-sqs7es is held until you confirm its key \(fgos identity pins --confirm/,
+  );
+});
+
 test('the mailbox-hook doctor row reports the record verdict from fgos mailbox status, passes with no record yet, and writes nothing', async () => {
   const { ensureHostBin, REPO_ROOT } = await import('../../scripts/lib/git-addon-stage.mjs');
   const host = ensureHostBin(process.env, REPO_ROOT);
