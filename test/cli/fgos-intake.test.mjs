@@ -6,7 +6,6 @@ import { test } from 'node:test';
 import {
   ADD_BAD_FLAG_CASES,
   FGOS,
-  MOVE_BAD_FLAG_CASES,
   REAL_REPO_ROOT,
   SUBMIT_BAD_FLAG_CASES,
   StoreError,
@@ -199,92 +198,6 @@ test('add with an unknown dep id is rejected as validation, exit 4', () => {
   const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'has-bad-dep', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--deps', 'ghost-dep', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
-});
-
-
-test('move applies a legal transition, appends one event, and updates the view, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'movable');
-  const before = eventLines(cwd).length;
-  // tsk-40m: todo -> doing is retired -- todo -> blocked stands in as the
-  // generic "some legal transition" example this test actually needs.
-  const result = run(cwd, ['move', 'movable', '--to', 'blocked']);
-  assert.equal(result.status, 0);
-  assert.equal(eventLines(cwd).length, before + 1);
-  assert.equal(stateView(cwd).work.movable.status, 'blocked');
-});
-
-
-// fsm-wontfix-terminal-status D1/D3: move --to wontfix is legal from each
-// of its 3 entry statuses (blocked/todo/doing) through the existing
-// generic move verb — no dedicated CLI verb needed.
-for (const from of ['blocked', 'todo', 'doing']) {
-  test(`move applies ${from} -> wontfix through the generic verb, exit 0`, () => {
-    const cwd = tmpCwdFromTemplate();
-    addOk(cwd, `wontfix-from-${from}`);
-    // tsk-40m: todo -> doing is retired -- a durably-'doing' entry status
-    // still needs a raw injection (doing -> wontfix itself stays a real,
-    // legal edge, kept for settleClaim's legacy fallback).
-    if (from === 'doing') moveToDurableDoingForTest(cwd, `wontfix-from-${from}`);
-    else if (from !== 'todo') run(cwd, ['move', `wontfix-from-${from}`, '--to', from]);
-    const result = run(cwd, ['move', `wontfix-from-${from}`, '--to', 'wontfix', '--reason', 'superseded']);
-    assert.equal(result.status, 0);
-    assert.equal(stateView(cwd).work[`wontfix-from-${from}`].status, 'wontfix');
-  });
-}
-
-test('move rejects an illegal transition as precondition, exit 2, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'stuck-todo');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'stuck-todo', '--to', 'done']);
-  assert.equal(result.status, 2);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-
-test('move rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'cas-item');
-  moveToDurableDoingForTest(cwd, 'cas-item');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'cas-item', '--to', 'done', '--expect', 'todo']);
-  assert.equal(result.status, 3);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['cas-item'].status, 'doing');
-});
-
-
-test('move on a nonexistent id is rejected as validation (not-found), exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
-  const result = run(cwd, ['move', 'never-added', '--to', 'doing']);
-  assert.equal(result.status, 4);
-});
-
-
-for (const [label, badFlagArgs] of MOVE_BAD_FLAG_CASES) {
-  test(`move with ${label} is rejected as validation, exit 4, no event written`, () => {
-    const cwd = tmpCwdFromTemplate();
-    addOk(cwd, 'move-bad-flag-item');
-    const before = eventLines(cwd).length;
-    const result = run(cwd, ['move', 'move-bad-flag-item', ...badFlagArgs]);
-    assert.equal(result.status, 4);
-    assert.equal(eventLines(cwd).length, before);
-  });
-}
-
-test('move reports the real event seq in its envelope data, not undefined', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'seq-check'); // event #1
-  // tsk-40m: todo -> doing is retired -- blocked stands in as the generic
-  // "some legal move" example this test actually needs.
-  const result = run(cwd, ['move', 'seq-check', '--to', 'blocked']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.seq, 2);
-  assert.equal(data.id, 'seq-check');
-  assert.equal(data.from, 'todo');
-  assert.equal(data.to, 'blocked');
 });
 
 

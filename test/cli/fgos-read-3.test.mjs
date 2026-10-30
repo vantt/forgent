@@ -6,7 +6,6 @@ import { test } from 'node:test';
 import {
   ADD_BAD_FLAG_CASES,
   FGOS,
-  MOVE_BAD_FLAG_CASES,
   REAL_REPO_ROOT,
   SUBMIT_BAD_FLAG_CASES,
   StoreError,

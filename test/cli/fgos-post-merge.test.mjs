@@ -8,7 +8,6 @@ import { writeBeacon, beaconPath } from '../../src/runner/main-checkout-activity
 import {
   ADD_BAD_FLAG_CASES,
   FGOS,
-  MOVE_BAD_FLAG_CASES,
   REAL_REPO_ROOT,
   SUBMIT_BAD_FLAG_CASES,
   StoreError,

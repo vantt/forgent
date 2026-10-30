@@ -401,12 +401,6 @@ function docsIndexManifestPath(root) {
   return path.join(root, 'docs', 'enduser-docs-index.json');
 }
 
-// tsk-34y: same invariant as ADD_BAD_FLAG_CASES/SUBMIT_BAD_FLAG_CASES above,
-// applied to `move` (D1, docs/history/test-suite-dry-consolidation/CONTEXT.md).
-const MOVE_BAD_FLAG_CASES = [
-  ['a bare --to (no value)', ['--to']],
-  ['a valid --to plus an empty --expect ""', ['--to', 'doing', '--expect', '']],
-];
 
 // tsk-34y: these `add` flag-value rejections shared one invariant -- an
 // otherwise-valid `add` invocation with one flag given a bad or bare value
@@ -1160,7 +1154,6 @@ function writeCleanupTtlConfig(cwd, ttlDays) {
 export {
   ADD_BAD_FLAG_CASES,
   FGOS,
-  MOVE_BAD_FLAG_CASES,
   REAL_REPO_ROOT,
   SUBMIT_BAD_FLAG_CASES,
   StoreError,

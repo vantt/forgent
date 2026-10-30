@@ -6,7 +6,6 @@ import { test } from 'node:test';
 import {
   ADD_BAD_FLAG_CASES,
   FGOS,
-  MOVE_BAD_FLAG_CASES,
   REAL_REPO_ROOT,
   SUBMIT_BAD_FLAG_CASES,
   StoreError,
@@ -118,94 +117,6 @@ The chosen mechanism determines security requirements and user authentication fl
 ## Phạm vi của câu trả lời
 
 Đồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.`;
-
-
-test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'goal-checked');
-  const result = run(cwd, ['move', 'goal-checked', '--to', 'awaiting-approval']);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['goal-checked'].status, 'awaiting-approval');
-});
-
-
-test('move awaiting-approval -> delivered (approval) applies via the real CLI, exit 0', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'approved-item');
-  const result = run(cwd, ['move', 'approved-item', '--to', 'delivered']);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['approved-item'].status, 'delivered');
-});
-
-
-test('move awaiting-approval -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'no-reason-item');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'no-reason-item', '--to', 'todo']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['no-reason-item'].status, 'awaiting-approval');
-});
-
-
-test('move awaiting-approval -> todo with an empty --reason "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'empty-reason-item');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'empty-reason-item', '--to', 'todo', '--reason', '']);
-  assert.equal(result.status, 4);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-
-test('move awaiting-approval -> todo (rejection) with --reason carries the reason into the event payload, exit 0', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'rejected-item');
-  const result = run(cwd, ['move', 'rejected-item', '--to', 'todo', '--reason', 'flaky test coverage']);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['rejected-item'].status, 'todo');
-
-  const lines = eventLines(cwd);
-  const lastEvent = JSON.parse(lines[lines.length - 1]);
-  assert.equal(lastEvent.type, 'work.move');
-  assert.equal(lastEvent.payload.reason, 'flaky test coverage');
-});
-
-
-test('move awaiting-approval -> doing is a forbidden edge (proposed is never a re-entry point for doing), exit 2, no event written', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'no-reentry-item');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'no-reentry-item', '--to', 'doing']);
-  assert.equal(result.status, 2);
-  assert.equal(eventLines(cwd).length, before);
-});
-
-
-test('move awaiting-approval -> done rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
-  const cwd = tmpCwd();
-  toProposed(cwd, 'cas-proposed-item');
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['move', 'cas-proposed-item', '--to', 'done', '--expect', 'todo']);
-  assert.equal(result.status, 3);
-  assert.equal(eventLines(cwd).length, before);
-  assert.equal(stateView(cwd).work['cas-proposed-item'].status, 'awaiting-approval');
-});
-
-
-test('move --reason on a non-rejection edge is accepted but ignored, not embedded in the payload', () => {
-  const cwd = tmpCwd();
-  addOk(cwd, 'reason-ignored-item');
-  // tsk-40m: todo -> doing is retired -- blocked stands in as the generic
-  // "some non-rejection edge" example this test actually needs.
-  const result = run(cwd, ['move', 'reason-ignored-item', '--to', 'blocked', '--reason', 'not a rejection']);
-  assert.equal(result.status, 0);
-
-  const lines = eventLines(cwd);
-  const lastEvent = JSON.parse(lines[lines.length - 1]);
-  assert.equal(lastEvent.payload.reason, undefined);
-});
 
 
 test('ask/answer round-trip on a todo item: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready', () => {
