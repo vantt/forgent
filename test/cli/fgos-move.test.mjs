@@ -52,9 +52,9 @@ test('move --to delivered is allowed when fgw/<id> exists and IS reachable from 
   assert.equal(stateView(cwd).work['move-reachable'].status, 'delivered');
 });
 
-test('move --to delivered is REFUSED when fgw/<id> exists and is NOT reachable from trunk, no event written', () => {
+test('move --to delivered is REFUSED when fgw/<id> exists and is NOT reachable from trunk, no event written', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'move-unmerged', { verify: 'true' });
+  await makeRunnerProposedItem(cwd, 'move-unmerged', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-unmerged');
 
   const before = stateView(cwd).work['move-unmerged'];
@@ -67,9 +67,9 @@ test('move --to delivered is REFUSED when fgw/<id> exists and is NOT reachable f
   assert.equal(after.status, before.status, 'refused move must not advance status');
 });
 
-test('move --to delivered with --override-reason proceeds despite an unreachable branch, and logs the reason to the decision log', () => {
+test('move --to delivered with --override-reason proceeds despite an unreachable branch, and logs the reason to the decision log', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'move-override', { verify: 'true' });
+  await makeRunnerProposedItem(cwd, 'move-override', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-override');
 
   const result = run(cwd, ['move', 'move-override', '--to', 'delivered', '--override-reason', 'hotfix landed via an out-of-band channel, evidence in incident-42']);
@@ -83,9 +83,9 @@ test('move --to delivered with --override-reason proceeds despite an unreachable
   assert.match(decisions.at(-1).rationale, /incident-42/);
 });
 
-test('move --to delivered without --override-reason refuses even with an EMPTY --override-reason value (validation, not a silent bypass)', () => {
+test('move --to delivered without --override-reason refuses even with an EMPTY --override-reason value (validation, not a silent bypass)', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'move-empty-override', { verify: 'true' });
+  await makeRunnerProposedItem(cwd, 'move-empty-override', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-empty-override');
 
   const result = run(cwd, ['move', 'move-empty-override', '--to', 'delivered', '--override-reason', '']);
@@ -93,9 +93,9 @@ test('move --to delivered without --override-reason refuses even with an EMPTY -
   assert.equal(stateView(cwd).work['move-empty-override'].status, 'awaiting-approval');
 });
 
-test('move --to a status other than delivered is never gated by the branch-reachability check, even with a live unmerged branch', () => {
+test('move --to a status other than delivered is never gated by the branch-reachability check, even with a live unmerged branch', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'move-not-delivered', { verify: 'true' });
+  await makeRunnerProposedItem(cwd, 'move-not-delivered', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-not-delivered');
 
   const result = run(cwd, ['move', 'move-not-delivered', '--to', 'blocked', '--reason', 'unrelated block reason']);
@@ -152,9 +152,9 @@ test('move --to awaiting-approval on a "doing" item refuses even with an EMPTY -
   assert.equal(stateView(cwd).work['move-guard-empty'].status, 'doing');
 });
 
-test('move --to awaiting-approval on a NON-"doing" item is never gated by the return-guard check', () => {
+test('move --to awaiting-approval on a NON-"doing" item is never gated by the return-guard check', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'move-guard-not-doing', { verify: 'true' });
+  await makeRunnerProposedItem(cwd, 'move-guard-not-doing', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-guard-not-doing');
   run(cwd, ['take', '--id', 'move-guard-not-doing']); // tsk-40m: real claim, no durable move anymore
   run(cwd, ['move', 'move-guard-not-doing', '--to', 'blocked', '--reason', 'unrelated']);

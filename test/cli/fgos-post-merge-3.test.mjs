@@ -90,10 +90,10 @@ import {
 
 
 
-test('catchup on a root parked with reason integration-drift, after a non-overlapping main-side change, merges main into fgw/<id> and bounces blocked -> awaiting-approval', () => {
+test('catchup on a root parked with reason integration-drift, after a non-overlapping main-side change, merges main into fgw/<id> and bounces blocked -> awaiting-approval', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
-  makeBlockedRunnerItem(cwd, 'catchup-root-drift', 'integration-drift', { verify: 'test -f catchup-root-drift-produced.txt' });
+  await makeBlockedRunnerItem(cwd, 'catchup-root-drift', 'integration-drift', { verify: 'test -f catchup-root-drift-produced.txt' });
 
   // A genuinely non-overlapping change lands on main AFTER the park
   // (another root's own approve, simulated directly).
@@ -122,10 +122,10 @@ test('catchup on a root parked with reason integration-drift, after a non-overla
 });
 
 
-test('catchup on a leaf parked with reason merge-conflict targets its PARENT branch (fgw/<root>), not main, and succeeds the same way', () => {
+test('catchup on a leaf parked with reason merge-conflict targets its PARENT branch (fgw/<root>), not main, and succeeds the same way', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
-  makeBlockedLeafItem(cwd, 'catchup-leaf-root', 'catchup-leaf-child', 'merge-conflict', { verify: 'test -f catchup-leaf-child-produced.txt' });
+  await makeBlockedLeafItem(cwd, 'catchup-leaf-root', 'catchup-leaf-child', 'merge-conflict', { verify: 'test -f catchup-leaf-child-produced.txt' });
 
   // A sibling leaf's own merge lands on fgw/<root> AFTER this leaf's park —
   // non-overlapping (a different file).
@@ -164,11 +164,11 @@ test('catchup on a leaf parked with reason merge-conflict targets its PARENT bra
 // re-running INSIDE the main-checkout lock on every single land, the exact
 // self-tightening loop this item exists to close.
 
-test('catchup records branchHeadAtReturn as its own commit tip, so a subsequent approve skips re-verifying entirely (the core reason this item exists)', () => {
+test('catchup records branchHeadAtReturn as its own commit tip, so a subsequent approve skips re-verifying entirely (the core reason this item exists)', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   const sentinel = path.join(cwd, 'verify-ran.sentinel');
-  makeBlockedRunnerItem(cwd, 'catchup-cashin', 'integration-drift', { verify: `touch ${JSON.stringify(sentinel)} && test -f catchup-cashin-produced.txt` });
+  await makeBlockedRunnerItem(cwd, 'catchup-cashin', 'integration-drift', { verify: `touch ${JSON.stringify(sentinel)} && test -f catchup-cashin-produced.txt` });
 
   fs.writeFileSync(path.join(cwd, 'main-side-change.txt'), 'landed while parked\n');
   gitAtCwd(cwd, ['add', 'main-side-change.txt']);
@@ -194,11 +194,11 @@ test('catchup records branchHeadAtReturn as its own commit tip, so a subsequent 
 });
 
 
-test('catchup on the already-caught-up path ALSO records branchHeadAtReturn (no new commit, but still a real verify that must be cashed in)', () => {
+test('catchup on the already-caught-up path ALSO records branchHeadAtReturn (no new commit, but still a real verify that must be cashed in)', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   const sentinel = path.join(cwd, 'verify-ran.sentinel');
-  makeAlreadyCaughtUpItem(cwd, 'catchup-caughtup-cashin', `touch ${JSON.stringify(sentinel)} && test -f catchup-caughtup-cashin-produced.txt`);
+  await makeAlreadyCaughtUpItem(cwd, 'catchup-caughtup-cashin', `touch ${JSON.stringify(sentinel)} && test -f catchup-caughtup-cashin-produced.txt`);
 
   const result = run(cwd, ['catchup', 'catchup-caughtup-cashin']);
   assert.equal(result.status, 0, result.stderr);
@@ -216,10 +216,10 @@ test('catchup on the already-caught-up path ALSO records branchHeadAtReturn (no 
 });
 
 
-test('an item that trips catchup verify-fail (never reaches awaiting-approval) does not have branchHeadAtReturn touched, and a later successful catchup still fixes it (fail-closed unaffected)', () => {
+test('an item that trips catchup verify-fail (never reaches awaiting-approval) does not have branchHeadAtReturn touched, and a later successful catchup still fixes it (fail-closed unaffected)', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
-  makeBlockedRunnerItem(cwd, 'catchup-redverify', 'integration-drift', { verify: 'test -f this-file-does-not-exist.txt' });
+  await makeBlockedRunnerItem(cwd, 'catchup-redverify', 'integration-drift', { verify: 'test -f this-file-does-not-exist.txt' });
   const before = stateView(cwd).work['catchup-redverify'].branchHeadAtReturn;
 
   const result = run(cwd, ['catchup', 'catchup-redverify']);
@@ -274,10 +274,10 @@ test('catchup on an item whose target has a REAL same-line conflict leaves it bl
 });
 
 
-test('catchup on a branch that already contains the target reports outcome "already-caught-up", still runs verify, and bounces blocked -> awaiting-approval without creating a commit', () => {
+test('catchup on a branch that already contains the target reports outcome "already-caught-up", still runs verify, and bounces blocked -> awaiting-approval without creating a commit', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
-  makeAlreadyCaughtUpItem(cwd, 'catchup-caught-up', 'test -f catchup-caught-up-produced.txt');
+  await makeAlreadyCaughtUpItem(cwd, 'catchup-caught-up', 'test -f catchup-caught-up-produced.txt');
 
   const mainHeadBefore = gitHead(cwd);
   const branchHeadBefore = gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-caught-up']).trim();
@@ -297,10 +297,10 @@ test('catchup on a branch that already contains the target reports outcome "alre
 });
 
 
-test('catchup on an already-caught-up branch whose verify is RED stays blocked and reports verify-fail, without attempting a merge --abort that has no merge to abort', () => {
+test('catchup on an already-caught-up branch whose verify is RED stays blocked and reports verify-fail, without attempting a merge --abort that has no merge to abort', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
-  makeAlreadyCaughtUpItem(cwd, 'catchup-caught-up-red', 'test -f never-produced.txt');
+  await makeAlreadyCaughtUpItem(cwd, 'catchup-caught-up-red', 'test -f never-produced.txt');
 
   const branchHeadBefore = gitAtCwd(cwd, ['rev-parse', 'fgw/catchup-caught-up-red']).trim();
 

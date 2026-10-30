@@ -286,11 +286,11 @@ test('cleanup (to blocked branch) clears the commit-activity beacon of the calle
   assert.equal(fs.existsSync(beacon), false, 'cleanup -> blocked must clear the session beacon early');
 });
 
-test('cleanup (to done branch) clears the commit-activity beacon of the caller session (tsk-5zv)', () => {
+test('cleanup (to done branch) clears the commit-activity beacon of the caller session (tsk-5zv)', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   writeCleanupTtlConfig(cwd, 0);
-  makeRunnerProposedItem(cwd, 'cleanup-lock-done', { verify: 'test -f cleanup-lock-done-produced.txt' });
+  await makeRunnerProposedItem(cwd, 'cleanup-lock-done', { verify: 'test -f cleanup-lock-done-produced.txt' });
   commitPendingBeforeApprove(cwd, 'cleanup-lock-done');
 
   const approve = run(cwd, ['approve', 'cleanup-lock-done']);

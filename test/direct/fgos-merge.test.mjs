@@ -89,8 +89,8 @@ function addItem(cwd, id, extra = {}) {
 }
 
 /** A root with a child (drift only tracks ids that are some other item's parent), awaiting approval and committed. */
-function makeDriftedRootAwaitingApproval(cwd, rootId, extra) {
-  makeDriftedRoot(cwd, rootId, extra);
+async function makeDriftedRootAwaitingApproval(cwd, rootId, extra) {
+  await makeDriftedRoot(cwd, rootId, extra);
   addItem(cwd, `${rootId}-child`, { title: 'child', parent: rootId });
   assert.equal(moveOk(cwd, rootId, 'awaiting-approval', { skipReturnGuard: "test fixture setup, not exercising return's own guard" }).status, 0);
   commitPendingBeforeApprove(cwd, rootId);
@@ -122,7 +122,7 @@ test('review on a non-proposed item is refused as precondition', async () => {
 
 test('review of a runner-source proposed item returns the branch diff and no warnings', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'review-runner-item');
+  await makeRunnerProposedItem(cwd, 'review-runner-item');
 
   const data = await review(cwd, 'review-runner-item');
   assert.equal(data.mode, 'local');
@@ -157,7 +157,7 @@ test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) d
 
 test('review of a leaf proposed item diffs against its resolved root branch (fgw/<root>), not main', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedLeafItem(cwd, 'review-leaf-root', 'review-leaf-child', { rootDivergesFromMain: true });
+  await makeRunnerProposedLeafItem(cwd, 'review-leaf-root', 'review-leaf-child', { rootDivergesFromMain: true });
 
   const data = await review(cwd, 'review-leaf-child');
   assert.equal(data.source, 'runner');
@@ -167,7 +167,7 @@ test('review of a leaf proposed item diffs against its resolved root branch (fgw
 
 test('review of a root proposed item still diffs against main', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'review-root-regression-item');
+  await makeRunnerProposedItem(cwd, 'review-root-regression-item');
 
   const data = await review(cwd, 'review-root-regression-item');
   assert.equal(data.source, 'runner');
@@ -187,7 +187,7 @@ test('review --github on a legacy (non-runner) item is a validation error, no st
 
 test('review --github on a runner item pushes the branch and opens a PR through the gh command, reports the PR number, and never mutates FSM state', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'gh-review-ok');
+  await makeRunnerProposedItem(cwd, 'gh-review-ok');
   addBareOrigin(cwd);
   const ghLog = path.join(cwd, 'gh-invocations.log');
   const ghCommand = writeCreateFake(cwd, ghLog, 314);
@@ -208,7 +208,7 @@ test('review --github on a runner item pushes the branch and opens a PR through 
 
 test('review --github reports a gh failure as a result with no state mutation (read-only contract holds on the blocked path)', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'gh-review-blocked');
+  await makeRunnerProposedItem(cwd, 'gh-review-blocked');
   addBareOrigin(cwd);
 
   const ghData = await review(cwd, 'gh-review-blocked', { github: true, ghCommand: writeAuthFailFake(cwd) });
@@ -240,7 +240,7 @@ test('review --github --pr on a legacy (non-runner) item is the same runner-sour
 
 test('review --github --pr on a merged PR (closed:true, mergedAt set) reports it merged, informational only, with no local state or friction change', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'gh-status-merged');
+  await makeRunnerProposedItem(cwd, 'gh-status-merged');
   const ghCommand = writeViewFake(cwd, 'gh-view-merged.cjs', path.join(cwd, 'gh-view.log'),
     { state: 'MERGED', mergeable: 'MERGEABLE', mergeStateStatus: 'CLEAN', mergedAt: '2026-07-17T10:00:00Z', closed: true, closedAt: '2026-07-17T10:00:00Z' });
 
@@ -256,7 +256,7 @@ test('review --github --pr on a merged PR (closed:true, mergedAt set) reports it
 
 test('review --github --pr on a closed-without-merge PR names the PR, points to fgos reject, mutates nothing, and resolves in exactly one gh invocation with mergeable UNKNOWN — proving pollTimeoutMs:0', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'gh-status-closed');
+  await makeRunnerProposedItem(cwd, 'gh-status-closed');
   const ghLog = path.join(cwd, 'gh-view.log');
   // mergeable:"UNKNOWN" is the honest test: were pollTimeoutMs the default 10s,
   // viewGitHubPRStatus would re-invoke this fake on a poll loop while mergeable
@@ -279,7 +279,7 @@ test('review --github --pr on a closed-without-merge PR names the PR, points to 
 
 test('review --github --pr reports a gh status-check failure as a result with no state mutation or friction', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'gh-status-failed');
+  await makeRunnerProposedItem(cwd, 'gh-status-failed');
 
   const failedData = await review(cwd, 'gh-status-failed', { github: true, prNumber: '5', ghCommand: writeAuthFailFake(cwd) });
   assert.equal(failedData.outcome, 'check-failed');
@@ -305,7 +305,7 @@ test('sync-root on a root with no fgw/<id> branch is refused as validation', asy
 
 test('sync-root happy path: merges fgw/<root> into main, root item status/stage UNCHANGED, fgw/<root> survives (not deleted)', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'sync-root-happy', { verify: `test -f sync-root-happy-produced.txt` });
+  await makeDriftedRoot(cwd, 'sync-root-happy', { verify: `test -f sync-root-happy-produced.txt` });
   commitPendingBeforeApprove(cwd, 'sync-root-happy');
 
   const data = await syncRoot(cwd, 'sync-root-happy');
@@ -328,7 +328,7 @@ test('sync-root happy path: merges fgw/<root> into main, root item status/stage 
 // was never the defective half.
 test('sync-root records exactly one decision on the root item, tagged as engine bookkeeping so it cannot satisfy the retrospective gate', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'sync-root-decision', { verify: 'true' });
+  await makeDriftedRoot(cwd, 'sync-root-decision', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'sync-root-decision');
 
   assert.equal((await syncRoot(cwd, 'sync-root-decision')).outcome, 'synced');
@@ -354,7 +354,7 @@ test('sync-root nested: a root with a parent merges into fgw/<parentId>, not mai
   // earlier leaves fgw/child's later commits carrying a legitimate .fgos/
   // diff relative to fgw/grandparent, which mergeRunnerItem's guard
   // correctly refuses as fgos-write-rejected.
-  makeDriftedRoot(cwd, 'sync-root-nested-child', { parent: 'sync-root-grandparent', verify: `test -f sync-root-nested-child-produced.txt` });
+  await makeDriftedRoot(cwd, 'sync-root-nested-child', { parent: 'sync-root-grandparent', verify: `test -f sync-root-nested-child-produced.txt` });
   gitAtCwd(cwd, ['branch', 'fgw/sync-root-grandparent', 'main']);
   commitPendingBeforeApprove(cwd, 'sync-root-nested-child');
 
@@ -374,7 +374,7 @@ test('sync-root nested: a root with a parent merges into fgw/<parentId>, not mai
 
 test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte unchanged, root status untouched', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'sync-root-conflict', { verify: 'true' });
+  await makeDriftedRoot(cwd, 'sync-root-conflict', { verify: 'true' });
   // A conflicting change on main AFTER the root branch forked, on the exact
   // same path the root's own commit touches.
   fs.writeFileSync(path.join(cwd, 'sync-root-conflict-produced.txt'), 'conflicting main content\n');
@@ -393,7 +393,7 @@ test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte un
 
 test('sync-root on a no-parent root refuses when the shared main checkout carries an uncommitted change on a path the root itself touches; no merge lands', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'sync-root-dirty', { verify: 'true' });
+  await makeDriftedRoot(cwd, 'sync-root-dirty', { verify: 'true' });
   // sync-root-dirty-produced.txt IS in this root's own fgw/sync-root-dirty
   // diff — re-dirtying that SAME path on main, uncommitted, is the
   // own-file-set conflict this gate exists to catch (an UNRELATED dirty path
@@ -411,7 +411,7 @@ test('sync-root on a no-parent root refuses when the shared main checkout carrie
 
 test('sync-root refuses a linked worktree as its repo root (it must land on the real main checkout)', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'sync-root-worktree-guard', { verify: 'true' });
+  await makeDriftedRoot(cwd, 'sync-root-worktree-guard', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'sync-root-worktree-guard');
   const wt = linkedWorktree(cwd, 'sync-root-side-branch');
 
@@ -460,7 +460,7 @@ test('sync-root of a root whose diff touches a self-modifying-capable module REF
 
 test('sync-root of a root whose staged merge fails its own verify: outcome blocked reason verify-fail, root status untouched', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'sync-root-verify-fail', { verify: 'test -f file-never-produced.txt' });
+  await makeDriftedRoot(cwd, 'sync-root-verify-fail', { verify: 'test -f file-never-produced.txt' });
   commitPendingBeforeApprove(cwd, 'sync-root-verify-fail');
 
   const headBefore = gitHead(cwd);
@@ -475,7 +475,7 @@ test('sync-root of a root whose staged merge fails its own verify: outcome block
 
 test('sync-root never reports outcome "synced" when landRunnerItem returns an outcome it does not explicitly handle', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'sync-root-blocked-other', { verify: 'true' });
+  await makeDriftedRoot(cwd, 'sync-root-blocked-other', { verify: 'true' });
 
   // Another item's in-progress/abandoned merge already staged on the main
   // checkout -- a real, unrelated branch, staged but never committed or
@@ -506,7 +506,7 @@ test('sync-root never reports outcome "synced" when landRunnerItem returns an ou
 
 test('sync-root outcome guard catches a publication Land refuses over an untracked collision and records unhandled-outcome friction', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'sync-root-merge-failed', { verify: 'true' });
+  await makeDriftedRoot(cwd, 'sync-root-merge-failed', { verify: 'true' });
 
   // `git merge --no-commit --no-ff` can fail WITHOUT ever creating
   // MERGE_HEAD when an untracked file at the target checkout collides with a
@@ -558,14 +558,14 @@ test('sync-root outcome guard catches a publication Land refuses over an untrack
 
 test('promote-to-component on a nonexistent member id is refused as validation', async () => {
   const cwd = initGitCwdMainFast();
-  makeFlatMember(cwd, 'ptc-real-a');
+  await makeFlatMember(cwd, 'ptc-real-a');
   await assert.rejects(promote(cwd, ['ptc-real-a', 'ptc-ghost'], { rootTitle: 'Component ghost' }), refusal(4, /ptc-ghost.*not found/));
 });
 
 test('promote-to-component refuses a member that already has a parent', async () => {
   const cwd = initGitCwdMainFast();
-  makeFlatMember(cwd, 'ptc-sibling');
-  makeFlatMember(cwd, 'ptc-already-parented', { deps: ['ptc-sibling'] });
+  await makeFlatMember(cwd, 'ptc-sibling');
+  await makeFlatMember(cwd, 'ptc-already-parented', { deps: ['ptc-sibling'] });
   editWork(fgosDir(cwd), { id: 'ptc-already-parented', patch: { parent: 'some-other-root' } });
   commitPending(cwd, 'state: pre-parent ptc-already-parented');
 
@@ -574,15 +574,15 @@ test('promote-to-component refuses a member that already has a parent', async ()
 
 test('promote-to-component refuses ids that are not connected via deps/mergeAfter', async () => {
   const cwd = initGitCwdMainFast();
-  makeFlatMember(cwd, 'ptc-disconnected-a');
-  makeFlatMember(cwd, 'ptc-disconnected-b');
+  await makeFlatMember(cwd, 'ptc-disconnected-a');
+  await makeFlatMember(cwd, 'ptc-disconnected-b');
   await assert.rejects(promote(cwd, ['ptc-disconnected-a', 'ptc-disconnected-b'], { rootTitle: 'Component disconnected' }), refusal(4, /not all connected/));
 });
 
 test('promote-to-component with a new root: creates a fresh root, merges both members into it, sets parent only after real success, records one engine decision', async () => {
   const cwd = initGitCwdMainFast();
-  registerFlatMember(cwd, 'ptc-new-root-a');
-  registerFlatMember(cwd, 'ptc-new-root-b', { deps: ['ptc-new-root-a'] });
+  await registerFlatMember(cwd, 'ptc-new-root-a');
+  await registerFlatMember(cwd, 'ptc-new-root-b', { deps: ['ptc-new-root-a'] });
   commitPending(cwd, 'state: setup ptc-new-root members');
   cutMemberBranch(cwd, 'ptc-new-root-a');
   cutMemberBranch(cwd, 'ptc-new-root-b');
@@ -621,8 +621,8 @@ test('promote-to-component reusing a member as root: the root itself is skipped,
   // ptc-reuse-other -> ptc-reuse-root would close a real cycle (see the
   // merged-parent-rejected test below). Declaring the edge on the ROOT side
   // matches the parent edge's own direction, so no cycle.
-  registerFlatMember(cwd, 'ptc-reuse-other');
-  registerFlatMember(cwd, 'ptc-reuse-root', { mergeAfter: ['ptc-reuse-other'] });
+  await registerFlatMember(cwd, 'ptc-reuse-other');
+  await registerFlatMember(cwd, 'ptc-reuse-root', { mergeAfter: ['ptc-reuse-other'] });
   commitPending(cwd, 'state: setup ptc-reuse members');
   cutMemberBranch(cwd, 'ptc-reuse-root');
   cutMemberBranch(cwd, 'ptc-reuse-other');
@@ -641,11 +641,11 @@ test('promote-to-component reusing a member as root: the root itself is skipped,
 
 test('promote-to-component reports merged-parent-rejected (never crashes) when the real git merge succeeds but setting parent would close a deps+parent cycle', async () => {
   const cwd = initGitCwdMainFast();
-  registerFlatMember(cwd, 'ptc-cycle-root');
+  await registerFlatMember(cwd, 'ptc-cycle-root');
   // deps (not mergeAfter) deliberately: ptc-cycle-other depends on the very
   // item this test promotes to root, so setting ptc-cycle-other.parent =
   // 'ptc-cycle-root' afterward closes a real deps+parent cycle.
-  registerFlatMember(cwd, 'ptc-cycle-other', { deps: ['ptc-cycle-root'] });
+  await registerFlatMember(cwd, 'ptc-cycle-other', { deps: ['ptc-cycle-root'] });
   commitPending(cwd, 'state: setup ptc-cycle members');
   cutMemberBranch(cwd, 'ptc-cycle-root');
   cutMemberBranch(cwd, 'ptc-cycle-other');
@@ -708,8 +708,8 @@ test('promote-to-component bails a conflicting member without setting its parent
 
 test('promote-to-component refuses a linked worktree as its repo root (it must land on the real main checkout)', async () => {
   const cwd = initGitCwdMainFast();
-  makeFlatMember(cwd, 'ptc-worktree-guard-a');
-  makeFlatMember(cwd, 'ptc-worktree-guard-b', { deps: ['ptc-worktree-guard-a'] });
+  await makeFlatMember(cwd, 'ptc-worktree-guard-a');
+  await makeFlatMember(cwd, 'ptc-worktree-guard-b', { deps: ['ptc-worktree-guard-a'] });
   const wt = linkedWorktree(cwd, 'ptc-worktree-guard-side-branch');
 
   try {
@@ -822,7 +822,7 @@ test('merge next picks the higher-ranked (mvp goalTier) item first when two are 
 
 test('merge next on a SOLE ready item that trips the Iron Law: skips it without attempting a merge, never auto-acknowledges', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', { verify: 'test -f src/runner/probe.mjs' });
+  await makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', { verify: 'test -f src/runner/probe.mjs' });
 
   const headBefore = gitHead(cwd);
   const data = await next(cwd);
@@ -838,8 +838,8 @@ test('merge next on a SOLE ready item that trips the Iron Law: skips it without 
 
 test('merge next with one Iron-Law-required ready item AND one ordinary ready item: skips the first, picks and merges the other', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', { verify: 'test -f src/runner/probe.mjs' });
-  makeRunnerProposedItem(cwd, 'ordinary-next-item', { verify: 'true' });
+  await makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', { verify: 'test -f src/runner/probe.mjs' });
+  await makeRunnerProposedItem(cwd, 'ordinary-next-item', { verify: 'true' });
 
   const data = await next(cwd);
   assert.equal(data.picked, 'ordinary-next-item', 'the non-blocked ready item must be picked, not the Iron-Law one, regardless of rank order');
@@ -857,7 +857,7 @@ test('merge next with one Iron-Law-required ready item AND one ordinary ready it
 
 test('merge next auto-syncs a blockedOnSync root before giving up: drift clears, the now-ready item merges to delivered', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRootAwaitingApproval(cwd, 'auto-sync-happy', { verify: 'test -f auto-sync-happy-produced.txt' });
+  await makeDriftedRootAwaitingApproval(cwd, 'auto-sync-happy', { verify: 'test -f auto-sync-happy-produced.txt' });
 
   const data = await next(cwd);
   assert.equal(data.syncRoot.id, 'auto-sync-happy');
@@ -870,7 +870,7 @@ test('merge next auto-syncs a blockedOnSync root before giving up: drift clears,
 
 test('merge next on a blockedOnSync root whose sync-root attempt hits a genuine conflict: picked is the root id, blocked, main untouched', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'auto-sync-conflict', { verify: 'true' });
+  await makeDriftedRoot(cwd, 'auto-sync-conflict', { verify: 'true' });
   // An unrelated main commit on the exact path the root's own commit touches.
   fs.writeFileSync(path.join(cwd, 'auto-sync-conflict-produced.txt'), 'conflicting main content\n');
   gitAtCwd(cwd, ['add', 'auto-sync-conflict-produced.txt']);
@@ -892,7 +892,7 @@ test('merge next on a blockedOnSync root whose sync-root attempt hits a genuine 
 
 test('merge next on a blockedOnSync root whose sync-root attempt hits a dirty main checkout: picked is the root id, blocked: dirty-tree, main untouched', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRootAwaitingApproval(cwd, 'auto-sync-dirty', { verify: 'true' });
+  await makeDriftedRootAwaitingApproval(cwd, 'auto-sync-dirty', { verify: 'true' });
   // auto-sync-dirty-produced.txt IS in this root's own branch diff —
   // re-dirtying that SAME path on main, uncommitted, after the state commits
   // is the own-file-set conflict the gate catches on the unattended path.

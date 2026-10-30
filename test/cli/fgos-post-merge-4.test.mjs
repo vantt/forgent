@@ -197,7 +197,7 @@ test('cleanup is a no-op — writes zero work.move events and stays at cleanup �
 });
 
 
-test('cleanup closes to done when TTL is configured to 0 and retrospective content + a resolving merge both exist', () => {
+test('cleanup closes to done when TTL is configured to 0 and retrospective content + a resolving merge both exist', async () => {
   // tsk-1p9: approve no longer calls cleanupMergedBranch at all — the
   // branch survives all the way from `delivered` through `cleanup`, and
   // this verb is now the ONLY thing that ever deletes it. `cleanupMergedBranch`
@@ -207,7 +207,7 @@ test('cleanup closes to done when TTL is configured to 0 and retrospective conte
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   writeCleanupTtlConfig(cwd, 0);
-  makeRunnerProposedItem(cwd, 'cleanup-ready-item', { verify: 'test -f cleanup-ready-item-produced.txt' });
+  await makeRunnerProposedItem(cwd, 'cleanup-ready-item', { verify: 'test -f cleanup-ready-item-produced.txt' });
   commitPendingBeforeApprove(cwd, 'cleanup-ready-item');
 
   const approve = run(cwd, ['approve', 'cleanup-ready-item']);
@@ -239,11 +239,11 @@ test('cleanup closes to done when TTL is configured to 0 and retrospective conte
 // against literal HEAD (always main from repoRoot), which would falsely
 // fail for every leaf; this test proves the root-aware fix (D7) plus the
 // verb's own force-delete (D8) actually get the leaf's branch gone.
-test('cleanup of a LEAF item deletes its own branch even though the ROOT branch is still unmerged into main (tsk-1p9 D7/D8)', () => {
+test('cleanup of a LEAF item deletes its own branch even though the ROOT branch is still unmerged into main (tsk-1p9 D7/D8)', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   writeCleanupTtlConfig(cwd, 0);
-  makeRunnerProposedLeafItem(cwd, 'leaf-cleanup-root', 'leaf-cleanup-child', { verify: 'test -f leaf-cleanup-child-produced.txt' });
+  await makeRunnerProposedLeafItem(cwd, 'leaf-cleanup-root', 'leaf-cleanup-child', { verify: 'test -f leaf-cleanup-child-produced.txt' });
   commitPendingBeforeApprove(cwd, 'leaf-cleanup-child');
 
   const approve = run(cwd, ['approve', 'leaf-cleanup-child']);
@@ -443,10 +443,10 @@ test('catchup accepts a blocked reason of merge-blocked-other-item as a valid pr
 });
 
 
-test('catchup succeeds when invoked with cwd inside the item\'s own linked worktree and --dir pointed at the main checkout (tsk-5vl regression guard)', () => {
+test('catchup succeeds when invoked with cwd inside the item\'s own linked worktree and --dir pointed at the main checkout (tsk-5vl regression guard)', async () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
-  makeBlockedRunnerItem(cwd, 'catchup-worktree-cwd', 'integration-drift', { verify: 'test -f catchup-worktree-cwd-produced.txt' });
+  await makeBlockedRunnerItem(cwd, 'catchup-worktree-cwd', 'integration-drift', { verify: 'test -f catchup-worktree-cwd-produced.txt' });
 
   const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-catchup-wt-'));
   fs.rmdirSync(wt);

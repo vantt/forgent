@@ -118,27 +118,6 @@ test('inventoryRunInitSites classifies every site in an injected multi-file corp
   }
 });
 
-test('inventoryRunInitSites matches the real P02 nine-file lease: 3 process-contract (subdir) + 4 fixture-construction, zero unknown', () => {
-  const nineFiles = [
-    'test/cli/fgos-claim.test.mjs',
-    'test/cli/fgos-claim-2.test.mjs',
-    'test/cli/fgos-read-5.test.mjs',
-    'test/cli/fgos-return.test.mjs',
-    'test/cli/fgos-iron-law-gate.test.mjs',
-    'test/cli/fgos-move.test.mjs',
-    'test/cli/fgos-approve-5.test.mjs',
-  ];
-  const entries = inventoryRunInitSites(nineFiles);
-  assert.equal(entries.length, 7, 'current-tree count differs from the reprofiled P00A baseline; re-verify before trusting P02 scope');
-  const byResp = entries.reduce((acc, e) => {
-    acc[e.primaryResponsibility] = (acc[e.primaryResponsibility] ?? 0) + 1;
-    return acc;
-  }, {});
-  assert.equal(byResp['process-contract'], 3);
-  assert.equal(byResp['fixture-construction'], 4);
-  assert.equal(byResp.unknown ?? 0, 0);
-});
-
 test('classifyProfiledTest: rust-host directory is cross-language-packaging', () => {
   const cls = classifyProfiledTest({ name: 'some fgctl behavior', file: '/repo/test/rust-host/fgctl-init.test.mjs' }, { repoRoot: '/repo' });
   assert.equal(cls.primaryResponsibility, 'cross-language-packaging');

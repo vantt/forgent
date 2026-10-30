@@ -116,9 +116,9 @@ test('P06 fixture pilot: template-copy cwd is a fresh copy, not shared mutable s
 });
 
 
-test('promote-to-component requires at least 2 ids, exit 4', () => {
+test('promote-to-component requires at least 2 ids, exit 4', async () => {
   const cwd = initGitCwdMainFast();
-  makeFlatMember(cwd, 'ptc-solo-a');
+  await makeFlatMember(cwd, 'ptc-solo-a');
 
   const result = run(cwd, ['promote-to-component', '--ids', 'ptc-solo-a', '--root-title', 'Component solo']);
   assert.equal(result.status, 4);
@@ -130,9 +130,9 @@ test('promote-to-component requires at least 2 ids, exit 4', () => {
 // subprocess-injected fake; no real gh binary, no network call.
 
 
-test('review --github --pr on a still-open PR (closed:false) reports it is open and mutates neither FSM state nor friction', () => {
+test('review --github --pr on a still-open PR (closed:false) reports it is open and mutates neither FSM state nor friction', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'gh-status-open');
+  await makeRunnerProposedItem(cwd, 'gh-status-open');
   const ghLog = path.join(cwd, 'gh-view.log');
   const fake = writeViewFake(cwd, 'gh-view-open.cjs', ghLog,
     { state: 'OPEN', mergeable: 'MERGEABLE', mergeStateStatus: 'CLEAN', mergedAt: null, closed: false, closedAt: null });
@@ -198,9 +198,9 @@ test('merge next run from inside a linked worktree without --dir is refused, exi
 // --- tsk-4j9-4: `fgos merge next` (merge-readiness automation) -----------
 
 
-test('merge next --acknowledge-iron-law forwarded by the caller: the picker does not pre-skip -- the flag applies to whichever item is picked, exactly as before', () => {
+test('merge next --acknowledge-iron-law forwarded by the caller: the picker does not pre-skip -- the flag applies to whichever item is picked, exactly as before', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
+  await makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
 
@@ -214,7 +214,7 @@ test('merge next --acknowledge-iron-law forwarded by the caller: the picker does
 
 test('merge next --no-wait fails immediately while another process holds the trunk\'s merge slot -- proves the flag actually forwards into approve (bin/fgos.mjs:1152), not just documented as if it did', async () => {
   const cwd = initGitCwdMainFast();
-  makeRunnerProposedItem(cwd, 'wait-merge-next-no-wait', { verify: 'true' });
+  await makeRunnerProposedItem(cwd, 'wait-merge-next-no-wait', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'wait-merge-next-no-wait');
   const holder = await holdLockInChild('merge-slot', { fgosDir: path.join(cwd, '.fgos'), ref: encodeURIComponent('refs/heads/main') });
   try {
@@ -235,9 +235,9 @@ test('merge next --no-wait fails immediately while another process holds the tru
 });
 
 
-test('sync-root --trust-dir with --dir succeeds from inside a linked worktree (tsk-4uj)', () => {
+test('sync-root --trust-dir with --dir succeeds from inside a linked worktree (tsk-4uj)', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'sync-root-trust-dir', { verify: 'true' });
+  await makeDriftedRoot(cwd, 'sync-root-trust-dir', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'sync-root-trust-dir');
 
   const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-sync-root-trust-wt-'));
@@ -252,9 +252,9 @@ test('sync-root --trust-dir with --dir succeeds from inside a linked worktree (t
   gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
 });
 
-test('sync-root --trust-dir WITHOUT --dir is a no-op -- still refuses from inside a linked worktree (tsk-4uj)', () => {
+test('sync-root --trust-dir WITHOUT --dir is a no-op -- still refuses from inside a linked worktree (tsk-4uj)', async () => {
   const cwd = initGitCwdMainFast();
-  makeDriftedRoot(cwd, 'sync-root-trust-dir-noop', { verify: 'true' });
+  await makeDriftedRoot(cwd, 'sync-root-trust-dir-noop', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'sync-root-trust-dir-noop');
 
   const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-sync-root-trust-noop-wt-'));
@@ -269,10 +269,10 @@ test('sync-root --trust-dir WITHOUT --dir is a no-op -- still refuses from insid
 });
 
 
-test('promote-to-component --trust-dir with --dir succeeds from inside a linked worktree (tsk-2bg)', () => {
+test('promote-to-component --trust-dir with --dir succeeds from inside a linked worktree (tsk-2bg)', async () => {
   const cwd = initGitCwdMainFast();
-  registerFlatMember(cwd, 'ptc-trust-dir-a');
-  registerFlatMember(cwd, 'ptc-trust-dir-b', { deps: ['ptc-trust-dir-a'] });
+  await registerFlatMember(cwd, 'ptc-trust-dir-a');
+  await registerFlatMember(cwd, 'ptc-trust-dir-b', { deps: ['ptc-trust-dir-a'] });
   commitPending(cwd, 'state: setup ptc-trust-dir members');
   cutMemberBranch(cwd, 'ptc-trust-dir-a');
   cutMemberBranch(cwd, 'ptc-trust-dir-b');
@@ -294,10 +294,10 @@ test('promote-to-component --trust-dir with --dir succeeds from inside a linked 
   gitAtCwd(cwd, ['worktree', 'remove', '--force', wt]);
 });
 
-test('promote-to-component --trust-dir WITHOUT --dir is a no-op -- still refuses from inside a linked worktree (tsk-2bg)', () => {
+test('promote-to-component --trust-dir WITHOUT --dir is a no-op -- still refuses from inside a linked worktree (tsk-2bg)', async () => {
   const cwd = initGitCwdMainFast();
-  makeFlatMember(cwd, 'ptc-trust-dir-noop-a');
-  makeFlatMember(cwd, 'ptc-trust-dir-noop-b', { deps: ['ptc-trust-dir-noop-a'] });
+  await makeFlatMember(cwd, 'ptc-trust-dir-noop-a');
+  await makeFlatMember(cwd, 'ptc-trust-dir-noop-b', { deps: ['ptc-trust-dir-noop-a'] });
 
   const wtParent = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-ptc-trust-noop-wt-'));
   const wt = path.join(wtParent, 'wt');

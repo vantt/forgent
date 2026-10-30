@@ -23,6 +23,7 @@ import { addOutcome, recordFriction, addDiscovery, moveWork, moveStep, addWork, 
 import { appendEvent } from '../../helpers/legacy-event-fixture.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { moveUseCase } from '../../../src/verbs/state/move.mjs';
+import { claimWork } from '../../../src/runner/claim-port.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
@@ -227,9 +228,9 @@ function moveToDurableDoingForTest(cwd, id, from = 'todo', extra = {}) {
 // -- releasing a mid-work claim while the branch/worktree survive is now a
 // pure runtime-claim release, no durable move). Fixture-only helper: real
 // callers release through settleClaim (return/reject/verify-fail-park),
-// never a bare release with no durable transition. The claim was taken by a
-// CLI child process, whose writer id can differ from this test process's, so
-// the release goes through the named admin path.
+// never a bare release with no durable transition. The claim may have been
+// taken by a CLI child process, whose writer id can differ from this test
+// process's, so the release goes through the named admin path.
 function releaseClaimFor(cwd, id) {
   releaseClaim(path.join(cwd, '.fgos'), { id, adminReason: 'test-fixture:claim-lock-release' });
 }
@@ -277,6 +278,11 @@ function addOk(cwd, id, extra = {}) {
 // A move a fixture needs, through the use case `fgos move` calls.
 function moveOk(cwd, id, to, options = {}) {
   return inProcess(() => moveUseCase({ dir: path.join(cwd, '.fgos'), repoRoot: cwd }, { id, to, ...options }));
+}
+
+// A take a fixture needs, through the claim `fgos take` makes for an explicit id on the main checkout.
+function takeOk(cwd, id) {
+  return claimWork(path.join(cwd, '.fgos'), { id, actor: 'human', isolate: false, repoRoot: cwd });
 }
 
 // The same item through the real `fgos add` child, for the tests that prove that verb's flags and defaults.
@@ -674,14 +680,14 @@ function commitPendingBeforeApprove(cwd, id) {
 // commit, with the item's own status independently moved to `proposed`
 // through the normal doing -> awaiting-approval edge — these CLI tests never invoke
 // the real runner, only the git/state shape it produces.
-function makeRunnerProposedItem(cwd, id, extra = {}) {
+async function makeRunnerProposedItem(cwd, id, extra = {}) {
   addOk(cwd, id, extra);
   // tsk-40m: `take` writes no durable move (claim time is a runtime-only
   // claim), but claimWork still durably appends a predicted work.outcome --
   // flush both that and the earlier work.add to main's own HEAD BEFORE
   // branching, or they'd ride along onto fgw/<id>'s own worker commit below
   // instead of staying on main.
-  run(cwd, ['take', '--id', id]);
+  await takeOk(cwd, id);
   commitPending(cwd, `state: claim ${id}`);
 
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
@@ -716,7 +722,7 @@ function makeRunnerProposedItem(cwd, id, extra = {}) {
 // leaf forks from it, so a test can prove a leaf's diff/merge target is
 // really the root branch (and not main) by asserting the root-only content
 // is absent/present as the trunk in play dictates.
-function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
+async function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   // Commit the root's own work.add event onto MAIN before any branch
@@ -751,7 +757,7 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
   // appends a predicted work.outcome -- flush both that and the leaf's own
   // work.add to main's own HEAD before branching, same reasoning as the
   // root's own work.add above.
-  run(cwd, ['take', '--id', leafId]);
+  await takeOk(cwd, leafId);
   commitPending(cwd, `state: claim ${leafId}`);
 
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${leafId}`, `fgw/${rootId}`]);
@@ -781,12 +787,12 @@ function makeRunnerProposedLeafItem(cwd, rootId, leafId, extra = {}) {
 // Like makeRunnerProposedItem, but the branch's real commit lands its file at
 // `relPath` (relative to cwd) — used to make the branch diff touch (or not
 // touch) a self-modifying-capable module path the Iron Law classifies.
-function makeRunnerProposedItemTouching(cwd, id, relPath, extra = {}) {
+async function makeRunnerProposedItemTouching(cwd, id, relPath, extra = {}) {
   addOk(cwd, id, extra);
   // tsk-40m: `take` writes no durable move, but claimWork still durably
   // appends a predicted work.outcome -- flush both that and the earlier
   // work.add to main's own HEAD before branching.
-  run(cwd, ['take', '--id', id]);
+  await takeOk(cwd, id);
   commitPending(cwd, `state: claim ${id}`);
 
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
@@ -818,14 +824,14 @@ function makeRunnerProposedItemTouching(cwd, id, relPath, extra = {}) {
 // path) — the exact drift shape tsk-3bn's own origin incident reproduced.
 // The root item's own status stays 'doing' throughout (a root mid-flight,
 // not yet closed) — sync-root must never touch it.
-function makeDriftedRoot(cwd, rootId, opts = {}) {
+async function makeDriftedRoot(cwd, rootId, opts = {}) {
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: rootId, title: `Title ${rootId}`, kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: opts.verify ?? 'true', ...(opts.parent ? { parent: opts.parent } : {}) });
   commitPending(cwd, `state: add ${rootId}`);
   // tsk-40m: claim time writes no durable event anymore -- nothing to
   // commit for the claim itself; the item stays effectively 'doing' via
   // the runtime claim for as long as this fixture never settles it.
-  run(cwd, ['take', '--id', rootId]);
+  await takeOk(cwd, rootId);
 
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${rootId}`]);
   fs.writeFileSync(path.join(cwd, `${rootId}-produced.txt`), 'ok\n');
@@ -851,12 +857,12 @@ function makeDriftedRoot(cwd, rootId, opts = {}) {
 // real ADR0020 guard correctly refuses as a staged .fgos/ change. A
 // single-member test can use makeFlatMember below instead, where this
 // distinction never matters.
-function registerFlatMember(cwd, id, opts = {}) {
+async function registerFlatMember(cwd, id, opts = {}) {
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id, title: `Title ${id}`, kind: 'task', status: 'todo', deps: opts.deps ?? [], mergeAfter: opts.mergeAfter, risk: 'light', refs: [], verify: opts.verify ?? 'true' });
   // tsk-40m: claim time writes no durable event anymore -- the item stays
   // effectively 'doing' via the runtime claim, nothing to commit for it.
-  run(cwd, ['take', '--id', id]);
+  await takeOk(cwd, id);
 }
 
 // Cut `id`'s own `fgw/<id>` branch from whatever main currently is, with one
@@ -876,8 +882,8 @@ function cutMemberBranch(cwd, id) {
 // Safe for single-member setups; a multi-member test that needs the merged
 // branches to actually share history should use registerFlatMember +
 // cutMemberBranch directly instead (see their own comments above).
-function makeFlatMember(cwd, id, opts = {}) {
-  registerFlatMember(cwd, id, opts);
+async function makeFlatMember(cwd, id, opts = {}) {
+  await registerFlatMember(cwd, id, opts);
   commitPending(cwd, `state: setup ${id}`);
   cutMemberBranch(cwd, id);
 }
@@ -994,16 +1000,16 @@ function makeLegacyProposedItem(cwd, id) {
 // (status-fsm.mjs's own reason requirement on that edge, same as the existing
 // 'approve of a runner item that conflicts' test above) so item.reason is
 // genuine, not synthesized.
-function makeBlockedRunnerItem(cwd, id, reason, extra = {}) {
-  makeRunnerProposedItem(cwd, id, extra);
+async function makeBlockedRunnerItem(cwd, id, reason, extra = {}) {
+  await makeRunnerProposedItem(cwd, id, extra);
   moveOk(cwd, id, 'blocked', { reason });
   commitPending(cwd, `state: park ${id} (${reason})`);
 }
 
 // Same shape, for a leaf under a per-root branch tree (mirrors
 // makeRunnerProposedLeafItem above).
-function makeBlockedLeafItem(cwd, rootId, leafId, reason, extra = {}) {
-  makeRunnerProposedLeafItem(cwd, rootId, leafId, extra);
+async function makeBlockedLeafItem(cwd, rootId, leafId, reason, extra = {}) {
+  await makeRunnerProposedLeafItem(cwd, rootId, leafId, extra);
   moveOk(cwd, leafId, 'blocked', { reason });
   commitPending(cwd, `state: park ${leafId} (${reason})`);
 }
@@ -1013,8 +1019,8 @@ function makeBlockedLeafItem(cwd, rootId, leafId, reason, extra = {}) {
 // leaving the item blocked forever. Reproduced here the way it happens for
 // real: a person merges the target by hand (or a prior catch-up landed the
 // merge and died later), then calls catchup.
-function makeAlreadyCaughtUpItem(cwd, id, verify) {
-  makeBlockedRunnerItem(cwd, id, 'integration-drift', { verify });
+async function makeAlreadyCaughtUpItem(cwd, id, verify) {
+  await makeBlockedRunnerItem(cwd, id, 'integration-drift', { verify });
   gitAtCwd(cwd, ['checkout', '-q', `fgw/${id}`]);
   gitAtCwd(cwd, ['merge', '--no-edit', '-q', 'main']);
   gitAtCwd(cwd, ['checkout', '-q', 'main']);
@@ -1122,9 +1128,9 @@ function initSessionSafeCwd() {
 // session-worktree symlink) and, under a fully-ignored `.fgos/`, have nothing to
 // commit. main's HEAD stays at seed; only the fgw/<id> branch carries the produced
 // file, exactly what classifySource keys off.
-function makeSessionSafeRunnerItem(cwd, id, extra = {}) {
+async function makeSessionSafeRunnerItem(cwd, id, extra = {}) {
   addOk(cwd, id, extra);
-  run(cwd, ['take', '--id', id]);
+  await takeOk(cwd, id);
   gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
   fs.writeFileSync(path.join(cwd, `${id}-produced.txt`), 'ok\n');
   gitAtCwd(cwd, ['add', `${id}-produced.txt`]);
@@ -1189,6 +1195,7 @@ export {
   addGoalItem,
   addOk,
   addViaCli,
+  takeOk,
   moveOk,
   addOutcome,
   addWork,

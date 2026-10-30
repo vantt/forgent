@@ -21,12 +21,12 @@ test('review on an unknown id reports the item, not the bare --pr flag (tsk-h6r)
   assert.match(res.stderr, /review: work "no-such-item" not found/);
 });
 
-test('review still refuses a bare --pr once every guard ahead of it has passed (tsk-h6r)', () => {
+test('review still refuses a bare --pr once every guard ahead of it has passed (tsk-h6r)', async () => {
   const cwd = initGitCwdMain();
   // Runner-sourced on purpose: the `--pr` check sits behind the
   // classifySource guard too, so a legacy item would be refused for its
   // source before `--pr` is ever looked at.
-  makeRunnerProposedItem(cwd, 'pr-flag-guard');
+  await makeRunnerProposedItem(cwd, 'pr-flag-guard');
 
   const res = run(cwd, ['review', 'pr-flag-guard', '--github', '--pr']);
 

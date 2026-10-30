@@ -48,8 +48,8 @@ function writeIronLawLevel(cwd, level) {
 
 // A root item (no parent) whose own branch touches a gated module, parked
 // at awaiting-approval and ready for a real `approve` into trunk.
-function makeGatedRoot(cwd, id) {
-  makeRunnerProposedItemTouching(cwd, id, GATED_MODULE, { verify: `test -f ${GATED_MODULE}` });
+async function makeGatedRoot(cwd, id) {
+  await makeRunnerProposedItemTouching(cwd, id, GATED_MODULE, { verify: `test -f ${GATED_MODULE}` });
   commitPendingBeforeApprove(cwd, id);
 }
 
@@ -129,9 +129,9 @@ function ironLawSkipRecords(cwd, id) {
 
 // ─── D1: the trunk boundary ────────────────────────────────────────────────
 
-test('approve of a ROOT item (target is trunk) whose diff touches a gated module still REFUSES — the gate is alive at the only boundary it guards', () => {
+test('approve of a ROOT item (target is trunk) whose diff touches a gated module still REFUSES — the gate is alive at the only boundary it guards', async () => {
   const cwd = initGitCwdMainFast();
-  makeGatedRoot(cwd, 'gate-root-trip');
+  await makeGatedRoot(cwd, 'gate-root-trip');
 
   const headBefore = gitHead(cwd);
   const result = run(cwd, ['approve', 'gate-root-trip']);
@@ -190,9 +190,9 @@ test("sync-root discriminates on !item.parent, NOT resolveRoot: a root whose par
 
 // ─── D3/D7: ironLaw.level, fail-closed to ask ──────────────────────────────
 
-test('a missing ironLaw key fails closed to ask — the root approve above still refuses (D7)', () => {
+test('a missing ironLaw key fails closed to ask — the root approve above still refuses (D7)', async () => {
   const cwd = initGitCwdMainFast();
-  makeGatedRoot(cwd, 'gate-level-absent');
+  await makeGatedRoot(cwd, 'gate-level-absent');
   assert.ok(
     readProjectConfig(cwd).ironLaw === undefined,
     'this case only means anything while the key is genuinely absent',
@@ -203,9 +203,9 @@ test('a missing ironLaw key fails closed to ask — the root approve above still
   assert.match(result.stderr, /Iron Law/);
 });
 
-test('an unrecognized ironLaw.level is refused by name and the approve never proceeds, so it never reads as warn (D7)', () => {
+test('an unrecognized ironLaw.level is refused by name and the approve never proceeds, so it never reads as warn (D7)', async () => {
   const cwd = initGitCwdMainFast();
-  makeGatedRoot(cwd, 'gate-level-bogus');
+  await makeGatedRoot(cwd, 'gate-level-bogus');
   writeIronLawLevel(cwd, 'whatever');
 
   const result = run(cwd, ['approve', 'gate-level-bogus']);
@@ -217,9 +217,9 @@ test('an unrecognized ironLaw.level is refused by name and the approve never pro
 
 // ─── D8: the warn-level record ─────────────────────────────────────────────
 
-test('ironLaw.level = warn lets the same root approve through AND writes exactly one decision record with kind engine (D3/D8)', () => {
+test('ironLaw.level = warn lets the same root approve through AND writes exactly one decision record with kind engine (D3/D8)', async () => {
   const cwd = initGitCwdMainFast();
-  makeGatedRoot(cwd, 'gate-level-warn');
+  await makeGatedRoot(cwd, 'gate-level-warn');
   writeIronLawLevel(cwd, 'warn');
 
   const result = run(cwd, ['approve', 'gate-level-warn']);
@@ -236,18 +236,18 @@ test('ironLaw.level = warn lets the same root approve through AND writes exactly
   assert.match(records[0].payload.text, new RegExp(GATED_MODULE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 });
 
-test('ironLaw.level = ask writes NO skip record when it refuses — the record marks a real skip, never an attempt (D8)', () => {
+test('ironLaw.level = ask writes NO skip record when it refuses — the record marks a real skip, never an attempt (D8)', async () => {
   const cwd = initGitCwdMainFast();
-  makeGatedRoot(cwd, 'gate-ask-no-record');
+  await makeGatedRoot(cwd, 'gate-ask-no-record');
   writeIronLawLevel(cwd, 'ask');
 
   assert.equal(run(cwd, ['approve', 'gate-ask-no-record']).status, 4);
   assert.equal(ironLawSkipRecords(cwd, 'gate-ask-no-record').length, 0);
 });
 
-test('merge next at level warn does NOT skip an Iron-Law item — the pure pre-check reads the same level the real gate does', () => {
+test('merge next at level warn does NOT skip an Iron-Law item — the pure pre-check reads the same level the real gate does', async () => {
   const cwd = initGitCwdMainFast();
-  makeGatedRoot(cwd, 'gate-merge-next-warn');
+  await makeGatedRoot(cwd, 'gate-merge-next-warn');
   writeIronLawLevel(cwd, 'warn');
 
   const result = run(cwd, ['merge', 'next']);
@@ -265,9 +265,9 @@ test('merge next at level warn does NOT skip an Iron-Law item — the pure pre-c
 // its own distinct wording (never "skipped") against the SAME loose
 // `/iron law/i` grep `ironLawSkipRecords` already uses.
 
-test('approve with --acknowledge-iron-law on a gated ROOT proceeds AND writes exactly one "acknowledged" decision record with kind engine, never "skipped" (tsk-sdr)', () => {
+test('approve with --acknowledge-iron-law on a gated ROOT proceeds AND writes exactly one "acknowledged" decision record with kind engine, never "skipped" (tsk-sdr)', async () => {
   const cwd = initGitCwdMainFast();
-  makeGatedRoot(cwd, 'gate-ack-approve');
+  await makeGatedRoot(cwd, 'gate-ack-approve');
 
   const result = run(cwd, ['approve', 'gate-ack-approve', '--acknowledge-iron-law']);
   assert.equal(result.status, 0, `an explicit acknowledgment must let the merge through: ${result.stdout}${result.stderr}`);
