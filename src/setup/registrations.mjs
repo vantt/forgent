@@ -502,7 +502,7 @@ export function checkRunnerPatternsConfig(cwd, run) {
         note(`${targetPath}: config-format-legacy-json: ${editsText}; edit ${targetPath}, then run \`fgos config migrate\``);
       }
     } catch (err) {
-      note(`${targetPath}: ${err.message}`);
+      note(err.message.startsWith(targetPath) ? err.message : `${targetPath}: ${err.message}`);
     }
   }
   for (const f of findings) {

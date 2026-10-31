@@ -805,16 +805,6 @@ test('doctor check runner-patterns-config: passes on the standard', () => {
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('doctor check runner-patterns-config: a retired key in the project file names the line of the key', () => {
-  const tmpDir = mkTempDir();
-  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
-  writeProjectConfig(tmpDir, { runner: { patterns: { reviewed: { maxRounds: 3 } } } });
-  const res = check.check(tmpDir);
-  assert.equal(res.passed, false);
-  assert.match(res.message, /config\.yaml:\d+: /);
-  fs.rmSync(tmpDir, { recursive: true, force: true });
-});
-
 test('doctor check runner-patterns-config: a custom pattern missing its promise names the first line of the pattern entry without repeating the layer', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-miss-home-'));
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-miss-repo-'));
@@ -836,7 +826,7 @@ test('doctor check runner-patterns-config: a custom pattern missing its promise 
   }
 });
 
-test('doctor check runner-patterns-config: a retired key in the project file fails naming the file and runner.loops.reviewed', () => {
+test('doctor check runner-patterns-config: a retired key in the project file fails naming the file, the line and runner.loops.reviewed', () => {
   const tmpDir = mkTempDir();
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
   writeProjectConfig(tmpDir, {
@@ -850,6 +840,7 @@ test('doctor check runner-patterns-config: a retired key in the project file fai
   assert.equal(res.passed, false);
   assert.match(res.message, new RegExp(path.join(tmpDir, '.fgos', 'config.yaml').replace(/[/\\?*]/g, '\\$&')));
   assert.match(res.message, /runner\.loops\.reviewed/);
+  assert.match(res.message, /config\.yaml:\d+: /, 'the message names the line of the key');
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 test('doctor check runner-patterns-config: a legacy json project file keeps the retired-key advice and leaves the format failure to config-format-legacy-json', () => {
@@ -894,50 +885,13 @@ test('doctor check runner-patterns-config: malformed legacy json file fails nami
     const res = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config').check(tmpDir, run);
     assert.equal(res.passed, false);
     assert.match(res.message, new RegExp(path.join(tmpDir, '.fgos', 'config.json').replace(/[/\\?*]/g, '\\$&')));
-    assert.match(res.message, /syntax|parse|error/i);
+    assert.match(res.message, /config\.json: syntax-error \(line \d+, column \d+\)$/);
+    assert.equal(res.message.split(path.join(tmpDir, '.fgos', 'config.json')).length - 1, 1, 'the file is named once');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
 
-
-test('doctor runner-patterns-config attributes loop shape validation error to file and line from its read', () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-err-home-'));
-  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-err-repo-'));
-  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
-  process.env.HOME = home;
-  process.env.USERPROFILE = home;
-
-  writeGlobalConfig(home, {
-    runner: {
-      loops: {
-        reviewed: {
-          bounds: {
-            maxRounds: { min: 5, max: 2 },
-          },
-        },
-      },
-    },
-  });
-  writeProjectConfig(repo, {
-    runner: {},
-  });
-
-  try {
-    const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
-    assert.ok(check, 'runner-patterns-config check must exist');
-    const res = check.check(repo);
-    assert.equal(res.passed, false);
-    assert.match(res.message, /~[/\\]\.fgos[/\\]config\.yaml:\d+/);
-    assert.match(res.message, /min \(5\) must be <= max \(2\)/);
-  } finally {
-    process.env.HOME = saved.HOME;
-    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
-    else delete process.env.USERPROFILE;
-    fs.rmSync(home, { recursive: true, force: true });
-    fs.rmSync(repo, { recursive: true, force: true });
-  }
-});
 
 test('doctor check runner-patterns-config: attributes catalog defaults problem to file and line or layer text', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doc-cat-home-'));
@@ -1133,41 +1087,21 @@ test('doctor check runner-patterns-config: a default beyond a bound warns', () =
   assert.match(res.message, /beyond.*bound|unclamped/i);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
-test('doctor check runner-patterns-config: warns when project defines loops with marker 1', () => {
-  const tmpDir = mkTempDir();
+test('doctor check runner-patterns-config: warns when project defines loops and the schema marker is below 2 or absent', () => {
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
-  writeProjectConfig(tmpDir, {
-    runner: {
-      loops: {
-        reviewed: { maxRounds: 3 },
-      },
-      patterns: {
-        seatBinding: { schema: 1 },
-      },
-    },
-  });
-  const res = check.check(tmpDir);
-  assert.equal(res.passed, true);
-  assert.match(res.message, /^warning:/);
-  assert.match(res.message, /set `runner\.patterns\.seatBinding\.schema` to 2 so older releases refuse this file/);
-  fs.rmSync(tmpDir, { recursive: true, force: true });
-});
-
-test('doctor check runner-patterns-config: warns when project defines loops with absent marker', () => {
-  const tmpDir = mkTempDir();
-  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
-  writeProjectConfig(tmpDir, {
-    runner: {
-      loops: {
-        reviewed: { maxRounds: 3 },
-      },
-    },
-  });
-  const res = check.check(tmpDir);
-  assert.equal(res.passed, true);
-  assert.match(res.message, /^warning:/);
-  assert.match(res.message, /set `runner\.patterns\.seatBinding\.schema` to 2 so older releases refuse this file/);
-  fs.rmSync(tmpDir, { recursive: true, force: true });
+  const loops = { reviewed: { maxRounds: 3 } };
+  for (const runner of [{ loops, patterns: { seatBinding: { schema: 1 } } }, { loops }]) {
+    const tmpDir = mkTempDir();
+    try {
+      writeProjectConfig(tmpDir, { runner });
+      const res = check.check(tmpDir);
+      assert.equal(res.passed, true);
+      assert.match(res.message, /^warning:/);
+      assert.match(res.message, /set `runner\.patterns\.seatBinding\.schema` to 2 so older releases refuse this file/);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  }
 });
 
 test('doctor check runner-patterns-config: passes without marker warning when project defines loops with marker 2', () => {

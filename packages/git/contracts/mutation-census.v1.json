@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "6b0af567af2e81261fc32fdeb5c4c2fd8567ac8a79ae45e3b3806928d862039e",
+  "payloadDigest": "ba781cfa4728d3541b86a3762c403df6b36155e3217482de633286e3e71eca5c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1122,7 +1122,7 @@
     "src/setup/mailbox-limits.mjs": "ba0ec014f188f3d84842b0997c60a524fc4e5df2a79f7216d2df471878d51513",
     "src/setup/model-pool-checks.mjs": "a770f17808c6a02cd2d5e50e145711635587f78eddf0639eb5525a7d442a9246",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "2bcffd1dde33a7005972a48fedf9103645c177cd3f6b3c3e40847f21b22fa634",
+    "src/setup/registrations.mjs": "f85c25eea2b700d58f911e15f6c78270c619f004f29a5744d3148e2199d9e831",
     "src/setup/run-supervisor-checks.mjs": "44e8b33ffdb5fee2f178549160ba25d94bc698056469852c6306e6352c1bdd3d",
     "src/setup/runner-config-conversion.mjs": "7ea5607079d0bf2399652ade3254cff1cec8eaea0259563252f1aebf60e76ca0",
     "src/setup/seat-binding-checks.mjs": "1620c36971e9f1ba1e113715b334b1b3b326dd62bfd2d557656fade19aa73691",

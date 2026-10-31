@@ -661,9 +661,9 @@ test('lintPhaseUnits warns on unknown pattern', () => {
 test('lintPhaseUnits throws when the shipped catalog cannot be read instead of skipping the pattern check', () => {
   const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('FGOS_')));
   const modulePath = path.join(__dirname, '..', '..', 'src', 'report', 'capability-plan-lint.mjs');
-  const script = `import(${JSON.stringify(modulePath)}).then((m) => { try { m.lintPhaseUnits('## Units\\n- unit: u1\\n  capability: docs:write\\n  objective: x\\n  pattern: unearthly-ritual\\n'); console.log('LINTED'); } catch (e) { console.log('THROWN ' + e.message.slice(0, 80)); } });`;
+  const script = `import(${JSON.stringify(modulePath)}).then((m) => { try { m.lintPhaseUnits('## Units\\n- unit: u1\\n  capability: docs:write\\n  objective: x\\n  pattern: unearthly-ritual\\n'); console.log('LINTED'); } catch (e) { console.log('THROWN ' + e.message.slice(0, 200)); } });`;
   const res = spawnSync(process.execPath, ['-e', script], { cwd: os.tmpdir(), env, encoding: 'utf8' });
-  assert.match(res.stdout, /^THROWN /m, res.stderr);
+  assert.match(res.stdout, /^THROWN git-addon-unavailable: addon not shipped/m, res.stderr);
 });
 
 test('lintPhaseUnits accepts a pattern defined in the project catalog and flags a typo', () => {

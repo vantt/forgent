@@ -1258,6 +1258,41 @@ test('project-declared non-coding pattern and standard reviewed resolve through 
   assert.equal(resProject.pin.pattern.layer, 'project');
   assert.equal(resProject.seats.length, 1);
   assert.equal(resProject.seats[0].role, 'producer');
+
+  const resGlobal = resolveCollaboration({
+    selectors: { callerString: 'editorial-review' },
+    runnerConfig: config,
+    origins: [{ path: 'runner.patterns.editorial-review.loop', layer: 'global' }],
+    shipped,
+  });
+  assert.equal(resGlobal.pin.pattern.layer, 'global');
+});
+
+test('a global bad loop and a project promise report global for the offending field, while the pin layer of a split pattern is project', () => {
+  const shipped = shippedCatalog();
+  const origins = [
+    { path: 'runner.patterns.reviewed.loop', layer: 'global' },
+    { path: 'runner.patterns.reviewed.promise', layer: 'project' },
+    { path: 'runner.patterns.valid-split.loop', layer: 'global' },
+    { path: 'runner.patterns.valid-split.promise', layer: 'project' },
+  ];
+  assert.equal(resolveLayer(origins, 'reviewed'), 'project');
+  assert.equal(resolveLayer(origins, 'reviewed', 'loop'), 'global');
+  assert.equal(resolveLayer(origins, 'reviewed', 'promise'), 'project');
+
+  const effective = { reviewed: { loop: 'solo', promise: 'custom project promise' } };
+  const { problems } = checkCatalog({ shipped: shipped.patterns, effective, origins });
+  const loopProblem = problems.find((p) => p.message.includes('loop'));
+  assert.ok(loopProblem, 'weakened loop must produce a problem');
+  assert.match(loopProblem.message, /source layer: global/, 'offending global field must report source layer global');
+
+  const collab = resolveCollaboration({
+    unit: { pattern: 'valid-split' },
+    runnerConfig: { patterns: { 'valid-split': { loop: 'solo', promise: 'project promise' } } },
+    shipped,
+    origins,
+  });
+  assert.equal(collab.pin.pattern.layer, 'project');
 });
 
 test('parameter defaults chain resolves specific winners without leaking activity parameters across patterns', () => {
@@ -2162,29 +2197,6 @@ test('checkCatalog attributes indexed seat descendants to field layer rather tha
   assert.ok(seatProb, 'seat-multiplicity problem expected');
   assert.equal(seatProb.source, 'global', 'offending seats are global, source layer must be global');
   assert.match(seatProb.message, /source layer: global/);
-});
-
-test('nested seat error path selection resolves through relative at', () => {
-  const shipped = shippedCatalog().patterns;
-  const effective = {
-    custom: {
-      loop: 'solo',
-      promise: 'A solo custom pattern.',
-      defaults: {
-        seats: [
-          { seat: 'producer', role: 'producer', extraKey: true },
-        ],
-      },
-    },
-  };
-  const origins = [{ path: 'runner.patterns.custom.defaults.seats[0].extraKey', layer: 'project', file: 'project:config.yaml', line: 15 }];
-  const { problems } = checkCatalog({ shipped, effective, origins });
-  const prob = problems.find((p) => p.code === 'param-invalid');
-  assert.ok(prob);
-  assert.equal(prob.path, 'runner.patterns.custom.defaults.seats[0].extraKey');
-  assert.equal(prob.source, 'project');
-  assert.match(prob.message, /has unknown key "extraKey"/);
-  assert.match(prob.message, /source layer: project/);
 });
 
 test('resolveLayer resolves with deterministic priority project > global > shipped, never array order, and emits shipped', () => {

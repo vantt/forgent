@@ -630,10 +630,7 @@ test('empty-patch notice in formatGlobalRetiredNotice prints neither a command n
 
 test('empty-patch notice in CLI setup prints neither a command nor a patch body', () => {
   const { projectDir, homeDir } = makeTempDirs();
-  const prevHome = process.env.HOME;
   try {
-    process.env.HOME = homeDir;
-    process.env.USERPROFILE = homeDir;
     writeProjectConfig(projectDir, {
       runner: {
         patterns: {
@@ -661,7 +658,6 @@ test('empty-patch notice in CLI setup prints neither a command nor a patch body'
     assert.doesNotMatch(humanResult.stdout, /from a directory outside any fgOS project/);
     assert.doesNotMatch(humanResult.stdout, /patch body/);
   } finally {
-    process.env.HOME = prevHome;
     cleanupDirs({ projectDir, homeDir });
   }
 });

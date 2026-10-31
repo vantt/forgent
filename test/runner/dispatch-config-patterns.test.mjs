@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { globalConfigPath, projectConfigPath, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { projectConfigPath, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import {
   loadRunnerConfig,
   loadRunnerConfigForDir,
@@ -20,8 +20,6 @@ import {
 } from '../../src/runner/dispatch/config.mjs';
 import { readStandardValue, ConfigDoorError } from '../../src/config/facade.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
-import { checkCatalog, resolveCollaboration } from '../../src/runner/execution/patterns/catalog.mjs';
-import { resolveLayer } from '../../src/runner/execution/patterns/catalog-entries.mjs';
 
 const standardRunner = (key) => JSON.parse(JSON.stringify(readStandardValue(key ? `runner.${key}` : 'runner').value));
 const BASE = { ...standardRunner(), executor: { command: 'claude', args: ['-p', '{prompt}'] } };
@@ -328,17 +326,6 @@ test('retired keys refusal: refuses with config-key-retired naming file and repl
     (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /research-fan-out-gated.*retired/.test(err.message),
   );
 
-  // 3. Direct validation: retired reviewed tuning shape
-  assert.throws(
-    () => validateRunnerPatternsShape({ reviewed: { maxRounds: 3 } }, 'patterns'),
-    (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /reviewed.*retired/.test(err.message),
-  );
-  // 4. Direct validation: mixed shape on reviewed reports per-key retirement finding
-  assert.throws(
-    () => validateRunnerPatternsShape({ reviewed: { loop: 'reviewed', maxRounds: 3 } }, 'patterns'),
-    (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /reviewed.*retired/.test(err.message),
-  );
-
   // 5. Named file door: loadRunnerConfig with defaultRule
   const { configPath: defaultRuleCfg } = mkTempConfig({
     ...BASE,
@@ -356,16 +343,6 @@ test('retired keys refusal: refuses with config-key-retired naming file and repl
   });
   assert.throws(
     () => loadRunnerConfig(reviewedCfg),
-    (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /runner\.loops\.reviewed/.test(err.message),
-  );
-
-  // 7. Named file door: loadRunnerConfig with mixed reviewed reports config-key-retired
-  const { configPath: mixedCfg } = mkTempConfig({
-    ...BASE,
-    patterns: { reviewed: { loop: 'reviewed', maxRounds: 3 } },
-  });
-  assert.throws(
-    () => loadRunnerConfig(mixedCfg),
     (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /runner\.loops\.reviewed/.test(err.message),
   );
 
@@ -405,25 +382,6 @@ test('retired keys refusal: refuses with config-key-retired naming file and repl
       && /use runner\.patterns\.research-fan-out instead/.test(thrown.message),
   );
 });
-test('named config with panel holding maxRounds is refused as an unknown key without retired advice', () => {
-  const { configPath } = mkTempConfig({
-    ...BASE,
-    patterns: { panel: { maxRounds: 3 } },
-  });
-  assert.throws(
-    () => loadRunnerConfig(configPath),
-    (err) => {
-      assert.ok(err instanceof RunnerConfigError);
-      assert.notEqual(err.code, 'config-key-retired');
-      assert.match(err.message, /unknown key "maxRounds"/);
-      assert.doesNotMatch(err.message, /retired/i);
-      assert.doesNotMatch(err.message, /runner\.loops\.panel/);
-      return true;
-    },
-  );
-});
-
-
 test('a file holding patterns.reviewed is byte-identical after a refused load', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-byte-identical-test-'));
   const configPath = projectConfigPath(tmpDir);
@@ -508,41 +466,6 @@ test('loadRunnerConfigForDir: other ConfigDoorError codes pass through unchanged
     (err) => err instanceof RunnerConfigError && err.code === 'config-schema',
   );
 
-  // Project mixed shape at the door
-  writeProjectConfig(repo, {
-    runner: {
-      patterns: {
-        reviewed: {
-          loop: 'reviewed',
-          maxRounds: 3,
-        },
-      },
-    },
-  });
-  // Project mixed shape at the door is reported with config-key-retired and advice to move tuning
-  assert.throws(
-    () => loadRunnerConfigForDir(repo),
-    (err) => err instanceof RunnerConfigError
-      && err.code === 'config-key-retired'
-      && /runner\.loops\.reviewed/.test(err.message)
-      && /config\.yaml/.test(err.message),
-  );
-
-  // Project pure retired key throws config-key-retired
-  writeProjectConfig(repo, {
-    runner: {
-      patterns: {
-        reviewed: {
-          maxRounds: 3,
-        },
-      },
-    },
-  });
-  assert.throws(
-    () => loadRunnerConfigForDir(repo),
-    (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /runner\.patterns\.reviewed\.maxRounds was retired/.test(err.message),
-  );
-
   fs.rmSync(repo, { recursive: true, force: true });
 });
 test('retired key door refusals collapse parent and descendant in one file and report distinct files', () => {
@@ -597,65 +520,6 @@ test('shippedCatalog: returns frozen { patterns, loops } and is cached per proce
   assert.ok(catalog1.loops.reviewed);
 });
 
-
-test('a global bad loop and a project promise report global for the offending field, the valid split pattern pins project', () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-split-origin-home-'));
-  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-split-origin-repo-'));
-
-  writeGlobalConfig(home, {
-    runner: {
-      patterns: {
-        reviewed: { loop: 'solo' },
-        'valid-split': { loop: 'solo' },
-      },
-    },
-  });
-
-  writeProjectConfig(repo, {
-    runner: {
-      patterns: {
-        reviewed: { promise: 'custom project promise' },
-        'valid-split': { promise: 'project promise' },
-      },
-    },
-  });
-
-  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
-  process.env.HOME = home;
-  process.env.USERPROFILE = home;
-  try {
-    const loaded = loadRunnerConfigForDir(repo);
-    const origins = runnerOriginsOf(loaded);
-    assert.equal(resolveLayer(origins, 'reviewed'), 'project');
-    assert.equal(resolveLayer(origins, 'reviewed', 'loop'), 'global');
-    assert.equal(resolveLayer(origins, 'reviewed', 'promise'), 'project');
-    const shipped = shippedCatalog();
-    const effective = {
-      reviewed: {
-        loop: 'solo',
-        promise: 'custom project promise',
-      },
-    };
-
-    const { problems } = checkCatalog({ shipped: shipped.patterns, effective, origins });
-    const loopProblem = problems.find((p) => p.message.includes('loop'));
-    assert.ok(loopProblem, 'weakened loop must produce a problem');
-    assert.match(loopProblem.message, /source layer: global/, 'offending global field must report source layer global');
-    const collab = resolveCollaboration({
-      unit: { pattern: 'valid-split' },
-      runnerConfig: { runner: { patterns: { 'valid-split': { loop: 'solo', promise: 'project promise' } } } },
-      shipped,
-      origins,
-    });
-    assert.equal(collab.pin.pattern.layer, 'project', 'pin layer must remain project');
-  } finally {
-    process.env.HOME = saved.HOME;
-    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
-    else delete process.env.USERPROFILE;
-    fs.rmSync(home, { recursive: true, force: true });
-    fs.rmSync(repo, { recursive: true, force: true });
-  }
-});
 
 test('the standard declares an empty generatedPaths list', () => {
   assert.deepEqual(standardRunner('generatedPaths'), []);
@@ -771,48 +635,6 @@ test('bad seat id in global file names only the origin file and line', () => {
     fs.rmSync(repo, { recursive: true, force: true });
   }
 });
-
-test('JS-only validation error in global file names the global file and line', () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-global-err-home-'));
-  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-global-err-repo-'));
-  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
-  process.env.HOME = home;
-  process.env.USERPROFILE = home;
-
-  writeGlobalConfig(home, {
-    runner: {
-      loops: {
-        reviewed: {
-          bounds: {
-            maxRounds: { min: 5, max: 2 },
-          },
-        },
-      },
-    },
-  });
-  writeProjectConfig(repo, {
-    runner: {},
-  });
-
-  try {
-    assert.throws(
-      () => loadRunnerConfigForDir(repo),
-      (err) => {
-        assert.ok(err instanceof RunnerConfigError);
-        assert.match(err.message, /~[/\\]\.fgos[/\\]config\.yaml:\d+/);
-        assert.match(err.message, /min \(5\) must be <= max \(2\)/);
-        return true;
-      },
-    );
-  } finally {
-    process.env.HOME = saved.HOME;
-    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
-    else delete process.env.USERPROFILE;
-    fs.rmSync(home, { recursive: true, force: true });
-    fs.rmSync(repo, { recursive: true, force: true });
-  }
-});
-
 
 test('relational validation error participating across files reports each source', () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-home-'));

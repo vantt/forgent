@@ -25,7 +25,7 @@ seedFileLocalBwrapRegistry();
 // must reach (command, worker script, worktree) live outside it.
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
-import { writeProjectConfig, writeGlobalConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeProjectConfig, writeGlobalConfig, readProjectConfig, withHome } from '../../helpers/config-fixture.mjs';
 
 function setupGitRepo() {
   const tmp = makeFixtureDir('fgos-run-test-');
@@ -199,7 +199,7 @@ test('runUnit runs solo read-only unit end-to-end', async () => {
   assert.ok(summary.settledAt);
 });
 
-test('run uses the loaded origins', async () => {
+test('a run pins the layer of the file that declared its pattern', async () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-run-origins-home-'));
   const { repoRoot, worktreeDir } = setupGitRepo();
   writeGlobalConfig(home, {
@@ -213,42 +213,22 @@ test('run uses the loaded origins', async () => {
     },
   });
 
-  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
-  process.env.HOME = home;
-  process.env.USERPROFILE = home;
   try {
-    let unitRunId = null;
-    try {
-      const res = await runUnit({
-        unitData: {
-          id: 'u-global-1',
-          objective: 'Run with global pattern',
-          capability: 'docs:write',
-          writes: [],
-        },
-        repoRoot,
-        cwd: worktreeDir,
-        pattern: 'global-only-pat',
-      });
-      unitRunId = res.unitRunId;
-    } catch (err) {
-      const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
-      if (fs.existsSync(assignmentsDir)) {
-        const runs = fs.readdirSync(assignmentsDir).filter((n) => n.startsWith('unit-run-'));
-        if (runs.length > 0) {
-          unitRunId = runs[0];
-        }
-      }
-      if (!unitRunId) throw err;
-    }
-
-    const unitJsonPath = path.join(repoRoot, '.fgos', 'assignments', unitRunId, 'unit.json');
+    const res = await withHome(home, () => runUnit({
+      unitData: {
+        id: 'u-global-1',
+        objective: 'Run with global pattern',
+        capability: 'docs:write',
+        writes: [],
+      },
+      repoRoot,
+      cwd: worktreeDir,
+      pattern: 'global-only-pat',
+    }));
+    const unitJsonPath = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json');
     const record = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
     assert.equal(record.collaboration?.pattern?.layer, 'global', 'global-only custom pattern must pin layer global');
   } finally {
-    process.env.HOME = saved.HOME;
-    if (saved.USERPROFILE !== undefined) process.env.USERPROFILE = saved.USERPROFILE;
-    else delete process.env.USERPROFILE;
     fs.rmSync(home, { recursive: true, force: true });
     fs.rmSync(repoRoot, { recursive: true, force: true });
   }

@@ -160,3 +160,30 @@ export function statGatewayToken(globalDir) {
 export function readGatewayToken(globalDir) {
   return fs.readFileSync(gatewayTokenPath(globalDir), 'utf8');
 }
+
+/**
+ * Runs `fn` with HOME and USERPROFILE pointing at `home`, then puts both back
+ * (a variable that was unset is deleted again, never left as the string
+ * "undefined"). Works for a sync or an async `fn`.
+ */
+export function withHome(home, fn) {
+  const saved = { HOME: process.env.HOME, USERPROFILE: process.env.USERPROFILE };
+  const restore = () => {
+    for (const [key, value] of Object.entries(saved)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  };
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+  let result;
+  try {
+    result = fn();
+  } catch (err) {
+    restore();
+    throw err;
+  }
+  if (result && typeof result.then === 'function') return result.finally(restore);
+  restore();
+  return result;
+}
