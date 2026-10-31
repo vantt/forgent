@@ -25,20 +25,24 @@ function context(cwd, loaderOptions) {
 // A row is its problems joined into one sentence, or its passing text; the facts it judged go under detail.
 const row = (problems, ok, detail, found = problems.filter(Boolean)) => found.length ? { passed: false, message: found.join('; '), detail } : { passed: true, message: ok, detail };
 
-/**
- * One Git doctor row. With a doctor `run`, rows of the run share one inspection of the repository for the configured
- * remote, and one worktree recovery view; the transport-config row adds one more `inspectGit` only when that remote is
- * not `origin`. Without a run the row inspects alone.
- */
-export function checkGit(cwd, kind, loaderOptions, portOptions, run) {
-  const recovery = kind === 'git-worktree-recovery';
+// One inspection per distinct question: with a doctor run it is asked once and shared, without one it is asked alone.
+function gitFacts(cwd, recovery, loaderOptions, run) {
   const inspect = () => {
     const found = context(cwd, loaderOptions);
     const { native, stateRoot, root, remote } = found;
     return { ...found, facts: recovery ? native.inspectGitWorktreeRecovery(stateRoot, cwd, root) : native.inspectGit(stateRoot, cwd, root, remote) };
   };
+  return run ? run.once(`git-${recovery ? 'worktree-recovery' : 'inspect'}:${cwd}`, inspect) : inspect();
+}
+/**
+ * One Git doctor row. With a doctor `run`, rows of the run (and the Node-and-Git floor row) share one inspection of the repository for the
+ * configured remote, and one worktree recovery view; the transport-config row adds one more `inspectGit` only when that remote is
+ * not `origin`. Without a run the row inspects alone.
+ */
+export function checkGit(cwd, kind, loaderOptions, portOptions, run) {
+  const recovery = kind === 'git-worktree-recovery';
   try {
-    const { root, remote, stateRoot, native, facts } = run ? run.once(`git-${recovery ? 'worktree-recovery' : 'inspect'}:${cwd}`, inspect) : inspect();
+    const { root, remote, stateRoot, native, facts } = gitFacts(cwd, recovery, loaderOptions, run);
     if (facts.notARepository && kind !== 'git-component-compatible') return { passed: true, message: 'info: not a Git repository' };
     switch (kind) {
       case 'git-worktree-recovery': {
@@ -94,9 +98,8 @@ export function checkMutationOneDoor(payloadRoot = OWN_PAYLOAD_ROOT) {
   return verifyCensus(doc, payloadRoot);
 }
 /** The Git binary fgos-git runs and its floor verdict; Git is only ever spawned by the driver. */
-export function gitFloor(cwd, loaderOptions) {
-  const { root, stateRoot, native } = context(cwd, loaderOptions);
-  return native.inspectGit(stateRoot, cwd, root).floor;
+export function gitFloor(cwd, loaderOptions, run) {
+  return gitFacts(cwd, false, loaderOptions, run).facts.floor;
 }
 /** The repository as the fixes found it, or null when there is none to fix. */
 function readBefore(cwd, loaderOptions) {

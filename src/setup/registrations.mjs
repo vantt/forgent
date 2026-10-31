@@ -343,14 +343,14 @@ function checkCliVersionVisible() {
   return { passed: true, message: `fgos ${info.packageVersion}${commitPart} — ${info.verbs.length} verbs` };
 }
 
-function checkNodeAndGit(cwd) {
+function checkNodeAndGit(cwd, run) {
   const major = parseInt(process.version.slice(1).split('.')[0], 10);
   if (Number.isNaN(major) || major < MIN_NODE_MAJOR) {
     return { passed: false, message: `node ${process.version} — need >=${MIN_NODE_MAJOR}` };
   }
   let floor;
   try {
-    floor = gitFloor(cwd);
+    floor = gitFloor(cwd, undefined, run);
   } catch (err) {
     return { passed: false, message: `git not available: ${err.message}` };
   }
@@ -1336,7 +1336,7 @@ function checkToolRegistryConfigured(cwd) {
 registerCheck({
   id: 'node-version-and-git',
   description: `Node >=${MIN_NODE_MAJOR} and git available`,
-  check: (cwd) => checkNodeAndGit(cwd),
+  check: (cwd, run) => checkNodeAndGit(cwd, run),
 });
 
 registerCheck({

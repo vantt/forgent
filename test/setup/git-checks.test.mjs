@@ -75,7 +75,7 @@ test('the repository rows report information, not a failure, outside a Git repos
   });
 });
 
-test('the five Git rows of one doctor run share one repository inspection', { skip: process.platform === 'win32' }, () => {
+test('the Git rows and the Git floor of one doctor run share one repository inspection', { skip: process.platform === 'win32' }, () => {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-git-run-'));
   try {
     execFileSync('git', ['init', '-q', repo], { stdio: 'ignore' });
@@ -84,6 +84,7 @@ test('the five Git rows of one doctor run share one repository inspection', { sk
     const run = { once: (key, compute) => base.once(key, () => { computed.push(key.split(':')[0]); return compute(); }) };
     const ids = ['git-worktree-recovery', 'git-component-compatible', 'git-repository-config', 'git-operation-journal', 'git-native-locks'];
     for (const id of ids) assert.equal(typeof DOCTOR_CHECKS.find((row) => row.id === id).check(repo, run).passed, 'boolean', id);
+    assert.equal(DOCTOR_CHECKS.find((row) => row.id === 'node-version-and-git').check(repo, run).passed, true);
     assert.deepEqual(computed.sort(), ['git-inspect', 'git-worktree-recovery']);
   } finally { fs.rmSync(repo, { recursive: true, force: true }); }
 });
