@@ -1825,7 +1825,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const id = requireField(positional[0] ?? flags.id, 'resolve-park-reason requires an id: fgos resolve-park-reason <id> --note "..."');
       const note = requireField(flags.note, 'resolve-park-reason requires --note "..."');
       const role = optionalField(flags.role, 'resolve-park-reason --role requires "human" or "session" (omit --role entirely to default to human)') ?? 'human';
-      const event = resolveParkReason(dir, { id, note, role });
+      const { event } = resolveParkReason(dir, { id, note, role });
       return { id, type: event.type, seq: event.seq };
     }
 

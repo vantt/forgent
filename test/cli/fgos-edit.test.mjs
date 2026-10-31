@@ -69,7 +69,7 @@ test('edit --verify-from-children run from inside a linked worktree with --dir a
   assert.ok(!verify.includes(worktreePath), `verify must not bake in the worktree's own path: ${verify}`);
 });
 
-test('fgos resolve-park-reason requires --note (exit 4) and records the note it is given', () => {
+test('fgos resolve-park-reason requires --note (exit 4), records the note it is given and prints the event type and seq', () => {
   const cwd = tmpCwdFromTemplate();
   assert.equal(addOk(cwd, 'resolve-cli-item').status, 0);
   assert.equal(moveOk(cwd, 'resolve-cli-item', 'awaiting-approval', { skipReturnGuard: 'test setup' }).status, 0);
@@ -83,6 +83,6 @@ test('fgos resolve-park-reason requires --note (exit 4) and records the note it 
   // boundary: the envelope is written by bin/fgos.mjs's dispatcher.
   const result = run(cwd, ['resolve-park-reason', 'resolve-cli-item', '--note', 'Clean close check']);
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(envelopeData(result.stdout).id, 'resolve-cli-item');
+  assert.deepEqual(envelopeData(result.stdout), { id: 'resolve-cli-item', type: 'work.resolve-park-reason', seq: eventLines(cwd).length });
   assert.equal(stateView(cwd).parkResolutions['resolve-cli-item'][0].note, 'Clean close check');
 });
