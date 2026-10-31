@@ -2162,8 +2162,17 @@ fn a_wake_asked_from_another_machine_is_signed_as_version_two_and_takes_effect_o
     assert_eq!(shape("wake one"), (2.into(), Some(true.into())));
     assert_eq!(shape("plain one"), (1.into(), None), "a send without --wake is unchanged");
 
-    sync_child(&cross.alpha);
-    sync_child(&cross.beta);
+    // Each send started its own detached sync child, and a foreground run that finds one holding the
+    // sync lock skips: beta may fetch before alpha's last push lands, which only delays the mail, so
+    // the machines sync until the four messages are in or a bounded wait runs out.
+    for _ in 0..40 {
+        sync_child(&cross.alpha);
+        sync_child(&cross.beta);
+        if recorded_wakes(&cross.beta).len() == 4 {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(250));
+    }
     assert_eq!(
         recorded_wakes(&cross.beta),
         vec![(true, true), (true, true), (true, false), (false, false)],

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f05f1bcbdb5222876888581551e9e0d0548c9c18c2265ef8f481a13b8ca69012",
+  "payloadDigest": "0f86e97c40c1ffdaf99c534e7d15bff35ce1a8cab86ee7bf9291e0864f77cf56",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -104,7 +104,7 @@
     "apps/fgos/src/wiring/mod.rs": "4eba0a0cbbcde164f4224ffa41d27b1cb53ddf32883ae149339dca22d244a5d0",
     "apps/fgos/tests/cli_tests.rs": "dd4111d7673fb8944b84e329704cf5ca141e51656bd1e5be26b0cf0a69de69e6",
     "apps/fgos/tests/internal_lock_routes.rs": "70aa38db75a1257e00b500549a2cf22b57032aff4a6d7b51d992d4a3f95d274a",
-    "apps/fgos/tests/mailbox_routes.rs": "95ae691c87a115e238bddbd1fc4658cda9241e2b5e9dff90db56c3e5586a52cf",
+    "apps/fgos/tests/mailbox_routes.rs": "a2eefd1a15bc3429dfa9fc4a04af100bebcecddd0934f9cf5b3a522775125f41",
     "apps/fgos/tests/mailbox_sync_child.rs": "77e2cc853d435a908f60f3c0dcfca4f36894742f64f3334da4d8c6176414f2be",
     "apps/fgos/tests/windows_borrow.rs": "59258d09ea0b2420b7cecfe73fd9b67d61f83bb3a4d97feaa770aa6d26a05521",
     "apps/fgos/tests/windows_lock_hold_route.rs": "fe11272fb65d947366300770cd5765c1604c800eeac7f052fad57320db7e8530",
