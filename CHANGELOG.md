@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- In the coding guide `review-item` needs only a validated plan, so an independent review can read a slice before it is verified or landed; `integrate` and the rest still wait for `child-verified`, and a review proposed at the validated-plan point is a listed route, not a deviation.
 - `fgos workflow start --inherit <closedCaseId>` lets a new case take over the milestones a closed case of the same guide, request and base commit already reached (for the coding guide, `decisions-locked` and `plan-validated`), so a successor case does not repeat the lock and validate dispatches. Delivery, integration, approval and merge milestones are never taken over; the source case and its receipts are recorded on the new case's opening event, and a case that is open, ran another guide or request, or started on another commit is refused by name.
 - A writing dispatch whose seats were never given their brief (the pane's agent lost the terminal before anything was typed, or the launch was abandoned first) is handed back to its case instead of spending the frame's writing dispatch, so a retry is not refused for a run that did nothing.
 - A mail sent with `--wake` now starts a turn in an idle Claude Code session, through the session's own socket, when that session accepts cross-session input (`crossSessionInbound: accept` in its settings); a session that does not accept is never written to and the report says `no-accept`.

@@ -451,7 +451,7 @@
           "id": "review-item",
           "operation": "executing/review-item",
           "entry": [
-            "child-verified"
+            "plan-validated"
           ],
           "produces": [],
           "effects": "none"
@@ -535,7 +535,8 @@
           "reason": "the reviewed pattern catches regressions before integration",
           "mayInstead": [
             "fix-verify-red",
-            "scoped-subtask"
+            "scoped-subtask",
+            "review-item"
           ]
         },
         {

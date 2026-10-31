@@ -46,7 +46,8 @@ fgos workflow status <caseId> --json     # read data.case
 Guide activities for a plan: `judge-ambiguity` or `lock-decisions` (reach
 `decisions-locked`), `validate-plan` (a reviewed read-only pass over the plan,
 reaches `plan-validated`), `implement-item` (a writing slice, reviewed, reaches
-`child-verified`), `review-item`, `fix-verify-red`, `scoped-subtask`,
+`child-verified`), `review-item` (read-only; it needs only `plan-validated`, so it can
+read work that is not yet verified), `fix-verify-red`, `scoped-subtask`,
 `scout-blast-radius`, `resolve-question`, `integrate`. The decision points say which
 route is `should` and which `may-instead`; going elsewhere is allowed with a reason.
 

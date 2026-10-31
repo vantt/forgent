@@ -143,7 +143,7 @@ activities:
   - { id: shape-plan, operation: planning/shape-plan, entry: [decisions-locked], produces: [plan-validated], effects: none, unit: { pattern: solo } }
   - { id: validate-plan, operation: planning/validate-plan, entry: [decisions-locked], produces: [plan-validated], effects: none, unit: { pattern: reviewed } }
   - { id: implement-item, operation: executing/implement-item, entry: [plan-validated], produces: [child-verified], effects: writes, unit: { pattern: reviewed } }
-  - { id: review-item, operation: executing/review-item, entry: [child-verified], produces: [], effects: none }
+  - { id: review-item, operation: executing/review-item, entry: [plan-validated], produces: [], effects: none }
   - { id: fix-verify-red, operation: executing/fix-verify-red, entry: [plan-validated], produces: [child-verified], effects: writes }
   - { id: integrate, operation: none, entry: [child-verified], produces: [integrated], effects: writes, unit: { kind: integrate } }
   - { id: resolve-question, operation: discovery/resolve-question, entry: [request-received], produces: [], effects: none }
@@ -161,7 +161,7 @@ decisions:
   - at: plan-validated
     should: implement-item for each child with disjoint writes
     reason: the reviewed pattern catches regressions before integration
-    mayInstead: [fix-verify-red, scoped-subtask]
+    mayInstead: [fix-verify-red, scoped-subtask, review-item]
   - at: approved
     listedRoutesOnly: true
 must:

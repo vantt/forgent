@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 
 import { validateWorkflow } from '../../src/workflow/index.mjs';
 import { admitProposal, newReservationId, recheckReservation } from '../../src/workflow/case-admission.mjs';
+import { loadWorkflow } from '../../src/workflow/loader.mjs';
 import { reserveParentFrame, refundParentFrame } from '../../src/workflow/case-frame.mjs';
 import { appendAll, FRAME, openCase, projectionOf, settle, verifyReceipt, withHold, eventsOf } from '../helpers/workflow-case-fixture.mjs';
 
@@ -246,4 +247,23 @@ test('a live reservation is rechecked against the subjects as they are now: a ch
   assert.equal(recheckReservation(live(same)), null, 'what was approved is what is there, and the reservation does not collide with itself');
   assert.ok(recheckReservation(live({ ...same, approved: 'sha256:tree-B' })).map((v) => v.code).includes('consent-stale'));
   assert.ok(recheckReservation(live({ ...same, approved: null })).map((v) => v.code).includes('consent-subject-unknown'));
+});
+
+test('the coding guide lets a review start once the plan is validated, while integration still waits for a verified child', () => {
+  const workflow = loadWorkflow('coding/feature');
+  const run = openCase({ workflow });
+  assert.deepEqual(codes(propose(run, { activity: 'review-item' })), ['entry-milestone-unmet'], 'a review has nothing to read before the plan is validated');
+
+  appendAll(run, [
+    { type: 'reservation', payload: { reservationId: 'r-validate', activity: 'validate-plan', writes: [], counters: { dispatches: 1, mutatingDispatches: 0 } } },
+    settle('r-validate', { milestone: 'plan-validated', subjectDigest: 'sha256:plan', activity: 'validate-plan' }),
+  ]);
+  const review = propose(run, { activity: 'review-item' });
+  assert.ok(review.reservation, 'a review of work that is not yet verified is admitted');
+  assert.equal(review.events[0].payload.routeKind, 'may-instead', 'and it costs no deviation');
+  assert.equal(projectionOf(run).deviations, 0);
+
+  const integrate = propose(run, { activity: 'integrate', writes: ['src/**'], worktree: '/wt/i' });
+  assert.equal(codes(integrate)[0], 'entry-milestone-unmet');
+  assert.match(integrate.refused.condition, /child-verified/);
 });

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3ec56bc69445d7cf794126f70fd5bc2c9b766cfa4bd4655256a453b3c5d00b3d",
+  "payloadDigest": "003e815d1ae78f41f4e2b6fb5b58310081b73556006cb8633f6f82d7308e5e05",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -53,7 +53,7 @@
     ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md": "0e699291a19227b487ed68b2334c82b531e890a8ca2ac532e1f0086bb60641ec",
     ".agents/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md": "1b0496bcdc6e22ab650325b363dae7eb225b7b61cd154d0b1b7489f449622b30",
     ".agents/skills/fgos-cook/SKILL.md": "1b2541eeb1ea461dc1ce167fb119d96dfb57f2def28cf89e3db6466b13f902b6",
-    ".agents/skills/fgos-cook/references/case-and-doors.md": "6409ca4292c4de21bf131a4aecc1f8933266964df17385787309e39ec33d15c2",
+    ".agents/skills/fgos-cook/references/case-and-doors.md": "2743699600b85d4c4d8ec79517b1873d6b48f62ed5f2fbe50c1b79b99c20c1e6",
     ".agents/skills/fgos-cook/references/reading-ak-plans.md": "813d4bb5e86f5016505e74a9a9388b371239aac5195e66f0b3791a03f2c00e2f",
     ".agents/skills/fgos-cook/references/route-table-pending.md": "c668cfb6665d740adf3c06483bd3e04da172d62fe4a1bc2dc11be56a8c40b36b",
     ".agents/skills/fgos-fanout/SKILL.md": "2d3c472e1bdf901d31ee54dff6e444f737650f73175cbd597732d2f4742ebb79",
@@ -137,7 +137,7 @@
     "core/skills/fgos-architecture-panel/SKILL.md": "b82218093ebe293c00c47d59a7dea6802da7bf5d9bd27a18fe7038a24da42a47",
     "core/skills/fgos-clarifying/SKILL.md": "1eb6fe9cc19fa2e311b9f0a2a6eeb3810c12834f3c8bb59671b44b423be34bee",
     "core/skills/fgos-cook/SKILL.md": "1f4b715c6a9702ffc33696a8b02727ca70591ec510f2f57f2f0db3fc780f828d",
-    "core/skills/fgos-cook/references/case-and-doors.md": "223506d86b03c72e84da38ed2fde4f380aa4fc19e4e32a781e6d7eb09be9a7fe",
+    "core/skills/fgos-cook/references/case-and-doors.md": "b1fe8da1efb6f99c8292c46a7f30550393fb2c22397fd984b5f7bcf13aef59c1",
     "core/skills/fgos-cook/references/reading-ak-plans.md": "182f876f7747d69f072b7638eb05100a47c7dc56693dbe8264a1cc7f5a459a21",
     "core/skills/fgos-cook/references/route-table-pending.md": "4d7287ee97089f05cb189fb6e7cb296004cf14cf35a46a52956a95e088990338",
     "core/skills/fgos-fanout/SKILL.md": "03dc71d49ddb0ecc44d05f3ef8377d2473531e5dc94684802623851a3197624a",
