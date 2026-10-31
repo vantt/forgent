@@ -52,6 +52,7 @@ import {
 } from './agent-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { crossMachineNote, mailboxOptIn, refusedConfigName } from './mailbox-limits.mjs';
+import { checkMailboxClaudeAccept, fixMailboxClaudeAccept } from './mailbox-claude-accept.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
   loadWorkflowDefinitions,
@@ -2243,6 +2244,17 @@ registerCheck({
   id: 'mailbox-hook',
   description: 'agent mailbox: whether this project opted in to the mailbox hook rows (mailbox.enabled), and when it did, the record verdict from fgos mailbox status',
   check: (cwd) => checkMailboxHook(cwd),
+});
+
+registerCheck({
+  id: 'mailbox-claude-accept',
+  description: 'agent mailbox: the Claude Code user settings accept cross-session input, so mail wakes an idle Claude session (crossSessionInbound: accept)',
+  check: (cwd) => checkMailboxClaudeAccept(cwd),
+});
+
+registerFix({
+  id: 'mailbox-claude-accept',
+  fix: (cwd) => fixMailboxClaudeAccept(cwd),
 });
 
 // Every capability a core/domain Workflow unit names must resolve the way
