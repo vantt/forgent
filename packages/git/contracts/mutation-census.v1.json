@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ba781cfa4728d3541b86a3762c403df6b36155e3217482de633286e3e71eca5c",
+  "payloadDigest": "e3f222299a078b51dc268a904f3011bc9fa0210423969fd6813c7421338f3249",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -575,7 +575,7 @@
     "packages/mailbox/rust/store/tests/hook_shell.rs": "700fdca98f17c77188bfea1bcb066d8debde6ec224da50c0f66ddbde663ffa20",
     "packages/mailbox/rust/store/tests/limits_contract.rs": "f325afd89b20852e7396e15d5634a0b44095f21f9d7d80162fd00c6924f67ffc",
     "packages/mailbox/rust/store/tests/limits_loader.rs": "e406a2233fa64fbe62aafa2dd1e3514ceae352ff5f2c562194225a29cc93ca0a",
-    "packages/mailbox/rust/store/tests/nudge.rs": "5c743b0e4737ac48dc1c9daba9b81250f98b17ad565024f5110d6943dc81a21c",
+    "packages/mailbox/rust/store/tests/nudge.rs": "1f08d11a49f39545d0d38cf38275fb112b087619f6c9fd559719d3a5049d82d0",
     "packages/mailbox/rust/store/tests/record_bodies.rs": "e086f3765180784e6d7abde53e02652048877bcee9b4b46bddf800f6d0f47db5",
     "packages/mailbox/rust/store/tests/record_ceiling.rs": "9e3fa6da4aa831523fe35c9cc6a77d4d03507f50284640d3e396d8ddd5f76c07",
     "packages/mailbox/rust/store/tests/record_contention.rs": "f8afef3cca7e7c67f30ba6faadaa1f363c66b7d8d687f01a6c83f4967180c267",
