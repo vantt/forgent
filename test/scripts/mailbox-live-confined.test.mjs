@@ -53,6 +53,11 @@ const HAS_WORKING_BWRAP = hasWorkingBwrap();
 
 const sha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+/** The processes of a run once they have exited: a kill has landed when its call returns, but under load the process may not be reaped yet. */
+async function processesGone(dir, pidNs, limitMs = 15_000) {
+  for (let waited = 0; processesOfRun(dir, pidNs).length > 0 && waited < limitMs; waited += 50) await sleep(50);
+  return processesOfRun(dir, pidNs);
+}
 
 let shimBytes = null;
 /** The workspace shim exactly as this branch's `fgctl` writes it (its generator's output). */
@@ -277,7 +282,7 @@ test('ending a confined run leaves no process, whether it ignores SIGTERM or for
     assert.ok(processesOfRun(prepared.paths.dir, run.entry.pidNs).length >= 2, `${runId} runs before the end`);
     const { left } = await endConfinedRun(run);
     assert.deepEqual(left, [], runId);
-    assert.deepEqual(processesOfRun(prepared.paths.dir, run.entry.pidNs), [], runId);
+    assert.deepEqual(await processesGone(prepared.paths.dir, run.entry.pidNs), [], runId);
     assert.ok(JSON.parse(fs.readFileSync(prepared.paths.ledger, 'utf8')).endedAt);
   }
 });
@@ -320,9 +325,7 @@ test('the orphan sweep kills a run the harness did not finish, even one whose la
   assert.equal(fs.existsSync(entries[1].login.copy), false, 'an unchanged copy is removed');
   assert.ok(fs.existsSync(path.dirname(entries[1].login.copy)), 'only the copy, never its home');
   for (const entry of entries) {
-    // The kill has landed when the sweep returns, but under load the process may not have exited yet.
-    for (let waited = 0; processesOfRun(entry.dir, entry.pidNs).length > 0 && waited < 5000; waited += 50) await sleep(50);
-    assert.deepEqual(processesOfRun(entry.dir, entry.pidNs), [], entry.runId);
+    assert.deepEqual(await processesGone(entry.dir, entry.pidNs), [], entry.runId);
     const recorded = JSON.parse(fs.readFileSync(path.join(w.base, 'ledger', `${entry.runId}.json`), 'utf8'));
     assert.equal(recorded.outcome, 'error');
     assert.equal(recorded.reason, 'orphan');
