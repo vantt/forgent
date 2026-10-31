@@ -6,7 +6,7 @@
 use crate::adapters::NudgeChannel;
 use crate::record::read_regular_capped;
 use fgos_mailbox_core::WriterKey;
-use fgos_process::facts::{view_of, Record, ScanFilter};
+use fgos_process::facts::{view_of, ProcView, Record, ScanFilter};
 use fgos_process::mapped::{spawn_mapped, MappedLead, MappedSpawn, MappedStdio};
 use std::ffi::OsString;
 use std::path::{Component, Path, PathBuf};
@@ -54,12 +54,7 @@ impl SystemNudge {
     /// `codex queue` finds its shared app server through the head's own
     /// `CODEX_HOME` (one daemon per account), read from the head's process.
     fn codex_queue(&self, key: &WriterKey, head: &Record) -> Result<(), String> {
-        let pid = head.pid.ok_or("head-process-unknown")?;
-        let filter = ScanFilter {
-            env_keys: vec!["CODEX_HOME".to_string()],
-            include_self: false,
-        };
-        let view = view_of(pid, &filter).ok_or("head-process-unreadable")?;
+        let view = head_view(head, "CODEX_HOME")?;
         // A clean environment: the child must not believe it holds the
         // sender's lock (`FGOS_LOCK_*`), and it needs only these three.
         let mut env: Vec<(OsString, OsString)> = ["PATH", "HOME"]
@@ -125,21 +120,17 @@ impl SystemNudge {
     /// behind a dialog that interrupts its user) and the socket lies inside
     /// the head's own runtime directory.
     fn claude_socket(&self, head: &Record) -> Result<(), String> {
-        let pid = head.pid.ok_or("head-process-unknown")?;
+        let view = head_view(head, "XDG_RUNTIME_DIR")?;
         let sessions = self
             .claude_sessions
             .as_deref()
             .ok_or("sessions-dir-unknown")?;
-        let socket = session_socket(sessions, pid.0, self.max_read_bytes)
+        let socket = session_socket(sessions, view.pid.0, self.max_read_bytes)
             .ok_or("socket-unknown")?;
-        if !head_accepts(pid.0, sessions.parent(), self.max_read_bytes) {
+        let argv = view.cmdline.as_deref().ok_or("head-process-unreadable")?;
+        if !head_accepts(argv, sessions.parent(), self.max_read_bytes) {
             return Err("no-accept".to_string());
         }
-        let filter = ScanFilter {
-            env_keys: vec!["XDG_RUNTIME_DIR".to_string()],
-            include_self: false,
-        };
-        let view = view_of(pid, &filter).ok_or("head-process-unreadable")?;
         let runtime = view
             .env_subset
             .get("XDG_RUNTIME_DIR")
@@ -149,6 +140,23 @@ impl SystemNudge {
         }
         write_socket(&socket, &socket_line())
     }
+}
+
+/// One read of the head's process, taken only when it is still the process the
+/// record names: a pid the system has since given to another process would
+/// otherwise lend its arguments, environment and socket to the nudge.
+fn head_view(head: &Record, env_key: &str) -> Result<ProcView, String> {
+    let pid = head.pid.ok_or("head-process-unknown")?;
+    let filter = ScanFilter {
+        env_keys: vec![env_key.to_string()],
+        include_self: false,
+    };
+    let view = view_of(pid, &filter).ok_or("head-process-unreadable")?;
+    let seen = view.tuple.as_ref().map(|tuple| &tuple.start_time);
+    if head.start_time.is_none() || seen != head.start_time.as_ref() {
+        return Err("head-process-changed".to_string());
+    }
+    Ok(view)
 }
 
 /// `messagingSocketPath` of the session file of process `pid`, when that file
@@ -168,20 +176,13 @@ fn inside(path: &Path, root: &Path) -> bool {
         && !path.components().any(|c| c == Component::ParentDir)
 }
 
-/// Whether the head process `pid` was set to accept cross-session input: its
+/// Whether the head process, given its arguments `args`, was set to accept cross-session input: its
 /// own `--settings` (an inline JSON or a file) says `accept`, or the
 /// user-level settings of its config directory do, unless the head was told
 /// to read no user settings (`--setting-sources` without `user`). Anything
 /// unreadable counts as not accepting. A repository setting can only tighten
 /// the choice, so project files are not read.
-fn head_accepts(pid: u32, config_dir: Option<&Path>, cap: u64) -> bool {
-    let Ok(raw) = std::fs::read(format!("/proc/{pid}/cmdline")) else {
-        return false;
-    };
-    let args: Vec<String> = raw
-        .split(|b| *b == 0)
-        .map(|a| String::from_utf8_lossy(a).into_owned())
-        .collect();
+fn head_accepts(args: &[String], config_dir: Option<&Path>, cap: u64) -> bool {
     let value_of = |flag: &str| {
         args.iter().enumerate().find_map(|(i, a)| {
             a.strip_prefix(&format!("{flag}="))

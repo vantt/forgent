@@ -48,11 +48,17 @@ fn head(home: &str) -> (Child, Record) {
             .env("CODEX_HOME", home)
             .stdout(Stdio::null()),
     );
-    let record = Record {
-        pid: Some(ProcId(child.id())),
-        ..Record::default()
-    };
+    let record = live_record(child.id());
     (child, record)
+}
+
+/// The record a head would have written about the live process `pid`.
+fn live_record(pid: u32) -> Record {
+    let filter = fgos_process::facts::ScanFilter::default();
+    fgos_process::facts::view_of(ProcId(pid), &filter)
+        .and_then(|view| view.tuple)
+        .expect("the process is readable")
+        .to_record()
 }
 
 fn nudge(program: PathBuf, timeout_ms: u64) -> SystemNudge {
@@ -250,7 +256,7 @@ fn claude_head(tag: &str, words: &[&str], socket_in_runtime: bool) -> ClaudeHead
         format!(r#"{{"pid":{},"version":"2.1.310","messagingSocketPath":"{}"}}"#, child.id(), socket.display()),
     )
     .expect("session file");
-    let record = Record { pid: Some(ProcId(child.id())), ..Record::default() };
+    let record = live_record(child.id());
     ClaudeHead { dir, child, record, listener }
 }
 
@@ -284,6 +290,30 @@ fn a_claude_head_started_with_the_accept_is_written_one_user_line_holding_only_t
     let doc: serde_json::Value = serde_json::from_str(seen.expect("a line arrived").trim()).expect("json");
     assert_eq!(doc, serde_json::json!({"type": "user", "message": {"role": "user", "content": NUDGE_LINE}}));
     let _ = std::fs::remove_dir_all(head.dir);
+}
+
+#[test]
+fn a_head_whose_pid_now_belongs_to_another_process_is_neither_read_nor_written() {
+    let mut claude = claude_head("sock-reused", &["--settings", r#"{"crossSessionInbound":"accept"}"#], true);
+    let mut stale = claude.record.clone();
+    stale.start_time = Some("1".to_string());
+    assert_eq!(
+        claude_nudge(&claude.dir).nudge(NudgeChannel::ClaudeSocket, &key(), &stale),
+        Err("head-process-changed".to_string())
+    );
+    assert!(line_read(&claude.listener).is_none());
+    let _ = claude.child.kill();
+    let _ = claude.child.wait();
+
+    let (mut codex_head, mut codex_record) = head("/accounts/one");
+    codex_record.start_time = Some("1".to_string());
+    assert_eq!(
+        nudge(PathBuf::from("/nonexistent/codex"), 5000).nudge(NudgeChannel::CodexQueue, &key(), &codex_record),
+        Err("head-process-changed".to_string())
+    );
+    let _ = codex_head.kill();
+    let _ = codex_head.wait();
+    let _ = std::fs::remove_dir_all(claude.dir);
 }
 
 #[test]

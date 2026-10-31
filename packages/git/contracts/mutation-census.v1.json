@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2acfac301a239064ff1fbb8cee008662b1f045eceb8591407dce0954004a02ad",
+  "payloadDigest": "f05f1bcbdb5222876888581551e9e0d0548c9c18c2265ef8f481a13b8ca69012",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -555,7 +555,7 @@
     "packages/mailbox/rust/store/src/hook/shell.rs": "c705bcbcef1b55989eba759cf007fdfc64c67e4396c6ad07de76de024570d415",
     "packages/mailbox/rust/store/src/lib.rs": "75c69e58c602f0cfce9cab837aca1d74175f799fff9fa9e73e51aa554707e644",
     "packages/mailbox/rust/store/src/limits.rs": "06ce138acdf54dbcaa5c07f27006828038a1a935f7aa087ea6fd7a876950e025",
-    "packages/mailbox/rust/store/src/nudge.rs": "cc8ce3346308ff7371a2ffdeef3d12982e0614527aad5fa9944e67c79a7b99db",
+    "packages/mailbox/rust/store/src/nudge.rs": "08da6c539ab696827ea56c7de6537ae43b6948d3fb7fe74e153dbcb6dc6702e8",
     "packages/mailbox/rust/store/src/record/bodies.rs": "22a80c7052850aae3ad924a46c3390a6961e2c78d8024cfea00c344c0b476490",
     "packages/mailbox/rust/store/src/record/mod.rs": "28b6986a6b06da84a02b2f991f74da7c7a38cd79c373c1f50872721c55c7b39b",
     "packages/mailbox/rust/store/src/record/os_ids.rs": "63def9b6aa981886dcead2b1db1538ec54904bbc032aa95ddcac441d924d4227",
@@ -575,7 +575,7 @@
     "packages/mailbox/rust/store/tests/hook_shell.rs": "700fdca98f17c77188bfea1bcb066d8debde6ec224da50c0f66ddbde663ffa20",
     "packages/mailbox/rust/store/tests/limits_contract.rs": "f325afd89b20852e7396e15d5634a0b44095f21f9d7d80162fd00c6924f67ffc",
     "packages/mailbox/rust/store/tests/limits_loader.rs": "e406a2233fa64fbe62aafa2dd1e3514ceae352ff5f2c562194225a29cc93ca0a",
-    "packages/mailbox/rust/store/tests/nudge.rs": "2664c967bc9eaf4a655b145b0600a962e43ebd85386d1f7bda1c36a563faa627",
+    "packages/mailbox/rust/store/tests/nudge.rs": "57cc982e72175175a52653454a42047ccb3f4d433537b1a65b0132e76bb223b0",
     "packages/mailbox/rust/store/tests/record_bodies.rs": "e086f3765180784e6d7abde53e02652048877bcee9b4b46bddf800f6d0f47db5",
     "packages/mailbox/rust/store/tests/record_ceiling.rs": "9e3fa6da4aa831523fe35c9cc6a77d4d03507f50284640d3e396d8ddd5f76c07",
     "packages/mailbox/rust/store/tests/record_contention.rs": "f8afef3cca7e7c67f30ba6faadaa1f363c66b7d8d687f01a6c83f4967180c267",
@@ -2678,7 +2678,7 @@
     },
     {
       "path": "packages/mailbox/rust/store/tests/nudge.rs",
-      "line": 242,
+      "line": 248,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"
