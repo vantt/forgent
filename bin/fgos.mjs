@@ -2295,6 +2295,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|'),
           // --case <parentCaseId>: open this case or wave under a conductor case, charged to its frame.
           parentCase: flags.case === undefined ? undefined : requireField(flags.case, '--case requires the id of the parent case'),
+          // --inherit <closedCaseId>: take over the milestones a closed case of the same request and base commit reached.
+          inheritFrom: flags.inherit === undefined ? undefined : requireField(flags.inherit, '--inherit requires the id of a closed case'),
           repoRoot: flags.dir,
           worktree: flags.worktree,
         };

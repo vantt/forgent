@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e3f222299a078b51dc268a904f3011bc9fa0210423969fd6813c7421338f3249",
+  "payloadDigest": "e168ebce51140ffc09aac7bade61c4e7800f6d37750ae0479e4bae6fb6506f5a",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -112,7 +112,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "61a083e9653794e4e95ca76b9a3b0fcafcf942dc76bb122db121c7423a144655",
     "apps/fgos/tests/windows_support/mod.rs": "9a28ecd4ed0adcdba4c3a21f8d214795c0d27aa1ebe54b202db635ea1fbdf2f0",
     "bin/fgos-runner.mjs": "fe8cac0ffb92d6bf8c6f8c001df35b66aeea4518192b2e22df060cd3266f9f83",
-    "bin/fgos.mjs": "163a269e9cb43ea9bcad41bac8cddb413b7e390552f4c84c09908fc4c4bfb4f1",
+    "bin/fgos.mjs": "d1a8f1f9180a054cf66007f9cd564e9fb1ac7cb1bacd949ccbffb9c3e55a8aa1",
     "core/skills/_shared/ak-cook-worker-contract.md": "1fc127fcd70dc9232146771063dea6f729909277a98e3bcc1cdf2a4183aa03d0",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -888,7 +888,7 @@
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "a8ecea5b3e88edee075579ee256fae18aae2188bd87aea6d9165d89c9e587122",
-    "src/cli/command-registry.mjs": "84d6e20e157de838f7433410936effa46d73687a81d7d0fefa300061d0588742",
+    "src/cli/command-registry.mjs": "e11cffb7719a25952fd1f572d2fc91da07fb2a439aeb04d5b5567c5dd64b0e61",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
     "src/cli/detached-child.mjs": "905d006eb7d43212e552a0ef543bbdbc59c4f033b886cb3410ebf3a9681a2e4c",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
@@ -1213,11 +1213,12 @@
     "src/workflow/case-bindings.mjs": "33a10912e1f5d1bd1c41100411c11c799f7094b81e6ec3f372acb598d5d9f22f",
     "src/workflow/case-close.mjs": "8c92c160e4cc7d704420e2f6e7888298942a3fea9358ee8ae5a7d2ef0a81d6c3",
     "src/workflow/case-frame.mjs": "2a04c4b7e12046ec6bd5696157a86b973371ac51355f62374033657bcd88f527",
+    "src/workflow/case-inherit.mjs": "57b8d34fa804f36899fef759688d23a2b3421713bb1d693dcde6c2956d1cf048",
     "src/workflow/case-lock.mjs": "2277fb6db0004b5365c0d5add23a6e72ca67cc407d8d052ed3817364eccd8349",
-    "src/workflow/case-projection.mjs": "51b9abf3ec6757c0c36dbe457ee0283a45848c382da0797b75ab75fa37ee2b86",
+    "src/workflow/case-projection.mjs": "7e992d666aef39ace5649a8e6b0befeb99c8540b7b7939252d4a6ebdbb19d6f9",
     "src/workflow/case-runtime.mjs": "99a7ab44a49de42cfc87e8e209c7c13a41b62c8ef1559a07edd6f0f8678f1ff7",
-    "src/workflow/case-start.mjs": "4851508fe4167d4f2f595543fc61a56aee6f25291d90a76f678738ea81a15b25",
-    "src/workflow/case-verbs.mjs": "ad292230aeefbe7da7ae107e14a6aaf024b0a68317f5f2152a0f0c4f781123d2",
+    "src/workflow/case-start.mjs": "247f551202b0b76c0dc52c2861973c68e701e36cd94235d7d347a11535c056b1",
+    "src/workflow/case-verbs.mjs": "b39467ee4d29ae300cd05c4bd31bb580a3d3524275d1c827a8f067e8221093b3",
     "src/workflow/checked.mjs": "a620d840253269121e89ebb7c4cada29d38752e55f16909edb7e3a92a8dad8bf",
     "src/workflow/definition.mjs": "20c32afca9b0138196a13bbe0bca16fbf97766aa4d0f61e1acd8bbb0046cc757",
     "src/workflow/dir-guard.mjs": "2999283b51f2d4e25d7d1428dd37b886b1d2826fa78eb02170328a35ac14ff03",
@@ -1994,14 +1995,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3446,
+      "line": 3448,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3590,
+      "line": 3592,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"

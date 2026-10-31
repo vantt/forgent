@@ -84,10 +84,10 @@ function conductorResult(mainRoot, workflowRunId, extra = {}) {
  * @returns {object} Projected state of the just-recorded run plus `detached: { pid, logPath, statusCommand }`
  */
 export function startWorkflowDetached(params = {}) {
-  const { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request, parent } = prepareWorkflowRun(params);
+  const { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request, parent, inherits } = prepareWorkflowRun(params);
   let opened = false;
   try {
-    withAdvanceLockSync(mainRoot, workflowRunId, (hold) => openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath, parent }));
+    withAdvanceLockSync(mainRoot, workflowRunId, (hold) => openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath, parent, inherits }));
     opened = true;
   } finally {
     refundIfNotOpened({ mainRoot, parent, opened });
@@ -122,12 +122,12 @@ export function startWorkflowDetached(params = {}) {
  * @returns {Promise<object>} Projected workflow state
  */
 export async function startWorkflow(params = {}) {
-  const { workflowRunId, workflow, mainRoot, worktreePath, frame, request, parent } = prepareWorkflowRun(params);
+  const { workflowRunId, workflow, mainRoot, worktreePath, frame, request, parent, inherits } = prepareWorkflowRun(params);
 
   let opened = false;
   try {
     return await withAdvanceLock(mainRoot, workflowRunId, async (hold) => {
-      openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath, parent });
+      openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath, parent, inherits });
       opened = true;
       if (workflow.guide.kind === 'guide') return conductorResult(mainRoot, workflowRunId);
       return advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog: params.onLog });

@@ -24,7 +24,8 @@ import { parseAccountPin } from '../runner/execution/account-pin.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { spawnDetachedCli } from '../cli/detached-child.mjs';
 import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
-import { assertWriteChains, workflowCheckout } from './unit-handoff.mjs';
+import { assertWriteChains, workflowCheckout, workflowCommit } from './unit-handoff.mjs';
+import { inheritFrom } from './case-inherit.mjs';
 import { RIGOR_ORDER } from './case-projection.mjs';
 import { bindWorktree } from './case-bindings.mjs';
 import { nestedStartRefusal } from './case-admission-port.mjs';
@@ -69,6 +70,8 @@ export function resolveFrame(guide, flags) {
   return frame;
 }
 
+const guideSha256 = (guide) => crypto.createHash('sha256').update(JSON.stringify(guide)).digest('hex');
+
 /**
  * Open the case on its ledger, under the run's `advance` hold: `case.opened` with the guide snapshot
  * reference, the frame and the request digest (which is what makes `request-received` achieved), and a
@@ -78,7 +81,7 @@ export function resolveFrame(guide, flags) {
  *
  * @returns {{ opened: boolean }}
  */
-export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = workflow.guide, frame, request, hold, worktreePath, legacy = false, parent = null }) {
+export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = workflow.guide, frame, request, hold, worktreePath, legacy = false, parent = null, inherits = null }) {
   const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
   if (events.some((e) => e.type === 'case.opened')) return { opened: false };
   const append = (event) => appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId, event, hold });
@@ -87,10 +90,12 @@ export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = wo
     payload: {
       caseId: workflowRunId,
       kind: guide.kind,
-      guide: { id: guide.id, sha256: crypto.createHash('sha256').update(JSON.stringify(guide)).digest('hex') },
+      guide: { id: guide.id, sha256: guideSha256(guide) },
       frame,
       requestDigest: digestText(request ?? ''),
+      baseCommit: inherits?.baseCommit ?? workflowCommit(worktreePath ?? mainRoot, 'HEAD'),
       openedAt: new Date().toISOString(),
+      ...(inherits ? { inherits } : {}),
       ...(parent ? { parent: { caseId: parent.parentCaseId, reservationId: parent.reservationId } } : {}),
       ...(legacy ? { legacy: true } : {}),
     },
@@ -307,6 +312,17 @@ export function prepareWorkflowRun(params) {
       throw new RunnerConfigError(`account "${account}" is not configured: pool "${pin.pool}" has no account "${pin.id}" in runner.llmAccounts`);
     }
   }
+  // Milestones taken over from a closed case are checked before anything is charged or created.
+  const inherits = params.inheritFrom
+    ? inheritFrom({
+      mainRoot,
+      fromCaseId: params.inheritFrom,
+      guide: workflow.guide,
+      guideSha256: guideSha256(workflow.guide),
+      requestDigest: digestText(params.request ?? ''),
+      baseCommit: workflowCommit(worktreePath, 'HEAD'),
+    })
+    : null;
   // A case or wave opened under a parent case is charged to the parent's frame first, in the parent's own
   // short `advance` section, released before the child exists; a child that cannot open gives it back.
   let parent = null;
@@ -336,5 +352,5 @@ export function prepareWorkflowRun(params) {
   }
   const { workflowRunId, runDir } = created;
 
-  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null, parent };
+  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null, parent, inherits };
 }

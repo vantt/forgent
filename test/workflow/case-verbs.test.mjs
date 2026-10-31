@@ -22,6 +22,7 @@ import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { appendAll, conductorWorkflow, settle, verifyReceipt } from '../helpers/workflow-case-fixture.mjs';
+import { execFileSync } from 'node:child_process';
 
 seedFileLocalBwrapRegistry();
 
@@ -165,4 +166,66 @@ test('a quiet conductor case closes and lets go of its worktree', async () => {
   const result = closeWorkflow(conductor.caseId, { repoRoot: tmp });
   assert.equal(result.unbound.length, 1);
   assert.equal(readBinding({ mainRoot: tmp, worktree: tmp, caseId: 'another' }).answer, 'unbound');
+});
+
+// A closed case that planned, built a child with a verify receipt, and closed; the plan and the child are what a successor could take over.
+async function closedPlannedCase(tmp, request = 'Ship the change') {
+  const first = await startWorkflow({ workflow: conductorWorkflow(), request, ...opts(tmp) });
+  const run = { repoRoot: tmp, caseId: first.caseId };
+  appendAll(run, [
+    { type: 'reservation', payload: { reservationId: 'r-plan', activity: 'plan', writes: [], counters: { dispatches: 1, mutatingDispatches: 0 } } },
+    settle('r-plan', { milestone: 'plan-ready', subjectDigest: 'sha256:plan', activity: 'plan' }),
+    { type: 'reservation', payload: { reservationId: 'r-build', activity: 'build-a', writes: ['src/a'], counters: { dispatches: 1, mutatingDispatches: 1 } } },
+    settle('r-build', { milestone: 'child-built', subjectDigest: 'sha256:child', receipts: [verifyReceipt('child-built', 'sha256:child')], activity: 'build-a' }),
+  ]);
+  closeWorkflow(first.caseId, { repoRoot: tmp });
+  return first.caseId;
+}
+
+test('inherit: a case takes over the plan a closed case of the same request and commit reached, never its delivery, and says where it came from', async () => {
+  const tmp = setupRepo();
+  const from = await closedPlannedCase(tmp);
+  const next = await startWorkflow({ workflow: conductorWorkflow(), request: 'Ship the change', inheritFrom: from, ...opts(tmp) });
+
+  assert.equal(next.case.milestones['plan-ready'].state, 'achieved');
+  assert.deepEqual(next.case.milestones['plan-ready'].inherited, { fromCase: from });
+  assert.equal(next.case.milestones['plan-ready'].digest, 'sha256:plan');
+  assert.equal(next.case.milestones['child-built'].state, 'unreached', 'a delivery milestone is bound to a tree and is never taken over');
+  assert.ok(['build-a', 'build-b'].every((id) => next.case.eligible.includes(id)), 'building can start without a second plan dispatch');
+});
+
+test('inherit: the opening event records the source case, the base commit and the milestones taken over', async () => {
+  const tmp = setupRepo();
+  const from = await closedPlannedCase(tmp);
+  const next = await startWorkflow({ workflow: conductorWorkflow(), request: 'Ship the change', inheritFrom: from, ...opts(tmp) });
+  const opened = eventsOf(tmp, next.caseId).find((e) => e.type === 'case.opened').payload;
+  const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+  assert.equal(opened.baseCommit, head);
+  assert.deepEqual([opened.inherits.fromCase, opened.inherits.baseCommit, opened.inherits.milestones.map((m) => m.milestone)], [from, head, ['plan-ready']]);
+});
+
+test('inherit: each condition that has moved is refused by name and creates no case', async () => {
+  const tmp = setupRepo();
+  const from = await closedPlannedCase(tmp);
+  const runsBefore = fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length;
+  const refused = (params, code) => assert.rejects(
+    () => startWorkflow({ workflow: conductorWorkflow(), request: 'Ship the change', ...opts(tmp), ...params }),
+    (err) => err.code === code,
+  );
+
+  await refused({ inheritFrom: 'no-such-case' }, 'inherit-source-unknown');
+  await refused({ inheritFrom: from, request: 'A different request' }, 'inherit-request-differs');
+  await refused({ inheritFrom: from, workflow: conductorWorkflow({ purpose: 'another version of the same guide' }) }, 'inherit-guide-differs');
+
+  const open = await startWorkflow({ workflow: conductorWorkflow(), request: 'Ship the change', ...opts(tmp) });
+  await refused({ inheritFrom: open.caseId }, 'inherit-source-open');
+  closeWorkflow(open.caseId, { repoRoot: tmp });
+  await refused({ inheritFrom: open.caseId }, 'inherit-nothing');
+
+  fs.writeFileSync(path.join(tmp, 'moved.txt'), 'the base commit moves\n');
+  execFileSync('git', ['add', 'moved.txt'], { cwd: tmp });
+  execFileSync('git', ['commit', '-q', '-m', 'move the base'], { cwd: tmp });
+  await refused({ inheritFrom: from }, 'inherit-base-differs');
+
+  assert.equal(fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length, runsBefore + 1, 'only the case opened to be closed exists beside the source: no refusal created a run');
 });

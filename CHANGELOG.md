@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos workflow start --inherit <closedCaseId>` lets a new case take over the milestones a closed case of the same guide, request and base commit already reached (for the coding guide, `decisions-locked` and `plan-validated`), so a successor case does not repeat the lock and validate dispatches. Delivery, integration, approval and merge milestones are never taken over; the source case and its receipts are recorded on the new case's opening event, and a case that is open, ran another guide or request, or started on another commit is refused by name.
 - `fgos doctor` names a legacy JSON config file once, not twice, when that file cannot be parsed.
 - `fgos` verbs start about 40 ms sooner: the CLI loads the modules of the dispatch, merge, discover/plan, worktree, gateway, setup and doctor verbs only when one of those verbs runs (`--help` took about 115 ms and now about 75 ms on an idle machine).
 - `fgos mailbox send` can now nudge a Codex session that is idle: after the mail is recorded it runs `codex queue` with one fixed line ("You have mail. Read it with: fgos mailbox inbox --claim"), never the message body, and the send report says whether the nudge was sent, is already outstanding, or was refused. The nudge only runs on Codex versions the adapters contract lists as tested for it (0.161.0 and 0.162.1 today); on any other version the report says `version-not-tested` and the mail waits for the session's next tool call as before.

@@ -100,6 +100,10 @@ export function projectCase(events, { currentDigests = {} } = {}) {
     switch (event.type) {
       case 'case.opened':
         achieve('request-received', p.requestDigest);
+        // Taken over from a closed case of the same plan; the source and its receipts stay on the milestone.
+        for (const item of p.inherits?.milestones ?? []) {
+          achieve(item.milestone, item.subjectDigest, { receipts: item.receipts ?? [], outcome: item.outcome ?? null, inherited: { fromCase: p.inherits.fromCase } });
+        }
         break;
       case 'step.complete':
         // The step's own milestone (and any the guide says it settles); a digest recorded by the
