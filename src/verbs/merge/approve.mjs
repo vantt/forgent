@@ -696,8 +696,9 @@ export async function approveUseCase(
     // Land takes the trunk's merge slot itself, the main checkout only for
     // publication, and waits on each (or fails fast under --no-wait) without
     // redoing the verify run.
-    const operationId = landOperationFor(dir, repoRoot, view, id, `refs/heads/${detectTrunk(repoRoot)}`);
-    const result = await landRunnerItem(repoRoot, item, { operationId, timeoutMs, ownFileSet, ...lockWait });
+    const trunk = detectTrunk(repoRoot);
+    const operationId = landOperationFor(dir, repoRoot, view, id, `refs/heads/${trunk}`);
+    const result = await landRunnerItem(repoRoot, item, { target: trunk, operationId, timeoutMs, ownFileSet, ...lockWait });
 
     if (result.outcome === 'conflict') {
       const reason = hadChildren ? 'integration-drift' : 'merge-conflict';
@@ -835,7 +836,7 @@ export async function approveUseCase(
     // the `cleanup` verb, gated by D7's TTL and D8's harness).
     // Same as the leaf-into-root path above: the receipt's published
     // commit, or the trunk's tip for an already-merged re-approve.
-    const mergedSha = result.receipt?.localEffect.publishedOid ?? resolveRefSha(repoRoot, detectTrunk(repoRoot));
+    const mergedSha = result.receipt?.localEffect.publishedOid ?? resolveRefSha(repoRoot, trunk);
     const moveResult = moveDeliveredOrRecordFault(dir, id, 'root-into-main merge', { mergedSha, mergedInto: 'main', landSettlement: result.landSettlement });
     if (!moveResult.event) {
       return {

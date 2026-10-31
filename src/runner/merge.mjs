@@ -380,11 +380,20 @@ export function changedFiles(repoRoot, item, opts = {}) {
     return [];
   }
   const branch = branchNameFor(item.id);
+  let tips;
+  try {
+    tips = [resolveRefSha(repoRoot, trunk), resolveRefSha(repoRoot, branch)];
+  } catch (err) {
+    throw new MergeError(`computing changed files for branch "${branch}" failed: ${err.message}`, { branch });
+  }
+  return landedPaths(repoRoot, branch, ...tips);
+}
+
+/** The paths `branch` (at commit `after`) changes since its merge base with commit `target`. */
+function landedPaths(repoRoot, branch, target, after) {
   try {
     const port = inspectGit(repoRoot);
-    const after = resolveRefSha(repoRoot, branch);
-    const before = port.compareCommits({ left: resolveRefSha(repoRoot, trunk), right: after }).mergeBase;
-    return diffPaths(port, before, after);
+    return diffPaths(port, port.compareCommits({ left: target, right: after }).mergeBase, after);
   } catch (err) {
     throw new MergeError(`computing changed files for branch "${branch}" failed: ${err.message}`, { branch });
   }
@@ -894,8 +903,9 @@ export async function landRunnerItem(repoRoot, item, {
   if (declared.outcome) return { ...declared, branch };
   const { files } = declared;
   // Read the paths this branch brings before it lands: afterwards the target
-  // contains it and the diff that names them is empty (tsk-2ypd).
-  const landedFiles = changedFiles(repoRoot, item, { trunk: target });
+  // contains it and the diff that names them is empty (tsk-2ypd). The two
+  // tips were resolved just above; the diff runs from their merge base.
+  const landedFiles = landedPaths(repoRoot, branch, pinned, source);
   const options = gitPortOptions(repoRoot, { mutation: true });
   const port = createGitLand(options);
   // A result that published nothing carries the `abandoned` settlement, so

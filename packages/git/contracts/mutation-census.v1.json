@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c0bb4b025fb60b9fb4783caa4943380e22b0d4143764a3f41d36781dab02f304",
+  "payloadDigest": "3dc158c85a8e748507a18d1a635b18d5a216f4c09644ea4cf1d2895832d02998",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1079,7 +1079,7 @@
     "src/runner/loop.mjs": "ee2671560bdf52f0b4cccb32b1e012bd7022cc5fda538b26a8a85cfa0fee7ed9",
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
-    "src/runner/merge.mjs": "ce33d532fea5f7c4428f5b13ce64cf99180452fe543fa70221d6f10e937e505a",
+    "src/runner/merge.mjs": "76da2a349edabd9ae7f774bc766f42632a9225d949eac7e56ab0544477c3f15e",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "f1254eb54d4285f3abb91752731069a000884d83cdb8cbfc1af6f2095118f75a",
     "src/runner/paths.mjs": "1c20a7dab2f568b281f4b6eb5aff0a4465ab492cb16f5665c2b6d1d19c4a5ea7",
@@ -1195,7 +1195,7 @@
     "src/verbs/events/seal.mjs": "0651dbaca85800a74027dc30144d0d8e0f45378ea06e81eda25994be2c859474",
     "src/verbs/events/status.mjs": "6fb73280f473c45dc2de55c1ad4514235a0f5e9563ebf7e2801d7b4c072ffc6f",
     "src/verbs/events/sync.mjs": "3456dd8965673bb8cfa92a253ecab3feebbd27984df8274c4e644bc4f5ab29ae",
-    "src/verbs/merge/approve.mjs": "2cefc6ee54600e4c5ad8fcbfb056bb48b44da12611fd4689ed5d6b3fd1182ea9",
+    "src/verbs/merge/approve.mjs": "ab949e397e78f9e696e30a0218281e3e4c04b9ce8b58b7d1d908d12058b16630",
     "src/verbs/merge/catchup.mjs": "3c73bf052a078cbe1ef40a271c32e7772da918637abf7cd2bbb7065dbd2be245",
     "src/verbs/merge/iron-law-level.mjs": "7535987e203033abffcc4ce72f7062489aa7673db6cbb80f0a527dc288ac6087",
     "src/verbs/merge/merge.mjs": "0a453f93896685a77cf5494ff5d2f6f8106ff638e1b17079a368801fdb064f89",
@@ -3419,14 +3419,14 @@
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 943,
+      "line": 953,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 973,
+      "line": 983,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
       "class": "configured-binary"
