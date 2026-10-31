@@ -612,7 +612,7 @@ function sameLandSettlement(recorded, wanted) {
   return LAND_SETTLEMENT_KEYS.every(key => recorded?.[key] === wanted[key]);
 }
 
-function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto, landSettlement, landOperationIds } = {}, planSnapshot = null) {
+function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, engineDecision, headAtTake, headAtReturn, branchHeadAtTake, branchHeadAtReturn, parentSnapshotAtAsk, claimTrigger, statusAtAsk, releaseTrigger, rationale, alternatives, source, askSource, approved, mergedSha, mergedInto, landSettlement, landOperationIds } = {}, planSnapshot = null) {
   const result = withStateAndRefresh(dir, (tx) => {
   if (landOperationIds !== undefined
     && (to !== 'blocked' || !Array.isArray(landOperationIds) || !landOperationIds.length
@@ -644,6 +644,11 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
   if (!work) {
     throw new StoreError('validation', `work "${id}" not found.`);
   }
+  // A caller's override is judged against the item as this transaction sees
+  // it, active claim included, and recorded in the same batch as the move,
+  // ahead of it, so a refused move records no decision either.
+  const decision = engineDecision?.(buildEffectiveView({ work: { [id]: work } }, readClaims(dir, tx)).work[id]);
+  if (decision) tx.append({ type: 'decision', payload: { id, ...decision, kind: 'engine', source: 'session' } });
 
   // `reason`/`ask`/`answer` are each only meaningful on their own edge
   // (per D5 for `reason`; async-human-gate D2/D5 for `ask`/`answer`);
@@ -892,7 +897,22 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
       // best-effort — see comment above.
     }
   }
-  return tx.append(rawEvent); // captures the real seq; rawEvent itself has none
+  const moved = tx.append(rawEvent); // captures the real seq; rawEvent itself has none
+  // Every door into `awaiting-approval` converges here, so the review handoff
+  // is fired here, in the move's own batch (tsk-2t9c D18). A move changes no
+  // holder, step or call thread, so the handoff guard reads the same item it
+  // would read after the move. An edge the role graph refuses is skipped:
+  // the handoff must never block the transition.
+  if (to === 'awaiting-approval' && roleGraphFor(getDomain(work.domain))) {
+    let handoff;
+    try {
+      handoff = callEvent(dir, before, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });
+    } catch {
+      // Best-effort -- see the comment above.
+    }
+    if (handoff) tx.append(handoff);
+  }
+  return moved;
   }, {
     readRoots: planSnapshot?.gitDir ? [planSnapshot.gitDir] : [],
     // A conflicted delivery never took effect, so it is not a prior success to return on a retry.
@@ -943,39 +963,6 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
       // above: the item already reached `delivered` -- that transition is
       // what matters and must never be undone or reported as failed over a
       // cleanup step that is not itself correctness-critical.
-    }
-  }
-  // tsk-2t9c D18: found via a real end-to-end run (a fresh agent following
-  // fgos-coding-implement's own Return-step prose, verbatim, top to
-  // bottom, on a real item) that never fired `handoff --to reviewer
-  // --reason review` even though the item genuinely reached `awaiting-
-  // approval` -- the instruction is imperative and unmissable in
-  // isolation, but sits trailing after several paragraphs of blocked/
-  // catchup caveats, is duplicated once per door into this status
-  // (`return`, `catchup`, and any future one), and nothing gates on it:
-  // skipping it produces no error, no red test, no symptom the skipping
-  // agent would ever notice. Same class of gap D16 already fixed for
-  // `delivered` (a skill-remembered side effect vs. an engine-guaranteed
-  // one) -- and the same fix: every door into `awaiting-approval`
-  // converges on this one `moveWork` call, so firing the review handoff
-  // HERE covers `return`/`catchup`/anything else at once, where the
-  // prose needed a copy per door and still wasn't reliably read. This
-  // does not change what the prose already prescribes -- it relocates
-  // who is responsible for making it actually happen. `recordCall` runs
-  // its own `evaluateHandoff` guard internally (fromRole read off the
-  // item's live `holder`, defaulting to the role graph's `defaultRole`),
-  // so a domain/stage/holder combination where this edge is not legal
-  // (or that already carries a role other than the review edge's `from`)
-  // simply refuses, caught and ignored below -- same "must never block
-  // the transition" fail-safe as every sibling block in this function.
-  if (result.event.payload.to === 'awaiting-approval') {
-    try {
-      const domain = getDomain(result.view.work[id]?.domain);
-      if (roleGraphFor(domain)) {
-        recordCall(dir, { id, toRole: 'reviewer', reason: 'review', note: 'auto-fired on reaching awaiting-approval (tsk-2t9c D18)' });
-      }
-    } catch {
-      // Best-effort -- see the block's own comment above.
     }
   }
   return result;
@@ -1538,40 +1525,42 @@ function openCallStack(callThreadEntries) {
  * for a future caller that does track its own nesting, instead of being
  * permanently unreachable dead code.
  */
-export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDepth = 0 } = {}) {
-  return withStateAndRefresh(dir, (tx) => {
-    const before = tx.view;
-    const work = before.work[id];
-    if (!work) {
-      throw new StoreError('validation', `work "${id}" not found.`);
-    }
-    const domain = getDomain(work.domain);
-    const roleGraph = roleGraphFor(domain);
-    const fromRole = work.holder ?? roleGraph?.defaultRole;
-    // effectiveStep, not raw work.workflowStep: a work item's step is
-    // legitimately absent under the lazy-default rule (domain-registry.mjs's own
-    // effectiveStep/step-fsm.mjs precedent) -- reading work.workflowStep
-    // directly here made every handoff attempt on an item that never had
-    // an explicit moveStep refuse, including split children born straight at
-    // their execute step without ever calling moveStep (src/intake/plan.mjs's
-    // normalizeChild path).
-    const step = effectiveStep(work, domain);
-    const openCallDepth = openCallStack(before.callThreads?.[id]).length;
+export function recordCall(dir, args = {}) {
+  return withStateAndRefresh(dir, (tx) => tx.append(callEvent(dir, tx.view, args)));
+}
 
-    const result = evaluateHandoff({ domain, step, fromRole, toRole, reason, openCallDepth, openSyncDepth });
-    if (!result.ok) {
-      throw new StoreError(
-        'validation',
-        `handoff refused: ${result.refusal} -- legal edges: ${JSON.stringify(result.legalEdges)}`,
-      );
-    }
+/** The event recording a call from `id`'s holder to `toRole` against `before`; throws when the role graph refuses it. */
+function callEvent(dir, before, { id, toRole, reason, note, outcome, openSyncDepth = 0 } = {}) {
+  const work = before.work[id];
+  if (!work) {
+    throw new StoreError('validation', `work "${id}" not found.`);
+  }
+  const domain = getDomain(work.domain);
+  const roleGraph = roleGraphFor(domain);
+  const fromRole = work.holder ?? roleGraph?.defaultRole;
+  // effectiveStep, not raw work.workflowStep: a work item's step is
+  // legitimately absent under the lazy-default rule (domain-registry.mjs's own
+  // effectiveStep/step-fsm.mjs precedent) -- reading work.workflowStep
+  // directly here made every handoff attempt on an item that never had
+  // an explicit moveStep refuse, including split children born straight at
+  // their execute step without ever calling moveStep (src/intake/plan.mjs's
+  // normalizeChild path).
+  const step = effectiveStep(work, domain);
+  const openCallDepth = openCallStack(before.callThreads?.[id]).length;
 
-    const rawEvent = result.edge.mode === 'async'
-      ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
-      : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
-    rawEvent.payload.writer = resolveWriterIdentity(dir);
-    return tx.append(rawEvent);
-  });
+  const result = evaluateHandoff({ domain, step, fromRole, toRole, reason, openCallDepth, openSyncDepth });
+  if (!result.ok) {
+    throw new StoreError(
+      'validation',
+      `handoff refused: ${result.refusal} -- legal edges: ${JSON.stringify(result.legalEdges)}`,
+    );
+  }
+
+  const rawEvent = result.edge.mode === 'async'
+    ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
+    : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
+  rawEvent.payload.writer = resolveWriterIdentity(dir);
+  return rawEvent;
 }
 
 /**

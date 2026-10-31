@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d667b730d060a423ac22b926ecdbcfb0f6afcc37eef00a845191bb2cd2c776e6",
+  "payloadDigest": "c0bb4b025fb60b9fb4783caa4943380e22b0d4143764a3f41d36781dab02f304",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1164,7 +1164,7 @@
     "src/state/runtime-coordination.mjs": "e546b13c02a8ae1c903fe5a0bb0974dcc41f85526a82111b8d82f0c925bb8ca5",
     "src/state/status-fsm.mjs": "6853485189d2e25e6ee2a5997d11f0b2ae4e608cf5ed6332df010b2e703b76b0",
     "src/state/step-fsm.mjs": "bf1e935a355d2fbb7b8a5f0927138dea21b21c6226fe5a442c22bd1875445625",
-    "src/state/store.mjs": "5187e524c5c4d53e932b4e07eacbb0d23e8a69cd65754f8f46e313a7b6218148",
+    "src/state/store.mjs": "d441af487582c33cbc4b98e06bc60424dd4779c9d27a92a35f53cb9293c51a9d",
     "src/state/tool-registry.mjs": "dd93124b68c1bc5589481d3a9220d19d25ea0f0eaa3b08e2c72e2098ac5f4991",
     "src/state/work-event-store.mjs": "a1e9476269ed8da9af7defe9d4b8201232276b15d75a7619e7bbabf022cdf22e",
     "src/state/work.mjs": "3298510e4be41ec95ee11ca4a14cb637a618143c92e1423c0e232943a2f01cc2",
@@ -1204,7 +1204,7 @@
     "src/verbs/merge/review.mjs": "538e8087eed7befd51b7ef78a93d1b12fa13f0fff260ec40e50e7f8e019ac49a",
     "src/verbs/merge/sync-root.mjs": "830cfbc215e2c7d4e6407920dc5b59a0ae2017c4cabd45883645ad790f0e9164",
     "src/verbs/state/edit.mjs": "734029f844bf8eb4b9c50ff7698c59dda48bd2a6b3ec3ffe8b601f0a31571223",
-    "src/verbs/state/move.mjs": "cf664d41737edd1a6a7eab5d7b9cce83e7fe407dda3d31560ab3beb97c048c39",
+    "src/verbs/state/move.mjs": "d2be22ddac01830ec35469b5a895f2c0883dd14e0b63ec3ae2c5e44cc2a2350c",
     "src/verbs/state/read.mjs": "a49ff63f71318e7b6066059078273a6c224ad7ec10c8790f25fabd13cae5cd93",
     "src/verbs/state/step.mjs": "ddebfcb5b53edfd67086ead35d886b86a1f49ad0ce18b98d7b637df239b059fb",
     "src/verbs/worktree/create.mjs": "b09413339c4594efa3261433f827ee1d8dd7080d270fc1cf28e9d68e2b4ed261",

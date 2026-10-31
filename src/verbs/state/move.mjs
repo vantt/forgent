@@ -1,4 +1,4 @@
-import { moveWork, addDecision, listWork, StoreError } from '../../state/store.mjs';
+import { moveWork, StoreError } from '../../state/store.mjs';
 import { branchNameFor, branchExists, detectTrunk, inspectGit } from '../../runner/worktree.mjs';
 
 function isBranchReachableFromTrunk(cwd, branch, trunk) {
@@ -14,6 +14,8 @@ function isBranchReachableFromTrunk(cwd, branch, trunk) {
 }
 
 export function moveUseCase({ dir, repoRoot }, { id, to, expectedStatus, reason, answer, overrideReason, skipReturnGuard, role = 'human', approved }) {
+  // Each override is recorded as an engine decision in the move's own transaction.
+  let engineDecision;
   if (to === 'delivered') {
     const branch = branchNameFor(id);
     if (branchExists(repoRoot, branch)) {
@@ -26,18 +28,16 @@ export function moveUseCase({ dir, repoRoot }, { id, to, expectedStatus, reason,
               + `Use "fgos approve ${id}" to merge for real, or pass --override-reason "<why>" to force this move anyway (recorded to the decision log).`,
           );
         }
-        addDecision(dir, {
-          id,
+        engineDecision = () => ({
           text: `move --to delivered override for "${id}": "${branch}" not reachable from "${trunk}"`,
           rationale: overrideReason,
-          kind: 'engine',
         });
       }
     }
   }
   if (to === 'awaiting-approval') {
-    const item = listWork(dir).work[id];
-    if (item?.status === 'doing') {
+    engineDecision = (item) => {
+      if (item.status !== 'doing') return undefined;
       if (!skipReturnGuard) {
         throw new StoreError(
           'validation',
@@ -45,14 +45,12 @@ export function moveUseCase({ dir, repoRoot }, { id, to, expectedStatus, reason,
             + `Use "fgos return ${id}" to prove it for real (pass --no-new-commits-ok if the work was already done before this claim), or pass --skip-return-guard "<why>" to force this move anyway (recorded to the decision log).`,
         );
       }
-      addDecision(dir, {
-        id,
+      return {
         text: `move --to awaiting-approval skip-return-guard override for "${id}": status was "doing"`,
         rationale: skipReturnGuard,
-        kind: 'engine',
-      });
-    }
+      };
+    };
   }
-  const { event } = moveWork(dir, { id, to, expectedStatus, reason, answer, role, approved });
+  const { event } = moveWork(dir, { id, to, expectedStatus, reason, answer, role, approved, engineDecision });
   return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
 }
