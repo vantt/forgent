@@ -9,7 +9,7 @@ import { createGitInspect, gitWriter } from '../../git/inspect.mjs';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
 import {
-  assertCaseAdmissionPort, CaseAdmissionRefusedError, normalizeCaseRef, seatLaunchesOf, seatLaunchesUsed,
+  assertCaseAdmissionPort, CaseAdmissionRefusedError, normalizeCaseRef, briefNeverReached, noBriefDelivered, seatLaunchesOf, seatLaunchesUsed,
   PORT_MISSING, SEAT_LAUNCH_CEILING,
 } from './case-admission-port.mjs';
 import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
@@ -544,12 +544,15 @@ function settleAdmission(scope, result, failure) {
   if (!admission || admission.settled) return;
   if (failure instanceof RunCancelledError) return;
   admission.settled = true;
-  const outcome = failure ? (admission.started ? 'execution-failure' : 'not-started') : result.outcome;
+  const ended = failure ? (admission.started ? 'execution-failure' : 'not-started') : result.outcome;
+  // A run whose seats were never given their brief did no work: it settles as one that never started.
+  const refunded = ended !== 'pass' && admission.started && scope.unitRecord && noBriefDelivered(scope.unitRecord);
+  const outcome = refunded ? 'not-started' : ended;
   try {
     admission.port.settle(admission.reservationId, {
       caseId: admission.caseId,
       outcome,
-      unitRunId: admission.started ? admission.unitRunId : null,
+      unitRunId: admission.started && !refunded ? admission.unitRunId : null,
       results: result?.results ?? [],
       seatLaunchesUsed: scope.unitRecord ? seatLaunchesUsed(scope.unitRecord) : 0,
       frameExhausted: scope.ceilingHit === true,
@@ -583,6 +586,16 @@ const MAX_LEASE_CONFLICTS = 8;
 /** Whether an attempt ended because the lease refused the account Seat Binding named (nothing ran). */
 function isLeaseConflict(runResult) {
   return runResult?.classification?.failure?.code === LEASE_CONFLICT_FAILURE_CODE;
+}
+
+/** The receipt the supervisor wrote for the run an attempt ended on, or null when there is none. */
+function readAttemptReceipt(assignmentsDir, assignmentId) {
+  try {
+    const attempt = currentAttemptOf(assignmentsDir, assignmentId);
+    return attempt ? JSON.parse(fs.readFileSync(path.join(attempt.dir, 'receipt.json'), 'utf8')) : null;
+  } catch {
+    return null;
+  }
 }
 
 /** The receipt the lease wrote for the run an attempt ended on, or null when it leased nothing. */
@@ -1402,6 +1415,8 @@ async function runUnitBody(options, scope) {
 
       attempts[attemptNo].outcome = result.outcome;
       attempts[attemptNo].runId = result.runResult?.runId ?? null;
+      if (result.outcome !== 'pass' && briefNeverReached(readAttemptReceipt(assignmentsDir, assignmentId))) attempts[attemptNo].briefNotDelivered = true;
+      else delete attempts[attemptNo].briefNotDelivered;
       if (receipt && !receiptDiffers) attempts[attemptNo].leaseReceipt = receipt;
       const credentialFault = result.outcome === 'provider-limit' && result.runResult?.classification?.failure?.cause === 'credential';
       if (credentialFault) attempts[attemptNo].failureCause = 'credential';

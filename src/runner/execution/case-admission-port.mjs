@@ -67,6 +67,20 @@ export function normalizeCaseRef(value) {
   return Object.freeze(Object.fromEntries(['caseId', 'activity', 'unitId', 'route', 'reason'].filter((k) => text(k)).map((k) => [k, text(k)])));
 }
 
+/** Whether an attempt's receipt says its agent was never given the brief (nothing was typed, or the launch was abandoned first). */
+export function briefNeverReached(receipt) {
+  return String(receipt?.outcome ?? '').startsWith('abandoned') || receipt?.reason === 'terminal:foreground-not-agent';
+}
+
+/**
+ * Whether the run launched seats and none of them was given its brief. Such a run did nothing a case
+ * should pay for, so its reservation is handed back instead of spending the frame's dispatch.
+ */
+export function noBriefDelivered(unitRecord) {
+  const launched = Object.values(unitRecord.bindings ?? {}).flat().filter((a) => a.dispatchRetryId !== undefined && a.leaseConflict !== true);
+  return launched.length > 0 && launched.every((a) => a.briefNotDelivered === true);
+}
+
 /** Every attempt a Unit run has launched so far, from its record: the one count the ceiling is held against. */
 export function seatLaunchesUsed(unitRecord) {
   return Object.values(unitRecord.bindings ?? {})

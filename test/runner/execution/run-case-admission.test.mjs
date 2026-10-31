@@ -13,7 +13,7 @@ import { execFileSync } from 'node:child_process';
 import { runUnit } from '../../../src/runner/execution/run.mjs';
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 import { runReviewed } from '../../../src/runner/execution/loops/reviewed.mjs';
-import { seatLaunchesOf, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
+import { seatLaunchesOf, briefNeverReached, noBriefDelivered, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { dispatchCwdHolder } from '../../../src/runner/dispatch/cwd-lock.mjs';
 import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-port.mjs';
@@ -295,6 +295,28 @@ test('the seat-launch ceiling stops the fallback chain: a provider limit stays o
     unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' }, caseAdmission: recordingPort(), caseRef: { caseId: 'case-test', activity: 'scout' }, repoRoot: free.repoRoot, cwd: free.worktreeDir, worktree: free.worktreeDir,
   });
   assert.equal(open.outcome, 'pass');
+});
+
+test('a run whose agents were never given their brief hands its dispatch back; one that was given it keeps it spent', async () => {
+  const launched = (extra = {}) => ({ dispatchRetryId: 'r1', outcome: 'execution-failure', ...extra });
+  assert.equal(briefNeverReached({ outcome: 'cancelled', reason: 'terminal:foreground-not-agent' }), true);
+  assert.equal(briefNeverReached({ outcome: 'abandoned-before-brief' }), true);
+  assert.equal(briefNeverReached({ outcome: 'cancelled', reason: 'terminal:needs-human' }), false, 'an agent that saw the brief and then waited on a person did work');
+  assert.equal(briefNeverReached(null), false);
+  assert.equal(noBriefDelivered({ bindings: { 'producer:1': [launched({ briefNotDelivered: true })] } }), true);
+  assert.equal(noBriefDelivered({ bindings: { 'producer:1': [launched({ briefNotDelivered: true }), launched()] } }), false, 'a fallback that was given the brief did work');
+  assert.equal(noBriefDelivered({ bindings: { 'producer:1': [launched({ briefNotDelivered: true, leaseConflict: true })] } }), false, 'nothing launched');
+  assert.equal(noBriefDelivered({ bindings: {} }), false);
+
+  // A seat that read its brief and failed still spends the dispatch.
+  const { repoRoot, worktreeDir } = setup(['quotaa']);
+  const port = recordingPort();
+  const res = await runUnit({
+    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' }, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'scout' }, repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  });
+  const settle = port.calls.find((c) => c[0] === 'settle')[2];
+  assert.notEqual(settle.outcome, 'not-started');
+  assert.equal(settle.unitRunId, res.unitRunId);
 });
 
 test('a ceiling of two lets the fallback launch exactly once more', async () => {
