@@ -129,6 +129,10 @@ pub struct NudgeFacts {
 pub enum NudgeChannel {
     /// `codex queue --thread <id> --message <line>` to the shared app server.
     CodexQueue,
+    /// One user-message line written to the head's own session socket
+    /// (`messagingSocketPath` of its session file), only to a head that
+    /// accepts cross-session input.
+    ClaudeSocket,
 }
 
 /// Why an adapters contract was refused; names the offending entry.
@@ -447,6 +451,7 @@ fn facts_of(cli: &str, raw: RawFacts) -> Result<AdapterFacts, ContractError> {
         Some(nudge) => {
             let channel = match (cli, nudge.channel.as_str()) {
                 ("codex", "codex-queue") => NudgeChannel::CodexQueue,
+                ("claude", "claude-socket") => NudgeChannel::ClaudeSocket,
                 _ => {
                     return refuse(&format!(
                         "nudge.channel {:?} is not one {cli} has",

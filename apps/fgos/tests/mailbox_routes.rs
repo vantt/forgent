@@ -1944,7 +1944,7 @@ fn two_machines() -> Cross {
     }
 }
 
-/// One run of `scene`'s detached sync child, in the foreground; it must stay silent.
+/// One run of `scene`'s detached sync child, in the foreground; it says nothing but the outcome of a nudge it tried.
 fn sync_child(scene: &Scene) {
     let main = scene.main();
     let out = scene.run(
@@ -1961,10 +1961,10 @@ fn sync_child(scene: &Scene) {
         b"",
     );
     assert_eq!(out.status.code(), Some(0), "{out:?}");
+    let stderr = String::from_utf8_lossy(&out.stderr);
     assert!(
-        out.stderr.is_empty(),
-        "{}",
-        String::from_utf8_lossy(&out.stderr)
+        stderr.lines().all(|l| l.starts_with("mailbox-sync: nudge for ")),
+        "{stderr}"
     );
 }
 

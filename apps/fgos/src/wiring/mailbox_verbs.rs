@@ -422,6 +422,8 @@ pub(crate) fn system_nudge(versions: &VersionSources) -> SystemNudge {
     SystemNudge {
         codex_program: versions.codex_program.clone(),
         timeout: std::time::Duration::from_secs(5),
+        claude_sessions: versions.claude_sessions.clone(),
+        max_read_bytes: versions.max_read_bytes,
     }
 }
 
