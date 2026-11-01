@@ -14,6 +14,7 @@ import { AGENT_RESULT_CLAIM_CONTRACT } from '../../src/runner/dispatch/agent-res
 import { acquireRunControl, buildRunControlHolder, settleRunControl, listGenerations, controlDirs } from '../../src/runner/dispatch/run-lock.mjs';
 import { copyCredentialFiles, credentialWriteBackMarker } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import { providerAccountDir } from '../../src/runner/dispatch/provider-capacity.mjs';
+import { terminalAdapterOutcome } from '../../src/run-supervisor/steps/settle-attempt.mjs';
 import { runAttemptStep, verifyPayload, releasePayloadRoot } from '../../src/run-supervisor/attempt-step.mjs';
 
 const REPO = path.resolve(import.meta.dirname, '../..');
@@ -316,4 +317,16 @@ test('the entry reports a missing step variable and a payload the envelope does 
     assert.throws(() => verifyPayload({ ...envelope, hostBin: path.join(w.root, 'nowhere') }), /manifest/);
     assert.throws(() => verifyPayload({ ...envelope, payloadRoot: path.join(w.root, 'missing') }), /does not exist/);
   } finally { w.cleanup(); }
+});
+
+test('a seat the supervisor stopped on a timeout is a provider limit only when its screen ends on the provider\'s strict wording', () => {
+  const timeout = { outcome: 'timeout' };
+  const credits = 'working...\nError: 402: {"message":"This request requires more credits, or fewer max_tokens."}';
+  assert.equal(terminalAdapterOutcome(timeout, credits, true), 'provider-limit');
+  assert.equal(terminalAdapterOutcome(timeout, "ERROR: You've hit your usage limit. try again at 7:18 PM.", true), 'provider-limit');
+  // The agent may have been working: its own prose about a rate limit keeps the plain timeout.
+  assert.equal(terminalAdapterOutcome(timeout, 'I will add retry handling because of the rate limit\nstill working', true), null);
+  assert.equal(terminalAdapterOutcome(timeout, '', true), null);
+  // A person-wait stop keeps reading the generic wordings.
+  assert.equal(terminalAdapterOutcome({ reason: 'terminal:blocked' }, 'rate limit reached'), 'provider-limit');
 });

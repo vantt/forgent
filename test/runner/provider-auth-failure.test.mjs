@@ -56,6 +56,13 @@ test('the usage-limit line codex prints as its last words is a quota stop', () =
   assert.equal(matchAuthFailureLine(CODEX_QUOTA_STDERR, { tailLines: AUTH_FAILURE_TAIL_LINES }), null);
 });
 
+test('pi\'s OpenRouter 402 credit line is a quota stop, and prose quoting it is not', () => {
+  const line = 'Error: 402: {"message":"This request requires more credits, or fewer max_tokens. You requested up to 384000 tokens, but can only afford 12000."}';
+  assert.equal(matchQuotaLimitLine(`working...\n${line}\n`, { tailLines: AUTH_FAILURE_TAIL_LINES }), line);
+  assert.equal(matchQuotaLimitLine('402 This request requires more credits\n'), '402 This request requires more credits');
+  assert.equal(matchQuotaLimitLine('the docs say a request requires more credits when the balance is low\n'), null);
+});
+
 test('a usage-limit wording quoted inside other text, or far up a long log, is not a quota stop', () => {
   assert.equal(matchQuotaLimitLine('grep: docs say "You’ve hit your usage limit"\n'), null);
   assert.equal(matchQuotaLimitLine('the usage limit has been reached in the fixture\n'), null);

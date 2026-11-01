@@ -154,6 +154,15 @@ pub(crate) fn is_quota_limit(line: &str) -> bool {
     rest.starts_with("you've hit your usage limit")
         || rest.starts_with("usage limit has been reached")
         || rest.starts_with("individual quota reached")
+        || out_of_credits(rest)
+}
+
+/// pi on an OpenRouter 402 prints `Error: 402: {"message":"This request requires more credits, ...`;
+/// the status and the JSON opening are optional so the plain-message form matches too.
+fn out_of_credits(rest: &str) -> bool {
+    let rest = rest.strip_prefix("402").map_or(rest, |r| r.trim_start_matches(':').trim_start());
+    let rest = rest.strip_prefix("{\"message\":\"").unwrap_or(rest);
+    rest.strip_prefix("this request ").unwrap_or(rest).starts_with("requires more credits")
 }
 
 /// Drops a leading label (`error:`, `warning `) so a pattern anchors to the message.

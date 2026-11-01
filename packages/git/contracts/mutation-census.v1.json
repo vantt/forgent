@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "166a6b288eb6446c9f4a665e8e1b75fe20ee3ec6f3c59ebd6ee3bab21ac3b2cc",
+  "payloadDigest": "e2cf7767d40487fe85c902eb0f013546138984e595683e0783dc13a98db4267a",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -189,7 +189,7 @@
     "herdr-dashboard/src/ports.rs": "db6dfc823d3697b6f35fd8632fba6ea0b8c5e256d4bdd38487fa87a935faa179",
     "herdr-dashboard/src/ui.rs": "c112cef4793c0be65d8e48143e8575df8954436c972f7f3aec185cf222460b64",
     "herdr-dashboard/tests/render_smoke.rs": "068febb6148d9a441f9cd98cc7983b403a0232942866d932efb1336aec6c5d6b",
-    "packages/agent-protocol/rust/src/direct/mod.rs": "a00cf541b61fc1ab35fa8a19a6e86e1c0bcf6c8e1227f4a4638aa8bfd818f35f",
+    "packages/agent-protocol/rust/src/direct/mod.rs": "2687ec760abd78348ef560372a77113bd4aa3f7ca27a1ebcfdcc2ee8a1792d27",
     "packages/agent-protocol/rust/src/lib.rs": "37952b9d8bdca0433d049834e205da623e4fc5d2631754ac7f35bdd8c35697e7",
     "packages/agent-protocol/rust/src/outcome.rs": "ec9f9ee257dae2a0f157aad78bf965c57c2c53ca185c8721304006c7e7495fc7",
     "packages/agent-protocol/rust/src/port.rs": "e7114a49dc37bffd9e5cbaae36b4a8a7f22be5892d8062d4c63f96d09d402e43",
@@ -960,7 +960,7 @@
     "src/run-supervisor/step-support.mjs": "40c78da932dafd643762ff5c32e1f8a3844d5a7f9cd7ec64055b8b1343f614f9",
     "src/run-supervisor/steps/cleanup-trust.mjs": "4427bcd94a9469eb2063403207866ef1d28ae2941987bc8f31853c2fb4b2f0b6",
     "src/run-supervisor/steps/finalize-home.mjs": "a44414ab2ddc7e8056bbf042069983bca4b98143628e748ddc594d0cbff312b8",
-    "src/run-supervisor/steps/settle-attempt.mjs": "0541225f2fb72ae992f59edb4cec9b2060629fa9dab3ecd282418c34b01feb3c",
+    "src/run-supervisor/steps/settle-attempt.mjs": "6016d74b8309475f3a8d433304c4ab35c5cfac2a54cb043ca2748dce8d14a96e",
     "src/run-supervisor/sweep.mjs": "6e4fdf218c53bfd85c2b89d47623a9457d73f05bbdad064547a6db4bc15d6fe6",
     "src/runner/agent-definitions.mjs": "c171c5812dad6312f8538b0abda0bf7c9b392847fbe8d7a9ef75bebc44c62434",
     "src/runner/agent-listing.mjs": "8c6bfd84c26fb939cc22bf511c7e5a328d7cfa91bb9c2ba0574b94f6d48b6c4d",
@@ -1006,7 +1006,7 @@
     "src/runner/dispatch/proof-helpers.mjs": "e053aac2167c22a7f48aeccda52ff29b3f2845024d7e9207afb3d19d5265425f",
     "src/runner/dispatch/provider-account-probe.mjs": "bfded5e8a1deeb6bae30950f84ae8a587c4e911892761c50cdab0cf4bfd7e86e",
     "src/runner/dispatch/provider-adapter.mjs": "d750985427a85fd25309d3d54fed014758e6a1a57ebc9c1cd240f4e314103723",
-    "src/runner/dispatch/provider-auth-failure.mjs": "d87918a5cabbad7eed60876bd02c976ef1f680c45e28d379338f59effb892dda",
+    "src/runner/dispatch/provider-auth-failure.mjs": "ad3d07cc29e54f6758694ed861afbf66fa30e6568905e9f9383ac7b6943f19f7",
     "src/runner/dispatch/provider-capacity.mjs": "b6d411a87277c2f74ab8ea663b8cd4b44eeb3607979e1333ee414faaafd412b2",
     "src/runner/dispatch/provider-credential-probe.mjs": "b1773175ff065ce80e9bb2b5123de15cc4d9b04a9bc0f249d9a1c971653bae74",
     "src/runner/dispatch/provider-credential-renewal.mjs": "688164f5c9162b7e1324eb803e5e103798d825b9582f4f392f478b3abaecd657",
@@ -3274,7 +3274,7 @@
     {
       "path": "src/run-supervisor/attempt-step.mjs",
       "line": 72,
-      "spawn": "settleAttempt -> src/run-supervisor/steps/settle-attempt.mjs:196",
+      "spawn": "settleAttempt -> src/run-supervisor/steps/settle-attempt.mjs:200",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },

@@ -51,6 +51,9 @@ export const QUOTA_LIMIT_PATTERNS = Object.freeze([
   /^(?:error:?\s*)?you(?:'|’)ve hit your usage limit/i,
   /^(?:error:?\s*)?usage limit has been reached/i,
   /^(?:error:?\s*)?individual quota reached/i,
+  // pi on an OpenRouter 402, as its source renders it: "Error: 402: {"message":"This request requires
+  // more credits, or fewer max_tokens. ..."}". Derived from pi's source, not captured from a screen.
+  /^(?:error:?\s*)?(?:402:?\s*)?(?:\{"message":")?(?:this request )?requires more credits/i,
 ]);
 
 /** The first line of `text` that reads like a used-up quota, or null; `tailLines` as above. */

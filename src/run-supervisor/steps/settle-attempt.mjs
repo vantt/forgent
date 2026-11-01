@@ -98,7 +98,9 @@ function paneScreenOf(runDir, envelope) {
  * What a pane screen says when an agent is paused by its provider rather than by a person: a used-up
  * quota, a rate limit, a model at capacity. Generic wordings on purpose -- a miss costs a "blocked"
  * instead of a "provider-limit", never a worker, because the pane is kept either way. Only read for an
- * attempt the supervisor already stopped early, so a working agent's own text never counts.
+ * attempt the supervisor stopped on a person-wait (blocked, needs-human, delivery-unknown), so a working
+ * agent's own text never counts. A timeout stop reads the strict provider wordings only: the agent may
+ * have been working, and its own prose can say "rate limit".
  */
 const SCREEN_LIMIT_PATTERNS = Object.freeze([
   /usage limit/i,
@@ -110,9 +112,9 @@ const SCREEN_LIMIT_PATTERNS = Object.freeze([
 ]);
 const SCREEN_TAIL_LINES = 15;
 
-function screenSaysProviderStop(screenText) {
+function screenSaysProviderStop(screenText, { strictOnly = false } = {}) {
   const lines = String(screenText ?? '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(-SCREEN_TAIL_LINES);
-  if (lines.some((line) => SCREEN_LIMIT_PATTERNS.some((pattern) => pattern.test(line)))) return true;
+  if (!strictOnly && lines.some((line) => SCREEN_LIMIT_PATTERNS.some((pattern) => pattern.test(line)))) return true;
   const tail = { tailLines: AUTH_FAILURE_TAIL_LINES };
   return matchQuotaLimitLine(screenText, tail) !== null || matchAuthFailureLine(screenText, tail) !== null;
 }
@@ -120,9 +122,11 @@ function screenSaysProviderStop(screenText) {
 /**
  * The adapter outcome a terminal early end names for the settlement. A screen that ends on the provider's
  * own words is a provider stop, which moves the caller to another account or candidate; anything else the
- * agent stopped on is a person to wait for.
+ * agent stopped on is a person to wait for. A seat that ran into its timeout is a provider stop only when
+ * its screen ends on the provider's own strict wording; a timeout otherwise keeps its timeout outcome.
  */
-function terminalAdapterOutcome(receipt, screenText) {
+export function terminalAdapterOutcome(receipt, screenText, timedOut = false) {
+  if (timedOut) return screenSaysProviderStop(screenText, { strictOnly: true }) ? 'provider-limit' : null;
   if (!/^terminal:(blocked|needs-human|delivery-unknown)/.test(receipt.reason ?? '')) return null;
   if (screenSaysProviderStop(screenText)) return 'provider-limit';
   return /^terminal:delivery-unknown/.test(receipt.reason) ? null : 'blocked';
@@ -215,7 +219,7 @@ export async function settleAttempt({ runDir, envelope }) {
       stdoutText,
       stderrText,
       executionError: raw.executionError,
-      adapterOutcome: terminalAdapterOutcome(receipt, screenText),
+      adapterOutcome: terminalAdapterOutcome(receipt, screenText, raw.isTimeout),
       effectiveCwd: envelope.cwd,
       gitBefore: baseline?.gitBefore ?? null,
       gitBeforeSource: baseline?.gitBeforeSource ?? 'pre-launch',
