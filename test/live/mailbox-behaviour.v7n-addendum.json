@@ -6,7 +6,7 @@
   },
   "frozenAt": "2026-10-30T06:25:00.545Z",
   "overrides": {
-    "packages/mailbox/contracts/frame.v1.txt": "4035b3ec81e8e5694880441a44482c53d35e5b517010540ddb825c7f869c442d",
+    "packages/mailbox/contracts/frame.v1.txt": "2b40708fcf9a384400429f5dde01849aa4e167a76caa66e21857dd3782326bad",
     "packages/mailbox/contracts/limits.v1.json": "24d1bc3448b4fb969e15fc4e2d344576c991e0e71d503f024f086777325bfb70"
   },
   "added": {
