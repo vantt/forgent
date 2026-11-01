@@ -144,6 +144,10 @@ fn only_codex_and_claude_have_a_nudge_channel_and_only_on_the_versions_they_were
         tested.nudge_for("claude", "2.1.310"),
         Some(NudgeChannel::ClaudeSocket)
     );
+    assert_eq!(
+        tested.nudge_for("claude", "2.1.314"),
+        Some(NudgeChannel::ClaudeSocket)
+    );
     assert_eq!(tested.nudge_for("claude", "2.1.311"), None);
     assert_eq!(
         tested.nudge_clis(),

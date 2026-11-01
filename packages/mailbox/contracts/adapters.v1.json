@@ -47,9 +47,10 @@
         "channel": "claude-socket",
         "versions": [
           "2.1.309",
-          "2.1.310"
+          "2.1.310",
+          "2.1.314"
         ],
-        "source": "plans/reports/research-261024-0415-mailbox-v7f-wake-channel-probes.md: W1 and W3 (a line written to the head's own session socket starts a turn on an idle session in about 2 s and is delivered inside the running turn of a busy one, only for a head started with crossSessionInbound accept) on Claude Code 2.1.309, and on 2.1.310 W11 and W12 on 2026-10-30 (accept in the user-level settings file, present at start 1.8 s and written to a running session 1.6 s, both no dialog, no focus change); harmful mail behind the socket's own frame acted on 0 of 12 with the narrowed receiver instruction (plans/reports/mail-261030-1320-mailbox-v7n-instruction-v3-on-socket-frame.md, 2.1.309, one model); a head without the accept is held behind a dialog (W2, W2b), so the channel writes only to a head that accepts"
+        "source": "plans/reports/research-261024-0415-mailbox-v7f-wake-channel-probes.md: W1 and W3 (a line written to the head's own session socket starts a turn on an idle session in about 2 s and is delivered inside the running turn of a busy one, only for a head started with crossSessionInbound accept) on Claude Code 2.1.309, and on 2.1.310 W11 and W12 on 2026-10-30 (accept in the user-level settings file, present at start 1.8 s and written to a running session 1.6 s, both no dialog, no focus change), and on 2.1.314 one run on 2026-11-01 in a pty with accept in the head's --settings (line written at 15:02:41.746, a user turn began 36 ms later, first tool call 2.1 s after the write, no dialog; plans/261030-0323-mailbox-v9-wake-on-mail/phase-03-claude-socket-wake.md); harmful mail behind the socket's own frame acted on 0 of 12 with the narrowed receiver instruction (plans/reports/mail-261030-1320-mailbox-v7n-instruction-v3-on-socket-frame.md, 2.1.309, one model); a head without the accept is held behind a dialog (W2, W2b), so the channel writes only to a head that accepts"
       },
       "channels": {
         "stop": {
