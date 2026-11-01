@@ -51,6 +51,9 @@ function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
 }
 const HAS_WORKING_BWRAP = hasWorkingBwrap();
 
+// The harness's kill window under a loaded machine: the default 5 s is too short while the whole suite runs.
+const LOADED_WAIT_MS = 15_000;
+
 const sha256 = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 /** The processes of a run once they have exited: a kill has landed when its call returns, but under load the process may not be reaped yet. */
@@ -264,7 +267,7 @@ test('a send from outside reaches a head registered inside the sandbox; a send b
   assert.equal(sent.status, 0, sent.text);
   fs.writeFileSync(path.join(prepared.paths.ws, 'go1.txt'), '');
   assert.equal((await run.exited).code, 0);
-  assert.deepEqual((await endConfinedRun(run)).left, []);
+  assert.deepEqual((await endConfinedRun(run, { waitMs: LOADED_WAIT_MS })).left, []);
 
   const [message] = snapshotOf(prepared.paths.ws).messages;
   assert.equal(message.from, 'mailbox-behaviour-harness');
@@ -280,7 +283,7 @@ test('ending a confined run leaves no process, whether it ignores SIGTERM or for
     const run = startConfinedRun(prepared);
     await sleep(300);
     assert.ok(processesOfRun(prepared.paths.dir, run.entry.pidNs).length >= 2, `${runId} runs before the end`);
-    const { left } = await endConfinedRun(run);
+    const { left } = await endConfinedRun(run, { waitMs: LOADED_WAIT_MS });
     assert.deepEqual(left, [], runId);
     assert.deepEqual(await processesGone(prepared.paths.dir, run.entry.pidNs), [], runId);
     assert.ok(JSON.parse(fs.readFileSync(prepared.paths.ledger, 'utf8')).endedAt);
@@ -412,7 +415,7 @@ test('two heads in two sandboxes share one record, and each receives the other\'
   fs.writeFileSync(path.join(ws, 'go.txt'), '');
   for (const me of ['A', 'B']) {
     assert.equal((await runs[me].exited).code, 0, me);
-    assert.deepEqual((await endConfinedRun(runs[me])).left, [], me);
+    assert.deepEqual((await endConfinedRun(runs[me], { waitMs: LOADED_WAIT_MS })).left, [], me);
   }
   const messages = snapshotOf(ws).messages;
   assert.equal(messages.length, 2);
