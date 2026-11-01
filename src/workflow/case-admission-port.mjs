@@ -335,6 +335,7 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
         achieved,
         seatLaunchesUsed: result.seatLaunchesUsed ?? 0,
         ...(result.frameExhausted ? { frameExhausted: true } : {}),
+        ...(result.gate ? { gate: result.gate } : {}),
         blind: reservation.blind === true,
         settledAt: new Date().toISOString(),
       };

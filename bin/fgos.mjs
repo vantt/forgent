@@ -2331,6 +2331,22 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow close requires a workflowRunId: fgos workflow close <id>');
         return closeWorkflow(workflowRunId, { repoRoot: flags.dir, reason: typeof flags.reason === 'string' ? flags.reason : undefined });
       }
+      if (sub === 'gate') {
+        const { gateWorkflow } = await import('../src/workflow/index.mjs');
+        const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow gate requires a workflowRunId: fgos workflow gate <id> --worktree <path> --writes <paths> --verify "<command>"');
+        const gateWrites = parseListFlag(flags.writes);
+        return gateWorkflow(workflowRunId, {
+          repoRoot: flags.dir,
+          worktree: requireField(flags.worktree, 'workflow gate requires --worktree <path>'),
+          writes: gateWrites,
+          activity: typeof flags.activity === 'string' ? flags.activity : undefined,
+          verify: typeof flags.verify === 'string' ? flags.verify : undefined,
+          capability: typeof flags.capability === 'string' ? flags.capability : undefined,
+          timeoutMs: flags.timeout === undefined ? undefined : parseRunTimeout(requireField(flags.timeout, '--timeout requires a duration, e.g. 45m or 2700s')),
+          reason: typeof flags.reason === 'string' ? flags.reason : undefined,
+        });
+      }
       if (sub === 'resume') {
         const { resumeWorkflow, resumeWorkflowDetached } = await import('../src/workflow/index.mjs');
         const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow resume requires a workflowRunId: fgos workflow resume <id>');

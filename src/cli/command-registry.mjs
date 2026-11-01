@@ -2491,6 +2491,26 @@ export const COMMAND_REGISTRY = [
         },
         examples: ['fgos workflow close wf-run-1234'],
       },
+      gate: {
+        description: 'Run the project\'s whole-worktree check for a case as the runner (no seat) and settle it as the receipt of an activity (default integrate). Admitted like any dispatch: it counts against the frame and needs the case worktree. A failing check leaves the milestone unachieved. The command is --verify, else capabilities.<capability>.verify.',
+        parameters: {
+          type: 'object',
+          properties: {
+            'run-id': { type: 'string', description: 'Positional (or --id): the Workflow Run id.' },
+            id: { type: 'string', description: 'Same as the positional run id.' },
+            worktree: { type: 'string', description: 'The case worktree the command runs in.' },
+            writes: { type: 'string', description: 'The tested paths (comma-separated); the receipt carries their digest.' },
+            activity: { type: 'string', description: 'Activity to settle (default integrate).' },
+            verify: { type: 'string', description: 'The command to run; else the verify of --capability.' },
+            capability: { type: 'string', description: 'Capability whose configured verify command is used when --verify is absent.' },
+            timeout: { type: 'string', description: 'Longest the command may run, e.g. 45m (default: runner timeoutMs).' },
+            reason: { type: 'string', description: 'Why, recorded on the route.' },
+          },
+          positional: ['run-id'],
+          required: ['run-id', 'worktree', 'writes'],
+        },
+        examples: ['fgos workflow gate wf-run-1234 --worktree ../wt --writes src,test --verify "npm test" --timeout 45m'],
+      },
       operations: {
         description: 'Read-only: the operations a stage step offers, read from the Workflow definition.',
         parameters: {

@@ -27,4 +27,5 @@ export {
   answerWorkflow,
   resumeWorkflow,
   closeWorkflow,
+  gateWorkflow,
 } from './case-verbs.mjs';

@@ -14,6 +14,7 @@ import {
   resumeWorkflowDetached,
   statusWorkflow,
   closeWorkflow,
+  gateWorkflow,
   readWorkflowEvents,
 } from '../../src/workflow/index.mjs';
 import { acquireDispatchCwdLock } from '../../src/runner/dispatch/cwd-lock.mjs';
@@ -228,4 +229,74 @@ test('inherit: each condition that has moved is refused by name and creates no c
   await refused({ inheritFrom: from }, 'inherit-base-differs');
 
   assert.equal(fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length, runsBefore + 1, 'only the case opened to be closed exists beside the source: no refusal created a run');
+});
+
+// A case that planned and built a child with a verify receipt, left open: the gate is what it may run next.
+async function builtCase(tmp) {
+  const started = await startWorkflow({ workflow: conductorWorkflow(), request: 'Ship the change', frame: { dispatches: 6, rigorFloor: 'standard' }, ...opts(tmp) });
+  const run = { repoRoot: tmp, caseId: started.caseId };
+  appendAll(run, [
+    { type: 'reservation', payload: { reservationId: 'r-plan', activity: 'plan', writes: [], counters: { dispatches: 1, mutatingDispatches: 0 } } },
+    settle('r-plan', { milestone: 'plan-ready', subjectDigest: 'sha256:plan', activity: 'plan' }),
+    { type: 'reservation', payload: { reservationId: 'r-build', activity: 'build-a', writes: ['src/a'], counters: { dispatches: 1, mutatingDispatches: 1 } } },
+    settle('r-build', { milestone: 'child-built', subjectDigest: 'sha256:child', receipts: [verifyReceipt('child-built', 'sha256:child')], activity: 'build-a' }),
+  ]);
+  return started.caseId;
+}
+
+const nodeExit = (code) => `"${process.execPath}" -e "process.exit(${code})"`;
+const settleEvents = (tmp, id) => eventsOf(tmp, id).filter((e) => e.type === 'settle');
+
+test('gate: the runner runs the whole-worktree command and a pass settles the integrated receipt, recording the command and an output digest', async () => {
+  const tmp = setupRepo();
+  const id = await builtCase(tmp);
+  const before = statusWorkflow(id, opts(tmp)).case.frameRemaining.mutatingDispatches;
+
+  const result = await gateWorkflow(id, { ...opts(tmp), writes: ['README.md'], verify: nodeExit(0) });
+  assert.equal(result.outcome, 'pass');
+  assert.equal(result.gate.passed, true);
+
+  const status = statusWorkflow(id, opts(tmp));
+  assert.equal(status.case.milestones.integrated.state, 'achieved');
+  assert.equal(status.case.frameRemaining.mutatingDispatches, before - 1, 'the gate is admitted like any writing dispatch and counts against the frame');
+  const last = settleEvents(tmp, id).at(-1).payload;
+  assert.equal(last.activity, 'integrate');
+  assert.equal(last.seatLaunchesUsed, 0);
+  assert.equal(last.gate.command, nodeExit(0));
+  assert.match(last.gate.outputDigest, /^sha256:[0-9a-f]{64}$/);
+  assert.ok(last.receipts.some((r) => r.evaluator === 'harness-verify' && r.milestone === 'integrated' && r.passed === true));
+});
+
+test('gate: a failing command leaves the milestone unachieved and records why', async () => {
+  const tmp = setupRepo();
+  const id = await builtCase(tmp);
+
+  const result = await gateWorkflow(id, { ...opts(tmp), writes: ['README.md'], verify: nodeExit(3) });
+  assert.equal(result.outcome, 'findings');
+  assert.equal(result.gate.status, 3);
+
+  assert.equal(statusWorkflow(id, opts(tmp)).case.milestones.integrated.state, 'unreached');
+  const last = settleEvents(tmp, id).at(-1).payload;
+  assert.equal(last.outcome, 'findings');
+  assert.equal(last.gate.passed, false);
+  assert.deepEqual(last.receipts, []);
+});
+
+test('gate: with no command, no tested paths or no worktree it refuses by name before touching the case', async () => {
+  const tmp = setupRepo();
+  const id = await builtCase(tmp);
+  const count = () => eventsOf(tmp, id).length;
+  const before = count();
+
+  await assert.rejects(gateWorkflow(id, { ...opts(tmp), writes: ['README.md'] }), (err) => err.code === 'gate-command-missing');
+  await assert.rejects(gateWorkflow(id, { ...opts(tmp), verify: nodeExit(0) }), (err) => err.code === 'gate-writes-required');
+  await assert.rejects(gateWorkflow(id, { ...opts(tmp), worktree: path.join(tmp, 'absent'), writes: ['README.md'], verify: nodeExit(0) }), (err) => err.code === 'gate-worktree-missing');
+  assert.equal(count(), before, 'a refused gate writes nothing to the ledger');
+});
+
+test('gate: a case that has not reached the activity entry refuses the gate through the same admission as any dispatch', async () => {
+  const tmp = setupRepo();
+  const { caseId: id } = await startWorkflow({ workflow: conductorWorkflow(), frame: { dispatches: 6, rigorFloor: 'standard' }, ...opts(tmp) });
+  await assert.rejects(gateWorkflow(id, { ...opts(tmp), writes: ['README.md'], verify: nodeExit(0) }), (err) => err.code === 'entry-milestone-unmet');
+  assert.equal(statusWorkflow(id, opts(tmp)).case.milestones.integrated.state, 'unreached');
 });

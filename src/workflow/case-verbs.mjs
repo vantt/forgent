@@ -22,6 +22,7 @@ import {
 import { drainCaseInbox, recordGateAnswerRound } from './case-runtime.mjs';
 import { closeCaseUnderHold, readCaseProjection } from './case-close.mjs';
 import { detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
+import { runCaseGate } from './case-gate.mjs';
 import { advanceWorkflowRun } from './runner.mjs';
 import { normalizeSeats } from './seats.mjs';
 import { seatProviders } from './seat-providers.mjs';
@@ -363,5 +364,24 @@ export function closeWorkflow(workflowRunId, options = {}) {
         : new RunnerConfigError(`Workflow case "${workflowRunId}" cannot close: ${result.reasons.join(', ')}`, { code: 'close-refused' });
     }
     return { closed: true, caseId: workflowRunId, unbound: result.unbound, kept: result.kept };
+  });
+}
+
+/**
+ * Run the project's whole-worktree check for a case as the runner, in `options.worktree`, and settle the
+ * result as the receipt of `options.activity`. The verb is opt-in: nothing runs it by itself.
+ */
+export async function gateWorkflow(workflowRunId, options = {}) {
+  const { mainRoot, worktreePath } = rootsOf(workflowRunId, options, 'gateWorkflow');
+  return runCaseGate({
+    mainRoot,
+    caseId: workflowRunId,
+    worktree: options.worktree ? path.resolve(options.worktree) : worktreePath,
+    writes: options.writes,
+    activity: options.activity,
+    command: options.verify,
+    capability: options.capability,
+    timeoutMs: options.timeoutMs,
+    reason: options.reason,
   });
 }
