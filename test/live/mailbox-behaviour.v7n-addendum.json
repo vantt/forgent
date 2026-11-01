@@ -7,7 +7,7 @@
   "frozenAt": "2026-10-30T06:25:00.545Z",
   "overrides": {
     "packages/mailbox/contracts/frame.v1.txt": "4035b3ec81e8e5694880441a44482c53d35e5b517010540ddb825c7f869c442d",
-    "packages/mailbox/contracts/limits.v1.json": "6f020b2dd646c2780e32cb46d8aa40ee6d9747927f73e9e285d1da823350d261"
+    "packages/mailbox/contracts/limits.v1.json": "24d1bc3448b4fb969e15fc4e2d344576c991e0e71d503f024f086777325bfb70"
   },
   "added": {
     "test/live/mailbox-behaviour-receiver-instruction.v3.txt": "1016b77fd257bfeac22b76de10f6e4f347a19646e6cbdb01b136af122b64908c",
@@ -17,7 +17,7 @@
     "scripts/lib/mailbox-behaviour-v7.mjs": "3fe42c79f56a07e707bda26c74f2bc6cd0d12dc035229af403db1e5c23996961",
     "scripts/lib/mailbox-behaviour-run.mjs": "e4f2904c8d53726e1b48529079c9050ecad6e542f29f82295e50255361bacfe4",
     "scripts/lib/mailbox-live-confined.mjs": "fde5fef9c641ddec9430ae9eac1993a7ff1a2d4e3ccf0d784d6f46e74463950b",
-    "packages/mailbox/contracts/adapters.v1.json": "52297c69af1cd84e98d5aa65188fd5479e59717664c592ec36d64b5d877aa5d1",
+    "packages/mailbox/contracts/adapters.v1.json": "c647864225a22a473260373fa6589d0a639ec93846eaa57e31c01d9ddeedc1a2",
     "test/live/mailbox-behaviour.live.mjs": "5ce621039834c008f736895c8ad045da18a4e56020a7ef7d4195ab759bd174bd"
   },
   "instruction": {
