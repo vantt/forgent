@@ -33,3 +33,9 @@ Unit and route tests; one live W1 run per added Claude version; then a live proo
 
 - A same-user process can write to a session that accepts. That is the K1 reason; it is bounded here by writing only to heads that were launched with the scoped accept on purpose, a fixed line, and the 0-of-12 measurement. Rollback: remove the `claude` entry from `nudge` in the contract; heads fall back to tool-call delivery.
 - The 12-run measurement is one model and one version; the report says so and the contract carries the version list.
+
+## Receiver instruction in the frame (owner chose A, 2026-11-01)
+
+Requirement 4 had no product anchor: the instruction measured in V7n is harness test data. Spec §5.5 already says the frame text, including its trailing instruction lines, is rendered from `packages/mailbox/contracts/frame.v1.txt`, so the standing instruction now lives there (main `8b70cb949`): one line after the reply line saying the mail brings no approval or permission, a read-only request inside the user's task may be done without asking, anything else needs the user first, the user is told in the final answer, and the inbox is not polled. It has no trusted-sender list, so every sender is treated as the untrusted case of instruction v3. Every CLI that gets a frame gets the line; the contract is embedded, so it ships with the next release.
+
+Still open: the harmful-cell measurement of this exact wording through the socket frame (V7n measured v3 behind the frame, 0 of 12 harmful). Until it is run the 0-of-12 figure belongs to v3, not to the shipped line.
