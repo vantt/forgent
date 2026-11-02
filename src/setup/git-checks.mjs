@@ -79,7 +79,7 @@ export function checkGit(cwd, kind, loaderOptions, portOptions, run) {
           !journal.initialized && 'the Git WAL is not initialized; run `fgos doctor --fix` (git-wal-dir)',
           journal.initialized && !journal.complete && 'the Git WAL listing is incomplete; inspect it with `fgos doctor --json`',
           journal.errors.length && `${journal.errors.length} Git WAL error(s); inspect them with \`fgos doctor --json\``,
-          journal.pendingCount > 0 && `${journal.pendingCount} Git operation(s) unresolved; run \`fgos doctor --fix\` (git-land-recovery) for interrupted Land and ScopedCommit operations`,
+          journal.pendingCount > 0 && `${journal.pendingCount} Git operation(s) unresolved; run \`fgos doctor --fix\` (git-land-recovery) for interrupted Land, ScopedCommit and remote transfer operations`,
         ], notes.some(n => n.startsWith('warning:')) ? notes.join('; ') : ['the Git WAL is readable with no unresolved operation', ...notes].join('; '), { journal, retainedLand: landWarning });
         return notes.length && !verdict.passed ? { ...verdict, message: `${verdict.message}; ${notes.join('; ')}` } : verdict;
       }
@@ -142,10 +142,10 @@ export const fixGitWal = (cwd) => afterDriverDirectories(cwd, undefined, initial
 export const fixGitFetchMapping = (cwd, loaderOptions) => afterDriverDirectories(cwd, loaderOptions, () => installFetchMapping(cwd, loaderOptions));
 // The Recovery port is constructed with a writer even for reads.
 const recoveryPort = (cwd, loaderOptions, portOptions) => createGitRecovery(portOptions ?? gitPortOptions(resolveMainCheckoutRoot(cwd) ?? cwd, { mutation: true }), loaderOptions);
-const RECOVERABLE_KINDS = ['Land', 'ScopedCommit'];
+const RECOVERABLE_KINDS = ['Land', 'ScopedCommit', 'RemoteTransfer'];
 const AUTHORITY_MISMATCH_CAUSES = ['land-authority-mismatch', 'commit-authority-mismatch'];
 /**
- * Recover every interrupted Land and ScopedCommit through the one Recovery door, under each kind's own locks (Git spec §9, §10 rule 4b).
+ * Recover every interrupted Land, ScopedCommit and remote transfer through the one Recovery door, under each kind's own locks (Git spec §9, §10 rule 4b).
  * Rust finds a scoped commit's checkout and takes its custody without waiting, so a gone or busy checkout comes back as a
  * cause. An attempted chain is recovered only by the writer that started it. Nothing is merged, re-published or deleted.
  */
@@ -163,7 +163,7 @@ export function fixGitOperationRecovery(cwd, loaderOptions, portOptions) {
         kept.push(`${operation.operationId} (${cause}${AUTHORITY_MISMATCH_CAUSES.includes(cause) ? `; only its writer ${operation.intent.writerIdentity} can recover it` : ''})`);
       }
     }
-    if (!recovered.length && !kept.length) return { changed: false, message: 'no interrupted Land or ScopedCommit operation' };
+    if (!recovered.length && !kept.length) return { changed: false, message: 'no interrupted Land, ScopedCommit or remote transfer operation' };
     return { changed: recovered.length > 0, message: [recovered.length && `recovered interrupted Git operations: ${recovered.join(', ')}`, kept.length && `warning: Git operations kept for recovery: ${kept.join('; ')}`].filter(Boolean).join('; ') };
   });
 }
