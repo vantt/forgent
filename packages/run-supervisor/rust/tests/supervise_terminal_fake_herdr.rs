@@ -212,24 +212,40 @@ fn a_pane_that_disappears_is_a_lost_carrier_and_nothing_is_closed() {
 }
 
 #[test]
-fn an_agent_reported_working_is_alive_without_asking_the_pane_for_its_processes() {
+fn only_new_words_on_the_screen_keep_a_working_agent_from_idling_never_a_spinner_or_a_clock() {
     let herdr = FakeHerdr::new("alive");
     let mut run = terminal_run_with("talive", &herdr, "sleep 600", 500, |opts| opts.idle_ms = Some(6_000));
     let supervisor = run.start_with_env(&herdr.env());
 
     brief_taken(&herdr, &run);
-    fs::write(herdr.dir.join("agent-status"), "working").unwrap();
-    // More than two idle periods in which nothing is drawn: the working verdict is the liveness proof.
-    std::thread::sleep(Duration::from_secs(14));
-    assert!(run.json("stop-requested.json").is_none(), "a working agent is not idle: {}", run.log());
+    let screen = herdr.dir.join("screen.txt");
+    // More than an idle period of new output: the agent is making progress.
+    for line in 0..20 {
+        let words: String = (0..=line).map(|n| format!("step {}\n", "abcdefghijklmnopqrstu".chars().nth(n).unwrap())).collect();
+        fs::write(&screen, words).unwrap();
+        std::thread::sleep(Duration::from_millis(500));
+    }
+    assert!(run.json("stop-requested.json").is_none(), "an agent writing new words is not idle: {}", run.log());
     let calls = herdr.calls();
     let typed = calls.iter().position(|c| c.starts_with("pane send-keys")).expect("the brief was submitted");
     assert!(calls[typed..].iter().all(|c| !c.starts_with("pane process-info")), "the watch never reads the pane's processes: {calls:?}");
 
-    kill_agent(&run);
+    // Still reported working, but only the spinner and the elapsed clock move: a stuck turn.
+    let frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+    for tick in 0..40 {
+        if run.json("stop-requested.json").is_some() {
+            break;
+        }
+        fs::write(&screen, format!("{} Working ({}s, 1.{}k tokens)\n", frames[tick % frames.len()], 30 + tick, tick)).unwrap();
+        std::thread::sleep(Duration::from_millis(500));
+    }
     let (code, line) = finish(supervisor, LIMIT);
+    // SAFETY: SIGKILL to the agent the gate reported; a pid that is gone is harmless.
+    unsafe { libc::kill(agent_pid(&run), libc::SIGKILL) };
     assert_eq!(code, 0, "{}", run.log());
-    assert_eq!(line["outcome"], "exited");
+    assert_eq!(line["outcome"], "timeout");
+    let stop = run.json("stop-requested.json").expect("stop request");
+    assert_eq!(stop["cause"], "idle", "a redrawing spinner is not progress: {stop}");
 }
 
 #[test]
@@ -242,9 +258,12 @@ fn a_pane_that_cannot_be_read_is_blind_time_that_runs_to_the_deadline_never_idle
     let supervisor = run.start_with_env(&herdr.env());
 
     brief_taken(&herdr, &run);
-    // Let the adapter confirm the delivery first, with the agent working; only then does the pane stop answering.
+    // Let the adapter confirm the delivery first, with the agent working and writing; only then does the pane stop answering.
     fs::write(herdr.dir.join("agent-status"), "working").unwrap();
-    std::thread::sleep(Duration::from_secs(4));
+    for word in ["reading", "planning", "editing", "testing", "writing", "checking", "done"] {
+        fs::write(herdr.dir.join("screen.txt"), word).unwrap();
+        std::thread::sleep(Duration::from_millis(600));
+    }
     herdr.set_flag("unreadable", true);
 
     let (code, line) = finish(supervisor, LIMIT);

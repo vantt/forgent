@@ -53,9 +53,9 @@ export function withoutPaneEnv(env) {
   return Object.fromEntries(Object.entries(env ?? {}).filter(([name]) => !PANE_TERMINAL_ENV.includes(name) && !name.startsWith('HERDR_')));
 }
 
-/** How long an agent may show no progress before the supervisor stops it. Applies only when the runner
- * config sets no `idleTimeoutMs` (which also governs cli-spawn, where silence is normal). */
-export const DEFAULT_IDLE_TIMEOUT_MS = 300000;
+/** How long an agent in a pane may show no new words on its screen before the supervisor stops it.
+ * The runner's `idleTimeoutMs` is for headless workers, where long silence is normal. */
+export const PANE_IDLE_TIMEOUT_MS = 1200000;
 
 /** After a result file appeared while the supervisor is gone, how long the gate still waits for the
  * agent to finish its report before it ends the domain. */

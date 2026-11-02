@@ -436,11 +436,12 @@ impl Sup<'_> {
         }
     }
 
-    /// A changed screen counts as activity for the idle timer.
+    /// New words on the screen count as activity for the idle timer. Only letters are compared:
+    /// a spinner, an elapsed clock or a token counter keeps redrawing while the agent is stuck.
     fn note_screen(&mut self, screen: Option<String>) {
         let Some(screen) = screen else { return };
         let mut hasher = DefaultHasher::new();
-        screen.hash(&mut hasher);
+        screen.chars().filter(|c| c.is_alphabetic()).for_each(|c| c.hash(&mut hasher));
         let digest = hasher.finish();
         if self.last_screen.replace(digest).is_some_and(|before| before != digest) {
             self.last_active = Instant::now();
@@ -498,9 +499,6 @@ impl AgentIo for TermIo<'_, '_> {
             (PaneState::Live, Some(activity)) => activity,
             _ => return Err(IoError::Io("the pane gave no activity".into())),
         };
-        if activity.state == "working" {
-            self.sup.last_active = Instant::now();
-        }
         Ok(match activity.detail {
             Some(detail) => Inspection {
                 state: detail.state.or_else(|| Some(activity.state).filter(|s| !s.is_empty())),

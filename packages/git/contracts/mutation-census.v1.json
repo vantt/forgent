@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3f7480c7aa460a1c148d6ffad7ebb0968de457198c916ebcb7a8a4dada67e96e",
+  "payloadDigest": "f394e4b159a391e8a0112f98b484f4c0bd674ba98d7caf364d12430e97e568b2",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -667,7 +667,7 @@
     "packages/run-supervisor/rust/src/route.rs": "c730f674e45859867eaae0e856c24aec5d9bf82f79ea0ff88ae1f8bcc44b603a",
     "packages/run-supervisor/rust/src/steps.rs": "30bad93df1d946005054daa5aefdeb0d3df5b4175ebb19bb28cec7680e9dd20b",
     "packages/run-supervisor/rust/src/supervise.rs": "9b304ce2bcefa42d9d75ff05aff282672145f3b7f962de9b4483a3ea9bcfe41e",
-    "packages/run-supervisor/rust/src/supervise/terminal.rs": "54e3b9abb82300c13a32525ba22b40f4db2863eae5521ec38486c313cd7133ca",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs": "c68768b789ee24a88035acffe517501be3fb511c8c4336c5239e2d101b6cc673",
     "packages/run-supervisor/rust/src/supervise/unix.rs": "d46cc2ebbcb241025a623310e2dcc04df256860a019ea6e1b0bf8bce597bd966",
     "packages/run-supervisor/rust/src/supervise/windows.rs": "e2b04b6d2499d769206aa1c8121eada6ab248351e25ad81ab90befa7c81d7205",
     "packages/run-supervisor/rust/src/terminal_slot.rs": "b09fd96ee9467a19310bce33bc13ba98423e07f9cee6c280840c0fb439bc8279",
@@ -692,7 +692,7 @@
     "packages/run-supervisor/rust/tests/supervise_guard.rs": "238d1180379434a4de3dd38d104d3d618809ccf178bc5535d991c0fc3e226163",
     "packages/run-supervisor/rust/tests/supervise_lifecycle.rs": "f565fb1d727af6f73080519ab303b3b40260c7deeea2d3319cad411c60cfa3ed",
     "packages/run-supervisor/rust/tests/supervise_portable.rs": "de0c450933c70bda74cfb7076547863b0c7a71573bd5ca3335c0923eb2827cfa",
-    "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs": "c564d1ab9d3e71ecf5fc9a16ed1793332de97fb97543a6c933b28b779b52e1e3",
+    "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs": "bcee7185f7194278b419b0d34b814ade8cdfc0d2c43992015e13ccf71facbafd",
     "packages/run-supervisor/rust/tests/support/adopt_fixture.rs": "0b871e409fd7c3249ee70bc7729c1da1aa1fb3c5a3a12d35615958a2f08d1b02",
     "packages/run-supervisor/rust/tests/support/herdr.rs": "3fd9f4f66315a6757ce104d385dd5df3833b081491d5b849fb2239f06d4b13a6",
     "packages/run-supervisor/rust/tests/support/mod.rs": "7042ae4b7561f0d6f4ff01c80747510a7dfa09bd958e140dcc61815f33be6bd0",
@@ -974,7 +974,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "6b35618fbb2349be178c672a52f05de765939d0eb68f1a1fa4a7535e291828f1",
-    "src/runner/dispatch/assignment-runner.mjs": "7da670bce3e9a2ee55823e0526c6e63a1418891f67fba0d2201d41916c088ea9",
+    "src/runner/dispatch/assignment-runner.mjs": "e0372b41fb83a865bc50bd5b460eeee50153c0af0e25b6be9f41043cf9b4ea53",
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "95c9e5ba54705cdcc129234a23096cc033b776010ce351959a15b6628c22e1a9",
@@ -996,7 +996,7 @@
     "src/runner/dispatch/execution-contract.mjs": "df3747d8745fc2986669d73a2b4cf2e66e59693c99978aa94349d03479f8e5f6",
     "src/runner/dispatch/executor-governance.mjs": "0f4252d4a1d02b7aaaf20102db0c47b6d3aa7f669ef2075f52d59f0beaac4f22",
     "src/runner/dispatch/herdr-deadlines.mjs": "cdaaaeaeb55d5296078e0a0e56d73eebacff514896bc741941ea57aa46c6596b",
-    "src/runner/dispatch/herdr-round.mjs": "dc6539e766b18759b1544ccc5b28984396376385a74443e5fe417ace06865400",
+    "src/runner/dispatch/herdr-round.mjs": "faa00f2b5f00b13e43108c8397380489dce46f83133c1954fc58641ef32fbaa0",
     "src/runner/dispatch/llm-accounts.mjs": "246105c8c967302ccaf988274f2ca502ce203328ef1742033de5544a336dbfec",
     "src/runner/dispatch/mechanism.mjs": "964be5b92c651b0e5cd0cfef5e51b6f9e90e1e172b0ccba7c58c19fe42d32709",
     "src/runner/dispatch/operation-prompt-templates.mjs": "932f932d239ccec0ef3debd919576d25ab068c50cb990d1f15afd03ff30f46af",
@@ -2929,7 +2929,7 @@
     },
     {
       "path": "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs",
-      "line": 307,
+      "line": 326,
       "spawn": "Command::new",
       "binary": "? internal_harness()",
       "class": "rust-test"

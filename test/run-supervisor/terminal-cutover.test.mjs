@@ -42,7 +42,7 @@ test('a herdr-spawn seat runs as a terminal attempt: brief typed by the supervis
   assert.equal(envelope.agentProtocol.cli, 'claude');
   assert.deepEqual(envelope.steps.map((s) => s.stepId), ['settle-attempt', 'finalize-home', 'cleanup-trust', 'release-slot']);
   assert.equal(envelope.identity.writerId, `att-${envelope.attemptId}`);
-  assert.equal(envelope.deadlines.idleMs, 300_000, 'an attempt has an idle limit even when the runner config sets none');
+  assert.equal(envelope.deadlines.idleMs, 1_200_000, 'a pane attempt has its own idle limit, whatever the runner config sets for headless workers');
   assert.equal(envelope.launch.briefPath, path.join(attemptDir, 'brief-1.md'));
   assert.equal(fs.readFileSync(envelope.launch.briefPath, 'utf8').trim(), brief.trim());
 

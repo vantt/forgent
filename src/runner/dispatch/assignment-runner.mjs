@@ -103,7 +103,7 @@ import { adoptRun } from '../../run-supervisor/client.mjs';
 import { register as registerDeliveredAttempt, unregister as unregisterDeliveredAttempt, beginLaunch as beginAttemptLaunch, endLaunch as endAttemptLaunch } from '../../run-supervisor/cancel-registry.mjs';
 import { watchWritesOutsideWorkspace } from './stray-writes.mjs';
 import { resolveLock } from '../../holder-lock/index.mjs';
-import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, DEFAULT_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
+import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, PANE_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
 import { resolveHerdrBin, workLabelOf } from './terminal-slot.mjs';
 import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
 import { prepareConfinementForLaunch } from './confinement/authority.mjs';
@@ -2045,7 +2045,7 @@ export async function executeAssignment(assignment, opts = {}) {
         mutating: effectiveMutation === 'mutating' && opts.forceSharedCwd !== true,
         attempt: terminalMode ? { ...prepResult.attempt, env: withoutPaneEnv(prepResult.attempt.env) } : prepResult.attempt,
         timeoutMs,
-        idleTimeoutMs: terminalMode ? (cfg.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS) : cfg.idleTimeoutMs,
+        idleTimeoutMs: terminalMode ? PANE_IDLE_TIMEOUT_MS : cfg.idleTimeoutMs,
         maxOutputBytes: cfg.maxBuffer || 10485760,
         cli: terminalMode && TERMINAL_CLIS.has(resolvedCmd.interactiveMode?.kind) ? resolvedCmd.interactiveMode.kind : commandCli(prepResult.attempt.command),
         stepEnv: attemptStepEnv,
