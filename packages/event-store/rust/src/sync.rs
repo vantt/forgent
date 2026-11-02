@@ -359,6 +359,7 @@ pub fn sync_with_fs(
                 .map_err(git_error)?,
             )
             .with_remote(grant.clone());
+            port.recover_own_transfers(repo).map_err(git_error)?;
             port.recover_publications(repo).map_err(git_error)?;
             transfer(&mut state.last_fetch, req.remote, || {
                 port.fetch_refs(repo, req.remote, &refspec::mappings(req.remote)?)
@@ -388,6 +389,7 @@ pub fn sync_with_fs(
                 .map_err(git_error)?,
             )
             .with_remote(grant.clone());
+            port.recover_own_transfers(repo).map_err(git_error)?;
             port.recover_publications(repo).map_err(git_error)?;
             let pin = crate::fence::pinned_legacy(&port, repo)?;
             let remote_legacy = tip(

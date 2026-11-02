@@ -748,6 +748,30 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
             .map_err(|e| self.pending_error(repo, id, i, e))?;
         self.finish(repo, &terminal)
     }
+    /// Settle the interrupted fetch or push this authority's own writer left
+    /// behind, by explicit call (admission itself never settles a transfer). A
+    /// killed sync would otherwise block every later one; recovery only observes
+    /// the refs and never replays the transport. A transfer of another writer or
+    /// binding fails the borrow check and stays.
+    pub fn recover_own_transfers(&self, repo: &RepoHandle) -> Result<Vec<String>> {
+        let wal = self.wal(repo)?;
+        let mut settled = Vec::new();
+        for chain in wal.retained(100_000)? {
+            let transfer = matches!(
+                chain.intent().kind,
+                wal::OperationKind::RemoteFetch { .. } | wal::OperationKind::RemotePush { .. }
+            );
+            if transfer
+                && chain.outcome().is_none()
+                && self.authority.validate_publication_borrow(chain.intent()).is_ok()
+            {
+                let id = chain.last().operation_id.clone();
+                self.recover(repo, &id)?;
+                settled.push(id);
+            }
+        }
+        Ok(settled)
+    }
     /// Recover retained PublicationCas records for this bound ref. Unknown
     /// attempts remain pending for a fresh-id successor; no CAS is replayed.
     pub fn recover_publications(&self, repo: &RepoHandle) -> Result<Vec<String>> {

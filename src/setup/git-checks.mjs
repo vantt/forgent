@@ -143,7 +143,7 @@ export const fixGitFetchMapping = (cwd, loaderOptions) => afterDriverDirectories
 // The Recovery port is constructed with a writer even for reads.
 const recoveryPort = (cwd, loaderOptions, portOptions) => createGitRecovery(portOptions ?? gitPortOptions(resolveMainCheckoutRoot(cwd) ?? cwd, { mutation: true }), loaderOptions);
 const RECOVERABLE_KINDS = ['Land', 'ScopedCommit', 'RemoteTransfer'];
-const AUTHORITY_MISMATCH_CAUSES = ['land-authority-mismatch', 'commit-authority-mismatch'];
+const AUTHORITY_MISMATCH_CAUSES = ['land-authority-mismatch', 'commit-authority-mismatch', 'remote-authority-mismatch'];
 /**
  * Recover every interrupted Land, ScopedCommit and remote transfer through the one Recovery door, under each kind's own locks (Git spec §9, §10 rule 4b).
  * Rust finds a scoped commit's checkout and takes its custody without waiting, so a gone or busy checkout comes back as a
@@ -160,7 +160,7 @@ export function fixGitOperationRecovery(cwd, loaderOptions, portOptions) {
         recovered.push(operation.operationId);
       } catch (err) {
         const { cause } = nativeError(err);
-        kept.push(`${operation.operationId} (${cause}${AUTHORITY_MISMATCH_CAUSES.includes(cause) ? `; only its writer ${operation.intent.writerIdentity} can recover it` : ''})`);
+        kept.push(`${operation.operationId} (${cause}${AUTHORITY_MISMATCH_CAUSES.includes(cause) ? `; only its writer ${operation.intent.writerIdentity} can recover it${cause === 'remote-authority-mismatch' ? ', and the next event sync settles it' : ''}` : ''})`);
       }
     }
     if (!recovered.length && !kept.length) return { changed: false, message: 'no interrupted Land, ScopedCommit or remote transfer operation' };
