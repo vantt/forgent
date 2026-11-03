@@ -26,7 +26,9 @@ An Event Store sync killed halfway through a fetch left a write-ahead-log transf
 
 ## Latency
 
-The long delays came before the receiver fetched, not at the nudge. Measured on the sender: a send reaches origin in 1 second (`refs/fgos/events/fg-server2-jdp2bv`). The receiver ingests on its own fetch cycle (about 300 s) and only while some fgOS process runs on that machine. The first two delays were longer than one cycle and the cause is not proven; the third was within one cycle. Not investigated further.
+The long delays came before the receiver fetched, not at the nudge. Measured on the sender: a send reaches origin in 1 second (`refs/fgos/events/fg-server2-jdp2bv`).
+
+Cause of the long delays, from the code: the receiving machine fetches only when a hook call of some session on that machine finds its last sync older than `eventStore.sync.intervalSec` (`apps/fgos/src/wiring/mailbox_hook.rs`, `start_sync`, which spawns one detached sync child). An idle receiver session runs no hook, so on a machine where nothing else is running no fetch happens until something does. On fg-server the only other session (RULE) was between turns during the first two sends, which matches 19 and 9.5 minutes; during the third send RULE's session was active and the delay was 3 minutes. This is the behaviour the send output states ("later when none does"), not a defect, but it means wake latency is unbounded on a quiet machine. A periodic sync process on the receiving machine would bound it; that is a new mechanism and an owner decision.
 
 ## Open items
 
