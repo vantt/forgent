@@ -14,7 +14,7 @@ import { AGENT_RESULT_CLAIM_CONTRACT } from '../../src/runner/dispatch/agent-res
 import { acquireRunControl, buildRunControlHolder, settleRunControl, listGenerations, controlDirs } from '../../src/runner/dispatch/run-lock.mjs';
 import { copyCredentialFiles, credentialWriteBackMarker } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import { providerAccountDir } from '../../src/runner/dispatch/provider-capacity.mjs';
-import { terminalAdapterOutcome } from '../../src/run-supervisor/steps/settle-attempt.mjs';
+import { providerStopOf } from '../../src/run-supervisor/steps/settle-attempt.mjs';
 import { runAttemptStep, verifyPayload, releasePayloadRoot } from '../../src/run-supervisor/attempt-step.mjs';
 
 const REPO = path.resolve(import.meta.dirname, '../..');
@@ -83,7 +83,7 @@ function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles
   envelope.digest = computeSha256Digest(envelope);
   fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify(envelope));
   if (receipt) {
-    fs.writeFileSync(path.join(runDir, 'receipt.json'), JSON.stringify({ v: 1, attemptId: ATTEMPT_ID, captureDigests: { stdout: null, stderr: null }, outboxPresent: Boolean(claim), synthesizedBy: 'supervisor', publishedAt: new Date().toISOString(), ...receipt }));
+    fs.writeFileSync(path.join(runDir, 'receipt.json'), JSON.stringify({ v: 1, attemptId: ATTEMPT_ID, captureDigests: { stdout: null, stderr: null }, outboxPresent: Boolean(claim), outboxResult: claim ? 'result-1.json' : null, synthesizedBy: 'supervisor', publishedAt: new Date().toISOString(), ...receipt }));
   }
   for (const [name, content] of Object.entries(outcomeFiles)) fs.writeFileSync(path.join(runDir, name), content);
   return { runDir, envelope, control };
@@ -345,14 +345,42 @@ test('the entry reports a missing step variable and a payload the envelope does 
   } finally { w.cleanup(); }
 });
 
-test('a seat the supervisor stopped on a timeout is a provider limit only when its screen ends on the provider\'s strict wording', () => {
-  const timeout = { outcome: 'timeout' };
-  const credits = 'working...\nError: 402: {"message":"This request requires more credits, or fewer max_tokens."}';
-  assert.equal(terminalAdapterOutcome(timeout, credits, true), 'provider-limit');
-  assert.equal(terminalAdapterOutcome(timeout, "ERROR: You've hit your usage limit. try again at 7:18 PM.", true), 'provider-limit');
-  // The agent may have been working: its own prose about a rate limit keeps the plain timeout.
-  assert.equal(terminalAdapterOutcome(timeout, 'I will add retry handling because of the rate limit\nstill working', true), null);
-  assert.equal(terminalAdapterOutcome(timeout, '', true), null);
-  // A person-wait stop keeps reading the generic wordings.
-  assert.equal(terminalAdapterOutcome({ reason: 'terminal:blocked' }, 'rate limit reached'), 'provider-limit');
+test('the receipt reason names the provider stop and one table turns the name into the outcome; a result in the outbox wins', () => {
+  const stop = (adapterOutcome, cause = null) => ({ adapterOutcome, cause });
+  for (const prefix of ['terminal', 'direct']) {
+    assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:usage-limit` }), stop('provider-limit', 'quota'));
+    assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:login` }), stop('provider-limit', 'credential'));
+    assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:trust-dialog` }), stop('blocked'));
+    // A name the table does not know is a person to wait for, never a success.
+    assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:something-new` }), stop('blocked'));
+  }
+  assert.deepEqual(providerStopOf({ reason: 'terminal:needs-human' }), stop('blocked'));
+  // A stop that is not the provider's names no adapter outcome.
+  for (const reason of ['terminal:delivery-unknown', 'terminal:result-unreadable', 'start-refused:lock-held', undefined]) assert.equal(providerStopOf({ reason }), null, String(reason));
+  assert.equal(providerStopOf({ reason: 'direct:blocked:login', outboxResult: 'result-2.json' }), null);
+});
+
+test('a pane seat stopped at its deadline whose receipt names the provider settles as a provider limit and stays a timeout', async () => {
+  const w = workspace();
+  try {
+    const { runDir } = attempt(w, {
+      terminal: true,
+      receipt: { outcome: 'timeout', reason: 'terminal:blocked:usage-limit', gateExit: gateExit({ exitCode: null, signal: 'SIGTERM', stoppedBy: 'soft-deadline', cause: 'soft-deadline' }) },
+    });
+    assert.equal((await run('settle-attempt', w, runDir)).exit, 0);
+    const result = resultOf(runDir);
+    const { family, code, cause } = result.classification.failure;
+    assert.deepEqual({ family, code, cause }, { family: 'provider', code: 'provider-limit', cause: 'quota' });
+    assert.equal(JSON.parse(fs.readFileSync(path.join(runDir, 'exit.json'), 'utf8')).timedOut, true, 'the outcome stays a timeout');
+  } finally { w.cleanup(); }
+});
+
+test('a direct agent whose receipt names a dead login settles as a provider limit marked as a credential fault', async () => {
+  const w = workspace();
+  try {
+    const { runDir } = attempt(w, { receipt: { outcome: 'exited', reason: 'direct:blocked:login', gateExit: gateExit({ exitCode: 1 }) } });
+    assert.equal((await run('settle-attempt', w, runDir)).exit, 0);
+    const { code, cause } = resultOf(runDir).classification.failure;
+    assert.deepEqual({ code, cause }, { code: 'provider-limit', cause: 'credential' });
+  } finally { w.cleanup(); }
 });

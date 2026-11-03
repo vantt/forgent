@@ -9,11 +9,10 @@ import { settleRunOutcome } from '../../runner/dispatch/settlement.mjs';
 import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
 import { computeSha256Digest, openAgentFileSync } from '../../runner/dispatch/proof-helpers.mjs';
 import { acquireRunControl, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
-import { resolveWorkerArtifactPath } from '../../runner/dispatch/worker-artifacts.mjs';
 import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs';
 import { strayWriteWarning, watchWritesOutsideWorkspace } from '../../runner/dispatch/stray-writes.mjs';
 import { createTerminalControl } from '../../terminal-control/client.mjs';
-import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from '../../runner/dispatch/provider-auth-failure.mjs';
+import { resolveWorkerArtifactPath } from '../../runner/dispatch/worker-artifacts.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
 
 const CAPTURE_TAIL_BYTES = 64 * 1024 * 1024;
@@ -94,41 +93,40 @@ function paneScreenOf(runDir, envelope) {
 }
 
 /**
- * What a pane screen says when an agent is paused by its provider rather than by a person: a used-up
- * quota, a rate limit, a model at capacity. Generic wordings on purpose -- a miss costs a "blocked"
- * instead of a "provider-limit", never a worker, because the pane is kept either way. Only read for an
- * attempt the supervisor stopped on a person-wait (blocked, needs-human, delivery-unknown), so a working
- * agent's own text never counts. A timeout stop reads the strict provider wordings only: the agent may
- * have been working, and its own prose can say "rate limit".
+ * The provider stop a receipt reason names: the one table from the supervisor's name to an outcome.
+ * `*:blocked:usage-limit` and `*:blocked:login` are a provider limit, which moves the caller to
+ * another account or candidate (a login is also a credential fault, so the walk does not land on
+ * the provider whose login just failed); every other blocked name and `terminal:needs-human` is a
+ * person to wait for, never a success. A result in the outbox is judged as reported whatever else the
+ * receipt says. The outcome stays the receipt's own: a deadline stop that names the provider is still
+ * a timeout. A name this table does not know settles on the receipt outcome alone.
  */
-const SCREEN_LIMIT_PATTERNS = Object.freeze([
-  /usage limit/i,
-  /rate limit/i,
-  /quota (?:exceeded|reached)/i,
-  /too many requests/i,
-  /try again (?:later|in \d)/i,
-  /model is at capacity/i,
-]);
-const SCREEN_TAIL_LINES = 15;
-
-function screenSaysProviderStop(screenText, { strictOnly = false } = {}) {
-  const lines = String(screenText ?? '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(-SCREEN_TAIL_LINES);
-  if (!strictOnly && lines.some((line) => SCREEN_LIMIT_PATTERNS.some((pattern) => pattern.test(line)))) return true;
-  const tail = { tailLines: AUTH_FAILURE_TAIL_LINES };
-  return matchQuotaLimitLine(screenText, tail) !== null || matchAuthFailureLine(screenText, tail) !== null;
+export function providerStopOf(receipt, claimed = Boolean(receipt.outboxResult)) {
+  if (claimed) return null;
+  const reason = receipt.reason ?? '';
+  const blocked = /^(?:terminal|direct):blocked:(.+)$/.exec(reason);
+  if (blocked) {
+    if (blocked[1] === 'usage-limit') return { adapterOutcome: 'provider-limit', cause: 'quota' };
+    if (blocked[1] === 'login') return { adapterOutcome: 'provider-limit', cause: 'credential' };
+    return { adapterOutcome: 'blocked', cause: null };
+  }
+  return reason === 'terminal:needs-human' ? { adapterOutcome: 'blocked', cause: null } : null;
 }
 
 /**
- * The adapter outcome a terminal early end names for the settlement. A screen that ends on the provider's
- * own words is a provider stop, which moves the caller to another account or candidate; anything else the
- * agent stopped on is a person to wait for. A seat that ran into its timeout is a provider stop only when
- * its screen ends on the provider's own strict wording; a timeout otherwise keeps its timeout outcome.
+ * The claim file this attempt's settlement judges, or null. The receipt names the newest result in the
+ * attempt's outbox by the agent protocol's rule, and that is the answer whenever it names one. A cli-spawn
+ * worker may still write its claim elsewhere (`agent-result.json` flat in the run directory, or a
+ * `result-<N>.json` beside it): places the supervisor's outbox does not watch, so a receipt that names nothing
+ * is not proof of no claim and the older lookup answers for those workers.
  */
-export function terminalAdapterOutcome(receipt, screenText, timedOut = false) {
-  if (timedOut) return screenSaysProviderStop(screenText, { strictOnly: true }) ? 'provider-limit' : null;
-  if (!/^terminal:(blocked|needs-human|delivery-unknown)/.test(receipt.reason ?? '')) return null;
-  if (screenSaysProviderStop(screenText)) return 'provider-limit';
-  return /^terminal:delivery-unknown/.test(receipt.reason) ? null : 'blocked';
+function claimOf(runDir, envelope, receipt) {
+  if (receipt.outboxResult) {
+    if (path.basename(receipt.outboxResult) !== receipt.outboxResult) throw new StepError('io', 'receipt.json names an outbox result outside the outbox');
+    return path.join(envelope.launch.outboxDir, receipt.outboxResult);
+  }
+  const found = resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
+  return fs.existsSync(found) ? found : null;
 }
 
 /** Why a terminal attempt was stopped, in the words of its screen: a person reads this, not a log. */
@@ -186,7 +184,6 @@ export async function settleAttempt({ runDir, envelope }) {
   // The controller's effective assignment (stored fields plus what it backfilled), else the stored one.
   const assignment = readJson(path.join(runDir, 'assignment.json')) ?? readJson(path.join(path.dirname(runDir), '..', 'assignment.json'));
   const baseline = evaluatorBaseline(runDir, receipt.outcome);
-  const outboxClaim = resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
   const { capture } = envelope.launch;
   // What the launching controller knew and no file of the attempt carries (policy, provider account,
   // fallback). Absent for an attempt whose controller died before it wrote it: the settlement then
@@ -197,11 +194,13 @@ export async function settleAttempt({ runDir, envelope }) {
     : null;
   const strayWarnings = strayWarning ? [strayWarning] : [];
   const screenText = paneScreenOf(runDir, envelope).replace(/\s+$/, '');
-  const raw = rawResultOf(receipt, fs.existsSync(outboxClaim), screenText);
+  const claimPath = claimOf(runDir, envelope, receipt);
+  const raw = rawResultOf(receipt, claimPath !== null, screenText);
+  // The screen is evidence for a person (the stop message, the stdout of a pane that writes no capture),
+  // never a judge: why a provider stopped the agent is the receipt's reason.
   const stdoutText = readTail(capture.stdout) || screenText;
-  // The screen is where a pane agent says why it stopped, the way stderr is for a process: the tail the
-  // settlement reads for a used-up quota or a dead login is the screen's.
-  const stderrText = [readTail(capture.stderr), screenText].filter(Boolean).join('\n');
+  const stderrText = readTail(capture.stderr);
+  const providerStop = providerStopOf(receipt, claimPath !== null);
 
   try {
     const settled = await settleRunOutcome({
@@ -218,7 +217,9 @@ export async function settleAttempt({ runDir, envelope }) {
       stdoutText,
       stderrText,
       executionError: raw.executionError,
-      adapterOutcome: terminalAdapterOutcome(receipt, screenText, raw.isTimeout),
+      agentResultPath: claimPath,
+      adapterOutcome: providerStop?.adapterOutcome ?? null,
+      providerStopCause: providerStop?.cause ?? null,
       effectiveCwd: envelope.cwd,
       gitBefore: baseline?.gitBefore ?? null,
       gitBeforeSource: baseline?.gitBeforeSource ?? 'pre-launch',

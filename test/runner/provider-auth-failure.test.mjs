@@ -89,7 +89,7 @@ test('a quota stop whose transcript mentions a failed login earlier stays a quot
   assert.ok(fault.until, 'a quota quarantine always ends');
 });
 
-test('a settled quota stop whose transcript mentions a failed login earlier names quota as its cause', async () => {
+test('settlement takes a provider stop and its cause from the caller, never from the stderr text', async () => {
   const fs = await import('node:fs');
   const os = await import('node:os');
   const path = await import('node:path');
@@ -104,25 +104,31 @@ test('a settled quota stop whose transcript mentions a failed login earlier name
     git('init', '-q'); git('config', 'user.email', 't@example.com'); git('config', 'user.name', 'T');
     fs.writeFileSync(path.join(cwd, 'plan.md'), 'x\n');
     git('add', '.'); git('commit', '-qm', 'init');
-    const runDir = path.join(base, 'run');
-    fs.mkdirSync(runDir, { recursive: true });
-    const { controlToken } = acquireRunControl(runDir, { controllerId: 'quota-test' });
-    const { runResult } = await settleRunOutcome({
-      runDir,
-      runMeta: { runId: 'run_quota_01', assignmentId: 'asgn_quota' },
-      assignment: { assignmentId: 'asgn_quota', role: 'reviewer', operation: 'validate-plan', mutation: 'read-only' },
-      controlEpoch: 1,
-      controlToken,
-      exitCode: 1,
-      stderrText: TRANSCRIPT_WITH_OLD_LOGIN_LINE,
-      settledAt: new Date().toISOString(),
-      effectiveCwd: cwd,
-      gitBefore: git('rev-parse', 'HEAD'),
-      dirtyBefore: [],
-      opts: { cwd, repoRoot: base },
-    });
-    assert.equal(runResult.classification.failure.code, 'provider-limit');
-    assert.equal(runResult.classification.failure.cause, 'quota');
+    const settle = async (name, stop) => {
+      const runDir = path.join(base, name);
+      fs.mkdirSync(runDir, { recursive: true });
+      const { controlToken } = acquireRunControl(runDir, { controllerId: 'quota-test' });
+      const { runResult } = await settleRunOutcome({
+        runDir,
+        runMeta: { runId: `run_${name}`, assignmentId: 'asgn_quota' },
+        assignment: { assignmentId: 'asgn_quota', role: 'reviewer', operation: 'validate-plan', mutation: 'read-only' },
+        controlEpoch: 1,
+        controlToken,
+        exitCode: 1,
+        stderrText: TRANSCRIPT_WITH_OLD_LOGIN_LINE,
+        settledAt: new Date().toISOString(),
+        effectiveCwd: cwd,
+        gitBefore: git('rev-parse', 'HEAD'),
+        dirtyBefore: [],
+        opts: { cwd, repoRoot: base },
+        ...stop,
+      });
+      return runResult.classification.failure;
+    };
+    const given = await settle('given', { adapterOutcome: 'provider-limit', providerStopCause: 'quota' });
+    assert.deepEqual({ code: given.code, cause: given.cause }, { code: 'provider-limit', cause: 'quota' });
+    // The same stderr with no stop from the caller is an ordinary failure: the text is not judged here.
+    assert.notEqual((await settle('none', {}))?.code, 'provider-limit');
   } finally {
     fs.rmSync(base, { recursive: true, force: true });
   }

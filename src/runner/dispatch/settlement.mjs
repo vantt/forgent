@@ -40,7 +40,6 @@ import {
   classifyProviderCapacityFault,
   quarantineProviderAccount,
 } from './provider-capacity.mjs';
-import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
 import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 
@@ -524,6 +523,10 @@ export async function settleRunOutcome({
   launchCommandId = null,
   receipt = null,
   adapterOutcome = null,
+  // Why a provider stopped the agent is the supervisor's verdict: `adapterOutcome`, and `providerStopCause`
+  // ('credential' or 'quota'). Settlement never re-reads the agent's text for it.
+  providerStopCause = null,
+  agentResultPath: givenResultPath,
   attestation = null,
   // Correlated findings the launching door already made (the executor CLI door's
   // repo-root watch, `stray-write-correlated`); kept beside settle's own.
@@ -545,13 +548,17 @@ export async function settleRunOutcome({
   fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
 
   const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
-  const agentResultPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
+  // The supervised caller hands over the file its receipt named (null: the receipt names none); a caller that
+  // passes nothing still has settlement look for one.
+  const agentResultPath = givenResultPath === undefined
+    ? resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json')
+    : givenResultPath;
 
   let agentClaim = null;
   let claimInvalid = false;
   let claimSha256 = null;
 
-  if (fs.existsSync(agentResultPath)) {
+  if (agentResultPath && fs.existsSync(agentResultPath)) {
     try {
       const claimBytes = readAgentFileSync(agentResultPath, MAX_AGENT_FILE_BYTES);
       const parsed = JSON.parse(claimBytes.toString('utf8'));
@@ -588,7 +595,7 @@ export async function settleRunOutcome({
     }
   }
 
-  if (fs.existsSync(agentResultPath)) {
+  if (agentResultPath && fs.existsSync(agentResultPath)) {
     workerArtifacts.push({
       path: path.relative(root, agentResultPath),
       kind: 'agent-result',
@@ -625,41 +632,12 @@ export async function settleRunOutcome({
     ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots)
     : [];
 
-  // A process that exits non-zero with a dead-credential message as its last words (pi: "No API key
-  // found for openrouter.") stopped because the provider cannot serve it, which is a provider limit
-  // like any other: the account is quarantined and the caller moves on instead of failing the role.
-  // A claim the worker managed to write means the worker did report, so it is judged as reported.
-  // A process that exits the same way with a used-up quota as its last words (codex: "ERROR: You've
-  // hit your usage limit ...") is the same kind of stop, read from the same stderr tail and without
-  // needing an account lease: the walk moves to another account or candidate, and a leased account is
-  // quarantined until the reset time the provider printed.
-  const alreadyProviderStop = adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit' || adapterOutcome === 'blocked';
-  const exitedOnProviderStop = !alreadyProviderStop
-    && !isTimeout
-    && typeof exitCode === 'number' && exitCode !== 0
-    && !agentClaim;
-  const exitedOnDeadCredential = exitedOnProviderStop
-    && matchAuthFailureLine(stderrText, { tailLines: AUTH_FAILURE_TAIL_LINES }) !== null;
-  const exitedOnQuota = exitedOnProviderStop
-    && !exitedOnDeadCredential
-    && matchQuotaLimitLine(stderrText, { tailLines: AUTH_FAILURE_TAIL_LINES }) !== null;
-  const settledAdapterOutcome = exitedOnDeadCredential || exitedOnQuota ? 'provider-limit' : adapterOutcome;
-  // Whether the stop is a dead credential, as opposed to a quota: a caller that walks to another
-  // candidate must not land on the provider whose login just failed.
-  // A quota sentence in the stderr tail is the provider's own last word and outranks a login
-  // wording further up, which in a streamed transcript may be the agent quoting it.
-  const quotaInTail = matchQuotaLimitLine(stderrText, { tailLines: AUTH_FAILURE_TAIL_LINES }) !== null;
-  const credentialFault = exitedOnDeadCredential
-    || ((settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit')
-      && !quotaInTail
-      && matchAuthFailureLine(stderrText) !== null);
-
   let providerCapacityFault = null;
   if (providerCapacitySelection?.status === 'selected') {
     const fault = classifyProviderCapacityFault({
       provider: providerCapacitySelection.provider,
       stderr: stderrText,
-      adapterOutcome: settledAdapterOutcome || (exitCode === 0 ? 'success' : 'failed'),
+      adapterOutcome: adapterOutcome || (exitCode === 0 ? 'success' : 'failed'),
       structuredAgent: agentClaim,
     });
     if (fault?.action && fault.action !== 'none') {
@@ -799,8 +777,8 @@ export async function settleRunOutcome({
     // generic exit the adapter reported; the code is what lets a caller move to the
     // next candidate instead of retrying the same provider. One waiting on a prompt only
     // a person can answer is `blocked`: retrying or moving on does not clear it.
-    ...(settledAdapterOutcome === 'provider-limit' || settledAdapterOutcome === 'paused-limit' || settledAdapterOutcome === 'blocked'
-      ? { failureOverride: { family: 'provider', code: settledAdapterOutcome, ...(credentialFault ? { cause: 'credential' } : exitedOnQuota ? { cause: 'quota' } : {}) } }
+    ...(adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit' || adapterOutcome === 'blocked'
+      ? { failureOverride: { family: 'provider', code: adapterOutcome, ...(providerStopCause ? { cause: providerStopCause } : {}) } }
       : evidenceFacts.failure ? { failureOverride: evidenceFacts.failure } : {}),
     ...(evidenceFacts.policy ? { policyOverride: evidenceFacts.policy } : {}),
     runtime: {
