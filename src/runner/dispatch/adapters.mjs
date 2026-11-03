@@ -12,7 +12,6 @@ export const DEFAULT_ADAPTER = 'cli-spawn';
 
 export const EXECUTOR_ADAPTER_NAMES = Object.freeze([
   DEFAULT_ADAPTER,
-  'http',
   'herdr-spawn',
 ]);
 
@@ -24,9 +23,6 @@ export const ADAPTER_REGISTRY = {
     locus: 'local-process',
     preparedInvocationContract: 'exact-v1',
     receiptContract: 'confinement-adapter-receipt.v1',
-  },
-  http: {
-    locus: 'remote-http',
   },
   'herdr-spawn': {
     locus: 'herdr-pane',
@@ -47,7 +43,6 @@ function uninitializedAdapter(name) {
 
 export const EXECUTOR_ADAPTERS = {
   [DEFAULT_ADAPTER]: uninitializedAdapter(DEFAULT_ADAPTER),
-  http: uninitializedAdapter('http'),
   'herdr-spawn': uninitializedAdapter('herdr-spawn'),
 };
 

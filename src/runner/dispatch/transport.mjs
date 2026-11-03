@@ -12,7 +12,7 @@
 // (`captureDispatchAttestation`), `resolveExecutorCommand` (the
 // prompt/model → argv substitution + cross-provider gate), live per-chunk
 // teeing (`teeChunk`), and the C9 v2 executor-adapter port
-// (`cliSpawnAdapter`/`httpAdapter`/`EXECUTOR_ADAPTERS`). Split out of the
+// (`cliSpawnAdapter`/`EXECUTOR_ADAPTERS`). Split out of the
 // former `src/runner/dispatch.mjs` (2204 lines, 6 concerns in one file) —
 // pure move, no behavior change; `src/runner/dispatch.mjs` re-exports every
 // name below unchanged as a barrel. See `docs/history/dispatch-activation-
@@ -332,26 +332,13 @@ function teeChunk(onChunk, stream, chunk) {
 }
 
 /**
- * C9 v2 (P41/D a4fe4c2b), signature generalized D13 (tsk-in1-5): the
- * executor port is a NAMED interface — `EXECUTOR_ADAPTERS` maps an adapter
- * name to a function `(invocation, opts) => Promise<result>`. `invocation`
- * is whatever shape that one adapter needs (`cliSpawnAdapter` reads
- * `command`/`args`; `httpAdapter` below reads `method`/`url`/`headers`/
- * `body`) — never a fixed `(command, args, cwd, opts)` argv shape, which
- * was itself "bẫy B1": forcing a non-CLI invocation through a mold built
- * for CLI argv. `opts` stays uniform across every adapter (`cwd`,
- * `timeoutMs`, `maxBuffer`, `onChunk`, `workId`, `tier`, `model`) since
- * none of those are invocation-specific — they are dispatch-level
- * execution context every adapter equally needs. Two adapters are
- * registered today: `cli-spawn` (this exact process-spawning body —
- * timeout-on-'exit', hand-tracked maxBuffer kill, onChunk teed before
- * accounting, process-group kill + optional idle-timeout + nested-depth
- * cap layered on top, see this file's own header comment) and `http`
- * (`httpAdapter` below, D13's real pluggability precedent — no executor
- * dispatches through it yet, same as `cli-spawn` before `agy` existed). An
- * `rpc`/`app-server` adapter (e.g. talking to a headless agent's
- * app-server over RPC instead of CLI argv) stays deferred beyond these
- * two — this cell only proves the port is pluggable, not that every
+ * The executor port is a NAMED interface: `EXECUTOR_ADAPTERS` maps an adapter name to a function
+ * `(invocation, opts) => Promise<result>`. `invocation` is whatever shape that one adapter needs
+ * (`cliSpawnAdapter` reads `command`/`args`), never a fixed argv shape. `opts` stays uniform across
+ * adapters (`cwd`, `timeoutMs`, `maxBuffer`, `onChunk`, `workId`, `tier`, `model`). Two adapters are
+ * registered: `cli-spawn` (this process-spawning body: timeout-on-'exit', hand-tracked maxBuffer kill,
+ * onChunk teed before accounting, process-group kill, optional idle-timeout, nested-depth cap) and
+ * `herdr-spawn` (a pane, run only as a terminal attempt of the run supervisor).
  */
 
 /** Kill the spawned child's entire process GROUP, not just the directly-
@@ -601,51 +588,6 @@ export function cliSpawnAdapter(invocation, opts) {
 }
 
 /**
- * D13 (tsk-in1-5): the real second `EXECUTOR_ADAPTERS` implementation —
- * proves the port generalized above is genuinely pluggable, not just
- * documented as such. Reads `invocation.method`/`.url`/`.headers`/`.body`
- * (never `command`/`args` — a `via:"api"` invocation is shaped for this
- * adapter by `validateInvocationShape`'s own `api` branch above, not for
- * `cli-spawn`). `opts.timeoutMs`, when set, aborts the request via
- * `AbortController` — same timeout CONTRACT as `cliSpawnAdapter`
- * (`DispatchError('worker-timeout', ...)`), not the same mechanism (no
- * subprocess to SIGTERM here). Mirrors `cli-spawn`'s own "non-zero exit is
- * not an error" stance (D3): a non-2xx HTTP status is returned as a normal
- * result (`status` on the result, same field name `cli-spawn` uses for its
- * own exit code), never thrown — only a network failure or a timeout
- * reaching the server at all is a `DispatchError`, matching
- * `worker-spawn-fail`/`worker-timeout`'s existing meaning ("the executor
- * itself could not run"), not "the executor ran and reported failure".
- */
-async function httpAdapter(invocation, opts) {
-  const { method = 'GET', url, headers, body } = invocation;
-  const { timeoutMs, workId, tier, model } = opts;
-  const controller = new AbortController();
-  const timer = timeoutMs ? setTimeout(() => controller.abort(), timeoutMs) : null;
-  let response;
-  try {
-    response = await fetch(url, { method, headers, body, signal: controller.signal });
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      throw new DispatchError(
-        'worker-timeout',
-        `executor timed out after ${timeoutMs}ms for work "${workId}".`,
-        { workId, tier, model },
-      );
-    }
-    throw new DispatchError(
-      'worker-spawn-fail',
-      `executor failed to start for work "${workId}": ${err.message}`,
-      { workId, tier, model, cause: err.message },
-    );
-  } finally {
-    if (timer) clearTimeout(timer);
-  }
-  const text = await response.text();
-  return { status: response.status, body: text, headers: Object.fromEntries(response.headers.entries()), tier, model };
-}
-
-/**
  * The `herdr-spawn` executor adapter is registered so the executor config, the planner and the
  * confinement authority know what a herdr seat is (a pane a person can watch, a prepared exact
  * invocation, a receipt), but it is never run through `execute`: an interactive agent runs as a
@@ -695,10 +637,6 @@ registerExecutorAdapter(DEFAULT_ADAPTER, cliSpawnAdapter, {
   locus: 'local-process',
   preparedInvocationContract: 'exact-v1',
   receiptContract: 'confinement-adapter-receipt.v1',
-});
-
-registerExecutorAdapter('http', httpAdapter, {
-  locus: 'remote-http',
 });
 
 registerExecutorAdapter('herdr-spawn', herdrSpawnAdapter, {

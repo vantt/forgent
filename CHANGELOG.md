@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Ctrl-C (or SIGTERM) during a slow launch now cancels the attempt at once instead of waiting for the supervisor to bind it first; the wait for the supervisor's binding is now 45 s, the sum of its own start budgets plus slack.
+- The `http` executor adapter and `via: "api"` invocations are removed (no shipped config used them): a config naming `via: "api"` is refused as an unknown `via`, and an executor whose adapter cannot run as a supervised attempt is refused with `supervised-adapter-required`.
 - An agent now always gets the attempt's own writer id and lineage, on every OS: a parent writer id the controller carried no longer reaches a Windows agent. The launch gate also tells a missing program (exit 127) from any other start failure such as a missing brief file or a program the OS refuses to run (exit 126) by the error kind instead of its English text.
 - A named pipe or a symlink left as the agent's result or report file no longer hangs the settle step (which stalled every later `fgos run` for ten minutes and left a blocked process behind per run): settlement reads those files without following links or blocking, treats a refused one as no valid claim, and the adopt route's timeout is now longer than all steps of an attempt together.
 - A step the run supervisor started (settle, finalize, release) no longer outlives a killed supervisor on Linux; it ends with it.

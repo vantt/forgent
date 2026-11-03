@@ -9,7 +9,6 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
-import http from 'node:http';
 import {
   loadRunnerConfig,
   loadRunnerConfigForDir,
@@ -755,8 +754,8 @@ test('loadRunnerConfig rejects a "capabilities.<name>" entry whose aliases is no
 // itself stays unchanged (cfg.executors already means something else,
 // tier-keyed, tsk-4eu) -----------------------------------------------
 
-test('INVOCATION_VIA is exactly the CO CHE GOI axis (D11 tsk-5tm-4, widened D8 tsk-in1-4, "api" restored D13 tsk-in1-5) — cli/task/mcp/api', () => {
-  assert.deepEqual(INVOCATION_VIA, ['cli', 'task', 'mcp', 'api']);
+test('INVOCATION_VIA is exactly the invocation-mode axis: cli, task and mcp', () => {
+  assert.deepEqual(INVOCATION_VIA, ['cli', 'task', 'mcp']);
 });
 
 test('loadRunnerConfig accepts a "executors.<id>" entry using the invocations[] shape instead of flat command/args', () => {
@@ -796,7 +795,7 @@ test('loadRunnerConfig rejects a "executors.<id>.invocations" that is not a non-
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-test('loadRunnerConfig rejects a "executors.<id>.invocations[]" entry with an unknown "via"', () => {
+test('loadRunnerConfig refuses a "via":"api" invocation by name, the http transport having been removed', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'bad-invocations-via.json');
   fs.writeFileSync(
@@ -804,13 +803,13 @@ test('loadRunnerConfig rejects a "executors.<id>.invocations[]" entry with an un
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: {
-        agy: { kind: 'agent', allowCrossProvider: true, invocations: [{ via: 'api', command: 'agy', args: ['{prompt}'] }] },
+        webhook: { kind: 'tool', invocations: [{ via: 'api', adapter: 'http', url: 'http://example.invalid/hook' }] },
       },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+  assert.throws(() => loadRunnerConfig(configPath), (err) => err instanceof RunnerConfigError && /"via" must be one of cli\/task\/mcp, got: "api"/.test(err.message));
 });
 
 test('loadRunnerConfig rejects a "executors.<id>.invocations[]" entry with a malformed command/args shape (reuses validateExecutorShape)', () => {
@@ -1076,141 +1075,9 @@ test('loadRunnerConfig rejects a "executors.<id>" entry whose allowCrossProvider
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-test('EXECUTOR_ADAPTERS registers adapters: cli-spawn (default), http, and herdr-spawn', () => {
-  assert.deepEqual(Object.keys(EXECUTOR_ADAPTERS), ['cli-spawn', 'http', 'herdr-spawn']);
+test('EXECUTOR_ADAPTERS registers adapters: cli-spawn (default) and herdr-spawn', () => {
+  assert.deepEqual(Object.keys(EXECUTOR_ADAPTERS), ['cli-spawn', 'herdr-spawn']);
   assert.equal(DEFAULT_ADAPTER, 'cli-spawn');
-});
-
-// --- httpAdapter (D13, tsk-in1-5): real requests against a real local test
-// server -- proves EXECUTOR_ADAPTERS' generalized (invocation, opts)
-// signature is genuinely pluggable, independent of any executor actually
-// registering a "via":"api" invocation (0 producer today, same as
-// cli-spawn before agy existed). ---------------------------------------
-
-function withTestServer(handler, fn) {
-  const server = http.createServer(handler);
-  return new Promise((resolve, reject) => {
-    server.listen(0, '127.0.0.1', async () => {
-      const { port } = server.address();
-      try {
-        await fn(`http://127.0.0.1:${port}`);
-        resolve();
-      } catch (err) {
-        reject(err);
-      } finally {
-        server.close();
-      }
-    });
-  });
-}
-
-test('EXECUTOR_ADAPTERS.http (httpAdapter) makes a real GET request and returns {status, body, headers, tier, model}', async () => {
-  await withTestServer(
-    (req, res) => {
-      res.writeHead(200, { 'content-type': 'text/plain' });
-      res.end('hello from test server');
-    },
-    async (url) => {
-      const result = await EXECUTOR_ADAPTERS.http({ url }, { tier: 'standard', model: 'sonnet' });
-      assert.equal(result.status, 200);
-      assert.equal(result.body, 'hello from test server');
-      assert.equal(result.headers['content-type'], 'text/plain');
-      assert.equal(result.tier, 'standard');
-      assert.equal(result.model, 'sonnet');
-    },
-  );
-});
-
-test('EXECUTOR_ADAPTERS.http sends method/headers/body verbatim to the real server (invocation shape, never command/args)', async () => {
-  await withTestServer(
-    (req, res) => {
-      let received = '';
-      req.on('data', (chunk) => { received += chunk; });
-      req.on('end', () => {
-        res.writeHead(201, { 'content-type': 'application/json' });
-        res.end(JSON.stringify({ method: req.method, xTest: req.headers['x-test'], received }));
-      });
-    },
-    async (url) => {
-      const result = await EXECUTOR_ADAPTERS.http(
-        { method: 'POST', url, headers: { 'x-test': 'abc' }, body: 'payload' },
-        {},
-      );
-      assert.equal(result.status, 201);
-      const parsed = JSON.parse(result.body);
-      assert.equal(parsed.method, 'POST');
-      assert.equal(parsed.xTest, 'abc');
-      assert.equal(parsed.received, 'payload');
-    },
-  );
-});
-
-test('EXECUTOR_ADAPTERS.http treats a non-2xx status as a normal result, never a thrown error (mirrors cli-spawn\'s "non-zero exit is not an error" stance, D3)', async () => {
-  await withTestServer(
-    (req, res) => {
-      res.writeHead(500, { 'content-type': 'text/plain' });
-      res.end('server broke');
-    },
-    async (url) => {
-      const result = await EXECUTOR_ADAPTERS.http({ url }, {});
-      assert.equal(result.status, 500);
-      assert.equal(result.body, 'server broke');
-    },
-  );
-});
-
-test('EXECUTOR_ADAPTERS.http throws DispatchError("worker-timeout") when the request exceeds opts.timeoutMs', async () => {
-  await withTestServer(
-    (req, res) => {
-      setTimeout(() => res.end('too late'), 500);
-    },
-    async (url) => {
-      await assert.rejects(
-        () => EXECUTOR_ADAPTERS.http({ url }, { timeoutMs: 50, workId: 'w1' }),
-        (err) => err instanceof DispatchError && err.errorClass === 'worker-timeout',
-      );
-    },
-  );
-});
-
-test('EXECUTOR_ADAPTERS.http throws DispatchError("worker-spawn-fail") when the request cannot reach a server at all', async () => {
-  await assert.rejects(
-    () => EXECUTOR_ADAPTERS.http({ url: 'http://127.0.0.1:1' }, { workId: 'w1' }),
-    (err) => err instanceof DispatchError && err.errorClass === 'worker-spawn-fail',
-  );
-});
-
-test('loadRunnerConfig accepts a "executors.<id>.invocations[]" entry with "via":"api" and a non-empty "url"', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'api-invocation-ok.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: {
-        webhook: { kind: 'tool', invocations: [{ via: 'api', adapter: 'http', url: 'http://example.invalid/hook' }] },
-      },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig rejects a "executors.<id>.invocations[]" entry with "via":"api" and no "url"', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'api-invocation-no-url.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { webhook: { kind: 'tool', invocations: [{ via: 'api', adapter: 'http' }] } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
 test('the committed .fgos/config.json runner section loads and is well-formed', () => {

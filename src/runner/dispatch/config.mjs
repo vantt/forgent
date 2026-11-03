@@ -629,25 +629,13 @@ const TIER_LADDER_URL = new URL('../../../packages/seat-binding/contracts/seat-b
 export const MODEL_POLICY_TIERS = Object.freeze(JSON.parse(fs.readFileSync(TIER_LADDER_URL, 'utf8')).tiers.map((tier) => tier.name));
 
 /**
- * `executors.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11, widened
- * D8 tsk-in1-4, `'api'` restored D13 tsk-in1-5): the CO CHE GOI axis,
- * orthogonal to `kind` (D5, the BAN CHAT axis) — `'cli'` (spawns a real
- * subprocess via `cli-spawn`, e.g. `agy`), `'task'` (native in-session
- * Agent/Task dispatch, no subprocess argv), `'mcp'` (presence/identifier-
- * only, e.g. `gitnexus` — never actually spawned through
- * `resolveExecutorConfig`, D2), `'api'` (a real HTTP call via the `http`
- * adapter — D8 dropped this value for 0 historical producers; D13 brings
- * it back now that a real adapter backs it, `httpAdapter` below). Matches
- * real event-log evidence for `cli`/`mcp`/`task`; `'binary'`/`'skill'`
- * stay dropped (0 real usage, merged from `tool-registry.mjs`'s own
- * separate `KINDS` vocabulary). `resolveExecutorConfig` only ever
- * dispatches a `via:"cli"` invocation (gate B2/B3 below) — `'api'` is a
- * real, independently-testable adapter (D13's pluggability precedent, see
- * `httpAdapter`'s own doc comment) with 0 producer wired into that
- * pipeline yet, same as `'mcp'`/`'task'` were before any executor used
- * them for real.
+ * `executors.<id>.invocations[].via` vocabulary (the invocation-mode axis, orthogonal to `kind`):
+ * `'cli'` (spawns a real subprocess via `cli-spawn`, e.g. `agy`), `'task'` (native in-session Agent/Task
+ * dispatch, no subprocess argv) and `'mcp'` (presence/identifier-only, e.g. `gitnexus`, never spawned
+ * through `resolveExecutorConfig`). `resolveExecutorConfig` only ever dispatches a `via:"cli"`
+ * invocation (gate B2/B3 below). Any other value, `'api'` included, is refused by name.
  */
-export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
+export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp']);
 
 /**
  * Shape-check one `executors.<id>` entry (D1/D2, tsk-62v; `allowCrossProvider`
@@ -694,12 +682,9 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
  * requires for a real spawn; a `via:"mcp"` entry only requires a non-empty
  * `command` IDENTIFIER (never spawned, never needs `args`); a `via:"task"`
  * entry requires neither (native dispatch carries no subprocess argv at
- * all); a `via:"api"` entry (D13, tsk-in1-5) requires a non-empty `url`
- * instead of `command`/`args` — shaped for `httpAdapter`, not `cli-spawn`.
- * Forcing every invocation through the cli-shaped check regardless
+ * all). Forcing every invocation through the cli-shaped check regardless
  * of `via` is exactly "bẫy B1" this gate exists to close — `gitnexus`'s
- * own `via:"mcp"` invocation is not spawnable and was never meant to be,
- * same reasoning D13 applied to `'api'`'s own shape.
+ * own `via:"mcp"` invocation is not spawnable and was never meant to be.
  * An ADDITIVE alternative to the flat `command`/`args` above, never a
  * replacement (a executor with neither, or with the flat shape, keeps
  * resolving exactly as before this field existed). `resolveExecutorConfig`
@@ -839,16 +824,6 @@ function validateInvocationShape(invocation, label, capabilityNames, executorCon
           throw new RunnerConfigError(`runner config (${label}) "tools.${capabilityName}" must be a non-empty string when present.`);
         }
       }
-    }
-  } else if (invocation.via === 'api') {
-    // D13: an 'api' invocation is shaped for `httpAdapter`, never
-    // `command`/`args` — the whole point of generalizing `EXECUTOR_
-    // ADAPTERS`' signature was to stop forcing a non-CLI invocation
-    // through that mold ("bẫy B1"). Only `url` is required; `method`/
-    // `headers`/`body` stay optional, read straight off the invocation by
-    // `httpAdapter` itself at dispatch time.
-    if (typeof invocation.url !== 'string' || !invocation.url.trim()) {
-      throw new RunnerConfigError(`runner config (${label}) "url" must be a non-empty string when "via" is "api".`);
     }
   }
   if (invocation.interactiveMode !== undefined) {
