@@ -19,7 +19,7 @@ class StoreError extends Error {
 
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { projectConfigPresent } from '../../config/facade.mjs';
-import { RunnerConfigError, loadRunnerConfigForDir, withDefaultExecutor } from './config.mjs';
+import { RunnerConfigError, loadRunnerConfigForDir, registeredCapabilityOf, withDefaultExecutor } from './config.mjs';
 import { WORK_ITEM_KEYS, refuseWorkItemInput } from './work-item-input.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { compileDispatchPlan } from './plan.mjs';
@@ -117,12 +117,6 @@ export function withRunDirReadAccess({ adapter, interactiveMode, args, runDir })
     : [...args.slice(0, existing + 1), ...directories, ...args.slice(existing + 1)];
 }
 
-function resolveRegisteredCapability(cfg, name) {
-  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
-  if (Object.hasOwn(capabilities, name)) return name;
-  return Object.keys(capabilities).find((capName) => capabilities[capName]?.aliases?.includes?.(name));
-}
-
 /**
  * The directory whose project config a dispatch reads: the linked worktree `cwd` sits in when that worktree
  * carries a config of its own (a YAML file or a legacy JSON one), otherwise `root`, the
@@ -155,7 +149,7 @@ export function runDoorHint({ cwd = process.cwd(), executorId, capability } = {}
   } catch { /* no readable config: the hint names no executor */ }
   const executor = executorId && cfg?.executors && Object.hasOwn(cfg.executors, executorId) ? cfg.executors[executorId] : null;
   const isAgent = executor !== null && (executor.kind ?? 'agent') === 'agent';
-  const registeredCapability = capability && cfg ? resolveRegisteredCapability(cfg, capability) : undefined;
+  const registeredCapability = capability && cfg ? registeredCapabilityOf(cfg, capability) : undefined;
   const command = ['fgos run "<prompt>"'];
   if (isAgent) command.push(`--provider ${executorId}`);
   if (registeredCapability) command.push(`--capability ${registeredCapability}`);

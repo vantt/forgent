@@ -84,10 +84,11 @@ function seatLaunchesOfSlice(slice, { runnerConfig, shipped, fallbackPerSeat }) 
  * are the writing slices, the repeats their rigor makes likely, and one spare. Read-only dispatches are the
  * read-only slices, a plan validation and a decision lock (both dropped when `inherit` is true: the case
  * continues one that already did them), the diagnoses, one early review per slice that asks for one, one
+ * follow-up dispatch per slice whose kind names one (a document is written, then reviewed), one
  * whole-worktree gate when anything writes, and one spare.
  *
  * @param {object} params
- * @param {Array<{ id: string, writes: string[], pattern: string, rigor: string, kind?: string, capability?: string, earlyReview?: boolean }>} params.slices
+ * @param {Array<{ id: string, writes: string[], pattern: string, rigor: string, kind?: string, capability?: string, earlyReview?: boolean, followUp?: { capability: string, pattern: string } | null }>} params.slices
  * @param {object} params.catalog `{ runnerConfig, shipped }`: what `resolveCollaboration` reads
  * @param {{ fallbackPerSeat: number, deviationsBeforeAsk: number }} params.frameDefaults the guide's own counts, passed through
  * @param {boolean} [params.inherit] the case continues a closed one (its validation and lock are not repeated)
@@ -124,6 +125,7 @@ export function proposeFrame({ slices, catalog, frameDefaults, inherit = false, 
     lockDecisions: inherit ? 0 : 1,
     diagnoses: allowance.diagnoses,
     earlyReviews: slices.filter((s) => s.earlyReview === true).length,
+    followUps: slices.filter((s) => s.followUp !== undefined && s.followUp !== null).length,
     gate: writing.length > 0 ? 1 : 0,
     spare: allowance.spareReads,
   };

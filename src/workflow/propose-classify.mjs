@@ -44,7 +44,7 @@ function segmentsMeet(a, b) {
 }
 
 /** Can two path globs (segments, `**` for any number of segments) name the same file? */
-function globsMeet(a, b) {
+export function globsMeet(a, b) {
   const seen = new Map();
   const walk = (i, j) => {
     const key = `${i}:${j}`;
@@ -112,7 +112,7 @@ const defaultTable = () => (cachedTable ??= loadSliceTable());
  * Canonical form of a write path: no `//` or `.` segments, no trailing slash. `.` is the whole repository.
  * A path that leaves the repository is refused.
  */
-function normalizeWrite(raw) {
+export function normalizeWrite(raw) {
   if (!isText(raw)) throw refuse('a slice write path must be a non-empty string', 'slice-write-invalid');
   const trimmed = raw.trim();
   const segments = trimmed.split('/').filter((segment) => segment !== '' && segment !== '.');

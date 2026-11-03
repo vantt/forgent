@@ -25,7 +25,7 @@ test('a frame counts each writing slice, the repeats a high rigor slice draws, a
 test('read-only dispatches are the validation, the lock, a diagnosis, the gate, a spare and each read-only slice', () => {
   const readOnly = { id: 'look', writes: [], pattern: 'solo', rigor: 'standard', kind: 'code' };
   const { frame, breakdown } = propose([slice('a'), readOnly]);
-  assert.deepEqual(breakdown.reads, { readOnlySlices: 1, validatePlan: 1, lockDecisions: 1, diagnoses: 1, earlyReviews: 0, gate: 1, spare: 1 });
+  assert.deepEqual(breakdown.reads, { readOnlySlices: 1, validatePlan: 1, lockDecisions: 1, diagnoses: 1, earlyReviews: 0, followUps: 0, gate: 1, spare: 1 });
   assert.equal(frame.dispatches, frame.mutatingDispatches + 6);
   assert.equal(frame.mutatingDispatches, 1 + 0 + 1);
 });
@@ -190,4 +190,13 @@ test('the seat launches planned grow with rigor and the per-dispatch ceiling the
   for (const c of RECORDED_CASES) {
     assert.ok(propose(c.slices).frame.seatLaunchesPerDispatch <= approvedPerDispatch, `${c.name} asks for more seat launches per dispatch than the approved frame allowed`);
   }
+});
+
+test('a document slice whose kind names a follow-up review adds one read-only dispatch for it', () => {
+  const doc = (id, extra = {}) => ({ id, writes: [`docs/${id}.md`], pattern: 'solo', rigor: 'low', kind: 'docs', ...extra });
+  const without = propose([slice('a'), doc('d1')]);
+  const withFollowUp = propose([slice('a'), doc('d1', { followUp: { capability: 'review', pattern: 'solo' } })]);
+  assert.equal(withFollowUp.breakdown.reads.followUps, 1);
+  assert.equal(withFollowUp.frame.dispatches - without.frame.dispatches, 1);
+  assert.equal(withFollowUp.frame.mutatingDispatches, without.frame.mutatingDispatches);
 });

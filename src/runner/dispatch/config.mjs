@@ -590,6 +590,16 @@ export function assertReasoningEffort(value, { supported, executorId } = {}) {
 export { RUN_TIMEOUT_MIN_MS, RUN_TIMEOUT_MAX_MS };
 const RUN_TIMEOUT_UNIT_MS = Object.freeze({ ms: 1, s: 1000, m: 60000, h: 3600000 });
 
+/**
+ * The registered name a capability goes by: its own key in `cfg.capabilities`, else the key that lists it as
+ * an alias; undefined when nothing registers it. The dispatch door and a proposal share this one check.
+ */
+export function registeredCapabilityOf(cfg, name) {
+  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+  if (Object.hasOwn(capabilities, name)) return name;
+  return Object.keys(capabilities).find((capName) => capabilities[capName]?.aliases?.includes?.(name));
+}
+
 /** A run timeout in milliseconds, refused when it is not a whole number inside the floor and ceiling. */
 export function assertRunTimeoutMs(value, label = 'run timeout') {
   const problem = runTimeoutProblem(value, label);
