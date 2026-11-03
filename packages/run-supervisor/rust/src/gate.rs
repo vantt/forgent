@@ -165,13 +165,18 @@ pub(crate) struct Config {
     /// The current boot, read once.
     pub(crate) boot_id: Option<String>,
     /// `terminal`: the agent runs in a pane and the supervisor may disappear while it runs.
+    #[cfg(unix)]
     pub(crate) terminal: bool,
     /// The envelope says the dispatch cwd is held by a lease, so a second lock description comes with GO.
+    #[cfg(unix)]
     pub(crate) mutating: bool,
+    #[cfg(unix)]
     pub(crate) outbox_dir: std::path::PathBuf,
     /// Extra wait after a result showed up while the supervisor is gone.
+    #[cfg(unix)]
     pub(crate) orphan_settle: Duration,
     /// `(writerId, parentWriterId)` the agent sees as `FGOS_SESSION_ID` and `FGOS_PARENT_WRITER_ID`.
+    #[cfg(unix)]
     pub(crate) identity: Option<(String, Option<String>)>,
 }
 
@@ -213,21 +218,31 @@ pub(crate) fn load_config(path: &Path) -> Result<Config, String> {
         Some("direct") => false,
         _ => return Err("envelope field mode missing".into()),
     };
+    #[cfg(unix)]
     let orphan_settle = match (terminal, value["terminal"]["orphanSettleMs"].as_u64()) {
         (true, Some(ms)) => Duration::from_millis(ms),
         (true, None) => return Err("a terminal envelope needs terminal.orphanSettleMs".into()),
         (false, _) => Duration::ZERO,
     };
+    #[cfg(unix)]
     let identity = match value["identity"]["writerId"].as_str() {
         Some(writer) => Some((writer.to_string(), value["identity"]["parentWriterId"].as_str().map(String::from))),
         None if terminal => return Err("a terminal envelope needs identity.writerId".into()),
         None => None,
     };
+    // Only the Unix gate has a terminal mode; the mode is still validated everywhere.
+    #[cfg(windows)]
+    let _ = terminal;
     Ok(Config {
+        #[cfg(unix)]
         terminal,
+        #[cfg(unix)]
         mutating: value["mutation"] == "mutating",
+        #[cfg(unix)]
         outbox_dir: text_of(&launch["outboxDir"], "launch.outboxDir")?.into(),
+        #[cfg(unix)]
         orphan_settle,
+        #[cfg(unix)]
         identity,
         attempt_id: text_of(&value["attemptId"], "attemptId")?,
         digest: claimed.to_string(),

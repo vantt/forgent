@@ -261,7 +261,7 @@ fn gate_tuple(stream: &UnixStream, root: &ProcessIdentity, sandboxed: bool) -> R
     }
     #[cfg(not(target_os = "linux"))]
     {
-        let _ = stream;
+        let _ = (stream, sandboxed);
         facts::identity_of(ProcId(root.pid)).ok_or_else(|| format!("pane root {} is gone", root.pid))
     }
 }

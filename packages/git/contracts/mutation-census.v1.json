@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "92f9e5d97b2b1c887fbb9cb26237e61e75fc151b8fbb2f8c00093fb5a8a9ca2b",
+  "payloadDigest": "50803284495baf1e26fed75ad50ed0344788ea1dbd094cf5bccbd609fe84f65c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -657,7 +657,7 @@
     "packages/run-supervisor/rust/src/adopt.rs": "49af84a9e4d2730a0b61c9d7881f8c2d39cf148e5c69d76b7f2eeba912a1189f",
     "packages/run-supervisor/rust/src/attempt_step.rs": "7fc6f8f380e41261ab4ef06bdf76e14609626d51f447b41e330ba3c56404f99c",
     "packages/run-supervisor/rust/src/envelope.rs": "8d22c89806e0aec6a278ab44bd450b909e0407a9bd1ae9839c3ada3db5c6a356",
-    "packages/run-supervisor/rust/src/gate.rs": "544c9bb6f2e9167620439ecc5feacd7da24eac3e362341cbb541e184f3be421e",
+    "packages/run-supervisor/rust/src/gate.rs": "f6107afb870117ad4186b02d96cc4997478ffa4cb29620023503253a9cb726df",
     "packages/run-supervisor/rust/src/gate/unix.rs": "4334a6ba97691420e0a5e23e791a3e170a57000732c7de11f91de44641f89ac9",
     "packages/run-supervisor/rust/src/gate/windows.rs": "9ccb6b2f3542a0a9a0c8057fcb476c744d0c84c123fef2a85004a6f589ddff65",
     "packages/run-supervisor/rust/src/go_channel.rs": "ac8abba20a50014ba985da57e86580c7456d1eb17bb4d47857abd7238d71e40d",
@@ -666,8 +666,8 @@
     "packages/run-supervisor/rust/src/publish.rs": "bd22fb4e33151e54220eb6e3de8a541037a178e51d6d41a890dece5bd2de261e",
     "packages/run-supervisor/rust/src/route.rs": "c730f674e45859867eaae0e856c24aec5d9bf82f79ea0ff88ae1f8bcc44b603a",
     "packages/run-supervisor/rust/src/steps.rs": "2e98e0eb7d3d1a0e53a2fb76927e2cb5589599c8e56e32d451ade6651110f42d",
-    "packages/run-supervisor/rust/src/supervise.rs": "77526c73c9df247094b4b04716643678b10190f400ca9015f6a2eb8a5ba311f3",
-    "packages/run-supervisor/rust/src/supervise/terminal.rs": "f28e9bdbd44efb07571aa55b6c32255d237cf2367ea366b7e967775e050a7380",
+    "packages/run-supervisor/rust/src/supervise.rs": "b5b35cd939df8a42df379a1c0695ea875177ae1346644bc6c6eb789c3811e0cc",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs": "a5b284d114effd5485e60629bd4613dc82b89a53bd9af428829f9105e6696f24",
     "packages/run-supervisor/rust/src/supervise/unix.rs": "d46cc2ebbcb241025a623310e2dcc04df256860a019ea6e1b0bf8bce597bd966",
     "packages/run-supervisor/rust/src/supervise/windows.rs": "e2b04b6d2499d769206aa1c8121eada6ab248351e25ad81ab90befa7c81d7205",
     "packages/run-supervisor/rust/src/terminal_slot.rs": "b09fd96ee9467a19310bce33bc13ba98423e07f9cee6c280840c0fb439bc8279",
@@ -2833,7 +2833,7 @@
     },
     {
       "path": "packages/run-supervisor/rust/src/gate.rs",
-      "line": 226,
+      "line": 236,
       "spawn": "Command::new <- packages/run-supervisor/rust/src/gate/unix.rs:527",
       "binary": "(parsed configuration (text_of(&launch[\"command\"], \"launch.command\")))",
       "class": "configured-binary"
@@ -2854,7 +2854,7 @@
     },
     {
       "path": "packages/run-supervisor/rust/src/supervise.rs",
-      "line": 430,
+      "line": 432,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:209",
       "binary": "(parsed configuration (envelope[\"containment\"][\"bwrapPrefix\"].as_array().and_then(|))",
       "class": "configured-binary"

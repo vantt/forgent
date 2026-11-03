@@ -182,6 +182,7 @@ struct Watch {
     grace: Duration,
     captures: [PathBuf; 2],
     /// Where the agent writes `result-<N>.json`.
+    #[cfg(unix)]
     outbox: PathBuf,
     /// The most the two capture files may hold together before the agent is stopped.
     max_output: Option<u64>,
@@ -204,6 +205,7 @@ impl Watch {
             idle: envelope["deadlines"]["idleMs"].as_u64().map(Duration::from_millis),
             grace: Duration::from_millis(envelope["deadlines"]["gateKillGraceMs"].as_u64().ok_or("envelope field deadlines.gateKillGraceMs missing")?),
             captures: [text(&envelope["launch"]["capture"]["stdout"], "launch.capture.stdout")?.into(), text(&envelope["launch"]["capture"]["stderr"], "launch.capture.stderr")?.into()],
+            #[cfg(unix)]
             outbox: text(&envelope["launch"]["outboxDir"], "launch.outboxDir")?.into(),
             max_output: envelope["launch"]["maxOutputBytes"].as_u64(),
             adapter: adapter_for(envelope["agentProtocol"]["cli"].as_str().unwrap_or_default()),
