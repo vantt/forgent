@@ -1342,11 +1342,9 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
   assert.equal(evidenceData.gitBeforeSource, 'pre-launch');
 });
 
-// This test and the one above it exercise genuinely different code paths: a
-// nonzero exit still RESOLVES executeExecutorCli (proving status/confidence
-// classification of a crash), while this test forces executeExecutorCli to
-// REJECT (proving gitBefore is captured pre-launch, not read from a
-// rawResult that a rejection path never produces).
+// This test and the one above it exercise genuinely different paths: a nonzero exit is settled
+// as a crash (status/confidence classification), while a run that times out after the worker
+// committed proves gitBefore is captured pre-launch, not read after the fact.
 test('executeAssignment captures gitBefore pre-launch when the worker commits then the run rejects via worker-timeout', async () => {
   const tempDir = mkTempDir();
 
@@ -1359,11 +1357,7 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
   execFileSync('git', ['commit', '-m', 'initial'], { cwd: tempDir, stdio: 'ignore' });
   const shaBeforeRun = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tempDir, encoding: 'utf8' }).trim();
 
-  // Worker commits a change, then hangs well past a short timeoutMs -- this
-  // makes executeExecutorCli genuinely REJECT with a worker-timeout
-  // DispatchError, landing in assignment-runner.mjs's own catch block
-  // (rawResult built with no headBefore/headAfter field), the only branch
-  // the R2 fix actually changes.
+  // Worker commits a change, then hangs well past a short timeoutMs, so the run ends on its timeout.
   const executorScript = path.join(tempDir, 'commit-then-hang-executor.mjs');
   fs.writeFileSync(
     executorScript,

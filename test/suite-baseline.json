@@ -234,7 +234,6 @@
     "test/runner/claim-liveness.test.mjs": 2.2,
     "test/runner/claim-port.test.mjs": 19.2,
     "test/runner/cli-spawn-reconciliation.test.mjs": 0.5,
-    "test/runner/codex-cli-glm-cli-live-executors.test.mjs": 0.2,
     "test/runner/concurrent-claim-eventlog-loss.test.mjs": 4.4,
     "test/runner/config-seat-binding-layers.test.mjs": 0.6,
     "test/runner/credential-store.test.mjs": 0.4,

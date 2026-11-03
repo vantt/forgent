@@ -307,7 +307,7 @@ export function workDispatchHint(work, stage) {
 /**
  * The generic, Work-agnostic inputs a Work-driven dispatch hands dispatch: the capability
  * hints its step implies and the agent type its task spec resolves to. Spread into
- * `executeExecutorCli` options; the Work item itself never crosses.
+ * the dispatch options; the Work item itself never crosses.
  */
 export function workDispatchContext({ work, stage, cwd, executorId } = {}) {
   return {

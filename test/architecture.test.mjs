@@ -338,18 +338,16 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
   return violations;
 }
 
-// The four symbols that run a worker or commit its work. Each may be called only from
+// The symbols that run a worker or commit its work. Each may be called only from
 // the files named below; any other caller has to come through runUnit.
 const RUN_DOOR_CALLERS = {
   executeAssignment: ['src/runner/execution/run.mjs', 'src/runner/dispatch/cli.mjs'],
-  executeExecutorCli: [], // No production caller is left: every dispatch runs through executeAssignment's supervised attempt.
   commitUnitWork: ['src/runner/execution/run.mjs', 'scripts/git/e3-bench.mjs'], // Paired E3 baseline calls the real legacy writer.
-  executeThroughConfinement: ['src/runner/dispatch/cli.mjs'],
+  executeThroughConfinement: [], // Every dispatch runs as a supervised attempt; the direct confinement door has no production caller left.
 };
 // Where each symbol is defined. Its home and the dispatch barrel may define or re-export it; calling it still counts.
 const RUN_DOOR_HOMES = {
   executeAssignment: 'src/runner/dispatch/assignment-runner.mjs',
-  executeExecutorCli: 'src/runner/dispatch/cli.mjs',
   commitUnitWork: 'src/runner/execution/commit-unit-work.mjs',
   executeThroughConfinement: 'src/runner/dispatch/confinement/authority.mjs',
 };
@@ -413,7 +411,7 @@ function runDoorUses() {
   return uses;
 }
 
-test('run-door call sites: executeAssignment, executeExecutorCli, commitUnitWork and executeThroughConfinement are called only from their named files', () => {
+test('run-door call sites: executeAssignment, commitUnitWork and executeThroughConfinement are called only from their named files', () => {
   const uses = runDoorUses();
   assert.deepEqual(checkRunDoorCallers(uses), []);
   // Each named caller still calls it: a door nobody uses any more leaves this table.
@@ -423,8 +421,8 @@ test('run-door call sites: executeAssignment, executeExecutorCli, commitUnitWork
 });
 
 test('run-door call-site guard catches an aliased import, a dynamic import(), a require() and a namespace call', () => {
-  assert.equal(usesSymbol("import { executeExecutorCli as run } from './dispatch/cli.mjs'; run();", 'executeExecutorCli'), true);
-  assert.equal(usesSymbol("const { executeExecutorCli } = await import('./dispatch.mjs');", 'executeExecutorCli'), true);
+  assert.equal(usesSymbol("import { executeAssignment as run } from './dispatch/assignment-runner.mjs'; run();", 'executeAssignment'), true);
+  assert.equal(usesSymbol("const { executeAssignment } = await import('./dispatch.mjs');", 'executeAssignment'), true);
   assert.equal(usesSymbol("const m = require('./dispatch.mjs'); m.commitUnitWork({});", 'commitUnitWork'), true);
   assert.equal(usesSymbol("import * as d from './dispatch.mjs'; d.executeAssignment(a);", 'executeAssignment'), true);
   assert.equal(usesSymbol("export { executeAssignment as runIt } from './dispatch/assignment-runner.mjs';", 'executeAssignment'), true);
@@ -435,9 +433,9 @@ test('run-door call-site guard catches an aliased import, a dynamic import(), a 
   assert.equal(usesSymbol("throw new Error(`executeAssignment: run ${id} is stale`);", 'executeAssignment'), false);
   assert.equal(usesSymbol("const r = `${executeAssignment(a)}`;", 'executeAssignment'), true);
   // A comment marker or a backtick inside a string must not hide the code after it.
-  assert.equal(usesSymbol("const g = 'docs/*.md';\nexecuteExecutorCli(x);\n/** later */", 'executeExecutorCli'), true);
-  assert.equal(usesSymbol("const u = 'https://x'; executeExecutorCli(x);", 'executeExecutorCli'), true);
-  assert.equal(usesSymbol("const q = 'a`b';\nexecuteExecutorCli(x);\nconst t = `c`;", 'executeExecutorCli'), true);
+  assert.equal(usesSymbol("const g = 'docs/*.md';\nexecuteAssignment(x);\n/** later */", 'executeAssignment'), true);
+  assert.equal(usesSymbol("const u = 'https://x'; executeAssignment(x);", 'executeAssignment'), true);
+  assert.equal(usesSymbol("const q = 'a`b';\nexecuteAssignment(x);\nconst t = `c`;", 'executeAssignment'), true);
   assert.equal(usesSymbol("const r = `${fn({ a: 1 }) + executeAssignment(a)}`;", 'executeAssignment'), true);
   // A bracket call by the plain name, an escaped name, and code a block-then-regex used to hide.
   assert.equal(usesSymbol("import * as d from './dispatch.mjs'; d['executeAssignment'](a);", 'executeAssignment'), true);
@@ -447,7 +445,7 @@ test('run-door call-site guard catches an aliased import, a dynamic import(), a 
     ['src/runner/relay.mjs: export * from ./dispatch/assignment-runner.mjs']);
   assert.equal(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * as d from './execution/commit-unit-work.mjs';").length, 1);
   assert.deepEqual(findStarRelaysOfRunDoors('src/runner/relay.mjs', "export * from './dispatch/config.mjs';"), []);
-  assert.ok(checkRunDoorCallers({ executeExecutorCli: ['src/runner/fanout-batch.mjs', 'src/runner/dispatch/assignment-runner.mjs', 'src/runner/new.mjs'] })
+  assert.ok(checkRunDoorCallers({ executeAssignment: ['src/runner/execution/run.mjs', 'src/runner/new.mjs'] })
     .some((v) => v.includes('src/runner/new.mjs')));
   assert.ok(checkRunDoorCallers({ commitUnitWork: ['src/runner/execution/run.mjs', 'src/runner/loop.mjs'] })
     .some((v) => v.includes('unexpected caller src/runner/loop.mjs')));

@@ -121,8 +121,8 @@ export { resolveHerdrBin };
  * tip), wrong for a leaf (forks from `fgw/<rootId>`, not main) or a retry
  * (the branch already carries the prior attempt's own commits).
  * `spawnWorker` passes its own worktree `cwd` as `attestRoot`;
- * `executeExecutorCli` (task-dispatch, no worktree involved — genuinely
- * runs against `fgosDir`'s own root) omits it, unchanged.
+ * a caller with no worktree of its own (genuinely running against
+ * `fgosDir`'s own root) omits it, unchanged.
  *
  * Fail-safe either way: a git read that cannot resolve (detached checkout
  * weirdness, no `.git`, etc.) never throws and never blocks dispatch —
@@ -366,7 +366,7 @@ function killChildTree(child, signal) {
 /**
  * The short-call cli-spawn adapter: it starts the agent as a child of the caller and returns when the
  * child has exited. It serves the callers whose agent lives and dies with the calling process (an account
- * probe, a panel judge, a goal check, `executeExecutorCli`). An attempt of a unit that must survive its
+ * probe, a panel judge, a goal check). An attempt of a unit that must survive its
  * controller never comes here: it runs through `fgos internal supervise`
  * (src/run-supervisor/direct-launch.mjs), whose supervisor owns the agent's process tree.
  */

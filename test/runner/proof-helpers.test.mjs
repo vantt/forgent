@@ -85,7 +85,7 @@ test('a name that already fits is untouched', () => {
 });
 
 test('a real capability id fits -- the name that herdr actually refused', () => {
-  // `executeExecutorCli` passes the capability id as the workId, so a dispatch
+  // A dispatch passes the capability id as the workId, so a dispatch
   // of `fgos-coding-implement` builds `fgos-fgos-coding-implement-<ts36>`:
   // 35 characters, three over what herdr accepts, and refused as
   // `invalid_agent_name` after the pane was already open.

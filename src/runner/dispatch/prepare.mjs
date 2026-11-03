@@ -12,7 +12,7 @@
 // (`tsk-5tm-3` D5 forbids re-deciding that; `dispatch/mechanism.mjs`'s
 // `decideDispatchMechanism`/`decideExecutorDispatchMechanism` already own
 // that judgment and are untouched here). It is additive: no existing
-// caller (`spawnWorker`, `executeExecutorCli`, `decideExecutorCli`) is
+// caller (`spawnWorker`, `decideExecutorCli`) is
 // wired to call it in this item — introducing that wiring would be a
 // behavior change, out of this item's consolidation-only scope. A future
 // item widens its body (claim-ownership/footprint refusal, executor.dispatch

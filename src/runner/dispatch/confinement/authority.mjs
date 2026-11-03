@@ -6,7 +6,7 @@ import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
 import { claudeMcpApprovalArgs } from "../trust-store.mjs";
-import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, getAdapterMetadata, resolveExecutorEnv, workerBaseEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
+import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, resolveExecutorEnv, workerBaseEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
 import { DispatchError } from "../dispatch-error.mjs";
 import { RunnerConfigError } from "../config.mjs";
 import { validateConfinementRequest, validateAssignmentLaunchContext } from "./request.mjs";
@@ -104,23 +104,6 @@ function applyBackendPlanToAttestation(attestation, backendPlan) {
     ];
   }
   return attestation;
-}
-
-function adapterConsumesPreparedSandbox(adapterName, adapterPort, request = null) {
-  const invocation = request?.invocation;
-  if (invocation?.providerKindOnly === true || invocation?.workerCommandSeam === false) {
-    return false;
-  }
-  if (adapterPort && typeof adapterPort === 'object') {
-    if (adapterPort.workerCommandSeam === false) return false;
-    if (adapterPort.preparedInvocationContract === 'exact-v1' || adapterPort.workerCommandSeam === true) return true;
-    if (adapterPort.preparedInvocationContract !== undefined) return false;
-  }
-  if (adapterPort && typeof adapterPort === 'function' && (adapterPort.preparedInvocationContract === 'exact-v1' || adapterPort.workerCommandSeam === true)) {
-    return true;
-  }
-  const meta = getAdapterMetadata(adapterName);
-  return meta?.preparedInvocationContract === 'exact-v1';
 }
 
 function requiredCoverageFailures(policy, coverage) {
@@ -735,14 +718,6 @@ export async function assessAndPrepare(request, opts = {}) {
     }
 
     const assessment = driver.assess(request, backendInstance);
-    if (!adapterConsumesPreparedSandbox(adapterName, adapterPort, request)) {
-      const detail = `adapter ${adapterName} does not apply the prepared sandbox.`;
-      assessment.mismatches.push({ code: 'confinement-adapter-unsupported', detail });
-      for (const key of Object.keys(assessment.coverage)) {
-        if (assessment.coverage[key] === 'satisfied') assessment.coverage[key] = 'unverified';
-      }
-    }
-
     try {
       assertAttestationStoreIsolated(request.context, assessment.resources || []);
       if (request.assignmentLaunchContext && request.context?.runDir) {

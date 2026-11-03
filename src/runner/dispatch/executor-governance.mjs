@@ -12,7 +12,7 @@ import { checkProviderDisallowed } from './provider-adapter.mjs';
  * fixes H2a/H2b) and derive its provider family (Phase 00 R6 fix F1) --
  * extracted verbatim from the dispatch policy's own former
  * inline steps 3b/4 (dispatch-engine-liveness-hardening Phase 7, C3
- * finding) so `cli.mjs`'s `executeExecutorCli` can derive the SAME
+ * finding) so a caller can derive the SAME
  * `resolvedProvider` it needs for governance without running this
  * resolver's entire tier/quality/persona/model computation. Same checks,
  * same order, same throws as before this extraction -- a pure move.
@@ -54,8 +54,7 @@ export function resolveExecutorProvider({ runnerConfig, primaryExecutor, options
  * family / executor id pair against `options.disallowedProviders`/
  * `.disallowedExecutors`. Extracted from the dispatch policy
  * (dispatch-engine-liveness-hardening Phase 7, C3 finding) so a caller that
- * has already resolved its own provider/executor (e.g. `cli.mjs`'s
- * `executeExecutorCli`/`spawnWorker`, which used to run this resolver's
+ * has already resolved its own provider/executor (e.g. `spawnWorker`, which used to run this resolver's
  * entire tier/quality/persona/model computation only to reach this same
  * check) can run the SAME governance check directly, without a second,
  * redundant resolver call whose rich result it then discarded.

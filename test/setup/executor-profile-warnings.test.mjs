@@ -93,3 +93,10 @@ test('Phase 06: collectExecutorProfileWarnings handles a missing/empty cfg grace
   assert.deepEqual(collectExecutorProfileWarnings({}), []);
   assert.deepEqual(collectExecutorProfileWarnings({ executors: null, capabilities: null }), []);
 });
+
+test('collectExecutorProfileWarnings names a "for" left on an agent executor as inert, since the work names its own capability', () => {
+  const cfg = { executors: { fake: { kind: 'agent', for: ['code:review'], invocations: [{ via: 'cli', command: 'fake', args: ['{prompt}'] }] } } };
+  const warning = collectExecutorProfileWarnings(cfg).find((w) => w.id === 'executor.fake.agent-for-inert');
+  assert.ok(warning, 'an agent executor declaring "for" must be named');
+  assert.match(warning.detail, /code:review/);
+});

@@ -12,8 +12,6 @@ import { buildConfinementRequest, validateConfinementRequest } from "../../src/r
 import { ensureMachineBackendRegistryDefaults } from "../../src/runner/dispatch/confinement/backend-registry.mjs";
 import { resolveConfinementPolicy } from "../../src/runner/dispatch/confinement/policies.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
-import { executeExecutorCli } from "../../src/runner/dispatch/cli.mjs";
-import { workUnitFor, workDispatchContext } from "../../src/runner/work-dispatch.mjs";
 import { loadRunnerConfigForDir, RunnerConfigError } from "../../src/runner/dispatch/config.mjs";
 
 test("buildConfinementRequest builds valid confinement-request.v1 shape at dispatch seam", () => {
@@ -260,44 +258,6 @@ test("M1: buildConfinementAttestation surfaces legacy confinement and bwrap obse
   assert.ok(att.evidence.some((e) => e.ref.includes("legacy-confinement")));
 });
 
-test("M2: executeExecutorCli in-process required confinement goes through executeThroughConfinement and throws DispatchError with refused attestation", async () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-m2-test-"));
-  const cfg = {
-    capabilities: {
-      "code:implement": {
-        prefer: "in-proc-exec",
-        confinement: { mode: "required", policy: "host-write-denied" },
-      },
-    },
-    executors: {
-      "in-proc-exec": {
-        agentType: "my-task-agent",
-        kind: "agent",
-      },
-    },
-  };
-
-  await assert.rejects(
-    () =>
-      executeExecutorCli("in-proc-exec", { tier: 'standard', model: 'sonnet', sharedCwd: true,
-        for: "code:implement",
-        repoRoot: root,
-        runnerConfig: cfg,
-        hasLiveTaskAccess: true,
-      }),
-    (err) => {
-      assert.ok(err instanceof DispatchError);
-      assert.equal(err.errorClass, "confinement-unsupported");
-      assert.equal(err.contract, "confinement-execution.v1");
-      assert.equal(err.status, "refused");
-      assert.ok(err.dispatchId);
-      assert.ok(err.attestation);
-      assert.equal(err.attestation.phase, "refused");
-      return true;
-    },
-  );
-});
-
 test("M3: executeThroughConfinement returns spec 6.9 confinement-execution.v1 shape and failure preserves cleanup/result", async () => {
   const fakeAdapter = async () => ({ exitCode: 0, stdout: "done" });
   const req = buildConfinementRequest({
@@ -448,147 +408,6 @@ test("HIGH-1 regression: fake adapter returning status/contract/result does not 
   assert.equal(res.result.status, 123, "wrapped result preserves adapter status");
   assert.equal(res.result.contract, "custom-adapter.v9", "wrapped result preserves adapter contract");
   assert.deepEqual(res.result.result, { custom: true }, "wrapped result preserves adapter result key");
-});
-
-test("MED-2: the loop worker Unit and executeExecutorCli agree on capability identity for research domain", async () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med2-test-"));
-  // H10/D2: isolate from whatever 'bwrap' backend is actually registered on
-  // this machine -- see the H1 test above for the full rationale.
-  const regPath = path.join(tmpDir, "confinement-backends.json");
-  fs.writeFileSync(regPath, JSON.stringify({ contract: "confinement-backend-registry.v1", confinementBackends: {} }));
-  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
-  try {
-    const cfg = {
-      capabilities: {
-        "code:implement": { confinement: { mode: "required", policy: "workspace-write" } },
-      },
-      executors: {
-        "agy-cli": {
-          command: "agy",
-          adapter: "cli-spawn",
-          args: ["-p", "{prompt}"],
-          invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
-          allowCrossProvider: true,
-        },
-      },
-      executor: {
-        command: "agy",
-        adapter: "cli-spawn",
-        args: ["-p", "{prompt}"],
-        invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
-      },
-      modelPolicies: {
-        claude: { standard: "sonnet" },
-        gemini: { standard: "gemini-flash" },
-      },
-    };
-
-    const researchWork = { id: "w-research", domain: "research", workflowStep: "executing", tier: "standard" };
-
-    // The loop's worker asks for the capability its Unit names.
-    const unitCapability = workUnitFor(researchWork, { cfg, worktree: tmpDir }).unitData.capability;
-    assert.equal(unitCapability, "code:implement", "the Unit folded research domain to coding and named code:implement");
-
-    let cliRefusedCap;
-    try {
-      // Dispatch's door runs a registered executor; the Work layer derives the capability hints
-      // from the step's own executor identity and dispatch takes them as given.
-      await executeExecutorCli("agy-cli", { model: 'sonnet', sharedCwd: true,
-        ...workDispatchContext({ work: researchWork, stage: "executing", cwd: tmpDir, executorId: "fgos-coding-implement" }),
-        repoRoot: tmpDir,
-        cwd: tmpDir,
-        runnerConfig: cfg,
-        fgosDir: path.join(tmpDir, ".fgos"),
-        tier: "standard",
-      });
-    } catch (err) {
-      cliRefusedCap = err.capability;
-    }
-    assert.equal(cliRefusedCap, "code:implement", "executeExecutorCli folded research domain to coding and resolved code:implement identically");
-  } finally {
-    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
-    fs.rmSync(tmpDir, { recursive: true, force: true });
-  }
-});
-
-test("MED-3: a tool executor's for[] order does not affect capability resolution or required refusal", async () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med3-test-"));
-  // H10/D2: isolate from whatever 'bwrap' backend is actually registered on
-  // this machine -- see the H1 test above for the full rationale.
-  const regPath = path.join(tmpDir, "confinement-backends.json");
-  fs.writeFileSync(regPath, JSON.stringify({ contract: "confinement-backend-registry.v1", confinementBackends: {} }));
-  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
-  try {
-    const cfgA = {
-      capabilities: {
-        "code:review": { confinement: { mode: "required", policy: "workspace-write" } },
-      },
-      executors: {
-        "multi-order-a": {
-          kind: "tool",
-          command: "echo",
-          adapter: "cli-spawn",
-          allowCrossProvider: true,
-          for: ["advise", "code:review"],
-          invocations: [{ via: "cli", command: "echo", args: [] }],
-        },
-      },
-      modelPolicies: { claude: { standard: "sonnet" } },
-    };
-
-    const cfgB = {
-      capabilities: {
-        "code:review": { confinement: { mode: "required", policy: "workspace-write" } },
-      },
-      executors: {
-        "multi-order-b": {
-          kind: "tool",
-          command: "echo",
-          adapter: "cli-spawn",
-          allowCrossProvider: true,
-          for: ["code:review", "advise"],
-          invocations: [{ via: "cli", command: "echo", args: [] }],
-        },
-      },
-      modelPolicies: { claude: { standard: "sonnet" } },
-    };
-
-    let refusedCapA;
-    try {
-      await executeExecutorCli("multi-order-a", { model: 'sonnet', sharedCwd: true,
-        repoRoot: tmpDir,
-        cwd: tmpDir,
-        runnerConfig: cfgA,
-        fgosDir: path.join(tmpDir, ".fgos"),
-        tier: "standard",
-      });
-    } catch (err) {
-      refusedCapA = err.capability;
-    }
-
-    let refusedCapB;
-    try {
-      await executeExecutorCli("multi-order-b", { model: 'sonnet', sharedCwd: true,
-        repoRoot: tmpDir,
-        cwd: tmpDir,
-        runnerConfig: cfgB,
-        fgosDir: path.join(tmpDir, ".fgos"),
-        tier: "standard",
-      });
-    } catch (err) {
-      refusedCapB = err.capability;
-    }
-
-    assert.equal(refusedCapA, "code:review", "order ['advise', 'code:review'] binds required policy");
-    assert.equal(refusedCapB, "code:review", "order ['code:review', 'advise'] binds required policy identically");
-  } finally {
-    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
-    fs.rmSync(tmpDir, { recursive: true, force: true });
-  }
 });
 
 test("MED-4: executor named bwrap without real bwrap invocation does not claim satisfied/covered", () => {

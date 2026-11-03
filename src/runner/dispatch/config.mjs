@@ -657,8 +657,8 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp']);
  * executor whose backend uses a different model-name vocabulary (e.g.
  * `agy`'s Gemini model strings vs. Claude's `haiku`/`sonnet`/`opus`)
  * cannot borrow that shared table without breaking Claude's own
- * tier-to-model resolution. This field lets `executeExecutorCli`
- * (task-dispatch only, below) substitute a executor-specific model instead.
+ * tier-to-model resolution. This field lets a task-dispatch
+ * caller substitute an executor-specific model instead.
  *
  * `agentType`, when present, must be a non-empty string (D1/D2, tsk-3sw):
  * names a Claude Code agent definition (`.claude/agents/<name>.md`) an

@@ -64,8 +64,7 @@ export function workCapabilityHints({ work, stage, executorId } = {}) {
 }
 
 /**
- * Canonical capability identity for a Work-driven dispatch (both doors:
- * `spawnWorker` and `executeExecutorCli`): the Work item's hints fed to
+ * Canonical capability identity for a Work-driven dispatch (`spawnWorker`): the Work item's hints fed to
  * dispatch's own Work-agnostic resolver.
  */
 export function resolveCapabilityIdentityDetails({ cfg, work, stage, executorId, resolvedExecutor, purpose } = {}) {

@@ -1,8 +1,4 @@
-// `executeExecutorCli(executorId, { sharedCwd: true, for: <capability> })`: the work names its
-// capability and the capability owns the posture. An agent executor declares no
-// `for` of its own (it can do any kind of work), so its posture is never inferred
-// from the executor, and the invocation that runs is the one that can carry the
-// capability's posture.
+// The dispatch CLI's `probe-account` door over a fixture repository with one agent executor.
 
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
@@ -11,9 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
-import { executeExecutorCli, runDispatchCli } from '../../src/runner/dispatch/cli.mjs';
-import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
-import { collectExecutorProfileWarnings } from '../../src/setup/executor-profile-warnings.mjs';
+import { runDispatchCli } from '../../src/runner/dispatch/cli.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 // argv: <invocation marker> <prompt>. Writes "<marker>:<prompt>" so a test can
@@ -73,51 +67,6 @@ function fixtureRepo({ workerEnv, executorPatch = {}, capabilitiesPatch = {} } =
   writeProjectConfig(root, { runner });
   return { root, runner };
 }
-
-const written = (root) => fs.readFileSync(path.join(root, 'written.txt'), 'utf8');
-
-test('a "for" left on an agent executor is inert: the dispatch still runs under the capability it names, and doctor names the leftover', async () => {
-  const { root } = fixtureRepo({ executorPatch: { for: ['code:review'] } });
-  const result = await executeExecutorCli('fake', { tier: 'standard', model: 'sonnet', sharedCwd: true, for: 'execute', prompt: 'hello', cwd: root, repoRoot: root });
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(written(root), 'first:hello');
-  const warnings = collectExecutorProfileWarnings(loadRunnerConfigForDir(root));
-  assert.ok(warnings.some((w) => w.id === 'executor.fake.agent-for-inert'), JSON.stringify(warnings));
-});
-
-test('execute <agent> --for <capability> runs the invocation the capability prefers for that executor', async () => {
-  const { root } = fixtureRepo();
-  const result = await executeExecutorCli('fake', { tier: 'standard', model: 'sonnet', sharedCwd: true, for: 'pinned-write', prompt: 'hello', cwd: root, repoRoot: root });
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(written(root), 'second:hello');
-});
-
-test('execute <agent> --for <confined capability> refuses before spawning and names the two runUnit doors for read-only work', async () => {
-  const { root } = fixtureRepo();
-  await assert.rejects(
-    executeExecutorCli('fake', { tier: 'standard', model: 'sonnet', sharedCwd: true, for: 'code:review', prompt: 'hello', cwd: root, repoRoot: root }),
-    (err) => {
-      assert.equal(err.errorClass, 'posture-needs-assignment');
-      assert.match(err.message, /fgos workflow start --units <file>/);
-      assert.match(err.message, /fgos run "<prompt>" --provider fake/);
-      assert.doesNotMatch(err.message, /execute --contract/);
-      return true;
-    },
-  );
-  assert.equal(fs.existsSync(path.join(root, 'written.txt')), false);
-});
-
-test('execute <agent> --for refuses an unregistered capability', async () => {
-  const { root } = fixtureRepo();
-  await assert.rejects(
-    executeExecutorCli('fake', { tier: 'standard', model: 'sonnet', sharedCwd: true, for: 'no-such-capability', prompt: 'hello', cwd: root, repoRoot: root }),
-    (err) => {
-      assert.equal(err.errorClass, 'capability-not-registered');
-      assert.match(err.message, /not a registered capability/);
-      return true;
-    },
-  );
-});
 
 test('dispatch CLI probe-account rejects a non-positive --timeout-ms', async () => {
   const { root } = fixtureRepo();

@@ -14,10 +14,8 @@ import {
   RunnerConfigError,
 } from '../../src/runner/dispatch/config.mjs';
 import {
-  DispatchError,
   resolveHerdrBin,
 } from '../../src/runner/dispatch/transport.mjs';
-import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
@@ -39,23 +37,6 @@ function runFgos(args, options = {}) {
     ...options,
   });
 }
-
-// ─── 1. F4: Explicit Unregistered Executor Fails Closed ──────────────────────
-
-test('an explicitly named unregistered executor fails closed in executeExecutorCli', async () => {
-  const unregisteredId = 'unregistered-test-executor-f4-' + Date.now();
-
-  await assert.rejects(
-    executeExecutorCli(unregisteredId, { prompt: 'test' }),
-    (err) => {
-      assert.ok(err instanceof DispatchError, 'must be an instance of DispatchError');
-      assert.equal(err.name, 'DispatchError');
-      assert.equal(err.errorClass, 'executor-not-found');
-      assert.match(err.message, new RegExp(unregisteredId));
-      return true;
-    },
-  );
-});
 
 // ─── 2. F5: Declared Vendor Precedence Over CLI Harness ──────────
 

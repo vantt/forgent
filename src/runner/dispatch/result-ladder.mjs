@@ -1,5 +1,5 @@
 // dispatch/result-ladder.mjs (extract-dispatch-result-normalization-ladder):
-// the result-assembly step of `executeExecutorCli` (`cli.mjs`), extracted
+// the result-assembly step of a direct executor run, extracted
 // into its own pure helper -- pure move, no behavior change. Applies the
 // current confidence ladder to the raw adapter `result` and returns the
 // final object every out-of-process `execute` call hands back:

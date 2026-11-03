@@ -45,10 +45,7 @@ export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, resolveHerdr
 
 export { executeThroughConfinement } from './dispatch/confinement/authority.mjs';
 
-export {
-  resolveAgentTypeForTaskSpec,
-  executeExecutorCli,
-} from './dispatch/cli.mjs';
+export { resolveAgentTypeForTaskSpec } from './dispatch/cli.mjs';
 
 export {
   createAssignmentId,

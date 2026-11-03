@@ -1,9 +1,4 @@
-// The in-session production call site, exercised the way production calls it.
-//
-// The runner loop's worker no longer launches through here: spawnWorker runs it as a Unit run
-// (runUnit), whose confinement and pane wiring are tested in test/runner/spawn-worker.test.mjs
-// and test/runner/execution/run-herdr.test.mjs; the fan-out batch's in
-// test/runner/fanout-batch-runner-commit.test.mjs.
+// A production call site, exercised the way production calls it: from a config file.
 //
 // Every other herdr-spawn test builds the adapter's invocation by hand and
 // hands it straight to `EXECUTOR_ADAPTERS['herdr-spawn']`. That is a fine way
@@ -21,10 +16,8 @@ import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
-import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
-import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-prod-callsite-home-'));
 const originalHome = process.env.HOME;
@@ -81,124 +74,6 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
   });
   return root;
 }
-
-function soleRunDir(root) {
-  const fgosDir = path.join(root, '.fgos');
-  const asgnBase = path.join(fgosDir, 'assignments');
-  if (fs.existsSync(asgnBase)) {
-    const asgns = fs.readdirSync(asgnBase);
-    if (asgns.length > 0) {
-      const runsDir = path.join(asgnBase, asgns[0], 'runs');
-      const attempts = fs.readdirSync(runsDir);
-      return path.join(runsDir, attempts[0]);
-    }
-  }
-  const base = path.join(fgosDir, 'dispatch-runs');
-  const workIds = fs.readdirSync(base);
-  assert.equal(workIds.length, 1, 'exactly one dispatch run was started');
-  const stamps = fs.readdirSync(path.join(base, workIds[0]));
-  assert.equal(stamps.length, 1);
-  return path.join(base, workIds[0], stamps[0]);
-}
-
-test('a herdr-spawn executor cannot be executed directly: a pane launch is an attempt of the run supervisor', async () => {
-  const root = fixtureRepo();
-  try {
-    await assert.rejects(
-      () => executeExecutorCli('herdr-worker', { model: 'sonnet', sharedCwd: true, prompt: 'do the thing', repoRoot: root, cwd: root, tier: 'standard' }),
-      /herdr-spawn runs as an attempt of the run supervisor/,
-    );
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
-
-test('in-process dispatch through executeExecutorCli gets authorityScope: external-harness (R6)', async () => {
-  const root = fixtureRepo(() => ({
-    kind: 'agent',
-    agentType: 'general-assistant',
-  }));
-  try {
-    const res = await executeExecutorCli('herdr-worker', { tier: 'standard', model: 'sonnet', sharedCwd: true,
-      prompt: 'in process prompt',
-      repoRoot: root,
-      cwd: root,
-      hasLiveTaskAccess: true,
-    });
-    assert.equal(res.mechanism, 'in-process');
-    assert.equal(res.authorityScope, 'external-harness');
-    assert.equal(res.attestation, null);
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
-
-test('in-process dispatch with required confinement refuses without trusted harness (R6)', async () => {
-  const root = fixtureRepo(() => ({
-    kind: 'agent',
-    agentType: 'general-assistant',
-  }));
-  // Add required confinement to the capability in config
-  const cfg = readProjectConfig(root);
-  cfg.runner.capabilities[IMPLEMENT_CAPABILITY].confinement = {
-    mode: 'required',
-    policy: 'host-write-denied',
-  };
-  writeProjectConfig(root, cfg);
-
-  try {
-    await assert.rejects(
-      () => executeExecutorCli('herdr-worker', { tier: 'standard', model: 'sonnet', sharedCwd: true,
-        prompt: 'in process prompt',
-        repoRoot: root,
-        cwd: root,
-        hasLiveTaskAccess: true,
-        for: IMPLEMENT_CAPABILITY,
-      }),
-      (err) => {
-        assert.equal(err.errorClass, 'confinement-unsupported');
-        assert.match(err.message, /in-process dispatch has no trusted harness attestation contract/);
-        return true;
-      },
-    );
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
-
-test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.json', async () => {
-  const root = fixtureRepo();
-  try {
-    const fgosDir = path.join(root, '.fgos');
-    const cfg = loadRunnerConfigForDir(root);
-    await executeExecutorCli('mock-non-assignment', { tier: 'standard', model: 'sonnet', sharedCwd: true,
-      prompt: 'hello world',
-      cwd: root,
-      repoRoot: root,
-      fgosDir,
-      runnerConfig: {
-        ...cfg,
-        executors: {
-          'mock-non-assignment': {
-            adapter: 'cli-spawn',
-            command: 'echo',
-            providerModel: 'claude',
-            args: ['legacy-ok'],
-            allowCrossProvider: true,
-          },
-        },
-      },
-    });
-    const runDir = soleRunDir(root);
-    assert.ok(fs.existsSync(runDir), 'dispatch run directory created');
-    const runJsonPath = path.join(runDir, 'run.json');
-    const runRecord = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-    assert.equal(runRecord.contract, 'run.v1');
-    assert.equal(runRecord.executorId, 'mock-non-assignment');
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
 
 test('fgos return --blocked sets item status to blocked with outcome and reason (R1 / F15)', () => {
   const root = fixtureRepo();

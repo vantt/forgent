@@ -121,27 +121,6 @@ test('controller death with a setsid escapee keeps an unconfined worktree inadmi
   assert.ok(fs.existsSync(f.record));
 });
 
-test('an unsupervised mutating executor is refused before its process starts', { skip }, async (t) => {
-  const f = fixture(t);
-  const { executeExecutorCli } = await import('../../src/runner/dispatch/cli.mjs');
-  fs.mkdirSync(f.fgosDir, { recursive: true });
-  const marker = path.join(f.cwd, 'must-not-start');
-  const runnerConfig = {
-    executors: { fake: { kind: 'agent', command: process.execPath, args: ['-e', `require('fs').writeFileSync(${JSON.stringify(marker)}, 'started')`], allowCrossProvider: true, providerModel: 'fake' } },
-    capabilities: { execute: { serves: { outputKind: 'change', mutates: true } } },
-    modelPolicies: { fake: { standard: 'fake-standard' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000,
-  };
-  await assert.rejects(() => executeExecutorCli('fake', { tier: 'standard', model: 'sonnet', cwd: f.cwd, repoRoot: f.cwd, runnerConfig, for: 'execute' }), (err) => {
-    assert.equal(err.code, 'custody-domain-required');
-    assert.equal(err.cwd, f.cwd);
-    assert.equal(err.executorId, 'fake');
-    assert.equal(err.capability, 'execute');
-    return true;
-  });
-  assert.equal(fs.existsSync(marker), false);
-});
-
 test('an invalid handed custody lease reports the attempted producer context', { skip }, (t) => {
   const f = fixture(t);
   assert.throws(() => acquireAttemptLocks({ ...f, assignmentDir: path.join(f.cwd, 'assignment'), attemptStr: '01', mutating: true,
