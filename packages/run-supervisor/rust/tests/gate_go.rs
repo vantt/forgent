@@ -36,7 +36,7 @@ fn go_with_the_wrong_digest_is_refused() {
     let attempt = Attempt::new("digest", &options);
     let mut gate = start_gate(&*driver, &attempt, None);
     send_go(&mut gate, &attempt.attempt_id, "sha256:0000000000000000000000000000000000000000000000000000000000000000");
-    assert_eq!(wait_exit(&mut gate.spawned, Duration::from_secs(10)), fgos_run_supervisor::gate::EXIT_ENVELOPE_INVALID);
+    assert_eq!(wait_exit(&mut gate.spawned, Duration::from_secs(10)), fgos_run_supervisor::route::EXIT_ENVELOPE_INVALID);
     assert!(!agent_marker.exists());
     assert!(attempt.gate_exit().is_none());
 }
@@ -48,7 +48,7 @@ fn go_for_another_attempt_is_refused() {
     let attempt = Attempt::new("attempt", &options);
     let mut gate = start_gate(&*driver, &attempt, None);
     send_go(&mut gate, "att-someone-else", &attempt.digest);
-    assert_eq!(wait_exit(&mut gate.spawned, Duration::from_secs(10)), fgos_run_supervisor::gate::EXIT_ENVELOPE_INVALID);
+    assert_eq!(wait_exit(&mut gate.spawned, Duration::from_secs(10)), fgos_run_supervisor::route::EXIT_ENVELOPE_INVALID);
     assert!(!agent_marker.exists());
 }
 
@@ -60,7 +60,17 @@ fn a_tampered_envelope_is_refused_before_hello() {
     let text = std::fs::read_to_string(&attempt.envelope).unwrap().replace("\"unit-1\"", "\"unit-2\"");
     std::fs::write(&attempt.envelope, text).unwrap();
     let mut gate = start_gate(&*driver, &attempt, None);
-    assert_eq!(wait_exit(&mut gate.spawned, Duration::from_secs(10)), fgos_run_supervisor::gate::EXIT_ENVELOPE_INVALID);
+    assert_eq!(wait_exit(&mut gate.spawned, Duration::from_secs(10)), fgos_run_supervisor::route::EXIT_ENVELOPE_INVALID);
+    assert!(!agent_marker.exists());
+}
+
+#[test]
+fn an_envelope_of_another_protocol_is_refused_before_hello() {
+    let Some(driver) = bwrap_driver("other-protocol") else { return };
+    let (options, agent_marker) = quick_agent("protocol");
+    let attempt = Attempt::new_with("protocol", &options, |envelope| envelope["protocolId"] = serde_json::json!(2));
+    let mut gate = start_gate(&*driver, &attempt, None);
+    assert_eq!(wait_exit(&mut gate.spawned, Duration::from_secs(10)), fgos_run_supervisor::route::EXIT_ENVELOPE_INVALID);
     assert!(!agent_marker.exists());
 }
 

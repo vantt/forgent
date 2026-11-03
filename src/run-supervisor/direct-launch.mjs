@@ -149,13 +149,16 @@ export function attemptStepEnv({ env = process.env } = {}) {
   return out;
 }
 
-/** The two variables an attempt's writer id travels in. */
-export function identityEnv(identity) {
-  if (!identity) return {};
-  return {
-    FGOS_SESSION_ID: identity.writerId,
-    ...(identity.parentWriterId ? { FGOS_PARENT_WRITER_ID: identity.parentWriterId } : {}),
-  };
+/**
+ * `env` with the attempt's writer id applied: `FGOS_SESSION_ID` set, `FGOS_PARENT_WRITER_ID` set or removed,
+ * so what the controller itself carried never reaches the agent. Both env sources of an attempt (the
+ * envelope's launch env and the side file) go through here; the gate only merges them.
+ */
+export function withIdentityEnv(env, identity) {
+  if (!identity) return env;
+  const out = { ...env };
+  delete out.FGOS_PARENT_WRITER_ID;
+  return { ...out, FGOS_SESSION_ID: identity.writerId, ...(identity.parentWriterId ? { FGOS_PARENT_WRITER_ID: identity.parentWriterId } : {}) };
 }
 
 /**
@@ -196,8 +199,8 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
     launch: {
       command: attempt.command,
       args: attempt.args,
-      // The writer id of the attempt and its lineage are not secrets; the gate sets both again last.
-      env: { ...attempt.env, ...identityEnv(identity) },
+      // The writer id of the attempt and its lineage are not secrets.
+      env: withIdentityEnv(attempt.env, identity),
       stdinPolicy: 'null',
       briefPath: terminal ? terminal.briefPath : null,
       outboxDir: terminal?.outboxDir ?? paths.outboxDir,

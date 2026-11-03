@@ -85,7 +85,7 @@ import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, Dispa
 import {
   acquireAttemptLocks,
   attemptGateCommand,
-  identityEnv,
+  withIdentityEnv,
   prepareAttemptFiles,
   terminalSocketPath,
   attemptStepEnv as attemptStepEnvOf,
@@ -2090,7 +2090,7 @@ export async function executeAssignment(assignment, opts = {}) {
         body: attemptEnvelopeBody,
         // The side file is merged over the envelope's own environment, so the dispatcher's id the
         // authority put in it must not win over the attempt's.
-        secretEnv: { ...(terminalMode ? withoutPaneEnv(prepResult.attempt.secretEnv) : prepResult.attempt.secretEnv), ...identityEnv(attemptIdentity) },
+        secretEnv: withIdentityEnv(terminalMode ? withoutPaneEnv(prepResult.attempt.secretEnv) : prepResult.attempt.secretEnv, attemptIdentity),
         controlEpoch,
         controlToken,
       });

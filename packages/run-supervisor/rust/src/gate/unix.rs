@@ -17,7 +17,8 @@ use fgos_process::facts;
 use fgos_process::ProcId;
 use serde_json::{json, Value};
 
-use super::{ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, read_stop, report, Config, GateArgs, GoEnd, Stop, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_NO_GO};
+use super::{ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, read_stop, Config, GateArgs, GoEnd, Stop, EXIT_NO_GO};
+use crate::route::{report, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL};
 use crate::go_channel::{write_frame, FrameBuf, FrameError};
 
 /// Off Linux the sweep after the agent ended is bounded: a process the scan cannot end must not hold the gate forever.
@@ -35,32 +36,32 @@ pub fn run(args: &GateArgs) -> i32 {
     });
     for fd in inherited {
         if let Err(err) = set_cloexec(fd as libc::c_int) {
-            report("fd-invalid", &format!("descriptor {fd}: {err}"));
+            report("gate", "fd-invalid", &format!("descriptor {fd}: {err}"));
             return EXIT_INTERNAL;
         }
     }
     let pipe = match install_signal_pipe() {
         Ok(fd) => fd,
         Err(err) => {
-            report("signal-setup-failed", &err.to_string());
+            report("gate", "signal-setup-failed", &err.to_string());
             return EXIT_INTERNAL;
         }
     };
     let config = match load_config(&args.envelope) {
         Ok(config) => config,
         Err(why) => {
-            report("envelope-invalid", &why);
+            report("gate", "envelope-invalid", &why);
             return EXIT_ENVELOPE_INVALID;
         }
     };
     if config.terminal != matches!(args.go, GoEnd::Socket(_)) {
-        report("envelope-invalid", "the envelope mode and the GO channel kind disagree");
+        report("gate", "envelope-invalid", "the envelope mode and the GO channel kind disagree");
         return EXIT_ENVELOPE_INVALID;
     }
     // SAFETY: getpid has no preconditions.
     let is_init = unsafe { libc::getpid() } == 1;
     if config.preferred == "linux-gate" && !is_init {
-        report("not-pid-1", "the envelope names linux-gate but this process is not pid 1 of its namespace");
+        report("gate", "not-pid-1", "the envelope names linux-gate but this process is not pid 1 of its namespace");
         return EXIT_INTERNAL;
     }
     // Own PDEATHSIG in the terminal gate rather than relying on bwrap's
@@ -69,7 +70,7 @@ pub fn run(args: &GateArgs) -> i32 {
     #[cfg(target_os = "linux")]
     if config.terminal && is_init {
         if let Err(err) = fgos_process::control::arm_parent_death_signal() {
-            report("parent-death-setup-failed", &err.to_string());
+            report("gate", "parent-death-setup-failed", &err.to_string());
             return EXIT_INTERNAL;
         }
     }
@@ -89,7 +90,7 @@ pub fn run(args: &GateArgs) -> i32 {
         GoEnd::Socket(path) => match connect_supervisor(path) {
             Ok(stream) => stream,
             Err(why) => {
-                report("go-socket-refused", &why);
+                report("gate", "go-socket-refused", &why);
                 return EXIT_NO_GO;
             }
         },
@@ -99,21 +100,21 @@ pub fn run(args: &GateArgs) -> i32 {
     }
     let Some(mut arrived) = wait_for_go(&mut go, pipe) else { return EXIT_NO_GO };
     if !go_matches(&config, &arrived.frame) {
-        report("go-mismatch", "GO does not name this attempt's envelope");
+        report("gate", "go-mismatch", "GO does not name this attempt's envelope");
         return EXIT_ENVELOPE_INVALID;
     }
     // The attempt lock, and the dispatch-cwd lease when the envelope is mutating, ride on GO.
     // The gate holds them until it exits; they are close-on-exec, so nothing it starts inherits them.
     let expected_locks = if config.terminal { 1 + usize::from(config.mutating) } else { 0 };
     if arrived.fds.len() != expected_locks {
-        report("go-mismatch", &format!("GO carried {} lock descriptions, the envelope expects {expected_locks}", arrived.fds.len()));
+        report("gate", "go-mismatch", &format!("GO carried {} lock descriptions, the envelope expects {expected_locks}", arrived.fds.len()));
         return EXIT_ENVELOPE_INVALID;
     }
     let held_locks = std::mem::take(&mut arrived.fds);
     let secrets = match read_side_env(&config) {
         Ok(env) => env,
         Err(why) => {
-            report("envelope-invalid", &why);
+            report("gate", "envelope-invalid", &why);
             return EXIT_ENVELOPE_INVALID;
         }
     };
@@ -122,7 +123,7 @@ pub fn run(args: &GateArgs) -> i32 {
     match result {
         Ok(()) => 0,
         Err(why) => {
-            report("gate-failed", &why);
+            report("gate", "gate-failed", &why);
             EXIT_INTERNAL
         }
     }
@@ -544,13 +545,6 @@ fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, Stri
                 cmd.env(name, value);
             }
         }
-    }
-    if let Some((writer, parent)) = &config.identity {
-        cmd.env("FGOS_SESSION_ID", writer);
-        match parent {
-            Some(parent) => cmd.env("FGOS_PARENT_WRITER_ID", parent),
-            None => cmd.env_remove("FGOS_PARENT_WRITER_ID"),
-        };
     }
     match go_frame.get("gateHostTuple").filter(|t| !t.is_null()) {
         Some(anchor) => cmd.env("FGOS_PIDNS_ANCHOR", anchor.to_string()),

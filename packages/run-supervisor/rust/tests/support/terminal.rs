@@ -38,6 +38,9 @@ pub fn terminal_attempt(name: &str, options: &Options, settle_ms: u64, mutating:
         envelope["slot"] = json!({"key": attempt_id, "groupKey": "g"});
         envelope["terminal"] = json!({"socketPath": socket_path, "exitCommand": null, "orphanSettleMs": settle_ms});
         envelope["identity"] = json!({"writerId": format!("att-w-{name}"), "parentWriterId": "parent-writer"});
+        // The controller puts the identity in the launch environment; the gate only passes it on.
+        envelope["launch"]["env"]["FGOS_SESSION_ID"] = envelope["identity"]["writerId"].clone();
+        envelope["launch"]["env"]["FGOS_PARENT_WRITER_ID"] = envelope["identity"]["parentWriterId"].clone();
     });
     (attempt, sock)
 }

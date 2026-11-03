@@ -10,7 +10,8 @@ use std::os::fd::AsRawFd;
 use std::path::PathBuf;
 use std::time::Duration;
 
-use fgos_run_supervisor::gate::{EXIT_ENVELOPE_INVALID, EXIT_NO_GO};
+use fgos_run_supervisor::gate::EXIT_NO_GO;
+use fgos_run_supervisor::route::EXIT_ENVELOPE_INVALID;
 use fgos_run_supervisor::go_channel::read_frame;
 use support::terminal::*;
 use support::*;
@@ -130,7 +131,7 @@ fn a_direct_envelope_on_a_socket_channel_is_refused() {
 }
 
 #[test]
-fn the_agent_sees_the_attempt_identity_and_nothing_of_the_parent_session() {
+fn the_agent_sees_the_launch_environment_identity_and_nothing_of_the_pane_session() {
     if bwrap_driver("env").is_none() {
         return;
     }
@@ -139,7 +140,7 @@ fn the_agent_sees_the_attempt_identity_and_nothing_of_the_parent_session() {
     let (attempt, socket) = terminal_attempt("env", &options, 0, false);
     let lock = locked_file(&attempt.dir.join("attempt.lock"));
     let listener = listen(&socket);
-    let mut pane = start_in_pane(&attempt, &socket, true, &[("CLAUDE_CODE_SESSION_ID", "parent-session"), ("FGOS_SESSION_ID", "stale-writer")]);
+    let mut pane = start_in_pane(&attempt, &socket, true, &[("CLAUDE_CODE_SESSION_ID", "parent-session"), ("FGOS_SESSION_ID", "stale-writer"), ("FGOS_PARENT_WRITER_ID", "stale-parent")]);
     let mut stream = handshake(&listener, &attempt, &[lock.as_raw_fd()]);
     assert_eq!(read_frame(&mut stream).expect("AGENT")["type"], "AGENT");
     assert_eq!(pane.wait_exit(LIMIT), 0);
@@ -148,7 +149,7 @@ fn the_agent_sees_the_attempt_identity_and_nothing_of_the_parent_session() {
     assert!(env.lines().any(|l| l == "FGOS_PARENT_WRITER_ID=parent-writer"), "{env}");
     assert!(env.lines().any(|l| l.starts_with("FGOS_PIDNS_ANCHOR={")), "{env}");
     assert!(!env.contains("CLAUDE_CODE_SESSION_ID"), "{env}");
-    assert!(!env.contains("stale-writer"), "{env}");
+    assert!(!env.contains("stale-writer") && !env.contains("stale-parent"), "{env}");
 }
 
 #[test]

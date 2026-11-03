@@ -22,7 +22,8 @@ use serde_json::{json, Value};
 use windows_sys::Win32::System::Console::{GenerateConsoleCtrlEvent, CTRL_BREAK_EVENT};
 use windows_sys::Win32::System::Threading::{CREATE_NEW_PROCESS_GROUP, CREATE_SUSPENDED};
 
-use super::{ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, report, stop_cause, stop_for, Config, GateArgs, GoEnd, Stop, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_NO_GO, EXIT_USAGE};
+use super::{ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, stop_cause, stop_for, Config, GateArgs, GoEnd, Stop, EXIT_NO_GO};
+use crate::route::{report, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_USAGE};
 use crate::go_channel::{read_frame, write_frame};
 use crate::go_pipe;
 
@@ -47,24 +48,24 @@ pub fn run(args: &GateArgs) -> i32 {
     let config = match load_config(&args.envelope) {
         Ok(config) => config,
         Err(why) => {
-            report("envelope-invalid", &why);
+            report("gate", "envelope-invalid", &why);
             return EXIT_ENVELOPE_INVALID;
         }
     };
     if config.preferred != "windows-job" {
-        report("wrong-driver", "the envelope does not name windows-job");
+        report("gate", "wrong-driver", "the envelope does not name windows-job");
         return EXIT_INTERNAL;
     }
     // The second holder of the attempt's job: it outlives the supervisor's handle.
     let outer = match open_job(job_name) {
         Ok(job) => job,
         Err(err) => {
-            report("job-open-failed", &format!("{job_name}: {err}"));
+            report("gate", "job-open-failed", &format!("{job_name}: {err}"));
             return EXIT_INTERNAL;
         }
     };
     if outer.contains(std::process::id()) != Some(true) {
-        report("not-in-job", "the gate is not a member of the attempt's job");
+        report("gate", "not-in-job", "the gate is not a member of the attempt's job");
         return EXIT_INTERNAL;
     }
 
@@ -80,20 +81,20 @@ pub fn run(args: &GateArgs) -> i32 {
         None => return EXIT_NO_GO,
     };
     if !go_matches(&config, &go_frame) {
-        report("go-mismatch", "GO does not name this attempt's envelope");
+        report("gate", "go-mismatch", "GO does not name this attempt's envelope");
         return EXIT_ENVELOPE_INVALID;
     }
     let secrets = match read_side_env(&config) {
         Ok(env) => env,
         Err(why) => {
-            report("envelope-invalid", &why);
+            report("gate", "envelope-invalid", &why);
             return EXIT_ENVELOPE_INVALID;
         }
     };
     match supervise_agent(&config, &go_frame, secrets, &mut go, job_name) {
         Ok(()) => 0,
         Err(why) => {
-            report("gate-failed", &why);
+            report("gate", "gate-failed", &why);
             EXIT_INTERNAL
         }
     }

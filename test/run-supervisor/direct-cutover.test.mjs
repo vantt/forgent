@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { acquireSync, createLockScope, spawnWithLocks } from '../../src/holder-lock/index.mjs';
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
-import { attemptGateCommand, attemptPaths, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, prepareAttemptFiles, waitForBinding, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
+import { attemptGateCommand, attemptPaths, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, prepareAttemptFiles, waitForBinding, withIdentityEnv, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, killToken, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
 import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -113,6 +113,22 @@ test('every envelope deadline carries a string bootId on every platform', (t) =>
     assert.equal(typeof at.bootId, 'string', `${name}.bootId`);
     assert.notEqual(at.bootId, '', `${name}.bootId`);
   }
+});
+
+test('the attempt writer id replaces whatever the controller carried, in the launch env and in the side-file env', (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-envelope-identity-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const stale = { PATH: '/bin', FGOS_SESSION_ID: 'stale-writer', FGOS_PARENT_WRITER_ID: 'stale-parent' };
+  const build = (identity) => buildEnvelope({
+    attemptId: 'att-1', unitRunId: 'unit-1', runDir: dir, host: { hostBin: '/h/fgos', payloadRoot: '/h/payload' }, cwd: dir, mutating: false,
+    attempt: { command: '/bin/agent', args: [], env: stale, bwrapPrefix: ['--unshare-pid', '--'], bwrapExecutable: '/usr/bin/bwrap' },
+    timeoutMs: 60_000, idleTimeoutMs: null, cli: 'claude', stepEnv: { PATH: '/bin', FGOS_STATE_ROOT: '/state' },
+    gateKillGraceMs: 1000, killWaitMs: 1000, identity,
+  }).launch.env;
+  assert.deepEqual(build({ writerId: 'w-1', parentWriterId: null }), { PATH: '/bin', FGOS_SESSION_ID: 'w-1' });
+  assert.deepEqual(build({ writerId: 'w-1', parentWriterId: 'p-1' }), { PATH: '/bin', FGOS_SESSION_ID: 'w-1', FGOS_PARENT_WRITER_ID: 'p-1' });
+  assert.deepEqual(withIdentityEnv(stale, { writerId: 'w-2', parentWriterId: null }), { PATH: '/bin', FGOS_SESSION_ID: 'w-2' });
+  assert.equal(withIdentityEnv(stale, null), stale, 'an attempt with no identity keeps its environment');
 });
 
 test('the envelope is immutable, digest-checked and secret-free; the side file is 0600 and holds the secrets and the control token', (t) => {
