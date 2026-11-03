@@ -67,6 +67,8 @@ impl ProcessPlatform for Macos {
             tty_nr: i64::from(info.e_tdev),
             // Wall-clock microseconds of the start: ordered like the Linux ticks, on another clock.
             start_ticks: u64::from(info.pbi_start_tvsec) * 1_000_000 + u64::from(info.pbi_start_tvusec),
+            // Zombies are filtered out above; a live process's kernel state is not read.
+            state: '?',
         })
     }
 

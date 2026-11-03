@@ -367,6 +367,16 @@ pub struct Relation {
     /// Start time in clock ticks since boot (Linux `starttime`): a process
     /// created later never has a smaller value.
     pub start_ticks: u64,
+    /// Process state letter (Linux `state`, field 3); `?` where the platform
+    /// gives none: the process was alive when read, nothing more is known.
+    pub state: char,
+}
+
+impl Relation {
+    /// `Z` or `X`: the process is a corpse or gone, nothing runs there.
+    pub fn is_gone(&self) -> bool {
+        matches!(self.state, 'Z' | 'X')
+    }
 }
 
 /// Now, in the unit and clock of [`Relation::start_ticks`]: clock ticks of
@@ -499,10 +509,10 @@ pub(crate) fn parse_stat(line: &str) -> Option<Stat> {
     })
 }
 
-/// Parent, group and start time from one `/proc/<pid>/stat` line.
+/// Parent, group, state and start time from one `/proc/<pid>/stat` line.
 pub fn parse_relation(pid: ProcId, line: &str) -> Option<Relation> {
     let stat = parse_stat(line)?;
-    Some(Relation { pid, parent: stat.parent, group: stat.group, session: stat.session, tty_nr: stat.tty_nr, start_ticks: stat.start_ticks })
+    Some(Relation { pid, parent: stat.parent, group: stat.group, session: stat.session, tty_nr: stat.tty_nr, start_ticks: stat.start_ticks, state: stat.state })
 }
 
 /// What [`scan`] reads for each process.
@@ -618,9 +628,11 @@ mod tests {
         let line = "4242 (weird) name (x)) S 100 4242 77 34816 4242 4194304 0 0 0 0 1 2 0 0 20 0 1 0 987654 1 2 3";
         assert_eq!(
             parse_relation(ProcId(4242), line),
-            Some(Relation { pid: ProcId(4242), parent: 100, group: 4242, session: 77, tty_nr: 34816, start_ticks: 987654 })
+            Some(Relation { pid: ProcId(4242), parent: 100, group: 4242, session: 77, tty_nr: 34816, start_ticks: 987654, state: 'S' })
         );
         assert_eq!(parse_relation(ProcId(1), "1 (x) S 0"), None);
+        let zombie = parse_relation(ProcId(9), "9 (dead) Z 100 9 77 0 9 4194304 0 0 0 0 1 2 0 0 20 0 1 0 55 1 2 3").expect("zombie line");
+        assert!(zombie.is_gone() && !parse_relation(ProcId(4242), line).unwrap().is_gone());
     }
 
     #[test]

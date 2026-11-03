@@ -630,23 +630,13 @@ fn kill_everything(agent: Option<libc::pid_t>, tuple: Option<&facts::ProcTuple>,
     }
 }
 
-/// Every live process whose parent chain reaches this gate.
+/// Every live process whose parent chain reaches this gate. Corpses are skipped; no process table
+/// pass (`None`) finds nothing.
 #[cfg(target_os = "linux")]
 fn descendants_of_self() -> Vec<libc::pid_t> {
-    let me = std::process::id();
-    let mut parent_of: Vec<(u32, u32)> = Vec::new();
-    for entry in std::fs::read_dir("/proc").into_iter().flatten().flatten() {
-        let Some(pid) = entry.file_name().to_str().and_then(|n| n.parse::<u32>().ok()) else { continue };
-        let Ok(stat) = std::fs::read_to_string(format!("/proc/{pid}/stat")) else { continue };
-        let Some(rest) = stat.rfind(')').map(|i| &stat[i + 1..]) else { continue };
-        let mut fields = rest.split_whitespace();
-        let (Some(state), Some(ppid)) = (fields.next(), fields.next().and_then(|p| p.parse::<u32>().ok())) else { continue };
-        if state != "Z" {
-            parent_of.push((pid, ppid));
-        }
-    }
+    let parent_of: Vec<(u32, u32)> = facts::relations().unwrap_or_default().iter().filter(|r| !r.is_gone()).map(|r| (r.pid.0, r.parent)).collect();
     let mut found: Vec<u32> = Vec::new();
-    let mut frontier = vec![me];
+    let mut frontier = vec![std::process::id()];
     while let Some(parent) = frontier.pop() {
         for (pid, _) in parent_of.iter().filter(|(_, ppid)| *ppid == parent) {
             if !found.contains(pid) {
