@@ -93,6 +93,17 @@ test('convention doctor passes for pre-cutoff violations but fails for post-cuto
   assert.match(oldAndNew.message, /new-bad\.md/);
 });
 
+// One wiring proof only: path/placement cases belong to Convention's Rust golden suite.
+test('convention doctor honors native blocking posture without applying the historical warning cutoff', (t) => {
+  const { root } = initSourceRepo(t);
+  const result = checkConventionConformance(root, {
+    hostRunner: () => ({ checked: 1, violations: [{ ...violation('docs/specs/new.md'), posture: 'block' }] }),
+    cutoffResolver: () => { throw new Error('blocking posture must not use the naming cutoff'); },
+  });
+  assert.equal(result.passed, false);
+  assert.match(result.message, /placement refused: 1 blocking/);
+});
+
 test('convention doctor reports a clean host result as passed', (t) => {
   const { root } = initSourceRepo(t);
   const result = checkConventionConformance(root, {

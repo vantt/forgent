@@ -84,7 +84,7 @@ default drop to `kernel`.
 
 ---
 
-**Source:** `docs/history/learnings/critical-patterns.md` —
+**Source:** the historical learning log (the dated entries below have no repository content commit at that path) —
 [20260718] "Adding ANY new `.mjs` module under `repo/` obliges a
 `docs/architecture-manifest.json` layer row in the SAME cell" (feature
 entry-standardization, P37), with a fourth recurrence noted against

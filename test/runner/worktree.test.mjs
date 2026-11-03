@@ -733,7 +733,7 @@ test('createClaimWorktree\'s dirty-and-behind refusal points at the stale-vs-rea
   assert.ok(caught instanceof WorktreeError);
   assert.match(
     caught.message,
-    /docs\/how-to\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\.md/,
+    /docs\/knowledge\/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt\/tell-a-stale-worktree-index-apart-from-real-uncommitted-work\.md/,
   );
 
   discardFixtureWorktree(repoRoot, first.path);

@@ -5,14 +5,20 @@ Document type: Contract index
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Route readers through host-invocation contracts and distinguish target contracts from current implementation
 Design status: Draft
-Implementation status: Current partial plus implemented preview provider protocol
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/**
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/README.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
+Implementation: Current partial plus implemented preview provider protocol
+Provenance: `docs/platform/host-invocation-routing/contracts/README.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Route readers through host-invocation contracts and distinguish target contracts from current implementation
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
 
 ## 1. Contracts

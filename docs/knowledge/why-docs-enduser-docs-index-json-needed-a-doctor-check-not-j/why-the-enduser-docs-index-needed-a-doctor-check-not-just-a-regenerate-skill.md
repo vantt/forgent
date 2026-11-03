@@ -90,7 +90,7 @@ invariant instead.
 
 ## Related
 
-- `docs/history/tsk-1m0/plan.md` — full plan and locked decisions.
+- Workshop plan tsk-1m0 (external source, no repository content commit) — full plan and locked decisions.
 - `src/report/enduser-index.mjs` — `buildEnduserIndex`, the pure function
   both the check and the real regenerate verb share.
 - `docs/history/compound-learn-artifact-registry/DISCUSSION.md` — the

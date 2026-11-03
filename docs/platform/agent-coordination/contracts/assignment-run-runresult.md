@@ -1,12 +1,50 @@
 # Assignment, Run, And RunResult Contract
 
+```txt
 Document type: Contract
-Design status: Accepted
-Implementation: Partial (RunResult v2 and Dispatch runtime inspection implemented)
-Last reviewed: 2026-09-11
-Canonical for: semantic requests, runtime attempts, normalized results, and evidence
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/contracts/assignment-run-runresult.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/contracts/assignment-run-runresult.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+
+## Implementation And Design Status
+
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.
+
+| Section | Status | Evidence / limit |
+|---|---|---|
+| Assignment | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/assignment.mjs:17,276; assignment-normalizer.mjs:2-20 (stamps mutation/evidence.required); assignment-runner.mjs:349-385,495-516,973-975 (provenance.kind inline/declared/unit-run checks: assertInlineMutatingAssignmentAuthorized, validateAssignmentLegality, seatIdOf) |
+| Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1563-1582 (run.json contents) |
+| Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |
+| Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1563-1582 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |
+| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |
+| Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |
+| Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |
+| Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |
+| Work Boundary | Current contract/invariant | docs/platform/runner/decisions/h-36d872fbb0e5.md (0049, Work Boundary: Work adapters stay above the Execution Core); no src/state import in src/runner/dispatch or src/runner/execution |
+| Required Negative Tests | Mixed implementation and proposal; no blanket implementation claim | test/runner/assignment-runresult.test.mjs, evidence-attribution.test.mjs, run-lock-identity.test.mjs, dispatch-liveness.test.mjs; items about 'superseded Run late result' tied to run-retried (retired) |
 
 ## Assignment
+
+Registry identity: **CTR013 · `Assignment`**. The current persisted Assignment
+payload carries no contract/schema version field; its policy and normalizer
+stamps are not a substitute for one. `DispatchPlan` remains inside the existing
+`assignment-run.v2` carriage and receives no separate registry id here.
 
 Assignment is an immutable semantic request. It should identify:
 
@@ -20,22 +58,20 @@ Assignment is an immutable semantic request. It should identify:
 - result/artifact destination contract;
 - creation timestamp and caller provenance.
 
-Assignment construction has two accepted provenance classes:
+Current construction has three provenance kinds:
 
-1. a declared Stage Operation and TaskSpec;
-2. an agent-proposed inline execution contract validated by foundation policy
-   and any selected domain harness.
+1. declared Workflow step operation/TaskSpec;
+2. validated inline contract and applicable registered domain harness;
+3. Unit-run execution and its computed binding.
 
 [ADR-006](../decisions/ADR-006-assignment-provenance-and-contract-snapshot.md)
-accepts how both classes converge: every Assignment carries
-`provenance.kind = declared | inline` with policy/normalizer versions and the
-validator chain, and the normalizer stamps `mutation` and `evidence.required`
-onto the immutable snapshot. Result interpretation reads those fields rather
-than switching on the operation id. The minimum inline field set is listed in
-ADR-006; in the first slice inline contracts are read-only only and carry no
-session reference. Implementation of the inline class and the stamped snapshot
-has not started; the declared-operation path remains the only implemented
-general builder until then.
+distinguishes their shapes. Declared/inline builders stamp policy/normalizer
+versions (`src/runner/dispatch/assignment.mjs:443-444,626-628`; constants in
+`src/runner/dispatch/execution-contract.mjs:47` and
+`src/runner/dispatch/assignment-normalizer.mjs:44`); Unit-run provenance is
+written by `execution/run.mjs:569-576`.
+Mutation/evidence normalization is current implementation, not an assumption
+that the retired session stamp-producing door still exists.
 
 Assignment does not contain attempt status as lifecycle truth. Retry does not
 rewrite the Assignment.
@@ -61,7 +97,7 @@ is allowed to exist". Every runtime-layer concern (RunHandle, continuation
 planning, executor fallback) reads and references Run; none of them admits an
 attempt on its own.
 
-Phases, in order:
+Proposed phase vocabulary, not a claim that the writer persists every transition:
 
 | Phase | Meaning | Must hold before entering |
 |---|---|---|
@@ -71,58 +107,59 @@ Phases, in order:
 | `delivered` | The work prompt/input reached the worker. | Bound. Delivery is a tri-state fact: `not-sent`, `sent`, `unknown`. A request sent without acknowledgment is `unknown`, never "launch failed". |
 | `settled` | A normalized RunResult or an explicit failure record exists. | Any earlier phase; crash windows settle as explicit failure with the phase reached. |
 
+The current writer initializes `phase: admitted` and `delivery: not-sent`
+(`assignment-runner.mjs:1562-1582`). Runtime inspection derives additional
+observations; recognizing `bound`/`delivered` does not prove those proposed
+phase transitions are durably written. Herdr launch reconciliation uses both
+Run identity and its persisted launch-command identity.
+
 Admission rules:
 
-- At most one current, non-superseded un-settled Run per Assignment. A new Run is legal only after the
-  prior Run is settled or superseded through a declared supersession event
-  (`run-retried` in CoordinationSession; standalone dispatch records the
-  equivalent event before the new Run is admitted).
-- `attempt` never resets on coordinator restart, candidate change, or
-  executor fallback. Attempt budget is counted against the Assignment.
-- A missing or lost RunHandle never grants a new admission. Recovery reads
-  worker result first, then RunHandle, then classifies, and only then asks for
-  a new Run through this admission rule.
-- Cancellation requested is a fact about intent, not proof the worker stopped.
-  A cancelled Run still settles through its late result if one arrives.
+- Admission uses immutable generation records and deterministic attempt identity
+  (`assignment-runner.mjs:697-714,895-910`).
+- When a `retryId` is supplied, the same destination/payload tuple reuses its
+  admission; a changed tuple or invalid predecessor refuses
+  (`assignment-runner.mjs:724-730,914-924`). This stricter tuple behavior is opt-in,
+  not the behavior of every legacy attempt caller.
+- A prior un-settled Run with live/unknown control holder refuses another
+  admission unless the caller explicitly requests `forceNewAttempt`; settled
+  result refusal is separately opt-in (`assignment-runner.mjs:926-940,1554-1561`).
+- Admission observations are not semantic acceptance. Corrupt settlement must
+  not be overwritten by a fresh launch.
 
 Three guarantees, kept distinct:
 
-- **Control fencing** — one controller per un-settled Run. To be implemented with
-  the repository's existing exclusive-create lock pattern (holder identity,
-  expiry, stale-by-pid). Observers hold no lock. A controller that lost the
-  lock may not deliver input, terminate, or write Run/RunHandle state.
-- **Result fencing** — a superseded Run loses the right to publish the
-  Assignment's authoritative result (`result-linked` after `run-retried`).
-  Its late result is still stored and validated: it may prove an effect
-  already happened.
+- **Control fencing** — one controller per un-settled Run, implemented via
+  `run-lock.mjs`'s exclusive-create generation ledger (`acquireRunControl`/
+  `releaseRunControl`). Holder identity is `{id, pid, bootId, processStartTime,
+  host}` (`buildRunControlHolder`); reclaim requires proven-dead identity
+  (`resolveHolderLiveness`) — a live PID, a PID whose liveness cannot be
+  disproven, or a PID reused after a host reboot is never mistaken for a dead
+  holder's slot. Observers hold no lock. A controller that lost the lock may
+  not deliver input, terminate, or write Run/RunHandle state.
+- **Result fencing (stronger proposal)** — authoritative result-link exclusion
+  for superseded Runs requires its own implemented eligibility owner. The old
+  session `result-linked`/`run-retried` event order is historical, not a current
+  standalone event API or proven guarantee.
 - **Effect protection** — deduplication or isolation at the place the effect
   occurs. Owned by the operation contract and its adapter. Run promises no
   exactly-once external effect; a stopped worker does not mean its effects
   are absent.
 
-Implementation status: deterministic `runId`, pre-spawn `run.json` metadata,
-and `run-retried` declaration/event-order supersession are implemented
-(`src/runner/dispatch/assignment-runner.mjs`, CoordinationSession store/replay).
-Strict fencing against the exact superseded Run is not yet implemented: current
-link/replay checks authorize a later link by intervening retry count/order, not
-by the exact eligible destination Run. Atomic admission and crash durability, the
-`bound`/`delivered` phases, the standalone supersession event, and the
-per-Run controller lock are not implemented; they are specified here so
-[RunHandle](../architecture/run-handle.md),
-[Continuation Planner](../architecture/coordination-continuation-recovery.md),
-and [Executor Fallback](../architecture/executor-health-and-fallback.md) share
-one admission authority instead of each inventing its own.
+Current admission uses deterministic Run identities, attempt numbering and existing-result refusal in `src/runner/dispatch/assignment-runner.mjs:697-940`. Run control is epoch/token-fenced in `run-lock.mjs:306-412`; corrupt settlement refuses rather than relaunching. `runtime-inspection.mjs:160-175` recognizes phase observations including bound/delivered; that is not proof that every proposed RunHandle transition/schema below has been implemented.
+
+The former session `run-retried` event-order and result-link fencing rules are preserved in history. The current standalone Run record writes the implemented `assignment-run.v2` subset (`assignment-runner.mjs:1563-1590`). The admissionKey/admitRun/authorityRef/writerRuntime interface and stronger proposed supersession contract below remain design targets, not asserted runtime APIs.
 
 ### Proposed Runtime Recovery Amendment
 
-Status: PROPOSED technical refinement, not implemented and not an implicit
+Status: PROPOSED technical refinement beyond the implemented assignment-run.v2 subset, not an implicit
 promotion of the linked designs to Accepted. The accepted identity/authority
 principles above remain; this section defines the proposed writer profile that
 would make their guarantees verifiable. See
 [Runtime Recovery Design](../architecture/runtime-recovery-design.md) for scope,
 local publication/locking, compatibility and proof.
 
-**Run record.** New writer format `assignment-run.v2` adds:
+**Proposed stronger Run record.** The implemented `assignment-run.v2` subset is described above; the full field set below is not today's writer schema:
 
 | Field | Semantics |
 |---|---|
@@ -157,16 +194,7 @@ The planned initial key derives from Assignment identity; retry key derives from
 the durable retry declaration identity. Unknown leftover metadata refuses; a
 staging directory is not guessed to be a dispatched Run.
 
-For session-owned work, the engine holds session then Assignment locks to allocate
-the next attempt, check cancellation/transfer/bounds and append `run-retried` with
-proposed fields `retryId`, required `previousRunId`, `nextRunId`, `nextAttempt`,
-`admissionPayloadDigest` before publishing the corresponding Run. Initial admission
-uses the already-created Assignment/authorization reference. No session lock spans
-adapter I/O. Crash after retry declaration before Run publication resumes that
-same declaration; it never derives fulfillment merely from number of result links.
-A declaration may be explicitly aborted before admission, with reason, under the
-same store door; its identity cannot later be reused. New retry cannot leapfrog a
-pending declaration. Retry result remains per Run, even when earlier work failed.
+The former session-owned retry allocation is historical, not an available session-engine mutation door. Current standalone admission and control fencing are owned by assignment-runner.mjs and run-lock.mjs.
 
 Standalone runtime persists equivalent supersession intent with the new Run's
 atomic admission record; the record itself is the declared equivalent, rather
@@ -174,7 +202,7 @@ than an unrelated event stream. The predecessor identity is required. A supersed
 Run may still be physically alive: new writable execution still needs quiescence
 or isolation/effect proof. Result fencing alone is insufficient.
 
-**Launch gate and crash reconciliation.** Under a short session/Assignment gate
+**Proposed launch gate and crash reconciliation.** Under an Assignment-owned gate
 and Run control lock, check the Run is still authorized/current, then durably
 record launch pending. Release outer locks before adapter I/O. Cancellation or
 transfer after this point sees an in-flight launch, not a free slot. The adapter
@@ -196,7 +224,7 @@ launch adapter; RunHandle runtime methods cannot bypass its prepared invocation.
 
 **Result eligibility.** Per-Run normalization/storage is permitted for late and
 superseded Runs. Publishing an Assignment's authoritative result requires exact
-runId eligibility under session -> Assignment locks, serialized with retry
+runId eligibility under the runtime-owned admission/control boundary, serialized with retry
 declaration/admission. A pending retry fences its previous Run at declaration;
 after abort before admission, the previous Run regains eligibility only through
 the explicit abort event. Other historical Runs never gain eligibility from a
@@ -205,24 +233,13 @@ replacement link. Accepted prior result remains readable as historical/current
 last-published view until an eligible new result links; readers expose that it is
 superseded for execution when a retry is pending.
 
-Schema-2 `result-linked` records carry admission/retry identity in addition to
-runId. Replay validates exact declared destination and event ordering, not just
-retry counts. Existing schema-1 links retain their old meaning; do not reinterpret
-historical event order as proof of stronger fencing. Late cancellation results
-may link for the last eligible Run, but cancellation never authorizes a new Run.
 
 Typed refusal reasons include admission-conflict, admission-payload-conflict,
 retry-pending, authority-revoked, budget-exhausted, writer-not-quiescent,
 launch-unknown, result-superseded, version-unsupported and owner-runtime-unavailable.
 They carry subject refs; no caller branches on message prose.
 
-**Profile migration.** Legacy Runs remain on their existing profile. Enable v2
-only for adapters proving launch reconciliation/bind-before-delivery. Schema-1
-session upgrades require quiescence and a validated migration mapping, not an
-automatic on-read rewrite. Initially only new schema-2 sessions use v2 runtime
-guarantees. Initial rollout must not force unsupported cli-spawn/in-process
-mechanisms to claim RunHandle support. The Node owner implements/tests this first;
-Rust ports the whole writer boundary with shared compatibility fixtures.
+**Proposed profile migration.** Enable stronger runtime profiles only after adapters prove launch reconciliation and bind-before-delivery. Do not force unsupported adapters to claim RunHandle support. Existing Node/Rust readers and writers must agree on the supported `assignment-run.v2` subset; the stronger fields above remain proposed unless their writer is cited. The retired session-schema migration design is retained only in history.
 
 ## RunResult
 
@@ -240,7 +257,7 @@ RunResult is the normalized outcome for one Run. It should identify:
 ### Dispatch Operability Addendum
 
 The dispatch-operability design track
-(`plans/260914-dispatch-operability-evidence-attribution/`) now supplies RunResult
+(`archive/plans/260914-dispatch-operability-evidence-attribution/`) records RunResult
 v2 interpretation and read-only Dispatch runtime inspection while preserving
 `result.json` as the one terminal RunResult location:
 
@@ -251,15 +268,18 @@ v2 interpretation and read-only Dispatch runtime inspection while preserving
 - `ProviderOutcome` is a host-invocation wrapper, not Run truth.
 - `agent-result.json` becomes `agent-result-claim.v2`, a worker claim consumed
   by the normalizer, never independent proof.
-- New v2 results classify execution, assessment, confidence, failure, policy,
-  delivery, and provenance separately.
+- Current normalization defaults to RunResult v3 and also supports v4
+  (`run-result.mjs:350-351,557-563`); v2 is the historical interpretation
+  recorded by this design addendum, not the current default. Execution,
+  assessment, confidence, failure, policy, delivery and provenance stay separate.
 - Historical v1 results are interpreted deterministically as `legacy-derived`
   and are not rewritten on read.
 - A v2 result whose compatibility `status`/`confidence` disagrees with its
   classification is `contract-corrupt` and fails closed.
 
-The accepted design authority is
-`plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md`.
+The archived design record is
+`archive/plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md`;
+it is historical design evidence, not a second live authority overriding code.
 The implementation proof for this slice is
 `test/runner/dispatch-operability-production-door.test.mjs`, which exercises
 the production Assignment door, public inspect CLI, historical/replayed result
@@ -284,7 +304,7 @@ Mutating operations must distinguish pre-existing state from changes attributabl
 to the Run. Evidence checks should use pre/post snapshots, git state, artifact
 timestamps/hashes, expected-file rules, or equivalent operation-specific proof.
 
-Planned evidence attribution makes this distinction explicit: pre/post Git
+Implemented evidence attribution makes this distinction explicit (src/runner/dispatch/evidence-attribution.mjs:10,69,197): pre/post Git
 snapshots provide correlation only, not proof of process authorship. Attribution
 levels are `proven`, `correlated`, `excluded`, and `unattributed`; only
 adapter/confinement evidence with declared positive coverage can produce
@@ -292,8 +312,9 @@ adapter/confinement evidence with declared positive coverage can produce
 
 ## Work Boundary
 
-Assignment, Run, and RunResult may reference Work and inform its driver. None is
-authorized to move Work status/stage, accept, approve, claim, return, or merge.
+Assignment, Run and RunResult may reference Work and inform its driver. None
+independently owns Work status/workflowStep, acceptance, approval, claim/return
+or merge; lifecycle actions go through the authorized Work verbs.
 
 ## Required Negative Tests
 
@@ -316,5 +337,6 @@ authorized to move Work status/stage, accept, approve, claim, return, or merge.
 - superseded Run's late result stored and validated, never accepted as the
   Assignment's authoritative result.
 
-Implementation-era detail remains in [Step 03](../roadmap/team-dispatch-v1/step-03-assignment-runresult.md)
-and [Step 04](../roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md).
+Implementation-era detail remains in [Step 03](../history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#literal-snapshot)
+and [Step 04](../history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md#literal-snapshot).
+

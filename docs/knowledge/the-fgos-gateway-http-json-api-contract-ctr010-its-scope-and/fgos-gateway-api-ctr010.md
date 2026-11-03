@@ -10,7 +10,7 @@ mode: reference
 # fgOS Gateway API (CTR010)
 
 The OpenAPI 3.1 spec for the fgOS interface daemon's HTTP+JSON surface
-lives at `docs/contracts/fgos-gateway-api-v1.yaml`, tagged
+lives at `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`, tagged
 `x-contract: "CTR010 · fgos-gateway.v1"` — joining the existing numbered
 CTR family (CTR001 one-door-write, CTR002 single-writer-lock, CTR006
 routing-handoff, CTR008 attention envelope) per decision `0011`. See

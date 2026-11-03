@@ -4,7 +4,7 @@ mode: reference
 ---
 # fgOS participant contract — what it takes to be a full participant in any language
 
-**Superseded in part (Event Store cutover, 2026-10):** after `fgos events migrate`, a repository has no `.fgos/events.jsonl`, no `.fgos/events/` shards and no `.fgos/events.lock`. Events are envelope v4 records in open logs under the Git common directory, sealed into `refs/fgos/events/<machine-id>`; the write door is the state mutex and the Event Store gate, not a file lock. The rule below stands and is now stricter: a participant never writes an event store file directly, in any language, and reads Work state through the `fgos` read verbs (`list`, `show`, `ready`, ...) rather than parsing a log. Sections that describe the raw log, its `seq` as a global ordinal or `.fgos/events.lock` describe the retired layout; for the current one read `docs/specs/work-state.md` ("Bố cục dữ liệu, thứ tự và xung đột") and `docs/platform/event-store/spec.md`.
+**Superseded in part (Event Store cutover, 2026-10):** after `fgos events migrate`, a repository has no `.fgos/events.jsonl`, no `.fgos/events/` shards and no `.fgos/events.lock`. Events are envelope v4 records in open logs under the Git common directory, sealed into `refs/fgos/events/<machine-id>`; the write door is the state mutex and the Event Store gate, not a file lock. The rule below stands and is now stricter: a participant never writes an event store file directly, in any language, and reads Work state through the `fgos` read verbs (`list`, `show`, `ready`, ...) rather than parsing a log. Sections that describe the raw log, its `seq` as a global ordinal or `.fgos/events.lock` describe the retired layout; for the current one read `docs/platform/work-state/spec.md` ("Bố cục dữ liệu, thứ tự và xung đột") and `docs/platform/event-store/spec.md`.
 
 
 Hand-authored reference, verified 2026-08-09 by reading the real source
@@ -18,7 +18,7 @@ map between them.
 
 ## Why this page exists
 
-[Decision 0014](../decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md)
+[Decision 0014](../../platform/platform-foundations.md#0014--kiến-trúc-giao-tiếp-người--fgos)
 locked this claim: "the standard contract is the event-log schema plus the
 append/read/subscribe protocol, **not a linkable lib** — any process, in
 any language, that speaks the log-format correctly is a full participant."
@@ -29,12 +29,12 @@ scattered:
 | Piece | Where it actually lives |
 |---|---|
 | Event shape + schema version | `src/state/work.mjs` |
-| CLI door, envelope, identity | `docs/io-contract.md` |
-| Event-log lock protocol | `docs/specs/work-state.md` RUL10 |
+| CLI door, envelope, identity | `docs/platform/work-state/contracts/cli-io-contract.md` |
+| Event-log lock protocol | `docs/platform/work-state/spec.md#11-business-rules` RUL10 |
 | Fold rules (state from events) | `src/state/replay.mjs` |
 
 A person writing a non-Node client had to read the ~215KB spec
-(`docs/specs/work-state.md`) and infer the contract themselves.
+(`docs/platform/work-state/spec.md`) and infer the contract themselves.
 `herdr-plugin` (Rust, ~4900 lines) already did exactly that inference
 correctly — see [Worked example](#worked-example-herdr-plugin-rust) below
 — but that correct inference lived only in its author's head, not in a
@@ -77,7 +77,7 @@ Per [decision 0011](../decisions/0011-version-tuong-minh-cho-moi-contract.md)
 ("every contract carries an explicit version in its own identifier"), a
 participant reading raw events must check `v` and handle version drift
 explicitly rather than assuming today's shape is permanent. The same
-decision's version-token table (reproduced from `docs/io-contract.md`):
+decision's version-token table (reproduced from `docs/platform/work-state/contracts/cli-io-contract.md#cli-io-contract`):
 
 | Surface | Token | Where it appears |
 |---|---|---|
@@ -98,10 +98,10 @@ only legitimate way to mutate fgOS state is to spawn `fgos <verb>` as a
 subprocess and let it append the event.
 
 Why this is a hard rule, not a preference: `bin/fgos.mjs`'s single write
-door (CTR001/CTR002, per `docs/io-contract.md`) is what a write through the
+door (CTR001/CTR002, per `docs/platform/work-state/contracts/cli-io-contract.md#cli-io-contract`) is what a write through the
 verb inherits, for free:
 
-- **The event-log lock** (`docs/specs/work-state.md` RUL10) —
+- **The event-log lock** (`docs/platform/work-state/spec.md#11-business-rules` RUL10) —
   `.fgos/events.lock`, a wx-atomic-create-plus-dead-pid-reap primitive with
   a blocking-with-timeout-and-backoff policy. Without it, two processes
   appending concurrently can both read the same last `seq` and both write
@@ -128,7 +128,7 @@ verb inherits, for free:
 - **The identity gate** — every write carries a `writer` field (`id` +
   `source`, one of `registry`/`env`/`pid`/`unresolved`, most-trusted
   first) recording which process/session made the change. This is
-  attribution, not authentication (`docs/io-contract.md`'s own D1: a local
+  attribution, not authentication (`docs/platform/work-state/contracts/cli-io-contract.md#cli-io-contract`'s own D1: a local
   CLI cannot authenticate its caller) — but it is free audit trail a
   direct log write would have to reconstruct by hand, correctly, forever.
 
@@ -189,7 +189,7 @@ separable from the next.
 ## Streams without an envelope (four exceptions)
 
 Four output streams intentionally do not wrap the `fgos.v1` envelope, each
-for its own reason — quoted from `docs/io-contract.md`'s own "Ngoại lệ có
+for its own reason — quoted from `docs/platform/work-state/contracts/cli-io-contract.md#cli-io-contract`'s own "Ngoại lệ có
 lý do" ("exceptions with a reason") section:
 
 1. **The machine-readable verb manifest** (`--help`/`--help --json`,
@@ -213,7 +213,7 @@ protocol, not a door facing a person or an external client.
 If a participant genuinely needs to write to `.fgos/events.jsonl` directly
 — bypassing the verb, and therefore the lock, the CAS precheck, and the
 identity gate the verb gives for free — the lock protocol it must
-reimplement correctly is specified in full at `docs/specs/work-state.md`
+reimplement correctly is specified in full at `docs/platform/work-state/spec.md#11-business-rules`
 RUL10: the `.fgos/events.lock` primitive (wx-atomic-create plus dead-pid
 reap), the blocking-with-timeout-and-backoff acquisition policy, the
 `lock-timeout` error category, and `withEventsLock`'s read-precheck-write
@@ -246,16 +246,16 @@ directly.
 
 ## Sources (file:line, read directly 2026-08-09)
 
-- `docs/io-contract.md` — CLI door, envelope, identity, exit codes, the
+- `docs/platform/work-state/contracts/cli-io-contract.md` — CLI door, envelope, identity, exit codes, the
   four envelope-less exceptions, the version-token table.
-- `docs/specs/work-state.md:1045` — RUL10, the `.fgos/events.lock`
+- `docs/platform/work-state/spec.md#11-business-rules` — RUL10, the `.fgos/events.lock`
   protocol in full.
 - `src/state/work.mjs:199` — `SCHEMA_VERSION = 3`.
 - `src/state/replay.mjs` — the fold rules a raw-log reader must
   reimplement.
 - `herdr-plugin/src/fgos.rs:297,344-371,378,438,468,587,659,710,757` —
   the worked-example participant.
-- [Decision 0014](../decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md) —
+- [Decision 0014](../../platform/platform-foundations.md#0014--kiến-trúc-giao-tiếp-người--fgos) —
   the locked architecture this page makes usable.
 - [Decision 0011](../decisions/0011-version-tuong-minh-cho-moi-contract.md) —
   the version-token convention.

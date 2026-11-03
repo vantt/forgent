@@ -17,7 +17,7 @@ repository-harness's tool-registry-capability
 > (scan-not-shell presence), 4 (doctor posture check), and 7 (test layers)
 > still hold; only the CONCRETE code in sections 2/5/6 is now historical,
 > not something a new port should copy verbatim. Current shape: `docs/
-> reference/forgentx-tool-registry-configuration.md`.
+> knowledge/forgentx-repo-s-tool-registry-configuration/forgentx-tool-registry-configuration.md`.
 
 ## 1. Split "team decision" from "fact about this machine" before writing any code
 

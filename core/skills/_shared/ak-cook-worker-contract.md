@@ -3,7 +3,7 @@
 How to brief a worker that runs its slice with `ak:cook`, AgentKit's own implementation skill (a
 third-party tool: fgOS uses it, never edits it). Put these rules into the Unit's prompt; the Unit
 itself names `skills: ["ak:cook"]` so `bind()` only picks an executor whose `supports.skills` lists
-it (`docs/specs/runner.md`, "Skills reach `bind()`").
+it (`docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`, "Skills reach `bind()`").
 
 `ak:cook` calls no fgos or Work command and knows nothing of fgOS's lifecycle, so everything it would
 normally do beyond editing code is switched off by the brief, not left to its defaults.

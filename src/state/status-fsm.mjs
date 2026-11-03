@@ -114,7 +114,7 @@ export const TRANSITIONS = Object.freeze([
   // the way every other human-only edge in this codebase already is: the
   // CLI verb that exposes the edge stamps `role: 'human'`, not this table.
   Object.freeze({ from: 'backlog', to: 'todo' }),
-  // tsk-40m (docs/architect/doing-coordination-redesign.md, design target
+  // tsk-40m (docs/platform/proposals/doing-coordination-redesign.md, design target
   // confirmed 2026-08-25): the direct edge settleClaim (store.mjs) now
   // needs to settle a fresh (`todo`-preClaim) claim straight through to
   // `awaiting-approval` with NO durable intermediate `work.move(->doing)`
@@ -176,8 +176,7 @@ export const TRANSITIONS = Object.freeze([
   Object.freeze({ from: 'doing', to: 'awaiting-human' }),
   Object.freeze({ from: 'awaiting-human', to: 'todo' }),
   // Claim-lock resume (str-clarify-decompose-claim-lock §5.1), tsk-40m P1
-  // fix + hard-cut RETIRED this edge entirely (docs/architect/doing-
-  // coordination-redesign.md): a claim active at ask-time now resumes via
+  // fix + hard-cut RETIRED this edge entirely (docs/platform/proposals/doing-coordination-redesign.md): a claim active at ask-time now resumes via
   // the `todo` edge above instead (its own preClaimStatus matches durable
   // status again, so buildEffectiveView's overlay shows 'doing' again on
   // its own — no durable write of 'doing' anywhere), and `putInAwaiting`

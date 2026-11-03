@@ -1,80 +1,64 @@
----
-area: agent-coordination-runtime
-updated: 2026-09-14
-coverage: substantially-implemented
----
-
 # Runtime Recovery And Work Continuity
 
-Design status: PROPOSED detailed design; Slices S0-S4 and the session-recovery
-half of S5 are now IMPLEMENTED (runtime-recovery track, closed 2026-09-14 —
-see `plans/260911-2305-runtime-recovery/plan.md`'s Product Gates table and the
-per-cell trace docs under
-`docs/architect/agent-coordination/verification/runtime-recovery/` for what
-actually shipped, including where the real implementation diverged from a
-specific field name or CLI invocation proposed below). The continuation/
-transfer half of S5, S6 and S7 remain NOT IMPLEMENTED — see §9's slice table,
-now annotated with real status. Product direction agreed; technical choices
-below are recommendations for review where not yet implemented, historical
-record of accepted reasoning where they are. This is the entry point and proof
-map, not a fourth runtime component. Contract owners remain Run, runtime
-adapters and Coordination.
+```txt
+Document type: Architecture
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/architecture/runtime-recovery-design.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+
+## Implementation And Design Status
+
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.
+
+| Section | Status | Evidence / limit |
+|---|---|---|
+| 1. Scope And Reading Order | Current Run owners; session continuation is history | Dispatch recovery is the live door; historical reading pointers do not create runtime support |
+| 2. Identity And Existing Reality | Current Run/Assignment identities and explicit proposals | assignment-runner.mjs:697,1563; launch name includes runId and launchCommandId at confinement/authority.mjs:1595 |
+| 3. Ownership And Dependencies | Current admission, recovery planner, fallback and local fencing | recovery-planner.mjs:243-316, recovery.mjs and run-lock.mjs:306-412; no live coordination-session owner |
+| 4. Recovery Choice | Current standalone Run recovery; manual track progression stays outside dispatch | recovery-planner.mjs:92-102; recover.mjs:304-322; no session transfer is implemented here |
+| 5. Arbitrary Interruption Is Not A Checkpoint | Explicit deferred inherited-edit design | evidence-attribution.mjs:25-59 is per-Run dirty-before attribution, not a generic lineage evaluator |
+| 6. Local Concurrency And Durability | Current local fencing; no distributed lease | run-lock.mjs:47-79,306-412; append-only local generations and release markers |
+| 7. Agent-Facing Contract | Implemented standalone dispatch recovery | src/verbs/dispatch/recover.mjs:116-132,266-408; recovery-planner.mjs:118-173,243-316. Observation is read-only; apply records a checked recovery action, not a session transition or automatic worker launch. |
+| 8. Compatibility And Rollout | Current writer version; additional ownership refusal is design | assignment-run.v2 writer at assignment-runner.mjs:1563; owner-runtime-unavailable is not a current error enum |
+| 9. Implementation Slices And Gates | Dated slice status, not freshly rerun proof | Current modules are cited locally; S5 retired; S6/S7 remain unimplemented designs |
+| 10. Proof Matrix | Required scenarios, not passing-test claims | X03, X05, X06, X07 and X10 require additional link/lineage/transfer/runtime-version ownership; standalone recover does not claim them |
+| 11. Review Finding Resolution And Limits | Current local limits distinguished from retired/deferred design | run-lock.mjs:306-412; naming includes launchCommandId; generic inherited-edit/effect ownership remains unsupported |
 
 ## 1. Scope And Reading Order
 
-Read `docs/specs/reading-map.md`, `docs/specs/runner.md`, this document, then:
-
-1. [Run admission amendment](../contracts/assignment-run-runresult.md#proposed-runtime-recovery-amendment).
-2. [RunHandle and recovery material](run-handle.md).
-3. [Fallback eligibility and selection](executor-health-and-fallback.md).
-4. [Session planning and continuation](coordination-continuation-recovery.md).
-
-Source of product agreements:
-`plans/reports/runtime-recovery-design-discussion-260911-1754.md`.
-Independent findings: `plans/reports/design-review-second-opinion-260911-1709-runtime-recovery.md`.
-Earlier settled constraints: `plans/reports/design-review-260911-1617-run-handle-continuation-health.md` sections 6-8.
-
-Keep long-horizon continuity without making every worker understand checkpoints.
-The first release may cover a subset, but must identify unsupported operations
-explicitly. No Work claim, merge, approval or status authority is added here.
+Current Run control/recovery responsibilities belong to the dispatch modules cited by each section. Session continuation is retired and retained only in historical snapshots. RunHandle, RecoveryMaterial and effect-grant schemas not implemented by those modules remain explicit proposals, not shipped interfaces.
 
 ## 2. Identity And Existing Reality
 
 | Identity | Owner | Current evidence and design consequence |
 |---|---|---|
-| Lead conversation/session | Agent harness outside Coordination | May drive many cells; not a persisted CoordinationSession identity. |
-| Track/cell | Consuming track/domain harness | `fgos-code-change`'s plan mode (`references/plan-mode.md`, formerly `fgos-plan-loop` sections 0/1/5) uses plan/phase documents and one `<track>--<cell>` session convention. `chain.mjs:24` derives membership from that name. No universal core Cell entity exists. |
-| CoordinationSession | Coordination engine/store | Bounded ledger, actors, authority, graph and budget; not a cell acceptance authority. |
-| Actor | Session | `replaceSessionActor` preserves role and old Assignment provenance; replacing one executor is not actor replacement. |
-| Assignment | Assignment builder/store | Immutable semantic task, session-blind; session owns membership refs. |
+| Track/cell | Consuming track/domain harness | A manual-harness convention, not a universal core entity or current session-chain API. See the owner-retained operating harness and its trace contract. |
+| Assignment | Assignment builder/store | Immutable semantic task; execution attempts are separate Run records. |
 | Run | Dispatch runtime | One attempt, deterministic identity, eligibility and settlement; retry retains Assignment. |
 
-A consumer may map multiple cells to nodes/bindings in one CoordinationSession,
-or map a cell to several replacement sessions. This proposal permits both, but
-does not claim the current `chain` implementation already supports both.
-Represent correlation as optional session-owned `workUnits[]`:
-`{owner, trackId, unitId, contractRef, bindingRefs[]}`. `contractRef` pins the
-external acceptance document revision/digest. `bindingRefs` identify the subset
-of this session participating in that unit; empty means the whole session only
-when explicitly declared `scope: session` by the consumer schema.
-
-The tracking adapter validates that owner namespace and membership; core stores
-the correlation but never treats it as authorization or quorum. Legacy name
-inference remains labeled legacy-derived, used only when explicit correlation is
-absent. A continuation copies only transferred unit correlations. `chain` groups
-by explicit unit identity and lists all associated sessions; it does not select
-the newest active session as the sole authority when several are active. Mixed
-or conflicting mappings are surfaced, not silently merged. Track acceptance
-still comes from the consuming harness, never the child session's existence.
+The former session-owned workUnits/chain correlation proposal is preserved in the complete historical snapshot. It is not a current execution identity or acceptance owner. Current Run admission and recovery retain the Assignment/Run identities above.
 
 ## 3. Ownership And Dependencies
 
 ```mermaid
 flowchart TD
-    T[Track or application caller] --> S[Coordination application service]
-    S --> P[Pure continuation planner]
-    S --> E[Existing engine and session store]
-    E --> D[Dispatch application service]
+    T[Track or application caller] --> D[Dispatch application service]
     D --> R[Run repository: admission and settlement]
     D --> F[Pure fallback resolver]
     D --> C[Existing dispatch compiler]
@@ -86,9 +70,7 @@ flowchart TD
 
 | Responsibility | Sole owner | Excluded responsibility |
 |---|---|---|
-| Legal bindings, visibility, quorum and disposition | Existing Coordination evaluators | Planner does not reimplement them. |
 | Next-action recommendation | Pure planner | No store import, I/O, executor selection or authority. |
-| Session/transfer mutation | Existing engine/store doors | CLI/request builder cannot enforce policy on their behalf. |
 | Attempt admission and result eligibility | Run repository/runtime | No separate attempt-admission service. |
 | Runtime control | Guard over repository + runtime adapter | No graph policy or result acceptance. |
 | Effect/recovery-material interpretation | Operation recovery adapter | Runtime observations never certify external effects. |
@@ -107,14 +89,13 @@ below specify persisted/exchanged boundaries; in-process APIs can use native typ
 | Worker result available | Normalize/store, publish only if eligible | Original Run. |
 | Observer lost, worker still working | Inspect/reattach/wait | Same Run and Assignment. |
 | Worker cannot continue | Reconcile effects and writers, then eligible replacement Run | Same Assignment and unit objective. |
-| Participant must be replaced across tasks | Existing actor replacement and governed future dispatch | Role, old membership and evidence. |
-| Session no longer executable | Legal continuation transfer, new ledger | Objective/provenance, not authority/quorum credit. |
-| Cell accepted, next cell begins | Existing track transition | Track acceptance history. |
+| Cell accepted, next cell begins | Consuming track/domain transition; outside dispatch recovery | Track acceptance history, if the consuming harness records it. |
 
-Result scanning wins before any new execution, including after budget exhaustion
-or cancellation. Read/collect is not admission. Cancellation bars retry and
-automatic continuation of the cancelled intent, but does not discard late results.
-An explicit new user intent is a new request, not an escape through continuation.
+Proposed cancellation/budget rule: result collection would remain available after
+budget exhaustion or cancellation, without admitting another execution; a new
+intent would require a new request. This is not implemented cancellation precedence:
+current Herdr/cli reconciliation returns `cancel-unsupported` before scanning
+results (`herdr-reconcile.mjs:351-355` (former module; removed from main before source capture, not a current owner), `reconcile-cli-spawn.mjs:38-47`).
 
 ## 5. Arbitrary Interruption Is Not A Checkpoint
 
@@ -143,17 +124,6 @@ for all S2 recovery.
 
 ## 6. Local Concurrency And Durability
 
-Lock order for mutation: session lock(s), sorted by coordinationId when more
-than one is needed; Assignment locks sorted by assignmentId; Run control lock.
-Standalone runtime takes only the latter locks. No code holding an Assignment
-or Run lock may call upward to acquire a session lock. Normalization may persist
-a per-Run result first; linking later reacquires locks in the prescribed order.
-No session/Assignment lock spans provider I/O. Their sections only validate and
-write durable intent/commit facts. Launch/control rechecks admitted permission
-under a short gate, records a pending command, then performs adapter I/O under
-the Run control lock. Cancellation ordered after that gate is an in-flight
-cancellation, not a retroactive claim that dispatch never began.
-
 Control acquisition must not reclaim a live process merely because TTL expired.
 Holder identity is `{hostId, bootId, pid, processStartTime}` of the process doing
 control, not a guessed Rust parent. Unknown liveness is not dead. A dead holder
@@ -179,53 +149,61 @@ never self-recognizes a second concurrent acquisition as reentrant. Generation
 records are retained with the runtime/session artifacts; compaction is offline
 only after the scope is quiescent.
 
-Publication uses a fully written/fsynced temp file in the same directory,
-followed by atomic non-overwriting publication (local filesystem hard-link on
-the initial Linux adapter), then directory fsync. State replacement uses
-temp+rename+directory fsync under the owning lock. This retains exclusive-create
-semantics while avoiding empty-lock and conditional-unlink races seen in P12.
-Implemented (Phase 02 H3) for the mutable Run/Assignment artifacts named in
-the contract doc (`result.json`, `run.json`, the effective-execution-contract
-projection, and the per-attempt dispatch-bookkeeping marker) via
-`publishMutableProjection`/`publishMarkerOnce`; a resume that finds an
-existing `result.json` which fails to parse refuses rather than relaunching
-over unreadable evidence. Unsupported filesystem guarantees refuse mutation
-with a named diagnostic;
-doctor must probe them before this writer profile is enabled. No distributed
-lease, background renew service or TTL-only takeover is required by default.
+The proposed durability profile requires a fully written/fsynced temp file in
+the same directory, atomic non-overwriting publication and directory fsync.
+It calls for temp+rename+directory fsync under the owning lock for replacement.
+Those are design requirements; the implementation's best-effort directory
+fsync and other limits are stated below, not silently promoted to guarantees.
+Current terminal `result.json` is published by `publishImmutableProof`
+(`settlement.mjs:434`), not the mutable writer. `run.json` updates, the
+effective-execution-contract projection and bookkeeping markers use their
+mutable/marker writers. An unreadable existing result refuses relaunch rather
+than overwriting evidence. The proof helper fsyncs the file, hard-links it
+without overwrite, treats `EEXIST` as an existing proof and rethrows other link
+errors; directory fsync is best-effort (`proof-helpers.mjs:73-125`).
+A dedicated unsupported-filesystem diagnostic/doctor probe is a design
+requirement, not an implemented check. No distributed lease, background
+renewal service or TTL-only takeover is required by this local design.
 
 ## 7. Agent-Facing Contract
 
-Extend the existing `coordination run` request door with a proposed recovery
-request variant: `{contract, coordinationId, writerId, intent: recover,
-target?: {assignmentId}, budgetGrantRef?: string}`. Omitted target scans the
-session; engine chooses one eligible action and returns progress. `show --json`
-exposes the same typed recommendation without refreshing/writing runtime facts.
-The headless adapter calls the same use case. These are proposed request fields,
-not commands/features available in the current release. A fresh controller may
-omit `writerId` only when the session manifest supplies a replacement-driver
-grant; otherwise the request returns `needs-input` with the exact identity
-requirement. Recovery executes exactly the planner's selected action. It does
-not unconditionally call close-after-steps; close is invoked only when the
-selected action is `close-session`.
+The current door is `fgos dispatch recover <runId>`, without `--action` for
+read-only observation. It builds a snapshot of the Run, visibility, outbox,
+controller evidence, real control epoch and settled signal, then returns a
+recommendation, `needs-input` or `park`. The intent is `resume` or `reassign`;
+the default is defined by the CLI/use case, not by a coordination-session scan.
 
-Return `{outcome: applied | already-applied | waiting | needs-input | refused,
-action, subjectRefs, reasonCode, evidenceRefs, nextCheckAt?}`. A repeated recover
-call recomputes facts and resumes a durable pending action. It never uses a
-worker-supplied child ID, task key, supersession boolean or ownership assertion.
-`needs-input` names the exact missing semantic decision/grant; it is not the
-default for ordinary concurrency, a slow observer or already-applied action.
-Blocked targets remain individually visible; another eligible independent target
-may progress. Stable ordering prevents one parked target monopolizing the scan.
+Resume requires explicit non-fresh driver-liveness evidence; fresh or unknown
+freshness parks. Reassignment requires replacement-authority evidence naming a
+driver, read from controller-owned state, never worker-writable outbox claims.
+Unknown evidence parks; a settled Run has nothing to recover. A recommendation
+contains `snapshotHash`, `expectedControlEpoch`, `actionKey`, `evidenceIds`,
+`action`, `expiresAt` and `reason`; the default lifetime is five minutes.
+
+Apply uses the same door with `--action`, `--expected-snapshot`,
+`--expected-control-epoch`, `--expected-expires-at` and `--action-key`.
+It re-reads facts, checks action-key binding, snapshot, epoch, expiry and
+present legality, then acquires real Run control and checks settlement again.
+Stale/expired plans, missing authority and held live control are refused or
+parked rather than overridden. Repeating a consumed action key returns the
+recorded `already-applied` outcome.
+
+Successful apply records the recovery command, updates the control-epoch
+projection and attempts the applicable dispatch-claim clear. It does not itself
+launch a replacement worker, close a session or advance a Workflow. Dormant
+session-ownership checks still refuse `resume-driver` for old session-owned
+Assignments; this is not a claim that the retired coordination door exists.
+
+Implementation evidence: `src/runner/dispatch/recovery-planner.mjs:118-173,
+243-316,319-361` and `src/verbs/dispatch/recover.mjs:95-132,266-408`.
+Read the [area portal](../README.md) and [runner spec](../../runner/spec.md)
+for the wider execution boundary; recovery here does not own Work lifecycle.
 
 ## 8. Compatibility And Rollout
 
-New semantics are opt-in by version, not unknown fields silently added to v1.
-Proposed Run writer format is `assignment-run.v2`; handle and material are new
-v1 formats. Continuation uses proposed CoordinationSession schema `2` and a
-FlowDefinition version supporting its optional continuation profile. Existing
-schema `1` sessions retain their existing engine path until a quiescent upgrade
-is explicitly supported. No old reader is allowed to execute against new state.
+Single-writer compatibility is an invariant. Cross-runtime control/version
+negotiation and the proposed `owner-runtime-unavailable` refusal below are
+rollout design obligations, not implemented generic error handling.
 
 One runtime owns a scope's writes. A Node-launched Run keeps its Node writer;
 Rust readers may inspect a supported version or return version-unsupported.
@@ -246,24 +224,19 @@ new config defaults. Project-over-global precedence remains unchanged.
 |---|---|---|---|
 | S0 | Freeze fixtures for existing ladder, budgets, retry/recheck, context and close behavior | Existing Node suites green; capture known deficiencies without marking them solved. | **Implemented** — P00 |
 | S1 | Versioned Run admission, strict publish fencing and local lock/reclaim | Concurrent admission and every pre-launch crash window; no two winners. Node first. | **Implemented** — P01 (`run-lock.mjs`) |
-| S2 | Herdr launch reconciliation, handle guard, pending-control reconciliation, material capture | Reattach/observe/reconcile through public door; isolated or read-only takeover only. The first Node adapter uses a deterministic Herdr agent name derived from `runId`; exit proof includes duplicate-name refusal and no resurrection after close. Writable partial-edit takeover parks until workspace-grant and evaluator owners exist; depends on S1. | **Implemented** for cli-spawn (P02L) and herdr-spawn including real bwrap-confined launch (P02H, hardened in the P02H reopen); **writable partial-edit takeover correctly still parks** (P06, deferred, unchanged) |
+| S2 | Herdr launch reconciliation, handle guard, pending-control reconciliation, material capture | Reattach/observe/reconcile through the public door; isolated or read-only takeover only. Launch identity uses `runId` plus persisted `launchCommandId` (`fgos-<runId>-<launchCommandId>`); duplicate-name refusal and no resurrection after close require adapter proof. | **Partial** — Herdr launch reconciliation exists in `herdr-reconcile.mjs` (former module; removed from main before source capture, not a current owner); the proposed RunHandle/scope guard, pending-control reconciliation and RecoveryMaterial capture are not implemented as that contract. Writable partial-edit takeover remains deferred (`herdr-reconcile.mjs:356-357` (former module; removed from main before source capture, not a current owner)). |
 | S3 | Eligible fallback through compiler and confinement | Same Assignment, bounded attempts, unknown effects park; depends on S1/S2 for takeover. | **Implemented** — P03 (`recovery.mjs`) |
 | S4 | Pure snapshot/planner + show | Can develop beside S1-S3 using recorded facts; no claim of automatic repair. | **Implemented** — P04 (pure evaluators) + P05 (standalone `dispatch recover`) |
-| S5 | One protocol continuation, transfer/import/budget/apply + chain read model | Parent-child crash/concurrency, fresh agent proof; needs runtime safety and relevant open/close fixes. | **Session-recovery half implemented** — P05S (`coordination recover`, a session-owned recovery read/apply door through the existing write door). **Transfer/import/budget/apply half NOT implemented** — P07, deferred, unchanged; terminal-parent transfer stays refused as designed. |
+| S5 | Retired coordination-session recovery/continuation | Full dated record remains in the historical snapshot; no current coordination recover door is claimed. | Retired in 2180b4e72 |
 | S6 | Additional runtime/operation adapters and optional checkpoint support | Capability-specific proof before enabling; no promise all adapters ship with S2. | **Not implemented** — out of this track's scope |
 | S7 | Rust writer port | Same fixtures for all supported Node semantics, sole writer and recovery compatibility. | **Not implemented** — separate track (see the `rust-host-r1-kernel` track) |
 
-S5's first protocol is a coding repair-and-recheck entry consuming a candidate
-and findings. It validates inputs, authorizes repair freshly, performs fresh
-independent review/red-team and disposition. It does not jump into the original
-protocol's revise node or borrow the parent's quorum. Exact operation schemas
-use the current FlowDefinition primitives, not a second graph language.
-
 ## 10. Proof Matrix
 
-These are required executable scenarios, not tests claimed to have passed.
-Initial implementation places them in the existing runner/verbs test families;
-fixtures record inputs, injected interruption, durable state and expected result.
+These are required design scenarios, not tests claimed to have passed.
+Run/control scenarios have current owners, but X03/X05/X06/X07/X10 require
+additional result-link, inherited-edit, transfer or runtime-version guarantees.
+They do not describe a shipped session-recovery contract.
 
 | ID | One primary verifiable scenario |
 |---|---|
@@ -274,13 +247,6 @@ fixtures record inputs, injected interruption, durable state and expected result
 | F-e | Worker-liveness branch is explicit: live/working writer yields partial or deferred capture; dead writer after quiescence yields preserved capture; unknown liveness parks. Zero stdout never infers launch failure or completion. |
 | F-f | Two callers race admission through launch/bind, including injected crash: one admitted launch identity and no duplicate resource. |
 | F-g | In-flight refusal identifies Run/handle when known, explicit pre-bind/ambiguous cause otherwise. |
-| C-a | Review-only request with omitted roster obligations refuses before open; valid restricted roster still opens. |
-| C-b | Valid partial escape hatch with pending fix: first pass does not close prematurely; authorized fix and eventual valid close succeed. |
-| C-c | Fresher existing authorization consumed with identity-derived distinct taskKey; no redundant authorize or reuse of old result. |
-| C-d | Parent-owned but unreleased artifact cannot be imported/granted to child; valid scoped import passes. |
-| C-e | Clock exceeds parent wall bound: collecting late results allowed, new parent dispatch refused. |
-| C-f | Crash after normalization before link: eligible result linked once, receipt alone never linked. |
-| C-g | Two callers continue exhausted parent: one child, one grant reservation; missing authority yields needs-input. |
 | E-a | Real zero-output ceiling shape: reconcile workspace/effects; fallback only after proven eligibility, not by stdout heuristic. |
 | E-b | Handshake unknown: reconcile or park; proven not-delivered branch uses next candidate within the same Assignment cap. |
 | E-c | Quota line with/without parseable reset: park same Run, preserve line, no timed relaunch. |
@@ -294,10 +260,7 @@ fixtures record inputs, injected interruption, durable state and expected result
 | X05 | Writable/inherited-acceptance profile: Run Result Evaluator attributes preserved failed-attempt edits as inherited and independently verifies final acceptance. Read-only/isolated profiles use per-Run delta evaluation and do not claim X05. |
 | X06 | Cancel during admission/control/transfer: ordering documented, no later unauthorized attempt; late result retained. |
 | X07 | Crash at each transfer step: resume through public request; no manual claim-file deletion or second child. |
-| X08 | Parent terminal/flow drift/destination entry invalid: transfer refuses; no post-terminal bookkeeping, synthetic quorum or reopening terminal session. |
-| X09 | Session with two external work-unit correlations and one unit across two sessions: chain renders both without conflating acceptance. |
 | X10 | Unknown state version or foreign owning runtime: explicit refusal; unchanged schema-1 requests retain behavior. |
-| X11 | Fresh agent follows short public instructions; runtime derives identity from the session manifest or returns typed needs-input; no manual IDs/state fixes; record intervention count and blocked independent-work progress. |
 
 ## 11. Review Finding Resolution And Limits
 
@@ -305,25 +268,34 @@ fixtures record inputs, injected interruption, durable state and expected result
 |---|---|
 | R01/R02 | Run amendment specifies exact supersession identity, serialized admit/publish, pending declaration recovery and launch reconciliation. |
 | R03 | Section 6 and RunHandle specify no TTL theft, immutable lock generation and pending remote-control handling. |
-| R04/R05/R06 | Continuation contract defines evaluator projections, typed action identities, idempotent apply and transfer transaction/grants. |
+| R04/R05/R06 | Retired session continuation design; preserved in the complete historical snapshot, not a current contract. |
 | R07/R08/R09 | Fallback defines one default, ceiling/spawn mapping, budget arithmetic and typed effect eligibility. |
-| R10 | C-b/C-c proof corrected; no blanket refusal of valid partial policy or extra authorization. |
+| R10 | Historical session-policy proof correction; not a current engine implementation claim. |
 | R11/R12/R13 | RunHandle separates liveness/progress, defines transitions/control coverage and one visibility binding source. |
-| R14/R15 | Ownership table, shared mutation door, versioned rollout and dependency gates. |
+| R14/R15 | Ownership table, versioned rollout and dependency gates. |
 
-Distributed leases, live partial session transfer, shared chain-budget allocation,
-health store/scoring and generic effect ledger are unsupported in the first writer
-profile. Their absence returns typed unsupported/unknown, never silently widens
-authority. No temporal estimate or successful live proof is asserted here.
+No distributed lease, live session transfer, shared chain-budget allocator,
+health scoring store or generic business-effect ledger is implemented here.
+Current recovery plans park or request authority for unsafe/unknown cases;
+do not infer a universal typed unsupported enum from this design.
 
-Profile decisions are now fixed: a terminal parent refuses transfer; the first
-Herdr adapter uses deterministic `runId` naming while retaining registry-lookup
-semantics; repeat mode is explicit in the operation/protocol contract; driver
-replacement requires a `driver-replaced` door; and live-process force-release is
-not available in Node/R1-R2. Operation-specific grants or business effect
-policies must be supplied by that operation's owner; a runtime adapter cannot
-infer permission to duplicate an external effect from this design.
+The current Herdr launch identity uses normalized
+`fgos-<runId>-<launchCommandId>`, with a persisted random launch command, not
+runId alone. The standalone reassign action is a fenced controller-epoch
+record with a checked authority input; it does not launch a replacement
+worker or execute the retired session `driver-replaced` continuation door.
+Evidence: `src/runner/dispatch/assignment-runner.mjs:2118` creates the random
+launch command; `src/runner/dispatch/confinement/authority.mjs:1608-1629`
+normalizes and persists its identity. Replacement authority is checked in
+`src/runner/dispatch/recovery-planner.mjs:160-171,204-212`; reassign records
+the fenced epoch without launching a worker in
+`src/verbs/dispatch/recover.mjs:235-247,382-398`.
+
+Operation-specific grants/effect policies must be supplied by their owner;
+no adapter may infer permission to duplicate external effects. Live-process
+force-release is not a current local-lock capability.
 
 R3 may add an audited force-release door. Until then every control critical
 section must release its token in `finally` and append a release marker, even
 when the controlled process remains alive.
+

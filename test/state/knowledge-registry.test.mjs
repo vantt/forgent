@@ -357,7 +357,7 @@ test('framework/mode/role vocabulary - unknown framework, unknown mode, and role
       reserveDocStore(tmpDir, { topicId: 't1', role: 'guide', currentPath: 'docs/t1/b.md', mode: 'not-a-real-mode' });
     }, /Invalid mode/);
 
-    // Rule 1 (docs/architect/knowledge-registry-redesign.md §7.2): a role
+    // Rule 1 (docs/platform/proposals/knowledge-registry-redesign.md §7.2): a role
     // name must not equal a framework mode name.
     assert.throws(() => {
       reserveDocStore(tmpDir, { topicId: 't1', role: 'reference', currentPath: 'docs/t1/c.md' });
@@ -513,7 +513,7 @@ test('doc.supersede and doc.retire fail closed (throw) when the doc does not exi
 });
 
 test('doc.attest rejects a retired doc and a doc under a retired topic -- enforced in the reducer, not only the CLI', () => {
-  // docs/architect/knowledge-registry-redesign.md §14.3: "attestation
+  // docs/platform/proposals/knowledge-registry-redesign.md §14.3: "attestation
   // rejects retired topics and retired documents". The CLI's own
   // resolveDocPath-based pre-check already excludes these, but any caller
   // using the write facade directly (attestDocStore) must be refused here

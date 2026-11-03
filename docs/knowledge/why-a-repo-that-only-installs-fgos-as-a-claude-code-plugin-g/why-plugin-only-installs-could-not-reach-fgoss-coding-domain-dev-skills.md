@@ -78,7 +78,7 @@ slash-commands depend on are actually present in the installed plugin's
 own directory — it verifies D1(a)'s fix artifact exists; it has no hook
 into a live `Skill()` dispatch failure at runtime, so it can only catch
 this class of gap before someone hits it, not during. `docs/distribution-
-vision.md` and `docs/specs/distribution.md` now state the posture
+vision.md` and `docs/platform/packaging-distribution/spec.md#8-plugin-and-skill-packaging` now state the posture
 explicitly: before this fix, `/fgOS:cook`/`/fgOS:discover`/`/fgOS:plan`/
 `/fgOS:pick`'s own dev-skill dispatch only worked from a forgentX
 checkout; after, a plugin-only install works too.

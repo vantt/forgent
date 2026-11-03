@@ -8,7 +8,7 @@ authoritative_for: whether dispatch execute()'s main-checkout lock (acquireMainC
 > mentions — `dispatch execute` (with `--contract`, `--assignment`,
 > `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
 > `dispatch fanout-batch` — were removed (decision 0062 in
-> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `docs/platform/runner/decisions/h-36d872fbb0e5.md#0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047`). Work now runs through `fgos run "<prompt>"` /
 > `fgos run --unit` or `fgos workflow start`, and fanout through
 > `node src/runner/fanout-batch.mjs`. The account below is kept as history.
 

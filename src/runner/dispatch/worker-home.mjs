@@ -28,13 +28,13 @@
 //      dispatch that fails safely at startup and is useless.
 //
 // Evidence for every line above:
-// docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/
+// docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/
 //
 // WHAT THIS DOES NOT SOLVE, stated so nobody assumes otherwise. The worker ends up
 // holding a copy of the operator's provider credential, because the credential has
 // to be reachable for the worker to function at all. HOME isolation cannot fix
 // that; only a credential-holding relay can, and that is named as open in
-// docs/architect/proposals/coordination-worker-provider-boundary.md.
+// docs/platform/proposals/coordination-worker-provider-boundary.md.
 
 import fs from 'node:fs';
 import path from 'node:path';

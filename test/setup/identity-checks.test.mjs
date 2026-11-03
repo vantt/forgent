@@ -161,19 +161,25 @@ test('shared-directory row reads only the cache: passes with counts, warns on dr
 test('ids row passes on a clean registry and names each repeated id, title clash and file number', (t) => {
   const { root } = withStateRoot(t);
   const repo = path.join(root, 'registry');
-  fs.mkdirSync(path.join(repo, 'docs/specs'), { recursive: true });
+  fs.mkdirSync(path.join(repo, 'docs/platform/area-a'), { recursive: true });
+  fs.mkdirSync(path.join(repo, 'docs/platform/area-b/decisions'), { recursive: true });
   fs.mkdirSync(path.join(repo, 'docs/decisions'));
   const backlog = (ids) => ['| ID | Story |', '|----|-------|', ...ids.map((id) => `| ${id} | a story |`)].join('\n');
   fs.writeFileSync(path.join(repo, 'docs/backlog.md'), backlog(['p-4f2a7qzb3x', 'STR27']));
   // The same decision recorded in two areas, under the same short title, is one decision.
-  fs.writeFileSync(path.join(repo, 'docs/specs/a.md'), '### D-ADR0070 (guide and ledger) -- text\n');
-  fs.writeFileSync(path.join(repo, 'docs/specs/b.md'), '### D-ADR0070 (guide and ledger) -- other words\n#### Not a decision: D-ADR0071\n');
+  fs.writeFileSync(path.join(repo, 'docs/platform/area-a/spec.md'), '### D-ADR0070 (guide and ledger) -- text\n');
+  fs.writeFileSync(path.join(repo, 'docs/platform/area-b/decisions/narrative.md'), '### D-ADR0070 (guide and ledger) -- other words\n#### Not a decision: D-ADR0071\n');
   fs.writeFileSync(path.join(repo, 'docs/decisions/0001-one.md'), '# one\n');
   const clean = checkIdentityIdsUnique(repo);
   assert.deepEqual(clean, { passed: true, message: '2 backlog ids, 1 D-ADR numbers and 1 decision files, none repeated' });
 
+  // Relocated history may repeat a decision under another title; it is not a second definition.
+  fs.mkdirSync(path.join(repo, 'docs/platform/area-a/history'), { recursive: true });
+  fs.writeFileSync(path.join(repo, 'docs/platform/area-a/history/old.md'), '### D-ADR0070 (an older title for the decision)\n');
+  assert.deepEqual(checkIdentityIdsUnique(repo), clean);
+
   fs.writeFileSync(path.join(repo, 'docs/backlog.md'), backlog(['p-4f2a7qzb3x', 'p-4f2a7qzb3x']));
-  fs.writeFileSync(path.join(repo, 'docs/specs/b.md'), '### D-ADR0070 (a different decision)\n');
+  fs.writeFileSync(path.join(repo, 'docs/platform/area-b/decisions/narrative.md'), '### D-ADR0070 (a different decision)\n');
   fs.writeFileSync(path.join(repo, 'docs/decisions/0001-two.md'), '# two\n');
   const broken = checkIdentityIdsUnique(repo);
   assert.equal(broken.passed, false);

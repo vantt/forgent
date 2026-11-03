@@ -2,7 +2,7 @@
 // primitive this cell introduces, per
 // plans/260911-2305-runtime-recovery/phase-designs/run-admission-and-fencing.md
 // ("Lock Protocol") and
-// docs/architect/agent-coordination/architecture/runtime-recovery-design.md
+// docs/platform/agent-coordination/architecture/runtime-recovery-design.md#6-local-concurrency-and-durability
 // section 6 ("Local Concurrency And Durability").
 //
 // Shared by three callers: Assignment/Run admission (assignment-runner.mjs),

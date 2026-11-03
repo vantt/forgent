@@ -102,7 +102,7 @@ rather than repeating it per playbook.
 
 ## Related
 
-- `docs/how-to/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md`
+- `docs/how-to/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md`
   — the underlying `fgos catchup` recipe this playbook wraps
 - `docs/how-to/recover-a-blocked-merge-conflict-when-catchup-cannot-reconcile-it.md`
   — the opposite direction: what to do when `catchup` itself can't

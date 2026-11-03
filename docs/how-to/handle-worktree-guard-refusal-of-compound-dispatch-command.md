@@ -5,7 +5,7 @@ authoritative_for: worktree-isolation guard refusal of executor-dispatch Step B,
 # Handle a worktree-guard refusal of the dispatch Step B command
 
 > Updated 2026-10-14: Step B used to run `node src/runner/dispatch.mjs execute`;
-> that door was removed (decision 0062 in `docs/specs/runner.md`). Step B now
+> that door was removed (decision 0062 in `docs/platform/runner/decisions/h-36d872fbb0e5.md`). Step B now
 > runs `fgos run`, and the same guard refusal and wrapper fix apply to it.
 
 ## When this applies

@@ -148,7 +148,7 @@ necessary, not sufficient, when any of those moved since `testedSha`).
 ## Checkpoint identity
 
 Every checkpoint is a durable record tuple. Record it in the cell trace —
-`docs/architect/agent-coordination/verification/<track>/<cell>.md`
+`docs/platform/agent-coordination/verification/<track>/<cell>.md`
 (`coding-cell-policy.md` § Tested and integrated identity):
 
 ```text
@@ -192,7 +192,7 @@ test-harness foundations, or `package.json` scripts — for example, in this
 repo, `src/runner/dispatch/**`, `src/verbs/coordination/**`, or
 `package.json` itself. The Lead determines whether a mechanical trigger
 fired for a given diff and records that determination in the cell trace
-(`docs/architect/agent-coordination/verification/<track>/<cell>.md`) with
+(`docs/platform/agent-coordination/verification/<track>/<cell>.md`) with
 the matching path(s) that fired it — never left implicit.
 
 ## Per-phase `## Verification`
@@ -246,7 +246,7 @@ Lead disposition: accepted -> Proof: escalated-to-full for cell <id> only
 ## Cell trace format
 
 Every cell trace
-(`docs/architect/agent-coordination/verification/<track>/<cell>.md`)
+(`docs/platform/agent-coordination/verification/<track>/<cell>.md`)
 records:
 
 ```text

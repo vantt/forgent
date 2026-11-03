@@ -1,0 +1,7 @@
+#!/bin/sh
+# Buffer ref lines once; byte-sensitive path policy remains in Node. Unrelated
+# ref operations must not pay Node startup or depend on its imports being valid.
+[ "$1" = prepared ] || exit 0
+INPUT=$(cat) || exit 1
+printf '%s\n' "$INPUT" | grep -q ' refs/heads/main$' || exit 0
+printf '%s\n' "$INPUT" | exec node "$(dirname "$0")/pre-commit" reference-transaction prepared

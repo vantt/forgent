@@ -1,6 +1,8 @@
 //! Workspace root, workspaceId, and workStateId resolution.
 //!
-//! Follows `docs/specs/distribution.md:297` for workspace root discovery: the
+//! Follows the Git Common Directory Discovery contract in
+//! `docs/platform/packaging-distribution/contracts/activation-binding.md`
+//! (under Init Pipeline And Root Binding) for workspace root discovery: the
 //! main checkout of the repository holding the start directory, as the Git
 //! component resolves it (never the linked worktree's own top level).
 //!

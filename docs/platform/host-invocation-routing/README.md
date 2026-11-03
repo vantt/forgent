@@ -10,6 +10,14 @@ Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted from docs/architect/host-invocation-routing/**
 Last reviewed: 2026-09-18
+Implementation: Existing dated R1/R2/R3 preview records; source claims retain their dated implementation limits
+Provenance: Six pinned legacy sources and the frozen Host Invocation area map; retained policy is non-authority history
+Writer type: Agent
+Canonical for: Area navigation; each linked document states its own authority and implementation limits
+Use this when: Finding the host invocation contract, selected migration direction and its proof boundaries
+Do not use this for: Selecting or installing a runtime, certifying current route counts, or treating dated plans as shipped code
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None
 Related:
 - docs/platform/host-invocation-routing/vision.md
 - docs/platform/host-invocation-routing/intent-preservation-ledger.md
@@ -49,8 +57,8 @@ Do not use this area to decide how a runtime is installed, activated, upgraded, 
 | Check preserved legacy intent and dispositions | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 | Understand current, legacy-current, planned, and unknown behavior | [spec.md](spec.md) |
 | Plan remaining work after R1/R2/R3 preview proofs | [roadmap.md](roadmap.md) |
-| Review R2 external process provider preview closeout | [../../../plans/260915-host-invocation-r2-external-process/plan.md](../../../plans/260915-host-invocation-r2-external-process/plan.md), [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
-| Review R3 remote peer closeout | [../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../plans/260918-host-invocation-r3-remote-peer/plan.md), [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |
+| Review R2 external process provider preview closeout | [../../../archive/plans/260915-host-invocation-r2-external-process/plan.md](../../../archive/plans/260915-host-invocation-r2-external-process/plan.md), [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
+| Review R3 remote peer closeout | [../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md](../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md), [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |
 | Understand invocation kernel shape | [architecture/invocation-kernel.md](architecture/invocation-kernel.md) |
 | Understand CLI, remote, and chat peer hosts | [architecture/host-use-cases.md](architecture/host-use-cases.md) |
 | Understand provider selection and authority | [architecture/provider-routing.md](architecture/provider-routing.md) |
@@ -108,7 +116,11 @@ Every design claim in this area must have an implementation status or a proof ga
 
 ## 8. Migration Notes
 
-The old documents under [../../architect/host-invocation-routing/](../../architect/host-invocation-routing/) remain legacy/current sources until redirected or drained. Do not delete them in this migration pass.
+After accepted source conservation and the atomic cutover, the maintained
+`docs/architect/host-invocation-routing/` tree is retired. Its spelling is
+source provenance, not a live compatibility route. Use [spec.md](spec.md) and
+the exact contracts, architecture, decisions and verification linked by this
+portal; preserved snapshots remain non-authority history.
 
 The preservation ledger must be checked after each phase. A detail omitted from prose is only safe when [intent-preservation-ledger.md](intent-preservation-ledger.md) records whether it was promoted, split, kept legacy, redirected, archived, deferred, superseded, rejected, or remains unknown.
 
@@ -132,3 +144,9 @@ The preservation ledger must be checked after each phase. A detail omitted from 
 | decisions index | [decisions/README.md](decisions/README.md) |
 | platform boundary | [../component-boundary.md](../component-boundary.md) |
 | packaging dependency | [../packaging-distribution/README.md](../packaging-distribution/README.md) |
+
+## 10. Source Conservation And Retired Policy
+
+Carriage note: the [retired documentation migration policy](history/documentation-migration/documentation-standardization-plan.md) is retained verbatim as non-authority history, not as the area's current documentation policy. The source inventory names that carrier.
+
+The source restoration notes distinguish literal selected-design text from checked implementation. In particular, contract range intersection and transport alternatives are not certified as implemented; performance budgets are not measurements; the old npm-bin removal clause is flagged rather than replacing the retained compatibility ownership rule. Existing September preview records are dated evidence, not a fresh current-route or release certification. Independent checkpoint conservation and the current-unit truth sample are still pending.

@@ -5,7 +5,7 @@ authoritative_for: RUL11 tùm lum doctrine, "khong phai no nang ma no tum lum" a
 # RUL11 — why "heavy" was the wrong diagnosis
 
 `tsk-7u7` locked a user-stated production philosophy into `AGENTS.md` as
-RUL11 (D-ADR0036, `docs/specs/platform-foundations.md`), with a literal
+RUL11 (D-ADR0036, `docs/platform/platform-foundations.md#0036-khoá-rul11-tùm-lum-không-phải-nặng-tùm-lum-không-phải-nặng`), with a literal
 anchor phrase kept on one un-wrapped line so it stays grep-matchable:
 `khong phai no nang ma no tum lum`.
 

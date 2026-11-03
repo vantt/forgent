@@ -49,11 +49,11 @@ a moment ago. It is not. That read happens *inside*
 lock, is what catches a concurrent write from another process that
 landed between the caller's earlier (unlocked) read and this write
 attempt. Removing it would be a real correctness regression — a
-lost-update risk — not an optimization, and not a theoretical one either:
-this project's own sessions have repeatedly hit real multi-process lock
-contention on this exact file (see
-`docs/explanation/main-checkout-lock-toctou-race.md` and the
-`main-checkout-lock` history). `addOutcome` has no such pre-read at all,
+lost-update risk — not an optimization. The `main-checkout-lock` history
+documents a different concurrency hazard: reading a half-written lockfile
+could report AMBIGUOUS without real contention (see
+`docs/knowledge/why-fgos-main-checkout-lock-could-report-ambiguous-with-no-r/main-checkout-lock-toctou-race.md`).
+That precedent does not establish actual contention on the events log. `addOutcome` has no such pre-read at all,
 for a different reason — it is a pure additive append with no "from"
 state to CAS against, so there is nothing to reread.
 

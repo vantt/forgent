@@ -223,7 +223,7 @@ function buildAgentTypeExecutor(baseExecutor, agentType) {
 /**
  * Resolve a `executorId`-OR-purpose name to its real serving executor,
  * applying `capabilities.<name>.prefer`/`overrides` (2026-08-16 user
- * decision, `docs/decisions/0033-...md`'s sibling `docs/history/
+ * decision 0033 and `docs/history/
  * capability-capacity-remodel/CONTEXT.md` D1/D2) — the ONE place every
  * `cfg.executors[executorId]` lookup in this file should go through
  * instead of tracing it out ad hoc (D4: `spawnWorker` used to have its

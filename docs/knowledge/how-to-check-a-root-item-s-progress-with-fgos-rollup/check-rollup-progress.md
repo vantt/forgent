@@ -209,9 +209,9 @@ runner, then a human `close`:
 
 ## Document history (compound-learn capture linkage)
 
-This doc's path (`docs/how-to/check-rollup-progress.md`) is itself linked
+This doc's path (`docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md#how-to-check-a-root-items-progress-with-fgos-rollup`) is itself linked
 to a real compound-learn capture, gathered via `fgos doc-sources
-docs/how-to/check-rollup-progress.md`:
+docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md#how-to-check-a-root-items-progress-with-fgos-rollup`:
 
 > ```json
 > {
@@ -219,7 +219,7 @@ docs/how-to/check-rollup-progress.md`:
 >   "predicted": null,
 >   "actual": null,
 >   "docType": "how-to",
->   "docPath": "docs/how-to/check-rollup-progress.md"
+>   "docPath": "docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md#document-history-compound-learn-capture-linkage"
 > }
 > ```
 > — real `work.outcome` capture, id `doc-fgos-rollup-howto`

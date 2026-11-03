@@ -14,7 +14,7 @@ Last reviewed: 2026-10-25
 Related:
 - docs/platform/config/spec.md (the one component above this one that applies a schema)
 - docs/platform/component-boundary.md
-- docs/specs/distribution.md, "Lịch sử quyết định", RUL108 (every YAML parse goes through the native door; supersedes RUL101, the vendored js-yaml)
+- docs/platform/packaging-distribution/spec.md#dependency-upgrade-discipline, "Lịch sử quyết định", RUL108 (every YAML parse goes through the native door; supersedes RUL101, the vendored js-yaml)
 - plans/reports/research-261021-2221-config-access-inventory.md
 - plans/reports/spike-261022-0017-yaml-config-gate-evidence.md
 - architecture panel run wf-run-1792598883803-72bd2251 (final packet: unit-run-1792600163126-d1239fca/producer round 2)
@@ -35,7 +35,7 @@ The owner set the shape on 2026-10-21: "chúng ta thực chất cần tool đọ
 | Edits that keep every untouched byte (section 5) | Locks, concurrency control, durable writes (Holder-lock, Durable File, called by Config) |
 | Comment blocks as positioned text, and their injection guard (section 6) | The `@fgos:` comment grammar and when a reason is required (Config) |
 | The merge primitive over semantic values, with per-path rules supplied by the caller (section 7) | Choosing the merge rules (Config, from descriptors) |
-| Golden fixtures that pin the meaning of both profiles (section 9) | Frontmatter of reports (`src/report/frontmatter.mjs`) and the portable `distill.mjs` reader, kept on their own paths as RUL101 already kept them |
+| Golden fixtures that pin the meaning of both profiles (section 9) | Frontmatter of reports (`src/report/frontmatter.mjs`) and the portable `distill.mjs` reader, kept on their own paths as RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) already kept them |
 
 There is one implementation: the Rust crate `fgos-yaml-doc`. Rust callers link it. Node reaches it only through the native door (section 10). No JavaScript YAML parser remains on the main parse path.
 
@@ -169,7 +169,7 @@ Node reaches the component through the one combined native addon, as it already 
 - **Objects the addon hands to JavaScript are built with define semantics**, for both the `yaml` and the `config` namespace. N-API's plain property set behaves like `obj[key] = value`, which turns a `__proto__` key into a prototype change; the addon instead defines own properties (or builds prototype-free objects), so a `__proto__` or `constructor` key is always an own key, as today's test pins. One Node wiring proof per namespace extends the existing `__proto__` test.
 - **A caught panic prints nothing.** The crate installs one process-wide panic hook, once, that stays silent while the panicking thread is inside one of its guarded calls and passes every other panic to the hook installed before it. The default hook would print the panic message to stderr, and the message of a failed string slice can quote input text. A host program that sets its own hook after the first call replaces this one; the refusal text stays value-free regardless.
 - **A panic never crosses the boundary.** Every addon entry point in both namespaces catches a Rust panic and returns a named refusal (`yaml-internal-error`), because a panic in a synchronous N-API call aborts the Node process, and the runner, the run supervisor and the gateway all parse YAML in process. A fixture feeds adversarial input through the Node door and checks the process survives.
-- The vendored `src/util/third-party/js-yaml.mjs` and its hash test are deleted in the same change. RUL101 ("every YAML parse goes through one vendored js-yaml behind `src/util/yaml.mjs`") is superseded by a new decision ID recorded in `docs/specs/distribution.md`'s "Lịch sử quyết định": the one-door rule stays, the implementation behind the door becomes Rust. `src/report/frontmatter.mjs` and `distill.mjs` stay on their own paths, as RUL101 kept them.
+- The vendored `src/util/third-party/js-yaml.mjs` and its hash test are deleted in the same change. RUL101 ("every YAML parse goes through one vendored js-yaml behind `src/util/yaml.mjs`") is superseded by a new decision ID recorded in `docs/platform/packaging-distribution/spec.md`'s "Lịch sử quyết định": the one-door rule stays, the implementation behind the door becomes Rust. `src/report/frontmatter.mjs` and `distill.mjs` stay on their own paths, as RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) kept them.
 - Measured cost (spike, G1): one N-API call about 12 µs, against 2.8 ms to spawn `/bin/true` and 40 ms for `fgos version` through the host. Loading the addon costs 0.5 ms plus an 8.4 ms hash check once per process, already paid by every Node process that touches Git.
 - When the addon cannot load (not shipped on the channel, target mismatch), the call fails with the door's named error and its next step. There is no JavaScript fallback parser.
 - The Windows load of the addon is unproven (gate G4). Until a Windows run passes, a Windows release is not considered to support YAML reads.
@@ -189,7 +189,7 @@ Node reaches the component through the one combined native addon, as it already 
 
 1. Crate, contract file and golden fixtures, including every case of `test/util/yaml.test.mjs`.
 2. Rust consumers of `serde_yaml` move to the crate; the advisory ignore is removed.
-3. Addon namespace and the `src/util/yaml.mjs` re-point; js-yaml and its hash test deleted; RUL101 supersession recorded (RUL108); the Node test becomes one wiring proof. Done 2026-10-23.
+3. Addon namespace and the `src/util/yaml.mjs` re-point; js-yaml and its hash test deleted; RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) supersession recorded (RUL108 (every YAML parse goes through the native door)); the Node test becomes one wiring proof. Done 2026-10-23.
 4. Architecture test: no import of a YAML library anywhere in `src`, `bin`, `scripts`, `test` or `core`, the door included. Done 2026-10-23.
 
 ## 13. Known limits
@@ -202,10 +202,10 @@ Node reaches the component through the one combined native addon, as it already 
 
 1. **What to read first?** This spec, then `docs/platform/config/spec.md`.
 2. **What kind of work?** A new foundation leaf; it replaces the vendored js-yaml door.
-3. **What contract does it touch?** The `parseYaml` facade signature (kept), the addon ABI marker (extended), RUL101 (superseded).
+3. **What contract does it touch?** The `parseYaml` facade signature (kept), the addon ABI marker (extended), RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) (superseded).
 4. **How much risk?** Every workflow, persona and config read passes through it; the golden fixtures and the re-parse check carry that risk.
 5. **What proof means done?** Golden fixtures pass in Rust; one Node wiring proof; `npm test` and `cargo test --workspace` green; the architecture test forbids other YAML imports.
-6. **What learning is left?** The parser choice and its evidence in the upgrade record; the RUL101 supersession in `distribution.md`.
+6. **What learning is left?** The parser choice and its evidence in the upgrade record; the RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) supersession in `distribution.md`.
 
 ## 15. Lịch sử quyết định
 
@@ -218,4 +218,4 @@ Node reaches the component through the one combined native addon, as it already 
 - **2026-10-22: the refused invisible set widens.** The directional marks U+200E and U+200F, the Arabic letter mark U+061C and the word joiner U+2060 hide text in a diff like the listed characters; they join the set for values, keys and comment text alike (sections 4 and 6).
 - **2026-10-22: one acknowledgement for every edit that can drop a note.** `set` and `insert` take the same `CommentLoss` argument `remove` already had; without it they keep refusing `comment-would-be-lost`. `setInlineComment` takes an optional text: absent removes the comment, empty text is refused (`inline-comment-empty`, one added rule id) so a removal cannot happen by accident.
 - **2026-10-22: a caught panic is silent.** One process-wide hook, installed once by the first guard, stays quiet inside a guarded call and delegates all other panics to the previous hook (section 10).
-- **2026-10-23: the Node door landed.** The addon's `yaml` namespace returns JSON text in document order plus the non-finite floats (JSON has no form for them, so they are restored from a path list); `parseYaml` keeps its signature, a refusal is a `YamlParseError` with rule, file, line and column and no input text. Parity of the old and new door over 1414 tracked documents: 1396 equal, 18 rejected by both, 0 different. RUL101 is superseded by RUL108 in `docs/specs/distribution.md`.
+- **2026-10-23: the Node door landed.** The addon's `yaml` namespace returns JSON text in document order plus the non-finite floats (JSON has no form for them, so they are restored from a path list); `parseYaml` keeps its signature, a refusal is a `YamlParseError` with rule, file, line and column and no input text. Parity of the old and new door over 1414 tracked documents: 1396 equal, 18 rejected by both, 0 different. RUL101 (every YAML parse goes through one vendored js-yaml; superseded by the native door) is superseded by RUL108 (every YAML parse goes through the native door) in `docs/platform/packaging-distribution/spec.md`.

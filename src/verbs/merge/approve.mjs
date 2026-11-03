@@ -176,14 +176,14 @@ function landOperationFor(dir, repoRoot, view, id, destination) {
 }
 
 /**
- * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` follows this
- *   verb's own `--trust-dir` policy, resolved by the adapter.
+ * @param {{dir: string, repoRoot: string, cwd?: string}} ctx - `repoRoot` follows this
+ *   verb's own `--trust-dir` policy; `cwd` remains the adapter's caller checkout.
  * @param {{id: string, resolveTimeoutMs: () => number|undefined, resolveWaitFlags: () => {noWait: boolean, waitMs: number|undefined},
  *   github: boolean, prNumber: string|undefined, ghCommand: string,
  *   acknowledgeIronLaw: boolean, acknowledgeDrift: boolean}} options
  */
 export async function approveUseCase(
-  { dir, repoRoot },
+  { dir, repoRoot, cwd = repoRoot },
   { id, resolveTimeoutMs, resolveWaitFlags, github, prNumber, ghCommand, acknowledgeIronLaw, acknowledgeDrift },
 ) {
   // Both resolved first, before any guard, and in this order — the exact
@@ -352,7 +352,7 @@ export async function approveUseCase(
     // taken/executed) has no `fgw/<root>` ref to diff against.
     const ironLaw = ironLawForItem(repoRoot, item, { view });
     runnerOwnDiff = ironLaw.filesChanged;
-    // Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1): the gate
+    // Trunk-boundary scoping (decision 0032, tsk-1y6-1 D1): the gate
     // only guards the merge that actually lands on trunk. A leaf merges
     // into `fgw/<root>` (the `rootId !== id` path further below), where
     // nothing reaches main and no unreviewed self-modifying diff can land
@@ -533,7 +533,7 @@ export async function approveUseCase(
           effectiveItem = { ...item, branchHeadAtReturn: catchupResult.catchupHead };
         }
         const operationId = landOperationFor(dir, repoRoot, view, id, `refs/heads/${rootBranch}`);
-        const result = await landRunnerItem(repoRoot, effectiveItem, { target: rootBranch, operationId, timeoutMs, ...lockWait });
+        const result = await landRunnerItem(repoRoot, effectiveItem, { target: rootBranch, operationId, timeoutMs, callerCheckout: cwd, ...lockWait });
 
         if (result.outcome === 'conflict') {
           const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
@@ -698,7 +698,7 @@ export async function approveUseCase(
     // redoing the verify run.
     const trunk = detectTrunk(repoRoot);
     const operationId = landOperationFor(dir, repoRoot, view, id, `refs/heads/${trunk}`);
-    const result = await landRunnerItem(repoRoot, item, { target: trunk, operationId, timeoutMs, ownFileSet, ...lockWait });
+    const result = await landRunnerItem(repoRoot, item, { target: trunk, operationId, timeoutMs, ownFileSet, callerCheckout: cwd, ...lockWait });
 
     if (result.outcome === 'conflict') {
       const reason = hadChildren ? 'integration-drift' : 'merge-conflict';

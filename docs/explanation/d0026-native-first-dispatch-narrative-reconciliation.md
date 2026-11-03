@@ -1,10 +1,10 @@
 ---
-authoritative_for: docs/specs/runner.md's D0026 "Lớp còn thiếu" narrative claiming no automatic decision layer existed yet for the Native-First Dispatch Doctrine, stale against the very 5-phase table two paragraphs below it showing 4 of 5 phases done (tsk-1ni/27y/53h/3ik) and phase 5 (agy) deliberately deferred; also names what shipped as a deliberate narrowing from the original 4-factor LLM-judgment vision to 3 mechanical config-time factors plus one self-declared has-live-task-access flag, cross-linked from docs/architect/dispatch-control-plane-redesign.md
+authoritative_for: docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity's D0026 "Lớp còn thiếu" narrative claiming no automatic decision layer existed yet for the Native-First Dispatch Doctrine, stale against the very 5-phase table two paragraphs below it showing 4 of 5 phases done (tsk-1ni/27y/53h/3ik) and phase 5 (agy) deliberately deferred; also names what shipped as a deliberate narrowing from the original 4-factor LLM-judgment vision to 3 mechanical config-time factors plus one self-declared has-live-task-access flag, cross-linked from docs/platform/proposals/dispatch-control-plane-redesign.md
 ---
 
 # A doc's own opening paragraph contradicted its own table two screens down
 
-`tsk-17m` fixed a stale-narrative bug in `docs/specs/runner.md`'s D0026
+`tsk-17m` fixed a stale-narrative bug in `docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity`'s D0026
 section ("Lớp còn thiếu — LLM đủ thông minh để tự nhận ra khi nào dùng
 nhánh nào", the Native-First Dispatch Doctrine's own gap description).
 
@@ -50,7 +50,7 @@ a more complex AI-judgment layer was still missing.
 
 ## The newest architecture doc didn't know this history existed
 
-`docs/architect/dispatch-control-plane-redesign.md` (2026-08-26, the
+`docs/platform/proposals/dispatch-control-plane-redesign.md#dispatch-control-plane-redesign` (2026-08-26, the
 newest architecture doc, also covered by
 [`dispatch-plan-protocol-redesign`](dispatch-plan-protocol-redesign.md))
 mentions the `decide` mechanism itself in its own Problem Statement ("a
@@ -75,7 +75,7 @@ already the mechanism that closed the D0026 gap.
 - The 5-phase table gained an explicit done/deferred status per row, so
   the table is self-sufficient without a reader having to separately query
   live state.
-- `docs/architect/dispatch-control-plane-redesign.md`'s Problem Statement
+- `docs/platform/proposals/dispatch-control-plane-redesign.md`'s Problem Statement
   gained a short cross-reference back to `runner.md`'s D0026 "Lớp còn
   thiếu" section, naming `decide` as the result of D0026's 4 done phases
   with Phase 5 as the one deliberately-deferred remainder.
@@ -90,7 +90,7 @@ not reopened for debate — only accurately reflected in the docs.
 
 `tsk-17m` fixed the narrative's own accuracy; `tsk-4he` added the piece a
 reader still needed: a dedicated "Từ vựng dispatch hiện hành" (current
-dispatch vocabulary) section in `docs/specs/runner.md`, placed before the
+dispatch vocabulary) section in `docs/platform/runner/architecture/h-7af1f0242611.md#từ-vựng-dispatch-hiện-hành`, placed before the
 historical "Lịch sử quyết định" section so current terms are read first.
 It gives a current-term ↔ superseded-term table:
 

@@ -1,6 +1,6 @@
 // test/runner/dispatch-confinement-p04.test.mjs
 // Comprehensive test suite for Phase 04: Required Enforcement And Executor Migration (R1-R8)
-// Spec: docs/specs/confinement-authority.md, plans/.../phase-04-required-enforcement-and-executor-migration.md
+// Spec: docs/platform/agent-confinement/spec.md, plans/.../phase-04-required-enforcement-and-executor-migration.md
 
 import '../helpers/process-tmp-root.mjs';
 import { test } from "node:test";

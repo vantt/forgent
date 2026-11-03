@@ -13,11 +13,19 @@ Last reviewed: 2026-09-18
 Related:
 - docs/platform/packaging-distribution/spec.md
 - docs/platform/packaging-distribution/contracts/projection-ledger.md
-- docs/architect/domainization/README.md
+- docs/platform/domainization/architecture/domainization.md
 - src/setup/skill-wrappers.mjs
 - scripts/build-skill-wrappers.mjs
 - test/setup/skill-wrappers.test.mjs
 - test/skills/fgos-mirror.test.mjs
+Implementation: Original section-specific implementation statements retained; provenance does not certify current implementation
+Provenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b
+Writer type: Human + agent coauthor
+Canonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review
+Use this when: Reading this area topic and its retained design details
+Do not use this for: Claiming a truth review or an authority cutover from carriage alone
+Supersedes: No authority transition in this carriage pass
+Superseded by: None recorded
 ```
 
 ## 1. Purpose
@@ -63,7 +71,7 @@ Current build/proof surfaces:
 | Assemble canonical skills from `core/skills` and `domains/*/skills` into `.agents/skills` | implemented | `src/setup/skill-wrappers.mjs`, `scripts/build-skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` |
 | Generate Claude wrapper skills from `.agents/skills` | implemented | `src/setup/skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` |
 | Mirror `fgos-*` dev skills into the fgOS plugin for plugin-only consumers | implemented | `plugins/fgOS/skills/`, `test/skills/fgos-mirror.test.mjs` |
-| Detect missing/stale plugin skill packaging through doctor/fix registry | implemented | `src/setup/registrations.mjs`, `test/skills/fgos-mirror.test.mjs` |
+| Detect missing/stale plugin skill packaging through doctor/fix registry | implemented | `src/setup/registrations.mjs`, `test/skills/fgos-mirror.test.mjs`  **Status note (2026-10-14):** The retained implementation claim overstates doctor/fix coverage: `plugin-dev-skills-packaged` detects missing files only (`src/setup/registrations.mjs:3251-3276`); byte drift is checked by `test/skills/fgos-mirror.test.mjs:137`, and this check has no registered repair. |
 | Generate Gemini CLI extension package layout and commands | partial | `src/setup/skill-wrappers.mjs` (`generateGeminiSkillPackage`), `test/setup/skill-wrappers.test.mjs` |
 
 Generated targets are not the source of truth. They may be committed for host compatibility, but edits should flow from the canonical source through the generator. Note that host trees may be mixed: `plugins/fgOS/skills/` contains hand-authored user commands (`pick`, `submit`, `cook`, `list`, etc.) alongside mirrored `fgos-*` dev skills, and `.claude/skills/` preserves hand-authored skills (`ui-spec`, `gitnexus`) without treating them as generated wrappers.

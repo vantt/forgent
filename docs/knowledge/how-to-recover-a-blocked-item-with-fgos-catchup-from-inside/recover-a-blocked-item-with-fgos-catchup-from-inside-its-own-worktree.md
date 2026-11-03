@@ -28,7 +28,7 @@ diagnose, fix, and return again" — correct for the case where `return`
 post-merge rollback already parked it with `reason:
 verify-fail-post-merge`): `return` requires `status: doing`, and this
 item's `blocked -> awaiting-approval` recovery edge never passes through
-`doing` (RUL33/RUL34, `docs/specs/work-state.md`). Calling `return` here
+`doing` (RUL33/RUL34, `docs/platform/work-state/spec.md#11-business-rules`). Calling `return` here
 just refuses.
 
 The correct recovery verb is `fgos catchup <id>`: it re-runs `verify` on

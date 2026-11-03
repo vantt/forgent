@@ -7,7 +7,7 @@ Template: `docs/architect/agent-coordination/intent-preservation-ledger.md`'s ow
 "Deferral Audit Template"
 
 Scope: every entry AC-I001 through AC-I009 in the
-[Intent Preservation Ledger](../../intent-preservation-ledger.md), audited
+Intent Preservation Ledger, audited
 against real, checked evidence -- not claimed without verification. Every row
 below was cross-checked directly against the cited trace file, test command,
 or live-proof artifact before being written; no status here is asserted from

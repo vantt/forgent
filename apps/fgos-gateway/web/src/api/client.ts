@@ -73,7 +73,7 @@ function jsonBody(body: unknown): RequestInit {
 }
 
 /**
- * Typed wrapper over docs/contracts/fgos-gateway-api-v1.yaml -- one
+ * Typed wrapper over docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml -- one
  * function per operationId, never a re-description of an endpoint's own
  * shape. `/contract` (unauthenticated, non-enveloped) is intentionally
  * NOT wrapped here: a client fetches it once, before it has a client

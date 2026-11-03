@@ -59,6 +59,7 @@ import { gitPortOptions } from '../git/inspect.mjs';
 import { createGitSync } from '../git/sync.mjs';
 import { nativeError } from '../git/native.mjs';
 import { createGitWorktree } from '../git/worktree.mjs';
+import { leaseAdmission } from './documentation-cutover-lease.mjs';
 
 /**
  * The invariant-check commands of the project at `repoRoot` (`invariantChecks.commands`). The door reads
@@ -535,7 +536,7 @@ function branchContentMismatch(repoRoot, branch, ref) {
   // ADR0020 guarantees a worker branch can NEVER
   // legitimately reflect main's live .fgos/ content, union-declared or
   // not, so a branch-side .fgos/ diff (e.g. the documented recovery in
-  // docs/how-to/fix-fgos-write-rejected-merge-block.md: restoring .fgos/
+  // docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md#example-tsk-3v2-the-block-triggers-from-merging-main-in-not-from-your-own-commit: restoring .fgos/
   // paths to the branch's own frozen pre-merge versions) is never real
   // discarded content, just an expected, permanent divergence from HEAD.
   // Rename detection stays on here (a rename names only its new path): a branch that renamed
@@ -566,7 +567,7 @@ function mergeHeadExists(repoRoot) {
 }
 
 export function formatFgosWriteRejectedDetail(branch, paths, targetLabel) {
-  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;
+  return `${branch} staged a change under .fgos/ (${paths.join(', ')}); merge aborted, ${targetLabel} unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.`;
 }
 
 /**
@@ -868,8 +869,21 @@ export async function landRunnerItem(repoRoot, item, {
   lockWaitMs = DEFAULT_LOCK_WAIT_MS,
   ownFileSet = null,
   operationId = crypto.randomUUID(),
+  callerCheckout = repoRoot,
 } = {}) {
   const destination = `refs/heads/${target}`;
+  // Authenticate the caller before any write, then re-admit the exact prepared
+  // pair before publish: a lease transition takes main-50, not Land's slot-20.
+  let pinned = resolveRefSha(repoRoot, target);
+  const source = resolveRefSha(repoRoot, branch);
+  const inspect = inspectGit(repoRoot);
+  const admitLease = (source, targetOid) => {
+    const base = inspect.compareCommits({ left: targetOid, right: source }).mergeBase;
+    const paths = diffPaths(inspect, base, source, { renames: false });
+    const admission = leaseAdmission({ repoRoot, worktreePath: callerCheckout, paths });
+    if (!admission.allowed) throw new MergeError(admission.message, { code: admission.reason, branch, targetRef: target });
+  };
+  admitLease(source, pinned);
   const fgosDir = path.join(repoRoot, '.fgos');
   const mergeSlot = ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`];
   const lockHeld = ([lock, params, label]) => {
@@ -879,7 +893,8 @@ export async function landRunnerItem(repoRoot, item, {
       branch, targetRef: target, code: 'lock-held', holders, lock,
     });
   };
-  // No-wait refuses a held slot before any read; Land's own try stays the decision.
+  // After read-only admission, no-wait refuses a held slot before any write;
+  // Land's own try stays the decision.
   if (lockWaitMs === 0 && probe(mergeSlot[0], mergeSlot[1]).result === 'held') throw lockHeld(mergeSlot);
   // Only a destination the main checkout holds involves its index at all.
   const onMain = checkedOutRef(repoRoot) === destination;
@@ -897,8 +912,10 @@ export async function landRunnerItem(repoRoot, item, {
   sealProjectBeforeLand(fgosDir, branch);
   // Trusted-side resolutions are bytes bound to the target they were read
   // against; only then is that target pinned, otherwise Land pins its own.
-  const pinned = resolveRefSha(repoRoot, target);
-  const source = resolveRefSha(repoRoot, branch);
+  // Re-admit after any checkpoint/wait, before declaring files against this
+  // exact target. A concurrent lease acquire may also have advanced main.
+  pinned = resolveRefSha(repoRoot, target);
+  admitLease(source, pinned);
   const declared = declareLandFiles(repoRoot, item, pinned, source);
   if (declared.outcome) return { ...declared, branch };
   const { files } = declared;
@@ -922,6 +939,8 @@ export async function landRunnerItem(repoRoot, item, {
       waitMs: lockWaitMs,
       request: {
         source,
+        // Declared resolution bytes belong to this exact target. Without
+        // declarations, let Land choose the current target under its slot.
         ...(files.length > 0 && { target: pinned }),
         destination,
         message: `merge ${branch} into ${target}`,
@@ -936,6 +955,9 @@ export async function landRunnerItem(repoRoot, item, {
         check: { passed: true, status: 0, timedOut: false, skipped: true, output: `publication already verified and recorded by Land operation ${operationId}; awaiting Work settlement` },
         receipt: previous }, 'delivered');
     }
+    // Slot admission may follow another successful land. Authenticate the
+    // actual prepared pair, not a target observed before waiting for the slot.
+    admitLease(candidate.source, candidate.target);
     // Eligibility still belongs to Work, decided against the exact source and
     // target Land pinned for this candidate, never a target read before it.
     const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, candidate.source, candidate.target);
@@ -960,6 +982,9 @@ export async function landRunnerItem(repoRoot, item, {
       };
     }
     if (!check.passed) return settled({ outcome: 'verify-fail', branch, check });
+    // Verification can outlive admission. Check committed authority again for
+    // this candidate's merge base; exact-old CAS covers a later acquire on main.
+    admitLease(candidate.source, candidate.target);
     phase = 'publish';
     const receipt = await port.publish({
       source: candidate.source, target: candidate.target,
@@ -968,6 +993,7 @@ export async function landRunnerItem(repoRoot, item, {
     }, { waitMs: lockWaitMs });
     return settled({ outcome: 'merged', branch, check, receipt }, 'delivered');
   } catch (err) {
+    if (err instanceof MergeError) throw err;
     let detail;
     try { detail = JSON.parse(err.message); } catch { detail = {}; }
     const cause = detail.cause;
@@ -999,7 +1025,12 @@ export async function landRunnerItem(repoRoot, item, {
     }
     // Preserve Land's stale result, including operation identity and recovery
     // evidence. Never re-run verification or CAS against a different target.
-    if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') throw err;
+    if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') {
+      // Acquire may win while prepare/publish waits for its own locks. Keep
+      // the named lease refusal when it blocks this pair, otherwise keep stale.
+      admitLease(source, pinned);
+      throw err;
+    }
     // A publication whose effect is unknown is never claimed abandoned: no
     // Work result is recorded, the candidate stays, and Land recovery
     // decides what happened before this id is published again.

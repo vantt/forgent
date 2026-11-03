@@ -1,0 +1,1486 @@
+{
+  "version": 1,
+  "shard": "a-rust-cli-and-proof-components-plan",
+  "sources": [
+    "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md"
+  ],
+  "files": [
+    {
+      "path": "docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md",
+      "disposition": "merge",
+      "rationale": "Most claim units are carried (merge/split/supersede) by the host-invocation-routing release-boundaries, verification, contract and architecture documents, but the P0-P7 phase-level steps, gates, commands, performance budgets, delivery graph, risk register and revertible-slice list are not carried; those units are recorded unknown-blocking.",
+      "targets": [
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+        "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+        "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+        "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+        "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+        "docs/platform/host-invocation-routing/roadmap.md",
+        "docs/platform/host-invocation-routing/spec.md",
+        "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+        "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_15bf45a3b2bdf1083bc63a6f10d14e82",
+      "sourceUnitDigest": "78b93c88e219b1c9",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Document title of the legacy plan; no target section carries this plan as such (targets are split by release proof, not by this plan title).",
+      "searched": [
+        "grep -iF \"Rust Host And Proof Providers\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Implementation Plan\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Proof Providers\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_182dc1f2f896d82f0cf35519579ebbbf",
+      "sourceUnitDigest": "bbf58c843d814796",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "2-open-release-decisions",
+      "claimKind": "historical-context",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source header states status \"proposed, blocked only by remaining section 3 decisions and the fgctl walking skeleton\", dated 2026-09-04/10. Target states R1/R2/R3 implemented preview with preview approved and compatibility window set; the proposed-status framing, revision note and the architecture/migration/component-boundary link list are not reproduced as a header."
+    },
+    {
+      "claimId": "claim_c710c879488536d7a2b949141952f010",
+      "sourceUnitDigest": "1aef0de67780feeb",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "intent",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "States this document owns execution order, deliverables, gates, verification and rollback while contracts/lifecycle/authority/framing/registry/compat modes/trade-offs are owned by the architecture doc and not redefined here. No target states this scope split for the plan.",
+      "searched": [
+        "grep -iF \"intentionally not redefined\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"execution order\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"not redefined here\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"deliverables, gates\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_d4b9b2583e0b4b598a7610af9ced7d36",
+      "sourceUnitDigest": "c00dc23b0e512e53",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "Heading of a migration pointer note (\"legacy-current execution-plan source during the 2026-09-14 promotion pass\"); its job (point to promoted docs) is done by the target docs themselves and area README section 8, so the note is obsolete navigation."
+    },
+    {
+      "claimId": "claim_bb1dcfee5986a94c37e667c75bd3af84",
+      "sourceUnitDigest": "9e7bbb0c3bb08918",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "Pointer list naming release-boundaries, compatibility-harness and r1/r2/r3 proof docs as the promoted successors; the source says it only applies \"during the 2026-09-14 promotion pass\". Those targets now exist and each links back to the source plan, so this navigation no longer applies."
+    },
+    {
+      "claimId": "claim_43c25aed966fdb607de17ca47cbce862",
+      "sourceUnitDigest": "a52bf71926ba8686",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "1-release-boundaries",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the three-release outcome; the R1/R2/R3 release definitions live in the release boundaries section (different title, same content)."
+    },
+    {
+      "claimId": "claim_a29012c7fb94f83828b7835413eebcc2",
+      "sourceUnitDigest": "62f374c5546f8bcb",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Three independently shippable releases (R1, R2, R3) are the rows of the release boundaries table."
+    },
+    {
+      "claimId": "claim_ab6683864cea05c444f1b78cd30475b9",
+      "sourceUnitDigest": "e0c70d6e826e2c96",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R1 (Rust installed entry, unmigrated CLI reaches Node, native version, install/init/doctor/upgrade/rollback/uninstall reproducible via fgctl), R2 (fixture proves framed protocol, no marketplace) and R3 (route calls shared service, no CLI/fgos.v1) are carried across r1 proof section 1, r2 proof sections 1/7 and r3 proof section 1. Differs: the target drops the split \"install/upgrade/rollback/uninstall via fgctl; init/doctor local under the active identity\" and does not say R2 avoids a full plugin marketplace as an outcome statement (only as non-gate)."
+    },
+    {
+      "claimId": "claim_a411676b68cace20da24d92621ed8925",
+      "sourceUnitDigest": "32389e1a464f6b37",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target row \"R2 and R3 do not delay R1 installed-entry flip\" carries the main claim. Differs: \"R1 is useful without R2 or R3\" and \"R2 and R3 may start after the R1 runtime kernel is stable\" are not stated."
+    },
+    {
+      "claimId": "claim_e8dfeedeba14914888b827064f151fa9",
+      "sourceUnitDigest": "2934016a2bd6d77f",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the non-goals list; closest target is the \"Explicitly not a gate\" column of the release table (see next row for what differs)."
+    },
+    {
+      "claimId": "claim_cde3d5a31e679710c732f892d197b7ef",
+      "sourceUnitDigest": "8fef48718a84f098",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Non-goals: WASM/marketplace/signatures and core-provider replacement are carried (release table non-gates, r2 proof section 7), repository-wide Node thinning rejected (node-to-rust-migration). Differs/absent: no Work Lifecycle writer/runner/coordination migration non-goal as such, no \"no Node deletion in the same change that flips its binding\", no \"no Rust toolchain or hidden lifecycle build on consuming projects\", no \"no speculative chat adapter\" rule."
+    },
+    {
+      "claimId": "claim_ab778e44a43171006f82c08d9939dcf5",
+      "sourceUnitDigest": "2c11291e0dae8db8",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "2-open-release-decisions",
+      "claimKind": "decision",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the decisions that must be settled before R1 execution; carried by the Open Release Decisions section."
+    },
+    {
+      "claimId": "claim_edbd740417658e6cfc22ced75d91b633",
+      "sourceUnitDigest": "32ffceba26aa0249",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "5-phase-b-close-remaining-packaging-release-decisions",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source says the listed items are product/release inputs not to be guessed. Roadmap Phase B says host-invocation can prepare the ask but must not answer packaging release decisions alone; the \"not implementation details to guess\" wording is not stated."
+    },
+    {
+      "claimId": "claim_c84180b3855a6187533b4f6f92c23630",
+      "sourceUnitDigest": "b6d4224f87ecdb2f",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "2-open-release-decisions",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Decisions 5 (preview vs stable: preview approved, stable undecided) and 6 (compatibility window: 30 calendar days after preview publication) are carried with a changed, settled status. Differs: decision 1 (supported R1 target matrix) is not stated anywhere in the targets; settled items 2-4 (archive publication, upgrade/rollback channel, artifact naming/integrity) and their pointers to runtime-identity-and-activation sections are not carried here."
+    },
+    {
+      "claimId": "claim_fb9821c822ae8aa2c943c79604fe94f1",
+      "sourceUnitDigest": "e5c1c36c536525ef",
+      "targetOwner": "docs/platform/host-invocation-routing/README.md",
+      "targetAnchor": "4-ownership-boundary",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "README ownership boundary and vision non-scope say fgctl owns release acquisition, activation, upgrade, repair and rollback, and the release table lists a separate setup verb as a non-gate. Differs: the explicit rule that local fgos init and doctor --fix never select or download a release, and the pointer to inventorying fgos setup callers, are not stated."
+    },
+    {
+      "claimId": "claim_cf0272c9d88e7c921805226ce86f7a61",
+      "sourceUnitDigest": "9374e834d79b7eef",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "2-dependency-answer",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Roadmap dependency table says local host work proceeds alone while the Rust-host default/released claim needs packaging-distribution, and the release decisions are owned by that stream. Differs: P1-P5 versus P6 split, the \"may not infer these decisions\" rule, the fgctl walking-skeleton dependency, and recording decisions 1/5/6 in the packaging stream are not stated in that form."
+    },
+    {
+      "claimId": "claim_53de40a0d6f29ad5ad76589e0a7df776",
+      "sourceUnitDigest": "cfe2388a62b1e426",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P0-P9 delivery graph; no target carries the P-package delivery graph (roadmap uses a different A-H phase list).",
+      "searched": [
+        "grep -iF \"Delivery Graph\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"P0-P9\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"P1 compatibility harness\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"node PK\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_72cb929bf5ecffe3431de368d5cb7def",
+      "sourceUnitDigest": "4fdba7fda591e7a2",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Mermaid dependency graph P0->P1/P2->P3->P4/P5->P6 with PK feeding P6, P3->P7, P5->P8, P6->P9. Not present in any target; roadmap phases A-H have a different shape.",
+      "searched": [
+        "grep -iF \"flowchart LR\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"P3 invocation kernel\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"P4 CLI adapter\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"PK: fgctl\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"mermaid\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_2f7f1c2f7b0f0673f7f2423731f30ae7",
+      "sourceUnitDigest": "61449d9023925375",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source: P7 does not block P8 when the first production remote route is native distribution.build.show. Roadmap says Phase F precondition is satisfied because Phase E delivered fixture.echo.echo, a semantic operation that is not only a built-in CLI route; the specific \"P7 does not block P8 for distribution.build.show\" statement is replaced by a different precondition story."
+    },
+    {
+      "claimId": "claim_9b87547dbf5c4930ad55f81ce588af0b",
+      "sourceUnitDigest": "7f2127f23a3ecac4",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "PK (fgctl walking skeleton) is an external dependency node delivered by the packaging stream, not a new P-package; P-numbering stays P0-P9. No target mentions PK or the walking skeleton.",
+      "searched": [
+        "grep -iF \"PK\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"walking skeleton\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"external dependency node\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"P-numbering\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_2ed84857b662413aec52b94409440707",
+      "sourceUnitDigest": "c39268c2a3a49a98",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P0 phase (lock release inputs and baseline inventory); no target carries a P0 phase for this plan (roadmap Phase A is a different local-proof phase).",
+      "searched": [
+        "grep -iF \"Baseline Inventory\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Lock Release Inputs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"P0 lock release inputs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_c3affbd60bf0454d48b3666cdd79c6d4",
+      "sourceUnitDigest": "6ff8646d4169033d",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P0 deliverables list; see the deliverables row for what is and is not carried.",
+      "searched": [
+        "grep -iF \"P0 deliverables\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Distribution decision update\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Deliverables (P0)\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_97675a05c81f8d594b0023e409ef78de",
+      "sourceUnitDigest": "2f778d947cee7cb9",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P0 deliverables: decision update, packaging skeleton interface, inventory of every fgos setup caller, machine-readable selector inventory, classification, checked route descriptors, legacy payload contract confirmation, nine-call-site caller inventory, distribution.build.show owner, gate-bypass ownership, fgos-runner in runtime inventory. Only the descriptor fields (command-route-descriptor), payload resolution (legacy-payload), fgos-runner inventory and gate-bypass ownership (roadmap Phase D) are carried; the fgos setup caller inventory, nine-site caller classification, ~75 test fixtures note and selector inventory obligations are absent.",
+      "searched": [
+        "grep -iF \"fgos setup\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"nine real call sites\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"~75 Node tests\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"fgos-cli-fallback\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"machine-readable inventory\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_ea3616daf5f3ce20345689c0f5513e44",
+      "sourceUnitDigest": "e6fbc64c5e80fae0",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P0 scout-evidence list; nothing like it exists in targets.",
+      "searched": [
+        "grep -iF \"Scout evidence\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"command-registry.mjs selector inventory\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Herdr VerbGateway call sites\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_beed103650a3300815a2f9fd55512980",
+      "sourceUnitDigest": "a17bef0c0cedbf03",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Scout evidence list (package.json bins, command-registry selector inventory, bin/fgos.mjs parsing, version.mjs/envelope.mjs, direct bin/fgos.mjs callers, Herdr VerbGateway call sites). Absent from targets.",
+      "searched": [
+        "grep -iF \"src/cli/version.mjs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"envelope.mjs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"global parsing, presentation\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"ports.rs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_2158185ee753c7a808c309de30cae3ec",
+      "sourceUnitDigest": "7b832411e2dc49a6",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P0 exit gate; see next row.",
+      "searched": [
+        "grep -iF \"P0 exit gate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"No selector is absent\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"planned init/doctor registration owner\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_2640fd2bf8f2de2fff20a9eecac26afb",
+      "sourceUnitDigest": "3bc05d64d21b4a58",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P0 exit gate: no selector absent, every new binary/payload/cache/config/dependency has a planned init/doctor registration owner, only P6 blockers are distribution choices 1/5/6 and the walking skeleton, every selector has one repair owner and proof suite, no caller treats the private legacy payload as a public entry. Not stated in targets (command-route-descriptor only says an unlisted selector fails the build).",
+      "searched": [
+        "grep -iF \"init/doctor registration owner\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"registration owner\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"one repair owner and proof suite\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"No selector is absent\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_1f4be3dfcd0e9431ceab5059ceed6633",
+      "sourceUnitDigest": "5b9a01374fe6d036",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P0 verify block; see next row.",
+      "searched": [
+        "grep -iF \"--help --json\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"node bin/fgos.mjs --help\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"P0 verify\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_edc2a35ab327afe6fae3c0079c44c33f",
+      "sourceUnitDigest": "272e9c166888db82",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R1 proof lists \"npm test\" among proof commands. Differs: the P0 verify command \"node bin/fgos.mjs --help --json\" is not listed anywhere."
+    },
+    {
+      "claimId": "claim_3c202991304027e73ce867fadfd87175",
+      "sourceUnitDigest": "42627a79ae9e2ad3",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "targetAnchor": "verification-compatibility-harness",
+      "claimKind": "verification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "P1 Compatibility Harness corresponds to the Compatibility Harness verification doc (same subject, same title)."
+    },
+    {
+      "claimId": "claim_89e8b193eb339f06478bf6998576080c",
+      "sourceUnitDigest": "caac82b738261b64",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P1 changed-areas list.",
+      "searched": [
+        "grep -iF \"Changed areas\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"export-command-selectors\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"packages/component-protocol/contracts\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_49ffb5866f0a65b3a12eef5f66b6d667",
+      "sourceUnitDigest": "6aaf7e020295fddc",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Changed areas for P1: test/rust-host/, packages/component-protocol/contracts/, scripts/export-command-selectors.mjs, scripts/explain-command-route.mjs. Only the explain script is mentioned (command-route-descriptor); the file/directory list is absent.",
+      "searched": [
+        "grep -iF \"export-command-selectors\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"packages/component-protocol/contracts\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"scripts/export\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_8fe84caa90063489ae91b4524baab644",
+      "sourceUnitDigest": "7c08fb127395d5e0",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the P1 harness steps; the required-proof section of the harness doc carries the invocation/capture requirements."
+    },
+    {
+      "claimId": "claim_aacc6f817470b6af566684cf21db1371",
+      "sourceUnitDigest": "75e970aa99de7261",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Steps 1-2 (identical argv bytes/stdin/cwd/env/timeout; capture stdout/stderr bytes, exit/signal, fs diff, process evidence, timing) are carried; steps 3 and 6 (generated route descriptor, explain-command-route reading the same artifact) are carried in command-route-descriptor. Differs/absent: byte drift test, Node-generated fgos.v1 vectors and differential serialization corpus, per-case comparison mode declaration, and the proof that the harness detects an injected stdout byte/exit-code change/missing argv token/unexpected child."
+    },
+    {
+      "claimId": "claim_fc22ecebfdc6e506475e638d1ba86920",
+      "sourceUnitDigest": "e48c44ad1a36f17b",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "targetAnchor": "2-coverage",
+      "claimKind": "verification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Coverage floor heading corresponds to the Coverage section."
+    },
+    {
+      "claimId": "claim_d2f98c28ed63bf5bdde71ee9905a5b9c",
+      "sourceUnitDigest": "5fb84715acee7850",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/compatibility-harness.md",
+      "targetAnchor": "2-coverage",
+      "claimKind": "verification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Coverage list (every selector, descriptor uniqueness, help/syntax passthrough, exit categories, version/ready, validation failure, unknown verb, init+add, --dir, distinct cwd, stdin, signal/process-tree) is the harness Coverage paragraph; the \"unknown/ambiguous routes fail closed\" detail is covered by command-route-descriptor rules."
+    },
+    {
+      "claimId": "claim_5c200f279a9c0fcf20b7df169781b026",
+      "sourceUnitDigest": "0bfc5192d67616e0",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of P1 performance gates.",
+      "searched": [
+        "grep -iF \"Performance gates\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"25 ms\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"10 ms p50\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_82a6b9c5ebba8c1384c0bfaca9be39b8",
+      "sourceUnitDigest": "bf8556795a73adb4",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Legacy exec overhead budget (<=25 ms p50 placeholder), native version latency budget (<=10 ms p50), both becoming regression gates in P6. No target states these budgets or gates.",
+      "searched": [
+        "grep -iF \"25 ms\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"10 ms\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"p50\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"latency\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"regression gate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_dce9740dd9f04988dc3d1ffc4c1069d5",
+      "sourceUnitDigest": "95a016a8b4081eb8",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P1 exit gate and verify block.",
+      "searched": [
+        "grep -iF \"Node-against-Node\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"P1 exit gate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"envelope-contract\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_cea27866daa3823bc706fe737e7155d9",
+      "sourceUnitDigest": "fab9d53bc259ccae",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P1 exit gate: harness fails on every injected difference and passes Node-against-Node. Not stated in targets.",
+      "searched": [
+        "grep -iF \"Node-against-Node\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"injected difference\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"fails on every\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_096b8a1eacd02f9b9f34e80d62ec57e3",
+      "sourceUnitDigest": "62f3a7411289035b",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P1 verify commands (node --test test/rust-host/envelope-contract.test.mjs; node scripts/export-command-selectors.mjs --check). Absent.",
+      "searched": [
+        "grep -iF \"envelope-contract.test\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"export-command-selectors\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"--check\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_7bcefee6ff2cdb9278b506d5893547f9",
+      "sourceUnitDigest": "f15b9252c05cadc5",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P2 Rust workspace phase; the workspace/generated-input phase is not carried as such.",
+      "searched": [
+        "grep -iF \"Rust Workspace\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Generated Inputs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Cargo.toml workspace\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_6dc943f5835fe7eef52790b415a67475",
+      "sourceUnitDigest": "53004c865ad2865c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P2 target areas list.",
+      "searched": [
+        "grep -iF \"Target areas\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"apps/fgos/ crate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"run-rust-dev-host\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_2d10871c46be72d9e7255698a6fcaf9a",
+      "sourceUnitDigest": "f9717b6dd725b490",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Roadmap evidence table and r1 proof snapshot name apps/fgos, packages/host-runtime/rust and packages/distribution/rust (distribution.build.show provider). Differs: workspace root Cargo.toml/Cargo.lock, scripts/build-rust-distribution.mjs (only named in roadmap Phase C as a build step) and scripts/run-rust-dev-host.mjs, and the crate-to-owner comments are not stated as a target layout."
+    },
+    {
+      "claimId": "claim_8a89cd3726b6841b4cce0fccb3963711",
+      "sourceUnitDigest": "8a229664592893d7",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "R1 is exactly three crates; component-protocol/rust created only in P7; no packages/legacy-node crate (legacy exec is a module in apps/fgos); adapters start as modules; no gate-policy component for convenience. Only the no gate-policy component rule is present (roadmap Phase D).",
+      "searched": [
+        "grep -iF \"exactly these three crates\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"packages/legacy-node\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"component-protocol/rust\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"start adapters as modules\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_34b17a8d6492f2d4be87cb3e6dd2a593",
+      "sourceUnitDigest": "db12d72fa2957700",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P2 steps.",
+      "searched": [
+        "grep -iF \"P2 steps\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"explicit workspace members\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"target CI cache\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_a86aab8a7c793278b0f40c41445b40ae",
+      "sourceUnitDigest": "6875848bffc6d004",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P2 steps: explicit workspace members/excludes, keep herdr-plugin and upstreams outside, prove excluded crates build independently, embed generated artifacts (spec mentions embedding command-routes.json), dev launcher that never uses ambient PATH fgos, staging builder emitting versioned manifest, fmt/lint/CI cache. Almost all absent.",
+      "searched": [
+        "grep -iF \"herdr-plugin\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"upstreams/\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"dev launcher\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"staging builder\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"warnings-as-errors\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_b11ef4abc110ba22303eb3f025541600",
+      "sourceUnitDigest": "9eca3b906bc3a65f",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P2 exit gate and verify.",
+      "searched": [
+        "grep -iF \"P2 exit gate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"lockfile drift\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"staged layout can run\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_4c19c4afc310f49b917983466dd84051",
+      "sourceUnitDigest": "f41238ebbdb29b85",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P2 exit gate: workspace has only intended members, no Herdr dependency or lockfile drift, dev launcher cannot read installed payload, staged layout runs without source-tree paths. Absent.",
+      "searched": [
+        "grep -iF \"lockfile drift\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"intended members\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"source-tree paths\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_ad2a4c535503fa65a9d6aaf7e9e16b3f",
+      "sourceUnitDigest": "bbed69a63f075067",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P2 verify commands (cargo fmt --check, cargo clippy --workspace -D warnings, cargo test --workspace, cargo test herdr-plugin). Only a different clippy command is recorded in r2 proof; these are absent.",
+      "searched": [
+        "grep -iF \"cargo fmt\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"--workspace --all-targets\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"herdr-plugin/Cargo.toml\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_d05c662260e9d5128581fc96a66c06d2",
+      "sourceUnitDigest": "d45f617de90c039f",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+      "targetAnchor": "1-claim",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "P3 invocation kernel vertical slice heading; the kernel claim section carries the one-contract boundary and service responsibilities (different title)."
+    },
+    {
+      "claimId": "claim_e64b800c425e9aeabfe7001e2f3b2654",
+      "sourceUnitDigest": "bde904172fa5b92e",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+      "targetAnchor": "1-claim",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "\"The kernel exposes exactly one contract: OperationRequest -> ProviderOutcome; legacy-cli selectors never enter it\" is the kernel claim, with the legacy bypass in legacy-cli-transition."
+    },
+    {
+      "claimId": "claim_8f36febbbef5a0b00318aa552d8ba677",
+      "sourceUnitDigest": "57b5e0235cc8ab91",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+      "targetAnchor": "1-claim",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the P3 deliverables; content carried by kernel claim/preserved details and provider-routing (see next row)."
+    },
+    {
+      "claimId": "claim_4bb58b361010872dadfab11d31a82ea0",
+      "sourceUnitDigest": "1e755bcc2b7eebda",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+      "targetAnchor": "1-claim",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Typed requests/outcomes, EncodedMessage deferred to the external adapter, snapshot/exact selector, two-stage authority, async invoke/cancellation/event sink, pure Router separate from the InvocationService pipeline are carried across invocation-kernel, provider-routing, operation-provider, operation-catalog and component-protocol. Differs: \"deny by default\" ports, the single native op plus one fixture in a compile-time const array with no linker/cache/manifest scan until P7, and the in-memory remote projector proof are not stated."
+    },
+    {
+      "claimId": "claim_4ab3e6e21afab0c12743395ae708c75d",
+      "sourceUnitDigest": "4f29feb464af70cb",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P3 steps.",
+      "searched": [
+        "grep -iF \"P3 steps\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"failing tests for duplicate/missing bindings\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"build_snapshot\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_7c356f4986b78e8e534ba028cc9c367a",
+      "sourceUnitDigest": "7ecf431e67de61d1",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P3 steps: failing tests first, pure build_snapshot at the composition root, exact binding without priority fallback (provider-routing states no priority rule), pipeline, cancellation through an in-memory provider, independent CLI/remote projection, no host adapter imports another (host-use-cases peer rule), diagnostics in trace/evidence. The ordered TDD steps, build_snapshot and diagnostics-mode rule are absent.",
+      "searched": [
+        "grep -iF \"build_snapshot\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"failing tests\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"in-memory provider\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"diagnostics mode\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_52f5747b1cfac5ba88f2842044cf65c2",
+      "sourceUnitDigest": "18f30d2925bd0b83",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P3 exit gate and verify.",
+      "searched": [
+        "grep -iF \"P3 exit gate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"no async runtime\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Both host projectors\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_ce523f4693d5650f3b9318313ec44f5c",
+      "sourceUnitDigest": "9bd28c8cb6d9aa3c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P3 exit gate: both host projectors reach the same provider, negative cases fail closed, Router unit-testable with no I/O and no async runtime, no Node/process/filesystem/gateway dependency. Absent.",
+      "searched": [
+        "grep -iF \"no async runtime\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"same provider\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"unit-testable\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_170a6657616537761a61c5f21bd16795",
+      "sourceUnitDigest": "bed3893625ec1eb0",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P3 verify commands (cargo test --workspace host_runtime; invocation_service). Absent.",
+      "searched": [
+        "grep -iF \"cargo test --workspace host_runtime\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"cargo test --workspace invocation_service\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"host_runtime invocation\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_c365039c0ed792fe357dc32da00152d3",
+      "sourceUnitDigest": "2eb1dca280858c41",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P4 phase; the P4 deliverables/steps/gates are mostly not carried (only the bypass rule and manifest payload resolution are).",
+      "searched": [
+        "grep -iF \"P4 CLI adapter legacy exec\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"CLI adapter descriptor lookup\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"executable-relative\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_b45d296754409e2acbb77c0a4c1fef1b",
+      "sourceUnitDigest": "c9ead15358ca1152",
+      "targetOwner": "docs/platform/host-invocation-routing/spec.md",
+      "targetAnchor": "5-legacy-compatibility-rule",
+      "claimKind": "architecture",
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "rationale": "Legacy lane lives in the CLI adapter and bypasses the kernel: spec section 5 (recognize only the checked selector, keep args as OsString, no InvocationService), legacy-cli-transition (bypasses kernel), roadmap Phase A (one Node child, one lifecycle record). Explicit \"inherited stdin, signal forwarding\" is only covered by harness coverage; CommandRouteDescriptor lookup by the adapter is in command-route-descriptor."
+    },
+    {
+      "claimId": "claim_b4ee57b972d9fdd779cc2d35ed472925",
+      "sourceUnitDigest": "64db257c6ecfd0a5",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P4 deliverables list.",
+      "searched": [
+        "grep -iF \"P4 deliverables\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Candidate Rust fgos executable\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"ownership header\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_3c530d80d64e3352d8588bc11e13ac6a",
+      "sourceUnitDigest": "02bb057b55c4a040",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+      "targetAnchor": "1-contract",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Payload left in place, identified legacy-node, resolved through components.legacyNode.root from the release manifest (legacy-payload), recursion guard and one lifecycle record (roadmap Phase A). Differs: candidate Rust executable deliverable, executable-relative resolution, one record through the same shared recorder as InvocationService, and the bin/fgos.mjs ownership header plus root AGENTS.md note are not stated."
+    },
+    {
+      "claimId": "claim_d71514962368cda1b73909568d6a28a9",
+      "sourceUnitDigest": "700c462cc2172811",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P4 steps.",
+      "searched": [
+        "grep -iF \"P4 steps\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"args_os\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"PATH recursion trap\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_d9af584b6c9f0301147adddd40c434dc",
+      "sourceUnitDigest": "63a1e5305e649cb2",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P4 steps: ownership header, args_os scan of host-global options, release path from workspace activation binding independent of cwd, join(...) with root \".\" for dev:<rev> and libexec/legacy-node for staged, direct node invocation, private recursion marker, run every P1 case through both entries, PATH recursion trap and direct-spawn rejection, tier 0 shim in each resolver (bin-discovery.mjs, shell function, resolve_fgos). Only the join formula and \"tier 0 preferred\" are present.",
+      "searched": [
+        "grep -iF \"args_os\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"dev:<rev>\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"resolve_fgos\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"bin-discovery\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"recursion trap\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"libexec/legacy-node\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_6658f5892f1b4e7dc4004664844953ee",
+      "sourceUnitDigest": "56b6f4f25e1edabd",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P4 exit gate and verify.",
+      "searched": [
+        "grep -iF \"P4 exit gate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"legacy-compatibility.test\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Stable bytes\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_9344ec4f4abbe45957e9e660949bcc50",
+      "sourceUnitDigest": "bb69d75fc970b570",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P4 exit gate: stable bytes/status/fs effects match P1, route kind visible in diagnostics without changing output, Node directly runnable at named payload path, explain-command-route identifies owner and proof suite for every unmigrated selector. Absent as a gate.",
+      "searched": [
+        "grep -iF \"route kind\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"captured diagnostics\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"directly runnable\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"proof suite for every unmigrated\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_67f27db330eee764c88b7e7b98fa7aec",
+      "sourceUnitDigest": "345e76168d68f845",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P4 verify commands (legacy-compatibility.test.mjs; cargo test legacy_node). Absent.",
+      "searched": [
+        "grep -iF \"legacy-compatibility.test\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"legacy_node\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"cargo test --workspace legacy_node\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_70ebd393b20048105ee2d61ba1b80340",
+      "sourceUnitDigest": "a6a086eff09da509",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "P5 native version heading; native version proof is carried by the R1 required proof."
+    },
+    {
+      "claimId": "claim_bf701b781e21f7713e78936e64426dbe",
+      "sourceUnitDigest": "1934f7c22ca6a424",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the P5 deliverables."
+    },
+    {
+      "claimId": "claim_fe3f6f8ac10ba0e516faa2ba0669ab12",
+      "sourceUnitDigest": "93ddcf4d8a516e9a",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Typed distribution.build.show and CLI version projection with no-Node proof: r1 proof section 1 (version native, no Node process), release-boundaries (native distribution.build.show), operation-catalog (first native operation), roadmap Phase A (typed provider output, no Node child)."
+    },
+    {
+      "claimId": "claim_91db470727c7581589d7f5db966832d4",
+      "sourceUnitDigest": "83efc99d50a58a5a",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P5 steps.",
+      "searched": [
+        "grep -iF \"P5 steps\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"process spy\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"sorted public verb\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_36867e29d791ecbb5a8afb6510e047f6",
+      "sourceUnitDigest": "eb7ccd3eb74202aa",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P5 steps: port package version/product-checkout commit/sorted verbs, version equality with package.json, Git resolved against product root with null outside a checkout, embedded selector inventory, one envelope from the CLI presenter, differential cases, process spy. Absent.",
+      "searched": [
+        "grep -iF \"product-checkout commit\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"sorted public verb\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"process spy\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"null outside a checkout\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_f169b920f8e2999c9c22629b72ed863a",
+      "sourceUnitDigest": "c2576ce150bf538a",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P5 exit gate and verify.",
+      "searched": [
+        "grep -iF \"P5 exit gate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"version-parity\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"binding selects built-in\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_c0feb8d360ffddc02c84efc83661c458",
+      "sourceUnitDigest": "166de2f356a6b6b8",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R1 proof says version is native and creates no Node process. Differs: \"immutable binding selects built-in version\" and \"matches Node contract\" as the gate criteria are not stated."
+    },
+    {
+      "claimId": "claim_99639b47347fba434b9b7d4bd1327bb5",
+      "sourceUnitDigest": "82a35a6f1ff8a72f",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P5 verify commands (version-parity.test.mjs; cargo test distribution_build_show). Absent.",
+      "searched": [
+        "grep -iF \"version-parity\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"distribution_build_show\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"cargo test --workspace distribution\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_a79713a60f70e2b2c71c26a4a0982b65",
+      "sourceUnitDigest": "1634afc72aeec64a",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P6 cutover phase; most P6 steps and gates are not carried in the host-invocation targets.",
+      "searched": [
+        "grep -iF \"Installed-Entry Cutover\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"P6 distribution\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Distribution And Installed-Entry\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_8b2997b208e7079cfdc61218ee3d2a50",
+      "sourceUnitDigest": "1d656023f93305b3",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Release table includes fgctl install/activation/rollback proof in R1 and vision/README say fgctl owns install/activation. Differs: \"P6 is part of R1, not late cleanup\", \"builds the release tree fgctl consumes\", and the statement that the libexec layout is superseded by the release tree manifest are not stated."
+    },
+    {
+      "claimId": "claim_a75423d87fabcab32bdaba2f464b3881",
+      "sourceUnitDigest": "76c1e7d61b33696a",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P6 steps.",
+      "searched": [
+        "grep -iF \"P6 steps\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"fgctl uninstall\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"src/setup/checks.mjs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_9ee3c1e8a270afbecd9d993057f83607",
+      "sourceUnitDigest": "25e866e682f0ec8e",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P6 steps: release tree build (roadmap names build-rust-distribution.mjs), reproducible artifact, fgctl init clean/repeated against an external project, fgctl upgrade/repair rollback, fgctl uninstall, doctor check registrations (Rust binary/runner/Node payload/drift/registry/integrity), safe fixes registries, README/CHANGELOG and fgos setup migration, separately revertible entry flip, compatibility window observation. Roadmap Phase C and r1 proof carry the preview outcome only; doctor registration, registries, docs/CHANGELOG and separate-flip obligations are absent.",
+      "searched": [
+        "grep -iF \"src/setup/checks.mjs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"CHANGELOG\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"separately revertible\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"safe fixes\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_4c0106ddaba03877864b6ae2abb98c73",
+      "sourceUnitDigest": "e268462ef10c3b7c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the P6 exit gate and verify.",
+      "searched": [
+        "grep -iF \"P6 exit gate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"missing Node payload\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"within the P1 performance-gate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_d4cc5fce1718a48b3f1510a87eb47273",
+      "sourceUnitDigest": "df2efdbe1065777b",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P6 exit gate: all targets pass P1/P5 through fgctl init from outside the repo, missing Node payload diagnosed before legacy invocation, broken runner payload diagnosed separately, no implicit build/download outside fgctl, rollback restores one complete prior release, perf thresholds hold. Only generic external-consumer proof exists.",
+      "searched": [
+        "grep -iF \"diagnosed before legacy\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"broken runner payload\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"implicitly outside\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"complete prior release\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_76de093f955dea43ee8202b61fd82aa3",
+      "sourceUnitDigest": "371cd71299f3f7c1",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "verification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Verify commands npm test, cargo test --workspace, node --test test/install-packaging.test.mjs appear verbatim in r1 proof section 4."
+    },
+    {
+      "claimId": "claim_23895431539495abbc82161abcb35e9d",
+      "sourceUnitDigest": "d4563d252f032faf",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Add explicit matrix commands after the remaining target-matrix and preview-vs-stable decisions land. Not stated; the target matrix decision itself is absent.",
+      "searched": [
+        "grep -iF \"matrix commands\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"target-matrix\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"explicit matrix commands\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_2aa069b8a259de3dda82fc48c4d48324",
+      "sourceUnitDigest": "d50f37288d0382c6",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "targetAnchor": "verification-r2-external-process-proof",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "P7 external process provider preview heading corresponds to the R2 external process proof document."
+    },
+    {
+      "claimId": "claim_0d786a42ec0d0eb88bfad2d38909ace5",
+      "sourceUnitDigest": "045ef706aafe9626",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Pointer to external provider protocol plus \"EncodedMessage introduced here, built-in providers never carry it\": component-protocol (EncodedMessage used only at the external boundary) and invocation-kernel (built-ins never decode EncodedMessage)."
+    },
+    {
+      "claimId": "claim_c371125b0a8a3ecdf03a2fdfbdea9290",
+      "sourceUnitDigest": "a4c4fc5a1927b63d",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the P7 steps; R2 required proof carries them."
+    },
+    {
+      "claimId": "claim_51cc2bb9b57c4e57f4d874cedc48d5e1",
+      "sourceUnitDigest": "2601da12c9b64e7b",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R2 required proof and packet shape carry static manifest validation without execution, handshake, framed protocol, bounded supervision/backpressure/cancellation/crash/completion-unknown, namespace/duplicate/unknown-capability refusal and a fixture through the router. Differs: handshake drift refusal, invoking the fixture through CLI and remote test projectors, and \"keep roots explicit and test/dev-scoped, defer broad ecosystem discovery\" are not stated."
+    },
+    {
+      "claimId": "claim_f78bf014e8a8b9db8499245ad280594e",
+      "sourceUnitDigest": "69a30193bb494176",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "targetAnchor": "6-r1-preview-proof-unaffected",
+      "claimKind": "verification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the P7 exit gate and verify."
+    },
+    {
+      "claimId": "claim_446d721d407f7da7777d6d7598181d1d",
+      "sourceUnitDigest": "eb23d168a9c79391",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "targetAnchor": "unheaded-block-12",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R2 proof: negative cases fail closed, no R1 composition-root change, legacy-cli unaffected (also legacy-cli-transition). Differs: \"built-in and process providers are distinguishable through one router\" is not stated."
+    },
+    {
+      "claimId": "claim_57d3b9749e5c2300873b408d8bd4bff3",
+      "sourceUnitDigest": "e6d6eb8789e7a770",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P7 verify commands (cargo test external_process; node --test external-provider.test.mjs). R2 proof records different closing commands; these are absent.",
+      "searched": [
+        "grep -iF \"external-provider.test.mjs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"cargo test --workspace external_process\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"node --test test/rust-host/external\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_336d6a1de7dfd1440b2165423909e544",
+      "sourceUnitDigest": "e768b0c2fe571acb",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "targetAnchor": "verification-r3-remote-peer-proof",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "P8 production remote native route heading corresponds to the R3 remote peer proof document."
+    },
+    {
+      "claimId": "claim_a8936ca958a19b57756c7f1451c3d4ae",
+      "sourceUnitDigest": "da5b1e0d0c62ae65",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "targetAnchor": "11-selected-route-r3-p0-2026-09-17",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R3 selects GET /v1/runtime for distribution.build.show first. Differs: \"unless another already-native read has more product value\" and \"do not choose a Node-only route merely to justify a bridge\" are not stated."
+    },
+    {
+      "claimId": "claim_4951927a0e6f131730d27ccdc6440e06",
+      "sourceUnitDigest": "cff68ebe490a454b",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "targetAnchor": "13-route-wiring-and-hard-regression-proof-r3-p2-r3-p3-2026-09-18",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the P8 steps; carried by route wiring and regression proof."
+    },
+    {
+      "claimId": "claim_f3a7761da9b79fcd907b36c8b2c83df1",
+      "sourceUnitDigest": "283c93b439b405ac",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "targetAnchor": "13-route-wiring-and-hard-regression-proof-r3-p2-r3-p3-2026-09-18",
+      "claimKind": "procedure",
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "rationale": "Remote projector/presenter around the shared service, only the selected route replaced, gateway auth preserved, no CLI spawn/fgos.v1 parse (r3 proof 1.3 and 2); untouched routes stay on VerbGateway with an explicit consumer list and VerbGateway not deletable until consumers are empty (r3 proof section 3, release boundaries); Node semantic bridge per operation (legacy-cli-transition). Not explicit: validation/rate/session context and CLI/remote semantic equality tests."
+    },
+    {
+      "claimId": "claim_95fde7454b1d6cc39c22b450f21f72d1",
+      "sourceUnitDigest": "e60d710668cb013a",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "verification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the P8 exit gate and verify."
+    },
+    {
+      "claimId": "claim_9457144f140ce0f5c9c64f3063e3776f",
+      "sourceUnitDigest": "3fe745ace291d658",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "verification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "One production route as true peer invocation, remaining old routes visible (inventory), no fgos.v1 fallback: r3 proof sections 1 and 3."
+    },
+    {
+      "claimId": "claim_c6fb2d851a8aed27c31af82f9056a862",
+      "sourceUnitDigest": "779f96f96e05bf79",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R3 proof records different focused commands (cargo test --manifest-path apps/fgos-gateway/Cargo.toml ...) instead of herdr-plugin cargo tests and npm test."
+    },
+    {
+      "claimId": "claim_cbdba798349c777e7f15979d300e0142",
+      "sourceUnitDigest": "7c6a82426019f1aa",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "7-phase-d-add-the-next-native-read-route",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "P9 next native read heading corresponds to roadmap Phase D (add the next native read route)."
+    },
+    {
+      "claimId": "claim_2bc13328f1e7a4d1ac848c004a8a0952",
+      "sourceUnitDigest": "fe1cd3e68c4ddee0",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "7-phase-d-add-the-next-native-read-route",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Roadmap Phase D carries gate-bypass as candidate, no fake gate-policy component, confirm ownership first, writers out of scope, native/legacy no drift. Differs: freeze precedence/malformed fixtures, consume resolved project context, prove zero writes and zero Node spawn, flip binding separately from Node deletion, and \"choose another settled read if ownership unclear\" are not stated."
+    },
+    {
+      "claimId": "claim_61d6d1de22e22af7eb3be3da75284378",
+      "sourceUnitDigest": "4cbffbcd3dd2a051",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "A native provider never blocks on human input and returns parked: node-to-rust-migration migration rules and operation-request-outcome human input section."
+    },
+    {
+      "claimId": "claim_137e7e29c20b6ff1f4855d7f465055ea",
+      "sourceUnitDigest": "88c6fc55695ee809",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "P9 verify commands (gate-bypass-parity.test.mjs; cargo test --workspace). Absent.",
+      "searched": [
+        "grep -iF \"gate-bypass-parity\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"gate-bypass parity\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"gate-bypass-parity.test.mjs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_ca69fde84ef390b737cc841f2e0722f8",
+      "sourceUnitDigest": "d847299e78dc5622",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the test and review gates section; no target has the per-gate proof table.",
+      "searched": [
+        "grep -iF \"Test And Review Gates\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Per commit\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Required proof | gate\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_ed367a232471867cbc3fb24c44d1baf6",
+      "sourceUnitDigest": "f74581052989fd52",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Gate table: per commit, R1 integration, R1 release, R2, R3 and future writer proof (replay, lock, atomicity, recovery, idempotency, mutual exclusion, rollback compatibility). Not carried.",
+      "searched": [
+        "grep -iF \"R1 integration\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"replay, lock, atomicity\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"mutual exclusion\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"rollback compatibility\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_de0f6932bac03ad628e2470515e7fb5f",
+      "sourceUnitDigest": "1713181ec507039a",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Evidence rules: process-spy not timing for no-spawn claims (perf gates the one timing exception), filesystem snapshots for zero-write, explicit timestamp predicates, never normalize arbitrary differences. Absent.",
+      "searched": [
+        "grep -iF \"process-spy\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"filesystem snapshots\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"timestamp predicates\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"normalize arbitrary\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_c245c752125bfa748075cb620216e537",
+      "sourceUnitDigest": "61bbe41eda82d22b",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the commit and rollback slices section; the independently revertible slice list is not carried.",
+      "searched": [
+        "grep -iF \"Commit And Rollback\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Independently revertible\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"revertible slices\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_88d182e8f7f1827e07da42ec9d992e49",
+      "sourceUnitDigest": "9fd2971f5a68d555",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in \"Independently revertible slices:\" for the 12-slice list.",
+      "searched": [
+        "grep -iF \"Independently revertible\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"revertible slices\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Independently revertible slices:\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_b9014c66550a776442837dad43e46a3b",
+      "sourceUnitDigest": "1332a50a9227ba20",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "12 independently revertible slices (harness, workspace, kernel, Node compat, native version, artifacts, init/doctor tests, entry flip, process protocol, first remote route, each native binding, each Node deletion). Absent.",
+      "searched": [
+        "grep -iF \"harness and generated selector artifact\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"workspace skeleton\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"init/doctor and external install tests\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Node deletion after observation\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_add5109449e2f6aefc7489ff836f0734",
+      "sourceUnitDigest": "191ee8f2ec30c185",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Release-boundaries row, vision and baseline say rollback of native R1/R2 is release rollback through fgctl, not a runtime provider-selection toggle; provider-routing says config cannot replace built-ins; node-to-rust-migration forbids dual-running writes. Differs: discard candidate binary before P6, ActivationRecord.previousArtifactDigest plus preserved release directory, \"roll back one native read by changing its binding in code and shipping a release\", never auto-retry a writer, and never delete a Node writer before cross-version recovery is proven are not stated."
+    },
+    {
+      "claimId": "claim_245edf82638eebaa26df985249540c8c",
+      "sourceUnitDigest": "3b1b5c1e57f44255",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the risks and controls table; no target carries the risk register.",
+      "searched": [
+        "grep -iF \"Risks And Controls\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Risk | Control\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"risk register\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_ce5758286602f8062fe2c8ac0d709f22",
+      "sourceUnitDigest": "97e3ab6e301065b6",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "14 risk/control pairs. Carried in spirit: legacy flags not re-parsed (spec section 5), no double envelope (legacy-cli-transition), silent override (provider-routing), capability escalation (two-stage authority), remote wraps CLI (r3 proof), crash becomes success (completion unknown). Absent: hash drift corpus, wrong-root fixtures, \"ship without install\", fgos-runner release mismatch, checkout-only success, doctor mutating, fake proof component, workspace absorbing Herdr, diagnostics breaking output.",
+      "searched": [
+        "grep -iF \"Hash drift\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Wrong root\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Workspace absorbs\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"checkout-only success\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim",
+        "grep -iF \"Fake proof component\" over all markdown files under docs/platform/host-invocation-routing/ (excluding forbidden names): no matching claim"
+      ]
+    },
+    {
+      "claimId": "claim_a264e3ef292f50c6f56a33929e6b8db5",
+      "sourceUnitDigest": "fb1f2858cb6dd6e4",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "verification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Definition of done heading; the R1 required proof section states the done criteria (changed form)."
+    },
+    {
+      "claimId": "claim_ab8c5d3c7ef7884ec870084364b54da4",
+      "sourceUnitDigest": "d23a0b885629b565",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R1 proof states done when Rust entry, unmigrated selectors reach Node, native version with no Node, fgctl install/init/doctor/upgrade/rollback/uninstall reproducible; R2 and R3 proofs carry their own closure. Differs: init/doctor diagnosing every new dependency, npm/workspace/Herdr tests green at owning gates, \"architecture owns contracts, this file no competing design\", and the stranger-from-reading-map reproducibility criterion are not stated."
+    }
+  ]
+}

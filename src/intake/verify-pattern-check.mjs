@@ -18,14 +18,14 @@
 
 // tsk-12t D1/D2/D4: mechanical pre-check for the documented `node --test`/
 // `--test-name-pattern` reporter-format trap
-// (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md) --
+// (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md#the-trap) --
 // Node's default reporter never prints a TAP-style `# pass`/`# fail` line,
 // so a verify grepping for that shape can never correctly detect pass/fail
 // regardless of what the tested code does. Gated on BOTH the wrong-reporter
 // grep shape AND a reference to `node --test`/`--test-name-pattern` (D2) —
 // scoped to the how-to doc's own documented trap, not a bare ban on any
 // TAP-style text.
-const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/how-to/avoid-vacuous-pass-with-node-test-test-name-pattern.md';
+const KNOWN_BAD_VERIFY_PATTERN_DOC = 'docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md';
 const NODE_TEST_REFERENCE_RE = /node\s+--test\b|--test-name-pattern\b/;
 const WRONG_REPORTER_GREP_RE = /\^#\s*(pass|fail)\b/;
 

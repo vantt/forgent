@@ -2,7 +2,7 @@
 # herdr-cockpit.sh — the official fgOS operator cockpit (P40/D d3dbe7f5,
 # supersedes the tmux-based D ef6ed305). herdr only arranges panes; every
 # pane runs the real fgOS CLI standalone (chrome only — see the hard rule in
-# docs/operator-runbook-herdr-cockpit.md). Must run from inside a
+# docs/platform/herdr-web-dashboard/operations/operator-runbook.md). Must run from inside a
 # herdr-managed pane (HERDR_ENV=1).
 set -euo pipefail
 

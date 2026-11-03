@@ -380,7 +380,7 @@ scope across two separate rounds.
 
 ---
 
-**Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` and
+**Source:** `docs/history/phase-2-status-category-schema/CONTEXT.md` at `947dc310396071a4d530216d5c06d05993d63bf5` and
 `DISCUSSION.md` (tsk-38t, D1-D6, settled 2026-08-04 via a 12-round
 `fgos-coding-shaping` session); work-item capture via `fgos check tsk-38t`
 and `fgos check tsk-38t-1`; `docs/decisions/0027-domain-so-huu-status-

@@ -1,7 +1,7 @@
 # Example family: clarification and challenge
 
 Clarify is real and grounded in
-[P01.3](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/dialogue/1-impact.md).
+[P01.3](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/dialogue/1-impact.md).
 No real session to date sent a pure `challenge` (a dispute of a specific
 claim, as opposed to a clarify or a new fact) — the challenge half below is
 constructed for illustration, grounded in a live, unresolved disagreement
@@ -64,13 +64,13 @@ turn below must attack what was actually recommended, not a stronger
 straw version of it: fixing the shell's launcher bugs "is notoriously
 complex state-machine engineering... by successfully engineering this
 coordination, you deeply entrench the multi-process architecture"
-([`critiques/architecture-critic.md`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/critiques/architecture-critic.md)).
+([`critiques/architecture-critic.md`](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/critiques/architecture-critic.md)).
 **What the real recommendation actually commits to, and what it explicitly
 does not:** put the shell in CI, fix three specific, deterministic bugs
 (silent fallback, wrong-port connection, raw-bind-host URL), ship
 telemetry — and, in the same breath, decline the harder cold-start-race
 coordination work Attack 1 worried about most
-([`explanation.md:18`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/explanation.md),
+([`explanation.md:18`](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/explanation.md#what-we-think-you-should-do),
 Step 4: "Do not build robust cold-start coordination yet"). A challenge
 that accuses the panel of recommending the declined work would be
 attacking a position nobody holds. This one attacks the part that was
@@ -92,7 +92,7 @@ legitimate here, and the coordinator does not get to pick the flattering
 one:
 
 1. **Defend, no reopen.** The real
-   [`synthesis.md:83`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/synthesis.md)
+   [`synthesis.md:83`](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/synthesis.md#attack-1--stay-thin-reversibility-illusion-architecture-critic-high-decision-impact--live)
    already states this exact posture toward Attack 1, precisely enough to
    quote rather than paraphrase: *"partially concessive, not resolving.
    Step 4 declines exactly the state-machine work Attack 1 names as

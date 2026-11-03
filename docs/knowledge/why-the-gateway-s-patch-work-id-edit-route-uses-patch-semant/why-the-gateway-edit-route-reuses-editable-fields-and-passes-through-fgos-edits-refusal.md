@@ -7,7 +7,7 @@ mode: explanation
 # Why the gateway edit route reuses EDITABLE_FIELDS and passes through `fgos edit`'s refusal
 
 The gateway's `/v1` surface had `GET /work/{id}` but no way to edit an
-item — `POST /work` only adds. `docs/ui-spec/modals/M03-add-edit-item.md`'s
+item — `POST /work` only adds. `docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md#m03-add-or-edit-a-work-item`'s
 edit mode already assumed an edit effect
 (`run_fgos_add_or_edit_verb`), so the UI spec was resting on an endpoint
 that didn't exist yet; the next item touching the task-detail screen
@@ -47,7 +47,7 @@ layer.
 ## Why this route had to land before tsk-2ok, not after
 
 This item's own footprint (`herdr-plugin/src/gateway.rs`,
-`docs/contracts/fgos-gateway-api-v1.yaml`) overlaps two siblings already
+`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`) overlaps two siblings already
 touching the same file — `tsk-54y` (CORS + bind) and `tsk-48w`
 (static-serving) — so none of the three could run concurrently with each
 other; they had to sequence through `gateway.rs` one at a time.

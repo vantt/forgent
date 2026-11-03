@@ -108,7 +108,7 @@ nhặt entry nào khai `capability`):
 > mechanism nằm ở `invocations[0].via`/`.command` — KHÔNG còn ở `kind`
 > nữa (tsk-in1-4 D5: `kind` giờ là trục BẢN CHẤT `agent`/`tool`, tách
 > khỏi trục CƠ CHẾ GỌI `invocations[].via`; xem "The curated
-> `runner.capabilities` catalog" ở trên và `docs/specs/runner.md` RUL41
+> `runner.capabilities` catalog" ở trên và `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` RUL41
 > cho toàn bộ thiết kế). `via: "mcp"` chỉ cần `command` (định danh, không
 > `args`, `validateInvocationShape`'s "gate B1" không ép hình dạng
 > executor lên nó); `via: "cli"` cần đủ `command`+`args` như 1 executor
@@ -124,7 +124,7 @@ must be unique within `executors`, which the engine already guarantees
 `invocations[0].via`/`.command` — no longer in `kind` (tsk-in1-4 D5:
 `kind` is now the BAN CHAT axis, `agent`/`tool`, separate from the CO CHE
 GOI axis `invocations[].via`; see "The curated `runner.capabilities`
-catalog" above and `docs/specs/runner.md` RUL41 for the full design).
+catalog" above and `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` RUL41 for the full design).
 `via: "mcp"` only needs `command` (an identifier, never `args` —
 `validateInvocationShape`'s "gate B1" never forces the executor shape
 onto it); `via: "cli"` needs the full `command`+`args` shape a real

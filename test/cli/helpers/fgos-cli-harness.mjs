@@ -207,7 +207,7 @@ function stateView(cwd) {
   return view;
 }
 
-// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+// tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): `todo -> doing`
 // is retired from status-fsm.mjs's TRANSITIONS table -- nothing durably
 // writes INTO `doing` anymore. Most fixtures needing an effective-'doing'
 // item should claim through `take`/`pick` instead (a real runtime claim) --
@@ -469,7 +469,7 @@ function addGoalItem(cwd, id, goalTier = 'mvp') {
 
 function toProposed(cwd, id) {
   addOk(cwd, id);
-  // tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+  // tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): `todo -> doing`
   // is retired from status-fsm.mjs's TRANSITIONS table -- durable 'doing' is
   // never written at all anymore. This fixture never wanted a real claim
   // (no branch, no headAtTake) -- it goes straight `todo -> awaiting-

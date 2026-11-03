@@ -6,7 +6,7 @@ Status: DONE_WITH_CONCERNS. Branch `controller-death/p06-docs` (2f95797d5, 44146
 - Red test first, then fix: `deriveUnitState` treats `settlement: abandoned-legacy` as closed (probe answers `legacy-run`). Test in `inspect-recover-adopt.test.mjs`, failed before, passes after.
 - Doctor checks `legacy-attempts-stuck` (on `findLegacyStuck`/`judgeLegacyHolders`/`sweepLegacy`, no second walker; recover door injected by `registrations.mjs` for layering; fix prints reason per kept run), `units-awaiting-resume` (via `listAssignmentRuns` + `unitDirOfAssignment` + `deriveUnitState`; warn only), `cancel-wait`.
 - One reader for both keys: `readCancelWaitMs`/`resolveCancelWait` moved into `gate-kill-grace.mjs`; `cancel-registry.mjs` no longer reads config; `run.mjs` and its test import the new place.
-- Docs: run-supervisor spec §9.1 + §14 rows + §16 entry; runner RUL104 + decision section; intent ledger PF-I011/PF-I012; io-contract 130/143; distribution #7/#7b lists + rows 7h-7j; reading-map; CHANGELOG (Added/Changed/Fixed).
+- Docs: run-supervisor spec §9.1 + §14 rows + §16 entry; runner RUL104 + decision section; intent ledger PF-I022/PF-I023; io-contract 130/143; distribution #7/#7b lists + rows 7h-7j; reading-map; CHANGELOG (Added/Changed/Fixed).
 - Named limits written: `gate-lost` not relaunched on resume (fail closed, r6 §9.7), relaunch-on-resume deferred (needs gate-side marker before GO); automatic resume deferred.
 
 ## Decisions

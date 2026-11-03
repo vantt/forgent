@@ -2,9 +2,9 @@
 # Shared fragment: citation-format
 
 tsk-37i: fgOS has three citation ID systems, each with a different
-lifetime and scope — global-permanent (`ADR<n>`, `docs/decisions/*.md`),
+lifetime and scope — global-permanent (`ADR<n>`, `docs/platform/<area>/decisions/`),
 area-scoped-reset-per-file (`RUL<n>`, resets inside each
-`docs/specs/<area>.md`), and feature-scoped (`D<n>` "D-local",
+`docs/platform/<area>/spec.md`; split rules use the exact owning subcomponent `spec.md`), and feature-scoped (`D<n>` "D-local",
 `docs/history/<feature>/CONTEXT.md`). That 3-tier shape is correct and
 stays as-is — upstream project `beegog` independently converged on the
 identical structure, recorded in
@@ -32,7 +32,7 @@ Bad:   9999
 Bad:   RUL99
 Bad:   RUL99 (runner)   <- an area-name-only suffix satisfies the
                             OLDER, narrower area-suffix convention
-                            (docs/id-systems-audit.md) but not this
+                            (docs/platform/documentation/history/id-systems-audit.md) but not this
                             rule -- a real one-line gloss of what the
                             id actually says is required, an area
                             name alone is not enough
@@ -49,7 +49,7 @@ Bad:   RUL99 (runner)   <- an area-name-only suffix satisfies the
 
 **D-local — never cite outside its own `CONTEXT.md` at all, gloss or
 not.** This is not a new rule — it is decision `0017`
-(`docs/id-systems-audit.md` §5), already locked, previously unenforced.
+(`docs/platform/documentation/history/id-systems-audit.md` §5), already locked, previously unenforced.
 A `D<n>` id belongs to exactly one feature's own
 `docs/history/<feature>/CONTEXT.md` and is not a portable reference the
 way `ADR`/`RUL` are. Citing it anywhere else — even with a gloss attached
@@ -94,7 +94,7 @@ companion tool, see
 design record) detects two finding kinds relevant to this rule —
 `bare-citation` (an `ADR`/`RUL` id with no qualifying gloss) and
 `d-local-outside-home` (a `D<n>` id in any file that is not its own
-`CONTEXT.md`) — across `docs/backlog.md`, `docs/specs/*.md`, and any
+`CONTEXT.md`) — across `docs/backlog.md`, recursive `docs/platform/**/spec.md` (including subcomponents), retained legacy specs when present, and any
 `--skills-dir` root given to it. It ratchets against a checked-in
 baseline (`scripts/check-decision-citation-drift.baseline.json`): a
 citation already known at the time the baseline was generated stays
@@ -102,3 +102,13 @@ visible in the tool's own output but does not fail `npm test`; a
 genuinely new one does. `--write-baseline` regenerates the snapshot —
 run it after a cleanup batch to shrink the baseline, never by
 hand-editing the JSON.
+
+## Decision homes after the authority cutover
+
+Decision narratives live under `docs/platform/<area>/decisions/`; RUL ids belong
+to the area spec, or its explicitly mapped subcomponent spec when the area is split.
+Use `docs/platform/governance.md#decision-scope-to-holder-table` to resolve
+read-first, fact/rule and narrative homes, including renamed area scopes.
+`docs/decisions/index.md` remains a generated projection, not a narrative home.
+Scope is free text persisted verbatim by `fgos decision --scope`; this table is
+reader routing, not a new scope enum or a second decision store.

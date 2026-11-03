@@ -79,7 +79,7 @@ export async function mergeNext({ dir, cwd, repoRoot }, { acknowledgeIronLaw, ap
   // nothing to go stale).
   const wouldTripIronLaw = (candidateId) => {
     if (acknowledgeIronLaw === true) return false;
-    // Trunk-boundary scoping (docs/decisions/0032, tsk-1y6-1 D1): at
+    // Trunk-boundary scoping (decision 0032, tsk-1y6-1 D1): at
     // `warn` the real gate inside `approveUseCase` below never refuses, so
     // a candidate this pre-check parked would be a skip nothing was ever
     // going to block.

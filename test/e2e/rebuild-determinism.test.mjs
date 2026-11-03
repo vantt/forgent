@@ -89,7 +89,7 @@ test('rebuild-determinism: init, add work with deps + unicode title, move throug
 
   // Move each item through a distinct path, always with --expect (CAS),
   // so the whole journey proves precondition + CAS on real transitions.
-  // tsk-40m (docs/architect/doing-coordination-redesign.md): todo -> doing
+  // tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): todo -> doing
   // is retired -- no real claim needed here (no branch), straight
   // todo -> awaiting-approval via the redesign's own new direct edge.
   assert.equal(move(cwd, 'a', 'awaiting-approval', 'todo').status, 0);

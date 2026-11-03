@@ -592,7 +592,7 @@ export function cliSpawnAdapter(invocation, opts) {
  * confinement authority know what a herdr seat is (a pane a person can watch, a prepared exact
  * invocation, a receipt), but it is never run through `execute`: an interactive agent runs as a
  * `terminal` attempt of the run supervisor (`executeAssignment`, which prepares the brief, the pane
- * and the folder-trust entry and hands the attempt over; docs/specs/runner.md). A caller that reaches
+ * and the folder-trust entry and hands the attempt over; docs/platform/run-supervisor/spec.md). A caller that reaches
  * this function directly has no attempt to hand over and is refused by name.
  */
 /**

@@ -26,7 +26,7 @@ That test caught every prior addition — it's an `assert.deepEqual` on the
 full sorted id list, so a new check that isn't added to the array (or an
 old one accidentally removed) fails the suite immediately.
 
-`docs/specs/distribution.md`'s Data Dictionary #7 row had no equivalent
+`docs/platform/packaging-distribution/spec.md#data-dictionary`'s Data Dictionary #7 row had no equivalent
 guard. Before this item, it read:
 
 > `node-and-git` (Node/git present), `shell-integration-sourced` (helper
@@ -68,7 +68,7 @@ be stale, not a live source of truth.
 
 `tsk-4y2` closed the specific instance of this gap named above: no test
 existed comparing `registerCheck`/`registerFit`'s real registered ids
-(`src/setup/registrations.mjs`) against `docs/specs/distribution.md`'s
+(`src/setup/registrations.mjs`) against `docs/platform/packaging-distribution/spec.md#data-dictionary`'s
 Data Dictionary #7/#7b rows — confirmed by grepping `test/` for
 `distribution.md`, which returned nothing. Without that guard, the same
 drift this document describes was already primed to repeat: `tsk-2jc`
@@ -106,7 +106,7 @@ unless the new guard actually worked. `tsk-2m5` (adding a
 of exactly that scenario, and confirms the guard held:
 
 > "adding `herdr-orchestrator-configured` also needs
-> `docs/specs/distribution.md`'s Data Dictionary row #7 updated, or
+> `docs/platform/packaging-distribution/spec.md#data-dictionary`'s Data Dictionary row #7 updated, or
 > `registrations.test.mjs`'s enumeration test fails."
 > — real commit message, `f14f1175`, branch `fgw/tsk-2m5`
 

@@ -1,0 +1,840 @@
+{
+  "version": 1,
+  "shard": "b-io-contract",
+  "sources": [
+    "docs/io-contract.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_9466cce125cf03619e4d50ff9f340dcb",
+      "sourceUnitDigest": "f72297b85c91b398d8341653aabae3add3e9cfc3079149c05b594d543b853d8a",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "1-purpose-and-scope",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9353",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "11a6e0e929f3ed69d0f883a5385618ea167d7902bd97f767fd7b0540f085ba52",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9353"
+    },
+    {
+      "claimId": "claim_1b5bd12129cc41ea75fc7dd3993142f3",
+      "sourceUnitDigest": "476e7efba05e358ccd01c95cbfb350eca1cc6a7905d784c5651cb99960515322",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9354",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "fb2a927391a144152bec76f586c13c1fcba302d284ddf5c00776250504d1fbd1",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "1. Purpose And Scope"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9354"
+    },
+    {
+      "claimId": "claim_882ee3f986d0dacee87764a5b6bb75d8",
+      "sourceUnitDigest": "accb25b08ef0d839f5a86e898250752fc12d3dac678c12fb5776e0743e68001c",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9355",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "accb25b08ef0d839f5a86e898250752fc12d3dac678c12fb5776e0743e68001c",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "1. Purpose And Scope"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9355"
+    },
+    {
+      "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "chiều-vào-verb-danh-tính",
+      "sourceUnitDigest": "a8638afcbc30af3cfed8ddecb38f890e54215f551afcbd9a9d09d23c02d8bce3",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9356",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "2-input-direction-verb-and-identity",
+      "reviewNote": "deep: read source and target sections and diffed them: replace src [Chiều vào — verb + danh tính Mọi thao tác ghi đi qua đúng **một cửa**: gọi verb của `bin/f] tgt [2. Input Direction Verb And Identity]; every difference is disclosed by the rationale; anchors exist; source digest a8638afc and target digest 7c4e0214 recompute; frozen prose equals the frozen list and the committed shard row at HEAD; latest prior verdict ok at the same digests",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-frozen-03-62751458b.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "7c4e0214ec4c8c108c24c1b00a560516fbc5de0bc1a26d70a082eca5ccafb23c",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9356"
+    },
+    {
+      "claimId": "claim_426f29d1e11055574c203d89cba84cc7",
+      "sourceUnitDigest": "4d3e5ba86bd907aba25dfcc099af5e2891236ac44ec6aac4eb3e2fc2bd2a5c83",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9357",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "4d3e5ba86bd907aba25dfcc099af5e2891236ac44ec6aac4eb3e2fc2bd2a5c83",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Single Write Door"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9357"
+    },
+    {
+      "claimId": "claim_b5ef9b491d020583ac6ca1379e4115a0",
+      "sourceUnitDigest": "eed0b8520401ce77b1b75379282e339007dd17d09e38cccd31ba0efad4e0a4dd",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9358",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "eed0b8520401ce77b1b75379282e339007dd17d09e38cccd31ba0efad4e0a4dd",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Identity"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9358"
+    },
+    {
+      "claimId": "claim_cb629f70ad6029530d70253f96ad3221",
+      "sourceUnitDigest": "bd8b780f96dd2ecc5b5f628c94f6b5b30a5a09eb139ef809d5b9334cd25d5992",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9359",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "bd8b780f96dd2ecc5b5f628c94f6b5b30a5a09eb139ef809d5b9334cd25d5992",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Identity"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9359"
+    },
+    {
+      "claimId": "claim_153f56c2d5a2e895f8e6b2607bb7ab3d",
+      "sourceUnitDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-14",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9360",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "25e4a007d2fc9a153cb3273376471f15e4bfca5c257f0c8bf06d1dd6af198770",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Caller Role"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9360"
+    },
+    {
+      "claimId": "claim_e9c39f67bc2eab533faa3053ff482708",
+      "sourceUnitDigest": "e067ab7149569e512622147ea6100a60c966d66751d0e4058bf7e78d06be9f8d",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "3-output-direction-unified-envelope",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9361",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "01eac1846cb1ba744cb0732c6b1b4773335a34f63361db7824958afeca36e989",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9361"
+    },
+    {
+      "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
+      "sourceUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-16",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9362",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "6dcf0faa76d27fed777c0586dad2b3b78200213c58d5606ad5e901e81e13e6fa",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Envelope Shape"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9362"
+    },
+    {
+      "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
+      "sourceUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-17",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9363",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "18c5d821a55d3517cf3efe368fb1d34e13730b3bc1d70ff376d72b147621bdd2",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Envelope Shape"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9363"
+    },
+    {
+      "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
+      "sourceUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-18",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9364",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "84367855d92bb2e3914cb9bc385c2dce9b5625c8acaf9e577c9c791e40d07e71",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Envelope Shape"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9364"
+    },
+    {
+      "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
+      "sourceUnitDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-21",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9365",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "6a5b9a01b04279716a3d504e251d1de122ff1652714708512706640ec9edd4ca",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Runner Stdout Envelope"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9365"
+    },
+    {
+      "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
+      "sourceUnitDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-22",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9366",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "bdeca0144b587f826ce46ea61d3be2e882ad021614d1e5f7c14cf2982573f056",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "3. Output Direction Unified Envelope",
+        "Recognizing A Real Envelope"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9366"
+    },
+    {
+      "claimId": "claim_f50b3640275fce5d0a7e8d4f4077c0c9",
+      "sourceUnitDigest": "f985a572644eee3e4fdf9f719940e9078fecbc2c2fe0ec50ff8cd7fdfdbd67f7",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "4-exit-codes",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9367",
+      "authoredBy": "codex-session:unit-run-1792052396770-6f1c5957@2026-10-15",
+      "targetUnitDigest": "a029b383e97c19e4f3b02c023dee86e46857fbf21c1429b169d5568fd40e723f",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9367"
+    },
+    {
+      "claimId": "claim_27d4d4dca46d6a8859628c443df0b31e",
+      "sourceUnitDigest": "413cdab72d47c625b9d5ebcc87a18b8ee1a05a85ac6aee0ad9a56e5adad017df",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "6-cursor-pagination",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9368",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "302bf7838a49e51804feb94da762bf7a0422cbe76ee2e49a3c32836d23f3ae6a",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9368"
+    },
+    {
+      "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+      "sourceUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-29",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9369",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "c34e8e9c9dbf41ceba76b86cd175dcb894ce3eb3de6e988c2bd68a77ece385e4",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "6. Cursor Pagination"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9369"
+    },
+    {
+      "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+      "sourceUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-30",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9370",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "b82a558166f118f339210d9a475214042a603bd09f64a3a2a8795d96fbdf57ce",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "6. Cursor Pagination"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9370"
+    },
+    {
+      "claimId": "claim_fda67d0dfc15159dc0e4c62b9dfddd87",
+      "sourceUnitDigest": "4a6703b22b4e2190d4f0460fda877fd5bd230759e24f8622ef8cadce47e1b5c2",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "7-machine-readable-verb-registry",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9371",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "targetUnitDigest": "4af102d0a390692f1d71ae14123acf45d63f8f39d71519bd975daff2f015d5fa",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9371"
+    },
+    {
+      "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+      "sourceUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-36",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9372",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "78393c0183b6bda3ff166520f4601ab2793cbdf85e2669949001a73b9102f293",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Entry Fields And Effect Axes"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9372"
+    },
+    {
+      "claimId": "claim_ba1c2ac95c9c161d9fd345e3bfa63741",
+      "sourceUnitDigest": "1a437d176164754dd1284bda7be3e18464c24c6cbcb8406723f763d940d871e4",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "8-multi-value-flag-convention",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9373",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "3e7cfb35e58461211cd5f01de9abfc2ee65622422e045ce05205496b1c82a0d8",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9373"
+    },
+    {
+      "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+      "sourceUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-38",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9374",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "a8eaefe3669a194a9fa84ca8fa92d4d58a5f7c8405e4d7c970fac1ce183148a5",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "8. Multi-Value Flag Convention"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9374"
+    },
+    {
+      "claimId": "claim_6c529b87f6073cc75fdf836d3507d21d",
+      "sourceUnitDigest": "a1b267899ca12fa969dfca32cd480bab82b6869cb5b582b89955e2a3d3d8348d",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "10-version-tokens",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9375",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "934cee435d2ab0ff2f52c0731e412fd76bc710ad64737c06ec5b8376287f58f0",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9375"
+    },
+    {
+      "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+      "sourceUnitDigest": "ae0e60ec193e0ac5ad026b2cf78a37ba3156fea7043460714946bfe66311ab5e",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-42",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: equal after listed exceptions: route; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9376",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "a378c81f6a84c5e3ed9b38917f7136c55dcc4af85295bcf105fa9ac9d6792532",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "10. Version Tokens"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9376"
+    },
+    {
+      "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+      "sourceUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-43",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9377",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "c9d3ad96d4b03b02fbcf8e5bd0261ab7c77109320f204a18b9a43eef0f4f1fd3",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "10. Version Tokens"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9377"
+    },
+    {
+      "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+      "sourceUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-44",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9378",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "03c9a0137385cea34764f24cc92708d2c2c2c6a722f1e24345441232595f92cb",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "10. Version Tokens"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9378"
+    },
+    {
+      "claimId": "claim_95a909b7be1252ba8de3be4c15f3638e",
+      "sourceUnitDigest": "6e8ef157c4c9861c47a991a59cc44ca82728233e8fc2938c6ba7c54bd1dcae8c",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "11-scope-boundary",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9379",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "f57aa1458563f22d63881b3372998ece0773b7fbf0be550fb99b5e928f23d91b",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9379"
+    },
+    {
+      "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+      "sourceUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-45",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9380",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "36d44c8bdf5ad1f062c83e623e68e7d429939c8bc1bc44c0b5bf36aba736078d",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "11. Scope Boundary"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9380"
+    },
+    {
+      "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+      "sourceUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-46",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9381",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "fa405ec4333b43518de9831ea52cd47228294303f0b3374b8d4a981a669414ea",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "11. Scope Boundary"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9381"
+    },
+    {
+      "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+      "sourceUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-47",
+      "claimKind": "historical-context",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9382",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "30a3d1465b852976e30a3aad9f6729d1f40caacbc299c7fb07e87ff06d42cff7",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "11. Scope Boundary"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9382"
+    },
+    {
+      "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+      "sourceUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-48",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9383",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "fd7e473ad76cf591e6a132079c9b744fc4a8cfa5672127e446ae7c4f6f323e75",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "11. Scope Boundary"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9383"
+    },
+    {
+      "claimId": "claim_7524deb4b2a1c12d1652076040bfec36",
+      "sourceUnitDigest": "701eefe16b5100fc56090ce1f1a948d0eedb1faf7ff9c8b385ce9039a3e2d141",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "12-references",
+      "claimKind": "navigation",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9384",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "9b906d61cd8f824de9ce5a5b203808e71c4b30774cc1d7ddb857d464197ee5f3",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9384"
+    },
+    {
+      "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+      "sourceUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-49",
+      "claimKind": "navigation",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9385",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "targetUnitDigest": "7fddf59545c800c11029e0609a32bd908db3409f458829aaf1afecc47bd7f4cf",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "12. References"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9385"
+    },
+    {
+      "claimId": "claim_2b155082055823ccabf6fb40242abe42",
+      "sourceUnitDigest": "18f6d5cf0b8c3966bb0c8aa69e1f405c0c43555cd0f49fff57b8610b6fd69945",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9386",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewNote": "deep: Upstream changed item 1 (-h, optional --json, verb sub) and the target list in the Reasoned Envelope Exceptions section carries it verbatim; heading depth and numbering are the only other differences.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "8a4450efa42cf8d7d02b90b65a9e093fbbfd3178788f682caa9a3a7cba5b73b7",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9386"
+    },
+    {
+      "claimId": "claim_992a812b2fcaa4f93dd86d2190d7ac3a",
+      "sourceUnitDigest": "cb6381a3b69f2fdd99ff81b06cafbce1f45add19c7076005c59ad0e093d49be8",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9387",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "reviewNote": "deep: Intro block unchanged by the merge; it sits inside the same target section, which now holds the updated exception list.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "8a4450efa42cf8d7d02b90b65a9e093fbbfd3178788f682caa9a3a7cba5b73b7",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9387"
+    },
+    {
+      "claimId": "claim_57f11d837272b3f9781b376ef1665c81",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceUnitDigest": "d38286962b4133b3c55926e513b03625483e4bd0b6b885a6fd3dde23c00686b8",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9388",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-10",
+      "reviewNote": "L12-112 authorized continuation: content-and-neighbour identity rename rebind; independent review pending, no approval carry.",
+      "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Source Trust Levels"
+      ],
+      "bindingSha256": "34d1e9c56a94dc1318b715e3bf44c17f5f2ce8af1ffa0261d534a8bcdfb62ac0",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9388"
+    },
+    {
+      "claimId": "claim_a14f9308d3f04e10e670c6f178d4ee33",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "unheaded-block-7",
+      "sourceUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+      "claimKind": "specification",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9389",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-13",
+      "reviewNote": "deep: io-contract unheaded-block-7 L44-49 to cli-io-contract unheaded-block-13 L116-121; digests b5b61247 equal on both sides, 0 links, source and target contexts equal the real heading chains, unchanged-since-review claim true (the 345f15d95 shard row carries the same target digest)",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-accounting-04-62751458b.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "b5b6124764e7d3f101cac103f5a6e63bdf8f5732bc72e4a7049337f519d4ea79",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Caller Role"
+      ],
+      "reviewReportCommit": "1d92a7229af9050b3ce57729c8652b8a836e93b6",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9389"
+    }
+  ],
+  "authorSession": "codex-session:1@2026-10-08",
+  "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-2reframe-b-io-contract.md",
+  "registryGaps": [
+    {
+      "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+      "sourceUnitDigest": "83773dda67db8d5f71205bb8c7106186023672125b08cbe4f33b09b0578163ca",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-33",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9390",
+      "authoredBy": "codex-session:unit-run-1792114313040-56132651@2026-10-16",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "unheaded-block-18",
+      "targetUnitDigest": "51dd3c8aa026a8f5a15e4c12c522b3bf2ad7c29238c49bf9ba51324806e10e23",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Manifest Shape"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9390"
+    },
+    {
+      "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+      "sourceUnitDigest": "39e4ab1f30a6acc99de534a9fd16bd348b9ef8c1827664c0a7a50487f0587c0c",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-35",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9391",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "unheaded-block-19",
+      "reviewNote": "deep: read both texts and the diff; the successor drops coordination from the externalEffect examples, replaces the --help pointer by the 15-verb COMMAND_REGISTRY sentence and adds the subcommands bullet, exactly the three changes the rationale lists; supersede with a named successor (cli-io-contract.md#unheaded-block-35) is the right disposition for changed text, no approval carried by byte-equality; anchor ok.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "e013c5b05d6ff58782aa8231ab4a55967bd5ef853dac4015aec8f16f5fcf9c68",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "7. Machine-Readable Verb Registry",
+        "Entry Fields And Effect Axes"
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9391"
+    },
+    {
+      "claimId": "claim_dd296404e1163caafba00641cf0adc79",
+      "sourceUnitDigest": "8b0c15df567594f067a267c8afb4414b290877d5f086aff68d1aab192ad5e908",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9392",
+      "authoredBy": "codex-session:27@2026-10-14",
+      "sourcePath": "docs/io-contract.md",
+      "sourceAnchor": "unheaded-block-15",
+      "reviewNote": "deep: Old block-15 gap row; same target section as the new row, which has the updated item 1.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-15",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-261015-0044-boundary-sync-resume-01.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "8a4450efa42cf8d7d02b90b65a9e093fbbfd3178788f682caa9a3a7cba5b73b7",
+      "targetAncestry": [
+        "CLI I/O Contract"
+      ],
+      "reviewReportCommit": "68b95dbd83adf817d42571d2c0b2961be75d78d2",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9392"
+    },
+    {
+      "claimId": "claim_2fa062c56cf4226e8519e768a5b5cab4",
+      "sourceUnitDigest": "3727b3fa0ee79f8b0b38d0e9fc868e336e85f10e12f7dbd47a34d140f3681127",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-23",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9393",
+      "authoredBy": "codex-session:unit-run-1792093168554-f28af963@2026-10-16",
+      "sourcePath": "docs/io-contract.md",
+      "reviewNote": "deep: read both texts and the diff; the successor adds OUTCOME_EXIT_CODES (4,10-14), the not-found 4 entry and the ok / pass mapping, as the rationale says, and keeps the rest; supersede to cli-io-contract.md#unheaded-block-23 under 4. Exit Codes is a correct disposition for changed text; anchor ok.",
+      "reviewedBy": "reviewer:claude-session:a4954387@2026-10-14",
+      "reviewedAt": "2026-10-16",
+      "reviewReport": "plans/260925-documentation-authority-unification/reports/phase-06/review-step10-decisions-09-287a22d33.md",
+      "reviewMode": "ordinary",
+      "targetUnitDigest": "d1af2d5a982f5d139fda776a23b4ad0b3776cc40c1fc0177636c44bdc91b968d",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "4. Exit Codes"
+      ],
+      "reviewReportCommit": "9b0526380329d8cb1cb6085a1c8f378e943e2505",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9393"
+    },
+    {
+      "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
+      "sourcePath": "docs/io-contract.md",
+      "sourceUnitDigest": "fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-10",
+      "rationale": "L13-69: content replaced beyond listed routes/metadata and structural adaptations; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9394",
+      "reviewStatus": "pending",
+      "authoredBy": "codex-session:unit-run-1792090455209-159fbfed@2026-10-16",
+      "remainder": "Verbatim historical changed-source lines in plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json#/rows/14; file SHA256 cbd26340297b27b42f7c66f7d9e26703a0916422de2c3c48cc81e1db6d9a11e4; residual SHA256 b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957; source fa53d50b84fef3025e7b4e5e8e810a83f885e4aab37a760652c1bcb9e676a5a9; primary target docs/platform/work-state/contracts/cli-io-contract.md#unheaded-block-10 SHA256 f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2. Every deleted/replaced nonblank source line is included; pure insertions excluded. A34Accepted=false; independent review pending; cutover blocked. Earlier residuals remain historical, not current coverage evidence.",
+      "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+      "targetAncestry": [
+        "CLI I/O Contract",
+        "2. Input Direction Verb And Identity",
+        "Writer Source Trust Levels"
+      ],
+      "residualRef": {
+        "path": "plans/260925-documentation-authority-unification/reports/phase-09/g0fix/partial-carry-residuals.json",
+        "row": 14,
+        "fileSha256": "cbd26340297b27b42f7c66f7d9e26703a0916422de2c3c48cc81e1db6d9a11e4",
+        "residualSha256": "b276baca8168777f55bdba5a90f6ca6334a7e6e1e5d0c9ebef8df5b362313957",
+        "targetUnitDigest": "f62415e8ccc40c73ee561ccc0cf7d550e46dbca39047ae09fe139b0fe91e0bb2",
+        "A34Accepted": false
+      },
+      "bindingSha256": "34d1e9c56a94dc1318b715e3bf44c17f5f2ce8af1ffa0261d534a8bcdfb62ac0",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9394"
+    }
+  ],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
+}

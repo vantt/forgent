@@ -62,7 +62,7 @@ particular failure mode is now rare or prevented.
 
 ## A follow-up: `tsk-40a` shipped the check/fix but never updated its own spec doc
 
-`tsk-22b` caught the drift this left behind: `docs/specs/distribution.md`'s
+`tsk-22b` caught the drift this left behind: `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md#registered-inventory`'s
 Data Dictionary #7/#7b rows ("Today's registered checks"/"Today's
 registered fixes") never got `no-stuck-merge-abort` added, even though
 `test/setup/registrations.test.mjs` carries dedicated tests asserting

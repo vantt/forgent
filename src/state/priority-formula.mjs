@@ -36,7 +36,7 @@ export function discountForRisk(risk) {
   return RISK_DISCOUNTS[risk] ?? RISK_DISCOUNTS.standard;
 }
 
-// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/specs/work-state.md),
+// tsk-4hb: `risk` is free text (Data Dictionary #6, docs/platform/work-state/spec.md#3-work-item-data-dictionary),
 // so a value outside RISK_DISCOUNTS is spec-legal, not a data error --
 // discountForRisk's own `?? standard` fallback cannot tell "absent" (a
 // legitimate default) apart from "present but unrecognized" (silently

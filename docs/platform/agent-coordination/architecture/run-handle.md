@@ -1,26 +1,37 @@
----
-area: agent-coordination-runtime
-updated: 2026-09-14
-coverage: substantially-implemented
----
-
 # RunHandle And Recovery Material
 
-Design status: PROPOSED detailed contract; the runtime-recovery track
-(closed 2026-09-14) implemented the recoverable-observation/control
-contract this file proposes — `run-lock.mjs` (control-epoch fencing),
-`visibility-session.mjs` (binding/reconcile), and the herdr-round.mjs launch
-reconciliation for herdr-spawn (P01/P02L/P02H, hardened further in the P02H
-reopen). Field names and exact schemas below are this proposal's own
-vocabulary; where the shipped code used different names or a simplified
-shape for the same guarantee, the per-cell trace docs under
-`docs/architect/agent-coordination/verification/runtime-recovery/` are the
-authoritative record of what is real — treat this file as the accepted
-reasoning behind those decisions, not as a byte-exact schema reference.
-Read [Runtime Recovery Design](runtime-recovery-design.md) first for ownership,
-local locking, version rollout, proof IDs and the long-horizon scope. This file
-owns runtime observation/control and recoverable-state capture, not Run admission
-or session policy. Two ports (repository/runtime) and one guard application service.
+```txt
+Document type: Architecture
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/architecture/run-handle.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/architecture/run-handle.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+
+## Implementation And Design Status
+
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs. Run-control acquisition checks the expected control epoch and refuses a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:306-320`. An expired heartbeat does not authorize stealing a live or unproven-dead holder; holder liveness must permit reclaim. Evidence: `src/runner/dispatch/run-lock.mjs:321-334`. Settlement verifies the exact epoch and token and publishes a settled generation. Evidence: `src/runner/dispatch/run-lock.mjs:390-412`.
+
+| Section | Status | Evidence / limit |
+|---|---|---|
+| 2. State Transitions | Unimplemented design proposal | No run-handle execution state machine in code (git grep RunHandle = 0); nearest: visibility-session.mjs:43 VISIBILITY_STATES, :59 RUN_STATUSES |
+| 5. RecoveryMaterialV1 | Unimplemented design proposal | RecoveryMaterial/run-recovery-material/writerQuiescence/workspace-authority-unavailable = 0 hits in src/packages/apps/core/domains/bin |
+| 6. Persistence And Supported Profile | Mixed implementation and proposal; no blanket implementation claim | run-handle.json absent; visibility.json still the binding authority: src/runner/dispatch/herdr-round.mjs:386,1132,1630 and cli.mjs:126; launch command files under runDir/controller/commands authority.mjs:1596-1600; setup/doctor registration for these not implemented |
+| 7. Proof And Deferred Scope | Unimplemented design proposal | Points to runtime-recovery-design.md#10 proof matrix (F-a..F-g, X01..X05/X10); docs/platform/agent-coordination/verification/runtime-recovery/ holds shipped-cell traces |
 
 ## 1. Identity And Facts
 
@@ -271,3 +282,4 @@ Also exercise every state transition and cancellation before/after submission.
 Default needs no distributed lease, generic checkpoint framework, full worker
 memory snapshot, health store or dashboard. Future adapters must explicitly
 advertise checkpoint/remote-control support rather than accepting arbitrary blobs.
+

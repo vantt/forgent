@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const AGENTS_MD = path.join(REPO_ROOT, 'AGENTS.md');
-const PLATFORM_FOUNDATIONS_SPEC = path.join(REPO_ROOT, 'docs', 'specs', 'platform-foundations.md');
+const PLATFORM_FOUNDATIONS_SPEC = path.join(REPO_ROOT, 'docs', 'platform', 'platform-foundations.md');
 
 const ANCHOR_PHRASE = 'tốt hơn, không to hơn';
 const RUL104_LAW = fs.readFileSync(new URL('./rul104-law.txt', import.meta.url), 'utf8').trim();

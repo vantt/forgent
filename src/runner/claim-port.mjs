@@ -144,7 +144,7 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
 
   const ceiling = readWorkerSlotCeiling(dir);
 
-  // tsk-40m (docs/architect/doing-coordination-redesign.md): claim time no
+  // tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): claim time no
   // longer writes a durable work.move(->doing), so the ORIGINAL claim's
   // branchHeadAtTake no longer lands on the item's own sticky top-level
   // field (that field is only ever set by a work.move payload) — it now

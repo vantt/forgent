@@ -1,10 +1,26 @@
 # Agent Coordination Vocabulary
 
-Document type: Index
-Design status: Accepted
-Implementation: Active
-Last reviewed: 2026-08-31
-Canonical for: vocabulary ownership and navigation
+```txt
+Document type: Collection index
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/vocabulary/README.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/vocabulary/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Purpose
 

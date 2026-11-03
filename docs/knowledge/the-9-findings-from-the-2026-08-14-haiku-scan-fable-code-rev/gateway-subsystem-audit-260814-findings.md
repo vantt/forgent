@@ -11,7 +11,7 @@ mode: reference
 
 `tsk-1zg` (parent/coordinator item). Full report:
 `plans/reports/gateway-audit-260814-2110-fable-hidden-bugs-report.md`.
-Scope: `herdr-plugin/src/gateway.rs`, `docs/contracts/fgos-gateway-api-v1.yaml`,
+Scope: `herdr-plugin/src/gateway.rs`, `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`,
 `docs/history/fgos-gateway-mcp-surface/`, `docs/history/fgos-interface-daemon/` —
 see `docs/explanation/why-the-fgos-interface-daemon-is-one-process-that-only-ever-shells-out-to-the-cli.md`
 and `docs/reference/fgos-gateway-api-ctr010.md` for the base design this

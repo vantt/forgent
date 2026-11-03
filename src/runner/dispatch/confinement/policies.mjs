@@ -1,5 +1,5 @@
 // policies.mjs — canonical confinement policy vocabulary, built-ins,
-// validation, and legacy normalization (Phase 01 R1-R4, docs/specs/confinement-authority.md §6.1-§6.2).
+// validation, and legacy normalization (Phase 01 R1-R4, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#6-canonical-contracts §6.1-§6.2).
 //
 // Spec is the single source of truth for shapes; this module implements:
 //   - BUILTIN_POLICIES: immutable definitions for `host-write-denied` and `workspace-write`

@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 
-// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). tsk-51i: the
+// S01 — Sign in (docs/platform/ui-spec/architecture/screens/S01-sign-in.md). tsk-51i: the
 // token gate now proves the token against the gateway (GET
 // /state/digest) before storing it, instead of trusting whatever was
 // typed -- these tests cover the real ST-READY/ST-SUBMITTING/ERR-AUTH

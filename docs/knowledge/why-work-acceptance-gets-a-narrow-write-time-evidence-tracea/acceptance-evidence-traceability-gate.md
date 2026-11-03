@@ -32,7 +32,7 @@ The check only fires when a clause supplies `text` **and** `evidence`
 together in the same write — never a blanket "evidence required at
 authorship" rule. A clause with `text` only (no `evidence` yet) is
 completely untouched. This deliberately preserves an existing allowance
-(RUL58 D4, `docs/specs/work-state.md`) that a forward-looking acceptance
+(RUL58 D4, `docs/platform/work-state/spec.md#11-business-rules`) that a forward-looking acceptance
 clause may state its claim before evidence exists, with evidence added
 later before the item reaches `done`. Requiring evidence at authorship for
 every clause was explicitly rejected — it would break the common,

@@ -1,6 +1,6 @@
 //! Release tree canonicalization and validation.
 //!
-//! Enforces rules from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.
+//! Enforces rules from `docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules`.
 
 use crate::manifest::{ManifestFileEntry, ReleaseManifest};
 use std::collections::HashSet;

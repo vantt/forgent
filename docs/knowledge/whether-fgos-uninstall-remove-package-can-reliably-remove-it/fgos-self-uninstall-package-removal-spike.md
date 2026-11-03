@@ -52,7 +52,7 @@ CONTEXT.md` D1, `plan.md`'s spike reshape):
 - **Windows** — explicitly skipped (`test.skip` on `win32`). Windows
   file-locking rules are the opposite of POSIX's — a process typically
   cannot delete a file it still has open — so this finding does not
-  transfer. `docs/distribution-vision.md`'s CI pillar (`tsk-3nx`) still
+  transfer. `docs/platform/packaging-distribution/history/distribution-vision.md#cài-đặt-setup-doctor-của-fgos-tầm-nhìn-nền-tảng`'s CI pillar (`tsk-3nx`) still
   has no Windows matrix to test this against.
 
 A follow-up item extending `--remove-package` to pnpm/yarn (and, once

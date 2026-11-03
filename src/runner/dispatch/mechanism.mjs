@@ -12,8 +12,7 @@
 import { resolveExecutorAndOverrides } from './resolve.mjs';
 
 /**
- * Native-First Dispatch Doctrine rules 1/2/4 (`docs/decisions/0026-vision-
- * orchestrator-roottask-executor-native-vs-cli-spawn.md`), as one pure
+ * Native-First Dispatch Doctrine rules 1/2/4 (`docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity`), as one pure
  * decision — tsk-3ik-1, Phase 4's own shared helper. Deliberately generic
  * over BOTH dispatch targets the doctrine names (a `executors.<id>`
  * executor, or a live session's own direct subTask/Task-tool call) — this

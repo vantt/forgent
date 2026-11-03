@@ -17,7 +17,7 @@ Source item: `tsk-62x-1`, `docs/history/fgos-terminal-pane-rename/CONTEXT.md`
    Every existing `/fgOS:<verb>` skill (`pick`, `ask`, `answer`, ...)
    wraps exactly one `fgos <verb>` CLI call because each one writes item
    state through CTR001's one-door-write. A herdr pane rename writes no
-   fgOS state at all (STR40, `docs/operator-runbook-herdr-cockpit.md`:
+   fgOS state at all (STR40, `docs/platform/herdr-web-dashboard/operations/operator-runbook.md#operator-runbook-herdr-cockpit`:
    "herdr chỉ làm chrome") — so it gets its own skill directory
    (`plugins/fgOS/skills/terminal/`) with a plain bash helper script
    (`rename.sh`), never a command-registry entry.

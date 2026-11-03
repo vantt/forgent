@@ -5,16 +5,24 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define the target semantic invocation kernel and lifecycle shape
 Design status: Draft
-Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/contracts/operation-request-outcome.md
 - docs/platform/host-invocation-routing/contracts/operation-provider.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
+Implementation: Current partial
+Provenance: `docs/platform/host-invocation-routing/architecture/invocation-kernel.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Define the target semantic invocation kernel and lifecycle shape
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
+
+Correction — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
 
 ## 1. Claim
 
@@ -34,7 +42,7 @@ The native kernel has exactly one semantic input/output boundary: `OperationRequ
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
 | Native routes use `OperationRequest` to `ProviderOutcome`. | `implemented preview` | [../../../../packages/host-runtime/rust/src/contracts.rs](../../../../packages/host-runtime/rust/src/contracts.rs), [../../../../packages/host-runtime/rust/src/invocation_service.rs](../../../../packages/host-runtime/rust/src/invocation_service.rs), [../../../../apps/fgos/src/cli_projector.rs](../../../../apps/fgos/src/cli_projector.rs), [../../../../apps/fgos-gateway/src/remote_invocation.rs](../../../../apps/fgos-gateway/src/remote_invocation.rs), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | Proven for `distribution.build.show`, `work.gate-bypass.show`, and the R2 fixture operation. Additional operations need their own route/provider proof. |
-| Legacy CLI routes bypass the kernel. | `implemented preview` | [legacy-cli-transition.md](legacy-cli-transition.md), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Current route matrix still has 71 `legacy-cli` selectors; keep bypass behavior until each selector migrates. |
+| Legacy CLI routes bypass the kernel. | `implemented preview` | [legacy-cli-transition.md](legacy-cli-transition.md), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Current route matrix still has 70 `legacy-cli` selectors; keep bypass behavior until each selector migrates. |
 | No component-boundary change. | `current` | [component-boundary.md](../../component-boundary.md) | No action for documentation migration. |
 
 ## 4. Related Files
@@ -44,4 +52,4 @@ The native kernel has exactly one semantic input/output boundary: `OperationRequ
 | operation request/outcome contract | [../contracts/operation-request-outcome.md](../contracts/operation-request-outcome.md) |
 | provider contract | [../contracts/operation-provider.md](../contracts/operation-provider.md) |
 | alignment | [../verification/implementation-alignment.md](../verification/implementation-alignment.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| source architecture | `../spec.md#host-invocation-and-provider-routing-architecture` |

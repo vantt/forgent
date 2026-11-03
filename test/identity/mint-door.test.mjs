@@ -32,8 +32,8 @@ test('the verb claims consecutive D-ADR numbers on a repository without a remote
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mint-adr-'));
   // boundary: a real repository is the only place the counter ref can be written.
   execFileSync('/usr/bin/git', ['init', '-q', '--initial-branch=main', repo], { stdio: 'ignore' });
-  fs.mkdirSync(path.join(repo, 'docs/specs'), { recursive: true });
-  fs.writeFileSync(path.join(repo, 'docs/specs/area.md'), '### D-ADR0072 (an existing decision)\n');
+  fs.mkdirSync(path.join(repo, 'docs/platform/area'), { recursive: true });
+  fs.writeFileSync(path.join(repo, 'docs/platform/area/spec.md'), '### D-ADR0072 (an existing decision)\n');
   // boundary: the verb is the unit under test and runs in the repository whose counter it writes.
   const claim = () => JSON.parse(execFileSync(HOST_BIN, ['identity', 'mint', 'd-adr', '--json'], {
     cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],

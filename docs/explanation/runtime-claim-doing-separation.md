@@ -119,7 +119,7 @@ retry.
 
 ## The prose docs still described the old durable-doing model (`tsk-4kn`)
 
-Landing the code (this doc's own D1-D6) didn't touch `docs/specs/runner.md`
+Landing the code (this doc's own D1-D6) didn't touch `docs/platform/runner/spec.md#spec-runner-vòng-tự-hành`
 or `docs/specs/work-state.md` — both still described claiming an item as a
 durable `todo -> doing` write, the exact model D1 retired. `tsk-4kn`
 corrected both specs' prose (take/return claim language, Data Dictionary

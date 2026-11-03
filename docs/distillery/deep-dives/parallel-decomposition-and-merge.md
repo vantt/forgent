@@ -43,7 +43,7 @@ forgentX muốn học từ beehive (và superpowers nếu đáng) cách chia vi�
 ## Giải pháp tổng hợp cho host
 
 forgentX ĐÃ có (kiểm bằng đọc source, không suy đoán):
-- `footprint` khai báo trên item con (`docs/specs/work-state.md` dòng ~1022), cố vấn PHI-CHẶN qua `footprintConflicts`/`footprintOverlap` (`src/state/graph-metrics.mjs`, `src/state/store.mjs`) — tương đương `beehive:computed-parallel-schedule`'s bước phát-hiện-chồng nhưng KHÔNG có bước xếp-sóng.
+- `footprint` khai báo trên item con (`docs/platform/work-state/spec.md#add-verb` dòng ~1022), cố vấn PHI-CHẶN qua `footprintConflicts`/`footprintOverlap` (`src/state/graph-metrics.mjs`, `src/state/store.mjs`) — tương đương `beehive:computed-parallel-schedule`'s bước phát-hiện-chồng nhưng KHÔNG có bước xếp-sóng.
 - `acceptance` clause đòi `evidence` trước khi `done` (RUL58) — tương đương `verify-enforced-close` (đã là candidate `ported`-shaped trong porting-log, chưa đánh dấu).
 - Merge dàn trận verify-trước-commit, `git merge --no-commit --no-ff`, abort sạch khi đỏ/xung đột (`src/runner/merge.mjs`) — CHÍNH XÁC là `beehive:worktree-merge-staged-verify-gate`. Porting-log hiện có hàng `worktree-merge-semantic-gate` (status `candidate`, ghi "chỉ đáng port SAU khi forgent thật sự chạy đa luồng — YAGNI") — **hàng này đã LỖI THỜI, tính năng đã tồn tại trong `src/runner/merge.mjs`**; đã sửa status → `ported` kèm Local trong porting-log (xem log thay đổi cuối tài liệu này).
 - Frozen-judge hẹp (`src/runner/frozen-judge.mjs`, STR63) — đã port `beehive:frozen-judge-file-scope` NHƯNG cố ý thu hẹp chỉ còn pattern test/CI/lockfile/manifest, không phải "MỌI file ngoài footprint".

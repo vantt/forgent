@@ -1,4 +1,4 @@
-// The tier a seat runs at is composed by the crate (docs/specs/seat-binding.md sections 5.4 and 6.3); the golden
+// The tier a seat runs at is composed by the crate (docs/platform/seat-binding/spec.md sections 5.4 and 6.3); the golden
 // vectors own those cases, `bind.test` the facade carrying the answer. What stays Node's is the name of a
 // workflow seat's recommendation.
 

@@ -1,44 +1,54 @@
 # Deprecated And Reserved Coordination Terms
 
+```txt
 Document type: Vocabulary
-Design status: Accepted
-Implementation: Active
-Last reviewed: 2026-09-01
-Canonical for: deprecated aliases, overloaded terms, and reserved vocabulary
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/vocabulary/deprecated-and-reserved.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/vocabulary/deprecated-and-reserved.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Reserved
 
 ### Participant
 
-Reserved for the existing fgOS platform-level concept: any process that
-speaks the fgOS event-log contract is a full "participant"
-(`docs/specs/platform-foundations.md` D0014,
-`docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md`).
-That definition lives outside this documentation tree and is not restated
-here. Do not reuse `Participant` for the agent-coordination actor-instance
-concept — the addressable instance that fills a Role inside a definition or
-session is [SessionActor](canonical-concepts.md#sessionactor)
-(per [ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md)).
+Platform event-log participant: any process that speaks the event-log format
+and append/read/subscribe contract, including a non-Node implementation
+(`docs/platform/platform-foundations.md#0014--kiến-trúc-giao-tiếp-người--fgos`). Do not redefine this platform
+term as a CoordinationSession actor or a terminal pane.
 
 ### Job
 
-Reserved for a future durable queue/scheduler unit. Team Dispatch V1 does not
-create Job records. Do not use Job as a generic synonym for Work, AdhocTask,
-Assignment, or Run.
+Reserved for a future durable scheduler/queue abstraction. No current Job
+record or Job-based dispatch selector is implied; Assignment and Run retain
+their distinct identities. See [ADR-004](../decisions/ADR-004-reserve-job.md).
 
 ### Mission
 
-Reserved for an optional broader objective envelope. Until its proposal is
-accepted, do not make Mission mandatory for standalone coordination and do not
-give it Work lifecycle semantics.
+Reserved vocabulary, not a current execution identity or a reason to create a second lifecycle store. The former session-specific proposal is historical.
 
 ## Discouraged Or Ambiguous
 
 ### Cell
 
-May be used informally in implementation planning or the operating harness, but
-is not currently a canonical runtime entity. Use AdhocTask for the proposed
-session-local runtime concept and child Work for durable lifecycle units.
+An informal planning/manual-harness unit, not a current universal runtime
+entity. Use Unit/Workflow execution for immediate execution and child Work
+when an independently durable delivery lifecycle is required. The retired
+AdhocTask/session-local proposal is not a current API.
 
 ### Exec Packet
 
@@ -63,18 +73,15 @@ task satisfaction, Work completion, and visible terminal state.
 
 ## Forbidden Equivalences
 
-- Do not call Assignment a Job.
-- Do not call Run a task lifecycle.
-- Do not call Herdr pane state evidence.
-- Do not call Mission a Work replacement.
-- Do not call every planner child Work.
-- Do not call every temporary helper unit an independent Work item.
-- Do not use consensus as a synonym for verified synthesis.
-- Do not call a SessionActor a Participant; Participant is reserved for the
-  platform-level event-log-contract concept.
+- Participant is not a CoordinationSession actor.
+- Job is not Work, Assignment, Run or a capability selector.
+- Cell is not an implicit persisted task or Work record.
+- Worker claim is not normalized RunResult or verified completion.
+- Process exit or pane quietness is not Work acceptance/approval.
 
 ## Historical Vocabulary
 
 Older terminology and rationale remain searchable in the
 [pre-migration vocabulary map](../history/implementation-records/orchestration-vocabulary-map-2026-08-27.md).
 Historical use does not override this document.
+

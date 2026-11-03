@@ -220,6 +220,31 @@ function readText(file) {
   }
 }
 
+/**
+ * Every Markdown file under `dir`, any depth; a directory that does not exist yields none.
+ * Directories named in `skip` are not entered: relocated history repeats decisions that
+ * the area specs already carry, so it must not count as a second definition.
+ */
+function markdownFilesUnder(dir, skip = []) {
+  const files = [];
+  const pending = [dir];
+  while (pending.length > 0) {
+    const current = pending.pop();
+    let entries;
+    try {
+      entries = fs.readdirSync(current, { withFileTypes: true });
+    } catch {
+      continue; // a checkout without the platform tree has no decisions to scan
+    }
+    for (const entry of entries) {
+      const full = path.join(current, entry.name);
+      if (entry.isDirectory()) { if (!skip.includes(entry.name)) pending.push(full); }
+      else if (entry.isFile() && entry.name.endsWith('.md')) files.push(full);
+    }
+  }
+  return files;
+}
+
 /** The id registries of one checkout: backlog rows, `D-ADR` headings, decision file numbers. */
 function readIdRegistries(root) {
   const backlogIds = [];
@@ -230,14 +255,7 @@ function readIdRegistries(root) {
   // One decision may be recorded in several area specs; it is the same decision while every
   // heading gives it the same short title, and two titles under one number are two decisions.
   const adrTitles = new Map();
-  const specsDir = path.join(root, 'docs/specs');
-  const documents = [path.join(root, 'docs/platform-foundations.md')];
-  try {
-    for (const name of fs.readdirSync(specsDir)) if (name.endsWith('.md')) documents.push(path.join(specsDir, name));
-  } catch {
-    // a checkout without specs has no decisions to scan
-  }
-  for (const file of documents) {
+  for (const file of markdownFilesUnder(path.join(root, 'docs/platform'), ['history'])) {
     for (const line of (readText(file) ?? '').split('\n')) {
       const heading = /^#+\s+(D-ADR\d{4})\s*(?:\(([^)]*)\))?/.exec(line);
       if (!heading) continue;

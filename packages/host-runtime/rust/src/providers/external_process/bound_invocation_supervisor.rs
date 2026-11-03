@@ -1,6 +1,6 @@
 //! Process supervisor for external process providers.
 //!
-//! Fills the `bound-invocation-supervisor` role (docs/decisions/):
+//! Fills the `bound-invocation-supervisor` role (decision records):
 //! a supervised external-process call bound to ONE invocation's own lifetime,
 //! never detached, never expected to outlive its caller -- the counterpart to
 //! Node's `detached-run-supervisor` role (`cli-spawn-supervisor.mjs`), which

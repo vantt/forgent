@@ -254,8 +254,9 @@ mod sequence {
     }
 
     /// The highest number of `kind` the documents under `root` already carry:
-    /// `D-ADR####` in a heading of `docs/specs/*.md` or `docs/platform-foundations.md`, or the `NNNN-` prefix of a
-    /// file directly in `docs/decisions/`. 0 when there is none.
+    /// `D-ADR####` in a heading of any Markdown file under `docs/platform/` (area specs, their
+    /// decision and history files, and the platform laws), or the `NNNN-` prefix of a file
+    /// directly in the retired `docs/decisions/` directory. 0 when there is none.
     pub(crate) fn highest_in_documents(root: &Path, kind: SequenceKind) -> u64 {
         match kind {
             SequenceKind::DAdr => decision_documents(root)
@@ -297,22 +298,32 @@ mod sequence {
             .collect()
     }
 
-    /// The documents that define `D-ADR` ids: the area specs and the platform laws.
+    /// The documents that define `D-ADR` ids: every Markdown file under `docs/platform/`.
+    /// Decision numbers live in area specs, `<area>/decisions/` files, relocated history and the
+    /// platform laws, so the whole tree is read rather than a list of known files.
     fn decision_documents(root: &Path) -> Vec<PathBuf> {
-        let mut files: Vec<PathBuf> = fs::read_dir(root.join("docs/specs"))
-            .into_iter()
-            .flatten()
-            .flatten()
-            .map(|entry| entry.path())
-            .filter(|path| path.extension().is_some_and(|e| e == "md"))
-            .collect();
-        files.push(root.join("docs/platform-foundations.md"));
+        let mut files = Vec::new();
+        let mut pending = vec![root.join("docs/platform")];
+        while let Some(dir) = pending.pop() {
+            let Ok(entries) = fs::read_dir(&dir) else {
+                continue;
+            };
+            for entry in entries.flatten() {
+                let Ok(kind) = entry.file_type() else {
+                    continue;
+                };
+                let path = entry.path();
+                if kind.is_dir() {
+                    pending.push(path);
+                } else if kind.is_file()
+                    && path.extension().is_some_and(|e| e == "md")
+                    && fs::metadata(&path).is_ok_and(|m| m.len() <= MAX_DOC_BYTES)
+                {
+                    files.push(path);
+                }
+            }
+        }
         files
-            .into_iter()
-            .filter(|path| {
-                fs::metadata(path).is_ok_and(|m| m.is_file() && m.len() <= MAX_DOC_BYTES)
-            })
-            .collect()
     }
 
     #[cfg(test)]

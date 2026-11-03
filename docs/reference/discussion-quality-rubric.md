@@ -23,7 +23,7 @@ The council's *Fast scoring rubric (0-2 each, 10 max)* in
 > - <=6 revise profile/triad/model routing
 
 These are the five criteria used in the
-[2026-10-04 council comparison](../../plans/reports/council-ab-comparison-261004.md).
+2026-10-04 council comparison.
 That comparison used an Opus judge and included both the pre-fix and post-fix
 fgOS synthesis. The council verdict's separate self-rated diversity scorecard
 is **not** this rubric.
@@ -47,7 +47,7 @@ Quote a short passage for every score; state what is missing. Citation presence
 alone does not prove a claim true. A blind judge without repository access
 must mark citation correctness as unverified rather than invent verification.
 
-The [historical comparison](../../plans/reports/council-ab-comparison-261004.md)
+The historical comparison
 is a calibration reference, not a fresh evaluation under these newly explicit
 anchors. It identified an input-plumbing defect and warned that format, provider
 changes and a single question/judge confounded the result. Do not copy its

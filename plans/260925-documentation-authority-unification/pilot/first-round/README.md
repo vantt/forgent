@@ -1,0 +1,3 @@
+# First-round blind audit shards
+
+The seven `a-*.json` shards are the decisions of the first-round blind audit of the host-invocation sources and the control source (2026-10-07). They are kept unchanged as first-round evidence and were validated against the inventory generated at that time. The extraction rule that merges short blocks into the neighbouring unit replaced the claim ids of the units it extended, so these shards no longer load against the current inventory (`decision-claim-unknown`); they are kept out of `pilot/decisions/` for that reason. The second-round control uses its own shard in `pilot/decisions/`.

@@ -127,7 +127,7 @@ created independently, on different branches, both claiming `0032`. This
 did NOT surface as a blocked `fgos approve` the way `tsk-66l`'s did —
 because the two branches' merges into `main` also had *other*, real
 file conflicts at the same time (`CHANGELOG.md`, `bin/fgos.mjs`,
-`docs/specs/distribution.md`, `src/setup/registrations.mjs`,
+`docs/platform/packaging-distribution/spec.md#spec-packaging-distribution`, `src/setup/registrations.mjs`,
 `test/setup/checks.test.mjs`, from the concurrent `tsk-in1` `kind`/`via`
 vocabulary migration touching the same files). A multi-file conflict
 resolved entirely by hand is exactly the shape the auto-resolver in

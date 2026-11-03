@@ -11,7 +11,7 @@ mode: explanation
 
 `tsk-jtb`. Before this item, `npm install -g github:vantt/forgent`
 carried no ref at all, so it always installed the latest commit on
-`main` (`docs/specs/distribution.md`'s own words: "no tagged or pinned
+`main` (`docs/platform/packaging-distribution/spec.md#spec-packaging-distribution`'s own words: "no tagged or pinned
 release exists yet") — `package.json`'s `version` had sat at `0.1.0`
 since the start, and the only existing git tag (`pre-tsk-3ce`) had
 nothing to do with a real release. Any broken commit that slipped past

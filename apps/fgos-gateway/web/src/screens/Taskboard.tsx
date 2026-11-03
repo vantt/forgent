@@ -6,7 +6,7 @@ import type { WorkItem } from '../api/types'
 import { hostOf, isNonLoopbackHost } from '../lib/network'
 import { statusColor } from '../lib/status'
 
-// S02 — Taskboard (docs/ui-spec/screens/S02-taskboard.md). Statuses that
+// S02 — Taskboard (docs/platform/ui-spec/architecture/screens/S02-taskboard.md). Statuses that
 // belong in the "needs answer" rail regardless of which group-by is
 // active on the board -- a cross-cutting subset, not a board group of its
 // own (Layout: the rail is pinned separately from whatever the board is
@@ -436,7 +436,7 @@ export function Taskboard({ client, baseUrl, onSelectItem, onOpenNeedsAnswer, po
       )}
 
       {showAddPlaceholder && (
-        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by
+        // M03 (docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md) is not owned by
         // any item in this cluster's current run -- see plan.md's own
         // "NẮN LẠI P3 tsk-5jr" section. A minimal placeholder keeps
         // A-S02-002 a real interaction instead of a dead button.

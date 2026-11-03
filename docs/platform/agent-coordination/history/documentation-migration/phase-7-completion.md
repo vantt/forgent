@@ -13,7 +13,7 @@ Use this when: Auditing the completed Agent Coordination documentation migration
 Do not use this for: Current runtime behavior, contract meaning, or proof contents
 Last reviewed: 2026-09-18
 Related:
-- docs/architect/agent-coordination/documentation-standardization-plan.md
+- docs/platform/agent-coordination/history/documentation-migration/documentation-standardization-plan.md
 - docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
 - docs/platform/agent-coordination/history/documentation-migration/migration-status.md
 ```

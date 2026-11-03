@@ -22,7 +22,7 @@ pub struct TriageRow {
     pub stage: String,
     /// tsk-64z D1: the Work Items panel's Status column and tab filter
     /// (TODO/DOING/REVIEW/DONE) both key off this raw literal
-    /// (`docs/reference/triage-table-columns.md`'s own "rendered as-is").
+    /// (`docs/knowledge/fgos-triage-table-columns/triage-table-columns.md#fgostriage-table-columns`'s own "rendered as-is").
     pub status: String,
     /// tsk-64z D1: "Blocked By" column — ids of OTHER still-open items
     /// this row directly waits on (`rankImpact`'s own `blockedBy`,
@@ -238,9 +238,10 @@ impl From<io::Error> for FgosError {
 /// byte-for-byte — see `parse_triage_preserves_rank_impact_order`, still
 /// pinned for the CLI's own `--all`-less order, just no longer what this
 /// function returns). An absent `priority` (`None` — an item that never
-/// had `computePriority` run, e.g. still at `todo`) sorts LAST, same
-/// absent-sorts-last convention `docs/reference/triage-table-columns.md`
-/// already documents for `goalTier`.
+/// had `computePriority` run, e.g. still at `todo`) sorts LAST, as
+/// implemented by the sort below.
+/// `docs/knowledge/fgos-triage-table-columns/triage-table-columns.md` describes
+/// table rendering; it does not specify absent-goalTier sort order.
 pub fn parse_triage(json: &str) -> Result<Vec<TriageRow>, serde_json::Error> {
     let envelope: TriageEnvelope = serde_json::from_str(json)?;
     let mut rows = envelope.data;

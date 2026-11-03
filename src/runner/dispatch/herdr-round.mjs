@@ -5,7 +5,7 @@
 // terminal-control port allocates for the attempt's key) and hands the attempt over; everything after the
 // handover -- starting the agent in the pane, waiting for its prompt, typing the brief, watching the
 // outbox, the deadlines, ending the agent, settling and releasing the pane -- belongs to the supervisor
-// and the gate, which keep going when this process is gone (docs/specs/runner.md).
+// and the gate, which keep going when this process is gone (docs/platform/run-supervisor/spec.md).
 //
 // Three refusals shaped what stays here, each because doing the opposite failed in measured production:
 //

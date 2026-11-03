@@ -70,5 +70,5 @@ take $ARGUMENTS --role session --dir" ...`.
 
 ---
 
-**Source:** `docs/history/fgos-discover-claim-via-pick/plan.md`; work-item
+**Source:** `docs/history/fgos-discover-claim-via-pick/plan.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; work-item
 capture via `fgos check tsk-20p`.

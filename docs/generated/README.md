@@ -13,8 +13,8 @@ Use this when: You need generated projections or regeneration rules
 Do not use this for: Editing source truth directly
 Last reviewed: 2026-09-13
 Related:
-- `docs/doc-governance.md`
-- `docs/templates/generated.md`
+- `docs/platform/governance.md`
+- `docs/platform/documentation/history/templates/generated.md`
 ```
 
 Generated docs are projections from declared sources. They must declare source

@@ -112,7 +112,7 @@ test('resolveDocPath - a lineage cycle reachable from an active topic does not c
 });
 
 test('resolveDocPath - a live (non-retired) doc under a retired topic is unresolvable', () => {
-  // docs/architect/knowledge-registry-redesign.md §14.3: attestation must
+  // docs/platform/proposals/knowledge-registry-redesign.md §14.3: attestation must
   // reject retired topics, not just retired documents. t1 was retired
   // directly (fgos topic retire) with its doc left in place -- unlike
   // split/merge, plain retire never moves the doc's topicId onto a

@@ -10,7 +10,7 @@ mode: explanation
 # Why the herdr web dashboard became a static client of the gateway, not its own server
 
 `tsk-54j` (P0a of `tsk-ldb`'s cluster) — writing the tech-agnostic area
-spec at `docs/specs/herdr-web-dashboard.md`, following `AGENTS.md`'s own
+spec at `docs/platform/herdr-web-dashboard/spec.md#spec-herdr-web-dashboard-browser-surface-for-fgos-work`, following `AGENTS.md`'s own
 rule that a new product area (and a new module adding config defaults or
 infra dependencies) gets a spec before it gets code. Full design:
 `docs/history/herdr-web-dashboard/CONTEXT.md`, later revised by
@@ -130,7 +130,7 @@ the same way the whole cluster was: not a screen written inside the
 `herdr-fgos` binary (that door was closed by `tsk-7l9` D8), but a screen
 in an **independent web client** calling the gateway's HTTP API. Every
 endpoint the screen uses is sourced from exactly one place —
-`docs/contracts/fgos-gateway-api-v1.yaml` (18 paths, matching 1:1 against
+`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml` (18 paths, matching 1:1 against
 the 17 routes actually registered in `gateway.rs` plus `/contract`
 itself) — the item is explicit that no endpoint gets re-described
 independently in either the item text or the code; every reference cites

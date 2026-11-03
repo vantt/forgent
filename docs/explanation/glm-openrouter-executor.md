@@ -8,7 +8,7 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > mentions — `dispatch execute` (with `--contract`, `--assignment`,
 > `--cwd`/`--repo-root`, `--prompt-file`), `dispatch log` and
 > `dispatch fanout-batch` — were removed (decision 0062 in
-> `docs/specs/runner.md`). Work now runs through `fgos run "<prompt>"` /
+> `docs/platform/runner/decisions/h-36d872fbb0e5.md#0061-unit-ad-hoc-được-preferpersona-mềm-one-liner-fgos-run-workflow-start---units--effort-unit-ghi-nối-nhánh-thay-một-phần-mục-1-của-0047`). Work now runs through `fgos run "<prompt>"` /
 > `fgos run --unit` or `fgos workflow start`, and fanout through
 > `node src/runner/fanout-batch.mjs`. The account below is kept as history.
 
@@ -21,7 +21,7 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > reference: `OPENROUTER_API_KEY` was set from `${GLM_OPENROUTER_API_KEY}`.
 > Since 2026-10-19 the committed invocation carries no key variable: it
 > declares `credentialStore` (the `pi` login store), and pi reads the key from
-> the `auth.json` the sandbox is handed (docs/specs/runner.md RUL105). The
+> the `auth.json` the sandbox is handed (docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules RUL105). The
 > per-executor `env` mechanism described below is unchanged for any
 > invocation that still names a variable. Everything below that names the claude CLI or
 > `ANTHROPIC_*` variables describes the superseded route.

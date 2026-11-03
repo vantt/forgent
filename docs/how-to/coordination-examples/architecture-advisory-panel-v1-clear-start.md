@@ -1,7 +1,7 @@
 # Example family: clear start (mdview)
 
 Grounded in a real, closed session:
-[P01.2](../../architect/agent-coordination/verification/architecture-advisory-panel/P01.2.md)
+[P01.2](../../platform/agent-coordination/verification/architecture-advisory-panel/P01.2.md)
 (worked here as a narrated example, not a copy of the proof files
 themselves — read those for the complete, unabridged artifacts).
 
@@ -113,9 +113,9 @@ all the way to the final response.
 The synthesizer's one recommendation, and the explanation the person
 actually read, both preserved that live disagreement rather than smoothing
 it — read the real
-[`synthesis.md`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/synthesis.md)
+[`synthesis.md`](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/synthesis.md)
 and
-[`explanation.md`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/explanation.md).
+[`explanation.md`](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/explanation.md).
 The explanation opens like this, not with an architecture diagram:
 
 > "Keep the daemon as the single authority. [...] But do not start with the

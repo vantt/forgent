@@ -158,11 +158,17 @@ fn concurrent_claims_from_different_clones_get_distinct_consecutive_numbers() {
 fn a_claim_starts_after_the_highest_number_the_documents_already_carry() {
     let w = world(1);
     let clone = &w.clones[0];
-    fs::create_dir_all(clone.join("docs/specs")).unwrap();
+    fs::create_dir_all(clone.join("docs/platform/area/decisions")).unwrap();
+    fs::create_dir_all(clone.join("docs/platform/area/history/old")).unwrap();
     fs::create_dir_all(clone.join("docs/decisions")).unwrap();
     fs::write(
-        clone.join("docs/specs/area.md"),
-        "# Area\n\nA body line naming D-ADR0099 is not a heading.\n\n### D-ADR0072 (a decision), replaces D-ADR0056\n",
+        clone.join("docs/platform/area/spec.md"),
+        "# Area\n\nA body line naming D-ADR0099 is not a heading.\n\n### D-ADR0060 (a decision), replaces D-ADR0056\n",
+    )
+    .unwrap();
+    fs::write(
+        clone.join("docs/platform/area/decisions/narrative.md"),
+        "# Decisions\n\n### D-ADR0072 (a decision kept in a decisions file)\n",
     )
     .unwrap();
     fs::write(clone.join("docs/decisions/0021-some-decision.md"), "# x\n").unwrap();
@@ -170,11 +176,31 @@ fn a_claim_starts_after_the_highest_number_the_documents_already_carry() {
 
     let adr = claim_sequence(&w.state, clone, SequenceKind::DAdr).unwrap();
     assert_eq!((adr.number, adr.id.as_str()), (73, "D-ADR0073"));
+
+    // Relocated history then carries the highest number, so it sets the next floor.
+    fs::write(
+        clone.join("docs/platform/area/history/old/note.md"),
+        "# Old\n\n### D-ADR0075 (relocated history)\n",
+    )
+    .unwrap();
     assert_eq!(
         claim_sequence(&w.state, clone, SequenceKind::DAdr)
             .unwrap()
             .id,
-        "D-ADR0074"
+        "D-ADR0076"
+    );
+
+    // The platform laws then carry a higher number, so they set the next floor.
+    fs::write(
+        clone.join("docs/platform/platform-foundations.md"),
+        "# Laws\n\n### D-ADR0080 (a law decision)\n",
+    )
+    .unwrap();
+    assert_eq!(
+        claim_sequence(&w.state, clone, SequenceKind::DAdr)
+            .unwrap()
+            .id,
+        "D-ADR0081"
     );
     assert_eq!(
         claim_sequence(&w.state, clone, SequenceKind::DecisionFile)

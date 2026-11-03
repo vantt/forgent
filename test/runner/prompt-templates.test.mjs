@@ -195,7 +195,7 @@ This repo is self-modifying: fix any of its own runner/evolve/state modules
 — proof a fix was validated against a real failing test before it existed.
 AFTER your implementation is written in this checkout (running this BEFORE
 your edits exist reads an empty diff and gives a false "not required" — see
-\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\`'s
+\`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\`'s
 "Watch out for" section), classify your own diff (the runner commits later, so
 the changed files come from the working tree, not from a branch diff):
 
@@ -212,7 +212,7 @@ console.log(JSON.stringify(classifyIronLaw({ filesChanged: [['diff', '--name-onl
 If the result's \`required\` is \`false\`, do nothing further. If
 \`required\` is \`true\`, you must produce real failing-test-first proof
 before reporting \`[DONE]\` — see
-\`docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\`
+\`docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md\`
 for the full recipe: identify the test file(s) covering your change, \`git
 stash push --\` the IMPLEMENTATION files only (never the test files), run
 the same test command and capture the real failing output (red — paste the

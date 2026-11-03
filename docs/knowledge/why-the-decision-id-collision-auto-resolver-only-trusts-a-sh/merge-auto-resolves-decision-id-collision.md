@@ -78,7 +78,7 @@ passing at commit time):
 `src/runner/merge.mjs` matches the `src/runner/` prefix rule in
 `src/evolve/iron-law.mjs`'s `MODULE_RULES` — this item's own diff requires
 `--acknowledge-iron-law` from a real human operator before it can be
-approved (RUL34/RUL37, `docs/specs/runner.md`; CONTEXT.md D2, unchanged and
+approved (RUL34/RUL37, `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`; CONTEXT.md D2, unchanged and
 unaffected by this item). That is treated as an expected cost, not a defect
 to route around: the same test suite quoted above IS the failing-test-first
 proof the human operator is expected to have already confirmed before

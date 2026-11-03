@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::collections::{HashSet, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::sync::LazyLock;
 
 const PACKAGED_RULES: &str = include_str!("../../contracts/convention.rules.v1.json");
@@ -91,6 +91,10 @@ pub struct Rule {
     pub roots: Vec<String>,
     pub scope: Vec<String>,
     pub posture: Posture,
+    /// A path-only refusal, not a body/authority judgment. More specific
+    /// admitted placement rows can override a forbidden catch-all.
+    #[serde(default)]
+    pub forbidden: bool,
     #[serde(default)]
     pub cutoff: Option<String>,
     #[serde(default)]
@@ -119,7 +123,7 @@ pub enum Cardinality {
     Collection,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, serde::Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Posture {
     Block,
@@ -170,7 +174,7 @@ fn validate_rules(rules: &RuleSet) -> Result<(), RuleError> {
         return Err(RuleError::InvalidRule("unexpected contract id".into()));
     }
     let mut ids = HashSet::new();
-    let mut kinds = HashSet::new();
+    let mut kinds = HashMap::new();
     for rule in &rules.rules {
         if !ids.insert(rule.id.as_str()) {
             return Err(RuleError::InvalidRule(format!(
@@ -178,10 +182,19 @@ fn validate_rules(rules: &RuleSet) -> Result<(), RuleError> {
                 rule.id
             )));
         }
-        if !kinds.insert(rule.kind.as_str()) {
+        if kinds
+            .insert(rule.kind.as_str(), rule.shape)
+            .is_some_and(|shape| shape != rule.shape || shape == RuleShape::NameTemplate)
+        {
             return Err(RuleError::InvalidRule(format!(
-                "duplicate kind '{}'",
+                "kind '{}' must have one shape and at most one name template",
                 rule.kind
+            )));
+        }
+        if rule.forbidden && rule.shape != RuleShape::PlacementGlob {
+            return Err(RuleError::InvalidRule(format!(
+                "forbidden rule '{}' must be placement-glob",
+                rule.id
             )));
         }
         match rule.shape {
@@ -222,12 +235,12 @@ fn validate_rules(rules: &RuleSet) -> Result<(), RuleError> {
     Ok(())
 }
 
-fn glob_specificity(glob: &str) -> Vec<u8> {
+pub(crate) fn glob_specificity(glob: &str) -> Vec<u8> {
     glob.split('/')
         .map(|segment| match segment {
             "**" => 0,
             "*" => 1,
-            value if value.starts_with('<') && value.ends_with('>') => 2,
+            value if value.contains('<') && value.contains('>') => 2,
             _ => 3,
         })
         .collect()
@@ -273,7 +286,7 @@ fn segments_can_match(left: &str, right: &str) -> bool {
 
 fn is_wildcard(segment: &str) -> bool {
     matches!(segment, "*" | "**")
-        || (segment.starts_with('<') && segment.ends_with('>') && segment.len() > 2)
+        || (segment.contains('<') && segment.contains('>') && segment.len() > 2)
 }
 
 impl RuleSet {

@@ -1,18 +1,44 @@
 # Dispatch Control Plane
 
+```txt
 Document type: Architecture
-Design status: Accepted
-Implementation: Partial
-Last reviewed: 2026-09-09
-Canonical for: dispatch responsibility and governance boundaries; the
-DispatchRequest, PolicyPatch, and DispatchPlan contracts; component-internal
-ownership and forbidden dependencies for the Dispatch And Execution Engine.
-Related: [Component Boundary Advisory](../../../architect/component-boundary/component-boundary-advisory.md)
-(discussion-only), [Component Authority Boundary Map](../../../architect/proposals/component-authority-boundary-map.md)
-(draft), [FlowDefinition Contract](../contracts/flow-definition.md),
-[Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md),
-[Assignment/Run/RunResult Contract](../contracts/assignment-run-runresult.md),
-[Dispatch Core Contract Normalization plan](../../../history/dispatch-core-contract-normalization/plan.md)
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/architecture/dispatch-control-plane.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+
+## Implementation And Design Status
+
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.
+
+| Section | Status | Evidence / limit |
+|---|---|---|
+| Responsibility | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:1-10 (executeAssignment; 'Never mutates Work lifecycle state') |
+| Flow | Implemented compiler pipeline; capability-set declaration remains design | compileDispatchPlan plan.mjs:45,444-461; no standalone execution-capability-set step is claimed |
+| Routing Identities | Legacy resolver implementation, distinct from host binding | resolve.mjs:33-66,269; executor for[] remains read by that resolver; runner.md contradiction is queued separately |
+| Contracts | Current implementation plus explicitly labelled target interfaces | DispatchRequest normalizer is proposed; compiled fields and accepted policy inputs are stated locally |
+| DispatchRequest (outer → core) | Unimplemented design proposal | git grep DispatchRequest src packages apps domains bin test: zero hits; plan.mjs:45 options bag is still the de facto request |
+| DispatchPlan (core → runtime) | Current compiled fields; example target shape is not literal output | plan.mjs:444-461; policy.executor-mismatch-ignored is a real reason code |
+| Executor Kinds | Current contract/invariant | src/runner/dispatch/config.mjs:452 EXECUTOR_KINDS=['agent','tool']; src/runner/dispatch/resolve.mjs:385 Gate B3; test/runner/dispatch.test.mjs |
+| Component-Internal Ownership | Current owners; proposed normalizer labelled design | resolve, assignment-policy, mechanism, plan, assignment-runner, transport and herdr-round; no live cohort exception |
+| Component-Outer Boundary Note | Current authority boundary and proposed normalized handoff | assignment-runner.mjs:523-539; outer callers cannot create an ungoverned launch door |
+| Separation Of Concerns | Current owner boundary | assignment.mjs, plan.mjs, assignment-runner.mjs, run-result.mjs; semantic operation selection belongs outside dispatch |
+| Source Inventory | Current source owners; no unsupported manifest registration | src/runner/work-compat.mjs and operation-choice.mjs are Work-layer modules; boundary tests prohibit lifecycle mutation, not all occurrences of claim |
 
 ## Responsibility
 
@@ -37,14 +63,12 @@ Assignment
   -> RunResult normalization
 ```
 
-`execution capability set` is a declared step, not a derived one. A mechanism
-having been selected does not tell the Run what that mechanism can and cannot
-do, so an executor declares it: how the prompt reaches the worker, what
-permission posture it runs under and what confinement that posture requires,
-what counts as a receipt, and whether the mechanism can be observed or
-contacted at all. A capability the mechanism does not have is refused by name
-rather than silently degraded, and a capability reachable in one execution
-mode but not the other has to say so (ADR-010 §3).
+Execution requirements are not inferred merely from the mechanism name.
+The current implementation expresses prompt delivery, permission posture and
+confinement through executor/configuration and adapter checks. A unified
+`execution capability set` is a design description, not a separately emitted
+plan field or an implemented compiler stage. Unsupported requirements must
+not be silently weakened; check the owning adapter and confinement authority.
 
 ## Routing Identities
 
@@ -62,18 +86,16 @@ executor-id  — explicit concrete implementation override, naming a
 `purpose` is not a third identity. It is compatibility terminology for
 capability. The `--for <purpose>` CLI flag and the `purpose`/`for` parameter
 names threaded through `src/runner/dispatch/plan.mjs` and
-`src/runner/dispatch/resolve.mjs` (`resolveExecutorIdForPurpose`,
-`resolveExecutorAndOverrides(cfg, executorIdOrPurpose)`) all name a capability
-value, resolved against the same `runner.capabilities` catalog an explicit
-capability selector would use. `compileDispatchPlan()`'s
-`selector.type: 'purpose'` denotes a capability-shaped request, not a separate
-ontology; nothing downstream branches on `purpose` as a concept distinct from
-capability. Renaming these call sites internally is compatibility work
-(tracked as Slice D/E in the normalization plan above), not a semantic
-change — `--for` and `--work` stay supported on `decide` at the CLI/API
+`src/runner/dispatch/resolve.mjs` (`resolveExecutorAndOverrides`) name capability
+values. `resolveExecutorIdForPurpose` is not a current exported resolver.
+`compileDispatchPlan()`'s `selector.type: 'purpose'` is the compatibility
+selector label. It does not create a third conceptual route identity.
+`--for` and `--work` stay supported on `decide` at the CLI/API
 adapter layer. (`execute --assignment` was removed with the rest of the raw
-`dispatch execute` door, decision 0062 in `docs/specs/runner.md`; work runs
+`dispatch execute` door, decision 0062 in `docs/platform/runner/decisions/h-36d872fbb0e5.md#0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability`; work runs
 through `fgos run`.)
+The [earlier normalization plan](../../../history/dispatch-core-contract-normalization/plan.md)
+is dated migration context, not an assertion that its remaining helpers ship.
 
 `job` is not a routing identity. ADR-004 reserves the term for a possible
 future scheduler; where it appears (e.g. in logs), it names a caller's
@@ -90,10 +112,10 @@ Component-Outer Boundary Note below.
 
 ## Contracts
 
-These three contracts are canonical for this control plane. They are
-additive over the current implementation, not a replacement of it — see the
-Implementation Status line under each for what is real today versus still
-Slice D/E scope in the normalization plan.
+The following shapes describe the intended request/policy/plan boundary.
+The status below each distinguishes design fields from the actual exported
+function inputs and compiled output; do not send the illustrative JSON as if
+all fields were already accepted by a typed normalizer.
 
 ### DispatchRequest (outer → core)
 
@@ -101,7 +123,7 @@ Slice D/E scope in the normalization plan.
 {
   "target": { "kind": "capability | executor", "value": "code:implement" },
   "policy": {
-    "minTier": "standard",
+    "rigor": "standard",
     "preferExecutor": "agy-herdr",
     "fallbackExecutors": ["codex-herdr"],
     "preferPersona": "code-reviewer",
@@ -111,7 +133,7 @@ Slice D/E scope in the normalization plan.
     "source": "workflow-operation",
     "domain": "coding",
     "workflow": "feature",
-    "stage": "executing",
+    "workflowStep": "executing",
     "operation": "implement-item",
     "taskSpec": "implement-item",
     "skill": "fgos-coding-implement"
@@ -135,54 +157,45 @@ Rules:
 
 **Implementation status.** No single typed `DispatchRequest` object exists
 yet. `compileDispatchPlan()`'s options bag
-(`executorId | for | work | assignment | stage | needsSoul |
-hasLiveTaskAccess | caller | cliOverride | options`) is the de facto request
-shape today — untyped, and `work`/`assignment` are resolved to a
-capability/executor-id *inside* `plan.mjs` rather than by the caller before
-the boundary. Introducing a normalized `DispatchRequest` helper near
-`plan.mjs` without changing `compileDispatchPlan`'s role as the sole
-execution chooser is Slice D scope.
+(`executorId | for | work | assignment | needsSoul | hasLiveTaskAccess |
+caller | workItem | workExecutorId | assignmentItem | cliOverride | options`)
+is the current input shape (`plan.mjs:46-60`). Work compatibility context is
+resolved through that path, not through a shipped typed DispatchRequest helper.
+The proposed normalized outer request remains an unimplemented design.
 
 ### PolicyPatch
 
-One validated shape at every declared scope (runner/default, definition,
-node, operation, role, actor, Work, Assignment, human/CLI, governance) — see
-the [FlowDefinition Contract](../contracts/flow-definition.md#policypatch)
-for the accepted schema. Dispatch does not define a second policy shape; it
-consumes the same one.
-
 ```txt
-runner/default
-→ definition/protocol
-→ operation/taskSpec
-→ role
-→ actor/persona
-→ Work constraints
-→ Assignment
-→ trusted human/CLI override
-→ governance
+Global defaults
+→ Domain defaults
+→ Workflow defaults
+→ Step defaults
+→ Operation/taskSpec defaults
+→ Role defaults
+→ Persona defaults
+→ Work policy
+→ Assignment policy
+→ Human/CLI inputs
+→ Governance
 ```
 
-Merge rules (already accepted and enforced):
+This is the documented policy composition order, not a claim that every scope
+is separately discovered by the leaf resolver. Callers supply composed inputs;
+`resolveAssignmentDispatchPolicy` resolves Assignment/Work/config/caller inputs.
 
-- tier constraints accumulate monotonically — a weaker layer cannot lower a
-  stronger required tier;
-- executor preference is most-specific-wins, subject to registration and
-  governance;
-- provider family derives from the selected registered executor, never from
-  a raw selector string;
-- literal model/executor names are not portable workflow/protocol data — a
-  *portable* definition expresses `minTier`/`capabilities` only;
-- provenance records the winning scope for every resolved field, as
-  `{field: {value, source: {scope, id}}}`.
-
-**Implementation status.** Implemented. `resolveAssignmentDispatchPolicy()`
-(`src/runner/dispatch/assignment-policy.mjs`) implements this exact
-precedence and provenance shape. `assertNoPortableExecutorPin()`
-(`src/runner/coordination/session-engine.mjs`) already rejects a literal
-`preferExecutor` declared at a portable definition/role/actor/operation
-scope. `fallbackExecutors` remains `reserved-not-executed`: recorded and
-validated, never automatically dispatched as failover.
+- Explicit rigor requirements cannot be weakened by a later lower requirement;
+  the implicit standard is a fallback, not a floor. Derived tiers retain the
+  strongest requirement (`assignment-policy.mjs:224-325` (former module; removed from main before source capture, not a current owner)).
+- Executor/persona preferences use the most-specific supported input, subject
+  to governance (`assignment-policy.mjs:332-380` (former module; removed from main before source capture, not a current owner)).
+- Provider/model selection belongs to the registered executor/policy path.
+- Portable YAML uses rigor rather than removed `minTier` or explicit tier/model
+  pins; the resolver rejects those retired/forbidden inputs
+  (`assignment-policy.mjs:203-215` (former module; removed from main before source capture, not a current owner)). A general
+  `assertNoPortableExecutorPin` helper is not current implementation.
+- Effective provenance records winning values and sources
+  (`assignment-policy.mjs:493-505` (former module; removed from main before source capture, not a current owner)); no current `mergePolicyStack` function is
+  implied by the composition diagram.
 
 ### DispatchPlan (core → runtime)
 
@@ -205,28 +218,25 @@ validated, never automatically dispatched as failover.
 An explicit executor override remains visible as an override; it must not
 silently replace the requested capability's own provenance.
 
-**Implementation status.** Implemented for dispatchable plans.
-`compileDispatchPlan()` (`src/runner/dispatch/plan.mjs`) returns the legacy
-selector/mechanism fields plus `bindingSource`, `tier`, `model`,
-`providerModel`, structured field-level `provenance`, and the complete
-merged `policy`. It delegates those policy fields to
-`resolveAssignmentDispatchPolicy()` rather than re-deriving them, and
-`assignment-runner.mjs` now reads `compiledPlan.policy` directly instead of
-calling the policy resolver a second time.
+**Implementation status.** The illustrative `requestedTarget`,
+`requestedCapability` and `selectedExecutor` names above are target-state
+vocabulary, not current compiled output keys. `compileDispatchPlan()` returns
+`selector`, `caller`, `mechanism`, `executorId`, `capability`, `invocation`,
+`governance`, `reasonCodes`, optional `agentType`/`mcpTool`, `configured`,
+`bindingSource`, `tier`, `model`, `providerModel`, `provenance` and `policy`
+(`plan.mjs:444-461`). Policy resolution delegates to
+`resolveAssignmentDispatchPolicy`; it is not duplicated by the caller.
 
 For a real Assignment, policy resolution failure or a
 decided-executor-versus-policy-executor mismatch remains a hard
 `RunnerConfigError`. For a non-Assignment compatibility request
 (`decide --for`, `decide <executor-id>`, `decide --work`), `plan.mjs`
-synthesizes the smallest policy object needed for observability:
-`preferExecutor` is the already-selected executor, and capability
-`overrides.providerModel`/`overrides.model`/`overrides.tier`/
-`overrides.rigorOverrides` are folded into the synthesized policy so the
-reported model/tier matches the same capability-default path used by
-execution. If that synthesized policy would disagree with an explicit caller
-override, the plan stays dispatchable and records
-`policy.executor-mismatch-ignored`; the optional policy fields are left
-unset rather than turning a legacy `decide` probe into a thrown error.
+synthesizes an Assignment policy with `preferExecutor` and, when configured,
+capability `rigor` and `capability` (`plan.mjs:403-411`).
+Removed capability `overrides` are rejected by config validation, not folded
+into policy. Synthetic policy failures leave policy fields null; an executor
+mismatch also records `policy.executor-mismatch-ignored`
+(`plan.mjs:422-441`). A real Assignment's corresponding failure remains fatal.
 
 Governance-blocked and genuinely unavailable plans also leave
 `tier`/`model`/`providerModel`/`provenance`/`policy` unset so they never
@@ -257,21 +267,25 @@ The Dispatch And Execution Engine owns exactly these authorities. No other
 component performs any of them; this control plane performs none of the
 Component-Outer Boundary Note's responsibilities.
 
-1. **Request normalizer** — accepts only a normalized capability/executor
-   target plus PolicyPatch/provenance; performs no Work graph traversal.
-2. **Capability binding resolver** — resolves capability aliases, `prefer`,
-   and executor `for[]` declarations (`resolveExecutorAndOverrides`).
+1. **Request normalizer (design)** — the normalized target/policy/provenance
+   boundary is proposed; current inputs are the compiler options above.
+2. **Capability binding resolver** — `resolveExecutorAndOverrides` binds literal
+   executor IDs/defaults or capability `prefer`; aliases and executor `for[]`
+   inform capability labels separately in `resolveCapabilityDetailsFromHints`
+   (`resolve.mjs:25-66,269-310`), not this binding resolver.
 3. **Executor registry resolver** — resolves a literal executor-id to its
    concrete invocation/tool/agent shape (`resolveExecutorConfig`).
-4. **Policy resolver** — `resolveAssignmentDispatchPolicy`/
-   `mergePolicyStack`; owns provider/model/tier derivation and provenance.
+4. **Policy resolver** — `resolveAssignmentDispatchPolicy`; owns supported
+   provider/model/rigor/tier derivation and provenance, not a `mergePolicyStack`.
 5. **Governance resolver** — checks egress/provider/executor/content
    constraints (cross-provider gate, `allowCrossProvider`, `carries`).
 6. **Mechanism resolver** — decides in-process/out-of-process/unavailable
    and MCP/tool handback (`decideDispatchMechanism`,
    `decideExecutorDispatchMechanism`).
-7. **DispatchPlan compiler** — `compileDispatchPlan()`; joins the prior
-   decisions into one plan. Remains the sole execution chooser.
+7. **DispatchPlan compiler** — `compileDispatchPlan()` joins the legacy
+   dispatch decisions. Unit execution first obtains its binding through
+   `bind()`; assignment-runner revalidates that binding and compiles the
+   governed execution plan. The domain harness owns neither choice.
 8. **Run runtime/adapters** — creates, launches, observes, settles, and
    retries a Run without choosing semantic operation
    (`assignment-runner.mjs`, `transport.mjs`, `herdr-round.mjs`).
@@ -280,31 +294,21 @@ Forbidden dependencies for all eight:
 
 - no `Work` lifecycle mutation (`pick`, `return`, `claim`, `take`): enforced by boundary grep tests (`test/runner/dispatch-reconciliation-import-graph.test.mjs`). Work driving orchestration lives exclusively in Work Driver (`src/runner/loop.mjs`, `src/runner/fanout-batch.mjs`);
 - no event store append (`appendEvent`): audit dispatch logging was isolated to `src/runner/dispatch-log.mjs` outside dispatch core (module removed with `dispatch log`, decision 0062; `fgos run` records provenance under `.fgos/assignments/<unitRunId>/`);
-- no workflow/stage/task/skill lookup: dispatch core contains no Work lookup implementations. Work capability lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) are housed in dedicated leaf compatibility module `src/runner/work-compat.mjs` (registered as `infra` in architecture manifest) with zero imports into dispatch core; `src/runner/dispatch/resolve.mjs` and `prepare.mjs` provide backward-compatible re-exports without importing `workflow-stage-graphs` or `operation-choice.mjs`, consumed by pre-existing callers (`plan.mjs` for `compileDispatchPlan({work})` and `cli.mjs` for `spawnWorker`). All 13 strictly decoupled dispatch core modules contain zero `workflow-stage-graphs` imports, and boundary tests enforce that strict core modules cannot import Work lookup symbols or `work-compat.mjs` (verified by `test/runner/dispatch-reconciliation-import-graph.test.mjs`);
+- no semantic Workflow/domain operation lookup in the strictly decoupled dispatch core. Work-layer lookups belong to `src/runner/work-compat.mjs` and `src/runner/operation-choice.mjs`; caller-derived hints enter the compiler. Historical compatibility re-exports and an `infra` manifest label are not current ownership proof. See boundary tests at `test/runner/dispatch-reconciliation-import-graph.test.mjs:434-443`.
 - no semantic operation choice;
 - no direct protocol/skill/domain executor launch;
 - no RunResult confidence decision (owned by the Run Result Evaluator);
 - no provider/model selection outside the policy resolver (item 4);
-- no second private dispatch path for a coordination or domain harness —
-  `cohort-planner.mjs` is the one confirmed exception, and it only *re-reads*
-  `resolveExecutorConfig`/`resolveAssignmentDispatchPolicy` for a
-  pre-dispatch feasibility check; it never spawns and never bypasses them.
+- no second private executor-launch path for a domain or coordinating harness.
+  The retired `cohort-planner.mjs` is not a current exception or authority.
 
 ## Component-Outer Boundary Note
 
-Work Driver, Coordination Engine/FlowDefinition, Domain Harness, and
-Host/CLI/API callers derive a capability or explicit executor-id plus a
-PolicyPatch and provenance, then hand a DispatchRequest to this control
-plane. None of them calls `resolveExecutorConfig` or launches an executor
-directly. `dispatchDeclaredOperation()`
-(`src/runner/coordination/session-engine.mjs`) is the concrete example
-today: it composes a full scoped policy stack (runner → definition →
-operation → role → actor) and passes the winning provenance to
-`resolveAssignmentDispatchPolicy` via `cliOverride.policyProvenance`, rather
-than re-deriving policy itself. Full component-outer ownership (Work Driver,
-FlowDefinition/operation, domain harness, host CLI/API selector
-compatibility) is documented in the normalization plan's Slice C scope, not
-duplicated here.
+Work, host, CLI/API and domain callers choose the semantic task and pass its
+target/capability, policy inputs and provenance into governed execution.
+They retain lifecycle decisions and consume returned evidence; they must not
+resolve executor configuration and launch around dispatch governance or
+confinement. The proposed outer normalizer is not a shipped alternate door.
 
 ## Governance
 
@@ -320,6 +324,10 @@ duplicated here.
 
 ## Separation Of Concerns
 
+Planning may be agent-led, declared by a Workflow, or supplied by a domain
+harness. A validated Assignment still enters the same governed execution path;
+the planning source does not grant a private launch or result-acceptance path.
+
 ```txt
 planner     proposes a declared or dynamic semantic action
 policy      validates legality, authority, bounds, and selected domain rules
@@ -330,17 +338,6 @@ normalizer  creates RunResult
 caller      consumes evidence and invokes authorized lifecycle behavior, if any
 ```
 
-Planning may be agent-led, declared, or domain-assisted. Dispatch does not care
-which source proposed the validated Assignment and must not create separate
-runtime paths for them. A CoordinationSession or a declared
-`CoordinationProtocol` FlowDefinition (see
-[ADR-008](../decisions/ADR-008-coordination-session-and-mission-deferral.md),
-[ADR-009](../decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md))
-is one more caller of this same flow: a Cohort Planner may emit actor policy
-inputs, but it resolves and dispatches exactly one Assignment at a time
-through this control plane — it may not spawn an executor directly or read
-sibling Assignment state.
-
 The detailed redesign source remains a
 [proposal](../proposals/dispatch-control-plane-redesign.md) until its unresolved
 target-state sections are reconciled with implementation.
@@ -349,8 +346,9 @@ target-state sections are reconciled with implementation.
 
 | Layer | Modules | Responsibilities & Boundaries |
 | --- | --- | --- |
-| Dispatch Core | `src/runner/dispatch/**` (`cli.mjs`, `plan.mjs`, `resolve.mjs`, `prepare.mjs`, `settlement.mjs`, `reconcile-cli-spawn.mjs`, `herdr-reconcile.mjs`, `proof-helpers.mjs`, `assignment-runner.mjs`, `confinement/**`, `transport.mjs`, `herdr-round.mjs`, `brief.mjs`, `assignment.mjs`, `runtime-inspection.mjs`) | Execution allocation, plan compilation, executor commands, confinement, and adapter execution. Strictly zero references to `pick`, `return`, `claim`, or `appendEvent`. |
-| Work Driver Compatibility | `src/runner/work-compat.mjs` | Leaf compatibility module (registered as "infra" in architecture manifest) housing Work Driver compatibility lookup implementations (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) with zero imports into dispatch core; consumed by `plan.mjs`/`cli.mjs` via compatibility re-export. |
-| Stage Operation Selection | `src/runner/dispatch/operation-choice.mjs` | Bridge for stage operation selection (`chooseStageOperation`, `executeDriverOperationChoice`) consuming hardened RunResult. |
-| Work Driver | `src/runner/loop.mjs`, `src/runner/fanout-batch.mjs` | Work item lifecycle orchestration, batch fan-out driving (`pick -> executeExecutorCli -> return`), fail-safe settlement (`fgos return --to blocked`), and worker slots occupancy (`OccupancyPort`). |
+| Dispatch Core | `src/runner/dispatch/**` (`cli.mjs`, `plan.mjs`, `resolve.mjs`, `prepare.mjs`, `settlement.mjs`, `reconcile-cli-spawn.mjs`, `herdr-reconcile.mjs` (former module; removed from main before source capture, not a current owner), `proof-helpers.mjs`, `assignment-runner.mjs`, `confinement/**`, `transport.mjs`, `herdr-round.mjs`, `brief.mjs`, `assignment.mjs`, `runtime-inspection.mjs`) | Execution allocation, plan compilation, confinement and adapter execution. Boundary tests prohibit Work lifecycle mutation/imports; they do not prohibit every textual occurrence of `claim`. |
+| Work Driver Compatibility | `src/runner/work-compat.mjs` | Work-layer capability/prompt lookup helpers; not a dispatch-core semantic owner or evidence of an `infra` manifest registration. |
+| Workflow Operation Selection | `src/runner/operation-choice.mjs` | `chooseStageOperation` and `executeDriverOperationChoice` retain their historical export names while selecting current Workflow step operations and consuming hardened RunResult. |
+| Work Driver | `src/runner/loop.mjs`, `src/runner/fanout-batch.mjs` | Work lifecycle orchestration and batch driving. A Run's dispatch claim is not Work intake/approval authority; no current `OccupancyPort` API is implied. |
 | Audit Seam | removed (`src/runner/dispatch-log.mjs`, decision 0062) | Audit event logging (`logExecutorDispatch`) was isolated from dispatch core; `fgos run` now records provenance under `.fgos/assignments/<unitRunId>/`. |
+

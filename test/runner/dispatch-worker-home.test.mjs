@@ -15,7 +15,7 @@ import { normalizeAgentName } from '../../src/runner/dispatch/proof-helpers.mjs'
 // found by hitting its own failure while running a real agent in an isolated
 // session on 2026-09-06. An empty private HOME is not a private HOME, it is a
 // broken one, and each missing item breaks it a different way. Evidence:
-// docs/architect/agent-coordination/verification/visibility-herdr/proofs/
+// docs/platform/agent-coordination/verification/visibility-herdr/proofs/
 //   2026-09-06-isolation/agent-in-session-findings.md and permission-posture-findings.md
 
 const REPO_ROOT = '/home/someone/projects/repo';

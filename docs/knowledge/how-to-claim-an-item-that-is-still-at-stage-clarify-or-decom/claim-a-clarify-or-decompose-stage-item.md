@@ -114,7 +114,7 @@ correct re-claim door for an item you already worked on.
 **When this comes up:** an item held at stage `decompose` is released back
 to `status: todo` the moment it reaches stage `executing` (the "claim-lock
 §3b release", `src/intake/plan.mjs`'s `releaseClaimOnExecuting`,
-`docs/specs/runner.md:163-168`) — precisely so the same or another session
+`docs/platform/runner/spec.md`) — precisely so the same or another session
 can claim it again for the executing phase on the same branch. Re-running
 `pick <id>` at that point is the intended, routine door.
 

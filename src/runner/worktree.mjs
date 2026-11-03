@@ -147,6 +147,8 @@ export function runWorktreeSetupCommands(worktreePath, repoRoot) {
       execFileSync(command, {
         cwd: worktreePath,
         shell: true,
+        // Like verify commands, these are explicitly configured consumer commands.
+        [Symbol.for('fgos.git.consumer-command')]: true,
         encoding: 'utf8',
         stdio: 'pipe',
         timeout: WORKTREE_SETUP_TIMEOUT_MS,
@@ -705,7 +707,7 @@ function relocateOrphanedCheckout(repoRoot, branch, targetPath) {
  * `opts.baseRef` (default: `detectTrunk(repoRoot)`, tsk-386 — no longer a
  * literal `'main'`; a host project whose trunk is `master` would otherwise
  * fail `git branch fgw/<id> main` outright on this fallback, per
- * `docs/distribution-vision.md`'s "installed into other repos" story).
+ * `docs/platform/git/spec.md#7-hardened-git-backend-parsers-and-hook-contract`'s "No hardcoded trunk" contract).
  * Idempotent: if `fgw/<id>` already exists, this is a no-op — it does NOT
  * move the branch to `baseRef`, mirroring the RETRY-WITHOUT-SELF-COLLISION
  * discipline above (a retried root-dispatch must not disturb a branch that
@@ -968,7 +970,7 @@ function isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced) {
  * current tip (`git merge-base --is-ancestor` — no commit would be lost),
  * and the worktree has no real uncommitted changes relative to that same
  * last-synced commit. Refuses loudly otherwise — never resets blind, the
- * same discipline `docs/how-to/safely-reset-the-main-checkout.md` already
+ * same discipline `docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md#before-you-start` already
  * documents for the main checkout, applied here to a claim worktree
  * instead (a different protected target — this stays its own guard, not a
  * reuse of `main-checkout-reset-guard.mjs`). A worktree already at its
@@ -1005,7 +1007,7 @@ export function resyncClaimWorktree(repoRoot, worktreePath, branch) {
 
   if (isDirtyRelativeToSync(repoRoot, worktreePath, lastSynced)) {
     throw new WorktreeError(
-      `refusing to resync claim worktree "${worktreePath}" on "${branch}" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in "${worktreePath}" before claiming "${branch}" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/how-to/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,
+      `refusing to resync claim worktree "${worktreePath}" on "${branch}" — its last-synced commit (${lastSynced}) is behind the branch's current tip (${branchTip}, likely from a child merge landing since this worktree was last synced) and the tree has uncommitted changes. Commit or discard the work in "${worktreePath}" before claiming "${branch}" again — never auto-reset over uncommitted work. Not sure whether this is real work or a stale artifact left over from the drift? See docs/knowledge/how-to-tell-a-stale-worktree-index-apart-from-real-uncommitt/tell-a-stale-worktree-index-apart-from-real-uncommitted-work.md for the diagnostic recipe.`,
       { branch, worktreePath, lastSynced, branchTip },
     );
   }

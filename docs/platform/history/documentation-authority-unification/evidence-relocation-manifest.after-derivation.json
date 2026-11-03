@@ -1,0 +1,118 @@
+{
+  "ruling": "L13-143.3",
+  "rule": "L13-140 link-markup exact edits",
+  "manifest": "evidence-relocation-manifest.after.json",
+  "manifestSha256": "0104ece8ae168098dbdea1d98a2391b3b7a1ee17bb9f540608f4a3246aa1bb5d",
+  "editedPaths": [
+    "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/scout-report.md",
+    "docs/platform/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md",
+    "docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
+    "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md",
+    "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md"
+  ],
+  "doorEntries": [
+    {
+      "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/scout-report.md",
+      "entries": [
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "e7ad0248538cdc54d347260f2e8b949646580b686335c5a518282c942dd3afb8",
+          "afterSha256": "591ce3ccfe7dc7bf4b82b08ed01a1dd003732c38dbe0dba61500ca40b5f9430f"
+        },
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "49c4ad522a2d904d3d3c2b428ab9aa093086c70bc22bd19acbeb9b6363c42c6a",
+          "afterSha256": "4501108d12773dc3926f06812d8010499226e10ac9dc8fc5519da4cefa2e628e"
+        },
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "69bacad3620d26406359090ad63aae7513ee3e0713d6bcce9b73ffce443d659a",
+          "afterSha256": "f6c2da9b1d335543f1cc4ce17b91be65a5e828fab9098421c8ef2e8b448a3b96"
+        },
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "fe2f8feef6e31b5c26a7d9abaee62a4df52fc152b9e31dfe233bbaf735c3372d",
+          "afterSha256": "bab4b163777be2bd38635d187cb57b042a9ff6d9a8e2c812096a45dcc9933bd5"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/coordination-envelope/capability-fit-2026-09-06.md",
+      "entries": [
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "b7b87a3e2c921acf7ebb0c274e0c5eae08e15cb8bf95578c1b1b04d560ceecbd",
+          "afterSha256": "55e08b4a814947a26f60e932f6c33df7b91a29fe9c5fff7708dd372ccd40cddd"
+        },
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "b00fc8f9c415c45698fdc5230438cd20ce16d442aa50fc178c5154af3c373fe1",
+          "afterSha256": "d3917a72879aa3592c451f0fdc91458fce1ee7ed69663431d2d8af164f3cb093"
+        },
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "b1617b3e2c0c6b1516c4c35e82d25dd2d85628b893217d70a53f9ead4028f2e8",
+          "afterSha256": "658f8dede3f96e61977660aab72ff168b8dba4e52a2616d418d7112b9b39f15f"
+        },
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "33ae57ce0341692c46e7431d61995eee1c3a94a8dc41443301f684a1bda2077a",
+          "afterSha256": "5d7ba3acbbe16f4095a82bbea2093aee75456bc777d8d1154d8cc6968a80dd59"
+        },
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "a1f7cc6eef4797ef7e2da5770d3a85ab7fe82880fb42f200642c7ee2b687bdb3",
+          "afterSha256": "75f3a8f7957bff9ce34188429c6eb828fa7fdf3b448e753883614ae1eb270975"
+        },
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "55c8be6dda4f141cc7556d3c9889bc5b6b33cce23592ae60ddd2f8aa1ce18a20",
+          "afterSha256": "09550f8d096e9cd40800e44943177aba41a26e0def327e97b7d8eb8793da8456"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
+      "entries": [
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "8dc887fef17e5a3b0b0f84a1fdb7c85f3facd3d98ad422ee56c9e4a4f0264759",
+          "afterSha256": "552848414174256cdb95bf523fed461ee0d70174e0275b003d364b6bc7f1aa27"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P00.1.md",
+      "entries": [
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "4022a94f481a07d729f0d8edc35e865b48b764ffcb5b32428ff43cb67a9114b1",
+          "afterSha256": "e648073298db0c477138f5b7f5be52964f813a1ed40fdd4bd89d77aa0a10fd11"
+        }
+      ]
+    },
+    {
+      "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P08.1.md",
+      "entries": [
+        {
+          "row": "plans/260925-documentation-authority-unification/reports/phase-09/owner-answers.md#l13-140",
+          "authority": "L13-140",
+          "beforeSha256": "6346015f1ea801afce63385e9bdf3bf0edd553077660bac24455963be988ac41",
+          "afterSha256": "9eae9d7c4c37152b73a4baf67c825e8770180b414236a19f2820d0b338bf6cab"
+        }
+      ]
+    }
+  ]
+}

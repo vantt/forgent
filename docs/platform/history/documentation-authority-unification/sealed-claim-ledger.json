@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "ruling": "L13-154.6",
+  "kind": "claim-ledger digest record",
+  "lastVerifiedSnapshot": {
+    "commit": "2a028cdc930c47ce207b64ab7d9e1a8a8ec295b4",
+    "rows": 68441,
+    "sha256": "acf712bffd2a5e4f2bb4f0ef565a1f1a7b11f8a4d1fa02d3c924affa5d4eab6d",
+    "verifyOk": true,
+    "summary": {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/step10-final-close-snapshot.json",
+      "blobSha": "8814f4399c21f9137119eb521b67c14c93b0dc55"
+    },
+    "snapshotArgv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "scripts/propose-doc-decisions.mjs",
+      "--inventory",
+      "<inventory at the snapshot commit>",
+      "--repo-root",
+      "<repo-root>",
+      "--identity-registry",
+      "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/pilot/decisions",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions",
+      "--snapshot",
+      "--out",
+      "<out>"
+    ],
+    "verifyArgv": [
+      "env",
+      "-u",
+      "CLAUDE_CODE_SESSION_ID",
+      "node",
+      "scripts/propose-doc-decisions.mjs",
+      "--inventory",
+      "<inventory at the snapshot commit>",
+      "--repo-root",
+      "<repo-root>",
+      "--identity-registry",
+      "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/pilot/decisions",
+      "--decisions",
+      "plans/260925-documentation-authority-unification/ledger/decisions",
+      "--verify",
+      "<snapshot.json>"
+    ],
+    "scope": "sources outside docs/platform/ (builder filter)"
+  },
+  "inputsAtApplyPin": [
+    {
+      "path": "plans/260925-documentation-authority-unification/ledger/decisions",
+      "treeSha": "3f919789cea5ef08b77f400d77c9663246ba86ea"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/pilot/decisions",
+      "treeSha": "5df1855b69713f56d724617d0b1371d7c0d853ef"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/claim-ledger.schema.json",
+      "blobSha": "0c09351af59a2f5357ad650eae7d9c195997fb53"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+      "blobSha": "a010a2e1b9a64ecd62daebe125e633d27bcc71b1"
+    },
+    {
+      "path": "plans/260925-documentation-authority-unification/reports/phase-06/working-identity-registry.json",
+      "blobSha": "16a5a3595d3bc5dbf0691b7a8a17820389935638"
+    }
+  ],
+  "postLand": {
+    "item": "fresh claim snapshot at the apply pin",
+    "phase": 10,
+    "reason": "the builder needs an inventory pinned to the snapshot commit; the committed doc-inventory parts are absent and rebinding decisions to post-F sources is plan bookkeeping (L13-152.2)"
+  }
+}

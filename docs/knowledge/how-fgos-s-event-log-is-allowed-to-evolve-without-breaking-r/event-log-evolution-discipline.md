@@ -77,7 +77,7 @@ red one.
 
 ---
 
-**Source:** `docs/history/learnings/critical-patterns.md` —
+**Source:** the historical learning log (the dated entries below have no repository content commit at that path) —
 [20260716] "Field mới stamp lên work item → CÙNG cell phải sửa allowlist fold +
 test," with its 2026-07-17 addendum on the write-side destructure (feature
 pr-lifecycle);

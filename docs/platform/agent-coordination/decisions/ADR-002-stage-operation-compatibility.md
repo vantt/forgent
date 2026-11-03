@@ -1,22 +1,40 @@
-# ADR-002: Preserve Stage Primary Operation Compatibility
+# ADR-002: Preserve Workflow step Primary Operation Compatibility
 
-Document type: ADR
-Design status: Accepted
-Implementation: Implemented
-Last reviewed: 2026-08-31
-Canonical for: migration from one Stage action to multiple operations
+```txt
+Document type: Decision
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: `docs/architect/agent-coordination/decisions/ADR-002-stage-operation-compatibility.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/decisions/ADR-002-stage-operation-compatibility.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Context
 
-Existing workflow consumers understand `stage.skill` and `stage.taskSpec`.
-Team Dispatch needs multiple legal operations per Stage without breaking that
-path.
+Current consumers obtain skills and TaskSpecs through Workflow projection APIs.
+The step's `skill` remains supported, while TaskSpec selection comes from the
+primary operation (`src/workflow/steps.mjs:52-63`), not `step.taskSpec`.
 
 ## Decision
 
-Stages may define multiple Stage Operations. `stage.skill` and
-`stage.taskSpec` remain the primary operation compatibility projection.
-Normalization and `operationsForStage()` provide the canonical operation list.
+Workflow steps may define multiple operations. `operationsForStep()` returns
+the normalized operations or synthesizes a primary operation for a skill-only
+step (`src/workflow/steps.mjs:70-85`). `taskSpecForStep()` and the domain
+`bundleForStep()` preserve primary-operation consumers. This compatibility
+does not revive Work stages or a Stage Protocol runtime.
 
 ## Consequences
 

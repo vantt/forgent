@@ -22,7 +22,7 @@ mechanism.
 
 The instinct to build a registration mechanism for "this item is done and
 ready to merge" was checked against the actual FSM and found redundant:
-`proposed` already means exactly that (`docs/platform-foundations.md` L9,
+`proposed` already means exactly that (`docs/platform/platform-foundations.md` L9,
 cited in CONTEXT.md: "Thang hoàn tất của MỘT việc: run ≠ merge ≠
 durable").
 

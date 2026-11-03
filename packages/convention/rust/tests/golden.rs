@@ -166,13 +166,127 @@ fn typed_request_uses_the_versioned_wire_keys_and_defaults() {
         "convention.query.outcome"
     );
 }
+// Owns guard 2, replacing the reservation-only proof: document placement is
+// now installed. Guard 1's refusal cases live in golden_cases_are_the_behavior_source.
 #[test]
-fn packaged_rules_reserve_only_synthetic_placement_kinds() {
-    let placement = packaged_rules()
-        .placement_rules()
-        .map(|rule| rule.kind.as_str())
-        .collect::<Vec<_>>();
-    assert_eq!(placement, ["fixture-singleton", "fixture-collection"]);
+fn documentation_placement_admits_constitution_shapes_and_refuses_unplaced_paths() {
+    for (path, kind) in [
+        ("docs/platform/README.md", "platform-portal"),
+        ("docs/reading-map.md", "reading-map"),
+        ("docs/platform/governance.md", "governance"),
+        (
+            "docs/platform/platform-foundations.md",
+            "platform-foundations",
+        ),
+        ("docs/platform/architecture-map.md", "architecture"),
+        ("docs/platform/component-boundary.md", "architecture"),
+        ("docs/platform/vision.md", "vision"),
+        (
+            "docs/platform/intent-preservation-ledger.md",
+            "intent-preservation-ledger",
+        ),
+        ("docs/platform/sample/README.md", "area-portal"),
+        (
+            "docs/platform/sample/subcomponents/child/README.md",
+            "subcomponent-portal",
+        ),
+        (
+            "docs/platform/sample/contracts/README.md",
+            "collection-index",
+        ),
+        (
+            "docs/platform/sample/subcomponents/child/contracts/README.md",
+            "collection-index",
+        ),
+        ("docs/platform/sample/spec.md", "spec"),
+        ("docs/platform/sample/subcomponents/child/spec.md", "spec"),
+        ("docs/platform/sample/vision.md", "vision"),
+        (
+            "docs/platform/sample/architecture/design.md",
+            "architecture",
+        ),
+        ("docs/platform/contracts/port.md", "contract"),
+        ("docs/platform/sample/contracts/port.md", "contract"),
+        ("docs/platform/decisions/one.md", "decision"),
+        ("docs/platform/sample/decisions/one.md", "decision"),
+        ("docs/platform/verification/README.md", "verification"),
+        ("docs/platform/sample/verification/proof.md", "verification"),
+        (
+            "docs/platform/sample/verification/run/log.json",
+            "evidence-payload",
+        ),
+        ("docs/platform/sample/operations/guide.md", "guide-runbook"),
+        ("docs/platform/sample/playbooks/guide.md", "guide-runbook"),
+        ("docs/platform/sample/vocabulary/terms.md", "vocabulary"),
+        ("docs/platform/sample/proposals/idea.md", "proposal"),
+        ("docs/platform/proposals/idea.md", "proposal"),
+        ("docs/platform/sample/roadmap.md", "roadmap"),
+        ("docs/platform/sample/roadmap/next.md", "roadmap"),
+        ("docs/platform/sample/safe-rollout-plan.md", "rollout-plan"),
+        ("docs/platform/sample/reports/proof.md", "history"),
+        ("docs/platform/history/old.md", "history"),
+        (
+            "docs/history/feature/DISCUSSION.md",
+            "discussion-scratchpad",
+        ),
+        ("docs/history/feature/old.md", "history"),
+        ("docs/knowledge/lesson.md", "knowledge"),
+        ("docs/generated/index.md", "generated-doc"),
+        (
+            "docs/platform/documentation/switchboard.md",
+            "switchboard-doc",
+        ),
+        (
+            "docs/platform/documentation/operations/portals/root.md",
+            "portal",
+        ),
+    ] {
+        assert_eq!(classify(path).unwrap().kind, kind, "{path}");
+        assert!(
+            check_paths(&[path.into()]).unwrap().violations.is_empty(),
+            "{path}"
+        );
+    }
+    for path in [
+        "docs/platform/unknown.md",
+        "docs/platform/sample/spec-copy.md",
+        "docs/platform/system/spec.md",
+        "docs/platform/areas/sample/spec.md",
+    ] {
+        let result = check_paths(&[path.into()]).unwrap();
+        assert_eq!(result.violations.len(), 1, "{path}");
+        assert_eq!(
+            result.violations[0].posture,
+            Some(fgos_convention::rules::Posture::Block)
+        );
+    }
+    assert!(check_paths(&[
+        "docs/how-to/user.md".into(),
+        "domains/sample/README.md".into()
+    ])
+    .unwrap()
+    .violations
+    .is_empty());
+    // all walks nested rule scopes, not only initial report/journal globs.
+    let root = std::env::temp_dir().join(format!("fgos-doc-placement-{}", std::process::id()));
+    std::fs::create_dir_all(root.join("docs/platform/sample/contracts")).unwrap();
+    std::fs::write(
+        root.join("docs/platform/sample/contracts/good.md"),
+        "# Good",
+    )
+    .unwrap();
+    std::fs::write(root.join("docs/platform/sample/bad.md"), "# Bad").unwrap();
+    let result = check_all(&root).unwrap();
+    assert_eq!(result.checked, 2);
+    assert_eq!(
+        result
+            .violations
+            .iter()
+            .map(|v| v.path.as_str())
+            .collect::<Vec<_>>(),
+        ["docs/platform/sample/bad.md"]
+    );
+    std::fs::remove_dir_all(root).unwrap();
 }
 
 #[cfg(unix)]

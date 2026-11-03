@@ -366,7 +366,7 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   // one door: the log carries exactly the runner's writes — the worker
   // never touched .fgos/ (add + claim (no durable write) + predicted +
   // executor-dispatch audit (D8, tsk-62v) + settle + actual, nothing
-  // else). tsk-40m (docs/architect/doing-coordination-redesign.md):
+  // else). tsk-40m (docs/platform/proposals/doing-coordination-redesign.md):
   // settleClaim writes an enriched work.attempt then transitions the item
   // DIRECTLY from its preClaimStatus to finalStatus — no durable
   // intermediate work.move(->doing) leg. `work.handoff:reviewer` is not a
@@ -488,7 +488,7 @@ test('runOnce\'s executor.dispatch audit event records the REAL spawned command 
   assert.notEqual(auditEvent.payload.command, auditEvent.payload.provider, 'this is precisely the divergence the item exists to close');
 });
 
-// (tsk-40m docs/architect/doing-coordination-redesign.md: settleClaim no
+// (tsk-40m docs/platform/proposals/doing-coordination-redesign.md: settleClaim no
 // longer writes a durable work.move(->doing) at claim time — the claim
 // itself is a runtime-only claim file, and the "runner did this" signal at
 // claim time now rides the settle's own work.attempt.actor field instead.)

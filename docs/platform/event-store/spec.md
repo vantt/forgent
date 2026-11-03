@@ -12,9 +12,9 @@ Owner: Event Store component
 Source (planned): packages/event-store/rust (crate fgos-event-store); Node facade src/event-store/ over the one combined N-API addon that links fgos-event-store and fgos-git (section 17)
 Contracts (planned): packages/event-store/contracts/
 Last reviewed: 2026-10-23
-Supersedes: L3 clauses 1 and 4 in docs/platform-foundations.md (D-ID ae461c8b, superseded by D-ADR0055); D-ADR0003 data layout
+Supersedes: L3 clauses 1 and 4 in docs/platform/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view (D-ID ae461c8b, superseded by D-ADR0055); D-ADR0003 data layout
 Related:
-- docs/platform-foundations.md (L3, L7, L10)
+- docs/platform/platform-foundations.md (L3, L7, L10)
 - docs/platform/holder-lock/spec.md
 - docs/platform/identity/spec.md
 - docs/platform/component-boundary.md
@@ -155,7 +155,7 @@ Rank order today (`docs/platform/holder-lock/spec.md:114-126`): `main-checkout` 
 | Machine id | Names the published ref `refs/fgos/events/<machine-id>` | 1. repository-local git config `fgos.machineId` (per clone, never tracked); 2. `<stateRoot>/machine-id`, minted once by the Identity component (`fgos doctor --fix`, fix `identity-machine-id`) as `<hostname-slug>-<6 random base32>`. Format `^[a-z0-9][a-z0-9-]{1,62}$`, checked in one place, `fgos_identity::machine::valid_machine_id`; Event Store reads it through that crate and keeps only this ref-name rule (the per-clone override) and its own error codes. `stateRoot` is holder-lock's (`docs/platform/holder-lock/spec.md:168-178`), so a process with another state root is another machine, as holder-lock already defines |
 | Store id (`origin`) | Ordering identity of one open root; one per clone | Minted at first append, random 128-bit, written once to `<eventOpenRoot>/store.json` with the machine id at creation. Moving the clone moves the file, so the store keeps its id |
 | Stream | One sequence space inside a store: `project`, `local`, or `branch:<branch-key>` | Scope of the registered type; branch key below |
-| Project consumer stream (clarification, 2026-10-20) | `project:<name>`: a `project`-scope sequence space of its own for one consumer, for example `project:porting` (plan D9; Work keeps `project`). It has its own `seq` and open log but is sealed onto the same `refs/fgos/events/<machine-id>` and shared exactly like `project`. `<name>` follows the branch-key slug grammar | Declared by the consumer's registry entry; no protocol change |
+| Project consumer stream (clarification, 2026-10-20) | `project:<name>`: a `project`-scope sequence space of its own for one consumer, for example `project:porting` (the plan’s project consumer stream clarification; Work keeps `project`). It has its own `seq` and open log but is sealed onto the same `refs/fgos/events/<machine-id>` and shared exactly like `project`. `<name>` follows the branch-key slug grammar | Declared by the consumer's registry entry; no protocol change |
 | Writer | Who wrote the event (`src`) | Session Identity `{id, source}`; recorded, never used for order or lock authority |
 
 The ref is per machine because that is the unit of sharing; the store id is per clone because two clones on one machine have independent open logs and must not share a sequence space (section 14).
@@ -244,7 +244,7 @@ Deleting a clone deletes its unsealed events. That is the price of keeping open 
 6. Assign consecutive `seq`, set `seen` from the cursor, and compute `h`. Write the event lines and then one commit marker, all with one `write`. The marker is the canonical line `{v: 4, kind: "batch-commit", origin, stream, firstSeq, lastSeq, count, sha256}`, where `sha256` is that of the batch's event-line bytes. Then `fsync` the file, and `fsync` the directory when the file was created.
 7. Release. Return `{origin, stream, firstSeq, lastSeq, h[]}`.
 
-The ack point is the end of step 6. From there, the events survive a process crash, and they survive an operating-system crash on a filesystem that honors `fsync`. Until sealed they are L7 level D5 (this machine only, `docs/platform-foundations.md:184-190`); after seal they are D2 in the local object store; after push a remote copy exists.
+The ack point is the end of step 6. From there, the events survive a process crash, and they survive an operating-system crash on a filesystem that honors `fsync`. Until sealed they sit at the L7 local-only durability level (this machine only, `docs/platform/platform-foundations.md#l7-durability-ladder`); after seal they sit at the commit-retained level in the local object store; after push a remote copy exists.
 
 A batch is all-or-nothing for readers. They fold an event line only when a commit marker that verifies (count, `seq` range and `sha256`) closes it. Any prefix of a batch that a short write or a crash leaves behind, complete lines included, is never folded and is dropped by step 3.
 
@@ -532,7 +532,7 @@ Doctor (`event-store-unsealed`): passes when nothing unsealed is older than twic
 
 The route has a cost: the combined native addon for every supported platform and Node ABI, carried in the npm package and the legacy-node payload, plus build, activation and doctor checks (section 21; section 23.2 item 9).
 
-**Baseline.** V-SPAWN-01 measured today's path end to end, from CLI spawn to exit, on 2026-10-17 ([experiment-261017-1431-event-store-v-spawn-01.md](../../../plans/reports/experiment-261017-1431-event-store-v-spawn-01.md); Intel i7-13700, `/tmp` on tmpfs, git 2.53.0, Node 24.22.0, 40 samples per row):
+**Baseline.** V-SPAWN-01 measured today's path end to end, from CLI spawn to exit, on 2026-10-17 (experiment-261017-1431-event-store-v-spawn-01.md; Intel i7-13700, `/tmp` on tmpfs, git 2.53.0, Node 24.22.0, 40 samples per row):
 
 | Mutation | p95 at 1 session | p95 at 10 | p95 at 20 |
 |---|---:|---:|---:|
@@ -664,7 +664,7 @@ These gates, not the text of this spec, confirm or reopen the design. The owner 
 
 Both tasks ran on 2026-10-17 in run `wf-run-1792224866445-9a03a834`. Their findings are folded into this text (see "Changes after the pre-signature proofs"). Neither one proves the corrections that this fold made. Those corrections are covered by section 23.2.
 
-1. **Model check of reader versus seal (V-C3-MODEL): done.** Report: [experiment-261017-1527-event-store-model-check-reader-seal.md](../../../plans/reports/experiment-261017-1527-event-store-model-check-reader-seal.md).
+1. **Model check of reader versus seal (V-C3-MODEL): done.** Report: experiment-261017-1527-event-store-model-check-reader-seal.md.
 
    Planned scope: a model of `active`, `closed` and the ref, with at least two readers, two seal attempts and one appender, including a `merge` commit of a shared machine id, a promote commit, the coverage walk of section 11 with an origin the reader has never seen, and the in-gate bound of section 11. It had to show that no acked event is lost, that none is counted twice, that every walk terminates, and that coverage never covers an event that was not read.
 
@@ -688,7 +688,7 @@ Both tasks ran on 2026-10-17 in run `wf-run-1792224866445-9a03a834`. Their findi
    - It assumes `fsync`, durable directory `fsync` of both rename directories, and an atomic, durable CAS.
    - It does not model byte-level corruption, a malicious rewind, git gc bugs, or unbounded network behavior. It does not model the in-gate bound or the placement of promoted events.
    - It checked spec v2 before M1-M4. Neither the amended text nor this fold's corrections were model checked: batch framing, high-water-mark recovery, certified pruning, deferral that holds the cursor, and the incremental condition.
-2. **Local git experiment on `refs/fgos/*` (V-REF-01): done.** Report: [experiment-261017-1527-event-store-git-ref-mechanics.md](../../../plans/reports/experiment-261017-1527-event-store-git-ref-mechanics.md).
+2. **Local git experiment on `refs/fgos/*` (V-REF-01): done.** Report: experiment-261017-1527-event-store-git-ref-mechanics.md.
 
    Planned scope: a local bare repository as the remote, with no external push and no owner authorization. It covered CAS `update-ref` including a stale old value; CAS and reads after `git pack-refs`; `git gc --prune=now` in the clone and in the bare repository; fetch through the refspec of section 14 into the mirror namespace; a fresh clone; divergence of a shared machine id and its `merge` commit; and the coverage walk over the resulting DAG with its commit count.
 
@@ -780,7 +780,7 @@ Outside expertise: the owner engages none (decision of 2026-10-17 15:13). The si
 12. Migration imports legacy truth once into `refs/fgos/legacy` with original file names, then deletes the tracked files in one change; rollback corrected to an export with a legacy-fold parity report (section 18).
 13. Deletion list extended with file compaction, direct readers and the porting store's separate path; `.fgos` strip kept pending inventory (sections 19, 20).
 14. Experiment 2 described as what it was (section 24); SQLite WAL listed as out of scope with the reason (section 25).
-15. Decision placeholder rewritten to supersede L3 clauses 1 and 4 and D-ADR0003 explicitly (section 26).
+15. Decision placeholder rewritten to supersede L3 clauses 1 and 4 and D-ADR0003 (bố cục dữ liệu events.jsonl tracked) explicitly (section 26).
 
 ## Changes in the amendment after the reopen council (2026-10-17)
 
@@ -826,7 +826,7 @@ The model check ran against spec v2 before the amendment above. Each counterexam
 
 ## Open for the owner
 
-Nothing in this spec is open for the owner. Signed on 2026-10-17 as D-ADR0055, with these confirmations: machine id owned by Event Store until a machine-identity component exists; non-git directories refused (to be reopened when a real non-git project needs fgOS); the porting store writes its own `project`-scope stream, never Work's; `eventStore.sync.intervalSec` 300 with opportunistic push; compaction opened when a full rebuild exceeds 2 s on the slowest machine. Earlier answers (15:13): cross-machine provisional success accepted, Node-to-Rust route N-API with no exec-guard exception, loss budget and seal cadence as written, no outside experts. The re-cut of 4.3-S and the claim-path item belong to the program board.
+Nothing in this spec is open for the owner. Signed on 2026-10-17 as D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy), with these confirmations: machine id owned by Event Store until a machine-identity component exists; non-git directories refused (to be reopened when a real non-git project needs fgOS); the porting store writes its own `project`-scope stream, never Work's; `eventStore.sync.intervalSec` 300 with opportunistic push; compaction opened when a full rebuild exceeds 2 s on the slowest machine. Earlier answers (15:13): cross-machine provisional success accepted, Node-to-Rust route N-API with no exec-guard exception, loss budget and seal cadence as written, no outside experts. The re-cut of 4.3-S and the claim-path item belong to the program board.
 
 ## Unresolved dissent
 
@@ -839,7 +839,7 @@ These positions came from the reopen council and are still not settled by eviden
 
 ## Changes after the corrected model check (2026-10-17)
 
-The model check was run again on the corrected rules ([report](../../../plans/reports/experiment-261017-1545-event-store-model-recheck-corrected.md)). All six earlier counterexamples are gone within its bounds. It found one progress gap and one ambiguity, both fixed here:
+The model check was run again on the corrected rules (report). All six earlier counterexamples are gone within its bounds. It found one progress gap and one ambiguity, both fixed here:
 
 1. **N1, rebuild-install livelock (section 13, 23.2).** Under sustained writes a rebuild computed outside the gate can be rejected forever. Retries are now bounded by `eventStore.rebuild.maxAttempts` (agent default 5) and end in `event-store-rebuild-busy` with the current cache kept valid.
 2. **Certification of a new seal (section 10 step 2.4).** The receipt keeps `lastSeq` apart from emitted coverage, and `<new>` is certified only when it and its ancestors are fully emitted with nothing deferred, matching sections 11 and 12.
@@ -850,11 +850,11 @@ Amended 2026-10-18 with the Git G0 signature: publication port moves to Git, com
 
 1. **Publication port (header, sections 3, 4, 20).** The port for `refs/fgos/*` is the Git component's Publication port (`docs/platform/git/spec.md` section 4), not a driver inside the crate. Event Store stays the only production writer of event refs and calls that port; it keeps every decision of sections 10 and 14.
 2. **Combined addon (header, sections 17, 21).** The Node route is the one combined N-API addon that links `fgos-event-store` and `fgos-git` (Git G0 owner decision Q1, 2026-10-17). There is still no exception to the exec guard and no per-call host facade; `event-store-native-addon` checks the combined addon.
-3. **Unchanged.** No protocol step, lock row, lock rank or decision of D-ADR0055 changes. The dissent "Git component as a precondition" is answered in placement only: publication runs through the Git port, and the Event Store cutover follows the order of Git spec section 12.
+3. **Unchanged.** No protocol step, lock row, lock rank or decision of D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy) changes. The dissent "Git component as a precondition" is answered in placement only: publication runs through the Git port, and the Event Store cutover follows the order of Git spec section 12.
 
 ## Changes with the phase 05 review (2026-10-18)
 
-Amended 2026-10-18 with the phase 05 sharing and sync review; no lock row, rank or decision of D-ADR0055 changes.
+Amended 2026-10-18 with the phase 05 sharing and sync review; no lock row, rank or decision of D-ADR0055 (nhật ký sự kiện là changeset niêm phong trên ref mỗi máy) changes.
 
 1. **Section 14.** Authenticated reconciliation (exact prior and candidate authorized before the CAS), per-mirror verification (foreign failure is a typed warning, own-id failure refuses), certified sync positions, and the clone-wide tracked-fence authority resolved through the trusted main checkout.
 2. **Git.** The no-op fetch-mapping setup records the effect-free `configApproved` outcome (Git spec section 10 rule 4c).
@@ -899,7 +899,7 @@ and Git's publication remote-name alphabet; project config overrides global.
 
 Export is implemented by `fgos_event_store::export::{export_jsonl,
 export_legacy_layout}`, marshaled by the combined addon. Both use the verified
-reader. The latter authenticates the D18 pin, validates every tree entry before
+reader. The latter authenticates the publication-reader contract pin, validates every tree entry before
 creating output, preserves original bytes, and emits v4 records with legacy
 fields and without their incompatible v4 hashes. A nonempty pre-cutover legacy
 history requires a pin for rollback export. Destinations are exclusively created;
@@ -1115,7 +1115,7 @@ power-loss qualification and the parked Work cutover remain separate gates.
 
 2026-10-21: item 5's real-forge step (owner authorization Q3, given 2026-10-21) passed: `scripts/event-store/forge-probe.sh https://github.com/vantt/forgent` appended one event in a fresh repository, synced `refs/fgos/events/<probe-id>` to GitHub, and a second fresh repository fetched it without pushing and read the event (`verdict: PASS`, no push or fetch warnings); the probe ref was deleted afterwards. The probe uses fresh repositories with the forge as origin instead of clones, because a clone that still tracks legacy `.fgos/events` files is refused until the Work cutover's migration.
 
-2026-10-21: item 10 (filesystem crash consistency) held on ext4: `scripts/event-store/power-loss.sh --runs 20` on the second machine, 20 dm-flakey power cuts with periodic seals, 1675 acknowledged events, none lost, doubled or out of sequence, every run `PASS`. The first runs failed (19/20, `seal.json missing`) because Git's `mktree` left seal trees unsynced; fixed in the Git Publication port before this result ([verification report](../../../plans/reports/verification-261021-1202-git-e1-and-event-store-power-loss.md)).
+2026-10-21: item 10 (filesystem crash consistency) held on ext4: `scripts/event-store/power-loss.sh --runs 20` on the second machine, 20 dm-flakey power cuts with periodic seals, 1675 acknowledged events, none lost, doubled or out of sequence, every run `PASS`. The first runs failed (19/20, `seal.json missing`) because Git's `mktree` left seal trees unsynced; fixed in the Git Publication port before this result (verification report).
 
 The dormant branch's repository door test is a regression census, not evidence
 that cutover V-DOOR-01 is complete: it asserts the exact pre-cutover invocation
@@ -1164,9 +1164,9 @@ establish that acceptance. Work remains unwired.
 
 ## Store proof gate clarifications (2026-10-20, dormant)
 
-Dated clarifications with no protocol change, made with the store part of the section 23.2 gate ([report](../../../plans/reports/verification-261020-2012-event-store-store-proof-gate.md)):
+Dated clarifications with no protocol change, made with the store part of the section 23.2 gate (report):
 
-- Section 5 names `project:<name>` consumer streams (plan D9: porting uses `project:porting`, Work keeps `project`). The crate already accepted them and seals them onto the machine's `events` ref with their own `seq` (`seal_publication.rs`, `project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse`).
+- Section 5 names `project:<name>` consumer streams (in the plan, porting uses `project:porting`, Work keeps `project`). The crate already accepted them and seals them onto the machine's `events` ref with their own `seq` (`seal_publication.rs`, `project_consumer_streams_share_one_ref_without_false_move_or_sequence_reuse`).
 - Section 10 step 2.3 now names Git's Publication port instead of `gix` or `git -c core.fsync=...`: Git fsyncs directories itself and treats `core.fsync` only as a backend input (Git spec section 10). The store's own barriers (step 1, step 2.4 and 2.5) are unchanged.
 - Section 21: the Git floor is judged by Git's own row `git-component-compatible` (the old `event-store-git-version` row is gone; Git guarantees a supported verdict only when every required probe passed), and it points to Git's floor (`git-floor.v1.json` through `gitFloorVerdict`, 2.53.0 with four required probes today) instead of 2.31 and 2.36; section 8's "git 2.31 or newer" likewise. The check body already read Git's verdict.
 - Section 8 records the measured topology result: `--separate-git-dir` and absorbed submodules are refused by Git's resolver (`trusted-main-gitfile-unsupported`), not resolved as experiment 1 suggested.
@@ -1210,7 +1210,7 @@ Dated clarification with no protocol change: a process that reads the same store
 
 ## Work cutover proof gate (2026-10-23)
 
-Dated clarification with no protocol change, made with the Work part of the section 23.2 gate ([report](../../../plans/reports/verification-261023-1630-work-cutover-parity-and-docs.md)):
+Dated clarification with no protocol change, made with the Work part of the section 23.2 gate (report):
 
 - Section 23.2 item 9 asks for the addon "in both the npm package and the legacy-node payload". The npm install channel is retired (owner decision, plan refresh Q-W1 superseded 2026-10-22) and ships no addon: on it Work verbs and `fgos events` refuse with `git-addon-unavailable`, naming the missing addon. Item 9 is therefore met by the legacy-node payload alone: the addon loads from the staged release, activation refuses a linux-x64 payload without `components.nativeAddon`, and `event-store-native-addon` has setup and doctor vectors. Work verbs also refuse on every platform other than Linux, macOS included (`event-store-unsupported-platform`).
 - Section 19 describes the code the cutover deletes. On the Work cutover branch every row is gone from the tree; the cited lines belong to the pre-cutover tree. The standing proof is the reader census in `test/event-store/door.test.mjs`: no product file reads the retired event files or imports a reader of them. The tracked event files and the `.gitattributes` `merge=union` line of a repository leave in that repository's own `fgos events migrate` commit.

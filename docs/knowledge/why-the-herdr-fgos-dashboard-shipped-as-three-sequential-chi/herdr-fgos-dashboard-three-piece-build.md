@@ -106,7 +106,7 @@ claim/return/compound bookkeeping was):
 
 Once all three children reached `status: done`, `tsk-19y` fell into
 `fgos ready`'s frontier on its own — no manual rollup-completion verb
-exists or was needed (`docs/specs/work-state.md`'s RUL25: a root's own
+exists or was needed (`docs/platform/work-state/spec.md#11-business-rules`'s RUL25: a root's own
 `verify`, carried since it left `clarify`, *is* the integration proof for
 the whole decomposed batch). The root's own `verify` — `cargo test &&
 cargo build --release && npm test` — passed clean against the branch

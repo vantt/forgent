@@ -920,7 +920,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
         source: 'resolvePlan',
         kind: 'engine',
         rationale:
-          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\'s Locked decisions section -- advisory only, never blocks; see docs/explanation/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',
+          'tsk-1gr D1/D2: mechanical path-token check over CONTEXT.md\'s Locked decisions section -- advisory only, never blocks; see docs/knowledge/auto-decompose-can-drop-a-locked-decision-from-every-child-s/auto-decompose-can-drop-a-locked-decision-from-every-childs-footprint.md for the failure mode this catches',
       });
     }
   } catch {

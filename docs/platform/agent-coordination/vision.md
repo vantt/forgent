@@ -1,10 +1,26 @@
 # Agent Coordination Foundation Vision
 
+```txt
 Document type: Vision
-Design status: Accepted
-Implementation: Partial
-Last reviewed: 2026-09-01
-Canonical for: product identity, foundation boundaries, optional structure, and domain augmentation
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/vision.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](history/retired-engine/files/vision.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Authority And Reading Rule
 
@@ -16,11 +32,10 @@ architecture, contracts, proposals, roadmaps, Skills, and implementation define
 more specific behavior underneath it. They may refine this Vision but must not
 silently narrow or contradict it.
 
-The [Intent Preservation Ledger](intent-preservation-ledger.md) is the required
-second read. It does not outrank this Vision or make deferred ideas accepted
-architecture. It makes deliberate narrowing visible and records what each
-increment must not preclude, so a temporary MVP does not silently replace the
-original direction.
+The [original intent ledger](history/retired-engine/files/intent-preservation-ledger.md#literal-snapshot)
+is dated preservation evidence, not a required current second read or an approval
+authority. It records earlier scope and deferred intent without making retired
+engine choices current.
 
 When a downstream document conflicts with this Vision:
 
@@ -39,12 +54,11 @@ Agent Coordination is the domain-neutral foundation that turns an objective
 into governed, evidence-aware activity across agents, capabilities, souls,
 providers, models, tiers, and execution mechanisms.
 
-It must work with or without Work and with or without a predeclared Workflow or
-Coordination Protocol. A coordinator agent may reason from a Mission/objective,
-create and revise a runtime plan, delegate bounded requests, consult or
-challenge other roles, and synthesize results. Declarative protocols and domain
-harnesses may constrain or improve that process, but they are augmentation, not
-an entry requirement.
+The direction supports execution with or without Work and without requiring
+a predeclared Workflow for every objective. Current bounded requests use Unit,
+CollaborationPattern and Workflow execution; the retired CoordinationProtocol,
+Mission/session plan and session-task store are not current entry requirements.
+Domain doctrine can enrich planning without acquiring private launch authority.
 
 The foundation owns the durable execution invariants that free-form prose must
 not own: dispatch governance, bounded execution, authority checks, budgets,
@@ -56,15 +70,14 @@ doctrine, Skills, protocol templates, planning harnesses, validators, evidence
 policy, resource analysis, isolation strategy, and lifecycle integration.
 
 ```txt
-Mission / objective
-  -> Agent Coordination Foundation
-       -> coordinator reasoning and runtime planning
+Objective
+  -> bounded Unit or Workflow execution
        -> semantic execution contracts
-       -> governed dispatch
+       -> governed binding and dispatch
        -> Assignment -> Run -> RunResult / Evidence
-       -> bounded adaptation and synthesis
+       -> bounded collaboration and synthesis
   -> optional augmentation
-       -> reusable Coordination Protocol
+       -> registered Workflow definitions
        -> domain knowledge / doctrine / Skills
        -> domain planning and validation harness
        -> organization-specific policy and experience
@@ -85,20 +98,18 @@ makes an integration profile look like the identity of the system.
 
 ### 2. Planning Currently Over-Materializes Work
 
-Current coding planning materializes every decomposed child through Work intake.
-That is correct for independently governable delivery units and too heavy for
-temporary research branches, review passes, specialist consultations, or
-bounded tasks returning to one parent objective.
-
-The system lacks a neutral way to represent session-local intent and dependency
-without creating another Work item.
+Independently governable delivery units belong in Work intake. Temporary
+research, review and consultation instead have current Unit/Pattern execution
+paths without requiring an extra Work record. The old claim that no neutral
+execution path exists is no longer current; further dynamic planning models
+are design questions, not grounds to revive a session-local task store.
 
 ### 3. Standalone Coordination Borrows Coding Workflow Structure
 
-The mission-lite prototype proves that read-only Assignments can run with
-`workId: null`, but it selects operations from coding Workflow stages and has no
-general runtime task graph. A standalone objective should not pretend to be at
-`planning` or `executing` merely to access dispatch.
+The former mission-lite prototype and coding-stage borrowing are historical;
+that module no longer implements standalone execution. Current Unit execution
+does not need a fabricated coding Work stage. A generic dynamic task-graph
+design remains distinct from the shipped Workflow/Pattern paths.
 
 ### 4. Predeclared Structure Has Been Treated As Universally Mandatory
 
@@ -145,22 +156,6 @@ sole authority whenever delivery lifecycle exists. Mission, Session, task,
 Assignment, Run, RunResult, protocol, or synthesis cannot become a second Work
 lifecycle.
 
-### V-003: A Predeclared Workflow Or Protocol Is Optional
-
-A session may use:
-
-- agent-led runtime planning;
-- a declared Workflow or Coordination Protocol;
-- a domain planning harness;
-- a composition of those sources.
-
-A one-shot consult may lower directly to one Assignment. A research session may
-create a runtime task graph incrementally. A repeatable or regulated process may
-select a declared protocol graph.
-
-These are composable sources of planning and constraints, not mutually
-exclusive top-level lifecycle modes.
-
 ### V-004: Runtime Execution Contracts Are Mandatory
 
 Optional predeclared structure does not mean optional execution contracts.
@@ -176,9 +171,10 @@ at least:
 - budget or execution bounds;
 - caller/session provenance.
 
-A registered Stage Operation and TaskSpec may supply that contract. Agent-led
-planning may supply an inline contract that passes the same foundation-level
-validation. The exact inline schema remains a contract-design decision.
+A Workflow operation/TaskSpec, Unit or validated inline contract supplies the
+applicable execution contract. Inline validation is implemented in
+`src/runner/dispatch/execution-contract.mjs:180-240,295-340`; it is not still an
+undecided schema. Unit and generic inline admission are distinct current paths.
 
 ### V-005: Agents Own Adaptive Reasoning; The Foundation Owns Authority
 
@@ -197,13 +193,11 @@ driver / caller     -> applies authorized lifecycle action, if any
 
 ### V-006: Planning Is Pluggable And Composable
 
-The foundation must accept planning intelligence from an agent, a declarative
-protocol, or a domain/organization harness without forking the execution core.
-
-Domain planning may enrich or reject an agent proposal. For example, coding may
-derive resource claims, detect file overlap, require isolated worktrees, and
-constrain merge targets. Research may rely only on generic dependency, budget,
-duplicate-intent, source-quality, and evidence rules.
+Planning intelligence may come from a caller, declared Workflow or domain
+doctrine without forking governed execution. The current coding harness enriches
+and validates supporting inline contracts through its pure seam; it is not proof
+that research/marketing harnesses or a universal plugin SDK already exist.
+Evidence: `domains/coding/harness/enrich-and-validate-contract.mjs:102-147`.
 
 ### V-007: Dispatch Is A Primary Foundation Capability
 
@@ -231,19 +225,6 @@ Domain packages and organization-specific extensions may provide:
 The foundation defines stable seams only when at least two real consumers prove
 the common need. It must not pre-build a large generic plugin framework from
 hypothetical variation.
-
-### V-009: Runtime Graphs May Be Trivial, Dynamic, Or Declared
-
-Coordination structure may be:
-
-- one Assignment with no meaningful graph;
-- an upfront task dependency graph;
-- a graph expanded dynamically as evidence reveals new questions;
-- a declared protocol graph;
-- a domain-validated hybrid of dynamic and declared structure.
-
-Dynamic does not mean unbounded. Task count, depth, concurrency, time, tokens,
-cost, communication rounds, mutation, and duplicate intent remain governed.
 
 ### V-010: Evidence And Provenance Survive Every Profile
 
@@ -336,17 +317,13 @@ Domain, organization, or lifecycle integrations own:
 
 The accepted Vision rejects these interpretations:
 
-1. Every CoordinationSession must reference a predeclared Workflow, Stage, or
-   Coordination Protocol.
-2. Every executable request must have a pre-existing TaskSpec file.
-3. No predefined graph means no structured runtime contract.
-4. Skill prose may call executors or mutate lifecycle directly.
-5. Work is required to gain access to coordination or dispatch.
-6. Protocol families such as research, brainstorm, or debate are mandatory
-   gateways rather than optional reusable accelerators.
-7. Coding-specific file/Git rules belong in the universal coordination core.
-8. Domain neutrality means the foundation has no hard safety, evidence, budget,
-   or authority policy.
+- Skill prose may bypass governed execution or mutate Work lifecycle directly.
+- Work is required before any bounded Unit may execute.
+- Domain-specific file/Git planning rules belong in the universal core.
+- Domain neutrality removes hard safety, evidence, budget or authority constraints.
+
+The retired session/protocol interpretations remain in the complete historical
+input; they are not reinstated as current engine requirements.
 
 ## Consequences For Downstream Design
 
@@ -362,22 +339,6 @@ Assignment remains the immutable semantic request. Downstream contracts must
 support both declared-operation provenance and a validated dynamic/inline
 operation contract without creating a governance bypass.
 
-### CoordinationSession And AdhocTask
-
-A CoordinationSession, if persisted, is a thin execution and recovery boundary;
-it does not require a protocol reference. AdhocTask, if used, represents
-session-local intent and evidence roll-up. A session may contain one trivial
-task or a dynamically evolving task graph.
-
-The exact persistence boundary and minimum task state remain Step 07 design
-questions.
-
-### Standalone Protocols
-
-Research, consult, brainstorm, debate, leader-worker, and peer-review protocols
-are optional doctrine/configuration packages on the foundation. Step 08 must
-also prove agent-led coordination without a predefined protocol.
-
 ### Planning Materialization
 
 Planning output must not automatically imply child Work. Domain planning may
@@ -392,39 +353,38 @@ plan/task validation, resource/isolation advice, and result/evidence evaluation.
 
 ## Open Design Questions Under This Vision
 
-The Vision fixes direction but intentionally does not decide:
+The earlier questions now have mixed status; answered contracts and still-open designs must be distinguished:
 
-1. whether CoordinationSession is always persisted or may be an invocation
-   envelope for trivial calls;
-2. the minimum AdhocTask state and persistence model;
-3. the exact validated inline execution-contract schema;
-4. how declared and dynamic tasks share operation identity and policy lookup;
-5. which planning/validation extension seams the first two consumers prove;
-6. how privacy and context-egress policy constrain external providers and souls;
-7. how dynamic fan-out budgets and duplicate-intent checks are enforced;
-8. how mutating session-local tasks obtain and integrate isolation;
-9. how nested Work branch topology is reconciled;
-10. whether and how an AdhocTask may be promoted to child Work.
+- Inline schema is now answered by the current validator; its reserved mutation
+  stamp gate is distinct from the Unit-run mutating worktree/binding gate.
+- Current declared/inline provenance and normalization are answered by the
+  Assignment builder/normalizer; a broader dynamic graph remains a proposal.
+- Additional unlike consumers must still prove new generic extension seams.
+- Provider privacy/context-egress guarantees need evidence from the effective
+  governance/confinement path; future soul/provider policies are not implied.
+- General same-workspace inherited-edit takeover remains an unimplemented
+  recovery profile, not an existing session-isolation mechanism.
+- Nested Work integration topology remains a separate owning-domain decision.
+
+The earlier V-003/V-009 session graph formulations remain historical. The
+desired breadth of a future generic dynamic graph is open, not asserted shipped.
 
 These belong in proposals, ADRs, architecture, and contracts beneath this
 Vision. They must be answered without reopening V-001 through V-013 implicitly.
 
 ## Reading Down From The Vision
 
-1. [Documentation Governance](../../architect/agent-coordination/documentation-governance.md) explains authority
-   and promotion rules.
-2. [Vocabulary](../../architect/agent-coordination/vocabulary/README.md) defines canonical terms.
-3. [Accepted Architecture](../../architect/agent-coordination/architecture/README.md) defines current system
-   boundaries and implemented profiles.
-4. [Contracts](../../architect/agent-coordination/contracts/README.md) define exact machine-visible behavior.
-5. [Architecture Decisions](../../architect/agent-coordination/decisions/README.md) record specific accepted and
-   rejected choices.
-6. [Step 07](../../architect/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md) resolves the
-   session/task/planning/isolation design still open under this Vision.
-7. [Step 08](../../architect/agent-coordination/proposals/step-08-standalone-coordination-protocols.md) develops
-   optional reusable protocols and agent-led standalone adoption.
-8. [Step 09](../../architect/proposals/step-09-group-thinking-substrate.md) discusses the
-   standalone group-thinking substrate expansion, and
-   [Step 10](../../architect/proposals/step-10-coding-domain-adoption.md) discusses bringing
-   the existing coding domain onto that foundation as its second unlike
-   consumer.
+1. [Vocabulary](vocabulary/README.md) names current, proposed and reserved terms.
+2. [Architecture](architecture/README.md) routes to current implementation owners
+   and explicitly proposed designs.
+3. [Assignment, Run and RunResult contract](contracts/assignment-run-runresult.md)
+   distinguishes current execution/evidence boundaries from historical schemas.
+4. [Decisions](decisions/README.md) distinguishes surviving boundaries from
+   retired-engine acceptance.
+5. [Historical Step 07](history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot)
+   and [Step 08](history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot)
+   preserve their earlier frontier; they do not define current execution doors.
+6. Current sequencing and binding implementation is linked by
+   [the runner spec](../runner/spec.md). The two recorded spec/code conflicts
+   require separate main-owner investigation, not inference from old acceptance.
+

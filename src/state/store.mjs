@@ -1670,7 +1670,7 @@ export function recordGateApprove(dir, { id, gate, actor, verify } = {}) {
  *
  * `scope` (tsk-1lv-2 D4): optional free text (no enum, same posture as
  * `source`/`kind`) — an area slug (e.g. `'repo'`, or one matching
- * `docs/specs/<area>.md`) marking a PLATFORM/repo-wide decision, as
+ * `docs/platform/governance.md#decision-scope-to-holder-table`) marking a PLATFORM/repo-wide decision, as
  * opposed to `id`'s per-item scoping. Absent entirely for an item-scoped
  * or unscoped decision; `src/report/decision-index.mjs`'s
  * `buildDecisionIndexMarkdown` is the one reader that filters on its

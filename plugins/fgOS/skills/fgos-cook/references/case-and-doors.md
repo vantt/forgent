@@ -2,7 +2,7 @@
 # Case and doors: the commands of the loop
 
 Read for [`fgos-cook`](../SKILL.md). Case semantics (milestones, admission, frame,
-refusals) are in `docs/specs/workflow.md` and the shared doctrine
+refusals) are in `docs/platform/workflow/spec.md` and the shared doctrine
 [`../../_shared/coordination-driver.md`](../../_shared/coordination-driver.md); this
 file only fixes which command each step of this skill runs. Run every `fgos` command
 with stdin closed (`</dev/null`).

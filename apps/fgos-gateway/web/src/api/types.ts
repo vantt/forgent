@@ -1,4 +1,4 @@
-// Types mirrored from docs/contracts/fgos-gateway-api-v1.yaml (tsk-yo0
+// Types mirrored from docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml (tsk-yo0
 // scope: "KHÔNG tự mô tả lại endpoint" -- every shape here traces to a
 // specific path in that contract, never invented independently.
 

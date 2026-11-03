@@ -249,7 +249,7 @@ never a silent acceptance:
   the session engine itself, before any dispatch, unless the bound
   operation declares `result.kind: "work-product"` AND the dispatch runs in
   a linked git worktree (never the main checkout) -- see
-  `docs/architect/agent-coordination/contracts/coordination-session.md`'s
+  `docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md`'s
   own mutation-rule section for the exact four conditions;
 - any field carrying Work lifecycle authority (`approve`, `merge`,
   `claim`, `workStatus`, and similar — a coordination session can never
@@ -267,10 +267,9 @@ never a silent acceptance:
   `dag: true` first-pass shape (`produce -> {review, red-team}`). Read-only
   individual nodes only; mutation/fan-out DAG is not this example and is not
   this feature.
-- `docs/architect/agent-coordination/contracts/coordination-session.md` —
+- `docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md` —
   the CoordinationSession manifest/event contract this CLI drives.
-- `docs/specs/runner.md` §"CoordinationSession — điều phối agent
-  Work-độc-lập" — the platform spec summary.
+- `docs/platform/runner/decisions/h-aabefc85f0c9.md#coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner` — the historical platform spec summary of CoordinationSession.
 - `src/runner/coordination/headless-adapter.mjs` — the headless/
   programmatic door onto the exact same engine calls this CLI uses
   (`runCoordinationHeadless`), for a caller that already has a request

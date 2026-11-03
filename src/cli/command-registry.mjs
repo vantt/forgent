@@ -393,6 +393,51 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
     nativeOnly: true,
   }),
+  withSubcommands({
+    name: 'docs-lease',
+    invoke: 'fgos docs-lease <acquire|status|release|abandon>',
+    description: 'Manage the exclusive documentation-cutover write lease (acquire, inspect status, release, abandon).',
+    subcommands: {
+      acquire: {
+        description: 'Acquire the documentation-cutover write lease and commit its held sidecar on main through ScopedCommit.',
+        parameters: { type: 'object', properties: { worktree: { type: 'string' } }, required: [] },
+        examples: ['fgos docs-lease acquire'],
+      },
+      status: {
+        description: 'Inspect status of the documentation-cutover write lease (held/free, age, digests, worktree).',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos docs-lease status', 'fgos docs-lease status --json'],
+      },
+      release: {
+        description: 'Release the documentation-cutover write lease (holder only), recording and reporting scope drift.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos docs-lease release'],
+      },
+      abandon: {
+        description: 'Owner door to abandon a held documentation-cutover write lease when its transition lock is free (requires confirmation and reason).',
+        parameters: {
+          type: 'object',
+          properties: {
+            'owner-confirmed': { type: 'boolean' },
+            reason: { type: 'string' },
+          },
+          required: [],
+        },
+        examples: ['fgos docs-lease abandon --owner-confirmed --reason "Session crashed"'],
+      },
+    },
+    examples: [
+      'fgos docs-lease status',
+      'fgos docs-lease acquire',
+      'fgos docs-lease release',
+      'fgos docs-lease abandon --owner-confirmed --reason "..."',
+    ],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+  }),
   {
     name: 'init',
     invoke: 'fgos init',
@@ -846,7 +891,7 @@ export const COMMAND_REGISTRY = [
         source: { type: 'string', description: 'Free text identifying who/what made the decision (optional, defaults to "session").' },
         id: { type: 'string', description: 'Work item id to also fold this decision under (optional; omit for the global log only).' },
         relation: { type: 'string', description: 'none|supersedes:<id>|touches:<id> -- every write declares its relation to prior decisions explicitly (tsk-1lv-1 D2); text that reads like a supersession without supersedes:<id> is refused, and supersedes triggers a write-time docs/**+src/**+plugins/** citation sweep.' },
-        scope: { type: 'string', description: 'An area slug (e.g. "repo", or one matching docs/specs/<area>.md) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by "fgos decision-index". Optional; omit for an item-scoped (--id) or unscoped decision.' },
+        scope: { type: 'string', description: 'An area slug (e.g. "repo", or one matching docs/platform/governance.md#decision-scope-to-holder-table) marking this as a platform/repo-wide decision (tsk-1lv-2 D4), rendered into docs/decisions/index.md by "fgos decision-index". Optional; omit for an item-scoped (--id) or unscoped decision.' },
       },
       positional: ['text'],
       required: ['text', 'rationale', 'relation'],
@@ -1921,7 +1966,7 @@ export const COMMAND_REGISTRY = [
       positional: ['doc-path'],
       required: ['doc-path'],
     },
-    examples: ['fgos doc-sources docs/how-to/check-rollup-progress.md'],
+    examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,
@@ -2248,7 +2293,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'doctor',
     invoke: 'fgos doctor',
-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',
+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',
     parameters: {
       type: 'object',
       properties: {

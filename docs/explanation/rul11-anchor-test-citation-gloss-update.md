@@ -5,7 +5,7 @@ authoritative_for: RUL11 anchor-phrase test updated to accept a glossed ADR0036 
 # Why the RUL11 anchor-phrase test needed updating for a citation gloss
 
 `tsk-2sp-5`'s citation-format cleanup pass hit a real blocker on
-`docs/specs/platform-foundations.md`'s RUL11 line: the bare `ADR0036`
+`docs/platform/platform-foundations.md#business-rules`'s RUL11 line: the bare `ADR0036`
 citation needed a one-line gloss to satisfy `check-decision-citation-
 drift.mjs`, but `test/docs/rul11-anchor-phrase.test.mjs`
 (`tsk-7u7`) asserted the RUL11 law text **word-for-word**, with no gloss
@@ -23,7 +23,7 @@ one-time, honest cost.
 
 ## What changed
 
-`docs/specs/platform-foundations.md`'s RUL11 line now reads (excerpt):
+`docs/platform/platform-foundations.md#business-rules`'s RUL11 line now reads (excerpt):
 
 ```
 - **RUL11 (tùm lum không phải nặng).** ... đích là ranh giới rõ và contract

@@ -17,7 +17,7 @@ export const VALID_DOC_LIFECYCLE = Object.freeze([
   'retired',
 ]);
 
-// docs/architect/knowledge-registry-redesign.md §5.5/§14.1: only 'diataxis'
+// docs/platform/work-state/contracts/knowledge-registry.md §5.5/§14.1: only 'diataxis'
 // is a registered framework today, and its 4 modes are a closed set --
 // growing either list is a real product decision (a new writing framework,
 // or a new Diataxis mode), never a typo a reducer should silently accept.
@@ -85,7 +85,7 @@ function assertSafeDocPath(value, label) {
 
 /**
  * Enforces the narrow, mechanical slice of the closed role/framework/mode
- * vocabulary that docs/architect/knowledge-registry-redesign.md §7.2 rule 1
+ * vocabulary that docs/platform/work-state/contracts/knowledge-registry.md §7.2 rule 1
  * already states unconditionally: framework must be a registered one, mode
  * must be one of that framework's own modes, and role must never equal a
  * mode name ("a role name must not equal any framework mode name"). This
@@ -207,8 +207,8 @@ function assertTopicWritable(view, topicId, verb) {
 /**
  * Resolves a doc's identity from an explicit docId, or by searching for the
  * doc whose (topicId, role) match -- never by reconstructing `${topicId}:
- * ${role}` as a string. docId is a durable identity (docs/architect/
- * knowledge-registry-redesign.md §7.3) that topic.split intentionally never
+ * ${role}` as a string. docId is a durable identity (docs/platform/work-state/contracts/
+ * knowledge-registry.md §7.3) that topic.split intentionally never
  * rewrites even though it does move the doc's own topicId onto the successor
  * -- so a caller holding only (topicId, role) after a split must look the
  * doc up by field, or it silently misses every doc whose id predates the
@@ -534,7 +534,7 @@ export function applyKnowledgeEvent(view, event) {
           `doc.register: doc '${id}' already exists with topicId='${existing.topicId}', role='${existing.role}', currentPath='${existing.currentPath}' — register cannot change a doc's identity or path. Use "fgos topic split"/"fgos topic merge" to change topicId/role (with lineage), or "fgos doc move-path" to change currentPath (preserves the old path as an alias).`
         );
       }
-      // docs/architect/knowledge-registry-redesign.md §7.3: doc.promote is
+      // docs/platform/work-state/contracts/knowledge-registry.md §7.3: doc.promote is
       // the sole provisional->active gate, doc.supersede/doc.retire are the
       // sole way out of 'active'. Re-registering an EXISTING docId must
       // never itself move the lifecycle beyond one narrow, already-tested
@@ -643,7 +643,7 @@ export function applyKnowledgeEvent(view, event) {
       break;
     }
 
-    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: migration
+    // docs/platform/work-state/contracts/knowledge-registry.md §13.5 rule 6: migration
     // "leaves every migrated document provisional unless explicitly
     // promoted" -- an active doc whose content moved out from under it
     // needs re-verification before it counts as authoritative again, but
@@ -730,11 +730,11 @@ export function applyKnowledgeEvent(view, event) {
       break;
     }
 
-    // docs/architect/knowledge-registry-redesign.md §7.4: "Attestation
+    // docs/platform/work-state/contracts/knowledge-registry.md §7.4: "Attestation
     // links a capture to a document slot ... the precise replacement for
     // the old 'compound stores docType/docPath' meaning." Modeled as
     // accumulating into the SAME `sourceCaptureIds` field `doc.register`
-    // already seeds from bootstrap (docs/architect/...md §7.2's own
+    // already seeds from bootstrap (docs/platform/work-state/contracts/knowledge-registry.md §7.2's own
     // example schema) -- one array of every capture that has ever
     // justified this doc's content, never overwritten, mirroring
     // an accumulate-never-replace fold rule.
@@ -745,7 +745,7 @@ export function applyKnowledgeEvent(view, event) {
       if (!doc) {
         throw new KnowledgeValidationError(`doc.attest: doc '${id}' not found`);
       }
-      // docs/architect/knowledge-registry-redesign.md §14.3: "attestation
+      // docs/platform/work-state/contracts/knowledge-registry.md §14.3: "attestation
       // rejects retired topics and retired documents". This must live here,
       // in the reducer, not only in the CLI's resolveDocPath-based
       // pre-check -- any caller using the write facade directly (attest-

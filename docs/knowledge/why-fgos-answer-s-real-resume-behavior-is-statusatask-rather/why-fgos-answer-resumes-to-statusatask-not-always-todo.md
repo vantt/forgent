@@ -15,7 +15,7 @@ mode: explanation
 `src/state/store.mjs:747-763`) resumes to `statusAtAsk`: `doing` when a
 claim was actively held at the moment `fgos ask` parked the item,
 `todo` otherwise. This is documented, intentional, already-shipped
-behavior (`docs/specs/work-state.md:229,1016`, "claim-lock §5.1") — the
+behavior (`docs/platform/work-state/spec.md#11-business-rules`, "claim-lock §5.1") — the
 old always-`todo` resume was the real historical bug, already fixed
 separately. Only the help string had never been updated to describe the
 real behavior.

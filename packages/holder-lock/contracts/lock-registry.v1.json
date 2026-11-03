@@ -2,7 +2,7 @@
   "contract": { "id": "lock-registry", "version": 1 },
   "description": "One row per lock. Rust and Node read this file; it is the only list of which locks exist and in which order they may be taken. v3Path is relative to <fgosDir>/locks/, <lockRoot>/ or <runDir>/ as written.",
   "ranks": {
-    "10": { "kinds": ["lease"], "note": "runner, gateway" },
+    "10": { "kinds": ["lease"], "note": "runner, gateway, documentation-cutover" },
     "15": { "kinds": ["lease"], "note": "attempt" },
     "20": { "kinds": ["mutex"], "note": "merge-slot--<target>" },
     "30": { "kinds": ["lease"], "note": "dispatch cwd" },
@@ -32,6 +32,15 @@
       "v3Path": "<fgosDir>/locks/runner.lock",
       "owner": "4.2",
       "note": "v1 source: src/runner/loop.mjs LOCK_FILE"
+    },
+    {
+      "name": "documentation-cutover",
+      "kind": "lease",
+      "scope": "repo",
+      "rank": 10,
+      "v3Path": "<fgosDir>/locks/documentation-cutover.lock",
+      "owner": "documentation",
+      "note": "documentation cutover write lease; public acquire API only (D8)"
     },
     {
       "name": "sessions",

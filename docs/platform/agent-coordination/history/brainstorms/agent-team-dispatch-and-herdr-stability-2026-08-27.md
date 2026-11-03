@@ -1,5 +1,23 @@
 # Agent Team Dispatch And Herdr Stability
 
+```txt
+Document type: History
+Audience: Human reviewers, maintainers, documentation agents
+Purpose: Preserve source material for Agent Team Dispatch And Herdr Stability
+Design status: Archived
+Implementation: Not re-verified; source implementation statements remain in the body
+Provenance: Source material from `docs/architect/agent-coordination/history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Documentation maintainer
+Canonical for: Historical evidence only; no current runtime authority
+Use this when: Comparing this source carriage with its pinned source
+Do not use this for: Inferring current implementation or supersession of retained sources
+Last reviewed: Source review history retained; no new implementation certification
+Related:
+- None
+Supersedes: None; the retained source records the historical design
+Superseded by: None
+Carriage note: Promotion metadata only; source claims and implementation are not re-decided here
+```
 Document type: History
 Design status: Superseded
 Implementation: N/A

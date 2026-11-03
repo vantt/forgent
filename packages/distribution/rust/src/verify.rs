@@ -1,6 +1,6 @@
 //! Manifest digest recomputation and per-file verification.
 //!
-//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.
+//! Matches `docs/platform/packaging-distribution/contracts/release-manifest.md#canonical-release-tree-rules`.
 
 use crate::canonical::{canonicalize_manifest_files, CanonicalError};
 use crate::manifest::{read_manifest_from_path, ReleaseManifest};

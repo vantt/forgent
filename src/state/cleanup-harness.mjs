@@ -202,7 +202,7 @@ function mergeStillResolves(git, work, { view, id } = {}) {
         : childrenResult;
     }
   }
-  // tsk-40m (docs/architect/doing-coordination-redesign.md): these top-level
+  // tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): these top-level
   // sticky fields are only ever set by a durable work.move payload, which
   // claim time no longer writes -- the real values now live on the settle's
   // own work.attempt, folded into work.lastAttempt. Checked as a fallback,

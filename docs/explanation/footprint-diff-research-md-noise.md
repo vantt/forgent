@@ -23,7 +23,7 @@ return: `fgos return tsk-22b` output included
 "docs/history/data-dictionary-no-stuck-merge-abort-drift/RESEARCH.md" }]`
 even though `passed: true` and the item's footprint had been correctly
 synced per the documented convention (`plan.md` +
-`docs/specs/distribution.md`).
+`docs/platform/packaging-distribution/spec.md#spec-packaging-distribution`).
 
 ## The third instance of a pattern already fixed twice
 

@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgent.dev/schemas/claim-ledger-row.v1.json",
+  "title": "Claim ledger row",
+  "description": "One row of the claimLedger array of the documentation inventory (plan §6.2). Enumerated values are not repeated here: a property marked x-vocabulary is checked against that section of claim-and-disposition-vocabulary.json, which is the only place the allowed values live. x-plan62 marks the fifteen fields plan §6.2 requires; x-filledBy names the step that must fill a field the inventory leaves empty today. rationale is optional on a row because the inventory item carries a rationale for every file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claimId",
+    "sourceId",
+    "sourcePath",
+    "sourceAnchor",
+    "sourceDigest",
+    "sourceUnitDigest",
+    "sourceLocation",
+    "targetOwner",
+    "targetAnchor",
+    "claimKind",
+    "authorityKind",
+    "status",
+    "relations",
+    "decisionRefs",
+    "evidenceLinks",
+    "disposition",
+    "reviewStatus",
+    "identityUnitDigest",
+    "identityFingerprint",
+    "identityStatus"
+  ],
+  "properties": {
+    "claimId": {
+      "type": "string",
+      "pattern": "^claim_(identity_gap_[0-9a-f]{24}|[0-9a-f]{32})$",
+      "description": "Opaque claim identity, independent of path and position. Rows whose identity could not be carried forward use the identity_gap form.",
+      "x-plan62": true
+    },
+    "sourceId": {
+      "type": "string",
+      "pattern": "^src_[0-9a-f]{32}$",
+      "description": "Opaque source-file identity.",
+      "x-plan62": true
+    },
+    "sourcePath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Repository-relative POSIX path of the source file.",
+      "x-plan62": true
+    },
+    "sourceAnchor": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable heading slug or unheaded-block ordinal inside the source.",
+      "x-plan62": true
+    },
+    "sourceDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of the whole source file.",
+      "x-plan62": true
+    },
+    "sourceUnitDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of this claim's source unit text (conservation proof)."
+    },
+    "sourceLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "description": "One-based inclusive line span of the source unit."
+    },
+    "targetOwner": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "description": "Path of the one document that will own the claim; null until a target is assigned.",
+      "x-plan62": true,
+      "x-filledBy": "Target owner assignment during the pilot and transformation steps; the inventory has it only for rows proposed promote or merge."
+    },
+    "targetAnchor": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "description": "Anchor of the claim inside targetOwner; null until the claim is placed in a target.",
+      "x-plan62": true,
+      "x-filledBy": "Transformation of each area; only promoted portals carry it today."
+    },
+    "claimKind": {
+      "type": "string",
+      "x-vocabulary": "claimKinds",
+      "x-plan62": true,
+      "x-filledBy": "Classification of every unclassified row during the pilot and transformation steps."
+    },
+    "authorityKind": {
+      "type": "string",
+      "x-vocabulary": "authorityKinds",
+      "x-plan62": true
+    },
+    "status": {
+      "type": "string",
+      "x-vocabulary": "claimStatuses",
+      "description": "Current, future or historical status of the claim.",
+      "x-plan62": true
+    },
+    "relations": {
+      "type": "array",
+      "description": "Typed relations to other claims or sources.",
+      "x-plan62": true,
+      "x-filledBy": "Typed relations beyond duplicate content are added during cross-area review.",
+      "items": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "x-vocabulary": "relationTypes"
+          }
+        }
+      }
+    },
+    "decisionRefs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Decision identifiers cited by the claim.",
+      "x-plan62": true
+    },
+    "evidenceLinks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Evidence the claim links to.",
+      "x-plan62": true
+    },
+    "disposition": {
+      "type": "string",
+      "x-vocabulary": "sourceDispositions",
+      "x-plan62": true
+    },
+    "reviewStatus": {
+      "type": "string",
+      "x-vocabulary": "reviewStatuses",
+      "x-plan62": true,
+      "x-filledBy": "Reviewed status is set by the independent review steps; the inventory emits blocking or pending."
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Why the disposition was chosen. Required by dispositions whose requiresRationale is true; the validator also accepts the rationale of the row's inventory item."
+    },
+    "identityUnitDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Digest used to carry identity across commits."
+    },
+    "identityFingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Content fingerprint used to carry identity across commits."
+    },
+    "identityStatus": {
+      "type": "string",
+      "x-vocabulary": "identityStatuses"
+    },
+    "semanticClaimId": {
+      "type": "string",
+      "pattern": "^semantic_[0-9a-f]{24}$",
+      "description": "Shared by rows with identical content in several source files."
+    },
+    "sourceOccurrences": {
+      "type": "array",
+      "description": "Every source path that holds the identical content; one is marked canonical.",
+      "items": {
+        "type": "object",
+        "required": [
+          "sourceOccurrenceOrdinal",
+          "path",
+          "role"
+        ],
+        "properties": {
+          "sourceOccurrenceOrdinal": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

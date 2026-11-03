@@ -68,7 +68,7 @@ goes stale between releases.
 
 - `README.md` `## Install` — the tag-pinned install command this
   procedure feeds.
-- `docs/specs/distribution.md` — the install mechanism spec (Install
+- `docs/platform/packaging-distribution/spec.md#install` — the install mechanism spec (Install
   Behaviors section).
 - `scripts/prepare-release.mjs` — the release metadata preparation script.
 - `.github/workflows/release.yml` — the tag-triggered publish workflow.

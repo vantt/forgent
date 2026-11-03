@@ -13,13 +13,13 @@ Source (planned): language not decided (section 15 question 1); thin wiring for 
 Last reviewed: 2026-10-19
 Supersedes: nothing. It replaces the hand-made practice recorded in section 2.
 Related:
-- docs/specs/confinement-authority.md (hostRead, "secret, not blind" limit)
+- docs/platform/agent-confinement/spec.md (hostRead, "secret, not blind" limit)
 - docs/history/glm-openrouter-executor/plan.md (decision that the key lives in an untracked file)
 - src/runner/dispatch/provider-capacity.mjs (credentialSource, per-run private home)
 - src/runner/dispatch/provider-adapter.mjs, src/runner/dispatch/adapters.mjs (variable expansion)
-- src/config/global-config.mjs (global and project config merge)
+- src/config/facade.mjs (global and project config merge)
 - src/setup/checks.mjs, src/setup/registrations.mjs (doctor checks, setup registrations)
-- .claude/hooks/privacy-block.cjs, .claude/hooks/lib/privacy-checker.cjs
+- .claude/settings.json (PreToolUse registration of the privacy hook; the hook scripts are untracked per-machine files)
 - docs/platform/component-boundary.md
 - docs/platform/platform-foundations.md (L10)
 - core/instructions/design-principles.md
@@ -65,7 +65,7 @@ Evidence is split by class: read from source, read from a machine file by name o
 | The privacy hook patterns cover `.env`, `.env.*`, `credentials`, `secrets.yaml`, `*.pem`, `*.key`, `id_rsa`, `id_ed25519`. They do not match `secrets.local.env` or `auth.json` | source | `.claude/hooks/lib/privacy-checker.cjs` lines 43 to 52 |
 | `herdr pane --env KEY=VALUE` puts a secret value in the argv of the `herdr` process for the length of one call; the owner accepted this risk | decision | `git show 76d8539d1` |
 
-**Correction.** An earlier statement in this project's discussion said that the bwrap confinement hides `.fgos/secrets.local.env` from workers. That was wrong. `docs/specs/confinement-authority.md` lists the file under the open limits as "secret, not blind" (section 9.2 closing paragraph), and the built-in `host-write-denied` policy has `hostRead: allow`. Read from the policy and the spec, a confined worker can read the file today. **This was not tested live.** A live probe is delivery step X1.
+**Correction.** An earlier statement in this project's discussion said that the bwrap confinement hides `.fgos/secrets.local.env` from workers. That was wrong. `docs/platform/agent-confinement/spec.md#92-hostread-blind-worker-mù-trước-run-state-của-peer` lists the file under the open limits as "secret, not blind" (section 9.2 closing paragraph), and the built-in `host-write-denied` policy has `hostRead: allow`. Read from the policy and the spec, a confined worker can read the file today. **This was not tested live.** A live probe is delivery step X1.
 
 **Constraint kept from the past.** The pi invocation must not carry the OpenRouter key variable in its env (`4f6fc44d7`, `8f7463036` and the test). This spec does not reverse it; the design in section 6 is how the store pi reads gets its key without that variable.
 
@@ -143,7 +143,7 @@ For a reference `${NAME}` a caller resolves for a named consumer, in order:
 2. the project secrets file, `.fgos/secrets.local.env` of the active project;
 3. the global secrets file under the user's fgOS directory.
 
-First hit wins. This matches "project always overwrites global" in `docs/distribution-vision.md` and the Config component's precedence (`docs/platform/config/spec.md` section 3). The order is a decision to confirm (section 15 question 7) because step 1 lets an inherited variable override a file; that is wanted for cron and CI, and is why the interactive shell export of section 7.1 is removed.
+First hit wins. This matches "project always overwrites global" in `docs/platform/packaging-distribution/history/distribution-vision.md` and the Config component's precedence (`docs/platform/config/spec.md` section 3). The order is a decision to confirm (section 15 question 7) because step 1 lets an inherited variable override a file; that is wanted for cron and CI, and is why the interactive shell export of section 7.1 is removed.
 
 ### 5.3 Expansion
 
@@ -228,7 +228,7 @@ No verb prints, copies or edits a value. Writing a secret into a source is done 
 |---|---|
 | Config loading (later) | Depends on the expansion function for `${VAR}`. Must not copy it (section 4.1) |
 | Provider capacity (`provider-capacity.mjs`) | The lease already creates the per-run private home and copies a person's login into it. The writer of section 6.2 runs at the same point |
-| Confinement (`docs/specs/confinement-authority.md`) | Owns what a worker can read. This component asks for secret paths to be hidden from it (section 15 question 4); it does not implement hiding |
+| Confinement (`docs/platform/agent-confinement/spec.md`) | Owns what a worker can read. This component asks for secret paths to be hidden from it (section 15 question 4); it does not implement hiding |
 | Hook installer and doctor (`src/setup/*`) | Own installation of any hook and the registry of checks. This component adds one check and one setup registration, no new mechanism |
 | Privacy hook | A safety net over secret-looking names (section 7.4) |
 | Dispatch | The only process that resolves a secret for a worker (rule 2) |
@@ -304,7 +304,7 @@ An adapter passes these before it is enabled; the core passes the first four wit
 2. **Encryption adapter.** `pass`, `gpg` or `systemd-creds` behind the `SecretSource` port, with a non-interactive unlock for cron. Which, and when? The port is built so the file adapter can be replaced without a caller change.
 3. **Per-provider spend-capped keys.** Does the owner create a dedicated, capped, revocable key per provider and accept rotating them? Without it, section 7.3 gives no bound.
 4. **Agent read protection for unconfined interactive sessions.** Options: deny rules for the secret paths in the agent CLI's own settings, extending the privacy patterns of section 7.4 to `secrets.local.env` and `auth.json`, and extending confinement `hostRead: blind` to secret paths. The first two are safety nets only; the third needs the confinement owner. Which of them, and in what order?
-   *Answered in part, 2026-10-23:* option 3 is realized for directories by the machine-private list of the Confinement Authority (`docs/specs/confinement-authority.md` section 9.3): a listed directory is hidden from every confined dispatch whatever its `hostRead`, and the first entry is `{home}/.fgos/private`. Options 1 and 2 are unchanged. This component's own paths enter the list as entries (with a probe case) when it lands its own directory; a single file such as `.fgos/secrets.local.env` is still not covered, because the list holds directories only.
+   *Answered in part, 2026-10-23:* option 3 is realized for directories by the machine-private list of the Confinement Authority (`docs/platform/agent-confinement/spec.md#93-machine-private-roots-thư-mục-riêng-của-máy-che-với-mọi-worker` section 9.3): a listed directory is hidden from every confined dispatch whatever its `hostRead`, and the first entry is `{home}/.fgos/private`. Options 1 and 2 are unchanged. This component's own paths enter the list as entries (with a probe case) when it lands its own directory; a single file such as `.fgos/secrets.local.env` is still not covered, because the list holds directories only.
 5. **One name for the shared key.** Answered 2026-10-20: `OPENROUTER_API_KEY`.
 6. **Scope of the expansion function.** Does it also take over the three `${HOME}`-only expansions of section 2, or stay for secrets and environment references only?
 7. **Resolver order.** Answered 2026-10-20: environment, then project file, then global file.

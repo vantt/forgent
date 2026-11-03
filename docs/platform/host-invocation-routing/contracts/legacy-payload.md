@@ -5,15 +5,21 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define legacy Node payload identity, source location, release placement, and compatibility boundaries
 Design status: Draft
-Implementation status: Legacy-current plus implemented-preview release manifest binding
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/legacy-cli-transition.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md
 - docs/platform/host-invocation-routing/contracts/command-route-descriptor.md
 - docs/platform/packaging-distribution/contracts/release-manifest.md
+Implementation: Legacy-current plus implemented-preview release manifest binding
+Provenance: `docs/platform/host-invocation-routing/contracts/legacy-payload.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Define legacy Node payload identity, source location, release placement, and compatibility boundaries
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
 
 ## 1. Contract
@@ -51,4 +57,4 @@ Node payload tests may spawn `bin/fgos.mjs` directly because they test the paylo
 | legacy transition | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) |
 | command route descriptor | [command-route-descriptor.md](command-route-descriptor.md) |
 | release manifest | [../../packaging-distribution/contracts/release-manifest.md](../../packaging-distribution/contracts/release-manifest.md) |
-| source transition | [../../../architect/host-invocation-routing/legacy-cli-transition.md](../../../architect/host-invocation-routing/legacy-cli-transition.md) |
+| source transition | `../architecture/legacy-cli-transition.md#legacy-cli-transition` |

@@ -15,6 +15,14 @@ Related:
 - src/setup/registrations.mjs
 - bin/fgos.mjs
 - test/setup/registrations.test.mjs
+Implementation: Original section-specific implementation statements retained; provenance does not certify current implementation
+Provenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b
+Writer type: Human + agent coauthor
+Canonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review
+Use this when: Reading this area topic and its retained design details
+Do not use this for: Claiming a truth review or an authority cutover from carriage alone
+Supersedes: No authority transition in this carriage pass
+Superseded by: None recorded
 ```
 
 ## 1. Purpose
@@ -60,10 +68,10 @@ passed-but-degraded with an upgrade instruction; other host errors fail.
 This check is read-only, introduces no config default, and never rewrites runs.
 
 `convention-conformance` checks the packaged naming and placement rules only
-inside an fgOS source checkout. Violations on paths already present at the
-rule cutoff pass with counts and up to three examples; a violation on a path
-introduced after that cutoff fails the check, even while the rule posture is
-`warn`. A missing or old host pass-skips with the reason because doctor never
+inside an fgOS source checkout. Any native `block`-posture violation fails
+regardless of path age or cutoff. For naming rules with `warn` posture, paths
+already present at the rule cutoff pass with counts and up to three examples;
+a violation introduced after that cutoff fails the check. A missing or old host pass-skips with the reason because doctor never
 reimplements the native rules. The check is read-only and has no registered
 fix or config default.
 
@@ -79,6 +87,12 @@ throwing out the whole doctor run. It is read-only, with no registered fix:
 `npm run fgos:dev -- <verb>` runs working-tree code; build/stage/upgrade updates
 plain `fgos`. Diagnosis never changes the activation implicitly.
 
+
+| Check | Pass | Fail | Not applicable |
+| --- | --- | --- | --- |
+| `documentation-cutover-lease` | Repository hooks are wired, the committed main-ref sidecar is absent, released or abandoned, and no stray main token exists. | Committed sidecar is corrupt/unreadable; a token exists in main while main is not the recorded holder; applicable hook wiring is missing; or a lease is held. Held state reports age and frozen scope, or a missing hook/kernel lock resource. | Outside Git or without a main branch; also without `.githooks/reference-transaction` when authority is neither held nor corrupt and no stray main token exists. |
+
+This check reads committed main-ref authority before treating missing repository hooks as not applicable: held/corrupt authority still fails if the reference hook disappears. It diagnoses a stray main token by file presence and the recorded holder checkout, without validating a linked holder's token possession. Acquire refuses the same stray condition with `stray-main-token`; held-lease admission also refuses main callers with that residue. The check is read-only, with no registered fix, config default or automatic token cleanup. After checking committed state and the recorded holder, the owner removes residue by hand; a real holder's release restores any pre-existing main token bytes. The [lease contract](../../holder-lock/spec.md#documentation-cutover-write-lease) owns the release crash window and recovery.
 
 `fgos doctor --fix`:
 
@@ -130,10 +144,92 @@ The exact list of registered checks/fixes changes over time. This contract shoul
 
 This canonical inventory is checked against the live registry by `test/setup/registrations.test.mjs`; the legacy distribution Data Dictionary is a historical projection.
 
-Today's registered checks: `active-release-matches-checkout`, `agent-claims-resolve`, `agent-cli-project-trusted`, `agent-type-names-unique`, `agy-hook-wired`, `agy-permissions-configured`, `agy-sub-homes-configured`, `blind-steps-use-proven-pools`, `bwrap-available`, `cancel-wait`, `capability-serves-valid`, `changelog-unreleased-stale`, `claude-plugin-marketplace`, `cli-version-visible`, `codex-hook-wired`, `command-routes-drift`, `config-comment-migrated-why`, `config-comment-missing-doc`, `config-comment-missing-why`, `config-doc-drift`, `config-format-legacy-json`, `config-global-permissions`, `config-key-in-wrong-file`, `config-legacy-shadowed`, `config-migrate-backup-stale`, `config-parse`, `config-redundant-value`, `config-schema`, `config-secret-outside-private`, `config-unknown-key`, `confined-pane-accounts`, `confinement-backend-registry-readable`, `confinement-blind-read`, `confinement-bwrap-platform`, `confinement-herdr-maturity`, `confinement-orphaned-resources-reaped`, `confinement-policies-declared`, `confinement-probe-freshness`, `confinement-strict-readiness`, `convention-conformance`, `coordination-example-requests-valid`, `coordination-protocol-dead-vocabulary`, `coordination-protocol-fixtures-valid`, `credential-copies-retained`, `curl-available`, `decision-index-stale`, `delivered-not-on-trunk`, `dependencies-installed`, `dispatch-decide-hook-wired`, `doc-active-duplicate`, `doc-alias-broken`, `doc-current-path-missing`, `doc-near-duplicate`, `doc-provisional-aged`, `doc-registry-stale`, `doc-role-underused`, `doc-source-conservation`, `doc-source-unreachable`, `doc-topic-oversized`, `domain-registry-compiled`, `domain-workflow-operations-coverage`, `enduser-docs-index-stale`, `event-store-integrity`, `event-store-legacy-layout`, `event-store-machine-id`, `event-store-native-addon`, `event-store-open-root`, `event-store-refspec`, `event-store-sync`, `event-store-unsealed`, `executor-confinement`, `executor-family-unique`, `executor-posture-coverage`, `executor-profile-warnings`, `executor-skills-installed`, `gate-kill-grace`, `gateway-token-configured`, `git-component-compatible`, `git-mutation-one-door`, `git-native-locks`, `git-operation-journal`, `git-repository-config`, `git-worktree-recovery`, `global-model-policies-portable`, `herdr-executor-kinds`, `identity-ids-unique`, `identity-machine-id`, `identity-machine-key`, `identity-pinned-machines`, `identity-project-id`, `identity-shared-directory`, `identity-ssh-keygen`, `instruction-projections-stale`, `invocation-git-write-grants`, `leaf-notify-drift`, `legacy-attempts-stuck`, `legacy-node-payload-present`, `llm-accounts-shape`, `llm-accounts-vs-legacy`, `lock-borrow-vectors`, `lock-holders`, `lock-kernel-semantics`, `mailbox-claude-accept`, `mailbox-hook`, `main-checkout-hook-wired`, `model-policy-pools`, `no-stuck-merge-abort`, `node-version-and-git`, `non-claude-trust-stores-readable`, `observe-dir-writable`, `observe-host-resolvable`, `observe-run-coverage`, `omp-hook-wired`, `operation-capability-resolves`, `operation-prompt-templates-valid`, `pi-hook-wired`, `plugin-dev-skills-packaged`, `plugin-skill-cli-reachable`, `process-containment`, `project-fgos-launcher`, `provider-capacity-state`, `readme-install-tag-exists`, `root-drift`, `run-attempts-stuck`, `run-supervisor-route`, `runner-generated-paths`, `runner-patterns-config`, `runtime-socket-dir`, `rust-host-binary-present`, `rust-host-target-supported`, `seat-binding-dry-bind`, `seat-binding-route`, `shadow-binder-divergence`, `shell-integration-sourced`, `task-specs-resolve`, `terminal-allocations`, `terminal-control`, `tier-fallback`, `tier-vocabulary-dead-keys`, `tool-registry-configured`, `trust-store-readable`, `units-awaiting-resume`, `work-classification-vocabulary`, `work-recorded-conflicts`, `work-step-vocabulary`, `worker-slots-ceiling-usable`, `workflow-capabilities-configured`, `workflow-case-binding-sentinel`, `workflow-case-bindings`, `writer-identity-resolvable`. This list changes with the corresponding registrations.
+Today's registered checks: `active-release-matches-checkout`, `agent-claims-resolve`, `agent-cli-project-trusted`, `agent-type-names-unique`, `agy-hook-wired`, `agy-permissions-configured`, `agy-sub-homes-configured`, `blind-steps-use-proven-pools`, `bwrap-available`, `cancel-wait`, `capability-serves-valid`, `changelog-unreleased-stale`, `claude-plugin-marketplace`, `cli-version-visible`, `codex-hook-wired`, `command-routes-drift`, `config-comment-migrated-why`, `config-comment-missing-doc`, `config-comment-missing-why`, `config-doc-drift`, `config-format-legacy-json`, `config-global-permissions`, `config-key-in-wrong-file`, `config-legacy-shadowed`, `config-migrate-backup-stale`, `config-parse`, `config-redundant-value`, `config-schema`, `config-secret-outside-private`, `config-unknown-key`, `confined-pane-accounts`, `confinement-backend-registry-readable`, `confinement-blind-read`, `confinement-bwrap-platform`, `confinement-herdr-maturity`, `confinement-orphaned-resources-reaped`, `confinement-policies-declared`, `confinement-probe-freshness`, `confinement-strict-readiness`, `convention-conformance`, `coordination-example-requests-valid`, `coordination-protocol-dead-vocabulary`, `coordination-protocol-fixtures-valid`, `credential-copies-retained`, `curl-available`, `decision-index-stale`, `delivered-not-on-trunk`, `dependencies-installed`, `dispatch-decide-hook-wired`, `doc-active-duplicate`, `doc-alias-broken`, `doc-current-path-missing`, `doc-near-duplicate`, `doc-provisional-aged`, `doc-registry-stale`, `doc-role-underused`, `doc-source-conservation`, `doc-source-unreachable`, `doc-topic-oversized`, `documentation-cutover-lease`, `domain-registry-compiled`, `domain-workflow-operations-coverage`, `enduser-docs-index-stale`, `event-store-integrity`, `event-store-legacy-layout`, `event-store-machine-id`, `event-store-native-addon`, `event-store-open-root`, `event-store-refspec`, `event-store-sync`, `event-store-unsealed`, `executor-confinement`, `executor-family-unique`, `executor-posture-coverage`, `executor-profile-warnings`, `executor-skills-installed`, `gate-kill-grace`, `gateway-token-configured`, `git-component-compatible`, `git-mutation-one-door`, `git-native-locks`, `git-operation-journal`, `git-repository-config`, `git-worktree-recovery`, `global-model-policies-portable`, `herdr-executor-kinds`, `identity-ids-unique`, `identity-machine-id`, `identity-machine-key`, `identity-pinned-machines`, `identity-project-id`, `identity-shared-directory`, `identity-ssh-keygen`, `instruction-projections-stale`, `invocation-git-write-grants`, `leaf-notify-drift`, `legacy-attempts-stuck`, `legacy-node-payload-present`, `llm-accounts-shape`, `llm-accounts-vs-legacy`, `lock-borrow-vectors`, `lock-holders`, `lock-kernel-semantics`, `mailbox-claude-accept`, `mailbox-hook`, `main-checkout-hook-wired`, `model-policy-pools`, `no-stuck-merge-abort`, `node-version-and-git`, `non-claude-trust-stores-readable`, `observe-dir-writable`, `observe-host-resolvable`, `observe-run-coverage`, `omp-hook-wired`, `operation-capability-resolves`, `operation-prompt-templates-valid`, `pi-hook-wired`, `plugin-dev-skills-packaged`, `plugin-skill-cli-reachable`, `process-containment`, `project-fgos-launcher`, `provider-capacity-state`, `readme-install-tag-exists`, `root-drift`, `run-attempts-stuck`, `run-supervisor-route`, `runner-generated-paths`, `runner-patterns-config`, `runtime-socket-dir`, `rust-host-binary-present`, `rust-host-target-supported`, `seat-binding-dry-bind`, `seat-binding-route`, `shadow-binder-divergence`, `shell-integration-sourced`, `task-specs-resolve`, `terminal-allocations`, `terminal-control`, `tier-fallback`, `tier-vocabulary-dead-keys`, `tool-registry-configured`, `trust-store-readable`, `units-awaiting-resume`, `work-classification-vocabulary`, `work-recorded-conflicts`, `work-step-vocabulary`, `worker-slots-ceiling-usable`, `workflow-capabilities-configured`, `workflow-case-binding-sentinel`, `workflow-case-bindings`, `writer-identity-resolvable`. This list changes with the corresponding registrations.
 
 Today's registered fixes: `agy-hook-wired`, `agy-permissions-configured`, `bin-discovery-cache`, `claude-plugin-marketplace`, `codex-hook-wired`, `config-chmod`, `config-copy-to-destination`, `config-move-under-private`, `config-refresh-docs`, `config-remove-redundant`, `confinement-backend-registry-readable`, `confinement-orphaned-resources-reaped`, `credential-copies-retained`, `decision-index-stale`, `dispatch-decide-hook-wired`, `doc-registry-stale`, `enduser-docs-index-stale`, `event-store-lock-dirs`, `gateway-token-configured`, `git-driver-directories`, `git-land-recovery`, `git-publication-refspecs`, `git-wal-dir`, `identity-machine-id`, `identity-machine-key`, `instruction-projections-stale`, `legacy-attempts-stuck`, `lock-dirs`, `mailbox-claude-accept`, `no-stuck-merge-abort`, `omp-hook-wired`, `pi-hook-wired`, `project-fgos-launcher`, `run-attempts-stuck`, `runtime-socket-dir`, `workflow-case-bindings`. This list changes with the corresponding registrations.
 
 The Git checks share one ABI/floor row, `git-component-compatible`, which also prints the repository layout and measured durability as information. `git-repository-config` judges the repository's transport settings and the Event Store mirror fetch mappings together. `git-operation-journal` keeps the pending count, oldest unresolved operation and retained bytes under `detail`, refuses unreadable or incomplete scans, warns about retained Land candidates, and fails `git-fence-missing` (next step: `fgctl upgrade` for the active release) when a WAL exists without the controller activation fence. Native locks are detected without removal. `git-wal-dir` initializes the trusted WAL directories; `git-driver-directories` creates or tightens only the current user’s designated fgOS root and empty driver hooks directory, canonicalizing a symlinked state root, rejecting symlinked hooks/foreign owners and leaving parents untouched; existing root chmod additionally requires canonical basename `fgos` or the driver’s own floor-record marker; Git doctor refusals name the mode/owner cause and this registered fix. The `git-publication-refspecs` fix reads the canonical Git RepositoryConfig mapping for the effective `eventStore.remote` (project over global, default `origin`), installs missing wildcard mirror mappings and replaces the obsolete exact legacy line using RepositoryConfig under repo-config 80, preserving user configuration and recording the effective remote URL. `event-store` registers `eventStore.remote` with default `origin`; obsolete exact origin mappings are also repaired when a different remote is configured. Reserved legacy-suffix mirrors are reported for manual cleanup. A missing addon makes the checks fail and fixes report a refusal without aborting unrelated setup fixes. The durability line of `git-component-compatible` reports the process-crash/fsync contract without certifying stable media.
 
 `git-repository-config` reports repository-local transport settings that Publication/Remote refuse, using Rust’s scope-based admission policy. For actions/checkout credentials, use `persist-credentials: false`, remove the repo-local `http.<url>.extraheader`, and configure a trusted global credential helper or `GIT_CONFIG_GLOBAL`-level setting. The check is read-only, reports keys without credential values, and has no automatic credential migration.
+
+## Retained Distribution Source Detail
+
+Distribution rules and recorded decisions are retained below; the area specification is `docs/platform/packaging-distribution/spec.md`.
+
+##### Contributor hooks setup
+
+- **Blocked when:** never — this is an explicit command a contributor runs
+  themselves; it always runs when invoked.
+- **What changes:** running the setup command wires up this repository's
+  pre-commit hook for the person who just cloned it. It is never triggered
+  automatically by any package manager's install step (per str88-fgos-pnpm-lifecycle)
+  — a contributor runs it once, by hand, after cloning.
+- **Side effects:** none beyond the local git config change; nothing is
+  installed and no network access happens.
+- **Afterwards:** the contributor's local clone has the pre-commit hook
+  wired up, identically to what used to happen automatically. Someone who
+  never runs this command simply does not get the local hook — this is a
+  one-time manual step for contributors, not a requirement for installing
+  or running `fgos` itself.
+- In fgOS source checkouts, the hook refuses newly staged root files outside
+  its own allowlist, including linked worktrees and `fgw/*` branches. Existing
+  root modifications/deletions remain permitted. Allowlist changes must land
+  separately on main before root additions use them; the index cannot authorize
+  itself. Merge commits skip this root guard; the `.fgos` deletion and worker
+  guards accept only a staged entry equal to the merge parent's where that
+  parent changed it since the merge base, and no other data-loss guard is
+  skipped. `main-checkout-hook-wired` diagnoses wiring using the existing check.
+- In fgOS source checkouts, the hook sends newly staged, copied, or renamed
+  Markdown files directly under `plans/reports/` and `plans/journals/` to the
+  native Convention checker, along with new/copied/renamed paths under `docs/`.
+  Native block-posture documentation violations refuse the commit; naming
+  violations warn. Unavailable, old, or failed hosts warn and pass-skip. Nested
+  evidence and per-plan `reports/` directories remain outside the naming scope.
+
+##### Setup
+
+- **Blocked when:** never — running `fgos setup` always attempts its work;
+  a shell profile that does not exist is simply skipped rather than
+  refused.
+- **What changes:** for every shell profile the caller actually has (bash's
+  and/or zsh's, whichever exist), the shell helper's source line is added
+  if not already present — never duplicated on a repeat run. Each of the local project config file and the global config file (`~/.fgos/config.yaml`, row 5b) is created as a header-only file when neither it nor a legacy `config.json` exists (`init` of the Config component); `fgos setup` writes no default into either, because the standard supplies every value, and a file that exists is left untouched. The lock directories of row 5g are created when missing:
+  `<lockRoot>` and `<fgosDir>/locks`, both mode 0700, an existing one tightened to it (the `lock-dirs` fix);
+  `<stateRoot>/terminal` is not set up here: the
+  terminal allocation store creates it with mode 0700 on first use.
+  The release's skills are copied into the project's `.agents/skills` and
+  their `.claude/skills` wrappers regenerated, except that a project file is
+  kept as it is when it is tracked with uncommitted changes since HEAD, or
+  when its skill's `SKILL.md` declares a newer `version` than the release's
+  copy; untracked and clean tracked files are still refreshed. Each kept
+  file is named in the setup output (a failed check line). A checkout that
+  is the release's own source regenerates its wrappers without this guard.
+- **Side effects:** the caller's own shell profile file(s), local project
+  config file, global config file (`~/.fgos/config.yaml`), and the two lock
+  directories may be created or modified; nothing outside the caller's own
+  environment is touched, and no network access happens.
+- **Afterwards:** the caller sees exactly what changed — which profile
+  file(s) gained the source line (or already had it), which project config
+  settings were newly added (or that none were needed), and which global
+  config settings were newly added (or that none were needed, or that the
+  global file was just created). Nothing is done silently; running `fgos
+  setup` again when everything is already current reports that plainly,
+  without repeating any change.
+
+##### Doctor
+
+- **Blocked when:** never — `fgos doctor` always runs every check and
+  reports the result; it never fails the invocation itself, only reports
+  individual checks as passing or not. Exit stays 0 because `fgctl
+  init|upgrade|repair` run it as their tail and mark the install degraded on
+  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.
+- **What changes:** nothing — this is a read-only diagnostic. It never
+  writes a config file, never modifies a shell profile, and never installs
+  anything, even when a check reports a problem (`config-not-stale`
+  failing on a missing config file reports that plainly rather than
+  creating one).
+- **Side effects:** none.
+- **Afterwards:** the caller sees each named check (Data Dictionary #7) and
+  whether it passed, including enough detail to know what to do next (e.g.
+  which config settings are missing, or that `fgos setup` has not been run
+  yet).

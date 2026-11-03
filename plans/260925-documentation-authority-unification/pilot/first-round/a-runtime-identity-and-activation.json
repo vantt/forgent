@@ -1,0 +1,2393 @@
+{
+  "version": 1,
+  "shard": "a-runtime-identity-and-activation",
+  "sources": [
+    "docs/architect/packaging-distribution/runtime-identity-and-activation.md"
+  ],
+  "files": [
+    {
+      "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "disposition": "merge",
+      "rationale": "Most structural claims (identity model, layout, activation/pin/manifest shapes, projection boundary, fgctl/local fgos split) are carried by the promoted architecture and contract docs, but a large block of lease, candidate-bootstrap, failure-rule, projection-ownership, migration, adoption, dev-activation and canonicalization detail has no target and is recorded as unknown-blocking.",
+      "targets": [
+        "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+        "docs/platform/packaging-distribution/architecture/future-constraints.md",
+        "docs/platform/packaging-distribution/README.md",
+        "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+        "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+        "docs/platform/packaging-distribution/contracts/activation-binding.md",
+        "docs/platform/packaging-distribution/contracts/release-manifest.md",
+        "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+        "docs/platform/packaging-distribution/vision.md",
+        "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+        "docs/platform/packaging-distribution/verification/install-and-release-proof.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_f3d6f2172d4780ee47f3a2f7a44b2ec8",
+      "sourceUnitDigest": "b0443ae563d60b4c",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "runtime-identity-and-activation",
+      "claimKind": "architecture",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Title heading of the document appears verbatim as the H1 of the promoted architecture doc."
+    },
+    {
+      "claimId": "claim_b6c7e0cf73c35dad866f2dd1d7a2a3e2",
+      "sourceUnitDigest": "10091961d72f5052",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "delete-as-obsolete",
+      "reviewStatus": "pending",
+      "rationale": "Legacy-status/promoted-to header block of a source that calls itself \"historical redirect\"; routing pointers to the promoted docs. Target README and architecture docs are now the entry points (README \"Read First\"), so this redirect metadata no longer applies.",
+      "searched": [
+        "Promoted to / historical redirect (README sections 2 and 9 carry the current routing)",
+        "Current reader entry",
+        "Use this legacy file for",
+        "architecture/runtime-identity-and-activation.md Related list",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_a8c8bb05d3b2183c26cfb7f502c66ac3",
+      "sourceUnitDigest": "38a429413f394159",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "delete-as-obsolete",
+      "reviewStatus": "pending",
+      "rationale": "Blockquote says \"Status: historical redirect ... Keep this file only as detailed source context\"; its links point to promoted docs that now exist and are linked from README section 2.",
+      "searched": [
+        "Promoted to / historical redirect (README sections 2 and 9 carry the current routing)",
+        "Current reader entry",
+        "Use this legacy file for",
+        "architecture/runtime-identity-and-activation.md Related list",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_26dac21a6c44a07abe3ff6c726462bca",
+      "sourceUnitDigest": "c04b3e9f7cf11dfb",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "historical-context",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "Status line \"Historical architecture contract draft\", date 2026-09-04 and scope sentence are provenance of the draft; scope is now carried by README section 5 ownership boundary. Retire with the draft."
+    },
+    {
+      "claimId": "claim_e7c16bc6110144f3672d8e3263df7c4b",
+      "sourceUnitDigest": "646813dad37dce5e",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "targetAnchor": "1-purpose",
+      "claimKind": "historical-context",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "First sentence (draft before promotion) is provenance; the point that shared gateway/web is a future constraint, not delivery scope, is stated in future-constraints Purpose and section 5."
+    },
+    {
+      "claimId": "claim_a194d0ab7320ba24239af2947b286713",
+      "sourceUnitDigest": "43afffffa5c14ced",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "delete-as-obsolete",
+      "reviewStatus": "pending",
+      "rationale": "Heading of a reading-guide section that the source itself calls historical context (\"Use the promoted platform docs as the working contract\").",
+      "searched": [
+        "Promoted to / historical redirect (README sections 2 and 9 carry the current routing)",
+        "Current reader entry",
+        "Use this legacy file for",
+        "architecture/runtime-identity-and-activation.md Related list",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_be4feb30622312940c6e2422342b3cf1",
+      "sourceUnitDigest": "627342a16c82cf67",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "delete-as-obsolete",
+      "reviewStatus": "pending",
+      "rationale": "Says the document is historical source context and tells readers to use promoted platform docs instead: a redirect with no remaining function once the promoted docs exist.",
+      "searched": [
+        "Promoted to / historical redirect (README sections 2 and 9 carry the current routing)",
+        "Current reader entry",
+        "Use this legacy file for",
+        "architecture/runtime-identity-and-activation.md Related list",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_8ea73a59479e5051ddabd5eb03c48818",
+      "sourceUnitDigest": "c87ee691f0ea6961",
+      "targetOwner": "docs/platform/packaging-distribution/README.md",
+      "targetAnchor": "2-read-first",
+      "claimKind": "navigation",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Reading-order list (topology first, then promoted architecture/contracts) is replaced by README \"Read First\" table; the instruction to read Workspace Topology Architecture first and the preservation-audit pointer are not repeated in that form."
+    },
+    {
+      "claimId": "claim_dc75ad7e62660d3711910c31e2882533",
+      "sourceUnitDigest": "3b4563ef12a08c63",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the V1 decisions table; the table is only partly carried (see the table row), no target section carries it as a whole.",
+      "searched": [
+        "Settled for V1",
+        "Historical Decisions",
+        "dev:<rev> / schema 1 / non-symlink activation / mutating lease",
+        "P7 red-team fix / static candidate preflight",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_12d5dbb269ca537c8e1923d57274a43f",
+      "sourceUnitDigest": "0266dc3bbac745ba",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Table of 16 settled V1 decisions. Carried elsewhere: digest identity, shim entry, per-workspace activation, tracked pin, no projection writes by fgctl, gateway as future constraint. Absent from every target: NFC/case-collision tree rules, activation.json as non-symlink durable file, mutating-lease refusal, no automatic state migration, existing-project adoption as schema 1, dev:<rev> activation, fgctl acquisition sources, static candidate preflight (never executes candidate code).",
+      "searched": [
+        "Settled for V1",
+        "Historical Decisions",
+        "dev:<rev> / schema 1 / non-symlink activation / mutating lease",
+        "P7 red-team fix / static candidate preflight",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_66b58ad141eda076944d47edf360f2e1",
+      "sourceUnitDigest": "208048747e295cc9",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "1-core-position",
+      "claimKind": "architecture",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"1. Core Position\" is the same heading in the promoted architecture doc."
+    },
+    {
+      "claimId": "claim_b3a8dbb74fb0731a881627328e2e80fa",
+      "sourceUnitDigest": "f4738d29d59228f6",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "architecture",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Runtime must be selected by workspace activation, not by PATH: stated in the same words in target Core Position."
+    },
+    {
+      "claimId": "claim_aaf3be3d5306a121c46039453a59cbd6",
+      "sourceUnitDigest": "7f9fba2427a6cbea",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "fgctl/local fgos split diagram is carried; target wording differs slightly (adds projections and state-schema duties for local fgos; drops \"shared release store\" and \"installation capsule\" labels). Ownership table in section 2 and fgctl-and-local-fgos carry the rest."
+    },
+    {
+      "claimId": "claim_c37dcdbe6ae24c4921c70633185cd44c",
+      "sourceUnitDigest": "c3de0f56b6d14690",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target states digest-based identity and that artifactDigest identifies the release manifest/tree, not archive checksum or path. Missing: \"version/tag/channel are human-facing metadata and selection policy, not final proof of what is installed\"."
+    },
+    {
+      "claimId": "claim_abc2a0de9c412207cb045053290a4e89",
+      "sourceUnitDigest": "8996967b902aee53",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "1-core-position",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"2. Runtime Lifecycle\": the lifecycle pipeline is partly carried in Core Position diagram and the paragraph on the active local tail; no target has a lifecycle heading."
+    },
+    {
+      "claimId": "claim_74c5730141447c8e8ba33ab0cf2d3d66",
+      "sourceUnitDigest": "9f5f2a7378194393",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in line for the lifecycle pipeline; the pipeline it introduces is carried in the Core Position diagram."
+    },
+    {
+      "claimId": "claim_6057d124ab44d29d90945fa60f209319",
+      "sourceUnitDigest": "3c4c222ca843dec7",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target diagram has acquire/stage/verify -> prepare workspace installation -> publish activation -> invoke local init; the tail is spelled out in the next paragraph (init, doctor --fix, doctor). Missing: explicit \"atomically\" on publish and the \"allow project-state mutation\" end state."
+    },
+    {
+      "claimId": "claim_659b692c5498f117fc6aeb1a67380a0d",
+      "sourceUnitDigest": "101b41019955eaf8",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Rule that no project workflow command may mutate state from a payload that has not crossed the activation boundary. No target states this boundary rule.",
+      "searched": [
+        "FGOS_BOOTSTRAP_CANDIDATE",
+        "candidate preflight (only code-panel-rollout-plan.md packet list, expected-changes level)",
+        "bootstrap context",
+        "restricted",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_7d62eb2a58328da0a2a9901c3a79533c",
+      "sourceUnitDigest": "5b2c3b2fc2847d26",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Candidate releases may run only bootstrap/preflight before activation; no writes to .agents/.claude/AGENTS.md; if projection tail fails the workspace is ready-degraded until doctor --fix. Targets only say fgctl does not write projections directly; the candidate restriction and ready-degraded status are absent.",
+      "searched": [
+        "FGOS_BOOTSTRAP_CANDIDATE",
+        "candidate preflight (only code-panel-rollout-plan.md packet list, expected-changes level)",
+        "bootstrap context",
+        "restricted",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_730ffda554a0b85dda9cf5813e028e29",
+      "sourceUnitDigest": "b41bcf03b6d6a9dc",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "2-minimum-layout",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"3. Roots And On-Disk Shape\"; the content is carried by the repository runtime layout contract (Minimum Layout)."
+    },
+    {
+      "claimId": "claim_baf584a0f52a107c6bf61a32a90ba52b",
+      "sourceUnitDigest": "e765d47bd516e295",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Packaging consumes workspace topology and focuses on runtime identity records; layout contract states \"Packaging-distribution consumes workspace topology; it does not own durable work-state semantics\"."
+    },
+    {
+      "claimId": "claim_7bb70a5e663580d6bb5fdff64fb102a6",
+      "sourceUnitDigest": "b165ad95a5b003a9",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Layout tree (workspace .fgos/installation, workHistoryRoot, runtimeCoordinationRoot, machineReleaseStore) is reproduced in the layout contract with identical entries and comments."
+    },
+    {
+      "claimId": "claim_4ecf15f45c6d4ae5224b0c4fc9924184",
+      "sourceUnitDigest": "dde0daf3a23c57b8",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in \"The separation is architectural\"; the separation bullets are the Separation Rules list."
+    },
+    {
+      "claimId": "claim_2dec8131bea8fca857c017c1744f5f87",
+      "sourceUnitDigest": "9a4418a0270aaf7e",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Separation bullets match Separation Rules (release payload immutable, stable entry surface, activation per workspace, tracked config/pin, per-workspace ledger, history vs coordination roots, distinct state classes); target adds release payload to the state-class list."
+    },
+    {
+      "claimId": "claim_78fb7962a13f38faf373501503aad531",
+      "sourceUnitDigest": "4ec49177875223e6",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Worker workspaces need an installation capsule and must not symlink or copy the whole shared .fgos tree: same sentence in layout section 4."
+    },
+    {
+      "claimId": "claim_67ea7318ee5a0c7394b3ab1f8adcc403",
+      "sourceUnitDigest": "e6ea7ecd83eecbd2",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Worker capsule tree identical in layout section 4."
+    },
+    {
+      "claimId": "claim_bce7f3242b78cb8e82985d7c5adde2f3",
+      "sourceUnitDigest": "ce51639978fcc97f",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-12",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "pinned-not-staged state and \"fgctl init must acquire/stage the pinned release, not silently choose latest\" are in layout section 6 (and distribution-pin section 5)."
+    },
+    {
+      "claimId": "claim_b9832e31175255738a4f2dac93d22f61",
+      "sourceUnitDigest": "f10a8cc5d7042732",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in \"Possible tracked pin shape\" becomes a \"Frozen Schema V1 Shape\" statement in distribution-pin; shape no longer tentative."
+    },
+    {
+      "claimId": "claim_606ae2a311e6a325982b36d31909ba55",
+      "sourceUnitDigest": "953b75abc1fe178e",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Pin JSON shape is carried (schemaVersion, projectRuntime.policy/artifactDigest/releaseVersion/channel/allowPrerelease); example differs: channel \"stable\" instead of null."
+    },
+    {
+      "claimId": "claim_a0b5501fc16d1899fa7113404c4d9592",
+      "sourceUnitDigest": "17d5f71a2c81f868",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in for the stable shim root-resolution order; no target states the order.",
+      "searched": [
+        "shim steps / root.json resolution order",
+        "TopologyContext (only layout comment on root.json)",
+        "forward-compat (only schema golden test mentions)",
+        "releasePath read-only rule",
+        "current symlink",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_b75456d68668096b7f0c16a1a127cea3",
+      "sourceUnitDigest": "217109f7756002fb",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Five-step root resolution order (root.json, else TopologyContext, machineReleaseStore, activation.json, exec releases/<digest>/bin/<entry>). Not stated in any target; layout only lists root.json and activation.json as files.",
+      "searched": [
+        "shim steps / root.json resolution order",
+        "TopologyContext (only layout comment on root.json)",
+        "forward-compat (only schema golden test mentions)",
+        "releasePath read-only rule",
+        "current symlink",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_f52782c280bebce5da6b93525468767b",
+      "sourceUnitDigest": "c605c14d493a1fed",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-10",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Shared release store is not a shared active runtime; two worktrees may use different bindings over the same content: target \"Multiple worktrees may share release content while using different activation bindings\" and activation-binding Selection Rule."
+    },
+    {
+      "claimId": "claim_94279ae6161753a909f28f600f659a71",
+      "sourceUnitDigest": "e38430e77a25fe87",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-14",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target: callers should not need to know the active release path. Missing: path-safe digest form (sha256-abc..., not sha256:...) and the statement that humans/agents/gateway/runner supervisors must not call releases/<digest> directly. Activation-binding example uses a colon form in releasePath."
+    },
+    {
+      "claimId": "claim_5a3a18f32e281545d12940271cb4e89f",
+      "sourceUnitDigest": "e1ee624971d89e1b",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-13",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Stable command paths .fgos/installation/bin/fgos and fgos-runner listed identically."
+    },
+    {
+      "claimId": "claim_701258f4566c7c5081bace1eb5cde015",
+      "sourceUnitDigest": "b4de8f587004719e",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-14",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target says the shim/binary resolves the active release through workspace installation state; \"thin shim that does the minimum to enter the active release\" is not stated."
+    },
+    {
+      "claimId": "claim_f64d078d07273a7fb7a4ea60cb70e7cc",
+      "sourceUnitDigest": "db6f1601d9f94e7a",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "4-status-rule",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Activation-binding says shims fail (exit code 3) when activation is missing, not ready, lacks releasePath or points to a missing executable, which carries read-activation and verify-entry steps. Missing: resolving machineReleaseStore from TopologyContext/root binding and the explicit step list."
+    },
+    {
+      "claimId": "claim_e4b4c1384a54c958cf7388473616a465",
+      "sourceUnitDigest": "40a4824d5b2adc94",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Shim must not scan workspace, verify fingerprints, resolve network versions, run doctor or load registries; overhead limited to one small record read plus exec. No target states this.",
+      "searched": [
+        "shim steps / root.json resolution order",
+        "TopologyContext (only layout comment on root.json)",
+        "forward-compat (only schema golden test mentions)",
+        "releasePath read-only rule",
+        "current symlink",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_9e084ca046f9dabf12285656ff43d26e",
+      "sourceUnitDigest": "6dc375b190324842",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Shim forward-compatibility rule: shim reads only schemaVersion, artifactDigest and releasePath from activation.json. Absent from all targets.",
+      "searched": [
+        "shim steps / root.json resolution order",
+        "TopologyContext (only layout comment on root.json)",
+        "forward-compat (only schema golden test mentions)",
+        "releasePath read-only rule",
+        "current symlink",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_3b8bf6d3bc131881bdb9631412ad5ee9",
+      "sourceUnitDigest": "53729c20689b7a3f",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Decision and rationale for a shim over a current symlink (Windows behavior, clear missing-release errors, future lease). Absent; layout contract only forbids symlinking the shared .fgos tree.",
+      "searched": [
+        "shim steps / root.json resolution order",
+        "TopologyContext (only layout comment on root.json)",
+        "forward-compat (only schema golden test mentions)",
+        "releasePath read-only rule",
+        "current symlink",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_7f687034c5f8c915c95d7c932ba0cbd6",
+      "sourceUnitDigest": "c30ccfd7fcd9ae71",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "3-separation-rules",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"4. Record Types\"; only the principle of separate records survives (layout Separation Rules), the five-record table is not carried."
+    },
+    {
+      "claimId": "claim_0372b73a7a1a072a8835ecde7be7d1df",
+      "sourceUnitDigest": "389e419e3ff43d61",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "\"Do not collapse all runtime facts into one ledger; separate records with separate authority\" matches layout Purpose (prevents collapsing distinct authorities into one .fgos tree)."
+    },
+    {
+      "claimId": "claim_2a086421fe8b46ed8c0a7c2741704dac",
+      "sourceUnitDigest": "994b75de735a5097",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Five-record table (mutability, owner, purpose). ReleaseManifest, activation binding and pin have contracts but no mutability/owner table; MigrationJournal row is absent; pin canonical writer fgctl with external edits tolerated and validated fail-closed is absent; ProjectionLedger owner (local fgos init/doctor --fix) is only in prose.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_088af18a5796ed72fe6d33ff2cc5d05c",
+      "sourceUnitDigest": "b801deec612f9c04",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "contract-release-manifest",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"5. ReleaseManifest\" is carried by the Release Manifest contract."
+    },
+    {
+      "claimId": "claim_f7b23e10496a2460c655bbcd0c765cfb",
+      "sourceUnitDigest": "bac0a2990fcb00aa",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Release manifest as the statement of what a release contains: target Purpose \"release identity and verification record for a staged runtime\"; \"immutable\" is not repeated."
+    },
+    {
+      "claimId": "claim_5af864b5fa493c8cad56ba05bd385809",
+      "sourceUnitDigest": "d54d128a83d245d1",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target Digest Rule says digest is over canonical manifest, not archive bytes. Missing: archive digests may still be recorded for diagnostics and identity must survive compression, transport and mirror differences."
+    },
+    {
+      "claimId": "claim_476624a28dc0601bad7c855e350042d0",
+      "sourceUnitDigest": "125ff5b2a95b660b",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "artifactDigest = sha256(canonical manifest without artifactDigest) is stated in Digest Rule; file digest as sha256 of bytes appears only as the files[].digest field."
+    },
+    {
+      "claimId": "claim_6cb12ca91b1025e0db77b036613ec6c4",
+      "sourceUnitDigest": "ead8dd03ae57188e",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Release build owns byte normalization; installer must not rewrite line endings or contents to pass a digest. No target states it.",
+      "searched": [
+        "NFC",
+        "case-insensitive / case collision",
+        "lexicographic",
+        "line ending / normaliz",
+        "transportDigest",
+        "immutable-entry / immutable-runtime / immutable-workshop-source",
+        "fingerprint",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_22bf19b42e0c2c9accb3cbb50a2d6b8e",
+      "sourceUnitDigest": "ec1e06b4fa5ef668",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Manifest JSON carried as frozen V1 shape. Differences: digestKind \"sha256\" (not release-tree-manifest), arch x86_64/libc gnu, requires node \">=20.0.0\" git \">=2.30.0\", mode \"0755\", file class \"binary\"; the adapter object (protocolVersion, entry, capabilities) is absent."
+    },
+    {
+      "claimId": "claim_5b308c0d698cf4b6e679cefd4b72159e",
+      "sourceUnitDigest": "b22b5c1e8b0d30d6",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target states legacyNode root+entry as the only locator, resolved from the manifest and not PATH/cwd. Missing: payload is the whole package per package.json files with source-relative layout, host resolves join(activeReleasePath, root, entry), and dev:<rev> declares root \".\", entries.fgos target/release/fgos."
+    },
+    {
+      "claimId": "claim_66db7a2760e67bac298e8fa999e03918",
+      "sourceUnitDigest": "fe23874c284a1ce5",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "6-safety-rules",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"Release Tree Canonicalization\"; only a part of the rules (symlink refusal, traversal, non-canonical ordering) is carried under Safety Rules."
+    },
+    {
+      "claimId": "claim_e53e994efd41de413243c7feb18609f5",
+      "sourceUnitDigest": "7f7044001655743c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "V1 uses a logical release file tree, not raw filesystem metadata. Principle absent from targets.",
+      "searched": [
+        "NFC",
+        "case-insensitive / case collision",
+        "lexicographic",
+        "line ending / normaliz",
+        "transportDigest",
+        "immutable-entry / immutable-runtime / immutable-workshop-source",
+        "fingerprint",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_3153b26f053448afc0c13f85a80b2337",
+      "sourceUnitDigest": "b36d585b2b0651d5",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Canonicalization table: relative paths, \"/\" separator, UTF-8 NFC, byte order, case-collision refusal, exact-byte digest, mode 755/644, directories inferred, symlink refusal, mtime/owner excluded, transportDigest. Only symlink refusal, path traversal and \"non-canonical ordering\" appear (Safety Rules); the rest is absent.",
+      "searched": [
+        "NFC",
+        "case-insensitive / case collision",
+        "lexicographic",
+        "line ending / normaliz",
+        "transportDigest",
+        "immutable-entry / immutable-runtime / immutable-workshop-source",
+        "fingerprint",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_4486d8c871bc7cace22f5877da298119",
+      "sourceUnitDigest": "97cd2867dcc936f5",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Each file entry carries an ownership class: field table lists files entries with path, kind, digest, mode, class."
+    },
+    {
+      "claimId": "claim_56c5ba0e0335bba198ad8dfad25d5012",
+      "sourceUnitDigest": "738abf5487f9f299",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "File entry JSON appears inside the manifest example; values differ (mode \"0755\", class \"binary\" instead of \"755\"/\"immutable-entry\")."
+    },
+    {
+      "claimId": "claim_bba13f19e0e5cec62ea4680455999120",
+      "sourceUnitDigest": "bb4c9f52ad4a73de",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Initial file classes table (immutable-entry, immutable-runtime, immutable-workshop-source, immutable-doc, metadata). Target example uses class \"binary\" and no class vocabulary is defined.",
+      "searched": [
+        "NFC",
+        "case-insensitive / case collision",
+        "lexicographic",
+        "line ending / normaliz",
+        "transportDigest",
+        "immutable-entry / immutable-runtime / immutable-workshop-source",
+        "fingerprint",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_2ce83669de6ea1d99233cd5dfee3de09",
+      "sourceUnitDigest": "55012af631606c03",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-11",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Generated projections are not release-tree files at projected paths; manifest records source material, ledger records projected location: same sentences in layout section 5."
+    },
+    {
+      "claimId": "claim_ab15836d7a655b68626a332fa0667efb",
+      "sourceUnitDigest": "3d1ea331b51042a1",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "files may eventually contain every immutable file; minimum useful fingerprint set. Absent.",
+      "searched": [
+        "NFC",
+        "case-insensitive / case collision",
+        "lexicographic",
+        "line ending / normaliz",
+        "transportDigest",
+        "immutable-entry / immutable-runtime / immutable-workshop-source",
+        "fingerprint",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_bb2261debf9bf9f07bb9a0841991d1a2",
+      "sourceUnitDigest": "32122ff0553fd6bc",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Minimum fingerprint list (entry binaries, provider descriptors, host entry, legacy Node payload, runner, adapter, init/doctor registries, skills/agents/prose, manifest files). Absent.",
+      "searched": [
+        "NFC",
+        "case-insensitive / case collision",
+        "lexicographic",
+        "line ending / normaliz",
+        "transportDigest",
+        "immutable-entry / immutable-runtime / immutable-workshop-source",
+        "fingerprint",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_e4bf9b812f0b787bcf56246677865361",
+      "sourceUnitDigest": "57af5b1c65fd1dda",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "contract-activation-binding",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"6. WorkspaceActivationBinding\" is carried by the Activation Binding contract."
+    },
+    {
+      "claimId": "claim_587ced3661ae01636f0e57ec6d2f4a0b",
+      "sourceUnitDigest": "885678733f817f28",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Activation as workspace-local ready pointer at .fgos/installation/activation.json and not a repository-wide pointer (Selection Rule) are carried. Missing: \"durably published\", \"not a symlink\", \"moment a staged and verified release becomes runtime authority\"."
+    },
+    {
+      "claimId": "claim_2a5878d831494ffbe840d40269af6d12",
+      "sourceUnitDigest": "6b8f7df04ef88517",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Activation JSON carried as frozen V1; differences: workspaceId/workStateId are 16-hex values (not wks_/state_ prefixes), previousArtifactDigest null example, pinSnapshot filled with the pin, status may be ready or quarantined."
+    },
+    {
+      "claimId": "claim_4b867492e168a488b4d812642f2aad61",
+      "sourceUnitDigest": "346ec840057e1f81",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Atomicity invariant: a project command sees either the previous or the new ready binding, never a half-prepared runtime. Only the code-panel rollout plan lists \"publish ready activation binding atomically\" as a packet bullet.",
+      "searched": [
+        "atomic / fsync / rename (only code-panel-rollout-plan.md P7 bullet \"Publish ready activation binding atomically\")",
+        "half-prepared",
+        "activation.json.tmp",
+        "install.lock obligation (layout lists the path only)",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_dcd34697ac5ac6857e5216f7d3798a0d",
+      "sourceUnitDigest": "e8964fb80febb2c4",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "fgctl must hold release-store install.lock before staging/verifying/repairing/upgrading/rolling back/quarantining, and a workspace activation lock before writing activation.json; projection writes are outside publish. Layout lists install.lock only as a path.",
+      "searched": [
+        "atomic / fsync / rename (only code-panel-rollout-plan.md P7 bullet \"Publish ready activation binding atomically\")",
+        "half-prepared",
+        "activation.json.tmp",
+        "install.lock obligation (layout lists the path only)",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_25d3080e64bc69696f28d89967456930",
+      "sourceUnitDigest": "dcbbe772314b4b46",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Implementation instruction: temp file plus atomic rename for activation.json. Absent.",
+      "searched": [
+        "atomic / fsync / rename (only code-panel-rollout-plan.md P7 bullet \"Publish ready activation binding atomically\")",
+        "half-prepared",
+        "activation.json.tmp",
+        "install.lock obligation (layout lists the path only)",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_377f8ce648788d30644f3bc51bfe5381",
+      "sourceUnitDigest": "3e990f9e6b22795c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "tmp write, fsync, rename, fsync parent directory sequence. Absent.",
+      "searched": [
+        "atomic / fsync / rename (only code-panel-rollout-plan.md P7 bullet \"Publish ready activation binding atomically\")",
+        "half-prepared",
+        "activation.json.tmp",
+        "install.lock obligation (layout lists the path only)",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_2d797473f60376ca54f9086ff0856496",
+      "sourceUnitDigest": "a04d969d83b5e49d",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-14",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Only implied: callers do not need to know the release path. The rule that stable shims do not change during activation (activation changes release identity, not command path) is not stated."
+    },
+    {
+      "claimId": "claim_f44d55f008d91c249201a984ce908b79",
+      "sourceUnitDigest": "88d26cd1a90388f4",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target says activation.json status is \"ready\" or \"quarantined\"; the source rule that only a durably published ready binding is stored and status \"preparing\" is never written is absent and the quarantined value is a change."
+    },
+    {
+      "claimId": "claim_5802544189befbf7e8e93082025a321f",
+      "sourceUnitDigest": "c31de9a6af67d0eb",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "72-install-transaction-record-installsjson",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Install transaction state path <store>/installs/<activationId>.json is section 7.2 of the layout contract."
+    },
+    {
+      "claimId": "claim_627c2ef29f032273927e9dfb2f6590ee",
+      "sourceUnitDigest": "dbf8dbfef2ba662c",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-17",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Layout 7.2 defines the install transaction record and shows statuses; the \"possible statuses\" lead-in is not stated."
+    },
+    {
+      "claimId": "claim_8c0433f08f3be8814239ac99589a77fb",
+      "sourceUnitDigest": "4eb7a14280149d74",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-18",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Example history shows staging, verified, preparing, ready-published only; the full set including ready-degraded, complete, failed, quarantined is not listed."
+    },
+    {
+      "claimId": "claim_9ceeef360a6b64748b005e3bcc8b0d5e",
+      "sourceUnitDigest": "08c7ff48c31e55b7",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Failure-rules table (stage/verify/dependency/preflight/atomic write/projection tail failures and what activation.json and the transaction do). Absent.",
+      "searched": [
+        "ready-degraded",
+        "runtime-dependency-missing",
+        "Acquire/stage fails",
+        "ready-published (only the example history in layout 7.2)",
+        "failure rules",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_ba307bc371864f9cec89f991fef61744",
+      "sourceUnitDigest": "9d7e46eac50d16bd",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Readiness rule: a candidate gains writer authority only after the workspace binding is published with status ready. Not stated; activation-binding only says shims expect ready.",
+      "searched": [
+        "FGOS_BOOTSTRAP_CANDIDATE",
+        "candidate preflight (only code-panel-rollout-plan.md packet list, expected-changes level)",
+        "bootstrap context",
+        "restricted",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_3673677485dd4449067c9e5074623e1a",
+      "sourceUnitDigest": "a1e7ae9c98f45bb7",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "fgctl may invoke the candidate release directly with a restricted bootstrap context during preparation. Absent.",
+      "searched": [
+        "FGOS_BOOTSTRAP_CANDIDATE",
+        "candidate preflight (only code-panel-rollout-plan.md packet list, expected-changes level)",
+        "bootstrap context",
+        "restricted",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_ba9547c5587487b5a423db3dfbd2a593",
+      "sourceUnitDigest": "785e4981db56df96",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Bootstrap env vars FGOS_BOOTSTRAP_CANDIDATE, FGOS_CANDIDATE_ARTIFACT_DIGEST, FGOS_CANDIDATE_RELEASE_PATH. Absent.",
+      "searched": [
+        "FGOS_BOOTSTRAP_CANDIDATE",
+        "candidate preflight (only code-panel-rollout-plan.md packet list, expected-changes level)",
+        "bootstrap context",
+        "restricted",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_107a23bb29dcf6db15e2471d7e77590b",
+      "sourceUnitDigest": "ccb205fdc5120e62",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Candidate in bootstrap context may only run preflight and write staging records; must not write host-visible projections, run workflow mutations or claim/write shared work-state. Absent.",
+      "searched": [
+        "FGOS_BOOTSTRAP_CANDIDATE",
+        "candidate preflight (only code-panel-rollout-plan.md packet list, expected-changes level)",
+        "bootstrap context",
+        "restricted",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_179e4e3efced44d5c47758b3fff895fa",
+      "sourceUnitDigest": "99f45b97f4f4b91e",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading \"7. Invocation Lease\"; no target section covers invocation leases.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_9b88f0158d85f69a82792e4b47f72022",
+      "sourceUnitDigest": "0449999b7a416906",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Any state-mutating command leases workspace/work-state/runtime identity at invocation start. Absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_5d408ebec2a9651d66e1dceb37b133aa",
+      "sourceUnitDigest": "7db0392a7929f28b",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Invocation flow (enter shim, read activation, record ids and digest, run from that release only, finish same digest or fail activation-changed/unknown-completion). Absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_644be2fa35959c10348a048777c5f1b9",
+      "sourceUnitDigest": "e46b094a9d547703",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lease prevents activation change, worktree switch or nested invocation from changing runtime authority mid-command. Absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_6db1dcef195562e8c4244f6ad6d0a032",
+      "sourceUnitDigest": "dc365e00a42eed95",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in \"V1 can be conservative\"; the conservative rules are absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_a56575cde3ab1f361ab6e7079699886f",
+      "sourceUnitDigest": "7925f88545b72971",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "fgctl may stage/verify while mutating invocations run but must not publish a new activation while a non-stale mutating lease exists. Absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_14de31f9e2756afe4d30767125f2f302",
+      "sourceUnitDigest": "e260a8e1fa942a1f",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Layout states runtimeCoordinationRoot owns claims/sessions/leases/locks and must not share a namespace with release/activation records. Missing: lease files scoped by workspace and work-state identity and lease root supplied by TopologyContext."
+    },
+    {
+      "claimId": "claim_17e7a6512fe8f04c509e9065bce86a5f",
+      "sourceUnitDigest": "2d86b51570e889b3",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lease file path <lease-root>/<workspaceId>/<invocationId>.json. Absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_5c02b1b4d39bd73bfe58708f36f054af",
+      "sourceUnitDigest": "38b30521e031c97a",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Minimum lease JSON shape (invocationId, pid, processStartToken, bootId, timestamps, mode, command, parentLeaseId, workItemId...). Absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_d3061a49a1c0d802afc38aba011003cd",
+      "sourceUnitDigest": "52a03c40c87b37d0",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "V1 lease rules (host binary writes leases, mutating commands lease before mutating, read-only leases in memory, nested inherit parentLeaseId, runner leases per assignment, runtime-busy refusal, stale cleanup only when ownership provable). Absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_94547bf976b374d541094e455eb5c259",
+      "sourceUnitDigest": "5b592c2a4dde4105",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lease states active/released/owner-dead/expired-unproven/completion-unknown. Absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_9abe48d0f9a2dc345830741d5ab789c8",
+      "sourceUnitDigest": "a1f9632769f4cbf2",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Timeout alone must not prove safety for a mutating lease; unprovable-owner lease fails closed or needs explicit recovery. Absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_9b6a43d8cd95739a1b4b582898073233",
+      "sourceUnitDigest": "fd456a8043fdb425",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Default V1 behavior is refuse (runtime-busy), not wait. Absent.",
+      "searched": [
+        "lease / leases (only repository-runtime-layout.md lists a leases/ directory under runtimeCoordinationRoot)",
+        "processStartToken",
+        "runtime-busy",
+        "parentLeaseId",
+        "expired-unproven / owner-dead / completion-unknown",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_52a973f8470cb1944a340ed858f04efb",
+      "sourceUnitDigest": "144862b42e821c60",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "contract-distribution-pin",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"8. Pin\" is carried by the Distribution Pin contract."
+    },
+    {
+      "claimId": "claim_971cf3ac708840a6682762c1ff359bfe",
+      "sourceUnitDigest": "90970e1148a17440",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "4-policy-boundary",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Pin records desired policy and does not prove what is active (\"The pin is policy. The activation binding is readiness.\"); tracked at .fgos/distribution.json in Purpose."
+    },
+    {
+      "claimId": "claim_91a834dde03fb4d5de522e8f2ee4e264",
+      "sourceUnitDigest": "657d4d3bbdbcdb79",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Path block .fgos/distribution.json identical."
+    },
+    {
+      "claimId": "claim_2d3b3ecd5f8dd13534b0918460ce00e8",
+      "sourceUnitDigest": "747dc79de35fcff3",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Pin is committed so a clone/teammate receives the same policy: Purpose (\"committed and tracked in git\") and Policy Boundary table (\"Tracked in git, shared across contributors\")."
+    },
+    {
+      "claimId": "claim_dd5a3702de5c2a8a3be89ba227b66af1",
+      "sourceUnitDigest": "953b75abc1fe178e",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Same pin JSON as the earlier example; frozen version uses channel \"stable\" instead of null."
+    },
+    {
+      "claimId": "claim_c79ecbfd6d9fcef835494ec27d9b430d",
+      "sourceUnitDigest": "22f562f2ec14869b",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in on supported policies; target field table says policy is \"exact-digest\", \"channel\", etc."
+    },
+    {
+      "claimId": "claim_fdba65f9b9568b8b056ca62b641ba27a",
+      "sourceUnitDigest": "0332f7a1c0ccb107",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source lists exact-digest, exact-version and later channel; target field table names \"exact-digest\" and \"channel\" as modes and does not list exact-version or mark channel as later."
+    },
+    {
+      "claimId": "claim_c55b087169bb5b95e77d2392f847dd59",
+      "sourceUnitDigest": "9542925797bd42cb",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Activation binding snapshots the pin: pinSnapshot field \"Snapshot of .fgos/distribution.json at activation time\"."
+    },
+    {
+      "claimId": "claim_fe64609bae7caa081faaaf50124b3467",
+      "sourceUnitDigest": "74e0babdb7970159",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/distribution-pin.md",
+      "targetAnchor": "unheaded-block-9",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Pin names a release not staged: fgctl must acquire and stage it, not silently select another (Expected Behavior); \"pinned-not-staged\" name in layout section 6."
+    },
+    {
+      "claimId": "claim_a9d41dca59b552f4bc5f85b11b18a34b",
+      "sourceUnitDigest": "514e33c19e1461da",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "targetAnchor": "contract-projection-ledger",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"9. ProjectionLedger\" is carried by the Projection Ledger contract."
+    },
+    {
+      "claimId": "claim_54ff3ce3897179b0bb4df450c2534926",
+      "sourceUnitDigest": "dbc6e52a4956ffbc",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Projections are host-visible files materialized by the active runtime; layout section 5 says they are not release-tree files."
+    },
+    {
+      "claimId": "claim_bf2f50b420f619b4ffc28d5469d60b0f",
+      "sourceUnitDigest": "436e77daf8a17308",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-10",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Examples .agents/skills, .claude/skills, managed AGENTS.md blocks are listed in the layout Source/Release/Projection table."
+    },
+    {
+      "claimId": "claim_83056288e77252541c6691aa5cc02180",
+      "sourceUnitDigest": "bd3972f7ad72224d",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Projection ledger is per workspace: \"records host-visible projections for that workspace only\"."
+    },
+    {
+      "claimId": "claim_68cb4be049108f3fa0787389fcad5d70",
+      "sourceUnitDigest": "48ec93fc0ee5d69e",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Ledger path .fgos/installation/projections/ledger.json identical."
+    },
+    {
+      "claimId": "claim_9828d5c2a7dc5da98fffde8f3709234a",
+      "sourceUnitDigest": "46a1d10e0b7d3504",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Each projected path needs an ownership class. Absent.",
+      "searched": [
+        "projection-owned",
+        "managed-block",
+        "coexistence-refuse",
+        "three-way",
+        "lastMaterializedDigest",
+        "ownership class",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_c255b948236f12ef2e1822baee4aeffe",
+      "sourceUnitDigest": "519915c1bae4fc22",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Ownership table (projection-owned, managed-block, source-owned, coexistence-refuse) with repair policies. Absent.",
+      "searched": [
+        "projection-owned",
+        "managed-block",
+        "coexistence-refuse",
+        "three-way",
+        "lastMaterializedDigest",
+        "ownership class",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_9645945ba0efdae80d19b702eae7e664",
+      "sourceUnitDigest": "13bcabf9e4534aa0",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in for three-way drift comparison. Absent.",
+      "searched": [
+        "projection-owned",
+        "managed-block",
+        "coexistence-refuse",
+        "three-way",
+        "lastMaterializedDigest",
+        "ownership class",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_bc5aa4f672c86bdabd7b9c71ecb07d5e",
+      "sourceUnitDigest": "07ef0f6781981420",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Three-way comparison inputs (runtime source digest, last materialized digest, current file digest). Absent.",
+      "searched": [
+        "projection-owned",
+        "managed-block",
+        "coexistence-refuse",
+        "three-way",
+        "lastMaterializedDigest",
+        "ownership class",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_c9b0a6af3e0c8e794470d4f769ee8237",
+      "sourceUnitDigest": "4a035b8070c692af",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in for materialization timing; target only says local fgos owns materialization after activation."
+    },
+    {
+      "claimId": "claim_f0fad11fa4e6246168b9b1eaf533dc47",
+      "sourceUnitDigest": "df6d248c259a8e79",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/projection-ledger.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target: active local fgos owns projection materialization after activation, and architecture says the tail is local init, doctor --fix, doctor. Missing: init creates/updates the ledger, doctor reports drift, doctor --fix repairs only safe projection-owned or managed-block drift."
+    },
+    {
+      "claimId": "claim_7a855153147bff66d84b5c0867a0a0ec",
+      "sourceUnitDigest": "b49c3a0f9af1ea4d",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-18",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "fgctl must not write host-visible projection files directly; local fgos owns them after activation: architecture Projection Boundary, projection-ledger Boundary. The reason (paths vary by release) is not repeated."
+    },
+    {
+      "claimId": "claim_f3266d83b74f1e5c4424ded4f2035d62",
+      "sourceUnitDigest": "b734501cca54cd7c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in for the minimum projection ledger entry. Absent.",
+      "searched": [
+        "projection-owned",
+        "managed-block",
+        "coexistence-refuse",
+        "three-way",
+        "lastMaterializedDigest",
+        "ownership class",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_9f66bcd8046c7a5e6557d0a770b58645",
+      "sourceUnitDigest": "447cd8e77af79e7f",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Projection ledger entry JSON (workspaceId, workStateId, path, ownership, source digest, lastMaterializedDigest, currentDigestAtLastCheck, policy). Contract only lists questions the ledger should answer.",
+      "searched": [
+        "projection-owned",
+        "managed-block",
+        "coexistence-refuse",
+        "three-way",
+        "lastMaterializedDigest",
+        "ownership class",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_fb5c18d2af675ad4dc2ae9abdf957916",
+      "sourceUnitDigest": "7c9d5350b58e5276",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Init/doctor/doctor --fix behavior per ownership class. Absent.",
+      "searched": [
+        "projection-owned",
+        "managed-block",
+        "coexistence-refuse",
+        "three-way",
+        "lastMaterializedDigest",
+        "ownership class",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_c0012a8de299b47450ea5d16a61dda21",
+      "sourceUnitDigest": "ff111686b8319e43",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Self-development uses same ownership classes; forgent source repo is not a nested product install; source-authored paths marked source-owned or managed. Absent.",
+      "searched": [
+        "projection-owned",
+        "managed-block",
+        "coexistence-refuse",
+        "three-way",
+        "lastMaterializedDigest",
+        "ownership class",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_d42eb384f05d935d19cf9891bb5c5df9",
+      "sourceUnitDigest": "0ff84bbd74e6a3ab",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading \"10. MigrationJournal\"; no target section.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_bee69c9fafc3e15fc38dd82f1b54acc9",
+      "sourceUnitDigest": "ac51cf26ef4e4e04",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Runtime rollback is not automatically state rollback. Absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_4a2a23337b8495f1940fd9e3226e9d31",
+      "sourceUnitDigest": "da01d2fc952c416b",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Migration journal records state-schema changes by local fgos. Absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_181a82457153d16a123d8c3378c30c98",
+      "sourceUnitDigest": "9a365e9b5b43ce38",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "MigrationJournal JSON shape. Absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_c6869299794e7b0b8faebb525521af54",
+      "sourceUnitDigest": "3608b979a603b21c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Downgrade safety must consider state-schema read/write ability, not only version order. Absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_bbe6d0ce5f2af5471b4b0f830209f3c6",
+      "sourceUnitDigest": "60ba86001f48ba64",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in \"Rule:\" for the downgrade rule. Absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_573f1ab0c14672c3e3d1893b96f5e6ef",
+      "sourceUnitDigest": "1fa15164579b61c1",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "fgctl may activate an older runtime only if it can read the current state schema and needed writes are possible. Absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_491998778e598a5385e78b541e33bff8",
+      "sourceUnitDigest": "498ce4bd1a2493ee",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "No automatic state migration in V1; state-schema-incompatible and state-schema-write-incompatible failures; read-only diagnostic use. Release-manifest says stateSchemas.migrations is reserved and empty in V1, but the failure rules are absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_bd90f346258ea0333f0e9b09949a2bae",
+      "sourceUnitDigest": "4a5dcd22823a0b2c",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Current work-state schema recorded outside the payload: layout shows schema.json under workHistoryRoot as \"current work-state schema record\"."
+    },
+    {
+      "claimId": "claim_32b5041b656e79a77a7b5195ad0a4e08",
+      "sourceUnitDigest": "7736cb341115949e",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Path <workHistoryRoot(workStateId)>/schema.json appears in the layout tree."
+    },
+    {
+      "claimId": "claim_58d65324d9aa4eca0030122ad96252c5",
+      "sourceUnitDigest": "84718c929dae82ae",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "schema.json shape (workStateId, currentStateSchema, lastWriterArtifactDigest). Layout names the file only.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_eb0ec8c42d305f6fc227246824a4e360",
+      "sourceUnitDigest": "70db9bdf36a7ab57",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in \"Compatibility checks:\". Absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_30369b94b606096331ba0ac8215dfe6f",
+      "sourceUnitDigest": "be3d98e07c3a3767",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Compatibility check flow for fgctl activate/upgrade/rollback and local mutating commands (stateSchemas.read/write vs currentStateSchema; workStateId match). Absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_3a0164aced10388208f0c748829bf990",
+      "sourceUnitDigest": "17a2c3fcd7e144c9",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Two workspaces with different artifact digests sharing one workStateId may write only if both manifests support the schema and locks permit. Absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_ec133e4ac5ee546b775219835450cb9a",
+      "sourceUnitDigest": "ac7af0538dc243ff",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Release manifest field table says stateSchemas.migrations is reserved and must be empty in V1. Missing: future migrations must be recorded in MigrationJournal with checkpoint/reversibility."
+    },
+    {
+      "claimId": "claim_093f54d48d2e2a3efc8f0c865ba57b66",
+      "sourceUnitDigest": "87c50c8516e8e94b",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading \"Existing Project Adoption\"; no target section.",
+      "searched": [
+        "adopt / adoption (spec.md only says local fgos init adopts/materializes)",
+        "legacy schema 1",
+        "events.jsonl",
+        "resolveTopology",
+        "existing .fgos",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_6ed197b95e7f9801fa8298694177e5d0",
+      "sourceUnitDigest": "6974a311e5509949",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "V1 must adopt existing fgOS projects (legacy .fgos/events*, config, coordination state without release store/activation/schema record). Spec only lists local fgos init as \"Adopts/materializes workspace state\".",
+      "searched": [
+        "adopt / adoption (spec.md only says local fgos init adopts/materializes)",
+        "legacy schema 1",
+        "events.jsonl",
+        "resolveTopology",
+        "existing .fgos",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_a144f2fd3dd53acd12feeb7e72607de9",
+      "sourceUnitDigest": "b10f8721b7f1f6d5",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Legacy adoption physical shape lead-in. Absent.",
+      "searched": [
+        "adopt / adoption (spec.md only says local fgos init adopts/materializes)",
+        "legacy schema 1",
+        "events.jsonl",
+        "resolveTopology",
+        "existing .fgos",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_2929202af5d9245fafd9c8fe0055e494",
+      "sourceUnitDigest": "1f0eae3e1e42a069",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Legacy path <existing-main>/.fgos/events*. Absent.",
+      "searched": [
+        "adopt / adoption (spec.md only says local fgos init adopts/materializes)",
+        "legacy schema 1",
+        "events.jsonl",
+        "resolveTopology",
+        "existing .fgos",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_ed503fa8fc58ad877bf8c8faa3f7958b",
+      "sourceUnitDigest": "1350217488d7df5f",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Canonical V1 logical root lead-in. Absent as adoption statement.",
+      "searched": [
+        "adopt / adoption (spec.md only says local fgos init adopts/materializes)",
+        "legacy schema 1",
+        "events.jsonl",
+        "resolveTopology",
+        "existing .fgos",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_26bc6a190eda16e49745b6bcc7fbc379",
+      "sourceUnitDigest": "0f882749d3e11278",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "workHistoryRoot(workStateId) as canonical logical root for adoption. Only appears in the layout tree.",
+      "searched": [
+        "adopt / adoption (spec.md only says local fgos init adopts/materializes)",
+        "legacy schema 1",
+        "events.jsonl",
+        "resolveTopology",
+        "existing .fgos",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_e75368e0fbbafcca9fac84a21c4a21f8",
+      "sourceUnitDigest": "67b295693448086f",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/repository-runtime-layout.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Layout says packaging consumes workspace topology and does not own work-state semantics, and placement of history is owned by topology. Missing: packaging must not hardcode the legacy layout, asks resolveTopology() and lets work-state own migration/import."
+    },
+    {
+      "claimId": "claim_5dbc470994864094ea367eb4194598be",
+      "sourceUnitDigest": "39971a15b5da085e",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "fgctl init on existing .fgos/ flow (preserve/import state, stage/activate, local init writes schema 1 if missing, bootstrap-safe doctor --fix, doctor). Absent.",
+      "searched": [
+        "adopt / adoption (spec.md only says local fgos init adopts/materializes)",
+        "legacy schema 1",
+        "events.jsonl",
+        "resolveTopology",
+        "existing .fgos",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_89796d37e2377576e2e7202f34b08ea8",
+      "sourceUnitDigest": "8ca6f556298555c6",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Missing schema record means legacy schema 1, not refuse. Absent.",
+      "searched": [
+        "adopt / adoption (spec.md only says local fgos init adopts/materializes)",
+        "legacy schema 1",
+        "events.jsonl",
+        "resolveTopology",
+        "existing .fgos",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_efd5afeb35b4352c0229ea2f7be2356b",
+      "sourceUnitDigest": "54e58acdabc49d0a",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading \"Dev / Source Activation\"; no target section.",
+      "searched": [
+        "dev:",
+        "dev-source",
+        "activationKind",
+        "distributable",
+        "dogfood",
+        "self-development",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_c95bf4f07595cb9b849208efc61e76fb",
+      "sourceUnitDigest": "12a6c926f8c2c640",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Self-development needs a dogfood path without nested repos or pretending a checkout is an immutable release. Absent.",
+      "searched": [
+        "dev:",
+        "dev-source",
+        "activationKind",
+        "distributable",
+        "dogfood",
+        "self-development",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_865a8350c10fa2d9cc73ba3edb8b0520",
+      "sourceUnitDigest": "5c2bcca41b6bdea7",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in for explicit dev activation kind. Absent.",
+      "searched": [
+        "dev:",
+        "dev-source",
+        "activationKind",
+        "distributable",
+        "dogfood",
+        "self-development",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_b1c87c14a97fd7e5f6eef9980f5e7968",
+      "sourceUnitDigest": "fbf2d2af13ec036d",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Dev activation record (artifactDigest dev:<rev>, activationKind dev-source, activeReleasePath, distributable false). Absent.",
+      "searched": [
+        "dev:",
+        "dev-source",
+        "activationKind",
+        "distributable",
+        "dogfood",
+        "self-development",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_fdcb9c68339480f045ead58c5b864c72",
+      "sourceUnitDigest": "92672313fb30534e",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Dev activation rules (explicit, never PATH fallback, skips release digest guarantees, reports dev:*, same authority rules, not distributable). Spec mentions a dev checkout channel only as a shell-helper tier.",
+      "searched": [
+        "dev:",
+        "dev-source",
+        "activationKind",
+        "distributable",
+        "dogfood",
+        "self-development",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_b4018a4e982ca86c1f265cfe32a05494",
+      "sourceUnitDigest": "7e3f5e9aeda86c61",
+      "targetOwner": "docs/platform/packaging-distribution/vision.md",
+      "targetAnchor": "unheaded-block-9",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Vision says to optimize for the project using fgOS, not only for developing fgOS itself. Missing: dev activation preserves dogfood without nesting a product repo inside a workshop repo."
+    },
+    {
+      "claimId": "claim_bc6c80a5dbb5b49aa616db0b538022ba",
+      "sourceUnitDigest": "42ee00da612d0611",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "targetAnchor": "6-failure-shape",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"11. Drift, Repair, Rollback, And Quarantine\"; only a part (doctor/fix reports or fixes drift without changing identity, unusable activation fails with repair message) is carried."
+    },
+    {
+      "claimId": "claim_d89c53081e03613f6a82fdbceea2c3fc",
+      "sourceUnitDigest": "1dde7d4f06222d9c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Drift table (release file digest mismatch quarantine/refuse, projection drift doctor --fix, managed config merge, mutable state excluded). Absent as a table; only generic drift handling in fgctl-and-local-fgos.",
+      "searched": [
+        "projection-owned",
+        "managed-block",
+        "coexistence-refuse",
+        "three-way",
+        "lastMaterializedDigest",
+        "ownership class",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_28574a962da3d238b368e94888838811",
+      "sourceUnitDigest": "a4bb3aa70ebac2ed",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target names fgctl init as one-command onboarding and repair/upgrade entry points, with one local tail; \"one pipeline\" for init/repair/upgrade is only a code-panel plan bullet."
+    },
+    {
+      "claimId": "claim_c528c54251a8a068ed907a33f2231af0",
+      "sourceUnitDigest": "4858351982325a4a",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Pipeline carried in part (acquire/stage/verify, prepare installation, publish activation, local init/doctor --fix/doctor in the next paragraph). Missing: candidate preflight step, stable shim ensure step."
+    },
+    {
+      "claimId": "claim_9951c6bd4ccb66c41b615e5738a97d03",
+      "sourceUnitDigest": "3c79eca349037f63",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Pipelines differ only by selection input; transaction reaches complete only after the local tail; failed tail leaves new binding authoritative with ready-degraded; preflight failure leaves previous binding. Absent.",
+      "searched": [
+        "ready-degraded",
+        "runtime-dependency-missing",
+        "Acquire/stage fails",
+        "ready-published (only the example history in layout 7.2)",
+        "failure rules",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_142e4978e7b8e88867324016df10b92a",
+      "sourceUnitDigest": "db2ff2c8d78686ed",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-21",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "doctor --fix must not become a hidden runtime selector (architecture section 8, fgctl-and-local-fgos boundary rules, doctor registry ownership boundary). Patching immutable release files is not mentioned."
+    },
+    {
+      "claimId": "claim_fbfdc2f30b08a7556f3b9726e80c04d3",
+      "sourceUnitDigest": "b6818031657d37ed",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Rollback unit is previousArtifactDigest + preserved release dir + state-schema check. Target field table says previousArtifactDigest \"enables 1-step rollback/repair\"; the preserved directory and compatibility check are absent."
+    },
+    {
+      "claimId": "claim_0cd7b4bfdcc2ed3688f0e5539de0eddb",
+      "sourceUnitDigest": "7840c891652d9cd5",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "If rollback cannot safely write state it may still allow read-only diagnostics when the old runtime can read. Absent.",
+      "searched": [
+        "MigrationJournal",
+        "state-schema-incompatible",
+        "state-schema-write-incompatible",
+        "currentStateSchema",
+        "lastWriterArtifactDigest",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_03ff5d2e77bb94115f3f86a5238c8117",
+      "sourceUnitDigest": "db10aa9662fc574b",
+      "targetOwner": "docs/platform/packaging-distribution/contracts/activation-binding.md",
+      "targetAnchor": "4-status-rule",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Activation status \"quarantined\" makes the shim refuse and direct the user to fgctl init/repair. Missing: moving/marking a failing release payload as quarantined and refusing use until fgctl repair reacquires a trusted artifact."
+    },
+    {
+      "claimId": "claim_d00aa510f8e3a7395320c9636c3a5528",
+      "sourceUnitDigest": "6a943609628d25d0",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "targetAnchor": "5-boundary-rules",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"12. Command Authority Matrix\"; matrix content only partly carried by boundary rules."
+    },
+    {
+      "claimId": "claim_9afc188be58ad9bb817c25a40707a574",
+      "sourceUnitDigest": "23c19d900d8f500d",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Boundary rules carry what fgctl may write (installation records, shims, release store) and that local fgos/doctor --fix must not change runtime identity; doctor read-only is in the registry contract. Missing: per-command matrix, init/repair/upgrade indirect state/projection effects, no automatic state migration, workflow verbs must lease runtime identity."
+    },
+    {
+      "claimId": "claim_f41b8ecfd7a8e422b2ee9ab94407e848",
+      "sourceUnitDigest": "d9941af0fab55e3c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading \"13. fgctl Form And V1 Acquisition Sources\"; acquisition sources are absent.",
+      "searched": [
+        "acquisition sources",
+        "GitHub release asset",
+        "local release tree path",
+        "expected release tree manifest digest",
+        "tarball (only verification/install-and-release-proof.md mentions fgctl init --from <fgos tarball> as proof)",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_8c209d52a1b27656139fcbd400ba677c",
+      "sourceUnitDigest": "3200e28a2754c7a2",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+      "targetAnchor": "2-principle",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target separates fgctl runtime authority from local fgos workflow authority. Missing: V1 fgctl is a Rust bootstrap binary that may share a source tree with the future Rust host."
+    },
+    {
+      "claimId": "claim_e3c3cc72883c4d057f257cc8ea1e6908",
+      "sourceUnitDigest": "80e3b0a2006c4d5f",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in for V1 acquisition sources. Absent.",
+      "searched": [
+        "acquisition sources",
+        "GitHub release asset",
+        "local release tree path",
+        "expected release tree manifest digest",
+        "tarball (only verification/install-and-release-proof.md mentions fgctl init --from <fgos tarball> as proof)",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_49c16dccd9a1f81a789161cd67643de6",
+      "sourceUnitDigest": "cdfb4b312bbd5ad5",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "V1 acquisition sources: local release tree path, local tarball plus manifest, GitHub release asset with authenticated/pinned expected manifest digest. Absent.",
+      "searched": [
+        "acquisition sources",
+        "GitHub release asset",
+        "local release tree path",
+        "expected release tree manifest digest",
+        "tarball (only verification/install-and-release-proof.md mentions fgctl init --from <fgos tarball> as proof)",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_5323e007ef39ce0e524fb9fd7f3be011",
+      "sourceUnitDigest": "d07a9d05be3b26a6",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-17",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target release tree already has native bin/fgos with legacy payload under libexec/legacy-node; the source plan to ship an existing Node host first was changed."
+    },
+    {
+      "claimId": "claim_052b867553ecf9809d2eaf538e329b64",
+      "sourceUnitDigest": "c982b508afeba9b2",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-17",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target release has native Rust bin/fgos plus legacy Node payload, not \"existing Node host or thin Node entry\"."
+    },
+    {
+      "claimId": "claim_b6c26b956749fd793c8ac8f97b1d999b",
+      "sourceUnitDigest": "67964a22f14f695c",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-17",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "\"Rust host replaces release bin/fgos in the same release tree contract\" has happened: target says Rust host executes the native bin/fgos."
+    },
+    {
+      "claimId": "claim_ffa872bb8b06a4e29d59df40a732bf31",
+      "sourceUnitDigest": "51b2aa3bfb25d86a",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Active local tail after activation is stated (init, doctor --fix, doctor). Missing: candidate preflight before publish is read-only/staging-only and general repair remains explicit."
+    },
+    {
+      "claimId": "claim_d7a9ea523826eba629da2b4c3cdc61b3",
+      "sourceUnitDigest": "c61353e227584092",
+      "targetOwner": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "targetAnchor": "2-proof-surfaces",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"14. Walking Skeleton\"; the proof slice is covered by proof surfaces and external consumer proof."
+    },
+    {
+      "claimId": "claim_c0afc8b40e3422d6dbd55aad9f6388bf",
+      "sourceUnitDigest": "e0e1f0ad2950436a",
+      "targetOwner": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "targetAnchor": "unheaded-block-13",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in for the first proof slice; target records the external-consumer proof (fgctl init --from asset, version --runtime-json, ready, upgrade, repair) as the realized slice."
+    },
+    {
+      "claimId": "claim_2e94447a40d78f539424a7213cc35f89",
+      "sourceUnitDigest": "5c3b67297cdbaebc",
+      "targetOwner": "docs/platform/packaging-distribution/verification/install-and-release-proof.md",
+      "targetAnchor": "unheaded-block-13",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target proof: fgctl init from a release asset in a fresh project, version --runtime-json reports host rust and activated artifactDigest, ready/upgrade/repair. Missing: TopologyContext resolution, install.lock, runtime dependency check, preflight, shim ensure, and reporting of workspaceId, workHistoryRoot, machineReleaseStore, release version, manifest schema, state-schema range, legacy Node identity, host kind node/rust/dev-source."
+    },
+    {
+      "claimId": "claim_a24422208854df7ad9c53b0a7f663e96",
+      "sourceUnitDigest": "dc301a37d3747bdf",
+      "targetOwner": "docs/platform/packaging-distribution/architecture/future-constraints.md",
+      "targetAnchor": "unheaded-block-11",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Future constraints say shared web/gateway delivery is a later slice. Missing: proof need only show fgctl, shim and local fgos agree on identity; the first tree may use the Node host (changed, native Rust host is now the default)."
+    },
+    {
+      "claimId": "claim_8c70ec6a92ebfe58cf460e88ce313aa8",
+      "sourceUnitDigest": "f6121d1e3ec24049",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading \"15. Open Decisions\"; no target section.",
+      "searched": [
+        "Open Decisions",
+        "rust-host-r1-kernel",
+        "path encoding for the workspace installation capsule",
+        "quarantine location / recovery command",
+        "release directory retention / GC",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_b19d5177a72889440523f68acc63caaa",
+      "sourceUnitDigest": "f68459234edbfb43",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Statement that the rust-host-r1-kernel track fixes V1 defaults for each open item and a default settles here only when the track proof lands. Absent.",
+      "searched": [
+        "Open Decisions",
+        "rust-host-r1-kernel",
+        "path encoding for the workspace installation capsule",
+        "quarantine location / recovery command",
+        "release directory retention / GC",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    },
+    {
+      "claimId": "claim_f293bbd03855e7b0ecb113520bd185b7",
+      "sourceUnitDigest": "41822b1f6683edd4",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Seven open decisions (capsule path encoding, release dir name, shim implementation incl. POSIX sh recommendation, fgctl acquisition UX, candidate preflight checks, old-release retention/GC with leases, quarantine location and recovery command). None is stated as open or settled in any target.",
+      "searched": [
+        "Open Decisions",
+        "rust-host-r1-kernel",
+        "path encoding for the workspace installation capsule",
+        "quarantine location / recovery command",
+        "release directory retention / GC",
+        "all 17 non-forbidden markdown files under docs/platform/packaging-distribution/"
+      ]
+    }
+  ]
+}

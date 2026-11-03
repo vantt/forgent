@@ -1,3 +1,0 @@
-
-Error: unexpected argument "BY".
-Prompts are read only from -p/--print, -i/--prompt-interactive, or stdin, so this argument would have been ignored.

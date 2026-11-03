@@ -17,6 +17,14 @@ Related:
 - docs/platform/packaging-distribution/contracts/skill-package-distribution.md
 - docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md
 - docs/platform/packaging-distribution/contracts/repository-runtime-layout.md
+Implementation: Original section-specific implementation statements retained; provenance does not certify current implementation
+Provenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b
+Writer type: Human + agent coauthor
+Canonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review
+Use this when: Reading this area topic and its retained design details
+Do not use this for: Claiming a truth review or an authority cutover from carriage alone
+Supersedes: No authority transition in this carriage pass
+Superseded by: None recorded
 ```
 
 Status: DONE. P1-P9 are merged, the panel branch has merged to `main`, and
@@ -48,7 +56,7 @@ The panel integration branch is the source of truth for combining packet outputs
 
 Before opening any packet:
 
-1. Read `docs/specs/reading-map.md`.
+1. Read `docs/reading-map.md`.
 2. Read `docs/platform/packaging-distribution/README.md`.
 3. Read `docs/platform/packaging-distribution/verification/source-preservation-audit.md`.
 4. Read the contract named in the packet.

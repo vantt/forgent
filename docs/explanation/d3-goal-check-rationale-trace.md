@@ -1,10 +1,10 @@
 ---
-authoritative_for: docs/routing-handoff-contract.md's D3 (never trust worker self-report, always independently re-run verify) citing a deleted docs/history/phase-2-routing/CONTEXT.md; real fgOS-specific rationale is unintentional worker drift (agy cwd bug, fanout worktree race), not the upstream beehive adversarial-swarm threat model
+authoritative_for: docs/platform/runner/contracts/routing-handoff.md's D3 (never trust worker self-report, always independently re-run verify) citing a deleted docs/history/phase-2-routing/CONTEXT.md; real fgOS-specific rationale is unintentional worker drift (agy cwd bug, fanout worktree race), not the upstream beehive adversarial-swarm threat model
 ---
 
 # D3's rationale outlived its own citation, and pointed to the wrong threat model anyway
 
-`docs/routing-handoff-contract.md`'s D3 (never trust a worker's own
+`docs/platform/runner/contracts/routing-handoff.md`'s D3 (never trust a worker's own
 self-report — always independently re-run `verify` via `goal-check.mjs`)
 cited `docs/history/phase-2-routing/CONTEXT.md D3/D4` as its decision
 source. That file no longer exists in the repo (confirmed by `find` — not
@@ -41,19 +41,18 @@ directly-verified incidents in the repo prove it:
 
 A third premise also didn't hold: "there's always a human reviewing before
 merge, so re-verify isn't needed" doesn't match how the system actually
-operates. fgOS's own priority #2, "Release con người" (docs/specs/runner.md),
+operates. fgOS's own priority #2, "Release con người" (docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm),
 drives toward unattended batch self-approval loops
 (`/fgOS:merge-loop`, `/fgOS:cleanup-loop`) — exactly the scenario where an
 independent re-verify catches drift a human isn't watching for.
 
 ## What shipped
 
-`docs/specs/runner.md`'s ADR-0005 entry ("Runner & cô lập worker") gained
+`docs/platform/runner/decisions/h-36d872fbb0e5.md#0005-runner-cô-lập-worker`'s ADR-0005 entry ("Runner & cô lập worker") gained
 the two fgOS-specific evidence citations and the corrected review-cadence
 premise, plus a new locked-decision line: independent re-verify guards
 against unintentional worker drift specifically because batch unattended
-merge loops don't have a human watching each item. `docs/routing-
-handoff-contract.md:81`'s dead citation was repointed from the deleted
+merge loops don't have a human watching each item. `docs/platform/runner/contracts/routing-handoff.md`'s dead citation was repointed from the deleted
 `phase-2-routing/CONTEXT.md` to this same ADR-0005 entry — D3 now has a
 rationale that stands on its own, without requiring a reader to trace back
 into an upstream project's docs to understand why it exists.

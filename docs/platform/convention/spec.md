@@ -5,7 +5,6 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent, tool author
 Purpose: Define the executable source of truth for fgOS names and repository-relative placement
 Design status: Accepted
-Implementation status: Implemented
 Canonical: Yes
 Owner: Convention component
 Source: packages/convention/rust
@@ -14,7 +13,15 @@ Last reviewed: 2026-10-10
 Related:
 - docs/platform/component-boundary.md
 - docs/platform/host-invocation-routing/contracts/operation-catalog.md
-- docs/io-contract.md
+- docs/platform/work-state/contracts/cli-io-contract.md
+Implementation: Implemented
+Provenance: Existing convention specification and its Related references; metadata completed for this scope
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Define the executable source of truth for fgOS names and repository-relative placement
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
 
 ## 1. Purpose and admission rule
@@ -85,19 +92,21 @@ Canonical generation never emits a compatibility form.
 
 A slug is normalized by lowercasing ASCII, replacing each run outside `[a-z0-9]` with `-`, collapsing repeated `-`, and trimming leading/trailing `-`. No transliteration or Unicode-normalization dependency is added. Empty output is `invalid-slug`.
 
-### 3.2 `placement-glob` reservation
+### 3.2 Documentation placement rules
 
-Schema v1 reserves `placement-glob` for path-only document kinds without installing any real fgOS documentation kind. A placement rule contains:
+Schema v1 installs the cutover documentation placement policy as path-only rules. A kind may have multiple placement rows, all with the same shape. A placement rule contains:
 
 - a slash-separated repository-relative glob;
-- named single-segment placeholders written `<name>`;
+- named single-segment placeholders written `<name>`, also within a segment such as `<name>-rollout-plan.md`;
 - `*` for one path segment and `**` for zero or more complete path segments;
 - `cardinality: singleton | collection`;
 - `scope`, `posture`, and the optional documentation flags above.
 
 Literal segments outrank placeholders, placeholders outrank `*`, and `*` outranks `**`. If equal-specificity rules match the same path, rule loading fails as ambiguous rather than depending on declaration order.
 
-The first implementation exercises this shape only with synthetic contract fixtures. It does not install document placement policy.
+The packaged rows implement the constitution’s minimum placements. Its one-or-more `**` is encoded as `**/<file>` in Convention’s zero-or-more grammar; literal collection-index refinements preserve the constitution’s README ownership under Convention’s literal-first specificity. The frozen migration-authoring-rules placement exception remains explicit until its separate retirement.
+
+`forbidden: true` emits `forbidden-placement` with the rule’s `posture`. Retired specs, architect and decision roots block every new path regardless of extension; the more specific generated `docs/decisions/index.md` row stays admitted as the generated decision-index exception. A forbidden catch-all rejects unplaced platform files; specific constitution rows admit valid paths. `system/` and `areas/` containers remain forbidden. No body or metadata inspection occurs here.
 
 ### 3.3 Project overlay reservation — Q13 open
 
@@ -148,9 +157,9 @@ A basename that identifies a registered kind at a noncanonical location reports 
 
 Enforcement scope for the initial `report`, `plan`, and `journal` rules is deliberately narrow:
 
-- pre-commit considers only newly added `*.md` files directly under `plans/reports/` and `plans/journals/`;
-- nested evidence, per-plan `reports/` directories, fixed names such as `acceptance.md`, and non-Markdown files are outside that scope;
-- all three initial kinds use `posture: warn`; phase 05 must not block a commit;
+- naming checks in pre-commit consider newly added/copied/renamed Markdown files directly under `plans/reports/` and `plans/journals/`; documentation placement checks consider new/copied/renamed paths under `docs/`;
+- nested evidence, per-plan `reports/` directories, fixed names such as `acceptance.md`, and non-Markdown files remain outside the plan/report naming scope; retired-root path refusal has no extension exemption;
+- report, plan and journal naming retain `posture: warn`; documentation placement refusals carry `posture: block` and block newly added/copied/renamed documentation paths in the existing hook;
 - old files remain visible as counts/examples, while the per-rule cutoff distinguishes newly introduced violations.
 
 ### 4.4 `classify`
@@ -159,7 +168,7 @@ Enforcement scope for the initial `report`, `plan`, and `journal` rules is delib
 fgos convention classify [--dir <root>] -- <path>
 ```
 
-This operation classifies only `placement-glob` rules; `name-template` kinds are checked through `check` and never receive an invented cardinality. It does not read the filesystem or document body. A match returns `{kind, cardinality, scope}`. No placement match is `unknown-kind`. Schema-v1 proof uses synthetic `placement-glob` rules only; no real documentation kind is packaged by this plan.
+This operation classifies only `placement-glob` rules; `name-template` kinds are checked through `check` and never receive an invented cardinality. It does not read the filesystem or document body. A match returns `{kind, cardinality, scope}`. No placement match is `unknown-kind`. The packaged documentation kinds and the synthetic schema fixtures are both classified through the same path-only implementation.
 
 ## 5. Time rule
 
@@ -182,6 +191,7 @@ Timestamp fields are calendar-validated, including month/day/leap-year and hour/
 | `pattern-mismatch` | A scoped artifact name does not match an accepted form. |
 | `invalid-timestamp` | A syntactically located timestamp is not a valid civil date/time. |
 | `wrong-location` | A recognized kind is outside an accepted location. |
+| `forbidden-placement` | A path matches a forbidden placement row; its native violation includes block/warn posture. |
 | `unknown-kind` | `classify` cannot map a path to any rule. |
 
 Messages are diagnostic text; consumers branch on code or process exit category, never message substrings.
@@ -201,11 +211,11 @@ Messages are diagnostic text; consumers branch on code or process exit category,
 
 The Rust host is the single implementation. A Node caller uses `invokeHost`; it does not reproduce kinds, patterns, directories, or validation. The client recognizes an old host only from the exact trimmed diagnostic `fgos: unknown verb "convention". Usage: fgos <command> [args...]` with validation exit 4 (or, if the host later exposes a structured verb list, an explicit absence there), never from broad stderr substrings. It maps that case to `host-version-mismatch`.
 
-Every call uses a 5-second process timeout so a stuck host cannot hang a commit or doctor run. The phase-05 caller behavior is closed and nonblocking:
+Every call uses a 5-second process timeout so a stuck host cannot hang a commit or doctor run. Caller behavior distinguishes native blocking placement violations from naming warnings:
 
 | Result | Hook | Doctor |
 |---|---|---|
-| success with violations | print each warning; continue | pre-cutoff only: `passed: true`; any post-cutoff violation: `passed: false`; include counts and up to three examples |
+| success with violations | refuse native block-posture documentation violations; otherwise print naming warnings and continue | native block posture fails; naming violations retain pre/post-cutoff handling; include counts and up to three examples |
 | `host-unavailable` | print one warning; skip | `passed: true` with pass-skip reason |
 | `host-version-mismatch` | print one warning; skip | `passed: true` with pass-skip reason |
 | `host-exec-error`, including provider exit 1 | print one warning with the category; skip | `passed: true` with pass-skip reason and category |
@@ -250,10 +260,11 @@ Golden data must include every kind × supported operation success, every stable
 
 `convention-conformance` is a registered doctor check and is listed in the Packaging-Distribution check registry and legacy distribution spec. It calls the thin client against the caller's working-tree top level.
 
-- Pre-cutoff violations: `passed: true` with counts and at most three examples.
+- Native `block`-posture violations: `passed: false` regardless of cutoff or path age.
+- Pre-cutoff `warn`-posture naming violations: `passed: true` with counts and at most three examples.
 - Any violation introduced after its rule's per-rule cutoff: `passed: false`, including for initial `warn` rules.
 - Missing/old host: `passed: true` with a pass-skip reason; never a guessed local implementation.
-- The pre-commit hook is independent of doctor failure posture: it prints warnings and never blocks.
+- The pre-commit hook preserves naming warnings but refuses native documentation violations carrying block posture; old/missing-host pass-skip behavior remains explicit. Doctor fails for native block posture without applying the historical naming cutoff.
 - Phase 05 applies packaged internal rules only in the fgOS source repository. Overlay-aware project behavior is deferred with Q13 because Plan B does not load overlays.
 
 The release containing the native verb must be staged and activated before plain `fgos` can enforce it. Merging source alone does not refresh an activated release.
@@ -362,3 +373,7 @@ Final `npm test` exercised 7,057 tests: 6,983 passed, 8 skipped, 65 todo,
 and one unrelated live-Herdr gateway test failed with
 `reason: confinement-mismatch`. The same test failed identically in all three
 post-implementation full-suite runs; no Convention path appears in its stack.
+
+## Documentation body validation
+
+Convention owns path naming and placement. The existing doc-health body checker, `scripts/check-doc-candidate-status.mjs`, owns body-link validation: `--links-only --repo-root <tree>` checks every local link and anchor in platform Markdown, including Related and clickable historical-source references, without switchboard or metadata exemptions. Code spans and fences remain literal. It reuses `list-doc-anchors.mjs`. Its enforcing door is the live `--links-only` repository self-check in `test/scripts/check-doc-candidate-status.test.mjs`, run by the normal test suite. The synthetic case in that file owns the grammar; the live case is one wiring proof. It is not duplicated in pre-commit. This checker adds no configuration key, environment variable, external tool or new doctor registry id.

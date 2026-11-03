@@ -1,14 +1,34 @@
-# Workflow Stage Operation Contract
+# Workflow Step Operation Contract
 
+```txt
 Document type: Contract
-Design status: Accepted
-Implementation: Implemented
-Last reviewed: 2026-08-31
-Canonical for: normalized Stage Operation behavior and compatibility
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/contracts/workflow-stage-operation.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/contracts/workflow-stage-operation.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Contract
 
-A workflow Stage may define multiple semantic operations. Each normalized
+Registry identity: **CTR012 · `workflow-step-operation`**. This names the live
+Workflow-definition-to-Assignment seam; the current payload carries no version
+field, and this registry allocation does not invent one.
+
+A Workflow step may define multiple semantic operations. Each declared
 operation has an identity and may reference:
 
 - TaskSpec;
@@ -18,19 +38,15 @@ operation has an identity and may reference:
 - dispatch policy hints;
 - mutation/evidence expectations supplied by TaskSpec or policy.
 
-This contract governs declared Workflow operations. Per the
-[Agent Coordination Foundation Vision](../vision.md), a standalone agent-led
-session need not fabricate a Workflow Stage to access coordination. Its future
-inline execution-contract path is governed by the Assignment contract and must
-not alter this compatibility contract.
+This surviving contract concerns Workflow step operations, not a revived coordination session. A standalone Unit-run request does not need to fabricate a Work-owned Workflow step. Assignment creation and governed execution remain separate from this compatibility helper.
 
 ## Primary Compatibility Path
 
-Existing consumers may continue to read:
+The current projections are:
 
 ```txt
-stage.skill
-stage.taskSpec
+skillForStep(wf, stepOrStatus)
+taskSpecForStep(wf, stepOrStatus)
 ```
 
 These fields represent the primary operation compatibility projection. Adding
@@ -39,22 +55,20 @@ explicitly changes it.
 
 ## Lookup
 
-`operationsForStage()` returns the normalized legal operations for one Stage.
-Consumers must not reconstruct operations independently from raw YAML.
+`operationsForStep(wf, stepId, { defaultRole = 'implementer' })` reads one step (`src/workflow/steps.mjs:70-85`):
 
-Expected behavior:
+- an unknown step returns the shared empty array;
+- an explicit nonempty operations array is returned unchanged;
+- otherwise a step with a skill produces one frozen primary operation with id/taskSpec equal to the step id, the supplied defaultRole and that skill;
+- otherwise it returns the empty array.
 
-- preserve declaration order unless configuration defines another priority;
-- include the primary operation exactly once;
-- normalize singular/plural Skill references consistently;
-- return no operations only when the Stage contract permits it;
-- reject unknown Stage or malformed operation according to caller contract.
+`taskSpecForStep` selects a primary operation (or the first) and returns its taskSpec; a status skill is its fallback (`steps.mjs:57-64`). The older raw stage.taskSpec projection is preserved in history, not asserted as the current step shape.
 
 ## Validation
 
-Setup/doctor validation must reject or report:
+The following are retained validation requirements for configuration/setup/doctor consumers, not checks implemented by operationsForStep itself. Consumers should reject or report:
 
-- duplicate operation IDs within a Stage;
+- duplicate operation IDs within a Workflow step;
 - missing TaskSpec reference;
 - missing Skill reference;
 - missing/unknown Role where required;
@@ -63,22 +77,22 @@ Setup/doctor validation must reject or report:
 - operation references incompatible with the workflow/domain.
 
 Validation must not silently drop an invalid secondary operation and leave the
-Stage appearing healthy.
+Workflow step appearing healthy.
 
 ## Driver Boundary
 
-The driver may select only an operation returned as legal for the active Stage.
+The driver may select only an operation returned as legal for the active Workflow step.
 Operation selection does not dispatch directly; it produces inputs for an
 Assignment builder and governed execution path.
 
-## Compatibility Tests
+## Compatibility Proof Obligations
 
-- legacy Stage with only `skill`/`taskSpec` normalizes to one primary operation;
-- Stage with `operations` preserves the primary compatibility fields;
+- legacy Workflow step with only `skill`/`taskSpec` normalizes to one primary operation;
+- Workflow step with `operations` preserves the primary compatibility fields;
 - multiple operations remain addressable by stable ID;
 - invalid references fail setup/doctor validation;
 - normalization is deterministic and idempotent;
-- driver cannot select an operation from another Stage.
+- driver cannot select an operation from another Workflow step.
 
 Implementation-era detail and task history remain in
-[Step 02](../roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md).
+[Step 02](../history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md#literal-snapshot).

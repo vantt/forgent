@@ -3,7 +3,7 @@
 // Git addon, and Git has one door (the addon), so there is no addon-less Git read path: in a
 // project no `fgctl init` has activated, `fgos init` refuses with a message that names
 // `fgctl init` and changes nothing. New onboarding goes through `fgctl init`
-// (docs/specs/distribution.md, Entry Points); the doctor-check state of an onboarded project is
+// (docs/platform/packaging-distribution/spec.md#entry-points-triggers, Entry Points); the doctor-check state of an onboarded project is
 // proven by the fgctl init tests, which run the real runtime tail (init, doctor --fix, doctor).
 // Mirrors test/install-packaging.test.mjs's real-process pattern (spawnSync the actual installed
 // binary, no mocks).

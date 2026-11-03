@@ -37,8 +37,7 @@ is not theoretical.
 
 The full narrative — the recognized `mission` config key mechanism, its
 interaction with the Iron Law's self-modifying-module rules, and the
-locked decisions behind all of it — lives in `docs/specs/
-platform-foundations.md`'s own "Lịch sử quyết định" section under `0035`,
+locked decisions behind all of it — lives in `docs/platform/platform-foundations.md`'s own "Lịch sử quyết định" section under `0035`,
 per this repo's own convention of retiring long-form decision narrative
 into the relevant area spec rather than a standalone ADR file (`tsk-1lv`
 D5). This document intentionally stays short and points there rather than

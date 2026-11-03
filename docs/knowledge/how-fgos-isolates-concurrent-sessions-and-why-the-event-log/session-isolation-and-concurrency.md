@@ -388,7 +388,7 @@ from "the infrastructure/a flaky dependency broke."
 
 ---
 
-**Source:** `docs/history/learnings/critical-patterns.md` —
+**Source:** the historical learning log (the dated entries below have no repository content commit at that path) —
 [20260717] "A test fixture for git-worktree/checkout-touching code must
 mirror the TARGET repo's real tracked-vs-gitignored layout" (feature
 fgos-multi-session-checkout);

@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "shard": "b-files",
+  "sources": [
+    "docs/specs/work-state.md",
+    "docs/io-contract.md"
+  ],
+  "files": [
+    {
+      "path": "docs/specs/work-state.md",
+      "disposition": "merge",
+      "rationale": "Every claim unit of the spec is carried by the candidate documents under docs/platform/work-state/ (spec, CLI I/O contract, implementation pointers, retired decision history, distill record); the unit-level decisions are in the sibling shards of this pilot.",
+      "targets": [
+        "docs/platform/work-state/spec.md",
+        "docs/platform/work-state/contracts/cli-io-contract.md",
+        "docs/platform/work-state/decisions/retired-decision-history.md",
+        "docs/platform/work-state/architecture/implementation-pointers.md",
+        "docs/platform/work-state/history/multi-role-harness-distill-record.md"
+      ]
+    },
+    {
+      "path": "docs/io-contract.md",
+      "disposition": "merge",
+      "rationale": "Every claim unit of the contract is carried by docs/platform/work-state/contracts/cli-io-contract.md; the unit-level decisions are in the b-io-contract shard.",
+      "targets": [
+        "docs/platform/work-state/contracts/cli-io-contract.md"
+      ]
+    }
+  ],
+  "registryGaps": [
+    {
+      "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "move",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-117",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9346",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewStatus": "pending",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9346"
+    },
+    {
+      "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "move",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-121",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9347",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "reviewStatus": "pending",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9347"
+    },
+    {
+      "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "move",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-126",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9348",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewStatus": "pending",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9348"
+    },
+    {
+      "claimId": "claim_7a0776311f7105750a4f234681f513a3",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "move",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-138",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9349",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewStatus": "pending",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9349"
+    },
+    {
+      "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "move",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-144",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9350",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewStatus": "pending",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9350"
+    },
+    {
+      "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "move",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-150",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9351",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewStatus": "pending",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9351"
+    },
+    {
+      "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "move",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-174",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9352",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "reviewStatus": "pending",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9352"
+    }
+  ],
+  "claims": [],
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
+}

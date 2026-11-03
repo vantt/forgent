@@ -15,7 +15,7 @@ Related:
 - docs/platform/run-supervisor/spec.md
 - docs/platform/terminal-control/spec.md
 - docs/platform/component-boundary.md
-- docs/specs/runner.md
+- docs/platform/runner/spec.md
 - plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md
 - plans/261016-1351-terminal-mode-and-launcher-identity/plan.md
 - plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md
@@ -153,4 +153,4 @@ The supervisor tails the stdout and stderr capture files (up to 64 KiB per tick)
 | consumer | [run-supervisor/spec.md](../run-supervisor/spec.md) |
 | boundary | [component-boundary.md](../component-boundary.md) |
 | plans | [direct mode](../../../plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md), [terminal mode](../../../plans/261016-1351-terminal-mode-and-launcher-identity/plan.md) |
-| design | [design r6, section 8](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |
+| design | design r6, section 8 |

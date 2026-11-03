@@ -33,7 +33,7 @@ historical successful output without recording that different comparison.
 ### Historical question and references
 
 The actual 2026-10-04 question is the `objective` in
-[`unit.json`](../../plans/reports/council-lens-experiment-261004/unit.json):
+`unit.json`:
 
 > Should fgOS add a mechanical dissent/agreement gate to the panel pattern, or
 > is provider-distinct panelists plus the reviewed pattern's red-team already
@@ -48,10 +48,10 @@ jq -r '.objective' plans/reports/council-lens-experiment-261004/unit.json
 
 Prior outputs, for coordinator calibration **outside the judge workspace**:
 
-- [Council final verdict](../../plans/reports/council-lens-experiment-261004/outputs/ab-council-chairman-verdict.md)
-- [fgOS pre-fix synthesis](../../plans/reports/council-lens-experiment-261004/outputs/ab-fgos-synthesizer.md)
-- [fgOS post-fix synthesis](../../plans/reports/council-lens-experiment-261004/outputs/ab2-fgos-synthesizer-after-fix.md)
-- [Comparison and limitations](../../plans/reports/council-ab-comparison-261004.md)
+- Council final verdict
+- fgOS pre-fix synthesis
+- fgOS post-fix synthesis
+- Comparison and limitations
 
 These are historical references, not substitutes for fresh current-setup runs.
 The post-fix export contains a claim envelope and assignment paths; passing
@@ -108,13 +108,13 @@ setting sources. `--safe-mode` still permits admin-managed policy; do not
 claim that every setting is disabled. `--bare` is a different mode that skips
 OAuth/keychain authentication, so it is not an interchangeable switch.
 
-The 2026-10-06 [availability canary](../../plans/reports/observe-independent-comparison-261006/isolation-canary.json) is not an A/B judgment. The later [actual comparison judge](../../plans/reports/observe-independent-comparison-261006/completion-judge-evidence.json) retains applied argv and SDK capabilities; its two-file before/after inventory is a coordinator-authored assertion, not an independently retained listing. That judge profile was a temporary configuration, not a committed one: re-declare and re-audit it each time. Three builtin plugins remain; no complete hidden-instruction inventory is claimed. Native Unit prepared argv/cwd do not alone prove effective execution: compare actual SDK initialization and execution evidence. `fgos run` binds whatever invocation `bind()` picks unless an `--override` names one; editing only a differently named profile does not apply its flags. Preserve referenced IDs and verify the invocation actually selected before a paid run.
+The 2026-10-06 availability canary is not an A/B judgment. The later actual comparison judge retains applied argv and SDK capabilities; its two-file before/after inventory is a coordinator-authored assertion, not an independently retained listing. That judge profile was a temporary configuration, not a committed one: re-declare and re-audit it each time. Three builtin plugins remain; no complete hidden-instruction inventory is claimed. Native Unit prepared argv/cwd do not alone prove effective execution: compare actual SDK initialization and execution evidence. `fgos run` binds whatever invocation `bind()` picks unless an `--override` names one; editing only a differently named profile does not apply its flags. Preserve referenced IDs and verify the invocation actually selected before a paid run.
 
 A confined Pi worker needs a provisioned writable private authentication runtime: ordinary Pi CLI reads take an adjacent auth-file lock. Redirecting its agent directory without provisioning does not supply credentials. Inspect the owning project's public runner projection for an existing account-backed private-home profile (`PI_CODING_AGENT_DIR` for Pi, `HOME` for agy) and let fgOS's declared account inventory/driver provision the allowlisted files opaquely. Do not manually read/extract/copy credential contents or silently widen host credential-write grants. The earlier readonly failure was configuration, not quota exhaustion or an absent platform mechanism.
 
 Source independence is stronger than hiding sibling runs: old comparisons can still be present in a readable source repository. Use the same immutable current-source packet for both arms, hide previous reports/scores, and audit actual reads. A passing output contract is not evidence that an arm stayed independent; discard contaminated output rather than relabel it or trim its reasoning.
 
-Distinguish two levels and name the one you achieved. **Read-audited**: raw tool calls show no seat read the other arm's output or prior results. **Sandbox-isolated**: no seat *could* read them, because every seat's confinement masks every repository that holds outputs, evidence or prior scores (not only the owning project's run trees). The [completed reference comparison](../../plans/reports/observe-acceptance-fixes-261006.md#cập-nhật-sau-nghiệm-thu-lần-hai) is read-audited only: only one seat masked the evidence repository, and a coordinator file holding one arm's position summary was readable when the other arm launched. Also check what the source packet already concludes: a packet that quotes a decision settled after the historical run changes the evidence condition, even when the question text is byte-identical.
+Distinguish two levels and name the one you achieved. **Read-audited**: raw tool calls show no seat read the other arm's output or prior results. **Sandbox-isolated**: no seat *could* read them, because every seat's confinement masks every repository that holds outputs, evidence or prior scores (not only the owning project's run trees). The completed reference comparison is read-audited only: only one seat masked the evidence repository, and a coordinator file holding one arm's position summary was readable when the other arm launched. Also check what the source packet already concludes: a packet that quotes a decision settled after the historical run changes the evidence condition, even when the question text is byte-identical.
 
 Run from the target project using the fgOS source entry, with a configured
 judge executor and explicit separate project root and scratch cwd:
@@ -136,7 +136,7 @@ model is whatever that invocation's configuration names (Opus here); check
 `data.results[-1]` and the binding under `.fgos/assignments/<unitRunId>/`
 for the model that actually ran. `fgos dispatch execute` (with
 `--prompt-file`, `--model`, `--tier`, `--cwd`, `--repo-root`) was removed;
-see `docs/specs/runner.md` decision 0062. A name alone does not configure an isolated invocation. Preserve
+see `docs/platform/runner/decisions/h-36d872fbb0e5.md#0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability` decision 0062. A name alone does not configure an isolated invocation. Preserve
 the effective prepared argv, model/session identity and actual transcript or
 stream outside scratch. Audit available tools/MCP, loaded instruction and hook
 events, and actual tool calls separately. No `--continue`, `--resume`,

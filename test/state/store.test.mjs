@@ -34,7 +34,7 @@ function tmpDir() {
   return initializeWorkRepository(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-learning-')));
 }
 
-// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`/
+// tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): `todo -> doing`/
 // `blocked -> doing` are RETIRED from status-fsm.mjs's TRANSITIONS table —
 // nothing durably writes INTO `doing` anymore, not even settleClaim's own
 // settle segment. This file's own tests need a durably-'doing' item purely
@@ -349,7 +349,7 @@ test('two interleaved writer identities share one origin stream and CAS sees bot
 
 // --- branch-source take/return write-side stamp (human-rounds D2) ---------
 //
-// RETIRED (tsk-40m, docs/architect/doing-coordination-redesign.md): the
+// RETIRED (tsk-40m, docs/platform/proposals/doing-coordination-redesign.md): the
 // three tests this section used to hold all exercised `moveWork(..., to:
 // 'doing', expectedStatus: 'blocked'/'todo', ...)` specifically —
 // `blocked -> doing`/`todo -> doing` are retired edges (see

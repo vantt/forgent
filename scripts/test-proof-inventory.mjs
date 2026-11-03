@@ -165,7 +165,7 @@ export function inventoryRunInitSites(files, { readFile = (f) => fs.readFileSync
 
 const DIR_RULES = [
   // Strong, structural signal only: rust-host tests genuinely cross the
-  // Rust/Node package boundary by directory convention (see docs/specs
+  // Rust/Node package boundary by directory convention (see docs/platform/packaging-distribution/spec.md
   // and P00's baseline report), not a content guess.
   { test: (dir) => dir === 'rust-host', responsibility: 'cross-language-packaging', reason: 'test/rust-host/** exercises the real Rust binary across the package boundary' },
 ];

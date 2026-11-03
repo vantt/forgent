@@ -115,12 +115,12 @@ detail to paper over.
 
 - `docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` —
   full decision record (D1–D3) and scout evidence.
-- `docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md`
+- `docs/how-to/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md`
   — the precedent this fragment's branch logic was extracted from;
   still the reference for config-entry/registration steps 1–3.
 - `docs/how-to/wire-a-skill-through-the-native-vs-cli-spawn-dispatch-decision.md`
   — Step B's own dispatch-decision mechanism in more depth.
-- `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
+- `docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity`
   — Native-First Dispatch Doctrine, the governing rules behind Step B.
 - `.agents/skills/_shared/executor-dispatch-fallback.md` — the assembled
   fragment loaded by local wrappers.

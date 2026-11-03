@@ -60,7 +60,7 @@ test('a nested `fgos run --writes` from a confined worker is refused as nested-w
   const answered = JSON.parse(/answered: (\{.*\})\. Nothing more/s.exec(text)[1]);
   t.diagnostic(JSON.stringify(answered));
   assert.match(answered.writes, /nested-write-from-confined-worker/);
-  assert.match(answered.named, /nested-write-from-confined-worker|authority-context|binding-view|nested/, 'with every variable unset the call is still refused, never run');
+  assert.match(answered.named, /nested-write-from-confined-worker/, 'with every variable unset the call is still refused by name, never run');
   // A nested read-only dispatch is not the admission's business: whatever else it meets, it is never refused by it.
   assert.doesNotMatch(answered.readOnly, /case admission refused|nested-write-from-confined-worker|authority-context/);
   // Nothing was written by the refused calls, and no second unit run exists beside the worker's own.

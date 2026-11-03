@@ -159,12 +159,12 @@ test('fgos docs-index writes repo/docs/enduser-docs-index.json with the real how
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
   assert.ok(Array.isArray(manifest));
 
-  const demo = manifest.find((e) => e.docPath === 'docs/how-to/check-rollup-progress.md');
+  const demo = manifest.find((e) => e.docPath === REAL_DEMO_DOC_PATH);
   assert.ok(demo, 'the how-to demo doc must appear in the manifest');
   assert.equal(demo.quadrant, 'how-to');
   assert.ok(demo.purpose && demo.purpose.length > 0);
   assert.ok(demo.audience && demo.audience.length > 0);
-  assert.equal(demo.docPath, 'docs/how-to/check-rollup-progress.md');
+  assert.equal(demo.docPath, REAL_DEMO_DOC_PATH);
   assert.equal(demo.title, "How to check a root item's progress with `fgos rollup`");
   // Slice ① gộp-sống (CONTEXT.md D13/D16/D17) links this demo doc to its
   // real compound-learn capture via `fgos compound doc-fgos-rollup-howto
@@ -381,8 +381,8 @@ test('every repo/docs/decisions/*.md file parses with parseFrontmatter to a non-
   }
 });
 
-test("docs/how-to/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto", () => {
-  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs', 'how-to', 'check-rollup-progress.md'), 'utf8');
+test("docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md's frontmatter has a non-empty type and links source_capture_ids to doc-fgos-rollup-howto", () => {
+  const content = fs.readFileSync(path.join(REPO_ROOT, 'docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'), 'utf8');
   const { meta } = parseFrontmatter(content);
   assert.ok(meta.type && meta.type.length > 0);
   assert.equal(meta.type, 'how-to');

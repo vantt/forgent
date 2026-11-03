@@ -7,14 +7,14 @@ mode: reference
 The read-in-one-pass layout document for the herdr web dashboard. This is
 what `tsk-5jr` (taskboard) and `tsk-4id` (task detail) open while building.
 
-**Product source:** `docs/specs/herdr-web-dashboard.md` — the area spec.
+**Product source:** `docs/platform/herdr-web-dashboard/spec.md#spec-herdr-web-dashboard-browser-surface-for-fgos-work` — the area spec.
 Every screen, rule and behaviour below traces to a section of it. Where
 that spec has an Open Gap, so does this document; nothing here settles a
 product question it left open.
 
 **Machine-readable companion:** `docs/ui-spec/` — surface files with
 validated interaction contracts, plus a clickable wireframe. Regenerate
-with the commands in `docs/ui-spec/00-overview.md`. Current state:
+with the commands in `docs/platform/ui-spec/spec.md#herdr-web-dashboard-ui-spec-overview`. Current state:
 **10 surfaces, 42 actions, 2 flows, validation clean (0 errors, 0
 warnings).**
 
@@ -36,7 +36,7 @@ criterion becomes checkable before pixels exist.
 
 ## Userflow
 
-Five surfaces, two flows. The full contracts are in `docs/ui-spec/flows/`.
+Five surfaces, two flows. The full contracts are in `docs/platform/ui-spec/operations/F01-answer-a-parked-question.md` and `docs/platform/ui-spec/operations/F02-approve-a-merge.md`.
 
 ### Answering a parked question (F01) — the flow this cluster exists for
 
@@ -191,7 +191,7 @@ that changes trunk.
 
 ## Empty and error states
 
-Full catalogue in `docs/ui-spec/30-states-and-errors.md`. The ones that
+Full catalogue in `docs/platform/ui-spec/contracts/30-states-and-errors.md#states-and-errors`. The ones that
 matter most:
 
 | Situation | What the person sees |

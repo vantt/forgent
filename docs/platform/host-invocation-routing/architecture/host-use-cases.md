@@ -5,15 +5,20 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define CLI, remote, chat, and future hosts as peer invocation surfaces
 Design status: Draft
-Implementation status: Accepted; R3 remote peer implemented preview for distribution.build.show
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/invocation-kernel.md
 - docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md
-- plans/260918-host-invocation-r3-remote-peer/plan.md
+Implementation: Accepted; R3 remote peer implemented preview for distribution.build.show
+Provenance: `docs/platform/host-invocation-routing/architecture/host-use-cases.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Define CLI, remote, chat, and future hosts as peer invocation surfaces
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
 
 ## 1. Claim
@@ -32,8 +37,8 @@ Related:
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Remote peer is project-local gateway in R3. | `current partial` | Source: [old architecture §10](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries), [../../../../apps/fgos-gateway/src/remote_invocation.rs](../../../../apps/fgos-gateway/src/remote_invocation.rs), [../../../../apps/fgos-gateway/src/gateway.rs](../../../../apps/fgos-gateway/src/gateway.rs) | Proven native gateway route for `distribution.build.show` in [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md); all other routes remain legacy `VerbGateway`. |
-| `GET /v1/runtime` (`distribution.build.show`) is the first remote-host-use-case proof for R3. | `implemented preview` | [R3 execution record](../../../../plans/260918-host-invocation-r3-remote-peer/plan.md#21-r3-p0-decision-2026-09-17), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md), [../../../../apps/fgos-gateway/src/gateway.rs](../../../../apps/fgos-gateway/src/gateway.rs), [../../../../apps/fgos-gateway/src/remote_invocation.rs](../../../../apps/fgos-gateway/src/remote_invocation.rs) | Route wired and verified with no-VerbGateway / no-fgos.v1 proof. Remote host is now a proven peer for `distribution.build.show` only. |
+| Remote peer is project-local gateway in R3. | `current partial` | Source: [old architecture §10](../spec.md#10-release-boundaries), [../../../../apps/fgos-gateway/src/remote_invocation.rs](../../../../apps/fgos-gateway/src/remote_invocation.rs), [../../../../apps/fgos-gateway/src/gateway.rs](../../../../apps/fgos-gateway/src/gateway.rs) | Proven native gateway route for `distribution.build.show` in [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md); all other routes remain legacy `VerbGateway`. |
+| `GET /v1/runtime` (`distribution.build.show`) is the first remote-host-use-case proof for R3. | `implemented preview` | [R3 execution record](../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md#21-r3-p0-decision-2026-09-17), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md), [../../../../apps/fgos-gateway/src/gateway.rs](../../../../apps/fgos-gateway/src/gateway.rs), [../../../../apps/fgos-gateway/src/remote_invocation.rs](../../../../apps/fgos-gateway/src/remote_invocation.rs) | Route wired and verified with no-VerbGateway / no-fgos.v1 proof. Remote host is now a proven peer for `distribution.build.show` only. |
 | Future shared multi-project gateway is separate. | `planned` | [Packaging future constraints](../../packaging-distribution/architecture/future-constraints.md) | Keep separate from R3 project-local gateway. |
 
 ## 4. Related Files
@@ -42,6 +47,6 @@ Related:
 | --- | --- |
 | kernel | [invocation-kernel.md](invocation-kernel.md) |
 | R3 proof | [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) |
-| R3 execution record | [../../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../plans/260918-host-invocation-r3-remote-peer/plan.md) |
+| R3 execution record | [../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | packaging future constraint | [../../packaging-distribution/architecture/future-constraints.md](../../packaging-distribution/architecture/future-constraints.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| source architecture | `../spec.md#host-invocation-and-provider-routing-architecture` |

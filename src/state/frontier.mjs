@@ -201,8 +201,8 @@ export function indexChildrenByParent(work) {
 
 // An item is RESOLVED when nothing further will happen to it that could
 // still change the CODE/graph state a dependent or lineage check cares
-// about. Per decision record 0027 (D1/D2, `docs/decisions/0027-domain-so-
-// huu-status-doan-truoc-delivered-supersede-base-workflow-model-d1-d3.md`)
+// about. Per decision record 0027 (D1/D2, status-category domain: owned statuses before
+// delivered, supersede, base workflow model D1-D3)
 // this is now a HYBRID read, not a flat literal Set, because the 10
 // statuses split into two groups with different rules (0027's own audit,
 // §"Hệ quả 1 chi tiết", `docs/history/phase-2-status-category-schema/

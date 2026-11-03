@@ -1,7 +1,7 @@
 # Example family: final decision, and a genuine defer
 
 Grounded in a real, closed outcome —
-[P01.2 Turn 2](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/dialogue/2-response.md)
+[P01.2 Turn 2](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/dialogue/2-response.md)
 — which happens to contain both a real `decide` and a real, explicit,
 named-trigger defer in the same turn, so this file does not need to
 construct either half.

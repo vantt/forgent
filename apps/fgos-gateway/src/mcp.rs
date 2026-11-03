@@ -19,7 +19,7 @@
 //! `mcpkit-axum` entirely; D1's actual intent (no second process, Rust-
 //! native, mounted onto the existing router) is unchanged.
 //!
-//! **`search`** parses `docs/contracts/fgos-gateway-api-v1.yaml` (the same
+//! **`search`** parses `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml` (the same
 //! file `gateway.rs`'s `get_contract` handler already serves) into a
 //! queryable operation list — no new data source, just a second way to
 //! reach data the gateway already exposes (CONTEXT.md's own pinned term).
@@ -122,7 +122,7 @@ pub struct SearchParams {
 }
 
 async fn search_contract(root: &std::path::Path, query: Option<String>) -> Result<String, String> {
-    let contract_path = root.join("docs/contracts/fgos-gateway-api-v1.yaml");
+    let contract_path = root.join("docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml");
     let raw = tokio::fs::read_to_string(&contract_path)
         .await
         .map_err(|err| format!("could not read the OpenAPI contract at {}: {err}", contract_path.display()))?;
@@ -524,9 +524,9 @@ mod tests {
     #[tokio::test]
     async fn search_with_no_query_returns_every_operation() {
         let root = std::env::temp_dir().join(format!("fgos-mcp-test-{}-{}", std::process::id(), line!()));
-        std::fs::create_dir_all(root.join("docs/contracts")).unwrap();
+        std::fs::create_dir_all(root.join("docs/platform/herdr-web-dashboard/contracts")).unwrap();
         std::fs::write(
-            root.join("docs/contracts/fgos-gateway-api-v1.yaml"),
+            root.join("docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"),
             "openapi: 3.1.0\npaths:\n  /work:\n    get:\n      operationId: listWork\n      summary: List work items\n  /ready:\n    get:\n      operationId: getReady\n      summary: Ready frontier\n",
         )
         .unwrap();
@@ -541,9 +541,9 @@ mod tests {
     #[tokio::test]
     async fn search_with_a_query_matching_nothing_returns_an_empty_result_not_an_error() {
         let root = std::env::temp_dir().join(format!("fgos-mcp-test-{}-{}", std::process::id(), line!()));
-        std::fs::create_dir_all(root.join("docs/contracts")).unwrap();
+        std::fs::create_dir_all(root.join("docs/platform/herdr-web-dashboard/contracts")).unwrap();
         std::fs::write(
-            root.join("docs/contracts/fgos-gateway-api-v1.yaml"),
+            root.join("docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"),
             "openapi: 3.1.0\npaths:\n  /work:\n    get:\n      operationId: listWork\n      summary: List work items\n",
         )
         .unwrap();
@@ -558,9 +558,9 @@ mod tests {
     #[tokio::test]
     async fn search_query_matches_case_insensitively_on_path_and_summary() {
         let root = std::env::temp_dir().join(format!("fgos-mcp-test-{}-{}", std::process::id(), line!()));
-        std::fs::create_dir_all(root.join("docs/contracts")).unwrap();
+        std::fs::create_dir_all(root.join("docs/platform/herdr-web-dashboard/contracts")).unwrap();
         std::fs::write(
-            root.join("docs/contracts/fgos-gateway-api-v1.yaml"),
+            root.join("docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"),
             "openapi: 3.1.0\npaths:\n  /work:\n    get:\n      operationId: listWork\n      summary: List work items\n  /ready:\n    get:\n      operationId: getReady\n      summary: Ready frontier\n",
         )
         .unwrap();

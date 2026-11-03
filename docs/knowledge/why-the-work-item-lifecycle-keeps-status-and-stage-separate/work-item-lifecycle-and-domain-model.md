@@ -111,7 +111,7 @@ level of a single transition's payload.
 
 ---
 
-**Source:** `docs/history/learnings/critical-patterns.md` —
+**Source:** the historical learning log (the dated entries below have no repository content commit at that path) —
 [20260720] "A cell that adds an FSM precondition refusing a previously-legal
 transition is scoped to EVERY existing test reaching the gated end-state — not
 the gate + one new test; cited breaker lists are illustrative" (feature

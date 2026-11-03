@@ -112,8 +112,8 @@ function sampleWork(overrides = {}) {
 const cfg = {};
 
 // tsk-12t: the documented `node --test`/`--test-name-pattern` reporter-
-// format trap (docs/how-to/avoid-vacuous-pass-with-node-test-test-name-
-// pattern.md) -- the ONE thing verify-pattern-check.mjs's mechanical check
+// format trap (docs/knowledge/avoid-a-vacuous-pass-from-node-test-test-name-pattern/avoid-vacuous-pass-with-node-test-test-name-pattern.md)
+// -- the ONE thing verify-pattern-check.mjs's mechanical check
 // still catches, reused here to produce a real, reachable disputed-child
 // outcome without any executor.
 const KNOWN_BAD_VERIFY = 'node --test --test-name-pattern="x" test/foo.test.mjs | grep "^# pass"';

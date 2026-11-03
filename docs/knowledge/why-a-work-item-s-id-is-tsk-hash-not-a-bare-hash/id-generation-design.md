@@ -43,6 +43,6 @@ to happen to satisfy it most of the time.
 
 ---
 
-**Source:** `docs/history/learnings/critical-patterns.md` —
+**Source:** the historical learning log (the dated entries below have no repository content commit at that path) —
 [20260718] "A plan can pass its own schema check while silently regressing the
 decision it implements" (feature work-id-tsk-hash).

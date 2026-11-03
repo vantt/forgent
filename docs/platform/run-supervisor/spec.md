@@ -18,8 +18,8 @@ Related:
 - docs/platform/terminal-control/spec.md
 - docs/platform/identity/spec.md
 - docs/platform/component-boundary.md
-- docs/specs/runner.md
-- docs/specs/distribution.md
+- docs/platform/runner/spec.md
+- docs/platform/packaging-distribution/spec.md
 - plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md
 - plans/261016-1351-terminal-mode-and-launcher-identity/plan.md
 - plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md
@@ -159,7 +159,7 @@ One attempt in a terminal pane. The supervisor still knows no pane: it asks term
 
 **Windows and without herdr.** A driver that declares no capability (Windows has no herdr build; herdr missing elsewhere) makes `launch` answer `unsupported`: the supervisor ends before binding with `start-refused.json` code `terminal-mode-unsupported` and the attempt settles as not started. It never switches to `direct` by itself; choosing the launch mode is `bind()`'s job.
 
-**Job control of the shell.** Measured on herdr 0.9.1 (P01 report, [measurements](../../../plans/reports/phase-lead-261018-0912-terminal-mode-p01-pane-tty-env-measurements.md)): the pane's shell is the session leader and the parent of bwrap; `tcsetpgrp(0, group)` works from pid 1 of the PID namespace without `setsid` (`setsid` plus `TIOCSCTTY` fails with `EPERM` in a pane). The gate hands the foreground back to its own group when the domain is empty; inside a PID namespace `getpgrp` reads 0, so the shell reclaims the tty when the sandbox exits. Before that it drops the tty's unread input (`tcflush(TCIFLUSH)`): text typed for an agent that never read it stays queued on the tty, and the shell would read it next and run it, backtick spans included (seen 2026-10-21, [debug report](../../../plans/reports/debug-261021-0843-herdr-brief-delivery-faults.md)). A gate killed outright (the supervisor's domain sweep after the grace) cannot drop it. Closing the pane, or killing the herdr server, ends bwrap, gate and agent within the first 500 ms check.
+**Job control of the shell.** Measured on herdr 0.9.1 (P01 report, measurements): the pane's shell is the session leader and the parent of bwrap; `tcsetpgrp(0, group)` works from pid 1 of the PID namespace without `setsid` (`setsid` plus `TIOCSCTTY` fails with `EPERM` in a pane). The gate hands the foreground back to its own group when the domain is empty; inside a PID namespace `getpgrp` reads 0, so the shell reclaims the tty when the sandbox exits. Before that it drops the tty's unread input (`tcflush(TCIFLUSH)`): text typed for an agent that never read it stays queued on the tty, and the shell would read it next and run it, backtick spans included (seen 2026-10-21, debug report). A gate killed outright (the supervisor's domain sweep after the grace) cannot drop it. Closing the pane, or killing the herdr server, ends bwrap, gate and agent within the first 500 ms check.
 
 ## 6. Receipt
 
@@ -275,7 +275,7 @@ Common rules: `--protocol 1` is required on every route; absent or different giv
 
 ## 11. Error model
 
-Who dies, and what each of the others does ([design r6, section 10](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md)):
+Who dies, and what each of the others does (design r6, section 10):
 
 | Who dies | Attempt lock | Agent | Deadline | Receipt and settle | Home | Cleanup |
 |---|---|---|---|---|---|---|
@@ -341,16 +341,16 @@ The check for orphaned confinement resources skips attempt homes (marker version
 
 ## 16. Lịch sử quyết định
 
-- **2026-10-16 — Hai cách khởi động, một cổng chứa process, gate là gốc process của agent.** Supervisor Node cầm pipe và kênh IPC chết cùng controller; thay bằng supervisor Rust không pipe, không IPC, gate pid 1 của PID namespace, chính sách "supervisor chết → agent chạy tiếp". Design r6 §9.1-9.3. Chi tiết quyết định thay `detached-run-supervisor` ở [runner.md](../../specs/runner.md).
+- **2026-10-16 — Hai cách khởi động, một cổng chứa process, gate là gốc process của agent.** Supervisor Node cầm pipe và kênh IPC chết cùng controller; thay bằng supervisor Rust không pipe, không IPC, gate pid 1 của PID namespace, chính sách "supervisor chết → agent chạy tiếp". Design r6 §9.1-9.3. Chi tiết quyết định thay `detached-run-supervisor` ở [h-36d872fbb0e5.md](../runner/decisions/h-36d872fbb0e5.md).
 - **2026-10-16 — Kongming M1-M3, N1-N8.** `--die-with-parent` chỉ ở terminal; `--as-pid-1` và handler SIGTERM/SIGINT ở gate; GO mang `attemptId` và digest, không so pid; bước sau receipt không nhận fd lock; rỗng ⇔ `judge(gate) == dead`; `lock-holders` coi monitor bwrap là thành viên.
-- **2026-10-16 — D4: argv không dựng ở Rust.** Agent-protocol `direct` đọc cấu hình executor đã dựng argv vào envelope; chuyển binder ProviderAdapter sang Rust là việc riêng. Xem [agent-protocol](../agent-protocol/spec.md).
-- **2026-10-17 — D6: miền Windows thuộc 4.4b.** Supervisor chỉ gọi `create_kill_job`, `open_job`, `assign_and_resume` và `Domain::WindowsJob`; gate luôn là thành viên job, `holder` là gate, `keeper` là supervisor.
+- **2026-10-16 — argv không dựng ở Rust.** Agent-protocol `direct` đọc cấu hình executor đã dựng argv vào envelope; chuyển binder ProviderAdapter sang Rust là việc riêng. Xem [agent-protocol](../agent-protocol/spec.md).
+- **2026-10-17 — miền Windows thuộc 4.4b.** Supervisor chỉ gọi `create_kill_job`, `open_job`, `assign_and_resume` và `Domain::WindowsJob`; gate luôn là thành viên job, `holder` là gate, `keeper` là supervisor.
 - **2026-10-18 — Cutover của `direct` (6.2 P09).** `executeAssignment` giao agent cho supervisor Rust; xoá `detached-run-supervisor.mjs`, kênh IPC, `reconcile-cli-spawn.mjs`, `legacySpawn`, `bindConfinedHomesToSupervisor`. Phát hiện khi chạy bwrap thật: gate nằm trong sandbox root chỉ-đọc nên không tạo được `gate-exit.json` và file capture; controller tạo sẵn file rỗng, driver bind đúng các file đó, gate ghi tại chỗ. Controller đợi `closed.json` sau result; settle step nhận ngữ cảnh controller qua `controller/settle-context.json`.
-- **2026-10-18 — D9: `dispatch.gateKillGraceMs`, mặc định 10000, tối thiểu 1000.** Doctor `gate-kill-grace`; setup không ghi khoá vào config global.
+- **2026-10-18 — `dispatch.gateKillGraceMs`, mặc định 10000, tối thiểu 1000.** Doctor `gate-kill-grace`; setup không ghi khoá vào config global.
 
 - **2026-10-18 — Cutover của `terminal` (6.3).** Round herdr không còn được canh trong controller: vòng poll, deadline, settle và đóng pane (`herdr-round.mjs`) bị xoá; supervisor canh pane theo attempt id qua terminal-control, gate trong pane nhận khoá qua `SCM_RIGHTS`. Đo trên herdr thật: `tcsetpgrp` làm được từ pid 1 của namespace, không cần `setsid`; không có phương án dự phòng "gate ngoài namespace". Pane chết hoặc supervisor chết đều có đường kết thúc đã đặt tên (`carrier-lost`, nhánh mồ côi). Pane giữ lại khi kết thúc không sạch.
 - **2026-10-18 — Pane không đọc được là thời gian mù, không phải thời gian nhàn rỗi.** Đồng hồ idle của `terminal` chạy tiếp khi màn hình hoặc trạng thái đổi hoặc đọc được `working`; lúc không đọc được cái nào thì bị lùi đúng khoảng mù, chỉ soft deadline và hard ceiling còn áp dụng. Thay thế hành vi cũ của vòng canh trong controller (đọc trạng thái lỗi cộng vào thời gian mù).
-- **2026-10-18 — Controller chết: attempt settle, unit chờ `--resume` (6.4).** Ctrl-C/SIGTERM gửi `cancel` cho attempt controller đã giao (chờ `dispatch.cancelWaitMs`, thoát 130/143, lần hai thoát ngay); chết bất thường thì supervisor hoặc adopt settle; unit đọc là `awaiting-resume` và chỉ `--resume` tường minh đi tiếp, dùng kết quả attempt đã settle qua adopt, không chạy lại agent. `recover` đề xuất `adopt`; `outbox/result-N.json` là bằng chứng, không còn là lý do park. Run cũ trước supervisor: doctor `legacy-attempts-stuck` settle `abandoned-legacy` chỉ khi mọi pid đã ghi đều chết và không còn home bản 1. Quyết định của anh 2026-10-16: không tự resume; tự resume là việc hoãn có tên (section 9.1). Chi tiết: [runner.md](../../specs/runner.md).
+- **2026-10-18 — Controller chết: attempt settle, unit chờ `--resume` (6.4).** Ctrl-C/SIGTERM gửi `cancel` cho attempt controller đã giao (chờ `dispatch.cancelWaitMs`, thoát 130/143, lần hai thoát ngay); chết bất thường thì supervisor hoặc adopt settle; unit đọc là `awaiting-resume` và chỉ `--resume` tường minh đi tiếp, dùng kết quả attempt đã settle qua adopt, không chạy lại agent. `recover` đề xuất `adopt`; `outbox/result-N.json` là bằng chứng, không còn là lý do park. Run cũ trước supervisor: doctor `legacy-attempts-stuck` settle `abandoned-legacy` chỉ khi mọi pid đã ghi đều chết và không còn home bản 1. Quyết định của anh 2026-10-16: không tự resume; tự resume là việc hoãn có tên (section 9.1). Chi tiết: [h-36d872fbb0e5.md](../runner/decisions/h-36d872fbb0e5.md).
 - **2026-10-19 — Controller chết, việc còn mở đóng lại.** (1) Sau tín hiệu đầu tiên `runUnit` không mở bước mới nào (role, commit, checker, verify, sync): ném `RunCancelledError`, unit để nguyên như controller chết (không settle `execution-failure`) và `--resume` đi tiếp; một pass chưa kịp commit thành `commit pending` mà resume làm nốt. (2) Tín hiệu trước khi supervisor bind: attempt đang giao (`beginLaunch` đến khi biết binding) được chờ, bind xong thì bị cancel, dòng resume luôn in; tín hiệu đến trước khi giao thì từ chối launch. (3) `dispatch.cancelWaitMs` và `gateKillGraceMs` sai là lỗi validation có tên, cùng câu chữ với doctor. (4) Handler SIGINT/SIGTERM chỉ được cài khi tiến trình xin (`enableCancelOnSignal`, ở cửa CLI); caller trong tiến trình giữ nguyên xử lý tín hiệu của mình. (5) `adopt` không có fallback khi release của `hostBin` trong envelope đã bị dọn: envelope buộc step vào đúng host đã ghi nó (`host_bin_is_current`, digest) nên chạy bằng host đang active sẽ nới một kiểm tra an toàn đã chốt; doctor `run-attempts-stuck` nêu nguyên nhân và cách gỡ (khôi phục thư mục release đó rồi `fgos doctor --fix`). Rust không đổi.
 - **2026-10-19 — Gate terminal tự cài PDEATHSIG.** Trên máy thật, giết monitor bwrap không giết gate (pid 1 với `--as-pid-1`): `--die-with-parent` của bwrap không đủ cho init của namespace. Gate terminal gọi `arm_parent_death_signal` (crate process) trước HELLO, không dùng `setpriv` hay công cụ ngoài; gate direct giữ nguyên (sống qua monitor để adopt). Cửa sổ trước khi cài (monitor chết trước `prctl`, `getppid()` đọc 0) do kiểm tra gate-thuộc-pane-root ở bước 3 đóng: monitor chết trước thì không chứng minh được tuple, không có GO. Regression `killing_the_terminal_monitor_ends_the_gate_and_its_agent` chạy gate thật trong bwrap thật.
 
@@ -362,8 +362,8 @@ The check for orphaned confinement resources skips attempt homes (marker version
 | uses | [process/spec.md](../process/spec.md), [holder-lock/spec.md](../holder-lock/spec.md) |
 | adapters | [agent-protocol/spec.md](../agent-protocol/spec.md) |
 | boundary | [component-boundary.md](../component-boundary.md) |
-| runner decision | [runner.md](../../specs/runner.md) |
+| runner decision | [h-36d872fbb0e5.md](../runner/decisions/h-36d872fbb0e5.md) |
 | plans | [direct mode](../../../plans/261016-1351-run-supervisor-rust-core-direct-mode/plan.md), [terminal mode](../../../plans/261016-1351-terminal-mode-and-launcher-identity/plan.md) |
 | terminal-control | [terminal-control/spec.md](../terminal-control/spec.md) |
 | identity | [identity/spec.md](../identity/spec.md) |
-| design and evidence | [design r6](../../../plans/reports/design-261016-1238-lock-and-run-supervisor-foundation-v3-r6.md) |
+| design and evidence | design r6 |

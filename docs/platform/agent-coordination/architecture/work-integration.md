@@ -1,64 +1,88 @@
 # Work Integration Boundaries
 
+```txt
 Document type: Architecture
-Design status: Accepted
-Implementation: Partial
-Last reviewed: 2026-09-09
-Canonical for: Work authority and coordination integration boundaries
-Related: [Dispatch Control Plane](dispatch-control-plane.md) for the
-DispatchRequest/PolicyPatch/DispatchPlan contracts the Work Driver hands off
-to once it has derived a target
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: `docs/architect/agent-coordination/architecture/work-integration.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/architecture/work-integration.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+
+## Implementation And Design Status
+
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.
+
+| Section | Status | Evidence / limit |
+|---|---|---|
+| Core Invariant | Current lifecycle boundary | Work records `workflowStep`; `stage` is rejected by src/state/work.mjs:455-467. The Workflow runner drives Work around execution; dispatch/execution do not own its lifecycle. |
+| Execution May | Current handoff and result boundary | src/workflow/runner.mjs:419-428 invokes execution and consumes its result; src/runner/dispatch/run-result.mjs:350-385 owns result normalization. |
+| Execution May Not | Current authority boundary | Execution does not replace Work lifecycle/approval/merge verbs; work.stage is not a valid current field (src/state/work.mjs:455-467). |
+| Child Work | Delivery-lifecycle decision, not automatic dispatch side effect | Child Work uses the Work parent edge; an execution attempt alone does not create a backlog item. |
+| Isolation | Mixed implementation and proposal; no blanket implementation claim | src/workflow/runner.mjs:385-391 (createWorkflowWorktree per Unit), :173-176 (cleanup keeps failed worktrees); assignment-runner.mjs:497 worktree mismatch refusal |
 
 ## Core Invariant
 
 ```txt
 Work lifecycle is owned only by Work engine verbs.
-Coordination returns evidence and recommendations to the Work driver.
+Execution returns evidence and recommendations to the Work driver.
 ```
 
 Work attachment is optional per the
 [Agent Coordination Foundation Vision](../vision.md). These boundaries apply
-whenever a session references Work; standalone coordination uses the same
-dispatch/runtime/evidence core without gaining a delivery lifecycle.
+when a Unit or Workflow execution references Work. Supporting execution without
+a Work item does not acquire a separate delivery lifecycle.
 
-## Coordination May
+## Execution May
 
-- read Work requirements, decisions, artifacts, stage, and allowed repository
-  scope;
-- execute a legal Work Stage Operation through Assignment;
+- read Work requirements, decisions, artifacts, `workflowStep`, and allowed
+  repository scope;
+- execute a Workflow step operation through the applicable Assignment/Unit door;
 - return RunResults, evidence, review findings, or synthesis;
 - inform the driver's choice of an existing Work verb;
-- reference child Work and session-local supporting activity.
+- reference child Work and supporting execution without inventing session-local
+  lifecycle entities.
 
-## Coordination May Not
+## Execution May Not
 
-- directly move Work stage or status;
+- directly replace Work `workflowStep` or status outside its owning verbs;
 - infer acceptance or approval from agent consensus;
 - claim/return Work outside existing lifecycle verbs;
 - merge a branch outside Work merge policy;
-- mark Work complete because a Run or session completed;
-- duplicate Work stage/status/approval/merge state in another runtime.
+- mark Work complete merely because a Run or Unit completed;
+- duplicate Work step/status/approval/merge state in another runtime.
 
 ## Child Work
 
 Child Work is appropriate when a unit needs independently durable backlog,
 claim, acceptance, approval, dependency, branch, merge, or resume behavior.
 
-Current planning tends to materialize every decomposed child as Work. The
-candidate AdhocTask distinction and hybrid materialization rules remain under
-discussion in [Step 07](../proposals/step-07-coordination-session-adhoc-task.md).
-
 ## Work Driver Handoff To Dispatch
 
-The Work Driver (the component-outer caller that selects a legal declared
-Stage Operation for a Work item) derives a capability or an explicit
-executor-id, plus PolicyPatch and provenance, from
-`Work → domain/workflow/stage → legal operation → taskSpec/skill metadata`.
-It hands that off as a DispatchRequest to the [Dispatch Control
-Plane](dispatch-control-plane.md); it must not call `resolveExecutorConfig`
-or launch an executor directly. This mirrors the accepted rule above that
-Coordination "may not" own dispatch mechanism choice — the same boundary
-applies to the Work Driver whether or not a CoordinationSession is involved.
+The Work driver supplies the task target/capability, policy inputs and provenance
+to the governed execution door. It does not call `resolveExecutorConfig` to
+bypass dispatch planning, governance or confinement. Dispatch resolves execution
+configuration; the Work driver retains the subsequent lifecycle decision.
+
+The current policy resolver accepts caller `policyInputs` (with its existing
+`cliOverride` alias) and records effective-policy provenance. This is distinct
+from the proposed `DispatchRequest` schema: a design request name must not be
+treated as an exported normalizer or an additional Work write door.
+
+See the [area portal](../README.md) and [runner spec](../../runner/spec.md).
 
 ## Isolation
 
@@ -69,12 +93,3 @@ physical checkout merely because declared source footprints differ.
 Nested immediate-parent branch integration is a candidate invariant, not yet an
 accepted cross-path contract.
 
-A CoordinationSession's local runtime state (`.fgos/coordination/`) may
-reference domain-provisioned workspace/isolation context for auditability, but
-that reference is not itself an isolation mechanism and grants no merge or
-Work-transition authority: those stay with the domain harness and Work engine
-verbs. Standalone coordination proofs stay read-only until a coding-domain
-live proof demonstrates resource-conflict detection, worktree isolation,
-merge ownership, recovery, and Work-transition authority under real
-concurrent load. See
-[ADR-010](../decisions/ADR-010-interactive-headless-parity-and-work-isolation.md).

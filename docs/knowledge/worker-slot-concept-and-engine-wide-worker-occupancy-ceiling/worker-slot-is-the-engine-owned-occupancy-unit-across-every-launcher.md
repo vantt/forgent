@@ -39,7 +39,7 @@ rootTask occupying a slot. "Worker" stays consistent with the
 > nguoi doc.
 
 This mirrors the existing hard rule in
-`docs/operator-runbook-herdr-cockpit.md`: every real status signal comes
+`docs/platform/herdr-web-dashboard/operations/operator-runbook.md#operator-runbook-herdr-cockpit`: every real status signal comes
 from the fgOS event log, one source of truth. The rule traces to a real
 production bug ("idle killed an agent") caused by a tool becoming a
 second source of truth. Live evidence for the same failure mode already

@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fixture } from '../git/land-fixture.mjs';
+import { loadNativeAddon } from '../../src/git/native.mjs';
+import { acquireDocumentationCutoverLease, DEFAULT_SIDECAR_PATH } from '../../src/runner/documentation-cutover-lease.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 import { branchKey } from '../../src/event-store/index.mjs';
@@ -17,6 +19,135 @@ function rootFixture() {
   activateGitFixture(f.repo);
   return f;
 }
+
+// Land suppresses repository hooks; only this boundary can prove that it
+// refuses scoped paths before preparing a native Land WAL or candidate.
+test('a non-holder cannot land scoped additions, renames, deletions or type changes even through an explicit branch', async (t) => {
+  const cases = [
+    ['addition', (f) => { fs.writeFileSync(path.join(f.repo, 'docs/new.md'), 'new\n'); }],
+    ['sidecar', (f) => { fs.mkdirSync(path.dirname(path.join(f.repo, DEFAULT_SIDECAR_PATH)), { recursive: true }); fs.writeFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH), '{}\n'); }],
+    ['rename out', (f) => f.git('mv', 'docs/original.md', 'outside.md')],
+    ['rename in', (f) => f.git('mv', 'b', 'docs/from-code.md')],
+    ['deletion', (f) => f.git('rm', 'docs/original.md')],
+    ['type change', (f) => { fs.unlinkSync(path.join(f.repo, 'docs/original.md')); fs.symlinkSync('../b', path.join(f.repo, 'docs/original.md')); }],
+  ];
+  for (const [name, change] of cases) await t.test(name, async () => {
+    const f = rootFixture();
+    try {
+      fs.appendFileSync(path.join(f.repo, '.git/info/exclude'), '\n.fgos/\n');
+      fs.mkdirSync(path.join(f.repo, 'docs'));
+      fs.writeFileSync(path.join(f.repo, 'docs/original.md'), 'original\n');
+      f.git('add', 'docs'); f.git('commit', '-qm', 'scope baseline');
+      f.git('checkout', '-qb', 'incoming');
+      change(f);
+      f.git('add', '-A'); f.git('commit', '-qm', name);
+      f.git('checkout', '-q', 'main');
+      const holder = path.join(f.temp, 'holder');
+      f.git('worktree', 'add', '-qb', 'holder', holder);
+      acquireDocumentationCutoverLease({ repoRoot: holder });
+      const before = f.git('rev-parse', 'main');
+      const operations = path.join(f.repo, '.git/fgos/git/operations');
+      const beforeOperations = fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [];
+      await assert.rejects(() => landRunnerItem(f.repo, { id: 'not-the-branch', verify: 'exit 99' }, { branch: 'incoming' }), { code: 'documentation-cutover-lease' });
+      assert.equal(f.git('rev-parse', 'main'), before);
+      assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false);
+      assert.deepEqual(fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [], beforeOperations, 'no Land operation beyond the lease transition');
+    } finally { f.close(); }
+  });
+});
+
+// The scope cases above do not exercise a caller from a different repository
+// or outside Git. Land disables hooks, so prove refusal at this production door.
+test('runner Land refuses foreign and non-Git callers before publishing frozen docs', async () => {
+  const f = rootFixture(); const foreign = rootFixture();
+  try {
+    branchCommit(f, 'scoped', 'main', { 'docs/new.md': 'frozen-scope edit\n' });
+    const holder = path.join(f.temp, 'holder');
+    f.git('worktree', 'add', '-qb', 'holder', holder);
+    acquireDocumentationCutoverLease({ repoRoot: holder });
+    const head = f.git('rev-parse', 'main');
+    const operations = path.join(f.repo, '.git/fgos/git/operations');
+    const before = fs.readdirSync(operations).sort();
+    for (const callerCheckout of [foreign.repo, foreign.temp]) {
+      await assert.rejects(() => landRunnerItem(f.repo, { id: 'source', verify: 'exit 99' }, { branch: 'scoped', callerCheckout }), { code: 'documentation-cutover-lease' });
+      assert.equal(f.git('rev-parse', 'main'), head);
+      assert.deepEqual(fs.readdirSync(operations).sort(), before);
+      assert.equal(fs.existsSync(path.join(f.repo, '.fgos/runtime/git-candidates')), false);
+    }
+  } finally { f.close(); foreign.close(); }
+});
+
+test('a held documentation lease permits a code-only land and its holder can land scoped files', async () => {
+  for (const holderCall of [false, true]) {
+    const f = rootFixture();
+    try {
+      const holder = path.join(f.temp, 'holder');
+      f.git('worktree', 'add', '-qb', 'holder', holder);
+      if (holderCall) branchCommit(f, 'scoped', 'main', { 'docs/new.md': 'holder change\n' });
+      acquireDocumentationCutoverLease({ repoRoot: holder });
+      const result = await landRunnerItem(f.repo, { id: 'source', verify: 'true' }, {
+        branch: holderCall ? 'scoped' : 'source', callerCheckout: holderCall ? holder : f.repo,
+      });
+      assert.equal(result.outcome, 'merged', JSON.stringify(result));
+      if (holderCall) assert.equal(f.git('show', 'main:docs/new.md'), 'holder change');
+      else {
+        fs.writeFileSync(path.join(f.repo, DEFAULT_SIDECAR_PATH), '{broken');
+        f.git('add', DEFAULT_SIDECAR_PATH); f.git('commit', '-qm', 'corrupt authority fixture');
+        await assert.rejects(() => landRunnerItem(f.repo, { id: 'source', verify: 'true' }, { branch: 'source', callerCheckout: holder }), { code: 'documentation-cutover-lease-corrupt' });
+      }
+    } finally { f.close(); }
+  }
+});
+
+// Earlier lease tests acquire before admission; only this proof interleaves
+// the real transition with target selection, verification and the native CAS.
+test('runner Land refuses a scoped branch when the lease is acquired after admission', async (t) => {
+  for (const timing of ['before prepare', 'after prepare', 'before publish']) await t.test(timing, async (t) => {
+    const f = rootFixture();
+    try {
+      branchCommit(f, 'scoped', 'main', { 'docs/new.md': 'must not publish\n' });
+      const holder = path.join(f.temp, 'holder');
+      f.git('worktree', 'add', '-qb', 'holder', holder);
+      const admittedTarget = f.git('rev-parse', 'main');
+      const source = f.git('rev-parse', 'scoped');
+      const native = loadNativeAddon();
+      const prepare = native.GitLand.prototype.prepare;
+      const publish = native.GitLand.prototype.publish;
+      let preparedTarget;
+      let heldTarget;
+      let publishes = 0;
+      const acquire = () => {
+        acquireDocumentationCutoverLease({ repoRoot: holder });
+        heldTarget = f.git('rev-parse', 'main');
+      };
+      t.mock.method(native.GitLand.prototype, 'prepare', async function(args, loans) {
+        assert.equal(args.request.target, undefined, 'no resolution bytes require a pre-slot target');
+        if (timing === 'before prepare') acquire();
+        const result = await prepare.call(this, args, loans);
+        preparedTarget = result.candidate.target;
+        assert.equal(result.candidate.source, source, 'the admitted source stays pinned');
+        if (timing === 'after prepare') acquire();
+        return result;
+      });
+      t.mock.method(native.GitLand.prototype, 'publish', function(...args) {
+        publishes++;
+        if (timing === 'before publish') acquire();
+        return publish.apply(this, args);
+      });
+      await assert.rejects(() => landRunnerItem(f.repo, { id: 'source', verify: 'true' }, {
+        branch: 'scoped', callerCheckout: f.repo,
+      }), { code: 'documentation-cutover-lease' });
+      assert.equal(preparedTarget, timing === 'before prepare' ? heldTarget : admittedTarget, 'lease admission must cover the target Land actually selected under its slot');
+      assert.notEqual(heldTarget, admittedTarget, 'the real lease transition advanced main');
+      assert.equal(publishes, timing === 'before publish' ? 1 : 0, 'only a lease arriving after the final gate reaches the native CAS check');
+      assert.equal(f.git('rev-parse', 'main'), heldTarget);
+      assert.equal(f.git('rev-parse', 'scoped'), source);
+      assert.throws(() => f.git('show', 'main:docs/new.md'));
+      assert.equal(fs.existsSync(path.join(f.repo, 'docs/new.md')), false);
+      assert.equal(JSON.parse(f.git('show', `main:${DEFAULT_SIDECAR_PATH}`)).state, 'held');
+    } finally { f.close(); }
+  });
+});
 
 test('root publication verifies the frozen Land candidate and returns its exact receipt', async () => {
   const f = rootFixture();

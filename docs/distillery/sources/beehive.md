@@ -933,8 +933,8 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 - **Seen:** af4840c
 
 ### spec-reading-map
-- **What:** `docs/specs/reading-map.md` = index 1 dòng/vị trí "cái gì sống ở đâu", kèm mục "chưa specced" và "elsewhere" — bản đồ điều hướng cho agent lạ.
-- **Where:** `docs/specs/reading-map.md`
+- **What:** `docs/reading-map.md#documentation-reading-map` = index 1 dòng/vị trí "cái gì sống ở đâu", kèm mục "chưa specced" và "elsewhere" — bản đồ điều hướng cho agent lạ.
+- **Where:** `docs/reading-map.md#documentation-reading-map`
 - **Notable:** trả lời Fresh Session Test câu "how is it organized".
 - **Seen:** e70602a
 
@@ -1059,7 +1059,7 @@ Plugin suite "validate-first agentic development" cho Claude Code + Codex. Chưn
 - **Seen:** 05a131f
 
 ### onboarding-manifest-drift
-- **What:** `.bee/onboarding.json` ghi SHA256 từng file managed; onboard re-run idempotent, detect drift + heal, `blocked_downgrade` guard (không force khi version unknown), never overwrite state/decisions/cells. Sticky opt-in — đồng ý một lần, upgrade sau tự mang theo. Từ 55cf3a4 (codex-onboarding/ao): onboarding giờ wire cả **Codex hooks** (`.codex/hooks.json`) song song hook Claude Code, và tạo state-layer skeleton (`docs/specs/reading-map.md`, `system-overview.md`, create-only). Loạt ao vá: self-onboard TỪNG clobber `.codex/hooks.json` của chính repo (nay **merge, không overwrite**); lệnh codex advisor malformed (không đọc prompt, không sandbox); regenerate hooks.json từ catalog, bỏ `.bak` lạc.
+- **What:** `.bee/onboarding.json` ghi SHA256 từng file managed; onboard re-run idempotent, detect drift + heal, `blocked_downgrade` guard (không force khi version unknown), never overwrite state/decisions/cells. Sticky opt-in — đồng ý một lần, upgrade sau tự mang theo. Từ 55cf3a4 (codex-onboarding/ao): onboarding giờ wire cả **Codex hooks** (`.codex/hooks.json`) song song hook Claude Code, và tạo state-layer skeleton (`docs/reading-map.md#documentation-reading-map`, `system-overview.md`, create-only). Loạt ao vá: self-onboard TỪNG clobber `.codex/hooks.json` của chính repo (nay **merge, không overwrite**); lệnh codex advisor malformed (không đọc prompt, không sandbox); regenerate hooks.json từ catalog, bỏ `.bak` lạc.
 - **Where:** `skills/bee-hive/scripts/onboard_bee.mjs` (renderCodexHookEntries, mergeCodexHooks), spec `docs/specs/onboarding.md`
 - **Notable:** "managed versions" pattern — update = re-onboard, không phải copy tay; consent là trạng thái bền. Đợt ao là bài học merge-không-overwrite cho file đa-chủ (`.codex/hooks.json` có cả entry của repo lẫn của bee) — cùng gene `managed-block-markers` nhưng cho JSON: chèn phần mình, giữ nguyên phần người.
 - **Seen:** 55cf3a4

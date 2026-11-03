@@ -54,7 +54,7 @@ function addSynthetic(dir, id) {
   });
 }
 
-// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+// tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): `todo -> doing`
 // is retired -- nothing durably writes INTO `doing` anymore. This file's
 // own tests need a durably-'doing' item purely as a PRECONDITION for
 // exercising a later moveWork(..., expectedStatus: 'doing') call — a raw

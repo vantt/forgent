@@ -52,7 +52,7 @@ owned, per `0031`'s own cleanup list.
 
 The full reasoning for the retirement — including why a narrower "fix"
 (exempting only the new sense) wasn't viable for a plain string-match
-guard — lives in `docs/specs/runner.md` (mục "### 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới").
+guard — lives in `docs/platform/runner/decisions/h-36d872fbb0e5.md#0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới` (mục "### 0031 — Bỏ guard cấm từ `orchestrator` sau khi `0029` đã gán nghĩa mới").
 "Launcher" itself remains the correct, unretired name for the one-item,
 fire-and-forget role `0026` originally described — only the *guard*
 enforcing that was removed, not the naming decision itself.
@@ -63,9 +63,9 @@ The citation above once pointed at a since-deleted file,
 `0031-bo-guard-cam-tu-orchestrator-sau-khi-0029-gan-nghia-moi.md` — dead
 the moment `0031`'s own cleanup removed it, per this doc's own account of
 that retirement. `tsk-4ah` repointed it at the surviving source
-(`docs/specs/runner.md`'s own `0031` section, cited above), added a
+(`docs/platform/runner/decisions/h-36d872fbb0e5.md#0031-bỏ-guard-cấm-từ-orchestrator-sau-khi-0029-đã-gán-nghĩa-mới`'s own `0031` section, cited above), added a
 disambiguation banner to `docs/history/orchestrator-worker-slots/
 DISCUSSION.md` (the newly-assigned "orchestrator" meaning from `0029` D17
 this doc's own §"What happened right after" describes), and added a
-pinned-term pointer to `docs/specs/reading-map.md`. No other content
+pinned-term pointer to `docs/reading-map.md#documentation-reading-map`. No other content
 changed.

@@ -777,3 +777,34 @@ test(
     );
   },
 );
+
+// Existing CLI fixtures prove explicit override scopes; none observes the default
+// post-cutover nested platform spec/decision read set. This is its owning proof.
+test('default citation scan includes nested area rules and decision narratives without losing legacy specs', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'citation-successors-'));
+  try {
+    const files = {
+      'docs/decisions/.keep': '',
+      'docs/specs/old.md': 'RUL901 bare legacy rule\n',
+      'docs/platform/sample/subcomponents/child/spec.md': 'RUL902 bare child rule\n',
+      'docs/platform/sample/decisions/settled.md': 'RUL903 bare narrative citation\n',
+      'docs/platform/sample/operations/not-a-spec.md': 'RUL904 outside the declared default read set\n',
+      'docs/platform/sample/history/retired/spec.md': 'RUL905 retired history must not be scanned\n',
+      'docs/platform/sample/history/retired/decisions/old.md': 'RUL906 retired narrative must not be scanned\n',
+    };
+    for (const [rel, content] of Object.entries(files)) {
+      const file = path.join(dir, rel);
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(file, content);
+    }
+    const result = spawnSync(process.execPath, [scriptPath], { cwd: dir, encoding: 'utf8' });
+    assert.equal(result.status, 1);
+    assert.match(result.stdout, /3 finding/);
+    for (const id of ['RUL901', 'RUL902', 'RUL903']) assert.ok(result.stdout.includes(id));
+    assert.ok(!result.stdout.includes('RUL904'));
+    assert.ok(!result.stdout.includes('RUL905'));
+    assert.ok(!result.stdout.includes('RUL906'));
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

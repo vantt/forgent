@@ -44,5 +44,5 @@ The old migration source classified command readiness as an ordering signal:
 | --- | --- |
 | source inventory | [source-inventory.md](source-inventory.md) |
 | ledger | [../intent-preservation-ledger.md](../intent-preservation-ledger.md) |
-| source migration strategy | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) |
+| source migration strategy | ../architecture/node-to-rust-migration.md |
 

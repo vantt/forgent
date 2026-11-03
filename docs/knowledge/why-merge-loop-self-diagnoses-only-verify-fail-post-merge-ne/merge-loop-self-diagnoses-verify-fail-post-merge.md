@@ -55,7 +55,7 @@ been run for real (`tsk-2z3`).
 
 ## Why Iron Law stays completely out of this
 
-The plan surfaced a real tension during clarify: `docs/specs/runner.md`
+The plan surfaced a real tension during clarify: `docs/platform/runner/decisions/h-36d872fbb0e5.md#vì-sao-supersedes-trống`
 (RUL34/RUL37, lines 530-531 and 598-603) requires a real human operator to
 run `--acknowledge-iron-law` — the spec's own words are "approve từ chối
 cho tới khi người vận hành xác nhận." The locked decision (CONTEXT.md D2)
@@ -67,7 +67,7 @@ own `SKILL.md` change reaffirms the boundary explicitly rather than leaving
 it implicit:
 
 > "an Iron Law block always needs a real human operator (RUL34/RUL37,
-> `docs/specs/runner.md`), with no exception this skill is ever allowed to
+> `docs/platform/runner/decisions/h-36d872fbb0e5.md#vì-sao-supersedes-trống`), with no exception this skill is ever allowed to
 > apply."
 
 ## Why the retry is bounded to exactly one attempt

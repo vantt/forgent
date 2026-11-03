@@ -433,7 +433,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
         // exact disagreement can force past it explicitly -- never silent:
         // always logged with the disagreement reason it overrode, per the
         // "never silently overridden" stance
-        // docs/explanation/judge-verdict-second-pass-semantic-check.md
+        // docs/knowledge/why-judgediscovery-judgedecompose-run-a-second-independent-j/judge-verdict-second-pass-semantic-check.md#why-disagreement-parks-instead-of-retrying
         // already states for this exact two-judge-disagreement path.
         //
         // tsk-12t D6: EXCEPT when `secondPass.mechanical` is true -- that

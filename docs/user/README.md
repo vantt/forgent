@@ -13,19 +13,20 @@ Use this when: You need tutorials, how-to guides, reference, or explanation
 Do not use this for: Internal platform authority or implementation contracts
 Last reviewed: 2026-09-13
 Related:
-- `docs/doc-governance.md`
-- `docs/README.md`
+- `docs/platform/governance.md`
+- `docs/platform/documentation/operations/portals/docs-portal.md`
 ```
 
 fgOS user-facing docs follow Diataxis:
 
-| Need | Target path | Current active path during migration |
+| Need | Deferred target path | Retained path after platform cutover |
 |---|---|---|
-| Learn by doing | `docs/user/tutorials/` | `docs/tutorials/` |
+| Learn by doing | `docs/user/tutorials/` (not created) | `docs/tutorials/` (tracked `.gitkeep` only; no tutorial content) |
 | Complete a task | `docs/user/how-to/` | `docs/how-to/` |
 | Look up facts | `docs/user/reference/` | `docs/reference/` |
 | Understand concepts | `docs/user/explanation/` | `docs/explanation/` |
 
-During migration, existing user-doc roots remain active. New or moved user docs
-should follow the target `docs/user/**` structure once the migration plan is
-approved.
+The platform-authority cutover does not retire or rename the retained user-doc
+roots above, nor does it create `docs/user/tutorials/`. Mapped end-user content
+is also under `docs/knowledge/**`. The target `docs/user/**` remains a separate
+future migration; do not infer approval or new directories from this table.

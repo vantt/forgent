@@ -13,7 +13,7 @@ whenever a session tried to claim a `doing` item — with zero regard for
 whether the claiming session was still actually working or had gone
 quiet. `startupReap` (`src/runner/loop.mjs`) deliberately never reaps a
 `human`/`session` claim, only a crashed `runner` claim — a documented,
-intentional "indefinite hold" (`docs/specs/work-state.md`'s own Open
+intentional "indefinite hold" (`docs/platform/work-state/README.md`'s own Open
 Gaps). A quiet, abandoned session/human claim just sat there forever,
 with no path back except a person manually investigating and
 force-moving the item.

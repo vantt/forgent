@@ -104,7 +104,7 @@ fn present_mailbox(answer: &crate::wiring::mailbox_verbs::MailboxAnswer) -> i32 
 /// string stderr carries), `reason` the stable code, `candidates` the sessions
 /// it concerns (`{id, handle, liveness}`; empty when none). It carries no
 /// `contract`, so
-/// it never passes for a success envelope (docs/io-contract.md: the error
+/// it never passes for a success envelope (docs/platform/work-state/contracts/cli-io-contract.md: the error
 /// path is not wrapped; success and failure differ by exit code).
 pub fn refusal_json(refusal: &fgos_identity::Refusal) -> String {
     serde_json::json!({

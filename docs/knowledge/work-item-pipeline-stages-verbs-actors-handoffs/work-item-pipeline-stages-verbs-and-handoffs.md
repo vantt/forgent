@@ -120,8 +120,8 @@ at `decompose` (planning+validating) and `executing` — **not yet at
 `.claude/skills/fgos-coding-planning/SKILL.md`,
 `.claude/skills/fgos-coding-validating/SKILL.md`,
 `.claude/skills/fgos-coding-implement/SKILL.md`,
-`.claude/skills/fgos-coding-compounding/SKILL.md`, `docs/specs/runner.md`,
-`docs/specs/work-state.md`, `docs/backlog.md` (STR7/STR8/STR14/STR40/
+`domains/coding/skills/fgos-coding-knowledge/SKILL.md`, `docs/platform/runner/spec.md#spec-runner-vòng-tự-hành`,
+`docs/platform/work-state/spec.md#work-state-specification`, `docs/backlog.md` (STR7/STR8/STR14/STR40/
 STR67/STR68/STR92/STR93, `tsk-1wd`, `tsk-1e4`).
 
 Updated 2026-07-31 for `tsk-4y5`: `src/state/priority-formula.mjs`,

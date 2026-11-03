@@ -1,5 +1,5 @@
 // enduser-index-generate.mjs — I/O generation layer for the read-by-tag
-// end-user doc index (docs/specs/enduser-docs-index.md). Unlike
+// end-user doc index (docs/platform/work-state/spec.md). Unlike
 // enduser-index.mjs (the pure transform, zero imports, no I/O by design),
 // this module does real fs I/O: it enumerates docs/<quadrant>/ (+
 // QUADRANT_DIR_ALIASES) on disk and folds the event log via `listWork`.
@@ -18,7 +18,7 @@ import { listWork } from '../state/store.mjs';
 
 // Scans one on-disk dir for `.md` files and pushes each as a docEntry
 // tagged with `quadrant` — the quadrant this dir counts as, which for an
-// alias dir (docs/specs/enduser-docs-index.md R10) differs from the dir's
+// alias dir (docs/platform/work-state/spec.md R10) differs from the dir's
 // own on-disk name. A missing dir is skipped cleanly (ENOENT), never a
 // crash: not every quadrant dir, nor every alias dir, is guaranteed to
 // exist yet (R6).

@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const AGENTS_MD = path.join(REPO_ROOT, 'AGENTS.md');
-const PLATFORM_FOUNDATIONS_SPEC = path.join(REPO_ROOT, 'docs', 'specs', 'platform-foundations.md');
+const PLATFORM_FOUNDATIONS_SPEC = path.join(REPO_ROOT, 'docs', 'platform', 'platform-foundations.md');
 
 const ANCHOR_PHRASE = 'khong phai no nang ma no tum lum';
 const RUL11_LAW = 'Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của tình trạng đó là tùm lum, không phải nặng; thấy tùm lum trong phạm vi việc đang làm thì gom lại, gom tới khi hết, quy mô không bao giờ là lý do miễn trừ; tùm lum thấy ngoài phạm vi thì ghi thành item riêng, và gom mà phải xây công cụ mới là một câu hỏi quyết định; đích là ranh giới rõ và contract tường minh (ADR0054 (thêm vế phạm vi cho RUL11 theo phát biểu của người dùng 2026-10-08, supersede ADR0036)).';

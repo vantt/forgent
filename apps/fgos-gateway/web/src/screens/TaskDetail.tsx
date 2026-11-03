@@ -6,7 +6,7 @@ import { pollStateDigest } from '../api/poll'
 import { statusColor } from '../lib/status'
 import type { SettlementEntry, WorkDetail, WorkDocsData } from '../api/types'
 
-// S03 — Task detail (docs/ui-spec/screens/S03-task-detail.md). "The core
+// S03 — Task detail (docs/platform/ui-spec/architecture/screens/S03-task-detail.md). "The core
 // deliverable of the whole cluster" per its own Purpose section.
 
 const NEEDS_ANSWER_STATUSES = new Set(['awaiting-human', 'awaiting-approval'])
@@ -484,7 +484,7 @@ export function TaskDetail({ client, baseUrl, itemId, onBack, pollIntervalMs = 5
       </div>
 
       {showEditPlaceholder && (
-        // M03 (docs/ui-spec/modals/M03-add-edit-item.md) is not owned by
+        // M03 (docs/platform/ui-spec/architecture/modals/M03-add-edit-item.md) is not owned by
         // any item in this cluster's current run -- same placeholder
         // pattern tsk-5jr's Taskboard already uses for the same reason.
         // tsk-41h's PATCH /work/{id} exists to support M03 once it is

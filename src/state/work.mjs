@@ -119,8 +119,8 @@ export const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'delivere
 
 /**
  * The fixed `statusCategory` domain (per decision record 0027, D2/D3 —
- * `docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-
- * base-workflow-model-d1-d3.md`; pinned terms in `docs/history/phase-2-
+ * status-category domain: owned statuses before delivered, supersede, base
+ * workflow model D1-D3; pinned terms in `docs/history/phase-2-
  * status-category-schema/CONTEXT.md`) — a lossy compression of the six
  * front-segment statuses (`todo`/`doing`/`blocked`/`awaiting-human`/
  * `awaiting-approval`/`wontfix`; see `DOMAINS[domain].statusLabels`,

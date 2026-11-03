@@ -25,7 +25,7 @@ the baseline's own bookkeeping had been kept honest.
 
 ## Why "top 2-3 files" from the item's own description got narrowed further
 
-Planning picked the single largest file (`docs/specs/work-state.md`, 425
+Planning picked the single largest file (`docs/platform/work-state/spec.md#work-state-specification`, 425
 findings, 23.8% of the total) instead of the description's suggested 2-3
 files — already halving the risk surface to one file / one commit.
 **Validating's reality gate found an even smaller honest path**:
@@ -58,7 +58,7 @@ after code was already written.
 
 This item (`tsk-2yu`) itself specced exactly one child
 (`tsk-2yu-1`: fix the 124 `bare-citation` findings in
-`docs/specs/work-state.md`), deliberately leaving 1664 findings
+`docs/platform/work-state/spec.md#work-state-specification`), deliberately leaving 1664 findings
 unspecced pending that slice's real numbers. As of this synthesis, the
 live baseline (`scripts/check-decision-citation-drift.baseline.json`)
 totals **249** findings (220 `d-local-outside-home`, 29 `bare-citation`)

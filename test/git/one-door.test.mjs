@@ -9,9 +9,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sandboxNamedPaths } from '../../scripts/lib/git-spawn-match.mjs';
+import { declaredToolingSite, isReadGitCommand, sandboxNamedPaths } from '../../scripts/lib/git-spawn-match.mjs';
 import { scan, census, verifyCensus, MUTATION_CENSUS_PATH } from '../../scripts/git-one-door-scan.mjs';
-import { productFrame } from '../helpers/git-spawn-spy.mjs';
+import { productFrame, productSite } from '../helpers/git-spawn-spy.mjs';
 
 const PROBES = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'fixtures', 'git-one-door');
 
@@ -97,6 +97,8 @@ test('the scan judges every file its root declares as product, whatever the dire
     write('src/dist/y.mjs', reset);
     write('bin/tool.mjs', reset);
     write('test/z.test.mjs', reset);
+    // Configured setup commands are consumer data, not an exemption for a fixed Git program.
+    write('src/setup.mjs', "import { execFileSync } from 'node:child_process';\nconst commands = JSON.parse(process.env.SETUP_COMMANDS);\nfor (const command of commands) execFileSync(command, { shell: true, [Symbol.for('fgos.git.consumer-command')]: true });\n");
     const result = scan({ root });
     assert.deepEqual(result.sites.map((s) => s.path).sort(), ['bin/tool.mjs', 'src/dist/y.mjs', 'src/runner/fixtures/x.mjs']);
     assert.deepEqual(result.outsideProduct, { test: 1 });
@@ -153,6 +155,23 @@ test('the spawn spy charges a command run through runBorrowed to the code that c
   assert.equal(productFrame(stack('src/runner/goal-check.mjs')), 'src/runner/goal-check.mjs:7');
   const direct = ['Error', `    at spawnSync (file://${root}/src/holder-lock/index.mjs:300:9)`].join('\n');
   assert.equal(productFrame(direct), 'src/holder-lock/index.mjs:300', 'holder-lock spawning git itself stays a site');
+});
+
+// The static scan accepts an owner-declared tooling exemption by path and call digest; the runtime
+// spy must accept the same declaration (by path and holding function) or a test that runs the tool fails the suite.
+test('the spawn spy classes a spawn from an owner-declared tooling function and still charges an undeclared one', () => {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+  const declared = JSON.parse(fs.readFileSync(path.join(root, 'scripts/lib/git-one-door-declarations.v1.json'), 'utf8')).declarations.find((d) => d.class === 'declared-tooling-exemption');
+  assert.ok(declared, 'scripts/lib/git-one-door-declarations.v1.json no longer declares a tooling exemption: point this proof at a fixture declarations root');
+  const [fn] = declared.siteId.split(':');
+  const stack = (name) => ['Error', `    at spiedSpawn (file://${root}/test/helpers/git-spawn-spy.mjs:110:20)`, `    at ${name} (file://${root}/${declared.path}:7:3)`].join('\n');
+  assert.deepEqual(productSite(stack(fn)), { frame: `${declared.path}:7`, fn });
+  assert.equal(declaredToolingSite(root, declared.path, fn), true);
+  assert.equal(declaredToolingSite(root, declared.path, 'aFunctionNoOwnerDeclared'), false);
+  assert.equal(declaredToolingSite(root, 'src/runner/goal-check.mjs', fn), false, 'a declaration names its own file');
+  assert.equal(isReadGitCommand('git', ['-C', '/x', 'rev-parse', 'HEAD']), true);
+  assert.equal(isReadGitCommand('/usr/bin/git', ['commit', '-m', 'x']), false, 'a write verb from a declared function is still charged');
+  assert.equal(isReadGitCommand('sh', ['rev-parse']), false, 'only a Git binary is a read');
 });
 
 test('a sandbox Git call is judged by every repository path it names, in separate and = forms', () => {

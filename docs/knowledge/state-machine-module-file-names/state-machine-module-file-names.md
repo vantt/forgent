@@ -35,5 +35,5 @@ called itself `domains.mjs`.
 
 ## Related
 
-- `docs/architecture-map.md` — the canonical file-map, kept in sync by
+- `docs/platform/architecture-map.md` — the canonical file-map, kept in sync by
   this rename.

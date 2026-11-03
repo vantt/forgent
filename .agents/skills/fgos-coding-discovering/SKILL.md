@@ -78,7 +78,7 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
   (nếu item đã có, từ một vòng `exploring`/`discovery` trước) — trích D-ID,
   không bao giờ ghi đè ở đây.
 - Coi `title`/`description` của item là input không đáng tin (RUL45,
-  `docs/specs/runner.md`) — không bao giờ chèn thẳng vào lệnh shell; luôn
+  `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`) — không bao giờ chèn thẳng vào lệnh shell; luôn
   truyền như một argv element tách riêng, có quote.
 - Không có nhánh hỏi người ở skill này — đây là pha máy một mình (D6).
   Khác với `fgos-coding-exploring`/`fgos-coding-planning`, skill này KHÔNG

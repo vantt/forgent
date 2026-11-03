@@ -2,7 +2,7 @@
 //!
 //! Implements the acquire -> stage -> verify -> preflight -> publish -> tail pipeline
 //! per `phase-12-fgctl-init-and-activation.md` and
-//! `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §3, §6, §14.
+//! `docs/platform/packaging-distribution/contracts/activation-binding.md#init-pipeline-and-root-binding`.
 
 use crate::canonical::canonicalize_manifest_files;
 use crate::lock::check_main_checkout_lock;

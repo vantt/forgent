@@ -1,17 +1,38 @@
 # Visibility And Herdr
 
+```txt
 Document type: Architecture
-Design status: Accepted
-Implementation: Substantial — the runtime-recovery track (closed 2026-09-14)
-implemented Run admission/control-epoch fencing (P01), cli-spawn and
-herdr-spawn launch reconciliation including a real bwrap-confined herdr-spawn
-launch (P02L, P02H, hardened in the P02H reopen), governed fallback (P03),
-and standalone/session recovery read-apply doors (P05, P05S). Every invariant
-and forbidden inference below held through that work's own independent
-review/red-team verification. See `plans/260911-2305-runtime-recovery/plan.md`
-and its per-cell trace docs for what shipped.
-Last reviewed: 2026-09-14
-Canonical for: visibility versus runtime truth
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/architecture/visibility-and-herdr.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+
+## Implementation And Design Status
+
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.
+
+| Section | Status | Evidence / limit |
+|---|---|---|
+| Purpose | Current contract/invariant | src/runner/dispatch/visibility-session.mjs:1-27 (visibility vs run.json vs result.json) |
+| Invariant | Current contract/invariant | visibility-session.mjs:3-13; herdr-round.mjs:21-24 (completion is the worker-written outbox/result-<round>.json, never agent_status); run-result.mjs:1276-1325 |
+| Session Binding | Current contract/invariant | visibility-session.mjs:3-13 (visibility.json volatile vs run.json.status), :59 RUN_STATUSES, :215-232 classifyRunOutcome settled/died/unknown, unknown never a retry |
+| Observer And Actor | Mixed implementation and proposal; no blanket implementation claim | markDetached visibility-session.mjs:129-133 leaves run.json untouched (live); the 'pid-and-token lease with expiry' is explicitly removed: visibility-session.mjs:136-149; real exclusion is run-lock.mjs acquireRunControl :306 |
+| Allowed Uses | Current contract/invariant | Read-only visibility uses: visibility-session.mjs findAgentBinding :150-, markDetached; no write to result/evidence |
 
 ## Purpose
 
@@ -32,8 +53,7 @@ A receipt is an artifact the receiver wrote.
 The last line is the one that had to be learned. Transport status is never
 proof of work: a message accepted is not a message acted on, and an agent
 reported idle is not an agent finished. Only a file the worker itself wrote
-says the worker did something, and a round ends when that file appears —
-never when the transport says it might have.
+supports the worker claim. A receipt-less exit, deadline or corrupt record must become an explicit failure/unknown result, never success inferred from transport (herdr-round.mjs:21-24; assignment-runner.mjs:2471-2540).
 
 ## Session Binding
 
@@ -59,7 +79,7 @@ automatic retry.
 ## Observer And Actor
 
 Observing and contacting are separate capabilities. One actor drives a Run at
-a time, held by a pid-and-token lease with an expiry; any number of observers
+a time, fenced by run-control epoch and token, not the removed visibility actor lease; any number of observers
 read alongside it, needing no permission and holding no lease, because they
 change nothing. Losing the gateway or the person watching moves visibility to
 `detached` and leaves `run.json` untouched — a lost observer is not a dead
@@ -113,3 +133,4 @@ headless, retried, or partially failed executions.
 
 The original stabilization discussion is retained in
 [history](../history/brainstorms/agent-team-dispatch-and-herdr-stability-2026-08-27.md).
+

@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { conventionCheck } from '../../src/convention/convention-client.mjs';
+import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const BUILT_HOST = process.env.FGOS_HOST_BIN || path.join(REPO_ROOT, 'target', 'debug', 'fgos');
@@ -46,6 +47,36 @@ test('conventionCheck all scans only rule-declared scopes through the real host'
     const data = withHost(BUILT_HOST, () => conventionCheck({ all: true }, { dir: root }));
     assert.equal(data.checked, 2);
     assert.deepEqual(data.violations.map((item) => item.path), ['plans/reports/bad.md']);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// Owns caller-directory forwarding through invokeHost. Existing native tests
+// above own scope/path rules; retirement's CLI test owns only gate wiring.
+test('conventionCheck forwards the linked caller tree rather than its main checkout', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-convention-linked-'));
+  const main = path.join(root, 'main');
+  const review = path.join(root, 'review');
+  const write = (file, bytes) => { fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, bytes); };
+  try {
+    // Unborn linked repository: only scratch fixture bytes, no Git writes.
+    for (const dir of ['objects/info', 'objects/pack', 'refs/heads', 'worktrees/review']) fs.mkdirSync(path.join(main, '.git', dir), { recursive: true });
+    write(path.join(main, '.git/config'), '[core]\nrepositoryformatversion = 0\nbare = false\n');
+    write(path.join(main, '.git/HEAD'), 'ref: refs/heads/main\n');
+    write(path.join(main, '.git/worktrees/review/HEAD'), 'ref: refs/heads/review\n');
+    write(path.join(main, '.git/worktrees/review/commondir'), '../..\n');
+    write(path.join(main, '.git/worktrees/review/gitdir'), path.join(review, '.git') + '\n');
+    write(path.join(review, '.git'), 'gitdir: ' + path.join(main, '.git/worktrees/review') + '\n');
+    assert.equal(resolveMainCheckoutRoot(review), fs.realpathSync(main));
+    const host = path.join(root, 'host.mjs');
+    const seen = path.join(root, 'host-argv.json');
+    write(host, '#!' + process.execPath + '\n' +
+      `import fs from 'node:fs'; fs.writeFileSync(${JSON.stringify(seen)},JSON.stringify(process.argv.slice(2)));\n` +
+      `console.log(JSON.stringify({contract:'fgos.v1',data:{checked:0,violations:[]}}));\n`);
+    fs.chmodSync(host, 0o755);
+    assert.deepEqual(withHost(host, () => conventionCheck({ all: true }, { dir: review })), { checked: 0, violations: [] });
+    assert.deepEqual(JSON.parse(fs.readFileSync(seen)), ['convention', 'check', '--json', '--all', '--dir', review]);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

@@ -667,7 +667,7 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp']);
  * below.
  *
  * `forceCliSpawn`, when present, must be a boolean (tsk-3ik-1, Native-First
- * Dispatch Doctrine rule 4, `docs/decisions/0026-...md`): the valid
+ * Dispatch Doctrine rule 4, decision 0026): the valid
  * "config forces cli/spawn anyway" exception (isolation, a separate
  * process/worktree/cwd) for an `agent`-kind executor that would otherwise
  * be native-eligible — read by `decideDispatchMechanism`/
@@ -1012,7 +1012,7 @@ const CONFINEMENT_FLAGS = ['privateHome', 'isolatedSession', 'ownWorktree'];
  * Why a door and not a comment: on a real machine this posture was supplied by a
  * shell alias and a settings key that fgOS could not see, so nothing in any
  * executor profile described what an agent would actually do. See
- * docs/architect/agent-coordination/verification/visibility-herdr/proofs/
+ * docs/platform/agent-coordination/verification/visibility-herdr/proofs/
  *   2026-09-06-isolation/permission-posture-findings.md
  */
 function validateExecutionProfileShape(executor, label) {
@@ -1187,7 +1187,7 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
   }
   // Phase C (executor-profile-schema-migration): `identity`/`supports` are
   // the ExecutorProfile target vocabulary (design.md §3.7, previously
-  // documented-only in docs/specs/runner.md's "target vocabulary" section)
+  // documented-only in docs/platform/runner/spec.md's "target vocabulary" section)
   // made real, additive config fields. Both optional -- a executor naming
   // neither resolves exactly as it did before this phase existed. No
   // resolution/dispatch code reads either field yet (this phase proves the

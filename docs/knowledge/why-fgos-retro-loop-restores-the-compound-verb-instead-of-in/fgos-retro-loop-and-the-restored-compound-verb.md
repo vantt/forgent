@@ -69,7 +69,7 @@ makes sense; the restored verb keeps the same name and flags
 on `item.status === 'retrospective'` instead of moving any stage, and
 never moves the item itself — that's `retro-next`'s job (see below).
 
-Keeping the same verb name mattered: `docs/specs/work-state.md` (RUL51-53),
+Keeping the same verb name mattered: `docs/platform/work-state/spec.md#friction-record` (RUL51-53),
 several tutorials, and multiple how-to docs already documented this exact
 command as canonical. Restoring it under the same name kept every one of
 those references correct with zero further doc edits, instead of

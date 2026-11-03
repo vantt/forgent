@@ -1,5 +1,5 @@
 // backend-registry.mjs — machine backend registry loader and schema validator
-// for confinement-backend-registry.v1 (Phase 01 R5, docs/specs/confinement-authority.md §6.2-§6.2.1).
+// for confinement-backend-registry.v1 (Phase 01 R5, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#62-nơi-đặt-policy §6.2-§6.2.1).
 //
 // Machine backend instances represent deployment configurations on this machine.
 // Project-local configs are forbidden from defining or overriding `confinementBackends`

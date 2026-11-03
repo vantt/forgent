@@ -25,13 +25,13 @@ a real session:
 > "decide whether the experimental native desktop shell should remain a thin
 > client of the existing single-daemon registry/render/search authority or
 > acquire local ownership"
-> — real intake, [mdview case, P01.2](../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/intake.md)
+> — real intake, [mdview case, P01.2](../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/intake.md)
 
 > "start from the symptom 'EOD and intraday evolution is becoming difficult'
 > and determine whether the right decision is to keep separate pipelines
 > with shared contracts, introduce one pluggable pipeline abstraction, or
 > reframe the problem elsewhere"
-> — real intake, [vnflow case, P01.3](../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/intake.md)
+> — real intake, [vnflow case, P01.3](../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/intake.md)
 
 Neither sentence names a protocol, a role, or an executor. Both are real,
 both ran, both reached a real outcome (see the two example families below).
@@ -74,7 +74,7 @@ this exact bound ran all 12 real operations across 6 separate CLI
 invocations — including a Phase-9 `revise-synthesis` at round 11 and
 `close-dialogue` at round 12 — and closed `"status": "completed"`. Every
 request/response file for that run is committed at
-[`proofs/P04.2/fix-round-1-live-proof/`](../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/fix-round-1-live-proof/).
+[`proofs/P04.2/fix-round-1-live-proof/`](../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P04.2/fix-round-1-live-proof/).
 
 ## `actors[]` is per-call — it does not persist across a resumed session
 
@@ -127,7 +127,7 @@ way — they are the panel doing its job before it talks to you. The
 explanation (Phase 8) is written to be defensible to colleagues who will
 live in the resulting codebase, not a summary of what happened internally —
 read a real one:
-[P01.2's `explanation.md`](../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/explanation.md).
+[P01.2's `explanation.md`](../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/explanation.md).
 
 ## Decision Dialogue — how you keep talking after the explanation lands
 
@@ -265,11 +265,11 @@ shows the real `actors[]` override shape this roster resolves to.
 - [`use-fgos-group-thinking.md`](use-fgos-group-thinking.md) — the gate
   mechanism this skill is a member of, and the request-file shape this guide
   assumes.
-- [P01.2](../architect/agent-coordination/verification/architecture-advisory-panel/P01.2.md)
-  and [P01.3](../architect/agent-coordination/verification/architecture-advisory-panel/P01.3.md)
+- [P01.2](../platform/agent-coordination/verification/architecture-advisory-panel/P01.2.md)
+  and [P01.3](../platform/agent-coordination/verification/architecture-advisory-panel/P01.3.md)
   — the two real, closed manual-proof sessions every example family below
   draws from.
-- [P03.2](../architect/agent-coordination/verification/architecture-advisory-panel/P03.2.md)
+- [P03.2](../platform/agent-coordination/verification/architecture-advisory-panel/P03.2.md)
   — the protocol's own conformance proof (13 cases: premature reveal, hidden
   dissent, unauthorized specialist, over-cap reopen, human-authority
   impersonation, heterogeneous actor/tier provenance).

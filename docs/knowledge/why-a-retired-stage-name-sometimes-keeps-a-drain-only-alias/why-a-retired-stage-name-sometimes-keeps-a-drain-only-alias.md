@@ -168,8 +168,8 @@ question and lets the file set close with it.
 The drain-only-alias call above is about `stage`/`skillMap`/`stepMap` —
 live engine state. A separate, later sweep (`tsk-5eq`,
 `docs/history/spec-docs-lifecycle-realignment/`) applied the identical
-policy to prose: rewriting `docs/specs/work-state.md` (`tsk-1uw`) and
-`docs/specs/runner.md` (`tsk-2t5`) to describe the current stage names
+policy to prose: rewriting `docs/platform/work-state/spec.md#work-state-specification` (`tsk-1uw`) and
+`docs/platform/runner/spec.md#spec-runner-vòng-tự-hành` (`tsk-2t5`) to describe the current stage names
 (`discovery`/`planning`) as primary, while both items' own instructions
 explicitly said to keep `decompose` mentioned as its legacy, drain-only
 alias rather than scrub every occurrence — the same "migrate what can

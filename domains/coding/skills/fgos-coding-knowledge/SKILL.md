@@ -41,7 +41,7 @@ Runs while a work item sits at status `retrospective`. This skill turns the item
    git commit -m "docs(<id>): retrospective synthesis"
    ```
 4. **Attest document.** Links this item's own capture to the doc slot
-   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a
+   (docs/platform/work-state/contracts/knowledge-registry.md §7.4) — REQUIRED for both a
    freshly-written doc and a re-attest of an existing one. Run:
    ```bash
    fgos knowledge attest --doc-path <currentPath> --capture-id <id>

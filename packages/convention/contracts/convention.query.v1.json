@@ -56,7 +56,8 @@
                 "properties": {
                   "path": {"type": "string"},
                   "code": {"type": "string"},
-                  "message": {"type": "string"}
+                  "message": {"type": "string"},
+                  "posture": {"enum": ["block", "warn"]}
                 }
               }
             }

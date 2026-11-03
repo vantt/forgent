@@ -28,7 +28,7 @@ mechanism, in full:
   that could be skipped or forgotten.
 - On a passing verify, it moves the item to `status: proposed` — the
   documented run-complete rung of the completion ladder (L9,
-  `docs/platform-foundations.md`): "worker chạy xong + verify xanh TRÊN
+  `docs/platform/platform-foundations.md#platform-foundations`): "worker chạy xong + verify xanh TRÊN
   NHÁNH — 'đã làm' nhưng CHƯA vào main." `proposed` *is* "registered,
   waiting to merge." There is no second, parallel list an item needs to
   land on.

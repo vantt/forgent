@@ -27,7 +27,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { recordTestFileCpuAtExit } from '../../scripts/lib/test-file-cpu.mjs';
-import { CONSUMER_COMMAND, SANDBOX_DOOR, STANDALONE_SKILL_CLASS, sandboxNamedPaths, shellRunsGit, standaloneSkillOf } from '../../scripts/lib/git-spawn-match.mjs';
+import { CONSUMER_COMMAND, DECLARED_TOOLING_CLASS, SANDBOX_DOOR, STANDALONE_SKILL_CLASS, declaredToolingSite, isReadGitCommand, sandboxNamedPaths, shellRunsGit, standaloneSkillOf } from '../../scripts/lib/git-spawn-match.mjs';
 
 export const SPY_LOG_ENV = 'FGOS_GIT_SPAWN_SPY_LOG';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -61,6 +61,11 @@ export function spawnTarget(file, args = [], options = {}, { shell = false } = {
 // the command its caller names, so, as in the static scan, the caller of runBorrowed owns the spawn.
 const BORROW_DOOR = path.join(ROOT, 'src', 'holder-lock', 'index.mjs');
 export function productFrame(stack, wrappers = new Set()) {
+  return productSite(stack, wrappers)?.frame ?? null;
+}
+
+/** The product frame of a spawn and the function that holds it, or null when the caller is not product code. */
+export function productSite(stack, wrappers = new Set()) {
   for (const line of String(stack).split('\n').slice(1)) {
     const fn = /^\s*at (?:async )?([\w$.<>]+)(?: \[as [\w$]+\])? \(/.exec(line)?.[1];
     if (fn && wrappers.has(fn.split('.').pop())) continue;
@@ -69,7 +74,7 @@ export function productFrame(stack, wrappers = new Set()) {
     const file = m[1].startsWith('file://') ? fileURLToPath(m[1]) : m[1];
     if (file === SELF) continue;
     if (file === BORROW_DOOR && fn === 'runBorrowed') continue;
-    return PRODUCT.some((dir) => file.startsWith(dir)) ? `${path.relative(ROOT, file)}:${/:(\d+):\d+\)?$/.exec(line.trim())[1]}` : null;
+    return PRODUCT.some((dir) => file.startsWith(dir)) ? { frame: `${path.relative(ROOT, file)}:${/:(\d+):\d+\)?$/.exec(line.trim())[1]}`, fn: fn?.split('.').pop() ?? null } : null;
   }
   return null;
 }
@@ -102,13 +107,15 @@ export function installGitSpawnSpy(cp = childProcess) {
     const target = spawnTarget(file, argv, opts, { shell });
     if (!target) return;
     const stack = new Error().stack;
-    const frame = productFrame(stack, wrappers(entry));
-    if (!frame) return;
+    const site = productSite(stack, wrappers(entry));
+    if (!site) return;
+    const { frame } = site;
     if (opts?.[CONSUMER_COMMAND] === true) return; // a consumer's declared command: configured, not a site
     const sandbox = opts?.[SANDBOX_DOOR];
     if (sandbox && insideSandbox(sandbox, file, argv, opts)) return;
     const skill = standaloneSkillOf(path.join(ROOT, frame.replace(/:\d+$/, '')), ROOT);
-    record({ ...(skill ? { class: STANDALONE_SKILL_CLASS, skill } : {}), target, frame, file: String(file), args: argv.map(String).slice(0, 12), cwd: opts?.cwd ? String(opts.cwd) : process.cwd(), stack: String(stack).split('\n').slice(2, 10).map((l) => l.trim()) });
+    const declared = !skill && site.fn && isReadGitCommand(file, argv) && declaredToolingSite(ROOT, frame.replace(/:\d+$/, ''), site.fn);
+    record({ ...(skill ? { class: STANDALONE_SKILL_CLASS, skill } : declared ? { class: DECLARED_TOOLING_CLASS } : {}), target, frame, file: String(file), args: argv.map(String).slice(0, 12), cwd: opts?.cwd ? String(opts.cwd) : process.cwd(), stack: String(stack).split('\n').slice(2, 10).map((l) => l.trim()) });
   };
   for (const name of ['execFileSync', 'execFile', 'spawnSync', 'spawn']) {
     const original = cp[name];

@@ -30,7 +30,7 @@ right matters for what a genuine cross-proposal composition can combine
   actionable diagnostics."
 
 See
-[`proposals/`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/proposals/)
+[`proposals/`](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/proposals/)
 for the real, full text of all three. **The corrected structure above
 matters for `request-composition` below:** the alternative shaper's own
 "Delete" and "Smaller Path" are two arms of ONE proposal, not two

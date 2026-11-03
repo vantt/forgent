@@ -4,7 +4,7 @@ import { GatewayUnreachableError } from '../api/errors'
 import { hostOf, isNonLoopbackHost } from '../lib/network'
 import type { WorkItem } from '../api/types'
 
-// S04 — Questions needing answer (docs/ui-spec/screens/S04-questions-
+// S04 — Questions needing answer (docs/platform/ui-spec/architecture/screens/S04-questions-
 // needing-answer.md). D15 (docs/history/herdr-web-dashboard/CONTEXT.md):
 // the `ask` channel only -- gate-approve questions have no durable,
 // remotely-observable pending state today (see TaskDetail.tsx's own

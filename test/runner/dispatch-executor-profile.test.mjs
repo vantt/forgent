@@ -18,7 +18,7 @@ import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture
 // and a settings key suppressing its acceptance screen. An executor may therefore
 // declare `bypass`, but only alongside the confinement that makes it defensible,
 // and the refusal has to happen at load rather than in review. Evidence:
-// docs/architect/agent-coordination/verification/visibility-herdr/proofs/
+// docs/platform/agent-coordination/verification/visibility-herdr/proofs/
 //   2026-09-06-isolation/permission-posture-findings.md
 
 function loadWith(executorEntry) {

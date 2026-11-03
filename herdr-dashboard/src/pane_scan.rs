@@ -24,7 +24,7 @@ pub struct PaneIdentity {
 ///
 /// `focused` is chrome-level data herdr already returns on the same row —
 /// legitimate to read (D10-2), unlike `agent_status`, which
-/// `docs/operator-runbook-herdr-cockpit.md`'s Hard rule forbids outright.
+/// `docs/platform/herdr-web-dashboard/operations/operator-runbook.md`'s Hard rule forbids outright.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PaneSnapshot {
     pub pane_id: String,

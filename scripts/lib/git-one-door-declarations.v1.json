@@ -1,0 +1,118 @@
+{
+  "schema": "git-one-door-declarations.v1",
+  "declarations": [
+    {
+      "path": ".githooks/pre-commit",
+      "siteId": "leaseGitRead:fde3f196247ca9899debc1bcfa212e8f8994581863af09df7f22a20dd4866dfc",
+      "class": "hook-read-context",
+      "reason": "the cold hook's leaseGitRead callback authenticates committed/staged lease authority for guardCommit and guardReferenceTransaction without loading the checkout addon; its callers only read Git facts.",
+      "retireWhen": "The lease reader retires, or the Git owner supplies an approved cold-client door preserving hook authentication.",
+      "verbs": ["cat-file", "ls-tree", "show-ref", "diff", "show", "symbolic-ref read", "rev-parse", "diff-tree", "rev-list", "merge-base"]
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "siteId": "validateSourceUnitCoverage:a985982eb27efbdd1763c452a4780d2dab2de98793ded58807b6a0c724fbb2ec",
+      "class": "declared-tooling-exemption",
+      "reason": "ls-tree -l needs size-only blob metadata, mode and OID. Inspect listTree lacks size; reading every body through readObjects exceeds its 32 MiB bound or reads gigabytes just to learn sizes.",
+      "retireWhen": "Migration readers and their owning proofs/consumers retire after Phase 10, or Git exposes bounded object-size metadata."
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "siteId": "validateCommitBlobIntegrity:a985982eb27efbdd1763c452a4780d2dab2de98793ded58807b6a0c724fbb2ec",
+      "class": "declared-tooling-exemption",
+      "reason": "immutable blob-integrity validation needs size-only ls-tree -l metadata, mode and OID. Inspect listTree has no size and readObjects would read entire large artifacts solely for metadata.",
+      "retireWhen": "Migration readers and their owning proofs/consumers retire after Phase 10, or Git exposes bounded object-size metadata."
+    },
+    {
+      "path": "scripts/check-doc-inventory-gates.mjs",
+      "siteId": "loadPreviousRegistries:15b3120da8596a3cce1e4f87d4c97fdd8b2cbb220755f3d21e4abdc6e950fed7",
+      "class": "declared-tooling-exemption",
+      "reason": "committed identity-registry JSON permits 1 GiB and can exceed Inspect's 32 MiB path/object ceiling; replacing it would narrow conservation checks.",
+      "retireWhen": "Committed-registry conservation and its proofs/consumers retire, or Git supplies an equivalent large-object reader."
+    },
+    {
+      "path": "scripts/check-evidence-relocation.mjs",
+      "siteId": "git:79ebd2a981c21db1c4937f2a653310053ab9285d4af4e4e2166c56e7660a36f2",
+      "class": "declared-tooling-exemption",
+      "reason": "gitIndex needs live-index mode/blob/stage, including unborn repositories and index-only drift. Inspect trackedPaths supplies paths only; HEAD and filesystem bytes cannot preserve these integrity checks.",
+      "retireWhen": "The relocation tool and its before/after proofs retire together, or Git exposes live-index metadata."
+    },
+    {
+      "path": "scripts/doc-alias-resolver.mjs",
+      "siteId": "readOldDocument:700c771104fc5ac3f19c796eca2e653e1a38fb9061c9cd33e28e08969f802002",
+      "class": "declared-tooling-exemption",
+      "reason": "the historical Markdown reader permits 64 MiB; Inspect stops at 32 MiB and has no ranged/streamed blob port. Lowering the allowance would narrow the resolver contract.",
+      "retireWhen": "The historical reader and migration/alias consumers retire, or Git supplies an equivalent bounded read."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "readBlobBufferAtCommit:75f7006a6d16ad26688b112f1750fae1106d557ca17ffd74e8c765e575e2a61d",
+      "class": "declared-tooling-exemption",
+      "reason": "immutable binary show is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; changing the generator invalidates phase-06 reproduction check B.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "registryBindsToCommit:0edec6a84bd894fefd26324f8de4a213bb672be733a0c889cd32801a7c547acc",
+      "class": "declared-tooling-exemption",
+      "reason": "scope-binding diff --quiet is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "listCommitEntries:79536f264fd406980cdb23ba68b0ca180c285aa47de32e83598ac705db685c23",
+      "class": "declared-tooling-exemption",
+      "reason": "sized tree enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "listCommitPaths:5cabe3388545e9ecaac628cb5d7c0f72f1446b3583a54a8174033fa3a8845cd9",
+      "class": "declared-tooling-exemption",
+      "reason": "path enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "scanInScopeFiles:79536f264fd406980cdb23ba68b0ca180c285aa47de32e83598ac705db685c23",
+      "class": "declared-tooling-exemption",
+      "reason": "sized blob enumeration is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "readCommitBlobMap:59301094edd07e7f82c4b121accc8d06f6c55c9777c1eca3bd010b8a7b0eb807",
+      "class": "declared-tooling-exemption",
+      "reason": "blob batching is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-doc-inventory.mjs",
+      "siteId": "carryForwardIdentityRegistry:0a943128baabe04ac45449896e2dd10fc55f15ef9dd5a1ca21237abd27c423d6",
+      "class": "declared-tooling-exemption",
+      "reason": "sized entry lookup is byte-pinned reproduction evidence in blob a52981ff2862cc2c553dbb3181e4e822a26b146b; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "siteId": "resolveCommitSha:67539c0c154f72f4f547c9c5483b8b9e149080c4e5dad0eb434251e200b52bdc",
+      "class": "declared-tooling-exemption",
+      "reason": "explicit commit resolution is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "siteId": "loadCommitTree:466434e47ec5f655be7a53b2e7c154107d75beb8f6db65c0a279c67323a688de",
+      "class": "declared-tooling-exemption",
+      "reason": "path enumeration is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    },
+    {
+      "path": "scripts/generate-shipped-path-inventory.mjs",
+      "siteId": "readBlobAtCommit:d9f8a50630af644e7b1c746bd04d04c8a47bb7daea80688b6ba5622a928a0821",
+      "class": "declared-tooling-exemption",
+      "reason": "immutable text show is byte-pinned reproduction evidence in blob 0f1cd7e1cee308772c0b56c37f3190333039cfb3; the generator must remain byte-identical.",
+      "retireWhen": "The plan reproduction manifests, readers and owning proofs/consumers retire together, or a separate owner ruling supersedes that evidence contract."
+    }
+  ]
+}

@@ -217,7 +217,7 @@ scanning the source alone was sufficient without also adding the generated
 copy as a second root.
 
 **Live confirmation of the fold-into-spec convention (`tsk-1fp-6`).** A
-later, unrelated item (superseding `docs/specs/distribution.md`'s install
+later, unrelated item (superseding `docs/platform/packaging-distribution/spec.md#spec-packaging-distribution`'s install
 entry-point law) had been planned three hours and twenty minutes *before*
 D5's retirement actually merged, still assuming the old convention (write
 a new numbered `docs/decisions/00NN-*.md` file). Caught on a re-scan for

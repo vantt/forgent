@@ -18,7 +18,7 @@ CASE (the person's own words, do not rephrase): "decide whether the experimental
 
 **Evidence against the hypothesis — the stronger finding**
 
-The shell is a native window loading the daemon's existing website. [main.rs:47](/home/vantt/projects/mdview/crates/mdview-desktop/src/main.rs:47) creates `WebviewUrl::External(url)`. Its entire application source is 144 lines, with no `Engine`, `SqliteStore`, renderer, indexer, search implementation, document cache, or Tauri command bridge.
+The shell is a native window loading the daemon's existing website. main.rs:47 creates `WebviewUrl::External(url)`. Its entire application source is 144 lines, with no `Engine`, `SqliteStore`, renderer, indexer, search implementation, document cache, or Tauri command bridge.
 
 The shared web interface has gained capabilities without corresponding shell edits:
 
@@ -49,11 +49,11 @@ There is already client-local state, but it belongs to the shared web frontend r
 
 The desktop is a daemon client; CLI and MCP are not exclusively daemon clients:
 
-- [runtime.rs:13](/home/vantt/projects/mdview/crates/mdview/src/runtime.rs:13) opens `registry.db` and constructs an `Engine`.
+- runtime.rs:13 opens `registry.db` and constructs an `Engine`.
 - `crates/mdview/src/cli.rs` calls that helper for registration, opening, searching, refreshing, and unregistering.
-- [mcp.rs:15](/home/vantt/projects/mdview/crates/mdview/src/mcp.rs:15) independently opens the same database and creates its own `Engine`.
+- mcp.rs:15 independently opens the same database and creates its own `Engine`.
 - `runtime.rs::spawn_refresh_detached` launches a separate `mdview refresh` process.
-- [repository.rs:34](/home/vantt/projects/mdview/crates/mdview-core/src/repository.rs:34) explicitly documents concurrent database access by daemon, CLI, MCP, and detached refresh, and configures a 15-second busy timeout.
+- repository.rs:34 explicitly documents concurrent database access by daemon, CLI, MCP, and detached refresh, and configures a 15-second busy timeout.
 
 Thus one shared registry and shared domain implementation coexist with multiple process-local engines and database connections. Registry mutation and CLI search are already outside the HTTP daemon process. "One daemon" and "one process owns every registry operation" are different claims here.
 

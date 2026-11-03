@@ -1,4 +1,6 @@
-use crate::rules::{packaged_rules, Cardinality, Rule, RuleSet, RuleShape};
+use crate::rules::{
+    glob_specificity, packaged_rules, Cardinality, Posture, Rule, RuleSet, RuleShape,
+};
 use fgos_host_runtime::civil_time::{
     days_from_civil, format_offset, format_unix_millis_rfc3339, parse_rfc3339_millis,
     parse_rfc3339_offset_seconds,
@@ -42,6 +44,8 @@ pub struct Violation {
     pub path: String,
     pub code: String,
     pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posture: Option<Posture>,
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
@@ -166,38 +170,61 @@ pub fn check_all(root: &Path) -> Result<CheckOutcome, ConventionError> {
     let rules = packaged_rules();
     let mut paths = Vec::new();
     for rule in &rules.rules {
-        if rule.shape != RuleShape::NameTemplate {
-            continue;
-        }
         for scope in &rule.scope {
-            let Some(directory) = scope.strip_suffix("*.md") else {
+            let segments = scope.split('/').collect::<Vec<_>>();
+            let literal = segments
+                .iter()
+                .take_while(|s| !s.contains(['*', '<']))
+                .count();
+            let directory = if literal == segments.len() {
+                segments[..literal.saturating_sub(1)].join("/")
+            } else {
+                segments[..literal].join("/")
+            };
+            let Some(absolute) = scope_directory_without_symlinks(root, &directory)? else {
                 continue;
             };
-            let Some(absolute) = scope_directory_without_symlinks(root, directory)? else {
-                continue;
-            };
-            let entries = match std::fs::read_dir(&absolute) {
-                Ok(entries) => entries,
-                Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
-                Err(error) => return Err(ConventionError::Io(error.to_string())),
-            };
-            for entry in entries {
-                let entry = entry.map_err(|error| ConventionError::Io(error.to_string()))?;
-                let file_type = entry
-                    .file_type()
-                    .map_err(|error| ConventionError::Io(error.to_string()))?;
-                if file_type.is_file() && entry.path().extension().is_some_and(|ext| ext == "md") {
-                    paths.push(format!(
-                        "{directory}{}",
-                        entry.file_name().to_string_lossy()
-                    ));
-                }
-            }
+            enumerate_scope(root, &absolute, scope, &mut paths)?;
         }
     }
     paths.sort();
     paths.dedup();
     check_paths_with_rules(rules, &paths)
+}
+
+fn enumerate_scope(
+    root: &Path,
+    directory: &Path,
+    scope: &str,
+    paths: &mut Vec<String>,
+) -> Result<(), ConventionError> {
+    let entries = match std::fs::read_dir(directory) {
+        Ok(entries) => entries,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+        Err(error) => return Err(ConventionError::Io(error.to_string())),
+    };
+    for entry in entries {
+        let entry = entry.map_err(|error| ConventionError::Io(error.to_string()))?;
+        let kind = entry
+            .file_type()
+            .map_err(|error| ConventionError::Io(error.to_string()))?;
+        let relative = entry
+            .path()
+            .strip_prefix(root)
+            .map_err(|error| ConventionError::Io(error.to_string()))?
+            .to_string_lossy()
+            .replace('\\', "/");
+        if kind.is_dir() {
+            // Descend only when the scope admits descendants. Never follow a
+            // directory symlink, including a symlink at a declared scope root.
+            if scope.contains("**") || relative.split('/').count() < scope.split('/').count() {
+                enumerate_scope(root, &entry.path(), scope, paths)?;
+            }
+        } else if glob_matches(scope, &relative) {
+            paths.push(relative);
+        }
+    }
+    Ok(())
 }
 
 fn scope_directory_without_symlinks(
@@ -231,22 +258,19 @@ pub fn classify_with_rules(
     if !valid_repo_path(path) {
         return Err(ConventionError::InvalidPath);
     }
-    let mut matches = rules
-        .placement_rules()
-        .filter_map(|rule| {
-            let glob = rule.glob.as_deref()?;
-            glob_matches(glob, path).then_some((glob_specificity(glob), rule))
-        })
-        .collect::<Vec<_>>();
-    matches.sort_by(|left, right| right.0.cmp(&left.0));
-    let Some((_, rule)) = matches.first() else {
-        return Err(ConventionError::UnknownKind);
-    };
+    let rule = placement_rule(rules, path).ok_or(ConventionError::UnknownKind)?;
     Ok(ClassifyOutcome {
         kind: rule.kind.clone(),
         cardinality: rule.cardinality.expect("validated placement rule"),
         scope: rule.scope.clone(),
     })
+}
+
+fn placement_rule<'a>(rules: &'a RuleSet, path: &str) -> Option<&'a Rule> {
+    rules
+        .placement_rules()
+        .filter(|rule| glob_matches(rule.glob.as_deref().unwrap_or_default(), path))
+        .max_by_key(|rule| glob_specificity(rule.glob.as_deref().unwrap_or_default()))
 }
 
 fn resolve_time(input: &NameInput<'_>) -> Result<(String, String, String), ConventionError> {
@@ -320,6 +344,14 @@ fn valid_plan_dir(value: &str) -> bool {
 }
 
 fn check_path(rules: &RuleSet, path: &str) -> Option<Violation> {
+    if let Some(rule) = placement_rule(rules, path) {
+        return rule.forbidden.then(|| Violation {
+            path: path.to_owned(),
+            code: "forbidden-placement".into(),
+            message: format!("path is forbidden by placement rule '{}'", rule.id),
+            posture: Some(rule.posture),
+        });
+    }
     let file_name = path.rsplit('/').next().unwrap_or(path);
     let scoped = rules
         .rules
@@ -572,6 +604,7 @@ fn violation(path: &str, code: &str, message: &str) -> Violation {
         path: path.to_owned(),
         code: code.to_owned(),
         message: message.to_owned(),
+        posture: None,
     }
 }
 
@@ -596,18 +629,23 @@ fn glob_segments_match(pattern: &[&str], segments: &[&str]) -> bool {
 }
 
 fn segment_matches(pattern: &str, segment: &str) -> bool {
-    pattern == "*"
-        || (pattern.starts_with('<') && pattern.ends_with('>') && !segment.is_empty())
-        || pattern == segment
-}
-
-fn glob_specificity(glob: &str) -> Vec<u8> {
-    glob.split('/')
-        .map(|segment| match segment {
-            "**" => 0,
-            "*" => 1,
-            value if value.starts_with('<') && value.ends_with('>') => 2,
-            _ => 3,
+    if pattern == segment {
+        return true;
+    }
+    let parts = pattern
+        .split_once('<')
+        .and_then(|(prefix, rest)| {
+            let (_, suffix) = rest.split_once('>')?;
+            Some((prefix, suffix, true))
         })
-        .collect()
+        .or_else(|| {
+            pattern
+                .split_once('*')
+                .map(|(prefix, suffix)| (prefix, suffix, false))
+        });
+    parts.is_some_and(|(prefix, suffix, nonempty)| {
+        segment.starts_with(prefix)
+            && segment.ends_with(suffix)
+            && segment.len() >= prefix.len() + suffix.len() + usize::from(nonempty)
+    })
 }

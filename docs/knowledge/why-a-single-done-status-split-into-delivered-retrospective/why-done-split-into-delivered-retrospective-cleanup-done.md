@@ -371,5 +371,5 @@ recorded.
 
 ---
 
-**Source:** `docs/history/work-item-status-delivered-retrospective-cleanup/CONTEXT.md`
+**Source:** `docs/history/work-item-status-delivered-retrospective-cleanup/CONTEXT.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
 (tsk-1ca, D1-D16); work-item capture via `fgos check tsk-1ca`.

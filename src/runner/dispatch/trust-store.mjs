@@ -9,7 +9,7 @@
 // before doing anything at all. Measured 2026-09-06, with zero worktree paths
 // present among the operator's own 145 entries — interactive dispatch into a
 // worktree had never once worked. Evidence:
-// docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/.
+// docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-p6/.
 //
 // WHY IT IS A SEPARATE MODULE. Writing into a file another tool owns is exactly
 // the kind of thing that should happen in one place, with one set of rules, so

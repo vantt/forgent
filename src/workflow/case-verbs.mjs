@@ -21,7 +21,7 @@ import {
 } from './case-lock.mjs';
 import { drainCaseInbox, recordGateAnswerRound } from './case-runtime.mjs';
 import { closeCaseUnderHold, readCaseProjection } from './case-close.mjs';
-import { detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
+import { admitRecordedWorkflow, detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
 import { runCaseGate } from './case-gate.mjs';
 import { advanceWorkflowRun } from './runner.mjs';
 import { normalizeSeats } from './seats.mjs';
@@ -123,7 +123,7 @@ export function startWorkflowDetached(params = {}) {
  * @returns {Promise<object>} Projected workflow state
  */
 export async function startWorkflow(params = {}) {
-  const { workflowRunId, workflow, mainRoot, worktreePath, frame, request, parent, inherits } = prepareWorkflowRun(params);
+  const { workflowRunId, workflow, mainRoot, worktreePath, frame, request, parent, documentationAdmission, inherits } = prepareWorkflowRun(params);
 
   let opened = false;
   try {
@@ -131,7 +131,7 @@ export async function startWorkflow(params = {}) {
       openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath, parent, inherits });
       opened = true;
       if (workflow.guide.kind === 'guide') return conductorResult(mainRoot, workflowRunId);
-      return advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog: params.onLog });
+      return advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, documentationAdmission, onLog: params.onLog });
     });
   } finally {
     refundIfNotOpened({ mainRoot, parent, opened });
@@ -187,18 +187,20 @@ function recordAnswer(workflowRunId, params, mainRoot) {
 /**
  * Try `advance` once, then keep the answer as a round. Taking it first means an unfinished ledger tail is
  * repaired before the ledger is read; when it is taken, the round is folded into the ledger at once. Returns
- * the hold, or null when a live proposer holds `advance` and will record the answer itself.
+ * the hold (null when a live proposer will record the answer) and the lease admission. The lease
+ * reads the repaired ledger, but still refuses before this call records a new answer.
  */
 function takeAndRecord(workflowRunId, params, mainRoot) {
   const hold = tryAcquireAdvanceLock(mainRoot, workflowRunId);
   try {
+    const documentationAdmission = admitRecordedWorkflow({ mainRoot, workflowRunId });
     recordAnswer(workflowRunId, params, mainRoot);
     if (hold) drainCaseInbox({ mainRoot, caseId: workflowRunId, hold });
+    return { hold, documentationAdmission };
   } catch (err) {
     hold?.release();
     throw err;
   }
-  return hold;
 }
 
 const recordedByLiveProposer = (mainRoot, workflowRunId) => ({
@@ -223,12 +225,12 @@ const recordedByLiveProposer = (mainRoot, workflowRunId) => ({
 export async function answerWorkflow(workflowRunId, params = {}) {
   if (!workflowRunId) throw new RunnerConfigError('answerWorkflow requires workflowRunId');
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, params, 'answerWorkflow');
-  const hold = takeAndRecord(workflowRunId, params, mainRoot);
+  const { hold, documentationAdmission } = takeAndRecord(workflowRunId, params, mainRoot);
   if (hold === null) return recordedByLiveProposer(mainRoot, workflowRunId);
   try {
     const { state, projection } = readCase(mainRoot, workflowRunId);
     if (isConductor(projection)) return conductorResult(mainRoot, workflowRunId);
-    return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
+    return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold, documentationAdmission });
   } finally {
     hold.release();
   }
@@ -244,7 +246,7 @@ export async function answerWorkflow(workflowRunId, params = {}) {
 export function answerWorkflowDetached(workflowRunId, params = {}) {
   if (!workflowRunId) throw new RunnerConfigError('answerWorkflow requires workflowRunId');
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, params, 'answerWorkflow');
-  const hold = takeAndRecord(workflowRunId, params, mainRoot);
+  const { hold } = takeAndRecord(workflowRunId, params, mainRoot);
   if (hold === null) return recordedByLiveProposer(mainRoot, workflowRunId);
   hold.release();
   if (isConductor(readCase(mainRoot, workflowRunId).projection)) return conductorResult(mainRoot, workflowRunId);
@@ -295,13 +297,17 @@ export async function resumeWorkflow(workflowRunId, options = {}) {
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, options, 'resumeWorkflow');
   let hold = tryAcquireAdvanceLock(mainRoot, workflowRunId);
   if (hold === null) {
-    if (heldConductor(mainRoot, workflowRunId)) return conductorResult(mainRoot, workflowRunId);
+    if (heldConductor(mainRoot, workflowRunId)) {
+      admitRecordedWorkflow({ mainRoot, workflowRunId });
+      return conductorResult(mainRoot, workflowRunId);
+    }
     hold = acquireAdvanceLock(mainRoot, workflowRunId); // refuses, naming the holder
   }
   try {
+    const documentationAdmission = admitRecordedWorkflow({ mainRoot, workflowRunId });
     const state = readResumeState(workflowRunId, mainRoot, options);
     if (isConductor(readCase(mainRoot, workflowRunId).projection)) return conductorResult(mainRoot, workflowRunId);
-    return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
+    return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold, documentationAdmission });
   } finally {
     hold.release();
   }
@@ -321,10 +327,12 @@ export function resumeWorkflowDetached(workflowRunId, options = {}) {
   let conductor = false;
   const hold = tryAcquireAdvanceLock(mainRoot, workflowRunId);
   if (hold === null) {
+    admitRecordedWorkflow({ mainRoot, workflowRunId });
     if (!heldConductor(mainRoot, workflowRunId)) acquireAdvanceLock(mainRoot, workflowRunId); // refuses, naming the holder
     conductor = true;
   } else {
     try {
+      admitRecordedWorkflow({ mainRoot, workflowRunId });
       readResumeState(workflowRunId, mainRoot, options);
       conductor = isConductor(readCase(mainRoot, workflowRunId).projection);
     } finally {

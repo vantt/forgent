@@ -9,7 +9,7 @@ domain: core | role: indexer | scope: enduser-docs | requires-skill: fgos-indexi
 
 ## Output
 - Regenerated catalog `docs/enduser-docs-index.json`.
-- Pointer in `docs/specs/reading-map.md` verified/updated for `docs/enduser-docs-index.json`.
+- Pointer in `docs/reading-map.md#documentation-reading-map` verified/updated for `docs/enduser-docs-index.json`.
 
 ## Gates
 - Soft: Idempotent regeneration — skips disk write when index content is unchanged.

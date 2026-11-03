@@ -189,5 +189,5 @@ actually in place.
   `blocked -> doing` there vs. `blocked -> proposed` here).
 - `fgos check <id>` — full outcome/friction history for an item, including
   the entries quoted above.
-- `docs/specs/runner.md` D4 — the byte-identical-mirror invariant that
+- `docs/platform/runner/spec.md` D4 — the byte-identical-mirror invariant that
   `test/skills/fgos-mirror.test.mjs` enforces.

@@ -15,6 +15,14 @@ Related:
 - docs/platform/packaging-distribution/spec.md
 - docs/platform/packaging-distribution/contracts/skill-package-distribution.md
 - docs/platform/packaging-distribution/contracts/projection-ledger.md
+Implementation: Original section-specific implementation statements retained; provenance does not certify current implementation
+Provenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b
+Writer type: Human + agent coauthor
+Canonical for: The topic stated by this document, subject to the unchanged switchboard route and independent review
+Use this when: Reading this area topic and its retained design details
+Do not use this for: Claiming a truth review or an authority cutover from carriage alone
+Supersedes: No authority transition in this carriage pass
+Superseded by: None recorded
 ```
 
 ## 1. Purpose
@@ -28,7 +36,7 @@ Rendering is downstream. The hard contract is composition semantics: order, auth
 | Concern | Owner |
 | --- | --- |
 | Meaning of a rule or instruction | Owning platform/component/domain |
-| Composition engine and registry shape (kind order, override, conflict, rule selection and budgets) | Agent Context Engine (RUL102, `docs/specs/distribution.md`); the code still lives in `src/setup/instruction-registry.mjs` and `src/setup/instruction-composition.mjs` as the engine's seed until its first budget/tiering slice moves it |
+| Composition engine and registry shape (kind order, override, conflict, rule selection and budgets) | Agent Context Engine (RUL102, `docs/platform/packaging-distribution/spec.md#lịch-sử-quyết-định`); the code still lives in `src/setup/instruction-registry.mjs` and `src/setup/instruction-composition.mjs` as the engine's seed until its first budget/tiering slice moves it |
 | Source discovery and install, render adapters, projection ledger, stale checks, projection health and repair | Packaging-distribution |
 | Host-specific file syntax | Host adapter |
 | Runtime execution behavior after instructions are read | Owning runtime/workflow component |

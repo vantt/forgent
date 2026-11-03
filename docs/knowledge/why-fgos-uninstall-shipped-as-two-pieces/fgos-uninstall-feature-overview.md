@@ -11,7 +11,7 @@ own branch).
 ## The starting ask
 
 The item's own description named the gap directly: fgOS's 7
-distribution-vision pillars (`docs/distribution-vision.md`) had no
+distribution-vision pillars (`docs/platform/packaging-distribution/history/distribution-vision.md#cài-đặt-setup-doctor-của-fgos-tầm-nhìn-nền-tảng`) had no
 uninstall branch at all, and flagged that scope needed to be chosen
 before anything could be built — "cần chốt scope (những gì tính là
 'harness/file liên quan' cần gỡ) trước khi thi công."

@@ -2,20 +2,26 @@
 
 ```txt
 Document type: Proof preservation table
-Audience: Human reviewer, architect, maintainer, documentation agent
-Purpose: Preserve Agent Coordination proof roots and consuming claims during migration
-Design status: Draft
-Implementation: Partial
-Provenance: Created from Phase 0 source inventory and documentation-standardization plan
+Audience: Human reviewer, maintainer and implementation agent
+Purpose: Navigate preserved design and historical material without asserting a retired runtime
+Design status: Archived
+Implementation: Retired engine material is non-authority history; verified retained units remain unchanged
+Provenance: Source material from `docs/platform/agent-coordination/history/documentation-migration/proof-preservation.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; retirement framing, metadata and current-owner navigation are adapted here.
 Writer type: Human + agent coauthor
-Canonical for: Migration proof tracking only
-Use this when: Linking implemented claims from target docs to evidence
-Do not use this for: Replacing proof artifacts or verification logs
-Last reviewed: 2026-09-18
+Canonical for: Retained-document navigation only; no current engine authority
+Use this when: Locating current execution owners or auditing historical claims
+Do not use this for: Reinstating CoordinationSession, CoordinationProtocol or FlowDefinition as current implementation
+Last reviewed: No current review date recorded; retained source dates are historical
 Related:
-- docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md
-- docs/architect/agent-coordination/verification/README.md
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/decisions/h-aabefc85f0c9.md#coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner
+- docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proof-preservation.md
+Supersedes: Stale current-state framing only; all old claims are preserved verbatim
+Superseded by: Runtime ownership in docs/platform/runner/spec.md#spec-runner-vòng-tự-hành
+Carriage note: Retirement framing and current-owner navigation
 ```
+
+2026-11-03 cutover note: The legacy runner citation above is a historical coordinate, not a post-cutover link. Prepared successors: `docs/platform/runner/spec.md`.
 
 Proof trees must remain linkable. Summary rows here do not replace the proof
 roots, logs, current-cell files, reviews, red-team reports, or known gaps.

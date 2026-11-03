@@ -1,77 +1,48 @@
 # Agent Coordination Concept Relationships
 
+```txt
 Document type: Vocabulary
-Design status: Accepted
-Implementation: Partial
-Last reviewed: 2026-08-31
-Canonical for: concept layering, ownership, and relationship rules
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: `docs/architect/agent-coordination/vocabulary/concept-relationships.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Layer Map
 
-```txt
-Objective/lifecycle
-  Mission (optional, proposed)       Work (durable lifecycle authority)
-            \                         /
-             -> CoordinationSession <-
-
-Planning and constraints (composable)
-  Agent-led runtime planning -----------\
-  optional Coordination Protocol -------+-> semantic execution contract
-  Workflow -> Stage -> Stage Operation -/       -> TaskSpec or validated inline contract
-  optional domain/organization harness --------> enrichment / validation
-
-Coordination runtime
-  CoordinationSession -> optional AdhocTask graph -> Assignment
-
-Dispatch/runtime
-  Assignment -> DispatchPlan -> Dispatcher -> Executor -> Run -> RunResult
-
-Evidence/visibility
-  RunResult -> Evidence / Artifact
-  Run       -> Herdr visibility
-```
-
-Dashed/proposed concepts in prose are defined in
-[Canonical Concepts](canonical-concepts.md) with explicit design status.
+Current execution chain: Workflow step or inline request -> Assignment -> DispatchPlan -> Run -> RunResult -> evidence -> driver decision. Unit/CollaborationPattern and Workflow runtime ownership is described by docs/platform/runner/spec.md. The former session layer map is preserved only in the historical snapshot.
 
 ## Runtime Profiles
 
-```txt
-Work-attached
-  Work
-    -> optional CoordinationSession
-      -> optional declared protocol / agent-led planning / domain harness
-      -> zero, one, or many AdhocTasks
-        -> Assignment -> Run -> RunResult / Evidence
-    -> outcome returned to Work driver
-
-Standalone
-  optional Mission
-    -> CoordinationSession
-      -> agent-led or optional declared protocol planning
-      -> zero, one, or many AdhocTasks
-        -> Assignment -> Run -> RunResult / Evidence
-      -> Synthesis
-```
-
-The profiles share planning-contract, dispatch, runtime, and evidence machinery
-and may share declared protocols when selected. They do not share lifecycle
-authority.
+The retired CoordinationSession profiles are historical. Workflow nodes call the Unit runner; Unit runs use CollaborationPattern. Neither revives FlowDefinition or a CoordinationSession store. Evidence: src/workflow/runner.mjs:419-428; src/runner/execution/run.mjs:532-540.
 
 ## Ownership Rules
 
 | Concern | Owner |
 |---|---|
-| Work status/stage/claim/approval/merge | Work engine verbs |
-| Legal lifecycle transition | Workflow graph and Work driver |
-| Legal operation in a stage/phase | Active protocol graph |
-| Legal dynamic execution | Foundation policy plus validated inline execution contract |
+| Work status/workflowStep/claim/approval/merge | Work engine verbs |
+| Workflow dependency progression | Workflow runner and definition |
+| Legal step operation | Workflow definition's operations and selected domain doctrine |
+| Legal inline execution | Validated inline contract and execution admission |
 | Input/output/evidence contract | TaskSpec or validated inline Assignment contract |
 | Adaptive execution judgment | Skill, within hard constraints |
-| Role responsibility | Declared protocol or validated dynamic execution contract |
-| Dynamic planning proposal | Coordinator agent/Skill, within policy and budget |
-| Domain plan/resource/evidence validation | Selected domain/organization harness |
-| Task dependencies/progress | CoordinationSession/AdhocTask runtime, proposed |
+| Role responsibility | Workflow operation, Unit or validated inline contract |
+| Dynamic planning proposal | Caller/Skill; no private execution authority |
+| Domain-specific task/evidence validation | Registered domain harness; do not imply all proposed domains ship |
 | Executor/provider/model/mechanism | Dispatch control plane |
 | Runtime attempt | Run |
 | Normalized claim and provenance | RunResult |
@@ -79,59 +50,63 @@ authority.
 
 ## Creation Rules
 
-- Normal intake creates Work.
-- A Work driver may start a Work-attached CoordinationSession.
-- An authorized standalone caller may start a session without Work.
-- A session may lower directly to one Assignment or materialize validated
-  AdhocTasks from a declared or dynamically proposed graph.
-- Independent lifecycle candidates create child Work only through normal Work
-  intake.
-- A declared operation selection or validated inline execution contract creates
-  an Assignment request.
-- Dispatch creates a Run for an Assignment.
-- Runtime settlement produces one RunResult per Run.
-- Synthesis reads accepted result/evidence refs; it does not create truth.
+- Intake creates durable Work through the existing Work write door.
+- A Workflow operation, Unit or validated inline request creates the applicable
+  Assignment; creating an execution request does not create a second Work item.
+- Dispatch admits a Run under the Assignment's effective policy and governance.
+- Retry/replacement creates another Run, retaining the Assignment and prior
+  attempt records; it does not overwrite a failed attempt with a new identity.
+- Result normalization belongs to the RunResult owner. Evidence informs the
+  consuming driver, not a second lifecycle engine.
+
+These are authority boundaries; the actual current door is Unit/Workflow
+execution, not the removed Mission/session planner.
 
 ## Critical Non-Equivalences
 
 ```txt
-Work != Mission
-Work != AdhocTask
-AdhocTask != Assignment
+Work lifecycle != Unit/Workflow execution completion
 Assignment != Run
 Run != RunResult
 Role != Executor
 Skill != TaskSpec
-Stage Operation != Assignment
-Coordination Protocol != CoordinationSession requirement
+Workflow step operation != Assignment
 Herdr state != Evidence
 Synthesis != Approval
-Job != Assignment/Run/Task
-Capability != Purpose (purpose/--for is a compatibility alias for Capability, not a third routing identity)
-Job != Capability/Executor-id (Job is unused, reserved for a future scheduler; it is never a dispatch target)
+Job != Assignment/Run/Work
+Purpose/--for = compatibility terminology for Capability, not a third route identity
+Job != Capability/Executor-id (reserved for a future scheduler, never a dispatch target)
 ```
 
 ## Lifecycle And Isolation
 
-Lifecycle ownership and execution isolation are independent:
+Lifecycle ownership and execution isolation are independent design axes:
 
 ```txt
-lifecycle: inherited | independent
-isolation: shared | isolated
+lifecycle design: inherited | independent
+isolation design: shared | isolated
 ```
 
-An inherited isolated task may use an ephemeral branch/worktree without
-becoming Work. Independent child Work uses Work-owned durable isolation and
-merge behavior.
+This two-axis schema is conceptual, not persisted fields accepted by the current
+Unit/Assignment validator. A temporary worktree does not alone create Work.
+Durable child Work still needs its own Work lifecycle and integration policy;
+parallel writes require the owning execution path's isolation checks.
 
 ## Coordination Rings
 
-```txt
-Strategic ring  = Orchestrator
-Activation ring = Launcher
-Flow ring       = Router + Driver
-Execution ring  = Dispatcher
-```
+The earlier strategic/activation/flow/execution ring names are a responsibility
+model, not verified current entities named Orchestrator, Launcher, Router and
+Driver. Current concrete owners are the Workflow runner for sequencing,
+Execution Core binding and patterns for Unit execution, dispatch adapters for
+attempts, and Work verbs for delivery lifecycle.
+
+Adopted responsibility model: The owner adopts this responsibility model. No
+Orchestrator, Launcher, Router, Driver or Dispatcher class or entity is required
+or planned.
 
 The rings are responsibility boundaries, not necessarily one process or module
 per ring.
+
+Adopted responsibility model: Concrete responsibility owners remain
+`src/workflow/runner.mjs`, `src/runner/execution/patterns` and
+`src/runner/dispatch`; this does not revive the retired session engine.

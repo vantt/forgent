@@ -1,5 +1,5 @@
 // working-tree-clean-unified.test.mjs — proves choke-point #2 from
-// docs/decisions/0022-fgos-choke-point-survey.md is actually fixed:
+// decision 0022 (fgos choke point survey) is actually fixed:
 // `return` (subtree scope) and `approve` (whole-repo scope) now share ONE
 // isWorkingTreeClean implementation (src/runner/merge.mjs), parameterized by
 // `scope`, instead of two independently-written functions. test/runner/merge.test.mjs

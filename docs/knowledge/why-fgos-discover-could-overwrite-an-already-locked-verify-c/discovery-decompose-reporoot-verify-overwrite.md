@@ -189,6 +189,6 @@ merged, not just planned.
 - `docs/explanation/fgos-discover-verify-path-drift.md` — a related but
   distinct `verify`-correctness issue (a wrong path guess for a
   never-locked value, not an overwrite of an already-locked one).
-- `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
+- `docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity`
   — cites this bug as live evidence for a separate, still-open doctrine
   question; explicitly out of scope here (D3).

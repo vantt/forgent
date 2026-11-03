@@ -67,7 +67,7 @@ CLI-subprocess handling.
 ## What v1 deliberately does not cover
 
 - **D3** — the orchestrator-to-herdr relationship is unchanged:
-  `docs/specs/runner.md` RUL40 stays as-is, driving herdr purely through
+  `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` RUL40 stays as-is, driving herdr purely through
   its existing `PaneOrchestrator` port. Herdr is never trusted as a
   decision signal; the orchestrator reads real work-item state back only
   through `WorkItemSource` (the fgOS CLI), never from herdr's own report.
@@ -87,7 +87,7 @@ CLI-subprocess handling.
 
 Global daemon state (lock, project registry, listening port/config)
 lives at `~/.fgos/config.json` and sibling files under `~/.fgos/` — this
-settles a previously open question in `docs/distribution-vision.md:112`
+settles a previously open question in `docs/platform/packaging-distribution/history/distribution-vision.md`
 ("where does fgOS read global config from?"), now decided here.
 
 ## D10 then D9: a real versioned API contract first, an MCP surface after

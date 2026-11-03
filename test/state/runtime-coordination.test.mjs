@@ -110,7 +110,7 @@ test('settleClaim settles directly (no durable intermediate doing) and releases 
   assert.equal(events.work['tsk-1'].lastAttempt.from, 'todo');
   assert.equal(events.work['tsk-1'].lastAttempt.to, 'awaiting-approval');
 
-  // tsk-40m (docs/architect/doing-coordination-redesign.md §7.3/§9.2):
+  // tsk-40m (docs/platform/proposals/doing-coordination-redesign.md §7.3/§9.2):
   // the durable log carries exactly work.attempt + ONE work.move, straight
   // from preClaimStatus to finalStatus -- no durable work.move(->doing)
   // leg at all.
@@ -796,7 +796,7 @@ test('settleClaim to finalStatus:"awaiting-human" with no ask writes NOTHING dur
   assert.equal(readClaim(dir, 'tsk-1').claimId, claim.claimId);
 });
 
-// tsk-40m (docs/architect/doing-coordination-redesign.md §7.3): a
+// tsk-40m (docs/platform/proposals/doing-coordination-redesign.md §7.3): a
 // same-state settle (finalStatus === preClaimStatus -- e.g. a branch-take
 // item failing verify again while already 'blocked') has nothing to
 // durably move: status-fsm.mjs has no self-loop edges by design. The

@@ -167,7 +167,7 @@ export function canAutoApprove(item, artifactText, level) {
   // - Negated prose ("no auth/audit risk applies here") still hard-gates —
   //   accepted, because teaching the floor to parse negation would turn it
   //   from mechanical/lexical into an interpretive read, exactly what its own
-  //   design principle (docs/explanation/gate-bypass-design.md) exists to prevent.
+  //   design principle (docs/knowledge/why-gate-bypass-is-shaped-the-way-it-is/gate-bypass-design.md#why-the-skip-criterion-is-mechanical-not-a-confidence-read) exists to prevent.
   const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));
   if (hardGateHit) return false;
 

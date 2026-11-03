@@ -69,7 +69,7 @@ its shell mirror in `plugins/fgOS/skills/terminal/rename.sh`, every test
 fixture exercising that constant, the README's `<!-- BEE:BACKLOG-BADGES
 -->` marker (confirmed behavior-inert first — no script or CI workflow
 in the repo reads that literal string), and the two live specs
-(`docs/specs/runner.md`, `docs/specs/work-state.md`) that documented the
+(`docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md#pointers-implementation`, `docs/platform/work-state/spec.md#2-entry-points-and-triggers`) that documented the
 same env-var priority in prose. It passed verify (`npm test`) on its
 first attempt, with one real friction along the way: an unrelated
 `goal-check` step failed once on the working branch with exit `127`

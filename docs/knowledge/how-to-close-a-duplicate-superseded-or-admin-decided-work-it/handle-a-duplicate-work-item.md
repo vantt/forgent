@@ -113,5 +113,5 @@ commit `f3424e6` on `fgw/tsk-1ua`, verified by the full suite:
   and why `compound-learn` doesn't apply to it).
 - `docs/history/fsm-wontfix-terminal-status/plan.md` — the implementation
   shape and risk map.
-- `docs/specs/work-state.md` Data Dictionary row #4 — the full status
+- `docs/platform/work-state/spec.md#3-work-item-data-dictionary` Data Dictionary row #4 — the full status
   domain reference, including `wontfix`'s formal edge list.

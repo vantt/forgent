@@ -500,6 +500,7 @@ function decide(ask, ctx, walk) {
  *   seat must differ from), preferIndependentOf ([{ seat, executor }] it should differ from), blind,
  *   workflowTier, raiseAuthorized
  * @param {object} ctx { runnerConfig, session }
+ *   Execution admission belongs to the calling door, not seat choice or replay.
  * @param {object} [options]
  * @param {object} [options.walk] where the seat stands after a failure
  * @param {object[]} [options.walk.tried] the seat's earlier bindings, oldest first (empty: the first binding)

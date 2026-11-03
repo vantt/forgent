@@ -13,13 +13,13 @@ Use this when: Continuing the documentation-system discussion or evaluating its 
 Do not use this for: Current documentation authority or current product behavior
 Last reviewed: 2026-09-25
 Related:
-- `../../doc-governance.md`
+- `../governance.md`
 - `../../reading-map.md`
 - `../README.md`
 - `../../../plans/260925-documentation-authority-unification/plan.md`
-- `../../../plans/260825-1841-knowledge-registry/plan.md`
-- `../../architect/documentation-system-design.md`
-- `../../architect/knowledge-registry-redesign.md`
+- `archive/plans/260825-1841-knowledge-registry/plan.md`
+- `docs/platform/documentation/architecture/documentation-system-design.md`
+- `docs/platform/proposals/knowledge-registry-redesign.md`
 ```
 
 This proposal preserves the complete discussion so it can continue without chat
@@ -65,7 +65,7 @@ each says how to tell that it is met.
 
 - Retiring `docs/specs/**` and `docs/architect/**` (owned by the cutover lane, plan 260925).
 - Building anything before the specification is approved.
-- Changing locked laws L1 to L10, or `AGENTS.md`, before Phase 9 of plan 260925.
+- Changing locked laws L1 to L10, or `AGENTS.md`, before the approved atomic documentation cutover.
 - Cross-session messaging (the MAIL lane).
 - Measuring agent behaviour at scale (A/B runs): not an objective of this system.
 
@@ -77,7 +77,7 @@ system:
 
 | Horizon | Outcome | Relationship to current work |
 |---|---|---|
-| H1 — Platform authority unification | End the active split between `docs/platform/**` and legacy/current `docs/specs/**` + `docs/architect/**`; switch all platform readers/writers in one cutover | Active priority; execution plan: `plans/260925-documentation-authority-unification/plan.md` |
+| H1 — Platform authority unification | Platform readers/writers use declared promoted owners and retained root authorities; former maintained specs/architect trees are retired | Atomic cutover complete; remaining verification and closeout stay in plans/260925-documentation-authority-unification/plan.md. H2/H3 remain separate deferred horizons. |
 | H2 — Knowledge and Documentation Engine | Generalize the existing end-user registry into the durable multi-profile authority for documents, claims, decisions, provenance, graph relationships, and read models | Preserved future architecture; maintenance MVP begins after H1 cutover |
 | H3 — Agent Context Engine | Compile instructions, effective decisions, and budgeted task-scoped reading plans from canonical authority | Preserved future architecture; never a blocker for H1 |
 
@@ -85,19 +85,16 @@ The already-implemented `tsk-28x` twelve-phase plan is historical foundation,
 not this proposal's implementation plan. It lives at
 `plans/260825-1841-knowledge-registry/` and covers the end-user
 knowledge/Diataxis registry whose code foundation landed at commit
-`5c948d2a4`; corpus migration followed in the `tsk-5mh` commit series and
-enforcement later flipped at `6cce97ab3`. Its historical path `plans/260825-1841-knowledge-registry/` is
-preserved. It must not be renamed to imply a whole-platform engine or interpreted
+`5c948d2a4`. Enforcement flipped at `6cce97ab3` on 2026-08-27 before the 332
+`tsk-5mh` migration commits later that day; projections were regenerated at
+`1c6aa7a4`. Its historical path `plans/260825-1841-knowledge-registry/` is
+preserved, and current-state corrections live beside it rather than rewriting
+its historical phase files. It must not be renamed to imply a whole-platform engine or interpreted
 as completion of the future Knowledge and Documentation Engine.
 
 ### 0.1. Immediate problem statement
 
-The hot problem is simpler than the full architecture: fgOS has fragmented
-platform authority across `docs/platform/**`, `docs/specs/**`,
-`docs/architect/**`, and root authority documents. Some areas have already been
-promoted independently while others remain candidate or legacy/current, so this
-is not a clean two-tree starting state. The first success is one explicit
-platform authority model and route, not a completed knowledge platform.
+After accepted atomic cutover, each platform claim has one declared owner in the promoted topology or a retained root authority. Retiring maintained trees no longer provide live authority; source provenance/history remains separate. This states the whole post-cutover topology without promoting H2/H3.
 
 ### 0.2. Sequence law
 
@@ -161,8 +158,8 @@ The repository already defines:
   links forming a reading graph;
 - eleven templates for the main maintained document types.
 
-The primary current sources are `docs/doc-governance.md`,
-`docs/reading-map.md`, `docs/platform/README.md`, and `docs/templates/**`.
+The primary current sources are `docs/platform/governance.md#documentation-governance`,
+`docs/reading-map.md`, `docs/platform/README.md`, and `docs/platform/documentation/history/templates/**`.
 
 ### 2.2. Existing CLI and registry
 
@@ -376,7 +373,7 @@ flowchart TD
 
 ### 4.1. Canonical prose governance
 
-`docs/doc-governance.md` remains the human-readable authority explaining the
+`docs/platform/governance.md#documentation-governance` remains the human-readable authority explaining the
 rules and rationale. The proposal must not create a second prose constitution.
 
 ### 4.2. Machine-readable documentation constitution

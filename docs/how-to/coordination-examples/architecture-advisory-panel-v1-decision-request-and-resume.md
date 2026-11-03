@@ -9,14 +9,14 @@ needs to re-derive.
 ## Part 1 — the real pattern: both sessions to date sent zero
 
 **Honest disclosure, not a gap being smoothed over:** neither
-[P01.2](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/decision-request.md)
+[P01.2](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/decision-request.md)
 nor P01.3 ever sent a Decision Request to the person. Both wrote the file
 anyway, because "we decided not to ask" is itself a decision that needs a
 record — a successor coordinator should never re-derive it from nothing, or
 worse, re-ask what was already reasoned through. Here is P01.2's real
 verdict table, **condensed from the source** (the reasoning is the
 artifact — read
-[`decision-request.md`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/decision-request.md)
+[`decision-request.md`](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/decision-request.md)
 itself for the full, unabridged text of every cell):
 
 | Candidate gap | User-exclusive? | Material now? | Disposition |
@@ -62,7 +62,7 @@ self-containment:
 ```
 
 Say P01.3's real
-[`scout-report.md`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/scout-report.md)
+[`scout-report.md`](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/scout-report.md)
 had additionally surfaced this constructed twist: the real
 `alert_dispatch_intraday.py` path writes trade-signal alerts to a log with
 no configured retention policy, and separately, whether the standing

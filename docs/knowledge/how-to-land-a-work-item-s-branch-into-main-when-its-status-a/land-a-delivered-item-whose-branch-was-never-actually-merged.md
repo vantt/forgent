@@ -16,7 +16,7 @@ fgw/<id> main` is still `false`. Two confirmed real cases: `tsk-64h` and
 `tsk-2t5` (verified 2026-08-12), both `ahead: 2` of `main` despite
 reading `delivered`. This is not theoretical: `tsk-2t5`'s own three
 verify clauses failed on `main` for real, because the spec it was
-supposed to have updated (`docs/specs/runner.md`) still carried the
+supposed to have updated (`docs/platform/runner/spec.md#spec-runner-vòng-tự-hành`) still carried the
 old, dead 22-status vocabulary the item's own branch had already fixed.
 
 ## Diagnose
@@ -58,7 +58,7 @@ Left unfixed, this keeps two audit-flagged instabilities open:
   status alone (a spec, a report, another item's `deps` check) is reading
   a fact that isn't real yet.
 - **Stage invariant drift** — a spec document can keep teaching a dead
-  vocabulary (in this real case, `docs/specs/runner.md` still described
+  vocabulary (in this real case, `docs/platform/runner/spec.md#spec-runner-vòng-tự-hành` still described
   a 22-status lifecycle a locked `discoverableStages` change had already
   retired everywhere else) simply because the commit that was supposed to
   retire it never actually reached `main`.

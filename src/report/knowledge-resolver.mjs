@@ -15,8 +15,8 @@ export function resolveDocPath(view, path) {
   if (!view || !view.docs || !path) return null;
 
   // "Live" means the doc itself is neither retired nor superseded, AND its
-  // own topic is still active -- docs/architect/knowledge-registry-
-  // redesign.md §14.3's producer gate explicitly requires attestation to
+  // own topic is still active -- docs/platform/proposals/knowledge-registry-redesign.md
+  // §14.3's producer gate explicitly requires attestation to
   // reject retired topics, not just retired documents; a superseded doc is
   // excluded the same way because doc.supersede already moved "current" to
   // supersededBy, so this doc is no longer the authoritative slot occupant

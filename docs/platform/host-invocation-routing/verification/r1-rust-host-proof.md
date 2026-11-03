@@ -5,14 +5,20 @@ Document type: Verification
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the proof gate for the distributable Rust CLI host
 Design status: Draft
-Implementation status: Published preview installed/default proof plus open stable graduation
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
 Last reviewed: 2026-09-21
 Related:
 - docs/platform/host-invocation-routing/architecture/release-boundaries.md
 - docs/platform/host-invocation-routing/verification/compatibility-harness.md
+Implementation: Published preview installed/default proof plus open stable graduation
+Provenance: `docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; `docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Preserve the proof gate for the distributable Rust CLI host
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
 
 ## 1. Required Proof
@@ -81,4 +87,4 @@ Post-release CI: 35498322149, success, including external consumer proof
 | release boundaries | [../architecture/release-boundaries.md](../architecture/release-boundaries.md) |
 | compatibility harness | [compatibility-harness.md](compatibility-harness.md) |
 | release manifest contract | [../../packaging-distribution/contracts/release-manifest.md](../../packaging-distribution/contracts/release-manifest.md) |
-| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+| source plan | ../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md |

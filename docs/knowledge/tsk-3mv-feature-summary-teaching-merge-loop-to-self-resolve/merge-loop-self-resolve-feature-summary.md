@@ -11,7 +11,7 @@ mode: explanation
 
 This is the root-level synthesis for `tsk-3mv`, tying together its two
 children (`tsk-3mv-1`, `tsk-3mv-2`) into the one feature they were split
-from — per `docs/specs/runner.md` RUL25, a decomposed root's own proposal
+from — per `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` RUL25, a decomposed root's own proposal
 represents the whole feature exactly once, so this document does the same
 at the doc layer: the two children's own `docs/explanation/` pages each
 cover their own half in depth; this page is the one place that explains
@@ -87,12 +87,12 @@ failing, 5 pre-existing skips.
 
 ## Related
 
-- `docs/explanation/merge-auto-resolves-decision-id-collision.md` —
+- `docs/explanation/merge-loop-self-diagnoses-verify-fail-post-merge.md` —
   `tsk-3mv-1`'s own synthesis.
 - `docs/explanation/merge-loop-self-diagnoses-verify-fail-post-merge.md` —
   `tsk-3mv-2`'s own synthesis.
 - `docs/history/tsk-3mv-merge-loop-self-resolve/CONTEXT.md` and `plan.md` —
   the full locked-decision and shaping record both children executed
   against.
-- `docs/specs/runner.md` RUL25/RUL26/RUL27 — the fan-out-parallel rules
+- `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` RUL25/RUL26/RUL27 — the fan-out-parallel rules
   this root's own close-out ran into the edge of.

@@ -5,14 +5,20 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define HostInvocation, OperationRequest, ContractRef, ProviderOutcome, ProviderError, and lifecycle outcomes
 Design status: Draft
-Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/invocation-kernel.md
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
+Implementation: Current partial
+Provenance: `docs/platform/host-invocation-routing/contracts/operation-request-outcome.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Define HostInvocation, OperationRequest, ContractRef, ProviderOutcome, ProviderError, and lifecycle outcomes
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
 
 ## 1. Contract
@@ -48,4 +54,4 @@ Providers never block waiting for a person. If human input is required, the prov
 | --- | --- |
 | kernel architecture | [../architecture/invocation-kernel.md](../architecture/invocation-kernel.md) |
 | component protocol | [component-protocol.md](component-protocol.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| source architecture | `../spec.md#host-invocation-and-provider-routing-architecture` |

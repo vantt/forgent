@@ -100,7 +100,7 @@ whatever outcome a later fix adds too.
 
 Landed as one coherent piece: the pre-call `mergeHeadExists` check, its
 two `approve` call sites, `sync-root`'s defensive guard, and the matching
-`CATCHUP_REASONS`/`docs/specs/runner.md` updates. Explicitly out of
+`CATCHUP_REASONS`/`docs/platform/runner/operations/h-51f5cd7279fd.md#đồng-bộ-lại-một-việc-đỗ-catch-up` updates. Explicitly out of
 scope: `tsk-2j9`'s already-delivered abort-crash guard (a *missing*
 `MERGE_HEAD`) and `tsk-18a`'s already-delivered conflict/unclassified
 split (a `MERGE_HEAD` this call itself created or never created) — both

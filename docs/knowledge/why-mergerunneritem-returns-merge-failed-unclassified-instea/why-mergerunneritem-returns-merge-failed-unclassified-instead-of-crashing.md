@@ -64,7 +64,7 @@ failure — never silently discarded, never mislabeled as a textual
 conflict it wasn't. That new reason was wired into
 `bin/fgos.mjs`'s `CATCHUP_REASONS` alongside `merge-conflict`,
 `verify-fail-post-merge`, and `integration-drift`, and documented in
-`docs/specs/runner.md` — a blocked item with this reason is now
+`docs/platform/runner/operations/h-51f5cd7279fd.md#đồng-bộ-lại-một-việc-đỗ-catch-up` — a blocked item with this reason is now
 catchup-eligible like the others, not a dead end.
 
 ## A residual bug found while proving the fix, in the same function

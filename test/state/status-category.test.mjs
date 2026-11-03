@@ -2,8 +2,7 @@ import '../helpers/process-tmp-root.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // test/state/status-category.test.mjs — decision record 0027 (D2/D3):
 // `statusCategory` is frozen onto the `work.move`/`work.add` event payload
-// at WRITE time (store.mjs), never derived on read (docs/platform-
-// foundations.md's L3 replay-from-zero law). This file proves the schema
+// at WRITE time (store.mjs), never derived on read (docs/platform/platform-foundations.md's L3 replay-from-zero law). This file proves the schema
 // exists (STATUS_CATEGORIES, work.mjs) and that the write door stamps it
 // correctly for the six front-segment statuses (DOMAINS.coding.statusLabels,
 // domain-registry.mjs) while leaving the four tail-segment statuses
@@ -198,7 +197,7 @@ test('addWork stamps statusCategory for the initial status ("todo" -> "todo") on
   assert.equal(view.work['add-stamped'].statusCategory, 'todo');
 });
 
-// Replay-from-zero (docs/platform-foundations.md L3): an event written
+// Replay-from-zero (docs/platform/platform-foundations.md L3): an event written
 // before this field existed carries no statusCategory at all — folding it
 // must not throw, and must not retroactively compute one (that would be
 // derive-on-read, which L3 forbids; see STATUS_CATEGORIES's own doc

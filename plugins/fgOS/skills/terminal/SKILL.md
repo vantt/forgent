@@ -21,7 +21,7 @@ the short id is the first 8 characters of the task id, the title is cut at
 id alone. The port builds that text from the fields the script passes (one
 format for the shell and for dispatched panes); the agent tool's own session
 id is not shown, and full ids stay in the allocation record. Pure
-herdr chrome (per STR40 — `docs/operator-runbook-herdr-cockpit.md`),
+herdr chrome (per STR40 — `docs/platform/herdr-web-dashboard/operations/operator-runbook.md#operator-runbook-herdr-cockpit`),
 written through the terminal-control port: it takes the caller's own pane
 (`fgos internal terminal-control attach`, keyed by this session's writer id,
 idempotent) and then writes the label (`label`). It never reads or writes

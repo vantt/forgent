@@ -53,7 +53,7 @@ the caller, never an environment probe.
 Work that changes files adds `--writes <paths> --worktree <linked
 worktree>`; the runner commits only those paths. (`dispatch.mjs execute`,
 with its `--cwd`/`--repo-root` flags, was removed; decision 0062 in
-`docs/specs/runner.md`.)
+`docs/platform/runner/decisions/h-36d872fbb0e5.md#0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability`.)
 
 ## Reuse The Shared Fragment
 

@@ -27,6 +27,12 @@ function collectFiles(dir, extensions = ['.js', '.mjs', '.cjs', '.json', '.yaml'
   return results;
 }
 
+function collectPlatformSpecs() {
+  return collectFiles(path.join(REPO_ROOT, 'docs', 'platform'), ['.md'])
+    .filter((file) => file.endsWith(`${path.sep}spec.md`) &&
+      !path.relative(path.join(REPO_ROOT, 'docs', 'platform'), file).split(path.sep).includes('history'));
+}
+
 test('dead vocabulary guard: Phase 1-3 retired symbols do not appear in src, bin, core, domains, scripts, config, or non-history docs', () => {
   const deadSymbols = [
     'modelForTier',
@@ -56,7 +62,7 @@ test('dead vocabulary guard: Phase 1-3 retired symbols do not appear in src, bin
     path.join(REPO_ROOT, 'docs', 'platform', 'agent-coordination', 'contracts'),
     path.join(REPO_ROOT, 'docs', 'architect', 'agent-coordination', 'contracts'),
   ];
-  const docFiles = docDirs.flatMap((d) => collectFiles(d, ['.md']));
+  const docFiles = [...docDirs.flatMap((d) => collectFiles(d, ['.md'])), ...collectPlatformSpecs()];
 
   const violations = [];
   const symbolRegexes = deadSymbols.map((sym) => ({ symbol: sym, regex: new RegExp(`\\b${sym}\\b`) }));
@@ -410,7 +416,7 @@ test('dead vocabulary guard: Request-to-Run P5 retired symbols (FlowDefinition, 
   ];
 
   const searchDirs = ['docs/specs', 'core', 'domains'].map((d) => path.join(REPO_ROOT, d));
-  const docFiles = searchDirs.flatMap((d) => collectFiles(d, ['.md']));
+  const docFiles = [...searchDirs.flatMap((d) => collectFiles(d, ['.md'])), ...collectPlatformSpecs()];
   const agentsMd = path.join(REPO_ROOT, 'AGENTS.md');
   if (fs.existsSync(agentsMd)) docFiles.push(agentsMd);
   const readmeMd = path.join(REPO_ROOT, 'README.md');
@@ -490,6 +496,7 @@ test('dead vocabulary guard: the fgos gateway and the herdr-dashboard plugin nev
   const roots = ['src', 'bin', 'core', 'domains', 'packages', 'apps', 'herdr-dashboard', path.join('docs', 'specs')];
   const files = [
     ...roots.flatMap((d) => walk(path.join(REPO_ROOT, d))),
+    ...collectPlatformSpecs(),
     path.join(REPO_ROOT, 'AGENTS.md'),
     path.join(REPO_ROOT, 'docs', 'platform', 'component-boundary.md'),
   ];

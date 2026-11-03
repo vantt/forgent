@@ -1,5 +1,5 @@
 // Regression coverage for choke-point-take-vs-pick-claim-eligibility
-// (docs/decisions/0022-fgos-choke-point-survey.md, candidate #1): `take` and
+// (decision 0022, fgos choke point survey, candidate #1): `take` and
 // `pick` used to disagree on whether an item still at stage `clarify`/
 // `decompose` is claimable — `take --id <id>` hard-rejected it while
 // `pick --id <id>` allowed it, even though `fgos-routing`'s own "Claim"

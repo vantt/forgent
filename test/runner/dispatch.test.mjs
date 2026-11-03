@@ -2104,7 +2104,7 @@ test('loadRunnerConfig rejects a "executors.<id>" entry whose forceCliSpawn is n
 });
 
 // --- decideDispatchMechanism (tsk-3ik-1, Native-First Dispatch Doctrine
-// rules 1/2/4, docs/decisions/0026-...md) — pure decision, no cfg lookup ---
+// rules 1/2/4, decision 0026) — pure decision, no cfg lookup ---
 
 test('decideDispatchMechanism: no native mechanism always resolves out-of-process, regardless of live access or force flag (rule 1)', () => {
   assert.equal(decideDispatchMechanism({ hasNativeMechanism: false, hasLiveTaskAccess: true, forceCliSpawn: false }), 'out-of-process');

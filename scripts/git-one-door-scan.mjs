@@ -26,6 +26,12 @@
 //   - rust-test: Rust code under `tests/` or `#[cfg(test)]`;
 //   - standalone-skill-script: code of a skill whose own SKILL.md declares `metadata.oneDoor: standalone`
 //     (owner decision 2026-10-20): outside the product one-door boundary, reported and counted.
+// Explicit owner declarations extend these classes by exact path + function/call digest, never by
+// line number. Pass-through argv binds the sorted multiset of resolved wrapper caller-call digests;
+// unresolved caller escapes refuse the declaration unless the program has proven configuration
+// provenance. Hook verb claims must equal literal caller verbs; tooling declarations require reads.
+// Tooling that cannot use an existing port has its own declared-tooling-exemption class; every
+// declaration carries its reason and retirement condition and must match exactly one raw site.
 //
 // Usage: node scripts/git-one-door-scan.mjs [--json] [--root <dir>] [--write-census]
 // The release build writes the census (packages/git/contracts/mutation-census.v1.json); doctor's
@@ -36,7 +42,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lexSource } from './lib/js-source-lexer.mjs';
-import { STANDALONE_SKILL_CLASS, shellRunsGit, standaloneSkillOf } from './lib/git-spawn-match.mjs';
+import { READ_VERBS, STANDALONE_SKILL_CLASS, hookVerb, shellRunsGit, standaloneSkillOf } from './lib/git-spawn-match.mjs';
 import { repositoryDirs, repositoryFiles } from './lib/git-dir-layout.mjs';
 import { createGitInspect, gitPortOptions } from '../src/git/inspect.mjs';
 
@@ -50,7 +56,6 @@ const SHELLS = new Set(['sh', 'bash', 'zsh', 'dash', 'cmd', 'cmd.exe', 'powershe
 const PASSTHROUGH = new Set(['env', 'nice', 'timeout', 'xargs', 'sudo', 'nohup', 'stdbuf', 'npx']);
 const HOOK_NAMES = new Set(['pre-commit', 'prepare-commit-msg', 'commit-msg', 'post-commit', 'pre-push', 'pre-rebase', 'post-checkout', 'post-merge', 'pre-receive', 'post-receive', 'update', 'reference-transaction', 'pre-merge-commit', 'post-rewrite']);
 // Verbs that only read, keyed by `hookVerb`: `reflog` and `symbolic-ref` count only in their read forms.
-const READ_VERBS = new Set(['reflog show', 'reflog exists', 'config --get', 'config --get-all', 'config --list', 'rev-parse', 'diff', 'show', 'cat-file', 'ls-files', 'ls-tree', 'log', 'merge-base', 'for-each-ref', 'symbolic-ref read', 'rev-list', 'var', 'version', '--version', 'check-attr', 'check-ignore', 'name-rev', 'describe']);
 const WRITE_VERBS = /\bgit\s+(?:-C\s+\S+\s+)?(add|commit|push|pull|fetch|merge|rebase|reset|checkout|switch|restore|rm|mv|stash|tag|cherry-pick|revert|am|apply|clean|init|clone|update-ref|update-index|gc|prune|notes|hook\s+run|worktree\s+(?:add|remove|prune|move|lock|unlock|repair)|branch\s+-[dDfmM]|config\s+(?!--get|-l|--list)[\w.-]+\s+\S)/;
 const PROHIBITION = /\b(never|not|don't|do not|no longer|instead of|refuse[sd]?|forbid|rather than|without)\b/i;
 
@@ -341,6 +346,11 @@ class JsFile {
     if (callMember) {
       const close = splitArgs(shapeExpr, callMember[0].length - 1).close;
       const tail = shapeExpr.slice(close + 1).trim();
+      // A computed property of a returned config object keeps that object's provenance too.
+      if (tail.startsWith('[') && splitArgs(tail, 0).close === tail.length - 1) {
+        const key = /^\[\s*(['"])(.*?)\1\s*\]$/.exec(expr.slice(close + 1).trim())?.[2] ?? '*';
+        return this.property(expr.slice(0, close + 1), [key], index, depth + 1);
+      }
       if (tail && /^(?:\??\.[A-Za-z_$][\w$]*)+$/.test(tail)) {
         const keys = tail.split(/\??\./).filter(Boolean);
         if (/^[A-Z][A-Z0-9]*_[A-Z0-9_]+$/.test(keys.at(-1))) return [{ external: `env ${keys.at(-1)}` }];
@@ -1167,22 +1177,6 @@ function scriptText(file, id, index) {
   return unknown ? null : text;
 }
 
-/** The verb of a Git argv (its words after `git`), in the form READ_VERBS keys: `config` with its
- * first option, `reflog` with its subcommand (`show` when none), and `symbolic-ref` as `read` only
- * when it names one ref and sets or deletes nothing. */
-function hookVerb(words) {
-  let i = 0;
-  while (i < words.length && /^(-C|-c|--git-dir|--work-tree)$/.test(words[i])) i += 2;
-  const [verb, ...rest] = words.slice(i);
-  if (verb === 'config') return `config ${rest[0]}`;
-  if (verb === 'reflog') return `reflog ${rest[0] && !rest[0].startsWith('-') ? rest[0] : 'show'}`;
-  if (verb === 'symbolic-ref') {
-    const sets = rest.some((w) => /^(-d|--delete|-m)$/.test(w)) || rest.filter((w) => !w.startsWith('-')).length !== 1;
-    return `symbolic-ref ${sets ? 'write' : 'read'}`;
-  }
-  return verb;
-}
-
 function firstVerbs(file, open) {
   // Literal argv verbs at a call: the literals of the argv array.
   const { args } = splitArgs(file.shape, open);
@@ -1203,7 +1197,7 @@ function scanJs(name, source, ctx) {
       if (cls === 'other') continue;
       if (cls === 'external') { ctx.classes.push({ ...record, class: 'configured-binary' }); continue; }
       if (cls === 'param') { ctx.wrappers.push({ file, site, entry, record }); continue; }
-      ctx.raw.push({ ...record, family: cls === 'unknown' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : entry.shell ? 'shell' : site.fn === 'runBorrowed' ? 'borrowed' : 'spawn', file, site, enclosing: enclosing(file.spans, site.open) });
+      ctx.raw.push({ ...record, family: cls === 'unknown' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : entry.shell ? 'shell' : site.fn === 'runBorrowed' ? 'borrowed' : 'spawn', programValue: entry.value, file, site, enclosing: enclosing(file.spans, site.open) });
     }
   }
   // The consumer-command marker is accepted only on a spawn whose binary is not a literal: it marks data
@@ -1385,13 +1379,16 @@ function valueFlowCalls(ctx, file, fn) {
 function computeValueFlow(ctx, file, fn) {
   const calls = [];
   const escapes = [];
+  let aliasedExport = false;
   const items = [];
   const seen = new Set();
   const followed = new Set();
   const escape = (f, at, why) => escapes.push(`${why} (${f.name}:${lineOf(f.source, Math.max(0, at))})`);
+  // A nonempty path can be a registry slot or a function's own .execute property, not a
+  // module namespace. Keep namespace-import provenance until the held function is selected.
   const push = (item) => {
     if (item.path.length > 4) return; // a cycle such as `fn.execute = fn`: shorter paths already cover its reads
-    const key = `${item.kind}:${item.file.name}:${item.scope?.from ?? -1}:${item.name}:${item.path.join('.')}`;
+    const key = `${item.kind}:${item.file.name}:${item.scope?.from ?? -1}:${item.name}:${item.path.join('.')}:${!!item.namespace}`;
     if (seen.has(key)) return;
     if (seen.size >= MAX_FLOW_ITEMS) { escape(item.file, 0, 'value flow too wide'); return; }
     seen.add(key);
@@ -1405,27 +1402,27 @@ function computeValueFlow(ctx, file, fn) {
     return f.binding(id, at)?.scope ?? null;
   };
   // A parameter receiving the value (at `path`): a plain name, or a destructuring that takes its key.
-  const intoParam = (f, span, param, path, at) => {
+  const intoParam = (f, span, param, path, at, namespace) => {
     const text = param.trim();
     if (text.startsWith('...')) { escape(f, at, 'passed into a rest parameter'); return; }
     if (text.startsWith('{')) {
       const pattern = text.slice(0, splitArgs(lexSource(text).shape, 0).close + 1);
       if (!path.length) { escape(f, at, 'destructured as a function'); return; }
-      for (const [key, local] of destructuredPairs(pattern)) if (key === path[0]) push({ kind: 'name', file: f, scope: span, name: local, path: path.slice(1) });
+      for (const [key, local] of destructuredPairs(pattern)) if (key === path[0]) push({ kind: 'name', file: f, scope: span, name: local, path: path.slice(1), namespace: namespace && path.length > 1 });
       return;
     }
     const name = text.replace(/\s*=[\s\S]*$/, '');
-    if (IDENT_RE.test(name)) push({ kind: 'name', file: f, scope: span, name, path });
+    if (IDENT_RE.test(name)) push({ kind: 'name', file: f, scope: span, name, path, namespace });
     else escape(f, at, 'passed into an unreadable parameter');
   };
   // A value handed to a callee the scan cannot resolve, under a key: every receiver of that key.
-  const byKey = (f, at, path) => {
+  const byKey = (f, at, path, namespace) => {
     if (!path.length) { escape(f, at, 'passed to an unresolved callee'); return; }
     const index = keyIndex(ctx);
-    for (const d of index.destructured.get(path[0]) ?? []) push({ kind: 'name', file: d.file, scope: d.scope, name: d.local, path: path.slice(1) });
+    for (const d of index.destructured.get(path[0]) ?? []) push({ kind: 'name', file: d.file, scope: d.scope, name: d.local, path: path.slice(1), namespace: namespace && path.length > 1 });
     for (const r of index.reads.get(path[0]) ?? []) {
       const start = r.at - (/[\w$.?\][)]*$/.exec(r.file.shape.slice(Math.max(0, r.at - 200), r.at))?.[0].length ?? 0);
-      follow(r.file, start, r.at + r.length, path.slice(1));
+      follow(r.file, start, r.at + r.length, path.slice(1), namespace && path.length > 1);
     }
   };
   // The expression [start, end) in `f` holds the function at property `path` of its value. Follows
@@ -1434,8 +1431,8 @@ function computeValueFlow(ctx, file, fn) {
   const pending = [];
   const follow = (...flow) => { pending.push(flow); };
   const drain = () => { while (pending.length) followNow(...pending.shift()); };
-  const followNow = (f, start, end, path) => {
-    const flowKey = `${f.name}:${start}:${end}:${path.join('.')}`;
+  const followNow = (f, start, end, path, namespace = false) => {
+    const flowKey = `${f.name}:${start}:${end}:${path.join('.')}:${!!namespace}`;
     if (followed.has(flowKey)) return;
     followed.add(flowKey);
     for (;;) {
@@ -1444,9 +1441,9 @@ function computeValueFlow(ctx, file, fn) {
       if (path.length) {
         if ((m = new RegExp(`^\\s*(?:\\?\\.|\\.)\\s*(${IDENT})`).exec(tail))) {
           if (m[1] !== path[0] && path[0] !== '*') return; // another property: not this value
-          end += m[0].length; path = path.slice(1); continue;
+          end += m[0].length; path = path.slice(1); namespace &&= path.length > 0; continue;
         }
-        if ((m = /^\s*(?:\?\.)?\[/.exec(tail))) { end = splitArgs(f.shape, end + m[0].length - 1).close + 1; path = path.slice(1); continue; }
+        if ((m = /^\s*(?:\?\.)?\[/.exec(tail))) { end = splitArgs(f.shape, end + m[0].length - 1).close + 1; path = path.slice(1); namespace &&= path.length > 0; continue; }
         if (/^\s*(?:\?\.)?\(/.test(tail)) return; // calling the holder: its result is not the holder
       } else {
         if ((m = /^\s*(?:\?\.|\.)\s*bind\s*\(/.exec(tail))) { end = splitArgs(f.shape, end + m[0].length - 1).close + 1; continue; }
@@ -1466,13 +1463,13 @@ function computeValueFlow(ctx, file, fn) {
     if (stop === '=') {
       if ((m = /\b(?:const|let|var)\s*\{([^}]*)\}\s*$/.exec(head))) {
         if (!path.length) { escape(f, at, 'destructured as a function'); return; }
-        for (const [key, local] of destructuredPairs(`{${f.code.slice(at - m[0].length, at).match(/\{([^}]*)\}/)[1]}}`)) if (key === path[0]) push({ kind: 'name', file: f, scope: enclosing(f.spans, at), name: local, path: path.slice(1) });
+        for (const [key, local] of destructuredPairs(`{${f.code.slice(at - m[0].length, at).match(/\{([^}]*)\}/)[1]}}`)) if (key === path[0]) push({ kind: 'name', file: f, scope: enclosing(f.spans, at), name: local, path: path.slice(1), namespace: namespace && path.length > 1 });
         return;
       }
-      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})\\s*$`).exec(head))) { push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path }); return; }
-      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})\\s*(?:\\?\\.)?\\[[^\\]\\n]*\\]\\s*$`).exec(head))) { push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path: ['*', ...path] }); return; }
+      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})\\s*$`).exec(head))) { push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path, namespace }); return; }
+      if ((m = new RegExp(`(?<![\\w$.])(${IDENT})\\s*(?:\\?\\.)?\\[[^\\]\\n]*\\]\\s*$`).exec(head))) { push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path: ['*', ...path], namespace }); return; }
       if ((m = new RegExp(`(?<![\\w$.])(${IDENT})((?:\\s*\\.\\s*${IDENT})+)\\s*$`).exec(head))) {
-        push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path: [...m[2].split('.').map((k) => k.trim()).filter(Boolean), ...path] });
+        push({ kind: 'name', file: f, scope: scopeOf(f, m[1], at), name: m[1], path: [...m[2].split('.').map((k) => k.trim()).filter(Boolean), ...path], namespace });
         return;
       }
       escape(f, at, 'assigned to an unreadable place');
@@ -1483,7 +1480,7 @@ function computeValueFlow(ctx, file, fn) {
       let outer = flowContext(f.shape, at);
       while (outer.stop === ',' || outer.stop === ':') outer = flowContext(f.shape, outer.at);
       if (outer.stop !== '{') { escape(f, at, 'an unreadable object key'); return; }
-      follow(f, outer.at, splitArgs(f.shape, outer.at).close + 1, [key?.[1] ?? key?.[2] ?? '*', ...path]);
+      follow(f, outer.at, splitArgs(f.shape, outer.at).close + 1, [key?.[1] ?? key?.[2] ?? '*', ...path], namespace);
       return;
     }
     if (stop === 'return') {
@@ -1492,7 +1489,7 @@ function computeValueFlow(ctx, file, fn) {
       if (literalMemberAt(f.shape, span) >= 0) { escape(f, at, `returned from method ${span.name}`); return; }
       for (const c of directCalls(ctx, f, span.name)) {
         const callee = new RegExp(`${IDENT}(?:\\s*\\.\\s*${IDENT})*\\s*(?:\\?\\.)?\\s*$`).exec(c.file.shape.slice(Math.max(0, c.open - 200), c.open));
-        follow(c.file, c.open - (callee?.[0].length ?? 0), splitArgs(c.file.shape, c.open).close + 1, path);
+        follow(c.file, c.open - (callee?.[0].length ?? 0), splitArgs(c.file.shape, c.open).close + 1, path, namespace);
       }
       return;
     }
@@ -1505,29 +1502,29 @@ function computeValueFlow(ctx, file, fn) {
       if (!spread && !IDENT_RE.test(ref)) return; // a statement inside a block: the value is not kept
       if (spread && !path.length) return; // spreading a function copies its own properties, not the function
       if (!/(?:[=(,:?[]|\breturn|=>)\s*$/.test(f.shape.slice(Math.max(0, outer.at - 12), outer.at))) return; // a block, not an object literal
-      follow(f, outer.at, close, spread ? path : [ref, ...path]);
+      follow(f, outer.at, close, spread ? path : [ref, ...path], namespace);
       return;
     }
     if (outer.stop === '(') {
       const calleeMatch = new RegExp(`(${IDENT}(?:\\s*\\.\\s*${IDENT})*)\\s*(?:\\?\\.)?\\s*$`).exec(f.shape.slice(Math.max(0, outer.at - 200), outer.at));
       const callee = calleeMatch?.[1].replace(/\s+/g, '');
       const close = splitArgs(f.shape, outer.at).close + 1;
-      if (!callee) { follow(f, outer.at, close, path); return; } // parentheses around the value
+      if (!callee) { follow(f, outer.at, close, path, namespace); return; } // parentheses around the value
       if (/^(if|while|switch|for|typeof|catch|with)$/.test(callee)) return; // tested, not kept
       const { args } = splitArgs(f.shape, outer.at);
       const index = args.findIndex(({ from, to }) => from <= start && end <= to);
       if (index < 0) return;
       if (callee === 'Reflect.set' && index === 2) {
         const table = f.code.slice(args[0].from, args[0].to).trim();
-        if (IDENT_RE.test(table)) push({ kind: 'name', file: f, scope: scopeOf(f, table, outer.at), name: table, path: ['*', ...path] });
+        if (IDENT_RE.test(table)) push({ kind: 'name', file: f, scope: scopeOf(f, table, outer.at), name: table, path: ['*', ...path], namespace });
         else escape(f, outer.at, 'stored into an unreadable table');
         return;
       }
-      if (callee === 'Object.freeze') { follow(f, outer.at - calleeMatch[0].length, close, path); return; }
+      if (callee === 'Object.freeze') { follow(f, outer.at - calleeMatch[0].length, close, path, namespace); return; }
       if (NO_FLOW_CALLEES.test(callee) || (callee === 'Reflect.set' && index === 0)) return; // reads or prints the value, never calls it
       const target = resolveFunction(ctx, f, callee);
-      if (target && target.fn.params[index] !== undefined) { intoParam(target.file, target.fn, target.fn.params[index], path, outer.at); return; }
-      byKey(f, outer.at, path);
+      if (target && target.fn.params[index] !== undefined) { intoParam(target.file, target.fn, target.fn.params[index], path, outer.at, namespace); return; }
+      byKey(f, outer.at, path, namespace);
       return;
     }
     if (outer.stop === '[') { escape(f, outer.at, 'stored in an array'); return; }
@@ -1545,18 +1542,65 @@ function computeValueFlow(ctx, file, fn) {
     while (outer.stop === ',' || outer.stop === ':') outer = flowContext(file.shape, outer.at);
     if (outer.stop === '{') follow(file, outer.at, splitArgs(file.shape, outer.at).close + 1, [fn.name]);
     else escape(file, fn.from, 'a member of an unreadable object');
-  } else {
+  } else if (fn.name) {
     push({ kind: 'name', file, scope: enclosing(file.spans, fn.from - 1), name: fn.name, path: [], origin: true });
+  } else {
+    // An anonymous callback can still be assigned to a named local (`const run = fallback ||
+    // ((command, args) => ...))`). Follow that expression to its binding, then to its calls.
+    follow(file, fn.from, fn.to + (file.shape[fn.bodyFrom] === '{' ? 1 : 0), []);
   }
   drain();
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     const f = item.file;
-    // A module-level binding is read wherever it is imported.
-    if (!item.scope && new RegExp(`export\\s+(?:const|let|var|(?:async\\s+)?function\\s*\\*?)\\s*${esc(item.name)}\\b|export\\s*\\{[^}]*\\b${esc(item.name)}\\b`).test(f.code)) {
-      for (const [other, alias] of importedAs(ctx, f, item.name)) push({ ...item, file: other, name: alias, origin: false });
+    // The caller resolver cannot follow export aliases/defaults. Treat those value flows as escapes,
+    // including aliases of a local alias, rather than letting a declaration hide their callers.
+    if (!item.scope) {
+      for (const exported of f.shape.matchAll(/\bexport\s*\{([^}]*)\}(?!\s*from\b)/g)) {
+        if (exported[1].split(',').some(part => {
+          const [local, alias] = part.trim().split(/\s+as\s+/);
+          return local === item.name && alias && alias !== local;
+        })) { aliasedExport = true; escape(f, exported.index, 'exported under an alias'); }
+      }
+      if (new RegExp(`\\bexport\\s+default\\s+(?:(?:async\\s+)?function\\s*\\*?\\s*)?${esc(item.name)}\\b`).test(f.shape)) { aliasedExport = true; escape(f, 0, 'exported as default'); }
     }
-    f.flowShape ??= f.shape.replace(/(?:import|export)\s*\{[^}]*\}\s*from\s*['"][^'"]*['"]/g, (m) => ' '.repeat(m.length));
+    // A module-level binding is read wherever it is imported. Star re-exports and exported
+    // namespace holders are not followed by the caller resolver: refuse them as export escapes.
+    if (!item.scope && new RegExp(`export\\s+(?:const|let|var|(?:async\\s+)?function\\s*\\*?)\\s*${esc(item.name)}\\b|export\\s*\\{[^}]*\\b${esc(item.name)}\\b`).test(f.code)) {
+      if (item.namespace) { aliasedExport = true; escape(f, 0, 'exported in a namespace holder'); }
+      else {
+        for (const [other, alias] of importedAs(ctx, f, item.name)) push({ ...item, file: other, name: alias, origin: false });
+        for (const other of importersOf(ctx, f)) {
+          const names = (spec) => spec.startsWith('.') && path.posix.normalize(path.posix.join(path.posix.dirname(other.name), spec)) === f.name;
+          // Only awaited namespace/destructured bindings are followed by the caller resolver.
+          // An inline member or promise callback must not hide a caller behind a read declaration.
+          for (const m of other.code.matchAll(/\bimport\s*\(\s*['"]([^'"]+)['"]/g)) {
+            if (!names(m[1])) continue;
+            const bound = /\b(?:const|let|var)\s+(?:[A-Za-z_$][\w$]*|\{[^}]*\})\s*=\s*await\s*$/.test(other.shape.slice(0, m.index));
+            if (bound && /^\s*\)/.test(other.shape.slice(m.index + m[0].length))) continue;
+            aliasedExport = true;
+            escape(other, m.index, 'imported dynamically in a form the caller resolver does not follow');
+          }
+          for (const m of other.code.matchAll(/export\s*(?:\{([^}]*)\}|\*(?:\s*as\s+[A-Za-z_$][\w$]*)?)\s*from\s*['"]([^'"]+)['"]/g)) {
+            if (!names(m[2])) continue;
+            if (m[1] === undefined) { aliasedExport = true; escape(other, m.index, 're-exported through a star'); }
+            else for (const part of m[1].split(',')) {
+              const [original, quoted] = part.trim().split(/\s+as\s+/);
+              if (original !== item.name) continue;
+              // Export names may be string literals (`as "default"`, `as 'x-y'`).
+              const alias = quoted?.replace(/^(['"])(.*)\1$/, '$2');
+              if (alias === 'default') { aliasedExport = true; escape(other, m.index, 'exported as default'); }
+              else if (alias !== undefined && !/^[A-Za-z_$][\w$]*$/.test(alias)) { aliasedExport = true; escape(other, m.index, 'exported under a string name'); }
+              else push({ ...item, file: other, name: alias ?? original, origin: false });
+            }
+          }
+          for (const m of other.code.matchAll(/import\s*\*\s*as\s+([A-Za-z_$][\w$]*)\s+from\s*['"]([^'"]+)['"]|(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*await\s+import\s*\(\s*['"]([^'"]+)['"]\s*\)/g)) {
+            if (names(m[2] ?? m[4])) push({ ...item, file: other, name: m[1] ?? m[3], path: [item.name, ...item.path], namespace: true, origin: false });
+          }
+        }
+      }
+    }
+    f.flowShape ??= f.shape.replace(/(?:import|export)\s*(?:\{[^}]*\}|\*(?:\s*as\s+[A-Za-z_$][\w$]*)?)\s*from\s*['"][^'"]*['"]/g, (m) => ' '.repeat(m.length));
     const shape = f.flowShape;
     const from = item.scope ? item.scope.from : 0;
     const to = item.scope ? item.scope.to : shape.length;
@@ -1572,15 +1616,15 @@ function computeValueFlow(ctx, file, fn) {
       if (params) {
         // Inside a parameter list: a default value flows into its parameter; a parameter name is a declaration.
         const dflt = new RegExp(`(${IDENT})\\s*=\\s*[^,]*$`).exec(shape.slice(params.from + 1, at));
-        if (dflt && params.params.some((p) => paramNames(p).includes(dflt[1]))) push({ kind: 'name', file: f, scope: params, name: dflt[1], path: item.path });
+        if (dflt && params.params.some((p) => paramNames(p).includes(dflt[1]))) push({ kind: 'name', file: f, scope: params, name: dflt[1], path: item.path, namespace: item.namespace });
         continue;
       }
       if (item.origin && /^\s*\.\s*[A-Za-z_$][\w$]*\s*=(?![=>])/.test(shape.slice(after, after + 80))) continue; // `fn.prop = ...` describes the function
-      follow(f, at, after, item.path);
+      follow(f, at, after, item.path, item.namespace);
     }
     drain();
   }
-  return { calls, escapes };
+  return { calls, escapes, aliasedExport };
 }
 
 /** Calls of a named function by name: in its own file and where it is imported (under any alias). */
@@ -1692,11 +1736,11 @@ function resolveWrappers(ctx) {
       continue;
     }
     if (!callers.length) {
-      ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (no caller found for ${fn?.name ?? 'anonymous function'})`, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
+      ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (no caller found for ${fn?.name ?? 'anonymous function'})`, programValue: value, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
       continue;
     }
     // The value also goes somewhere the flow cannot follow: the call sites found are not all of them.
-    if (flow?.escapes.length) ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (${fn.name} escapes: ${flow.escapes[0]})`, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
+    if (flow?.escapes.length) ctx.raw.push({ ...w.record, family: 'unresolved-binary', binary: `${w.record.binary} (${fn.name} escapes: ${flow.escapes[0]})`, programValue: value, file: w.file, site: w.site, enclosing: enclosing(w.file.spans, w.site.open) });
     for (const c of callers) {
       budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
       const { args } = splitArgs(c.file.shape, c.open);
@@ -1726,7 +1770,7 @@ function resolveWrappers(ctx) {
         if (cls === 'external') ctx.classes.push({ ...record, class: 'configured-binary' });
         else if (cls === 'param') queue.push({ file: c.file, site: { ...w.site, open: c.open }, entry, record, via: key });
         else if (cls === 'git' || cls === 'hook' || cls === 'unknown' || cls === 'shell' || cls === 'passthrough') {
-          ctx.raw.push({ ...record, family: cls === 'unknown' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : 'wrapper-caller', file: c.file, site: { ...w.site, open: c.open }, enclosing: enclosing(c.file.spans, c.open) });
+          ctx.raw.push({ ...record, family: cls === 'unknown' ? 'unresolved-binary' : cls === 'hook' ? 'hook-spawn' : 'wrapper-caller', programValue: v, file: c.file, site: { ...w.site, open: c.open }, enclosing: enclosing(c.file.spans, c.open) });
         }
       }
     }
@@ -2439,6 +2483,153 @@ function scanSkill(name, source, ctx) {
 
 // ---------- driver ----------
 
+// Shipped with scripts/, so verifyCensus binds this input just like the other Node payload files.
+export const GIT_DECLARATIONS_PATH = 'scripts/lib/git-one-door-declarations.v1.json';
+
+/** Comment-blanked call text, without preceding lines or offsets. */
+function declarationCallText(file, open) {
+  let start = open;
+  while (/\s/.test(file.shape[start - 1] ?? '')) start--;
+  let depth = 0;
+  let i = start - 1;
+  for (; i >= 0; i--) {
+    const c = file.shape[i];
+    if (')]}'.includes(c)) { depth++; continue; }
+    if (depth) { if ('([{'.includes(c)) depth--; continue; }
+    if (/[\w$.]/.test(c) || (c === '?' && file.shape[i + 1] === '.')) continue;
+    // Whitespace around member/index/call syntax belongs to the callee, not `return`/`await`.
+    if (/\s/.test(c) && (/\.$/.test(file.shape.slice(0, i).trimEnd())
+      || /^[.(\[]/.test(file.shape.slice(i + 1, start).trimStart()))) continue;
+    break;
+  }
+  return file.code.slice(i + 1, start).trim() + file.code.slice(open, splitArgs(file.shape, open).close + 1);
+}
+
+/** A literal argv verb, preserving unknown operands rather than mistaking their string fragments
+ * for a verb. Identity stays strict about spreads; read validation may accept a spread after a
+ * fixed verb, except when trailing operands select that verb's read/write form. */
+function declarationVerb(argv, allowTrailingSpread = false) {
+  const text = argv.trim();
+  const shape = lexSource(text).shape;
+  if (!text.startsWith('[') || splitArgs(shape, 0).close !== text.length - 1) return undefined;
+  const items = splitArgs(shape, 0).args.map(({ from, to }) => text.slice(from, to).trim());
+  const spread = items.findIndex(item => item.startsWith('...'));
+  if (!allowTrailingSpread && spread >= 0) return undefined;
+  const words = items.map(item => /^(['"])((?:\\.|(?!\1).)*)\1$/s.exec(item)?.[2]);
+  let i = 0;
+  for (; i < words.length;) {
+    if (/^(-C|-c|--git-dir|--work-tree)$/.test(words[i] ?? '')) { i += 2; continue; }
+    if (/^(?:--(?:no-replace-objects|no-optional-locks|bare|literal-pathspecs)|--(?:git-dir|work-tree)=.+)$/.test(words[i] ?? '')) { i++; continue; }
+    break;
+  }
+  if (!words[i] || words[i].startsWith('-') || (spread >= 0 && (spread <= i || ['config', 'reflog', 'symbolic-ref'].includes(words[i])))) return undefined;
+  return hookVerb(words.slice(i).map(word => word ?? '__operand__'));
+}
+
+/** Resolve declaration program operands through the same named/value callers as wrapper resolution.
+ * Escaping binary parameters cannot prove config: an unseen caller could supply a fixed Git program. */
+function declarationPrograms(ctx, file, programValue) {
+  budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
+  const seen = new Set();
+  const resolve = (values, depth = 0) => values.flatMap(v => {
+    if (v.param === undefined) return [v];
+    const home = v.file ?? file;
+    const key = `${home.name}:${v.fn.from}:${v.index}:${(v.path ?? []).join('.')}`;
+    if (depth > MAX_DEPTH || seen.has(key)) return [{ unknown: 'cyclic declaration program' }];
+    seen.add(key);
+    const flow = valueFlowCalls(ctx, home, v.fn);
+    const callers = dedupeCalls([...(v.fn.name ? callersOf(ctx, home, v.fn.name) : []), ...flow.calls]);
+    const resolved = callers.flatMap(c => {
+      const supplied = splitArgs(c.file.shape, c.open).args.map(a => c.file.code.slice(a.from, a.to));
+      return resolve(argumentValues(c.file, v, supplied, c.open, 0), depth + 1);
+    });
+    seen.delete(key);
+    if (!callers.length || flow.escapes.length) resolved.push({ unknown: 'unresolved declaration program caller' });
+    return resolved;
+  });
+  const values = resolve([programValue ?? { unknown: 'unresolved program' }]);
+  return {
+    fixedGit: values.some(v => binaryClass(v) === 'git'),
+    configured: values.length > 0 && values.every(v => binaryClass(v) === 'external'),
+  };
+}
+
+/** A pass-through site's identity also binds the sorted call digests of its wrapper. Reuse both
+ * caller resolvers: a callback handed under a key, or an anonymous local, is not called by name. */
+function declaredSiteId(ctx, file, site) {
+  const owner = enclosing(file.spans, site.open);
+  let fn = owner;
+  while (fn && !fn.name) fn = enclosing(file.spans, fn.from - 1);
+  const call = declarationCallText(file, site.open);
+  const { args } = splitArgs(file.shape, site.open);
+  const argv = args[1] ? file.code.slice(args[1].from, args[1].to) : '';
+  const verb = declarationVerb(argv);
+  const flow = owner ? valueFlowCalls(ctx, file, owner) : { calls: [], escapes: [] };
+  const aliasedExport = flow.aliasedExport;
+  if (verb) return { siteId: `${fn?.name ?? '<module>'}:${sha256(call)}`, callerVerbs: [verb], aliasedExport, ...(flow.escapes.length ? { escapes: flow.escapes } : {}) };
+  const callers = owner ? dedupeCalls([
+    ...(owner.name ? callersOf(ctx, file, owner.name) : []),
+    ...flow.calls,
+  ]) : [];
+  const callerDigests = callers.map(c => sha256(`${c.file.name}\0${declarationCallText(c.file, c.open)}`)).sort();
+  budget.steps = 0; budget.memo.clear(); budget.stack.length = 0;
+  const parameters = argv ? file.elements(argv, site.open, 0).filter(v => v.param !== undefined) : [];
+  const observedVerb = declarationVerb(argv, true);
+  const callerVerbs = observedVerb ? [observedVerb] : callers.flatMap(c => {
+    const { args: supplied } = splitArgs(c.file.shape, c.open);
+    return parameters.map(v => {
+      const arg = supplied[v.index];
+      return arg ? declarationVerb(c.file.code.slice(arg.from, arg.to), true) : undefined;
+    });
+  });
+  return { siteId: `${fn?.name ?? '<module>'}:${sha256(JSON.stringify([call, callerDigests]))}`, callerDigests, callerVerbs, aliasedExport, escapes: flow.escapes };
+}
+
+/** Owner declarations classify raw sites only; stale/ambiguous inputs never yield a green census. */
+function applyDeclarations(root, sites, classes, digests, observations, ctx) {
+  let bytes;
+  try { bytes = fs.readFileSync(path.join(root, GIT_DECLARATIONS_PATH), 'utf8'); }
+  catch (err) { if (err.code === 'ENOENT') return sites; throw err; }
+  const invalid = (detail) => { throw new Error(`invalid Git declaration: ${detail}`); };
+  let doc;
+  try { doc = JSON.parse(bytes); } catch { invalid('unreadable JSON'); }
+  if (doc?.schema !== 'git-one-door-declarations.v1' || !Array.isArray(doc.declarations)) invalid('expected git-one-door-declarations.v1');
+  digests[GIT_DECLARATIONS_PATH] = sha256(bytes);
+  const declared = new Set();
+  const matched = new Set();
+  const text = (v) => typeof v === 'string' && v.trim().length > 0;
+  for (const entry of doc.declarations) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)
+      || Object.keys(entry).some(k => !['path', 'siteId', 'class', 'reason', 'retireWhen', 'verbs'].includes(k))
+      || !text(entry.path) || path.posix.normalize(entry.path) !== entry.path
+      || /[\\\\*?\[\]{}:\x00]/.test(entry.path) || path.posix.isAbsolute(entry.path) || entry.path.split('/').some(p => p === '..' || p === '.')
+      || !/^(?:[A-Za-z_$][\w$]*|<module>):[a-f0-9]{64}$/.test(entry.siteId)
+      || !text(entry.reason) || !text(entry.retireWhen)
+      || !['hook-read-context', 'configured-binary', 'declared-tooling-exemption'].includes(entry.class)) invalid('expected exact path, siteId, supported class, reason and retireWhen');
+    const key = `${entry.path}\0${entry.siteId}`;
+    if (declared.has(key)) invalid(`duplicate ${entry.path} ${entry.siteId}`);
+    declared.add(key);
+    const found = sites.filter(s => s.path === entry.path && s.siteId === entry.siteId);
+    if (found.length !== 1) throw new Error(`stale or ambiguous Git declaration: ${entry.path} ${entry.siteId} matched ${found.length} sites`);
+    const [site] = found;
+    const { escapes = [] } = site;
+    const { callerVerbs: verbs, aliasedExport, file, programValue } = observations.get(site) ?? {};
+    const programs = entry.class === 'configured-binary' ? declarationPrograms(ctx, file, programValue) : null;
+    if (escapes.length && !(programs?.configured && !aliasedExport)) invalid(`wrapper escapes for ${entry.path}: ${escapes[0]}`);
+    if (entry.class === 'hook-read-context') {
+      if (!entry.path.startsWith(`${HOOKS_DIR}/`) || site.binary !== 'git'
+        || !Array.isArray(entry.verbs) || !entry.verbs.length || !entry.verbs.every(v => READ_VERBS.has(v))
+        || !verbs?.length || verbs.some(v => !v || !entry.verbs.includes(v))
+        || entry.verbs.some(v => !verbs.includes(v))) invalid(`hook read verbs for ${entry.path}: declared verbs must equal literal caller verbs`);
+    } else if (entry.verbs !== undefined) invalid(`verbs on non-hook ${entry.path}`);
+    if (entry.class === 'declared-tooling-exemption' && (!verbs?.length || verbs.some(v => !READ_VERBS.has(v)))) invalid(`tooling read verbs for ${entry.path}: expected literal read verbs`);
+    if (entry.class === 'configured-binary' && (site.family !== 'unresolved-binary' || programs?.fixedGit)) invalid(`fixed program is not configured data: ${entry.path}`);
+    classes.push({ ...site, ...entry });
+    matched.add(site);
+  }
+  return sites.filter(s => !matched.has(s));
+}
+
 export function scan({ root = REPO, files, openInspect } = {}) {
   const ctx = { js: new Map(), rust: new Map(), raw: [], wrappers: [], classes: [], markers: [] };
   // Outside the declared product, files are counted per top-level directory, never parsed.
@@ -2486,8 +2677,9 @@ export function scan({ root = REPO, files, openInspect } = {}) {
     if (own) doors.add(mk.path); else ctx.raw.push({ path: mk.path, line: mk.line, spawn: 'sandbox marker', binary: 'marker outside the sandbox door', family: 'sandbox-marker' });
   }
   const sites = [];
+  const observations = new Map();
   for (const s of ctx.raw) {
-    const { file, site, enclosing: _e, ...record } = s;
+    const { file, site, enclosing: _e, programValue, ...record } = s;
     const skill = standaloneSkillOf(path.join(root, record.path), root);
     if (skill) { ctx.classes.push({ ...record, class: STANDALONE_SKILL_CLASS, skill }); continue; }
     if (doors.has(record.path) && file && /\[\s*SANDBOX_DOOR\s*\]/.test(file.code.slice(site.open, splitArgs(file.shape, site.open).close))) {
@@ -2505,11 +2697,16 @@ export function scan({ root = REPO, files, openInspect } = {}) {
       });
       if (verbs.every((v) => v && READ_VERBS.has(v))) { ctx.classes.push({ ...record, class: 'hook-read-context', verbs }); continue; }
     }
-    sites.push(record);
+    if (file && site) {
+      const { callerVerbs, aliasedExport, ...identity } = declaredSiteId(ctx, file, site);
+      const identified = { ...record, ...identity };
+      observations.set(identified, { callerVerbs, aliasedExport, file, programValue });
+      sites.push(identified);
+    } else sites.push(record);
   }
   const key = (s) => `${s.path}:${String(s.line).padStart(6, '0')}:${s.binary}`;
   const unique = (list) => [...new Map(list.map((s) => [key(s), s])).values()].sort((a, b) => key(a).localeCompare(key(b)));
-  const finalSites = unique(sites);
+  const finalSites = unique(applyDeclarations(root, sites, ctx.classes, digests, observations, ctx));
   const classes = unique(ctx.classes);
   const families = {};
   for (const s of finalSites) families[s.family] = (families[s.family] ?? 0) + 1;
@@ -2554,7 +2751,8 @@ export function censusDrift(doc, root, changes) {
   const drift = [];
   for (const [name, source] of changes) {
     if (name === 'scripts/git-one-door-scan.mjs' || (product && !product(name))) continue;
-    const digest = source !== null && kindOf(name, source) ? sha256(source) : undefined;
+    // The declarations file is a recorded scan input (not code), so it is judged by digest like the sources it declares.
+    const digest = source !== null && (kindOf(name, source) || name === GIT_DECLARATIONS_PATH) ? sha256(source) : undefined;
     if (doc.files[name] !== digest) drift.push(name);
   }
   return drift;

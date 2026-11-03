@@ -59,7 +59,7 @@ from `QUADRANT_META` alone, keyed by the entry's `quadrant`.
 ## Superseded pointer
 
 This skill's manifest supersedes **only** the end-user-docs pointer bullet
-in `docs/specs/reading-map.md` (the line naming `docs/how-to/`,
+in `docs/reading-map.md#5-detailed-product-and-source-map` (the line naming `docs/how-to/`,
 `docs/tutorials/`, `docs/reference/`, `docs/explanation/`). That file
 itself stays the whole-repo canonical first-read and every other entry in
 it is unaffected — this skill never removes or restructures

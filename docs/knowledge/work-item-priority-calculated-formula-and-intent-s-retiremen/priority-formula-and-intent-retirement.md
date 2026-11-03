@@ -104,7 +104,7 @@ inversion math was correct; the degeneracy was in the inputs feeding it:
 - **`urgent`**: absent on 476/482 items, so `weightForUrgency(undefined)`
   (falling back to `medium`'s weight) fired for 98.8% of real items —
   effectively a constant. This is a **producer gap, not a formula bug**:
-  `docs/specs/work-state.md`'s own Data Dictionary #6 documents `risk` as
+  `docs/platform/work-state/spec.md#3-work-item-data-dictionary`'s own Data Dictionary #6 documents `risk` as
   free text (see below), and `weightForUrgency`'s absent-default is
   exactly correct behavior for a genuinely unset value. Whether items
   should always carry an explicit urgency is a submit-time product
@@ -181,7 +181,7 @@ formula.test.mjs test/intake/plan.test.mjs && npm test` passing.
 - `docs/history/work-item-priority-matrix/CONTEXT.md` — D1-D8, scout
   evidence, pinned terms.
 - `docs/history/work-item-priority-matrix/plan.md` — mode/risk-map/phases.
-- `docs/history/tsk-4hb-priority-formula-degenerate-axes/plan.md` — the
+- `docs/reference/work-item-pipeline-stages-verbs-and-handoffs.md` — the
   real-data scan and `isRecognizedRisk` fix shape behind the `risk`-axis
   section above.
 - `docs/history/tsk-1r3-priority-refined-pass-drops-term/CONTEXT.md` — D1

@@ -210,7 +210,7 @@ per this repo's convention.
 
 ---
 
-**Source:** `docs/history/fgos-coding-planning-mode-gate-and-gate-traceability/CONTEXT.md`
+- Source context: `docs/history/fgos-planning-mode-gate-and-gate-traceability/CONTEXT.md` at `32e6c1a93`.
 (tsk-5ay, D1-D2); work-item capture via `fgos check tsk-5ay`. Follow-up
 fixes: `tsk-da1` (`fgos check tsk-da1`), filed as an independent code
 review after `tsk-3uz`/`tsk-5ay` merged; `tsk-59a` (`fgos check tsk-59a`),

@@ -49,7 +49,7 @@ Also rejected: 3 of the 14 hook scripts guard their own entry point on
 `exec`-ing them would make them silently not run — and one of those three
 is `privacy-block`. Shell execution of each hook command was verified
 live, not assumed (proof:
-`docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-hem/`).
+`docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-hem/`).
 
 ## What was deliberately left as a follow-up, not fixed here
 

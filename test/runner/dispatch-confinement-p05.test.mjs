@@ -1,6 +1,6 @@
 // test/runner/dispatch-confinement-p05.test.mjs
 // Comprehensive test suite for Phase 05: Herdr and Legacy Confinement Convergence (R1-R6)
-// Spec: docs/specs/confinement-authority.md, plans/.../phase-05-herdr-and-legacy-convergence.md
+// Spec: docs/platform/agent-confinement/spec.md, plans/.../phase-05-herdr-and-legacy-convergence.md
 
 import '../helpers/process-tmp-root.mjs';
 import { test } from "node:test";

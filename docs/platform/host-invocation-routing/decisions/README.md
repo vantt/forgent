@@ -5,16 +5,22 @@ Document type: Decisions index
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Route readers to accepted host-invocation decisions and keep future ADRs separate from vision and preservation records
 Design status: Draft
-Implementation status: Active
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Created during host-invocation documentation migration
 Last reviewed: 2026-09-14
 Related:
 - docs/platform/host-invocation-routing/README.md
 - docs/platform/host-invocation-routing/vision.md
 - docs/platform/host-invocation-routing/intent-preservation-ledger.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
+Implementation: Active
+Provenance: Created during host-invocation documentation migration
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Route readers to accepted host-invocation decisions and keep future ADRs separate from vision and preservation records
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
 
 ## 1. Current Decision Record

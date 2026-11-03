@@ -11,7 +11,7 @@ import {
 // no herdr server is started here, and nothing in this file touches the operator's
 // live session. The parts that genuinely need a running server are proved by the
 // live probes under
-// docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/,
+// docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/,
 // which measured that a named session starts headless with its own socket, that a
 // pane created inside it is handed THAT session's socket rather than the
 // operator's, and that from inside it sees only its own panes.

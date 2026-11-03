@@ -5,14 +5,20 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define operation identity, descriptors, catalog authorship, and version matching
 Design status: Draft
-Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/provider-routing.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
+Implementation: Current partial
+Provenance: `docs/platform/host-invocation-routing/contracts/operation-catalog.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Define operation identity, descriptors, catalog authorship, and version matching
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
 
 ## 1. Contract
@@ -36,4 +42,4 @@ Related:
 | --- | --- |
 | provider routing | [../architecture/provider-routing.md](../architecture/provider-routing.md) |
 | operation provider | [operation-provider.md](operation-provider.md) |
-| source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
+| source architecture | `../spec.md#host-invocation-and-provider-routing-architecture` |

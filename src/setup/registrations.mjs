@@ -139,6 +139,7 @@ import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/re
 import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
+import { checkDocumentationCutoverLeaseDoctor } from '../runner/documentation-cutover-lease.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -856,7 +857,7 @@ export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {
     }
   }
   if (missing.length > 0) {
-    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md` };
+    return { passed: false, message: `missing task-spec file(s): ${missing.join('; ')} -- run fgos-coding-implement's own task-spec item, or docs/knowledge/how-to-write-a-task-spec/write-a-task-spec.md` };
   }
   return { passed: true, message: 'every domain\'s taskSpecMap entry and operation resolves to a real domains/<domain>/task-specs/ file and core/task-specs/ contains all domain-agnostic task-specs' };
 }
@@ -2050,6 +2051,11 @@ registerCheck({
   description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, no predecessor domain is left running, and the state and porting-events hot records parse and their holder can be judged',
   check: (cwd) => checkLockHolders(cwd),
 });
+registerCheck({
+  id: 'documentation-cutover-lease',
+  description: 'repository documentation-cutover hooks are wired and no committed lease freezes the documentation scope',
+  check: (cwd) => checkDocumentationCutoverLeaseDoctor(cwd),
+});
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
 
 // Run supervisor (docs/platform/run-supervisor/spec.md): the containment driver agents run in, the
@@ -2508,7 +2514,7 @@ for (const entry of CONFIG_FIXES) registerFix(entry);
 // accepts a marketplace entry under this name regardless of its source
 // (github, directory, or otherwise) -- a dev-checkout's own directory-
 // sourced entry (this exact repo's own self-hosting case, per
-// docs/distribution-vision.md's "context 3") is just as valid a pass as a
+// docs/platform/packaging-distribution/history/distribution-vision.md's "context 3") is just as valid a pass as a
 // github-sourced one; only the FIX, which only ever runs on a genuinely
 // missing entry, needs to pick one source to add.
 const CLAUDE_PLUGIN_MARKETPLACE_NAME = 'fgos-plugins';
@@ -2817,7 +2823,7 @@ function checkReadmeInstallTagExists(cwd) {
   }
   return {
     passed: false,
-    message: `README.md recommends installing tag "${tag}", which does not exist -- cut it per docs/how-to/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,
+    message: `README.md recommends installing tag "${tag}", which does not exist -- cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md, or update README.md to a tag that does exist`,
   };
 }
 
@@ -3459,7 +3465,7 @@ registerFix({
   fix: (cwd) => fixNoStuckMergeAbort(cwd),
 });
 
-// Phase 02 R8 (docs/architect/agent-coordination/contracts/flow-definition.md,
+// Phase 02 R8 (docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md,
 // ADR-009), AGENTS.md's install/setup/doctor gate: the new FlowDefinition
 // definition surface (Workflow projection adapter + CoordinationProtocol
 // loader, src/runner/definitions/) is a real infra dependency (it shells
@@ -5282,6 +5288,14 @@ export function checkConventionConformance(cwd, {
     };
   }
 
+  const blocking = result.violations.filter((violation) => violation.posture === 'block');
+  if (blocking.length > 0) {
+    return {
+      passed: false,
+      message: `convention placement refused: ${blocking.length} blocking violation(s); examples: ${blocking.slice(0, 3).map((v) => `${v.path}: ${v.code} ${v.message}`).join('; ')}`,
+    };
+  }
+
   let cutoff;
   try {
     cutoff = cutoffResolver(root);
@@ -5310,7 +5324,7 @@ export function checkConventionConformance(cwd, {
 
 registerCheck({
   id: 'convention-conformance',
-  description: 'source-repository report and journal paths conform to packaged naming and placement rules',
+  description: 'source-repository paths conform to packaged naming, documentation placement and retired-root rules',
   check: (cwd) => checkConventionConformance(cwd),
 });
 
@@ -5534,7 +5548,7 @@ registerCheck({
   description: 'The release mutation census lists no Git or hook spawn outside the fgos-git driver and matches the payload it was built from',
   check: () => checkMutationOneDoor(),
 });
-// Workflow case bindings (docs/specs/workflow.md RUL-WF-27): the binding records are a view of each
+// Workflow case bindings (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27): the binding records are a view of each
 // case's ledger. Bodies live in workflow-case-checks.mjs.
 registerCheck({
   id: 'workflow-case-binding-sentinel',

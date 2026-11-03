@@ -2692,7 +2692,7 @@ generated: true
 - Docs:
   - `inline-or-delete-the-d-id` (active): `docs/how-to/fix-d-local-outside-home-findings.md`
 
-### citation-format cleanup applied to docs/specs/runner.md (`citation-drift-runner-md-cleanup`)
+### citation-format cleanup applied to docs/platform/runner/spec.md#spec-runner-vòng-tự-hành (`citation-drift-runner-md-cleanup`)
 - Status: **active**
 - Purpose Slug: `citation-drift-runner-md-cleanup`
 - Docs:

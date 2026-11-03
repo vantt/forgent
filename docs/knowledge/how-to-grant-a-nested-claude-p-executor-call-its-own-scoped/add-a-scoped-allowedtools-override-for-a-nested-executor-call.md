@@ -19,8 +19,8 @@ mode: how-to
 > verbatim. The modern equivalent for scoping `allowedTools` to one call
 > site: give that call site its own `executors.<executorId>` entry with
 > an explicit `command`/`args` (the same executor-block shape), and pass
-> that id as `resolveExecutorCommand`'s `executorId` — see `docs/how-to/
-> wire-a-headless-function-through-an-agent-executor-executor.md`. Kept
+> that id as `resolveExecutorCommand`'s `executorId` — see `docs/
+> knowledge/how-to-wire-a-headless-function-through-an-agent-executor-ex/wire-a-headless-function-through-an-agent-executor-executor.md`. Kept
 > below as the historical record of `tsk-62d`'s own reasoning (step 5's
 > "what almost went wrong" lesson — read the resolver's real signature and
 > callers before adding a parallel dimension — still holds regardless of
@@ -84,7 +84,7 @@ config needing to opt in.
 ```
 
 Add only the tool(s) your call site actually needs on top of the base set —
-this is a security boundary (RUL6, `docs/specs/runner.md`), not a
+this is a security boundary (RUL6, `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`), not a
 convenience flag.
 
 ## 4. Verify
@@ -130,5 +130,5 @@ Real capture from closing this item:
   args) was chosen.
 - `docs/history/tsk-62d-judge-scout-capability/plan.md` — the "smaller
   path" revision this recipe is drawn from, plus the full risk map.
-- `docs/specs/runner.md` RUL6 — the minimal-`allowedTools` security stance
+- `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` RUL6 — the minimal-`allowedTools` security stance
   this recipe's step 3 is bound by.

@@ -15,7 +15,7 @@ import { addWork, moveWork, putInAwaiting, answerAwaiting, listWork, categoryOf,
 import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 
-// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+// tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): `todo -> doing`
 // is retired from status-fsm.mjs's TRANSITIONS table — nothing durably
 // writes INTO `doing` anymore. This file's own tests need a durably-'doing'
 // item purely as a PRECONDITION for exercising putInAwaiting/answerAwaiting's
@@ -181,8 +181,7 @@ test('a second ask after an answer overwrites the prior parentSnapshotAtAsk, nev
   assert.deepEqual(rebuilt.gates['item-x'].parentSnapshotAtAsk, secondSnapshot);
 });
 
-// claim-lock §5.1, tsk-40m P1 fix (docs/architect/doing-coordination-
-// redesign.md) — statusAtAsk/durableStatusAtAsk snapshot + answerAwaiting's
+// claim-lock §5.1, tsk-40m P1 fix (docs/platform/proposals/doing-coordination-redesign.md) — statusAtAsk/durableStatusAtAsk snapshot + answerAwaiting's
 // dynamic resume target. Two SEPARATE fields now, never conflated:
 // `statusAtAsk` is informational/audit only (whatever the caller reports,
 // possibly the EFFECTIVE view); `durableStatusAtAsk` is the ONLY one
@@ -277,7 +276,7 @@ test('answerAwaiting with no durableStatusAtAsk/statusAtAsk on the gate falls ba
   assert.equal(view.work['item-x'].status, 'todo');
 });
 
-// Hard-cut (docs/architect/doing-coordination-redesign.md): awaiting-human
+// Hard-cut (docs/platform/proposals/doing-coordination-redesign.md): awaiting-human
 // -> doing is retired from status-fsm.mjs's TRANSITIONS table entirely — a
 // durableStatusAtAsk of 'doing' can only ever be a truthful historical
 // record of a genuinely legacy pre-migration item (no active claim

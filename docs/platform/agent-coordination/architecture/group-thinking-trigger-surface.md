@@ -1,15 +1,26 @@
 # Group Thinking Trigger Surface
 
+```txt
 Document type: Architecture
-Design status: Accepted
-Implementation: Implemented as skill and documentation routing
-Last reviewed: 2026-09-09
-Canonical for: end-user vocabulary, use-case presets, and the boundary between
-the group-thinking UX surface and coordination protocol core
-Related: [Protocol Model](protocol-model.md),
-[Dispatch Control Plane](dispatch-control-plane.md),
-[FlowDefinition Contract](../contracts/flow-definition.md), and
-[Group Thinking Protocol Pack](../../../../core/protocol-packs/group-thinking.json)
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/architecture/group-thinking-trigger-surface.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Decision
 
@@ -17,14 +28,14 @@ Related: [Protocol Model](protocol-model.md),
 together. A person describes the outcome they want, such as review, compare,
 debate, red-team, or independent opinions. They do not select a protocol.
 
-`fgos-advise` (formerly `fgos-panel`) owns this surface routing. It picks one
-request kind and route and then hands the registered Workflow or preset id to
-`fgos-group-thinking`, which remains the execution door. No CLI verb, protocol, capability, or execution path is
-added by this surface.
+`fgos-advise` (formerly `fgos-panel`) owns intent-first selection and routes to a named Workflow or a
+CollaborationPattern preset. For discussion Workflows it may start the Workflow
+directly or delegate to `fgos-group-thinking` after selecting the name. The latter
+is not a current protocol-pack gate. This surface adds no private execution path.
 
 ## Baseline UX Audit
 
-This table records the surface before `fgos-panel` (now `fgos-advise`) was introduced.
+This is a dated pre-introduction UX audit of `fgos-panel` (now `fgos-advise`), not a list of currently installed skills or commands. In particular `fgos-code-panel` and the protocol-pack gate below are historical; today's explicit implementation route is `fgos-run`.
 
 | Current trigger | User mental model | Required knowledge | Problem | Proposed surface |
 |---|---|---|---|---|
@@ -35,10 +46,10 @@ This table records the surface before `fgos-panel` (now `fgos-advise`) was intro
 | RFC-Review-Lite | Structured proposal critique | RFC vocabulary and protocol behavior | "RFC" sounds coding-specific although the protocol can review any concrete proposal | Surface name `proposal-review` |
 | Nominal-Group-Lite | Independent ideation and ranking | NGT method and its no-winner limitation | Method name is unfamiliar to most users | Surface names `option-comparison` and `strategy-options` |
 | Delphi-Feedback-Lite | Iterative, mediated feedback | Delphi method and its bounded-round limitation | Method name implies expertise and stronger consensus/anonymity than the lite protocol claims | Surface names `independent-feedback` and `reflection-review` |
-| Direct `fgos coordination run/show` | Low-level session control | Request JSON, operation ids, actors, grants, resume ids | Correct power-user door, too low-level as a first contact | Surface launches through `run`; replay remains `show` |
+| Historical coordination run/show | Retired session-engine UX | Preserved in the historical snapshot | Not a current execution door | Use current Workflow/Unit owners |
 | "Get independent opinions" | Fresh views before commitment | Nothing beyond the question | Previously had no reliable skill trigger and could collapse to one-agent advice | `independent-feedback` or `option-comparison`, based on whether options exist |
 | "Red-team this decision" | Attack assumptions and failure modes | Nothing beyond the decision/proposal | Could misroute to code implementation red-team | `architecture-panel` for architecture; otherwise `proposal-review` |
-| "Coding decision panel" | Advisory design choice | Nothing beyond the choice | Could misroute to mutating `fgos-code-panel` | Non-mutating `architecture-panel` or `option-comparison`; use `fgos-code-panel` only when implementation is explicitly requested |
+| "Coding decision panel" | Advisory design choice | Nothing beyond the choice | Historical misroute to mutating `fgos-code-panel` | Current advisory route is `architecture-panel`/`option-comparison`; explicit implementation uses `fgos-run`, not the removed code-panel skill |
 | "Business panel" | Multi-perspective business decision | Nothing beyond the business question | Existing named skills look coding-specific | Generic `option-comparison`, `proposal-review`, or `independent-feedback` preset |
 
 ## Vocabulary Evaluation
@@ -92,66 +103,43 @@ implementation.
 
 ### Core owns
 
-- Protocol registry membership and protocol id/version.
-- FlowDefinition validation and protocol semantics.
-- CoordinationSession state, actors and role binding.
-- Visibility windows, authorization, reopen, completion, and close rules.
-- Dispatch-plan resolution and governed execution.
-- Evidence, RunResult, contribution ledger, result artifact, and replay shape.
+Workflow definitions, Unit contracts and CollaborationPattern own executable semantics, gates and legal outcomes. Dispatch resolves capability/executor/provider routing; this facade cannot pin those choices.
 
 ### Surface owns
 
-- Natural-language triggers and aliases.
-- Selection of exactly one use-case preset from the table above.
-- Filling objective, context, proposal/options, and expected-output request data.
-- Passing the preset's explicit registered protocol id to the existing
-  `fgos-group-thinking` gate.
-- Returning the result and coordination id in terms the person used.
+Extract the subject, accessible artifact/options and material scope, select the canonical preset, fill the request and return attributed findings and the real run reference. Ask only for missing material inputs or advice-versus-implementation authority.
 
 ### Forbidden coupling
 
-- Core protocols must not contain end-user synonym lists or business/coding
-  marketing labels.
-- A surface skill must not define protocol actors, transitions, visibility,
-  authorization, reopen, quorum, or close semantics. It reads the registered
-  FlowDefinition for those facts.
-- A surface must not invent a protocol or accept an unregistered id.
-- Protocol registry remains the source of truth; this table cannot make a
-  protocol executable.
-- Replay always uses `fgos coordination show <coordinationId> --json`.
-- Dispatch always crosses the Dispatch Control Plane. Surface docs never pin a
-  provider, model, executor, or tier.
-- `purpose`/job/use-case preset is not a new dispatch ontology. Every advisory
-  preset uses the existing `advise` capability.
+Do not invent actors, grants, transitions, quorum, close rules, routing pins or an alternate session engine in task prose. Status and human answers use the registered Workflow doors. Evidence: core/skills/fgos-advise/SKILL.md:18-27,102-118.
+
+A purpose/use-case preset is not another dispatch ontology or routing identity.
+Selection fills the existing advisory/coding capability and task contract; it
+must not manufacture a capability merely because an alias is used in conversation.
 
 ## Entry Point Choice
 
-| Need | Use |
-|---|---|
-| Natural-language group review, comparison, red-team, or independent views | `fgos-advise` |
-| Deep software-architecture recommendation and dialogue | `fgos-architecture-panel` (also selected by `fgos-advise`) |
-| Actual single code change plus independent review and red-team | `fgos-code-panel` |
-| A known protocol id and low-level request/session operation | `fgos-group-thinking` or `fgos coordination run` |
-| Replay/status for any of the above | `fgos coordination show <coordinationId> --json` |
+Use fgos-advise for intent-first request-kind and route selection, fgos-group-thinking for named discussion Workflow use, and fgos-architecture-panel for architecture-advisory. Only explicit code implementation/change requests route to fgos-run. Workflow status, answer and resume use the Workflow run id; the retired coordination run/show doors are not current. Evidence: core/skills/fgos-advise/SKILL.md:18-27,102-118.
 
 ## Alternatives Considered
 
 ### A. Keep only `fgos-group-thinking`
 
-Smallest file change, but preserves the central failure: its pack gate correctly
-requires an explicit id from its caller. Teaching protocol ids in examples would
-make the person learn core vocabulary rather than fixing the surface.
+Historically this left protocol-pack selection exposed to the person. The
+current named-Workflow skill can execute an already selected method, but it does
+not replace intent-first surface selection.
 
 ### B. Add `fgos-advise`
 
-Selected. It gives natural requests one memorable entrypoint, keeps all mapping
-in this canonical table, and delegates unchanged execution to the pack gate and
-registered protocol. Existing specialist skills remain available.
+Selected. Natural requests use one surface and the canonical table, while named
+Workflow/CollaborationPattern owners retain execution semantics. Selection is
+not permission to implement an advisory request.
 
 ### C. Rename or deprecate the existing skills
 
-Rejected for now. `fgos-group-thinking` is an accurate internal gate name,
-`fgos-architecture-panel` is already a strong specialist surface, and
-`fgos-code-panel` has a distinct mutating contract. Renaming creates migration
-cost without improving the new happy path. Their descriptions instead state the
-boundary and preserve backward compatibility.
+The earlier keep-all-skills decision was dated migration reasoning.
+`fgos-code-panel` is no longer a current installed implementation facade;
+explicit code-change requests route to `fgos-run`. `fgos-architecture-panel`
+retains the specialized advisory route and `fgos-group-thinking` handles named
+discussion Workflows.
+

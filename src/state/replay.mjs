@@ -562,7 +562,7 @@ function applyEvent(view, event) {
       // this stays a plain forward fold over data the log ALREADY carries.
       //
       // Deliberately not `to !== 'exploring'`: that reads the arrival edge,
-      // which RUL27 (`docs/specs/work-state.md`) locks against precisely so
+      // which RUL27 (`docs/platform/work-state/spec.md#11-business-rules`) locks against precisely so
       // inserting a stage in the middle cannot silence an existing
       // settlement — and it would retroactively silence every real
       // `discovery -> exploring` settlement in this repo's own live log (all

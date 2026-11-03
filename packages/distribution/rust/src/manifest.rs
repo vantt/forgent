@@ -1,7 +1,7 @@
 //! Manifest types for fgOS release distributions.
 //!
-//! Matches `docs/platform/packaging-distribution/contracts/release-manifest.md`
-//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.
+//! Frozen release manifest types and field invariants.
+//! See `docs/platform/packaging-distribution/contracts/release-manifest.md#2-frozen-schema-v1-shape`.
 //!
 //! # Frozen Schema V1 Invariants
 //! - `schemaVersion` is frozen at 1.

@@ -1,10 +1,34 @@
 # ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt
 
-Document type: ADR
-Design status: Accepted
-Implementation: Partial
-Last reviewed: 2026-09-07
-Canonical for: who owns an interactive Run's lifecycle, and what may end one
+```txt
+Document type: Decision
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: Source material from `docs/architect/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; live routes and the explicitly stated implementation corrections are adapted here.
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+
+## Implementation And Design Status
+
+The implementation column below bounds the retained text. Proposed typed interfaces, acceptance scenarios and target-state rules are design obligations, not claims that those interfaces already exist. Historical names in examples are not revived APIs.
+
+| Section | Status | Evidence / limit |
+|---|---|---|
+| Decision | Mixed implementation and proposal; no blanket implementation claim | herdr-round.mjs:21-24 (agent_status never concludes a round; result file is receipt); herdr-agent.mjs:385; assignment-runner.mjs:2471-2492; visibility-session.mjs:136-146 (actor lease deliberately removed) |
 
 ## Context
 
@@ -44,13 +68,10 @@ failure, `pane process-info` to ask whether a process is still there. Every one
 of those answers a question about the transport. None of them answers whether
 work happened.
 
-**A receipt is an artifact the receiver wrote.** A round ends when the worker's
-own result file appears in its outbox, and at no other moment. `agent_status`
-is never read as completion anywhere; it says only whether it is safe to type
-right now, which is the only question it was ever able to answer.
+**A receipt is an artifact the receiver wrote.** The herdr round reads the worker-written result file, not agent_status (src/runner/dispatch/herdr-round.mjs:21-24). The Assignment supervisor path instead waits for protected/adapter-receipts/<launchCommandId>.json; supervisor exit or timeout can end that wait without a success receipt, producing an explicit failure/unknown outcome (src/runner/dispatch/assignment-runner.mjs:2471-2540). Neither terminal idleness nor transport acceptance proves work.
 
 **Visibility and contact are separate capabilities.** V0 grants observation
-only: any number of watchers, exactly one actor holding a pid-and-token lease.
+only. Observers do not settle Runs. The former actor-lease API was removed; current controller exclusion is fenced by run-control epoch and token, not a visibility lease (src/runner/dispatch/visibility-session.mjs:136-149; run-lock.mjs:306-412).
 A mechanism that cannot support a capability refuses it by name rather than
 degrading quietly.
 
@@ -94,3 +115,4 @@ degrading quietly.
 Supersedes nothing. Extends ADR-005 (herdr is visibility, not evidence) with
 who drives, and ADR-010 §3 (interactive and headless must have identical
 capability, declared) with what a mechanism must declare about itself.
+

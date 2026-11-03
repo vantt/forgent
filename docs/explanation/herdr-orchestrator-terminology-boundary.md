@@ -1,5 +1,5 @@
 ---
-authoritative_for: the boundary between Herdr's own Rust "orchestrator" vocabulary (PaneOrchestrator, OrchestratorSettings, HerdrOrchestratorToggles — pane lifecycle/toggle mechanics in herdr-dashboard/src/) and fgOS dispatch's own "orchestrator" glossary sense (the T0 composition layer that manages N units of work and stays attached, per docs/architect's own dispatch-control-plane-redesign.md §5.1) — two unrelated meanings sharing one English word, never to be conflated or renamed toward each other
+authoritative_for: the boundary between Herdr's own Rust "orchestrator" vocabulary (PaneOrchestrator, OrchestratorSettings, HerdrOrchestratorToggles — pane lifecycle/toggle mechanics in herdr-dashboard/src/) and fgOS dispatch's own "orchestrator" glossary sense (the T0 composition layer that manages N units of work and stays attached, per docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md §5.1) — two unrelated meanings sharing one English word, never to be conflated or renamed toward each other
 ---
 
 # Herdr's `PaneOrchestrator` and fgOS's "orchestrator" are two different words that happen to be spelled the same
@@ -18,7 +18,7 @@ for unrelated reasons.
   config section (auto-discover/auto-merge/auto-retro/auto-cleanup pane
   launching). These are Rust port terms about **process visibility and
   control** — Herdr never holds task truth.
-- **fgOS's "orchestrator"** (per `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md`
+- **fgOS's "orchestrator"** (per `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#51-dispatch-roles`
   §5.1, and the current-vocabulary table added by `tsk-4he` — see
   [`d0026-native-first-dispatch-narrative-reconciliation`](d0026-native-first-dispatch-narrative-reconciliation.md))
   names the T0 composition layer that manages N units of work and stays
@@ -46,8 +46,8 @@ docs herdr-dashboard src` — every hit has a clear/allowlisted meaning.
 
 The target file was later moved during an unrelated reorganization
 ("docs: organize agent coordination architecture", commit `ba7b62ac`) from
-`docs/architect/dispatch-control-plane-redesign.md` to
-`docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md`.
+`docs/platform/proposals/dispatch-control-plane-redesign.md#dispatch-control-plane-redesign` to
+`docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md#dispatch-control-plane-redesign`.
 The subsection this item added survived that move intact — confirmed live
 by reading the file's current content, not assumed from the item's own
 merge record.

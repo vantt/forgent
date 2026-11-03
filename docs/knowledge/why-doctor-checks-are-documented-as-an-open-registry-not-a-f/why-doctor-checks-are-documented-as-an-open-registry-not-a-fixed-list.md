@@ -60,7 +60,7 @@ superseded. This wasn't a scope guess — `tsk-2qz` had already delegated
 it explicitly by id in its own locked decision
 (`docs/history/doctor-fix-gate-bypass/CONTEXT.md` D2):
 
-> Quyết định này ĐẢO RUL9 + RUL11 (docs/specs/distribution.md:200,210)
+> Quyết định này ĐẢO RUL9 + RUL11 (docs/platform/packaging-distribution/spec.md#business-rules,210)
 > ... tsk-1qm chịu trách nhiệm supersede chính thức trong spec.
 
 ## Real friction hit during closure

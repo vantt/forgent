@@ -6,7 +6,7 @@ authoritative_for: fixing a bare-citation finding, check-decision-citation-drift
 
 `check-decision-citation-drift.mjs` flags a `bare-citation` finding when a
 line cites an `ADR<n>`/`RUL<n>` id with no one-line gloss right after it
-(`tsk-37i` D3). `tsk-2yu-1` fixed 124 of these in `docs/specs/work-state.md`
+(`tsk-37i` D3). `tsk-2yu-1` fixed 124 of these in `docs/platform/work-state/spec.md#work-state-specification`
 as the calibration slice for the larger citation-baseline cleanup — see
 `docs/explanation/citation-baseline-cleanup-calibration-slice.md` for why
 this specific slice was chosen.
@@ -34,7 +34,7 @@ rule/decision is actually defined:
 - Most `RUL<n>` ids: the rule's own heading/title in the same spec doc
   citing it.
 - A cross-spec `RUL<n>` reference: the rule's home spec (e.g.
-  `docs/specs/runner.md` for a rule defined there but cited from
+  `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` for a rule defined there but cited from
   `work-state.md`).
 - `ADR<n>` ids: `docs/decisions/index.md` (the generated decision index).
 
@@ -51,7 +51,7 @@ needed after the mechanical pass.
 ```bash
 node scripts/check-decision-citation-drift.mjs \
   --decisions-dir docs/decisions --backlog docs/backlog.md \
-  --specs-dir docs/specs --skills-dir .agents/skills \
+  --specs-dir docs/platform --skills-dir .agents/skills \
   --skills-dir plugins/fgOS/skills --write-baseline
 ```
 

@@ -193,7 +193,7 @@ retrofit it onto an existing item, submitted or added, at any time.
 ## Real-world lesson: a target sitting in `cleanup` has already delivered — don't wait out its TTL
 
 `tsk-2jc` (milestone, single target `tsk-1qm`, closing when
-`docs/specs/distribution.md` matches reality after a `doctor --fix`
+`docs/platform/packaging-distribution/spec.md#spec-packaging-distribution` matches reality after a `doctor --fix`
 feature landed) hit a version of this pattern the original how-to above
 doesn't cover: the target wasn't `done` yet, but not because anything was
 unfinished — it was sitting in `cleanup`, waiting out the mechanical

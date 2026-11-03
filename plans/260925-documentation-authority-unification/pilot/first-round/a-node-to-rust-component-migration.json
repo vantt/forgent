@@ -1,0 +1,1036 @@
+{
+  "version": 1,
+  "shard": "a-node-to-rust-component-migration",
+  "sources": [
+    "docs/architect/host-invocation-routing/node-to-rust-component-migration.md"
+  ],
+  "files": [
+    {
+      "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
+      "disposition": "merge",
+      "rationale": "Most claim units are carried, some in reduced form, by the promoted architecture, verification, history and roadmap targets; the per-component procedure, rollback rules, read-model sequence and several rationale/decision units are absent and recorded as unknown-blocking.",
+      "targets": [
+        "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+        "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+        "docs/platform/host-invocation-routing/vision.md",
+        "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+        "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+        "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+        "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+        "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+        "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+        "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+        "docs/platform/host-invocation-routing/README.md",
+        "docs/platform/host-invocation-routing/roadmap.md",
+        "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_14f599ac6c6af84bcd15a503faaaea03",
+      "sourceUnitDigest": "24e0aa773ffabc72",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "architecture-node-to-rust-migration",
+      "claimKind": "navigation",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Document title; the promoted architecture doc carries the same subject as its title (\"Architecture: Node To Rust Migration\")."
+    },
+    {
+      "claimId": "claim_95f304c1b827f4b6f1d5070a006051bb",
+      "sourceUnitDigest": "206fd476551e3bbb",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "1-selected-direction",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target states Rust host first with Node as legacy payload/lane; the R1 -> R2 -> R3 -> per-component native sequence lives only as release slices in release-boundaries.md. Not carried: status line (\"not an implementation plan\"), 2026-09-01 date, 2026-09-10 revision and 2026-09-03/04/10 selected-direction revision history, and the product-owner source attribution."
+    },
+    {
+      "claimId": "claim_2519e82bb2a6054b1b822fc266471424",
+      "sourceUnitDigest": "3eb6efe648980740",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Scope statement plus the obligation that every native migration slice must read the Component Boundary Advisory before choosing where a provider/component module lives. No target states that read-first obligation or the physical-placement-compass pointer (spec.md only says \"No component-boundary change\" and links component-boundary.md).",
+      "searched": [
+        "grep \"Component Boundary Advisory|physical placement|placement\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"component-boundary\" -> only \"no change\" notes in spec.md/README.md/roadmap.md",
+        "grep \"must read\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_6275bba15f3262cd1adb35973216a47d",
+      "sourceUnitDigest": "cb163186599cc014",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "Heading of a transitional note; the source scopes it to \"the 2026-09-14 promotion pass\" and README.md section 8 says old documents stay legacy/current \"until redirected or drained\", i.e. the note is migration scaffolding, not durable content."
+    },
+    {
+      "claimId": "claim_fd246fe0ad796f0ce1f3448b6ad8ec61",
+      "sourceUnitDigest": "4db21e2ea3a790fe",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "Source text: \"remains a legacy-current source during the 2026-09-14 promotion pass\" and points to the promoted docs/ledger; this is the migration map itself, superseded by the targets linking back to the source (their Related Files) and README.md section 8."
+    },
+    {
+      "claimId": "claim_416ff7a5bcd064e885b8fd36a8a1236f",
+      "sourceUnitDigest": "99072fd3166d7306",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "2-migration-rules",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading of the section whose preservation requirement is carried in Migration Rules; the framing question and current-state text are handled in the following rows."
+    },
+    {
+      "claimId": "claim_6ff55a84cad191f74d5ba955c12176d5",
+      "sourceUnitDigest": "615307c7f55ec3f8",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "1-selected-direction",
+      "claimKind": "historical-context",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target rejects big-bang rewrite and repository-wide Node thinning, carrying the conclusion \"cannot move in one rebuild\". Not carried: the current-state description that bin/fgos.mjs still combines entry, dispatch, use-case orchestration and policy."
+    },
+    {
+      "claimId": "claim_dd0dd857d5e3520ae9dc78c58f0fc8ad",
+      "sourceUnitDigest": "9fcfee1906a70f28",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "1-selected-direction",
+      "claimKind": "intent",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in to the migration question; its answer (Rust host first, Node legacy until the boundary is ready) is the Selected Direction statement."
+    },
+    {
+      "claimId": "claim_2578e5e7c9eabf7bcd4a8f5e65a0c650",
+      "sourceUnitDigest": "b9957f75ceeb1b0f",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "1-selected-direction",
+      "claimKind": "intent",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target states the answer (\"Rust host first, with Node as legacy payload/lane until each complete component or use-case boundary is ready to move\") but not the question framing and not the word \"permanent\" host."
+    },
+    {
+      "claimId": "claim_9394d4472d63f8e7c7694fb5292fa610",
+      "sourceUnitDigest": "f40cb00fe843af70",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Migration Rules first bullet repeats the sentence: preserve current commands, fgos.v1, errors, state authority, install behavior and rollback until each replacement is proven."
+    },
+    {
+      "claimId": "claim_993f44595192c14f62bc1f2f87bf3be0",
+      "sourceUnitDigest": "6de78c0e2380ab85",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/legacy-payload.md",
+      "targetAnchor": "1-contract",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Carried: identity legacy-node, npm package as package.json files defines it, bin/fgos.mjs unmoved, staged whole under components.legacyNode.root (legacy-payload.md); descriptor fields selector/route_kind/owner_path/compatibility_tests (command-route-descriptor.md); bin/fgos.mjs not the public entry (spec.md section 3). Not carried: \"a selector cannot be made native merely by changing a Rust parser; its descriptor and complete provider binding change together\"."
+    },
+    {
+      "claimId": "claim_c66daabdf8cd04e568de890f07b21c27",
+      "sourceUnitDigest": "895d0cb403741694",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "1-selected-direction",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Options section: target keeps only the outcome (Rust host first selected; Node-thinning-first and big-bang rejected); option write-ups are handled row by row."
+    },
+    {
+      "claimId": "claim_aec6fb3d8eed3c772ec8bac9808009d3",
+      "sourceUnitDigest": "1b4f6a70d3530daa",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "1-selected-direction",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading for Option A; target carries only that repository-wide Node thinning first is rejected."
+    },
+    {
+      "claimId": "claim_38ab2fca27e14c583debbe4bd42386c9",
+      "sourceUnitDigest": "b69dc6e06127e05d",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Diagram of Option A (large Node-thinning refactor, stable Node component ports, Rust implementations behind ports, replace outer host last). No target describes this option or the port-first sequence.",
+      "searched": [
+        "grep \"Option A|Option B|Option C\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"ports\" and \"thinning|Node-thinning\" in all 30 files under docs/platform/host-invocation-routing/ -> only the one-line rejection in node-to-rust-migration.md and history baseline",
+        "grep \"replace the outer host last|outer host\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_bb413cec669065c6ea224f0a326fcad1",
+      "sourceUnitDigest": "171ae708c6fc2202",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Reasons Option A was not chosen: heavy investment in a composition root scheduled for removal; delays the final Rust plugin/host seam. Target only says Node-thinning-first is rejected, without these reasons.",
+      "searched": [
+        "grep \"composition root\" in all 30 files under docs/platform/host-invocation-routing/ -> only vision.md mission fit and operation-catalog const-catalog row",
+        "grep \"scheduled for removal|plugin/host seam|delays\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"Option A\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_f03a714ee76799cf8da8475e40245815",
+      "sourceUnitDigest": "753539e00700ad95",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "1-selected-direction",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading for Option B, which is the selected direction (Rust host first, Node as legacy payload/lane)."
+    },
+    {
+      "claimId": "claim_44ccd4764a3854df36f1cc5c79fbd985",
+      "sourceUnitDigest": "c26354ae28b1df2d",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Option B flow (thin Rust host/router -> CLI adapter execs unmigrated selectors to Node -> move one complete operation -> remove its Node path after proof) is spread over migration rules, legacy-cli-transition.md and spec.md section 5. Target states only final Node removal on zero remaining routes; per-operation removal of the Node path after proof is not stated."
+    },
+    {
+      "claimId": "claim_6b9a10b4a4db290948a1d116ceb41ec2",
+      "sourceUnitDigest": "e9233efa0247c229",
+      "targetOwner": "docs/platform/host-invocation-routing/vision.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "vision.md says Rust becomes the host first because it establishes the permanent composition root and plugin seam while Node stays until each boundary is ready. Not carried: keeps initial Rust change narrow without a disposable wrapper; R1 already has legacy-cli exec lane and native-selector shape that survive a long migration; boundary extraction only when a component actually migrates."
+    },
+    {
+      "claimId": "claim_4862726f445bfdcba1b58996cf47dfd8",
+      "sourceUnitDigest": "a755bd8cd566ed1f",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "1-selected-direction",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading for Option C; target carries that big-bang rewrite is rejected."
+    },
+    {
+      "claimId": "claim_2f8cc2098b8aab83a7d7442cc88028a8",
+      "sourceUnitDigest": "0e5aa008176865dc",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Diagram of Option C (reimplement parser + use cases + state + distribution, switch everything at once). No target describes the big-bang option beyond naming it rejected.",
+      "searched": [
+        "grep \"big-bang|Big-Bang|big bang\" in all 30 files under docs/platform/host-invocation-routing/ -> only the rejection phrase",
+        "grep \"switch everything|all at once\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"reimplement\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_9c041351e42cf17447a86425475d1d50",
+      "sourceUnitDigest": "730307ecbac91088",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Reasons for rejecting Option C (no safe parity or rollback gradient; mixes host replacement, component redesign, authority movement and distribution in one release). Rejection itself is carried in node-to-rust-migration.md section 1, but none of these reasons appears in any target.",
+      "searched": [
+        "grep \"parity or rollback gradient|rollback gradient\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"authority movement|component redesign\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"mixes\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_d3350f1f59df99f9dfa937d5ea894de4",
+      "sourceUnitDigest": "9cf9fd76cccbf49a",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "1-selected-direction",
+      "claimKind": "decision",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading Selected Option; target heading \"Selected Direction\" carries the selection."
+    },
+    {
+      "claimId": "claim_a2a90fc8f7288cae9b03d22aeb16c504",
+      "sourceUnitDigest": "6ccdeec538edc0ee",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "1-selected-direction",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target states Rust host first with Node as legacy lane. Not carried: first Rust release is intentionally a small distributable host/router; legacy-cli exec lane by default and \"not an immediate rewrite of all Node semantics\" (partly in spec.md section 5 and release-boundaries.md R1 row)."
+    },
+    {
+      "claimId": "claim_5b0f65a4cc7366113339fc3a47d9eded",
+      "sourceUnitDigest": "d09127beb575abd4",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the rationale section (why the sequence is selected); no target has this rationale section.",
+      "searched": [
+        "grep \"Why The Sequence|monotonic\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"Node dependency\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"demonstrated removal|forecasted ownership\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_666cd097b96236ab3c885054b2240ead",
+      "sourceUnitDigest": "387c2ab2cd3ac650",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in claim that the sequence provides a monotonic migration; no target states it.",
+      "searched": [
+        "grep \"monotonic\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"sequence provides\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"final host exists\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_50f628b5dcaf8dbdffee5607d27480f1",
+      "sourceUnitDigest": "14d6dae2683b8069",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Six rationale bullets (final host exists before replacement; each slice removes one Node dependency; untouched operations stay on current path; rollback is release rollback via fgctl; extension work targets the permanent host boundary; Node cleanup follows demonstrated removal). Only the fgctl rollback bullet (history baseline, vision.md) and Node removal on zero routes (migration rules) appear elsewhere; the other bullets are absent, so the rationale as a set is not carried.",
+      "searched": [
+        "grep \"final host|permanent host boundary\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"removes one Node|each completed slice\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"untouched operations|current execution path\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_f2eb44e222e17f54c6ccc94e0af4fa3e",
+      "sourceUnitDigest": "7c44e976bbdd4a59",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Accepted temporary cost: legacy operations may start slightly slower because Rust delegates to Node, and the installed product carries both runtimes until migration completes. Not stated in any target.",
+      "searched": [
+        "grep \"slower|slightly\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"both runtimes|carries both\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"overhead|latency\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_de06d5be825c0a46599c25f4b5f41b0d",
+      "sourceUnitDigest": "9c3b81a227227dd1",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "3-readiness-categories",
+      "claimKind": "navigation",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading Current Migration Readiness; target section 3 Readiness Categories carries the readiness lists by pointer to history baseline."
+    },
+    {
+      "claimId": "claim_5ac4a4ce8501c135b57d3289f96d5a70",
+      "sourceUnitDigest": "8b5a966733683eab",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Target section 3 says the near-thin/partly-thin/not-thin lists are ordering signals needing a fresh scan; section 1 rejects Node-thinning first, matching \"ordering signal, not a prerequisite to refactor all Node code first\"."
+    },
+    {
+      "claimId": "claim_bb89ed52536b1289401a9172c85ec599",
+      "sourceUnitDigest": "4bf14f6ed957be3f",
+      "targetOwner": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Near-thin category row in the history baseline table."
+    },
+    {
+      "claimId": "claim_3b0b946349b8fa27b333dc346315983f",
+      "sourceUnitDigest": "144cfee926561bd1",
+      "targetOwner": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Baseline table lists the same near-thin commands (version, review, approve, reject, catchup, sync-root, promote-to-component, gateway start|stop|status, session start|end|list|gc, triage, goal). Dropped: what each delegates to (version resolution, src/verbs/merge/*, gateway lifecycle control, session component, impact ranking, focus/set/show functions) and the \"mostly\" qualifiers."
+    },
+    {
+      "claimId": "claim_213f64c40ab34be11ddf0b4f82a8698b",
+      "sourceUnitDigest": "a0fbc6f74a40364c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Near-thin commands need less boundary extraction, but risk and authority still determine their order. Targets say read-only before writers and ordering signals, not this risk/authority ordering rule.",
+      "searched": [
+        "grep \"risk and authority|authority still\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"boundary extraction\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"less boundary\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_bf3d7167dae0b1afb1dbded1c3a1b910",
+      "sourceUnitDigest": "0dd2aede1dd71a16",
+      "targetOwner": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Partly-thin category row in the history baseline table."
+    },
+    {
+      "claimId": "claim_c636fbbe9cf7f50c068480a13103d857",
+      "sourceUnitDigest": "07bd4f0c440272f0",
+      "targetOwner": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Baseline lists submit, discover, plan, init, doctor, check, rollup, evolve. Dropped: the per-command reasons (submit composes title derivation/ID generation/defaults/domain entry/acceptance parsing/add; discover owns verdict parsing/preconditions/config/patching; plan owns validation branching/stage checks/verdict/child parsing; init/doctor compose rc wiring/hooks/defaults/fixes/checks/presentation; check/rollup/evolve compose read models and output)."
+    },
+    {
+      "claimId": "claim_c6b117438c78c0881915df368cb8f4d9",
+      "sourceUnitDigest": "079b802febbbc6b9",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Migration Rules: migrate complete operation/use-case boundaries; section 1 rejects repository-wide Node thinning; baseline row says partly-thin migrate only by complete use-case boundary."
+    },
+    {
+      "claimId": "claim_57e68cea3f9bf4d66fc048f02f59383d",
+      "sourceUnitDigest": "354e2a02895790b2",
+      "targetOwner": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Not-thin category row in the history baseline table."
+    },
+    {
+      "claimId": "claim_1af65e52e9258010540ae12b62a51d26",
+      "sourceUnitDigest": "77d94f86a9816b38",
+      "targetOwner": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Baseline lists take, pick, return, move, add, edit, uninstall, preflight, unlock, main-checkout-reset, resync-worktree and knowledge/documentation/registry verbs. Dropped: per-command reasons (pull-door policy, git/worktree behavior, verification, claims, advisory checks; lifecycle guards and decision logging; parsing/normalization; host/system policy mixed with control flow; reporting plus orchestration in the CLI switch)."
+    },
+    {
+      "claimId": "claim_5325339ee4038a9c701bb19edd74dd17",
+      "sourceUnitDigest": "ddccd808c7c802a9",
+      "targetOwner": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Baseline says not-thin commands remain whole legacy operations until boundaries are ready; narrower than the source condition \"until their transaction and authority boundaries can move together\"."
+    },
+    {
+      "claimId": "claim_9856db4ff1c2d562e95ff0786f823389",
+      "sourceUnitDigest": "cf9af2c3f99440df",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "1-release-boundaries",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading R1 Distributable Rust CLI Host; the R1 row of the release boundary table carries the slice."
+    },
+    {
+      "claimId": "claim_502a4f82b936983d2e826e42f613f60d",
+      "sourceUnitDigest": "e0bdf8b949ac84b4",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R1 proof states installed entry is Rust-host-owned, unmigrated selectors transparently reach Node, version is native; legacy-payload.md carries fgos-runner as the remaining public Node entry. Not carried: \"smallest honest meaning of ship the Rust host\", \"not merely a binary that passes repository tests\", and the fgos-runner separately-proven requirement inside R1."
+    },
+    {
+      "claimId": "claim_a1db1d2b5ec77e9580555f69f4cad2be",
+      "sourceUnitDigest": "35bcff5e78ce85d2",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in to the ordered R1 migration order; targets list the R1 slice as an unordered table cell, so the ordering is not carried."
+    },
+    {
+      "claimId": "claim_874ccce76215f5a036d08203211c2868",
+      "sourceUnitDigest": "2f1c21e70e66ff46",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "procedure",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R1 table row lists kernel, const catalog/snapshot, two-stage authority, CLI lane, native distribution.build.show and fgctl proof; legacy-payload.md carries the legacy-node manifest naming; command-route-descriptor.md carries the descriptor. Not carried: the 8-step order, confirming the supported target matrix, adding the ownership header to bin/fgos.mjs and root AGENTS.md note, freezing compatibility evidence before kernel work, and flipping the installed default only after compatibility and distribution gates pass."
+    },
+    {
+      "claimId": "claim_cd920a5c6b37f91738221ce29db5e4d7",
+      "sourceUnitDigest": "9b9f46a7268c027b",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "R1 row \"Explicitly not a gate\" lists external ecosystem discovery, WASM, chat and production gateway migration."
+    },
+    {
+      "claimId": "claim_9f1e20c17bafe84ffd5c9170a751a5a0",
+      "sourceUnitDigest": "53a1ae624ad97a3e",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R1 proof carries: every unmigrated selector reaches Node via the release manifest, native version with no Node process, fgctl install/upgrade/rollback reproducible. Not carried: the exact external-temp-project fgctl init proof followed by fgos init -> doctor --fix -> doctor on every supported target, previous release as named rollback channel, explain-command-route naming owner and parity suite, and \"host, legacy payload and Node runner always come from one versioned release artifact\"."
+    },
+    {
+      "claimId": "claim_fa0f4a4233cf24cffd3756f14d6e0ad6",
+      "sourceUnitDigest": "cbb07c4d6a29cdde",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "1-release-boundaries",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading R2 External Process Provider Preview; the R2 row of the release boundary table carries it."
+    },
+    {
+      "claimId": "claim_9c7bb3f6e802409a5b90faaac46a2c3f",
+      "sourceUnitDigest": "1fb2478b8a376378",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "navigation",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "R2 row states the external process preview slice after R1; protocol/manifest/adapter detail lives in the external-provider-protocol architecture doc and R2 proof."
+    },
+    {
+      "claimId": "claim_5641bb020619ed89671f878220ee6a81",
+      "sourceUnitDigest": "ea4eaa0a063f1cd3",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R2 proof carries protocol conformance, static manifest validation without execution, bounded supervision/handshake/cancellation/crash/completion-unknown, and one vendor-scoped fixture operation through the common router. Not carried: step 5, expose provider/registry diagnostics through an explicit diagnostics surface, never compatibility output."
+    },
+    {
+      "claimId": "claim_82c03ace667d3b9a6b3a4130445160e1",
+      "sourceUnitDigest": "ab44d8f11fc0dc58",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r2-external-process-proof.md",
+      "targetAnchor": "unheaded-block-13",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R2 non-gates carry marketplace, publisher trust/signatures, production WASM and core-provider replacement. Not carried: broad project/global discovery UX as separate ecosystem work, and the exit criterion that R2 exits when the process adapter and protocol are real and fail closed."
+    },
+    {
+      "claimId": "claim_6837def654317a6834bd8353f3d62683",
+      "sourceUnitDigest": "5a78d1358fc89e9c",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "1-release-boundaries",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading R3 Production Remote Host; the R3 row of the release boundary table carries it."
+    },
+    {
+      "claimId": "claim_3c20acd43697420d9cf2954ba122554a",
+      "sourceUnitDigest": "bbacd120b9de0eef",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/release-boundaries.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "intent",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "R3 row: remote peer calls the shared invocation service directly."
+    },
+    {
+      "claimId": "claim_363a3b2745d8220ca67a388e667ef69f",
+      "sourceUnitDigest": "368ba325b431f312",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R3 proof carries one native route through remote projector/presenter, gateway auth unchanged, no fgos.v1 parsing, a route inventory, and VerbGateway not deletable until all consumers retire. Not carried: build a real per-operation Node semantic bridge or keep the route on the old chokepoint during a named rollback window, and the rule to delete the CLI-shelling chokepoint once no route uses it."
+    },
+    {
+      "claimId": "claim_64d8ef6551f46c1a400b4b5953b6ba51",
+      "sourceUnitDigest": "213113fd22439c4b",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "legacy-cli-transition.md carries \"captured stdout/stderr remain public presentation, not semantic ProviderOutcome\". Not carried: the separate blast-radius review for the R3 stage because the Herdr crate combines gateway, TUI, Axum, MCP, auth and web concerns."
+    },
+    {
+      "claimId": "claim_cb5f9407269b77080fbb088ca91118fd",
+      "sourceUnitDigest": "e2e36b01c3aa13ea",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "host-use-cases.md carries remote peer is the project-local gateway in R3 and a future shared multi-project gateway is separate (planned). Not carried: the gateway is the Herdr crate released alongside the runtime and composing the host-runtime crate in-process; the shared gateway reaches a project runtime only through the out-of-process Project Runtime Adapter, never in-process."
+    },
+    {
+      "claimId": "claim_ac42bff1400920fcfd54f99e5c852012",
+      "sourceUnitDigest": "9ba12c1bc084a3db",
+      "targetOwner": "docs/platform/host-invocation-routing/README.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "decision",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Area portal current-position row: chat is a future peer only after a real adapter and admission/interruption/presentation contracts exist; release-boundaries R1 row lists chat as not a gate."
+    },
+    {
+      "claimId": "claim_1e2e21550762c240e9cdd8798da86400",
+      "sourceUnitDigest": "d38e66402682d6fc",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "7-phase-d-add-the-next-native-read-route",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading for the next read-only proof; roadmap Phase D covers adding the next native read route."
+    },
+    {
+      "claimId": "claim_cfc4ff3c049548b37886519af328eb5f",
+      "sourceUnitDigest": "7ea0f46cc6d8e9f8",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "unheaded-block-26",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Phase D goal: migrate one more read-only semantic route after version; migration rules put read-only before writers."
+    },
+    {
+      "claimId": "claim_8e655426dff7dfaa26b546b3bcc8a45e",
+      "sourceUnitDigest": "6f3c4c5697571155",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "7-phase-d-add-the-next-native-read-route",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading gate-bypass; roadmap Phase D names gate-bypass as the candidate and records its native proof."
+    },
+    {
+      "claimId": "claim_7226555e50f437af97567386259ab46c",
+      "sourceUnitDigest": "0ac6f4af09c9fd42",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "unheaded-block-27",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Roadmap carries gate-bypass routing to work.gate-bypass.show as a read through the existing work/state read core, with writers out of scope. Not carried: the proof purpose (real project filesystem/config path, precedence over the legacy standalone file, malformed input handling, fail-closed default)."
+    },
+    {
+      "claimId": "claim_9ab0a693a87bf70ad7512cd88a1d9daf",
+      "sourceUnitDigest": "6a55ef48765cef54",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Scope exclusion: do not include approval-policy calculation or risk-keyword evaluation in the gate-bypass slice. Roadmap says only that src/state/gate-bypass.mjs owns the pure read computation and keeps writers out; the exclusion is not stated.",
+      "searched": [
+        "grep \"risk-keyword|risk keyword\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"approval-policy|approval policy\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"Do not include\" in all 30 files under docs/platform/host-invocation-routing/ -> only unrelated gate-policy line"
+      ]
+    },
+    {
+      "claimId": "claim_c005ecb1989a286b1757798cc7d2a94e",
+      "sourceUnitDigest": "dfa2fb74dabfd94a",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "unheaded-block-32",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Roadmap Phase D done-when: second native route exists, boundary documented, tests prove native and legacy semantics do not drift. Not carried: positive and malformed/missing-file cases equivalent, no writes and no Node spawn as the exit condition."
+    },
+    {
+      "claimId": "claim_18f1c32a71e8c60bca41d1d3284f18a2",
+      "sourceUnitDigest": "fd704e4f7f1ef4ef",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading: why ready is not the first read proof. No target explains this decision.",
+      "searched": [
+        "grep \"ready\" in all 30 files under docs/platform/host-invocation-routing/ -> only harness coverage list, R3 inventory row and unrelated words",
+        "grep \"first proof\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"Work Lifecycle read model\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_a916424d6dc432c47d25679e4bd81f5c",
+      "sourceUnitDigest": "e9130dbfa54030bb",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "ready depends on event loading, replay, domain stage mapping, lineage/dependency semantics and effective runtime claims, so porting it first would turn a host proof into a Work Lifecycle read-model migration; it is a later read-side slice after version and gate-bypass. No target states this reasoning or ordering.",
+      "searched": [
+        "grep \"event loading|lineage|stage mapping\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"effective runtime claims|effective claim\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"ready\" in all 30 files under docs/platform/host-invocation-routing/ -> no ordering statement"
+      ]
+    },
+    {
+      "claimId": "claim_c072318ec582affe5e0e6936961fadc4",
+      "sourceUnitDigest": "d1c2fad49a508790",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "2-migration-rules",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading Repeat By Component Boundary; only the complete-boundary and read-before-writer rules survive in Migration Rules."
+    },
+    {
+      "claimId": "claim_9f2283b25ef4be9f0e68b4381f1ce08e",
+      "sourceUnitDigest": "79c90b13578b11cb",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in to the per-component repeat procedure, which no target carries (see the ten-step list).",
+      "searched": [
+        "grep \"For each subsequent component\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"subsequent component\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"Repeat By Component\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_abc80009ab1bf59c40a645089fbc82fd",
+      "sourceUnitDigest": "da634aada4e73515",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Ten-step per-component procedure (read boundary advisory and name responsibility/authority/state/effects/class/placement; pick complete boundary; capture Node behavior as shared fixtures; extract only needed boundary; implement native provider; run both against same fixtures; shadow only side-effect-free reads; switch after parity; observe rollback window; remove Node in later cleanup). Targets keep only the complete-boundary rule and no-write-shadow rule.",
+      "searched": [
+        "grep \"shared fixtures|same semantic fixtures\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"observation window|rollback window\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"Shadow only|side-effect-free\" in all 30 files under docs/platform/host-invocation-routing/ -> only the no-write-dual-run rule"
+      ]
+    },
+    {
+      "claimId": "claim_b2148884a229612fc756e330b1399dd1",
+      "sourceUnitDigest": "80cf071a352d8510",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Migration Rules carry \"read-only operations come before complex writers\". Not carried: near-thin operations first and \"file size alone does not choose order\"."
+    },
+    {
+      "claimId": "claim_43dd4f7aa139c570ea072ea4f9b7221d",
+      "sourceUnitDigest": "17182ded50a6a695",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Contract carries: providers never block waiting for a person; a parked outcome is returned and the host or Work Lifecycle re-invokes later (also in migration rules). Not carried: the precondition that this must hold before any ask/answer-shaped operation migrates."
+    },
+    {
+      "claimId": "claim_e960a05c0b656d0dae2cffd3daee5a0d",
+      "sourceUnitDigest": "225088240c21859f",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "4-implementation-alignment",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading Read Models Before Writers; the alignment table row \"Read models before writers\" carries it."
+    },
+    {
+      "claimId": "claim_273dc85bcdf5ba25529e63b15e143f10",
+      "sourceUnitDigest": "6820b1ee737ed435",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "intent",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Alignment row says read models migrate before writers and names version/gate-bypass/remote runtime as read proofs. Not carried: the next meaningful proof is a Work Lifecycle read-side component, potentially the dependencies for ready."
+    },
+    {
+      "claimId": "claim_99bf6932b3f44681c138edf8384d652b",
+      "sourceUnitDigest": "3446982a4c242232",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in to the seven-step internal sequence for the Work Lifecycle read-side component; no target carries it.",
+      "searched": [
+        "grep \"Sequence it internally\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"frontier\" in all 30 files under docs/platform/host-invocation-routing/ -> only roadmap next-frontier wording",
+        "grep \"decode fixtures|replay fixtures\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_056d11e86ef88989c436bc14a24997a1",
+      "sourceUnitDigest": "8d95bdf1308d786d",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Seven-step sequence (event/schema decode fixtures, deterministic replay fixtures, domain/stage projection fixtures, frontier calculation fixtures, effective claim overlay, CLI ready parity and pagination, remote semantic parity). Absent from all targets.",
+      "searched": [
+        "grep \"deterministic replay|decode fixtures\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"frontier calculation|effective claim overlay\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"pagination\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_0d3534934d94da41639a8bbc329bb899",
+      "sourceUnitDigest": "498ede6821d57d1a",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "intent",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Alignment row \"Read models before writers\" states the same ordering: reusable Rust read models before any event writer moves."
+    },
+    {
+      "claimId": "claim_b31f86388112e9f8aac5f3ea07c83bd5",
+      "sourceUnitDigest": "7b1dc142c1f821dc",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "4-implementation-alignment",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading Migrate State-Writing Components; alignment row \"Writer migration has atomicity/replay/mutual-exclusion gates\" points to it as planned."
+    },
+    {
+      "claimId": "claim_63860fe2462fbdab3c4d5b57444fb5a4",
+      "sourceUnitDigest": "e9835473d73b6c3d",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Alignment row says writer migration has gates; the source lead-in \"move a writer only when all of these are explicit and tested\" is not stated as a rule."
+    },
+    {
+      "claimId": "claim_bd9900cec35acddc9849345a94c6db36",
+      "sourceUnitDigest": "4f8ff02e1afae831",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Alignment row names only atomicity/replay/mutual-exclusion gates as planned. Not carried: sole authority owner, event/schema version compatibility, lock and concurrency behavior, fsync/rename expectations, idempotency and retry policy, crash recovery and partial-write detection, typed error/exit mapping, rollback compatibility with events written by Rust."
+    },
+    {
+      "claimId": "claim_ae033477100f1de32bd90e0dfbc1864a",
+      "sourceUnitDigest": "d185160a573cf183",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Migration Rules carry \"never dual-run a write for shadow comparison\". Not carried: use fixtures, isolated temp stores and replay equivalence instead."
+    },
+    {
+      "claimId": "claim_acf1156543b8ec7d86e7b4e009201170",
+      "sourceUnitDigest": "5be3e11ab7d00af8",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "11-phase-h-legacy-node-retirement",
+      "claimKind": "procedure",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading Remove Node; roadmap Phase H Legacy Node Retirement covers it."
+    },
+    {
+      "claimId": "claim_6cc2bd78692503007d071066315a111e",
+      "sourceUnitDigest": "a305db81df6b4bd9",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "unheaded-block-51",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Phase H goal: remove legacy Node only after zero-route and release-policy proof."
+    },
+    {
+      "claimId": "claim_8eb35e24ef106901ca1a2214ec25fdbd",
+      "sourceUnitDigest": "f4bd959c67e70a2b",
+      "targetOwner": "docs/platform/host-invocation-routing/roadmap.md",
+      "targetAnchor": "11-phase-h-legacy-node-retirement",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Phase H gates carry zero legacy-cli routes, replay compatibility and public host contract tests, no setup/doctor/init/repair dependency on Node fallback, rollback not needing Node payload. Not carried: obsolete Node facades, manifests, test adapters and distribution entries removed in the same cleanup series; roadmap instead adds closed compatibility window and retiring docs."
+    },
+    {
+      "claimId": "claim_119c3cb5a48455746661c2e7d0a2b898",
+      "sourceUnitDigest": "52530bbda152c1a0",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Migration Rules: \"Node removal follows zero remaining routes and proof, not a calendar date\"."
+    },
+    {
+      "claimId": "claim_ac2177776d1a367f2d8e81699b04fc63",
+      "sourceUnitDigest": "30245265d7fc6538",
+      "targetOwner": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "targetAnchor": "3-historical-decisions-preserved",
+      "claimKind": "decision",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading Rollback Rules; the baseline historical decisions carry config-cannot-replace-built-in and release-rollback-through-fgctl rules."
+    },
+    {
+      "claimId": "claim_485913c207130897d47aa1e1511faa50",
+      "sourceUnitDigest": "c2f9416ff4f07d2f",
+      "targetOwner": "docs/platform/host-invocation-routing/history/host-invocation-baseline.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "decision",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Baseline carries: config cannot replace built-in providers; rollback of native R1/R2 behavior is release rollback through fgctl (also external-provider-manifest.md rules, vision.md). Not carried: ActivationRecord.previousArtifactDigest plus preserved release directory plus state-schema compatibility check mechanism, and that the previous release still contains both native provider and Node payload during the observation window."
+    },
+    {
+      "claimId": "claim_a1c1085c9d77a84ca5e5aefe1de6d059",
+      "sourceUnitDigest": "685b687d446cbbf7",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Rollback bullets: legacy and native side by side only during the operation observation window; never delete a Node writer before proving it can read/recover Rust-written state or declaring the cutover irreversible with evidence; remove rollback code per component after its window; no permanent second implementation tree. None appears in any target.",
+      "searched": [
+        "grep \"observation window|rollback window\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"irreversible|second implementation|permanent second\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"side by side\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_5d6afe6b9aac75dd4fb323e2a866d837",
+      "sourceUnitDigest": "fc9ac4b4847ff405",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "verification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading Verification Gates; stage proofs live in the R1/R2/R3 proof docs."
+    },
+    {
+      "claimId": "claim_20545e78518081973da7685f01636fee",
+      "sourceUnitDigest": "e2ed506da1623f6f",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Rule that every migration stage must leave a reproducible gate. No target states this stage-gate rule (verification README says verification records alignment at a point in time).",
+      "searched": [
+        "grep \"Every stage\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"reproducible gate\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"reproducible\" in all 30 files under docs/platform/host-invocation-routing/ -> only R1 install proof wording"
+      ]
+    },
+    {
+      "claimId": "claim_e919af7f6751a0a8df95673a9057c298",
+      "sourceUnitDigest": "39f8e89e949c1c2d",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "1-required-proof",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Stage gate table is spread over r1-rust-host-proof.md, compatibility-harness.md (argv/stdin/cwd/env/exit/signal parity), r2 and r3 proofs, roadmap Phase D/H. Not carried: the performance gate (legacy passthrough overhead vs direct node entry and native version latency thresholds from the plan P1 harness), and the Work read model and First writer proof rows (Rust replay determinism; atomicity/recovery/concurrency/mutual exclusion/idempotency/cross-version replay) as gates."
+    },
+    {
+      "claimId": "claim_e205cd11ce321170320898e9845689a3",
+      "sourceUnitDigest": "3eb88c6187aa1fc7",
+      "targetOwner": "docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md",
+      "targetAnchor": "4-proof-commands-from-source-plan",
+      "claimKind": "verification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "R1 proof lists npm test and cargo test --workspace (plus an install-packaging test). Not carried: that they remain the repository-wide proof until Node tests are retired deliberately."
+    },
+    {
+      "claimId": "claim_f3092763d47af8fa8eaffec73ca0fe63",
+      "sourceUnitDigest": "54f6b09a0dcce16b",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading of the remaining-decisions section; no target lists the remaining migration decisions (release-boundaries open decisions cover different items).",
+      "searched": [
+        "grep \"Remaining Migration Decisions\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"target matrix|supported target\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"first eligible writer|eligible writer\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_f16be2f3b890cb70b0c1492df480469d",
+      "sourceUnitDigest": "ef175327bce10a7d",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Four open questions: supported target matrix gating the first distributed Rust host; length of the provider rollback observation window; whether gate-bypass remains the next proof or a settled component read replaces it; first eligible state-writing component after Rust replay parity. Only question 3 is settled elsewhere (spec.md: gate-bypass closed, local native proof implemented); the others are not carried or recorded as settled.",
+      "searched": [
+        "grep \"target matrix|supported target\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"observation window|rollback window\" in all 30 files under docs/platform/host-invocation-routing/",
+        "grep \"first eligible writer|eligible writer|first writer\" in all 30 files under docs/platform/host-invocation-routing/"
+      ]
+    },
+    {
+      "claimId": "claim_9abc9022ffe0e22751258bd1dca6136d",
+      "sourceUnitDigest": "7183b170a4f5f7e7",
+      "targetOwner": "docs/platform/host-invocation-routing/README.md",
+      "targetAnchor": "unheaded-block-10",
+      "claimKind": "decision",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Area portal ownership boundary: host invocation consumes the runtime selected by Packaging-Distribution and does not own fgctl, release acquisition, activation binding publication, upgrade, repair or rollback; this is the settled owner for the release/install mechanism."
+    }
+  ]
+}

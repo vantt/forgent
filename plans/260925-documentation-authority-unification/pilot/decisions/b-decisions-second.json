@@ -1,0 +1,1300 @@
+{
+  "version": 1,
+  "shard": "b-decisions-second",
+  "sources": [
+    "docs/specs/work-state.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_67c5f9d1a031030f5bd1f3ab27320130",
+      "sourceUnitDigest": "4b0aa9f66af44b8646bc59ceecd4cd0ae333b703213d215683c9721a930d8e51",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-62",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9264",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "4b0aa9f66af44b8646bc59ceecd4cd0ae333b703213d215683c9721a930d8e51",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "e8955e0b3dec8d380ded621144ee9f6050d0ca7c7cbae806dbdd3c1c3aded384",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9264"
+    },
+    {
+      "claimId": "claim_7a2a3390e3beca0100dbfebb57cb6aab",
+      "sourceUnitDigest": "bc40e0a51da3f0b6c1bc1f2d9e080ca9425d47377adf8516d68d3017e61c10d2",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-63",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: equal after listed exceptions: route; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9265",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "bc40e0a51da3f0b6c1bc1f2d9e080ca9425d47377adf8516d68d3017e61c10d2",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "143c1d294a8bccba0781ea9d3a7c82b00219fc00bf2eb923c7d0702250c15ecb",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9265"
+    },
+    {
+      "claimId": "claim_69ddf8650201dae7cbe8fe80373c6a7c",
+      "sourceUnitDigest": "1c78b8c81620de3db87b5014b8eb841f44817b8e0fffb595a008ae70b1bcca69",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "quyết-định-9",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9266",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "1c78b8c81620de3db87b5014b8eb841f44817b8e0fffb595a008ae70b1bcca69",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Quyết định"
+      ],
+      "bindingSha256": "5a489398d3c43d610cba45aa856c44fbc6a4a2da7350fb702eac9ac5ca673646",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9266"
+    },
+    {
+      "claimId": "claim_5fb4a29b7884b27f3d265612f67e4f31",
+      "sourceUnitDigest": "f0688f3556688d27119ec8c0d5d0d39020787569f9c8191bc9d9a09d49cad8f6",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-64",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9267",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "f0688f3556688d27119ec8c0d5d0d39020787569f9c8191bc9d9a09d49cad8f6",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Quyết định"
+      ],
+      "bindingSha256": "beeb1266e1726c7d5f7adeed3a1f2e696d7b7ec787b2af9a82cb279bb8707966",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9267"
+    },
+    {
+      "claimId": "claim_5eca88140b6e1a8d5c14095b6cb31045",
+      "sourceUnitDigest": "e63e9faed67fe666896d680ac13dbc95a8757bf4e5a4fb9a8ac949b89c9144f4",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-65",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9268",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "e63e9faed67fe666896d680ac13dbc95a8757bf4e5a4fb9a8ac949b89c9144f4",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Quyết định"
+      ],
+      "bindingSha256": "511ba783c29f900dc4e7624be599e8b54b7a422da891d6dadb48be415f3e152c",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9268"
+    },
+    {
+      "claimId": "claim_b1c9fa89736c52b8bff6d5ec328cc553",
+      "sourceUnitDigest": "6b827c7b203c054cb640d2f707bed0f02545eee40a3085f6a9f37fd107bff94d",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "hệ-quả-9",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9269",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "6b827c7b203c054cb640d2f707bed0f02545eee40a3085f6a9f37fd107bff94d",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Hệ quả"
+      ],
+      "bindingSha256": "befc446dfbb8b5e8f0c313f382c717ddb420f065cd01554101d1b900a02bf27d",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9269"
+    },
+    {
+      "claimId": "claim_ec3bfee565512c6d032778295c5838c1",
+      "sourceUnitDigest": "1d55a3e34d5b0515071b018c1d53482d9bf5a55a0c89eceb1dd80d27d32f1ee5",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-66",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9270",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "1d55a3e34d5b0515071b018c1d53482d9bf5a55a0c89eceb1dd80d27d32f1ee5",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Hệ quả"
+      ],
+      "bindingSha256": "533f915a738b98b9b58efe79a3e8991f42ec0319e9dd074c0f390c4275bde430",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9270"
+    },
+    {
+      "claimId": "claim_82f766f5320ab6bbe5174aeda52e710b",
+      "sourceUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-67",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9271",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e77fd85d475bec04c6872e6ebdf495b104",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0024 — Đổi tên status `proposed` thành `awaiting-approval`",
+        "Hệ quả"
+      ],
+      "bindingSha256": "715b1769453d08cd09cf2dc2af3853bee69eb466eb242b66de8858e7d01880b3",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9271"
+    },
+    {
+      "claimId": "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
+      "sourceUnitDigest": "8a864bfaf25cf07832117f7c05ee8ae61b7abb202998b3e7ad816bb10111da8c",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-domain-sở-hữu-vocabularytransition-status-đoạn-trước-delivered-supersede-base-workflow-model",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: equal after listed exceptions: route; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9272",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "8a864bfaf25cf07832117f7c05ee8ae61b7abb202998b3e7ad816bb10111da8c",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)"
+      ],
+      "bindingSha256": "a4e5610c92ff3fadc4b7b3afa0fee3d809db5a983b38d7aace52adb41adfc9db",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9272"
+    },
+    {
+      "claimId": "claim_818a58278988ed797931b14ca91614e2",
+      "sourceUnitDigest": "a06a29884a79a4ebab4677e90c1c1a1e9b2a4f8378e0ef8b769c2a78a9c1a701",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "bối-cảnh-10",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: equal after listed exceptions: route; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9273",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "a06a29884a79a4ebab4677e90c1c1a1e9b2a4f8378e0ef8b769c2a78a9c1a701",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "d2de80fc0670c8283f80392af534bf9aaaa467789e4b4e2a4767e413d2596fcc",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9273"
+    },
+    {
+      "claimId": "claim_2d89ae63cbc81e492eb80e9a28174b67",
+      "sourceUnitDigest": "f4a426a2b8673dfb37672014bca4267277fc6da03ffcd9103a7962736b64c4a4",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-68",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: equal after listed exceptions: route; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9274",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "f4a426a2b8673dfb37672014bca4267277fc6da03ffcd9103a7962736b64c4a4",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "56d2b9a1d722d7b313bbc953d11b8ceea3722afb0575d30c0fda3b4e739f51df",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9274"
+    },
+    {
+      "claimId": "claim_a92d8b1ad203c61b04078fa8b94c9b17",
+      "sourceUnitDigest": "9e779d390baf10f4993b0973177117e4316f471f04f463cffc54dd6affbc0197",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-69",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9275",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "9e779d390baf10f4993b0973177117e4316f471f04f463cffc54dd6affbc0197",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "a86e4183a4f3387496fd9d1150e7ddbfc888319c459f9dd7ede32695632d70e1",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9275"
+    },
+    {
+      "claimId": "claim_a3944b679053b61dc2d743795cde3d77",
+      "sourceUnitDigest": "5e566c132da3b486f17ad15991b3409a28229ac2f48472d4e61c13ab0b31b41a",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-70",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9276",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "5e566c132da3b486f17ad15991b3409a28229ac2f48472d4e61c13ab0b31b41a",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Bối cảnh"
+      ],
+      "bindingSha256": "c4bea91554b42a04d1cbb9d6c778bff80f1d7e3d158254dc17f997673ac8b00b",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9276"
+    },
+    {
+      "claimId": "claim_466331635349f55e32c11e0fcf56d334",
+      "sourceUnitDigest": "d76f5cf17475a3fbfcac8752ebf9fd616795b1b9d810e23235f38a8322acffa4",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "quyết-định-10",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: equal after listed exceptions: route; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9277",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "d76f5cf17475a3fbfcac8752ebf9fd616795b1b9d810e23235f38a8322acffa4",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Quyết định"
+      ],
+      "bindingSha256": "35ff871241b77208e38a39ebb4b3fa5532c98140d9df19148e2a1575ac940335",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9277"
+    },
+    {
+      "claimId": "claim_3f65fc24d3eeb760ecc11ff781159152",
+      "sourceUnitDigest": "1c7ea2fda926300b7351bee9c39ec9314d0d7f3d053ba408667ef2c0d8f4ac0c",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-71",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9278",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "1c7ea2fda926300b7351bee9c39ec9314d0d7f3d053ba408667ef2c0d8f4ac0c",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Quyết định"
+      ],
+      "bindingSha256": "6665fea495e0f931bfcf6135d909805907cb97d6370526b1b1917b2bf1f3d4f2",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9278"
+    },
+    {
+      "claimId": "claim_a4a77d7c336663f81a9bc8ac697ab518",
+      "sourceUnitDigest": "46ec1457959a8895465a7d7320215bb4940457e34d39eaeb5ab18a8b637aae01",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-72",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9279",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "46ec1457959a8895465a7d7320215bb4940457e34d39eaeb5ab18a8b637aae01",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Quyết định"
+      ],
+      "bindingSha256": "6a9e55e7bad336a4200a19a8afdbfe08f2849b34c3580485f5138f373c3d3d93",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9279"
+    },
+    {
+      "claimId": "claim_a4ed529f5ed4745e1c6bbbb06eb3a4b2",
+      "sourceUnitDigest": "127c7c7a99d0a8fcab543606c597226d64df9b202cda0911d7cbaa815a363cf4",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-73",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: equal after listed exceptions: route; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9280",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "127c7c7a99d0a8fcab543606c597226d64df9b202cda0911d7cbaa815a363cf4",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Quyết định"
+      ],
+      "bindingSha256": "cc2b5110b487405fef6b5729c400bc91065c33d2d4c5df534e84c8715a02e94b",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9280"
+    },
+    {
+      "claimId": "claim_f3d9c6dbb704d09c37ab5cfd4f65927e",
+      "sourceUnitDigest": "7b133e87cfdf8159a9ddd402d8ce2f59f1a286b8bac218807963a8a8bbbf3483",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-74",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9281",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "7b133e87cfdf8159a9ddd402d8ce2f59f1a286b8bac218807963a8a8bbbf3483",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Quyết định"
+      ],
+      "bindingSha256": "948158ad5dd310c86fea6a786e1d99086939e6a70f9b90884a005bc8e2c014c2",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9281"
+    },
+    {
+      "claimId": "claim_6c5753df306960b46d20e133a2a36894",
+      "sourceUnitDigest": "6d99060fca9f1fb5602ee7d2ec14775af7aa01b666e2f16ed715219741b651c5",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-75",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9282",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "6d99060fca9f1fb5602ee7d2ec14775af7aa01b666e2f16ed715219741b651c5",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Quyết định"
+      ],
+      "bindingSha256": "2a6a0e272f0fe954a7651fd55597a4a0de3df4913d062c54261978574d660070",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9282"
+    },
+    {
+      "claimId": "claim_1d98a4a5c3391d5318f53153b3f5f442",
+      "sourceUnitDigest": "7c211b5505c4924dd9c23a68d64ab36658204db5c7e536e15eceea988ef445f7",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-76",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9283",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "7c211b5505c4924dd9c23a68d64ab36658204db5c7e536e15eceea988ef445f7",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Quyết định"
+      ],
+      "bindingSha256": "f1c0847d161deaf93486cf70ddc7c1e4cab842010427784aab8b4bf1c1853873",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9283"
+    },
+    {
+      "claimId": "claim_546450931dd47024138ce0a32699cd72",
+      "sourceUnitDigest": "31a4c4ddccf1d5d56990ceba0e49bc09638561de5ffb5300c3fd73cab4f933fe",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-77",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9284",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "31a4c4ddccf1d5d56990ceba0e49bc09638561de5ffb5300c3fd73cab4f933fe",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Quyết định"
+      ],
+      "bindingSha256": "58b83b8541fbe37fa63bd79ec67e13270ef60a3d63624a2da0e56454a8b80c13",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9284"
+    },
+    {
+      "claimId": "claim_0da8b597cb243173df9f5eb46a34ec76",
+      "sourceUnitDigest": "7dae6b0f1c8a4ba4b700b6a8723d516664ceb3697f8860c66ee5ee50ff0cf1e9",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "audit-mọi-consumer-thật-của-status-fsmmjsstatusestransitionsliteral-status-hôm-nay",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9285",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "7dae6b0f1c8a4ba4b700b6a8723d516664ceb3697f8860c66ee5ee50ff0cf1e9",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay"
+      ],
+      "bindingSha256": "d059dcdfe02921eddd70ae12befca09f3bbd18a35575c587bb5e1e3908c165bf",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9285"
+    },
+    {
+      "claimId": "claim_0cabbd5a6b95edeb9aab6832ad276c50",
+      "sourceUnitDigest": "c2f2baeae1bc366d51a16dbf1b083a2add5cacd51c1bf7c3ea6d3f91c5190d11",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-78",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9286",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "c2f2baeae1bc366d51a16dbf1b083a2add5cacd51c1bf7c3ea6d3f91c5190d11",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay"
+      ],
+      "bindingSha256": "55cbc7b98d5de28ee5ebfc2102e95218589f663a3a4e3853985531bc418978b2",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9286"
+    },
+    {
+      "claimId": "claim_7889671f1f2783b634ef6d90a251f3e9",
+      "sourceUnitDigest": "cfb28f2fabec3889394f7a2c06ee84aab57810dada3902eddbaabc23c4c3fca5",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "1-nguồn-sự-thật-định-nghĩa-statusestransitions",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9287",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "cfb28f2fabec3889394f7a2c06ee84aab57810dada3902eddbaabc23c4c3fca5",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "1. Nguồn sự thật (định nghĩa STATUSES/TRANSITIONS)"
+      ],
+      "bindingSha256": "7ab3b0ea2b0c0af89f94ddfd6c3a917258546af052cfb03b74aee983ce21822d",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9287"
+    },
+    {
+      "claimId": "claim_fc0f124b5b1368034455207d6378bc00",
+      "sourceUnitDigest": "bdee4fb8f864c64bb1ccdda044960818cc6bfae1e87d8ac8da077bbb8fb4a757",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-79",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9288",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "bdee4fb8f864c64bb1ccdda044960818cc6bfae1e87d8ac8da077bbb8fb4a757",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "1. Nguồn sự thật (định nghĩa STATUSES/TRANSITIONS)"
+      ],
+      "bindingSha256": "e3ae43630968a3656627745903e28e57e607c333863673a1ca15acb4d8dcc192",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9288"
+    },
+    {
+      "claimId": "claim_c0adce3f717a031d4159eee6dd0aaaa1",
+      "sourceUnitDigest": "517a80cc0c3f64d3de66ea1c720d3d3d3d581f8e33c2160727bcb78d8cfea3ac",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "2-resolved_statuses-tập-giống-category-viết-tay-trộn-cả-2-nhóm",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9289",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "517a80cc0c3f64d3de66ea1c720d3d3d3d581f8e33c2160727bcb78d8cfea3ac",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "2. `RESOLVED_STATUSES` (tập \"giống category\" viết tay, trộn cả 2 nhóm)"
+      ],
+      "bindingSha256": "b2d5a1e0ad0124bea84beb7d60860bc6aa5a745720884d4bd74167540e46b796",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9289"
+    },
+    {
+      "claimId": "claim_d97ba7f5ff310af83839fea58329acdd",
+      "sourceUnitDigest": "827c7ac395f16aea73f4b6cb168d3876cf6a02ba54e137c27768654b4b04a7e4",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-80",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9290",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "827c7ac395f16aea73f4b6cb168d3876cf6a02ba54e137c27768654b4b04a7e4",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "2. `RESOLVED_STATUSES` (tập \"giống category\" viết tay, trộn cả 2 nhóm)"
+      ],
+      "bindingSha256": "10f0a54be45ed192ffce8515bdd4a067bdc1518fa9e340a4e20e695f64ad0737",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9290"
+    },
+    {
+      "claimId": "claim_84950cfff9d75392b847739c4812768a",
+      "sourceUnitDigest": "4e6cda4b133d000a59389f9baa14d539c3dbc65fce54bbade31697dbdd6f33f6",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-81",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9291",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "4e6cda4b133d000a59389f9baa14d539c3dbc65fce54bbade31697dbdd6f33f6",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "2. `RESOLVED_STATUSES` (tập \"giống category\" viết tay, trộn cả 2 nhóm)"
+      ],
+      "bindingSha256": "2fb32bc659bb269860db0727dcb1c9bf929c9188cddfece2933a6fb960c1a8bb",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9291"
+    },
+    {
+      "claimId": "claim_ebfe14fc1ae59246f7b3c8871b402520",
+      "sourceUnitDigest": "8590e597d5f07589aa636ec12500101275449755ae201796444dc84e81a70538",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "3-literal-status-trong-verb-logic-của-binfgosmjs-tầng-clistore-chính-là-bảng-transition-của-domain-coding-hôm-nay",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9292",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "8590e597d5f07589aa636ec12500101275449755ae201796444dc84e81a70538",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "3. Literal status trong verb logic của `bin/fgos.mjs` (tầng CLI/store — chính là \"bảng transition của domain coding\" hôm nay)"
+      ],
+      "bindingSha256": "d5b49f6f4adadb1814dd355b4d4463e0efa028823d23f257c7ddd5e960ee37eb",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9292"
+    },
+    {
+      "claimId": "claim_72ee6b558f807216affeb2559c6a597d",
+      "sourceUnitDigest": "707bfd13096596cdaacead82be5204686f47f824c3a3323cbb5bed21ebcceb95",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-82",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9293",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "707bfd13096596cdaacead82be5204686f47f824c3a3323cbb5bed21ebcceb95",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "3. Literal status trong verb logic của `bin/fgos.mjs` (tầng CLI/store — chính là \"bảng transition của domain coding\" hôm nay)"
+      ],
+      "bindingSha256": "7f057bb1b3c38e330726ac964eb4094bcbf1aca1255853ae22c07a4ecf175057",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9293"
+    },
+    {
+      "claimId": "claim_6a85836cdc08fbdfde62f6d3fd9c2d8f",
+      "sourceUnitDigest": "96096e1e5dd0a59ceb0881cddb307462283daac13759672f41a1890a346e6f98",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "4-runner-vòng-tự-hành-tiêu-thụ-nặng-nhóm-đầu",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9294",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "96096e1e5dd0a59ceb0881cddb307462283daac13759672f41a1890a346e6f98",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "4. `runner/` — vòng tự hành, tiêu thụ nặng nhóm đầu"
+      ],
+      "bindingSha256": "0b25e5b129d3f754bf90680541b3db6fdb49298f7f137cd4a92bbab839f029f3",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9294"
+    },
+    {
+      "claimId": "claim_4fceb5ca59ea256ccd77c0975d3576e1",
+      "sourceUnitDigest": "78c3de3f1ca205dedc7323091a92d4c1fcfff8e99132b37291aa46035cd75a20",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-83",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9295",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "78c3de3f1ca205dedc7323091a92d4c1fcfff8e99132b37291aa46035cd75a20",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "4. `runner/` — vòng tự hành, tiêu thụ nặng nhóm đầu"
+      ],
+      "bindingSha256": "51b5317af278529d10ede36f9944530276eba71b2e4511a20b98b33150f6c7b1",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9295"
+    },
+    {
+      "claimId": "claim_f1507b5008c678f9474202706e018774",
+      "sourceUnitDigest": "80901672ceab8f8cd67de403bda21b3525f9f208c1e723ebcb6fbac040c47bec",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "5-cơ-chế-domain-agnostic-khác-được-discussionmd-liệt-tường-minh",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9296",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "80901672ceab8f8cd67de403bda21b3525f9f208c1e723ebcb6fbac040c47bec",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "5. Cơ chế domain-agnostic khác (được DISCUSSION.md liệt tường minh)"
+      ],
+      "bindingSha256": "1e23afec2146f1e14e4ca95cd49da07f4b1ab2d4373107fa339cf532d31929cb",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9296"
+    },
+    {
+      "claimId": "claim_042b85c001dab92b6ae561f89eac6337",
+      "sourceUnitDigest": "fa83039437009e5f88a38c2bc19014eb481d33e6f82c491aeee4e2b226bf5e6a",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-84",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9297",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "fa83039437009e5f88a38c2bc19014eb481d33e6f82c491aeee4e2b226bf5e6a",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "5. Cơ chế domain-agnostic khác (được DISCUSSION.md liệt tường minh)"
+      ],
+      "bindingSha256": "ce2022fcdbee9871564c880dd9f79d4dda870ccc83f2266363af05e6e321e587",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9297"
+    },
+    {
+      "claimId": "claim_3fbb7ac76d27f06cc8e095a1d0e6b88e",
+      "sourceUnitDigest": "a2754368a8483a13afd1ca546a21025987ca1532c56e60f9c1d2634630716325",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "6-gap-liên-quan-nhưng-không-phải-phạm-vi-audit-status-literal-ghi-nhận-để-không-lặp-lại-công-sức",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9298",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "a2754368a8483a13afd1ca546a21025987ca1532c56e60f9c1d2634630716325",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "6. Gap liên quan nhưng KHÔNG phải phạm vi audit status literal (ghi nhận để không lặp lại công sức)"
+      ],
+      "bindingSha256": "97f7ab4b5ee539a14c3ed4edfeff8537a70c5aa1d9d5a71e22888001951d6271",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9298"
+    },
+    {
+      "claimId": "claim_c5f9a98133b0fd6692dd0c7555d775e1",
+      "sourceUnitDigest": "d398e694ec2837bbe5052cfea277526dd887042f9bcc401bea01cd63b3d42971",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-85",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9299",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "d398e694ec2837bbe5052cfea277526dd887042f9bcc401bea01cd63b3d42971",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+        "6. Gap liên quan nhưng KHÔNG phải phạm vi audit status literal (ghi nhận để không lặp lại công sức)"
+      ],
+      "bindingSha256": "89ca854e7135470f14f92e27691b36609464719a6d492c5643ced7942ea24a87",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9299"
+    },
+    {
+      "claimId": "claim_e2d3709ee991f35ec6153e7e84c46e2f",
+      "sourceUnitDigest": "d35b961952abd6b36b76ada556f74a2030bcfe670cbe03c89c6005d0ca313a2c",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "hệ-quả-10",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9300",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "d35b961952abd6b36b76ada556f74a2030bcfe670cbe03c89c6005d0ca313a2c",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Hệ quả"
+      ],
+      "bindingSha256": "8bfbbf1f7916eec0a5471421143fb6b9f8e4ca3f0c82450c069fadd8c4496720",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9300"
+    },
+    {
+      "claimId": "claim_8eeec687713e79da23a9339df1179b60",
+      "sourceUnitDigest": "e12e5b17bd0afd2f30ca5edac6ad58cfea0a5dce8eab8429d40b6eb688a3eba0",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-86",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9301",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "e12e5b17bd0afd2f30ca5edac6ad58cfea0a5dce8eab8429d40b6eb688a3eba0",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+        "Hệ quả"
+      ],
+      "bindingSha256": "8336d157604d047a719a8c56ce7dbb31dae573455b38b529522f36fffd7fd01b",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9301"
+    },
+    {
+      "claimId": "claim_217bf9908c0941c13b1eaf2f7a2d9d64",
+      "sourceUnitDigest": "f617f1c06417c2f7984c2c37a8b6d06c85bdc662faa1bb373adac1858eb519d8",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0032-multi-role-team-harness-trục-roleholder-handoff-và-marketing-cockpit-absorption",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: equal except structural heading depth, anchor lines, blank lines or fences; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9302",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "f617f1c06417c2f7984c2c37a8b6d06c85bdc662faa1bb373adac1858eb519d8",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption"
+      ],
+      "bindingSha256": "8ef7e89155f83c0a385269c971ebfeef8a702b1310c1eaceacc0a0d487d02afc",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9302"
+    },
+    {
+      "claimId": "claim_63db75c2d22d1861c69845d62518ee60",
+      "sourceUnitDigest": "6f54e9c73c49cc06bd93ba1401ddb0bdefda6e4c89e62bfc55be6fd092514bb6",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-87",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9303",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "6f54e9c73c49cc06bd93ba1401ddb0bdefda6e4c89e62bfc55be6fd092514bb6",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption"
+      ],
+      "bindingSha256": "b60a4b5ad63f0d18bce3db3e80f600aa71dad47b8f511fa3c6e2a130f7c82f23",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9303"
+    },
+    {
+      "claimId": "claim_e6ae96517c239248948c36255ae4dcac",
+      "sourceUnitDigest": "8f1228fba721265945a07108259062804b98237bd0e778925cc20893b9af31f4",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "2-distill-journey",
+      "claimKind": "historical-context",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9304",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "8cb65c5075a2a4c13e78b4300f757cfeb334104a6783d6f9c1e6c60f44515274",
+      "targetAncestry": [
+        "Multi-Role Harness Distill Record"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9304"
+    },
+    {
+      "claimId": "claim_634d509e158ed8fc22f610e4c51030ba",
+      "sourceUnitDigest": "9f9c5aa1e0bc5a1c034b9356fe0d0dc2f659f3bb7202679d3db53ba250b1b5eb",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "historical-context",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9305",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "9f9c5aa1e0bc5a1c034b9356fe0d0dc2f659f3bb7202679d3db53ba250b1b5eb",
+      "targetAncestry": [
+        "Multi-Role Harness Distill Record",
+        "2. Distill Journey"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9305"
+    },
+    {
+      "claimId": "claim_7e0016df70b7640b0337c5daf5f80e90",
+      "sourceUnitDigest": "18b3552e741e5967638a6d0f6fb9d1fad995dba304c5da7b97064c41da301ab7",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "i-kiến-trúc-nền-seq-18029-18031",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9306",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "18b3552e741e5967638a6d0f6fb9d1fad995dba304c5da7b97064c41da301ab7",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "I. Kiến trúc nền (seq 18029, 18031)"
+      ],
+      "bindingSha256": "18e185fa981f90506a8581a5472db7544e297676bfcf905a392dbc75f87d835d",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9306"
+    },
+    {
+      "claimId": "claim_a9be2da803446c73efbfcac40ee82637",
+      "sourceUnitDigest": "2a1722766193d70b5f41165f820655b64f3c7ce5a79b105d57af313ff03ffe9e",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-89",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9307",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "2a1722766193d70b5f41165f820655b64f3c7ce5a79b105d57af313ff03ffe9e",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "I. Kiến trúc nền (seq 18029, 18031)"
+      ],
+      "bindingSha256": "e4c26fe7ccc6513a6dc4ebc226b80b837f64961adf8b967e2673aaa6b0edf306",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9307"
+    },
+    {
+      "claimId": "claim_f30f58465c33adf6343057d6c3fcb2b3",
+      "sourceUnitDigest": "bade02e702bb44fecb5168e34ecf4a5dfa1fa0c37d8af333ae496d147be72054",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "ii-handoff-trái-tim-của-tính-uyển-chuyển-seq-18032-18070-18058",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9308",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "bade02e702bb44fecb5168e34ecf4a5dfa1fa0c37d8af333ae496d147be72054",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "II. Handoff — trái tim của tính uyển chuyển (seq 18032, 18070, 18058)"
+      ],
+      "bindingSha256": "bf2535f3daf0009dfa3e583aa19307aae83748d3306f4a2e3b2c652c26bdd423",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9308"
+    },
+    {
+      "claimId": "claim_6f7a10c04ee1414d39b0b2ef8d7d2d6d",
+      "sourceUnitDigest": "dce677680de09c58dce4e54b16850671db81f3e54202b29d8adc8e9c2f358bae",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-90",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9309",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "dce677680de09c58dce4e54b16850671db81f3e54202b29d8adc8e9c2f358bae",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "II. Handoff — trái tim của tính uyển chuyển (seq 18032, 18070, 18058)"
+      ],
+      "bindingSha256": "284c0d81547afa34c09ab3ea8e4b49de6208b85a8de585fa11363aaea1acca30",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9309"
+    },
+    {
+      "claimId": "claim_45840c035132a9c46aa748567ae37648",
+      "sourceUnitDigest": "fe8801065e62f36ed531f0954d2c07dbc7dfe367c30b7bc5c0f0835e17515efc",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "iii-cấu-trúc-khai-báo-seq-18059-18060-18110-18189-18232-18242",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9310",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "fe8801065e62f36ed531f0954d2c07dbc7dfe367c30b7bc5c0f0835e17515efc",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "III. Cấu trúc khai báo (seq 18059, 18060, 18110, 18189, 18232, 18242)"
+      ],
+      "bindingSha256": "f5c229d4314146530781865ae31b1b49307dc9250c88545c647200c684b5b85c",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9310"
+    },
+    {
+      "claimId": "claim_10986602d5cab816cf923616dc6b58f8",
+      "sourceUnitDigest": "7dfb88e6ee480189beccd2e878bedb9e493d9bad07a27830301fddd053040d70",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-91",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9311",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "7dfb88e6ee480189beccd2e878bedb9e493d9bad07a27830301fddd053040d70",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "III. Cấu trúc khai báo (seq 18059, 18060, 18110, 18189, 18232, 18242)"
+      ],
+      "bindingSha256": "08eccb6c21fa2bf60ac34c7c8524252c952641a54cfae72a741caed82dd71823",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9311"
+    },
+    {
+      "claimId": "claim_7baf6e6911d7bdc8cbb66425d0aff57a",
+      "sourceUnitDigest": "58d933902652fcbf9670c78092b0d222429d51933968062e729a6534b5ea3b40",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "iv-trình-tự-triển-khai-seq-18030",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9312",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "58d933902652fcbf9670c78092b0d222429d51933968062e729a6534b5ea3b40",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "IV. Trình tự triển khai (seq 18030)"
+      ],
+      "bindingSha256": "e36fabd049df78f844c5aaa76a26295bdf87e80e1a2e69fa84d38973b6b56cd2",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9312"
+    },
+    {
+      "claimId": "claim_2e0270967476b583f5548c2d0632c6f7",
+      "sourceUnitDigest": "4b806f05cc974fa81ae9b0ebd50789a568fb41a274c5ffb11865accbfb2ef9cd",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-92",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9313",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "4b806f05cc974fa81ae9b0ebd50789a568fb41a274c5ffb11865accbfb2ef9cd",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "IV. Trình tự triển khai (seq 18030)"
+      ],
+      "bindingSha256": "50d674e3812d52b169552f318bedddeb848a2c3d45cebf5d34b9cbd6be74c170",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9313"
+    },
+    {
+      "claimId": "claim_b7d1849e7cde5d799b984dbf0ea3bcff",
+      "sourceUnitDigest": "d6ebd90319d8f7c2c586f0790b3649a8f9bad951d61aa6918d0aa40c7918483a",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-93",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9314",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "d6ebd90319d8f7c2c586f0790b3649a8f9bad951d61aa6918d0aa40c7918483a",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "IV. Trình tự triển khai (seq 18030)"
+      ],
+      "bindingSha256": "e798792a519fbf5f099dd5579756f1f47dc891f66fb646f09c6afa882df1a1ee",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9314"
+    },
+    {
+      "claimId": "claim_fd3c6c93c220012e1e08d65c9276ab24",
+      "sourceUnitDigest": "a53db20b6d5f1c2bd15b3fee81feaa4d33c20ab74c964495d03a27b1fddc30a2",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-94",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9315",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "a53db20b6d5f1c2bd15b3fee81feaa4d33c20ab74c964495d03a27b1fddc30a2",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "IV. Trình tự triển khai (seq 18030)"
+      ],
+      "bindingSha256": "6fd22273fc0d64ff8a92fb4c4c3809eeb1ef4ff41f9222d9491c798c0cabb500",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9315"
+    },
+    {
+      "claimId": "claim_963bf3272df983c42aead0351a429ce4",
+      "sourceUnitDigest": "7d8d4de935f8bf823aac021f09fd624fb3d0ddbf230d363a630e5d9aa2532274",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "v-kết-luận-so-sánh-marketing-cockpit-vòng-fable-vẫn-đứng-vững",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9316",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "7d8d4de935f8bf823aac021f09fd624fb3d0ddbf230d363a630e5d9aa2532274",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "V. Kết luận so sánh marketing-cockpit (vòng fable, vẫn đứng vững)"
+      ],
+      "bindingSha256": "266b66ab51ec92cb7fdfb8f355c4c97f90b0f3296afc136574322b4be298c051",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9316"
+    },
+    {
+      "claimId": "claim_68304d9e3c8f531fd5dcc25392c6d072",
+      "sourceUnitDigest": "6bfb192eaa61ff2f393e5621a2ccb051f67179a9627e65c6d6fdb53ceb54fe51",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-95",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9317",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "6bfb192eaa61ff2f393e5621a2ccb051f67179a9627e65c6d6fdb53ceb54fe51",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "V. Kết luận so sánh marketing-cockpit (vòng fable, vẫn đứng vững)"
+      ],
+      "bindingSha256": "3153eb209b4dfde6fc2183f01f78d59c325474f5f6d4181a16138eb2cc784df8",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9317"
+    },
+    {
+      "claimId": "claim_8d8de83dcecd115c8b517cbf12d08795",
+      "sourceUnitDigest": "a0a6b146892e904d63cafd64b0a130c3c392e0a199fea7a9929b0f2006f7011d",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-96",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9318",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "a0a6b146892e904d63cafd64b0a130c3c392e0a199fea7a9929b0f2006f7011d",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "V. Kết luận so sánh marketing-cockpit (vòng fable, vẫn đứng vững)"
+      ],
+      "bindingSha256": "aa0c207edf0dec64a4bbccff1637712ac233c155298aaeff213090cb9c2ee5a2",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9318"
+    },
+    {
+      "claimId": "claim_331e9d0a3a7f29b20ec75ed8981f7fb7",
+      "sourceUnitDigest": "b18e4845b71df780025ec4c6b82b4551cf5916138dff3b17f3153700677909e5",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-97",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9319",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "b18e4845b71df780025ec4c6b82b4551cf5916138dff3b17f3153700677909e5",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "V. Kết luận so sánh marketing-cockpit (vòng fable, vẫn đứng vững)"
+      ],
+      "bindingSha256": "be625dba770783884798465f47ba6dd511224f6d24df5de45ff1419f3d32aff7",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9319"
+    },
+    {
+      "claimId": "claim_c696887f984b8248a620d445d341cf0b",
+      "sourceUnitDigest": "6c186518993aba9c2fe311251b119425dfca052b2b34cb6dde932afad6c42da5",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "vi-treo-có-chủ-đích-không-phải-quên",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9320",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "6c186518993aba9c2fe311251b119425dfca052b2b34cb6dde932afad6c42da5",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "VI. Treo có chủ đích (không phải quên)"
+      ],
+      "bindingSha256": "fee2744f5092b5bb5115a8bd17f31937c101129b0de38537f59df7dad1183cf9",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9320"
+    },
+    {
+      "claimId": "claim_092f7d288e8617bb3b8abff586e988f8",
+      "sourceUnitDigest": "2431462c129b13b99afc3b1e18061c825932a166ce50c26248dca7ce2905f946",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-98",
+      "claimKind": "decision",
+      "disposition": "move",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9321",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "2431462c129b13b99afc3b1e18061c825932a166ce50c26248dca7ce2905f946",
+      "targetAncestry": [
+        "0002 — Mô hình việc phẳng",
+        "0032 — Multi-role Team Harness: trục role/holder, handoff, và marketing-cockpit absorption",
+        "VI. Treo có chủ đích (không phải quên)"
+      ],
+      "bindingSha256": "940a11981b8bb0abd1ba58e731fc25d0154b0e1e5a9dc0d0439e125016cd4416",
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9321"
+    },
+    {
+      "claimId": "claim_cf9060b6664b21d6e5fac0b31aac0ff6",
+      "sourceUnitDigest": "a88af4784f074e4e1ddb17c6bd1df456ef5df67e0aad123b2f2cdca8014d9981",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "3-state-at-distill-time",
+      "claimKind": "historical-context",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9322",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "dda4c28cba5f1a13d782c50c996bc50d5848d6d8172ecb38066a23e8e1c19023",
+      "targetAncestry": [
+        "Multi-Role Harness Distill Record"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9322"
+    },
+    {
+      "claimId": "claim_be0cd74b4a0bd4c5860e9116aa8dd6c6",
+      "sourceUnitDigest": "09bb0ef5d78c9357cc67cc5622d215a494f8bcc8948a9b11a6287dd110b2fce9",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "historical-context",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9323",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "09bb0ef5d78c9357cc67cc5622d215a494f8bcc8948a9b11a6287dd110b2fce9",
+      "targetAncestry": [
+        "Multi-Role Harness Distill Record",
+        "3. State At Distill Time"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9323"
+    },
+    {
+      "claimId": "claim_581643ec8243af5744e04c222f13c214",
+      "sourceUnitDigest": "a143984b5d286e2892a0a62f7d7c28a16ab28cb4e21da75c590e1505c064bc73",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "4-implementation-review-and-verification-after-distill",
+      "claimKind": "historical-context",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9324",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "a88add6a18b0023671d9f83c9261dfd52d1440fd05936db3be3acd430adb0b11",
+      "targetAncestry": [
+        "Multi-Role Harness Distill Record"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9324"
+    },
+    {
+      "claimId": "claim_690988881136792349476d55b83bd81d",
+      "sourceUnitDigest": "721cb9fe837087d22e83ba6ac1761a6cf9c628a88e0445f49dd1bd26943a8ec9",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "historical-context",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9325",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "721cb9fe837087d22e83ba6ac1761a6cf9c628a88e0445f49dd1bd26943a8ec9",
+      "targetAncestry": [
+        "Multi-Role Harness Distill Record",
+        "4. Implementation Review And Verification After Distill"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9325"
+    },
+    {
+      "claimId": "claim_e24e9588d1d0d0ec87a1a90db87e62b9",
+      "sourceUnitDigest": "42f0a4f36be3f8722adbd5bc7066fc539bd31e67484940ec1c0e7f3c6a0d7cb8",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "historical-context",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9326",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "42f0a4f36be3f8722adbd5bc7066fc539bd31e67484940ec1c0e7f3c6a0d7cb8",
+      "targetAncestry": [
+        "Multi-Role Harness Distill Record",
+        "4. Implementation Review And Verification After Distill"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9326"
+    },
+    {
+      "claimId": "claim_6866da75d153e251a298ec889e5e67f8",
+      "sourceUnitDigest": "0ce476ffc3451d8e11c1e2c4c802eb70edf96b3e83627708fa309fbfba167bde",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "historical-context",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9327",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "0ce476ffc3451d8e11c1e2c4c802eb70edf96b3e83627708fa309fbfba167bde",
+      "targetAncestry": [
+        "Multi-Role Harness Distill Record",
+        "4. Implementation Review And Verification After Distill"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9327"
+    },
+    {
+      "claimId": "claim_48a16587298cde876c7142378489c618",
+      "sourceUnitDigest": "71b2516db6bbf541250e88bbb627868772f01e932ba697f12b1bafa46adc00fc",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "historical-context",
+      "disposition": "archive-with-reason",
+      "reviewStatus": "pending",
+      "rationale": "L13-69: byte-equal; own source occurrence and exceptions in plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9328",
+      "authoredBy": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17",
+      "targetUnitDigest": "71b2516db6bbf541250e88bbb627868772f01e932ba697f12b1bafa46adc00fc",
+      "targetAncestry": [
+        "Multi-Role Harness Distill Record",
+        "4. Implementation Review And Verification After Distill"
+      ],
+      "decisionAuthority": "L13-69",
+      "dispositionProofRef": "plans/260925-documentation-authority-unification/reports/phase-09/g7/r8-dispositions.json#/rows/9328"
+    }
+  ],
+  "authorSession": "codex-session:unit-run-1792089181794-89ae42db@2026-10-16",
+  "correctionSession": "codex-session:fgos-run_unit-run-179224f23e2a8f@2026-10-17"
+}

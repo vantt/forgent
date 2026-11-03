@@ -127,7 +127,7 @@ dispatch demo family kept as living evidence).
 
 ## Related
 
-- `docs/history/caller-verdict-protocol-discover-decompose/CONTEXT.md` —
+- `docs/explanation/discovery-decompose-reporoot-verify-overwrite.md` —
   full decision record and scout evidence.
 - `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
   — Native-First Dispatch Doctrine; this item is Phase 2 of 5 (Phase 1:

@@ -33,7 +33,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '../../..');
 
 export const REAL_DEMO_OUTCOME_ID = 'doc-fgos-rollup-howto';
-export const REAL_DEMO_DOC_PATH = 'docs/how-to/check-rollup-progress.md';
+export const REAL_DEMO_DOC_PATH = 'docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md';
 
 /**
  * Builds a fresh fixture root: `docs/` symlinked to this repo's own real

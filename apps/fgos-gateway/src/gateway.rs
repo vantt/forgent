@@ -1,5 +1,5 @@
 //! tsk-7l9-2: fgOS gateway — the REST surface `docs/history/fgos-interface-daemon/`
-//! locks (CONTEXT.md D1/D4/D5/D7/D8, `docs/contracts/fgos-gateway-api-v1.yaml`,
+//! locks (CONTEXT.md D1/D4/D5/D7/D8, `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`,
 //! CTR010). Lives inside the `fgos-gateway` binary (D8) as a new async adapter
 //! sitting beside the existing synchronous TUI/orchestrator code — nothing in
 //! `app.rs`/`main.rs`'s TUI path changes shape or gains an async dependency.
@@ -149,7 +149,7 @@ pub fn load_gateway_config(home_dir: Option<&Path>) -> Result<GatewayConfig, Gat
 /// The one CLOSED taxonomy `src/state/store.mjs`'s `EXIT_CODES` already
 /// defines, mirrored here verbatim (D7's own note: this gateway adds no
 /// categories of its own) — matches
-/// `docs/contracts/fgos-gateway-api-v1.yaml`'s `ErrorEnvelope.category` enum.
+/// `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`'s `ErrorEnvelope.category` enum.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ErrorCategory {
     Precondition,
@@ -215,7 +215,7 @@ impl ErrorCategory {
     }
 }
 
-/// `docs/contracts/fgos-gateway-api-v1.yaml`'s `ErrorEnvelope` shape.
+/// `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`'s `ErrorEnvelope` shape.
 #[derive(Debug)]
 pub struct GatewayError {
     pub category: ErrorCategory,
@@ -516,7 +516,7 @@ struct AppState {
 
 /// tsk-4qf: axum's own `Json<T>` rejects a malformed body with a
 /// plain-text response, not this gateway's `ErrorEnvelope` -- the contract
-/// (`docs/contracts/fgos-gateway-api-v1.yaml`) tells clients to "branch on
+/// (`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`) tells clients to "branch on
 /// this body's `category`" for every non-2xx response, which a plain-text
 /// body can't satisfy. Wraps `axum::Json` so its own rejection (already
 /// `Display`, `axum::extract::rejection::JsonRejection`) becomes a real
@@ -1142,7 +1142,7 @@ async fn get_runtime(State(_state): State<AppState>) -> Result<Json<Value>, Gate
 /// `GET /v1/contract`: serves the gateway's own OpenAPI spec verbatim, so an
 /// agent can read it and self-implement a client without hand-tracking a
 /// separate doc (the whole point of D10's own "real, versioned, public
-/// contract" — see `docs/contracts/fgos-gateway-api-v1.yaml`). Reads the
+/// contract" — see `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`). Reads the
 /// file fresh on every request rather than embedding it at compile time: the
 /// spec doc is edited independently of this crate (piece 1 of this feature,
 /// `tsk-7l9-1`), so a request always sees whatever is actually on disk
@@ -1151,7 +1151,7 @@ async fn get_runtime(State(_state): State<AppState>) -> Result<Json<Value>, Gate
 /// has to be able to read the contract before it can know it needs a token
 /// at all.
 async fn get_contract(State(state): State<AppState>) -> Response {
-    let path = state.root.join("docs/contracts/fgos-gateway-api-v1.yaml");
+    let path = state.root.join("docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml");
     match tokio::fs::read_to_string(&path).await {
         Ok(contents) => (
             StatusCode::OK,
@@ -1212,8 +1212,7 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
         .nest_service("/mcp", mcp_service)
         .route_layer(middleware::from_fn_with_state(state.clone(), require_token));
 
-    // tsk-4uh: the contract's `servers.url` (docs/contracts/fgos-gateway-
-    // api-v1.yaml:54-59) and this file's own startup log (`run`, below) both
+    // tsk-4uh: the contract's `servers.url` (docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:54-59) and this file's own startup log (`run`, below) both
     // already advertise `/v1` -- nesting the whole api router (contract +
     // authenticated together) under it here is what makes the code agree
     // with both instead of being the lone outlier. Nesting is pure path
@@ -1704,8 +1703,8 @@ mod tests {
     async fn contract_route_is_reachable_without_a_token() {
         let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
         let root = std::env::temp_dir().join(format!("fgos-gateway-test-{}", std::process::id()));
-        std::fs::create_dir_all(root.join("docs/contracts")).unwrap();
-        std::fs::write(root.join("docs/contracts/fgos-gateway-api-v1.yaml"), "openapi: 3.1.0\n").unwrap();
+        std::fs::create_dir_all(root.join("docs/platform/herdr-web-dashboard/contracts")).unwrap();
+        std::fs::write(root.join("docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml"), "openapi: 3.1.0\n").unwrap();
         let app = build_router(gateway, test_config(), root.clone());
 
         use axum::body::Body;

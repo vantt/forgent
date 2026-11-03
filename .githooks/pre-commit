@@ -30,6 +30,7 @@ import { resolveActiveHostBin, routeEnv } from '../src/util/host-bin-path.mjs';
 import { checkBorrowedDescription, resolveLock, LOCK_FD_ENV, LOCK_JOB_ENV } from '../src/holder-lock/index.mjs';
 import { runLockRouteSync, lockTransport, ROUTE_CALL_TIMEOUT_MS } from '../src/holder-lock/driver.mjs';
 import { readBeacon, judgeBeacon, writeBeacon, DEFAULT_BEACON_WINDOW_MS } from '../src/runner/main-checkout-activity.mjs';
+import { guardCommit, guardReferenceTransaction } from '../src/runner/documentation-cutover-lease-hook.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -521,7 +522,7 @@ async function warnOnConventionViolations(committingToplevel) {
   }
   const paths = staged
     .split('\0')
-    .filter((candidate) => /^plans\/(?:reports|journals)\/[^/]+\.md$/u.test(candidate));
+    .filter((candidate) => candidate.startsWith('docs/') || /^plans\/(?:reports|journals)\/[^/]+\.md$/u.test(candidate));
   if (paths.length === 0) return;
 
   let conventionCheck;
@@ -534,14 +535,25 @@ async function warnOnConventionViolations(committingToplevel) {
 
   try {
     const result = conventionCheck(paths, { dir: committingToplevel });
+    const blocking = (result.violations ?? []).filter((violation) => violation.posture === 'block');
     for (const violation of result.violations ?? []) {
-      process.stderr.write(`warning: convention ${violation.path}: ${violation.code} ${violation.message}\n`);
+      process.stderr.write(`${violation.posture === 'block' ? 'error' : 'warning'}: convention ${violation.path}: ${violation.code} ${violation.message}\n`);
     }
+    if (blocking.length) refuse('commit refused: documentation placement violates Convention');
   } catch (error) {
     const category = error?.code ?? 'host-exec-error';
     const detail = error?.timedOut ? 'host timed out' : (error?.message ?? 'unknown error');
     process.stderr.write(`warning: convention check skipped (${category}): ${detail}\n`);
   }
+}
+
+// Both Git hooks use this read-only adapter. The reference-transaction shell
+// starts Node here only for prepared main updates; ordinary ref operations do
+// not depend on any of these imports. Lease policy remains in the shared module.
+function leaseGitRead(args) {
+  return execFileSync('git', ['--no-replace-objects', ...args], {
+    cwd: process.cwd(), stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024,
+  });
 }
 
 async function main() {
@@ -570,13 +582,19 @@ async function main() {
   const carriedChanges = carriedIn(workerChanges);
   const fgosWorkerChanges = workerChanges.filter((p) => !carriedChanges.has(p));
   if (fgosWorkerChanges.length > 0) {
-    refuse(`commit refused: this commit on a worker branch stages changes under ".fgos/" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
+    refuse(`commit refused: this commit on a worker branch stages changes under ".fgos/" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
     return;
   }
 
   const rootRefusal = rootFileRefusal(committingToplevel);
   if (rootRefusal) {
     refuse(rootRefusal);
+    return;
+  }
+
+  const leaseRefusal = guardCommit({ root: committingToplevel, git: leaseGitRead });
+  if (leaseRefusal) {
+    refuse(leaseRefusal);
     return;
   }
 
@@ -665,10 +683,15 @@ async function main() {
   process.exit(0);
 }
 
-try {
-  await main();
-} catch (err) {
-  if (!err?.refusal) throw err;
-  console.error(err.message);
-  process.exitCode = 1;
+if (process.argv[2] === 'reference-transaction' && process.argv[3] === 'prepared') {
+  const refusal = guardReferenceTransaction({ git: leaseGitRead, root: process.cwd(), input: fs.readFileSync(0, 'utf8') });
+  if (refusal) { process.stderr.write(`${refusal}\n`); process.exitCode = 1; }
+} else {
+  try {
+    await main();
+  } catch (err) {
+    if (!err?.refusal) throw err;
+    console.error(err.message);
+    process.exitCode = 1;
+  }
 }

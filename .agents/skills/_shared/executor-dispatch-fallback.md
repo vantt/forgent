@@ -309,6 +309,6 @@ scarcity signal needs the full denominator, not just the misses.
   consumer. Step A's `in-process`/`out-of-process` branching (`decide`,
   tsk-3ik-1) is proven by `src/runner/dispatch.mjs`'s own unit tests, and
   Step B's run by `fgos run`'s (`src/runner/execution/run.mjs`).
-- `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md`
+- `docs/platform/runner/decisions/h-36d872fbb0e5.md#0026-native-first-dispatch-doctrine-launcherroottaskcapacity`
   — Native-First Dispatch Doctrine, Step A's own governing rules 1/2/4,
   applied internally by `decide` now (tsk-3ik-1) rather than by hand.

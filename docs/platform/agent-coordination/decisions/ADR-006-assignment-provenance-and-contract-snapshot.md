@@ -1,22 +1,30 @@
 # ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot
 
-Document type: ADR
-Design status: Accepted
-Implementation: Implemented
-Last reviewed: 2026-09-01
-Canonical for: how declared and agent-led execution requests converge on one Assignment
-Related: [Vision V-003/V-004](../vision.md), [ADR-002](ADR-002-stage-operation-compatibility.md), [ADR-003](ADR-003-assignment-run-runresult-separation.md), [Assignment contract](../contracts/assignment-run-runresult.md)
+```txt
+Document type: Decision
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: `docs/architect/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Context
 
-`buildAssignment()` and `executeAssignment()` currently accept only a declared
-`domain + workflow + stage + operation` whose TaskSpec exists on disk. The
-standalone mission-lite prototype therefore borrows the coding `planning` Stage
-to reach dispatch. Mutation classification is derived from operation/role sets
-(`READ_ONLY_ROLES`, `KNOWN_MUTATING_OPS`, plus a `missionId || workId === null`
-heuristic), and evidence requirements are per-operation branches in result
-interpretation. A request without an operation id has no way to declare what it
-may mutate or what evidence satisfies it.
+The original first-slice motivation is preserved in the complete historical input. Current build/execute accepts validated declared, inline and Unit-run provenance through the same governed Assignment path.
 
 The Vision requires agent-led planning to lower into the same governed
 Assignment path with equivalent objective, constraint, output, mutation,
@@ -24,36 +32,40 @@ evidence, capability, budget, and provenance semantics.
 
 ## Decision
 
-1. **Two provenance classes, one Assignment.** Every Assignment carries
-   `provenance.kind = declared | inline`, plus `contractPolicyVersion`,
-   `normalizerVersion`, and the validator chain that produced it.
-   - `declared`: existing domain/workflow/stage/operation/TaskSpec legality
-     validation, unchanged (ADR-002 preserved).
-   - `inline`: an agent-proposed contract validated by the foundation validator
-     and any selected domain harness (ADR-007), plus caller provenance
-     (writer identity, optional parent Assignment reference).
+1. **Three current provenance kinds, one execution path.** Declared and inline
+   builders stamp `contractPolicyVersion`, `normalizerVersion` and validator
+   provenance (`assignment.mjs:443-444,626-628`). The Unit door separately writes
+   `provenance.kind: unit-run` with its Unit-run context (`execution/run.mjs:569-576`);
+   do not assert every kind has the declared builder's identical shape.
+   - `declared`: Workflow step/operation/TaskSpec validation and normalization.
+   - `inline`: foundation contract validation, the applicable registered domain
+     harness and caller provenance.
+   - `unit-run`: the Unit execution door and its computed binding/admission.
 2. **Normalizer stamps the snapshot.** At build time the normalizer stamps
    `mutation` (`read-only | mutating`) and `evidence.required`
    (`reported | verified`) onto the immutable Assignment. Declared operations
-   are stamped from the existing operation/role mapping; inline contracts must
-   declare them explicitly. A missing value is a build failure, never a default.
+   use operation tables with role/mutation-derived fallbacks for unmapped
+   operations (`assignment-normalizer.mjs:95-124`); inline contracts must declare
+   mutation/evidence explicitly. Missing required inline values fail validation.
 3. **Interpretation reads the Assignment, not the operation id.** Result
    confidence gating, mutation policy, and post-advance behavior are driven by
-   Assignment fields. Operation-specific behavior is declared on the operation
-   table or inline contract as `resultKind` (for example `gate-verdict`,
-   `advisory`, `work-product`) and an optional `onAdvance` action, replacing
-   `if (operation === ...)` branches.
-4. **Minimum inline contract.** objective; bounded context references;
-   constraints/authority; expected outputs; `mutation`; `evidence.required`;
-   role and capability hints; budget (`timeoutMs`, `maxRuns`; token counts are
-   telemetry only); caller provenance. Unknown fields are rejected.
-5. **Same stores and governance.** Both classes use `.fgos/assignments/`,
-   `executeAssignment()`, `compileDispatchPlan`, and the same Run/RunResult
-   normalization. Neither class may bypass dispatch governance.
-6. **First slice is read-only.** Until session-local isolation and
-   serialization are proven, an inline contract with `mutation: mutating` is
-   rejected fail-closed. The inline schema carries no session or coordination
-   reference in this slice.
+   Assignment fields. Declared `resultKind` and optional `onAdvance` use the
+   normalizer tables, with advisory/work-product fallback from mutation
+   (`assignment-normalizer.mjs:120-143`). These are not arbitrary accepted
+   inline-contract fields.
+4. **Validated inline fields.** `objective`, `contextRefs`, `constraints`,
+   `expectedOutputs`, `mutation`, `evidence`, required `role` and `budget`;
+   optional `capabilities`, `supports`, `contractTemplate` and narrow `policy`.
+   Budget requires positive integer `timeoutMs` and `maxRuns`; optional `tokens`
+   is telemetry, not an enforced limit (`execution-contract.mjs:372-383`);
+   inline policy accepts only
+   `tier`, not a full PolicyPatch. Caller fields are validated separately
+   (`execution-contract.mjs:180-240,295-340`). Unknown fields are rejected.
+5. **Same execution governance.** Declared, inline and Unit-run requests
+   converge on Assignment execution and Run/RunResult normalization rather than
+   private dispatch or stores that bypass governance.
+6. **Current mutation admission, not the retired first slice.** Generic inline mutation validation still requires the reserved protocol-operation stamp (`execution-contract.mjs:327-334`, `assignment-normalizer.mjs:173-175`), but the engine that produced that stamp was retired. The current Unit-run mutating door uses the worktree and recomputed-binding checks in docs/platform/runner/decisions/h-36d872fbb0e5.md (0047, the Unit mutation-admission contract). Do not present the dormant stamp path as a current general session-runtime door.
+
 7. **Retire the standalone read-only heuristic.** Once no declared caller
    passes `workId: null`, the `missionId || workId === null => read-only`
    clauses are removed; read-only status comes only from the stamped
@@ -61,13 +73,14 @@ evidence, capability, budget, and provenance semantics.
 
 ## Consequences
 
-- Standalone coordination no longer fabricates a coding Stage; the Vision's
-  two-consumer proof becomes testable.
+- Standalone Unit execution does not fabricate a coding Work stage.
+- A registered domain harness is not proof that every proposed domain ships.
 - Declared operations gain an explicit, inspectable mutation/evidence snapshot
   without parsing TaskSpec Markdown.
 - Result interpretation becomes contract-driven and testable per field.
-- A mutating inline path, session references, and dynamic task graphs remain
-  future decisions and must not be implied by this ADR.
+- Session references and dynamic session task graphs are historical/deferred
+  vocabulary; Unit-run mutation is current and must not be called universally
+  deferred just because the generic inline stamp gate remains.
 
 ## Rejected Alternatives
 

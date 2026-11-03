@@ -289,8 +289,8 @@ domains_covered: [harness, skills, hooks, workflow, orchestration, context-memor
 - **Seen:** 14e6f10
 
 ### templates-first
-- **What:** `docs/templates/`: story, decision (Context/Decision/Reasoning/Alternatives/Implications), spec-intake, validation-report, high-risk-story 4 file.
-- **Where:** `docs/templates/`
+- **What:** `docs/platform/documentation/history/templates/`: story, decision (Context/Decision/Reasoning/Alternatives/Implications), spec-intake, validation-report, high-risk-story 4 file.
+- **Where:** `docs/platform/documentation/history/templates/`
 - **Notable:** mọi artifact loại đều có khuôn — agent điền form thay vì sáng tác cấu trúc.
 - **Seen:** 14e6f10
 

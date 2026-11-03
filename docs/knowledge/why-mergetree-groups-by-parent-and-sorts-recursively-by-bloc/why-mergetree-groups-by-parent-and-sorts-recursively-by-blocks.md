@@ -113,7 +113,7 @@ decision in its own right.
 
 - `docs/history/merge-list-tree-bottleneck-priority/CONTEXT.md` — full
   decision record (D1–D7) this design implements.
-- `docs/history/merge-list-tree-bottleneck-priority/DISCUSSION.md#task-merge-tree-render`
+- `docs/how-to/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md`
   — the render task's own scope and D-ID mapping.
 - `docs/how-to/check-whether-a-suspected-mechanism-ever-fired-before-fixing-it.md`
   — D5's own separate lesson from the same design discussion (the

@@ -49,7 +49,7 @@ for (const [from, to] of [
   // event carries no payload keys beyond id/from/to is what pins "no
   // reason/ask/answer required", the same shape blocked -> todo has.
   ['backlog', 'todo'],
-  // tsk-40m (docs/architect/doing-coordination-redesign.md): settleClaim
+  // tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): settleClaim
   // settles a fresh (never-durably-doing) claim straight through to
   // awaiting-approval — the direct edge this redesign needs, replacing
   // `todo -> doing` (retired below, see the standalone refusal test).
@@ -74,7 +74,7 @@ for (const [from, to] of [
   });
 }
 
-// tsk-40m (docs/architect/doing-coordination-redesign.md, design target
+// tsk-40m (docs/platform/proposals/doing-coordination-redesign.md, design target
 // confirmed 2026-08-25): `todo -> doing` and `blocked -> doing` are
 // RETIRED, not merely unused — nothing durably writes INTO `doing` anymore,
 // not even settleClaim's own settle segment (`doing` is derived purely
@@ -194,7 +194,7 @@ test('reason is ignored (never appears in payload) for every edge other than awa
 // cleanup->done, cleanup->blocked. This sweep asserts the FULL table, so a
 // missed edge would silently pass as "still precondition" and hide it.
 //
-// tsk-40m (docs/architect/doing-coordination-redesign.md, design target
+// tsk-40m (docs/platform/proposals/doing-coordination-redesign.md, design target
 // confirmed 2026-08-25): `todo->doing` and `blocked->doing` RETIRED —
 // settleClaim (store.mjs) settles a claim straight from preClaimStatus to
 // finalStatus with no durable intermediate `doing` leg at all; `doing` is

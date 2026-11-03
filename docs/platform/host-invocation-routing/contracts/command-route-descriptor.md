@@ -5,15 +5,23 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define per-selector native versus legacy CLI routing and repair ownership
 Design status: Draft
-Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/legacy-cli-transition.md
 Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md
 - docs/platform/host-invocation-routing/verification/compatibility-harness.md
+Implementation: Current partial
+Provenance: `docs/platform/host-invocation-routing/contracts/command-route-descriptor.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Define per-selector native versus legacy CLI routing and repair ownership
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
+
+Correction — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
 
 ## 1. Contract
 
@@ -42,7 +50,7 @@ Minimum fields:
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Descriptor exists for every selector. | `current partial` | [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../../../../test/rust-host/command-routes.test.mjs](../../../../test/rust-host/command-routes.test.mjs) | Snapshot on branch `mailbox/v1-v3`: 80 selectors, 73 `legacy-cli`, seven native. Keep drift tests current as selectors move. |
+| Descriptor exists for every selector. | `current partial` | [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../../../../test/rust-host/command-routes.test.mjs](../../../../test/rust-host/command-routes.test.mjs) | Current snapshot has 82 selectors: 74 `legacy-cli`, eight native. Keep drift tests current as selectors move. |
 | `legacy-cli` preserves provider-owned argv. | `implemented preview` | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Full compatibility-vector cleanup remains future, but manifest-owned legacy CLI lane is proven for preview. |
 
 ## 4. Related Files

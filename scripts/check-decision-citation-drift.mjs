@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // check-decision-citation-drift.mjs -- detects two families of citation
-// defect across docs/backlog.md, docs/specs/*.md, and any --skills-dir
+// defect across backlog, retained specs, recursive platform specs/decisions, and --skills-dir
 // roots (recursive, *.md):
 // (1) dead-framing: a line cites a decision (ADR<n> or a bare NNNN) which
 //     has since been superseded, without naming the superseding decision
@@ -293,6 +293,20 @@ function loadSourceFiles(
           .split('\n'),
       });
     }
+  }
+  // Add successor homes without dropping an explicit --specs-dir or retained
+  // legacy source. Split decisions/rules must not disappear from the read set.
+  const seen = new Set(sources.map((source) => source.file));
+  const platformRoot = path.resolve(specsDir) === path.resolve(cwd, 'docs/specs')
+    ? path.join(cwd, 'docs/platform') : null;
+  for (const full of platformRoot ? collectMarkdownFiles(platformRoot) : []) {
+    const file = path.relative(cwd, full).replaceAll('\\', '/');
+    if (file.split('/').includes('history')) continue;
+    if (!(file.endsWith('/spec.md') || file.includes('/decisions/') ||
+          file === 'docs/platform/platform-foundations.md')) continue;
+    if (seen.has(file)) continue;
+    seen.add(file);
+    sources.push({ file, lines: fs.readFileSync(full, 'utf8').split('\n') });
   }
   for (const dir of skillsDirs) {
     for (const full of collectMarkdownFiles(dir)) {

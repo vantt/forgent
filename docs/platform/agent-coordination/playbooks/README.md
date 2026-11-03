@@ -1,10 +1,26 @@
 # Agent Coordination Playbooks
 
-Document type: Index
-Design status: N/A
-Implementation: Active
-Last reviewed: 2026-08-31
-Canonical for: engineering bootstrap and manual fallback procedures only
+```txt
+Document type: Collection index
+Audience: Maintainer, implementation agent and independent reviewer
+Purpose: Preserve current contracts and explicitly distinguish unimplemented design from retired engine history
+Design status: Accepted at atomic cutover
+Implementation: Section-specific; proposal schemas and dated findings are not blanket implementation claims
+Provenance: `docs/platform/agent-coordination/playbooks/README.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Human + agent coauthor
+Canonical for: The current subject and design boundaries stated in this file; not retired engine authority
+Use this when: Reading the surviving contract, its implementation limits or current proposals
+Do not use this for: Reinstating the retired coordination engine or treating proposal details as shipped behavior
+Last reviewed: No current review date recorded; retained source dates are historical
+Related:
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/spec.md
+Supersedes: Incorrect whole-file retirement or over-removal only
+Superseded by: None for the surviving current subject
+Carriage note: Liveness evidence and explicit implementation/proposal distinction
+```
+
+Complete pre-rework input: [historical snapshot](../history/retired-engine/files/playbooks/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Migration Status
 
@@ -19,25 +35,31 @@ code own their respective claims.
   coordinator/doer/reviewer/red-team roles, current-cell artifacts, token
   discipline, review gates, and live proof capture.
 - [Master Multi-Agent Implementation Coordinator](prompts/master-coordinator.md)
-  is the one-entry prompt that resumes a track, opens cells, delegates role
-  work, enforces independent review/red-team gates, and closes proven cells.
-- [Step 07 Design Discussion Handoff](prompts/step-07-design-discussion-handoff.md)
-  restores the unresolved Step 07 architecture context in a fresh chat without
-  treating proposals as accepted or starting implementation.
-- [MVP6+ Dogfood Handoff](mvp6-dogfood-handoff.md) is the concrete, cited
-  starting point for using the real `fgos coordination` runtime/surface path
-  (not the manual Master Prompt) to coordinate MVP6+ plan/artifact review
-  work: input shape, command/surface, roles, artifacts, resume, and what
-  stays outside coordination authority.
+  is an owner-retained manual engineering prompt, not a runtime sequencer or
+  authority to bypass the registered execution/review doors.
+- [Step 07 Design Discussion Handoff](../history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md#literal-snapshot)
+  preserves the earlier engine-design discussion; it is historical context.
+- [MVP6+ Dogfood Handoff](../history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md#literal-snapshot)
+  preserves the old `fgos coordination` procedure, retired in 2180b4e72.
+  It is not a current operating command or standalone execution door.
+- Advisory cognitive references consumed by the registered skill:
+  [coordinator companion](prompts/architecture-advisory-coordinator.md),
+  [role doctrine](architecture-advisory-role-doctrine.md),
+  [artifact templates](architecture-advisory-artifact-templates.md), and
+  [quality rubric](architecture-advisory-evaluation-rubric.md).
+  These supply judgment guidance, not a manual substitute for the registered
+  architecture-advisory graph.
 
 Playbooks explain how people and agents work. They do not define runtime
 entities, lifecycle authority, or machine contracts.
 
 ## Runtime Boundary
 
-Nothing under this directory is a production dependency of agent coordination.
-Runtime code, workflow/protocol configuration, Skills, and TaskSpecs must not
-load or reference these playbooks.
+Playbooks do not own runtime storage, gates or sequencing. The current
+`fgos-architecture-panel` skill explicitly references the advisory companions
+for cognitive quality (`core/skills/fgos-architecture-panel/SKILL.md:135-142`);
+therefore it is false to say no production Skill may reference this directory.
+Those references do not make historical runtime recipes executable support.
 
 The production authoring sources are:
 
@@ -66,22 +88,20 @@ human selects a prompt template
   -> agent records trace/evidence
 ```
 
-This is useful while the CoordinationSession/AdhocTask/protocol runtime is not
-capable of orchestrating the same process itself. It may also remain useful as
-a manual recovery/debug procedure.
+This remains a manual engineering/review convention, not a prerequisite for
+finishing an unimplemented CoordinationSession runtime. Current automated
+execution uses Unit/CollaborationPattern and Workflow; manual recovery/debug
+guidance must respect those owners.
 
 ## End-State Lifecycle
 
-After runtime coordination is implemented and verified:
+Current runtime execution goes through its code, Workflow definitions, Skills
+and TaskSpecs. The registered advisory companions remain cognitive references;
+do not infer they can be deleted without affecting those references.
 
-- normal use goes through code, protocol/workflow config, Skills, and TaskSpecs;
-- `playbooks/prompts/` is not read during execution;
-- deleting or archiving the playbook must not change product behavior;
-- retain it only as a manual fallback or a generic engineering procedure;
-- move it to repository-wide engineering documentation if it is reused for
-  unrelated features;
-- archive it under history when self-hosted coordination has replaced the
-  bootstrap process and the fallback is no longer needed.
+The operating harness/master prompt remains current by owner decision.
+Any future relocation or retirement requires its own liveness and consumer
+check, not an assumption that the retired coordination engine will replace it.
 
 The master coordinator prompt is retained while manual Codex/Agy-style
 orchestration remains an active engineering need. Separate copy/paste prompts

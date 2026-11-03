@@ -65,7 +65,7 @@ they get relocated as one unit.
 
 ---
 
-**Source:** `docs/history/learnings/critical-patterns.md` —
+**Source:** the historical learning log (the dated entries below have no repository content commit at that path) —
 [20260718] "Before applying a review finding's proposed fix, check whether the
 touched code drifted since the review's frozen head commit" (feature
 phase2-p1-breaker-inert-fix);

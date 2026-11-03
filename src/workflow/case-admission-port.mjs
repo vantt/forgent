@@ -134,6 +134,16 @@ const writable = (dir) => {
   }
 };
 
+/** Whether this process may write a case's ledger and bindings: a masked or read-only view cannot. */
+export function confinedWriteRefusal({ mainRoot, caseId = null }) {
+  if (currentDispatchDepth() === 0) return null;
+  const dir = caseId === null ? null : path.join(mainRoot, '.fgos', 'workflow-runs', caseId);
+  if (dir !== null && fs.existsSync(dir) && !writable(dir)) return 'its view of the case ledger is read-only';
+  if (!fs.existsSync(path.join(bindingsDir(mainRoot), '.root'))) return 'it cannot see the real bindings directory';
+  if (!writable(bindingsDir(mainRoot))) return 'its view of the bindings is read-only';
+  return null;
+}
+
 /** The case `id` as it is now, or why it cannot be named: unknown and closed are both `authority-context-invalid`. */
 function openCaseFacts(mainRoot, id, what) {
   if (!fs.existsSync(caseDirOf(mainRoot, id))) return { refused: refusal('authority-context-invalid', `${what} names case ${id}, which does not exist`).refused };
@@ -212,22 +222,13 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
     }
   };
 
-  /** Whether this process may write a case's ledger and bindings: a masked or read-only view cannot. */
-  const confinedWriteRefusal = (id) => {
-    if (currentDispatchDepth() === 0) return null;
-    const dir = id === null ? null : path.join(mainRoot, '.fgos', 'workflow-runs', id);
-    if (dir !== null && fs.existsSync(dir) && !writable(dir)) return 'its view of the case ledger is read-only';
-    if (!fs.existsSync(path.join(bindingsDir(mainRoot), '.root'))) return 'it cannot see the real bindings directory';
-    if (!writable(bindingsDir(mainRoot))) return 'its view of the bindings is read-only';
-    return null;
-  };
   const confinedRefusal = (why) => refusal('nested-write-from-confined-worker', `a writing dispatch from inside a confined worker is refused: ${why}; a confined worker may dispatch read-only work only`);
 
   return {
     resolveBinding({ worktree, caseId: asked = null }) {
       // No case is named. A call that carries case variables, or a masked view, is not standalone.
       if (asked === null && caseId === null) {
-        const confined = confinedWriteRefusal(null);
+        const confined = confinedWriteRefusal({ mainRoot });
         if (confined) return { answer: 'nested-write-from-confined-worker', condition: confinedRefusal(confined).refused.condition };
         const claimed = caseEnvOf(env);
         if (claimed) {
@@ -254,7 +255,7 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
       const writing = proposal.writes.length > 0;
       // A confined caller is refused by name before anything else is looked at, whatever it names.
       if (writing) {
-        const confined = confinedWriteRefusal(id);
+        const confined = confinedWriteRefusal({ mainRoot, caseId: id });
         if (confined) return confinedRefusal(confined);
       }
       const named = openCaseFacts(mainRoot, id, 'the call');

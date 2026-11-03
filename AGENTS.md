@@ -5,16 +5,16 @@
 Forgent (fgOS) is the platform layer for building and running agent applications — the infrastructure, skills, and automation that sit beneath every agent app, so developers can forge new agents instead of building everything from scratch.
 
 - README.md — product description + documentation index
-- docs/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)
-- docs/specs/system-overview.md — area map, shared entities, cross-area flows
-- docs/specs/reading-map.md — where every doc and source path in this repo lives
+- docs/platform/platform-foundations.md — L1-L10 locked design laws; L5 is this repo's definition of done (six questions, below)
+- docs/platform/system-overview/spec.md — area map, shared entities, cross-area flows
+- docs/reading-map.md — where every doc and source path in this repo lives
 - docs/backlog.md — product backlog (PBI rows: proposed / in-flight / done)
 - plans/261017-1313-fgos-platform-program-board/plan.md — platform program board (lanes, waits, shared-file collisions). Do not read it by default. Open it only when you start, finish, block or land a platform lane (lock/git/state/config/runner): read the "Các luồng" and "File chung dễ va" sections, update your own lane's row, and add one line at the top of its `log.md`. Never read `log.md` whole; grep it by lane ID, date or commit.
-- docs/routing-handoff-contract.md — agent-to-agent handoff contract + trust boundary
-- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in docs/specs/<area>.md's own "Lịch sử quyết định" sections (tsk-1lv-4)
+- docs/platform/runner/contracts/routing-handoff.md — agent-to-agent handoff contract + trust boundary
+- docs/decisions/index.md — generated projection of platform/repo-wide decisions (`fgos decision-index`); narrative lives in each area's spec.md "Lịch sử quyết định" section and in decisions/ where present; resolve renamed/split scopes through docs/platform/governance.md#decision-scope-to-holder-table
 - domains/<domain>/AGENTS.md — domain-specific doctrine (e.g. domains/coding/AGENTS.md for fgos-coding-* workflows), read dynamically by fgos-routing
 
-## Product priority order (D-ADR0030, docs/specs/runner.md)
+## Product priority order (D-ADR0030, docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm)
 
 1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.
 2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.
@@ -24,20 +24,20 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 Tốc độ ở mục 1 là tốc độ ship của **project đang DÙNG fgOS** (fgOS không loại trừ khi tự dogfood) — không phải tốc độ tự thân team fgOS build một tính năng của chính fgOS. Đừng chọn phương án rẻ để fgOS tự triển khai nếu nó làm project dùng fgOS chậm hơn.
 
-Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/specs/runner.md's "Lịch sử quyết định" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).
+Thứ tự cố định — bậc dưới không ghi đè bậc trên. Chi tiết: docs/platform/runner/decisions/h-36d872fbb0e5.md#0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm's "Lịch sử quyết định" § D-ADR0030 (mở rộng D-ADR0025; narrative đầy đủ, docs/decisions/*.md corpus đã retired tsk-1lv-4).
 
-## Ranh giới sứ mệnh (D-ADR0035, docs/specs/platform-foundations.md)
+## Ranh giới sứ mệnh (D-ADR0035, docs/platform/platform-foundations.md#0035-xác-lập-ranh-giới-sứ-mệnh-fgos-phục-vụ-project-khácbusiness-workflow-không-tự-phát-triển-chính-nó-mặc-định)
 
 fgOS tồn tại để: 
  1. phát triển các project khác 
  2. làm nền vận hành các business base workflow 
  
-fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi "sửa fgOS" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/specs/platform-foundations.md's "Lịch sử quyết định" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4).
+fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi "sửa fgOS" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/platform/platform-foundations.md's "Lịch sử quyết định" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4).
 
 
 ## Before touching code
 
-Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for whatever
+Read `docs/reading-map.md`, then the area or subcomponent spec under `docs/platform/` for whatever
 you're about to change. Specs are the state layer — BA-grade, tech-agnostic — read
 the spec before the code.
 
@@ -54,13 +54,13 @@ found; say in the plan what was reused and what was missing.
 
 A stranger agent with no chat history should be able to answer, for any change:
 
-1. **What to read first?** `docs/specs/reading-map.md`, then the relevant area spec.
+1. **What to read first?** `docs/reading-map.md`, then the relevant area spec.
 2. **What kind of work is this?** Check it against the area's spec and
    `docs/backlog.md`; a new product area gets a spec before it gets code.
-3. **What contract does it touch?** `docs/routing-handoff-contract.md` for
+3. **What contract does it touch?** `docs/platform/runner/contracts/routing-handoff.md` for
    agent-to-agent boundaries; the area spec's Shared Entities table for
    in-process contracts.
-4. **How much risk?** Does it change a locked law in `docs/platform-foundations.md`,
+4. **How much risk?** Does it change a locked law in `docs/platform/platform-foundations.md`,
    or existing covered behavior in the test suite? Either raises the bar.
 5. **What proof means done?** `npm test` (state + cli + runner + e2e suite) and
    `cargo test --workspace` green. Every behaviour has one owning proof, at the
@@ -70,9 +70,10 @@ A stranger agent with no chat history should be able to answer, for any change:
    mechanism retires its tests in the same change. Green must come from real
    behavior: never add an env switch, flag, or test-only code branch that skips
    checks to make tests pass; fix production code or the fixture instead.
-6. **What learning gets left behind?** A settled decision goes into
-   `docs/decisions/`; a settled spec fact goes into the relevant
-   `docs/specs/<area>.md`.
+6. **What learning gets left behind?** A settled decision narrative goes into
+   the area's `spec.md` decision-history section, or `decisions/` where present; a settled fact goes into the exact area or
+   subcomponent `spec.md`. Resolve both through
+   `docs/platform/governance.md#decision-scope-to-holder-table`.
 
 ## Scratch artifacts
 
@@ -127,7 +128,7 @@ restaged; activation never refreshes itself merely because source was edited.
 
 ## Install/setup/doctor gate
 
-`docs/distribution-vision.md` sets the direction for this repo's own
+`docs/platform/packaging-distribution/history/distribution-vision.md` sets the direction for this repo's own
 cài đặt/setup/doctor story. Before any change is done, ask:
 
 - Does this add a config default, env var, or infra dependency (a new
@@ -139,7 +140,7 @@ cài đặt/setup/doctor story. Before any change is done, ask:
   project) is active — per the vision doc, project config always
   overwrites global, and fgOS stays aware of both without conflict.
 - If the change touches how fgOS gets installed, upgraded, or diagnosed at
-  all, read `docs/distribution-vision.md` and `docs/specs/distribution.md`
+  all, read `docs/platform/packaging-distribution/vision.md` and `docs/platform/packaging-distribution/spec.md`
   first — a new module gets a spec/config-registry entry before it gets
   code, same bar as a new product area (question 2 above).
 - Does this change something a user of fgOS would see? If yes, add a line
@@ -147,10 +148,10 @@ cài đặt/setup/doctor story. Before any change is done, ask:
 
 ## Changing a locked law
 
-Laws in `docs/platform-foundations.md` are fixed until their named review
+Laws in `docs/platform/platform-foundations.md` are fixed until their named review
 threshold is hit. Changing one supersedes its decision ID — never edit it in place.
 
-## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/specs/platform-foundations.md)
+## RUL11 — tùm lum, không phải nặng (D-ADR0054, supersedes D-ADR0036, docs/platform/platform-foundations.md#0054-rul11-tùm-lum-không-phải-nặng-gom-trong-phạm-vi-việc-đang-làm-supersede-0036)
 
 Việc trở nặng không vì bản chất nó lớn mà vì thiếu và quên — tên đúng của
 tình trạng đó là tùm lum, không phải nặng. Khi thấy tùm lum trong phạm vi
@@ -162,7 +163,7 @@ hình dễ, không chắp vá.
 
 khong phai no nang ma no tum lum
 
-## RUL104 — tốt hơn, không to hơn (D-ADR0062, supersedes D-ADR0061, docs/specs/platform-foundations.md)
+## RUL104 — tốt hơn, không to hơn (D-ADR0062, supersedes D-ADR0061, docs/platform/platform-foundations.md#0062-rul104-tốt-hơn-không-to-hơn-thêm-clean-code-và-hexagonal-supersede-0061)
 
 Khi audit, soát lại hay làm cứng phần đã có, mỗi thay đổi phải làm thứ đang
 có tốt hơn: ổn định hơn, nhanh hơn, nhẹ hơn, code đơn giản hơn theo các
@@ -350,20 +351,20 @@ Every question asking the owner to choose a direction carries five parts: what i
 
 # Platform Operating Laws
 
-Platform laws L1-L10 are locked in `docs/platform-foundations.md` and define immutable platform invariants for fgOS:
+Platform laws L1-L10 are locked in `docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack` and define immutable platform invariants for fgOS:
 
-- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform-foundations.md#l1--hai-vt-l-ca-tri-thc-log-vs-state`)
-- **L2 — Kiến trúc memory hai tầng** (`docs/platform-foundations.md#l2--kin-trc-memory-hai-tng`)
-- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform-foundations.md#l3--lut-store-truth--jsonl-db-l-view`)
-- **L4 — Routing model theo audience của từng interface** (`docs/platform-foundations.md#l4--routing-model-theo-audience-ca-tng-interface`)
-- **L5 — Definition of done: sáu câu hỏi** (`docs/platform-foundations.md#l5--definition-of-done-su-cu-hi`)
-- **L6 — Maturity ladder F0–F5** (`docs/platform-foundations.md#l6--maturity-ladder-f0f5`)
-- **L7 — Durability ladder** (`docs/platform-foundations.md#l7--durability-ladder`)
-- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform-foundations.md#l8--doctrine-placement-rule-always-loaded-layer`)
-- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform-foundations.md#l9--thang-hon-tt-ca-mt-vic-run--merge--durable`)
-- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform-foundations.md#l10--add-through-not-alongside-m-rng-qua-ca-khng-p-cnh-ca`)
+- **L1 — Hai vật lý của tri thức: Log vs State** (`docs/platform/platform-foundations.md#l1-hai-vật-lý-của-tri-thức-log-vs-state`)
+- **L2 — Kiến trúc memory hai tầng** (`docs/platform/platform-foundations.md#l2-kiến-trúc-memory-hai-tầng`)
+- **L3 — Luật store: truth ở JSONL, db là view** (`docs/platform/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view`)
+- **L4 — Routing model theo audience của từng interface** (`docs/platform/platform-foundations.md#l4-routing-model-theo-audience-của-từng-interface`)
+- **L5 — Definition of done: sáu câu hỏi** (`docs/platform/platform-foundations.md#l5-definition-of-done-sáu-câu-hỏi`)
+- **L6 — Maturity ladder F0–F5** (`docs/platform/platform-foundations.md#l6-maturity-ladder-f0f5`)
+- **L7 — Durability ladder** (`docs/platform/platform-foundations.md#l7-durability-ladder`)
+- **L8 — Doctrine placement rule (always-loaded layer)** (`docs/platform/platform-foundations.md#l8-doctrine-placement-rule-always-loaded-layer`)
+- **L9 — Thang hoàn tất của MỘT việc: run ≠ merge ≠ durable** (`docs/platform/platform-foundations.md#l9-thang-hoàn-tất-của-một-việc-run-merge-durable`)
+- **L10 — Add-through-not-alongside: mở rộng QUA cửa, không đắp CẠNH cửa** (`docs/platform/platform-foundations.md#l10-add-through-not-alongside-mở-rộng-qua-cửa-không-đắp-cạnh-cửa`)
 
-Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform-foundations.md`. Changing any locked law requires superseding its decision ID rather than editing in place.
+Authoritative statements, rationales, evidence sources, and review thresholds are defined exclusively in `docs/platform/platform-foundations.md#luật-nền-platform-forgent-phase-0-compound-learning-stack`. Changing any locked law requires superseding its decision ID rather than editing in place.
 
 ### procedure
 

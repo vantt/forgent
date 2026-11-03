@@ -1,6 +1,6 @@
 import type { ErrorEnvelope } from './types'
 
-// Area spec Edge Cases Settled (docs/specs/herdr-web-dashboard.md:259-260):
+// Area spec Edge Cases Settled (docs/platform/herdr-web-dashboard/spec.md#edge-cases-settled):
 // "The gateway is unreachable. The client says so plainly and offers to
 // retry; it never presents stale data as current." A network-level fetch
 // failure (bad host, connection refused, DNS failure, offline) throws

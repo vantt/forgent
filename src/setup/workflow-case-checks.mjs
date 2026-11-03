@@ -1,5 +1,5 @@
 // workflow-case-checks.mjs — doctor checks and the repair of the worktree binding records of Workflow cases
-// (docs/specs/workflow.md RUL-WF-27). Bodies live here; `registrations.mjs` registers them.
+// (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27). Bodies live here; `registrations.mjs` registers them.
 //
 // The ledger is the truth (L3); a binding record is a view of it. The check reads every record and every
 // ledger that has a `binding` event and says where they disagree; the fix settles what a crash left

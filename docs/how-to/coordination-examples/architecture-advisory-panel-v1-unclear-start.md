@@ -1,7 +1,7 @@
 # Example family: unclear start (vnflow)
 
 Grounded in a real, closed session:
-[P01.3](../../architect/agent-coordination/verification/architecture-advisory-panel/P01.3.md)
+[P01.3](../../platform/agent-coordination/verification/architecture-advisory-panel/P01.3.md)
 (worked here as a narrated example, not a copy of the proof files
 themselves).
 

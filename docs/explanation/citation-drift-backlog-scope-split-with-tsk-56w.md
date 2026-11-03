@@ -40,7 +40,7 @@ group:
 - `tsk-2sp-1` — `docs/specs/work-state.md` (301 `d-local-outside-home`
   findings — `work-state.md`'s own `bare-citation` findings were already
   fixed by `tsk-2yu-1`)
-- `tsk-2sp-2` — `docs/specs/runner.md` (412 findings)
+- `tsk-2sp-2` — `docs/platform/runner/spec.md#spec-runner-vòng-tự-hành` (412 findings)
 - `tsk-2sp-5` — the remaining `docs/*.md` files (306 findings)
 
 301 + 412 + 306 = 1019, matching the narrowed scope exactly — no further

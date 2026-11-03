@@ -2,20 +2,26 @@
 
 ```txt
 Document type: Proposal status table
-Audience: Human reviewer, architect, maintainer, documentation agent
-Purpose: Preserve Agent Coordination proposal/frontier status during migration
-Design status: Draft
-Implementation: Partial
-Provenance: Created from Phase 0 source inventory and documentation-standardization plan
+Audience: Human reviewer, maintainer and implementation agent
+Purpose: Navigate preserved design and historical material without asserting a retired runtime
+Design status: Archived
+Implementation: Retired engine material is non-authority history; verified retained units remain unchanged
+Provenance: Source material from `docs/platform/agent-coordination/history/documentation-migration/proposal-status.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; retirement framing, metadata and current-owner navigation are adapted here.
 Writer type: Human + agent coauthor
-Canonical for: Migration proposal tracking only
-Use this when: Moving proposals or preventing accidental promotion
-Do not use this for: Accepted architecture or runtime truth
-Last reviewed: 2026-09-18
+Canonical for: Retained-document navigation only; no current engine authority
+Use this when: Locating current execution owners or auditing historical claims
+Do not use this for: Reinstating CoordinationSession, CoordinationProtocol or FlowDefinition as current implementation
+Last reviewed: No current review date recorded; retained source dates are historical
 Related:
-- docs/platform/agent-coordination/history/documentation-migration/source-inventory.md
-- docs/platform/agent-coordination/history/documentation-migration/claim-preservation.md
+- docs/platform/agent-coordination/README.md
+- docs/platform/runner/decisions/h-aabefc85f0c9.md#coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner
+- docs/platform/agent-coordination/history/retired-engine/history/documentation-migration/proposal-status.md
+Supersedes: Stale current-state framing only; all old claims are preserved verbatim
+Superseded by: Runtime ownership in docs/platform/runner/spec.md#spec-runner-vòng-tự-hành
+Carriage note: Retirement framing and current-owner navigation
 ```
+
+2026-11-03 cutover note: The legacy runner citation above is a historical coordinate, not a post-cutover link. Prepared successors: `docs/platform/runner/spec.md`.
 
 Proposal status is conservative. A proposal can contain accepted pieces, but
 the accepted content must be extracted into the proper architecture, contract,

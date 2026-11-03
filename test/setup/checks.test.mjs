@@ -38,6 +38,12 @@ import {
 import { addDecision } from '../../src/state/store.mjs';
 import { createSession } from '../../src/runner/session.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
+import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
+
+// Single-file runs need the same real native payload as the suite launcher.
+// Keep Git's probe cache in this test process's private temporary tree.
+process.env.FGOS_STATE_ROOT = mkTemp('fgos-checks-state-');
+ensureScriptAddon();
 import { initializeWorkRepository, freezeLegacyWorkFixture } from '../helpers/work-store-release.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
@@ -139,6 +145,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'doc-near-duplicate',
       'doc-provisional-aged',
       'doc-topic-oversized',
+      'documentation-cutover-lease',
       'doc-role-underused',
       'doc-source-conservation',
       'agy-permissions-configured',

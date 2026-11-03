@@ -18,7 +18,7 @@ rule (`docs/history/compound-learn-artifact-registry/DISCUSSION.md`).
 
 ## The full spec lives elsewhere — this doc is the narrative, not a duplicate
 
-`docs/architect/knowledge-registry-redesign.md` (743 lines) is the
+`docs/platform/proposals/knowledge-registry-redesign.md#knowledge-registry-redesign` (743 lines) is the
 complete design spec: problem statement, goals, non-goals, the full
 `knowledge`/`topic`/`doc` command surface, lifecycle states, migration
 plan, and harness requirements. This doc doesn't restate it — it's the
@@ -333,7 +333,7 @@ they were fixed here.
 `.fgos/config.json`'s `docRegistry.enforce` stayed `false` — so the gate
 ran soft-fail (`{attested:false, reason:...}`) on any unregistered path
 instead of actually refusing. `tsk-1uj` is step 5 of the design doc's own
-"Correct Implementation Order" (`docs/architect/knowledge-registry-redesign.md`
+"Correct Implementation Order" (`docs/platform/proposals/knowledge-registry-redesign.md`
 §11): flip that flag to `true`, closing the gap between "the gate exists"
 and "the gate enforces."
 

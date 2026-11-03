@@ -740,9 +740,9 @@ test('formatFgosWriteRejectedDetail includes playbook recovery doc path', () => 
   const detail = formatFgosWriteRejectedDetail('fgw/demo-item', ['.fgos/events.jsonl'], 'main');
   assert.equal(
     detail,
-    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/how-to/fix-fgos-write-rejected-merge-block.md for the recovery steps.',
+    'fgw/demo-item staged a change under .fgos/ (.fgos/events.jsonl); merge aborted, main unchanged — ADR0020. See docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md for the recovery steps.',
   );
-  assert.ok(detail.includes('docs/how-to/fix-fgos-write-rejected-merge-block.md'));
+  assert.ok(detail.includes('docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md'));
 });
 
 test('landRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/', async () => {
@@ -974,7 +974,7 @@ test('landRunnerItem merges cleanly when a non-union .fgos/ path auto-merges to 
   // The branch catches up (merges main in, adopting a:2), then reverts
   // JUST field `a` back to its own pre-merge (branchHeadAtTake) value and
   // commits that -- the real ADR0020 pre-commit-hook-driven pattern
-  // (docs/how-to/fix-fgos-write-rejected-merge-block.md step 3-4). Field
+  // (docs/knowledge/how-to-fix-a-fgos-write-rejected-merge-block-on-a-fgos-chang/fix-fgos-write-rejected-merge-block.md step 3-4). Field
   // `b` is left as main's round-1 merge brought it in, untouched by this
   // revert -- the branch's own net content is now byte-identical to its
   // branchHeadAtTake commit (both `{a:1, b:1}`), even though its commit

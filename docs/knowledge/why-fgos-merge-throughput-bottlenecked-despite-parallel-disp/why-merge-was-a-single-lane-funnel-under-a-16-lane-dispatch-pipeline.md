@@ -163,7 +163,7 @@ carries its own `.fgos/`).
 
 ## Related
 
-- `docs/explanation/why-the-main-checkout-lock-needs-a-heartbeat-during-merge-verify.md`
+- `docs/how-to/recover-from-a-merge-loop-merge-conflict-block-by-running-fgos-catchup.md`
   — cause 1's earlier symptom-level patch
 - `docs/explanation/why-a-leaf-to-root-approve-no-longer-gates-on-the-shared-checkout-being-clean.md`
   — cause 3, fixed

@@ -1,127 +1,72 @@
 # Agent Coordination
 
 ```txt
-Document type: Area portal
-Audience: Human reviewer, architect, maintainer, documentation agent
-Purpose: Route readers through the Agent Coordination platform area during migration
+Document type: Area Portal
+Audience: Human reviewer, maintainer and implementation agent
+Purpose: Route current execution to its owners and retain historical evidence
 Design status: Accepted
-Implementation: Partial
-Provenance: Promoted from docs/architect/agent-coordination/README.md during documentation standardization
+Implementation: Current-owner navigation; former coordination engine retired
+Provenance: recorded conservation authority whole-area reframe; complete classified input retained in history/retired-engine/files
 Writer type: Human + agent coauthor
-Canonical for: Agent Coordination navigation and migration status
-Use this when: You need to understand accepted, proposed, implemented, partial, or deferred-preserved Agent Coordination material
-Do not use this for: Exact runtime schemas, accepted contracts, or proof artifacts by itself
-Last reviewed: 2026-09-18
+Canonical for: Area navigation, not runtime schema or old engine status
+Use this when: Locating current execution owners or historical coordination claims
+Do not use this for: Reinstating the retired CoordinationSession engine
+Last reviewed: No current review date recorded; retained source dates are historical
 Related:
-- docs/doc-governance.md
-- docs/platform/README.md
-- docs/platform/component-boundary.md
-- docs/architect/agent-coordination/documentation-standardization-plan.md
+- docs/platform/runner/spec.md#spec-runner-vòng-tự-hành
+- docs/platform/agent-coordination/spec.md
+- docs/platform/agent-coordination/history/retired-engine/README.md
+Supersedes: Stale current-state framing only; no old claim is dropped
+Superseded by: None
+Carriage note: Current-owner routing and retirement framing
 ```
 
-> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và các khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4 của track Request-to-Run (D-0050). Hệ thống đã chuyển sang mô hình gọn: **Unit run** qua **CollaborationPattern** (`solo`, `reviewed`, `panel` + preset) và **Workflow run** (`src/workflow/**`). Các tài liệu trong thư mục này lưu giữ thiết kế lịch sử của Step 00–09.
+## Current Execution
 
-> **Ghi chú (2026-10-14, decision 0062 trong `docs/specs/runner.md`):** các cửa dispatch thô mà tài liệu, proof và roadmap trong thư mục này nhắc tới — `dispatch execute` (cả `--contract`, `--assignment`), `dispatch log`, `dispatch fanout-batch` — đã bị xoá. Việc chạy qua `fgos run "<prompt>"` / `fgos run --unit` hoặc `fgos workflow start`. Các bản ghi verification/proof giữ nguyên lệnh đã chạy lúc đó, như bằng chứng lịch sử.
+The former coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`. `coordination` is not a current public CLI verb; the actual machine-readable `--help --json` manifest is the CLI inventory.
 
-This is the target platform portal for Agent Coordination. During migration,
-legacy docs under [docs/architect/agent-coordination/](../../architect/agent-coordination/)
-remain current unless a target document explicitly supersedes or redirects them.
-Agent Coordination is the domain-neutral foundation for governed, evidence-aware
-agent activity across agents, capabilities, providers, models, tiers, execution
-mechanisms, and optional Work integration.
+CollaborationPattern owns Unit collaboration patterns in `src/runner/execution/loops/index.mjs`; Unit execution enters through `src/runner/execution/run.mjs`. Workflow execution belongs to `src/workflow/runner.mjs` and its Unit execution-core integration.
+The surviving Assignment/Run dispatch chain is also current: Assignment building, DispatchPlan compilation, governed execution and RunResult normalization are owned by `src/runner/dispatch/assignment.mjs`, `plan.mjs`, `assignment-runner.mjs` and `run-result.mjs`.
 
-## Component Relationship
+Read [the runner spec](../runner/spec.md#spec-runner-vòng-tự-hành) for the current execution contract, then [this area's current-owner map](spec.md). Do not treat CoordinationSession, CoordinationProtocol or FlowDefinition in the preserved documents as current implemented engine entities.
 
-```mermaid
-flowchart LR
-  Human[Human or operator]
-  Work[Work Lifecycle Engine]
-  Domain[Domain components and extensions]
-  Coordination[Agent Coordination Engine]
-  Flow[Workflow or CoordinationProtocol]
-  Assignment[Assignment]
-  Dispatch[Dispatch and Execution Engine]
-  Run[Run]
-  Result[RunResult and evidence]
-  Executor[Provider, model, executor]
-  Herdr[Herdr visibility]
-  Host[Host and surface layer]
-  Package[Packaging and distribution]
+> **Ghi chú (2026-10-14, decision 0062 trong `docs/platform/runner/decisions/h-36d872fbb0e5.md#0062-xoá-cửa-thô-dispatch-là-tầng-thấp-fanout-về-tầng-work-thay-phần-purpose-door-của-rul68-2-tầng-dispatch-và-phần-mỗi-cửa-một-lane-posture-của-rul77-posture-belongs-to-the-capability`):** các cửa dispatch thô mà tài liệu, proof và roadmap trong thư mục này nhắc tới — `dispatch execute` (cả `--contract`, `--assignment`), `dispatch log`, `dispatch fanout-batch` — đã bị xoá. Việc chạy qua `fgos run "<prompt>"` / `fgos run --unit` hoặc `fgos workflow start`. Các bản ghi verification/proof giữ nguyên lệnh đã chạy lúc đó, như bằng chứng lịch sử.
 
-  Human --> Work
-  Human --> Coordination
-  Work -->|optional operation context| Coordination
-  Coordination -->|recommendations and evidence only| Work
-  Domain -.->|policy, doctrine, and harnesses| Coordination
-  Flow -.->|optional declared structure| Coordination
-  Coordination --> Assignment --> Dispatch --> Run --> Result
-  Dispatch --> Executor
-  Herdr -.->|observes, never settles| Run
-  Host -->|invokes approved public doors| Coordination
-  Host --> Dispatch
-  Package -.->|installs and activates| Host
-```
+## Preserved History
 
-Solid arrows show a control or data path. Dashed arrows show optional
-augmentation, activation, or observation. In particular, Work remains the only
-delivery-lifecycle authority, and Herdr never establishes Run truth.
+The [complete previous portal](history/retired-engine/README.md#literal-snapshot) and [previous spec](history/retired-engine/spec.md#literal-snapshot) remain verbatim, including all original qualifications and statuses. They are non-authority history, not present implementation claims.
 
-## Read First
+Use the snapshots to audit preserved claims. They do not reinstate the retired engine or strengthen proposal/implementation status.
 
-| Order | Read | Why |
-|---|---|---|
-| 1 | [vision.md](vision.md) | Highest area authority for identity, boundaries, optional structure, and domain augmentation. |
-| 2 | [intent-preservation-ledger.md](intent-preservation-ledger.md) | Required second read before narrowing or deferring a capability. |
-| 3 | [history/documentation-migration/source-inventory.md](history/documentation-migration/source-inventory.md) | Migration ledger for old source paths, target disposition, and status. |
-| 4 | [history/documentation-migration/migration-status.md](history/documentation-migration/migration-status.md) | Phase-by-phase migration progress and remaining work. |
-| 5 | [subcomponents/README.md](subcomponents/README.md) | Map of child components and current status. |
-| 6 | [../../architect/agent-coordination/README.md](../../architect/agent-coordination/README.md) | Legacy/current portal while architecture, contracts, ADRs, verification, playbooks, proposals, roadmap, and history are promoted. |
+- [Historical architecture](history/retired-engine/architecture/system-context.md#literal-snapshot)
+- [Historical CLI proposal](history/retired-engine/proposals/semantic-cli-surface.md#literal-snapshot)
+- [Historical implementation alignment](history/retired-engine/verification/implementation-alignment.md#literal-snapshot)
+- [Retired documentation policies and migration plans](history/documentation-migration/documentation-governance.md)
 
-## Current Accepted Baseline
+## Surviving Current Material
 
-The accepted Step 00-08 foundation remains in the legacy architecture package
-until later migration phases promote the detailed docs:
+The retired engine no longer defines this area's live runtime. Current material
+is narrower, but not empty: it retains the dispatch/result/recovery boundaries
+that have surviving executable owners, and four cognitive companions consumed
+by the registered architecture-advisory skill. No current CoordinationSession,
+FlowDefinition, CoordinationProtocol or `fgos coordination` contract is retained.
 
-- Work owns delivery lifecycle when present.
-- Workflow Stage Operation compatibility governs legal operation selection.
-- Assignment, Run, and RunResult are distinct.
-- Dispatch governs execution infrastructure.
-- RunResult and evidence boundaries prevent false success.
-- Herdr is visibility, not evidence or Run truth.
-- CoordinationSession is the V1 executable/recovery root.
-- FlowDefinition is shared graph/operation/policy IR with typed profiles.
-
-## Status Summary
-
-| Area | Status | Current authority |
-|---|---|---|
-| Vision and intent ledger | promoted | [vision.md](vision.md), [intent-preservation-ledger.md](intent-preservation-ledger.md) |
-| Spec | promoted summary / partial | [spec.md](spec.md), [verification/implementation-alignment.md](verification/implementation-alignment.md), [../../specs/runner.md](../../specs/runner.md) plus accepted legacy contracts |
-| Architecture | promoted target; legacy documents carry redirect notes | [architecture/README.md](architecture/README.md) |
-| Contracts | promoted target; legacy documents carry redirect notes | [contracts/README.md](contracts/README.md) |
-| Decisions | promoted target; legacy documents carry redirect notes | [decisions/README.md](decisions/README.md) |
-| Verification | target index; legacy proof artifacts retained link-only | [verification/README.md](verification/README.md) |
-| Proposals | non-canonical target; legacy documents carry redirect notes | [proposals/README.md](proposals/README.md) |
-| Playbooks | operational/bootstrap target; legacy documents carry redirect notes | [playbooks/README.md](playbooks/README.md) |
-| Roadmap | implementation-sequence target; legacy documents carry redirect notes | [roadmap/README.md](roadmap/README.md) |
-
-## Cross-Area Boundaries
-
-| Boundary | Owner | Agent Coordination stance |
-|---|---|---|
-| Host invocation and provider process routing | [host-invocation-routing](../host-invocation-routing/README.md) | Link-only authority; Agent Coordination consumes this boundary through dispatch/executor integration. |
-| Packaging, install, activation, release manifest, setup/doctor, runtime identity | [packaging-distribution](../packaging-distribution/README.md) | Link-only authority; do not duplicate setup or runtime activation rules here. |
-| Platform component boundary | [component-boundary.md](../component-boundary.md) | No component-boundary change: these diagrams expose existing ownership and flows only. |
-
-## Related Files
-
-| Relationship | File |
+| Reading need | Current document material |
 |---|---|
-| documentation governance | [../../doc-governance.md](../../doc-governance.md) |
-| platform portal | [../README.md](../README.md) |
-| platform intent ledger | [../intent-preservation-ledger.md](../intent-preservation-ledger.md) |
-| component boundary | [../component-boundary.md](../component-boundary.md) |
-| migration plan | [../../architect/agent-coordination/documentation-standardization-plan.md](../../architect/agent-coordination/documentation-standardization-plan.md) |
-| legacy portal | [../../architect/agent-coordination/README.md](../../architect/agent-coordination/README.md) |
-| current state summary | [spec.md](spec.md) |
-| implementation alignment | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
+| Execution and Workflow ownership | [spec.md](spec.md), with links to the runner spec and executable owners |
+| Retained dispatch boundary | [Dispatch control plane](architecture/dispatch-control-plane.md), [runtime model](architecture/runtime-model.md) |
+| Evidence and outcome | [Evidence/results](architecture/evidence-and-results.md), [RunResult contract](contracts/assignment-run-runresult.md), [visibility](architecture/visibility-and-herdr.md) |
+| Recovery and control | [Recovery](architecture/runtime-recovery-design.md), [run control](architecture/run-handle.md), [recovery choice](architecture/executor-health-and-fallback.md) |
+| Work and result authority boundaries | [Work integration](architecture/work-integration.md), [ADR-001](decisions/ADR-001-work-lifecycle-authority.md), [ADR-003](decisions/ADR-003-assignment-run-runresult-separation.md), [ADR-005](decisions/ADR-005-herdr-visibility-only.md), [ADR-011](decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md) |
+| Cognitive advisory quality, not runtime recipes | [Coordinator companion](playbooks/prompts/architecture-advisory-coordinator.md), [role doctrine](playbooks/architecture-advisory-role-doctrine.md), [artifact templates](playbooks/architecture-advisory-artifact-templates.md), [evaluation rubric](playbooks/architecture-advisory-evaluation-rubric.md) |
+| Dated physical evidence | [Verification index](verification/README.md); evidence payload bytes and paths remain unchanged |
+| Legal Workflow operations and current vocabulary | [Operation contract](contracts/workflow-stage-operation.md), [vocabulary index](vocabulary/README.md), [trigger surface](architecture/group-thinking-trigger-surface.md) |
+| Provenance, compatibility and domain harness decisions | [Decision index](decisions/README.md), including current ADR-002, ADR-004, ADR-006 and ADR-007 |
+| Current intended design, not blanket implementation | [Proposal index](proposals/README.md), [foundation vision](vision.md); section status distinguishes proposals from implemented behavior |
+| Owner-retained manual operating material | [Operating harness](playbooks/coordination-operating-harness.md), [master coordinator](playbooks/prompts/master-coordinator.md); these are not the registered architecture-advisory runtime |
+| Classified prior files | [Whole-input history](history/retired-engine/files/README.md#literal-snapshot); historical statuses and links do not establish present implementation |
+
+The registered skill explicitly retains the four cognitive companions and
+rejects historical runtime recipes (`core/skills/fgos-architecture-panel/SKILL.md:135-142`).
+This reframe changes document placement and framing only; it does not promote
+the area, accept historical proposals or replace the runner spec.

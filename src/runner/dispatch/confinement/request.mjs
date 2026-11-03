@@ -1,5 +1,5 @@
 // request.mjs — Confinement Authority request construction and validation
-// (Phase 02 R1-R2, docs/specs/confinement-authority.md §6.4, §6.10).
+// (Phase 02 R1-R2, docs/platform/agent-confinement/contracts/confinement-authority-v1.md#6-canonical-contracts §6.4, §6.10).
 
 import fs from "node:fs";
 import path from "node:path";

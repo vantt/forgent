@@ -17,7 +17,7 @@ to recur.**
 The real merge landed on `main`; the item only falls into the
 already-designed "historical item with no sha" bucket — the
 `delivered`-not-on-trunk check's own git-derived fallback still covers it
-(`docs/specs/work-state.md` Data Dictionary #28/#29). But `tsk-5dk` was
+(`docs/platform/work-state/spec.md#3-work-item-data-dictionary` Data Dictionary #28/#29). But `tsk-5dk` was
 supposed to be a case WITH a real sha per its own design, so this is a
 genuine, unexplained gap — not merely a known-graceful degradation.
 

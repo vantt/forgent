@@ -5,16 +5,23 @@ Document type: Verification
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the proof gate for external process provider preview
 Design status: Draft
-Implementation status: Implemented preview (R2-P0 through R2-P5 closed 2026-09-15; R3, marketplace, signatures, and production WASM remain future work)
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
 Last reviewed: 2026-09-15
 Related:
-- plans/260915-host-invocation-r2-external-process/plan.md
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
 - docs/platform/host-invocation-routing/contracts/external-provider-manifest.md
+Implementation: Implemented preview (R2-P0 through R2-P5 closed 2026-09-15; R3, marketplace, signatures, and production WASM remain future work)
+Provenance: `docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; `docs/platform/host-invocation-routing/verification/r2-external-process-proof.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Preserve the proof gate for external process provider preview
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
+
+Correction — checked route snapshot (2026-10-13): `packages/host-runtime/contracts/command-routes.json` has 75 selectors: 70 `legacy-cli` and five native (`convention`, `friction`, `gate-bypass`, `metrics`, `version`). This recount supersedes current-count wording; dated proof records remain historical.
 
 ## 1. Required Proof
 
@@ -84,15 +91,15 @@ Every R2 merge re-ran and passed `cargo test -p fgos-host-runtime -p fgos --quie
 
 ## 7. Non-Gates
 
-Marketplace, publisher trust, signature system, production WASM, and core-provider replacement do not gate R2. These remain future work for R3 or later, per the [R2 execution record](../../../../plans/260915-host-invocation-r2-external-process/plan.md)'s own non-goals.
+Marketplace, publisher trust, signature system, production WASM, and core-provider replacement do not gate R2. These remain future work for R3 or later, per the [R2 execution record](../../../../archive/plans/260915-host-invocation-r2-external-process/plan.md)'s own non-goals.
 
 ## 8. Related Files
 
 | Relationship | File |
 | --- | --- |
-| execution record | [../../../../plans/260915-host-invocation-r2-external-process/plan.md](../../../../plans/260915-host-invocation-r2-external-process/plan.md) |
+| execution record | ../../../../plans/260915-host-invocation-r2-external-process/plan.md |
 | component protocol | [../contracts/component-protocol.md](../contracts/component-protocol.md) |
 | provider manifest | [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
 | implementation alignment | [implementation-alignment.md](implementation-alignment.md) |
 | R1 proof | [r1-rust-host-proof.md](r1-rust-host-proof.md) |
-| source plan | [../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md) |
+| source plan | ../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md |

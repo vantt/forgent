@@ -21,7 +21,7 @@ const TOKEN_STORAGE_KEY = 'herdr-gateway-token'
 
 type View = { name: 'board' } | { name: 'detail'; itemId: string } | { name: 'needs-answer' }
 
-// S01 — Sign in (docs/ui-spec/screens/S01-sign-in.md). "The first and
+// S01 — Sign in (docs/platform/ui-spec/architecture/screens/S01-sign-in.md). "The first and
 // only door" -- one field, one credential, exchanged for a session by a
 // real request (tsk-51i, D16/D17's own design pass): a token that is
 // simply the wrong shape/value never gets stored, it is proven against

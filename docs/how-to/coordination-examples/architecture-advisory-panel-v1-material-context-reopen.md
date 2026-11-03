@@ -1,7 +1,7 @@
 # Example family: material-context reopen
 
 Grounded in a real turn —
-[P01.2 Turn 1](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/human/1-person.md)
+[P01.2 Turn 1](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/human/1-person.md)
 — but this file's own second half is a deliberate, disclosed rewrite: the
 real session ran on the **manual playbook**, before this protocol existed,
 and the manual playbook could reopen Phase 3 with a fresh dispatch. This
@@ -34,7 +34,7 @@ answer without checking. The driver authorized a **narrow reopen of Phase
 and it found a real, live defect: a fresh daemon's one-time auth token is
 printed to stdout, which the desktop shell discards, an unpassable login
 wall for a first-time user. Read the real finding:
-[`scout-report-followup-1.md`](../../architect/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/scout-report-followup-1.md).
+[`scout-report-followup-1.md`](../../platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.2/scout-report-followup-1.md).
 
 ## What THIS protocol does with the same turn — the real, bounded difference
 

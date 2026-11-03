@@ -5,15 +5,20 @@ Document type: Verification
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the proof gate for production remote peer adoption
 Design status: Draft
-Implementation status: Implemented preview (R3-P0 frozen; R3-P1 adapter implemented preview; R3-P2/P3 route and proof closed; R3-P4 inventory recorded)
 Canonical: Yes, after review
 Owner: Host invocation
-Source type: Promoted from docs/architect/host-invocation-routing/node-to-rust-component-migration.md and rust-cli-and-proof-components-plan.md
 Last reviewed: 2026-09-18
 Related:
-- plans/260918-host-invocation-r3-remote-peer/plan.md
 - docs/platform/host-invocation-routing/architecture/host-use-cases.md
 - docs/platform/host-invocation-routing/architecture/release-boundaries.md
+Implementation: Implemented preview (R3-P0 frozen; R3-P1 adapter implemented preview; R3-P2/P3 route and proof closed; R3-P4 inventory recorded)
+Provenance: `docs/architect/host-invocation-routing/node-to-rust-component-migration.md` at `947dc310396071a4d530216d5c06d05993d63bf5`; `docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
+Writer type: Original writer attribution not recorded; retained source provenance
+Canonical for: The stated document scope; source implementation limits remain explicit
+Use this when: Preserve the proof gate for production remote peer adoption
+Do not use this for: Authority beyond the declared scope or implementation truth without the cited verification
+Supersedes: The mapped source location; source provenance is retained
+Superseded by: None recorded
 ```
 
 ## 1. Required Proof
@@ -27,7 +32,7 @@ R3 proves at least one production gateway route as a true peer invocation: remot
 - **Status:** Implemented preview (R3-P2 route wired, R3-P3 proof verified).
 - **Full frozen fields** (auth, request projection, response shape, error
   mapping, deadline/disconnect, rationale): [R3 execution record
-  §6 R3-P0](../../../../plans/260918-host-invocation-r3-remote-peer/plan.md#r3-p0-route-and-contract-freeze).
+  §6 R3-P0](../../../../archive/plans/260918-host-invocation-r3-remote-peer/plan.md#r3-p0-route-and-contract-freeze).
 
 ### 1.2 Adapter Status (R3-P1, 2026-09-18)
 
@@ -102,7 +107,7 @@ Migrating any remaining routes is strictly out of R3 scope. Writes stay out of t
 
 | Relationship | File |
 | --- | --- |
-| execution record | [../../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../plans/260918-host-invocation-r3-remote-peer/plan.md) |
+| execution record | ../../../../plans/260918-host-invocation-r3-remote-peer/plan.md |
 | host use cases | [../architecture/host-use-cases.md](../architecture/host-use-cases.md) |
 | release boundaries | [../architecture/release-boundaries.md](../architecture/release-boundaries.md) |
-| source migration | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) |
+| source migration | ../../../architect/host-invocation-routing/node-to-rust-component-migration.md |

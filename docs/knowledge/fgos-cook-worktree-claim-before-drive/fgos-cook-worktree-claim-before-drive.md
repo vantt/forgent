@@ -93,5 +93,5 @@ left standing alongside a new one.
 
 ---
 
-**Source:** `docs/history/fgos-cook-branch-isolation/` (`RESEARCH.md`,
+**Source:** `docs/history/fgos-cook-branch-isolation/` at `947dc310396071a4d530216d5c06d05993d63bf5` (`RESEARCH.md`,
 `plan.md`); work-item capture via `fgos check tsk-hes`.

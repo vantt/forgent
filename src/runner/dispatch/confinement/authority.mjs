@@ -1,5 +1,5 @@
 // authority.mjs — Agent Confinement Authority runtime execution door
-// (Phase 02 R1-R7, docs/specs/confinement-authority.md §1, §5.2, §6.6, §6.9).
+// (Phase 02 R1-R7, docs/platform/agent-confinement/spec.md §1, §5.2; docs/platform/agent-confinement/contracts/confinement-authority-v1.md#6-canonical-contracts §6.6, §6.9).
 
 import crypto from "node:crypto";
 import path from "node:path";

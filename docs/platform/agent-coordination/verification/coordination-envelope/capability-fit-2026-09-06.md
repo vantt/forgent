@@ -8,7 +8,7 @@ Canonical for: evidence of this bounded audit only, not accepted architecture
 State class: Log — historical findings for this run; later runs append separate reports
 
 Related: [Probe contract](../../../proposals/coordination-envelope-probe-contract.md),
-[Progress](../../../proposals/coordination-envelope-progress.md).
+[Progress](../../history/proposals-redesigns/coordination-envelope-progress.md).
 
 ## Outcome
 
@@ -119,18 +119,18 @@ must not call `createSessionAssignment` or an executor adapter as a shortcut.
 
 Source anchors:
 
-- [Request schema](../../../../../src/verbs/coordination/schema.mjs): validateSteps,
+- Request schema: validateSteps,
   validateCoordinationRequest, validateTask.
-- [Public run](../../../../../src/verbs/coordination/run.mjs): model/fan-out policy
+- Public run: model/fan-out policy
   refusals, sequential request loop, mutation forwarding, automatic close.
-- [Engine](../../../../../src/runner/coordination/session-engine.mjs):
+- Engine:
   validateConsultProposal permits one specialist; declared slots depend on a
   definition; classifySessionQuorum, closeSessionByQuorum, assertWithinWallTimeBudget.
-- [Store](../../../../../src/runner/coordination/store.mjs): assertDriverIdentity,
+- Store: assertDriverIdentity,
   createSessionAssignment aggregate counters.
 - [Runner](../../../../../src/runner/dispatch/assignment-runner.mjs): documented
   same-user trust boundary.
-- [Recovery test source](../../../../../test/runner/coordination-recovery-and-quorum.test.mjs):
+- Recovery test source:
   constructed crash-state fixtures and fake subprocess executors; not rerun here.
 
 No single rejected invented step proves that all possible encodings fail. The

@@ -123,10 +123,10 @@ case 'doctor': {
 }
 ```
 
-This is a deliberate reversal of `docs/specs/distribution.md`'s RUL9
+This is a deliberate reversal of `docs/platform/packaging-distribution/spec.md#business-rules`'s RUL9
 ("doctor's checks never write anything, under any circumstance") and RUL11
 ("doctor --fix does not exist yet") — intentional per
-`docs/distribution-vision.md` §3, not drift. Without `--fix`, behavior is
+`docs/platform/packaging-distribution/history/distribution-vision.md` §3, not drift. Without `--fix`, behavior is
 byte-identical to before this flag existed.
 
 ## Step 5 — legacy-file fallback, if your data used to live elsewhere

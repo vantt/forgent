@@ -297,7 +297,7 @@ export function snapshotDirtyBeforeFiles(dir, dirtyBefore) {
  * this codebase's own dispatch modules and write files under `.fgos/` is,
  * by this repo's own already-locked architecture, in the SAME trust class
  * as the user who invoked it -- not an external attacker class. See
- * `docs/routing-handoff-contract.md`'s three locked invariants
+ * `docs/platform/runner/contracts/routing-handoff.md`'s three locked invariants
  * (containment is instructions plus a throwaway branch, never a sandbox;
  * work items must originate from the real user; `.fgos/config.json`'s
  * `runner` section is executable config, whoever can edit it decides what

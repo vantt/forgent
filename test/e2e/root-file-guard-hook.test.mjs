@@ -254,3 +254,20 @@ test('Convention hook pass-skips an old host with one warning', (t) => {
   assert.match(result.stderr, /warning: convention check skipped \(host-version-mismatch\)/);
   assert.equal(result.stderr.match(/host-version-mismatch/g)?.length, 1);
 });
+
+// Wiring only: the native rule cases are owned by Convention's Rust golden suite.
+test('Convention hook refuses a native block-posture documentation finding', (t) => {
+  const f = fixture(t);
+  f.git(['config', 'core.hooksPath', path.join(sourceRoot, '.githooks')]);
+  f.put('docs/platform/misplaced.md', '# Misplaced\n');
+  f.git(['add', 'docs/platform/misplaced.md']);
+  const host = path.join(f.temp, 'blocking-host.mjs');
+  fs.writeFileSync(host, `#!/usr/bin/env node
+const paths = process.argv.slice(process.argv.indexOf('--') + 1);
+const violations = paths.map(path => ({path, code:'forbidden-placement', message:'native fixture refusal', posture:'block'}));
+process.stdout.write(JSON.stringify({contract:'fgos.v1', data:{checked:paths.length, violations}}));
+`, { mode: 0o755 });
+  const result = f.commit(f.repo, { FGOS_HOST_BIN: host });
+  refused(result, 'docs/platform/misplaced.md');
+  assert.match(result.stderr, /documentation placement violates Convention/);
+});

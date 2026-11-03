@@ -41,7 +41,7 @@ rmcp = { version = "3", features = ["server", "macros", "transport-streamable-ht
 # function results (serde_json::Value) into Rhai `Dynamic` values and back.
 rhai = { version = "1", features = ["serde"] }
 # tsk-7l9-3: `search`'s only new data need -- parses the OpenAPI contract
-# (`docs/contracts/fgos-gateway-api-v1.yaml`) into a queryable operation list
+# (`docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`) into a queryable operation list
 # instead of serving it as an opaque string the way `/contract` already does.
 fgos-yaml-doc = { path = "../../packages/yaml-doc/rust" }
 fgos-config = { path = "../../packages/config/rust" }
