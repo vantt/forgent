@@ -29,7 +29,7 @@ use fgos_agent_protocol::terminal::{
     REASON_COMPLETED_NO_EXIT, REASON_FOREGROUND_NOT_AGENT, REASON_RESULT_UNREADABLE,
 };
 use fgos_process::facts::{self, ProcTuple};
-use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
+use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, KillOutcome, ProcId};
 use fgos_terminal_control::core::{Core, Want};
 use fgos_terminal_control::port::{ExpectedProcess, LaunchOutcome, LaunchSpec, PaneState, ProcessIdentity, Refusal as TerminalRefusal, SendOutcome};
 use serde_json::{json, Value};
@@ -49,6 +49,8 @@ const READY_MS: u64 = 30_000;
 const AGENT_WAIT: Duration = Duration::from_secs(30);
 /// How long the agent has to leave after the exit command before the supervisor stops it.
 const EXIT_WAIT: Duration = Duration::from_secs(20);
+/// How long past the grace a refused domain kill is retried before the attempt is published as it stands.
+const DOMAIN_END_WAIT: Duration = Duration::from_secs(10);
 /// Gap between two looks at the pane while the agent works.
 const WORK_POLL_MS: u64 = 700;
 const CARRIER_EVERY: Duration = Duration::from_secs(1);
@@ -416,9 +418,8 @@ impl Sup<'_> {
                 self.begin_stop(cause, None);
             }
         } else if !self.ended_domain && self.stopped.is_some_and(|at| at.elapsed() >= self.watch.grace + GATE_STOP_SLACK) {
-            // The gate outlived its own grace: end the whole domain.
-            self.ended_domain = true;
-            let _ = domain_kill_all(&self.domain);
+            // The gate outlived its own grace: end the whole domain. A refused kill is tried again on the next tick.
+            self.ended_domain = domain_kill_all(&self.domain) == KillOutcome::Ok;
         }
     }
 
@@ -582,8 +583,10 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
     };
     drive(&plan, &core, &mut sup);
 
-    // The domain must be empty before the lease goes.
-    while !sup.gate_gone {
+    // The domain must be empty before the lease goes; a domain the kill cannot end within DOMAIN_END_WAIT
+    // after the grace is published with what is known (the attempt is then not proven empty).
+    let give_up_after = watch.grace + GATE_STOP_SLACK + DOMAIN_END_WAIT;
+    while !sup.gate_gone && !sup.stopped.is_some_and(|at| at.elapsed() >= give_up_after) {
         sup.tick(&core, &plan.key);
         std::thread::sleep(TICK);
     }

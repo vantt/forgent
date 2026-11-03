@@ -20,7 +20,7 @@ use std::time::{Duration, Instant};
 
 use fgos_agent_protocol::direct::{adapter_for, Direct};
 use fgos_process::containment::{ContainmentDomain, ContainmentDriver, GuaranteeLevel, Spawned};
-use fgos_process::{facts, DomainState};
+use fgos_process::{facts, DomainState, KillOutcome};
 
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -531,9 +531,8 @@ fn watch_gate(watch: &Watch, go: &mut os::Go, driver: &dyn ContainmentDriver, do
                 request_stop(watch, go, &gate, cause);
             }
         } else if !ended_domain && stopped.is_some_and(|at| at.elapsed() >= watch.grace + GATE_STOP_SLACK) {
-            // The gate outlived its own grace: end the whole domain.
-            ended_domain = true;
-            let _ = driver.kill_all(domain, 0);
+            // The gate outlived its own grace: end the whole domain. A refused kill is tried again on the next tick.
+            ended_domain = driver.kill_all(domain, 0) == KillOutcome::Ok;
         }
         std::thread::sleep(TICK);
     }

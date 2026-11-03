@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "18a7a3bd359ff8239c2b0dae7cd584d1043151a6a0475cf36b799ec272455f63",
+  "payloadDigest": "92f9e5d97b2b1c887fbb9cb26237e61e75fc151b8fbb2f8c00093fb5a8a9ca2b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -666,8 +666,8 @@
     "packages/run-supervisor/rust/src/publish.rs": "bd22fb4e33151e54220eb6e3de8a541037a178e51d6d41a890dece5bd2de261e",
     "packages/run-supervisor/rust/src/route.rs": "c730f674e45859867eaae0e856c24aec5d9bf82f79ea0ff88ae1f8bcc44b603a",
     "packages/run-supervisor/rust/src/steps.rs": "2e98e0eb7d3d1a0e53a2fb76927e2cb5589599c8e56e32d451ade6651110f42d",
-    "packages/run-supervisor/rust/src/supervise.rs": "f33fa773ad1ac7a9664f30e4fbbefcf0806859d216483899b960235423f17acf",
-    "packages/run-supervisor/rust/src/supervise/terminal.rs": "c4441a554bf7aaaf40096b9fce0f1ba4a595ef43f74671eed416b2f3ad9b869a",
+    "packages/run-supervisor/rust/src/supervise.rs": "77526c73c9df247094b4b04716643678b10190f400ca9015f6a2eb8a5ba311f3",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs": "f28e9bdbd44efb07571aa55b6c32255d237cf2367ea366b7e967775e050a7380",
     "packages/run-supervisor/rust/src/supervise/unix.rs": "d46cc2ebbcb241025a623310e2dcc04df256860a019ea6e1b0bf8bce597bd966",
     "packages/run-supervisor/rust/src/supervise/windows.rs": "e2b04b6d2499d769206aa1c8121eada6ab248351e25ad81ab90befa7c81d7205",
     "packages/run-supervisor/rust/src/terminal_slot.rs": "b09fd96ee9467a19310bce33bc13ba98423e07f9cee6c280840c0fb439bc8279",
