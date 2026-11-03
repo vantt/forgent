@@ -632,6 +632,92 @@
       },
       "message": "Reply with the single word ok. Do not use any tools.",
       "source": "real working screen recorded 2026-10-18 from codex v0.163 on herdr (state working, rule osc_title_working)"
+    },
+    {
+      "name": "usage-limit-on-a-working-screen-is-the-reason-a-deadline-stop-names",
+      "step": "classify-stop",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "working...\nERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 7:18 PM."
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "usage-limit"
+      },
+      "source": "the wording codex printed on 2026-10-13 (measured on its stderr); placed on a pane screen, not captured from one"
+    },
+    {
+      "name": "agent-prose-about-a-rate-limit-is-not-a-stop-reason",
+      "step": "classify-stop",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "I will add retry handling because of the rate limit\nstill working"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      },
+      "source": "synthesized: the agent's own words while it works"
+    },
+    {
+      "name": "usage-limit-with-the-tui-error-marker-is-the-reason-a-deadline-stop-names",
+      "step": "classify-stop",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "working...\n■ You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:40 PM."
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "usage-limit"
+      },
+      "source": "the codex TUI's error line (its error marker, then the sentence codex prints on its stderr, measured 2026-10-13); the screen text is the one the pane wiring test has always used, not a fresh capture: no real quota screen of any CLI is recorded in the repo"
+    },
+    {
+      "name": "usage-limit-with-the-tui-error-marker-on-an-idle-screen-is-blocked-usage-limit",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "working...\n■ You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:40 PM.",
+            "inspection": {
+              "state": "idle"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "usage-limit"
+      },
+      "source": "the codex TUI's error line (its error marker, then the sentence codex prints on its stderr, measured 2026-10-13); the screen text is the one the pane wiring test has always used, not a fresh capture: no real quota screen of any CLI is recorded in the repo"
+    },
+    {
+      "name": "a-quoted-usage-limit-sentence-is-not-the-reason-a-deadline-stop-names",
+      "step": "classify-stop",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "I read the log:\n> You've hit your usage limit, so I retried later"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      },
+      "source": "synthesized: the agent quoting the sentence while it works"
     }
   ]
 }

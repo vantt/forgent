@@ -544,6 +544,40 @@
       },
       "message": "Read the brief file and do the task.",
       "source": "the typed path takes 7 to 25 s for a 4 KB brief and can lose its final Enter; the prompt door does not"
+    },
+    {
+      "name": "openrouter-402-credit-line-on-a-working-screen-is-the-reason-a-deadline-stop-names",
+      "step": "classify-stop",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "working...\nError: 402: {\"message\":\"This request requires more credits, or fewer max_tokens. You requested up to 384000 tokens, but can only afford 12000.\",\"code\":402}"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "usage-limit"
+      },
+      "source": "derived from pi's source and OpenRouter's documented 402 body; not captured from a real screen"
+    },
+    {
+      "name": "no-api-key-on-a-working-screen-is-the-reason-a-deadline-stop-names",
+      "step": "classify-stop",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "working...\nNo API key found for openrouter."
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "login"
+      },
+      "source": "the real tail of a pi exit on a missing key, shown on a pane screen"
     }
   ]
 }

@@ -22,7 +22,8 @@
     "decides": [
       "activity source for idle: growth of the stdout capture (any new text, a JSON event line included)",
       "completion: agent exited and outbox/result-<N>.json exists -> completed; exited without it -> exited(code) unless a blocked/needs-human pattern was read",
-      "named blocked results from known output patterns (login prompt, trust dialog, usage limit)"
+      "named blocked results from known output patterns (login prompt, trust dialog, usage limit)",
+      "the supervisor puts a blocked result in the receipt's `reason` as `direct:blocked:<reason>` (only for a non-zero exit with no outbox result); the settle step maps it to an outcome"
     ]
   },
   "matrix": {
@@ -35,7 +36,7 @@
       "pi": { "direct": "6.2", "terminal": "6.3" },
       "omp": { "direct": "6.2", "terminal": "6.3" }
     },
-    "unknownCli": "direct: an unknown CLI gets the generic adapter (exit and outbox only, no output patterns); terminal: an envelope naming a CLI without a terminal adapter is refused before launch (agent-protocol-unsupported)"
+    "unknownCli": "direct: an unknown CLI gets the generic adapter name, and its last words are read for a dead login or a used-up quota like any other (an executor can wrap any program); terminal: an envelope naming a CLI without a terminal adapter is refused before launch (agent-protocol-unsupported)"
   },
   "vectors": "fixtures per cell live under packages/agent-protocol/contracts/fixtures/<mode>/<cli>/vectors.json (direct and terminal cells exist; terminal vectors replay recorded screens on a virtual clock)"
 }

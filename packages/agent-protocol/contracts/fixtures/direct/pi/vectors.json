@@ -67,6 +67,39 @@
         "kind": "blocked",
         "reason": "usage-limit"
       }
+    },
+    {
+      "name": "blocked-usage-limit-openrouter-402",
+      "cli": "pi",
+      "exitCode": 1,
+      "captureTail": "working...\nError: 402: {\"message\":\"This request requires more credits, or fewer max_tokens.\"}\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "usage-limit"
+      }
+    },
+    {
+      "name": "agent-prose-about-a-rate-limit-is-not-a-block",
+      "cli": "pi",
+      "exitCode": 1,
+      "captureTail": "I will add retry handling because of the rate limit\nstill working\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "exited",
+        "code": 1
+      }
+    },
+    {
+      "name": "a-quoted-key-sentence-is-not-a-block",
+      "cli": "pi",
+      "exitCode": 1,
+      "captureTail": "The test checks that \"No API key found for x\" is reported\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "exited",
+        "code": 1
+      }
     }
   ]
 }

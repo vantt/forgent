@@ -63,17 +63,29 @@ fn every_cli_vector_classifies_as_recorded() {
 }
 
 #[test]
-fn unknown_cli_gets_exit_and_outbox_only() {
+fn only_a_provider_stop_of_a_direct_run_names_a_receipt_reason() {
+    let reasons = [BlockedReason::TrustDialog, BlockedReason::Login, BlockedReason::UsageLimit].map(|reason| Outcome::Blocked(reason).receipt_reason());
+    assert_eq!(
+        reasons,
+        [Some("direct:blocked:trust-dialog".to_string()), Some("direct:blocked:login".into()), Some("direct:blocked:usage-limit".into())]
+    );
+    for ended in [Outcome::NeedsHuman, Outcome::Exited { code: Some(1) }, Outcome::Completed { result_path: PathBuf::from("/run/outbox/result-1.json") }] {
+        assert_eq!(ended.receipt_reason(), None, "{ended:?} names no provider stop");
+    }
+}
+
+#[test]
+fn unknown_cli_is_named_generic_and_still_has_its_last_words_read() {
     let adapter = adapter_for("some-other-cli");
     assert_eq!(adapter.cli(), "generic");
     let login = "No API key found for openrouter.\n";
     assert_eq!(
         adapter.classify(ExitInfo { code: Some(1) }, login, None),
-        Outcome::Exited { code: Some(1) }
+        Outcome::Blocked(BlockedReason::Login)
     );
     let done = Path::new("/run/outbox/result-1.json");
     assert_eq!(
-        adapter.classify(ExitInfo { code: Some(0) }, "", Some(done)),
+        adapter.classify(ExitInfo { code: Some(0) }, login, Some(done)),
         Outcome::Completed {
             result_path: done.to_path_buf()
         }

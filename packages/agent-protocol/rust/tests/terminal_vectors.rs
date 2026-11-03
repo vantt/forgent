@@ -246,6 +246,11 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
                         None => json!({ "outcome": "none" }),
                     }
                 }
+                // Where a deadline stop reads why the agent stopped: a dead login or a used-up quota names the provider.
+                "classify-stop" => match adapter.stop_reason(&pane.frame().screen) {
+                    Some(reason) => json!({ "outcome": "blocked", "reason": reason.as_str() }),
+                    None => json!({ "outcome": "none" }),
+                },
                 "exit-command" => match adapter.exit_command() {
                     ExitCommand::Text(text) => json!({ "outcome": "exit", "text": text }),
                     ExitCommand::Keys(keys) => json!({ "outcome": "exit", "keys": keys }),

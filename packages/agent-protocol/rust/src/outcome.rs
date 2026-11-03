@@ -37,6 +37,16 @@ pub enum Outcome {
     },
 }
 
+impl Outcome {
+    /// The receipt's `reason` for a direct run the provider stopped; `None` for any other end.
+    pub fn receipt_reason(&self) -> Option<String> {
+        match self {
+            Outcome::Blocked(reason) => Some(format!("direct:blocked:{}", reason.as_str())),
+            Outcome::Completed { .. } | Outcome::NeedsHuman | Outcome::Exited { .. } => None,
+        }
+    }
+}
+
 /// Whether new capture output counts for the idle timer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Activity {

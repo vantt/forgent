@@ -16,18 +16,16 @@ pub const TAIL_LINES: usize = 5;
 #[derive(Debug, Clone, Copy)]
 pub struct Direct {
     cli: &'static str,
-    /// Does this CLI's output name a dead login or a used-up quota?
-    names_blocks: bool,
 }
 
-/// The adapter for an envelope's `agentProtocol.cli`; an unknown name gets the
-/// generic adapter (exit and outbox only).
+/// The adapter for an envelope's `agentProtocol.cli`. Every CLI's last words are read for a dead login or a
+/// used-up quota (an executor can wrap any program); an unknown name is only reported as `generic`.
 pub fn adapter_for(cli: &str) -> Direct {
     let known = ["claude", "codex", "agy", "pi", "omp"];
     let wanted = cli.trim().to_ascii_lowercase();
     match known.iter().find(|name| **name == wanted) {
-        Some(cli) => Direct { cli, names_blocks: true },
-        None => Direct { cli: "generic", names_blocks: false },
+        Some(cli) => Direct { cli },
+        None => Direct { cli: "generic" },
     }
 }
 
@@ -51,10 +49,8 @@ impl Direct {
                 result_path: path.to_path_buf(),
             };
         }
-        if self.names_blocks {
-            if let Some(reason) = blocked_reason(capture_tail) {
-                return Outcome::Blocked(reason);
-            }
+        if let Some(reason) = blocked_reason(capture_tail) {
+            return Outcome::Blocked(reason);
         }
         Outcome::Exited { code: exit.code }
     }
@@ -150,11 +146,21 @@ pub(crate) fn screen_login(line: &str) -> bool {
 
 pub(crate) fn is_quota_limit(line: &str) -> bool {
     let line = line.to_lowercase().replace('’', "'");
-    let rest = strip_label(&line, &["error"]);
+    let rest = strip_label(strip_marker(&line), &["error"]);
     rest.starts_with("you've hit your usage limit")
         || rest.starts_with("usage limit has been reached")
         || rest.starts_with("individual quota reached")
         || out_of_credits(rest)
+}
+
+/// Drops one leading symbol a TUI draws before an error line (`■ `, `⚠ `): a non-ASCII character that is
+/// neither a letter nor a digit. Plain punctuation stays, so a quoted line (`> ...`) is still a quote.
+fn strip_marker(line: &str) -> &str {
+    let line = line.trim_start();
+    match line.chars().next() {
+        Some(mark) if !mark.is_ascii() && !mark.is_alphanumeric() => line[mark.len_utf8()..].trim_start(),
+        _ => line,
+    }
 }
 
 /// pi on an OpenRouter 402 prints `Error: 402: {"message":"This request requires more credits, ...`;

@@ -291,10 +291,10 @@ impl Terminal {
     }
 
     /// Why the agent has stopped on this screen: a blocking dialog, a dead login or a used-up
-    /// quota. Only for the places that already know the agent stopped; the screen-only checks
-    /// (start banner, ready gate, unruled wait) use `classify_blocked`, so quota text left in
-    /// scrollback never stops a launch.
-    fn stop_reason(&self, screen: &str) -> Option<BlockedReason> {
+    /// quota. Only for the places that already know the agent stopped (an idle screen, a deadline
+    /// stop); the screen-only checks (start banner, ready gate, unruled wait) use `classify_blocked`,
+    /// so quota text left in scrollback never stops a launch.
+    pub fn stop_reason(&self, screen: &str) -> Option<BlockedReason> {
         self.classify_blocked(screen)
             .or_else(|| quota_on(screen).then_some(BlockedReason::UsageLimit))
     }

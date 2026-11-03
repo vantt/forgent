@@ -78,6 +78,39 @@
         "kind": "blocked",
         "reason": "login"
       }
+    },
+    {
+      "name": "blocked-login-authentication-failed",
+      "cli": "claude",
+      "exitCode": 1,
+      "captureTail": "working...\nAuthentication failed\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "login"
+      }
+    },
+    {
+      "name": "blocked-login-api-key-expired",
+      "cli": "claude",
+      "exitCode": 1,
+      "captureTail": "working...\nError: API key expired\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "login"
+      }
+    },
+    {
+      "name": "blocked-login-required",
+      "cli": "claude",
+      "exitCode": 1,
+      "captureTail": "working...\nLogin required\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "login"
+      }
     }
   ]
 }

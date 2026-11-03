@@ -424,6 +424,39 @@
         "outcome": "exit",
         "text": "/exit"
       }
+    },
+    {
+      "name": "login-on-a-working-screen-is-the-reason-a-deadline-stop-names",
+      "step": "classify-stop",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "working...\nNot logged in · Please run /login"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "login"
+      },
+      "source": "the line is the real tail of `claude -p` run with an empty HOME (2026-10-18), shown on a pane screen"
+    },
+    {
+      "name": "agent-prose-about-a-rate-limit-is-not-a-stop-reason",
+      "step": "classify-stop",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "I will add retry handling because of the rate limit\nstill working"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      },
+      "source": "synthesized: the agent's own words while it works"
     }
   ]
 }

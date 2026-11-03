@@ -67,6 +67,39 @@
         "kind": "blocked",
         "reason": "usage-limit"
       }
+    },
+    {
+      "name": "blocked-usage-limit-has-been-reached",
+      "cli": "codex",
+      "exitCode": 1,
+      "captureTail": "working...\nUsage limit has been reached\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "usage-limit"
+      }
+    },
+    {
+      "name": "blocked-individual-quota-reached",
+      "cli": "codex",
+      "exitCode": 1,
+      "captureTail": "working...\nIndividual quota reached\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "usage-limit"
+      }
+    },
+    {
+      "name": "a-quota-stop-whose-transcript-quotes-an-older-login-error-is-a-usage-limit",
+      "cli": "codex",
+      "exitCode": 1,
+      "captureTail": "exec\nError: authentication failed for registry fixture\na\nb\nc\nd\ne\nf\nERROR: You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:39 PM.\nERROR: You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:39 PM.\ntokens used\n379,854\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "usage-limit"
+      }
     }
   ]
 }
