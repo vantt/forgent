@@ -1,9 +1,8 @@
 // Shared by the attempt-step entry and the steps: exit codes, the step error, and the readers of
-// the envelope and the side file.
+// the envelope and the side file. The host route has already verified the envelope digest.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { computeSha256Digest } from '../runner/dispatch/proof-helpers.mjs';
 
 export const EXIT_DONE = 0;
 export const EXIT_ENVELOPE_INVALID = 65;
@@ -27,9 +26,8 @@ export function readEnvelope(runDir) {
   } catch (err) {
     throw new StepError('envelope-invalid', `envelope.json cannot be read: ${err.code ?? err.message}`, EXIT_ENVELOPE_INVALID);
   }
-  const { digest, ...body } = envelope ?? {};
-  if (envelope?.v !== 3 || digest !== computeSha256Digest(body)) {
-    throw new StepError('envelope-invalid', 'envelope is not version 3 or its digest does not match', EXIT_ENVELOPE_INVALID);
+  if (envelope?.v !== 3) {
+    throw new StepError('envelope-invalid', 'envelope is not version 3', EXIT_ENVELOPE_INVALID);
   }
   return envelope;
 }

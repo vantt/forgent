@@ -15,7 +15,8 @@ import { acquireRunControl, buildRunControlHolder, settleRunControl, listGenerat
 import { copyCredentialFiles, credentialWriteBackMarker } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import { providerAccountDir, providerCapacityStatePaths } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { providerStopOf } from '../../src/run-supervisor/steps/settle-attempt.mjs';
-import { runAttemptStep, verifyPayload, releasePayloadRoot } from '../../src/run-supervisor/attempt-step.mjs';
+import { runAttemptStep, verifyPayload } from '../../src/run-supervisor/attempt-step.mjs';
+import { releasePayloadRoot } from '../../src/run-supervisor/payload-root.mjs';
 
 const REPO = path.resolve(import.meta.dirname, '../..');
 const ENTRY = path.join(REPO, 'src/run-supervisor/attempt-step.mjs');
@@ -326,7 +327,7 @@ test('finalize-home refuses a home whose marker is another attempt or version 1,
 // A step runs with the FGOS_* variables of its runner (attemptStepEnv), which is how the entry finds the native door.
 const doorEnv = () => Object.fromEntries(Object.entries(process.env).filter(([name]) => name.startsWith('FGOS_') && name !== 'FGOS_STATE_ROOT'));
 
-test('the entry reports a missing step variable and a payload the envelope does not name', async () => {
+test('the entry reports a missing step variable and a payload the release manifest does not declare', async () => {
   const w = workspace();
   try {
     const { runDir, envelope } = attempt(w, { receipt: { outcome: 'exited', gateExit: gateExit() } });
@@ -339,9 +340,8 @@ test('the entry reports a missing step variable and a payload the envelope does 
     assert.equal(JSON.parse(ok.stdout).result, 'done');
 
     assert.equal(releasePayloadRoot(envelope.hostBin), fs.realpathSync(REPO));
-    assert.throws(() => verifyPayload({ ...envelope, payloadRoot: w.release }), /payload other than/);
-    assert.throws(() => verifyPayload({ ...envelope, hostBin: path.join(w.root, 'nowhere') }), /manifest/);
-    assert.throws(() => verifyPayload({ ...envelope, payloadRoot: path.join(w.root, 'missing') }), /does not exist/);
+    assert.doesNotThrow(() => verifyPayload(envelope));
+    assert.throws(() => verifyPayload({ ...envelope, payloadRoot: w.release }), /does not declare/);
   } finally { w.cleanup(); }
 });
 

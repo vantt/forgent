@@ -170,3 +170,36 @@ fn a_step_dies_when_its_supervisor_is_killed() {
     }
     assert!(!survived, "the step outlived its supervisor");
 }
+
+/// `fgos internal attempt-step <step> --run-dir <dir>` as the host runs it; the exit code is the answer.
+fn attempt_step_exit(step: &str, dir: &Path) -> i32 {
+    std::process::Command::new(support::supervisor::internal_harness())
+        .args(["internal", "attempt-step", step, "--protocol", "1", "--run-dir"])
+        .arg(dir)
+        .env_clear()
+        .output()
+        .unwrap()
+        .status
+        .code()
+        .unwrap()
+}
+
+#[test]
+fn the_attempt_step_route_refuses_what_the_entry_no_longer_rechecks() {
+    let root = std::env::temp_dir().join(format!("fgos-steps-route-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir_all(&root).unwrap();
+    let fixture = support::adopt_fixture::attempt_in(&root, "route", &["settle-attempt"]);
+
+    // The envelope names a payload that has no step entry.
+    assert_eq!(attempt_step_exit("settle-attempt", &fixture.dir), 66, "payload without the entry");
+    // A step the envelope does not list.
+    assert_eq!(attempt_step_exit("no-such-step", &fixture.dir), 65, "unknown step");
+    // An envelope whose digest no longer matches its content.
+    let path = fixture.dir.join("envelope.json");
+    let mut value: Value = serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
+    value["unitRunId"] = json!("tampered");
+    fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
+    assert_eq!(attempt_step_exit("settle-attempt", &fixture.dir), 65, "digest mismatch");
+    let _ = fs::remove_dir_all(&root);
+}

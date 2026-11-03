@@ -11,38 +11,27 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { EXIT_DONE, EXIT_ENVELOPE_INVALID, EXIT_PAYLOAD_MISSING, EXIT_ERROR, EXIT_RETRY, StepError, readEnvelope } from './step-support.mjs';
-import { settleAttempt } from './steps/settle-attempt.mjs';
-import { finalizeHome } from './steps/finalize-home.mjs';
-import { cleanupTrust } from './steps/cleanup-trust.mjs';
 import { realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from './protocol.mjs';
 
-export { releasePayloadRoot };
-
-const PAYLOAD_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-
-const STEPS = Object.freeze({
-  'settle-attempt': settleAttempt,
-  'finalize-home': finalizeHome,
-  'cleanup-trust': cleanupTrust,
+// Each step module is loaded only when its step runs: a step does not pay for the imports of the others.
+const STEP_LOADERS = Object.freeze({
+  'settle-attempt': async () => (await import('./steps/settle-attempt.mjs')).settleAttempt,
+  'finalize-home': async () => (await import('./steps/finalize-home.mjs')).finalizeHome,
+  'cleanup-trust': async () => (await import('./steps/cleanup-trust.mjs')).cleanupTrust,
 });
 
 /** Variables a step needs from `steps[].env`: the runner starts it with nothing else. */
 const REQUIRED_ENV = Object.freeze(['FGOS_STATE_ROOT', process.platform === 'win32' ? 'USERPROFILE' : 'HOME']);
 
-/** The payload that runs this step is the one the envelope names and the release manifest declares. */
+/**
+ * The host route already verified the envelope digest, the step id and the payload it execs from.
+ * What only Node can read is the release manifest next to `hostBin`: it must declare the payload the
+ * envelope names. A host with no manifest is a development host and has nothing to cross-check.
+ */
 export function verifyPayload(envelope) {
-  const named = typeof envelope.payloadRoot === 'string' ? realpathOrNull(envelope.payloadRoot) : null;
-  if (!named) throw new StepError('payload-missing', 'payloadRoot of the envelope does not exist', EXIT_PAYLOAD_MISSING);
-  if (realpathOrNull(PAYLOAD_ROOT) !== named) {
-    throw new StepError('payload-missing', 'this step runs from a payload other than the envelope payloadRoot', EXIT_PAYLOAD_MISSING);
-  }
-  if (!realpathOrNull(envelope.hostBin)) {
-    throw new StepError('payload-missing', 'the release manifest of hostBin cannot be read: hostBin does not exist', EXIT_PAYLOAD_MISSING);
-  }
-  // A host with no release manifest next to it is a development host: the payload that started the
-  // controller is the only anchor there is, and the check above already holds the step to it.
-  const declared = releasePayloadRoot(envelope.hostBin);
+  const named = realpathOrNull(envelope.payloadRoot);
+  const declared = typeof envelope.hostBin === 'string' ? releasePayloadRoot(envelope.hostBin) : null;
   if (declared !== null && declared !== named) {
     throw new StepError('payload-missing', 'the release manifest of hostBin does not declare the envelope payloadRoot', EXIT_PAYLOAD_MISSING);
   }
@@ -64,12 +53,13 @@ function emit(line) {
 export async function runAttemptStep(stepId, runDir, { env = process.env } = {}) {
   try {
     const envelope = readEnvelope(runDir);
-    if (!envelope.steps?.some((s) => s.stepId === stepId) || !STEPS[stepId]) {
+    const load = STEP_LOADERS[stepId];
+    if (!load || !envelope.steps?.some((s) => s.stepId === stepId)) {
       throw new StepError('envelope-invalid', `the envelope has no step ${stepId}`, EXIT_ENVELOPE_INVALID);
     }
     requireStepEnv(env);
     verifyPayload(envelope);
-    const outcome = await STEPS[stepId]({ runDir, envelope, env });
+    const outcome = await (await load())({ runDir, envelope, env });
     if (outcome.result === 'retry') {
       emit({ result: 'retry', reason: outcome.reason });
       return EXIT_RETRY;

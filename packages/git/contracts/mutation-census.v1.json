@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e3eeb2d58b09ab49ec48657bca75f234caea262ef48f110cac6fd2a0f36996bc",
+  "payloadDigest": "f0d17ca547183b7d9772b79551772f4e957d3ea34a71b9bbc0cc5ec4e8b1e263",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -687,7 +687,7 @@
     "packages/run-supervisor/rust/tests/portable/supervisor.rs": "f0a736ba7f6ba37fbd1951ae53f89e78ee9f783b2a8bed5eb6d1c89277bc38f1",
     "packages/run-supervisor/rust/tests/release_slot_step.rs": "03d1fd52cda11cf2b2148de0d41b417a9f76973410473651e01c8028f8ff6252",
     "packages/run-supervisor/rust/tests/steps_portable.rs": "5075773f7acaa5f08233095269ed064dff3f9f39f453c796ed0eb48968c7ad7f",
-    "packages/run-supervisor/rust/tests/steps_runner.rs": "5ac29d5cada97b4ceadac9b77cc91d70383eb193a698990dde7eebf04bf7f5d9",
+    "packages/run-supervisor/rust/tests/steps_runner.rs": "a61e7036af377176fa3a597f1f7ad9a71c3519fcabf4ba5a5c4e14684b89b41e",
     "packages/run-supervisor/rust/tests/supervise_crash.rs": "09472ab66bc48120ab81774d7a05fcfaa4ff0bd7a0f0d433226d3113b7044896",
     "packages/run-supervisor/rust/tests/supervise_guard.rs": "238d1180379434a4de3dd38d104d3d618809ccf178bc5535d991c0fc3e226163",
     "packages/run-supervisor/rust/tests/supervise_lifecycle.rs": "bb53c9a4fd26e4ba325b04ab6834fa882abf84227db320dab51a0823cc1bca6d",
@@ -947,7 +947,7 @@
     "src/report/item-trace.mjs": "bb91d0d9635d0794ed9a979cc4fa6721d26db18905637d465be8ce6d831e7155",
     "src/report/knowledge-projection.mjs": "6e3e4dbacf4da735924b5cc705d9c805a6d8af362c6182298550e708f698d832",
     "src/report/knowledge-resolver.mjs": "eab342bb4296e20fdbc6742cec084be0924e80cfa6d3f7e525395959b6bd0751",
-    "src/run-supervisor/attempt-step.mjs": "cabe99992da3c5157035f3320abd4a184191297989fe973ae3dbd4f0fc8fb273",
+    "src/run-supervisor/attempt-step.mjs": "ce87d561e33798a1b28f8269596fc27d2b854a9d1ca502278c3da38424561936",
     "src/run-supervisor/cancel-opt-in.mjs": "f5b9a2eadc709918201ed01620098886bd108e8445c2b2304b845b4e73981403",
     "src/run-supervisor/cancel-registry.mjs": "03ec19e0768cf19ce0224103187c5de05200aba9fb9618e5b2c71fa953e70e87",
     "src/run-supervisor/client.mjs": "f4d941fc332d9e209f463cbf657e0abdf7b932f1ba17492cdd1dbd7d33c21600",
@@ -957,7 +957,7 @@
     "src/run-supervisor/payload-root.mjs": "b1ad1d5402b921254d06aecf20a7bc1fe322845c0ab72f028c5fb7047402bdd9",
     "src/run-supervisor/protocol.mjs": "ac221d21aa23f3d3e48c21740919415c8ab5113f4d8b4c2cc5405eb48e6dde2f",
     "src/run-supervisor/runtime-dir.mjs": "2f02f66882dd2e81b3cc7e9f402fdd0c4c4001e9ceb42e6c4e8984f2e0f2f594",
-    "src/run-supervisor/step-support.mjs": "40c78da932dafd643762ff5c32e1f8a3844d5a7f9cd7ec64055b8b1343f614f9",
+    "src/run-supervisor/step-support.mjs": "2aacda9aac0acba78d81777cfa34088a84dd616782ce396ef295c014bf3115eb",
     "src/run-supervisor/steps/cleanup-trust.mjs": "4427bcd94a9469eb2063403207866ef1d28ae2941987bc8f31853c2fb4b2f0b6",
     "src/run-supervisor/steps/finalize-home.mjs": "3150a00e4d0742ac817ba1b2939ae6410e87977b70bde31624168cb890a1d97b",
     "src/run-supervisor/steps/settle-attempt.mjs": "3ca10ab26498f29fb727353c8b5c29bdad631dc6193a9af9ed32dc828733902c",
@@ -2923,6 +2923,13 @@
       "class": "rust-test"
     },
     {
+      "path": "packages/run-supervisor/rust/tests/steps_runner.rs",
+      "line": 176,
+      "spawn": "Command::new",
+      "binary": "? support::supervisor::internal_harness()",
+      "class": "rust-test"
+    },
+    {
       "path": "packages/run-supervisor/rust/tests/supervise_guard.rs",
       "line": 32,
       "spawn": "Command::new",
@@ -3274,18 +3281,19 @@
       "class": "configured-binary"
     },
     {
-      "path": "src/run-supervisor/attempt-step.mjs",
-      "line": 72,
-      "spawn": "settleAttempt -> src/run-supervisor/steps/settle-attempt.mjs:198",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
       "path": "src/run-supervisor/client.mjs",
       "line": 39,
       "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
+    },
+    {
+      "path": "src/run-supervisor/steps/settle-attempt.mjs",
+      "line": 198,
+      "spawn": "paneScreenOf -> src/run-supervisor/steps/settle-attempt.mjs:91",
+      "binary": "param envelope",
+      "class": "uncalled-wrapper",
+      "function": "settleAttempt"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
