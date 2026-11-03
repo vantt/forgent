@@ -17,7 +17,7 @@ import { recordCustodyHandoff } from './cwd-lock.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
-import { normalizeRunResultV2, interpretRunResult, ASSESSMENT_VERDICTS, runOutcome, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
+import { normalizeRunResultV2, interpretRunResult, readSettledResult, ASSESSMENT_VERDICTS, runOutcome, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
 import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 import {
   commitRunSettlement,
@@ -92,7 +92,6 @@ import {
   awaitSettledResult,
   buildEnvelope,
   readLaunchSettings,
-  readSettledResult,
   resolveAttemptHost,
   startSupervisor,
   waitForBinding,

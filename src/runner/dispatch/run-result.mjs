@@ -8,6 +8,7 @@
 // - Compatibility projections preserve legacy top-level status and confidence.
 
 import fs from 'node:fs';
+import path from 'node:path';
 import { isAssessmentRequired } from './agent-result-claim-contract.mjs';
 
 export const RUN_RESULT_CONTRACT = Object.freeze({ id: 'assignment-run-result', version: 3 });
@@ -1123,6 +1124,16 @@ export function interpretRunResult(input, options = {}) {
   };
 
   return derivedView;
+}
+
+/** The settled result of an attempt directory, or null while there is none (or it cannot be read soundly). */
+export function readSettledResult(runDir, runId) {
+  const file = path.join(runDir, 'result.json');
+  if (!fs.existsSync(file)) return null;
+  try {
+    const result = interpretRunResult(file, { expectedRunId: runId });
+    return result && !result.corrupt && !result.contractCorrupt && !result.resultCorrupt && result.classification?.provenance !== 'contract-corrupt' ? result : null;
+  } catch { return null; }
 }
 
 /**

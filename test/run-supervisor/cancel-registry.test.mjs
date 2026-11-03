@@ -158,18 +158,17 @@ const attemptWithEnvelope = (name, unitRunId) => {
   return dir;
 };
 
-test('5. a signal while an attempt is handed over waits for its binding, then cancels it and names the unit', async () => {
+test('5. a signal while an attempt is handed over writes its cancel request at once, waits for its receipt and names the unit', async () => {
   const dir = attemptWithEnvelope('handover', 'unit-handover');
   await withSignalHandlers(async ({ exits, stderr }) => {
     beginLaunch(dir);
     process.emit('SIGINT');
-    await sleep(300);
-    assert.deepEqual(exits, [], 'the controller keeps waiting while the binding is unknown');
+    await waitUntil(() => exists(dir, 'cancel-requested.json'), { timeoutMs: 5000, what: 'the cancel request before any binding' });
+    assert.equal(readJson(here(dir, 'cancel-requested.json')).by, 'signal:SIGINT');
     register(dir);
     endLaunch(dir);
-    await waitUntil(() => exists(dir, 'cancel-requested.json'), { timeoutMs: 5000, what: 'the cancel request of the bound attempt' });
-    assert.equal(readJson(here(dir, 'cancel-requested.json')).by, 'signal:SIGINT');
-    assert.deepEqual(exits, [], 'and for the receipt');
+    await sleep(300);
+    assert.deepEqual(exits, [], 'the controller keeps waiting for the receipt');
     fs.writeFileSync(here(dir, 'receipt.json'), JSON.stringify({ outcome: 'cancelled' }));
     await waitUntil(() => exits.length > 0, { timeoutMs: 5000, what: 'the exit' });
     assert.deepEqual(exits, [130]);
@@ -187,7 +186,6 @@ test('6. a launch that fails before any binding ends the wait and still prints t
     await waitUntil(() => exits.length > 0, { timeoutMs: 5000, what: 'the exit' });
     assert.deepEqual(exits, [143]);
     assert.match(stderr(), /unit unit-failed-launch chờ resume/);
-    assert.equal(exists(dir, 'cancel-requested.json'), false, 'nothing was bound, nothing to cancel');
   });
 });
 

@@ -16,14 +16,17 @@ import { admitSuccessor } from '../runner/dispatch/cwd-lock.mjs';
 import { DispatchError } from '../runner/dispatch/dispatch-error.mjs';
 import { computeSha256Digest, openAgentFileSync, publishImmutableProof, publishMutableProjection } from '../runner/dispatch/proof-helpers.mjs';
 import { selfRecord } from '../runner/dispatch/process-identity.mjs';
-import { interpretRunResult } from '../runner/dispatch/run-result.mjs';
+import { readSettledResult } from '../runner/dispatch/run-result.mjs';
 import { adoptRun, resolveRouteHostBin, RunSupervisorError } from './client.mjs';
 import { readGateKillGraceMs } from './gate-kill-grace.mjs';
 import { ensureRuntimeSocketDir } from './runtime-dir.mjs';
 import { OWN_PAYLOAD_ROOT, realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL, ATTEMPT_STEP_TIMEOUT_MS, MAX_ATTEMPT_STEPS } from './protocol.mjs';
 
-const BINDING_WAIT_MS = 30_000;
+// The supervisor's own start budgets for a terminal seat, summed, plus slack for the herdr calls:
+// DEFAULT_SHELL_READY_TIMEOUT_MS 10 000 and DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS 5 000 (terminal-control
+// route.rs) and HELLO_LIMIT 15 000 (supervise.rs), + 15 000.
+const BINDING_WAIT_MS = 45_000;
 const POLL_MS = 25;
 const CLOSE_WAIT_MS = 60_000;
 const TAIL_CHUNK_BYTES = 1024 * 1024;
@@ -335,16 +338,6 @@ export async function waitForBinding(runDir, child, { timeoutMs = BINDING_WAIT_M
     await sleep(POLL_MS);
   }
   return fs.existsSync(binding) ? { state: 'bound' } : { state: 'unknown' };
-}
-
-/** The settled result of the attempt, or null while there is none (or it cannot be read). */
-export function readSettledResult(runDir, runId) {
-  const file = path.join(runDir, 'result.json');
-  if (!fs.existsSync(file)) return null;
-  try {
-    const result = interpretRunResult(file, { expectedRunId: runId });
-    return result && !result.corrupt && !result.contractCorrupt && !result.resultCorrupt && result.classification?.provenance !== 'contract-corrupt' ? result : null;
-  } catch { return null; }
 }
 
 /**

@@ -2,9 +2,10 @@
 // handed over to stop that attempt, wait a bounded time for the receipt, say how to continue, and leave.
 // The controller never signals an agent itself; it only publishes `cancel-requested.json`, which the
 // supervisor polls. An attempt that is being handed over (`beginLaunch` until its binding is known, or the
-// launch fails) is waited for: once it binds it is asked to cancel too, so a signal that lands before the
-// binding never leaves an attempt running uncancelled. After the first signal no new launch and no new
-// step starts (`assertNotCancelled`): the controller only waits for the receipts and leaves.
+// launch fails) is asked at once, like a delivered one: its envelope exists before the launch begins, and
+// the supervisor reads the request on its first tick, so a slow launch is cancelled without waiting for its
+// binding. After the first signal no new launch and no new step starts (`assertNotCancelled`): the
+// controller only waits for the receipts of every attempt it asked and leaves.
 //
 // Handlers are installed only by a process that asked for it (`enableCancelOnSignal`, the CLI entry);
 // an in-process caller of the runner keeps its own signal handling.
@@ -99,9 +100,9 @@ export function requestCancel(runDir, signal) {
 }
 
 /**
- * Handle SIGINT and SIGTERM: the first one cancels every attempt this process delivered or is still handing
- * over, waits for the receipts (at most `cancelWaitMs`), prints the resume line and exits 130 or 143; the
- * second exits at once (the cancel files are already written, the supervisors still stop their attempts).
+ * Handle SIGINT and SIGTERM: the first one writes the cancel request of every attempt this process delivered
+ * or is still handing over at once, waits for the receipts (at most `cancelWaitMs`), prints the resume line
+ * and exits 130 or 143; the second exits at once (the cancel files are already written, the supervisors still stop their attempts).
  * @returns {() => void} removes the handlers
  */
 export function installCancelOnSignal({ cancelWaitMs, exit = (code) => process.exit(code), stderr = process.stderr } = {}) {
@@ -114,18 +115,15 @@ export function installCancelOnSignal({ cancelWaitMs, exit = (code) => process.e
     (async () => {
       const seen = new Set();
       const asked = new Set();
-      const sweep = () => {
-        for (const dir of [...delivered, ...launching]) {
-          seen.add(dir);
-          if (delivered.has(dir) && !asked.has(dir)) requestCancel(dir, signal) && asked.add(dir);
-        }
-      };
+      const pending = () => [...delivered, ...launching].filter((dir) => !fs.existsSync(path.join(dir, 'receipt.json')));
       const deadline = Date.now() + cancelWaitMs;
       try {
         for (;;) {
-          sweep();
-          const answered = [...asked].every((dir) => fs.existsSync(path.join(dir, 'receipt.json')));
-          if ((launching.size === 0 && answered) || Date.now() >= deadline) break;
+          for (const dir of [...delivered, ...launching]) {
+            seen.add(dir);
+            if (!asked.has(dir) && requestCancel(dir, signal)) asked.add(dir);
+          }
+          if (pending().length === 0 || Date.now() >= deadline) break;
           await sleep(POLL_MS);
         }
       } finally {
