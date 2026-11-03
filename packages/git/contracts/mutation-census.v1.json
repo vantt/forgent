@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "da14011ef05501909e68ea8bc53b8a1134bb146fcfbd5bf1d1bf4b81586a13db",
+  "payloadDigest": "f24c4bc83a44d35220c7cd7076254709becd549ebcbf3f40f6799df3e0ee30f2",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -537,7 +537,7 @@
     "packages/mailbox/rust/core/tests/wake.rs": "a4460aa55dde049c7a9e232c6ee1569f54b842bfcac322451aaf6e4ad5270ad2",
     "packages/mailbox/rust/store/examples/mailbox-record-cost.rs": "dd17ff0d5bca78355f57a046b2c3a8761b4416e45a6c52580453287cd5eaeb99",
     "packages/mailbox/rust/store/src/adapters/agy.rs": "2ca9d10a744245a4b233e26f64b96d6fde27de92394e60d9332b1a830979f9fe",
-    "packages/mailbox/rust/store/src/adapters/claude.rs": "e76f2b88d48e8c27d6d8cdf58098943a12a4fc2fadb674fa1fbd9ed226c1216e",
+    "packages/mailbox/rust/store/src/adapters/claude.rs": "59c35b605a468cf582dc9cdc37fcf634aec6f66398d5fbc01d2579464be2239e",
     "packages/mailbox/rust/store/src/adapters/claude_head.rs": "c9c9dde4a3b0fc641d63b60f4b4480674f15034c1c08e1ea33dc3d920c333bc7",
     "packages/mailbox/rust/store/src/adapters/codex.rs": "04dbb96b604cf4d72eba561a32d201ba88f166e68b84c8c35fd0e71a2f2b3c6a",
     "packages/mailbox/rust/store/src/adapters/extension.rs": "fc45a9dea9fced15e479b1ccd675e13aeccc0eab9b15d0d3cfc118ecf8197578",
@@ -583,7 +583,7 @@
     "packages/mailbox/rust/store/tests/record_ingest.rs": "f72b53dfab5d64a92b3e4aae0dcc64b1cd0bff41c6a6aa5a97f21a41af73974e",
     "packages/mailbox/rust/store/tests/record_prune.rs": "72ae0203f2840ed402c12e0fa84f720d3443d0f36382af8896822de670fbd4ba",
     "packages/mailbox/rust/store/tests/record_snapshot.rs": "423bd8fc58b7d2b9d768479e4fb65f9c2eb6209b10ae4684806a29a58ee3fc33",
-    "packages/mailbox/rust/store/tests/verbs.rs": "7ea57a656aaec44be61fe89725a6425af47c6935f7d6c158e2e65958e177c35b",
+    "packages/mailbox/rust/store/tests/verbs.rs": "2d01fc621840bb1898a32e41231f729f04391cbd5d8c1980035da7455bb8f6d7",
     "packages/observe/rust/src/case_journal.rs": "ac5759859b6bb349602b252a581c7a0f8547438756fd4f1af5e219a23fd85124",
     "packages/observe/rust/src/contract.rs": "8b42fd3a75b049d8edec267b011c3069ea3bd1efb31809187b64729d79dfb0ca",
     "packages/observe/rust/src/eval_journal.rs": "716c2657ff121095d186069a40a56173865f99a1cb14ba7848204dd5114f7124",

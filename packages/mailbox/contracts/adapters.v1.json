@@ -19,6 +19,10 @@
       "version": "2.1.309"
     },
     {
+      "cli": "claude",
+      "version": "2.1.314"
+    },
+    {
       "cli": "codex",
       "version": "0.161.0"
     },

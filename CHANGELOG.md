@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Claude Code 2.1.314 is now a tested version for the mailbox hook (Stop and PostToolUse payloads recorded on it), so sending to a session on that version no longer prints "is not one this mailbox was tested against".
 - fgOS Git commands no longer refuse every repository on a machine where `git lfs install` (or any global or system config) set a filter, credential helper or other command key; such keys are refused only when the repository's own local or worktree config sets them.
 - `fgos setup` now names the backup copy of the project config when a blocked runner config conversion keeps it (a write that changed the file before failing).
 - A seat running in a pane is now stopped as idle after 20 minutes with no new words on its screen, even while its CLI still shows a spinner, an elapsed clock or a token counter (a stuck pi turn used to run to the executor timeout); `runner.idleTimeoutMs` now applies only to headless workers.

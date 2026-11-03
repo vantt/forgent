@@ -263,7 +263,7 @@ fn send_adds_the_untested_version_clause_from_the_recipients_version() {
         .filter(|entry| entry["cli"] == "claude")
         .map(|entry| entry["version"].as_str().unwrap())
         .collect();
-    assert!(listed.contains(&"2.1.309"), "{listed:?}");
+    assert!(listed.contains(&"2.1.309") && listed.contains(&"2.1.314"), "{listed:?}");
     for version in listed {
         session(version);
         assert_eq!(
