@@ -339,8 +339,8 @@ impl GitDriver {
     }
 
     fn read_repository_facts(&self, repo: &mut RepoHandle) -> Result<Vec<ConfigRecord>> {
+        // The config door checks every fresh read; a cached read was checked.
         let config = self.config(repo)?;
-        self.check_config(repo, &config)?;
         // Formats are config facts: reused exactly while the stamp that proved
         // them still matches, read afresh when the stamp moved.
         let formats = match self.config_entry(repo, |entry| entry.formats)?.flatten() {
@@ -731,9 +731,15 @@ impl GitDriver {
         args.push("--list");
         self.invoke(context, root, &args, Policy::Inspect, None, false, PATH_LIMIT, timeout)
     }
-    /// Read-only diagnostic shared with Remote admission. Scope, rather than
-    /// origin spelling, determines trust even for linked worktrees and symlinks.
+    /// Read-only diagnostic shared with Remote admission.
     pub fn untrusted_transport_config(&self, repo: &RepoHandle) -> Result<Vec<String>> {
+        Ok(self.repository_scoped_keys(repo)?.into_iter().filter(|k| repository_transport_config(k)).collect())
+    }
+    /// Keys the repository itself sets (local or worktree scope, and files those
+    /// include): the only configuration a cloned repository controls. Global,
+    /// system and command-line values are the operator's own. Scope, rather than
+    /// origin spelling, determines trust even for linked worktrees and symlinks.
+    fn repository_scoped_keys(&self, repo: &RepoHandle) -> Result<Vec<String>> {
         let mut keys = Vec::new();
         // Transfers are rooted in the trusted main checkout; a linked handle
         // also contributes its worktree-scoped policy. Refuse either source.
@@ -746,9 +752,7 @@ impl GitDriver {
                 return Err(out.error("git-config-failed"));
             }
             for (scope, key, _) in parse_config(&out.stdout)? {
-                if ![b"global".as_slice(), b"system", b"command"].contains(&scope.as_slice())
-                    && repository_transport_config(&key)
-                {
+                if ![b"global".as_slice(), b"system", b"command"].contains(&scope.as_slice()) {
                     keys.push(key);
                 }
             }
@@ -761,16 +765,16 @@ impl GitDriver {
     pub(crate) fn preflight(&self, repo: &RepoHandle) -> Result<()> {
         self.config(repo).map(|_| ())
     }
+    /// A command key runs code, so it is refused where the repository set it.
+    /// The scope listing is spent only when the effective config has one.
     fn check_config(&self, repo: &RepoHandle, config: &[ConfigRecord]) -> Result<()> {
-        for (_, key, _) in config {
-            if command_config(key)
-                && (key != "credential.helper"
-                    || self.untrusted_transport_config(repo)?.iter().any(|k| k == "credential.helper"))
-            {
-                return Err(failure(format!("repository-config-untrusted: {key}")));
-            }
+        if !config.iter().any(|(_, key, _)| command_config(key)) {
+            return Ok(());
         }
-        Ok(())
+        match self.repository_scoped_keys(repo)?.into_iter().find(|key| command_config(key)) {
+            Some(key) => Err(failure(format!("repository-config-untrusted: {key}"))),
+            None => Ok(()),
+        }
     }
     /// An owned handle local to one port call. It never escapes into the
     /// long-lived port handle; every call re-proves its facts against the
@@ -3092,6 +3096,31 @@ mod tests {
             .checked(&repo, &["status", "--porcelain=v1", "-z"], Policy::Inspect)
             .unwrap()
             .is_empty());
+    }
+    // `git lfs install` writes filter commands into the operator's global
+    // config; only the repository's own scopes are untrusted.
+    #[test]
+    fn command_keys_from_the_operators_global_config_are_accepted() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        let home = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        let global = home.0.join("gitconfig");
+        fs::write(&global, "[filter \"lfs\"]\n\tclean = git-lfs clean -- %f\n\tsmudge = git-lfs smudge -- %f\n\tprocess = git-lfs filter-process\n[credential]\n\thelper = store\n").unwrap();
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        let script = home.0.join("global-git");
+        fs::write(&script, format!("#!/bin/sh\nGIT_CONFIG_GLOBAL='{}' exec '{}' \"$@\"\n", global.display(), driver.git.display())).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&script, fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        driver.git = script;
+        let repo = resolve(&driver, &dir.0);
+        driver.checked(&repo, &["status", "--porcelain=v1", "-z"], Policy::Inspect).unwrap();
+        git(&dir.0, &["config", "filter.lfs.clean", "/nonexistent/command"]);
+        let err = driver.checked(&repo, &["status", "--porcelain=v1", "-z"], Policy::Inspect).unwrap_err();
+        assert_eq!(err.cause, "repository-config-untrusted: filter.lfs.clean");
     }
     #[test]
     fn layouts_preserve_missing_object_diagnostics_without_fetch() {
