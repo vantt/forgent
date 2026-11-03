@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { settleRunOutcome } from '../../runner/dispatch/settlement.mjs';
-import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
+import { readSettledResult } from '../../runner/dispatch/run-result.mjs';
 import { computeSha256Digest, openAgentFileSync } from '../../runner/dispatch/proof-helpers.mjs';
 import { acquireRunControl, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
 import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs';
@@ -35,17 +35,6 @@ function readTail(file) {
     fs.readSync(fd, buffer, 0, length, size - length);
     return buffer.toString('utf8');
   } catch { return ''; } finally { if (fd !== undefined) fs.closeSync(fd); }
-}
-
-function settledResultOf(runDir, runId) {
-  const file = path.join(runDir, 'result.json');
-  if (!fs.existsSync(file)) return null;
-  try {
-    const existing = interpretRunResult(file, { expectedRunId: runId });
-    const sound = existing && !existing.corrupt && !existing.contractCorrupt && !existing.resultCorrupt
-      && existing.classification?.provenance !== 'contract-corrupt';
-    return sound ? existing : null;
-  } catch { return null; }
 }
 
 function evaluatorBaseline(runDir, outcome) {
@@ -174,7 +163,7 @@ function rawResultOf(receipt, outboxClaimPresent, screenText = '') {
 export async function settleAttempt({ runDir, envelope }) {
   const runMeta = readJson(path.join(runDir, 'run.json'));
   if (!runMeta?.runId) throw new StepError('io', 'run.json is missing or has no runId');
-  const done = settledResultOf(runDir, runMeta.runId);
+  const done = readSettledResult(runDir, runMeta.runId);
   if (done) return { result: 'done', detail: { settled: 'already' } };
 
   const receipt = readJson(path.join(runDir, 'receipt.json'));
@@ -250,7 +239,7 @@ export async function settleAttempt({ runDir, envelope }) {
   } catch (err) {
     if (err?.code === 'run-control-superseded') {
       // Another writer settled this run first; its result.json is the answer.
-      if (settledResultOf(runDir, runMeta.runId)) return { result: 'done', detail: { settled: 'by-other' } };
+      if (readSettledResult(runDir, runMeta.runId)) return { result: 'done', detail: { settled: 'by-other' } };
       throw new StepError('internal', err.message);
     }
     throw err;
