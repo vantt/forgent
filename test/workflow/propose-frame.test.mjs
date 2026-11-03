@@ -1,0 +1,193 @@
+import '../helpers/process-tmp-root.mjs';
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+
+import { proposeFrame, ProposeFrameError, FRAME_ALLOWANCE } from '../../src/workflow/propose-frame.mjs';
+import { resolveFrame } from '../../src/workflow/case-start.mjs';
+import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
+
+const catalog = () => ({ runnerConfig: {}, shipped: shippedCatalog() });
+const frameDefaults = { fallbackPerSeat: 2, deviationsBeforeAsk: 2 };
+const propose = (slices, extra = {}) => proposeFrame({ slices, catalog: catalog(), frameDefaults, ...extra });
+
+const slice = (id, rigor = 'standard', extra = {}) => ({ id, writes: [`src/${id}.mjs`], pattern: 'reviewed', rigor, kind: 'code', ...extra });
+const many = (n, rigor, prefix) => Array.from({ length: n }, (_, i) => slice(`${prefix}-${i + 1}`, rigor));
+
+// ---- the arithmetic -------------------------------------------------------------------------------
+
+test('a frame counts each writing slice, the repeats a high rigor slice draws, and one spare writing dispatch', () => {
+  const { frame, breakdown } = propose([slice('a', 'standard'), slice('b', 'high'), slice('c', 'high')]);
+  assert.equal(breakdown.writingSlices, 3);
+  assert.equal(breakdown.fixes, FRAME_ALLOWANCE.fixPerSlice.high * 2 + FRAME_ALLOWANCE.fixPerSlice.standard);
+  assert.equal(frame.mutatingDispatches, 3 + 2 + 1);
+});
+
+test('read-only dispatches are the validation, the lock, a diagnosis, the gate, a spare and each read-only slice', () => {
+  const readOnly = { id: 'look', writes: [], pattern: 'solo', rigor: 'standard', kind: 'code' };
+  const { frame, breakdown } = propose([slice('a'), readOnly]);
+  assert.deepEqual(breakdown.reads, { readOnlySlices: 1, validatePlan: 1, lockDecisions: 1, diagnoses: 1, earlyReviews: 0, gate: 1, spare: 1 });
+  assert.equal(frame.dispatches, frame.mutatingDispatches + 6);
+  assert.equal(frame.mutatingDispatches, 1 + 0 + 1);
+});
+
+test('a case that continues a closed one does not repeat the plan validation or the decision lock', () => {
+  const fresh = propose([slice('a')]);
+  const inherited = propose([slice('a')], { inherit: true });
+  assert.equal(fresh.frame.dispatches - inherited.frame.dispatches, 2);
+  assert.equal(inherited.frame.mutatingDispatches, fresh.frame.mutatingDispatches);
+  assert.equal(inherited.breakdown.reads.validatePlan, 0);
+  assert.equal(inherited.breakdown.reads.lockDecisions, 0);
+});
+
+test('a slice that asks for an early review adds one read-only dispatch', () => {
+  const plain = propose([slice('a')]);
+  const reviewed = propose([slice('a', 'standard', { earlyReview: true })]);
+  assert.equal(reviewed.frame.dispatches - plain.frame.dispatches, 1);
+});
+
+test('nothing writing means no writing dispatch, no spare writing dispatch and no gate', () => {
+  const { frame, breakdown } = propose([{ id: 'look', writes: [], pattern: 'solo', rigor: 'standard', kind: 'code' }]);
+  assert.equal(frame.mutatingDispatches, 0);
+  assert.equal(breakdown.spareWrites, 0);
+  assert.equal(breakdown.reads.gate, 0);
+});
+
+test('the rigor floor is the lowest rigor among the slices', () => {
+  assert.equal(propose([slice('a', 'high'), slice('b', 'standard')]).frame.rigorFloor, 'standard');
+  assert.equal(propose([slice('a', 'high'), slice('b', 'critical')]).frame.rigorFloor, 'high');
+  const doc = { id: 'doc', writes: ['docs/x.md'], pattern: 'solo', rigor: 'low', kind: 'docs' };
+  assert.equal(propose([slice('a', 'high'), doc]).frame.rigorFloor, 'low');
+});
+
+test('a read-only slice at a lower rigor than the writing slices lowers the floor so admission accepts it', () => {
+  const look = { id: 'look', writes: [], pattern: 'solo', rigor: 'low', kind: 'code' };
+  assert.equal(propose([slice('a', 'high'), look]).frame.rigorFloor, 'low');
+});
+
+test('the counts the guide fixes are passed through, never widened', () => {
+  const { frame } = propose([slice('a')]);
+  assert.equal(frame.fallbackPerSeat, frameDefaults.fallbackPerSeat);
+  assert.equal(frame.deviationsBeforeAsk, frameDefaults.deviationsBeforeAsk);
+});
+
+// ---- the seat launches come from the catalog -------------------------------------------------------
+
+test('seat launches per dispatch are the catalog launch bound of the heaviest slice times the fallback per seat', () => {
+  const { frame, breakdown } = propose([slice('a', 'standard'), slice('b', 'high')]);
+  const perSlice = Object.fromEntries(breakdown.seatLaunches.map((l) => [l.id, l.perDispatch]));
+  assert.ok(perSlice.b >= perSlice.a, 'a higher rigor never plans fewer seat launches');
+  assert.equal(frame.seatLaunchesPerDispatch, Math.max(perSlice.a, perSlice.b));
+  assert.equal(perSlice.a % frameDefaults.fallbackPerSeat, 0);
+});
+
+test('a solo slice plans fewer seat launches than a reviewed one at the same rigor', () => {
+  const solo = propose([slice('a', 'standard', { pattern: 'solo' })]).breakdown.seatLaunches[0].perDispatch;
+  const reviewed = propose([slice('a', 'standard')]).breakdown.seatLaunches[0].perDispatch;
+  assert.ok(solo < reviewed);
+});
+
+test('a frame the proposal returns is accepted by the case start as a narrowing of the guide defaults', () => {
+  const { frame } = propose(many(3, 'high', 'x'));
+  const guide = {
+    id: 'coding/feature',
+    frameDefaults: {
+      dispatches: 'set-at-approval', mutatingDispatches: 'set-at-approval', seatLaunchesPerDispatch: 'set-at-approval',
+      fallbackPerSeat: 2, deviationsBeforeAsk: 2, rigorFloor: 'set-at-approval',
+    },
+  };
+  const flags = Object.fromEntries(Object.entries(frame).map(([k, v]) => [k, typeof v === 'number' ? String(v) : v]));
+  assert.deepEqual(resolveFrame(guide, flags), frame);
+});
+
+// ---- refusals --------------------------------------------------------------------------------------
+
+test('a frame for no slice is refused', () => {
+  assert.throws(() => propose([]), (e) => e instanceof ProposeFrameError && e.code === 'no-slices');
+});
+
+test('a code slice below standard rigor is refused, a document slice is not', () => {
+  assert.throws(() => propose([slice('a', 'low')]), (e) => e.code === 'code-slice-below-standard');
+  assert.doesNotThrow(() => propose([{ id: 'doc', writes: ['docs/x.md'], pattern: 'solo', rigor: 'low', kind: 'docs' }]));
+});
+
+test('two slices with one id, a slice without writes listed, an unknown rigor and an unknown pattern are refused', () => {
+  assert.throws(() => propose([slice('a'), slice('a')]), (e) => e.code === 'slice-duplicate');
+  assert.throws(() => propose([{ id: 'a', pattern: 'reviewed', rigor: 'standard' }]), (e) => e.code === 'slice-invalid');
+  assert.throws(() => propose([slice('a', 'extreme')]), (e) => e.code === 'slice-invalid');
+  assert.throws(() => propose([slice('a', 'standard', { pattern: 'no-such-pattern' })]), (e) => e instanceof ProposeFrameError);
+});
+
+test('a sparse writes list, a sparse slice list and a symbol rigor are refused by name, not by a crash', () => {
+  const holey = slice('a');
+  holey.writes = new Array(2);
+  holey.writes[0] = 'src/a.mjs';
+  assert.throws(() => propose([holey]), (e) => e instanceof ProposeFrameError && e.code === 'slice-invalid');
+  const slices = new Array(2);
+  slices[1] = slice('b');
+  assert.throws(() => propose(slices), (e) => e instanceof ProposeFrameError && e.code === 'slice-invalid');
+  assert.throws(() => propose([slice('a', Symbol('high'))]), (e) => e instanceof ProposeFrameError && e.code === 'slice-invalid');
+});
+
+test('a guide that does not state its fallback and deviation counts is refused', () => {
+  assert.throws(() => proposeFrame({ slices: [slice('a')], catalog: catalog(), frameDefaults: { fallbackPerSeat: 'set-at-approval', deviationsBeforeAsk: 2 } }), (e) => e.code === 'frame-defaults-missing');
+});
+
+// ---- the recorded cases ----------------------------------------------------------------------------
+//
+// Every case below ran under a frame the owner approved. `approved` is that frame and `spent` is what the
+// case's ledger recorded (reservations, and how many of them wrote). The slices are what the case set out to
+// do. The ledger does not tie a dispatch to a slice, so for the main case the slice count and rigor come from
+// the plan's own list (14 slices up to the setup conversion, 10 of them raised to high); for the later cases
+// the slices are the writing dispatches of the ledger, each a different write set. Write paths are
+// representative, the arithmetic does not read them.
+//
+// Two bounds hold for every case: the proposal is not smaller than what the case spent, and not wider than
+// one and a half times what was approved. Six of the seven cases were sized to what they ran, and there the
+// proposal is also not smaller than the approved frame. The successor case was approved with headroom for
+// slices it never opened (24 dispatches, 14 writing; it ran 6 and 4), so only the two bounds apply to it.
+
+const std = (n, prefix) => many(n, 'standard', prefix);
+const RECORDED_CASES = [
+  {
+    name: 'main case', ledger: 'wf-run-1792986771290-0cee70ca',
+    approved: { dispatches: 30, mutating: 22 }, spent: { dispatches: 25, mutating: 22 },
+    slices: [...many(10, 'high', 'raised'), ...std(4, 'plain')],
+  },
+  {
+    name: 'successor case', ledger: 'wf-run-1793156600638-bf25ac2d',
+    approved: { dispatches: 24, mutating: 14 }, spent: { dispatches: 6, mutating: 4 },
+    slices: std(4, 'rest'), sizedToWork: false,
+  },
+  { name: 'first fix round', ledger: 'wf-run-1793204727428-cb058862', approved: { dispatches: 8, mutating: 4 }, spent: { dispatches: 5, mutating: 3 }, slices: std(3, 'fix') },
+  { name: 'second fix round', ledger: 'wf-run-1793213132570-50ce60a7', approved: { dispatches: 6, mutating: 2 }, spent: { dispatches: 4, mutating: 2 }, slices: std(2, 'fix') },
+  { name: 'third fix round', ledger: 'wf-run-1793244359873-ac20a7a4', approved: { dispatches: 6, mutating: 2 }, spent: { dispatches: 4, mutating: 2 }, slices: std(2, 'fix') },
+  { name: 'fourth fix round', ledger: 'wf-run-1793252785917-d7c7021a', approved: { dispatches: 9, mutating: 4 }, spent: { dispatches: 5, mutating: 3 }, slices: std(3, 'fix') },
+  { name: 'fifth fix round', ledger: 'wf-run-1793266874143-8e6d800b', approved: { dispatches: 7, mutating: 3 }, spent: { dispatches: 4, mutating: 2 }, slices: std(2, 'fix') },
+];
+
+for (const c of RECORDED_CASES) {
+  test(`the frame proposed for the ${c.name} covers what it spent and stays within one and a half times what was approved`, (t) => {
+    const { frame } = propose(c.slices);
+    const ratio = (n, d) => (n / d).toFixed(2);
+    t.diagnostic(`${c.name} (${c.ledger}): approved ${c.approved.dispatches}/${c.approved.mutating}, spent ${c.spent.dispatches}/${c.spent.mutating}, proposed ${frame.dispatches}/${frame.mutatingDispatches}, ratio to approved ${ratio(frame.dispatches, c.approved.dispatches)}/${ratio(frame.mutatingDispatches, c.approved.mutating)}`);
+    assert.ok(frame.dispatches >= c.spent.dispatches, `dispatches ${frame.dispatches} < spent ${c.spent.dispatches}`);
+    assert.ok(frame.mutatingDispatches >= c.spent.mutating, `writing dispatches ${frame.mutatingDispatches} < spent ${c.spent.mutating}`);
+    assert.ok(frame.dispatches <= c.approved.dispatches * 1.5, `dispatches ${frame.dispatches} > 1.5 x approved ${c.approved.dispatches}`);
+    assert.ok(frame.mutatingDispatches <= c.approved.mutating * 1.5, `writing dispatches ${frame.mutatingDispatches} > 1.5 x approved ${c.approved.mutating}`);
+    if (c.sizedToWork !== false) {
+      assert.ok(frame.dispatches >= c.approved.dispatches, `dispatches ${frame.dispatches} < approved ${c.approved.dispatches}`);
+      assert.ok(frame.mutatingDispatches >= c.approved.mutating, `writing dispatches ${frame.mutatingDispatches} < approved ${c.approved.mutating}`);
+    }
+    assert.equal(frame.rigorFloor, 'standard');
+  });
+}
+
+test('the seat launches planned grow with rigor and the per-dispatch ceiling the owner approved before covers the heaviest recorded slice', () => {
+  const per = (rigor) => propose([slice('a', rigor)]).frame.seatLaunchesPerDispatch;
+  assert.ok(per('standard') < per('high'));
+  assert.ok(per('high') < per('critical'));
+  const approvedPerDispatch = 12;
+  for (const c of RECORDED_CASES) {
+    assert.ok(propose(c.slices).frame.seatLaunchesPerDispatch <= approvedPerDispatch, `${c.name} asks for more seat launches per dispatch than the approved frame allowed`);
+  }
+});

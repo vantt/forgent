@@ -327,6 +327,8 @@
     "src/workflow/case-close.mjs": "infra",
     "src/workflow/case-gate.mjs": "infra",
     "src/workflow/case-inherit.mjs": "infra",
+    "src/workflow/propose-frame.mjs": "infra",
+    "src/workflow/propose-classify.mjs": "infra",
     "src/workflow/case-admission-port.mjs": "infra",
     "src/workflow/unit-handoff.mjs": "infra",
     "src/workflow/case-start.mjs": "use-case",

@@ -1,0 +1,103 @@
+# Slice kinds: how the write paths of one slice decide its kind, capability, pattern and rigor.
+# Each path of a slice takes the rule that matches it with the highest rigor; the slice takes the
+# highest-rigor path, and the first listed rule wins a tie, so code outranks tests and docs in a mixed slice
+# whatever order the paths are written in. A directory or glob also covers every rule that names files below it;
+# a rule that starts with ** (any directory) is repeated under the trees that hold such files (apps, packages,
+# tools, herdr-dashboard) so a glob over one of those trees reaches them.
+# An agent may raise a slice's rigor with a reason; nothing lowers it below this table.
+# `ask-owner-first` kinds are never dispatched: the owner is asked before any seat is launched.
+version: 1
+default:
+  kind: code
+  reason: the path matches no rule, so it is treated as ordinary code
+rules:
+  - id: irreversible
+    kind: irreversible
+    rigor: critical
+    askOwnerFirst: true
+    match:
+      - "**/migrations/**"
+      - "**/*.sql"
+      - ".fgos/**"
+  - id: contract
+    kind: contract
+    capability: code:implement
+    pattern: reviewed
+    rigor: high
+    match:
+      - "packages/*/contracts/**"
+      - "core/config-schema/**"
+      - "**/*.schema.json"
+      - "**/*.schema.yaml"
+      - "docs/platform-foundations.md"
+      - "docs/specs/platform-foundations.md"
+      - "domains/coding/slice-kinds.yaml"
+  - id: platform
+    kind: platform
+    capability: code:implement
+    pattern: reviewed
+    rigor: high
+    match:
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+      - "**/package-lock.json"
+      - "**/*.rs"
+      - "apps/**/*.rs"
+      - "apps/**/Cargo.toml"
+      - "apps/**/Cargo.lock"
+      - "packages/**/*.rs"
+      - "packages/**/Cargo.toml"
+      - "packages/**/Cargo.lock"
+      - "tools/**/*.rs"
+      - "tools/**/Cargo.toml"
+      - "tools/**/Cargo.lock"
+      - "herdr-dashboard/**/*.rs"
+      - "herdr-dashboard/**/Cargo.toml"
+      - "herdr-dashboard/**/Cargo.lock"
+      - "packages/*/rust/**"
+      - "packages/*/node-addon/**"
+      - "packages/*/write-scope/**"
+      - "src/identity/**"
+      - "src/holder-lock/**"
+      - "src/git/**"
+      - "src/native/door.mjs"
+      - "src/util/session-identity.mjs"
+      - "src/util/identity-mint.mjs"
+      - "src/state/hot-lock.mjs"
+      - "src/runner/repo-locks.mjs"
+      - "src/setup/holder-lock-checks.mjs"
+      - "src/workflow/case-lock.mjs"
+  - id: code
+    kind: code
+    capability: code:implement
+    pattern: reviewed
+    rigor: standard
+    match:
+      - "src/**"
+      - "bin/**"
+      - "scripts/**"
+      - "core/**"
+      - "domains/**"
+      - "apps/**"
+      - "packages/**"
+  - id: test
+    kind: test
+    capability: code:test
+    pattern: reviewed
+    rigor: standard
+    match:
+      - "test/**"
+      - "**/*.test.mjs"
+  - id: docs
+    kind: docs
+    capability: docs:write
+    pattern: solo
+    followUp:
+      capability: review
+      pattern: solo
+    rigor: low
+    match:
+      - "docs/**"
+      - "plans/**"
+      - "README.md"
+      - "CHANGELOG.md"
