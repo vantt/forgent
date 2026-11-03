@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "aca74297a5961ebf412ad45bed7641f3b329538d6e1933e13f85b1c68af0430c",
+  "payloadDigest": "e082bcdc1206d8ef337f93865fbedde96ac539767d1b89b6ac07e72d5b76e604",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -950,17 +950,17 @@
     "src/run-supervisor/attempt-step.mjs": "cabe99992da3c5157035f3320abd4a184191297989fe973ae3dbd4f0fc8fb273",
     "src/run-supervisor/cancel-opt-in.mjs": "f5b9a2eadc709918201ed01620098886bd108e8445c2b2304b845b4e73981403",
     "src/run-supervisor/cancel-registry.mjs": "03ec19e0768cf19ce0224103187c5de05200aba9fb9618e5b2c71fa953e70e87",
-    "src/run-supervisor/client.mjs": "64b632a38eb54f44f97f0020dd46cf362c7837d693a2667aac42209f50a540ec",
-    "src/run-supervisor/direct-launch.mjs": "716d9a450be22d2120a44d940bdcef41ae4faa66f605fbc55915aa32d234e81f",
+    "src/run-supervisor/client.mjs": "f4d941fc332d9e209f463cbf657e0abdf7b932f1ba17492cdd1dbd7d33c21600",
+    "src/run-supervisor/direct-launch.mjs": "e30690e5989316732a98be6febc1c1f3c5154bfae299551c6d38e14227816923",
     "src/run-supervisor/gate-kill-grace.mjs": "f20564cf9b62a4e9ce52050d3ce2a78f418897226274d331ccc63af6a368b532",
     "src/run-supervisor/legacy-sweep.mjs": "63d49b8910513337ae01810361b02fdcc2a4c8ab5ab17fcf5c52de1f9474d51a",
     "src/run-supervisor/payload-root.mjs": "b1ad1d5402b921254d06aecf20a7bc1fe322845c0ab72f028c5fb7047402bdd9",
-    "src/run-supervisor/protocol.mjs": "84c0eaa3c8a94429c4c207d2a80d9e7851914cd64985e82f8507ffcbead63b7c",
+    "src/run-supervisor/protocol.mjs": "ac221d21aa23f3d3e48c21740919415c8ab5113f4d8b4c2cc5405eb48e6dde2f",
     "src/run-supervisor/runtime-dir.mjs": "2f02f66882dd2e81b3cc7e9f402fdd0c4c4001e9ceb42e6c4e8984f2e0f2f594",
     "src/run-supervisor/step-support.mjs": "40c78da932dafd643762ff5c32e1f8a3844d5a7f9cd7ec64055b8b1343f614f9",
     "src/run-supervisor/steps/cleanup-trust.mjs": "4427bcd94a9469eb2063403207866ef1d28ae2941987bc8f31853c2fb4b2f0b6",
     "src/run-supervisor/steps/finalize-home.mjs": "a44414ab2ddc7e8056bbf042069983bca4b98143628e748ddc594d0cbff312b8",
-    "src/run-supervisor/steps/settle-attempt.mjs": "6016d74b8309475f3a8d433304c4ab35c5cfac2a54cb043ca2748dce8d14a96e",
+    "src/run-supervisor/steps/settle-attempt.mjs": "8ce15cd8dfb05d7d83a2ff6e107bf84cab5c75b28d9be1c9234c69784c31d834",
     "src/run-supervisor/sweep.mjs": "6e4fdf218c53bfd85c2b89d47623a9457d73f05bbdad064547a6db4bc15d6fe6",
     "src/runner/agent-definitions.mjs": "c171c5812dad6312f8538b0abda0bf7c9b392847fbe8d7a9ef75bebc44c62434",
     "src/runner/agent-listing.mjs": "8c6bfd84c26fb939cc22bf511c7e5a328d7cfa91bb9c2ba0574b94f6d48b6c4d",
@@ -1003,7 +1003,7 @@
     "src/runner/dispatch/plan.mjs": "355cc52529ad4186609fb663412150b764e7d10ca66de04f9888c98c651379d7",
     "src/runner/dispatch/prepare.mjs": "d2bc4e5bccce5db31c8a56a364d06d88916b4c108cb0191957e8989b44ff90ce",
     "src/runner/dispatch/process-identity.mjs": "37fd2e1b2fa509428bfe64a962b8716dc7f4952beb7efc84e32212b83d739b2f",
-    "src/runner/dispatch/proof-helpers.mjs": "e053aac2167c22a7f48aeccda52ff29b3f2845024d7e9207afb3d19d5265425f",
+    "src/runner/dispatch/proof-helpers.mjs": "d1fa73eb4b3960f2daeb08cb5b820d50cd75beee0e71ecaebff55cbad1b8c56f",
     "src/runner/dispatch/provider-account-probe.mjs": "bfded5e8a1deeb6bae30950f84ae8a587c4e911892761c50cdab0cf4bfd7e86e",
     "src/runner/dispatch/provider-adapter.mjs": "d750985427a85fd25309d3d54fed014758e6a1a57ebc9c1cd240f4e314103723",
     "src/runner/dispatch/provider-auth-failure.mjs": "ad3d07cc29e54f6758694ed861afbf66fa30e6568905e9f9383ac7b6943f19f7",
@@ -1019,7 +1019,7 @@
     "src/runner/dispatch/run-result.mjs": "9d0bf13cc9f695ae58d60052debbdf446868260b481c6ef036f9acaa611890f9",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runtime-inspection.mjs": "a5160e0f4dcf10d48fd72407dd45d0b84d35e24713dbf99b384b6db6f84e8e5b",
-    "src/runner/dispatch/settlement.mjs": "171c6ba0444214c62db034f7ebcfc301e04de77091ea2437139f417262dac780",
+    "src/runner/dispatch/settlement.mjs": "d8a0e6633f5d2c7f009a248cc067f52c19d1b72a4b0d464f51afcb8f755a5566",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/stop-processes-inside.mjs": "ae37ac4e4b33d235d7da1a3bfca849980ce8816f6db86b9aec285bcccdb58c2b",
     "src/runner/dispatch/stray-writes.mjs": "8ab287ef44a7e731d4c22fb50e820017645d707e9b41b63a75b7fb4bc028f2ff",
@@ -3276,13 +3276,13 @@
     {
       "path": "src/run-supervisor/attempt-step.mjs",
       "line": 72,
-      "spawn": "settleAttempt -> src/run-supervisor/steps/settle-attempt.mjs:200",
+      "spawn": "settleAttempt -> src/run-supervisor/steps/settle-attempt.mjs:199",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/run-supervisor/client.mjs",
-      "line": 38,
+      "line": 39,
       "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
@@ -3297,7 +3297,7 @@
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
       "line": 2107,
-      "spawn": "startSupervisor -> src/run-supervisor/direct-launch.mjs:276",
+      "spawn": "startSupervisor -> src/run-supervisor/direct-launch.mjs:277",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

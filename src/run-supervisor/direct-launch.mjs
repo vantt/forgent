@@ -14,14 +14,14 @@ import { acquireSync, createLockScope, spawnWithLocks, resolveLock, resolveState
 import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
 import { admitSuccessor } from '../runner/dispatch/cwd-lock.mjs';
 import { DispatchError } from '../runner/dispatch/dispatch-error.mjs';
-import { computeSha256Digest, publishImmutableProof, publishMutableProjection } from '../runner/dispatch/proof-helpers.mjs';
+import { computeSha256Digest, openAgentFileSync, publishImmutableProof, publishMutableProjection } from '../runner/dispatch/proof-helpers.mjs';
 import { selfRecord } from '../runner/dispatch/process-identity.mjs';
 import { interpretRunResult } from '../runner/dispatch/run-result.mjs';
 import { adoptRun, resolveRouteHostBin, RunSupervisorError } from './client.mjs';
 import { readGateKillGraceMs } from './gate-kill-grace.mjs';
 import { ensureRuntimeSocketDir } from './runtime-dir.mjs';
 import { OWN_PAYLOAD_ROOT, realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
-import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from './protocol.mjs';
+import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL, ATTEMPT_STEP_TIMEOUT_MS, MAX_ATTEMPT_STEPS } from './protocol.mjs';
 
 const BINDING_WAIT_MS = 30_000;
 const POLL_MS = 25;
@@ -29,7 +29,7 @@ const CLOSE_WAIT_MS = 60_000;
 const TAIL_CHUNK_BYTES = 1024 * 1024;
 const ADOPT_POLL_MS = 250;
 const ADOPT_WAIT_MS = 60_000;
-const STEP_TIMEOUT_MS = 10 * 60 * 1000;
+const STEP_TIMEOUT_MS = ATTEMPT_STEP_TIMEOUT_MS;
 /** Slack past the soft deadline for SIGTERM, the kill grace and the supervisor's own domain sweep. */
 const HARD_CEILING_SLACK_MS = 15_000;
 const ENV_ALLOW = ['PATH', 'HOME', 'USERPROFILE', 'TMPDIR', 'TEMP', 'TMP', 'LANG', 'LC_ALL', 'SYSTEMROOT', 'XDG_RUNTIME_DIR'];
@@ -168,6 +168,7 @@ export function identityEnv(identity) {
  * @param {string} p.capture          directory that holds the agent's stdout and stderr files
  */
 export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, cwdLeaseOwner, identity, terminal = null, extraSteps = [] }) {
+  if (2 + extraSteps.length > MAX_ATTEMPT_STEPS) throw new DispatchError('too-many-steps', `an attempt runs at most ${MAX_ATTEMPT_STEPS} steps`, { runDir });
   const paths = attemptPaths(runDir, attemptId);
   const sideFile = paths.sideFile;
   const step = (stepId) => ({
@@ -299,9 +300,9 @@ export function captureTail(paths, onChunk) {
     for (const stream of ['stdout', 'stderr']) {
       let fd;
       try {
-        fd = fs.openSync(paths[stream], fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
-        const stat = fs.fstatSync(fd);
-        if (!stat.isFile() || stat.size <= offsets[stream]) continue;
+        let stat;
+        ({ fd, stat } = openAgentFileSync(paths[stream]));
+        if (stat.size <= offsets[stream]) continue;
         const length = Math.min(stat.size - offsets[stream], TAIL_CHUNK_BYTES);
         const buffer = Buffer.alloc(length);
         const read = fs.readSync(fd, buffer, 0, length, offsets[stream]);

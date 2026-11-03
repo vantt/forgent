@@ -47,6 +47,50 @@ export function sha256FileSync(filePath) {
   }
 }
 
+/**
+ * Open a file the agent may have written for reading: never follow a link, never block on a pipe
+ * (the open is non-blocking), and refuse anything that is not a regular file. Returns the descriptor
+ * and its stat; the caller closes the descriptor. Throws ENOTREGULAR for a FIFO, device, socket or
+ * directory, and the open's own error for a link or a missing file.
+ */
+export function openAgentFileSync(filePath) {
+  const fd = fs.openSync(filePath, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0) | (fs.constants.O_NONBLOCK ?? 0));
+  try {
+    const stat = fs.fstatSync(fd);
+    if (!stat.isFile()) {
+      const err = new Error(`not a regular file: ${filePath}`);
+      err.code = 'ENOTREGULAR';
+      throw err;
+    }
+    return { fd, stat };
+  } catch (err) {
+    fs.closeSync(fd);
+    throw err;
+  }
+}
+
+/** All bytes of an agent-written file, at most `maxBytes`; throws E2BIG past the cap (see openAgentFileSync). */
+export function readAgentFileSync(filePath, maxBytes) {
+  const { fd, stat } = openAgentFileSync(filePath);
+  try {
+    if (stat.size > maxBytes) {
+      const err = new Error(`file larger than ${maxBytes} bytes: ${filePath}`);
+      err.code = 'E2BIG';
+      throw err;
+    }
+    const buffer = Buffer.alloc(stat.size);
+    let filled = 0;
+    while (filled < buffer.length) {
+      const read = fs.readSync(fd, buffer, filled, buffer.length - filled, filled);
+      if (read === 0) break;
+      filled += read;
+    }
+    return buffer.subarray(0, filled);
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
 export function normalizeAgentName(raw, { maxLength = 32 } = {}) {
   const cleaned = String(raw ?? '')
     .toLowerCase()

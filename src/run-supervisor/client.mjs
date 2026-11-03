@@ -6,9 +6,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { resolveHostBin } from '../util/host-bin.mjs';
-import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from './protocol.mjs';
+import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL, ATTEMPT_STEP_TIMEOUT_MS, MAX_ATTEMPT_STEPS } from './protocol.mjs';
 
-const ROUTE_TIMEOUT_MS = 10 * 60 * 1000;
+// Strictly above the steps one attempt can run back to back, so a slow step ends itself first.
+const ROUTE_TIMEOUT_MS = ATTEMPT_STEP_TIMEOUT_MS * MAX_ATTEMPT_STEPS + 60 * 1000;
 const MAX_OUTPUT_BYTES = 64 * 1024 * 1024;
 
 export class RunSupervisorError extends Error {

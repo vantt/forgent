@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { settleRunOutcome } from '../../runner/dispatch/settlement.mjs';
 import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
-import { computeSha256Digest } from '../../runner/dispatch/proof-helpers.mjs';
+import { computeSha256Digest, openAgentFileSync } from '../../runner/dispatch/proof-helpers.mjs';
 import { acquireRunControl, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
 import { resolveWorkerArtifactPath } from '../../runner/dispatch/worker-artifacts.mjs';
 import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs';
@@ -26,9 +26,8 @@ function readTail(file) {
   let fd;
   try {
     // The agent can write what the capture files hold: never follow a link it may have put there.
-    fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW ?? 0));
-    const stat = fs.fstatSync(fd);
-    if (!stat.isFile()) return '';
+    let stat;
+    ({ fd, stat } = openAgentFileSync(file));
     const { size } = stat;
     const length = Math.min(size, CAPTURE_TAIL_BYTES);
     const buffer = Buffer.alloc(length);

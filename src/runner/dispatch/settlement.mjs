@@ -7,7 +7,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { sha256FileSync } from './proof-helpers.mjs';
+import { sha256FileSync, readAgentFileSync } from './proof-helpers.mjs';
+
+// The agent writes its claim and report: a larger file is not one.
+const MAX_AGENT_FILE_BYTES = 4 * 1024 * 1024;
 import { RunnerConfigError } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 import {
@@ -550,7 +553,7 @@ export async function settleRunOutcome({
 
   if (fs.existsSync(agentResultPath)) {
     try {
-      const claimBytes = fs.readFileSync(agentResultPath);
+      const claimBytes = readAgentFileSync(agentResultPath, MAX_AGENT_FILE_BYTES);
       const parsed = JSON.parse(claimBytes.toString('utf8'));
       const validation = validateAgentResultClaim(parsed, { role: assignment?.role, posture: assignment?.posture, operation: assignment?.operation });
       if (validation.valid) {
@@ -570,7 +573,7 @@ export async function settleRunOutcome({
     let reportValid = false;
     let reportSha256 = null;
     try {
-      const reportBytes = fs.readFileSync(agentReportPath);
+      const reportBytes = readAgentFileSync(agentReportPath, MAX_AGENT_FILE_BYTES);
       reportValid = isSubstantiveReportText(reportBytes.toString('utf8'));
       if (reportValid) {
         reportSha256 = crypto.createHash('sha256').update(reportBytes).digest('hex');

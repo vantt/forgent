@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
 import {
@@ -568,6 +568,59 @@ test('executeAssignment fails closed on malformed agent-result.json (Step 04 §5
   // reported as one. The same text now lives under `runnerNote`.
   assert.equal(result.agentClaim, undefined, 'no real worker claim exists -- agentClaim must not be fabricated');
   assert.match(result.runnerNote.summary, /schema validation/i);
+});
+
+// The agent writes agent-result.json, so settlement must neither follow a link it left there nor block on a
+// pipe. The run happens in a child process: a settlement that blocks would otherwise hang this whole file,
+// and the child's timeout turns that into a plain failure.
+function settleWithPlantedClaim(plantClaim) {
+  const tempDir = mkTempDir();
+  const harness = path.join(tempDir, 'harness.mjs');
+  const executorScript = path.join(tempDir, 'planting-executor.mjs');
+  const here = (rel) => JSON.stringify(new URL(rel, import.meta.url).href);
+  fs.writeFileSync(executorScript, `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    import { execFileSync, spawnSync } from 'node:child_process';
+    const runsDir = path.join(process.cwd(), '.fgos', 'assignments');
+    for (const asgn of fs.readdirSync(runsDir)) {
+      const runDir = path.join(runsDir, asgn, 'runs', '01');
+      if (!fs.existsSync(runDir)) continue;
+      const claim = path.join(runDir, 'agent-result.json');
+      ${plantClaim}
+    }
+    process.stdout.write('Done.\\n');
+  `);
+  fs.writeFileSync(harness, `
+    import '${new URL('../helpers/process-tmp-root.mjs', import.meta.url).href}';
+    import { buildAssignment } from ${here('../helpers/declared-assignment.mjs')};
+    import { bindableExecute } from ${here('../helpers/work-seat-config.mjs')};
+    import { executeAssignment } from ${here('../../src/runner/dispatch/assignment-runner.mjs')};
+    import { runOutcome } from ${here('../../src/runner/dispatch/run-result.mjs')};
+    const cwd = ${JSON.stringify(tempDir)};
+    const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [${JSON.stringify(executorScript)}, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
+    const assignment = buildAssignment({ workId: 'tsk-planted-claim', stage: 'planning', operation: 'validate-plan' });
+    const result = await bindableExecute(executeAssignment)(assignment, { cwd, repoRoot: cwd, runnerConfig });
+    process.stdout.write(JSON.stringify({ outcome: runOutcome(result), agentClaim: result.agentClaim ?? null }));
+  `);
+  const run = spawnSync(process.execPath, [harness], { encoding: 'utf8', timeout: 90000, killSignal: 'SIGTERM' });
+  assert.equal(run.status, 0, `settlement must finish, not block (signal ${run.signal}): ${run.stderr}`);
+  return JSON.parse(run.stdout.slice(run.stdout.indexOf('{')));
+}
+
+test('settlement treats a named pipe left as agent-result.json as no valid claim instead of blocking on it', { skip: process.platform === 'win32' }, () => {
+  const out = settleWithPlantedClaim(`execFileSync('mkfifo', [claim]);`);
+  assert.equal(out.agentClaim, null);
+  assert.equal(out.outcome.evidence, 'failed');
+});
+
+test('settlement does not follow a symlink left as agent-result.json to a file elsewhere', { skip: process.platform === 'win32' }, () => {
+  const out = settleWithPlantedClaim(`
+      const target = path.join(path.dirname(runDir), 'elsewhere.json');
+      fs.writeFileSync(target, JSON.stringify({ status: 'done', summary: 'Plan sound' }));
+      fs.symlinkSync(target, claim);`);
+  assert.equal(out.agentClaim, null, 'a claim reached through a link is not the agent\'s claim');
+  assert.equal(out.outcome.evidence, 'failed');
 });
 
 test('executeAssignment fails closed on invalid agent-result.json schema (Step 04 §5.2)', async () => {
@@ -1234,7 +1287,7 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
     `
     import fs from 'node:fs';
     import path from 'node:path';
-    import { execFileSync } from 'node:child_process';
+    import { execFileSync, spawnSync } from 'node:child_process';
     const cwd = process.cwd();
     fs.writeFileSync(path.join(cwd, 'tracked.txt'), 'worker committed content\\n');
     execFileSync('git', ['add', '.'], { cwd, stdio: 'ignore' });
@@ -1317,7 +1370,7 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
     `
     import fs from 'node:fs';
     import path from 'node:path';
-    import { execFileSync } from 'node:child_process';
+    import { execFileSync, spawnSync } from 'node:child_process';
     const cwd = process.cwd();
     fs.writeFileSync(path.join(cwd, 'tracked.txt'), 'worker committed content before hang\\n');
     execFileSync('git', ['add', '.'], { cwd, stdio: 'ignore' });
