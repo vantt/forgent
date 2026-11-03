@@ -14,7 +14,6 @@
 //! stops by polling `stop-requested.json`).
 
 use std::fs::{self, File};
-use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
@@ -80,10 +79,28 @@ pub fn outcome_for(gate_exit: Option<&Value>, outbox_present: bool) -> &'static 
     }
 }
 
-/// `"sha256:<hex>"` of a capture file's bytes, `None` when it does not exist.
+/// A file the agent can write, opened without following a link or waiting on a FIFO: regular files only.
+/// Anything else (missing, a link, a FIFO, a directory) is `None`, as good as absent.
+fn open_agent_file(path: &Path) -> Option<File> {
+    let mut options = std::fs::OpenOptions::new();
+    options.read(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
+    }
+    #[cfg(windows)]
+    let opened = fgos_durable_file::open_no_reparse(&mut options, path);
+    #[cfg(not(windows))]
+    let opened = options.open(path);
+    let file = opened.ok()?;
+    file.metadata().ok()?.is_file().then_some(file)
+}
+
+/// `"sha256:<hex>"` of a capture file's bytes, `None` when it is absent or not a regular file.
 fn capture_digest(path: &Path) -> Option<String> {
     use std::io::Read;
-    let mut file = std::fs::File::open(path).ok()?;
+    let mut file = open_agent_file(path)?;
     let mut hasher = Sha256::new();
     let mut buf = [0u8; 64 * 1024];
     loop {
@@ -115,29 +132,17 @@ const CAPTURE_TAIL_BYTES: u64 = 16 * 1024;
 /// FIFO, regular files only, never more than [`CAPTURE_TAIL_BYTES`]. Anything else reads as empty.
 fn capture_tail(path: &Path) -> String {
     use std::io::{Read, Seek, SeekFrom};
-    let mut options = std::fs::OpenOptions::new();
-    options.read(true);
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::OpenOptionsExt;
-        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
-    }
-    #[cfg(windows)]
-    let opened = fgos_durable_file::open_no_reparse(&mut options, path);
-    #[cfg(not(windows))]
-    let opened = options.open(path);
-    let Ok(mut file) = opened else {
+    let Some(mut file) = open_agent_file(path) else {
         return String::new();
     };
     let Ok(meta) = file.metadata() else {
         return String::new();
     };
-    if !meta.is_file()
-        || file
-            .seek(SeekFrom::Start(
-                meta.len().saturating_sub(CAPTURE_TAIL_BYTES),
-            ))
-            .is_err()
+    if file
+        .seek(SeekFrom::Start(
+            meta.len().saturating_sub(CAPTURE_TAIL_BYTES),
+        ))
+        .is_err()
     {
         return String::new();
     }
@@ -176,11 +181,21 @@ fn direct_reason(
         .receipt_reason()
 }
 
+/// The most a `gate-exit.json` may hold; a larger file reads as absent.
+const MAX_GATE_EXIT_BYTES: u64 = 64 * 1024;
+
 /// The `gate-exit.json` of this attempt, when one was published.
 fn read_gate_exit(run_dir: &Path, attempt_id: &str) -> Option<Value> {
-    let value: Value =
-        serde_json::from_str(&std::fs::read_to_string(run_dir.join("gate-exit.json")).ok()?)
-            .ok()?;
+    use std::io::Read;
+    let mut bytes = Vec::new();
+    open_agent_file(&run_dir.join("gate-exit.json"))?
+        .take(MAX_GATE_EXIT_BYTES + 1)
+        .read_to_end(&mut bytes)
+        .ok()?;
+    if bytes.len() as u64 > MAX_GATE_EXIT_BYTES {
+        return None;
+    }
+    let value: Value = serde_json::from_slice(&bytes).ok()?;
     (value["attemptId"] == attempt_id).then_some(value)
 }
 
@@ -303,7 +318,6 @@ impl Refusal {
 }
 
 const TICK: Duration = Duration::from_millis(50);
-const HEARTBEAT_EVERY: Duration = Duration::from_secs(5);
 /// How long the gate has to say HELLO after it started.
 const HELLO_LIMIT: Duration = Duration::from_secs(15);
 /// Slack beyond `gateKillGraceMs` before the supervisor ends the domain itself.
@@ -378,15 +392,22 @@ impl Watch {
         })
     }
 
-    fn soft_deadline_passed(&self) -> bool {
-        let Some((boot_id, at)) = &self.soft_at else {
-            return false;
-        };
+    /// Time left to the soft deadline; `None` when the attempt has none.
+    fn soft_left(&self) -> Option<Duration> {
+        let (boot_id, at) = self.soft_at.as_ref()?;
         // Another boot than the recorded one: the instant is meaningless, treat it as past.
-        self.boot_id
+        if self
+            .boot_id
             .as_ref()
             .is_some_and(|current| current != boot_id)
-            || boottime_ns() >= *at
+        {
+            return Some(Duration::ZERO);
+        }
+        Some(Duration::from_nanos(at.saturating_sub(boottime_ns())))
+    }
+
+    fn soft_deadline_passed(&self) -> bool {
+        self.soft_left().is_some_and(|left| left.is_zero())
     }
 
     /// The capture files hold more than the attempt's output budget.
@@ -421,7 +442,7 @@ impl CaptureTail {
         use std::io::{Read, Seek, SeekFrom};
         let mut active = false;
         for (offset, path) in self.offsets.iter_mut().zip(&watch.captures) {
-            let Ok(mut file) = File::open(path) else {
+            let Some(mut file) = open_agent_file(path) else {
                 continue;
             };
             if file.seek(SeekFrom::Start(*offset)).is_err() {
@@ -438,14 +459,6 @@ impl CaptureTail {
         }
         active
     }
-}
-
-fn write_atomic(dir: &Path, name: &str, value: &Value) -> std::io::Result<()> {
-    let temp = dir.join(format!(".{name}.tmp.{}", std::process::id()));
-    let mut file = os::create_private(&temp)?;
-    file.write_all(&serde_json::to_vec(value).map_err(std::io::Error::other)?)?;
-    drop(file);
-    fs::rename(&temp, dir.join(name))
 }
 
 /// Run the supervisor; the return value is the process exit code.
@@ -485,9 +498,15 @@ fn record_start_refusal(envelope_path: &Path, refusal: &Refusal) {
     if envelope_path.parent().map(Path::to_path_buf) != Some(PathBuf::from(run_dir)) {
         return;
     }
-    let note = json!({"v": 1, "attemptId": attempt_id, "code": refusal.code, "why": refusal.why, "at": iso_utc_now()});
+    publish_start_refusal(Path::new(run_dir), attempt_id, refusal.code, &refusal.why);
+}
+
+/// `start-refused.json` for an attempt that was never bound; the one writer.
+fn publish_start_refusal(run_dir: &Path, attempt_id: &str, code: &str, why: &str) {
+    let note =
+        json!({"v": 1, "attemptId": attempt_id, "code": code, "why": why, "at": iso_utc_now()});
     if let Ok(bytes) = serde_json::to_vec(&note) {
-        let _ = publish_once(Path::new(run_dir), "start-refused.json", &bytes);
+        let _ = publish_once(run_dir, "start-refused.json", &bytes);
     }
 }
 
@@ -624,10 +643,7 @@ fn not_started(
     code: &'static str,
     why: &str,
 ) -> Result<i32, Refusal> {
-    let note = json!({"v": 1, "attemptId": watch.attempt_id, "code": code, "why": why, "at": iso_utc_now()});
-    if let Ok(bytes) = serde_json::to_vec(&note) {
-        let _ = publish_once(run_dir, "start-refused.json", &bytes);
-    }
+    publish_start_refusal(run_dir, &watch.attempt_id, code, why);
     eprintln!("fgos internal supervise: attempt not started: {code}: {why}");
     finish(
         envelope,
@@ -784,6 +800,63 @@ fn wait_for_hello(go: &mut os::Go, spawned: &mut Spawned, since: Instant) -> boo
     }
 }
 
+/// What both watch loops keep about the gate's channel and the end-of-grace sweep.
+struct GateLink {
+    channel_open: bool,
+    /// The `tuple` of the AGENT frame, once the gate sent one.
+    agent: Option<Value>,
+    ended_domain: bool,
+}
+
+impl GateLink {
+    fn new() -> GateLink {
+        GateLink {
+            channel_open: true,
+            agent: None,
+            ended_domain: false,
+        }
+    }
+
+    /// Whether the gate reported its agent.
+    #[cfg(unix)]
+    fn agent_bound(&self) -> bool {
+        self.agent.is_some()
+    }
+
+    /// Read what the gate sent and publish `agent-binding.json` for the first AGENT frame. One frame per
+    /// look, so a noisy channel cannot starve the loop; a gate that is gone is read to its end, so an AGENT
+    /// frame sent just before it left is not lost.
+    fn read_frames(&mut self, watch: &Watch, go: &mut os::Go, gate_gone: bool) {
+        while self.channel_open && go.readable(Duration::ZERO) {
+            match read_frame(go) {
+                Ok(frame) if frame["type"] == "AGENT" && self.agent.is_none() => {
+                    let body = json!({"v": 1, "attemptId": watch.attempt_id, "envelopeDigest": watch.digest, "agent": frame["tuple"], "at": iso_utc_now()});
+                    if let Ok(bytes) = serde_json::to_vec(&body) {
+                        let _ = publish_once(&watch.run_dir, "agent-binding.json", &bytes);
+                    }
+                    self.agent = Some(frame["tuple"].clone());
+                }
+                Ok(_) => {}
+                // The gate closed or broke the channel: it still reports through gate-exit.json.
+                Err(_) => self.channel_open = false,
+            }
+            if !gate_gone {
+                break;
+            }
+        }
+    }
+
+    /// The gate outlived its own grace after the stop at `stopped`: end the whole domain. A refused kill is
+    /// tried again on the next look.
+    fn escalate(&mut self, watch: &Watch, stopped: Instant, kill: impl FnOnce() -> KillOutcome) {
+        if !self.ended_domain && stopped.elapsed() >= watch.grace + GATE_STOP_SLACK {
+            self.ended_domain = kill() == KillOutcome::Ok;
+        }
+    }
+}
+
+/// Direct mode's watch. Its causes include the output budget; a terminal attempt has no capture files and so
+/// no budget (`terminal.rs` keeps its own causes).
 fn watch_gate(
     watch: &Watch,
     go: &mut os::Go,
@@ -791,70 +864,39 @@ fn watch_gate(
     domain: &mut ContainmentDomain,
     spawned: &mut Spawned,
 ) {
-    let started = Instant::now();
-    let mut last_active = started;
+    let mut last_active = Instant::now();
     let mut tail = CaptureTail { offsets: [0, 0] };
-    let mut last_beat: Option<Instant> = None;
+    let mut link = GateLink::new();
     let mut stopped: Option<Instant> = None;
-    let mut ended_domain = false;
     let gate = spawned.root.clone();
-    let mut channel_open = true;
-    let mut agent_bound = false;
     loop {
         let gate_gone = spawned.child.try_wait().ok().flatten().is_some();
-        // A gate that leaves within a tick of its AGENT frame must not lose it.
-        while channel_open && go.readable(Duration::ZERO) {
-            match read_frame(go) {
-                Ok(frame) if frame["type"] == "AGENT" && !agent_bound => {
-                    agent_bound = true;
-                    let body = json!({"v": 1, "attemptId": watch.attempt_id, "envelopeDigest": watch.digest, "agent": frame["tuple"], "at": iso_utc_now()});
-                    if let Ok(bytes) = serde_json::to_vec(&body) {
-                        let _ = publish_once(&watch.run_dir, "agent-binding.json", &bytes);
-                    }
-                }
-                Ok(_) => {}
-                // The gate closed or broke the channel: it still reports through gate-exit.json.
-                Err(_) => channel_open = false,
-            }
-            if !gate_gone {
-                break;
-            }
-        }
+        link.read_frames(watch, go, gate_gone);
         if gate_gone {
             return;
         }
         if tail.active(watch) {
             last_active = Instant::now();
         }
-        if last_beat.is_none_or(|at| at.elapsed() >= HEARTBEAT_EVERY) {
-            last_beat = Some(Instant::now());
-            let _ = write_atomic(
-                &watch.run_dir,
-                "supervisor-heartbeat.json",
-                &json!({"v": 1, "attemptId": watch.attempt_id, "at": iso_utc_now(), "agentBound": agent_bound}),
-            );
-        }
-        if stopped.is_none() {
-            let cause = if watch.cancel_requested() {
-                Some("cancel")
-            } else if watch.output_over_limit() {
-                Some("output-limit")
-            } else if watch.soft_deadline_passed() {
-                Some("soft-deadline")
-            } else if watch.idle.is_some_and(|idle| last_active.elapsed() >= idle) {
-                Some("idle")
-            } else {
-                None
-            };
-            if let Some(cause) = cause {
-                stopped = Some(Instant::now());
-                request_stop(watch, go, &gate, cause);
+        match stopped {
+            None => {
+                let cause = if watch.cancel_requested() {
+                    Some("cancel")
+                } else if watch.output_over_limit() {
+                    Some("output-limit")
+                } else if watch.soft_deadline_passed() {
+                    Some("soft-deadline")
+                } else if watch.idle.is_some_and(|idle| last_active.elapsed() >= idle) {
+                    Some("idle")
+                } else {
+                    None
+                };
+                if let Some(cause) = cause {
+                    stopped = Some(Instant::now());
+                    request_stop(watch, go, &gate, cause);
+                }
             }
-        } else if !ended_domain
-            && stopped.is_some_and(|at| at.elapsed() >= watch.grace + GATE_STOP_SLACK)
-        {
-            // The gate outlived its own grace: end the whole domain. A refused kill is tried again on the next tick.
-            ended_domain = driver.kill_all(domain, 0) == KillOutcome::Ok;
+            Some(at) => link.escalate(watch, at, || driver.kill_all(domain, 0)),
         }
         std::thread::sleep(TICK);
     }
@@ -893,6 +935,60 @@ mod tests {
             "abandoned-before-brief"
         );
         assert_eq!(outcome_for(Some(&orphan("orphan-result")), true), "exited");
+    }
+
+    /// A FIFO or a link where the agent could write a capture file or `gate-exit.json` must read as
+    /// absent. Each read here used to block forever on the FIFO or follow the link.
+    #[cfg(unix)]
+    #[test]
+    fn files_the_agent_can_replace_with_a_fifo_or_a_link_read_as_absent() {
+        use std::os::unix::ffi::OsStrExt;
+        let dir = std::env::temp_dir().join(format!("agent-files-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        let fifo = |name: &str| {
+            let path = dir.join(name);
+            let c_path = std::ffi::CString::new(path.as_os_str().as_bytes()).unwrap();
+            // SAFETY: a NUL-terminated path that lives through the call.
+            assert_eq!(unsafe { libc::mkfifo(c_path.as_ptr(), 0o600) }, 0);
+            path
+        };
+        let (out, err) = (fifo("stdout.log"), dir.join("stderr.log"));
+        fs::write(&err, "hello").unwrap();
+        fs::write(dir.join("secret"), "{\"attemptId\":\"a1\"}").unwrap();
+        std::os::unix::fs::symlink(dir.join("secret"), dir.join("gate-exit.json")).unwrap();
+        let envelope = json!({
+            "attemptId": "a1", "digest": "d", "runDir": dir, "mode": "direct",
+            "deadlines": {"gateKillGraceMs": 1000},
+            "launch": {"capture": {"stdout": out, "stderr": err}, "outboxDir": dir.join("outbox")},
+            "agentProtocol": {"cli": "claude"},
+        });
+
+        let (tx, rx) = std::sync::mpsc::channel();
+        let (env, run_dir) = (envelope.clone(), dir.clone());
+        std::thread::spawn(move || {
+            let _ = tx.send(publish_receipt_as(&env, &run_dir, "supervisor", false));
+        });
+        let outcome = rx
+            .recv_timeout(Duration::from_secs(10))
+            .expect("the receipt must not wait on a FIFO")
+            .unwrap();
+        assert_eq!(outcome, "gate-lost", "a linked gate-exit.json is not read");
+        let receipt: Value =
+            serde_json::from_slice(&fs::read(dir.join("receipt.json")).unwrap()).unwrap();
+        assert_eq!(receipt["captureDigests"]["stdout"], Value::Null);
+        assert!(receipt["captureDigests"]["stderr"]
+            .as_str()
+            .is_some_and(|d| d.starts_with("sha256:")));
+
+        let watch = Watch::from(&envelope, &dir).unwrap();
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let _ = tx.send(CaptureTail { offsets: [0, 0] }.active(&watch));
+        });
+        rx.recv_timeout(Duration::from_secs(10))
+            .expect("the activity read must not wait on a FIFO");
+        let _ = fs::remove_dir_all(&dir);
     }
 
     #[test]

@@ -165,6 +165,10 @@ impl ProcessPlatform for Linux {
             .map(str::to_owned)
     }
 
+    fn ns_pids_of(&self, pid: ProcId) -> Option<Vec<u32>> {
+        facts::parse_ns_pids(&fs::read_to_string(format!("/proc/{}/status", pid.0)).ok()?)
+    }
+
     fn last_pid(&self) -> Option<u32> {
         fs::read_to_string("/proc/sys/kernel/ns_last_pid")
             .ok()?

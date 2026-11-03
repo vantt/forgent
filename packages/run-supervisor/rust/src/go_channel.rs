@@ -3,6 +3,10 @@
 //! `packages/run-supervisor/contracts/gate-go.v1.json`.
 
 use std::io::{self, Read, Write};
+#[cfg(unix)]
+use std::os::fd::AsRawFd;
+#[cfg(unix)]
+use std::os::unix::net::UnixStream;
 
 use serde_json::Value;
 
@@ -79,6 +83,41 @@ pub fn read_frame(input: &mut impl Read) -> Result<Value, FrameError> {
         Ok(value) if value.is_object() => Ok(value),
         _ => Err(FrameError::Protocol),
     }
+}
+
+/// The kernel's credentials of the process on the other end of a connected socket.
+#[cfg(target_os = "linux")]
+pub(crate) fn peer_cred(stream: &UnixStream) -> Option<libc::ucred> {
+    let mut cred = libc::ucred {
+        pid: 0,
+        uid: 0,
+        gid: 0,
+    };
+    let mut len = std::mem::size_of::<libc::ucred>() as libc::socklen_t;
+    // SAFETY: SO_PEERCRED writes one ucred into the buffer passed.
+    let rc = unsafe {
+        libc::getsockopt(
+            stream.as_raw_fd(),
+            libc::SOL_SOCKET,
+            libc::SO_PEERCRED,
+            (&mut cred as *mut libc::ucred).cast(),
+            &mut len,
+        )
+    };
+    (rc == 0).then_some(cred)
+}
+
+/// The uid of the process on the other end of a connected socket.
+#[cfg(target_os = "linux")]
+pub(crate) fn peer_uid(stream: &UnixStream) -> Option<libc::uid_t> {
+    peer_cred(stream).map(|cred| cred.uid)
+}
+
+#[cfg(all(unix, not(target_os = "linux")))]
+pub(crate) fn peer_uid(stream: &UnixStream) -> Option<libc::uid_t> {
+    let (mut uid, mut gid): (libc::uid_t, libc::gid_t) = (0, 0);
+    // SAFETY: getpeereid writes the two ids.
+    (unsafe { libc::getpeereid(stream.as_raw_fd(), &mut uid, &mut gid) } == 0).then_some(uid)
 }
 
 #[cfg(test)]

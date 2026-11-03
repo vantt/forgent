@@ -56,6 +56,11 @@ pub trait ProcessPlatform: Send + Sync {
     fn command_name_of(&self, _pid: ProcId) -> Option<String> {
         None
     }
+    /// The pid of `pid` in each PID namespace it is visible in, outermost first (Linux `NSpid`); `None` where the OS
+    /// has no such read or the process is gone.
+    fn ns_pids_of(&self, _pid: ProcId) -> Option<Vec<u32>> {
+        None
+    }
     /// The last pid allocated in this process's pid namespace.
     fn last_pid(&self) -> Option<u32> {
         None

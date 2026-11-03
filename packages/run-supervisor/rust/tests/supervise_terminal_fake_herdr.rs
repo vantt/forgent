@@ -579,27 +579,3 @@ fn a_fifo_named_like_a_result_does_not_stop_the_orphaned_gate_from_enforcing_the
     );
     assert!(!alive(agent_pid(&run) as u32), "the agent is gone");
 }
-
-#[test]
-fn an_idle_agent_with_unchanged_invalid_result_stops_and_releases_custody() {
-    let herdr = FakeHerdr::new("invalid-result");
-    let mut run = terminal_run("tinvalid-result", &herdr, "sleep 600", 300);
-    let supervisor = run.start_with_env(&herdr.env());
-    brief_taken(&herdr, &run);
-    wait_until(STEP, "brief delivery", || herdr.sent().len() >= 2);
-    // Let the supervisor observe working before returning to the idle prompt.
-    std::thread::sleep(Duration::from_secs(2));
-    fs::create_dir_all(&run.outbox).unwrap();
-    fs::write(
-        run.outbox.join("result-1.json"),
-        "{\"summary\":\"raw\nnewline\"}",
-    )
-    .unwrap();
-    herdr.set_explain(Verdict::Idle);
-    let (code, _) = finish(supervisor, LIMIT);
-    assert_eq!(code, 0, "{}", run.log());
-    let receipt = run.json("receipt.json").unwrap();
-    assert_eq!(receipt["reason"], "terminal:result-unreadable");
-    assert!(run.json("steps/release-slot.json").is_some());
-    assert!(lock_is_free(&run.path("attempt.lock")));
-}

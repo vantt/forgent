@@ -31,7 +31,7 @@ use fgos_agent_protocol::terminal::{
 };
 use fgos_agent_protocol::BlockedReason;
 use fgos_process::facts::{self, ProcTuple};
-use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, KillOutcome, ProcId};
+use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
 use fgos_terminal_control::core::{Core, Want};
 use fgos_terminal_control::port::{
     ExpectedProcess, LaunchOutcome, LaunchSpec, PaneState, ProcessIdentity,
@@ -40,14 +40,11 @@ use fgos_terminal_control::port::{
 use serde_json::{json, Value};
 
 use super::{
-    os, request_stop, write_atomic, Refusal, TerminalEnd, Watch, GATE_STOP_SLACK, HEARTBEAT_EVERY,
-    HELLO_LIMIT, TICK,
+    os, request_stop, GateLink, Refusal, TerminalEnd, Watch, GATE_STOP_SLACK, HELLO_LIMIT, TICK,
 };
-use crate::go_channel::{read_frame, write_frame};
-use crate::publish::publish_once;
+use crate::go_channel::{peer_uid, read_frame, write_frame};
 use crate::route::EXIT_ENVELOPE_INVALID;
 use crate::terminal_slot::Backend;
-use fgos_identity::text::iso_utc_now;
 
 /// `sun_path` holds 108 bytes including the terminating NUL.
 const MAX_SOCKET_PATH: usize = 107;
@@ -63,6 +60,17 @@ const DOMAIN_END_WAIT: Duration = Duration::from_secs(10);
 const WORK_POLL_MS: u64 = 700;
 const CARRIER_EVERY: Duration = Duration::from_secs(1);
 const SCREEN_SAMPLE_EVERY: Duration = Duration::from_secs(1);
+
+/// Whether looking at the screen can change what ends the attempt. New words push the idle deadline later, so
+/// it matters only while that deadline can still come before the soft one; with no idle deadline there is
+/// nothing to push.
+fn sampling_can_matter(idle_left: Option<Duration>, soft_left: Option<Duration>) -> bool {
+    match (idle_left, soft_left) {
+        (None, _) => false,
+        (Some(_), None) => true,
+        (Some(idle), Some(soft)) => idle < soft,
+    }
+}
 
 /// What the envelope says about a terminal attempt.
 struct Plan {
@@ -211,39 +219,6 @@ impl Drop for AttemptSocket {
     }
 }
 
-#[cfg(target_os = "linux")]
-fn peer_uid(stream: &UnixStream) -> Option<libc::uid_t> {
-    peer_cred(stream).map(|cred| cred.uid)
-}
-
-#[cfg(not(target_os = "linux"))]
-fn peer_uid(stream: &UnixStream) -> Option<libc::uid_t> {
-    let (mut uid, mut gid) = (0, 0);
-    // SAFETY: getpeereid writes the two ids.
-    (unsafe { libc::getpeereid(stream.as_raw_fd(), &mut uid, &mut gid) } == 0).then_some(uid)
-}
-
-#[cfg(target_os = "linux")]
-fn peer_cred(stream: &UnixStream) -> Option<libc::ucred> {
-    let mut cred = libc::ucred {
-        pid: 0,
-        uid: 0,
-        gid: 0,
-    };
-    let mut len = std::mem::size_of::<libc::ucred>() as libc::socklen_t;
-    // SAFETY: SO_PEERCRED writes one ucred.
-    let rc = unsafe {
-        libc::getsockopt(
-            stream.as_raw_fd(),
-            libc::SOL_SOCKET,
-            libc::SO_PEERCRED,
-            (&mut cred as *mut libc::ucred).cast(),
-            &mut len,
-        )
-    };
-    (rc == 0).then_some(cred)
-}
-
 /// One frame with descriptors riding on it (`SCM_RIGHTS`).
 fn send_frame_with_fds(stream: &UnixStream, frame: &Value, fds: &[RawFd]) -> std::io::Result<()> {
     let body = serde_json::to_vec(frame).map_err(std::io::Error::other)?;
@@ -354,7 +329,7 @@ fn gate_tuple(
 ) -> Result<ProcTuple, String> {
     #[cfg(target_os = "linux")]
     {
-        let from_peer = peer_cred(stream)
+        let from_peer = crate::go_channel::peer_cred(stream)
             .map(|c| c.pid as u32)
             .filter(|pid| *pid != 0 && within(*pid, root.pid));
         if let Some(tuple) = from_peer
@@ -376,16 +351,6 @@ fn gate_tuple(
     }
 }
 
-#[cfg(target_os = "linux")]
-fn parent_of(pid: u32) -> Option<u32> {
-    let stat = fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
-    stat[stat.rfind(')')? + 1..]
-        .split_whitespace()
-        .nth(1)?
-        .parse()
-        .ok()
-}
-
 /// `pid` is `ancestor` or one of its descendants.
 #[cfg(target_os = "linux")]
 fn within(pid: u32, ancestor: u32) -> bool {
@@ -394,8 +359,8 @@ fn within(pid: u32, ancestor: u32) -> bool {
         if at == ancestor {
             return true;
         }
-        match parent_of(at) {
-            Some(parent) if parent > 1 => at = parent,
+        match facts::relation_of(ProcId(at)) {
+            Some(relation) if relation.parent > 1 => at = relation.parent,
             _ => return false,
         }
     }
@@ -405,23 +370,16 @@ fn within(pid: u32, ancestor: u32) -> bool {
 /// The child of `root` that is pid 1 in a namespace of its own, or `root` when it has none and no sandbox was asked for.
 #[cfg(target_os = "linux")]
 fn namespace_init_under(root: u32, sandboxed: bool) -> Option<u32> {
-    let nspid = |pid: u32| -> Option<Vec<u32>> {
-        let status = fs::read_to_string(format!("/proc/{pid}/status")).ok()?;
-        let line = status.lines().find_map(|l| l.strip_prefix("NSpid:"))?;
-        Some(
-            line.split_whitespace()
-                .filter_map(|n| n.parse().ok())
-                .collect(),
-        )
-    };
-    if nspid(root)?.len() == 1 {
-        let children = fs::read_to_string(format!("/proc/{root}/task/{root}/children"))
-            .ok()
-            .unwrap_or_default();
-        let init = children
-            .split_whitespace()
-            .filter_map(|c| c.parse::<u32>().ok())
-            .find(|c| nspid(*c).is_some_and(|ns| ns.len() > 1 && ns.last() == Some(&1)));
+    if facts::ns_pids_of(ProcId(root))?.len() == 1 {
+        let init = facts::relations()
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|relation| relation.parent == root)
+            .map(|relation| relation.pid.0)
+            .find(|child| {
+                facts::ns_pids_of(ProcId(*child))
+                    .is_some_and(|ns| ns.len() > 1 && ns.last() == Some(&1))
+            });
         // Behind a sandbox the pane root is only bwrap's monitor: with no namespace init found, nothing here is the gate.
         return init.or(if sandboxed { None } else { Some(root) });
     }
@@ -453,21 +411,16 @@ fn domain_of(kind: &str, gate: ProcTuple) -> Result<Domain, String> {
 /// Everything the watch loop changes while the attempt runs.
 struct Sup<'a> {
     watch: &'a Watch,
-    run_dir: &'a Path,
     go: os::Go,
     domain: Domain,
     gate: ProcTuple,
     last_active: Instant,
-    last_beat: Option<Instant>,
     last_carrier: Instant,
     last_sample: Instant,
     last_screen: Option<u64>,
     stopped: Option<Instant>,
-    ended_domain: bool,
-    agent_bound: bool,
-    /// The agent as the gate reported it, for domains that do not contain it (a process group).
-    agent: Option<ProcTuple>,
-    channel_open: bool,
+    /// The gate's channel and the agent it reported, which a domain that does not contain it (a process group) needs.
+    link: GateLink,
     gate_gone: bool,
     end: TerminalEnd,
     adapter: Terminal,
@@ -495,39 +448,22 @@ impl Sup<'_> {
         if !self.gate_gone && domain_is_empty(&self.domain) == DomainState::Empty {
             self.gate_gone = true;
         }
-        while self.channel_open && self.go.readable(Duration::ZERO) {
-            match read_frame(&mut self.go) {
-                Ok(frame) if frame["type"] == "AGENT" && !self.agent_bound => {
-                    self.agent_bound = true;
-                    self.agent = tuple_of(&frame["tuple"]);
-                    let body = json!({"v": 1, "attemptId": self.watch.attempt_id, "envelopeDigest": self.watch.digest, "agent": frame["tuple"], "at": iso_utc_now()});
-                    if let Ok(bytes) = serde_json::to_vec(&body) {
-                        let _ = publish_once(self.run_dir, "agent-binding.json", &bytes);
-                    }
-                }
-                Ok(_) => {}
-                // The gate closed or broke the channel: it still reports through gate-exit.json.
-                Err(_) => self.channel_open = false,
-            }
-        }
+        self.link
+            .read_frames(self.watch, &mut self.go, self.gate_gone);
         if self.gate_gone {
             return;
-        }
-        if self
-            .last_beat
-            .is_none_or(|at| at.elapsed() >= HEARTBEAT_EVERY)
-        {
-            self.last_beat = Some(Instant::now());
-            let _ = write_atomic(
-                self.run_dir,
-                "supervisor-heartbeat.json",
-                &json!({"v": 1, "attemptId": self.watch.attempt_id, "at": iso_utc_now(), "agentBound": self.agent_bound}),
-            );
         }
         if self.last_carrier.elapsed() >= CARRIER_EVERY {
             self.carrier_check(core, key);
         }
-        if self.watch.idle.is_some() && self.last_sample.elapsed() >= SCREEN_SAMPLE_EVERY {
+        let idle_left = self
+            .watch
+            .idle
+            .map(|idle| idle.saturating_sub(self.last_active.elapsed()));
+        if !sampling_can_matter(idle_left, self.watch.soft_left()) {
+            // Not sampling: the time until sampling starts is not blind time.
+            self.last_sample = Instant::now();
+        } else if self.last_sample.elapsed() >= SCREEN_SAMPLE_EVERY {
             let since_sample = self.last_sample.elapsed();
             self.last_sample = Instant::now();
             match core.read(key, None, Some("visible")) {
@@ -559,13 +495,10 @@ impl Sup<'_> {
                 };
                 self.begin_stop(cause, reason.as_deref());
             }
-        } else if !self.ended_domain
-            && self
-                .stopped
-                .is_some_and(|at| at.elapsed() >= self.watch.grace + GATE_STOP_SLACK)
-        {
-            // The gate outlived its own grace: end the whole domain. A refused kill is tried again on the next tick.
-            self.ended_domain = domain_kill_all(&self.domain) == KillOutcome::Ok;
+        } else if let Some(at) = self.stopped {
+            let domain = &self.domain;
+            self.link
+                .escalate(self.watch, at, || domain_kill_all(domain));
         }
     }
 
@@ -816,20 +749,15 @@ pub(super) fn run(
     let now = Instant::now();
     let mut sup = Sup {
         watch,
-        run_dir,
         go: os::Go::from_stream(stream),
         domain,
         gate,
         last_active: now,
-        last_beat: None,
         last_carrier: now,
         last_sample: now,
         last_screen: None,
         stopped: None,
-        ended_domain: false,
-        agent_bound: false,
-        agent: None,
-        channel_open: true,
+        link: GateLink::new(),
         gate_gone: false,
         end: TerminalEnd::default(),
         adapter: plan.adapter,
@@ -847,15 +775,20 @@ pub(super) fn run(
         let _ = domain_kill_all(&sup.domain);
     }
     // A process group does not hold the agent (it leads a group of its own): end it by identity.
-    if let (Domain::LinuxPgroup(_), Some(agent)) = (&sup.domain, &sup.agent) {
+    if let (Domain::LinuxPgroup(_), Some(agent)) =
+        (&sup.domain, sup.link.agent.as_ref().and_then(tuple_of))
+    {
         let _ =
-            fgos_process::control::signal_by_identity(agent, fgos_process::control::Signal::Kill);
+            fgos_process::control::signal_by_identity(&agent, fgos_process::control::Signal::Kill);
     }
     let end = sup.end.clone();
     drop(sup);
     locks.release_cwd();
     super::finish(envelope, run_dir, watch, locks, false, &end)
 }
+
+/// The stop an unreadable result ends in: the contract's cause and the receipt reason it names.
+const UNREADABLE_STOP: (&str, &str) = ("cancel", REASON_RESULT_UNREADABLE);
 
 /// The file and idle observations must both persist; unknown activity breaks the evidence.
 #[derive(Default)]
@@ -894,10 +827,10 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
     let mut outbox = FsOutbox::new(io.sup.watch.outbox.clone());
 
     let waited = Instant::now();
-    while !io.sup.agent_bound && !io.sup.finished() && waited.elapsed() < AGENT_WAIT {
+    while !io.sup.link.agent_bound() && !io.sup.finished() && waited.elapsed() < AGENT_WAIT {
         io.pause(TICK.as_millis() as u64);
     }
-    if !io.sup.agent_bound && !io.sup.finished() {
+    if !io.sup.link.agent_bound() && !io.sup.finished() {
         io.sup.begin_stop("cancel", Some(REASON_AGENT_NOT_STARTED));
     }
     if io.sup.finished() {
@@ -921,7 +854,7 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
     }
     // Once, and the connection stays open: the gate reads an early close as a dead supervisor.
     if write_frame(&mut io.sup.go, &json!({"type": "BRIEF_DELIVERED"})).is_err() {
-        io.sup.channel_open = false;
+        io.sup.link.channel_open = false;
     }
 
     let started = Instant::now();
@@ -943,7 +876,8 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
         if unreadable.expired(file, idle, started.elapsed().as_millis() as u64) {
             io.sup.carrier_check(io.core, io.key);
             if !io.sup.finished() {
-                io.sup.begin_stop("cancel", Some(REASON_RESULT_UNREADABLE));
+                let (cause, reason) = UNREADABLE_STOP;
+                io.sup.begin_stop(cause, Some(reason));
             }
             return;
         }
@@ -1032,7 +966,20 @@ mod tests {
         assert!(!wait.expired(outbox.newest_unreadable(&mut clock), true, 70_000));
         fs::write(&path, "{}").unwrap();
         assert!(!wait.expired(outbox.newest_unreadable(&mut clock), true, 100_000));
+        // The stop that follows an expired wait ends as a cancel and names this reason on the receipt.
+        assert_eq!(UNREADABLE_STOP, ("cancel", "terminal:result-unreadable"));
         fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn the_screen_is_sampled_only_while_idle_can_come_before_the_soft_deadline() {
+        let secs = |s| Some(Duration::from_secs(s));
+        assert!(!sampling_can_matter(None, None));
+        assert!(!sampling_can_matter(None, secs(5)));
+        assert!(sampling_can_matter(secs(1200), None));
+        assert!(sampling_can_matter(secs(10), secs(11)));
+        assert!(!sampling_can_matter(secs(10), secs(10)));
+        assert!(!sampling_can_matter(secs(1200), secs(900)));
     }
 
     #[test]

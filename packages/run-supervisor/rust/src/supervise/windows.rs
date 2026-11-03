@@ -248,14 +248,6 @@ impl Write for Go {
     }
 }
 
-pub(super) fn create_private(path: &Path) -> io::Result<File> {
-    OpenOptions::new()
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .open(path)
-}
-
 pub(super) fn driver_for(
     preferred: &str,
     bwrap: Option<PathBuf>,

@@ -173,39 +173,11 @@ fn connect_supervisor(path: &Path) -> Result<UnixStream, String> {
         return Err(format!("{} is not owned by this user", path.display()));
     }
     let stream = UnixStream::connect(path).map_err(|e| format!("{}: {e}", path.display()))?;
-    match peer_uid(&stream) {
+    match crate::go_channel::peer_uid(&stream) {
         Some(uid) if uid == me => Ok(stream),
         Some(_) => Err("the peer on the GO socket is another user".into()),
         None => Err("the peer on the GO socket cannot be identified".into()),
     }
-}
-
-#[cfg(target_os = "linux")]
-fn peer_uid(stream: &UnixStream) -> Option<libc::uid_t> {
-    let mut cred: libc::ucred = libc::ucred {
-        pid: 0,
-        uid: 0,
-        gid: 0,
-    };
-    let mut len = std::mem::size_of::<libc::ucred>() as libc::socklen_t;
-    // SAFETY: getsockopt writes one ucred into the buffer passed.
-    let rc = unsafe {
-        libc::getsockopt(
-            stream.as_raw_fd(),
-            libc::SOL_SOCKET,
-            libc::SO_PEERCRED,
-            (&mut cred as *mut libc::ucred).cast(),
-            &mut len,
-        )
-    };
-    (rc == 0).then_some(cred.uid)
-}
-
-#[cfg(not(target_os = "linux"))]
-fn peer_uid(stream: &UnixStream) -> Option<libc::uid_t> {
-    let (mut uid, mut gid): (libc::uid_t, libc::gid_t) = (0, 0);
-    // SAFETY: getpeereid writes the two ids.
-    (unsafe { libc::getpeereid(stream.as_raw_fd(), &mut uid, &mut gid) } == 0).then_some(uid)
 }
 
 fn set_cloexec(fd: libc::c_int) -> io::Result<()> {

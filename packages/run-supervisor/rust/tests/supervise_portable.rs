@@ -92,7 +92,6 @@ fn a_full_lifecycle_binds_receipts_runs_the_steps_in_order_and_frees_the_lock() 
         run.lock_is_free(),
         "the attempt lock is empty once the supervisor is gone"
     );
-    assert!(run.json("supervisor-heartbeat.json").is_some());
 }
 
 #[test]

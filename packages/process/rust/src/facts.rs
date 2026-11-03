@@ -488,6 +488,23 @@ pub fn command_name_of(pid: ProcId) -> Option<String> {
     platform::current().command_name_of(pid)
 }
 
+/// The pid of `pid` in each PID namespace it is visible in, outermost first (Linux `NSpid`): one entry when
+/// it lives in this namespace alone, more when it sits inside namespaces of its own, where the last entry is its
+/// pid there. `None` where the platform has no such read or `pid` is gone.
+pub fn ns_pids_of(pid: ProcId) -> Option<Vec<u32>> {
+    platform::current().ns_pids_of(pid)
+}
+
+/// The `NSpid` list of a `/proc/<pid>/status` text.
+pub fn parse_ns_pids(status: &str) -> Option<Vec<u32>> {
+    let line = status.lines().find_map(|l| l.strip_prefix("NSpid:"))?;
+    Some(
+        line.split_whitespace()
+            .filter_map(|n| n.parse().ok())
+            .collect(),
+    )
+}
+
 /// The command name of a `/proc/<pid>/stat` line: the text between the first
 /// `(` and the last `)`, so a name holding spaces or parentheses stays whole.
 pub fn parse_command_name(line: &str) -> Option<&str> {
@@ -693,6 +710,20 @@ mod tests {
     fn parses_state_and_start_time_from_a_stat_line_with_spaces_in_comm() {
         let line = "4242 (weird) name (x)) S 100 4242 77 34816 4242 4194304 0 0 0 0 1 2 0 0 20 0 1 0 987654 1 2 3";
         assert_eq!(parse_proc_stat(line), Some(('S', "987654".to_string())));
+    }
+
+    #[test]
+    fn reads_the_pid_in_every_namespace_from_a_status_text() {
+        assert_eq!(
+            parse_ns_pids("Name:\tx\nNSpid:\t4242\t17\t1\nNgid:\t0\n"),
+            Some(vec![4242, 17, 1])
+        );
+        assert_eq!(parse_ns_pids("NSpid:\t7\n"), Some(vec![7]));
+        assert_eq!(parse_ns_pids("Name:\tx\n"), None);
+        assert_eq!(
+            ns_pids_of(ProcId(std::process::id())).map(|ns| ns.len()),
+            cfg!(target_os = "linux").then_some(1)
+        );
     }
 
     #[test]

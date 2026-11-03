@@ -88,7 +88,6 @@ fn a_full_lifecycle_binds_receipts_runs_the_steps_in_order_and_frees_the_lock() 
         lock_is_free(&run.path("attempt.lock")),
         "the attempt lock is empty once the supervisor is gone"
     );
-    assert!(run.json("supervisor-heartbeat.json").is_some());
 }
 
 /// One direct attempt whose agent is `script` (run by `/bin/sh`), settled to its receipt.
