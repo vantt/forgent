@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3cc76f68dfdfe04c731c000bb7ea329260e3d98737b7c1d9c2f5b179526de9c9",
+  "payloadDigest": "1d3726d0986222c5639c2a69aad5190de51b8543d84929ac5f91d3ef57b0f433",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -680,7 +680,7 @@
     "packages/run-supervisor/rust/tests/gate_ceiling.rs": "9ad2b5a80ef1007870044ffec3ee38d141aa705b2d7796d342fd7da777d2b3fd",
     "packages/run-supervisor/rust/tests/gate_go.rs": "01dcfd9e706edc3764654b271eab383de23770fec563fe162b114d696da455cf",
     "packages/run-supervisor/rust/tests/gate_orphan.rs": "ee7cb384c3ff2914c8e3c03eab3887ec068218952d29b9a769fa726dd6727519",
-    "packages/run-supervisor/rust/tests/gate_pid1.rs": "a4d26f3798723bead0c100763b1d50ff6fbd15b29b88a7e790671e0cd20d8172",
+    "packages/run-supervisor/rust/tests/gate_pid1.rs": "331d3ed0dc5fbc2cc8312482c9b63a817257cfcfdfad62a0e28fb6b6b281df9a",
     "packages/run-supervisor/rust/tests/gate_portable.rs": "fc7f154c05c6a658f0b9070b19c2757a73b8ecd5a48ab1d90f6e45e4d208f362",
     "packages/run-supervisor/rust/tests/gate_terminal_socket.rs": "199f6d2277c32cf57f11d696c3f76f1ab71808103e8149c179acfad0fac41c6e",
     "packages/run-supervisor/rust/tests/portable/mod.rs": "0fec848daa697fa5d625dd39dc5eefbcb21f071a36dd9a2163e46de899d17de8",
@@ -2889,7 +2889,7 @@
     },
     {
       "path": "packages/run-supervisor/rust/tests/gate_pid1.rs",
-      "line": 238,
+      "line": 239,
       "spawn": "Command::new",
       "binary": "? harness()",
       "class": "rust-test"

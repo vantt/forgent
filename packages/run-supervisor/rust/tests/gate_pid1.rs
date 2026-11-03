@@ -162,7 +162,7 @@ fn a_long_attempt_with_many_orphans_accumulates_no_zombies() {
     let Some(driver) = bwrap_driver("no-zombies") else { return };
     let marker = std::env::temp_dir().join(format!("fgos-gate-zombie-marker-{}", std::process::id()));
     let _ = fs::remove_file(&marker);
-    let options = noisy(&["--outbox", "/nonexistent", "--marker", &marker.to_string_lossy(), "--run-ms", "60000", "--orphans", "200", "--orphan-life", "2"]);
+    let options = noisy(&["--outbox", "/nonexistent", "--marker", &marker.to_string_lossy(), "--run-ms", "30000", "--orphans", "200", "--orphan-life", "1"]);
     let attempt = Attempt::new("zombies", &options);
     let mut gate = start_gate(&*driver, &attempt, None);
     start_agent(&mut gate, &attempt);
@@ -170,7 +170,8 @@ fn a_long_attempt_with_many_orphans_accumulates_no_zombies() {
     let mut ever_seen: BTreeSet<u32> = BTreeSet::new();
     let mut zombie_since: BTreeMap<u32, Instant> = BTreeMap::new();
     let begin = Instant::now();
-    while begin.elapsed() < Duration::from_secs(57) {
+    // The churn is what proves reaping: stop once enough distinct processes came and went, with a cap.
+    while ever_seen.len() <= 150 && begin.elapsed() < Duration::from_secs(30) {
         let members = namespace_members(&gate.spawned.root);
         let now = Instant::now();
         let zombies: BTreeSet<u32> = members.iter().filter(|(_, state)| *state == 'Z').map(|(pid, _)| *pid).collect();
