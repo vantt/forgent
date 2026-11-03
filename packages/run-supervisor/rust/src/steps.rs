@@ -249,10 +249,10 @@ mod unix {
         });
 
         let started = Instant::now();
-        let status = loop {
-            match child.try_wait() {
-                Ok(Some(status)) => break status,
-                Ok(None) if started.elapsed() >= timeout => {
+        loop {
+            match super::exit_observed(pid) {
+                Ok(true) => break,
+                Ok(false) if started.elapsed() >= timeout => {
                     if let Some(tuple) = &identity {
                         let _ = signal_by_identity(tuple, Signal::Kill);
                     }
@@ -261,13 +261,15 @@ mod unix {
                     let _ = child.wait();
                     return Err(fail(format!("step exceeded stepTimeoutMs ({} ms)", timeout.as_millis())));
                 }
-                Ok(None) => std::thread::sleep(Duration::from_millis(20)),
+                Ok(false) => std::thread::sleep(Duration::from_millis(20)),
                 Err(e) => return Err(fail(format!("step wait failed: {e}"))),
             }
-        };
-        // A descendant that outlived the step must not outlive the chain.
-        // SAFETY: the pid was reaped just now, but a group with this id can only be this step's own.
+        }
+        // A descendant that outlived the step must not outlive the chain. The step has ended but is not
+        // reaped yet, so its pid is still reserved and the group id it names can only be this step's own.
+        // SAFETY: as above.
         unsafe { libc::killpg(pid, libc::SIGKILL) };
+        let status = child.wait().map_err(|e| fail(format!("step wait failed: {e}")))?;
         // A descendant outside the step's group may still hold the pipe: wait a bounded time, never forever.
         let text = text_rx.recv_timeout(Duration::from_secs(2)).unwrap_or_default();
         let exit = match status.code() {
@@ -276,6 +278,24 @@ mod unix {
         };
         interpret(exit, &text)
     }
+}
+
+/// Whether the child `pid` has ended, without reaping it: the pid stays reserved until `wait`.
+#[cfg(unix)]
+fn exit_observed(pid: libc::pid_t) -> std::io::Result<bool> {
+    // SAFETY: an all-zero siginfo_t is valid; waitid fills it only when a child changed state.
+    let mut info: libc::siginfo_t = unsafe { std::mem::zeroed() };
+    // SAFETY: waitid with a valid out pointer, on a child of this process.
+    let rc = unsafe { libc::waitid(libc::P_PID, pid as libc::id_t, &mut info, libc::WEXITED | libc::WNOHANG | libc::WNOWAIT) };
+    if rc < 0 {
+        return Err(std::io::Error::last_os_error());
+    }
+    #[cfg(target_os = "linux")]
+    // SAFETY: si_pid is valid after a successful waitid.
+    let who = unsafe { info.si_pid() };
+    #[cfg(not(target_os = "linux"))]
+    let who = info.si_pid;
+    Ok(who != 0)
 }
 
 /// A step on Windows: started through the handle-list spawn (it inherits its

@@ -91,6 +91,20 @@ fn a_step_past_its_timeout_is_killed_with_its_descendants_and_leaves_no_receipt(
     }
 }
 
+#[test]
+fn a_descendant_a_finished_step_leaves_behind_does_not_outlive_the_chain() {
+    let (dir, mut envelope) = attempt("leftover", Vec::new());
+    envelope["steps"] = json!([shell_step(&dir, "settle-attempt", &format!("sleep 60 >/dev/null 2>&1 & echo $! > {0}/child.pid; exit 1", dir.display()), 20_000)]);
+    let outcome = run_steps(&envelope, &dir);
+    assert!(matches!(outcome, StepsOutcome::Failed { .. }), "{outcome:?}");
+    let pid: u32 = fs::read_to_string(dir.join("child.pid")).unwrap().trim().parse().unwrap();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while alive(pid) && Instant::now() < deadline {
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    assert!(!alive(pid), "the descendant of a finished step must be dead");
+}
+
 // Lists /proc/<pid>/fd, which only Linux has.
 #[cfg(target_os = "linux")]
 #[test]
