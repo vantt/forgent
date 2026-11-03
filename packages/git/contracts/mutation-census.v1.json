@@ -1238,22 +1238,7 @@
     "src/workflow/unit-handoff.mjs": "d339daf5eb2fe88e49b7854b34c08c45a7c028e6048681e8e593e3a4504dfbc2",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3"
   },
-  "sites": [
-    {
-      "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 40,
-      "spawn": "Command::new <- packages/process/rust/src/containment/linux.rs:64",
-      "binary": "? BWRAP_LOCATIONS .iter() .map(PathBuf::from) .find(|path| path.is_file())",
-      "family": "unresolved-binary"
-    },
-    {
-      "path": "packages/process/rust/src/containment/linux.rs",
-      "line": 43,
-      "spawn": "Command::new <- packages/process/rust/src/mapped.rs:226",
-      "binary": "? BWRAP_LOCATIONS .iter() .map(PathBuf::from) .find(|path| path.is_file())",
-      "family": "unresolved-binary"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -2752,12 +2737,84 @@
       "class": "rust-test"
     },
     {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 64,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:40"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 64,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:40"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 64,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:40"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 315,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:43"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 315,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:43"
+    },
+    {
+      "path": "packages/process/rust/src/containment/linux.rs",
+      "line": 315,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:43"
+    },
+    {
       "path": "packages/process/rust/src/mapped.rs",
       "line": 226,
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
       "resolvedAt": "apps/fgos/src/wiring/mailbox_sync.rs:140"
+    },
+    {
+      "path": "packages/process/rust/src/mapped.rs",
+      "line": 226,
+      "spawn": "Command::new",
+      "binary": "/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:43"
+    },
+    {
+      "path": "packages/process/rust/src/mapped.rs",
+      "line": 226,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:43"
+    },
+    {
+      "path": "packages/process/rust/src/mapped.rs",
+      "line": 226,
+      "spawn": "Command::new",
+      "binary": "/usr/local/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/process/rust/src/containment/linux.rs:43"
     },
     {
       "path": "packages/process/rust/src/mapped.rs",

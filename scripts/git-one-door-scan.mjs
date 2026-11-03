@@ -1822,8 +1822,8 @@ function rustModel(name, source, root) {
     // `cond.then(|| v)` is `v` or `None`.
     const then = /^[\s\S]+\.then\(\s*(?:move\s*)?\|\s*\|\s*([\s\S]+)\)$/.exec(expr);
     if (then && rustBalanced(then[1])) return evalRust(then[1], index, depth + 1);
-    // `LIST.iter().map(PathBuf::from).find(..)`: an element of the list.
-    const pick = /^([\s\S]+?)\.(?:iter|into_iter)\(\)(?:\.(?:map\(\s*(?:\w+::)*\w+\s*\)|copied\(\)|cloned\(\)))*\.(?:find\([\s\S]*\)|next\(\)|last\(\))$/.exec(expr);
+    // `LIST.iter().map(PathBuf::from).find(..)`, on one line or split by rustfmt: an element of the list.
+    const pick = /^([\s\S]+?)\s*\.(?:iter|into_iter)\(\)(?:\s*\.(?:map\(\s*(?:\w+::)*\w+\s*\)|copied\(\)|cloned\(\)))*\s*\.(?:find\([\s\S]*\)|next\(\)|last\(\))$/.exec(expr);
     if (pick) return rustElements(pick[1], index, depth + 1);
     // A call by bare name, or through a module path of this crate (`pick::herdr_bin()`); a path into
     // std, core or alloc names no function of this crate.
