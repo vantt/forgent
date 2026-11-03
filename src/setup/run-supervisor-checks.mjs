@@ -174,14 +174,16 @@ function boundSocketPaths(procFile) {
  * listened on one was killed before it could remove the path. Sockets only, never other files.
  */
 function orphanAttemptSockets(dir, { uid, procFile }) {
-  const bound = boundSocketPaths(procFile);
-  if (bound === null) return null;
+  // The directory is listed before the table is read: a socket bound in between is then not in the
+  // listing at all, instead of being listed while missing from an older table.
   let names;
   try {
     names = fs.readdirSync(dir);
   } catch {
-    return [];
+    names = [];
   }
+  const bound = boundSocketPaths(procFile);
+  if (bound === null) return null;
   const orphans = [];
   for (const name of names.filter((entry) => ATTEMPT_SOCKET_NAME.test(entry)).sort()) {
     const file = path.join(dir, name);
