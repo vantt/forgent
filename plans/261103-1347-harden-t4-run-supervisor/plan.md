@@ -198,7 +198,7 @@ close:   P08
 
 The big lead copies H-T4c, H-T4d, H-T4e into the T5 phase file's "Received" section and H-T4a, H-T4b to TEST on the board, the same turn this plan is accepted (owner decision 8).
 
-## Owner questions (P07 only waits on them; batch them with the `cargo fmt` question)
+## Owner questions (answered 2026-11-03 14:22, decision 60: OQ-1 (a), OQ-2 (a), fmt (a); P07 is unblocked)
 
 ### OQ-1. Who closes an attempt whose controller died before it took the attempt lock?
 
