@@ -342,7 +342,7 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
 // the files named below; any other caller has to come through runUnit.
 const RUN_DOOR_CALLERS = {
   executeAssignment: ['src/runner/execution/run.mjs', 'src/runner/dispatch/cli.mjs'],
-  executeExecutorCli: ['src/runner/dispatch/assignment-runner.mjs'],
+  executeExecutorCli: [], // No production caller is left: every dispatch runs through executeAssignment's supervised attempt.
   commitUnitWork: ['src/runner/execution/run.mjs', 'scripts/git/e3-bench.mjs'], // Paired E3 baseline calls the real legacy writer.
   executeThroughConfinement: ['src/runner/dispatch/cli.mjs'],
 };

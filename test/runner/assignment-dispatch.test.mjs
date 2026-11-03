@@ -1445,6 +1445,18 @@ test('executeAssignment: reusing a retryId with a CHANGED destination/payload is
   );
 });
 
+test('executeAssignment: an executor whose adapter cannot run as a supervised attempt is refused by name', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = admissionRunnerConfig(writeEchoExecutor(tempDir));
+  const assignment = buildAssignment({ work: { id: 'tsk-unsupervised-adapter', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+  const unsupervised = { ...runnerConfig, executor: { ...runnerConfig.executor, adapter: 'rpc' } };
+
+  await assert.rejects(
+    () => executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig: unsupervised }),
+    (err) => err.code === 'supervised-adapter-required' && err.adapter === 'rpc',
+  );
+});
+
 test('executeAssignment: an expectedRunId ahead of the naturally-computed next attempt is REFUSED, never silently adopted as the new attempt number (L1)', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
