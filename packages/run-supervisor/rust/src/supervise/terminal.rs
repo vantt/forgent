@@ -525,17 +525,6 @@ impl AgentIo for TermIo<'_, '_> {
     }
 }
 
-/// Nothing was started, or the gate never said HELLO: no binding, no GO, the receipt names
-/// `abandoned-not-started` and the steps (the slot is kept) still run.
-fn not_started(envelope: &Value, run_dir: &Path, watch: &Watch, locks: os::Locks, code: &'static str, why: &str) -> Result<i32, Refusal> {
-    let note = json!({"v": 1, "attemptId": watch.attempt_id, "code": code, "why": why, "at": iso_utc_now()});
-    if let Ok(bytes) = serde_json::to_vec(&note) {
-        let _ = publish_once(run_dir, "start-refused.json", &bytes);
-    }
-    eprintln!("fgos internal supervise: terminal attempt not started: {code}: {why}");
-    super::finish(envelope, run_dir, watch, locks, true, &TerminalEnd::default())
-}
-
 pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch: &Watch) -> Result<i32, Refusal> {
     let plan = Plan::from(envelope)?;
     let mut socket = AttemptSocket::bind(&plan.socket_path).map_err(Refusal::internal)?;
@@ -547,14 +536,14 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
     // The `launched` marker is durable before `launch` returns; only then may a GO exist.
     let root = match core.launch(&plan.key, &spec) {
         Ok(LaunchOutcome::Launched(identity)) => identity,
-        Ok(LaunchOutcome::NotStarted { reason }) => return not_started(envelope, run_dir, watch, locks, "terminal-launch-not-started", &reason),
-        Err(TerminalRefusal::Unsupported { capability, detail }) => return not_started(envelope, run_dir, watch, locks, "terminal-mode-unsupported", &format!("{capability}: {detail}")),
-        Err(TerminalRefusal::Unknown { reason }) => return not_started(envelope, run_dir, watch, locks, "terminal-launch-unknown", &reason),
+        Ok(LaunchOutcome::NotStarted { reason }) => return super::not_started(envelope, run_dir, watch, locks, "terminal-launch-not-started", &reason),
+        Err(TerminalRefusal::Unsupported { capability, detail }) => return super::not_started(envelope, run_dir, watch, locks, "terminal-mode-unsupported", &format!("{capability}: {detail}")),
+        Err(TerminalRefusal::Unknown { reason }) => return super::not_started(envelope, run_dir, watch, locks, "terminal-launch-unknown", &reason),
     };
 
     let Some(stream) = socket.accept_gate(&watch.attempt_id, HELLO_LIMIT) else {
         socket.close();
-        return not_started(envelope, run_dir, watch, locks, "terminal-gate-silent", "the gate did not say HELLO in time");
+        return super::not_started(envelope, run_dir, watch, locks, "terminal-gate-silent", "the gate did not say HELLO in time");
     };
     socket.close();
 
@@ -568,7 +557,7 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
     if let Err(why) = send_frame_with_fds(&stream, &go_frame, &locks.raw_fds()) {
         // Without GO the gate runs nothing and leaves by itself; make sure.
         let _ = domain_kill_all(&domain);
-        return Err(Refusal::internal(format!("GO was not sent: {why}")));
+        return super::not_started(envelope, run_dir, watch, locks, "terminal-go-not-sent", &format!("GO was not sent: {why}"));
     }
 
     let now = Instant::now();

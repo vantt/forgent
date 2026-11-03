@@ -370,7 +370,21 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
     // The gate is gone: the cwd lease is released now, not after the steps.
     locks.release_cwd();
 
+    if !sent_go {
+        return not_started(&envelope, &run_dir, &watch, locks, "gate-silent", "no GO was sent, so the gate ran nothing");
+    }
     finish(&envelope, &run_dir, &watch, locks, false, &TerminalEnd::default())
+}
+
+/// Nothing was started, or the gate never got GO: the receipt names `abandoned-not-started` with the code from
+/// `start-refused.json`, and the steps (the slot is kept) still run.
+fn not_started(envelope: &Value, run_dir: &Path, watch: &Watch, locks: os::Locks, code: &'static str, why: &str) -> Result<i32, Refusal> {
+    let note = json!({"v": 1, "attemptId": watch.attempt_id, "code": code, "why": why, "at": iso_utc_now()});
+    if let Ok(bytes) = serde_json::to_vec(&note) {
+        let _ = publish_once(run_dir, "start-refused.json", &bytes);
+    }
+    eprintln!("fgos internal supervise: attempt not started: {code}: {why}");
+    finish(envelope, run_dir, watch, locks, true, &TerminalEnd::default())
 }
 
 /// The gate is gone and its domain is empty: publish the receipt, run the

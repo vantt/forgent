@@ -177,6 +177,21 @@ fn a_gate_that_dies_without_gate_exit_gives_a_gate_lost_receipt() {
 }
 
 #[test]
+fn a_gate_that_refuses_the_envelope_before_hello_gets_an_abandoned_not_started_receipt() {
+    let Some(_driver) = bwrap_driver("supervise-gate-silent") else { return };
+    // The supervisor accepts this envelope; the gate refuses it before HELLO: a brief-file policy with no briefPath.
+    let mut run = SupRun::new_with("gate-silent", &RunOpts::agent(300), |e| e["launch"]["stdinPolicy"] = json!("brief-file"));
+    let supervisor = run.start();
+    let (code, line) = finish(supervisor, LIMIT);
+    assert_eq!(code, 0, "{}", run.log());
+    assert_eq!(line["outcome"], "abandoned-not-started");
+    let receipt = run.json("receipt.json").unwrap();
+    assert_eq!(receipt["reason"], "start-refused:gate-silent");
+    assert!(!run.marker.exists(), "no agent ever ran");
+    assert!(lock_is_free(&run.path("attempt.lock")));
+}
+
+#[test]
 fn an_agent_that_prints_past_its_output_budget_is_stopped_and_the_receipt_says_so() {
     let Some(_driver) = bwrap_driver("supervise-output-limit") else { return };
     let mut opts = RunOpts::agent(60_000);

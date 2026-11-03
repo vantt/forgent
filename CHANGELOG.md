@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- An attempt whose gate never got GO (the gate refused its envelope, never said hello, or GO could not be sent) is now receipted as not started, so `--resume` may run it again, instead of as `gate-lost`, which resume refuses to rerun.
 - A pane attempt whose supervisor died no longer freezes its gate when the agent leaves a named pipe called `result-1.json` in the outbox; the hard ceiling still ends the agent, and the gate and the receipt now use the same rule for the newest finished result.
 - Claude Code 2.1.314 is now a tested version for the mailbox hook (Stop and PostToolUse payloads recorded on it), so sending to a session on that version no longer prints "is not one this mailbox was tested against".
 - fgOS Git commands no longer refuse every repository on a machine where `git lfs install` (or any global or system config) set a filter, credential helper or other command key; such keys are refused only when the repository's own local or worktree config sets them.
