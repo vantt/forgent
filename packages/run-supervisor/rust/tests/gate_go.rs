@@ -75,6 +75,19 @@ fn an_envelope_of_another_protocol_is_refused_before_hello() {
 }
 
 #[test]
+fn a_missing_brief_file_is_not_reported_as_a_missing_program() {
+    let Some(driver) = bwrap_driver("missing-brief") else { return };
+    let (mut options, agent_marker) = quick_agent("brief");
+    options.stdin_brief = Some(std::env::temp_dir().join("fgos-gate-no-such-brief").to_string_lossy().into_owned());
+    let attempt = Attempt::new("brief", &options);
+    let mut gate = start_gate(&*driver, &attempt, None);
+    send_go(&mut gate, &attempt.attempt_id, &attempt.digest);
+    wait_exit(&mut gate.spawned, Duration::from_secs(10));
+    assert_eq!(attempt.gate_exit().expect("the gate still reports the end of the attempt")["exitCode"], 126);
+    assert!(!agent_marker.exists());
+}
+
+#[test]
 fn a_correct_go_runs_the_agent_and_reports_its_tuple() {
     let Some(driver) = bwrap_driver("correct-go") else { return };
     let (options, agent_marker) = quick_agent("ok");

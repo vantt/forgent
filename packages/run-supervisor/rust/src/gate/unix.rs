@@ -17,7 +17,7 @@ use fgos_process::facts;
 use fgos_process::ProcId;
 use serde_json::{json, Value};
 
-use super::{ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, read_stop, Config, GateArgs, GoEnd, Stop, EXIT_NO_GO};
+use super::{ceiling_left, StartError, go_matches, load_config, publish_gate_exit, read_side_env, read_stop, Config, GateArgs, GoEnd, Stop, EXIT_NO_GO};
 use crate::route::{report, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL};
 use crate::go_channel::{write_frame, FrameBuf, FrameError};
 
@@ -408,13 +408,10 @@ fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, 
     } else {
         let child = match spawn_agent(config, &arrived.frame, secrets) {
             Ok(child) => child,
-            Err(why) => {
-                // An agent that cannot start ends like a shell command that cannot start: 127 when the
-                // program is not there, 126 when it cannot be run. The reason lands in the capture stderr.
-                crate::gate::note_agent_not_started(config, &why);
-                let code = if why.contains("No such file or directory") { 127 } else { 126 };
+            Err(err) => {
+                crate::gate::note_in_capture(config, &err.why());
                 end_domain(None, None, pid1);
-                return publish_gate_exit(config, Value::from(code), Value::Null, None);
+                return publish_gate_exit(config, Value::from(err.exit_code()), Value::Null, None);
             }
         };
         let pid = child.id() as libc::pid_t;
@@ -524,7 +521,7 @@ fn give_back_foreground() {
 /// Variables a terminal multiplexer sets for the program that runs in a pane.
 const PANE_TERMINAL_ENV: [&str; 4] = ["TERM", "COLORTERM", "TERM_PROGRAM", "TERM_PROGRAM_VERSION"];
 
-fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, String>) -> Result<std::process::Child, String> {
+fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, String>) -> Result<std::process::Child, StartError> {
     let mut cmd = Command::new(&config.command);
     // A sandbox hides some directories (a worktree under /tmp behind its private tmpfs): the agent then
     // starts at the root, as a process started by bwrap itself would.
@@ -578,11 +575,11 @@ fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, Stri
             });
         }
     } else {
-        let append = |path: &Path| OpenOptions::new().create(true).append(true).mode(0o600).custom_flags(libc::O_CLOEXEC).open(path).map_err(|e| format!("capture {}: {e}", path.display()));
+        let append = |path: &Path| OpenOptions::new().create(true).append(true).mode(0o600).custom_flags(libc::O_CLOEXEC).open(path).map_err(|e| StartError::Setup(format!("capture {}: {e}", path.display())));
         let stdout = append(&config.stdout)?;
         let stderr = append(&config.stderr)?;
         let stdin: Stdio = match &config.brief {
-            Some(path) => File::open(path).map_err(|e| format!("brief {}: {e}", path.display()))?.into(),
+            Some(path) => File::open(path).map_err(|e| StartError::Setup(format!("brief {}: {e}", path.display())))?.into(),
             None => Stdio::null(),
         };
         cmd.stdin(stdin).stdout(stdout).stderr(stderr);
@@ -597,7 +594,7 @@ fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, Stri
         }
     }
     // The agent receives no lock description: the map is empty.
-    spawn_with_fds(cmd, &[]).map_err(|e| format!("agent {} did not start: {e}", config.command))
+    spawn_with_fds(cmd, &[]).map_err(|source| StartError::Spawn { program: config.command.clone(), source })
 }
 
 fn signal_agent_group(agent: Option<libc::pid_t>, sig: libc::c_int) {

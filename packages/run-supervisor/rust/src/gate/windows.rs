@@ -22,7 +22,7 @@ use serde_json::{json, Value};
 use windows_sys::Win32::System::Console::{GenerateConsoleCtrlEvent, CTRL_BREAK_EVENT};
 use windows_sys::Win32::System::Threading::{CREATE_NEW_PROCESS_GROUP, CREATE_SUSPENDED};
 
-use super::{ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, stop_cause, stop_for, Config, GateArgs, GoEnd, Stop, EXIT_NO_GO};
+use super::{ceiling_left, StartError, go_matches, load_config, publish_gate_exit, read_side_env, stop_cause, stop_for, Config, GateArgs, GoEnd, Stop, EXIT_NO_GO};
 use crate::route::{report, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_USAGE};
 use crate::go_channel::{read_frame, write_frame};
 use crate::go_pipe;
@@ -135,12 +135,9 @@ fn supervise_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, 
     } else {
         let started = match spawn_agent(config, go_frame, secrets, &nested) {
             Ok(started) => started,
-            Err(why) => {
-                // An agent that cannot start ends like a shell command that cannot start: 127 when the
-                // program is not there, 126 when it cannot be run. The reason lands in the capture stderr.
-                crate::gate::note_agent_not_started(config, &why);
-                let code = if why.contains("cannot find") || why.contains("not found") || why.contains("os error 2") { 127 } else { 126 };
-                return publish_gate_exit(config, Value::from(code), Value::Null, None);
+            Err(err) => {
+                crate::gate::note_in_capture(config, &err.why());
+                return publish_gate_exit(config, Value::from(err.exit_code()), Value::Null, None);
             }
         };
         let tuple = facts::identity_of(ProcId(started.id())).map_or(Value::Null, |t| t.to_record().to_json());
@@ -187,12 +184,12 @@ fn job_suffix(job_name: &str) -> String {
     job_name.rsplit('\\').next().unwrap_or(job_name).chars().take(120).collect()
 }
 
-fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, String>, nested: &Job) -> Result<Spawned, String> {
-    let append = |path: &std::path::Path| OpenOptions::new().create(true).append(true).open(path).map_err(|e| format!("capture {}: {e}", path.display()));
+fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, String>, nested: &Job) -> Result<Spawned, StartError> {
+    let append = |path: &std::path::Path| OpenOptions::new().create(true).append(true).open(path).map_err(|e| StartError::Setup(format!("capture {}: {e}", path.display())));
     let stdout = append(&config.stdout)?;
     let stderr = append(&config.stderr)?;
     let stdin = match &config.brief {
-        Some(path) => ChildStdio::File(File::open(path).map_err(|e| format!("brief {}: {e}", path.display()))?),
+        Some(path) => ChildStdio::File(File::open(path).map_err(|e| StartError::Setup(format!("brief {}: {e}", path.display())))?),
         None => ChildStdio::Null,
     };
     let mut env: BTreeMap<String, String> = config.env.clone();
@@ -213,8 +210,8 @@ fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, Stri
         stdout: ChildStdio::File(stdout),
         stderr: ChildStdio::File(stderr),
     };
-    let agent = spawn(spec).map_err(|e| format!("agent {} did not start: {e}", config.command))?;
-    agent.assign_and_resume(nested).map_err(|e| format!("agent could not enter its job: {e}"))?;
+    let agent = spawn(spec).map_err(|source| StartError::Spawn { program: config.command.clone(), source })?;
+    agent.assign_and_resume(nested).map_err(|e| StartError::Setup(format!("agent could not enter its job: {e}")))?;
     Ok(agent)
 }
 

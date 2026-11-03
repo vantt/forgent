@@ -209,3 +209,17 @@ fn an_agent_that_cannot_start_ends_the_attempt_like_a_shell_command_that_cannot(
     assert_eq!(exit["stoppedBy"], "agent");
     assert!(fs::read_to_string(&attempt.stderr).unwrap().contains("did not start"), "the reason reaches the capture stderr");
 }
+
+#[test]
+fn a_program_the_os_refuses_to_run_ends_the_attempt_with_126() {
+    let not_a_program = std::env::temp_dir().join(format!("fgos-gate-not-a-program-{}", std::process::id()));
+    fs::write(&not_a_program, "plain text, no mode bits").unwrap();
+    let mut options = Options::new(&[]);
+    options.command = Some(not_a_program.to_string_lossy().into_owned());
+    let attempt = Attempt::new("refused", &options);
+    let mut gate = start_gate(&attempt);
+    read_hello(&mut gate);
+    send_go(&mut gate, &attempt.attempt_id, &attempt.digest);
+    assert_eq!(wait_exit(&mut gate, &attempt, Duration::from_secs(15)), 0, "{}", attempt.gate_log());
+    assert_eq!(attempt.gate_exit().expect("the gate still reports the end of the attempt")["exitCode"], 126);
+}

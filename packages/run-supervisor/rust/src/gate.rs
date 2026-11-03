@@ -285,9 +285,31 @@ pub(crate) fn note_in_capture(config: &Config, text: &str) {
     }
 }
 
-/// Say why the agent could not start.
-pub(crate) fn note_agent_not_started(config: &Config, why: &str) {
-    note_in_capture(config, why);
+/// Why the agent did not start.
+pub(crate) enum StartError {
+    /// A capture file, the brief or the agent's job could not be set up.
+    Setup(String),
+    /// The OS refused to start the program.
+    Spawn { program: String, source: std::io::Error },
+}
+
+impl StartError {
+    /// An agent that cannot start ends like a shell command that cannot start: 127 when the program
+    /// itself is not there, 126 for anything else.
+    pub(crate) fn exit_code(&self) -> i32 {
+        match self {
+            StartError::Spawn { source, .. } if source.kind() == std::io::ErrorKind::NotFound => 127,
+            _ => 126,
+        }
+    }
+
+    /// The reason, as it lands in the capture stderr.
+    pub(crate) fn why(&self) -> String {
+        match self {
+            StartError::Setup(why) => why.clone(),
+            StartError::Spawn { program, source } => format!("agent {program} did not start: {source}"),
+        }
+    }
 }
 
 /// Publish `gate-exit.json` once. `exit_code` and `signal` are JSON values
