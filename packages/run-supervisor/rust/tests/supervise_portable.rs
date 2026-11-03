@@ -132,8 +132,14 @@ fn a_supervisor_killed_midway_leaves_the_agent_running_and_adopt_settles_from_ga
     let running = run.adopt(&["--probe-only"]);
     assert_eq!(
         running["state"], "running",
-        "a live domain is never adopted: {running}"
+        "a live gate is never adopted: {running}"
     );
+    // Adopting for real must not end the attempt either; where the lock died with the supervisor the live gate is the reason.
+    let adopting = run.adopt(&[]);
+    assert_eq!(adopting["state"], "running", "{adopting}");
+    #[cfg(windows)]
+    assert_eq!(adopting["reason"], "gate-alive");
+    assert!(!run.path("adopting.json").exists() && !run.path("receipt.json").exists());
 
     wait_until(
         Duration::from_secs(60),

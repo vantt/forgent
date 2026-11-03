@@ -87,7 +87,7 @@ test('receipt outcomes and step ids are shared by every contract that names them
   assert.deepEqual(step.fields.stepId.enum, [...envelope.fields.steps.item.stepId.enum, envelope.fields.steps.builtinItem.stepId.const]);
   assert.deepEqual(receipt.fields.outcome.enum, ['exited', 'timeout', 'cancelled', 'output-limit', 'gate-lost', 'carrier-lost', 'abandoned-not-started', 'abandoned-before-brief']);
   assert.equal(route.common.exitCodes['3'], 'host-version-mismatch');
-  for (const name of ['supervise', 'gate', 'adopt', 'attempt-step', 'lock-scan']) {
+  for (const name of ['supervise', 'gate', 'adopt', 'attempt-step']) {
     assert.match(route.routes[name].argv, /--protocol 1/, `${name} requires the protocol flag`);
     assert.doesNotMatch(route.routes[name].argv, /--[a-z-]+=/, `${name} uses --name value syntax`);
   }

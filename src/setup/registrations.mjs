@@ -135,7 +135,7 @@ import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding
 import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
 import { listAssignmentRuns, scanAssignmentLayout } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
-import { checkRunSupervisorRoute, checkProcessContainment, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkGateKillGrace, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck, checkUnitsAwaitingResume, checkCancelWait } from './run-supervisor-checks.mjs';
+import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkRunSupervisorConfig, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck } from './run-supervisor-checks.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
 import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
@@ -2053,17 +2053,13 @@ registerCheck({
 });
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
 
-// Run supervisor (docs/platform/run-supervisor/spec.md): the containment driver agents run in, the
-// host routes, the runtime socket directory, attempts nobody holds and the gate's kill grace.
+// Run supervisor (docs/platform/run-supervisor/spec.md): the host routes with the containment driver agents
+// run in, the runtime socket directory, attempts nobody holds (and the units awaiting resume) and the
+// gate's kill grace with the cancel wait.
 // `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` are read with a default and never written by setup.
 registerCheck({
-  id: 'process-containment',
-  description: 'the host names the containment driver agents run in and its level (kernel or best-effort) with the routes around it',
-  check: (cwd) => checkProcessContainment(cwd),
-});
-registerCheck({
   id: 'run-supervisor-route',
-  description: 'the host binary serves supervise, gate, adopt and attempt-step at protocol 1',
+  description: 'the host binary serves supervise, gate, adopt and attempt-step at protocol 1 and names the containment driver agents run in and its level (kernel or best-effort)',
   check: (cwd) => checkRunSupervisorRoute(cwd),
 });
 registerCheck({
@@ -2073,28 +2069,18 @@ registerCheck({
 });
 registerCheck({
   id: 'run-attempts-stuck',
-  description: 'no attempt with a v3 envelope is left without a closed.json while its lock is free (fgos doctor --fix adopts it)',
+  description: 'no attempt with a v3 envelope is left without a closed.json while its lock is free (fgos doctor --fix adopts it; an attempt whose release was removed only warns); lists unit runs awaiting fgos run --resume (a warning, never a failure)',
   check: (cwd) => checkRunAttemptsStuck(cwd),
 });
 registerCheck({
-  id: 'gate-kill-grace',
-  description: 'dispatch.gateKillGraceMs is an integer of at least 1000 ms (default 10000)',
-  check: (cwd) => checkGateKillGrace(cwd),
+  id: 'run-supervisor-config',
+  description: 'dispatch.gateKillGraceMs is an integer of at least 1000 ms (default 10000) and dispatch.cancelWaitMs is an integer of at least 1000 ms and not shorter than it (default gateKillGraceMs + 5000)',
+  check: (cwd) => checkRunSupervisorConfig(cwd),
 });
 registerCheck({
   id: 'legacy-attempts-stuck',
   description: 'no run from before the run supervisor is left running with every recorded process dead (fgos doctor --fix settles it as abandoned-legacy; a run that cannot be proven dead is kept and its reason named)',
   check: (cwd) => checkLegacyAttemptsStuck(cwd),
-});
-registerCheck({
-  id: 'units-awaiting-resume',
-  description: 'lists unit runs whose controller is gone and whose last attempt is closed, with the fgos run --resume command (information, never a failure)',
-  check: (cwd) => checkUnitsAwaitingResume(cwd),
-});
-registerCheck({
-  id: 'cancel-wait',
-  description: 'dispatch.cancelWaitMs is an integer of at least 1000 ms and not shorter than dispatch.gateKillGraceMs (default gateKillGraceMs + 5000)',
-  check: (cwd) => checkCancelWait(cwd),
 });
 registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
 registerFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });

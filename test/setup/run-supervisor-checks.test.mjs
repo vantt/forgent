@@ -11,16 +11,13 @@ import { spawn, spawnSync } from 'node:child_process';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/checks.mjs';
 import {
   checkRunSupervisorRoute,
-  checkProcessContainment,
   checkRuntimeSocketDir,
   fixRuntimeSocketDir,
   checkRunAttemptsStuck,
   fixRunAttemptsStuck,
-  checkGateKillGrace,
+  checkRunSupervisorConfig,
   checkLegacyAttemptsStuck,
   fixLegacyAttemptsStuck,
-  checkUnitsAwaitingResume,
-  checkCancelWait,
 } from '../../src/setup/run-supervisor-checks.mjs';
 import { readGateKillGraceMs, readCancelWaitMs, DEFAULT_GATE_KILL_GRACE_MS } from '../../src/run-supervisor/gate-kill-grace.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../../src/verbs/dispatch/recover.mjs';
@@ -63,23 +60,21 @@ const probeLine = (containment) => JSON.stringify({ v: 1, protocol: 1, result: '
 
 test('the run supervisor checks and fixes are registered', () => {
   const ids = DOCTOR_CHECKS.map((check) => check.id);
-  for (const id of ['process-containment', 'run-supervisor-route', 'runtime-socket-dir', 'run-attempts-stuck', 'gate-kill-grace']) {
+  for (const id of ['run-supervisor-route', 'runtime-socket-dir', 'run-attempts-stuck', 'run-supervisor-config', 'legacy-attempts-stuck']) {
     assert.ok(ids.includes(id), `${id} is a doctor check`);
   }
+  for (const id of ['process-containment', 'gate-kill-grace', 'units-awaiting-resume', 'cancel-wait']) assert.ok(!ids.includes(id), `${id} is folded into another row`);
   const fixIds = FIX_REGISTRATIONS.map((fix) => fix.id);
-  assert.ok(fixIds.includes('runtime-socket-dir'));
-  assert.ok(fixIds.includes('run-attempts-stuck'));
-  for (const id of ['legacy-attempts-stuck', 'units-awaiting-resume', 'cancel-wait']) assert.ok(ids.includes(id), `${id} is a doctor check`);
-  assert.ok(fixIds.includes('legacy-attempts-stuck'));
+  for (const id of ['runtime-socket-dir', 'run-attempts-stuck', 'legacy-attempts-stuck']) assert.ok(fixIds.includes(id), `${id} has a fix`);
 });
 
 // ─── run-supervisor-route ───────────────────────────────────────────────
 
-test('run-supervisor-route: the real host serves all four routes; a host without them fails by name', () => {
+test('run-supervisor-route: the real host serves all four routes and names its driver and level; a host without them fails by name', () => {
   const root = workspace('route');
   const ok = checkRunSupervisorRoute(root, { bin: HOST_BIN });
   assert.equal(ok.passed, true, ok.message);
-  assert.match(ok.message, /serves supervise, gate, adopt, attempt-step at protocol 1/);
+  assert.match(ok.message, /serves supervise, gate, adopt, attempt-step at protocol 1; containment: (bwrap-pidns, level kernel|linux-pgroup, level best-effort|windows-job, level kernel|macos-tree, level best-effort)/);
 
   const silent = fakeHost('silent-host', '', 2);
   const bad = checkRunSupervisorRoute(root, { bin: silent });
@@ -90,26 +85,19 @@ test('run-supervisor-route: the real host serves all four routes; a host without
   assert.match(checkRunSupervisorRoute(root, { bin: old }).message, /host-version-mismatch/);
 });
 
-// ─── process-containment ────────────────────────────────────────────────
-
-test('process-containment: the real host names its driver and level', () => {
-  const res = checkProcessContainment(workspace('containment-real'), { bin: HOST_BIN });
-  assert.equal(res.passed, true, res.message);
-  assert.match(res.message, /(bwrap-pidns, level kernel|linux-pgroup, level best-effort|windows-job, level kernel|macos-tree, level best-effort)/);
-});
-
-test('process-containment: kernel passes; best-effort warns on Linux and informs elsewhere; no driver fails', () => {
+test('run-supervisor-route: containment kernel passes; best-effort warns on Linux and informs elsewhere; no driver fails', () => {
   const root = workspace('containment-levels');
-  const kernel = checkProcessContainment(root, { bin: fakeHost('h-kernel', probeLine({ driver: 'bwrap-pidns', level: 'kernel', escapes: ['a daemon outside the namespace'] })) });
-  assert.deepEqual(kernel, { passed: true, message: 'bwrap-pidns, level kernel; escapes: a daemon outside the namespace' });
+  const served = (bin) => `${bin} serves supervise, gate, adopt, attempt-step at protocol 1; containment: `;
+  const kernelBin = fakeHost('h-kernel', probeLine({ driver: 'bwrap-pidns', level: 'kernel', escapes: ['a daemon outside the namespace'] }));
+  assert.deepEqual(checkRunSupervisorRoute(root, { bin: kernelBin }), { passed: true, message: `${served(kernelBin)}bwrap-pidns, level kernel; escapes: a daemon outside the namespace` });
 
   const bestEffort = fakeHost('h-best', probeLine({ driver: 'linux-pgroup', level: 'best-effort', escapes: ['setsid descendants leave the process group'] }));
-  const linux = checkProcessContainment(root, { bin: bestEffort, platform: 'linux' });
+  const linux = checkRunSupervisorRoute(root, { bin: bestEffort, platform: 'linux' });
   assert.equal(linux.passed, true, 'no user namespace warns, never fails');
-  assert.match(linux.message, /^warning: linux-pgroup, level best-effort: bwrap with a user namespace is unavailable here/);
+  assert.ok(linux.message.startsWith(`warning: ${served(bestEffort)}linux-pgroup, level best-effort: bwrap with a user namespace is unavailable here`), linux.message);
   assert.match(linux.message, /escapes: setsid descendants/);
   assert.match(linux.message, /Install bwrap and enable unprivileged user namespaces/);
-  assert.match(checkProcessContainment(root, { bin: bestEffort, platform: 'darwin' }).message, /^info: linux-pgroup, level best-effort/);
+  assert.ok(checkRunSupervisorRoute(root, { bin: bestEffort, platform: 'darwin' }).message.startsWith(`info: ${served(bestEffort)}linux-pgroup, level best-effort`));
 
   const mountRefused = fakeHost('h-mount', probeLine({
     driver: 'linux-pgroup',
@@ -117,11 +105,11 @@ test('process-containment: kernel passes; best-effort warns on Linux and informs
     selectedBecause: "containment-mount-refused: bwrap: Can't bind mount /oldroot/var/tmp/x on /newroot/var/tmp/x: Invalid argument",
     escapes: ['setsid descendants leave the process group'],
   }));
-  const mountRes = checkProcessContainment(root, { bin: mountRefused, platform: 'linux' });
+  const mountRes = checkRunSupervisorRoute(root, { bin: mountRefused, platform: 'linux' });
   assert.equal(mountRes.passed, true);
-  assert.match(mountRes.message, /^warning: linux-pgroup, level best-effort: a host mount cannot be remounted \(bwrap: Can't bind mount \/oldroot\/var\/tmp\/x on \/newroot\/var\/tmp\/x: Invalid argument\); unmount or fix it, then restart long-running fgOS processes \(gateway, supervisors\), which keep the answer they probed at start, to get kernel containment/);
+  assert.match(mountRes.message, /^warning: .*containment: linux-pgroup, level best-effort: a host mount cannot be remounted \(bwrap: Can't bind mount \/oldroot\/var\/tmp\/x on \/newroot\/var\/tmp\/x: Invalid argument\); unmount or fix it, then restart long-running fgOS processes \(gateway, supervisors\), which keep the answer they probed at start, to get kernel containment/);
   assert.doesNotMatch(mountRes.message, /user namespaces are disabled/);
-  const none = checkProcessContainment(root, { bin: fakeHost('h-none', probeLine({ driver: null, level: 'unsupported', escapes: [], error: 'unsupported-platform' })) });
+  const none = checkRunSupervisorRoute(root, { bin: fakeHost('h-none', probeLine({ driver: null, level: 'unsupported', escapes: [], error: 'unsupported-platform' })) });
   assert.equal(none.passed, false);
   assert.match(none.message, /no containment driver on this machine \(unsupported-platform\)/);
   assert.match(none.message, /Rebuild the host from this checkout/);
@@ -231,26 +219,49 @@ test('runtime-socket-dir: without a socket table nothing is judged or removed', 
   assert.ok(fs.existsSync(file));
 });
 
-// ─── gate-kill-grace ────────────────────────────────────────────────────
+// ─── run-supervisor-config ──────────────────────────────────────────────
 
-test('gate-kill-grace: absent is the default, project overrides global, below 1000 or not an integer fails', () => {
-  const root = workspace('grace');
-  const globalHome = path.join(scratch, 'grace-home');
+test('run-supervisor-config: absent is the defaults, project overrides global, an unusable grace or cancel wait, or a wait shorter than the grace, fails', () => {
+  const root = workspace('config');
+  const globalHome = path.join(scratch, 'config-home');
   const globalConfigPath = globalConfigFile(globalHome);
-  assert.deepEqual(checkGateKillGrace(root, { globalConfigPath }), { passed: true, message: 'dispatch.gateKillGraceMs = 10000 (default)' });
+  const grace = (value, source) => `dispatch.gateKillGraceMs = ${value} (${source})`;
+  const wait = (value, source) => `dispatch.cancelWaitMs = ${value} (${source})`;
+  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(10000, 'default')}; ${wait(15000, 'default')}` });
 
   writeGlobalConfig(globalHome, { dispatch: { gateKillGraceMs: 4000 } });
-  assert.deepEqual(checkGateKillGrace(root, { globalConfigPath }), { passed: true, message: 'dispatch.gateKillGraceMs = 4000 (global)' });
+  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(4000, 'global')}; ${wait(9000, 'default')}` });
 
   writeProjectConfig(root, { dispatch: { gateKillGraceMs: 2500 } });
-  assert.deepEqual(checkGateKillGrace(root, { globalConfigPath }), { passed: true, message: 'dispatch.gateKillGraceMs = 2500 (project)' });
+  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(2500, 'project')}; ${wait(7500, 'default')}` });
 
   for (const bad of [999, 0, -5, 1500.5, '5000']) {
     writeProjectConfig(root, { dispatch: { gateKillGraceMs: bad } });
-    const res = checkGateKillGrace(root, { globalConfigPath });
+    const res = checkRunSupervisorConfig(root, { globalConfigPath });
     assert.equal(res.passed, false, `${JSON.stringify(bad)} is refused`);
-    assert.match(res.message, /must be an integer of at least 1000 ms/);
+    assert.match(res.message, /dispatch\.gateKillGraceMs must be an integer of at least 1000 ms/);
   }
+
+  writeGlobalConfig(globalHome, { dispatch: { cancelWaitMs: 20000 } });
+  writeProjectConfig(root, {});
+  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(10000, 'default')}; ${wait(20000, 'global')}` });
+  writeProjectConfig(root, { dispatch: { cancelWaitMs: 12000 } });
+  assert.deepEqual(checkRunSupervisorConfig(root, { globalConfigPath }), { passed: true, message: `${grace(10000, 'default')}; ${wait(12000, 'project')}` });
+
+  for (const bad of [999, 0, 1500.5, '9000']) {
+    writeProjectConfig(root, { dispatch: { cancelWaitMs: bad } });
+    const res = checkRunSupervisorConfig(root, { globalConfigPath });
+    assert.equal(res.passed, false, `${JSON.stringify(bad)} is refused`);
+    assert.match(res.message, /dispatch\.cancelWaitMs must be an integer of at least 1000 ms/);
+  }
+  writeProjectConfig(root, { dispatch: { cancelWaitMs: 5000 } });
+  const short = checkRunSupervisorConfig(root, { globalConfigPath: path.join(scratch, 'config-home-empty', 'config.json') });
+  assert.equal(short.passed, false);
+  assert.match(short.message, /shorter than dispatch\.gateKillGraceMs = 10000/);
+
+  writeProjectConfig(root, { dispatch: { gateKillGraceMs: 10, cancelWaitMs: 10 } });
+  const both = checkRunSupervisorConfig(root, { globalConfigPath: path.join(scratch, 'config-home-empty', 'config.json') });
+  assert.match(both.message, /dispatch\.gateKillGraceMs must be an integer.*; dispatch\.cancelWaitMs must be an integer/, 'one snapshot reports both keys');
 });
 
 test('the gate kill grace reader follows the same merge and refuses an unusable value', () => {
@@ -322,7 +333,8 @@ test('run-attempts-stuck: an attempt whose release was removed is named with the
   const dir = attemptDir(root, 'gone');
   fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: gone }));
   const res = checkRunAttemptsStuck(root);
-  assert.equal(res.passed, false, res.message);
+  assert.equal(res.passed, true, 'adopt can never close it: a warning, not a failure');
+  assert.match(res.message, /^warning: 1 attempt\(s\) cannot be closed by adopt: /);
   assert.match(res.message, new RegExp(`runs/01 \\(the release that wrote it was removed \\(${gone} is gone\\)`));
   assert.match(res.message, /restore them at those paths, then run "fgos doctor --fix" again/);
   assert.match(fixRunAttemptsStuck(root).message, /1 still open: .*the release that wrote it was removed/);
@@ -334,7 +346,17 @@ test('run-attempts-stuck: an attempt whose release was removed is named with the
 
   // A release that is still there is not blamed: adopt's own reason stands.
   fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: HOST_BIN }));
-  assert.doesNotMatch(checkRunAttemptsStuck(root).message, /was removed/);
+  const blamed = checkRunAttemptsStuck(root);
+  assert.equal(blamed.passed, false, 'a stuck attempt adopt could close still fails');
+  assert.doesNotMatch(blamed.message, /was removed/);
+
+  // Other stuck attempts keep failing, and the removed release is still named next to them.
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: gone }));
+  attemptDir(root, 'free');
+  const mixed = checkRunAttemptsStuck(root);
+  assert.equal(mixed.passed, false, mixed.message);
+  assert.match(mixed.message, /1 attempt\(s\) have no holder and no closed\.json: .*assignments\/free\/runs\/01/);
+  assert.match(mixed.message, /1 attempt\(s\) cannot be closed by adopt: .*the release that wrote it was removed/);
 });
 
 test('run-attempts-stuck: a held lock is a running attempt, not a finding', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
@@ -412,7 +434,7 @@ test('legacy-attempts-stuck: a run with a live recorded process is kept and the 
   assert.match(after.message, /^warning: 1 run\(s\) from before the run supervisor are left running and stay open: .*pid-alive/);
 });
 
-// ─── units-awaiting-resume ──────────────────────────────────────────────
+// ─── units awaiting resume (judged by run-attempts-stuck) ───────────────
 
 /** A unit run whose only attempt is closed (no controller, no summary): it awaits resume. */
 function unitWithAttempt(root, unitRunId, { closed }) {
@@ -429,56 +451,27 @@ function unitWithAttempt(root, unitRunId, { closed }) {
   return unitDir;
 }
 
-test('units-awaiting-resume: no unit passes; a unit with a closed attempt warns with the resume command and never fails', () => {
+test('run-attempts-stuck: no unit passes; a unit with a closed attempt warns with the resume command and never fails', () => {
   process.env.FGOS_HOST_BIN = HOST_BIN;
   const root = workspace('units-awaiting');
-  assert.equal(checkUnitsAwaitingResume(root).message, 'no unit run to resume');
+  assert.equal(checkRunAttemptsStuck(root).message, 'no attempt waits to be closed');
   const unitDir = unitWithAttempt(root, 'unit-closed', { closed: true });
-  const res = checkUnitsAwaitingResume(root);
+  const res = checkRunAttemptsStuck(root);
   assert.equal(res.passed, true, 'information, not a failure');
   assert.match(res.message, /^warning: 1 unit run\(s\) await resume: "fgos run --resume unit-closed"/);
 
   fs.writeFileSync(path.join(unitDir, 'unit-summary.json'), JSON.stringify({ outcome: 'pass' }));
-  assert.match(checkUnitsAwaitingResume(root).message, /1 unit run\(s\), none awaiting resume/);
+  assert.equal(checkRunAttemptsStuck(root).message, 'no attempt waits to be closed');
 });
 
-test('units-awaiting-resume: a unit whose attempt is not closed is not awaiting resume', () => {
+test('run-attempts-stuck: a unit whose attempt is not closed is not awaiting resume', () => {
   process.env.FGOS_HOST_BIN = HOST_BIN;
   const root = workspace('units-running');
   unitWithAttempt(root, 'unit-open', { closed: false });
   const run = path.join(root, '.fgos', 'assignments', 'unit-open/producer/1/runs/01');
   fs.writeFileSync(path.join(run, 'attempt.lock'), '');
   fs.writeFileSync(path.join(run, 'envelope.json'), JSON.stringify({ v: 3 }));
-  assert.match(checkUnitsAwaitingResume(root).message, /none awaiting resume/);
-});
-
-// ─── cancel-wait ────────────────────────────────────────────────────────
-
-test('cancel-wait: absent is the grace plus five seconds, project overrides global, unusable or shorter than the grace fails', () => {
-  const root = workspace('cancel-wait');
-  const globalHome = path.join(scratch, 'cancel-home');
-  const globalConfigPath = globalConfigFile(globalHome);
-  assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 15000 (default)' });
-
-  writeGlobalConfig(globalHome, { dispatch: { gateKillGraceMs: 2000 } });
-  assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 7000 (default)' });
-
-  writeGlobalConfig(globalHome, { dispatch: { cancelWaitMs: 20000 } });
-  assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 20000 (global)' });
-
-  writeProjectConfig(root, { dispatch: { cancelWaitMs: 12000 } });
-  assert.deepEqual(checkCancelWait(root, { globalConfigPath }), { passed: true, message: 'dispatch.cancelWaitMs = 12000 (project)' });
-
-  for (const bad of [999, 0, 1500.5, '9000']) {
-    writeProjectConfig(root, { dispatch: { cancelWaitMs: bad } });
-    const res = checkCancelWait(root, { globalConfigPath });
-    assert.equal(res.passed, false, `${JSON.stringify(bad)} is refused`);
-    assert.match(res.message, /must be an integer of at least 1000 ms/);
-  }
-  writeProjectConfig(root, { dispatch: { cancelWaitMs: 5000 } });
-  const short = checkCancelWait(root, { globalConfigPath: path.join(scratch, 'cancel-home-empty', 'config.json') });
-  assert.equal(short.passed, false);
-  assert.match(short.message, /shorter than dispatch\.gateKillGraceMs = 10000/);
+  assert.doesNotMatch(checkRunAttemptsStuck(root).message, /await resume/, 'the open attempt is judged by the same scan and the unit is running');
 });
 
 test('the cancel wait reader shares the gate kill grace merge and refuses an unusable value', () => {
@@ -489,5 +482,5 @@ test('the cancel wait reader shares the gate kill grace merge and refuses an unu
   writeProjectConfig(root, { dispatch: { cancelWaitMs: 10 } });
   assert.throws(() => readCancelWaitMs({ projectRoot: root }), { name: 'RunnerConfigError', category: 'validation', code: 'invalid-cancel-wait', message: /dispatch\.cancelWaitMs must be an integer of at least 1000/ });
   // The doctor check names the same key with the same words.
-  assert.match(checkCancelWait(root, { globalConfigPath: path.join(scratch, 'no-global-config.json') }).message, /dispatch\.cancelWaitMs must be an integer of at least 1000/);
+  assert.match(checkRunSupervisorConfig(root, { globalConfigPath: path.join(scratch, 'no-global-config.json') }).message, /dispatch\.cancelWaitMs must be an integer of at least 1000/);
 });

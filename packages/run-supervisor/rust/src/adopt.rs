@@ -14,6 +14,8 @@ use std::time::Duration;
 use fgos_holder_lock::{
     predecessor, Acquire, HeldReason, Mode, Probe, Resource, Wait, DEFAULT_KILL_WAIT_MS,
 };
+use fgos_process::control::{signal_by_identity, Signal};
+use fgos_process::facts::{ProcTuple, Record, Verdict as Judged};
 use fgos_process::{domain_watch, facts, DomainState};
 use serde_json::{json, Value};
 
@@ -158,6 +160,16 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
     }
     let binding = read_json(&dir.join("supervisor-binding.json"));
     let envelope_json = read_json(&dir.join("envelope.json"));
+    // A run dir named on purpose may wait out a domain, so a bound gate that is not provably dead still owns it: where the lock dies with the
+    // supervisor (Windows) a free lock says nothing, and ending the domain would kill a live agent.
+    // (a scan already refuses a non-empty domain)
+    if matches!(args.target, Target::RunDir(_))
+        && binding
+            .as_ref()
+            .is_some_and(|b| facts::judge_here(&Record::from_json(&b["gate"])) != Judged::Dead)
+    {
+        return Verdict::because("running", "gate-alive");
+    }
     let refusal = binding
         .is_none()
         .then(|| start_refusal(dir, envelope_json.as_ref()))
@@ -179,6 +191,18 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
         (None, Some(record)) => domain_of(record),
         (None, None) => DomainState::Empty,
     };
+    // A best-effort domain does not hold an agent that leads a group of its own: the published agent counts too.
+    let agent = best_effort_agent(dir, binding.as_ref());
+    let domain_state = match domain_state {
+        DomainState::Empty
+            if agent
+                .as_ref()
+                .is_some_and(|a| facts::judge_here(a) != Judged::Dead) =>
+        {
+            DomainState::NotEmpty
+        }
+        state => state,
+    };
     if args.probe_only {
         return match domain_state {
             DomainState::Empty => match &refusal {
@@ -192,7 +216,7 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
     if matches!(args.target, Target::Scan) && domain_state != DomainState::Empty {
         return Verdict::because("running", "domain-not-empty");
     }
-    adopt_locked(dir, &resource, binding.is_some(), args)
+    adopt_locked(dir, &resource, binding.is_some(), agent, args)
 }
 
 /// The attempt lock is held: an adopter's `adopting.json` tells it from the supervisor.
@@ -204,7 +228,46 @@ fn held_state(dir: &Path) -> Verdict {
     })
 }
 
-fn adopt_locked(dir: &Path, resource: &Resource, bound: bool, args: &AdoptArgs) -> Verdict {
+/// The agent `agent-binding.json` names, when the binding says the domain is only best-effort.
+fn best_effort_agent(dir: &Path, binding: Option<&Value>) -> Option<Record> {
+    if binding?["guarantee"]["containment"] != "best-effort" {
+        return None;
+    }
+    Some(Record::from_json(
+        &read_json(&dir.join("agent-binding.json"))?["agent"],
+    ))
+}
+
+/// Ends the agent by identity and waits at most `wait_ms`; `false` when it may still live.
+fn agent_ended(agent: &Record, wait_ms: u64) -> bool {
+    if facts::judge_here(agent) == Judged::Dead {
+        return true;
+    }
+    // Only the exact process the record names: the live process under that pid must carry the recorded start time.
+    let tuple: Option<ProcTuple> = agent
+        .pid
+        .and_then(facts::identity_of)
+        .filter(|t| t.to_record().start_time == agent.start_time);
+    if let Some(tuple) = tuple {
+        let _ = signal_by_identity(&tuple, Signal::Kill);
+    }
+    let until = std::time::Instant::now() + Duration::from_millis(wait_ms);
+    while facts::judge_here(agent) != Judged::Dead {
+        if std::time::Instant::now() >= until {
+            return false;
+        }
+        std::thread::sleep(Duration::from_millis(25));
+    }
+    true
+}
+
+fn adopt_locked(
+    dir: &Path,
+    resource: &Resource,
+    bound: bool,
+    agent: Option<Record>,
+    args: &AdoptArgs,
+) -> Verdict {
     let handle = match fgos_holder_lock::acquire(resource, Mode::Ex, Wait::Try, args.kill_wait_ms) {
         Acquire::Acquired(handle) => handle,
         Acquire::Held {
@@ -217,6 +280,10 @@ fn adopt_locked(dir: &Path, resource: &Resource, bound: bool, args: &AdoptArgs) 
             return Verdict::because("open", format!("{}: {detail}", reason.as_str()))
         }
     };
+    // The steps never run over a live agent.
+    if agent.is_some_and(|a| !agent_ended(&a, args.kill_wait_ms)) {
+        return Verdict::because("held", "agent-alive");
+    }
     let verdict = drive(dir, bound);
     // The marker only describes the current holder; it goes before the lock does.
     let _ = std::fs::remove_file(dir.join("adopting.json"));

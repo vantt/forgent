@@ -10,7 +10,7 @@ import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { ensurePrivateDir, writeOwnershipMarkerV2, extendOwnershipMarker } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { sweepAttempts } from '../../src/run-supervisor/sweep.mjs';
+import { sweepAttempts } from '../../src/run-supervisor/client.mjs';
 
 const REPO = path.resolve(import.meta.dirname, '../..');
 const HOST = process.env.FGOS_HOST_BIN;
@@ -120,7 +120,7 @@ test('two adopters over one dead attempt remove its home once', { skip: NEEDS_HO
     const home = attemptHome(w, { attemptId: 'att-r4', runDir });
     const countFile = path.join(w.root, 'finalized.count');
     deadAttempt(w, 'r4', home, { countFile });
-    const sweepScript = `import(${JSON.stringify(path.join(REPO, 'src/run-supervisor/sweep.mjs'))}).then((m) => { m.sweepAttempts({ assignmentsRoot: ${JSON.stringify(w.assignmentsRoot)} }); });`;
+    const sweepScript = `import(${JSON.stringify(path.join(REPO, 'src/run-supervisor/client.mjs'))}).then((m) => { m.sweepAttempts({ assignmentsRoot: ${JSON.stringify(w.assignmentsRoot)} }); });`;
     const run = () => new Promise((resolve) => {
       const child = spawn(process.execPath, ['-e', sweepScript], { stdio: 'ignore', env: { ...process.env, FGOS_HOST_BIN: HOST } });
       child.once('exit', resolve);

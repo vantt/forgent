@@ -7,6 +7,9 @@
 // `run-attempts-stuck` sends the unclosed attempts through the adopt door, `legacy-attempts-stuck`
 // settles runs from before the supervisor through the legacy sweep (the recover door is passed in by
 // the registration: it is a use case above this layer).
+// Five rows cover the layer: `run-supervisor-route` (routes and containment driver), `runtime-socket-dir`,
+// `run-attempts-stuck` (stuck attempts, attempts whose release is gone, units awaiting resume),
+// `run-supervisor-config` (kill grace and cancel wait) and `legacy-attempts-stuck`.
 //
 // Levels follow the doctor convention: `passed: false` fails, a message that starts with
 // `warning:` warns, `info:` is informational, anything else passes.
@@ -19,8 +22,7 @@ import { hostBin } from '../holder-lock/driver.mjs';
 import { routeEnv } from '../util/host-bin-path.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from '../run-supervisor/protocol.mjs';
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES } from '../run-supervisor/runtime-dir.mjs';
-import { adoptRun, adoptScan, listOpenAttemptDirs } from '../run-supervisor/client.mjs';
-import { sweepAttempts } from '../run-supervisor/sweep.mjs';
+import { adoptScan, listOpenAttemptDirs, sweepAttempts } from '../run-supervisor/client.mjs';
 import { findLegacyStuck, judgeLegacyHolders, sweepLegacy } from '../run-supervisor/legacy-sweep.mjs';
 import { GATE_KILL_GRACE_KEY, readDispatchConfig, resolveGateKillGrace, gateKillGraceProblem, CANCEL_WAIT_KEY, resolveCancelWait, cancelWaitProblem } from '../run-supervisor/gate-kill-grace.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
@@ -80,36 +82,13 @@ function resolveBin(repoRoot, override) {
 // run-supervisor-route
 // ---------------------------------------------------------------------
 
-/** The host binary answers `--probe` on every route of the run supervisor at protocol 1. */
-export function checkRunSupervisorRoute(repoRoot, { bin: binOverride } = {}) {
-  const { bin, error } = resolveBin(repoRoot, binOverride);
-  if (error) return { passed: false, message: `no host binary to ask for the run supervisor routes: ${error}` };
-  const missing = [];
-  for (const route of ROUTES) {
-    const answer = probeRoute(bin, route);
-    if (answer.error) missing.push(`${route}: ${answer.error}`);
-  }
-  if (missing.length > 0) {
-    return { passed: false, message: `${bin} does not serve the run supervisor at protocol ${PROTOCOL} (${listed(missing)}); restage and activate a release built from this tree` };
-  }
-  return { passed: true, message: `${bin} serves ${ROUTES.join(', ')} at protocol ${PROTOCOL}` };
-}
-
-// ---------------------------------------------------------------------
-// process-containment
-// ---------------------------------------------------------------------
-
 /**
  * The containment driver the host runs agents in on this machine, its level and the routes around
- * it. `kernel` passes. `best-effort` warns on Linux (no bwrap user namespace: the process-group
- * driver runs instead) and is informational on macOS (the best the platform offers).
- * `unsupported` fails.
+ * it, from the answer of the `supervise` probe. `kernel` passes. `best-effort` warns on Linux (no bwrap
+ * user namespace: the process-group driver runs instead) and is informational on macOS (the best the
+ * platform offers). `unsupported` fails.
  */
-export function checkProcessContainment(repoRoot, { platform = process.platform, bin: binOverride } = {}) {
-  const { bin, error } = resolveBin(repoRoot, binOverride);
-  if (error) return { passed: false, message: `no host binary to ask for the containment driver: ${error}` };
-  const answer = probeRoute(bin, 'supervise');
-  if (answer.error) return { passed: false, message: `${bin} did not report its containment driver: ${answer.error}` };
+function containmentOf(answer, { platform }) {
   const { driver, level, escapes = [], error: driverError, selectedBecause } = answer.containment ?? {};
   const escapeText = escapes.length > 0 ? `; escapes: ${listed(escapes)}` : '';
   if (level === 'kernel') return { passed: true, message: `${driver}, level kernel${escapeText}` };
@@ -125,6 +104,30 @@ export function checkProcessContainment(repoRoot, { platform = process.platform,
     return { passed: true, message: info(`${driver}, level best-effort${escapeText}`) };
   }
   return { passed: false, message: `no containment driver on this machine (${driverError ?? 'unsupported'}); fgos run cannot start an agent. Rebuild the host from this checkout (\`npm run fgos:dev\`) or restage the active release, then run \`fgos doctor\`` };
+}
+
+/**
+ * The host binary answers `--probe` on every route of the run supervisor at protocol 1, and the
+ * `supervise` answer names a usable containment driver: one probe of that route serves both.
+ */
+export function checkRunSupervisorRoute(repoRoot, { platform = process.platform, bin: binOverride } = {}) {
+  const { bin, error } = resolveBin(repoRoot, binOverride);
+  if (error) return { passed: false, message: `no host binary to ask for the run supervisor routes: ${error}` };
+  const missing = [];
+  let supervise;
+  for (const route of ROUTES) {
+    const answer = probeRoute(bin, route);
+    if (answer.error) missing.push(`${route}: ${answer.error}`);
+    else if (route === 'supervise') supervise = answer;
+  }
+  if (missing.length > 0) {
+    return { passed: false, message: `${bin} does not serve the run supervisor at protocol ${PROTOCOL} (${listed(missing)}); restage and activate a release built from this tree` };
+  }
+  const containment = containmentOf(supervise, { platform });
+  if (!containment.passed) return containment;
+  // The containment text keeps its own level prefix; the row carries it in front.
+  const level = /^(warning|info): /.exec(containment.message)?.[0] ?? '';
+  return { passed: true, message: `${level}${bin} serves ${ROUTES.join(', ')} at protocol ${PROTOCOL}; containment: ${containment.message.slice(level.length)}` };
 }
 
 // ---------------------------------------------------------------------
@@ -287,28 +290,62 @@ const stuckEntry = (verdict) => {
   return `${verdict.attemptDir}${reason ? ` (${reason})` : ''}`;
 };
 
+/** Unit runs whose controller is gone and whose last attempt is closed, as the resume commands to type. */
+function unitsAwaitingResume(repoRoot, verdicts) {
+  const fgosDir = fgosDirFromRoot(repoRoot);
+  const unitDirs = new Set();
+  for (const { assignmentId } of listAssignmentRuns(fgosDir)) {
+    const unitDir = unitDirOfAssignment(fgosDir, assignmentId);
+    if (unitDir) unitDirs.add(unitDir);
+  }
+  // The scan already judged every attempt that is not closed; one that is not in it is closed.
+  const byDir = new Map(verdicts.map((verdict) => [verdict.attemptDir, verdict]));
+  const probe = (attemptDir) => byDir.get(attemptDir) ?? { state: 'closed' };
+  const waiting = [];
+  for (const unitDir of [...unitDirs].sort()) {
+    const unit = deriveUnitState(unitDir, { probe });
+    if (unit.unitState === 'awaiting-resume') waiting.push(unit.resumeCommand);
+  }
+  return waiting;
+}
+
 /**
- * Attempts with a v3 envelope and no `closed.json` whose lock nobody holds, found through the adopt
- * route's `--probe-only` (nothing is written). A held lock is a running attempt, not a finding.
+ * Attempts with a v3 envelope and no `closed.json` whose lock nobody holds, found through one adopt
+ * `--probe-only` scan (nothing is written): they fail, except an attempt whose release was removed, which
+ * adopt can never close and so only warns. A held lock is a running attempt, not a finding. The same scan
+ * judges the unit runs awaiting `fgos run --resume`, which warn and never fail.
  */
 export function checkRunAttemptsStuck(repoRoot) {
   const assignmentsRoot = assignmentsRootOf(repoRoot);
-  if (listOpenAttemptDirs(assignmentsRoot).length === 0) return { passed: true, message: 'no attempt waits to be closed' };
-  const { bin, error } = resolveBin(repoRoot);
-  if (error) return { passed: true, message: warn(`attempts are open but the host cannot judge them: ${error}`) };
-  let verdicts;
-  try {
-    verdicts = adoptScan({ assignmentsRoot, probeOnly: true, hostBin: bin });
-  } catch (err) {
-    return { passed: true, message: warn(`attempts are open but adopt could not judge them: ${err.message}`) };
+  let verdicts = [];
+  if (listOpenAttemptDirs(assignmentsRoot).length > 0) {
+    const { bin, error } = resolveBin(repoRoot);
+    if (error) return { passed: true, message: warn(`attempts are open but the host cannot judge them: ${error}`) };
+    try {
+      verdicts = adoptScan({ assignmentsRoot, probeOnly: true, hostBin: bin });
+    } catch (err) {
+      return { passed: true, message: warn(`attempts are open but adopt could not judge them: ${err.message}`) };
+    }
   }
   const stuck = verdicts.filter((verdict) => STUCK_STATES.has(verdict.state));
-  if (stuck.length === 0) {
-    const running = verdicts.filter((verdict) => verdict.state === 'running' || verdict.state === 'being-adopted').length;
-    return { passed: true, message: `${verdicts.length} open attempt(s), none stuck${running > 0 ? ` (${running} running)` : ''}` };
+  const gone = stuck.filter((verdict) => releaseGoneReason(verdict.attemptDir));
+  const failing = stuck.filter((verdict) => !gone.includes(verdict));
+  const warnings = [];
+  if (gone.length > 0) warnings.push(`${gone.length} attempt(s) cannot be closed by adopt: ${listed(gone.map(stuckEntry))}`);
+  try {
+    const waiting = unitsAwaitingResume(repoRoot, verdicts);
+    if (waiting.length > 0) warnings.push(`${waiting.length} unit run(s) await resume: ${listed(waiting.map((command) => `"${command}"`))}`);
+  } catch (err) {
+    warnings.push(`unit runs exist but adopt could not judge them: ${err.message}`);
   }
-  const named = stuck.map(stuckEntry);
-  return { passed: false, message: `${stuck.length} attempt(s) have no holder and no closed.json: ${listed(named)} -- run "fgos doctor --fix"` };
+  if (failing.length > 0) {
+    const text = `${failing.length} attempt(s) have no holder and no closed.json: ${listed(failing.map(stuckEntry))} -- run "fgos doctor --fix"`;
+    return { passed: false, message: warnings.length > 0 ? `${text}; ${warnings.join('; ')}` : text };
+  }
+  if (warnings.length > 0) return { passed: true, message: warn(warnings.join('; ')) };
+  if (verdicts.length === 0) return { passed: true, message: 'no attempt waits to be closed' };
+  const running = verdicts.filter((verdict) => verdict.state === 'running' || verdict.state === 'being-adopted').length;
+  return { passed: true, message: `${verdicts.length} open attempt(s), none stuck${running > 0 ? ` (${running} running)` : ''}` };
 }
 
 export function fixRunAttemptsStuck(repoRoot) {
@@ -321,24 +358,6 @@ export function fixRunAttemptsStuck(repoRoot) {
   const left = (result.adopt ?? []).filter((verdict) => STUCK_STATES.has(verdict.state));
   const message = `adopted ${adopted.length} attempt(s)${left.length > 0 ? `; ${left.length} still open: ${listed(left.map(stuckEntry))}` : ''}`;
   return { changed: adopted.length > 0, message };
-}
-
-// ---------------------------------------------------------------------
-// gate-kill-grace
-// ---------------------------------------------------------------------
-
-/** `dispatch.gateKillGraceMs` after the config merge (project over global): value and source; below 1000 ms fails. */
-export function checkGateKillGrace(repoRoot, { globalConfigPath } = {}) {
-  let snapshot;
-  try {
-    snapshot = readDispatchConfig({ projectRoot: path.resolve(repoRoot), globalConfigPath });
-  } catch (err) {
-    return { passed: false, message: `${GATE_KILL_GRACE_KEY} unreadable: ${err.message}` };
-  }
-  const { value, source } = resolveGateKillGrace(snapshot);
-  const problem = gateKillGraceProblem(value);
-  if (problem) return { passed: false, message: `${problem} (${source})` };
-  return { passed: true, message: `${GATE_KILL_GRACE_KEY} = ${value} (${source})` };
 }
 
 // ---------------------------------------------------------------------
@@ -382,59 +401,32 @@ export function fixLegacyAttemptsStuck(repoRoot, { door, ...judgeOptions }) {
 }
 
 // ---------------------------------------------------------------------
-// units-awaiting-resume
+// run-supervisor-config
 // ---------------------------------------------------------------------
 
 /**
- * Unit runs whose controller is gone and whose last attempt is closed, with no summary: information, not
- * a failure (nothing continues on its own; a person types `fgos run --resume <unit>`). Read-only; each
- * unit is judged by `deriveUnitState` over the adopt probe.
+ * `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` after the config merge (project over global), read
+ * once: value and source of each. The grace fails below 1000 ms or when not an integer; the cancel wait
+ * fails when unusable or shorter than the grace (the controller would leave before the gate could finish
+ * stopping the agent).
  */
-export function checkUnitsAwaitingResume(repoRoot, { bin: binOverride } = {}) {
-  const fgosDir = fgosDirFromRoot(repoRoot);
-  const unitDirs = new Set();
-  for (const { assignmentId } of listAssignmentRuns(fgosDir)) {
-    const unitDir = unitDirOfAssignment(fgosDir, assignmentId);
-    if (unitDir) unitDirs.add(unitDir);
-  }
-  if (unitDirs.size === 0) return { passed: true, message: 'no unit run to resume' };
-  const { bin, error } = resolveBin(repoRoot, binOverride);
-  if (error) return { passed: true, message: warn(`unit runs exist but the host cannot judge their attempts: ${error}`) };
-  const probe = (attemptDir) => adoptRun(attemptDir, { probeOnly: true, hostBin: bin });
-  const waiting = [];
-  try {
-    for (const unitDir of [...unitDirs].sort()) {
-      const unit = deriveUnitState(unitDir, { probe });
-      if (unit.unitState === 'awaiting-resume') waiting.push(unit.resumeCommand);
-    }
-  } catch (err) {
-    return { passed: true, message: warn(`unit runs exist but adopt could not judge them: ${err.message}`) };
-  }
-  if (waiting.length === 0) return { passed: true, message: `${unitDirs.size} unit run(s), none awaiting resume` };
-  return { passed: true, message: warn(`${waiting.length} unit run(s) await resume: ${listed(waiting.map((command) => `"${command}"`))}`) };
-}
-
-// ---------------------------------------------------------------------
-// cancel-wait
-// ---------------------------------------------------------------------
-
-/**
- * `dispatch.cancelWaitMs` after the config merge (project over global): value and source. It fails
- * when unusable or shorter than `dispatch.gateKillGraceMs`: the controller would leave before the gate
- * could finish stopping the agent.
- */
-export function checkCancelWait(repoRoot, { globalConfigPath } = {}) {
+export function checkRunSupervisorConfig(repoRoot, { globalConfigPath } = {}) {
   let snapshot;
   try {
     snapshot = readDispatchConfig({ projectRoot: path.resolve(repoRoot), globalConfigPath });
   } catch (err) {
-    return { passed: false, message: `${CANCEL_WAIT_KEY} unreadable: ${err.message}` };
+    return { passed: false, message: `${GATE_KILL_GRACE_KEY} and ${CANCEL_WAIT_KEY} unreadable: ${err.message}` };
   }
-  const { value, source, grace } = resolveCancelWait(snapshot);
-  const problem = cancelWaitProblem(value);
-  if (problem) return { passed: false, message: `${problem} (${source})` };
-  if (Number.isInteger(grace) && value < grace) {
-    return { passed: false, message: `${CANCEL_WAIT_KEY} = ${value} (${source}) is shorter than ${GATE_KILL_GRACE_KEY} = ${grace}: a stopped controller would leave before the gate can finish stopping the agent` };
+  const grace = resolveGateKillGrace(snapshot);
+  const wait = resolveCancelWait(snapshot);
+  const problems = [];
+  const graceProblem = gateKillGraceProblem(grace.value);
+  if (graceProblem) problems.push(`${graceProblem} (${grace.source})`);
+  const waitProblem = cancelWaitProblem(wait.value);
+  if (waitProblem) problems.push(`${waitProblem} (${wait.source})`);
+  else if (Number.isInteger(wait.grace) && wait.value < wait.grace) {
+    problems.push(`${CANCEL_WAIT_KEY} = ${wait.value} (${wait.source}) is shorter than ${GATE_KILL_GRACE_KEY} = ${wait.grace}: a stopped controller would leave before the gate can finish stopping the agent`);
   }
-  return { passed: true, message: `${CANCEL_WAIT_KEY} = ${value} (${source})` };
+  if (problems.length > 0) return { passed: false, message: problems.join('; ') };
+  return { passed: true, message: `${GATE_KILL_GRACE_KEY} = ${grace.value} (${grace.source}); ${CANCEL_WAIT_KEY} = ${wait.value} (${wait.source})` };
 }

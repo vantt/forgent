@@ -97,19 +97,31 @@ impl Fixture {
 
     /// `supervisor-binding.json` naming `tuple` as the gate and the domain.
     pub fn bind(&self, tuple: &ProcTuple) {
-        self.bind_domain(&predecessor::domain_json(&Domain::LinuxGate(tuple.clone())));
+        self.bind_domain(
+            tuple,
+            &predecessor::domain_json(&Domain::LinuxGate(tuple.clone())),
+        );
     }
 
-    /// The binding for any domain record (`{domainKind, domainId}`).
-    pub fn bind_domain(&self, record: &Value) {
+    /// The binding for any domain record (`{domainKind, domainId}`) led by `gate`.
+    pub fn bind_domain(&self, gate: &ProcTuple, record: &Value) {
         let binding = json!({
             "v": 1, "attemptId": self.attempt_id, "envelopeDigest": "sha256:0",
-            "supervisor": record["domainId"], "gate": record["domainId"],
+            "supervisor": record["domainId"], "gate": gate.to_record().to_json(),
             "domain": {"kind": record["domainKind"], "id": record["domainId"]},
             "guarantee": {"containment": "kernel", "lock": "kernel"},
             "boundAt": "2026-10-18T00:00:00.000Z",
         });
         fs::write(self.path("supervisor-binding.json"), binding.to_string()).unwrap();
+    }
+
+    /// The binding of a driver that only does its best, and the agent the gate published.
+    pub fn best_effort_agent(&self, agent: &ProcTuple) {
+        let mut binding = self.json("supervisor-binding.json").expect("bind first");
+        binding["guarantee"]["containment"] = json!("best-effort");
+        fs::write(self.path("supervisor-binding.json"), binding.to_string()).unwrap();
+        let published = json!({"v": 1, "attemptId": self.attempt_id, "envelopeDigest": "sha256:0", "agent": agent.to_record().to_json(), "at": "2026-10-18T00:00:00.000Z"});
+        fs::write(self.path("agent-binding.json"), published.to_string()).unwrap();
     }
 
     /// The record a supervisor declared into the lock before it died.

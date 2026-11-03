@@ -101,7 +101,7 @@ import { mintWorkId } from '../util/identity-mint.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { chooseStageOperation, executeDriverOperationChoice } from './operation-choice.mjs';
 import { runOutcome } from './dispatch/run-result.mjs';
-import { sweepAttempts } from '../run-supervisor/sweep.mjs';
+import { sweepAttempts } from '../run-supervisor/client.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 

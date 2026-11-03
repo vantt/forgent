@@ -45,8 +45,7 @@ import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
 import { createConfinementCredentialRenewal } from '../dispatch/confinement/cleanup.mjs';
-import { sweepAttempts } from '../../run-supervisor/sweep.mjs';
-import { adoptRun } from '../../run-supervisor/client.mjs';
+import { adoptRun, sweepAttempts } from '../../run-supervisor/client.mjs';
 import { installCancelOnSignal, assertNotCancelled, RunCancelledError } from '../../run-supervisor/cancel-registry.mjs';
 import { cancelOnSignalEnabled } from '../../run-supervisor/cancel-opt-in.mjs';
 import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';

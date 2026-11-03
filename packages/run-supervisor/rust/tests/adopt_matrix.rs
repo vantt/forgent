@@ -6,8 +6,12 @@ mod support;
 
 use std::fs;
 
+use fgos_holder_lock::predecessor;
+use fgos_process::Domain;
 use serde_json::json;
-use support::adopt_fixture::{adopt, attempt, dead_tuple, hold_lock, live_process, lock_is_free};
+use support::adopt_fixture::{
+    adopt, adopt_with, attempt, dead_tuple, hold_lock, live_process, lock_is_free,
+};
 
 const STEPS: [&str; 2] = ["settle-attempt", "finalize-home"];
 
@@ -229,7 +233,7 @@ fn adopt_probe_only_reports_without_writing_or_running_anything() {
     let line = adopt(&a.dir, &["--probe-only"]);
     assert_eq!(
         (line["state"].as_str(), line["reason"].as_str()),
-        (Some("running"), Some("domain-not-empty"))
+        (Some("running"), Some("gate-alive"))
     );
     assert_eq!(a.snapshot(), before);
     child.kill().unwrap();
@@ -240,7 +244,10 @@ fn adopt_probe_only_reports_without_writing_or_running_anything() {
 fn adopt_a_domain_that_a_dead_gate_left_behind_is_ended_before_the_attempt_goes_on() {
     let a = attempt("matrix-domain", &STEPS);
     let (mut child, tuple) = live_process();
-    a.bind(&tuple);
+    a.bind_domain(
+        &dead_tuple(),
+        &predecessor::domain_json(&Domain::LinuxGate(tuple.clone())),
+    );
     a.declare(&tuple);
     a.gate_exit("agent");
     let line = adopt(&a.dir, &[]);
@@ -272,7 +279,7 @@ fn adopt_a_domain_that_cannot_be_judged_stays_held_and_nothing_else_happens() {
             "keeper": null,
         },
     });
-    a.bind_domain(&record);
+    a.bind_domain(&dead_tuple(), &record);
     a.declare_record(&record);
     let line = adopt(&a.dir, &["--kill-wait-ms", "100"]);
     assert_eq!(
@@ -300,4 +307,37 @@ fn adopt_a_declared_domain_without_a_binding_is_not_called_empty() {
     );
     child.kill().unwrap();
     child.wait().unwrap();
+}
+
+#[test]
+fn adopt_a_best_effort_attempt_with_a_live_agent_outside_its_domain_ends_the_agent_before_closing()
+{
+    let a = attempt("matrix-agent-outside", &STEPS);
+    // The gate is dead and its group empty, but the agent leads a group of its own and still runs.
+    let (mut agent, tuple) = live_process();
+    a.bind(&dead_tuple());
+    a.best_effort_agent(&tuple);
+    a.gate_exit("agent");
+
+    let probe = adopt(&a.dir, &["--probe-only"]);
+    assert_eq!(
+        (probe["state"].as_str(), probe["reason"].as_str()),
+        (Some("running"), Some("domain-not-empty")),
+        "{probe}"
+    );
+    let scan = adopt_with(&["--scan"], &format!("{}\n", a.dir.display())).1;
+    assert_eq!(
+        (scan[0]["state"].as_str(), scan[0]["reason"].as_str()),
+        (Some("running"), Some("domain-not-empty")),
+        "{scan:?}"
+    );
+    assert_eq!(a.runs_of("settle-attempt"), 0);
+
+    let line = adopt(&a.dir, &[]);
+    assert_eq!(line["state"], "adopted", "{line}");
+    assert!(
+        !agent.wait().unwrap().success(),
+        "the agent was ended by identity"
+    );
+    assert_eq!(a.runs_of("settle-attempt"), 1);
 }
