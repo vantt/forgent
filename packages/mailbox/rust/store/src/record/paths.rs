@@ -24,6 +24,7 @@ const BODY_SUFFIX: &str = ".body";
 const BREAKER_FILE: &str = "breaker.json";
 const HOOK_OUTCOME_FILE: &str = "hook-outcome.json";
 const SYNC_LOG_FILE: &str = "sync.log";
+const TAKE_STAMP_FILE: &str = "mail-taken";
 /// The holder-lock registry row the record takes.
 const LOCK_NAME: &str = "mailbox";
 /// The registry's template parameter for the `.fgos` directory.
@@ -73,6 +74,13 @@ impl Paths {
     /// without the mailbox lock.
     pub fn sync_log(&self) -> PathBuf {
         self.mailbox_dir().join(SYNC_LOG_FILE)
+    }
+
+    /// The stamp the sync child leaves when it starts: the remote's name as the content and the
+    /// time as the file's modification time. The hook starts the next child by its age, so a
+    /// plain Event Store sync, which never takes mail, cannot hold the child back.
+    pub fn take_stamp(&self) -> PathBuf {
+        self.mailbox_dir().join(TAKE_STAMP_FILE)
     }
 
     /// The hook outcome file's name inside [`Paths::mailbox_dir`].

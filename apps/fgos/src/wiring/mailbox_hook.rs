@@ -17,7 +17,7 @@
 //! else held: this process holds no other `LockScope` at any point.
 use super::mailbox_config::{is_config_reason, project_mailbox, CrossMachine};
 use super::mailbox_identity::{ensure_registered, session_of, state_root};
-use fgos_event_store::{layout::Layout, sync::sync_status};
+use fgos_event_store::layout::Layout;
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::ancestry::ancestry_of;
 use fgos_mailbox::hook::outcome_log;
@@ -176,12 +176,11 @@ fn run(args: &[OsString]) {
 }
 
 /// Starts the one detached `hook mailbox-sync` child when mail may cross
-/// machines and the clone's last sync attempt is older than the interval (or
-/// went to another remote, or was never made). The due test only reads
-/// `sync.json` from the main checkout's Git directory, with no Git process;
-/// the attempt itself is recorded by the child's sync, the Event Store's one
-/// writer of that file, so a rare second child finds the seal lock busy and
-/// ends. A call that cannot start the child loses nothing: the next call
+/// machines and the last child that took mail started longer ago than the
+/// interval (or for another remote, or never). The due test reads only the
+/// child's own stamp, with no Git process, so a plain `fgos events sync`, which
+/// fetches but takes no mail, cannot postpone the child; a rare second child
+/// finds the seal lock busy and ends. A call that cannot start the child loses nothing: the next call
 /// tries again. Nothing is printed.
 fn start_sync(fgos_dir: &Path, paths: &Paths, cross: &CrossMachine) {
     if !cross.enabled || cross.sync_interval_sec == 0 {
@@ -207,11 +206,14 @@ fn start_sync(fgos_dir: &Path, paths: &Paths, cross: &CrossMachine) {
     if !fenced && std::fs::symlink_metadata(layout.store()).is_err() {
         return;
     }
-    let Ok(last) = sync_status(&layout) else {
-        return;
-    };
-    let now = now().as_millis() / 1000;
-    if last.remote == cross.remote && now.saturating_sub(last.time) < cross.sync_interval_sec {
+    let taken = paths.take_stamp();
+    let recent = std::fs::read_to_string(&taken).is_ok_and(|remote| remote == cross.remote)
+        && std::fs::metadata(&taken)
+            .and_then(|meta| meta.modified())
+            .ok()
+            .and_then(|at| at.elapsed().ok())
+            .is_some_and(|age| age.as_secs() < cross.sync_interval_sec);
+    if recent {
         return;
     }
     super::mailbox_sync::spawn(main, paths, &cross.remote);

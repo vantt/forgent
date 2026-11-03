@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1bdfe5d2480c22abe75bcdb704a6a7706dc27072920e2bd0423b3ea2b8397ab4",
+  "payloadDigest": "9bddadd4c6e33c522497cb98b9cf4ea9ffbe08b68fe578234b9b90cdeb500aa2",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -89,14 +89,14 @@
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
     "apps/fgos/src/wiring/identity_log.rs": "d7d9dd503ecbd84a5373aa27f6853996e6944aba2940d15e8284cd92c14eef7a",
     "apps/fgos/src/wiring/mailbox_config.rs": "f0f9af4c5781982e4024f01f88cff7febec6bf7c4fc862d82dd57060789f5830",
-    "apps/fgos/src/wiring/mailbox_hook.rs": "d24b2132a410bd3b606032c32bfd1116729acf802b8ce06577f54cd2dc96e2a8",
+    "apps/fgos/src/wiring/mailbox_hook.rs": "e58291e3e8a2cbb9a8914f56b74fcb1454565a2fb7171f3cee4dc2c68945fe53",
     "apps/fgos/src/wiring/mailbox_hook_unsupported.rs": "42f2aa9df8c530b5a1534696b2dba99e8410552598691748a6518ede830d674e",
     "apps/fgos/src/wiring/mailbox_identity.rs": "a3a1d4a29a6de7279f8b592d930bb11ce66dec217cbd59651571e6a5318e7aa3",
     "apps/fgos/src/wiring/mailbox_ingest.rs": "b2f8b7758ab5e51db261d3f492a87655eef00338b9f1a8550200c5af339a85b4",
     "apps/fgos/src/wiring/mailbox_remote.rs": "7e78695793e118df5dd0f91da005d0ed163ea4ab1567d2dfb546ba1fa2b10010",
     "apps/fgos/src/wiring/mailbox_root.rs": "e04f92eaa95d71cd1273b529163f0f903b4f11f4a4de45daecdffb8748d9dbc6",
     "apps/fgos/src/wiring/mailbox_surface.rs": "f03ecafe23d3c254c9a02288277f3ee7b22ff4d61c72574abc07ee0e38f2ce18",
-    "apps/fgos/src/wiring/mailbox_sync.rs": "58e1e9e008a9f8ffd518ce24f5f7a83fbf1fdf0bf3d72b978e3744e16c76c105",
+    "apps/fgos/src/wiring/mailbox_sync.rs": "bdcffdac092d7932b48e27c2891cfbb0731bfab6103941193a8e785f43f1c01d",
     "apps/fgos/src/wiring/mailbox_sync_unsupported.rs": "b56921a2c7999184b9eb2324992d6f7ccdcacda6b4c45b2048c838f993691995",
     "apps/fgos/src/wiring/mailbox_verbs.rs": "86c55fb33fd520fd3eb2f8a46c6d39c9e997ca9e54f5a14cf8c8b3592b7e5527",
     "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "3432cb4e6ec45ff3e6ad31c282ad75e25d40a39f2ecd54af8f5989a51a0405b3",
@@ -104,7 +104,7 @@
     "apps/fgos/src/wiring/mod.rs": "1d97f2fc90f11dc995284b4f013c5cf976230999b85d80f489959f49eed270b2",
     "apps/fgos/tests/cli_tests.rs": "7028ff534bc2df335c1cb5cce94ab13dcc7730211e5c66d33162633cdbc41045",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
-    "apps/fgos/tests/mailbox_routes.rs": "63346e4b7672d84bcb3dcbda618e897e5446b2ee17d758498aa9e65d33b73f84",
+    "apps/fgos/tests/mailbox_routes.rs": "ce2fd66e5334cb9135b178a2f8502944a45b0e6975fc94226c8872cb228cd091",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
     "apps/fgos/tests/windows_borrow.rs": "4e77453a5386cf512a22db39e6a529e163c7dc930d8795c93ef05e60ba19c7b9",
     "apps/fgos/tests/windows_lock_hold_route.rs": "9cedd72a21ef501d00d37ce8fe1f52bb33cbfa799774470534c96dc59a4959aa",
@@ -559,7 +559,7 @@
     "packages/mailbox/rust/store/src/record/bodies.rs": "22a80c7052850aae3ad924a46c3390a6961e2c78d8024cfea00c344c0b476490",
     "packages/mailbox/rust/store/src/record/mod.rs": "72fd0f9ed799956b3c42e61c9ed3d59fc5d9a7333c4d6a03af911f83488e6bad",
     "packages/mailbox/rust/store/src/record/os_ids.rs": "63def9b6aa981886dcead2b1db1538ec54904bbc032aa95ddcac441d924d4227",
-    "packages/mailbox/rust/store/src/record/paths.rs": "11f4fd0d19284c24b98f8b6068ca7f6b7f4a8dca514dc15408ff4f7b6952dcc9",
+    "packages/mailbox/rust/store/src/record/paths.rs": "9ace23e669d89421f6e569c9e08c80d2e1656bb6414983e555ec5e1908b5f893",
     "packages/mailbox/rust/store/src/record/prune.rs": "5b49ea7b860d6874f436244c81a1bbd7926d4a74b815e36022a5d5248232d763",
     "packages/mailbox/rust/store/src/record/snapshot.rs": "e3cf5f5c20110c80185189335cf9656ab33276bdc956740b84123de757a33edf",
     "packages/mailbox/rust/store/src/record/sys.rs": "35dc8d786013bd0caa523a1c03eab500cd4eb2dedbe2443df6119b938fd09709",
@@ -2790,7 +2790,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/mailbox_sync.rs:140"
+      "resolvedAt": "apps/fgos/src/wiring/mailbox_sync.rs:150"
     },
     {
       "path": "packages/process/rust/src/mapped.rs",

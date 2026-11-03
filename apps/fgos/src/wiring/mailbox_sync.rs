@@ -65,6 +65,7 @@ fn run(args: &[OsString]) {
             return;
         }
     };
+    stamp(&fgos_dir, &remote);
     if let Err(why) = publish_heads(&dir, &fgos_dir, &loaded.limits) {
         eprintln!("mailbox-sync: {why}");
     }
@@ -81,6 +82,15 @@ fn run(args: &[OsString]) {
         }
         Ok(false) => {}
         Err(why) => eprintln!("mailbox-sync: {why}"),
+    }
+}
+
+/// Records that a child took mail now, for the hook's due test. A stamp that cannot be written
+/// loses nothing: the next hook call starts another child.
+fn stamp(fgos_dir: &Path, remote: &str) {
+    let stamp = Paths::new(fgos_dir).take_stamp();
+    if stamp.parent().is_some_and(Path::is_dir) {
+        let _ = std::fs::write(stamp, remote);
     }
 }
 

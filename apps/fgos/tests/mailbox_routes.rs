@@ -1699,8 +1699,9 @@ fn a_send_racing_a_hook_that_holds_the_lock_longer_than_the_hooks_skip_budget_wa
 }
 
 /// The hook starts its detached sync child only when the project turned
-/// cross-machine mail on and the clone's last sync attempt is older than the
-/// interval. The child's own start leaves its log file beside the record.
+/// cross-machine mail on and the last child that took mail started longer ago
+/// than the interval; a recent plain Event Store sync does not count. The child's own start
+/// leaves its log file beside the record.
 #[test]
 fn the_hook_starts_the_detached_sync_child_only_when_cross_machine_is_on_and_a_sync_is_due() {
     use fgos_event_store::layout::Layout;
@@ -1743,14 +1744,15 @@ fn the_hook_starts_the_detached_sync_child_only_when_cross_machine_is_on_and_a_s
     let attempt = format!(
         r#"{{"v":1,"time":{recent},"remote":"origin","tips":{{}},"error":null,"warnings":[],"unpublishedSince":null}}"#
     );
-    fs::write(layout.root.join("sync.json"), attempt).unwrap();
+    let stamp = scene.mailbox_dir().join("mail-taken");
+    fs::write(&stamp, "origin").unwrap();
     hook();
     assert!(
         !log.exists(),
-        "a sync attempted inside the interval is not due: no child"
+        "a child that took mail inside the interval makes the next one not due: no child"
     );
 
-    fs::remove_file(layout.root.join("sync.json")).unwrap();
+    fs::remove_file(&stamp).unwrap();
     hook();
     assert!(
         !log.exists(),
@@ -1758,10 +1760,11 @@ fn the_hook_starts_the_detached_sync_child_only_when_cross_machine_is_on_and_a_s
     );
 
     fs::write(scene.main().join(".fgos/events"), "fence\n").unwrap();
+    fs::write(layout.root.join("sync.json"), attempt).unwrap();
     hook();
     assert!(
         log.exists(),
-        "a due sync with cross-machine mail on starts the child"
+        "a plain sync inside the interval does not hold the child back"
     );
 }
 
