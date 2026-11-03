@@ -35,3 +35,15 @@ Cause of the long delays, from the code: the receiving machine fetches only when
 - The send-time hint "version 2.1.314 is not one this mailbox was tested against" comes from the hook-path version list (`testedAgainst`), not from the nudge list. Adding 2.1.314 there needs its own measurement first.
 - The decision on the global accept key stays with the owner: fg-server2 holds it globally, fg-server uses the scoped receiver.
 - Codex cross-machine wake after Claude is finished.
+
+## Proposal: bounding the wake delay on a quiet receiver (owner choice, nothing built)
+
+Problem: a machine fetches only when a hook of one of its own sessions runs. A receiver on a machine with no other activity gets its wake mail late, with no upper bound. No scheduler or always-running sync exists in fgOS today; the only long-running process is the gateway (`fgos gateway start`), and it does not run on every machine.
+
+| Option | What it adds | Cost | Bound |
+|---|---|---|---|
+| A. OS timer | `fgos events sync` every `eventStore.sync.intervalSec`, registered by `fgos setup` and checked by `fgos doctor` | One scheduler adapter per platform (systemd user timer, launchd, Task Scheduler), new doctor row, new one-door census entry | The interval |
+| B. Gateway tick | The gateway process runs the same sync on its own tick | No new process kind, but only where the gateway runs | The interval, only on gateway machines |
+| C. Keep as is | Document that a wake arrives with the next fgOS activity on the receiver | None | None, but in practice agent machines have activity |
+
+Recommendation: C now, A only if the owner wants wake delivery on idle machines. B leaves the gap on the machines where it matters. Lane MAIL does not start A or B without the owner's choice, and OPC reviews any new process or Git call site.
