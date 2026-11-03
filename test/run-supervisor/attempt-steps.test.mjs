@@ -215,10 +215,12 @@ function homeOf(w, runDir, { marker = {}, renewed = true } = {}) {
 test('finalize-home after a timeout writes the renewed login back to its account and removes the home', async () => {
   const w = workspace();
   try {
-    const { runDir } = attempt(w, { receipt: { outcome: 'timeout', gateExit: gateExit({ exitCode: null, signal: 'SIGKILL', stoppedBy: 'idle' }) } });
+    const { runDir, envelope } = attempt(w, { receipt: { outcome: 'timeout', gateExit: gateExit({ exitCode: null, signal: 'SIGKILL', stoppedBy: 'idle' }) } });
     const { home, source } = homeOf(w, runDir);
+    assert.equal(fs.existsSync(envelope.sideFile), true);
     const done = await run('finalize-home', w, runDir);
     assert.equal(done.exit, 0, JSON.stringify(done.out));
+    assert.equal(fs.existsSync(envelope.sideFile), false, 'the attempt secrets are removed once the home is finalized');
     assert.equal(done.out.detail.homes, 1);
     assert.equal(fs.existsSync(home), false);
     assert.equal(readPi(source).xai.refresh, NEW.refresh, 'the account source received the renewed login');

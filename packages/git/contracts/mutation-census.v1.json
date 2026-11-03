@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e082bcdc1206d8ef337f93865fbedde96ac539767d1b89b6ac07e72d5b76e604",
+  "payloadDigest": "5a5adc22fdac5b4f1a0329da6b9535dd5751fb628c688f72fc27d7dec57745f6",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "93634831ae49f958101d6c843cfe69bcddf0287bea51ca51605f6395917cd2de",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -959,7 +959,7 @@
     "src/run-supervisor/runtime-dir.mjs": "2f02f66882dd2e81b3cc7e9f402fdd0c4c4001e9ceb42e6c4e8984f2e0f2f594",
     "src/run-supervisor/step-support.mjs": "40c78da932dafd643762ff5c32e1f8a3844d5a7f9cd7ec64055b8b1343f614f9",
     "src/run-supervisor/steps/cleanup-trust.mjs": "4427bcd94a9469eb2063403207866ef1d28ae2941987bc8f31853c2fb4b2f0b6",
-    "src/run-supervisor/steps/finalize-home.mjs": "a44414ab2ddc7e8056bbf042069983bca4b98143628e748ddc594d0cbff312b8",
+    "src/run-supervisor/steps/finalize-home.mjs": "3150a00e4d0742ac817ba1b2939ae6410e87977b70bde31624168cb890a1d97b",
     "src/run-supervisor/steps/settle-attempt.mjs": "8ce15cd8dfb05d7d83a2ff6e107bf84cab5c75b28d9be1c9234c69784c31d834",
     "src/run-supervisor/sweep.mjs": "6e4fdf218c53bfd85c2b89d47623a9457d73f05bbdad064547a6db4bc15d6fe6",
     "src/runner/agent-definitions.mjs": "c171c5812dad6312f8538b0abda0bf7c9b392847fbe8d7a9ef75bebc44c62434",

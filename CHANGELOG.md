@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - A named pipe or a symlink left as the agent's result or report file no longer hangs the settle step (which stalled every later `fgos run` for ten minutes and left a blocked process behind per run): settlement reads those files without following links or blocking, treats a refused one as no valid claim, and the adopt route's timeout is now longer than all steps of an attempt together.
+- An attempt's secret side file (`protected/attempt-secrets.json`) is now removed when its home is finalized, instead of staying on disk after the attempt settles.
 - An attempt whose gate never got GO (the gate refused its envelope, never said hello, or GO could not be sent) is now receipted as not started, so `--resume` may run it again, instead of as `gate-lost`, which resume refuses to rerun.
 - A pane attempt whose supervisor died no longer freezes its gate when the agent leaves a named pipe called `result-1.json` in the outbox; the hard ceiling still ends the agent, and the gate and the receipt now use the same rule for the newest finished result.
 - Claude Code 2.1.314 is now a tested version for the mailbox hook (Stop and PostToolUse payloads recorded on it), so sending to a session on that version no longer prints "is not one this mailbox was tested against".
