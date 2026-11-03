@@ -19,6 +19,7 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use fgos_agent_protocol::direct::{adapter_for, Direct};
+use fgos_agent_protocol::ExitInfo;
 use fgos_process::containment::{ContainmentDomain, ContainmentDriver, GuaranteeLevel, Spawned};
 use fgos_process::{facts, DomainState, KillOutcome};
 
@@ -87,9 +88,50 @@ fn capture_digest(path: &Path) -> Option<String> {
     }
 }
 
-fn outbox_present(outbox: &Path) -> bool {
+/// The file name of the newest outbox result, by the agent protocol's one rule.
+fn newest_outbox_result(outbox: &Path) -> Option<String> {
     let names: Vec<String> = std::fs::read_dir(outbox).into_iter().flatten().flatten().filter_map(|e| e.file_name().to_str().map(String::from)).collect();
-    fgos_agent_protocol::direct::newest_result(outbox, names.iter().map(String::as_str)).is_some()
+    let newest = fgos_agent_protocol::direct::newest_result(outbox, names.iter().map(String::as_str))?;
+    newest.file_name()?.to_str().map(String::from)
+}
+
+/// How many trailing bytes of a capture file the direct classifier reads: its last [`fgos_agent_protocol::direct::TAIL_LINES`] lines.
+const CAPTURE_TAIL_BYTES: u64 = 16 * 1024;
+
+/// The last bytes of a capture file the agent can write: opened without following a link or waiting on a
+/// FIFO, regular files only, never more than [`CAPTURE_TAIL_BYTES`]. Anything else reads as empty.
+fn capture_tail(path: &Path) -> String {
+    use std::io::{Read, Seek, SeekFrom};
+    let mut options = std::fs::OpenOptions::new();
+    options.read(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
+    }
+    #[cfg(windows)]
+    let opened = fgos_durable_file::open_no_reparse(&mut options, path);
+    #[cfg(not(windows))]
+    let opened = options.open(path);
+    let Ok(mut file) = opened else { return String::new() };
+    let Ok(meta) = file.metadata() else { return String::new() };
+    if !meta.is_file() || file.seek(SeekFrom::Start(meta.len().saturating_sub(CAPTURE_TAIL_BYTES))).is_err() {
+        return String::new();
+    }
+    let mut bytes = Vec::new();
+    match file.take(CAPTURE_TAIL_BYTES).read_to_end(&mut bytes) {
+        Ok(_) => String::from_utf8_lossy(&bytes).into_owned(),
+        Err(_) => String::new(),
+    }
+}
+
+/// The provider stop a direct agent's last words name, as the receipt's `reason`. Only an agent that exited
+/// non-zero with no result in the outbox is read; a result in the outbox always wins.
+fn direct_reason(envelope: &Value, gate_exit: Option<&Value>, outbox_result: Option<&str>, outcome: &str) -> Option<String> {
+    let code = gate_exit?["exitCode"].as_i64().filter(|code| *code != 0 && outcome == "exited" && outbox_result.is_none())?;
+    let stderr = capture_tail(Path::new(envelope["launch"]["capture"]["stderr"].as_str()?));
+    let adapter = adapter_for(envelope["agentProtocol"]["cli"].as_str().unwrap_or_default());
+    adapter.classify(ExitInfo { code: i32::try_from(code).ok() }, &stderr, None).receipt_reason()
 }
 
 /// The `gate-exit.json` of this attempt, when one was published.
@@ -118,7 +160,8 @@ pub(crate) fn publish_receipt_with(envelope: &Value, run_dir: &Path, synthesized
     let attempt_id = envelope["attemptId"].as_str().unwrap_or_default();
     let gate_exit = read_gate_exit(run_dir, attempt_id);
     let launch = &envelope["launch"];
-    let present = launch["outboxDir"].as_str().is_some_and(|dir| outbox_present(Path::new(dir)));
+    let outbox_result = launch["outboxDir"].as_str().and_then(|dir| newest_outbox_result(Path::new(dir)));
+    let present = outbox_result.is_some();
     let digest_of = |key: &str| launch["capture"][key].as_str().and_then(|p| capture_digest(Path::new(p))).map_or(Value::Null, Value::from);
     let outcome = if not_started {
         "abandoned-not-started"
@@ -133,6 +176,7 @@ pub(crate) fn publish_receipt_with(envelope: &Value, run_dir: &Path, synthesized
         "outcome": outcome,
         "captureDigests": {"stdout": digest_of("stdout"), "stderr": digest_of("stderr")},
         "outboxPresent": present,
+        "outboxResult": outbox_result,
         "synthesizedBy": synthesized_by,
         "publishedAt": iso_utc_now(),
     });
@@ -143,8 +187,11 @@ pub(crate) fn publish_receipt_with(envelope: &Value, run_dir: &Path, synthesized
         if let Some(code) = read_start_refusal(run_dir, attempt_id) {
             receipt["reason"] = json!(format!("start-refused:{code}"));
         }
-    } else if let Some(reason) = &end.reason {
-        receipt["reason"] = json!(reason);
+    } else {
+        let direct = || if envelope["mode"] == "direct" { direct_reason(envelope, receipt.get("gateExit"), outbox_result.as_deref(), outcome) } else { None };
+        if let Some(reason) = end.reason.clone().or_else(direct) {
+            receipt["reason"] = json!(reason);
+        }
     }
     publish_once(run_dir, "receipt.json", &serde_json::to_vec(&receipt).map_err(std::io::Error::other)?)?;
     // A receipt that already existed is the one that counts.

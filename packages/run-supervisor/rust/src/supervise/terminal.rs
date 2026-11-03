@@ -23,6 +23,7 @@ use std::os::unix::net::{UnixListener, UnixStream};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
+use fgos_agent_protocol::BlockedReason;
 use fgos_agent_protocol::port::{AgentIo, Inspection, IoError, SendInput};
 use fgos_agent_protocol::terminal::{
     adapter_for, ExitCommand, FsOutbox, Terminal, TerminalOutcome, UnreadableResult, REASON_AGENT_NOT_STARTED,
@@ -345,6 +346,7 @@ struct Sup<'a> {
     channel_open: bool,
     gate_gone: bool,
     end: TerminalEnd,
+    adapter: Terminal,
 }
 
 impl Sup<'_> {
@@ -415,11 +417,23 @@ impl Sup<'_> {
                 None
             };
             if let Some(cause) = cause {
-                self.begin_stop(cause, None);
+                let reason = if matches!(cause, "soft-deadline" | "idle") { self.provider_stop_reason(core, key) } else { None };
+                self.begin_stop(cause, reason.as_deref());
             }
         } else if !self.ended_domain && self.stopped.is_some_and(|at| at.elapsed() >= self.watch.grace + GATE_STOP_SLACK) {
             // The gate outlived its own grace: end the whole domain. A refused kill is tried again on the next tick.
             self.ended_domain = domain_kill_all(&self.domain) == KillOutcome::Ok;
+        }
+    }
+
+    /// A deadline stop reads the screen once and names the provider when it ends on a dead login or a used-up
+    /// quota, so the caller moves to another account. The outcome stays `timeout`. A trust dialog or any other
+    /// screen names nothing: the agent may simply have been working.
+    fn provider_stop_reason(&self, core: &Core, key: &str) -> Option<String> {
+        let screen = core.read(key, None, Some("visible")).ok()?;
+        match self.adapter.stop_reason(&screen)? {
+            reason @ (BlockedReason::Login | BlockedReason::UsageLimit) => TerminalOutcome::Blocked(reason).receipt_reason(),
+            BlockedReason::TrustDialog => None,
         }
     }
 
@@ -580,6 +594,7 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
         channel_open: true,
         gate_gone: false,
         end: TerminalEnd::default(),
+        adapter: plan.adapter,
     };
     drive(&plan, &core, &mut sup);
 

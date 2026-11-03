@@ -47,6 +47,8 @@ fn a_full_lifecycle_binds_receipts_runs_the_steps_in_order_and_frees_the_lock() 
     assert_eq!(receipt["outcome"], "exited");
     assert_eq!(receipt["synthesizedBy"], "supervisor");
     assert_eq!(receipt["outboxPresent"], true);
+    assert_eq!(receipt["outboxResult"], "result-1.json", "the receipt names the newest outbox result");
+    assert!(receipt.get("reason").is_none(), "an agent that finished names no provider stop");
     assert_eq!(receipt["gateExit"]["stoppedBy"], "agent");
     assert!(receipt["captureDigests"]["stdout"].as_str().unwrap().starts_with("sha256:"));
 
@@ -60,6 +62,40 @@ fn a_full_lifecycle_binds_receipts_runs_the_steps_in_order_and_frees_the_lock() 
     assert_eq!(closed["steps"], json!(["settle-attempt", "finalize-home"]));
     assert!(lock_is_free(&run.path("attempt.lock")), "the attempt lock is empty once the supervisor is gone");
     assert!(run.json("supervisor-heartbeat.json").is_some());
+}
+
+/// One direct attempt whose agent is `script` (run by `/bin/sh`), settled to its receipt.
+fn direct_receipt(name: &str, script: &str) -> Option<serde_json::Value> {
+    let _driver = bwrap_driver(&format!("supervise-{name}"))?;
+    let script = script.to_string();
+    let mut run = SupRun::new_with(name, &RunOpts::agent(0), |e| {
+        e["launch"]["command"] = json!("/bin/sh");
+        e["launch"]["args"] = json!(["-c", script]);
+    });
+    let supervisor = run.start();
+    let (code, _) = finish(supervisor, LIMIT);
+    assert_eq!(code, 0, "{}", run.log());
+    run.json("receipt.json")
+}
+
+#[test]
+fn a_direct_agent_that_exits_on_a_provider_stop_names_it_in_the_receipt_unless_it_left_a_result() {
+    let outbox = |run: &str| format!("mkdir -p $PWD/outbox; echo '{{}}' > $PWD/outbox/{run}");
+    let login = "echo 'working...' >&2; echo 'No API key found for openrouter.' >&2";
+    let quota = "echo \"ERROR: You've hit your usage limit. try again at 7:18 PM.\" >&2";
+    let Some(dead_login) = direct_receipt("dlogin", &format!("{login}; exit 1")) else { return };
+    assert_eq!(dead_login["outcome"], "exited");
+    assert_eq!(dead_login["reason"], "direct:blocked:login");
+    assert_eq!(dead_login["outboxResult"], serde_json::Value::Null);
+    assert_eq!(direct_receipt("dquota", &format!("{quota}; exit 1")).unwrap()["reason"], "direct:blocked:usage-limit");
+    // A result in the outbox wins over whatever the agent printed last.
+    let reported = direct_receipt("dwon", &format!("{}; {login}; exit 1", outbox("result-2.json"))).unwrap();
+    assert!(reported.get("reason").is_none(), "{reported}");
+    assert_eq!(reported["outboxResult"], "result-2.json");
+    // A clean exit never yields a reason, even when the last words quote a provider wording.
+    assert!(direct_receipt("dclean", &format!("{login}; exit 0")).unwrap().get("reason").is_none());
+    // Ordinary failure output names no provider.
+    assert!(direct_receipt("dplain", "echo 'tests failed' >&2; exit 1").unwrap().get("reason").is_none());
 }
 
 #[test]

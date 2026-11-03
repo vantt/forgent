@@ -276,6 +276,43 @@ fn a_pane_that_cannot_be_read_is_blind_time_that_runs_to_the_deadline_never_idle
     assert_eq!(stop["cause"], "soft-deadline", "idle time must not accrue while nothing can be read: {stop}");
 }
 
+/// A working pane agent stopped at its soft deadline while its screen shows `screen`; the receipt it leaves.
+fn receipt_of_a_deadline_stop(name: &str, screen: &str) -> Value {
+    let herdr = FakeHerdr::new(name);
+    let mut run = terminal_run_with(&format!("t{name}"), &herdr, "sleep 600", 500, |opts| opts.soft_ms = Some(12_000));
+    let supervisor = run.start_with_env(&herdr.env());
+    brief_taken(&herdr, &run);
+    fs::write(herdr.dir.join("screen.txt"), screen).unwrap();
+    let (code, line) = finish(supervisor, LIMIT);
+    // SAFETY: SIGKILL to the agent the gate reported; a pid that is gone is harmless.
+    unsafe { libc::kill(agent_pid(&run), libc::SIGKILL) };
+    assert_eq!(code, 0, "{}", run.log());
+    assert_eq!(line["outcome"], "timeout");
+    run.json("receipt.json").expect("receipt")
+}
+
+#[test]
+fn a_deadline_stop_names_a_provider_stop_on_the_screen_and_keeps_the_timeout_outcome() {
+    let trust_dialog = fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../agent-protocol/contracts/fixtures/terminal/claude/trust-dialog.txt")).unwrap();
+    let cases = [
+        // Strict provider wordings on a working pane: the caller must be able to move to another account.
+        ("dlimit", "working...\nERROR: You've hit your usage limit. try again at 7:18 PM.\n".to_string()),
+        ("dlogin", "working...\nNot logged in \u{b7} Please run /login\n".to_string()),
+        // The agent may have been working: its own prose about a rate limit, or a dialog, names nothing.
+        ("dprose", "I will add retry handling because of the rate limit\nstill working\n".to_string()),
+        ("dtrust", trust_dialog),
+    ];
+    let receipts: Vec<Value> = std::thread::scope(|scope| {
+        let runs: Vec<_> = cases.iter().map(|(name, screen)| scope.spawn(|| receipt_of_a_deadline_stop(name, screen))).collect();
+        runs.into_iter().map(|run| run.join().unwrap()).collect()
+    });
+    assert_eq!(receipts[0]["gateExit"]["stoppedBy"], "soft-deadline");
+    assert_eq!(receipts[0]["reason"], "terminal:blocked:usage-limit");
+    assert_eq!(receipts[1]["reason"], "terminal:blocked:login");
+    assert!(receipts[2].get("reason").is_none(), "{}", receipts[2]);
+    assert!(receipts[3].get("reason").is_none(), "{}", receipts[3]);
+}
+
 #[test]
 fn a_launch_that_proves_nothing_sends_no_go_and_the_gate_finds_the_socket_closed() {
     let herdr = FakeHerdr::new("unknown");

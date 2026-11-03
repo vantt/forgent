@@ -7,8 +7,9 @@
     "outcome": { "enum": ["exited", "timeout", "cancelled", "output-limit", "gate-lost", "carrier-lost", "abandoned-not-started", "abandoned-before-brief"] },
     "gateExit": "the gate-exit.v1 object, or absent when no gate-exit.json exists",
     "captureDigests": { "stdout": "\"sha256:<hex>\" of the capture file bytes or null when absent", "stderr": "same" },
-    "outboxPresent": "boolean, an outbox result-<N>.json exists in launch.outboxDir",
-    "reason": "optional string; `start-refused:<code>` on abandoned-not-started when the supervisor named why it never bound (start-refused.json), e.g. lock-held on Windows; `terminal:<outcome>` or `terminal:blocked:<reason>` when a terminal adapter outcome (agent-protocol terminal-outcomes.v1.json) ended the run early",
+    "outboxPresent": "boolean, an outbox result-<N>.json exists in launch.outboxDir; equals `outboxResult != null`",
+    "outboxResult": "string or null, the file name of the newest outbox result (the agent protocol's rule: highest plain decimal N of result-<N>.json), null when there is none; the one newest-result rule, settlement reads this file",
+    "reason": "optional string; `start-refused:<code>` on abandoned-not-started when the supervisor named why it never bound (start-refused.json), e.g. lock-held on Windows; `terminal:<outcome>` or `terminal:blocked:<reason>` when a terminal adapter outcome (agent-protocol terminal-outcomes.v1.json) ended the run early, or when a soft-deadline or idle stop (outcome `timeout`) found the screen on a dead login or a used-up quota; `direct:blocked:<reason>` (login, usage-limit) when a direct agent exited non-zero with no outbox result and the last lines of its stderr capture name the provider stop. Settle turns a `blocked:login` or `blocked:usage-limit` reason into a provider limit; any other reason never yields success",
     "synthesizedBy": { "enum": ["supervisor", "adopt"] },
     "publishedAt": "string, ISO-8601 UTC"
   },
