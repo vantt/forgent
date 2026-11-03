@@ -222,9 +222,17 @@ mod unix {
         let log = OpenOptions::new().create(true).append(true).mode(0o600).custom_flags(libc::O_CLOEXEC).open(run_dir.join("supervisor.log")).map_err(|e| fail(format!("supervisor.log: {e}")))?;
         let mut cmd = Command::new(&spec.host_bin);
         cmd.args(&spec.argv).env_clear().envs(&spec.env).current_dir(&spec.cwd).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::from(log));
-        // SAFETY: setsid is async-signal-safe; the step leads its own group so a timeout ends its descendants too.
+        // SAFETY: setsid and prctl are async-signal-safe; the step leads its own group so a timeout ends its
+        // descendants too, and on Linux it dies with the supervisor that started it.
         unsafe {
-            cmd.pre_exec(|| if libc::setsid() < 0 { Err(std::io::Error::last_os_error()) } else { Ok(()) });
+            cmd.pre_exec(|| {
+                if libc::setsid() < 0 {
+                    return Err(std::io::Error::last_os_error());
+                }
+                #[cfg(target_os = "linux")]
+                fgos_process::control::arm_parent_death_signal()?;
+                Ok(())
+            });
         }
         // The step receives no lock description: the map is empty.
         let mut child = spawn_with_fds(cmd, &[]).map_err(|e| fail(format!("step did not start: {e}")))?;

@@ -111,3 +111,48 @@ fn a_step_holds_no_lock_description() {
     assert!(!listing.contains("attempt.lock"), "the step inherited the lock: {listing}");
     assert!(!listing.lines().skip(1).any(|l| l.contains("-> /") && !l.contains("/dev/null") && !l.contains("pipe:") && !l.contains("supervisor.log") && !l.contains("fds.txt")), "unexpected descriptor: {listing}");
 }
+
+/// Role of the process the next test kills: it runs a step that never ends.
+#[cfg(target_os = "linux")]
+#[test]
+fn steps_supervisor_helper() {
+    let Ok(dir) = std::env::var("FGOS_STEPS_HELPER_DIR") else { return };
+    let dir = std::path::PathBuf::from(dir);
+    let envelope = json!({"attemptId": "att-orphan", "steps": [shell_step(&dir, "settle-attempt", &format!("echo $$ > {0}/step.pid; exec sleep 60", dir.display()), 60_000)]});
+    run_steps(&envelope, &dir);
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn a_step_dies_when_its_supervisor_is_killed() {
+    let (dir, _) = attempt("orphan", Vec::new());
+    let mut supervisor = std::process::Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "steps_supervisor_helper", "--nocapture", "--test-threads=1"])
+        .env("FGOS_STEPS_HELPER_DIR", &dir)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    let pid_file = dir.join("step.pid");
+    let deadline = Instant::now() + Duration::from_secs(20);
+    let step_pid = loop {
+        if let Some(pid) = fs::read_to_string(&pid_file).ok().and_then(|t| t.trim().parse::<u32>().ok()) {
+            break pid;
+        }
+        assert!(Instant::now() < deadline, "the step never started");
+        std::thread::sleep(Duration::from_millis(20));
+    };
+    assert!(alive(step_pid));
+    supervisor.kill().unwrap();
+    supervisor.wait().unwrap();
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while alive(step_pid) && Instant::now() < deadline {
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    let survived = alive(step_pid);
+    if survived {
+        // SAFETY: ends the stray step this test started.
+        unsafe { libc::kill(step_pid as libc::pid_t, libc::SIGKILL) };
+    }
+    assert!(!survived, "the step outlived its supervisor");
+}
