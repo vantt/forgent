@@ -15,6 +15,8 @@ import { createTerminalControl } from '../../terminal-control/client.mjs';
 import { resolveWorkerArtifactPath } from '../../runner/dispatch/worker-artifacts.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
 
+/** The last lines of a pane screen that may carry the reset time a provider printed. */
+const SCREEN_EVIDENCE_LINES = 15;
 const CAPTURE_TAIL_BYTES = 64 * 1024 * 1024;
 
 function readJson(file) {
@@ -220,6 +222,7 @@ export async function settleAttempt({ runDir, envelope }) {
       agentResultPath: claimPath,
       adapterOutcome: providerStop?.adapterOutcome ?? null,
       providerStopCause: providerStop?.cause ?? null,
+      capacityEvidenceText: screenText.split(/\r?\n/).slice(-SCREEN_EVIDENCE_LINES).join('\n'),
       effectiveCwd: envelope.cwd,
       gitBefore: baseline?.gitBefore ?? null,
       gitBeforeSource: baseline?.gitBeforeSource ?? 'pre-launch',

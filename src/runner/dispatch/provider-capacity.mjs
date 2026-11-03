@@ -952,7 +952,12 @@ const AUTH_ANCHOR_PATTERNS = [
   /login required/i,
 ];
 
-export function classifyProviderCapacityFault({ provider, stderr = '', adapterOutcome, structuredAgent, now = Date.now() } = {}) {
+/**
+ * `stopCause` ('credential' or 'quota') is the supervisor's verdict on why the provider stopped the agent, taken
+ * from its receipt: when given it decides auth fault versus quota, and the text is not re-read for the class.
+ * `capacityEvidenceText` (a pane screen, which leaves no stderr) only dates a quota stop's reset time.
+ */
+export function classifyProviderCapacityFault({ provider, stderr = '', adapterOutcome, structuredAgent, stopCause = null, capacityEvidenceText = '', now = Date.now() } = {}) {
   // C2b: provider is now required -- the old `provider === undefined`
   // wildcard classified stderr from ANY provider using openai's own
   // vocabulary, which is exactly what let an unrelated syntax-error stderr
@@ -968,7 +973,8 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
     // not end on a quota sentence (a streamed transcript may quote a login error).
     const authInTail = matchAuthFailureLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES });
     const quotaInTail = !authInTail && matchQuotaLimitLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES });
-    if (authInTail || (!quotaInTail && matchAuthFailureLine(text))) {
+    const deadCredential = stopCause ? stopCause === 'credential' : authInTail || (!quotaInTail && matchAuthFailureLine(text));
+    if (deadCredential) {
       return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
     }
     // The text carries the reset window when the provider named one; otherwise the
@@ -977,7 +983,7 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
       action: 'quarantine',
       reasonCode: 'quota-limit',
       quarantineKind: 'temporary',
-      until: quotaQuarantineUntil(text, now),
+      until: quotaQuarantineUntil(`${text}\n${typeof capacityEvidenceText === 'string' ? capacityEvidenceText : ''}`, now),
     };
   }
   if (provider === 'openai' || provider === 'openai-codex') {

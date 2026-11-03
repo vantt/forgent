@@ -13,7 +13,7 @@ import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs
 import { AGENT_RESULT_CLAIM_CONTRACT } from '../../src/runner/dispatch/agent-result-claim-contract.mjs';
 import { acquireRunControl, buildRunControlHolder, settleRunControl, listGenerations, controlDirs } from '../../src/runner/dispatch/run-lock.mjs';
 import { copyCredentialFiles, credentialWriteBackMarker } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
-import { providerAccountDir } from '../../src/runner/dispatch/provider-capacity.mjs';
+import { providerAccountDir, providerCapacityStatePaths } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { providerStopOf } from '../../src/run-supervisor/steps/settle-attempt.mjs';
 import { runAttemptStep, verifyPayload, releasePayloadRoot } from '../../src/run-supervisor/attempt-step.mjs';
 
@@ -382,5 +382,26 @@ test('a direct agent whose receipt names a dead login settles as a provider limi
     assert.equal((await run('settle-attempt', w, runDir)).exit, 0);
     const { code, cause } = resultOf(runDir).classification.failure;
     assert.deepEqual({ code, cause }, { code: 'provider-limit', cause: 'credential' });
+  } finally { w.cleanup(); }
+});
+
+test('a pane seat the supervisor stopped on a dead login quarantines its leased account as an auth fault', async () => {
+  const w = workspace();
+  try {
+    paneShows(w, 'working...\nNot logged in \u00b7 Please run /login');
+    const { runDir } = attempt(w, {
+      terminal: true,
+      receipt: { outcome: 'cancelled', reason: 'terminal:blocked:login', gateExit: gateExit({ exitCode: null, signal: 'SIGTERM', stoppedBy: 'cancel', cause: 'cancel' }) },
+    });
+    const capacityDir = path.join(w.root, 'capacity');
+    fs.writeFileSync(path.join(runDir, 'controller', 'settle-context.json'), JSON.stringify({
+      providerCapacitySelection: { status: 'selected', provider: 'xai', accountId: 'acct-1' },
+      providerCapacityRuntimeDir: capacityDir,
+    }));
+    assert.equal((await run('settle-attempt', w, runDir)).exit, 0);
+    const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(capacityDir).statePath, 'utf8'));
+    const record = JSON.stringify(state);
+    assert.match(record, /auth-token/);
+    assert.match(record, /manual-clear/);
   } finally { w.cleanup(); }
 });

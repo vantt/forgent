@@ -676,6 +676,31 @@ test('a round that ended on a dead credential quarantines the account as an auth
   assert.equal(fault.until, undefined);
 });
 
+// A pane seat leaves no stderr: the supervisor's receipt names why the provider stopped it, and the
+// settlement hands that stop to the classifier as typed input; the screen is only reset-time evidence.
+test('a pane seat stopped on a dead login quarantines the account as an auth fault, whatever its stderr says', () => {
+  const fault = classifyProviderCapacityFault({
+    provider: 'xai',
+    stderr: '',
+    adapterOutcome: 'provider-limit',
+    stopCause: 'credential',
+    capacityEvidenceText: 'working...\nNot logged in · Please run /login',
+  });
+  assert.equal(fault.reasonCode, 'auth-token');
+  assert.equal(fault.quarantineKind, 'manual-clear');
+  assert.equal(fault.until, undefined);
+});
+
+test('a pane seat stopped on a used-up quota ends its quarantine at the reset time its screen printed', () => {
+  const now = Date.parse('2026-10-05T10:00:00.000Z');
+  const screen = '■ You\'ve hit your usage limit. Upgrade to Pro. Resets in 24m1s.';
+  const fault = classifyProviderCapacityFault({ provider: 'openai-codex', stderr: '', adapterOutcome: 'provider-limit', stopCause: 'quota', capacityEvidenceText: screen, now });
+  assert.equal(fault.reasonCode, 'quota-limit');
+  assert.equal(fault.until, new Date(now + (24 * 60 + 1) * 1000).toISOString());
+  // The evidence text only dates a stop the supervisor named; it never makes one.
+  assert.equal(classifyProviderCapacityFault({ provider: 'openai-codex', stderr: '', adapterOutcome: 'failed', capacityEvidenceText: screen, now }).action, 'evidence-only');
+});
+
 test('an owner-set quarantine keeps the account out of selection until its end time', () => {
   const dir = mkTempDir();
   const globalConfigPath = globalConfigFile(dir);
