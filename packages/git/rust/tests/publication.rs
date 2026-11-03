@@ -1381,6 +1381,54 @@ fn a_fetch_left_at_its_attempt_is_settled_by_an_explicit_recovery_and_the_next_f
 }
 
 #[test]
+fn a_fetch_killed_before_its_attempt_is_left_to_admission_and_does_not_fail_the_sync() {
+    struct Seed;
+    impl wal::PublicationAuthority for Seed {
+        fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> {
+            Ok(())
+        }
+    }
+    let t = Temp::new();
+    let root = t.0.join("repo");
+    let remote = t.0.join("remote");
+    init(&root, "sha1", "files");
+    init(&remote, "sha1", "files");
+    let tree = String::from_utf8(git(&remote, &["hash-object", "-t", "tree", "-w", "--stdin"])).unwrap();
+    let commit_id = String::from_utf8(git(&remote, &["commit-tree", tree.trim(), "-m", "x"])).unwrap();
+    git(&remote, &["update-ref", reference().as_str(), commit_id.trim()]);
+    git(&root, &["remote", "add", "origin", remote.to_str().unwrap()]);
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &root);
+    let mut h = handle(&t.0.join("seal.lock"));
+    let port = PublicationPort::new(&driver, authority(&repo, &mut h)).with_remote(RemoteGrant {
+        name: "origin".into(),
+        pinned_url: remote.to_str().unwrap().into(),
+    });
+    let mapping = "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".to_owned();
+    let a = commit(&port, &repo, vec![], "a");
+    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a), "seed").unwrap();
+    let journal = wal::Wal::open(&repo).unwrap();
+    let mut intent = journal.retained(1000).unwrap().into_iter().next().unwrap().intent().clone();
+    intent.kind = wal::OperationKind::RemoteFetch {
+        url: remote.to_str().unwrap().into(),
+        refspecs: vec![mapping.clone()],
+        targets: vec![],
+    };
+    intent.expected = wal::Tip::Absent;
+    intent.next = wal::Tip::Absent;
+    let chain = match journal.begin("killed-early", intent, &Seed).unwrap() {
+        wal::Begin::Created(c) => c,
+        _ => panic!(),
+    };
+    journal.append(&chain, Phase::Prepared).unwrap();
+    assert!(port.recover_own_transfers(&repo).unwrap().is_empty());
+    port.recover_publications(&repo).unwrap();
+    port.fetch_refs(&repo, "origin", std::slice::from_ref(&mapping)).unwrap();
+    let closed = journal.compacted("killed-early").unwrap().map(|c| c.outcome().unwrap()).or_else(|| journal.inspect("killed-early").unwrap().outcome().cloned());
+    assert!(matches!(closed, Some(wal::Outcome::AbandonedBeforeAttempt)));
+}
+
+#[test]
 fn post_attempt_read_failure_is_pending_with_operation_id() {
     struct Tamper(PathBuf);
     impl FileSystem for Tamper {

@@ -751,8 +751,10 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
     /// Settle the interrupted fetch or push this authority's own writer left
     /// behind, by explicit call (admission itself never settles a transfer). A
     /// killed sync would otherwise block every later one; recovery only observes
-    /// the refs and never replays the transport. A transfer of another writer or
-    /// binding fails the borrow check and stays.
+    /// the refs and never replays the transport. Only a chain that reached its
+    /// attempt is settled here; one killed earlier is left to admission, which
+    /// closes it as abandoned. A transfer of another writer or binding fails the
+    /// borrow check and stays.
     pub fn recover_own_transfers(&self, repo: &RepoHandle) -> Result<Vec<String>> {
         let wal = self.wal(repo)?;
         let mut settled = Vec::new();
@@ -762,7 +764,7 @@ impl<'a, F: FileSystem> PublicationPort<'a, F> {
                 wal::OperationKind::RemoteFetch { .. } | wal::OperationKind::RemotePush { .. }
             );
             if transfer
-                && chain.outcome().is_none()
+                && matches!(chain.last_state(), Phase::TargetAttempt { .. })
                 && self.authority.validate_publication_borrow(chain.intent()).is_ok()
             {
                 let id = chain.last().operation_id.clone();
