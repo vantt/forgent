@@ -280,6 +280,26 @@ test('stops and reports blocked when config write door refuses without raw write
   }
 });
 
+test('keeps and reports the backup copy when the door changed the file before refusing', () => {
+  const { projectDir } = makeTempDirs();
+  try {
+    writeProjectConfig(projectDir, { runner: oldPatternsConfig() });
+
+    const result = convertRunnerPatternsConfig(projectDir, {
+      patchDoor: () => {
+        fs.appendFileSync(projectConfigPath(projectDir), '\n');
+        throw new Error('config-write-conflict: partial-write');
+      },
+    });
+    assert.equal(result.status, 'blocked', 'door refusal must report blocked');
+    const copies = fs.readdirSync(path.join(projectDir, '.fgos')).filter((n) => n.includes('.pre-patterns-catalog-'));
+    assert.equal(copies.length, 1, 'a changed file keeps its backup copy');
+    assert.equal(result.backup, path.join(projectDir, '.fgos', copies[0]), 'the blocked result names the kept copy');
+  } finally {
+    cleanupDirs({ projectDir });
+  }
+});
+
 test('converts configuration with modern reviewed override and retired maxRounds, keeping override meaning and passing loader', () => {
   const { projectDir, homeDir } = makeTempDirs();
   const prevHome = process.env.HOME;

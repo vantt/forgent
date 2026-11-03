@@ -4772,6 +4772,7 @@ function renderPretty(verb, data) {
         formatCheck(
           false,
           `runner patterns config conversion blocked (${data.runnerPatternsConversion.blocker})`,
+          data.runnerPatternsConversion.backup ? `backup: ${data.runnerPatternsConversion.backup}` : undefined,
         ),
       );
     }

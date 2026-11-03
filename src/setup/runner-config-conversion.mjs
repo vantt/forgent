@@ -211,19 +211,21 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
       if (host?.bin) {
         applyNativeConfigPatch(host.bin, projectDir, edits, reason);
       } else {
-        discardUnusedBackup(targetPath, backupPath);
+        const backup = discardUnusedBackup(targetPath, backupPath);
         return {
           status: 'blocked',
           blocker: 'config-write-door-unavailable: Config write door (native fgos config patch) is unavailable; conversion must go through the Config write door',
+          backup,
           written: [],
         };
       }
     }
   } catch (err) {
-    discardUnusedBackup(targetPath, backupPath);
+    const backup = discardUnusedBackup(targetPath, backupPath);
     return {
       status: 'blocked',
       blocker: err.message ?? String(err),
+      backup,
       written: [],
     };
   }
@@ -248,12 +250,17 @@ export function convertRunnerPatternsConfig(projectDir, options = {}) {
 
 // A refused write leaves the file byte-identical, so the copy made just before it
 // only adds one file per setup run; keep it when the file differs from it.
+// Returns the path of a kept copy, or undefined when it was deleted.
 function discardUnusedBackup(targetPath, backupPath) {
   try {
-    if (fs.readFileSync(targetPath).equals(fs.readFileSync(backupPath))) fs.rmSync(backupPath);
+    if (fs.readFileSync(targetPath).equals(fs.readFileSync(backupPath))) {
+      fs.rmSync(backupPath);
+      return undefined;
+    }
   } catch {
     // keep the copy when either file cannot be read
   }
+  return backupPath;
 }
 
 /**

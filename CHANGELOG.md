@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos setup` now names the backup copy of the project config when a blocked runner config conversion keeps it (a write that changed the file before failing).
 - A seat running in a pane is now stopped as idle after 20 minutes with no new words on its screen, even while its CLI still shows a spinner, an elapsed clock or a token counter (a stuck pi turn used to run to the executor timeout); `runner.idleTimeoutMs` now applies only to headless workers.
 - An Event Store sync killed halfway through a fetch or push no longer blocks every later sync (mail between machines stopped when it did): the next sync settles the leftover transfer itself, observing the refs and never replaying the transport; `fgos doctor --fix` names such a transfer and says the next sync settles it.
 - A `--wake` mail now also wakes an idle Claude Code 2.1.314 session that accepts cross-session input (2.1.309 and 2.1.310 already did); a version no contract lists is still refused by name
