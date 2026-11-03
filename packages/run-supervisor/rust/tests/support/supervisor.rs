@@ -37,8 +37,8 @@ pub struct RunOpts {
     pub host_bin: Option<String>,
     pub preferred: String,
     pub grace_ms: u64,
-    /// A hard ceiling that already passed: the gate never starts the agent.
-    pub ceiling_past: bool,
+    /// The hard ceiling, in milliseconds from now; negative is already past, and then the gate never starts the agent.
+    pub ceiling_in_ms: i64,
     /// `launch.maxOutputBytes`: the budget of the two capture files together.
     pub max_output: Option<u64>,
 }
@@ -46,7 +46,7 @@ pub struct RunOpts {
 impl RunOpts {
     /// A `noisy-agent.mjs` that works for `run_ms`.
     pub fn agent(run_ms: u64) -> Self {
-        Self { agent_args: vec!["--run-ms".into(), run_ms.to_string()], soft_ms: None, idle_ms: None, steps: Vec::new(), mutating: false, host_bin: None, preferred: "linux-gate".into(), grace_ms: 3_000, ceiling_past: false, max_output: None }
+        Self { agent_args: vec!["--run-ms".into(), run_ms.to_string()], soft_ms: None, idle_ms: None, steps: Vec::new(), mutating: false, host_bin: None, preferred: "linux-gate".into(), grace_ms: 3_000, ceiling_in_ms: 600_000, max_output: None }
     }
 }
 
@@ -137,7 +137,7 @@ impl SupRun {
             "deadlines": {
                 "softAt": {"bootId": boot_id(), "boottimeNs": soft},
                 "idleMs": opts.idle_ms,
-                "hardCeiling": {"bootId": boot_id(), "boottimeNs": if opts.ceiling_past { boottime_ns() - 1_000_000_000 } else { boottime_ns() + 600_000_000_000u64 }},
+                "hardCeiling": {"bootId": boot_id(), "boottimeNs": (boottime_ns() as i64 + opts.ceiling_in_ms * 1_000_000) as u64},
                 "gateKillGraceMs": opts.grace_ms,
             },
             "agentProtocol": {"cli": "claude", "mode": "direct"},

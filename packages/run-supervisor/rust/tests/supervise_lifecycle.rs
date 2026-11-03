@@ -150,7 +150,7 @@ fn a_tampered_envelope_is_refused_before_anything_starts() {
 fn a_gate_that_never_starts_the_agent_still_ends_in_a_named_receipt() {
     let Some(_driver) = bwrap_driver("supervise-no-agent") else { return };
     let mut opts = RunOpts::agent(300);
-    opts.ceiling_past = true;
+    opts.ceiling_in_ms = -1_000;
     let mut run = SupRun::new("no-agent", &opts);
     let supervisor = run.start();
     let (code, line) = finish(supervisor, LIMIT);

@@ -10,6 +10,8 @@ use std::process::{Command, ExitStatus, Stdio};
 use std::sync::atomic::{AtomicI32, Ordering};
 use std::time::{Duration, Instant};
 
+use fgos_agent_protocol::port::{AgentIo, IoError, SendInput};
+use fgos_agent_protocol::terminal::{FsOutbox, Outbox};
 use fgos_process::control::spawn_with_fds;
 use fgos_process::facts;
 use fgos_process::ProcId;
@@ -377,15 +379,13 @@ impl Channel {
     }
 }
 
-/// A finished `result-<N>.json` in the outbox: it parses as JSON, so a file still being written does not count.
-fn outbox_has_result(dir: &Path) -> bool {
-    let Ok(entries) = std::fs::read_dir(dir) else { return false };
-    entries.flatten().any(|entry| {
-        let name = entry.file_name();
-        let Some(name) = name.to_str() else { return false };
-        let numbered = name.strip_prefix("result-").and_then(|rest| rest.strip_suffix(".json")).is_some_and(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit()));
-        numbered && std::fs::read(entry.path()).ok().is_some_and(|bytes| serde_json::from_slice::<Value>(&bytes).is_ok())
-    })
+/// The agent protocol's port with no pane behind it: the gate only needs its clock and its pause to read the outbox.
+struct NoPane;
+
+impl AgentIo for NoPane {
+    fn send(&mut self, _: &SendInput) -> Result<(), IoError> {
+        Err(IoError::Unsupported)
+    }
 }
 
 /// How often the outbox is looked at while the supervisor is gone and the agent has been briefed.
@@ -429,6 +429,7 @@ fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, 
         }
     }
 
+    let mut outbox = FsOutbox::new(config.outbox_dir.clone());
     let mut grace_ends: Option<Instant> = None;
     let mut escalated = false;
     while agent_pid.is_some() && status.is_none() {
@@ -462,7 +463,7 @@ fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, 
                 let orphan_cause = if !channel.brief_delivered {
                     Some("abandoned-before-brief")
                 } else {
-                    if channel.result_seen.is_none() && outbox_has_result(&config.outbox_dir) {
+                    if channel.result_seen.is_none() && outbox.newest_complete(&mut NoPane).is_some() {
                         channel.result_seen = Some(Instant::now());
                     }
                     channel.result_seen.filter(|at| at.elapsed() >= config.orphan_settle).map(|_| "orphan-result")

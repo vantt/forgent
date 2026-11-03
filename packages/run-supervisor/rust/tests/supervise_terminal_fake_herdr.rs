@@ -341,6 +341,26 @@ fn a_supervisor_killed_after_the_brief_leaves_the_gate_running_and_adopt_release
 }
 
 #[test]
+fn a_fifo_named_like_a_result_does_not_stop_the_orphaned_gate_from_enforcing_the_hard_ceiling() {
+    let herdr = FakeHerdr::new("fifo-ceiling");
+    let mut run = terminal_run_with("tfifo", &herdr, "sleep 600", 1_000, |opts| opts.ceiling_in_ms = 9_000);
+    let mut supervisor = run.start_with_env(&herdr.env());
+
+    brief_taken(&herdr, &run);
+    std::thread::sleep(Duration::from_millis(3_500));
+    supervisor.kill().unwrap();
+    let _ = supervisor.wait();
+    fs::create_dir_all(&run.outbox).unwrap();
+    let fifo = std::ffi::CString::new(run.outbox.join("result-1.json").to_str().unwrap()).unwrap();
+    // SAFETY: a valid NUL-terminated path in the attempt's own outbox.
+    assert_eq!(unsafe { libc::mkfifo(fifo.as_ptr(), 0o600) }, 0);
+
+    wait_until(STEP, "the gate to enforce the ceiling past a FIFO result", || run.json("gate-exit.json").is_some());
+    assert_eq!(run.json("gate-exit.json").unwrap()["stoppedBy"], "hard-ceiling");
+    assert!(!alive(agent_pid(&run) as u32), "the agent is gone");
+}
+
+#[test]
 fn an_idle_agent_with_unchanged_invalid_result_stops_and_releases_custody() {
     let herdr = FakeHerdr::new("invalid-result");
     let mut run = terminal_run("tinvalid-result", &herdr, "sleep 600", 300);
