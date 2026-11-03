@@ -395,13 +395,16 @@ provides:
 capabilities: []
 "#;
 
-    let invalid_manifest: ExternalManifest =
-        serde_json::from_value(
-            fgos_yaml_doc::parse(invalid_yaml.as_bytes(), fgos_yaml_doc::Profile::Tool, "<test>")
-                .and_then(|doc| doc.to_json())
-                .expect("parses"),
+    let invalid_manifest: ExternalManifest = serde_json::from_value(
+        fgos_yaml_doc::parse(
+            invalid_yaml.as_bytes(),
+            fgos_yaml_doc::Profile::Tool,
+            "<test>",
         )
-        .expect("deserializes structurally without validation");
+        .and_then(|doc| doc.to_json())
+        .expect("parses"),
+    )
+    .expect("deserializes structurally without validation");
 
     let result = linker.link(&[invalid_manifest]);
     assert!(

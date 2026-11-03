@@ -32,7 +32,10 @@ fn rooted(req: &ObserveRequest, writes: bool) -> Result<Cow<'_, ObserveRequest>,
         return Ok(Cow::Borrowed(req));
     }
     let root = trusted_root(&req.root).map_err(ProviderError::ProviderFailed)?;
-    Ok(Cow::Owned(ObserveRequest { root, ..req.clone() }))
+    Ok(Cow::Owned(ObserveRequest {
+        root,
+        ..req.clone()
+    }))
 }
 
 const fn observe_descriptor(
@@ -57,11 +60,17 @@ const fn observe_descriptor(
     }
 }
 
-pub const OBSERVE_METRICS_DESCRIPTOR: ProviderDescriptor =
-    observe_descriptor("observe.metrics", "observe.metrics.request", "observe.metrics.outcome");
+pub const OBSERVE_METRICS_DESCRIPTOR: ProviderDescriptor = observe_descriptor(
+    "observe.metrics",
+    "observe.metrics.request",
+    "observe.metrics.outcome",
+);
 
-pub const OBSERVE_FRICTION_DESCRIPTOR: ProviderDescriptor =
-    observe_descriptor("observe.friction", "observe.friction.request", "observe.friction.outcome");
+pub const OBSERVE_FRICTION_DESCRIPTOR: ProviderDescriptor = observe_descriptor(
+    "observe.friction",
+    "observe.friction.request",
+    "observe.friction.outcome",
+);
 
 /// What the composition root gives Observe: the observation sources and
 /// scanners the metrics verbs read and the work store they need.
@@ -144,7 +153,8 @@ mod tests {
     use std::process::Command;
 
     fn temp_dir(tag: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("fgos-observe-root-{tag}-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("fgos-observe-root-{tag}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::canonicalize(dir).unwrap()
@@ -153,7 +163,13 @@ mod tests {
     #[test]
     fn a_directory_inside_a_repository_resolves_to_the_main_root() {
         let main = temp_dir("repository");
-        assert!(Command::new("git").arg("init").arg("-q").arg(&main).status().unwrap().success());
+        assert!(Command::new("git")
+            .arg("init")
+            .arg("-q")
+            .arg(&main)
+            .status()
+            .unwrap()
+            .success());
         let nested = main.join("a/b");
         std::fs::create_dir_all(&nested).unwrap();
         assert_eq!(trusted_root(&nested).unwrap(), main);
@@ -189,13 +205,46 @@ mod tests {
         };
         let friction = |sub| request("observe.friction", sub, &[]);
         let metrics = |sub, args| request("observe.metrics", sub, args);
-        for write in [friction("record"), friction("resolve"), metrics("snapshot", &[]), metrics("case", &["open"]), metrics("case", &["close"]), metrics("eval", &["record"])] {
-            let writes = if write.operation == "observe.friction" { friction_cli::writes(&write) } else { metrics_cli::writes(&write) };
-            assert!(writes && rooted(&write, writes).is_err(), "{} {:?} must resolve the root", write.sub, write.args);
+        for write in [
+            friction("record"),
+            friction("resolve"),
+            metrics("snapshot", &[]),
+            metrics("case", &["open"]),
+            metrics("case", &["close"]),
+            metrics("eval", &["record"]),
+        ] {
+            let writes = if write.operation == "observe.friction" {
+                friction_cli::writes(&write)
+            } else {
+                metrics_cli::writes(&write)
+            };
+            assert!(
+                writes && rooted(&write, writes).is_err(),
+                "{} {:?} must resolve the root",
+                write.sub,
+                write.args
+            );
         }
-        for read in [friction("rank"), friction("list"), friction("show"), metrics("case", &["list"]), metrics("eval", &["list"]), metrics("runs", &[]), metrics("entropy", &[])] {
-            let writes = if read.operation == "observe.friction" { friction_cli::writes(&read) } else { metrics_cli::writes(&read) };
-            assert!(!writes && rooted(&read, writes).unwrap().root == broken, "{} {:?} must keep the requested root", read.sub, read.args);
+        for read in [
+            friction("rank"),
+            friction("list"),
+            friction("show"),
+            metrics("case", &["list"]),
+            metrics("eval", &["list"]),
+            metrics("runs", &[]),
+            metrics("entropy", &[]),
+        ] {
+            let writes = if read.operation == "observe.friction" {
+                friction_cli::writes(&read)
+            } else {
+                metrics_cli::writes(&read)
+            };
+            assert!(
+                !writes && rooted(&read, writes).unwrap().root == broken,
+                "{} {:?} must keep the requested root",
+                read.sub,
+                read.args
+            );
         }
         let _ = std::fs::remove_dir_all(&broken);
     }

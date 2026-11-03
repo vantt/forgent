@@ -49,7 +49,11 @@ impl GitDriver {
         if !wal::valid_id(&grant.name) {
             return Err(failure("remote-not-granted"));
         }
-        let out = self.checked(repo, &["remote", "get-url", "--", &grant.name], Policy::Inspect)?;
+        let out = self.checked(
+            repo,
+            &["remote", "get-url", "--", &grant.name],
+            Policy::Inspect,
+        )?;
         let url = std::str::from_utf8(out.strip_suffix(b"\n").unwrap_or(&out))
             .map_err(|_| failure("git-protocol-invalid-utf8"))?;
         // Every URL accepted here reads back identically in display form, so the pin is a raw compare.
@@ -369,15 +373,14 @@ impl GitDriver {
         };
         let chain = wal.append(&chain, Phase::Prepared)?;
         scope.validate().map_err(failure)?;
-        let attempted = wal
-            .append(
-                &chain,
-                Phase::TargetAttempt {
-                    prior_target_attempt: None,
-                    expected: Tip::Absent,
-                    next: Tip::Absent,
-                },
-            )?;
+        let attempted = wal.append(
+            &chain,
+            Phase::TargetAttempt {
+                prior_target_attempt: None,
+                expected: Tip::Absent,
+                next: Tip::Absent,
+            },
+        )?;
         let mut install_attempted = false;
         let result = (|| {
             filesystem
@@ -611,7 +614,9 @@ pub(crate) fn userinfo_is_credential(scheme: &str, user: &str) -> bool {
 }
 
 pub(crate) fn url_has_credentials_or_controls(url: &str) -> bool {
-    if url.bytes().any(|b| b.is_ascii_control() || b.is_ascii_whitespace())
+    if url
+        .bytes()
+        .any(|b| b.is_ascii_control() || b.is_ascii_whitespace())
         || url.contains(['?', '#'])
         || url.contains("::")
     {
@@ -636,7 +641,10 @@ fn is_scp_form(url: &str) -> bool {
     let Some((target, path)) = url.split_once(':') else {
         return false;
     };
-    if url.contains("://") || target.contains('/') || path.split('/').next().unwrap_or("").contains('@') {
+    if url.contains("://")
+        || target.contains('/')
+        || path.split('/').next().unwrap_or("").contains('@')
+    {
         return false;
     }
     let (user, host) = match target.rsplit_once('@') {
@@ -645,26 +653,65 @@ fn is_scp_form(url: &str) -> bool {
     };
     let host_ok = !host.is_empty()
         && !host.starts_with('-')
-        && host.bytes().all(|b| b.is_ascii_alphanumeric() || b"._-".contains(&b));
+        && host
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b"._-".contains(&b));
     host_ok && !user.is_some_and(|u| userinfo_is_credential("ssh", u))
 }
 
 impl GitDriver {
     /// A transport timeout stays unknown: observation never repeats the request.
-    pub fn recover_transfer(&self, repo: &RepoHandle, held: Vec<BorrowedHandle<'_>>, writer: &str, id: &str) -> Result<Outcome> {
+    pub fn recover_transfer(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        writer: &str,
+        id: &str,
+    ) -> Result<Outcome> {
         let mut scope = crate::refs::acquire_worktree_admin(repo, held)?;
         crate::recovery::leaf(&mut scope, repo)?;
         let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
         let chain = wal.inspect(id)?;
-        if !matches!(chain.intent().kind, OperationKind::RemoteFetch {..} | OperationKind::RemotePush {..}) { return Err(failure("not-remote-transfer-operation")); }
-        if chain.intent().writer_identity != writer || chain.intent().repo_identity != wal.repository_identity() { return Err(failure("remote-authority-mismatch")); }
-        if let Some(o) = chain.outcome() { return Ok(o.clone()); }
-        let attempted = chain.records().iter().any(|r| matches!(r.phase, Phase::TargetAttempt {..}));
-        let outcome = if !attempted { Outcome::AbandonedBeforeAttempt } else {
-            let observations = chain.intent().resource_set.iter().map(|n| Ok((n.clone(), tip(&direct(self,repo,&RefName::parse(n).map_err(failure)?)?)))).collect::<Result<Vec<_>>>()?;
-            Outcome::Transfer {acknowledged:false,unknown:true,observations,details:vec!["outcome-unknown; query remote before any new request".into()]}
+        if !matches!(
+            chain.intent().kind,
+            OperationKind::RemoteFetch { .. } | OperationKind::RemotePush { .. }
+        ) {
+            return Err(failure("not-remote-transfer-operation"));
+        }
+        if chain.intent().writer_identity != writer
+            || chain.intent().repo_identity != wal.repository_identity()
+        {
+            return Err(failure("remote-authority-mismatch"));
+        }
+        if let Some(o) = chain.outcome() {
+            return Ok(o.clone());
+        }
+        let attempted = chain
+            .records()
+            .iter()
+            .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }));
+        let outcome = if !attempted {
+            Outcome::AbandonedBeforeAttempt
+        } else {
+            let observations = chain
+                .intent()
+                .resource_set
+                .iter()
+                .map(|n| {
+                    Ok((
+                        n.clone(),
+                        tip(&direct(self, repo, &RefName::parse(n).map_err(failure)?)?),
+                    ))
+                })
+                .collect::<Result<Vec<_>>>()?;
+            Outcome::Transfer {
+                acknowledged: false,
+                unknown: true,
+                observations,
+                details: vec!["outcome-unknown; query remote before any new request".into()],
+            }
         };
-        wal.append(&chain,Phase::Outcome(outcome.clone()))?;
+        wal.append(&chain, Phase::Outcome(outcome.clone()))?;
         Ok(outcome)
     }
 }

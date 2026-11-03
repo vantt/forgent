@@ -56,9 +56,9 @@ impl InstallLockGuard {
             fgos_holder_lock::Acquire::Held { .. } | fgos_holder_lock::Acquire::Timeout { .. } => {
                 Err(LockError::AlreadyInProgress)
             }
-            fgos_holder_lock::Acquire::Unavailable { reason, detail } => {
-                Err(LockError::DriverUnavailable(format!("{}: {detail}", reason.as_str())))
-            }
+            fgos_holder_lock::Acquire::Unavailable { reason, detail } => Err(
+                LockError::DriverUnavailable(format!("{}: {detail}", reason.as_str())),
+            ),
         }
     }
 }

@@ -502,7 +502,14 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                                 wait,
                                 now: now(),
                             };
-                            match mailbox_remote::send(&ctx, &from, to, body, reply_to.as_deref(), *wake) {
+                            match mailbox_remote::send(
+                                &ctx,
+                                &from,
+                                to,
+                                body,
+                                reply_to.as_deref(),
+                                *wake,
+                            ) {
                                 mailbox_remote::Outcome::NotRemote => {}
                                 mailbox_remote::Outcome::Recorded(text) => {
                                     return remote_answer(true, text, *json, warning)

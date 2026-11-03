@@ -148,11 +148,40 @@ mod tests {
         assert!(run("runs", &["--json", "--by=role"]).is_ok());
         assert!(run("case", &["list", "--json", "--open"]).is_ok());
         assert!(run("eval", &["list", "--harness=plain", "--json"]).is_ok());
-        assert_eq!(run("runs", &["--by", "nobody"]).unwrap_err(), "invalid --by value \"nobody\". Allowed: executor, adapter, role");
-        assert_eq!(run("runs", &["--nope"]).unwrap_err(), "metrics runs: unknown option --nope");
-        assert_eq!(run("faults", &["--limit", "abc"]).unwrap_err(), "faults --limit requires a positive integer value");
-        assert_eq!(run("case", &["list", "--bogus"]).unwrap_err(), "metrics case: unknown option --bogus");
-        assert_eq!(run("case", &["close", "x", "--interventions", "abc", "--verdict", "usable"]).unwrap_err(), "invalid value for --interventions: abc");
-        assert_eq!(run("eval", &["list", "--question", " "]).unwrap_err(), "metrics eval: missing value for --question");
+        assert_eq!(
+            run("runs", &["--by", "nobody"]).unwrap_err(),
+            "invalid --by value \"nobody\". Allowed: executor, adapter, role"
+        );
+        assert_eq!(
+            run("runs", &["--nope"]).unwrap_err(),
+            "metrics runs: unknown option --nope"
+        );
+        assert_eq!(
+            run("faults", &["--limit", "abc"]).unwrap_err(),
+            "faults --limit requires a positive integer value"
+        );
+        assert_eq!(
+            run("case", &["list", "--bogus"]).unwrap_err(),
+            "metrics case: unknown option --bogus"
+        );
+        assert_eq!(
+            run(
+                "case",
+                &[
+                    "close",
+                    "x",
+                    "--interventions",
+                    "abc",
+                    "--verdict",
+                    "usable"
+                ]
+            )
+            .unwrap_err(),
+            "invalid value for --interventions: abc"
+        );
+        assert_eq!(
+            run("eval", &["list", "--question", " "]).unwrap_err(),
+            "metrics eval: missing value for --question"
+        );
     }
 }

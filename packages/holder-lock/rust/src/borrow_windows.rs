@@ -17,12 +17,17 @@ use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::{self, ProcTuple};
-use fgos_process::platform::windows_job::{ancestor_chain, create_kill_job, filetime_now, job_name, open_job, own_session, JobView};
+use fgos_process::platform::windows_job::{
+    ancestor_chain, create_kill_job, filetime_now, job_name, open_job, own_session, JobView,
+};
 use fgos_process::platform::windows_spawn::{spawn, ChildStdio, SpawnSpec, Spawned};
 use fgos_process::{Domain, DomainState, ProcId, WindowsJob};
 
 use crate::driver;
-use crate::port::{borrowed_argv, probe, BorrowError, BorrowOutcome, BorrowSpec, BorrowStdio, BorrowedCheck, Handle, HelperExe, Mode, NotBorrowerReason, Probe, Resource};
+use crate::port::{
+    borrowed_argv, probe, BorrowError, BorrowOutcome, BorrowSpec, BorrowStdio, BorrowedCheck,
+    Handle, HelperExe, Mode, NotBorrowerReason, Probe, Resource,
+};
 use crate::predecessor;
 
 /// The variable that names a borrow job: `<lock name>:<job name>`.
@@ -50,7 +55,10 @@ pub(crate) struct BorrowControl<'a> {
 impl BorrowControl<'_> {
     /// Nothing to report and nothing to cancel.
     pub(crate) fn none() -> BorrowControl<'static> {
-        BorrowControl { cancel: None, on_started: None }
+        BorrowControl {
+            cancel: None,
+            on_started: None,
+        }
     }
 }
 
@@ -61,10 +69,20 @@ fn setup_error(message: impl Into<String>) -> BorrowError {
 /// The job-keeper, started outside the job and inheriting nothing but its own
 /// pipes. `Err` when it did not acknowledge within the bound; the keeper is
 /// then ended.
-fn start_keeper(helper: &HelperExe, job: &str, record: &std::path::Path) -> io::Result<(Spawned, File)> {
+fn start_keeper(
+    helper: &HelperExe,
+    job: &str,
+    record: &std::path::Path,
+) -> io::Result<(Spawned, File)> {
     let argv = helper.argv();
     let mut args: Vec<OsString> = argv[1..].iter().map(OsString::from).collect();
-    args.extend(["job-keeper".into(), "--job".into(), job.into(), "--record".into(), record.as_os_str().to_os_string()]);
+    args.extend([
+        "job-keeper".into(),
+        "--job".into(),
+        job.into(),
+        "--record".into(),
+        record.as_os_str().to_os_string(),
+    ]);
     let mut keeper = spawn(SpawnSpec {
         program: OsString::from(&argv[0]),
         args,
@@ -90,15 +108,24 @@ fn start_keeper(helper: &HelperExe, job: &str, record: &std::path::Path) -> io::
     }
     let _ = keeper.kill();
     let _ = keeper.wait();
-    Err(io::Error::other("job-keeper did not acknowledge that it opened the job"))
+    Err(io::Error::other(
+        "job-keeper did not acknowledge that it opened the job",
+    ))
 }
 
 /// The suspended child: `CREATE_SUSPENDED` so it cannot run, or create a
 /// process outside the job, before assignment. It inherits the handles of its
 /// three streams and nothing else the holder owns.
-fn start_child(handle: &Handle, spec: &BorrowSpec, job: &str, program: &str, args: &[String]) -> io::Result<Spawned> {
+fn start_child(
+    handle: &Handle,
+    spec: &BorrowSpec,
+    job: &str,
+    program: &str,
+    args: &[String],
+) -> io::Result<Spawned> {
     // Names compare without case, as Windows reads them: a caller's `PATH` replaces the parent's `Path`.
-    let mut env: std::collections::BTreeMap<String, (OsString, OsString)> = std::collections::BTreeMap::new();
+    let mut env: std::collections::BTreeMap<String, (OsString, OsString)> =
+        std::collections::BTreeMap::new();
     let mut set = |name: OsString, value: OsString| {
         env.insert(name.to_string_lossy().to_uppercase(), (name, value));
     };
@@ -110,12 +137,28 @@ fn start_child(handle: &Handle, spec: &BorrowSpec, job: &str, program: &str, arg
     for (name, value) in &spec.env {
         set(OsString::from(name), OsString::from(value));
     }
-    set(OsString::from(LOCK_JOB_ENV), OsString::from(format!("{}:{job}", handle.name())));
-    let open = |path: &std::path::Path| std::fs::OpenOptions::new().create(true).append(true).open(path);
+    set(
+        OsString::from(LOCK_JOB_ENV),
+        OsString::from(format!("{}:{job}", handle.name())),
+    );
+    let open = |path: &std::path::Path| {
+        std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)
+    };
     let (stdin, stdout, stderr) = match &spec.stdio {
-        BorrowStdio::Inherit => (ChildStdio::Inherit, ChildStdio::Inherit, ChildStdio::Inherit),
+        BorrowStdio::Inherit => (
+            ChildStdio::Inherit,
+            ChildStdio::Inherit,
+            ChildStdio::Inherit,
+        ),
         BorrowStdio::Null => (ChildStdio::Null, ChildStdio::Null, ChildStdio::Null),
-        BorrowStdio::Files { out, err } => (ChildStdio::Null, ChildStdio::File(open(out)?), ChildStdio::File(open(err)?)),
+        BorrowStdio::Files { out, err } => (
+            ChildStdio::Null,
+            ChildStdio::File(open(out)?),
+            ChildStdio::File(open(err)?),
+        ),
     };
     spawn(SpawnSpec {
         program: OsString::from(program),
@@ -130,8 +173,14 @@ fn start_child(handle: &Handle, spec: &BorrowSpec, job: &str, program: &str, arg
 }
 
 /// Wait for the child, ending the job when a cancel arrives.
-fn wait_child(child: &Spawned, job: &fgos_process::platform::windows_job::Job, control: &BorrowControl<'_>) -> io::Result<u32> {
-    let Some(cancel) = control.cancel else { return child.wait() };
+fn wait_child(
+    child: &Spawned,
+    job: &fgos_process::platform::windows_job::Job,
+    control: &BorrowControl<'_>,
+) -> io::Result<u32> {
+    let Some(cancel) = control.cancel else {
+        return child.wait();
+    };
     let mut cancelled = false;
     loop {
         if let Some(code) = child.try_wait()? {
@@ -150,7 +199,11 @@ fn wait_child(child: &Spawned, job: &fgos_process::platform::windows_job::Job, c
 /// list, because the list alone can omit a member that is still running and
 /// the job's count can drop before the process object is signaled. `Ok(members
 /// that were still running)`; `Err(pids left)` when the bound passes.
-fn empty_the_job(job: &fgos_process::platform::windows_job::Job, name: &str, kill_wait: Duration) -> Result<u32, Vec<u32>> {
+fn empty_the_job(
+    job: &fgos_process::platform::windows_job::Job,
+    name: &str,
+    kill_wait: Duration,
+) -> Result<u32, Vec<u32>> {
     let Some(mut view) = JobView::open(name, true) else {
         let _ = job.terminate();
         return Err(Vec::new());
@@ -171,26 +224,43 @@ fn empty_the_job(job: &fgos_process::platform::windows_job::Job, name: &str, kil
 
 /// Run `spec` with the holder's authority inside a fresh job. See the module
 /// note; the steps follow `predecessor.v1.json`.
-pub(crate) fn run(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe, control: &BorrowControl<'_>) -> Result<BorrowOutcome, BorrowError> {
+pub(crate) fn run(
+    handle: &Handle,
+    spec: &BorrowSpec,
+    helper: &HelperExe,
+    control: &BorrowControl<'_>,
+) -> Result<BorrowOutcome, BorrowError> {
     crate::port::validate(handle)?;
     if !driver::current().supported() {
         return Err(BorrowError::Unsupported);
     }
     if handle.mode != Mode::Ex {
-        return Err(BorrowError::InvalidSpec("only an exclusive lock can be borrowed".into()));
+        return Err(BorrowError::InvalidSpec(
+            "only an exclusive lock can be borrowed".into(),
+        ));
     }
     let argv = borrowed_argv(&spec.argv);
     let Some((program, args)) = argv.split_first() else {
         return Err(BorrowError::InvalidSpec("argv is empty".into()));
     };
     let name = job_name(JOB_PREFIX, handle.name());
-    let session_id = own_session().ok_or_else(|| setup_error("cannot read this process's Windows session"))?;
-    let holder = facts::self_identity().ok_or_else(|| setup_error("cannot read this process's identity"))?;
+    let session_id =
+        own_session().ok_or_else(|| setup_error("cannot read this process's Windows session"))?;
+    let holder =
+        facts::self_identity().ok_or_else(|| setup_error("cannot read this process's identity"))?;
     let record = predecessor::record_path(handle.path());
-    let mut domain = WindowsJob { job: name.clone(), session_id, declared_at: filetime_now(), holder, keeper: None };
+    let mut domain = WindowsJob {
+        job: name.clone(),
+        session_id,
+        declared_at: filetime_now(),
+        holder,
+        keeper: None,
+    };
     // Declared before the job exists: a holder that dies from here on leaves a
     // record the next contender can judge.
-    handle.declare_domain(&Domain::WindowsJob(domain.clone())).map_err(BorrowError::Spawn)?;
+    handle
+        .declare_domain(&Domain::WindowsJob(domain.clone()))
+        .map_err(BorrowError::Spawn)?;
     let job = match create_kill_job(&name) {
         Ok(job) => job,
         Err(err) => {
@@ -208,7 +278,11 @@ pub(crate) fn run(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe, contro
     };
     let keeper_tuple: Option<ProcTuple> = facts::identity_of(ProcId(keeper.id()));
     domain.keeper = keeper_tuple;
-    if domain.keeper.is_none() || handle.declare_domain(&Domain::WindowsJob(domain.clone())).is_err() {
+    if domain.keeper.is_none()
+        || handle
+            .declare_domain(&Domain::WindowsJob(domain.clone()))
+            .is_err()
+    {
         let _ = keeper.kill();
         let _ = keeper.wait();
         predecessor::remove_record(&record);
@@ -250,19 +324,34 @@ pub(crate) fn run(handle: &Handle, spec: &BorrowSpec, helper: &HelperExe, contro
 
 /// A leftover that could not be killed outranks a failed wait (the port's
 /// error precedence); the record is removed only once the domain is empty.
-fn settle(waited: io::Result<u32>, emptied: Result<u32, Vec<u32>>, remove_record: impl FnOnce()) -> Result<BorrowOutcome, BorrowError> {
+fn settle(
+    waited: io::Result<u32>,
+    emptied: Result<u32, Vec<u32>>,
+    remove_record: impl FnOnce(),
+) -> Result<BorrowOutcome, BorrowError> {
     let killed = match emptied {
         // The record stays: the domain is not empty, and the next contender
         // must judge it.
         Err(pids) => {
             let exit = waited.as_ref().ok().map(|code| *code as i32);
-            return Err(BorrowError::LeftoverNotKilled { outcome: BorrowOutcome { exit, signal: None, leftovers_killed: 0 }, pids });
+            return Err(BorrowError::LeftoverNotKilled {
+                outcome: BorrowOutcome {
+                    exit,
+                    signal: None,
+                    leftovers_killed: 0,
+                },
+                pids,
+            });
         }
         Ok(killed) => killed,
     };
     remove_record();
     let exit_code = waited.map_err(BorrowError::Wait)?;
-    Ok(BorrowOutcome { exit: Some(exit_code as i32), signal: None, leftovers_killed: killed })
+    Ok(BorrowOutcome {
+        exit: Some(exit_code as i32),
+        signal: None,
+        leftovers_killed: killed,
+    })
 }
 
 #[cfg(test)]
@@ -274,11 +363,16 @@ mod tests {
         let mut removed = false;
         let failed_wait = Err(io::Error::other("wait failed"));
         let error = settle(failed_wait, Err(vec![4242]), || removed = true).unwrap_err();
-        assert!(matches!(error, BorrowError::LeftoverNotKilled { ref pids, .. } if pids == &[4242]));
+        assert!(
+            matches!(error, BorrowError::LeftoverNotKilled { ref pids, .. } if pids == &[4242])
+        );
         assert!(error.to_string().starts_with("borrow-leftover-not-killed"));
         assert!(!removed);
         let mut removed = false;
-        let error = settle(Err(io::Error::other("wait failed")), Ok(1), || removed = true).unwrap_err();
+        let error = settle(Err(io::Error::other("wait failed")), Ok(1), || {
+            removed = true
+        })
+        .unwrap_err();
         assert!(matches!(error, BorrowError::Wait(_)));
         assert!(removed);
     }
@@ -290,25 +384,38 @@ mod tests {
 /// that job and a holder; (c) this process is in the job; (d) the recorded
 /// holder (pid and creation time) is one of this process's ancestors, and the
 /// lock is held.
-pub fn borrowed_check_job(lock_path: &std::path::Path, fgos_lock_job: Option<&str>) -> BorrowedCheck {
+pub fn borrowed_check_job(
+    lock_path: &std::path::Path,
+    fgos_lock_job: Option<&str>,
+) -> BorrowedCheck {
     let fail = |reason| BorrowedCheck::NotBorrower(reason);
-    let Some((name, job)) = fgos_lock_job.and_then(|value| value.split_once(':')).filter(|(name, job)| !name.is_empty() && !job.is_empty()) else {
+    let Some((name, job)) = fgos_lock_job
+        .and_then(|value| value.split_once(':'))
+        .filter(|(name, job)| !name.is_empty() && !job.is_empty())
+    else {
         return fail(NotBorrowerReason::JobMissing);
     };
     let record = std::fs::read_to_string(predecessor::record_path(lock_path))
         .ok()
         .and_then(|text| serde_json::from_str::<serde_json::Value>(&text).ok())
         .and_then(|value| predecessor::parse_record(&value));
-    let Some(Domain::WindowsJob(domain)) = record else { return fail(NotBorrowerReason::RecordMismatch) };
+    let Some(Domain::WindowsJob(domain)) = record else {
+        return fail(NotBorrowerReason::RecordMismatch);
+    };
     if domain.job != job {
         return fail(NotBorrowerReason::RecordMismatch);
     }
-    let in_job = open_job(job).ok().and_then(|opened| opened.contains(std::process::id())).unwrap_or(false);
+    let in_job = open_job(job)
+        .ok()
+        .and_then(|opened| opened.contains(std::process::id()))
+        .unwrap_or(false);
     if !in_job {
         return fail(NotBorrowerReason::NotInJob);
     }
     let holder_start = domain.holder.start_time.parse::<u64>().ok();
-    let is_ancestor = ancestor_chain().iter().any(|(pid, created)| *pid == domain.holder.pid.0 && Some(*created) == holder_start);
+    let is_ancestor = ancestor_chain()
+        .iter()
+        .any(|(pid, created)| *pid == domain.holder.pid.0 && Some(*created) == holder_start);
     if !is_ancestor {
         return fail(NotBorrowerReason::HolderNotAncestor);
     }

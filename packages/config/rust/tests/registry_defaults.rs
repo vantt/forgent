@@ -181,8 +181,7 @@ fn every_doc_line_in_a_bundled_standard_file_is_the_render_of_its_schema_node() 
                 stack.pop();
             }
             stack.push((indent, key));
-            let path: Vec<Segment> =
-                stack.iter().map(|(_, k)| Segment::Key(k.clone())).collect();
+            let path: Vec<Segment> = stack.iter().map(|(_, k)| Segment::Key(k.clone())).collect();
             let want = rendered(&schemas, &standard, &path);
             let (at, doc) = pending.take().unwrap_or((index + 1, Vec::new()));
             let is_catalog = path.first() == Some(&Segment::Key("runner".into()))

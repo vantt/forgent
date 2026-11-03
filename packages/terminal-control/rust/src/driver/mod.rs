@@ -155,7 +155,12 @@ pub trait TerminalDriver {
     fn capabilities(&self) -> Vec<&'static str>;
     fn server_incarnation(&self) -> DriverResult<ServerIncarnation>;
 
-    fn tab_create(&self, label: &str, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane>;
+    fn tab_create(
+        &self,
+        label: &str,
+        cwd: Option<&str>,
+        env: &[(String, String)],
+    ) -> DriverResult<CreatedPane>;
     /// `ratio` is the share kept by the existing pane, as herdr measures it.
     fn pane_split(
         &self,
@@ -182,7 +187,10 @@ pub trait TerminalDriver {
     fn activity(&self, pane: &str) -> DriverResult<Activity>;
     /// The driver's own detector verdict for the pane (`activity.state`).
     fn activity_detail(&self, _pane: &str) -> DriverResult<ActivityDetail> {
-        Err(Refusal::Unsupported { capability: "activity.state".into(), detail: format!("driver {} gives no detector detail", self.name()) })
+        Err(Refusal::Unsupported {
+            capability: "activity.state".into(),
+            detail: format!("driver {} gives no detector detail", self.name()),
+        })
     }
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()>;
     /// Geometry of the tab holding `pane`: the rects the multiplexer reports, one read.

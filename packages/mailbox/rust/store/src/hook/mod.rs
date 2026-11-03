@@ -18,9 +18,7 @@ pub use drain::{
 };
 #[cfg(unix)]
 pub(crate) use drain::{claim_inbox, InboxClaim};
-pub use limits::{
-    BreakerLimits, HookCallLimits, HookLimits, StopBlockLimits, VerbLimits,
-};
+pub use limits::{BreakerLimits, HookCallLimits, HookLimits, StopBlockLimits, VerbLimits};
 
 use fgos_mailbox_core::Cli;
 

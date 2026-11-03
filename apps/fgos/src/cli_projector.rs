@@ -91,7 +91,11 @@ pub fn project_cli_invocation(
         ),
         "config.read" | "config.write" => (
             ContractRef::from_static(
-                if operation.as_str() == "config.read" { "config.read.request" } else { "config.write.request" },
+                if operation.as_str() == "config.read" {
+                    "config.read.request"
+                } else {
+                    "config.write.request"
+                },
                 "1.0.0",
             ),
             Box::new(project_config_request(args, root)?),
@@ -152,11 +156,24 @@ fn project_config_request(
         "check" => (&[], &[], 0),
         "explain" => (&[], &[], 1),
         "set" => (&["--reason"], &["--global"], 2),
-        "unset" => (&["--reason"], &["--global", "--acknowledge-comment-loss"], 1),
+        "unset" => (
+            &["--reason"],
+            &["--global", "--acknowledge-comment-loss"],
+            1,
+        ),
         "patch" => (&["--reason"], &["--global"], 1),
-        "migrate" => {
-            (&[], &["--dry-run", "--global", "--finish", "--convert", "--machine-checked", "--accept-machine-overrides"], 0)
-        }
+        "migrate" => (
+            &[],
+            &[
+                "--dry-run",
+                "--global",
+                "--finish",
+                "--convert",
+                "--machine-checked",
+                "--accept-machine-overrides",
+            ],
+            0,
+        ),
         "refresh-docs" => (&[], &["--global"], 0),
         other => {
             return Err(format!(
@@ -165,7 +182,8 @@ fn project_config_request(
             ))
         }
     };
-    let (mut values, mut on, mut positional) = (std::collections::HashMap::new(), Vec::new(), Vec::new());
+    let (mut values, mut on, mut positional) =
+        (std::collections::HashMap::new(), Vec::new(), Vec::new());
     let mut rest = args[2..].iter().map(|a| a.to_string_lossy().into_owned());
     while let Some(token) = rest.next() {
         if !token.starts_with("--") {
@@ -174,7 +192,9 @@ fn project_config_request(
         }
         let (flag, inline) = token
             .split_once('=')
-            .map_or((token.as_str(), None), |(flag, value)| (flag, Some(value.to_owned())));
+            .map_or((token.as_str(), None), |(flag, value)| {
+                (flag, Some(value.to_owned()))
+            });
         if flag == "--json" {
             continue;
         }
@@ -190,20 +210,41 @@ fn project_config_request(
         }
     }
     if positional.len() != arguments {
-        return Err(format!("config {sub} takes {arguments} argument(s), got {}", positional.len()));
+        return Err(format!(
+            "config {sub} takes {arguments} argument(s), got {}",
+            positional.len()
+        ));
     }
     let has = |flag: &str| on.iter().any(|f| f == flag);
     let reason = values.remove("--reason").unwrap_or_default();
     let (global, mut arg) = (has("--global"), positional.into_iter());
     let mut next = || arg.next().unwrap_or_default();
     let verb = match sub {
-        "show" => Verb::Show { path: values.remove("--path") },
-        "standard" => Verb::Standard { path: values.remove("--path") },
+        "show" => Verb::Show {
+            path: values.remove("--path"),
+        },
+        "standard" => Verb::Standard {
+            path: values.remove("--path"),
+        },
         "check" => Verb::Check,
         "explain" => Verb::Explain { path: next() },
-        "set" => Verb::Set { path: next(), value: next(), reason, global },
-        "unset" => Verb::Unset { path: next(), reason, global, acknowledge: has("--acknowledge-comment-loss") },
-        "patch" => Verb::Patch { file: next().into(), reason, global },
+        "set" => Verb::Set {
+            path: next(),
+            value: next(),
+            reason,
+            global,
+        },
+        "unset" => Verb::Unset {
+            path: next(),
+            reason,
+            global,
+            acknowledge: has("--acknowledge-comment-loss"),
+        },
+        "patch" => Verb::Patch {
+            file: next().into(),
+            reason,
+            global,
+        },
         "refresh-docs" => Verb::RefreshDocs { global },
         _ => {
             if has("--finish") && !global {
@@ -216,7 +257,9 @@ fn project_config_request(
                 return Err("--machine-checked needs --finish or --convert".into());
             }
             if has("--accept-machine-overrides") && global {
-                return Err("--accept-machine-overrides is for the project migration, not --global".into());
+                return Err(
+                    "--accept-machine-overrides is for the project migration, not --global".into(),
+                );
             }
             Verb::Migrate {
                 global,
@@ -238,30 +281,45 @@ fn project_config_request(
 /// [--project] [--prune] [--machine <handle|id>]`, `fgos identity pins [--forget <machine-id> | --confirm <machine-id> --fingerprint <fp>]`, `fgos identity mint <kind> [--release <number>]
 /// [--json]`. `--dir` is accepted and ignored on
 /// every verb, because the shell integration appends it.
-fn project_identity_request(
-    args: &[OsString],
-) -> Result<fgos_identity::IdentityRequest, String> {
+fn project_identity_request(args: &[OsString]) -> Result<fgos_identity::IdentityRequest, String> {
     let subcommand = args
         .get(1)
         .map(|value| value.to_string_lossy().into_owned())
         .filter(|value| !value.starts_with('-'));
     let mut index = if subcommand.is_some() { 2 } else { 1 };
     let (verb, allowed): (fgos_identity::Verb, &[&str]) = match subcommand.as_deref() {
-        None | Some("writer") => (fgos_identity::Verb::Writer, &["--pid", "--fgos-dir", "--dir"]),
+        None | Some("writer") => (
+            fgos_identity::Verb::Writer,
+            &["--pid", "--fgos-dir", "--dir"],
+        ),
         Some("machine") => (
             fgos_identity::Verb::Machine { alias: None },
             &["--alias", "--dir"],
         ),
         Some("session") => (
             fgos_identity::Verb::Session(fgos_identity::SessionAction::Read),
-            &["--pid", "--fgos-dir", "--register", "--role", "--drop-role", "--take", "--dir"],
+            &[
+                "--pid",
+                "--fgos-dir",
+                "--register",
+                "--role",
+                "--drop-role",
+                "--take",
+                "--dir",
+            ],
         ),
         Some("resolve") => (
-            fgos_identity::Verb::Resolve { query: String::new() },
+            fgos_identity::Verb::Resolve {
+                query: String::new(),
+            },
             &["--dir"],
         ),
         Some("list") => (
-            fgos_identity::Verb::List { project: false, prune: false, machine: None },
+            fgos_identity::Verb::List {
+                project: false,
+                prune: false,
+                machine: None,
+            },
             &["--project", "--prune", "--machine", "--dir"],
         ),
         Some("project") => (
@@ -269,7 +327,10 @@ fn project_identity_request(
             &["--init", "--new", "--handle", "--dir"],
         ),
         Some("mint") => (
-            fgos_identity::Verb::Mint { kind: String::new(), release: None },
+            fgos_identity::Verb::Mint {
+                kind: String::new(),
+                release: None,
+            },
             &["--release", "--dir"],
         ),
         Some("pins") => (
@@ -295,7 +356,10 @@ fn project_identity_request(
                 .map(|value| value.to_string_lossy().into_owned())
                 .filter(|value| !value.starts_with('-'))
                 .ok_or_else(|| {
-                    format!("mint requires an id kind. Available: {}", fgos_identity::KIND_NAMES.join(", "))
+                    format!(
+                        "mint requires an id kind. Available: {}",
+                        fgos_identity::KIND_NAMES.join(", ")
+                    )
                 })?;
             index += 1;
             *kind = name;
@@ -305,7 +369,10 @@ fn project_identity_request(
                 .get(index)
                 .map(|value| value.to_string_lossy().into_owned())
                 .filter(|value| !value.starts_with('-'))
-                .ok_or_else(|| "resolve requires a handle or a role such as lead:MAIL or work:<name>".to_string())?;
+                .ok_or_else(|| {
+                    "resolve requires a handle or a role such as lead:MAIL or work:<name>"
+                        .to_string()
+                })?;
             index += 1;
             *query = name;
         }
@@ -330,7 +397,16 @@ fn project_identity_request(
         if value == "--json" {
             continue;
         }
-        if ["--init", "--new", "--register", "--take", "--project", "--prune"].contains(&value.as_str()) {
+        if [
+            "--init",
+            "--new",
+            "--register",
+            "--take",
+            "--project",
+            "--prune",
+        ]
+        .contains(&value.as_str())
+        {
             if !allowed.contains(&value.as_str()) {
                 return Err(format!("unknown identity option '{value}'"));
             }
@@ -373,7 +449,9 @@ fn project_identity_request(
                     .parse::<u32>()
                     .ok()
                     .filter(|pid| *pid > 0)
-                    .ok_or_else(|| format!("--pid must be a positive integer, got '{flag_value}'"))?;
+                    .ok_or_else(|| {
+                        format!("--pid must be a positive integer, got '{flag_value}'")
+                    })?;
                 request.pid = Some(pid);
             }
             "--release" => {
@@ -381,7 +459,9 @@ fn project_identity_request(
                     .parse::<u64>()
                     .ok()
                     .filter(|number| *number > 0)
-                    .ok_or_else(|| format!("--release must be a positive number, got '{flag_value}'"))?;
+                    .ok_or_else(|| {
+                        format!("--release must be a positive number, got '{flag_value}'")
+                    })?;
                 if let fgos_identity::Verb::Mint { release, .. } = &mut request.verb {
                     *release = Some(number);
                 }
@@ -458,7 +538,11 @@ fn project_identity_request(
                 *action = fgos_identity::SessionAction::Register { role, take };
             }
         }
-        fgos_identity::Verb::List { project, prune: pruned, machine } => {
+        fgos_identity::Verb::List {
+            project,
+            prune: pruned,
+            machine,
+        } => {
             *project = by_project;
             *pruned = prune;
             *machine = machine_filter;
@@ -466,15 +550,22 @@ fn project_identity_request(
         _ => {}
     }
     if matches!(request.verb, fgos_identity::Verb::Pins(_)) {
-        request.verb = fgos_identity::Verb::Pins(match (forget, confirm, fingerprint) {
-            (None, None, None) => fgos_identity::PinsAction::List,
-            (Some(machine_id), None, None) => fgos_identity::PinsAction::Forget { machine_id },
-            (Some(_), Some(_), _) => return Err("--forget and --confirm are exclusive".into()),
-            (Some(_), None, Some(_)) => return Err("--fingerprint goes with --confirm".into()),
-            (None, None, Some(_)) => return Err("--fingerprint needs --confirm".into()),
-            (None, Some(_), None) => return Err("--confirm requires --fingerprint <SHA256:...>, the fingerprint you compared".into()),
-            (None, Some(machine_id), Some(fingerprint)) => fgos_identity::PinsAction::Confirm { machine_id, fingerprint },
-        });
+        request.verb =
+            fgos_identity::Verb::Pins(match (forget, confirm, fingerprint) {
+                (None, None, None) => fgos_identity::PinsAction::List,
+                (Some(machine_id), None, None) => fgos_identity::PinsAction::Forget { machine_id },
+                (Some(_), Some(_), _) => return Err("--forget and --confirm are exclusive".into()),
+                (Some(_), None, Some(_)) => return Err("--fingerprint goes with --confirm".into()),
+                (None, None, Some(_)) => return Err("--fingerprint needs --confirm".into()),
+                (None, Some(_), None) => return Err(
+                    "--confirm requires --fingerprint <SHA256:...>, the fingerprint you compared"
+                        .into(),
+                ),
+                (None, Some(machine_id), Some(fingerprint)) => fgos_identity::PinsAction::Confirm {
+                    machine_id,
+                    fingerprint,
+                },
+            });
     }
     if matches!(request.verb, fgos_identity::Verb::Project(_)) {
         request.verb = fgos_identity::Verb::Project(match (mint, handle) {
@@ -622,9 +713,18 @@ mod tests {
             native_operation_id("identity.writer", &args).unwrap()
         };
         assert_eq!(operation(&["identity", "--json"]), "identity.writer");
-        assert_eq!(operation(&["identity", "writer", "--pid", "7"]), "identity.writer");
-        assert_eq!(operation(&["identity", "machine", "--json"]), "identity.read");
-        assert_eq!(operation(&["identity", "session", "--pid", "7"]), "identity.read");
+        assert_eq!(
+            operation(&["identity", "writer", "--pid", "7"]),
+            "identity.writer"
+        );
+        assert_eq!(
+            operation(&["identity", "machine", "--json"]),
+            "identity.read"
+        );
+        assert_eq!(
+            operation(&["identity", "session", "--pid", "7"]),
+            "identity.read"
+        );
         assert_eq!(
             operation(&["identity", "machine", "--alias", "lab"]),
             "identity.write"
@@ -634,17 +734,38 @@ mod tests {
             .map(OsString::from)
             .collect();
         assert!(native_operation_id("identity.writer", &args).is_err());
-        assert_eq!(operation(&["identity", "project", "--json"]), "identity.read");
-        assert_eq!(operation(&["identity", "project", "--init"]), "identity.write");
+        assert_eq!(
+            operation(&["identity", "project", "--json"]),
+            "identity.read"
+        );
+        assert_eq!(
+            operation(&["identity", "project", "--init"]),
+            "identity.write"
+        );
         assert_eq!(
             operation(&["identity", "project", "--handle", "app", "--new"]),
             "identity.write"
         );
-        assert_eq!(operation(&["identity", "mint", "work", "--json"]), "identity.write");
-        assert_eq!(operation(&["identity", "resolve", "lead:MAIL"]), "identity.read");
-        assert_eq!(operation(&["identity", "list", "--project"]), "identity.read");
-        assert_eq!(operation(&["identity", "list", "--prune"]), "identity.write");
-        assert_eq!(operation(&["identity", "session", "--register"]), "identity.write");
+        assert_eq!(
+            operation(&["identity", "mint", "work", "--json"]),
+            "identity.write"
+        );
+        assert_eq!(
+            operation(&["identity", "resolve", "lead:MAIL"]),
+            "identity.read"
+        );
+        assert_eq!(
+            operation(&["identity", "list", "--project"]),
+            "identity.read"
+        );
+        assert_eq!(
+            operation(&["identity", "list", "--prune"]),
+            "identity.write"
+        );
+        assert_eq!(
+            operation(&["identity", "session", "--register"]),
+            "identity.write"
+        );
         assert_eq!(
             operation(&["identity", "session", "--role", "lead:MAIL", "--take"]),
             "identity.write"
@@ -657,7 +778,14 @@ mod tests {
             let args: Vec<OsString> = args.iter().map(OsString::from).collect();
             project_identity_request(&args)
         };
-        let registered = request(&["identity", "session", "--role=lead:MAIL", "--take", "--json"]).unwrap();
+        let registered = request(&[
+            "identity",
+            "session",
+            "--role=lead:MAIL",
+            "--take",
+            "--json",
+        ])
+        .unwrap();
         assert_eq!(
             registered.verb,
             fgos_identity::Verb::Session(fgos_identity::SessionAction::Register {
@@ -666,18 +794,37 @@ mod tests {
             })
         );
         assert_eq!(
-            request(&["identity", "resolve", "claude-4f2a@fg", "--json"]).unwrap().verb,
-            fgos_identity::Verb::Resolve { query: "claude-4f2a@fg".into() }
+            request(&["identity", "resolve", "claude-4f2a@fg", "--json"])
+                .unwrap()
+                .verb,
+            fgos_identity::Verb::Resolve {
+                query: "claude-4f2a@fg".into()
+            }
         );
         assert_eq!(
-            request(&["identity", "list", "--project", "--prune"]).unwrap().verb,
-            fgos_identity::Verb::List { project: true, prune: true, machine: None }
+            request(&["identity", "list", "--project", "--prune"])
+                .unwrap()
+                .verb,
+            fgos_identity::Verb::List {
+                project: true,
+                prune: true,
+                machine: None
+            }
         );
         assert_eq!(
-            request(&["identity", "list", "--machine", "bravo"]).unwrap().verb,
-            fgos_identity::Verb::List { project: false, prune: false, machine: Some("bravo".into()) }
+            request(&["identity", "list", "--machine", "bravo"])
+                .unwrap()
+                .verb,
+            fgos_identity::Verb::List {
+                project: false,
+                prune: false,
+                machine: Some("bravo".into())
+            }
         );
-        assert!(request(&["identity", "session", "--take"]).is_err(), "--take needs --role");
+        assert!(
+            request(&["identity", "session", "--take"]).is_err(),
+            "--take needs --role"
+        );
         assert!(request(&["identity", "resolve"]).is_err());
         assert!(request(&["identity", "machine", "--register"]).is_err());
         assert!(request(&["identity", "list", "--role", "lead:MAIL"]).is_err());
@@ -692,10 +839,16 @@ mod tests {
         let minted = request(&["identity", "mint", "d-adr", "--release", "73", "--json"]).unwrap();
         assert_eq!(
             minted.verb,
-            fgos_identity::Verb::Mint { kind: "d-adr".into(), release: Some(73) }
+            fgos_identity::Verb::Mint {
+                kind: "d-adr".into(),
+                release: Some(73)
+            }
         );
         let message = request(&["identity", "mint", "--json"]).unwrap_err();
-        assert!(message.contains("requires an id kind") && message.contains("d-adr"), "{message}");
+        assert!(
+            message.contains("requires an id kind") && message.contains("d-adr"),
+            "{message}"
+        );
         assert!(request(&["identity", "mint", "d-adr", "--release", "0"]).is_err());
         assert!(request(&["identity", "machine", "--release", "3"]).is_err());
     }
@@ -867,18 +1020,45 @@ mod tests {
     fn config_read_verbs_map_their_arguments_and_run_as_a_read() {
         use fgos_config::provider::Verb;
         assert_eq!(
-            config(&["config", "show", "--json", "--dir", "/x", "--path", "a.b[0]"]).unwrap().verb,
-            Verb::Show { path: Some("a.b[0]".into()) }
+            config(&["config", "show", "--json", "--dir", "/x", "--path", "a.b[0]"])
+                .unwrap()
+                .verb,
+            Verb::Show {
+                path: Some("a.b[0]".into())
+            }
         );
-        assert_eq!(config(&["config", "standard", "--path=a"]).unwrap().verb, Verb::Standard { path: Some("a".into()) });
-        assert_eq!(config(&["config", "explain", "gateBypass.level"]).unwrap().verb, Verb::Explain { path: "gateBypass.level".into() });
+        assert_eq!(
+            config(&["config", "standard", "--path=a"]).unwrap().verb,
+            Verb::Standard {
+                path: Some("a".into())
+            }
+        );
+        assert_eq!(
+            config(&["config", "explain", "gateBypass.level"])
+                .unwrap()
+                .verb,
+            Verb::Explain {
+                path: "gateBypass.level".into()
+            }
+        );
         assert_eq!(config(&["config", "check"]).unwrap().verb, Verb::Check);
-        for args in [&["config", "show"][..], &["config", "explain", "a"], &["config", "check"], &["config", "migrate", "--dry-run"]] {
+        for args in [
+            &["config", "show"][..],
+            &["config", "explain", "a"],
+            &["config", "check"],
+            &["config", "migrate", "--dry-run"],
+        ] {
             let args: Vec<OsString> = args.iter().map(OsString::from).collect();
-            assert_eq!(native_operation_id("config.read", &args).unwrap(), "config.read");
+            assert_eq!(
+                native_operation_id("config.read", &args).unwrap(),
+                "config.read"
+            );
         }
         let write: Vec<OsString> = ["config", "migrate"].iter().map(OsString::from).collect();
-        assert_eq!(native_operation_id("config.read", &write).unwrap(), "config.write");
+        assert_eq!(
+            native_operation_id("config.read", &write).unwrap(),
+            "config.write"
+        );
         assert!(config(&["config", "show", "extra"]).is_err());
         assert!(config(&["config", "explain"]).is_err());
         assert!(config(&["config", "show", "--bogus"]).is_err());
@@ -889,27 +1069,75 @@ mod tests {
     fn config_write_verbs_map_their_arguments_and_refuse_incompatible_flags() {
         use fgos_config::provider::Verb;
         assert_eq!(
-            config(&["config", "set", "a.b", "[x, y]", "--reason", "why not", "--global"]).unwrap().verb,
-            Verb::Set { path: "a.b".into(), value: "[x, y]".into(), reason: "why not".into(), global: true }
+            config(&["config", "set", "a.b", "[x, y]", "--reason", "why not", "--global"])
+                .unwrap()
+                .verb,
+            Verb::Set {
+                path: "a.b".into(),
+                value: "[x, y]".into(),
+                reason: "why not".into(),
+                global: true
+            }
         );
         assert_eq!(
-            config(&["config", "unset", "a.b", "--acknowledge-comment-loss"]).unwrap().verb,
-            Verb::Unset { path: "a.b".into(), reason: String::new(), global: false, acknowledge: true }
+            config(&["config", "unset", "a.b", "--acknowledge-comment-loss"])
+                .unwrap()
+                .verb,
+            Verb::Unset {
+                path: "a.b".into(),
+                reason: String::new(),
+                global: false,
+                acknowledge: true
+            }
         );
         assert_eq!(
-            config(&["config", "patch", "p.yaml", "--reason=r"]).unwrap().verb,
-            Verb::Patch { file: "p.yaml".into(), reason: "r".into(), global: false }
+            config(&["config", "patch", "p.yaml", "--reason=r"])
+                .unwrap()
+                .verb,
+            Verb::Patch {
+                file: "p.yaml".into(),
+                reason: "r".into(),
+                global: false
+            }
         );
-        assert_eq!(config(&["config", "refresh-docs", "--global"]).unwrap().verb, Verb::RefreshDocs { global: true });
         assert_eq!(
-            config(&["config", "migrate", "--global", "--finish", "--machine-checked"]).unwrap().verb,
-            Verb::Migrate { global: true, finish: true, convert: false, machine_checked: true, accept_machine_overrides: false, dry_run: false }
+            config(&["config", "refresh-docs", "--global"])
+                .unwrap()
+                .verb,
+            Verb::RefreshDocs { global: true }
+        );
+        assert_eq!(
+            config(&[
+                "config",
+                "migrate",
+                "--global",
+                "--finish",
+                "--machine-checked"
+            ])
+            .unwrap()
+            .verb,
+            Verb::Migrate {
+                global: true,
+                finish: true,
+                convert: false,
+                machine_checked: true,
+                accept_machine_overrides: false,
+                dry_run: false
+            }
         );
         // A negative number is a value, not a flag.
-        assert!(matches!(config(&["config", "set", "a", "-1"]).unwrap().verb, Verb::Set { value, .. } if value == "-1"));
+        assert!(
+            matches!(config(&["config", "set", "a", "-1"]).unwrap().verb, Verb::Set { value, .. } if value == "-1")
+        );
         assert!(config(&["config", "migrate", "--finish"]).is_err());
         assert!(config(&["config", "migrate", "--global", "--machine-checked"]).is_err());
-        assert!(config(&["config", "migrate", "--global", "--accept-machine-overrides"]).is_err());
+        assert!(config(&[
+            "config",
+            "migrate",
+            "--global",
+            "--accept-machine-overrides"
+        ])
+        .is_err());
         assert!(config(&["config", "set", "only-a-path"]).is_err());
         assert!(config(&["config", "set", "a", "b", "--reason"]).is_err());
         assert!(config(&["config", "unset", "a", "--global", "--finish"]).is_err());

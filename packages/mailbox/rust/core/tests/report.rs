@@ -3,9 +3,8 @@ mod common;
 use common::{spec_limits, t};
 use fgos_mailbox_core::{
     delivery_report, inbox_text, nudge_sentence, record_error_text, record_unavailable_text,
-    refusal_text, NudgeReport,
-    Generation, Kind, MessageId, MessageView, Refusal, SendOutcome, ShortName, VersionClause,
-    WakeDrop,
+    refusal_text, Generation, Kind, MessageId, MessageView, NudgeReport, Refusal, SendOutcome,
+    ShortName, VersionClause, WakeDrop,
 };
 use serde_json::json;
 
@@ -86,7 +85,10 @@ fn a_wake_to_a_cli_with_only_a_nudge_channel_never_promises_the_end_of_its_turn(
         "Its idle session was nudged to read it now."
     );
     assert_eq!(
-        nudge_sentence(&NudgeReport::Refused("codex-queue-refused".into()), &spec_limits()),
+        nudge_sentence(
+            &NudgeReport::Refused("codex-queue-refused".into()),
+            &spec_limits()
+        ),
         "It could not be nudged (codex-queue-refused); it sees this at its next tool call."
     );
 }

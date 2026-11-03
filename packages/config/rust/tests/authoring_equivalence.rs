@@ -251,7 +251,10 @@ fn impact_analysis_resolves_to_gitnexus_here_and_to_no_provider_in_a_fresh_proje
         put(&mut layer, &path, at(&source, &path).unwrap().clone());
     }
     let here = read_back("impact-here", Some(&layer), None).unwrap();
-    assert_eq!(here["runner"]["capabilities"]["impact-analysis"]["prefer"], "gitnexus");
+    assert_eq!(
+        here["runner"]["capabilities"]["impact-analysis"]["prefer"],
+        "gitnexus"
+    );
     let tool = &here["runner"]["executors"]["gitnexus"];
     assert_eq!(tool["kind"], "tool");
     assert_eq!(tool["for"], json!(["impact-analysis"]));
@@ -264,8 +267,13 @@ fn impact_analysis_resolves_to_gitnexus_here_and_to_no_provider_in_a_fresh_proje
         .filter(|(_, e)| e["kind"] == "tool")
         .map(|(id, _)| id)
         .collect();
-    assert!(tools.is_empty(), "the standard declares tool executors: {tools:?}");
-    assert!(fresh["runner"]["capabilities"]["impact-analysis"].get("prefer").is_none());
+    assert!(
+        tools.is_empty(),
+        "the standard declares tool executors: {tools:?}"
+    );
+    assert!(fresh["runner"]["capabilities"]["impact-analysis"]
+        .get("prefer")
+        .is_none());
 }
 
 #[test]

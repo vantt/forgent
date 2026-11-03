@@ -6,7 +6,10 @@
 use std::time::Duration;
 
 use super::pgroup::{self, wait_until, ListFn, Members, Unlistable};
-use super::{ContainmentDomain, ContainmentDriver, ContainmentError, Guarantee, GuaranteeLevel, SpawnSpec, Spawned};
+use super::{
+    ContainmentDomain, ContainmentDriver, ContainmentError, Guarantee, GuaranteeLevel, SpawnSpec,
+    Spawned,
+};
 use crate::facts::{self, Observed, ProcTuple, Verdict};
 use crate::{Domain, DomainState, KillOutcome, ProcId};
 
@@ -32,7 +35,11 @@ impl ContainmentDriver for MacosTree {
         Ok(ContainmentDomain::new(attempt_id))
     }
 
-    fn spawn_in(&self, domain: &mut ContainmentDomain, spec: SpawnSpec) -> Result<Spawned, ContainmentError> {
+    fn spawn_in(
+        &self,
+        domain: &mut ContainmentDomain,
+        spec: SpawnSpec,
+    ) -> Result<Spawned, ContainmentError> {
         let (child, root) = pgroup::spawn_leader(&spec, crate::platform::macos::child_identity)?;
         domain.seen.push(root.clone());
         domain.set_domain(Domain::MacosTree(root.clone()));
@@ -59,7 +66,9 @@ impl ContainmentDriver for MacosTree {
             if pgroup::remember_tree(members, &root, &mut domain.seen) {
                 let _ = pgroup::signal_group(&root, libc::SIGTERM);
             }
-            wait_until(Duration::from_millis(grace_ms), || tree_state(&root, &domain.seen) == DomainState::Empty);
+            wait_until(Duration::from_millis(grace_ms), || {
+                tree_state(&root, &domain.seen) == DomainState::Empty
+            });
         }
         let wait = domain.empty_wait();
         tree_kill(&root, &mut domain.seen, wait)
@@ -92,13 +101,19 @@ fn list_pids(selector: u32, info: u32) -> Vec<u32> {
         let mut buf = vec![0 as libc::pid_t; slots];
         let size = (buf.len() * std::mem::size_of::<libc::pid_t>()) as libc::c_int;
         // SAFETY: proc_listpids writes at most `size` bytes into `buf`.
-        let got = unsafe { libc::proc_listpids(selector, info, buf.as_mut_ptr() as *mut libc::c_void, size) };
+        let got = unsafe {
+            libc::proc_listpids(selector, info, buf.as_mut_ptr() as *mut libc::c_void, size)
+        };
         if got <= 0 {
             return Vec::new();
         }
         let count = got as usize / std::mem::size_of::<libc::pid_t>();
         if count < slots {
-            return buf[..count].iter().filter(|pid| **pid > 0).map(|pid| *pid as u32).collect();
+            return buf[..count]
+                .iter()
+                .filter(|pid| **pid > 0)
+                .map(|pid| *pid as u32)
+                .collect();
         }
         slots *= 2;
     }
@@ -136,9 +151,13 @@ fn members(root: u32, walk_tree: bool, pgid: Option<u32>) -> Result<Members, Unl
     let mut unreadable = 0;
     for pid in pids {
         match platform.observe(ProcId(pid)) {
-            Observed::Live { start_time } => {
-                tuples.push(ProcTuple { host: observer.host.clone(), boot_id: observer.boot_id.clone(), pid_ns: observer.pid_ns.clone(), pid: ProcId(pid), start_time })
-            }
+            Observed::Live { start_time } => tuples.push(ProcTuple {
+                host: observer.host.clone(),
+                boot_id: observer.boot_id.clone(),
+                pid_ns: observer.pid_ns.clone(),
+                pid: ProcId(pid),
+                start_time,
+            }),
             Observed::Absent | Observed::Zombie => {}
             Observed::Unreadable(_) => unreadable += 1,
         }
@@ -169,7 +188,11 @@ pub(crate) fn tree_state_adopt(root: &ProcTuple) -> DomainState {
 }
 
 /// Ends a `macos-tree` domain; see [`pgroup::kill`].
-pub(crate) fn tree_kill(root: &ProcTuple, seen: &mut Vec<ProcTuple>, empty_wait: Duration) -> KillOutcome {
+pub(crate) fn tree_kill(
+    root: &ProcTuple,
+    seen: &mut Vec<ProcTuple>,
+    empty_wait: Duration,
+) -> KillOutcome {
     pgroup::kill(members as ListFn, root, seen, empty_wait)
 }
 
@@ -184,11 +207,28 @@ mod tests {
     fn tree_state_reports_unknown_when_a_seen_member_cannot_be_judged() {
         let mut child = Command::new("/usr/bin/true").spawn().unwrap();
         let observer = facts::observer();
-        let root = ProcTuple { host: observer.host, boot_id: observer.boot_id, pid_ns: observer.pid_ns, pid: ProcId(child.id()), start_time: "0".into() };
+        let root = ProcTuple {
+            host: observer.host,
+            boot_id: observer.boot_id,
+            pid_ns: observer.pid_ns,
+            pid: ProcId(child.id()),
+            start_time: "0".into(),
+        };
         child.wait().unwrap();
-        let foreign = ProcTuple { host: "other-host".into(), ..root.clone() };
-        assert_eq!(facts::judge_here(&root.to_record()), Verdict::Dead, "the root fixture is gone");
-        assert_eq!(facts::judge_here(&foreign.to_record()), Verdict::Unknown, "the fixture member must be one this observer cannot judge");
+        let foreign = ProcTuple {
+            host: "other-host".into(),
+            ..root.clone()
+        };
+        assert_eq!(
+            facts::judge_here(&root.to_record()),
+            Verdict::Dead,
+            "the root fixture is gone"
+        );
+        assert_eq!(
+            facts::judge_here(&foreign.to_record()),
+            Verdict::Unknown,
+            "the fixture member must be one this observer cannot judge"
+        );
         assert_eq!(tree_state(&root, &[foreign]), DomainState::Unknown);
     }
 }

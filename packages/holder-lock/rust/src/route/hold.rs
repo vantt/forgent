@@ -21,7 +21,9 @@ use std::time::Duration;
 
 use serde_json::{json, Value};
 
-use super::{line, PROTOCOL, EXIT_INTERNAL, EXIT_NEGATIVE, EXIT_OK, EXIT_TIMEOUT, EXIT_UNAVAILABLE};
+use super::{
+    line, EXIT_INTERNAL, EXIT_NEGATIVE, EXIT_OK, EXIT_TIMEOUT, EXIT_UNAVAILABLE, PROTOCOL,
+};
 use crate::port::{self, Acquire, Mode, Resource, Wait};
 
 /// How often the helper looks for requests and for its parent's death.
@@ -58,7 +60,11 @@ pub(super) fn parent_unopenable(args: &HoldArgs, detail: &str) -> i32 {
 }
 
 fn answer_unavailable(work: &Path, reason: &str, detail: &str) -> i32 {
-    match write_ready(work, "unavailable", json!({ "reason": reason, "detail": detail })) {
+    match write_ready(
+        work,
+        "unavailable",
+        json!({ "reason": reason, "detail": detail }),
+    ) {
         Ok(()) => EXIT_UNAVAILABLE,
         Err(err) => ready_failed(&err),
     }
@@ -80,7 +86,9 @@ fn request_number(name: &str) -> Option<u64> {
 
 /// The numbers of the requests not seen before, in order.
 fn new_requests(work: &Path, seen: &mut BTreeSet<u64>) -> Vec<u64> {
-    let Ok(entries) = fs::read_dir(work) else { return Vec::new() };
+    let Ok(entries) = fs::read_dir(work) else {
+        return Vec::new();
+    };
     let mut pending: Vec<u64> = entries
         .filter_map(|entry| request_number(&entry.ok()?.file_name().to_string_lossy()))
         .filter(|n| !seen.contains(n))
@@ -109,7 +117,13 @@ impl Flight {
 
 /// Borrowing is Windows-only: elsewhere every request is refused by name.
 #[cfg(not(windows))]
-fn serve<'scope, 'env>(work: &'env Path, seen: &mut BTreeSet<u64>, _handle: &'env port::Handle, _flight: &mut Flight, _scope: &'scope std::thread::Scope<'scope, 'env>) {
+fn serve<'scope, 'env>(
+    work: &'env Path,
+    seen: &mut BTreeSet<u64>,
+    _handle: &'env port::Handle,
+    _flight: &mut Flight,
+    _scope: &'scope std::thread::Scope<'scope, 'env>,
+) {
     for n in new_requests(work, seen) {
         answer(work, n, json!({ "error": "borrow-unsupported" }));
     }
@@ -147,7 +161,10 @@ mod borrow {
 
     impl Flight {
         pub(in crate::route) fn none() -> Self {
-            Flight { running: None, unemptied: Arc::new(AtomicBool::new(false)) }
+            Flight {
+                running: None,
+                unemptied: Arc::new(AtomicBool::new(false)),
+            }
         }
 
         /// End the running borrow's job at once (parent death, `cancel`).
@@ -158,7 +175,11 @@ mod borrow {
         }
 
         fn busy(&mut self) -> bool {
-            if self.running.as_ref().is_some_and(|(_, _, done)| done.load(Ordering::SeqCst)) {
+            if self
+                .running
+                .as_ref()
+                .is_some_and(|(_, _, done)| done.load(Ordering::SeqCst))
+            {
                 self.running = None;
             }
             self.running.is_some()
@@ -172,7 +193,11 @@ mod borrow {
             .and_then(Value::as_array)
             .ok_or("argv must be an array of strings")?
             .iter()
-            .map(|a| a.as_str().map(str::to_string).ok_or("argv must be an array of strings"))
+            .map(|a| {
+                a.as_str()
+                    .map(str::to_string)
+                    .ok_or("argv must be an array of strings")
+            })
             .collect::<Result<_, _>>()?;
         if argv.first().is_none_or(|program| program.is_empty()) {
             return Err("argv needs a program".into());
@@ -184,7 +209,14 @@ mod borrow {
         };
         let env: BTreeMap<String, String> = match request.get("env") {
             None | Some(Value::Null) => BTreeMap::new(),
-            Some(Value::Object(map)) => map.iter().map(|(k, v)| v.as_str().map(|v| (k.clone(), v.to_string())).ok_or("env values must be strings")).collect::<Result<_, _>>()?,
+            Some(Value::Object(map)) => map
+                .iter()
+                .map(|(k, v)| {
+                    v.as_str()
+                        .map(|v| (k.clone(), v.to_string()))
+                        .ok_or("env values must be strings")
+                })
+                .collect::<Result<_, _>>()?,
             Some(_) => return Err("env must be a string map".into()),
         };
         if request.get("stdin").is_some_and(|s| s != "null") {
@@ -195,23 +227,41 @@ mod borrow {
             cwd,
             clear_env: request.get("env").is_some_and(|e| !e.is_null()),
             env,
-            stdio: BorrowStdio::Files { out: work.join(format!("out-{n}.log")), err: work.join(format!("err-{n}.log")) },
+            stdio: BorrowStdio::Files {
+                out: work.join(format!("out-{n}.log")),
+                err: work.join(format!("err-{n}.log")),
+            },
         })
     }
 
     fn result_of(outcome: Result<port::BorrowOutcome, BorrowError>) -> Value {
         match outcome {
             Ok(o) => json!({ "exit": o.exit, "leftoversKilled": o.leftovers_killed }),
-            Err(BorrowError::LeftoverNotKilled { outcome, pids }) => json!({ "error": "borrow-leftover-not-killed", "pids": pids, "exit": outcome.exit, "leftoversKilled": outcome.leftovers_killed }),
-            Err(err @ BorrowError::Spawn(_)) => json!({ "error": "borrow-spawn-failed", "message": err.to_string() }),
-            Err(err @ BorrowError::InvalidSpec(_)) => json!({ "error": "borrow-spec-invalid", "message": err.to_string() }),
+            Err(BorrowError::LeftoverNotKilled { outcome, pids }) => {
+                json!({ "error": "borrow-leftover-not-killed", "pids": pids, "exit": outcome.exit, "leftoversKilled": outcome.leftovers_killed })
+            }
+            Err(err @ BorrowError::Spawn(_)) => {
+                json!({ "error": "borrow-spawn-failed", "message": err.to_string() })
+            }
+            Err(err @ BorrowError::InvalidSpec(_)) => {
+                json!({ "error": "borrow-spec-invalid", "message": err.to_string() })
+            }
             Err(err) => json!({ "error": "borrow-failed", "message": err.to_string() }),
         }
     }
 
-    pub(in crate::route) fn serve<'scope, 'env>(work: &'env Path, seen: &mut BTreeSet<u64>, handle: &'env port::Handle, flight: &mut Flight, scope: &'scope std::thread::Scope<'scope, 'env>) {
+    pub(in crate::route) fn serve<'scope, 'env>(
+        work: &'env Path,
+        seen: &mut BTreeSet<u64>,
+        handle: &'env port::Handle,
+        flight: &mut Flight,
+        scope: &'scope std::thread::Scope<'scope, 'env>,
+    ) {
         for n in new_requests(work, seen) {
-            let request: Value = match fs::read_to_string(work.join(format!("req-{n}.json"))).ok().and_then(|text| serde_json::from_str(&text).ok()) {
+            let request: Value = match fs::read_to_string(work.join(format!("req-{n}.json")))
+                .ok()
+                .and_then(|text| serde_json::from_str(&text).ok())
+            {
                 Some(request) => request,
                 None => {
                     answer(work, n, json!({ "error": "request-unreadable" }));
@@ -225,12 +275,21 @@ mod borrow {
                     // GO; a dead helper therefore cannot authorize a late start.
                     let result = if flight.busy() {
                         json!({ "error": "borrow-busy" })
-                    } else if let Some(domain) = crate::predecessor::parse_record(&request["domain"]) {
-                        match port::validate(handle).map_err(std::io::Error::other).and_then(|()| handle.declare_domain(&domain)) {
+                    } else if let Some(domain) =
+                        crate::predecessor::parse_record(&request["domain"])
+                    {
+                        match port::validate(handle)
+                            .map_err(std::io::Error::other)
+                            .and_then(|()| handle.declare_domain(&domain))
+                        {
                             Ok(()) => json!({ "result": "declared" }),
-                            Err(err) => json!({ "error": "lock-domain-declaration-failed", "message": err.to_string() }),
+                            Err(err) => {
+                                json!({ "error": "lock-domain-declaration-failed", "message": err.to_string() })
+                            }
                         }
-                    } else { json!({ "error": "domain-invalid" }) };
+                    } else {
+                        json!({ "error": "domain-invalid" })
+                    };
                     answer(work, n, result);
                 }
                 Some("clear-domain") => {
@@ -239,7 +298,9 @@ mod borrow {
                     } else {
                         match handle.clear_domain() {
                             Ok(()) => json!({ "result": "cleared" }),
-                            Err(err) => json!({ "error": "lock-domain-not-empty", "message": err.to_string() }),
+                            Err(err) => {
+                                json!({ "error": "lock-domain-not-empty", "message": err.to_string() })
+                            }
                         }
                     };
                     answer(work, n, result);
@@ -250,20 +311,32 @@ mod borrow {
                         continue;
                     }
                     if flight.unemptied.load(Ordering::SeqCst) {
-                        answer(work, n, json!({ "error": "borrow-leftover-pending", "message": "an earlier borrow left processes the helper could not end" }));
+                        answer(
+                            work,
+                            n,
+                            json!({ "error": "borrow-leftover-pending", "message": "an earlier borrow left processes the helper could not end" }),
+                        );
                         continue;
                     }
                     let spec = match parse_borrow(&request, work, n) {
                         Ok(spec) => spec,
                         Err(message) => {
-                            answer(work, n, json!({ "error": "borrow-spec-invalid", "message": message }));
+                            answer(
+                                work,
+                                n,
+                                json!({ "error": "borrow-spec-invalid", "message": message }),
+                            );
                             continue;
                         }
                     };
                     let helper = match HelperExe::current() {
                         Ok(helper) => helper,
                         Err(err) => {
-                            answer(work, n, json!({ "error": "borrow-spawn-failed", "message": err.to_string() }));
+                            answer(
+                                work,
+                                n,
+                                json!({ "error": "borrow-spawn-failed", "message": err.to_string() }),
+                            );
                             continue;
                         }
                     };
@@ -273,9 +346,16 @@ mod borrow {
                     let unemptied = flight.unemptied.clone();
                     scope.spawn(move || {
                         let started = |pid: u32| {
-                            let _ = write_atomic(work, &format!("started-{n}.json"), &json!({ "pid": pid }).to_string());
+                            let _ = write_atomic(
+                                work,
+                                &format!("started-{n}.json"),
+                                &json!({ "pid": pid }).to_string(),
+                            );
                         };
-                        let control = BorrowControl { cancel: Some(&cancel), on_started: Some(&started) };
+                        let control = BorrowControl {
+                            cancel: Some(&cancel),
+                            on_started: Some(&started),
+                        };
                         let outcome = borrow_windows::run(handle, &spec, &helper, &control);
                         if matches!(outcome, Err(BorrowError::LeftoverNotKilled { .. })) {
                             unemptied.store(true, Ordering::SeqCst);
@@ -287,7 +367,9 @@ mod borrow {
                 Some("cancel") => {
                     // `n` names the borrow to end; a cancel for one that is not
                     // running is stale and ignored.
-                    if let (Some(target), Some((running, _, _))) = (request.get("n").and_then(Value::as_u64), &flight.running) {
+                    if let (Some(target), Some((running, _, _))) =
+                        (request.get("n").and_then(Value::as_u64), &flight.running)
+                    {
                         if target == *running {
                             flight.cancel();
                         }
@@ -303,7 +385,11 @@ mod borrow {
 /// `parent_gone(tick)` reports the parent gone (it waits up to `tick` for
 /// that). Returns the process exit code.
 pub(super) fn run(args: &HoldArgs, mut parent_gone: impl FnMut(Duration) -> bool) -> i32 {
-    let name = args.path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default();
+    let name = args
+        .path
+        .file_stem()
+        .map(|s| s.to_string_lossy().into_owned())
+        .unwrap_or_default();
     let mut resource = Resource::new(name, &args.path);
     resource.predecessor_kinds = args.predecessor_kinds.clone();
     let handle = match port::acquire(&resource, args.mode, args.wait, args.kill_wait_ms) {
@@ -321,7 +407,9 @@ pub(super) fn run(args: &HoldArgs, mut parent_gone: impl FnMut(Duration) -> bool
                 Err(err) => ready_failed(&err),
             };
         }
-        Acquire::Unavailable { reason, detail } => return answer_unavailable(&args.work, reason.as_str(), &detail),
+        Acquire::Unavailable { reason, detail } => {
+            return answer_unavailable(&args.work, reason.as_str(), &detail)
+        }
     };
     if let Err(err) = write_ready(&args.work, "acquired", json!({})) {
         // `handle` drops here: nothing is held when this exits.
@@ -343,7 +431,10 @@ pub(super) fn run(args: &HoldArgs, mut parent_gone: impl FnMut(Duration) -> bool
     // Unlock explicitly, then close: every borrow's domain is empty by now.
     match port::release(handle) {
         port::Release::Released { .. } => EXIT_OK,
-        outcome => { eprintln!("lock-release-stuck: {outcome:?}"); crate::route::EXIT_INTERNAL }
+        outcome => {
+            eprintln!("lock-release-stuck: {outcome:?}");
+            crate::route::EXIT_INTERNAL
+        }
     }
 }
 
@@ -355,10 +446,19 @@ mod win {
     use std::os::windows::io::AsRawHandle;
     use std::time::Duration;
 
-    use windows_sys::Win32::Foundation::{CloseHandle, SetHandleInformation, FILETIME, HANDLE, HANDLE_FLAG_INHERIT, INVALID_HANDLE_VALUE, WAIT_OBJECT_0};
-    use windows_sys::Win32::System::Diagnostics::ToolHelp::{CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W, TH32CS_SNAPPROCESS};
-    use windows_sys::Win32::System::Threading::{GetCurrentProcess, GetCurrentProcessId, GetProcessTimes, OpenProcess, WaitForSingleObject, PROCESS_QUERY_LIMITED_INFORMATION};
+    use windows_sys::Win32::Foundation::{
+        CloseHandle, SetHandleInformation, FILETIME, HANDLE, HANDLE_FLAG_INHERIT,
+        INVALID_HANDLE_VALUE, WAIT_OBJECT_0,
+    };
     use windows_sys::Win32::Storage::FileSystem::SYNCHRONIZE;
+    use windows_sys::Win32::System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,
+        TH32CS_SNAPPROCESS,
+    };
+    use windows_sys::Win32::System::Threading::{
+        GetCurrentProcess, GetCurrentProcessId, GetProcessTimes, OpenProcess, WaitForSingleObject,
+        PROCESS_QUERY_LIMITED_INFORMATION,
+    };
 
     struct Owned(HANDLE);
 
@@ -382,8 +482,15 @@ mod win {
     fn creation_time(process: HANDLE) -> Option<u64> {
         // SAFETY: four valid out-pointers for a handle with query access.
         unsafe {
-            let (mut created, mut exited, mut kernel, mut user): (FILETIME, FILETIME, FILETIME, FILETIME) = std::mem::zeroed();
-            (GetProcessTimes(process, &mut created, &mut exited, &mut kernel, &mut user) != 0).then(|| (u64::from(created.dwHighDateTime) << 32) | u64::from(created.dwLowDateTime))
+            let (mut created, mut exited, mut kernel, mut user): (
+                FILETIME,
+                FILETIME,
+                FILETIME,
+                FILETIME,
+            ) = std::mem::zeroed();
+            (GetProcessTimes(process, &mut created, &mut exited, &mut kernel, &mut user) != 0).then(
+                || (u64::from(created.dwHighDateTime) << 32) | u64::from(created.dwLowDateTime),
+            )
         }
     }
 
@@ -413,7 +520,11 @@ mod win {
     /// Mark this process's own standard handles non-inheritable, so nothing
     /// reaches a later child (a git process) through them.
     fn seal_std_handles() {
-        let handles = [std::io::stdin().as_raw_handle(), std::io::stdout().as_raw_handle(), std::io::stderr().as_raw_handle()];
+        let handles = [
+            std::io::stdin().as_raw_handle(),
+            std::io::stdout().as_raw_handle(),
+            std::io::stderr().as_raw_handle(),
+        ];
         for handle in handles {
             if !handle.is_null() {
                 // SAFETY: clearing one flag on a handle this process owns; a
@@ -430,18 +541,25 @@ mod win {
     /// the given time for that.
     pub(in crate::route) fn watch_parent() -> Result<impl FnMut(Duration) -> bool, String> {
         seal_std_handles();
-        let ppid = parent_pid().ok_or_else(|| "cannot read this process's parent from the process snapshot".to_string())?;
+        let ppid = parent_pid().ok_or_else(|| {
+            "cannot read this process's parent from the process snapshot".to_string()
+        })?;
         // SAFETY: OpenProcess takes plain values and returns a handle or null.
         let raw = unsafe { OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, 0, ppid) };
         if raw.is_null() {
-            return Err(format!("OpenProcess on parent pid {ppid} failed: {}", std::io::Error::last_os_error()));
+            return Err(format!(
+                "OpenProcess on parent pid {ppid} failed: {}",
+                std::io::Error::last_os_error()
+            ));
         }
         let parent = Owned(raw);
         // SAFETY: the pseudo handle of this process is always valid.
         let own = creation_time(unsafe { GetCurrentProcess() });
         if let (Some(parent_created), Some(own_created)) = (creation_time(parent.0), own) {
             if parent_created > own_created {
-                return Err(format!("parent pid {ppid} was created after this process: the pid was reused"));
+                return Err(format!(
+                    "parent pid {ppid} was created after this process: the pid was reused"
+                ));
             }
         }
         Ok(move |tick: Duration| parent.ended_within(tick))
@@ -466,11 +584,21 @@ mod tests {
     fn args(dir: &Path, wait: Wait) -> HoldArgs {
         let work = dir.join("work");
         fs::create_dir_all(&work).unwrap();
-        HoldArgs { predecessor_kinds: Vec::new(), path: dir.join("hold.lock"), mode: Mode::Ex, wait, kill_wait_ms: 100, work }
+        HoldArgs {
+            predecessor_kinds: Vec::new(),
+            path: dir.join("hold.lock"),
+            mode: Mode::Ex,
+            wait,
+            kill_wait_ms: 100,
+            work,
+        }
     }
 
     fn ready(work: &Path) -> Value {
-        serde_json::from_str(&fs::read_to_string(work.join("ready.json")).expect("ready.json written")).unwrap()
+        serde_json::from_str(
+            &fs::read_to_string(work.join("ready.json")).expect("ready.json written"),
+        )
+        .unwrap()
     }
 
     #[test]
@@ -489,7 +617,10 @@ mod tests {
         });
         let started = std::time::Instant::now();
         while !work.join("ready.json").exists() {
-            assert!(started.elapsed() < Duration::from_secs(5), "ready.json never appeared");
+            assert!(
+                started.elapsed() < Duration::from_secs(5),
+                "ready.json never appeared"
+            );
             std::thread::sleep(Duration::from_millis(2));
         }
         let answer = ready(&work);
@@ -502,12 +633,19 @@ mod tests {
         fs::write(work.join("req-1.json"), "{}").unwrap();
         let started = std::time::Instant::now();
         while !work.join("result-1.json").exists() {
-            assert!(started.elapsed() < Duration::from_secs(5), "request never answered");
+            assert!(
+                started.elapsed() < Duration::from_secs(5),
+                "request never answered"
+            );
             std::thread::sleep(Duration::from_millis(2));
         }
-        let result: Value = serde_json::from_str(&fs::read_to_string(work.join("result-1.json")).unwrap()).unwrap();
+        let result: Value =
+            serde_json::from_str(&fs::read_to_string(work.join("result-1.json")).unwrap()).unwrap();
         assert_eq!(result, json!({ "error": "borrow-unsupported" }));
-        assert!(!work.join("result-2.json").exists(), "a temp file is not a request");
+        assert!(
+            !work.join("result-2.json").exists(),
+            "a temp file is not a request"
+        );
 
         gone.store(true, Ordering::SeqCst);
         assert_eq!(helper.join().unwrap(), EXIT_OK);
@@ -519,13 +657,22 @@ mod tests {
     fn a_held_lock_is_answered_held_and_the_helper_exits() {
         let dir = temp("held");
         let args = args(&dir, Wait::Try);
-        let Acquire::Acquired(holder) = acquire(&Resource::new("hold", &args.path), Mode::Ex, Wait::Try, 100) else { panic!("holder") };
-        let code = run(&args, |_| panic!("a helper that did not acquire never waits on its parent"));
+        let Acquire::Acquired(holder) =
+            acquire(&Resource::new("hold", &args.path), Mode::Ex, Wait::Try, 100)
+        else {
+            panic!("holder")
+        };
+        let code = run(&args, |_| {
+            panic!("a helper that did not acquire never waits on its parent")
+        });
         assert_eq!(code, EXIT_NEGATIVE);
         let answer = ready(&args.work);
         assert_eq!(answer["result"], "held");
         assert_eq!(answer["reason"], "kernel-lock-held");
-        assert!(matches!(port::release(holder), port::Release::Released { .. }));
+        assert!(matches!(
+            port::release(holder),
+            port::Release::Released { .. }
+        ));
         let _ = fs::remove_dir_all(&dir);
     }
 
@@ -533,12 +680,19 @@ mod tests {
     fn a_wait_that_runs_out_is_answered_timeout() {
         let dir = temp("timeout");
         let args = args(&dir, Wait::Ms(30));
-        let Acquire::Acquired(holder) = acquire(&Resource::new("hold", &args.path), Mode::Ex, Wait::Try, 100) else { panic!("holder") };
+        let Acquire::Acquired(holder) =
+            acquire(&Resource::new("hold", &args.path), Mode::Ex, Wait::Try, 100)
+        else {
+            panic!("holder")
+        };
         assert_eq!(run(&args, |_| panic!("no parent wait")), EXIT_TIMEOUT);
         let answer = ready(&args.work);
         assert_eq!(answer["result"], "timeout");
         assert!(answer["waitedMs"].as_u64().unwrap() >= 30);
-        assert!(matches!(port::release(holder), port::Release::Released { .. }));
+        assert!(matches!(
+            port::release(holder),
+            port::Release::Released { .. }
+        ));
         let _ = fs::remove_dir_all(&dir);
     }
 

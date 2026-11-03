@@ -71,23 +71,43 @@ impl GateArgs {
     /// Parse the arguments after `internal gate`:
     /// `--protocol 1 --envelope <path> (--go-fd N | --go-socket <path>) [--lock-fds 3,4] [--job-name <name>]`.
     pub fn parse(args: &[String]) -> Result<GateArgs, ArgsError> {
-        let flags = Flags::parse(args, &["envelope", "go-fd", "go-socket", "lock-fds", "job-name"], 0)?;
+        let flags = Flags::parse(
+            args,
+            &["envelope", "go-fd", "go-socket", "lock-fds", "job-name"],
+            0,
+        )?;
         let envelope = PathBuf::from(flags.require("envelope")?);
         let go = match (flags.get("go-fd"), flags.get("go-socket")) {
             (Some(fd), None) => GoEnd::Fd(parse_fd(fd)?),
             (None, Some(path)) => GoEnd::Socket(path.into()),
-            _ => return Err(ArgsError::Usage("exactly one of --go-fd and --go-socket is required".into())),
+            _ => {
+                return Err(ArgsError::Usage(
+                    "exactly one of --go-fd and --go-socket is required".into(),
+                ))
+            }
         };
         let lock_fds = match flags.get("lock-fds") {
-            Some(list) => list.split(',').filter(|s| !s.is_empty()).map(parse_fd).collect::<Result<_, _>>()?,
+            Some(list) => list
+                .split(',')
+                .filter(|s| !s.is_empty())
+                .map(parse_fd)
+                .collect::<Result<_, _>>()?,
             None => Vec::new(),
         };
-        Ok(GateArgs { envelope, go, lock_fds, job_name: flags.get("job-name").map(String::from) })
+        Ok(GateArgs {
+            envelope,
+            go,
+            lock_fds,
+            job_name: flags.get("job-name").map(String::from),
+        })
     }
 }
 
 fn parse_fd(text: &str) -> Result<u32, ArgsError> {
-    text.parse::<u32>().ok().filter(|fd| *fd >= 3).ok_or_else(|| ArgsError::Usage(format!("{text} is not a descriptor slot of 3 or more")))
+    text.parse::<u32>()
+        .ok()
+        .filter(|fd| *fd >= 3)
+        .ok_or_else(|| ArgsError::Usage(format!("{text} is not a descriptor slot of 3 or more")))
 }
 
 /// Run the gate; the return value is the process exit code.
@@ -147,10 +167,20 @@ pub(crate) struct Stop {
 pub(crate) fn load_config(path: &Path) -> Result<Config, String> {
     let value = envelope::read_verified(path)?;
     let claimed = value["digest"].as_str().ok_or("envelope has no digest")?;
-    let text_of = |v: &Value, what: &str| v.as_str().map(String::from).ok_or_else(|| format!("envelope field {what} missing"));
+    let text_of = |v: &Value, what: &str| {
+        v.as_str()
+            .map(String::from)
+            .ok_or_else(|| format!("envelope field {what} missing"))
+    };
     let launch = &value["launch"];
     let string_map = |v: &Value| -> BTreeMap<String, String> {
-        v.as_object().map(|m| m.iter().filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string()))).collect()).unwrap_or_default()
+        v.as_object()
+            .map(|m| {
+                m.iter()
+                    .filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string())))
+                    .collect()
+            })
+            .unwrap_or_default()
     };
     let stdin_policy = text_of(&launch["stdinPolicy"], "launch.stdinPolicy")?;
     let brief = match (stdin_policy.as_str(), launch["briefPath"].as_str()) {
@@ -159,7 +189,10 @@ pub(crate) fn load_config(path: &Path) -> Result<Config, String> {
         ("null", _) => None,
         (other, _) => return Err(format!("unknown stdinPolicy {other}")),
     };
-    let ceiling = match (value["deadlines"]["hardCeiling"]["bootId"].as_str(), value["deadlines"]["hardCeiling"]["boottimeNs"].as_u64()) {
+    let ceiling = match (
+        value["deadlines"]["hardCeiling"]["bootId"].as_str(),
+        value["deadlines"]["hardCeiling"]["boottimeNs"].as_u64(),
+    ) {
         (Some(boot), Some(ns)) => Some((boot.to_string(), ns)),
         _ => None,
     };
@@ -191,7 +224,14 @@ pub(crate) fn load_config(path: &Path) -> Result<Config, String> {
         run_dir: text_of(&value["runDir"], "runDir")?.into(),
         cwd: text_of(&value["cwd"], "cwd")?.into(),
         command: text_of(&launch["command"], "launch.command")?,
-        args: launch["args"].as_array().map(|a| a.iter().filter_map(|v| v.as_str().map(String::from)).collect()).unwrap_or_default(),
+        args: launch["args"]
+            .as_array()
+            .map(|a| {
+                a.iter()
+                    .filter_map(|v| v.as_str().map(String::from))
+                    .collect()
+            })
+            .unwrap_or_default(),
         env: string_map(&launch["env"]),
         brief,
         stdout: text_of(&launch["capture"]["stdout"], "launch.capture.stdout")?.into(),
@@ -200,17 +240,30 @@ pub(crate) fn load_config(path: &Path) -> Result<Config, String> {
         preferred: text_of(&value["containment"]["preferred"], "containment.preferred")?,
         ceiling,
         boot_id: facts::boot_id(),
-        grace: Duration::from_millis(value["deadlines"]["gateKillGraceMs"].as_u64().ok_or("envelope field deadlines.gateKillGraceMs missing")?),
+        grace: Duration::from_millis(
+            value["deadlines"]["gateKillGraceMs"]
+                .as_u64()
+                .ok_or("envelope field deadlines.gateKillGraceMs missing")?,
+        ),
     })
 }
 
 pub(crate) fn read_side_env(config: &Config) -> Result<BTreeMap<String, String>, String> {
-    let text = fs::read_to_string(&config.side_file).map_err(|e| format!("side file unreadable: {e}"))?;
-    let value: Value = serde_json::from_str(&text).map_err(|e| format!("side file is not JSON: {e}"))?;
+    let text =
+        fs::read_to_string(&config.side_file).map_err(|e| format!("side file unreadable: {e}"))?;
+    let value: Value =
+        serde_json::from_str(&text).map_err(|e| format!("side file is not JSON: {e}"))?;
     if value["attemptId"] != config.attempt_id.as_str() {
         return Err("side file belongs to another attempt".into());
     }
-    Ok(value["env"].as_object().map(|m| m.iter().filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string()))).collect()).unwrap_or_default())
+    Ok(value["env"]
+        .as_object()
+        .map(|m| {
+            m.iter()
+                .filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string())))
+                .collect()
+        })
+        .unwrap_or_default())
 }
 
 /// Nanoseconds on the clock the envelope's hard ceiling is written on:
@@ -219,7 +272,10 @@ pub(crate) fn read_side_env(config: &Config) -> Result<BTreeMap<String, String>,
 pub fn boottime_ns() -> u64 {
     #[cfg(unix)]
     {
-        let mut ts = libc::timespec { tv_sec: 0, tv_nsec: 0 };
+        let mut ts = libc::timespec {
+            tv_sec: 0,
+            tv_nsec: 0,
+        };
         #[cfg(target_os = "linux")]
         let clock = libc::CLOCK_BOOTTIME;
         #[cfg(not(target_os = "linux"))]
@@ -231,14 +287,19 @@ pub fn boottime_ns() -> u64 {
     #[cfg(windows)]
     {
         // SAFETY: GetTickCount64 has no preconditions.
-        unsafe { windows_sys::Win32::System::SystemInformation::GetTickCount64() }.saturating_mul(1_000_000)
+        unsafe { windows_sys::Win32::System::SystemInformation::GetTickCount64() }
+            .saturating_mul(1_000_000)
     }
 }
 
 /// Time left to the ceiling, `Some(ZERO)` when it passed or the boot differs.
 pub(crate) fn ceiling_left(config: &Config) -> Option<Duration> {
     let (boot_id, at) = config.ceiling.as_ref()?;
-    if config.boot_id.as_ref().is_some_and(|current| current != boot_id) {
+    if config
+        .boot_id
+        .as_ref()
+        .is_some_and(|current| current != boot_id)
+    {
         return Some(Duration::ZERO);
     }
     Some(Duration::from_nanos(at.saturating_sub(boottime_ns())))
@@ -263,17 +324,34 @@ pub(crate) fn read_stop(config: &Config) -> Stop {
 /// [`read_stop`] for a cause already read.
 pub(crate) fn stop_for(cause: Option<String>) -> Stop {
     match cause.as_deref() {
-        Some("soft-deadline") => Stop { stopped_by: "soft-deadline", cause: "soft-deadline".into() },
-        Some("idle") => Stop { stopped_by: "idle", cause: "idle".into() },
-        Some("output-limit") => Stop { stopped_by: "output-limit", cause: "output-limit".into() },
-        Some("cancel") => Stop { stopped_by: "cancel", cause: "cancel".into() },
-        _ => Stop { stopped_by: "cancel", cause: "signal".into() },
+        Some("soft-deadline") => Stop {
+            stopped_by: "soft-deadline",
+            cause: "soft-deadline".into(),
+        },
+        Some("idle") => Stop {
+            stopped_by: "idle",
+            cause: "idle".into(),
+        },
+        Some("output-limit") => Stop {
+            stopped_by: "output-limit",
+            cause: "output-limit".into(),
+        },
+        Some("cancel") => Stop {
+            stopped_by: "cancel",
+            cause: "cancel".into(),
+        },
+        _ => Stop {
+            stopped_by: "cancel",
+            cause: "signal".into(),
+        },
     }
 }
 
 /// Does the GO frame name this attempt's envelope. The pid is never compared.
 pub(crate) fn go_matches(config: &Config, frame: &Value) -> bool {
-    frame["type"] == "GO" && frame["attemptId"] == config.attempt_id.as_str() && frame["envelopeDigest"] == config.digest.as_str()
+    frame["type"] == "GO"
+        && frame["attemptId"] == config.attempt_id.as_str()
+        && frame["envelopeDigest"] == config.digest.as_str()
 }
 
 /// A line from the gate in the agent's own stderr capture, where whoever reads the run's output looks.
@@ -290,7 +368,10 @@ pub(crate) enum StartError {
     /// A capture file, the brief or the agent's job could not be set up.
     Setup(String),
     /// The OS refused to start the program.
-    Spawn { program: String, source: std::io::Error },
+    Spawn {
+        program: String,
+        source: std::io::Error,
+    },
 }
 
 impl StartError {
@@ -298,7 +379,9 @@ impl StartError {
     /// itself is not there, 126 for anything else.
     pub(crate) fn exit_code(&self) -> i32 {
         match self {
-            StartError::Spawn { source, .. } if source.kind() == std::io::ErrorKind::NotFound => 127,
+            StartError::Spawn { source, .. } if source.kind() == std::io::ErrorKind::NotFound => {
+                127
+            }
             _ => 126,
         }
     }
@@ -307,15 +390,24 @@ impl StartError {
     pub(crate) fn why(&self) -> String {
         match self {
             StartError::Setup(why) => why.clone(),
-            StartError::Spawn { program, source } => format!("agent {program} did not start: {source}"),
+            StartError::Spawn { program, source } => {
+                format!("agent {program} did not start: {source}")
+            }
         }
     }
 }
 
 /// Publish `gate-exit.json` once. `exit_code` and `signal` are JSON values
 /// (`null` when the platform has none); no `Stop` means the agent ended by itself.
-pub(crate) fn publish_gate_exit(config: &Config, exit_code: Value, signal: Value, stop: Option<Stop>) -> Result<(), String> {
-    let (stopped_by, cause) = stop.map_or(("agent", Value::Null), |s| (s.stopped_by, Value::from(s.cause)));
+pub(crate) fn publish_gate_exit(
+    config: &Config,
+    exit_code: Value,
+    signal: Value,
+    stop: Option<Stop>,
+) -> Result<(), String> {
+    let (stopped_by, cause) = stop.map_or(("agent", Value::Null), |s| {
+        (s.stopped_by, Value::from(s.cause))
+    });
     let exit = json!({
         "v": 1,
         "attemptId": config.attempt_id,
@@ -331,9 +423,11 @@ pub(crate) fn publish_gate_exit(config: &Config, exit_code: Value, signal: Value
     // leaves an empty `gate-exit.json` bound into it and the gate fills it in place. No process of the
     // agent exists any more at this point, so nothing else can write it: the gate has the last word.
     if fs::symlink_metadata(&target).is_ok_and(|meta| meta.is_file()) {
-        return write_in_place(&target, &bytes).map_err(|e| format!("gate-exit.json not written: {e}"));
+        return write_in_place(&target, &bytes)
+            .map_err(|e| format!("gate-exit.json not written: {e}"));
     }
-    publish_once(&config.run_dir, "gate-exit.json", &bytes).map_err(|e| format!("gate-exit.json not published: {e}"))?;
+    publish_once(&config.run_dir, "gate-exit.json", &bytes)
+        .map_err(|e| format!("gate-exit.json not published: {e}"))?;
     Ok(())
 }
 
@@ -362,16 +456,104 @@ mod tests {
 
     #[test]
     fn argv_parses_and_refuses() {
-        let ok = GateArgs::parse(&argv(&["--protocol", "1", "--envelope", "/e.json", "--go-fd", "5", "--lock-fds", "3,4"])).unwrap();
-        assert_eq!(ok, GateArgs { envelope: "/e.json".into(), go: GoEnd::Fd(5), lock_fds: vec![3, 4], job_name: None });
-        let pipe = GateArgs::parse(&argv(&["--protocol", "1", "--envelope", "/e.json", "--go-socket", "p", "--job-name", "Local\\j"])).unwrap();
-        assert_eq!(pipe, GateArgs { envelope: "/e.json".into(), go: GoEnd::Socket("p".into()), lock_fds: vec![], job_name: Some("Local\\j".into()) });
-        assert_eq!(GateArgs::parse(&argv(&["--envelope", "/e", "--go-fd", "5"])), Err(ArgsError::VersionMismatch));
-        assert_eq!(GateArgs::parse(&argv(&["--protocol", "2", "--envelope", "/e", "--go-fd", "5"])), Err(ArgsError::VersionMismatch));
-        assert!(matches!(GateArgs::parse(&argv(&["--protocol", "1", "--go-fd", "5"])), Err(ArgsError::Usage(_))));
-        assert!(matches!(GateArgs::parse(&argv(&["--protocol", "1", "--envelope", "/e", "--go-fd", "2"])), Err(ArgsError::Usage(_))));
-        assert!(matches!(GateArgs::parse(&argv(&["--protocol", "1", "--envelope", "/e", "--go-fd", "5", "--wat"])), Err(ArgsError::Usage(_))));
-        assert!(matches!(GateArgs::parse(&argv(&["--protocol", "1", "--envelope", "/e"])), Err(ArgsError::Usage(_))));
-        assert!(matches!(GateArgs::parse(&argv(&["--protocol", "1", "--envelope", "/e", "--go-fd", "5", "--go-socket", "p"])), Err(ArgsError::Usage(_))));
+        let ok = GateArgs::parse(&argv(&[
+            "--protocol",
+            "1",
+            "--envelope",
+            "/e.json",
+            "--go-fd",
+            "5",
+            "--lock-fds",
+            "3,4",
+        ]))
+        .unwrap();
+        assert_eq!(
+            ok,
+            GateArgs {
+                envelope: "/e.json".into(),
+                go: GoEnd::Fd(5),
+                lock_fds: vec![3, 4],
+                job_name: None
+            }
+        );
+        let pipe = GateArgs::parse(&argv(&[
+            "--protocol",
+            "1",
+            "--envelope",
+            "/e.json",
+            "--go-socket",
+            "p",
+            "--job-name",
+            "Local\\j",
+        ]))
+        .unwrap();
+        assert_eq!(
+            pipe,
+            GateArgs {
+                envelope: "/e.json".into(),
+                go: GoEnd::Socket("p".into()),
+                lock_fds: vec![],
+                job_name: Some("Local\\j".into())
+            }
+        );
+        assert_eq!(
+            GateArgs::parse(&argv(&["--envelope", "/e", "--go-fd", "5"])),
+            Err(ArgsError::VersionMismatch)
+        );
+        assert_eq!(
+            GateArgs::parse(&argv(&[
+                "--protocol",
+                "2",
+                "--envelope",
+                "/e",
+                "--go-fd",
+                "5"
+            ])),
+            Err(ArgsError::VersionMismatch)
+        );
+        assert!(matches!(
+            GateArgs::parse(&argv(&["--protocol", "1", "--go-fd", "5"])),
+            Err(ArgsError::Usage(_))
+        ));
+        assert!(matches!(
+            GateArgs::parse(&argv(&[
+                "--protocol",
+                "1",
+                "--envelope",
+                "/e",
+                "--go-fd",
+                "2"
+            ])),
+            Err(ArgsError::Usage(_))
+        ));
+        assert!(matches!(
+            GateArgs::parse(&argv(&[
+                "--protocol",
+                "1",
+                "--envelope",
+                "/e",
+                "--go-fd",
+                "5",
+                "--wat"
+            ])),
+            Err(ArgsError::Usage(_))
+        ));
+        assert!(matches!(
+            GateArgs::parse(&argv(&["--protocol", "1", "--envelope", "/e"])),
+            Err(ArgsError::Usage(_))
+        ));
+        assert!(matches!(
+            GateArgs::parse(&argv(&[
+                "--protocol",
+                "1",
+                "--envelope",
+                "/e",
+                "--go-fd",
+                "5",
+                "--go-socket",
+                "p"
+            ])),
+            Err(ArgsError::Usage(_))
+        ));
     }
 }

@@ -6,7 +6,6 @@
 #![cfg(unix)]
 mod common;
 
-use fgos_mailbox_core::SNAPSHOT_SCHEMA_VERSION;
 use common::record::{self as rec, read_state, send_req, wait_exit, TempFgos, T0};
 use common::{files, fixture, hook_limits, limits};
 use fgos_mailbox::adapters::TestedClis;
@@ -16,6 +15,7 @@ use fgos_mailbox::hook::shell::{
 };
 use fgos_mailbox::hook::{Adapter, HeadFacts, HookEvent, QuietReason};
 use fgos_mailbox::record::{Record, Wait};
+use fgos_mailbox_core::SNAPSHOT_SCHEMA_VERSION;
 use fgos_mailbox_core::{MessageId, MessageState, Timestamp, WriterKey};
 use fgos_process::facts::{identity_of, Record as ProcRecord};
 use fgos_process::ProcId;

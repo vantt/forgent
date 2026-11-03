@@ -43,7 +43,9 @@ fn consumer_contracts(out: &std::path::Path) {
             !file.is_empty()
                 && !file.starts_with('/')
                 && !file.contains('\\')
-                && file.split('/').all(|part| !part.is_empty() && part != "." && part != ".."),
+                && file
+                    .split('/')
+                    .all(|part| !part.is_empty() && part != "." && part != ".."),
             "{source}: contractFile must be a relative path inside the repository: {file}"
         );
         let path = repo.join(file);

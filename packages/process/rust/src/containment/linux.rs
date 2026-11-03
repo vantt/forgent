@@ -11,7 +11,10 @@ use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, Instant};
 
 use super::pgroup::{self, wait_until, ListFn, Members, Unlistable, POLL};
-use super::{ContainmentDomain, GateChild, ContainmentDriver, ContainmentError, Guarantee, GuaranteeLevel, SelectEnv, SpawnSpec, Spawned, StartMode};
+use super::{
+    ContainmentDomain, ContainmentDriver, ContainmentError, GateChild, Guarantee, GuaranteeLevel,
+    SelectEnv, SpawnSpec, Spawned, StartMode,
+};
 use crate::control::{self, Signal};
 use crate::facts::{self, ProcTuple, Verdict};
 use crate::mapped::{spawn_mapped, MappedLead};
@@ -43,19 +46,34 @@ pub(crate) fn select(env: &SelectEnv) -> Box<dyn ContainmentDriver> {
 fn bwrap_path(env: &SelectEnv) -> Option<PathBuf> {
     match &env.bwrap {
         Some(path) => (path.is_absolute() && path.is_file()).then(|| path.clone()),
-        None => BWRAP_LOCATIONS.iter().map(PathBuf::from).find(|path| path.is_file()),
+        None => BWRAP_LOCATIONS
+            .iter()
+            .map(PathBuf::from)
+            .find(|path| path.is_file()),
     }
 }
 
 /// Can `bwrap` make a user plus pid namespace here? Probed once per process
 /// and path by running a real command in one.
 fn pidns_usable(bwrap: &Path) -> Result<(), String> {
-    static PROBED: LazyLock<Mutex<HashMap<PathBuf, Result<(), String>>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
+    static PROBED: LazyLock<Mutex<HashMap<PathBuf, Result<(), String>>>> =
+        LazyLock::new(|| Mutex::new(HashMap::new()));
     if let Some(known) = PROBED.lock().ok().and_then(|map| map.get(bwrap).cloned()) {
         return known;
     }
     let output = Command::new(bwrap)
-        .args(["--unshare-user", "--unshare-pid", "--as-pid-1", "--dev-bind", "/", "/", "--proc", "/proc", "--", "/bin/true"])
+        .args([
+            "--unshare-user",
+            "--unshare-pid",
+            "--as-pid-1",
+            "--dev-bind",
+            "/",
+            "/",
+            "--proc",
+            "/proc",
+            "--",
+            "/bin/true",
+        ])
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::piped())
@@ -64,7 +82,11 @@ fn pidns_usable(bwrap: &Path) -> Result<(), String> {
         Ok(out) if out.status.success() => Ok(()),
         Ok(out) => {
             let stderr_str = String::from_utf8_lossy(&out.stderr);
-            let first_line = stderr_str.lines().map(str::trim).find(|line| !line.is_empty()).unwrap_or("probe failed");
+            let first_line = stderr_str
+                .lines()
+                .map(str::trim)
+                .find(|line| !line.is_empty())
+                .unwrap_or("probe failed");
             if is_mount_refusal(first_line) {
                 Err(format!("containment-mount-refused: {first_line}"))
             } else {
@@ -99,15 +121,31 @@ impl BwrapPidns {
         let terminal = spec.mode == StartMode::Terminal;
         let Some(given) = &spec.bwrap_prefix else {
             let mut prefix = vec![self.bwrap.to_string_lossy().into_owned()];
-            prefix.extend(["--unshare-pid", "--as-pid-1", "--dev-bind", "/", "/", "--proc", "/proc"].map(String::from));
+            prefix.extend(
+                [
+                    "--unshare-pid",
+                    "--as-pid-1",
+                    "--dev-bind",
+                    "/",
+                    "/",
+                    "--proc",
+                    "/proc",
+                ]
+                .map(String::from),
+            );
             if terminal {
                 prefix.push("--die-with-parent".to_string());
             }
             return Ok(prefix);
         };
         // The confinement's argv is attested by digest: check it, never edit it.
-        if !given.first().is_some_and(|program| Path::new(program).is_absolute()) {
-            return Err(ContainmentError::InvalidPrefix("bwrap-program-not-absolute"));
+        if !given
+            .first()
+            .is_some_and(|program| Path::new(program).is_absolute())
+        {
+            return Err(ContainmentError::InvalidPrefix(
+                "bwrap-program-not-absolute",
+            ));
         }
         let has = |flag: &str| given.iter().any(|arg| arg == flag);
         if !has("--unshare-pid") {
@@ -116,7 +154,10 @@ impl BwrapPidns {
         if !has("--as-pid-1") {
             return Err(ContainmentError::InvalidPrefix("missing-as-pid-1"));
         }
-        if !given.windows(2).any(|pair| pair[0] == "--proc" && pair[1] == "/proc") {
+        if !given
+            .windows(2)
+            .any(|pair| pair[0] == "--proc" && pair[1] == "/proc")
+        {
             return Err(ContainmentError::InvalidPrefix("missing-proc-mount"));
         }
         if has("--info-fd") {
@@ -124,7 +165,9 @@ impl BwrapPidns {
         }
         match (has("--die-with-parent"), terminal) {
             (true, false) => Err(ContainmentError::InvalidPrefix("die-with-parent-in-direct")),
-            (false, true) => Err(ContainmentError::InvalidPrefix("die-with-parent-missing-in-terminal")),
+            (false, true) => Err(ContainmentError::InvalidPrefix(
+                "die-with-parent-missing-in-terminal",
+            )),
             _ => Ok(given.clone()),
         }
     }
@@ -139,28 +182,53 @@ impl ContainmentDriver for BwrapPidns {
         Ok(ContainmentDomain::new(attempt_id))
     }
 
-    fn spawn_in(&self, domain: &mut ContainmentDomain, spec: SpawnSpec) -> Result<Spawned, ContainmentError> {
+    fn spawn_in(
+        &self,
+        domain: &mut ContainmentDomain,
+        spec: SpawnSpec,
+    ) -> Result<Spawned, ContainmentError> {
         let prefix = self.prefix(&spec)?;
         if spec.argv.is_empty() {
             return Err(ContainmentError::SpawnFailed("empty gate command".into()));
         }
         // bwrap reports the gate's host pid on this pipe once the namespace stands.
         let (read_end, write_end) = cloexec_pipe()?;
-        let info_slot = spec.fd_map.iter().map(|(slot, _)| slot.0 + 1).max().unwrap_or(3).max(3);
+        let info_slot = spec
+            .fd_map
+            .iter()
+            .map(|(slot, _)| slot.0 + 1)
+            .max()
+            .unwrap_or(3)
+            .max(3);
         let mut request = pgroup::gate_request(prefix.clone(), &spec, MappedLead::Caller);
-        request.argv.extend(["--info-fd".into(), info_slot.to_string().into(), "--".into()]);
+        request.argv.extend([
+            "--info-fd".into(),
+            info_slot.to_string().into(),
+            "--".into(),
+        ]);
         request.argv.extend(spec.argv.iter().map(Into::into));
-        let mut mapped: Vec<(FdSlot, &File)> = spec.fd_map.iter().map(|(slot, file)| (*slot, file)).collect();
+        let mut mapped: Vec<(FdSlot, &File)> = spec
+            .fd_map
+            .iter()
+            .map(|(slot, file)| (*slot, file))
+            .collect();
         mapped.push((FdSlot(info_slot), &write_end));
-        let mut child = spawn_mapped(&request, &mapped).map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
+        let mut child = spawn_mapped(&request, &mapped)
+            .map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
         drop(write_end);
 
         let gate_pid = match read_child_pid(read_end) {
             Ok(pid) => pid,
             Err(why) => {
                 end_failed_spawn(&mut child);
-                let why = match why.starts_with(NO_GATE_PID).then(|| refusal_line(&prefix)).flatten() {
-                    Some(line) if is_mount_refusal(&line) => format!("containment-mount-refused: {line}"),
+                let why = match why
+                    .starts_with(NO_GATE_PID)
+                    .then(|| refusal_line(&prefix))
+                    .flatten()
+                {
+                    Some(line) if is_mount_refusal(&line) => {
+                        format!("containment-mount-refused: {line}")
+                    }
                     Some(line) => format!("{NO_GATE_PID}: {line}"),
                     None => why,
                 };
@@ -178,14 +246,18 @@ impl ContainmentDriver for BwrapPidns {
                 // Its nonnumeric start time cannot match a Linux process,
                 // including a later reuse of the reported pid.
                 ProcTuple {
-                    host: observer.host, boot_id: observer.boot_id,
-                    pid_ns: observer.pid_ns, pid: ProcId(gate_pid),
+                    host: observer.host,
+                    boot_id: observer.boot_id,
+                    pid_ns: observer.pid_ns,
+                    pid: ProcId(gate_pid),
                     start_time: super::EXITED_GATE.into(),
                 }
             }
             None => {
                 end_failed_spawn(&mut child);
-                return Err(ContainmentError::SpawnFailed("gate identity unreadable".into()));
+                return Err(ContainmentError::SpawnFailed(
+                    "gate identity unreadable".into(),
+                ));
             }
         };
         domain.set_domain(Domain::LinuxGate(root.clone()));
@@ -207,12 +279,16 @@ impl ContainmentDriver for BwrapPidns {
             return KillOutcome::Ok;
         }
         if grace_ms > 0 && signal_settled(&control::signal_by_identity(&gate, Signal::Term)) {
-            wait_until(Duration::from_millis(grace_ms), || facts::judge_here(&gate.to_record()) == Verdict::Dead);
+            wait_until(Duration::from_millis(grace_ms), || {
+                facts::judge_here(&gate.to_record()) == Verdict::Dead
+            });
         }
         if !signal_settled(&control::signal_by_identity(&gate, Signal::Kill)) {
             return KillOutcome::Refused;
         }
-        if wait_until(domain.empty_wait(), || facts::judge_here(&gate.to_record()) == Verdict::Dead) {
+        if wait_until(domain.empty_wait(), || {
+            facts::judge_here(&gate.to_record()) == Verdict::Dead
+        }) {
             KillOutcome::Ok
         } else {
             KillOutcome::Refused
@@ -251,10 +327,16 @@ fn refusal_line(prefix: &[String]) -> Option<String> {
         let _ = stderr.take(DIAGNOSTIC_STDERR_BYTES).read_to_end(&mut text);
         let _ = sender.send(text);
     });
-    let text = receiver.recv_timeout(DIAGNOSTIC_TIMEOUT).unwrap_or_default();
+    let text = receiver
+        .recv_timeout(DIAGNOSTIC_TIMEOUT)
+        .unwrap_or_default();
     let _ = rerun.kill();
     let _ = rerun.wait();
-    String::from_utf8_lossy(&text).lines().map(str::trim).find(|line| !line.is_empty()).map(str::to_owned)
+    String::from_utf8_lossy(&text)
+        .lines()
+        .map(str::trim)
+        .find(|line| !line.is_empty())
+        .map(str::to_owned)
 }
 
 /// A spawn that failed after bwrap started: end the whole attempt, not just the
@@ -289,10 +371,11 @@ pub struct LinuxPgroup {
 
 impl LinuxPgroup {
     pub fn with_reason(reason: impl Into<String>) -> Self {
-        Self { selected_because: Some(reason.into()) }
+        Self {
+            selected_because: Some(reason.into()),
+        }
     }
 }
-
 
 impl ContainmentDriver for LinuxPgroup {
     fn name(&self) -> &'static str {
@@ -303,7 +386,11 @@ impl ContainmentDriver for LinuxPgroup {
         Ok(ContainmentDomain::new(attempt_id))
     }
 
-    fn spawn_in(&self, domain: &mut ContainmentDomain, spec: SpawnSpec) -> Result<Spawned, ContainmentError> {
+    fn spawn_in(
+        &self,
+        domain: &mut ContainmentDomain,
+        spec: SpawnSpec,
+    ) -> Result<Spawned, ContainmentError> {
         let (child, root) = pgroup::spawn_leader(&spec, tuple_of)?;
         domain.seen.push(root.clone());
         domain.set_domain(Domain::LinuxPgroup(root.clone()));
@@ -330,7 +417,9 @@ impl ContainmentDriver for LinuxPgroup {
             if pgroup::remember_tree(members, &leader, &mut domain.seen) {
                 let _ = pgroup::signal_group(&leader, libc::SIGTERM);
             }
-            wait_until(Duration::from_millis(grace_ms), || pgroup_state(&leader, &domain.seen) == DomainState::Empty);
+            wait_until(Duration::from_millis(grace_ms), || {
+                pgroup_state(&leader, &domain.seen) == DomainState::Empty
+            });
         }
         let wait = domain.empty_wait();
         pgroup_kill(&leader, &mut domain.seen, wait)
@@ -352,7 +441,13 @@ impl ContainmentDriver for LinuxPgroup {
 
 fn tuple_from(pid: u32, stat: &facts::Stat) -> ProcTuple {
     let observer = facts::observer();
-    ProcTuple { host: observer.host, boot_id: observer.boot_id, pid_ns: observer.pid_ns, pid: ProcId(pid), start_time: stat.start_ticks.to_string() }
+    ProcTuple {
+        host: observer.host,
+        boot_id: observer.boot_id,
+        pid_ns: observer.pid_ns,
+        pid: ProcId(pid),
+        start_time: stat.start_ticks.to_string(),
+    }
 }
 
 /// The identity of `pid`, a zombie included: a gate that already ended still
@@ -364,7 +459,10 @@ fn tuple_of(pid: ProcId) -> Option<ProcTuple> {
 /// Whether the kernel knows no process with this pid.
 fn pid_unknown(pid: u32) -> bool {
     // SAFETY: signal 0 only checks that the pid exists; nothing is sent.
-    unsafe { libc::kill(pid as libc::pid_t, 0) != 0 && io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH) }
+    unsafe {
+        libc::kill(pid as libc::pid_t, 0) != 0
+            && io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH)
+    }
 }
 
 /// Every live descendant of `root` by parent links, and every live process in
@@ -390,7 +488,11 @@ fn members_with(
             unreadable += 1;
             continue;
         };
-        let Some(pid) = entry.file_name().to_str().and_then(|name| name.parse::<u32>().ok()) else {
+        let Some(pid) = entry
+            .file_name()
+            .to_str()
+            .and_then(|name| name.parse::<u32>().ok())
+        else {
             continue;
         };
         match read_stat_fn(pid) {
@@ -399,7 +501,9 @@ fn members_with(
             // A process that exits while its `stat` is read answers ESRCH, or
             // a truncated row; either is gone once the kernel no longer knows
             // the pid. A reused pid stays unreadable, never gone.
-            Err(err) if err.kind() == io::ErrorKind::NotFound || err.raw_os_error() == Some(libc::ESRCH) => {}
+            Err(err)
+                if err.kind() == io::ErrorKind::NotFound
+                    || err.raw_os_error() == Some(libc::ESRCH) => {}
             Err(err) if err.kind() == io::ErrorKind::InvalidData && pid_unknown(pid) => {}
             Err(_) => unreadable += 1,
         }
@@ -415,7 +519,9 @@ fn members_with(
     }
     let tuples = rows
         .iter()
-        .filter(|(pid, stat)| *pid != root && (tree.contains(pid) || pgid.is_some_and(|pg| stat.group == pg)))
+        .filter(|(pid, stat)| {
+            *pid != root && (tree.contains(pid) || pgid.is_some_and(|pg| stat.group == pg))
+        })
         .map(|(pid, stat)| tuple_from(*pid, stat))
         .collect();
     Ok(Members { tuples, unreadable })
@@ -436,11 +542,20 @@ pub fn environment_marked(name: &str, value: &str) -> Vec<u32> {
     let me = std::process::id();
     entries
         .filter_map(|entry| entry.ok())
-        .filter_map(|entry| entry.file_name().to_str().and_then(|n| n.parse::<u32>().ok()))
+        .filter_map(|entry| {
+            entry
+                .file_name()
+                .to_str()
+                .and_then(|n| n.parse::<u32>().ok())
+        })
         .filter(|pid| *pid != me)
         .filter(|pid| read_stat(*pid).is_ok_and(|stat| !stat.is_gone()))
         .filter(|pid| {
-            fs::read(format!("/proc/{pid}/environ")).is_ok_and(|bytes| bytes.split(|b| *b == 0).any(|entry| entry == wanted.as_bytes()))
+            fs::read(format!("/proc/{pid}/environ")).is_ok_and(|bytes| {
+                bytes
+                    .split(|b| *b == 0)
+                    .any(|entry| entry == wanted.as_bytes())
+            })
         })
         .collect()
 }
@@ -451,7 +566,11 @@ pub(crate) fn pgroup_state(leader: &ProcTuple, seen: &[ProcTuple]) -> DomainStat
 }
 
 /// Ends a `linux-pgroup` domain; see [`pgroup::kill`].
-pub(crate) fn pgroup_kill(leader: &ProcTuple, seen: &mut Vec<ProcTuple>, empty_wait: Duration) -> KillOutcome {
+pub(crate) fn pgroup_kill(
+    leader: &ProcTuple,
+    seen: &mut Vec<ProcTuple>,
+    empty_wait: Duration,
+) -> KillOutcome {
     pgroup::kill(members as ListFn, leader, seen, empty_wait)
 }
 
@@ -474,9 +593,19 @@ fn read_child_pid(mut read_end: File) -> Result<u32, String> {
         if left.is_zero() {
             return Err("bwrap reported no gate pid in time".into());
         }
-        let mut pfd = libc::pollfd { fd: read_end.as_raw_fd(), events: libc::POLLIN, revents: 0 };
+        let mut pfd = libc::pollfd {
+            fd: read_end.as_raw_fd(),
+            events: libc::POLLIN,
+            revents: 0,
+        };
         // SAFETY: poll on one valid pollfd.
-        let ready = unsafe { libc::poll(&mut pfd, 1, left.as_millis().min(i32::MAX as u128) as libc::c_int) };
+        let ready = unsafe {
+            libc::poll(
+                &mut pfd,
+                1,
+                left.as_millis().min(i32::MAX as u128) as libc::c_int,
+            )
+        };
         if ready < 0 && io::Error::last_os_error().kind() != io::ErrorKind::Interrupted {
             return Err(io::Error::last_os_error().to_string());
         }
@@ -497,7 +626,9 @@ fn read_child_pid(mut read_end: File) -> Result<u32, String> {
 
 fn parse_child_pid(text: &[u8]) -> Option<u32> {
     let value: serde_json::Value = serde_json::from_slice(text).ok()?;
-    u32::try_from(value.get("child-pid")?.as_u64()?).ok().filter(|pid| *pid > 0)
+    u32::try_from(value.get("child-pid")?.as_u64()?)
+        .ok()
+        .filter(|pid| *pid > 0)
 }
 
 #[cfg(test)]
@@ -507,7 +638,10 @@ mod tests {
     #[test]
     fn unreaped_fast_child_keeps_its_identity() {
         let mut child = Command::new("/bin/true").spawn().unwrap();
-        assert!(wait_until(Duration::from_secs(5), || matches!(facts::observe(ProcId(child.id())), facts::Observed::Zombie)));
+        assert!(wait_until(Duration::from_secs(5), || matches!(
+            facts::observe(ProcId(child.id())),
+            facts::Observed::Zombie
+        )));
         let tuple = tuple_of(ProcId(child.id())).expect("zombie identity");
         assert!(tuple.start_time.parse::<u64>().is_ok());
         assert_eq!(facts::judge_here(&tuple.to_record()), Verdict::Dead);
@@ -523,15 +657,31 @@ mod tests {
         let driver = BwrapPidns::new("/usr/bin/bwrap".into());
         assert_eq!(driver.is_empty(&mut domain), DomainState::Empty);
         assert_eq!(driver.kill_all(&mut domain, 100), KillOutcome::Ok);
-        assert_eq!(crate::domain_kill_all(domain.domain().unwrap()), KillOutcome::Ok);
+        assert_eq!(
+            crate::domain_kill_all(domain.domain().unwrap()),
+            KillOutcome::Ok
+        );
     }
 
     #[test]
     fn environment_marker_finds_a_live_carrier_and_not_its_dead_or_unmarked_neighbours() {
         let value = format!("marker-{}", std::process::id());
-        let mut carrier = Command::new("/bin/sleep").arg("30").env("FGOS_TEST_MARK", &value).spawn().unwrap();
-        let mut bystander = Command::new("/bin/sleep").arg("30").env("FGOS_TEST_MARK", "other").spawn().unwrap();
-        assert!(wait_until(Duration::from_secs(5), || environment_marked("FGOS_TEST_MARK", &value) == vec![carrier.id()]));
+        let mut carrier = Command::new("/bin/sleep")
+            .arg("30")
+            .env("FGOS_TEST_MARK", &value)
+            .spawn()
+            .unwrap();
+        let mut bystander = Command::new("/bin/sleep")
+            .arg("30")
+            .env("FGOS_TEST_MARK", "other")
+            .spawn()
+            .unwrap();
+        assert!(wait_until(Duration::from_secs(5), || environment_marked(
+            "FGOS_TEST_MARK",
+            &value
+        ) == vec![
+            carrier.id()
+        ]));
         carrier.kill().unwrap();
         carrier.wait().unwrap();
         assert!(environment_marked("FGOS_TEST_MARK", &value).is_empty());
@@ -544,11 +694,21 @@ mod tests {
     #[test]
     fn pgroup_state_reports_unknown_when_a_seen_member_cannot_be_judged() {
         let mut child = Command::new("/bin/true").spawn().unwrap();
-        assert!(wait_until(Duration::from_secs(5), || matches!(facts::observe(ProcId(child.id())), facts::Observed::Zombie)));
+        assert!(wait_until(Duration::from_secs(5), || matches!(
+            facts::observe(ProcId(child.id())),
+            facts::Observed::Zombie
+        )));
         let leader = tuple_of(ProcId(child.id())).expect("zombie identity");
         child.wait().unwrap();
-        let foreign = ProcTuple { host: "other-host".into(), ..leader.clone() };
-        assert_eq!(facts::judge_here(&foreign.to_record()), Verdict::Unknown, "the fixture member must be one this observer cannot judge");
+        let foreign = ProcTuple {
+            host: "other-host".into(),
+            ..leader.clone()
+        };
+        assert_eq!(
+            facts::judge_here(&foreign.to_record()),
+            Verdict::Unknown,
+            "the fixture member must be one this observer cannot judge"
+        );
         assert_eq!(pgroup_state(&leader, &[foreign]), DomainState::Unknown);
     }
 
@@ -561,13 +721,37 @@ mod tests {
 
     #[test]
     fn members_treats_stat_esrch_error_as_vanished_process() {
-        let esrch = members_with(1, false, None, |_| Err(io::Error::from_raw_os_error(libc::ESRCH)), |_| false).ok().expect("proc listing");
+        let esrch = members_with(
+            1,
+            false,
+            None,
+            |_| Err(io::Error::from_raw_os_error(libc::ESRCH)),
+            |_| false,
+        )
+        .ok()
+        .expect("proc listing");
         assert_eq!(esrch.unreadable, 0, "ESRCH: the process vanished mid-read");
         let me = std::process::id();
-        let cut = |pid: u32| if pid == me { Err(io::Error::from(io::ErrorKind::InvalidData)) } else { read_stat(pid) };
-        let gone = members_with(1, false, None, cut, |pid| pid == me).ok().expect("proc listing");
-        assert_eq!(gone.unreadable, 0, "a cut row of a pid the kernel no longer knows is gone");
-        let live = members_with(1, false, None, cut, |_| false).ok().expect("proc listing");
-        assert_eq!(live.unreadable, 1, "a cut row of a live pid stays unreadable");
+        let cut = |pid: u32| {
+            if pid == me {
+                Err(io::Error::from(io::ErrorKind::InvalidData))
+            } else {
+                read_stat(pid)
+            }
+        };
+        let gone = members_with(1, false, None, cut, |pid| pid == me)
+            .ok()
+            .expect("proc listing");
+        assert_eq!(
+            gone.unreadable, 0,
+            "a cut row of a pid the kernel no longer knows is gone"
+        );
+        let live = members_with(1, false, None, cut, |_| false)
+            .ok()
+            .expect("proc listing");
+        assert_eq!(
+            live.unreadable, 1,
+            "a cut row of a live pid stays unreadable"
+        );
     }
 }

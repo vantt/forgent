@@ -26,23 +26,42 @@ fn child_entry() {
         return;
     }
     let lock_path = std::env::var(LOCK_FILE).expect("lock file path");
-    let file = OpenOptions::new().read(true).write(true).open(&lock_path).expect("open lock file");
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(&lock_path)
+        .expect("open lock file");
     // SAFETY: flock on a descriptor this process owns.
-    assert_eq!(unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX) }, 0, "flock in child");
-    fs::write(std::env::var(READY_FILE).expect("ready file path"), b"ready").expect("ready marker");
+    assert_eq!(
+        unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX) },
+        0,
+        "flock in child"
+    );
+    fs::write(
+        std::env::var(READY_FILE).expect("ready file path"),
+        b"ready",
+    )
+    .expect("ready marker");
     loop {
         std::thread::sleep(Duration::from_secs(3600));
     }
 }
 
 fn temp_dir(tag: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("fgos-process-{tag}-{}-{}", std::process::id(), nanos()));
+    let dir = std::env::temp_dir().join(format!(
+        "fgos-process-{tag}-{}-{}",
+        std::process::id(),
+        nanos()
+    ));
     fs::create_dir_all(&dir).expect("temp dir");
     dir
 }
 
 fn nanos() -> u128 {
-    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos()
 }
 
 fn wait_for(path: &Path, child: &mut Child) {
@@ -89,16 +108,27 @@ fn a_child_holding_flock_is_listed_and_disappears_when_it_dies() {
 
     let listed = facts::lock_holders(dev, ino);
     let pids = holder_pids(&listed);
-    assert_eq!(pids, vec![child.id()], "exactly the child holds the lock: {listed:?}");
+    assert_eq!(
+        pids,
+        vec![child.id()],
+        "exactly the child holds the lock: {listed:?}"
+    );
     if let Holders::List(holders) = &listed {
         let tuple = &holders[0];
-        assert_eq!(Some(tuple.start_time.clone()), facts::identity_of(ProcId(child.id())).map(|t| t.start_time));
+        assert_eq!(
+            Some(tuple.start_time.clone()),
+            facts::identity_of(ProcId(child.id())).map(|t| t.start_time)
+        );
         assert_eq!(tuple.host, facts::host());
     }
 
     child.kill().expect("kill child");
     child.wait().expect("reap child");
-    assert_eq!(holder_pids(&facts::lock_holders(dev, ino)), Vec::<u32>::new(), "a dead holder is gone from the list");
+    assert_eq!(
+        holder_pids(&facts::lock_holders(dev, ino)),
+        Vec::<u32>::new(),
+        "a dead holder is gone from the list"
+    );
     fs::remove_dir_all(&dir).ok();
 }
 
@@ -106,7 +136,13 @@ fn a_child_holding_flock_is_listed_and_disappears_when_it_dies() {
 fn this_process_is_listed_while_it_holds_flock_and_not_after_close() {
     let dir = temp_dir("holders-self");
     let lock_path = dir.join("resource.lock");
-    let file = OpenOptions::new().read(true).write(true).create(true).truncate(true).open(&lock_path).unwrap();
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(&lock_path)
+        .unwrap();
     let (dev, ino) = facts::file_key(&file).unwrap();
     // SAFETY: flock on a descriptor this process owns.
     assert_eq!(unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX) }, 0);
@@ -115,7 +151,10 @@ fn this_process_is_listed_while_it_holds_flock_and_not_after_close() {
     let me = std::process::id();
     assert!(holder_pids(&facts::lock_holders(dev, ino)).contains(&me));
     drop(file);
-    assert!(!holder_pids(&facts::lock_holders(dev, ino)).contains(&me), "a closed description holds nothing");
+    assert!(
+        !holder_pids(&facts::lock_holders(dev, ino)).contains(&me),
+        "a closed description holds nothing"
+    );
     fs::remove_dir_all(&dir).ok();
 }
 
@@ -131,18 +170,53 @@ fn scan_sees_a_child_by_its_environment_and_names_what_it_cannot_read() {
         .spawn()
         .expect("spawn sleep");
 
-    let filter = ScanFilter { env_keys: vec!["FGOS_STATE_ROOT".to_string()], include_self: false };
+    let filter = ScanFilter {
+        env_keys: vec!["FGOS_STATE_ROOT".to_string()],
+        include_self: false,
+    };
     let Scan::Views(views) = facts::scan(&filter) else {
         panic!("Linux must scan");
     };
-    let view = views.iter().find(|v| v.pid.0 == child.id()).expect("the child is in the scan");
-    assert_eq!(view.tuple.as_ref().map(|t| t.pid), Some(view.pid), "our own child is identified");
-    assert_eq!(view.tuple.as_ref().and_then(|t| facts::identity_of(t.pid)).map(|t| t.start_time), view.tuple.as_ref().map(|t| t.start_time.clone()));
-    assert_eq!(view.env_subset.get("FGOS_STATE_ROOT"), Some(&state_root.to_string_lossy().into_owned()));
-    assert_eq!(view.cmdline.as_ref().and_then(|c| c.first()).map(String::as_str), Some("sleep"));
-    assert_eq!(view.cwd.as_deref(), Some(std::env::current_dir().unwrap().as_path()));
-    assert!(view.unreadable.is_empty(), "our own child is fully readable: {:?}", view.unreadable);
-    assert!(views.iter().all(|v| v.pid.0 != std::process::id()), "include_self=false leaves the scanner out");
+    let view = views
+        .iter()
+        .find(|v| v.pid.0 == child.id())
+        .expect("the child is in the scan");
+    assert_eq!(
+        view.tuple.as_ref().map(|t| t.pid),
+        Some(view.pid),
+        "our own child is identified"
+    );
+    assert_eq!(
+        view.tuple
+            .as_ref()
+            .and_then(|t| facts::identity_of(t.pid))
+            .map(|t| t.start_time),
+        view.tuple.as_ref().map(|t| t.start_time.clone())
+    );
+    assert_eq!(
+        view.env_subset.get("FGOS_STATE_ROOT"),
+        Some(&state_root.to_string_lossy().into_owned())
+    );
+    assert_eq!(
+        view.cmdline
+            .as_ref()
+            .and_then(|c| c.first())
+            .map(String::as_str),
+        Some("sleep")
+    );
+    assert_eq!(
+        view.cwd.as_deref(),
+        Some(std::env::current_dir().unwrap().as_path())
+    );
+    assert!(
+        view.unreadable.is_empty(),
+        "our own child is fully readable: {:?}",
+        view.unreadable
+    );
+    assert!(
+        views.iter().all(|v| v.pid.0 != std::process::id()),
+        "include_self=false leaves the scanner out"
+    );
 
     // SAFETY: geteuid reads the effective uid.
     let euid = unsafe { libc::geteuid() };
@@ -152,11 +226,22 @@ fn scan_sees_a_child_by_its_environment_and_names_what_it_cannot_read() {
         // failed named, never dropped. (Inside a sandbox whose init is our
         // own user there is nothing unreadable about it; when /proc hides
         // pid 1 entirely, `init_uid` is None and the scan cannot see it.)
-        let init = views.iter().find(|v| v.pid.0 == 1).expect("pid 1 is listed even though it belongs to another user");
+        let init = views
+            .iter()
+            .find(|v| v.pid.0 == 1)
+            .expect("pid 1 is listed even though it belongs to another user");
         if init.tuple.is_some() {
-            assert!(init.unreadable.iter().any(|u| u.starts_with("environ:")), "pid 1's environ is unreadable to a non-root scanner: {:?}", init.unreadable);
+            assert!(
+                init.unreadable.iter().any(|u| u.starts_with("environ:")),
+                "pid 1's environ is unreadable to a non-root scanner: {:?}",
+                init.unreadable
+            );
         } else {
-            assert!(init.unreadable.iter().any(|u| u.starts_with("stat:")), "an unidentified process names the read that failed: {:?}", init.unreadable);
+            assert!(
+                init.unreadable.iter().any(|u| u.starts_with("stat:")),
+                "an unidentified process names the read that failed: {:?}",
+                init.unreadable
+            );
         }
         assert!(init.env_subset.is_empty());
     }

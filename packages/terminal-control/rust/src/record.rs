@@ -1,7 +1,7 @@
 //! The allocation record and its one-shot markers (`allocation-record.v1.json`).
 //! A record is never edited; state changes are new markers.
 
-use crate::port::{Disposition, Display, Origin, ProcessIdentity, ServerIncarnation};
+use crate::port::{Display, Disposition, Origin, ProcessIdentity, ServerIncarnation};
 use serde::{Deserialize, Serialize};
 
 pub const VERSION: u32 = 1;
@@ -29,7 +29,11 @@ pub enum MarkerKind {
 }
 
 impl MarkerKind {
-    pub const ALL: [MarkerKind; 3] = [MarkerKind::LaunchRequested, MarkerKind::Launched, MarkerKind::Released];
+    pub const ALL: [MarkerKind; 3] = [
+        MarkerKind::LaunchRequested,
+        MarkerKind::Launched,
+        MarkerKind::Released,
+    ];
 
     /// File-name part: `<key>.<suffix>.json`.
     pub fn suffix(self) -> &'static str {

@@ -45,7 +45,10 @@ pub fn acquire_store_lock(root: &Path) -> Result<StoreLockGuard, ObserveLockErro
 }
 
 /// Acquires the exclusive store lock, waiting up to `wait` for the kernel.
-pub fn acquire_store_lock_within(root: &Path, wait: Duration) -> Result<StoreLockGuard, ObserveLockError> {
+pub fn acquire_store_lock_within(
+    root: &Path,
+    wait: Duration,
+) -> Result<StoreLockGuard, ObserveLockError> {
     let lock_path = observe_lock_path(root);
     if let Some(parent) = lock_path.parent() {
         std::fs::create_dir_all(parent).map_err(|source| ObserveLockError::Io {
@@ -65,10 +68,12 @@ pub fn acquire_store_lock_within(root: &Path, wait: Duration) -> Result<StoreLoc
         fgos_holder_lock::Acquire::Held { .. } | fgos_holder_lock::Acquire::Timeout { .. } => {
             Err(ObserveLockError::Timeout(lock_path))
         }
-        fgos_holder_lock::Acquire::Unavailable { reason, detail } => Err(ObserveLockError::DriverUnavailable {
-            path: lock_path,
-            note: format!("{}: {detail}", reason.as_str()),
-        }),
+        fgos_holder_lock::Acquire::Unavailable { reason, detail } => {
+            Err(ObserveLockError::DriverUnavailable {
+                path: lock_path,
+                note: format!("{}: {detail}", reason.as_str()),
+            })
+        }
     }
 }
 

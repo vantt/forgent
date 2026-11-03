@@ -11,16 +11,18 @@ use std::io::{BufRead, Write};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use fgos_holder_lock::{predecessor, Acquire, HeldReason, Mode, Probe, Resource, Wait, DEFAULT_KILL_WAIT_MS};
+use fgos_holder_lock::{
+    predecessor, Acquire, HeldReason, Mode, Probe, Resource, Wait, DEFAULT_KILL_WAIT_MS,
+};
 use fgos_process::{domain_watch, facts, DomainState};
 use serde_json::{json, Value};
 
 use crate::envelope;
 use crate::publish::publish_once;
-use fgos_identity::text::iso_utc_now;
 use crate::route::{refuse, report, ArgsError, Flags, EXIT_INTERNAL};
 use crate::steps::{run_steps, StepsOutcome};
 use crate::supervise::publish_receipt_as;
+use fgos_identity::text::iso_utc_now;
 
 /// Parsed argv of `fgos internal adopt`.
 #[derive(Debug, PartialEq, Eq)]
@@ -38,17 +40,32 @@ pub enum Target {
 }
 
 pub fn parse_args(args: &[String]) -> Result<AdoptArgs, ArgsError> {
-    let flags = Flags::parse_with_switches(args, &["run-dir", "kill-wait-ms"], &["scan", "probe-only"], 0)?;
+    let flags = Flags::parse_with_switches(
+        args,
+        &["run-dir", "kill-wait-ms"],
+        &["scan", "probe-only"],
+        0,
+    )?;
     let target = match (flags.get("run-dir"), flags.get("scan")) {
         (Some(dir), None) => Target::RunDir(PathBuf::from(dir)),
         (None, Some(_)) => Target::Scan,
-        _ => return Err(ArgsError::Usage("exactly one of --run-dir and --scan is required".into())),
+        _ => {
+            return Err(ArgsError::Usage(
+                "exactly one of --run-dir and --scan is required".into(),
+            ))
+        }
     };
     let kill_wait_ms = match flags.get("kill-wait-ms") {
-        Some(text) => text.parse().map_err(|_| ArgsError::Usage("--kill-wait-ms needs a number".into()))?,
+        Some(text) => text
+            .parse()
+            .map_err(|_| ArgsError::Usage("--kill-wait-ms needs a number".into()))?,
         None => DEFAULT_KILL_WAIT_MS,
     };
-    Ok(AdoptArgs { target, probe_only: flags.get("probe-only").is_some(), kill_wait_ms })
+    Ok(AdoptArgs {
+        target,
+        probe_only: flags.get("probe-only").is_some(),
+        kill_wait_ms,
+    })
 }
 
 /// What one attempt directory came to.
@@ -62,16 +79,28 @@ pub struct Verdict {
 
 impl Verdict {
     fn state(state: &'static str) -> Self {
-        Verdict { state, outcome: None, pending_step: None, reason: None }
+        Verdict {
+            state,
+            outcome: None,
+            pending_step: None,
+            reason: None,
+        }
     }
 
     fn because(state: &'static str, reason: impl Into<String>) -> Self {
-        Verdict { reason: Some(reason.into()), ..Verdict::state(state) }
+        Verdict {
+            reason: Some(reason.into()),
+            ..Verdict::state(state)
+        }
     }
 
     fn line(&self, dir: &Path) -> Value {
         let mut line = json!({"v": 1, "protocol": 1, "attemptDir": dir, "state": self.state});
-        for (key, value) in [("outcome", &self.outcome), ("pendingStep", &self.pending_step), ("reason", &self.reason)] {
+        for (key, value) in [
+            ("outcome", &self.outcome),
+            ("pendingStep", &self.pending_step),
+            ("reason", &self.reason),
+        ] {
             if let Some(value) = value {
                 line[key] = Value::String(value.clone());
             }
@@ -88,12 +117,22 @@ pub fn run(args: &[String]) -> i32 {
     let mut out = std::io::BufWriter::new(std::io::stdout().lock());
     let dirs: Vec<PathBuf> = match &args.target {
         Target::RunDir(dir) => vec![dir.clone()],
-        Target::Scan => std::io::stdin().lock().lines().map_while(Result::ok).map(|l| l.trim().to_string()).filter(|l| !l.is_empty()).map(PathBuf::from).collect(),
+        Target::Scan => std::io::stdin()
+            .lock()
+            .lines()
+            .map_while(Result::ok)
+            .map(|l| l.trim().to_string())
+            .filter(|l| !l.is_empty())
+            .map(PathBuf::from)
+            .collect(),
     };
     for dir in &dirs {
         let verdict = adopt_one(dir, &args);
         // A closed stdout must not turn the work already done into a failure.
-        if writeln!(out, "{}", verdict.line(dir)).and_then(|()| out.flush()).is_err() {
+        if writeln!(out, "{}", verdict.line(dir))
+            .and_then(|()| out.flush())
+            .is_err()
+        {
             report("adopt", "internal", "stdout closed");
             return EXIT_INTERNAL;
         }
@@ -119,15 +158,24 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
     }
     let binding = read_json(&dir.join("supervisor-binding.json"));
     let envelope_json = read_json(&dir.join("envelope.json"));
-    let refusal = binding.is_none().then(|| start_refusal(dir, envelope_json.as_ref())).flatten();
-    if binding.is_none() && refusal.is_none() && !dir.join("receipt.json").exists() && still_starting(envelope_json.as_ref(), START_GRACE) {
+    let refusal = binding
+        .is_none()
+        .then(|| start_refusal(dir, envelope_json.as_ref()))
+        .flatten();
+    if binding.is_none()
+        && refusal.is_none()
+        && !dir.join("receipt.json").exists()
+        && still_starting(envelope_json.as_ref(), START_GRACE)
+    {
         return Verdict::because("running", "starting");
     }
     // Lock free is not enough: the domain must be provably empty.
     // A supervisor that died between declaring the domain and binding it left only the declared record.
     let declared = read_json(&predecessor::record_path(&lock_path));
     let domain_state = match (&binding, &declared) {
-        (Some(binding), _) => domain_of(&json!({"v": 1, "domainKind": binding["domain"]["kind"], "domainId": binding["domain"]["id"]})),
+        (Some(binding), _) => domain_of(
+            &json!({"v": 1, "domainKind": binding["domain"]["kind"], "domainId": binding["domain"]["id"]}),
+        ),
         (None, Some(record)) => domain_of(record),
         (None, None) => DomainState::Empty,
     };
@@ -149,16 +197,25 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
 
 /// The attempt lock is held: an adopter's `adopting.json` tells it from the supervisor.
 fn held_state(dir: &Path) -> Verdict {
-    Verdict::state(if dir.join("adopting.json").exists() { "being-adopted" } else { "running" })
+    Verdict::state(if dir.join("adopting.json").exists() {
+        "being-adopted"
+    } else {
+        "running"
+    })
 }
 
 fn adopt_locked(dir: &Path, resource: &Resource, bound: bool, args: &AdoptArgs) -> Verdict {
     let handle = match fgos_holder_lock::acquire(resource, Mode::Ex, Wait::Try, args.kill_wait_ms) {
         Acquire::Acquired(handle) => handle,
-        Acquire::Held { reason: HeldReason::KernelLockHeld, .. } => return held_state(dir),
+        Acquire::Held {
+            reason: HeldReason::KernelLockHeld,
+            ..
+        } => return held_state(dir),
         Acquire::Held { reason, .. } => return Verdict::because("held", reason.as_str()),
         Acquire::Timeout { .. } => return Verdict::because("held", "lock-timeout"),
-        Acquire::Unavailable { reason, detail } => return Verdict::because("open", format!("{}: {detail}", reason.as_str())),
+        Acquire::Unavailable { reason, detail } => {
+            return Verdict::because("open", format!("{}: {detail}", reason.as_str()))
+        }
     };
     let verdict = drive(dir, bound);
     // The marker only describes the current holder; it goes before the lock does.
@@ -177,7 +234,10 @@ fn drive(dir: &Path, bound_hint: bool) -> Verdict {
         Ok(envelope) => envelope,
         Err(why) => return Verdict::because("open", why),
     };
-    let attempt_id = envelope["attemptId"].as_str().unwrap_or_default().to_string();
+    let attempt_id = envelope["attemptId"]
+        .as_str()
+        .unwrap_or_default()
+        .to_string();
     if let Err(why) = write_marker(dir, &attempt_id) {
         return Verdict::because("open", format!("adopting.json not written: {why}"));
     }
@@ -190,17 +250,33 @@ fn drive(dir: &Path, bound_hint: bool) -> Verdict {
     match run_steps(&envelope, dir) {
         StepsOutcome::Done(ids) => {
             let closed = json!({"v": 1, "attemptId": attempt_id, "closedBy": "adopt", "steps": ids, "at": iso_utc_now()});
-            let published = serde_json::to_vec(&closed).map_err(std::io::Error::other).and_then(|bytes| publish_once(dir, "closed.json", &bytes));
+            let published = serde_json::to_vec(&closed)
+                .map_err(std::io::Error::other)
+                .and_then(|bytes| publish_once(dir, "closed.json", &bytes));
             match published {
                 Ok(_) => {
-                    let reason = (outcome == "abandoned-not-started").then(|| start_refusal(dir, Some(&envelope))).flatten().map(|code| format!("start-refused:{code}"));
-                    Verdict { outcome: Some(outcome), reason, ..Verdict::state("adopted") }
+                    let reason = (outcome == "abandoned-not-started")
+                        .then(|| start_refusal(dir, Some(&envelope)))
+                        .flatten()
+                        .map(|code| format!("start-refused:{code}"));
+                    Verdict {
+                        outcome: Some(outcome),
+                        reason,
+                        ..Verdict::state("adopted")
+                    }
                 }
-                Err(why) => Verdict { outcome: Some(outcome), ..Verdict::because("open", format!("closed.json not published: {why}")) },
+                Err(why) => Verdict {
+                    outcome: Some(outcome),
+                    ..Verdict::because("open", format!("closed.json not published: {why}"))
+                },
             }
         }
         StepsOutcome::Retry { step_id, reason } | StepsOutcome::Failed { step_id, reason } => {
-            Verdict { outcome: Some(outcome), pending_step: Some(step_id), ..Verdict::because("open", reason) }
+            Verdict {
+                outcome: Some(outcome),
+                pending_step: Some(step_id),
+                ..Verdict::because("open", reason)
+            }
         }
     }
 }
@@ -224,10 +300,15 @@ fn start_refusal(dir: &Path, envelope: Option<&Value>) -> Option<String> {
 
 /// `adopting.json`, rewritten by each adopter: temp file, then rename.
 fn write_marker(dir: &Path, attempt_id: &str) -> std::io::Result<()> {
-    let me = facts::self_identity().map(|t| t.to_record().to_json()).unwrap_or(Value::Null);
+    let me = facts::self_identity()
+        .map(|t| t.to_record().to_json())
+        .unwrap_or(Value::Null);
     let body = json!({"v": 1, "attemptId": attempt_id, "adopter": me, "at": iso_utc_now()});
     let temp = dir.join(format!(".adopting.json.tmp.{}", std::process::id()));
-    std::fs::write(&temp, serde_json::to_vec(&body).map_err(std::io::Error::other)?)?;
+    std::fs::write(
+        &temp,
+        serde_json::to_vec(&body).map_err(std::io::Error::other)?,
+    )?;
     std::fs::rename(&temp, dir.join("adopting.json")).inspect_err(|_| {
         let _ = std::fs::remove_file(&temp);
     })
@@ -255,12 +336,19 @@ const START_GRACE: Duration = Duration::ZERO;
 /// are never consulted.
 pub(crate) fn still_starting(envelope: Option<&Value>, grace: Duration) -> bool {
     let created = envelope.map(|e| &e["createdAt"]);
-    let (Some(boot_id), Some(at)) = (created.and_then(|c| c["bootId"].as_str()), created.and_then(|c| c["boottimeNs"].as_u64())) else { return false };
+    let (Some(boot_id), Some(at)) = (
+        created.and_then(|c| c["bootId"].as_str()),
+        created.and_then(|c| c["boottimeNs"].as_u64()),
+    ) else {
+        return false;
+    };
     if facts::boot_id().is_some_and(|current| current != boot_id) {
         return false;
     }
     // A `createdAt` later than now can only come from before a reboot of a platform with no boot id.
-    crate::gate::boottime_ns().checked_sub(at).is_some_and(|age| u128::from(age) < grace.as_nanos())
+    crate::gate::boottime_ns()
+        .checked_sub(at)
+        .is_some_and(|age| u128::from(age) < grace.as_nanos())
 }
 
 /// Cheap check for a scan: the file is JSON with `v` 3. The digest is checked when the attempt is adopted.
@@ -280,14 +368,20 @@ const FALLBACK_SETTLE: Duration = Duration::from_millis(1500);
 /// watch is polled again, bounded, while the job could not be opened; a job
 /// that opens, or a record of another session, answers at once.
 fn domain_of(record: &Value) -> DomainState {
-    let Some(domain) = predecessor::parse_record(record) else { return DomainState::Unknown };
+    let Some(domain) = predecessor::parse_record(record) else {
+        return DomainState::Unknown;
+    };
     let mut watch = domain_watch(&domain);
     #[cfg(windows)]
     {
         let started = std::time::Instant::now();
         loop {
             let state = watch.is_empty();
-            if state == DomainState::Empty || watch.trace().job_opened || watch.reason().is_some() || started.elapsed() >= FALLBACK_SETTLE {
+            if state == DomainState::Empty
+                || watch.trace().job_opened
+                || watch.reason().is_some()
+                || started.elapsed() >= FALLBACK_SETTLE
+            {
                 return state;
             }
             std::thread::sleep(Duration::from_millis(25));
@@ -308,30 +402,77 @@ mod tests {
     #[test]
     fn a_young_envelope_of_this_boot_is_still_starting_and_anything_else_is_not() {
         let boot = facts::boot_id().unwrap_or_else(|| "no-boot-id".into());
-        let at = |boot_id: &str, ns: u64| json!({"createdAt": {"bootId": boot_id, "boottimeNs": ns}});
+        let at =
+            |boot_id: &str, ns: u64| json!({"createdAt": {"bootId": boot_id, "boottimeNs": ns}});
         let grace = Duration::from_secs(60);
         let now = crate::gate::boottime_ns();
         assert!(still_starting(Some(&at(&boot, now)), grace));
         assert!(!still_starting(Some(&at(&boot, now)), Duration::ZERO));
         // Aged by waiting, not by arithmetic: a machine that booted a minute ago has no "two minutes ago".
         std::thread::sleep(Duration::from_millis(30));
-        assert!(!still_starting(Some(&at(&boot, now)), Duration::from_millis(10)), "an old envelope");
+        assert!(
+            !still_starting(Some(&at(&boot, now)), Duration::from_millis(10)),
+            "an old envelope"
+        );
         // Another boot is only knowable where the platform has a boot id.
         if facts::boot_id().is_some() {
-            assert!(!still_starting(Some(&at("another-boot", now)), grace), "another boot: the starter is gone");
+            assert!(
+                !still_starting(Some(&at("another-boot", now)), grace),
+                "another boot: the starter is gone"
+            );
         }
-        assert!(!still_starting(Some(&at(&boot, now + 3_600_000_000_000)), grace), "later than now: the clock restarted");
-        assert!(!still_starting(Some(&json!({"v": 3})), grace), "no createdAt, no grace");
+        assert!(
+            !still_starting(Some(&at(&boot, now + 3_600_000_000_000)), grace),
+            "later than now: the clock restarted"
+        );
+        assert!(
+            !still_starting(Some(&json!({"v": 3})), grace),
+            "no createdAt, no grace"
+        );
         assert!(!still_starting(None, grace));
     }
 
     #[test]
     fn argv_names_one_target_and_needs_protocol_one() {
-        let parsed = parse_args(&argv(&["--protocol", "1", "--run-dir", "/a", "--probe-only"])).unwrap();
-        assert_eq!(parsed, AdoptArgs { target: Target::RunDir("/a".into()), probe_only: true, kill_wait_ms: DEFAULT_KILL_WAIT_MS });
-        assert_eq!(parse_args(&argv(&["--protocol", "1", "--scan", "--kill-wait-ms", "50"])).unwrap().kill_wait_ms, 50);
-        assert!(matches!(parse_args(&argv(&["--protocol", "1"])), Err(ArgsError::Usage(_))));
-        assert!(matches!(parse_args(&argv(&["--protocol", "1", "--scan", "--run-dir", "/a"])), Err(ArgsError::Usage(_))));
-        assert_eq!(parse_args(&argv(&["--scan"])), Err(ArgsError::VersionMismatch));
+        let parsed = parse_args(&argv(&[
+            "--protocol",
+            "1",
+            "--run-dir",
+            "/a",
+            "--probe-only",
+        ]))
+        .unwrap();
+        assert_eq!(
+            parsed,
+            AdoptArgs {
+                target: Target::RunDir("/a".into()),
+                probe_only: true,
+                kill_wait_ms: DEFAULT_KILL_WAIT_MS
+            }
+        );
+        assert_eq!(
+            parse_args(&argv(&[
+                "--protocol",
+                "1",
+                "--scan",
+                "--kill-wait-ms",
+                "50"
+            ]))
+            .unwrap()
+            .kill_wait_ms,
+            50
+        );
+        assert!(matches!(
+            parse_args(&argv(&["--protocol", "1"])),
+            Err(ArgsError::Usage(_))
+        ));
+        assert!(matches!(
+            parse_args(&argv(&["--protocol", "1", "--scan", "--run-dir", "/a"])),
+            Err(ArgsError::Usage(_))
+        ));
+        assert_eq!(
+            parse_args(&argv(&["--scan"])),
+            Err(ArgsError::VersionMismatch)
+        );
     }
 }

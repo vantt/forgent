@@ -121,7 +121,10 @@ fn now_unix_secs() -> i64 {
 pub fn compute_case(cw: &CaseWindow) -> (CaseSection, Vec<String>) {
     let mut warnings = Vec::new();
     let duration_min = if let (Some(until_str), since_str) = (&cw.until, &cw.since) {
-        if let (Some(t0), Some(t1)) = (parse_iso_prefix_secs(since_str), parse_iso_prefix_secs(until_str)) {
+        if let (Some(t0), Some(t1)) = (
+            parse_iso_prefix_secs(since_str),
+            parse_iso_prefix_secs(until_str),
+        ) {
             let diff_sec = (t1 - t0).max(0);
             let min = (diff_sec as f64) / 60.0;
             if min > 24.0 * 60.0 {
@@ -462,9 +465,10 @@ pub fn compute_work(
 
             // #1: add -> delivered
             if let Some(dm) = delivered_move {
-                if let (Some(t_add), Some(t_del)) =
-                    (added_ts.and_then(parse_iso_prefix_secs), parse_iso_prefix_secs(&dm.ts))
-                {
+                if let (Some(t_add), Some(t_del)) = (
+                    added_ts.and_then(parse_iso_prefix_secs),
+                    parse_iso_prefix_secs(&dm.ts),
+                ) {
                     let diff_hours = ((t_del - t_add).max(0) as f64) / 3600.0;
                     add_to_delivered_hours.push(diff_hours);
                 }
@@ -640,14 +644,29 @@ mod tests {
         };
         let verdict = |verdict: &str| json!({ "assessment": { "verdict": verdict } });
         let obs = vec![
-            run("r1", json!({ "executor": "claude", "adapter": "herdr-spawn", "role": "implementer", "category": "ok" })),
-            run("r2", json!({ "executor": "claude", "adapter": "herdr-spawn", "category": "infra" })),
-            run("r3", json!({ "executor": "agy", "category": "verdict", "classification": verdict("findings") })),
+            run(
+                "r1",
+                json!({ "executor": "claude", "adapter": "herdr-spawn", "role": "implementer", "category": "ok" }),
+            ),
+            run(
+                "r2",
+                json!({ "executor": "claude", "adapter": "herdr-spawn", "category": "infra" }),
+            ),
+            run(
+                "r3",
+                json!({ "executor": "agy", "category": "verdict", "classification": verdict("findings") }),
+            ),
             run("r4", json!({ "executor": "agy", "category": "policy" })),
-            run("r5", json!({ "executor": "claude", "category": "verdict", "classification": verdict("inconclusive") })),
+            run(
+                "r5",
+                json!({ "executor": "claude", "category": "verdict", "classification": verdict("inconclusive") }),
+            ),
             run("r6", json!({ "executor": "claude", "category": "blocked" })),
             // The producer always writes `category`; a record without one is unclassified.
-            run("r7", json!({ "executor": "claude", "classification": verdict("pass") })),
+            run(
+                "r7",
+                json!({ "executor": "claude", "classification": verdict("pass") }),
+            ),
         ];
 
         let runs = compute_runs(&obs);

@@ -5,9 +5,7 @@ use crate::flags::Flags;
 use crate::friction::{self, invalid_input, FrictionInput};
 use serde_json::json;
 
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
-    "record", "resolve", "list", "show", "rank", "ping",
-];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["record", "resolve", "list", "show", "rank", "ping"];
 
 /// Whether the verb appends to the friction store.
 pub fn writes(req: &ObserveRequest) -> bool {
@@ -23,7 +21,9 @@ fn required<'a>(flags: &'a Flags, flag: &str) -> Result<&'a str, String> {
 fn subject_of(flags: &Flags) -> Result<Subject, String> {
     let subject = required(flags, "--subject")?;
     Subject::parse(subject).ok_or_else(|| {
-        invalid_input(format!("invalid subject \"{subject}\". Expected format kind:id"))
+        invalid_input(format!(
+            "invalid subject \"{subject}\". Expected format kind:id"
+        ))
     })
 }
 

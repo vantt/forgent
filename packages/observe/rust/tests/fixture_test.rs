@@ -3,9 +3,17 @@ use fgos_observe::shard::{read_store, UnsafeShard};
 use std::path::Path;
 
 fn read_values(root: &Path, store: &str) -> Vec<serde_json::Value> {
-    let read = read_store(root, store, UnsafeShard::Fail).expect("should read the golden fixture store");
-    assert!(read.invalid.is_empty(), "golden fixture has invalid lines: {:?}", read.invalid);
-    read.records.into_iter().map(|record| record.value).collect()
+    let read =
+        read_store(root, store, UnsafeShard::Fail).expect("should read the golden fixture store");
+    assert!(
+        read.invalid.is_empty(),
+        "golden fixture has invalid lines: {:?}",
+        read.invalid
+    );
+    read.records
+        .into_iter()
+        .map(|record| record.value)
+        .collect()
 }
 
 #[test]

@@ -1,7 +1,7 @@
 use fgos_observe::metrics_cli::discussions::dispatch_discussions;
 use fgos_observe::{
-    Observation, ObservationSource, ObserveRequest, SourceError, WorkEntropySignalsRecord,
-    WorkObservationSource, WorkOutcomesRecord, Window,
+    Observation, ObservationSource, ObserveRequest, SourceError, Window, WorkEntropySignalsRecord,
+    WorkObservationSource, WorkOutcomesRecord,
 };
 use fgos_run_result::{scan_coverage, scan_unit_summaries, RunResultSource};
 use serde_json::{json, Value};
@@ -46,7 +46,10 @@ impl WorkObservationSource for UnavailableWork {
         panic!("a discussion must not read the work store")
     }
 
-    fn read_entropy_signals(&self, _: &std::path::Path) -> Result<WorkEntropySignalsRecord, SourceError> {
+    fn read_entropy_signals(
+        &self,
+        _: &std::path::Path,
+    ) -> Result<WorkEntropySignalsRecord, SourceError> {
         panic!("a discussion must not read the work store")
     }
 }
@@ -307,7 +310,9 @@ fn summary_source_never_rebuilds_results_and_does_not_double_count_runs() {
         .unwrap(),
     )
     .unwrap();
-    let mut observations = scan_unit_summaries(&root.0, &Window::default()).unwrap().observations;
+    let mut observations = scan_unit_summaries(&root.0, &Window::default())
+        .unwrap()
+        .observations;
     assert_eq!(observations.len(), 1); // result-only unit does not become a discussion
     assert_eq!(observations[0].source, "unit-summary");
     assert_eq!(observations[0].kind, "unit.settled");

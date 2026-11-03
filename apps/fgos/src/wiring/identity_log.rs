@@ -7,8 +7,8 @@
 use fgos_event_store::{
     append::{append, AppendRequest, EventInput},
     identity::StoreIdentity,
-    legacy_import::write_readiness,
     layout::{Layout, StreamId},
+    legacy_import::write_readiness,
     read::{read, ReadRequest},
     registry::Registry,
     sync::sync_status,
@@ -21,7 +21,11 @@ use serde_json::Value;
 use std::path::{Path, PathBuf};
 
 fn store_fault(reason: &'static str, error: impl std::fmt::Debug) -> Refusal {
-    Refusal { reason, detail: format!("{error:?}"), candidates: Vec::new() }
+    Refusal {
+        reason,
+        detail: format!("{error:?}"),
+        candidates: Vec::new(),
+    }
 }
 
 #[derive(Debug)]
@@ -49,32 +53,74 @@ impl LogDoor for StoreLogDoor {
 impl StoreLogDoor {
     /// The log of `stream` (a registered stream id) of the clone `dir` is in, written as `writer`:
     /// the same admission, cursor and ordering Identity's directory uses, for another stream.
-    pub fn open_stream(&self, dir: &Path, writer: &str, stream: &str) -> Result<Option<Box<dyn EntryLog>>, Refusal> {
-        Ok(self.open_store(dir, writer, stream)?.map(|log| Box::new(log) as Box<dyn EntryLog>))
+    pub fn open_stream(
+        &self,
+        dir: &Path,
+        writer: &str,
+        stream: &str,
+    ) -> Result<Option<Box<dyn EntryLog>>, Refusal> {
+        Ok(self
+            .open_store(dir, writer, stream)?
+            .map(|log| Box::new(log) as Box<dyn EntryLog>))
     }
 
     /// [`StoreLogDoor::open_stream`] as the concrete log, whose whole envelopes a reader that needs
     /// positions (a cursor) and store timestamps can read.
-    pub fn open_store(&self, dir: &Path, writer: &str, stream: &str) -> Result<Option<StoreLog>, Refusal> {
+    pub fn open_store(
+        &self,
+        dir: &Path,
+        writer: &str,
+        stream: &str,
+    ) -> Result<Option<StoreLog>, Refusal> {
         let fault = |e: &dyn std::fmt::Debug| store_fault("event-store-unavailable", e);
         let clone = match super::event_store_clone::open(dir) {
             Ok(Some(clone)) => clone,
             Ok(None) => return Ok(None),
-            Err(failure) => return Err(Refusal { reason: failure.reason, detail: failure.detail, candidates: Vec::new() }),
+            Err(failure) => {
+                return Err(Refusal {
+                    reason: failure.reason,
+                    detail: failure.detail,
+                    candidates: Vec::new(),
+                })
+            }
         };
         let stream = StreamId::parse(stream).map_err(|e| fault(&e))?;
-        let super::event_store_clone::EventStoreClone { driver, repo, layout, registry, machine } = clone;
-        Ok(Some(StoreLog { driver, repo, layout, registry, stream, machine, writer: writer.to_owned(), dir: dir.to_owned() }))
+        let super::event_store_clone::EventStoreClone {
+            driver,
+            repo,
+            layout,
+            registry,
+            machine,
+        } = clone;
+        Ok(Some(StoreLog {
+            driver,
+            repo,
+            layout,
+            registry,
+            stream,
+            machine,
+            writer: writer.to_owned(),
+            dir: dir.to_owned(),
+        }))
     }
 }
 
 impl StoreLog {
     /// Every envelope of this stream the clone holds, in the store's order, and this store's own
     /// origin id (empty while the clone has no store yet).
-    pub fn envelopes(&self) -> Result<(Vec<fgos_event_store::envelope::Envelope>, String), Refusal> {
+    pub fn envelopes(
+        &self,
+    ) -> Result<(Vec<fgos_event_store::envelope::Envelope>, String), Refusal> {
         let (result, origin) = self.read_stream()?;
         let stream = self.stream.as_str();
-        Ok((result.sequence.into_iter().filter(|event| event.stream == stream).collect(), origin))
+        Ok((
+            result
+                .sequence
+                .into_iter()
+                .filter(|event| event.stream == stream)
+                .collect(),
+            origin,
+        ))
     }
 
     /// The write admission every writer of the Event Store passes before it appends: a clone whose
@@ -82,7 +128,9 @@ impl StoreLog {
     fn admit_write(&self) -> Result<(), Refusal> {
         let remote = fgos_config::provider::effective_value(&self.dir, "eventStore.remote")?;
         let remote = match &remote {
-            Some(value) => value.as_str().ok_or_else(|| store_fault("event-store-config", "eventStore.remote is not text"))?,
+            Some(value) => value.as_str().ok_or_else(|| {
+                store_fault("event-store-config", "eventStore.remote is not text")
+            })?,
             None => "origin",
         };
         write_readiness(&self.driver, &self.repo, remote).map_err(|e| Refusal {
@@ -97,7 +145,11 @@ impl StoreLog {
     fn read_stream(&self) -> Result<(fgos_event_store::read::ReadResult, String), Refusal> {
         let fault = |e: &dyn std::fmt::Debug| store_fault("event-store-read-failed", e);
         let origin = match std::fs::symlink_metadata(self.layout.store()) {
-            Ok(_) => StoreIdentity::open(&self.layout, &self.machine).map_err(|e| fault(&e))?.store_id,
+            Ok(_) => {
+                StoreIdentity::open(&self.layout, &self.machine)
+                    .map_err(|e| fault(&e))?
+                    .store_id
+            }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => String::new(),
             Err(e) => return Err(fault(&e)),
         };
@@ -116,7 +168,10 @@ impl StoreLog {
         )
         .map_err(|e| fault(&e))?;
         if !result.deferred.is_empty() || !result.missing.is_empty() {
-            return Err(store_fault("event-store-incomplete-history", "run `fgos events sync` and retry"));
+            return Err(store_fault(
+                "event-store-incomplete-history",
+                "run `fgos events sync` and retry",
+            ));
         }
         Ok((result, origin))
     }
@@ -136,7 +191,12 @@ impl EntryLog for StoreLog {
             &self.registry,
             AppendRequest {
                 stream: &self.stream,
-                events: &[EventInput { event_type: event_type.to_owned(), schema_version: 1, payload, ts: iso_utc_now() }],
+                events: &[EventInput {
+                    event_type: event_type.to_owned(),
+                    schema_version: 1,
+                    payload,
+                    ts: iso_utc_now(),
+                }],
                 cursor: &cursor,
                 writer: &self.writer,
                 machine: &self.machine,
@@ -153,7 +213,10 @@ impl EntryLog for StoreLog {
             .sequence
             .into_iter()
             .filter(|event| event.stream == self.stream.as_str())
-            .map(|event| RawEvent { event_type: event.event_type, payload: event.payload })
+            .map(|event| RawEvent {
+                event_type: event.event_type,
+                payload: event.payload,
+            })
             .collect();
         let fetched_at = sync_status(&self.layout)
             .map_err(|e| store_fault("event-store-read-failed", e))?

@@ -59,7 +59,10 @@ fn concurrent_mints_install_one_complete_id_and_never_replace_it() {
                 })
             })
             .collect();
-        threads.into_iter().map(|t| t.join().unwrap()).collect::<Vec<_>>()
+        threads
+            .into_iter()
+            .map(|t| t.join().unwrap())
+            .collect::<Vec<_>>()
     });
     assert_eq!(results.iter().filter(|(created, _)| *created).count(), 1);
     assert!(results.iter().all(|(_, id)| id == &results[0].1));
@@ -78,7 +81,10 @@ fn concurrent_mints_install_one_complete_id_and_never_replace_it() {
 #[test]
 fn mint_refuses_a_hostname_without_slug_characters() {
     let root = state_root();
-    assert!(matches!(machine::mint(&root, "世界!"), Err(Error::Invalid(_))));
+    assert!(matches!(
+        machine::mint(&root, "世界!"),
+        Err(Error::Invalid(_))
+    ));
     assert!(!root.join("machine-id").exists());
     let _ = fs::remove_dir_all(root);
 }
@@ -88,13 +94,19 @@ fn mint_refuses_and_preserves_an_invalid_or_symlinked_existing_id() {
     let root = state_root();
     let file = root.join("machine-id");
     fs::write(&file, "INVALID").unwrap();
-    assert!(matches!(machine::mint(&root, "a-host"), Err(Error::Invalid(_))));
+    assert!(matches!(
+        machine::mint(&root, "a-host"),
+        Err(Error::Invalid(_))
+    ));
     assert_eq!(fs::read_to_string(&file).unwrap(), "INVALID");
     fs::remove_file(&file).unwrap();
     #[cfg(unix)]
     {
         std::os::unix::fs::symlink(root.join("elsewhere"), &file).unwrap();
-        assert!(matches!(machine::mint(&root, "a-host"), Err(Error::Invalid(_))));
+        assert!(matches!(
+            machine::mint(&root, "a-host"),
+            Err(Error::Invalid(_))
+        ));
     }
     let _ = fs::remove_dir_all(root);
 }
@@ -114,7 +126,9 @@ fn handle_drops_the_suffix_prefixes_a_leading_digit_and_cuts_to_forty() {
 #[test]
 fn every_derived_handle_follows_the_convention_machine_handle_rule() {
     let rule = fgos_convention::rules::packaged_rules();
-    let rule = rule.identifier("machine-handle").expect("machine-handle kind");
+    let rule = rule
+        .identifier("machine-handle")
+        .expect("machine-handle kind");
     let ids = [
         "fg-server-abc234",
         "4f-server-abc234",
@@ -136,7 +150,10 @@ fn alias_round_trips_and_replaces_atomically() {
     let root = state_root();
     assert_eq!(machine::read_alias(&root).unwrap(), None);
     machine::write_alias(&root, "owner").unwrap();
-    assert_eq!(machine::read_alias(&root).unwrap().as_deref(), Some("owner"));
+    assert_eq!(
+        machine::read_alias(&root).unwrap().as_deref(),
+        Some("owner")
+    );
     machine::write_alias(&root, "lab").unwrap();
     assert_eq!(machine::read_alias(&root).unwrap().as_deref(), Some("lab"));
     let _ = fs::remove_dir_all(root);

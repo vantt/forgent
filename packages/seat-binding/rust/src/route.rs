@@ -37,10 +37,20 @@ pub fn main(args: &[String]) -> i32 {
 /// The route without I/O: the exit code and the one answer line.
 pub fn run(args: &[String], stdin: &str) -> (i32, Value) {
     let Some(op) = args.first().map(String::as_str) else {
-        return error("", "usage", "needs an operation: bind or ladder", EXIT_USAGE);
+        return error(
+            "",
+            "usage",
+            "needs an operation: bind or ladder",
+            EXIT_USAGE,
+        );
     };
     if op != "bind" && op != "ladder" {
-        return error(op, "usage", &format!("unknown operation {op}; expected bind or ladder"), EXIT_USAGE);
+        return error(
+            op,
+            "usage",
+            &format!("unknown operation {op}; expected bind or ladder"),
+            EXIT_USAGE,
+        );
     }
     let mut protocol: Option<&str> = None;
     let mut iter = args[1..].iter();
@@ -50,34 +60,75 @@ pub fn run(args: &[String], stdin: &str) -> (i32, Value) {
                 Some(value) => protocol = Some(value),
                 None => return error(op, "usage", "--protocol needs a value", EXIT_USAGE),
             },
-            other => return error(op, "usage", &format!("unknown argument {other}"), EXIT_USAGE),
+            other => {
+                return error(
+                    op,
+                    "usage",
+                    &format!("unknown argument {other}"),
+                    EXIT_USAGE,
+                )
+            }
         }
     }
     if protocol != Some("1") {
-        return error(op, "host-version-mismatch", "needs --protocol 1", EXIT_VERSION_MISMATCH);
+        return error(
+            op,
+            "host-version-mismatch",
+            "needs --protocol 1",
+            EXIT_VERSION_MISMATCH,
+        );
     }
     let request: Value = match serde_json::from_str(stdin) {
         Ok(value) => value,
-        Err(err) => return error(op, "invalid-request", &format!("stdin is not JSON: {err}"), EXIT_INVALID_REQUEST),
+        Err(err) => {
+            return error(
+                op,
+                "invalid-request",
+                &format!("stdin is not JSON: {err}"),
+                EXIT_INVALID_REQUEST,
+            )
+        }
     };
     if request.get("v").and_then(Value::as_u64) != Some(1) {
-        return error(op, "host-version-mismatch", "the request must carry v: 1", EXIT_VERSION_MISMATCH);
+        return error(
+            op,
+            "host-version-mismatch",
+            "the request must carry v: 1",
+            EXIT_VERSION_MISMATCH,
+        );
     }
     match op {
         "ladder" => (0, answer(op, "ok", json!({ "ladder": ladder() }))),
         _ => {
             let Some(input) = request.get("input") else {
-                return error(op, "invalid-request", "bind needs an input", EXIT_INVALID_REQUEST);
+                return error(
+                    op,
+                    "invalid-request",
+                    "bind needs an input",
+                    EXIT_INVALID_REQUEST,
+                );
             };
             let input: BindInput = match serde_json::from_value(input.clone()) {
                 Ok(input) => input,
-                Err(err) => return error(op, "invalid-request", &format!("input does not match the contract: {err}"), EXIT_INVALID_REQUEST),
+                Err(err) => {
+                    return error(
+                        op,
+                        "invalid-request",
+                        &format!("input does not match the contract: {err}"),
+                        EXIT_INVALID_REQUEST,
+                    )
+                }
             };
             let output = bind(&input);
             let result = if output.ok { "ok" } else { "refused" };
             match serde_json::to_value(&output) {
                 Ok(output) => (0, answer(op, result, json!({ "output": output }))),
-                Err(err) => error(op, "invalid-request", &format!("the answer cannot be encoded: {err}"), EXIT_INVALID_REQUEST),
+                Err(err) => error(
+                    op,
+                    "invalid-request",
+                    &format!("the answer cannot be encoded: {err}"),
+                    EXIT_INVALID_REQUEST,
+                ),
             }
         }
     }
@@ -98,7 +149,10 @@ fn answer(op: &str, result: &str, body: Value) -> Value {
 }
 
 fn error(op: &str, code: &str, message: &str, exit: i32) -> (i32, Value) {
-    (exit, answer(op, "error", json!({ "code": code, "message": message })))
+    (
+        exit,
+        answer(op, "error", json!({ "code": code, "message": message })),
+    )
 }
 
 #[cfg(test)]
@@ -127,12 +181,20 @@ mod tests {
             assert_eq!(line["code"], "host-version-mismatch");
         }
         let (code, line) = run(&args(&["ladder", "--protocol", "1"]), r#"{"v":2}"#);
-        assert_eq!((code, line["code"].as_str()), (EXIT_VERSION_MISMATCH, Some("host-version-mismatch")));
+        assert_eq!(
+            (code, line["code"].as_str()),
+            (EXIT_VERSION_MISMATCH, Some("host-version-mismatch"))
+        );
     }
 
     #[test]
     fn usage_faults_exit_two() {
-        for list in [&[][..], &["nope", "--protocol", "1"][..], &["bind", "--protocol"][..], &["bind", "--x", "1"][..]] {
+        for list in [
+            &[][..],
+            &["nope", "--protocol", "1"][..],
+            &["bind", "--protocol"][..],
+            &["bind", "--x", "1"][..],
+        ] {
             let (code, line) = run(&args(list), "{}");
             assert_eq!(code, EXIT_USAGE, "{list:?}");
             assert_eq!(line["result"], "error");
@@ -141,7 +203,12 @@ mod tests {
 
     #[test]
     fn a_request_that_is_not_the_contract_is_invalid_not_a_decision() {
-        for stdin in ["", "not json", r#"{"v":1}"#, r#"{"v":1,"input":{"protocol":1}}"#] {
+        for stdin in [
+            "",
+            "not json",
+            r#"{"v":1}"#,
+            r#"{"v":1,"input":{"protocol":1}}"#,
+        ] {
             let (code, line) = run(&args(&["bind", "--protocol", "1"]), stdin);
             assert_eq!(code, EXIT_INVALID_REQUEST, "{stdin}");
             assert_eq!(line["code"], "invalid-request");

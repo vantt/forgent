@@ -15,7 +15,9 @@ fn cap_path(key: &str) -> String {
 
 /// `<prefix>:*` for a capability containing `:`; capabilities without one have no prefix line.
 fn prefix_key(capability: &str) -> Option<String> {
-    capability.split_once(':').map(|(prefix, _)| format!("{prefix}:*"))
+    capability
+        .split_once(':')
+        .map(|(prefix, _)| format!("{prefix}:*"))
 }
 
 /// The exact entry and the prefix entry of a capability, each with its config path.
@@ -40,7 +42,10 @@ fn validate(config: &Config) -> Result<(), Refusal> {
     for (key, entry) in &config.capabilities.0 {
         let base = cap_path(key);
         if entry.prefer.as_ref().is_some_and(Vec::is_empty) {
-            return Err(invalid(&format!("{base}.prefer"), "prefer must not be empty"));
+            return Err(invalid(
+                &format!("{base}.prefer"),
+                "prefer must not be empty",
+            ));
         }
         for role in entry.roles.0.keys() {
             if !ROLES.contains(&role.as_str()) {
@@ -50,10 +55,17 @@ fn validate(config: &Config) -> Result<(), Refusal> {
                 ));
             }
         }
-        for (group, scopes) in [("roles", &entry.roles), ("personas", &entry.personas), ("seats", &entry.seats)] {
+        for (group, scopes) in [
+            ("roles", &entry.roles),
+            ("personas", &entry.personas),
+            ("seats", &entry.seats),
+        ] {
             for (name, scope) in &scopes.0 {
                 if scope.prefer.as_ref().is_some_and(Vec::is_empty) {
-                    return Err(invalid(&format!("{base}.{group}.{name}.prefer"), "prefer must not be empty"));
+                    return Err(invalid(
+                        &format!("{base}.{group}.{name}.prefer"),
+                        "prefer must not be empty",
+                    ));
                 }
             }
         }
@@ -66,7 +78,10 @@ fn validate(config: &Config) -> Result<(), Refusal> {
     for (family, cells) in &config.model_policies.0 {
         for key in cells.0.keys() {
             if Tier::parse(key).is_none() {
-                return Err(invalid(&format!("modelPolicies.{family}.{key}"), "unknown tier name"));
+                return Err(invalid(
+                    &format!("modelPolicies.{family}.{key}"),
+                    "unknown tier name",
+                ));
             }
         }
     }
@@ -92,7 +107,10 @@ fn resolve_tier(
         found.iter().find_map(|(path, entry)| {
             pick(entry)
                 .and_then(|scope| scope.tier)
-                .map(|tier| Resolved { tier, source: format!("{path}.{group}.{name}.tier") })
+                .map(|tier| Resolved {
+                    tier,
+                    source: format!("{path}.{group}.{name}.tier"),
+                })
         })
     };
     if let Some(hit) = scoped(&|e| e.seats.0.get(seat), "seats", seat) {
@@ -107,15 +125,23 @@ fn resolve_tier(
         return hit;
     }
     if let Some(recommended) = workflow {
-        return Resolved { tier: recommended.tier, source: recommended.source.clone() };
+        return Resolved {
+            tier: recommended.tier,
+            source: recommended.source.clone(),
+        };
     }
-    if let Some(hit) = found
-        .iter()
-        .find_map(|(path, entry)| entry.tier.map(|tier| Resolved { tier, source: format!("{path}.tier") }))
-    {
+    if let Some(hit) = found.iter().find_map(|(path, entry)| {
+        entry.tier.map(|tier| Resolved {
+            tier,
+            source: format!("{path}.tier"),
+        })
+    }) {
         return hit;
     }
-    Resolved { tier: config.defaults.tier, source: DEFAULTS_TIER_PATH.to_string() }
+    Resolved {
+        tier: config.defaults.tier,
+        source: DEFAULTS_TIER_PATH.to_string(),
+    }
 }
 
 /// `maxTier` = `cap.maxTier` ?? `prefix.maxTier` ?? global; absent means no ceiling.
@@ -123,7 +149,11 @@ fn resolve_max(config: &Config, capability: &str) -> Option<(Tier, String)> {
     entries(config, capability)
         .into_iter()
         .find_map(|(path, entry)| entry.max_tier.map(|tier| (tier, format!("{path}.maxTier"))))
-        .or_else(|| config.max_tier.map(|tier| (tier, GLOBAL_MAX_TIER_PATH.to_string())))
+        .or_else(|| {
+            config
+                .max_tier
+                .map(|tier| (tier, GLOBAL_MAX_TIER_PATH.to_string()))
+        })
 }
 
 /// The first declared `prefer` list of the §6.3 `prefer` column; `tierFallback.<tier>` last.
@@ -154,13 +184,20 @@ fn resolve_prefer(
     if let Some(hit) = scoped(&|e| e.roles.0.get(role.name()), "roles", role.name()) {
         return hit;
     }
-    if let Some(hit) = found
-        .iter()
-        .find_map(|(path, entry)| entry.prefer.clone().map(|list| (list, format!("{path}.prefer"))))
-    {
+    if let Some(hit) = found.iter().find_map(|(path, entry)| {
+        entry
+            .prefer
+            .clone()
+            .map(|list| (list, format!("{path}.prefer")))
+    }) {
         return hit;
     }
-    let fallback = config.tier_fallback.0.get(tier.name()).cloned().unwrap_or_default();
+    let fallback = config
+        .tier_fallback
+        .0
+        .get(tier.name())
+        .cloned()
+        .unwrap_or_default();
     (
         fallback.into_iter().map(Prefer::Executor).collect(),
         format!("tierFallback.{}", tier.name()),
@@ -184,7 +221,11 @@ fn apply_cap(tier: Tier, source: &str, max: &Option<(Tier, String)>) -> Capped {
                 reason: "max-tier-cap".to_string(),
             }),
         },
-        _ => Capped { tier, source: source.to_string(), lowered: None },
+        _ => Capped {
+            tier,
+            source: source.to_string(),
+            lowered: None,
+        },
     }
 }
 
@@ -195,7 +236,14 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
     let seat = ask.seat.as_str();
     let persona = ask.selectors.persona.as_deref().or(ask.persona.as_deref());
 
-    let resolved = resolve_tier(config, capability, seat, persona, ask.role, ask.workflow.as_ref());
+    let resolved = resolve_tier(
+        config,
+        capability,
+        seat,
+        persona,
+        ask.role,
+        ask.workflow.as_ref(),
+    );
     let max = resolve_max(config, capability);
 
     // A persona an override names that lifts the tier above the answer without it is a raise.
@@ -209,7 +257,12 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
             ask.role,
             ask.workflow.as_ref(),
         );
-        let without = apply_cap(base.tier, &base.source, &resolve_max(config, &ask.capability)).tier;
+        let without = apply_cap(
+            base.tier,
+            &base.source,
+            &resolve_max(config, &ask.capability),
+        )
+        .tier;
         let with = apply_cap(resolved.tier, &resolved.source, &max).tier;
         if with > without {
             if !ask.raise_authorized {
@@ -251,7 +304,11 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
 
     let capped = apply_cap(tier, &source, &max);
     let final_tier = capped.tier;
-    let max_tier = max.map(|(value, path)| MaxTier { value, source: path, applied: capped.lowered.is_some() });
+    let max_tier = max.map(|(value, path)| MaxTier {
+        value,
+        source: path,
+        applied: capped.lowered.is_some(),
+    });
 
     let recommendation = ask
         .workflow
@@ -259,9 +316,15 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
         .filter(|workflow| workflow.source != resolved.source)
         .cloned();
 
-    let (prefer, prefer_source) = resolve_prefer(config, capability, seat, persona, ask.role, final_tier);
+    let (prefer, prefer_source) =
+        resolve_prefer(config, capability, seat, persona, ask.role, final_tier);
 
-    let tier_fallback = config.tier_fallback.0.get(final_tier.name()).cloned().unwrap_or_default();
+    let tier_fallback = config
+        .tier_fallback
+        .0
+        .get(final_tier.name())
+        .cloned()
+        .unwrap_or_default();
 
     let mut cells = BTreeMap::new();
     for (family, by_tier) in &config.model_policies.0 {
@@ -280,7 +343,10 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
         recommendation,
         lowered_from: capped.lowered,
         max_tier,
-        definition: format!("{}: {}; self-check: {}", definition.name, definition.work, definition.self_check),
+        definition: format!(
+            "{}: {}; self-check: {}",
+            definition.name, definition.work, definition.self_check
+        ),
         prefer,
         prefer_source,
         tier_fallback,

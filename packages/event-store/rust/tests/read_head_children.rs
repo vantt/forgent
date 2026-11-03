@@ -4,12 +4,18 @@
 mod reader_support;
 use fgos_event_store::{
     cursor::Cursor,
-    legacy_import::write_readiness,
     layout::StreamId,
+    legacy_import::write_readiness,
     read::{read, ReadRequest},
 };
 use reader_support::*;
-use std::{fs, os::unix::fs::PermissionsExt, path::{Path, PathBuf}, process::Command, sync::OnceLock};
+use std::{
+    fs,
+    os::unix::fs::PermissionsExt,
+    path::{Path, PathBuf},
+    process::Command,
+    sync::OnceLock,
+};
 
 static LOG: OnceLock<PathBuf> = OnceLock::new();
 /// A `git` that records `<argv>` ahead of the real one on PATH, installed before any driver exists.
@@ -18,20 +24,35 @@ fn logging_git() -> &'static Path {
         let dir = std::env::temp_dir().join(format!("es-read-head-bin-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir(&dir).unwrap();
-        let real = Command::new("sh").args(["-c", "command -v git"]).output().unwrap().stdout;
+        let real = Command::new("sh")
+            .args(["-c", "command -v git"])
+            .output()
+            .unwrap()
+            .stdout;
         let real = String::from_utf8(real).unwrap().trim().to_owned();
         let log = dir.join("argv.log");
         let script = dir.join("git");
-        fs::write(&script, format!("#!/bin/sh\nprintf '%s\\n' \"$*\" >> '{}'\nexec '{real}' \"$@\"\n", log.display())).unwrap();
+        fs::write(
+            &script,
+            format!(
+                "#!/bin/sh\nprintf '%s\\n' \"$*\" >> '{}'\nexec '{real}' \"$@\"\n",
+                log.display()
+            ),
+        )
+        .unwrap();
         fs::set_permissions(&script, fs::Permissions::from_mode(0o755)).unwrap();
         let mut paths = vec![dir];
-        paths.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        paths.extend(std::env::split_paths(
+            &std::env::var_os("PATH").unwrap_or_default(),
+        ));
         std::env::set_var("PATH", std::env::join_paths(paths).unwrap());
         log
     })
 }
 fn logged_lines() -> usize {
-    fs::read_to_string(logging_git()).map(|l| l.lines().count()).unwrap_or(0)
+    fs::read_to_string(logging_git())
+        .map(|l| l.lines().count())
+        .unwrap_or(0)
 }
 /// Subcommands of the children run against `f`'s repository after the first `from` logged lines.
 fn children(f: &Fixture, from: usize) -> Vec<String> {
@@ -55,10 +76,32 @@ fn children(f: &Fixture, from: usize) -> Vec<String> {
         .collect()
 }
 fn git(f: &Fixture, args: &[&str]) {
-    assert!(Command::new("/usr/bin/git").arg("-C").arg(f.root.join("repo")).args(args).status().unwrap().success(), "{args:?}");
+    assert!(
+        Command::new("/usr/bin/git")
+            .arg("-C")
+            .arg(f.root.join("repo"))
+            .args(args)
+            .status()
+            .unwrap()
+            .success(),
+        "{args:?}"
+    );
 }
 fn commit(f: &Fixture) {
-    git(f, &["-c", "user.name=T", "-c", "user.email=t@example.invalid", "commit", "-q", "--allow-empty", "-m", "one"]);
+    git(
+        f,
+        &[
+            "-c",
+            "user.name=T",
+            "-c",
+            "user.email=t@example.invalid",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "one",
+        ],
+    );
 }
 /// One read; the children it ran, after a first read that settles one-time validation.
 fn read_children(f: &Fixture) -> Vec<String> {
@@ -68,7 +111,15 @@ fn read_children(f: &Fixture) -> Vec<String> {
         read(
             &f.driver,
             &f.repo,
-            ReadRequest { layout: &f.layout, origin: &own, machine: "test-aa", streams: &streams, cursor: &Cursor::default(), folded: &[], project: true },
+            ReadRequest {
+                layout: &f.layout,
+                origin: &own,
+                machine: "test-aa",
+                streams: &streams,
+                cursor: &Cursor::default(),
+                folded: &[],
+                project: true,
+            },
         )
         .unwrap()
     };
@@ -78,7 +129,8 @@ fn read_children(f: &Fixture) -> Vec<String> {
     children(f, from)
 }
 fn head_children(names: &[String]) -> usize {
-    names.iter().filter(|n| *n == "symbolic-ref").count() + names.iter().filter(|n| *n == "rev-parse").count()
+    names.iter().filter(|n| *n == "symbolic-ref").count()
+        + names.iter().filter(|n| *n == "rev-parse").count()
 }
 
 #[test]
@@ -87,7 +139,11 @@ fn an_attached_head_is_read_in_the_tip_listing_with_no_separate_head_children() 
     let f = Fixture::new();
     commit(&f);
     let names = read_children(&f);
-    assert_eq!(names.iter().filter(|n| *n == "for-each-ref").count(), 1, "{names:?}");
+    assert_eq!(
+        names.iter().filter(|n| *n == "for-each-ref").count(),
+        1,
+        "{names:?}"
+    );
     assert_eq!(head_children(&names), 0, "{names:?}");
 }
 
@@ -119,7 +175,11 @@ fn write_admission_of_a_commit_without_legacy_directories_reads_the_roots_in_one
     let from = logged_lines();
     write_readiness(&f.driver, &f.repo, "origin").unwrap();
     let names = children(&f, from);
-    assert_eq!(names.iter().filter(|n| *n == "cat-file").count(), 1, "{names:?}");
+    assert_eq!(
+        names.iter().filter(|n| *n == "cat-file").count(),
+        1,
+        "{names:?}"
+    );
     assert!(!names.iter().any(|n| n == "ls-tree"), "{names:?}");
 }
 

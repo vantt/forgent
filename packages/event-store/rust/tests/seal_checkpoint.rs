@@ -34,7 +34,13 @@ fn world() -> World {
         path: r.root.join("cache/event-history.json"),
         reuse: true,
     };
-    World { r, driver, repo, origin, cp }
+    World {
+        r,
+        driver,
+        repo,
+        origin,
+        cp,
+    }
 }
 impl World {
     fn seal(&self, checkpoint: bool) -> Sealed {
@@ -61,7 +67,15 @@ impl World {
         read_checkpointed(
             port,
             &self.repo,
-            ReadRequest { layout: &self.r.layout, origin: &self.origin, machine: "test-aa2345", streams: &streams, cursor: &empty, folded: &[], project: true },
+            ReadRequest {
+                layout: &self.r.layout,
+                origin: &self.origin,
+                machine: "test-aa2345",
+                streams: &streams,
+                cursor: &empty,
+                folded: &[],
+                project: true,
+            },
             None,
             cp,
             None,
@@ -74,7 +88,15 @@ impl World {
         read(
             &self.driver,
             &self.repo,
-            ReadRequest { layout: &self.r.layout, origin: &self.origin, machine: "test-aa2345", streams: &streams, cursor: &empty, folded: &[], project: true },
+            ReadRequest {
+                layout: &self.r.layout,
+                origin: &self.origin,
+                machine: "test-aa2345",
+                streams: &streams,
+                cursor: &empty,
+                folded: &[],
+                project: true,
+            },
         )
         .unwrap()
         .sequence
@@ -85,7 +107,10 @@ impl World {
 fn a_second_process_reads_zero_sealed_commits_after_a_seal_moved_the_checkpoint() {
     let w = world();
     assert_eq!(w.seal(false).last_seq, 1);
-    assert!(w.fresh(&w.driver, &w.cp).checkpoint.written, "the first read writes the file");
+    assert!(
+        w.fresh(&w.driver, &w.cp).checkpoint.written,
+        "the first read writes the file"
+    );
 
     w.r.append(2);
     let sealed = w.seal(true);
@@ -93,8 +118,16 @@ fn a_second_process_reads_zero_sealed_commits_after_a_seal_moved_the_checkpoint(
 
     let counting = CountingPort::new(&w.driver);
     let next = w.fresh(&counting, &w.cp);
-    assert!(next.checkpoint.continued && !next.checkpoint.written, "{:?}", next.checkpoint);
-    assert_eq!(counting.read_commits.get(), 0, "the sealed commit is not walked again");
+    assert!(
+        next.checkpoint.continued && !next.checkpoint.written,
+        "{:?}",
+        next.checkpoint
+    );
+    assert_eq!(
+        counting.read_commits.get(),
+        0,
+        "the sealed commit is not walked again"
+    );
     assert_eq!(next.sequence.len(), 3);
     assert_eq!(next.sequence, w.truth());
 }
@@ -128,7 +161,11 @@ fn a_checkpoint_a_seal_wrote_is_still_checked_against_the_store_and_ignored_when
     fs::write(&w.cp.path, honest.replacen("🦀", "x", 1)).unwrap();
     let counting = CountingPort::new(&w.driver);
     let next = w.fresh(&counting, &w.cp);
-    assert!(!next.checkpoint.continued && next.checkpoint.ignored.is_some(), "{:?}", next.checkpoint);
+    assert!(
+        !next.checkpoint.continued && next.checkpoint.ignored.is_some(),
+        "{:?}",
+        next.checkpoint
+    );
     assert!(next.checkpoint.written, "the read rewrites the file");
     assert_eq!(next.sequence, w.truth());
     // The rewritten file is the honest one again.
@@ -152,7 +189,13 @@ fn sealing_and_reading_concurrently_never_leave_a_checkpoint_that_cannot_be_used
                 for _ in 0..4 {
                     let got = w.fresh(&w.driver, &w.cp);
                     assert!(!got.sequence.is_empty());
-                    let rebuilt = w.fresh(&w.driver, &Checkpoint { reuse: false, ..w.cp.clone() });
+                    let rebuilt = w.fresh(
+                        &w.driver,
+                        &Checkpoint {
+                            reuse: false,
+                            ..w.cp.clone()
+                        },
+                    );
                     assert!(!rebuilt.sequence.is_empty());
                 }
             });

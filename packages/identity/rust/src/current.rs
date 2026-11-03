@@ -114,14 +114,20 @@ pub fn os_record(pid: u32) -> Option<Record> {
     fgos_process::facts::identity_of(fgos_process::ProcId(pid)).map(|tuple| tuple.to_record())
 }
 
-
 /// The record of the process `head` names, or why it is not that process: not
 /// readable or not running, or running with another start time (its pid was
 /// reused). The one place that judges a head reference.
 pub(crate) fn read_head(head: &HeadRef) -> Result<Record, String> {
     let record = os_record(head.pid)
-        .filter(|record| fgos_process::facts::judge_here(record) == fgos_process::facts::Verdict::Alive)
-        .ok_or_else(|| format!("process {} cannot be read or is not running, so it cannot be a session's head", head.pid))?;
+        .filter(|record| {
+            fgos_process::facts::judge_here(record) == fgos_process::facts::Verdict::Alive
+        })
+        .ok_or_else(|| {
+            format!(
+                "process {} cannot be read or is not running, so it cannot be a session's head",
+                head.pid
+            )
+        })?;
     match record.start_time.as_deref() {
         Some(now) if now == head.start_time => Ok(record),
         now => Err(format!(
@@ -152,7 +158,12 @@ pub fn current_session(
 ) -> Result<CurrentSession, Refusal> {
     let machine = machine_info(state_root)?;
     let tree = crate::proc_tree::os_process_tree();
-    let identity = resolve(&|key| std::env::var(key).ok(), tree.as_ref(), caller_pid, fgos_dir);
+    let identity = resolve(
+        &|key| std::env::var(key).ok(),
+        tree.as_ref(),
+        caller_pid,
+        fgos_dir,
+    );
     let local = session::local(&identity, &os_pid_facts).ok_or_else(|| Refusal {
         reason: "unresolved",
         detail: "this session cannot be told from any other: no session id in the environment and no process holding a terminal".into(),
@@ -194,10 +205,19 @@ pub fn session_for(
     // the process-tree handle and the head read.
     let cli = (key.source == crate::resolve::PI_SESSION_VAR)
         .then(|| {
-            let trusted = head.filter(|head| read_head(head).is_ok()).map(|head| head.pid);
-            crate::resolve::ancestry_cli(key.source, crate::proc_tree::os_process_tree().as_ref(), trusted)
+            let trusted = head
+                .filter(|head| read_head(head).is_ok())
+                .map(|head| head.pid);
+            crate::resolve::ancestry_cli(
+                key.source,
+                crate::proc_tree::os_process_tree().as_ref(),
+                trusted,
+            )
         })
         .flatten();
-    let local = Local { cli: cli.unwrap_or(local.cli), ..local };
+    let local = Local {
+        cli: cli.unwrap_or(local.cli),
+        ..local
+    };
     Ok(named(&machine_info(state_root)?, local))
 }

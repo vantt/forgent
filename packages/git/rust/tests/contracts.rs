@@ -75,12 +75,28 @@ fn every_wal_failure_is_named_by_one_kebab_cause_and_code_in_every_port() {
         (Busy, Code::Refused, "busy"),
         (OperationIdConflict, Code::Refused, "operation-id-conflict"),
         (Untrusted, Code::Refused, "repository-identity-changed"),
-        (UnsafePath("/r/fgos has mode 0775".into()), Code::Refused, "git-wal-path-unsafe"),
+        (
+            UnsafePath("/r/fgos has mode 0775".into()),
+            Code::Refused,
+            "git-wal-path-unsafe",
+        ),
         (Unsupported, Code::Refused, "git-wal-unsupported"),
-        (PublicationBorrowUnavailable, Code::Refused, "publication-borrow-unavailable"),
+        (
+            PublicationBorrowUnavailable,
+            Code::Refused,
+            "publication-borrow-unavailable",
+        ),
         (FenceMissing, Code::RecoveryRequired, "git-fence-missing"),
-        (RecoveryRequired, Code::RecoveryRequired, "operation-recovery-required"),
-        (Corrupt("record parse".into()), Code::RecoveryRequired, "git-wal-corrupt"),
+        (
+            RecoveryRequired,
+            Code::RecoveryRequired,
+            "operation-recovery-required",
+        ),
+        (
+            Corrupt("record parse".into()),
+            Code::RecoveryRequired,
+            "git-wal-corrupt",
+        ),
         (io(), Code::RecoveryRequired, "git-wal-io"),
     ];
     for (error, code, cause) in arms {

@@ -3,9 +3,7 @@
 //! Every directory component and the leaf are opened no-follow, relative to a descriptor of the
 //! directory before it. The caller-supplied root is opened once, no-follow, so a symlinked root is
 //! refused as well. The bytes and the revision come from the one descriptor returned here.
-use rustix::fs::{
-    fchmod, fstat, mkdirat, openat, statat, AtFlags, FileType, Mode, OFlags, CWD,
-};
+use rustix::fs::{fchmod, fstat, mkdirat, openat, statat, AtFlags, FileType, Mode, OFlags, CWD};
 use rustix::io::Errno;
 use sha2::{Digest, Sha256};
 use std::ffi::OsStr;
@@ -191,10 +189,9 @@ fn resolve_dir(
         #[cfg(any(target_os = "linux", target_os = "android"))]
         Strategy::Openat2 => {
             let joined: std::path::PathBuf = dirs.iter().collect();
-            let resolve =
-                rustix::fs::ResolveFlags::BENEATH
-                    | rustix::fs::ResolveFlags::NO_SYMLINKS
-                    | rustix::fs::ResolveFlags::NO_MAGICLINKS;
+            let resolve = rustix::fs::ResolveFlags::BENEATH
+                | rustix::fs::ResolveFlags::NO_SYMLINKS
+                | rustix::fs::ResolveFlags::NO_MAGICLINKS;
             match rustix::fs::openat2(root, &joined, DIR_FLAGS, Mode::empty(), resolve) {
                 Ok(fd) => Ok(Some(fd)),
                 Err(errno) => classify(errno, root, &joined).map(|()| None),

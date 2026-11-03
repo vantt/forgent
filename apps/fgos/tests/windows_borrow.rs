@@ -14,12 +14,17 @@ use std::time::Duration;
 
 use fgos_holder_lock::borrow_vectors::{self, git_env, init_repo};
 use fgos_holder_lock::predecessor::record_path;
-use fgos_holder_lock::{acquire, probe, release, run_borrowed, Acquire, BorrowError, BorrowSpec, BorrowStdio, HelperExe, Mode, Probe, Release, Resource, Wait};
+use fgos_holder_lock::{
+    acquire, probe, release, run_borrowed, Acquire, BorrowError, BorrowSpec, BorrowStdio,
+    HelperExe, Mode, Probe, Release, Resource, Wait,
+};
 use serde_json::Value;
+use std::os::windows::io::AsRawHandle;
 use windows_support::*;
 use windows_sys::Win32::Foundation::{SetHandleInformation, HANDLE, HANDLE_FLAG_INHERIT};
-use windows_sys::Win32::Storage::FileSystem::{GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION};
-use std::os::windows::io::AsRawHandle;
+use windows_sys::Win32::Storage::FileSystem::{
+    GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION,
+};
 
 const KILL_WAIT_MS: u64 = 2000;
 
@@ -35,8 +40,25 @@ fn take(resource: &Resource) -> fgos_holder_lock::Handle {
 }
 
 fn commit_spec(repo: &Path) -> BorrowSpec {
-    let argv = ["git", "-C", &repo.to_string_lossy(), "commit", "-q", "--allow-empty", "-m", "borrowed"].map(String::from).to_vec();
-    BorrowSpec { argv, cwd: Some(repo.to_path_buf()), env: git_env(), clear_env: false, stdio: BorrowStdio::Null }
+    let argv = [
+        "git",
+        "-C",
+        &repo.to_string_lossy(),
+        "commit",
+        "-q",
+        "--allow-empty",
+        "-m",
+        "borrowed",
+    ]
+    .map(String::from)
+    .to_vec();
+    BorrowSpec {
+        argv,
+        cwd: Some(repo.to_path_buf()),
+        env: git_env(),
+        clear_env: false,
+        stdio: BorrowStdio::Null,
+    }
 }
 
 fn write_hook(repo: &Path, name: &str, body: &str) {
@@ -44,7 +66,9 @@ fn write_hook(repo: &Path, name: &str, body: &str) {
 }
 
 fn assert_keeper_gone() {
-    wait_until(Duration::from_secs(3), "the job-keeper to exit", || children_named("fgos.exe").is_empty());
+    wait_until(Duration::from_secs(3), "the job-keeper to exit", || {
+        children_named("fgos.exe").is_empty()
+    });
 }
 
 #[test]
@@ -64,8 +88,15 @@ fn a_borrowed_commit_ends_what_its_hook_left_behind_and_leaves_nothing() {
     assert!(outcome.leftovers_killed >= 1, "{outcome:?}");
     let sleeper = pids_in(&pidfile);
     assert_eq!(sleeper.len(), 1, "the hook wrote one pid");
-    assert_eq!(ended(sleeper[0]), Some(true), "the hook's background process is signaled when run_borrowed returns");
-    assert!(!record_path(&resource.path).exists(), "the predecessor record is removed");
+    assert_eq!(
+        ended(sleeper[0]),
+        Some(true),
+        "the hook's background process is signaled when run_borrowed returns"
+    );
+    assert!(
+        !record_path(&resource.path).exists(),
+        "the predecessor record is removed"
+    );
     assert_keeper_gone();
     assert!(matches!(release(handle), Release::Released { .. }));
     assert_eq!(probe(&resource).unwrap(), Probe::Free);
@@ -97,8 +128,12 @@ fn a_hook_inside_the_job_is_a_borrower_and_a_sibling_outside_it_is_not() {
     let handle = take(&resource);
     std::thread::scope(|scope| {
         let borrow = scope.spawn(|| run_borrowed(&handle, &commit_spec(&repo), &helper()));
-        let job_env = wait_for_file(&jobfile, "the hook to write its FGOS_LOCK_JOB").trim().to_string();
-        let hook_says: Value = serde_json::from_str(wait_for_file(&marker, "the hook's borrowed-check answer").trim()).unwrap();
+        let job_env = wait_for_file(&jobfile, "the hook to write its FGOS_LOCK_JOB")
+            .trim()
+            .to_string();
+        let hook_says: Value =
+            serde_json::from_str(wait_for_file(&marker, "the hook's borrowed-check answer").trim())
+                .unwrap();
         assert_eq!(hook_says["result"], "borrower", "{hook_says}");
 
         let sibling = Command::new(fgos())
@@ -109,7 +144,14 @@ fn a_hook_inside_the_job_is_a_borrower_and_a_sibling_outside_it_is_not() {
             .output()
             .unwrap();
         let sibling_says: Value = serde_json::from_slice(&sibling.stdout).unwrap();
-        assert_eq!((sibling_says["result"].as_str(), sibling_says["reason"].as_str()), (Some("not-borrower"), Some("not-in-job")), "{sibling_says}");
+        assert_eq!(
+            (
+                sibling_says["result"].as_str(),
+                sibling_says["reason"].as_str()
+            ),
+            (Some("not-borrower"), Some("not-in-job")),
+            "{sibling_says}"
+        );
         assert_eq!(sibling.status.code(), Some(10));
 
         fs::write(&go, "go").unwrap();
@@ -121,7 +163,10 @@ fn a_hook_inside_the_job_is_a_borrower_and_a_sibling_outside_it_is_not() {
 
 /// The commands a holder that dies mid-borrow leaves running.
 fn blocking_script(pidfile: &Path) -> String {
-    format!("sleep 60 & echo $(cat /proc/$!/winpid) >> '{}'; sleep 60", sh_path(pidfile))
+    format!(
+        "sleep 60 & echo $(cat /proc/$!/winpid) >> '{}'; sleep 60",
+        sh_path(pidfile)
+    )
 }
 
 #[test]
@@ -132,15 +177,27 @@ fn a_holder_that_dies_mid_borrow_leaves_a_job_the_next_acquire_empties_before_ad
     let mut violations = Vec::new();
     for round in 0..50 {
         let pidfile = dir.join(format!("pids-{round}"));
-        let mut hold = Hold::start(&resource.path, &dir.join(format!("work-{round}")), KILL_WAIT_MS).expect("helper acquires");
+        let mut hold = Hold::start(
+            &resource.path,
+            &dir.join(format!("work-{round}")),
+            KILL_WAIT_MS,
+        )
+        .expect("helper acquires");
         let n = hold.borrow(&["sh", "-c", &blocking_script(&pidfile)]);
         let shell = hold.started_pid(n);
-        wait_for_file(&pidfile, "the borrowed script to start its background process");
+        wait_for_file(
+            &pidfile,
+            "the borrowed script to start its background process",
+        );
         hold.kill();
 
         let mut members = pids_in(&pidfile);
         members.push(shell);
-        let Acquire::Acquired(handle) = acquire(&resource, Mode::Ex, Wait::Ms(10_000), KILL_WAIT_MS) else { panic!("round {round}: the next acquire did not admit") };
+        let Acquire::Acquired(handle) =
+            acquire(&resource, Mode::Ex, Wait::Ms(10_000), KILL_WAIT_MS)
+        else {
+            panic!("round {round}: the next acquire did not admit")
+        };
         for pid in &members {
             if ended(*pid) != Some(true) {
                 violations.push((round, *pid));
@@ -148,7 +205,10 @@ fn a_holder_that_dies_mid_borrow_leaves_a_job_the_next_acquire_empties_before_ad
         }
         assert!(matches!(release(handle), Release::Released { .. }));
     }
-    assert!(violations.is_empty(), "members still running when acquire returned: {violations:?}");
+    assert!(
+        violations.is_empty(),
+        "members still running when acquire returned: {violations:?}"
+    );
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -169,7 +229,14 @@ fn a_keeper_that_cannot_open_its_job_does_not_acknowledge_and_leaves_nothing() {
     });
     handle.declare_domain(&domain).unwrap();
     let out = Command::new(fgos())
-        .args(["internal", "holder-lock-helper", "job-keeper", "--job", "Local\\fgos-borrow-no-such-job", "--record"])
+        .args([
+            "internal",
+            "holder-lock-helper",
+            "job-keeper",
+            "--job",
+            "Local\\fgos-borrow-no-such-job",
+            "--record",
+        ])
         .arg(record_path(&resource.path))
         .stdin(Stdio::null())
         .output()
@@ -185,7 +252,10 @@ fn a_keeper_that_cannot_open_its_job_does_not_acknowledge_and_leaves_nothing() {
     let outcome = run_borrowed(&handle, &commit_spec(&repo), &HelperExe(comspec.into()));
     assert!(matches!(outcome, Err(BorrowError::Spawn(_))), "{outcome:?}");
     assert!(!record_path(&resource.path).exists(), "no record is left");
-    assert!(children_named("fgos.exe").is_empty() && children_named("cmd.exe").is_empty(), "no process is left");
+    assert!(
+        children_named("fgos.exe").is_empty() && children_named("cmd.exe").is_empty(),
+        "no process is left"
+    );
     assert!(matches!(release(handle), Release::Released { .. }));
     let _ = fs::remove_dir_all(&dir);
 }
@@ -196,26 +266,57 @@ fn a_holder_that_outlives_its_lock_is_not_killed_by_a_record_written_back() {
     let dir = temp_dir("outlives");
     let resource = Resource::new("wb-outlives", dir.join("outlives.lock"));
     // A child this process started before the borrow.
-    let mut bystander = Command::new("ping").args(["-n", "120", "127.0.0.1"]).stdin(Stdio::null()).stdout(Stdio::null()).spawn().unwrap();
+    let mut bystander = Command::new("ping")
+        .args(["-n", "120", "127.0.0.1"])
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .spawn()
+        .unwrap();
     let saved = dir.join("record.saved");
     let handle = take(&resource);
     let copy = BorrowSpec {
-        argv: ["sh", "-c", &format!("cp '{}' '{}'", sh_path(&record_path(&resource.path)), sh_path(&saved))].map(String::from).to_vec(),
+        argv: [
+            "sh",
+            "-c",
+            &format!(
+                "cp '{}' '{}'",
+                sh_path(&record_path(&resource.path)),
+                sh_path(&saved)
+            ),
+        ]
+        .map(String::from)
+        .to_vec(),
         cwd: None,
         env: Default::default(),
         clear_env: false,
         stdio: BorrowStdio::Null,
     };
-    assert_eq!(run_borrowed(&handle, &copy, &helper()).expect("run_borrowed").exit, Some(0));
+    assert_eq!(
+        run_borrowed(&handle, &copy, &helper())
+            .expect("run_borrowed")
+            .exit,
+        Some(0)
+    );
     assert!(matches!(release(handle), Release::Released { .. }));
     // What a failed removal would have left behind.
-    fs::write(record_path(&resource.path), fs::read_to_string(&saved).unwrap()).unwrap();
+    fs::write(
+        record_path(&resource.path),
+        fs::read_to_string(&saved).unwrap(),
+    )
+    .unwrap();
 
     let hold = Hold::start(&resource.path, &dir.join("work"), KILL_WAIT_MS);
     let acquired = hold.is_ok();
     drop(hold);
-    assert!(acquired, "another process acquires despite the stale record");
-    assert_eq!(ended(std::process::id()), Some(false), "the first holder is alive");
+    assert!(
+        acquired,
+        "another process acquires despite the stale record"
+    );
+    assert_eq!(
+        ended(std::process::id()),
+        Some(false),
+        "the first holder is alive"
+    );
     assert_eq!(ended(bystander.id()), Some(false), "its child is alive");
     let _ = bystander.kill();
     let _ = bystander.wait();
@@ -227,9 +328,18 @@ fn the_borrow_vectors_and_the_sibling_check_are_green_on_windows() {
     let _serial = serial();
     let report = borrow_vectors::run(git(), &helper(), &[], false).expect("vectors run");
     for v in &report.vectors {
-        println!("vector {}: {} in {} ms ({})", v.name, if v.pass { "pass" } else { "FAIL" }, v.elapsed_ms, v.detail);
+        println!(
+            "vector {}: {} in {} ms ({})",
+            v.name,
+            if v.pass { "pass" } else { "FAIL" },
+            v.elapsed_ms,
+            v.detail
+        );
     }
-    println!("sibling: {:?}; total {} ms; {}", report.sibling, report.elapsed_ms, report.git_version);
+    println!(
+        "sibling: {:?}; total {} ms; {}",
+        report.sibling, report.elapsed_ms, report.git_version
+    );
     assert_eq!(report.vectors.len(), 4);
     assert!(report.pass(), "{report:#?}");
 }
@@ -246,19 +356,26 @@ fn file_identity(handle: HANDLE) -> Option<String> {
     // SAFETY: a zeroed out-structure for a handle value; a value that is not a file fails.
     unsafe {
         let mut info: BY_HANDLE_FILE_INFORMATION = std::mem::zeroed();
-        (GetFileInformationByHandle(handle, &mut info) != 0).then(|| format!("{}:{}:{}", info.dwVolumeSerialNumber, info.nFileIndexHigh, info.nFileIndexLow))
+        (GetFileInformationByHandle(handle, &mut info) != 0).then(|| {
+            format!(
+                "{}:{}:{}",
+                info.dwVolumeSerialNumber, info.nFileIndexHigh, info.nFileIndexLow
+            )
+        })
     }
 }
-
 
 /// The borrowed child's side of the handle test: reports whether the handle
 /// value it was given is open in this process. Does nothing unless a borrow
 /// started it.
 #[test]
 fn borrowed_child_handle_probe() {
-    let Ok(result) = std::env::var(PROBE_ROLE) else { return };
+    let Ok(result) = std::env::var(PROBE_ROLE) else {
+        return;
+    };
     let value: usize = std::env::var(PROBE_HANDLE).unwrap().parse().unwrap();
-    let open = file_identity(value as HANDLE).is_some_and(|id| id == std::env::var(PROBE_IDENTITY).unwrap());
+    let open = file_identity(value as HANDLE)
+        .is_some_and(|id| id == std::env::var(PROBE_IDENTITY).unwrap());
     fs::write(result, if open { "open" } else { "closed" }).unwrap();
 }
 
@@ -272,13 +389,33 @@ fn a_handle_the_holder_owns_is_not_open_in_the_borrowed_child() {
     let owned = fs::File::create(dir.join("owned.txt")).unwrap();
     let raw = owned.as_raw_handle() as HANDLE;
     // SAFETY: setting the inherit flag on a handle this test owns.
-    assert_ne!(unsafe { SetHandleInformation(raw, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT) }, 0);
+    assert_ne!(
+        unsafe { SetHandleInformation(raw, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT) },
+        0
+    );
     let result = dir.join("probe.txt");
     let exe = std::env::current_exe().unwrap();
     let spec = BorrowSpec {
-        argv: vec![exe.to_string_lossy().into_owned(), "--exact".into(), "borrowed_child_handle_probe".into(), "--nocapture".into()],
+        argv: vec![
+            exe.to_string_lossy().into_owned(),
+            "--exact".into(),
+            "borrowed_child_handle_probe".into(),
+            "--nocapture".into(),
+        ],
         cwd: None,
-        env: [(PROBE_ROLE.to_string(), result.to_string_lossy().into_owned()), (PROBE_HANDLE.to_string(), (raw as usize).to_string()), (PROBE_IDENTITY.to_string(), file_identity(raw).expect("the holder's file has an identity"))].into_iter().collect(),
+        env: [
+            (
+                PROBE_ROLE.to_string(),
+                result.to_string_lossy().into_owned(),
+            ),
+            (PROBE_HANDLE.to_string(), (raw as usize).to_string()),
+            (
+                PROBE_IDENTITY.to_string(),
+                file_identity(raw).expect("the holder's file has an identity"),
+            ),
+        ]
+        .into_iter()
+        .collect(),
         clear_env: false,
         stdio: BorrowStdio::Null,
     };
@@ -286,7 +423,11 @@ fn a_handle_the_holder_owns_is_not_open_in_the_borrowed_child() {
     let outcome = run_borrowed(&handle, &spec, &helper()).expect("run_borrowed");
 
     assert_eq!(outcome.exit, Some(0));
-    assert_eq!(fs::read_to_string(&result).unwrap(), "closed", "the holder's inheritable handle must not reach the borrowed child");
+    assert_eq!(
+        fs::read_to_string(&result).unwrap(),
+        "closed",
+        "the holder's inheritable handle must not reach the borrowed child"
+    );
     assert_keeper_gone();
     assert!(matches!(release(handle), Release::Released { .. }));
     let _ = fs::remove_dir_all(&dir);

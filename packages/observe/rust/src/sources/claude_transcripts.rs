@@ -91,7 +91,11 @@ fn listed_worktrees(root: &Path) -> Vec<PathBuf> {
         let Ok(page) = driver.list_worktrees(&repo, cursor, 4096) else {
             return paths;
         };
-        paths.extend(page.entries.into_iter().map(|row| path_from_bytes(row.path)));
+        paths.extend(
+            page.entries
+                .into_iter()
+                .map(|row| path_from_bytes(row.path)),
+        );
         match page.next_cursor {
             Some(next) => cursor = Some(next),
             None => return paths,

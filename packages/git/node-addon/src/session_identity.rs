@@ -1,6 +1,8 @@
 //! Writer identity marshaling: the rule and the attempt-id contract live in `fgos-identity`.
 use crate::{check, error};
-use fgos_identity::{mint_attempt_writer_id, random, resolve_current, InvalidAttemptId, RandomKind};
+use fgos_identity::{
+    mint_attempt_writer_id, random, resolve_current, InvalidAttemptId, RandomKind,
+};
 use napi::Result;
 use napi_derive::napi;
 use serde_json::{json, Value};
@@ -38,8 +40,13 @@ pub fn mint_random(kind: String) -> Result<String> {
 #[napi(namespace = "sessionIdentity", js_name = "mintMachineId")]
 pub fn mint_machine_id(state_root: String, hostname: String) -> Result<Value> {
     check()?;
-    let (changed, machine_id) = fgos_identity::machine::mint(Path::new(&state_root), &hostname).map_err(error)?;
-    let message = if changed { "machine id minted once" } else { "machine id already exists" };
+    let (changed, machine_id) =
+        fgos_identity::machine::mint(Path::new(&state_root), &hostname).map_err(error)?;
+    let message = if changed {
+        "machine id minted once"
+    } else {
+        "machine id already exists"
+    };
     Ok(json!({ "changed": changed, "machineId": machine_id, "message": message }))
 }
 
@@ -48,7 +55,12 @@ pub fn mint_machine_id(state_root: String, hostname: String) -> Result<Value> {
 #[napi(namespace = "sessionIdentity", js_name = "mintMachineKey")]
 pub fn mint_machine_key(state_root: String) -> Result<Value> {
     check()?;
-    let (changed, fingerprint) = fgos_identity::signing::mint_key(Path::new(&state_root)).map_err(|r| error(format!("{}: {}", r.reason, r.detail)))?;
-    let message = if changed { "machine key minted once" } else { "machine key already exists" };
+    let (changed, fingerprint) = fgos_identity::signing::mint_key(Path::new(&state_root))
+        .map_err(|r| error(format!("{}: {}", r.reason, r.detail)))?;
+    let message = if changed {
+        "machine key minted once"
+    } else {
+        "machine key already exists"
+    };
     Ok(json!({ "changed": changed, "fingerprint": fingerprint, "message": message }))
 }

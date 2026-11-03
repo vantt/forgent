@@ -13,7 +13,9 @@ use std::path::PathBuf;
 
 use fgos_process::platform::windows_spawn::{spawn, ChildStdio, SpawnSpec};
 use windows_sys::Win32::Foundation::{SetHandleInformation, HANDLE, HANDLE_FLAG_INHERIT};
-use windows_sys::Win32::Storage::FileSystem::{GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION};
+use windows_sys::Win32::Storage::FileSystem::{
+    GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION,
+};
 
 const ROLE: &str = "WS_ROLE";
 const PROBE_HANDLE: &str = "WS_PROBE_HANDLE";
@@ -28,21 +30,32 @@ fn file_identity(handle: HANDLE) -> Option<String> {
     // SAFETY: a zeroed out-structure for a handle value; a value that is not a file fails.
     unsafe {
         let mut info: BY_HANDLE_FILE_INFORMATION = std::mem::zeroed();
-        (GetFileInformationByHandle(handle, &mut info) != 0).then(|| format!("{}:{}:{}", info.dwVolumeSerialNumber, info.nFileIndexHigh, info.nFileIndexLow))
+        (GetFileInformationByHandle(handle, &mut info) != 0).then(|| {
+            format!(
+                "{}:{}:{}",
+                info.dwVolumeSerialNumber, info.nFileIndexHigh, info.nFileIndexLow
+            )
+        })
     }
 }
-
 
 /// The child's side: reports on a handle value, or echoes stdin, or prints
 /// its working directory and one variable.
 #[test]
 fn child_entry() {
-    let Ok(role) = std::env::var(ROLE) else { return };
+    let Ok(role) = std::env::var(ROLE) else {
+        return;
+    };
     match role.as_str() {
         "probe" => {
             let value: usize = std::env::var(PROBE_HANDLE).unwrap().parse().unwrap();
-            let open = file_identity(value as HANDLE).is_some_and(|id| id == std::env::var(PROBE_IDENTITY).unwrap());
-            fs::write(std::env::var(RESULT).unwrap(), if open { "open" } else { "closed" }).unwrap();
+            let open = file_identity(value as HANDLE)
+                .is_some_and(|id| id == std::env::var(PROBE_IDENTITY).unwrap());
+            fs::write(
+                std::env::var(RESULT).unwrap(),
+                if open { "open" } else { "closed" },
+            )
+            .unwrap();
         }
         "echo" => {
             let mut text = String::new();
@@ -51,15 +64,29 @@ fn child_entry() {
         }
         "where" => {
             let cwd = std::env::current_dir().unwrap();
-            fs::write(std::env::var(RESULT).unwrap(), format!("{}|{}", cwd.display(), std::env::var("WS_MARK").unwrap_or_default())).unwrap();
+            fs::write(
+                std::env::var(RESULT).unwrap(),
+                format!(
+                    "{}|{}",
+                    cwd.display(),
+                    std::env::var("WS_MARK").unwrap_or_default()
+                ),
+            )
+            .unwrap();
         }
         other => panic!("unknown role {other}"),
     }
 }
 
 fn temp_dir(tag: &str) -> PathBuf {
-    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
-    let dir = std::env::temp_dir().join(format!("fgos-windows-spawn-{tag}-{}-{nanos}", std::process::id()));
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let dir = std::env::temp_dir().join(format!(
+        "fgos-windows-spawn-{tag}-{}-{nanos}",
+        std::process::id()
+    ));
     fs::create_dir_all(&dir).unwrap();
     dir
 }
@@ -73,7 +100,12 @@ fn child_spec(extra: &[(&str, String)]) -> SpawnSpec {
     }
     SpawnSpec {
         program: std::env::current_exe().unwrap().into_os_string(),
-        args: vec!["--exact".into(), "child_entry".into(), "--nocapture".into(), "--test-threads=1".into()],
+        args: vec![
+            "--exact".into(),
+            "child_entry".into(),
+            "--nocapture".into(),
+            "--test-threads=1".into(),
+        ],
         cwd: None,
         env: Some(env),
         creation_flags: 0,
@@ -89,7 +121,10 @@ fn inheritable_handle_of_the_holder(dir: &std::path::Path) -> (fs::File, HANDLE)
     let file = fs::File::create(dir.join("holder-owned.txt")).unwrap();
     let raw = file.as_raw_handle() as HANDLE;
     // SAFETY: setting the inherit flag on a handle this test owns.
-    assert_ne!(unsafe { SetHandleInformation(raw, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT) }, 0);
+    assert_ne!(
+        unsafe { SetHandleInformation(raw, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT) },
+        0
+    );
     (file, raw)
 }
 
@@ -99,10 +134,19 @@ fn a_handle_the_parent_owns_is_not_open_in_the_child() {
     let (_held, raw) = inheritable_handle_of_the_holder(&dir);
     let result = dir.join("result.txt");
     let identity = file_identity(raw).expect("the holder's file has an identity");
-    let spec = child_spec(&[(ROLE, "probe".into()), (PROBE_HANDLE, (raw as usize).to_string()), (PROBE_IDENTITY, identity), (RESULT, result.to_string_lossy().into_owned())]);
+    let spec = child_spec(&[
+        (ROLE, "probe".into()),
+        (PROBE_HANDLE, (raw as usize).to_string()),
+        (PROBE_IDENTITY, identity),
+        (RESULT, result.to_string_lossy().into_owned()),
+    ]);
     let child = spawn(spec).expect("spawn");
     assert_eq!(child.wait().unwrap(), 0);
-    assert_eq!(fs::read_to_string(&result).unwrap(), "closed", "the inheritable handle the parent owns (the same file) must not reach the child");
+    assert_eq!(
+        fs::read_to_string(&result).unwrap(),
+        "closed",
+        "the inheritable handle the parent owns (the same file) must not reach the child"
+    );
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -116,7 +160,9 @@ fn a_file_given_as_a_standard_stream_receives_the_childs_output() {
     let mut child = spawn(spec).expect("spawn");
     child.stdin.take().unwrap().write_all(b"hello").unwrap();
     assert_eq!(child.wait().unwrap(), 0);
-    assert!(fs::read_to_string(&out_path).unwrap().contains("echo:hello"));
+    assert!(fs::read_to_string(&out_path)
+        .unwrap()
+        .contains("echo:hello"));
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -126,9 +172,19 @@ fn piped_streams_reach_the_parent() {
     spec.stdin = ChildStdio::Piped;
     spec.stdout = ChildStdio::Piped;
     let mut child = spawn(spec).expect("spawn");
-    child.stdin.take().unwrap().write_all(b"through a pipe").unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(b"through a pipe")
+        .unwrap();
     let mut text = String::new();
-    child.stdout.take().unwrap().read_to_string(&mut text).unwrap();
+    child
+        .stdout
+        .take()
+        .unwrap()
+        .read_to_string(&mut text)
+        .unwrap();
     assert!(text.contains("echo:through a pipe"), "{text}");
     assert_eq!(child.wait().unwrap(), 0);
 }
@@ -137,13 +193,20 @@ fn piped_streams_reach_the_parent() {
 fn the_working_directory_and_environment_are_the_ones_asked_for() {
     let dir = temp_dir("where");
     let result = dir.join("result.txt");
-    let mut spec = child_spec(&[(ROLE, "where".into()), (RESULT, result.to_string_lossy().into_owned()), ("WS_MARK", "marked".into())]);
+    let mut spec = child_spec(&[
+        (ROLE, "where".into()),
+        (RESULT, result.to_string_lossy().into_owned()),
+        ("WS_MARK", "marked".into()),
+    ]);
     spec.cwd = Some(dir.clone());
     let child = spawn(spec).expect("spawn");
     assert_eq!(child.wait().unwrap(), 0);
     let text = fs::read_to_string(&result).unwrap();
     let (cwd, mark) = text.split_once('|').unwrap();
-    assert_eq!(fs::canonicalize(cwd).unwrap(), fs::canonicalize(&dir).unwrap());
+    assert_eq!(
+        fs::canonicalize(cwd).unwrap(),
+        fs::canonicalize(&dir).unwrap()
+    );
     assert_eq!(mark, "marked");
     let _ = fs::remove_dir_all(&dir);
 }
@@ -152,5 +215,8 @@ fn the_working_directory_and_environment_are_the_ones_asked_for() {
 fn a_program_that_does_not_exist_is_an_error_not_a_panic() {
     let mut spec = child_spec(&[]);
     spec.program = "fgos-no-such-program-anywhere".into();
-    assert_eq!(spawn(spec).err().map(|e| e.kind()), Some(std::io::ErrorKind::NotFound));
+    assert_eq!(
+        spawn(spec).err().map(|e| e.kind()),
+        Some(std::io::ErrorKind::NotFound)
+    );
 }

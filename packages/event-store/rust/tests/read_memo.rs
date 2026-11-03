@@ -336,5 +336,4 @@ fn a_memo_answer_leaves_out_legacy_events_only_for_a_caller_that_holds_them() {
     assert!(aware.memoized);
     assert!(aware.legacy.is_empty(), "the caller keeps its own copy");
     assert_eq!(aware.cursor.legacy_digest.as_deref(), Some(digest.as_str()));
-
 }

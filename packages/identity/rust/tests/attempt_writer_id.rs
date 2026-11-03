@@ -3,10 +3,11 @@
 //! resolves as an env id; every invalid case is refused by the mint.
 
 use fgos_identity::{
-    env_identity, is_attempt_writer_id, mint_attempt_writer_id, scrub_and_set, Source, WriterId, ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH, MAX_ID_LENGTH,
+    env_identity, is_attempt_writer_id, mint_attempt_writer_id, scrub_and_set, Source, WriterId,
+    ATTEMPT_PREFIX, MAX_ATTEMPT_ID_LENGTH, MAX_ID_LENGTH,
 };
-use std::collections::BTreeMap;
 use serde_json::Value;
+use std::collections::BTreeMap;
 
 const VECTORS: &str = include_str!("../../contracts/vectors/attempt-writer-id.v1.json");
 const CONTRACT: &str = include_str!("../../contracts/attempt-writer-id.v1.json");
@@ -26,10 +27,21 @@ fn contract_bounds_match_the_resolve_rule() {
     let contract: Value = serde_json::from_str(CONTRACT).unwrap();
     let c = &contract["constraints"];
     assert_eq!(c["prefix"], ATTEMPT_PREFIX);
-    assert_eq!(c["maxWriterIdLength"].as_u64().unwrap() as usize, MAX_ID_LENGTH);
-    let scrubbed: Vec<&str> = contract["environment"]["scrubbed"].as_array().unwrap().iter().map(|v| v.as_str().unwrap()).collect();
+    assert_eq!(
+        c["maxWriterIdLength"].as_u64().unwrap() as usize,
+        MAX_ID_LENGTH
+    );
+    let scrubbed: Vec<&str> = contract["environment"]["scrubbed"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.as_str().unwrap())
+        .collect();
     assert_eq!(scrubbed, fgos_identity::launcher::SCRUBBED);
-    assert_eq!(c["maxAttemptIdLength"].as_u64().unwrap() as usize, MAX_ATTEMPT_ID_LENGTH);
+    assert_eq!(
+        c["maxAttemptIdLength"].as_u64().unwrap() as usize,
+        MAX_ATTEMPT_ID_LENGTH
+    );
 }
 
 #[test]
@@ -55,7 +67,8 @@ fn every_vector_case_reproduces_and_valid_ids_resolve_as_env_ids() {
             let id = id.clone();
             move |key: &str| (key == "FGOS_SESSION_ID").then(|| id.clone())
         };
-        let resolved = env_identity(&env, None).unwrap_or_else(|| panic!("{name}: rule refused the id"));
+        let resolved =
+            env_identity(&env, None).unwrap_or_else(|| panic!("{name}: rule refused the id"));
         assert_eq!(resolved.source, Source::Env, "{name}");
         assert_eq!(resolved.id, WriterId::Session(id), "{name}");
     }
@@ -65,18 +78,35 @@ fn every_vector_case_reproduces_and_valid_ids_resolve_as_env_ids() {
 fn an_attempt_writer_id_is_recognised_by_its_prefix_and_nothing_else_is() {
     let minted = mint_attempt_writer_id("asgn-demo_01").unwrap();
     assert!(is_attempt_writer_id(&minted));
-    for other in ["", "att", "ATT-x", "xatt-x", "claude-2b", "pid-0123456789ab", " att-x"] {
-        assert!(!is_attempt_writer_id(other), "{other:?} is not an attempt writer id");
+    for other in [
+        "",
+        "att",
+        "ATT-x",
+        "xatt-x",
+        "claude-2b",
+        "pid-0123456789ab",
+        " att-x",
+    ] {
+        assert!(
+            !is_attempt_writer_id(other),
+            "{other:?} is not an attempt writer id"
+        );
     }
 }
 
 #[test]
 fn minting_twice_gives_the_same_id() {
-    assert_eq!(mint_attempt_writer_id("att_asgn-demo_01_7f3a"), mint_attempt_writer_id("att_asgn-demo_01_7f3a"));
+    assert_eq!(
+        mint_attempt_writer_id("att_asgn-demo_01_7f3a"),
+        mint_attempt_writer_id("att_asgn-demo_01_7f3a")
+    );
 }
 
 fn env_of(pairs: &[(&str, &str)]) -> BTreeMap<String, String> {
-    pairs.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect()
+    pairs
+        .iter()
+        .map(|(k, v)| (k.to_string(), v.to_string()))
+        .collect()
 }
 
 #[test]
@@ -91,8 +121,14 @@ fn scrub_and_set_keeps_no_inherited_session_id_and_sets_the_minted_one() {
         ("FGOS_PARENT_WRITER_ID", "grandparent"),
     ]);
     scrub_and_set(&mut env, "att-a1", Some("ctl-1")).unwrap();
-    assert_eq!(env.get("FGOS_SESSION_ID").map(String::as_str), Some("att-a1"));
-    assert_eq!(env.get("FGOS_PARENT_WRITER_ID").map(String::as_str), Some("ctl-1"));
+    assert_eq!(
+        env.get("FGOS_SESSION_ID").map(String::as_str),
+        Some("att-a1")
+    );
+    assert_eq!(
+        env.get("FGOS_PARENT_WRITER_ID").map(String::as_str),
+        Some("ctl-1")
+    );
     assert_eq!(env.get("PATH").map(String::as_str), Some("/usr/bin"));
     assert!(!env.contains_key("CLAUDE_CODE_SESSION_ID"));
     assert!(!env.contains_key("CODEX_THREAD_ID"));
@@ -104,8 +140,14 @@ fn scrub_and_set_keeps_no_inherited_session_id_and_sets_the_minted_one() {
 fn an_empty_inherited_session_id_does_not_survive() {
     let mut env = env_of(&[("FGOS_SESSION_ID", ""), ("FGOS_PARENT_WRITER_ID", "old")]);
     scrub_and_set(&mut env, "att-a1", None).unwrap();
-    assert_eq!(env.get("FGOS_SESSION_ID").map(String::as_str), Some("att-a1"));
-    assert!(!env.contains_key("FGOS_PARENT_WRITER_ID"), "no controller id, no inherited lineage");
+    assert_eq!(
+        env.get("FGOS_SESSION_ID").map(String::as_str),
+        Some("att-a1")
+    );
+    assert!(
+        !env.contains_key("FGOS_PARENT_WRITER_ID"),
+        "no controller id, no inherited lineage"
+    );
     let resolved = env_identity(&|k: &str| env.get(k).cloned(), None).unwrap();
     assert_eq!(resolved.id, WriterId::Session("att-a1".into()));
 }

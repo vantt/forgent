@@ -23,9 +23,12 @@ fn observed_from(proc_world: &serde_json::Value) -> Observed {
     match proc_world["state"].as_str() {
         Some("absent") => Observed::Absent,
         Some("Z") | Some("X") => Observed::Zombie,
-        Some(_) if proc_world["startTimeReadable"].as_bool() == Some(true) => {
-            Observed::Live { start_time: proc_world["startTime"].as_str().expect("readable start time").to_string() }
-        }
+        Some(_) if proc_world["startTimeReadable"].as_bool() == Some(true) => Observed::Live {
+            start_time: proc_world["startTime"]
+                .as_str()
+                .expect("readable start time")
+                .to_string(),
+        },
         Some(_) => Observed::Unreadable(match proc_world["unreadableCause"].as_str() {
             Some("permission") => UnreadableCause::Permission,
             Some("timeout") => UnreadableCause::Timeout,
@@ -49,7 +52,9 @@ fn observer_from(value: &serde_json::Value) -> Observer {
         host: value["host"].as_str().expect("observer host").to_string(),
         boot_id: value["bootId"].as_str().map(String::from),
         pid_ns: value["pidNs"].as_str().expect("observer pidNs").to_string(),
-        in_init_pid_ns: value["inInitPidNs"].as_bool().expect("observer inInitPidNs"),
+        in_init_pid_ns: value["inInitPidNs"]
+            .as_bool()
+            .expect("observer inInitPidNs"),
     }
 }
 
@@ -61,7 +66,9 @@ fn world_from(record: &Record, world: &serde_json::Value) -> World {
     if let Some(anchor) = &record.anchor {
         let pid = anchor.pid.expect("anchor pid");
         let seen = match world["anchorJudge"].as_str() {
-            Some("alive") => Observed::Live { start_time: anchor.start_time.clone().expect("anchor start time") },
+            Some("alive") => Observed::Live {
+                start_time: anchor.start_time.clone().expect("anchor start time"),
+            },
             Some("dead") => Observed::Absent,
             _ => Observed::Unreadable(UnreadableCause::DriverMissing),
         };
@@ -87,16 +94,28 @@ fn every_vector_judges_as_the_table_says() {
         let expected = verdict_from(vector["expect"].as_str().expect("expect"));
         let got = judge(&record, &observer, &world);
         if got != expected {
-            failures.push(format!("{name} ({}): expected {expected:?}, got {got:?}", vector["row"]));
+            failures.push(format!(
+                "{name} ({}): expected {expected:?}, got {got:?}",
+                vector["row"]
+            ));
         }
     }
-    assert!(failures.is_empty(), "vectors that disagree with judge():\n{}", failures.join("\n"));
+    assert!(
+        failures.is_empty(),
+        "vectors that disagree with judge():\n{}",
+        failures.join("\n")
+    );
 }
 
 #[test]
 fn every_rule_in_the_table_is_pinned_by_at_least_one_vector() {
     let doc: serde_json::Value = serde_json::from_str(VECTORS).expect("vector file parses");
-    let rows: Vec<&str> = doc["vectors"].as_array().unwrap().iter().map(|v| v["row"].as_str().unwrap()).collect();
+    let rows: Vec<&str> = doc["vectors"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v["row"].as_str().unwrap())
+        .collect();
     for rule in doc["rules"].as_array().expect("rules array") {
         let id = rule["id"].as_str().unwrap();
         assert!(rows.contains(&id), "rule {id} has no vector");

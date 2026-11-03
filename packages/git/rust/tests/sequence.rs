@@ -20,18 +20,27 @@ fn logging_git_log() -> &'static Path {
         let dir = std::env::temp_dir().join(format!("fgos-sequence-git-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir(&dir).unwrap();
-        let real = Command::new("sh").args(["-c", "command -v git"]).output().unwrap().stdout;
+        let real = Command::new("sh")
+            .args(["-c", "command -v git"])
+            .output()
+            .unwrap()
+            .stdout;
         let real = String::from_utf8(real).unwrap().trim().to_owned();
         let script = dir.join("git");
         let log = dir.join("argv.log");
         fs::write(
             &script,
-            format!("#!/bin/sh\nprintf '%s %s\\n' \"$PWD\" \"$*\" >> '{}'\nexec '{real}' \"$@\"\n", log.display()),
+            format!(
+                "#!/bin/sh\nprintf '%s %s\\n' \"$PWD\" \"$*\" >> '{}'\nexec '{real}' \"$@\"\n",
+                log.display()
+            ),
         )
         .unwrap();
         fs::set_permissions(&script, fs::Permissions::from_mode(0o755)).unwrap();
         let mut paths = vec![dir.clone()];
-        paths.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        paths.extend(std::env::split_paths(
+            &std::env::var_os("PATH").unwrap_or_default(),
+        ));
         std::env::set_var("PATH", std::env::join_paths(paths).unwrap());
         log
     })
@@ -156,10 +165,20 @@ fn a_local_claim_asks_git_to_flush_even_when_the_repository_configures_writeout_
     // override it on the very commands that write the counter, and still be claimed and ordered.
     let f = Fixture::new();
     let repo = f.clone_named("alone", false);
-    git(&f.root.join("alone"), &["config", "core.fsyncMethod", "writeout-only"]);
+    git(
+        &f.root.join("alone"),
+        &["config", "core.fsyncMethod", "writeout-only"],
+    );
     let home = f.driver.sequence_home(&repo).unwrap();
-    let first = claimed(f.driver.sequence_push(&repo, &home, "d-adr", None, 1, "claim-a").unwrap());
-    assert_eq!(git(&f.root.join("alone"), &["rev-parse", "refs/fgos/seq/d-adr"]), first.as_str());
+    let first = claimed(
+        f.driver
+            .sequence_push(&repo, &home, "d-adr", None, 1, "claim-a")
+            .unwrap(),
+    );
+    assert_eq!(
+        git(&f.root.join("alone"), &["rev-parse", "refs/fgos/seq/d-adr"]),
+        first.as_str()
+    );
 
     let calls = fs::read_to_string(logging_git_log()).unwrap();
     let root = f.root.canonicalize().unwrap();
@@ -186,7 +205,10 @@ fn a_remote_counter_accepts_one_of_two_claims_made_from_the_same_tip() {
     let f = Fixture::new();
     let a = f.clone_named("a", true);
     let b = f.clone_named("b", true);
-    let (home_a, home_b) = (f.driver.sequence_home(&a).unwrap(), f.driver.sequence_home(&b).unwrap());
+    let (home_a, home_b) = (
+        f.driver.sequence_home(&a).unwrap(),
+        f.driver.sequence_home(&b).unwrap(),
+    );
     assert!(matches!(home_a, SequenceHome::Remote(_)));
 
     let first = claimed(
@@ -260,11 +282,27 @@ fn an_origin_that_cannot_be_used_is_a_refusal_not_a_local_counter() {
     // and the claim went to a counter on this machine alone.
     let f = Fixture::new();
     let repo = f.clone_named("a", true);
-    git(&f.root.join("a"), &["config", "remote.origin.url", "git://example.invalid/r"]);
-    let refused = f.driver.sequence_home(&repo).expect_err("an unsupported origin");
-    assert!(refused.cause.contains("remote-protocol-not-supported"), "{}", refused.cause);
-    git(&f.root.join("a"), &["config", "--unset", "remote.origin.url"]);
-    assert!(matches!(f.driver.sequence_home(&repo).unwrap(), SequenceHome::Local));
+    git(
+        &f.root.join("a"),
+        &["config", "remote.origin.url", "git://example.invalid/r"],
+    );
+    let refused = f
+        .driver
+        .sequence_home(&repo)
+        .expect_err("an unsupported origin");
+    assert!(
+        refused.cause.contains("remote-protocol-not-supported"),
+        "{}",
+        refused.cause
+    );
+    git(
+        &f.root.join("a"),
+        &["config", "--unset", "remote.origin.url"],
+    );
+    assert!(matches!(
+        f.driver.sequence_home(&repo).unwrap(),
+        SequenceHome::Local
+    ));
 }
 
 #[test]

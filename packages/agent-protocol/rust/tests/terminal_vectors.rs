@@ -144,7 +144,9 @@ impl Outbox for ScriptedOutbox {
 fn wire(outcome: &TerminalOutcome) -> Value {
     match outcome {
         TerminalOutcome::Ready => json!({ "outcome": "ready" }),
-        TerminalOutcome::Blocked(reason) => json!({ "outcome": "blocked", "reason": reason.as_str() }),
+        TerminalOutcome::Blocked(reason) => {
+            json!({ "outcome": "blocked", "reason": reason.as_str() })
+        }
         TerminalOutcome::Delivered => json!({ "outcome": "delivered" }),
         TerminalOutcome::DeliveryUnknown => json!({ "outcome": "delivery-unknown" }),
         TerminalOutcome::Completed { result_path } => {
@@ -170,7 +172,10 @@ fn sent_texts(pane: &ScriptedPane) -> usize {
 }
 
 fn submit_sends(pane: &ScriptedPane) -> usize {
-    pane.sent.iter().filter(|s| s.text.is_some() && s.submit).count()
+    pane.sent
+        .iter()
+        .filter(|s| s.text.is_some() && s.submit)
+        .count()
 }
 
 fn sent_enters(pane: &ScriptedPane) -> usize {
@@ -259,7 +264,14 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
             };
             let mut want = expect.clone();
             if let Some(map) = want.as_object_mut() {
-                for key in ["readiness", "sentTexts", "sentKeys", "submitSends", "minEnters", "maxEnters"] {
+                for key in [
+                    "readiness",
+                    "sentTexts",
+                    "sentKeys",
+                    "submitSends",
+                    "minEnters",
+                    "maxEnters",
+                ] {
                     map.remove(key);
                 }
             }
@@ -280,7 +292,11 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
                 assert_eq!(sent_keys(&pane), want, "{name}: non-Enter key presses");
             }
             if let Some(count) = expect["submitSends"].as_u64() {
-                assert_eq!(submit_sends(&pane) as u64, count, "{name}: prompt-door send count");
+                assert_eq!(
+                    submit_sends(&pane) as u64,
+                    count,
+                    "{name}: prompt-door send count"
+                );
             }
             if let Some(min) = expect["minEnters"].as_u64() {
                 assert!(
@@ -354,7 +370,10 @@ fn terminal_a_result_file_counts_only_once_it_is_complete_json() {
         "a half-written file is not a result"
     );
     fs::write(dir.join("result-1.json"), "{\"status\":\"done\"}\n").unwrap();
-    assert_eq!(outbox.newest_complete(&mut Clock::default()), Some(dir.join("result-1.json")));
+    assert_eq!(
+        outbox.newest_complete(&mut Clock::default()),
+        Some(dir.join("result-1.json"))
+    );
 
     // claude's temp name is never a result; a newer incomplete result hides nothing it has not earned.
     fs::write(
@@ -362,7 +381,10 @@ fn terminal_a_result_file_counts_only_once_it_is_complete_json() {
         "{\"status\":\"done\"}",
     )
     .unwrap();
-    assert_eq!(outbox.newest_complete(&mut Clock::default()), Some(dir.join("result-1.json")));
+    assert_eq!(
+        outbox.newest_complete(&mut Clock::default()),
+        Some(dir.join("result-1.json"))
+    );
     fs::write(dir.join("result-2.json"), "").unwrap();
     assert_eq!(
         outbox.newest_complete(&mut Clock::default()),
@@ -370,9 +392,16 @@ fn terminal_a_result_file_counts_only_once_it_is_complete_json() {
         "the newest result is still being written"
     );
     fs::write(dir.join("result-2.json"), "[1]").unwrap();
-    assert_eq!(outbox.newest_complete(&mut Clock::default()), None, "a result is a JSON object");
+    assert_eq!(
+        outbox.newest_complete(&mut Clock::default()),
+        None,
+        "a result is a JSON object"
+    );
     fs::write(dir.join("result-2.json"), "{}").unwrap();
-    assert_eq!(outbox.newest_complete(&mut Clock::default()), Some(dir.join("result-2.json")));
+    assert_eq!(
+        outbox.newest_complete(&mut Clock::default()),
+        Some(dir.join("result-2.json"))
+    );
     fs::remove_dir_all(&dir).unwrap();
 }
 
@@ -381,10 +410,24 @@ fn a_stability_wait_the_run_cut_short_is_not_stable_and_the_wait_goes_through_pa
     let dir = scratch_dir("cut-short");
     fs::write(dir.join("result-1.json"), "{}").unwrap();
     let mut io = Clock::default();
-    assert_eq!(FsOutbox::new(&dir).newest_complete(&mut io), Some(dir.join("result-1.json")));
-    assert_eq!(io.pauses, vec![20], "the stability wait is one pause on the adapter clock");
-    let mut ended = Clock { cut_short: true, ..Clock::default() };
-    assert_eq!(FsOutbox::new(&dir).newest_complete(&mut ended), None, "a cut-short window proves nothing");
+    assert_eq!(
+        FsOutbox::new(&dir).newest_complete(&mut io),
+        Some(dir.join("result-1.json"))
+    );
+    assert_eq!(
+        io.pauses,
+        vec![20],
+        "the stability wait is one pause on the adapter clock"
+    );
+    let mut ended = Clock {
+        cut_short: true,
+        ..Clock::default()
+    };
+    assert_eq!(
+        FsOutbox::new(&dir).newest_complete(&mut ended),
+        None,
+        "a cut-short window proves nothing"
+    );
     fs::write(dir.join("result-2.json"), "not json").unwrap();
     assert!(FsOutbox::new(&dir).newest_unreadable(&mut ended).is_none());
     fs::remove_dir_all(dir).unwrap();
@@ -406,7 +449,11 @@ fn every_receipt_reason_and_stop_constant_is_named_in_the_contract() {
         TerminalOutcome::NeedsHuman,
         TerminalOutcome::DeliveryUnknown,
     ]
-    .map(|outcome| outcome.receipt_reason().expect("an early end names its reason"));
+    .map(|outcome| {
+        outcome
+            .receipt_reason()
+            .expect("an early end names its reason")
+    });
     assert_eq!(
         rendered,
         [
@@ -423,9 +470,18 @@ fn every_receipt_reason_and_stop_constant_is_named_in_the_contract() {
         REASON_RESULT_UNREADABLE,
         REASON_COMPLETED_NO_EXIT,
     ]) {
-        assert!(prose.contains(reason), "{reason} is not named in toReceiptReason");
+        assert!(
+            prose.contains(reason),
+            "{reason} is not named in toReceiptReason"
+        );
     }
-    for step in [TerminalOutcome::Ready, TerminalOutcome::Delivered, TerminalOutcome::Completed { result_path: done() }] {
+    for step in [
+        TerminalOutcome::Ready,
+        TerminalOutcome::Delivered,
+        TerminalOutcome::Completed {
+            result_path: done(),
+        },
+    ] {
         assert_eq!(step.receipt_reason(), None, "{step:?} ends nothing early");
     }
 }
@@ -548,7 +604,10 @@ fn unreadable_results_exclude_empty_and_completed_publications_and_track_edits()
     assert!(outbox.newest_unreadable(&mut Clock::default()).is_none());
     fs::write(&path, "{\"summary\":\"raw\nnewline\"}").unwrap();
     let first = outbox.newest_unreadable(&mut Clock::default()).unwrap();
-    assert_eq!(outbox.newest_unreadable(&mut Clock::default()), Some(first.clone()));
+    assert_eq!(
+        outbox.newest_unreadable(&mut Clock::default()),
+        Some(first.clone())
+    );
     fs::write(&path, "[1]").unwrap();
     assert_ne!(outbox.newest_unreadable(&mut Clock::default()), Some(first));
     fs::write(&path, "{}").unwrap();
@@ -583,14 +642,21 @@ fn outbox_read_finishes_within<T: Send + 'static>(
 fn a_fifo_named_like_a_result_is_never_read_and_both_outbox_reads_return_none_promptly() {
     let dir = scratch_dir("fifo-result");
     let fifo = dir.join("result-1.json");
-    let made = std::process::Command::new("mkfifo").arg(&fifo).status().unwrap();
+    let made = std::process::Command::new("mkfifo")
+        .arg(&fifo)
+        .status()
+        .unwrap();
     assert!(made.success(), "mkfifo failed");
     let limit = std::time::Duration::from_secs(2);
 
     let complete_dir = dir.clone();
-    let complete = outbox_read_finishes_within(&fifo, limit, move || FsOutbox::new(complete_dir).newest_complete(&mut Clock::default()));
+    let complete = outbox_read_finishes_within(&fifo, limit, move || {
+        FsOutbox::new(complete_dir).newest_complete(&mut Clock::default())
+    });
     let unreadable_dir = dir.clone();
-    let unreadable = outbox_read_finishes_within(&fifo, limit, move || FsOutbox::new(unreadable_dir).newest_unreadable(&mut Clock::default()));
+    let unreadable = outbox_read_finishes_within(&fifo, limit, move || {
+        FsOutbox::new(unreadable_dir).newest_unreadable(&mut Clock::default())
+    });
     assert_eq!(
         (complete, unreadable.map(|found| found.is_some())),
         (Some(None), Some(false)),
@@ -607,8 +673,16 @@ const OVERSIZED_RESULT_BYTES: usize = MAX_RESULT_BYTES + 1;
 fn an_oversized_result_file_is_not_taken_as_complete() {
     let dir = scratch_dir("oversized-result");
     let padding = "a".repeat(OVERSIZED_RESULT_BYTES);
-    fs::write(dir.join("result-1.json"), format!("{{\"status\":\"done\",\"pad\":\"{padding}\"}}")).unwrap();
-    assert_eq!(FsOutbox::new(&dir).newest_complete(&mut Clock::default()), None, "an oversized result was read whole and accepted");
+    fs::write(
+        dir.join("result-1.json"),
+        format!("{{\"status\":\"done\",\"pad\":\"{padding}\"}}"),
+    )
+    .unwrap();
+    assert_eq!(
+        FsOutbox::new(&dir).newest_complete(&mut Clock::default()),
+        None,
+        "an oversized result was read whole and accepted"
+    );
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -623,7 +697,12 @@ struct EndingPane {
 
 impl EndingPane {
     fn new() -> Self {
-        Self { now: 0, ending: false, accepted: vec![], refused: 0 }
+        Self {
+            now: 0,
+            ending: false,
+            accepted: vec![],
+            refused: 0,
+        }
     }
 
     fn gate(&mut self) -> Result<(), IoError> {
@@ -647,7 +726,10 @@ impl AgentIo for EndingPane {
     }
     fn inspect(&mut self) -> Result<Inspection, IoError> {
         self.gate()?;
-        Ok(Inspection { state: Some("idle".into()), ..Default::default() })
+        Ok(Inspection {
+            state: Some("idle".into()),
+            ..Default::default()
+        })
     }
     fn now_ms(&self) -> u64 {
         self.now
@@ -673,10 +755,25 @@ fn terminal_delivery_sends_nothing_once_the_attempt_is_ending() {
     for cli in CLIS {
         let adapter = adapter_for(cli).unwrap();
         let mut pane = EndingPane::new();
-        let outcome = adapter.deliver_brief(&mut pane, "Read the brief file and do the task.", &mut NoOutbox);
-        assert_eq!(wire(&outcome), json!({ "outcome": "delivery-unknown" }), "{cli}");
-        assert_eq!(pane.accepted.len(), 1, "{cli}: only the brief itself went in before the stop");
-        assert!(pane.accepted.iter().all(|s| s.text.is_some()), "{cli}: no key press after the stop");
+        let outcome = adapter.deliver_brief(
+            &mut pane,
+            "Read the brief file and do the task.",
+            &mut NoOutbox,
+        );
+        assert_eq!(
+            wire(&outcome),
+            json!({ "outcome": "delivery-unknown" }),
+            "{cli}"
+        );
+        assert_eq!(
+            pane.accepted.len(),
+            1,
+            "{cli}: only the brief itself went in before the stop"
+        );
+        assert!(
+            pane.accepted.iter().all(|s| s.text.is_some()),
+            "{cli}: no key press after the stop"
+        );
     }
 }
 
@@ -686,8 +783,16 @@ fn terminal_delivery_into_an_attempt_that_is_already_ending_types_nothing() {
         let adapter = adapter_for(cli).unwrap();
         let mut pane = EndingPane::new();
         pane.ending = true;
-        let outcome = adapter.deliver_brief(&mut pane, "Read the brief file and do the task.", &mut NoOutbox);
-        assert_eq!(wire(&outcome), json!({ "outcome": "delivery-unknown" }), "{cli}");
+        let outcome = adapter.deliver_brief(
+            &mut pane,
+            "Read the brief file and do the task.",
+            &mut NoOutbox,
+        );
+        assert_eq!(
+            wire(&outcome),
+            json!({ "outcome": "delivery-unknown" }),
+            "{cli}"
+        );
         assert!(pane.accepted.is_empty(), "{cli}: nothing reaches the pane");
     }
 }

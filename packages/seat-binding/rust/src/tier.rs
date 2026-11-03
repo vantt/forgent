@@ -66,10 +66,19 @@ const LADDER_JSON: &str = include_str!("../../contracts/seat-binding.tier-ladder
 pub fn tier_ladder() -> &'static [TierDefinition] {
     static LADDER: OnceLock<Vec<TierDefinition>> = OnceLock::new();
     LADDER.get_or_init(|| {
-        let file: LadderFile = serde_json::from_str(LADDER_JSON).expect("the tier ladder contract parses");
-        assert_eq!(file.tiers.len(), Tier::ALL.len(), "the ladder contract lists every tier");
+        let file: LadderFile =
+            serde_json::from_str(LADDER_JSON).expect("the tier ladder contract parses");
+        assert_eq!(
+            file.tiers.len(),
+            Tier::ALL.len(),
+            "the ladder contract lists every tier"
+        );
         for (tier, definition) in Tier::ALL.iter().zip(&file.tiers) {
-            assert_eq!(definition.name, format!("{tier:?}").to_lowercase(), "the ladder contract is weakest first");
+            assert_eq!(
+                definition.name,
+                format!("{tier:?}").to_lowercase(),
+                "the ladder contract is weakest first"
+            );
         }
         file.tiers
     })
@@ -111,7 +120,9 @@ impl Effort {
 }
 
 /// Effective rigor: decides checker count and independence strictness, never tier.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Default)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Default,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum Rigor {
     Low,

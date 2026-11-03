@@ -23,7 +23,12 @@ use super::{boot_id, boottime_ns, fixture, node};
 /// The binary that plays the host: `internal <route> ...`.
 pub fn internal_harness() -> PathBuf {
     let exe = std::env::current_exe().expect("current_exe");
-    exe.parent().unwrap().parent().unwrap().join("examples").join("internal_harness")
+    exe.parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .join("examples")
+        .join("internal_harness")
 }
 
 pub struct RunOpts {
@@ -46,7 +51,18 @@ pub struct RunOpts {
 impl RunOpts {
     /// A `noisy-agent.mjs` that works for `run_ms`.
     pub fn agent(run_ms: u64) -> Self {
-        Self { agent_args: vec!["--run-ms".into(), run_ms.to_string()], soft_ms: None, idle_ms: None, steps: Vec::new(), mutating: false, host_bin: None, preferred: "linux-gate".into(), grace_ms: 3_000, ceiling_in_ms: 600_000, max_output: None }
+        Self {
+            agent_args: vec!["--run-ms".into(), run_ms.to_string()],
+            soft_ms: None,
+            idle_ms: None,
+            steps: Vec::new(),
+            mutating: false,
+            host_bin: None,
+            preferred: "linux-gate".into(),
+            grace_ms: 3_000,
+            ceiling_in_ms: 600_000,
+            max_output: None,
+        }
     }
 }
 
@@ -82,13 +98,21 @@ fn flock(file: &File, op: libc::c_int) -> bool {
 
 /// Whether a stranger can take the lock file shared right now.
 pub fn lock_is_free(path: &Path) -> bool {
-    let file = OpenOptions::new().read(true).write(true).open(path).expect("lock file");
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(path)
+        .expect("lock file");
     flock(&file, libc::LOCK_SH | libc::LOCK_NB)
 }
 
 /// Whether a stranger can take the lock file exclusively right now.
 pub fn lock_is_free_ex(path: &Path) -> bool {
-    let file = OpenOptions::new().read(true).write(true).open(path).expect("lock file");
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(path)
+        .expect("lock file");
     flock(&file, libc::LOCK_EX | libc::LOCK_NB)
 }
 
@@ -103,15 +127,30 @@ impl SupRun {
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(dir.join("protected")).unwrap();
         let attempt_id = format!("att-sup-{name}");
-        let (outbox, stdout, stderr) = (dir.join("outbox"), dir.join("capture-stdout.log"), dir.join("capture-stderr.log"));
+        let (outbox, stdout, stderr) = (
+            dir.join("outbox"),
+            dir.join("capture-stdout.log"),
+            dir.join("capture-stderr.log"),
+        );
         let (marker, grandchild_pid) = (dir.join("agent.marker"), dir.join("grandchild.pid"));
         let side_file = dir.join("protected/attempt-secrets.json");
         fs::write(&side_file, json!({"v": 1, "attemptId": attempt_id, "env": {}, "controlEpoch": 1, "controlToken": "t"}).to_string()).unwrap();
 
-        let mut args = vec![fixture("noisy-agent.mjs"), "--outbox".into(), outbox.to_string_lossy().into(), "--marker".into(), marker.to_string_lossy().into(), "--grandchild-pidfile".into(), grandchild_pid.to_string_lossy().into()];
+        let mut args = vec![
+            fixture("noisy-agent.mjs"),
+            "--outbox".into(),
+            outbox.to_string_lossy().into(),
+            "--marker".into(),
+            marker.to_string_lossy().into(),
+            "--grandchild-pidfile".into(),
+            grandchild_pid.to_string_lossy().into(),
+        ];
         args.extend(opts.agent_args.clone());
         let soft = opts.soft_ms.map(|ms| boottime_ns() + ms * 1_000_000);
-        let host_bin = opts.host_bin.clone().unwrap_or_else(|| internal_harness().to_string_lossy().into_owned());
+        let host_bin = opts
+            .host_bin
+            .clone()
+            .unwrap_or_else(|| internal_harness().to_string_lossy().into_owned());
         let mut value = json!({
             "v": 3,
             "attemptId": attempt_id,
@@ -144,7 +183,9 @@ impl SupRun {
             "steps": opts.steps,
             "sideFile": side_file,
         });
-        if opts.mutating { value["cwdLeaseFile"] = json!(dir.join("cwd.lease")); }
+        if opts.mutating {
+            value["cwdLeaseFile"] = json!(dir.join("cwd.lease"));
+        }
         patch(&mut value);
         let digest = envelope::digest(&value).unwrap();
         value["digest"] = Value::String(digest);
@@ -152,13 +193,33 @@ impl SupRun {
         fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
 
         let open = |name: &str| {
-            let file = OpenOptions::new().read(true).write(true).create(true).truncate(false).mode(0o600).open(dir.join(name)).unwrap();
-            assert!(flock(&file, libc::LOCK_EX | libc::LOCK_NB), "controller takes {name}");
+            let file = OpenOptions::new()
+                .read(true)
+                .write(true)
+                .create(true)
+                .truncate(false)
+                .mode(0o600)
+                .open(dir.join(name))
+                .unwrap();
+            assert!(
+                flock(&file, libc::LOCK_EX | libc::LOCK_NB),
+                "controller takes {name}"
+            );
             file
         };
         let lock = Some(open("attempt.lock"));
         let lease = opts.mutating.then(|| open("cwd.lease"));
-        Self { dir, attempt_id, envelope: path, outbox, stdout, marker, grandchild_pid, lock, lease }
+        Self {
+            dir,
+            attempt_id,
+            envelope: path,
+            outbox,
+            stdout,
+            marker,
+            grandchild_pid,
+            lock,
+            lease,
+        }
     }
 
     /// Start the supervisor with the descriptions at slots 3 and 4, then let go
@@ -170,11 +231,27 @@ impl SupRun {
     /// [`SupRun::start`] with environment variables the supervisor needs (it starts with nothing else).
     pub fn start_with_env(&mut self, env: &[(String, String)]) -> Child {
         let mut cmd = Command::new(internal_harness());
-        let log = OpenOptions::new().create(true).append(true).open(self.dir.join("supervisor.log")).unwrap();
-        cmd.args(["internal", "supervise", "--protocol", "1", "--envelope"]).arg(&self.envelope).env_clear().envs(env.iter().map(|(k, v)| (k, v))).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::from(log));
+        let log = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(self.dir.join("supervisor.log"))
+            .unwrap();
+        cmd.args(["internal", "supervise", "--protocol", "1", "--envelope"])
+            .arg(&self.envelope)
+            .env_clear()
+            .envs(env.iter().map(|(k, v)| (k, v)))
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::from(log));
         // SAFETY: setsid is async-signal-safe; the supervisor leads its own session like a detached one.
         unsafe {
-            cmd.pre_exec(|| if libc::setsid() < 0 { Err(std::io::Error::last_os_error()) } else { Ok(()) });
+            cmd.pre_exec(|| {
+                if libc::setsid() < 0 {
+                    Err(std::io::Error::last_os_error())
+                } else {
+                    Ok(())
+                }
+            });
         }
         let mut map: Vec<(FdSlot, &File)> = vec![(FdSlot(3), self.lock.as_ref().unwrap())];
         if let Some(lease) = &self.lease {
@@ -207,11 +284,18 @@ pub fn finish(child: Child, limit: Duration) -> (i32, Value) {
         if child.try_wait().unwrap().is_some() {
             break;
         }
-        assert!(start.elapsed() < limit, "supervisor did not exit within {limit:?}");
+        assert!(
+            start.elapsed() < limit,
+            "supervisor did not exit within {limit:?}"
+        );
         sleep(Duration::from_millis(20));
     }
     let out = child.wait_with_output().unwrap();
-    let line = String::from_utf8_lossy(&out.stdout).lines().last().and_then(|l| serde_json::from_str::<Value>(l).ok()).unwrap_or(Value::Null);
+    let line = String::from_utf8_lossy(&out.stdout)
+        .lines()
+        .last()
+        .and_then(|l| serde_json::from_str::<Value>(l).ok())
+        .unwrap_or(Value::Null);
     (out.status.code().unwrap_or(-1), line)
 }
 
@@ -224,5 +308,8 @@ pub fn wait_until(limit: Duration, what: &str, mut cond: impl FnMut() -> bool) {
 }
 
 pub fn env_of(pairs: &[(&str, &str)]) -> BTreeMap<String, String> {
-    pairs.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect()
+    pairs
+        .iter()
+        .map(|(k, v)| (k.to_string(), v.to_string()))
+        .collect()
 }

@@ -36,7 +36,11 @@ fn subset(expected: &Value, actual: Option<&Value>, path: &str, failures: &mut V
         }
         (Value::Array(e), Some(Value::Array(a))) => {
             if a.len() < e.len() {
-                failures.push(format!("{path}: has {} elements, expected at least {}", a.len(), e.len()));
+                failures.push(format!(
+                    "{path}: has {} elements, expected at least {}",
+                    a.len(),
+                    e.len()
+                ));
             }
             for (index, value) in e.iter().enumerate() {
                 subset(value, a.get(index), &format!("{path}[{index}]"), failures);
@@ -79,7 +83,10 @@ fn golden_cases_are_the_behavior_source() {
                 .map(|r| r.candidates.iter().map(|c| json!(c.executor)).collect())
                 .unwrap_or_default();
             if &Value::Array(actual.clone()) != list {
-                local.push(format!("executors: expected {list}, got {}", Value::Array(actual)));
+                local.push(format!(
+                    "executors: expected {list}, got {}",
+                    Value::Array(actual)
+                ));
             }
         }
         if let Some(list) = case.get("skippedReasons") {
@@ -89,7 +96,10 @@ fn golden_cases_are_the_behavior_source() {
                 .map(|r| r.skipped.iter().map(|s| json!(s.reason)).collect())
                 .unwrap_or_default();
             if &Value::Array(actual.clone()) != list {
-                local.push(format!("skippedReasons: expected {list}, got {}", Value::Array(actual)));
+                local.push(format!(
+                    "skippedReasons: expected {list}, got {}",
+                    Value::Array(actual)
+                ));
             }
         }
         if let Some(parts) = case.get("explainContains").and_then(Value::as_array) {
@@ -103,7 +113,12 @@ fn golden_cases_are_the_behavior_source() {
         }
         failures.extend(local.into_iter().map(|f| format!("[{name}] {f}")));
     }
-    assert!(failures.is_empty(), "{} golden failures:\n{}", failures.len(), failures.join("\n"));
+    assert!(
+        failures.is_empty(),
+        "{} golden failures:\n{}",
+        failures.len(),
+        failures.join("\n")
+    );
 }
 
 #[test]
@@ -122,10 +137,17 @@ fn the_replayable_input_carries_no_config_body_or_account_facts() {
     let (output, value) = run(&fixture["base"], &fixture["cases"][0]);
     let text = value["bindingInput"].to_string();
     assert!(value["bindingInput"]["protocol"] == 1);
-    for forbidden in ["modelPolicies", "\"accountView\":", "\"launchView\":", "clis", "tierFallback"] {
+    for forbidden in [
+        "modelPolicies",
+        "\"accountView\":",
+        "\"launchView\":",
+        "clis",
+        "tierFallback",
+    ] {
         assert!(!text.contains(forbidden), "bindingInput leaks {forbidden}");
     }
-    let replay: fgos_seat_binding::BindingInput = serde_json::from_value(value["bindingInput"].clone()).unwrap();
+    let replay: fgos_seat_binding::BindingInput =
+        serde_json::from_value(value["bindingInput"].clone()).unwrap();
     assert_eq!(replay, output.binding_input);
 }
 

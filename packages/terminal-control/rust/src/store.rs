@@ -21,8 +21,12 @@ pub fn valid_key(key: &str) -> bool {
     let first_ok = bytes.first().is_some_and(|b| b.is_ascii_alphanumeric());
     first_ok
         && bytes.len() <= 128
-        && bytes.iter().all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
-        && !MarkerKind::ALL.iter().any(|m| key.ends_with(&format!(".{}", m.suffix())))
+        && bytes
+            .iter()
+            .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'_' | b'-'))
+        && !MarkerKind::ALL
+            .iter()
+            .any(|m| key.ends_with(&format!(".{}", m.suffix())))
 }
 
 /// The directory of one driver under the state root, holding one directory
@@ -52,7 +56,11 @@ pub struct Store {
 
 impl Store {
     /// Open (creating, mode 0700) the store of one server incarnation.
-    pub fn open(state_root: &Path, driver: &str, incarnation: &ServerIncarnation) -> io::Result<Store> {
+    pub fn open(
+        state_root: &Path,
+        driver: &str,
+        incarnation: &ServerIncarnation,
+    ) -> io::Result<Store> {
         Store::open_id(state_root, driver, &incarnation.id())
     }
 
@@ -86,8 +94,14 @@ impl Store {
         let mut keys = Vec::new();
         for entry in fs::read_dir(self.allocations())? {
             let name = entry?.file_name().to_string_lossy().into_owned();
-            let Some(stem) = name.strip_suffix(".json") else { continue };
-            if name.starts_with('.') || MarkerKind::ALL.iter().any(|m| stem.ends_with(&format!(".{}", m.suffix()))) {
+            let Some(stem) = name.strip_suffix(".json") else {
+                continue;
+            };
+            if name.starts_with('.')
+                || MarkerKind::ALL
+                    .iter()
+                    .any(|m| stem.ends_with(&format!(".{}", m.suffix())))
+            {
                 continue;
             }
             keys.push(stem.to_string());
@@ -97,16 +111,35 @@ impl Store {
     }
 
     /// Publish a marker once. `Ok(false)`: that marker already exists.
-    pub fn publish_marker<T: Serialize>(&self, key: &str, kind: MarkerKind, marker: &T) -> io::Result<bool> {
-        publish_once(&self.allocations(), &format!("{key}.{}.json", kind.suffix()), marker)
+    pub fn publish_marker<T: Serialize>(
+        &self,
+        key: &str,
+        kind: MarkerKind,
+        marker: &T,
+    ) -> io::Result<bool> {
+        publish_once(
+            &self.allocations(),
+            &format!("{key}.{}.json", kind.suffix()),
+            marker,
+        )
     }
 
-    pub fn read_marker<T: DeserializeOwned>(&self, key: &str, kind: MarkerKind) -> io::Result<Option<T>> {
-        read_json(&self.allocations().join(format!("{key}.{}.json", kind.suffix())))
+    pub fn read_marker<T: DeserializeOwned>(
+        &self,
+        key: &str,
+        kind: MarkerKind,
+    ) -> io::Result<Option<T>> {
+        read_json(
+            &self
+                .allocations()
+                .join(format!("{key}.{}.json", kind.suffix())),
+        )
     }
 
     pub fn has_marker(&self, key: &str, kind: MarkerKind) -> bool {
-        self.allocations().join(format!("{key}.{}.json", kind.suffix())).exists()
+        self.allocations()
+            .join(format!("{key}.{}.json", kind.suffix()))
+            .exists()
     }
 }
 
@@ -120,14 +153,21 @@ fn create_private_dir(dir: &Path) -> io::Result<()> {
 
 fn read_json<T: DeserializeOwned>(path: &Path) -> io::Result<Option<T>> {
     match fs::read(path) {
-        Ok(bytes) => serde_json::from_slice(&bytes).map(Some).map_err(io::Error::from),
+        Ok(bytes) => serde_json::from_slice(&bytes)
+            .map(Some)
+            .map_err(io::Error::from),
         Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(None),
         Err(e) => Err(e),
     }
 }
 
 fn publish_once<T: Serialize>(dir: &Path, name: &str, value: &T) -> io::Result<bool> {
-    install_result(fgos_durable_file::install_once_with_mode(dir, name, &serde_json::to_vec(value)?, 0o666))
+    install_result(fgos_durable_file::install_once_with_mode(
+        dir,
+        name,
+        &serde_json::to_vec(value)?,
+        0o666,
+    ))
 }
 
 /// The file was installed under its final name but the parent directory sync failed, so the
@@ -141,19 +181,27 @@ pub struct InstallUnproven {
 
 impl InstallUnproven {
     pub fn of(error: &io::Error) -> Option<&InstallUnproven> {
-        error.get_ref().and_then(|inner| inner.downcast_ref::<InstallUnproven>())
+        error
+            .get_ref()
+            .and_then(|inner| inner.downcast_ref::<InstallUnproven>())
     }
 }
 
 impl std::fmt::Display for InstallUnproven {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "installed ({:?}) but the parent directory sync failed: {}", self.installed, self.source)
+        write!(
+            f,
+            "installed ({:?}) but the parent directory sync failed: {}",
+            self.installed, self.source
+        )
     }
 }
 
 impl std::error::Error for InstallUnproven {}
 
-fn install_result(result: Result<fgos_durable_file::Installed, fgos_durable_file::InstallError>) -> io::Result<bool> {
+fn install_result(
+    result: Result<fgos_durable_file::Installed, fgos_durable_file::InstallError>,
+) -> io::Result<bool> {
     let installed = match result {
         Ok(installed) => installed,
         Err(error) => match error.installed {
@@ -164,7 +212,12 @@ fn install_result(result: Result<fgos_durable_file::Installed, fgos_durable_file
                 }
                 installed
             }
-            Some(installed) => return Err(io::Error::other(InstallUnproven { installed, source: error.source })),
+            Some(installed) => {
+                return Err(io::Error::other(InstallUnproven {
+                    installed,
+                    source: error.source,
+                }))
+            }
             None => return Err(error.source),
         },
     };
@@ -185,7 +238,8 @@ mod install_mapping_tests {
         }
     }
     #[test]
-    fn errors_before_install_propagate_and_errors_after_install_keep_the_outcome_unless_the_parent_sync_failed() {
+    fn errors_before_install_propagate_and_errors_after_install_keep_the_outcome_unless_the_parent_sync_failed(
+    ) {
         let dir = std::env::temp_dir().join(format!(
             "fgos-terminal-control-mapping-{}-{}",
             std::process::id(),
@@ -232,10 +286,14 @@ mod install_mapping_tests {
             b"original",
             &FailAt("parent-fsync"),
         ));
-        let error = result.expect_err("a marker whose durability is unproven was reported as success");
+        let error =
+            result.expect_err("a marker whose durability is unproven was reported as success");
         let unproven = InstallUnproven::of(&error).expect("the error names the unproven install");
         assert_eq!(unproven.installed, fgos_durable_file::Installed::Created);
-        assert_eq!(std::fs::read(dir.join("parent-fsync")).unwrap(), b"original");
+        assert_eq!(
+            std::fs::read(dir.join("parent-fsync")).unwrap(),
+            b"original"
+        );
         std::fs::remove_dir_all(dir).unwrap();
     }
 }

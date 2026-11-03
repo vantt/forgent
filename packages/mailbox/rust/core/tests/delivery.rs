@@ -502,7 +502,8 @@ fn a_step_claim_measures_a_body_it_can_see_instead_of_assuming_the_worst_case() 
     assert_eq!(claim.too_large, 0, "a ~1.9 KB mail fits an 8 KiB step");
     assert_eq!(claim.items.len(), 1);
     assert_eq!(claim.items[0].id, id);
-    let blind = fgos_mailbox_core::worst_case_len(&claim.items[0], prose.len() as u64, &pair.limits);
+    let blind =
+        fgos_mailbox_core::worst_case_len(&claim.items[0], prose.len() as u64, &pair.limits);
     assert!(
         blind + fgos_mailbox_core::pointer_reserve() > bound as usize,
         "the byte-count bound alone would have refused it ({blind} bytes)"

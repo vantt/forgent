@@ -85,7 +85,12 @@ pub fn sign_payload(root: &Path, domain: &str, mut payload: Value) -> Result<Val
 /// The one session of another machine `to` names (a handle, a role alias or a
 /// full id), folded directly from the project's shared log rather than read
 /// from the cache; `Ok(None)` when the clone has no store to fold.
-fn resolve(main: &Path, root: &Path, writer: &str, to: &str) -> Result<Option<Result<Target, Refusal>>, Refusal> {
+fn resolve(
+    main: &Path,
+    root: &Path,
+    writer: &str,
+    to: &str,
+) -> Result<Option<Result<Target, Refusal>>, Refusal> {
     let Some(log) = StoreLogDoor.open_stream(main, writer, shared::STREAM)? else {
         return Ok(None);
     };
@@ -100,7 +105,13 @@ fn resolve(main: &Path, root: &Path, writer: &str, to: &str) -> Result<Option<Re
             detail: format!("{to:?} names a session of this machine"),
             candidates: Vec::new(),
         })?;
-        Ok(Target { id: listed.id, handle: listed.handle, machine: remote.machine, pin: remote.pin, fetched_at: remote.fetched_at })
+        Ok(Target {
+            id: listed.id,
+            handle: listed.handle,
+            machine: remote.machine,
+            pin: remote.pin,
+            fetched_at: remote.fetched_at,
+        })
     })))
 }
 
@@ -116,7 +127,12 @@ struct Outgoing<'a> {
 
 /// The event payload of one message, signed. A message that asks for a wake is version 2 under
 /// its own domain; any other is version 1.
-fn sent_payload(root: &Path, msg: &Outgoing<'_>, machine: &MachineRef, target: &Target) -> Result<Value, Refusal> {
+fn sent_payload(
+    root: &Path,
+    msg: &Outgoing<'_>,
+    machine: &MachineRef,
+    target: &Target,
+) -> Result<Value, Refusal> {
     let wake = msg.wake;
     let mut payload = json!({
         "v": if wake { 2 } else { 1 },
@@ -133,13 +149,24 @@ fn sent_payload(root: &Path, msg: &Outgoing<'_>, machine: &MachineRef, target: &
     if wake {
         payload["wake"] = Value::Bool(true);
     }
-    sign_payload(root, if wake { SENT_DOMAIN_WAKE } else { SENT_DOMAIN }, payload)
+    sign_payload(
+        root,
+        if wake { SENT_DOMAIN_WAKE } else { SENT_DOMAIN },
+        payload,
+    )
 }
 
 /// The signed event that tells a sender what its message came to on this machine: `outcome` is
 /// `offered`, or `refused` with the refusal's code.
-pub fn settled_payload(root: &Path, id: &str, machine: &str, outcome: &str, reason: Option<&str>) -> Result<Value, Refusal> {
-    let mut payload = json!({ "v": 1, "id": id, "machine": machine, "outcome": outcome, "at": iso_utc_now() });
+pub fn settled_payload(
+    root: &Path,
+    id: &str,
+    machine: &str,
+    outcome: &str,
+    reason: Option<&str>,
+) -> Result<Value, Refusal> {
+    let mut payload =
+        json!({ "v": 1, "id": id, "machine": machine, "outcome": outcome, "at": iso_utc_now() });
     if let Some(reason) = reason {
         payload["reason"] = Value::String(reason.to_owned());
     }
@@ -160,8 +187,16 @@ pub struct SentSummary {
 impl SentSummary {
     pub fn text(&self) -> String {
         let refused: usize = self.refused.values().sum();
-        let reasons: Vec<String> = self.refused.iter().map(|(reason, n)| format!("{reason} {n}")).collect();
-        let tail = if reasons.is_empty() { String::new() } else { format!(" ({})", reasons.join(", ")) };
+        let reasons: Vec<String> = self
+            .refused
+            .iter()
+            .map(|(reason, n)| format!("{reason} {n}"))
+            .collect();
+        let tail = if reasons.is_empty() {
+            String::new()
+        } else {
+            format!(" ({})", reasons.join(", "))
+        };
         format!(
             "cross-machine: {} sent in the last 24 hours; {} offered, {} refused{tail}, {} waiting for the receiver's fetch",
             self.sent, self.offered, refused, self.waiting
@@ -176,14 +211,22 @@ impl SentSummary {
 pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSummary, String> {
     let refusal = |r: Refusal| format!("{}: {}", r.reason, r.detail);
     let machine = machine_info(root).map_err(refusal)?.id;
-    let Some(log) = StoreLogDoor.open_store(main, &machine, STREAM).map_err(refusal)? else {
+    let Some(log) = StoreLogDoor
+        .open_store(main, &machine, STREAM)
+        .map_err(refusal)?
+    else {
         return Ok(SentSummary::default());
     };
     let (events, own_origin) = log.envelopes().map_err(refusal)?;
-    let recent = |ts: &str| iso_utc_secs(ts).is_some_and(|at| now_secs.saturating_sub(at) <= 86_400);
+    let recent =
+        |ts: &str| iso_utc_secs(ts).is_some_and(|at| now_secs.saturating_sub(at) <= 86_400);
     // id -> the machine it went to, and what the latest settlement of it says.
-    let mut sent: std::collections::BTreeMap<String, (String, Option<Result<(), String>>)> = Default::default();
-    for event in events.iter().filter(|e| e.event_type == MESSAGE_SENT && e.origin == own_origin && recent(&e.ts)) {
+    let mut sent: std::collections::BTreeMap<String, (String, Option<Result<(), String>>)> =
+        Default::default();
+    for event in events
+        .iter()
+        .filter(|e| e.event_type == MESSAGE_SENT && e.origin == own_origin && recent(&e.ts))
+    {
         let payload = &event.payload;
         if let (Some(id), Some(to)) = (payload["id"].as_str(), payload["to"]["machine"].as_str()) {
             sent.insert(id.to_owned(), (to.to_owned(), None));
@@ -191,27 +234,45 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
     }
     for event in events.iter().filter(|e| e.event_type == MESSAGE_SETTLED) {
         let payload = &event.payload;
-        let (Some(id), Some(by), Some(outcome)) = (payload["id"].as_str(), payload["machine"].as_str(), payload["outcome"].as_str()) else {
+        let (Some(id), Some(by), Some(outcome)) = (
+            payload["id"].as_str(),
+            payload["machine"].as_str(),
+            payload["outcome"].as_str(),
+        ) else {
             continue;
         };
-        let Some((to, settled)) = sent.get_mut(id) else { continue };
+        let Some((to, settled)) = sent.get_mut(id) else {
+            continue;
+        };
         if to != by {
             continue;
         }
         let mut unsigned = payload.clone();
-        let signature: Option<Signature> =
-            unsigned.as_object_mut().and_then(|o| o.remove("sig")).and_then(|sig| serde_json::from_value(sig).ok());
-        let verified = signature.as_ref().and_then(|sig| signed_bytes(SETTLED_DOMAIN, &unsigned).ok().and_then(|bytes| signing::verify(root, &bytes, sig).ok()));
+        let signature: Option<Signature> = unsigned
+            .as_object_mut()
+            .and_then(|o| o.remove("sig"))
+            .and_then(|sig| serde_json::from_value(sig).ok());
+        let verified = signature.as_ref().and_then(|sig| {
+            signed_bytes(SETTLED_DOMAIN, &unsigned)
+                .ok()
+                .and_then(|bytes| signing::verify(root, &bytes, sig).ok())
+        });
         if verified.is_none_or(|v| v.machine_id != by) {
             continue;
         }
         *settled = match outcome {
             "offered" => Some(Ok(())),
-            "refused" => Some(Err(payload["reason"].as_str().unwrap_or("unknown").to_owned())),
+            "refused" => Some(Err(payload["reason"]
+                .as_str()
+                .unwrap_or("unknown")
+                .to_owned())),
             _ => continue,
         };
     }
-    let mut summary = SentSummary { sent: sent.len(), ..Default::default() };
+    let mut summary = SentSummary {
+        sent: sent.len(),
+        ..Default::default()
+    };
     for (_, settled) in sent.into_values() {
         match settled {
             None => summary.waiting += 1,
@@ -264,12 +325,27 @@ pub struct Context<'a> {
 
 /// Sends `body` to the session `to` names on another machine, when one
 /// does; see the module's comment. `from` is the caller's full session id.
-pub fn send(ctx: &Context<'_>, from: &WriterKey, to: &str, body: &str, reply_to: Option<&str>, wake: bool) -> Outcome {
-    let Context { fgos_dir, record, limits, cross, wait, now } = *ctx;
+pub fn send(
+    ctx: &Context<'_>,
+    from: &WriterKey,
+    to: &str,
+    body: &str,
+    reply_to: Option<&str>,
+    wake: bool,
+) -> Outcome {
+    let Context {
+        fgos_dir,
+        record,
+        limits,
+        cross,
+        wait,
+        now,
+    } = *ctx;
     if !cross.enabled {
         return Outcome::NotRemote;
     }
-    let (Some(main), Some(root)) = (fgos_dir.parent(), super::mailbox_identity::state_root()) else {
+    let (Some(main), Some(root)) = (fgos_dir.parent(), super::mailbox_identity::state_root())
+    else {
         return Outcome::NotRemote;
     };
     let target = match resolve(main, &root, from.as_str(), to) {
@@ -278,10 +354,17 @@ pub fn send(ctx: &Context<'_>, from: &WriterKey, to: &str, body: &str, reply_to:
             return Outcome::Refused(format!("not recorded: {}", refusal_line(&refusal)));
         }
         Ok(None) | Ok(Some(Err(_))) => return Outcome::NotRemote,
-        Err(refusal) => return Outcome::Refused(format!("not recorded: {}", refusal_line(&refusal))),
+        Err(refusal) => {
+            return Outcome::Refused(format!("not recorded: {}", refusal_line(&refusal)))
+        }
     };
     let label = format!("{}@{}", target.handle, target.machine.id);
-    let req = RemoteSend { from, body_bytes: body.len() as u64, max_body_bytes: WIRE_MAX_BODY_BYTES, to: &label };
+    let req = RemoteSend {
+        from,
+        body_bytes: body.len() as u64,
+        max_body_bytes: WIRE_MAX_BODY_BYTES,
+        to: &label,
+    };
     let id = match verbs::admit_remote(record, &req, wait, now, limits) {
         Ok(id) => id,
         Err(text) => return Outcome::Refused(text),
@@ -291,11 +374,21 @@ pub fn send(ctx: &Context<'_>, from: &WriterKey, to: &str, body: &str, reply_to:
         // The writer key attributes the append; the event names the sender by its full session id,
         // which the receiver checks against the signer's machine.
         let session = current_session(&root, std::process::id(), Some(fgos_dir))?;
-        let msg = Outgoing { id: id.as_str(), from: &session.info.id, body, reply_to, wake };
+        let msg = Outgoing {
+            id: id.as_str(),
+            from: &session.info.id,
+            body,
+            reply_to,
+            wake,
+        };
         let payload = sent_payload(&root, &msg, &machine, &target)?;
         let log = StoreLogDoor
             .open_stream(main, from.as_str(), STREAM)?
-            .ok_or_else(|| Refusal { reason: "event-store-unavailable", detail: "this clone has no Event Store".into(), candidates: Vec::new() })?;
+            .ok_or_else(|| Refusal {
+                reason: "event-store-unavailable",
+                detail: "this clone has no Event Store".into(),
+                candidates: Vec::new(),
+            })?;
         log.append(MESSAGE_SENT, payload)
     })();
     match appended {
@@ -313,8 +406,10 @@ mod tests {
 
     #[test]
     fn the_wire_cap_and_signing_domain_equal_the_remote_contract() {
-        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../packages/mailbox/contracts/remote.v1.json");
-        let contract: serde_json::Value = serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../packages/mailbox/contracts/remote.v1.json");
+        let contract: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
         let cap = contract["limits"]
             .as_array()
             .unwrap()
@@ -322,11 +417,21 @@ mod tests {
             .find(|limit| limit["key"] == "mailbox.remote.maxBodyBytes")
             .expect("the contract names the wire cap");
         assert_eq!(cap["default"], WIRE_MAX_BODY_BYTES);
-        let domain = contract["types"].as_array().unwrap().iter().find(|t| t["type"] == "mailbox.message-sent").unwrap();
+        let domain = contract["types"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|t| t["type"] == "mailbox.message-sent")
+            .unwrap();
         assert_eq!(domain["signingDomain"], SENT_DOMAIN);
         assert_eq!(domain["wakeVersion"]["signingDomain"], SENT_DOMAIN_WAKE);
         assert_eq!(domain["wakeVersion"]["v"], 2);
-        let settled = contract["types"].as_array().unwrap().iter().find(|t| t["type"] == "mailbox.message-settled").unwrap();
+        let settled = contract["types"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|t| t["type"] == "mailbox.message-settled")
+            .unwrap();
         assert_eq!(settled["signingDomain"], SETTLED_DOMAIN);
     }
 }

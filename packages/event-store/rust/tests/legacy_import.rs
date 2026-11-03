@@ -17,7 +17,8 @@ fn git(f: &Fixture, args: &[&str]) -> String {
     );
     String::from_utf8(out.stdout).unwrap().trim().into()
 }
-const EVENTS: &[u8] = b"{\"ts\":\"2026-01-01T00:00:00.000Z\",\"type\":\"work.add\",\"payload\":{\"id\":\"one\"}}\n";
+const EVENTS: &[u8] =
+    b"{\"ts\":\"2026-01-01T00:00:00.000Z\",\"type\":\"work.add\",\"payload\":{\"id\":\"one\"}}\n";
 #[test]
 fn a_clone_without_the_import_data_tree_object_still_verifies_the_published_legacy_commit() {
     let f = Fixture::new();
@@ -65,12 +66,20 @@ fn a_migrated_write_is_refused_when_a_legacy_mirror_differs_from_the_pin() {
     write_readiness(&f.driver, &f.repo, "origin").unwrap();
     git(
         &f,
-        &["update-ref", "refs/fgos/remotes/origin/legacy", oid.as_str()],
+        &[
+            "update-ref",
+            "refs/fgos/remotes/origin/legacy",
+            oid.as_str(),
+        ],
     );
     write_readiness(&f.driver, &f.repo, "origin").unwrap();
     git(
         &f,
-        &["update-ref", "refs/fgos/remotes/origin/legacy", other.as_str()],
+        &[
+            "update-ref",
+            "refs/fgos/remotes/origin/legacy",
+            other.as_str(),
+        ],
     );
     assert_eq!(
         write_readiness(&f.driver, &f.repo, "origin")

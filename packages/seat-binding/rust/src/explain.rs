@@ -3,7 +3,12 @@
 
 use crate::model::*;
 
-pub fn explain(ask: &Ask, policy: Option<&Policy>, ranked: Option<&Ranked>, refusal: Option<&Refusal>) -> Explain {
+pub fn explain(
+    ask: &Ask,
+    policy: Option<&Policy>,
+    ranked: Option<&Ranked>,
+    refusal: Option<&Refusal>,
+) -> Explain {
     let mut lines = vec![format!(
         "{} / {}  (role {}, capability {})",
         ask.label.as_deref().unwrap_or("-"),
@@ -38,21 +43,36 @@ pub fn explain(ask: &Ask, policy: Option<&Policy>, ranked: Option<&Ranked>, refu
         }
         lines.push(format!("    {}", tier_line(policy)));
         let list: Vec<&str> = policy.prefer.iter().map(|p| p.executor()).collect();
-        let mut prefer = format!("    prefer: {} = [{}]", policy.prefer_source, list.join(", "));
+        let mut prefer = format!(
+            "    prefer: {} = [{}]",
+            policy.prefer_source,
+            list.join(", ")
+        );
         if ranked.independent_of.is_empty() {
             prefer.push_str("; independence: none required");
         } else {
-            let peers: Vec<String> = ranked.independent_of.iter().map(|p| format!("!= {}({}) ok", p.seat, p.family)).collect();
+            let peers: Vec<String> = ranked
+                .independent_of
+                .iter()
+                .map(|p| format!("!= {}({}) ok", p.seat, p.family))
+                .collect();
             prefer.push_str(&format!("; independence: {}", peers.join(", ")));
         }
         if !ranked.moved_by.is_empty() {
             prefer.push_str(&format!("; moved by: {}", ranked.moved_by.join(", ")));
         }
         if !ranked.shared_with.is_empty() {
-            prefer.push_str(&format!("; shares a family with: {}", ranked.shared_with.join(", ")));
+            prefer.push_str(&format!(
+                "; shares a family with: {}",
+                ranked.shared_with.join(", ")
+            ));
         }
         lines.push(prefer);
-        let chosen_pool = ranked.candidates.first().and_then(|c| c.pool.clone()).unwrap_or_default();
+        let chosen_pool = ranked
+            .candidates
+            .first()
+            .and_then(|c| c.pool.clone())
+            .unwrap_or_default();
         let next = if ranked.fallback_families.is_empty() {
             "none left: refuse".to_string()
         } else {
@@ -63,7 +83,10 @@ pub fn explain(ask: &Ask, policy: Option<&Policy>, ranked: Option<&Ranked>, refu
             policy.tier.name()
         ));
         for skipped in &ranked.skipped {
-            lines.push(format!("    skipped {} ({}): {}", skipped.executor, skipped.reason, skipped.detail));
+            lines.push(format!(
+                "    skipped {} ({}): {}",
+                skipped.executor, skipped.reason, skipped.detail
+            ));
         }
     } else if let Some(refusal) = refusal {
         if let Some(policy) = policy {
@@ -75,7 +98,10 @@ pub fn explain(ask: &Ask, policy: Option<&Policy>, ranked: Option<&Ranked>, refu
         }
         if let Some(ranked) = ranked {
             for skipped in &ranked.skipped {
-                lines.push(format!("    skipped {} ({}): {}", skipped.executor, skipped.reason, skipped.detail));
+                lines.push(format!(
+                    "    skipped {} ({}): {}",
+                    skipped.executor, skipped.reason, skipped.detail
+                ));
             }
         }
     }
@@ -107,7 +133,11 @@ fn tier_line(policy: &Policy) -> String {
         }
     };
     if let Some(recommended) = &policy.recommendation {
-        line.push_str(&format!("; workflow recommends {} ({})", recommended.tier.name(), recommended.source));
+        line.push_str(&format!(
+            "; workflow recommends {} ({})",
+            recommended.tier.name(),
+            recommended.source
+        ));
     }
     if let Some(by) = &policy.raised_by {
         line.push_str(&format!("; raised by {by}"));

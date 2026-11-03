@@ -56,7 +56,11 @@ pub(crate) fn corrupt_loose_objects(common: &Path, oids: &[Oid]) -> io::Result<V
 /// `sync_files` is false only for objects Git wrote under `core.fsync`, whose
 /// file it already fsynced before linking it; objects written by `git add` or
 /// `write-tree` need it.
-pub(crate) fn sync_loose_objects(common: &Path, oids: &[Oid], sync_files: bool) -> io::Result<Vec<PathBuf>> {
+pub(crate) fn sync_loose_objects(
+    common: &Path,
+    oids: &[Oid],
+    sync_files: bool,
+) -> io::Result<Vec<PathBuf>> {
     let objects = common.join("objects");
     #[cfg_attr(not(unix), allow(unused_mut))]
     let mut files = Vec::new();
@@ -128,15 +132,20 @@ mod durable_objects {
     #[cfg(unix)]
     fn loose(common: &Path, oid: &Oid) -> Option<(u64, u64, u128)> {
         let s = oid.as_str();
-        let m = std::fs::symlink_metadata(common.join("objects").join(&s[..2]).join(&s[2..])).ok()?;
-        m.is_file().then(|| crate::wal::durable_identity(&m)).flatten()
+        let m =
+            std::fs::symlink_metadata(common.join("objects").join(&s[..2]).join(&s[2..])).ok()?;
+        m.is_file()
+            .then(|| crate::wal::durable_identity(&m))
+            .flatten()
     }
     #[cfg(not(unix))]
     fn loose(_: &Path, _: &Oid) -> Option<(u64, u64, u128)> {
         None
     }
     pub(super) fn remember(common: &Path, oid: &Oid) {
-        let Some(file) = loose(common, oid) else { return };
+        let Some(file) = loose(common, oid) else {
+            return;
+        };
         if let Ok(mut seen) = SEEN.lock() {
             let seen = seen.get_or_insert_with(HashMap::new);
             if seen.len() >= BOUND {
@@ -145,14 +154,19 @@ mod durable_objects {
                     seen.clear();
                 }
             }
-            seen.insert((common.to_path_buf(), oid.as_str().to_owned()), (file, Instant::now()));
+            seen.insert(
+                (common.to_path_buf(), oid.as_str().to_owned()),
+                (file, Instant::now()),
+            );
         }
     }
     /// The loose file this process made durable is still the one at its name.
     pub(super) fn durable(common: &Path, oid: &Oid) -> bool {
         let known = SEEN.lock().ok().and_then(|seen| {
-            seen.as_ref()
-                .and_then(|seen| seen.get(&(common.to_path_buf(), oid.as_str().to_owned())).copied())
+            seen.as_ref().and_then(|seen| {
+                seen.get(&(common.to_path_buf(), oid.as_str().to_owned()))
+                    .copied()
+            })
         });
         matches!(known, Some((file, at)) if at.elapsed() < KEEP && loose(common, oid) == Some(file))
     }
@@ -206,7 +220,11 @@ mod tests {
             synced.into_iter().collect::<BTreeSet<_>>(),
             BTreeSet::from([file.clone(), fanout(&common, &oid), common.join("objects")])
         );
-        assert!(sync_loose_objects(&common, std::slice::from_ref(&oid), true).unwrap().is_empty());
+        assert!(
+            sync_loose_objects(&common, std::slice::from_ref(&oid), true)
+                .unwrap()
+                .is_empty()
+        );
         // A recreated loose file is a different file at the same name.
         fs::remove_file(&file).unwrap();
         assert_eq!(write(&dir, b"one"), oid);
@@ -229,9 +247,17 @@ mod tests {
     #[test]
     fn several_objects_share_one_objects_dir_and_packed_objects_need_nothing() {
         let (dir, common) = scratch("many");
-        let oids: Vec<_> = (0..4).map(|i| write(&dir, format!("blob {i}").as_bytes())).collect();
+        let oids: Vec<_> = (0..4)
+            .map(|i| write(&dir, format!("blob {i}").as_bytes()))
+            .collect();
         let synced = sync_loose_objects(&common, &oids, true).unwrap();
-        assert_eq!(synced.iter().filter(|p| **p == common.join("objects")).count(), 1);
+        assert_eq!(
+            synced
+                .iter()
+                .filter(|p| **p == common.join("objects"))
+                .count(),
+            1
+        );
         assert_eq!(synced.iter().filter(|p| p.is_file()).count(), 4);
         git(&dir, &["repack", "-adq"], b"");
         git(&dir, &["prune-packed"], b"");
@@ -245,11 +271,18 @@ mod tests {
         let (empty, garbage, good) = (write(&dir, b"e"), write(&dir, b"g"), write(&dir, b"ok"));
         let file = |oid: &Oid| fanout(&common, oid).join(&oid.as_str()[2..]);
         for (oid, bytes) in [(&empty, &b""[..]), (&garbage, &b"not zlib at all"[..])] {
-            fs::set_permissions(file(oid), std::os::unix::fs::PermissionsExt::from_mode(0o644)).unwrap();
+            fs::set_permissions(
+                file(oid),
+                std::os::unix::fs::PermissionsExt::from_mode(0o644),
+            )
+            .unwrap();
             fs::write(file(oid), bytes).unwrap();
         }
         let oids = [empty.clone(), garbage.clone(), good.clone()];
-        assert_eq!(corrupt_loose_objects(&common, &oids).unwrap(), vec![empty, garbage]);
+        assert_eq!(
+            corrupt_loose_objects(&common, &oids).unwrap(),
+            vec![empty, garbage]
+        );
         let error = sync_loose_objects(&common, &oids, true).unwrap_err();
         assert_eq!(error.to_string(), "object-file-corrupt");
         assert!(sync_loose_objects(&common, &[good], true).is_ok());

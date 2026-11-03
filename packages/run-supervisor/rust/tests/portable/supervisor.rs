@@ -24,7 +24,10 @@ pub fn internal_harness() -> PathBuf {
 }
 
 pub fn base_env() -> BTreeMap<String, String> {
-    ["PATH", "SystemRoot"].iter().filter_map(|k| std::env::var(k).ok().map(|v| (k.to_string(), v))).collect()
+    ["PATH", "SystemRoot"]
+        .iter()
+        .filter_map(|k| std::env::var(k).ok().map(|v| (k.to_string(), v)))
+        .collect()
 }
 
 pub struct Opts {
@@ -40,7 +43,14 @@ pub struct Opts {
 
 impl Opts {
     pub fn agent(args: &[&str]) -> Self {
-        Self { agent_args: args.iter().map(|a| a.to_string()).collect(), soft_ms: None, steps: Vec::new(), host_bin: None, grace_ms: 3_000, mutating: false }
+        Self {
+            agent_args: args.iter().map(|a| a.to_string()).collect(),
+            soft_ms: None,
+            steps: Vec::new(),
+            host_bin: None,
+            grace_ms: 3_000,
+            mutating: false,
+        }
     }
 }
 
@@ -86,11 +96,17 @@ impl Run {
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(dir.join("protected")).unwrap();
         let attempt_id = format!("att-sup-{name}");
-        let (stdout, stderr) = (dir.join("capture-stdout.log"), dir.join("capture-stderr.log"));
+        let (stdout, stderr) = (
+            dir.join("capture-stdout.log"),
+            dir.join("capture-stderr.log"),
+        );
         let side_file = dir.join("protected").join("attempt-secrets.json");
         fs::write(&side_file, json!({"v": 1, "attemptId": attempt_id, "env": {}, "controlEpoch": 1, "controlToken": "t"}).to_string()).unwrap();
         let soft = opts.soft_ms.map(|ms| boottime_ns() + ms * 1_000_000);
-        let host_bin = opts.host_bin.clone().unwrap_or_else(|| internal_harness().to_string_lossy().into_owned());
+        let host_bin = opts
+            .host_bin
+            .clone()
+            .unwrap_or_else(|| internal_harness().to_string_lossy().into_owned());
         let lease_path = dir.join("cwd.lease");
         let mut value = json!({
             "v": 3,
@@ -137,9 +153,21 @@ impl Run {
         let take = |path: &Path| {
             use std::os::fd::AsRawFd;
             use std::os::unix::fs::OpenOptionsExt;
-            let file = fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).mode(0o600).open(path).unwrap();
+            let file = fs::OpenOptions::new()
+                .read(true)
+                .write(true)
+                .create(true)
+                .truncate(false)
+                .mode(0o600)
+                .open(path)
+                .unwrap();
             // SAFETY: flock on a descriptor this process owns.
-            assert_eq!(unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) }, 0, "controller takes {}", path.display());
+            assert_eq!(
+                unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) },
+                0,
+                "controller takes {}",
+                path.display()
+            );
             file
         };
         #[cfg(unix)]
@@ -162,15 +190,28 @@ impl Run {
     /// Keep the controller's copy, as the execution core does through commit.
     #[cfg(unix)]
     pub fn retain_lease(&self) -> fs::File {
-        self.lease.as_ref().expect("mutating lease").try_clone().unwrap()
+        self.lease
+            .as_ref()
+            .expect("mutating lease")
+            .try_clone()
+            .unwrap()
     }
 
     /// Start the supervisor. Unix: the lock description at slot 3, then the
     /// controller lets go of its copy. Windows: the supervisor takes the lock itself.
     pub fn start(&mut self) -> Child {
-        let log = fs::OpenOptions::new().create(true).append(true).open(self.dir.join("supervisor.log")).unwrap();
+        let log = fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(self.dir.join("supervisor.log"))
+            .unwrap();
         let mut cmd = Command::new(internal_harness());
-        cmd.args(["internal", "supervise", "--protocol", "1", "--envelope"]).arg(&self.envelope).env_clear().stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::from(log));
+        cmd.args(["internal", "supervise", "--protocol", "1", "--envelope"])
+            .arg(&self.envelope)
+            .env_clear()
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::from(log));
         #[cfg(unix)]
         {
             use std::os::unix::process::CommandExt;
@@ -179,7 +220,13 @@ impl Run {
             use fgos_process::FdSlot;
             // SAFETY: setsid is async-signal-safe; the supervisor leads its own session like a detached one.
             unsafe {
-                cmd.pre_exec(|| if libc::setsid() < 0 { Err(std::io::Error::last_os_error()) } else { Ok(()) });
+                cmd.pre_exec(|| {
+                    if libc::setsid() < 0 {
+                        Err(std::io::Error::last_os_error())
+                    } else {
+                        Ok(())
+                    }
+                });
             }
             let mut map = vec![(FdSlot(3), self.lock.as_ref().unwrap())];
             if let Some(lease) = &self.lease {
@@ -213,12 +260,18 @@ impl Run {
 
     /// Whether a stranger can take the attempt lock now.
     pub fn lock_is_free(&self) -> bool {
-        matches!(probe(&Resource::new("attempt", &self.lock_path)), Ok(Probe::Free))
+        matches!(
+            probe(&Resource::new("attempt", &self.lock_path)),
+            Ok(Probe::Free)
+        )
     }
 
     /// Whether a stranger can take the cwd lease now.
     pub fn lease_is_free(&self) -> bool {
-        matches!(probe(&Resource::new("dispatch-cwd", &self.lease_path)), Ok(Probe::Free))
+        matches!(
+            probe(&Resource::new("dispatch-cwd", &self.lease_path)),
+            Ok(Probe::Free)
+        )
     }
 
     /// `internal adopt` on this run's directory, as the host runs it: the one JSON line.
@@ -234,7 +287,11 @@ impl Run {
             .output()
             .unwrap();
         assert_eq!(out.status.code(), Some(0), "adopt exits 0");
-        String::from_utf8_lossy(&out.stdout).lines().filter_map(|l| serde_json::from_str::<Value>(l).ok()).next_back().expect("one adopt line")
+        String::from_utf8_lossy(&out.stdout)
+            .lines()
+            .filter_map(|l| serde_json::from_str::<Value>(l).ok())
+            .next_back()
+            .expect("one adopt line")
     }
 }
 
@@ -245,11 +302,18 @@ pub fn finish(mut child: Child, limit: Duration) -> (i32, Value) {
         if child.try_wait().unwrap().is_some() {
             break;
         }
-        assert!(start.elapsed() < limit, "supervisor did not exit within {limit:?}");
+        assert!(
+            start.elapsed() < limit,
+            "supervisor did not exit within {limit:?}"
+        );
         sleep(Duration::from_millis(20));
     }
     let out = child.wait_with_output().unwrap();
-    let line = String::from_utf8_lossy(&out.stdout).lines().last().and_then(|l| serde_json::from_str::<Value>(l).ok()).unwrap_or(Value::Null);
+    let line = String::from_utf8_lossy(&out.stdout)
+        .lines()
+        .last()
+        .and_then(|l| serde_json::from_str::<Value>(l).ok())
+        .unwrap_or(Value::Null);
     (out.status.code().unwrap_or(-1), line)
 }
 

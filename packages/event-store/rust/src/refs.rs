@@ -57,8 +57,20 @@ fn list_with_head_paged(
 ) -> Result<(Vec<fgos_git::RefEntry>, Option<fgos_git::HeadFact>), Error> {
     let mut all = prefixes.to_vec();
     all.push(fgos_git::RefPrefix::parse(HEADS).map_err(|e| invalid(e.to_string()))?);
-    let (entries, head) = pages(port, repo, &all, page_size, prefixes.iter().all(|p| p.as_str() < HEADS))?;
-    Ok((entries.into_iter().filter(|e| !e.name.as_str().starts_with(HEADS)).collect(), head))
+    let (entries, head) = pages(
+        port,
+        repo,
+        &all,
+        page_size,
+        prefixes.iter().all(|p| p.as_str() < HEADS),
+    )?;
+    Ok((
+        entries
+            .into_iter()
+            .filter(|e| !e.name.as_str().starts_with(HEADS))
+            .collect(),
+        head,
+    ))
 }
 fn pages(
     port: &dyn fgos_git::Inspect,
@@ -116,7 +128,13 @@ mod tests {
     use std::{fs, os::unix::fs::PermissionsExt, path::Path, process::Command};
 
     fn git(p: &Path, args: &[&str]) {
-        let ok = Command::new("git").arg("-C").arg(p).args(args).status().unwrap().success();
+        let ok = Command::new("git")
+            .arg("-C")
+            .arg(p)
+            .args(args)
+            .status()
+            .unwrap()
+            .success();
         assert!(ok, "{args:?}");
     }
     /// Branches `a`..`e` and one event ref; HEAD attached to `head`.
@@ -127,12 +145,28 @@ mod tests {
         fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
         git(&root, &["init", "-q", "--initial-branch=a", "repo"]);
         let repo = root.join("repo");
-        git(&repo, &["-c", "user.name=T", "-c", "user.email=t@example.invalid", "commit", "-q", "--allow-empty", "-m", "one"]);
+        git(
+            &repo,
+            &[
+                "-c",
+                "user.name=T",
+                "-c",
+                "user.email=t@example.invalid",
+                "commit",
+                "-q",
+                "--allow-empty",
+                "-m",
+                "one",
+            ],
+        );
         for b in ["b", "c", "d", "e"] {
             git(&repo, &["branch", b]);
         }
         git(&repo, &["update-ref", "refs/fgos/events/m1", "HEAD"]);
-        git(&repo, &["symbolic-ref", "HEAD", &format!("refs/heads/{head}")]);
+        git(
+            &repo,
+            &["symbolic-ref", "HEAD", &format!("refs/heads/{head}")],
+        );
         let driver = GitDriver::new(&root).unwrap();
         let handle = match driver.resolve_repo(&repo, &repo).unwrap() {
             ResolveRepo::Repository(r) => r,
@@ -148,14 +182,29 @@ mod tests {
     fn a_branch_heavy_repository_stops_at_the_first_page_and_a_head_beyond_it_is_unobserved() {
         // A page of three rows holds the event ref and branches `a`, `b`; `c`..`e` do not fit.
         let (root, driver, handle) = repo("limit", "e");
-        let (entries, head) = super::list_with_head_paged(&driver, &handle, &prefixes(), 3).unwrap();
-        assert_eq!(entries.len(), 1, "the event refs are complete and branches are not tips");
-        assert!(head.is_none(), "HEAD names a branch past the page: the caller must use resolve_head");
-        git(&root.join("repo"), &["symbolic-ref", "HEAD", "refs/heads/b"]);
+        let (entries, head) =
+            super::list_with_head_paged(&driver, &handle, &prefixes(), 3).unwrap();
+        assert_eq!(
+            entries.len(),
+            1,
+            "the event refs are complete and branches are not tips"
+        );
+        assert!(
+            head.is_none(),
+            "HEAD names a branch past the page: the caller must use resolve_head"
+        );
+        git(
+            &root.join("repo"),
+            &["symbolic-ref", "HEAD", "refs/heads/b"],
+        );
         let (_, head) = super::list_with_head_paged(&driver, &handle, &prefixes(), 3).unwrap();
-        assert!(matches!(head, Some(HeadFact::Attached { target, .. }) if target.as_str() == "refs/heads/b"));
+        assert!(
+            matches!(head, Some(HeadFact::Attached { target, .. }) if target.as_str() == "refs/heads/b")
+        );
         let (_, head) = super::list_with_head(&driver, &handle, &prefixes()).unwrap();
-        assert!(matches!(head, Some(HeadFact::Attached { target, .. }) if target.as_str() == "refs/heads/b"));
+        assert!(
+            matches!(head, Some(HeadFact::Attached { target, .. }) if target.as_str() == "refs/heads/b")
+        );
         let _ = fs::remove_dir_all(root);
     }
 }

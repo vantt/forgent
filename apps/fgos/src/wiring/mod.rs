@@ -1,5 +1,7 @@
 //! Source wiring modules for composition root.
 
+pub mod event_store_clone;
+pub mod identity_log;
 #[cfg(unix)]
 pub mod mailbox_config;
 #[cfg(unix)]
@@ -27,5 +29,3 @@ pub mod mailbox_verbs;
 #[path = "mailbox_verbs_unsupported.rs"]
 pub mod mailbox_verbs;
 pub mod metrics_sources;
-pub mod event_store_clone;
-pub mod identity_log;

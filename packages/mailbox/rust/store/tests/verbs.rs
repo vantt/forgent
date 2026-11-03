@@ -263,7 +263,10 @@ fn send_adds_the_untested_version_clause_from_the_recipients_version() {
         .filter(|entry| entry["cli"] == "claude")
         .map(|entry| entry["version"].as_str().unwrap())
         .collect();
-    assert!(listed.contains(&"2.1.309") && listed.contains(&"2.1.314"), "{listed:?}");
+    assert!(
+        listed.contains(&"2.1.309") && listed.contains(&"2.1.314"),
+        "{listed:?}"
+    );
     for version in listed {
         session(version);
         assert_eq!(
@@ -730,9 +733,25 @@ fn a_wake_to_a_codex_head_nudges_it_once_and_an_unread_wake_adds_no_second_nudge
     let first = go("one");
     let second = go("two");
 
-    assert!(first.text.ends_with("Its idle session was nudged to read it now."), "{}", first.text);
-    assert!(second.text.ends_with("An earlier nudge to it is still unread, so none was added."), "{}", second.text);
-    assert_eq!(*nudge.0.lock().unwrap(), ["head-c"], "one nudge for two unread wakes");
+    assert!(
+        first
+            .text
+            .ends_with("Its idle session was nudged to read it now."),
+        "{}",
+        first.text
+    );
+    assert!(
+        second
+            .text
+            .ends_with("An earlier nudge to it is still unread, so none was added."),
+        "{}",
+        second.text
+    );
+    assert_eq!(
+        *nudge.0.lock().unwrap(),
+        ["head-c"],
+        "one nudge for two unread wakes"
+    );
 }
 
 #[test]
@@ -753,7 +772,9 @@ fn a_wake_whose_recipient_version_is_unreadable_is_not_nudged_and_says_why() {
 
     assert!(answer.recorded);
     assert!(
-        answer.text.contains("could not be nudged (version-unreadable)"),
+        answer
+            .text
+            .contains("could not be nudged (version-unreadable)"),
         "{}",
         answer.text
     );

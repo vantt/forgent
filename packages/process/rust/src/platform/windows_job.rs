@@ -43,11 +43,21 @@ pub struct MemberState {
 /// Empty needs every member signaled and nothing unopenable. With the job it
 /// also needs accounting at zero; without it (tree fallback) it needs
 /// [`FALLBACK_QUIET_ROUNDS`] quiet polls in a row.
-pub fn decide(acct: Option<u32>, members: &[MemberState], unopenable: &[u32], quiet_rounds: u32, job_open: bool) -> DomainState {
+pub fn decide(
+    acct: Option<u32>,
+    members: &[MemberState],
+    unopenable: &[u32],
+    quiet_rounds: u32,
+    job_open: bool,
+) -> DomainState {
     if !unopenable.is_empty() || members.iter().any(|m| !m.signaled) {
         return DomainState::NotEmpty;
     }
-    let settled = if job_open { acct == Some(0) } else { quiet_rounds >= FALLBACK_QUIET_ROUNDS };
+    let settled = if job_open {
+        acct == Some(0)
+    } else {
+        quiet_rounds >= FALLBACK_QUIET_ROUNDS
+    };
     if settled {
         DomainState::Empty
     } else {
@@ -86,8 +96,16 @@ pub struct Tree {
 /// process created before `declared_at` is not part of the domain, and a
 /// domain member's whole parent chain was created after the declare, so its
 /// subtree is skipped too. The keeper is never a member and never walked.
-pub fn tree_from(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u32, u64)>, declared_at: u64) -> Tree {
-    let reused_since = procs.iter().find(|p| p.pid == holder.0 && p.created.is_some_and(|c| c != holder.1)).and_then(|p| p.created);
+pub fn tree_from(
+    procs: &[ProcEntry],
+    holder: (u32, u64),
+    keeper: Option<(u32, u64)>,
+    declared_at: u64,
+) -> Tree {
+    let reused_since = procs
+        .iter()
+        .find(|p| p.pid == holder.0 && p.created.is_some_and(|c| c != holder.1))
+        .and_then(|p| p.created);
     let mut known: BTreeMap<u32, u64> = BTreeMap::new();
     known.insert(holder.0, holder.1);
     let mut settled: BTreeSet<u32> = BTreeSet::new();
@@ -98,13 +116,16 @@ pub fn tree_from(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u32, u
             if p.pid == 0 || known.contains_key(&p.pid) || settled.contains(&p.pid) {
                 continue;
             }
-            let Some(parent_created) = known.get(&p.ppid).copied() else { continue };
+            let Some(parent_created) = known.get(&p.ppid).copied() else {
+                continue;
+            };
             let Some(created) = p.created else {
                 tree.unopenable.push(p.pid);
                 settled.insert(p.pid);
                 continue;
             };
-            let holder_pid_reused = p.ppid == holder.0 && reused_since.is_some_and(|r| created >= r);
+            let holder_pid_reused =
+                p.ppid == holder.0 && reused_since.is_some_and(|r| created >= r);
             if created < parent_created || holder_pid_reused {
                 continue;
             }
@@ -132,20 +153,39 @@ pub fn tree_from(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u32, u
 /// the holder, yet its process object is not signaled until its teardown
 /// finishes; the parent chain alone would miss it. These are only candidates
 /// to wait for, never to signal: an unrelated orphan looks the same.
-pub fn orphans_since(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u32, u64)>, declared_at: u64, tree: &Tree) -> Vec<(u32, u64)> {
+pub fn orphans_since(
+    procs: &[ProcEntry],
+    holder: (u32, u64),
+    keeper: Option<(u32, u64)>,
+    declared_at: u64,
+    tree: &Tree,
+) -> Vec<(u32, u64)> {
     // A holder pid that now belongs to a newer process means the holder died a while ago
     // (a pid is not reused within the milliseconds a closing job needs to tear down), so
     // nothing is tearing down on its behalf.
-    if procs.iter().any(|p| p.pid == holder.0 && p.created.is_some_and(|c| c != holder.1)) {
+    if procs
+        .iter()
+        .any(|p| p.pid == holder.0 && p.created.is_some_and(|c| c != holder.1))
+    {
         return Vec::new();
     }
-    let in_tree: BTreeSet<u32> = tree.members.iter().map(|(pid, _)| *pid).chain(tree.unopenable.iter().copied()).collect();
+    let in_tree: BTreeSet<u32> = tree
+        .members
+        .iter()
+        .map(|(pid, _)| *pid)
+        .chain(tree.unopenable.iter().copied())
+        .collect();
     let by_pid: BTreeMap<u32, &ProcEntry> = procs.iter().map(|p| (p.pid, p)).collect();
     let mut found: BTreeMap<u32, u64> = BTreeMap::new();
     for p in procs {
         let Some(created) = p.created else { continue };
-        let parent_alive = by_pid.get(&p.ppid).is_some_and(|parent| parent.created.is_none_or(|pc| pc <= created));
-        let excluded = p.pid == 0 || in_tree.contains(&p.pid) || (p.pid, created) == holder || keeper == Some((p.pid, created));
+        let parent_alive = by_pid
+            .get(&p.ppid)
+            .is_some_and(|parent| parent.created.is_none_or(|pc| pc <= created));
+        let excluded = p.pid == 0
+            || in_tree.contains(&p.pid)
+            || (p.pid, created) == holder
+            || keeper == Some((p.pid, created));
         if created >= declared_at && !parent_alive && !excluded {
             found.insert(p.pid, created);
         }
@@ -155,8 +195,12 @@ pub fn orphans_since(procs: &[ProcEntry], holder: (u32, u64), keeper: Option<(u3
         let mut grew = false;
         for p in procs {
             let Some(created) = p.created else { continue };
-            let Some(parent_created) = found.get(&p.ppid).copied() else { continue };
-            let excluded = found.contains_key(&p.pid) || in_tree.contains(&p.pid) || keeper == Some((p.pid, created));
+            let Some(parent_created) = found.get(&p.ppid).copied() else {
+                continue;
+            };
+            let excluded = found.contains_key(&p.pid)
+                || in_tree.contains(&p.pid)
+                || keeper == Some((p.pid, created));
             if !excluded && created >= parent_created && created >= declared_at {
                 found.insert(p.pid, created);
                 grew = true;
@@ -214,16 +258,26 @@ pub enum ListRead {
 /// Read a job's process-id list, starting with a buffer of `initial_slots`
 /// `usize` slots and growing it while the answer is "more data". `query`
 /// fills the buffer it is given (header first, ids from [`LIST_HEADER_SLOTS`]).
-pub fn read_id_list(initial_slots: usize, mut query: impl FnMut(&mut [usize]) -> ListRead) -> Option<Vec<u32>> {
+pub fn read_id_list(
+    initial_slots: usize,
+    mut query: impl FnMut(&mut [usize]) -> ListRead,
+) -> Option<Vec<u32>> {
     let mut slots = initial_slots.max(LIST_HEADER_SLOTS + 1);
     for _ in 0..16 {
         let mut buf = vec![0usize; slots];
         match query(&mut buf) {
             ListRead::Filled { in_list } => {
                 let end = (LIST_HEADER_SLOTS + in_list).min(buf.len());
-                return Some(buf[LIST_HEADER_SLOTS..end].iter().map(|id| *id as u32).collect());
+                return Some(
+                    buf[LIST_HEADER_SLOTS..end]
+                        .iter()
+                        .map(|id| *id as u32)
+                        .collect(),
+                );
             }
-            ListRead::MoreData { assigned } => slots = (LIST_HEADER_SLOTS + assigned).max(slots * 2),
+            ListRead::MoreData { assigned } => {
+                slots = (LIST_HEADER_SLOTS + assigned).max(slots * 2)
+            }
             ListRead::Failed => return None,
         }
     }
@@ -232,12 +286,30 @@ pub fn read_id_list(initial_slots: usize, mut query: impl FnMut(&mut [usize]) ->
 
 /// The lock name with everything outside `[A-Za-z0-9._-]` mapped to `_`.
 pub fn sanitize_lock_name(lock_name: &str) -> String {
-    lock_name.chars().map(|c| if c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-') { c } else { '_' }).collect()
+    lock_name
+        .chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-') {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect()
 }
 
 /// `Local\<prefix>-<sanitized lock name>-<pid>-<creation>-<counter>`.
-pub fn format_job_name(prefix: &str, lock_name: &str, pid: u32, creation: u64, counter: u32) -> String {
-    format!("Local\\{prefix}-{}-{pid}-{creation}-{counter}", sanitize_lock_name(lock_name))
+pub fn format_job_name(
+    prefix: &str,
+    lock_name: &str,
+    pid: u32,
+    creation: u64,
+    counter: u32,
+) -> String {
+    format!(
+        "Local\\{prefix}-{}-{pid}-{creation}-{counter}",
+        sanitize_lock_name(lock_name)
+    )
 }
 
 #[cfg(windows)]
@@ -252,20 +324,33 @@ mod os {
     use std::process::Child;
     use std::sync::atomic::{AtomicU32, Ordering};
 
-    use windows_sys::Win32::Foundation::{CloseHandle, GetLastError, ERROR_INVALID_PARAMETER, ERROR_MORE_DATA, FILETIME, HANDLE, INVALID_HANDLE_VALUE, WAIT_OBJECT_0};
+    use windows_sys::Win32::Foundation::{
+        CloseHandle, GetLastError, ERROR_INVALID_PARAMETER, ERROR_MORE_DATA, FILETIME, HANDLE,
+        INVALID_HANDLE_VALUE, WAIT_OBJECT_0,
+    };
     use windows_sys::Win32::Storage::FileSystem::SYNCHRONIZE;
     use windows_sys::Win32::System::Diagnostics::ToolHelp::{
-        CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, Thread32First, Thread32Next, PROCESSENTRY32W, TH32CS_SNAPPROCESS, TH32CS_SNAPTHREAD, THREADENTRY32,
+        CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, Thread32First, Thread32Next,
+        PROCESSENTRY32W, TH32CS_SNAPPROCESS, TH32CS_SNAPTHREAD, THREADENTRY32,
     };
     use windows_sys::Win32::System::JobObjects::{
-        AssignProcessToJobObject, CreateJobObjectW, IsProcessInJob, JobObjectBasicAccountingInformation, JobObjectBasicProcessIdList, JobObjectExtendedLimitInformation,
-        OpenJobObjectW, QueryInformationJobObject, SetInformationJobObject, TerminateJobObject, JOBOBJECT_BASIC_ACCOUNTING_INFORMATION, JOBOBJECT_EXTENDED_LIMIT_INFORMATION,
-        JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+        AssignProcessToJobObject, CreateJobObjectW, IsProcessInJob,
+        JobObjectBasicAccountingInformation, JobObjectBasicProcessIdList,
+        JobObjectExtendedLimitInformation, OpenJobObjectW, QueryInformationJobObject,
+        SetInformationJobObject, TerminateJobObject, JOBOBJECT_BASIC_ACCOUNTING_INFORMATION,
+        JOBOBJECT_EXTENDED_LIMIT_INFORMATION, JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
     };
     use windows_sys::Win32::System::RemoteDesktop::ProcessIdToSessionId;
-    use windows_sys::Win32::System::Threading::{GetCurrentProcess, GetCurrentProcessId, GetProcessTimes, OpenProcess, OpenThread, ResumeThread, TerminateProcess, WaitForSingleObject, PROCESS_QUERY_LIMITED_INFORMATION, THREAD_SUSPEND_RESUME};
+    use windows_sys::Win32::System::Threading::{
+        GetCurrentProcess, GetCurrentProcessId, GetProcessTimes, OpenProcess, OpenThread,
+        ResumeThread, TerminateProcess, WaitForSingleObject, PROCESS_QUERY_LIMITED_INFORMATION,
+        THREAD_SUSPEND_RESUME,
+    };
 
-    use super::{decide, format_job_name, orphans_since, read_id_list, tree_from, ListRead, MemberState, OrphanWindow, ProcEntry};
+    use super::{
+        decide, format_job_name, orphans_since, read_id_list, tree_from, ListRead, MemberState,
+        OrphanWindow, ProcEntry,
+    };
     use crate::control::{signal_by_identity, Signal};
     use crate::facts::{Observed, ProcTuple};
     use crate::platform;
@@ -318,7 +403,8 @@ mod os {
     fn creation_time(handle: HANDLE) -> Option<u64> {
         // SAFETY: four valid out-pointers for a handle opened with query access.
         unsafe {
-            let (mut c, mut e, mut k, mut u): (FILETIME, FILETIME, FILETIME, FILETIME) = std::mem::zeroed();
+            let (mut c, mut e, mut k, mut u): (FILETIME, FILETIME, FILETIME, FILETIME) =
+                std::mem::zeroed();
             (GetProcessTimes(handle, &mut c, &mut e, &mut k, &mut u) != 0).then(|| filetime_u64(&c))
         }
     }
@@ -336,7 +422,9 @@ mod os {
             let handle = unsafe { OpenProcess(access, 0, pid) };
             if !handle.is_null() {
                 let handle = Owned(handle);
-                let created = (access != SYNCHRONIZE).then(|| creation_time(handle.0)).flatten();
+                let created = (access != SYNCHRONIZE)
+                    .then(|| creation_time(handle.0))
+                    .flatten();
                 return Ok((handle, created));
             }
             // SAFETY: reads the calling thread's last error.
@@ -395,7 +483,12 @@ mod os {
         let rc = unsafe {
             let mut info: JOBOBJECT_EXTENDED_LIMIT_INFORMATION = std::mem::zeroed();
             info.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-            SetInformationJobObject(handle, JobObjectExtendedLimitInformation, &info as *const _ as *const c_void, std::mem::size_of::<JOBOBJECT_EXTENDED_LIMIT_INFORMATION>() as u32)
+            SetInformationJobObject(
+                handle,
+                JobObjectExtendedLimitInformation,
+                &info as *const _ as *const c_void,
+                std::mem::size_of::<JOBOBJECT_EXTENDED_LIMIT_INFORMATION>() as u32,
+            )
         };
         if rc == 0 {
             return Err(io::Error::last_os_error());
@@ -407,7 +500,16 @@ mod os {
     pub fn open_job(name: &str) -> io::Result<Job> {
         let wide = wide(name);
         // SAFETY: a NUL-terminated name.
-        let handle = unsafe { OpenJobObjectW(JOB_OBJECT_QUERY_RIGHT | JOB_OBJECT_TERMINATE_RIGHT | JOB_OBJECT_ASSIGN_PROCESS_RIGHT | SYNCHRONIZE, 0, wide.as_ptr()) };
+        let handle = unsafe {
+            OpenJobObjectW(
+                JOB_OBJECT_QUERY_RIGHT
+                    | JOB_OBJECT_TERMINATE_RIGHT
+                    | JOB_OBJECT_ASSIGN_PROCESS_RIGHT
+                    | SYNCHRONIZE,
+                0,
+                wide.as_ptr(),
+            )
+        };
         if handle.is_null() {
             return Err(io::Error::last_os_error());
         }
@@ -422,7 +524,13 @@ mod os {
             // SAFETY: the pseudo handle of this process is always valid.
             creation_time(unsafe { GetCurrentProcess() }).unwrap_or(0)
         };
-        format_job_name(prefix, lock_name, std::process::id(), creation, COUNTER.fetch_add(1, Ordering::Relaxed))
+        format_job_name(
+            prefix,
+            lock_name,
+            std::process::id(),
+            creation,
+            COUNTER.fetch_add(1, Ordering::Relaxed),
+        )
     }
 
     /// The thread id of the only thread of `pid`, a process created suspended.
@@ -444,7 +552,10 @@ mod os {
                 more = Thread32Next(snap.0, &mut entry) != 0;
             }
         }
-        Err(io::Error::new(io::ErrorKind::NotFound, format!("no thread of pid {pid} in the snapshot")))
+        Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("no thread of pid {pid} in the snapshot"),
+        ))
     }
 
     /// Put a child created with `CREATE_SUSPENDED` into `job`, then resume its
@@ -506,7 +617,13 @@ mod os {
         // SAFETY: a zeroed accounting block of the size the class expects.
         unsafe {
             let mut info: JOBOBJECT_BASIC_ACCOUNTING_INFORMATION = std::mem::zeroed();
-            let ok = QueryInformationJobObject(job, JobObjectBasicAccountingInformation, &mut info as *mut _ as *mut c_void, std::mem::size_of::<JOBOBJECT_BASIC_ACCOUNTING_INFORMATION>() as u32, std::ptr::null_mut());
+            let ok = QueryInformationJobObject(
+                job,
+                JobObjectBasicAccountingInformation,
+                &mut info as *mut _ as *mut c_void,
+                std::mem::size_of::<JOBOBJECT_BASIC_ACCOUNTING_INFORMATION>() as u32,
+                std::ptr::null_mut(),
+            );
             (ok != 0).then_some(info.ActiveProcesses)
         }
     }
@@ -514,13 +631,25 @@ mod os {
     fn job_ids(job: HANDLE, slots: usize) -> Option<Vec<u32>> {
         read_id_list(slots, |buf| {
             // SAFETY: the buffer is `buf.len()` usize slots, header first.
-            let ok = unsafe { QueryInformationJobObject(job, JobObjectBasicProcessIdList, buf.as_mut_ptr() as *mut c_void, std::mem::size_of_val(buf) as u32, std::ptr::null_mut()) };
+            let ok = unsafe {
+                QueryInformationJobObject(
+                    job,
+                    JobObjectBasicProcessIdList,
+                    buf.as_mut_ptr() as *mut c_void,
+                    std::mem::size_of_val(buf) as u32,
+                    std::ptr::null_mut(),
+                )
+            };
             if ok != 0 {
-                return ListRead::Filled { in_list: header_in_list(buf) };
+                return ListRead::Filled {
+                    in_list: header_in_list(buf),
+                };
             }
             // SAFETY: reads the calling thread's last error.
             if unsafe { GetLastError() } == ERROR_MORE_DATA {
-                return ListRead::MoreData { assigned: header_assigned(buf) };
+                return ListRead::MoreData {
+                    assigned: header_assigned(buf),
+                };
             }
             ListRead::Failed
         })
@@ -571,7 +700,11 @@ mod os {
             entry.dwSize = std::mem::size_of::<PROCESSENTRY32W>() as u32;
             let mut more = Process32FirstW(snap.0, &mut entry) != 0;
             while more {
-                rows.push(read_row(entry.th32ProcessID, entry.th32ParentProcessID, job));
+                rows.push(read_row(
+                    entry.th32ProcessID,
+                    entry.th32ParentProcessID,
+                    job,
+                ));
                 more = Process32NextW(snap.0, &mut entry) != 0;
             }
         }
@@ -582,7 +715,15 @@ mod os {
         // SAFETY: OpenProcess takes plain values and returns a handle or null.
         let raw = unsafe { OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, 0, pid) };
         if raw.is_null() {
-            return Snap { entry: ProcEntry { pid, ppid, created: None }, handle: None, in_job: false };
+            return Snap {
+                entry: ProcEntry {
+                    pid,
+                    ppid,
+                    created: None,
+                },
+                handle: None,
+                in_job: false,
+            };
         }
         let handle = Owned(raw);
         let in_job = job.is_some_and(|job| {
@@ -590,7 +731,15 @@ mod os {
             // SAFETY: both handles are open; one BOOL out.
             unsafe { IsProcessInJob(handle.0, job, &mut result) != 0 && result != 0 }
         });
-        Snap { entry: ProcEntry { pid, ppid, created: creation_time(handle.0) }, handle: Some(handle), in_job }
+        Snap {
+            entry: ProcEntry {
+                pid,
+                ppid,
+                created: creation_time(handle.0),
+            },
+            handle: Some(handle),
+            in_job,
+        }
     }
 
     // ---------- the shared poller ----------
@@ -665,27 +814,51 @@ mod os {
             let mut named: BTreeMap<u32, Named> = BTreeMap::new();
             if let Some(job) = job {
                 match job_ids(job, LIST_SLOTS) {
-                    Some(ids) => ids.into_iter().for_each(|pid| named.entry(pid).or_default().in_list = true),
+                    Some(ids) => ids
+                        .into_iter()
+                        .for_each(|pid| named.entry(pid).or_default().in_list = true),
                     // A list that cannot be read cannot prove the job empty.
                     None => acct = None,
                 }
             }
-            let mut snap = if (scan && job.is_some()) || tree.is_some() { snapshot(job.filter(|_| scan)) } else { vec![] };
+            let mut snap = if (scan && job.is_some()) || tree.is_some() {
+                snapshot(job.filter(|_| scan))
+            } else {
+                vec![]
+            };
             if scan {
-                snap.iter().filter(|s| s.in_job).for_each(|s| named.entry(s.entry.pid).or_default().in_scan = true);
+                snap.iter()
+                    .filter(|s| s.in_job)
+                    .for_each(|s| named.entry(s.entry.pid).or_default().in_scan = true);
             }
             let mut unopenable: Vec<u32> = vec![];
             if let Some(record) = tree {
                 let procs: Vec<ProcEntry> = snap.iter().map(|s| s.entry).collect();
-                let holder = record.holder.start_time.parse::<u64>().map(|created| (record.holder.pid.0, created));
-                let keeper = record.keeper.as_ref().and_then(|k| k.start_time.parse::<u64>().ok().map(|created| (k.pid.0, created)));
+                let holder = record
+                    .holder
+                    .start_time
+                    .parse::<u64>()
+                    .map(|created| (record.holder.pid.0, created));
+                let keeper = record.keeper.as_ref().and_then(|k| {
+                    k.start_time
+                        .parse::<u64>()
+                        .ok()
+                        .map(|created| (k.pid.0, created))
+                });
                 match holder {
                     Ok(holder) => {
                         let found = tree_from(&procs, holder, keeper, record.declared_at);
-                        found.members.iter().for_each(|(pid, _)| named.entry(*pid).or_default().in_tree = true);
+                        found
+                            .members
+                            .iter()
+                            .for_each(|(pid, _)| named.entry(*pid).or_default().in_tree = true);
                         if job.is_none() {
                             if self.orphan_window.is_open(std::time::Instant::now()) {
-                                orphans_since(&procs, holder, keeper, record.declared_at, &found).into_iter().for_each(|(pid, _)| named.entry(pid).or_default().in_orphan = true);
+                                orphans_since(&procs, holder, keeper, record.declared_at, &found)
+                                    .into_iter()
+                                    .for_each(|(pid, _)| {
+                                        named.entry(pid).or_default().in_orphan = true
+                                    });
                             }
                         }
                         unopenable.extend(found.unopenable);
@@ -709,7 +882,10 @@ mod os {
             // After the window an orphan candidate that no other source ever named stops counting.
             if self.orphan_window.is_closed(std::time::Instant::now()) {
                 for pid in std::mem::take(&mut self.orphan_pids) {
-                    let by_other = self.seen.get(&pid).is_some_and(|n| n.in_list || n.in_scan || n.in_tree);
+                    let by_other = self
+                        .seen
+                        .get(&pid)
+                        .is_some_and(|n| n.in_list || n.in_scan || n.in_tree);
                     if !by_other {
                         self.tracked.remove(&pid);
                     }
@@ -721,10 +897,11 @@ mod os {
                 }
                 let snapped = snap.iter_mut().find(|s| s.entry.pid == pid);
                 let in_snapshot = snapped.is_some();
-                let opened = match snapped.and_then(|s| s.handle.take().map(|h| (h, s.entry.created))) {
-                    Some(pair) => Ok(pair),
-                    None => open_for_wait(pid),
-                };
+                let opened =
+                    match snapped.and_then(|s| s.handle.take().map(|h| (h, s.entry.created))) {
+                        Some(pair) => Ok(pair),
+                        None => open_for_wait(pid),
+                    };
                 match opened {
                     Ok((handle, created)) => {
                         self.tracked.insert(pid, Tracked { handle, created });
@@ -734,13 +911,30 @@ mod os {
                     Err(_) => {}
                 }
             }
-            let members: Vec<MemberState> = self.tracked.iter().map(|(pid, t)| MemberState { pid: *pid, signaled: signaled(t.handle.0) }).collect();
+            let members: Vec<MemberState> = self
+                .tracked
+                .iter()
+                .map(|(pid, t)| MemberState {
+                    pid: *pid,
+                    signaled: signaled(t.handle.0),
+                })
+                .collect();
             let outside_job = named
                 .iter()
                 .filter(|(_, n)| n.in_tree && !n.in_list && !n.in_scan)
-                .filter_map(|(pid, _)| self.tracked.get(pid).filter(|t| !signaled(t.handle.0)).and_then(|t| t.created.map(|c| (*pid, c))))
+                .filter_map(|(pid, _)| {
+                    self.tracked
+                        .get(pid)
+                        .filter(|t| !signaled(t.handle.0))
+                        .and_then(|t| t.created.map(|c| (*pid, c)))
+                })
                 .collect();
-            Poll { acct, members, unopenable, outside_job }
+            Poll {
+                acct,
+                members,
+                unopenable,
+                outside_job,
+            }
         }
     }
 
@@ -780,7 +974,11 @@ mod os {
         /// handles show them now (for naming what a bounded wait left behind).
         pub fn live_pids(&mut self) -> Vec<u32> {
             let poll = self.core.poll(self.with_scan, None);
-            poll.members.iter().filter(|m| !m.signaled).map(|m| m.pid).collect()
+            poll.members
+                .iter()
+                .filter(|m| !m.signaled)
+                .map(|m| m.pid)
+                .collect()
         }
 
         /// End every process in the job.
@@ -803,7 +1001,9 @@ mod os {
         let mut child = find(std::process::id());
         while let Some(me) = child {
             let Some(parent) = find(me.ppid) else { break };
-            let (Some(parent_created), Some(child_created)) = (parent.created, me.created) else { break };
+            let (Some(parent_created), Some(child_created)) = (parent.created, me.created) else {
+                break;
+            };
             if parent_created > child_created || chain.len() >= 64 {
                 break;
             }
@@ -844,14 +1044,21 @@ mod os {
     pub fn own_session() -> Option<u32> {
         let mut session = 0;
         // SAFETY: one out-pointer for this process's id.
-        (unsafe { ProcessIdToSessionId(GetCurrentProcessId(), &mut session) } != 0).then_some(session)
+        (unsafe { ProcessIdToSessionId(GetCurrentProcessId(), &mut session) } != 0)
+            .then_some(session)
     }
 
     impl ContenderView {
         /// A view of `record`; the job is opened here and again on a poll while
         /// it has not opened yet.
         pub fn new(record: &WindowsJob) -> ContenderView {
-            let mut view = ContenderView { record: record.clone(), core: Core::default(), other_session: own_session() != Some(record.session_id), quiet_rounds: 0, job_opened: false };
+            let mut view = ContenderView {
+                record: record.clone(),
+                core: Core::default(),
+                other_session: own_session() != Some(record.session_id),
+                quiet_rounds: 0,
+                job_opened: false,
+            };
             if !view.other_session {
                 view.core.try_open(&record.job);
                 view.job_opened = view.core.job.is_some();
@@ -866,7 +1073,20 @@ mod os {
 
         /// Every pid the polls so far named, with the sources that named it.
         pub fn trace(&self) -> Vec<(u32, NamedBy)> {
-            self.core.seen.iter().map(|(pid, n)| (*pid, NamedBy { list: n.in_list, scan: n.in_scan, tree: n.in_tree || n.in_orphan })).collect()
+            self.core
+                .seen
+                .iter()
+                .map(|(pid, n)| {
+                    (
+                        *pid,
+                        NamedBy {
+                            list: n.in_list,
+                            scan: n.in_scan,
+                            tree: n.in_tree || n.in_orphan,
+                        },
+                    )
+                })
+                .collect()
         }
 
         /// Set once a poll answered "not empty" because the record is from
@@ -892,7 +1112,11 @@ mod os {
                 // The holder released through the normal rule, so its job is the
                 // whole domain; with no job there is nothing left to see.
                 if !job_open {
-                    return if self.core.job_gone() { DomainState::Empty } else { DomainState::NotEmpty };
+                    return if self.core.job_gone() {
+                        DomainState::Empty
+                    } else {
+                        DomainState::NotEmpty
+                    };
                 }
                 let poll = self.core.poll(true, None);
                 return decide(poll.acct, &poll.members, &poll.unopenable, 0, true);
@@ -900,7 +1124,13 @@ mod os {
             let poll = self.core.poll(job_open, Some(&self.record));
             let quiet = poll.unopenable.is_empty() && poll.members.iter().all(|m| m.signaled);
             self.quiet_rounds = if quiet { self.quiet_rounds + 1 } else { 0 };
-            decide(poll.acct, &poll.members, &poll.unopenable, self.quiet_rounds, job_open)
+            decide(
+                poll.acct,
+                &poll.members,
+                &poll.unopenable,
+                self.quiet_rounds,
+                job_open,
+            )
         }
 
         /// End the domain at once. A live holder is never touched and neither is
@@ -923,7 +1153,13 @@ mod os {
             let platform = platform::current();
             let mut outcome = KillOutcome::Ok;
             for (pid, created) in poll.outside_job {
-                let tuple = ProcTuple { host: platform.host(), boot_id: platform.boot_id(), pid_ns: platform.pid_ns().id, pid: ProcId(pid), start_time: created.to_string() };
+                let tuple = ProcTuple {
+                    host: platform.host(),
+                    boot_id: platform.boot_id(),
+                    pid_ns: platform.pid_ns().id,
+                    pid: ProcId(pid),
+                    start_time: created.to_string(),
+                };
                 if !signal_settled(&signal_by_identity(&tuple, Signal::Kill)) {
                     outcome = KillOutcome::Refused;
                 }
@@ -938,21 +1174,36 @@ mod tests {
     use super::*;
 
     fn live(pid: u32) -> MemberState {
-        MemberState { pid, signaled: false }
+        MemberState {
+            pid,
+            signaled: false,
+        }
     }
 
     fn dead(pid: u32) -> MemberState {
-        MemberState { pid, signaled: true }
+        MemberState {
+            pid,
+            signaled: true,
+        }
     }
 
     fn row(pid: u32, ppid: u32, created: u64) -> ProcEntry {
-        ProcEntry { pid, ppid, created: Some(created) }
+        ProcEntry {
+            pid,
+            ppid,
+            created: Some(created),
+        }
     }
 
     #[test]
     fn a_member_whose_parent_left_is_a_candidate_with_its_own_descendants() {
         // holder 10 (dead, absent), git 20 under it is gone; sh 30 lost its parent, hook 40 is sh's child.
-        let procs = [row(30, 20, 300), row(40, 30, 400), row(50, 5, 50), row(60, 1, 500)];
+        let procs = [
+            row(30, 20, 300),
+            row(40, 30, 400),
+            row(50, 5, 50),
+            row(60, 1, 500),
+        ];
         let tree = tree_from(&procs, (10, 100), None, 200);
         assert!(tree.members.is_empty(), "the chain through 20 is broken");
         let found = orphans_since(&procs, (10, 100), None, 200, &tree);
@@ -963,10 +1214,20 @@ mod tests {
     #[test]
     fn processes_with_a_live_parent_or_older_than_the_declare_are_not_candidates() {
         // 50 predates the declare; 70's parent 60 is alive and unrelated to the domain.
-        let procs = [row(50, 5, 50), row(60, 1, 150), row(70, 60, 300), row(10, 2, 100)];
+        let procs = [
+            row(50, 5, 50),
+            row(60, 1, 150),
+            row(70, 60, 300),
+            row(10, 2, 100),
+        ];
         let tree = tree_from(&procs, (10, 100), None, 200);
         let found = orphans_since(&procs, (10, 100), None, 200, &tree);
-        assert!(found.iter().all(|(pid, _)| *pid != 70 && *pid != 50 && *pid != 10), "{found:?}");
+        assert!(
+            found
+                .iter()
+                .all(|(pid, _)| *pid != 70 && *pid != 50 && *pid != 10),
+            "{found:?}"
+        );
     }
 
     #[test]
@@ -975,7 +1236,10 @@ mod tests {
         let tree = tree_from(&procs, (10, 100), Some((30, 310)), 200);
         assert_eq!(tree.members, vec![(20, 300)]);
         let found = orphans_since(&procs, (10, 100), Some((30, 310)), 200, &tree);
-        assert!(found.iter().all(|(pid, _)| *pid != 20 && *pid != 30), "{found:?}");
+        assert!(
+            found.iter().all(|(pid, _)| *pid != 20 && *pid != 30),
+            "{found:?}"
+        );
     }
 
     #[test]
@@ -999,7 +1263,10 @@ mod tests {
         let t0 = std::time::Instant::now();
         let mut window = OrphanWindow::default();
         assert!(!window.is_closed(t0), "not started yet");
-        assert!(window.is_open(t0), "the first poll that finds the job gone starts it");
+        assert!(
+            window.is_open(t0),
+            "the first poll that finds the job gone starts it"
+        );
         assert!(window.is_open(t0 + ORPHAN_SETTLE / 2));
         let late = t0 + ORPHAN_SETTLE + std::time::Duration::from_millis(1);
         assert!(!window.is_open(late), "closed: the clause names nothing");
@@ -1012,29 +1279,53 @@ mod tests {
     fn a_live_member_the_list_omits_keeps_the_domain_not_empty() {
         // Accounting says zero and the list is empty, yet the scan or the tree
         // named a process whose object is still unsignaled.
-        assert_eq!(decide(Some(0), &[dead(10), live(11)], &[], 0, true), DomainState::NotEmpty);
+        assert_eq!(
+            decide(Some(0), &[dead(10), live(11)], &[], 0, true),
+            DomainState::NotEmpty
+        );
     }
 
     #[test]
     fn zero_accounting_with_an_unsignaled_member_is_not_empty() {
-        assert_eq!(decide(Some(0), &[live(7)], &[], 0, true), DomainState::NotEmpty);
-        assert_eq!(decide(Some(0), &[dead(7)], &[], 0, true), DomainState::Empty);
-        assert_eq!(decide(Some(1), &[dead(7)], &[], 0, true), DomainState::NotEmpty);
+        assert_eq!(
+            decide(Some(0), &[live(7)], &[], 0, true),
+            DomainState::NotEmpty
+        );
+        assert_eq!(
+            decide(Some(0), &[dead(7)], &[], 0, true),
+            DomainState::Empty
+        );
+        assert_eq!(
+            decide(Some(1), &[dead(7)], &[], 0, true),
+            DomainState::NotEmpty
+        );
         assert_eq!(decide(None, &[], &[], 0, true), DomainState::NotEmpty);
     }
 
     #[test]
     fn an_unopenable_pid_keeps_the_domain_not_empty() {
-        assert_eq!(decide(Some(0), &[dead(7)], &[99], 0, true), DomainState::NotEmpty);
+        assert_eq!(
+            decide(Some(0), &[dead(7)], &[99], 0, true),
+            DomainState::NotEmpty
+        );
         assert_eq!(decide(None, &[], &[99], 9, false), DomainState::NotEmpty);
     }
 
     #[test]
     fn the_fallback_needs_two_quiet_rounds() {
-        assert_eq!(decide(None, &[dead(7)], &[], 0, false), DomainState::NotEmpty);
-        assert_eq!(decide(None, &[dead(7)], &[], 1, false), DomainState::NotEmpty);
+        assert_eq!(
+            decide(None, &[dead(7)], &[], 0, false),
+            DomainState::NotEmpty
+        );
+        assert_eq!(
+            decide(None, &[dead(7)], &[], 1, false),
+            DomainState::NotEmpty
+        );
         assert_eq!(decide(None, &[dead(7)], &[], 2, false), DomainState::Empty);
-        assert_eq!(decide(None, &[live(7)], &[], 2, false), DomainState::NotEmpty);
+        assert_eq!(
+            decide(None, &[live(7)], &[], 2, false),
+            DomainState::NotEmpty
+        );
     }
 
     #[test]
@@ -1045,13 +1336,20 @@ mod tests {
             sizes.push(buf.len());
             let room = buf.len() - LIST_HEADER_SLOTS;
             if room < members.len() {
-                return ListRead::MoreData { assigned: members.len() };
+                return ListRead::MoreData {
+                    assigned: members.len(),
+                };
             }
             buf[LIST_HEADER_SLOTS..LIST_HEADER_SLOTS + members.len()].copy_from_slice(&members);
-            ListRead::Filled { in_list: members.len() }
+            ListRead::Filled {
+                in_list: members.len(),
+            }
         });
         assert_eq!(ids, Some(vec![101, 102, 103, 104, 105]));
-        assert!(sizes.len() >= 2 && sizes[0] < sizes[1], "retried with a bigger buffer: {sizes:?}");
+        assert!(
+            sizes.len() >= 2 && sizes[0] < sizes[1],
+            "retried with a bigger buffer: {sizes:?}"
+        );
         assert_eq!(read_id_list(2, |_| ListRead::Failed), None);
     }
 
@@ -1061,7 +1359,14 @@ mod tests {
 
     #[test]
     fn the_tree_keeps_descendants_created_at_or_after_the_declare() {
-        let procs = [p(10, 1, Some(100)), p(11, 10, Some(150)), p(12, 11, Some(160)), p(13, 10, Some(90)), p(14, 13, Some(170)), p(20, 1, Some(155))];
+        let procs = [
+            p(10, 1, Some(100)),
+            p(11, 10, Some(150)),
+            p(12, 11, Some(160)),
+            p(13, 10, Some(90)),
+            p(14, 13, Some(170)),
+            p(20, 1, Some(155)),
+        ];
         let tree = tree_from(&procs, (10, 100), None, 140);
         let mut pids: Vec<u32> = tree.members.iter().map(|m| m.0).collect();
         pids.sort_unstable();
@@ -1072,7 +1377,12 @@ mod tests {
 
     #[test]
     fn the_tree_never_names_the_holder_or_the_keeper() {
-        let procs = [p(10, 1, Some(100)), p(11, 10, Some(150)), p(12, 10, Some(151)), p(13, 12, Some(160))];
+        let procs = [
+            p(10, 1, Some(100)),
+            p(11, 10, Some(150)),
+            p(12, 10, Some(151)),
+            p(13, 12, Some(160)),
+        ];
         let tree = tree_from(&procs, (10, 100), Some((12, 151)), 140);
         let pids: Vec<u32> = tree.members.iter().map(|m| m.0).collect();
         assert_eq!(pids, vec![11]);
@@ -1082,7 +1392,11 @@ mod tests {
     fn a_reused_holder_pid_does_not_claim_the_new_owners_children() {
         // Pid 10 now belongs to a process created at 500; its child 30 is its
         // own, while 11 was created (at 150) under the old holder.
-        let procs = [p(10, 1, Some(500)), p(11, 10, Some(150)), p(30, 10, Some(510))];
+        let procs = [
+            p(10, 1, Some(500)),
+            p(11, 10, Some(150)),
+            p(30, 10, Some(510)),
+        ];
         let tree = tree_from(&procs, (10, 100), None, 140);
         let pids: Vec<u32> = tree.members.iter().map(|m| m.0).collect();
         assert_eq!(pids, vec![11]);
@@ -1090,15 +1404,26 @@ mod tests {
 
     #[test]
     fn a_child_whose_creation_time_is_unreadable_is_unopenable() {
-        let procs = [p(10, 1, Some(100)), p(11, 10, None), p(12, 11, Some(160)), p(40, 99, None)];
+        let procs = [
+            p(10, 1, Some(100)),
+            p(11, 10, None),
+            p(12, 11, Some(160)),
+            p(40, 99, None),
+        ];
         let tree = tree_from(&procs, (10, 100), None, 140);
         assert_eq!(tree.unopenable, vec![11]);
-        assert!(tree.members.is_empty(), "the unreadable node is not walked: {tree:?}");
+        assert!(
+            tree.members.is_empty(),
+            "the unreadable node is not walked: {tree:?}"
+        );
     }
 
     #[test]
     fn job_names_follow_the_documented_shape() {
         assert_eq!(sanitize_lock_name("main checkout/x y"), "main_checkout_x_y");
-        assert_eq!(format_job_name("fgos-borrow", "a:b", 7, 99, 3), "Local\\fgos-borrow-a_b-7-99-3");
+        assert_eq!(
+            format_job_name("fgos-borrow", "a:b", 7, 99, 3),
+            "Local\\fgos-borrow-a_b-7-99-3"
+        );
     }
 }

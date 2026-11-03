@@ -90,7 +90,11 @@ pub fn format_offset(offset_seconds: i32) -> Option<String> {
     }
     let sign = if offset_seconds < 0 { '-' } else { '+' };
     let absolute = offset_seconds.unsigned_abs();
-    Some(format!("{sign}{:02}:{:02}", absolute / 3_600, absolute % 3_600 / 60))
+    Some(format!(
+        "{sign}{:02}:{:02}",
+        absolute / 3_600,
+        absolute % 3_600 / 60
+    ))
 }
 
 /// Formats Unix milliseconds in the supplied numeric UTC offset.
@@ -107,7 +111,11 @@ pub fn format_unix_millis_rfc3339(unix_millis: i64, offset_seconds: i32) -> Opti
     let hour = seconds_of_day / 3_600;
     let minute = seconds_of_day % 3_600 / 60;
     let second = seconds_of_day % 60;
-    let offset = if offset_seconds == 0 { "Z".to_owned() } else { format_offset(offset_seconds)? };
+    let offset = if offset_seconds == 0 {
+        "Z".to_owned()
+    } else {
+        format_offset(offset_seconds)?
+    };
     Some(format!(
         "{year:04}-{month:02}-{day:02}T{hour:02}:{minute:02}:{second:02}.{millis:03}{offset}"
     ))
@@ -190,11 +198,15 @@ fn parse_rfc3339(timestamp: &str) -> Option<(i64, i32)> {
             if hours > 23 || minutes > 59 {
                 return None;
             }
-            i32::try_from((hours * 3_600 + minutes * 60) * if *sign == b'+' { 1 } else { -1 }).ok()?
+            i32::try_from((hours * 3_600 + minutes * 60) * if *sign == b'+' { 1 } else { -1 })
+                .ok()?
         }
         _ => return None,
     };
-    Some((midnight + (hour * 3_600 + minute * 60 + second - i64::from(offset)) * 1_000 + fraction, offset))
+    Some((
+        midnight + (hour * 3_600 + minute * 60 + second - i64::from(offset)) * 1_000 + fraction,
+        offset,
+    ))
 }
 
 fn number(value: &str) -> Option<i64> {

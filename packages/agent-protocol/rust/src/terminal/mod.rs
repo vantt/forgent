@@ -50,10 +50,14 @@ impl TerminalOutcome {
     /// The receipt's `reason` for an outcome that ends the run early; `None` for a step that went well.
     pub fn receipt_reason(&self) -> Option<String> {
         match self {
-            TerminalOutcome::Blocked(reason) => Some(format!("terminal:blocked:{}", reason.as_str())),
+            TerminalOutcome::Blocked(reason) => {
+                Some(format!("terminal:blocked:{}", reason.as_str()))
+            }
             TerminalOutcome::NeedsHuman => Some("terminal:needs-human".into()),
             TerminalOutcome::DeliveryUnknown => Some("terminal:delivery-unknown".into()),
-            TerminalOutcome::Ready | TerminalOutcome::Delivered | TerminalOutcome::Completed { .. } => None,
+            TerminalOutcome::Ready
+            | TerminalOutcome::Delivered
+            | TerminalOutcome::Completed { .. } => None,
         }
     }
 }
@@ -142,7 +146,11 @@ impl FsOutbox {
     /// Keep the contents and timestamp so edits between supervisor polls reset the grace.
     pub fn newest_unreadable(&mut self, io: &mut dyn AgentIo) -> Option<UnreadableResult> {
         let found = self.stable_newest(io, |bytes| !bytes.is_empty() && !is_json_object(bytes))?;
-        Some(UnreadableResult { path: found.path, bytes: found.bytes, modified: found.modified })
+        Some(UnreadableResult {
+            path: found.path,
+            bytes: found.bytes,
+            modified: found.modified,
+        })
     }
 
     fn newest_read(&self) -> Option<Found> {
@@ -152,7 +160,11 @@ impl FsOutbox {
             .collect();
         let path = newest_result(&self.dir, names.iter().map(String::as_str))?;
         let (bytes, modified) = read_result(&self.dir, &path)?;
-        Some(Found { path, bytes, modified })
+        Some(Found {
+            path,
+            bytes,
+            modified,
+        })
     }
 
     /// The newest result when `wanted` accepts its bytes and they, with the modified time, are
@@ -192,19 +204,26 @@ fn is_json_object(bytes: &[u8]) -> bool {
 fn read_result(dir: &Path, path: &Path) -> Option<(Vec<u8>, SystemTime)> {
     let opened = fgos_durable_file::open_beneath(dir, Path::new(path.file_name()?)).ok()??;
     let bytes = opened.read(MAX_RESULT_BYTES).ok()?.bytes;
-    Some((bytes, std::fs::symlink_metadata(path).ok()?.modified().ok()?))
+    Some((
+        bytes,
+        std::fs::symlink_metadata(path).ok()?.modified().ok()?,
+    ))
 }
 
 #[cfg(windows)]
 fn read_result(_dir: &Path, path: &Path) -> Option<(Vec<u8>, SystemTime)> {
     use std::io::Read as _;
-    let mut file = fgos_durable_file::open_no_reparse(std::fs::OpenOptions::new().read(true), path).ok()?;
+    let mut file =
+        fgos_durable_file::open_no_reparse(std::fs::OpenOptions::new().read(true), path).ok()?;
     let metadata = file.metadata().ok()?;
     if metadata.len() > MAX_RESULT_BYTES as u64 {
         return None;
     }
     let mut bytes = Vec::new();
-    (&mut file).take(MAX_RESULT_BYTES as u64 + 1).read_to_end(&mut bytes).ok()?;
+    (&mut file)
+        .take(MAX_RESULT_BYTES as u64 + 1)
+        .read_to_end(&mut bytes)
+        .ok()?;
     (bytes.len() <= MAX_RESULT_BYTES).then_some((bytes, metadata.modified().ok()?))
 }
 
@@ -254,7 +273,9 @@ pub fn adapter_for(cli: &str) -> Option<Terminal> {
 }
 
 fn quota_on(screen: &str) -> bool {
-    lines_of_interest(screen).iter().any(|line| is_quota_limit(line))
+    lines_of_interest(screen)
+        .iter()
+        .any(|line| is_quota_limit(line))
 }
 
 fn lines_of_interest(screen: &str) -> Vec<String> {
@@ -328,7 +349,11 @@ impl Terminal {
             return None;
         }
         let lowered = bottom_lines(&screen, 20).to_lowercase();
-        let banner = self.profile.start_banners.iter().find(|b| lowered.contains(b.marker))?;
+        let banner = self
+            .profile
+            .start_banners
+            .iter()
+            .find(|b| lowered.contains(b.marker))?;
         Some((banner, screen))
     }
 

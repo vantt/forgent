@@ -96,7 +96,13 @@ impl Record {
         };
         let pid = value
             .get("pid")
-            .and_then(|v| v.as_u64().or_else(|| v.as_f64().filter(|f| f.fract() == 0.0 && *f >= 0.0).map(|f| f as u64)))
+            .and_then(|v| {
+                v.as_u64().or_else(|| {
+                    v.as_f64()
+                        .filter(|f| f.fract() == 0.0 && *f >= 0.0)
+                        .map(|f| f as u64)
+                })
+            })
             .filter(|p| *p > 0 && *p <= u64::from(u32::MAX))
             .map(|p| ProcId(p as u32));
         let anchor = value
@@ -108,7 +114,10 @@ impl Record {
             boot_id: text("bootId").filter(|b| !b.is_empty() && b != "unknown-boot"),
             pid_ns: text("pidNs"),
             pid,
-            start_time: value.get("startTime").and_then(scalar_text).or_else(|| value.get("processStartTime").and_then(scalar_text)),
+            start_time: value
+                .get("startTime")
+                .and_then(scalar_text)
+                .or_else(|| value.get("processStartTime").and_then(scalar_text)),
             anchor,
         }
     }
@@ -302,7 +311,10 @@ pub fn file_key(file: &File) -> io::Result<(u64, u64)> {
     #[cfg(not(unix))]
     {
         let _ = file;
-        Err(io::Error::new(io::ErrorKind::Unsupported, "file keys are not readable on this platform"))
+        Err(io::Error::new(
+            io::ErrorKind::Unsupported,
+            "file keys are not readable on this platform",
+        ))
     }
 }
 
@@ -346,9 +358,14 @@ pub struct FileUser {
 /// return `None`. Never use this diagnostic snapshot to authorize mutation.
 pub fn file_users(dev: u64, ino: u64) -> Option<Vec<FileUser>> {
     #[cfg(target_os = "linux")]
-    { crate::platform::linux::file_users(dev, ino) }
+    {
+        crate::platform::linux::file_users(dev, ino)
+    }
     #[cfg(not(target_os = "linux"))]
-    { let _ = (dev, ino); None }
+    {
+        let _ = (dev, ino);
+        None
+    }
 }
 
 /// One process's place in the process tree at the moment it was read.
@@ -421,7 +438,11 @@ pub fn creation_mark() -> Option<CreationMark> {
     let at = std::time::Instant::now();
     let last_pid = platform::current().last_pid();
     let ticks = boot_ticks_now()?.saturating_sub(1);
-    Some(CreationMark { last_pid, ticks, at })
+    Some(CreationMark {
+        last_pid,
+        ticks,
+        at,
+    })
 }
 
 /// The processes that can have been created after `mark`, without reading
@@ -512,7 +533,15 @@ pub(crate) fn parse_stat(line: &str) -> Option<Stat> {
 /// Parent, group, state and start time from one `/proc/<pid>/stat` line.
 pub fn parse_relation(pid: ProcId, line: &str) -> Option<Relation> {
     let stat = parse_stat(line)?;
-    Some(Relation { pid, parent: stat.parent, group: stat.group, session: stat.session, tty_nr: stat.tty_nr, start_ticks: stat.start_ticks, state: stat.state })
+    Some(Relation {
+        pid,
+        parent: stat.parent,
+        group: stat.group,
+        session: stat.session,
+        tty_nr: stat.tty_nr,
+        start_ticks: stat.start_ticks,
+        state: stat.state,
+    })
 }
 
 /// What [`scan`] reads for each process.
@@ -597,13 +626,23 @@ mod tests {
         assert!(me.start_ticks > 0);
         // SAFETY: getsid has no preconditions.
         assert_eq!(me.session, unsafe { libc::getsid(0) } as u32);
-        let mut child = std::process::Command::new("sleep").arg("1").spawn().unwrap();
+        let mut child = std::process::Command::new("sleep")
+            .arg("1")
+            .spawn()
+            .unwrap();
         let pid = child.id();
         child.kill().unwrap();
         child.wait().unwrap();
         assert_eq!(relation_of(ProcId(pid)), None);
         // The scan view of the same process names its argv and the variables asked for.
-        let view = view_of(ProcId(std::process::id()), &ScanFilter { env_keys: vec!["PATH".into()], include_self: true }).expect("this process is readable");
+        let view = view_of(
+            ProcId(std::process::id()),
+            &ScanFilter {
+                env_keys: vec!["PATH".into()],
+                include_self: true,
+            },
+        )
+        .expect("this process is readable");
         assert!(view.cmdline.is_some_and(|argv| !argv.is_empty()));
         assert!(view.env_subset.contains_key("PATH"));
     }
@@ -612,7 +651,10 @@ mod tests {
     #[test]
     fn a_process_started_after_boot_ticks_now_has_no_smaller_start() {
         let before = boot_ticks_now().expect("boot clock");
-        let mut child = std::process::Command::new("sleep").arg("1").spawn().unwrap();
+        let mut child = std::process::Command::new("sleep")
+            .arg("1")
+            .spawn()
+            .unwrap();
         let start = relations()
             .unwrap()
             .into_iter()
@@ -628,10 +670,22 @@ mod tests {
         let line = "4242 (weird) name (x)) S 100 4242 77 34816 4242 4194304 0 0 0 0 1 2 0 0 20 0 1 0 987654 1 2 3";
         assert_eq!(
             parse_relation(ProcId(4242), line),
-            Some(Relation { pid: ProcId(4242), parent: 100, group: 4242, session: 77, tty_nr: 34816, start_ticks: 987654, state: 'S' })
+            Some(Relation {
+                pid: ProcId(4242),
+                parent: 100,
+                group: 4242,
+                session: 77,
+                tty_nr: 34816,
+                start_ticks: 987654,
+                state: 'S'
+            })
         );
         assert_eq!(parse_relation(ProcId(1), "1 (x) S 0"), None);
-        let zombie = parse_relation(ProcId(9), "9 (dead) Z 100 9 77 0 9 4194304 0 0 0 0 1 2 0 0 20 0 1 0 55 1 2 3").expect("zombie line");
+        let zombie = parse_relation(
+            ProcId(9),
+            "9 (dead) Z 100 9 77 0 9 4194304 0 0 0 0 1 2 0 0 20 0 1 0 55 1 2 3",
+        )
+        .expect("zombie line");
         assert!(zombie.is_gone() && !parse_relation(ProcId(4242), line).unwrap().is_gone());
     }
 
@@ -643,11 +697,16 @@ mod tests {
 
     #[test]
     fn reads_the_command_name_with_spaces_and_parentheses_whole() {
-        assert_eq!(parse_command_name("4242 (weird) name (x)) S 100"), Some("weird) name (x)"));
+        assert_eq!(
+            parse_command_name("4242 (weird) name (x)) S 100"),
+            Some("weird) name (x)")
+        );
         assert_eq!(parse_command_name("1 (omp) S 0"), Some("omp"));
         assert_eq!(parse_command_name("no parenthesis"), None);
         #[cfg(target_os = "linux")]
-        assert!(!command_name_of(ProcId(std::process::id())).expect("this process is readable").is_empty());
+        assert!(!command_name_of(ProcId(std::process::id()))
+            .expect("this process is readable")
+            .is_empty());
     }
 
     #[test]
@@ -658,21 +717,50 @@ mod tests {
 
     #[test]
     fn record_from_json_applies_the_legacy_field_and_rejects_bad_pids() {
-        let legacy = Record::from_json(&serde_json::json!({ "pid": 4242, "processStartTime": "100" }));
+        let legacy =
+            Record::from_json(&serde_json::json!({ "pid": 4242, "processStartTime": "100" }));
         assert_eq!(legacy.pid, Some(ProcId(4242)));
         assert_eq!(legacy.start_time.as_deref(), Some("100"));
-        for bad in [serde_json::json!({ "pid": "abc" }), serde_json::json!({ "pid": 0 }), serde_json::json!({ "pid": null }), serde_json::json!({ "pid": 4294967296u64 }), serde_json::json!({ "pid": 1.5 }), serde_json::json!({})] {
+        for bad in [
+            serde_json::json!({ "pid": "abc" }),
+            serde_json::json!({ "pid": 0 }),
+            serde_json::json!({ "pid": null }),
+            serde_json::json!({ "pid": 4294967296u64 }),
+            serde_json::json!({ "pid": 1.5 }),
+            serde_json::json!({}),
+        ] {
             assert_eq!(Record::from_json(&bad).pid, None, "{bad}");
         }
-        assert_eq!(Record::from_json(&serde_json::json!({ "pid": 4242.0 })).pid, Some(ProcId(4242)), "an integral float is the integer it prints as");
-        assert_eq!(Record::from_json(&serde_json::json!({ "startTime": 100 })).start_time.as_deref(), Some("100"), "a numeric start time compares by its text");
+        assert_eq!(
+            Record::from_json(&serde_json::json!({ "pid": 4242.0 })).pid,
+            Some(ProcId(4242)),
+            "an integral float is the integer it prints as"
+        );
+        assert_eq!(
+            Record::from_json(&serde_json::json!({ "startTime": 100 }))
+                .start_time
+                .as_deref(),
+            Some("100"),
+            "a numeric start time compares by its text"
+        );
     }
 
     #[test]
     fn a_boot_id_that_names_no_boot_reads_as_absent() {
-        assert_eq!(Record::from_json(&serde_json::json!({ "bootId": "unknown-boot" })).boot_id, None);
-        assert_eq!(Record::from_json(&serde_json::json!({ "bootId": "" })).boot_id, None);
-        assert_eq!(Record::from_json(&serde_json::json!({ "bootId": "b1" })).boot_id.as_deref(), Some("b1"));
+        assert_eq!(
+            Record::from_json(&serde_json::json!({ "bootId": "unknown-boot" })).boot_id,
+            None
+        );
+        assert_eq!(
+            Record::from_json(&serde_json::json!({ "bootId": "" })).boot_id,
+            None
+        );
+        assert_eq!(
+            Record::from_json(&serde_json::json!({ "bootId": "b1" }))
+                .boot_id
+                .as_deref(),
+            Some("b1")
+        );
     }
 
     #[test]
@@ -683,7 +771,10 @@ mod tests {
             pid_ns: Some("pid:[1]".into()),
             pid: Some(ProcId(7)),
             start_time: Some("100".into()),
-            anchor: Some(Box::new(Record { pid: Some(ProcId(1)), ..Record::default() })),
+            anchor: Some(Box::new(Record {
+                pid: Some(ProcId(1)),
+                ..Record::default()
+            })),
         };
         assert_eq!(Record::from_json(&record.to_json()), record);
     }

@@ -12,12 +12,14 @@
 //! The process facts are reached through an injected judge, so every rule
 //! here is tested without real processes.
 
-use crate::current::{current_session, machine_info, os_record, read_head, session_for, CurrentSession};
+use crate::current::{
+    current_session, machine_info, os_record, read_head, session_for, CurrentSession,
+};
 use crate::proc_tree::{os_process_tree, ProcessTree};
 use crate::project;
 use crate::refusal::{Candidate, Liveness, Refusal, Remote};
-use crate::shared::SharedView;
 use crate::resolve::{terminal_head, HeadRef, WriterKey};
+use crate::shared::SharedView;
 use crate::text::{base32_prefix, iso_utc_now};
 use fgos_durable_file::{install_once_with_mode, replace_durably_with_mode, Installed};
 use fgos_process::facts::{judge_here, Record, Verdict};
@@ -34,7 +36,8 @@ const MAX_SCAN: usize = 2 * MAX_ENTRIES;
 /// identifier kind beside it. This list is the one place that knows them.
 pub const ROLE_KINDS: [(&str, &str); 2] = [("lead:", "lane-id"), ("work:", "work-item-id")];
 /// What a refused role is not, for the refusal detail.
-const ROLE_SHAPE: &str = "`lead:<LANE>` with a Convention lane-id or `work:<name>` with a Convention work-item-id";
+const ROLE_SHAPE: &str =
+    "`lead:<LANE>` with a Convention lane-id or `work:<name>` with a Convention work-item-id";
 const FORMAT_VERSION: u32 = 1;
 const FILE_SUFFIX: &str = ".json";
 const FILE_HASH_LENGTH: usize = 12;
@@ -162,7 +165,10 @@ fn file_name(handle: &str) -> String {
 
 /// Why `role` is not a role alias, as a Convention code; `None` when it is.
 pub fn role_problem(role: &str) -> Option<&'static str> {
-    let Some((prefix, kind)) = ROLE_KINDS.iter().find(|(prefix, _)| role.starts_with(prefix)) else {
+    let Some((prefix, kind)) = ROLE_KINDS
+        .iter()
+        .find(|(prefix, _)| role.starts_with(prefix))
+    else {
         return Some("invalid-identifier");
     };
     fgos_convention::rules::packaged_rules()
@@ -175,7 +181,9 @@ pub fn role_problem(role: &str) -> Option<&'static str> {
 /// Whether `query` is shaped as a role alias (a role kind's prefix) rather
 /// than a handle; the name after the prefix is not checked here.
 pub fn is_role_alias(query: &str) -> bool {
-    ROLE_KINDS.iter().any(|(prefix, _)| query.starts_with(prefix))
+    ROLE_KINDS
+        .iter()
+        .any(|(prefix, _)| query.starts_with(prefix))
 }
 
 /// The agent head's process facts: the highest ancestor of the caller that
@@ -222,7 +230,12 @@ fn scan(root: &Path, judge: Judge) -> Result<Scan, Refusal> {
     let dir = directory(root);
     let reader = match fs::read_dir(&dir) {
         Ok(reader) => reader,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Scan { rows: Vec::new(), foreign: 0 }),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            return Ok(Scan {
+                rows: Vec::new(),
+                foreign: 0,
+            })
+        }
         Err(e) => return Err(unreadable(&dir, e)),
     };
     let mut rows = Vec::new();
@@ -240,7 +253,11 @@ fn scan(root: &Path, judge: Judge) -> Result<Scan, Refusal> {
         match entry {
             Some(entry) => {
                 let verdict = entry.verdict(judge);
-                rows.push(Row { file, entry, verdict });
+                rows.push(Row {
+                    file,
+                    entry,
+                    verdict,
+                });
             }
             None => foreign += 1,
         }
@@ -257,7 +274,11 @@ fn remove(root: &Path, file: &str) -> Result<(), Refusal> {
 }
 
 /// Removes the rows `doomed` selects and returns the rows left and how many went.
-fn sweep(root: &Path, rows: Vec<Row>, doomed: impl Fn(&Row) -> bool) -> Result<(Vec<Row>, usize), Refusal> {
+fn sweep(
+    root: &Path,
+    rows: Vec<Row>,
+    doomed: impl Fn(&Row) -> bool,
+) -> Result<(Vec<Row>, usize), Refusal> {
     let (gone, kept): (Vec<Row>, Vec<Row>) = rows.into_iter().partition(|row| doomed(row));
     for row in &gone {
         remove(root, &row.file)?;
@@ -305,7 +326,11 @@ fn read_named(root: &Path, handle: &str, judge: Judge) -> Option<Row> {
         .and_then(|bytes| serde_json::from_slice::<Entry>(&bytes).ok())
         .filter(|entry| entry.v == FORMAT_VERSION && file_name(&entry.handle) == file)?;
     let verdict = entry.verdict(judge);
-    Some(Row { file, entry, verdict })
+    Some(Row {
+        file,
+        entry,
+        verdict,
+    })
 }
 
 /// Registration of an entry that takes no role into a directory below its cap:
@@ -432,7 +457,12 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
         }
     }
     for row in rows.iter().filter(|row| {
-        row.entry.id != merged.id && row.entry.roles.iter().any(|role| merged.roles.contains(role))
+        row.entry.id != merged.id
+            && row
+                .entry
+                .roles
+                .iter()
+                .any(|role| merged.roles.contains(role))
     }) {
         let mut holder = row.entry.clone();
         holder.roles.retain(|role| !merged.roles.contains(role));
@@ -509,7 +539,11 @@ pub fn register_writer(
     take: bool,
 ) -> Result<Listed, Refusal> {
     let session = session_for(state_root, key, Some(head))?;
-    let record = read_head(head).map_err(|detail| Refusal { reason: "head-not-live", detail, candidates: Vec::new() })?;
+    let record = read_head(head).map_err(|detail| Refusal {
+        reason: "head-not-live",
+        detail,
+        candidates: Vec::new(),
+    })?;
     register_session(state_root, session, Some(record), clone_dir, roles, take)
 }
 
@@ -532,18 +566,27 @@ pub fn drop_role(root: &Path, own_id: &str, role: &str, judge: Judge) -> Result<
         return Err(Refusal {
             candidates: Vec::new(),
             reason: "not-registered",
-            detail: format!("{own_id} is not in the session directory, so it holds no role; register it first"),
+            detail: format!(
+                "{own_id} is not in the session directory, so it holds no role; register it first"
+            ),
         });
     };
     if !row.entry.roles.iter().any(|held| held == role) {
         return Err(Refusal {
             candidates: rows
                 .iter()
-                .filter(|other| other.verdict != Verdict::Dead && other.entry.roles.iter().any(|held| held == role))
+                .filter(|other| {
+                    other.verdict != Verdict::Dead
+                        && other.entry.roles.iter().any(|held| held == role)
+                })
                 .map(candidate_of)
                 .collect(),
             reason: "role-not-held",
-            detail: format!("{} does not hold {role}; it holds: {}", row.entry.handle, join(&row.entry.roles)),
+            detail: format!(
+                "{} does not hold {role}; it holds: {}",
+                row.entry.handle,
+                join(&row.entry.roles)
+            ),
         });
     }
     let mut entry = row.entry.clone();
@@ -570,7 +613,12 @@ pub fn drop_current_role(
 /// only when this machine's directory has no answer does `shared` (the
 /// sessions other machines published) get asked; a full id of another machine
 /// resolves through it, and is `not-found` without it.
-pub fn resolve(root: &Path, query: &str, judge: Judge, shared: Option<&SharedView>) -> Result<Listed, Refusal> {
+pub fn resolve(
+    root: &Path,
+    query: &str,
+    judge: Judge,
+    shared: Option<&SharedView>,
+) -> Result<Listed, Refusal> {
     let query = query.trim();
     if let Some((machine_id, _)) = query.split_once('/') {
         return resolve_full_id(root, machine_id, query, judge, shared);
@@ -607,7 +655,10 @@ pub fn resolve(root: &Path, query: &str, judge: Judge, shared: Option<&SharedVie
                 .collect();
             let mut missing = Refusal {
                 reason: "not-found",
-                detail: format!("no live session is named {query:?}; candidates: {}", join(&names)),
+                detail: format!(
+                    "no live session is named {query:?}; candidates: {}",
+                    join(&names)
+                ),
                 candidates: live
                     .iter()
                     .filter(|row| {
@@ -632,19 +683,36 @@ pub fn resolve(root: &Path, query: &str, judge: Judge, shared: Option<&SharedVie
             }
         }
         many => {
-            let ids: Vec<String> = many.iter().map(|row| format!("{} ({})", row.entry.handle, row.entry.id)).collect();
+            let ids: Vec<String> = many
+                .iter()
+                .map(|row| format!("{} ({})", row.entry.handle, row.entry.id))
+                .collect();
             let candidates = many.iter().map(|row| candidate_of(row)).collect();
             Err(Refusal {
                 reason: "ambiguous",
-                detail: format!("{query:?} names {} live sessions: {}", many.len(), join(&ids)),
+                detail: format!(
+                    "{query:?} names {} live sessions: {}",
+                    many.len(),
+                    join(&ids)
+                ),
                 candidates,
             })
         }
     }
 }
 
-fn resolve_full_id(root: &Path, machine_id: &str, id: &str, judge: Judge, shared: Option<&SharedView>) -> Result<Listed, Refusal> {
-    let not_found = |detail: String| Refusal { reason: "not-found", detail, candidates: Vec::new() };
+fn resolve_full_id(
+    root: &Path,
+    machine_id: &str,
+    id: &str,
+    judge: Judge,
+    shared: Option<&SharedView>,
+) -> Result<Listed, Refusal> {
+    let not_found = |detail: String| Refusal {
+        reason: "not-found",
+        detail,
+        candidates: Vec::new(),
+    };
     if machine_info(root)?.id != machine_id {
         return match shared {
             Some(view) => view.resolve(id),
@@ -698,7 +766,10 @@ pub fn list(
         .collect();
     sessions.sort_by(|a, b| (&a.registered_at, &a.handle).cmp(&(&b.registered_at, &b.handle)));
     if let Some(view) = shared {
-        let taken: Vec<String> = sessions.iter().flat_map(|session| session.roles.clone()).collect();
+        let taken: Vec<String> = sessions
+            .iter()
+            .flat_map(|session| session.roles.clone())
+            .collect();
         sessions.extend(view.list(project_id, &taken));
     }
     Ok(Sessions { sessions, pruned })

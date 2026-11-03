@@ -419,7 +419,9 @@ pub fn fenced_legacy(
         entries.push(TreeEntry {
             name: b"seal.json".to_vec(),
             mode: 0o100644,
-            oid: p.write_blob(&f.repo, &seal.canonical_line().unwrap()).unwrap(),
+            oid: p
+                .write_blob(&f.repo, &seal.canonical_line().unwrap())
+                .unwrap(),
         });
         git_order(&mut entries);
         let tree = p.write_tree(&f.repo, &entries).unwrap();

@@ -78,7 +78,11 @@ pub enum Recorded {
 }
 
 fn refuse(reason: &'static str, detail: impl Into<String>) -> Refusal {
-    Refusal { reason, detail: detail.into(), candidates: Vec::new() }
+    Refusal {
+        reason,
+        detail: detail.into(),
+        candidates: Vec::new(),
+    }
 }
 
 pub fn directory(state_root: &Path) -> PathBuf {
@@ -86,11 +90,17 @@ pub fn directory(state_root: &Path) -> PathBuf {
 }
 
 fn read_file(path: &Path) -> Result<Pin, Refusal> {
-    let raw = fs::read_to_string(path).map_err(|e| refuse("pins-unreadable", format!("{}: {e}", path.display())))?;
+    let raw = fs::read_to_string(path)
+        .map_err(|e| refuse("pins-unreadable", format!("{}: {e}", path.display())))?;
     serde_json::from_str::<Pin>(&raw)
         .ok()
         .filter(|pin| pin.v == VERSION && valid_machine_id(&pin.machine_id))
-        .ok_or_else(|| refuse("pins-unreadable", format!("{} is not a pin file", path.display())))
+        .ok_or_else(|| {
+            refuse(
+                "pins-unreadable",
+                format!("{} is not a pin file", path.display()),
+            )
+        })
 }
 
 /// Pins `pin` unless its machine already has one. A pin file that cannot be
@@ -100,14 +110,19 @@ pub fn record(state_root: &Path, pin: &Pin) -> Result<Recorded, Refusal> {
         return Err(refuse("invalid-signature", "machineId is not a machine id"));
     }
     let dir = directory(state_root);
-    fs::create_dir_all(&dir).map_err(|e| refuse("pin-write-failed", format!("{}: {e}", dir.display())))?;
+    fs::create_dir_all(&dir)
+        .map_err(|e| refuse("pin-write-failed", format!("{}: {e}", dir.display())))?;
     let mut bytes = serde_json::to_vec(pin).expect("Pin always serializes");
     bytes.push(b'\n');
     match fgos_durable_file::install_once_with_mode(&dir, &pin.machine_id, &bytes, 0o600) {
         Ok(fgos_durable_file::Installed::Created) => Ok(Recorded::Created),
         Ok(fgos_durable_file::Installed::AlreadyExists) => {
             let existing = read_file(&dir.join(&pin.machine_id))?;
-            Ok(if existing.public_key == pin.public_key { Recorded::Same(existing) } else { Recorded::Different(existing) })
+            Ok(if existing.public_key == pin.public_key {
+                Recorded::Same(existing)
+            } else {
+                Recorded::Different(existing)
+            })
         }
         Err(e) => Err(refuse("pin-write-failed", e.to_string())),
     }
@@ -137,24 +152,45 @@ pub fn list(state_root: &Path) -> Result<Vec<Pin>, Refusal> {
 /// signature of that machine pins its new key. Returns the pin removed.
 pub fn forget(state_root: &Path, machine_id: &str) -> Result<Pin, Refusal> {
     if !valid_machine_id(machine_id) {
-        return Err(refuse("invalid-machine-id", format!("{machine_id:?} is not a machine id")));
+        return Err(refuse(
+            "invalid-machine-id",
+            format!("{machine_id:?} is not a machine id"),
+        ));
     }
     let _lock = lock(state_root)?;
     let path = directory(state_root).join(machine_id);
     let pin = read_file(&path).map_err(|e| {
-        if path.exists() { e } else { refuse("pin-not-found", format!("machine {machine_id} has no pinned key")) }
+        if path.exists() {
+            e
+        } else {
+            refuse(
+                "pin-not-found",
+                format!("machine {machine_id} has no pinned key"),
+            )
+        }
     })?;
-    fs::remove_file(&path).map_err(|e| refuse("pin-write-failed", format!("{}: {e}", path.display())))?;
+    fs::remove_file(&path)
+        .map_err(|e| refuse("pin-write-failed", format!("{}: {e}", path.display())))?;
     Ok(pin)
 }
 
 /// Takes the registered `identity-pins` lock (`<state root>/locks/identity-pins.lock`) through
 /// holder-lock; it is released when the scope drops.
 fn lock(state_root: &Path) -> Result<LockScope<'static>, Refusal> {
-    let failed = |e: ScopeError| refuse("pin-write-failed", format!("cannot take the pins lock: {e}"));
+    let failed = |e: ScopeError| {
+        refuse(
+            "pin-write-failed",
+            format!("cannot take the pins lock: {e}"),
+        )
+    };
     let mut scope = LockScope::seeded(Vec::new()).map_err(failed)?;
-    let params = BTreeMap::from([("lockRoot".to_owned(), state_root.join("locks").to_string_lossy().into_owned())]);
-    scope.acquire(LOCK_NAME, &params, Wait::Ms(LOCK_WAIT_MS)).map_err(failed)?;
+    let params = BTreeMap::from([(
+        "lockRoot".to_owned(),
+        state_root.join("locks").to_string_lossy().into_owned(),
+    )]);
+    scope
+        .acquire(LOCK_NAME, &params, Wait::Ms(LOCK_WAIT_MS))
+        .map_err(failed)?;
     Ok(scope)
 }
 
@@ -166,14 +202,22 @@ fn lock(state_root: &Path) -> Result<LockScope<'static>, Refusal> {
 /// concurrent [`forget`] either wins (`pin-missing`) or runs after the confirm.
 pub fn confirm(state_root: &Path, machine_id: &str, fingerprint: &str) -> Result<Pin, Refusal> {
     if !valid_machine_id(machine_id) {
-        return Err(refuse("invalid-machine-id", format!("{machine_id:?} is not a machine id")));
+        return Err(refuse(
+            "invalid-machine-id",
+            format!("{machine_id:?} is not a machine id"),
+        ));
     }
     let _lock = lock(state_root)?;
     let dir = directory(state_root);
     let path = dir.join(machine_id);
     let mut pin = match read_file(&path) {
         Ok(pin) => pin,
-        Err(_) if !path.exists() => return Err(refuse("pin-missing", format!("machine {machine_id} has no pinned key to confirm"))),
+        Err(_) if !path.exists() => {
+            return Err(refuse(
+                "pin-missing",
+                format!("machine {machine_id} has no pinned key to confirm"),
+            ))
+        }
         Err(e) => return Err(e),
     };
     if pin.fingerprint != fingerprint {

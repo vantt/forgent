@@ -37,12 +37,21 @@ fn two_descriptions_in_one_process_exclude_each_other() {
     let res = resource(&dir, "two");
     let first = acquired(acquire(&res, Mode::Ex, Wait::Try, 2000));
     match acquire(&res, Mode::Ex, Wait::Try, 2000) {
-        Acquire::Held { reason: HeldReason::KernelLockHeld, domain: None } => {}
+        Acquire::Held {
+            reason: HeldReason::KernelLockHeld,
+            domain: None,
+        } => {}
         other => panic!("second description must be held out: {other:?}"),
     }
-    assert!(matches!(release(first), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(first),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     let second = acquired(acquire(&res, Mode::Ex, Wait::Try, 2000));
-    assert!(matches!(release(second), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(second),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -55,10 +64,19 @@ fn a_sigkilled_holder_frees_the_lock_at_once() {
     let mut holder = spawn_role("holder", &res.path, &ready, "");
     wait_ready(&ready, &mut holder);
     assert_eq!(probe(&res).unwrap(), Probe::Held);
-    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Held { reason: HeldReason::KernelLockHeld, .. }));
+    assert!(matches!(
+        acquire(&res, Mode::Ex, Wait::Try, 2000),
+        Acquire::Held {
+            reason: HeldReason::KernelLockHeld,
+            ..
+        }
+    ));
     kill_and_reap(&mut holder);
     assert_eq!(probe(&res).unwrap(), Probe::Free);
-    assert!(matches!(release(acquired(acquire(&res, Mode::Ex, Wait::Try, 2000))), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(acquired(acquire(&res, Mode::Ex, Wait::Try, 2000))),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -72,13 +90,22 @@ fn wait_ms_times_out_and_nothing_is_kept() {
     wait_ready(&ready, &mut holder);
     let started = Instant::now();
     match acquire(&res, Mode::Ex, Wait::Ms(300), 2000) {
-        Acquire::Timeout { waited_ms } => assert!((300..800).contains(&waited_ms), "waited {waited_ms} ms"),
+        Acquire::Timeout { waited_ms } => {
+            assert!((300..800).contains(&waited_ms), "waited {waited_ms} ms")
+        }
         other => panic!("expected timeout: {other:?}"),
     }
     let elapsed = started.elapsed();
-    assert!(elapsed >= Duration::from_millis(300) && elapsed < Duration::from_millis(800), "{elapsed:?}");
+    assert!(
+        elapsed >= Duration::from_millis(300) && elapsed < Duration::from_millis(800),
+        "{elapsed:?}"
+    );
     kill_and_reap(&mut holder);
-    assert_eq!(probe(&res).unwrap(), Probe::Free, "the timed-out acquire must not hold anything");
+    assert_eq!(
+        probe(&res).unwrap(),
+        Probe::Free,
+        "the timed-out acquire must not hold anything"
+    );
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -90,8 +117,15 @@ fn probes_are_shared_and_never_obstruct_each_other() {
     // A probe in progress is a shared lock on its own description; another
     // probe still answers free.
     fs::write(&res.path, b"").unwrap();
-    let in_progress = fs::OpenOptions::new().read(true).write(true).open(&res.path).unwrap();
-    assert!(matches!(fgos_holder_lock::port::lock_description(&in_progress, Mode::Sh, Wait::Try).unwrap(), fgos_holder_lock::port::DescriptionLock::Locked));
+    let in_progress = fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(&res.path)
+        .unwrap();
+    assert!(matches!(
+        fgos_holder_lock::port::lock_description(&in_progress, Mode::Sh, Wait::Try).unwrap(),
+        fgos_holder_lock::port::DescriptionLock::Locked
+    ));
     assert_eq!(probe(&res).unwrap(), Probe::Free);
     drop(in_progress);
     // An exclusive holder in another process: held.
@@ -129,15 +163,27 @@ fn predecessor_gate_is_killed_before_the_next_holder_proceeds() {
         let started = Instant::now();
         let handle = acquired(acquire(&res, Mode::Ex, Wait::Ms(5000), 2000));
         let took = started.elapsed();
-        assert!(gone(gate), "round {round}: acquired while the gate {gate} was still alive");
-        assert!(!record_path(&res.path).exists(), "an emptied domain's record is removed");
+        assert!(
+            gone(gate),
+            "round {round}: acquired while the gate {gate} was still alive"
+        );
+        assert!(
+            !record_path(&res.path).exists(),
+            "an emptied domain's record is removed"
+        );
         extra.push(took.as_secs_f64() * 1000.0);
-        assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+        assert!(matches!(
+            release(handle),
+            fgos_holder_lock::Release::Released { .. }
+        ));
     }
     extra.sort_by(|a, b| a.partial_cmp(b).unwrap());
     let (p50, p95) = (percentile(&extra, 0.5), percentile(&extra, 0.95));
     println!("predecessor-check: 50 rounds, 0 violations, acquire after holder death p50 {p50:.2} ms p95 {p95:.2} ms");
-    assert!(p95 < 500.0, "killing at once must cost milliseconds, not a drain wait: p95 {p95} ms");
+    assert!(
+        p95 < 500.0,
+        "killing at once must cost milliseconds, not a drain wait: p95 {p95} ms"
+    );
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -163,12 +209,18 @@ fn a_stale_predecessor_record_lets_the_next_holder_through_at_once() {
         let handle = acquired(acquire(&res, Mode::Ex, Wait::Try, 2000));
         extra.push(started.elapsed().as_secs_f64() * 1000.0);
         assert!(!record_path(&res.path).exists());
-        assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+        assert!(matches!(
+            release(handle),
+            fgos_holder_lock::Release::Released { .. }
+        ));
     }
     let mut plain = Vec::new();
     for _ in 0..20 {
         let started = Instant::now();
-        assert!(matches!(release(acquired(acquire(&res, Mode::Ex, Wait::Try, 2000))), fgos_holder_lock::Release::Released { .. }));
+        assert!(matches!(
+            release(acquired(acquire(&res, Mode::Ex, Wait::Try, 2000))),
+            fgos_holder_lock::Release::Released { .. }
+        ));
         plain.push(started.elapsed().as_secs_f64() * 1000.0);
     }
     extra.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -201,7 +253,10 @@ fn an_unkillable_predecessor_domain_is_held_within_the_kill_wait() {
     declare(&record_path(&res.path), &Domain::LinuxGate(init)).unwrap();
     let started = Instant::now();
     match acquire(&res, Mode::Ex, Wait::Try, 200) {
-        Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) } => {
+        Acquire::Held {
+            reason: HeldReason::PredecessorDomainNotEmpty,
+            domain: Some(domain),
+        } => {
             assert_eq!(domain["domainKind"], "linux-gate");
             assert_eq!(domain["domainId"]["pid"], 1);
         }
@@ -209,9 +264,19 @@ fn an_unkillable_predecessor_domain_is_held_within_the_kill_wait() {
     }
     let took = started.elapsed();
     // A refused kill answers at once; the bound only allows for a loaded host.
-    assert!(took < Duration::from_millis(1200), "held after {took:?}, kill wait was 200 ms");
-    assert_eq!(probe(&res).unwrap(), Probe::Free, "the description was closed");
-    assert!(record_path(&res.path).exists(), "a record that could not be emptied is kept");
+    assert!(
+        took < Duration::from_millis(1200),
+        "held after {took:?}, kill wait was 200 ms"
+    );
+    assert_eq!(
+        probe(&res).unwrap(),
+        Probe::Free,
+        "the description was closed"
+    );
+    assert!(
+        record_path(&res.path).exists(),
+        "a record that could not be emptied is kept"
+    );
     let _ = fs::remove_dir_all(&dir);
 }
 
@@ -220,9 +285,16 @@ fn an_unknown_record_is_never_ignored() {
     let _serial = serial();
     let dir = temp_dir("unknown-record");
     let res = resource(&dir, "u");
-    fs::write(record_path(&res.path), r#"{"v":2,"domainKind":"future","domainId":"x"}"#).unwrap();
+    fs::write(
+        record_path(&res.path),
+        r#"{"v":2,"domainKind":"future","domainId":"x"}"#,
+    )
+    .unwrap();
     match acquire(&res, Mode::Ex, Wait::Try, 50) {
-        Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) } => assert_eq!(domain["v"], 2),
+        Acquire::Held {
+            reason: HeldReason::PredecessorDomainNotEmpty,
+            domain: Some(domain),
+        } => assert_eq!(domain["v"], 2),
         other => panic!("expected held: {other:?}"),
     }
     assert!(record_path(&res.path).exists());
@@ -238,6 +310,9 @@ fn only_an_exclusive_holder_declares_a_domain() {
     let me = identity_of(ProcId(std::process::id())).unwrap();
     assert!(shared.declare_domain(&Domain::LinuxGate(me)).is_err());
     assert!(!record_path(&res.path).exists());
-    assert!(matches!(release(shared), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(shared),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     let _ = fs::remove_dir_all(&dir);
 }

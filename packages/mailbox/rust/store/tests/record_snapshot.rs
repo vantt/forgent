@@ -285,7 +285,10 @@ fn a_refused_send_is_still_saved() {
 #[test]
 fn a_newer_snapshot_is_refused_and_left_byte_for_byte() {
     let fgos = TempFgos::new("newer");
-    let newer = with_version(&registered(&fgos), fgos_mailbox_core::SNAPSHOT_SCHEMA_VERSION + 1);
+    let newer = with_version(
+        &registered(&fgos),
+        fgos_mailbox_core::SNAPSHOT_SCHEMA_VERSION + 1,
+    );
     std::fs::write(fgos.paths().snapshot(), &newer).unwrap();
     let err = fgos
         .record()
@@ -477,7 +480,8 @@ fn the_frozen_version_1_snapshot_still_reads() {
     // is empty and the version is the current one; nothing else changes.
     let mut upgraded = expected.clone();
     upgraded["schema_version"] = fgos_mailbox_core::SNAPSHOT_SCHEMA_VERSION.into();
-    upgraded["remote"] = serde_json::json!({ "baselined": false, "cursor": {}, "seen": {}, "refusals": [] });
+    upgraded["remote"] =
+        serde_json::json!({ "baselined": false, "cursor": {}, "seen": {}, "refusals": [] });
     assert_eq!(serde_json::to_value(&state).unwrap(), upgraded);
 }
 

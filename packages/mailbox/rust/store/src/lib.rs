@@ -21,9 +21,9 @@ pub mod ancestry;
 pub mod head;
 pub mod hook;
 #[cfg(unix)]
-pub mod nudge;
-#[cfg(unix)]
 pub mod limits;
+#[cfg(unix)]
+pub mod nudge;
 #[cfg(unix)]
 pub mod record;
 #[cfg(unix)]

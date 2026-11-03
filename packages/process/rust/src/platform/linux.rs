@@ -9,7 +9,10 @@ use std::sync::OnceLock;
 
 use super::{as_pid_t, unix_hostname, ProcessPlatform};
 use crate::control::{self, Signal, SignalOutcome};
-use crate::facts::{self, CreationMark, Holders, Observed, PidNs, ProcTuple, ProcView, Relation, Scan, ScanFilter, UnreadableCause, Verdict};
+use crate::facts::{
+    self, CreationMark, Holders, Observed, PidNs, ProcTuple, ProcView, Relation, Scan, ScanFilter,
+    UnreadableCause, Verdict,
+};
 use crate::{FdSlot, ProcId};
 
 /// The inode number of the initial PID namespace, fixed by the kernel
@@ -21,10 +24,23 @@ pub struct Linux;
 
 impl Linux {
     /// The scan view of one process, or `None` when nothing runs there.
-    fn view_with(&self, pid: ProcId, filter: &ScanFilter, host: &str, boot_id: &Option<String>, pid_ns: &str) -> Option<ProcView> {
+    fn view_with(
+        &self,
+        pid: ProcId,
+        filter: &ScanFilter,
+        host: &str,
+        boot_id: &Option<String>,
+        pid_ns: &str,
+    ) -> Option<ProcView> {
         let mut unreadable = Vec::new();
         let tuple = match self.observe(pid) {
-            Observed::Live { start_time } => Some(ProcTuple { host: host.to_string(), boot_id: boot_id.clone(), pid_ns: pid_ns.to_string(), pid, start_time }),
+            Observed::Live { start_time } => Some(ProcTuple {
+                host: host.to_string(),
+                boot_id: boot_id.clone(),
+                pid_ns: pid_ns.to_string(),
+                pid,
+                start_time,
+            }),
             // Exited, or gone while the scan ran: nothing is running there.
             Observed::Zombie | Observed::Absent => return None,
             // A process this observer may not look at is still a process:
@@ -67,7 +83,10 @@ impl ProcessPlatform for Linux {
                     let is_initial = id == INIT_PID_NS;
                     PidNs { id, is_initial }
                 }
-                Err(_) => PidNs { id: "unknown".to_string(), is_initial: false },
+                Err(_) => PidNs {
+                    id: "unknown".to_string(),
+                    is_initial: false,
+                },
             })
             .clone()
     }
@@ -78,12 +97,16 @@ impl ProcessPlatform for Linux {
         };
         match read_stat(pid.0) {
             Ok(stat) if stat.is_gone() => Observed::Zombie,
-            Ok(stat) => Observed::Live { start_time: stat.start_ticks.to_string() },
+            Ok(stat) => Observed::Live {
+                start_time: stat.start_ticks.to_string(),
+            },
             Err(err) => match err.kind() {
                 // A pid hidden by `hidepid` reads as missing too; signal 0
                 // tells a hidden process (EPERM) from no process (ESRCH).
                 io::ErrorKind::NotFound if !pid_exists(raw) => Observed::Absent,
-                io::ErrorKind::NotFound | io::ErrorKind::PermissionDenied => Observed::Unreadable(UnreadableCause::Permission),
+                io::ErrorKind::NotFound | io::ErrorKind::PermissionDenied => {
+                    Observed::Unreadable(UnreadableCause::Permission)
+                }
                 _ => Observed::Unreadable(UnreadableCause::DriverMissing),
             },
         }
@@ -123,25 +146,43 @@ impl ProcessPlatform for Linux {
             return None;
         }
         let mut buf = [0u8; 4096];
-        Some(pids.into_iter().filter_map(|pid| read_relation(&proc_dir, pid, &mut buf)).collect())
+        Some(
+            pids.into_iter()
+                .filter_map(|pid| read_relation(&proc_dir, pid, &mut buf))
+                .collect(),
+        )
     }
 
     fn relation_of(&self, pid: ProcId) -> Option<Relation> {
-        facts::parse_relation(pid, &fs::read_to_string(format!("/proc/{}/stat", pid.0)).ok()?)
+        facts::parse_relation(
+            pid,
+            &fs::read_to_string(format!("/proc/{}/stat", pid.0)).ok()?,
+        )
     }
 
     fn command_name_of(&self, pid: ProcId) -> Option<String> {
-        facts::parse_command_name(&fs::read_to_string(format!("/proc/{}/stat", pid.0)).ok()?).map(str::to_owned)
+        facts::parse_command_name(&fs::read_to_string(format!("/proc/{}/stat", pid.0)).ok()?)
+            .map(str::to_owned)
     }
 
     fn last_pid(&self) -> Option<u32> {
-        fs::read_to_string("/proc/sys/kernel/ns_last_pid").ok()?.trim().parse().ok()
+        fs::read_to_string("/proc/sys/kernel/ns_last_pid")
+            .ok()?
+            .trim()
+            .parse()
+            .ok()
     }
 
     fn created_since(&self, mark: &CreationMark) -> Option<Vec<Relation>> {
         let floor = mark.last_pid?;
-        let pid_max: u64 = fs::read_to_string("/proc/sys/kernel/pid_max").ok()?.trim().parse().ok()?;
-        let window = std::time::Duration::from_secs_f64(pid_max as f64 / facts::ALLOCATION_RATE_BOUND as f64);
+        let pid_max: u64 = fs::read_to_string("/proc/sys/kernel/pid_max")
+            .ok()?
+            .trim()
+            .parse()
+            .ok()?;
+        let window = std::time::Duration::from_secs_f64(
+            pid_max as f64 / facts::ALLOCATION_RATE_BOUND as f64,
+        );
         if mark.at.elapsed() >= window {
             return None;
         }
@@ -150,7 +191,11 @@ impl ProcessPlatform for Linux {
         let proc_dir = File::open("/proc").ok()?;
         let mut buf = [0u8; 4096];
         let last = self.last_pid()?;
-        let span = if last >= floor { u64::from(last - floor) } else { pid_max.saturating_sub(u64::from(floor)) + u64::from(last) };
+        let span = if last >= floor {
+            u64::from(last - floor)
+        } else {
+            pid_max.saturating_sub(u64::from(floor)) + u64::from(last)
+        };
         if span <= 4096 {
             // Few allocations since the mark: probe each pid allocated after
             // it, up to the cursor, instead of listing every process. Thread
@@ -158,8 +203,14 @@ impl ProcessPlatform for Linux {
             let mut out = Vec::new();
             let mut pid = floor;
             while pid != last {
-                pid = if u64::from(pid) + 1 >= pid_max { 1 } else { pid + 1 };
-                if let Some((relation, leader)) = read_relation_and_leader(&proc_dir, ProcId(pid), &mut buf) {
+                pid = if u64::from(pid) + 1 >= pid_max {
+                    1
+                } else {
+                    pid + 1
+                };
+                if let Some((relation, leader)) =
+                    read_relation_and_leader(&proc_dir, ProcId(pid), &mut buf)
+                {
                     if leader {
                         out.push(relation);
                     }
@@ -171,7 +222,13 @@ impl ProcessPlatform for Linux {
         // allocated no later than that read.
         let pids = proc_pids();
         let last = self.last_pid()?;
-        let after = |pid: u32| if last >= floor { pid > floor && pid <= last } else { pid > floor || pid <= last };
+        let after = |pid: u32| {
+            if last >= floor {
+                pid > floor && pid <= last
+            } else {
+                pid > floor || pid <= last
+            }
+        };
         Some(
             pids.into_iter()
                 .filter(|pid| after(pid.0))
@@ -193,7 +250,13 @@ impl ProcessPlatform for Linux {
     }
 
     fn view_of(&self, pid: ProcId, filter: &ScanFilter) -> Option<ProcView> {
-        self.view_with(pid, filter, &self.host(), &self.boot_id(), &self.pid_ns().id)
+        self.view_with(
+            pid,
+            filter,
+            &self.host(),
+            &self.boot_id(),
+            &self.pid_ns().id,
+        )
     }
 
     fn spawn_with_fds(&self, cmd: Command, fd_map: &[(FdSlot, &File)]) -> io::Result<Child> {
@@ -215,7 +278,9 @@ impl ProcessPlatform for Linux {
             return match err.raw_os_error() {
                 // A kernel without pidfd, or a seccomp filter that refuses it:
                 // check and kill, with the reuse window that implies.
-                Some(libc::ENOSYS) | Some(libc::EPERM) => control::unix_signal_after_check(self, tuple, sig),
+                Some(libc::ENOSYS) | Some(libc::EPERM) => {
+                    control::unix_signal_after_check(self, tuple, sig)
+                }
                 _ => control::errno_outcome(err),
             };
         }
@@ -223,11 +288,18 @@ impl ProcessPlatform for Linux {
         // The pidfd pins the pid: whatever the start time says now is still
         // true when the signal is sent (a process reaped meanwhile gives
         // ESRCH from pidfd_send_signal, never a signal to a newcomer).
-        let outcome = match facts::judge(&tuple.to_record(), &observer, &facts::PlatformTable(self)) {
+        let outcome = match facts::judge(&tuple.to_record(), &observer, &facts::PlatformTable(self))
+        {
             Verdict::Alive => {
                 // SAFETY: pidfd_send_signal takes the pidfd, a signal, an optional siginfo and flags.
                 let rc = unsafe {
-                    libc::syscall(libc::SYS_pidfd_send_signal, pidfd, control::signo(sig), std::ptr::null::<libc::siginfo_t>(), 0 as libc::c_uint)
+                    libc::syscall(
+                        libc::SYS_pidfd_send_signal,
+                        pidfd,
+                        control::signo(sig),
+                        std::ptr::null::<libc::siginfo_t>(),
+                        0 as libc::c_uint,
+                    )
                 };
                 if rc == 0 {
                     SignalOutcome::Sent
@@ -255,13 +327,23 @@ fn read_relation(proc_dir: &File, pid: ProcId, buf: &mut [u8; 4096]) -> Option<R
 /// [`read_relation`], and whether `pid` names a thread-group leader: a
 /// thread created with `CLONE_THREAD` has exit signal -1 (stat field 38),
 /// which no process has.
-fn read_relation_and_leader(proc_dir: &File, pid: ProcId, buf: &mut [u8; 4096]) -> Option<(Relation, bool)> {
+fn read_relation_and_leader(
+    proc_dir: &File,
+    pid: ProcId,
+    buf: &mut [u8; 4096],
+) -> Option<(Relation, bool)> {
     use std::io::Read;
     use std::os::fd::{AsRawFd, FromRawFd};
     let name = std::ffi::CString::new(format!("{}/stat", pid.0)).ok()?;
     // SAFETY: openat on a directory descriptor the caller owns and a
     // NUL-terminated relative name; the result is owned by a File.
-    let fd = unsafe { libc::openat(proc_dir.as_raw_fd(), name.as_ptr(), libc::O_RDONLY | libc::O_CLOEXEC) };
+    let fd = unsafe {
+        libc::openat(
+            proc_dir.as_raw_fd(),
+            name.as_ptr(),
+            libc::O_RDONLY | libc::O_CLOEXEC,
+        )
+    };
     if fd < 0 {
         return None;
     }
@@ -284,7 +366,8 @@ fn read_relation_and_leader(proc_dir: &File, pid: ProcId, buf: &mut [u8; 4096]) 
 /// `/proc/<pid>/stat` through the one parser; an unparsable line is
 /// `InvalidData`.
 pub(crate) fn read_stat(pid: u32) -> io::Result<facts::Stat> {
-    facts::parse_stat(&fs::read_to_string(format!("/proc/{pid}/stat"))?).ok_or_else(|| io::Error::from(io::ErrorKind::InvalidData))
+    facts::parse_stat(&fs::read_to_string(format!("/proc/{pid}/stat"))?)
+        .ok_or_else(|| io::Error::from(io::ErrorKind::InvalidData))
 }
 
 /// Signal 0: does any process (even one `/proc` hides from us) own `pid`?
@@ -303,7 +386,12 @@ fn proc_pids() -> Vec<ProcId> {
     };
     entries
         .filter_map(|entry| entry.ok())
-        .filter_map(|entry| entry.file_name().to_str().and_then(|name| name.parse::<u32>().ok()))
+        .filter_map(|entry| {
+            entry
+                .file_name()
+                .to_str()
+                .and_then(|name| name.parse::<u32>().ok())
+        })
         .map(ProcId)
         .collect()
 }
@@ -333,25 +421,39 @@ fn parse_lock(line: &str) -> Option<LockEntry> {
     let mut fields = line.split_whitespace();
     fields.next()?; // ordinal
     let kind = fields.next()?;
-    if kind == "->" { return None; } // blocked request, not a held lock
+    if kind == "->" {
+        return None;
+    } // blocked request, not a held lock
     fields.next()?; // advisory/mandatory
     fields.next()?; // read/write
     let pid = fields.next()?.parse().ok()?;
     let token = fields.next()?;
-    if token.split(':').count() != 3 { return None; }
-    Some(LockEntry { kind: kind.into(), pid, token: token.into() })
+    if token.split(':').count() != 3 {
+        return None;
+    }
+    Some(LockEntry {
+        kind: kind.into(),
+        pid,
+        token: token.into(),
+    })
 }
 
 fn fdinfo_locks(info: &str) -> impl Iterator<Item = LockEntry> + '_ {
-    info.lines().filter_map(|line| parse_lock(line.strip_prefix("lock:")?))
+    info.lines()
+        .filter_map(|line| parse_lock(line.strip_prefix("lock:")?))
 }
 
 /// This process as named by this proc mount. Reject a mount from an ancestor
 /// PID namespace: its numbers cannot safely be passed to pidfd/kcmp syscalls.
 pub fn proc_self_pid() -> io::Result<ProcId> {
-    let pid = fs::read_link("/proc/self")?.to_string_lossy().parse().map_err(io::Error::other)?;
+    let pid = fs::read_link("/proc/self")?
+        .to_string_lossy()
+        .parse()
+        .map_err(io::Error::other)?;
     if pid != std::process::id() {
-        return Err(io::Error::other("proc mount belongs to a different PID namespace"));
+        return Err(io::Error::other(
+            "proc mount belongs to a different PID namespace",
+        ));
     }
     Ok(ProcId(pid))
 }
@@ -360,7 +462,9 @@ pub fn proc_self_pid() -> io::Result<ProcId> {
 pub fn own_lock_token(file: &File) -> io::Result<String> {
     use std::os::fd::AsRawFd;
     let info = fs::read_to_string(format!("/proc/self/fdinfo/{}", file.as_raw_fd()))?;
-    let token = fdinfo_locks(&info).find(|entry| entry.kind == "FLOCK").map(|entry| entry.token);
+    let token = fdinfo_locks(&info)
+        .find(|entry| entry.kind == "FLOCK")
+        .map(|entry| entry.token);
     token.ok_or_else(|| io::Error::other("description has no FLOCK record"))
 }
 
@@ -384,29 +488,50 @@ pub fn locked_fds(dev: u64, ino: u64, pids: Option<&[ProcId]>) -> io::Result<Vec
     let all;
     let pids = match pids {
         Some(pids) => pids,
-        None => { all = proc_pids(); &all }
+        None => {
+            all = proc_pids();
+            &all
+        }
     };
     let mut out = Vec::new();
     for &pid in pids {
-        let Some(identity) = Linux.identity_of(pid) else { continue; };
+        let Some(identity) = Linux.identity_of(pid) else {
+            continue;
+        };
         let base = PathBuf::from(format!("/proc/{pid}"));
         let entries = match fs::read_dir(base.join("fd")) {
             Ok(entries) => entries,
-            Err(e) if e.kind() == io::ErrorKind::NotFound || (scanning_all && e.kind() == io::ErrorKind::PermissionDenied) => continue,
+            Err(e)
+                if e.kind() == io::ErrorKind::NotFound
+                    || (scanning_all && e.kind() == io::ErrorKind::PermissionDenied) =>
+            {
+                continue
+            }
             Err(e) => return Err(e),
         };
         for entry in entries {
             let entry = entry?;
-            let Some(fd) = entry.file_name().to_str().and_then(|s| s.parse().ok()) else { continue; };
-            let Ok(meta) = fs::metadata(entry.path()) else { continue; };
-            if (meta.dev(), meta.ino()) != (dev, ino) { continue; }
+            let Some(fd) = entry.file_name().to_str().and_then(|s| s.parse().ok()) else {
+                continue;
+            };
+            let Ok(meta) = fs::metadata(entry.path()) else {
+                continue;
+            };
+            if (meta.dev(), meta.ino()) != (dev, ino) {
+                continue;
+            }
             let info = match fs::read_to_string(base.join("fdinfo").join(entry.file_name())) {
                 Ok(info) => info,
                 Err(e) if e.kind() == io::ErrorKind::NotFound => continue,
                 Err(e) => return Err(e),
             };
             for lock in fdinfo_locks(&info) {
-                out.push(LockedFd { pid, fd: FdSlot(fd), identity: identity.clone(), lock });
+                out.push(LockedFd {
+                    pid,
+                    fd: FdSlot(fd),
+                    identity: identity.clone(),
+                    lock,
+                });
             }
         }
     }
@@ -419,13 +544,19 @@ pub fn file_users(dev: u64, ino: u64) -> Option<Vec<facts::FileUser>> {
     use std::os::unix::fs::MetadataExt;
     let mut users = Vec::new();
     for pid in proc_pids() {
-        let Some(identity) = Linux.identity_of(pid) else { continue; };
+        let Some(identity) = Linux.identity_of(pid) else {
+            continue;
+        };
         let base = PathBuf::from(format!("/proc/{pid}"));
-        let Ok(entries) = fs::read_dir(base.join("fd")) else { continue; };
+        let Ok(entries) = fs::read_dir(base.join("fd")) else {
+            continue;
+        };
         let found = entries.flatten().any(|entry| {
             fs::metadata(entry.path()).is_ok_and(|m| (m.dev(), m.ino()) == (dev, ino))
         });
-        if !found { continue; }
+        if !found {
+            continue;
+        }
         let exe = fs::read_link(base.join("exe")).ok();
         if Linux.identity_of(pid).as_ref() == Some(&identity) {
             users.push(facts::FileUser { identity, exe });
@@ -437,17 +568,31 @@ pub fn file_users(dev: u64, ino: u64) -> Option<Vec<facts::FileUser>> {
 /// The scan view of one process. Each read that fails is named in
 /// `unreadable` with the OS error (another user's process gives
 /// `permission denied`; a kernel thread has no exe).
-fn view_of(pid: ProcId, tuple: Option<ProcTuple>, filter: &ScanFilter, mut unreadable: Vec<String>) -> ProcView {
+fn view_of(
+    pid: ProcId,
+    tuple: Option<ProcTuple>,
+    filter: &ScanFilter,
+    mut unreadable: Vec<String>,
+) -> ProcView {
     let base = PathBuf::from(format!("/proc/{}", pid.0));
     let mut note = |field: &str, err: io::Error| unreadable.push(format!("{field}: {err}"));
 
     let effective_uid = fs::read_to_string(base.join("status"))
-        .map_err(|err| note("uid", err)).ok()
-        .and_then(|status| status.lines().find(|line| line.starts_with("Uid:"))
-            .and_then(|line| line.split_whitespace().nth(2))
-            .and_then(|uid| uid.parse().ok()));
-    let exe = fs::read_link(base.join("exe")).map_err(|err| note("exe", err)).ok();
-    let cwd = fs::read_link(base.join("cwd")).map_err(|err| note("cwd", err)).ok();
+        .map_err(|err| note("uid", err))
+        .ok()
+        .and_then(|status| {
+            status
+                .lines()
+                .find(|line| line.starts_with("Uid:"))
+                .and_then(|line| line.split_whitespace().nth(2))
+                .and_then(|uid| uid.parse().ok())
+        });
+    let exe = fs::read_link(base.join("exe"))
+        .map_err(|err| note("exe", err))
+        .ok();
+    let cwd = fs::read_link(base.join("cwd"))
+        .map_err(|err| note("cwd", err))
+        .ok();
     let cmdline = fs::read(base.join("cmdline"))
         .map(|bytes| split_nul(&bytes))
         .map_err(|err| note("cmdline", err))
@@ -467,7 +612,16 @@ fn view_of(pid: ProcId, tuple: Option<ProcTuple>, filter: &ScanFilter, mut unrea
             Err(err) => note("environ", err),
         }
     }
-    ProcView { effective_uid, pid, tuple, exe, cmdline, cwd, env_subset, unreadable }
+    ProcView {
+        effective_uid,
+        pid,
+        tuple,
+        exe,
+        cmdline,
+        cwd,
+        env_subset,
+        unreadable,
+    }
 }
 
 fn split_nul(bytes: &[u8]) -> Vec<String> {
@@ -485,17 +639,35 @@ mod tests {
     #[test]
     fn lock_lines_name_their_inode_and_other_lines_are_ignored() {
         let info = "pos:\t0\nflags:\t02100002\nmnt_id:\t29\nino:\t98765\nlock:\t1: FLOCK  ADVISORY  WRITE 12345 00:2f:98765 0 EOF\nlock:\t2: POSIX  ADVISORY  READ 12345 08:01:4 0 EOF\n";
-        assert_eq!(fdinfo_locks(info).map(|entry| entry.token.rsplit(':').next().unwrap().parse::<u64>().unwrap()).collect::<Vec<_>>(), vec![98765, 4]);
+        assert_eq!(
+            fdinfo_locks(info)
+                .map(|entry| entry
+                    .token
+                    .rsplit(':')
+                    .next()
+                    .unwrap()
+                    .parse::<u64>()
+                    .unwrap())
+                .collect::<Vec<_>>(),
+            vec![98765, 4]
+        );
         assert_eq!(fdinfo_locks("pos:\t0\n").count(), 0);
     }
 
     #[test]
     fn table_parser_keeps_full_identity_and_ignores_blocked_requests() {
-        assert_eq!(parse_lock("9: FLOCK ADVISORY WRITE 42 08:01:123 0 EOF"),
-            Some(LockEntry { kind: "FLOCK".into(), pid: 42, token: "08:01:123".into() }));
+        assert_eq!(
+            parse_lock("9: FLOCK ADVISORY WRITE 42 08:01:123 0 EOF"),
+            Some(LockEntry {
+                kind: "FLOCK".into(),
+                pid: 42,
+                token: "08:01:123".into()
+            })
+        );
         assert!(parse_lock("9: -> FLOCK ADVISORY WRITE 43 08:01:123 0 EOF").is_none());
         assert!(parse_lock("9: FLOCK ADVISORY WRITE").is_none());
-        let entries = fdinfo_locks("lock: 1: FLOCK ADVISORY WRITE 42 00:2f:98765 0 EOF").collect::<Vec<_>>();
+        let entries =
+            fdinfo_locks("lock: 1: FLOCK ADVISORY WRITE 42 00:2f:98765 0 EOF").collect::<Vec<_>>();
         assert_eq!(entries[0].pid, 42);
         assert_eq!(entries[0].token, "00:2f:98765");
     }
@@ -510,26 +682,52 @@ mod tests {
 
     #[test]
     fn a_pid_beyond_the_table_is_absent() {
-        let pid_max: u32 = fs::read_to_string("/proc/sys/kernel/pid_max").unwrap().trim().parse().unwrap();
+        let pid_max: u32 = fs::read_to_string("/proc/sys/kernel/pid_max")
+            .unwrap()
+            .trim()
+            .parse()
+            .unwrap();
         assert_eq!(Linux.observe(ProcId(pid_max + 1)), Observed::Absent);
-        assert_eq!(Linux.observe(ProcId(u32::MAX)), Observed::Absent, "a pid that does not fit pid_t names nothing");
-        assert_eq!(Linux.observe(ProcId(0)), Observed::Absent, "pid 0 is a process group to kill(2), never a process");
+        assert_eq!(
+            Linux.observe(ProcId(u32::MAX)),
+            Observed::Absent,
+            "a pid that does not fit pid_t names nothing"
+        );
+        assert_eq!(
+            Linux.observe(ProcId(0)),
+            Observed::Absent,
+            "pid 0 is a process group to kill(2), never a process"
+        );
     }
 
     #[test]
     fn threads_are_not_listed_as_processes_created_since_a_mark() {
         let mark = facts::creation_mark().unwrap();
-        let worker = std::thread::spawn(|| std::thread::sleep(std::time::Duration::from_millis(200)));
-        let mut child = std::process::Command::new("sleep").arg("1").spawn().unwrap();
+        let worker =
+            std::thread::spawn(|| std::thread::sleep(std::time::Duration::from_millis(200)));
+        let mut child = std::process::Command::new("sleep")
+            .arg("1")
+            .spawn()
+            .unwrap();
         let created = Linux.created_since(&mark).expect("young mark");
         let pids: Vec<u32> = created.iter().map(|r| r.pid.0).collect();
         child.kill().unwrap();
         child.wait().unwrap();
         worker.join().unwrap();
         assert!(pids.contains(&child.id()), "the child is listed: {pids:?}");
-        assert!(!pids.contains(&std::process::id()), "this process predates the mark");
-        let own_tasks: Vec<u32> = fs::read_dir("/proc/self/task").unwrap().flatten().filter_map(|e| e.file_name().to_str()?.parse().ok()).collect();
-        assert!(own_tasks.iter().all(|tid| !pids.contains(tid)), "no thread id of this process is listed");
+        assert!(
+            !pids.contains(&std::process::id()),
+            "this process predates the mark"
+        );
+        let own_tasks: Vec<u32> = fs::read_dir("/proc/self/task")
+            .unwrap()
+            .flatten()
+            .filter_map(|e| e.file_name().to_str()?.parse().ok())
+            .collect();
+        assert!(
+            own_tasks.iter().all(|tid| !pids.contains(tid)),
+            "no thread id of this process is listed"
+        );
     }
 
     #[test]

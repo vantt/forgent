@@ -31,7 +31,9 @@ impl StepsOutcome {
     pub fn pending(&self) -> Option<&str> {
         match self {
             StepsOutcome::Done(_) => None,
-            StepsOutcome::Retry { step_id, .. } | StepsOutcome::Failed { step_id, .. } => Some(step_id),
+            StepsOutcome::Retry { step_id, .. } | StepsOutcome::Failed { step_id, .. } => {
+                Some(step_id)
+            }
         }
     }
 }
@@ -45,9 +47,17 @@ impl StepsOutcome {
 /// nothing, so the pass that completes that step decides with the full facts.
 pub fn run_steps(envelope: &Value, run_dir: &Path) -> StepsOutcome {
     let attempt_id = envelope["attemptId"].as_str().unwrap_or_default();
-    let items = envelope["steps"].as_array().map(Vec::as_slice).unwrap_or_default();
+    let items = envelope["steps"]
+        .as_array()
+        .map(Vec::as_slice)
+        .unwrap_or_default();
     let step_id_of = |step: &Value| step["stepId"].as_str().unwrap_or_default().to_string();
-    let has_receipt = |step_id: &str| run_dir.join("steps").join(format!("{step_id}.json")).exists();
+    let has_receipt = |step_id: &str| {
+        run_dir
+            .join("steps")
+            .join(format!("{step_id}.json"))
+            .exists()
+    };
     let is_builtin = |step: &Value| step["builtin"] == true;
 
     let mut failure: Option<StepsOutcome> = None;
@@ -59,7 +69,10 @@ pub fn run_steps(envelope: &Value, run_dir: &Path) -> StepsOutcome {
         match os::run_step(step, run_dir) {
             Ok(detail) => {
                 if let Err(why) = publish_receipt(run_dir, attempt_id, &step_id, detail) {
-                    failure = Some(StepsOutcome::Failed { step_id, reason: format!("receipt not published: {why}") });
+                    failure = Some(StepsOutcome::Failed {
+                        step_id,
+                        reason: format!("receipt not published: {why}"),
+                    });
                     break;
                 }
             }
@@ -87,7 +100,9 @@ pub fn run_steps(envelope: &Value, run_dir: &Path) -> StepsOutcome {
             other => Err(StepFailure::Failed(format!("unknown builtin step {other}"))),
         };
         let failed = match result {
-            Ok(detail) => publish_receipt(run_dir, attempt_id, &step_id, detail).err().map(|why| StepFailure::Failed(format!("receipt not published: {why}"))),
+            Ok(detail) => publish_receipt(run_dir, attempt_id, &step_id, detail)
+                .err()
+                .map(|why| StepFailure::Failed(format!("receipt not published: {why}"))),
             Err(failed) => Some(failed),
         };
         if let Some(failed) = failed {
@@ -104,13 +119,24 @@ pub fn run_steps(envelope: &Value, run_dir: &Path) -> StepsOutcome {
 /// `kept-unknown` leaves the step without a receipt, so adopt tries again.
 fn release_slot(envelope: &Value, run_dir: &Path) -> Result<Option<Value>, StepFailure> {
     use crate::terminal_slot::{disposition_for, release, retain_window, Backend, ReleaseFailure};
-    let key = envelope["slot"]["key"].as_str().ok_or_else(|| StepFailure::Failed("release-slot needs envelope.slot.key".into()))?;
-    let receipt: Option<Value> = std::fs::read_to_string(run_dir.join("receipt.json")).ok().and_then(|text| serde_json::from_str(&text).ok());
+    let key = envelope["slot"]["key"]
+        .as_str()
+        .ok_or_else(|| StepFailure::Failed("release-slot needs envelope.slot.key".into()))?;
+    let receipt: Option<Value> = std::fs::read_to_string(run_dir.join("receipt.json"))
+        .ok()
+        .and_then(|text| serde_json::from_str(&text).ok());
     let disposition = disposition_for(receipt.as_ref());
-    match release(&Backend::from_env(run_dir), key, disposition, retain_window(envelope)) {
+    match release(
+        &Backend::from_env(run_dir),
+        key,
+        disposition,
+        retain_window(envelope),
+    ) {
         Ok(detail) => Ok(Some(detail)),
         Err(ReleaseFailure::Retry(reason)) => Err(StepFailure::Retry(reason)),
-        Err(ReleaseFailure::Unsupported(reason)) => Err(StepFailure::Failed(format!("terminal-mode-unsupported: {reason}"))),
+        Err(ReleaseFailure::Unsupported(reason)) => Err(StepFailure::Failed(format!(
+            "terminal-mode-unsupported: {reason}"
+        ))),
     }
 }
 
@@ -120,7 +146,12 @@ enum StepFailure {
     Failed(String),
 }
 
-fn publish_receipt(run_dir: &Path, attempt_id: &str, step_id: &str, detail: Option<Value>) -> std::io::Result<()> {
+fn publish_receipt(
+    run_dir: &Path,
+    attempt_id: &str,
+    step_id: &str,
+    detail: Option<Value>,
+) -> std::io::Result<()> {
     let steps_dir = run_dir.join("steps");
     std::fs::create_dir_all(&steps_dir)?;
     let mut receipt = serde_json::json!({
@@ -151,11 +182,36 @@ impl StepSpec {
     fn parse(step: &Value) -> Result<StepSpec, StepFailure> {
         let fail = |why: &str| StepFailure::Failed(why.into());
         Ok(StepSpec {
-            host_bin: step["hostBin"].as_str().ok_or_else(|| fail("step has no hostBin"))?.to_string(),
-            argv: step["argv"].as_array().map(|a| a.iter().filter_map(Value::as_str).map(String::from).collect()).unwrap_or_default(),
-            cwd: step["cwd"].as_str().ok_or_else(|| fail("step has no cwd"))?.to_string(),
-            timeout: Duration::from_millis(step["stepTimeoutMs"].as_u64().ok_or_else(|| fail("step has no stepTimeoutMs"))?),
-            env: step["env"].as_object().map(|m| m.iter().filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string()))).collect()).unwrap_or_default(),
+            host_bin: step["hostBin"]
+                .as_str()
+                .ok_or_else(|| fail("step has no hostBin"))?
+                .to_string(),
+            argv: step["argv"]
+                .as_array()
+                .map(|a| {
+                    a.iter()
+                        .filter_map(Value::as_str)
+                        .map(String::from)
+                        .collect()
+                })
+                .unwrap_or_default(),
+            cwd: step["cwd"]
+                .as_str()
+                .ok_or_else(|| fail("step has no cwd"))?
+                .to_string(),
+            timeout: Duration::from_millis(
+                step["stepTimeoutMs"]
+                    .as_u64()
+                    .ok_or_else(|| fail("step has no stepTimeoutMs"))?,
+            ),
+            env: step["env"]
+                .as_object()
+                .map(|m| {
+                    m.iter()
+                        .filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string())))
+                        .collect()
+                })
+                .unwrap_or_default(),
         })
     }
 }
@@ -171,21 +227,40 @@ enum StepExit {
 /// What a step that ran to its end means: `Ok(detail)` publishes the receipt.
 /// `text` is what the step printed on stdout; its last JSON object line is its report.
 fn interpret(exit: StepExit, text: &str) -> Result<Option<Value>, StepFailure> {
-    let reported = text.lines().rev().find_map(|line| serde_json::from_str::<Value>(line.trim()).ok().filter(Value::is_object));
+    let reported = text.lines().rev().find_map(|line| {
+        serde_json::from_str::<Value>(line.trim())
+            .ok()
+            .filter(Value::is_object)
+    });
     match exit {
         StepExit::Code(0) => {
             if let Some(report) = &reported {
                 match report["result"].as_str() {
-                    Some("retry") => return Err(StepFailure::Retry(report["reason"].as_str().unwrap_or("retry").to_string())),
-                    Some("error") => return Err(StepFailure::Failed(format!("step reported {}", report["code"].as_str().unwrap_or("error")))),
+                    Some("retry") => {
+                        return Err(StepFailure::Retry(
+                            report["reason"].as_str().unwrap_or("retry").to_string(),
+                        ))
+                    }
+                    Some("error") => {
+                        return Err(StepFailure::Failed(format!(
+                            "step reported {}",
+                            report["code"].as_str().unwrap_or("error")
+                        )))
+                    }
                     _ => {}
                 }
             }
             Ok(reported.and_then(|r| r.get("detail").cloned()))
         }
-        StepExit::Code(EXIT_RETRY) => Err(StepFailure::Retry(reported.and_then(|r| r["reason"].as_str().map(String::from)).unwrap_or_else(|| "retry".into()))),
+        StepExit::Code(EXIT_RETRY) => Err(StepFailure::Retry(
+            reported
+                .and_then(|r| r["reason"].as_str().map(String::from))
+                .unwrap_or_else(|| "retry".into()),
+        )),
         StepExit::Code(code) => Err(StepFailure::Failed(format!("step exited {code}"))),
-        StepExit::Signal(signal) => Err(StepFailure::Failed(format!("step died by signal {signal}"))),
+        StepExit::Signal(signal) => {
+            Err(StepFailure::Failed(format!("step died by signal {signal}")))
+        }
     }
 }
 
@@ -219,9 +294,21 @@ mod unix {
         let spec = StepSpec::parse(step)?;
         let timeout = spec.timeout;
 
-        let log = OpenOptions::new().create(true).append(true).mode(0o600).custom_flags(libc::O_CLOEXEC).open(run_dir.join("supervisor.log")).map_err(|e| fail(format!("supervisor.log: {e}")))?;
+        let log = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .mode(0o600)
+            .custom_flags(libc::O_CLOEXEC)
+            .open(run_dir.join("supervisor.log"))
+            .map_err(|e| fail(format!("supervisor.log: {e}")))?;
         let mut cmd = Command::new(&spec.host_bin);
-        cmd.args(&spec.argv).env_clear().envs(&spec.env).current_dir(&spec.cwd).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::from(log));
+        cmd.args(&spec.argv)
+            .env_clear()
+            .envs(&spec.env)
+            .current_dir(&spec.cwd)
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::from(log));
         // SAFETY: setsid and prctl are async-signal-safe; the step leads its own group so a timeout ends its
         // descendants too, and on Linux it dies with the supervisor that started it.
         unsafe {
@@ -235,7 +322,8 @@ mod unix {
             });
         }
         // The step receives no lock description: the map is empty.
-        let mut child = spawn_with_fds(cmd, &[]).map_err(|e| fail(format!("step did not start: {e}")))?;
+        let mut child =
+            spawn_with_fds(cmd, &[]).map_err(|e| fail(format!("step did not start: {e}")))?;
         let identity = facts::identity_of(ProcId(child.id()));
         let pid = child.id() as libc::pid_t;
         let mut stdout = child.stdout.take().map(|s| s.take(STDOUT_LIMIT));
@@ -259,7 +347,10 @@ mod unix {
                     // SAFETY: the child is not reaped yet, so its pid still names its own group.
                     unsafe { libc::killpg(pid, libc::SIGKILL) };
                     let _ = child.wait();
-                    return Err(fail(format!("step exceeded stepTimeoutMs ({} ms)", timeout.as_millis())));
+                    return Err(fail(format!(
+                        "step exceeded stepTimeoutMs ({} ms)",
+                        timeout.as_millis()
+                    )));
                 }
                 Ok(false) => std::thread::sleep(Duration::from_millis(20)),
                 Err(e) => return Err(fail(format!("step wait failed: {e}"))),
@@ -269,9 +360,13 @@ mod unix {
         // reaped yet, so its pid is still reserved and the group id it names can only be this step's own.
         // SAFETY: as above.
         unsafe { libc::killpg(pid, libc::SIGKILL) };
-        let status = child.wait().map_err(|e| fail(format!("step wait failed: {e}")))?;
+        let status = child
+            .wait()
+            .map_err(|e| fail(format!("step wait failed: {e}")))?;
         // A descendant outside the step's group may still hold the pipe: wait a bounded time, never forever.
-        let text = text_rx.recv_timeout(Duration::from_secs(2)).unwrap_or_default();
+        let text = text_rx
+            .recv_timeout(Duration::from_secs(2))
+            .unwrap_or_default();
         let exit = match status.code() {
             Some(code) => StepExit::Code(code),
             None => StepExit::Signal(status.signal().unwrap_or(0)),
@@ -286,7 +381,14 @@ fn exit_observed(pid: libc::pid_t) -> std::io::Result<bool> {
     // SAFETY: an all-zero siginfo_t is valid; waitid fills it only when a child changed state.
     let mut info: libc::siginfo_t = unsafe { std::mem::zeroed() };
     // SAFETY: waitid with a valid out pointer, on a child of this process.
-    let rc = unsafe { libc::waitid(libc::P_PID, pid as libc::id_t, &mut info, libc::WEXITED | libc::WNOHANG | libc::WNOWAIT) };
+    let rc = unsafe {
+        libc::waitid(
+            libc::P_PID,
+            pid as libc::id_t,
+            &mut info,
+            libc::WEXITED | libc::WNOHANG | libc::WNOWAIT,
+        )
+    };
     if rc < 0 {
         return Err(std::io::Error::last_os_error());
     }
@@ -323,12 +425,22 @@ mod windows {
     pub(super) fn run_step(step: &Value, run_dir: &Path) -> Result<Option<Value>, StepFailure> {
         let fail = |why: String| StepFailure::Failed(why);
         let step_spec = StepSpec::parse(step)?;
-        let log = OpenOptions::new().create(true).append(true).open(run_dir.join("supervisor.log")).map_err(|e| fail(format!("supervisor.log: {e}")))?;
+        let log = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(run_dir.join("supervisor.log"))
+            .map_err(|e| fail(format!("supervisor.log: {e}")))?;
         let spec = SpawnSpec {
             program: OsString::from(&step_spec.host_bin),
             args: step_spec.argv.iter().map(OsString::from).collect(),
             cwd: Some(step_spec.cwd.clone().into()),
-            env: Some(step_spec.env.iter().map(|(k, v)| (OsString::from(k), OsString::from(v))).collect()),
+            env: Some(
+                step_spec
+                    .env
+                    .iter()
+                    .map(|(k, v)| (OsString::from(k), OsString::from(v)))
+                    .collect(),
+            ),
             // Suspended so the step runs its first instruction inside its job.
             creation_flags: CREATE_SUSPENDED,
             stdin: ChildStdio::Null,
@@ -336,11 +448,18 @@ mod windows {
             stderr: ChildStdio::File(log),
         };
         let mut child = spawn(spec).map_err(|e| fail(format!("step did not start: {e}")))?;
-        let job = create_kill_job(&format!("Local\\fgos-step-{}-{}", std::process::id(), child.id())).map_err(|e| {
+        let job = create_kill_job(&format!(
+            "Local\\fgos-step-{}-{}",
+            std::process::id(),
+            child.id()
+        ))
+        .map_err(|e| {
             let _ = child.kill();
             fail(format!("step job: {e}"))
         })?;
-        child.assign_and_resume(&job).map_err(|e| fail(format!("step could not enter its job: {e}")))?;
+        child
+            .assign_and_resume(&job)
+            .map_err(|e| fail(format!("step could not enter its job: {e}")))?;
 
         let mut stdout = child.stdout.take().map(|s| s.take(STDOUT_LIMIT));
         let (text_tx, text_rx) = std::sync::mpsc::channel();
@@ -359,7 +478,10 @@ mod windows {
                 Ok(None) if started.elapsed() >= step_spec.timeout => {
                     let _ = job.terminate();
                     let _ = child.wait();
-                    return Err(fail(format!("step exceeded stepTimeoutMs ({} ms)", step_spec.timeout.as_millis())));
+                    return Err(fail(format!(
+                        "step exceeded stepTimeoutMs ({} ms)",
+                        step_spec.timeout.as_millis()
+                    )));
                 }
                 Ok(None) => std::thread::sleep(Duration::from_millis(20)),
                 Err(e) => return Err(fail(format!("step wait failed: {e}"))),
@@ -367,7 +489,9 @@ mod windows {
         };
         // A descendant that outlived the step must not outlive the chain.
         let _ = job.terminate();
-        let text = text_rx.recv_timeout(Duration::from_secs(2)).unwrap_or_default();
+        let text = text_rx
+            .recv_timeout(Duration::from_secs(2))
+            .unwrap_or_default();
         interpret(StepExit::Code(code as i32), &text)
     }
 }

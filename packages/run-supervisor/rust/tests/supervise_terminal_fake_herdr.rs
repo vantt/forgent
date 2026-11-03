@@ -28,13 +28,27 @@ fn terminal_run(name: &str, herdr: &FakeHerdr, agent_script: &str, grace_ms: u64
 }
 
 /// `terminal_run` with the deadlines (or anything else of the options) a test sets.
-fn terminal_run_with(name: &str, herdr: &FakeHerdr, agent_script: &str, grace_ms: u64, tune: impl FnOnce(&mut RunOpts)) -> SupRun {
+fn terminal_run_with(
+    name: &str,
+    herdr: &FakeHerdr,
+    agent_script: &str,
+    grace_ms: u64,
+    tune: impl FnOnce(&mut RunOpts),
+) -> SupRun {
     let dir = std::env::temp_dir().join(format!("fgos-sup-{name}-{}", std::process::id()));
     let mut opts = RunOpts::agent(0);
     opts.preferred = "linux-pgroup".into();
     opts.grace_ms = grace_ms;
     tune(&mut opts);
-    opts.steps = vec![shell_step(&dir, "settle-attempt", &format!("echo settle >> {}/order", dir.display()), 10_000), release_slot_item()];
+    opts.steps = vec![
+        shell_step(
+            &dir,
+            "settle-attempt",
+            &format!("echo settle >> {}/order", dir.display()),
+            10_000,
+        ),
+        release_slot_item(),
+    ];
     let socket = herdr.go_socket().to_string_lossy().into_owned();
     let script = agent_script.replace("{dir}", &dir.to_string_lossy());
     let run = SupRun::new_with(name, &opts, |e| {
@@ -53,13 +67,19 @@ fn terminal_run_with(name: &str, herdr: &FakeHerdr, agent_script: &str, grace_ms
     for stream in ["stdout", "stderr"] {
         fs::write(envelope["launch"]["capture"][stream].as_str().unwrap(), "").unwrap();
     }
-    fs::write(run.path("brief.md"), "Do the thing and write result-1.json.\n").unwrap();
+    fs::write(
+        run.path("brief.md"),
+        "Do the thing and write result-1.json.\n",
+    )
+    .unwrap();
     herdr.allocate(&run.attempt_id);
     run
 }
 
 fn agent_pid(run: &SupRun) -> i32 {
-    run.json("agent-binding.json").and_then(|a| a["agent"]["pid"].as_i64()).expect("agent pid") as i32
+    run.json("agent-binding.json")
+        .and_then(|a| a["agent"]["pid"].as_i64())
+        .expect("agent pid") as i32
 }
 
 fn kill_agent(run: &SupRun) {
@@ -69,12 +89,18 @@ fn kill_agent(run: &SupRun) {
 
 fn write_result(run: &SupRun) {
     fs::create_dir_all(&run.outbox).unwrap();
-    fs::write(run.outbox.join("result-1.json"), json!({"status": "ok"}).to_string()).unwrap();
+    fs::write(
+        run.outbox.join("result-1.json"),
+        json!({"status": "ok"}).to_string(),
+    )
+    .unwrap();
 }
 
 /// Past the prompt: the brief typed, the agent shown working.
 fn brief_taken(herdr: &FakeHerdr, run: &SupRun) {
-    wait_until(STEP, "the gate to report the agent", || run.json("agent-binding.json").is_some());
+    wait_until(STEP, "the gate to report the agent", || {
+        run.json("agent-binding.json").is_some()
+    });
     herdr.wait_sent(2, STEP);
     herdr.set_explain(Verdict::Working);
 }
@@ -97,7 +123,11 @@ fn a_full_lifecycle_launches_briefs_waits_for_the_result_and_closes_the_pane_onc
 
     write_result(&run);
     herdr.wait_sent(3, STEP);
-    assert_eq!(herdr.sent()[2], json!({"kind": "prompt", "text": "/exit"}), "the adapter's exit command follows the result");
+    assert_eq!(
+        herdr.sent()[2],
+        json!({"kind": "prompt", "text": "/exit"}),
+        "the adapter's exit command follows the result"
+    );
     kill_agent(&run);
 
     let (code, line) = finish(supervisor, LIMIT);
@@ -107,7 +137,10 @@ fn a_full_lifecycle_launches_briefs_waits_for_the_result_and_closes_the_pane_onc
 
     let binding = run.json("supervisor-binding.json").expect("binding");
     assert_eq!(binding["attemptId"], run.attempt_id.as_str());
-    assert!(run.json("attempt.lock.predecessor.json").is_some(), "the domain was declared on the lock");
+    assert!(
+        run.json("attempt.lock.predecessor.json").is_some(),
+        "the domain was declared on the lock"
+    );
     let receipt = run.json("receipt.json").expect("receipt");
     assert_eq!(receipt["outcome"], "exited");
     assert_eq!(receipt["outboxPresent"], true);
@@ -115,11 +148,23 @@ fn a_full_lifecycle_launches_briefs_waits_for_the_result_and_closes_the_pane_onc
     assert!(receipt.get("reason").is_none());
 
     assert_eq!(fs::read_to_string(run.path("order")).unwrap(), "settle\n");
-    let release = run.json("steps/release-slot.json").expect("release-slot receipt");
+    let release = run
+        .json("steps/release-slot.json")
+        .expect("release-slot receipt");
     assert_eq!(release["detail"]["disposition"], "close");
-    assert_eq!(pane_closes(&herdr), vec!["pane close fk:p1".to_string()], "exactly one pane close, for this key's pane");
-    assert!(herdr.calls_starting("tab close").is_empty(), "no tab is ever closed");
-    assert!(!herdr.go_socket().exists(), "the attempt socket is gone with the supervisor");
+    assert_eq!(
+        pane_closes(&herdr),
+        vec!["pane close fk:p1".to_string()],
+        "exactly one pane close, for this key's pane"
+    );
+    assert!(
+        herdr.calls_starting("tab close").is_empty(),
+        "no tab is ever closed"
+    );
+    assert!(
+        !herdr.go_socket().exists(),
+        "the attempt socket is gone with the supervisor"
+    );
     assert!(lock_is_free(&run.path("attempt.lock")));
 }
 
@@ -133,15 +178,33 @@ fn a_pane_whose_shell_never_becomes_ready_ends_as_not_started_and_the_steps_stil
     let (code, line) = finish(supervisor, LIMIT);
     assert_eq!(code, 0, "{}", run.log());
     assert_eq!(line["outcome"], "abandoned-not-started");
-    assert_eq!(run.json("start-refused.json").expect("start-refused")["code"], "terminal-launch-not-started");
+    assert_eq!(
+        run.json("start-refused.json").expect("start-refused")["code"],
+        "terminal-launch-not-started"
+    );
     let receipt = run.json("receipt.json").expect("receipt");
     assert_eq!(receipt["outcome"], "abandoned-not-started");
-    assert_eq!(receipt["reason"], "start-refused:terminal-launch-not-started");
-    assert!(run.json("agent-binding.json").is_none() && run.json("supervisor-binding.json").is_none(), "no gate was bound");
-    assert!(run.json("steps/release-slot.json").is_some(), "the steps still run");
+    assert_eq!(
+        receipt["reason"],
+        "start-refused:terminal-launch-not-started"
+    );
+    assert!(
+        run.json("agent-binding.json").is_none() && run.json("supervisor-binding.json").is_none(),
+        "no gate was bound"
+    );
+    assert!(
+        run.json("steps/release-slot.json").is_some(),
+        "the steps still run"
+    );
     let runs = herdr.calls_starting("pane run");
-    assert!(!runs.is_empty() && runs.iter().all(|c| c.contains("fgos-ok-")), "only probes were typed: {runs:?}");
-    assert!(!herdr.dir.join("script.pid").exists(), "the launcher was never typed: only probes ran");
+    assert!(
+        !runs.is_empty() && runs.iter().all(|c| c.contains("fgos-ok-")),
+        "only probes were typed: {runs:?}"
+    );
+    assert!(
+        !herdr.dir.join("script.pid").exists(),
+        "the launcher was never typed: only probes ran"
+    );
 }
 
 #[test]
@@ -154,33 +217,48 @@ fn an_attempt_that_cannot_go_on_closes_the_captured_pane_and_names_why() {
     let (code, line) = finish(supervisor, LIMIT);
     assert_eq!(code, 0, "{}", run.log());
     assert_eq!(line["result"], "closed");
-    assert!(herdr.sent().is_empty(), "nothing is typed at a pane that waits for a person");
+    assert!(
+        herdr.sent().is_empty(),
+        "nothing is typed at a pane that waits for a person"
+    );
 
     let receipt = run.json("receipt.json").expect("receipt");
     assert_eq!(receipt["outcome"], "cancelled");
     assert_eq!(receipt["reason"], "terminal:needs-human");
     assert_eq!(run.json("stop-requested.json").unwrap()["cause"], "cancel");
-    let release = run.json("steps/release-slot.json").expect("release-slot receipt");
+    let release = run
+        .json("steps/release-slot.json")
+        .expect("release-slot receipt");
     assert_eq!(release["detail"]["disposition"], "close");
     assert_eq!(pane_closes(&herdr), vec!["pane close fk:p1".to_string()]);
-    assert!(run.json("agent-binding.json").is_some(), "the gate did start the agent before the supervisor judged the screen");
+    assert!(
+        run.json("agent-binding.json").is_some(),
+        "the gate did start the agent before the supervisor judged the screen"
+    );
 }
 
 #[test]
-fn a_brief_the_pane_refuses_because_its_shell_holds_the_foreground_ends_the_attempt_with_that_reason() {
+fn a_brief_the_pane_refuses_because_its_shell_holds_the_foreground_ends_the_attempt_with_that_reason(
+) {
     let herdr = FakeHerdr::new("shellfg");
     // Not at the prompt yet: the supervisor waits while the test takes the agent out of the foreground.
     herdr.set_explain(Verdict::Working);
     let mut run = terminal_run("tshellfg", &herdr, "sleep 600", 3_000);
     let supervisor = run.start_with_env(&herdr.env());
 
-    wait_until(STEP, "the gate to report the agent", || run.json("agent-binding.json").is_some());
+    wait_until(STEP, "the gate to report the agent", || {
+        run.json("agent-binding.json").is_some()
+    });
     herdr.set_flag("no-process", true);
     herdr.set_explain(Verdict::Idle);
 
     let (code, line) = finish(supervisor, LIMIT);
     assert_eq!(code, 0, "{}", run.log());
-    assert!(herdr.sent().is_empty(), "nothing is typed at a pane whose shell holds the foreground: {:?}", herdr.sent());
+    assert!(
+        herdr.sent().is_empty(),
+        "nothing is typed at a pane whose shell holds the foreground: {:?}",
+        herdr.sent()
+    );
     assert_eq!(line["outcome"], "cancelled");
     let receipt = run.json("receipt.json").expect("receipt");
     assert_eq!(receipt["outcome"], "cancelled");
@@ -206,29 +284,54 @@ fn a_pane_that_disappears_is_a_lost_carrier_and_nothing_is_closed() {
     assert_eq!(line["outcome"], "carrier-lost");
     let receipt = run.json("receipt.json").expect("receipt");
     assert_eq!(receipt["outcome"], "carrier-lost");
-    assert!(receipt.get("gateExit").is_none(), "the gate published nothing");
-    assert!(pane_closes(&herdr).is_empty(), "a lost carrier closes nothing");
-    assert_eq!(run.json("steps/release-slot.json").unwrap()["detail"]["disposition"], "retain");
+    assert!(
+        receipt.get("gateExit").is_none(),
+        "the gate published nothing"
+    );
+    assert!(
+        pane_closes(&herdr).is_empty(),
+        "a lost carrier closes nothing"
+    );
+    assert_eq!(
+        run.json("steps/release-slot.json").unwrap()["detail"]["disposition"],
+        "retain"
+    );
 }
 
 #[test]
 fn only_new_words_on_the_screen_keep_a_working_agent_from_idling_never_a_spinner_or_a_clock() {
     let herdr = FakeHerdr::new("alive");
-    let mut run = terminal_run_with("talive", &herdr, "sleep 600", 500, |opts| opts.idle_ms = Some(6_000));
+    let mut run = terminal_run_with("talive", &herdr, "sleep 600", 500, |opts| {
+        opts.idle_ms = Some(6_000)
+    });
     let supervisor = run.start_with_env(&herdr.env());
 
     brief_taken(&herdr, &run);
     let screen = herdr.dir.join("screen.txt");
     // More than an idle period of new output: the agent is making progress.
     for line in 0..20 {
-        let words: String = (0..=line).map(|n| format!("step {}\n", "abcdefghijklmnopqrstu".chars().nth(n).unwrap())).collect();
+        let words: String = (0..=line)
+            .map(|n| format!("step {}\n", "abcdefghijklmnopqrstu".chars().nth(n).unwrap()))
+            .collect();
         fs::write(&screen, words).unwrap();
         std::thread::sleep(Duration::from_millis(500));
     }
-    assert!(run.json("stop-requested.json").is_none(), "an agent writing new words is not idle: {}", run.log());
+    assert!(
+        run.json("stop-requested.json").is_none(),
+        "an agent writing new words is not idle: {}",
+        run.log()
+    );
     let calls = herdr.calls();
-    let typed = calls.iter().position(|c| c.starts_with("pane send-keys")).expect("the brief was submitted");
-    assert!(calls[typed..].iter().all(|c| !c.starts_with("pane process-info")), "the watch never reads the pane's processes: {calls:?}");
+    let typed = calls
+        .iter()
+        .position(|c| c.starts_with("pane send-keys"))
+        .expect("the brief was submitted");
+    assert!(
+        calls[typed..]
+            .iter()
+            .all(|c| !c.starts_with("pane process-info")),
+        "the watch never reads the pane's processes: {calls:?}"
+    );
 
     // Still reported working, but only the spinner and the elapsed clock move: a stuck turn.
     let frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -236,7 +339,16 @@ fn only_new_words_on_the_screen_keep_a_working_agent_from_idling_never_a_spinner
         if run.json("stop-requested.json").is_some() {
             break;
         }
-        fs::write(&screen, format!("{} Working ({}s, 1.{}k tokens)\n", frames[tick % frames.len()], 30 + tick, tick)).unwrap();
+        fs::write(
+            &screen,
+            format!(
+                "{} Working ({}s, 1.{}k tokens)\n",
+                frames[tick % frames.len()],
+                30 + tick,
+                tick
+            ),
+        )
+        .unwrap();
         std::thread::sleep(Duration::from_millis(500));
     }
     let (code, line) = finish(supervisor, LIMIT);
@@ -245,7 +357,10 @@ fn only_new_words_on_the_screen_keep_a_working_agent_from_idling_never_a_spinner
     assert_eq!(code, 0, "{}", run.log());
     assert_eq!(line["outcome"], "timeout");
     let stop = run.json("stop-requested.json").expect("stop request");
-    assert_eq!(stop["cause"], "idle", "a redrawing spinner is not progress: {stop}");
+    assert_eq!(
+        stop["cause"], "idle",
+        "a redrawing spinner is not progress: {stop}"
+    );
 }
 
 #[test]
@@ -260,7 +375,9 @@ fn a_pane_that_cannot_be_read_is_blind_time_that_runs_to_the_deadline_never_idle
     brief_taken(&herdr, &run);
     // Let the adapter confirm the delivery first, with the agent working and writing; only then does the pane stop answering.
     fs::write(herdr.dir.join("agent-status"), "working").unwrap();
-    for word in ["reading", "planning", "editing", "testing", "writing", "checking", "done"] {
+    for word in [
+        "reading", "planning", "editing", "testing", "writing", "checking", "done",
+    ] {
         fs::write(herdr.dir.join("screen.txt"), word).unwrap();
         std::thread::sleep(Duration::from_millis(600));
     }
@@ -273,13 +390,18 @@ fn a_pane_that_cannot_be_read_is_blind_time_that_runs_to_the_deadline_never_idle
     assert_eq!(code, 0, "{}", run.log());
     assert_eq!(line["outcome"], "timeout");
     let stop = run.json("stop-requested.json").expect("stop request");
-    assert_eq!(stop["cause"], "soft-deadline", "idle time must not accrue while nothing can be read: {stop}");
+    assert_eq!(
+        stop["cause"], "soft-deadline",
+        "idle time must not accrue while nothing can be read: {stop}"
+    );
 }
 
 /// A working pane agent stopped at its soft deadline while its screen shows `screen`; the receipt it leaves.
 fn receipt_of_a_deadline_stop(name: &str, screen: &str) -> Value {
     let herdr = FakeHerdr::new(name);
-    let mut run = terminal_run_with(&format!("t{name}"), &herdr, "sleep 600", 500, |opts| opts.soft_ms = Some(12_000));
+    let mut run = terminal_run_with(&format!("t{name}"), &herdr, "sleep 600", 500, |opts| {
+        opts.soft_ms = Some(12_000)
+    });
     let supervisor = run.start_with_env(&herdr.env());
     brief_taken(&herdr, &run);
     fs::write(herdr.dir.join("screen.txt"), screen).unwrap();
@@ -293,17 +415,33 @@ fn receipt_of_a_deadline_stop(name: &str, screen: &str) -> Value {
 
 #[test]
 fn a_deadline_stop_names_a_provider_stop_on_the_screen_and_keeps_the_timeout_outcome() {
-    let trust_dialog = fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../agent-protocol/contracts/fixtures/terminal/claude/trust-dialog.txt")).unwrap();
+    let trust_dialog = fs::read_to_string(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../agent-protocol/contracts/fixtures/terminal/claude/trust-dialog.txt"
+    ))
+    .unwrap();
     let cases = [
         // Strict provider wordings on a working pane: the caller must be able to move to another account.
-        ("dlimit", "working...\nERROR: You've hit your usage limit. try again at 7:18 PM.\n".to_string()),
-        ("dlogin", "working...\nNot logged in \u{b7} Please run /login\n".to_string()),
+        (
+            "dlimit",
+            "working...\nERROR: You've hit your usage limit. try again at 7:18 PM.\n".to_string(),
+        ),
+        (
+            "dlogin",
+            "working...\nNot logged in \u{b7} Please run /login\n".to_string(),
+        ),
         // The agent may have been working: its own prose about a rate limit, or a dialog, names nothing.
-        ("dprose", "I will add retry handling because of the rate limit\nstill working\n".to_string()),
+        (
+            "dprose",
+            "I will add retry handling because of the rate limit\nstill working\n".to_string(),
+        ),
         ("dtrust", trust_dialog),
     ];
     let receipts: Vec<Value> = std::thread::scope(|scope| {
-        let runs: Vec<_> = cases.iter().map(|(name, screen)| scope.spawn(|| receipt_of_a_deadline_stop(name, screen))).collect();
+        let runs: Vec<_> = cases
+            .iter()
+            .map(|(name, screen)| scope.spawn(|| receipt_of_a_deadline_stop(name, screen)))
+            .collect();
         runs.into_iter().map(|run| run.join().unwrap()).collect()
     });
     assert_eq!(receipts[0]["gateExit"]["stoppedBy"], "soft-deadline");
@@ -317,23 +455,41 @@ fn a_deadline_stop_names_a_provider_stop_on_the_screen_and_keeps_the_timeout_out
 fn a_launch_that_proves_nothing_sends_no_go_and_the_gate_finds_the_socket_closed() {
     let herdr = FakeHerdr::new("unknown");
     herdr.set_flag("no-process", true);
-    let mut run = terminal_run("tunknown", &herdr, "echo ran > {dir}/agent.ran; sleep 600", 3_000);
+    let mut run = terminal_run(
+        "tunknown",
+        &herdr,
+        "echo ran > {dir}/agent.ran; sleep 600",
+        3_000,
+    );
     let supervisor = run.start_with_env(&herdr.env());
 
     let (code, line) = finish(supervisor, LIMIT);
     assert_eq!(code, 0, "{}", run.log());
     assert_eq!(line["outcome"], "abandoned-not-started");
     let receipt = run.json("receipt.json").expect("receipt");
-    assert_eq!(receipt["reason"], "start-refused:terminal-launch-not-started");
-    assert!(run.json("supervisor-binding.json").is_none(), "no GO was ever prepared");
+    assert_eq!(
+        receipt["reason"],
+        "start-refused:terminal-launch-not-started"
+    );
+    assert!(
+        run.json("supervisor-binding.json").is_none(),
+        "no GO was ever prepared"
+    );
     assert!(!herdr.go_socket().exists(), "the listening socket is gone");
 
     // The gate was started in the pane anyway and meets a socket that no longer answers.
-    let script: i32 = fs::read_to_string(herdr.dir.join("script.pid")).unwrap().trim().parse().unwrap();
+    let script: i32 = fs::read_to_string(herdr.dir.join("script.pid"))
+        .unwrap()
+        .trim()
+        .parse()
+        .unwrap();
     wait_until(STEP, "the pane's gate to leave", || !alive(script as u32));
     assert!(!run.path("agent.ran").exists(), "no agent ran");
     assert!(run.json("gate-exit.json").is_none());
-    assert_eq!(run.json("steps/release-slot.json").unwrap()["detail"]["disposition"], "retain");
+    assert_eq!(
+        run.json("steps/release-slot.json").unwrap()["detail"]["disposition"],
+        "retain"
+    );
     assert!(pane_closes(&herdr).is_empty());
 }
 
@@ -350,15 +506,25 @@ fn a_supervisor_killed_after_the_brief_leaves_the_gate_running_and_adopt_release
     let _ = supervisor.wait();
     let agent = agent_pid(&run);
     assert!(alive(agent as u32), "the agent outlives its supervisor");
-    assert!(!lock_is_free(&run.path("attempt.lock")), "the gate holds the lock the supervisor handed over");
+    assert!(
+        !lock_is_free(&run.path("attempt.lock")),
+        "the gate holds the lock the supervisor handed over"
+    );
 
     write_result(&run);
-    wait_until(STEP, "the orphaned gate to end the domain", || run.json("gate-exit.json").is_some());
+    wait_until(STEP, "the orphaned gate to end the domain", || {
+        run.json("gate-exit.json").is_some()
+    });
     let exit = run.json("gate-exit.json").unwrap();
     assert_eq!(exit["stoppedBy"], "orphan");
     assert_eq!(exit["cause"], "orphan-result");
-    wait_until(STEP, "the lock to be free", || lock_is_free(&run.path("attempt.lock")));
-    assert!(pane_closes(&herdr).is_empty(), "nobody has released the slot yet");
+    wait_until(STEP, "the lock to be free", || {
+        lock_is_free(&run.path("attempt.lock"))
+    });
+    assert!(
+        pane_closes(&herdr).is_empty(),
+        "nobody has released the slot yet"
+    );
 
     let out = Command::new(internal_harness())
         .args(["internal", "adopt", "--protocol", "1", "--run-dir"])
@@ -368,11 +534,19 @@ fn a_supervisor_killed_after_the_brief_leaves_the_gate_running_and_adopt_release
         .stdin(Stdio::null())
         .output()
         .unwrap();
-    assert!(out.status.success(), "{} {}", String::from_utf8_lossy(&out.stdout), String::from_utf8_lossy(&out.stderr));
+    assert!(
+        out.status.success(),
+        "{} {}",
+        String::from_utf8_lossy(&out.stdout),
+        String::from_utf8_lossy(&out.stderr)
+    );
     let receipt = run.json("receipt.json").expect("receipt");
     assert_eq!(receipt["synthesizedBy"], "adopt");
     assert_eq!(receipt["outcome"], "exited");
-    assert_eq!(run.json("steps/release-slot.json").unwrap()["detail"]["disposition"], "close");
+    assert_eq!(
+        run.json("steps/release-slot.json").unwrap()["detail"]["disposition"],
+        "close"
+    );
     assert_eq!(pane_closes(&herdr), vec!["pane close fk:p1".to_string()]);
     assert!(run.json("closed.json").is_some());
 }
@@ -380,7 +554,9 @@ fn a_supervisor_killed_after_the_brief_leaves_the_gate_running_and_adopt_release
 #[test]
 fn a_fifo_named_like_a_result_does_not_stop_the_orphaned_gate_from_enforcing_the_hard_ceiling() {
     let herdr = FakeHerdr::new("fifo-ceiling");
-    let mut run = terminal_run_with("tfifo", &herdr, "sleep 600", 1_000, |opts| opts.ceiling_in_ms = 9_000);
+    let mut run = terminal_run_with("tfifo", &herdr, "sleep 600", 1_000, |opts| {
+        opts.ceiling_in_ms = 9_000
+    });
     let mut supervisor = run.start_with_env(&herdr.env());
 
     brief_taken(&herdr, &run);
@@ -392,8 +568,15 @@ fn a_fifo_named_like_a_result_does_not_stop_the_orphaned_gate_from_enforcing_the
     // SAFETY: a valid NUL-terminated path in the attempt's own outbox.
     assert_eq!(unsafe { libc::mkfifo(fifo.as_ptr(), 0o600) }, 0);
 
-    wait_until(STEP, "the gate to enforce the ceiling past a FIFO result", || run.json("gate-exit.json").is_some());
-    assert_eq!(run.json("gate-exit.json").unwrap()["stoppedBy"], "hard-ceiling");
+    wait_until(
+        STEP,
+        "the gate to enforce the ceiling past a FIFO result",
+        || run.json("gate-exit.json").is_some(),
+    );
+    assert_eq!(
+        run.json("gate-exit.json").unwrap()["stoppedBy"],
+        "hard-ceiling"
+    );
     assert!(!alive(agent_pid(&run) as u32), "the agent is gone");
 }
 
@@ -407,7 +590,11 @@ fn an_idle_agent_with_unchanged_invalid_result_stops_and_releases_custody() {
     // Let the supervisor observe working before returning to the idle prompt.
     std::thread::sleep(Duration::from_secs(2));
     fs::create_dir_all(&run.outbox).unwrap();
-    fs::write(run.outbox.join("result-1.json"), "{\"summary\":\"raw\nnewline\"}").unwrap();
+    fs::write(
+        run.outbox.join("result-1.json"),
+        "{\"summary\":\"raw\nnewline\"}",
+    )
+    .unwrap();
     herdr.set_explain(Verdict::Idle);
     let (code, _) = finish(supervisor, LIMIT);
     assert_eq!(code, 0, "{}", run.log());

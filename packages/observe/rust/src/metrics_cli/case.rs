@@ -58,7 +58,13 @@ fn handle_close(req: &ObserveRequest, args: &[String]) -> Result<serde_json::Val
     let flags = parse_flags(
         "case",
         args,
-        &["--interventions", "--verdict", "--note", "--items", "--sessions"],
+        &[
+            "--interventions",
+            "--verdict",
+            "--note",
+            "--items",
+            "--sessions",
+        ],
         &[],
         true,
     )?;
@@ -73,7 +79,12 @@ fn handle_close(req: &ObserveRequest, args: &[String]) -> Result<serde_json::Val
     let list = |flag| {
         flags
             .value(flag)
-            .map(|raw| raw.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect())
+            .map(|raw| {
+                raw.split(',')
+                    .map(|s| s.trim().to_string())
+                    .filter(|s| !s.is_empty())
+                    .collect()
+            })
             .unwrap_or_default()
     };
     let (items, sessions) = (list("--items"), list("--sessions"));

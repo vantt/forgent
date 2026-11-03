@@ -2,8 +2,8 @@ mod common;
 use common::*;
 use fgos_terminal_control::core::Core;
 use fgos_terminal_control::driver::{Direction, CAPABILITIES};
-use fgos_terminal_control::policy::{PlaceInput, Placement, PlacementPolicy};
 use fgos_terminal_control::policy::measured_split::MeasuredSplit;
+use fgos_terminal_control::policy::{PlaceInput, Placement, PlacementPolicy};
 use fgos_terminal_control::port::*;
 
 #[test]
@@ -50,20 +50,36 @@ fn a_pane_released_while_the_group_is_measured_does_not_stop_the_allocation() {
     let b = core.allocate(&request("b", "g")).unwrap().slot;
     // Another process closes `a` after the group was found live and before its geometry is read.
     *driver.vanish_on_layout.borrow_mut() = Some(a.pane_id.clone());
-    let c = core.allocate(&request("c", "g")).expect("a vanished pane is no error");
+    let c = core
+        .allocate(&request("c", "g"))
+        .expect("a vanished pane is no error");
     assert!(driver.panes.borrow().contains_key(&c.slot.pane_id));
-    let anchor = driver.calls("pane.split").last().cloned().unwrap_or_default();
-    assert!(!anchor.contains(&a.pane_id), "no split starts from the vanished pane: {anchor}");
+    let anchor = driver
+        .calls("pane.split")
+        .last()
+        .cloned()
+        .unwrap_or_default();
+    assert!(
+        !anchor.contains(&a.pane_id),
+        "no split starts from the vanished pane: {anchor}"
+    );
     assert!(driver.panes.borrow().contains_key(&b.pane_id));
 }
 
 #[test]
 fn every_pane_of_the_group_vanishing_while_it_is_measured_continues_in_a_new_tab() {
     let driver = MemDriver::new(352, 69);
-    let core = core(&driver, &MeasuredSplit, state_dir("all-vanish-while-measured"));
+    let core = core(
+        &driver,
+        &MeasuredSplit,
+        state_dir("all-vanish-while-measured"),
+    );
     let a = core.allocate(&request("a", "g")).unwrap().slot;
     *driver.vanish_on_layout.borrow_mut() = Some(a.pane_id.clone());
-    let b = core.allocate(&request("b", "g")).expect("a vanished pane is no error").slot;
+    let b = core
+        .allocate(&request("b", "g"))
+        .expect("a vanished pane is no error")
+        .slot;
     assert_ne!(b.tab_id, a.tab_id);
     let labels: Vec<_> = driver.tabs.borrow().iter().map(|t| t.1.clone()).collect();
     // The first tab was still live when the group was read, so the new one counts as the second.
@@ -77,8 +93,16 @@ fn release_close_closes_only_its_own_pane_and_never_a_tab() {
     let a = core.allocate(&request("a", "g")).unwrap().slot;
     let b = core.allocate(&request("b", "g")).unwrap().slot;
     let out = core.release("a", Disposition::Close, None).unwrap();
-    assert_eq!(out, ReleaseOutcome::Released { disposition: Disposition::Close });
-    assert_eq!(driver.calls("pane.close"), vec![format!("pane.close {}", a.pane_id)]);
+    assert_eq!(
+        out,
+        ReleaseOutcome::Released {
+            disposition: Disposition::Close
+        }
+    );
+    assert_eq!(
+        driver.calls("pane.close"),
+        vec![format!("pane.close {}", a.pane_id)]
+    );
     assert!(driver.panes.borrow().contains_key(&b.pane_id));
     assert!(driver.log.borrow().iter().all(|l| !l.contains("tab.close")));
     // releasing again is idempotent and closes nothing more
@@ -121,11 +145,21 @@ fn an_allocated_pane_carries_its_display_label_in_a_new_tab_and_after_a_split() 
     let first = core.allocate(&request("a", "g")).unwrap().slot;
     let second = core.allocate(&request("b", "g")).unwrap().slot;
     assert_eq!(driver.calls("pane.split").len(), 1);
-    assert_eq!(driver.calls("label.pane"), vec![format!("label.pane {} label-g", first.pane_id), format!("label.pane {} label-g", second.pane_id)]);
+    assert_eq!(
+        driver.calls("label.pane"),
+        vec![
+            format!("label.pane {} label-g", first.pane_id),
+            format!("label.pane {} label-g", second.pane_id)
+        ]
+    );
 }
 
 fn display(id: Option<&str>, title: Option<&str>) -> Display {
-    Display { id: id.map(Into::into), title: title.map(Into::into), ..Display::default() }
+    Display {
+        id: id.map(Into::into),
+        title: title.map(Into::into),
+        ..Display::default()
+    }
 }
 
 #[test]
@@ -133,38 +167,107 @@ fn labels_are_built_from_short_ids_and_titles_of_at_most_24_characters_in_one_pl
     // Tab label: `<first 8 of the id> · <title cut at 24>`, one part alone when the other is missing, the group key when both are.
     let work = display(Some("tsk-1lvxq7m2h9"), Some("fix terminal layout"));
     assert_eq!(work.tab_label("g"), "tsk-1lvx · fix terminal layout");
-    let long = display(Some("tsk-1lvxq7m2h9"), Some("  a very long title\nthat runs past the limit "));
+    let long = display(
+        Some("tsk-1lvxq7m2h9"),
+        Some("  a very long title\nthat runs past the limit "),
+    );
     assert_eq!(long.tab_label("g"), "tsk-1lvx · a very long title that r");
-    assert_eq!(display(Some("run-9f3a"), Some("tới lượt người dùng soạn thảo văn bản dài")).tab_label("g"), "run-9f3a · tới lượt người dùng soạn");
-    assert_eq!(display(Some("tsk-1lvxq7m2h9"), None).tab_label("g"), "tsk-1lvx");
-    assert_eq!(display(None, Some("only a title")).tab_label("g"), "only a title");
+    assert_eq!(
+        display(
+            Some("run-9f3a"),
+            Some("tới lượt người dùng soạn thảo văn bản dài")
+        )
+        .tab_label("g"),
+        "run-9f3a · tới lượt người dùng soạn"
+    );
+    assert_eq!(
+        display(Some("tsk-1lvxq7m2h9"), None).tab_label("g"),
+        "tsk-1lvx"
+    );
+    assert_eq!(
+        display(None, Some("only a title")).tab_label("g"),
+        "only a title"
+    );
     assert_eq!(display(None, Some("   ")).tab_label("unit-g"), "unit-g");
     // Worker pane: `<role> · <model>`, the agent when no model is known, the role alone, else the tab label.
-    let worker = Display { role: Some("producer".into()), model: Some("claude-sonnet".into()), agent: Some("claude".into()), ..work.clone() };
+    let worker = Display {
+        role: Some("producer".into()),
+        model: Some("claude-sonnet".into()),
+        agent: Some("claude".into()),
+        ..work.clone()
+    };
     assert_eq!(worker.pane_label("g"), "producer · claude-sonnet");
-    assert_eq!(Display { model: None, ..worker.clone() }.pane_label("g"), "producer · claude");
-    assert_eq!(Display { model: None, agent: None, ..worker.clone() }.pane_label("g"), "producer");
+    assert_eq!(
+        Display {
+            model: None,
+            ..worker.clone()
+        }
+        .pane_label("g"),
+        "producer · claude"
+    );
+    assert_eq!(
+        Display {
+            model: None,
+            agent: None,
+            ..worker.clone()
+        }
+        .pane_label("g"),
+        "producer"
+    );
     assert_eq!(work.pane_label("g"), "tsk-1lvx · fix terminal layout");
     // A person's own pane names its session by the first 8 characters, after the tab label.
-    let own = Display { session: Some("0123456789abcdef".into()), ..work.clone() };
-    assert_eq!(own.pane_label("g"), "tsk-1lvx · fix terminal layout | fg.ssid:01234567");
-    assert_eq!(Display { title: None, ..own }.pane_label("g"), "tsk-1lvx | fg.ssid:01234567");
+    let own = Display {
+        session: Some("0123456789abcdef".into()),
+        ..work.clone()
+    };
+    assert_eq!(
+        own.pane_label("g"),
+        "tsk-1lvx · fix terminal layout | fg.ssid:01234567"
+    );
+    assert_eq!(
+        Display { title: None, ..own }.pane_label("g"),
+        "tsk-1lvx | fg.ssid:01234567"
+    );
 }
 
 #[test]
-fn the_tab_and_the_worker_pane_take_their_labels_from_the_display_and_an_overflow_tab_is_numbered() {
+fn the_tab_and_the_worker_pane_take_their_labels_from_the_display_and_an_overflow_tab_is_numbered()
+{
     // 100x20 keeps every pane in a tab of its own, so the group overflows.
     let driver = MemDriver::new(100, 20);
     let core = core(&driver, &MeasuredSplit, state_dir("label-format"));
     let mut a = request("a", "g");
-    a.display = Display { role: Some("producer".into()), model: Some("claude-sonnet".into()), ..display(Some("tsk-1lvxq7m2h9"), Some("fix terminal layout")) };
+    a.display = Display {
+        role: Some("producer".into()),
+        model: Some("claude-sonnet".into()),
+        ..display(Some("tsk-1lvxq7m2h9"), Some("fix terminal layout"))
+    };
     core.allocate(&a).unwrap();
     let mut b = request("b", "g");
-    b.display = Display { role: Some("judge".into()), model: Some("gpt-5".into()), ..a.display.clone() };
+    b.display = Display {
+        role: Some("judge".into()),
+        model: Some("gpt-5".into()),
+        ..a.display.clone()
+    };
     core.allocate(&b).unwrap();
     let tabs: Vec<_> = driver.tabs.borrow().iter().map(|t| t.1.clone()).collect();
-    assert_eq!(tabs, vec!["tsk-1lvx · fix terminal layout", "tsk-1lvx · fix terminal layout (2)"]);
-    let panes: Vec<_> = driver.calls("label.pane").iter().map(|c| c.split_once(' ').and_then(|(_, rest)| rest.split_once(' ')).map(|(_, l)| l.to_string()).unwrap()).collect();
+    assert_eq!(
+        tabs,
+        vec![
+            "tsk-1lvx · fix terminal layout",
+            "tsk-1lvx · fix terminal layout (2)"
+        ]
+    );
+    let panes: Vec<_> = driver
+        .calls("label.pane")
+        .iter()
+        .map(|c| {
+            c.split_once(' ')
+                .and_then(|(_, rest)| rest.split_once(' '))
+                .map(|(_, l)| l.to_string())
+                .unwrap()
+        })
+        .collect();
     assert_eq!(panes, vec!["producer · claude-sonnet", "judge · gpt-5"]);
 }
 
@@ -187,28 +290,49 @@ impl PlacementPolicy for AlwaysSplit {
 #[test]
 fn a_split_measured_below_the_minimum_is_closed_and_a_new_tab_opens() {
     let driver = MemDriver::new(100, 20);
-    let core = Core::new(&driver, &AlwaysSplit, config(state_dir("below-min-remeasure")));
+    let core = Core::new(
+        &driver,
+        &AlwaysSplit,
+        config(state_dir("below-min-remeasure")),
+    );
     let first = core.allocate(&request("a", "g")).unwrap().slot;
     let second = core.allocate(&request("b", "g")).unwrap().slot;
     assert_ne!(first.tab_id, second.tab_id);
-    assert_eq!(driver.pane_count(), 2, "the empty pane the split made is gone");
+    assert_eq!(
+        driver.pane_count(),
+        2,
+        "the empty pane the split made is gone"
+    );
     assert_eq!(driver.tab_count(), 2);
     assert_eq!(driver.calls("pane.split").len(), 1);
     assert_eq!(driver.calls("pane.close").len(), 1);
     assert!(driver.log.borrow().iter().all(|l| !l.contains("tab.close")));
     for pane in driver.panes.borrow().values() {
-        assert!(pane.rect.width >= 60 && pane.rect.height >= 15, "{:?}", pane.rect);
+        assert!(
+            pane.rect.width >= 60 && pane.rect.height >= 15,
+            "{:?}",
+            pane.rect
+        );
     }
 }
 
 #[test]
 fn without_geometry_the_newest_pane_splits_down_and_the_tab_fills_by_count() {
-    let caps: Vec<_> = CAPABILITIES.iter().copied().filter(|c| *c != "layout.geometry").collect();
+    let caps: Vec<_> = CAPABILITIES
+        .iter()
+        .copied()
+        .filter(|c| *c != "layout.geometry")
+        .collect();
     let driver = MemDriver::with_caps(352, 69, caps);
     let core = core(&driver, &MeasuredSplit, state_dir("no-geometry"));
     let mut tabs = std::collections::BTreeSet::new();
     for i in 0..5 {
-        tabs.insert(core.allocate(&request(&format!("k{i}"), "g")).unwrap().slot.tab_id);
+        tabs.insert(
+            core.allocate(&request(&format!("k{i}"), "g"))
+                .unwrap()
+                .slot
+                .tab_id,
+        );
     }
     // maxPanesPerTab is 4: the fifth pane opens a second tab.
     assert_eq!(tabs.len(), 2);
@@ -221,7 +345,10 @@ fn without_geometry_the_newest_pane_splits_down_and_the_tab_fills_by_count() {
 fn a_driver_without_the_capability_is_unsupported() {
     let driver = MemDriver::with_caps(352, 69, vec![]);
     let core = core(&driver, &MeasuredSplit, state_dir("unsupported"));
-    assert!(matches!(core.allocate(&request("a", "g")), Err(Refusal::Unsupported { .. })));
+    assert!(matches!(
+        core.allocate(&request("a", "g")),
+        Err(Refusal::Unsupported { .. })
+    ));
 }
 
 #[test]
@@ -236,8 +363,19 @@ fn invalid_keys_are_refused() {
 #[test]
 fn the_core_never_reads_labels_or_lists_to_decide() {
     let source = include_str!("../src/core.rs");
-    for forbidden in ["pane list", "tab list", "tab_list", "pane_list", "list_panes", ".display.label ==", "label =="] {
-        assert!(!source.contains(forbidden), "core.rs must not use `{forbidden}`");
+    for forbidden in [
+        "pane list",
+        "tab list",
+        "tab_list",
+        "pane_list",
+        "list_panes",
+        ".display.label ==",
+        "label ==",
+    ] {
+        assert!(
+            !source.contains(forbidden),
+            "core.rs must not use `{forbidden}`"
+        );
     }
     assert!(!source.contains("cfg(target_os"), "core has no OS branches");
 }
@@ -251,7 +389,12 @@ fn attach_records_the_pane_and_release_never_closes_it() {
     let attached = core.attach("att", &own.pane_id, None, None).unwrap();
     assert_eq!(attached.origin, Origin::Attached);
     let out = core.release("att", Disposition::Close, None).unwrap();
-    assert_eq!(out, ReleaseOutcome::Released { disposition: Disposition::Close });
+    assert_eq!(
+        out,
+        ReleaseOutcome::Released {
+            disposition: Disposition::Close
+        }
+    );
     assert!(driver.calls("pane.close").is_empty());
     assert!(driver.panes.borrow().contains_key(&own.pane_id));
 }
@@ -268,23 +411,38 @@ fn attach_takes_only_a_pane_whose_shell_is_the_caller_or_one_of_its_ancestors() 
     };
 
     // A live process that is not an ancestor of the caller: it descends from the caller, not the other way round.
-    let mut stranger = std::process::Command::new("sleep").arg("30").spawn().expect("spawn sleep");
+    let mut stranger = std::process::Command::new("sleep")
+        .arg("30")
+        .spawn()
+        .expect("spawn sleep");
     driver.set_foreground(&pane, stranger.id(), vec![], stranger.id());
     let reason = not_owned(core.attach("a-stranger", &pane, None, None));
-    assert!(reason.contains(&stranger.id().to_string()) && reason.contains(&std::process::id().to_string()), "the refusal names both: {reason}");
+    assert!(
+        reason.contains(&stranger.id().to_string())
+            && reason.contains(&std::process::id().to_string()),
+        "the refusal names both: {reason}"
+    );
     let _ = stranger.kill();
     let _ = stranger.wait();
 
     // The caller's own shell is the pane's shell.
     run_caller_in(&driver, &pane);
-    assert_eq!(core.attach("a-own", &pane, None, None).unwrap().origin, Origin::Attached);
+    assert_eq!(
+        core.attach("a-own", &pane, None, None).unwrap().origin,
+        Origin::Attached
+    );
 
     // An ancestor's shell counts: the caller runs inside it (a pane's shell starts the agent that starts the caller).
     #[cfg(target_os = "linux")]
     {
-        let parent = fgos_terminal_control::identity::parent_of_this_process().filter(|p| *p > 1).expect("a test process has a parent");
+        let parent = fgos_terminal_control::identity::parent_of_this_process()
+            .filter(|p| *p > 1)
+            .expect("a test process has a parent");
         driver.set_foreground(&pane, parent, vec![], parent);
-        assert_eq!(core.attach("a-ancestor", &pane, None, None).unwrap().origin, Origin::Attached);
+        assert_eq!(
+            core.attach("a-ancestor", &pane, None, None).unwrap().origin,
+            Origin::Attached
+        );
     }
 }
 
@@ -292,13 +450,24 @@ fn attach_takes_only_a_pane_whose_shell_is_the_caller_or_one_of_its_ancestors() 
 fn a_caller_the_os_does_not_name_never_takes_a_pane_even_through_a_key_already_bound_to_it() {
     let driver = MemDriver::new(352, 69);
     let root = state_dir("attach-unnamed-caller");
-    let pane = core(&driver, &MeasuredSplit, root.clone()).allocate(&request("own", "g")).unwrap().slot.pane_id;
+    let pane = core(&driver, &MeasuredSplit, root.clone())
+        .allocate(&request("own", "g"))
+        .unwrap()
+        .slot
+        .pane_id;
     run_caller_in(&driver, &pane);
-    core(&driver, &MeasuredSplit, root.clone()).attach("bound", &pane, None, None).unwrap();
+    core(&driver, &MeasuredSplit, root.clone())
+        .attach("bound", &pane, None, None)
+        .unwrap();
 
     for caller in [None, Some(u32::MAX - 1), Some(1)] {
-        let outcome = core(&driver, &MeasuredSplit, root.clone()).with_caller(caller).attach("bound", &pane, None, None);
-        assert!(matches!(&outcome, Err(Refusal::Unknown { reason }) if reason.starts_with("pane-not-owned:")), "caller {caller:?}: {outcome:?}");
+        let outcome = core(&driver, &MeasuredSplit, root.clone())
+            .with_caller(caller)
+            .attach("bound", &pane, None, None);
+        assert!(
+            matches!(&outcome, Err(Refusal::Unknown { reason }) if reason.starts_with("pane-not-owned:")),
+            "caller {caller:?}: {outcome:?}"
+        );
     }
 }
 
@@ -311,14 +480,23 @@ fn a_caller_closes_its_own_attached_pane_and_no_other() {
     run_caller_in(&driver, &mine.pane_id);
     run_caller_in(&driver, &other.pane_id);
     core.attach("att-mine", &mine.pane_id, None, None).unwrap();
-    core.attach("att-other", &other.pane_id, None, None).unwrap();
+    core.attach("att-other", &other.pane_id, None, None)
+        .unwrap();
 
     // Naming a different pane as the caller's own, or none, never closes.
-    core.release_as("att-other", Disposition::Close, None, Some(&mine.pane_id)).unwrap();
+    core.release_as("att-other", Disposition::Close, None, Some(&mine.pane_id))
+        .unwrap();
     assert!(driver.calls("pane.close").is_empty());
 
-    let out = core.release_as("att-mine", Disposition::Close, None, Some(&mine.pane_id)).unwrap();
-    assert_eq!(out, ReleaseOutcome::Released { disposition: Disposition::Close });
+    let out = core
+        .release_as("att-mine", Disposition::Close, None, Some(&mine.pane_id))
+        .unwrap();
+    assert_eq!(
+        out,
+        ReleaseOutcome::Released {
+            disposition: Disposition::Close
+        }
+    );
     assert_eq!(driver.calls("pane.close").len(), 1);
     assert!(!driver.panes.borrow().contains_key(&mine.pane_id));
     assert!(driver.panes.borrow().contains_key(&other.pane_id));
@@ -345,10 +523,15 @@ fn an_attached_pane_joins_the_group_it_names_and_the_next_pane_opens_beside_it()
     let core = core(&driver, &MeasuredSplit, state_dir("attach-group"));
     let own = core.allocate(&request("own", "other")).unwrap().slot;
     run_caller_in(&driver, &own.pane_id);
-    let attached = core.attach("anchor", &own.pane_id, Some("batch"), None).unwrap();
+    let attached = core
+        .attach("anchor", &own.pane_id, Some("batch"), None)
+        .unwrap();
     assert_eq!(attached.origin, Origin::Attached);
     let next = core.allocate(&request("seat", "batch")).unwrap().slot;
-    assert_eq!(next.tab_id, own.tab_id, "the batch continues in the tab of its attached pane");
+    assert_eq!(
+        next.tab_id, own.tab_id,
+        "the batch continues in the tab of its attached pane"
+    );
     assert_eq!(driver.tab_count(), 1);
     assert_eq!(driver.calls("pane.split").len(), 1);
 }

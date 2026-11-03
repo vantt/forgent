@@ -23,7 +23,10 @@ pub enum MainCheckoutLockError {
 pub fn check_main_checkout_lock(workspace_root: &Path) -> Result<(), MainCheckoutLockError> {
     let resource = fgos_holder_lock::Resource::new(
         "main-checkout",
-        workspace_root.join(".fgos").join("locks").join("main-checkout.lock"),
+        workspace_root
+            .join(".fgos")
+            .join("locks")
+            .join("main-checkout.lock"),
     );
     let probed = fgos_holder_lock::probe(&resource).map_err(|e| match e.kind() {
         std::io::ErrorKind::Unsupported => MainCheckoutLockError::DriverUnavailable(e.to_string()),

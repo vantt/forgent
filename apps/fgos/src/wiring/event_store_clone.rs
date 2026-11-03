@@ -16,7 +16,10 @@ pub struct OpenFault {
 }
 
 fn fault(error: &dyn std::fmt::Debug) -> OpenFault {
-    OpenFault { reason: "event-store-unavailable", detail: format!("{error:?}") }
+    OpenFault {
+        reason: "event-store-unavailable",
+        detail: format!("{error:?}"),
+    }
 }
 
 pub struct EventStoreClone {
@@ -39,8 +42,18 @@ pub fn open(dir: &Path) -> Result<Option<EventStoreClone>, OpenFault> {
     };
     let layout = Layout::from_common_dir(Some(repo.common_dir())).map_err(|e| fault(&e))?;
     let configured = driver.machine_id(&repo).map_err(|e| fault(&e))?;
-    let configured = configured.as_ref().map(|fact| std::str::from_utf8(&fact.value)).transpose().map_err(|e| fault(&e))?;
+    let configured = configured
+        .as_ref()
+        .map(|fact| std::str::from_utf8(&fact.value))
+        .transpose()
+        .map_err(|e| fault(&e))?;
     let machine = machine_id(configured, &state).map_err(|e| fault(&e))?;
     let registry = Registry::shipped().map_err(|e| fault(&e))?;
-    Ok(Some(EventStoreClone { driver, repo, layout, registry, machine }))
+    Ok(Some(EventStoreClone {
+        driver,
+        repo,
+        layout,
+        registry,
+        machine,
+    }))
 }

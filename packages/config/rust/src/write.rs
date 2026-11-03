@@ -499,7 +499,8 @@ pub fn init(
         }),
         // Lost a race with a creator outside the lock.
         Installed::AlreadyExists => {
-            let (file, revision) = existing(select_source(&root, &dir, max)?).ok_or_else(|| conflict("revision-changed"))?;
+            let (file, revision) = existing(select_source(&root, &dir, max)?)
+                .ok_or_else(|| conflict("revision-changed"))?;
             Ok(InitResult {
                 created: false,
                 file,

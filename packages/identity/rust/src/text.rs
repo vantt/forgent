@@ -21,7 +21,10 @@ pub fn random_bytes<const N: usize>() -> io::Result<[u8; N]> {
 
 /// 128 random bits as 32 lowercase hex characters, from the kernel.
 pub fn random_hex128() -> io::Result<String> {
-    Ok(random_bytes::<16>()?.iter().map(|b| format!("{b:02x}")).collect())
+    Ok(random_bytes::<16>()?
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect())
 }
 
 /// Lowercase ASCII letters and digits of `input`, every other run of
@@ -44,13 +47,16 @@ pub fn slug(input: &str) -> String {
 /// worth of `bytes`; `chars` must not exceed `bytes.len() * 8 / 5`.
 pub fn base32_prefix(bytes: &[u8], chars: usize) -> String {
     const ALPHABET: &[u8; 32] = b"abcdefghijklmnopqrstuvwxyz234567";
-    assert!(chars <= bytes.len() * 8 / 5, "not enough bytes for {chars} characters");
+    assert!(
+        chars <= bytes.len() * 8 / 5,
+        "not enough bytes for {chars} characters"
+    );
     (0..chars)
         .map(|index| {
             let bit = index * 5;
             let (byte, shift) = (bit / 8, bit % 8);
-            let window = (u16::from(bytes[byte]) << 8)
-                | bytes.get(byte + 1).copied().map_or(0, u16::from);
+            let window =
+                (u16::from(bytes[byte]) << 8) | bytes.get(byte + 1).copied().map_or(0, u16::from);
             ALPHABET[((window >> (11 - shift)) & 31) as usize] as char
         })
         .collect()
@@ -90,15 +96,21 @@ pub fn iso_utc(secs: u64, millis: u32) -> String {
 pub fn iso_utc_secs(text: &str) -> Option<u64> {
     let (date, time) = text.strip_suffix('Z')?.split_once('T')?;
     let mut date = date.split('-');
-    let (year, month, day): (i64, i64, i64) =
-        (date.next()?.parse().ok()?, date.next()?.parse().ok()?, date.next()?.parse().ok()?);
+    let (year, month, day): (i64, i64, i64) = (
+        date.next()?.parse().ok()?,
+        date.next()?.parse().ok()?,
+        date.next()?.parse().ok()?,
+    );
     if date.next().is_some() || !(1..=12).contains(&month) || !(1..=31).contains(&day) {
         return None;
     }
     let time = time.split('.').next()?;
     let mut time = time.split(':');
-    let (hour, minute, second): (u64, u64, u64) =
-        (time.next()?.parse().ok()?, time.next()?.parse().ok()?, time.next()?.parse().ok()?);
+    let (hour, minute, second): (u64, u64, u64) = (
+        time.next()?.parse().ok()?,
+        time.next()?.parse().ok()?,
+        time.next()?.parse().ok()?,
+    );
     if time.next().is_some() || hour > 23 || minute > 59 || second > 60 {
         return None;
     }
@@ -121,7 +133,14 @@ mod iso_tests {
         for secs in [0, 86_399, 951_782_400, 1_788_000_123, 4_102_444_800] {
             assert_eq!(iso_utc_secs(&iso_utc(secs, 456)), Some(secs));
         }
-        for bad in ["", "2026-10-29", "2026-13-01T00:00:00Z", "2026-10-29T25:00:00Z", "2026-10-29T00:00:00", "x"] {
+        for bad in [
+            "",
+            "2026-10-29",
+            "2026-13-01T00:00:00Z",
+            "2026-10-29T25:00:00Z",
+            "2026-10-29T00:00:00",
+            "x",
+        ] {
             assert_eq!(iso_utc_secs(bad), None, "{bad}");
         }
     }

@@ -73,10 +73,7 @@ pub fn key_local(key: &WriterKey) -> Option<Local> {
 /// The local session id of a resolved writer, or `None` when the caller
 /// cannot be told from any other (`unresolved`, or a pid whose process facts
 /// cannot be read).
-pub fn local(
-    identity: &WriterIdentity,
-    facts: &dyn Fn(u32) -> Option<PidFacts>,
-) -> Option<Local> {
+pub fn local(identity: &WriterIdentity, facts: &dyn Fn(u32) -> Option<PidFacts>) -> Option<Local> {
     match &identity.id {
         WriterId::Session(id) => {
             let mut local = env_local(identity.env_var?, id);

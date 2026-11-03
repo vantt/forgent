@@ -44,14 +44,20 @@ pub fn two_process_probe(dir: &Path, helper: &HelperExe) -> Result<f64, String> 
 }
 
 fn sweep_stale_probes(dir: &Path) {
-    let Ok(entries) = fs::read_dir(dir) else { return };
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
+    };
     for entry in entries.flatten() {
         let name = entry.file_name();
         let name = name.to_string_lossy();
         if !(name.starts_with(".semantics-probe-") && name.ends_with(".lock")) {
             continue;
         }
-        let age = entry.metadata().and_then(|m| m.modified()).ok().and_then(|t| t.elapsed().ok());
+        let age = entry
+            .metadata()
+            .and_then(|m| m.modified())
+            .ok()
+            .and_then(|t| t.elapsed().ok());
         if age.is_some_and(|age| age > STALE_PROBE) {
             let _ = fs::remove_file(entry.path());
         }
@@ -123,7 +129,12 @@ fn probe_at(path: &Path, helper: &HelperExe) -> Result<(), String> {
         .stdout(Stdio::piped())
         .stderr(Stdio::null())
         .spawn()
-        .map_err(|e| format!("holder helper {} could not be started: {e}", helper.0.display()))?;
+        .map_err(|e| {
+            format!(
+                "holder helper {} could not be started: {e}",
+                helper.0.display()
+            )
+        })?;
     let mut stdout = child.stdout.take().expect("piped stdout");
     let (tx, rx) = std::sync::mpsc::channel();
     std::thread::spawn(move || {
@@ -136,7 +147,10 @@ fn probe_at(path: &Path, helper: &HelperExe) -> Result<(), String> {
         other => {
             let _ = child.kill();
             let _ = child.wait();
-            return Err(format!("the holder helper did not report that it holds the lock within {} ms: {other:?}", READY_WAIT.as_millis()));
+            return Err(format!(
+                "the holder helper did not report that it holds the lock within {} ms: {other:?}",
+                READY_WAIT.as_millis()
+            ));
         }
     };
     let _ = child.kill();
@@ -178,8 +192,8 @@ mod tests {
     fn a_live_child_holds_the_lock_and_its_death_frees_it() {
         let dir =
             std::env::temp_dir().join(format!("fgos-semantics-probe-test-{}", std::process::id()));
-        let elapsed =
-            two_process_probe(&dir.join("locks"), &HelperExe::current().unwrap()).expect("probe passes on a local tmp mount");
+        let elapsed = two_process_probe(&dir.join("locks"), &HelperExe::current().unwrap())
+            .expect("probe passes on a local tmp mount");
         assert!(elapsed < 1000.0, "probe took {elapsed} ms");
         assert_eq!(
             fs::read_dir(dir.join("locks")).unwrap().count(),
@@ -191,10 +205,22 @@ mod tests {
 
     #[test]
     fn a_probe_file_another_process_holds_is_refused() {
-        let dir = std::env::temp_dir().join(format!("fgos-semantics-held-test-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("fgos-semantics-held-test-{}", std::process::id()));
         fs::create_dir_all(&dir).unwrap();
-        let held = fs::OpenOptions::new().read(true).write(true).create(true).truncate(false).open(dir.join(format!(".semantics-probe-{}.lock", std::process::id()))).unwrap();
-        assert_eq!(driver::current().try_lock(&held, crate::port::Mode::Ex).unwrap(), driver::TryLock::Locked);
+        let held = fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .truncate(false)
+            .open(dir.join(format!(".semantics-probe-{}.lock", std::process::id())))
+            .unwrap();
+        assert_eq!(
+            driver::current()
+                .try_lock(&held, crate::port::Mode::Ex)
+                .unwrap(),
+            driver::TryLock::Locked
+        );
         let refused = two_process_probe(&dir, &HelperExe::current().unwrap()).unwrap_err();
         assert!(refused.contains("already locked"), "{refused}");
         drop(held);

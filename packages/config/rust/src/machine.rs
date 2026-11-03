@@ -112,8 +112,8 @@ pub fn project_snapshot(
     root: &Path,
     lookup: impl Fn(&str) -> Option<String>,
 ) -> Result<Snapshot, SnapshotError> {
-    let home = home_dir(&lookup)
-        .ok_or_else(|| std::io::Error::other(format!("{HOME_VAR} is not set")))?;
+    let home =
+        home_dir(&lookup).ok_or_else(|| std::io::Error::other(format!("{HOME_VAR} is not set")))?;
     let req = SnapshotRequest {
         project_root: root.into(),
         trusted_root: root.into(),

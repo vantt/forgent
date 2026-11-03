@@ -301,7 +301,12 @@ fn the_shell_that_launched_the_upgrade_does_not_block_it() {
     fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
     let ws = root.join("ws");
     fs::create_dir(&ws).unwrap();
-    assert!(Command::new("git").args(["init", "-q"]).arg(&ws).status().unwrap().success());
+    assert!(Command::new("git")
+        .args(["init", "-q"])
+        .arg(&ws)
+        .status()
+        .unwrap()
+        .success());
     let state = root.join("state");
     fs::create_dir(&state).unwrap();
     fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
@@ -333,7 +338,10 @@ fn the_shell_that_launched_the_upgrade_does_not_block_it() {
         .output()
         .unwrap();
     let message = String::from_utf8_lossy(&out.stderr).into_owned();
-    assert!(!message.contains("git-predecessor-writer-live"), "{message}");
+    assert!(
+        !message.contains("git-predecessor-writer-live"),
+        "{message}"
+    );
     assert!(fgos_holder_lock::tombstone::is_tombstone(
         &ws.join(".fgos/locks/activation.lock"),
         "activation",

@@ -83,7 +83,14 @@ fn migration_cases() {
         let global = input["scope"] == "global";
         let writer = common::writer(&input["writer"]);
         let got = match global {
-            true => fgos_config::migrate::global(&ctx, &roots, &writer, &opts, input["machine_checked"] != false, |_| Ok(())),
+            true => fgos_config::migrate::global(
+                &ctx,
+                &roots,
+                &writer,
+                &opts,
+                input["machine_checked"] != false,
+                |_| Ok(()),
+            ),
             false => project(&ctx, &roots, &writer, &opts, |_| Ok(())),
         };
         for needle in want["absent"].as_array().into_iter().flatten() {

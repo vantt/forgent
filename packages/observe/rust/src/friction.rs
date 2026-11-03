@@ -52,7 +52,10 @@ pub fn current_caller() -> CallerInfo {
         }
         fgos_identity::Source::Pid | fgos_identity::Source::Unresolved => None,
     };
-    CallerInfo { pid: std::process::id(), session_id }
+    CallerInfo {
+        pid: std::process::id(),
+        session_id,
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -180,7 +183,10 @@ fn read_events(root: &Path) -> Result<Vec<Event>, String> {
     let mut invalid = store.invalid;
     let mut events = Vec::new();
     for StoredRecord { value, shard, line } in store.records {
-        let millis = value.get("ts").and_then(Value::as_str).and_then(stamp_millis);
+        let millis = value
+            .get("ts")
+            .and_then(Value::as_str)
+            .and_then(stamp_millis);
         let is_resolve = value.get("type").and_then(Value::as_str) == Some("friction-resolved");
         if millis.is_none() && !is_resolve {
             invalid.push(shard::InvalidLine {
@@ -190,7 +196,12 @@ fn read_events(root: &Path) -> Result<Vec<Event>, String> {
             });
             continue;
         }
-        events.push(Event { value, millis, shard, line });
+        events.push(Event {
+            value,
+            millis,
+            shard,
+            line,
+        });
     }
     shard::warn_skipped(STORE, &invalid);
     events.sort_by_key(|event| event.millis);
@@ -198,8 +209,13 @@ fn read_events(root: &Path) -> Result<Vec<Event>, String> {
 }
 
 fn append_values(root: &Path, values: &[Value]) -> Result<(), String> {
-    let lines = values.iter().map(shard::encode_line).collect::<Result<Vec<_>, _>>()?;
-    shard::append_lines(root, STORE, TornTail::Heal, &lines).map(drop).map_err(|e| e.to_string())
+    let lines = values
+        .iter()
+        .map(shard::encode_line)
+        .collect::<Result<Vec<_>, _>>()?;
+    shard::append_lines(root, STORE, TornTail::Heal, &lines)
+        .map(drop)
+        .map_err(|e| e.to_string())
 }
 
 /// Records a new friction event.
@@ -273,7 +289,12 @@ pub fn list(
     since_filter: Option<&str>,
 ) -> Result<Value, String> {
     let since = since_filter
-        .map(|since| ParsedWindow::parse(&Window { since: Some(since.to_string()), until: None }))
+        .map(|since| {
+            ParsedWindow::parse(&Window {
+                since: Some(since.to_string()),
+                until: None,
+            })
+        })
         .transpose()
         .map_err(invalid_input)?;
     let matches: Vec<Value> = read_events(root)?
@@ -299,11 +320,22 @@ pub fn show(root: &Path, subject_str: &str) -> Result<Value, String> {
     })?;
     let key = (subject.kind.as_str().to_string(), subject.id.clone());
 
-    let events: Vec<Event> =
-        read_events(root)?.into_iter().filter(|event| event.subject() == key).collect();
-    let recorded: Vec<&Event> = events.iter().filter(|e| e.kind() == "friction-recorded").collect();
-    let resolves: Vec<&Event> = events.iter().filter(|e| e.kind() == "friction-resolved").collect();
-    let unsettled_count = recorded.iter().filter(|rec| !is_settled(rec, &resolves)).count();
+    let events: Vec<Event> = read_events(root)?
+        .into_iter()
+        .filter(|event| event.subject() == key)
+        .collect();
+    let recorded: Vec<&Event> = events
+        .iter()
+        .filter(|e| e.kind() == "friction-recorded")
+        .collect();
+    let resolves: Vec<&Event> = events
+        .iter()
+        .filter(|e| e.kind() == "friction-resolved")
+        .collect();
+    let unsettled_count = recorded
+        .iter()
+        .filter(|rec| !is_settled(rec, &resolves))
+        .count();
 
     Ok(json!({
         "subject": subject.to_string_repr(),
@@ -334,8 +366,14 @@ pub fn rank(root: &Path, limit: Option<usize>) -> Result<Value, String> {
 
     let mut candidates = Vec::new();
     for (key, records) in recorded_by_subject {
-        let resolves = resolves_by_subject.get(&key).map(Vec::as_slice).unwrap_or(&[]);
-        let unsettled: Vec<&&Event> = records.iter().filter(|rec| !is_settled(rec, resolves)).collect();
+        let resolves = resolves_by_subject
+            .get(&key)
+            .map(Vec::as_slice)
+            .unwrap_or(&[]);
+        let unsettled: Vec<&&Event> = records
+            .iter()
+            .filter(|rec| !is_settled(rec, resolves))
+            .collect();
         // Events are in instant order, so the last of the maxima is the latest.
         let Some(latest) = unsettled.iter().max_by_key(|event| event.millis) else {
             continue;
@@ -447,7 +485,10 @@ mod tests {
             doc_type: None,
         };
         let refusal = record(&tmp, input).unwrap_err();
-        assert!(refusal.starts_with("friction-invalid-input: invalid layer"), "{refusal}");
+        assert!(
+            refusal.starts_with("friction-invalid-input: invalid layer"),
+            "{refusal}"
+        );
 
         // Invalid docType
         let input_doctype = FrictionInput {
@@ -537,17 +578,30 @@ mod tests {
             recorded_line("tsk-legacy-stamp", "2026-07-01T10:00:00Z"),
             resolved_line("tsk-legacy-stamp", "2026-07-01T10:00:00.500Z"),
         ];
-        fs::write(friction_dir(&tmp).join("one-writer.jsonl"), format!("{}\n", lines.join("\n"))).unwrap();
+        fs::write(
+            friction_dir(&tmp).join("one-writer.jsonl"),
+            format!("{}\n", lines.join("\n")),
+        )
+        .unwrap();
 
         for subject in ["work:tsk-equal", "work:tsk-legacy-stamp"] {
-            assert_eq!(show(&tmp, subject).unwrap()["unsettled"], 0, "{subject} stays unsettled");
+            assert_eq!(
+                show(&tmp, subject).unwrap()["unsettled"],
+                0,
+                "{subject} stays unsettled"
+            );
         }
-        assert_eq!(rank(&tmp, None).unwrap(), json!([]), "rank still lists settled records");
+        assert_eq!(
+            rank(&tmp, None).unwrap(),
+            json!([]),
+            "rank still lists settled records"
+        );
         let _ = fs::remove_dir_all(&tmp);
     }
 
     #[test]
-    fn a_resolve_stamped_just_after_or_with_no_instant_settles_the_records_already_written_before_it() {
+    fn a_resolve_stamped_just_after_or_with_no_instant_settles_the_records_already_written_before_it(
+    ) {
         let tmp = temp_root("legacy-stamps");
         let lines = [
             recorded_line("tsk-marker", "2026-07-01T10:00:00Z"),
@@ -555,10 +609,18 @@ mod tests {
             recorded_line("tsk-free-text", "2026-07-01T10:00:00Z"),
             resolved_line("tsk-free-text", "sometime later"),
         ];
-        fs::write(friction_dir(&tmp).join("one-writer.jsonl"), format!("{}\n", lines.join("\n"))).unwrap();
+        fs::write(
+            friction_dir(&tmp).join("one-writer.jsonl"),
+            format!("{}\n", lines.join("\n")),
+        )
+        .unwrap();
 
         for id in ["tsk-marker", "tsk-free-text"] {
-            assert_eq!(show(&tmp, &format!("work:{id}")).unwrap()["unsettled"], 0, "{id} stays unsettled");
+            assert_eq!(
+                show(&tmp, &format!("work:{id}")).unwrap()["unsettled"],
+                0,
+                "{id} stays unsettled"
+            );
         }
         assert_eq!(rank(&tmp, None).unwrap(), json!([]));
         let _ = fs::remove_dir_all(&tmp);
@@ -570,7 +632,11 @@ mod tests {
         let ts = "2026-10-01T10:00:00.000Z";
         for (shard, id) in [("pid-7", "tsk-pid"), ("session-a", "tsk-session")] {
             let lines = [recorded_line(id, ts), resolved_line(id, ts)];
-            fs::write(friction_dir(&tmp).join(format!("{shard}.jsonl")), format!("{}\n", lines.join("\n"))).unwrap();
+            fs::write(
+                friction_dir(&tmp).join(format!("{shard}.jsonl")),
+                format!("{}\n", lines.join("\n")),
+            )
+            .unwrap();
         }
         assert_eq!(show(&tmp, "work:tsk-pid").unwrap()["unsettled"], 1);
         assert_eq!(show(&tmp, "work:tsk-session").unwrap()["unsettled"], 0);
@@ -584,9 +650,16 @@ mod tests {
             recorded_line("tsk-good", "2026-10-01T10:00:00.000Z"),
             recorded_line("tsk-bad-stamp", "yesterday"),
         ];
-        fs::write(friction_dir(&tmp).join("w.jsonl"), format!("{}\n", lines.join("\n"))).unwrap();
+        fs::write(
+            friction_dir(&tmp).join("w.jsonl"),
+            format!("{}\n", lines.join("\n")),
+        )
+        .unwrap();
         assert_eq!(listed_ids(&tmp), vec!["tsk-good".to_string()]);
-        assert_eq!(show(&tmp, "work:tsk-bad-stamp").unwrap()["totalRecorded"], 0);
+        assert_eq!(
+            show(&tmp, "work:tsk-bad-stamp").unwrap()["totalRecorded"],
+            0
+        );
         let _ = fs::remove_dir_all(&tmp);
     }
 
@@ -596,14 +669,24 @@ mod tests {
         let tmp = temp_root("symlink");
         let external = temp_root("symlink-external");
         let target = external.join("outside.jsonl");
-        let original = format!("{}\n", recorded_line("tsk-outside", "2026-10-01T10:00:00.000Z"));
+        let original = format!(
+            "{}\n",
+            recorded_line("tsk-outside", "2026-10-01T10:00:00.000Z")
+        );
         fs::write(&target, &original).unwrap();
-        std::os::unix::fs::symlink(&target, crate::shard::shard_path(&tmp, "friction").unwrap()).unwrap();
+        std::os::unix::fs::symlink(&target, crate::shard::shard_path(&tmp, "friction").unwrap())
+            .unwrap();
 
-        assert!(record(&tmp, fresh_input("tsk-new")).is_err(), "record wrote through a symlinked shard");
+        assert!(
+            record(&tmp, fresh_input("tsk-new")).is_err(),
+            "record wrote through a symlinked shard"
+        );
         assert_eq!(fs::read_to_string(&target).unwrap(), original);
         if let Ok(listed) = list(&tmp, None, None, None) {
-            assert!(!listed.to_string().contains("tsk-outside"), "list read records through a symlinked shard");
+            assert!(
+                !listed.to_string().contains("tsk-outside"),
+                "list read records through a symlinked shard"
+            );
         }
         let _ = fs::remove_dir_all(&tmp);
         let _ = fs::remove_dir_all(&external);

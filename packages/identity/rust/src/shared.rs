@@ -19,8 +19,8 @@ use crate::signing::{self, Signature, Verified};
 use crate::text::iso_utc_now;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, BTreeSet};
 use sha2::{Digest, Sha256};
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 /// The Event Store stream the shared directory lives in.
@@ -40,7 +40,10 @@ pub struct MachineRef {
 
 impl From<&MachineInfo> for MachineRef {
     fn from(machine: &MachineInfo) -> Self {
-        Self { id: machine.id.clone(), handle: machine.handle.clone() }
+        Self {
+            id: machine.id.clone(),
+            handle: machine.handle.clone(),
+        }
     }
 }
 
@@ -69,7 +72,11 @@ pub trait LogDoor: Send + Sync + std::fmt::Debug {
 }
 
 fn refuse(reason: &'static str, detail: impl Into<String>) -> Refusal {
-    Refusal { reason, detail: detail.into(), candidates: Vec::new() }
+    Refusal {
+        reason,
+        detail: detail.into(),
+        candidates: Vec::new(),
+    }
 }
 
 /// The entry fields that travel; the clone path and the liveness stay local.
@@ -106,14 +113,22 @@ impl Claim {
     /// A payload is a published entry when it carries one, else an end.
     fn of_payload(payload: &Value) -> Option<Self> {
         let published = payload.get("entry").is_some();
-        let kind = if published { SESSION_PUBLISHED } else { SESSION_ENDED };
+        let kind = if published {
+            SESSION_PUBLISHED
+        } else {
+            SESSION_ENDED
+        };
         Self::parse(kind, payload)
     }
 
     fn parse(event_type: &str, payload: &Value) -> Option<Self> {
         match event_type {
-            SESSION_PUBLISHED => serde_json::from_value(payload.clone()).ok().map(Self::Published),
-            SESSION_ENDED => serde_json::from_value(payload.clone()).ok().map(Self::Ended),
+            SESSION_PUBLISHED => serde_json::from_value(payload.clone())
+                .ok()
+                .map(Self::Published),
+            SESSION_ENDED => serde_json::from_value(payload.clone())
+                .ok()
+                .map(Self::Ended),
             _ => None,
         }
     }
@@ -134,7 +149,11 @@ impl Claim {
 }
 
 /// The payload of `identity.session-published` for `entry`, signed by this machine.
-pub fn published_payload(state_root: &Path, entry: &Listed, machine: &MachineRef) -> Result<Value, Refusal> {
+pub fn published_payload(
+    state_root: &Path,
+    entry: &Listed,
+    machine: &MachineRef,
+) -> Result<Value, Refusal> {
     sign_payload(
         state_root,
         json!({
@@ -173,7 +192,10 @@ pub fn sign_payload(state_root: &Path, mut payload: Value) -> Result<Value, Refu
     payload
         .as_object_mut()
         .ok_or_else(|| refuse("invalid-payload", "payload is not an object"))?
-        .insert("sig".into(), serde_json::to_value(signature).expect("Signature always serializes"));
+        .insert(
+            "sig".into(),
+            serde_json::to_value(signature).expect("Signature always serializes"),
+        );
     Ok(payload)
 }
 
@@ -186,15 +208,23 @@ pub fn verify_payload(state_root: &Path, payload: &Value) -> Result<Verified, Re
         .as_object_mut()
         .and_then(|object| object.remove("sig"))
         .ok_or_else(|| refuse("invalid-signature", "the payload carries no sig"))?;
-    let signature: Signature = serde_json::from_value(sig).map_err(|e| refuse("invalid-signature", e.to_string()))?;
+    let signature: Signature =
+        serde_json::from_value(sig).map_err(|e| refuse("invalid-signature", e.to_string()))?;
     let claim = Claim::of_payload(&unsigned)
         .ok_or_else(|| refuse("invalid-payload", "the payload is not a directory event"))?;
     let machine_id = &claim.machine().id;
-    let owns_id = claim.id().split_once('/').is_some_and(|(owner, _)| owner == machine_id);
+    let owns_id = claim
+        .id()
+        .split_once('/')
+        .is_some_and(|(owner, _)| owner == machine_id);
     if signature.machine_id != *machine_id || !owns_id {
         return Err(refuse(
             "machine-mismatch",
-            format!("the event names machine {machine_id}, signed by {}, for session {}", signature.machine_id, claim.id()),
+            format!(
+                "the event names machine {machine_id}, signed by {}, for session {}",
+                signature.machine_id,
+                claim.id()
+            ),
         ));
     }
     signing::verify(state_root, &signed_bytes(&unsigned)?, &signature)
@@ -255,7 +285,8 @@ pub fn write_cache(path: &Path, cache: &Cache) -> Result<(), Refusal> {
         return Ok(());
     }
     let (dir, name) = (path.parent().unwrap_or(Path::new(".")), CACHE_FILE);
-    std::fs::create_dir_all(dir).map_err(|e| refuse("cache-write-failed", format!("{}: {e}", dir.display())))?;
+    std::fs::create_dir_all(dir)
+        .map_err(|e| refuse("cache-write-failed", format!("{}: {e}", dir.display())))?;
     fgos_durable_file::replace_durably_with_mode(dir, name, &bytes, 0o600)
         .map(|_| ())
         .map_err(|e| refuse("cache-write-failed", format!("{}: {e}", path.display())))
@@ -270,20 +301,44 @@ fn verified_key(payload: &Value) -> Option<String> {
     hash.update(signed_bytes(&unsigned).ok()?);
     hash.update(signature.public_key.as_bytes());
     hash.update(signature.sig.as_bytes());
-    Some(hash.finalize().iter().map(|byte| format!("{byte:02x}")).collect())
+    Some(
+        hash.finalize()
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect(),
+    )
 }
 
 /// [`verify_payload`], unless `known` already holds this payload verified and
 /// the machine is still pinned to the key that signed it (a re-keyed machine
 /// is checked again).
-fn verify_known(state_root: &Path, payload: &Value, known: Option<&Cache>, pinned: &BTreeMap<String, pins::Pin>) -> (Result<Verified, Refusal>, Option<String>) {
+fn verify_known(
+    state_root: &Path,
+    payload: &Value,
+    known: Option<&Cache>,
+    pinned: &BTreeMap<String, pins::Pin>,
+) -> (Result<Verified, Refusal>, Option<String>) {
     let key = verified_key(payload);
     if let (Some(cache), Some(key)) = (known, &key) {
-        let signer = payload.pointer("/sig/machineId").and_then(Value::as_str).unwrap_or_default();
-        let signing_key = payload.pointer("/sig/publicKey").and_then(Value::as_str).unwrap_or_default();
-        if let Some(pin) = pinned.get(signer).filter(|pin| pin.public_key == signing_key) {
+        let signer = payload
+            .pointer("/sig/machineId")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        let signing_key = payload
+            .pointer("/sig/publicKey")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        if let Some(pin) = pinned
+            .get(signer)
+            .filter(|pin| pin.public_key == signing_key)
+        {
             if cache.verified.contains(key) {
-                let verified = Verified { machine_id: signer.to_owned(), fingerprint: pin.fingerprint.clone(), first_seen: false, state: pin.state };
+                let verified = Verified {
+                    machine_id: signer.to_owned(),
+                    fingerprint: pin.fingerprint.clone(),
+                    first_seen: false,
+                    state: pin.state,
+                };
                 return (Ok(verified), Some(key.clone()));
             }
         }
@@ -310,10 +365,18 @@ pub struct SharedView {
 /// id is verified unless it is dropped, plus the first event of each machine,
 /// which is verified first so the key a machine is pinned to is the one it
 /// published first, not the one of its newest event.
-pub fn fold(state_root: &Path, events: &[RawEvent], fetched_at: Option<String>, known: Option<&Cache>) -> SharedView {
+pub fn fold(
+    state_root: &Path,
+    events: &[RawEvent],
+    fetched_at: Option<String>,
+    known: Option<&Cache>,
+) -> SharedView {
     let own = machine::read(state_root).ok();
-    let pinned: BTreeMap<String, pins::Pin> =
-        pins::list(state_root).unwrap_or_default().into_iter().map(|pin| (pin.machine_id.clone(), pin)).collect();
+    let pinned: BTreeMap<String, pins::Pin> = pins::list(state_root)
+        .unwrap_or_default()
+        .into_iter()
+        .map(|pin| (pin.machine_id.clone(), pin))
+        .collect();
     let mut verified = BTreeSet::new();
     let mut check = |payload: &Value| {
         let (result, key) = verify_known(state_root, payload, known, &pinned);
@@ -325,29 +388,47 @@ pub fn fold(state_root: &Path, events: &[RawEvent], fetched_at: Option<String>, 
     let mut checked: BTreeMap<usize, Result<Verified, Refusal>> = BTreeMap::new();
     let mut pinned_first = BTreeSet::new();
     for (position, event) in events.iter().enumerate() {
-        let Some(claim) = Claim::parse(&event.event_type, &event.payload) else { continue };
+        let Some(claim) = Claim::parse(&event.event_type, &event.payload) else {
+            continue;
+        };
         let machine_id = &claim.machine().id;
         if own.as_deref() != Some(machine_id.as_str()) && pinned_first.insert(machine_id.clone()) {
             checked.insert(position, check(&event.payload));
         }
     }
     for (position, event) in events.iter().enumerate().rev() {
-        let Some(claim) = Claim::parse(&event.event_type, &event.payload) else { continue };
+        let Some(claim) = Claim::parse(&event.event_type, &event.payload) else {
+            continue;
+        };
         let id = claim.id().to_owned();
         if decided.contains_key(&id) || own.as_deref() == Some(claim.machine().id.as_str()) {
             continue;
         }
-        let result = checked.remove(&position).unwrap_or_else(|| check(&event.payload));
+        let result = checked
+            .remove(&position)
+            .unwrap_or_else(|| check(&event.payload));
         match result {
             Ok(verified) => {
                 let outcome = match claim {
-                    Claim::Published(p) => Some((position, RemoteEntry { entry: p.entry, machine: p.machine, pin: verified.state })),
+                    Claim::Published(p) => Some((
+                        position,
+                        RemoteEntry {
+                            entry: p.entry,
+                            machine: p.machine,
+                            pin: verified.state,
+                        },
+                    )),
                     Claim::Ended(_) => None,
                 };
                 decided.insert(id, outcome);
             }
             Err(refusal) => dropped.push(Dropped {
-                reason: if refusal.reason == "machine-key-changed" { "key-changed" } else { refusal.reason }.to_owned(),
+                reason: if refusal.reason == "machine-key-changed" {
+                    "key-changed"
+                } else {
+                    refusal.reason
+                }
+                .to_owned(),
                 machine_id: claim.machine().id.clone(),
             }),
         }
@@ -359,16 +440,26 @@ pub fn fold(state_root: &Path, events: &[RawEvent], fetched_at: Option<String>, 
     // uses shows as the machine id instead.
     let mut claimed = BTreeSet::new();
     for remote in entries.iter_mut().rev() {
-        remote.entry.roles.retain(|role| claimed.insert(role.clone()));
+        remote
+            .entry
+            .roles
+            .retain(|role| claimed.insert(role.clone()));
     }
     let mut handles: BTreeMap<String, String> = BTreeMap::new();
     for remote in &mut entries {
-        let first = handles.entry(remote.machine.handle.clone()).or_insert_with(|| remote.machine.id.clone());
+        let first = handles
+            .entry(remote.machine.handle.clone())
+            .or_insert_with(|| remote.machine.id.clone());
         if *first != remote.machine.id {
             remote.machine.handle = remote.machine.id.clone();
         }
     }
-    SharedView { entries, fetched_at, dropped, verified }
+    SharedView {
+        entries,
+        fetched_at,
+        dropped,
+        verified,
+    }
 }
 
 impl SharedView {
@@ -393,11 +484,16 @@ impl SharedView {
 
     /// Keeps only the entries of `project_id`; two projects on one remote never mix.
     pub fn retain_project(&mut self, project_id: &str) {
-        self.entries.retain(|remote| remote.entry.project_id.as_deref() == Some(project_id));
+        self.entries
+            .retain(|remote| remote.entry.project_id.as_deref() == Some(project_id));
     }
 
     fn remote(&self, remote: &RemoteEntry) -> Remote {
-        Remote { machine: remote.machine.clone(), fetched_at: self.fetched_at.clone(), pin: remote.pin }
+        Remote {
+            machine: remote.machine.clone(),
+            fetched_at: self.fetched_at.clone(),
+            pin: remote.pin,
+        }
     }
 
     fn listed(&self, remote: &RemoteEntry) -> Listed {
@@ -439,15 +535,25 @@ impl SharedView {
                 vec![remote.entry.handle.clone()]
             }
         };
-        let hits: Vec<&RemoteEntry> = self.entries.iter().filter(|r| names(r).iter().any(|n| n == query)).collect();
+        let hits: Vec<&RemoteEntry> = self
+            .entries
+            .iter()
+            .filter(|r| names(r).iter().any(|n| n == query))
+            .collect();
         match hits.as_slice() {
             [one] => Ok(self.listed(one)),
             [] => {
-                let near: Vec<&RemoteEntry> =
-                    self.entries.iter().filter(|r| !query.is_empty() && names(r).iter().any(|n| n.contains(query))).collect();
+                let near: Vec<&RemoteEntry> = self
+                    .entries
+                    .iter()
+                    .filter(|r| !query.is_empty() && names(r).iter().any(|n| n.contains(query)))
+                    .collect();
                 Err(Refusal {
                     reason: "not-found",
-                    detail: format!("no remote session is named {query:?}; candidates: {}", join(near.iter().flat_map(|r| names(r)))),
+                    detail: format!(
+                        "no remote session is named {query:?}; candidates: {}",
+                        join(near.iter().flat_map(|r| names(r)))
+                    ),
                     candidates: near.iter().map(|r| self.candidate(r)).collect(),
                 })
             }
@@ -456,7 +562,10 @@ impl SharedView {
                 detail: format!(
                     "{query:?} names {} remote sessions: {}",
                     many.len(),
-                    join(many.iter().map(|r| format!("{} ({})", r.entry.handle, r.entry.id)))
+                    join(
+                        many.iter()
+                            .map(|r| format!("{} ({})", r.entry.handle, r.entry.id))
+                    )
                 ),
                 candidates: many.iter().map(|r| self.candidate(r)).collect(),
             }),
@@ -490,7 +599,6 @@ fn join(names: impl IntoIterator<Item = String>) -> String {
         names.join(", ")
     }
 }
-
 
 /// Publishes what changed since this machine's last events in `log`: `own`
 /// (the entry just written locally) when it is new or its handle, project or
@@ -530,7 +638,11 @@ pub fn publish_changes(
             appended += 1;
         }
     }
-    let kept: BTreeSet<&str> = live.iter().chain(own).map(|listed| listed.id.as_str()).collect();
+    let kept: BTreeSet<&str> = live
+        .iter()
+        .chain(own)
+        .map(|listed| listed.id.as_str())
+        .collect();
     for (id, state) in &last {
         if state.is_some() && !kept.contains(id.as_str()) {
             log.append(SESSION_ENDED, ended_payload(state_root, id, &me)?)?;

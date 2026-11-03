@@ -1,7 +1,13 @@
 #![cfg(target_os = "linux")]
 //! A ref listing that includes `refs/heads/` also observes HEAD, in the one child that lists.
 use fgos_git::*;
-use std::{fs, os::unix::fs::PermissionsExt, path::{Path, PathBuf}, process::Command, sync::OnceLock};
+use std::{
+    fs,
+    os::unix::fs::PermissionsExt,
+    path::{Path, PathBuf},
+    process::Command,
+    sync::OnceLock,
+};
 
 static LOG: OnceLock<PathBuf> = OnceLock::new();
 
@@ -34,7 +40,9 @@ fn logging_git() -> &'static Path {
     })
 }
 fn logged_lines() -> usize {
-    fs::read_to_string(logging_git()).map(|l| l.lines().count()).unwrap_or(0)
+    fs::read_to_string(logging_git())
+        .map(|l| l.lines().count())
+        .unwrap_or(0)
 }
 /// Subcommands of the children run against `repo` after the first `from` logged lines.
 fn children(repo: &RepoHandle, from: usize) -> Vec<String> {
@@ -57,7 +65,12 @@ fn children(repo: &RepoHandle, from: usize) -> Vec<String> {
         .collect()
 }
 fn git(p: &Path, args: &[&str]) -> String {
-    let o = Command::new("/usr/bin/git").arg("-C").arg(p).args(args).output().unwrap();
+    let o = Command::new("/usr/bin/git")
+        .arg("-C")
+        .arg(p)
+        .args(args)
+        .output()
+        .unwrap();
     assert!(o.status.success(), "{args:?}: {o:?}");
     String::from_utf8(o.stdout).unwrap().trim().into()
 }
@@ -73,13 +86,31 @@ impl Fixture {
     /// Branch `a` at a second commit, branch `b` at the first; HEAD attached to `a`.
     fn new(name: &str) -> Self {
         logging_git();
-        let root = std::env::temp_dir().join(format!("fgos-head-in-listing-{name}-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!(
+            "fgos-head-in-listing-{name}-{}",
+            std::process::id()
+        ));
         let _ = fs::remove_dir_all(&root);
         fs::create_dir(&root).unwrap();
         fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
         let repo = root.join("repo");
         git(&root, &["init", "-q", "--initial-branch=a", "repo"]);
-        let commit = |m: &str| git(&repo, &["-c", "user.name=T", "-c", "user.email=t@example.invalid", "commit", "-q", "--allow-empty", "-m", m]);
+        let commit = |m: &str| {
+            git(
+                &repo,
+                &[
+                    "-c",
+                    "user.name=T",
+                    "-c",
+                    "user.email=t@example.invalid",
+                    "commit",
+                    "-q",
+                    "--allow-empty",
+                    "-m",
+                    m,
+                ],
+            )
+        };
         commit("one");
         let first = git(&repo, &["rev-parse", "HEAD"]);
         git(&repo, &["branch", "b"]);
@@ -91,14 +122,31 @@ impl Fixture {
             ResolveRepo::Repository(r) => r,
             _ => panic!(),
         };
-        Self { root, repo, driver, handle, first, second }
+        Self {
+            root,
+            repo,
+            driver,
+            handle,
+            first,
+            second,
+        }
     }
     fn list(&self) -> RefPage {
-        let prefixes = [RefPrefix::parse("refs/fgos/events/").unwrap(), RefPrefix::parse("refs/heads/").unwrap()];
-        self.driver.list_refs(&self.handle, &prefixes, None, 4096).unwrap()
+        let prefixes = [
+            RefPrefix::parse("refs/fgos/events/").unwrap(),
+            RefPrefix::parse("refs/heads/").unwrap(),
+        ];
+        self.driver
+            .list_refs(&self.handle, &prefixes, None, 4096)
+            .unwrap()
     }
     fn value(page: &RefPage, name: &str) -> RefValue {
-        page.entries.iter().find(|e| e.name.as_str() == name).unwrap().value.clone()
+        page.entries
+            .iter()
+            .find(|e| e.name.as_str() == name)
+            .unwrap()
+            .value
+            .clone()
     }
 }
 impl Drop for Fixture {
@@ -114,10 +162,17 @@ fn an_attached_head_is_observed_by_the_one_child_that_lists_the_tips() {
     let from = logged_lines();
     let page = f.list();
     assert_eq!(children(&f.handle, from), ["for-each-ref"]);
-    assert_eq!(page.head.as_ref().map(RefName::as_str), Some("refs/heads/a"));
-    assert!(matches!(Fixture::value(&page, "refs/heads/a"), RefValue::Direct(o) if o.as_str() == f.second));
+    assert_eq!(
+        page.head.as_ref().map(RefName::as_str),
+        Some("refs/heads/a")
+    );
+    assert!(
+        matches!(Fixture::value(&page, "refs/heads/a"), RefValue::Direct(o) if o.as_str() == f.second)
+    );
     // Agrees with the two-child observation it replaces.
-    assert!(matches!(f.driver.resolve_head(&f.handle).unwrap(), HeadFact::Attached { target, commit } if target.as_str() == "refs/heads/a" && commit.as_str() == f.second));
+    assert!(
+        matches!(f.driver.resolve_head(&f.handle).unwrap(), HeadFact::Attached { target, commit } if target.as_str() == "refs/heads/a" && commit.as_str() == f.second)
+    );
 }
 
 #[test]
@@ -126,11 +181,16 @@ fn a_head_switched_before_the_listing_reads_it_gives_the_new_branch_with_its_own
     f.list();
     fs::write(f.handle.git_dir().join("inject-switch"), "refs/heads/b").unwrap();
     let page = f.list();
-    assert!(!f.handle.git_dir().join("inject-switch").exists(), "the switch was never injected");
+    assert!(
+        !f.handle.git_dir().join("inject-switch").exists(),
+        "the switch was never injected"
+    );
     // One HEAD read names one branch, and the commit is that branch's own listed value, so the
     // pair can only be (a, second) or (b, first); never branch a's name with branch b's commit.
     let name = page.head.as_ref().expect("head observed").as_str();
-    let RefValue::Direct(commit) = Fixture::value(&page, name) else { panic!() };
+    let RefValue::Direct(commit) = Fixture::value(&page, name) else {
+        panic!()
+    };
     assert_eq!((name, commit.as_str()), ("refs/heads/b", f.first.as_str()));
     assert_eq!(git(&f.repo, &["symbolic-ref", "HEAD"]), "refs/heads/b");
 }
@@ -138,13 +198,31 @@ fn a_head_switched_before_the_listing_reads_it_gives_the_new_branch_with_its_own
 #[test]
 fn detached_and_unborn_heads_and_an_unlisted_branch_report_no_head() {
     let f = Fixture::new("none");
-    let heads_only = |f: &Fixture| f.driver.list_refs(&f.handle, &[RefPrefix::parse("refs/fgos/events/").unwrap()], None, 4096).unwrap();
-    assert!(heads_only(&f).head.is_none(), "branch not among the listed prefixes");
+    let heads_only = |f: &Fixture| {
+        f.driver
+            .list_refs(
+                &f.handle,
+                &[RefPrefix::parse("refs/fgos/events/").unwrap()],
+                None,
+                4096,
+            )
+            .unwrap()
+    };
+    assert!(
+        heads_only(&f).head.is_none(),
+        "branch not among the listed prefixes"
+    );
     git(&f.repo, &["symbolic-ref", "HEAD", "refs/heads/unborn"]);
     assert!(f.list().head.is_none());
-    assert!(matches!(f.driver.resolve_head(&f.handle).unwrap(), HeadFact::Unborn { .. }));
+    assert!(matches!(
+        f.driver.resolve_head(&f.handle).unwrap(),
+        HeadFact::Unborn { .. }
+    ));
     git(&f.repo, &["symbolic-ref", "HEAD", "refs/heads/a"]);
     git(&f.repo, &["checkout", "-q", "--detach"]);
     assert!(f.list().head.is_none());
-    assert!(matches!(f.driver.resolve_head(&f.handle).unwrap(), HeadFact::Detached { .. }));
+    assert!(matches!(
+        f.driver.resolve_head(&f.handle).unwrap(),
+        HeadFact::Detached { .. }
+    ));
 }

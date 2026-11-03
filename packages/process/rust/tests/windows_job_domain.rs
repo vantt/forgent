@@ -13,12 +13,16 @@ use std::process::{Child, Command, Stdio};
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::{identity_of, ProcTuple};
-use fgos_process::platform::windows_job::{assign_and_resume, create_kill_job, filetime_now, job_name, open_job, ContenderView, Job};
+use fgos_process::platform::windows_job::{
+    assign_and_resume, create_kill_job, filetime_now, job_name, open_job, ContenderView, Job,
+};
 use fgos_process::{domain_watch, Domain, DomainState, KillOutcome, ProcId, WindowsJob};
 use windows_sys::Win32::Foundation::{CloseHandle, HANDLE, WAIT_OBJECT_0};
 use windows_sys::Win32::Storage::FileSystem::SYNCHRONIZE;
 use windows_sys::Win32::System::RemoteDesktop::ProcessIdToSessionId;
-use windows_sys::Win32::System::Threading::{GetCurrentProcessId, OpenProcess, WaitForSingleObject};
+use windows_sys::Win32::System::Threading::{
+    GetCurrentProcessId, OpenProcess, WaitForSingleObject,
+};
 
 const REPEATS: usize = 50;
 const ROLE: &str = "WJ_ROLE";
@@ -31,7 +35,9 @@ const CREATE_BREAKAWAY_FROM_JOB: u32 = 0x0100_0000;
 
 #[test]
 fn child_entry() {
-    let Ok(role) = std::env::var(ROLE) else { return };
+    let Ok(role) = std::env::var(ROLE) else {
+        return;
+    };
     // A role never outlives a crashed test run by more than two minutes.
     std::thread::spawn(|| {
         std::thread::sleep(Duration::from_secs(120));
@@ -66,7 +72,13 @@ fn child_entry() {
         // A member that tries to leave the job, then starts a child.
         "breakaway" => {
             let escaped = Command::new(std::env::current_exe().unwrap())
-                .args(["--exact", "child_entry", "--nocapture", "--test-threads", "1"])
+                .args([
+                    "--exact",
+                    "child_entry",
+                    "--nocapture",
+                    "--test-threads",
+                    "1",
+                ])
                 .env(ROLE, "block")
                 .env(READY, ready_path().with_extension("escaped"))
                 .creation_flags(CREATE_BREAKAWAY_FROM_JOB)
@@ -121,7 +133,19 @@ impl Drop for Guard {
 
 fn spawn_role(role: &str, arg: &str, ready: &Path, suspended: bool) -> Guard {
     let mut cmd = Command::new(std::env::current_exe().expect("test binary"));
-    cmd.args(["--exact", "child_entry", "--nocapture", "--test-threads", "1"]).env(ROLE, role).env(READY, ready).env(ARG, arg).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::inherit());
+    cmd.args([
+        "--exact",
+        "child_entry",
+        "--nocapture",
+        "--test-threads",
+        "1",
+    ])
+    .env(ROLE, role)
+    .env(READY, ready)
+    .env(ARG, arg)
+    .stdin(Stdio::null())
+    .stdout(Stdio::null())
+    .stderr(Stdio::inherit());
     if suspended {
         cmd.creation_flags(CREATE_SUSPENDED);
     }
@@ -132,9 +156,18 @@ fn spawn_role(role: &str, arg: &str, ready: &Path, suspended: bool) -> Guard {
 fn spawn_plain(role: &str) -> Child {
     let dir = std::env::temp_dir();
     Command::new(std::env::current_exe().unwrap())
-        .args(["--exact", "child_entry", "--nocapture", "--test-threads", "1"])
+        .args([
+            "--exact",
+            "child_entry",
+            "--nocapture",
+            "--test-threads",
+            "1",
+        ])
         .env(ROLE, role)
-        .env(READY, dir.join(format!("fgos-wj-plain-{}-{}", std::process::id(), role)))
+        .env(
+            READY,
+            dir.join(format!("fgos-wj-plain-{}-{}", std::process::id(), role)),
+        )
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .spawn()
@@ -149,7 +182,11 @@ fn wait_ready(ready: &Path, child: &Child) -> String {
                 return text.trim().to_string();
             }
         }
-        assert!(Instant::now() < deadline, "role {} never became ready", child.id());
+        assert!(
+            Instant::now() < deadline,
+            "role {} never became ready",
+            child.id()
+        );
         std::thread::sleep(Duration::from_millis(5));
     }
 }
@@ -164,7 +201,9 @@ fn ready_file(tag: &str, i: usize) -> PathBuf {
 /// binary share the process table and a timing-sensitive wait.
 fn serial() -> std::sync::MutexGuard<'static, ()> {
     static SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
-    SERIAL.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+    SERIAL
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
 }
 
 // ---------- the test's own view of the processes ----------
@@ -199,7 +238,10 @@ impl Drop for Watched {
 fn own_session() -> u32 {
     let mut session = 0;
     // SAFETY: one out-pointer.
-    assert_ne!(unsafe { ProcessIdToSessionId(GetCurrentProcessId(), &mut session) }, 0);
+    assert_ne!(
+        unsafe { ProcessIdToSessionId(GetCurrentProcessId(), &mut session) },
+        0
+    );
     session
 }
 
@@ -208,7 +250,13 @@ fn tuple(pid: u32) -> ProcTuple {
 }
 
 fn record(job: &str, holder: ProcTuple, keeper: Option<ProcTuple>, declared_at: u64) -> WindowsJob {
-    WindowsJob { job: job.to_string(), session_id: own_session(), declared_at, holder, keeper }
+    WindowsJob {
+        job: job.to_string(),
+        session_id: own_session(),
+        declared_at,
+        holder,
+        keeper,
+    }
 }
 
 fn kill(guard: &mut Guard) {
@@ -237,7 +285,9 @@ fn settle(view: &mut ContenderView, within: Duration, members: &[&Watched]) -> (
 }
 
 fn pids(text: &str) -> Vec<u32> {
-    text.split_whitespace().filter_map(|t| t.parse().ok()).collect()
+    text.split_whitespace()
+        .filter_map(|t| t.parse().ok())
+        .collect()
 }
 
 // ---------- scenarios ----------
@@ -260,7 +310,12 @@ fn holder_dead_second_owner_alive_member_blocked() {
         assign_and_resume(&job, &member.0).unwrap();
         let grandchild: u32 = wait_ready(&member_ready, &member.0).parse().unwrap();
         let (member_h, grandchild_h) = (Watched::open(member.0.id()), Watched::open(grandchild));
-        let rec = record(&name, tuple(holder.0.id()), Some(tuple(keeper.0.id())), declared);
+        let rec = record(
+            &name,
+            tuple(holder.0.id()),
+            Some(tuple(keeper.0.id())),
+            declared,
+        );
         // The keeper is the second owner: the test's own handle can go.
         drop(job);
         kill(&mut holder);
@@ -268,10 +323,18 @@ fn holder_dead_second_owner_alive_member_blocked() {
         let mut view = ContenderView::new(&rec);
         assert!(view.job_opened(), "the keeper holds the job open");
         for _ in 0..3 {
-            assert_eq!(view.is_empty(), DomainState::NotEmpty, "member is blocked and alive");
+            assert_eq!(
+                view.is_empty(),
+                DomainState::NotEmpty,
+                "member is blocked and alive"
+            );
         }
         assert_eq!(view.kill_all(), KillOutcome::Ok);
-        let (reached, violated) = settle(&mut view, Duration::from_secs(2), &[&member_h, &grandchild_h]);
+        let (reached, violated) = settle(
+            &mut view,
+            Duration::from_secs(2),
+            &[&member_h, &grandchild_h],
+        );
         assert!(reached, "repeat {i}: never empty after kill_all");
         violations += usize::from(violated);
         assert!(alive(keeper.0.id()), "the keeper is never touched");
@@ -295,7 +358,11 @@ fn all_owners_dead_the_chain_decides() {
         kill(&mut holder);
 
         let mut view = ContenderView::new(&rec);
-        let (reached, violated) = settle(&mut view, Duration::from_secs(5), &watched.iter().collect::<Vec<_>>());
+        let (reached, violated) = settle(
+            &mut view,
+            Duration::from_secs(5),
+            &watched.iter().collect::<Vec<_>>(),
+        );
         assert!(reached, "repeat {i}: never empty");
         violations += usize::from(violated);
     }
@@ -315,7 +382,12 @@ fn dying_job_open_keeper_outlives_the_holder_briefly() {
         let keeper_ready = ready_file("t8-keeper", i);
         let mut keeper = spawn_role("keeper", &name, &keeper_ready, false);
         wait_ready(&keeper_ready, &keeper.0);
-        let rec = record(&name, tuple(holder.0.id()), Some(tuple(keeper.0.id())), declared);
+        let rec = record(
+            &name,
+            tuple(holder.0.id()),
+            Some(tuple(keeper.0.id())),
+            declared,
+        );
         let watched: Vec<Watched> = reported.iter().map(|pid| Watched::open(*pid)).collect();
         kill(&mut holder);
         std::thread::sleep(Duration::from_millis((i as u64 * 50) / REPEATS as u64));
@@ -323,7 +395,11 @@ fn dying_job_open_keeper_outlives_the_holder_briefly() {
 
         let mut view = ContenderView::new(&rec);
         opened += usize::from(view.job_opened());
-        let (reached, violated) = settle(&mut view, Duration::from_secs(5), &watched.iter().collect::<Vec<_>>());
+        let (reached, violated) = settle(
+            &mut view,
+            Duration::from_secs(5),
+            &watched.iter().collect::<Vec<_>>(),
+        );
         assert!(reached, "repeat {i}: never empty");
         violations += usize::from(violated);
     }
@@ -376,9 +452,19 @@ fn holder_alive_job_not_empty_ends_only_the_job() {
         let mut view = ContenderView::new(&rec);
         assert_eq!(view.is_empty(), DomainState::NotEmpty);
         assert_eq!(view.kill_all(), KillOutcome::Ok);
-        let (reached, violated) = settle(&mut view, Duration::from_secs(2), &[&member_h, &grandchild_h]);
-        assert!(reached && !violated, "repeat {i}: reached {reached}, violated {violated}");
-        assert!(alive(holder.0.id()), "the holder is not a member and survives");
+        let (reached, violated) = settle(
+            &mut view,
+            Duration::from_secs(2),
+            &[&member_h, &grandchild_h],
+        );
+        assert!(
+            reached && !violated,
+            "repeat {i}: reached {reached}, violated {violated}"
+        );
+        assert!(
+            alive(holder.0.id()),
+            "the holder is not a member and survives"
+        );
     }
 }
 
@@ -429,7 +515,11 @@ fn a_member_cannot_break_away_from_the_job() {
         assign_and_resume(&job, &member.0).unwrap();
         let report = wait_ready(&ready, &member.0);
         let mut words = report.split_whitespace();
-        assert_eq!(words.next(), Some("denied"), "repeat {i}: CREATE_BREAKAWAY_FROM_JOB must fail");
+        assert_eq!(
+            words.next(),
+            Some("denied"),
+            "repeat {i}: CREATE_BREAKAWAY_FROM_JOB must fail"
+        );
         let child: u32 = words.next().unwrap().parse().unwrap();
         assert_eq!(job.contains(child), Some(true), "its child is in the job");
     }
@@ -446,7 +536,11 @@ fn assign_and_resume_puts_the_child_and_its_child_in_the_job() {
         assign_and_resume(&job, &member.0).unwrap();
         let report = wait_ready(&ready, &member.0);
         let mut words = report.split_whitespace();
-        assert_eq!(words.next(), Some("true"), "repeat {i}: in the job before its first instruction");
+        assert_eq!(
+            words.next(),
+            Some("true"),
+            "repeat {i}: in the job before its first instruction"
+        );
         let child: u32 = words.next().unwrap().parse().unwrap();
         assert_eq!(job.contains(member.0.id()), Some(true));
         assert_eq!(job.contains(child), Some(true));

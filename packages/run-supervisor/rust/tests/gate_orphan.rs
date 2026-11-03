@@ -16,7 +16,11 @@ use support::*;
 const LIMIT: Duration = Duration::from_secs(20);
 
 /// A gate with a running `sleep` agent, the lock handed over, and the supervisor's stream.
-fn running(name: &str, settle_ms: u64, ceiling_ms: Option<u64>) -> (Attempt, Pane, std::os::unix::net::UnixStream, std::fs::File) {
+fn running(
+    name: &str,
+    settle_ms: u64,
+    ceiling_ms: Option<u64>,
+) -> (Attempt, Pane, std::os::unix::net::UnixStream, std::fs::File) {
     let mut options = Options::new("/bin/sh", &["-c", "sleep 120"]);
     options.grace_ms = 2_000;
     if let Some(ms) = ceiling_ms {
@@ -39,7 +43,10 @@ fn eof_before_the_brief_ends_the_domain_at_once() {
     }
     let (attempt, mut pane, stream, _lock) = running("orphan-before-brief", 0, None);
     sleep(Duration::from_millis(200));
-    assert!(pane.running(), "the agent runs while the supervisor is there");
+    assert!(
+        pane.running(),
+        "the agent runs while the supervisor is there"
+    );
     drop(stream);
     assert_eq!(pane.wait_exit(LIMIT), 0, "the whole sandbox ended");
     let exit = attempt.gate_exit().unwrap();
@@ -54,7 +61,8 @@ fn a_result_after_the_brief_ends_the_domain_after_the_settle_wait() {
         return;
     }
     let settle = Duration::from_millis(800);
-    let (attempt, mut pane, mut stream, _lock) = running("orphan-result", settle.as_millis() as u64, None);
+    let (attempt, mut pane, mut stream, _lock) =
+        running("orphan-result", settle.as_millis() as u64, None);
     write_frame(&mut stream, &json!({"type": "BRIEF_DELIVERED"})).unwrap();
     drop(stream);
     sleep(Duration::from_millis(500));
@@ -67,7 +75,11 @@ fn a_result_after_the_brief_ends_the_domain_after_the_settle_wait() {
     write_text(&attempt.outbox.join("result-1.json"), "{\"ok\":true}");
     let seen = Instant::now();
     assert_eq!(pane.wait_exit(LIMIT), 0);
-    assert!(seen.elapsed() >= settle - Duration::from_millis(100), "the settle wait was kept: {:?}", seen.elapsed());
+    assert!(
+        seen.elapsed() >= settle - Duration::from_millis(100),
+        "the settle wait was kept: {:?}",
+        seen.elapsed()
+    );
     let exit = attempt.gate_exit().unwrap();
     assert_eq!(exit["stoppedBy"], "orphan");
     assert_eq!(exit["cause"], "orphan-result");
@@ -82,7 +94,10 @@ fn a_supervisor_that_stays_does_not_trigger_the_outbox_watch() {
     write_frame(&mut stream, &json!({"type": "BRIEF_DELIVERED"})).unwrap();
     write_text(&attempt.outbox.join("result-1.json"), "{\"ok\":true}");
     sleep(Duration::from_millis(800));
-    assert!(pane.running(), "with the supervisor connected the supervisor decides");
+    assert!(
+        pane.running(),
+        "with the supervisor connected the supervisor decides"
+    );
     drop(stream);
     assert_eq!(pane.wait_exit(LIMIT), 0);
     assert_eq!(attempt.gate_exit().unwrap()["cause"], "orphan-result");

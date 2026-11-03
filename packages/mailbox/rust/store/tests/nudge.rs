@@ -151,7 +151,12 @@ fn only_codex_and_claude_have_a_nudge_channel_and_only_on_the_versions_they_were
     assert_eq!(tested.nudge_for("claude", "2.1.311"), None);
     assert_eq!(
         tested.nudge_clis(),
-        [Cli::new("claude").expect("cli"), Cli::new("codex").expect("cli")].into_iter().collect()
+        [
+            Cli::new("claude").expect("cli"),
+            Cli::new("codex").expect("cli")
+        ]
+        .into_iter()
+        .collect()
     );
     assert_eq!(
         tested.nudge_for("codex", "0.161.0"),
@@ -174,7 +179,9 @@ struct Counting(std::cell::RefCell<Vec<(NudgeChannel, String)>>);
 
 impl Nudge for Counting {
     fn nudge(&self, channel: NudgeChannel, key: &WriterKey, _head: &Record) -> Result<(), String> {
-        self.0.borrow_mut().push((channel, key.as_str().to_string()));
+        self.0
+            .borrow_mut()
+            .push((channel, key.as_str().to_string()));
         Ok(())
     }
 }
@@ -203,14 +210,26 @@ fn a_wake_taken_from_another_machine_is_nudged_through_the_same_gates_as_a_send_
     let stub = Counting::default();
 
     // No wake that took effect, or a recipient with no channel: nothing is asked of anyone.
-    assert_eq!(fgos_mailbox::verbs::nudge_remote(&remote_wake(false, true, false), &tested, &stub), None);
-    assert_eq!(fgos_mailbox::verbs::nudge_remote(&remote_wake(true, false, false), &tested, &stub), None);
+    assert_eq!(
+        fgos_mailbox::verbs::nudge_remote(&remote_wake(false, true, false), &tested, &stub),
+        None
+    );
+    assert_eq!(
+        fgos_mailbox::verbs::nudge_remote(&remote_wake(true, false, false), &tested, &stub),
+        None
+    );
     // An earlier wake is still unread: it is not repeated.
-    assert_eq!(fgos_mailbox::verbs::nudge_remote(&remote_wake(true, true, true), &tested, &stub), Some(NudgeReport::Pending));
+    assert_eq!(
+        fgos_mailbox::verbs::nudge_remote(&remote_wake(true, true, true), &tested, &stub),
+        Some(NudgeReport::Pending)
+    );
     assert!(stub.0.borrow().is_empty());
 
     // A version no contract lists, or one that cannot be read, is refused by name.
-    let untested = versions(program(&scratch("remote-untested"), "echo 'codex-cli 9.9.9'"));
+    let untested = versions(program(
+        &scratch("remote-untested"),
+        "echo 'codex-cli 9.9.9'",
+    ));
     assert_eq!(
         fgos_mailbox::verbs::nudge_remote(&remote_wake(true, true, false), &untested, &stub),
         Some(NudgeReport::Refused("version-not-tested".into()))
@@ -227,7 +246,10 @@ fn a_wake_taken_from_another_machine_is_nudged_through_the_same_gates_as_a_send_
         fgos_mailbox::verbs::nudge_remote(&remote_wake(true, true, false), &tested, &stub),
         Some(NudgeReport::Sent)
     );
-    assert_eq!(*stub.0.borrow(), vec![(NudgeChannel::CodexQueue, "019a-thread".to_string())]);
+    assert_eq!(
+        *stub.0.borrow(),
+        vec![(NudgeChannel::CodexQueue, "019a-thread".to_string())]
+    );
 }
 
 /// A Claude Code stand-in: a shell holding the given command-line words and a
@@ -246,7 +268,11 @@ fn claude_head(tag: &str, words: &[&str], socket_in_runtime: bool) -> ClaudeHead
     let socks = runtime.join("cc-socks");
     std::fs::create_dir_all(&socks).expect("runtime dir");
     std::fs::create_dir_all(dir.join("sessions")).expect("sessions dir");
-    let socket = if socket_in_runtime { socks.join("a.sock") } else { dir.join("outside.sock") };
+    let socket = if socket_in_runtime {
+        socks.join("a.sock")
+    } else {
+        dir.join("outside.sock")
+    };
     let listener = std::os::unix::net::UnixListener::bind(&socket).expect("socket");
     let child = spawn_locked(
         Command::new("sh")
@@ -257,11 +283,20 @@ fn claude_head(tag: &str, words: &[&str], socket_in_runtime: bool) -> ClaudeHead
     );
     std::fs::write(
         dir.join("sessions").join(format!("{}.json", child.id())),
-        format!(r#"{{"pid":{},"version":"2.1.310","messagingSocketPath":"{}"}}"#, child.id(), socket.display()),
+        format!(
+            r#"{{"pid":{},"version":"2.1.310","messagingSocketPath":"{}"}}"#,
+            child.id(),
+            socket.display()
+        ),
     )
     .expect("session file");
     let record = live_record(child.id());
-    ClaudeHead { dir, child, record, listener }
+    ClaudeHead {
+        dir,
+        child,
+        record,
+        listener,
+    }
 }
 
 fn claude_nudge(dir: &std::path::Path) -> SystemNudge {
@@ -284,21 +319,33 @@ fn line_read(listener: &std::os::unix::net::UnixListener) -> Option<String> {
 
 #[test]
 fn a_claude_head_started_with_the_accept_is_written_one_user_line_holding_only_the_fixed_nudge() {
-    let mut head = claude_head("sock-sent", &["--settings", r#"{"crossSessionInbound":"accept"}"#], true);
+    let mut head = claude_head(
+        "sock-sent",
+        &["--settings", r#"{"crossSessionInbound":"accept"}"#],
+        true,
+    );
     let result = claude_nudge(&head.dir).nudge(NudgeChannel::ClaudeSocket, &key(), &head.record);
     let seen = line_read(&head.listener);
     let _ = head.child.kill();
     let _ = head.child.wait();
 
     assert_eq!(result, Ok(()));
-    let doc: serde_json::Value = serde_json::from_str(seen.expect("a line arrived").trim()).expect("json");
-    assert_eq!(doc, serde_json::json!({"type": "user", "message": {"role": "user", "content": NUDGE_LINE}}));
+    let doc: serde_json::Value =
+        serde_json::from_str(seen.expect("a line arrived").trim()).expect("json");
+    assert_eq!(
+        doc,
+        serde_json::json!({"type": "user", "message": {"role": "user", "content": NUDGE_LINE}})
+    );
     let _ = std::fs::remove_dir_all(head.dir);
 }
 
 #[test]
 fn a_head_whose_pid_now_belongs_to_another_process_is_neither_read_nor_written() {
-    let mut claude = claude_head("sock-reused", &["--settings", r#"{"crossSessionInbound":"accept"}"#], true);
+    let mut claude = claude_head(
+        "sock-reused",
+        &["--settings", r#"{"crossSessionInbound":"accept"}"#],
+        true,
+    );
     let mut stale = claude.record.clone();
     stale.start_time = Some("1".to_string());
     assert_eq!(
@@ -312,7 +359,11 @@ fn a_head_whose_pid_now_belongs_to_another_process_is_neither_read_nor_written()
     let (mut codex_head, mut codex_record) = head("/accounts/one");
     codex_record.start_time = Some("1".to_string());
     assert_eq!(
-        nudge(PathBuf::from("/nonexistent/codex"), 5000).nudge(NudgeChannel::CodexQueue, &key(), &codex_record),
+        nudge(PathBuf::from("/nonexistent/codex"), 5000).nudge(
+            NudgeChannel::CodexQueue,
+            &key(),
+            &codex_record
+        ),
         Err("head-process-changed".to_string())
     );
     let _ = codex_head.kill();
@@ -321,19 +372,36 @@ fn a_head_whose_pid_now_belongs_to_another_process_is_neither_read_nor_written()
 }
 
 #[test]
-fn a_claude_head_is_written_when_the_accept_is_in_its_user_settings_unless_it_reads_no_user_settings() {
+fn a_claude_head_is_written_when_the_accept_is_in_its_user_settings_unless_it_reads_no_user_settings(
+) {
     let mut head = claude_head("sock-user", &[], true);
-    std::fs::write(head.dir.join("settings.json"), r#"{"crossSessionInbound":"accept"}"#).expect("user settings");
+    std::fs::write(
+        head.dir.join("settings.json"),
+        r#"{"crossSessionInbound":"accept"}"#,
+    )
+    .expect("user settings");
     let nudger = claude_nudge(&head.dir);
-    assert_eq!(nudger.nudge(NudgeChannel::ClaudeSocket, &key(), &head.record), Ok(()));
+    assert_eq!(
+        nudger.nudge(NudgeChannel::ClaudeSocket, &key(), &head.record),
+        Ok(())
+    );
     assert!(line_read(&head.listener).is_some());
     let _ = head.child.kill();
     let _ = head.child.wait();
 
-    let mut project_only = claude_head("sock-project-only", &["--setting-sources", "project"], true);
-    std::fs::write(project_only.dir.join("settings.json"), r#"{"crossSessionInbound":"accept"}"#).expect("user settings");
+    let mut project_only =
+        claude_head("sock-project-only", &["--setting-sources", "project"], true);
+    std::fs::write(
+        project_only.dir.join("settings.json"),
+        r#"{"crossSessionInbound":"accept"}"#,
+    )
+    .expect("user settings");
     assert_eq!(
-        claude_nudge(&project_only.dir).nudge(NudgeChannel::ClaudeSocket, &key(), &project_only.record),
+        claude_nudge(&project_only.dir).nudge(
+            NudgeChannel::ClaudeSocket,
+            &key(),
+            &project_only.record
+        ),
         Err("no-accept".to_string())
     );
     assert!(line_read(&project_only.listener).is_none());
@@ -344,7 +412,8 @@ fn a_claude_head_is_written_when_the_accept_is_in_its_user_settings_unless_it_re
 }
 
 #[test]
-fn a_claude_head_without_the_accept_gets_no_write_and_a_socket_outside_its_runtime_dir_is_refused() {
+fn a_claude_head_without_the_accept_gets_no_write_and_a_socket_outside_its_runtime_dir_is_refused()
+{
     let mut plain = claude_head("sock-plain", &[], true);
     assert_eq!(
         claude_nudge(&plain.dir).nudge(NudgeChannel::ClaudeSocket, &key(), &plain.record),
@@ -354,7 +423,11 @@ fn a_claude_head_without_the_accept_gets_no_write_and_a_socket_outside_its_runti
     let _ = plain.child.kill();
     let _ = plain.child.wait();
 
-    let mut outside = claude_head("sock-outside", &["--settings", r#"{"crossSessionInbound":"accept"}"#], false);
+    let mut outside = claude_head(
+        "sock-outside",
+        &["--settings", r#"{"crossSessionInbound":"accept"}"#],
+        false,
+    );
     assert_eq!(
         claude_nudge(&outside.dir).nudge(NudgeChannel::ClaudeSocket, &key(), &outside.record),
         Err("socket-outside-runtime-dir".to_string())

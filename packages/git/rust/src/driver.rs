@@ -41,7 +41,11 @@ fn read_floor_record(path: &Path, key: &serde_json::Value) -> Option<GitFloorVer
     #[cfg(unix)]
     let file = {
         use std::os::unix::fs::OpenOptionsExt;
-        fs::OpenOptions::new().read(true).custom_flags(libc::O_NOFOLLOW).open(path).ok()?
+        fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(libc::O_NOFOLLOW)
+            .open(path)
+            .ok()?
     };
     #[cfg(not(unix))]
     let file = fs::File::open(path).ok()?;
@@ -65,10 +69,17 @@ fn read_floor_record(path: &Path, key: &serde_json::Value) -> Option<GitFloorVer
         })
         .collect::<Option<Vec<_>>>()?;
     let supported = record.get("supported")?.as_bool()?;
-    let contract: serde_json::Value = serde_json::from_str(include_str!("../../contracts/git-floor.v1.json")).ok()?;
-    let required: BTreeSet<_> = contract["requiredProbes"].as_array()?.iter().map(|v| v.as_str()).collect();
+    let contract: serde_json::Value =
+        serde_json::from_str(include_str!("../../contracts/git-floor.v1.json")).ok()?;
+    let required: BTreeSet<_> = contract["requiredProbes"]
+        .as_array()?
+        .iter()
+        .map(|v| v.as_str())
+        .collect();
     let actual: BTreeSet<_> = probes.iter().map(|p| Some(p.name.as_str())).collect();
-    if actual != required || probes.len() != required.len() { return None; }
+    if actual != required || probes.len() != required.len() {
+        return None;
+    }
     // A record never claims more than its own probes show.
     if supported != (!probes.is_empty() && probes.iter().all(|p| p.passed)) {
         return None;
@@ -136,11 +147,13 @@ pub(crate) struct ConfigCache {
 // driver, and a verb opens many. Every use still rechecks the source stamps;
 // the source list is keyed by the selected Git and the variables its answer
 // depends on.
-static CONFIG_SOURCES: Mutex<BTreeMap<(PathBuf, ConfigEnvironment), Vec<PathBuf>>> = Mutex::new(BTreeMap::new());
+static CONFIG_SOURCES: Mutex<BTreeMap<(PathBuf, ConfigEnvironment), Vec<PathBuf>>> =
+    Mutex::new(BTreeMap::new());
 static REPOSITORY_CONFIG: Mutex<BTreeMap<PathBuf, ConfigCache>> = Mutex::new(BTreeMap::new());
 // A main checkout's repository-scoped transport keys, valid exactly while the
 // config stamp they were listed under still matches.
-static TRANSPORT_POLICY: Mutex<BTreeMap<PathBuf, (ConfigStamp, Vec<String>)>> = Mutex::new(BTreeMap::new());
+static TRANSPORT_POLICY: Mutex<BTreeMap<PathBuf, (ConfigStamp, Vec<String>)>> =
+    Mutex::new(BTreeMap::new());
 
 fn io(error: std::io::Error) -> OperationError {
     failure(format!("git-driver-io: {error}"))
@@ -187,7 +200,11 @@ impl BorrowedSpawn for fgos_holder_lock::Handle {
         io: &fgos_holder_lock::BorrowIo,
         watch: bool,
     ) -> Result<fgos_holder_lock::BorrowIoOutcome> {
-        let run = if watch { fgos_holder_lock::run_borrowed_io_watched } else { fgos_holder_lock::run_borrowed_io };
+        let run = if watch {
+            fgos_holder_lock::run_borrowed_io_watched
+        } else {
+            fgos_holder_lock::run_borrowed_io
+        };
         run(self, spec, io).map_err(borrow_failure)
     }
 }
@@ -212,7 +229,9 @@ pub struct GitDriver {
     containment: Box<dyn ContainmentDriver>,
 }
 impl GitDriver {
-    pub(crate) fn state_root(&self) -> &Path { &self.state_root }
+    pub(crate) fn state_root(&self) -> &Path {
+        &self.state_root
+    }
     /// Setup-only repair. Canonicalizes the root; hooks use a no-follow descriptor.
     /// Existing unrelated roots and foreign owners are never chmodded.
     pub fn prepare_directories(state_root: &Path) -> Result<bool> {
@@ -361,12 +380,23 @@ impl GitDriver {
     // A checkout handle answers from its own operation-local cache, any other
     // handle from the process-wide one; both only ever hold a validated stamp.
     // `None` when no entry exists yet.
-    fn config_entry<T>(&self, repo: &RepoHandle, use_entry: impl FnOnce(&mut ConfigCache) -> T) -> Result<Option<T>> {
+    fn config_entry<T>(
+        &self,
+        repo: &RepoHandle,
+        use_entry: impl FnOnce(&mut ConfigCache) -> T,
+    ) -> Result<Option<T>> {
         if let Some(local) = &repo.checkout_config {
-            return Ok(local.lock().map_err(|_| failure("config-cache-poisoned"))?.as_mut().map(use_entry));
+            return Ok(local
+                .lock()
+                .map_err(|_| failure("config-cache-poisoned"))?
+                .as_mut()
+                .map(use_entry));
         }
-        Ok(REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
-            .get_mut(&repo.git_dir).map(use_entry))
+        Ok(REPOSITORY_CONFIG
+            .lock()
+            .map_err(|_| failure("config-cache-poisoned"))?
+            .get_mut(&repo.git_dir)
+            .map(use_entry))
     }
 
     /// Remote admission's question, asked once per config stamp of a main
@@ -382,33 +412,59 @@ impl GitDriver {
             return self.untrusted_transport_config(repo);
         };
         let poisoned = || failure("config-cache-poisoned");
-        if let Some((known, keys)) = TRANSPORT_POLICY.lock().map_err(|_| poisoned())?.get(&repo.git_dir) {
+        if let Some((known, keys)) = TRANSPORT_POLICY
+            .lock()
+            .map_err(|_| poisoned())?
+            .get(&repo.git_dir)
+        {
             if *known == stamp {
                 return Ok(keys.clone());
             }
         }
         let keys = self.untrusted_transport_config(repo)?;
-        TRANSPORT_POLICY.lock().map_err(|_| poisoned())?.insert(repo.git_dir.clone(), (stamp, keys.clone()));
+        TRANSPORT_POLICY
+            .lock()
+            .map_err(|_| poisoned())?
+            .insert(repo.git_dir.clone(), (stamp, keys.clone()));
         Ok(keys)
     }
 
     fn repository_formats(&self, repo: &RepoHandle) -> Result<(ObjectFormat, RefStorage)> {
-        let out = self.invoke(Some(repo), &repo.trusted_main_root,
-            &["rev-parse", "--show-object-format", "--show-ref-format"], Policy::Inspect, None, true,
-            PATH_LIMIT, Duration::from_secs(30))?;
-        if !out.success { return Err(out.error("git-command-failed")); }
-        let mut facts = std::str::from_utf8(&out.stdout).map_err(|_| failure("repository-facts-invalid"))?.lines();
-        let object_format = match facts.next().ok_or_else(|| failure("unsupported-object-format"))? {
+        let out = self.invoke(
+            Some(repo),
+            &repo.trusted_main_root,
+            &["rev-parse", "--show-object-format", "--show-ref-format"],
+            Policy::Inspect,
+            None,
+            true,
+            PATH_LIMIT,
+            Duration::from_secs(30),
+        )?;
+        if !out.success {
+            return Err(out.error("git-command-failed"));
+        }
+        let mut facts = std::str::from_utf8(&out.stdout)
+            .map_err(|_| failure("repository-facts-invalid"))?
+            .lines();
+        let object_format = match facts
+            .next()
+            .ok_or_else(|| failure("unsupported-object-format"))?
+        {
             "sha1" => ObjectFormat::Sha1,
             "sha256" => ObjectFormat::Sha256,
             _ => return Err(failure("unsupported-object-format")),
         };
-        let refs = match facts.next().ok_or_else(|| failure("unsupported-ref-storage"))? {
+        let refs = match facts
+            .next()
+            .ok_or_else(|| failure("unsupported-ref-storage"))?
+        {
             "files" => RefStorage::Files,
             "reftable" => RefStorage::Reftable,
             _ => return Err(failure("unsupported-ref-storage")),
         };
-        if facts.next().is_some() { return Err(failure("unsupported-ref-storage")); }
+        if facts.next().is_some() {
+            return Err(failure("unsupported-ref-storage"));
+        }
         Ok((object_format, refs))
     }
 
@@ -542,7 +598,9 @@ impl GitDriver {
         );
         if hooks {
             if let Err(mut error) = self.refresh_checkout_facts(repo) {
-                if let Ok(original) = &out { error.stderr = original.stderr.clone(); }
+                if let Ok(original) = &out {
+                    error.stderr = original.stderr.clone();
+                }
                 return Err(error);
             }
         }
@@ -593,7 +651,10 @@ impl GitDriver {
     ) -> Result<Vec<PathBuf>> {
         let environment = (
             self.git.clone(),
-            (std::env::var_os("HOME"), std::env::var_os("XDG_CONFIG_HOME")),
+            (
+                std::env::var_os("HOME"),
+                std::env::var_os("XDG_CONFIG_HOME"),
+            ),
         );
         let mut sources = CONFIG_SOURCES
             .lock()
@@ -643,9 +704,15 @@ impl GitDriver {
         repo: &RepoHandle,
         handle: &fgos_holder_lock::Handle,
     ) -> Result<()> {
-        let mut cache = REPOSITORY_CONFIG.lock()
+        let mut cache = REPOSITORY_CONFIG
+            .lock()
             .map_err(|_| failure("config-cache-poisoned"))?;
-        let fresh = self.validated_config(repo, cache.get(&repo.git_dir), Policy::Publication, Some(handle))?;
+        let fresh = self.validated_config(
+            repo,
+            cache.get(&repo.git_dir),
+            Policy::Publication,
+            Some(handle),
+        )?;
         cache.insert(repo.git_dir.clone(), fresh);
         Ok(())
     }
@@ -659,9 +726,20 @@ impl GitDriver {
         loan: Option<&dyn BorrowedSpawn>,
     ) -> Result<ConfigCache> {
         let mut paths = self.config_paths(Some(repo), &repo.trusted_main_root, policy, loan)?;
-        paths.extend([repo.common_dir.join("config"), repo.git_dir.join("config.worktree")]);
+        paths.extend([
+            repo.common_dir.join("config"),
+            repo.git_dir.join("config.worktree"),
+        ]);
         if let Some(cached) = cached {
-            paths.extend(cached.stamp.paths.iter().filter(|p| !paths.contains(p)).cloned().collect::<Vec<_>>());
+            paths.extend(
+                cached
+                    .stamp
+                    .paths
+                    .iter()
+                    .filter(|p| !paths.contains(p))
+                    .cloned()
+                    .collect::<Vec<_>>(),
+            );
             if ConfigStamp::read(paths.clone())? == cached.stamp {
                 return Ok(cached.clone());
             }
@@ -669,19 +747,34 @@ impl GitDriver {
         loop {
             let before = ConfigStamp::read(paths.clone())?;
             let out = self.invoke_input(
-                Some(repo), &repo.trusted_main_root,
-                &["config", "--null", "--show-origin", "--list"], policy, loan,
-                true, PATH_LIMIT, Duration::from_secs(30), &[],
+                Some(repo),
+                &repo.trusted_main_root,
+                &["config", "--null", "--show-origin", "--list"],
+                policy,
+                loan,
+                true,
+                PATH_LIMIT,
+                Duration::from_secs(30),
+                &[],
             )?;
-            if !out.success { return Err(out.error("git-config-failed")); }
+            if !out.success {
+                return Err(out.error("git-config-failed"));
+            }
             let records = parse_config(&out.stdout)?;
             self.check_config(repo, &records)?;
             for (origin, _, _) in &records {
                 if let Some(path) = origin.strip_prefix(b"file:") {
-                    let path = PathBuf::from(std::str::from_utf8(path)
-                        .map_err(|_| failure("non-utf8-config-origin"))?);
-                    let path = if path.is_absolute() { path } else { repo.trusted_main_root.join(path) };
-                    if !paths.contains(&path) { paths.push(path); }
+                    let path = PathBuf::from(
+                        std::str::from_utf8(path).map_err(|_| failure("non-utf8-config-origin"))?,
+                    );
+                    let path = if path.is_absolute() {
+                        path
+                    } else {
+                        repo.trusted_main_root.join(path)
+                    };
+                    if !paths.contains(&path) {
+                        paths.push(path);
+                    }
                 }
             }
             // Newly discovered origins need a fresh read with their before-stamp.
@@ -692,14 +785,22 @@ impl GitDriver {
             if before != ConfigStamp::read(paths)? {
                 return Err(failure("repository-config-changed-during-read"));
             }
-            return Ok(ConfigCache { stamp: before, records, formats: None });
+            return Ok(ConfigCache {
+                stamp: before,
+                records,
+                formats: None,
+            });
         }
     }
 
     fn config(&self, repo: &RepoHandle) -> Result<Vec<ConfigRecord>> {
         if let Some(config) = &repo.checkout_config {
-            let mut cache = config.lock().map_err(|_| failure("config-cache-poisoned"))?;
-            let previous = cache.take().ok_or_else(|| failure("checkout-facts-invalidated"))?;
+            let mut cache = config
+                .lock()
+                .map_err(|_| failure("config-cache-poisoned"))?;
+            let previous = cache
+                .take()
+                .ok_or_else(|| failure("checkout-facts-invalidated"))?;
             let fresh = self.validated_config(repo, Some(&previous), Policy::Inspect, None)?;
             let records = fresh.records.clone();
             *cache = Some(fresh);
@@ -709,7 +810,8 @@ impl GitDriver {
         // rechecks source stamps, including missing files; no HEAD/ref fact
         // is retained between commands. A refusal keeps the last good stamp
         // so a long-lived read handle can recover after a config repair.
-        let mut cache = REPOSITORY_CONFIG.lock()
+        let mut cache = REPOSITORY_CONFIG
+            .lock()
             .map_err(|_| failure("config-cache-poisoned"))?;
         let fresh = self.validated_config(repo, cache.get(&repo.git_dir), Policy::Inspect, None)?;
         let records = fresh.records.clone();
@@ -729,11 +831,24 @@ impl GitDriver {
         let mut args = vec!["config", "--null"];
         args.extend_from_slice(annotate);
         args.push("--list");
-        self.invoke(context, root, &args, Policy::Inspect, None, false, PATH_LIMIT, timeout)
+        self.invoke(
+            context,
+            root,
+            &args,
+            Policy::Inspect,
+            None,
+            false,
+            PATH_LIMIT,
+            timeout,
+        )
     }
     /// Read-only diagnostic shared with Remote admission.
     pub fn untrusted_transport_config(&self, repo: &RepoHandle) -> Result<Vec<String>> {
-        Ok(self.repository_scoped_keys(repo)?.into_iter().filter(|k| repository_transport_config(k)).collect())
+        Ok(self
+            .repository_scoped_keys(repo)?
+            .into_iter()
+            .filter(|k| repository_transport_config(k))
+            .collect())
     }
     /// Keys the repository itself sets (local or worktree scope, and files those
     /// include): the only configuration a cloned repository controls. Global,
@@ -747,7 +862,12 @@ impl GitDriver {
             if context.is_some() && repo.git_dir == repo.common_dir {
                 continue;
             }
-            let out = self.config_listing(context, &repo.trusted_main_root, &["--show-scope"], Duration::from_secs(30))?;
+            let out = self.config_listing(
+                context,
+                &repo.trusted_main_root,
+                &["--show-scope"],
+                Duration::from_secs(30),
+            )?;
             if !out.success {
                 return Err(out.error("git-config-failed"));
             }
@@ -771,7 +891,11 @@ impl GitDriver {
         if !config.iter().any(|(_, key, _)| command_config(key)) {
             return Ok(());
         }
-        match self.repository_scoped_keys(repo)?.into_iter().find(|key| command_config(key)) {
+        match self
+            .repository_scoped_keys(repo)?
+            .into_iter()
+            .find(|key| command_config(key))
+        {
             Some(key) => Err(failure(format!("repository-config-untrusted: {key}"))),
             None => Ok(()),
         }
@@ -782,7 +906,9 @@ impl GitDriver {
     pub(crate) fn checkout_repository(&self, repo: &RepoHandle) -> Result<RepoHandle> {
         self.require_floor()?;
         let mut current = match self.resolve_topology(
-            repo.work_tree.as_deref().ok_or_else(|| failure("checkout-required"))?,
+            repo.work_tree
+                .as_deref()
+                .ok_or_else(|| failure("checkout-required"))?,
             &repo.trusted_main_root,
         )? {
             ResolveRepo::Repository(r) => r,
@@ -793,8 +919,11 @@ impl GitDriver {
         }
         // Seeded from the process-wide entry for this git dir; the stamp check
         // inside decides whether it still stands or the config is read afresh.
-        let seed = REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
-            .get(&current.git_dir).cloned();
+        let seed = REPOSITORY_CONFIG
+            .lock()
+            .map_err(|_| failure("config-cache-poisoned"))?
+            .get(&current.git_dir)
+            .cloned();
         let config = self.validated_config(&current, seed.as_ref(), Policy::Inspect, None)?;
         current.checkout_config = Some(Mutex::new(Some(config)));
         self.read_repository_facts(&mut current)?;
@@ -805,10 +934,14 @@ impl GitDriver {
             return Err(failure("repository-promisor-changed"));
         }
         // What this operation proved stands for the next handle of the same git dir.
-        let proven = current.checkout_config.as_ref()
+        let proven = current
+            .checkout_config
+            .as_ref()
             .and_then(|local| local.lock().ok().and_then(|entry| entry.clone()));
         if let Some(proven) = proven {
-            REPOSITORY_CONFIG.lock().map_err(|_| failure("config-cache-poisoned"))?
+            REPOSITORY_CONFIG
+                .lock()
+                .map_err(|_| failure("config-cache-poisoned"))?
                 .insert(current.git_dir.clone(), proven);
         }
         Ok(current)
@@ -816,11 +949,18 @@ impl GitDriver {
 
     pub(crate) fn refresh_checkout_facts(&self, repo: &RepoHandle) -> Result<()> {
         if let Some(config) = &repo.checkout_config {
-            *config.lock().map_err(|_| failure("config-cache-poisoned"))? = None;
+            *config
+                .lock()
+                .map_err(|_| failure("config-cache-poisoned"))? = None;
             let fresh = self.checkout_repository(repo)?;
-            let replacement = fresh.checkout_config.ok_or_else(|| failure("checkout-facts-invalidated"))?
-                .into_inner().map_err(|_| failure("config-cache-poisoned"))?;
-            *config.lock().map_err(|_| failure("config-cache-poisoned"))? = replacement;
+            let replacement = fresh
+                .checkout_config
+                .ok_or_else(|| failure("checkout-facts-invalidated"))?
+                .into_inner()
+                .map_err(|_| failure("config-cache-poisoned"))?;
+            *config
+                .lock()
+                .map_err(|_| failure("config-cache-poisoned"))? = replacement;
         } else {
             self.checkout_repository(repo)?;
         }
@@ -830,13 +970,22 @@ impl GitDriver {
     /// Names a revision that is not a commit or tree. Asked only after a read
     /// of it missed or failed, so a read that succeeds spends no call on it.
     fn require_commit_or_tree(&self, repo: &RepoHandle, revision: &Oid) -> Result<()> {
-        let kind = self.checked(repo, &["cat-file", "-t", revision.as_str()], Policy::Inspect)?;
+        let kind = self.checked(
+            repo,
+            &["cat-file", "-t", revision.as_str()],
+            Policy::Inspect,
+        )?;
         if kind != b"commit\n" && kind != b"tree\n" {
             return Err(failure("revision-not-commit-or-tree"));
         }
         Ok(())
     }
-    pub(crate) fn checked(&self, repo: &RepoHandle, args: &[&str], policy: Policy) -> Result<Vec<u8>> {
+    pub(crate) fn checked(
+        &self,
+        repo: &RepoHandle,
+        args: &[&str],
+        policy: Policy,
+    ) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;
         let out = self.invoke(
@@ -887,7 +1036,8 @@ impl GitDriver {
             .map(|(_, _, v)| v);
         Ok(match configured {
             Some(bytes) => {
-                let value = std::str::from_utf8(&bytes).map_err(|_| failure("non-utf8-hook-path"))?;
+                let value =
+                    std::str::from_utf8(&bytes).map_err(|_| failure("non-utf8-hook-path"))?;
                 if value.starts_with('~') {
                     return Err(failure("unresolved-hook-path"));
                 }
@@ -914,8 +1064,9 @@ impl GitDriver {
                         #[cfg(unix)]
                         let executable = {
                             use std::os::unix::fs::PermissionsExt;
-                            fs::metadata(entry.path())
-                                .map_or(true, |m| m.is_file() && m.permissions().mode() & 0o111 != 0)
+                            fs::metadata(entry.path()).map_or(true, |m| {
+                                m.is_file() && m.permissions().mode() & 0o111 != 0
+                            })
                         };
                         #[cfg(not(unix))]
                         let executable = true;
@@ -928,11 +1079,16 @@ impl GitDriver {
                 Err(_) => return Ok(true),
             }
         }
-        if matches!(policy, Policy::HookContext | Policy::Publication | Policy::LocalMutation) {
+        if matches!(
+            policy,
+            Policy::HookContext | Policy::Publication | Policy::LocalMutation
+        ) {
             return Ok(self.config(repo)?.iter().any(|(_, k, _)| {
                 let key = k.to_ascii_lowercase();
                 key.starts_with("filter.")
-                    && [".clean", ".smudge", ".process"].iter().any(|tail| key.ends_with(tail))
+                    && [".clean", ".smudge", ".process"]
+                        .iter()
+                        .any(|tail| key.ends_with(tail))
             }));
         }
         Ok(false)
@@ -1227,7 +1383,11 @@ impl GitDriver {
             match &exit_fd {
                 Some(fd) => {
                     use std::os::fd::AsRawFd;
-                    let mut pfd = libc::pollfd { fd: fd.as_raw_fd(), events: libc::POLLIN, revents: 0 };
+                    let mut pfd = libc::pollfd {
+                        fd: fd.as_raw_fd(),
+                        events: libc::POLLIN,
+                        revents: 0,
+                    };
                     let ms = step.as_millis().max(1) as libc::c_int;
                     // SAFETY: one pollfd on a descriptor owned by this call.
                     unsafe { libc::poll(&mut pfd, 1, ms) };
@@ -1300,26 +1460,39 @@ impl GitDriver {
     fn floor_key(&self) -> Option<serde_json::Value> {
         let home = std::env::var_os("HOME").map(PathBuf::from);
         let xdg = std::env::var_os("XDG_CONFIG_HOME").map(PathBuf::from);
-        let mut configs = self.config_paths(None, &self.state_root, Policy::Inspect, None).ok()?;
+        let mut configs = self
+            .config_paths(None, &self.state_root, Policy::Inspect, None)
+            .ok()?;
         let before = ConfigStamp::read(configs.clone()).ok()?;
         // Includes may depend on gitdir/onbranch/hasconfig as well as files.
         // Conservatively do not persist a verdict for any include directive,
         // including missing or currently inactive includeIf targets.
         let config = self
-            .config_listing(None, &self.state_root, &["--show-origin"], Duration::from_secs(10))
+            .config_listing(
+                None,
+                &self.state_root,
+                &["--show-origin"],
+                Duration::from_secs(10),
+            )
             .ok()?;
         if !config.success {
             return None;
         }
         for (origin, key, _) in parse_config(&config.stdout).ok()? {
-            if key == "include.path" || key.starts_with("includeif.") { return None; }
+            if key == "include.path" || key.starts_with("includeif.") {
+                return None;
+            }
             if let Some(path) = origin.strip_prefix(b"file:") {
                 let path = PathBuf::from(std::str::from_utf8(path).ok()?);
                 let path = self.state_root.join(path);
-                if !configs.contains(&path) { configs.push(path); }
+                if !configs.contains(&path) {
+                    configs.push(path);
+                }
             }
         }
-        if before != ConfigStamp::read(before.paths.clone()).ok()? { return None; }
+        if before != ConfigStamp::read(before.paths.clone()).ok()? {
+            return None;
+        }
         let binary = ConfigStamp::read(vec![self.git.clone()]).ok()?;
         let configs = ConfigStamp::read(configs).ok()?;
         Some(serde_json::json!({
@@ -1542,11 +1715,20 @@ pub(crate) fn read_ref_value(
     name: &RefName,
     run: &dyn Fn(&[&str]) -> Result<Output>,
 ) -> Result<RefValue> {
-    let listing = run(&["for-each-ref", "--format=%(refname)%00%(objectname)%00%(symref)", "--", name.as_str()])?;
+    let listing = run(&[
+        "for-each-ref",
+        "--format=%(refname)%00%(objectname)%00%(symref)",
+        "--",
+        name.as_str(),
+    ])?;
     if !listing.success {
         return Err(listing.error(layout_cause(&repo.layout, "git-command-failed")));
     }
-    for l in listing.stdout.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
+    for l in listing
+        .stdout
+        .split(|b| *b == b'\n')
+        .filter(|l| !l.is_empty())
+    {
         let fields: Vec<_> = l.split(|b| *b == 0).collect();
         if fields.len() != 3 {
             return Err(failure("invalid-ref-observation"));
@@ -1695,7 +1877,11 @@ fn secure_driver_directory(path: &Path, mode: u32, recursive: bool) -> Result<bo
         }
     }
     #[cfg(not(unix))]
-    if mode == 0o500 { check_hooks(path)?; } else { trusted_directory(path)?; }
+    if mode == 0o500 {
+        check_hooks(path)?;
+    } else {
+        trusted_directory(path)?;
+    }
     Ok(created && !existed)
 }
 fn trusted_directory(path: &Path) -> Result<()> {
@@ -1947,13 +2133,21 @@ impl crate::wal::RecoveryReader for WalReader<'_> {
                 return Ok(false);
             }
             // Intact means the candidate is a commit and everything it reaches is present.
-            let kind = self.driver.checked(self.repo, &["cat-file", "-t", "--", oid], Policy::Inspect);
+            let kind =
+                self.driver
+                    .checked(self.repo, &["cat-file", "-t", "--", oid], Policy::Inspect);
             return Ok(kind.is_ok_and(|kind| kind == b"commit\n")
                 && self
                     .driver
                     .checked(
                         self.repo,
-                        &["rev-list", "--objects", "--missing=error", "--end-of-options", oid],
+                        &[
+                            "rev-list",
+                            "--objects",
+                            "--missing=error",
+                            "--end-of-options",
+                            oid,
+                        ],
                         Policy::Inspect,
                     )
                     .is_ok());
@@ -2112,15 +2306,27 @@ impl Inspect for GitDriver {
         self.require_floor()?;
         self.preflight(repo)?;
         let head = |args: &[&str]| {
-            self.invoke(Some(repo), &repo.trusted_main_root, args, Policy::Inspect, None, true, 4096, Duration::from_secs(30))
+            self.invoke(
+                Some(repo),
+                &repo.trusted_main_root,
+                args,
+                Policy::Inspect,
+                None,
+                true,
+                4096,
+                Duration::from_secs(30),
+            )
         };
-        let target_of = |name: &str| RefName::parse(name).map_err(|_| failure("invalid-head-target"));
+        let target_of =
+            |name: &str| RefName::parse(name).map_err(|_| failure("invalid-head-target"));
         // HEAD is read by two children, bracketed: the symbolic target first, then the commit with
         // the target it was read under. One `rev-parse` reads HEAD several times, so a switch in
         // the middle could pair one branch's commit with another's name; the two names must agree.
         let first = head(&["symbolic-ref", "--quiet", "HEAD"])?;
         let target = if first.success {
-            Some(target_of(line(&first.stdout).map_err(|_| failure("invalid-head-target"))?)?)
+            Some(target_of(
+                line(&first.stdout).map_err(|_| failure("invalid-head-target"))?,
+            )?)
         } else if first.code == Some(1) {
             None
         } else {
@@ -2129,22 +2335,29 @@ impl Inspect for GitDriver {
         let out = head(&["rev-parse", "HEAD^{commit}", "--symbolic-full-name", "HEAD"])?;
         if out.success {
             let text = line(&out.stdout).map_err(|_| failure("invalid-head-oid"))?;
-            let (value, name) = text.split_once('\n').ok_or_else(|| failure("invalid-head-oid"))?;
-            let commit = Oid::parse(value, repo.object_format()).map_err(|_| failure("invalid-head-oid"))?;
+            let (value, name) = text
+                .split_once('\n')
+                .ok_or_else(|| failure("invalid-head-oid"))?;
+            let commit =
+                Oid::parse(value, repo.object_format()).map_err(|_| failure("invalid-head-oid"))?;
             return match (target, name) {
                 (None, "HEAD") => Ok(HeadFact::Detached { commit }),
-                (Some(target), name) if target.as_str() == name => Ok(HeadFact::Attached { target, commit }),
+                (Some(target), name) if target.as_str() == name => {
+                    Ok(HeadFact::Attached { target, commit })
+                }
                 _ => Err(failure("head-changed-during-read")),
             };
         }
         // Not born: a symbolic HEAD whose target is not listed is unborn.
         if let Some(target) = target {
-            let page = self.list_refs(
-                repo,
-                &[RefPrefix::parse(target.as_str()).map_err(|_| failure("invalid-head-target"))?],
-                None,
-                100_000,
-            )?;
+            let page =
+                self.list_refs(
+                    repo,
+                    &[RefPrefix::parse(target.as_str())
+                        .map_err(|_| failure("invalid-head-target"))?],
+                    None,
+                    100_000,
+                )?;
             if !page.entries.iter().any(|e| e.name == target) && page.complete {
                 return Ok(HeadFact::Unborn { target });
             }
@@ -2360,7 +2573,10 @@ impl Inspect for GitDriver {
             // `%(HEAD)` is `*` on the one listed ref that HEAD, read once by this child, names.
             // Only a direct branch is a HEAD fact (Git keeps `refs/heads/` to commits, so no object
             // type read is needed); anything else is left to `resolve_head`.
-            if fields[3] == b"*" && name.as_str().starts_with("refs/heads/") && matches!(value, RefValue::Direct(_)) {
+            if fields[3] == b"*"
+                && name.as_str().starts_with("refs/heads/")
+                && matches!(value, RefValue::Direct(_))
+            {
                 head = Some(name.clone());
             }
             entries.push(RefEntry { name, value });
@@ -2523,7 +2739,11 @@ impl Inspect for GitDriver {
         GitDriver::resolve_repo(self, path, path)
     }
 }
-pub(crate) fn config_facts(driver: &GitDriver, repo: &RepoHandle, key: &str) -> Result<Vec<ConfigFact>> {
+pub(crate) fn config_facts(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    key: &str,
+) -> Result<Vec<ConfigFact>> {
     driver
         .config(repo)?
         .into_iter()
@@ -2739,7 +2959,19 @@ mod tests {
             version: "2.53.0".into(),
             minimum: "2.53.0".into(),
             supported: true,
-            probes: ["hook-suppression", "no-lazy-fetch", "update-ref-no-deref", "hook-run"].into_iter().map(|name| FloorProbe { name: name.into(), passed: true, evidence: "e".into() }).collect(),
+            probes: [
+                "hook-suppression",
+                "no-lazy-fetch",
+                "update-ref-no-deref",
+                "hook-run",
+            ]
+            .into_iter()
+            .map(|name| FloorProbe {
+                name: name.into(),
+                passed: true,
+                evidence: "e".into(),
+            })
+            .collect(),
         };
         let path = t.0.join(FLOOR_RECORD);
         fs::write(&path, floor_record(&key, &verdict).to_string()).unwrap();
@@ -2757,13 +2989,18 @@ mod tests {
         // Passing an incomplete or different probe set cannot certify the floor.
         for name in ["different-probe", "hook-suppression"] {
             let mut incomplete = floor_record(&key, &verdict);
-            incomplete["probes"] = serde_json::json!([{"name": name, "passed": true, "evidence": "e"}]);
+            incomplete["probes"] =
+                serde_json::json!([{"name": name, "passed": true, "evidence": "e"}]);
             fs::write(&path, incomplete.to_string()).unwrap();
             assert!(read_floor_record(&path, &key).is_none());
         }
         // A symlink is never followed.
         fs::remove_file(&path).unwrap();
-        fs::write(t.0.join("elsewhere"), floor_record(&key, &verdict).to_string()).unwrap();
+        fs::write(
+            t.0.join("elsewhere"),
+            floor_record(&key, &verdict).to_string(),
+        )
+        .unwrap();
         #[cfg(unix)]
         {
             std::os::unix::fs::symlink(t.0.join("elsewhere"), &path).unwrap();
@@ -2779,14 +3016,28 @@ mod tests {
         assert_eq!(key["hostVersion"], env!("CARGO_PKG_VERSION"));
         assert!(key["probeCode"].as_str().is_some_and(|s| s.len() == 64));
         assert_eq!(key["path"], std::env::var("PATH").unwrap());
-        assert!(key["binary"][0].is_string(), "the binary identity is recorded");
-        assert!(key["configs"].as_array().unwrap().iter().any(|c| c[0] == serde_json::json!("/etc/gitconfig")));
+        assert!(
+            key["binary"][0].is_string(),
+            "the binary identity is recorded"
+        );
+        assert!(key["configs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|c| c[0] == serde_json::json!("/etc/gitconfig")));
     }
     #[test]
     fn include_directives_disable_persistent_floor_reuse_even_when_inactive() {
         let t = Temp::new();
         git(&t.0, &["init", "--quiet"]);
-        git(&t.0, &["config", "includeIf.gitdir:/never-a-probe/.path", "missing-include"]);
+        git(
+            &t.0,
+            &[
+                "config",
+                "includeIf.gitdir:/never-a-probe/.path",
+                "missing-include",
+            ],
+        );
         let driver = GitDriver::new(&t.0).unwrap();
         assert!(driver.floor_key().is_none());
     }
@@ -2815,7 +3066,15 @@ mod tests {
     fn log_git_children(driver: &mut GitDriver, dir: &Path) -> PathBuf {
         let log = dir.join("children.log");
         let script = dir.join("logging-git");
-        fs::write(&script, format!("#!/bin/sh\necho \"$*\" >> '{}'\nexec '{}' \"$@\"\n", log.display(), driver.git.display())).unwrap();
+        fs::write(
+            &script,
+            format!(
+                "#!/bin/sh\necho \"$*\" >> '{}'\nexec '{}' \"$@\"\n",
+                log.display(),
+                driver.git.display()
+            ),
+        )
+        .unwrap();
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
@@ -2827,8 +3086,12 @@ mod tests {
     /// (config listings, format reads) spawned so far.
     fn fact_reads(log: &Path) -> (usize, usize) {
         let text = fs::read_to_string(log).unwrap_or_default();
-        (text.lines().filter(|l| l.contains("--show-origin")).count(),
-         text.lines().filter(|l| l.contains("--show-object-format")).count())
+        (
+            text.lines().filter(|l| l.contains("--show-origin")).count(),
+            text.lines()
+                .filter(|l| l.contains("--show-object-format"))
+                .count(),
+        )
     }
 
     #[test]
@@ -2837,18 +3100,38 @@ mod tests {
         let dir = Temp::new();
         let logs = Temp::new();
         git(&dir.0, &["init", "-q"]);
-        git(&dir.0, &["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "root"]);
+        git(
+            &dir.0,
+            &[
+                "-c",
+                "user.name=t",
+                "-c",
+                "user.email=t@t",
+                "commit",
+                "-q",
+                "--allow-empty",
+                "-m",
+                "root",
+            ],
+        );
         let linked = dir.0.join("linked");
         git(&dir.0, &["worktree", "add", "-q", linked.to_str().unwrap()]);
         // Config a resolve refuses: the root never reads it.
-        git(&dir.0, &["config", "filter.external.clean", "touch /unreachable"]);
+        git(
+            &dir.0,
+            &["config", "filter.external.clean", "touch /unreachable"],
+        );
         let mut driver = GitDriver::new(&state.0).unwrap();
         let log = log_git_children(&mut driver, &logs.0);
         let main = fs::canonicalize(&dir.0).unwrap();
         assert_eq!(driver.trusted_root(&linked).unwrap(), Some(main.clone()));
         assert_eq!(driver.trusted_root(&main).unwrap(), Some(main));
         assert_eq!(driver.trusted_root(&logs.0).unwrap(), None);
-        assert_eq!(fs::read_to_string(&log).unwrap_or_default(), "", "no Git child ran");
+        assert_eq!(
+            fs::read_to_string(&log).unwrap_or_default(),
+            "",
+            "no Git child ran"
+        );
     }
 
     #[test]
@@ -2863,28 +3146,68 @@ mod tests {
         let log = log_git_children(&mut driver, &logs.0);
         let repo = resolve(&driver, &dir.0);
         let proven = fact_reads(&log);
-        assert_eq!(proven, (1, 1), "the first handle reads its config and formats once");
+        assert_eq!(
+            proven,
+            (1, 1),
+            "the first handle reads its config and formats once"
+        );
         let operation = driver.checkout_repository(&repo).unwrap();
-        assert_eq!(fact_reads(&log), proven, "a checkout handle answers from the facts the stamp still proves");
-        driver.checked(&operation, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap();
+        assert_eq!(
+            fact_reads(&log),
+            proven,
+            "a checkout handle answers from the facts the stamp still proves"
+        );
+        driver
+            .checked(&operation, &["rev-parse", "--git-dir"], Policy::Inspect)
+            .unwrap();
         // An independent writer, outside cooperative checkout exclusion.
         let root = dir.0.clone();
-        std::thread::spawn(move || git(&root, &["config", "filter.external.clean", "touch /unreachable"]))
-            .join().unwrap();
-        let error = driver.checked(&operation, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap_err();
-        assert!(error.cause.contains("repository-config-untrusted: filter.external.clean"));
+        std::thread::spawn(move || {
+            git(
+                &root,
+                &["config", "filter.external.clean", "touch /unreachable"],
+            )
+        })
+        .join()
+        .unwrap();
+        let error = driver
+            .checked(&operation, &["rev-parse", "--git-dir"], Policy::Inspect)
+            .unwrap_err();
+        assert!(error
+            .cause
+            .contains("repository-config-untrusted: filter.external.clean"));
         // A new checkout handle sees the write too: the held stamp no longer matches.
         let error = driver.checkout_repository(&repo).unwrap_err();
-        assert!(error.cause.contains("repository-config-untrusted: filter.external.clean"), "{}", error.cause);
+        assert!(
+            error
+                .cause
+                .contains("repository-config-untrusted: filter.external.clean"),
+            "{}",
+            error.cause
+        );
         git(&dir.0, &["config", "--unset", "filter.external.clean"]);
-        assert_eq!(driver.preflight(&operation).unwrap_err().cause, "checkout-facts-invalidated");
+        assert_eq!(
+            driver.preflight(&operation).unwrap_err().cause,
+            "checkout-facts-invalidated"
+        );
         let next = driver.checkout_repository(&repo).unwrap();
-        driver.checked(&next, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap();
+        driver
+            .checked(&next, &["rev-parse", "--git-dir"], Policy::Inspect)
+            .unwrap();
         let reread = fact_reads(&log);
-        assert!(reread.0 > proven.0 && reread.1 > proven.1, "a moved stamp re-reads config and formats");
+        assert!(
+            reread.0 > proven.0 && reread.1 > proven.1,
+            "a moved stamp re-reads config and formats"
+        );
         let again = driver.checkout_repository(&repo).unwrap();
-        driver.checked(&again, &["rev-parse", "--git-dir"], Policy::Inspect).unwrap();
-        assert_eq!(fact_reads(&log), reread, "the re-read facts stand for the next handle");
+        driver
+            .checked(&again, &["rev-parse", "--git-dir"], Policy::Inspect)
+            .unwrap();
+        assert_eq!(
+            fact_reads(&log),
+            reread,
+            "the re-read facts stand for the next handle"
+        );
     }
 
     // The config cache is shared by every driver in a process; a new driver must still see a
@@ -2895,17 +3218,39 @@ mod tests {
         let dir = Temp::new();
         git(&dir.0, &["init", "-q", "--object-format=sha256"]);
         let first = GitDriver::new(&state.0).unwrap();
-        assert_eq!(resolve(&first, &dir.0).object_format(), ObjectFormat::Sha256);
+        assert_eq!(
+            resolve(&first, &dir.0).object_format(),
+            ObjectFormat::Sha256
+        );
         let cached = GitDriver::new(&state.0).unwrap();
-        assert_eq!(resolve(&cached, &dir.0).object_format(), ObjectFormat::Sha256, "formats reused while the stamp holds");
-        git(&dir.0, &["config", "filter.external.clean", "touch /unreachable"]);
-        let error = match GitDriver::new(&state.0).unwrap().resolve_repo(&dir.0, &dir.0) {
+        assert_eq!(
+            resolve(&cached, &dir.0).object_format(),
+            ObjectFormat::Sha256,
+            "formats reused while the stamp holds"
+        );
+        git(
+            &dir.0,
+            &["config", "filter.external.clean", "touch /unreachable"],
+        );
+        let error = match GitDriver::new(&state.0)
+            .unwrap()
+            .resolve_repo(&dir.0, &dir.0)
+        {
             Err(error) => error,
             Ok(_) => panic!("a config written after the cache filled was not seen"),
         };
-        assert!(error.cause.contains("repository-config-untrusted: filter.external.clean"), "{}", error.cause);
+        assert!(
+            error
+                .cause
+                .contains("repository-config-untrusted: filter.external.clean"),
+            "{}",
+            error.cause
+        );
         git(&dir.0, &["config", "--unset", "filter.external.clean"]);
-        assert_eq!(resolve(&GitDriver::new(&state.0).unwrap(), &dir.0).object_format(), ObjectFormat::Sha256);
+        assert_eq!(
+            resolve(&GitDriver::new(&state.0).unwrap(), &dir.0).object_format(),
+            ObjectFormat::Sha256
+        );
     }
 
     #[test]
@@ -2913,11 +3258,21 @@ mod tests {
         for format in ["sha1", "sha256"] {
             let state = Temp::new();
             let dir = Temp::new();
-            git(&dir.0, &["init", "-q", &format!("--object-format={format}")]);
+            git(
+                &dir.0,
+                &["init", "-q", &format!("--object-format={format}")],
+            );
             let driver = GitDriver::new(&state.0).unwrap();
             let repo = resolve(&driver, &dir.0);
-            let oid = driver.hash_object(&repo, ObjectType::Blob, b"unpublished bytes\0").unwrap();
-            assert!(!repo.common_dir().join("objects").join(&oid.as_str()[..2]).join(&oid.as_str()[2..]).exists());
+            let oid = driver
+                .hash_object(&repo, ObjectType::Blob, b"unpublished bytes\0")
+                .unwrap();
+            assert!(!repo
+                .common_dir()
+                .join("objects")
+                .join(&oid.as_str()[..2])
+                .join(&oid.as_str()[2..])
+                .exists());
             assert!(driver.hash_object(&repo, ObjectType::Tag, b"bad").is_err());
         }
     }
@@ -3007,7 +3362,10 @@ mod tests {
             !control.status.success(),
             "the installed hook must reject the control"
         );
-        assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+        assert!(matches!(
+            release(handle),
+            fgos_holder_lock::Release::Released { .. }
+        ));
     }
     #[test]
     fn floor_and_all_repository_backends() {
@@ -3109,7 +3467,15 @@ mod tests {
         fs::write(&global, "[filter \"lfs\"]\n\tclean = git-lfs clean -- %f\n\tsmudge = git-lfs smudge -- %f\n\tprocess = git-lfs filter-process\n[credential]\n\thelper = store\n").unwrap();
         let mut driver = GitDriver::new(&state.0).unwrap();
         let script = home.0.join("global-git");
-        fs::write(&script, format!("#!/bin/sh\nGIT_CONFIG_GLOBAL='{}' exec '{}' \"$@\"\n", global.display(), driver.git.display())).unwrap();
+        fs::write(
+            &script,
+            format!(
+                "#!/bin/sh\nGIT_CONFIG_GLOBAL='{}' exec '{}' \"$@\"\n",
+                global.display(),
+                driver.git.display()
+            ),
+        )
+        .unwrap();
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
@@ -3117,9 +3483,16 @@ mod tests {
         }
         driver.git = script;
         let repo = resolve(&driver, &dir.0);
-        driver.checked(&repo, &["status", "--porcelain=v1", "-z"], Policy::Inspect).unwrap();
-        git(&dir.0, &["config", "filter.lfs.clean", "/nonexistent/command"]);
-        let err = driver.checked(&repo, &["status", "--porcelain=v1", "-z"], Policy::Inspect).unwrap_err();
+        driver
+            .checked(&repo, &["status", "--porcelain=v1", "-z"], Policy::Inspect)
+            .unwrap();
+        git(
+            &dir.0,
+            &["config", "filter.lfs.clean", "/nonexistent/command"],
+        );
+        let err = driver
+            .checked(&repo, &["status", "--porcelain=v1", "-z"], Policy::Inspect)
+            .unwrap_err();
         assert_eq!(err.cause, "repository-config-untrusted: filter.lfs.clean");
     }
     #[test]
@@ -3209,14 +3582,20 @@ mod tests {
 
         // A shallow boundary only.
         fs::write(dir.0.join(".git/HEAD"), format!("{bogus}\n")).unwrap();
-        expect(causes(&resolve(&driver, &dir.0)), "shallow-history-incomplete");
+        expect(
+            causes(&resolve(&driver, &dir.0)),
+            "shallow-history-incomplete",
+        );
         // Alternates as well as the shallow boundary: alternates name the cause.
         fs::write(
             dir.0.join(".git/objects/info/alternates"),
             b"/missing/alternate\n",
         )
         .unwrap();
-        expect(causes(&resolve(&driver, &dir.0)), "alternate-object-unavailable");
+        expect(
+            causes(&resolve(&driver, &dir.0)),
+            "alternate-object-unavailable",
+        );
     }
     #[test]
     fn a_tree_listing_asks_the_object_kind_only_after_a_read_missed() {
@@ -3227,19 +3606,54 @@ mod tests {
         fs::create_dir(dir.0.join("d")).unwrap();
         fs::write(dir.0.join("d/f"), "f").unwrap();
         git(&dir.0, &["add", "."]);
-        git(&dir.0, &["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "root"]);
+        git(
+            &dir.0,
+            &[
+                "-c",
+                "user.name=t",
+                "-c",
+                "user.email=t@t",
+                "commit",
+                "-qm",
+                "root",
+            ],
+        );
         let mut driver = GitDriver::new(&state.0).unwrap();
         let log = log_git_children(&mut driver, &logs.0);
         let repo = resolve(&driver, &dir.0);
-        let oid = |rev: &str| Oid::parse(String::from_utf8(git(&dir.0, &["rev-parse", rev])).unwrap().trim(), repo.object_format()).unwrap();
-        let kinds = || fs::read_to_string(&log).unwrap().lines().filter(|l| l.contains(" cat-file -t ")).count();
+        let oid = |rev: &str| {
+            Oid::parse(
+                String::from_utf8(git(&dir.0, &["rev-parse", rev]))
+                    .unwrap()
+                    .trim(),
+                repo.object_format(),
+            )
+            .unwrap()
+        };
+        let kinds = || {
+            fs::read_to_string(&log)
+                .unwrap()
+                .lines()
+                .filter(|l| l.contains(" cat-file -t "))
+                .count()
+        };
         for prefix in [&b""[..], b"d/"] {
-            assert!(!driver.list_tree(&repo, &oid("HEAD"), prefix, None, 10).unwrap().entries.is_empty());
+            assert!(!driver
+                .list_tree(&repo, &oid("HEAD"), prefix, None, 10)
+                .unwrap()
+                .entries
+                .is_empty());
         }
         assert_eq!(kinds(), 0, "a commit's listing spends no call on its kind");
-        assert!(driver.list_tree(&repo, &oid("HEAD"), b"nope/x", None, 10).unwrap().entries.is_empty());
+        assert!(driver
+            .list_tree(&repo, &oid("HEAD"), b"nope/x", None, 10)
+            .unwrap()
+            .entries
+            .is_empty());
         for prefix in [&b""[..], b"d/x"] {
-            let error = driver.list_tree(&repo, &oid("HEAD:d/f"), prefix, None, 10).unwrap_err();
+            let error = driver
+                .list_tree(&repo, &oid("HEAD:d/f"), prefix, None, 10)
+                .unwrap_err();
             assert_eq!(error.cause, "revision-not-commit-or-tree");
         }
         assert_eq!(kinds(), 3, "only the missed reads ask for the kind");
@@ -3250,25 +3664,55 @@ mod tests {
         let dir = Temp::new();
         let logs = Temp::new();
         git(&dir.0, &["init", "-q"]);
-        git(&dir.0, &["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "root"]);
+        git(
+            &dir.0,
+            &[
+                "-c",
+                "user.name=t",
+                "-c",
+                "user.email=t@t",
+                "commit",
+                "-q",
+                "--allow-empty",
+                "-m",
+                "root",
+            ],
+        );
         let linked = dir.0.join("linked");
         git(&dir.0, &["worktree", "add", "-q", linked.to_str().unwrap()]);
         let mut driver = GitDriver::new(&state.0).unwrap();
         driver.require_floor().unwrap();
         let log = log_git_children(&mut driver, &logs.0);
-        let listings = || fs::read_to_string(&log).unwrap_or_default().lines().filter(|l| l.contains("--show-scope")).count();
+        let listings = || {
+            fs::read_to_string(&log)
+                .unwrap_or_default()
+                .lines()
+                .filter(|l| l.contains("--show-scope"))
+                .count()
+        };
         let repo = resolve(&driver, &dir.0);
         assert!(driver.transport_policy(&repo).unwrap().is_empty());
         assert!(driver.transport_policy(&repo).unwrap().is_empty());
-        assert_eq!(listings(), 1, "an unchanged stamp answers from the first listing");
+        assert_eq!(
+            listings(),
+            1,
+            "an unchanged stamp answers from the first listing"
+        );
         git(&dir.0, &["config", "http.sslCAInfo", "/unreachable"]);
-        assert_eq!(driver.transport_policy(&repo).unwrap(), vec!["http.sslcainfo"]);
+        assert_eq!(
+            driver.transport_policy(&repo).unwrap(),
+            vec!["http.sslcainfo"]
+        );
         assert_eq!(listings(), 2, "a config write is seen at once");
         let linked = resolve(&driver, &linked);
         let before = listings();
         driver.transport_policy(&linked).unwrap();
         driver.transport_policy(&linked).unwrap();
-        assert_eq!(listings() - before, 4, "a linked handle lists both contexts every time");
+        assert_eq!(
+            listings() - before,
+            4,
+            "a linked handle lists both contexts every time"
+        );
     }
     #[test]
     fn a_missing_tree_or_path_is_an_alternates_error_and_stays_absent_when_only_shallow() {
@@ -3280,7 +3724,16 @@ mod tests {
         git(&dir.0, &["init", "-q"]);
         git(
             &dir.0,
-            &["-c", "user.name=Test", "-c", "user.email=t@e", "commit", "--allow-empty", "-qm", "initial"],
+            &[
+                "-c",
+                "user.name=Test",
+                "-c",
+                "user.email=t@e",
+                "commit",
+                "--allow-empty",
+                "-qm",
+                "initial",
+            ],
         );
         let head = String::from_utf8(git(&dir.0, &["rev-parse", "HEAD"])).unwrap();
         let driver = GitDriver::new(&state.0).unwrap();
@@ -3409,7 +3862,10 @@ mod tests {
             fs::set_permissions(&driver.hooks, fs::Permissions::from_mode(0o700)).unwrap();
         }
         fs::write(driver.hooks.join("injected"), b"x").unwrap();
-        let cause = driver.checked(&repo, &["status", "-z"], Policy::Inspect).unwrap_err().cause;
+        let cause = driver
+            .checked(&repo, &["status", "-z"], Policy::Inspect)
+            .unwrap_err()
+            .cause;
         assert!(cause.starts_with("trusted-hooks-not-empty"));
         assert!(cause.contains(&driver.hooks.display().to_string()));
         assert!(cause.contains("remove foreign files"));
@@ -3535,16 +3991,28 @@ mod tests {
         fn name(&self) -> &'static str {
             self.inner.name()
         }
-        fn create(&self, attempt_id: &str) -> std::result::Result<containment::ContainmentDomain, containment::ContainmentError> {
+        fn create(
+            &self,
+            attempt_id: &str,
+        ) -> std::result::Result<containment::ContainmentDomain, containment::ContainmentError>
+        {
             self.inner.create(attempt_id)
         }
-        fn spawn_in(&self, domain: &mut containment::ContainmentDomain, spec: SpawnSpec) -> std::result::Result<containment::Spawned, containment::ContainmentError> {
+        fn spawn_in(
+            &self,
+            domain: &mut containment::ContainmentDomain,
+            spec: SpawnSpec,
+        ) -> std::result::Result<containment::Spawned, containment::ContainmentError> {
             self.inner.spawn_in(domain, spec)
         }
         fn is_empty(&self, domain: &mut containment::ContainmentDomain) -> DomainState {
             self.inner.is_empty(domain)
         }
-        fn kill_all(&self, domain: &mut containment::ContainmentDomain, _grace_ms: u64) -> KillOutcome {
+        fn kill_all(
+            &self,
+            domain: &mut containment::ContainmentDomain,
+            _grace_ms: u64,
+        ) -> KillOutcome {
             // End the real processes so the test leaves nothing behind, but
             // answer as a driver that could not.
             self.inner.kill_all(domain, 0);
@@ -3556,12 +4024,15 @@ mod tests {
     }
     #[test]
     #[cfg(unix)]
-    fn a_timed_out_contained_call_whose_domain_cannot_be_emptied_returns_containment_unproven_without_waiting() {
+    fn a_timed_out_contained_call_whose_domain_cannot_be_emptied_returns_containment_unproven_without_waiting(
+    ) {
         let state = Temp::new();
         let dir = Temp::new();
         git(&dir.0, &["init", "-q"]);
         let mut driver = GitDriver::new(&state.0).unwrap();
-        driver.containment = Box::new(UnemptiedDriver { inner: driver.containment });
+        driver.containment = Box::new(UnemptiedDriver {
+            inner: driver.containment,
+        });
         let repo = resolve(&driver, &dir.0);
         let start = Instant::now();
         let err = driver
@@ -3578,23 +4049,34 @@ mod tests {
             .err()
             .unwrap();
         assert_eq!(err.cause, "containment-unproven");
-        assert!(start.elapsed() < Duration::from_secs(3), "took {:?}", start.elapsed());
+        assert!(
+            start.elapsed() < Duration::from_secs(3),
+            "took {:?}",
+            start.elapsed()
+        );
     }
     #[test]
     #[cfg(target_os = "linux")]
-    fn a_contained_call_whose_root_exited_but_whose_domain_cannot_be_emptied_returns_containment_unproven() {
+    fn a_contained_call_whose_root_exited_but_whose_domain_cannot_be_emptied_returns_containment_unproven(
+    ) {
         let state = Temp::new();
         let dir = Temp::new();
         git(&dir.0, &["init", "-q"]);
         let mut driver = GitDriver::new(&state.0).unwrap();
         // A process-group domain sees the background member the root leaves.
-        driver.containment = Box::new(UnemptiedDriver { inner: Box::new(fgos_process::containment::LinuxPgroup::default()) });
+        driver.containment = Box::new(UnemptiedDriver {
+            inner: Box::new(fgos_process::containment::LinuxPgroup::default()),
+        });
         let repo = resolve(&driver, &dir.0);
         let err = driver
             .invoke(
                 Some(&repo),
                 &dir.0,
-                &["-c", "alias.leave=!sleep 30 </dev/null >/dev/null 2>&1 &", "leave"],
+                &[
+                    "-c",
+                    "alias.leave=!sleep 30 </dev/null >/dev/null 2>&1 &",
+                    "leave",
+                ],
                 Policy::Inspect,
                 None,
                 true,
@@ -3655,7 +4137,10 @@ mod tests {
             use std::os::unix::fs::PermissionsExt;
             fs::set_permissions(&script, fs::Permissions::from_mode(0o755)).unwrap();
         }
-        git(&sub_dir, &["config", "filter.x.clean", script.to_str().unwrap()]);
+        git(
+            &sub_dir,
+            &["config", "filter.x.clean", script.to_str().unwrap()],
+        );
 
         let mut driver = GitDriver::new(&state.0).unwrap();
         driver.containment = Box::new(fgos_process::containment::LinuxPgroup::default());
@@ -3679,7 +4164,6 @@ mod tests {
                 unsafe { libc::kill(pid as libc::pid_t, libc::SIGKILL) };
             }
         }
-
     }
 }
 
@@ -3701,10 +4185,20 @@ impl GitDriver {
             _ => return Err(failure("unsupported-hash-object-type")),
         };
         let out = self.inspect_input(repo, &["hash-object", "-t", kind, "--stdin"], bytes)?;
-        Oid::parse(std::str::from_utf8(&out).map_err(|_| failure("invalid-object-id"))?.trim(), repo.object_format())
-            .map_err(|_| failure("invalid-object-id"))
+        Oid::parse(
+            std::str::from_utf8(&out)
+                .map_err(|_| failure("invalid-object-id"))?
+                .trim(),
+            repo.object_format(),
+        )
+        .map_err(|_| failure("invalid-object-id"))
     }
-    pub(crate) fn inspect_input(&self, repo: &RepoHandle, args: &[&str], input: &[u8]) -> Result<Vec<u8>> {
+    pub(crate) fn inspect_input(
+        &self,
+        repo: &RepoHandle,
+        args: &[&str],
+        input: &[u8],
+    ) -> Result<Vec<u8>> {
         self.require_floor()?;
         self.preflight(repo)?;
         let out = self.invoke_input(
@@ -3834,9 +4328,15 @@ impl GitDriver {
         let diagnostic = (|| -> Result<&str> {
             if let Some(path) = self.hooks_value(repo)? {
                 let report = self.inspect_hooks(repo, &repo.trusted_main_root().join(&path))?;
-                if report.status == "owned" && report.provenance.is_some() && !report.enforcement_missing {
-                    let replay = self.checkout_call(repo, scope, &["hook", "run", "pre-commit"], &[], true)?;
-                    if !replay.success { return Ok("hook-refused"); }
+                if report.status == "owned"
+                    && report.provenance.is_some()
+                    && !report.enforcement_missing
+                {
+                    let replay =
+                        self.checkout_call(repo, scope, &["hook", "run", "pre-commit"], &[], true)?;
+                    if !replay.success {
+                        return Ok("hook-refused");
+                    }
                 }
             }
             Ok("commit-rejected")

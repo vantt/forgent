@@ -316,7 +316,14 @@ impl GitDriver {
             }
         }
         if !self
-            .status(&target, Untracked::All, Submodules::Configured, Ignored::Excluded, None, 1)?
+            .status(
+                &target,
+                Untracked::All,
+                Submodules::Configured,
+                Ignored::Excluded,
+                None,
+                1,
+            )?
             .entries
             .is_empty()
         {
@@ -465,8 +472,7 @@ impl GitDriver {
             resource_set
         };
         admission(wal, id, &resource_set)?;
-        let request_digest =
-            wal::canonical_digest(&(&kind, &old, &next, writer))?;
+        let request_digest = wal::canonical_digest(&(&kind, &old, &next, writer))?;
         let binding = wal::canonical_digest(&(wal.repository_identity(), "worktree-admin"))?;
         let intent = Intent {
             kind,
@@ -511,11 +517,10 @@ impl GitDriver {
         if !missing(&admin_root)? {
             fgos_durable_file::sync_directory(&admin_root).map_err(failure)?;
         }
-        let terminal = wal
-            .append(
-                chain,
-                Phase::Outcome(Outcome::Worktree { completed, details }),
-            )?;
+        let terminal = wal.append(
+            chain,
+            Phase::Outcome(Outcome::Worktree { completed, details }),
+        )?;
         release_pin(
             self,
             repo,
@@ -732,15 +737,14 @@ impl GitDriver {
             Tip::Absent,
             Tip::Oid(input.base.as_str().into()),
         )?;
-        let attempted = wal
-            .append(
-                &chain,
-                Phase::TargetAttempt {
-                    prior_target_attempt: None,
-                    expected: chain.intent().expected.clone(),
-                    next: chain.intent().next.clone(),
-                },
-            )?;
+        let attempted = wal.append(
+            &chain,
+            Phase::TargetAttempt {
+                prior_target_attempt: None,
+                expected: chain.intent().expected.clone(),
+                next: chain.intent().next.clone(),
+            },
+        )?;
         let result = (|| {
             let mut args = vec!["worktree", "add", "--quiet"];
             let branch;
@@ -967,15 +971,14 @@ impl GitDriver {
         )?;
         self.worktree_custody(repo, &scope, &path)?;
         self.worktree_not_live(&path, &mut warned)?;
-        let attempted = wal
-            .append(
-                &chain,
-                Phase::TargetAttempt {
-                    prior_target_attempt: None,
-                    expected: chain.intent().expected.clone(),
-                    next: Tip::Absent,
-                },
-            )?;
+        let attempted = wal.append(
+            &chain,
+            Phase::TargetAttempt {
+                prior_target_attempt: None,
+                expected: chain.intent().expected.clone(),
+                next: Tip::Absent,
+            },
+        )?;
         self.worktree_custody(repo, &scope, &path)?;
         self.worktree_not_live(&path, &mut warned)?;
         self.worktree_call(repo, &scope, &["worktree", "remove", "--", text(&path)?])
@@ -1100,15 +1103,14 @@ impl GitDriver {
         )?;
         self.worktree_custody(repo, &scope, &source)?;
         self.worktree_not_live(&source, &mut warned)?;
-        let attempted = wal
-            .append(
-                &chain,
-                Phase::TargetAttempt {
-                    prior_target_attempt: None,
-                    expected: tip.clone(),
-                    next: tip,
-                },
-            )?;
+        let attempted = wal.append(
+            &chain,
+            Phase::TargetAttempt {
+                prior_target_attempt: None,
+                expected: tip.clone(),
+                next: tip,
+            },
+        )?;
         self.worktree_custody(repo, &scope, &source)?;
         self.worktree_not_live(&source, &mut warned)?;
         self.worktree_call(
@@ -1146,7 +1148,8 @@ impl GitDriver {
         #[cfg(unix)]
         admin_identity(&directory)?;
         #[cfg(not(unix))]
-        if fs::symlink_metadata(&directory).map_err(failure)?
+        if fs::symlink_metadata(&directory)
+            .map_err(failure)?
             .file_type()
             .is_symlink()
         {
@@ -1227,16 +1230,25 @@ impl GitDriver {
             return self.repair_worktree_locked(repo, &scope, id);
         }
         let issues = self.inspect_worktree_orphans(repo)?;
-        let issue = issues.iter().find(|issue| issue.path == path
-            && issue.reason == "missing-worktree-preserved")
+        let issue = issues
+            .iter()
+            .find(|issue| issue.path == path && issue.reason == "missing-worktree-preserved")
             .ok_or_else(|| failure("worktree-prune-registration-unproven"))?;
-        let admin = repo.common_dir().join("worktrees").join(&issue.registration);
+        let admin = repo
+            .common_dir()
+            .join("worktrees")
+            .join(&issue.registration);
         let identity = admin_identity(&admin)?;
         if !missing(&admin.join("locked"))? {
             return Err(failure("worktree-user-locked"));
         }
         let common = fs::read_to_string(admin.join("commondir")).map_err(failure)?;
-        if admin.join(common.trim_end()).canonicalize().map_err(failure)? != repo.common_dir() {
+        if admin
+            .join(common.trim_end())
+            .canonicalize()
+            .map_err(failure)?
+            != repo.common_dir()
+        {
             return Err(recovery("worktree-admin-backlink-changed"));
         }
         let scan = wal.scan(100_000)?;
@@ -1245,11 +1257,20 @@ impl GitDriver {
         }
         let mut owned = None;
         for entry in scan.entries {
-            let Some(chain) = existing(&wal, &entry.operation_id)? else { continue };
+            let Some(chain) = existing(&wal, &entry.operation_id)? else {
+                continue;
+            };
             if matches!(&chain.intent().kind, OperationKind::WorktreeCreate {
                 path: created, registration, ..
             } if created.as_ref() == text(&path)? && registration.as_ref() == issue.registration)
-                && matches!(chain.outcome(), Some(Outcome::Worktree { completed: true, .. })) {
+                && matches!(
+                    chain.outcome(),
+                    Some(Outcome::Worktree {
+                        completed: true,
+                        ..
+                    })
+                )
+            {
                 owned = Some(entry.operation_id);
                 break;
             }
@@ -1267,28 +1288,62 @@ impl GitDriver {
         };
         // A vanished detached checkout can still be the only root of valuable
         // history. Preserve its registration unless a non-operation ref owns it.
-        let reachable = self.checked(repo, &["for-each-ref", "--format=%(refname)",
-            &format!("--contains={}", tip.as_str())], Policy::Inspect)?;
-        if !reachable.split(|b| *b == b'\n')
-            .any(|name| name.starts_with(b"refs/") && !name.starts_with(b"refs/fgos/")) {
-            return Err(failure("worktree-prune-tip-unreachable: registration preserved"));
+        let reachable = self.checked(
+            repo,
+            &[
+                "for-each-ref",
+                "--format=%(refname)",
+                &format!("--contains={}", tip.as_str()),
+            ],
+            Policy::Inspect,
+        )?;
+        if !reachable
+            .split(|b| *b == b'\n')
+            .any(|name| name.starts_with(b"refs/") && !name.starts_with(b"refs/fgos/"))
+        {
+            return Err(failure(
+                "worktree-prune-tip-unreachable: registration preserved",
+            ));
         }
         let evidence = wal::canonical_digest(&(owned, text(&path)?, &identity))?;
-        let chain = self.begin_worktree(repo, &scope, &wal,
+        let chain = self.begin_worktree(
+            repo,
+            &scope,
+            &wal,
             OperationKind::WorktreeRemove {
-                path: text(&path)?.into(), registration: issue.registration.clone().into(),
+                path: text(&path)?.into(),
+                registration: issue.registration.clone().into(),
                 registration_identity: identity.clone().into(),
                 delivery: Box::new(wal::WorktreeDeliveryBinding {
-                    delivered_to: tip.as_str().into(), evidence_digest: evidence.clone(),
+                    delivered_to: tip.as_str().into(),
+                    evidence_digest: evidence.clone(),
                 }),
-            }, writer, id, Tip::Oid(tip.as_str().into()), Tip::Absent)?;
-        let attempted = wal.append(&chain, Phase::TargetAttempt {
-            prior_target_attempt: None, expected: chain.intent().expected.clone(), next: Tip::Absent,
-        })?;
+            },
+            writer,
+            id,
+            Tip::Oid(tip.as_str().into()),
+            Tip::Absent,
+        )?;
+        let attempted = wal.append(
+            &chain,
+            Phase::TargetAttempt {
+                prior_target_attempt: None,
+                expected: chain.intent().expected.clone(),
+                next: Tip::Absent,
+            },
+        )?;
         self.prune_owned_registration(&scope, &admin, text(&path)?, &identity)
             .map_err(|error| pending(error, id))?;
-        self.finish_worktree(repo, &scope, &wal, &attempted, true,
-            vec![format!("missing checkout; owned create evidence: {evidence}")])
+        self.finish_worktree(
+            repo,
+            &scope,
+            &wal,
+            &attempted,
+            true,
+            vec![format!(
+                "missing checkout; owned create evidence: {evidence}"
+            )],
+        )
     }
     /// Prune is operation-specific; Git's global prune could destroy unrelated evidence.
     pub fn prune_worktree(
@@ -1333,9 +1388,16 @@ impl GitDriver {
             let name = entry.file_name();
             let kind = entry.file_type().map_err(failure)?;
             if kind.is_file()
-                && ["gitdir", "commondir", "HEAD", "index", "ORIG_HEAD", "COMMIT_EDITMSG"]
-                    .iter()
-                    .any(|s| name == *s)
+                && [
+                    "gitdir",
+                    "commondir",
+                    "HEAD",
+                    "index",
+                    "ORIG_HEAD",
+                    "COMMIT_EDITMSG",
+                ]
+                .iter()
+                .any(|s| name == *s)
             {
                 files.push(entry.path());
             } else if kind.is_dir() && (name == "logs" || name == "refs") {
@@ -1441,8 +1503,7 @@ impl GitDriver {
             .iter()
             .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }))
         {
-            let terminal = wal
-                .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
+            let terminal = wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
             return release_pin(
                 self,
                 repo,

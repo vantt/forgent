@@ -5,11 +5,14 @@ use crate::*;
 use fgos_holder_lock::{Handle, Wait};
 use std::fs::{self, File, OpenOptions};
 use std::io::{Seek, SeekFrom, Write};
-use std::time::Duration;
 use std::path::Path;
+use std::time::Duration;
 
 fn stale_config() -> OperationError {
-    OperationError { retryable: true, ..stale("config-change-stale") }
+    OperationError {
+        retryable: true,
+        ..stale("config-change-stale")
+    }
 }
 struct Authority<'a> {
     handle: &'a Handle,
@@ -172,10 +175,12 @@ impl GitDriver {
         } else {
             wal::canonical_digest(&("hooksConfig", hooks_request))
         }?;
-        for chain in wal.active(100_000).map_err(|_| recovery("git-wal-unreadable"))? {
+        for chain in wal
+            .active(100_000)
+            .map_err(|_| recovery("git-wal-unreadable"))?
+        {
             if let OperationKind::ConfigChange(change) = &chain.intent().kind {
-                authority
-                    .validate_publication_borrow(chain.intent())?;
+                authority.validate_publication_borrow(chain.intent())?;
                 let staging = chain
                     .records()
                     .iter()
@@ -328,8 +333,7 @@ impl GitDriver {
         if missing.is_empty() && !replace_legacy && hooks.as_ref().is_none_or(|h| h.old == h.next) {
             // Approval has no target effect. Preserve URL provenance in Intent
             // with one typed terminal record, never a fictitious transfer.
-            chain = wal
-                .append(&chain, Phase::Outcome(Outcome::ConfigApproved))?;
+            chain = wal.append(&chain, Phase::Outcome(Outcome::ConfigApproved))?;
             return Ok(receipt(id, &chain.intent().request_digest));
         }
         let result = (|| {
@@ -397,16 +401,15 @@ impl GitDriver {
             file.write_all(&fs::read(&draft).map_err(failed)?)
                 .map_err(failed)?;
             file.sync_all().map_err(failed)?;
-            chain = wal
-                .append(
-                    &chain,
-                    Phase::NativeLockOwned(crate::NativeLockArtifact::capture(
-                        &staging,
-                        &fgos_process::facts::self_identity()
-                            .ok_or_else(|| failed("config-owner-identity-unavailable"))?,
-                        &file,
-                    )?),
-                )?;
+            chain = wal.append(
+                &chain,
+                Phase::NativeLockOwned(crate::NativeLockArtifact::capture(
+                    &staging,
+                    &fgos_process::facts::self_identity()
+                        .ok_or_else(|| failed("config-owner-identity-unavailable"))?,
+                    &file,
+                )?),
+            )?;
             filesystem.checkpoint("config-staged").map_err(failed)?;
             chain = wal.append(&chain, Phase::Prepared)?;
             // Native config.lock has excluded Git config writers since the snapshot
@@ -418,17 +421,15 @@ impl GitDriver {
             {
                 return Err(stale_config());
             }
-            authority
-                .validate_publication_borrow(chain.intent())?;
-            chain = wal
-                .append(
-                    &chain,
-                    Phase::TargetAttempt {
-                        prior_target_attempt: None,
-                        expected: Tip::Absent,
-                        next: Tip::Absent,
-                    },
-                )?;
+            authority.validate_publication_borrow(chain.intent())?;
+            chain = wal.append(
+                &chain,
+                Phase::TargetAttempt {
+                    prior_target_attempt: None,
+                    expected: Tip::Absent,
+                    next: Tip::Absent,
+                },
+            )?;
             if !cleanup.is_owned() {
                 return Err(failed("config-lock-replaced"));
             }
@@ -552,14 +553,31 @@ impl GitDriver {
         // apply checkout/transport admission (which refuses include.path).
         // Reading config executes no configured command; mutation still uses
         // the native exact-old config writer below.
-        let out = self.config_listing(None, repo.trusted_main_root(), &["--show-origin"], Duration::from_secs(30))?;
-        if !out.success { return Err(failed("hooks-config-read-failed")); }
-        crate::driver::parse_config(&out.stdout)?.into_iter()
-            .rfind(|(origin, key, _)| origin.starts_with(b"file:") && key == "core.hookspath").map(|(_, _, value)| String::from_utf8(value).map_err(failed)).transpose()
+        let out = self.config_listing(
+            None,
+            repo.trusted_main_root(),
+            &["--show-origin"],
+            Duration::from_secs(30),
+        )?;
+        if !out.success {
+            return Err(failed("hooks-config-read-failed"));
+        }
+        crate::driver::parse_config(&out.stdout)?
+            .into_iter()
+            .rfind(|(origin, key, _)| origin.starts_with(b"file:") && key == "core.hookspath")
+            .map(|(_, _, value)| String::from_utf8(value).map_err(failed))
+            .transpose()
     }
     fn local_hooks_value(&self, repo: &RepoHandle) -> Result<Option<String>> {
-        let out = self.config_listing(None, repo.trusted_main_root(), &["--show-scope", "--show-origin"], Duration::from_secs(30))?;
-        if !out.success { return Err(failed("hooks-config-read-failed")); }
+        let out = self.config_listing(
+            None,
+            repo.trusted_main_root(),
+            &["--show-scope", "--show-origin"],
+            Duration::from_secs(30),
+        )?;
+        if !out.success {
+            return Err(failed("hooks-config-read-failed"));
+        }
         // With both flags Git emits scope\0origin\0key\nvalue\0. Keep
         // the existing key/value parser, but admit only our own config files.
         let fields: Vec<_> = out.stdout.split_inclusive(|b| *b == 0).collect();
@@ -572,23 +590,32 @@ impl GitDriver {
         for row in fields.as_chunks::<3>().0 {
             let scope = &row[0][..row[0].len() - 1];
             let origin = &row[1][..row[1].len() - 1];
-            let Some(file) = origin.strip_prefix(b"file:") else { continue; };
+            let Some(file) = origin.strip_prefix(b"file:") else {
+                continue;
+            };
             let file = Path::new(std::str::from_utf8(file).map_err(failed)?);
-            let file = if file.is_absolute() { file.to_path_buf() } else { repo.trusted_main_root().join(file) };
-            if (scope == b"local" && file == local)
-                || (scope == b"worktree" && file == worktree)
-            {
+            let file = if file.is_absolute() {
+                file.to_path_buf()
+            } else {
+                repo.trusted_main_root().join(file)
+            };
+            if (scope == b"local" && file == local) || (scope == b"worktree" && file == worktree) {
                 records.extend_from_slice(row[1]);
                 records.extend_from_slice(row[2]);
             }
         }
         let values: Vec<_> = crate::driver::parse_config(&records)?
-            .into_iter().filter(|(_, key, _)| key == "core.hookspath").collect();
+            .into_iter()
+            .filter(|(_, key, _)| key == "core.hookspath")
+            .collect();
         if values.len() > 1 {
             return Err(failed("hooks-config-ambiguous"));
         }
-        values.into_iter().next()
-            .map(|(_, _, value)| String::from_utf8(value).map_err(failed)).transpose()
+        values
+            .into_iter()
+            .next()
+            .map(|(_, _, value)| String::from_utf8(value).map_err(failed))
+            .transpose()
     }
     /// A visible config value is not a durable one. Finish the file and parent
     /// directory sync before acknowledging; when it cannot be proven the chain
@@ -650,7 +677,9 @@ impl GitDriver {
         for entry in scan.entries {
             // scan includes the terminal ledger; those operation directories
             // have already been removed. Config ownership chains stay retained.
-            if wal.compacted(&entry.operation_id)?.is_some() { continue; }
+            if wal.compacted(&entry.operation_id)?.is_some() {
+                continue;
+            }
             let chain = wal.inspect(&entry.operation_id)?;
             if matches!(
                 chain.outcome(),
@@ -781,8 +810,18 @@ impl GitDriver {
         id: &str,
         change: &wal::ConfigChange,
     ) -> Result<()> {
-        let hooks = change.hooks.as_ref().map(|h| (h.owner_path.as_str(), h.next.is_none()));
-        match self.change_config(repo, &change.remote, &change.refspecs, id, hooks, &wal::OsFileSystem) {
+        let hooks = change
+            .hooks
+            .as_ref()
+            .map(|h| (h.owner_path.as_str(), h.next.is_none()));
+        match self.change_config(
+            repo,
+            &change.remote,
+            &change.refspecs,
+            id,
+            hooks,
+            &wal::OsFileSystem,
+        ) {
             Ok(_) => Ok(()),
             Err(e) if e.cause == "config-change-resolved-without-success" => Ok(()),
             Err(e) => Err(e),

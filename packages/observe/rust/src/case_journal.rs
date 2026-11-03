@@ -191,7 +191,8 @@ pub fn find_currently_open(cases: &[CaseWindow]) -> Option<&CaseWindow> {
 /// Appends one record to the writer's shard under `.fgos/observe/cases/`; the
 /// caller holds the store lock.
 fn append_record(root: &Path, record: &CaseRecord) -> Result<(), CaseError> {
-    let line = shard::encode_line(record).map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))?;
+    let line = shard::encode_line(record)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))?;
     shard::append_lines(root, STORE, TornTail::Heal, &[line])?;
     Ok(())
 }
@@ -455,7 +456,10 @@ mod tests {
 
         // Inject incomplete/corrupted JSON line into shard
         let shard_path = shard::shard_path(&root, "cases").unwrap();
-        let mut f = std::fs::OpenOptions::new().append(true).open(&shard_path).unwrap();
+        let mut f = std::fs::OpenOptions::new()
+            .append(true)
+            .open(&shard_path)
+            .unwrap();
         f.write_all(b"{\"v\":1,\"type\":\"case-open\n").unwrap(); // malformed
         f.flush().unwrap();
 

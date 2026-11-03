@@ -226,7 +226,13 @@ impl GitLand {
                 }
                 self.core
                     .driver
-                    .acknowledge_land(&self.core.repo, &self.core.writer, id, acknowledgement, &wal::OsFileSystem)
+                    .acknowledge_land(
+                        &self.core.repo,
+                        &self.core.writer,
+                        id,
+                        acknowledgement,
+                        &wal::OsFileSystem,
+                    )
                     .unwrap_or_else(|e| vec![format!("land-cleanup-deferred: {}", e.cause)])
             }
             None => vec![],

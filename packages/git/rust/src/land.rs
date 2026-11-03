@@ -52,7 +52,11 @@ pub(crate) fn validate_declared_files(files: &[LandFile], kind: &str) -> Result<
 /// Write one declared file's literal bytes under `root`, or remove it when it
 /// declares an absence. Git never interprets them. Symlink ancestors and
 /// targets are refused rather than written through.
-pub(crate) fn write_declared_file(root: &std::path::Path, file: &LandFile, kind: &str) -> Result<()> {
+pub(crate) fn write_declared_file(
+    root: &std::path::Path,
+    file: &LandFile,
+    kind: &str,
+) -> Result<()> {
     let path = std::path::Path::new(&file.path);
     let full = root.join(path);
     let mut at = root.to_path_buf();
@@ -200,7 +204,9 @@ impl GitDriver {
         Ok(main)
     }
     fn land_native_state(&self, repo: &RepoHandle, scope: &LockScope<'_>) -> Result<()> {
-        require_no_native_state(repo.git_dir(), &[], |_| failure("foreign-main-checkout-state"))?;
+        require_no_native_state(repo.git_dir(), &[], |_| {
+            failure("foreign-main-checkout-state")
+        })?;
         let out = self.land_text(repo, scope, &["ls-files", "--unmerged", "-z"], &[])?;
         if !out.is_empty() {
             return Err(failure("foreign-main-checkout-state"));
@@ -237,7 +243,14 @@ impl GitDriver {
         let mut cursor = None;
         let mut dirty = false;
         loop {
-            let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
+            let page = self.status(
+                repo,
+                Untracked::All,
+                Submodules::Configured,
+                Ignored::Excluded,
+                cursor,
+                4096,
+            )?;
             for entry in page.entries {
                 let p = fgos_write_scope::path_text(&entry.path).map_err(failure)?;
                 if is_store_path(p) {
@@ -450,10 +463,7 @@ impl GitDriver {
             .trusted_main_root()
             .join(".fgos/runtime/git-candidates");
         std::fs::create_dir_all(&parent).map_err(failure)?;
-        let candidate_operation = format!(
-            "lc-{}",
-            wal::canonical_digest(&("land-candidate", id))?
-        );
+        let candidate_operation = format!("lc-{}", wal::canonical_digest(&("land-candidate", id))?);
         let worktree = self.create_detached_worktree(
             repo,
             held(&session.slot)?,
@@ -606,7 +616,10 @@ impl GitDriver {
                 writer,
                 (kind, request_digest),
                 (resources, binding.clone()),
-                (Tip::Oid(req.target.clone()), Tip::Oid(view.candidate.clone())),
+                (
+                    Tip::Oid(req.target.clone()),
+                    Tip::Oid(view.candidate.clone()),
+                ),
             );
             let authority = Authority {
                 scope: &session.slot,
@@ -762,29 +775,27 @@ impl GitDriver {
             (false, false)
         };
         // Persist the opaque consumer evidence before the one-shot barrier.
-        let chain = wal
-            .append(
-                &chain,
-                Phase::LandVerified {
-                    evidence: evidence.clone(),
-                    checkout: if main && !store_collision {
-                        Some(self.land_checkout_proof(repo, &candidate_repo, &scope, c)?)
-                    } else if store_collision {
-                        Some(r#"{"storeCollision":true}"#.into())
-                    } else {
-                        None
-                    },
+        let chain = wal.append(
+            &chain,
+            Phase::LandVerified {
+                evidence: evidence.clone(),
+                checkout: if main && !store_collision {
+                    Some(self.land_checkout_proof(repo, &candidate_repo, &scope, c)?)
+                } else if store_collision {
+                    Some(r#"{"storeCollision":true}"#.into())
+                } else {
+                    None
                 },
-            )?;
-        let chain = wal
-            .append(
-                &chain,
-                Phase::TargetAttempt {
-                    prior_target_attempt: None,
-                    expected: chain.intent().expected.clone(),
-                    next: chain.intent().next.clone(),
-                },
-            )?;
+            },
+        )?;
+        let chain = wal.append(
+            &chain,
+            Phase::TargetAttempt {
+                prior_target_attempt: None,
+                expected: chain.intent().expected.clone(),
+                next: chain.intent().next.clone(),
+            },
+        )?;
         let before = self.checkouts(repo)?;
         filesystem.checkpoint("land-before-cas").map_err(failure)?;
         let cas = self.land_call(
@@ -810,13 +821,12 @@ impl GitDriver {
             &self.checkouts(repo)?,
         )?;
         if lost {
-            let terminal = wal
-                .append(
-                    &chain,
-                    Phase::Outcome(Outcome::Loss {
-                        observed: crate::refs::tip(&observed),
-                    }),
-                )?;
+            let terminal = wal.append(
+                &chain,
+                Phase::Outcome(Outcome::Loss {
+                    observed: crate::refs::tip(&observed),
+                }),
+            )?;
             let receipt = land_receipt(&terminal, repo)?;
             drop(scope);
             session.receipt = Some(receipt.clone());
@@ -876,14 +886,13 @@ impl GitDriver {
         {
             return Err(recovery("land-ref-drift"));
         }
-        let terminal = wal
-            .append(
-                &chain,
-                Phase::Outcome(Outcome::Land {
-                    checkout: checkout.into(),
-                    observed_only: false,
-                }),
-            )?;
+        let terminal = wal.append(
+            &chain,
+            Phase::Outcome(Outcome::Land {
+                checkout: checkout.into(),
+                observed_only: false,
+            }),
+        )?;
         filesystem.checkpoint("land-receipt").map_err(failure)?;
         let receipt = land_receipt(&terminal, repo)?;
         drop(scope);
@@ -1095,7 +1104,8 @@ impl GitDriver {
         if !old_entries.success {
             return Err(old_entries.error("land-index-entries-failed"));
         }
-        let candidate_entries = self.land_call(candidate, scope, &["ls-files", "--stage", "-z"], &[])?;
+        let candidate_entries =
+            self.land_call(candidate, scope, &["ls-files", "--stage", "-z"], &[])?;
         if !candidate_entries.success {
             return Err(candidate_entries.error("land-index-entries-failed"));
         }
@@ -1173,7 +1183,8 @@ impl GitDriver {
             return Err(failure("not-land-operation"));
         };
         let req = &payload.request;
-        let binding = wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))?;
+        let binding =
+            wal::canonical_digest(&(wal.repository_identity(), "land", &req.destination))?;
         let pre_attempt = initial.as_ref().is_some_and(|c| {
             !c.records()
                 .iter()
@@ -1235,8 +1246,7 @@ impl GitDriver {
             }
         })?;
         if !attempted {
-            let terminal = wal
-                .append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
+            let terminal = wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt))?;
             return land_receipt(&terminal, repo);
         }
         let destination = RefName::parse(&req.destination).map_err(failure)?;
@@ -1250,14 +1260,13 @@ impl GitDriver {
                 if crate::refs::direct(self, repo, &destination)? != observed {
                     return Err(recovery("land-ref-drift"));
                 }
-                let terminal = wal
-                    .append(
-                        &chain,
-                        Phase::Outcome(Outcome::Land {
-                            checkout: "pending".into(),
-                            observed_only: true,
-                        }),
-                    )?;
+                let terminal = wal.append(
+                    &chain,
+                    Phase::Outcome(Outcome::Land {
+                        checkout: "pending".into(),
+                        observed_only: true,
+                    }),
+                )?;
                 return land_receipt(&terminal, repo);
             }
         }
@@ -1429,7 +1438,14 @@ impl GitDriver {
             let mut cursor = None;
             let mut dirty = false;
             loop {
-                let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
+                let page = self.status(
+                    repo,
+                    Untracked::All,
+                    Submodules::Configured,
+                    Ignored::Excluded,
+                    cursor,
+                    4096,
+                )?;
                 dirty |= page
                     .entries
                     .iter()
@@ -1447,14 +1463,13 @@ impl GitDriver {
         } else {
             checkout
         };
-        let terminal = wal
-            .append(
-                &chain,
-                Phase::Outcome(Outcome::Land {
-                    checkout: checkout.into(),
-                    observed_only: true,
-                }),
-            )?;
+        let terminal = wal.append(
+            &chain,
+            Phase::Outcome(Outcome::Land {
+                checkout: checkout.into(),
+                observed_only: true,
+            }),
+        )?;
         land_receipt(&terminal, repo)
     }
 }
@@ -1539,10 +1554,7 @@ impl GitDriver {
                 writer,
             ))?,
         };
-        let removal_id = format!(
-            "lr-{}",
-            wal::canonical_digest(&("land-cleanup", id))?
-        );
+        let removal_id = format!("lr-{}", wal::canonical_digest(&("land-cleanup", id))?);
         if let Err(e) = self.remove_land_candidate(
             repo,
             held(&slot)?,
@@ -1572,13 +1584,7 @@ impl GitDriver {
                         self.land_text(
                             repo,
                             &scope,
-                            &durable_args(&[
-                                "update-ref",
-                                "--no-deref",
-                                "-d",
-                                pin.as_str(),
-                                oid,
-                            ]),
+                            &durable_args(&["update-ref", "--no-deref", "-d", pin.as_str(), oid]),
                             &[],
                         )?;
                         if crate::refs::direct(self, repo, &pin)? != ExpectedTip::Absent {

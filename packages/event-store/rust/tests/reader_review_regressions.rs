@@ -305,7 +305,10 @@ fn unordered_historical_mapping_records_read_as_no_provenance_until_setup_record
         "test-mapping-setup",
     )
     .unwrap();
-    assert_eq!(refspec::pinned_url(&f.driver, &f.repo, "origin").unwrap(), url);
+    assert_eq!(
+        refspec::pinned_url(&f.driver, &f.repo, "origin").unwrap(),
+        url
+    );
     let facts = diagnostics::facts(&f.driver, &f.repo, &f.root, "origin").unwrap();
     assert_eq!(facts["provenance"]["url"], url);
 }
@@ -343,7 +346,8 @@ fn ignored_stream_can_advance_after_certification_without_a_false_gap() {
         .is_empty());
 }
 #[test]
-fn a_head_without_a_fence_that_tracks_the_old_event_file_is_admitted_for_writes_and_the_file_is_not_read() {
+fn a_head_without_a_fence_that_tracks_the_old_event_file_is_admitted_for_writes_and_the_file_is_not_read(
+) {
     let f = Fixture::new();
     let mut h = f.handle();
     {
@@ -661,8 +665,18 @@ fn reserved_legacy_mirror_is_not_a_phantom_event_tip() {
     let oid = seal(&p, &f.repo, vec![], &[event('a', 1, 1)], "test-aa");
     // A perfectly valid event commit under the wildcard legacy namespace must
     // never become an event stream, even when its suffix contains /events/.
-    for name in ["refs/fgos/remotes/origin/legacy/events/test-aa", "refs/fgos/remotes/origin/legacy-old", "refs/fgos/remotes/origin/legacyx/y"] {
-        assert!(std::process::Command::new("git").arg("-C").arg(f.root.join("repo")).args(["update-ref", name, oid.as_str()]).status().unwrap().success());
+    for name in [
+        "refs/fgos/remotes/origin/legacy/events/test-aa",
+        "refs/fgos/remotes/origin/legacy-old",
+        "refs/fgos/remotes/origin/legacyx/y",
+    ] {
+        assert!(std::process::Command::new("git")
+            .arg("-C")
+            .arg(f.root.join("repo"))
+            .args(["update-ref", name, oid.as_str()])
+            .status()
+            .unwrap()
+            .success());
     }
     let result = read_project(&f, &Cursor::default(), &[]);
     assert!(result.events.is_empty());

@@ -5,9 +5,9 @@
 mod driver;
 mod recovery;
 mod restore;
-pub use restore::{RestoreRequest, RestorePreview, RestoreResult};
+pub use restore::{RestorePreview, RestoreRequest, RestoreResult};
 mod land;
-pub use land::{LandRequest, LandFile, LandEvidence, LandCandidate, LandSession};
+pub use land::{LandCandidate, LandEvidence, LandFile, LandRequest, LandSession};
 mod inspect;
 mod objects;
 mod refs;
@@ -15,16 +15,16 @@ mod worktree;
 pub use worktree::{WorktreeCreate, WorktreeDelivery, WorktreeHandle, WorktreeIssue};
 mod remote;
 mod sequence;
-pub use sequence::{sequence_ref, SequenceHome, SequencePush, SequenceTip};
 pub use inspect::*;
 pub use remote::{RefMapping, RemoteRef};
+pub use sequence::{sequence_ref, SequenceHome, SequencePush, SequenceTip};
 mod publication;
 mod repository_config;
 pub use publication::{HolderAuthority, PublicationPort, RemoteGrant};
 pub use repository_config::{obsolete_legacy_fetch_mapping, publication_fetch_mappings};
 pub mod wal;
-pub use driver::{main_checkout_root, GitDriver};
 use driver::WalReader;
+pub use driver::{main_checkout_root, GitDriver};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -131,7 +131,9 @@ impl RepoHandle {
     pub fn git_dir(&self) -> &std::path::Path {
         &self.git_dir
     }
-    pub fn work_tree(&self) -> Option<&std::path::Path> { self.work_tree.as_deref() }
+    pub fn work_tree(&self) -> Option<&std::path::Path> {
+        self.work_tree.as_deref()
+    }
     pub fn common_dir(&self) -> &std::path::Path {
         &self.common_dir
     }
@@ -309,7 +311,13 @@ impl From<wal::WalError> for OperationError {
     fn from(e: wal::WalError) -> Self {
         use wal::WalError::*;
         let code = match e {
-            Busy | OperationIdConflict | Untrusted | UnsafePath(_) | Unsupported | PublicationBorrowUnavailable | RecordTooLarge => ResultCode::Refused,
+            Busy
+            | OperationIdConflict
+            | Untrusted
+            | UnsafePath(_)
+            | Unsupported
+            | PublicationBorrowUnavailable
+            | RecordTooLarge => ResultCode::Refused,
             Io(_) | Corrupt(_) | FenceMissing | RecoveryRequired => ResultCode::RecoveryRequired,
         };
         let named = classified(code, e.cause());
@@ -498,8 +506,18 @@ pub trait Inspect {
     fn resolve_repo(&self, path: &std::path::Path) -> Result<ResolveRepo>;
 }
 pub trait RepositoryConfig {
-    fn ensure_hooks(&self, repo: &RepoHandle, owned_path: &std::path::Path, operation_id: &str) -> Result<HooksReport>;
-    fn remove_owned_hooks_config(&self, repo: &RepoHandle, owned_path: &std::path::Path, operation_id: &str) -> Result<HooksReport>;
+    fn ensure_hooks(
+        &self,
+        repo: &RepoHandle,
+        owned_path: &std::path::Path,
+        operation_id: &str,
+    ) -> Result<HooksReport>;
+    fn remove_owned_hooks_config(
+        &self,
+        repo: &RepoHandle,
+        owned_path: &std::path::Path,
+        operation_id: &str,
+    ) -> Result<HooksReport>;
     fn ensure_fetch_mapping(
         &self,
         repo: &RepoHandle,
@@ -585,7 +603,11 @@ impl TreeCursor {
     /// A transport resumes the same query from the last path it was given;
     /// the listing still refuses a cursor of another revision or prefix.
     pub fn resume(revision: &Oid, prefix: &[u8], after: Vec<u8>) -> Self {
-        Self { revision: revision.clone(), prefix: prefix.to_vec(), after }
+        Self {
+            revision: revision.clone(),
+            prefix: prefix.to_vec(),
+            after,
+        }
     }
     pub fn after(&self) -> &[u8] {
         &self.after
@@ -625,8 +647,13 @@ pub use scoped_commit::{CommitBaseline, CommitRequest, CommitResult};
 /// Literal Git path, independent of the declaration grammar. JSON strings
 /// round-trip UTF-8, including star, tab and newline; staging uses NUL input.
 pub(crate) fn literal_repo_path(path: &str) -> Result<()> {
-    if path.is_empty() || path.starts_with('/') || path.contains('\0')
-        || path.split('/').any(|p| p.is_empty() || p == "." || p == "..") {
+    if path.is_empty()
+        || path.starts_with('/')
+        || path.contains('\0')
+        || path
+            .split('/')
+            .any(|p| p.is_empty() || p == "." || p == "..")
+    {
         return Err(failure("invalid-literal-path"));
     }
     Ok(())

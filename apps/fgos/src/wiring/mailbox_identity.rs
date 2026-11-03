@@ -52,8 +52,7 @@ pub enum Addressed {
 /// character, whatever its project folder is called. Text that addresses a
 /// group is left to the core, which refuses it as a group (check 1).
 pub fn is_alias(to: &str) -> bool {
-    (to.contains('@') || to.contains('/') || is_role_alias(to))
-        && !fgos_mailbox_core::is_group(to)
+    (to.contains('@') || to.contains('/') || is_role_alias(to)) && !fgos_mailbox_core::is_group(to)
 }
 
 /// The Identity session of a mailbox head: its full id and handle, derived
@@ -446,7 +445,13 @@ mod tests {
         let claude = Cli::new("claude").unwrap();
         let stale = state_root("stale");
         assert_eq!(
-            ensure_registered(&stale, None, &claude, &bound("wiring-stale-head", Some("1"))).as_deref(),
+            ensure_registered(
+                &stale,
+                None,
+                &claude,
+                &bound("wiring-stale-head", Some("1"))
+            )
+            .as_deref(),
             Some("ident:head-not-live")
         );
         assert_eq!(entries(&stale), 0);

@@ -30,8 +30,11 @@ use crate::envelope;
 use crate::gate::boottime_ns;
 use crate::go_channel::{read_frame, write_frame};
 use crate::publish::publish_once;
+use crate::route::{
+    emit, refuse, report, Flags, EXIT_ATTEMPT_BOUND, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL,
+    EXIT_VERSION_MISMATCH,
+};
 use fgos_identity::text::iso_utc_now;
-use crate::route::{emit, refuse, report, Flags, EXIT_ATTEMPT_BOUND, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_VERSION_MISMATCH};
 
 #[cfg(unix)]
 mod terminal;
@@ -52,7 +55,9 @@ pub struct SuperviseArgs {
 
 pub fn parse_args(args: &[String]) -> Result<SuperviseArgs, crate::route::ArgsError> {
     let flags = Flags::parse(args, &["envelope"], 0)?;
-    Ok(SuperviseArgs { envelope: PathBuf::from(flags.require("envelope")?) })
+    Ok(SuperviseArgs {
+        envelope: PathBuf::from(flags.require("envelope")?),
+    })
 }
 
 /// The receipt outcome for what the gate left behind (`receipt.v1.json`).
@@ -60,7 +65,9 @@ pub fn parse_args(args: &[String]) -> Result<SuperviseArgs, crate::route::ArgsEr
 /// agent (exit 64, 65 or 70 publish nothing): the lock being free proves the
 /// domain is empty, so the physical result is `gate-lost`.
 pub fn outcome_for(gate_exit: Option<&Value>, outbox_present: bool) -> &'static str {
-    if gate_exit.is_some_and(|g| g["stoppedBy"] == "orphan" && g["cause"] == "abandoned-before-brief") {
+    if gate_exit
+        .is_some_and(|g| g["stoppedBy"] == "orphan" && g["cause"] == "abandoned-before-brief")
+    {
         return "abandoned-before-brief";
     }
     match gate_exit.and_then(|g| g["stoppedBy"].as_str()) {
@@ -90,8 +97,14 @@ fn capture_digest(path: &Path) -> Option<String> {
 
 /// The file name of the newest outbox result, by the agent protocol's one rule.
 fn newest_outbox_result(outbox: &Path) -> Option<String> {
-    let names: Vec<String> = std::fs::read_dir(outbox).into_iter().flatten().flatten().filter_map(|e| e.file_name().to_str().map(String::from)).collect();
-    let newest = fgos_agent_protocol::direct::newest_result(outbox, names.iter().map(String::as_str))?;
+    let names: Vec<String> = std::fs::read_dir(outbox)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter_map(|e| e.file_name().to_str().map(String::from))
+        .collect();
+    let newest =
+        fgos_agent_protocol::direct::newest_result(outbox, names.iter().map(String::as_str))?;
     newest.file_name()?.to_str().map(String::from)
 }
 
@@ -113,9 +126,19 @@ fn capture_tail(path: &Path) -> String {
     let opened = fgos_durable_file::open_no_reparse(&mut options, path);
     #[cfg(not(windows))]
     let opened = options.open(path);
-    let Ok(mut file) = opened else { return String::new() };
-    let Ok(meta) = file.metadata() else { return String::new() };
-    if !meta.is_file() || file.seek(SeekFrom::Start(meta.len().saturating_sub(CAPTURE_TAIL_BYTES))).is_err() {
+    let Ok(mut file) = opened else {
+        return String::new();
+    };
+    let Ok(meta) = file.metadata() else {
+        return String::new();
+    };
+    if !meta.is_file()
+        || file
+            .seek(SeekFrom::Start(
+                meta.len().saturating_sub(CAPTURE_TAIL_BYTES),
+            ))
+            .is_err()
+    {
         return String::new();
     }
     let mut bytes = Vec::new();
@@ -127,16 +150,37 @@ fn capture_tail(path: &Path) -> String {
 
 /// The provider stop a direct agent's last words name, as the receipt's `reason`. Only an agent that exited
 /// non-zero with no result in the outbox is read; a result in the outbox always wins.
-fn direct_reason(envelope: &Value, gate_exit: Option<&Value>, outbox_result: Option<&str>, outcome: &str) -> Option<String> {
-    let code = gate_exit?["exitCode"].as_i64().filter(|code| *code != 0 && outcome == "exited" && outbox_result.is_none())?;
+fn direct_reason(
+    envelope: &Value,
+    gate_exit: Option<&Value>,
+    outbox_result: Option<&str>,
+    outcome: &str,
+) -> Option<String> {
+    let code = gate_exit?["exitCode"]
+        .as_i64()
+        .filter(|code| *code != 0 && outcome == "exited" && outbox_result.is_none())?;
     let stderr = capture_tail(Path::new(envelope["launch"]["capture"]["stderr"].as_str()?));
-    let adapter = adapter_for(envelope["agentProtocol"]["cli"].as_str().unwrap_or_default());
-    adapter.classify(ExitInfo { code: i32::try_from(code).ok() }, &stderr, None).receipt_reason()
+    let adapter = adapter_for(
+        envelope["agentProtocol"]["cli"]
+            .as_str()
+            .unwrap_or_default(),
+    );
+    adapter
+        .classify(
+            ExitInfo {
+                code: i32::try_from(code).ok(),
+            },
+            &stderr,
+            None,
+        )
+        .receipt_reason()
 }
 
 /// The `gate-exit.json` of this attempt, when one was published.
 fn read_gate_exit(run_dir: &Path, attempt_id: &str) -> Option<Value> {
-    let value: Value = serde_json::from_str(&std::fs::read_to_string(run_dir.join("gate-exit.json")).ok()?).ok()?;
+    let value: Value =
+        serde_json::from_str(&std::fs::read_to_string(run_dir.join("gate-exit.json")).ok()?)
+            .ok()?;
     (value["attemptId"] == attempt_id).then_some(value)
 }
 
@@ -151,18 +195,42 @@ pub(crate) struct TerminalEnd {
 
 /// Publish `receipt.json` once and return the outcome of whichever receipt is there, for either author. `not_started`: the attempt was never
 /// bound, so the receipt names `abandoned-not-started` whatever else is on disk.
-pub(crate) fn publish_receipt_as(envelope: &Value, run_dir: &Path, synthesized_by: &str, not_started: bool) -> std::io::Result<String> {
-    publish_receipt_with(envelope, run_dir, synthesized_by, not_started, &TerminalEnd::default())
+pub(crate) fn publish_receipt_as(
+    envelope: &Value,
+    run_dir: &Path,
+    synthesized_by: &str,
+    not_started: bool,
+) -> std::io::Result<String> {
+    publish_receipt_with(
+        envelope,
+        run_dir,
+        synthesized_by,
+        not_started,
+        &TerminalEnd::default(),
+    )
 }
 
 /// [`publish_receipt_as`] with what a `terminal` supervisor saw end the attempt.
-pub(crate) fn publish_receipt_with(envelope: &Value, run_dir: &Path, synthesized_by: &str, not_started: bool, end: &TerminalEnd) -> std::io::Result<String> {
+pub(crate) fn publish_receipt_with(
+    envelope: &Value,
+    run_dir: &Path,
+    synthesized_by: &str,
+    not_started: bool,
+    end: &TerminalEnd,
+) -> std::io::Result<String> {
     let attempt_id = envelope["attemptId"].as_str().unwrap_or_default();
     let gate_exit = read_gate_exit(run_dir, attempt_id);
     let launch = &envelope["launch"];
-    let outbox_result = launch["outboxDir"].as_str().and_then(|dir| newest_outbox_result(Path::new(dir)));
+    let outbox_result = launch["outboxDir"]
+        .as_str()
+        .and_then(|dir| newest_outbox_result(Path::new(dir)));
     let present = outbox_result.is_some();
-    let digest_of = |key: &str| launch["capture"][key].as_str().and_then(|p| capture_digest(Path::new(p))).map_or(Value::Null, Value::from);
+    let digest_of = |key: &str| {
+        launch["capture"][key]
+            .as_str()
+            .and_then(|p| capture_digest(Path::new(p)))
+            .map_or(Value::Null, Value::from)
+    };
     let outcome = if not_started {
         "abandoned-not-started"
     } else if end.carrier_lost && gate_exit.is_none() {
@@ -188,14 +256,32 @@ pub(crate) fn publish_receipt_with(envelope: &Value, run_dir: &Path, synthesized
             receipt["reason"] = json!(format!("start-refused:{code}"));
         }
     } else {
-        let direct = || if envelope["mode"] == "direct" { direct_reason(envelope, receipt.get("gateExit"), outbox_result.as_deref(), outcome) } else { None };
+        let direct = || {
+            if envelope["mode"] == "direct" {
+                direct_reason(
+                    envelope,
+                    receipt.get("gateExit"),
+                    outbox_result.as_deref(),
+                    outcome,
+                )
+            } else {
+                None
+            }
+        };
         if let Some(reason) = end.reason.clone().or_else(direct) {
             receipt["reason"] = json!(reason);
         }
     }
-    publish_once(run_dir, "receipt.json", &serde_json::to_vec(&receipt).map_err(std::io::Error::other)?)?;
+    publish_once(
+        run_dir,
+        "receipt.json",
+        &serde_json::to_vec(&receipt).map_err(std::io::Error::other)?,
+    )?;
     // A receipt that already existed is the one that counts.
-    let published: Value = std::fs::read_to_string(run_dir.join("receipt.json")).ok().and_then(|t| serde_json::from_str(&t).ok()).unwrap_or(receipt);
+    let published: Value = std::fs::read_to_string(run_dir.join("receipt.json"))
+        .ok()
+        .and_then(|t| serde_json::from_str(&t).ok())
+        .unwrap_or(receipt);
     Ok(published["outcome"].as_str().unwrap_or(outcome).to_string())
 }
 
@@ -208,7 +294,11 @@ pub(crate) struct Refusal {
 
 impl Refusal {
     fn internal(why: impl Into<String>) -> Refusal {
-        Refusal { exit: EXIT_INTERNAL, code: "internal", why: why.into() }
+        Refusal {
+            exit: EXIT_INTERNAL,
+            code: "internal",
+            why: why.into(),
+        }
     }
 }
 
@@ -239,8 +329,15 @@ struct Watch {
 
 impl Watch {
     fn from(envelope: &Value, run_dir: &Path) -> Result<Watch, String> {
-        let text = |v: &Value, what: &str| v.as_str().map(String::from).ok_or_else(|| format!("envelope field {what} missing"));
-        let soft_at = match (envelope["deadlines"]["softAt"]["bootId"].as_str(), envelope["deadlines"]["softAt"]["boottimeNs"].as_u64()) {
+        let text = |v: &Value, what: &str| {
+            v.as_str()
+                .map(String::from)
+                .ok_or_else(|| format!("envelope field {what} missing"))
+        };
+        let soft_at = match (
+            envelope["deadlines"]["softAt"]["bootId"].as_str(),
+            envelope["deadlines"]["softAt"]["boottimeNs"].as_u64(),
+        ) {
             (Some(boot), Some(ns)) => Some((boot.to_string(), ns)),
             _ => None,
         };
@@ -249,27 +346,60 @@ impl Watch {
             digest: text(&envelope["digest"], "digest")?,
             run_dir: run_dir.to_path_buf(),
             soft_at,
-            idle: envelope["deadlines"]["idleMs"].as_u64().map(Duration::from_millis),
-            grace: Duration::from_millis(envelope["deadlines"]["gateKillGraceMs"].as_u64().ok_or("envelope field deadlines.gateKillGraceMs missing")?),
-            captures: [text(&envelope["launch"]["capture"]["stdout"], "launch.capture.stdout")?.into(), text(&envelope["launch"]["capture"]["stderr"], "launch.capture.stderr")?.into()],
+            idle: envelope["deadlines"]["idleMs"]
+                .as_u64()
+                .map(Duration::from_millis),
+            grace: Duration::from_millis(
+                envelope["deadlines"]["gateKillGraceMs"]
+                    .as_u64()
+                    .ok_or("envelope field deadlines.gateKillGraceMs missing")?,
+            ),
+            captures: [
+                text(
+                    &envelope["launch"]["capture"]["stdout"],
+                    "launch.capture.stdout",
+                )?
+                .into(),
+                text(
+                    &envelope["launch"]["capture"]["stderr"],
+                    "launch.capture.stderr",
+                )?
+                .into(),
+            ],
             #[cfg(unix)]
             outbox: text(&envelope["launch"]["outboxDir"], "launch.outboxDir")?.into(),
             max_output: envelope["launch"]["maxOutputBytes"].as_u64(),
-            adapter: adapter_for(envelope["agentProtocol"]["cli"].as_str().unwrap_or_default()),
+            adapter: adapter_for(
+                envelope["agentProtocol"]["cli"]
+                    .as_str()
+                    .unwrap_or_default(),
+            ),
             boot_id: facts::boot_id(),
         })
     }
 
     fn soft_deadline_passed(&self) -> bool {
-        let Some((boot_id, at)) = &self.soft_at else { return false };
+        let Some((boot_id, at)) = &self.soft_at else {
+            return false;
+        };
         // Another boot than the recorded one: the instant is meaningless, treat it as past.
-        self.boot_id.as_ref().is_some_and(|current| current != boot_id) || boottime_ns() >= *at
+        self.boot_id
+            .as_ref()
+            .is_some_and(|current| current != boot_id)
+            || boottime_ns() >= *at
     }
 
     /// The capture files hold more than the attempt's output budget.
     fn output_over_limit(&self) -> bool {
-        let Some(max) = self.max_output else { return false };
-        let total: u64 = self.captures.iter().filter_map(|path| fs::metadata(path).ok()).map(|meta| meta.len()).sum();
+        let Some(max) = self.max_output else {
+            return false;
+        };
+        let total: u64 = self
+            .captures
+            .iter()
+            .filter_map(|path| fs::metadata(path).ok())
+            .map(|meta| meta.len())
+            .sum();
         total > max
     }
 
@@ -291,14 +421,19 @@ impl CaptureTail {
         use std::io::{Read, Seek, SeekFrom};
         let mut active = false;
         for (offset, path) in self.offsets.iter_mut().zip(&watch.captures) {
-            let Ok(mut file) = File::open(path) else { continue };
+            let Ok(mut file) = File::open(path) else {
+                continue;
+            };
             if file.seek(SeekFrom::Start(*offset)).is_err() {
                 continue;
             }
             let mut delta = Vec::new();
             if file.take(64 * 1024).read_to_end(&mut delta).is_ok() && !delta.is_empty() {
                 *offset += delta.len() as u64;
-                active |= watch.adapter.activity_from(&String::from_utf8_lossy(&delta)).is_active();
+                active |= watch
+                    .adapter
+                    .activity_from(&String::from_utf8_lossy(&delta))
+                    .is_active();
             }
         }
         active
@@ -335,8 +470,17 @@ pub fn run(args: &[String]) -> i32 {
 /// in `start-refused.json`, so adopt and doctor show a code, not a line of
 /// `supervisor.log`. Best effort: the refusal itself is what the exit code reports.
 fn record_start_refusal(envelope_path: &Path, refusal: &Refusal) {
-    let Some(envelope) = std::fs::read_to_string(envelope_path).ok().and_then(|text| serde_json::from_str::<Value>(&text).ok()) else { return };
-    let (Some(run_dir), Some(attempt_id)) = (envelope["runDir"].as_str(), envelope["attemptId"].as_str()) else { return };
+    let Some(envelope) = std::fs::read_to_string(envelope_path)
+        .ok()
+        .and_then(|text| serde_json::from_str::<Value>(&text).ok())
+    else {
+        return;
+    };
+    let (Some(run_dir), Some(attempt_id)) =
+        (envelope["runDir"].as_str(), envelope["attemptId"].as_str())
+    else {
+        return;
+    };
     // The note goes beside the envelope it names, never to a directory only the (unverified) envelope points at.
     if envelope_path.parent().map(Path::to_path_buf) != Some(PathBuf::from(run_dir)) {
         return;
@@ -349,20 +493,38 @@ fn record_start_refusal(envelope_path: &Path, refusal: &Refusal) {
 
 /// The code a supervisor named when it refused to start this attempt, if it did.
 pub(crate) fn read_start_refusal(run_dir: &Path, attempt_id: &str) -> Option<String> {
-    let note: Value = serde_json::from_str(&std::fs::read_to_string(run_dir.join("start-refused.json")).ok()?).ok()?;
-    (note["attemptId"] == attempt_id).then(|| note["code"].as_str().unwrap_or("unknown").to_string())
+    let note: Value =
+        serde_json::from_str(&std::fs::read_to_string(run_dir.join("start-refused.json")).ok()?)
+            .ok()?;
+    (note["attemptId"] == attempt_id)
+        .then(|| note["code"].as_str().unwrap_or("unknown").to_string())
 }
 
 fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
     // Before any other syscall: nothing this process spawns may inherit a lock.
     let mut locks = os::Locks::early()?;
 
-    let envelope = envelope::read_verified(&args.envelope).map_err(|why| Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why })?;
+    let envelope = envelope::read_verified(&args.envelope).map_err(|why| Refusal {
+        exit: EXIT_ENVELOPE_INVALID,
+        code: "envelope-invalid",
+        why,
+    })?;
     if !envelope::host_bin_is_current(&envelope) {
-        return Err(Refusal { exit: EXIT_VERSION_MISMATCH, code: "host-version-mismatch", why: "the envelope names another host binary than the one running".into() });
+        return Err(Refusal {
+            exit: EXIT_VERSION_MISMATCH,
+            code: "host-version-mismatch",
+            why: "the envelope names another host binary than the one running".into(),
+        });
     }
-    let invalid = |why: &str| Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why: why.into() };
-    let run_dir = envelope["runDir"].as_str().map(PathBuf::from).ok_or_else(|| invalid("runDir missing"))?;
+    let invalid = |why: &str| Refusal {
+        exit: EXIT_ENVELOPE_INVALID,
+        code: "envelope-invalid",
+        why: why.into(),
+    };
+    let run_dir = envelope["runDir"]
+        .as_str()
+        .map(PathBuf::from)
+        .ok_or_else(|| invalid("runDir missing"))?;
     let terminal = match envelope["mode"].as_str() {
         Some("direct") => false,
         Some("terminal") => true,
@@ -371,22 +533,35 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
     // A supervisor already ran this attempt (or its receipt exists): a second one would take the lock and,
     // by the predecessor rule, end the live domain the first one left running. Leave the attempt to adopt.
     if run_dir.join("supervisor-binding.json").exists() || run_dir.join("receipt.json").exists() {
-        return Err(Refusal { exit: EXIT_ATTEMPT_BOUND, code: "attempt-already-bound", why: "the attempt directory already has a supervisor binding or a receipt".into() });
+        return Err(Refusal {
+            exit: EXIT_ATTEMPT_BOUND,
+            code: "attempt-already-bound",
+            why: "the attempt directory already has a supervisor binding or a receipt".into(),
+        });
     }
     locks.complete(&envelope, &run_dir)?;
-    let watch = Watch::from(&envelope, &run_dir).map_err(|why| Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why })?;
+    let watch = Watch::from(&envelope, &run_dir).map_err(|why| Refusal {
+        exit: EXIT_ENVELOPE_INVALID,
+        code: "envelope-invalid",
+        why,
+    })?;
     if terminal {
         return supervise_terminal(&envelope, &run_dir, locks, &watch);
     }
 
     let driver = open_driver(&envelope).map_err(Refusal::internal)?;
-    let mut domain = driver.create(&watch.attempt_id).map_err(|why| Refusal::internal(why.to_string()))?;
+    let mut domain = driver
+        .create(&watch.attempt_id)
+        .map_err(|why| Refusal::internal(why.to_string()))?;
     if let Some(ms) = envelope["deadlines"]["killWaitMs"].as_u64() {
         domain.set_empty_wait(Duration::from_millis(ms));
     }
     let mut link = os::GoLink::new(&domain).map_err(Refusal::internal)?;
-    let spec = os::gate_spec(&envelope, &run_dir, &locks, &mut link, &domain).map_err(Refusal::internal)?;
-    let mut spawned = driver.spawn_in(&mut domain, spec).map_err(|why| Refusal::internal(format!("gate did not start: {why}")))?;
+    let spec = os::gate_spec(&envelope, &run_dir, &locks, &mut link, &domain)
+        .map_err(Refusal::internal)?;
+    let mut spawned = driver
+        .spawn_in(&mut domain, spec)
+        .map_err(|why| Refusal::internal(format!("gate did not start: {why}")))?;
     let gate_started = Instant::now();
 
     // The domain is on record before the gate may run anything.
@@ -420,36 +595,80 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
     locks.release_cwd();
 
     if !sent_go {
-        return not_started(&envelope, &run_dir, &watch, locks, "gate-silent", "no GO was sent, so the gate ran nothing");
+        return not_started(
+            &envelope,
+            &run_dir,
+            &watch,
+            locks,
+            "gate-silent",
+            "no GO was sent, so the gate ran nothing",
+        );
     }
-    finish(&envelope, &run_dir, &watch, locks, false, &TerminalEnd::default())
+    finish(
+        &envelope,
+        &run_dir,
+        &watch,
+        locks,
+        false,
+        &TerminalEnd::default(),
+    )
 }
 
 /// Nothing was started, or the gate never got GO: the receipt names `abandoned-not-started` with the code from
 /// `start-refused.json`, and the steps (the slot is kept) still run.
-fn not_started(envelope: &Value, run_dir: &Path, watch: &Watch, locks: os::Locks, code: &'static str, why: &str) -> Result<i32, Refusal> {
+fn not_started(
+    envelope: &Value,
+    run_dir: &Path,
+    watch: &Watch,
+    locks: os::Locks,
+    code: &'static str,
+    why: &str,
+) -> Result<i32, Refusal> {
     let note = json!({"v": 1, "attemptId": watch.attempt_id, "code": code, "why": why, "at": iso_utc_now()});
     if let Ok(bytes) = serde_json::to_vec(&note) {
         let _ = publish_once(run_dir, "start-refused.json", &bytes);
     }
     eprintln!("fgos internal supervise: attempt not started: {code}: {why}");
-    finish(envelope, run_dir, watch, locks, true, &TerminalEnd::default())
+    finish(
+        envelope,
+        run_dir,
+        watch,
+        locks,
+        true,
+        &TerminalEnd::default(),
+    )
 }
 
 /// The gate is gone and its domain is empty: publish the receipt, run the
 /// steps, close the attempt when every step has its receipt, report on stdout.
-fn finish(envelope: &Value, run_dir: &Path, watch: &Watch, locks: os::Locks, not_started: bool, end: &TerminalEnd) -> Result<i32, Refusal> {
-    let outcome = publish_receipt_with(envelope, run_dir, "supervisor", not_started, end).map_err(|why| Refusal::internal(format!("receipt.json not published: {why}")))?;
+fn finish(
+    envelope: &Value,
+    run_dir: &Path,
+    watch: &Watch,
+    locks: os::Locks,
+    not_started: bool,
+    end: &TerminalEnd,
+) -> Result<i32, Refusal> {
+    let outcome = publish_receipt_with(envelope, run_dir, "supervisor", not_started, end)
+        .map_err(|why| Refusal::internal(format!("receipt.json not published: {why}")))?;
     let steps = crate::steps::run_steps(envelope, run_dir);
     let (result, pending) = match &steps {
         crate::steps::StepsOutcome::Done(ids) => {
             let closed = json!({"v": 1, "attemptId": watch.attempt_id, "closedBy": "supervisor", "steps": ids, "at": iso_utc_now()});
-            serde_json::to_vec(&closed).map_err(std::io::Error::other).and_then(|b| publish_once(run_dir, "closed.json", &b)).map_err(|why| Refusal::internal(format!("closed.json not published: {why}")))?;
+            serde_json::to_vec(&closed)
+                .map_err(std::io::Error::other)
+                .and_then(|b| publish_once(run_dir, "closed.json", &b))
+                .map_err(|why| Refusal::internal(format!("closed.json not published: {why}")))?;
             ("closed", None)
         }
         other => {
-            if let crate::steps::StepsOutcome::Retry { reason, .. } | crate::steps::StepsOutcome::Failed { reason, .. } = other {
-                eprintln!("fgos internal supervise: step {} left open: {reason}", other.pending().unwrap_or("?"));
+            if let crate::steps::StepsOutcome::Retry { reason, .. }
+            | crate::steps::StepsOutcome::Failed { reason, .. } = other
+            {
+                eprintln!(
+                    "fgos internal supervise: step {} left open: {reason}",
+                    other.pending().unwrap_or("?")
+                );
             }
             ("open", other.pending().map(String::from))
         }
@@ -464,34 +683,71 @@ fn finish(envelope: &Value, run_dir: &Path, watch: &Watch, locks: os::Locks, not
 }
 
 #[cfg(unix)]
-fn supervise_terminal(envelope: &Value, run_dir: &Path, locks: os::Locks, watch: &Watch) -> Result<i32, Refusal> {
+fn supervise_terminal(
+    envelope: &Value,
+    run_dir: &Path,
+    locks: os::Locks,
+    watch: &Watch,
+) -> Result<i32, Refusal> {
     terminal::run(envelope, run_dir, locks, watch)
 }
 
 #[cfg(not(unix))]
-fn supervise_terminal(_envelope: &Value, _run_dir: &Path, _locks: os::Locks, _watch: &Watch) -> Result<i32, Refusal> {
-    Err(Refusal { exit: EXIT_INTERNAL, code: "terminal-mode-unsupported", why: "the terminal launch mode has no driver on this platform".into() })
+fn supervise_terminal(
+    _envelope: &Value,
+    _run_dir: &Path,
+    _locks: os::Locks,
+    _watch: &Watch,
+) -> Result<i32, Refusal> {
+    Err(Refusal {
+        exit: EXIT_INTERNAL,
+        code: "terminal-mode-unsupported",
+        why: "the terminal launch mode has no driver on this platform".into(),
+    })
 }
 
 fn open_driver(envelope: &Value) -> Result<Box<dyn ContainmentDriver>, String> {
-    let preferred = envelope["containment"]["preferred"].as_str().ok_or("containment.preferred missing")?;
-    let bwrap = envelope["containment"]["bwrapPrefix"].as_array().and_then(|p| p.first()).and_then(Value::as_str).map(PathBuf::from);
+    let preferred = envelope["containment"]["preferred"]
+        .as_str()
+        .ok_or("containment.preferred missing")?;
+    let bwrap = envelope["containment"]["bwrapPrefix"]
+        .as_array()
+        .and_then(|p| p.first())
+        .and_then(Value::as_str)
+        .map(PathBuf::from);
     os::driver_for(preferred, bwrap)
 }
 
 /// `declare_domain` on the attempt lock, then `supervisor-binding.json`.
-fn bind(envelope: &Value, run_dir: &Path, locks: &os::Locks, driver: &dyn ContainmentDriver, domain: &ContainmentDomain, spawned: &Spawned) -> Result<(), String> {
+fn bind(
+    envelope: &Value,
+    run_dir: &Path,
+    locks: &os::Locks,
+    driver: &dyn ContainmentDriver,
+    domain: &ContainmentDomain,
+    spawned: &Spawned,
+) -> Result<(), String> {
     let record = os::record_to_declare(domain.domain().ok_or("the driver returned no domain id")?);
     let kernel = driver.guarantee().level == GuaranteeLevel::Kernel;
     bind_record(envelope, run_dir, locks, &record, &spawned.root, kernel)
 }
 
 /// [`bind`] for a domain the caller already knows: record it on the lock, then publish the binding.
-fn bind_record(envelope: &Value, run_dir: &Path, locks: &os::Locks, record: &fgos_process::Domain, gate: &facts::ProcTuple, kernel: bool) -> Result<(), String> {
+fn bind_record(
+    envelope: &Value,
+    run_dir: &Path,
+    locks: &os::Locks,
+    record: &fgos_process::Domain,
+    gate: &facts::ProcTuple,
+    kernel: bool,
+) -> Result<(), String> {
     // The supervisor holds the attempt lock exclusively.
     let predecessor = fgos_holder_lock::predecessor::record_path(&run_dir.join("attempt.lock"));
-    fgos_holder_lock::predecessor::declare(&predecessor, record).map_err(|e| format!("declare_domain: {e}"))?;
-    locks.declare_on_lease(record).map_err(|e| format!("declare_domain on the cwd lease: {e}"))?;
+    fgos_holder_lock::predecessor::declare(&predecessor, record)
+        .map_err(|e| format!("declare_domain: {e}"))?;
+    locks
+        .declare_on_lease(record)
+        .map_err(|e| format!("declare_domain on the cwd lease: {e}"))?;
     let declared = fgos_holder_lock::predecessor::domain_json(record);
     let me = facts::self_identity().ok_or("the supervisor's own identity is unreadable")?;
     let binding = json!({
@@ -507,7 +763,12 @@ fn bind_record(envelope: &Value, run_dir: &Path, locks: &os::Locks, record: &fgo
         },
         "boundAt": iso_utc_now(),
     });
-    publish_once(run_dir, "supervisor-binding.json", &serde_json::to_vec(&binding).map_err(|e| e.to_string())?).map_err(|e| format!("supervisor-binding.json: {e}"))?;
+    publish_once(
+        run_dir,
+        "supervisor-binding.json",
+        &serde_json::to_vec(&binding).map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| format!("supervisor-binding.json: {e}"))?;
     Ok(())
 }
 
@@ -523,7 +784,13 @@ fn wait_for_hello(go: &mut os::Go, spawned: &mut Spawned, since: Instant) -> boo
     }
 }
 
-fn watch_gate(watch: &Watch, go: &mut os::Go, driver: &dyn ContainmentDriver, domain: &mut ContainmentDomain, spawned: &mut Spawned) {
+fn watch_gate(
+    watch: &Watch,
+    go: &mut os::Go,
+    driver: &dyn ContainmentDriver,
+    domain: &mut ContainmentDomain,
+    spawned: &mut Spawned,
+) {
     let started = Instant::now();
     let mut last_active = started;
     let mut tail = CaptureTail { offsets: [0, 0] };
@@ -561,7 +828,11 @@ fn watch_gate(watch: &Watch, go: &mut os::Go, driver: &dyn ContainmentDriver, do
         }
         if last_beat.is_none_or(|at| at.elapsed() >= HEARTBEAT_EVERY) {
             last_beat = Some(Instant::now());
-            let _ = write_atomic(&watch.run_dir, "supervisor-heartbeat.json", &json!({"v": 1, "attemptId": watch.attempt_id, "at": iso_utc_now(), "agentBound": agent_bound}));
+            let _ = write_atomic(
+                &watch.run_dir,
+                "supervisor-heartbeat.json",
+                &json!({"v": 1, "attemptId": watch.attempt_id, "at": iso_utc_now(), "agentBound": agent_bound}),
+            );
         }
         if stopped.is_none() {
             let cause = if watch.cancel_requested() {
@@ -579,7 +850,9 @@ fn watch_gate(watch: &Watch, go: &mut os::Go, driver: &dyn ContainmentDriver, do
                 stopped = Some(Instant::now());
                 request_stop(watch, go, &gate, cause);
             }
-        } else if !ended_domain && stopped.is_some_and(|at| at.elapsed() >= watch.grace + GATE_STOP_SLACK) {
+        } else if !ended_domain
+            && stopped.is_some_and(|at| at.elapsed() >= watch.grace + GATE_STOP_SLACK)
+        {
             // The gate outlived its own grace: end the whole domain. A refused kill is tried again on the next tick.
             ended_domain = driver.kill_all(domain, 0) == KillOutcome::Ok;
         }
@@ -615,16 +888,33 @@ mod tests {
         assert_eq!(outcome_for(Some(&exit("orphan")), false), "gate-lost");
         assert_eq!(outcome_for(None, true), "gate-lost");
         let orphan = |cause: &str| json!({"stoppedBy": "orphan", "cause": cause});
-        assert_eq!(outcome_for(Some(&orphan("abandoned-before-brief")), true), "abandoned-before-brief");
+        assert_eq!(
+            outcome_for(Some(&orphan("abandoned-before-brief")), true),
+            "abandoned-before-brief"
+        );
         assert_eq!(outcome_for(Some(&orphan("orphan-result")), true), "exited");
     }
 
     #[test]
     fn argv_needs_protocol_one_and_an_envelope() {
         let argv = |items: &[&str]| items.iter().map(|s| s.to_string()).collect::<Vec<_>>();
-        assert_eq!(parse_args(&argv(&["--protocol", "1", "--envelope", "/e.json"])).unwrap().envelope, PathBuf::from("/e.json"));
-        assert_eq!(parse_args(&argv(&["--envelope", "/e"])), Err(crate::route::ArgsError::VersionMismatch));
-        assert!(matches!(parse_args(&argv(&["--protocol", "1"])), Err(crate::route::ArgsError::Usage(_))));
-        assert!(matches!(parse_args(&argv(&["--protocol", "1", "--envelope", "/e", "--x", "1"])), Err(crate::route::ArgsError::Usage(_))));
+        assert_eq!(
+            parse_args(&argv(&["--protocol", "1", "--envelope", "/e.json"]))
+                .unwrap()
+                .envelope,
+            PathBuf::from("/e.json")
+        );
+        assert_eq!(
+            parse_args(&argv(&["--envelope", "/e"])),
+            Err(crate::route::ArgsError::VersionMismatch)
+        );
+        assert!(matches!(
+            parse_args(&argv(&["--protocol", "1"])),
+            Err(crate::route::ArgsError::Usage(_))
+        ));
+        assert!(matches!(
+            parse_args(&argv(&["--protocol", "1", "--envelope", "/e", "--x", "1"])),
+            Err(crate::route::ArgsError::Usage(_))
+        ));
     }
 }

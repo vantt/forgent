@@ -128,11 +128,22 @@ impl GitWorktree {
                 .map_err(operation)?)),
             "prune" => {
                 if let Some(path) = args.get("path") {
-                    self.driver.prune_missing_worktree(&self.repo, held,
-                        Path::new(path.as_str().ok_or_else(|| error("invalid-worktree-path"))?),
-                        &self.writer, id()?).map_err(operation)?;
+                    self.driver
+                        .prune_missing_worktree(
+                            &self.repo,
+                            held,
+                            Path::new(
+                                path.as_str()
+                                    .ok_or_else(|| error("invalid-worktree-path"))?,
+                            ),
+                            &self.writer,
+                            id()?,
+                        )
+                        .map_err(operation)?;
                 } else {
-                    self.driver.prune_worktree(&self.repo, held, id()?).map_err(operation)?;
+                    self.driver
+                        .prune_worktree(&self.repo, held, id()?)
+                        .map_err(operation)?;
                 }
                 Ok(json!({"pruned":true}))
             }

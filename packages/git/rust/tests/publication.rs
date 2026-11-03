@@ -784,9 +784,18 @@ fn an_interrupted_pin_release_is_resumed_only_while_the_pin_still_equals_its_can
         let port = PublicationPort::new(&driver, authority(&repo, &mut h));
         let a = commit(&port, &repo, vec![], "a");
         let b = commit(&port, &repo, vec![a.clone()], "b");
-        for (id, from, to) in [("stuck", ExpectedTip::Absent, &a), ("moved", ExpectedTip::Oid(a.clone()), &b)] {
-            port.compare_and_swap(&repo, &reference(), &from, &ExpectedTip::Oid(to.clone()), id)
-                .unwrap();
+        for (id, from, to) in [
+            ("stuck", ExpectedTip::Absent, &a),
+            ("moved", ExpectedTip::Oid(a.clone()), &b),
+        ] {
+            port.compare_and_swap(
+                &repo,
+                &reference(),
+                &from,
+                &ExpectedTip::Oid(to.clone()),
+                id,
+            )
+            .unwrap();
         }
         let native = root.join(if backend == "files" {
             "packed-refs.lock"
@@ -806,7 +815,9 @@ fn an_interrupted_pin_release_is_resumed_only_while_the_pin_still_equals_its_can
             Phase::PinReleaseAttempt { .. }
         ));
         assert_eq!(
-            String::from_utf8(git(&root, &["rev-parse", &pin("stuck")])).unwrap().trim(),
+            String::from_utf8(git(&root, &["rev-parse", &pin("stuck")]))
+                .unwrap()
+                .trim(),
             a.as_str()
         );
         // Still blocked on a later call; nothing is removed on its behalf.
@@ -824,14 +835,25 @@ fn an_interrupted_pin_release_is_resumed_only_while_the_pin_still_equals_its_can
         fs::write(&native, b"unknown owner evidence").unwrap();
         assert!(port.release_pin_and_compact(&repo, "moved").is_err());
         fs::remove_file(&native).unwrap();
-        git(&root, &["update-ref", "--no-deref", &pin("moved"), a.as_str(), b.as_str()]);
+        git(
+            &root,
+            &[
+                "update-ref",
+                "--no-deref",
+                &pin("moved"),
+                a.as_str(),
+                b.as_str(),
+            ],
+        );
         assert!(port.release_pin_and_compact(&repo, "moved").is_err());
         assert!(matches!(
             wal.inspect("moved").unwrap().last().phase,
             Phase::PinReleaseAttempt { .. }
         ));
         assert_eq!(
-            String::from_utf8(git(&root, &["rev-parse", &pin("moved")])).unwrap().trim(),
+            String::from_utf8(git(&root, &["rev-parse", &pin("moved")]))
+                .unwrap()
+                .trim(),
             a.as_str()
         );
     }
@@ -854,15 +876,33 @@ fn recovery_reports_a_chain_whose_pin_release_is_stuck_and_still_settles_the_oth
             ("second-ok", ExpectedTip::Oid(a.clone()), &b),
             ("third-ok", ExpectedTip::Oid(b.clone()), &c),
         ] {
-            port.compare_and_swap(&repo, &reference(), &from, &ExpectedTip::Oid(to.clone()), id)
-                .unwrap();
+            port.compare_and_swap(
+                &repo,
+                &reference(),
+                &from,
+                &ExpectedTip::Oid(to.clone()),
+                id,
+            )
+            .unwrap();
         }
         let pin = |id: &str| format!("refs/fgos/git-operations/{id}/candidate");
         // The first chain's pin no longer holds its candidate, so its release
         // is refused; it sorts before the chains that can complete.
-        git(&root, &["update-ref", "--no-deref", &pin("first-stuck"), b.as_str(), a.as_str()]);
+        git(
+            &root,
+            &[
+                "update-ref",
+                "--no-deref",
+                &pin("first-stuck"),
+                b.as_str(),
+                a.as_str(),
+            ],
+        );
         let wal = wal::Wal::open(&repo).unwrap();
-        assert_eq!(port.recover_publications(&repo).unwrap(), vec!["first-stuck".to_string()]);
+        assert_eq!(
+            port.recover_publications(&repo).unwrap(),
+            vec!["first-stuck".to_string()]
+        );
         assert!(wal.inspect("first-stuck").is_ok());
         for id in ["second-ok", "third-ok"] {
             assert!(wal.inspect(id).is_err(), "{id} was released and compacted");
@@ -1332,10 +1372,21 @@ fn a_fetch_left_at_its_attempt_is_settled_by_an_explicit_recovery_and_the_next_f
     let remote = t.0.join("remote");
     init(&root, "sha1", "files");
     init(&remote, "sha1", "files");
-    let tree = String::from_utf8(git(&remote, &["hash-object", "-t", "tree", "-w", "--stdin"])).unwrap();
-    let commit_id = String::from_utf8(git(&remote, &["commit-tree", tree.trim(), "-m", "x"])).unwrap();
-    git(&remote, &["update-ref", reference().as_str(), commit_id.trim()]);
-    git(&root, &["remote", "add", "origin", remote.to_str().unwrap()]);
+    let tree = String::from_utf8(git(
+        &remote,
+        &["hash-object", "-t", "tree", "-w", "--stdin"],
+    ))
+    .unwrap();
+    let commit_id =
+        String::from_utf8(git(&remote, &["commit-tree", tree.trim(), "-m", "x"])).unwrap();
+    git(
+        &remote,
+        &["update-ref", reference().as_str(), commit_id.trim()],
+    );
+    git(
+        &root,
+        &["remote", "add", "origin", remote.to_str().unwrap()],
+    );
     let driver = GitDriver::new(&t.0).unwrap();
     let repo = resolve(&driver, &root);
     let mut h = handle(&t.0.join("seal.lock"));
@@ -1347,9 +1398,23 @@ fn a_fetch_left_at_its_attempt_is_settled_by_an_explicit_recovery_and_the_next_f
     // A sync killed after it recorded its attempt leaves a fetch chain on the
     // authority's own ref; a finished publication supplies the matching binding.
     let a = commit(&port, &repo, vec![], "a");
-    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a), "seed").unwrap();
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(a),
+        "seed",
+    )
+    .unwrap();
     let journal = wal::Wal::open(&repo).unwrap();
-    let mut intent = journal.retained(1000).unwrap().into_iter().next().unwrap().intent().clone();
+    let mut intent = journal
+        .retained(1000)
+        .unwrap()
+        .into_iter()
+        .next()
+        .unwrap()
+        .intent()
+        .clone();
     intent.kind = wal::OperationKind::RemoteFetch {
         url: remote.to_str().unwrap().into(),
         refspecs: vec![mapping.clone()],
@@ -1372,12 +1437,29 @@ fn a_fetch_left_at_its_attempt_is_settled_by_an_explicit_recovery_and_the_next_f
             },
         )
         .unwrap();
-    let blocked = port.fetch_refs(&repo, "origin", std::slice::from_ref(&mapping)).unwrap_err();
+    let blocked = port
+        .fetch_refs(&repo, "origin", std::slice::from_ref(&mapping))
+        .unwrap_err();
     assert_eq!(blocked.code, ResultCode::RecoveryRequired);
-    assert_eq!(port.recover_own_transfers(&repo).unwrap(), vec!["killed-sync".to_string()]);
-    let settled = journal.compacted("killed-sync").unwrap().map(|c| c.outcome().unwrap()).or_else(|| journal.inspect("killed-sync").unwrap().outcome().cloned());
-    assert!(matches!(settled, Some(wal::Outcome::Transfer { acknowledged: false, unknown: true, .. })));
-    port.fetch_refs(&repo, "origin", std::slice::from_ref(&mapping)).unwrap();
+    assert_eq!(
+        port.recover_own_transfers(&repo).unwrap(),
+        vec!["killed-sync".to_string()]
+    );
+    let settled = journal
+        .compacted("killed-sync")
+        .unwrap()
+        .map(|c| c.outcome().unwrap())
+        .or_else(|| journal.inspect("killed-sync").unwrap().outcome().cloned());
+    assert!(matches!(
+        settled,
+        Some(wal::Outcome::Transfer {
+            acknowledged: false,
+            unknown: true,
+            ..
+        })
+    ));
+    port.fetch_refs(&repo, "origin", std::slice::from_ref(&mapping))
+        .unwrap();
 }
 
 #[test]
@@ -1393,10 +1475,21 @@ fn a_fetch_killed_before_its_attempt_is_left_to_admission_and_does_not_fail_the_
     let remote = t.0.join("remote");
     init(&root, "sha1", "files");
     init(&remote, "sha1", "files");
-    let tree = String::from_utf8(git(&remote, &["hash-object", "-t", "tree", "-w", "--stdin"])).unwrap();
-    let commit_id = String::from_utf8(git(&remote, &["commit-tree", tree.trim(), "-m", "x"])).unwrap();
-    git(&remote, &["update-ref", reference().as_str(), commit_id.trim()]);
-    git(&root, &["remote", "add", "origin", remote.to_str().unwrap()]);
+    let tree = String::from_utf8(git(
+        &remote,
+        &["hash-object", "-t", "tree", "-w", "--stdin"],
+    ))
+    .unwrap();
+    let commit_id =
+        String::from_utf8(git(&remote, &["commit-tree", tree.trim(), "-m", "x"])).unwrap();
+    git(
+        &remote,
+        &["update-ref", reference().as_str(), commit_id.trim()],
+    );
+    git(
+        &root,
+        &["remote", "add", "origin", remote.to_str().unwrap()],
+    );
     let driver = GitDriver::new(&t.0).unwrap();
     let repo = resolve(&driver, &root);
     let mut h = handle(&t.0.join("seal.lock"));
@@ -1406,9 +1499,23 @@ fn a_fetch_killed_before_its_attempt_is_left_to_admission_and_does_not_fail_the_
     });
     let mapping = "+refs/fgos/events/*:refs/fgos/remotes/origin/events/*".to_owned();
     let a = commit(&port, &repo, vec![], "a");
-    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a), "seed").unwrap();
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(a),
+        "seed",
+    )
+    .unwrap();
     let journal = wal::Wal::open(&repo).unwrap();
-    let mut intent = journal.retained(1000).unwrap().into_iter().next().unwrap().intent().clone();
+    let mut intent = journal
+        .retained(1000)
+        .unwrap()
+        .into_iter()
+        .next()
+        .unwrap()
+        .intent()
+        .clone();
     intent.kind = wal::OperationKind::RemoteFetch {
         url: remote.to_str().unwrap().into(),
         refspecs: vec![mapping.clone()],
@@ -1423,8 +1530,13 @@ fn a_fetch_killed_before_its_attempt_is_left_to_admission_and_does_not_fail_the_
     journal.append(&chain, Phase::Prepared).unwrap();
     assert!(port.recover_own_transfers(&repo).unwrap().is_empty());
     port.recover_publications(&repo).unwrap();
-    port.fetch_refs(&repo, "origin", std::slice::from_ref(&mapping)).unwrap();
-    let closed = journal.compacted("killed-early").unwrap().map(|c| c.outcome().unwrap()).or_else(|| journal.inspect("killed-early").unwrap().outcome().cloned());
+    port.fetch_refs(&repo, "origin", std::slice::from_ref(&mapping))
+        .unwrap();
+    let closed = journal
+        .compacted("killed-early")
+        .unwrap()
+        .map(|c| c.outcome().unwrap())
+        .or_else(|| journal.inspect("killed-early").unwrap().outcome().cloned());
     assert!(matches!(closed, Some(wal::Outcome::AbandonedBeforeAttempt)));
 }
 
@@ -1697,7 +1809,10 @@ fn historical_transfer_wal_digests_and_pre_attempt_recovery_remain_compatible() 
         for prepared in [false, true] {
             let id = format!("pre-attempt-{n}-{prepared}");
             let error = port.recover(&repo, &id).unwrap_err();
-            assert!(error.cause.contains("abandoned-before-attempt"), "{error:?}");
+            assert!(
+                error.cause.contains("abandoned-before-attempt"),
+                "{error:?}"
+            );
         }
     }
 }
@@ -1894,7 +2009,9 @@ fn literal_ref_pages_and_batched_tree_paths() {
                     (commit.clone(), vec![b"seal.json".to_vec()]),
                     (root.clone(), vec![b"x".to_vec()]),
                 ];
-                let single = port.read_paths_at(&repo, root, &[b"x".to_vec()], 10).unwrap_err();
+                let single = port
+                    .read_paths_at(&repo, root, &[b"x".to_vec()], 10)
+                    .unwrap_err();
                 let many = port.read_paths_at_many(&repo, &reads, 10).unwrap_err();
                 assert_eq!(format!("{many:?}"), format!("{single:?}"));
             }
@@ -2319,74 +2436,138 @@ fn config_recovery_observes_attempted_changes_and_never_replays_old_ids() {
 /// different request is refused.
 #[test]
 fn publication_keeps_retained_chains_bounded_and_compacted_ids_bound() {
-    for (format, backend) in [("sha1", "files"), ("sha256", "files"), ("sha1", "reftable"), ("sha256", "reftable")] {
-    let t = Temp::new();
-    let root = t.0.join("repo");
-    init(&root, format, backend);
-    let driver = GitDriver::new(&t.0).unwrap();
-    let repo = resolve(&driver, &root);
-    let mut h = handle(&t.0.join("seal.lock"));
-    let port = PublicationPort::new(&driver, authority(&repo, &mut h));
-    let mut tip = ExpectedTip::Absent;
-    let mut done = Vec::new();
-    for n in 0..12 {
-        let parents = match &tip {
-            ExpectedTip::Oid(o) => vec![o.clone()],
-            ExpectedTip::Absent => vec![],
-        };
-        let next = commit(&port, &repo, parents, &format!("seal {n}"));
-        let id = format!("seal-{n:02}");
+    for (format, backend) in [
+        ("sha1", "files"),
+        ("sha256", "files"),
+        ("sha1", "reftable"),
+        ("sha256", "reftable"),
+    ] {
+        let t = Temp::new();
+        let root = t.0.join("repo");
+        init(&root, format, backend);
+        let driver = GitDriver::new(&t.0).unwrap();
+        let repo = resolve(&driver, &root);
+        let mut h = handle(&t.0.join("seal.lock"));
+        let port = PublicationPort::new(&driver, authority(&repo, &mut h));
+        let mut tip = ExpectedTip::Absent;
+        let mut done = Vec::new();
+        for n in 0..12 {
+            let parents = match &tip {
+                ExpectedTip::Oid(o) => vec![o.clone()],
+                ExpectedTip::Absent => vec![],
+            };
+            let next = commit(&port, &repo, parents, &format!("seal {n}"));
+            let id = format!("seal-{n:02}");
+            let receipt = port
+                .compare_and_swap(
+                    &repo,
+                    &reference(),
+                    &tip,
+                    &ExpectedTip::Oid(next.clone()),
+                    &id,
+                )
+                .unwrap();
+            assert!(matches!(
+                receipt.attribution,
+                Attribution::ThisInvocationWonCas
+            ));
+            done.push((id, tip.clone(), next.clone()));
+            tip = ExpectedTip::Oid(next);
+            // Keep the change times of successive chains apart.
+            std::thread::sleep(std::time::Duration::from_millis(5));
+        }
+        let operations = repo.common_dir().join("fgos/git/operations");
+        let retained = fs::read_dir(&operations).unwrap().count();
+        assert!(retained <= 5, "retained operation directories: {retained}");
+        let pins = fs::read_dir(repo.common_dir().join("refs/fgos/git-operations"))
+            .map(|d| d.count())
+            .unwrap_or(0);
+        assert!(pins <= 5, "retained pins: {pins}");
+        let ledger = fs::read_dir(repo.common_dir().join("fgos/git/compacted"))
+            .unwrap()
+            .count();
+        assert!(ledger >= 7, "compacted ids: {ledger}");
+        // The first id is compacted: same request returns its receipt.
+        let (id, old, next) = &done[1];
+        assert!(!operations.join(id).exists());
+        // Compaction preserves the full durable terminal receipt for recovery.
+        assert_eq!(&port.release_pin_and_compact(&repo, id).unwrap().id, id);
+        let compacted = port.recover(&repo, id).unwrap();
+        assert_eq!(&compacted.local_effect.expected, old);
+        assert_eq!(compacted.local_effect.published_oid.as_ref(), Some(next));
+        assert!(matches!(
+            compacted.attribution,
+            Attribution::ThisInvocationWonCas
+        ));
         let receipt = port
-            .compare_and_swap(&repo, &reference(), &tip, &ExpectedTip::Oid(next.clone()), &id)
+            .compare_and_swap(
+                &repo,
+                &reference(),
+                old,
+                &ExpectedTip::Oid(next.clone()),
+                id,
+            )
             .unwrap();
-        assert!(matches!(receipt.attribution, Attribution::ThisInvocationWonCas));
-        done.push((id, tip.clone(), next.clone()));
-        tip = ExpectedTip::Oid(next);
-        // Keep the change times of successive chains apart.
-        std::thread::sleep(std::time::Duration::from_millis(5));
-    }
-    let operations = repo.common_dir().join("fgos/git/operations");
-    let retained = fs::read_dir(&operations).unwrap().count();
-    assert!(retained <= 5, "retained operation directories: {retained}");
-    let pins = fs::read_dir(repo.common_dir().join("refs/fgos/git-operations"))
-        .map(|d| d.count())
-        .unwrap_or(0);
-    assert!(pins <= 5, "retained pins: {pins}");
-    let ledger = fs::read_dir(repo.common_dir().join("fgos/git/compacted")).unwrap().count();
-    assert!(ledger >= 7, "compacted ids: {ledger}");
-    // The first id is compacted: same request returns its receipt.
-    let (id, old, next) = &done[1];
-    assert!(!operations.join(id).exists());
-    // Compaction preserves the full durable terminal receipt for recovery.
-    assert_eq!(&port.release_pin_and_compact(&repo, id).unwrap().id, id);
-    let compacted = port.recover(&repo, id).unwrap();
-    assert_eq!(&compacted.local_effect.expected, old);
-    assert_eq!(compacted.local_effect.published_oid.as_ref(), Some(next));
-    assert!(matches!(compacted.attribution, Attribution::ThisInvocationWonCas));
-    let receipt = port
-        .compare_and_swap(&repo, &reference(), old, &ExpectedTip::Oid(next.clone()), id)
+        assert_eq!(receipt.local_effect.published_oid.as_ref(), Some(next));
+        assert!(matches!(
+            receipt.attribution,
+            Attribution::ThisInvocationWonCas
+        ));
+        // A different request under the same id is refused.
+        assert!(port
+            .compare_and_swap(
+                &repo,
+                &reference(),
+                &ExpectedTip::Absent,
+                &ExpectedTip::Oid(done[1].2.clone()),
+                id
+            )
+            .is_err());
+        // Old experimental entries lack expected/next. Preserve their bindings
+        // and exact replay; read-only recovery must report the missing evidence.
+        let journal = wal::Wal::open(&repo).unwrap();
+        let compacted = journal.compacted(id).unwrap().unwrap();
+        let legacy_digest = wal::canonical_digest(&(
+            1u8,
+            "legacy-receipt",
+            &compacted.request,
+            &compacted.binding,
+            &compacted.receipt,
+        ))
         .unwrap();
-    assert_eq!(receipt.local_effect.published_oid.as_ref(), Some(next));
-    assert!(matches!(receipt.attribution, Attribution::ThisInvocationWonCas));
-    // A different request under the same id is refused.
-    assert!(port
-        .compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(done[1].2.clone()), id)
-        .is_err());
-    // Old experimental entries lack expected/next. Preserve their bindings
-    // and exact replay; read-only recovery must report the missing evidence.
-    let journal = wal::Wal::open(&repo).unwrap();
-    let compacted = journal.compacted(id).unwrap().unwrap();
-    let legacy_digest = wal::canonical_digest(&(1u8, "legacy-receipt", &compacted.request, &compacted.binding, &compacted.receipt)).unwrap();
-    let legacy = serde_json::json!({"v": 1, "id": "legacy-receipt", "q": compacted.request, "b": compacted.binding, "r": compacted.receipt, "digest": legacy_digest});
-    fgos_durable_file::install_once(&repo.common_dir().join("fgos/git/compacted"), "legacy-receipt", legacy.to_string().as_bytes()).unwrap();
-    let incomplete = port.recover(&repo, "legacy-receipt").unwrap_err();
-    assert_eq!(incomplete.code, ResultCode::RecoveryRequired);
-    assert!(incomplete.cause.starts_with("legacy-compact-receipt-incomplete"));
-    assert_eq!(port.compare_and_swap(&repo, &reference(), old, &ExpectedTip::Oid(next.clone()), "legacy-receipt").unwrap().local_effect.published_oid.as_ref(), Some(next));
-    // The latest id keeps its whole chain for recover.
-    let (last, _, last_next) = done.last().unwrap();
-    let recovered = port.recover(&repo, last).unwrap();
-    assert_eq!(recovered.local_effect.published_oid.as_ref(), Some(last_next));
+        let legacy = serde_json::json!({"v": 1, "id": "legacy-receipt", "q": compacted.request, "b": compacted.binding, "r": compacted.receipt, "digest": legacy_digest});
+        fgos_durable_file::install_once(
+            &repo.common_dir().join("fgos/git/compacted"),
+            "legacy-receipt",
+            legacy.to_string().as_bytes(),
+        )
+        .unwrap();
+        let incomplete = port.recover(&repo, "legacy-receipt").unwrap_err();
+        assert_eq!(incomplete.code, ResultCode::RecoveryRequired);
+        assert!(incomplete
+            .cause
+            .starts_with("legacy-compact-receipt-incomplete"));
+        assert_eq!(
+            port.compare_and_swap(
+                &repo,
+                &reference(),
+                old,
+                &ExpectedTip::Oid(next.clone()),
+                "legacy-receipt"
+            )
+            .unwrap()
+            .local_effect
+            .published_oid
+            .as_ref(),
+            Some(next)
+        );
+        // The latest id keeps its whole chain for recover.
+        let (last, _, last_next) = done.last().unwrap();
+        let recovered = port.recover(&repo, last).unwrap();
+        assert_eq!(
+            recovered.local_effect.published_oid.as_ref(),
+            Some(last_next)
+        );
     }
 }
 
@@ -2395,7 +2576,9 @@ fn changing_cas_uses_the_intact_candidate_fast_path() {
     struct FastPath(std::sync::atomic::AtomicUsize);
     impl FileSystem for FastPath {
         fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
-            if step == "candidate-fast-path" { self.0.fetch_add(1, Ordering::SeqCst); }
+            if step == "candidate-fast-path" {
+                self.0.fetch_add(1, Ordering::SeqCst);
+            }
             Ok(())
         }
     }
@@ -2408,11 +2591,29 @@ fn changing_cas_uses_the_intact_candidate_fast_path() {
     let fast = FastPath(Default::default());
     let port = PublicationPort::with_filesystem(&driver, authority(&repo, &mut h), &fast);
     let a = commit(&port, &repo, vec![], "a");
-    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a.clone()), "fast-a").unwrap();
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(a.clone()),
+        "fast-a",
+    )
+    .unwrap();
     fast.0.store(0, Ordering::SeqCst);
     let b = commit(&port, &repo, vec![a.clone()], "b");
-    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Oid(a), &ExpectedTip::Oid(b), "fast-b").unwrap();
-    assert_eq!(fast.0.load(Ordering::SeqCst), 1, "the changing CAS was decided by one successful rev-list");
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Oid(a),
+        &ExpectedTip::Oid(b),
+        "fast-b",
+    )
+    .unwrap();
+    assert_eq!(
+        fast.0.load(Ordering::SeqCst),
+        1,
+        "the changing CAS was decided by one successful rev-list"
+    );
 }
 
 #[test]
@@ -2420,7 +2621,9 @@ fn recreated_loose_object_gets_directory_durability_again() {
     struct Syncs(AtomicU64);
     impl FileSystem for Syncs {
         fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
-            if step == "publication-directory-fsync" { self.0.fetch_add(1, Ordering::SeqCst); }
+            if step == "publication-directory-fsync" {
+                self.0.fetch_add(1, Ordering::SeqCst);
+            }
             Ok(())
         }
     }
@@ -2437,7 +2640,13 @@ fn recreated_loose_object_gets_directory_durability_again() {
     assert_eq!(port.write_blob(&repo, b"recreated").unwrap(), oid);
     assert_eq!(syncs.0.load(Ordering::SeqCst), 0);
     let hex = oid.as_str();
-    fs::remove_file(repo.common_dir().join("objects").join(&hex[..2]).join(&hex[2..])).unwrap();
+    fs::remove_file(
+        repo.common_dir()
+            .join("objects")
+            .join(&hex[..2])
+            .join(&hex[2..]),
+    )
+    .unwrap();
     assert_eq!(port.write_blob(&repo, b"recreated").unwrap(), oid);
     assert!(syncs.0.load(Ordering::SeqCst) >= 2);
 }
@@ -2532,16 +2741,36 @@ fn event_publication_recovery_ignores_unrelated_recovery_leaf() {
     let repo = resolve(&driver, &root);
     let _wal = wal::Wal::open(&repo).unwrap();
     fs::create_dir_all(root.join("fgos/git/locks")).unwrap();
-    let leaf = match acquire(&Resource::new("recovery", root.join("fgos/git/locks/recovery.lock")), Mode::Ex, Wait::Try, 2000) {
-        Acquire::Acquired(h) => h, e => panic!("{e:?}"),
+    let leaf = match acquire(
+        &Resource::new("recovery", root.join("fgos/git/locks/recovery.lock")),
+        Mode::Ex,
+        Wait::Try,
+        2000,
+    ) {
+        Acquire::Acquired(h) => h,
+        e => panic!("{e:?}"),
     };
     let mut h = handle(&t.0.join("seal.lock"));
     let port = PublicationPort::new(&driver, authority(&repo, &mut h));
     let a = commit(&port, &repo, vec![], "event");
-    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a.clone()), "live-recovery").unwrap();
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(a.clone()),
+        "live-recovery",
+    )
+    .unwrap();
     port.recover(&repo, "live-recovery").unwrap();
     // Same-id publication invokes recover on the live Event Store path too.
-    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a), "live-recovery").unwrap();
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(a),
+        "live-recovery",
+    )
+    .unwrap();
     assert!(port.recover_publications(&repo).unwrap().is_empty());
     drop(leaf);
 }
@@ -2699,7 +2928,9 @@ fn a_group_read_over_the_output_bound_falls_back_to_single_reads() {
         .unwrap();
     assert_eq!(many.len(), 3);
     for (n, answer) in many.iter().enumerate() {
-        assert!(matches!(&answer[0].value, PathValue::Blob(b) if b.len() == 30 * 1024 * 1024 && b[0] == n as u8));
+        assert!(
+            matches!(&answer[0].value, PathValue::Blob(b) if b.len() == 30 * 1024 * 1024 && b[0] == n as u8)
+        );
     }
 }
 
@@ -2724,7 +2955,16 @@ fn fetch_of_more_machine_refs_than_one_wal_record_holds_installs_every_mirror() 
     let tree = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
     git(&remote, &["hash-object", "-t", "tree", "-w", "/dev/null"]);
     let head = Command::new("git")
-        .args(["-c", "user.name=t", "-c", "user.email=t@t", "commit-tree", "-m", "events", tree])
+        .args([
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@t",
+            "commit-tree",
+            "-m",
+            "events",
+            tree,
+        ])
         .current_dir(&remote)
         .output()
         .unwrap();
@@ -2745,7 +2985,10 @@ fn fetch_of_more_machine_refs_than_one_wal_record_holds_installs_every_mirror() 
         }
     }
     assert!(stdin.wait().unwrap().success());
-    git(&root, &["remote", "add", "origin", remote.to_str().unwrap()]);
+    git(
+        &root,
+        &["remote", "add", "origin", remote.to_str().unwrap()],
+    );
     let driver = GitDriver::new(&t.0).unwrap();
     let repo = resolve(&driver, &root);
     let mut h = handle(&t.0.join("seal.lock"));
@@ -2759,9 +3002,17 @@ fn fetch_of_more_machine_refs_than_one_wal_record_holds_installs_every_mirror() 
     port.fetch_refs(&repo, "origin", &[mapping]).unwrap();
     assert!(operations.0.load(Ordering::Relaxed) > 1);
     let mirrors = port
-        .list_refs(&repo, &[RefPrefix::parse("refs/fgos/remotes/origin/events/").unwrap()], None, 1000)
+        .list_refs(
+            &repo,
+            &[RefPrefix::parse("refs/fgos/remotes/origin/events/").unwrap()],
+            None,
+            1000,
+        )
         .unwrap();
     assert!(mirrors.complete);
     assert_eq!(mirrors.entries.len(), names.len());
-    assert_eq!(wal::Wal::open(&repo).unwrap().scan(100).unwrap().unresolved, 0);
+    assert_eq!(
+        wal::Wal::open(&repo).unwrap().scan(100).unwrap().unresolved,
+        0
+    );
 }

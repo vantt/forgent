@@ -2,9 +2,7 @@
 
 use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use fgos_observe::time::ParsedWindow;
-use fgos_observe::{
-    Observation, SourceError, Subject, SubjectKind, UnitSummaryScan, Window,
-};
+use fgos_observe::{Observation, SourceError, Subject, SubjectKind, UnitSummaryScan, Window};
 use serde_json::Value;
 use std::fs::{self, File};
 use std::io::Read;

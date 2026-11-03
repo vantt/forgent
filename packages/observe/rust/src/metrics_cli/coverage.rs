@@ -29,7 +29,10 @@ mod tests {
             panic!("coverage must not read the work store")
         }
 
-        fn read_entropy_signals(&self, _: &Path) -> Result<crate::WorkEntropySignalsRecord, crate::SourceError> {
+        fn read_entropy_signals(
+            &self,
+            _: &Path,
+        ) -> Result<crate::WorkEntropySignalsRecord, crate::SourceError> {
             panic!("coverage must not read the work store")
         }
     }

@@ -2,8 +2,8 @@
 // Reuse Land/SafeRestore's real repository fixture. The syscall crash harness
 // follows land_crash_matrix/worktree: no production fault flag or synthetic WAL.
 include!("support/land.rs");
-use fgos_holder_lock::{Acquire, BorrowedHandle, Handle, Mode, Resource, Wait, acquire};
-use serde_json::{Value, json};
+use fgos_holder_lock::{acquire, Acquire, BorrowedHandle, Handle, Mode, Resource, Wait};
+use serde_json::{json, Value};
 use std::{
     io::{Read, Write},
     os::unix::{fs::MetadataExt, process::CommandExt},
@@ -266,20 +266,30 @@ fn recovery_matrix_child() {
 // Stop the operating controller immediately after the first directory fsync
 // following Intent installation. It has no running Git child at this boundary.
 // Unlike polling, ptrace cannot miss a fast operation or race the next effect.
-fn interrupt(f: &Fixture, kind: &str) { interrupt_at(f, kind, "intent"); }
+fn interrupt(f: &Fixture, kind: &str) {
+    interrupt_at(f, kind, "intent");
+}
 // waitpid(-1) below reaps every child of its process, so the tracer runs in its
 // own process (as in land_crash_matrix) and cannot steal the Git children that
 // other tests in this binary are waiting on.
 fn interrupt_at(f: &Fixture, kind: &str, boundary: &str) {
     let mut controller = Command::new(std::env::current_exe().unwrap())
-        .args(["--exact", "recovery_trace_controller", "--ignored", "--nocapture"])
+        .args([
+            "--exact",
+            "recovery_trace_controller",
+            "--ignored",
+            "--nocapture",
+        ])
         .stdin(Stdio::piped())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
         .unwrap();
     controller.stdin.take().unwrap().write_all(json!({"main": f.main, "temp": f.temp, "kind": kind, "boundary": boundary, "target": f.request.target, "source": f.request.source, "request": f.request}).to_string().as_bytes()).unwrap();
-    assert!(controller.wait().unwrap().success(), "{kind}: trace controller failed");
+    assert!(
+        controller.wait().unwrap().success(),
+        "{kind}: trace controller failed"
+    );
 }
 #[test]
 #[ignore = "isolated ptrace controller, invoked by interrupt_at"]
@@ -312,7 +322,12 @@ fn recovery_trace_controller() {
         });
     }
     let mut child = command.spawn().unwrap();
-    child.stdin.take().unwrap().write_all(input.as_bytes()).unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(input.as_bytes())
+        .unwrap();
     let pid = child.id() as libc::pid_t;
     let mut status = 0;
     assert_eq!(unsafe { libc::waitpid(pid, &mut status, 0) }, pid);
@@ -330,8 +345,7 @@ fn recovery_trace_controller() {
         unsafe { libc::ptrace(libc::PTRACE_SETOPTIONS, pid, 0, options) },
         0
     );
-    let record = main
-        .join(format!(".git/fgos/git/operations/{ID}/00000000.json"));
+    let record = main.join(format!(".git/fgos/git/operations/{ID}/00000000.json"));
     let mut owned = std::collections::BTreeSet::from([pid]);
     let mut reached = false;
     let mut killed = false;
@@ -378,19 +392,36 @@ fn recovery_trace_controller() {
                 0
             );
             let durable = regs.orig_rax == libc::SYS_fsync as u64 && regs.rax == 0;
-            let renamed = [libc::SYS_rename, libc::SYS_renameat, libc::SYS_renameat2].contains(&(regs.orig_rax as i64)) && regs.rax == 0;
-            reached = if boundary == "intent" { durable && record.is_file() }
-            else if (durable || renamed) && record.is_file() {
+            let renamed = [libc::SYS_rename, libc::SYS_renameat, libc::SYS_renameat2]
+                .contains(&(regs.orig_rax as i64))
+                && regs.rax == 0;
+            reached = if boundary == "intent" {
+                durable && record.is_file()
+            } else if (durable || renamed) && record.is_file() {
                 let wal = wal::Wal::open_existing(&main.join(".git"), wal::OsFileSystem).unwrap();
                 let chain = wal.inspect(ID).unwrap();
                 match boundary {
-                    "pin" => main.join(format!(".git/refs/fgos/git-operations/{ID}/candidate")).is_file(),
-                    "attempt" => durable && matches!(chain.last_state(), wal::Phase::TargetAttempt {..}),
-                    "transfer-effect" => renamed && fs::read_to_string(temp.join("remote.git/refs/heads/shared")).is_ok_and(|v| v.trim() == target),
-                    "cas" => renamed && fs::read_to_string(main.join(".git/refs/heads/topic")).is_ok_and(|v| v.trim() == source),
+                    "pin" => main
+                        .join(format!(".git/refs/fgos/git-operations/{ID}/candidate"))
+                        .is_file(),
+                    "attempt" => {
+                        durable && matches!(chain.last_state(), wal::Phase::TargetAttempt { .. })
+                    }
+                    "transfer-effect" => {
+                        renamed
+                            && fs::read_to_string(temp.join("remote.git/refs/heads/shared"))
+                                .is_ok_and(|v| v.trim() == target)
+                    }
+                    "cas" => {
+                        renamed
+                            && fs::read_to_string(main.join(".git/refs/heads/topic"))
+                                .is_ok_and(|v| v.trim() == source)
+                    }
                     _ => panic!("unknown boundary"),
                 }
-            } else { false };
+            } else {
+                false
+            };
             if reached {
                 for task in &owned {
                     unsafe {
@@ -592,7 +623,16 @@ fn recovery_matrix_all_payload_kinds() {
             let before = f.driver.inspect_operation(&repo, ID).unwrap();
             assert_eq!(before["terminal"], false);
             if kind == "ConfigChange" {
-                let error = f.driver.reconcile_operation(&repo, vec![BorrowedHandle::new(&seal).unwrap()], WRITER, ID, None).unwrap_err();
+                let error = f
+                    .driver
+                    .reconcile_operation(
+                        &repo,
+                        vec![BorrowedHandle::new(&seal).unwrap()],
+                        WRITER,
+                        ID,
+                        None,
+                    )
+                    .unwrap_err();
                 assert_eq!(error.cause, "config-recovery-caller-loans-refused");
             }
             let own_first = if recovery_first {
@@ -643,7 +683,13 @@ fn recovery_matrix_all_payload_kinds() {
                     .unwrap();
             } else if kind == "Land" {
                 f.driver
-                    .acknowledge_land(&repo, WRITER, ID, "durable matrix consumer", &wal::OsFileSystem)
+                    .acknowledge_land(
+                        &repo,
+                        WRITER,
+                        ID,
+                        "durable matrix consumer",
+                        &wal::OsFileSystem,
+                    )
                     .unwrap();
             } else {
                 // The owning resource remains held while exercising WAL's existing
@@ -695,13 +741,11 @@ fn recovery_matrix_all_payload_kinds() {
                 terminal["outcome"],
                 "{kind}"
             );
-            assert!(
-                !f.driver.list_pending(&repo, 100).unwrap()["operations"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .any(|o| o["operationId"] == ID)
-            );
+            assert!(!f.driver.list_pending(&repo, 100).unwrap()["operations"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|o| o["operationId"] == ID));
             println!(
                 "{kind} (Recovery first={recovery_first}): SIGKILL -> pending/inspect -> reconcile/own-port -> compact/digest/receipt"
             );
@@ -711,15 +755,42 @@ fn recovery_matrix_all_payload_kinds() {
 
 #[test]
 fn ref_and_transfer_post_attempt_recovery() {
-    for (kind, boundary) in [("RefUpdate", "pin"), ("RefUpdate", "attempt"), ("RefUpdate", "cas"), ("RemoteTransfer", "attempt"), ("RemoteTransfer", "transfer-effect")] {
+    for (kind, boundary) in [
+        ("RefUpdate", "pin"),
+        ("RefUpdate", "attempt"),
+        ("RefUpdate", "cas"),
+        ("RemoteTransfer", "attempt"),
+        ("RemoteTransfer", "transfer-effect"),
+    ] {
         let f = Fixture::new();
-        git(&f.main, &["update-ref", "refs/heads/topic", &f.request.target]);
+        git(
+            &f.main,
+            &["update-ref", "refs/heads/topic", &f.request.target],
+        );
         if kind == "RemoteTransfer" {
-            git(&f.main, &["init", "-q", "--bare", f.temp.join("remote.git").to_str().unwrap()]);
-            git(&f.main, &["remote", "add", "origin", f.temp.join("remote.git").to_str().unwrap()]);
+            git(
+                &f.main,
+                &[
+                    "init",
+                    "-q",
+                    "--bare",
+                    f.temp.join("remote.git").to_str().unwrap(),
+                ],
+            );
+            git(
+                &f.main,
+                &[
+                    "remote",
+                    "add",
+                    "origin",
+                    f.temp.join("remote.git").to_str().unwrap(),
+                ],
+            );
         }
         interrupt_at(&f, kind, boundary);
-        let result = f.driver.reconcile_operation(&f.repo, vec![], WRITER, ID, None);
+        let result = f
+            .driver
+            .reconcile_operation(&f.repo, vec![], WRITER, ID, None);
         if boundary == "attempt" && kind == "RefUpdate" {
             assert!(result.unwrap_err().cause.contains("ref-effect-unknown"));
         } else {
@@ -727,17 +798,44 @@ fn ref_and_transfer_post_attempt_recovery() {
             if kind == "RemoteTransfer" {
                 assert_eq!(outcome["unknown"], true);
                 assert_eq!(outcome["acknowledged"], false);
-                assert_eq!(f.temp.join("remote.git/refs/heads/shared").exists(), boundary == "transfer-effect");
-                assert_eq!(f.driver.reconcile_operation(&f.repo, vec![], WRITER, ID, None).unwrap(), outcome);
+                assert_eq!(
+                    f.temp.join("remote.git/refs/heads/shared").exists(),
+                    boundary == "transfer-effect"
+                );
+                assert_eq!(
+                    f.driver
+                        .reconcile_operation(&f.repo, vec![], WRITER, ID, None)
+                        .unwrap(),
+                    outcome
+                );
             } else {
-                assert_eq!(outcome["kind"], if boundary == "pin" { "abandonedBeforeAttempt" } else { "success" });
-                if boundary == "cas" { assert_eq!(outcome["attribution"], "effectObservedOnly"); }
-                let replay = f.driver.recover_ref_operation(&f.repo, vec![], WRITER, ID).unwrap();
+                assert_eq!(
+                    outcome["kind"],
+                    if boundary == "pin" {
+                        "abandonedBeforeAttempt"
+                    } else {
+                        "success"
+                    }
+                );
+                if boundary == "cas" {
+                    assert_eq!(outcome["attribution"], "effectObservedOnly");
+                }
+                let replay = f
+                    .driver
+                    .recover_ref_operation(&f.repo, vec![], WRITER, ID)
+                    .unwrap();
                 assert_eq!(serde_json::to_value(replay).unwrap(), outcome);
-                assert!(!f.main.join(format!(".git/refs/fgos/git-operations/{ID}/candidate")).exists());
+                assert!(!f
+                    .main
+                    .join(format!(".git/refs/fgos/git-operations/{ID}/candidate"))
+                    .exists());
                 let wal = wal::Wal::open(&f.repo).unwrap();
-                let admin = CompactAuthority(locked("worktree-admin", f.main.join(".fgos/locks/worktree-admin.lock")));
-                wal.compact(&wal.inspect(ID).unwrap(), &Reader(&f.main), &admin).unwrap();
+                let admin = CompactAuthority(locked(
+                    "worktree-admin",
+                    f.main.join(".fgos/locks/worktree-admin.lock"),
+                ));
+                wal.compact(&wal.inspect(ID).unwrap(), &Reader(&f.main), &admin)
+                    .unwrap();
             }
         }
     }
@@ -747,21 +845,62 @@ fn ref_and_transfer_post_attempt_recovery() {
 fn ref_checkout_recovery_requires_quiescent_clean_custody_and_no_native_lock() {
     let f = Fixture::new();
     let tree = f.temp.join("producer");
-    git(&f.main, &["worktree", "add", "-qb", "topic", tree.to_str().unwrap(), &f.request.target]);
+    git(
+        &f.main,
+        &[
+            "worktree",
+            "add",
+            "-qb",
+            "topic",
+            tree.to_str().unwrap(),
+            &f.request.target,
+        ],
+    );
     interrupt_at(&f, "RefCheckout", "attempt");
-    let no_custody = f.driver.recover_ref_operation(&f.repo, vec![], WRITER, ID).unwrap_err();
+    let no_custody = f
+        .driver
+        .recover_ref_operation(&f.repo, vec![], WRITER, ID)
+        .unwrap_err();
     assert_eq!(no_custody.cause, "checkout-custody-required");
     let wrong = Some(custody(&f.main, &f.main));
-    assert_eq!(f.driver.recover_ref_operation(&f.repo, held(&wrong), WRITER, ID).unwrap_err().cause, "checkout-custody-mismatch");
+    assert_eq!(
+        f.driver
+            .recover_ref_operation(&f.repo, held(&wrong), WRITER, ID)
+            .unwrap_err()
+            .cause,
+        "checkout-custody-mismatch"
+    );
     drop(wrong);
     let lease = Some(custody(&f.main, &tree));
     fs::write(tree.join("b"), "dirty").unwrap();
-    assert_eq!(f.driver.recover_ref_operation(&f.repo, held(&lease), WRITER, ID).unwrap_err().cause, "ref-checkout-recovery-required");
+    assert_eq!(
+        f.driver
+            .recover_ref_operation(&f.repo, held(&lease), WRITER, ID)
+            .unwrap_err()
+            .cause,
+        "ref-checkout-recovery-required"
+    );
     fs::write(tree.join("b"), "base\n").unwrap();
     let native = f.main.join(".git/refs/heads/topic.lock");
     fs::write(&native, "foreign").unwrap();
-    assert_eq!(f.driver.recover_ref_operation(&f.repo, held(&lease), WRITER, ID).unwrap_err().cause, "ref-checkout-or-native-state-recovery-required");
+    assert_eq!(
+        f.driver
+            .recover_ref_operation(&f.repo, held(&lease), WRITER, ID)
+            .unwrap_err()
+            .cause,
+        "ref-checkout-or-native-state-recovery-required"
+    );
     fs::remove_file(&native).unwrap();
-    assert_eq!(f.driver.recover_ref_operation(&f.repo, held(&lease), WRITER, ID).unwrap_err().cause, "ref-effect-unknown");
-    assert!(!f.driver.inspect_operation(&f.repo, ID).unwrap()["terminal"].as_bool().unwrap());
+    assert_eq!(
+        f.driver
+            .recover_ref_operation(&f.repo, held(&lease), WRITER, ID)
+            .unwrap_err()
+            .cause,
+        "ref-effect-unknown"
+    );
+    assert!(
+        !f.driver.inspect_operation(&f.repo, ID).unwrap()["terminal"]
+            .as_bool()
+            .unwrap()
+    );
 }

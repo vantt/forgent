@@ -11,9 +11,13 @@ use std::time::{Duration, Instant};
 
 use fgos_holder_lock::HelperExe;
 use serde_json::{json, Value};
-use windows_sys::Win32::Foundation::{CloseHandle, GetLastError, ERROR_INVALID_PARAMETER, INVALID_HANDLE_VALUE, WAIT_OBJECT_0};
+use windows_sys::Win32::Foundation::{
+    CloseHandle, GetLastError, ERROR_INVALID_PARAMETER, INVALID_HANDLE_VALUE, WAIT_OBJECT_0,
+};
 use windows_sys::Win32::Storage::FileSystem::SYNCHRONIZE;
-use windows_sys::Win32::System::Diagnostics::ToolHelp::{CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W, TH32CS_SNAPPROCESS};
+use windows_sys::Win32::System::Diagnostics::ToolHelp::{
+    CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W, TH32CS_SNAPPROCESS,
+};
 use windows_sys::Win32::System::Threading::{OpenProcess, WaitForSingleObject};
 
 pub fn fgos() -> PathBuf {
@@ -28,12 +32,20 @@ pub fn helper() -> HelperExe {
 /// processes this test process started: they run one at a time.
 pub fn serial() -> std::sync::MutexGuard<'static, ()> {
     static SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
-    SERIAL.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+    SERIAL
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
 }
 
 pub fn temp_dir(tag: &str) -> PathBuf {
-    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
-    let dir = std::env::temp_dir().join(format!("fgos-win-borrow-{tag}-{}-{nanos}", std::process::id()));
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let dir = std::env::temp_dir().join(format!(
+        "fgos-win-borrow-{tag}-{}-{nanos}",
+        std::process::id()
+    ));
     fs::create_dir_all(&dir).unwrap();
     dir
 }
@@ -46,31 +58,38 @@ pub fn sh_path(path: &Path) -> String {
 pub fn wait_until(bound: Duration, what: &str, mut done: impl FnMut() -> bool) {
     let started = Instant::now();
     while !done() {
-        assert!(started.elapsed() < bound, "{what} did not happen within {bound:?}");
+        assert!(
+            started.elapsed() < bound,
+            "{what} did not happen within {bound:?}"
+        );
         std::thread::sleep(Duration::from_millis(5));
     }
 }
 
 pub fn wait_for_json(path: &Path, what: &str) -> Value {
     let mut found = None;
-    wait_until(Duration::from_secs(20), what, || match fs::read_to_string(path) {
-        Ok(text) => {
-            found = serde_json::from_str(&text).ok();
-            found.is_some()
+    wait_until(Duration::from_secs(20), what, || {
+        match fs::read_to_string(path) {
+            Ok(text) => {
+                found = serde_json::from_str(&text).ok();
+                found.is_some()
+            }
+            Err(_) => false,
         }
-        Err(_) => false,
     });
     found.unwrap()
 }
 
 pub fn wait_for_file(path: &Path, what: &str) -> String {
     let mut text = String::new();
-    wait_until(Duration::from_secs(20), what, || match fs::read_to_string(path) {
-        Ok(t) if !t.trim().is_empty() => {
-            text = t;
-            true
+    wait_until(Duration::from_secs(20), what, || {
+        match fs::read_to_string(path) {
+            Ok(t) if !t.trim().is_empty() => {
+                text = t;
+                true
+            }
+            _ => false,
         }
-        _ => false,
     });
     text
 }
@@ -112,8 +131,14 @@ pub fn children_of(parent: u32, exe: &str) -> Vec<u32> {
         entry.dwSize = std::mem::size_of::<PROCESSENTRY32W>() as u32;
         let mut more = Process32FirstW(snap, &mut entry) != 0;
         while more {
-            let len = entry.szExeFile.iter().position(|c| *c == 0).unwrap_or(entry.szExeFile.len());
-            if entry.th32ParentProcessID == me && String::from_utf16_lossy(&entry.szExeFile[..len]).eq_ignore_ascii_case(exe) {
+            let len = entry
+                .szExeFile
+                .iter()
+                .position(|c| *c == 0)
+                .unwrap_or(entry.szExeFile.len());
+            if entry.th32ParentProcessID == me
+                && String::from_utf16_lossy(&entry.szExeFile[..len]).eq_ignore_ascii_case(exe)
+            {
                 found.push(entry.th32ProcessID);
             }
             more = Process32NextW(snap, &mut entry) != 0;
@@ -138,19 +163,35 @@ impl Hold {
     }
 
     /// [`Hold::start`] with a chosen `fgos` executable.
-    pub fn start_with(exe: &Path, lock: &Path, work: &Path, kill_wait_ms: u64) -> Result<Hold, Value> {
+    pub fn start_with(
+        exe: &Path,
+        lock: &Path,
+        work: &Path,
+        kill_wait_ms: u64,
+    ) -> Result<Hold, Value> {
         fs::create_dir_all(work).unwrap();
         let child = Command::new(exe)
             .args(["internal", "lock-hold", "--protocol", "2", "--path"])
             .arg(lock)
-            .args(["--mode", "ex", "--try", "--kill-wait-ms", &kill_wait_ms.to_string(), "--work"])
+            .args([
+                "--mode",
+                "ex",
+                "--try",
+                "--kill-wait-ms",
+                &kill_wait_ms.to_string(),
+                "--work",
+            ])
             .arg(work)
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
             .unwrap();
-        let mut hold = Hold { child, work: work.to_path_buf(), next: 0 };
+        let mut hold = Hold {
+            child,
+            work: work.to_path_buf(),
+            next: 0,
+        };
         let ready = wait_for_json(&work.join("ready.json"), "ready.json");
         if ready["result"] == "acquired" {
             Ok(hold)
@@ -175,7 +216,9 @@ impl Hold {
     }
 
     pub fn started_pid(&self, n: u64) -> u32 {
-        wait_for_json(&self.work.join(format!("started-{n}.json")), "started file")["pid"].as_u64().unwrap() as u32
+        wait_for_json(&self.work.join(format!("started-{n}.json")), "started file")["pid"]
+            .as_u64()
+            .unwrap() as u32
     }
 
     pub fn result(&self, n: u64) -> Value {
@@ -197,5 +240,9 @@ impl Drop for Hold {
 
 /// The pids a pid file lists, one per line.
 pub fn pids_in(path: &Path) -> Vec<u32> {
-    fs::read_to_string(path).unwrap_or_default().lines().filter_map(|l| l.trim().parse().ok()).collect()
+    fs::read_to_string(path)
+        .unwrap_or_default()
+        .lines()
+        .filter_map(|l| l.trim().parse().ok())
+        .collect()
 }

@@ -166,13 +166,25 @@ impl Cell {
                     if model.trim().is_empty() {
                         return Err("a cell model must not be empty".to_string());
                     }
-                    Ok(CellEntry { model, pool, effort: None })
+                    Ok(CellEntry {
+                        model,
+                        pool,
+                        effort: None,
+                    })
                 }
-                CellEntrySpec::Object { model, pool, effort } => {
+                CellEntrySpec::Object {
+                    model,
+                    pool,
+                    effort,
+                } => {
                     if model.trim().is_empty() {
                         return Err("a cell model must not be empty".to_string());
                     }
-                    Ok(CellEntry { model: model.clone(), pool: pool.clone(), effort: *effort })
+                    Ok(CellEntry {
+                        model: model.clone(),
+                        pool: pool.clone(),
+                        effort: *effort,
+                    })
                 }
             })
             .collect()
@@ -242,7 +254,9 @@ pub struct Defaults {
 
 impl Default for Defaults {
     fn default() -> Self {
-        Defaults { tier: default_tier() }
+        Defaults {
+            tier: default_tier(),
+        }
     }
 }
 

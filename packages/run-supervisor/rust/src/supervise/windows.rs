@@ -18,7 +18,9 @@ use std::sync::mpsc;
 use std::time::{Duration, Instant};
 
 use fgos_holder_lock::{acquire, Acquire, Handle, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
-use fgos_process::containment::{select, ContainmentDomain, ContainmentDriver, SelectEnv, SpawnSpec, StartMode, WindowsJobDriver};
+use fgos_process::containment::{
+    select, ContainmentDomain, ContainmentDriver, SelectEnv, SpawnSpec, StartMode, WindowsJobDriver,
+};
 use fgos_process::{facts, Domain};
 use serde_json::Value;
 use windows_sys::Win32::System::Pipes::PeekNamedPipe;
@@ -41,14 +43,23 @@ pub(super) struct Locks {
 impl Locks {
     /// Nothing is inherited on Windows: the locks are taken once the envelope names them.
     pub(super) fn early() -> Result<Locks, Refusal> {
-        Ok(Locks { attempt: None, cwd_lease: None, lease_path: None, lease_owner: None })
+        Ok(Locks {
+            attempt: None,
+            cwd_lease: None,
+            lease_path: None,
+            lease_owner: None,
+        })
     }
 
     pub(super) fn complete(&mut self, envelope: &Value, run_dir: &Path) -> Result<(), Refusal> {
         self.attempt = Some(take("attempt", &run_dir.join("attempt.lock"))?);
         if envelope["mutation"] == "mutating" {
             let Some(lease) = envelope["cwdLeaseFile"].as_str() else {
-                return Err(Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why: "a mutating attempt needs cwdLeaseFile on Windows".into() });
+                return Err(Refusal {
+                    exit: EXIT_ENVELOPE_INVALID,
+                    code: "envelope-invalid",
+                    why: "a mutating attempt needs cwdLeaseFile on Windows".into(),
+                });
             };
             if let Some(owner) = envelope["cwdLeaseOwner"].as_str() {
                 self.lease_owner = Some(PathBuf::from(owner));
@@ -68,7 +79,10 @@ impl Locks {
             return declare_via_holder(owner, record);
         }
         match &self.lease_path {
-            Some(path) => fgos_holder_lock::predecessor::declare(&fgos_holder_lock::predecessor::record_path(path), record),
+            Some(path) => fgos_holder_lock::predecessor::declare(
+                &fgos_holder_lock::predecessor::record_path(path),
+                record,
+            ),
             None => Ok(()),
         }
     }
@@ -81,20 +95,28 @@ impl Locks {
 /// Reuse the lock-hold helper's request/answer channel. Only a helper still
 /// holding the lease can answer; parent death before this point refuses GO.
 fn declare_via_holder(owner: &Path, domain: &Domain) -> io::Result<()> {
-    let n = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_err(io::Error::other)?.as_nanos();
+    let n = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(io::Error::other)?
+        .as_nanos();
     let n = u64::try_from(n).map_err(io::Error::other)?;
     let mut record = fgos_holder_lock::predecessor::domain_json(domain);
     record["v"] = serde_json::json!(1);
     let target = owner.join(format!("req-{n}.json"));
     let temporary = owner.join(format!("req-{n}.json.tmp"));
-    std::fs::write(&temporary, serde_json::json!({ "op": "declare-domain", "domain": record }).to_string())?;
+    std::fs::write(
+        &temporary,
+        serde_json::json!({ "op": "declare-domain", "domain": record }).to_string(),
+    )?;
     std::fs::rename(&temporary, &target)?;
     let result = owner.join(format!("result-{n}.json"));
     let until = Instant::now() + Duration::from_secs(5);
     let answer = loop {
         match std::fs::read(&result) {
             Ok(bytes) => break serde_json::from_slice::<Value>(&bytes).map_err(io::Error::other),
-            Err(err) if err.kind() == io::ErrorKind::NotFound && Instant::now() < until => std::thread::sleep(Duration::from_millis(5)),
+            Err(err) if err.kind() == io::ErrorKind::NotFound && Instant::now() < until => {
+                std::thread::sleep(Duration::from_millis(5))
+            }
             Err(err) => break Err(err),
         }
     };
@@ -102,16 +124,35 @@ fn declare_via_holder(owner: &Path, domain: &Domain) -> io::Result<()> {
     let _ = std::fs::remove_file(result);
     match answer? {
         value if value["result"] == "declared" => Ok(()),
-        value => Err(io::Error::other(format!("custody-domain-required: lease holder refused declaration: {value}"))),
+        value => Err(io::Error::other(format!(
+            "custody-domain-required: lease holder refused declaration: {value}"
+        ))),
     }
 }
 
 fn take(name: &str, path: &Path) -> Result<Handle, Refusal> {
-    match acquire(&Resource::new(name, path), Mode::Ex, Wait::Ms(LOCK_WAIT_MS), DEFAULT_KILL_WAIT_MS) {
+    match acquire(
+        &Resource::new(name, path),
+        Mode::Ex,
+        Wait::Ms(LOCK_WAIT_MS),
+        DEFAULT_KILL_WAIT_MS,
+    ) {
         Acquire::Acquired(handle) => Ok(handle),
-        Acquire::Held { reason, .. } => Err(Refusal { exit: EXIT_INTERNAL, code: "lock-held", why: format!("{name}: {}", reason.as_str()) }),
-        Acquire::Timeout { waited_ms } => Err(Refusal { exit: EXIT_INTERNAL, code: "lock-held", why: format!("{name}: still held after {waited_ms} ms") }),
-        Acquire::Unavailable { reason, detail } => Err(Refusal { exit: EXIT_INTERNAL, code: "lock-unavailable", why: format!("{name}: {}: {detail}", reason.as_str()) }),
+        Acquire::Held { reason, .. } => Err(Refusal {
+            exit: EXIT_INTERNAL,
+            code: "lock-held",
+            why: format!("{name}: {}", reason.as_str()),
+        }),
+        Acquire::Timeout { waited_ms } => Err(Refusal {
+            exit: EXIT_INTERNAL,
+            code: "lock-held",
+            why: format!("{name}: still held after {waited_ms} ms"),
+        }),
+        Acquire::Unavailable { reason, detail } => Err(Refusal {
+            exit: EXIT_INTERNAL,
+            code: "lock-unavailable",
+            why: format!("{name}: {}: {detail}", reason.as_str()),
+        }),
     }
 }
 
@@ -124,12 +165,18 @@ pub(super) struct GoLink {
 
 impl GoLink {
     pub(super) fn new(domain: &ContainmentDomain) -> Result<GoLink, String> {
-        let job_name = WindowsJobDriver::job_name(domain).ok_or("the domain has no job")?.to_string();
+        let job_name = WindowsJobDriver::job_name(domain)
+            .ok_or("the domain has no job")?
+            .to_string();
         // The job's own name carries the unguessable token; the pipe reuses it.
         let suffix = job_name.rsplit('\\').next().unwrap_or(&job_name);
         let path = format!(r"\\.\pipe\fgos-go-{suffix}");
         let server = go_pipe::listen(&path).map_err(|e| format!("GO pipe {path}: {e}"))?;
-        Ok(GoLink { server: Some(server), path, job_name })
+        Ok(GoLink {
+            server: Some(server),
+            path,
+            job_name,
+        })
     }
 
     /// Wait for the gate to connect: bounded, and a gate that left first ends the wait.
@@ -164,7 +211,16 @@ impl Go {
         loop {
             let mut available = 0u32;
             // SAFETY: a peek into the pipe handle this value owns; only the available-byte count is asked for.
-            let ok = unsafe { PeekNamedPipe(self.0.as_raw_handle() as _, std::ptr::null_mut(), 0, std::ptr::null_mut(), &mut available, std::ptr::null_mut()) };
+            let ok = unsafe {
+                PeekNamedPipe(
+                    self.0.as_raw_handle() as _,
+                    std::ptr::null_mut(),
+                    0,
+                    std::ptr::null_mut(),
+                    &mut available,
+                    std::ptr::null_mut(),
+                )
+            };
             // A broken pipe fails the peek: the read that follows reports it.
             if ok == 0 || available > 0 {
                 return true;
@@ -193,18 +249,34 @@ impl Write for Go {
 }
 
 pub(super) fn create_private(path: &Path) -> io::Result<File> {
-    OpenOptions::new().write(true).create(true).truncate(true).open(path)
+    OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(path)
 }
 
-pub(super) fn driver_for(preferred: &str, bwrap: Option<PathBuf>) -> Result<Box<dyn ContainmentDriver>, String> {
+pub(super) fn driver_for(
+    preferred: &str,
+    bwrap: Option<PathBuf>,
+) -> Result<Box<dyn ContainmentDriver>, String> {
     let driver = select(&SelectEnv { bwrap }).map_err(|e| e.to_string())?;
     if driver.name() != preferred {
-        return Err(format!("the envelope asks for {preferred} but this machine gives {}", driver.name()));
+        return Err(format!(
+            "the envelope asks for {preferred} but this machine gives {}",
+            driver.name()
+        ));
     }
     Ok(driver)
 }
 
-pub(super) fn gate_spec(envelope: &Value, run_dir: &Path, _locks: &Locks, link: &mut GoLink, _domain: &ContainmentDomain) -> Result<SpawnSpec, String> {
+pub(super) fn gate_spec(
+    envelope: &Value,
+    run_dir: &Path,
+    _locks: &Locks,
+    link: &mut GoLink,
+    _domain: &ContainmentDomain,
+) -> Result<SpawnSpec, String> {
     let host_bin = envelope["hostBin"].as_str().ok_or("hostBin missing")?;
     let argv = vec![
         host_bin.to_string(),
@@ -220,19 +292,40 @@ pub(super) fn gate_spec(envelope: &Value, run_dir: &Path, _locks: &Locks, link: 
         link.job_name.clone(),
     ];
     // The gate needs no environment of its own; the agent's comes from the envelope.
-    let env: BTreeMap<String, String> = ["SystemRoot"].iter().filter_map(|k| std::env::var(k).ok().map(|v| (k.to_string(), v))).collect();
-    let log = || OpenOptions::new().create(true).append(true).open(run_dir.join("supervisor.log")).map_err(|e| format!("supervisor.log: {e}"));
-    Ok(SpawnSpec { argv, bwrap_prefix: None, fd_map: vec![], env, cwd: envelope["cwd"].as_str().ok_or("cwd missing")?.into(), stdin: None, stdout: Some(log()?), stderr: Some(log()?), mode: StartMode::Direct })
+    let env: BTreeMap<String, String> = ["SystemRoot"]
+        .iter()
+        .filter_map(|k| std::env::var(k).ok().map(|v| (k.to_string(), v)))
+        .collect();
+    let log = || {
+        OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(run_dir.join("supervisor.log"))
+            .map_err(|e| format!("supervisor.log: {e}"))
+    };
+    Ok(SpawnSpec {
+        argv,
+        bwrap_prefix: None,
+        fd_map: vec![],
+        env,
+        cwd: envelope["cwd"].as_str().ok_or("cwd missing")?.into(),
+        stdin: None,
+        stdout: Some(log()?),
+        stderr: Some(log()?),
+        mode: StartMode::Direct,
+    })
 }
 
 /// The supervisor is the keeper of the job: it holds the handle `create` made and is never a member.
 pub(super) fn record_to_declare(domain: &Domain) -> Domain {
     match domain {
-        Domain::WindowsJob(job) => Domain::WindowsJob(fgos_process::WindowsJob { keeper: facts::self_identity(), ..job.clone() }),
+        Domain::WindowsJob(job) => Domain::WindowsJob(fgos_process::WindowsJob {
+            keeper: facts::self_identity(),
+            ..job.clone()
+        }),
         other => other.clone(),
     }
 }
 
 /// Windows has no signal to send: the gate polls `stop-requested.json`.
 pub(super) fn nudge_gate(_gate: &facts::ProcTuple) {}
-

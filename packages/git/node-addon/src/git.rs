@@ -1,10 +1,10 @@
 //! Opaque repository and seal authority stay in Rust for their entire lifetime.
 mod config;
+mod land;
 mod recovery;
+mod restore;
 mod scoped_commit;
 mod sync;
-mod land;
-mod restore;
 mod write_scope;
 #[allow(unused_imports)] // N-API registration is used by Node, not Rust unit tests.
 pub use write_scope::write_scope;

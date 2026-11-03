@@ -32,7 +32,13 @@ pub struct MemPane {
 }
 
 impl MemPane {
-    pub fn new(pane_id: &str, tab: String, rect: Rect, info: ProcessInfo, env: Vec<(String, String)>) -> Self {
+    pub fn new(
+        pane_id: &str,
+        tab: String,
+        rect: Rect,
+        info: ProcessInfo,
+        env: Vec<(String, String)>,
+    ) -> Self {
         MemPane {
             tab,
             rect,
@@ -63,10 +69,12 @@ impl MemPane {
                     }
                 }
                 ShellScript::LineModeRead => {
-                    self.screen.push_str(&format!("\nread: consumed line (nonce {nonce})\n"));
+                    self.screen
+                        .push_str(&format!("\nread: consumed line (nonce {nonce})\n"));
                 }
                 ShellScript::EchoOnly => {
-                    self.screen.push_str(&format!("\nprintf '%s%s\\n' fgos-ok- {nonce}\n"));
+                    self.screen
+                        .push_str(&format!("\nprintf '%s%s\\n' fgos-ok- {nonce}\n"));
                 }
             }
         } else {
@@ -102,7 +110,12 @@ impl MemDriver {
     pub fn with_caps(cols: u32, rows: u32, caps: Vec<&'static str>) -> Self {
         MemDriver {
             caps,
-            area: Rect { x: 0, y: 0, width: cols, height: rows },
+            area: Rect {
+                x: 0,
+                y: 0,
+                width: cols,
+                height: rows,
+            },
             panes: RefCell::new(BTreeMap::new()),
             tabs: RefCell::new(Vec::new()),
             log: RefCell::new(Vec::new()),
@@ -120,7 +133,12 @@ impl MemDriver {
     }
 
     pub fn calls(&self, prefix: &str) -> Vec<String> {
-        self.log.borrow().iter().filter(|l| l.starts_with(prefix)).cloned().collect()
+        self.log
+            .borrow()
+            .iter()
+            .filter(|l| l.starts_with(prefix))
+            .cloned()
+            .collect()
     }
 
     /// The pane vanishes (the user closed it).
@@ -140,9 +158,18 @@ impl MemDriver {
         self.incarnation_pid.set(self.incarnation_pid.get() + 1);
     }
 
-    pub fn set_foreground(&self, pane: &str, shell_pid: u32, foreground: Vec<ForegroundProcess>, pgid: u32) {
-        self.panes.borrow_mut().get_mut(pane).unwrap().info =
-            ProcessInfo { shell_pid, foreground_pgid: pgid, foreground };
+    pub fn set_foreground(
+        &self,
+        pane: &str,
+        shell_pid: u32,
+        foreground: Vec<ForegroundProcess>,
+        pgid: u32,
+    ) {
+        self.panes.borrow_mut().get_mut(pane).unwrap().info = ProcessInfo {
+            shell_pid,
+            foreground_pgid: pgid,
+            foreground,
+        };
     }
     pub fn set_script(&self, pane: &str, script: ShellScript) {
         let mut panes = self.panes.borrow_mut();
@@ -158,7 +185,13 @@ impl MemDriver {
         }
     }
 
-    pub fn set_launch_foreground(&self, pane: &str, shell_pid: u32, foreground: Vec<ForegroundProcess>, pgid: u32) {
+    pub fn set_launch_foreground(
+        &self,
+        pane: &str,
+        shell_pid: u32,
+        foreground: Vec<ForegroundProcess>,
+        pgid: u32,
+    ) {
         let mut panes = self.panes.borrow_mut();
         if let Some(p) = panes.get_mut(pane) {
             p.on_launch_foreground = Some(ProcessInfo {
@@ -191,19 +224,32 @@ impl MemDriver {
 /// Make the test process the shell of `pane`: the caller of a core built in a test runs in it.
 pub fn run_caller_in(driver: &MemDriver, pane: &str) {
     let me = std::process::id();
-    driver.set_foreground(pane, me, vec![ForegroundProcess { pid: me, argv: vec!["bash".into()] }], me);
+    driver.set_foreground(
+        pane,
+        me,
+        vec![ForegroundProcess {
+            pid: me,
+            argv: vec!["bash".into()],
+        }],
+        me,
+    );
 }
 
 pub fn bare(shell: u32) -> ProcessInfo {
     ProcessInfo {
         shell_pid: shell,
         foreground_pgid: shell,
-        foreground: vec![ForegroundProcess { pid: shell, argv: vec!["bash".into()] }],
+        foreground: vec![ForegroundProcess {
+            pid: shell,
+            argv: vec!["bash".into()],
+        }],
     }
 }
 
 fn unknown(reason: &str) -> Refusal {
-    Refusal::Unknown { reason: reason.into() }
+    Refusal::Unknown {
+        reason: reason.into(),
+    }
 }
 
 impl TerminalDriver for MemDriver {
@@ -216,25 +262,71 @@ impl TerminalDriver for MemDriver {
     fn server_incarnation(&self) -> DriverResult<ServerIncarnation> {
         Ok(self.current())
     }
-    fn tab_create(&self, label: &str, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
+    fn tab_create(
+        &self,
+        label: &str,
+        cwd: Option<&str>,
+        env: &[(String, String)],
+    ) -> DriverResult<CreatedPane> {
         let tab = self.id("t");
         let pane = self.id("p");
-        self.log.borrow_mut().push(format!("tab.create {label} cwd={} env={} -> {tab}/{pane}", cwd.unwrap_or("-"), env.len()));
-        self.tabs.borrow_mut().push((tab.clone(), label.to_string()));
-        self.panes.borrow_mut().insert(pane.clone(), MemPane::new(&pane, tab.clone(), self.area, bare(900), env.to_vec()));
-        Ok(CreatedPane { tab_id: tab, pane_id: pane })
+        self.log.borrow_mut().push(format!(
+            "tab.create {label} cwd={} env={} -> {tab}/{pane}",
+            cwd.unwrap_or("-"),
+            env.len()
+        ));
+        self.tabs
+            .borrow_mut()
+            .push((tab.clone(), label.to_string()));
+        self.panes.borrow_mut().insert(
+            pane.clone(),
+            MemPane::new(&pane, tab.clone(), self.area, bare(900), env.to_vec()),
+        );
+        Ok(CreatedPane {
+            tab_id: tab,
+            pane_id: pane,
+        })
     }
-    fn pane_split(&self, anchor: &str, direction: Direction, ratio: f64, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
+    fn pane_split(
+        &self,
+        anchor: &str,
+        direction: Direction,
+        ratio: f64,
+        cwd: Option<&str>,
+        env: &[(String, String)],
+    ) -> DriverResult<CreatedPane> {
         let mut panes = self.panes.borrow_mut();
-        let Some(a) = panes.get_mut(anchor) else { return Err(unknown("pane_not_found")) };
+        let Some(a) = panes.get_mut(anchor) else {
+            return Err(unknown("pane_not_found"));
+        };
         let (kept, new_rect) = match direction {
             Direction::Right => {
                 let kept = (f64::from(a.rect.width) * ratio).round() as u32;
-                (Rect { width: kept, ..a.rect }, Rect { x: a.rect.x + kept, width: a.rect.width - kept, ..a.rect })
+                (
+                    Rect {
+                        width: kept,
+                        ..a.rect
+                    },
+                    Rect {
+                        x: a.rect.x + kept,
+                        width: a.rect.width - kept,
+                        ..a.rect
+                    },
+                )
             }
             Direction::Down => {
                 let kept = (f64::from(a.rect.height) * ratio).round() as u32;
-                (Rect { height: kept, ..a.rect }, Rect { y: a.rect.y + kept, height: a.rect.height - kept, ..a.rect })
+                (
+                    Rect {
+                        height: kept,
+                        ..a.rect
+                    },
+                    Rect {
+                        y: a.rect.y + kept,
+                        height: a.rect.height - kept,
+                        ..a.rect
+                    },
+                )
             }
         };
         a.rect = kept;
@@ -246,30 +338,50 @@ impl TerminalDriver for MemDriver {
             cwd.unwrap_or("-"),
             env.len()
         ));
-        self.panes.borrow_mut().insert(pane.clone(), MemPane::new(&pane, tab.clone(), new_rect, bare(901), env.to_vec()));
-        Ok(CreatedPane { tab_id: tab, pane_id: pane })
+        self.panes.borrow_mut().insert(
+            pane.clone(),
+            MemPane::new(&pane, tab.clone(), new_rect, bare(901), env.to_vec()),
+        );
+        Ok(CreatedPane {
+            tab_id: tab,
+            pane_id: pane,
+        })
     }
     fn pane_close(&self, pane: &str, expected: &ServerIncarnation) -> DriverResult<CloseOutcome> {
         if *expected != self.current() {
-            self.log.borrow_mut().push(format!("pane.close-refused {pane}"));
+            self.log
+                .borrow_mut()
+                .push(format!("pane.close-refused {pane}"));
             return Err(unknown("server incarnation changed"));
         }
         self.log.borrow_mut().push(format!("pane.close {pane}"));
         let removed = self.panes.borrow_mut().remove(pane);
-        let Some(removed) = removed else { return Ok(CloseOutcome::AlreadyGone) };
+        let Some(removed) = removed else {
+            return Ok(CloseOutcome::AlreadyGone);
+        };
         // A lone remaining pane takes the whole tab back, as a multiplexer does.
         let mut panes = self.panes.borrow_mut();
-        let rest: Vec<String> = panes.iter().filter(|(_, p)| p.tab == removed.tab).map(|(id, _)| id.clone()).collect();
+        let rest: Vec<String> = panes
+            .iter()
+            .filter(|(_, p)| p.tab == removed.tab)
+            .map(|(id, _)| id.clone())
+            .collect();
         if let [only] = rest.as_slice() {
             panes.get_mut(only).unwrap().rect = self.area;
         }
         Ok(CloseOutcome::Closed)
     }
     fn pane_liveness(&self, pane: &str) -> DriverResult<PaneLiveness> {
-        Ok(if self.panes.borrow().contains_key(pane) { PaneLiveness::Live } else { PaneLiveness::Gone })
+        Ok(if self.panes.borrow().contains_key(pane) {
+            PaneLiveness::Live
+        } else {
+            PaneLiveness::Gone
+        })
     }
     fn pane_run(&self, pane: &str, command_line: &str) -> DriverResult<()> {
-        self.log.borrow_mut().push(format!("pane.run {pane} {command_line}"));
+        self.log
+            .borrow_mut()
+            .push(format!("pane.run {pane} {command_line}"));
         let mut panes = self.panes.borrow_mut();
         if let Some(p) = panes.get_mut(pane) {
             p.handle_pane_run(command_line);
@@ -277,14 +389,23 @@ impl TerminalDriver for MemDriver {
         Ok(())
     }
     fn send_text(&self, pane: &str, text: &str, submit: bool) -> DriverResult<()> {
-        self.log.borrow_mut().push(format!("send.text {pane} {text} {submit}"));
+        self.log
+            .borrow_mut()
+            .push(format!("send.text {pane} {text} {submit}"));
         Ok(())
     }
     fn send_keys(&self, pane: &str, keys: &[String]) -> DriverResult<()> {
-        self.log.borrow_mut().push(format!("send.keys {pane} {}", keys.join(",")));
+        self.log
+            .borrow_mut()
+            .push(format!("send.keys {pane} {}", keys.join(",")));
         Ok(())
     }
-    fn read_screen(&self, pane: &str, _lines: Option<u32>, _source: Option<&str>) -> DriverResult<String> {
+    fn read_screen(
+        &self,
+        pane: &str,
+        _lines: Option<u32>,
+        _source: Option<&str>,
+    ) -> DriverResult<String> {
         let mut panes = self.panes.borrow_mut();
         if let Some(p) = panes.get_mut(pane) {
             Ok(p.screen.clone())
@@ -297,13 +418,22 @@ impl TerminalDriver for MemDriver {
             self.vanish_on_process_info.borrow_mut().take();
             self.kill_pane(pane);
         }
-        self.panes.borrow().get(pane).map(|p| p.info.clone()).ok_or_else(|| unknown("pane_not_found"))
+        self.panes
+            .borrow()
+            .get(pane)
+            .map(|p| p.info.clone())
+            .ok_or_else(|| unknown("pane_not_found"))
     }
     fn activity(&self, _pane: &str) -> DriverResult<Activity> {
-        Ok(Activity { state: "idle".into(), ..Default::default() })
+        Ok(Activity {
+            state: "idle".into(),
+            ..Default::default()
+        })
     }
     fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()> {
-        self.log.borrow_mut().push(format!("label.pane {pane} {label}"));
+        self.log
+            .borrow_mut()
+            .push(format!("label.pane {pane} {label}"));
         Ok(())
     }
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry> {
@@ -312,13 +442,24 @@ impl TerminalDriver for MemDriver {
             self.kill_pane(pane);
         }
         let panes = self.panes.borrow();
-        let tab = panes.get(pane).ok_or_else(|| unknown("pane_not_found"))?.tab.clone();
+        let tab = panes
+            .get(pane)
+            .ok_or_else(|| unknown("pane_not_found"))?
+            .tab
+            .clone();
         let members = panes
             .iter()
             .filter(|(_, p)| p.tab == tab)
-            .map(|(id, p)| PaneGeometry { pane_id: id.clone(), rect: p.rect })
+            .map(|(id, p)| PaneGeometry {
+                pane_id: id.clone(),
+                rect: p.rect,
+            })
             .collect();
-        Ok(TabGeometry { tab_id: tab, area: self.area, panes: members })
+        Ok(TabGeometry {
+            tab_id: tab,
+            area: self.area,
+            panes: members,
+        })
     }
 }
 
@@ -332,7 +473,11 @@ pub fn state_dir(name: &str) -> PathBuf {
 pub fn config(state_root: PathBuf) -> CoreConfig {
     CoreConfig {
         state_root,
-        limits: Limits { min_cols: 60, min_rows: 15, max_panes_per_tab: 4 },
+        limits: Limits {
+            min_cols: 60,
+            min_rows: 15,
+            max_panes_per_tab: 4,
+        },
         allocation_grace_ms: 60_000,
         launch_identify_timeout_ms: 500,
         shell_ready_timeout_ms: 500,
@@ -347,7 +492,10 @@ pub fn request(key: &str, group: &str) -> AllocateRequest {
     AllocateRequest {
         key: key.into(),
         group_key: group.into(),
-        display: Display { title: Some(format!("label-{group}")), ..Display::default() },
+        display: Display {
+            title: Some(format!("label-{group}")),
+            ..Display::default()
+        },
         group_size: None,
         cwd: None,
         env: Default::default(),

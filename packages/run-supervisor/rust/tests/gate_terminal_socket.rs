@@ -11,22 +11,31 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use fgos_run_supervisor::gate::EXIT_NO_GO;
-use fgos_run_supervisor::route::EXIT_ENVELOPE_INVALID;
 use fgos_run_supervisor::go_channel::read_frame;
+use fgos_run_supervisor::route::EXIT_ENVELOPE_INVALID;
 use support::terminal::*;
 use support::*;
 
 const LIMIT: Duration = Duration::from_secs(15);
 
 fn marker(name: &str) -> PathBuf {
-    let path = std::env::temp_dir().join(format!("fgos-gate-terminal-marker-{name}-{}", std::process::id()));
+    let path = std::env::temp_dir().join(format!(
+        "fgos-gate-terminal-marker-{name}-{}",
+        std::process::id()
+    ));
     let _ = fs::remove_file(&path);
     path
 }
 
 fn run_marker(name: &str) -> (Options, PathBuf) {
     let path = marker(name);
-    (Options::new("/bin/sh", &["-c", &format!("echo ran > {}", path.display())]), path)
+    (
+        Options::new(
+            "/bin/sh",
+            &["-c", &format!("echo ran > {}", path.display())],
+        ),
+        path,
+    )
 }
 
 #[test]
@@ -90,10 +99,17 @@ fn the_lock_rides_on_go_and_outlives_the_supervisor_until_the_gate_exits() {
     let mut stream = handshake(&listener, &attempt, &[lock.as_raw_fd()]);
     assert_eq!(read_frame(&mut stream).expect("AGENT")["type"], "AGENT");
     // The supervisor has briefed the agent and goes away for good: its description closes and the connection drops.
-    fgos_run_supervisor::go_channel::write_frame(&mut stream, &serde_json::json!({"type": "BRIEF_DELIVERED"})).unwrap();
+    fgos_run_supervisor::go_channel::write_frame(
+        &mut stream,
+        &serde_json::json!({"type": "BRIEF_DELIVERED"}),
+    )
+    .unwrap();
     drop(lock);
     drop(stream);
-    assert!(!stranger_can_lock(&lock_path), "the gate still holds the description while the agent runs");
+    assert!(
+        !stranger_can_lock(&lock_path),
+        "the gate still holds the description while the agent runs"
+    );
     assert_eq!(pane.wait_exit(LIMIT), 0);
     assert_eq!(attempt.gate_exit().unwrap()["stoppedBy"], "agent");
     assert!(stranger_can_lock(&lock_path), "free once the gate is gone");
@@ -140,16 +156,38 @@ fn the_agent_sees_the_launch_environment_identity_and_nothing_of_the_pane_sessio
     let (attempt, socket) = terminal_attempt("env", &options, 0, false);
     let lock = locked_file(&attempt.dir.join("attempt.lock"));
     let listener = listen(&socket);
-    let mut pane = start_in_pane(&attempt, &socket, true, &[("CLAUDE_CODE_SESSION_ID", "parent-session"), ("FGOS_SESSION_ID", "stale-writer"), ("FGOS_PARENT_WRITER_ID", "stale-parent")]);
+    let mut pane = start_in_pane(
+        &attempt,
+        &socket,
+        true,
+        &[
+            ("CLAUDE_CODE_SESSION_ID", "parent-session"),
+            ("FGOS_SESSION_ID", "stale-writer"),
+            ("FGOS_PARENT_WRITER_ID", "stale-parent"),
+        ],
+    );
     let mut stream = handshake(&listener, &attempt, &[lock.as_raw_fd()]);
     assert_eq!(read_frame(&mut stream).expect("AGENT")["type"], "AGENT");
     assert_eq!(pane.wait_exit(LIMIT), 0);
     let env = fs::read_to_string(&out).unwrap();
-    assert!(env.lines().any(|l| l == "FGOS_SESSION_ID=att-w-env"), "{env}");
-    assert!(env.lines().any(|l| l == "FGOS_PARENT_WRITER_ID=parent-writer"), "{env}");
-    assert!(env.lines().any(|l| l.starts_with("FGOS_PIDNS_ANCHOR={")), "{env}");
+    assert!(
+        env.lines().any(|l| l == "FGOS_SESSION_ID=att-w-env"),
+        "{env}"
+    );
+    assert!(
+        env.lines()
+            .any(|l| l == "FGOS_PARENT_WRITER_ID=parent-writer"),
+        "{env}"
+    );
+    assert!(
+        env.lines().any(|l| l.starts_with("FGOS_PIDNS_ANCHOR={")),
+        "{env}"
+    );
     assert!(!env.contains("CLAUDE_CODE_SESSION_ID"), "{env}");
-    assert!(!env.contains("stale-writer") && !env.contains("stale-parent"), "{env}");
+    assert!(
+        !env.contains("stale-writer") && !env.contains("stale-parent"),
+        "{env}"
+    );
 }
 
 #[test]
@@ -162,15 +200,32 @@ fn the_agent_keeps_the_terminal_and_pane_variables_of_its_own_pane() {
     let (attempt, socket) = terminal_attempt("pane-env", &options, 0, false);
     let lock = locked_file(&attempt.dir.join("attempt.lock"));
     let listener = listen(&socket);
-    let mut pane = start_in_pane(&attempt, &socket, true, &[("TERM", "xterm-256color"), ("HERDR_PANE_ID", "w1:p9"), ("HERDR_SOCKET_PATH", "/pane/herdr.sock"), ("HOME", "/pane-home")]);
+    let mut pane = start_in_pane(
+        &attempt,
+        &socket,
+        true,
+        &[
+            ("TERM", "xterm-256color"),
+            ("HERDR_PANE_ID", "w1:p9"),
+            ("HERDR_SOCKET_PATH", "/pane/herdr.sock"),
+            ("HOME", "/pane-home"),
+        ],
+    );
     let mut stream = handshake(&listener, &attempt, &[lock.as_raw_fd()]);
     assert_eq!(read_frame(&mut stream).expect("AGENT")["type"], "AGENT");
     assert_eq!(pane.wait_exit(LIMIT), 0);
     let env = fs::read_to_string(&out).unwrap();
     assert!(env.lines().any(|l| l == "TERM=xterm-256color"), "{env}");
     assert!(env.lines().any(|l| l == "HERDR_PANE_ID=w1:p9"), "{env}");
-    assert!(env.lines().any(|l| l == "HERDR_SOCKET_PATH=/pane/herdr.sock"), "{env}");
-    assert!(!env.lines().any(|l| l == "HOME=/pane-home"), "only the pane's own variables survive the clear: {env}");
+    assert!(
+        env.lines()
+            .any(|l| l == "HERDR_SOCKET_PATH=/pane/herdr.sock"),
+        "{env}"
+    );
+    assert!(
+        !env.lines().any(|l| l == "HOME=/pane-home"),
+        "only the pane's own variables survive the clear: {env}"
+    );
 }
 
 #[test]
@@ -179,10 +234,17 @@ fn neither_the_agent_nor_its_child_holds_a_lock_description() {
         return;
     }
     let (out_agent, out_child) = (marker("leak-agent"), marker("leak-child"));
-    let script = format!("ls -l /proc/self/fd > {}; sh -c 'ls -l /proc/self/fd > {}'", out_agent.display(), out_child.display());
+    let script = format!(
+        "ls -l /proc/self/fd > {}; sh -c 'ls -l /proc/self/fd > {}'",
+        out_agent.display(),
+        out_child.display()
+    );
     let options = Options::new("/bin/sh", &["-c", &script]);
     let (attempt, socket) = terminal_attempt("no-fd-leak", &options, 0, true);
-    let (lock_path, lease_path) = (attempt.dir.join("attempt.lock"), attempt.dir.join("cwd.lease"));
+    let (lock_path, lease_path) = (
+        attempt.dir.join("attempt.lock"),
+        attempt.dir.join("cwd.lease"),
+    );
     let (lock, lease) = (locked_file(&lock_path), locked_file(&lease_path));
     let listener = listen(&socket);
     let mut pane = start_in_pane(&attempt, &socket, true, &[]);
@@ -191,7 +253,10 @@ fn neither_the_agent_nor_its_child_holds_a_lock_description() {
     assert_eq!(pane.wait_exit(LIMIT), 0);
     for out in [&out_agent, &out_child] {
         let listing = fs::read_to_string(out).unwrap();
-        assert!(!listing.contains("attempt.lock") && !listing.contains("cwd.lease"), "{listing}");
+        assert!(
+            !listing.contains("attempt.lock") && !listing.contains("cwd.lease"),
+            "{listing}"
+        );
     }
 }
 
@@ -202,7 +267,13 @@ fn the_agent_group_is_the_foreground_group_of_the_pane_tty() {
     }
     // Fields 5 and 8 of /proc/self/stat: process group and foreground group of the controlling tty.
     let out = marker("foreground-out");
-    let options = Options::new("/bin/sh", &["-c", &format!("cut -d' ' -f5,8 /proc/self/stat > {}", out.display())]);
+    let options = Options::new(
+        "/bin/sh",
+        &[
+            "-c",
+            &format!("cut -d' ' -f5,8 /proc/self/stat > {}", out.display()),
+        ],
+    );
     let (attempt, socket) = terminal_attempt("foreground", &options, 0, false);
     let lock = locked_file(&attempt.dir.join("attempt.lock"));
     let listener = listen(&socket);
@@ -213,7 +284,11 @@ fn the_agent_group_is_the_foreground_group_of_the_pane_tty() {
     let text = fs::read_to_string(&out).unwrap();
     let fields: Vec<&str> = text.split_whitespace().collect();
     assert_eq!(fields.len(), 2, "{text}");
-    assert_eq!(fields[0], fields[1], "pgrp {} must be the tty's foreground group {}", fields[0], fields[1]);
+    assert_eq!(
+        fields[0], fields[1],
+        "pgrp {} must be the tty's foreground group {}",
+        fields[0], fields[1]
+    );
     assert_ne!(fields[1], "0");
 }
 
@@ -237,11 +312,19 @@ fn input_the_agent_never_read_is_dropped_before_the_pane_shell_reads_the_tty_aga
     assert_eq!(pane.wait_exit(LIMIT), 0);
 
     // The pane's shell takes the tty back and reads whatever is still queued on it.
-    let mut shell = std::process::Command::new("/bin/sh").stdin(tty).stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null()).spawn().unwrap();
+    let mut shell = std::process::Command::new("/bin/sh")
+        .stdin(tty)
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
     std::thread::sleep(Duration::from_millis(800));
     let _ = shell.kill();
     let _ = shell.wait();
-    assert!(!ran.exists(), "text typed for the agent ran in the pane's shell");
+    assert!(
+        !ran.exists(),
+        "text typed for the agent ran in the pane's shell"
+    );
 }
 
 #[test]
@@ -265,9 +348,14 @@ fn a_pane_without_a_controlling_tty_does_not_start_the_agent() {
 /// --as-pid-1 the gate owns its parent-death signal after bwrap's exec.
 #[test]
 fn killing_the_terminal_monitor_ends_the_gate_and_its_agent() {
-    if bwrap_driver("monitor-death").is_none() { return; }
+    if bwrap_driver("monitor-death").is_none() {
+        return;
+    }
     let beat = marker("monitor-death");
-    let script = format!("trap '' HUP; while :; do echo beat >> {}; sleep 0.02; done", beat.display());
+    let script = format!(
+        "trap '' HUP; while :; do echo beat >> {}; sleep 0.02; done",
+        beat.display()
+    );
     let options = Options::new("/bin/sh", &["-c", &script]);
     let (attempt, socket) = terminal_attempt("monitor-death", &options, 60_000, false);
     let lock = locked_file(&attempt.dir.join("attempt.lock"));
@@ -277,24 +365,47 @@ fn killing_the_terminal_monitor_ends_the_gate_and_its_agent() {
     struct Cleanup(fgos_process::facts::ProcTuple);
     impl Drop for Cleanup {
         fn drop(&mut self) {
-            let _ = fgos_process::control::signal_by_identity(&self.0, fgos_process::control::Signal::Kill);
+            let _ = fgos_process::control::signal_by_identity(
+                &self.0,
+                fgos_process::control::Signal::Kill,
+            );
         }
     }
     // The accepted socket's peer is the gate, expressed in our PID namespace.
     let mut cred: libc::ucred = unsafe { std::mem::zeroed() };
     let mut len = std::mem::size_of_val(&cred) as libc::socklen_t;
     // SAFETY: getsockopt writes a ucred into the correctly sized live buffer.
-    assert_eq!(unsafe { libc::getsockopt(stream.as_raw_fd(), libc::SOL_SOCKET,
-        libc::SO_PEERCRED, (&mut cred as *mut libc::ucred).cast(), &mut len) }, 0);
-    let _cleanup = Cleanup(fgos_process::facts::identity_of(fgos_process::ProcId(cred.pid as u32)).unwrap());
+    assert_eq!(
+        unsafe {
+            libc::getsockopt(
+                stream.as_raw_fd(),
+                libc::SOL_SOCKET,
+                libc::SO_PEERCRED,
+                (&mut cred as *mut libc::ucred).cast(),
+                &mut len,
+            )
+        },
+        0
+    );
+    let _cleanup =
+        Cleanup(fgos_process::facts::identity_of(fgos_process::ProcId(cred.pid as u32)).unwrap());
     assert_eq!(read_frame(&mut stream).expect("AGENT")["type"], "AGENT");
-    support::supervisor::wait_until(LIMIT, "heartbeat", || fs::read(&beat).is_ok_and(|b| !b.is_empty()));
+    support::supervisor::wait_until(LIMIT, "heartbeat", || {
+        fs::read(&beat).is_ok_and(|b| !b.is_empty())
+    });
     pane.child.kill().unwrap();
     pane.child.wait().unwrap();
     std::thread::sleep(Duration::from_millis(300));
-    assert_eq!(fgos_process::facts::judge_here(&_cleanup.0.to_record()),
-        fgos_process::facts::Verdict::Dead, "the namespace init must be dead");
+    assert_eq!(
+        fgos_process::facts::judge_here(&_cleanup.0.to_record()),
+        fgos_process::facts::Verdict::Dead,
+        "the namespace init must be dead"
+    );
     let settled = fs::read(&beat).unwrap();
     std::thread::sleep(Duration::from_millis(300));
-    assert_eq!(fs::read(&beat).unwrap(), settled, "namespace survived its monitor");
+    assert_eq!(
+        fs::read(&beat).unwrap(),
+        settled,
+        "namespace survived its monitor"
+    );
 }

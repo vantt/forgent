@@ -23,12 +23,20 @@ pub const ARG: &str = "HL_TEST_ARG";
 /// lock test holds this for its whole run.
 pub fn serial() -> std::sync::MutexGuard<'static, ()> {
     static SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
-    SERIAL.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+    SERIAL
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
 }
 
 pub fn temp_dir(tag: &str) -> PathBuf {
-    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
-    let dir = std::env::temp_dir().join(format!("fgos-holder-lock-{tag}-{}-{nanos}", std::process::id()));
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let dir = std::env::temp_dir().join(format!(
+        "fgos-holder-lock-{tag}-{}-{nanos}",
+        std::process::id()
+    ));
     fs::create_dir_all(&dir).expect("temp dir");
     dir
 }
@@ -63,17 +71,25 @@ impl Drop for Guard {
 /// Spawn this test binary as a child running `role` (through the test named
 /// `child_entry`).
 pub fn spawn_role(role: &str, lock: &Path, ready: &Path, arg: &str) -> Guard {
-    Guard(Command::new(std::env::current_exe().expect("test binary"))
-        .args(["--exact", "child_entry", "--nocapture", "--test-threads", "1"])
-        .env(ROLE, role)
-        .env(LOCK, lock)
-        .env(READY, ready)
-        .env(ARG, arg)
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::inherit())
-        .spawn()
-        .expect("spawn child role"))
+    Guard(
+        Command::new(std::env::current_exe().expect("test binary"))
+            .args([
+                "--exact",
+                "child_entry",
+                "--nocapture",
+                "--test-threads",
+                "1",
+            ])
+            .env(ROLE, role)
+            .env(LOCK, lock)
+            .env(READY, ready)
+            .env(ARG, arg)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::inherit())
+            .spawn()
+            .expect("spawn child role"),
+    )
 }
 
 /// Wait until the child wrote its ready file; returns the file's text.
@@ -153,7 +169,9 @@ pub fn child_entry() {
                     break t;
                 }
             };
-            handle.declare_domain(&Domain::LinuxGate(tuple)).expect("declare domain");
+            handle
+                .declare_domain(&Domain::LinuxGate(tuple))
+                .expect("declare domain");
             write_ready(&gate.id().to_string());
             let _keep = (handle, gate);
             hold_forever();
@@ -178,18 +196,34 @@ pub fn child_entry() {
                     // zombie, so a killed holder can still read as live here:
                     // the test names every pid it kills before the signal.
                     let pid: u32 = text.trim().parse().unwrap_or(0);
-                    let killed = fs::read_to_string(lock.with_extension("killed")).unwrap_or_default();
+                    let killed =
+                        fs::read_to_string(lock.with_extension("killed")).unwrap_or_default();
                     let was_killed = killed.lines().any(|line| line.trim() == pid.to_string());
-                    if !was_killed && matches!(fgos_process::facts::observe(ProcId(pid)), fgos_process::facts::Observed::Live { .. }) {
+                    if !was_killed
+                        && matches!(
+                            fgos_process::facts::observe(ProcId(pid)),
+                            fgos_process::facts::Observed::Live { .. }
+                        )
+                    {
                         use std::io::Write;
-                        let mut f = fs::OpenOptions::new().create(true).append(true).open(&violations).unwrap();
-                        writeln!(f, "{} entered while {pid} was inside", std::process::id()).unwrap();
+                        let mut f = fs::OpenOptions::new()
+                            .create(true)
+                            .append(true)
+                            .open(&violations)
+                            .unwrap();
+                        writeln!(f, "{} entered while {pid} was inside", std::process::id())
+                            .unwrap();
                     }
                 }
                 fs::write(&marker, std::process::id().to_string()).unwrap();
-                std::thread::sleep(Duration::from_micros(500 + u64::from(std::process::id() % 7) * 300));
+                std::thread::sleep(Duration::from_micros(
+                    500 + u64::from(std::process::id() % 7) * 300,
+                ));
                 fs::remove_file(&marker).unwrap();
-                assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+                assert!(matches!(
+                    release(handle),
+                    fgos_holder_lock::Release::Released { .. }
+                ));
             }
             std::process::exit(0);
         }

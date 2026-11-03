@@ -16,10 +16,17 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::Instant;
 
-use crate::port::{self, Acquire, BorrowSpec, BorrowStdio, BorrowedCheck, HelperExe, Mode, Probe, Resource, Wait};
+use crate::port::{
+    self, Acquire, BorrowSpec, BorrowStdio, BorrowedCheck, HelperExe, Mode, Probe, Resource, Wait,
+};
 
 /// The four vectors, in run order.
-pub const VECTORS: [&str; 4] = ["shell-alias-background", "filter-clean-smudge", "hook-background", "gc-auto-loose-objects"];
+pub const VECTORS: [&str; 4] = [
+    "shell-alias-background",
+    "filter-clean-smudge",
+    "hook-background",
+    "gc-auto-loose-objects",
+];
 
 /// Kill wait used for the leftovers of a vector.
 const KILL_WAIT_MS: u64 = 2000;
@@ -88,7 +95,10 @@ fn git_plain(git: &Path, repo: &Path) -> Command {
 pub fn git_env() -> BTreeMap<String, String> {
     [
         ("GIT_CONFIG_NOSYSTEM", "1"),
-        ("GIT_CONFIG_GLOBAL", if cfg!(windows) { "NUL" } else { "/dev/null" }),
+        (
+            "GIT_CONFIG_GLOBAL",
+            if cfg!(windows) { "NUL" } else { "/dev/null" },
+        ),
         ("GIT_TERMINAL_PROMPT", "0"),
         ("GIT_AUTHOR_NAME", "fgos"),
         ("GIT_AUTHOR_EMAIL", "fgos@localhost"),
@@ -103,7 +113,11 @@ pub fn git_env() -> BTreeMap<String, String> {
 fn run_plain(mut cmd: Command, what: &str) -> Result<String, String> {
     let out = cmd.output().map_err(|e| format!("{what}: {e}"))?;
     if !out.status.success() {
-        return Err(format!("{what}: {} {}", out.status, String::from_utf8_lossy(&out.stderr).trim()));
+        return Err(format!(
+            "{what}: {} {}",
+            out.status,
+            String::from_utf8_lossy(&out.stderr).trim()
+        ));
     }
     Ok(String::from_utf8_lossy(&out.stdout).trim().to_string())
 }
@@ -169,7 +183,9 @@ pub fn add_loose_objects(git: &Path, repo: &Path) -> Result<usize, String> {
             return Ok(count);
         }
         if round >= 8 {
-            return Err(format!("only {count} loose objects in objects/17 after {round} rounds"));
+            return Err(format!(
+                "only {count} loose objects in objects/17 after {round} rounds"
+            ));
         }
         let mut paths = String::new();
         for i in 0..1024 {
@@ -179,12 +195,17 @@ pub fn add_loose_objects(git: &Path, repo: &Path) -> Result<usize, String> {
             paths.push('\n');
         }
         let mut cmd = git_plain(git, repo);
-        cmd.args(["hash-object", "-w", "--no-filters", "--stdin-paths"]).stdin(Stdio::piped()).stdout(Stdio::null()).stderr(Stdio::piped());
+        cmd.args(["hash-object", "-w", "--no-filters", "--stdin-paths"])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::null())
+            .stderr(Stdio::piped());
         let mut child = cmd.spawn().map_err(|e| format!("git hash-object: {e}"))?;
         {
             use std::io::Write;
             let mut stdin = child.stdin.take().expect("piped stdin");
-            stdin.write_all(paths.as_bytes()).map_err(|e| e.to_string())?;
+            stdin
+                .write_all(paths.as_bytes())
+                .map_err(|e| e.to_string())?;
         }
         let status = child.wait().map_err(|e| e.to_string())?;
         if !status.success() {
@@ -212,14 +233,29 @@ impl Borrowing<'_> {
         let mut killed = 0;
         let mut notes = Vec::new();
         for args in calls {
-            let mut argv = vec![self.git.to_string_lossy().into_owned(), "-C".into(), self.repo.to_string_lossy().into_owned()];
+            let mut argv = vec![
+                self.git.to_string_lossy().into_owned(),
+                "-C".into(),
+                self.repo.to_string_lossy().into_owned(),
+            ];
             argv.extend(args.iter().map(|a| a.to_string()));
-            let spec = BorrowSpec { argv, cwd: Some(self.repo.to_path_buf()), env: git_env(), clear_env: false, stdio: BorrowStdio::Null };
+            let spec = BorrowSpec {
+                argv,
+                cwd: Some(self.repo.to_path_buf()),
+                env: git_env(),
+                clear_env: false,
+                stdio: BorrowStdio::Null,
+            };
             match port::run_borrowed(&handle, &spec, self.helper) {
                 Ok(outcome) => {
                     killed += outcome.leftovers_killed;
                     if outcome.exit != Some(0) {
-                        notes.push(format!("git {} exited {:?}/{:?}", args.join(" "), outcome.exit, outcome.signal));
+                        notes.push(format!(
+                            "git {} exited {:?}/{:?}",
+                            args.join(" "),
+                            outcome.exit,
+                            outcome.signal
+                        ));
                     }
                 }
                 Err(err) => {
@@ -245,7 +281,12 @@ fn vector(name: &str, git: &Path, helper: &HelperExe, dir: &Path) -> VectorResul
     let bg = background(&pidfile);
     let result = (|| -> Result<(bool, String), String> {
         init_repo(git, &repo)?;
-        let borrowing = Borrowing { git, helper, repo: &repo, resource };
+        let borrowing = Borrowing {
+            git,
+            helper,
+            repo: &repo,
+            resource,
+        };
         let (killed, probe, notes, expect_no_leftovers) = match name {
             "shell-alias-background" => {
                 config(git, &repo, "alias.bgsleep", &format!("!{bg} true"))?;
@@ -255,7 +296,8 @@ fn vector(name: &str, git: &Path, helper: &HelperExe, dir: &Path) -> VectorResul
             "filter-clean-smudge" => {
                 config(git, &repo, "filter.bg.clean", &format!("{bg} cat"))?;
                 config(git, &repo, "filter.bg.smudge", &format!("{bg} cat"))?;
-                fs::write(repo.join(".gitattributes"), "*.flt filter=bg\n").map_err(|e| e.to_string())?;
+                fs::write(repo.join(".gitattributes"), "*.flt filter=bg\n")
+                    .map_err(|e| e.to_string())?;
                 fs::write(repo.join("data.flt"), "filtered\n").map_err(|e| e.to_string())?;
                 let (k, p, n) = borrowing.run(&[
                     vec!["add", ".gitattributes", "data.flt"],
@@ -269,19 +311,24 @@ fn vector(name: &str, git: &Path, helper: &HelperExe, dir: &Path) -> VectorResul
                 let body = format!("#!/bin/sh\n{bg}\nexit 0\n");
                 write_hook(&repo, "pre-commit", &body)?;
                 write_hook(&repo, "post-commit", &body)?;
-                let (k, p, n) = borrowing.run(&[vec!["commit", "-q", "--allow-empty", "-m", "hooked"]])?;
+                let (k, p, n) =
+                    borrowing.run(&[vec!["commit", "-q", "--allow-empty", "-m", "hooked"]])?;
                 (k, p, n, false)
             }
             "gc-auto-loose-objects" => {
                 config(git, &repo, "gc.auto", "1")?;
                 let loose = add_loose_objects(git, &repo)?;
-                let (k, p, mut n) = borrowing.run(&[vec!["commit", "-q", "--allow-empty", "-m", "gc-eligible"]])?;
+                let (k, p, mut n) =
+                    borrowing.run(&[vec!["commit", "-q", "--allow-empty", "-m", "gc-eligible"]])?;
                 n.push(format!("{loose} loose objects in objects/17"));
                 (k, p, n, true)
             }
             other => return Err(format!("unknown vector {other}")),
         };
-        let mut detail = format!("probe after release: {}; leftovers killed: {killed}", if probe == Probe::Free { "free" } else { "held" });
+        let mut detail = format!(
+            "probe after release: {}; leftovers killed: {killed}",
+            if probe == Probe::Free { "free" } else { "held" }
+        );
         for note in &notes {
             detail.push_str("; ");
             detail.push_str(note);
@@ -303,7 +350,12 @@ fn vector(name: &str, git: &Path, helper: &HelperExe, dir: &Path) -> VectorResul
         Ok((pass, detail))
     })();
     let (pass, detail) = result.unwrap_or_else(|err| (false, err));
-    VectorResult { name: name.to_string(), pass, elapsed_ms: ms(started), detail }
+    VectorResult {
+        name: name.to_string(),
+        pass,
+        elapsed_ms: ms(started),
+        detail,
+    }
 }
 
 /// Every pid the vector's background command wrote is a process that has
@@ -313,7 +365,9 @@ fn vector(name: &str, git: &Path, helper: &HelperExe, dir: &Path) -> VectorResul
 /// reachable by git for the vectors to mean anything.
 #[cfg(windows)]
 fn background_pids_ended(pidfile: &Path) -> Result<usize, String> {
-    use windows_sys::Win32::Foundation::{CloseHandle, GetLastError, ERROR_INVALID_PARAMETER, WAIT_OBJECT_0};
+    use windows_sys::Win32::Foundation::{
+        CloseHandle, GetLastError, ERROR_INVALID_PARAMETER, WAIT_OBJECT_0,
+    };
     use windows_sys::Win32::Storage::FileSystem::SYNCHRONIZE;
     use windows_sys::Win32::System::Threading::{OpenProcess, WaitForSingleObject};
 
@@ -331,13 +385,17 @@ fn background_pids_ended(pidfile: &Path) -> Result<usize, String> {
             if err == ERROR_INVALID_PARAMETER {
                 continue;
             }
-            return Err(format!("cannot open background pid {pid} to judge it (Win32 error {err})"));
+            return Err(format!(
+                "cannot open background pid {pid} to judge it (Win32 error {err})"
+            ));
         }
         // SAFETY: a zero wait polls an open handle, which is closed right after.
         let ended = unsafe { WaitForSingleObject(handle, 0) == WAIT_OBJECT_0 };
         unsafe { CloseHandle(handle) };
         if !ended {
-            return Err(format!("background pid {pid} is still running after run_borrowed returned"));
+            return Err(format!(
+                "background pid {pid} is still running after run_borrowed returned"
+            ));
         }
     }
     Ok(pids.len())
@@ -356,37 +414,67 @@ fn sibling(dir: &Path) -> (bool, String) {
     let resource = Resource::new("borrow-vectors", dir.join("sibling.lock"));
     let handle = match port::acquire(&resource, Mode::Ex, Wait::Ms(2000), KILL_WAIT_MS) {
         Acquire::Acquired(h) => h,
-        other => return (false, format!("owner could not take the sibling lock: {other:?}")),
+        other => {
+            return (
+                false,
+                format!("owner could not take the sibling lock: {other:?}"),
+            )
+        }
     };
     let answer = sibling_answer(&handle, &resource);
     if let outcome @ port::Release::Stuck { .. } = port::release(handle) {
         return (false, format!("lock-release-stuck: {outcome:?}"));
     }
     match answer {
-        Ok(BorrowedCheck::NotBorrower(reason)) => (true, format!("sibling refused ({})", reason.as_str())),
-        Ok(BorrowedCheck::Borrower) => (false, "a sibling outside the borrow was accepted as borrower".into()),
+        Ok(BorrowedCheck::NotBorrower(reason)) => {
+            (true, format!("sibling refused ({})", reason.as_str()))
+        }
+        Ok(BorrowedCheck::Borrower) => (
+            false,
+            "a sibling outside the borrow was accepted as borrower".into(),
+        ),
         Err(why) => (false, why),
     }
 }
 
 #[cfg(unix)]
 fn sibling_answer(_handle: &port::Handle, resource: &Resource) -> Result<BorrowedCheck, String> {
-    let own = fs::OpenOptions::new().read(true).write(true).open(&resource.path).map_err(|e| format!("sibling open: {e}"))?;
-    Ok(port::borrowed_check(&own, &resource.path, Some(&format!("borrow-vectors:{}", port::BORROW_SLOT)), port::BORROW_SLOT))
+    let own = fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(&resource.path)
+        .map_err(|e| format!("sibling open: {e}"))?;
+    Ok(port::borrowed_check(
+        &own,
+        &resource.path,
+        Some(&format!("borrow-vectors:{}", port::BORROW_SLOT)),
+        port::BORROW_SLOT,
+    ))
 }
 
 /// A real record and a real job the owner declared, with this process
 /// outside it: the check must stop at "not in the job".
 #[cfg(windows)]
 fn sibling_answer(handle: &port::Handle, resource: &Resource) -> Result<BorrowedCheck, String> {
-    use fgos_process::platform::windows_job::{create_kill_job, filetime_now, job_name, own_session};
+    use fgos_process::platform::windows_job::{
+        create_kill_job, filetime_now, job_name, own_session,
+    };
     use fgos_process::{Domain, WindowsJob};
 
     let name = job_name("fgos-borrow", "borrow-vectors");
-    let holder = fgos_process::facts::self_identity().ok_or("cannot read this process's identity")?;
+    let holder =
+        fgos_process::facts::self_identity().ok_or("cannot read this process's identity")?;
     let session_id = own_session().ok_or("cannot read this process's session")?;
-    let domain = Domain::WindowsJob(WindowsJob { job: name.clone(), session_id, declared_at: filetime_now(), holder, keeper: None });
-    handle.declare_domain(&domain).map_err(|e| format!("declare: {e}"))?;
+    let domain = Domain::WindowsJob(WindowsJob {
+        job: name.clone(),
+        session_id,
+        declared_at: filetime_now(),
+        holder,
+        keeper: None,
+    });
+    handle
+        .declare_domain(&domain)
+        .map_err(|e| format!("declare: {e}"))?;
     let job = create_kill_job(&name).map_err(|e| format!("create job: {e}"))?;
     let answer = crate::borrowed_check_job(&resource.path, Some(&format!("borrow-vectors:{name}")));
     drop(job);
@@ -395,27 +483,46 @@ fn sibling_answer(handle: &port::Handle, resource: &Resource) -> Result<Borrowed
 }
 
 fn temp_dir() -> io::Result<PathBuf> {
-    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or(0);
-    let dir = std::env::temp_dir().join(format!("fgos-borrow-vectors-{}-{nanos}", std::process::id()));
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_nanos())
+        .unwrap_or(0);
+    let dir = std::env::temp_dir().join(format!(
+        "fgos-borrow-vectors-{}-{nanos}",
+        std::process::id()
+    ));
     fs::create_dir_all(&dir)?;
     Ok(dir)
 }
 
 /// Run the named vectors (all four when `only` is empty) with `git`.
-pub fn run(git: &Path, helper: &HelperExe, only: &[String], keep_repo: bool) -> Result<Report, RunError> {
+pub fn run(
+    git: &Path,
+    helper: &HelperExe,
+    only: &[String],
+    keep_repo: bool,
+) -> Result<Report, RunError> {
     let started = Instant::now();
     for name in only {
         if !VECTORS.contains(&name.as_str()) {
-            return Err(RunError::Usage(format!("unknown vector {name}; known: {}", VECTORS.join(", "))));
+            return Err(RunError::Usage(format!(
+                "unknown vector {name}; known: {}",
+                VECTORS.join(", ")
+            )));
         }
     }
     if !crate::driver::current().supported() {
-        return Err(RunError::Unavailable(crate::driver::current().unsupported_detail().to_string()));
+        return Err(RunError::Unavailable(
+            crate::driver::current().unsupported_detail().to_string(),
+        ));
     }
     // Every git child of the vectors runs inside the run's own temp directory, the version check too.
     let dir = temp_dir().map_err(|e| RunError::Unavailable(format!("temp dir: {e}")))?;
     let mut version = Command::new(git);
-    version.arg("--version").current_dir(&dir).stdin(Stdio::null());
+    version
+        .arg("--version")
+        .current_dir(&dir)
+        .stdin(Stdio::null());
     let git_version = match run_plain(version, "git --version") {
         Ok(version) => version,
         Err(e) => {
@@ -435,5 +542,11 @@ pub fn run(git: &Path, helper: &HelperExe, only: &[String], keep_repo: bool) -> 
         let _ = fs::remove_dir_all(&dir);
         None
     };
-    Ok(Report { vectors, sibling, git_version, elapsed_ms: ms(started), kept })
+    Ok(Report {
+        vectors,
+        sibling,
+        git_version,
+        elapsed_ms: ms(started),
+        kept,
+    })
 }

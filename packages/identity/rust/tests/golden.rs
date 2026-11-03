@@ -169,6 +169,8 @@ fn contract_outcome_version_is_the_one_the_provider_declares() {
     let contract: Value = serde_json::from_str(CONTRACT).unwrap();
     assert_eq!(
         contract["x-outcomeVersion"].as_str().unwrap(),
-        fgos_identity::IDENTITY_DESCRIPTOR.outcome_contract.version()
+        fgos_identity::IDENTITY_DESCRIPTOR
+            .outcome_contract
+            .version()
     );
 }

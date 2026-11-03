@@ -1,17 +1,21 @@
 //! One Node-API load for both foundations. No protocol decisions live here.
 mod event_store;
-pub use event_store::{event_store_branch_key, open_store, resolve_event_store, event_store_facts};
+pub use event_store::{event_store_branch_key, event_store_facts, open_store, resolve_event_store};
 mod git;
-pub use git::{close_git_loan, ensure_git_fetch_mapping, git_fetch_mappings, initialize_git_wal, inspect_git, inspect_git_worktree_recovery, mint_git_loan, prepare_git_driver_directories, take_git_handover};
-mod single_load;
-pub mod process;
-pub mod holder_lock;
-pub mod durable_file;
+pub use git::{
+    close_git_loan, ensure_git_fetch_mapping, git_fetch_mappings, initialize_git_wal, inspect_git,
+    inspect_git_worktree_recovery, mint_git_loan, prepare_git_driver_directories,
+    take_git_handover,
+};
 pub mod canonical_json;
-pub mod session_identity;
-pub mod marshal;
-pub mod yaml;
 pub mod config;
+pub mod durable_file;
+pub mod holder_lock;
+pub mod marshal;
+pub mod process;
+pub mod session_identity;
+mod single_load;
+pub mod yaml;
 use napi::{Error, Result};
 use napi_derive::napi;
 use serde_json::{json, Value};

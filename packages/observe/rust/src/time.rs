@@ -53,7 +53,9 @@ pub fn now_iso() -> String {
     static LAST_MILLIS: AtomicI64 = AtomicI64::new(0);
     let wall = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .map_or(0, |elapsed| i64::try_from(elapsed.as_millis()).unwrap_or(i64::MAX));
+        .map_or(0, |elapsed| {
+            i64::try_from(elapsed.as_millis()).unwrap_or(i64::MAX)
+        });
     let millis = loop {
         let last = LAST_MILLIS.load(Ordering::SeqCst);
         let next = wall.max(last.saturating_add(1));
@@ -74,8 +76,14 @@ mod tests {
     #[test]
     fn now_is_strictly_increasing_within_a_process_and_parses() {
         let stamps: Vec<String> = (0..50).map(|_| now_iso()).collect();
-        let instants: Vec<i64> = stamps.iter().map(|s| parse_rfc3339_millis(s).expect(s)).collect();
-        assert!(instants.windows(2).all(|pair| pair[0] < pair[1]), "{stamps:?}");
+        let instants: Vec<i64> = stamps
+            .iter()
+            .map(|s| parse_rfc3339_millis(s).expect(s))
+            .collect();
+        assert!(
+            instants.windows(2).all(|pair| pair[0] < pair[1]),
+            "{stamps:?}"
+        );
         assert!(stamps.iter().all(|s| s.ends_with('Z')));
     }
 

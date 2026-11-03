@@ -30,9 +30,12 @@ use fgos_holder_lock::borrow_vectors::{git_env, init_repo};
 use fgos_holder_lock::predecessor::record_path;
 use fgos_holder_lock::{acquire_with_trace, release, Acquire, Mode, Release, Resource, Wait};
 use serde_json::{json, Value};
-use windows_sys::Win32::Foundation::{CloseHandle, HANDLE};
-use windows_sys::Win32::System::Threading::{CreateEventW, OpenEventW, OpenProcess, SetEvent, TerminateProcess, WaitForSingleObject, PROCESS_TERMINATE};
 use windows_support::{children_of, ended, sh_path, temp_dir, wait_for_json, Hold};
+use windows_sys::Win32::Foundation::{CloseHandle, HANDLE};
+use windows_sys::Win32::System::Threading::{
+    CreateEventW, OpenEventW, OpenProcess, SetEvent, TerminateProcess, WaitForSingleObject,
+    PROCESS_TERMINATE,
+};
 
 const KILL_WAIT_MS: u64 = 2000;
 const WARMUP_REPEATS: usize = 20;
@@ -42,7 +45,10 @@ const HOOK_WAIT_MS: u32 = 120_000;
 const EVENT_SYNCHRONIZE: u32 = 0x0010_0000;
 
 fn repeats() -> usize {
-    std::env::var("HL_STRESS_REPEATS").ok().and_then(|v| v.parse().ok()).unwrap_or(500)
+    std::env::var("HL_STRESS_REPEATS")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(500)
 }
 
 fn wide(text: &str) -> Vec<u16> {
@@ -51,7 +57,9 @@ fn wide(text: &str) -> Vec<u16> {
 
 /// The holder executable: the build's own `fgos`, or the override.
 fn holder_exe() -> PathBuf {
-    std::env::var_os("FGOS_STRESS_FGOS_BIN").map(PathBuf::from).unwrap_or_else(windows_support::fgos)
+    std::env::var_os("FGOS_STRESS_FGOS_BIN")
+        .map(PathBuf::from)
+        .unwrap_or_else(windows_support::fgos)
 }
 
 /// The role a hook runs: report the pid chain, then wait for the event.
@@ -59,8 +67,16 @@ fn holder_exe() -> PathBuf {
 #[test]
 #[ignore]
 fn hook_wait_role() {
-    let (Ok(event), Ok(report)) = (std::env::var("HL_STRESS_EVENT"), std::env::var("HL_STRESS_REPORT")) else { return };
-    let chain: Vec<u32> = fgos_process::platform::windows_job::ancestor_chain().into_iter().map(|(pid, _)| pid).collect();
+    let (Ok(event), Ok(report)) = (
+        std::env::var("HL_STRESS_EVENT"),
+        std::env::var("HL_STRESS_REPORT"),
+    ) else {
+        return;
+    };
+    let chain: Vec<u32> = fgos_process::platform::windows_job::ancestor_chain()
+        .into_iter()
+        .map(|(pid, _)| pid)
+        .collect();
     let body = json!({ "hook": std::process::id(), "chain": chain }).to_string();
     let tmp = format!("{report}.tmp");
     fs::write(&tmp, body).unwrap();
@@ -140,7 +156,11 @@ impl Rig {
         let exe = std::env::current_exe().unwrap();
         let hook = format!("#!/bin/sh\n'{}' --exact hook_wait_role --ignored --nocapture >/dev/null 2>&1\nexit 0\n", sh_path(&exe));
         fs::write(repo.join(".git/hooks/pre-commit"), hook).unwrap();
-        Rig { resource: Resource::new("stress", dir.join("stress.lock")), dir, repo }
+        Rig {
+            resource: Resource::new("stress", dir.join("stress.lock")),
+            dir,
+            repo,
+        }
     }
 
     fn one(&self, round: usize, scenario: Scenario) -> Repeat {
@@ -149,11 +169,15 @@ impl Rig {
         let _ = fs::remove_file(&report);
         let work = self.dir.join(format!("work-{round}"));
         let holder_exe = holder_exe();
-        let mut hold = Hold::start_with(&holder_exe, &self.resource.path, &work, KILL_WAIT_MS).expect("the holder acquires");
+        let mut hold = Hold::start_with(&holder_exe, &self.resource.path, &work, KILL_WAIT_MS)
+            .expect("the holder acquires");
         let mut env: BTreeMap<String, String> = std::env::vars().collect();
         env.extend(git_env());
         env.insert("HL_STRESS_EVENT".into(), event.name.clone());
-        env.insert("HL_STRESS_REPORT".into(), report.to_string_lossy().into_owned());
+        env.insert(
+            "HL_STRESS_REPORT".into(),
+            report.to_string_lossy().into_owned(),
+        );
         let repo = self.repo.to_string_lossy().into_owned();
         hold.request(json!({
             "op": "borrow",
@@ -165,7 +189,15 @@ impl Rig {
         let hook = wait_for_json(&report, "the hook's report");
         let holder_pid = hold.child.id();
         let mut members: Vec<u32> = vec![hook["hook"].as_u64().unwrap() as u32];
-        members.extend(hook["chain"].as_array().unwrap().iter().filter_map(Value::as_u64).map(|p| p as u32).take_while(|p| *p != holder_pid));
+        members.extend(
+            hook["chain"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter_map(Value::as_u64)
+                .map(|p| p as u32)
+                .take_while(|p| *p != holder_pid),
+        );
         let keepers = children_of(holder_pid, "fgos.exe");
 
         hold.kill();
@@ -173,12 +205,19 @@ impl Rig {
         let judged = members.clone();
         let contender = std::thread::spawn(move || {
             let started = Instant::now();
-            let (answer, trace) = acquire_with_trace(&resource, Mode::Ex, Wait::Ms(30_000), KILL_WAIT_MS);
+            let (answer, trace) =
+                acquire_with_trace(&resource, Mode::Ex, Wait::Ms(30_000), KILL_WAIT_MS);
             let waited = started.elapsed();
-            let Acquire::Acquired(handle) = answer else { let why = format!("the contender was not admitted: {answer:?}; job opened: {}; named (pid, listed, scanned, tree): {:?}; hook pids: {:?}", trace.job_opened, trace.named, judged);
-            return (waited, trace, Err(why)) };
+            let Acquire::Acquired(handle) = answer else {
+                let why = format!("the contender was not admitted: {answer:?}; job opened: {}; named (pid, listed, scanned, tree): {:?}; hook pids: {:?}", trace.job_opened, trace.named, judged);
+                return (waited, trace, Err(why));
+            };
             // As soon as acquire returns: every pid that was in the borrow.
-            let still_running: Vec<u32> = judged.iter().copied().filter(|pid| ended(*pid) != Some(true)).collect();
+            let still_running: Vec<u32> = judged
+                .iter()
+                .copied()
+                .filter(|pid| ended(*pid) != Some(true))
+                .collect();
             assert!(matches!(release(handle), Release::Released { .. }));
             (waited, trace, Ok(still_running))
         });
@@ -197,13 +236,27 @@ impl Rig {
             Err(why) => panic!("round {round}: {why}"),
         };
         let sources = |pid: u32| -> Vec<&'static str> {
-            let Some((_, list, scan, tree)) = trace.named.iter().find(|(p, ..)| *p == pid) else { return Vec::new() };
-            [(*list, "job-list"), (*scan, "in-job-scan"), (*tree, "tree")].into_iter().filter(|(on, _)| *on).map(|(_, name)| name).collect()
+            let Some((_, list, scan, tree)) = trace.named.iter().find(|(p, ..)| *p == pid) else {
+                return Vec::new();
+            };
+            [(*list, "job-list"), (*scan, "in-job-scan"), (*tree, "tree")]
+                .into_iter()
+                .filter(|(on, _)| *on)
+                .map(|(_, name)| name)
+                .collect()
         };
         let named_by_one_source_only = members.iter().any(|pid| sources(*pid).len() == 1);
-        let violations = still_running.iter().map(|pid| json!({ "round": round, "pid": pid, "namedBy": sources(*pid) })).collect();
+        let violations = still_running
+            .iter()
+            .map(|pid| json!({ "round": round, "pid": pid, "namedBy": sources(*pid) }))
+            .collect();
         let _ = fs::remove_file(record_path(&self.resource.path));
-        Repeat { wait_ms: waited.as_secs_f64() * 1000.0, job_opened: trace.job_opened, named_by_one_source_only, violations }
+        Repeat {
+            wait_ms: waited.as_secs_f64() * 1000.0,
+            job_opened: trace.job_opened,
+            named_by_one_source_only,
+            violations,
+        }
     }
 }
 
@@ -232,7 +285,10 @@ fn report(name: &str, entry: Value) {
         println!("{name}: {entry}");
         return;
     };
-    let mut all: Value = fs::read_to_string(&out).ok().and_then(|text| serde_json::from_str(&text).ok()).unwrap_or_else(|| json!({ "scenarios": {} }));
+    let mut all: Value = fs::read_to_string(&out)
+        .ok()
+        .and_then(|text| serde_json::from_str(&text).ok())
+        .unwrap_or_else(|| json!({ "scenarios": {} }));
     all["scenarios"][name] = entry;
     all["windows"] = json!(std::env::var("OS").unwrap_or_default());
     fs::write(&out, serde_json::to_string_pretty(&all).unwrap()).unwrap();
@@ -243,7 +299,9 @@ fn run(name: &str, make: impl Fn(&Rig, &mut Jitter, f64) -> Scenario) {
     let total = repeats();
     // The wait of a contender that finds a dead holder and a live job: the
     // keeper kill of `dying-job-open` is drawn from twice its median.
-    let mut warm: Vec<f64> = (0..WARMUP_REPEATS).map(|i| rig.one(1_000_000 + i, Scenario::HolderOnly).wait_ms).collect();
+    let mut warm: Vec<f64> = (0..WARMUP_REPEATS)
+        .map(|i| rig.one(1_000_000 + i, Scenario::HolderOnly).wait_ms)
+        .collect();
     warm.sort_by(f64::total_cmp);
     let p50 = percentile(&warm, 50.0);
     let mut jitter = Jitter(0x9E37_79B9_7F4A_7C15 ^ std::process::id() as u64);
@@ -271,14 +329,20 @@ fn run(name: &str, make: impl Fn(&Rig, &mut Jitter, f64) -> Scenario) {
     if name == "dying-job-open" {
         assert!(job_opened * 2 >= total, "{name}: the job was opened in only {job_opened} of {total} repeats, so the scenario did not exercise the job source");
     }
-    assert!(violations.is_empty(), "{name}: {} violation(s): {violations:?}", violations.len());
+    assert!(
+        violations.is_empty(),
+        "{name}: {} violation(s): {violations:?}",
+        violations.len()
+    );
     let _ = fs::remove_dir_all(&rig.dir);
 }
 
 #[test]
 #[ignore]
 fn borrow_hook_predecessor_check() {
-    run("borrow-hook-predecessor-check", |_, _, _| Scenario::HolderOnly);
+    run("borrow-hook-predecessor-check", |_, _, _| {
+        Scenario::HolderOnly
+    });
 }
 
 #[test]

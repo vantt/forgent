@@ -106,8 +106,7 @@ impl GitDriver {
             }
         }
         let commit = self.checked(repo, &["cat-file", "commit", oid.as_str()], Policy::Inspect)?;
-        let number =
-            commit_number(&commit).ok_or_else(|| failure("sequence-ref-malformed"))?;
+        let number = commit_number(&commit).ok_or_else(|| failure("sequence-ref-malformed"))?;
         Ok(Some(SequenceTip { oid, number }))
     }
 
@@ -268,8 +267,8 @@ impl GitDriver {
         if !out.success {
             return Err(out.error("sequence-read-failed"));
         }
-        let text = std::str::from_utf8(&out.stdout)
-            .map_err(|_| failure("git-protocol-invalid-utf8"))?;
+        let text =
+            std::str::from_utf8(&out.stdout).map_err(|_| failure("git-protocol-invalid-utf8"))?;
         for line in text.lines() {
             if let Some((oid, advertised)) = line.split_once('\t') {
                 if advertised == name.as_str() {

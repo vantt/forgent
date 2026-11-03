@@ -12,11 +12,11 @@ use crate::{
     refs::own_ref,
     walk::{self, git_error},
 };
-use std::path::Path;
 use fgos_git::{
     ExpectedTip, GitDriver, HolderAuthority, Inspect, Oid, Publication, PublicationPort, RefValue,
     RepoHandle,
 };
+use std::path::Path;
 struct PublicationFs<'a>(&'a (dyn FileSystem + Sync));
 impl fgos_git::wal::FileSystem for PublicationFs<'_> {
     fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {

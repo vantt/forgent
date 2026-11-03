@@ -37,7 +37,10 @@ pub struct Project {
 
 /// 32 lowercase hex characters. The one check of this rule.
 pub fn valid_project_id(value: &str) -> bool {
-    value.len() == 32 && value.bytes().all(|c| matches!(c, b'0'..=b'9' | b'a'..=b'f'))
+    value.len() == 32
+        && value
+            .bytes()
+            .all(|c| matches!(c, b'0'..=b'9' | b'a'..=b'f'))
 }
 
 /// The handle rule is the Convention `project-handle` kind.
@@ -70,13 +73,20 @@ fn parse(raw: &str) -> Result<Project, Error> {
     let project: Project = serde_json::from_str(raw)
         .map_err(|e| Error::Invalid(format!("{FILE} is not a project file: {e}")))?;
     if project.v != FORMAT_VERSION {
-        return Err(Error::Invalid(format!("{FILE} has format version {}, expected {FORMAT_VERSION}", project.v)));
+        return Err(Error::Invalid(format!(
+            "{FILE} has format version {}, expected {FORMAT_VERSION}",
+            project.v
+        )));
     }
     if !valid_project_id(&project.project_id) {
-        return Err(Error::Invalid(format!("{FILE} holds an invalid project id")));
+        return Err(Error::Invalid(format!(
+            "{FILE} holds an invalid project id"
+        )));
     }
     if let Some(code) = handle_problem(&project.handle) {
-        return Err(Error::Invalid(format!("{FILE} holds an invalid handle ({code})")));
+        return Err(Error::Invalid(format!(
+            "{FILE} holds an invalid handle ({code})"
+        )));
     }
     Ok(project)
 }
@@ -98,7 +108,9 @@ pub fn read(root: &Path) -> Result<Project, Error> {
 /// Convention rule.
 pub fn mint(root: &Path, handle: &str, replace: bool) -> Result<Option<Project>, Error> {
     if let Some(code) = handle_problem(handle) {
-        return Err(Error::Invalid(format!("handle {handle:?} is not a project handle ({code})")));
+        return Err(Error::Invalid(format!(
+            "handle {handle:?} is not a project handle ({code})"
+        )));
     }
     let project = Project {
         v: FORMAT_VERSION,
@@ -160,7 +172,10 @@ fn main_root(repo: &RepoHandle) -> Result<(PathBuf, bool), Refusal> {
 }
 
 /// The Git driver and the repository containing `dir`.
-pub(crate) fn open_repository(driver_dir: &Path, dir: &Path) -> Result<(GitDriver, RepoHandle), Refusal> {
+pub(crate) fn open_repository(
+    driver_dir: &Path,
+    dir: &Path,
+) -> Result<(GitDriver, RepoHandle), Refusal> {
     let git = |e: OperationError| Refusal {
         candidates: Vec::new(),
         reason: "git-read-failed",
@@ -243,7 +258,10 @@ pub fn project_init(
         return Err(Refusal {
             candidates: Vec::new(),
             reason: "linked-worktree",
-            detail: format!("the project id is minted on the main checkout ({}), never in a linked worktree", root.display()),
+            detail: format!(
+                "the project id is minted on the main checkout ({}), never in a linked worktree",
+                root.display()
+            ),
         });
     }
     if !fork {
@@ -253,7 +271,9 @@ pub fn project_init(
                 return Err(Refusal {
                     candidates: Vec::new(),
                     reason: "project-id-exists",
-                    detail: format!("{FILE} already exists; `--new` replaces it on purpose (a fork split)"),
+                    detail: format!(
+                        "{FILE} already exists; `--new` replaces it on purpose (a fork split)"
+                    ),
                 })
             }
         }

@@ -34,7 +34,8 @@ fn validate_numbers(value: &Value) -> Result<(), CanonicalError> {
             // Preserve the previous serializer's first-error ordering.
             let mut keys: Vec<_> = map.keys().collect();
             keys.sort_by(|a, b| a.encode_utf16().cmp(b.encode_utf16()));
-            keys.into_iter().try_for_each(|key| validate_numbers(&map[key]))
+            keys.into_iter()
+                .try_for_each(|key| validate_numbers(&map[key]))
         }
         _ => Ok(()),
     }
@@ -57,7 +58,8 @@ pub fn digest(envelope: &Value) -> Result<String, CanonicalError> {
 /// JSON, `v` is 3, `protocolId` is 1 and the digest matches its content.
 pub fn read_verified(path: &std::path::Path) -> Result<Value, String> {
     let text = std::fs::read_to_string(path).map_err(|e| format!("envelope unreadable: {e}"))?;
-    let value: Value = serde_json::from_str(&text).map_err(|e| format!("envelope is not JSON: {e}"))?;
+    let value: Value =
+        serde_json::from_str(&text).map_err(|e| format!("envelope is not JSON: {e}"))?;
     if value["v"] != 3 {
         return Err("envelope version is not 3".into());
     }
@@ -76,6 +78,14 @@ pub fn read_verified(path: &std::path::Path) -> Result<Value, String> {
 /// through symlinks). A release that wrote the envelope and a binary that
 /// reads it must be the same one.
 pub fn host_bin_is_current(envelope: &Value) -> bool {
-    let Some(named) = envelope["hostBin"].as_str().and_then(|p| std::fs::canonicalize(p).ok()) else { return false };
-    std::env::current_exe().ok().and_then(|p| std::fs::canonicalize(p).ok()).is_some_and(|me| me == named)
+    let Some(named) = envelope["hostBin"]
+        .as_str()
+        .and_then(|p| std::fs::canonicalize(p).ok())
+    else {
+        return false;
+    };
+    std::env::current_exe()
+        .ok()
+        .and_then(|p| std::fs::canonicalize(p).ok())
+        .is_some_and(|me| me == named)
 }

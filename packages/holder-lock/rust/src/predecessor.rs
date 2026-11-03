@@ -13,12 +13,17 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::ProcTuple;
-use fgos_process::{domain_watch, Domain, DomainState, KillOutcome, ProcId, WatchTrace, WindowsJob};
+use fgos_process::{
+    domain_watch, Domain, DomainState, KillOutcome, ProcId, WatchTrace, WindowsJob,
+};
 use serde_json::{json, Value};
 
 /// `<lockFile>.predecessor.json`.
 pub fn record_path(lock_path: &Path) -> PathBuf {
-    let mut name: OsString = lock_path.file_name().map(OsString::from).unwrap_or_default();
+    let mut name: OsString = lock_path
+        .file_name()
+        .map(OsString::from)
+        .unwrap_or_default();
     name.push(".predecessor.json");
     lock_path.with_file_name(name)
 }
@@ -52,7 +57,9 @@ pub fn domain_json(domain: &Domain) -> Value {
     }
     match domain {
         Domain::LinuxGate(t) => json!({ "domainKind": "linux-gate", "domainId": tuple(t, true) }),
-        Domain::LinuxPgroup(t) => json!({ "domainKind": "linux-pgroup", "domainId": tuple(t, true) }),
+        Domain::LinuxPgroup(t) => {
+            json!({ "domainKind": "linux-pgroup", "domainId": tuple(t, true) })
+        }
         Domain::WindowsJob(job) => json!({
             "domainKind": "windows-job",
             "domainId": {
@@ -73,11 +80,18 @@ fn windows_tuple(t: &ProcTuple) -> Value {
 }
 
 fn tuple_from(id: &Value, with_ns: bool) -> Option<ProcTuple> {
-    let pid = id.get("pid")?.as_u64().filter(|p| *p > 0 && *p <= u64::from(u32::MAX))?;
+    let pid = id
+        .get("pid")?
+        .as_u64()
+        .filter(|p| *p > 0 && *p <= u64::from(u32::MAX))?;
     Some(ProcTuple {
         host: id.get("host")?.as_str()?.to_string(),
         boot_id: id.get("bootId").and_then(Value::as_str).map(str::to_string),
-        pid_ns: if with_ns { id.get("pidNs")?.as_str()?.to_string() } else { "none".to_string() },
+        pid_ns: if with_ns {
+            id.get("pidNs")?.as_str()?.to_string()
+        } else {
+            "none".to_string()
+        },
         pid: ProcId(pid as u32),
         start_time: id.get("startTime")?.as_str()?.to_string(),
     })
@@ -122,7 +136,10 @@ pub fn parse_record(record: &Value) -> Option<Domain> {
 pub fn declare(path: &Path, domain: &Domain) -> io::Result<()> {
     let mut record = domain_json(domain);
     record["v"] = json!(1);
-    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or(0);
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_nanos())
+        .unwrap_or(0);
     let mut tmp_name: OsString = path.file_name().map(OsString::from).unwrap_or_default();
     tmp_name.push(format!(".tmp-{}-{nanos}", std::process::id()));
     let tmp = path.with_file_name(tmp_name);
@@ -141,15 +158,22 @@ pub(crate) fn remove_record(path: &Path) {
 /// Reject an unprovable predecessor before ordinary admission can erase it.
 /// Called under the kernel lock, closing the contender's pre-read/acquire race.
 pub fn disallowed_kind(path: &Path, allowed: &[String]) -> Option<Value> {
-    if allowed.is_empty() { return None; }
+    if allowed.is_empty() {
+        return None;
+    }
     let raw = match std::fs::read_to_string(path) {
         Err(err) if err.kind() == io::ErrorKind::NotFound => return None,
         Err(err) => return Some(json!({ "unreadable": err.to_string() })),
         Ok(text) => serde_json::from_str::<Value>(&text).unwrap_or(json!({ "raw": text })),
     };
-    if raw["domainKind"].as_str().is_some_and(|kind| allowed.iter().any(|a| a == kind)) {
+    if raw["domainKind"]
+        .as_str()
+        .is_some_and(|kind| allowed.iter().any(|a| a == kind))
+    {
         None
-    } else { Some(raw) }
+    } else {
+        Some(raw)
+    }
 }
 
 /// Recorded handoff under an exclusive held description. Never kills a domain.
@@ -166,10 +190,14 @@ pub fn clear(path: &Path, wait: Duration) -> io::Result<()> {
     let mut watch = domain_watch(&domain);
     let until = Instant::now() + wait;
     while watch.is_empty() != DomainState::Empty {
-        if Instant::now() >= until { return Err(io::Error::other("domain-not-empty")); }
+        if Instant::now() >= until {
+            return Err(io::Error::other("domain-not-empty"));
+        }
         std::thread::sleep(Duration::from_millis(5));
     }
-    if std::fs::read_to_string(path)? != text { return Err(io::Error::other("domain-record-changed")); }
+    if std::fs::read_to_string(path)? != text {
+        return Err(io::Error::other("domain-record-changed"));
+    }
     std::fs::remove_file(path)
 }
 
@@ -182,7 +210,9 @@ pub fn contender_view(lock_file: &Path) -> Value {
     let text = match std::fs::read_to_string(&record_path) {
         Ok(text) => text,
         Err(err) if err.kind() == io::ErrorKind::NotFound => return json!({ "state": "absent" }),
-        Err(err) => return json!({ "state": "unknown", "reason": "record-unreadable", "detail": err.to_string() }),
+        Err(err) => {
+            return json!({ "state": "unknown", "reason": "record-unreadable", "detail": err.to_string() })
+        }
     };
     let Ok(raw) = serde_json::from_str::<Value>(&text) else {
         return json!({ "state": "unknown", "reason": "record-not-json", "domain": { "raw": text.chars().take(120).collect::<String>() } });
@@ -209,7 +239,11 @@ pub fn contender_view(lock_file: &Path) -> Value {
     };
     let mut fields = json!({ "state": state, "domain": domain_json(&domain) });
     if state != "empty" {
-        fields["reason"] = json!(watch.reason().unwrap_or(if state == "unknown" { "no-judge-on-this-platform" } else { "domain-has-live-members" }));
+        fields["reason"] = json!(watch.reason().unwrap_or(if state == "unknown" {
+            "no-judge-on-this-platform"
+        } else {
+            "domain-has-live-members"
+        }));
     }
     fields
 }
@@ -234,11 +268,19 @@ fn admit_traced(path: &Path, kill_wait: Duration, trace: &mut WatchTrace) -> Adm
     let text = match std::fs::read_to_string(path) {
         Ok(text) => text,
         Err(err) if err.kind() == io::ErrorKind::NotFound => return Admit::Proceed,
-        Err(err) => return Admit::NotEmpty { domain: json!({ "unreadable": err.to_string() }) },
+        Err(err) => {
+            return Admit::NotEmpty {
+                domain: json!({ "unreadable": err.to_string() }),
+            }
+        }
     };
     let raw: Value = match serde_json::from_str(&text) {
         Ok(value) => value,
-        Err(_) => return Admit::NotEmpty { domain: json!({ "raw": text }) },
+        Err(_) => {
+            return Admit::NotEmpty {
+                domain: json!({ "raw": text }),
+            }
+        }
     };
     let Some(domain) = parse_record(&raw) else {
         // An unknown version or kind is never deleted or ignored.
@@ -303,25 +345,44 @@ mod tests {
 
     impl DomainJudge for StuckMember {
         fn is_empty(&mut self) -> DomainState {
-            if Instant::now() >= self.gone_at { DomainState::Empty } else { DomainState::NotEmpty }
+            if Instant::now() >= self.gone_at {
+                DomainState::Empty
+            } else {
+                DomainState::NotEmpty
+            }
         }
         fn kill_all(&mut self, within: Duration) -> KillOutcome {
             let wait = within.min(self.gone_at.saturating_duration_since(Instant::now()));
             std::thread::sleep(wait);
-            if self.is_empty() == DomainState::Empty { KillOutcome::Ok } else { KillOutcome::Refused }
+            if self.is_empty() == DomainState::Empty {
+                KillOutcome::Ok
+            } else {
+                KillOutcome::Refused
+            }
         }
     }
 
     #[test]
     fn admission_over_a_member_that_outlives_the_kill_returns_within_the_kill_wait() {
         let kill_wait = Duration::from_millis(300);
-        let path = std::env::temp_dir().join(format!("fgos-stuck-member-{}.predecessor.json", std::process::id()));
-        let mut watch = StuckMember { gone_at: Instant::now() + Duration::from_secs(30) };
+        let path = std::env::temp_dir().join(format!(
+            "fgos-stuck-member-{}.predecessor.json",
+            std::process::id()
+        ));
+        let mut watch = StuckMember {
+            gone_at: Instant::now() + Duration::from_secs(30),
+        };
         let start = Instant::now();
         let answer = judge(&path, &mut watch, json!({ "kind": "stuck" }), kill_wait);
         let took = start.elapsed();
-        assert!(matches!(answer, Admit::NotEmpty { .. }), "a member that is still alive keeps the domain not empty");
-        assert!(took <= kill_wait + Duration::from_millis(250), "the kill wait bounds the whole admission, kill included: took {took:?}");
+        assert!(
+            matches!(answer, Admit::NotEmpty { .. }),
+            "a member that is still alive keeps the domain not empty"
+        );
+        assert!(
+            took <= kill_wait + Duration::from_millis(250),
+            "the kill wait bounds the whole admission, kill included: took {took:?}"
+        );
     }
 
     #[test]
@@ -333,7 +394,10 @@ mod tests {
         let record = record_path(&lock);
         std::fs::write(&record, "not json").unwrap();
         let view = contender_view(&lock);
-        assert_eq!((view["state"].as_str(), view["reason"].as_str()), (Some("unknown"), Some("record-not-json")));
+        assert_eq!(
+            (view["state"].as_str(), view["reason"].as_str()),
+            (Some("unknown"), Some("record-not-json"))
+        );
         assert_eq!(view["domain"]["raw"], "not json");
         assert_eq!(std::fs::read_to_string(&record).unwrap(), "not json");
         std::fs::write(&record, r#"{"v":99}"#).unwrap();

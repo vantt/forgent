@@ -14,9 +14,9 @@ use serde_json::{json, Map, Value};
 
 use crate::borrow_vectors::{self, RunError};
 use crate::driver;
+use crate::port::{BorrowedCheck, Mode, Wait, DEFAULT_KILL_WAIT_MS};
 #[cfg(not(windows))]
 use crate::port::{NotBorrowerReason, BORROW_SLOT, LOCK_FD_ENV};
-use crate::port::{BorrowedCheck, Mode, Wait, DEFAULT_KILL_WAIT_MS};
 
 mod hold;
 
@@ -33,7 +33,11 @@ pub const SCAN_PROTOCOL: u64 = 1;
 
 /// The protocol a route answers to and accepts.
 fn protocol_of(route: &str) -> u64 {
-    if route == "quiesce-scan" { SCAN_PROTOCOL } else { PROTOCOL }
+    if route == "quiesce-scan" {
+        SCAN_PROTOCOL
+    } else {
+        PROTOCOL
+    }
 }
 
 const EXIT_OK: i32 = 0;
@@ -54,7 +58,11 @@ fn seal_slot3() {
         unsafe {
             let flags = libc::fcntl(BORROW_SLOT as libc::c_int, libc::F_GETFD);
             if flags >= 0 {
-                libc::fcntl(BORROW_SLOT as libc::c_int, libc::F_SETFD, flags | libc::FD_CLOEXEC);
+                libc::fcntl(
+                    BORROW_SLOT as libc::c_int,
+                    libc::F_SETFD,
+                    flags | libc::FD_CLOEXEC,
+                );
             }
         }
     }
@@ -84,7 +92,12 @@ fn emit(result: Option<&str>, fields: Value, code: i32) -> i32 {
 
 fn error_as(protocol: u64, code: &str, message: &str, exit: i32) -> i32 {
     eprintln!("fgos internal: {code}: {message}");
-    emit_as(protocol, Some("error"), json!({ "code": code, "message": message }), exit)
+    emit_as(
+        protocol,
+        Some("error"),
+        json!({ "code": code, "message": message }),
+        exit,
+    )
 }
 
 fn error(code: &str, message: &str, exit: i32) -> i32 {
@@ -122,7 +135,11 @@ impl Flags {
     }
 
     fn values(&self, name: &str) -> Vec<&str> {
-        self.items.iter().filter(|(n, _)| n == name).filter_map(|(_, v)| v.as_deref()).collect()
+        self.items
+            .iter()
+            .filter(|(n, _)| n == name)
+            .filter_map(|(_, v)| v.as_deref())
+            .collect()
     }
 
     fn one(&self, name: &str) -> Result<Option<&str>, String> {
@@ -140,7 +157,10 @@ impl Flags {
 }
 
 fn positive_ms(raw: &str, flag: &str, min: u64) -> Result<u64, String> {
-    raw.parse::<u64>().ok().filter(|n| *n >= min).ok_or_else(|| format!("{flag} needs an integer >= {min}, got {raw}"))
+    raw.parse::<u64>()
+        .ok()
+        .filter(|n| *n >= min)
+        .ok_or_else(|| format!("{flag} needs an integer >= {min}, got {raw}"))
 }
 
 /// `fgos internal <route> ...`. `args` are the arguments after `internal`.
@@ -155,7 +175,9 @@ pub fn main(args: &[OsString]) -> i32 {
         }
     }
     let Some((route, rest)) = strings.split_first() else {
-        return usage("fgos internal <lock-fd|lock-hold|quiesce-scan|lock-borrow-vectors> --protocol 2 ...");
+        return usage(
+            "fgos internal <lock-fd|lock-hold|quiesce-scan|lock-borrow-vectors> --protocol 2 ...",
+        );
     };
     // The protocol is checked before anything else about the call, so a
     // payload of another release always learns that first.
@@ -171,7 +193,10 @@ pub fn main(args: &[OsString]) -> i32 {
     }
     let spoken = protocol_of(route);
     if protocol != Some(spoken.to_string().as_str()) {
-        let message = format!("this host speaks internal protocol {spoken} on {route}; the call asked for {}", protocol.unwrap_or("none"));
+        let message = format!(
+            "this host speaks internal protocol {spoken} on {route}; the call asked for {}",
+            protocol.unwrap_or("none")
+        );
         return error_as(spoken, "host-version-mismatch", &message, EXIT_MISMATCH);
     }
     match route.as_str() {
@@ -196,16 +221,26 @@ fn take_slot3() -> std::io::Result<File> {
 /// obstructs a holder. Every other lock operation runs in the caller's process
 /// through the addon's `holderLock`.
 fn lock_fd(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--borrowed-check", "--shared-try-path"], &["--shared-try"]) {
+    let flags = match Flags::parse(
+        args,
+        &["--borrowed-check", "--shared-try-path"],
+        &["--shared-try"],
+    ) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
     if flags.items.len() != 1 {
-        return usage("exactly one of --borrowed-check <path>, --shared-try, --shared-try-path <path>");
+        return usage(
+            "exactly one of --borrowed-check <path>, --shared-try, --shared-try-path <path>",
+        );
     }
     let drv = driver::current();
     if !drv.supported() {
-        return emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }), EXIT_UNAVAILABLE);
+        return emit(
+            Some("unavailable"),
+            json!({ "reason": "unsupported-platform", "detail": drv.unsupported_detail() }),
+            EXIT_UNAVAILABLE,
+        );
     }
     if flags.has("--shared-try") {
         return shared_try();
@@ -229,27 +264,45 @@ fn lock_fd(args: &[String]) -> i32 {
     let answer = {
         let file = match take_slot3() {
             Ok(file) => file,
-            Err(_) => return emit(Some("not-borrower"), json!({ "reason": NotBorrowerReason::FdMissing.as_str() }), EXIT_NEGATIVE),
+            Err(_) => {
+                return emit(
+                    Some("not-borrower"),
+                    json!({ "reason": NotBorrowerReason::FdMissing.as_str() }),
+                    EXIT_NEGATIVE,
+                )
+            }
         };
         let env = std::env::var(LOCK_FD_ENV).ok();
         crate::port::borrowed_check(&file, &lock_path, env.as_deref(), BORROW_SLOT)
     };
     match answer {
         BorrowedCheck::Borrower => emit(Some("borrower"), json!({}), EXIT_OK),
-        BorrowedCheck::NotBorrower(reason) => emit(Some("not-borrower"), json!({ "reason": reason.as_str() }), EXIT_NEGATIVE),
+        BorrowedCheck::NotBorrower(reason) => emit(
+            Some("not-borrower"),
+            json!({ "reason": reason.as_str() }),
+            EXIT_NEGATIVE,
+        ),
     }
 }
 
 #[cfg(windows)]
 fn shared_try() -> i32 {
-    emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": "--shared-try hands a descriptor to the route; on Windows use --shared-try-path" }), EXIT_UNAVAILABLE)
+    emit(
+        Some("unavailable"),
+        json!({ "reason": "unsupported-platform", "detail": "--shared-try hands a descriptor to the route; on Windows use --shared-try-path" }),
+        EXIT_UNAVAILABLE,
+    )
 }
 
 #[cfg(not(windows))]
 fn shared_try() -> i32 {
     match take_slot3() {
         Ok(file) => say(shared_probe(&file)),
-        Err(err) => error("io", &format!("fd 3 is not an open lock file: {err}"), EXIT_INTERNAL),
+        Err(err) => error(
+            "io",
+            &format!("fd 3 is not an open lock file: {err}"),
+            EXIT_INTERNAL,
+        ),
     }
 }
 
@@ -261,7 +314,13 @@ fn shared_try() -> i32 {
 fn shared_try_path(path: &Path) -> i32 {
     let file = match OpenOptions::new().read(true).open(path) {
         Ok(file) => file,
-        Err(err) => return error("io", &format!("cannot open {}: {err}", path.display()), EXIT_INTERNAL),
+        Err(err) => {
+            return error(
+                "io",
+                &format!("cannot open {}: {err}", path.display()),
+                EXIT_INTERNAL,
+            )
+        }
     };
     let answer = shared_probe(&file);
     driver::current().unlock_private(&file);
@@ -284,13 +343,29 @@ fn say(answer: Answer) -> i32 {
 
 fn shared_probe(file: &File) -> Answer {
     match driver::current().file_guarantee(file) {
-        Ok(g) if !g.usable() => return Answer::Say("unavailable", json!({ "reason": "unsupported-filesystem", "detail": g.notes.join("; ") }), EXIT_UNAVAILABLE),
+        Ok(g) if !g.usable() => {
+            return Answer::Say(
+                "unavailable",
+                json!({ "reason": "unsupported-filesystem", "detail": g.notes.join("; ") }),
+                EXIT_UNAVAILABLE,
+            )
+        }
         Ok(_) => {}
-        Err(err) => return Answer::Say("unavailable", json!({ "reason": "io-error", "detail": format!("file guarantee: {err}") }), EXIT_UNAVAILABLE),
+        Err(err) => {
+            return Answer::Say(
+                "unavailable",
+                json!({ "reason": "io-error", "detail": format!("file guarantee: {err}") }),
+                EXIT_UNAVAILABLE,
+            )
+        }
     }
     match crate::port::lock_description(file, Mode::Sh, Wait::Try) {
         Ok(crate::port::DescriptionLock::Locked) => Answer::Say("free", json!({}), EXIT_OK),
-        Ok(_) => Answer::Say("held", json!({ "reason": "kernel-lock-held" }), EXIT_NEGATIVE),
+        Ok(_) => Answer::Say(
+            "held",
+            json!({ "reason": "kernel-lock-held" }),
+            EXIT_NEGATIVE,
+        ),
         Err(err) => Answer::Fail(format!("shared lock: {err}")),
     }
 }
@@ -298,12 +373,25 @@ fn shared_probe(file: &File) -> Answer {
 /// `lock-hold --path <lockFile> --mode ex|sh --work <dir> (--try | --wait-ms N)
 /// [--kill-wait-ms K]`: the Windows helper that holds one lock for Node.
 fn lock_hold(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--path", "--mode", "--work", "--wait-ms", "--kill-wait-ms", "--predecessor-kinds"], &["--try"]) {
+    let flags = match Flags::parse(
+        args,
+        &[
+            "--path",
+            "--mode",
+            "--work",
+            "--wait-ms",
+            "--kill-wait-ms",
+            "--predecessor-kinds",
+        ],
+        &["--try"],
+    ) {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
     let parsed = (|| -> Result<hold::HoldArgs, String> {
-        let path = flags.one("--path")?.ok_or("--path <lockFile> is required")?;
+        let path = flags
+            .one("--path")?
+            .ok_or("--path <lockFile> is required")?;
         let work = flags.one("--work")?.ok_or("--work <dir> is required")?;
         let mode = match flags.one("--mode")?.ok_or("--mode ex|sh is required")? {
             "ex" => Mode::Ex,
@@ -318,9 +406,23 @@ fn lock_hold(args: &[String]) -> i32 {
         if flags.values("--try").len() > 1 {
             return Err("--try given more than once".to_string());
         }
-        let kill_wait_ms = flags.one("--kill-wait-ms")?.map(|raw| positive_ms(raw, "--kill-wait-ms", 0)).transpose()?.unwrap_or(DEFAULT_KILL_WAIT_MS);
-        let predecessor_kinds = flags.one("--predecessor-kinds")?.map(|s| s.split(',').map(str::to_string).collect()).unwrap_or_default();
-        Ok(hold::HoldArgs { predecessor_kinds, path: PathBuf::from(path), mode, wait, kill_wait_ms, work: PathBuf::from(work) })
+        let kill_wait_ms = flags
+            .one("--kill-wait-ms")?
+            .map(|raw| positive_ms(raw, "--kill-wait-ms", 0))
+            .transpose()?
+            .unwrap_or(DEFAULT_KILL_WAIT_MS);
+        let predecessor_kinds = flags
+            .one("--predecessor-kinds")?
+            .map(|s| s.split(',').map(str::to_string).collect())
+            .unwrap_or_default();
+        Ok(hold::HoldArgs {
+            predecessor_kinds,
+            path: PathBuf::from(path),
+            mode,
+            wait,
+            kill_wait_ms,
+            work: PathBuf::from(work),
+        })
     })();
     #[cfg_attr(not(windows), allow(unused_variables))]
     let parsed = match parsed {
@@ -336,7 +438,11 @@ fn lock_hold(args: &[String]) -> i32 {
     }
     #[cfg(not(windows))]
     {
-        emit(Some("unavailable"), json!({ "reason": "unsupported-platform", "detail": "lock-hold is the Windows helper; other platforms hand a descriptor to lock-fd" }), EXIT_UNAVAILABLE)
+        emit(
+            Some("unavailable"),
+            json!({ "reason": "unsupported-platform", "detail": "lock-hold is the Windows helper; other platforms hand a descriptor to lock-fd" }),
+            EXIT_UNAVAILABLE,
+        )
     }
 }
 
@@ -345,15 +451,29 @@ fn lock_borrow_vectors(args: &[String]) -> i32 {
         Ok(flags) => flags,
         Err(message) => return usage(&message),
     };
-    let only: Vec<String> = flags.values("--vector").into_iter().map(str::to_string).collect();
+    let only: Vec<String> = flags
+        .values("--vector")
+        .into_iter()
+        .map(str::to_string)
+        .collect();
     let ran = match crate::port::HelperExe::current() {
-        Ok(helper) => borrow_vectors::run(Path::new("git"), &helper, &only, flags.has("--keep-repo")),
-        Err(err) => Err(RunError::Unavailable(format!("the running executable is unknown: {err}"))),
+        Ok(helper) => {
+            borrow_vectors::run(Path::new("git"), &helper, &only, flags.has("--keep-repo"))
+        }
+        Err(err) => Err(RunError::Unavailable(format!(
+            "the running executable is unknown: {err}"
+        ))),
     };
     let report = match ran {
         Ok(report) => report,
         Err(RunError::Usage(message)) => return usage(&message),
-        Err(RunError::Unavailable(detail)) => return emit(Some("unavailable"), json!({ "detail": detail }), EXIT_UNAVAILABLE),
+        Err(RunError::Unavailable(detail)) => {
+            return emit(
+                Some("unavailable"),
+                json!({ "detail": detail }),
+                EXIT_UNAVAILABLE,
+            )
+        }
     };
     let pass = report.pass();
     let verdict = |ok: bool| if ok { "pass" } else { "fail" };
@@ -369,33 +489,63 @@ fn lock_borrow_vectors(args: &[String]) -> i32 {
         "elapsedMs": report.elapsed_ms,
     });
     if report.elapsed_ms > 1000.0 {
-        fields["detail"] = json!(format!("run took {} ms, over the 1000 ms budget", report.elapsed_ms));
+        fields["detail"] = json!(format!(
+            "run took {} ms, over the 1000 ms budget",
+            report.elapsed_ms
+        ));
     }
     if let Some(kept) = &report.kept {
         fields["keptRepo"] = json!(kept.to_string_lossy());
     }
-    emit(Some(verdict(pass)), fields, if pass { EXIT_OK } else { EXIT_NEGATIVE })
+    emit(
+        Some(verdict(pass)),
+        fields,
+        if pass { EXIT_OK } else { EXIT_NEGATIVE },
+    )
 }
 
 fn quiesce_scan(args: &[String]) -> i32 {
-    let flags = match Flags::parse(args, &["--root", "--dir", "--exclude-pid"], &["--workspace-only"]) {
+    let flags = match Flags::parse(
+        args,
+        &["--root", "--dir", "--exclude-pid"],
+        &["--workspace-only"],
+    ) {
         Ok(flags) => flags,
         Err(message) => return usage_as(SCAN_PROTOCOL, &message),
     };
-    let roots: Vec<PathBuf> = flags.values("--root").into_iter().map(PathBuf::from).collect();
+    let roots: Vec<PathBuf> = flags
+        .values("--root")
+        .into_iter()
+        .map(PathBuf::from)
+        .collect();
     if roots.is_empty() {
-        return usage_as(SCAN_PROTOCOL, "quiesce-scan needs at least one --root <path>");
+        return usage_as(
+            SCAN_PROTOCOL,
+            "quiesce-scan needs at least one --root <path>",
+        );
     }
     // Linked worktrees come from the caller's Git listing; holder-lock never runs Git.
-    let dirs: Vec<PathBuf> = flags.values("--dir").into_iter().map(PathBuf::from).collect();
+    let dirs: Vec<PathBuf> = flags
+        .values("--dir")
+        .into_iter()
+        .map(PathBuf::from)
+        .collect();
     if !dirs.is_empty() && roots.len() != 1 {
-        return usage_as(SCAN_PROTOCOL, "quiesce-scan --dir belongs to exactly one --root");
+        return usage_as(
+            SCAN_PROTOCOL,
+            "quiesce-scan --dir belongs to exactly one --root",
+        );
     }
     let mut exclude = Vec::new();
     for raw in flags.values("--exclude-pid") {
         match raw.parse::<u32>() {
             Ok(pid) => exclude.push(pid),
-            Err(_) => return usage_as(SCAN_PROTOCOL, &format!("--exclude-pid needs a pid, got {raw}")),
+            Err(_) => {
+                return usage_as(
+                    SCAN_PROTOCOL,
+                    &format!("--exclude-pid needs a pid, got {raw}"),
+                )
+            }
         }
     }
     quiesce::scan(&roots, &dirs, &exclude, flags.has("--workspace-only"))
@@ -460,8 +610,13 @@ mod quiesce {
     /// unreadable argv says nothing, so it still counts.
     fn could_be_fgos(argv: Option<&[String]>) -> bool {
         let Some(argv) = argv else { return true };
-        let Some(first) = argv.first() else { return false };
-        let base = Path::new(first).file_name().and_then(|n| n.to_str()).unwrap_or("");
+        let Some(first) = argv.first() else {
+            return false;
+        };
+        let base = Path::new(first)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("");
         crate::origin::is_script_runtime(base) || crate::origin::FGOS_BINARIES.contains(&base)
     }
 
@@ -472,7 +627,12 @@ mod quiesce {
     /// could be fgOS, so an idle shell, an agent session or `git -C` is not a
     /// writer. A process whose argv cannot be read still counts. Argument
     /// text alone never counts.
-    fn workspace_hit(cmdline: Option<&[String]>, cwd: Option<&Path>, dirs: &[PathBuf], workspace_only: bool) -> Option<&'static str> {
+    fn workspace_hit(
+        cmdline: Option<&[String]>,
+        cwd: Option<&Path>,
+        dirs: &[PathBuf],
+        workspace_only: bool,
+    ) -> Option<&'static str> {
         if !workspace_only && !could_be_fgos(cmdline) {
             return None;
         }
@@ -493,7 +653,9 @@ mod quiesce {
         use std::os::unix::fs::MetadataExt;
         // SAFETY: geteuid has no preconditions.
         let me = unsafe { libc::geteuid() };
-        std::fs::metadata(format!("/proc/{pid}")).map(|m| m.uid() == me).unwrap_or(false)
+        std::fs::metadata(format!("/proc/{pid}"))
+            .map(|m| m.uid() == me)
+            .unwrap_or(false)
     }
 
     #[cfg(not(target_os = "linux"))]
@@ -501,21 +663,44 @@ mod quiesce {
         false
     }
 
-    pub(super) fn scan(roots: &[PathBuf], linked: &[PathBuf], exclude: &[u32], workspace_only: bool) -> i32 {
+    pub(super) fn scan(
+        roots: &[PathBuf],
+        linked: &[PathBuf],
+        exclude: &[u32],
+        workspace_only: bool,
+    ) -> i32 {
         if !cfg!(target_os = "linux") {
-            return emit(Some("unavailable"), json!({ "processes": [], "unreadable": 0, "detail": "process scan is only implemented on Linux; a person confirms no fgOS process is left" }), EXIT_UNAVAILABLE);
+            return emit(
+                Some("unavailable"),
+                json!({ "processes": [], "unreadable": 0, "detail": "process scan is only implemented on Linux; a person confirms no fgOS process is left" }),
+                EXIT_UNAVAILABLE,
+            );
         }
         // Inside a PID namespace (a sandbox) every process outside it is
         // invisible: a scan from there could only ever look clean.
         if !fgos_process::facts::pid_ns().is_initial {
-            return emit(Some("unavailable"), json!({ "processes": [], "unreadable": 0, "detail": "the scan runs inside a PID namespace that hides the host's processes; run it from the host" }), EXIT_UNAVAILABLE);
+            return emit(
+                Some("unavailable"),
+                json!({ "processes": [], "unreadable": 0, "detail": "the scan runs inside a PID namespace that hides the host's processes; run it from the host" }),
+                EXIT_UNAVAILABLE,
+            );
         }
-        let per_root: Vec<(PathBuf, Vec<PathBuf>)> = roots.iter().map(|r| (r.clone(), workspace_dirs(r, linked))).collect();
-        let filter = ScanFilter { env_keys: Vec::new(), include_self: false };
+        let per_root: Vec<(PathBuf, Vec<PathBuf>)> = roots
+            .iter()
+            .map(|r| (r.clone(), workspace_dirs(r, linked)))
+            .collect();
+        let filter = ScanFilter {
+            env_keys: Vec::new(),
+            include_self: false,
+        };
         let views = match scan_processes(&filter) {
             Scan::Views(views) => views,
             Scan::Unsupported => {
-                return emit(Some("unavailable"), json!({ "processes": [], "unreadable": 0, "detail": "process scan unsupported here" }), EXIT_UNAVAILABLE)
+                return emit(
+                    Some("unavailable"),
+                    json!({ "processes": [], "unreadable": 0, "detail": "process scan unsupported here" }),
+                    EXIT_UNAVAILABLE,
+                )
             }
         };
         let mut processes = Vec::new();
@@ -528,7 +713,13 @@ mod quiesce {
             // A process belongs to the workspace whose directory it works in
             // or is directed into; a process of another workspace is not ours.
             let hit = per_root.iter().find_map(|(root, dirs)| {
-                workspace_hit(view.cmdline.as_deref(), view.cwd.as_deref(), dirs, workspace_only).map(|matched| (matched, root.as_path()))
+                workspace_hit(
+                    view.cmdline.as_deref(),
+                    view.cwd.as_deref(),
+                    dirs,
+                    workspace_only,
+                )
+                .map(|matched| (matched, root.as_path()))
             });
             match hit {
                 Some((matched, root)) => {
@@ -545,7 +736,13 @@ mod quiesce {
                         "root": root.to_string_lossy(),
                     }));
                 }
-                None if !workspace_only && !view.unreadable.is_empty() && same_user(view.pid.0) && could_be_fgos(view.cmdline.as_deref()) => unreadable += 1,
+                None if !workspace_only
+                    && !view.unreadable.is_empty()
+                    && same_user(view.pid.0)
+                    && could_be_fgos(view.cmdline.as_deref()) =>
+                {
+                    unreadable += 1
+                }
                 None => {}
             }
         }
@@ -600,12 +797,17 @@ mod quiesce {
         #[cfg(unix)]
         #[test]
         fn workspace_dirs_are_the_root_and_the_listed_worktrees_only() {
-            let base = std::env::temp_dir().join(format!("fgos-quiesce-dirs-{}", std::process::id()));
+            let base =
+                std::env::temp_dir().join(format!("fgos-quiesce-dirs-{}", std::process::id()));
             let (root, linked) = (base.join("root"), base.join("linked"));
             std::fs::create_dir_all(&root).unwrap();
             std::fs::create_dir_all(&linked).unwrap();
             let canonical = |p: &Path| p.canonicalize().unwrap();
-            assert_eq!(workspace_dirs(&root, &[]), vec![canonical(&root)], "nothing is listed for the caller");
+            assert_eq!(
+                workspace_dirs(&root, &[]),
+                vec![canonical(&root)],
+                "nothing is listed for the caller"
+            );
             assert_eq!(
                 workspace_dirs(&root, &[linked.clone(), root.clone(), base.join("gone")]),
                 vec![canonical(&root), canonical(&linked), base.join("gone")],
@@ -619,25 +821,81 @@ mod quiesce {
         fn a_cwd_in_the_workspace_counts_only_for_a_process_that_could_be_fgos() {
             let dirs = vec![PathBuf::from("/workspace")];
             let cwd = Some(Path::new("/workspace/sub"));
-            let hit = |parts: &[&str], only: bool| workspace_hit(Some(&argv(parts)), cwd, &dirs, only);
-            assert_eq!(hit(&["/usr/bin/zsh"], false), None, "an idle shell is not a writer");
-            assert_eq!(hit(&["claude"], false), None, "an agent session is not a writer");
+            let hit =
+                |parts: &[&str], only: bool| workspace_hit(Some(&argv(parts)), cwd, &dirs, only);
+            assert_eq!(
+                hit(&["/usr/bin/zsh"], false),
+                None,
+                "an idle shell is not a writer"
+            );
+            assert_eq!(
+                hit(&["claude"], false),
+                None,
+                "an agent session is not a writer"
+            );
             assert_eq!(hit(&["node", "bin/fgos.mjs", "run"], false), Some("cwd"));
             assert_eq!(hit(&["fgos", "run", "x"], false), Some("cwd"));
-            assert_eq!(hit(&["/usr/bin/zsh"], true), Some("cwd"), "workspace-only leaves the filtering to the caller");
-            assert_eq!(workspace_hit(None, cwd, &dirs, false), Some("cwd"), "an unreadable argv still counts");
-            assert_eq!(workspace_hit(Some(&argv(&["/usr/bin/zsh"])), Some(Path::new("/elsewhere")), &dirs, false), None);
+            assert_eq!(
+                hit(&["/usr/bin/zsh"], true),
+                Some("cwd"),
+                "workspace-only leaves the filtering to the caller"
+            );
+            assert_eq!(
+                workspace_hit(None, cwd, &dirs, false),
+                Some("cwd"),
+                "an unreadable argv still counts"
+            );
+            assert_eq!(
+                workspace_hit(
+                    Some(&argv(&["/usr/bin/zsh"])),
+                    Some(Path::new("/elsewhere")),
+                    &dirs,
+                    false
+                ),
+                None
+            );
             let elsewhere = Some(Path::new("/elsewhere"));
-            assert_eq!(workspace_hit(Some(&argv(&["fgos", "run", "do /workspace/x", "/workspace/y"])), elsewhere, &dirs, false), None, "a prompt or positional path is text, not a root");
-            assert_eq!(workspace_hit(Some(&argv(&["fgos", "run", "--worktree", "/workspace/y"])), elsewhere, &dirs, false), Some("cmdline"), "a typed root counts");
-            assert_eq!(workspace_hit(Some(&argv(&["git", "-C", "/workspace"])), elsewhere, &dirs, false), None, "git is not fgOS outside workspace-only mode");
+            assert_eq!(
+                workspace_hit(
+                    Some(&argv(&["fgos", "run", "do /workspace/x", "/workspace/y"])),
+                    elsewhere,
+                    &dirs,
+                    false
+                ),
+                None,
+                "a prompt or positional path is text, not a root"
+            );
+            assert_eq!(
+                workspace_hit(
+                    Some(&argv(&["fgos", "run", "--worktree", "/workspace/y"])),
+                    elsewhere,
+                    &dirs,
+                    false
+                ),
+                Some("cmdline"),
+                "a typed root counts"
+            );
+            assert_eq!(
+                workspace_hit(
+                    Some(&argv(&["git", "-C", "/workspace"])),
+                    elsewhere,
+                    &dirs,
+                    false
+                ),
+                None,
+                "git is not fgOS outside workspace-only mode"
+            );
         }
 
         #[test]
         fn an_unreadable_process_counts_only_when_its_argv_could_be_fgos() {
             assert!(could_be_fgos(None), "no argv at all says nothing");
             assert!(could_be_fgos(Some(&argv(&["node", "bin/fgos.mjs"]))));
-            assert!(could_be_fgos(Some(&argv(&["/usr/bin/node", "--test", "x.mjs"]))));
+            assert!(could_be_fgos(Some(&argv(&[
+                "/usr/bin/node",
+                "--test",
+                "x.mjs"
+            ]))));
             assert!(could_be_fgos(Some(&argv(&["/opt/fgos/bin/fgos", "run"]))));
             assert!(could_be_fgos(Some(&argv(&["fgos-gateway"]))));
             assert!(could_be_fgos(Some(&argv(&["nodejs"]))));
@@ -645,9 +903,18 @@ mod quiesce {
             assert!(could_be_fgos(Some(&argv(&["node-22"]))));
             assert!(could_be_fgos(Some(&argv(&["bun", "run"]))));
             assert!(could_be_fgos(Some(&argv(&["deno", "run"]))));
-            assert!(!could_be_fgos(Some(&argv(&["nodemon"]))), "a name that only starts with node is something else");
-            assert!(!could_be_fgos(Some(&argv(&["(sd-pam)"]))), "systemd's session helper");
-            assert!(!could_be_fgos(Some(&argv(&[]))), "a zombie or kernel thread has an empty argv");
+            assert!(
+                !could_be_fgos(Some(&argv(&["nodemon"]))),
+                "a name that only starts with node is something else"
+            );
+            assert!(
+                !could_be_fgos(Some(&argv(&["(sd-pam)"]))),
+                "systemd's session helper"
+            );
+            assert!(
+                !could_be_fgos(Some(&argv(&[]))),
+                "a zombie or kernel thread has an empty argv"
+            );
         }
     }
 }

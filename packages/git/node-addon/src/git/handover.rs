@@ -38,7 +38,12 @@ pub fn mint_git_loan(
                 fd,
                 Resource::new(name, path),
                 u64::from(kill_wait_ms),
-                lock.0.lock().map_err(error)?.as_ref().ok_or_else(|| error("holder-lock-closed"))?.since(),
+                lock.0
+                    .lock()
+                    .map_err(error)?
+                    .as_ref()
+                    .ok_or_else(|| error("holder-lock-closed"))?
+                    .since(),
                 protected_roots,
             )
         }
@@ -47,14 +52,7 @@ pub fn mint_git_loan(
     }
     #[cfg(not(unix))]
     {
-        let _ = (
-            fd,
-            name,
-            path,
-            kill_wait_ms,
-            lock,
-            protected_roots,
-        );
+        let _ = (fd, name, path, kill_wait_ms, lock, protected_roots);
         Err(error("git-lock-handover-unsupported"))
     }
 }

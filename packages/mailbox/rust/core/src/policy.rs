@@ -245,7 +245,11 @@ impl MailboxState {
         self.check_lifetime_key(&LifetimeKey::new(from, generation), limits)
     }
 
-    pub(crate) fn check_lifetime_key(&self, key: &LifetimeKey, limits: &Limits) -> Result<(), Refusal> {
+    pub(crate) fn check_lifetime_key(
+        &self,
+        key: &LifetimeKey,
+        limits: &Limits,
+    ) -> Result<(), Refusal> {
         let attempts = self.lifetime.get(key).copied().unwrap_or(0);
         if attempts > limits.session.lifetime_cap {
             return Err(Refusal::LifetimeCap {

@@ -10,8 +10,9 @@
 //! returns.
 
 use super::{
-    Activity, ActivityDetail, AgentFacts, CloseOutcome, CreatedPane, Direction, DriverResult, ForegroundProcess, PaneGeometry,
-    PaneLiveness, ProcessInfo, PtySize, Rect, TabGeometry, TerminalDriver,
+    Activity, ActivityDetail, AgentFacts, CloseOutcome, CreatedPane, Direction, DriverResult,
+    ForegroundProcess, PaneGeometry, PaneLiveness, ProcessInfo, PtySize, Rect, TabGeometry,
+    TerminalDriver,
 };
 use crate::port::{Refusal, ServerIncarnation};
 use serde_json::Value;
@@ -46,7 +47,10 @@ pub struct HerdrConfig {
 
 impl HerdrConfig {
     pub fn new(bin: impl Into<String>) -> Self {
-        HerdrConfig { bin: bin.into(), ..Default::default() }
+        HerdrConfig {
+            bin: bin.into(),
+            ..Default::default()
+        }
     }
 
     fn bin(&self) -> &str {
@@ -60,7 +64,10 @@ impl HerdrConfig {
     /// The socket the CLI is pointed at: the caller's own, else the one herdr keeps
     /// for the named session.
     fn socket(&self) -> Option<String> {
-        self.socket_path.clone().filter(|p| !p.is_empty()).or_else(|| self.session.as_deref().and_then(|s| self.session_socket(s)))
+        self.socket_path
+            .clone()
+            .filter(|p| !p.is_empty())
+            .or_else(|| self.session.as_deref().and_then(|s| self.session_socket(s)))
     }
 
     /// herdr's socket layout, read off a live server: the default session keeps
@@ -69,15 +76,33 @@ impl HerdrConfig {
     fn session_socket(&self, session: &str) -> Option<String> {
         let valid = session.starts_with(|c: char| c.is_ascii_lowercase())
             && session.len() <= 32
-            && session.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-');
-        let home = self.env.iter().find(|(k, _)| k == "HOME").map(|(_, v)| v.clone()).or_else(|| std::env::var("HOME").ok()).filter(|h| !h.is_empty());
-        let base = std::path::Path::new(&home.filter(|_| valid)?).join(".config").join("herdr");
-        let socket = if session == "default" { base.join("herdr.sock") } else { base.join("sessions").join(session).join("herdr.sock") };
+            && session
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-');
+        let home = self
+            .env
+            .iter()
+            .find(|(k, _)| k == "HOME")
+            .map(|(_, v)| v.clone())
+            .or_else(|| std::env::var("HOME").ok())
+            .filter(|h| !h.is_empty());
+        let base = std::path::Path::new(&home.filter(|_| valid)?)
+            .join(".config")
+            .join("herdr");
+        let socket = if session == "default" {
+            base.join("herdr.sock")
+        } else {
+            base.join("sessions").join(session).join("herdr.sock")
+        };
         Some(socket.to_string_lossy().into_owned())
     }
 
     fn timeout(&self) -> Duration {
-        let each = Duration::from_millis(if self.timeout_ms == 0 { DEFAULT_TIMEOUT_MS } else { self.timeout_ms });
+        let each = Duration::from_millis(if self.timeout_ms == 0 {
+            DEFAULT_TIMEOUT_MS
+        } else {
+            self.timeout_ms
+        });
         match self.deadline {
             Some(deadline) => each.min(deadline.saturating_duration_since(Instant::now())),
             None => each,
@@ -99,8 +124,16 @@ pub struct HerdrError {
 pub fn envelope(body: &Value) -> Result<Value, HerdrError> {
     if let Some(err) = body.get("error").filter(|e| e.is_object()) {
         return Err(HerdrError {
-            code: err.get("code").and_then(Value::as_str).unwrap_or("herdr_error").to_string(),
-            message: err.get("message").and_then(Value::as_str).unwrap_or_default().to_string(),
+            code: err
+                .get("code")
+                .and_then(Value::as_str)
+                .unwrap_or("herdr_error")
+                .to_string(),
+            message: err
+                .get("message")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_string(),
         });
     }
     Ok(body.get("result").cloned().unwrap_or_else(|| body.clone()))
@@ -111,11 +144,18 @@ fn text<'a>(v: &'a Value, key: &str) -> Option<&'a str> {
 }
 
 fn number(v: &Value, key: &str) -> Option<u32> {
-    v.get(key).and_then(Value::as_u64).and_then(|n| u32::try_from(n).ok())
+    v.get(key)
+        .and_then(Value::as_u64)
+        .and_then(|n| u32::try_from(n).ok())
 }
 
 fn rect(v: &Value) -> Option<Rect> {
-    Some(Rect { x: number(v, "x")?, y: number(v, "y")?, width: number(v, "width")?, height: number(v, "height")? })
+    Some(Rect {
+        x: number(v, "x")?,
+        y: number(v, "y")?,
+        width: number(v, "width")?,
+        height: number(v, "height")?,
+    })
 }
 
 /// `pane layout`: `layout.area`, `layout.panes[].rect`, `layout.tab_id`.
@@ -125,9 +165,18 @@ pub fn parse_layout(result: &Value) -> Option<TabGeometry> {
         .get("panes")?
         .as_array()?
         .iter()
-        .map(|p| Some(PaneGeometry { pane_id: text(p, "pane_id")?.to_string(), rect: rect(p.get("rect")?)? }))
+        .map(|p| {
+            Some(PaneGeometry {
+                pane_id: text(p, "pane_id")?.to_string(),
+                rect: rect(p.get("rect")?)?,
+            })
+        })
         .collect::<Option<Vec<_>>>()?;
-    Some(TabGeometry { tab_id: text(layout, "tab_id")?.to_string(), area: rect(layout.get("area")?)?, panes })
+    Some(TabGeometry {
+        tab_id: text(layout, "tab_id")?.to_string(),
+        area: rect(layout.get("area")?)?,
+        panes,
+    })
 }
 
 /// `tab create`: the new tab and its root pane.
@@ -141,7 +190,10 @@ pub fn parse_tab_created(result: &Value) -> Option<CreatedPane> {
 /// `pane split`: the new pane and the tab it landed in.
 pub fn parse_split(result: &Value) -> Option<CreatedPane> {
     let pane = result.get("pane")?;
-    Some(CreatedPane { tab_id: text(pane, "tab_id")?.to_string(), pane_id: text(pane, "pane_id")?.to_string() })
+    Some(CreatedPane {
+        tab_id: text(pane, "tab_id")?.to_string(),
+        pane_id: text(pane, "pane_id")?.to_string(),
+    })
 }
 
 /// `pane process-info`.
@@ -155,11 +207,23 @@ pub fn parse_process_info(result: &Value) -> Option<ProcessInfo> {
         .iter()
         .filter(|p| p.get("argv").is_some())
         .map(|p| {
-            let argv = p.get("argv")?.as_array()?.iter().map(|a| a.as_str().map(str::to_string)).collect::<Option<Vec<_>>>()?;
-            Some(ForegroundProcess { pid: number(p, "pid")?, argv })
+            let argv = p
+                .get("argv")?
+                .as_array()?
+                .iter()
+                .map(|a| a.as_str().map(str::to_string))
+                .collect::<Option<Vec<_>>>()?;
+            Some(ForegroundProcess {
+                pid: number(p, "pid")?,
+                argv,
+            })
         })
         .collect::<Option<Vec<_>>>()?;
-    Some(ProcessInfo { shell_pid: number(info, "shell_pid")?, foreground_pgid: number(info, "foreground_process_group_id")?, foreground })
+    Some(ProcessInfo {
+        shell_pid: number(info, "shell_pid")?,
+        foreground_pgid: number(info, "foreground_process_group_id")?,
+        foreground,
+    })
 }
 
 /// `agent get` (or `pane get`): what herdr's agent detection says about the pane.
@@ -168,7 +232,10 @@ pub fn parse_activity(result: &Value) -> Option<Activity> {
     Some(Activity {
         state: text(pane, "agent_status")?.to_string(),
         agent: text(pane, "agent").map(str::to_string),
-        session: pane.pointer("/agent_session/value").and_then(Value::as_str).map(str::to_string),
+        session: pane
+            .pointer("/agent_session/value")
+            .and_then(Value::as_str)
+            .map(str::to_string),
         detail: None,
     })
 }
@@ -176,23 +243,35 @@ pub fn parse_activity(result: &Value) -> Option<Activity> {
 /// `agent explain --json`: the screen detector's verdict. herdr answers the
 /// verdict as the body itself, or wrapped in `result`.
 pub fn parse_explain(body: &Value) -> ActivityDetail {
-    let verdict = body.get("result").filter(|r| r.is_object() && body.get("state").is_none()).unwrap_or(body);
+    let verdict = body
+        .get("result")
+        .filter(|r| r.is_object() && body.get("state").is_none())
+        .unwrap_or(body);
     let flag = |name: &str| verdict.get(name).and_then(Value::as_bool) == Some(true);
-    let matched = verdict.pointer("/matched_rule/id").and_then(Value::as_str).filter(|s| !s.is_empty());
+    let matched = verdict
+        .pointer("/matched_rule/id")
+        .and_then(Value::as_str)
+        .filter(|s| !s.is_empty());
     let prompt_text = matched
         .and_then(|id| {
             verdict
                 .get("evaluated_rules")?
                 .as_array()?
                 .iter()
-                .find(|r| r.get("matched").and_then(Value::as_bool) == Some(true) && r.get("id").and_then(Value::as_str) == Some(id))
+                .find(|r| {
+                    r.get("matched").and_then(Value::as_bool) == Some(true)
+                        && r.get("id").and_then(Value::as_str) == Some(id)
+                })
         })
         .and_then(|r| r.pointer("/evidence/region_preview"))
         .and_then(Value::as_str)
         .unwrap_or_default()
         .to_string();
     ActivityDetail {
-        state: verdict.get("state").and_then(Value::as_str).map(str::to_string),
+        state: verdict
+            .get("state")
+            .and_then(Value::as_str)
+            .map(str::to_string),
         visible_blocker: flag("visible_blocker"),
         visible_idle: flag("visible_idle"),
         visible_working: flag("visible_working"),
@@ -205,7 +284,11 @@ pub fn parse_explain(body: &Value) -> ActivityDetail {
 pub fn parse_agent_kinds(help: &str) -> Option<Vec<String>> {
     const MARK: &str = "[possible values:";
     let rest = &help[help.find(MARK)? + MARK.len()..];
-    let kinds: Vec<String> = rest[..rest.find(']')?].split(',').map(|k| k.trim().to_string()).filter(|k| !k.is_empty()).collect();
+    let kinds: Vec<String> = rest[..rest.find(']')?]
+        .split(',')
+        .map(|k| k.trim().to_string())
+        .filter(|k| !k.is_empty())
+        .collect();
     (!kinds.is_empty()).then_some(kinds)
 }
 
@@ -214,11 +297,16 @@ pub fn parse_agent_kinds(help: &str) -> Option<Vec<String>> {
 pub fn parse_integrations(text: &str) -> Option<BTreeMap<String, String>> {
     let states = text.lines().filter_map(|line| {
         let (name, rest) = line.trim_start().split_once(':')?;
-        let name_ok = !name.is_empty() && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '-');
+        let name_ok =
+            !name.is_empty() && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '-');
         let rest = rest.trim_start().to_ascii_lowercase();
-        let state = ["current", "outdated", "not installed"].into_iter().find(|state| {
-            rest.strip_prefix(state).is_some_and(|after| !after.starts_with(|c: char| c.is_ascii_alphanumeric() || c == '_'))
-        })?;
+        let state = ["current", "outdated", "not installed"]
+            .into_iter()
+            .find(|state| {
+                rest.strip_prefix(state).is_some_and(|after| {
+                    !after.starts_with(|c: char| c.is_ascii_alphanumeric() || c == '_')
+                })
+            })?;
         name_ok.then(|| (name.to_ascii_lowercase(), state.to_string()))
     });
     let states: BTreeMap<String, String> = states.collect();
@@ -260,11 +348,16 @@ impl CallError {
 }
 
 fn unknown(reason: impl Into<String>) -> Refusal {
-    Refusal::Unknown { reason: reason.into() }
+    Refusal::Unknown {
+        reason: reason.into(),
+    }
 }
 
 fn unsupported(capability: &str, detail: impl Into<String>) -> Refusal {
-    Refusal::Unsupported { capability: capability.into(), detail: detail.into() }
+    Refusal::Unsupported {
+        capability: capability.into(),
+        detail: detail.into(),
+    }
 }
 
 fn drain<R: Read + Send + 'static>(mut pipe: R) -> mpsc::Receiver<String> {
@@ -283,7 +376,11 @@ fn wait_for_exit(#[cfg(unix)] exit_fd: Option<&std::os::fd::OwnedFd>, left: Dura
     #[cfg(unix)]
     if let Some(fd) = exit_fd {
         use std::os::fd::AsRawFd;
-        let mut pfd = libc::pollfd { fd: fd.as_raw_fd(), events: libc::POLLIN, revents: 0 };
+        let mut pfd = libc::pollfd {
+            fd: fd.as_raw_fd(),
+            events: libc::POLLIN,
+            revents: 0,
+        };
         let ms = left.as_millis().clamp(1, libc::c_int::MAX as u128) as libc::c_int;
         // SAFETY: one pollfd on a descriptor the caller owns for the call.
         unsafe { libc::poll(&mut pfd, 1, ms) };
@@ -294,7 +391,10 @@ fn wait_for_exit(#[cfg(unix)] exit_fd: Option<&std::os::fd::OwnedFd>, left: Dura
 
 fn exec(config: &HerdrConfig, args: &[&str], timeout: Duration) -> DriverResult<Output> {
     let mut cmd = Command::new(config.bin());
-    cmd.args(args).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
+    cmd.args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
     if let Some(session) = &config.session {
         cmd.env("HERDR_SESSION", session);
     }
@@ -303,10 +403,14 @@ fn exec(config: &HerdrConfig, args: &[&str], timeout: Duration) -> DriverResult<
     }
     cmd.envs(config.env.iter().map(|(k, v)| (k, v)));
     let label = args.iter().take(2).copied().collect::<Vec<_>>().join(" ");
-    let mut child = fgos_process::control::spawn_with_fds(cmd, &[]).map_err(|e| match e.kind() {
-        std::io::ErrorKind::NotFound => unsupported("herdr", format!("herdr binary \"{}\" not found", config.bin())),
-        _ => unknown(format!("herdr {label} could not start: {e}")),
-    })?;
+    let mut child =
+        fgos_process::control::spawn_with_fds(cmd, &[]).map_err(|e| match e.kind() {
+            std::io::ErrorKind::NotFound => unsupported(
+                "herdr",
+                format!("herdr binary \"{}\" not found", config.bin()),
+            ),
+            _ => unknown(format!("herdr {label} could not start: {e}")),
+        })?;
     let out = child.stdout.take().map(drain);
     let err = child.stderr.take().map(drain);
     let deadline = Instant::now() + timeout;
@@ -318,7 +422,10 @@ fn exec(config: &HerdrConfig, args: &[&str], timeout: Duration) -> DriverResult<
             Ok(None) if Instant::now() >= deadline => {
                 let _ = child.kill();
                 let _ = child.wait();
-                return Err(unknown(format!("herdr {label} timed out after {}ms", timeout.as_millis())));
+                return Err(unknown(format!(
+                    "herdr {label} timed out after {}ms",
+                    timeout.as_millis()
+                )));
             }
             Ok(None) => wait_for_exit(
                 #[cfg(unix)]
@@ -328,8 +435,15 @@ fn exec(config: &HerdrConfig, args: &[&str], timeout: Duration) -> DriverResult<
             Err(e) => return Err(unknown(format!("herdr {label} wait failed: {e}"))),
         }
     };
-    let grab = |rx: Option<mpsc::Receiver<String>>| rx.and_then(|r| r.recv_timeout(READER_GRACE).ok()).unwrap_or_default();
-    Ok(Output { status: status.code(), stdout: grab(out), stderr: grab(err) })
+    let grab = |rx: Option<mpsc::Receiver<String>>| {
+        rx.and_then(|r| r.recv_timeout(READER_GRACE).ok())
+            .unwrap_or_default()
+    };
+    Ok(Output {
+        status: status.code(),
+        stdout: grab(out),
+        stderr: grab(err),
+    })
 }
 
 /// The first of stdout and stderr that holds a JSON object: herdr answers on
@@ -338,16 +452,31 @@ fn json_body(out: &Output) -> Option<Value> {
     [&out.stdout, &out.stderr]
         .into_iter()
         .filter(|s| !s.trim().is_empty())
-        .find_map(|s| serde_json::from_str::<Value>(s.trim()).ok().filter(Value::is_object))
+        .find_map(|s| {
+            serde_json::from_str::<Value>(s.trim())
+                .ok()
+                .filter(Value::is_object)
+        })
 }
 
 fn call(config: &HerdrConfig, args: &[&str], timeout: Duration) -> Result<Value, CallError> {
     let out = exec(config, args, timeout).map_err(CallError::Refusal)?;
     match json_body(&out) {
         Some(body) => envelope(&body).map_err(CallError::Herdr),
-        None if out.status == Some(0) && out.stdout.trim().is_empty() && out.stderr.trim().is_empty() => Ok(Value::Object(Default::default())),
+        None if out.status == Some(0)
+            && out.stdout.trim().is_empty()
+            && out.stderr.trim().is_empty() =>
+        {
+            Ok(Value::Object(Default::default()))
+        }
         None => {
-            let said: String = out.stdout.trim().chars().chain(out.stderr.trim().chars()).take(200).collect();
+            let said: String = out
+                .stdout
+                .trim()
+                .chars()
+                .chain(out.stderr.trim().chars())
+                .take(200)
+                .collect();
             Err(CallError::Refusal(unknown(format!(
                 "herdr {} returned no parseable JSON (exit {}): {said}",
                 args.iter().take(2).copied().collect::<Vec<_>>().join(" "),
@@ -372,14 +501,22 @@ impl HerdrDriver {
     /// that is missing, hangs or does not answer declares no capability.
     pub fn new(config: HerdrConfig) -> Self {
         let (caps, absent) = probe(&config);
-        HerdrDriver { config, caps, absent, endpoint: RefCell::new(None) }
+        HerdrDriver {
+            config,
+            caps,
+            absent,
+            endpoint: RefCell::new(None),
+        }
     }
 
     fn require(&self, capability: &str) -> DriverResult<()> {
         if self.caps.contains(&capability) {
             return Ok(());
         }
-        let why = self.absent.clone().unwrap_or_else(|| format!("herdr driver does not declare {capability}"));
+        let why = self
+            .absent
+            .clone()
+            .unwrap_or_else(|| format!("herdr driver does not declare {capability}"));
         Err(unsupported(capability, why))
     }
 
@@ -406,7 +543,8 @@ impl HerdrDriver {
                 }
                 args.extend(["status", "server", "--json"]);
                 let status = self.run(&args)?;
-                parse_status_socket(&status).ok_or_else(|| unknown("herdr status server reports no running socket"))?
+                parse_status_socket(&status)
+                    .ok_or_else(|| unknown("herdr status server reports no running socket"))?
             }
         };
         *self.endpoint.borrow_mut() = Some(endpoint.clone());
@@ -420,12 +558,23 @@ fn env_pairs(env: &[(String, String)]) -> Vec<String> {
 
 fn probe(config: &HerdrConfig) -> (Vec<&'static str>, Option<String>) {
     if cfg!(windows) {
-        return (vec![], Some("herdr is not supported on this platform".into()));
+        return (
+            vec![],
+            Some("herdr is not supported on this platform".into()),
+        );
     }
     let timeout = config.timeout();
     match exec(config, &["--version"], timeout) {
         Ok(out) if out.status == Some(0) => {}
-        Ok(out) => return (vec![], Some(format!("herdr --version exited {}", out.status.map_or("none".into(), |c| c.to_string())))),
+        Ok(out) => {
+            return (
+                vec![],
+                Some(format!(
+                    "herdr --version exited {}",
+                    out.status.map_or("none".into(), |c| c.to_string())
+                )),
+            )
+        }
         Err(Refusal::Unsupported { detail, .. }) => return (vec![], Some(detail)),
         Err(Refusal::Unknown { reason }) => return (vec![], Some(reason)),
     }
@@ -441,7 +590,8 @@ fn probe(config: &HerdrConfig) -> (Vec<&'static str>, Option<String>) {
         "activity.state",
         "label",
     ];
-    if matches!(exec(config, &["pane", "layout", "--help"], timeout), Ok(out) if out.status == Some(0)) {
+    if matches!(exec(config, &["pane", "layout", "--help"], timeout), Ok(out) if out.status == Some(0))
+    {
         caps.push("layout.geometry");
     }
     if cfg!(unix) {
@@ -475,7 +625,12 @@ impl TerminalDriver for HerdrDriver {
         })
     }
 
-    fn tab_create(&self, label: &str, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
+    fn tab_create(
+        &self,
+        label: &str,
+        cwd: Option<&str>,
+        env: &[(String, String)],
+    ) -> DriverResult<CreatedPane> {
         self.require("tab.create")?;
         let mut args = vec!["tab", "create", "--label", label, "--no-focus"];
         if let Some(cwd) = cwd {
@@ -499,23 +654,42 @@ impl TerminalDriver for HerdrDriver {
                     ws.extend(["--env", pair]);
                 }
                 let created = self.run(&ws)?;
-                let pane = parse_tab_created(&created).ok_or_else(|| unknown("herdr workspace create returned no tab_id/pane_id"))?;
+                let pane = parse_tab_created(&created)
+                    .ok_or_else(|| unknown("herdr workspace create returned no tab_id/pane_id"))?;
                 let _ = self.run(&["tab", "rename", &pane.tab_id, label]);
                 return Ok(pane);
             }
             Err(other) => return Err(other.into_refusal()),
         };
-        parse_tab_created(&result).ok_or_else(|| unknown("herdr tab create returned no tab_id/pane_id"))
+        parse_tab_created(&result)
+            .ok_or_else(|| unknown("herdr tab create returned no tab_id/pane_id"))
     }
 
-    fn pane_split(&self, anchor_pane: &str, direction: Direction, ratio: f64, cwd: Option<&str>, env: &[(String, String)]) -> DriverResult<CreatedPane> {
+    fn pane_split(
+        &self,
+        anchor_pane: &str,
+        direction: Direction,
+        ratio: f64,
+        cwd: Option<&str>,
+        env: &[(String, String)],
+    ) -> DriverResult<CreatedPane> {
         self.require("pane.split")?;
         let direction = match direction {
             Direction::Right => "right",
             Direction::Down => "down",
         };
         let ratio = ratio.to_string();
-        let mut args = vec!["pane", "split", "--pane", anchor_pane, "--direction", direction, "--ratio", &ratio, "--no-focus"];
+        let mut args = vec![
+            "pane",
+            "split",
+            "--pane",
+            anchor_pane,
+            "--direction",
+            direction,
+            "--ratio",
+            &ratio,
+            "--no-focus",
+        ];
         if let Some(cwd) = cwd {
             args.extend(["--cwd", cwd]);
         }
@@ -531,9 +705,14 @@ impl TerminalDriver for HerdrDriver {
         self.require("pane.close")?;
         self.require("server.incarnation")?;
         if &self.server_incarnation()? != expected {
-            return Err(unknown("herdr server incarnation changed before close; pane kept"));
+            return Err(unknown(
+                "herdr server incarnation changed before close; pane kept",
+            ));
         }
-        let timeout = self.config.timeout().min(Duration::from_millis(CLOSE_TIMEOUT_MS));
+        let timeout = self
+            .config
+            .timeout()
+            .min(Duration::from_millis(CLOSE_TIMEOUT_MS));
         match call(&self.config, &["pane", "close", pane], timeout) {
             Ok(_) => {}
             Err(e) if e.is_pane_not_found() => return Ok(CloseOutcome::AlreadyGone),
@@ -541,8 +720,12 @@ impl TerminalDriver for HerdrDriver {
         }
         match self.server_incarnation() {
             Ok(after) if &after == expected => Ok(CloseOutcome::Closed),
-            Ok(_) => Err(unknown("herdr server incarnation changed while the pane was closing")),
-            Err(Refusal::Unknown { reason }) => Err(unknown(format!("herdr server incarnation unreadable after close: {reason}"))),
+            Ok(_) => Err(unknown(
+                "herdr server incarnation changed while the pane was closing",
+            )),
+            Err(Refusal::Unknown { reason }) => Err(unknown(format!(
+                "herdr server incarnation unreadable after close: {reason}"
+            ))),
             Err(other) => Err(other),
         }
     }
@@ -579,7 +762,12 @@ impl TerminalDriver for HerdrDriver {
         self.run(&args).map(|_| ())
     }
 
-    fn read_screen(&self, pane: &str, lines: Option<u32>, source: Option<&str>) -> DriverResult<String> {
+    fn read_screen(
+        &self,
+        pane: &str,
+        lines: Option<u32>,
+        source: Option<&str>,
+    ) -> DriverResult<String> {
         self.require("read.screen")?;
         let lines = lines.map(|n| n.to_string());
         let mut args = vec!["pane", "read", pane];
@@ -596,7 +784,11 @@ impl TerminalDriver for HerdrDriver {
             match envelope(&body) {
                 Err(e) => return Err(CallError::Herdr(e).into_refusal()),
                 Ok(result) => {
-                    if let Some(screen) = result.pointer("/read/text").or_else(|| result.get("text")).and_then(Value::as_str) {
+                    if let Some(screen) = result
+                        .pointer("/read/text")
+                        .or_else(|| result.get("text"))
+                        .and_then(Value::as_str)
+                    {
                         return Ok(screen.to_string());
                     }
                 }
@@ -605,14 +797,19 @@ impl TerminalDriver for HerdrDriver {
         if out.status == Some(0) {
             Ok(out.stdout)
         } else {
-            Err(unknown(format!("herdr pane read failed (exit {}): {}", out.status.map_or("none".into(), |c| c.to_string()), out.stderr.trim())))
+            Err(unknown(format!(
+                "herdr pane read failed (exit {}): {}",
+                out.status.map_or("none".into(), |c| c.to_string()),
+                out.stderr.trim()
+            )))
         }
     }
 
     fn process_info(&self, pane: &str) -> DriverResult<ProcessInfo> {
         self.require("process.info")?;
         let result = self.run(&["pane", "process-info", "--pane", pane])?;
-        parse_process_info(&result).ok_or_else(|| unknown("herdr pane process-info answered an unexpected shape"))
+        parse_process_info(&result)
+            .ok_or_else(|| unknown("herdr pane process-info answered an unexpected shape"))
     }
 
     fn activity(&self, pane: &str) -> DriverResult<Activity> {
@@ -623,7 +820,12 @@ impl TerminalDriver for HerdrDriver {
             Ok(result) => result,
             // herdr answered: no agent is recognised in this pane. That is an answer
             // (`unknown` state), not a failure to read one.
-            Err(CallError::Herdr(e)) if e.code == "agent_not_found" => return Ok(Activity { state: "unknown".into(), ..Default::default() }),
+            Err(CallError::Herdr(e)) if e.code == "agent_not_found" => {
+                return Ok(Activity {
+                    state: "unknown".into(),
+                    ..Default::default()
+                })
+            }
             Err(other) => return Err(other.into_refusal()),
         };
         parse_activity(&result).ok_or_else(|| unknown("herdr agent get reported no agent_status"))
@@ -631,8 +833,17 @@ impl TerminalDriver for HerdrDriver {
 
     fn activity_detail(&self, pane: &str) -> DriverResult<ActivityDetail> {
         self.require("activity.state")?;
-        let out = exec(&self.config, &["agent", "explain", pane, "--json"], self.config.timeout())?;
-        let body = json_body(&out).ok_or_else(|| unknown(format!("herdr agent explain returned no parseable JSON (exit {})", out.status.map_or("none".into(), |c| c.to_string()))))?;
+        let out = exec(
+            &self.config,
+            &["agent", "explain", pane, "--json"],
+            self.config.timeout(),
+        )?;
+        let body = json_body(&out).ok_or_else(|| {
+            unknown(format!(
+                "herdr agent explain returned no parseable JSON (exit {})",
+                out.status.map_or("none".into(), |c| c.to_string())
+            ))
+        })?;
         if let Err(e) = envelope(&body).map(|_| ()) {
             return Err(CallError::Herdr(e).into_refusal());
         }
@@ -647,13 +858,17 @@ impl TerminalDriver for HerdrDriver {
     fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry> {
         self.require("layout.geometry")?;
         let result = self.run(&["pane", "layout", "--pane", pane])?;
-        parse_layout(&result).ok_or_else(|| unknown("herdr pane layout answered an unexpected shape"))
+        parse_layout(&result)
+            .ok_or_else(|| unknown("herdr pane layout answered an unexpected shape"))
     }
 
     fn socket_path(&self) -> Option<String> {
         match self.config.session {
             Some(_) => self.config.socket(),
-            None => self.config.socket().or_else(|| self.config.session_socket("default")),
+            None => self
+                .config
+                .socket()
+                .or_else(|| self.config.session_socket("default")),
         }
     }
 
@@ -662,10 +877,16 @@ impl TerminalDriver for HerdrDriver {
             return AgentFacts::default();
         }
         // Plain text, not the JSON envelope: only a command that ran and exited 0 is read.
-        let said = |args: &[&str]| exec(&self.config, args, self.config.timeout()).ok().filter(|out| out.status == Some(0)).map(|out| out.stdout);
+        let said = |args: &[&str]| {
+            exec(&self.config, args, self.config.timeout())
+                .ok()
+                .filter(|out| out.status == Some(0))
+                .map(|out| out.stdout)
+        };
         AgentFacts {
             kinds: said(&["agent", "start", "--help"]).and_then(|help| parse_agent_kinds(&help)),
-            integrations: said(&["integration", "status"]).and_then(|text| parse_integrations(&text)),
+            integrations: said(&["integration", "status"])
+                .and_then(|text| parse_integrations(&text)),
         }
     }
 
@@ -683,7 +904,8 @@ impl TerminalDriver for HerdrDriver {
 #[cfg(unix)]
 fn peer_pid(path: &str) -> DriverResult<u32> {
     use std::os::fd::AsRawFd;
-    let stream = std::os::unix::net::UnixStream::connect(path).map_err(|e| unknown(format!("herdr socket {path} is not reachable: {e}")))?;
+    let stream = std::os::unix::net::UnixStream::connect(path)
+        .map_err(|e| unknown(format!("herdr socket {path} is not reachable: {e}")))?;
     let fd = stream.as_raw_fd();
 
     #[cfg(target_os = "linux")]
@@ -691,33 +913,67 @@ fn peer_pid(path: &str) -> DriverResult<u32> {
         let mut cred: libc::ucred = unsafe { std::mem::zeroed() };
         let mut len = std::mem::size_of::<libc::ucred>() as libc::socklen_t;
         // SAFETY: `cred` and `len` are valid for the call; `fd` is a live socket.
-        let rc = unsafe { libc::getsockopt(fd, libc::SOL_SOCKET, libc::SO_PEERCRED, (&mut cred as *mut libc::ucred).cast(), &mut len) };
+        let rc = unsafe {
+            libc::getsockopt(
+                fd,
+                libc::SOL_SOCKET,
+                libc::SO_PEERCRED,
+                (&mut cred as *mut libc::ucred).cast(),
+                &mut len,
+            )
+        };
         if rc != 0 {
-            return Err(unknown(format!("SO_PEERCRED failed on {path}: {}", std::io::Error::last_os_error())));
+            return Err(unknown(format!(
+                "SO_PEERCRED failed on {path}: {}",
+                std::io::Error::last_os_error()
+            )));
         }
-        u32::try_from(cred.pid).ok().filter(|p| *p != 0).ok_or_else(|| unknown("SO_PEERCRED returned no pid"))
+        u32::try_from(cred.pid)
+            .ok()
+            .filter(|p| *p != 0)
+            .ok_or_else(|| unknown("SO_PEERCRED returned no pid"))
     }
     #[cfg(target_os = "macos")]
     {
         let mut pid: libc::pid_t = 0;
         let mut len = std::mem::size_of::<libc::pid_t>() as libc::socklen_t;
         // SAFETY: `pid` and `len` are valid for the call; `fd` is a live socket.
-        let rc = unsafe { libc::getsockopt(fd, libc::SOL_LOCAL, libc::LOCAL_PEERPID, (&mut pid as *mut libc::pid_t).cast(), &mut len) };
+        let rc = unsafe {
+            libc::getsockopt(
+                fd,
+                libc::SOL_LOCAL,
+                libc::LOCAL_PEERPID,
+                (&mut pid as *mut libc::pid_t).cast(),
+                &mut len,
+            )
+        };
         if rc != 0 {
-            return Err(unknown(format!("LOCAL_PEERPID failed on {path}: {}", std::io::Error::last_os_error())));
+            return Err(unknown(format!(
+                "LOCAL_PEERPID failed on {path}: {}",
+                std::io::Error::last_os_error()
+            )));
         }
-        u32::try_from(pid).ok().filter(|p| *p != 0).ok_or_else(|| unknown("LOCAL_PEERPID returned no pid"))
+        u32::try_from(pid)
+            .ok()
+            .filter(|p| *p != 0)
+            .ok_or_else(|| unknown("LOCAL_PEERPID returned no pid"))
     }
     #[cfg(not(any(target_os = "linux", target_os = "macos")))]
     {
         let _ = fd;
-        Err(unsupported("server.incarnation", "no peer credential lookup on this platform"))
+        Err(unsupported(
+            "server.incarnation",
+            "no peer credential lookup on this platform",
+        ))
     }
 }
 
 #[cfg(not(unix))]
 fn peer_pid(_path: &str) -> DriverResult<u32> {
-    Err(unsupported("server.incarnation", "no unix socket on this platform"))
+    Err(unsupported(
+        "server.incarnation",
+        "no unix socket on this platform",
+    ))
 }
 
 /// The pty window size behind a shell's stdin, read from `/proc` (same user).
@@ -733,7 +989,10 @@ fn pty_size(shell_pid: u32) -> Option<PtySize> {
     let mut size: libc::winsize = unsafe { std::mem::zeroed() };
     // SAFETY: `size` is a valid winsize for TIOCGWINSZ; the fd is open.
     let rc = unsafe { libc::ioctl(tty.as_raw_fd(), libc::TIOCGWINSZ, &mut size) };
-    (rc == 0 && size.ws_col > 0 && size.ws_row > 0).then(|| PtySize { cols: u32::from(size.ws_col), rows: u32::from(size.ws_row) })
+    (rc == 0 && size.ws_col > 0 && size.ws_row > 0).then(|| PtySize {
+        cols: u32::from(size.ws_col),
+        rows: u32::from(size.ws_row),
+    })
 }
 
 #[cfg(not(target_os = "linux"))]

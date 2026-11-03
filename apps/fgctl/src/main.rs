@@ -34,7 +34,9 @@ fn main() {
         std::process::exit(fgos_holder_lock::helper::main(&helper_args));
     }
 
-    if args.get(1).is_some_and(|a| a == "internal") && args.get(2).is_some_and(|a| a == "quiesce-scan") {
+    if args.get(1).is_some_and(|a| a == "internal")
+        && args.get(2).is_some_and(|a| a == "quiesce-scan")
+    {
         let route_args: Vec<std::ffi::OsString> = std::env::args_os().skip(2).collect();
         std::process::exit(fgos_holder_lock::route::main(&route_args));
     }

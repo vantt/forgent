@@ -11,8 +11,14 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// No process holds the observe lock under `root` once a command returned.
 fn assert_observe_lock_free(root: &std::path::Path) {
-    let resource = fgos_holder_lock::Resource::new("observe", fgos_observe::store_lock::observe_lock_path(root));
-    assert_eq!(fgos_holder_lock::probe(&resource).unwrap(), fgos_holder_lock::Probe::Free);
+    let resource = fgos_holder_lock::Resource::new(
+        "observe",
+        fgos_observe::store_lock::observe_lock_path(root),
+    );
+    assert_eq!(
+        fgos_holder_lock::probe(&resource).unwrap(),
+        fgos_holder_lock::Probe::Free
+    );
 }
 
 static NEXT: AtomicUsize = AtomicUsize::new(0);

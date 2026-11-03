@@ -43,7 +43,12 @@ impl Direct {
     }
 
     /// `result_path` is the newest `outbox/result-<N>.json`, when one exists.
-    pub fn classify(&self, exit: ExitInfo, capture_tail: &str, result_path: Option<&Path>) -> Outcome {
+    pub fn classify(
+        &self,
+        exit: ExitInfo,
+        capture_tail: &str,
+        result_path: Option<&Path>,
+    ) -> Outcome {
         if let Some(path) = result_path {
             return Outcome::Completed {
                 result_path: path.to_path_buf(),
@@ -66,7 +71,8 @@ pub fn newest_result<'a>(
         .filter_map(|name| {
             let number = name.strip_prefix("result-")?.strip_suffix(".json")?;
             // Plain decimal only: `+5` and `007` parse as numbers but are not names the agent protocol issues.
-            let plain = number.bytes().all(|b| b.is_ascii_digit()) && (number == "0" || !number.starts_with('0'));
+            let plain = number.bytes().all(|b| b.is_ascii_digit())
+                && (number == "0" || !number.starts_with('0'));
             let number: u64 = number.parse().ok().filter(|_| plain)?;
             Some((number, name))
         })
@@ -110,7 +116,9 @@ const LOGIN_PHRASES: [&str; 8] = [
 /// `api key` then, within 20 characters, one of the words that name a key problem.
 fn api_key_trouble(after_api_key: &str) -> bool {
     let window: String = after_api_key.chars().take(20 + "expired".len()).collect();
-    ["missing", "invalid", "expired"].iter().any(|word| window.contains(word))
+    ["missing", "invalid", "expired"]
+        .iter()
+        .any(|word| window.contains(word))
 }
 
 /// `no api key found for <name>`, at the start of the message.
@@ -124,10 +132,17 @@ fn no_key_found(message: &str) -> bool {
 /// `TAIL_LINES` lines, the CLI's own error region (a glog line carries it mid-line).
 pub(crate) fn capture_login(line: &str) -> bool {
     let line = line.to_lowercase();
-    if LOGIN_PHRASES.iter().chain(&["invalid_grant", "run /login"]).any(|needle| line.contains(needle)) {
+    if LOGIN_PHRASES
+        .iter()
+        .chain(&["invalid_grant", "run /login"])
+        .any(|needle| line.contains(needle))
+    {
         return true;
     }
-    if line.match_indices("api key").any(|(at, _)| api_key_trouble(&line[at + "api key".len()..])) {
+    if line
+        .match_indices("api key")
+        .any(|(at, _)| api_key_trouble(&line[at + "api key".len()..]))
+    {
         return true;
     }
     no_key_found(strip_label(&line, &["error"]))
@@ -139,7 +154,9 @@ pub(crate) fn capture_login(line: &str) -> bool {
 pub(crate) fn screen_login(line: &str) -> bool {
     let line = line.to_lowercase();
     let message = strip_label(&line, &["error", "warning", "fatal"]);
-    LOGIN_PHRASES.iter().any(|phrase| message.starts_with(phrase))
+    LOGIN_PHRASES
+        .iter()
+        .any(|phrase| message.starts_with(phrase))
         || message.strip_prefix("api key").is_some_and(api_key_trouble)
         || no_key_found(message)
 }
@@ -158,7 +175,9 @@ pub(crate) fn is_quota_limit(line: &str) -> bool {
 fn strip_marker(line: &str) -> &str {
     let line = line.trim_start();
     match line.chars().next() {
-        Some(mark) if !mark.is_ascii() && !mark.is_alphanumeric() => line[mark.len_utf8()..].trim_start(),
+        Some(mark) if !mark.is_ascii() && !mark.is_alphanumeric() => {
+            line[mark.len_utf8()..].trim_start()
+        }
         _ => line,
     }
 }
@@ -166,9 +185,13 @@ fn strip_marker(line: &str) -> &str {
 /// pi on an OpenRouter 402 prints `Error: 402: {"message":"This request requires more credits, ...`;
 /// the status and the JSON opening are optional so the plain-message form matches too.
 fn out_of_credits(rest: &str) -> bool {
-    let rest = rest.strip_prefix("402").map_or(rest, |r| r.trim_start_matches(':').trim_start());
+    let rest = rest
+        .strip_prefix("402")
+        .map_or(rest, |r| r.trim_start_matches(':').trim_start());
     let rest = rest.strip_prefix("{\"message\":\"").unwrap_or(rest);
-    rest.strip_prefix("this request ").unwrap_or(rest).starts_with("requires more credits")
+    rest.strip_prefix("this request ")
+        .unwrap_or(rest)
+        .starts_with("requires more credits")
 }
 
 /// Drops a leading label (`error:`, `warning `) so a pattern anchors to the message.

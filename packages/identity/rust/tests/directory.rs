@@ -64,46 +64,103 @@ fn files(root: &Path) -> usize {
 fn two_sessions_resolve_by_handle_and_by_role() {
     let root = state_root();
     let alive = judge(&[]);
-    directory::register(&root, entry("aaaa", Some(10), &["lead:MAIL"]), false, &alive).unwrap();
-    directory::register(&root, entry("bbbb", Some(20), &["lead:IDENT"]), false, &alive).unwrap();
+    directory::register(
+        &root,
+        entry("aaaa", Some(10), &["lead:MAIL"]),
+        false,
+        &alive,
+    )
+    .unwrap();
+    directory::register(
+        &root,
+        entry("bbbb", Some(20), &["lead:IDENT"]),
+        false,
+        &alive,
+    )
+    .unwrap();
 
     let by_handle = directory::resolve(&root, "claude-aaaa@fg", &alive, None).unwrap();
     assert_eq!(by_handle.id, "fg-abc234/aaaa");
     assert_eq!(by_handle.liveness, Liveness::Alive);
-    assert_eq!(directory::resolve(&root, "lead:IDENT", &alive, None).unwrap().handle, "claude-bbbb@fg");
-    assert_eq!(directory::list(&root, None, false, &alive, None).unwrap().sessions.len(), 2);
+    assert_eq!(
+        directory::resolve(&root, "lead:IDENT", &alive, None)
+            .unwrap()
+            .handle,
+        "claude-bbbb@fg"
+    );
+    assert_eq!(
+        directory::list(&root, None, false, &alive, None)
+            .unwrap()
+            .sessions
+            .len(),
+        2
+    );
 }
 
 #[test]
 fn unknown_names_are_not_found_with_the_close_candidates() {
     let root = state_root();
     let alive = judge(&[]);
-    directory::register(&root, entry("aaaa", Some(10), &["lead:MAIL"]), false, &alive).unwrap();
+    directory::register(
+        &root,
+        entry("aaaa", Some(10), &["lead:MAIL"]),
+        false,
+        &alive,
+    )
+    .unwrap();
 
     let by_handle = directory::resolve(&root, "claude-aaa", &alive, None).unwrap_err();
     assert_eq!(by_handle.reason, "not-found");
-    assert!(by_handle.detail.contains("claude-aaaa@fg"), "{}", by_handle.detail);
+    assert!(
+        by_handle.detail.contains("claude-aaaa@fg"),
+        "{}",
+        by_handle.detail
+    );
     assert_eq!(
         by_handle.candidates,
-        [Candidate { id: "fg-abc234/aaaa".into(), handle: "claude-aaaa@fg".into(), liveness: Liveness::Alive, remote: None }]
+        [Candidate {
+            id: "fg-abc234/aaaa".into(),
+            handle: "claude-aaaa@fg".into(),
+            liveness: Liveness::Alive,
+            remote: None
+        }]
     );
     let by_role = directory::resolve(&root, "lead:MA", &alive, None).unwrap_err();
     assert_eq!(by_role.reason, "not-found");
     assert!(by_role.detail.contains("lead:MAIL"), "{}", by_role.detail);
-    assert_eq!(by_role.candidates.iter().map(|c| c.handle.as_str()).collect::<Vec<_>>(), ["claude-aaaa@fg"]);
-    assert_eq!(directory::resolve(&root, "", &alive, None).unwrap_err().reason, "not-found");
+    assert_eq!(
+        by_role
+            .candidates
+            .iter()
+            .map(|c| c.handle.as_str())
+            .collect::<Vec<_>>(),
+        ["claude-aaaa@fg"]
+    );
+    assert_eq!(
+        directory::resolve(&root, "", &alive, None)
+            .unwrap_err()
+            .reason,
+        "not-found"
+    );
 }
 
 #[test]
 fn a_role_held_twice_is_ambiguous_and_lists_both() {
     let root = state_root();
     let alive = judge(&[]);
-    directory::register(&root, entry("aaaa", Some(10), &["lead:MAIL"]), false, &alive).unwrap();
+    directory::register(
+        &root,
+        entry("aaaa", Some(10), &["lead:MAIL"]),
+        false,
+        &alive,
+    )
+    .unwrap();
     directory::register(&root, entry("bbbb", Some(20), &[]), false, &alive).unwrap();
     // Two concurrent takes can leave a role on two entries; plant that state.
     for file in fs::read_dir(directory::directory(&root)).unwrap() {
         let path = file.unwrap().path();
-        let mut value: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        let mut value: serde_json::Value =
+            serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
         value["roles"] = serde_json::json!(["lead:MAIL"]);
         fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
     }
@@ -119,17 +176,41 @@ fn a_role_held_twice_is_ambiguous_and_lists_both() {
 #[test]
 fn a_dead_session_is_never_resolved_and_the_next_write_removes_it() {
     let root = state_root();
-    directory::register(&root, entry("aaaa", Some(10), &["lead:MAIL"]), false, &judge(&[])).unwrap();
+    directory::register(
+        &root,
+        entry("aaaa", Some(10), &["lead:MAIL"]),
+        false,
+        &judge(&[]),
+    )
+    .unwrap();
     let after_death = judge(&[10]);
 
-    assert_eq!(directory::resolve(&root, "claude-aaaa@fg", &after_death, None).unwrap_err().reason, "not-found");
-    assert!(directory::list(&root, None, false, &after_death, None).unwrap().sessions.is_empty());
+    assert_eq!(
+        directory::resolve(&root, "claude-aaaa@fg", &after_death, None)
+            .unwrap_err()
+            .reason,
+        "not-found"
+    );
+    assert!(directory::list(&root, None, false, &after_death, None)
+        .unwrap()
+        .sessions
+        .is_empty());
     assert_eq!(files(&root), 1, "a read never removes");
 
     directory::register(&root, entry("bbbb", Some(20), &[]), false, &after_death).unwrap();
-    assert_eq!(files(&root), 2, "a write that takes no role and is below the cap scans nothing, so it prunes nothing");
+    assert_eq!(
+        files(&root),
+        2,
+        "a write that takes no role and is below the cap scans nothing, so it prunes nothing"
+    );
     // A write that takes a role scans, removes the dead entry and finds its role free.
-    directory::register(&root, entry("bbbb", Some(20), &["lead:MAIL"]), false, &after_death).unwrap();
+    directory::register(
+        &root,
+        entry("bbbb", Some(20), &["lead:MAIL"]),
+        false,
+        &after_death,
+    )
+    .unwrap();
     assert_eq!(files(&root), 1, "the role write removed the dead entry");
 }
 
@@ -141,16 +222,38 @@ fn a_session_without_a_terminal_ancestor_is_unknown_and_prune_never_removes_it()
     directory::register(&root, entry("bbbb", Some(20), &[]), false, &alive).unwrap();
 
     let before = directory::list(&root, None, false, &alive, None).unwrap();
-    assert_eq!(before.sessions.iter().map(|s| s.liveness).collect::<Vec<_>>(), [Liveness::Unknown, Liveness::Alive]);
-    assert_eq!(directory::resolve(&root, "claude-aaaa@fg", &alive, None).unwrap().liveness, Liveness::Unknown);
+    assert_eq!(
+        before
+            .sessions
+            .iter()
+            .map(|s| s.liveness)
+            .collect::<Vec<_>>(),
+        [Liveness::Unknown, Liveness::Alive]
+    );
+    assert_eq!(
+        directory::resolve(&root, "claude-aaaa@fg", &alive, None)
+            .unwrap()
+            .liveness,
+        Liveness::Unknown
+    );
 
     let nothing_dead = directory::list(&root, None, true, &alive, None).unwrap();
-    assert_eq!(nothing_dead.pruned, 0, "unknown may be a live headless agent");
+    assert_eq!(
+        nothing_dead.pruned, 0,
+        "unknown may be a live headless agent"
+    );
     assert_eq!(nothing_dead.sessions.len(), 2);
 
     let one_dead = directory::list(&root, None, true, &judge(&[20]), None).unwrap();
     assert_eq!(one_dead.pruned, 1);
-    assert_eq!(one_dead.sessions.iter().map(|s| s.handle.as_str()).collect::<Vec<_>>(), ["claude-aaaa@fg"]);
+    assert_eq!(
+        one_dead
+            .sessions
+            .iter()
+            .map(|s| s.handle.as_str())
+            .collect::<Vec<_>>(),
+        ["claude-aaaa@fg"]
+    );
     assert_eq!(files(&root), 1);
 }
 
@@ -172,15 +275,37 @@ fn list_by_project_keeps_only_that_projects_sessions() {
 fn a_role_held_by_a_live_session_is_refused_unless_taken() {
     let root = state_root();
     let alive = judge(&[]);
-    directory::register(&root, entry("aaaa", Some(10), &["lead:MAIL"]), false, &alive).unwrap();
+    directory::register(
+        &root,
+        entry("aaaa", Some(10), &["lead:MAIL"]),
+        false,
+        &alive,
+    )
+    .unwrap();
 
-    let refused = directory::register(&root, entry("bbbb", Some(20), &["lead:MAIL"]), false, &alive).unwrap_err();
+    let refused = directory::register(
+        &root,
+        entry("bbbb", Some(20), &["lead:MAIL"]),
+        false,
+        &alive,
+    )
+    .unwrap_err();
     assert_eq!(refused.reason, "role-held");
     assert!(refused.detail.contains("claude-aaaa@fg") && refused.detail.contains("--take"));
-    assert_eq!(directory::resolve(&root, "lead:MAIL", &alive, None).unwrap().handle, "claude-aaaa@fg");
+    assert_eq!(
+        directory::resolve(&root, "lead:MAIL", &alive, None)
+            .unwrap()
+            .handle,
+        "claude-aaaa@fg"
+    );
 
     directory::register(&root, entry("bbbb", Some(20), &["lead:MAIL"]), true, &alive).unwrap();
-    assert_eq!(directory::resolve(&root, "lead:MAIL", &alive, None).unwrap().handle, "claude-bbbb@fg");
+    assert_eq!(
+        directory::resolve(&root, "lead:MAIL", &alive, None)
+            .unwrap()
+            .handle,
+        "claude-bbbb@fg"
+    );
     let former = directory::resolve(&root, "claude-aaaa@fg", &alive, None).unwrap();
     assert!(former.roles.is_empty(), "the role moved, it was not copied");
 }
@@ -189,13 +314,35 @@ fn a_role_held_by_a_live_session_is_refused_unless_taken() {
 fn a_session_drops_only_its_own_role_and_it_then_resolves_not_found() {
     let root = state_root();
     let alive = judge(&[]);
-    directory::register(&root, entry("aaaa", Some(10), &["lead:MAIL", "lead:IDENT"]), false, &alive).unwrap();
-    directory::register(&root, entry("bbbb", Some(20), &["lead:HARDEN"]), false, &alive).unwrap();
+    directory::register(
+        &root,
+        entry("aaaa", Some(10), &["lead:MAIL", "lead:IDENT"]),
+        false,
+        &alive,
+    )
+    .unwrap();
+    directory::register(
+        &root,
+        entry("bbbb", Some(20), &["lead:HARDEN"]),
+        false,
+        &alive,
+    )
+    .unwrap();
 
     let after = directory::drop_role(&root, "fg-abc234/aaaa", "lead:MAIL", &alive).unwrap();
     assert_eq!(after.roles, ["lead:IDENT"]);
-    assert_eq!(directory::resolve(&root, "lead:MAIL", &alive, None).unwrap_err().reason, "not-found");
-    assert_eq!(directory::resolve(&root, "lead:IDENT", &alive, None).unwrap().handle, "claude-aaaa@fg");
+    assert_eq!(
+        directory::resolve(&root, "lead:MAIL", &alive, None)
+            .unwrap_err()
+            .reason,
+        "not-found"
+    );
+    assert_eq!(
+        directory::resolve(&root, "lead:IDENT", &alive, None)
+            .unwrap()
+            .handle,
+        "claude-aaaa@fg"
+    );
 
     let not_held = directory::drop_role(&root, "fg-abc234/aaaa", "lead:MAIL", &alive).unwrap_err();
     assert_eq!(not_held.reason, "role-not-held");
@@ -203,18 +350,54 @@ fn a_session_drops_only_its_own_role_and_it_then_resolves_not_found() {
     // Another live session's role is out of reach: the caller names only itself.
     let foreign = directory::drop_role(&root, "fg-abc234/aaaa", "lead:HARDEN", &alive).unwrap_err();
     assert_eq!(foreign.reason, "role-not-held");
-    assert_eq!(foreign.candidates.iter().map(|c| c.handle.as_str()).collect::<Vec<_>>(), ["claude-bbbb@fg"], "the holder is named");
-    assert_eq!(directory::resolve(&root, "lead:HARDEN", &alive, None).unwrap().handle, "claude-bbbb@fg");
-    assert_eq!(directory::drop_role(&root, "fg-abc234/cccc", "lead:MAIL", &alive).unwrap_err().reason, "not-registered");
-    assert_eq!(directory::drop_role(&root, "fg-abc234/aaaa", "MAIL", &alive).unwrap_err().reason, "invalid-role");
+    assert_eq!(
+        foreign
+            .candidates
+            .iter()
+            .map(|c| c.handle.as_str())
+            .collect::<Vec<_>>(),
+        ["claude-bbbb@fg"],
+        "the holder is named"
+    );
+    assert_eq!(
+        directory::resolve(&root, "lead:HARDEN", &alive, None)
+            .unwrap()
+            .handle,
+        "claude-bbbb@fg"
+    );
+    assert_eq!(
+        directory::drop_role(&root, "fg-abc234/cccc", "lead:MAIL", &alive)
+            .unwrap_err()
+            .reason,
+        "not-registered"
+    );
+    assert_eq!(
+        directory::drop_role(&root, "fg-abc234/aaaa", "MAIL", &alive)
+            .unwrap_err()
+            .reason,
+        "invalid-role"
+    );
 }
 
 #[test]
 fn a_role_must_be_lead_with_a_lane_id_or_work_with_a_work_item_id() {
     let root = state_root();
     let alive = judge(&[]);
-    for bad in ["lead:mail", "lead:", "boss:MAIL", "MAIL", "lead:1A", "lead:ABCDEFGHIJKLMNOPQ", "work:", "work:Tsk-1", "work:1abc", "work:a:b", "work:abcdefghijklmnopqrstuvwxyz01234"] {
-        let refused = directory::register(&root, entry("aaaa", Some(10), &[bad]), false, &alive).unwrap_err();
+    for bad in [
+        "lead:mail",
+        "lead:",
+        "boss:MAIL",
+        "MAIL",
+        "lead:1A",
+        "lead:ABCDEFGHIJKLMNOPQ",
+        "work:",
+        "work:Tsk-1",
+        "work:1abc",
+        "work:a:b",
+        "work:abcdefghijklmnopqrstuvwxyz01234",
+    ] {
+        let refused =
+            directory::register(&root, entry("aaaa", Some(10), &[bad]), false, &alive).unwrap_err();
         assert_eq!(refused.reason, "invalid-role", "{bad}");
     }
     assert_eq!(files(&root), 0);
@@ -227,28 +410,77 @@ fn a_role_must_be_lead_with_a_lane_id_or_work_with_a_work_item_id() {
 fn a_work_role_has_one_live_holder_moves_with_take_and_resolves() {
     let root = state_root();
     let alive = judge(&[]);
-    directory::register(&root, entry("aaaa", Some(10), &["work:tsk-4f2a9c1b3d"]), false, &alive).unwrap();
-    assert_eq!(directory::resolve(&root, "work:tsk-4f2a9c1b3d", &alive, None).unwrap().handle, "claude-aaaa@fg");
+    directory::register(
+        &root,
+        entry("aaaa", Some(10), &["work:tsk-4f2a9c1b3d"]),
+        false,
+        &alive,
+    )
+    .unwrap();
+    assert_eq!(
+        directory::resolve(&root, "work:tsk-4f2a9c1b3d", &alive, None)
+            .unwrap()
+            .handle,
+        "claude-aaaa@fg"
+    );
 
-    let refused = directory::register(&root, entry("bbbb", Some(20), &["work:tsk-4f2a9c1b3d"]), false, &alive).unwrap_err();
+    let refused = directory::register(
+        &root,
+        entry("bbbb", Some(20), &["work:tsk-4f2a9c1b3d"]),
+        false,
+        &alive,
+    )
+    .unwrap_err();
     assert_eq!(refused.reason, "role-held");
     assert!(refused.detail.contains("claude-aaaa@fg") && refused.detail.contains("--take"));
 
-    directory::register(&root, entry("bbbb", Some(20), &["work:tsk-4f2a9c1b3d"]), true, &alive).unwrap();
-    assert_eq!(directory::resolve(&root, "work:tsk-4f2a9c1b3d", &alive, None).unwrap().handle, "claude-bbbb@fg");
-    assert!(directory::resolve(&root, "claude-aaaa@fg", &alive, None).unwrap().roles.is_empty());
+    directory::register(
+        &root,
+        entry("bbbb", Some(20), &["work:tsk-4f2a9c1b3d"]),
+        true,
+        &alive,
+    )
+    .unwrap();
+    assert_eq!(
+        directory::resolve(&root, "work:tsk-4f2a9c1b3d", &alive, None)
+            .unwrap()
+            .handle,
+        "claude-bbbb@fg"
+    );
+    assert!(directory::resolve(&root, "claude-aaaa@fg", &alive, None)
+        .unwrap()
+        .roles
+        .is_empty());
 
-    let after = directory::drop_role(&root, "fg-abc234/bbbb", "work:tsk-4f2a9c1b3d", &alive).unwrap();
+    let after =
+        directory::drop_role(&root, "fg-abc234/bbbb", "work:tsk-4f2a9c1b3d", &alive).unwrap();
     assert!(after.roles.is_empty());
-    assert_eq!(directory::resolve(&root, "work:tsk-4f2a9c1b3d", &alive, None).unwrap_err().reason, "not-found");
+    assert_eq!(
+        directory::resolve(&root, "work:tsk-4f2a9c1b3d", &alive, None)
+            .unwrap_err()
+            .reason,
+        "not-found"
+    );
 }
 
 #[test]
 fn registering_again_refreshes_the_entry_and_keeps_its_roles_and_first_time() {
     let root = state_root();
     let alive = judge(&[]);
-    let first = directory::register(&root, entry("aaaa", Some(10), &["lead:MAIL"]), false, &alive).unwrap();
-    let again = directory::register(&root, entry("aaaa", Some(11), &["lead:IDENT"]), false, &alive).unwrap();
+    let first = directory::register(
+        &root,
+        entry("aaaa", Some(10), &["lead:MAIL"]),
+        false,
+        &alive,
+    )
+    .unwrap();
+    let again = directory::register(
+        &root,
+        entry("aaaa", Some(11), &["lead:IDENT"]),
+        false,
+        &alive,
+    )
+    .unwrap();
 
     assert_eq!(again.roles, ["lead:IDENT", "lead:MAIL"]);
     assert_eq!(again.registered_at, first.registered_at);
@@ -265,12 +497,19 @@ fn a_second_live_session_with_the_same_handle_is_refused_with_both_ids() {
 
     let refused = directory::register(&root, clash.clone(), false, &alive).unwrap_err();
     assert_eq!(refused.reason, "handle-in-use");
-    assert!(refused.detail.contains("fg-abc234/aaaa") && refused.detail.contains("fg-abc234/other"));
+    assert!(
+        refused.detail.contains("fg-abc234/aaaa") && refused.detail.contains("fg-abc234/other")
+    );
     // Once the first one is dead the handle is free: the dead entry is replaced, not left beside it.
     let taken = directory::register(&root, clash, false, &judge(&[10])).unwrap();
     assert_eq!(taken.id, "fg-abc234/other");
     assert_eq!(files(&root), 1);
-    assert_eq!(directory::resolve(&root, "claude-aaaa@fg", &judge(&[10]), None).unwrap().id, "fg-abc234/other");
+    assert_eq!(
+        directory::resolve(&root, "claude-aaaa@fg", &judge(&[10]), None)
+            .unwrap()
+            .id,
+        "fg-abc234/other"
+    );
 }
 
 #[test]
@@ -301,9 +540,16 @@ fn a_full_directory_refuses_a_new_entry_and_prune_is_the_way_out() {
     let root = state_root();
     let alive = judge(&[]);
     for n in 0..MAX_ENTRIES {
-        directory::register(&root, entry(&format!("s{n}"), Some(1_000 + n as u32), &[]), false, &alive).unwrap();
+        directory::register(
+            &root,
+            entry(&format!("s{n}"), Some(1_000 + n as u32), &[]),
+            false,
+            &alive,
+        )
+        .unwrap();
     }
-    let refused = directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap_err();
+    let refused =
+        directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap_err();
     assert_eq!(refused.reason, "directory-full");
     assert!(refused.detail.contains("list --prune"));
     // A session already in the directory still refreshes.
@@ -312,12 +558,25 @@ fn a_full_directory_refuses_a_new_entry_and_prune_is_the_way_out() {
     // At the cap a write removes the dead entries first, so a new session fits.
     let one_dead = judge(&[1_005]);
     directory::register(&root, entry("extra", Some(1), &[]), false, &one_dead).unwrap();
-    assert_eq!(files(&root), MAX_ENTRIES, "one dead entry went, one session came");
-    assert!(!directory::list(&root, None, false, &one_dead, None).unwrap().sessions.iter().any(|s| s.handle == "claude-s5@fg"));
+    assert_eq!(
+        files(&root),
+        MAX_ENTRIES,
+        "one dead entry went, one session came"
+    );
+    assert!(!directory::list(&root, None, false, &one_dead, None)
+        .unwrap()
+        .sessions
+        .iter()
+        .any(|s| s.handle == "claude-s5@fg"));
 
     // Every head dies: prune empties the directory and a new session fits.
     let all_dead = |_: &Record| Verdict::Dead;
-    assert_eq!(directory::list(&root, None, true, &all_dead, None).unwrap().pruned, MAX_ENTRIES);
+    assert_eq!(
+        directory::list(&root, None, true, &all_dead, None)
+            .unwrap()
+            .pruned,
+        MAX_ENTRIES
+    );
     directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap();
 }
 
@@ -328,9 +587,14 @@ fn a_full_directory_of_entries_that_may_be_alive_is_never_pruned_by_a_write() {
     for n in 0..MAX_ENTRIES {
         directory::register(&root, entry(&format!("u{n}"), None, &[]), false, &alive).unwrap();
     }
-    let refused = directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap_err();
+    let refused =
+        directory::register(&root, entry("extra", Some(1), &[]), false, &alive).unwrap_err();
     assert_eq!(refused.reason, "directory-full");
-    assert_eq!(files(&root), MAX_ENTRIES, "unknown liveness is never removed");
+    assert_eq!(
+        files(&root),
+        MAX_ENTRIES,
+        "unknown liveness is never removed"
+    );
 }
 
 #[test]
@@ -341,7 +605,13 @@ fn files_this_build_does_not_read_are_left_alone() {
     let foreign = directory::directory(&root).join("future.json");
     fs::write(&foreign, r#"{"v":2}"#).unwrap();
 
-    assert_eq!(directory::list(&root, None, true, &alive, None).unwrap().sessions.len(), 1);
+    assert_eq!(
+        directory::list(&root, None, true, &alive, None)
+            .unwrap()
+            .sessions
+            .len(),
+        1
+    );
     directory::register(&root, entry("bbbb", Some(20), &[]), false, &alive).unwrap();
     assert!(foreign.exists());
 }
@@ -356,7 +626,11 @@ impl ProcessTree for Table {
 
 #[test]
 fn liveness_is_judged_by_the_terminal_head_never_the_fgos_child() {
-    let stat = |ppid, tty_nr| ProcStat { ppid, session: 100, tty_nr };
+    let stat = |ppid, tty_nr| ProcStat {
+        ppid,
+        session: 100,
+        tty_nr,
+    };
     let tree = Table(HashMap::from([
         (300, stat(200, 34816)), // the fgos child that registers
         (200, stat(100, 34816)), // the agent
@@ -368,9 +642,20 @@ fn liveness_is_judged_by_the_terminal_head_never_the_fgos_child() {
     let record = directory::head_liveness(&tree, 300, &record_of).unwrap();
     assert_eq!(record.pid, Some(ProcId(100)));
 
-    let detached = Table(HashMap::from([(300, stat(200, 0)), (200, stat(1, 0)), (1, stat(0, 0))]));
-    assert_eq!(directory::head_liveness(&detached, 300, &record_of), None, "no terminal ancestor: unknown");
-    assert_eq!(directory::head_liveness(&Table(HashMap::new()), 300, &record_of), None);
+    let detached = Table(HashMap::from([
+        (300, stat(200, 0)),
+        (200, stat(1, 0)),
+        (1, stat(0, 0)),
+    ]));
+    assert_eq!(
+        directory::head_liveness(&detached, 300, &record_of),
+        None,
+        "no terminal ancestor: unknown"
+    );
+    assert_eq!(
+        directory::head_liveness(&Table(HashMap::new()), 300, &record_of),
+        None
+    );
 }
 
 fn machine_root() -> PathBuf {
@@ -380,25 +665,45 @@ fn machine_root() -> PathBuf {
 }
 
 fn head_of(pid: u32) -> fgos_identity::HeadRef {
-    let start_time = fgos_process::facts::identity_of(ProcId(pid)).unwrap().start_time;
+    let start_time = fgos_process::facts::identity_of(ProcId(pid))
+        .unwrap()
+        .start_time;
     fgos_identity::HeadRef { pid, start_time }
 }
 
 #[test]
 fn a_writer_key_registers_the_session_it_names_with_the_live_head_and_resolves() {
     let root = machine_root();
-    let key = fgos_identity::WriterKey { source: "CODEX_THREAD_ID", value: "thread-9" };
+    let key = fgos_identity::WriterKey {
+        source: "CODEX_THREAD_ID",
+        value: "thread-9",
+    };
     let roles = vec!["lead:MAIL".to_string()];
-    let listed = directory::register_writer(&root, None, &key, &head_of(std::process::id()), &roles, false).unwrap();
+    let listed = directory::register_writer(
+        &root,
+        None,
+        &key,
+        &head_of(std::process::id()),
+        &roles,
+        false,
+    )
+    .unwrap();
     assert_eq!(listed.id, "fg-abc234/thread-9");
     assert_eq!(listed.cli, "codex");
     assert!(listed.handle.starts_with("codex-"), "{}", listed.handle);
     assert_eq!(listed.liveness, Liveness::Alive);
     let found = directory::resolve(&root, &listed.handle, &judge(&[]), None).unwrap();
     assert_eq!(found.id, listed.id);
-    assert_eq!(directory::resolve(&root, "lead:MAIL", &judge(&[]), None).unwrap().id, listed.id);
+    assert_eq!(
+        directory::resolve(&root, "lead:MAIL", &judge(&[]), None)
+            .unwrap()
+            .id,
+        listed.id
+    );
     // the same key registers again as a refresh, the roles kept
-    let again = directory::register_writer(&root, None, &key, &head_of(std::process::id()), &[], false).unwrap();
+    let again =
+        directory::register_writer(&root, None, &key, &head_of(std::process::id()), &[], false)
+            .unwrap();
     assert_eq!(again.roles, roles);
     let _ = fs::remove_dir_all(root);
 }
@@ -406,23 +711,54 @@ fn a_writer_key_registers_the_session_it_names_with_the_live_head_and_resolves()
 #[test]
 fn a_writer_key_outside_the_rule_or_a_head_that_is_not_running_registers_nothing() {
     let root = machine_root();
-    let bad = fgos_identity::WriterKey { source: "OMP_SESSION_ID", value: "s-1" };
-    assert_eq!(directory::register_writer(&root, None, &bad, &head_of(std::process::id()), &[], false).unwrap_err().reason, "invalid-writer-key");
+    let bad = fgos_identity::WriterKey {
+        source: "OMP_SESSION_ID",
+        value: "s-1",
+    };
+    assert_eq!(
+        directory::register_writer(&root, None, &bad, &head_of(std::process::id()), &[], false)
+            .unwrap_err()
+            .reason,
+        "invalid-writer-key"
+    );
 
-    let mut child = std::process::Command::new("sleep").arg("5").spawn().unwrap();
+    let mut child = std::process::Command::new("sleep")
+        .arg("5")
+        .spawn()
+        .unwrap();
     let gone = head_of(child.id());
     child.kill().unwrap();
     child.wait().unwrap();
-    let key = fgos_identity::WriterKey { source: "CLAUDE_CODE_SESSION_ID", value: "s-2" };
-    assert_eq!(directory::register_writer(&root, None, &key, &gone, &[], false).unwrap_err().reason, "head-not-live");
-    let nobody = fgos_identity::HeadRef { pid: u32::MAX, start_time: "1".into() };
-    assert_eq!(directory::register_writer(&root, None, &key, &nobody, &[], false).unwrap_err().reason, "head-not-live");
+    let key = fgos_identity::WriterKey {
+        source: "CLAUDE_CODE_SESSION_ID",
+        value: "s-2",
+    };
+    assert_eq!(
+        directory::register_writer(&root, None, &key, &gone, &[], false)
+            .unwrap_err()
+            .reason,
+        "head-not-live"
+    );
+    let nobody = fgos_identity::HeadRef {
+        pid: u32::MAX,
+        start_time: "1".into(),
+    };
+    assert_eq!(
+        directory::register_writer(&root, None, &key, &nobody, &[], false)
+            .unwrap_err()
+            .reason,
+        "head-not-live"
+    );
     // a live process with another start time is a reused pid, not the head
     let mut reused = head_of(std::process::id());
     reused.start_time.push('0');
     let refusal = directory::register_writer(&root, None, &key, &reused, &[], false).unwrap_err();
     assert_eq!(refusal.reason, "head-not-live");
-    assert!(refusal.detail.contains("pid was reused"), "{}", refusal.detail);
+    assert!(
+        refusal.detail.contains("pid was reused"),
+        "{}",
+        refusal.detail
+    );
     assert_eq!(files(&root), 0, "a refused registration leaves no entry");
     let _ = fs::remove_dir_all(root);
 }
@@ -436,14 +772,34 @@ fn a_full_id_resolves_the_exact_live_entry_of_this_machine_and_never_another_mac
     directory::register(&root, entry("beta", Some(2), &[]), false, &alive).unwrap();
     directory::register(&root, entry("gone", Some(3), &[]), false, &alive).unwrap();
 
-    assert_eq!(directory::resolve(&root, "fg-abc234/alpha", &alive, None).unwrap().handle, a.handle);
-    assert_eq!(directory::resolve(&root, " fg-abc234/alpha ", &alive, None).unwrap().handle, a.handle);
+    assert_eq!(
+        directory::resolve(&root, "fg-abc234/alpha", &alive, None)
+            .unwrap()
+            .handle,
+        a.handle
+    );
+    assert_eq!(
+        directory::resolve(&root, " fg-abc234/alpha ", &alive, None)
+            .unwrap()
+            .handle,
+        a.handle
+    );
     let missing = directory::resolve(&root, "fg-abc234/nobody", &alive, None).unwrap_err();
     assert_eq!(missing.reason, "not-found");
-    assert_eq!(directory::resolve(&root, "fg-abc234/gone", &judge(&[3]), None).unwrap_err().reason, "not-found", "a dead head is not resolved");
+    assert_eq!(
+        directory::resolve(&root, "fg-abc234/gone", &judge(&[3]), None)
+            .unwrap_err()
+            .reason,
+        "not-found",
+        "a dead head is not resolved"
+    );
 
     let other = directory::resolve(&root, "fg-other99/alpha", &alive, None).unwrap_err();
     assert_eq!(other.reason, "not-found");
-    assert!(other.detail.contains("shared directory"), "{}", other.detail);
+    assert!(
+        other.detail.contains("shared directory"),
+        "{}",
+        other.detail
+    );
     let _ = fs::remove_dir_all(root);
 }

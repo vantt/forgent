@@ -1309,7 +1309,8 @@ fn identity_rejects_bad_options() {
 /// owned by the identity crate's session tests.
 #[test]
 fn identity_session_prints_a_stable_handle_per_session_and_refuses_an_unresolved_caller() {
-    let state = std::env::temp_dir().join(format!("fgos_test_identity_session_{}", std::process::id()));
+    let state =
+        std::env::temp_dir().join(format!("fgos_test_identity_session_{}", std::process::id()));
     let _ = fs::remove_dir_all(&state);
     fs::create_dir_all(&state).unwrap();
     fs::write(state.join("machine-id"), "fg-server-abc234\n").unwrap();
@@ -1336,7 +1337,10 @@ fn identity_session_prints_a_stable_handle_per_session_and_refuses_an_unresolved
             .unwrap(),
     );
     assert_eq!(bare["session"], a);
-    assert_eq!(bare["machine"], serde_json::json!({ "id": "fg-server-abc234", "handle": "fg-server" }));
+    assert_eq!(
+        bare["machine"],
+        serde_json::json!({ "id": "fg-server-abc234", "handle": "fg-server" })
+    );
 
     let unresolved = identity_command(&["session", "--pid", "99999999"])
         .env("FGOS_STATE_ROOT", &state)
@@ -1354,7 +1358,10 @@ fn identity_session_prints_a_stable_handle_per_session_and_refuses_an_unresolved
 /// crate's directory tests.
 #[test]
 fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role() {
-    let state = std::env::temp_dir().join(format!("fgos_test_identity_directory_{}", std::process::id()));
+    let state = std::env::temp_dir().join(format!(
+        "fgos_test_identity_directory_{}",
+        std::process::id()
+    ));
     let _ = fs::remove_dir_all(&state);
     fs::create_dir_all(&state).unwrap();
     fs::write(state.join("machine-id"), "fg-server-abc234\n").unwrap();
@@ -1366,36 +1373,89 @@ fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role(
             .output()
             .unwrap()
     };
-    let handle_of = |id: &str| identity_data(&run(id, &["session", "--json"]))["handle"].as_str().unwrap().to_owned();
+    let handle_of = |id: &str| {
+        identity_data(&run(id, &["session", "--json"]))["handle"]
+            .as_str()
+            .unwrap()
+            .to_owned()
+    };
     let (a, b) = (handle_of("alpha"), handle_of("beta"));
     identity_data(&run("alpha", &["--json"]));
-    assert!(!state.join("identity").exists(), "a plain read and the bare verb never register");
+    assert!(
+        !state.join("identity").exists(),
+        "a plain read and the bare verb never register"
+    );
 
     let registered = identity_data(&run("alpha", &["session", "--role", "lead:MAIL", "--json"]));
     assert_eq!(registered["handle"], a.as_str());
     assert_eq!(registered["roles"], serde_json::json!(["lead:MAIL"]));
     identity_data(&run("beta", &["session", "--register", "--json"]));
 
-    assert_eq!(identity_data(&run("beta", &["resolve", &a, "--json"]))["id"], "fg-server-abc234/alpha");
-    assert_eq!(identity_data(&run("alpha", &["resolve", "lead:MAIL", "--json"]))["handle"], a.as_str());
-    assert_eq!(identity_data(&run("beta", &["resolve", "fg-server-abc234/alpha", "--json"]))["handle"], a.as_str());
-    assert_eq!(run("beta", &["resolve", "fg-other-xyz789/alpha"]).status.code(), Some(65));
-    assert_eq!(identity_data(&run("beta", &["list", "--json"]))["sessions"].as_array().unwrap().len(), 2);
+    assert_eq!(
+        identity_data(&run("beta", &["resolve", &a, "--json"]))["id"],
+        "fg-server-abc234/alpha"
+    );
+    assert_eq!(
+        identity_data(&run("alpha", &["resolve", "lead:MAIL", "--json"]))["handle"],
+        a.as_str()
+    );
+    assert_eq!(
+        identity_data(&run(
+            "beta",
+            &["resolve", "fg-server-abc234/alpha", "--json"]
+        ))["handle"],
+        a.as_str()
+    );
+    assert_eq!(
+        run("beta", &["resolve", "fg-other-xyz789/alpha"])
+            .status
+            .code(),
+        Some(65)
+    );
+    assert_eq!(
+        identity_data(&run("beta", &["list", "--json"]))["sessions"]
+            .as_array()
+            .unwrap()
+            .len(),
+        2
+    );
 
     let held = run("beta", &["session", "--role", "lead:MAIL"]);
     assert_eq!(held.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&held.stderr).contains("[role-held]"));
-    identity_data(&run("beta", &["session", "--role", "lead:MAIL", "--take", "--json"]));
-    assert_eq!(identity_data(&run("alpha", &["resolve", "lead:MAIL", "--json"]))["handle"], b.as_str());
+    identity_data(&run(
+        "beta",
+        &["session", "--role", "lead:MAIL", "--take", "--json"],
+    ));
+    assert_eq!(
+        identity_data(&run("alpha", &["resolve", "lead:MAIL", "--json"]))["handle"],
+        b.as_str()
+    );
 
     let foreign = run("alpha", &["session", "--drop-role", "lead:MAIL"]);
-    assert_eq!(foreign.status.code(), Some(65), "alpha no longer holds the role beta took");
+    assert_eq!(
+        foreign.status.code(),
+        Some(65),
+        "alpha no longer holds the role beta took"
+    );
     assert!(String::from_utf8_lossy(&foreign.stderr).contains("[role-not-held]"));
-    identity_data(&run("beta", &["session", "--drop-role", "lead:MAIL", "--json"]));
-    assert_eq!(run("alpha", &["resolve", "lead:MAIL"]).status.code(), Some(65));
+    identity_data(&run(
+        "beta",
+        &["session", "--drop-role", "lead:MAIL", "--json"],
+    ));
+    assert_eq!(
+        run("alpha", &["resolve", "lead:MAIL"]).status.code(),
+        Some(65)
+    );
 
-    identity_data(&run("alpha", &["session", "--role", "work:tsk-4f2a9c1b3d", "--json"]));
-    assert_eq!(identity_data(&run("beta", &["resolve", "work:tsk-4f2a9c1b3d", "--json"]))["handle"], a.as_str());
+    identity_data(&run(
+        "alpha",
+        &["session", "--role", "work:tsk-4f2a9c1b3d", "--json"],
+    ));
+    assert_eq!(
+        identity_data(&run("beta", &["resolve", "work:tsk-4f2a9c1b3d", "--json"]))["handle"],
+        a.as_str()
+    );
     let bad_work = run("beta", &["session", "--role", "work:Tsk-1"]);
     assert_eq!(bad_work.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&bad_work.stderr).contains("[invalid-role]"));
@@ -1403,14 +1463,18 @@ fn identity_directory_registers_only_on_request_and_resolves_by_handle_and_role(
     let missing = run("alpha", &["resolve", "claude-zzzz@fg-server"]);
     assert_eq!(missing.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&missing.stderr).contains("[not-found]"));
-    assert!(missing.stdout.is_empty(), "without --json a refusal prints nothing on stdout");
+    assert!(
+        missing.stdout.is_empty(),
+        "without --json a refusal prints nothing on stdout"
+    );
 
     // With --json the same refusal is also one line of JSON on stdout: the
     // message, the stable reason and the candidates, never a success envelope.
     let near = run("alpha", &["resolve", &a[..10], "--json"]);
     assert_eq!(near.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&near.stderr).contains("[not-found]"));
-    let refusal: serde_json::Value = serde_json::from_slice(&near.stdout).expect("a --json refusal is JSON");
+    let refusal: serde_json::Value =
+        serde_json::from_slice(&near.stdout).expect("a --json refusal is JSON");
     assert_eq!(refusal["reason"], "not-found");
     let candidates = refusal["candidates"].as_array().unwrap();
     assert_eq!(candidates.len(), 1);
@@ -1438,13 +1502,23 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
     use fgos_identity::shared::{published_payload, MachineRef};
     use std::os::unix::fs::PermissionsExt;
 
-    let world = std::env::temp_dir().join(format!("fgos_test_identity_shared_{}", std::process::id()));
+    let world =
+        std::env::temp_dir().join(format!("fgos_test_identity_shared_{}", std::process::id()));
     let _ = fs::remove_dir_all(&world);
     fs::create_dir_all(&world).unwrap();
     fs::set_permissions(&world, fs::Permissions::from_mode(0o700)).unwrap();
     let git = |dir: &std::path::Path, args: &[&str]| {
-        let out = Command::new("git").arg("-C").arg(dir).args(args).output().unwrap();
-        assert!(out.status.success(), "git {args:?}: {}", String::from_utf8_lossy(&out.stderr));
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(dir)
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
     };
     let remote = world.join("remote.git");
     git(&world, &["init", "--bare", "-q", remote.to_str().unwrap()]);
@@ -1462,7 +1536,15 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
     // so it has no store yet; its first identity publish creates it.
     let clone = |name: &str| {
         let root = world.join(name);
-        git(&world, &["clone", "-q", remote.to_str().unwrap(), root.to_str().unwrap()]);
+        git(
+            &world,
+            &[
+                "clone",
+                "-q",
+                remote.to_str().unwrap(),
+                root.to_str().unwrap(),
+            ],
+        );
         fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
         fs::create_dir_all(root.join(".fgos")).unwrap();
         fs::write(
@@ -1472,7 +1554,11 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
         .unwrap();
         let fence = root.join(".fgos/locks/activation.lock");
         fs::create_dir_all(&fence).unwrap();
-        fs::write(fence.join("TOMBSTONE"), "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n").unwrap();
+        fs::write(
+            fence.join("TOMBSTONE"),
+            "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
+        )
+        .unwrap();
         let repo = match driver.resolve_repo(&root, &root).unwrap() {
             ResolveRepo::Repository(repo) => repo,
             _ => panic!("a clone is a repository"),
@@ -1497,11 +1583,22 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
         sync(
             &driver,
             repo,
-            SyncRequest { layout, machine, remote: "origin", no_push: false, opportunistic: false, held_ranks: &[], hot_lock_depth: 0 },
+            SyncRequest {
+                layout,
+                machine,
+                remote: "origin",
+                no_push: false,
+                opportunistic: false,
+                held_ranks: &[],
+                hot_lock_depth: 0,
+            },
         )
         .unwrap();
     };
-    let (alpha_state, bravo_state) = (machine_state("alpha", "alpha-aaaaaa"), machine_state("bravo", "bravo-bbbbbb"));
+    let (alpha_state, bravo_state) = (
+        machine_state("alpha", "alpha-aaaaaa"),
+        machine_state("bravo", "bravo-bbbbbb"),
+    );
     let (alpha_root, alpha_repo, alpha_layout) = clone("alpha");
     let (bravo_root, bravo_repo, bravo_layout) = clone("bravo");
     let _ = bravo_root;
@@ -1515,14 +1612,40 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
             .unwrap()
     };
     let published_in_alpha = || {
-        let active = alpha_layout.stream(&StreamId::parse("project:identity").unwrap()).active();
-        fs::read_to_string(active).map_or(0, |text| text.matches("identity.session-published").count())
+        let active = alpha_layout
+            .stream(&StreamId::parse("project:identity").unwrap())
+            .active();
+        fs::read_to_string(active)
+            .map_or(0, |text| text.matches("identity.session-published").count())
     };
-    assert!(!alpha_layout.store().exists(), "the clone has never appended");
-    identity_data(&run(&["session", "--register", "--role", "lead:WORK", "--json"]));
-    assert_eq!(published_in_alpha(), 1, "a new registration in a migrated clone without a store creates it and publishes once");
-    identity_data(&run(&["session", "--register", "--role", "lead:WORK", "--json"]));
-    assert_eq!(published_in_alpha(), 1, "an unchanged registration publishes nothing");
+    assert!(
+        !alpha_layout.store().exists(),
+        "the clone has never appended"
+    );
+    identity_data(&run(&[
+        "session",
+        "--register",
+        "--role",
+        "lead:WORK",
+        "--json",
+    ]));
+    assert_eq!(
+        published_in_alpha(),
+        1,
+        "a new registration in a migrated clone without a store creates it and publishes once"
+    );
+    identity_data(&run(&[
+        "session",
+        "--register",
+        "--role",
+        "lead:WORK",
+        "--json",
+    ]));
+    assert_eq!(
+        published_in_alpha(),
+        1,
+        "an unchanged registration publishes nothing"
+    );
 
     // Bravo publishes a session with its own key into its clone and pushes it.
     let listed = fgos_identity::directory::Listed {
@@ -1536,19 +1659,36 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
         liveness: fgos_identity::refusal::Liveness::Alive,
         remote: None,
     };
-    let payload = published_payload(&bravo_state, &listed, &MachineRef { id: "bravo-bbbbbb".into(), handle: "bravo".into() }).unwrap();
+    let payload = published_payload(
+        &bravo_state,
+        &listed,
+        &MachineRef {
+            id: "bravo-bbbbbb".into(),
+            handle: "bravo".into(),
+        },
+    )
+    .unwrap();
     let registry = Registry::shipped().unwrap();
     let sealed: Vec<bool> = ["identity.session-published", "identity.session-ended"]
         .iter()
         .map(|t| registry.get(t).unwrap().seal_on_write)
         .collect();
-    assert_eq!(sealed, [false, false], "the host appends and never seals, so the contract says so");
+    assert_eq!(
+        sealed,
+        [false, false],
+        "the host appends and never seals, so the contract says so"
+    );
     append(
         &bravo_layout,
         &registry,
         AppendRequest {
             stream: &StreamId::parse("project:identity").unwrap(),
-            events: &[EventInput { event_type: "identity.session-published".into(), schema_version: 1, payload, ts: "2026-10-24T01:00:00.000Z".into() }],
+            events: &[EventInput {
+                event_type: "identity.session-published".into(),
+                schema_version: 1,
+                payload,
+                ts: "2026-10-24T01:00:00.000Z".into(),
+            }],
             cursor: &Default::default(),
             writer: "bravo-writer",
             machine: "bravo-bbbbbb",
@@ -1562,16 +1702,41 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
     let remote_session = identity_data(&run(&["resolve", "lead:MAIL", "--json"]));
     assert_eq!(remote_session["id"], "bravo-bbbbbb/sess");
     assert_eq!(remote_session["liveness"], "remote");
-    assert_eq!(remote_session["machine"], serde_json::json!({ "id": "bravo-bbbbbb", "handle": "bravo" }));
+    assert_eq!(
+        remote_session["machine"],
+        serde_json::json!({ "id": "bravo-bbbbbb", "handle": "bravo" })
+    );
     assert_eq!(remote_session["pin"], "seen");
     assert!(remote_session["fetchedAt"].is_string());
-    assert_eq!(identity_data(&run(&["resolve", "bravo-bbbbbb/sess", "--json"]))["handle"], "claude-sess@bravo");
-    assert_eq!(identity_data(&run(&["resolve", "lead:WORK", "--json"]))["id"], "alpha-aaaaaa/alpha-session", "the local session is asked first");
-    let cache: serde_json::Value = serde_json::from_slice(&fs::read(alpha_root.join(".fgos/cache/identity-directory.json")).unwrap()).unwrap();
-    assert_eq!(cache["entries"][0]["machine"]["id"], "bravo-bbbbbb", "a read keeps the verified view in the cache");
+    assert_eq!(
+        identity_data(&run(&["resolve", "bravo-bbbbbb/sess", "--json"]))["handle"],
+        "claude-sess@bravo"
+    );
+    assert_eq!(
+        identity_data(&run(&["resolve", "lead:WORK", "--json"]))["id"],
+        "alpha-aaaaaa/alpha-session",
+        "the local session is asked first"
+    );
+    let cache: serde_json::Value = serde_json::from_slice(
+        &fs::read(alpha_root.join(".fgos/cache/identity-directory.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(
+        cache["entries"][0]["machine"]["id"], "bravo-bbbbbb",
+        "a read keeps the verified view in the cache"
+    );
     let by_machine = identity_data(&run(&["list", "--machine", "bravo", "--json"]));
-    let ids: Vec<&str> = by_machine["sessions"].as_array().unwrap().iter().map(|s| s["id"].as_str().unwrap()).collect();
-    assert_eq!(ids, ["bravo-bbbbbb/sess"], "--machine keeps one machine's sessions");
+    let ids: Vec<&str> = by_machine["sessions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|s| s["id"].as_str().unwrap())
+        .collect();
+    assert_eq!(
+        ids,
+        ["bravo-bbbbbb/sess"],
+        "--machine keeps one machine's sessions"
+    );
 
     let _ = fs::remove_dir_all(&world);
 }
@@ -1584,13 +1749,25 @@ fn identity_register_in_a_repository_without_a_fence_or_a_store_mints_the_store(
     use fgos_git::{GitDriver, ResolveRepo};
     use std::os::unix::fs::PermissionsExt;
 
-    let world = std::env::temp_dir().join(format!("fgos_test_identity_unfenced_{}", std::process::id()));
+    let world = std::env::temp_dir().join(format!(
+        "fgos_test_identity_unfenced_{}",
+        std::process::id()
+    ));
     let _ = fs::remove_dir_all(&world);
     fs::create_dir_all(&world).unwrap();
     fs::set_permissions(&world, fs::Permissions::from_mode(0o700)).unwrap();
     let git = |dir: &std::path::Path, args: &[&str]| {
-        let out = Command::new("git").arg("-C").arg(dir).args(args).output().unwrap();
-        assert!(out.status.success(), "git {args:?}: {}", String::from_utf8_lossy(&out.stderr));
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(dir)
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
     };
     let state = world.join("state");
     fs::create_dir_all(&state).unwrap();
@@ -1610,8 +1787,25 @@ fn identity_register_in_a_repository_without_a_fence_or_a_store_mints_the_store(
     .unwrap();
     let activation = root.join(".fgos/locks/activation.lock");
     fs::create_dir_all(&activation).unwrap();
-    fs::write(activation.join("TOMBSTONE"), "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n").unwrap();
-    git(&root, &["-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-q", "--allow-empty", "-m", "init"]);
+    fs::write(
+        activation.join("TOMBSTONE"),
+        "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
+    )
+    .unwrap();
+    git(
+        &root,
+        &[
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@example.invalid",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "init",
+        ],
+    );
 
     let driver = GitDriver::new(&world).unwrap();
     let repo = match driver.resolve_repo(&root, &root).unwrap() {
@@ -1623,7 +1817,10 @@ fn identity_register_in_a_repository_without_a_fence_or_a_store_mints_the_store(
     for dir in [layout.common_dir.join("fgos"), layout.root.join("locks")] {
         fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
     }
-    assert!(!root.join(".fgos/events").exists() && !layout.store().exists(), "no fence and no store");
+    assert!(
+        !root.join(".fgos/events").exists() && !layout.store().exists(),
+        "no fence and no store"
+    );
 
     let output = identity_command(&["session", "--register", "--role", "lead:WORK", "--json"])
         .env("FGOS_STATE_ROOT", &state)
@@ -1633,8 +1830,16 @@ fn identity_register_in_a_repository_without_a_fence_or_a_store_mints_the_store(
         .unwrap();
     identity_data(&output);
     assert!(layout.store().exists(), "the first append minted the store");
-    let active = layout.stream(&StreamId::parse("project:identity").unwrap()).active();
-    assert_eq!(fs::read_to_string(active).unwrap().matches("identity.session-published").count(), 1);
+    let active = layout
+        .stream(&StreamId::parse("project:identity").unwrap())
+        .active();
+    assert_eq!(
+        fs::read_to_string(active)
+            .unwrap()
+            .matches("identity.session-published")
+            .count(),
+        1
+    );
 
     let _ = fs::remove_dir_all(&world);
 }
@@ -1643,7 +1848,8 @@ fn identity_register_in_a_repository_without_a_fence_or_a_store_mints_the_store(
 /// hook or step asks it to register. The attempt-id rule is owned by the identity crate.
 #[test]
 fn identity_session_register_in_a_runner_seat_exits_quietly_and_registers_nothing() {
-    let state = std::env::temp_dir().join(format!("fgos_test_identity_seat_{}", std::process::id()));
+    let state =
+        std::env::temp_dir().join(format!("fgos_test_identity_seat_{}", std::process::id()));
     let _ = fs::remove_dir_all(&state);
     fs::create_dir_all(&state).unwrap();
     fs::write(state.join("machine-id"), "fg-server-abc234\n").unwrap();
@@ -1658,12 +1864,24 @@ fn identity_session_register_in_a_runner_seat_exits_quietly_and_registers_nothin
 
     let seat = run("att-unit-7");
     let answer = identity_data(&seat);
-    assert_eq!(answer, serde_json::json!({ "registered": false, "reason": "runner-seat" }));
-    assert!(seat.stderr.is_empty(), "a skipped registration says nothing on stderr");
-    assert!(!state.join("identity").exists(), "the runner seat left no directory entry");
+    assert_eq!(
+        answer,
+        serde_json::json!({ "registered": false, "reason": "runner-seat" })
+    );
+    assert!(
+        seat.stderr.is_empty(),
+        "a skipped registration says nothing on stderr"
+    );
+    assert!(
+        !state.join("identity").exists(),
+        "the runner seat left no directory entry"
+    );
 
     identity_data(&run("alpha"));
-    assert!(state.join("identity").exists(), "an ordinary session still registers");
+    assert!(
+        state.join("identity").exists(),
+        "an ordinary session still registers"
+    );
     let _ = fs::remove_dir_all(&state);
 }
 
@@ -1672,7 +1890,8 @@ fn identity_session_register_in_a_runner_seat_exits_quietly_and_registers_nothin
 /// alias rules are owned by the identity crate's own tests.
 #[test]
 fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
-    let state = std::env::temp_dir().join(format!("fgos_test_identity_machine_{}", std::process::id()));
+    let state =
+        std::env::temp_dir().join(format!("fgos_test_identity_machine_{}", std::process::id()));
     let _ = fs::remove_dir_all(&state);
     fs::create_dir_all(&state).unwrap();
     let machine = |args: &[&str]| {
@@ -1686,7 +1905,10 @@ fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
     assert_eq!(missing.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&missing.stderr).contains("[machine-id-missing]"));
     let refusal: serde_json::Value = serde_json::from_slice(&missing.stdout).unwrap();
-    assert_eq!(refusal["reason"], "machine-id-missing", "a refusal under --json is not a success envelope");
+    assert_eq!(
+        refusal["reason"], "machine-id-missing",
+        "a refusal under --json is not a success envelope"
+    );
 
     fs::write(state.join("machine-id"), "fg-server-abc234\n").unwrap();
     assert_eq!(
@@ -1705,7 +1927,9 @@ fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
     assert_eq!(bad.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&bad.stderr).contains("[invalid-alias]"));
     assert_eq!(
-        fs::read_to_string(state.join("machine-alias")).unwrap().trim(),
+        fs::read_to_string(state.join("machine-alias"))
+            .unwrap()
+            .trim(),
         "owner"
     );
     let _ = fs::remove_dir_all(&state);
@@ -1716,7 +1940,8 @@ fn identity_machine_reads_refuses_and_sets_the_alias_through_the_state_root() {
 /// when it is made is owned by the identity crate's signing tests.
 #[test]
 fn identity_pins_lists_confirms_and_forgets_a_pin_by_machine_id() {
-    let state = std::env::temp_dir().join(format!("fgos_test_identity_pins_{}", std::process::id()));
+    let state =
+        std::env::temp_dir().join(format!("fgos_test_identity_pins_{}", std::process::id()));
     let _ = fs::remove_dir_all(&state);
     fs::create_dir_all(state.join("identity/pins")).unwrap();
     let pin = serde_json::json!({
@@ -1725,7 +1950,10 @@ fn identity_pins_lists_confirms_and_forgets_a_pin_by_machine_id() {
     });
     fs::write(state.join("identity/pins/peer-abc234"), pin.to_string()).unwrap();
     let pins = |args: &[&str]| {
-        identity_command(&[&["pins"], args].concat()).env("FGOS_STATE_ROOT", &state).output().unwrap()
+        identity_command(&[&["pins"], args].concat())
+            .env("FGOS_STATE_ROOT", &state)
+            .output()
+            .unwrap()
     };
 
     // A pin file written without `state` lists as `seen`.
@@ -1733,14 +1961,28 @@ fn identity_pins_lists_confirms_and_forgets_a_pin_by_machine_id() {
         "v": 1, "machineId": pin["machineId"], "publicKey": pin["publicKey"], "fingerprint": pin["fingerprint"],
         "firstSeen": pin["firstSeen"], "state": "seen"
     });
-    assert_eq!(identity_data(&pins(&["--json"])), serde_json::json!({ "pins": [seen] }));
+    assert_eq!(
+        identity_data(&pins(&["--json"])),
+        serde_json::json!({ "pins": [seen] })
+    );
     let fingerprint = pin["fingerprint"].as_str().unwrap();
     for refused in [
         pins(&["--confirm", "peer-abc234"]),
         pins(&["--fingerprint", fingerprint]),
-        pins(&["--confirm", "peer-abc234", "--fingerprint", fingerprint, "--forget", "peer-abc234"]),
+        pins(&[
+            "--confirm",
+            "peer-abc234",
+            "--fingerprint",
+            fingerprint,
+            "--forget",
+            "peer-abc234",
+        ]),
     ] {
-        assert_ne!(refused.status.code(), Some(0), "--confirm needs --fingerprint and excludes --forget");
+        assert_ne!(
+            refused.status.code(),
+            Some(0),
+            "--confirm needs --fingerprint and excludes --forget"
+        );
     }
     let absent = pins(&["--confirm", "other-abc234", "--fingerprint", fingerprint]);
     assert_eq!(absent.status.code(), Some(65));
@@ -1748,18 +1990,41 @@ fn identity_pins_lists_confirms_and_forgets_a_pin_by_machine_id() {
     let wrong = pins(&["--confirm", "peer-abc234", "--fingerprint", "SHA256:other"]);
     assert_eq!(wrong.status.code(), Some(65));
     let stderr = String::from_utf8_lossy(&wrong.stderr);
-    assert!(stderr.contains("[fingerprint-mismatch]") && stderr.contains(fingerprint) && stderr.contains("SHA256:other"), "{stderr}");
-    let confirmed = identity_data(&pins(&["--confirm", "peer-abc234", "--fingerprint", fingerprint]));
+    assert!(
+        stderr.contains("[fingerprint-mismatch]")
+            && stderr.contains(fingerprint)
+            && stderr.contains("SHA256:other"),
+        "{stderr}"
+    );
+    let confirmed = identity_data(&pins(&[
+        "--confirm",
+        "peer-abc234",
+        "--fingerprint",
+        fingerprint,
+    ]));
     assert_eq!(confirmed["confirmed"]["state"], "confirmed");
     assert!(confirmed["confirmed"]["confirmedAt"].is_string());
-    assert_eq!(identity_data(&pins(&["--json"]))["pins"][0], confirmed["confirmed"]);
+    assert_eq!(
+        identity_data(&pins(&["--json"]))["pins"][0],
+        confirmed["confirmed"]
+    );
     let pin = confirmed["confirmed"].clone();
     let missing = pins(&["--forget", "other-abc234"]);
     assert_eq!(missing.status.code(), Some(65));
     assert!(String::from_utf8_lossy(&missing.stderr).contains("[pin-not-found]"));
-    assert_ne!(pins(&["--forget"]).status.code(), Some(0), "--forget needs a machine id");
-    assert_eq!(identity_data(&pins(&["--forget", "peer-abc234"])), serde_json::json!({ "forgotten": pin }));
-    assert_eq!(identity_data(&pins(&["--json"])), serde_json::json!({ "pins": [] }));
+    assert_ne!(
+        pins(&["--forget"]).status.code(),
+        Some(0),
+        "--forget needs a machine id"
+    );
+    assert_eq!(
+        identity_data(&pins(&["--forget", "peer-abc234"])),
+        serde_json::json!({ "forgotten": pin })
+    );
+    assert_eq!(
+        identity_data(&pins(&["--json"])),
+        serde_json::json!({ "pins": [] })
+    );
     let _ = fs::remove_dir_all(&state);
 }
 
@@ -1769,11 +2034,16 @@ fn identity_pins_lists_confirms_and_forgets_a_pin_by_machine_id() {
 /// crate's project tests.
 #[test]
 fn identity_project_reads_mints_once_and_refuses_a_second_mint_through_the_cwd() {
-    let base = std::env::temp_dir().join(format!("fgos_test_identity_project_{}", std::process::id()));
+    let base =
+        std::env::temp_dir().join(format!("fgos_test_identity_project_{}", std::process::id()));
     let _ = fs::remove_dir_all(&base);
     let repo = base.join("sample-app");
     fs::create_dir_all(&repo).unwrap();
-    let init = Command::new("/usr/bin/git").args(["init", "-q"]).current_dir(&repo).output().unwrap();
+    let init = Command::new("/usr/bin/git")
+        .args(["init", "-q"])
+        .current_dir(&repo)
+        .output()
+        .unwrap();
     assert!(init.status.success());
     let project = |args: &[&str]| {
         identity_command(&[&["project"], args].concat())
@@ -1800,7 +2070,11 @@ fn identity_project_reads_mints_once_and_refuses_a_second_mint_through_the_cwd()
     assert_ne!(renamed["id"], minted["id"]);
     assert_eq!(renamed["handle"], "other");
 
-    assert_ne!(project(&["--handle", "x"]).status.code(), Some(0), "--handle alone writes nothing");
+    assert_ne!(
+        project(&["--handle", "x"]).status.code(),
+        Some(0),
+        "--handle alone writes nothing"
+    );
     assert_ne!(project(&["--init", "--new"]).status.code(), Some(0));
     let _ = fs::remove_dir_all(&base);
 }
@@ -1913,9 +2187,20 @@ fn host_pins_the_state_root_for_the_node_payload() {
     fs::create_dir_all(&dir).unwrap();
     let seen = dir.join("seen.txt");
     let fake_node = dir.join("node");
-    fs::write(&fake_node, format!("#!/bin/sh\nprintf '%s' \"$FGOS_STATE_ROOT\" > '{}'\n", seen.display())).unwrap();
+    fs::write(
+        &fake_node,
+        format!(
+            "#!/bin/sh\nprintf '%s' \"$FGOS_STATE_ROOT\" > '{}'\n",
+            seen.display()
+        ),
+    )
+    .unwrap();
     fs::set_permissions(&fake_node, fs::Permissions::from_mode(0o755)).unwrap();
-    let path = format!("{}:{}", dir.display(), std::env::var("PATH").unwrap_or_default());
+    let path = format!(
+        "{}:{}",
+        dir.display(),
+        std::env::var("PATH").unwrap_or_default()
+    );
     let run = |pinned: Option<&str>| {
         let mut cmd = Command::new(fgos_bin());
         cmd.args(["add", "--help"])
@@ -1928,7 +2213,12 @@ fn host_pins_the_state_root_for_the_node_payload() {
             cmd.env("FGOS_STATE_ROOT", root);
         }
         let out = cmd.output().unwrap();
-        assert_eq!(out.status.code(), Some(0), "{}", String::from_utf8_lossy(&out.stderr));
+        assert_eq!(
+            out.status.code(),
+            Some(0),
+            "{}",
+            String::from_utf8_lossy(&out.stderr)
+        );
         fs::read_to_string(&seen).unwrap()
     };
     assert_eq!(run(None), "/custom/state-home");
@@ -1950,9 +2240,13 @@ fn config_sandbox(name: &str) -> PathBuf {
 
 fn config_run(sandbox: &std::path::Path, args: &[&str], confined: bool) -> std::process::Output {
     let mut cmd = Command::new(fgos_bin());
-    cmd.arg("config").args(args).arg("--dir").arg(sandbox.join("project"));
+    cmd.arg("config")
+        .args(args)
+        .arg("--dir")
+        .arg(sandbox.join("project"));
     cmd.current_dir(sandbox.join("project"));
-    cmd.env("HOME", sandbox.join("home")).env("FGOS_STATE_ROOT", sandbox.join("state"));
+    cmd.env("HOME", sandbox.join("home"))
+        .env("FGOS_STATE_ROOT", sandbox.join("state"));
     cmd.env("FGOS_SESSION_ID", "config-test-writer");
     cmd.env_remove("FGOS_CONFINED");
     if confined {
@@ -1968,21 +2262,35 @@ fn config_data(output: &std::process::Output) -> serde_json::Value {
         "config must exit 0, stderr={}",
         String::from_utf8_lossy(&output.stderr)
     );
-    let parsed: serde_json::Value = serde_json::from_slice(&output.stdout).expect("a JSON envelope");
+    let parsed: serde_json::Value =
+        serde_json::from_slice(&output.stdout).expect("a JSON envelope");
     assert_eq!(parsed["contract"], "fgos.v1");
     parsed["data"].clone()
 }
 
 fn config_refusal(output: &std::process::Output) -> String {
-    assert_eq!(output.status.code(), Some(65), "stderr={}", String::from_utf8_lossy(&output.stderr));
+    assert_eq!(
+        output.status.code(),
+        Some(65),
+        "stderr={}",
+        String::from_utf8_lossy(&output.stderr)
+    );
     String::from_utf8_lossy(&output.stderr).into_owned()
 }
 
 #[test]
 fn config_show_prints_the_value_with_where_it_came_from() {
     let sandbox = config_sandbox("show");
-    fs::write(sandbox.join("project/.fgos/config.yaml"), "gateBypass:\n  level: light\n").unwrap();
-    let shown = config_data(&config_run(&sandbox, &["show", "--path", "gateBypass.level", "--json"], false));
+    fs::write(
+        sandbox.join("project/.fgos/config.yaml"),
+        "gateBypass:\n  level: light\n",
+    )
+    .unwrap();
+    let shown = config_data(&config_run(
+        &sandbox,
+        &["show", "--path", "gateBypass.level", "--json"],
+        false,
+    ));
     assert_eq!(shown["value"], "light");
     assert_eq!(shown["provenance"][0]["layer"], "project");
     let _ = fs::remove_dir_all(&sandbox);
@@ -1994,8 +2302,15 @@ fn config_explain_and_standard_describe_a_key_without_a_secret_value() {
     let explained = config_data(&config_run(&sandbox, &["explain", "gateway.token"], false));
     assert_eq!(explained["scope"], "global-only");
     assert_eq!(explained["sensitivity"], "secret-value");
-    let fragment = config_data(&config_run(&sandbox, &["standard", "--path", "gateway.port"], false));
-    assert!(fragment["fragment"].as_str().unwrap().contains("port: 4170"));
+    let fragment = config_data(&config_run(
+        &sandbox,
+        &["standard", "--path", "gateway.port"],
+        false,
+    ));
+    assert!(fragment["fragment"]
+        .as_str()
+        .unwrap()
+        .contains("port: 4170"));
     let _ = fs::remove_dir_all(&sandbox);
 }
 
@@ -2010,15 +2325,29 @@ fn config_check_fails_on_a_fail_row_and_prints_the_row_without_the_value() {
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(&private, fs::Permissions::from_mode(0o700)).unwrap();
-        fs::set_permissions(private.join("gateway-token"), fs::Permissions::from_mode(0o600)).unwrap();
+        fs::set_permissions(
+            private.join("gateway-token"),
+            fs::Permissions::from_mode(0o600),
+        )
+        .unwrap();
     }
-    assert_eq!(config_data(&config_run(&sandbox, &["check"], false))["ok"], true);
-    fs::write(sandbox.join("project/.fgos/config.yaml"), "gateway:\n  port: 49999\n").unwrap();
+    assert_eq!(
+        config_data(&config_run(&sandbox, &["check"], false))["ok"],
+        true
+    );
+    fs::write(
+        sandbox.join("project/.fgos/config.yaml"),
+        "gateway:\n  port: 49999\n",
+    )
+    .unwrap();
     let output = config_run(&sandbox, &["check", "--json"], false);
     assert_eq!(output.status.code(), Some(65));
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("config-schema"), "{stdout}");
-    assert!(!stdout.contains("49999"), "a finding never carries a value: {stdout}");
+    assert!(
+        !stdout.contains("49999"),
+        "a finding never carries a value: {stdout}"
+    );
     let _ = fs::remove_dir_all(&sandbox);
 }
 
@@ -2026,23 +2355,69 @@ fn config_check_fails_on_a_fail_row_and_prints_the_row_without_the_value() {
 fn config_set_unset_and_patch_write_through_the_transaction_and_record_the_reason() {
     let sandbox = config_sandbox("write");
     let file = sandbox.join("project/.fgos/config.yaml");
-    let set = |reason: &str| config_run(&sandbox, &["set", "gateBypass.level", "light", "--reason", reason], false);
-    assert_eq!(config_data(&set("light gates while auditing"))["applied"][0]["path"], "gateBypass.level");
+    let set = |reason: &str| {
+        config_run(
+            &sandbox,
+            &["set", "gateBypass.level", "light", "--reason", reason],
+            false,
+        )
+    };
+    assert_eq!(
+        config_data(&set("light gates while auditing"))["applied"][0]["path"],
+        "gateBypass.level"
+    );
     let text = fs::read_to_string(&file).unwrap();
-    assert!(text.contains("@fgos:why [config-test-writer] light gates while auditing"), "{text}");
-    let shown = config_data(&config_run(&sandbox, &["show", "--path", "gateBypass.level"], false));
+    assert!(
+        text.contains("@fgos:why [config-test-writer] light gates while auditing"),
+        "{text}"
+    );
+    let shown = config_data(&config_run(
+        &sandbox,
+        &["show", "--path", "gateBypass.level"],
+        false,
+    ));
     assert_eq!(shown["value"], "light");
-    assert!(config_refusal(&config_run(&sandbox, &["set", "gateBypass.level", "heavy"], false))
-        .contains("config-comment-reason-required"));
+    assert!(config_refusal(&config_run(
+        &sandbox,
+        &["set", "gateBypass.level", "heavy"],
+        false
+    ))
+    .contains("config-comment-reason-required"));
     // The note on the key is not dropped silently.
-    let plain = config_run(&sandbox, &["unset", "gateBypass.level", "--reason", "back to the standard"], false);
+    let plain = config_run(
+        &sandbox,
+        &[
+            "unset",
+            "gateBypass.level",
+            "--reason",
+            "back to the standard",
+        ],
+        false,
+    );
     assert_eq!(plain.status.code(), Some(65));
     assert!(config_refusal(&plain).contains("pass --acknowledge-comment-loss"));
-    let ack = ["unset", "gateBypass.level", "--reason", "back to the standard", "--acknowledge-comment-loss"];
-    assert_eq!(config_data(&config_run(&sandbox, &ack, false))["applied"][0]["unset"], true);
+    let ack = [
+        "unset",
+        "gateBypass.level",
+        "--reason",
+        "back to the standard",
+        "--acknowledge-comment-loss",
+    ];
+    assert_eq!(
+        config_data(&config_run(&sandbox, &ack, false))["applied"][0]["unset"],
+        true
+    );
     let patch = sandbox.join("patch.yaml");
-    fs::write(&patch, "- set: gateBypass.level\n  value: standard\n- set: cleanup.enabled\n  value: true\n").unwrap();
-    let applied = config_data(&config_run(&sandbox, &["patch", patch.to_str().unwrap(), "--reason", "tune both"], false));
+    fs::write(
+        &patch,
+        "- set: gateBypass.level\n  value: standard\n- set: cleanup.enabled\n  value: true\n",
+    )
+    .unwrap();
+    let applied = config_data(&config_run(
+        &sandbox,
+        &["patch", patch.to_str().unwrap(), "--reason", "tune both"],
+        false,
+    ));
     assert_eq!(applied["applied"].as_array().unwrap().len(), 2);
     let _ = fs::remove_dir_all(&sandbox);
 }
@@ -2050,7 +2425,17 @@ fn config_set_unset_and_patch_write_through_the_transaction_and_record_the_reaso
 #[test]
 fn config_writes_are_refused_for_a_confined_session_before_any_file_is_read() {
     let sandbox = config_sandbox("confined");
-    let output = config_run(&sandbox, &["set", "gateBypass.level", "light", "--reason", "should not land"], true);
+    let output = config_run(
+        &sandbox,
+        &[
+            "set",
+            "gateBypass.level",
+            "light",
+            "--reason",
+            "should not land",
+        ],
+        true,
+    );
     assert!(config_refusal(&output).contains("config-write-confined"));
     assert!(!sandbox.join("project/.fgos/config.yaml").exists());
     let _ = fs::remove_dir_all(&sandbox);
@@ -2060,20 +2445,30 @@ fn config_writes_are_refused_for_a_confined_session_before_any_file_is_read() {
 fn config_migrate_converts_a_legacy_project_file_and_leaves_the_tombstone() {
     let sandbox = config_sandbox("migrate");
     let json = sandbox.join("project/.fgos/config.json");
-    fs::write(&json, "{\"gateBypass\":{\"level\":\"light\"},\"gateway\":{\"port\":4170,\"token\":null}}\n").unwrap();
+    fs::write(
+        &json,
+        "{\"gateBypass\":{\"level\":\"light\"},\"gateway\":{\"port\":4170,\"token\":null}}\n",
+    )
+    .unwrap();
     let dry = config_data(&config_run(&sandbox, &["migrate", "--dry-run"], false));
     assert_eq!(dry["kept"][0], "gateBypass.level");
     assert!(!sandbox.join("project/.fgos/config.yaml").exists());
     let done = config_data(&config_run(&sandbox, &["migrate"], false));
     assert_eq!(done["dryRun"], false);
-    assert!(fs::read_to_string(&json).unwrap().starts_with("moved to .fgos/config.yaml"));
+    assert!(fs::read_to_string(&json)
+        .unwrap()
+        .starts_with("moved to .fgos/config.yaml"));
     let yaml = fs::read_to_string(sandbox.join("project/.fgos/config.yaml")).unwrap();
-    assert!(yaml.contains("[migrate] carried over from config.json"), "{yaml}");
+    assert!(
+        yaml.contains("[migrate] carried over from config.json"),
+        "{yaml}"
+    );
     let _ = fs::remove_dir_all(&sandbox);
 }
 
 #[test]
-fn config_migrate_global_copies_first_refuses_the_removal_without_the_machine_check_then_converts() {
+fn config_migrate_global_copies_first_refuses_the_removal_without_the_machine_check_then_converts()
+{
     let sandbox = config_sandbox("global");
     fs::create_dir_all(sandbox.join("home/.fgos")).unwrap();
     let global = sandbox.join("home/.fgos/config.json");
@@ -2082,15 +2477,29 @@ fn config_migrate_global_copies_first_refuses_the_removal_without_the_machine_ch
     let copied = config_data(&config_run(&sandbox, &["migrate", "--global"], false));
     assert_eq!(copied["stage"], "copy");
     assert!(sandbox.join("home/.fgos/private/accounts.yaml").exists());
-    assert_eq!(fs::read_to_string(&global).unwrap(), legacy, "stage 1 keeps the source");
+    assert_eq!(
+        fs::read_to_string(&global).unwrap(),
+        legacy,
+        "stage 1 keeps the source"
+    );
     let refused = config_run(&sandbox, &["migrate", "--global", "--finish"], false);
     assert!(config_refusal(&refused).contains("config-machine-check-required"));
-    let finished = config_data(&config_run(&sandbox, &["migrate", "--global", "--finish", "--machine-checked"], false));
+    let finished = config_data(&config_run(
+        &sandbox,
+        &["migrate", "--global", "--finish", "--machine-checked"],
+        false,
+    ));
     assert_eq!(finished["stage"], "finish");
-    let converted = config_data(&config_run(&sandbox, &["migrate", "--global", "--convert", "--machine-checked"], false));
+    let converted = config_data(&config_run(
+        &sandbox,
+        &["migrate", "--global", "--convert", "--machine-checked"],
+        false,
+    ));
     assert_eq!(converted["kept"][0], "gateBypass.level");
     assert!(sandbox.join("home/.fgos/config.yaml").exists());
-    assert!(fs::read_to_string(&global).unwrap().starts_with("moved to .fgos/config.yaml"));
+    assert!(fs::read_to_string(&global)
+        .unwrap()
+        .starts_with("moved to .fgos/config.yaml"));
     let _ = fs::remove_dir_all(&sandbox);
 }
 
@@ -2101,7 +2510,12 @@ fn config_refresh_docs_rewrites_doc_lines_once_and_then_has_nothing_to_do() {
     fs::write(&file, "gateBypass:\n  level: light\n").unwrap();
     let first = config_data(&config_run(&sandbox, &["refresh-docs"], false));
     assert_eq!(first["nothingToDo"], false);
-    assert!(fs::read_to_string(&file).unwrap().contains("# @fgos:doc Gate bypass level"));
-    assert_eq!(config_data(&config_run(&sandbox, &["refresh-docs"], false))["nothingToDo"], true);
+    assert!(fs::read_to_string(&file)
+        .unwrap()
+        .contains("# @fgos:doc Gate bypass level"));
+    assert_eq!(
+        config_data(&config_run(&sandbox, &["refresh-docs"], false))["nothingToDo"],
+        true
+    );
     let _ = fs::remove_dir_all(&sandbox);
 }

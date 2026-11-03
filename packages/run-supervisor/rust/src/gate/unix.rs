@@ -17,9 +17,12 @@ use fgos_process::facts;
 use fgos_process::ProcId;
 use serde_json::{json, Value};
 
-use super::{ceiling_left, StartError, go_matches, load_config, publish_gate_exit, read_side_env, read_stop, Config, GateArgs, GoEnd, Stop, EXIT_NO_GO};
-use crate::route::{report, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL};
+use super::{
+    ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, read_stop, Config,
+    GateArgs, GoEnd, StartError, Stop, EXIT_NO_GO,
+};
 use crate::go_channel::{write_frame, FrameBuf, FrameError};
+use crate::route::{report, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL};
 
 /// Off Linux the sweep after the agent ended is bounded: a process the scan cannot end must not hold the gate forever.
 #[cfg(not(target_os = "linux"))]
@@ -55,13 +58,21 @@ pub fn run(args: &GateArgs) -> i32 {
         }
     };
     if config.terminal != matches!(args.go, GoEnd::Socket(_)) {
-        report("gate", "envelope-invalid", "the envelope mode and the GO channel kind disagree");
+        report(
+            "gate",
+            "envelope-invalid",
+            "the envelope mode and the GO channel kind disagree",
+        );
         return EXIT_ENVELOPE_INVALID;
     }
     // SAFETY: getpid has no preconditions.
     let is_init = unsafe { libc::getpid() } == 1;
     if config.preferred == "linux-gate" && !is_init {
-        report("gate", "not-pid-1", "the envelope names linux-gate but this process is not pid 1 of its namespace");
+        report(
+            "gate",
+            "not-pid-1",
+            "the envelope names linux-gate but this process is not pid 1 of its namespace",
+        );
         return EXIT_INTERNAL;
     }
     // Own PDEATHSIG in the terminal gate rather than relying on bwrap's
@@ -95,19 +106,41 @@ pub fn run(args: &GateArgs) -> i32 {
             }
         },
     };
-    if write_frame(&mut go, &json!({"type": "HELLO", "attemptId": config.attempt_id})).is_err() {
+    if write_frame(
+        &mut go,
+        &json!({"type": "HELLO", "attemptId": config.attempt_id}),
+    )
+    .is_err()
+    {
         return EXIT_NO_GO;
     }
-    let Some(mut arrived) = wait_for_go(&mut go, pipe) else { return EXIT_NO_GO };
+    let Some(mut arrived) = wait_for_go(&mut go, pipe) else {
+        return EXIT_NO_GO;
+    };
     if !go_matches(&config, &arrived.frame) {
-        report("gate", "go-mismatch", "GO does not name this attempt's envelope");
+        report(
+            "gate",
+            "go-mismatch",
+            "GO does not name this attempt's envelope",
+        );
         return EXIT_ENVELOPE_INVALID;
     }
     // The attempt lock, and the dispatch-cwd lease when the envelope is mutating, ride on GO.
     // The gate holds them until it exits; they are close-on-exec, so nothing it starts inherits them.
-    let expected_locks = if config.terminal { 1 + usize::from(config.mutating) } else { 0 };
+    let expected_locks = if config.terminal {
+        1 + usize::from(config.mutating)
+    } else {
+        0
+    };
     if arrived.fds.len() != expected_locks {
-        report("gate", "go-mismatch", &format!("GO carried {} lock descriptions, the envelope expects {expected_locks}", arrived.fds.len()));
+        report(
+            "gate",
+            "go-mismatch",
+            &format!(
+                "GO carried {} lock descriptions, the envelope expects {expected_locks}",
+                arrived.fds.len()
+            ),
+        );
         return EXIT_ENVELOPE_INVALID;
     }
     let held_locks = std::mem::take(&mut arrived.fds);
@@ -149,10 +182,22 @@ fn connect_supervisor(path: &Path) -> Result<UnixStream, String> {
 
 #[cfg(target_os = "linux")]
 fn peer_uid(stream: &UnixStream) -> Option<libc::uid_t> {
-    let mut cred: libc::ucred = libc::ucred { pid: 0, uid: 0, gid: 0 };
+    let mut cred: libc::ucred = libc::ucred {
+        pid: 0,
+        uid: 0,
+        gid: 0,
+    };
     let mut len = std::mem::size_of::<libc::ucred>() as libc::socklen_t;
     // SAFETY: getsockopt writes one ucred into the buffer passed.
-    let rc = unsafe { libc::getsockopt(stream.as_raw_fd(), libc::SOL_SOCKET, libc::SO_PEERCRED, (&mut cred as *mut libc::ucred).cast(), &mut len) };
+    let rc = unsafe {
+        libc::getsockopt(
+            stream.as_raw_fd(),
+            libc::SOL_SOCKET,
+            libc::SO_PEERCRED,
+            (&mut cred as *mut libc::ucred).cast(),
+            &mut len,
+        )
+    };
     (rc == 0).then_some(cred.uid)
 }
 
@@ -208,7 +253,13 @@ fn install_signal_pipe() -> io::Result<libc::c_int> {
     for fd in fds {
         set_cloexec(fd)?;
         // SAFETY: fcntl on a descriptor just created.
-        unsafe { libc::fcntl(fd, libc::F_SETFL, libc::fcntl(fd, libc::F_GETFL) | libc::O_NONBLOCK) };
+        unsafe {
+            libc::fcntl(
+                fd,
+                libc::F_SETFL,
+                libc::fcntl(fd, libc::F_GETFL) | libc::O_NONBLOCK,
+            )
+        };
     }
     SIGNAL_PIPE.store(fds[1], Ordering::Relaxed);
     for sig in [libc::SIGTERM, libc::SIGINT, libc::SIGCHLD] {
@@ -257,7 +308,10 @@ struct Arrived {
 /// Every descriptor is received close-on-exec at once (`MSG_CMSG_CLOEXEC`) and marked again before
 /// anything else runs, so no later spawn can inherit a lock description.
 fn recv_chunk(fd: libc::c_int, buf: &mut [u8], fds: &mut Vec<OwnedFd>) -> io::Result<usize> {
-    let mut iov = libc::iovec { iov_base: buf.as_mut_ptr().cast(), iov_len: buf.len() };
+    let mut iov = libc::iovec {
+        iov_base: buf.as_mut_ptr().cast(),
+        iov_len: buf.len(),
+    };
     let mut control = [0u64; 8];
     // SAFETY: an all-zero msghdr is valid; the fields used are set below.
     let mut msg: libc::msghdr = unsafe { std::mem::zeroed() };
@@ -293,7 +347,10 @@ fn recv_chunk(fd: libc::c_int, buf: &mut [u8], fds: &mut Vec<OwnedFd>) -> io::Re
         set_cloexec(held.as_raw_fd())?;
     }
     if msg.msg_flags & libc::MSG_CTRUNC != 0 {
-        return Err(io::Error::new(io::ErrorKind::InvalidData, "ancillary data truncated"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "ancillary data truncated",
+        ));
     }
     fds.extend(taken);
     Ok(n as usize)
@@ -308,11 +365,23 @@ fn wait_for_go(go: &mut UnixStream, pipe: libc::c_int) -> Option<Arrived> {
     let mut fds: Vec<OwnedFd> = Vec::new();
     loop {
         let mut pollset = [
-            libc::pollfd { fd: go.as_raw_fd(), events: libc::POLLIN, revents: 0 },
-            libc::pollfd { fd: pipe, events: libc::POLLIN, revents: 0 },
+            libc::pollfd {
+                fd: go.as_raw_fd(),
+                events: libc::POLLIN,
+                revents: 0,
+            },
+            libc::pollfd {
+                fd: pipe,
+                events: libc::POLLIN,
+                revents: 0,
+            },
         ];
         poll_fds(&mut pollset, None);
-        if pollset[1].revents != 0 && drain_signals(pipe).iter().any(|s| *s == libc::SIGTERM || *s == libc::SIGINT) {
+        if pollset[1].revents != 0
+            && drain_signals(pipe)
+                .iter()
+                .any(|s| *s == libc::SIGTERM || *s == libc::SIGINT)
+        {
             return None;
         }
         if pollset[0].revents == 0 {
@@ -322,13 +391,24 @@ fn wait_for_go(go: &mut UnixStream, pipe: libc::c_int) -> Option<Arrived> {
         match recv_chunk(go.as_raw_fd(), &mut chunk, &mut fds) {
             Ok(0) => return None,
             Ok(n) => frames.push(&chunk[..n]),
-            Err(err) if matches!(err.kind(), io::ErrorKind::WouldBlock | io::ErrorKind::Interrupted) => continue,
+            Err(err)
+                if matches!(
+                    err.kind(),
+                    io::ErrorKind::WouldBlock | io::ErrorKind::Interrupted
+                ) =>
+            {
+                continue
+            }
             Err(_) => return None,
         }
         match frames.next_frame() {
             Ok(Some(frame)) => {
                 go.set_nonblocking(false).ok()?;
-                return Some(Arrived { frame, fds, rest: frames });
+                return Some(Arrived {
+                    frame,
+                    fds,
+                    rest: frames,
+                });
             }
             Ok(None) => {}
             Err(_) => return None,
@@ -350,7 +430,9 @@ impl Channel {
     fn absorb(&mut self) {
         loop {
             match self.frames.next_frame() {
-                Ok(Some(frame)) if frame["type"] == "BRIEF_DELIVERED" => self.brief_delivered = true,
+                Ok(Some(frame)) if frame["type"] == "BRIEF_DELIVERED" => {
+                    self.brief_delivered = true
+                }
                 Ok(Some(_)) => {}
                 Ok(None) => return,
                 Err(FrameError::Closed | FrameError::Protocol) => {
@@ -392,19 +474,34 @@ impl AgentIo for NoPane {
 /// How often the outbox is looked at while the supervisor is gone and the agent has been briefed.
 const OUTBOX_POLL: Duration = Duration::from_millis(50);
 
-fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, String>, go: &mut UnixStream, pipe: libc::c_int, pid1: bool) -> Result<(), String> {
+fn supervise_agent(
+    config: &Config,
+    arrived: Arrived,
+    secrets: BTreeMap<String, String>,
+    go: &mut UnixStream,
+    pipe: libc::c_int,
+    pid1: bool,
+) -> Result<(), String> {
     let mut stop: Option<Stop> = None;
     let mut status: Option<ExitStatus> = None;
     let mut agent_pid: Option<libc::pid_t> = None;
     let mut agent_tuple: Option<facts::ProcTuple> = None;
-    let mut channel = config.terminal.then_some(Channel { frames: arrived.rest, brief_delivered: false, gone: false, result_seen: None });
+    let mut channel = config.terminal.then_some(Channel {
+        frames: arrived.rest,
+        brief_delivered: false,
+        gone: false,
+        result_seen: None,
+    });
     if let Some(channel) = channel.as_mut() {
         channel.absorb();
     }
 
     if ceiling_left(config) == Some(Duration::ZERO) {
         // A ceiling already behind us: the agent never starts.
-        stop = Some(Stop { stopped_by: "hard-ceiling", cause: "hard-ceiling".into() });
+        stop = Some(Stop {
+            stopped_by: "hard-ceiling",
+            cause: "hard-ceiling".into(),
+        });
     } else {
         let child = match spawn_agent(config, &arrived.frame, secrets) {
             Ok(child) => child,
@@ -419,11 +516,14 @@ fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, 
         agent_tuple = facts::identity_of(ProcId(child.id()));
         // The Child handle is not used again: the gate reaps with waitpid(-1).
         std::mem::forget(child);
-        let tuple = agent_tuple.as_ref().map_or(Value::Null, |t| t.to_record().to_json());
+        let tuple = agent_tuple
+            .as_ref()
+            .map_or(Value::Null, |t| t.to_record().to_json());
         let _ = write_frame(go, &json!({"type": "AGENT", "tuple": tuple}));
         if channel.is_some() {
             // From here the channel is only watched, never waited on.
-            go.set_nonblocking(true).map_err(|e| format!("GO channel: {e}"))?;
+            go.set_nonblocking(true)
+                .map_err(|e| format!("GO channel: {e}"))?;
         }
     }
 
@@ -432,10 +532,18 @@ fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, 
     let mut escalated = false;
     while agent_pid.is_some() && status.is_none() {
         let now = Instant::now();
-        let watching_outbox = channel.as_ref().is_some_and(|c| c.gone && c.brief_delivered) && stop.is_none();
-        let settle_left = channel.as_ref().and_then(|c| c.result_seen).map(|at| (at + config.orphan_settle).saturating_duration_since(now));
+        let watching_outbox = channel
+            .as_ref()
+            .is_some_and(|c| c.gone && c.brief_delivered)
+            && stop.is_none();
+        let settle_left = channel
+            .as_ref()
+            .and_then(|c| c.result_seen)
+            .map(|at| (at + config.orphan_settle).saturating_duration_since(now));
         let timeout = [
-            grace_ends.filter(|_| !escalated).map(|at| at.saturating_duration_since(now)),
+            grace_ends
+                .filter(|_| !escalated)
+                .map(|at| at.saturating_duration_since(now)),
             ceiling_left(config).filter(|_| stop.is_none()),
             watching_outbox.then_some(OUTBOX_POLL),
             settle_left.filter(|_| stop.is_none()),
@@ -444,7 +552,18 @@ fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, 
         .flatten()
         .min();
         let listening = channel.as_ref().is_some_and(|c| !c.gone);
-        let mut fds = [libc::pollfd { fd: pipe, events: libc::POLLIN, revents: 0 }, libc::pollfd { fd: if listening { go.as_raw_fd() } else { -1 }, events: libc::POLLIN, revents: 0 }];
+        let mut fds = [
+            libc::pollfd {
+                fd: pipe,
+                events: libc::POLLIN,
+                revents: 0,
+            },
+            libc::pollfd {
+                fd: if listening { go.as_raw_fd() } else { -1 },
+                events: libc::POLLIN,
+                revents: 0,
+            },
+        ];
         poll_fds(&mut fds, timeout);
         for sig in drain_signals(pipe) {
             if (sig == libc::SIGTERM || sig == libc::SIGINT) && stop.is_none() {
@@ -461,20 +580,31 @@ fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, 
                 let orphan_cause = if !channel.brief_delivered {
                     Some("abandoned-before-brief")
                 } else {
-                    if channel.result_seen.is_none() && outbox.newest_complete(&mut NoPane).is_some() {
+                    if channel.result_seen.is_none()
+                        && outbox.newest_complete(&mut NoPane).is_some()
+                    {
                         channel.result_seen = Some(Instant::now());
                     }
-                    channel.result_seen.filter(|at| at.elapsed() >= config.orphan_settle).map(|_| "orphan-result")
+                    channel
+                        .result_seen
+                        .filter(|at| at.elapsed() >= config.orphan_settle)
+                        .map(|_| "orphan-result")
                 };
                 if let Some(cause) = orphan_cause {
-                    stop = Some(Stop { stopped_by: "orphan", cause: cause.into() });
+                    stop = Some(Stop {
+                        stopped_by: "orphan",
+                        cause: cause.into(),
+                    });
                     grace_ends = Some(Instant::now() + config.grace);
                     signal_agent_group(agent_pid, libc::SIGTERM);
                 }
             }
         }
         if stop.is_none() && ceiling_left(config) == Some(Duration::ZERO) {
-            stop = Some(Stop { stopped_by: "hard-ceiling", cause: "hard-ceiling".into() });
+            stop = Some(Stop {
+                stopped_by: "hard-ceiling",
+                cause: "hard-ceiling".into(),
+            });
             grace_ends = Some(Instant::now() + config.grace);
             signal_agent_group(agent_pid, libc::SIGTERM);
         }
@@ -491,8 +621,15 @@ fn supervise_agent(config: &Config, arrived: Arrived, secrets: BTreeMap<String, 
     }
 
     let (exit_code, signal) = match status {
-        Some(s) if s.code().is_some() => (s.code().map(Value::from).unwrap_or(Value::Null), Value::Null),
-        Some(s) => (Value::Null, s.signal().map_or(Value::Null, |n| Value::from(signal_name(n)))),
+        Some(s) if s.code().is_some() => (
+            s.code().map(Value::from).unwrap_or(Value::Null),
+            Value::Null,
+        ),
+        Some(s) => (
+            Value::Null,
+            s.signal()
+                .map_or(Value::Null, |n| Value::from(signal_name(n))),
+        ),
         None => (Value::Null, Value::Null),
     };
     publish_gate_exit(config, exit_code, signal, stop)?;
@@ -521,17 +658,30 @@ fn give_back_foreground() {
 /// Variables a terminal multiplexer sets for the program that runs in a pane.
 const PANE_TERMINAL_ENV: [&str; 4] = ["TERM", "COLORTERM", "TERM_PROGRAM", "TERM_PROGRAM_VERSION"];
 
-fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, String>) -> Result<std::process::Child, StartError> {
+fn spawn_agent(
+    config: &Config,
+    go_frame: &Value,
+    secrets: BTreeMap<String, String>,
+) -> Result<std::process::Child, StartError> {
     let mut cmd = Command::new(&config.command);
     // A sandbox hides some directories (a worktree under /tmp behind its private tmpfs): the agent then
     // starts at the root, as a process started by bwrap itself would.
     if config.cwd.is_dir() {
         cmd.current_dir(&config.cwd);
     } else {
-        crate::gate::note_in_capture(config, &format!("working directory {} is not visible here, starting in /", config.cwd.display()));
+        crate::gate::note_in_capture(
+            config,
+            &format!(
+                "working directory {} is not visible here, starting in /",
+                config.cwd.display()
+            ),
+        );
         cmd.current_dir("/");
     }
-    cmd.args(&config.args).env_clear().envs(&config.env).envs(&secrets);
+    cmd.args(&config.args)
+        .env_clear()
+        .envs(&config.env)
+        .envs(&secrets);
     if config.terminal {
         // The gate runs in the pane, so these are the pane's own values: its terminal type and which
         // pane, tab and server it belongs to. What the controller had (another pane, or none) must never
@@ -551,7 +701,9 @@ fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, Stri
         // The agent is the pane's REPL: it keeps the pane's tty on all three descriptors and, with no
         // session of its own (a pane's tty belongs to the shell's session), leads a process group that is
         // made the tty's foreground group before it starts.
-        cmd.stdin(Stdio::inherit()).stdout(Stdio::inherit()).stderr(Stdio::inherit());
+        cmd.stdin(Stdio::inherit())
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit());
         // SAFETY: only async-signal-safe calls between fork and exec.
         unsafe {
             cmd.pre_exec(|| {
@@ -575,11 +727,21 @@ fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, Stri
             });
         }
     } else {
-        let append = |path: &Path| OpenOptions::new().create(true).append(true).mode(0o600).custom_flags(libc::O_CLOEXEC).open(path).map_err(|e| StartError::Setup(format!("capture {}: {e}", path.display())));
+        let append = |path: &Path| {
+            OpenOptions::new()
+                .create(true)
+                .append(true)
+                .mode(0o600)
+                .custom_flags(libc::O_CLOEXEC)
+                .open(path)
+                .map_err(|e| StartError::Setup(format!("capture {}: {e}", path.display())))
+        };
         let stdout = append(&config.stdout)?;
         let stderr = append(&config.stderr)?;
         let stdin: Stdio = match &config.brief {
-            Some(path) => File::open(path).map_err(|e| StartError::Setup(format!("brief {}: {e}", path.display())))?.into(),
+            Some(path) => File::open(path)
+                .map_err(|e| StartError::Setup(format!("brief {}: {e}", path.display())))?
+                .into(),
             None => Stdio::null(),
         };
         cmd.stdin(stdin).stdout(stdout).stderr(stderr);
@@ -594,7 +756,10 @@ fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, Stri
         }
     }
     // The agent receives no lock description: the map is empty.
-    spawn_with_fds(cmd, &[]).map_err(|source| StartError::Spawn { program: config.command.clone(), source })
+    spawn_with_fds(cmd, &[]).map_err(|source| StartError::Spawn {
+        program: config.command.clone(),
+        source,
+    })
 }
 
 fn signal_agent_group(agent: Option<libc::pid_t>, sig: libc::c_int) {
@@ -631,7 +796,12 @@ fn kill_everything(agent: Option<libc::pid_t>, tuple: Option<&facts::ProcTuple>,
 /// pass (`None`) finds nothing.
 #[cfg(target_os = "linux")]
 fn descendants_of_self() -> Vec<libc::pid_t> {
-    let parent_of: Vec<(u32, u32)> = facts::relations().unwrap_or_default().iter().filter(|r| !r.is_gone()).map(|r| (r.pid.0, r.parent)).collect();
+    let parent_of: Vec<(u32, u32)> = facts::relations()
+        .unwrap_or_default()
+        .iter()
+        .filter(|r| !r.is_gone())
+        .map(|r| (r.pid.0, r.parent))
+        .collect();
     let mut found: Vec<u32> = Vec::new();
     let mut frontier = vec![std::process::id()];
     while let Some(parent) = frontier.pop() {
@@ -688,13 +858,17 @@ fn end_domain(agent: Option<libc::pid_t>, tuple: Option<&facts::ProcTuple>, pid1
     loop {
         reap_all(None);
         // SAFETY: waitpid with a valid out pointer; WNOHANG never blocks.
-        let none_left = unsafe { libc::waitpid(-1, std::ptr::null_mut(), libc::WNOHANG) } < 0 && io::Error::last_os_error().raw_os_error() == Some(libc::ECHILD);
+        let none_left = unsafe { libc::waitpid(-1, std::ptr::null_mut(), libc::WNOHANG) } < 0
+            && io::Error::last_os_error().raw_os_error() == Some(libc::ECHILD);
         #[cfg(target_os = "linux")]
         let tree_empty = descendants_of_self().is_empty();
         // No subreaper off Linux: orphans go to launchd, so the domain judge
         // (agent group plus tree scan) is the only view of what is left.
         #[cfg(not(target_os = "linux"))]
-        let tree_empty = tuple.is_none_or(|t| fgos_process::domain_is_empty(&fgos_process::Domain::MacosTree(t.clone())) == fgos_process::DomainState::Empty);
+        let tree_empty = tuple.is_none_or(|t| {
+            fgos_process::domain_is_empty(&fgos_process::Domain::MacosTree(t.clone()))
+                == fgos_process::DomainState::Empty
+        });
         #[cfg(not(target_os = "linux"))]
         if !tree_empty && started.elapsed() >= NON_LINUX_EMPTY_WAIT {
             eprintln!("fgos internal gate: processes still in the agent's tree after {NON_LINUX_EMPTY_WAIT:?}");

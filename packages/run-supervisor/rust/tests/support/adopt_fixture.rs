@@ -26,7 +26,17 @@ pub fn attempt_in(root: &Path, name: &str, steps: &[&str]) -> Fixture {
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     let attempt_id = format!("att-adopt-{name}");
-    let step_values: Vec<Value> = steps.iter().map(|id| shell_step(&dir, id, &format!("echo x >> {}/ran-{id}", dir.display()), 10_000)).collect();
+    let step_values: Vec<Value> = steps
+        .iter()
+        .map(|id| {
+            shell_step(
+                &dir,
+                id,
+                &format!("echo x >> {}/ran-{id}", dir.display()),
+                10_000,
+            )
+        })
+        .collect();
     let mut value = json!({
         "v": 3,
         "attemptId": attempt_id,
@@ -54,13 +64,21 @@ pub fn attempt_in(root: &Path, name: &str, steps: &[&str]) -> Fixture {
     });
     let digest = envelope::digest(&value).unwrap();
     value["digest"] = Value::String(digest);
-    fs::write(dir.join("envelope.json"), serde_json::to_vec(&value).unwrap()).unwrap();
+    fs::write(
+        dir.join("envelope.json"),
+        serde_json::to_vec(&value).unwrap(),
+    )
+    .unwrap();
     fs::write(dir.join("attempt.lock"), "").unwrap();
     Fixture { dir, attempt_id }
 }
 
 pub fn attempt(name: &str, steps: &[&str]) -> Fixture {
-    attempt_in(&std::env::temp_dir().join(format!("fgos-adopt-{}", std::process::id())), name, steps)
+    attempt_in(
+        &std::env::temp_dir().join(format!("fgos-adopt-{}", std::process::id())),
+        name,
+        steps,
+    )
 }
 
 impl Fixture {
@@ -96,14 +114,22 @@ impl Fixture {
 
     /// The record a supervisor declared into the lock before it died.
     pub fn declare(&self, tuple: &ProcTuple) {
-        predecessor::declare(&predecessor::record_path(&self.path("attempt.lock")), &Domain::LinuxGate(tuple.clone())).unwrap();
+        predecessor::declare(
+            &predecessor::record_path(&self.path("attempt.lock")),
+            &Domain::LinuxGate(tuple.clone()),
+        )
+        .unwrap();
     }
 
     /// The same, for a record written as the contract spells it.
     pub fn declare_record(&self, record: &Value) {
         let mut record = record.clone();
         record["v"] = json!(1);
-        fs::write(predecessor::record_path(&self.path("attempt.lock")), record.to_string()).unwrap();
+        fs::write(
+            predecessor::record_path(&self.path("attempt.lock")),
+            record.to_string(),
+        )
+        .unwrap();
     }
 
     pub fn gate_exit(&self, stopped_by: &str) {
@@ -118,7 +144,18 @@ impl Fixture {
 
     /// Every file in the directory with its bytes, to prove a call changed nothing.
     pub fn snapshot(&self) -> Vec<(String, Vec<u8>)> {
-        let mut files: Vec<(String, Vec<u8>)> = walk(&self.dir).into_iter().map(|p| (p.strip_prefix(&self.dir).unwrap().to_string_lossy().into_owned(), fs::read(&p).unwrap_or_default())).collect();
+        let mut files: Vec<(String, Vec<u8>)> = walk(&self.dir)
+            .into_iter()
+            .map(|p| {
+                (
+                    p.strip_prefix(&self.dir)
+                        .unwrap()
+                        .to_string_lossy()
+                        .into_owned(),
+                    fs::read(&p).unwrap_or_default(),
+                )
+            })
+            .collect();
         files.sort();
         files
     }
@@ -155,15 +192,29 @@ pub fn live_process() -> (Child, ProcTuple) {
 
 /// A kernel lock held by this test on `<dir>/attempt.lock`: stands in for a running supervisor.
 pub fn hold_lock(dir: &Path) -> File {
-    let file = OpenOptions::new().read(true).write(true).create(true).truncate(false).open(dir.join("attempt.lock")).unwrap();
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(dir.join("attempt.lock"))
+        .unwrap();
     // SAFETY: flock on a descriptor this function owns.
-    assert_eq!(unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) }, 0, "test takes the attempt lock");
+    assert_eq!(
+        unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) },
+        0,
+        "test takes the attempt lock"
+    );
     file
 }
 
 /// Whether a stranger could take the lock shared right now.
 pub fn lock_is_free(dir: &Path) -> bool {
-    let file = OpenOptions::new().read(true).write(true).open(dir.join("attempt.lock")).unwrap();
+    let file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(dir.join("attempt.lock"))
+        .unwrap();
     // SAFETY: flock on a descriptor this function owns.
     unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_SH | libc::LOCK_NB) == 0 }
 }
@@ -173,7 +224,12 @@ pub fn adopt_with(args: &[&str], stdin: &str) -> (i32, Vec<Value>) {
     let mut child = adopt_spawn(args);
     {
         use std::io::Write;
-        child.stdin.take().unwrap().write_all(stdin.as_bytes()).unwrap();
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(stdin.as_bytes())
+            .unwrap();
     }
     adopt_finish(child)
 }
@@ -188,11 +244,22 @@ pub fn adopt(dir: &Path, extra: &[&str]) -> Value {
 }
 
 pub fn adopt_spawn(args: &[&str]) -> Child {
-    Command::new(internal_harness()).args(["internal", "adopt", "--protocol", "1"]).args(args).env_clear().stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::inherit()).spawn().unwrap()
+    Command::new(internal_harness())
+        .args(["internal", "adopt", "--protocol", "1"])
+        .args(args)
+        .env_clear()
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::inherit())
+        .spawn()
+        .unwrap()
 }
 
 pub fn adopt_finish(child: Child) -> (i32, Vec<Value>) {
     let out = child.wait_with_output().unwrap();
-    let lines = String::from_utf8_lossy(&out.stdout).lines().filter_map(|l| serde_json::from_str(l).ok()).collect();
+    let lines = String::from_utf8_lossy(&out.stdout)
+        .lines()
+        .filter_map(|l| serde_json::from_str(l).ok())
+        .collect();
     (out.status.code().unwrap_or(-1), lines)
 }

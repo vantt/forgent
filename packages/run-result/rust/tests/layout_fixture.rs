@@ -7,7 +7,8 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 #[cfg(unix)]
 use fgos_observe::{
-    ObserveRequest, SourceError, WorkEntropySignalsRecord, WorkObservationSource, WorkOutcomesRecord,
+    ObserveRequest, SourceError, WorkEntropySignalsRecord, WorkObservationSource,
+    WorkOutcomesRecord,
 };
 #[cfg(unix)]
 use fgos_run_result::scan_unit_summaries;
@@ -17,7 +18,11 @@ struct NoWork;
 
 #[cfg(unix)]
 impl WorkObservationSource for NoWork {
-    fn read_outcomes_report(&self, _: &Path, _: Option<&str>) -> Result<WorkOutcomesRecord, SourceError> {
+    fn read_outcomes_report(
+        &self,
+        _: &Path,
+        _: Option<&str>,
+    ) -> Result<WorkOutcomesRecord, SourceError> {
         panic!("this verb must not read the work store")
     }
 
@@ -177,10 +182,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         .unwrap();
     assert_eq!(no_assignment.attrs["role"], Value::Null);
     let nested = scan.runs.iter().find(|o| o.subject.id == "nested").unwrap();
-    assert_eq!(
-        nested.attrs["assignmentId"],
-        "unit-run-example/member-1/1"
-    );
+    assert_eq!(nested.attrs["assignmentId"], "unit-run-example/member-1/1");
     let flat = scan.runs.iter().find(|o| o.subject.id == "flat").unwrap();
     assert_eq!(flat.attrs["assignmentId"], "legacy");
 
@@ -628,7 +630,10 @@ fn run_scan_keeps_explicit_nulls_and_does_not_reclassify_non_object_results() {
     assert_eq!(scan.skipped.get("unparseable"), None);
     assert_eq!(scan.skipped["no-run-id"], 1);
     let by_id = |id: &str| scan.runs.iter().find(|o| o.subject.id == id).unwrap();
-    assert_eq!(by_id("null-contract").attrs["outcome"]["reason"], "unsupported-contract");
+    assert_eq!(
+        by_id("null-contract").attrs["outcome"]["reason"],
+        "unsupported-contract"
+    );
     let classification = by_id("null-classification");
     assert_eq!(classification.attrs["classification"], Value::Null);
     assert_eq!(classification.attrs["category"], "ok");

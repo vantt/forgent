@@ -412,23 +412,45 @@ impl GitDriver {
             #[cfg(unix)]
             let collision_metadata = fs::symlink_metadata(root.join(p));
             let folded = p.to_lowercase();
-            let tracked_alias = tracked.iter().filter(|indexed| indexed.to_lowercase() == folded).any(|indexed| {
-                #[cfg(unix)]
-                {
-                    use std::os::unix::fs::MetadataExt;
-                    match (fs::symlink_metadata(root.join(indexed)), collision_metadata.as_ref()) {
-                        (Ok(a), Ok(b)) => a.dev() == b.dev() && a.ino() == b.ino()
-                            && fs::read_dir(root.join(Path::new(p).parent().unwrap_or(Path::new(""))))
-                                .is_ok_and(|mut entries| !entries.any(|e| e.is_ok_and(|e| e.file_name() == Path::new(p).file_name().unwrap_or_default()))),
-                        _ => false,
+            let tracked_alias = tracked
+                .iter()
+                .filter(|indexed| indexed.to_lowercase() == folded)
+                .any(|indexed| {
+                    #[cfg(unix)]
+                    {
+                        use std::os::unix::fs::MetadataExt;
+                        match (
+                            fs::symlink_metadata(root.join(indexed)),
+                            collision_metadata.as_ref(),
+                        ) {
+                            (Ok(a), Ok(b)) => {
+                                a.dev() == b.dev()
+                                    && a.ino() == b.ino()
+                                    && fs::read_dir(
+                                        root.join(Path::new(p).parent().unwrap_or(Path::new(""))),
+                                    )
+                                    .is_ok_and(
+                                        |mut entries| {
+                                            !entries.any(|e| {
+                                                e.is_ok_and(|e| {
+                                                    e.file_name()
+                                                        == Path::new(p)
+                                                            .file_name()
+                                                            .unwrap_or_default()
+                                                })
+                                            })
+                                        },
+                                    )
+                            }
+                            _ => false,
+                        }
                     }
-                }
-                #[cfg(not(unix))]
-                {
-                    let _ = indexed;
-                    false
-                }
-            });
+                    #[cfg(not(unix))]
+                    {
+                        let _ = indexed;
+                        false
+                    }
+                });
             if !tracked.contains(p) && !tracked_alias && !request.allowed_replacements.contains(p) {
                 return Err(failure(format!("restore-untracked-target-collision: {p}; list in allowedReplacements to replace")));
             }
@@ -467,7 +489,12 @@ impl GitDriver {
         fgos_holder_lock::validate_quiescent(checkout::handle(scope, repo)?).map_err(failure)?;
         // A bisect leaves only its bookkeeping and never blocks a restore.
         let tolerated: &[&str] = if tolerate_stopped_operation {
-            &["BISECT_START", "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD"]
+            &[
+                "BISECT_START",
+                "MERGE_HEAD",
+                "CHERRY_PICK_HEAD",
+                "REVERT_HEAD",
+            ]
         } else {
             &["BISECT_START"]
         };
@@ -761,9 +788,11 @@ impl GitDriver {
                     let digest = wal.store_restore_snapshot(&snapshot)?;
                     let mut error = failure(format!("restore-reapply-required: restore-overlapping-content: {p}; snapshot:{digest}"));
                     let patch_path = if request.checkout_baseline.is_some() {
-                        Some(
-                            wal.store_restore_patch(&preview.reference, id, &snapshot.staged_patch)?,
-                        )
+                        Some(wal.store_restore_patch(
+                            &preview.reference,
+                            id,
+                            &snapshot.staged_patch,
+                        )?)
                     } else {
                         None
                     };
@@ -809,7 +838,10 @@ impl GitDriver {
                 checkout::checkout_resources(&repo)?,
                 checkout::binding(checkout::handle(&scope, &repo)?)?,
             ),
-            (Tip::Oid(request.expected_head.clone()), Tip::Oid(request.target.clone())),
+            (
+                Tip::Oid(request.expected_head.clone()),
+                Tip::Oid(request.target.clone()),
+            ),
         );
         let authority = Authority {
             scope: &scope,
@@ -845,21 +877,18 @@ impl GitDriver {
             && request.reapply_local_delta
             && !snapshot.staged_patch.is_empty()
         {
-            Some(
-                wal.store_restore_patch(&preview.reference, id, &snapshot.staged_patch)?,
-            )
+            Some(wal.store_restore_patch(&preview.reference, id, &snapshot.staged_patch)?)
         } else {
             None
         };
-        chain = wal
-            .append(
-                &chain,
-                Phase::TargetAttempt {
-                    prior_target_attempt: None,
-                    expected: chain.intent().expected.clone(),
-                    next: chain.intent().next.clone(),
-                },
-            )?;
+        chain = wal.append(
+            &chain,
+            Phase::TargetAttempt {
+                prior_target_attempt: None,
+                expected: chain.intent().expected.clone(),
+                next: chain.intent().next.clone(),
+            },
+        )?;
         filesystem
             .checkpoint("restore-before-reset")
             .map_err(failure)?;
@@ -960,9 +989,7 @@ impl GitDriver {
                             use std::os::unix::fs::PermissionsExt;
                             let incoming =
                                 fs::metadata(&path).map_err(failure)?.permissions().mode();
-                            fs::Permissions::from_mode(
-                                (mode.mode() & !0o111) | (incoming & 0o111),
-                            )
+                            fs::Permissions::from_mode((mode.mode() & !0o111) | (incoming & 0o111))
                         } else {
                             mode
                         };
@@ -989,15 +1016,15 @@ impl GitDriver {
                     ..request.clone()
                 },
             )?;
-            let post = wal
-                .store_restore_snapshot(&self.restore_capture(&repo, &scope, &after, id, confirmed)?)?;
+            let post = wal.store_restore_snapshot(
+                &self.restore_capture(&repo, &scope, &after, id, confirmed)?,
+            )?;
             Ok(post)
         })();
         let mut warnings = vec![];
         match post_check {
             Ok(post) => {
-                chain = wal
-                    .append(&chain, Phase::RestoreApplied { snapshot: post })?;
+                chain = wal.append(&chain, Phase::RestoreApplied { snapshot: post })?;
             }
             Err(e) => warnings.push(format!("restore-post-check-failed: {}", e.cause)),
         }
@@ -1071,9 +1098,11 @@ impl GitDriver {
         #[cfg(unix)]
         let extraction_directory = {
             use std::os::unix::fs::OpenOptionsExt;
-            fs::OpenOptions::new().read(true)
+            fs::OpenOptions::new()
+                .read(true)
                 .custom_flags(libc::O_DIRECTORY | libc::O_NOFOLLOW | libc::O_CLOEXEC)
-                .open(destination).map_err(failure)?
+                .open(destination)
+                .map_err(failure)?
         };
         let destination = destination.canonicalize().map_err(failure)?;
         if destination.starts_with(checkout::root(&repo)?)
@@ -1097,14 +1126,24 @@ impl GitDriver {
                     return Err(failure("restore-extract-outside-repository-required"));
                 }
             }
-            if page.complete { break; }
+            if page.complete {
+                break;
+            }
             cursor = page.next_cursor;
         }
-        let filename = Path::new(name).file_name().ok_or_else(|| failure("restore-extract-path"))?;
+        let filename = Path::new(name)
+            .file_name()
+            .ok_or_else(|| failure("restore-extract-path"))?;
         #[cfg(unix)]
         {
             use std::io::Write;
-            use std::{ffi::CString, os::{fd::{AsRawFd, FromRawFd}, unix::{ffi::OsStrExt, fs::MetadataExt}}};
+            use std::{
+                ffi::CString,
+                os::{
+                    fd::{AsRawFd, FromRawFd},
+                    unix::{ffi::OsStrExt, fs::MetadataExt},
+                },
+            };
             let checked = fs::metadata(&destination).map_err(failure)?;
             let dir = extraction_directory;
             // Bind the checked canonical directory to its held descriptor before
@@ -1116,9 +1155,21 @@ impl GitDriver {
             let filename = CString::new(filename.as_bytes()).map_err(failure)?;
             // SAFETY: dir is held, filename is a single validated basename;
             // successful openat transfers ownership to File exactly once.
-            let fd = unsafe { libc::openat(dir.as_raw_fd(), filename.as_ptr(),
-                libc::O_WRONLY | libc::O_CREAT | libc::O_EXCL | libc::O_NOFOLLOW | libc::O_CLOEXEC, 0o600) };
-            if fd < 0 { return Err(failure(std::io::Error::last_os_error())); }
+            let fd = unsafe {
+                libc::openat(
+                    dir.as_raw_fd(),
+                    filename.as_ptr(),
+                    libc::O_WRONLY
+                        | libc::O_CREAT
+                        | libc::O_EXCL
+                        | libc::O_NOFOLLOW
+                        | libc::O_CLOEXEC,
+                    0o600,
+                )
+            };
+            if fd < 0 {
+                return Err(failure(std::io::Error::last_os_error()));
+            }
             let mut output = unsafe { fs::File::from_raw_fd(fd) };
             output.write_all(&bytes).map_err(failure)?;
             output.sync_all().map_err(failure)?;

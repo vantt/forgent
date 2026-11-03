@@ -87,7 +87,10 @@ pub fn is_session_shard(shard: &str) -> bool {
 }
 
 fn not_regular(path: &Path) -> io::Error {
-    io::Error::new(io::ErrorKind::InvalidInput, format!("{NOT_REGULAR}: {}", path.display()))
+    io::Error::new(
+        io::ErrorKind::InvalidInput,
+        format!("{NOT_REGULAR}: {}", path.display()),
+    )
 }
 
 /// Preflights `<root>/.fgos/observe/<store>` component by component without
@@ -109,7 +112,10 @@ fn store_dir(root: &Path, store: &str, create: bool) -> io::Result<Option<PathBu
             Ok(_) => {
                 return Err(io::Error::new(
                     io::ErrorKind::InvalidInput,
-                    format!("observe store component must be a real directory: {}", path.display()),
+                    format!(
+                        "observe store component must be a real directory: {}",
+                        path.display()
+                    ),
                 ))
             }
             Err(e) if !create && e.kind() == io::ErrorKind::NotFound => return Ok(None),
@@ -152,7 +158,9 @@ fn open_regular(path: &Path, options: &mut OpenOptions) -> io::Result<File> {
     #[cfg(unix)]
     let file = {
         use std::os::unix::fs::OpenOptionsExt;
-        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK).open(path)?
+        options
+            .custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK)
+            .open(path)?
     };
     #[cfg(windows)]
     let file = fgos_durable_file::open_no_reparse(options, path)?;
@@ -175,9 +183,17 @@ pub fn encode_line<T: Serialize>(record: &T) -> Result<Vec<u8>, String> {
 /// Appends encoded `lines` to the current writer's shard of `store` in one
 /// write and syncs it. The caller holds the store lock and only ever appends to
 /// its own writer shard. Returns the shard path.
-pub fn append_lines(root: &Path, store: &str, tail: TornTail, lines: &[Vec<u8>]) -> io::Result<PathBuf> {
+pub fn append_lines(
+    root: &Path,
+    store: &str,
+    tail: TornTail,
+    lines: &[Vec<u8>],
+) -> io::Result<PathBuf> {
     let path = shard_path(root, store)?;
-    let mut file = open_regular(&path, OpenOptions::new().read(true).append(true).create(true))?;
+    let mut file = open_regular(
+        &path,
+        OpenOptions::new().read(true).append(true).create(true),
+    )?;
     let mut buffer = Vec::new();
     if file.metadata()?.len() > 0 {
         let mut last = [0u8; 1];
@@ -230,7 +246,10 @@ fn read_bounded_line(reader: &mut impl BufRead, line: &mut Vec<u8>) -> io::Resul
 }
 
 fn relative(root: &Path, path: &Path) -> String {
-    path.strip_prefix(root).unwrap_or(path).to_string_lossy().into_owned()
+    path.strip_prefix(root)
+        .unwrap_or(path)
+        .to_string_lossy()
+        .into_owned()
 }
 
 /// Reads every `.jsonl` shard of `store`. A missing store directory is empty;
@@ -264,7 +283,10 @@ pub fn read_store(root: &Path, store: &str, unsafe_shard: UnsafeShard) -> io::Re
     }
     shards.sort();
     for path in shards {
-        let shard = path.file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default();
+        let shard = path
+            .file_stem()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or_default();
         let mut reader = BufReader::new(open_regular(&path, OpenOptions::new().read(true))?);
         let mut bytes = Vec::new();
         let mut line = 0;
@@ -278,10 +300,16 @@ pub fn read_store(root: &Path, store: &str, unsafe_shard: UnsafeShard) -> io::Re
                 serde_json::from_slice::<Value>(&bytes).map_err(|e| e.to_string())
             };
             match parsed {
-                Ok(value) => result.records.push(StoredRecord { value, shard: shard.clone(), line }),
-                Err(reason) => {
-                    result.invalid.push(InvalidLine { file: relative(root, &path), line, reason })
-                }
+                Ok(value) => result.records.push(StoredRecord {
+                    value,
+                    shard: shard.clone(),
+                    line,
+                }),
+                Err(reason) => result.invalid.push(InvalidLine {
+                    file: relative(root, &path),
+                    line,
+                    reason,
+                }),
             }
         }
     }
@@ -292,7 +320,10 @@ pub fn read_store(root: &Path, store: &str, unsafe_shard: UnsafeShard) -> io::Re
 /// door, so a store that reports its own invalid lines (evals) stays quiet.
 pub fn warn_skipped(store: &str, invalid: &[InvalidLine]) {
     for item in invalid {
-        eprintln!("fgos: warning: observe {store}: skipped {}:{}: {}", item.file, item.line, item.reason);
+        eprintln!(
+            "fgos: warning: observe {store}: skipped {}:{}: {}",
+            item.file, item.line, item.reason
+        );
     }
 }
 
@@ -302,7 +333,8 @@ mod tests {
     use serde_json::json;
 
     fn temp_root(tag: &str) -> PathBuf {
-        let tmp = std::env::temp_dir().join(format!("fgos-test-shard-{tag}-{}", std::process::id()));
+        let tmp =
+            std::env::temp_dir().join(format!("fgos-test-shard-{tag}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&tmp);
         fs::create_dir_all(&tmp).unwrap();
         tmp
@@ -319,12 +351,22 @@ mod tests {
     #[test]
     fn appended_lines_read_back_in_shard_then_line_order() {
         let tmp = temp_root("roundtrip");
-        let path = append_lines(&tmp, "s", TornTail::Heal, &lines(&[json!({"n": 1}), json!({"n": 2})])).unwrap();
+        let path = append_lines(
+            &tmp,
+            "s",
+            TornTail::Heal,
+            &lines(&[json!({"n": 1}), json!({"n": 2})]),
+        )
+        .unwrap();
         assert!(path.to_string_lossy().ends_with(".jsonl"));
         fs::write(dir(&tmp, "s").join("zzzz-last.jsonl"), "{\"n\":0}\n").unwrap();
 
         let read = read_store(&tmp, "s", UnsafeShard::Fail).unwrap();
-        let order: Vec<_> = read.records.iter().map(|r| (r.shard.clone(), r.line, r.value["n"].clone())).collect();
+        let order: Vec<_> = read
+            .records
+            .iter()
+            .map(|r| (r.shard.clone(), r.line, r.value["n"].clone()))
+            .collect();
         assert_eq!((order[0].1, order[1].1), (1, 2));
         assert_eq!(order[2], ("zzzz-last".to_string(), 1, json!(0)));
         assert!(read.invalid.is_empty());
@@ -352,12 +394,19 @@ mod tests {
         fs::write(dir(&tmp, "s").join("w.jsonl"), bytes).unwrap();
 
         let read = read_store(&tmp, "s", UnsafeShard::Fail).unwrap();
-        let good: Vec<_> = read.records.iter().map(|r| (r.line, r.value["n"].clone())).collect();
+        let good: Vec<_> = read
+            .records
+            .iter()
+            .map(|r| (r.line, r.value["n"].clone()))
+            .collect();
         assert_eq!(good, vec![(1, json!(1)), (6, json!(2))]);
         let bad: Vec<_> = read.invalid.iter().map(|i| i.line).collect();
         assert_eq!(bad, vec![2, 3, 5]);
         assert!(read.invalid[2].reason.contains("1 MiB"));
-        assert!(read.invalid.iter().all(|i| i.file == ".fgos/observe/s/w.jsonl"));
+        assert!(read
+            .invalid
+            .iter()
+            .all(|i| i.file == ".fgos/observe/s/w.jsonl"));
         let _ = fs::remove_dir_all(&tmp);
     }
 
@@ -367,7 +416,8 @@ mod tests {
         let path = shard_path(&tmp, "s").unwrap();
         fs::write(&path, "{\"n\":1}\n{\"n\":2").unwrap();
 
-        let refused = append_lines(&tmp, "s", TornTail::Refuse, &lines(&[json!({"n": 3})])).unwrap_err();
+        let refused =
+            append_lines(&tmp, "s", TornTail::Refuse, &lines(&[json!({"n": 3})])).unwrap_err();
         assert!(refused.to_string().contains("torn line"), "{refused}");
         assert_eq!(fs::read_to_string(&path).unwrap(), "{\"n\":1}\n{\"n\":2");
 
@@ -415,9 +465,16 @@ mod tests {
         fs::create_dir_all(tmp.join(".fgos/observe")).unwrap();
         std::os::unix::fs::symlink(&external, dir(&tmp, "s")).unwrap();
 
-        let appended = append_lines(&tmp, "s", TornTail::Heal, &lines(&[json!({"n": 1})])).unwrap_err();
-        assert!(appended.to_string().contains("real directory"), "{appended}");
-        assert!(read_store(&tmp, "s", UnsafeShard::Report).unwrap_err().to_string().contains("real directory"));
+        let appended =
+            append_lines(&tmp, "s", TornTail::Heal, &lines(&[json!({"n": 1})])).unwrap_err();
+        assert!(
+            appended.to_string().contains("real directory"),
+            "{appended}"
+        );
+        assert!(read_store(&tmp, "s", UnsafeShard::Report)
+            .unwrap_err()
+            .to_string()
+            .contains("real directory"));
         assert_eq!(fs::read_dir(&external).unwrap().count(), 1);
         let _ = fs::remove_dir_all(&tmp);
         let _ = fs::remove_dir_all(&external);

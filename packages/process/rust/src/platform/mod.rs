@@ -6,7 +6,10 @@ use std::io;
 use std::process::{Child, Command};
 
 use crate::control::{Signal, SignalOutcome};
-use crate::facts::{CreationMark, Holders, Observed, Observer, PidNs, ProcTuple, ProcView, Relation, Scan, ScanFilter};
+use crate::facts::{
+    CreationMark, Holders, Observed, Observer, PidNs, ProcTuple, ProcView, Relation, Scan,
+    ScanFilter,
+};
 use crate::{FdSlot, ProcId};
 
 #[cfg(target_os = "linux")]
@@ -75,14 +78,25 @@ pub trait ProcessPlatform: Send + Sync {
     /// The observer facts of this process.
     fn observer(&self) -> Observer {
         let pid_ns = self.pid_ns();
-        Observer { host: self.host(), boot_id: self.boot_id(), pid_ns: pid_ns.id, in_init_pid_ns: pid_ns.is_initial }
+        Observer {
+            host: self.host(),
+            boot_id: self.boot_id(),
+            pid_ns: pid_ns.id,
+            in_init_pid_ns: pid_ns.is_initial,
+        }
     }
 
     /// The full identity of a live `pid`; `None` when it is absent, a zombie
     /// or unreadable.
     fn identity_of(&self, pid: ProcId) -> Option<ProcTuple> {
         match self.observe(pid) {
-            Observed::Live { start_time } => Some(ProcTuple { host: self.host(), boot_id: self.boot_id(), pid_ns: self.pid_ns().id, pid, start_time }),
+            Observed::Live { start_time } => Some(ProcTuple {
+                host: self.host(),
+                boot_id: self.boot_id(),
+                pid_ns: self.pid_ns().id,
+                pid,
+                start_time,
+            }),
             _ => None,
         }
     }

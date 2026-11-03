@@ -745,8 +745,10 @@ mod tests {
 
     #[test]
     fn test_tracked_state_json_view_is_never_read() {
-        let dir =
-            std::env::temp_dir().join(format!("fgos_test_work_tracked_view_{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!(
+            "fgos_test_work_tracked_view_{}",
+            std::process::id()
+        ));
         let _ = fs::remove_dir_all(&dir);
         let fgos_dir = dir.join(".fgos");
         fs::create_dir_all(&fgos_dir).unwrap();

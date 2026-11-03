@@ -10,12 +10,19 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
 
 fn fake_bin() -> String {
-    format!("{}/tests/fixtures/herdr/fake-herdr.sh", env!("CARGO_MANIFEST_DIR"))
+    format!(
+        "{}/tests/fixtures/herdr/fake-herdr.sh",
+        env!("CARGO_MANIFEST_DIR")
+    )
 }
 
 fn scratch(name: &str) -> PathBuf {
     static N: AtomicU32 = AtomicU32::new(0);
-    let dir = std::env::temp_dir().join(format!("tcd-{}-{}-{name}", std::process::id(), N.fetch_add(1, Ordering::SeqCst)));
+    let dir = std::env::temp_dir().join(format!(
+        "tcd-{}-{}-{name}",
+        std::process::id(),
+        N.fetch_add(1, Ordering::SeqCst)
+    ));
     std::fs::create_dir_all(&dir).unwrap();
     dir
 }
@@ -30,7 +37,10 @@ impl Fake {
         let dir = scratch(name);
         let mut config = HerdrConfig::new(fake_bin());
         config.timeout_ms = 5_000;
-        config.env.push(("FAKE_HERDR_LOG".into(), dir.join("log").to_string_lossy().into_owned()));
+        config.env.push((
+            "FAKE_HERDR_LOG".into(),
+            dir.join("log").to_string_lossy().into_owned(),
+        ));
         Fake { dir, config }
     }
 
@@ -60,7 +70,17 @@ impl Drop for Fake {
 }
 
 fn core_config(fake: &Fake) -> CoreConfig {
-    CoreConfig { state_root: fake.dir.join("state"), limits: Limits { min_cols: 1, min_rows: 1, max_panes_per_tab: 4 }, allocation_grace_ms: 60_000, launch_identify_timeout_ms: 200, shell_ready_timeout_ms: 200 }
+    CoreConfig {
+        state_root: fake.dir.join("state"),
+        limits: Limits {
+            min_cols: 1,
+            min_rows: 1,
+            max_panes_per_tab: 4,
+        },
+        allocation_grace_ms: 60_000,
+        launch_identify_timeout_ms: 200,
+        shell_ready_timeout_ms: 200,
+    }
 }
 
 fn is_unsupported<T: std::fmt::Debug>(r: DriverResult<T>) -> bool {
@@ -76,7 +96,19 @@ fn declares_what_herdr_can_do_after_one_probe() {
     let fake = Fake::new("caps");
     let driver = fake.driver();
     let caps = driver.capabilities();
-    for expected in ["tab.create", "pane.split", "pane.close", "pane.run", "send.text", "send.keys", "read.screen", "process.info", "activity.state", "label", "layout.geometry"] {
+    for expected in [
+        "tab.create",
+        "pane.split",
+        "pane.close",
+        "pane.run",
+        "send.text",
+        "send.keys",
+        "read.screen",
+        "process.info",
+        "activity.state",
+        "label",
+        "layout.geometry",
+    ] {
         assert!(caps.contains(&expected), "{expected} missing from {caps:?}");
     }
     assert_eq!(caps.contains(&"server.incarnation"), cfg!(unix));
@@ -85,7 +117,10 @@ fn declares_what_herdr_can_do_after_one_probe() {
     let probed = fake.calls().len();
     let _ = driver.capabilities();
     assert_eq!(fake.calls().len(), probed);
-    assert_eq!(fake.calls(), vec!["--version".to_string(), "pane layout --help".to_string()]);
+    assert_eq!(
+        fake.calls(),
+        vec!["--version".to_string(), "pane layout --help".to_string()]
+    );
 }
 
 #[test]
@@ -93,18 +128,49 @@ fn each_capability_runs_the_expected_command() {
     let fake = Fake::new("argv");
     let d = fake.driver();
 
-    let tab = d.tab_create("lead-1", Some("/work"), &[("HOME".to_string(), "/h".to_string())]).unwrap();
-    assert_eq!((tab.tab_id.as_str(), tab.pane_id.as_str()), ("wS:tF9", "wS:p59X"));
-    let pane = d.pane_split("wS:p59X", Direction::Down, 0.3, Some("/w2"), &[("A".to_string(), "b".to_string())]).unwrap();
+    let tab = d
+        .tab_create(
+            "lead-1",
+            Some("/work"),
+            &[("HOME".to_string(), "/h".to_string())],
+        )
+        .unwrap();
+    assert_eq!(
+        (tab.tab_id.as_str(), tab.pane_id.as_str()),
+        ("wS:tF9", "wS:p59X")
+    );
+    let pane = d
+        .pane_split(
+            "wS:p59X",
+            Direction::Down,
+            0.3,
+            Some("/w2"),
+            &[("A".to_string(), "b".to_string())],
+        )
+        .unwrap();
     assert_eq!(pane.pane_id, "wS:p59Y");
     d.pane_run("wS:p59Y", "sh /tmp/launch.sh").unwrap();
     d.send_text("wS:p59Y", "hello world", true).unwrap();
     d.send_text("wS:p59Y", "draft", false).unwrap();
     let seen = d.activity_detail("wS:p59Y").unwrap();
-    assert_eq!((seen.state.as_deref(), seen.visible_idle, seen.visible_working), (Some("idle"), true, false));
-    assert_eq!((seen.matched_rule.as_deref(), seen.prompt_text.as_str()), (Some("live_prompt_box"), "❯ half typed\n"));
-    d.send_keys("wS:p59Y", &["Escape".into(), "Enter".into()]).unwrap();
-    assert_eq!(d.read_screen("wS:p59Y", Some(40), Some("visible")).unwrap(), "line one\nline two\n");
+    assert_eq!(
+        (
+            seen.state.as_deref(),
+            seen.visible_idle,
+            seen.visible_working
+        ),
+        (Some("idle"), true, false)
+    );
+    assert_eq!(
+        (seen.matched_rule.as_deref(), seen.prompt_text.as_str()),
+        (Some("live_prompt_box"), "❯ half typed\n")
+    );
+    d.send_keys("wS:p59Y", &["Escape".into(), "Enter".into()])
+        .unwrap();
+    assert_eq!(
+        d.read_screen("wS:p59Y", Some(40), Some("visible")).unwrap(),
+        "line one\nline two\n"
+    );
     assert_eq!(d.process_info("wS:p59Y").unwrap().shell_pid, 2785881);
     assert_eq!(d.activity("wS:p59Y").unwrap().state, "working");
     d.label_pane("wS:p59Y", "seat 1").unwrap();
@@ -133,8 +199,13 @@ fn each_capability_runs_the_expected_command() {
 #[test]
 fn split_ratio_is_the_share_the_existing_pane_keeps() {
     let fake = Fake::new("ratio");
-    fake.driver().pane_split("wS:p59X", Direction::Right, 0.5, None, &[]).unwrap();
-    assert!(fake.calls().iter().any(|c| c.contains("--direction right --ratio 0.5")));
+    fake.driver()
+        .pane_split("wS:p59X", Direction::Right, 0.5, None, &[])
+        .unwrap();
+    assert!(fake
+        .calls()
+        .iter()
+        .any(|c| c.contains("--direction right --ratio 0.5")));
 }
 
 #[test]
@@ -143,18 +214,32 @@ fn a_session_names_its_own_socket_and_reaches_herdr_through_its_environment() {
     let home = dir.join("home");
     let mut config = HerdrConfig::new(fake_bin());
     config.session = Some("confined-1".into());
-    config.env.push(("FAKE_HERDR_LOG".into(), dir.join("log").to_string_lossy().into_owned()));
-    config.env.push(("HOME".into(), home.to_string_lossy().into_owned()));
+    config.env.push((
+        "FAKE_HERDR_LOG".into(),
+        dir.join("log").to_string_lossy().into_owned(),
+    ));
+    config
+        .env
+        .push(("HOME".into(), home.to_string_lossy().into_owned()));
     config.timeout_ms = 5_000;
     let driver = HerdrDriver::new(config);
-    let socket = home.join(".config/herdr/sessions/confined-1/herdr.sock").to_string_lossy().into_owned();
+    let socket = home
+        .join(".config/herdr/sessions/confined-1/herdr.sock")
+        .to_string_lossy()
+        .into_owned();
     assert_eq!(driver.socket_path().as_deref(), Some(socket.as_str()));
     match driver.server_incarnation() {
-        Err(Refusal::Unknown { reason }) => assert!(reason.contains(&socket), "the incarnation looks at the session's own socket: {reason}"),
+        Err(Refusal::Unknown { reason }) => assert!(
+            reason.contains(&socket),
+            "the incarnation looks at the session's own socket: {reason}"
+        ),
         other => panic!("nothing listens there, got {other:?}"),
     }
     let log = std::fs::read_to_string(dir.join("log")).unwrap();
-    assert!(!log.contains("status"), "a named session needs no `status server` to find its socket: {log}");
+    assert!(
+        !log.contains("status"),
+        "a named session needs no `status server` to find its socket: {log}"
+    );
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -167,13 +252,42 @@ fn the_socket_follows_herdrs_layout_for_the_default_session_a_named_one_and_the_
         config.env.push(("HOME".into(), "/home/op".into()));
         HerdrDriver::new(config).socket_path()
     };
-    assert_eq!(with(None, None).as_deref(), Some("/home/op/.config/herdr/herdr.sock"), "no session is the default one");
-    assert_eq!(with(Some("default"), None).as_deref(), Some("/home/op/.config/herdr/herdr.sock"));
-    assert_eq!(with(Some("fgos-worker"), None).as_deref(), Some("/home/op/.config/herdr/sessions/fgos-worker/herdr.sock"));
-    assert_eq!(with(Some("fgos-worker"), Some("/own/herdr.sock")).as_deref(), Some("/own/herdr.sock"), "the caller's own socket wins");
-    assert_eq!(with(None, Some("/pane/herdr.sock")).as_deref(), Some("/pane/herdr.sock"));
-    for bad in ["", "Upper", "1st", "a/b", "..", "has space", &"x".repeat(33)] {
-        assert_eq!(with(Some(bad), None), None, "{bad:?} is not a session name herdr accepts");
+    assert_eq!(
+        with(None, None).as_deref(),
+        Some("/home/op/.config/herdr/herdr.sock"),
+        "no session is the default one"
+    );
+    assert_eq!(
+        with(Some("default"), None).as_deref(),
+        Some("/home/op/.config/herdr/herdr.sock")
+    );
+    assert_eq!(
+        with(Some("fgos-worker"), None).as_deref(),
+        Some("/home/op/.config/herdr/sessions/fgos-worker/herdr.sock")
+    );
+    assert_eq!(
+        with(Some("fgos-worker"), Some("/own/herdr.sock")).as_deref(),
+        Some("/own/herdr.sock"),
+        "the caller's own socket wins"
+    );
+    assert_eq!(
+        with(None, Some("/pane/herdr.sock")).as_deref(),
+        Some("/pane/herdr.sock")
+    );
+    for bad in [
+        "",
+        "Upper",
+        "1st",
+        "a/b",
+        "..",
+        "has space",
+        &"x".repeat(33),
+    ] {
+        assert_eq!(
+            with(Some(bad), None),
+            None,
+            "{bad:?} is not a session name herdr accepts"
+        );
     }
 }
 
@@ -184,7 +298,13 @@ fn absent_herdr_declares_nothing_and_every_op_is_unsupported() {
     let d = HerdrDriver::new(config);
     assert!(d.capabilities().is_empty());
     assert!(is_unsupported(d.tab_create("x", None, &[])));
-    assert!(is_unsupported(d.pane_split("p", Direction::Down, 0.5, None, &[])));
+    assert!(is_unsupported(d.pane_split(
+        "p",
+        Direction::Down,
+        0.5,
+        None,
+        &[]
+    )));
     assert!(is_unsupported(d.read_screen("p", None, None)));
     assert!(is_unsupported(d.layout_geometry("p")));
     assert!(is_unsupported(d.server_incarnation()));
@@ -198,7 +318,11 @@ fn a_hung_herdr_command_is_unknown_after_the_timeout() {
         fake.config.timeout_ms = 400;
         let d = fake.driver();
         let started = std::time::Instant::now();
-        let refused = if hung == "agent get" { is_unknown(d.activity("wS:p59Y")) } else { is_unknown(d.pane_liveness("wS:p59Y")) };
+        let refused = if hung == "agent get" {
+            is_unknown(d.activity("wS:p59Y"))
+        } else {
+            is_unknown(d.pane_liveness("wS:p59Y"))
+        };
         assert!(refused, "a hang of `{hung}` is never read as gone or idle");
         assert!(started.elapsed() < std::time::Duration::from_secs(5));
     }
@@ -211,8 +335,15 @@ fn a_command_never_runs_past_the_operations_budget() {
     fake.config.deadline = Some(std::time::Instant::now() + std::time::Duration::from_millis(800));
     let d = fake.driver();
     let started = std::time::Instant::now();
-    assert!(is_unknown(d.pane_liveness("wS:p59Y")), "a hang past the budget is never read as gone");
-    assert!(started.elapsed() < std::time::Duration::from_secs(5), "the command outlived the budget: {:?}", started.elapsed());
+    assert!(
+        is_unknown(d.pane_liveness("wS:p59Y")),
+        "a hang past the budget is never read as gone"
+    );
+    assert!(
+        started.elapsed() < std::time::Duration::from_secs(5),
+        "the command outlived the budget: {:?}",
+        started.elapsed()
+    );
 }
 
 #[test]
@@ -222,7 +353,10 @@ fn an_unreadable_answer_is_unknown() {
     assert!(is_unknown(d.activity("wS:p59Y")));
     assert!(is_unknown(d.process_info("wS:p59Y")));
     assert!(is_unknown(d.layout_geometry("wS:p59Y")));
-    assert!(is_unknown(d.pane_liveness("wS:p59Y")), "unreadable is never read as gone");
+    assert!(
+        is_unknown(d.pane_liveness("wS:p59Y")),
+        "unreadable is never read as gone"
+    );
 }
 
 #[test]
@@ -253,7 +387,10 @@ fn commands_do_not_inherit_the_callers_descriptors() {
         libc::close(pipe[0]);
         libc::close(pipe[1]);
     }
-    assert!(fds[0] >= 200 && fds[1] >= 200 && fds[2] >= 2048, "descriptor limit too low for this test: {fds:?}");
+    assert!(
+        fds[0] >= 200 && fds[1] >= 200 && fds[2] >= 2048,
+        "descriptor limit too low for this test: {fds:?}"
+    );
     let dir = scratch("fds");
     let dump = dir.join("fds");
     let fake = Fake::new("fds").env("FAKE_HERDR_FDS", &dump.to_string_lossy());
@@ -294,7 +431,12 @@ mod incarnation {
     impl RemoteListener {
         fn start(path: &Path) -> Self {
             let child = Command::new(std::env::current_exe().unwrap())
-                .args(["--exact", "incarnation::listener_helper", "--nocapture", "--test-threads=1"])
+                .args([
+                    "--exact",
+                    "incarnation::listener_helper",
+                    "--nocapture",
+                    "--test-threads=1",
+                ])
                 .env("TC_LISTEN", path)
                 .stdout(Stdio::null())
                 .stderr(Stdio::null())
@@ -322,7 +464,9 @@ mod incarnation {
     /// `TC_LISTEN` set, it listens on that path until killed.
     #[test]
     fn listener_helper() {
-        let Some(path) = std::env::var_os("TC_LISTEN") else { return };
+        let Some(path) = std::env::var_os("TC_LISTEN") else {
+            return;
+        };
         let _listener = UnixListener::bind(&path).unwrap();
         std::thread::sleep(std::time::Duration::from_secs(60));
     }
@@ -390,7 +534,10 @@ mod incarnation {
         let fake = fake_at("close-gone2", &sock).env("FAKE_HERDR_PANE_GONE", "1");
         let d = fake.driver();
         let inc = d.server_incarnation().unwrap();
-        assert_eq!(d.pane_close("wS:p59Y", &inc).unwrap(), CloseOutcome::AlreadyGone);
+        assert_eq!(
+            d.pane_close("wS:p59Y", &inc).unwrap(),
+            CloseOutcome::AlreadyGone
+        );
     }
 
     #[test]
@@ -403,7 +550,10 @@ mod incarnation {
         let mut stale: ServerIncarnation = d.server_incarnation().unwrap();
         stale.pid += 1;
         assert!(is_unknown(d.pane_close("wS:p59Y", &stale)));
-        assert!(!fake.calls().iter().any(|c| c.starts_with("pane close")), "a stale incarnation must not reach herdr");
+        assert!(
+            !fake.calls().iter().any(|c| c.starts_with("pane close")),
+            "a stale incarnation must not reach herdr"
+        );
     }
 
     #[test]
@@ -414,30 +564,64 @@ mod incarnation {
         let _b = RemoteListener::start(&second);
         let mut fake = Fake::new("swap");
         fake.config.socket_path = Some(first.to_string_lossy().into_owned());
-        let fake = fake.env("FAKE_HERDR_ON_CLOSE", &format!("mv -f {} {}", second.display(), first.display()));
+        let fake = fake.env(
+            "FAKE_HERDR_ON_CLOSE",
+            &format!("mv -f {} {}", second.display(), first.display()),
+        );
         let d = fake.driver();
         let before = d.server_incarnation().unwrap();
         assert_ne!(before.pid, std::process::id());
 
         let outcome = d.pane_close("wS:p59Y", &before);
-        assert!(is_unknown(outcome), "the other server answered after the close; nothing may be called closed");
-        assert!(fake.calls().iter().any(|c| c == "pane close wS:p59Y"), "the close itself was issued once");
-        assert_eq!(fake.calls().iter().filter(|c| c.starts_with("pane close")).count(), 1, "never closed a second time");
+        assert!(
+            is_unknown(outcome),
+            "the other server answered after the close; nothing may be called closed"
+        );
+        assert!(
+            fake.calls().iter().any(|c| c == "pane close wS:p59Y"),
+            "the close itself was issued once"
+        );
+        assert_eq!(
+            fake.calls()
+                .iter()
+                .filter(|c| c.starts_with("pane close"))
+                .count(),
+            1,
+            "never closed a second time"
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
     fn each_operation_runs_a_fixed_number_of_herdr_commands() {
-        use fgos_terminal_control::port::{AllocateRequest, Disposition, Display, LaunchSpec};
+        use fgos_terminal_control::port::{AllocateRequest, Display, Disposition, LaunchSpec};
 
         let fake = Fake::new("count");
         let sock = fake.dir.join("s");
         let _listener = UnixListener::bind(&sock).unwrap();
-        let fake = fake_at("count2", &sock).env("FAKE_HERDR_FOREGROUND", "shell").env("FAKE_HERDR_SHELL_PID", &std::process::id().to_string());
+        let fake = fake_at("count2", &sock)
+            .env("FAKE_HERDR_FOREGROUND", "shell")
+            .env("FAKE_HERDR_SHELL_PID", &std::process::id().to_string());
         let driver = fake.driver();
         let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
-        let allocate = |key: &str| AllocateRequest { key: key.into(), group_key: "g".into(), display: Display { title: Some(key.into()), ..Default::default() }, group_size: None, cwd: None, env: Default::default() };
-        let spec = LaunchSpec { command: "true".into(), args: vec![], cwd: "/".into(), env: Default::default(), expect: None };
+        let allocate = |key: &str| AllocateRequest {
+            key: key.into(),
+            group_key: "g".into(),
+            display: Display {
+                title: Some(key.into()),
+                ..Default::default()
+            },
+            group_size: None,
+            cwd: None,
+            env: Default::default(),
+        };
+        let spec = LaunchSpec {
+            command: "true".into(),
+            args: vec![],
+            cwd: "/".into(),
+            env: Default::default(),
+            expect: None,
+        };
         // Commands herdr was asked to run by one operation; the probe at construction is not counted.
         let ran = |op: &dyn Fn()| {
             let before = fake.calls().len();
@@ -446,22 +630,86 @@ mod incarnation {
         };
 
         let counts = [
-            ("capabilities", ran(&|| drop(core.capabilities(CapabilitiesAsk::default())))),
-            ("capabilities naming an anchor pane", ran(&|| drop(core.capabilities(CapabilitiesAsk { anchor_pane: Some("wS:p59X"), ..Default::default() })))),
-            ("allocate into a new tab", ran(&|| drop(core.allocate(&allocate("k1")).unwrap()))),
-            ("allocate beside a live pane", ran(&|| drop(core.allocate(&allocate("k2")).unwrap()))),
-            ("allocate beside two live panes", ran(&|| drop(core.allocate(&allocate("k5")).unwrap()))),
-            ("allocate beside three live panes", ran(&|| drop(core.allocate(&allocate("k6")).unwrap()))),
-            ("allocate beside four live panes", ran(&|| drop(core.allocate(&allocate("k7")).unwrap()))),
-            ("attach", ran(&|| drop(core.attach("k3", "wS:p59Z", Some("g3"), None).unwrap()))),
-            ("launch refused for an attached pane", ran(&|| drop(core.launch("k3", &spec).unwrap_err()))),
-            ("send refused at a shell", ran(&|| drop(core.send("k1", Some("hello"), None, false).unwrap()))),
-            ("read", ran(&|| drop(core.read("k1", Some(5), None).unwrap()))),
+            (
+                "capabilities",
+                ran(&|| drop(core.capabilities(CapabilitiesAsk::default()))),
+            ),
+            (
+                "capabilities naming an anchor pane",
+                ran(&|| {
+                    drop(core.capabilities(CapabilitiesAsk {
+                        anchor_pane: Some("wS:p59X"),
+                        ..Default::default()
+                    }))
+                }),
+            ),
+            (
+                "allocate into a new tab",
+                ran(&|| drop(core.allocate(&allocate("k1")).unwrap())),
+            ),
+            (
+                "allocate beside a live pane",
+                ran(&|| drop(core.allocate(&allocate("k2")).unwrap())),
+            ),
+            (
+                "allocate beside two live panes",
+                ran(&|| drop(core.allocate(&allocate("k5")).unwrap())),
+            ),
+            (
+                "allocate beside three live panes",
+                ran(&|| drop(core.allocate(&allocate("k6")).unwrap())),
+            ),
+            (
+                "allocate beside four live panes",
+                ran(&|| drop(core.allocate(&allocate("k7")).unwrap())),
+            ),
+            (
+                "attach",
+                ran(&|| drop(core.attach("k3", "wS:p59Z", Some("g3"), None).unwrap())),
+            ),
+            (
+                "launch refused for an attached pane",
+                ran(&|| drop(core.launch("k3", &spec).unwrap_err())),
+            ),
+            (
+                "send refused at a shell",
+                ran(&|| drop(core.send("k1", Some("hello"), None, false).unwrap())),
+            ),
+            (
+                "read",
+                ran(&|| drop(core.read("k1", Some(5), None).unwrap())),
+            ),
             ("inspect", ran(&|| drop(core.inspect("k1", false)))),
-            ("label", ran(&|| core.label("k1", &Display { title: Some("renamed".into()), ..Default::default() }).unwrap())),
-            ("capabilities asking for the agent facts", ran(&|| drop(core.capabilities(CapabilitiesAsk { agents: true, ..Default::default() })))),
-            ("reconcile-scan over six records", ran(&|| drop(core.reconcile_scan(0).unwrap()))),
-            ("release close", ran(&|| drop(core.release("k2", Disposition::Close, None).unwrap()))),
+            (
+                "label",
+                ran(&|| {
+                    core.label(
+                        "k1",
+                        &Display {
+                            title: Some("renamed".into()),
+                            ..Default::default()
+                        },
+                    )
+                    .unwrap()
+                }),
+            ),
+            (
+                "capabilities asking for the agent facts",
+                ran(&|| {
+                    drop(core.capabilities(CapabilitiesAsk {
+                        agents: true,
+                        ..Default::default()
+                    }))
+                }),
+            ),
+            (
+                "reconcile-scan over six records",
+                ran(&|| drop(core.reconcile_scan(0).unwrap())),
+            ),
+            (
+                "release close",
+                ran(&|| drop(core.release("k2", Disposition::Close, None).unwrap())),
+            ),
         ];
         assert_eq!(
             counts,
@@ -479,8 +727,14 @@ mod incarnation {
                 ("read", 2),
                 ("inspect", 3),
                 ("label", 2),
-                ("capabilities asking for the agent facts", ran(&|| drop(core.capabilities(CapabilitiesAsk { agents: true, ..Default::default() })))),
-            ("reconcile-scan over six records", 12),
+                (
+                    "capabilities asking for the agent facts",
+                    ran(&|| drop(core.capabilities(CapabilitiesAsk {
+                        agents: true,
+                        ..Default::default()
+                    })))
+                ),
+                ("reconcile-scan over six records", 12),
                 ("release close", 2),
             ],
         );
@@ -497,34 +751,75 @@ mod incarnation {
         let fake = fake_at("shell-fg2", &sock).env("FAKE_HERDR_FOREGROUND", "shell");
         let driver = fake.driver();
         let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
-        core.allocate(&AllocateRequest { key: "k".into(), group_key: "g".into(), display: Display { title: Some("shell-fg".into()), ..Default::default() }, group_size: None, cwd: None, env: Default::default() }).unwrap();
+        core.allocate(&AllocateRequest {
+            key: "k".into(),
+            group_key: "g".into(),
+            display: Display {
+                title: Some("shell-fg".into()),
+                ..Default::default()
+            },
+            group_size: None,
+            cwd: None,
+            env: Default::default(),
+        })
+        .unwrap();
 
         let typed = fake.dir.join("typed");
         let prompted = fake.dir.join("prompted");
-        let brief = |marker: &Path| format!("# Brief 1\n\nWrite it as `touch {}` first, then rename it.\n", marker.display());
+        let brief = |marker: &Path| {
+            format!(
+                "# Brief 1\n\nWrite it as `touch {}` first, then rename it.\n",
+                marker.display()
+            )
+        };
         for (marker, submit) in [(&typed, false), (&prompted, true)] {
             match core.send("k", Some(&brief(marker)), None, submit).unwrap() {
                 SendOutcome::ForegroundNotAgent { reason } => assert!(reason.contains("shell"), "{reason}"),
                 other => panic!("a shell in the foreground must refuse the send (submit {submit}), got {other:?}"),
             }
         }
-        assert!(matches!(core.send("k", None, Some(&["Enter".to_string()]), false).unwrap(), SendOutcome::ForegroundNotAgent { .. }));
-        let sends: Vec<String> = fake.calls().into_iter().filter(|c| c.starts_with("pane send") || c.starts_with("agent prompt")).collect();
-        assert!(sends.is_empty(), "nothing may be typed at the shell: {sends:?}");
-        assert!(!typed.exists() && !prompted.exists(), "the backtick span ran");
+        assert!(matches!(
+            core.send("k", None, Some(&["Enter".to_string()]), false)
+                .unwrap(),
+            SendOutcome::ForegroundNotAgent { .. }
+        ));
+        let sends: Vec<String> = fake
+            .calls()
+            .into_iter()
+            .filter(|c| c.starts_with("pane send") || c.starts_with("agent prompt"))
+            .collect();
+        assert!(
+            sends.is_empty(),
+            "nothing may be typed at the shell: {sends:?}"
+        );
+        assert!(
+            !typed.exists() && !prompted.exists(),
+            "the backtick span ran"
+        );
 
         // The control: the same text typed past the core reaches this pane's shell, and the span runs.
         let control = fake.dir.join("control");
-        driver.send_text("wS:p59X", &brief(&control), false).unwrap();
-        assert!(control.exists(), "the fake's shell must run typed text, or the check above proves nothing");
+        driver
+            .send_text("wS:p59X", &brief(&control), false)
+            .unwrap();
+        assert!(
+            control.exists(),
+            "the fake's shell must run typed text, or the check above proves nothing"
+        );
     }
 }
 
 #[test]
 fn a_session_without_a_workspace_gets_one_and_its_root_pane_is_the_first_pane() {
     let fake = Fake::new("no-workspace").env("FAKE_HERDR_NO_WORKSPACE", "1");
-    let created = fake.driver().tab_create("lead-1", Some("/work"), &[]).unwrap();
-    assert_eq!((created.tab_id.as_str(), created.pane_id.as_str()), ("wS:tF9", "wS:p59X"));
+    let created = fake
+        .driver()
+        .tab_create("lead-1", Some("/work"), &[])
+        .unwrap();
+    assert_eq!(
+        (created.tab_id.as_str(), created.pane_id.as_str()),
+        ("wS:tF9", "wS:p59X")
+    );
     let calls: Vec<String> = fake.calls().into_iter().skip(2).collect();
     assert_eq!(
         calls,
@@ -539,11 +834,26 @@ fn a_session_without_a_workspace_gets_one_and_its_root_pane_is_the_first_pane() 
 #[test]
 fn a_screen_comes_back_as_plain_text_or_in_the_envelope_and_a_failure_is_named() {
     let plain = Fake::new("read-plain");
-    assert_eq!(plain.driver().read_screen("wS:p59Y", Some(60), None).unwrap(), "line one\nline two\n");
-    assert!(plain.calls().iter().any(|c| c == "pane read wS:p59Y --lines 60"));
+    assert_eq!(
+        plain
+            .driver()
+            .read_screen("wS:p59Y", Some(60), None)
+            .unwrap(),
+        "line one\nline two\n"
+    );
+    assert!(plain
+        .calls()
+        .iter()
+        .any(|c| c == "pane read wS:p59Y --lines 60"));
 
     let enveloped = Fake::new("read-json").env("FAKE_HERDR_READ_JSON", "1");
-    assert_eq!(enveloped.driver().read_screen("wS:p59Y", None, None).unwrap(), "enveloped screen");
+    assert_eq!(
+        enveloped
+            .driver()
+            .read_screen("wS:p59Y", None, None)
+            .unwrap(),
+        "enveloped screen"
+    );
 
     let failing = Fake::new("read-fail").env("FAKE_HERDR_PANE_GONE", "1");
     match failing.driver().read_screen("wS:p59Y", None, None) {
@@ -559,43 +869,90 @@ fn a_pane_with_no_recognised_agent_answers_unknown_state_while_a_failed_read_sta
     assert_eq!((activity.state.as_str(), activity.agent), ("unknown", None));
 
     let failing = Fake::new("agent-get-garbled").env("FAKE_HERDR_GARBLE", "1");
-    assert!(is_unknown(failing.driver().activity("wS:p59Y")), "an unreadable answer is not \"no agent\"");
+    assert!(
+        is_unknown(failing.driver().activity("wS:p59Y")),
+        "an unreadable answer is not \"no agent\""
+    );
 }
 
 #[test]
 fn capabilities_say_whether_the_named_anchor_pane_resolves() {
     let anchor = |fake: &Fake, named: Option<&str>| {
         let driver = fake.driver();
-        let report = Core::new(&driver, &MeasuredSplit, core_config(fake)).capabilities(CapabilitiesAsk { anchor_pane: named, ..Default::default() });
+        let report =
+            Core::new(&driver, &MeasuredSplit, core_config(fake)).capabilities(CapabilitiesAsk {
+                anchor_pane: named,
+                ..Default::default()
+            });
         report.anchor_pane
     };
     let live = Fake::new("anchor-live");
     assert_eq!(anchor(&live, None), AnchorPane::Absent);
     assert_eq!(anchor(&live, Some("wS:p59X")), AnchorPane::Resolved);
-    assert!(live.calls().iter().filter(|c| c.starts_with("pane get")).count() == 1, "only the named pane is asked about");
+    assert!(
+        live.calls()
+            .iter()
+            .filter(|c| c.starts_with("pane get"))
+            .count()
+            == 1,
+        "only the named pane is asked about"
+    );
 
     let gone = Fake::new("anchor-gone").env("FAKE_HERDR_PANE_GONE", "1");
-    assert!(matches!(anchor(&gone, Some("ghost")), AnchorPane::Unresolvable { reason } if reason.contains("ghost")));
+    assert!(
+        matches!(anchor(&gone, Some("ghost")), AnchorPane::Unresolvable { reason } if reason.contains("ghost"))
+    );
 
     let absent = HerdrDriver::new(HerdrConfig::new("/no/such/herdr"));
-    let report = Core::new(&absent, &MeasuredSplit, core_config(&live)).capabilities(CapabilitiesAsk { anchor_pane: Some("wS:p59X"), ..Default::default() });
-    assert!(matches!(report.anchor_pane, AnchorPane::Unresolvable { reason } if reason.contains("not found")), "no herdr runs, and the pane is not claimed to resolve");
+    let report =
+        Core::new(&absent, &MeasuredSplit, core_config(&live)).capabilities(CapabilitiesAsk {
+            anchor_pane: Some("wS:p59X"),
+            ..Default::default()
+        });
+    assert!(
+        matches!(report.anchor_pane, AnchorPane::Unresolvable { reason } if reason.contains("not found")),
+        "no herdr runs, and the pane is not claimed to resolve"
+    );
 }
 
 #[test]
 fn agent_kinds_and_integrations_come_from_herdrs_own_text_and_are_unknown_when_it_cannot_be_read() {
     let ask = |fake: &Fake| {
         let driver = fake.driver();
-        let report = Core::new(&driver, &MeasuredSplit, core_config(fake)).capabilities(CapabilitiesAsk { agents: true, ..Default::default() });
+        let report =
+            Core::new(&driver, &MeasuredSplit, core_config(fake)).capabilities(CapabilitiesAsk {
+                agents: true,
+                ..Default::default()
+            });
         report.agents.expect("asked for")
     };
     let fake = Fake::new("agents");
     let facts = ask(&fake);
-    assert_eq!(facts.kinds.unwrap(), ["pi", "claude", "codex", "agy", "gemini"]);
-    assert_eq!(facts.integrations.unwrap().get("codex").map(String::as_str), Some("outdated"));
-    assert!(fake.calls().ends_with(&["agent start --help".to_string(), "integration status".to_string()]), "{:?}", fake.calls());
+    assert_eq!(
+        facts.kinds.unwrap(),
+        ["pi", "claude", "codex", "agy", "gemini"]
+    );
+    assert_eq!(
+        facts.integrations.unwrap().get("codex").map(String::as_str),
+        Some("outdated")
+    );
+    assert!(
+        fake.calls().ends_with(&[
+            "agent start --help".to_string(),
+            "integration status".to_string()
+        ]),
+        "{:?}",
+        fake.calls()
+    );
 
-    assert_eq!(ask(&Fake::new("agents-garbled").env("FAKE_HERDR_GARBLE", "1")), AgentFacts::default());
+    assert_eq!(
+        ask(&Fake::new("agents-garbled").env("FAKE_HERDR_GARBLE", "1")),
+        AgentFacts::default()
+    );
     let driver = HerdrDriver::new(HerdrConfig::new("/no/such/herdr"));
-    assert_eq!(driver.agent_facts(), AgentFacts::default(), "an absent herdr is asked nothing");
+    assert_eq!(
+        driver.agent_facts(),
+        AgentFacts::default(),
+        "an absent herdr is asked nothing"
+    );
 }

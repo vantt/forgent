@@ -45,9 +45,17 @@ fn markers_are_one_shot_and_are_not_keys() {
     let root = state_dir("markers");
     let store = Store::open(&root, "mem", &incarnation()).unwrap();
     store.publish_record(&record("a", "p1")).unwrap();
-    let marker = LaunchRequestedMarker { v: VERSION, key: "a".into(), at: 5 };
-    assert!(store.publish_marker("a", MarkerKind::LaunchRequested, &marker).unwrap());
-    assert!(!store.publish_marker("a", MarkerKind::LaunchRequested, &marker).unwrap());
+    let marker = LaunchRequestedMarker {
+        v: VERSION,
+        key: "a".into(),
+        at: 5,
+    };
+    assert!(store
+        .publish_marker("a", MarkerKind::LaunchRequested, &marker)
+        .unwrap());
+    assert!(!store
+        .publish_marker("a", MarkerKind::LaunchRequested, &marker)
+        .unwrap());
     assert!(store.has_marker("a", MarkerKind::LaunchRequested));
     assert!(!store.has_marker("a", MarkerKind::Launched));
     assert_eq!(store.record_keys().unwrap(), vec!["a".to_string()]);
@@ -72,8 +80,17 @@ fn directories_are_private() {
     let _ = Store::open(&root, "mem", &incarnation()).unwrap();
     // Every directory the store creates under a state root that had none, the terminal directory itself included.
     let driver = root.join("terminal").join("mem");
-    for dir in [root.join("terminal"), driver.clone(), driver.join(incarnation().id()), driver.join(incarnation().id()).join("allocations")] {
-        assert_eq!(std::fs::metadata(&dir).unwrap().permissions().mode() & 0o777, 0o700, "{dir:?}");
+    for dir in [
+        root.join("terminal"),
+        driver.clone(),
+        driver.join(incarnation().id()),
+        driver.join(incarnation().id()).join("allocations"),
+    ] {
+        assert_eq!(
+            std::fs::metadata(&dir).unwrap().permissions().mode() & 0o777,
+            0o700,
+            "{dir:?}"
+        );
     }
 }
 
@@ -82,7 +99,16 @@ fn key_validation_matches_the_port_pattern() {
     for ok in ["a", "A1", "unit-run.12_x"] {
         assert!(valid_key(ok), "{ok}");
     }
-    for bad in ["", ".a", "-a", "a b", "a/b", "a.released", "a.launched", "a.launch-requested"] {
+    for bad in [
+        "",
+        ".a",
+        "-a",
+        "a b",
+        "a/b",
+        "a.released",
+        "a.launched",
+        "a.launch-requested",
+    ] {
         assert!(!valid_key(bad), "{bad}");
     }
     assert!(!valid_key(&"a".repeat(129)));

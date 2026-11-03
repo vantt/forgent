@@ -158,7 +158,9 @@ impl MailboxState {
             )),
             // A sender with no head has no generation and is exempt (owner
             // decision Q3).
-            WakeSender::Head { generation: None, .. } => None,
+            WakeSender::Head {
+                generation: None, ..
+            } => None,
             WakeSender::Remote { machine, from } => Some((
                 WakeLifetimeKey::remote(machine, from, parties.to),
                 limits.wake.remote_lifetime_cap,

@@ -33,7 +33,8 @@ pub fn exit_descriptor(pid: u32) -> Option<std::os::fd::OwnedFd> {
     {
         use std::os::fd::FromRawFd;
         // SAFETY: pidfd_open takes a pid and flags; the result is owned below.
-        let fd = unsafe { libc::syscall(libc::SYS_pidfd_open, pid as libc::pid_t, 0 as libc::c_uint) };
+        let fd =
+            unsafe { libc::syscall(libc::SYS_pidfd_open, pid as libc::pid_t, 0 as libc::c_uint) };
         // SAFETY: a non-negative result is a new descriptor owned by nobody else.
         (fd >= 0).then(|| unsafe { std::os::fd::OwnedFd::from_raw_fd(fd as libc::c_int) })
     }
@@ -128,7 +129,10 @@ pub fn take_inherited(slot: FdSlot) -> io::Result<File> {
     #[cfg(not(unix))]
     {
         let _ = slot;
-        Err(io::Error::new(io::ErrorKind::Unsupported, "descriptor slots are not inherited on this platform"))
+        Err(io::Error::new(
+            io::ErrorKind::Unsupported,
+            "descriptor slots are not inherited on this platform",
+        ))
     }
 }
 
@@ -171,20 +175,35 @@ pub(crate) fn errno_outcome(err: io::Error) -> SignalOutcome {
 
 /// The unix spawn shared by the Linux and macOS drivers.
 #[cfg(unix)]
-pub(crate) fn unix_spawn_with_fds(mut cmd: Command, fd_map: &[(FdSlot, &File)]) -> io::Result<Child> {
+pub(crate) fn unix_spawn_with_fds(
+    mut cmd: Command,
+    fd_map: &[(FdSlot, &File)],
+) -> io::Result<Child> {
     use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
     use std::os::unix::process::CommandExt;
 
     let mut slots: Vec<libc::c_int> = Vec::with_capacity(fd_map.len());
     for (slot, _) in fd_map {
         if slot.0 < 3 {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, format!("slot {} is below 3; stdio is mapped through Command itself", slot.0)));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!(
+                    "slot {} is below 3; stdio is mapped through Command itself",
+                    slot.0
+                ),
+            ));
         }
         let Ok(slot) = libc::c_int::try_from(slot.0) else {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, format!("slot {} is not a descriptor number", slot.0)));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!("slot {} is not a descriptor number", slot.0),
+            ));
         };
         if slots.contains(&slot) {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, format!("slot {slot} is mapped twice")));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!("slot {slot} is mapped twice"),
+            ));
         }
         slots.push(slot);
     }
@@ -233,7 +252,10 @@ pub(crate) fn unix_spawn_with_fds(mut cmd: Command, fd_map: &[(FdSlot, &File)]) 
     // with close-on-exec are left to exec: among them is the pipe `Command`
     // reports an exec failure through, which is what keeps a missing
     // program an error of this call.
-    let leaks: Vec<libc::c_int> = inheritable_fds().into_iter().filter(|fd| !slots.contains(fd)).collect();
+    let leaks: Vec<libc::c_int> = inheritable_fds()
+        .into_iter()
+        .filter(|fd| !slots.contains(fd))
+        .collect();
 
     // SAFETY: the closure only calls async-signal-safe functions (dup2,
     // close) on plain integers it owns.
@@ -265,13 +287,22 @@ pub(crate) fn inheritable_fds() -> Vec<libc::c_int> {
     let listed: Vec<libc::c_int> = match std::fs::read_dir("/dev/fd") {
         Ok(entries) => entries
             .filter_map(|entry| entry.ok())
-            .filter_map(|entry| entry.file_name().to_str().and_then(|name| name.parse::<libc::c_int>().ok()))
+            .filter_map(|entry| {
+                entry
+                    .file_name()
+                    .to_str()
+                    .and_then(|name| name.parse::<libc::c_int>().ok())
+            })
             .filter(|fd| *fd >= 3)
             .collect(),
         Err(_) => {
             // SAFETY: sysconf reads a limit.
             let open_max = unsafe { libc::sysconf(libc::_SC_OPEN_MAX) };
-            let open_max = if open_max <= 0 || open_max > 65_536 { 65_536 } else { open_max as libc::c_int };
+            let open_max = if open_max <= 0 || open_max > 65_536 {
+                65_536
+            } else {
+                open_max as libc::c_int
+            };
             (3..open_max).collect()
         }
     };
@@ -293,7 +324,11 @@ pub(crate) fn inheritable_fds() -> Vec<libc::c_int> {
 /// without pidfd. The pid can be reused between the check and the kill;
 /// that window is the price of a platform without pidfd.
 #[cfg(unix)]
-pub(crate) fn unix_signal_after_check(platform: &dyn platform::ProcessPlatform, tuple: &ProcTuple, sig: Signal) -> SignalOutcome {
+pub(crate) fn unix_signal_after_check(
+    platform: &dyn platform::ProcessPlatform,
+    tuple: &ProcTuple,
+    sig: Signal,
+) -> SignalOutcome {
     use crate::facts::{judge, Observed, PlatformTable, Verdict};
     let observer = platform.observer();
     if let Some(outcome) = out_of_scope(tuple, &observer) {

@@ -13,10 +13,10 @@ use crate::{Domain, DomainState, FdSlot, KillOutcome};
 
 #[cfg(target_os = "linux")]
 pub(crate) mod linux;
-#[cfg(unix)]
-mod pgroup;
 #[cfg(target_os = "macos")]
 pub(crate) mod macos;
+#[cfg(unix)]
+mod pgroup;
 #[cfg(windows)]
 mod windows;
 
@@ -195,7 +195,9 @@ impl fmt::Display for ContainmentError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::UnsupportedPlatform => write!(f, "unsupported-platform"),
-            Self::DriverUnavailable(why) | Self::SpawnFailed(why) | Self::NamespaceUnavailable(why) => write!(f, "{}: {why}", self.name()),
+            Self::DriverUnavailable(why)
+            | Self::SpawnFailed(why)
+            | Self::NamespaceUnavailable(why) => write!(f, "{}: {why}", self.name()),
             Self::InvalidPrefix(reason) => write!(f, "invalid-bwrap-prefix: {reason}"),
             Self::Io(err) => write!(f, "io: {err}"),
         }
@@ -217,7 +219,11 @@ pub trait ContainmentDriver: Send + Sync {
     /// A domain with no process yet.
     fn create(&self, attempt_id: &str) -> Result<ContainmentDomain, ContainmentError>;
     /// Start the gate inside the domain; the domain id is complete afterwards.
-    fn spawn_in(&self, domain: &mut ContainmentDomain, spec: SpawnSpec) -> Result<Spawned, ContainmentError>;
+    fn spawn_in(
+        &self,
+        domain: &mut ContainmentDomain,
+        spec: SpawnSpec,
+    ) -> Result<Spawned, ContainmentError>;
     /// Whether the domain has no process left. `Unknown` is never empty.
     fn is_empty(&self, domain: &mut ContainmentDomain) -> DomainState;
     /// SIGTERM, then SIGKILL after `grace_ms` (0: SIGKILL at once), then wait
@@ -275,7 +281,9 @@ pub(crate) fn pgroup_state(leader: &ProcTuple) -> DomainState {
 /// Wait, within the default empty wait, until `gate` is judged dead.
 pub(crate) fn wait_dead(gate: &ProcTuple) {
     #[cfg(target_os = "linux")]
-    pgroup::wait_until(DEFAULT_EMPTY_WAIT, || crate::facts::judge_here(&gate.to_record()) == crate::facts::Verdict::Dead);
+    pgroup::wait_until(DEFAULT_EMPTY_WAIT, || {
+        crate::facts::judge_here(&gate.to_record()) == crate::facts::Verdict::Dead
+    });
     #[cfg(not(target_os = "linux"))]
     let _ = gate;
 }

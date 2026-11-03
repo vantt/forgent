@@ -10,10 +10,18 @@ use serde_json::json;
 use std::collections::BTreeMap;
 
 pub fn dispatch_faults(req: &ObserveRequest) -> Result<serde_json::Value, String> {
-    let flags = parse_flags("faults", &req.args, &["--class", "--since", "--until", "--limit"], &[], false)?;
+    let flags = parse_flags(
+        "faults",
+        &req.args,
+        &["--class", "--since", "--until", "--limit"],
+        &[],
+        false,
+    )?;
     let fault_class_filter = flags.value("--class").map(str::to_owned);
     let limit = match flags.number::<usize>("--limit") {
-        Ok(Some(0)) | Err(_) => return Err("faults --limit requires a positive integer value".to_string()),
+        Ok(Some(0)) | Err(_) => {
+            return Err("faults --limit requires a positive integer value".to_string())
+        }
         Ok(limit) => limit,
     };
 

@@ -51,7 +51,7 @@ impl Repo {
             "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
         )
         .unwrap();
-        let layout =Layout::from_common_dir(Some(&root.join(".git"))).unwrap();
+        let layout = Layout::from_common_dir(Some(&root.join(".git"))).unwrap();
         fs::create_dir_all(layout.root.join("locks")).unwrap();
         #[cfg(unix)]
         {

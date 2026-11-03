@@ -59,7 +59,11 @@ pub struct Verified {
 }
 
 fn refuse(reason: &'static str, detail: impl Into<String>) -> Refusal {
-    Refusal { reason, detail: detail.into(), candidates: Vec::new() }
+    Refusal {
+        reason,
+        detail: detail.into(),
+        candidates: Vec::new(),
+    }
 }
 
 fn identity_dir(state_root: &Path) -> PathBuf {
@@ -73,7 +77,10 @@ fn key_path(state_root: &Path) -> PathBuf {
 #[cfg(unix)]
 fn private_dir(path: &Path) -> io::Result<()> {
     use std::os::unix::fs::DirBuilderExt;
-    fs::DirBuilder::new().recursive(true).mode(0o700).create(path)
+    fs::DirBuilder::new()
+        .recursive(true)
+        .mode(0o700)
+        .create(path)
 }
 
 #[cfg(not(unix))]
@@ -90,13 +97,15 @@ impl Scratch {
     fn new(state_root: &Path) -> Result<Self, Refusal> {
         let name = random_hex128().map_err(|e| refuse("random-unavailable", e.to_string()))?;
         let path = state_root.join("tmp").join(format!("signing-{name}"));
-        private_dir(&path).map_err(|e| refuse("signing-scratch-failed", format!("{}: {e}", path.display())))?;
+        private_dir(&path)
+            .map_err(|e| refuse("signing-scratch-failed", format!("{}: {e}", path.display())))?;
         Ok(Self(path))
     }
 
     fn file(&self, name: &str, bytes: &[u8]) -> Result<PathBuf, Refusal> {
         let path = self.0.join(name);
-        fs::write(&path, bytes).map_err(|e| refuse("signing-scratch-failed", format!("{}: {e}", path.display())))?;
+        fs::write(&path, bytes)
+            .map_err(|e| refuse("signing-scratch-failed", format!("{}: {e}", path.display())))?;
         Ok(path)
     }
 }
@@ -120,7 +129,10 @@ fn ssh_keygen(args: &[&OsStr], stdin: &[u8]) -> Result<std::process::Output, Ref
         .spawn()
         .map_err(|e| {
             if e.kind() == io::ErrorKind::NotFound {
-                refuse("ssh-keygen-missing", "ssh-keygen is not installed or not on PATH; install OpenSSH 8.1 or later")
+                refuse(
+                    "ssh-keygen-missing",
+                    "ssh-keygen is not installed or not on PATH; install OpenSSH 8.1 or later",
+                )
             } else {
                 refuse("ssh-keygen-failed", format!("cannot start ssh-keygen: {e}"))
             }
@@ -134,7 +146,12 @@ fn ssh_keygen(args: &[&OsStr], stdin: &[u8]) -> Result<std::process::Output, Ref
         });
         child.wait_with_output()
     });
-    output.map_err(|e| refuse("ssh-keygen-failed", format!("ssh-keygen did not finish: {e}")))
+    output.map_err(|e| {
+        refuse(
+            "ssh-keygen-failed",
+            format!("ssh-keygen did not finish: {e}"),
+        )
+    })
 }
 
 fn text(bytes: &[u8]) -> String {
@@ -142,13 +159,19 @@ fn text(bytes: &[u8]) -> String {
 }
 
 fn failed(what: &str, output: &std::process::Output) -> Refusal {
-    refuse("ssh-keygen-failed", format!("{what}: {}", text(&output.stderr)))
+    refuse(
+        "ssh-keygen-failed",
+        format!("{what}: {}", text(&output.stderr)),
+    )
 }
 
 /// The first two fields of an OpenSSH public key line: the type and the key,
 /// without the comment.
 fn key_without_comment(line: &str) -> String {
-    line.split_whitespace().take(2).collect::<Vec<_>>().join(" ")
+    line.split_whitespace()
+        .take(2)
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 /// The single accepted shape of a public key that travels: `ssh-ed25519 <base64>`.
@@ -159,7 +182,9 @@ fn check_public_key(public_key: &str) -> Result<(), Refusal> {
         && public_key.split_once(' ').is_some_and(|(kind, blob)| {
             kind == KEY_TYPE
                 && !blob.is_empty()
-                && blob.bytes().all(|c| c.is_ascii_alphanumeric() || matches!(c, b'+' | b'/' | b'='))
+                && blob
+                    .bytes()
+                    .all(|c| c.is_ascii_alphanumeric() || matches!(c, b'+' | b'/' | b'='))
         });
     if valid {
         Ok(())
@@ -171,18 +196,26 @@ fn check_public_key(public_key: &str) -> Result<(), Refusal> {
 fn check_armor(sig: &str) -> Result<(), Refusal> {
     let valid = sig.len() <= MAX_SIGNATURE_LENGTH
         && sig.starts_with(ARMOR_HEADER)
-        && sig.chars().all(|c| c == '\n' || c == '\r' || c.is_ascii_graphic() || c == ' ');
+        && sig
+            .chars()
+            .all(|c| c == '\n' || c == '\r' || c.is_ascii_graphic() || c == ' ');
     if valid {
         Ok(())
     } else {
-        Err(refuse("invalid-signature", "sig must be an armored SSH signature of at most 4096 printable characters"))
+        Err(refuse(
+            "invalid-signature",
+            "sig must be an armored SSH signature of at most 4096 printable characters",
+        ))
     }
 }
 
 /// `SHA256:<base64>` of a public key, as OpenSSH prints it.
 pub fn fingerprint(public_key: &str) -> Result<String, Refusal> {
     check_public_key(public_key)?;
-    let output = ssh_keygen(&["-l".as_ref(), "-f".as_ref(), "-".as_ref()], format!("{public_key}\n").as_bytes())?;
+    let output = ssh_keygen(
+        &["-l".as_ref(), "-f".as_ref(), "-".as_ref()],
+        format!("{public_key}\n").as_bytes(),
+    )?;
     if !output.status.success() {
         return Err(failed("cannot fingerprint the public key", &output));
     }
@@ -191,7 +224,12 @@ pub fn fingerprint(public_key: &str) -> Result<String, Refusal> {
         .nth(1)
         .filter(|print| print.starts_with("SHA256:"))
         .map(str::to_owned)
-        .ok_or_else(|| refuse("ssh-keygen-failed", "ssh-keygen printed no SHA256 fingerprint"))
+        .ok_or_else(|| {
+            refuse(
+                "ssh-keygen-failed",
+                "ssh-keygen printed no SHA256 fingerprint",
+            )
+        })
 }
 
 /// This machine's public key, derived from the private key file so it cannot
@@ -199,14 +237,22 @@ pub fn fingerprint(public_key: &str) -> Result<String, Refusal> {
 pub fn own_public_key(state_root: &Path) -> Result<String, Refusal> {
     let key = key_path(state_root);
     if !key.is_file() {
-        return Err(refuse("machine-key-missing", "no machine signing key yet; run `fgos doctor --fix` to mint it"));
+        return Err(refuse(
+            "machine-key-missing",
+            "no machine signing key yet; run `fgos doctor --fix` to mint it",
+        ));
     }
     let output = ssh_keygen(&["-y".as_ref(), "-f".as_ref(), key.as_os_str()], b"")?;
     if !output.status.success() {
         return Err(failed("cannot read the machine key", &output));
     }
     let public_key = key_without_comment(&text(&output.stdout));
-    check_public_key(&public_key).map_err(|_| refuse("machine-key-unreadable", "the machine key is not an ed25519 key"))?;
+    check_public_key(&public_key).map_err(|_| {
+        refuse(
+            "machine-key-unreadable",
+            "the machine key is not an ed25519 key",
+        )
+    })?;
     Ok(public_key)
 }
 
@@ -226,28 +272,50 @@ pub fn key_fingerprint(state_root: &Path) -> Result<Option<String>, Refusal> {
 /// convenience copy, rewritten from the private key.
 pub fn mint_key(state_root: &Path) -> Result<(bool, String), Refusal> {
     let dir = identity_dir(state_root);
-    private_dir(&dir).map_err(|e| refuse("machine-key-write-failed", format!("{}: {e}", dir.display())))?;
-    let write_failed = |e: fgos_durable_file::InstallError| refuse("machine-key-write-failed", e.to_string());
+    private_dir(&dir).map_err(|e| {
+        refuse(
+            "machine-key-write-failed",
+            format!("{}: {e}", dir.display()),
+        )
+    })?;
+    let write_failed =
+        |e: fgos_durable_file::InstallError| refuse("machine-key-write-failed", e.to_string());
     let mut created = false;
     if !key_path(state_root).exists() {
         let scratch = Scratch::new(state_root)?;
         let key = scratch.0.join("key");
         let output = ssh_keygen(
-            &["-q".as_ref(), "-t".as_ref(), "ed25519".as_ref(), "-N".as_ref(), "".as_ref(), "-C".as_ref(), "fgos-machine".as_ref(), "-f".as_ref(), key.as_os_str()],
+            &[
+                "-q".as_ref(),
+                "-t".as_ref(),
+                "ed25519".as_ref(),
+                "-N".as_ref(),
+                "".as_ref(),
+                "-C".as_ref(),
+                "fgos-machine".as_ref(),
+                "-f".as_ref(),
+                key.as_os_str(),
+            ],
             b"",
         )?;
         if !output.status.success() {
             return Err(failed("cannot generate the machine key", &output));
         }
-        let private = fs::read(&key).map_err(|e| refuse("machine-key-write-failed", e.to_string()))?;
+        let private =
+            fs::read(&key).map_err(|e| refuse("machine-key-write-failed", e.to_string()))?;
         created = fgos_durable_file::install_once_with_mode(&dir, KEY_FILE, &private, 0o600)
             .map_err(write_failed)?
             == fgos_durable_file::Installed::Created;
     }
     let public_key = own_public_key(state_root)?;
     if created || !dir.join(PUBLIC_KEY_FILE).is_file() {
-        fgos_durable_file::replace_durably_with_mode(&dir, PUBLIC_KEY_FILE, format!("{public_key}\n").as_bytes(), 0o644)
-            .map_err(write_failed)?;
+        fgos_durable_file::replace_durably_with_mode(
+            &dir,
+            PUBLIC_KEY_FILE,
+            format!("{public_key}\n").as_bytes(),
+            0o644,
+        )
+        .map_err(write_failed)?;
     }
     Ok((created, fingerprint(&public_key)?))
 }
@@ -256,17 +324,39 @@ pub fn mint_key(state_root: &Path) -> Result<(bool, String), Refusal> {
 pub fn sign(state_root: &Path, bytes: &[u8]) -> Result<Signature, Refusal> {
     let public_key = own_public_key(state_root)?;
     let machine_id = machine::read(state_root).map_err(|e| match e {
-        crate::Error::Missing(_) => refuse("machine-id-missing", "no machine id yet; run `fgos doctor --fix` to mint it"),
+        crate::Error::Missing(_) => refuse(
+            "machine-id-missing",
+            "no machine id yet; run `fgos doctor --fix` to mint it",
+        ),
         e => refuse("machine-id-unreadable", e.to_string()),
     })?;
     let key = key_path(state_root);
-    let output = ssh_keygen(&["-Y".as_ref(), "sign".as_ref(), "-f".as_ref(), key.as_os_str(), "-n".as_ref(), NAMESPACE.as_ref()], bytes)?;
+    let output = ssh_keygen(
+        &[
+            "-Y".as_ref(),
+            "sign".as_ref(),
+            "-f".as_ref(),
+            key.as_os_str(),
+            "-n".as_ref(),
+            NAMESPACE.as_ref(),
+        ],
+        bytes,
+    )?;
     if !output.status.success() {
         return Err(failed("cannot sign", &output));
     }
-    let sig = String::from_utf8(output.stdout).map_err(|_| refuse("ssh-keygen-failed", "ssh-keygen printed a signature that is not text"))?;
+    let sig = String::from_utf8(output.stdout).map_err(|_| {
+        refuse(
+            "ssh-keygen-failed",
+            "ssh-keygen printed a signature that is not text",
+        )
+    })?;
     check_armor(&sig)?;
-    Ok(Signature { machine_id, public_key, sig })
+    Ok(Signature {
+        machine_id,
+        public_key,
+        sig,
+    })
 }
 
 /// Checks that `signature` holds for `bytes`, then that its key is the one
@@ -302,18 +392,45 @@ pub fn verify(state_root: &Path, bytes: &[u8], signature: &Signature) -> Result<
     }
     let scratch = Scratch::new(state_root)?;
     let sig_file = scratch.file("signature", signature.sig.as_bytes())?;
-    let allowed = scratch.file("allowed-signers", format!("{PRINCIPAL} namespaces=\"{NAMESPACE}\" {}\n", signature.public_key).as_bytes())?;
+    let allowed = scratch.file(
+        "allowed-signers",
+        format!(
+            "{PRINCIPAL} namespaces=\"{NAMESPACE}\" {}\n",
+            signature.public_key
+        )
+        .as_bytes(),
+    )?;
     let output = ssh_keygen(
         &[
-            "-Y".as_ref(), "verify".as_ref(), "-f".as_ref(), allowed.as_os_str(), "-I".as_ref(), PRINCIPAL.as_ref(),
-            "-n".as_ref(), NAMESPACE.as_ref(), "-s".as_ref(), sig_file.as_os_str(),
+            "-Y".as_ref(),
+            "verify".as_ref(),
+            "-f".as_ref(),
+            allowed.as_os_str(),
+            "-I".as_ref(),
+            PRINCIPAL.as_ref(),
+            "-n".as_ref(),
+            NAMESPACE.as_ref(),
+            "-s".as_ref(),
+            sig_file.as_os_str(),
         ],
         bytes,
     )?;
     if !output.status.success() {
-        return Err(refuse("bad-signature", format!("the signature does not hold for these bytes under {}: {}", signature.public_key, text(&output.stderr))));
+        return Err(refuse(
+            "bad-signature",
+            format!(
+                "the signature does not hold for these bytes under {}: {}",
+                signature.public_key,
+                text(&output.stderr)
+            ),
+        ));
     }
-    let pin = Pin::new(&signature.machine_id, &signature.public_key, &fingerprint, &iso_utc_now());
+    let pin = Pin::new(
+        &signature.machine_id,
+        &signature.public_key,
+        &fingerprint,
+        &iso_utc_now(),
+    );
     let (first_seen, state) = match pins::record(state_root, &pin)? {
         Recorded::Created => (true, PinState::Seen),
         Recorded::Same(existing) => (false, existing.state),
@@ -328,10 +445,17 @@ pub fn verify(state_root: &Path, bytes: &[u8], signature: &Signature) -> Result<
         }
     };
     // A machine trusts itself: its own key was compared with the signature above, so its pin is confirmed.
-    let state = if state == PinState::Seen && machine::read(state_root).is_ok_and(|own| own == signature.machine_id) {
+    let state = if state == PinState::Seen
+        && machine::read(state_root).is_ok_and(|own| own == signature.machine_id)
+    {
         pins::confirm(state_root, &signature.machine_id, &fingerprint)?.state
     } else {
         state
     };
-    Ok(Verified { machine_id: signature.machine_id.clone(), fingerprint, first_seen, state })
+    Ok(Verified {
+        machine_id: signature.machine_id.clone(),
+        fingerprint,
+        first_seen,
+        state,
+    })
 }

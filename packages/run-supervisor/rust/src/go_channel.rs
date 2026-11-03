@@ -50,7 +50,10 @@ impl FrameBuf {
 pub fn write_frame(out: &mut impl Write, frame: &Value) -> io::Result<()> {
     let bytes = serde_json::to_vec(frame).map_err(io::Error::other)?;
     if bytes.len() > MAX_FRAME_BYTES {
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "frame over the size limit"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "frame over the size limit",
+        ));
     }
     let mut buf = Vec::with_capacity(4 + bytes.len());
     buf.extend_from_slice(&(bytes.len() as u32).to_be_bytes());
@@ -61,13 +64,17 @@ pub fn write_frame(out: &mut impl Write, frame: &Value) -> io::Result<()> {
 
 pub fn read_frame(input: &mut impl Read) -> Result<Value, FrameError> {
     let mut head = [0u8; 4];
-    input.read_exact(&mut head).map_err(|_| FrameError::Closed)?;
+    input
+        .read_exact(&mut head)
+        .map_err(|_| FrameError::Closed)?;
     let len = u32::from_be_bytes(head) as usize;
     if len > MAX_FRAME_BYTES {
         return Err(FrameError::Protocol);
     }
     let mut body = vec![0u8; len];
-    input.read_exact(&mut body).map_err(|_| FrameError::Closed)?;
+    input
+        .read_exact(&mut body)
+        .map_err(|_| FrameError::Closed)?;
     match serde_json::from_slice::<Value>(&body) {
         Ok(value) if value.is_object() => Ok(value),
         _ => Err(FrameError::Protocol),
@@ -97,7 +104,10 @@ mod tests {
         assert!(buf.next_frame().unwrap().is_none());
         buf.push(&wire[3..]);
         assert_eq!(buf.next_frame().unwrap().unwrap()["type"], "GO");
-        assert_eq!(buf.next_frame().unwrap().unwrap()["type"], "BRIEF_DELIVERED");
+        assert_eq!(
+            buf.next_frame().unwrap().unwrap()["type"],
+            "BRIEF_DELIVERED"
+        );
         assert!(buf.next_frame().unwrap().is_none());
         let mut oversize = FrameBuf::default();
         oversize.push(&((MAX_FRAME_BYTES + 1) as u32).to_be_bytes());
@@ -108,11 +118,23 @@ mod tests {
     fn oversize_short_and_non_object_frames_are_refused() {
         let mut oversize = ((MAX_FRAME_BYTES + 1) as u32).to_be_bytes().to_vec();
         oversize.extend_from_slice(b"{}");
-        assert!(matches!(read_frame(&mut oversize.as_slice()), Err(FrameError::Protocol)));
-        assert!(matches!(read_frame(&mut [0u8, 0, 0, 9, b'{'].as_slice()), Err(FrameError::Closed)));
+        assert!(matches!(
+            read_frame(&mut oversize.as_slice()),
+            Err(FrameError::Protocol)
+        ));
+        assert!(matches!(
+            read_frame(&mut [0u8, 0, 0, 9, b'{'].as_slice()),
+            Err(FrameError::Closed)
+        ));
         let mut array = 2u32.to_be_bytes().to_vec();
         array.extend_from_slice(b"[]");
-        assert!(matches!(read_frame(&mut array.as_slice()), Err(FrameError::Protocol)));
-        assert!(matches!(read_frame(&mut [].as_slice()), Err(FrameError::Closed)));
+        assert!(matches!(
+            read_frame(&mut array.as_slice()),
+            Err(FrameError::Protocol)
+        ));
+        assert!(matches!(
+            read_frame(&mut [].as_slice()),
+            Err(FrameError::Closed)
+        ));
     }
 }

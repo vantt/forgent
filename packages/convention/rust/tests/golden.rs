@@ -249,7 +249,9 @@ fn error_code(error: ConventionError) -> String {
 #[test]
 fn identifier_cases_are_the_behavior_source() {
     let fixture: Value = serde_json::from_str(GOLDEN).unwrap();
-    let cases = fixture["identifierCases"].as_array().expect("identifierCases");
+    let cases = fixture["identifierCases"]
+        .as_array()
+        .expect("identifierCases");
     assert!(!cases.is_empty());
     for case in cases {
         let rule = packaged_rules()
@@ -264,7 +266,9 @@ fn identifier_cases_are_the_behavior_source() {
 #[test]
 fn definition_file_cases_are_the_behavior_source() {
     let fixture: Value = serde_json::from_str(GOLDEN).unwrap();
-    let cases = fixture["definitionFileCases"].as_array().expect("definitionFileCases");
+    let cases = fixture["definitionFileCases"]
+        .as_array()
+        .expect("definitionFileCases");
     assert!(!cases.is_empty());
     let rules = packaged_rules();
     for case in cases {

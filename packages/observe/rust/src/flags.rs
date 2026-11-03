@@ -44,7 +44,9 @@ impl Flags {
                 let value = match inline {
                     Some(value) => value.to_string(),
                     None => {
-                        let value = args.get(i).ok_or_else(|| format!("missing value for {name}"))?;
+                        let value = args
+                            .get(i)
+                            .ok_or_else(|| format!("missing value for {name}"))?;
                         i += 1;
                         value.clone()
                     }
@@ -62,7 +64,10 @@ impl Flags {
     }
 
     pub fn value(&self, flag: &str) -> Option<&str> {
-        self.values.iter().find(|(name, _)| name == flag).map(|(_, value)| value.as_str())
+        self.values
+            .iter()
+            .find(|(name, _)| name == flag)
+            .map(|(_, value)| value.as_str())
     }
 
     pub fn switch(&self, flag: &str) -> bool {
@@ -76,7 +81,10 @@ impl Flags {
     /// The flag's value as a number; absent is `None`, unparsable is an error.
     pub fn number<T: FromStr>(&self, flag: &str) -> Result<Option<T>, String> {
         self.value(flag)
-            .map(|raw| raw.parse::<T>().map_err(|_| format!("invalid value for {flag}: {raw}")))
+            .map(|raw| {
+                raw.parse::<T>()
+                    .map_err(|_| format!("invalid value for {flag}: {raw}"))
+            })
             .transpose()
     }
 }
@@ -92,7 +100,16 @@ mod tests {
     #[test]
     fn spaced_and_equals_values_switches_positional_and_global_flags_parse_one_way() {
         let flags = Flags::parse(
-            &args(&["--layer", "state", "--limit=3", "--detail-stdin", "--dir", "/x", "--json", "work:a"]),
+            &args(&[
+                "--layer",
+                "state",
+                "--limit=3",
+                "--detail-stdin",
+                "--dir",
+                "/x",
+                "--json",
+                "work:a",
+            ]),
             &["--layer", "--limit"],
             &["--detail-stdin"],
             true,
@@ -107,13 +124,33 @@ mod tests {
 
     #[test]
     fn unknown_flags_missing_values_bad_numbers_and_stray_positionals_are_named_errors() {
-        let parse = |list: &[&str], positional| Flags::parse(&args(list), &["--limit"], &["--on"], positional);
-        assert_eq!(parse(&["--nope"], false).unwrap_err(), "unknown option --nope");
-        assert_eq!(parse(&["--limit"], false).unwrap_err(), "missing value for --limit");
-        assert_eq!(parse(&["--on=1"], false).unwrap_err(), "unknown option --on=1");
-        assert_eq!(parse(&["stray"], false).unwrap_err(), "unexpected argument stray");
-        assert_eq!(parse(&["a", "b"], true).unwrap_err(), "unexpected argument b");
+        let parse = |list: &[&str], positional| {
+            Flags::parse(&args(list), &["--limit"], &["--on"], positional)
+        };
+        assert_eq!(
+            parse(&["--nope"], false).unwrap_err(),
+            "unknown option --nope"
+        );
+        assert_eq!(
+            parse(&["--limit"], false).unwrap_err(),
+            "missing value for --limit"
+        );
+        assert_eq!(
+            parse(&["--on=1"], false).unwrap_err(),
+            "unknown option --on=1"
+        );
+        assert_eq!(
+            parse(&["stray"], false).unwrap_err(),
+            "unexpected argument stray"
+        );
+        assert_eq!(
+            parse(&["a", "b"], true).unwrap_err(),
+            "unexpected argument b"
+        );
         let bad = parse(&["--limit", "abc"], false).unwrap();
-        assert_eq!(bad.number::<usize>("--limit").unwrap_err(), "invalid value for --limit: abc");
+        assert_eq!(
+            bad.number::<usize>("--limit").unwrap_err(),
+            "invalid value for --limit: abc"
+        );
     }
 }

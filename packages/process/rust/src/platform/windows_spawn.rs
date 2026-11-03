@@ -22,10 +22,15 @@ use std::os::windows::ffi::OsStrExt;
 use std::os::windows::io::{AsRawHandle, FromRawHandle, OwnedHandle, RawHandle};
 use std::path::{Path, PathBuf};
 
-use windows_sys::Win32::Foundation::{DuplicateHandle, SetHandleInformation, DUPLICATE_SAME_ACCESS, HANDLE, HANDLE_FLAG_INHERIT, INVALID_HANDLE_VALUE, WAIT_OBJECT_0, WAIT_TIMEOUT};
+use windows_sys::Win32::Foundation::{
+    DuplicateHandle, SetHandleInformation, DUPLICATE_SAME_ACCESS, HANDLE, HANDLE_FLAG_INHERIT,
+    INVALID_HANDLE_VALUE, WAIT_OBJECT_0, WAIT_TIMEOUT,
+};
 use windows_sys::Win32::System::Threading::{
-    CreateProcessW, DeleteProcThreadAttributeList, GetCurrentProcess, GetExitCodeProcess, InitializeProcThreadAttributeList, TerminateProcess, UpdateProcThreadAttribute, WaitForSingleObject, CREATE_UNICODE_ENVIRONMENT,
-    EXTENDED_STARTUPINFO_PRESENT, INFINITE, PROCESS_INFORMATION, PROC_THREAD_ATTRIBUTE_HANDLE_LIST, STARTF_USESTDHANDLES, STARTUPINFOEXW,
+    CreateProcessW, DeleteProcThreadAttributeList, GetCurrentProcess, GetExitCodeProcess,
+    InitializeProcThreadAttributeList, TerminateProcess, UpdateProcThreadAttribute,
+    WaitForSingleObject, CREATE_UNICODE_ENVIRONMENT, EXTENDED_STARTUPINFO_PRESENT, INFINITE,
+    PROCESS_INFORMATION, PROC_THREAD_ATTRIBUTE_HANDLE_LIST, STARTF_USESTDHANDLES, STARTUPINFOEXW,
 };
 
 use super::windows_job::{assign_and_resume_handles, Job};
@@ -118,7 +123,11 @@ impl Spawned {
     /// its main thread, so it runs its first instruction inside the job. On
     /// failure the suspended process is ended.
     pub fn assign_and_resume(&self, job: &Job) -> io::Result<()> {
-        assign_and_resume_handles(job, self.process.as_raw_handle() as HANDLE, self.thread.as_raw_handle() as HANDLE)
+        assign_and_resume_handles(
+            job,
+            self.process.as_raw_handle() as HANDLE,
+            self.thread.as_raw_handle() as HANDLE,
+        )
     }
 
     fn exit_code(&self) -> io::Result<u32> {
@@ -154,7 +163,11 @@ fn append_arg(line: &mut Vec<u16>, arg: &OsStr) {
             backslashes += 1;
             continue;
         }
-        let escaped = if unit == quote { backslashes * 2 + 1 } else { backslashes };
+        let escaped = if unit == quote {
+            backslashes * 2 + 1
+        } else {
+            backslashes
+        };
         line.extend(std::iter::repeat(backslash).take(escaped));
         backslashes = 0;
         line.push(unit);
@@ -179,7 +192,12 @@ fn command_line(program: &OsStr, args: &[OsString]) -> Vec<u16> {
 /// each ended by a NUL, the block ended by one more.
 fn environment_block(vars: &[(OsString, OsString)]) -> Vec<u16> {
     let mut sorted: Vec<&(OsString, OsString)> = vars.iter().collect();
-    sorted.sort_by_key(|(name, _)| wide(name).iter().map(|u| char::from_u32(u32::from(*u)).map_or(*u, |c| c.to_ascii_uppercase() as u16)).collect::<Vec<u16>>());
+    sorted.sort_by_key(|(name, _)| {
+        wide(name)
+            .iter()
+            .map(|u| char::from_u32(u32::from(*u)).map_or(*u, |c| c.to_ascii_uppercase() as u16))
+            .collect::<Vec<u16>>()
+    });
     let mut block = Vec::new();
     for (name, value) in sorted {
         block.extend(wide(name));
@@ -198,25 +216,51 @@ fn environment_block(vars: &[(OsString, OsString)]) -> Vec<u16> {
 /// (`.exe` added when it has no extension); a bare name is searched for in
 /// `PATH` of the child's environment, never in the working directory.
 fn resolve_program(program: &OsStr, path_var: Option<&OsStr>) -> io::Result<PathBuf> {
-    let with_extension = |candidate: PathBuf| if candidate.extension().is_some() { candidate } else { candidate.with_extension("exe") };
+    let with_extension = |candidate: PathBuf| {
+        if candidate.extension().is_some() {
+            candidate
+        } else {
+            candidate.with_extension("exe")
+        }
+    };
     let direct = Path::new(program);
     let has_directory = program.to_string_lossy().contains(['\\', '/', ':']);
     let found = if has_directory {
         let candidate = with_extension(direct.to_path_buf());
         candidate.is_file().then_some(candidate)
     } else {
-        path_var.and_then(|paths| std::env::split_paths(paths).map(|dir| with_extension(dir.join(program))).find(|candidate| candidate.is_file()))
+        path_var.and_then(|paths| {
+            std::env::split_paths(paths)
+                .map(|dir| with_extension(dir.join(program)))
+                .find(|candidate| candidate.is_file())
+        })
     };
-    let found = found.ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, format!("program not found: {}", program.to_string_lossy())))?;
-    let ext = found.extension().and_then(OsStr::to_str).map(str::to_ascii_lowercase);
+    let found = found.ok_or_else(|| {
+        io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("program not found: {}", program.to_string_lossy()),
+        )
+    })?;
+    let ext = found
+        .extension()
+        .and_then(OsStr::to_str)
+        .map(str::to_ascii_lowercase);
     if matches!(ext.as_deref(), Some("bat") | Some("cmd")) {
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, format!("a batch file cannot be started with an explicit handle list: {}", found.display())));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            format!(
+                "a batch file cannot be started with an explicit handle list: {}",
+                found.display()
+            ),
+        ));
     }
     Ok(found)
 }
 
 fn path_of(env: &[(OsString, OsString)]) -> Option<OsString> {
-    env.iter().find(|(name, _)| name.to_string_lossy().eq_ignore_ascii_case("PATH")).map(|(_, value)| value.clone())
+    env.iter()
+        .find(|(name, _)| name.to_string_lossy().eq_ignore_ascii_case("PATH"))
+        .map(|(_, value)| value.clone())
 }
 
 /// An inheritable copy of `handle`, owned by this process until it is dropped
@@ -224,7 +268,17 @@ fn path_of(env: &[(OsString, OsString)]) -> Option<OsString> {
 fn inheritable_copy(handle: HANDLE) -> io::Result<OwnedHandle> {
     let mut copy: HANDLE = std::ptr::null_mut();
     // SAFETY: duplicating a handle of this process into this process.
-    let ok = unsafe { DuplicateHandle(GetCurrentProcess(), handle, GetCurrentProcess(), &mut copy, 0, 1, DUPLICATE_SAME_ACCESS) };
+    let ok = unsafe {
+        DuplicateHandle(
+            GetCurrentProcess(),
+            handle,
+            GetCurrentProcess(),
+            &mut copy,
+            0,
+            1,
+            DUPLICATE_SAME_ACCESS,
+        )
+    };
     if ok == 0 {
         return Err(io::Error::last_os_error());
     }
@@ -244,23 +298,47 @@ fn usable(handle: HANDLE) -> bool {
 
 fn open_stream(kind: ChildStdio, standard: HANDLE, reading: bool) -> io::Result<Stream> {
     match kind {
-        ChildStdio::Inherit => Ok(Stream { child: usable(standard).then(|| inheritable_copy(standard)).transpose()?, parent: None }),
+        ChildStdio::Inherit => Ok(Stream {
+            child: usable(standard)
+                .then(|| inheritable_copy(standard))
+                .transpose()?,
+            parent: None,
+        }),
         ChildStdio::Null => {
-            let nul = std::fs::OpenOptions::new().read(reading).write(!reading).open("NUL")?;
-            Ok(Stream { child: Some(inheritable_copy(nul.as_raw_handle() as HANDLE)?), parent: None })
+            let nul = std::fs::OpenOptions::new()
+                .read(reading)
+                .write(!reading)
+                .open("NUL")?;
+            Ok(Stream {
+                child: Some(inheritable_copy(nul.as_raw_handle() as HANDLE)?),
+                parent: None,
+            })
         }
-        ChildStdio::File(file) => Ok(Stream { child: Some(inheritable_copy(file.as_raw_handle() as HANDLE)?), parent: None }),
+        ChildStdio::File(file) => Ok(Stream {
+            child: Some(inheritable_copy(file.as_raw_handle() as HANDLE)?),
+            parent: None,
+        }),
         ChildStdio::Piped => {
             let (read_end, write_end) = std::io::pipe()?;
-            let (child_end, parent_end): (OwnedHandle, OwnedHandle) = if reading { (read_end.into(), write_end.into()) } else { (write_end.into(), read_end.into()) };
+            let (child_end, parent_end): (OwnedHandle, OwnedHandle) = if reading {
+                (read_end.into(), write_end.into())
+            } else {
+                (write_end.into(), read_end.into())
+            };
             // The parent's end is never inheritable, whatever the pipe was
             // created with; the child gets a copy of its own end.
             // SAFETY: clearing one flag on a handle this function owns.
-            if unsafe { SetHandleInformation(parent_end.as_raw_handle() as HANDLE, HANDLE_FLAG_INHERIT, 0) } == 0 {
+            if unsafe {
+                SetHandleInformation(parent_end.as_raw_handle() as HANDLE, HANDLE_FLAG_INHERIT, 0)
+            } == 0
+            {
                 return Err(io::Error::last_os_error());
             }
             let child = inheritable_copy(child_end.as_raw_handle() as HANDLE)?;
-            Ok(Stream { child: Some(child), parent: Some(File::from(parent_end)) })
+            Ok(Stream {
+                child: Some(child),
+                parent: Some(File::from(parent_end)),
+            })
         }
     }
 }
@@ -279,12 +357,25 @@ impl AttributeList {
         unsafe { InitializeProcThreadAttributeList(std::ptr::null_mut(), 1, 0, &mut size) };
         let mut buffer = vec![0usize; size.div_ceil(std::mem::size_of::<usize>()).max(1)];
         // SAFETY: a zeroed buffer of the size just asked for.
-        if unsafe { InitializeProcThreadAttributeList(buffer.as_mut_ptr() as *mut c_void, 1, 0, &mut size) } == 0 {
+        if unsafe {
+            InitializeProcThreadAttributeList(buffer.as_mut_ptr() as *mut c_void, 1, 0, &mut size)
+        } == 0
+        {
             return Err(io::Error::last_os_error());
         }
         let list = AttributeList { buffer };
         // SAFETY: the list is initialized for one attribute; `handles` is kept alive by the caller.
-        let ok = unsafe { UpdateProcThreadAttribute(list.pointer(), 0, PROC_THREAD_ATTRIBUTE_HANDLE_LIST as usize, handles.as_mut_ptr() as *const c_void, std::mem::size_of_val(handles), std::ptr::null_mut(), std::ptr::null()) };
+        let ok = unsafe {
+            UpdateProcThreadAttribute(
+                list.pointer(),
+                0,
+                PROC_THREAD_ATTRIBUTE_HANDLE_LIST as usize,
+                handles.as_mut_ptr() as *const c_void,
+                std::mem::size_of_val(handles),
+                std::ptr::null_mut(),
+                std::ptr::null(),
+            )
+        };
         if ok == 0 {
             return Err(io::Error::last_os_error());
         }
@@ -313,14 +404,37 @@ pub fn spawn(spec: SpawnSpec) -> io::Result<Spawned> {
     let search = path_of(&env).or_else(|| std::env::var_os("PATH"));
     let program = resolve_program(&spec.program, search.as_deref())?;
     let mut line = command_line(&spec.program, &spec.args);
-    let application = wide(program.as_os_str()).into_iter().chain(std::iter::once(0)).collect::<Vec<u16>>();
+    let application = wide(program.as_os_str())
+        .into_iter()
+        .chain(std::iter::once(0))
+        .collect::<Vec<u16>>();
     let block = environment_block(&env);
-    let cwd = spec.cwd.as_ref().map(|dir| wide(dir.as_os_str()).into_iter().chain(std::iter::once(0)).collect::<Vec<u16>>());
+    let cwd = spec.cwd.as_ref().map(|dir| {
+        wide(dir.as_os_str())
+            .into_iter()
+            .chain(std::iter::once(0))
+            .collect::<Vec<u16>>()
+    });
 
     let stdin = open_stream(spec.stdin, std::io::stdin().as_raw_handle() as HANDLE, true)?;
-    let stdout = open_stream(spec.stdout, std::io::stdout().as_raw_handle() as HANDLE, false)?;
-    let stderr = open_stream(spec.stderr, std::io::stderr().as_raw_handle() as HANDLE, false)?;
-    let raw = |stream: &Stream| stream.child.as_ref().map_or(std::ptr::null_mut(), |handle| handle.as_raw_handle() as HANDLE);
+    let stdout = open_stream(
+        spec.stdout,
+        std::io::stdout().as_raw_handle() as HANDLE,
+        false,
+    )?;
+    let stderr = open_stream(
+        spec.stderr,
+        std::io::stderr().as_raw_handle() as HANDLE,
+        false,
+    )?;
+    let raw = |stream: &Stream| {
+        stream
+            .child
+            .as_ref()
+            .map_or(std::ptr::null_mut(), |handle| {
+                handle.as_raw_handle() as HANDLE
+            })
+    };
     let (child_in, child_out, child_err) = (raw(&stdin), raw(&stdout), raw(&stderr));
     // One entry per distinct handle: a duplicate in the list is refused.
     let mut inherited: Vec<HANDLE> = Vec::new();
@@ -337,7 +451,11 @@ pub fn spawn(spec: SpawnSpec) -> io::Result<Spawned> {
     startup.StartupInfo.hStdInput = child_in;
     startup.StartupInfo.hStdOutput = child_out;
     startup.StartupInfo.hStdError = child_err;
-    let attributes = if inherited.is_empty() { None } else { Some(AttributeList::with_handle_list(&mut inherited)?) };
+    let attributes = if inherited.is_empty() {
+        None
+    } else {
+        Some(AttributeList::with_handle_list(&mut inherited)?)
+    };
     let mut flags = spec.creation_flags | CREATE_UNICODE_ENVIRONMENT;
     if let Some(list) = &attributes {
         startup.lpAttributeList = list.pointer();
@@ -365,9 +483,21 @@ pub fn spawn(spec: SpawnSpec) -> io::Result<Spawned> {
         return Err(io::Error::last_os_error());
     }
     // SAFETY: CreateProcessW returned two fresh handles this function owns.
-    let (process, thread) = unsafe { (OwnedHandle::from_raw_handle(info.hProcess as RawHandle), OwnedHandle::from_raw_handle(info.hThread as RawHandle)) };
+    let (process, thread) = unsafe {
+        (
+            OwnedHandle::from_raw_handle(info.hProcess as RawHandle),
+            OwnedHandle::from_raw_handle(info.hThread as RawHandle),
+        )
+    };
     // The child holds its own copies now; this process closes the inheritable ones on drop.
-    Ok(Spawned { process, thread, pid: info.dwProcessId, stdin: stdin.parent, stdout: stdout.parent, stderr: stderr.parent })
+    Ok(Spawned {
+        process,
+        thread,
+        pid: info.dwProcessId,
+        stdin: stdin.parent,
+        stdout: stdout.parent,
+        stderr: stderr.parent,
+    })
 }
 
 #[cfg(test)]
@@ -397,7 +527,10 @@ mod tests {
 
     #[test]
     fn the_environment_block_is_sorted_by_name_without_case_and_double_terminated() {
-        let vars = vec![(OsString::from("b"), OsString::from("2")), (OsString::from("A"), OsString::from("1"))];
+        let vars = vec![
+            (OsString::from("b"), OsString::from("2")),
+            (OsString::from("A"), OsString::from("1")),
+        ];
         let block = text(environment_block(&vars));
         assert_eq!(block, "A=1\0b=2\0\0");
         assert_eq!(environment_block(&[]), vec![0, 0]);

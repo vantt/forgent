@@ -125,8 +125,8 @@ impl SystemNudge {
             .claude_sessions
             .as_deref()
             .ok_or("sessions-dir-unknown")?;
-        let socket = session_socket(sessions, view.pid.0, self.max_read_bytes)
-            .ok_or("socket-unknown")?;
+        let socket =
+            session_socket(sessions, view.pid.0, self.max_read_bytes).ok_or("socket-unknown")?;
         let argv = view.cmdline.as_deref().ok_or("head-process-unreadable")?;
         if !head_accepts(argv, sessions.parent(), self.max_read_bytes) {
             return Err("no-accept".to_string());

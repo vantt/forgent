@@ -207,7 +207,11 @@ pub fn list(
         invalid: store
             .invalid
             .into_iter()
-            .map(|item| InvalidEvalLine { file: item.file, line: item.line, error: item.reason })
+            .map(|item| InvalidEvalLine {
+                file: item.file,
+                line: item.line,
+                error: item.reason,
+            })
             .collect(),
     };
     let mut seen_ids = HashSet::new();
@@ -234,7 +238,9 @@ pub fn list(
             Err(error) => result.invalid.push(InvalidEvalLine { file, line, error }),
         }
     }
-    result.invalid.sort_by(|a, b| (&a.file, a.line).cmp(&(&b.file, b.line)));
+    result
+        .invalid
+        .sort_by(|a, b| (&a.file, a.line).cmp(&(&b.file, b.line)));
     result
         .evals
         .sort_by(|a, b| a.ts.cmp(&b.ts).then_with(|| a.eval_id.cmp(&b.eval_id)));

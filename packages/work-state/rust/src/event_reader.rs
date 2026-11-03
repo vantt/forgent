@@ -153,7 +153,10 @@ pub(crate) fn import_fixture(root: &Path, content: &str) {
         String::from_utf8(output.stdout).unwrap().trim().to_owned()
     };
     let blob_tree = |name: &str, blob: &str| {
-        git_with(&["mktree"], format!("100644 blob {blob}\t{name}\n").as_bytes())
+        git_with(
+            &["mktree"],
+            format!("100644 blob {blob}\t{name}\n").as_bytes(),
+        )
     };
     let head = git(&["rev-parse", "HEAD"]);
     let events_blob = git(&["hash-object", "-w", ".fgos/events.jsonl"]);
@@ -171,7 +174,12 @@ pub(crate) fn import_fixture(root: &Path, content: &str) {
         format!("100644 blob {events_blob}\tevents.jsonl\n100644 blob {seal_blob}\tseal.json\n")
             .as_bytes(),
     );
-    let legacy_commit = git(&["commit-tree", &legacy_tree, "-m", "fgos-events legacy import"]);
+    let legacy_commit = git(&[
+        "commit-tree",
+        &legacy_tree,
+        "-m",
+        "fgos-events legacy import",
+    ]);
     git(&["update-ref", "refs/fgos/legacy", &legacy_commit]);
     let pin = json!({
         "legacyRefOid": legacy_commit,

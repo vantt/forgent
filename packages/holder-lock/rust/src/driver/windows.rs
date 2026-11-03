@@ -14,10 +14,14 @@ use std::os::windows::io::AsRawHandle;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use windows_sys::Win32::Foundation::{CloseHandle, ERROR_LOCK_VIOLATION, HANDLE, INVALID_HANDLE_VALUE};
+use windows_sys::Win32::Foundation::{
+    CloseHandle, ERROR_LOCK_VIOLATION, HANDLE, INVALID_HANDLE_VALUE,
+};
 use windows_sys::Win32::Storage::FileSystem::{
-    CreateFileW, FileIdInfo, FileRemoteProtocolInfo, GetDriveTypeW, GetFileInformationByHandleEx, GetFinalPathNameByHandleW, GetVolumePathNameW, LockFileEx, UnlockFileEx, FILE_ATTRIBUTE_NORMAL,
-    FILE_ID_INFO, FILE_REMOTE_PROTOCOL_INFO, FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE, LOCKFILE_EXCLUSIVE_LOCK, LOCKFILE_FAIL_IMMEDIATELY, OPEN_EXISTING, VOLUME_NAME_DOS,
+    CreateFileW, FileIdInfo, FileRemoteProtocolInfo, GetDriveTypeW, GetFileInformationByHandleEx,
+    GetFinalPathNameByHandleW, GetVolumePathNameW, LockFileEx, UnlockFileEx, FILE_ATTRIBUTE_NORMAL,
+    FILE_ID_INFO, FILE_REMOTE_PROTOCOL_INFO, FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE,
+    LOCKFILE_EXCLUSIVE_LOCK, LOCKFILE_FAIL_IMMEDIATELY, OPEN_EXISTING, VOLUME_NAME_DOS,
 };
 use windows_sys::Win32::System::IO::OVERLAPPED;
 
@@ -56,7 +60,10 @@ fn remote(detail: &str) -> Guarantee {
 
 fn wide(path: &Path) -> Vec<u16> {
     use std::os::windows::ffi::OsStrExt;
-    path.as_os_str().encode_wide().chain(std::iter::once(0)).collect()
+    path.as_os_str()
+        .encode_wide()
+        .chain(std::iter::once(0))
+        .collect()
 }
 
 fn handle_of(file: &File) -> HANDLE {
@@ -80,7 +87,12 @@ fn file_is_remote(file: &File) -> bool {
     // SAFETY: the struct is plain data and the size passed is its own.
     let mut info: FILE_REMOTE_PROTOCOL_INFO = unsafe { std::mem::zeroed() };
     let ok = unsafe {
-        GetFileInformationByHandleEx(handle_of(file), FileRemoteProtocolInfo, (&mut info as *mut FILE_REMOTE_PROTOCOL_INFO).cast(), std::mem::size_of::<FILE_REMOTE_PROTOCOL_INFO>() as u32)
+        GetFileInformationByHandleEx(
+            handle_of(file),
+            FileRemoteProtocolInfo,
+            (&mut info as *mut FILE_REMOTE_PROTOCOL_INFO).cast(),
+            std::mem::size_of::<FILE_REMOTE_PROTOCOL_INFO>() as u32,
+        )
     };
     ok != 0
 }
@@ -89,7 +101,14 @@ fn file_is_remote(file: &File) -> bool {
 fn file_id(handle: HANDLE) -> io::Result<(u64, [u8; 16])> {
     // SAFETY: plain data, size matches.
     let mut info: FILE_ID_INFO = unsafe { std::mem::zeroed() };
-    let ok = unsafe { GetFileInformationByHandleEx(handle, FileIdInfo, (&mut info as *mut FILE_ID_INFO).cast(), std::mem::size_of::<FILE_ID_INFO>() as u32) };
+    let ok = unsafe {
+        GetFileInformationByHandleEx(
+            handle,
+            FileIdInfo,
+            (&mut info as *mut FILE_ID_INFO).cast(),
+            std::mem::size_of::<FILE_ID_INFO>() as u32,
+        )
+    };
     if ok == 0 {
         return Err(io::Error::last_os_error());
     }
@@ -100,7 +119,9 @@ fn file_id(handle: HANDLE) -> io::Result<(u64, [u8; 16])> {
 /// The 64-bit file index is not unique on ReFS or a Dev Drive, so the
 /// 128-bit id and the volume serial are compared whole.
 fn same_file_id(file: &File, path: &Path) -> bool {
-    let Ok(locked) = file_id(handle_of(file)) else { return false };
+    let Ok(locked) = file_id(handle_of(file)) else {
+        return false;
+    };
     let wide_path = wide(path);
     // SAFETY: wide_path is NUL terminated; the handle is closed below.
     let fresh = unsafe {
@@ -127,7 +148,9 @@ fn nearest_existing(dir: &Path) -> PathBuf {
     let mut probe = dir.to_path_buf();
     while !probe.exists() {
         match probe.parent() {
-            Some(parent) if parent != probe && !parent.as_os_str().is_empty() => probe = parent.to_path_buf(),
+            Some(parent) if parent != probe && !parent.as_os_str().is_empty() => {
+                probe = parent.to_path_buf()
+            }
             _ => break,
         }
     }
@@ -187,7 +210,14 @@ impl LockDriver for LockFileExDriver {
         let mut buf = vec![0u16; 1024];
         loop {
             // SAFETY: buf is writable for its stated length.
-            let len = unsafe { GetFinalPathNameByHandleW(handle_of(file), buf.as_mut_ptr(), buf.len() as u32, VOLUME_NAME_DOS) } as usize;
+            let len = unsafe {
+                GetFinalPathNameByHandleW(
+                    handle_of(file),
+                    buf.as_mut_ptr(),
+                    buf.len() as u32,
+                    VOLUME_NAME_DOS,
+                )
+            } as usize;
             if len == 0 {
                 return Err(io::Error::last_os_error());
             }
@@ -213,9 +243,19 @@ impl LockDriver for LockFileExDriver {
         HoldersList::Unlistable("Windows has no API that lists byte-range lock holders".to_string())
     }
 
-
-    fn end_leftovers(&self, _file: &File, _child_pid: u32, _kill_wait: Duration, _since: Option<fgos_process::facts::CreationMark>, _protected_roots: &[u32]) -> Result<u32, Leftovers> {
-        Err(Leftovers { killed: 0, pids: Vec::new(), foreign: false })
+    fn end_leftovers(
+        &self,
+        _file: &File,
+        _child_pid: u32,
+        _kill_wait: Duration,
+        _since: Option<fgos_process::facts::CreationMark>,
+        _protected_roots: &[u32],
+    ) -> Result<u32, Leftovers> {
+        Err(Leftovers {
+            killed: 0,
+            pids: Vec::new(),
+            foreign: false,
+        })
     }
 
     fn unlock_private(&self, file: &File) {

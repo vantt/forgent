@@ -14,23 +14,40 @@ fn registering_the_current_session_names_it_by_its_own_handle() {
     std::fs::create_dir_all(&root).unwrap();
     machine::mint(&root, "testhost").unwrap();
     // SAFETY: this binary holds one test, so nothing else reads the environment meanwhile.
-    unsafe { std::env::set_var("CLAUDE_CODE_SESSION_ID", "0f0e0d0c-aaaa-bbbb-cccc-111122223333") };
+    unsafe {
+        std::env::set_var(
+            "CLAUDE_CODE_SESSION_ID",
+            "0f0e0d0c-aaaa-bbbb-cccc-111122223333",
+        )
+    };
     let pid = std::process::id();
 
     let own = current_session(&root, pid, None).unwrap();
-    assert!(own.info.handle.starts_with("claude-"), "{}", own.info.handle);
+    assert!(
+        own.info.handle.starts_with("claude-"),
+        "{}",
+        own.info.handle
+    );
     assert_eq!(
-        directory::resolve(&root, &own.info.handle, &judge_here, None).unwrap_err().reason,
+        directory::resolve(&root, &own.info.handle, &judge_here, None)
+            .unwrap_err()
+            .reason,
         "not-found",
         "a session is not in the directory before it registers"
     );
 
     let roles = vec!["lead:IDENT".to_string()];
-    let listed = directory::register_current(&root, pid, None, Some(root.as_path()), &roles, false).unwrap();
+    let listed =
+        directory::register_current(&root, pid, None, Some(root.as_path()), &roles, false).unwrap();
     assert_eq!(listed.handle, own.info.handle);
     assert_eq!(listed.id, own.info.id);
     assert_eq!(listed.roles, roles);
     let found = directory::resolve(&root, &own.info.handle, &judge_here, None).unwrap();
     assert_eq!(found.id, own.info.id);
-    assert_eq!(directory::resolve(&root, "lead:IDENT", &judge_here, None).unwrap().handle, own.info.handle);
+    assert_eq!(
+        directory::resolve(&root, "lead:IDENT", &judge_here, None)
+            .unwrap()
+            .handle,
+        own.info.handle
+    );
 }

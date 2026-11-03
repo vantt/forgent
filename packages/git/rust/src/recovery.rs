@@ -5,7 +5,7 @@ use crate::{
 };
 use fgos_holder_lock::{BorrowedHandle, Handle, LockScope, Wait};
 use serde::Serialize;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::collections::BTreeMap;
 
 /// Acquire only after the interrupted operation's complete resource authority.
@@ -65,8 +65,10 @@ impl GitDriver {
                 // Generic terminal outcomes do not retain the original kind.
                 _ => None,
             };
-            return Ok(json!({"repoIdentity":wal.repository_identity(),"operationId":id,"kind":compact_kind,"requestDigest":c.request,
-                "terminal":true,"compacted":true,"outcome":outcome}));
+            return Ok(
+                json!({"repoIdentity":wal.repository_identity(),"operationId":id,"kind":compact_kind,"requestDigest":c.request,
+                "terminal":true,"compacted":true,"outcome":outcome}),
+            );
         }
         let c = match wal.inspect(id) {
             Ok(c) => c,
@@ -167,7 +169,9 @@ impl GitDriver {
             return Err(failure("scoped-commit-checkout-gone"));
         }
         match self.resolve_repo(path, repo.trusted_main_root())? {
-            ResolveRepo::Repository(checkout) if checkout.common_dir() == repo.common_dir() => Ok(checkout),
+            ResolveRepo::Repository(checkout) if checkout.common_dir() == repo.common_dir() => {
+                Ok(checkout)
+            }
             _ => Err(failure("untrusted-worktree")),
         }
     }
@@ -195,7 +199,8 @@ impl GitDriver {
                 if let Some(own) = &custody {
                     held.push(BorrowedHandle::new(own).map_err(|e| failure(format!("{e:?}")))?);
                 }
-                let outcome = self.recover_scoped_commit(&checkout, held, writer, id, &wal::OsFileSystem);
+                let outcome =
+                    self.recover_scoped_commit(&checkout, held, writer, id, &wal::OsFileSystem);
                 if let Some(own) = custody {
                     let _ = fgos_holder_lock::release(own);
                 }
@@ -210,14 +215,16 @@ impl GitDriver {
                 self.inspect_operation(repo, id)
             }
             OperationKind::ConfigChange(change) => {
-                if !held.is_empty() { return Err(failure("config-recovery-caller-loans-refused")); }
+                if !held.is_empty() {
+                    return Err(failure("config-recovery-caller-loans-refused"));
+                }
                 // repo-config is already rank 80 and is the resource authority
                 // for both writers and recoverers. Do not acquire a peer leaf.
                 match self.recover_config_change(repo, id, change) {
                     Ok(()) => self.inspect_operation(repo, id),
                     Err(e) => Err(e),
                 }
-            },
+            }
             OperationKind::RefUpdate { .. } | OperationKind::RefDelete => {
                 value(self.recover_ref_operation(repo, held, writer, id)?)
             }
@@ -237,7 +244,10 @@ impl GitDriver {
 /// never waited for, so a checkout a live writer holds is named busy and kept.
 /// None for the main checkout, whose `main-checkout` lock the recovery takes
 /// itself, and none when the caller lends its own locks.
-fn scoped_commit_custody(checkout: &RepoHandle, held: &[BorrowedHandle<'_>]) -> Result<Option<Handle>> {
+fn scoped_commit_custody(
+    checkout: &RepoHandle,
+    held: &[BorrowedHandle<'_>],
+) -> Result<Option<Handle>> {
     let root = crate::scoped_commit::root(checkout)?;
     if root == checkout.trusted_main_root() || !held.is_empty() {
         return Ok(None);
@@ -245,7 +255,10 @@ fn scoped_commit_custody(checkout: &RepoHandle, held: &[BorrowedHandle<'_>]) -> 
     #[cfg(unix)]
     {
         use fgos_holder_lock::{acquire, Acquire, Mode, Resource, DEFAULT_KILL_WAIT_MS};
-        let resource = Resource::new("dispatch-cwd", crate::refs::custody_lock_path(checkout, root)?);
+        let resource = Resource::new(
+            "dispatch-cwd",
+            crate::refs::custody_lock_path(checkout, root)?,
+        );
         match acquire(&resource, Mode::Ex, Wait::Try, DEFAULT_KILL_WAIT_MS) {
             Acquire::Acquired(handle) => Ok(Some(handle)),
             Acquire::Held { .. } => Err(failure("checkout-custody-busy")),

@@ -427,7 +427,9 @@ pub fn open_no_reparse(options: &mut OpenOptions, path: &Path) -> io::Result<fs:
     use windows_sys::Win32::Storage::FileSystem::{
         FILE_ATTRIBUTE_REPARSE_POINT, FILE_FLAG_OPEN_REPARSE_POINT,
     };
-    let file = options.custom_flags(FILE_FLAG_OPEN_REPARSE_POINT).open(path)?;
+    let file = options
+        .custom_flags(FILE_FLAG_OPEN_REPARSE_POINT)
+        .open(path)?;
     let metadata = file.metadata()?;
     if metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0 || !metadata.is_file() {
         return Err(io::Error::new(

@@ -8,14 +8,14 @@ use fgos_holder_lock::origin::{self, Holder};
 use fgos_holder_lock::{state_root, HelperExe, HoldersList, Probe, Resource, UnavailableReason};
 #[cfg(unix)]
 use fgos_holder_lock::{HeldReason, Mode, NodeLock, Release, Wait};
+use napi::{bindgen_prelude::External, Error, Result};
 #[cfg(unix)]
 use napi::{Env, JsObject};
-use napi::{bindgen_prelude::External, Error, Result};
 use napi_derive::napi;
 use serde_json::{json, Value};
-use std::{cell::Cell, path::Path};
 #[cfg(unix)]
 use std::sync::Mutex;
+use std::{cell::Cell, path::Path};
 
 thread_local! { static TAKEN: Cell<bool> = const { Cell::new(false) }; }
 pub struct Registration;
@@ -55,7 +55,12 @@ fn mode_of(mode: &str) -> Result<Mode> {
 fn wait_of(wait: &Value) -> Result<Wait> {
     match wait.get("kind").and_then(Value::as_str) {
         Some("try") => Ok(Wait::Try),
-        Some("ms") => wait.get("ms").and_then(Value::as_u64).filter(|ms| *ms >= 1).map(Wait::Ms).ok_or_else(|| failed("holder-lock-wait-invalid: ms must be an integer >= 1")),
+        Some("ms") => wait
+            .get("ms")
+            .and_then(Value::as_u64)
+            .filter(|ms| *ms >= 1)
+            .map(Wait::Ms)
+            .ok_or_else(|| failed("holder-lock-wait-invalid: ms must be an integer >= 1")),
         _ => Err(failed("holder-lock-wait-invalid: kind must be try or ms")),
     }
 }
@@ -64,15 +69,27 @@ fn wait_of(wait: &Value) -> Result<Wait> {
 /// Only where a description can be shared: Windows keeps its lock in the `lock-hold` helper.
 #[cfg(unix)]
 #[napi(namespace = "holderLock", js_name = "lockFd")]
-pub fn lock_fd(env: Env, _capability: External<Registration>, fd: i32, mode: String, wait: Value, kill_wait_ms: u32, predecessor_kinds: Vec<String>) -> Result<JsObject> {
+pub fn lock_fd(
+    env: Env,
+    _capability: External<Registration>,
+    fd: i32,
+    mode: String,
+    wait: Value,
+    kill_wait_ms: u32,
+    predecessor_kinds: Vec<String>,
+) -> Result<JsObject> {
     door()?;
     use fgos_holder_lock::LockFd;
     let (mode, wait) = (mode_of(&mode)?, wait_of(&wait)?);
     // SAFETY: the facade owns `fd` and does not close it during this synchronous call.
-    let (lock, answer) = match unsafe { fgos_holder_lock::lock_fd(fd, mode, wait, u64::from(kill_wait_ms), &predecessor_kinds) } {
+    let (lock, answer) = match unsafe {
+        fgos_holder_lock::lock_fd(fd, mode, wait, u64::from(kill_wait_ms), &predecessor_kinds)
+    } {
         LockFd::Acquired(lock) => (Some(lock), json!({ "result": "acquired" })),
         LockFd::Held { reason, domain } => (None, held_json(reason, domain)),
-        LockFd::Timeout { waited_ms } => (None, json!({ "result": "timeout", "waitedMs": waited_ms })),
+        LockFd::Timeout { waited_ms } => {
+            (None, json!({ "result": "timeout", "waitedMs": waited_ms }))
+        }
         LockFd::Unavailable { reason, detail } => (None, unavailable_json(reason, &detail)),
     };
     let mut object = env.to_js_value(&answer)?.coerce_to_object()?;
@@ -99,11 +116,17 @@ fn unavailable_json(reason: UnavailableReason, detail: &str) -> Value {
 #[napi(namespace = "holderLock")]
 pub fn probe(path: String) -> Result<Value> {
     door()?;
-    let stem = Path::new(&path).file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default();
+    let stem = Path::new(&path)
+        .file_stem()
+        .map(|s| s.to_string_lossy().into_owned())
+        .unwrap_or_default();
     match fgos_holder_lock::probe(&Resource::new(stem, &path)) {
         Ok(Probe::Free) => Ok(json!({ "result": "free" })),
         Ok(Probe::Held) => Ok(json!({ "result": "held", "reason": "kernel-lock-held" })),
-        Err(err) if err.kind() == std::io::ErrorKind::Unsupported => Ok(unavailable_json(UnavailableReason::UnsupportedPlatform, &err.to_string())),
+        Err(err) if err.kind() == std::io::ErrorKind::Unsupported => Ok(unavailable_json(
+            UnavailableReason::UnsupportedPlatform,
+            &err.to_string(),
+        )),
         Err(err) => Err(failed(format!("holder-lock-io: probe {path}: {err}"))),
     }
 }
@@ -118,28 +141,49 @@ pub fn guarantee(dir: String) -> Result<Value> {
 #[cfg(unix)]
 fn open_lock<R>(lock: &External<LockExternal>, call: impl FnOnce(&mut NodeLock) -> R) -> Result<R> {
     let mut guard = lock.0.lock().map_err(failed)?;
-    Ok(call(guard.as_mut().ok_or_else(|| failed("holder-lock-closed"))?))
+    Ok(call(
+        guard.as_mut().ok_or_else(|| failed("holder-lock-closed"))?,
+    ))
 }
 
 /// End what still holds the lock's description after the borrowing child `child_pid` exited.
 #[cfg(target_os = "linux")]
 #[napi(namespace = "holderLock", js_name = "drainChild")]
-pub fn drain_child(_capability: External<Registration>, lock: External<LockExternal>, child_pid: u32, protected_roots: Vec<u32>) -> Result<Value> {
+pub fn drain_child(
+    _capability: External<Registration>,
+    lock: External<LockExternal>,
+    child_pid: u32,
+    protected_roots: Vec<u32>,
+) -> Result<Value> {
     door()?;
-    open_lock(&lock, |lock| match fgos_holder_lock::drain_borrowed_description(lock, child_pid, &protected_roots) {
-        Ok(killed) => json!({ "result": "drained", "leftoversKilled": killed, "remaining": [] }),
-        Err(left) => json!({ "result": "not-drained", "leftoversKilled": left.killed, "remaining": left.pids }),
-    })
+    open_lock(
+        &lock,
+        |lock| match fgos_holder_lock::drain_borrowed_description(lock, child_pid, &protected_roots)
+        {
+            Ok(killed) => {
+                json!({ "result": "drained", "leftoversKilled": killed, "remaining": [] })
+            }
+            Err(left) => {
+                json!({ "result": "not-drained", "leftoversKilled": left.killed, "remaining": left.pids })
+            }
+        },
+    )
 }
 
 /// Record a completed handoff under the held exclusive description.
 #[cfg(unix)]
 #[napi(namespace = "holderLock", js_name = "clearDomain")]
-pub fn clear_domain(_capability: External<Registration>, lock: External<LockExternal>, path: String) -> Result<Value> {
+pub fn clear_domain(
+    _capability: External<Registration>,
+    lock: External<LockExternal>,
+    path: String,
+) -> Result<Value> {
     door()?;
     open_lock(&lock, |lock| match lock.clear_domain(Path::new(&path)) {
         Ok(()) => json!({ "result": "cleared" }),
-        Err(err) if err.kind() == std::io::ErrorKind::InvalidInput => json!({ "result": "lock-handle-invalid", "detail": err.to_string() }),
+        Err(err) if err.kind() == std::io::ErrorKind::InvalidInput => {
+            json!({ "result": "lock-handle-invalid", "detail": err.to_string() })
+        }
         Err(err) => json!({ "result": "lock-domain-not-empty", "detail": err.to_string() }),
     })
 }
@@ -147,20 +191,32 @@ pub fn clear_domain(_capability: External<Registration>, lock: External<LockExte
 /// Settle a lock whose own descriptor the caller already closed: end escaped copies and prove the lock gone.
 #[cfg(unix)]
 #[napi(namespace = "holderLock", js_name = "releaseFd")]
-pub fn release_fd(_capability: External<Registration>, lock: External<LockExternal>) -> Result<Value> {
+pub fn release_fd(
+    _capability: External<Registration>,
+    lock: External<LockExternal>,
+) -> Result<Value> {
     door()?;
     let taken = lock.0.lock().map_err(failed)?.take();
-    let Some(mut taken) = taken else { return Ok(json!({ "settled": "closed", "killed": 0, "pids": [] })) };
+    let Some(mut taken) = taken else {
+        return Ok(json!({ "settled": "closed", "killed": 0, "pids": [] }));
+    };
     Ok(match fgos_holder_lock::release_description(&mut taken) {
-        Release::Released { killed } => json!({ "settled": "released", "killed": killed, "pids": [] }),
-        Release::Stuck { killed, pids } => json!({ "settled": "stuck", "killed": killed, "pids": pids }),
+        Release::Released { killed } => {
+            json!({ "settled": "released", "killed": killed, "pids": [] })
+        }
+        Release::Stuck { killed, pids } => {
+            json!({ "settled": "stuck", "killed": killed, "pids": pids })
+        }
     })
 }
 
 /// Drop the duplicate of a description that lives on in a process it was handed to.
 #[cfg(unix)]
 #[napi(namespace = "holderLock", js_name = "closeHandedOver")]
-pub fn close_handed_over(_capability: External<Registration>, lock: External<LockExternal>) -> Result<()> {
+pub fn close_handed_over(
+    _capability: External<Registration>,
+    lock: External<LockExternal>,
+) -> Result<()> {
     drop(lock.0.lock().map_err(failed)?.take());
     Ok(())
 }
@@ -169,8 +225,11 @@ pub fn close_handed_over(_capability: External<Registration>, lock: External<Loc
 #[napi(namespace = "holderLock", js_name = "stateRoot")]
 pub fn state_root_of(env: Value) -> Result<Value> {
     door()?;
-    let (root, source) = state_root::state_root_from(|key| env.get(key).and_then(Value::as_str).map(String::from));
-    Ok(json!({ "stateRoot": root.to_string_lossy(), "lockRoot": root.join("locks").to_string_lossy(), "source": source.as_str() }))
+    let (root, source) =
+        state_root::state_root_from(|key| env.get(key).and_then(Value::as_str).map(String::from));
+    Ok(
+        json!({ "stateRoot": root.to_string_lossy(), "lockRoot": root.join("locks").to_string_lossy(), "source": source.as_str() }),
+    )
 }
 
 fn holder_json(holder: &Holder) -> Value {
@@ -185,14 +244,20 @@ fn holder_json(holder: &Holder) -> Value {
 #[napi(namespace = "holderLock")]
 pub fn holders(path: String, lock_name: String) -> Result<Value> {
     door()?;
-    Ok(match fgos_holder_lock::holders(&Resource::new(&lock_name, &path)) {
-        Ok(HoldersList::List(tuples)) => {
-            let holders = origin::describe(tuples, &lock_name, &state_root::state_root().0);
-            json!({ "kind": "list", "holders": holders.iter().map(holder_json).collect::<Vec<_>>() })
-        }
-        Ok(HoldersList::Unlistable(reason)) => json!({ "kind": "unlistable", "reason": reason }),
-        Err(err) => json!({ "kind": "unlistable", "reason": format!("cannot open {path}: {err}") }),
-    })
+    Ok(
+        match fgos_holder_lock::holders(&Resource::new(&lock_name, &path)) {
+            Ok(HoldersList::List(tuples)) => {
+                let holders = origin::describe(tuples, &lock_name, &state_root::state_root().0);
+                json!({ "kind": "list", "holders": holders.iter().map(holder_json).collect::<Vec<_>>() })
+            }
+            Ok(HoldersList::Unlistable(reason)) => {
+                json!({ "kind": "unlistable", "reason": reason })
+            }
+            Err(err) => {
+                json!({ "kind": "unlistable", "reason": format!("cannot open {path}: {err}") })
+            }
+        },
+    )
 }
 
 /// One reading of the predecessor record next to `lock_file`; never kills, never edits.
@@ -208,5 +273,9 @@ pub fn predecessor_state(lock_file: String) -> Result<Value> {
 #[napi(namespace = "holderLock", js_name = "twoProcessProbe")]
 pub fn two_process_probe(dir: String, helper_exe: Option<String>) -> Result<f64> {
     door()?;
-    fgos_holder_lock::semantics::two_process_probe(Path::new(&dir), &HelperExe(helper_exe.unwrap_or_default().into())).map_err(failed)
+    fgos_holder_lock::semantics::two_process_probe(
+        Path::new(&dir),
+        &HelperExe(helper_exe.unwrap_or_default().into()),
+    )
+    .map_err(failed)
 }

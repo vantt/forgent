@@ -1,11 +1,11 @@
 //! Mechanical recovery transport; dispatch and authority live in Rust.
 use super::{
-    handover::{Loan, consume},
+    handover::{consume, Loan},
     operation, text,
 };
 use crate::{check, error};
 use fgos_git::*;
-use napi::{Result, bindgen_prelude::External};
+use napi::{bindgen_prelude::External, Result};
 use napi_derive::napi;
 use serde_json::Value;
 use std::path::Path;

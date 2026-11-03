@@ -12,8 +12,9 @@ use std::time::{Duration, Instant};
 
 use windows_sys::Win32::Foundation::CloseHandle;
 use windows_sys::Win32::System::JobObjects::{
-    JobObjectExtendedLimitInformation, OpenJobObjectW, QueryInformationJobObject, JOBOBJECT_EXTENDED_LIMIT_INFORMATION,
-    JOB_OBJECT_LIMIT_BREAKAWAY_OK, JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE, JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK,
+    JobObjectExtendedLimitInformation, OpenJobObjectW, QueryInformationJobObject,
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION, JOB_OBJECT_LIMIT_BREAKAWAY_OK,
+    JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE, JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK,
 };
 
 use common::{scratch, wait_for, win_spec};
@@ -36,7 +37,10 @@ fn live(pid: u32) -> bool {
 fn wait_dead(pid: u32, what: &str) {
     let start = Instant::now();
     while live(pid) {
-        assert!(start.elapsed() < Duration::from_secs(20), "{what} (pid {pid}) is still alive");
+        assert!(
+            start.elapsed() < Duration::from_secs(20),
+            "{what} (pid {pid}) is still alive"
+        );
         sleep(Duration::from_millis(50));
     }
 }
@@ -71,10 +75,15 @@ fn containment_windows_job_close_ends_child_grandchild_and_detached_child() {
     let dir = scratch("close");
     let driver = WindowsJobDriver;
     let mut domain = driver.create("attempt-close").unwrap();
-    let spawned = driver.spawn_in(&mut domain, win_spec("tree", &dir, &[])).unwrap();
+    let spawned = driver
+        .spawn_in(&mut domain, win_spec("tree", &dir, &[]))
+        .unwrap();
     let record = domain.domain().unwrap().clone();
     assert!(matches!(record, Domain::WindowsJob(_)));
-    let pids: Vec<(&str, u32)> = ["child", "detached", "nest", "grandchild"].iter().map(|name| (*name, pid_file(&dir, &format!("{name}.pid")))).collect();
+    let pids: Vec<(&str, u32)> = ["child", "detached", "nest", "grandchild"]
+        .iter()
+        .map(|name| (*name, pid_file(&dir, &format!("{name}.pid"))))
+        .collect();
     for (name, pid) in &pids {
         assert!(live(*pid), "{name} should be running");
     }
@@ -92,7 +101,10 @@ fn containment_windows_job_close_ends_child_grandchild_and_detached_child() {
     let mut watch = domain_watch(&record);
     let start = Instant::now();
     while watch.is_empty() != DomainState::Empty {
-        assert!(start.elapsed() < Duration::from_secs(20), "a closed job's record never judged empty");
+        assert!(
+            start.elapsed() < Duration::from_secs(20),
+            "a closed job's record never judged empty"
+        );
         sleep(Duration::from_millis(50));
     }
 }
@@ -102,12 +114,22 @@ fn containment_windows_job_refuses_breakaway() {
     let dir = scratch("breakaway");
     let driver = WindowsJobDriver;
     let mut domain = driver.create("attempt-breakaway").unwrap();
-    let _spawned = driver.spawn_in(&mut domain, win_spec("breakaway", &dir, &[])).unwrap();
+    let _spawned = driver
+        .spawn_in(&mut domain, win_spec("breakaway", &dir, &[]))
+        .unwrap();
     assert_eq!(wait_for(&dir.join("breakaway.txt")).trim(), "denied");
     // The runner's own job may also deny breakaway: read the flags of this job itself.
     let flags = limit_flags(WindowsJobDriver::job_name(&domain).unwrap());
-    assert_ne!(flags & JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE, 0, "kill on close is set");
-    assert_eq!(flags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK | JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK), 0, "no breakaway flag is set");
+    assert_ne!(
+        flags & JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+        0,
+        "kill on close is set"
+    );
+    assert_eq!(
+        flags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK | JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK),
+        0,
+        "no breakaway flag is set"
+    );
     assert_eq!(driver.guarantee().level, GuaranteeLevel::Kernel);
     driver.kill_all(&mut domain, 0);
 }
@@ -115,7 +137,11 @@ fn containment_windows_job_refuses_breakaway() {
 #[test]
 fn containment_windows_job_outlives_its_supervisor_while_the_gate_holds_a_handle() {
     let dir = scratch("supervisor");
-    let mut supervisor = common::helper_command().env("FGOS_TEST_ROLE", "supervisor").env("FGOS_TEST_DIR", &dir).spawn().unwrap();
+    let mut supervisor = common::helper_command()
+        .env("FGOS_TEST_ROLE", "supervisor")
+        .env("FGOS_TEST_DIR", &dir)
+        .spawn()
+        .unwrap();
     let agent = pid_file(&dir, "agent.pid");
     let gate = pid_file(&dir, "gate.pid");
     pid_file(&dir, "supervisor.pid");
@@ -124,7 +150,10 @@ fn containment_windows_job_outlives_its_supervisor_while_the_gate_holds_a_handle
     let _ = supervisor.wait();
     sleep(Duration::from_secs(2));
     assert!(live(gate), "the gate holds the job open");
-    assert!(live(agent), "the agent lives while one handle on the job is open");
+    assert!(
+        live(agent),
+        "the agent lives while one handle on the job is open"
+    );
 
     // Both holders gone: the job closes and ends the agent.
     let tuple = facts::identity_of(ProcId(gate)).expect("gate identity");

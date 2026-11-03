@@ -53,7 +53,9 @@ fn fs_kind(stat: &libc::statfs) -> FsKind {
 #[cfg(target_os = "macos")]
 fn fs_kind(stat: &libc::statfs) -> FsKind {
     // SAFETY: f_fstypename is a NUL-terminated C string inside the struct.
-    let name = unsafe { std::ffi::CStr::from_ptr(stat.f_fstypename.as_ptr()) }.to_string_lossy().into_owned();
+    let name = unsafe { std::ffi::CStr::from_ptr(stat.f_fstypename.as_ptr()) }
+        .to_string_lossy()
+        .into_owned();
     match name.as_str() {
         "nfs" | "smbfs" | "afpfs" | "webdav" | "cifs" => FsKind::Network(name),
         _ => FsKind::Local,
@@ -67,7 +69,8 @@ fn fs_kind(_stat: &libc::statfs) -> FsKind {
 
 fn statfs_path(path: &Path) -> io::Result<libc::statfs> {
     use std::os::unix::ffi::OsStrExt;
-    let c = CString::new(path.as_os_str().as_bytes()).map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "path holds a NUL byte"))?;
+    let c = CString::new(path.as_os_str().as_bytes())
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "path holds a NUL byte"))?;
     // SAFETY: statfs fills a zeroed struct from a valid C path.
     let mut out: libc::statfs = unsafe { std::mem::zeroed() };
     if unsafe { libc::statfs(c.as_ptr(), &mut out) } != 0 {
@@ -147,7 +150,9 @@ impl LockDriver for FlockDriver {
             let err = io::Error::last_os_error();
             match err.raw_os_error() {
                 Some(libc::EINTR) => continue,
-                Some(code) if code == libc::EWOULDBLOCK || code == libc::EAGAIN => return Ok(TryLock::WouldBlock),
+                Some(code) if code == libc::EWOULDBLOCK || code == libc::EAGAIN => {
+                    return Ok(TryLock::WouldBlock)
+                }
                 _ => return Err(err),
             }
         }
@@ -189,7 +194,10 @@ impl LockDriver for FlockDriver {
         #[cfg(not(any(target_os = "linux", target_os = "macos")))]
         {
             let _ = file;
-            Err(io::Error::new(io::ErrorKind::Unsupported, "description path is not readable on this platform"))
+            Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "description path is not readable on this platform",
+            ))
         }
     }
 
@@ -197,7 +205,9 @@ impl LockDriver for FlockDriver {
         match fgos_process::facts::file_key(file) {
             Ok((dev, ino)) => match fgos_process::facts::lock_holders(dev, ino) {
                 fgos_process::facts::Holders::List(list) => HoldersList::List(list),
-                fgos_process::facts::Holders::Unlistable => HoldersList::Unlistable(format!("holders are not listable on {PLATFORM}")),
+                fgos_process::facts::Holders::Unlistable => {
+                    HoldersList::Unlistable(format!("holders are not listable on {PLATFORM}"))
+                }
             },
             Err(err) => HoldersList::Unlistable(format!("lock file key unreadable: {err}")),
         }
@@ -224,7 +234,14 @@ impl LockDriver for FlockDriver {
         request.lead = fgos_process::mapped::MappedLead::Group;
     }
 
-    fn end_leftovers(&self, file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>, protected_roots: &[u32]) -> Result<u32, Leftovers> {
+    fn end_leftovers(
+        &self,
+        file: &File,
+        child_pid: u32,
+        kill_wait: Duration,
+        since: Option<CreationMark>,
+        protected_roots: &[u32],
+    ) -> Result<u32, Leftovers> {
         #[cfg(target_os = "linux")]
         {
             end_listed_holders(file, child_pid, kill_wait, since, protected_roots)
@@ -240,14 +257,39 @@ impl LockDriver for FlockDriver {
 /// Linux: only the borrow group and descendants may be killed. Foreign
 /// direct pre-exec children of the owner are waited; escaped holders are killed.
 #[cfg(target_os = "linux")]
-fn end_listed_holders(file: &File, child_pid: u32, kill_wait: Duration, since: Option<CreationMark>, protected_roots: &[u32]) -> Result<u32, Leftovers> {
-    drain_description(file, Some(child_pid), std::process::id(), kill_wait, Reach::of(since)?, protected_roots)
+fn end_listed_holders(
+    file: &File,
+    child_pid: u32,
+    kill_wait: Duration,
+    since: Option<CreationMark>,
+    protected_roots: &[u32],
+) -> Result<u32, Leftovers> {
+    drain_description(
+        file,
+        Some(child_pid),
+        std::process::id(),
+        kill_wait,
+        Reach::of(since)?,
+        protected_roots,
+    )
 }
 
 /// Non-spawning admission: no borrowing domain means nobody may be killed.
 #[cfg(target_os = "linux")]
-pub(crate) fn wait_unborrowed(file: &File, kill_wait: Duration, since: Option<CreationMark>) -> Result<(), Leftovers> {
-    drain_description(file, None, std::process::id(), kill_wait, Reach::of(since)?, &[]).map(|_| ())
+pub(crate) fn wait_unborrowed(
+    file: &File,
+    kill_wait: Duration,
+    since: Option<CreationMark>,
+) -> Result<(), Leftovers> {
+    drain_description(
+        file,
+        None,
+        std::process::id(),
+        kill_wait,
+        Reach::of(since)?,
+        &[],
+    )
+    .map(|_| ())
 }
 
 /// Which processes a drain reads descriptor tables of.
@@ -269,7 +311,11 @@ impl Reach {
     fn of(since: Option<CreationMark>) -> Result<Self, Leftovers> {
         // Missing reach facts refuse instead of reintroducing a host scan
         // on admission or every borrow. Release still settles the description.
-        since.map(Reach::Since).ok_or(Leftovers { killed: 0, pids: Vec::new(), foreign: false })
+        since.map(Reach::Since).ok_or(Leftovers {
+            killed: 0,
+            pids: Vec::new(),
+            foreign: false,
+        })
     }
 }
 
@@ -283,7 +329,12 @@ impl Tree {
         fgos_process::facts::relations().map(Self::of)
     }
     fn of(relations: Vec<fgos_process::facts::Relation>) -> Self {
-        Self(relations.into_iter().map(|r| (r.pid.0, (r.parent, r.group, r.start_ticks))).collect())
+        Self(
+            relations
+                .into_iter()
+                .map(|r| (r.pid.0, (r.parent, r.group, r.start_ticks)))
+                .collect(),
+        )
     }
     /// Parent and group, from the pass or (for a pid it did not see) read now.
     fn parent_and_group(&self, pid: u32) -> Option<(u32, u32)> {
@@ -308,25 +359,36 @@ struct Cleanup {
 #[cfg(target_os = "linux")]
 impl Cleanup {
     fn signal(&mut self, pid: u32) -> bool {
-        let Some(tuple) = fgos_process::facts::identity_of(fgos_process::ProcId(pid)) else { return false; };
+        let Some(tuple) = fgos_process::facts::identity_of(fgos_process::ProcId(pid)) else {
+            return false;
+        };
         self.signal_identity(&tuple);
         true
     }
 
     fn signal_identity(&mut self, tuple: &fgos_process::facts::ProcTuple) {
         use fgos_process::control::{signal_by_identity, Signal, SignalOutcome};
-        if self.signaled.insert((tuple.pid.0, tuple.start_time.clone()))
+        if self
+            .signaled
+            .insert((tuple.pid.0, tuple.start_time.clone()))
             && signal_by_identity(tuple, Signal::Kill) == SignalOutcome::Sent
-        { self.killed += 1; }
+        {
+            self.killed += 1;
+        }
     }
 }
 
 #[cfg(target_os = "linux")]
-fn cleanup_loop(kill_wait: Duration, mut pass: impl FnMut(&mut Cleanup, Instant) -> Result<bool, Leftovers>) -> Result<u32, Leftovers> {
+fn cleanup_loop(
+    kill_wait: Duration,
+    mut pass: impl FnMut(&mut Cleanup, Instant) -> Result<bool, Leftovers>,
+) -> Result<u32, Leftovers> {
     let deadline = Instant::now() + kill_wait;
     let mut cleanup = Cleanup::default();
     loop {
-        if pass(&mut cleanup, deadline)? { return Ok(cleanup.killed); }
+        if pass(&mut cleanup, deadline)? {
+            return Ok(cleanup.killed);
+        }
         std::thread::sleep(Duration::from_millis(1));
     }
 }
@@ -337,36 +399,59 @@ fn cleanup_loop(kill_wait: Duration, mut pass: impl FnMut(&mut Cleanup, Instant)
 #[cfg(target_os = "linux")]
 fn has_borrowed_copy(dev: u64, ino: u64, pid: u32) -> bool {
     use fgos_process::{facts::locked_fds, ProcId};
-    locked_fds(dev, ino, Some(&[ProcId(pid)])).is_ok_and(|fds| fds.iter().any(|fd| {
-        if fd.lock.kind != "FLOCK" { return false; }
-        let Ok(info) = std::fs::read_to_string(format!("/proc/{pid}/fdinfo/{}", fd.fd.0)) else { return false; };
-        info.lines().find_map(|line| line.strip_prefix("flags:")
-            .and_then(|flags| u32::from_str_radix(flags.trim(), 8).ok()))
-            .is_some_and(|flags| flags & libc::O_CLOEXEC as u32 == 0)
-    }))
+    locked_fds(dev, ino, Some(&[ProcId(pid)])).is_ok_and(|fds| {
+        fds.iter().any(|fd| {
+            if fd.lock.kind != "FLOCK" {
+                return false;
+            }
+            let Ok(info) = std::fs::read_to_string(format!("/proc/{pid}/fdinfo/{}", fd.fd.0))
+            else {
+                return false;
+            };
+            info.lines()
+                .find_map(|line| {
+                    line.strip_prefix("flags:")
+                        .and_then(|flags| u32::from_str_radix(flags.trim(), 8).ok())
+                })
+                .is_some_and(|flags| flags & libc::O_CLOEXEC as u32 == 0)
+        })
+    })
 }
 
 /// Close first; the kernel's locker stamp distinguishes our escaped copies
 /// from a later acquirer's fresh description, without taking a probe lock.
 #[cfg(target_os = "linux")]
 pub(crate) fn settle_release(file: File, kill_wait: Duration) -> crate::port::Release {
-    use fgos_process::facts::{file_key, locked_fds, own_lock_token, proc_self_pid};
     use crate::port::Release;
+    use fgos_process::facts::{file_key, locked_fds, own_lock_token, proc_self_pid};
     let key = file_key(&file);
     let token = own_lock_token(&file);
     let me = proc_self_pid().map(|pid| pid.0);
     // open(/proc/self/fd/N), unlike dup(N), creates an independent description.
     // Keep it unlocked until after close. This pins even an unlinked inode so
     // a replaced resource path cannot redirect the shared probe elsewhere.
-    let mut probe = File::open(format!("/proc/self/fd/{}", file.as_raw_fd())).and_then(|probe| {
-        if key.as_ref().is_ok_and(|key| file_key(&probe).is_ok_and(|actual| actual == *key)) {
-            Ok(probe)
-        } else { Err(io::Error::other("release probe inode mismatch")) }
-    }).ok();
+    let mut probe = File::open(format!("/proc/self/fd/{}", file.as_raw_fd()))
+        .and_then(|probe| {
+            if key
+                .as_ref()
+                .is_ok_and(|key| file_key(&probe).is_ok_and(|actual| actual == *key))
+            {
+                Ok(probe)
+            } else {
+                Err(io::Error::other("release probe inode mismatch"))
+            }
+        })
+        .ok();
     drop(file);
     let result = cleanup_loop(kill_wait, |cleanup, deadline| {
-        let stuck = |pids| Leftovers { killed: cleanup.killed, pids, foreign: false };
-        let (Ok((dev, ino)), Ok(me)) = (&key, &me) else { return Err(stuck(Vec::new())); };
+        let stuck = |pids| Leftovers {
+            killed: cleanup.killed,
+            pids,
+            foreign: false,
+        };
+        let (Ok((dev, ino)), Ok(me)) = (&key, &me) else {
+            return Err(stuck(Vec::new()));
+        };
         // A granted Sh probe on the independent description proves the old Ex
         // description gone (Ex and Sh from different descriptions conflict), so
         // the cold lock-table read is needed only once the probe is refused.
@@ -380,22 +465,37 @@ pub(crate) fn settle_release(file: File, kill_wait: Duration) -> crate::port::Re
                 return Ok(true);
             }
         }
-        let mine = locked_fds(*dev, *ino, Some(&[fgos_process::ProcId(*me)])).map_err(|_| stuck(Vec::new()))?;
+        let mine = locked_fds(*dev, *ino, Some(&[fgos_process::ProcId(*me)]))
+            .map_err(|_| stuck(Vec::new()))?;
         // Any live own lock on this inode proves the old EX description gone.
         // Return before the scan: kcmp need not be available to spare its copies.
-        if mine.iter().any(|fd| fd.lock.kind == "FLOCK") { return Ok(true); }
+        if mine.iter().any(|fd| fd.lock.kind == "FLOCK") {
+            return Ok(true);
+        }
         let holders = locked_fds(*dev, *ino, None).map_err(|_| stuck(Vec::new()))?;
         let mut candidates = HashMap::new();
         for holder in holders {
             // Positive proof of a later acquirer, including when its record
             // fell outside the lock-table prefix: EX exclusivity proves our
             // old description gone. Never signal that acquirer.
-            if holder.lock.kind == "FLOCK" && holder.lock.pid != i64::from(*me)
-                && token.as_ref().is_ok_and(|token| holder.lock.token == *token)
-            { return Ok(true); }
-            if holder.pid.0 == *me || holder.lock.kind != "FLOCK" || holder.lock.pid != i64::from(*me) { continue; }
+            if holder.lock.kind == "FLOCK"
+                && holder.lock.pid != i64::from(*me)
+                && token
+                    .as_ref()
+                    .is_ok_and(|token| holder.lock.token == *token)
+            {
+                return Ok(true);
+            }
+            if holder.pid.0 == *me
+                || holder.lock.kind != "FLOCK"
+                || holder.lock.pid != i64::from(*me)
+            {
+                continue;
+            }
             if let Ok(token) = &token {
-                if holder.lock.token != *token { continue; }
+                if holder.lock.token != *token {
+                    continue;
+                }
             }
             candidates.insert(holder.pid.0, holder.identity);
         }
@@ -407,22 +507,35 @@ pub(crate) fn settle_release(file: File, kill_wait: Duration) -> crate::port::Re
         for &pid in &pids {
             // A same-process reacquirer can appear during the full scan.
             // Its EX lock proves our old description gone; spare its copies.
-            if locked_fds(*dev, *ino, Some(&[fgos_process::ProcId(*me)])).is_ok_and(|mine| mine.iter().any(|fd| fd.lock.kind == "FLOCK")) {
+            if locked_fds(*dev, *ino, Some(&[fgos_process::ProcId(*me)]))
+                .is_ok_and(|mine| mine.iter().any(|fd| fd.lock.kind == "FLOCK"))
+            {
                 return Ok(true);
             }
             // Unknown parent/flags are not authority to kill. Adopted
             // borrowers are direct children too; their explicit mapping lacks
             // CLOEXEC, unlike unrelated pre-exec copies.
-            if parent_and_group(pid).is_some_and(|(parent, _)| parent != *me || has_borrowed_copy(*dev, *ino, pid)) {
+            if parent_and_group(pid)
+                .is_some_and(|(parent, _)| parent != *me || has_borrowed_copy(*dev, *ino, pid))
+            {
                 cleanup.signal_identity(&candidates[&pid]);
             }
         }
-        if Instant::now() >= deadline { return Err(Leftovers { killed: cleanup.killed, pids, foreign: false }); }
+        if Instant::now() >= deadline {
+            return Err(Leftovers {
+                killed: cleanup.killed,
+                pids,
+                foreign: false,
+            });
+        }
         Ok(false)
     });
     match result {
         Ok(killed) => Release::Released { killed },
-        Err(left) => Release::Stuck { killed: left.killed, pids: left.pids },
+        Err(left) => Release::Stuck {
+            killed: left.killed,
+            pids: left.pids,
+        },
     }
 }
 
@@ -498,7 +611,12 @@ pub(crate) fn drain_description(
         let mut domain = Vec::new();
         if let Some(root) = child_pid {
             match &tree {
-                Some(tree) => domain.extend(tree.0.keys().copied().filter(|pid| tree.in_borrow_domain(*pid, root))),
+                Some(tree) => domain.extend(
+                    tree.0
+                        .keys()
+                        .copied()
+                        .filter(|pid| tree.in_borrow_domain(*pid, root)),
+                ),
                 None => {
                     if let Ok(entries) = std::fs::read_dir("/proc") {
                         domain.extend(
@@ -513,11 +631,16 @@ pub(crate) fn drain_description(
         }
         for tuple in holders {
             let pid = tuple.pid.0;
-            if protected_roots.iter().any(|root| in_borrow_domain(pid, *root)) {
+            if protected_roots
+                .iter()
+                .any(|root| in_borrow_domain(pid, *root))
+            {
                 foreign.push(pid);
             } else if child_pid.is_some_and(|root| in_borrow_domain(pid, root))
                 || (child_pid.is_some()
-                    && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner || has_borrowed_copy(dev, ino, pid)))
+                    && parent_and_group(pid).is_some_and(|(parent, _)| {
+                        parent != owner || has_borrowed_copy(dev, ino, pid)
+                    }))
             {
                 // Each acquire owns a fresh CLOEXEC description. An outside
                 // holder other than an owner's CLOEXEC pre-exec child can
@@ -532,10 +655,18 @@ pub(crate) fn drain_description(
         let mut live = Vec::new();
         for pid in domain.into_iter().filter(|pid| Some(*pid) != child_pid) {
             // Re-check membership immediately before pinning and signalling.
-            if !protected_roots.iter().any(|root| in_borrow_domain(pid, *root)) && (child_pid.is_some_and(|root| in_borrow_domain(pid, root))
-                || (child_pid.is_some() && parent_and_group(pid).is_some_and(|(parent, _)| parent != owner || has_borrowed_copy(dev, ino, pid))))
+            if !protected_roots
+                .iter()
+                .any(|root| in_borrow_domain(pid, *root))
+                && (child_pid.is_some_and(|root| in_borrow_domain(pid, root))
+                    || (child_pid.is_some()
+                        && parent_and_group(pid).is_some_and(|(parent, _)| {
+                            parent != owner || has_borrowed_copy(dev, ino, pid)
+                        })))
                 && cleanup.signal(pid)
-            { live.push(pid); }
+            {
+                live.push(pid);
+            }
         }
 
         if live.is_empty() && !foreign.is_empty() && Instant::now() >= deadline {
@@ -579,7 +710,9 @@ fn in_domain(mut pid: u32, root: u32, relation: impl Fn(u32) -> Option<(u32, u32
         if pid == root {
             return true;
         }
-        let Some((parent, group)) = relation(pid) else { return false };
+        let Some((parent, group)) = relation(pid) else {
+            return false;
+        };
         if group == root {
             return true;
         }
@@ -596,15 +729,26 @@ fn end_process_group(child_pid: u32, kill_wait: Duration) -> Result<u32, Leftove
     let pgid = child_pid as libc::pid_t;
     // SAFETY: killpg only targets the child's own group; the unreaped child
     // keeps the group id from being reused.
-    let killed = if unsafe { libc::killpg(pgid, libc::SIGKILL) } == 0 { 1 } else { 0 };
+    let killed = if unsafe { libc::killpg(pgid, libc::SIGKILL) } == 0 {
+        1
+    } else {
+        0
+    };
     let deadline = Instant::now() + kill_wait;
     loop {
-        let left: Vec<u32> = group_members(pgid).into_iter().filter(|pid| *pid != child_pid).collect();
+        let left: Vec<u32> = group_members(pgid)
+            .into_iter()
+            .filter(|pid| *pid != child_pid)
+            .collect();
         if left.is_empty() {
             return Ok(killed);
         }
         if Instant::now() >= deadline {
-            return Err(Leftovers { killed, pids: left, foreign: false });
+            return Err(Leftovers {
+                killed,
+                pids: left,
+                foreign: false,
+            });
         }
         std::thread::sleep(Duration::from_millis(1));
     }
@@ -619,13 +763,19 @@ fn group_members(pgid: libc::pid_t) -> Vec<u32> {
     loop {
         let bytes = (pids.len() * std::mem::size_of::<libc::pid_t>()) as libc::c_int;
         // SAFETY: proc_listpids writes at most `bytes` bytes into the buffer.
-        let n = unsafe { libc::proc_listpids(PROC_PGRP_ONLY, pgid as u32, pids.as_mut_ptr().cast(), bytes) };
+        let n = unsafe {
+            libc::proc_listpids(PROC_PGRP_ONLY, pgid as u32, pids.as_mut_ptr().cast(), bytes)
+        };
         if n <= 0 {
             return Vec::new();
         }
         let count = n as usize / std::mem::size_of::<libc::pid_t>();
         if count < pids.len() {
-            return pids[..count].iter().filter(|p| **p > 0).map(|p| *p as u32).collect();
+            return pids[..count]
+                .iter()
+                .filter(|p| **p > 0)
+                .map(|p| *p as u32)
+                .collect();
         }
         pids.resize(pids.len() * 2, 0);
     }

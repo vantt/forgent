@@ -18,7 +18,10 @@ fn attempt(name: &str, steps: Vec<Value>) -> (std::path::PathBuf, Value) {
     let dir = std::env::temp_dir().join(format!("fgos-steps-{name}-{}", std::process::id()));
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
-    (dir, json!({"attemptId": format!("att-{name}"), "steps": steps}))
+    (
+        dir,
+        json!({"attemptId": format!("att-{name}"), "steps": steps}),
+    )
 }
 
 fn has_receipt(dir: &Path, id: &str) -> bool {
@@ -26,23 +29,57 @@ fn has_receipt(dir: &Path, id: &str) -> bool {
 }
 
 fn alive(pid: u32) -> bool {
-    fs::read_to_string(format!("/proc/{pid}/stat")).ok().and_then(|s| s.rfind(')').and_then(|i| s[i + 1..].trim_start().chars().next())).is_some_and(|c| c != 'Z' && c != 'X')
+    fs::read_to_string(format!("/proc/{pid}/stat"))
+        .ok()
+        .and_then(|s| {
+            s.rfind(')')
+                .and_then(|i| s[i + 1..].trim_start().chars().next())
+        })
+        .is_some_and(|c| c != 'Z' && c != 'X')
 }
 
 #[test]
 fn steps_run_in_order_and_a_step_with_a_receipt_is_skipped() {
     let (dir, mut envelope) = attempt("order", Vec::new());
     envelope["steps"] = json!([
-        shell_step(&dir, "settle-attempt", &format!("echo settle >> {0}/order", dir.display()), 10_000),
-        shell_step(&dir, "finalize-home", &format!("echo finalize >> {0}/order", dir.display()), 10_000),
-        shell_step(&dir, "release-slot", &format!("echo release >> {0}/order", dir.display()), 10_000),
+        shell_step(
+            &dir,
+            "settle-attempt",
+            &format!("echo settle >> {0}/order", dir.display()),
+            10_000
+        ),
+        shell_step(
+            &dir,
+            "finalize-home",
+            &format!("echo finalize >> {0}/order", dir.display()),
+            10_000
+        ),
+        shell_step(
+            &dir,
+            "release-slot",
+            &format!("echo release >> {0}/order", dir.display()),
+            10_000
+        ),
     ]);
     fs::create_dir_all(dir.join("steps")).unwrap();
     fs::write(dir.join("steps/finalize-home.json"), "{}").unwrap();
     let outcome = run_steps(&envelope, &dir);
-    assert_eq!(outcome, StepsOutcome::Done(vec!["settle-attempt".into(), "finalize-home".into(), "release-slot".into()]));
-    assert_eq!(fs::read_to_string(dir.join("order")).unwrap(), "settle\nrelease\n", "the step with a receipt did not run again");
-    let receipt: Value = serde_json::from_str(&fs::read_to_string(dir.join("steps/settle-attempt.json")).unwrap()).unwrap();
+    assert_eq!(
+        outcome,
+        StepsOutcome::Done(vec![
+            "settle-attempt".into(),
+            "finalize-home".into(),
+            "release-slot".into()
+        ])
+    );
+    assert_eq!(
+        fs::read_to_string(dir.join("order")).unwrap(),
+        "settle\nrelease\n",
+        "the step with a receipt did not run again"
+    );
+    let receipt: Value =
+        serde_json::from_str(&fs::read_to_string(dir.join("steps/settle-attempt.json")).unwrap())
+            .unwrap();
     assert_eq!(receipt["attemptId"], "att-order");
     assert_eq!(receipt["status"], "done");
 }
@@ -51,11 +88,27 @@ fn steps_run_in_order_and_a_step_with_a_receipt_is_skipped() {
 fn a_step_answering_75_leaves_no_receipt_and_stops_the_chain() {
     let (dir, mut envelope) = attempt("retry", Vec::new());
     envelope["steps"] = json!([
-        shell_step(&dir, "settle-attempt", "echo '{\"result\":\"retry\",\"reason\":\"credential-home-kept\"}'; exit 75", 10_000),
-        shell_step(&dir, "finalize-home", &format!("touch {}/second-ran", dir.display()), 10_000),
+        shell_step(
+            &dir,
+            "settle-attempt",
+            "echo '{\"result\":\"retry\",\"reason\":\"credential-home-kept\"}'; exit 75",
+            10_000
+        ),
+        shell_step(
+            &dir,
+            "finalize-home",
+            &format!("touch {}/second-ran", dir.display()),
+            10_000
+        ),
     ]);
     let outcome = run_steps(&envelope, &dir);
-    assert_eq!(outcome, StepsOutcome::Retry { step_id: "settle-attempt".into(), reason: "credential-home-kept".into() });
+    assert_eq!(
+        outcome,
+        StepsOutcome::Retry {
+            step_id: "settle-attempt".into(),
+            reason: "credential-home-kept".into()
+        }
+    );
     assert!(!has_receipt(&dir, "settle-attempt"));
     assert!(!dir.join("second-ran").exists(), "the chain stopped");
 }
@@ -63,7 +116,10 @@ fn a_step_answering_75_leaves_no_receipt_and_stops_the_chain() {
 #[test]
 fn a_failing_step_stops_the_chain_without_a_receipt() {
     let (dir, mut envelope) = attempt("fail", Vec::new());
-    envelope["steps"] = json!([shell_step(&dir, "settle-attempt", "exit 3", 10_000), shell_step(&dir, "finalize-home", "true", 10_000)]);
+    envelope["steps"] = json!([
+        shell_step(&dir, "settle-attempt", "exit 3", 10_000),
+        shell_step(&dir, "finalize-home", "true", 10_000)
+    ]);
     let outcome = run_steps(&envelope, &dir);
     assert_eq!(outcome.pending(), Some("settle-attempt"));
     assert!(matches!(outcome, StepsOutcome::Failed { .. }));
@@ -73,16 +129,31 @@ fn a_failing_step_stops_the_chain_without_a_receipt() {
 #[test]
 fn a_step_past_its_timeout_is_killed_with_its_descendants_and_leaves_no_receipt() {
     let (dir, mut envelope) = attempt("hang", Vec::new());
-    envelope["steps"] = json!([shell_step(&dir, "settle-attempt", &format!("echo $$ > {0}/step.pid; sleep 60 & echo $! > {0}/child.pid; wait", dir.display()), 600)]);
+    envelope["steps"] = json!([shell_step(
+        &dir,
+        "settle-attempt",
+        &format!(
+            "echo $$ > {0}/step.pid; sleep 60 & echo $! > {0}/child.pid; wait",
+            dir.display()
+        ),
+        600
+    )]);
     let started = Instant::now();
     let outcome = run_steps(&envelope, &dir);
     assert!(started.elapsed() < Duration::from_secs(20));
-    assert!(matches!(outcome, StepsOutcome::Failed { ref reason, .. } if reason.contains("stepTimeoutMs")), "{outcome:?}");
+    assert!(
+        matches!(outcome, StepsOutcome::Failed { ref reason, .. } if reason.contains("stepTimeoutMs")),
+        "{outcome:?}"
+    );
     assert!(!has_receipt(&dir, "settle-attempt"));
     // SIGKILL reaches the whole group before run_steps returns; the kernel
     // finishes tearing a process down a moment later, so wait for that, bounded.
     for name in ["step.pid", "child.pid"] {
-        let pid: u32 = fs::read_to_string(dir.join(name)).unwrap().trim().parse().unwrap();
+        let pid: u32 = fs::read_to_string(dir.join(name))
+            .unwrap()
+            .trim()
+            .parse()
+            .unwrap();
         let deadline = Instant::now() + Duration::from_secs(5);
         while alive(pid) && Instant::now() < deadline {
             std::thread::sleep(Duration::from_millis(10));
@@ -94,15 +165,33 @@ fn a_step_past_its_timeout_is_killed_with_its_descendants_and_leaves_no_receipt(
 #[test]
 fn a_descendant_a_finished_step_leaves_behind_does_not_outlive_the_chain() {
     let (dir, mut envelope) = attempt("leftover", Vec::new());
-    envelope["steps"] = json!([shell_step(&dir, "settle-attempt", &format!("sleep 60 >/dev/null 2>&1 & echo $! > {0}/child.pid; exit 1", dir.display()), 20_000)]);
+    envelope["steps"] = json!([shell_step(
+        &dir,
+        "settle-attempt",
+        &format!(
+            "sleep 60 >/dev/null 2>&1 & echo $! > {0}/child.pid; exit 1",
+            dir.display()
+        ),
+        20_000
+    )]);
     let outcome = run_steps(&envelope, &dir);
-    assert!(matches!(outcome, StepsOutcome::Failed { .. }), "{outcome:?}");
-    let pid: u32 = fs::read_to_string(dir.join("child.pid")).unwrap().trim().parse().unwrap();
+    assert!(
+        matches!(outcome, StepsOutcome::Failed { .. }),
+        "{outcome:?}"
+    );
+    let pid: u32 = fs::read_to_string(dir.join("child.pid"))
+        .unwrap()
+        .trim()
+        .parse()
+        .unwrap();
     let deadline = Instant::now() + Duration::from_secs(5);
     while alive(pid) && Instant::now() < deadline {
         std::thread::sleep(Duration::from_millis(10));
     }
-    assert!(!alive(pid), "the descendant of a finished step must be dead");
+    assert!(
+        !alive(pid),
+        "the descendant of a finished step must be dead"
+    );
 }
 
 // Lists /proc/<pid>/fd, which only Linux has.
@@ -119,18 +208,35 @@ fn a_step_holds_no_lock_description() {
         let flags = libc::fcntl(lock.as_raw_fd(), libc::F_GETFD);
         libc::fcntl(lock.as_raw_fd(), libc::F_SETFD, flags & !libc::FD_CLOEXEC);
     }
-    envelope["steps"] = json!([shell_step(&dir, "settle-attempt", &format!("ls -l /proc/$$/fd > {}/fds.txt", dir.display()), 10_000)]);
+    envelope["steps"] = json!([shell_step(
+        &dir,
+        "settle-attempt",
+        &format!("ls -l /proc/$$/fd > {}/fds.txt", dir.display()),
+        10_000
+    )]);
     assert!(matches!(run_steps(&envelope, &dir), StepsOutcome::Done(_)));
     let listing = fs::read_to_string(dir.join("fds.txt")).unwrap();
-    assert!(!listing.contains("attempt.lock"), "the step inherited the lock: {listing}");
-    assert!(!listing.lines().skip(1).any(|l| l.contains("-> /") && !l.contains("/dev/null") && !l.contains("pipe:") && !l.contains("supervisor.log") && !l.contains("fds.txt")), "unexpected descriptor: {listing}");
+    assert!(
+        !listing.contains("attempt.lock"),
+        "the step inherited the lock: {listing}"
+    );
+    assert!(
+        !listing.lines().skip(1).any(|l| l.contains("-> /")
+            && !l.contains("/dev/null")
+            && !l.contains("pipe:")
+            && !l.contains("supervisor.log")
+            && !l.contains("fds.txt")),
+        "unexpected descriptor: {listing}"
+    );
 }
 
 /// Role of the process the next test kills: it runs a step that never ends.
 #[cfg(target_os = "linux")]
 #[test]
 fn steps_supervisor_helper() {
-    let Ok(dir) = std::env::var("FGOS_STEPS_HELPER_DIR") else { return };
+    let Ok(dir) = std::env::var("FGOS_STEPS_HELPER_DIR") else {
+        return;
+    };
     let dir = std::path::PathBuf::from(dir);
     let envelope = json!({"attemptId": "att-orphan", "steps": [shell_step(&dir, "settle-attempt", &format!("echo $$ > {0}/step.pid; exec sleep 60", dir.display()), 60_000)]});
     run_steps(&envelope, &dir);
@@ -141,7 +247,12 @@ fn steps_supervisor_helper() {
 fn a_step_dies_when_its_supervisor_is_killed() {
     let (dir, _) = attempt("orphan", Vec::new());
     let mut supervisor = std::process::Command::new(std::env::current_exe().unwrap())
-        .args(["--exact", "steps_supervisor_helper", "--nocapture", "--test-threads=1"])
+        .args([
+            "--exact",
+            "steps_supervisor_helper",
+            "--nocapture",
+            "--test-threads=1",
+        ])
         .env("FGOS_STEPS_HELPER_DIR", &dir)
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
@@ -150,7 +261,10 @@ fn a_step_dies_when_its_supervisor_is_killed() {
     let pid_file = dir.join("step.pid");
     let deadline = Instant::now() + Duration::from_secs(20);
     let step_pid = loop {
-        if let Some(pid) = fs::read_to_string(&pid_file).ok().and_then(|t| t.trim().parse::<u32>().ok()) {
+        if let Some(pid) = fs::read_to_string(&pid_file)
+            .ok()
+            .and_then(|t| t.trim().parse::<u32>().ok())
+        {
             break pid;
         }
         assert!(Instant::now() < deadline, "the step never started");
@@ -174,7 +288,14 @@ fn a_step_dies_when_its_supervisor_is_killed() {
 /// `fgos internal attempt-step <step> --run-dir <dir>` as the host runs it; the exit code is the answer.
 fn attempt_step_exit(step: &str, dir: &Path) -> i32 {
     std::process::Command::new(support::supervisor::internal_harness())
-        .args(["internal", "attempt-step", step, "--protocol", "1", "--run-dir"])
+        .args([
+            "internal",
+            "attempt-step",
+            step,
+            "--protocol",
+            "1",
+            "--run-dir",
+        ])
         .arg(dir)
         .env_clear()
         .output()
@@ -192,14 +313,26 @@ fn the_attempt_step_route_refuses_what_the_entry_no_longer_rechecks() {
     let fixture = support::adopt_fixture::attempt_in(&root, "route", &["settle-attempt"]);
 
     // The envelope names a payload that has no step entry.
-    assert_eq!(attempt_step_exit("settle-attempt", &fixture.dir), 66, "payload without the entry");
+    assert_eq!(
+        attempt_step_exit("settle-attempt", &fixture.dir),
+        66,
+        "payload without the entry"
+    );
     // A step the envelope does not list.
-    assert_eq!(attempt_step_exit("no-such-step", &fixture.dir), 65, "unknown step");
+    assert_eq!(
+        attempt_step_exit("no-such-step", &fixture.dir),
+        65,
+        "unknown step"
+    );
     // An envelope whose digest no longer matches its content.
     let path = fixture.dir.join("envelope.json");
     let mut value: Value = serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
     value["unitRunId"] = json!("tampered");
     fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
-    assert_eq!(attempt_step_exit("settle-attempt", &fixture.dir), 65, "digest mismatch");
+    assert_eq!(
+        attempt_step_exit("settle-attempt", &fixture.dir),
+        65,
+        "digest mismatch"
+    );
     let _ = fs::remove_dir_all(&root);
 }

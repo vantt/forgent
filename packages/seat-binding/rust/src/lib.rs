@@ -48,7 +48,10 @@ pub fn bind(input: &BindInput) -> BindOutput {
             None,
             Some(Refusal::new(
                 "protocol-mismatch",
-                format!("seat binding speaks protocol {PROTOCOL}, got {}", input.protocol),
+                format!(
+                    "seat binding speaks protocol {PROTOCOL}, got {}",
+                    input.protocol
+                ),
             )),
         );
     }
@@ -56,7 +59,14 @@ pub fn bind(input: &BindInput) -> BindOutput {
         Ok(policy) => policy,
         Err(refusal) => return finish(None, None, Some(refusal)),
     };
-    let ranked = rank(&policy, &input.peers, &input.walk, &input.account_view, &input.launch_view, input.now);
+    let ranked = rank(
+        &policy,
+        &input.peers,
+        &input.walk,
+        &input.account_view,
+        &input.launch_view,
+        input.now,
+    );
     let refusal = ranked.refusal.clone();
     finish(Some(policy), Some(ranked), refusal)
 }

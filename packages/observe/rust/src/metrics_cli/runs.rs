@@ -12,7 +12,13 @@ pub fn dispatch_runs(
     req: &ObserveRequest,
     sources: &[Box<dyn ObservationSource>],
 ) -> Result<Value, String> {
-    let flags = parse_flags("runs", &req.args, &["--by", "--since", "--until", "--case"], &[], false)?;
+    let flags = parse_flags(
+        "runs",
+        &req.args,
+        &["--by", "--since", "--until", "--case"],
+        &[],
+        false,
+    )?;
     let by_filter = match flags.value("--by") {
         None => None,
         Some(by @ ("executor" | "adapter" | "role")) => Some(by),
@@ -40,7 +46,10 @@ pub fn dispatch_runs(
 
     // 2. Collect observations from the run-result source, the only one the runs section reads
     let mut observations: Vec<Observation> = Vec::new();
-    for src in sources.iter().filter(|src| src.source_id() == RUN_RESULT_SOURCE) {
+    for src in sources
+        .iter()
+        .filter(|src| src.source_id() == RUN_RESULT_SOURCE)
+    {
         observations.extend(
             src.observations(&req.root, &window)
                 .map_err(|e| format!("source error: {}", e))?,

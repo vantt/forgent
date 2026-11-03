@@ -66,7 +66,11 @@ fn main() {
         }
         "step-write" => {
             use std::io::Write;
-            let mut file = std::fs::OpenOptions::new().create(true).append(true).open(arg(1)).expect("step file");
+            let mut file = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(arg(1))
+                .expect("step file");
             writeln!(file, "{}", arg(2)).expect("step line");
         }
         "step-exit" => std::process::exit(arg(1).parse().expect("exit code")),
@@ -100,7 +104,10 @@ fn forever() -> ! {
 
 fn start_child(new_session: bool) -> u32 {
     let mut cmd = Command::new(std::env::current_exe().expect("current_exe"));
-    cmd.arg("child").stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null());
+    cmd.arg("child")
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
     #[cfg(unix)]
     if new_session {
         use std::os::unix::process::CommandExt;
@@ -145,19 +152,29 @@ fn holds_handle_on(path: &str) -> bool {
     (3..1024).any(|fd| {
         // SAFETY: fstat over a descriptor number; a closed one only fails.
         let mut st: libc::stat = unsafe { std::mem::zeroed() };
-        unsafe { libc::fstat(fd, &mut st) == 0 && st.st_ino as u64 == meta.ino() && st.st_dev as u64 == meta.dev() }
+        unsafe {
+            libc::fstat(fd, &mut st) == 0
+                && st.st_ino as u64 == meta.ino()
+                && st.st_dev as u64 == meta.dev()
+        }
     })
 }
 
 #[cfg(windows)]
 fn holds_handle_on(path: &str) -> bool {
     use std::os::windows::io::AsRawHandle;
-    use windows_sys::Win32::Storage::FileSystem::{GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION};
+    use windows_sys::Win32::Storage::FileSystem::{
+        GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION,
+    };
 
     fn identity(handle: windows_sys::Win32::Foundation::HANDLE) -> Option<(u32, u32, u32)> {
         let mut info: BY_HANDLE_FILE_INFORMATION = unsafe { std::mem::zeroed() };
         // SAFETY: one valid out-pointer; an invalid handle value only fails.
-        (unsafe { GetFileInformationByHandle(handle, &mut info) } != 0).then_some((info.dwVolumeSerialNumber, info.nFileIndexHigh, info.nFileIndexLow))
+        (unsafe { GetFileInformationByHandle(handle, &mut info) } != 0).then_some((
+            info.dwVolumeSerialNumber,
+            info.nFileIndexHigh,
+            info.nFileIndexLow,
+        ))
     }
     let wanted = {
         let file = std::fs::File::open(path).expect("lock file");

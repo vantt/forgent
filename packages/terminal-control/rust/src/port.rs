@@ -43,11 +43,18 @@ fn shortened(text: Option<&String>, max: usize) -> Option<String> {
 impl Display {
     /// `<short id> · <title>`; either part alone when the other is missing; the group key when both are.
     pub fn tab_label(&self, group_key: &str) -> String {
-        let parts: Vec<String> = [shortened(self.id.as_ref(), SHORT_ID_CHARS), shortened(self.title.as_ref(), TITLE_CHARS)]
-            .into_iter()
-            .flatten()
-            .collect();
-        if parts.is_empty() { group_key.to_string() } else { parts.join(LABEL_SEPARATOR) }
+        let parts: Vec<String> = [
+            shortened(self.id.as_ref(), SHORT_ID_CHARS),
+            shortened(self.title.as_ref(), TITLE_CHARS),
+        ]
+        .into_iter()
+        .flatten()
+        .collect();
+        if parts.is_empty() {
+            group_key.to_string()
+        } else {
+            parts.join(LABEL_SEPARATOR)
+        }
     }
 
     /// A person's own pane (a session is named): `<tab label> | fg.ssid:<first 8>`. A worker pane (a role is
@@ -57,10 +64,12 @@ impl Display {
             return format!("{} | fg.ssid:{session}", self.tab_label(group_key));
         }
         match shortened(self.role.as_ref(), TITLE_CHARS) {
-            Some(role) => match shortened(self.model.as_ref().or(self.agent.as_ref()), usize::MAX) {
-                Some(model) => format!("{role}{LABEL_SEPARATOR}{model}"),
-                None => role,
-            },
+            Some(role) => {
+                match shortened(self.model.as_ref().or(self.agent.as_ref()), usize::MAX) {
+                    Some(model) => format!("{role}{LABEL_SEPARATOR}{model}"),
+                    None => role,
+                }
+            }
             None => self.tab_label(group_key),
         }
     }
@@ -116,7 +125,9 @@ pub enum Refusal {
 impl std::fmt::Display for Refusal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Refusal::Unsupported { capability, detail } => write!(f, "{capability} unsupported: {detail}"),
+            Refusal::Unsupported { capability, detail } => {
+                write!(f, "{capability} unsupported: {detail}")
+            }
             Refusal::Unknown { reason } => f.write_str(reason),
         }
     }
@@ -182,7 +193,9 @@ pub enum LaunchOutcome {
     Launched(ProcessIdentity),
     /// Nothing was proven to run. The `launch-requested` marker stays, so the
     /// slot is kept and never launched into again.
-    NotStarted { reason: String },
+    NotStarted {
+        reason: String,
+    },
 }
 
 /// What `send` did with the input.
@@ -191,7 +204,9 @@ pub enum SendOutcome {
     Sent,
     /// Nothing was typed: the pane's foreground is its shell, or no program
     /// could be identified there. A shell would run the text as commands.
-    ForegroundNotAgent { reason: String },
+    ForegroundNotAgent {
+        reason: String,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -203,9 +218,13 @@ pub enum Disposition {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ReleaseOutcome {
-    Released { disposition: Disposition },
+    Released {
+        disposition: Disposition,
+    },
     /// The core could not prove it may close the pane, so it kept it.
-    KeptUnknown { reason: String },
+    KeptUnknown {
+        reason: String,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -251,7 +270,9 @@ pub enum AnchorPane {
     /// The caller named none.
     Absent,
     Resolved,
-    Unresolvable { reason: String },
+    Unresolvable {
+        reason: String,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

@@ -8,7 +8,10 @@ use std::cell::Cell;
 use std::process::{Child, Command};
 
 fn spawn_sleeper() -> Child {
-    Command::new("sleep").arg("30").spawn().expect("spawn sleep")
+    Command::new("sleep")
+        .arg("30")
+        .spawn()
+        .expect("spawn sleep")
 }
 
 fn launch_spec() -> LaunchSpec {
@@ -27,7 +30,8 @@ fn an_orchestrator_that_died_after_allocate_leaves_the_pane_alone() {
     let root = state_dir("orphan");
     let now = Cell::new(1_000_000u64);
     let slot = {
-        let core = Core::new(&driver, &MeasuredSplit, config(root.clone())).with_clock(|| now.get());
+        let core =
+            Core::new(&driver, &MeasuredSplit, config(root.clone())).with_clock(|| now.get());
         core.allocate(&request("a", "g")).unwrap().slot
     };
     // A fresh core, much later: the scan reports the bare shell, closes nothing.
@@ -61,7 +65,11 @@ fn launch_requested_without_launched_is_kept_and_never_launched_into_again() {
     let runs_before = driver.calls("pane.run").len();
     let again = core.launch("a", &launch_spec()).unwrap();
     assert!(matches!(again, LaunchOutcome::NotStarted { .. }));
-    assert_eq!(driver.calls("pane.run").len(), runs_before, "second launch must not reach the driver");
+    assert_eq!(
+        driver.calls("pane.run").len(),
+        runs_before,
+        "second launch must not reach the driver"
+    );
     let findings = core.reconcile_scan(0).unwrap();
     assert_eq!(findings.len(), 1);
     assert_eq!(findings[0].kind, FindingKind::Unknown);
@@ -79,19 +87,31 @@ fn launch_identifies_the_root_process_and_writes_the_launched_marker() {
         &slot.pane_id,
         900,
         vec![
-            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
-            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+            ForegroundProcess {
+                pid: 900,
+                argv: vec!["bash".into()],
+            },
+            ForegroundProcess {
+                pid: child.id(),
+                argv: vec!["sleep".into(), "30".into()],
+            },
         ],
         child.id(),
     );
     let out = core.launch("a", &launch_spec()).unwrap();
-    let LaunchOutcome::Launched(identity) = out else { panic!("{out:?}") };
+    let LaunchOutcome::Launched(identity) = out else {
+        panic!("{out:?}")
+    };
     assert_eq!(identity.pid, child.id());
     assert_eq!(identity.pgid, child.id());
     assert!(!identity.start_time.is_empty());
     let run = driver.calls("pane.run");
     let last_run = run.last().expect("at least one pane.run call");
-    assert!(last_run.contains("cd '/tmp' && 'sleep' '30'") && !last_run.contains("exec"), "{}", last_run);
+    assert!(
+        last_run.contains("cd '/tmp' && 'sleep' '30'") && !last_run.contains("exec"),
+        "{}",
+        last_run
+    );
     assert!(core.reconcile_scan(0).unwrap().is_empty());
     let inspection = core.inspect("a", false);
     assert_eq!(inspection.pane, PaneState::Live);
@@ -110,16 +130,33 @@ fn a_command_that_replaced_the_shell_is_still_the_foreground_of_its_slot() {
     driver.set_launch_foreground(
         &slot.pane_id,
         child.id(),
-        vec![ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] }],
+        vec![ForegroundProcess {
+            pid: child.id(),
+            argv: vec!["sleep".into(), "30".into()],
+        }],
         child.id(),
     );
-    let LaunchOutcome::Launched(identity) = core.launch("a", &launch_spec()).unwrap() else { panic!("not launched") };
+    let LaunchOutcome::Launched(identity) = core.launch("a", &launch_spec()).unwrap() else {
+        panic!("not launched")
+    };
     assert_eq!(identity.pid, child.id());
-    assert_eq!(core.inspect("a", false).foreground.map(|f| f.pid), Some(child.id()), "inspect finds the exec'd root through the launched marker");
+    assert_eq!(
+        core.inspect("a", false).foreground.map(|f| f.pid),
+        Some(child.id()),
+        "inspect finds the exec'd root through the launched marker"
+    );
     child.kill().unwrap();
     child.wait().unwrap();
     // The process is gone: nothing is reported as the foreground, whatever the marker says.
-    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }], 900);
+    driver.set_foreground(
+        &slot.pane_id,
+        900,
+        vec![ForegroundProcess {
+            pid: 900,
+            argv: vec!["bash".into()],
+        }],
+        900,
+    );
     assert_eq!(core.inspect("a", false).foreground, None);
 }
 
@@ -134,7 +171,10 @@ fn a_server_restart_invalidates_old_records_and_never_closes_the_new_servers_pan
     let inspection = core.inspect("a", false);
     assert_eq!(inspection.pane, PaneState::Unknown);
     let released = core.release("a", Disposition::Close, None).unwrap();
-    assert!(matches!(released, ReleaseOutcome::KeptUnknown { .. }), "{released:?}");
+    assert!(
+        matches!(released, ReleaseOutcome::KeptUnknown { .. }),
+        "{released:?}"
+    );
     assert!(driver.calls("pane.close").is_empty());
     assert!(driver.panes.borrow().contains_key(&slot.pane_id));
     let findings = core.reconcile_scan(0).unwrap();
@@ -190,13 +230,17 @@ fn a_scan_reports_an_expired_retained_pane_with_its_pane_id_and_closes_nothing()
 fn retain_with_a_foreign_foreground_is_kept() {
     let driver = MemDriver::new(352, 69);
     let now = Cell::new(1_000u64);
-    let core = Core::new(&driver, &MeasuredSplit, config(state_dir("retain-foreign"))).with_clock(|| now.get());
+    let core = Core::new(&driver, &MeasuredSplit, config(state_dir("retain-foreign")))
+        .with_clock(|| now.get());
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     core.release("a", Disposition::Retain, Some(2_000)).unwrap();
     driver.set_foreground(
         &slot.pane_id,
         900,
-        vec![ForegroundProcess { pid: 31337, argv: vec!["vim".into()] }],
+        vec![ForegroundProcess {
+            pid: 31337,
+            argv: vec!["vim".into()],
+        }],
         31337,
     );
     now.set(9_000);
@@ -209,7 +253,8 @@ fn retain_with_a_foreign_foreground_is_kept() {
 fn retain_without_until_is_kept_until_a_person_closes_it() {
     let driver = MemDriver::new(352, 69);
     let now = Cell::new(1_000u64);
-    let core = Core::new(&driver, &MeasuredSplit, config(state_dir("retain-null"))).with_clock(|| now.get());
+    let core = Core::new(&driver, &MeasuredSplit, config(state_dir("retain-null")))
+        .with_clock(|| now.get());
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     core.release("a", Disposition::Retain, None).unwrap();
     now.set(u64::MAX / 2);
@@ -223,19 +268,66 @@ fn send_and_read_reach_the_pane_of_the_key() {
     let core = core(&driver, &MeasuredSplit, state_dir("send-read"));
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     let mut child = spawn_sleeper();
-    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }, ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] }], child.id());
-    assert_eq!(core.send("a", Some("hello"), None, true).unwrap(), SendOutcome::Sent);
-    assert_eq!(core.send("a", None, Some(&["Enter".to_string()]), false).unwrap(), SendOutcome::Sent);
-    assert!(core.send("a", Some("x"), Some(&["Enter".to_string()]), false).is_err());
-    assert_eq!(driver.calls("send."), vec![format!("send.text {} hello true", slot.pane_id), format!("send.keys {} Enter", slot.pane_id)]);
+    driver.set_foreground(
+        &slot.pane_id,
+        900,
+        vec![
+            ForegroundProcess {
+                pid: 900,
+                argv: vec!["bash".into()],
+            },
+            ForegroundProcess {
+                pid: child.id(),
+                argv: vec!["sleep".into(), "30".into()],
+            },
+        ],
+        child.id(),
+    );
+    assert_eq!(
+        core.send("a", Some("hello"), None, true).unwrap(),
+        SendOutcome::Sent
+    );
+    assert_eq!(
+        core.send("a", None, Some(&["Enter".to_string()]), false)
+            .unwrap(),
+        SendOutcome::Sent
+    );
+    assert!(core
+        .send("a", Some("x"), Some(&["Enter".to_string()]), false)
+        .is_err());
+    assert_eq!(
+        driver.calls("send."),
+        vec![
+            format!("send.text {} hello true", slot.pane_id),
+            format!("send.keys {} Enter", slot.pane_id)
+        ]
+    );
     // A foreground program that is gone is no program to type at: nothing more reaches the pane.
     child.kill().unwrap();
     child.wait().unwrap();
-    assert!(matches!(core.send("a", Some("late"), None, false).unwrap(), SendOutcome::ForegroundNotAgent { reason } if reason.contains("no live process")));
+    assert!(
+        matches!(core.send("a", Some("late"), None, false).unwrap(), SendOutcome::ForegroundNotAgent { reason } if reason.contains("no live process"))
+    );
     assert_eq!(driver.calls("send.").len(), 2);
-    assert_eq!(core.read("a", None, None).unwrap(), format!("screen of {}", slot.pane_id));
-    core.label("a", &Display { title: Some("new".into()), ..Display::default() }).unwrap();
-    assert_eq!(driver.calls("label.pane"), vec![format!("label.pane {} label-g", slot.pane_id), format!("label.pane {} new", slot.pane_id)]);
+    assert_eq!(
+        core.read("a", None, None).unwrap(),
+        format!("screen of {}", slot.pane_id)
+    );
+    core.label(
+        "a",
+        &Display {
+            title: Some("new".into()),
+            ..Display::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(
+        driver.calls("label.pane"),
+        vec![
+            format!("label.pane {} label-g", slot.pane_id),
+            format!("label.pane {} new", slot.pane_id)
+        ]
+    );
 }
 
 #[test]
@@ -255,7 +347,10 @@ fn close_after_retain_does_not_pretend_to_close() {
     core.allocate(&request("a", "g")).unwrap();
     core.release("a", Disposition::Retain, Some(1)).unwrap();
     let out = core.release("a", Disposition::Close, None).unwrap();
-    assert!(matches!(&out, ReleaseOutcome::KeptUnknown { reason } if reason.contains("reported for a person to close")), "the refusal says who closes it: {out:?}");
+    assert!(
+        matches!(&out, ReleaseOutcome::KeptUnknown { reason } if reason.contains("reported for a person to close")),
+        "the refusal says who closes it: {out:?}"
+    );
     assert!(driver.calls("pane.close").is_empty());
 }
 
@@ -277,11 +372,35 @@ fn immediate_close_with_a_foreign_foreground_is_kept_without_a_release_marker() 
     let driver = MemDriver::new(352, 69);
     let core = core(&driver, &MeasuredSplit, state_dir("close-foreign"));
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
-    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 31337, argv: vec!["vim".into()] }], 31337);
-    assert!(matches!(core.release("a", Disposition::Close, None).unwrap(), ReleaseOutcome::KeptUnknown { .. }));
+    driver.set_foreground(
+        &slot.pane_id,
+        900,
+        vec![ForegroundProcess {
+            pid: 31337,
+            argv: vec!["vim".into()],
+        }],
+        31337,
+    );
+    assert!(matches!(
+        core.release("a", Disposition::Close, None).unwrap(),
+        ReleaseOutcome::KeptUnknown { .. }
+    ));
     assert!(driver.panes.borrow().contains_key(&slot.pane_id));
-    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }], 900);
-    assert!(matches!(core.release("a", Disposition::Close, None).unwrap(), ReleaseOutcome::Released { disposition: Disposition::Close }));
+    driver.set_foreground(
+        &slot.pane_id,
+        900,
+        vec![ForegroundProcess {
+            pid: 900,
+            argv: vec!["bash".into()],
+        }],
+        900,
+    );
+    assert!(matches!(
+        core.release("a", Disposition::Close, None).unwrap(),
+        ReleaseOutcome::Released {
+            disposition: Disposition::Close
+        }
+    ));
     assert!(!driver.panes.borrow().contains_key(&slot.pane_id));
 }
 
@@ -298,8 +417,14 @@ fn a_pane_whose_foreground_process_only_shares_a_pid_with_the_launched_one_is_ke
         &slot.pane_id,
         900,
         vec![
-            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
-            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+            ForegroundProcess {
+                pid: 900,
+                argv: vec!["bash".into()],
+            },
+            ForegroundProcess {
+                pid: child.id(),
+                argv: vec!["sleep".into(), "30".into()],
+            },
         ],
         child.id(),
     );
@@ -311,11 +436,17 @@ fn a_pane_whose_foreground_process_only_shares_a_pid_with_the_launched_one_is_ke
     driver.set_foreground(
         &slot.pane_id,
         900,
-        vec![ForegroundProcess { pid: stranger, argv: vec!["vim".into()] }],
+        vec![ForegroundProcess {
+            pid: stranger,
+            argv: vec!["vim".into()],
+        }],
         stranger,
     );
     let released = core.release("a", Disposition::Close, None).unwrap();
-    assert!(matches!(released, ReleaseOutcome::KeptUnknown { .. }), "{released:?}");
+    assert!(
+        matches!(released, ReleaseOutcome::KeptUnknown { .. }),
+        "{released:?}"
+    );
     assert!(driver.panes.borrow().contains_key(&slot.pane_id));
 }
 
@@ -328,18 +459,39 @@ fn an_empty_foreground_list_proves_no_ownership() {
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_foreground(&slot.pane_id, 900, vec![], 900);
     let released = core.release("a", Disposition::Close, None).unwrap();
-    assert!(matches!(released, ReleaseOutcome::KeptUnknown { .. }), "{released:?}");
+    assert!(
+        matches!(released, ReleaseOutcome::KeptUnknown { .. }),
+        "{released:?}"
+    );
     assert!(driver.panes.borrow().contains_key(&slot.pane_id));
 }
 
 #[test]
 fn immediate_close_without_process_info_is_kept_without_a_release_marker() {
-    let driver = MemDriver::with_caps(352, 69, all_caps().into_iter().filter(|c| *c != "process.info").collect());
+    let driver = MemDriver::with_caps(
+        352,
+        69,
+        all_caps()
+            .into_iter()
+            .filter(|c| *c != "process.info")
+            .collect(),
+    );
     let core = core(&driver, &MeasuredSplit, state_dir("close-no-process-info"));
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     // Even a shell-only foreground cannot be read without the capability: nothing proves the close is safe.
-    driver.set_foreground(&slot.pane_id, 900, vec![ForegroundProcess { pid: 900, argv: vec!["bash".into()] }], 900);
-    assert!(matches!(core.release("a", Disposition::Close, None).unwrap(), ReleaseOutcome::KeptUnknown { .. }));
+    driver.set_foreground(
+        &slot.pane_id,
+        900,
+        vec![ForegroundProcess {
+            pid: 900,
+            argv: vec!["bash".into()],
+        }],
+        900,
+    );
+    assert!(matches!(
+        core.release("a", Disposition::Close, None).unwrap(),
+        ReleaseOutcome::KeptUnknown { .. }
+    ));
     assert!(driver.panes.borrow().contains_key(&slot.pane_id));
     assert!(driver.calls("pane.close").is_empty());
 }
@@ -354,8 +506,14 @@ fn the_launcher_is_typed_only_after_the_shell_has_run_a_probe() {
         &slot.pane_id,
         900,
         vec![
-            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
-            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+            ForegroundProcess {
+                pid: 900,
+                argv: vec!["bash".into()],
+            },
+            ForegroundProcess {
+                pid: child.id(),
+                argv: vec!["sleep".into(), "30".into()],
+            },
         ],
         child.id(),
     );
@@ -363,8 +521,16 @@ fn the_launcher_is_typed_only_after_the_shell_has_run_a_probe() {
     assert!(matches!(out, LaunchOutcome::Launched(_)), "{out:?}");
     let runs = driver.calls("pane.run");
     assert_eq!(runs.len(), 2);
-    assert!(runs[0].contains("printf '%s%s\\n' fgos-ok- "), "first call must be probe: {}", runs[0]);
-    assert!(runs[1].contains("cd '/tmp' && 'sleep' '30'"), "second call must be launcher: {}", runs[1]);
+    assert!(
+        runs[0].contains("printf '%s%s\\n' fgos-ok- "),
+        "first call must be probe: {}",
+        runs[0]
+    );
+    assert!(
+        runs[1].contains("cd '/tmp' && 'sleep' '30'"),
+        "second call must be launcher: {}",
+        runs[1]
+    );
     child.kill().unwrap();
     child.wait().unwrap();
 }
@@ -382,18 +548,32 @@ fn a_shell_whose_start_prompt_eats_the_first_key_still_gets_an_intact_launch_lin
         &slot.pane_id,
         900,
         vec![
-            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
-            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+            ForegroundProcess {
+                pid: 900,
+                argv: vec!["bash".into()],
+            },
+            ForegroundProcess {
+                pid: child.id(),
+                argv: vec!["sleep".into(), "30".into()],
+            },
         ],
         child.id(),
     );
     let out = core.launch("a", &launch_spec()).unwrap();
     assert!(matches!(out, LaunchOutcome::Launched(_)), "{out:?}");
     let runs = driver.calls("pane.run");
-    assert_eq!(runs.len(), 3, "expected probe 1, probe 2, then launch line: {runs:?}");
+    assert_eq!(
+        runs.len(),
+        3,
+        "expected probe 1, probe 2, then launch line: {runs:?}"
+    );
     assert!(runs[0].contains("printf '%s%s\\n' fgos-ok- "));
     assert!(runs[1].contains("printf '%s%s\\n' fgos-ok- "));
-    assert!(runs[2].contains("cd '/tmp' && 'sleep' '30'"), "launch line must be intact: {}", runs[2]);
+    assert!(
+        runs[2].contains("cd '/tmp' && 'sleep' '30'"),
+        "launch line must be intact: {}",
+        runs[2]
+    );
     child.kill().unwrap();
     child.wait().unwrap();
 }
@@ -407,9 +587,16 @@ fn a_shell_serving_only_typed_echo_retypes_only_after_backoff_and_caps_at_three_
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_script(&slot.pane_id, ShellScript::EchoOnly);
     let out = core.launch("a", &launch_spec()).unwrap();
-    assert!(matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("not become ready")), "{out:?}");
+    assert!(
+        matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("not become ready")),
+        "{out:?}"
+    );
     let runs = driver.calls("pane.run");
-    assert_eq!(runs.len(), 3, "must type at most three probes after backoff: {runs:?}");
+    assert_eq!(
+        runs.len(),
+        3,
+        "must type at most three probes after backoff: {runs:?}"
+    );
     for r in &runs {
         assert!(r.contains("printf '%s%s\\n' fgos-ok- "));
     }
@@ -424,7 +611,10 @@ fn a_shell_reading_whole_lines_gets_at_most_three_probes_and_ends_not_started() 
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     driver.set_script(&slot.pane_id, ShellScript::LineModeRead);
     let out = core.launch("a", &launch_spec()).unwrap();
-    assert!(matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("not become ready")), "{out:?}");
+    assert!(
+        matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("not become ready")),
+        "{out:?}"
+    );
     let runs = driver.calls("pane.run");
     assert_eq!(runs.len(), 3, "must type at most three probes: {runs:?}");
     for r in &runs {
@@ -443,15 +633,28 @@ fn a_pane_whose_foreground_is_a_child_process_gets_nothing_typed_and_ends_not_st
         &slot.pane_id,
         900,
         vec![
-            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
-            ForegroundProcess { pid: 9999, argv: vec!["sudo".into(), "-i".into()] },
+            ForegroundProcess {
+                pid: 900,
+                argv: vec!["bash".into()],
+            },
+            ForegroundProcess {
+                pid: 9999,
+                argv: vec!["sudo".into(), "-i".into()],
+            },
         ],
         9999,
     );
     let before = driver.calls("pane.run").len();
     let out = core.launch("a", &launch_spec()).unwrap();
-    assert!(matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("foreground is not the shell")), "{out:?}");
-    assert_eq!(driver.calls("pane.run").len(), before, "pane.run delta must be zero");
+    assert!(
+        matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("foreground is not the shell")),
+        "{out:?}"
+    );
+    assert_eq!(
+        driver.calls("pane.run").len(),
+        before,
+        "pane.run delta must be zero"
+    );
 }
 
 #[test]
@@ -475,8 +678,14 @@ fn a_shell_that_never_becomes_ready_ends_not_started_with_no_marker_and_reports_
         &slot.pane_id,
         900,
         vec![
-            ForegroundProcess { pid: 900, argv: vec!["bash".into()] },
-            ForegroundProcess { pid: child.id(), argv: vec!["sleep".into(), "30".into()] },
+            ForegroundProcess {
+                pid: 900,
+                argv: vec!["bash".into()],
+            },
+            ForegroundProcess {
+                pid: child.id(),
+                argv: vec!["sleep".into(), "30".into()],
+            },
         ],
         child.id(),
     );
@@ -500,7 +709,10 @@ fn every_probe_differs_contains_no_y_and_scrollback_token_does_not_satisfy() {
     cfg.shell_ready_timeout_ms = 450;
     let core = Core::new(&driver, &MeasuredSplit, cfg);
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
-    driver.set_screen(&slot.pane_id, "earlier session\nfgos-ok-cafebabedeadbeef0123456789abcdef\n");
+    driver.set_screen(
+        &slot.pane_id,
+        "earlier session\nfgos-ok-cafebabedeadbeef0123456789abcdef\n",
+    );
     driver.set_script(&slot.pane_id, ShellScript::LineModeRead);
 
     let out = core.launch("a", &launch_spec()).unwrap();
@@ -510,8 +722,17 @@ fn every_probe_differs_contains_no_y_and_scrollback_token_does_not_satisfy() {
     assert_eq!(runs.len(), 3);
     let mut nonces = Vec::new();
     for r in &runs {
-        assert!(!r.contains('y') && !r.contains('Y'), "probe must not contain y or Y: {r}");
-        let nonce = r.strip_prefix(&format!("pane.run {} printf '%s%s\\n' fgos-ok- ", slot.pane_id)).expect("probe format").trim();
+        assert!(
+            !r.contains('y') && !r.contains('Y'),
+            "probe must not contain y or Y: {r}"
+        );
+        let nonce = r
+            .strip_prefix(&format!(
+                "pane.run {} printf '%s%s\\n' fgos-ok- ",
+                slot.pane_id
+            ))
+            .expect("probe format")
+            .trim();
         nonces.push(nonce.to_string());
     }
     assert_ne!(nonces[0], nonces[1]);
@@ -526,7 +747,10 @@ fn a_vanished_pane_ends_the_handshake_at_once_with_unknown() {
     let slot = core.allocate(&request("a", "g")).unwrap().slot;
     *driver.vanish_on_process_info.borrow_mut() = Some(slot.pane_id.clone());
     let out = core.launch("a", &launch_spec());
-    assert!(matches!(&out, Err(Refusal::Unknown { reason }) if reason.contains("pane is gone")), "{out:?}");
+    assert!(
+        matches!(&out, Err(Refusal::Unknown { reason }) if reason.contains("pane is gone")),
+        "{out:?}"
+    );
 }
 
 #[test]
@@ -536,7 +760,9 @@ fn a_created_pane_gets_the_quiet_env() {
     let req1 = request("pane-tab", "group-1");
     let slot1 = core.allocate(&req1).unwrap().slot;
 
-    let env1 = driver.env_of(&slot1.pane_id).expect("env recorded for created tab pane");
+    let env1 = driver
+        .env_of(&slot1.pane_id)
+        .expect("env recorded for created tab pane");
     assert!(
         env1.contains(&("DISABLE_AUTO_UPDATE".to_string(), "true".to_string())),
         "created tab pane must receive DISABLE_AUTO_UPDATE=true, got {env1:?}"
@@ -544,7 +770,9 @@ fn a_created_pane_gets_the_quiet_env() {
 
     let req2 = request("pane-split", "group-1");
     let slot2 = core.allocate(&req2).unwrap().slot;
-    let env2 = driver.env_of(&slot2.pane_id).expect("env recorded for created split pane");
+    let env2 = driver
+        .env_of(&slot2.pane_id)
+        .expect("env recorded for created split pane");
     assert!(
         env2.contains(&("DISABLE_AUTO_UPDATE".to_string(), "true".to_string())),
         "created split pane must receive DISABLE_AUTO_UPDATE=true, got {env2:?}"
@@ -559,7 +787,9 @@ fn a_caller_value_for_the_same_key_wins() {
     req.env.insert("DISABLE_AUTO_UPDATE".into(), "false".into());
     let slot = core.allocate(&req).unwrap().slot;
 
-    let env = driver.env_of(&slot.pane_id).expect("env recorded for created pane");
+    let env = driver
+        .env_of(&slot.pane_id)
+        .expect("env recorded for created pane");
     assert!(
         env.contains(&("DISABLE_AUTO_UPDATE".to_string(), "false".to_string())),
         "caller-provided DISABLE_AUTO_UPDATE must win, got {env:?}"
@@ -592,5 +822,8 @@ fn an_attached_pane_is_created_with_no_env() {
     assert_eq!(driver.calls("tab.create").len(), tab_creates_before);
     assert_eq!(driver.calls("pane.split").len(), splits_before);
     let env = driver.env_of(&pane).expect("pane exists");
-    assert!(env.is_empty(), "attached pane must have no env injected, got {env:?}");
+    assert!(
+        env.is_empty(),
+        "attached pane must have no env injected, got {env:?}"
+    );
 }

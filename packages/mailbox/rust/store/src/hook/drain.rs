@@ -33,9 +33,9 @@ use super::{Adapter, HookEvent, HookLimits};
 use crate::adapters::{Shape, TestedClis};
 use crate::head::{head_text, is_complete, judge_stored, record_of_head_text};
 use fgos_mailbox_core::{
-    render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, ClaimedWhat,
-    Cli, Finished, Generation, IdSource, Limits, MailboxState, MessageId, RegisterRefusal,
-    RegisterRequest, Registered, Timestamp, WriterKey, FRAME_SEPARATOR,
+    render, too_large_pointer, AttemptToken, Checkpoint, ClaimedItem, ClaimedWhat, Cli, Finished,
+    Generation, IdSource, Limits, MailboxState, MessageId, RegisterRefusal, RegisterRequest,
+    Registered, Timestamp, WriterKey, FRAME_SEPARATOR,
 };
 use fgos_process::facts::Record;
 

@@ -17,6 +17,7 @@
 //! else held: this process holds no other `LockScope` at any point.
 use super::mailbox_config::{is_config_reason, project_mailbox, CrossMachine};
 use super::mailbox_identity::{ensure_registered, session_of, state_root};
+use fgos_event_store::{layout::Layout, sync::sync_status};
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::ancestry::ancestry_of;
 use fgos_mailbox::hook::outcome_log;
@@ -24,7 +25,6 @@ use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
 use fgos_mailbox::hook::shell::{self, GateState, ShellInput, WriteGate};
 use fgos_mailbox::hook::{Adapter, HookEvent};
 use fgos_mailbox::record::Paths;
-use fgos_event_store::{layout::Layout, sync::sync_status};
 use fgos_mailbox_core::{Cli, Timestamp, WriterKey};
 use std::ffi::OsString;
 use std::path::Path;
@@ -202,7 +202,8 @@ fn start_sync(fgos_dir: &Path, paths: &Paths, cross: &CrossMachine) {
     let Ok(layout) = Layout::from_common_dir(Some(&git_dir)) else {
         return;
     };
-    let fenced = std::fs::symlink_metadata(main.join(".fgos/events")).is_ok_and(|meta| meta.is_file());
+    let fenced =
+        std::fs::symlink_metadata(main.join(".fgos/events")).is_ok_and(|meta| meta.is_file());
     if !fenced && std::fs::symlink_metadata(layout.store()).is_err() {
         return;
     }

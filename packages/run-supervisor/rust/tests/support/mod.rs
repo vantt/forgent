@@ -18,7 +18,9 @@ use std::path::{Path, PathBuf};
 use std::thread::sleep;
 use std::time::{Duration, Instant};
 
-use fgos_process::containment::{select, ContainmentDomain, ContainmentDriver, SelectEnv, SpawnSpec, Spawned, StartMode};
+use fgos_process::containment::{
+    select, ContainmentDomain, ContainmentDriver, SelectEnv, SpawnSpec, Spawned, StartMode,
+};
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::FdSlot;
 use fgos_run_supervisor::envelope;
@@ -36,7 +38,12 @@ pub fn bwrap_driver(test: &str) -> Option<Box<dyn ContainmentDriver>> {
 
 pub fn harness() -> PathBuf {
     let exe = std::env::current_exe().expect("current_exe");
-    exe.parent().unwrap().parent().unwrap().join("examples").join("gate_harness")
+    exe.parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .join("examples")
+        .join("gate_harness")
 }
 
 pub fn fixture(name: &str) -> String {
@@ -54,7 +61,10 @@ pub fn node() -> String {
 }
 
 pub fn boottime_ns() -> u64 {
-    let mut ts = libc::timespec { tv_sec: 0, tv_nsec: 0 };
+    let mut ts = libc::timespec {
+        tv_sec: 0,
+        tv_nsec: 0,
+    };
     #[cfg(target_os = "linux")]
     let clock = libc::CLOCK_BOOTTIME;
     #[cfg(not(target_os = "linux"))]
@@ -130,10 +140,17 @@ impl Attempt {
         fs::create_dir_all(dir.join("protected")).unwrap();
         let attempt_id = format!("att-{name}");
         let outbox = dir.join("outbox");
-        let (stdout, stderr) = (dir.join("capture-stdout.log"), dir.join("capture-stderr.log"));
+        let (stdout, stderr) = (
+            dir.join("capture-stdout.log"),
+            dir.join("capture-stderr.log"),
+        );
         let side_file = dir.join("protected/attempt-secrets.json");
         fs::write(&side_file, json!({"v": 1, "attemptId": attempt_id, "env": options.side_env, "controlEpoch": 1, "controlToken": "t"}).to_string()).unwrap();
-        let ceiling = options.ceiling.clone().map(|(boot, ns)| json!({"bootId": boot, "boottimeNs": ns})).unwrap_or(Value::Null);
+        let ceiling = options
+            .ceiling
+            .clone()
+            .map(|(boot, ns)| json!({"bootId": boot, "boottimeNs": ns}))
+            .unwrap_or(Value::Null);
         let mut envelope_value = json!({
             "v": 3,
             "attemptId": attempt_id,
@@ -170,7 +187,15 @@ impl Attempt {
         envelope_value["digest"] = Value::String(digest.clone());
         let path = dir.join("envelope.json");
         fs::write(&path, serde_json::to_vec(&envelope_value).unwrap()).unwrap();
-        Self { dir, attempt_id, envelope: path, digest, outbox, stdout, stderr }
+        Self {
+            dir,
+            attempt_id,
+            envelope: path,
+            digest,
+            outbox,
+            stdout,
+            stderr,
+        }
     }
 
     pub fn stop_requested(&self, cause: &str) {
@@ -194,7 +219,16 @@ pub struct Gate {
 pub fn start_gate(driver: &dyn ContainmentDriver, attempt: &Attempt, lock: Option<&File>) -> Gate {
     let (mine, theirs) = UnixStream::pair().unwrap();
     let mut domain = driver.create(&attempt.attempt_id).unwrap();
-    let mut argv: Vec<String> = [harness().to_string_lossy().into_owned(), "--protocol".into(), "1".into(), "--envelope".into(), attempt.envelope.to_string_lossy().into_owned(), "--go-fd".into(), "5".into()].into();
+    let mut argv: Vec<String> = [
+        harness().to_string_lossy().into_owned(),
+        "--protocol".into(),
+        "1".into(),
+        "--envelope".into(),
+        attempt.envelope.to_string_lossy().into_owned(),
+        "--go-fd".into(),
+        "5".into(),
+    ]
+    .into();
     let mut fd_map = vec![(FdSlot(5), File::from(OwnedFd::from(theirs)))];
     if let Some(lock) = lock {
         argv.extend(["--lock-fds".to_string(), "3".to_string()]);
@@ -212,7 +246,11 @@ pub fn start_gate(driver: &dyn ContainmentDriver, attempt: &Attempt, lock: Optio
         mode: StartMode::Direct,
     };
     let spawned = driver.spawn_in(&mut domain, spec).expect("spawn gate");
-    Gate { spawned, go: mine, domain }
+    Gate {
+        spawned,
+        go: mine,
+        domain,
+    }
 }
 
 pub fn send_go(gate: &mut Gate, attempt_id: &str, digest: &str) {
@@ -236,7 +274,9 @@ pub fn wait_exit(spawned: &mut Spawned, limit: Duration) -> i32 {
     loop {
         if let Some(status) = spawned.child.try_wait().unwrap() {
             use std::os::unix::process::ExitStatusExt;
-            return status.code().unwrap_or_else(|| 128 + status.signal().unwrap_or(0));
+            return status
+                .code()
+                .unwrap_or_else(|| 128 + status.signal().unwrap_or(0));
         }
         assert!(start.elapsed() < limit, "gate did not exit");
         sleep(Duration::from_millis(10));
@@ -244,20 +284,37 @@ pub fn wait_exit(spawned: &mut Spawned, limit: Duration) -> i32 {
 }
 
 pub fn pid_ns_of(pid: u32) -> Option<String> {
-    fs::read_link(format!("/proc/{pid}/ns/pid")).ok().map(|p| p.to_string_lossy().into_owned())
+    fs::read_link(format!("/proc/{pid}/ns/pid"))
+        .ok()
+        .map(|p| p.to_string_lossy().into_owned())
 }
 
 /// `(pid, state)` of every process in the gate's PID namespace, the gate included.
 pub fn namespace_members(gate: &ProcTuple) -> Vec<(u32, char)> {
-    let Some(ns) = pid_ns_of(gate.pid.0) else { return Vec::new() };
+    let Some(ns) = pid_ns_of(gate.pid.0) else {
+        return Vec::new();
+    };
     let mut members = Vec::new();
     for entry in fs::read_dir("/proc").unwrap().flatten() {
-        let Some(pid) = entry.file_name().to_str().and_then(|n| n.parse::<u32>().ok()) else { continue };
+        let Some(pid) = entry
+            .file_name()
+            .to_str()
+            .and_then(|n| n.parse::<u32>().ok())
+        else {
+            continue;
+        };
         if pid_ns_of(pid).as_deref() != Some(ns.as_str()) {
             continue;
         }
-        let Ok(stat) = fs::read_to_string(format!("/proc/{pid}/stat")) else { continue };
-        let Some(state) = stat.rfind(')').and_then(|i| stat[i + 1..].trim_start().chars().next()) else { continue };
+        let Ok(stat) = fs::read_to_string(format!("/proc/{pid}/stat")) else {
+            continue;
+        };
+        let Some(state) = stat
+            .rfind(')')
+            .and_then(|i| stat[i + 1..].trim_start().chars().next())
+        else {
+            continue;
+        };
         members.push((pid, state));
     }
     members
@@ -265,7 +322,10 @@ pub fn namespace_members(gate: &ProcTuple) -> Vec<(u32, char)> {
 
 pub fn alive(pid: u32) -> bool {
     match fs::read_to_string(format!("/proc/{pid}/stat")) {
-        Ok(stat) => stat.rfind(')').and_then(|i| stat[i + 1..].trim_start().chars().next()).is_some_and(|s| s != 'Z' && s != 'X'),
+        Ok(stat) => stat
+            .rfind(')')
+            .and_then(|i| stat[i + 1..].trim_start().chars().next())
+            .is_some_and(|s| s != 'Z' && s != 'X'),
         Err(_) => false,
     }
 }
@@ -276,6 +336,10 @@ pub fn boot_id() -> String {
 
 /// Does `pid` hold a descriptor on the file `key` names?
 pub fn holds_file(pid: u32, key: (u64, u64)) -> bool {
-    let Ok(entries) = fs::read_dir(format!("/proc/{pid}/fd")) else { return false };
-    entries.flatten().any(|entry| fs::metadata(entry.path()).map(|m| (m.dev(), m.ino())).ok() == Some(key))
+    let Ok(entries) = fs::read_dir(format!("/proc/{pid}/fd")) else {
+        return false;
+    };
+    entries
+        .flatten()
+        .any(|entry| fs::metadata(entry.path()).map(|m| (m.dev(), m.ino())).ok() == Some(key))
 }

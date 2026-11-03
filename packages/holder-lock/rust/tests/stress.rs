@@ -47,7 +47,11 @@ fn eight_processes_with_sigkills_never_overlap_and_never_stick() {
                     let mut victim = workers.swap_remove(pos);
                     {
                         use std::io::Write;
-                        let mut f = fs::OpenOptions::new().create(true).append(true).open(&killed).unwrap();
+                        let mut f = fs::OpenOptions::new()
+                            .create(true)
+                            .append(true)
+                            .open(&killed)
+                            .unwrap();
                         writeln!(f, "{pid}").unwrap();
                     }
                     kill_and_reap(&mut victim);
@@ -58,7 +62,10 @@ fn eight_processes_with_sigkills_never_overlap_and_never_stick() {
         }
         std::thread::sleep(Duration::from_micros(300));
     }
-    assert_eq!(kills, KILLS, "could not catch {KILLS} holders inside the critical section");
+    assert_eq!(
+        kills, KILLS,
+        "could not catch {KILLS} holders inside the critical section"
+    );
     for mut w in workers {
         loop {
             if let Some(status) = w.try_wait().unwrap() {

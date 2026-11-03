@@ -142,7 +142,11 @@ pub fn env_identity(
 ) -> Option<WriterIdentity> {
     ENV_ORDER.iter().find_map(|key| {
         let value = lookup(key)?;
-        let (_, id) = WriterKey { source: key, value: &value }.checked()?;
+        let (_, id) = WriterKey {
+            source: key,
+            value: &value,
+        }
+        .checked()?;
         let id = id.to_string();
         let source = if registry_confirms(fgos_dir, &id) {
             Source::Registry

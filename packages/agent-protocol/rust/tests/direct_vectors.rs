@@ -64,13 +64,32 @@ fn every_cli_vector_classifies_as_recorded() {
 
 #[test]
 fn only_a_provider_stop_of_a_direct_run_names_a_receipt_reason() {
-    let reasons = [BlockedReason::TrustDialog, BlockedReason::Login, BlockedReason::UsageLimit].map(|reason| Outcome::Blocked(reason).receipt_reason());
+    let reasons = [
+        BlockedReason::TrustDialog,
+        BlockedReason::Login,
+        BlockedReason::UsageLimit,
+    ]
+    .map(|reason| Outcome::Blocked(reason).receipt_reason());
     assert_eq!(
         reasons,
-        [Some("direct:blocked:trust-dialog".to_string()), Some("direct:blocked:login".into()), Some("direct:blocked:usage-limit".into())]
+        [
+            Some("direct:blocked:trust-dialog".to_string()),
+            Some("direct:blocked:login".into()),
+            Some("direct:blocked:usage-limit".into())
+        ]
     );
-    for ended in [Outcome::NeedsHuman, Outcome::Exited { code: Some(1) }, Outcome::Completed { result_path: PathBuf::from("/run/outbox/result-1.json") }] {
-        assert_eq!(ended.receipt_reason(), None, "{ended:?} names no provider stop");
+    for ended in [
+        Outcome::NeedsHuman,
+        Outcome::Exited { code: Some(1) },
+        Outcome::Completed {
+            result_path: PathBuf::from("/run/outbox/result-1.json"),
+        },
+    ] {
+        assert_eq!(
+            ended.receipt_reason(),
+            None,
+            "{ended:?} names no provider stop"
+        );
     }
 }
 
@@ -113,8 +132,15 @@ fn newest_result_takes_the_highest_number() {
         Some(outbox.join("result-10.json"))
     );
     assert_eq!(newest_result(outbox, ["agent-1.json"]), None);
-    assert_eq!(newest_result(outbox, ["result-007.json", "result-00.json"]), None, "leading zeros are not issued names");
-    assert_eq!(newest_result(outbox, ["result-0.json"]), Some(outbox.join("result-0.json")));
+    assert_eq!(
+        newest_result(outbox, ["result-007.json", "result-00.json"]),
+        None,
+        "leading zeros are not issued names"
+    );
+    assert_eq!(
+        newest_result(outbox, ["result-0.json"]),
+        Some(outbox.join("result-0.json"))
+    );
 }
 
 #[test]
@@ -123,7 +149,10 @@ fn activity_counts_growth() {
     assert_eq!(adapter.activity_from(""), Activity::Quiet);
     assert_eq!(adapter.activity_from("  \n\n"), Activity::Quiet);
     assert_eq!(adapter.activity_from("compiling...\n"), Activity::Output);
-    assert_eq!(adapter.activity_from("{\"type\":\"message_end\"}\n"), Activity::Output);
+    assert_eq!(
+        adapter.activity_from("{\"type\":\"message_end\"}\n"),
+        Activity::Output
+    );
     assert!(Activity::Output.is_active() && !Activity::Quiet.is_active());
 }
 

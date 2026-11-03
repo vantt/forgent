@@ -104,7 +104,10 @@ fn every_standard_agent_pool_names_both_claude_and_openai() {
         let mut lists = vec![(format!("{capability}.prefer"), &entry["prefer"])];
         for group in ["seats", "personas", "roles"] {
             for (key, scope) in entry[group].as_object().into_iter().flatten() {
-                lists.push((format!("{capability}.{group}.{key}.prefer"), &scope["prefer"]));
+                lists.push((
+                    format!("{capability}.{group}.{key}.prefer"),
+                    &scope["prefer"],
+                ));
             }
         }
         for (path, list) in lists {
@@ -112,7 +115,10 @@ fn every_standard_agent_pool_names_both_claude_and_openai() {
                 continue;
             }
             let listed = names(list);
-            if listed.iter().all(|name| runner["executors"][name]["kind"] == "agent") {
+            if listed
+                .iter()
+                .all(|name| runner["executors"][name]["kind"] == "agent")
+            {
                 pools += 1;
                 need_both(format!("capabilities.{path}"), listed);
             }
@@ -121,6 +127,9 @@ fn every_standard_agent_pool_names_both_claude_and_openai() {
     for (tier, list) in runner["tierFallback"].as_object().unwrap() {
         need_both(format!("tierFallback.{tier}"), names(list));
     }
-    assert!(pools > 30, "the standard's agent pools were not found ({pools})");
+    assert!(
+        pools > 30,
+        "the standard's agent pools were not found ({pools})"
+    );
     assert!(gaps.is_empty(), "{gaps:#?}");
 }

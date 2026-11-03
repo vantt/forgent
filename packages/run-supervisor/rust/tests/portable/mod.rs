@@ -26,7 +26,12 @@ const EXE: &str = if cfg!(windows) { ".exe" } else { "" };
 
 pub fn example(name: &str) -> PathBuf {
     let exe = std::env::current_exe().expect("current_exe");
-    exe.parent().unwrap().parent().unwrap().join("examples").join(format!("{name}{EXE}"))
+    exe.parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .join("examples")
+        .join(format!("{name}{EXE}"))
 }
 
 pub fn harness() -> PathBuf {
@@ -74,7 +79,12 @@ pub struct Options {
 
 impl Options {
     pub fn new(args: &[&str]) -> Self {
-        Self { args: args.iter().map(|a| a.to_string()).collect(), ceiling: None, grace_ms: 10_000, command: None }
+        Self {
+            args: args.iter().map(|a| a.to_string()).collect(),
+            ceiling: None,
+            grace_ms: 10_000,
+            command: None,
+        }
     }
 }
 
@@ -89,14 +99,22 @@ pub struct Attempt {
 
 impl Attempt {
     pub fn new(name: &str, options: &Options) -> Self {
-        let dir = std::env::temp_dir().join(format!("fgos-gate-portable-{name}-{}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("fgos-gate-portable-{name}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(dir.join("protected")).unwrap();
         let attempt_id = format!("att-{name}");
-        let (stdout, stderr) = (dir.join("capture-stdout.log"), dir.join("capture-stderr.log"));
+        let (stdout, stderr) = (
+            dir.join("capture-stdout.log"),
+            dir.join("capture-stderr.log"),
+        );
         let side_file = dir.join("protected").join("attempt-secrets.json");
         fs::write(&side_file, json!({"v": 1, "attemptId": attempt_id, "env": {}, "controlEpoch": 1, "controlToken": "t"}).to_string()).unwrap();
-        let ceiling = options.ceiling.clone().map(|(boot, ns)| json!({"bootId": boot, "boottimeNs": ns})).unwrap_or(Value::Null);
+        let ceiling = options
+            .ceiling
+            .clone()
+            .map(|(boot, ns)| json!({"bootId": boot, "boottimeNs": ns}))
+            .unwrap_or(Value::Null);
         let mut env = BTreeMap::new();
         for key in ["PATH", "SystemRoot"] {
             if let Ok(value) = std::env::var(key) {
@@ -138,7 +156,14 @@ impl Attempt {
         envelope_value["digest"] = Value::String(digest.clone());
         let path = dir.join("envelope.json");
         fs::write(&path, serde_json::to_vec(&envelope_value).unwrap()).unwrap();
-        Self { dir, attempt_id, envelope: path, digest, stdout, stderr }
+        Self {
+            dir,
+            attempt_id,
+            envelope: path,
+            digest,
+            stdout,
+            stderr,
+        }
     }
 
     pub fn stop_requested(&self, cause: &str) {
@@ -151,7 +176,8 @@ impl Attempt {
     }
 
     pub fn gate_log(&self) -> String {
-        fs::read_to_string(self.dir.join("gate-stdout.log")).unwrap_or_default() + &fs::read_to_string(self.dir.join("gate-stderr.log")).unwrap_or_default()
+        fs::read_to_string(self.dir.join("gate-stdout.log")).unwrap_or_default()
+            + &fs::read_to_string(self.dir.join("gate-stderr.log")).unwrap_or_default()
     }
 }
 
@@ -174,25 +200,54 @@ pub fn start_gate(attempt: &Attempt) -> Gate {
     let (mine, theirs) = UnixStream::pair().unwrap();
     let theirs = File::from(OwnedFd::from(theirs));
     let mut cmd = Command::new(harness());
-    cmd.args(["--protocol", "1", "--envelope"]).arg(&attempt.envelope).args(["--go-fd", "5"]).current_dir(&attempt.dir);
-    cmd.stdin(Stdio::null()).stdout(File::create(attempt.dir.join("gate-stdout.log")).unwrap()).stderr(File::create(attempt.dir.join("gate-stderr.log")).unwrap());
+    cmd.args(["--protocol", "1", "--envelope"])
+        .arg(&attempt.envelope)
+        .args(["--go-fd", "5"])
+        .current_dir(&attempt.dir);
+    cmd.stdin(Stdio::null())
+        .stdout(File::create(attempt.dir.join("gate-stdout.log")).unwrap())
+        .stderr(File::create(attempt.dir.join("gate-stderr.log")).unwrap());
     let child = spawn_with_fds(cmd, &[(FdSlot(5), &theirs)]).expect("spawn gate");
-    Gate { child, go: Box::new(mine), _domain: None }
+    Gate {
+        child,
+        go: Box::new(mine),
+        _domain: None,
+    }
 }
 
 #[cfg(windows)]
 pub fn start_gate(attempt: &Attempt) -> Gate {
-    use fgos_process::containment::{select, ContainmentDomain, SelectEnv, SpawnSpec, StartMode, WindowsJobDriver};
+    use fgos_process::containment::{
+        select, ContainmentDomain, SelectEnv, SpawnSpec, StartMode, WindowsJobDriver,
+    };
     use fgos_run_supervisor::go_pipe;
 
     let driver = select(&SelectEnv::default()).expect("select");
     assert_eq!(driver.name(), "windows-job");
     let mut domain: ContainmentDomain = driver.create(&attempt.attempt_id).expect("create job");
     let job = WindowsJobDriver::job_name(&domain).unwrap().to_string();
-    let pipe = format!(r"\\.\pipe\fgos-gate-go-{}-{}", attempt.attempt_id, std::process::id());
+    let pipe = format!(
+        r"\\.\pipe\fgos-gate-go-{}-{}",
+        attempt.attempt_id,
+        std::process::id()
+    );
     let server = go_pipe::listen(&pipe).expect("listen");
-    let argv: Vec<String> = [harness().to_string_lossy().into_owned(), "--protocol".into(), "1".into(), "--envelope".into(), attempt.envelope.to_string_lossy().into_owned(), "--go-socket".into(), pipe, "--job-name".into(), job].into();
-    let env: BTreeMap<String, String> = ["PATH", "SystemRoot"].iter().filter_map(|k| std::env::var(k).ok().map(|v| (k.to_string(), v))).collect();
+    let argv: Vec<String> = [
+        harness().to_string_lossy().into_owned(),
+        "--protocol".into(),
+        "1".into(),
+        "--envelope".into(),
+        attempt.envelope.to_string_lossy().into_owned(),
+        "--go-socket".into(),
+        pipe,
+        "--job-name".into(),
+        job,
+    ]
+    .into();
+    let env: BTreeMap<String, String> = ["PATH", "SystemRoot"]
+        .iter()
+        .filter_map(|k| std::env::var(k).ok().map(|v| (k.to_string(), v)))
+        .collect();
     let spec = SpawnSpec {
         argv,
         bwrap_prefix: None,
@@ -210,8 +265,15 @@ pub fn start_gate(attempt: &Attempt) -> Gate {
     std::thread::spawn(move || {
         let _ = tx.send(server.accept());
     });
-    let go = rx.recv_timeout(Duration::from_secs(30)).expect("the gate never connected to the GO pipe").expect("accept");
-    Gate { child: spawned.child, go: Box::new(go), _domain: Some(Box::new(domain)) }
+    let go = rx
+        .recv_timeout(Duration::from_secs(30))
+        .expect("the gate never connected to the GO pipe")
+        .expect("accept");
+    Gate {
+        child: spawned.child,
+        go: Box::new(go),
+        _domain: Some(Box::new(domain)),
+    }
 }
 
 /// Ask the gate to stop the way the supervisor does: the file first, then, where
@@ -253,7 +315,11 @@ pub fn wait_exit(gate: &mut Gate, attempt: &Attempt, limit: Duration) -> i32 {
         if let Some(status) = gate.child.try_wait().unwrap() {
             return status.code().unwrap_or(-1);
         }
-        assert!(start.elapsed() < limit, "gate did not exit; its output:\n{}", attempt.gate_log());
+        assert!(
+            start.elapsed() < limit,
+            "gate did not exit; its output:\n{}",
+            attempt.gate_log()
+        );
         sleep(Duration::from_millis(10));
     }
 }
@@ -263,7 +329,10 @@ pub fn alive(pid: u32) -> bool {
     #[cfg(target_os = "linux")]
     {
         match fs::read_to_string(format!("/proc/{pid}/stat")) {
-            Ok(stat) => stat.rfind(')').and_then(|i| stat[i + 1..].trim_start().chars().next()).is_some_and(|s| s != 'Z' && s != 'X'),
+            Ok(stat) => stat
+                .rfind(')')
+                .and_then(|i| stat[i + 1..].trim_start().chars().next())
+                .is_some_and(|s| s != 'Z' && s != 'X'),
             Err(_) => false,
         }
     }
@@ -277,7 +346,9 @@ pub fn alive(pid: u32) -> bool {
 #[cfg(windows)]
 pub fn alive(pid: u32) -> bool {
     use windows_sys::Win32::Foundation::CloseHandle;
-    use windows_sys::Win32::System::Threading::{GetExitCodeProcess, OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION};
+    use windows_sys::Win32::System::Threading::{
+        GetExitCodeProcess, OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION,
+    };
     const STILL_ACTIVE: u32 = 259;
     // SAFETY: a query-only handle to a pid, closed before returning.
     unsafe {
@@ -305,5 +376,8 @@ pub fn wait_dead(pid: u32, limit: Duration) -> bool {
 }
 
 pub fn pid_in(path: &Path) -> u32 {
-    wait_for(path, Duration::from_secs(10)).trim().parse().expect("pid")
+    wait_for(path, Duration::from_secs(10))
+        .trim()
+        .parse()
+        .expect("pid")
 }

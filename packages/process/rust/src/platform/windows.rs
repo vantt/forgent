@@ -43,7 +43,13 @@ extern "system" {
     fn OpenProcess(desired_access: Dword, inherit_handle: Bool, process_id: Dword) -> Handle;
     fn CloseHandle(handle: Handle) -> Bool;
     fn WaitForSingleObject(handle: Handle, milliseconds: Dword) -> Dword;
-    fn GetProcessTimes(handle: Handle, creation: *mut FileTime, exit: *mut FileTime, kernel: *mut FileTime, user: *mut FileTime) -> Bool;
+    fn GetProcessTimes(
+        handle: Handle,
+        creation: *mut FileTime,
+        exit: *mut FileTime,
+        kernel: *mut FileTime,
+        user: *mut FileTime,
+    ) -> Bool;
     fn TerminateProcess(handle: Handle, exit_code: u32) -> Bool;
 }
 
@@ -78,7 +84,8 @@ impl ProcessHandle {
         let mut kernel = FileTime::default();
         let mut user = FileTime::default();
         // SAFETY: four valid out-pointers for an open handle.
-        if unsafe { GetProcessTimes(self.0, &mut creation, &mut exit, &mut kernel, &mut user) } == 0 {
+        if unsafe { GetProcessTimes(self.0, &mut creation, &mut exit, &mut kernel, &mut user) } == 0
+        {
             return Err(io::Error::last_os_error());
         }
         Ok(Some(creation.as_u64()))
@@ -116,7 +123,10 @@ impl ProcessPlatform for Windows {
     }
 
     fn pid_ns(&self) -> PidNs {
-        PidNs { id: "none".to_string(), is_initial: true }
+        PidNs {
+            id: "none".to_string(),
+            is_initial: true,
+        }
     }
 
     fn observe(&self, pid: ProcId) -> Observed {
@@ -125,7 +135,9 @@ impl ProcessPlatform for Windows {
             Err(err) => return unreadable(&err),
         };
         match handle.creation_time() {
-            Ok(Some(creation)) => Observed::Live { start_time: creation.to_string() },
+            Ok(Some(creation)) => Observed::Live {
+                start_time: creation.to_string(),
+            },
             Ok(None) => Observed::Zombie,
             Err(err) => unreadable(&err),
         }
@@ -150,7 +162,10 @@ impl ProcessPlatform for Windows {
         if let Some(outcome) = control::out_of_scope(tuple, &self.observer()) {
             return outcome;
         }
-        let handle = match ProcessHandle::open(tuple.pid, PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION) {
+        let handle = match ProcessHandle::open(
+            tuple.pid,
+            PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION,
+        ) {
             Ok(handle) => handle,
             Err(err) => {
                 return match err.raw_os_error() {

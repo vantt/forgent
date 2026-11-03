@@ -182,7 +182,6 @@ pub fn write_readiness(driver: &GitDriver, repo: &RepoHandle, remote: &str) -> R
     Ok(())
 }
 
-
 /// Read-only doctor body: the tracked fence, the legacy refs and the sealed tree they name must agree.
 pub fn legacy_layout(driver: &GitDriver, repo: &RepoHandle) -> Result<serde_json::Value, Error> {
     let authority = crate::fence::authority(driver, repo)?;
@@ -192,7 +191,9 @@ pub fn legacy_layout(driver: &GitDriver, repo: &RepoHandle) -> Result<serde_json
         Ok(Some(pin)) => pin,
         Ok(None) => return Ok(serde_json::json!({"passed":true,"problems":[]})),
         Err(e) => {
-            return Ok(serde_json::json!({"passed":false,"problems":[format!("legacy ref missing or differs from fence: {e}")]}))
+            return Ok(
+                serde_json::json!({"passed":false,"problems":[format!("legacy ref missing or differs from fence: {e}")]}),
+            )
         }
     };
     let mut problems: Vec<String> = Vec::new();

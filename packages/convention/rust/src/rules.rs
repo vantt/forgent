@@ -29,9 +29,17 @@ pub struct DefinitionFileRule {
 
 impl DefinitionFileRule {
     /// The name inside `file_name`, or None when the file name does not follow this rule.
-    pub fn name_of<'a>(&self, file_name: &'a str, identifiers: &[IdentifierRule]) -> Option<&'a str> {
-        let name = file_name.strip_prefix(self.prefix.as_str())?.strip_suffix(self.suffix.as_str())?;
-        let rule = identifiers.iter().find(|rule| rule.id == self.name_identifier)?;
+    pub fn name_of<'a>(
+        &self,
+        file_name: &'a str,
+        identifiers: &[IdentifierRule],
+    ) -> Option<&'a str> {
+        let name = file_name
+            .strip_prefix(self.prefix.as_str())?
+            .strip_suffix(self.suffix.as_str())?;
+        let rule = identifiers
+            .iter()
+            .find(|rule| rule.id == self.name_identifier)?;
         rule.check(name).ok().map(|_| name)
     }
 }

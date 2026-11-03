@@ -11,7 +11,13 @@ pub fn dispatch_discussions(
     req: &ObserveRequest,
     scanner: UnitSummaryScanner,
 ) -> Result<Value, String> {
-    let flags = parse_flags("discussions", &req.args, &["--since", "--until", "--by"], &[], false)?;
+    let flags = parse_flags(
+        "discussions",
+        &req.args,
+        &["--since", "--until", "--by"],
+        &[],
+        false,
+    )?;
     for flag in ["--since", "--until", "--by"] {
         if flags.value(flag).is_some_and(str::is_empty) {
             return Err(format!("metrics discussions: missing value for {flag}"));
@@ -340,13 +346,15 @@ mod tests {
     #[test]
     fn a_summary_written_before_seats_existed_counts_the_same_voters() {
         // Before seats a seat carried only its role-keyed name; the kind alone says who votes.
-        let legacy = |name: &str, kind: &str, choice: Option<&str>| json!({
-            "role": name, "kind": kind,
-            "final": {"stance": match choice {
-                Some(choice) => json!({"status": "valid", "choice": choice, "confidence": 0.8}),
-                None => json!({"status": "missing"}),
-            }},
-        });
+        let legacy = |name: &str, kind: &str, choice: Option<&str>| {
+            json!({
+                "role": name, "kind": kind,
+                "final": {"stance": match choice {
+                    Some(choice) => json!({"status": "valid", "choice": choice, "confidence": 0.8}),
+                    None => json!({"status": "missing"}),
+                }},
+            })
+        };
         let Value::Object(unit) = json!({
             "stanceOptions": ["a", "b"],
             "seats": [

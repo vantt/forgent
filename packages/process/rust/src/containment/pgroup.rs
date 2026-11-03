@@ -9,8 +9,8 @@ use std::time::{Duration, Instant};
 use super::{ContainmentError, GateChild, SpawnSpec};
 use crate::control::{self, Signal};
 use crate::facts::{self, ProcTuple, Verdict};
-use crate::platform::as_pid_t;
 use crate::mapped::{spawn_mapped, MappedLead, MappedSpawn, MappedStdio};
+use crate::platform::as_pid_t;
 use crate::{signal_settled, DomainState, FdSlot, KillOutcome, ProcId};
 
 pub(crate) const POLL: Duration = Duration::from_millis(10);
@@ -28,7 +28,8 @@ pub(crate) struct Unlistable;
 /// Live descendants of `root` by parent links (walked only when `walk_tree`:
 /// a dead leader's pid may name anyone) and live processes of the group
 /// `pgid`, `root` itself excluded.
-pub(crate) type ListFn = fn(root: u32, walk_tree: bool, pgid: Option<u32>) -> Result<Members, Unlistable>;
+pub(crate) type ListFn =
+    fn(root: u32, walk_tree: bool, pgid: Option<u32>) -> Result<Members, Unlistable>;
 
 /// Add the live descendants of the leader to what the domain has seen;
 /// `false` when they could not be listed.
@@ -74,7 +75,12 @@ pub(crate) fn state(list: ListFn, leader: &ProcTuple, seen: &[ProcTuple]) -> Dom
 
 /// `killpg` while the leader is provably the group's leader, then kill by
 /// identity everything seen in the tree or the group, until a pass finds none.
-pub(crate) fn kill(list: ListFn, leader: &ProcTuple, seen: &mut Vec<ProcTuple>, empty_wait: Duration) -> KillOutcome {
+pub(crate) fn kill(
+    list: ListFn,
+    leader: &ProcTuple,
+    seen: &mut Vec<ProcTuple>,
+    empty_wait: Duration,
+) -> KillOutcome {
     let mut refused = false;
     for _ in 0..10 {
         let leader_alive = facts::judge_here(&leader.to_record()) == Verdict::Alive;
@@ -119,7 +125,9 @@ pub(crate) fn kill(list: ListFn, leader: &ProcTuple, seen: &mut Vec<ProcTuple>, 
         }
         std::thread::sleep(POLL);
     }
-    wait_until(empty_wait, || state(list, leader, seen) == DomainState::Empty);
+    wait_until(empty_wait, || {
+        state(list, leader, seen) == DomainState::Empty
+    });
     if !refused && state(list, leader, seen) == DomainState::Empty {
         KillOutcome::Ok
     } else {
@@ -154,7 +162,11 @@ pub(crate) fn wait_until(limit: Duration, mut done: impl FnMut() -> bool) -> boo
 
 /// The gate's start request: `argv` (program first), the spec's exact
 /// environment, directory and stdio (`/dev/null` where none is given).
-pub(crate) fn gate_request<'a>(argv: Vec<String>, spec: &'a SpawnSpec, lead: MappedLead) -> MappedSpawn<'a> {
+pub(crate) fn gate_request<'a>(
+    argv: Vec<String>,
+    spec: &'a SpawnSpec,
+    lead: MappedLead,
+) -> MappedSpawn<'a> {
     let stdio = |file: &'a Option<File>| file.as_ref().map_or(MappedStdio::Null, MappedStdio::File);
     MappedSpawn {
         argv: argv.into_iter().map(Into::into).collect(),
@@ -168,16 +180,29 @@ pub(crate) fn gate_request<'a>(argv: Vec<String>, spec: &'a SpawnSpec, lead: Map
 
 /// Start the gate as the leader of its own session and process group with
 /// the spec's descriptor map, and read its identity with `identity`.
-pub(crate) fn spawn_leader(spec: &SpawnSpec, identity: impl Fn(ProcId) -> Option<ProcTuple>) -> Result<(GateChild, ProcTuple), ContainmentError> {
+pub(crate) fn spawn_leader(
+    spec: &SpawnSpec,
+    identity: impl Fn(ProcId) -> Option<ProcTuple>,
+) -> Result<(GateChild, ProcTuple), ContainmentError> {
     if spec.argv.is_empty() {
         return Err(ContainmentError::SpawnFailed("empty gate command".into()));
     }
-    let map: Vec<(FdSlot, &File)> = spec.fd_map.iter().map(|(slot, file)| (*slot, file)).collect();
-    let mut child = spawn_mapped(&gate_request(spec.argv.clone(), spec, MappedLead::Session), &map).map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
+    let map: Vec<(FdSlot, &File)> = spec
+        .fd_map
+        .iter()
+        .map(|(slot, file)| (*slot, file))
+        .collect();
+    let mut child = spawn_mapped(
+        &gate_request(spec.argv.clone(), spec, MappedLead::Session),
+        &map,
+    )
+    .map_err(|err| ContainmentError::SpawnFailed(err.to_string()))?;
     let Some(root) = identity(ProcId(child.id())) else {
         let _ = child.kill();
         let _ = child.wait();
-        return Err(ContainmentError::SpawnFailed("gate left before its identity was read".into()));
+        return Err(ContainmentError::SpawnFailed(
+            "gate left before its identity was read".into(),
+        ));
     };
     Ok((child, root))
 }
@@ -191,7 +216,13 @@ mod tests {
     fn dead_leader() -> ProcTuple {
         let mut child = Command::new("true").spawn().unwrap();
         let observer = facts::observer();
-        let leader = ProcTuple { host: observer.host, boot_id: observer.boot_id, pid_ns: observer.pid_ns, pid: ProcId(child.id()), start_time: "0".into() };
+        let leader = ProcTuple {
+            host: observer.host,
+            boot_id: observer.boot_id,
+            pid_ns: observer.pid_ns,
+            pid: ProcId(child.id()),
+            start_time: "0".into(),
+        };
         child.wait().unwrap();
         assert_eq!(facts::judge_here(&leader.to_record()), Verdict::Dead);
         leader
@@ -200,9 +231,19 @@ mod tests {
     #[test]
     fn a_candidate_that_cannot_be_read_makes_the_domain_unknown_not_empty() {
         let leader = dead_leader();
-        let unreadable: ListFn = |_, _, _| Ok(Members { tuples: Vec::new(), unreadable: 1 });
+        let unreadable: ListFn = |_, _, _| {
+            Ok(Members {
+                tuples: Vec::new(),
+                unreadable: 1,
+            })
+        };
         let unlistable: ListFn = |_, _, _| Err(Unlistable);
-        let clean: ListFn = |_, _, _| Ok(Members { tuples: Vec::new(), unreadable: 0 });
+        let clean: ListFn = |_, _, _| {
+            Ok(Members {
+                tuples: Vec::new(),
+                unreadable: 0,
+            })
+        };
         assert_eq!(state(unreadable, &leader, &[]), DomainState::Unknown);
         assert_eq!(state(unlistable, &leader, &[]), DomainState::Unknown);
         assert_eq!(state(clean, &leader, &[]), DomainState::Empty);
@@ -211,7 +252,20 @@ mod tests {
     #[test]
     fn a_kill_that_could_not_read_every_candidate_is_refused() {
         let leader = dead_leader();
-        let unreadable: ListFn = |_, _, _| Ok(Members { tuples: Vec::new(), unreadable: 1 });
-        assert_eq!(kill(unreadable, &leader, &mut Vec::new(), Duration::from_millis(20)), KillOutcome::Refused);
+        let unreadable: ListFn = |_, _, _| {
+            Ok(Members {
+                tuples: Vec::new(),
+                unreadable: 1,
+            })
+        };
+        assert_eq!(
+            kill(
+                unreadable,
+                &leader,
+                &mut Vec::new(),
+                Duration::from_millis(20)
+            ),
+            KillOutcome::Refused
+        );
     }
 }

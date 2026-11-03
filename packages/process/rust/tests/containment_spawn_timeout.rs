@@ -18,11 +18,25 @@ mod common;
 fn processes_with(token: &str) -> Vec<u32> {
     let mut found = Vec::new();
     for entry in fs::read_dir("/proc").unwrap().flatten() {
-        let Some(pid) = entry.file_name().to_str().and_then(|n| n.parse::<u32>().ok()) else { continue };
-        let Ok(cmdline) = fs::read(format!("/proc/{pid}/cmdline")) else { continue };
+        let Some(pid) = entry
+            .file_name()
+            .to_str()
+            .and_then(|n| n.parse::<u32>().ok())
+        else {
+            continue;
+        };
+        let Ok(cmdline) = fs::read(format!("/proc/{pid}/cmdline")) else {
+            continue;
+        };
         if pid != std::process::id() && String::from_utf8_lossy(&cmdline).contains(token) {
             if let Ok(stat) = fs::read_to_string(format!("/proc/{pid}/stat")) {
-                if !stat.rsplit(')').next().unwrap_or("").trim_start().starts_with('Z') {
+                if !stat
+                    .rsplit(')')
+                    .next()
+                    .unwrap_or("")
+                    .trim_start()
+                    .starts_with('Z')
+                {
                     found.push(pid);
                 }
             }
@@ -34,10 +48,15 @@ fn processes_with(token: &str) -> Vec<u32> {
 #[test]
 fn a_timed_out_spawn_leaves_no_process_of_the_attempt() {
     let _ = (&common::scratch, &common::wait_for);
-    let Some(_) = common::require_bwrap() else { return; };
+    let Some(_) = common::require_bwrap() else {
+        return;
+    };
     // A decimal duration that no other process on the machine has.
     let token = format!("299.{}", std::process::id());
-    let wrapper = PathBuf::from(format!("{}/tests/fixtures/bwrap-without-info-fd.sh", env!("CARGO_MANIFEST_DIR")));
+    let wrapper = PathBuf::from(format!(
+        "{}/tests/fixtures/bwrap-without-info-fd.sh",
+        env!("CARGO_MANIFEST_DIR")
+    ));
     let driver = BwrapPidns::new(wrapper);
     let mut domain = driver.create("att-timeout").unwrap();
     let spec = common::spec(["/bin/sleep", &token]);
@@ -56,10 +75,16 @@ fn a_timed_out_spawn_leaves_no_process_of_the_attempt() {
             }
         })
     };
-    let failure = driver.spawn_in(&mut domain, spec).err().expect("the spawn must time out");
+    let failure = driver
+        .spawn_in(&mut domain, spec)
+        .err()
+        .expect("the spawn must time out");
     watcher.join().unwrap();
     assert_eq!(failure.name(), "namespace-unavailable");
-    assert!(seen.load(Ordering::Relaxed), "the gate command was running during the wait");
+    assert!(
+        seen.load(Ordering::Relaxed),
+        "the gate command was running during the wait"
+    );
 
     let start = Instant::now();
     loop {
@@ -67,7 +92,10 @@ fn a_timed_out_spawn_leaves_no_process_of_the_attempt() {
         if left.is_empty() {
             break;
         }
-        assert!(start.elapsed() < Duration::from_secs(3), "processes of the failed attempt survive: {left:?}");
+        assert!(
+            start.elapsed() < Duration::from_secs(3),
+            "processes of the failed attempt survive: {left:?}"
+        );
         sleep(Duration::from_millis(20));
     }
 }

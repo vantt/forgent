@@ -189,7 +189,12 @@ impl MailboxState {
             self.check_budget(&account, limits)?;
             self.check_lifetime_key(&LifetimeKey::remote(mail.machine, mail.from), limits)?;
             let recipient = self.resolve_key(mail.to, dead)?;
-            let (to, generation, cli, head) = (recipient.key.clone(), recipient.generation, recipient.cli.clone(), recipient.head.clone());
+            let (to, generation, cli, head) = (
+                recipient.key.clone(),
+                recipient.generation,
+                recipient.cli.clone(),
+                recipient.head.clone(),
+            );
             self.check_loop(&account, &to, now, limits)?;
             self.check_queue(&to, generation, limits)?;
             self.check_share(&account, &to, generation, limits)?;

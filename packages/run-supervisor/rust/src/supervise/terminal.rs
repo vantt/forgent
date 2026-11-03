@@ -23,24 +23,31 @@ use std::os::unix::net::{UnixListener, UnixStream};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use fgos_agent_protocol::BlockedReason;
 use fgos_agent_protocol::port::{AgentIo, Inspection, IoError, SendInput};
 use fgos_agent_protocol::terminal::{
-    adapter_for, ExitCommand, FsOutbox, Terminal, TerminalOutcome, UnreadableResult, REASON_AGENT_NOT_STARTED,
-    REASON_COMPLETED_NO_EXIT, REASON_FOREGROUND_NOT_AGENT, REASON_RESULT_UNREADABLE,
+    adapter_for, ExitCommand, FsOutbox, Terminal, TerminalOutcome, UnreadableResult,
+    REASON_AGENT_NOT_STARTED, REASON_COMPLETED_NO_EXIT, REASON_FOREGROUND_NOT_AGENT,
+    REASON_RESULT_UNREADABLE,
 };
+use fgos_agent_protocol::BlockedReason;
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, KillOutcome, ProcId};
 use fgos_terminal_control::core::{Core, Want};
-use fgos_terminal_control::port::{ExpectedProcess, LaunchOutcome, LaunchSpec, PaneState, ProcessIdentity, Refusal as TerminalRefusal, SendOutcome};
+use fgos_terminal_control::port::{
+    ExpectedProcess, LaunchOutcome, LaunchSpec, PaneState, ProcessIdentity,
+    Refusal as TerminalRefusal, SendOutcome,
+};
 use serde_json::{json, Value};
 
-use super::{os, request_stop, write_atomic, Refusal, TerminalEnd, Watch, GATE_STOP_SLACK, HEARTBEAT_EVERY, HELLO_LIMIT, TICK};
+use super::{
+    os, request_stop, write_atomic, Refusal, TerminalEnd, Watch, GATE_STOP_SLACK, HEARTBEAT_EVERY,
+    HELLO_LIMIT, TICK,
+};
 use crate::go_channel::{read_frame, write_frame};
 use crate::publish::publish_once;
-use fgos_identity::text::iso_utc_now;
 use crate::route::EXIT_ENVELOPE_INVALID;
 use crate::terminal_slot::Backend;
+use fgos_identity::text::iso_utc_now;
 
 /// `sun_path` holds 108 bytes including the terminating NUL.
 const MAX_SOCKET_PATH: usize = 107;
@@ -71,26 +78,55 @@ struct Plan {
 
 impl Plan {
     fn from(envelope: &Value) -> Result<Plan, Refusal> {
-        let invalid = |why: String| Refusal { exit: EXIT_ENVELOPE_INVALID, code: "envelope-invalid", why };
-        let text = |v: &Value, what: &str| v.as_str().map(String::from).ok_or_else(|| invalid(format!("envelope field {what} missing")));
-        let cli = envelope["agentProtocol"]["cli"].as_str().unwrap_or_default();
-        let adapter = adapter_for(cli).ok_or(Refusal { exit: EXIT_ENVELOPE_INVALID, code: "agent-protocol-unsupported", why: format!("{cli} has no terminal adapter") })?;
+        let invalid = |why: String| Refusal {
+            exit: EXIT_ENVELOPE_INVALID,
+            code: "envelope-invalid",
+            why,
+        };
+        let text = |v: &Value, what: &str| {
+            v.as_str()
+                .map(String::from)
+                .ok_or_else(|| invalid(format!("envelope field {what} missing")))
+        };
+        let cli = envelope["agentProtocol"]["cli"]
+            .as_str()
+            .unwrap_or_default();
+        let adapter = adapter_for(cli).ok_or(Refusal {
+            exit: EXIT_ENVELOPE_INVALID,
+            code: "agent-protocol-unsupported",
+            why: format!("{cli} has no terminal adapter"),
+        })?;
         let brief_path = text(&envelope["launch"]["briefPath"], "launch.briefPath")?;
-        let brief = fs::read_to_string(&brief_path).map_err(|e| invalid(format!("brief {brief_path}: {e}")))?;
-        let bwrap_prefix = envelope["containment"]["bwrapPrefix"].as_array().map(|items| {
-            let mut prefix: Vec<String> = items.iter().filter_map(Value::as_str).map(String::from).collect();
-            if prefix.last().is_some_and(|last| last == "--") {
-                prefix.pop();
-            }
-            prefix
-        });
+        let brief = fs::read_to_string(&brief_path)
+            .map_err(|e| invalid(format!("brief {brief_path}: {e}")))?;
+        let bwrap_prefix = envelope["containment"]["bwrapPrefix"]
+            .as_array()
+            .map(|items| {
+                let mut prefix: Vec<String> = items
+                    .iter()
+                    .filter_map(Value::as_str)
+                    .map(String::from)
+                    .collect();
+                if prefix.last().is_some_and(|last| last == "--") {
+                    prefix.pop();
+                }
+                prefix
+            });
         Ok(Plan {
             key: text(&envelope["slot"]["key"], "slot.key")?,
-            socket_path: PathBuf::from(text(&envelope["terminal"]["socketPath"], "terminal.socketPath")?),
+            socket_path: PathBuf::from(text(
+                &envelope["terminal"]["socketPath"],
+                "terminal.socketPath",
+            )?),
             host_bin: text(&envelope["hostBin"], "hostBin")?,
             bwrap_prefix: bwrap_prefix.filter(|p| !p.is_empty()),
-            domain_kind: text(&envelope["containment"]["preferred"], "containment.preferred")?,
-            exit: envelope["terminal"]["exitCommand"].as_str().map(String::from),
+            domain_kind: text(
+                &envelope["containment"]["preferred"],
+                "containment.preferred",
+            )?,
+            exit: envelope["terminal"]["exitCommand"]
+                .as_str()
+                .map(String::from),
             brief: brief.trim_end().to_string(),
             adapter,
         })
@@ -107,19 +143,31 @@ impl AttemptSocket {
     /// Bind inside a directory only this user can use, mode 0600.
     fn bind(path: &Path) -> Result<AttemptSocket, String> {
         if path.as_os_str().len() > MAX_SOCKET_PATH {
-            return Err(format!("socket path {} is longer than {MAX_SOCKET_PATH} bytes", path.display()));
+            return Err(format!(
+                "socket path {} is longer than {MAX_SOCKET_PATH} bytes",
+                path.display()
+            ));
         }
         let dir = path.parent().ok_or("socket path has no directory")?;
-        let meta = fs::metadata(dir).map_err(|e| format!("socket directory {}: {e}", dir.display()))?;
+        let meta =
+            fs::metadata(dir).map_err(|e| format!("socket directory {}: {e}", dir.display()))?;
         // SAFETY: getuid has no failure mode.
         if meta.uid() != unsafe { libc::getuid() } || meta.mode() & 0o077 != 0 {
-            return Err(format!("socket directory {} must be owned by this user with mode 0700", dir.display()));
+            return Err(format!(
+                "socket directory {} must be owned by this user with mode 0700",
+                dir.display()
+            ));
         }
         let _ = fs::remove_file(path);
-        let listener = UnixListener::bind(path).map_err(|e| format!("bind {}: {e}", path.display()))?;
-        fs::set_permissions(path, fs::Permissions::from_mode(0o600)).map_err(|e| format!("chmod {}: {e}", path.display()))?;
+        let listener =
+            UnixListener::bind(path).map_err(|e| format!("bind {}: {e}", path.display()))?;
+        fs::set_permissions(path, fs::Permissions::from_mode(0o600))
+            .map_err(|e| format!("chmod {}: {e}", path.display()))?;
         listener.set_nonblocking(true).map_err(|e| e.to_string())?;
-        Ok(AttemptSocket { listener: Some(listener), path: path.to_path_buf() })
+        Ok(AttemptSocket {
+            listener: Some(listener),
+            path: path.to_path_buf(),
+        })
     }
 
     /// The gate's connection: same uid, first frame HELLO for this attempt. Anything else is dropped
@@ -135,7 +183,9 @@ impl AttemptSocket {
                     let _ = stream.set_nonblocking(false);
                     let _ = stream.set_read_timeout(Some(Duration::from_secs(5)));
                     let mut reader = &stream;
-                    let hello = peer_uid(&stream) == Some(me) && read_frame(&mut reader).is_ok_and(|f| f["type"] == "HELLO" && f["attemptId"] == attempt_id);
+                    let hello = peer_uid(&stream) == Some(me)
+                        && read_frame(&mut reader)
+                            .is_ok_and(|f| f["type"] == "HELLO" && f["attemptId"] == attempt_id);
                     if hello {
                         let _ = stream.set_read_timeout(None);
                         return Some(stream);
@@ -175,10 +225,22 @@ fn peer_uid(stream: &UnixStream) -> Option<libc::uid_t> {
 
 #[cfg(target_os = "linux")]
 fn peer_cred(stream: &UnixStream) -> Option<libc::ucred> {
-    let mut cred = libc::ucred { pid: 0, uid: 0, gid: 0 };
+    let mut cred = libc::ucred {
+        pid: 0,
+        uid: 0,
+        gid: 0,
+    };
     let mut len = std::mem::size_of::<libc::ucred>() as libc::socklen_t;
     // SAFETY: SO_PEERCRED writes one ucred.
-    let rc = unsafe { libc::getsockopt(stream.as_raw_fd(), libc::SOL_SOCKET, libc::SO_PEERCRED, (&mut cred as *mut libc::ucred).cast(), &mut len) };
+    let rc = unsafe {
+        libc::getsockopt(
+            stream.as_raw_fd(),
+            libc::SOL_SOCKET,
+            libc::SO_PEERCRED,
+            (&mut cred as *mut libc::ucred).cast(),
+            &mut len,
+        )
+    };
     (rc == 0).then_some(cred)
 }
 
@@ -187,7 +249,10 @@ fn send_frame_with_fds(stream: &UnixStream, frame: &Value, fds: &[RawFd]) -> std
     let body = serde_json::to_vec(frame).map_err(std::io::Error::other)?;
     let mut wire = (body.len() as u32).to_be_bytes().to_vec();
     wire.extend_from_slice(&body);
-    let mut iov = libc::iovec { iov_base: wire.as_mut_ptr().cast(), iov_len: wire.len() };
+    let mut iov = libc::iovec {
+        iov_base: wire.as_mut_ptr().cast(),
+        iov_len: wire.len(),
+    };
     let mut control = [0u64; 8];
     // SAFETY: an all-zero msghdr is valid; the fields used are set below.
     let mut msg: libc::msghdr = unsafe { std::mem::zeroed() };
@@ -213,7 +278,10 @@ fn send_frame_with_fds(stream: &UnixStream, frame: &Value, fds: &[RawFd]) -> std
         return Err(std::io::Error::last_os_error());
     }
     if sent as usize != wire.len() {
-        return Err(std::io::Error::new(std::io::ErrorKind::WriteZero, "GO was sent in pieces"));
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::WriteZero,
+            "GO was sent in pieces",
+        ));
     }
     Ok(())
 }
@@ -225,25 +293,53 @@ fn shell_quote(text: &str) -> String {
 /// The launcher the pane runs: `exec bwrap … -- <host> internal gate …`, or the gate itself where
 /// there is no sandbox. Written next to the envelope, mode 0700.
 fn launch_spec(plan: &Plan, run_dir: &Path) -> Result<LaunchSpec, String> {
-    let gate_args: Vec<String> = ["internal", "gate", "--protocol", "1", "--envelope"].iter().map(|s| s.to_string()).chain([run_dir.join("envelope.json").to_string_lossy().into_owned(), "--go-socket".into(), plan.socket_path.to_string_lossy().into_owned()]).collect();
+    let gate_args: Vec<String> = ["internal", "gate", "--protocol", "1", "--envelope"]
+        .iter()
+        .map(|s| s.to_string())
+        .chain([
+            run_dir.join("envelope.json").to_string_lossy().into_owned(),
+            "--go-socket".into(),
+            plan.socket_path.to_string_lossy().into_owned(),
+        ])
+        .collect();
     let (program, args) = match &plan.bwrap_prefix {
         Some(prefix) => {
-            let args = prefix[1..].iter().cloned().chain(["--".to_string(), plan.host_bin.clone()]).chain(gate_args).collect();
+            let args = prefix[1..]
+                .iter()
+                .cloned()
+                .chain(["--".to_string(), plan.host_bin.clone()])
+                .chain(gate_args)
+                .collect();
             (prefix[0].clone(), args)
         }
         None => (plan.host_bin.clone(), gate_args),
     };
     let script = run_dir.join("launcher.sh");
-    let line = std::iter::once(program.as_str()).chain(args.iter().map(String::as_str)).map(shell_quote).collect::<Vec<_>>().join(" ");
-    let mut file = fs::OpenOptions::new().write(true).create(true).truncate(true).mode(0o700).open(&script).map_err(|e| format!("{}: {e}", script.display()))?;
-    file.write_all(format!("#!/bin/sh\nexec {line}\n").as_bytes()).map_err(|e| e.to_string())?;
+    let line = std::iter::once(program.as_str())
+        .chain(args.iter().map(String::as_str))
+        .map(shell_quote)
+        .collect::<Vec<_>>()
+        .join(" ");
+    let mut file = fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .mode(0o700)
+        .open(&script)
+        .map_err(|e| format!("{}: {e}", script.display()))?;
+    file.write_all(format!("#!/bin/sh\nexec {line}\n").as_bytes())
+        .map_err(|e| e.to_string())?;
     drop(file);
     Ok(LaunchSpec {
         command: script.to_string_lossy().into_owned(),
         args: Vec::new(),
         cwd: run_dir.to_string_lossy().into_owned(),
         env: Default::default(),
-        expect: Some(ExpectedProcess { argv0: program.clone(), command: program, args }),
+        expect: Some(ExpectedProcess {
+            argv0: program.clone(),
+            command: program,
+            args,
+        }),
     })
 }
 
@@ -251,26 +347,43 @@ fn launch_spec(plan: &Plan, run_dir: &Path) -> Result<LaunchSpec, String> {
 /// (the kernel translates the peer pid for a reader in an ancestor namespace); it must belong to the
 /// process terminal-control saw in the pane. Without that answer, the namespace's init among the
 /// pane root's children is the gate.
-fn gate_tuple(stream: &UnixStream, root: &ProcessIdentity, sandboxed: bool) -> Result<ProcTuple, String> {
+fn gate_tuple(
+    stream: &UnixStream,
+    root: &ProcessIdentity,
+    sandboxed: bool,
+) -> Result<ProcTuple, String> {
     #[cfg(target_os = "linux")]
     {
-        let from_peer = peer_cred(stream).map(|c| c.pid as u32).filter(|pid| *pid != 0 && within(*pid, root.pid));
-        if let Some(tuple) = from_peer.or_else(|| namespace_init_under(root.pid, sandboxed)).and_then(|pid| facts::identity_of(ProcId(pid))) {
+        let from_peer = peer_cred(stream)
+            .map(|c| c.pid as u32)
+            .filter(|pid| *pid != 0 && within(*pid, root.pid));
+        if let Some(tuple) = from_peer
+            .or_else(|| namespace_init_under(root.pid, sandboxed))
+            .and_then(|pid| facts::identity_of(ProcId(pid)))
+        {
             return Ok(tuple);
         }
-        Err(format!("the gate is not among the descendants of pane root {}", root.pid))
+        Err(format!(
+            "the gate is not among the descendants of pane root {}",
+            root.pid
+        ))
     }
     #[cfg(not(target_os = "linux"))]
     {
         let _ = (stream, sandboxed);
-        facts::identity_of(ProcId(root.pid)).ok_or_else(|| format!("pane root {} is gone", root.pid))
+        facts::identity_of(ProcId(root.pid))
+            .ok_or_else(|| format!("pane root {} is gone", root.pid))
     }
 }
 
 #[cfg(target_os = "linux")]
 fn parent_of(pid: u32) -> Option<u32> {
     let stat = fs::read_to_string(format!("/proc/{pid}/stat")).ok()?;
-    stat[stat.rfind(')')? + 1..].split_whitespace().nth(1)?.parse().ok()
+    stat[stat.rfind(')')? + 1..]
+        .split_whitespace()
+        .nth(1)?
+        .parse()
+        .ok()
 }
 
 /// `pid` is `ancestor` or one of its descendants.
@@ -295,11 +408,20 @@ fn namespace_init_under(root: u32, sandboxed: bool) -> Option<u32> {
     let nspid = |pid: u32| -> Option<Vec<u32>> {
         let status = fs::read_to_string(format!("/proc/{pid}/status")).ok()?;
         let line = status.lines().find_map(|l| l.strip_prefix("NSpid:"))?;
-        Some(line.split_whitespace().filter_map(|n| n.parse().ok()).collect())
+        Some(
+            line.split_whitespace()
+                .filter_map(|n| n.parse().ok())
+                .collect(),
+        )
     };
     if nspid(root)?.len() == 1 {
-        let children = fs::read_to_string(format!("/proc/{root}/task/{root}/children")).ok().unwrap_or_default();
-        let init = children.split_whitespace().filter_map(|c| c.parse::<u32>().ok()).find(|c| nspid(*c).is_some_and(|ns| ns.len() > 1 && ns.last() == Some(&1)));
+        let children = fs::read_to_string(format!("/proc/{root}/task/{root}/children"))
+            .ok()
+            .unwrap_or_default();
+        let init = children
+            .split_whitespace()
+            .filter_map(|c| c.parse::<u32>().ok())
+            .find(|c| nspid(*c).is_some_and(|ns| ns.len() > 1 && ns.last() == Some(&1)));
         // Behind a sandbox the pane root is only bwrap's monitor: with no namespace init found, nothing here is the gate.
         return init.or(if sandboxed { None } else { Some(root) });
     }
@@ -322,7 +444,9 @@ fn domain_of(kind: &str, gate: ProcTuple) -> Result<Domain, String> {
         "linux-gate" => Ok(Domain::LinuxGate(gate)),
         "linux-pgroup" => Ok(Domain::LinuxPgroup(gate)),
         "macos-tree" => Ok(Domain::MacosTree(gate)),
-        other => Err(format!("containment {other} has no terminal gate domain on this platform")),
+        other => Err(format!(
+            "containment {other} has no terminal gate domain on this platform"
+        )),
     }
 }
 
@@ -389,9 +513,16 @@ impl Sup<'_> {
         if self.gate_gone {
             return;
         }
-        if self.last_beat.is_none_or(|at| at.elapsed() >= HEARTBEAT_EVERY) {
+        if self
+            .last_beat
+            .is_none_or(|at| at.elapsed() >= HEARTBEAT_EVERY)
+        {
             self.last_beat = Some(Instant::now());
-            let _ = write_atomic(self.run_dir, "supervisor-heartbeat.json", &json!({"v": 1, "attemptId": self.watch.attempt_id, "at": iso_utc_now(), "agentBound": self.agent_bound}));
+            let _ = write_atomic(
+                self.run_dir,
+                "supervisor-heartbeat.json",
+                &json!({"v": 1, "attemptId": self.watch.attempt_id, "at": iso_utc_now(), "agentBound": self.agent_bound}),
+            );
         }
         if self.last_carrier.elapsed() >= CARRIER_EVERY {
             self.carrier_check(core, key);
@@ -411,16 +542,28 @@ impl Sup<'_> {
                 Some("cancel")
             } else if self.watch.soft_deadline_passed() {
                 Some("soft-deadline")
-            } else if self.watch.idle.is_some_and(|idle| self.last_active.elapsed() >= idle) {
+            } else if self
+                .watch
+                .idle
+                .is_some_and(|idle| self.last_active.elapsed() >= idle)
+            {
                 Some("idle")
             } else {
                 None
             };
             if let Some(cause) = cause {
-                let reason = if matches!(cause, "soft-deadline" | "idle") { self.provider_stop_reason(core, key) } else { None };
+                let reason = if matches!(cause, "soft-deadline" | "idle") {
+                    self.provider_stop_reason(core, key)
+                } else {
+                    None
+                };
                 self.begin_stop(cause, reason.as_deref());
             }
-        } else if !self.ended_domain && self.stopped.is_some_and(|at| at.elapsed() >= self.watch.grace + GATE_STOP_SLACK) {
+        } else if !self.ended_domain
+            && self
+                .stopped
+                .is_some_and(|at| at.elapsed() >= self.watch.grace + GATE_STOP_SLACK)
+        {
             // The gate outlived its own grace: end the whole domain. A refused kill is tried again on the next tick.
             self.ended_domain = domain_kill_all(&self.domain) == KillOutcome::Ok;
         }
@@ -432,7 +575,9 @@ impl Sup<'_> {
     fn provider_stop_reason(&self, core: &Core, key: &str) -> Option<String> {
         let screen = core.read(key, None, Some("visible")).ok()?;
         match self.adapter.stop_reason(&screen)? {
-            reason @ (BlockedReason::Login | BlockedReason::UsageLimit) => TerminalOutcome::Blocked(reason).receipt_reason(),
+            reason @ (BlockedReason::Login | BlockedReason::UsageLimit) => {
+                TerminalOutcome::Blocked(reason).receipt_reason()
+            }
             BlockedReason::TrustDialog => None,
         }
     }
@@ -443,7 +588,14 @@ impl Sup<'_> {
         if self.end.carrier_lost {
             return;
         }
-        let seen = core.inspect_parts(key, Want { foreground: false, activity: false, detail: false });
+        let seen = core.inspect_parts(
+            key,
+            Want {
+                foreground: false,
+                activity: false,
+                detail: false,
+            },
+        );
         if seen.pane == PaneState::Gone {
             self.end.carrier_lost = true;
             // The gate has published nothing and is not asked to: only the end-of-grace sweep follows.
@@ -456,9 +608,16 @@ impl Sup<'_> {
     fn note_screen(&mut self, screen: Option<String>) {
         let Some(screen) = screen else { return };
         let mut hasher = DefaultHasher::new();
-        screen.chars().filter(|c| c.is_alphabetic()).for_each(|c| c.hash(&mut hasher));
+        screen
+            .chars()
+            .filter(|c| c.is_alphabetic())
+            .for_each(|c| c.hash(&mut hasher));
         let digest = hasher.finish();
-        if self.last_screen.replace(digest).is_some_and(|before| before != digest) {
+        if self
+            .last_screen
+            .replace(digest)
+            .is_some_and(|before| before != digest)
+        {
             self.last_active = Instant::now();
         }
     }
@@ -484,13 +643,23 @@ impl AgentIo for TermIo<'_, '_> {
         if self.sup.finished() {
             return Err(IoError::Io("the attempt is ending".into()));
         }
-        match self.core.send(self.key, input.text.as_deref(), input.keys.as_deref(), input.submit).map_err(io_err)? {
+        match self
+            .core
+            .send(
+                self.key,
+                input.text.as_deref(),
+                input.keys.as_deref(),
+                input.submit,
+            )
+            .map_err(io_err)?
+        {
             SendOutcome::Sent => Ok(()),
             // Nothing was typed. The agent is not the pane's foreground program, so it cannot take a
             // brief: the attempt ends with the reason on its receipt, a failed attempt for the settlement.
             SendOutcome::ForegroundNotAgent { reason } => {
                 eprintln!("fgos internal supervise: nothing typed into the pane: {reason}");
-                self.sup.begin_stop("cancel", Some(REASON_FOREGROUND_NOT_AGENT));
+                self.sup
+                    .begin_stop("cancel", Some(REASON_FOREGROUND_NOT_AGENT));
                 Err(IoError::Io(format!("nothing was typed: {reason}")))
             }
         }
@@ -500,7 +669,10 @@ impl AgentIo for TermIo<'_, '_> {
         if self.sup.finished() {
             return Err(IoError::Io("the attempt is ending".into()));
         }
-        let screen = self.core.read(self.key, None, Some("visible")).map_err(io_err)?;
+        let screen = self
+            .core
+            .read(self.key, None, Some("visible"))
+            .map_err(io_err)?;
         self.sup.note_screen(Some(screen.clone()));
         Ok(screen)
     }
@@ -509,21 +681,33 @@ impl AgentIo for TermIo<'_, '_> {
         if self.sup.finished() {
             return Err(IoError::Io("the attempt is ending".into()));
         }
-        let seen = self.core.inspect_parts(self.key, Want { foreground: false, activity: true, detail: true });
+        let seen = self.core.inspect_parts(
+            self.key,
+            Want {
+                foreground: false,
+                activity: true,
+                detail: true,
+            },
+        );
         let activity = match (seen.pane, seen.activity) {
             (PaneState::Live, Some(activity)) => activity,
             _ => return Err(IoError::Io("the pane gave no activity".into())),
         };
         Ok(match activity.detail {
             Some(detail) => Inspection {
-                state: detail.state.or_else(|| Some(activity.state).filter(|s| !s.is_empty())),
+                state: detail
+                    .state
+                    .or_else(|| Some(activity.state).filter(|s| !s.is_empty())),
                 visible_blocker: detail.visible_blocker,
                 visible_idle: detail.visible_idle,
                 visible_working: detail.visible_working,
                 matched_rule: detail.matched_rule.is_some(),
                 prompt_text: detail.prompt_text,
             },
-            None => Inspection { state: Some(activity.state).filter(|s| !s.is_empty()), ..Default::default() },
+            None => Inspection {
+                state: Some(activity.state).filter(|s| !s.is_empty()),
+                ..Default::default()
+            },
         })
     }
 
@@ -540,7 +724,12 @@ impl AgentIo for TermIo<'_, '_> {
     }
 }
 
-pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch: &Watch) -> Result<i32, Refusal> {
+pub(super) fn run(
+    envelope: &Value,
+    run_dir: &Path,
+    mut locks: os::Locks,
+    watch: &Watch,
+) -> Result<i32, Refusal> {
     let plan = Plan::from(envelope)?;
     let mut socket = AttemptSocket::bind(&plan.socket_path).map_err(Refusal::internal)?;
     crate::terminal_slot::record_endpoint(run_dir);
@@ -551,20 +740,62 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
     // The `launched` marker is durable before `launch` returns; only then may a GO exist.
     let root = match core.launch(&plan.key, &spec) {
         Ok(LaunchOutcome::Launched(identity)) => identity,
-        Ok(LaunchOutcome::NotStarted { reason }) => return super::not_started(envelope, run_dir, watch, locks, "terminal-launch-not-started", &reason),
-        Err(TerminalRefusal::Unsupported { capability, detail }) => return super::not_started(envelope, run_dir, watch, locks, "terminal-mode-unsupported", &format!("{capability}: {detail}")),
-        Err(TerminalRefusal::Unknown { reason }) => return super::not_started(envelope, run_dir, watch, locks, "terminal-launch-unknown", &reason),
+        Ok(LaunchOutcome::NotStarted { reason }) => {
+            return super::not_started(
+                envelope,
+                run_dir,
+                watch,
+                locks,
+                "terminal-launch-not-started",
+                &reason,
+            )
+        }
+        Err(TerminalRefusal::Unsupported { capability, detail }) => {
+            return super::not_started(
+                envelope,
+                run_dir,
+                watch,
+                locks,
+                "terminal-mode-unsupported",
+                &format!("{capability}: {detail}"),
+            )
+        }
+        Err(TerminalRefusal::Unknown { reason }) => {
+            return super::not_started(
+                envelope,
+                run_dir,
+                watch,
+                locks,
+                "terminal-launch-unknown",
+                &reason,
+            )
+        }
     };
 
     let Some(stream) = socket.accept_gate(&watch.attempt_id, HELLO_LIMIT) else {
         socket.close();
-        return super::not_started(envelope, run_dir, watch, locks, "terminal-gate-silent", "the gate did not say HELLO in time");
+        return super::not_started(
+            envelope,
+            run_dir,
+            watch,
+            locks,
+            "terminal-gate-silent",
+            "the gate did not say HELLO in time",
+        );
     };
     socket.close();
 
-    let gate = gate_tuple(&stream, &root, plan.bwrap_prefix.is_some()).map_err(Refusal::internal)?;
+    let gate =
+        gate_tuple(&stream, &root, plan.bwrap_prefix.is_some()).map_err(Refusal::internal)?;
     let domain = domain_of(&plan.domain_kind, gate.clone()).map_err(Refusal::internal)?;
-    if let Err(why) = super::bind_record(envelope, run_dir, &locks, &domain, &gate, plan.domain_kind == "linux-gate") {
+    if let Err(why) = super::bind_record(
+        envelope,
+        run_dir,
+        &locks,
+        &domain,
+        &gate,
+        plan.domain_kind == "linux-gate",
+    ) {
         let _ = domain_kill_all(&domain);
         return Err(Refusal::internal(why));
     }
@@ -572,7 +803,14 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
     if let Err(why) = send_frame_with_fds(&stream, &go_frame, &locks.raw_fds()) {
         // Without GO the gate runs nothing and leaves by itself; make sure.
         let _ = domain_kill_all(&domain);
-        return super::not_started(envelope, run_dir, watch, locks, "terminal-go-not-sent", &format!("GO was not sent: {why}"));
+        return super::not_started(
+            envelope,
+            run_dir,
+            watch,
+            locks,
+            "terminal-go-not-sent",
+            &format!("GO was not sent: {why}"),
+        );
     }
 
     let now = Instant::now();
@@ -610,7 +848,8 @@ pub(super) fn run(envelope: &Value, run_dir: &Path, mut locks: os::Locks, watch:
     }
     // A process group does not hold the agent (it leads a group of its own): end it by identity.
     if let (Domain::LinuxPgroup(_), Some(agent)) = (&sup.domain, &sup.agent) {
-        let _ = fgos_process::control::signal_by_identity(agent, fgos_process::control::Signal::Kill);
+        let _ =
+            fgos_process::control::signal_by_identity(agent, fgos_process::control::Signal::Kill);
     }
     let end = sup.end.clone();
     drop(sup);
@@ -631,8 +870,13 @@ impl UnreadableWait {
         if !same {
             self.file = file.map(|file| (file, now_ms));
         }
-        let expired = same && idle && self.idle_before
-            && self.file.as_ref().is_some_and(|(_, since)| now_ms.saturating_sub(*since) >= 30_000);
+        let expired = same
+            && idle
+            && self.idle_before
+            && self
+                .file
+                .as_ref()
+                .is_some_and(|(_, since)| now_ms.saturating_sub(*since) >= 30_000);
         self.idle_before = idle;
         expired
     }
@@ -641,7 +885,11 @@ impl UnreadableWait {
 /// The agent protocol, step by step, until the agent is done, something ends the run early or the
 /// gate leaves on its own.
 fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
-    let mut io = TermIo { core, key: &plan.key, sup };
+    let mut io = TermIo {
+        core,
+        key: &plan.key,
+        sup,
+    };
     let adapter = plan.adapter;
     let mut outbox = FsOutbox::new(io.sup.watch.outbox.clone());
 
@@ -689,8 +937,9 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
             }
         }
         let file = outbox.newest_unreadable(&mut io);
-        let idle = io.inspect().is_ok_and(|seen| seen.state.as_deref() == Some("idle")
-            && !seen.visible_working && !seen.visible_blocker);
+        let idle = io.inspect().is_ok_and(|seen| {
+            seen.state.as_deref() == Some("idle") && !seen.visible_working && !seen.visible_blocker
+        });
         if unreadable.expired(file, idle, started.elapsed().as_millis() as u64) {
             io.sup.carrier_check(io.core, io.key);
             if !io.sup.finished() {
@@ -716,10 +965,22 @@ fn end_early(io: &mut TermIo, outcome: &TerminalOutcome) {
 /// The result is in: type the exit command, give the agent a short time to leave, then stop it.
 fn ask_to_leave(plan: &Plan, adapter: &Terminal, io: &mut TermIo) {
     let _ = match &plan.exit {
-        Some(text) => io.send(&SendInput { text: Some(text.clone()), keys: None, submit: true }),
+        Some(text) => io.send(&SendInput {
+            text: Some(text.clone()),
+            keys: None,
+            submit: true,
+        }),
         None => match adapter.exit_command() {
-            ExitCommand::Text(text) => io.send(&SendInput { text: Some(text.to_string()), keys: None, submit: true }),
-            ExitCommand::Keys(keys) => io.send(&SendInput { text: None, keys: Some(keys.iter().map(|k| k.to_string()).collect()), submit: false }),
+            ExitCommand::Text(text) => io.send(&SendInput {
+                text: Some(text.to_string()),
+                keys: None,
+                submit: true,
+            }),
+            ExitCommand::Keys(keys) => io.send(&SendInput {
+                text: None,
+                keys: Some(keys.iter().map(|k| k.to_string()).collect()),
+                submit: false,
+            }),
         },
     };
     let asked = Instant::now();
@@ -777,7 +1038,9 @@ mod tests {
     #[test]
     fn a_path_longer_than_a_unix_socket_holds_is_refused_before_anything_is_bound() {
         let long = PathBuf::from(format!("/tmp/{}/go.sock", "x".repeat(120)));
-        assert!(AttemptSocket::bind(&long).err().is_some_and(|why| why.contains("longer than")));
+        assert!(AttemptSocket::bind(&long)
+            .err()
+            .is_some_and(|why| why.contains("longer than")));
     }
 
     #[test]
@@ -786,12 +1049,24 @@ mod tests {
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         fs::set_permissions(&dir, fs::Permissions::from_mode(0o755)).unwrap();
-        assert!(AttemptSocket::bind(&dir.join("go.sock")).err().is_some_and(|why| why.contains("mode 0700")));
+        assert!(AttemptSocket::bind(&dir.join("go.sock"))
+            .err()
+            .is_some_and(|why| why.contains("mode 0700")));
         fs::set_permissions(&dir, fs::Permissions::from_mode(0o700)).unwrap();
         let socket = AttemptSocket::bind(&dir.join("go.sock")).unwrap();
-        assert_eq!(fs::metadata(dir.join("go.sock")).unwrap().permissions().mode() & 0o777, 0o600);
+        assert_eq!(
+            fs::metadata(dir.join("go.sock"))
+                .unwrap()
+                .permissions()
+                .mode()
+                & 0o777,
+            0o600
+        );
         drop(socket);
-        assert!(!dir.join("go.sock").exists(), "the path goes with the socket");
+        assert!(
+            !dir.join("go.sock").exists(),
+            "the path goes with the socket"
+        );
         let _ = fs::remove_dir_all(&dir);
     }
 }

@@ -105,7 +105,8 @@ fn load_checked(
     let cursor = line(&file.cursor)
         .and_then(|canonical| Cursor::parse(&canonical))
         .map_err(|e| format!("checkpoint cursor: {e}"))?;
-    if expected.is_some_and(|(query, project)| cursor.streams != *query || cursor.project_order != project)
+    if expected
+        .is_some_and(|(query, project)| cursor.streams != *query || cursor.project_order != project)
     {
         return Err("checkpoint answers another query".into());
     }

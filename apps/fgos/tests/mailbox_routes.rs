@@ -1963,7 +1963,9 @@ fn sync_child(scene: &Scene) {
     assert_eq!(out.status.code(), Some(0), "{out:?}");
     let stderr = String::from_utf8_lossy(&out.stderr);
     assert!(
-        stderr.lines().all(|l| l.starts_with("mailbox-sync: nudge for ")),
+        stderr
+            .lines()
+            .all(|l| l.starts_with("mailbox-sync: nudge for ")),
         "{stderr}"
     );
 }
@@ -2123,7 +2125,12 @@ fn recorded_wakes(scene: &Scene) -> Vec<(bool, bool)> {
         .as_array()
         .unwrap()
         .iter()
-        .map(|m| (m["wake"].as_bool().unwrap(), m["effective_wake"].as_bool().unwrap()))
+        .map(|m| {
+            (
+                m["wake"].as_bool().unwrap(),
+                m["effective_wake"].as_bool().unwrap(),
+            )
+        })
         .collect()
 }
 
@@ -2143,7 +2150,9 @@ fn a_wake_asked_from_another_machine_is_signed_as_version_two_and_takes_effect_o
     let send = |args: &[&str]| {
         let mut argv = vec!["mailbox", "send"];
         argv.extend_from_slice(args);
-        let out = cross.alpha.run(&cross.alpha.main(), Some("sender-a"), &argv, b"");
+        let out = cross
+            .alpha
+            .run(&cross.alpha.main(), Some("sender-a"), &argv, b"");
         assert_eq!(out.status.code(), Some(0), "{out:?}");
         String::from_utf8_lossy(&out.stdout).into_owned()
     };
@@ -2160,7 +2169,11 @@ fn a_wake_asked_from_another_machine_is_signed_as_version_two_and_takes_effect_o
         (event["v"].clone(), event.get("wake").cloned())
     };
     assert_eq!(shape("wake one"), (2.into(), Some(true.into())));
-    assert_eq!(shape("plain one"), (1.into(), None), "a send without --wake is unchanged");
+    assert_eq!(
+        shape("plain one"),
+        (1.into(), None),
+        "a send without --wake is unchanged"
+    );
 
     // Each send started its own detached sync child, and a foreground run that finds one holding the
     // sync lock skips: beta may fetch before alpha's last push lands, which only delays the mail, so
@@ -2188,7 +2201,8 @@ fn mail_sent_before_the_receivers_first_sync_is_refused_to_its_sender_by_name() 
     confirm_alpha_on_beta(&cross);
     // Beta's first ingest is still to come: take back the baseline its setup syncs took.
     let snapshot_path = cross.beta.mailbox_dir().join("record/snapshot.json");
-    let mut snapshot: serde_json::Value = serde_json::from_slice(&fs::read(&snapshot_path).unwrap()).unwrap();
+    let mut snapshot: serde_json::Value =
+        serde_json::from_slice(&fs::read(&snapshot_path).unwrap()).unwrap();
     snapshot["remote"]["baselined"] = false.into();
     snapshot["remote"]["cursor"] = serde_json::json!({});
     fs::write(&snapshot_path, serde_json::to_vec(&snapshot).unwrap()).unwrap();
@@ -2196,7 +2210,13 @@ fn mail_sent_before_the_receivers_first_sync_is_refused_to_its_sender_by_name() 
     let out = cross.alpha.run(
         &cross.alpha.main(),
         Some("sender-a"),
-        &["mailbox", "send", "--to", &cross.target, "sent before your first sync"],
+        &[
+            "mailbox",
+            "send",
+            "--to",
+            &cross.target,
+            "sent before your first sync",
+        ],
         b"",
     );
     assert_eq!(out.status.code(), Some(0), "{out:?}");
@@ -2204,9 +2224,20 @@ fn mail_sent_before_the_receivers_first_sync_is_refused_to_its_sender_by_name() 
     sync_child(&cross.beta);
     sync_child(&cross.alpha);
 
-    assert_eq!(cross.beta.message_states().len(), 0, "the baseline delivers nothing older");
-    let status = cross.alpha.run(&cross.alpha.main(), Some("sender-a"), &["mailbox", "status", "--json"], b"");
-    let folded = serde_json::from_slice::<serde_json::Value>(&status.stdout).unwrap()["data"]["crossMachine"].clone();
+    assert_eq!(
+        cross.beta.message_states().len(),
+        0,
+        "the baseline delivers nothing older"
+    );
+    let status = cross.alpha.run(
+        &cross.alpha.main(),
+        Some("sender-a"),
+        &["mailbox", "status", "--json"],
+        b"",
+    );
+    let folded = serde_json::from_slice::<serde_json::Value>(&status.stdout).unwrap()["data"]
+        ["crossMachine"]
+        .clone();
     assert_eq!(folded["refused"]["before-first-sync"], 1, "{folded}");
     assert_eq!(folded["waiting"], 0, "{folded}");
 }

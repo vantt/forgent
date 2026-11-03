@@ -13,7 +13,10 @@ use fgos_run_supervisor::publish::{publish_once, Published};
 use portable::*;
 
 fn marker(name: &str) -> std::path::PathBuf {
-    let path = std::env::temp_dir().join(format!("fgos-gate-portable-marker-{name}-{}", std::process::id()));
+    let path = std::env::temp_dir().join(format!(
+        "fgos-gate-portable-marker-{name}-{}",
+        std::process::id()
+    ));
     let _ = fs::remove_file(&path);
     path
 }
@@ -31,14 +34,26 @@ fn the_agent_starts_only_after_go_and_its_output_lands_in_the_capture_files() {
     send_go(&mut gate, &attempt.attempt_id, &attempt.digest);
     let agent = fgos_run_supervisor::go_channel::read_frame(&mut gate.go).expect("AGENT");
     assert_eq!(agent["type"], "AGENT");
-    assert!(agent["tuple"]["pid"].as_u64().is_some(), "the AGENT frame names the agent: {agent}");
+    assert!(
+        agent["tuple"]["pid"].as_u64().is_some(),
+        "the AGENT frame names the agent: {agent}"
+    );
     wait_for(&ran, Duration::from_secs(10));
-    assert_eq!(wait_exit(&mut gate, &attempt, Duration::from_secs(15)), 0, "{}", attempt.gate_log());
+    assert_eq!(
+        wait_exit(&mut gate, &attempt, Duration::from_secs(15)),
+        0,
+        "{}",
+        attempt.gate_log()
+    );
     let exit = attempt.gate_exit().expect("gate-exit.json");
     assert_eq!(exit["stoppedBy"], "agent");
     assert_eq!(exit["exitCode"], 0);
-    assert!(fs::read_to_string(&attempt.stdout).unwrap().contains("agent says hello"));
-    assert!(fs::read_to_string(&attempt.stderr).unwrap().contains("agent says hello on stderr"));
+    assert!(fs::read_to_string(&attempt.stdout)
+        .unwrap()
+        .contains("agent says hello"));
+    assert!(fs::read_to_string(&attempt.stderr)
+        .unwrap()
+        .contains("agent says hello on stderr"));
 }
 
 #[test]
@@ -50,8 +65,14 @@ fn gate_exit_is_published_once() {
     start_agent(&mut gate, &attempt);
     assert_eq!(wait_exit(&mut gate, &attempt, Duration::from_secs(15)), 0);
     let first = fs::read_to_string(attempt.dir.join("gate-exit.json")).unwrap();
-    assert_eq!(publish_once(&attempt.dir, "gate-exit.json", b"{\"second\":true}").unwrap(), Published::AlreadyPublished);
-    assert_eq!(fs::read_to_string(attempt.dir.join("gate-exit.json")).unwrap(), first);
+    assert_eq!(
+        publish_once(&attempt.dir, "gate-exit.json", b"{\"second\":true}").unwrap(),
+        Published::AlreadyPublished
+    );
+    assert_eq!(
+        fs::read_to_string(attempt.dir.join("gate-exit.json")).unwrap(),
+        first
+    );
 }
 
 #[test]
@@ -82,7 +103,11 @@ fn eof_before_go_ends_the_gate_with_64_and_no_agent() {
         if let Some(status) = child.try_wait().unwrap() {
             break status.code().unwrap_or(-1);
         }
-        assert!(start.elapsed() < Duration::from_secs(15), "gate did not exit; {}", attempt.gate_log());
+        assert!(
+            start.elapsed() < Duration::from_secs(15),
+            "gate did not exit; {}",
+            attempt.gate_log()
+        );
         std::thread::sleep(Duration::from_millis(10));
     };
     assert_eq!(code, 64);
@@ -103,12 +128,22 @@ fn a_stop_request_ends_the_agent_and_its_child_inside_the_grace() {
     let started = Instant::now();
     request_stop(&gate, &attempt, "soft-deadline");
     assert_eq!(wait_exit(&mut gate, &attempt, Duration::from_secs(20)), 0);
-    assert!(started.elapsed() < Duration::from_millis(3_000 + 5_000), "the agent ends inside the grace: {:?}", started.elapsed());
+    assert!(
+        started.elapsed() < Duration::from_millis(3_000 + 5_000),
+        "the agent ends inside the grace: {:?}",
+        started.elapsed()
+    );
     let exit = attempt.gate_exit().unwrap();
     assert_eq!(exit["stoppedBy"], "soft-deadline");
     assert_eq!(exit["cause"], "soft-deadline");
-    assert!(wait_dead(agent_pid, Duration::from_secs(5)), "agent {agent_pid} survived the gate");
-    assert!(wait_dead(child, Duration::from_secs(5)), "the agent's child {child} survived the gate");
+    assert!(
+        wait_dead(agent_pid, Duration::from_secs(5)),
+        "agent {agent_pid} survived the gate"
+    );
+    assert!(
+        wait_dead(child, Duration::from_secs(5)),
+        "the agent's child {child} survived the gate"
+    );
 }
 
 #[test]
@@ -124,13 +159,22 @@ fn an_agent_that_ignores_the_stop_is_killed_after_the_grace() {
     request_stop(&gate, &attempt, "cancel");
     assert_eq!(wait_exit(&mut gate, &attempt, Duration::from_secs(20)), 0);
     let took = started.elapsed();
-    assert!(took >= Duration::from_millis(1_400), "the kill waited for the grace: {took:?}");
-    assert!(took < Duration::from_secs(8), "and not much longer: {took:?}");
+    assert!(
+        took >= Duration::from_millis(1_400),
+        "the kill waited for the grace: {took:?}"
+    );
+    assert!(
+        took < Duration::from_secs(8),
+        "and not much longer: {took:?}"
+    );
     let exit = attempt.gate_exit().unwrap();
     assert_eq!(exit["stoppedBy"], "cancel");
     #[cfg(unix)]
     assert_eq!(exit["signal"], "SIGKILL");
-    assert!(wait_dead(agent["tuple"]["pid"].as_u64().unwrap() as u32, Duration::from_secs(5)));
+    assert!(wait_dead(
+        agent["tuple"]["pid"].as_u64().unwrap() as u32,
+        Duration::from_secs(5)
+    ));
 }
 
 #[test]
@@ -148,22 +192,35 @@ fn the_hard_ceiling_is_enforced_with_no_supervisor_left() {
     drop(go);
     // The supervisor is gone: the gate and the agent carry on until the ceiling.
     std::thread::sleep(Duration::from_millis(600));
-    assert!(child.try_wait().unwrap().is_none(), "the gate outlives its supervisor in direct mode");
+    assert!(
+        child.try_wait().unwrap().is_none(),
+        "the gate outlives its supervisor in direct mode"
+    );
     let begun = Instant::now();
     let code = loop {
         if let Some(status) = child.try_wait().unwrap() {
             break status.code().unwrap_or(-1);
         }
-        assert!(begun.elapsed() < Duration::from_secs(20), "the ceiling never fired; {}", attempt.gate_log());
+        assert!(
+            begun.elapsed() < Duration::from_secs(20),
+            "the ceiling never fired; {}",
+            attempt.gate_log()
+        );
         std::thread::sleep(Duration::from_millis(10));
     };
     assert_eq!(code, 0);
     let took = started.elapsed();
-    assert!(took >= Duration::from_millis(5_500), "the ceiling is absolute: {took:?}");
+    assert!(
+        took >= Duration::from_millis(5_500),
+        "the ceiling is absolute: {took:?}"
+    );
     let exit = attempt.gate_exit().unwrap();
     assert_eq!(exit["stoppedBy"], "hard-ceiling");
     assert_eq!(exit["cause"], "hard-ceiling");
-    assert!(wait_dead(agent["tuple"]["pid"].as_u64().unwrap() as u32, Duration::from_secs(5)));
+    assert!(wait_dead(
+        agent["tuple"]["pid"].as_u64().unwrap() as u32,
+        Duration::from_secs(5)
+    ));
 }
 
 #[test]
@@ -173,9 +230,17 @@ fn a_child_the_agent_leaves_behind_dies_with_the_gate() {
     let attempt = Attempt::new("orphan", &options);
     let mut gate = start_gate(&attempt);
     start_agent(&mut gate, &attempt);
-    assert_eq!(wait_exit(&mut gate, &attempt, Duration::from_secs(20)), 0, "{}", attempt.gate_log());
+    assert_eq!(
+        wait_exit(&mut gate, &attempt, Duration::from_secs(20)),
+        0,
+        "{}",
+        attempt.gate_log()
+    );
     let child = pid_in(&pids);
-    assert!(wait_dead(child, Duration::from_secs(10)), "the child {child} outlived the gate");
+    assert!(
+        wait_dead(child, Duration::from_secs(10)),
+        "the child {child} outlived the gate"
+    );
     assert_eq!(attempt.gate_exit().unwrap()["stoppedBy"], "agent");
 }
 
@@ -186,33 +251,63 @@ fn a_child_the_agent_leaves_behind_dies_with_the_gate() {
 #[test]
 fn a_child_in_its_own_session_dies_with_the_gate() {
     let (ran, pids) = (marker("setsid"), marker("setsid-pids"));
-    let options = Options::new(&["orphan-setsid", &ran.to_string_lossy(), &pids.to_string_lossy()]);
+    let options = Options::new(&[
+        "orphan-setsid",
+        &ran.to_string_lossy(),
+        &pids.to_string_lossy(),
+    ]);
     let attempt = Attempt::new("setsid", &options);
     let mut gate = start_gate(&attempt);
     start_agent(&mut gate, &attempt);
-    assert_eq!(wait_exit(&mut gate, &attempt, Duration::from_secs(20)), 0, "{}", attempt.gate_log());
+    assert_eq!(
+        wait_exit(&mut gate, &attempt, Duration::from_secs(20)),
+        0,
+        "{}",
+        attempt.gate_log()
+    );
     let child = pid_in(&pids);
-    assert!(wait_dead(child, Duration::from_secs(10)), "the child {child} outlived the gate");
+    assert!(
+        wait_dead(child, Duration::from_secs(10)),
+        "the child {child} outlived the gate"
+    );
 }
 
 #[test]
 fn an_agent_that_cannot_start_ends_the_attempt_like_a_shell_command_that_cannot() {
     let mut options = Options::new(&[]);
-    options.command = Some(std::env::temp_dir().join("fgos-no-such-agent-binary").to_string_lossy().into_owned());
+    options.command = Some(
+        std::env::temp_dir()
+            .join("fgos-no-such-agent-binary")
+            .to_string_lossy()
+            .into_owned(),
+    );
     let attempt = Attempt::new("nostart", &options);
     let mut gate = start_gate(&attempt);
     read_hello(&mut gate);
     send_go(&mut gate, &attempt.attempt_id, &attempt.digest);
-    assert_eq!(wait_exit(&mut gate, &attempt, Duration::from_secs(15)), 0, "{}", attempt.gate_log());
-    let exit = attempt.gate_exit().expect("the gate still reports the end of the attempt");
+    assert_eq!(
+        wait_exit(&mut gate, &attempt, Duration::from_secs(15)),
+        0,
+        "{}",
+        attempt.gate_log()
+    );
+    let exit = attempt
+        .gate_exit()
+        .expect("the gate still reports the end of the attempt");
     assert_eq!(exit["exitCode"], 127, "program not found is 127: {exit}");
     assert_eq!(exit["stoppedBy"], "agent");
-    assert!(fs::read_to_string(&attempt.stderr).unwrap().contains("did not start"), "the reason reaches the capture stderr");
+    assert!(
+        fs::read_to_string(&attempt.stderr)
+            .unwrap()
+            .contains("did not start"),
+        "the reason reaches the capture stderr"
+    );
 }
 
 #[test]
 fn a_program_the_os_refuses_to_run_ends_the_attempt_with_126() {
-    let not_a_program = std::env::temp_dir().join(format!("fgos-gate-not-a-program-{}", std::process::id()));
+    let not_a_program =
+        std::env::temp_dir().join(format!("fgos-gate-not-a-program-{}", std::process::id()));
     fs::write(&not_a_program, "plain text, no mode bits").unwrap();
     let mut options = Options::new(&[]);
     options.command = Some(not_a_program.to_string_lossy().into_owned());
@@ -220,6 +315,16 @@ fn a_program_the_os_refuses_to_run_ends_the_attempt_with_126() {
     let mut gate = start_gate(&attempt);
     read_hello(&mut gate);
     send_go(&mut gate, &attempt.attempt_id, &attempt.digest);
-    assert_eq!(wait_exit(&mut gate, &attempt, Duration::from_secs(15)), 0, "{}", attempt.gate_log());
-    assert_eq!(attempt.gate_exit().expect("the gate still reports the end of the attempt")["exitCode"], 126);
+    assert_eq!(
+        wait_exit(&mut gate, &attempt, Duration::from_secs(15)),
+        0,
+        "{}",
+        attempt.gate_log()
+    );
+    assert_eq!(
+        attempt
+            .gate_exit()
+            .expect("the gate still reports the end of the attempt")["exitCode"],
+        126
+    );
 }

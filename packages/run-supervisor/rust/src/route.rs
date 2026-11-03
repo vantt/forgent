@@ -33,7 +33,12 @@ impl Flags {
 
     /// [`Flags::parse`] where the names in `switches` take no value; `get`
     /// returns `"true"` for a switch that was given.
-    pub fn parse_with_switches(args: &[String], allowed: &[&str], switches: &[&str], positional: usize) -> Result<Flags, ArgsError> {
+    pub fn parse_with_switches(
+        args: &[String],
+        allowed: &[&str],
+        switches: &[&str],
+        positional: usize,
+    ) -> Result<Flags, ArgsError> {
         let mut flags = Flags::default();
         let mut iter = args.iter();
         while let Some(arg) = iter.next() {
@@ -45,7 +50,9 @@ impl Flags {
                 if name != "protocol" && !allowed.contains(&name) {
                     return Err(ArgsError::Usage(format!("unknown flag {arg}")));
                 }
-                let value = iter.next().ok_or_else(|| ArgsError::Usage(format!("{arg} needs a value")))?;
+                let value = iter
+                    .next()
+                    .ok_or_else(|| ArgsError::Usage(format!("{arg} needs a value")))?;
                 flags.values.push((name.to_string(), value.clone()));
             } else if flags.positional.len() < positional {
                 flags.positional.push(arg.clone());
@@ -60,11 +67,15 @@ impl Flags {
     }
 
     pub fn get(&self, name: &str) -> Option<&str> {
-        self.values.iter().find(|(n, _)| n == name).map(|(_, v)| v.as_str())
+        self.values
+            .iter()
+            .find(|(n, _)| n == name)
+            .map(|(_, v)| v.as_str())
     }
 
     pub fn require(&self, name: &str) -> Result<&str, ArgsError> {
-        self.get(name).ok_or_else(|| ArgsError::Usage(format!("--{name} is required")))
+        self.get(name)
+            .ok_or_else(|| ArgsError::Usage(format!("--{name} is required")))
     }
 }
 
@@ -85,7 +96,11 @@ pub fn refuse(route: &str, err: ArgsError) -> i32 {
 /// One JSON object on stdout, one line of free text on stderr. A closed
 /// stdout or stderr must not turn the named exit code into a panic.
 pub fn report(route: &str, code: &str, why: &str) {
-    let _ = writeln!(std::io::stdout(), "{}", serde_json::json!({"v": 1, "protocol": 1, "result": "error", "code": code}));
+    let _ = writeln!(
+        std::io::stdout(),
+        "{}",
+        serde_json::json!({"v": 1, "protocol": 1, "result": "error", "code": code})
+    );
     let _ = writeln!(std::io::stderr(), "fgos internal {route}: {code}: {why}");
 }
 
@@ -105,7 +120,9 @@ fn probe(route: &str, args: &[String]) -> i32 {
     if let Err(err) = Flags::parse_with_switches(args, &[], &["probe"], 0) {
         return refuse(route, err);
     }
-    let containment = match fgos_process::containment::select(&fgos_process::containment::SelectEnv::default()) {
+    let containment = match fgos_process::containment::select(
+        &fgos_process::containment::SelectEnv::default(),
+    ) {
         Ok(driver) => {
             let guarantee = driver.guarantee();
             let level = match guarantee.level {
@@ -119,7 +136,9 @@ fn probe(route: &str, args: &[String]) -> i32 {
             }
             obj
         }
-        Err(err) => serde_json::json!({"driver": null, "level": "unsupported", "escapes": [], "error": err.name()}),
+        Err(err) => {
+            serde_json::json!({"driver": null, "level": "unsupported", "escapes": [], "error": err.name()})
+        }
     };
     emit(serde_json::json!({"result": "ok", "route": route, "containment": containment}));
     0
@@ -152,13 +171,25 @@ mod tests {
 
     #[test]
     fn probe_needs_protocol_one() {
-        assert_eq!(probe("supervise", &argv(&["--probe"])), EXIT_VERSION_MISMATCH);
-        assert_eq!(probe("supervise", &argv(&["--probe", "--protocol", "1"])), 0);
+        assert_eq!(
+            probe("supervise", &argv(&["--probe"])),
+            EXIT_VERSION_MISMATCH
+        );
+        assert_eq!(
+            probe("supervise", &argv(&["--probe", "--protocol", "1"])),
+            0
+        );
     }
 
     #[test]
     fn probe_refuses_a_stray_flag() {
-        assert_eq!(probe("adopt", &argv(&["--probe", "--protocol", "1", "--nope", "x"])), EXIT_USAGE);
+        assert_eq!(
+            probe(
+                "adopt",
+                &argv(&["--probe", "--protocol", "1", "--nope", "x"])
+            ),
+            EXIT_USAGE
+        );
     }
 
     #[test]

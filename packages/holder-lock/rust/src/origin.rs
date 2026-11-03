@@ -16,7 +16,10 @@ pub const FGOS_BINARIES: [&str; 3] = ["fgos", "fgos-runner", "fgos-gateway"];
 /// Whether a program's basename is a script runtime that can run a fgOS
 /// script: `node`, `nodejs`, a versioned `node20` or `node-22`, `bun` or `deno`.
 pub fn is_script_runtime(base: &str) -> bool {
-    let versioned_node = base.strip_prefix("node").is_some_and(|rest| rest.is_empty() || rest.starts_with(|c: char| c.is_ascii_digit() || c == '.' || c == '-' || c == 'j'));
+    let versioned_node = base.strip_prefix("node").is_some_and(|rest| {
+        rest.is_empty()
+            || rest.starts_with(|c: char| c.is_ascii_digit() || c == '.' || c == '-' || c == 'j')
+    });
     versioned_node || matches!(base, "bun" | "deno")
 }
 
@@ -53,17 +56,33 @@ impl Origin {
 
 /// What the holder itself shows: its environment and its argv. `None` when
 /// nothing says it is a fgOS process.
-pub fn own_origin(argv: Option<&[String]>, env: &BTreeMap<String, String>, lock_name: &str, state_root: &Path) -> Option<Origin> {
-    if env.get(LOCK_FD_ENV).is_some_and(|value| value.starts_with(&format!("{lock_name}:"))) {
+pub fn own_origin(
+    argv: Option<&[String]>,
+    env: &BTreeMap<String, String>,
+    lock_name: &str,
+    state_root: &Path,
+) -> Option<Origin> {
+    if env
+        .get(LOCK_FD_ENV)
+        .is_some_and(|value| value.starts_with(&format!("{lock_name}:")))
+    {
         return Some(Origin::Borrowed);
     }
     if env.contains_key(STATE_ROOT_ENV) {
         return Some(Origin::FgosHost);
     }
     let argv = argv?;
-    let named_binary = argv.first().and_then(|arg| Path::new(arg).file_name()).and_then(|n| n.to_str()).is_some_and(|base| FGOS_BINARIES.contains(&base));
-    let named_script = argv.iter().any(|arg| arg.ends_with("bin/fgos.mjs") || arg.ends_with("scripts/run-tests.mjs"));
-    let in_release = argv.iter().any(|arg| Path::new(arg).starts_with(state_root.join("releases")));
+    let named_binary = argv
+        .first()
+        .and_then(|arg| Path::new(arg).file_name())
+        .and_then(|n| n.to_str())
+        .is_some_and(|base| FGOS_BINARIES.contains(&base));
+    let named_script = argv
+        .iter()
+        .any(|arg| arg.ends_with("bin/fgos.mjs") || arg.ends_with("scripts/run-tests.mjs"));
+    let in_release = argv
+        .iter()
+        .any(|arg| Path::new(arg).starts_with(state_root.join("releases")));
     (named_binary || named_script || in_release).then_some(Origin::FgosPayload)
 }
 
@@ -71,10 +90,16 @@ pub fn own_origin(argv: Option<&[String]>, env: &BTreeMap<String, String>, lock_
 /// (`comm`) and the own origin of its parent when the parent holds the same
 /// lock. Only the bwrap monitor of an attempt counts as a member: a leaked
 /// lock descriptor in the agent or its descendants must still be named.
-pub fn holder_origin(own: Option<Origin>, comm: Option<&str>, parent_own: Option<Origin>) -> Origin {
+pub fn holder_origin(
+    own: Option<Origin>,
+    comm: Option<&str>,
+    parent_own: Option<Origin>,
+) -> Origin {
     match own {
         Some(origin) => origin,
-        None if comm.is_some_and(|c| c.trim() == "bwrap") && parent_own.is_some() => Origin::AttemptMember,
+        None if comm.is_some_and(|c| c.trim() == "bwrap") && parent_own.is_some() => {
+            Origin::AttemptMember
+        }
         None => Origin::Foreign,
     }
 }
@@ -95,25 +120,50 @@ fn comm_of(pid: u32) -> Option<String> {
 }
 
 fn parent_of(pid: u32) -> Option<u32> {
-    facts::relation_of(fgos_process::ProcId(pid)).map(|r| r.parent).filter(|p| *p > 0)
+    facts::relation_of(fgos_process::ProcId(pid))
+        .map(|r| r.parent)
+        .filter(|p| *p > 0)
 }
 
 /// Classify every process in `holders` (the holders of the lock named `lock_name`).
 pub fn describe(holders: Vec<ProcTuple>, lock_name: &str, state_root: &Path) -> Vec<Holder> {
-    let filter = ScanFilter { env_keys: vec![LOCK_FD_ENV.into(), STATE_ROOT_ENV.into()], include_self: true };
-    let views: Vec<Option<ProcView>> = holders.iter().map(|t| facts::view_of(t.pid, &filter)).collect();
-    let own: Vec<Option<Origin>> = views.iter().map(|view| view.as_ref().and_then(|v| own_origin(v.cmdline.as_deref(), &v.env_subset, lock_name, state_root))).collect();
+    let filter = ScanFilter {
+        env_keys: vec![LOCK_FD_ENV.into(), STATE_ROOT_ENV.into()],
+        include_self: true,
+    };
+    let views: Vec<Option<ProcView>> = holders
+        .iter()
+        .map(|t| facts::view_of(t.pid, &filter))
+        .collect();
+    let own: Vec<Option<Origin>> = views
+        .iter()
+        .map(|view| {
+            view.as_ref().and_then(|v| {
+                own_origin(v.cmdline.as_deref(), &v.env_subset, lock_name, state_root)
+            })
+        })
+        .collect();
     holders
         .iter()
         .enumerate()
         .map(|(i, tuple)| {
-            let parent_own = parent_of(tuple.pid.0).and_then(|parent| holders.iter().position(|h| h.pid.0 == parent)).and_then(|j| own[j]);
-            let comm = if own[i].is_none() { comm_of(tuple.pid.0) } else { None };
+            let parent_own = parent_of(tuple.pid.0)
+                .and_then(|parent| holders.iter().position(|h| h.pid.0 == parent))
+                .and_then(|j| own[j]);
+            let comm = if own[i].is_none() {
+                comm_of(tuple.pid.0)
+            } else {
+                None
+            };
             let cmdline = match views[i].as_ref().and_then(|v| v.cmdline.as_ref()) {
                 Some(argv) => argv.join(" ").chars().take(200).collect(),
                 None => "<unreadable>".to_string(),
             };
-            Holder { tuple: tuple.clone(), origin: holder_origin(own[i], comm.as_deref(), parent_own), cmdline }
+            Holder {
+                tuple: tuple.clone(),
+                origin: holder_origin(own[i], comm.as_deref(), parent_own),
+                cmdline,
+            }
         })
         .collect()
 }
@@ -126,28 +176,60 @@ mod tests {
         parts.iter().map(|p| p.to_string()).collect()
     }
     fn env(pairs: &[(&str, &str)]) -> BTreeMap<String, String> {
-        pairs.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect()
+        pairs
+            .iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect()
     }
 
     #[test]
     fn foreign_borrowed_host_payload_and_attempt_member_are_told_apart() {
         let root = Path::new("/state/fgos");
-        let own = |a: &[&str], e: &[(&str, &str)]| own_origin(Some(&argv(a)), &env(e), "main-checkout", root);
-        assert_eq!(own(&["git", "status"], &[("FGOS_LOCK_FD", "main-checkout:3")]), Some(Origin::Borrowed));
+        let own = |a: &[&str], e: &[(&str, &str)]| {
+            own_origin(Some(&argv(a)), &env(e), "main-checkout", root)
+        };
+        assert_eq!(
+            own(&["git", "status"], &[("FGOS_LOCK_FD", "main-checkout:3")]),
+            Some(Origin::Borrowed)
+        );
         // A borrowed description of another lock says nothing about this one.
         assert_eq!(own(&["git"], &[("FGOS_LOCK_FD", "other:3")]), None);
-        assert_eq!(own(&["node", "x"], &[("FGOS_STATE_ROOT", "/state/fgos")]), Some(Origin::FgosHost));
-        assert_eq!(own(&["/usr/bin/fgos-runner", "--once"], &[]), Some(Origin::FgosPayload));
-        assert_eq!(own(&["node", "/w/bin/fgos.mjs", "x"], &[]), Some(Origin::FgosPayload));
-        assert_eq!(own(&["node", "/w/scripts/run-tests.mjs"], &[]), Some(Origin::FgosPayload));
-        assert_eq!(own(&["/state/fgos/releases/abc/libexec/node"], &[]), Some(Origin::FgosPayload));
+        assert_eq!(
+            own(&["node", "x"], &[("FGOS_STATE_ROOT", "/state/fgos")]),
+            Some(Origin::FgosHost)
+        );
+        assert_eq!(
+            own(&["/usr/bin/fgos-runner", "--once"], &[]),
+            Some(Origin::FgosPayload)
+        );
+        assert_eq!(
+            own(&["node", "/w/bin/fgos.mjs", "x"], &[]),
+            Some(Origin::FgosPayload)
+        );
+        assert_eq!(
+            own(&["node", "/w/scripts/run-tests.mjs"], &[]),
+            Some(Origin::FgosPayload)
+        );
+        assert_eq!(
+            own(&["/state/fgos/releases/abc/libexec/node"], &[]),
+            Some(Origin::FgosPayload)
+        );
         assert_eq!(own(&["vim", "notes"], &[]), None);
         assert_eq!(own_origin(None, &env(&[]), "main-checkout", root), None);
         // Only a bwrap whose parent holds the lock with a fgOS origin is a member.
-        assert_eq!(holder_origin(None, Some("bwrap\n"), Some(Origin::FgosPayload)), Origin::AttemptMember);
+        assert_eq!(
+            holder_origin(None, Some("bwrap\n"), Some(Origin::FgosPayload)),
+            Origin::AttemptMember
+        );
         assert_eq!(holder_origin(None, Some("bwrap"), None), Origin::Foreign);
-        assert_eq!(holder_origin(None, Some("sleep"), Some(Origin::FgosPayload)), Origin::Foreign);
-        assert_eq!(holder_origin(Some(Origin::Borrowed), Some("bwrap"), None), Origin::Borrowed);
+        assert_eq!(
+            holder_origin(None, Some("sleep"), Some(Origin::FgosPayload)),
+            Origin::Foreign
+        );
+        assert_eq!(
+            holder_origin(Some(Origin::Borrowed), Some("bwrap"), None),
+            Origin::Borrowed
+        );
         assert_eq!(Origin::AttemptMember.as_str(), "attempt-member");
     }
 }

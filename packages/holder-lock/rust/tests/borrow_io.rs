@@ -51,9 +51,13 @@ fn pids_gone(dir: &std::path::Path) {
 #[test]
 fn child_entry() {
     #[cfg(target_os = "linux")]
-    if scm_role() { return; }
+    if scm_role() {
+        return;
+    }
     #[cfg(target_os = "linux")]
-    if release_race_role() { return; }
+    if release_race_role() {
+        return;
+    }
     common::child_entry()
 }
 
@@ -92,7 +96,10 @@ fn contender_blocks_during_borrow_and_acquires_after_return_and_release() {
     });
     // The synchronous call lends the handle; ownership stays with the caller.
     assert!(!ready.exists());
-    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(handle),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     assert_eq!(wait_ready(&ready, &mut contender), "held");
     kill_and_reap(&mut contender);
     fs::remove_dir_all(dir).unwrap();
@@ -135,7 +142,10 @@ fn binary_git_hash_object_round_trip_with_hooks_off() {
         .unwrap();
     assert!(read.status.success());
     assert_eq!(read.stdout, input);
-    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(handle),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -153,7 +163,10 @@ fn full_duplex_binary_capture_does_not_deadlock() {
     .unwrap();
     assert_eq!(out.stdout, input);
     assert_eq!(out.stderr, b"diagnostic");
-    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(handle),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -176,8 +189,14 @@ fn overflow_kills_root_and_borrowing_leftovers_before_refusal() {
         );
         assert_eq!(error.to_string(), format!("borrow-output-limit: {stream}"));
         pids_gone(&dir);
-        assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
-        assert!(matches!(release(held(&resource(&dir, "io"))), fgos_holder_lock::Release::Released { .. }));
+        assert!(matches!(
+            release(handle),
+            fgos_holder_lock::Release::Released { .. }
+        ));
+        assert!(matches!(
+            release(held(&resource(&dir, "io"))),
+            fgos_holder_lock::Release::Released { .. }
+        ));
         fs::remove_dir_all(dir).unwrap();
     }
 }
@@ -199,8 +218,14 @@ fn deadline_kills_and_drains_even_when_child_never_reads_stdin() {
     assert!(matches!(error, BorrowError::Deadline { .. }), "{error}");
     assert_eq!(error.to_string(), "borrow-deadline: terminated");
     pids_gone(&dir);
-    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
-    assert!(matches!(release(held(&res)), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(handle),
+        fgos_holder_lock::Release::Released { .. }
+    ));
+    assert!(matches!(
+        release(held(&res)),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -223,7 +248,10 @@ fn successful_root_exit_drains_leftovers_and_captures_tail() {
     assert_eq!(out.stdout, b"tail");
     assert_eq!(out.stderr, b"error");
     pids_gone(&dir);
-    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(handle),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -237,16 +265,36 @@ fn replaced_lock_inode_refuses_old_handle_before_any_child() {
     fs::rename(&res.path, dir.join("original.lock")).unwrap();
     let successor = held(&res);
     validate(&successor).unwrap();
-    assert_eq!(validate(&old).unwrap_err().to_string(), "lock-resource-replaced");
+    assert_eq!(
+        validate(&old).unwrap_err().to_string(),
+        "lock-resource-replaced"
+    );
     let spec = shell("touch spawned", &dir);
-    assert_eq!(run_borrowed_io(&old, &spec, &bounds(vec![])).unwrap_err().to_string(), "lock-resource-replaced");
+    assert_eq!(
+        run_borrowed_io(&old, &spec, &bounds(vec![]))
+            .unwrap_err()
+            .to_string(),
+        "lock-resource-replaced"
+    );
     let helper = HelperExe::current().unwrap();
-    assert_eq!(run_borrowed(&old, &spec, &helper).unwrap_err().to_string(), "lock-resource-replaced");
+    assert_eq!(
+        run_borrowed(&old, &spec, &helper).unwrap_err().to_string(),
+        "lock-resource-replaced"
+    );
     assert!(!dir.join("spawned").exists());
-    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Held { .. }));
-    assert!(matches!(release(old), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        acquire(&res, Mode::Ex, Wait::Try, 2000),
+        Acquire::Held { .. }
+    ));
+    assert!(matches!(
+        release(old),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     validate(&successor).unwrap();
-    assert!(matches!(release(successor), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(successor),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -266,7 +314,9 @@ fn unrelated_pre_exec_child_survives_borrowed_git() {
             unsafe {
                 cmd.pre_exec(move || {
                     let fd = libc::open(marker.as_ptr(), libc::O_WRONLY | libc::O_CREAT, 0o600);
-                    if fd < 0 { return Err(std::io::Error::last_os_error()); }
+                    if fd < 0 {
+                        return Err(std::io::Error::last_os_error());
+                    }
                     libc::close(fd);
                     libc::usleep(500_000);
                     Ok(())
@@ -279,13 +329,19 @@ fn unrelated_pre_exec_child_survives_borrowed_git() {
             assert!(Instant::now() < deadline);
             std::thread::sleep(Duration::from_millis(1));
         }
-        let spec = BorrowSpec { argv: vec!["git".into(), "--version".into()], ..Default::default() };
+        let spec = BorrowSpec {
+            argv: vec!["git".into(), "--version".into()],
+            ..Default::default()
+        };
         let out = run_borrowed_io(&handle, &spec, &bounds(vec![])).unwrap();
         assert_eq!(out.outcome.exit, Some(0));
         assert_eq!(out.outcome.leftovers_killed, 0);
         assert!(unrelated.join().unwrap().success());
     });
-    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(handle),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -298,28 +354,46 @@ fn admission_refuses_escapee_and_borrow_cleanup_kills_it() {
     let res = resource(&dir, "io");
     let handle = held(&res);
     let marker = std::ffi::CString::new(dir.join("foreign").to_str().unwrap()).unwrap();
-    let lock_fd: i32 = fs::read_dir("/proc/self/fd").unwrap().flatten().find_map(|entry| {
-        (fs::read_link(entry.path()).ok()? == res.path).then(|| entry.file_name().to_str().unwrap().parse().unwrap())
-    }).unwrap();
+    let lock_fd: i32 = fs::read_dir("/proc/self/fd")
+        .unwrap()
+        .flatten()
+        .find_map(|entry| {
+            (fs::read_link(entry.path()).ok()? == res.path)
+                .then(|| entry.file_name().to_str().unwrap().parse().unwrap())
+        })
+        .unwrap();
     let mut cmd = Command::new("/bin/true");
     // Fork an unrelated grandchild before exec, keeping its inherited copy.
     // SAFETY: the child uses only async-signal-safe syscalls, never Rust locks.
     unsafe {
         cmd.pre_exec(move || {
             let pid = libc::fork();
-            if pid < 0 { return Err(std::io::Error::last_os_error()); }
+            if pid < 0 {
+                return Err(std::io::Error::last_os_error());
+            }
             if pid == 0 {
                 libc::setsid();
                 // Close Command's exec-error pipe too; retain only the lock
                 // copy so the parent's spawn can finish independently.
                 for fd in 3..65536 {
-                    if fd != lock_fd { libc::close(fd); }
+                    if fd != lock_fd {
+                        libc::close(fd);
+                    }
                 }
-                loop { libc::pause(); }
+                loop {
+                    libc::pause();
+                }
             }
             let fd = libc::open(marker.as_ptr(), libc::O_WRONLY | libc::O_CREAT, 0o600);
-            if fd < 0 { libc::kill(pid, libc::SIGKILL); return Err(std::io::Error::last_os_error()); }
-            libc::write(fd, (&pid as *const libc::pid_t).cast(), std::mem::size_of_val(&pid));
+            if fd < 0 {
+                libc::kill(pid, libc::SIGKILL);
+                return Err(std::io::Error::last_os_error());
+            }
+            libc::write(
+                fd,
+                (&pid as *const libc::pid_t).cast(),
+                std::mem::size_of_val(&pid),
+            );
             libc::close(fd);
             Ok(())
         });
@@ -331,22 +405,38 @@ fn admission_refuses_escapee_and_borrow_cleanup_kills_it() {
     impl Drop for ForeignGuard {
         fn drop(&mut self) {
             // SAFETY: test owns this deliberately created process.
-            unsafe { libc::kill(self.0 as i32, libc::SIGKILL); }
+            unsafe {
+                libc::kill(self.0 as i32, libc::SIGKILL);
+            }
         }
     }
     let foreign = ForeignGuard(pid);
-    assert!(matches!(validate_quiescent(&handle), Err(BorrowError::ForeignHolder { pids }) if pids.contains(&pid)));
+    assert!(
+        matches!(validate_quiescent(&handle), Err(BorrowError::ForeignHolder { pids }) if pids.contains(&pid))
+    );
     let outcome = run_borrowed_io(&handle, &shell("true", &dir), &bounds(vec![])).unwrap();
     assert!(outcome.outcome.leftovers_killed > 0);
-    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Held { .. }));
-    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        acquire(&res, Mode::Ex, Wait::Try, 2000),
+        Acquire::Held { .. }
+    ));
+    assert!(matches!(
+        release(handle),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     drop(foreign);
     let deadline = Instant::now() + Duration::from_secs(5);
-    while !matches!(fgos_process::facts::observe(fgos_process::ProcId(pid)), fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie) {
+    while !matches!(
+        fgos_process::facts::observe(fgos_process::ProcId(pid)),
+        fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie
+    ) {
         assert!(Instant::now() < deadline);
         std::thread::sleep(Duration::from_millis(1));
     }
-    assert!(matches!(release(held(&res)), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(held(&res)),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -356,11 +446,25 @@ fn borrowed_grandchild_keeps_fd_and_is_drained() {
     let _serial = serial();
     let dir = temp_dir("grandchild");
     let handle = held(&resource(&dir, "io"));
-    let out = run_borrowed_io(&handle, &shell("sh -c 'sleep 30 & echo $! > grandchild'", &dir), &bounds(vec![])).unwrap();
+    let out = run_borrowed_io(
+        &handle,
+        &shell("sh -c 'sleep 30 & echo $! > grandchild'", &dir),
+        &bounds(vec![]),
+    )
+    .unwrap();
     assert_eq!(out.outcome.exit, Some(0));
     assert!(out.outcome.leftovers_killed > 0);
-    gone(fs::read_to_string(dir.join("grandchild")).unwrap().trim().parse().unwrap());
-    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+    gone(
+        fs::read_to_string(dir.join("grandchild"))
+            .unwrap()
+            .trim()
+            .parse()
+            .unwrap(),
+    );
+    assert!(matches!(
+        release(handle),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -376,7 +480,13 @@ fn setsid_escapee_after_an_earlier_proven_drain_is_still_killed() {
     let res = resource(&dir, "io");
     let handle = held(&res);
     // A proven drain moves the read floor forward.
-    assert_eq!(run_borrowed_io(&handle, &shell("true", &dir), &bounds(vec![])).unwrap().outcome.exit, Some(0));
+    assert_eq!(
+        run_borrowed_io(&handle, &shell("true", &dir), &bounds(vec![]))
+            .unwrap()
+            .outcome
+            .exit,
+        Some(0)
+    );
     std::thread::sleep(Duration::from_millis(30));
     let out = run_borrowed_io(
         &handle,
@@ -386,9 +496,21 @@ fn setsid_escapee_after_an_earlier_proven_drain_is_still_killed() {
     .unwrap();
     assert_eq!(out.outcome.exit, Some(0));
     assert!(out.outcome.leftovers_killed > 0);
-    gone(fs::read_to_string(dir.join("escapee")).unwrap().trim().parse().unwrap());
-    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
-    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Acquired(_)));
+    gone(
+        fs::read_to_string(dir.join("escapee"))
+            .unwrap()
+            .trim()
+            .parse()
+            .unwrap(),
+    );
+    assert!(matches!(
+        release(handle),
+        fgos_holder_lock::Release::Released { .. }
+    ));
+    assert!(matches!(
+        acquire(&res, Mode::Ex, Wait::Try, 2000),
+        Acquire::Acquired(_)
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -407,25 +529,43 @@ fn refused_admission_keeps_finding_the_same_leaked_holder() {
     validate_quiescent(&handle).unwrap();
     std::thread::sleep(Duration::from_millis(30));
     let marker = std::ffi::CString::new(dir.join("leaked").to_str().unwrap()).unwrap();
-    let lock_fd: i32 = fs::read_dir("/proc/self/fd").unwrap().flatten().find_map(|entry| {
-        (fs::read_link(entry.path()).ok()? == res.path).then(|| entry.file_name().to_str().unwrap().parse().unwrap())
-    }).unwrap();
+    let lock_fd: i32 = fs::read_dir("/proc/self/fd")
+        .unwrap()
+        .flatten()
+        .find_map(|entry| {
+            (fs::read_link(entry.path()).ok()? == res.path)
+                .then(|| entry.file_name().to_str().unwrap().parse().unwrap())
+        })
+        .unwrap();
     let mut cmd = Command::new("/bin/true");
     // SAFETY: the child uses only async-signal-safe syscalls, never Rust locks.
     unsafe {
         cmd.pre_exec(move || {
             let pid = libc::fork();
-            if pid < 0 { return Err(std::io::Error::last_os_error()); }
+            if pid < 0 {
+                return Err(std::io::Error::last_os_error());
+            }
             if pid == 0 {
                 libc::setsid();
                 for fd in 3..65536 {
-                    if fd != lock_fd { libc::close(fd); }
+                    if fd != lock_fd {
+                        libc::close(fd);
+                    }
                 }
-                loop { libc::pause(); }
+                loop {
+                    libc::pause();
+                }
             }
             let fd = libc::open(marker.as_ptr(), libc::O_WRONLY | libc::O_CREAT, 0o600);
-            if fd < 0 { libc::kill(pid, libc::SIGKILL); return Err(std::io::Error::last_os_error()); }
-            libc::write(fd, (&pid as *const libc::pid_t).cast(), std::mem::size_of_val(&pid));
+            if fd < 0 {
+                libc::kill(pid, libc::SIGKILL);
+                return Err(std::io::Error::last_os_error());
+            }
+            libc::write(
+                fd,
+                (&pid as *const libc::pid_t).cast(),
+                std::mem::size_of_val(&pid),
+            );
             libc::close(fd);
             Ok(())
         });
@@ -436,21 +576,31 @@ fn refused_admission_keeps_finding_the_same_leaked_holder() {
     impl Drop for Leaked {
         fn drop(&mut self) {
             // SAFETY: the test owns this deliberately created process.
-            unsafe { libc::kill(self.0 as i32, libc::SIGKILL); }
+            unsafe {
+                libc::kill(self.0 as i32, libc::SIGKILL);
+            }
         }
     }
     let leaked = Leaked(pid);
     for _ in 0..2 {
-        assert!(matches!(validate_quiescent(&handle), Err(BorrowError::ForeignHolder { pids }) if pids.contains(&pid)));
+        assert!(
+            matches!(validate_quiescent(&handle), Err(BorrowError::ForeignHolder { pids }) if pids.contains(&pid))
+        );
         std::thread::sleep(Duration::from_millis(30));
     }
     drop(leaked);
     let deadline = Instant::now() + Duration::from_secs(5);
-    while !matches!(fgos_process::facts::observe(fgos_process::ProcId(pid)), fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie) {
+    while !matches!(
+        fgos_process::facts::observe(fgos_process::ProcId(pid)),
+        fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie
+    ) {
         assert!(Instant::now() < deadline);
         std::thread::sleep(Duration::from_millis(1));
     }
-    assert!(matches!(release(handle), fgos_holder_lock::Release::Released { .. }));
+    assert!(matches!(
+        release(handle),
+        fgos_holder_lock::Release::Released { .. }
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -464,19 +614,27 @@ fn descriptor_sent_to_a_preexisting_process_is_killed_before_release() {
 
 #[cfg(target_os = "linux")]
 #[test]
-fn dropped_handle_kills_preexisting_recipient() { recipient_release(true, false, false); }
+fn dropped_handle_kills_preexisting_recipient() {
+    recipient_release(true, false, false);
+}
 
 #[cfg(target_os = "linux")]
 #[test]
-fn replaced_resource_still_settles_old_inode() { recipient_release(false, true, false); }
+fn replaced_resource_still_settles_old_inode() {
+    recipient_release(false, true, false);
+}
 
 #[cfg(target_os = "linux")]
 #[test]
-fn nested_pidns_recipient_is_killed_at_release() { recipient_release(false, false, true); }
+fn nested_pidns_recipient_is_killed_at_release() {
+    recipient_release(false, false, true);
+}
 
 #[cfg(target_os = "linux")]
 #[test]
-fn nested_pidns_recipient_is_killed_by_drop() { recipient_release(true, false, true); }
+fn nested_pidns_recipient_is_killed_by_drop() {
+    recipient_release(true, false, true);
+}
 
 #[cfg(target_os = "linux")]
 fn recipient_release(drop_only: bool, replace: bool, nested: bool) {
@@ -495,7 +653,10 @@ fn recipient_release_in_table(drop_only: bool, replace: bool, nested: bool, larg
         use fgos_process::containment::{select, SelectEnv};
         let driver = select(&SelectEnv::default()).unwrap();
         if driver.name() != "bwrap-pidns" {
-            eprintln!("skip: release recipient: no-bwrap-pidns (driver {})", driver.name());
+            eprintln!(
+                "skip: release recipient: no-bwrap-pidns (driver {})",
+                driver.name()
+            );
             return;
         }
     }
@@ -504,19 +665,41 @@ fn recipient_release_in_table(drop_only: bool, replace: bool, nested: bool, larg
     let exe = std::env::current_exe().unwrap();
     let mut command = if nested {
         let mut cmd = Command::new("bwrap");
-        cmd.args(["--ro-bind", "/", "/", "--unshare-pid", "--proc", "/proc", "--bind"])
-            .arg(&dir).arg(&dir).arg("--").arg(&exe);
+        cmd.args([
+            "--ro-bind",
+            "/",
+            "/",
+            "--unshare-pid",
+            "--proc",
+            "/proc",
+            "--bind",
+        ])
+        .arg(&dir)
+        .arg(&dir)
+        .arg("--")
+        .arg(&exe);
         cmd
-    } else { Command::new(&exe) };
+    } else {
+        Command::new(&exe)
+    };
     let mut process = command
-        .args(["--exact", "child_entry", "--nocapture"]).env("SCM_ROLE", "parent").current_dir(&dir)
-        .stdin(std::process::Stdio::null()).stdout(std::process::Stdio::null()).stderr(std::process::Stdio::inherit()).spawn().unwrap();
+        .args(["--exact", "child_entry", "--nocapture"])
+        .env("SCM_ROLE", "parent")
+        .current_dir(&dir)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::inherit())
+        .spawn()
+        .unwrap();
     let deadline = Instant::now() + Duration::from_secs(5);
     while !dir.join("ready").exists() {
         assert!(Instant::now() < deadline);
         std::thread::sleep(Duration::from_millis(2));
     }
-    let mut pid: u32 = fs::read_to_string(dir.join("ready")).unwrap().parse().unwrap();
+    let mut pid: u32 = fs::read_to_string(dir.join("ready"))
+        .unwrap()
+        .parse()
+        .unwrap();
     let res = resource(&dir, "io");
     let handle = held(&res);
     let mut fillers = Vec::new();
@@ -525,34 +708,61 @@ fn recipient_release_in_table(drop_only: bool, replace: bool, nested: bool, larg
         for n in 0..256 {
             let file = fs::File::create(dir.join(format!("filler-{n}"))).unwrap();
             // SAFETY: a live test-owned description, held until after release.
-            assert_eq!(unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) }, 0);
+            assert_eq!(
+                unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) },
+                0
+            );
             fillers.push(file);
         }
     }
-    let out = run_borrowed_io(&handle, &BorrowSpec {
-        argv: vec![std::env::current_exe().unwrap().to_str().unwrap().into(), "--exact".into(), "child_entry".into(), "--nocapture".into()],
-        env: [("SCM_ROLE".into(), "sender".into())].into(),
-        cwd: Some(dir.clone()),
-        ..Default::default()
-    }, &bounds(vec![])).unwrap();
+    let out = run_borrowed_io(
+        &handle,
+        &BorrowSpec {
+            argv: vec![
+                std::env::current_exe().unwrap().to_str().unwrap().into(),
+                "--exact".into(),
+                "child_entry".into(),
+                "--nocapture".into(),
+            ],
+            env: [("SCM_ROLE".into(), "sender".into())].into(),
+            cwd: Some(dir.clone()),
+            ..Default::default()
+        },
+        &bounds(vec![]),
+    )
+    .unwrap();
     assert_eq!(out.outcome.exit, Some(0));
     assert_eq!(out.outcome.leftovers_killed, 0);
     if nested {
         use std::os::unix::fs::MetadataExt;
         let meta = fs::metadata(&res.path).unwrap();
-        pid = fgos_process::facts::locked_fds(meta.dev(), meta.ino(), None).unwrap().into_iter()
-            .find(|fd| fd.pid.0 != std::process::id()).expect("nested recipient's host-visible descriptor").pid.0;
+        pid = fgos_process::facts::locked_fds(meta.dev(), meta.ino(), None)
+            .unwrap()
+            .into_iter()
+            .find(|fd| fd.pid.0 != std::process::id())
+            .expect("nested recipient's host-visible descriptor")
+            .pid
+            .0;
     }
-    assert!(matches!(fgos_process::facts::observe(fgos_process::ProcId(pid)), fgos_process::facts::Observed::Live { .. }));
+    assert!(matches!(
+        fgos_process::facts::observe(fgos_process::ProcId(pid)),
+        fgos_process::facts::Observed::Live { .. }
+    ));
     if replace {
         fs::remove_file(&res.path).unwrap();
         fs::write(&res.path, b"").unwrap();
     }
-    if drop_only { drop(handle); }
-    else { assert!(matches!(release(handle), Release::Released { killed } if killed >= 1)); }
+    if drop_only {
+        drop(handle);
+    } else {
+        assert!(matches!(release(handle), Release::Released { killed } if killed >= 1));
+    }
     gone(pid);
     assert!(process.wait().unwrap().success());
-    assert!(matches!(acquire(&res, Mode::Ex, Wait::Try, 2000), Acquire::Acquired(_)));
+    assert!(matches!(
+        acquire(&res, Mode::Ex, Wait::Try, 2000),
+        Acquire::Acquired(_)
+    ));
     fs::remove_dir_all(dir).unwrap();
 }
 
@@ -561,10 +771,15 @@ fn scm_role() -> bool {
     use std::io::{Read, Write};
     use std::os::fd::{AsRawFd, FromRawFd};
     use std::os::unix::net::{UnixListener, UnixStream};
-    let Ok(role) = std::env::var("SCM_ROLE") else { return false; };
+    let Ok(role) = std::env::var("SCM_ROLE") else {
+        return false;
+    };
     if role == "parent" {
         let mut child = Command::new(std::env::current_exe().unwrap())
-            .args(["--exact", "child_entry", "--nocapture"]).env("SCM_ROLE", "receiver").spawn().unwrap();
+            .args(["--exact", "child_entry", "--nocapture"])
+            .env("SCM_ROLE", "receiver")
+            .spawn()
+            .unwrap();
         let status = child.wait().unwrap();
         use std::os::unix::process::ExitStatusExt;
         assert_eq!(status.signal(), Some(libc::SIGKILL));
@@ -574,10 +789,15 @@ fn scm_role() -> bool {
         let listener = UnixListener::bind("socket").unwrap();
         fs::write("ready", std::process::id().to_string()).unwrap();
         listener.accept().unwrap().0
-    } else { UnixStream::connect("socket").unwrap() };
+    } else {
+        UnixStream::connect("socket").unwrap()
+    };
     let mut data = *b"x";
     let mut control = [0usize; 8];
-    let mut iov = libc::iovec { iov_base: data.as_mut_ptr().cast(), iov_len: 1 };
+    let mut iov = libc::iovec {
+        iov_base: data.as_mut_ptr().cast(),
+        iov_len: 1,
+    };
     // SAFETY: zeroed msghdr, aligned ancillary buffer, live stream and payload.
     unsafe {
         let mut msg: libc::msghdr = std::mem::zeroed();
@@ -595,7 +815,10 @@ fn scm_role() -> bool {
             let mut ack = [0];
             stream.read_exact(&mut ack).unwrap();
         } else {
-            assert_eq!(libc::recvmsg(stream.as_raw_fd(), &mut msg, libc::MSG_CMSG_CLOEXEC), 1);
+            assert_eq!(
+                libc::recvmsg(stream.as_raw_fd(), &mut msg, libc::MSG_CMSG_CLOEXEC),
+                1
+            );
             let cmsg = libc::CMSG_FIRSTHDR(&msg);
             assert!(!cmsg.is_null());
             assert_eq!((*cmsg).cmsg_type, libc::SCM_RIGHTS);
@@ -613,25 +836,36 @@ fn scm_role() -> bool {
 #[cfg(target_os = "linux")]
 fn release_race_role() -> bool {
     use std::io::{BufRead, Write};
-    let Some(path) = std::env::var_os("RELEASE_RACE") else { return false; };
+    let Some(path) = std::env::var_os("RELEASE_RACE") else {
+        return false;
+    };
     let res = Resource::new("io", path);
     let mut input = std::io::stdin().lock();
     let mut output = std::io::stdout().lock();
     let mut line = String::new();
     for _ in 0..1000 {
-        line.clear(); input.read_line(&mut line).unwrap(); assert_eq!(line.trim(), "go");
+        line.clear();
+        input.read_line(&mut line).unwrap();
+        assert_eq!(line.trim(), "go");
         let deadline = Instant::now() + Duration::from_secs(10);
         let handle = loop {
             match acquire(&res, Mode::Ex, Wait::Try, 2000) {
                 Acquire::Acquired(handle) => break handle,
-                Acquire::Held { .. } => { assert!(Instant::now() < deadline); std::thread::yield_now(); }
+                Acquire::Held { .. } => {
+                    assert!(Instant::now() < deadline);
+                    std::thread::yield_now();
+                }
                 other => panic!("{other:?}"),
             }
         };
-        writeln!(output, "acquired").unwrap(); output.flush().unwrap();
-        line.clear(); input.read_line(&mut line).unwrap(); assert_eq!(line.trim(), "release");
+        writeln!(output, "acquired").unwrap();
+        output.flush().unwrap();
+        line.clear();
+        input.read_line(&mut line).unwrap();
+        assert_eq!(line.trim(), "release");
         assert_eq!(release(handle), Release::Released { killed: 0 });
-        writeln!(output, "released").unwrap(); output.flush().unwrap();
+        writeln!(output, "released").unwrap();
+        output.flush().unwrap();
     }
     true
 }
@@ -644,23 +878,34 @@ fn thousand_legitimate_contenders_are_never_signalled_at_release() {
     let dir = temp_dir("release-race");
     let res = resource(&dir, "io");
     // Read protocol markers past the test harness preamble.
-    let mut child = Guard(Command::new(std::env::current_exe().unwrap())
-        .args(["--exact", "child_entry", "--nocapture"])
-        .env("RELEASE_RACE", &res.path).stdin(std::process::Stdio::piped())
-        .stdout(std::process::Stdio::piped()).spawn().unwrap());
+    let mut child = Guard(
+        Command::new(std::env::current_exe().unwrap())
+            .args(["--exact", "child_entry", "--nocapture"])
+            .env("RELEASE_RACE", &res.path)
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .spawn()
+            .unwrap(),
+    );
     let mut input = child.stdin.take().unwrap();
     let mut output = BufReader::new(child.stdout.take().unwrap());
     let mut line = String::new();
     // libtest prints a preamble; read until each protocol marker.
-    let mut marker = |wanted: &str| {
-        loop { line.clear(); assert!(output.read_line(&mut line).unwrap() > 0); if line.trim().ends_with(wanted) { break; } }
+    let mut marker = |wanted: &str| loop {
+        line.clear();
+        assert!(output.read_line(&mut line).unwrap() > 0);
+        if line.trim().ends_with(wanted) {
+            break;
+        }
     };
     for _ in 0..1000 {
         let handle = held(&res);
-        writeln!(input, "go").unwrap(); input.flush().unwrap();
+        writeln!(input, "go").unwrap();
+        input.flush().unwrap();
         assert_eq!(release(handle), Release::Released { killed: 0 });
         marker("acquired");
-        writeln!(input, "release").unwrap(); input.flush().unwrap();
+        writeln!(input, "release").unwrap();
+        input.flush().unwrap();
         marker("released");
     }
     assert!(child.wait().unwrap().success());
@@ -681,7 +926,9 @@ fn same_process_reacquirer_and_its_borrow_survive_release() {
                 barrier.wait();
                 let deadline = Instant::now() + Duration::from_secs(5);
                 let next = loop {
-                    if let Acquire::Acquired(next) = acquire(&res, Mode::Ex, Wait::Try, 2000) { break next; }
+                    if let Acquire::Acquired(next) = acquire(&res, Mode::Ex, Wait::Try, 2000) {
+                        break next;
+                    }
                     assert!(Instant::now() < deadline);
                     std::thread::yield_now();
                 };
@@ -702,33 +949,53 @@ fn same_process_reacquirer_and_its_borrow_survive_release() {
 fn release_waits_or_reports_stuck_without_killing_pre_exec_child_and_shared_plainly_closes() {
     use std::os::unix::process::CommandExt;
     let _serial = serial();
-    for (mode, kill_wait, stuck) in [(Mode::Ex, 2000, false), (Mode::Sh, 2000, false), (Mode::Ex, 10, true)] {
+    for (mode, kill_wait, stuck) in [
+        (Mode::Ex, 2000, false),
+        (Mode::Sh, 2000, false),
+        (Mode::Ex, 10, true),
+    ] {
         let dir = temp_dir("release-pre-exec");
         let res = resource(&dir, "io");
-        let handle = match acquire(&res, mode, Wait::Try, kill_wait) { Acquire::Acquired(h) => h, other => panic!("{other:?}") };
+        let handle = match acquire(&res, mode, Wait::Try, kill_wait) {
+            Acquire::Acquired(h) => h,
+            other => panic!("{other:?}"),
+        };
         let marker = std::ffi::CString::new(dir.join("ready").to_str().unwrap()).unwrap();
         std::thread::scope(|scope| {
             let child = scope.spawn(|| {
                 let mut cmd = Command::new("/bin/true");
                 // SAFETY: only async-signal-safe calls before exec.
-                unsafe { cmd.pre_exec(move || {
-                    let fd = libc::open(marker.as_ptr(), libc::O_WRONLY | libc::O_CREAT, 0o600);
-                    if fd < 0 { return Err(std::io::Error::last_os_error()); }
-                    libc::close(fd);
-                    libc::usleep(200_000);
-                    Ok(())
-                }); }
+                unsafe {
+                    cmd.pre_exec(move || {
+                        let fd = libc::open(marker.as_ptr(), libc::O_WRONLY | libc::O_CREAT, 0o600);
+                        if fd < 0 {
+                            return Err(std::io::Error::last_os_error());
+                        }
+                        libc::close(fd);
+                        libc::usleep(200_000);
+                        Ok(())
+                    });
+                }
                 cmd.status().unwrap()
             });
             let deadline = Instant::now() + Duration::from_secs(5);
-            while !dir.join("ready").exists() { assert!(Instant::now() < deadline); std::thread::yield_now(); }
+            while !dir.join("ready").exists() {
+                assert!(Instant::now() < deadline);
+                std::thread::yield_now();
+            }
             let outcome = release(handle);
             if stuck {
                 assert!(matches!(outcome, Release::Stuck { killed: 0, pids } if !pids.is_empty()));
             } else {
                 assert_eq!(outcome, Release::Released { killed: 0 });
-                if mode == Mode::Ex { assert!(matches!(probe(&res).unwrap(), Probe::Free)); }
-                else { assert!(!child.is_finished(), "shared close should not settle transient copies"); }
+                if mode == Mode::Ex {
+                    assert!(matches!(probe(&res).unwrap(), Probe::Free));
+                } else {
+                    assert!(
+                        !child.is_finished(),
+                        "shared close should not settle transient copies"
+                    );
+                }
             }
             assert!(child.join().unwrap().success());
         });
@@ -743,12 +1010,22 @@ fn adopted_direct_child_is_drained_on_borrow_and_release() {
     const ROLE: &str = "FGOS_TEST_ADOPTED_HOLDER";
     if std::env::var_os(ROLE).is_none() {
         assert!(Command::new(std::env::current_exe().unwrap())
-            .args(["--exact", "adopted_direct_child_is_drained_on_borrow_and_release", "--nocapture"])
-            .env(ROLE, "1").status().unwrap().success());
+            .args([
+                "--exact",
+                "adopted_direct_child_is_drained_on_borrow_and_release",
+                "--nocapture"
+            ])
+            .env(ROLE, "1")
+            .status()
+            .unwrap()
+            .success());
         return;
     }
     // SAFETY: the isolated fixture process adopts only its own descendants.
-    assert_eq!(unsafe { libc::prctl(libc::PR_SET_CHILD_SUBREAPER, 1, 0, 0, 0) }, 0);
+    assert_eq!(
+        unsafe { libc::prctl(libc::PR_SET_CHILD_SUBREAPER, 1, 0, 0, 0) },
+        0
+    );
     for at_release in [false, true] {
         let dir = temp_dir("adopted-holder");
         let res = resource(&dir, "io");
@@ -756,31 +1033,48 @@ fn adopted_direct_child_is_drained_on_borrow_and_release() {
         let script = "setsid sh -c 'echo $$ > adopted; exec sleep 30' </dev/null >/dev/null 2>&1 & while [ ! -s adopted ]; do sleep 0.01; done";
         if at_release {
             use std::os::unix::process::CommandExt;
-            let lock_fd: i32 = fs::read_dir("/proc/self/fd").unwrap().flatten().find_map(|e| {
-                (fs::read_link(e.path()).ok()? == res.path).then(|| e.file_name().to_str().unwrap().parse().unwrap())
-            }).unwrap();
+            let lock_fd: i32 = fs::read_dir("/proc/self/fd")
+                .unwrap()
+                .flatten()
+                .find_map(|e| {
+                    (fs::read_link(e.path()).ok()? == res.path)
+                        .then(|| e.file_name().to_str().unwrap().parse().unwrap())
+                })
+                .unwrap();
             let mut cmd = Command::new("sh");
             cmd.args(["-c", script]).current_dir(&dir);
             // SAFETY: explicit borrowing of the test-owned held description.
-            unsafe { cmd.pre_exec(move || {
-                if libc::dup2(lock_fd, 3) < 0 || libc::fcntl(3, libc::F_SETFD, 0) < 0 {
-                    return Err(std::io::Error::last_os_error());
-                }
-                Ok(())
-            }); }
+            unsafe {
+                cmd.pre_exec(move || {
+                    if libc::dup2(lock_fd, 3) < 0 || libc::fcntl(3, libc::F_SETFD, 0) < 0 {
+                        return Err(std::io::Error::last_os_error());
+                    }
+                    Ok(())
+                });
+            }
             assert!(cmd.status().unwrap().success());
         } else {
             let out = run_borrowed_io(&handle, &shell(script, &dir), &bounds(vec![])).unwrap();
             assert_eq!(out.outcome.exit, Some(0));
             assert!(out.outcome.leftovers_killed > 0);
         }
-        let pid = fs::read_to_string(dir.join("adopted")).unwrap().trim().parse::<u32>().unwrap();
+        let pid = fs::read_to_string(dir.join("adopted"))
+            .unwrap()
+            .trim()
+            .parse::<u32>()
+            .unwrap();
         let result = release(handle);
         // Always clean up our fixture, including a failing release regression.
         let state = fgos_process::facts::observe(fgos_process::ProcId(pid));
-        unsafe { libc::kill(pid as i32, libc::SIGKILL); libc::waitpid(pid as i32, std::ptr::null_mut(), 0); }
+        unsafe {
+            libc::kill(pid as i32, libc::SIGKILL);
+            libc::waitpid(pid as i32, std::ptr::null_mut(), 0);
+        }
         assert!(matches!(result, Release::Released { .. }), "{result:?}");
-        assert!(matches!(state, fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie));
+        assert!(matches!(
+            state,
+            fgos_process::facts::Observed::Absent | fgos_process::facts::Observed::Zombie
+        ));
         assert!(matches!(release(held(&res)), Release::Released { .. }));
         fs::remove_dir_all(dir).unwrap();
     }
@@ -792,7 +1086,8 @@ fn deadline_reports_cooperative_cleanup_or_forced_residue() {
     for cooperative in [true, false] {
         let dir = temp_dir("io-term-lock");
         let handle = held(&resource(&dir, "io"));
-        let script = format!(r#"import os,signal,time
+        let script = format!(
+            r#"import os,signal,time
 fd=os.open('index.lock',os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
 def cleanup(sig,frame):
  os.unlink('index.lock')
@@ -800,7 +1095,13 @@ def cleanup(sig,frame):
 signal.signal(signal.SIGTERM,{})
 open('ready','w').close()
 while True: time.sleep(.01)
-"#, if cooperative { "cleanup" } else { "signal.SIG_IGN" });
+"#,
+            if cooperative {
+                "cleanup"
+            } else {
+                "signal.SIG_IGN"
+            }
+        );
         let spec = BorrowSpec {
             argv: vec!["python3".into(), "-c".into(), script],
             cwd: Some(dir.clone()),
@@ -811,10 +1112,19 @@ while True: time.sleep(.01)
         let started = Instant::now();
         let error = run_borrowed_io(&handle, &spec, &io).unwrap_err();
         assert!(dir.join("ready").exists(), "handler was not installed");
-        let expected = if cooperative { Termination::Terminated } else { Termination::KilledAfterGrace };
-        assert!(matches!(error, BorrowError::Deadline { termination } if termination == expected), "{error}");
+        let expected = if cooperative {
+            Termination::Terminated
+        } else {
+            Termination::KilledAfterGrace
+        };
+        assert!(
+            matches!(error, BorrowError::Deadline { termination } if termination == expected),
+            "{error}"
+        );
         assert_eq!(dir.join("index.lock").exists(), !cooperative);
-        if !cooperative { assert!(started.elapsed() >= Duration::from_secs(8)); }
+        if !cooperative {
+            assert!(started.elapsed() >= Duration::from_secs(8));
+        }
         assert!(started.elapsed() < Duration::from_secs(15));
         assert!(matches!(release(handle), Release::Released { .. }));
         fs::remove_dir_all(dir).unwrap();
@@ -830,16 +1140,30 @@ fn watched_borrow_reports_a_setsid_child_that_dropped_the_borrowed_descriptor() 
     let handle = held(&res);
     let script = "( setsid sleep 30 </dev/null >/dev/null 2>&1 3>&- & echo $! > pids ); sleep 0.1";
     let unwatched = run_borrowed_io(&handle, &shell(script, &dir), &bounds(Vec::new())).unwrap();
-    assert!(unwatched.escaped.is_empty(), "an unwatched run reports nothing");
-    let survivor_pids = || fs::read_to_string(dir.join("pids")).unwrap().trim().parse::<i32>().unwrap();
+    assert!(
+        unwatched.escaped.is_empty(),
+        "an unwatched run reports nothing"
+    );
+    let survivor_pids = || {
+        fs::read_to_string(dir.join("pids"))
+            .unwrap()
+            .trim()
+            .parse::<i32>()
+            .unwrap()
+    };
     let kill = |pid: i32| unsafe { libc::kill(pid, libc::SIGKILL) };
     kill(survivor_pids());
-    let watched = run_borrowed_io_watched(&handle, &shell(script, &dir), &bounds(Vec::new())).unwrap();
+    let watched =
+        run_borrowed_io_watched(&handle, &shell(script, &dir), &bounds(Vec::new())).unwrap();
     let pid = survivor_pids();
     kill(pid);
     assert_eq!(watched.escaped, vec![pid as u32]);
-    let clean = run_borrowed_io_watched(&handle, &shell("true", &dir), &bounds(Vec::new())).unwrap();
-    assert!(clean.escaped.is_empty(), "a run that leaves nothing behind reports nothing");
+    let clean =
+        run_borrowed_io_watched(&handle, &shell("true", &dir), &bounds(Vec::new())).unwrap();
+    assert!(
+        clean.escaped.is_empty(),
+        "a run that leaves nothing behind reports nothing"
+    );
 }
 
 /// A lock released while a sibling thread forks children is free to an
@@ -864,18 +1188,25 @@ fn released_lock_is_free_while_a_sibling_thread_forks_children() {
     let deadline = Instant::now() + Duration::from_secs(20);
     let mut held_after_release = 0;
     for _ in 0..300 {
-        if Instant::now() > deadline { break; }
+        if Instant::now() > deadline {
+            break;
+        }
         for _ in 0..2 {
             match acquire(&res, Mode::Ex, Wait::Try, 2000) {
                 Acquire::Acquired(handle) => {
                     assert!(matches!(release(handle), Release::Released { .. }));
                 }
-                Acquire::Held { .. } => { held_after_release += 1; }
+                Acquire::Held { .. } => {
+                    held_after_release += 1;
+                }
                 other => panic!("{other:?}"),
             }
         }
     }
     stop.store(true, Ordering::Relaxed);
     forker.join().unwrap();
-    assert_eq!(held_after_release, 0, "an Ex try right after a release answered Held");
+    assert_eq!(
+        held_after_release, 0,
+        "an Ex try right after a release answered Held"
+    );
 }

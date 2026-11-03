@@ -38,11 +38,18 @@ fn adopt_scan_skips_two_thousand_closed_runs_quickly_and_adopts_the_five_that_ne
     let started = Instant::now();
     let (code, lines) = adopt_with(&["--scan"], &closed.join("\n"));
     let skip = started.elapsed();
-    eprintln!("scan of {CLOSED} closed attempts, process start included: {} ms (goal 50 ms)", skip.as_millis());
+    eprintln!(
+        "scan of {CLOSED} closed attempts, process start included: {} ms (goal 50 ms)",
+        skip.as_millis()
+    );
     assert_eq!(code, 0);
     assert_eq!(lines.len(), CLOSED);
     assert!(lines.iter().all(|l| l["state"] == "closed"));
-    assert!(skip.as_millis() < 500, "skip took {} ms; 50 ms is the goal on a normal machine, 500 ms the hard limit", skip.as_millis());
+    assert!(
+        skip.as_millis() < 500,
+        "skip took {} ms; 50 ms is the goal on a normal machine, 500 ms the hard limit",
+        skip.as_millis()
+    );
 
     // Mixed: five attempts to adopt among the closed ones, answers in input order.
     let needing: Vec<_> = (0..5)
@@ -59,10 +66,20 @@ fn adopt_scan_skips_two_thousand_closed_runs_quickly_and_adopts_the_five_that_ne
     }
     let (code, lines) = adopt_with(&["--scan"], &order.join("\n"));
     assert_eq!(code, 0);
-    let dirs: Vec<&str> = lines.iter().map(|l| l["attemptDir"].as_str().unwrap()).collect();
-    assert_eq!(dirs, order.iter().map(String::as_str).collect::<Vec<_>>(), "one line per input line, in order");
+    let dirs: Vec<&str> = lines
+        .iter()
+        .map(|l| l["attemptDir"].as_str().unwrap())
+        .collect();
+    assert_eq!(
+        dirs,
+        order.iter().map(String::as_str).collect::<Vec<_>>(),
+        "one line per input line, in order"
+    );
     assert_eq!(lines.iter().filter(|l| l["state"] == "adopted").count(), 5);
-    assert_eq!(lines.iter().filter(|l| l["state"] == "closed").count(), CLOSED);
+    assert_eq!(
+        lines.iter().filter(|l| l["state"] == "closed").count(),
+        CLOSED
+    );
     for a in &needing {
         assert_eq!(a.runs_of("settle-attempt"), 1);
         assert_eq!(a.json("receipt.json").unwrap()["outcome"], "exited");
@@ -80,18 +97,46 @@ fn adopt_scan_leaves_a_running_attempt_and_a_foreign_run_alone() {
     let (mut live, tuple) = live_process();
     let busy = attempt_in(&root, "busy-domain", &["settle-attempt"]);
     busy.bind(&tuple);
-    let input = [&running.dir, &legacy.dir, &busy.dir].iter().map(|d| d.to_string_lossy().into_owned()).collect::<Vec<_>>().join("\n");
+    let input = [&running.dir, &legacy.dir, &busy.dir]
+        .iter()
+        .map(|d| d.to_string_lossy().into_owned())
+        .collect::<Vec<_>>()
+        .join("\n");
 
     let (code, lines) = adopt_with(&["--scan"], &input);
     assert_eq!(code, 0);
-    let states: Vec<_> = lines.iter().map(|l| (l["state"].as_str().unwrap(), l["reason"].as_str())).collect();
-    assert_eq!(states, vec![("running", None), ("legacy-run", None), ("running", Some("domain-not-empty"))]);
-    assert_eq!(busy.runs_of("settle-attempt"), 0, "a scan never ends a domain");
+    let states: Vec<_> = lines
+        .iter()
+        .map(|l| (l["state"].as_str().unwrap(), l["reason"].as_str()))
+        .collect();
+    assert_eq!(
+        states,
+        vec![
+            ("running", None),
+            ("legacy-run", None),
+            ("running", Some("domain-not-empty"))
+        ]
+    );
+    assert_eq!(
+        busy.runs_of("settle-attempt"),
+        0,
+        "a scan never ends a domain"
+    );
     live.kill().unwrap();
     live.wait().unwrap();
 
-    let (code, lines) = adopt_with(&["--scan", "--probe-only"], &format!("{}\n", busy.dir.display()));
-    assert_eq!((code, lines[0]["state"].as_str()), (0, Some("needs-adopt")), "the domain is empty now: {lines:?}");
-    assert!(!busy.path("receipt.json").exists(), "a probe writes nothing");
+    let (code, lines) = adopt_with(
+        &["--scan", "--probe-only"],
+        &format!("{}\n", busy.dir.display()),
+    );
+    assert_eq!(
+        (code, lines[0]["state"].as_str()),
+        (0, Some("needs-adopt")),
+        "the domain is empty now: {lines:?}"
+    );
+    assert!(
+        !busy.path("receipt.json").exists(),
+        "a probe writes nothing"
+    );
     let _ = fs::remove_dir_all(&root);
 }

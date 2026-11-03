@@ -15,7 +15,10 @@ use fgos_terminal_control::core::{Core, CoreConfig};
 use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
 use fgos_terminal_control::policy::{policy_by_name, PlacementPolicy};
 use fgos_terminal_control::port::{Disposition, ReleaseOutcome};
-use fgos_terminal_control::route::{DEFAULT_ALLOCATION_GRACE_MS, DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS, DEFAULT_SHELL_READY_TIMEOUT_MS, DEFAULT_LIMITS};
+use fgos_terminal_control::route::{
+    DEFAULT_ALLOCATION_GRACE_MS, DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS, DEFAULT_LIMITS,
+    DEFAULT_SHELL_READY_TIMEOUT_MS,
+};
 use fgos_terminal_control::store::default_state_root;
 use serde_json::Value;
 
@@ -44,8 +47,21 @@ impl Backend {
     /// The backend of this process's environment; what the environment does not name comes from the
     /// endpoint the supervisor recorded in the attempt directory (adopt runs under another environment).
     pub fn from_env(run_dir: &Path) -> Backend {
-        let recorded: Value = std::fs::read_to_string(run_dir.join(ENDPOINT_FILE)).ok().and_then(|t| serde_json::from_str(&t).ok()).unwrap_or(Value::Null);
-        let pick = |var: &str, field: &str| std::env::var(var).ok().filter(|v| !v.is_empty()).or_else(|| recorded[field].as_str().filter(|v| !v.is_empty()).map(String::from));
+        let recorded: Value = std::fs::read_to_string(run_dir.join(ENDPOINT_FILE))
+            .ok()
+            .and_then(|t| serde_json::from_str(&t).ok())
+            .unwrap_or(Value::Null);
+        let pick = |var: &str, field: &str| {
+            std::env::var(var)
+                .ok()
+                .filter(|v| !v.is_empty())
+                .or_else(|| {
+                    recorded[field]
+                        .as_str()
+                        .filter(|v| !v.is_empty())
+                        .map(String::from)
+                })
+        };
         let mut herdr = HerdrConfig::new(pick("FGOS_HERDR_BIN", "bin").unwrap_or_default());
         herdr.session = pick("HERDR_SESSION", "session");
         herdr.socket_path = pick("HERDR_SOCKET_PATH", "socket");
@@ -81,7 +97,10 @@ pub fn record_endpoint(run_dir: &Path) {
 }
 
 pub fn now_ms() -> u64 {
-    SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as u64).unwrap_or(0)
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0)
 }
 
 /// Close for a recognized gate exit with both captured streams; the step runner asks only once every
@@ -90,21 +109,34 @@ pub fn disposition_for(receipt: Option<&Value>) -> Disposition {
     let captured_exit = receipt.is_some_and(|r| {
         let exit = &r["gateExit"];
         let ended = match r["outcome"].as_str() {
-            Some("exited") => exit["stoppedBy"] == "agent"
-                || (exit["stoppedBy"] == "orphan" && exit["cause"] == "orphan-result" && r["outboxPresent"] == true),
+            Some("exited") => {
+                exit["stoppedBy"] == "agent"
+                    || (exit["stoppedBy"] == "orphan"
+                        && exit["cause"] == "orphan-result"
+                        && r["outboxPresent"] == true)
+            }
             Some("cancelled") => exit["stoppedBy"] == "cancel",
-            Some("timeout") => matches!(exit["stoppedBy"].as_str(), Some("soft-deadline" | "idle" | "hard-ceiling")),
+            Some("timeout") => matches!(
+                exit["stoppedBy"].as_str(),
+                Some("soft-deadline" | "idle" | "hard-ceiling")
+            ),
             Some("output-limit") => exit["stoppedBy"] == "output-limit",
             _ => false,
         };
         let captured = ["stdout", "stderr"].iter().all(|stream| {
             r["captureDigests"][stream].as_str().is_some_and(|digest| {
-                digest.strip_prefix("sha256:").is_some_and(|hex| hex.len() == 64 && hex.bytes().all(|b| b.is_ascii_hexdigit()))
+                digest.strip_prefix("sha256:").is_some_and(|hex| {
+                    hex.len() == 64 && hex.bytes().all(|b| b.is_ascii_hexdigit())
+                })
             })
         });
         ended && captured
     });
-    if captured_exit { Disposition::Close } else { Disposition::Retain }
+    if captured_exit {
+        Disposition::Close
+    } else {
+        Disposition::Retain
+    }
 }
 
 /// Why `release-slot` has no receipt.
@@ -117,15 +149,28 @@ pub enum ReleaseFailure {
 }
 
 /// `release(key, disposition)`; `Ok` carries the detail the step receipt records.
-pub fn release(backend: &Backend, key: &str, disposition: Disposition, retain_window: Option<u64>) -> Result<Value, ReleaseFailure> {
+pub fn release(
+    backend: &Backend,
+    key: &str,
+    disposition: Disposition,
+    retain_window: Option<u64>,
+) -> Result<Value, ReleaseFailure> {
     use fgos_terminal_control::port::Refusal;
     // A retained pane with no window stays until a person closes it.
-    let until = if disposition == Disposition::Retain { retain_window.map(|window| now_ms() + window) } else { None };
+    let until = if disposition == Disposition::Retain {
+        retain_window.map(|window| now_ms() + window)
+    } else {
+        None
+    };
     match backend.core().release(key, disposition, until) {
-        Ok(ReleaseOutcome::Released { disposition }) => Ok(serde_json::json!({"disposition": disposition, "key": key})),
+        Ok(ReleaseOutcome::Released { disposition }) => {
+            Ok(serde_json::json!({"disposition": disposition, "key": key}))
+        }
         Ok(ReleaseOutcome::KeptUnknown { reason }) => Err(ReleaseFailure::Retry(reason)),
         Err(Refusal::Unknown { reason }) => Err(ReleaseFailure::Retry(reason)),
-        Err(Refusal::Unsupported { capability, detail }) => Err(ReleaseFailure::Unsupported(format!("{capability}: {detail}"))),
+        Err(Refusal::Unsupported { capability, detail }) => Err(ReleaseFailure::Unsupported(
+            format!("{capability}: {detail}"),
+        )),
     }
 }
 
@@ -136,14 +181,28 @@ mod tests {
 
     #[test]
     fn the_envelope_sets_how_long_a_retained_pane_stays() {
-        assert_eq!(retain_window(&json!({"terminal": {}})), Some(RETAIN_FAILED_PANE_MS), "absent means the default");
-        assert_eq!(retain_window(&json!({"terminal": {"retainFailedPaneMs": null}})), None, "null keeps it until a person closes it");
-        assert_eq!(retain_window(&json!({"terminal": {"retainFailedPaneMs": 90000}})), Some(90000));
+        assert_eq!(
+            retain_window(&json!({"terminal": {}})),
+            Some(RETAIN_FAILED_PANE_MS),
+            "absent means the default"
+        );
+        assert_eq!(
+            retain_window(&json!({"terminal": {"retainFailedPaneMs": null}})),
+            None,
+            "null keeps it until a person closes it"
+        );
+        assert_eq!(
+            retain_window(&json!({"terminal": {"retainFailedPaneMs": 90000}})),
+            Some(90000)
+        );
     }
 
     #[test]
     fn missing_receipt_or_missing_facts_retain() {
         assert_eq!(disposition_for(None), Disposition::Retain);
-        assert_eq!(disposition_for(Some(&json!({"outcome": "exited", "outboxPresent": true}))), Disposition::Retain);
+        assert_eq!(
+            disposition_for(Some(&json!({"outcome": "exited", "outboxPresent": true}))),
+            Disposition::Retain
+        );
     }
 }

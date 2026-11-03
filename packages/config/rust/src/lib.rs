@@ -20,34 +20,34 @@ macro_rules! contract {
     }};
 }
 
-pub mod error;
-pub mod locks;
 pub mod bundle;
 pub mod cache;
 pub mod detect;
-pub mod files;
-pub mod grammar;
-pub mod lint;
-pub mod redact;
-pub mod schema;
-pub mod scope;
-pub mod snapshot;
-pub mod standard;
-pub mod validate;
 pub mod docs;
 #[cfg(unix)]
 pub mod doctor;
+pub mod error;
+pub mod files;
+pub mod grammar;
 pub mod inspect;
+pub mod lint;
+pub mod locks;
 pub mod machine;
 /// The migration writes files through the write door, so it is Unix only like it.
 #[cfg(unix)]
 pub mod migrate;
 #[cfg(feature = "host-provider")]
 pub mod provider;
+pub mod redact;
 pub mod relocate;
 #[cfg(unix)]
 pub mod repair;
+pub mod schema;
+pub mod scope;
 pub mod session;
+pub mod snapshot;
+pub mod standard;
+pub mod validate;
 /// The write door needs the no-follow directory primitives of Durable File, which are Unix only.
 #[cfg(unix)]
 pub mod write;

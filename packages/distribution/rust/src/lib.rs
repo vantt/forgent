@@ -491,4 +491,3 @@ mod tests {
         assert_eq!(compact, vector["compact_hash_input"].as_str().unwrap());
     }
 }
-

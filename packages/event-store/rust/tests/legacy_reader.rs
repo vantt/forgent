@@ -141,10 +141,8 @@ fn every_legacy_file_of_a_commit_is_read_through_one_git_read_however_many_files
         std::iter::once(("events.jsonl".to_owned(), line(1).into_bytes()))
             .chain((2..=9).map(|n| (format!("events/part-{n}.jsonl"), line(n).into_bytes())))
             .collect();
-    let borrowed: Vec<(&str, Vec<u8>)> = files
-        .iter()
-        .map(|(p, b)| (p.as_str(), b.clone()))
-        .collect();
+    let borrowed: Vec<(&str, Vec<u8>)> =
+        files.iter().map(|(p, b)| (p.as_str(), b.clone())).collect();
     fenced_legacy(&f, &mut h, &borrowed);
     let p = f.port(&mut h, "refs/fgos/events/test-aa");
     let counting = CountingPort::new(&p);

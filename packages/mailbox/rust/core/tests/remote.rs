@@ -1,7 +1,9 @@
 mod common;
 
 use common::{key, t, Pair, B_NAME};
-use fgos_mailbox_core::{CounterReason, Ingested, MessageState, Refusal, RemoteMail, Settlement, WakeDrop};
+use fgos_mailbox_core::{
+    CounterReason, Ingested, MessageState, Refusal, RemoteMail, Settlement, WakeDrop,
+};
 use std::collections::BTreeSet;
 
 const WIRE_CAP: u64 = 2048;
@@ -148,7 +150,8 @@ fn a_remote_message_is_unsettled_once_offered_or_refused_and_settled_marks_only_
     let mut pair = Pair::new(t(0));
     let from = key("session-1");
     let to = key("b");
-    let Ingested::Recorded { id, .. } = ingest(&mut pair, &mail(&from, "m1", &to, "hi"), 1).unwrap()
+    let Ingested::Recorded { id, .. } =
+        ingest(&mut pair, &mail(&from, "m1", &to, "hi"), 1).unwrap()
     else {
         panic!("recorded")
     };
@@ -200,24 +203,46 @@ fn a_wake_from_a_remote_sender_takes_effect_only_for_a_recipient_with_a_channel_
     let mut pair = Pair::new(t(0));
     let from = key("session-1");
     let to = key("b");
-    let channel: BTreeSet<_> = ["claude", "codex", "pi", "omp"].map(common::cli).into_iter().collect();
+    let channel: BTreeSet<_> = ["claude", "codex", "pi", "omp"]
+        .map(common::cli)
+        .into_iter()
+        .collect();
 
     // No channel for the recipient's CLI: the mail lands, the wake is dropped, nothing is spent.
     let none = BTreeSet::new();
-    let dropped = recorded_wake(ingest(&mut pair, &waking(mail(&from, "m0", &to, "hi"), &none, &none), 1));
+    let dropped = recorded_wake(ingest(
+        &mut pair,
+        &waking(mail(&from, "m0", &to, "hi"), &none, &none),
+        1,
+    ));
     assert!(!dropped.effective);
     assert_eq!(dropped.dropped, Some(WakeDrop::NoChannel));
 
-    let first = recorded_wake(ingest(&mut pair, &waking(mail(&from, "m1", &to, "hi"), &none, &channel), 2));
+    let first = recorded_wake(ingest(
+        &mut pair,
+        &waking(mail(&from, "m1", &to, "hi"), &none, &channel),
+        2,
+    ));
     assert!(first.effective && first.to_nudge);
     assert_eq!(first.to_key, to);
     assert!(!first.outstanding);
 
-    let second = recorded_wake(ingest(&mut pair, &waking(mail(&from, "m2", &to, "again"), &none, &channel), 3));
+    let second = recorded_wake(ingest(
+        &mut pair,
+        &waking(mail(&from, "m2", &to, "again"), &none, &channel),
+        3,
+    ));
     assert!(second.outstanding, "the first wake is still unread");
 
     // A message that did not ask for a wake never takes one.
-    let plain = recorded_wake(ingest(&mut pair, &RemoteMail { nudge_clis: &channel, ..mail(&from, "m3", &to, "x") }, 4));
+    let plain = recorded_wake(ingest(
+        &mut pair,
+        &RemoteMail {
+            nudge_clis: &channel,
+            ..mail(&from, "m3", &to, "x")
+        },
+        4,
+    ));
     assert!(!plain.effective && plain.dropped.is_none());
 }
 
@@ -229,24 +254,49 @@ fn each_remote_sender_session_stops_waking_at_its_own_cap_while_its_mail_still_l
     let calm = key("calm");
     let to = key("b");
     let none = BTreeSet::new();
-    let channel: BTreeSet<_> = ["claude", "codex", "pi", "omp"].map(common::cli).into_iter().collect();
+    let channel: BTreeSet<_> = ["claude", "codex", "pi", "omp"]
+        .map(common::cli)
+        .into_iter()
+        .collect();
     let cap = pair.limits.wake.remote_lifetime_cap;
-    assert!(cap < pair.limits.wake.lifetime_cap, "a remote sender's wake budget is smaller than a local one's");
+    assert!(
+        cap < pair.limits.wake.lifetime_cap,
+        "a remote sender's wake budget is smaller than a local one's"
+    );
     let gap = pair.limits.wake.exchange_gap_sec + 1;
 
     let mut at = 1;
     for i in 0..cap {
         let id = format!("w{i}");
-        let wake = recorded_wake(ingest(&mut pair, &waking(mail(&noisy, &id, &to, "hi"), &none, &channel), at));
+        let wake = recorded_wake(ingest(
+            &mut pair,
+            &waking(mail(&noisy, &id, &to, "hi"), &none, &channel),
+            at,
+        ));
         assert!(wake.effective, "wake {i} of {cap}");
         at += gap;
     }
-    let spent = recorded_wake(ingest(&mut pair, &waking(mail(&noisy, "w-last", &to, "hi"), &none, &channel), at));
+    let spent = recorded_wake(ingest(
+        &mut pair,
+        &waking(mail(&noisy, "w-last", &to, "hi"), &none, &channel),
+        at,
+    ));
     assert!(!spent.effective);
     assert_eq!(spent.dropped, Some(WakeDrop::LifetimeCap));
     let header_count = pair.state.messages().filter(|m| m.from == noisy).count();
-    assert_eq!(header_count as u32, cap + 1, "the capped sender's mail still landed");
+    assert_eq!(
+        header_count as u32,
+        cap + 1,
+        "the capped sender's mail still landed"
+    );
 
-    let other = recorded_wake(ingest(&mut pair, &waking(mail(&calm, "c1", &to, "hi"), &none, &channel), at));
-    assert!(other.effective, "another remote sender has its own wake budget");
+    let other = recorded_wake(ingest(
+        &mut pair,
+        &waking(mail(&calm, "c1", &to, "hi"), &none, &channel),
+        at,
+    ));
+    assert!(
+        other.effective,
+        "another remote sender has its own wake budget"
+    );
 }

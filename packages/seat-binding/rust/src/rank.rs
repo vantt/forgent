@@ -24,8 +24,12 @@ impl Cand<'_> {
     }
 
     fn pool(&self) -> Option<String> {
-        self.leases
-            .then(|| self.entry.as_ref().and_then(|e| e.pool.clone()).unwrap_or_else(|| self.facts.family.clone()))
+        self.leases.then(|| {
+            self.entry
+                .as_ref()
+                .and_then(|e| e.pool.clone())
+                .unwrap_or_else(|| self.facts.family.clone())
+        })
     }
 
     fn model(&self) -> Option<String> {
@@ -59,7 +63,11 @@ struct Run {
 
 fn label(policy: &Policy) -> String {
     let ask = &policy.ask;
-    format!("{}/{}", ask.label.as_deref().unwrap_or(&ask.capability), ask.seat)
+    format!(
+        "{}/{}",
+        ask.label.as_deref().unwrap_or(&ask.capability),
+        ask.seat
+    )
 }
 
 pub fn rank(
@@ -76,17 +84,38 @@ pub fn rank(
     let mut prefer_bases: Vec<Base> = Vec::new();
     for p in &ask.unit_prefer {
         let (name, invocation) = (p.executor(), p.invocation());
-        if !prefer_bases.iter().any(|b| b.name == name && b.invocation.as_deref() == invocation) {
-            prefer_bases.push(Base { name: name.to_string(), invocation: invocation.map(str::to_string), source: "unit-prefer".to_string(), from_override: false });
+        if !prefer_bases
+            .iter()
+            .any(|b| b.name == name && b.invocation.as_deref() == invocation)
+        {
+            prefer_bases.push(Base {
+                name: name.to_string(),
+                invocation: invocation.map(str::to_string),
+                source: "unit-prefer".to_string(),
+                from_override: false,
+            });
         }
     }
-    let bare: Vec<String> = prefer_bases.iter().filter(|b| b.invocation.is_none()).map(|b| b.name.clone()).collect();
+    let bare: Vec<String> = prefer_bases
+        .iter()
+        .filter(|b| b.invocation.is_none())
+        .map(|b| b.name.clone())
+        .collect();
     for p in &policy.prefer {
         let (name, invocation) = (p.executor(), p.invocation());
-        if bare.iter().any(|b| b == name) || prefer_bases.iter().any(|b| b.name == name && b.invocation.as_deref() == invocation) {
+        if bare.iter().any(|b| b == name)
+            || prefer_bases
+                .iter()
+                .any(|b| b.name == name && b.invocation.as_deref() == invocation)
+        {
             continue;
         }
-        prefer_bases.push(Base { name: name.to_string(), invocation: invocation.map(str::to_string), source: policy.prefer_source.clone(), from_override: false });
+        prefer_bases.push(Base {
+            name: name.to_string(),
+            invocation: invocation.map(str::to_string),
+            source: policy.prefer_source.clone(),
+            from_override: false,
+        });
     }
 
     let override_ = ask.override_.as_ref();
@@ -104,15 +133,17 @@ pub fn rank(
             let first = run_bases(policy, vec![base], peers, walk, accounts, launch, now);
             let droppable = override_.is_some_and(|o| o.run_wide)
                 && first.survivors.is_empty()
-                && first
-                    .refusal
-                    .as_ref()
-                    .is_some_and(|r| matches!(r.reason.as_str(), "pin-unsatisfiable" | "unknown-executor"));
+                && first.refusal.as_ref().is_some_and(|r| {
+                    matches!(r.reason.as_str(), "pin-unsatisfiable" | "unknown-executor")
+                });
             if droppable {
-                let mut second = run_bases(policy, prefer_bases, peers, walk, accounts, launch, now);
+                let mut second =
+                    run_bases(policy, prefer_bases, peers, walk, accounts, launch, now);
                 if let Some(why) = first.refusal {
                     second.skipped.push(Skip {
-                        executor: override_.and_then(|o| o.executor.clone()).unwrap_or_default(),
+                        executor: override_
+                            .and_then(|o| o.executor.clone())
+                            .unwrap_or_default(),
                         family: String::new(),
                         reason: why.reason,
                         detail: format!("run-wide override skipped for this seat: {}", why.detail),
@@ -132,7 +163,12 @@ pub fn rank(
     if run.survivors.is_empty() && run.refusal.is_none() {
         run.refusal = Some(Refusal::new(
             "no-candidate",
-            format!("{}: no candidate executor for capability \"{}\" role \"{}\"", label(policy), ask.capability, ask.role.name()),
+            format!(
+                "{}: no candidate executor for capability \"{}\" role \"{}\"",
+                label(policy),
+                ask.capability,
+                ask.role.name()
+            ),
         ));
     }
     Ranked {
@@ -180,17 +216,29 @@ fn run_bases(
             None => {
                 last_unknown = Some(Refusal::new(
                     "unknown-executor",
-                    format!("{}: executor \"{}\" is not registered", label(policy), base.name),
+                    format!(
+                        "{}: executor \"{}\" is not registered",
+                        label(policy),
+                        base.name
+                    ),
                 ));
             }
         }
     }
-    if !resolved.is_empty() && last_unknown.is_none() && resolved.iter().all(|(_, _, f)| f.kind == ExecutorKind::Tool) {
+    if !resolved.is_empty()
+        && last_unknown.is_none()
+        && resolved
+            .iter()
+            .all(|(_, _, f)| f.kind == ExecutorKind::Tool)
+    {
         refuse(
             &mut run,
             Refusal::new(
                 "not-an-agent-seat",
-                format!("{}: every candidate is a tool executor; Seat Binding chooses agent seats only", label(policy)),
+                format!(
+                    "{}: every candidate is a tool executor; Seat Binding chooses agent seats only",
+                    label(policy)
+                ),
             ),
         );
         return run;
@@ -201,12 +249,25 @@ fn run_bases(
     let mut dropped_for_cell = false;
     for (base, id, facts) in resolved {
         if facts.kind == ExecutorKind::Tool {
-            run.skipped.push(skip(id, facts, "not-an-agent-seat", "a tool executor serves no agent seat".into(), None));
+            run.skipped.push(skip(
+                id,
+                facts,
+                "not-an-agent-seat",
+                "a tool executor serves no agent seat".into(),
+                None,
+            ));
             continue;
         }
-        let mechanism = if ask.posture.force_out_of_process { Mechanism::OutOfProcess } else { facts.mechanism };
+        let mechanism = if ask.posture.force_out_of_process {
+            Mechanism::OutOfProcess
+        } else {
+            facts.mechanism
+        };
         let leases = mechanism == Mechanism::OutOfProcess;
-        let invocation = base.invocation.clone().or_else(|| facts.default_invocation.clone());
+        let invocation = base
+            .invocation
+            .clone()
+            .or_else(|| facts.default_invocation.clone());
         let cell = policy.cells.get(&facts.family);
         let make = |entry: Option<CellEntry>| Cand {
             executor: id.clone(),
@@ -226,8 +287,16 @@ fn run_bases(
                     id,
                     facts,
                     "tier-cell-missing",
-                    format!("family \"{}\" has no cell at {}", facts.family, policy.tier.name()),
-                    Some(format!("modelPolicies.{}.{}", facts.family, policy.tier.name())),
+                    format!(
+                        "family \"{}\" has no cell at {}",
+                        facts.family,
+                        policy.tier.name()
+                    ),
+                    Some(format!(
+                        "modelPolicies.{}.{}",
+                        facts.family,
+                        policy.tier.name()
+                    )),
                 ));
             }
             (true, Some(entries)) => cands.extend(entries.iter().cloned().map(|e| make(Some(e)))),
@@ -249,7 +318,12 @@ fn run_bases(
             r.config = Some(policy.prefer_source.clone());
             r
         } else {
-            last_unknown.unwrap_or_else(|| Refusal::new("no-candidate", format!("{}: nothing is configured for this seat", label(policy))))
+            last_unknown.unwrap_or_else(|| {
+                Refusal::new(
+                    "no-candidate",
+                    format!("{}: nothing is configured for this seat", label(policy)),
+                )
+            })
         };
         refuse(&mut run, refusal);
         return run;
@@ -261,8 +335,14 @@ fn run_bases(
             c.executor == keep.executor
                 && keep.model == c.model()
                 && keep.pool == c.pool()
-                && keep.invocation.as_ref().is_none_or(|i| c.invocation.as_ref() == Some(i))
-                && keep.effort.is_none_or(|e| c.entry.as_ref().and_then(|x| x.effort) == Some(e) || ask.override_.as_ref().and_then(|o| o.effort) == Some(e))
+                && keep
+                    .invocation
+                    .as_ref()
+                    .is_none_or(|i| c.invocation.as_ref() == Some(i))
+                && keep.effort.is_none_or(|e| {
+                    c.entry.as_ref().and_then(|x| x.effort) == Some(e)
+                        || ask.override_.as_ref().and_then(|o| o.effort) == Some(e)
+                })
         });
         // A candidate that already failed is not tried again: only its account may rotate, and that
         // is a retry (no `tried`), not a walk step.
@@ -303,7 +383,13 @@ fn run_bases(
             (seat.unwrap_or_else(|| n.to_string()), family)
         })
         .collect();
-    run.independent_of = hard.iter().map(|(seat, family)| PeerRef { seat: seat.clone(), family: family.clone() }).collect();
+    run.independent_of = hard
+        .iter()
+        .map(|(seat, family)| PeerRef {
+            seat: seat.clone(),
+            family: family.clone(),
+        })
+        .collect();
     let soft_families: Vec<(String, String)> = soft_names
         .iter()
         .map(|n| {
@@ -320,7 +406,13 @@ fn run_bases(
         }
     };
 
-    let ctx = Ctx { policy, walk, accounts, now, hard: &hard };
+    let ctx = Ctx {
+        policy,
+        walk,
+        accounts,
+        now,
+        hard: &hard,
+    };
     let mut survivors: Vec<(Candidate, usize)> = Vec::new();
     let mut natural_first: Option<String> = None;
     let mut last_rejection: Option<Refusal> = None;
@@ -333,10 +425,19 @@ fn run_bases(
                 }
             }
             Err(rejection) => {
-                if rejection.reason == "independence-unsatisfiable" && natural_first.is_none() && judge(&ctx, cand, true).is_ok() {
+                if rejection.reason == "independence-unsatisfiable"
+                    && natural_first.is_none()
+                    && judge(&ctx, cand, true).is_ok()
+                {
                     natural_first = Some(cand.executor.clone());
                 }
-                let mut out = skip(&cand.executor, cand.facts, &rejection.reason, rejection.detail.clone(), rejection.config.clone());
+                let mut out = skip(
+                    &cand.executor,
+                    cand.facts,
+                    &rejection.reason,
+                    rejection.detail.clone(),
+                    rejection.config.clone(),
+                );
                 out.model = cand.model();
                 out.pool = cand.pool();
                 run.skipped.push(out);
@@ -352,13 +453,17 @@ fn run_bases(
 
     // A pinned account selects the survivors of its pool; a seat the pool does not serve runs unpinned.
     if let Some((pool, account)) = &pin {
-        if survivors.iter().any(|(c, _)| c.pool.as_deref() == Some(pool)) {
+        if survivors
+            .iter()
+            .any(|(c, _)| c.pool.as_deref() == Some(pool))
+        {
             survivors.retain(|(c, _)| c.pool.as_deref() == Some(pool));
             for (c, _) in &mut survivors {
                 let pool_accounts = accounts.pools.get(pool).map(Vec::as_slice).unwrap_or(&[]);
                 match pool_accounts.iter().find(|a| &a.id == account) {
                     None => {
-                        let known: Vec<&str> = pool_accounts.iter().map(|a| a.id.as_str()).collect();
+                        let known: Vec<&str> =
+                            pool_accounts.iter().map(|a| a.id.as_str()).collect();
                         let refusal = if known.is_empty() {
                             Refusal::new("account-pin-no-inventory", format!("account \"{pool}/{account}\" cannot be pinned: pool \"{pool}\" has no account list (runner.llmAccounts.{pool} in ~/.fgos/config.json), so it leases no account"))
                         } else {
@@ -393,7 +498,10 @@ fn run_bases(
     // Soft spread: the family used by the fewest listed peers first; order breaks ties.
     if !soft_families.is_empty() {
         for (c, use_count) in &mut survivors {
-            *use_count = soft_families.iter().filter(|(_, f)| f == &c.family.to_lowercase()).count();
+            *use_count = soft_families
+                .iter()
+                .filter(|(_, f)| f == &c.family.to_lowercase())
+                .count();
         }
         let before = survivors.first().map(|(c, _)| c.executor.clone());
         survivors.sort_by_key(|(_, use_count)| *use_count);
@@ -411,12 +519,24 @@ fn run_bases(
 
     run.survivors = survivors.into_iter().map(|(c, _)| c).collect();
     if run.survivors.is_empty() {
-        let mut refusal = last_rejection.unwrap_or_else(|| Refusal::new("no-candidate", format!("{}: no candidate passed the filters", label(policy))));
+        let mut refusal = last_rejection.unwrap_or_else(|| {
+            Refusal::new(
+                "no-candidate",
+                format!("{}: no candidate passed the filters", label(policy)),
+            )
+        });
         if refusal.reason == "independence-unsatisfiable" {
             refusal.peers = run.independent_of.clone();
         }
         if walk.continuity.is_some() {
-            refusal = Refusal::new("seat-continuity-unavailable", format!("{}: the kept executor/model/effort has no usable account left ({})", label(policy), refusal.detail));
+            refusal = Refusal::new(
+                "seat-continuity-unavailable",
+                format!(
+                    "{}: the kept executor/model/effort has no usable account left ({})",
+                    label(policy),
+                    refusal.detail
+                ),
+            );
         }
         refuse(&mut run, refusal);
         return run;
@@ -434,8 +554,22 @@ fn run_bases(
     run
 }
 
-fn skip(executor: &str, facts: &ExecutorFacts, reason: &str, detail: String, config: Option<String>) -> Skip {
-    Skip { executor: executor.to_string(), family: facts.family.clone(), reason: reason.to_string(), detail, config, model: None, pool: None }
+fn skip(
+    executor: &str,
+    facts: &ExecutorFacts,
+    reason: &str,
+    detail: String,
+    config: Option<String>,
+) -> Skip {
+    Skip {
+        executor: executor.to_string(),
+        family: facts.family.clone(),
+        reason: reason.to_string(),
+        detail,
+        config,
+        model: None,
+        pool: None,
+    }
 }
 
 fn override_pin(ask: &Ask) -> Result<Option<(String, String)>, Refusal> {
@@ -455,11 +589,18 @@ fn override_pin(ask: &Ask) -> Result<Option<(String, String)>, Refusal> {
 /// restricted to the seat's own families (a list narrows, never widens); with no list, the
 /// rest of the prefer order. Candidates already tried never come back.
 fn walk_order<'a>(cands: Vec<Cand<'a>>, tried: &[Identity], policy: &Policy) -> Vec<Cand<'a>> {
-    let Some(last) = tried.last() else { return cands };
+    let Some(last) = tried.last() else {
+        return cands;
+    };
     let last_index = cands.iter().position(|c| c.matches(last));
     let last_family = last_index
         .map(|i| cands[i].family().to_string())
-        .or_else(|| cands.iter().find(|c| c.executor == last.executor).map(|c| c.family().to_string()));
+        .or_else(|| {
+            cands
+                .iter()
+                .find(|c| c.executor == last.executor)
+                .map(|c| c.family().to_string())
+        });
     let mut order: Vec<usize> = Vec::new();
     if let Some(family) = &last_family {
         order.extend((0..cands.len()).filter(|&i| cands[i].family() == family));
@@ -509,19 +650,42 @@ fn judge(ctx: &Ctx, cand: &Cand, ignore_independence: bool) -> Result<Candidate,
     let pool = cand.pool();
 
     if let Some(detail) = &facts.disallowed {
-        return Err(rejection("governance", format!("governance rejected executor \"{id}\": {detail}")));
+        return Err(rejection(
+            "governance",
+            format!("governance rejected executor \"{id}\": {detail}"),
+        ));
     }
     if !ask.required_skills.is_empty() {
-        let missing: Vec<&String> = ask.required_skills.iter().filter(|s| !facts.skills.contains(s)).collect();
+        let missing: Vec<&String> = ask
+            .required_skills
+            .iter()
+            .filter(|s| !facts.skills.contains(s))
+            .collect();
         if !missing.is_empty() {
             return Err(rejection(
                 "skills-unavailable",
-                format!("executor \"{id}\" does not declare skills [{}]", missing.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(", ")),
+                format!(
+                    "executor \"{id}\" does not declare skills [{}]",
+                    missing
+                        .iter()
+                        .map(|s| s.as_str())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                ),
             ));
         }
     }
-    if pool.as_ref().is_some_and(|p| ctx.walk.exclude_pools.contains(p)) {
-        return Err(rejection("pool-excluded", format!("executor \"{id}\" pool \"{}\" is excluded because its credential just failed", pool.clone().unwrap_or_default())));
+    if pool
+        .as_ref()
+        .is_some_and(|p| ctx.walk.exclude_pools.contains(p))
+    {
+        return Err(rejection(
+            "pool-excluded",
+            format!(
+                "executor \"{id}\" pool \"{}\" is excluded because its credential just failed",
+                pool.clone().unwrap_or_default()
+            ),
+        ));
     }
 
     if !ignore_independence && !ctx.hard.is_empty() {
@@ -530,10 +694,19 @@ fn judge(ctx: &Ctx, cand: &Cand, ignore_independence: bool) -> Result<Candidate,
             && ask.raise_authorized
             && ask.override_.as_ref().is_some_and(|o| o.accept_dependence);
         if !accepted && ctx.hard.iter().any(|(_, f)| *f == family) {
-            let names: Vec<String> = ctx.hard.iter().map(|(seat, f)| format!("{seat}({f})")).collect();
+            let names: Vec<String> = ctx
+                .hard
+                .iter()
+                .map(|(seat, f)| format!("{seat}({f})"))
+                .collect();
             return Err(rejection(
                 "independence-unsatisfiable",
-                format!("{}: executor \"{id}\" (family \"{}\") is not independent of {}", label(policy), facts.family, names.join(", ")),
+                format!(
+                    "{}: executor \"{id}\" (family \"{}\") is not independent of {}",
+                    label(policy),
+                    facts.family,
+                    names.join(", ")
+                ),
             ));
         }
     }
@@ -578,7 +751,9 @@ fn judge(ctx: &Ctx, cand: &Cand, ignore_independence: bool) -> Result<Candidate,
         (None, None) => (None, "invocation-default"),
     };
     if let Some(want) = effort {
-        let rendered: Vec<Effort> = invocation_facts.map(|i| i.efforts.clone()).unwrap_or_default();
+        let rendered: Vec<Effort> = invocation_facts
+            .map(|i| i.efforts.clone())
+            .unwrap_or_default();
         if !rendered.contains(&want) {
             let mut refusal = rejection(
                 "effort-unsupported",
@@ -587,7 +762,11 @@ fn judge(ctx: &Ctx, cand: &Cand, ignore_independence: bool) -> Result<Candidate,
                     label(policy),
                     invocation_facts.map(|i| i.id.as_str()).unwrap_or("none"),
                     want.name(),
-                    rendered.iter().map(|e| e.name()).collect::<Vec<_>>().join(", ")
+                    rendered
+                        .iter()
+                        .map(|e| e.name())
+                        .collect::<Vec<_>>()
+                        .join(", ")
                 ),
             );
             refusal.rendered = rendered;
@@ -596,14 +775,23 @@ fn judge(ctx: &Ctx, cand: &Cand, ignore_independence: bool) -> Result<Candidate,
     }
 
     let account_ids = match &pool {
-        Some(p) => order_accounts(ctx, p, &facts.family, invocation_facts.and_then(|i| i.cli.as_deref()), id, cand.entry.as_ref().map(|e| e.model.as_str()))?,
+        Some(p) => order_accounts(
+            ctx,
+            p,
+            &facts.family,
+            invocation_facts.and_then(|i| i.cli.as_deref()),
+            id,
+            cand.entry.as_ref().map(|e| e.model.as_str()),
+        )?,
         None => Vec::new(),
     };
 
     Ok(Candidate {
         executor: id.clone(),
         family: facts.family.clone(),
-        invocation: invocation_facts.map(|i| i.id.clone()).or_else(|| cand.invocation.clone()),
+        invocation: invocation_facts
+            .map(|i| i.id.clone())
+            .or_else(|| cand.invocation.clone()),
         model: cand.model(),
         model_source: match (&cand.entry, cand.leases) {
             (Some(_), true) => format!("modelPolicies.{}.{}", facts.family, policy.tier.name()),
@@ -622,8 +810,20 @@ fn judge(ctx: &Ctx, cand: &Cand, ignore_independence: bool) -> Result<Candidate,
 
 /// Accounts of `pool` in lease order for a launch through `cli`. A pool with no account runs on the
 /// executor's own login, which only the pool named after the family may do.
-fn order_accounts(ctx: &Ctx, pool: &str, family: &str, cli: Option<&str>, executor: &str, model: Option<&str>) -> Result<Vec<String>, Refusal> {
-    let all = ctx.accounts.pools.get(pool).map(Vec::as_slice).unwrap_or(&[]);
+fn order_accounts(
+    ctx: &Ctx,
+    pool: &str,
+    family: &str,
+    cli: Option<&str>,
+    executor: &str,
+    model: Option<&str>,
+) -> Result<Vec<String>, Refusal> {
+    let all = ctx
+        .accounts
+        .pools
+        .get(pool)
+        .map(Vec::as_slice)
+        .unwrap_or(&[]);
     if all.is_empty() {
         return if pool == family {
             Ok(Vec::new())
@@ -631,7 +831,8 @@ fn order_accounts(ctx: &Ctx, pool: &str, family: &str, cli: Option<&str>, execut
             Err(rejection("pool-unusable", format!("executor \"{executor}\" with model \"{}\" is not served: pool \"{pool}\" has no account, so nothing can pay for the call", model.unwrap_or(""))))
         };
     }
-    let holds_login = |a: &&AccountFacts| !a.disabled && cli.is_none_or(|c| a.clis.iter().any(|x| x == c));
+    let holds_login =
+        |a: &&AccountFacts| !a.disabled && cli.is_none_or(|c| a.clis.iter().any(|x| x == c));
     let usable: Vec<&AccountFacts> = all.iter().filter(holds_login).collect();
     if usable.is_empty() {
         return Err(rejection(
@@ -645,7 +846,11 @@ fn order_accounts(ctx: &Ctx, pool: &str, family: &str, cli: Option<&str>, execut
         .filter(|a| {
             a.quarantined_until.is_none_or(|until| until <= ctx.now)
                 && a.probe != Probe::Failed
-                && !ctx.walk.failed_accounts.iter().any(|f| f.pool == pool && f.account == a.id)
+                && !ctx
+                    .walk
+                    .failed_accounts
+                    .iter()
+                    .any(|f| f.pool == pool && f.account == a.id)
         })
         .collect();
     if ready.is_empty() {

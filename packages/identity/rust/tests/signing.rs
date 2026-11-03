@@ -12,7 +12,11 @@ use std::sync::{Arc, Barrier};
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
 fn state_root() -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("fgos-identity-signing-{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
+    let dir = std::env::temp_dir().join(format!(
+        "fgos-identity-signing-{}-{}",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
     fs::create_dir_all(&dir).unwrap();
     dir
 }
@@ -25,7 +29,9 @@ fn machine(machine_id: &str) -> PathBuf {
     root
 }
 
-fn refusal_of<T: std::fmt::Debug>(result: Result<T, fgos_identity::Refusal>) -> fgos_identity::Refusal {
+fn refusal_of<T: std::fmt::Debug>(
+    result: Result<T, fgos_identity::Refusal>,
+) -> fgos_identity::Refusal {
     result.expect_err("expected a refusal")
 }
 
@@ -43,12 +49,18 @@ fn a_signature_verifies_pins_the_machine_once_and_a_flipped_byte_is_refused_with
     flipped[0] ^= 1;
     let bad = refusal_of(signing::verify(&verifier, &flipped, &signature));
     assert_eq!(bad.reason, "bad-signature");
-    assert!(pins::list(&verifier).unwrap().is_empty(), "only a signature that holds pins a machine");
+    assert!(
+        pins::list(&verifier).unwrap().is_empty(),
+        "only a signature that holds pins a machine"
+    );
 
     let first = signing::verify(&verifier, BYTES, &signature).unwrap();
     assert!(first.first_seen);
     assert_eq!(first.machine_id, "alpha-aaaaaa");
-    assert_eq!(Some(first.fingerprint.clone()), signing::key_fingerprint(&signer).unwrap());
+    assert_eq!(
+        Some(first.fingerprint.clone()),
+        signing::key_fingerprint(&signer).unwrap()
+    );
     let second = signing::verify(&verifier, BYTES, &signature).unwrap();
     assert!(!second.first_seen);
     assert_eq!(second.fingerprint, first.fingerprint);
@@ -71,10 +83,17 @@ fn a_different_key_for_a_pinned_machine_is_refused_until_the_pin_is_forgotten() 
     let changed = refusal_of(signing::verify(&verifier, BYTES, &new));
     assert_eq!(changed.reason, "machine-key-changed");
     for key in [&old.public_key, &new.public_key] {
-        assert!(changed.detail.contains(&signing::fingerprint(key).unwrap()), "{}", changed.detail);
+        assert!(
+            changed.detail.contains(&signing::fingerprint(key).unwrap()),
+            "{}",
+            changed.detail
+        );
     }
     assert!(changed.detail.contains("--forget alpha-aaaaaa"));
-    assert!(!signing::verify(&verifier, BYTES, &old).unwrap().first_seen, "the pinned key still passes");
+    assert!(
+        !signing::verify(&verifier, BYTES, &old).unwrap().first_seen,
+        "the pinned key still passes"
+    );
 
     pins::forget(&verifier, "alpha-aaaaaa").unwrap();
     assert!(signing::verify(&verifier, BYTES, &new).unwrap().first_seen);
@@ -85,7 +104,10 @@ fn a_signature_in_this_machines_name_must_come_from_this_machines_key() {
     let own = machine("alpha-aaaaaa");
     let impostor = machine("alpha-aaaaaa");
     let forged = signing::sign(&impostor, BYTES).unwrap();
-    assert_eq!(refusal_of(signing::verify(&own, BYTES, &forged)).reason, "machine-key-changed");
+    assert_eq!(
+        refusal_of(signing::verify(&own, BYTES, &forged)).reason,
+        "machine-key-changed"
+    );
     assert!(pins::list(&own).unwrap().is_empty());
     let genuine = signing::sign(&own, BYTES).unwrap();
     assert!(signing::verify(&own, BYTES, &genuine).unwrap().first_seen);
@@ -93,7 +115,9 @@ fn a_signature_in_this_machines_name_must_come_from_this_machines_key() {
 
 #[test]
 fn racing_first_sightings_of_one_machine_settle_to_one_pin() {
-    let signers: Vec<Signature> = (0..4).map(|_| signing::sign(&machine("alpha-aaaaaa"), BYTES).unwrap()).collect();
+    let signers: Vec<Signature> = (0..4)
+        .map(|_| signing::sign(&machine("alpha-aaaaaa"), BYTES).unwrap())
+        .collect();
     let verifier = state_root();
     let barrier = Arc::new(Barrier::new(signers.len()));
     let results: Vec<_> = std::thread::scope(|scope| {
@@ -113,16 +137,26 @@ fn racing_first_sightings_of_one_machine_settle_to_one_pin() {
     assert_eq!(winners.len(), 1, "{results:?}");
     assert!(results[winners[0]].as_ref().unwrap().first_seen);
     for (index, result) in results.iter().enumerate().filter(|(i, _)| *i != winners[0]) {
-        assert_eq!(result.as_ref().unwrap_err().reason, "machine-key-changed", "signer {index}");
+        assert_eq!(
+            result.as_ref().unwrap_err().reason,
+            "machine-key-changed",
+            "signer {index}"
+        );
     }
-    assert_eq!(pins::list(&verifier).unwrap()[0].public_key, signers[winners[0]].public_key);
+    assert_eq!(
+        pins::list(&verifier).unwrap()[0].public_key,
+        signers[winners[0]].public_key
+    );
 }
 
 #[test]
 fn without_a_key_sign_is_refused_and_the_key_is_minted_once_with_a_private_mode() {
     let root = state_root();
     fs::write(root.join("machine-id"), "alpha-aaaaaa\n").unwrap();
-    assert_eq!(refusal_of(signing::sign(&root, BYTES)).reason, "machine-key-missing");
+    assert_eq!(
+        refusal_of(signing::sign(&root, BYTES)).reason,
+        "machine-key-missing"
+    );
     assert_eq!(signing::key_fingerprint(&root).unwrap(), None);
 
     let barrier = Arc::new(Barrier::new(4));
@@ -140,8 +174,14 @@ fn without_a_key_sign_is_refused_and_the_key_is_minted_once_with_a_private_mode(
     });
     assert_eq!(minted.iter().filter(|(created, _)| *created).count(), 1);
     assert!(minted.iter().all(|(_, print)| print == &minted[0].1));
-    assert_eq!(signing::mint_key(&root).unwrap(), (false, minted[0].1.clone()));
-    assert_eq!(signing::key_fingerprint(&root).unwrap(), Some(minted[0].1.clone()));
+    assert_eq!(
+        signing::mint_key(&root).unwrap(),
+        (false, minted[0].1.clone())
+    );
+    assert_eq!(
+        signing::key_fingerprint(&root).unwrap(),
+        Some(minted[0].1.clone())
+    );
 
     let identity = root.join("identity");
     let public = fs::read_to_string(identity.join("machine-key.pub")).unwrap();
@@ -149,9 +189,21 @@ fn without_a_key_sign_is_refused_and_the_key_is_minted_once_with_a_private_mode(
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        assert_eq!(fs::metadata(identity.join("machine-key")).unwrap().permissions().mode() & 0o777, 0o600);
+        assert_eq!(
+            fs::metadata(identity.join("machine-key"))
+                .unwrap()
+                .permissions()
+                .mode()
+                & 0o777,
+            0o600
+        );
     }
-    assert!(fs::read_dir(root.join("tmp")).map(|mut d| d.next().is_none()).unwrap_or(true), "scratch directories are removed");
+    assert!(
+        fs::read_dir(root.join("tmp"))
+            .map(|mut d| d.next().is_none())
+            .unwrap_or(true),
+        "scratch directories are removed"
+    );
 }
 
 #[test]
@@ -160,13 +212,29 @@ fn a_signature_that_is_not_in_the_accepted_shape_is_refused_before_any_check() {
     let verifier = state_root();
     let good = signing::sign(&signer, BYTES).unwrap();
     let cases = [
-        Signature { public_key: format!("{}\nother ssh-ed25519 AAAA", good.public_key), ..good.clone() },
-        Signature { public_key: "ssh-rsa AAAA".into(), ..good.clone() },
-        Signature { sig: "not armor".into(), ..good.clone() },
-        Signature { machine_id: "../escape".into(), ..good.clone() },
+        Signature {
+            public_key: format!("{}\nother ssh-ed25519 AAAA", good.public_key),
+            ..good.clone()
+        },
+        Signature {
+            public_key: "ssh-rsa AAAA".into(),
+            ..good.clone()
+        },
+        Signature {
+            sig: "not armor".into(),
+            ..good.clone()
+        },
+        Signature {
+            machine_id: "../escape".into(),
+            ..good.clone()
+        },
     ];
     for case in cases {
-        assert_eq!(refusal_of(signing::verify(&verifier, BYTES, &case)).reason, "invalid-signature", "{case:?}");
+        assert_eq!(
+            refusal_of(signing::verify(&verifier, BYTES, &case)).reason,
+            "invalid-signature",
+            "{case:?}"
+        );
     }
     assert!(pins::list(&verifier).unwrap().is_empty());
 }
@@ -175,18 +243,40 @@ fn a_signature_that_is_not_in_the_accepted_shape_is_refused_before_any_check() {
 fn pins_list_by_machine_forget_one_and_refuse_what_they_do_not_hold() {
     let verifier = state_root();
     for id in ["zulu-zzzzzz", "alpha-aaaaaa"] {
-        signing::verify(&verifier, BYTES, &signing::sign(&machine(id), BYTES).unwrap()).unwrap();
+        signing::verify(
+            &verifier,
+            BYTES,
+            &signing::sign(&machine(id), BYTES).unwrap(),
+        )
+        .unwrap();
     }
-    let ids: Vec<String> = pins::list(&verifier).unwrap().into_iter().map(|p| p.machine_id).collect();
+    let ids: Vec<String> = pins::list(&verifier)
+        .unwrap()
+        .into_iter()
+        .map(|p| p.machine_id)
+        .collect();
     assert_eq!(ids, ["alpha-aaaaaa", "zulu-zzzzzz"]);
-    assert_eq!(pins::forget(&verifier, "zulu-zzzzzz").unwrap().machine_id, "zulu-zzzzzz");
-    assert_eq!(refusal_of(pins::forget(&verifier, "zulu-zzzzzz")).reason, "pin-not-found");
-    assert_eq!(refusal_of(pins::forget(&verifier, "../x")).reason, "invalid-machine-id");
+    assert_eq!(
+        pins::forget(&verifier, "zulu-zzzzzz").unwrap().machine_id,
+        "zulu-zzzzzz"
+    );
+    assert_eq!(
+        refusal_of(pins::forget(&verifier, "zulu-zzzzzz")).reason,
+        "pin-not-found"
+    );
+    assert_eq!(
+        refusal_of(pins::forget(&verifier, "../x")).reason,
+        "invalid-machine-id"
+    );
 
     fs::write(pins::directory(&verifier).join("alpha-aaaaaa"), "garbage").unwrap();
     assert_eq!(refusal_of(pins::list(&verifier)).reason, "pins-unreadable");
     let again = signing::sign(&machine("alpha-aaaaaa"), BYTES).unwrap();
-    assert_eq!(refusal_of(signing::verify(&verifier, BYTES, &again)).reason, "pins-unreadable", "a broken pin is never replaced by a new sighting");
+    assert_eq!(
+        refusal_of(signing::verify(&verifier, BYTES, &again)).reason,
+        "pins-unreadable",
+        "a broken pin is never replaced by a new sighting"
+    );
 }
 
 #[test]
@@ -196,27 +286,53 @@ fn a_pin_is_seen_until_the_owner_confirms_its_fingerprint_and_forgetting_resets_
     let signature = signing::sign(&signer, BYTES).unwrap();
     let fingerprint = signing::key_fingerprint(&signer).unwrap().unwrap();
 
-    assert_eq!(refusal_of(pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint)).reason, "pin-missing");
+    assert_eq!(
+        refusal_of(pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint)).reason,
+        "pin-missing"
+    );
     let first = signing::verify(&verifier, BYTES, &signature).unwrap();
     assert_eq!(first.state, PinState::Seen);
     assert_eq!(pins::list(&verifier).unwrap()[0].confirmed_at, None);
 
     let wrong = refusal_of(pins::confirm(&verifier, "alpha-aaaaaa", "SHA256:other"));
     assert_eq!(wrong.reason, "fingerprint-mismatch");
-    assert!(wrong.detail.contains(&fingerprint) && wrong.detail.contains("SHA256:other"), "{}", wrong.detail);
-    assert_eq!(signing::verify(&verifier, BYTES, &signature).unwrap().state, PinState::Seen, "a refused confirm changes nothing");
+    assert!(
+        wrong.detail.contains(&fingerprint) && wrong.detail.contains("SHA256:other"),
+        "{}",
+        wrong.detail
+    );
+    assert_eq!(
+        signing::verify(&verifier, BYTES, &signature).unwrap().state,
+        PinState::Seen,
+        "a refused confirm changes nothing"
+    );
 
     let confirmed = pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint).unwrap();
     assert_eq!(confirmed.state, PinState::Confirmed);
     let stamp = confirmed.confirmed_at.clone().expect("confirmedAt is set");
     let after = signing::verify(&verifier, BYTES, &signature).unwrap();
-    assert_eq!((after.state, after.first_seen), (PinState::Confirmed, false));
-    assert_eq!(pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint).unwrap().confirmed_at, Some(stamp), "confirming again is a no-op");
+    assert_eq!(
+        (after.state, after.first_seen),
+        (PinState::Confirmed, false)
+    );
+    assert_eq!(
+        pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint)
+            .unwrap()
+            .confirmed_at,
+        Some(stamp),
+        "confirming again is a no-op"
+    );
     let raw = fs::read_to_string(pins::directory(&verifier).join("alpha-aaaaaa")).unwrap();
-    assert!(raw.contains("\"state\":\"confirmed\"") && raw.contains("\"confirmedAt\""), "{raw}");
+    assert!(
+        raw.contains("\"state\":\"confirmed\"") && raw.contains("\"confirmedAt\""),
+        "{raw}"
+    );
 
     pins::forget(&verifier, "alpha-aaaaaa").unwrap();
-    assert_eq!(refusal_of(pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint)).reason, "pin-missing");
+    assert_eq!(
+        refusal_of(pins::confirm(&verifier, "alpha-aaaaaa", &fingerprint)).reason,
+        "pin-missing"
+    );
     let again = signing::verify(&verifier, BYTES, &signature).unwrap();
     assert_eq!((again.first_seen, again.state), (true, PinState::Seen));
 }
@@ -233,12 +349,22 @@ fn a_pin_file_without_state_reads_as_seen_and_the_own_machine_verifies_as_confir
     );
     fs::write(pins::directory(&verifier).join("alpha-aaaaaa"), legacy).unwrap();
     assert_eq!(pins::list(&verifier).unwrap()[0].state, PinState::Seen);
-    assert_eq!(signing::verify(&verifier, BYTES, &signature).unwrap().state, PinState::Seen);
+    assert_eq!(
+        signing::verify(&verifier, BYTES, &signature).unwrap().state,
+        PinState::Seen
+    );
 
     let own = machine("alpha-aaaaaa");
     let mine = signing::sign(&own, BYTES).unwrap();
-    assert_eq!(signing::verify(&own, BYTES, &mine).unwrap().state, PinState::Confirmed);
-    assert_eq!(pins::list(&own).unwrap()[0].state, PinState::Confirmed, "the own pin is recorded as confirmed");
+    assert_eq!(
+        signing::verify(&own, BYTES, &mine).unwrap().state,
+        PinState::Confirmed
+    );
+    assert_eq!(
+        pins::list(&own).unwrap()[0].state,
+        PinState::Confirmed,
+        "the own pin is recorded as confirmed"
+    );
 }
 
 #[test]
@@ -262,6 +388,9 @@ fn a_confirm_racing_a_forget_never_leaves_a_confirmed_pin_after_the_forget() {
         });
         forget.unwrap();
         assert!(confirm.is_ok() || confirm.unwrap_err().reason == "pin-missing");
-        assert!(pins::list(&verifier).unwrap().is_empty(), "a forgotten key stays forgotten");
+        assert!(
+            pins::list(&verifier).unwrap().is_empty(),
+            "a forgotten key stays forgotten"
+        );
     }
 }

@@ -16,18 +16,27 @@ fn logging_git_log() -> &'static Path {
         let dir = std::env::temp_dir().join(format!("fgos-publication-git-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir(&dir).unwrap();
-        let real = Command::new("sh").args(["-c", "command -v git"]).output().unwrap().stdout;
+        let real = Command::new("sh")
+            .args(["-c", "command -v git"])
+            .output()
+            .unwrap()
+            .stdout;
         let real = String::from_utf8(real).unwrap().trim().to_owned();
         let script = dir.join("git");
         let log = dir.join("argv.log");
         fs::write(
             &script,
-            format!("#!/bin/sh\nprintf '%s\\n' \"$*\" >> '{}'\nexec '{real}' \"$@\"\n", log.display()),
+            format!(
+                "#!/bin/sh\nprintf '%s\\n' \"$*\" >> '{}'\nexec '{real}' \"$@\"\n",
+                log.display()
+            ),
         )
         .unwrap();
         fs::set_permissions(&script, fs::Permissions::from_mode(0o755)).unwrap();
         let mut paths = vec![dir.clone()];
-        paths.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        paths.extend(std::env::split_paths(
+            &std::env::var_os("PATH").unwrap_or_default(),
+        ));
         std::env::set_var("PATH", std::env::join_paths(paths).unwrap());
         log
     })
@@ -50,7 +59,11 @@ fn git_children(repo: &Path, from: usize) -> (Vec<String>, usize) {
                     word => break word,
                 }
             };
-            Some(if l.contains("/candidate") { format!("{verb}:pin") } else { verb.to_owned() })
+            Some(if l.contains("/candidate") {
+                format!("{verb}:pin")
+            } else {
+                verb.to_owned()
+            })
         })
         .collect();
     (ours, all.len())
@@ -174,37 +187,77 @@ fn a_publication_and_its_release_run_only_the_git_children_whose_answers_are_not
     let names = |v: &[&str]| v.iter().map(|s| s.to_string()).collect::<Vec<_>>();
     let a = commit(&port, &repo, vec![], "a");
     let (_, mut seen) = git_children(&root, 0);
-    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Absent, &ExpectedTip::Oid(a.clone()), "ceremony-a").unwrap();
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(a.clone()),
+        "ceremony-a",
+    )
+    .unwrap();
     let (first, next) = git_children(&root, seen);
     seen = next;
     // The pin is created and read back before the target is touched, and an absent target
     // is probed by existence instead of by listing plus symbolic probe.
     assert_eq!(
         first,
-        names(&["show-ref", "rev-list", "update-ref:pin", "for-each-ref:pin", "show-ref", "update-ref", "for-each-ref"]),
+        names(&[
+            "show-ref",
+            "rev-list",
+            "update-ref:pin",
+            "for-each-ref:pin",
+            "show-ref",
+            "update-ref",
+            "for-each-ref"
+        ]),
         "first publication of a ref"
     );
     port.release_pin_and_compact(&repo, "ceremony-a").unwrap();
     let (released, next) = git_children(&root, seen);
     seen = next;
-    assert_eq!(released, names(&["for-each-ref:pin", "update-ref:pin", "show-ref:pin"]), "pin release");
+    assert_eq!(
+        released,
+        names(&["for-each-ref:pin", "update-ref:pin", "show-ref:pin"]),
+        "pin release"
+    );
     let b = commit(&port, &repo, vec![a.clone()], "b");
     let (_, next) = git_children(&root, seen);
     seen = next;
-    port.compare_and_swap(&repo, &reference(), &ExpectedTip::Oid(a), &ExpectedTip::Oid(b), "ceremony-b").unwrap();
+    port.compare_and_swap(
+        &repo,
+        &reference(),
+        &ExpectedTip::Oid(a),
+        &ExpectedTip::Oid(b),
+        "ceremony-b",
+    )
+    .unwrap();
     let (changing, _) = git_children(&root, seen);
     assert_eq!(
         changing,
-        names(&["for-each-ref", "rev-list", "update-ref:pin", "for-each-ref:pin", "for-each-ref", "update-ref", "for-each-ref"]),
+        names(&[
+            "for-each-ref",
+            "rev-list",
+            "update-ref:pin",
+            "for-each-ref:pin",
+            "for-each-ref",
+            "update-ref",
+            "for-each-ref"
+        ]),
         "changing publication"
     );
     let calls = fs::read_to_string(logging_git_log()).unwrap();
     let tag = format!("--git-dir={}", fs::canonicalize(&root).unwrap().display());
-    for call in calls.lines().filter(|l| l.contains(&tag) && l.contains(" update-ref ")) {
+    for call in calls
+        .lines()
+        .filter(|l| l.contains(&tag) && l.contains(" update-ref "))
+    {
         assert!(
             call.contains("core.fsync=all") && call.contains("core.fsyncMethod=fsync"),
             "ref update without the durable method: {call}"
         );
-        assert!(call.contains("--no-deref"), "ref update that follows symbolic refs: {call}");
+        assert!(
+            call.contains("--no-deref"),
+            "ref update that follows symbolic refs: {call}"
+        );
     }
 }

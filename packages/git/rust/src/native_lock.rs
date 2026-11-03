@@ -7,7 +7,10 @@ use fgos_holder_lock::BorrowedHandle;
 use fgos_process::{facts, ProcId};
 use serde::{Deserialize, Serialize};
 #[cfg(unix)]
-use std::{fs::OpenOptions, io::{Read, Seek}};
+use std::{
+    fs::OpenOptions,
+    io::{Read, Seek},
+};
 use std::{
     fs::{self, File},
     path::Path,
@@ -62,7 +65,8 @@ pub struct NativeLockReport {
     pub observed_inode: Option<u64>,
     pub observed_state: Option<String>,
 }
-pub(crate) const UNOWNED_INDEX_LOCK: &str = "native-index-lock-unowned: follow Git spec §11 retained index.lock runbook";
+pub(crate) const UNOWNED_INDEX_LOCK: &str =
+    "native-index-lock-unowned: follow Git spec §11 retained index.lock runbook";
 
 pub(crate) const INDEX_LOCK_RUNBOOK: &str = r#"1. Confirm no process uses the index: the report lists visible holders; additionally
    `fuser -v <git-dir>/index.lock` or `ls -l /proc/*/fd 2>/dev/null | grep index.lock`.
@@ -82,17 +86,29 @@ fn inspect_file(path: &Path) -> String {
     let mut text = String::from("native-index-lock-unowned; unknown external lock; preserved. Visible holders are a best-effort snapshot, not proof of abandonment.\n");
     match fs::symlink_metadata(path) {
         Ok(m) => {
-            let modified = m.modified().ok().and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok());
+            let modified = m
+                .modified()
+                .ok()
+                .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok());
             let age = m.modified().ok().and_then(|t| t.elapsed().ok());
-            text.push_str(&format!("size={} bytes; mtimeUnix={modified:?}; age={age:?}\n", m.len()));
+            text.push_str(&format!(
+                "size={} bytes; mtimeUnix={modified:?}; age={age:?}\n",
+                m.len()
+            ));
             #[cfg(unix)]
             {
                 use std::os::unix::fs::MetadataExt;
                 match facts::file_users(m.dev(), m.ino()) {
                     Some(users) => {
-                        text.push_str(&format!("visible holders={} (hidden/unreadable processes omitted)\n", users.len()));
+                        text.push_str(&format!(
+                            "visible holders={} (hidden/unreadable processes omitted)\n",
+                            users.len()
+                        ));
                         for user in users {
-                            text.push_str(&format!("pid={} exe={:?} startTime={}\n", user.identity.pid.0, user.exe, user.identity.start_time));
+                            text.push_str(&format!(
+                                "pid={} exe={:?} startTime={}\n",
+                                user.identity.pid.0, user.exe, user.identity.start_time
+                            ));
                         }
                     }
                     None => text.push_str("visible holders unavailable on this platform\n"),
@@ -109,7 +125,10 @@ fn inspect_file(path: &Path) -> String {
         if let Ok((mut file, _, _, _)) = state(&sidecar) {
             let mut bytes = Vec::new();
             if file.rewind().is_ok() && file.by_ref().take(4096).read_to_end(&mut bytes).is_ok() {
-                text.push_str(&format!("index~pid.lock (diagnostic only; first 4096 bytes): {:?}\n", String::from_utf8_lossy(&bytes)));
+                text.push_str(&format!(
+                    "index~pid.lock (diagnostic only; first 4096 bytes): {:?}\n",
+                    String::from_utf8_lossy(&bytes)
+                ));
             }
         }
     }
@@ -240,7 +259,8 @@ fn sync_dirs(dirs: &[&Path]) -> Result<()> {
     fgos_durable_file::sync_directories(dirs).map_err(failure)
 }
 fn parent_of(path: &Path) -> Result<&Path> {
-    path.parent().ok_or_else(|| failure("native-lock-parent-missing"))
+    path.parent()
+        .ok_or_else(|| failure("native-lock-parent-missing"))
 }
 /// Atomically swaps two existing paths; the caller reads `ENOSYS`, `EINVAL`
 /// and `EOPNOTSUPP` as "this filesystem cannot".
@@ -250,8 +270,20 @@ fn exchange(old: &Path, new: &Path) -> std::io::Result<()> {
     let old = std::ffi::CString::new(old.as_os_str().as_bytes())?;
     let new = std::ffi::CString::new(new.as_os_str().as_bytes())?;
     // SAFETY: both arguments are NUL-terminated strings that outlive the call.
-    let result = unsafe { libc::renameat2(libc::AT_FDCWD, old.as_ptr(), libc::AT_FDCWD, new.as_ptr(), libc::RENAME_EXCHANGE) };
-    if result == 0 { Ok(()) } else { Err(std::io::Error::last_os_error()) }
+    let result = unsafe {
+        libc::renameat2(
+            libc::AT_FDCWD,
+            old.as_ptr(),
+            libc::AT_FDCWD,
+            new.as_ptr(),
+            libc::RENAME_EXCHANGE,
+        )
+    };
+    if result == 0 {
+        Ok(())
+    } else {
+        Err(std::io::Error::last_os_error())
+    }
 }
 pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
     repo: &RepoHandle,
@@ -279,7 +311,9 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
         }
         Err(e) => {
             report.inspection = inspect_file(path);
-            report.inspection.push_str(&format!("\nartifact inspection unavailable; preserved: {e}"));
+            report.inspection.push_str(&format!(
+                "\nartifact inspection unavailable; preserved: {e}"
+            ));
             return Ok(report);
         }
         Ok(_) => (),
@@ -304,18 +338,28 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
     }
     let directory = repo.common_dir().join("fgos/git/native-lock-quarantine");
     let destination = directory.join(format!("{id}-{}-{}", owned.device, owned.inode));
-    let quarantined = destination.join(path.file_name().ok_or_else(|| failure("native-lock-basename-missing"))?);
+    let quarantined = destination.join(
+        path.file_name()
+            .ok_or_else(|| failure("native-lock-basename-missing"))?,
+    );
     // The synced marker's name records the exact guard inode before exchange.
     // Only that empty directory can be removed when resuming an interrupted move.
     if fs::symlink_metadata(&destination).is_ok_and(|m| m.is_dir()) {
         for entry in fs::read_dir(&destination).map_err(failure)? {
             let entry = entry.map_err(failure)?;
             let name = entry.file_name();
-            let Some((device, inode)) = name.to_str().and_then(|n| n.strip_prefix("guard-"))
+            let Some((device, inode)) = name
+                .to_str()
+                .and_then(|n| n.strip_prefix("guard-"))
                 .and_then(|n| n.split_once('-'))
-                .and_then(|(d, i)| Some((d.parse::<u64>().ok()?, i.parse::<u64>().ok()?))) else { continue; };
+                .and_then(|(d, i)| Some((d.parse::<u64>().ok()?, i.parse::<u64>().ok()?)))
+            else {
+                continue;
+            };
             let metadata = fs::symlink_metadata(entry.path()).map_err(failure)?;
-            if !metadata.is_file() || metadata.len() != 0 { continue; }
+            if !metadata.is_file() || metadata.len() != 0 {
+                continue;
+            }
             let guard_key = (device, inode);
             let empty_guard = |p: &Path| -> bool {
                 fs::symlink_metadata(p).is_ok_and(|m| m.is_dir() && !m.file_type().is_symlink())
@@ -331,12 +375,15 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
                 }
                 validate()?;
                 // Recheck just before removing; remove_dir never removes bytes.
-                if !empty_guard(path) { return Err(recovery("native-lock-guard-changed")); }
+                if !empty_guard(path) {
+                    return Err(recovery("native-lock-guard-changed"));
+                }
                 fs::remove_dir(path).map_err(failure)?;
                 sync_dirs(&[parent_of(path)?])?;
                 report.status = "quarantined".into();
                 report.quarantine_path = Some(quarantined.to_string_lossy().into());
-                report.inspection = "completed interrupted exchange; exact recorded empty guard removed".into();
+                report.inspection =
+                    "completed interrupted exchange; exact recorded empty guard removed".into();
                 return Ok(report);
             }
             // A stop after recording the guard but before exchange is retryable too.
@@ -418,7 +465,9 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
             "inode/state or owner changed immediately before move; preserved".into();
         return Ok(report);
     }
-    filesystem.checkpoint("native-lock-rechecked").map_err(failure)?;
+    filesystem
+        .checkpoint("native-lock-rechecked")
+        .map_err(failure)?;
     // As with holder-lock's activation tombstone, exchange with a directory
     // guard: ordinary Git cannot create a foreign index.lock in the gap.
     #[cfg(target_os = "linux")]
@@ -427,32 +476,49 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
         let guard = File::open(&quarantined).map_err(failure)?;
         let (device, inode) = facts::file_key(&guard).map_err(failure)?;
         let marker = destination.join(format!("guard-{device}-{inode}"));
-        fs::OpenOptions::new().write(true).create_new(true).open(&marker)
-            .and_then(|f| f.sync_all()).map_err(failure)?;
+        fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&marker)
+            .and_then(|f| f.sync_all())
+            .map_err(failure)?;
         sync_dirs(&[&destination, &directory])?;
-        filesystem.checkpoint("native-lock-guard-recorded").map_err(failure)?;
+        filesystem
+            .checkpoint("native-lock-guard-recorded")
+            .map_err(failure)?;
         match exchange(path, &quarantined) {
             Ok(()) => Some(guard),
             Err(e) => {
                 fs::remove_dir(&quarantined).map_err(failure)?;
                 fs::remove_file(&marker).map_err(failure)?;
-                if !matches!(e.raw_os_error(), Some(libc::ENOSYS | libc::EINVAL | libc::EOPNOTSUPP)) { return Err(failure(e)); }
+                if !matches!(
+                    e.raw_os_error(),
+                    Some(libc::ENOSYS | libc::EINVAL | libc::EOPNOTSUPP)
+                ) {
+                    return Err(failure(e));
+                }
                 fs::rename(path, &quarantined).map_err(failure)?;
                 None
             }
         }
     };
     #[cfg(not(target_os = "linux"))]
-    let guard: Option<File> = { fs::rename(path, &quarantined).map_err(failure)?; None };
+    let guard: Option<File> = {
+        fs::rename(path, &quarantined).map_err(failure)?;
+        None
+    };
     sync_dirs(&[parent_of(path)?, &destination, &directory])?;
-    filesystem.checkpoint("native-lock-after-move").map_err(failure)?;
+    filesystem
+        .checkpoint("native-lock-after-move")
+        .map_err(failure)?;
     // The pathname may have been replaced after the final observation. Never
     // report a substituted inode as repaired, and restore it without overwrite.
     let moved = File::open(&quarantined).map_err(failure)?;
     if facts::file_key(&moved).map_err(failure)? != (owned.device, owned.inode) {
         #[cfg(target_os = "linux")]
         if let Some(guard) = &guard {
-            if File::open(path).and_then(|f| facts::file_key(&f)).ok() == Some(facts::file_key(guard).map_err(failure)?)
+            if File::open(path).and_then(|f| facts::file_key(&f)).ok()
+                == Some(facts::file_key(guard).map_err(failure)?)
                 && exchange(path, &quarantined).is_ok()
             {
                 fs::remove_dir(&quarantined).map_err(failure)?;
@@ -461,26 +527,33 @@ pub(crate) fn quarantine_owned_artifact<F: wal::FileSystem>(
                 return Ok(report);
             }
             report.quarantine_path = Some(quarantined.to_string_lossy().into());
-            report.inspection = "substituted inode retained in quarantine; guard changed or exchange failed".into();
+            report.inspection =
+                "substituted inode retained in quarantine; guard changed or exchange failed".into();
             return Ok(report);
         }
         match fs::hard_link(&quarantined, path) {
             Ok(()) => {
                 fs::remove_file(&quarantined).map_err(failure)?;
-                report.inspection = "substituted inode restored without overwrite; inspect again".into();
+                report.inspection =
+                    "substituted inode restored without overwrite; inspect again".into();
             }
             Err(e) => {
                 report.quarantine_path = Some(quarantined.to_string_lossy().into());
-                report.inspection = format!("substituted inode retained in quarantine; original path preserved: {e}");
+                report.inspection = format!(
+                    "substituted inode retained in quarantine; original path preserved: {e}"
+                );
             }
         }
         sync_dirs(&[parent_of(path)?, &destination])?;
         return Ok(report);
     }
     if let Some(guard) = &guard {
-        if File::open(path).and_then(|f| facts::file_key(&f)).ok() != Some(facts::file_key(guard).map_err(failure)?) {
+        if File::open(path).and_then(|f| facts::file_key(&f)).ok()
+            != Some(facts::file_key(guard).map_err(failure)?)
+        {
             report.quarantine_path = Some(quarantined.to_string_lossy().into());
-            report.inspection = "owned artifact quarantined; native path guard changed, preserved".into();
+            report.inspection =
+                "owned artifact quarantined; native path guard changed, preserved".into();
             return Ok(report);
         }
         fs::remove_dir(path).map_err(failure)?;
@@ -515,8 +588,8 @@ impl NativeLockArtifact {
 
 #[cfg(all(test, unix))]
 mod tests {
-    use crate as fgos_git;
     use super::INDEX_LOCK_RUNBOOK;
+    use crate as fgos_git;
     use std::fs::File;
     include!("../tests/support/land.rs");
     use fgos_git::wal::{FileSystem, Outcome, Wal};
@@ -649,12 +722,17 @@ mod tests {
         assert!(report.inspection.contains(INDEX_LOCK_RUNBOOK));
         #[cfg(target_os = "linux")]
         {
-            assert!(report.inspection.contains(&format!("pid={} exe=", std::process::id())));
+            assert!(report
+                .inspection
+                .contains(&format!("pid={} exe=", std::process::id())));
             assert!(report.inspection.contains("startTime="));
         }
         assert_eq!(report.path, path.to_string_lossy());
         assert!(report.observed_inode.is_some_and(|inode| inode > 0));
-        assert!(report.observed_state.as_deref().is_some_and(|d| d.len() == 64 && d.bytes().all(|b| b.is_ascii_hexdigit())));
+        assert!(report
+            .observed_state
+            .as_deref()
+            .is_some_and(|d| d.len() == 64 && d.bytes().all(|b| b.is_ascii_hexdigit())));
         assert_eq!(fs::read(&path).unwrap(), b"external");
         assert!(f
             .driver
@@ -668,7 +746,10 @@ mod tests {
             .repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem)
             .unwrap();
         assert_eq!(report.status, "inspectedRepairRequired");
-        assert!(fs::symlink_metadata(&path).unwrap().file_type().is_symlink());
+        assert!(fs::symlink_metadata(&path)
+            .unwrap()
+            .file_type()
+            .is_symlink());
     }
     struct Swap(PathBuf);
     impl FileSystem for Swap {
@@ -690,12 +771,7 @@ mod tests {
         let path = f.main.join(".git/index.lock");
         let report = f
             .driver
-            .repair_native_index_lock(
-                &f.repo,
-                vec![],
-                "interrupted",
-                &Swap(path.clone()),
-            )
+            .repair_native_index_lock(&f.repo, vec![], "interrupted", &Swap(path.clone()))
             .unwrap();
         assert_eq!(report.status, "inspectedRepairRequired");
         assert!(report.inspection.contains("immediately before move"));
@@ -742,12 +818,7 @@ mod tests {
         child.wait().unwrap();
         assert!(f
             .driver
-            .repair_native_index_lock(
-                &f.repo,
-                vec![],
-                "interrupted",
-                &InterruptBeforeMove,
-            )
+            .repair_native_index_lock(&f.repo, vec![], "interrupted", &InterruptBeforeMove,)
             .is_err());
         let report = f
             .driver
@@ -765,7 +836,9 @@ mod tests {
     #[cfg(target_os = "linux")]
     impl FileSystem for InterruptExchange {
         fn checkpoint(&self, step: &'static str) -> io::Result<()> {
-            if step == self.0 { return Err(io::Error::other("interrupted exchange")); }
+            if step == self.0 {
+                return Err(io::Error::other("interrupted exchange"));
+            }
             Ok(())
         }
     }
@@ -776,15 +849,23 @@ mod tests {
             let f = Fixture::new();
             pending(&f);
             let (mut child, _fd) = owned(&f);
-            child.kill().unwrap(); child.wait().unwrap();
-            let error = f.driver.repair_native_index_lock(
-                &f.repo, vec![], "interrupted", &InterruptExchange(step),
-            ).unwrap_err();
+            child.kill().unwrap();
+            child.wait().unwrap();
+            let error = f
+                .driver
+                .repair_native_index_lock(&f.repo, vec![], "interrupted", &InterruptExchange(step))
+                .unwrap_err();
             assert!(error.cause.contains("interrupted exchange"));
-            let report = f.driver.repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem).unwrap();
+            let report = f
+                .driver
+                .repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem)
+                .unwrap();
             assert_eq!(report.status, "quarantined");
             assert!(!f.main.join(".git/index.lock").exists());
-            assert_eq!(fs::read(report.quarantine_path.unwrap()).unwrap(), b"retained native lock bytes\0\xff");
+            assert_eq!(
+                fs::read(report.quarantine_path.unwrap()).unwrap(),
+                b"retained native lock bytes\0\xff"
+            );
         }
     }
     #[test]
@@ -794,19 +875,32 @@ mod tests {
             let f = Fixture::new();
             pending(&f);
             let (mut child, _fd) = owned(&f);
-            child.kill().unwrap(); child.wait().unwrap();
-            f.driver.repair_native_index_lock(
-                &f.repo, vec![], "interrupted", &InterruptExchange("native-lock-after-move"),
-            ).unwrap_err();
+            child.kill().unwrap();
+            child.wait().unwrap();
+            f.driver
+                .repair_native_index_lock(
+                    &f.repo,
+                    vec![],
+                    "interrupted",
+                    &InterruptExchange("native-lock-after-move"),
+                )
+                .unwrap_err();
             let path = f.main.join(".git/index.lock");
             if replace {
                 fs::rename(&path, path.with_extension("held-guard")).unwrap();
                 fs::create_dir(&path).unwrap();
-            } else { fs::write(path.join("foreign"), "preserve").unwrap(); }
-            let report = f.driver.repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem).unwrap();
+            } else {
+                fs::write(path.join("foreign"), "preserve").unwrap();
+            }
+            let report = f
+                .driver
+                .repair_native_index_lock(&f.repo, vec![], "interrupted", &wal::OsFileSystem)
+                .unwrap();
             assert_eq!(report.status, "inspectedRepairRequired");
             assert!(path.is_dir());
-            if !replace { assert_eq!(fs::read(path.join("foreign")).unwrap(), b"preserve"); }
+            if !replace {
+                assert_eq!(fs::read(path.join("foreign")).unwrap(), b"preserve");
+            }
         }
     }
     struct OccupyQuarantine(PathBuf);
@@ -866,7 +960,11 @@ mod tests {
             #[cfg(target_os = "linux")]
             if step == "native-lock-after-move" {
                 assert!(self.0.is_dir(), "exchange must retain a native-path guard");
-                assert!(fs::OpenOptions::new().write(true).create_new(true).open(&self.0).is_err());
+                assert!(fs::OpenOptions::new()
+                    .write(true)
+                    .create_new(true)
+                    .open(&self.0)
+                    .is_err());
             }
             Ok(())
         }
@@ -879,13 +977,16 @@ mod tests {
         child.kill().unwrap();
         child.wait().unwrap();
         let path = f.main.join(".git/index.lock");
-        let report = f.driver.repair_native_index_lock(
-            &f.repo, vec![], "interrupted", &LateSwap(path.clone()),
-        ).unwrap();
+        let report = f
+            .driver
+            .repair_native_index_lock(&f.repo, vec![], "interrupted", &LateSwap(path.clone()))
+            .unwrap();
         assert_eq!(report.status, "inspectedRepairRequired");
         assert!(report.inspection.contains("restored without overwrite"));
         assert_eq!(fs::read(&path).unwrap(), b"foreign replacement");
-        assert_eq!(fs::read(path.with_extension("original")).unwrap(), b"retained native lock bytes\0\xff");
+        assert_eq!(
+            fs::read(path.with_extension("original")).unwrap(),
+            b"retained native lock bytes\0\xff"
+        );
     }
-
 }

@@ -7,10 +7,17 @@ use serde_json::{json, Value};
 
 /// `list` filters by `--harness` / `--question`; `record` takes no flags.
 fn filters(args: &[String], record: bool) -> Result<(Option<String>, Option<String>), String> {
-    let values: &[&str] = if record { &[] } else { &["--harness", "--question"] };
+    let values: &[&str] = if record {
+        &[]
+    } else {
+        &["--harness", "--question"]
+    };
     let flags = parse_flags("eval", args, values, &[], false)?;
     for flag in values {
-        if flags.value(flag).is_some_and(|value| value.trim().is_empty()) {
+        if flags
+            .value(flag)
+            .is_some_and(|value| value.trim().is_empty())
+        {
             return Err(format!("metrics eval: missing value for {flag}"));
         }
     }

@@ -4,7 +4,12 @@ use fgos_git::*;
 use std::{fs, os::unix::fs::PermissionsExt, path::Path, process::Command};
 
 fn git(p: &Path, args: &[&str]) -> String {
-    let o = Command::new("git").arg("-C").arg(p).args(args).output().unwrap();
+    let o = Command::new("git")
+        .arg("-C")
+        .arg(p)
+        .args(args)
+        .output()
+        .unwrap();
     assert!(o.status.success(), "{args:?}: {o:?}");
     String::from_utf8(o.stdout).unwrap().trim().into()
 }
@@ -18,14 +23,34 @@ fn a_head_switched_between_the_two_reads_is_refused_not_paired() {
     let repo = root.join("repo");
     git(&root, &["init", "-q", "--initial-branch=a", "repo"]);
     let commit = |message: &str| {
-        git(&repo, &["-c", "user.name=T", "-c", "user.email=t@example.invalid", "commit", "-q", "--allow-empty", "-m", message])
+        git(
+            &repo,
+            &[
+                "-c",
+                "user.name=T",
+                "-c",
+                "user.email=t@example.invalid",
+                "commit",
+                "-q",
+                "--allow-empty",
+                "-m",
+                message,
+            ],
+        )
     };
     commit("one");
     git(&repo, &["branch", "b"]);
     commit("two");
 
     // A git on PATH that, once, points HEAD at branch `b` just before `rev-parse` reads it.
-    let real = String::from_utf8(Command::new("sh").args(["-c", "command -v git"]).output().unwrap().stdout).unwrap();
+    let real = String::from_utf8(
+        Command::new("sh")
+            .args(["-c", "command -v git"])
+            .output()
+            .unwrap()
+            .stdout,
+    )
+    .unwrap();
     let real = real.trim();
     let bin = root.join("bin");
     fs::create_dir(&bin).unwrap();
@@ -54,5 +79,7 @@ fn a_head_switched_between_the_two_reads_is_refused_not_paired() {
     assert!(marker.exists(), "the switch was never injected");
     assert_eq!(error.cause, "head-changed-during-read");
     // Switched and settled: the next read is one consistent answer.
-    assert!(matches!(driver.resolve_head(&handle).unwrap(), HeadFact::Attached { target, .. } if target.as_str() == "refs/heads/b"));
+    assert!(
+        matches!(driver.resolve_head(&handle).unwrap(), HeadFact::Attached { target, .. } if target.as_str() == "refs/heads/b")
+    );
 }

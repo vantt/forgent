@@ -22,10 +22,13 @@ use serde_json::{json, Value};
 use windows_sys::Win32::System::Console::{GenerateConsoleCtrlEvent, CTRL_BREAK_EVENT};
 use windows_sys::Win32::System::Threading::{CREATE_NEW_PROCESS_GROUP, CREATE_SUSPENDED};
 
-use super::{ceiling_left, StartError, go_matches, load_config, publish_gate_exit, read_side_env, stop_cause, stop_for, Config, GateArgs, GoEnd, Stop, EXIT_NO_GO};
-use crate::route::{report, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_USAGE};
+use super::{
+    ceiling_left, go_matches, load_config, publish_gate_exit, read_side_env, stop_cause, stop_for,
+    Config, GateArgs, GoEnd, StartError, Stop, EXIT_NO_GO,
+};
 use crate::go_channel::{read_frame, write_frame};
 use crate::go_pipe;
+use crate::route::{report, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL, EXIT_USAGE};
 
 /// How often the gate looks at the agent, the stop file and the ceiling.
 const POLL: Duration = Duration::from_millis(20);
@@ -53,7 +56,11 @@ pub fn run(args: &GateArgs) -> i32 {
         }
     };
     if config.preferred != "windows-job" {
-        report("gate", "wrong-driver", "the envelope does not name windows-job");
+        report(
+            "gate",
+            "wrong-driver",
+            "the envelope does not name windows-job",
+        );
         return EXIT_INTERNAL;
     }
     // The second holder of the attempt's job: it outlives the supervisor's handle.
@@ -65,7 +72,11 @@ pub fn run(args: &GateArgs) -> i32 {
         }
     };
     if outer.contains(std::process::id()) != Some(true) {
-        report("gate", "not-in-job", "the gate is not a member of the attempt's job");
+        report(
+            "gate",
+            "not-in-job",
+            "the gate is not a member of the attempt's job",
+        );
         return EXIT_INTERNAL;
     }
 
@@ -73,7 +84,12 @@ pub fn run(args: &GateArgs) -> i32 {
         Ok(file) => file,
         Err(_) => return EXIT_NO_GO,
     };
-    if write_frame(&mut go, &json!({"type": "HELLO", "attemptId": config.attempt_id})).is_err() {
+    if write_frame(
+        &mut go,
+        &json!({"type": "HELLO", "attemptId": config.attempt_id}),
+    )
+    .is_err()
+    {
         return EXIT_NO_GO;
     }
     let go_frame = match wait_for_go(&go, &config) {
@@ -81,7 +97,11 @@ pub fn run(args: &GateArgs) -> i32 {
         None => return EXIT_NO_GO,
     };
     if !go_matches(&config, &go_frame) {
-        report("gate", "go-mismatch", "GO does not name this attempt's envelope");
+        report(
+            "gate",
+            "go-mismatch",
+            "GO does not name this attempt's envelope",
+        );
         return EXIT_ENVELOPE_INVALID;
     }
     let secrets = match read_side_env(&config) {
@@ -122,16 +142,26 @@ fn wait_for_go(go: &File, config: &Config) -> Option<Value> {
     }
 }
 
-fn supervise_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, String>, go: &mut File, job_name: &str) -> Result<(), String> {
+fn supervise_agent(
+    config: &Config,
+    go_frame: &Value,
+    secrets: BTreeMap<String, String>,
+    go: &mut File,
+    job_name: &str,
+) -> Result<(), String> {
     // The agent's own job: ending it ends the agent's tree and nothing else.
-    let nested = create_kill_job(&format!("Local\\fgos-gate-agent-{}", job_suffix(job_name))).map_err(|e| format!("agent job: {e}"))?;
+    let nested = create_kill_job(&format!("Local\\fgos-gate-agent-{}", job_suffix(job_name)))
+        .map_err(|e| format!("agent job: {e}"))?;
     let mut stop: Option<Stop> = None;
     let mut exit_code: Option<u32> = None;
     let mut agent: Option<Spawned> = None;
 
     if ceiling_left(config) == Some(Duration::ZERO) {
         // A ceiling already behind us: the agent never starts.
-        stop = Some(Stop { stopped_by: "hard-ceiling", cause: "hard-ceiling".into() });
+        stop = Some(Stop {
+            stopped_by: "hard-ceiling",
+            cause: "hard-ceiling".into(),
+        });
     } else {
         let started = match spawn_agent(config, go_frame, secrets, &nested) {
             Ok(started) => started,
@@ -140,7 +170,8 @@ fn supervise_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, 
                 return publish_gate_exit(config, Value::from(err.exit_code()), Value::Null, None);
             }
         };
-        let tuple = facts::identity_of(ProcId(started.id())).map_or(Value::Null, |t| t.to_record().to_json());
+        let tuple = facts::identity_of(ProcId(started.id()))
+            .map_or(Value::Null, |t| t.to_record().to_json());
         let _ = write_frame(go, &json!({"type": "AGENT", "tuple": tuple}));
         agent = Some(started);
     }
@@ -163,7 +194,10 @@ fn supervise_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, 
             }
         }
         if stop.is_none() && ceiling_left(config) == Some(Duration::ZERO) {
-            stop = Some(Stop { stopped_by: "hard-ceiling", cause: "hard-ceiling".into() });
+            stop = Some(Stop {
+                stopped_by: "hard-ceiling",
+                cause: "hard-ceiling".into(),
+            });
             grace_ends = Some(Instant::now() + config.grace);
             ask_agent_to_stop(running);
         }
@@ -176,20 +210,45 @@ fn supervise_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, 
 
     end_domain(&nested, job_name);
 
-    publish_gate_exit(config, exit_code.map_or(Value::Null, Value::from), Value::Null, stop)
+    publish_gate_exit(
+        config,
+        exit_code.map_or(Value::Null, Value::from),
+        Value::Null,
+        stop,
+    )
 }
 
 /// The part of the job name that is unique to the attempt, for the nested job's name.
 fn job_suffix(job_name: &str) -> String {
-    job_name.rsplit('\\').next().unwrap_or(job_name).chars().take(120).collect()
+    job_name
+        .rsplit('\\')
+        .next()
+        .unwrap_or(job_name)
+        .chars()
+        .take(120)
+        .collect()
 }
 
-fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, String>, nested: &Job) -> Result<Spawned, StartError> {
-    let append = |path: &std::path::Path| OpenOptions::new().create(true).append(true).open(path).map_err(|e| StartError::Setup(format!("capture {}: {e}", path.display())));
+fn spawn_agent(
+    config: &Config,
+    go_frame: &Value,
+    secrets: BTreeMap<String, String>,
+    nested: &Job,
+) -> Result<Spawned, StartError> {
+    let append = |path: &std::path::Path| {
+        OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)
+            .map_err(|e| StartError::Setup(format!("capture {}: {e}", path.display())))
+    };
     let stdout = append(&config.stdout)?;
     let stderr = append(&config.stderr)?;
     let stdin = match &config.brief {
-        Some(path) => ChildStdio::File(File::open(path).map_err(|e| StartError::Setup(format!("brief {}: {e}", path.display())))?),
+        Some(path) => ChildStdio::File(
+            File::open(path)
+                .map_err(|e| StartError::Setup(format!("brief {}: {e}", path.display())))?,
+        ),
         None => ChildStdio::Null,
     };
     let mut env: BTreeMap<String, String> = config.env.clone();
@@ -210,8 +269,13 @@ fn spawn_agent(config: &Config, go_frame: &Value, secrets: BTreeMap<String, Stri
         stdout: ChildStdio::File(stdout),
         stderr: ChildStdio::File(stderr),
     };
-    let agent = spawn(spec).map_err(|source| StartError::Spawn { program: config.command.clone(), source })?;
-    agent.assign_and_resume(nested).map_err(|e| StartError::Setup(format!("agent could not enter its job: {e}")))?;
+    let agent = spawn(spec).map_err(|source| StartError::Spawn {
+        program: config.command.clone(),
+        source,
+    })?;
+    agent
+        .assign_and_resume(nested)
+        .map_err(|e| StartError::Setup(format!("agent could not enter its job: {e}")))?;
     Ok(agent)
 }
 
@@ -229,15 +293,23 @@ fn ask_agent_to_stop(agent: &Spawned) {
 fn end_domain(nested: &Job, job_name: &str) {
     let me = std::process::id();
     let _ = nested.terminate();
-    let Some(mut view) = job_view(job_name) else { return };
+    let Some(mut view) = job_view(job_name) else {
+        return;
+    };
     let start = Instant::now();
     loop {
-        let others: Vec<u32> = view.live_pids().into_iter().filter(|pid| *pid != me).collect();
+        let others: Vec<u32> = view
+            .live_pids()
+            .into_iter()
+            .filter(|pid| *pid != me)
+            .collect();
         if others.is_empty() {
             return;
         }
         if start.elapsed() >= EMPTY_WAIT {
-            eprintln!("fgos internal gate: processes still in the job after {EMPTY_WAIT:?}: {others:?}");
+            eprintln!(
+                "fgos internal gate: processes still in the job after {EMPTY_WAIT:?}: {others:?}"
+            );
             return;
         }
         let _ = nested.terminate();

@@ -10,5 +10,8 @@ pub const PROFILE: Profile = Profile {
     enter_gap_ms: 300,
     submit_by_prompt_door: false,
     trust_markers: &["do you trust the contents of this project"],
-    start_banners: &[StartBanner { marker: "meet gemini", dismiss_key: "esc" }],
+    start_banners: &[StartBanner {
+        marker: "meet gemini",
+        dismiss_key: "esc",
+    }],
 };

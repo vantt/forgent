@@ -207,7 +207,11 @@ impl GitDriver {
         )
     }
     /// Work's existing fallback timing read, with bounded literal paths.
-    pub fn last_path_commit_time(&self, repo: &RepoHandle, files: &[String]) -> Result<Option<i64>> {
+    pub fn last_path_commit_time(
+        &self,
+        repo: &RepoHandle,
+        files: &[String],
+    ) -> Result<Option<i64>> {
         if files.is_empty() {
             return Err(failure("invalid-literal-path"));
         }
@@ -215,9 +219,15 @@ impl GitDriver {
         let mut args = vec!["--literal-pathspecs", "log", "-1", "--format=%ct", "--"];
         args.extend(files.iter().map(String::as_str));
         let raw = self.checked(repo, &args, Policy::Inspect)?;
-        let text = std::str::from_utf8(&raw).map_err(|_| failure("invalid-commit-time"))?.trim();
-        if text.is_empty() { return Ok(None); }
-        text.parse().map(Some).map_err(|_| failure("invalid-commit-time"))
+        let text = std::str::from_utf8(&raw)
+            .map_err(|_| failure("invalid-commit-time"))?
+            .trim();
+        if text.is_empty() {
+            return Ok(None);
+        }
+        text.parse()
+            .map(Some)
+            .map_err(|_| failure("invalid-commit-time"))
     }
     /// Literal full refs only; missing remains distinct from errors and symbolic.
     pub fn resolve_ref(&self, repo: &RepoHandle, name: &RefName) -> Result<RefValue> {
@@ -347,7 +357,13 @@ impl GitDriver {
         sides: DiffSides<'a>,
         commits_only: bool,
     ) -> Result<Vec<&'a str>> {
-        let require = |value: &Oid| if commits_only { self.require_commit(repo, value) } else { self.require_tree_ish(repo, value) };
+        let require = |value: &Oid| {
+            if commits_only {
+                self.require_commit(repo, value)
+            } else {
+                self.require_tree_ish(repo, value)
+            }
+        };
         Ok(match sides {
             DiffSides::Objects(before, after) => {
                 require(before)?;
@@ -385,7 +401,11 @@ impl GitDriver {
             "diff",
             "--name-status",
             "--no-relative",
-            if scope.renames { "--find-renames" } else { "--no-renames" },
+            if scope.renames {
+                "--find-renames"
+            } else {
+                "--no-renames"
+            },
             "--no-ext-diff",
             "--no-textconv",
             "-z",
@@ -429,22 +449,36 @@ impl GitDriver {
         context: Option<u32>,
         max_bytes: usize,
     ) -> Result<Vec<u8>> {
-        if max_bytes == 0 || max_bytes > 50 * 1024 * 1024 || context.is_some_and(|n| n > 1_000_000) {
+        if max_bytes == 0 || max_bytes > 50 * 1024 * 1024 || context.is_some_and(|n| n > 1_000_000)
+        {
             return Err(failure("invalid-diff-bound"));
         }
         literal_paths(paths)?;
         let unified = context.map(|n| format!("--unified={n}"));
-        let mut args = vec!["--literal-pathspecs", "diff", "--no-relative", "--no-ext-diff", "--no-textconv"];
+        let mut args = vec![
+            "--literal-pathspecs",
+            "diff",
+            "--no-relative",
+            "--no-ext-diff",
+            "--no-textconv",
+        ];
         args.extend(unified.as_deref());
         args.extend(self.diff_sides(repo, sides, true)?);
         args.push("--");
         args.extend(paths.iter().map(String::as_str));
         let output = self.invoke(
-            Some(repo), repo.trusted_main_root(),
+            Some(repo),
+            repo.trusted_main_root(),
             &args,
-            Policy::Inspect, None, true, max_bytes, Duration::from_secs(30),
+            Policy::Inspect,
+            None,
+            true,
+            max_bytes,
+            Duration::from_secs(30),
         )?;
-        if !output.success { return Err(output.error("diff-read-failed")); }
+        if !output.success {
+            return Err(output.error("diff-read-failed"));
+        }
         Ok(output.stdout)
     }
     fn require_tree_ish(&self, repo: &RepoHandle, value: &Oid) -> Result<()> {
@@ -747,7 +781,9 @@ impl GitDriver {
         previous_paths: &[Vec<u8>],
         max_bytes: u64,
     ) -> Result<WritesSnapshot> {
-        if max_bytes == 0 || previous_paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT {
+        if max_bytes == 0
+            || previous_paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT
+        {
             return Err(failure("invalid-snapshot-bounds"));
         }
         let head = match self.resolve_head(repo)? {
@@ -758,7 +794,14 @@ impl GitDriver {
             previous_paths.iter().cloned().collect();
         let mut cursor = None;
         loop {
-            let page = self.status(repo, Untracked::All, Submodules::Configured, Ignored::Excluded, cursor, 4096)?;
+            let page = self.status(
+                repo,
+                Untracked::All,
+                Submodules::Configured,
+                Ignored::Excluded,
+                cursor,
+                4096,
+            )?;
             paths.extend(page.entries.into_iter().map(|e| e.path));
             if paths.iter().map(|p| p.len() + 1).sum::<usize>() > crate::driver::PATH_LIMIT {
                 return Err(failure("snapshot-path-limit"));
@@ -944,14 +987,37 @@ pub(crate) fn fingerprint(
 
 impl GitDriver {
     pub fn resolve_commit_ref(&self, repo: &RepoHandle, name: &str) -> Result<Option<Oid>> {
-        if name.is_empty() || name.contains('\0') { return Err(failure("invalid-ref-name")); }
+        if name.is_empty() || name.contains('\0') {
+            return Err(failure("invalid-ref-name"));
+        }
         let revision = format!("{name}^{{commit}}");
         self.require_floor()?;
         self.preflight(repo)?;
-        let out = self.invoke(Some(repo), repo.trusted_main_root(), &["rev-parse", "-q", "--verify", "--end-of-options", &revision], Policy::Inspect, None, true, 4096, std::time::Duration::from_secs(30))?;
+        let out = self.invoke(
+            Some(repo),
+            repo.trusted_main_root(),
+            &["rev-parse", "-q", "--verify", "--end-of-options", &revision],
+            Policy::Inspect,
+            None,
+            true,
+            4096,
+            std::time::Duration::from_secs(30),
+        )?;
         if out.success {
-            Ok(Some(Oid::parse(std::str::from_utf8(&out.stdout).map_err(|_|failure("invalid-oid"))?.trim_end_matches('\n'), repo.object_format()).map_err(|_|failure("invalid-oid"))?))
-        } else if out.code == Some(1) { Ok(None) } else { Err(out.error("ref-resolution-failed")) }
+            Ok(Some(
+                Oid::parse(
+                    std::str::from_utf8(&out.stdout)
+                        .map_err(|_| failure("invalid-oid"))?
+                        .trim_end_matches('\n'),
+                    repo.object_format(),
+                )
+                .map_err(|_| failure("invalid-oid"))?,
+            ))
+        } else if out.code == Some(1) {
+            Ok(None)
+        } else {
+            Err(out.error("ref-resolution-failed"))
+        }
     }
 }
 
@@ -1109,7 +1175,12 @@ impl GitDriver {
     /// The tree `git merge-tree --write-tree` produces for two commits and the
     /// paths it left conflicted. Exit 1 is the conflicted answer. The command
     /// may add unreferenced objects; it changes no ref, index or checkout.
-    pub fn merge_tree(&self, repo: &RepoHandle, target: &Oid, source: &Oid) -> Result<MergeTreeFact> {
+    pub fn merge_tree(
+        &self,
+        repo: &RepoHandle,
+        target: &Oid,
+        source: &Oid,
+    ) -> Result<MergeTreeFact> {
         self.require_commit(repo, target)?;
         self.require_commit(repo, source)?;
         let out = self.inspect_command(
@@ -1143,7 +1214,10 @@ impl GitDriver {
         if conflicted != !conflicted_paths.is_empty() {
             return Err(failure("invalid-merge-tree-protocol"));
         }
-        Ok(MergeTreeFact { tree, conflicted_paths })
+        Ok(MergeTreeFact {
+            tree,
+            conflicted_paths,
+        })
     }
     /// One named attribute of literal paths, from the `.gitattributes` of a
     /// commit or tree, exactly as Git reports it.
@@ -1157,7 +1231,9 @@ impl GitDriver {
         self.require_tree_ish(repo, revision)?;
         if attribute.is_empty()
             || attribute.starts_with('-')
-            || !attribute.bytes().all(|b| b.is_ascii_alphanumeric() || b"-_.".contains(&b))
+            || !attribute
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b"-_.".contains(&b))
         {
             return Err(failure("invalid-attribute-name"));
         }
@@ -1174,7 +1250,11 @@ impl GitDriver {
             input.push(0);
         }
         let source = format!("--source={}", revision.as_str());
-        let bytes = self.inspect_input(repo, &["check-attr", "-z", "--stdin", &source, attribute], &input)?;
+        let bytes = self.inspect_input(
+            repo,
+            &["check-attr", "-z", "--stdin", &source, attribute],
+            &input,
+        )?;
         let fields = records(&bytes)?;
         if fields.len() != paths.len() * 3 {
             return Err(failure("invalid-check-attr-protocol"));
@@ -1201,7 +1281,9 @@ impl GitDriver {
         // so a leading colon (pathspec magic) is refused here instead.
         if paths.is_empty()
             || paths.len() > 4096
-            || paths.iter().any(|p| p.is_empty() || p.contains(&0) || p.starts_with(b":"))
+            || paths
+                .iter()
+                .any(|p| p.is_empty() || p.contains(&0) || p.starts_with(b":"))
             || paths.iter().map(|p| p.len() + 1).sum::<usize>() > LIMIT
         {
             return Err(failure("invalid-literal-path"));
@@ -1229,20 +1311,35 @@ impl GitDriver {
             return Err(out.error("git-command-failed"));
         }
         let ignored = records(&out.stdout)?;
-        if ignored.iter().any(|p| !paths.iter().any(|q| q.as_slice() == *p)) {
+        if ignored
+            .iter()
+            .any(|p| !paths.iter().any(|q| q.as_slice() == *p))
+        {
             return Err(failure("invalid-check-ignore-protocol"));
         }
         Ok(ignored.into_iter().map(<[u8]>::to_vec).collect())
     }
     /// The earliest merge commit on the ancestry path from `ancestor` to
     /// `descendant` (both commits), or none.
-    pub fn first_ancestry_merge(&self, repo: &RepoHandle, ancestor: &Oid, descendant: &Oid) -> Result<Option<Oid>> {
+    pub fn first_ancestry_merge(
+        &self,
+        repo: &RepoHandle,
+        ancestor: &Oid,
+        descendant: &Oid,
+    ) -> Result<Option<Oid>> {
         self.require_commit(repo, ancestor)?;
         self.require_commit(repo, descendant)?;
         let range = format!("{}..{}", ancestor.as_str(), descendant.as_str());
         let bytes = self.checked(
             repo,
-            &["rev-list", "--merges", "--ancestry-path", "--reverse", &range, "--"],
+            &[
+                "rev-list",
+                "--merges",
+                "--ancestry-path",
+                "--reverse",
+                &range,
+                "--",
+            ],
             Policy::Inspect,
         )?;
         bytes
@@ -1258,14 +1355,23 @@ impl GitDriver {
     /// A commit's committer time, in seconds since the epoch.
     pub fn commit_time(&self, repo: &RepoHandle, commit: &Oid) -> Result<i64> {
         self.require_commit(repo, commit)?;
-        let raw = self.checked(repo, &["log", "-1", "--format=%ct", commit.as_str(), "--"], Policy::Inspect)?;
+        let raw = self.checked(
+            repo,
+            &["log", "-1", "--format=%ct", commit.as_str(), "--"],
+            Policy::Inspect,
+        )?;
         std::str::from_utf8(&raw)
             .ok()
             .and_then(|text| text.trim_end_matches('\n').parse().ok())
             .ok_or_else(|| failure("invalid-commit-time"))
     }
     /// How many commits `include` reaches that `exclude`, when given, does not.
-    pub fn count_commits(&self, repo: &RepoHandle, include: &Oid, exclude: Option<&Oid>) -> Result<u64> {
+    pub fn count_commits(
+        &self,
+        repo: &RepoHandle,
+        include: &Oid,
+        exclude: Option<&Oid>,
+    ) -> Result<u64> {
         self.require_commit(repo, include)?;
         let range = match exclude {
             Some(exclude) => {
@@ -1274,17 +1380,34 @@ impl GitDriver {
             }
             None => include.as_str().to_owned(),
         };
-        count(&self.checked(repo, &["rev-list", "--count", &range, "--"], Policy::Inspect)?)
+        count(&self.checked(
+            repo,
+            &["rev-list", "--count", &range, "--"],
+            Policy::Inspect,
+        )?)
     }
     /// How many non-merge commits of `head` have no patch-equivalent commit
     /// on `upstream` (`rev-list --cherry-pick --right-only --no-merges`).
-    pub fn unmatched_commit_count(&self, repo: &RepoHandle, upstream: &Oid, head: &Oid) -> Result<u64> {
+    pub fn unmatched_commit_count(
+        &self,
+        repo: &RepoHandle,
+        upstream: &Oid,
+        head: &Oid,
+    ) -> Result<u64> {
         self.require_commit(repo, upstream)?;
         self.require_commit(repo, head)?;
         let range = format!("{}...{}", upstream.as_str(), head.as_str());
         count(&self.checked(
             repo,
-            &["rev-list", "--count", "--cherry-pick", "--right-only", "--no-merges", &range, "--"],
+            &[
+                "rev-list",
+                "--count",
+                "--cherry-pick",
+                "--right-only",
+                "--no-merges",
+                &range,
+                "--",
+            ],
             Policy::Inspect,
         )?)
     }
@@ -1295,10 +1418,20 @@ impl GitDriver {
         cursor: Option<InspectCursor>,
         max: usize,
     ) -> Result<InspectPage<Vec<u8>>> {
-        let bytes = self.checked(repo, &["ls-files", "-z", "--cached", "--full-name"], Policy::Inspect)?;
+        let bytes = self.checked(
+            repo,
+            &["ls-files", "-z", "--cached", "--full-name"],
+            Policy::Inspect,
+        )?;
         let entries = records(&bytes)?
             .into_iter()
-            .map(|path| if path.is_empty() { Err(failure("invalid-ls-files-protocol")) } else { Ok(path.to_vec()) })
+            .map(|path| {
+                if path.is_empty() {
+                    Err(failure("invalid-ls-files-protocol"))
+                } else {
+                    Ok(path.to_vec())
+                }
+            })
             .collect::<Result<Vec<_>>>()?;
         page(entries, &bytes, cursor, max)
     }

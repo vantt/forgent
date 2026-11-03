@@ -18,8 +18,8 @@ pub mod platform;
 
 pub use platform::ProcessPlatform;
 
-use std::time::Duration;
 use facts::{ProcTuple, Verdict};
+use std::time::Duration;
 
 /// A process id as the OS numbers it. Never a raw `pid_t`: the drivers cast
 /// at the boundary.
@@ -116,9 +116,13 @@ enum Watch {
 pub fn domain_watch(domain: &Domain) -> DomainWatch {
     #[cfg(windows)]
     if let Domain::WindowsJob(record) = domain {
-        return DomainWatch { inner: Watch::Job(platform::windows_job::ContenderView::new(record)) };
+        return DomainWatch {
+            inner: Watch::Job(platform::windows_job::ContenderView::new(record)),
+        };
     }
-    DomainWatch { inner: Watch::Direct(domain.clone()) }
+    DomainWatch {
+        inner: Watch::Direct(domain.clone()),
+    }
 }
 
 /// The job view of the named Windows job, for the release rule and the keeper.
@@ -138,7 +142,12 @@ pub struct WatchTrace {
 /// Is the signal outcome one that leaves nothing to end: sent, or the process
 /// was already gone or is no longer the recorded one.
 pub(crate) fn signal_settled(outcome: &control::SignalOutcome) -> bool {
-    matches!(outcome, control::SignalOutcome::Sent | control::SignalOutcome::NotFound | control::SignalOutcome::IdentityMismatch)
+    matches!(
+        outcome,
+        control::SignalOutcome::Sent
+            | control::SignalOutcome::NotFound
+            | control::SignalOutcome::IdentityMismatch
+    )
 }
 
 impl DomainWatch {
@@ -148,12 +157,18 @@ impl DomainWatch {
         match &mut self.inner {
             #[cfg(windows)]
             Watch::Job(view) => view.is_empty(),
-            Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") && gate.start_time == containment::EXITED_GATE => DomainState::Empty,
-            Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") => match facts::judge_here(&gate.to_record()) {
-                Verdict::Dead => DomainState::Empty,
-                Verdict::Alive => DomainState::NotEmpty,
-                Verdict::Unknown => DomainState::Unknown,
-            },
+            Watch::Direct(Domain::LinuxGate(gate))
+                if cfg!(target_os = "linux") && gate.start_time == containment::EXITED_GATE =>
+            {
+                DomainState::Empty
+            }
+            Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") => {
+                match facts::judge_here(&gate.to_record()) {
+                    Verdict::Dead => DomainState::Empty,
+                    Verdict::Alive => DomainState::NotEmpty,
+                    Verdict::Unknown => DomainState::Unknown,
+                }
+            }
             Watch::Direct(Domain::LinuxPgroup(leader)) => containment::pgroup_state(leader),
             Watch::Direct(Domain::MacosTree(root)) => containment::tree_state(root),
             Watch::Direct(_) => DomainState::Unknown,
@@ -169,7 +184,11 @@ impl DomainWatch {
         match &mut self.inner {
             #[cfg(windows)]
             Watch::Job(view) => view.kill_all(),
-            Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") && gate.start_time == containment::EXITED_GATE => KillOutcome::Ok,
+            Watch::Direct(Domain::LinuxGate(gate))
+                if cfg!(target_os = "linux") && gate.start_time == containment::EXITED_GATE =>
+            {
+                KillOutcome::Ok
+            }
             Watch::Direct(Domain::LinuxGate(gate)) if cfg!(target_os = "linux") => {
                 if signal_settled(&control::signal_by_identity(gate, control::Signal::Kill)) {
                     KillOutcome::Ok
@@ -187,7 +206,14 @@ impl DomainWatch {
     pub fn trace(&self) -> WatchTrace {
         match &self.inner {
             #[cfg(windows)]
-            Watch::Job(view) => WatchTrace { job_opened: view.job_opened(), named: view.trace().into_iter().map(|(pid, by)| (pid, by.list, by.scan, by.tree)).collect() },
+            Watch::Job(view) => WatchTrace {
+                job_opened: view.job_opened(),
+                named: view
+                    .trace()
+                    .into_iter()
+                    .map(|(pid, by)| (pid, by.list, by.scan, by.tree))
+                    .collect(),
+            },
             Watch::Direct(_) => WatchTrace::default(),
         }
     }

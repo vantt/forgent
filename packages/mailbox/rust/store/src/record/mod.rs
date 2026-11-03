@@ -35,7 +35,8 @@ use fgos_durable_file::sync_directory;
 use fgos_holder_lock::{Acquire, LockScope, ScopeError};
 use fgos_mailbox_core::{
     Claim, Finished, IdSource, Ingested, Limits, MailboxState, MessageId, Refusal, RegisterRefusal,
-    Registered, RemoteDrop, RemoteMail, SendOutcome, SendRequest, SnapshotVersionError, Timestamp, WriterKey,
+    Registered, RemoteDrop, RemoteMail, SendOutcome, SendRequest, SnapshotVersionError, Timestamp,
+    WriterKey,
 };
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
@@ -505,7 +506,12 @@ impl Record {
             limits,
             |_| Ok(()),
             |state, ids, dead| {
-                let IngestBatch { mails, drops, refusals, cursor } = *batch;
+                let IngestBatch {
+                    mails,
+                    drops,
+                    refusals,
+                    cursor,
+                } = *batch;
                 let dead = dead.cloned().unwrap_or_default();
                 for drop in drops {
                     state.count_remote_drop(drop, now, limits);
@@ -534,7 +540,8 @@ impl Record {
                     .collect();
                 // A refusal or a duplicate still changed the state (the id
                 // is remembered, the counters moved), so any mail saves.
-                let changed = moved || !mails.is_empty() || !drops.is_empty() || !refusals.is_empty();
+                let changed =
+                    moved || !mails.is_empty() || !drops.is_empty() || !refusals.is_empty();
                 (
                     Reported {
                         value: results,

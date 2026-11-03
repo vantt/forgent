@@ -17,8 +17,17 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 
 fn git(dir: &Path, args: &[&str]) -> String {
-    let out = Command::new("git").arg("-C").arg(dir).args(args).output().unwrap();
-    assert!(out.status.success(), "git {args:?}: {}", String::from_utf8_lossy(&out.stderr));
+    let out = Command::new("git")
+        .arg("-C")
+        .arg(dir)
+        .args(args)
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "git {args:?}: {}",
+        String::from_utf8_lossy(&out.stderr)
+    );
     String::from_utf8_lossy(&out.stdout).into_owned()
 }
 
@@ -44,7 +53,10 @@ fn child(state: &Path, dir: &Path) -> Output {
 
 #[test]
 fn the_sync_child_pushes_an_unsealed_mailbox_event_and_stays_silent() {
-    let world = std::env::temp_dir().join(format!("fgos_test_mailbox_sync_child_{}", std::process::id()));
+    let world = std::env::temp_dir().join(format!(
+        "fgos_test_mailbox_sync_child_{}",
+        std::process::id()
+    ));
     let _ = fs::remove_dir_all(&world);
     private_dir(&world);
     let remote = world.join("remote.git");
@@ -55,7 +67,15 @@ fn the_sync_child_pushes_an_unsealed_mailbox_event_and_stays_silent() {
 
     // A clone of a migrated project: the `.fgos/events` fence is there and the fetch mapping is set.
     let root = world.join("alpha");
-    git(&world, &["clone", "-q", remote.to_str().unwrap(), root.to_str().unwrap()]);
+    git(
+        &world,
+        &[
+            "clone",
+            "-q",
+            remote.to_str().unwrap(),
+            root.to_str().unwrap(),
+        ],
+    );
     private_dir(&root);
     fs::create_dir_all(root.join(".fgos")).unwrap();
     fs::write(
@@ -65,7 +85,11 @@ fn the_sync_child_pushes_an_unsealed_mailbox_event_and_stays_silent() {
     .unwrap();
     let fence = root.join(".fgos/locks/activation.lock");
     fs::create_dir_all(&fence).unwrap();
-    fs::write(fence.join("TOMBSTONE"), "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n").unwrap();
+    fs::write(
+        fence.join("TOMBSTONE"),
+        "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
+    )
+    .unwrap();
     fs::write(root.join(".fgos/events"), "fence\n").unwrap();
     let driver = GitDriver::new(&world).unwrap();
     let repo = match driver.resolve_repo(&root, &root).unwrap() {
@@ -97,28 +121,66 @@ fn the_sync_child_pushes_an_unsealed_mailbox_event_and_stays_silent() {
     append(
         &layout,
         &Registry::shipped().unwrap(),
-        AppendRequest { stream: &stream, events: &[event], cursor: &Default::default(), writer: "test", machine: "alpha-aaaaaa", held_ranks: &[] },
+        AppendRequest {
+            stream: &stream,
+            events: &[event],
+            cursor: &Default::default(),
+            writer: "test",
+            machine: "alpha-aaaaaa",
+            held_ranks: &[],
+        },
     )
     .unwrap();
-    assert_eq!(git(&remote, &["for-each-ref", "refs/fgos/"]), "", "nothing is pushed before the child runs");
+    assert_eq!(
+        git(&remote, &["for-each-ref", "refs/fgos/"]),
+        "",
+        "nothing is pushed before the child runs"
+    );
 
     // Cross-machine mail is off by default: the child does nothing, whoever started it.
     let out = child(&state, &root);
-    assert_eq!(out.status.code(), Some(0), "{}", String::from_utf8_lossy(&out.stderr));
-    assert_eq!(git(&remote, &["for-each-ref", "refs/fgos/"]), "", "a project that did not turn cross-machine mail on pushes nothing");
+    assert_eq!(
+        out.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert_eq!(
+        git(&remote, &["for-each-ref", "refs/fgos/"]),
+        "",
+        "a project that did not turn cross-machine mail on pushes nothing"
+    );
 
-    fs::write(root.join(".fgos/config.json"), r#"{"mailbox":{"crossMachine":{"enabled":true}}}"#).unwrap();
+    fs::write(
+        root.join(".fgos/config.json"),
+        r#"{"mailbox":{"crossMachine":{"enabled":true}}}"#,
+    )
+    .unwrap();
     let out = child(&state, &root);
-    assert_eq!(out.status.code(), Some(0), "{}", String::from_utf8_lossy(&out.stderr));
-    assert!(out.stdout.is_empty() && out.stderr.is_empty(), "a successful child prints nothing");
+    assert_eq!(
+        out.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert!(
+        out.stdout.is_empty() && out.stderr.is_empty(),
+        "a successful child prints nothing"
+    );
     let refs = git(&remote, &["for-each-ref", "refs/fgos/"]);
-    assert!(refs.contains("alpha-aaaaaa"), "the sealed mailbox stream reached the remote: {refs:?}");
+    assert!(
+        refs.contains("alpha-aaaaaa"),
+        "the sealed mailbox stream reached the remote: {refs:?}"
+    );
     let _ = fs::remove_dir_all(&world);
 }
 
 #[test]
 fn the_sync_child_ends_quietly_with_status_zero_outside_a_repository_and_on_a_bad_flag() {
-    let world: PathBuf = std::env::temp_dir().join(format!("fgos_test_mailbox_sync_child_none_{}", std::process::id()));
+    let world: PathBuf = std::env::temp_dir().join(format!(
+        "fgos_test_mailbox_sync_child_none_{}",
+        std::process::id()
+    ));
     let _ = fs::remove_dir_all(&world);
     private_dir(&world);
     let state = world.join("state");
@@ -129,7 +191,11 @@ fn the_sync_child_ends_quietly_with_status_zero_outside_a_repository_and_on_a_ba
     let out = child(&state, &plain);
     assert_eq!(out.status.code(), Some(0));
     assert!(out.stdout.is_empty() && out.stderr.is_empty());
-    let out = Command::new(env!("CARGO_BIN_EXE_fgos")).args(["hook", "mailbox-sync", "--bogus"]).current_dir(&plain).output().unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_fgos"))
+        .args(["hook", "mailbox-sync", "--bogus"])
+        .current_dir(&plain)
+        .output()
+        .unwrap();
     assert_eq!(out.status.code(), Some(0));
     assert!(out.stdout.is_empty() && out.stderr.is_empty());
     let _ = fs::remove_dir_all(&world);

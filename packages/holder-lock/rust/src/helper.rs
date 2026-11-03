@@ -41,7 +41,13 @@ fn probe_holder(args: &[OsString]) -> i32 {
         eprintln!("probe-holder: usage: probe-holder --path <file>");
         return EXIT_USAGE;
     };
-    let file = match OpenOptions::new().read(true).write(true).create(true).truncate(false).open(&path) {
+    let file = match OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(&path)
+    {
         Ok(file) => file,
         Err(err) => {
             eprintln!("probe-holder: open {}: {err}", path.display());
@@ -60,7 +66,11 @@ fn probe_holder(args: &[OsString]) -> i32 {
         }
     }
     let mut stdout = std::io::stdout();
-    if stdout.write_all(b"R\n").and_then(|()| stdout.flush()).is_err() {
+    if stdout
+        .write_all(b"R\n")
+        .and_then(|()| stdout.flush())
+        .is_err()
+    {
         return 1;
     }
     std::thread::sleep(PROBE_HOLDER_LIFETIME);
@@ -87,7 +97,9 @@ mod keeper {
     use fgos_process::{job_view, Domain, DomainState};
     use windows_sys::Win32::Foundation::{CloseHandle, FILETIME, HANDLE, WAIT_OBJECT_0};
     use windows_sys::Win32::Storage::FileSystem::SYNCHRONIZE;
-    use windows_sys::Win32::System::Threading::{GetProcessTimes, OpenProcess, WaitForSingleObject, PROCESS_QUERY_LIMITED_INFORMATION};
+    use windows_sys::Win32::System::Threading::{
+        GetProcessTimes, OpenProcess, WaitForSingleObject, PROCESS_QUERY_LIMITED_INFORMATION,
+    };
 
     use super::EXIT_USAGE;
     use crate::predecessor;
@@ -112,7 +124,11 @@ mod keeper {
 
     fn args_of(args: &[OsString]) -> Option<(String, std::path::PathBuf)> {
         match args {
-            [job_flag, job, record_flag, record] if job_flag == "--job" && record_flag == "--record" => Some((job.to_str()?.to_string(), record.into())),
+            [job_flag, job, record_flag, record]
+                if job_flag == "--job" && record_flag == "--record" =>
+            {
+                Some((job.to_str()?.to_string(), record.into()))
+            }
             _ => None,
         }
     }
@@ -128,8 +144,10 @@ mod keeper {
         let holder = Owned(raw);
         // SAFETY: four valid out-pointers for a handle with query access.
         let created = unsafe {
-            let (mut c, mut e, mut k, mut u): (FILETIME, FILETIME, FILETIME, FILETIME) = std::mem::zeroed();
-            (GetProcessTimes(holder.0, &mut c, &mut e, &mut k, &mut u) != 0).then(|| (u64::from(c.dwHighDateTime) << 32) | u64::from(c.dwLowDateTime))
+            let (mut c, mut e, mut k, mut u): (FILETIME, FILETIME, FILETIME, FILETIME) =
+                std::mem::zeroed();
+            (GetProcessTimes(holder.0, &mut c, &mut e, &mut k, &mut u) != 0)
+                .then(|| (u64::from(c.dwHighDateTime) << 32) | u64::from(c.dwLowDateTime))
         };
         (created.map(|c| c.to_string()).as_deref() == Some(start_time)).then_some(holder)
     }
@@ -139,9 +157,15 @@ mod keeper {
             eprintln!("job-keeper: usage: job-keeper --job <name> --record <file>");
             return EXIT_USAGE;
         };
-        let domain = std::fs::read_to_string(&record).ok().and_then(|text| serde_json::from_str(&text).ok()).and_then(|value| predecessor::parse_record(&value));
+        let domain = std::fs::read_to_string(&record)
+            .ok()
+            .and_then(|text| serde_json::from_str(&text).ok())
+            .and_then(|value| predecessor::parse_record(&value));
         let Some(Domain::WindowsJob(domain)) = domain else {
-            eprintln!("job-keeper: {} holds no windows-job record", record.display());
+            eprintln!(
+                "job-keeper: {} holds no windows-job record",
+                record.display()
+            );
             return 1;
         };
         if domain.job != job {
@@ -172,12 +196,18 @@ mod keeper {
             // stdin closed without `finished`: not a reason to exit.
         });
         let mut stdout = std::io::stdout();
-        if stdout.write_all(b"K").and_then(|()| stdout.flush()).is_err() {
+        if stdout
+            .write_all(b"K")
+            .and_then(|()| stdout.flush())
+            .is_err()
+        {
             return 1;
         }
         loop {
             std::thread::sleep(POLL);
-            if (finished.load(Ordering::SeqCst) || holder.ended()) && view.is_empty() == DomainState::Empty {
+            if (finished.load(Ordering::SeqCst) || holder.ended())
+                && view.is_empty() == DomainState::Empty
+            {
                 return 0;
             }
         }

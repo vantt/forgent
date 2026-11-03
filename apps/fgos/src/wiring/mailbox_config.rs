@@ -80,15 +80,27 @@ impl CrossMachine {
             code: "config-schema",
             detail: format!("{} is not {what}", path.join(".")),
         };
-        let at = |path: &[&str]| path.iter().try_fold(snapshot, |value, name| value.get(*name));
-        let flag = |path: &[&str]| at(path).and_then(Value::as_bool).ok_or_else(|| refused(path, "a boolean"));
+        let at = |path: &[&str]| {
+            path.iter()
+                .try_fold(snapshot, |value, name| value.get(*name))
+        };
+        let flag = |path: &[&str]| {
+            at(path)
+                .and_then(Value::as_bool)
+                .ok_or_else(|| refused(path, "a boolean"))
+        };
         let remote = ["eventStore", "remote"];
         let interval = ["eventStore", "sync", "intervalSec"];
         Ok(Self {
             enabled: flag(&["mailbox", "crossMachine", "enabled"])?,
             require_confirmed: flag(&["mailbox", "remote", "requireConfirmed"])?,
-            remote: at(&remote).and_then(Value::as_str).ok_or_else(|| refused(&remote, "text"))?.to_owned(),
-            sync_interval_sec: at(&interval).and_then(Value::as_u64).ok_or_else(|| refused(&interval, "a whole number"))?,
+            remote: at(&remote)
+                .and_then(Value::as_str)
+                .ok_or_else(|| refused(&remote, "text"))?
+                .to_owned(),
+            sync_interval_sec: at(&interval)
+                .and_then(Value::as_u64)
+                .ok_or_else(|| refused(&interval, "a whole number"))?,
         })
     }
 }
@@ -102,7 +114,10 @@ pub fn project_limits(fgos_dir: &Path) -> Result<Loaded, ConfigFailure> {
 pub fn project_mailbox(fgos_dir: &Path) -> Result<(Loaded, CrossMachine), ConfigFailure> {
     let snapshot = effective_snapshot(fgos_dir)?;
     let cross = CrossMachine::read(&snapshot)?;
-    let config = snapshot.get(SECTION).cloned().map(|section| json!({ SECTION: section }));
+    let config = snapshot
+        .get(SECTION)
+        .cloned()
+        .map(|section| json!({ SECTION: section }));
     let loaded = load(config.as_ref()).map_err(ConfigFailure::Invalid)?;
     Ok((loaded, cross))
 }
@@ -200,7 +215,8 @@ mod tests {
     /// What the snapshot says is read as it is; a key it lacks or holds in
     /// the wrong type is refused instead of guessed.
     #[test]
-    fn the_cross_machine_settings_are_read_from_the_snapshot_and_a_missing_or_mistyped_key_is_refused() {
+    fn the_cross_machine_settings_are_read_from_the_snapshot_and_a_missing_or_mistyped_key_is_refused(
+    ) {
         let snapshot = |enabled: Value, interval: Value| {
             serde_json::json!({
                 "mailbox": { "crossMachine": { "enabled": enabled }, "remote": { "requireConfirmed": true } },
@@ -209,9 +225,18 @@ mod tests {
         };
         assert_eq!(
             CrossMachine::read(&snapshot(true.into(), 0.into())),
-            Ok(CrossMachine { enabled: true, require_confirmed: true, remote: "upstream".into(), sync_interval_sec: 0 })
+            Ok(CrossMachine {
+                enabled: true,
+                require_confirmed: true,
+                remote: "upstream".into(),
+                sync_interval_sec: 0
+            })
         );
-        for bad in [snapshot("yes".into(), 300.into()), snapshot(true.into(), "soon".into()), serde_json::json!({})] {
+        for bad in [
+            snapshot("yes".into(), 300.into()),
+            snapshot(true.into(), "soon".into()),
+            serde_json::json!({}),
+        ] {
             assert!(CrossMachine::read(&bad).is_err(), "{bad}");
         }
     }

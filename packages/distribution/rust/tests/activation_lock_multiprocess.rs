@@ -43,7 +43,13 @@ struct Holder(Child);
 impl Holder {
     fn spawn(lock: &Path, ready: &Path) -> Holder {
         let mut child = Command::new(std::env::current_exe().unwrap())
-            .args(["--exact", "child_entry", "--nocapture", "--test-threads", "1"])
+            .args([
+                "--exact",
+                "child_entry",
+                "--nocapture",
+                "--test-threads",
+                "1",
+            ])
             .env(ROLE, "holder")
             .env(LOCK, lock)
             .env(READY, ready)
@@ -76,8 +82,14 @@ impl Drop for Holder {
 }
 
 fn temp_workspace(tag: &str) -> PathBuf {
-    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
-    let dir = std::env::temp_dir().join(format!("fgos-activation-{tag}-{}-{nanos}", std::process::id()));
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let dir = std::env::temp_dir().join(format!(
+        "fgos-activation-{tag}-{}-{nanos}",
+        std::process::id()
+    ));
     fs::create_dir_all(&dir).unwrap();
     dir
 }
@@ -86,7 +98,9 @@ fn temp_workspace(tag: &str) -> PathBuf {
 /// process until the child execs, which could keep another test's lock alive.
 fn serial() -> std::sync::MutexGuard<'static, ()> {
     static SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
-    SERIAL.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
+    SERIAL
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
 }
 
 #[test]
@@ -106,7 +120,11 @@ fn a_held_activation_lock_refuses_and_a_killed_holder_frees_it_at_once() {
     holder.kill();
     let started = Instant::now();
     let guard = ActivationLockGuard::acquire(&ws).expect("a dead holder frees the lock");
-    assert!(started.elapsed() < Duration::from_millis(50), "took {:?}: no reclaim window may exist", started.elapsed());
+    assert!(
+        started.elapsed() < Duration::from_millis(50),
+        "took {:?}: no reclaim window may exist",
+        started.elapsed()
+    );
     drop(guard);
     fs::remove_dir_all(&ws).ok();
 }
@@ -116,7 +134,10 @@ fn two_guards_in_one_process_exclude_each_other_and_drop_releases() {
     let _serial = serial();
     let ws = temp_workspace("two");
     let first = ActivationLockGuard::acquire(&ws).expect("first");
-    assert!(matches!(ActivationLockGuard::acquire(&ws), Err(InitError::ActivationLockHeld(_))));
+    assert!(matches!(
+        ActivationLockGuard::acquire(&ws),
+        Err(InitError::ActivationLockHeld(_))
+    ));
     drop(first);
     drop(ActivationLockGuard::acquire(&ws).expect("after drop"));
     fs::remove_dir_all(&ws).ok();
@@ -129,10 +150,19 @@ fn the_activation_description_does_not_leak_into_a_spawned_child() {
     let _serial = serial();
     let ws = temp_workspace("leak");
     let guard = ActivationLockGuard::acquire(&ws).expect("acquire");
-    let mut child = Command::new("sleep").arg("30").stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).spawn().unwrap();
+    let mut child = Command::new("sleep")
+        .arg("30")
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
     let lock = fs::canonicalize(activation_lock_path(&ws)).unwrap();
     let mut open_on_lock = Vec::new();
-    for entry in fs::read_dir(format!("/proc/{}/fd", child.id())).unwrap().flatten() {
+    for entry in fs::read_dir(format!("/proc/{}/fd", child.id()))
+        .unwrap()
+        .flatten()
+    {
         if let Ok(target) = fs::read_link(entry.path()) {
             if target == lock {
                 open_on_lock.push(entry.path());
@@ -143,7 +173,10 @@ fn the_activation_description_does_not_leak_into_a_spawned_child() {
     let _ = child.wait();
     drop(guard);
     fs::remove_dir_all(&ws).ok();
-    assert!(open_on_lock.is_empty(), "the child inherited the lock description: {open_on_lock:?}");
+    assert!(
+        open_on_lock.is_empty(),
+        "the child inherited the lock description: {open_on_lock:?}"
+    );
 }
 
 #[test]
@@ -155,7 +188,10 @@ fn the_main_checkout_probe_sees_a_kernel_holder_and_passes_over_a_tombstone() {
     assert!(check_main_checkout_lock(&ws).is_ok(), "no holder: free");
 
     let mut holder = Holder::spawn(&v3, &ws.join("ready"));
-    assert!(matches!(check_main_checkout_lock(&ws), Err(MainCheckoutLockError::Held)));
+    assert!(matches!(
+        check_main_checkout_lock(&ws),
+        Err(MainCheckoutLockError::Held)
+    ));
     holder.kill();
     assert!(check_main_checkout_lock(&ws).is_ok(), "holder gone: free");
 

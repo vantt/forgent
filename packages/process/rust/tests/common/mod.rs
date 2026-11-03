@@ -8,8 +8,12 @@ use fgos_process::containment::{SpawnSpec, StartMode};
 use std::sync::LazyLock;
 
 pub fn scratch(name: &str) -> PathBuf {
-    let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
-    let dir = std::env::temp_dir().join(format!("fgos-test-{name}-{}-{}", std::process::id(), nanos));
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let dir =
+        std::env::temp_dir().join(format!("fgos-test-{name}-{}-{}", std::process::id(), nanos));
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir
@@ -19,9 +23,15 @@ pub fn wait_for(path: &Path) -> String {
     let start = Instant::now();
     loop {
         if let Ok(text) = fs::read_to_string(path) {
-            if !text.trim().is_empty() { return text; }
+            if !text.trim().is_empty() {
+                return text;
+            }
         }
-        assert!(start.elapsed() < Duration::from_secs(20), "timeout: {}", path.display());
+        assert!(
+            start.elapsed() < Duration::from_secs(20),
+            "timeout: {}",
+            path.display()
+        );
         std::thread::sleep(Duration::from_millis(10));
     }
 }
@@ -45,10 +55,17 @@ pub fn require_bwrap() -> Option<PathBuf> {
     static NESTED_USERNS: LazyLock<Option<String>> = LazyLock::new(|| {
         let content = fs::read_to_string("/proc/self/uid_map").ok()?;
         let lines: Vec<&str> = content.lines().collect();
-        if lines.len() == 1 && lines[0].split_whitespace().collect::<Vec<_>>() == ["0", "0", "4294967295"] {
+        if lines.len() == 1
+            && lines[0].split_whitespace().collect::<Vec<_>>() == ["0", "0", "4294967295"]
+        {
             None
         } else {
-            Some(lines.first().map(|l| l.trim().to_string()).unwrap_or_default())
+            Some(
+                lines
+                    .first()
+                    .map(|l| l.trim().to_string())
+                    .unwrap_or_default(),
+            )
         }
     });
 
@@ -58,7 +75,18 @@ pub fn require_bwrap() -> Option<PathBuf> {
             return Err("/usr/bin/bwrap not found".to_string());
         }
         match std::process::Command::new(&bwrap)
-            .args(["--unshare-user", "--unshare-pid", "--as-pid-1", "--dev-bind", "/", "/", "--proc", "/proc", "--", "/bin/true"])
+            .args([
+                "--unshare-user",
+                "--unshare-pid",
+                "--as-pid-1",
+                "--dev-bind",
+                "/",
+                "/",
+                "--proc",
+                "/proc",
+                "--",
+                "/bin/true",
+            ])
             .stdin(std::process::Stdio::null())
             .stdout(std::process::Stdio::null())
             .stderr(std::process::Stdio::piped())
@@ -86,7 +114,13 @@ pub fn require_bwrap() -> Option<PathBuf> {
 #[cfg(windows)]
 pub fn helper_argv() -> Vec<String> {
     let me = std::env::current_exe().unwrap().display().to_string();
-    vec![me, "--exact".into(), "helper_role".into(), "--nocapture".into(), "--test-threads=1".into()]
+    vec![
+        me,
+        "--exact".into(),
+        "helper_role".into(),
+        "--nocapture".into(),
+        "--test-threads=1".into(),
+    ]
 }
 
 #[cfg(windows)]
@@ -103,7 +137,8 @@ pub fn win_spec(role: &str, dir: &Path, extra: &[(&str, &str)]) -> SpawnSpec {
     s.cwd = dir.to_path_buf();
     s.env = std::env::vars().collect();
     s.env.insert("FGOS_TEST_ROLE".into(), role.into());
-    s.env.insert("FGOS_TEST_DIR".into(), dir.display().to_string());
+    s.env
+        .insert("FGOS_TEST_DIR".into(), dir.display().to_string());
     for (k, v) in extra {
         s.env.insert((*k).into(), (*v).into());
     }
@@ -121,30 +156,51 @@ fn write_pid(dir: &Path, name: &str, pid: u32) {
 pub fn run_helper_role() {
     use std::io::BufRead;
     use std::os::windows::process::CommandExt;
-    let Ok(role) = std::env::var("FGOS_TEST_ROLE") else { return; };
+    let Ok(role) = std::env::var("FGOS_TEST_ROLE") else {
+        return;
+    };
     let dir = PathBuf::from(std::env::var("FGOS_TEST_DIR").unwrap());
     match role.as_str() {
-        "sleep" => loop { std::thread::sleep(Duration::from_secs(3600)); },
+        "sleep" => loop {
+            std::thread::sleep(Duration::from_secs(3600));
+        },
         "tree" => {
             let child = helper_command().creation_flags(0).spawn().unwrap();
             write_pid(&dir, "child.pid", child.id());
-            let detached = helper_command().creation_flags(0x0000_0008).spawn().unwrap();
+            let detached = helper_command()
+                .creation_flags(0x0000_0008)
+                .spawn()
+                .unwrap();
             write_pid(&dir, "detached.pid", detached.id());
-            let nest = helper_command().env("FGOS_TEST_ROLE", "nest").env("FGOS_TEST_DIR", &dir).spawn().unwrap();
+            let nest = helper_command()
+                .env("FGOS_TEST_ROLE", "nest")
+                .env("FGOS_TEST_DIR", &dir)
+                .spawn()
+                .unwrap();
             write_pid(&dir, "nest.pid", nest.id());
-            loop { std::thread::sleep(Duration::from_secs(3600)); }
+            loop {
+                std::thread::sleep(Duration::from_secs(3600));
+            }
         }
         "nest" => {
             let grandchild = helper_command().creation_flags(0).spawn().unwrap();
             write_pid(&dir, "grandchild.pid", grandchild.id());
-            loop { std::thread::sleep(Duration::from_secs(3600)); }
+            loop {
+                std::thread::sleep(Duration::from_secs(3600));
+            }
         }
         "exit" => {
-            let code: i32 = std::env::var("FGOS_TEST_EXIT_CODE").ok().and_then(|c| c.parse().ok()).unwrap_or(0);
+            let code: i32 = std::env::var("FGOS_TEST_EXIT_CODE")
+                .ok()
+                .and_then(|c| c.parse().ok())
+                .unwrap_or(0);
             std::process::exit(code);
         }
         "lingering" => {
-            let _ = helper_command().creation_flags(0x0000_0008).spawn().unwrap();
+            let _ = helper_command()
+                .creation_flags(0x0000_0008)
+                .spawn()
+                .unwrap();
             std::process::exit(0);
         }
         "echo" => {
@@ -163,23 +219,39 @@ pub fn run_helper_role() {
                 Err(_) => "denied".to_string(),
             };
             let _ = fs::write(dir.join("breakaway.txt"), outcome);
-            loop { std::thread::sleep(Duration::from_secs(3600)); }
+            loop {
+                std::thread::sleep(Duration::from_secs(3600));
+            }
         }
         "holder" => {
-            let _keep = fgos_process::platform::windows_job::open_job(&std::env::var("FGOS_TEST_JOB").unwrap()).unwrap();
+            let _keep = fgos_process::platform::windows_job::open_job(
+                &std::env::var("FGOS_TEST_JOB").unwrap(),
+            )
+            .unwrap();
             let agent = helper_command().creation_flags(0).spawn().unwrap();
             write_pid(&dir, "agent.pid", agent.id());
             write_pid(&dir, "gate.pid", std::process::id());
-            loop { std::thread::sleep(Duration::from_secs(3600)); }
+            loop {
+                std::thread::sleep(Duration::from_secs(3600));
+            }
         }
         "supervisor" => {
             use fgos_process::containment::ContainmentDriver;
             let driver = fgos_process::containment::WindowsJobDriver;
             let mut domain = driver.create("attempt-supervisor").unwrap();
-            let job = fgos_process::containment::WindowsJobDriver::job_name(&domain).unwrap().to_string();
-            let _spawned = driver.spawn_in(&mut domain, win_spec("holder", &dir, &[("FGOS_TEST_JOB", &job)])).unwrap();
+            let job = fgos_process::containment::WindowsJobDriver::job_name(&domain)
+                .unwrap()
+                .to_string();
+            let _spawned = driver
+                .spawn_in(
+                    &mut domain,
+                    win_spec("holder", &dir, &[("FGOS_TEST_JOB", &job)]),
+                )
+                .unwrap();
             write_pid(&dir, "supervisor.pid", std::process::id());
-            loop { std::thread::sleep(Duration::from_secs(3600)); }
+            loop {
+                std::thread::sleep(Duration::from_secs(3600));
+            }
         }
         other => panic!("unknown role {other}"),
     }
@@ -189,7 +261,10 @@ pub fn run_helper_role() {
 #[cfg(unix)]
 #[allow(dead_code)] // used by the conformance binary only
 pub fn running(pattern: &str) -> usize {
-    let out = std::process::Command::new("pgrep").args(["-f", pattern]).output().expect("pgrep");
+    let out = std::process::Command::new("pgrep")
+        .args(["-f", pattern])
+        .output()
+        .expect("pgrep");
     String::from_utf8_lossy(&out.stdout).lines().count()
 }
 
@@ -197,5 +272,7 @@ pub fn running(pattern: &str) -> usize {
 #[cfg(unix)]
 #[allow(dead_code)] // used by the conformance binary only
 pub fn end_all(pattern: &str) {
-    let _ = std::process::Command::new("pkill").args(["-KILL", "-f", pattern]).status();
+    let _ = std::process::Command::new("pkill")
+        .args(["-KILL", "-f", pattern])
+        .status();
 }

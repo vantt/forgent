@@ -2077,7 +2077,10 @@ mod tests {
     #[cfg(unix)]
     fn git_that_ignores_gc_switch(dir: &Path) -> PathBuf {
         use std::os::unix::fs::PermissionsExt;
-        let real = Command::new("sh").args(["-c", "command -v git"]).output().unwrap();
+        let real = Command::new("sh")
+            .args(["-c", "command -v git"])
+            .output()
+            .unwrap();
         let real = String::from_utf8(real.stdout).unwrap().trim().to_string();
         assert!(!real.is_empty(), "git must be on PATH");
         let wrapper = dir.join("git");
@@ -2156,8 +2159,10 @@ mod tests {
         .unwrap();
         assert!(report.pass(), "{report:?}");
         let kept = report.kept.unwrap();
-        let resource =
-            fgos_holder_lock::Resource::new("borrow-vectors", kept.join("gc-auto-loose-objects.lock"));
+        let resource = fgos_holder_lock::Resource::new(
+            "borrow-vectors",
+            kept.join("gc-auto-loose-objects.lock"),
+        );
         assert_eq!(
             fgos_holder_lock::probe(&resource).unwrap(),
             fgos_holder_lock::Probe::Free

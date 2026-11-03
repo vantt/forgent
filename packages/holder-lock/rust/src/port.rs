@@ -20,9 +20,9 @@ use std::time::{Duration, Instant};
 
 use fgos_process::facts::ProcTuple;
 #[cfg(unix)]
-use fgos_process::FdSlot;
-#[cfg(unix)]
 use fgos_process::mapped::{spawn_mapped, MappedChild, MappedLead, MappedSpawn, MappedStdio};
+#[cfg(unix)]
+use fgos_process::FdSlot;
 use fgos_process::{Domain, WatchTrace};
 use serde_json::{json, Value};
 
@@ -73,7 +73,11 @@ impl HelperExe {
 
     /// The argv prefix to which a role and its arguments are appended.
     pub fn argv(&self) -> Vec<std::ffi::OsString> {
-        vec![self.0.clone().into_os_string(), "internal".into(), "holder-lock-helper".into()]
+        vec![
+            self.0.clone().into_os_string(),
+            "internal".into(),
+            "holder-lock-helper".into(),
+        ]
     }
 }
 
@@ -92,7 +96,11 @@ pub struct Resource {
 impl Resource {
     /// A resource named `name` locked through the file at `path`.
     pub fn new(name: impl Into<String>, path: impl Into<PathBuf>) -> Self {
-        Resource { name: name.into(), path: path.into(), predecessor_kinds: Vec::new() }
+        Resource {
+            name: name.into(),
+            path: path.into(),
+            predecessor_kinds: Vec::new(),
+        }
     }
 }
 
@@ -188,7 +196,10 @@ pub struct Handle {
 }
 
 /// The per-spawn scan floor and the start of the latest successful proof.
-type Marks = std::sync::Mutex<(Option<fgos_process::facts::CreationMark>, Option<fgos_process::facts::CreationMark>)>;
+type Marks = std::sync::Mutex<(
+    Option<fgos_process::facts::CreationMark>,
+    Option<fgos_process::facts::CreationMark>,
+)>;
 
 /// Lagged scan floor for fork-inherited copies; release settles transfers.
 #[cfg_attr(not(unix), allow(dead_code))]
@@ -221,7 +232,9 @@ impl Handle {
     }
 
     fn settle_release(&mut self) -> Release {
-        let Some(file) = self.file.take() else { return Release::Released { killed: 0 }; };
+        let Some(file) = self.file.take() else {
+            return Release::Released { killed: 0 };
+        };
         #[cfg(target_os = "linux")]
         if self.mode == Mode::Ex {
             return driver::flock::settle_release(file, Duration::from_millis(self.kill_wait_ms));
@@ -247,7 +260,10 @@ impl Handle {
             return Err(io::Error::other("only an exclusive holder clears a domain"));
         }
         validate(self).map_err(io::Error::other)?;
-        predecessor::clear(&predecessor::record_path(&self.resource.path), Duration::from_millis(self.kill_wait_ms))
+        predecessor::clear(
+            &predecessor::record_path(&self.resource.path),
+            Duration::from_millis(self.kill_wait_ms),
+        )
     }
 
     #[cfg_attr(not(unix), allow(dead_code))]
@@ -267,7 +283,10 @@ impl Handle {
     /// would find it populated and kill it.
     pub fn declare_domain(&self, domain: &Domain) -> io::Result<()> {
         if self.mode != Mode::Ex {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, "only an exclusive holder declares a domain"));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "only an exclusive holder declares a domain",
+            ));
         }
         predecessor::declare(&predecessor::record_path(&self.resource.path), domain)
     }
@@ -285,7 +304,9 @@ pub struct BorrowedHandle<'a> {
 impl<'a> BorrowedHandle<'a> {
     /// Duplicate with CLOEXEC and verify before admitting it to a native scope.
     pub fn new(owner: &'a Handle) -> Result<Self, BorrowError> {
-        if cfg!(windows) { return Err(BorrowError::Unsupported); }
+        if cfg!(windows) {
+            return Err(BorrowError::Unsupported);
+        }
         validate(owner)?;
         let file = owner.file().try_clone().map_err(BorrowError::Io)?;
         let handle = Handle {
@@ -295,11 +316,17 @@ impl<'a> BorrowedHandle<'a> {
             mode: owner.mode,
             kill_wait_ms: owner.kill_wait_ms,
             terminate_grace_ms: owner.terminate_grace_ms,
-            since: std::sync::Mutex::new(*owner.since.lock().map_err(|_| {
-                BorrowError::InvalidSpec("lock-history-poisoned".into())
-            })?),
+            since: std::sync::Mutex::new(
+                *owner
+                    .since
+                    .lock()
+                    .map_err(|_| BorrowError::InvalidSpec("lock-history-poisoned".into()))?,
+            ),
         };
-        let borrowed = Self { handle, _owner: std::marker::PhantomData };
+        let borrowed = Self {
+            handle,
+            _owner: std::marker::PhantomData,
+        };
         validate(borrowed.as_ref())?;
         Ok(borrowed)
     }
@@ -354,11 +381,15 @@ impl BorrowedHandle<'static> {
 }
 
 impl AsRef<Handle> for BorrowedHandle<'_> {
-    fn as_ref(&self) -> &Handle { &self.handle }
+    fn as_ref(&self) -> &Handle {
+        &self.handle
+    }
 }
 
 impl AsRef<Handle> for Handle {
-    fn as_ref(&self) -> &Handle { self }
+    fn as_ref(&self) -> &Handle {
+        self
+    }
 }
 
 impl Drop for BorrowedHandle<'_> {
@@ -428,7 +459,10 @@ impl Guarantee {
 
     /// Whether a lock may be taken at all (exclusion is a kernel level).
     pub fn usable(&self) -> bool {
-        matches!(self.exclusion, Level::Kernel | Level::KernelUnmeasured | Level::JobScoped)
+        matches!(
+            self.exclusion,
+            Level::Kernel | Level::KernelUnmeasured | Level::JobScoped
+        )
     }
 }
 
@@ -587,17 +621,27 @@ pub enum BorrowError {
 impl std::fmt::Display for BorrowError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            BorrowError::ForeignHolder { pids } => write!(f, "lock-description-foreign-holder: {pids:?}"),
+            BorrowError::ForeignHolder { pids } => {
+                write!(f, "lock-description-foreign-holder: {pids:?}")
+            }
             BorrowError::ResourceReplaced => write!(f, "lock-resource-replaced"),
-            BorrowError::IoUnsupported => write!(f, "borrow-io-unsupported: explicit I/O requires Unix"),
+            BorrowError::IoUnsupported => {
+                write!(f, "borrow-io-unsupported: explicit I/O requires Unix")
+            }
             BorrowError::OutputLimit(stream) => write!(f, "borrow-output-limit: {stream}"),
-            BorrowError::Deadline { termination } => write!(f, "borrow-deadline: {}", termination.as_str()),
+            BorrowError::Deadline { termination } => {
+                write!(f, "borrow-deadline: {}", termination.as_str())
+            }
             BorrowError::Io(err) => write!(f, "borrow-io-failed: {err}"),
             BorrowError::InvalidSpec(why) => write!(f, "borrow-spec-invalid: {why}"),
             BorrowError::Spawn(err) => write!(f, "borrow-spawn-failed: {err}"),
             BorrowError::Wait(err) => write!(f, "borrow-wait-failed: {err}"),
-            BorrowError::Unsupported => write!(f, "borrow-unsupported: no lock driver on this platform"),
-            BorrowError::LeftoverNotKilled { pids, .. } => write!(f, "borrow-leftover-not-killed: {pids:?}"),
+            BorrowError::Unsupported => {
+                write!(f, "borrow-unsupported: no lock driver on this platform")
+            }
+            BorrowError::LeftoverNotKilled { pids, .. } => {
+                write!(f, "borrow-leftover-not-killed: {pids:?}")
+            }
         }
     }
 }
@@ -631,7 +675,10 @@ struct Locked<'a> {
 
 impl<'a> Locked<'a> {
     fn new(drv: &'a dyn LockDriver, file: &'a File) -> Self {
-        Locked { drv, file: Some(file) }
+        Locked {
+            drv,
+            file: Some(file),
+        }
     }
 
     /// The lock now belongs to whoever owns the file.
@@ -655,7 +702,12 @@ pub fn lock_description(file: &File, mode: Mode, wait: Wait) -> io::Result<Descr
     lock_description_with(driver::current(), file, mode, wait)
 }
 
-fn lock_description_with(drv: &dyn LockDriver, file: &File, mode: Mode, wait: Wait) -> io::Result<DescriptionLock> {
+fn lock_description_with(
+    drv: &dyn LockDriver,
+    file: &File,
+    mode: Mode,
+    wait: Wait,
+) -> io::Result<DescriptionLock> {
     let started = Instant::now();
     let deadline = match wait {
         Wait::Try => None,
@@ -667,7 +719,13 @@ fn lock_description_with(drv: &dyn LockDriver, file: &File, mode: Mode, wait: Wa
 /// Poll non-blocking attempts until `deadline` (`None`: one attempt). A
 /// timeout is only reported once the deadline has passed; `waited_ms`
 /// counts from `started`.
-fn lock_until(drv: &dyn LockDriver, file: &File, mode: Mode, started: Instant, deadline: Option<Instant>) -> io::Result<DescriptionLock> {
+fn lock_until(
+    drv: &dyn LockDriver,
+    file: &File,
+    mode: Mode,
+    started: Instant,
+    deadline: Option<Instant>,
+) -> io::Result<DescriptionLock> {
     let mut pause = Duration::from_millis(1);
     loop {
         if drv.try_lock(file, mode)? == TryLock::Locked {
@@ -678,7 +736,9 @@ fn lock_until(drv: &dyn LockDriver, file: &File, mode: Mode, started: Instant, d
         };
         let now = Instant::now();
         if now >= deadline {
-            return Ok(DescriptionLock::Timeout { waited_ms: started.elapsed().as_millis() as u64 });
+            return Ok(DescriptionLock::Timeout {
+                waited_ms: started.elapsed().as_millis() as u64,
+            });
         }
         std::thread::sleep(pause.min(deadline - now));
         pause = (pause * 2).min(Duration::from_millis(10));
@@ -688,7 +748,12 @@ fn lock_until(drv: &dyn LockDriver, file: &File, mode: Mode, started: Instant, d
 fn open_lock_file(path: &Path) -> io::Result<File> {
     // std opens with O_CLOEXEC on every unix; O_RDWR because NFSv4 and BSD
     // refuse an exclusive lock on a read-only descriptor.
-    OpenOptions::new().read(true).write(true).create(true).truncate(false).open(path)
+    OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(path)
 }
 
 /// Take `resource` in `mode`. Returns `Acquired` only when the kernel lock is
@@ -703,16 +768,30 @@ pub fn acquire(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64) -
 /// [`predecessor::admit_with_trace`]); the same code path, the trace is empty
 /// when no record was judged.
 #[doc(hidden)]
-pub fn acquire_with_trace(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64) -> (Acquire, WatchTrace) {
+pub fn acquire_with_trace(
+    resource: &Resource,
+    mode: Mode,
+    wait: Wait,
+    kill_wait_ms: u64,
+) -> (Acquire, WatchTrace) {
     let mut trace = WatchTrace::default();
     let answer = acquire_traced(resource, mode, wait, kill_wait_ms, &mut trace);
     (answer, trace)
 }
 
-fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64, trace: &mut WatchTrace) -> Acquire {
+fn acquire_traced(
+    resource: &Resource,
+    mode: Mode,
+    wait: Wait,
+    kill_wait_ms: u64,
+    trace: &mut WatchTrace,
+) -> Acquire {
     let drv = driver::current();
     if !drv.supported() {
-        return Acquire::Unavailable { reason: UnavailableReason::UnsupportedPlatform, detail: drv.unsupported_detail().to_string() };
+        return Acquire::Unavailable {
+            reason: UnavailableReason::UnsupportedPlatform,
+            detail: drv.unsupported_detail().to_string(),
+        };
     }
     let started = Instant::now();
     let deadline = match wait {
@@ -727,14 +806,27 @@ fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64
         let opened_after = fgos_process::facts::creation_mark();
         let file = match open_lock_file(&resource.path) {
             Ok(file) => file,
-            Err(err) => return Acquire::Unavailable { reason: UnavailableReason::IoError, detail: format!("open {}: {err}", resource.path.display()) },
+            Err(err) => {
+                return Acquire::Unavailable {
+                    reason: UnavailableReason::IoError,
+                    detail: format!("open {}: {err}", resource.path.display()),
+                }
+            }
         };
         match drv.file_guarantee(&file) {
             Ok(g) if !g.usable() => {
-                return Acquire::Unavailable { reason: UnavailableReason::UnsupportedFilesystem, detail: g.notes.join("; ") };
+                return Acquire::Unavailable {
+                    reason: UnavailableReason::UnsupportedFilesystem,
+                    detail: g.notes.join("; "),
+                };
             }
             Ok(_) => {}
-            Err(err) => return Acquire::Unavailable { reason: UnavailableReason::IoError, detail: format!("statfs {}: {err}", resource.path.display()) },
+            Err(err) => {
+                return Acquire::Unavailable {
+                    reason: UnavailableReason::IoError,
+                    detail: format!("statfs {}: {err}", resource.path.display()),
+                }
+            }
         }
         let until = match wait {
             Wait::Try => None,
@@ -742,11 +834,23 @@ fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64
         };
         match lock_until(drv, &file, mode, started, until) {
             Ok(DescriptionLock::Locked) => {}
-            Ok(DescriptionLock::Held) => return Acquire::Held { reason: HeldReason::KernelLockHeld, domain: None },
-            Ok(DescriptionLock::Timeout { .. }) => {
-                return Acquire::Timeout { waited_ms: started.elapsed().as_millis() as u64 };
+            Ok(DescriptionLock::Held) => {
+                return Acquire::Held {
+                    reason: HeldReason::KernelLockHeld,
+                    domain: None,
+                }
             }
-            Err(err) => return Acquire::Unavailable { reason: UnavailableReason::IoError, detail: format!("flock {}: {err}", resource.path.display()) },
+            Ok(DescriptionLock::Timeout { .. }) => {
+                return Acquire::Timeout {
+                    waited_ms: started.elapsed().as_millis() as u64,
+                };
+            }
+            Err(err) => {
+                return Acquire::Unavailable {
+                    reason: UnavailableReason::IoError,
+                    detail: format!("flock {}: {err}", resource.path.display()),
+                }
+            }
         }
         let locked = Locked::new(drv, &file);
         if !drv.same_file(&file, &resource.path) {
@@ -754,22 +858,44 @@ fn acquire_traced(resource: &Resource, mode: Mode, wait: Wait, kill_wait_ms: u64
             drop(file);
             replaced += 1;
             if replaced > 8 || (wait != Wait::Try && Instant::now() >= deadline) {
-                return Acquire::Timeout { waited_ms: started.elapsed().as_millis() as u64 };
+                return Acquire::Timeout {
+                    waited_ms: started.elapsed().as_millis() as u64,
+                };
             }
             continue;
         }
-        if let Some(domain) = predecessor::disallowed_kind(&predecessor::record_path(&resource.path), &resource.predecessor_kinds) {
-            return Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) };
+        if let Some(domain) = predecessor::disallowed_kind(
+            &predecessor::record_path(&resource.path),
+            &resource.predecessor_kinds,
+        ) {
+            return Acquire::Held {
+                reason: HeldReason::PredecessorDomainNotEmpty,
+                domain: Some(domain),
+            };
         }
-        let (admitted, seen) = predecessor::admit_with_trace(&predecessor::record_path(&resource.path), Duration::from_millis(kill_wait_ms));
+        let (admitted, seen) = predecessor::admit_with_trace(
+            &predecessor::record_path(&resource.path),
+            Duration::from_millis(kill_wait_ms),
+        );
         *trace = seen;
         if let Admit::NotEmpty { domain } = admitted {
             drop(locked);
             drop(file);
-            return Acquire::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) };
+            return Acquire::Held {
+                reason: HeldReason::PredecessorDomainNotEmpty,
+                domain: Some(domain),
+            };
         }
         locked.keep();
-        return Acquire::Acquired(Handle { protected_roots: vec![], file: Some(file), resource: resource.clone(), mode, kill_wait_ms, terminate_grace_ms: 3000, since: std::sync::Mutex::new((opened_after, opened_after)) });
+        return Acquire::Acquired(Handle {
+            protected_roots: vec![],
+            file: Some(file),
+            resource: resource.clone(),
+            mode,
+            kill_wait_ms,
+            terminate_grace_ms: 3000,
+            since: std::sync::Mutex::new((opened_after, opened_after)),
+        });
     }
 }
 
@@ -782,7 +908,9 @@ pub fn validate(handle: &Handle) -> Result<(), BorrowError> {
         return Err(BorrowError::Unsupported);
     }
     if handle.mode != Mode::Ex {
-        return Err(BorrowError::InvalidSpec("only an exclusive lock can be borrowed".into()));
+        return Err(BorrowError::InvalidSpec(
+            "only an exclusive lock can be borrowed".into(),
+        ));
     }
     if !drv.same_file(handle.file(), &handle.resource.path) {
         return Err(BorrowError::ResourceReplaced);
@@ -790,7 +918,9 @@ pub fn validate(handle: &Handle) -> Result<(), BorrowError> {
     #[cfg(unix)]
     {
         let annotation = format!("{}:{BORROW_SLOT}", handle.name());
-        if borrowed_check(handle.file(), handle.path(), Some(&annotation), BORROW_SLOT) != BorrowedCheck::Borrower {
+        if borrowed_check(handle.file(), handle.path(), Some(&annotation), BORROW_SLOT)
+            != BorrowedCheck::Borrower
+        {
             return Err(BorrowError::ResourceReplaced);
         }
     }
@@ -808,8 +938,12 @@ pub fn validate_quiescent(handle: &Handle) -> Result<(), BorrowError> {
     #[cfg(target_os = "linux")]
     {
         let started = fgos_process::facts::creation_mark();
-        driver::flock::wait_unborrowed(handle.file(), Duration::from_millis(handle.kill_wait_ms), handle.since())
-            .map_err(|left| BorrowError::ForeignHolder { pids: left.pids })?;
+        driver::flock::wait_unborrowed(
+            handle.file(),
+            Duration::from_millis(handle.kill_wait_ms),
+            handle.since(),
+        )
+        .map_err(|left| BorrowError::ForeignHolder { pids: left.pids })?;
         handle.proven_alone_at(started);
         // Resource identity can change while transient holders drain.
         validate(handle)
@@ -843,7 +977,10 @@ pub enum Release {
 }
 
 fn is_git(program: &str) -> bool {
-    let base = Path::new(program).file_name().and_then(|n| n.to_str()).unwrap_or(program);
+    let base = Path::new(program)
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or(program);
     base == "git" || base.eq_ignore_ascii_case("git.exe")
 }
 
@@ -875,12 +1012,21 @@ pub fn borrowed_argv(argv: &[String]) -> Vec<String> {
 /// creates, a second job owner (`helper`, role `job-keeper`) outlives a dead
 /// holder, and nothing is handed to the child (`borrow_windows`). `helper` is
 /// unused on POSIX.
-pub fn run_borrowed(handle: &impl AsRef<Handle>, spec: &BorrowSpec, helper: &HelperExe) -> Result<BorrowOutcome, BorrowError> {
+pub fn run_borrowed(
+    handle: &impl AsRef<Handle>,
+    spec: &BorrowSpec,
+    helper: &HelperExe,
+) -> Result<BorrowOutcome, BorrowError> {
     let handle = handle.as_ref();
     validate(handle)?;
     #[cfg(windows)]
     {
-        crate::borrow_windows::run(handle, spec, helper, &crate::borrow_windows::BorrowControl::none())
+        crate::borrow_windows::run(
+            handle,
+            spec,
+            helper,
+            &crate::borrow_windows::BorrowControl::none(),
+        )
     }
     #[cfg(unix)]
     {
@@ -894,7 +1040,8 @@ fn run_borrowed_posix(handle: &Handle, spec: &BorrowSpec) -> Result<BorrowOutcom
     let drv = driver::current();
     let mut request = borrowed_request(handle, spec)?;
     drv.prepare_borrow(&mut request);
-    let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), handle.file())]).map_err(BorrowError::Spawn)?;
+    let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), handle.file())])
+        .map_err(BorrowError::Spawn)?;
     finish_borrowed(handle, &mut child)
 }
 
@@ -906,13 +1053,23 @@ fn finish_borrowed(handle: &Handle, child: &mut MappedChild) -> Result<BorrowOut
     let waited = wait_exited_unreaped(pid).map_err(BorrowError::Wait);
     let started = fgos_process::facts::creation_mark();
     let since = handle.since();
-    let leftovers = driver::current().end_leftovers(handle.file(), pid, Duration::from_millis(handle.kill_wait_ms), since, &handle.protected_roots);
+    let leftovers = driver::current().end_leftovers(
+        handle.file(),
+        pid,
+        Duration::from_millis(handle.kill_wait_ms),
+        since,
+        &handle.protected_roots,
+    );
     if leftovers.is_ok() {
         handle.proven_alone_at(started);
     }
     let status = child.wait().map_err(BorrowError::Wait)?;
     let (exit, signal) = exit_parts(&status);
-    let mut outcome = BorrowOutcome { exit, signal, leftovers_killed: 0 };
+    let mut outcome = BorrowOutcome {
+        exit,
+        signal,
+        leftovers_killed: 0,
+    };
     match leftovers {
         Ok(killed) => outcome.leftovers_killed = killed,
         Err(left) => {
@@ -920,7 +1077,10 @@ fn finish_borrowed(handle: &Handle, child: &mut MappedChild) -> Result<BorrowOut
                 return Err(BorrowError::ForeignHolder { pids: left.pids });
             }
             outcome.leftovers_killed = left.killed;
-            return Err(BorrowError::LeftoverNotKilled { outcome, pids: left.pids });
+            return Err(BorrowError::LeftoverNotKilled {
+                outcome,
+                pids: left.pids,
+            });
         }
     }
     waited?;
@@ -930,25 +1090,38 @@ fn finish_borrowed(handle: &Handle, child: &mut MappedChild) -> Result<BorrowOut
 /// The borrowing child's request: the argv `borrowed_argv` shapes, the
 /// spec's environment plus the slot annotation, its stdio.
 #[cfg(unix)]
-fn borrowed_request(handle: &Handle, spec: &BorrowSpec) -> Result<MappedSpawn<'static>, BorrowError> {
+fn borrowed_request(
+    handle: &Handle,
+    spec: &BorrowSpec,
+) -> Result<MappedSpawn<'static>, BorrowError> {
     validate(handle)?;
     let drv = driver::current();
     if !drv.supported() {
         return Err(BorrowError::Unsupported);
     }
     if handle.mode != Mode::Ex {
-        return Err(BorrowError::InvalidSpec("only an exclusive lock can be borrowed".into()));
+        return Err(BorrowError::InvalidSpec(
+            "only an exclusive lock can be borrowed".into(),
+        ));
     }
     let argv = borrowed_argv(&spec.argv);
     if argv.is_empty() {
         return Err(BorrowError::InvalidSpec("argv is empty".into()));
     }
-    let mut env: Vec<(std::ffi::OsString, std::ffi::OsString)> = spec.env.iter().map(|(k, v)| (k.into(), v.into())).collect();
-    env.push((LOCK_FD_ENV.into(), format!("{}:{BORROW_SLOT}", handle.resource.name).into()));
+    let mut env: Vec<(std::ffi::OsString, std::ffi::OsString)> =
+        spec.env.iter().map(|(k, v)| (k.into(), v.into())).collect();
+    env.push((
+        LOCK_FD_ENV.into(),
+        format!("{}:{BORROW_SLOT}", handle.resource.name).into(),
+    ));
     let stdio = match &spec.stdio {
         BorrowStdio::Inherit => [MappedStdio::Inherit; 3],
         BorrowStdio::Null => [MappedStdio::Null; 3],
-        BorrowStdio::Files { .. } => return Err(BorrowError::InvalidSpec("file stdio is only available on Windows".into())),
+        BorrowStdio::Files { .. } => {
+            return Err(BorrowError::InvalidSpec(
+                "file stdio is only available on Windows".into(),
+            ))
+        }
     };
     Ok(MappedSpawn {
         argv: argv.into_iter().map(Into::into).collect(),
@@ -964,7 +1137,11 @@ fn borrowed_request(handle: &Handle, spec: &BorrowSpec) -> Result<MappedSpawn<'s
 /// predecessor handling and per-OS leftover domain. Unix only; Windows keeps
 /// its existing borrow path and refuses this form before starting a child.
 /// The spec's stdio is superseded by explicit input and captured output.
-pub fn run_borrowed_io(handle: &impl AsRef<Handle>, spec: &BorrowSpec, io: &BorrowIo) -> Result<BorrowIoOutcome, BorrowError> {
+pub fn run_borrowed_io(
+    handle: &impl AsRef<Handle>,
+    spec: &BorrowSpec,
+    io: &BorrowIo,
+) -> Result<BorrowIoOutcome, BorrowError> {
     run_borrowed_io_with(handle.as_ref(), spec, io, false)
 }
 
@@ -973,11 +1150,20 @@ pub fn run_borrowed_io(handle: &impl AsRef<Handle>, spec: &BorrowSpec, io: &Borr
 /// cleanup that inherited it (a descendant that left the process tree and
 /// dropped the borrowed descriptor). Only Linux scans; elsewhere `escaped`
 /// stays empty.
-pub fn run_borrowed_io_watched(handle: &impl AsRef<Handle>, spec: &BorrowSpec, io: &BorrowIo) -> Result<BorrowIoOutcome, BorrowError> {
+pub fn run_borrowed_io_watched(
+    handle: &impl AsRef<Handle>,
+    spec: &BorrowSpec,
+    io: &BorrowIo,
+) -> Result<BorrowIoOutcome, BorrowError> {
     run_borrowed_io_with(handle.as_ref(), spec, io, true)
 }
 
-fn run_borrowed_io_with(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watch: bool) -> Result<BorrowIoOutcome, BorrowError> {
+fn run_borrowed_io_with(
+    handle: &Handle,
+    spec: &BorrowSpec,
+    io: &BorrowIo,
+    watch: bool,
+) -> Result<BorrowIoOutcome, BorrowError> {
     validate(handle)?;
     #[cfg(not(unix))]
     {
@@ -991,19 +1177,27 @@ fn run_borrowed_io_with(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watch
 }
 
 #[cfg(unix)]
-fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watch: bool) -> Result<BorrowIoOutcome, BorrowError> {
+fn run_borrowed_io_posix(
+    handle: &Handle,
+    spec: &BorrowSpec,
+    io: &BorrowIo,
+    watch: bool,
+) -> Result<BorrowIoOutcome, BorrowError> {
     use std::io::Write;
     let drv = driver::current();
     let mut explicit = spec.clone();
     explicit.stdio = BorrowStdio::Null;
     let watch_token = watch_token();
     if watch {
-        explicit.env.insert(WATCH_ENV.to_string(), watch_token.clone());
+        explicit
+            .env
+            .insert(WATCH_ENV.to_string(), watch_token.clone());
     }
     let mut request = borrowed_request(handle, &explicit)?;
     request.stdio = [MappedStdio::Piped; 3];
     drv.prepare_borrow(&mut request);
-    let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), handle.file())]).map_err(BorrowError::Spawn)?;
+    let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), handle.file())])
+        .map_err(BorrowError::Spawn)?;
     let pid = child.id();
     let mut input = child.stdin.take();
     let mut stdout = child.stdout.take().expect("piped stdout");
@@ -1023,7 +1217,9 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
         let exit_fd = fgos_process::control::exit_descriptor(pid);
         loop {
             if Instant::now() >= io.deadline {
-                return Err(BorrowError::Deadline { termination: Termination::KilledAfterGrace });
+                return Err(BorrowError::Deadline {
+                    termination: Termination::KilledAfterGrace,
+                });
             }
             if out_open {
                 out_open = capture_available(&mut stdout, &mut out, io.stdout_limit, "stdout")?;
@@ -1037,8 +1233,12 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
             if let Some(pipe) = input.as_mut() {
                 match pipe.write(&io.stdin[written..]) {
                     Ok(n) => written += n,
-                    Err(e) if e.kind() == std::io::ErrorKind::WouldBlock || e.kind() == std::io::ErrorKind::Interrupted => {}
-                    Err(e) if e.kind() == std::io::ErrorKind::BrokenPipe => { input.take(); }
+                    Err(e)
+                        if e.kind() == std::io::ErrorKind::WouldBlock
+                            || e.kind() == std::io::ErrorKind::Interrupted => {}
+                    Err(e) if e.kind() == std::io::ErrorKind::BrokenPipe => {
+                        input.take();
+                    }
                     Err(e) => return Err(BorrowError::Io(e)),
                 }
                 if written == io.stdin.len() {
@@ -1051,19 +1251,39 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
             use std::os::fd::AsRawFd;
             let mut fds = Vec::with_capacity(4);
             if out_open {
-                fds.push(libc::pollfd { fd: stdout.as_raw_fd(), events: libc::POLLIN, revents: 0 });
+                fds.push(libc::pollfd {
+                    fd: stdout.as_raw_fd(),
+                    events: libc::POLLIN,
+                    revents: 0,
+                });
             }
             if err_open {
-                fds.push(libc::pollfd { fd: stderr.as_raw_fd(), events: libc::POLLIN, revents: 0 });
+                fds.push(libc::pollfd {
+                    fd: stderr.as_raw_fd(),
+                    events: libc::POLLIN,
+                    revents: 0,
+                });
             }
             if let Some(pipe) = input.as_ref() {
-                fds.push(libc::pollfd { fd: pipe.as_raw_fd(), events: libc::POLLOUT, revents: 0 });
+                fds.push(libc::pollfd {
+                    fd: pipe.as_raw_fd(),
+                    events: libc::POLLOUT,
+                    revents: 0,
+                });
             }
             if let Some(fd) = exit_fd.as_ref() {
-                fds.push(libc::pollfd { fd: fd.as_raw_fd(), events: libc::POLLIN, revents: 0 });
+                fds.push(libc::pollfd {
+                    fd: fd.as_raw_fd(),
+                    events: libc::POLLIN,
+                    revents: 0,
+                });
             }
             let left = io.deadline.saturating_duration_since(Instant::now());
-            let step = if exit_fd.is_some() { left } else { left.min(Duration::from_millis(1)) };
+            let step = if exit_fd.is_some() {
+                left
+            } else {
+                left.min(Duration::from_millis(1))
+            };
             let timeout = step.as_millis().clamp(1, i32::MAX as u128) as libc::c_int;
             // SAFETY: poll reads and writes only the pollfd array it is given.
             if unsafe { libc::poll(fds.as_mut_ptr(), fds.len() as libc::nfds_t, timeout) } < 0 {
@@ -1080,7 +1300,9 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
         // prepare_borrow makes the root its group leader. Retain the root
         // unreaped throughout grace and drain, pinning the process group id.
         // SIGTERM also lets children remove their own exclusively-created files.
-        unsafe { libc::killpg(pid as libc::pid_t, libc::SIGTERM); }
+        unsafe {
+            libc::killpg(pid as libc::pid_t, libc::SIGTERM);
+        }
         let until = Instant::now() + Duration::from_millis(handle.terminate_grace_ms);
         let terminated = loop {
             match child_exited_unreaped(pid, true) {
@@ -1094,7 +1316,11 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
         }
         if matches!(transfer, Err(BorrowError::Deadline { .. })) {
             transfer = Err(BorrowError::Deadline {
-                termination: if terminated { Termination::Terminated } else { Termination::KilledAfterGrace },
+                termination: if terminated {
+                    Termination::Terminated
+                } else {
+                    Termination::KilledAfterGrace
+                },
             });
         }
     }
@@ -1106,10 +1332,19 @@ fn run_borrowed_io_posix(handle: &Handle, spec: &BorrowSpec, io: &BorrowIo, watc
     while capture_chunk(&mut stdout, &mut out, io.stdout_limit, "stdout")? == Some(true) {}
     while capture_chunk(&mut stderr, &mut err, io.stderr_limit, "stderr")? == Some(true) {}
     #[cfg(target_os = "linux")]
-    let escaped = if watch { fgos_process::containment::environment_marked(WATCH_ENV, &watch_token) } else { Vec::new() };
+    let escaped = if watch {
+        fgos_process::containment::environment_marked(WATCH_ENV, &watch_token)
+    } else {
+        Vec::new()
+    };
     #[cfg(not(target_os = "linux"))]
     let escaped = Vec::new();
-    Ok(BorrowIoOutcome { outcome, stdout: out, stderr: err, escaped })
+    Ok(BorrowIoOutcome {
+        outcome,
+        stdout: out,
+        stderr: err,
+        escaped,
+    })
 }
 
 #[cfg(unix)]
@@ -1125,10 +1360,15 @@ fn nonblocking(pipe: &impl std::os::fd::AsRawFd) -> Result<(), BorrowError> {
 
 /// Read everything the pipe has now. `Ok(false)` once the writer side closed.
 #[cfg(unix)]
-fn capture_available(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: usize, stream: &'static str) -> Result<bool, BorrowError> {
+fn capture_available(
+    pipe: &mut impl std::io::Read,
+    bytes: &mut Vec<u8>,
+    limit: usize,
+    stream: &'static str,
+) -> Result<bool, BorrowError> {
     loop {
         match capture_chunk(pipe, bytes, limit, stream)? {
-            Some(true) => {},
+            Some(true) => {}
             Some(false) => return Ok(false),
             None => return Ok(true),
         }
@@ -1136,7 +1376,12 @@ fn capture_available(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: 
 }
 
 #[cfg(unix)]
-fn capture_chunk(pipe: &mut impl std::io::Read, bytes: &mut Vec<u8>, limit: usize, stream: &'static str) -> Result<Option<bool>, BorrowError> {
+fn capture_chunk(
+    pipe: &mut impl std::io::Read,
+    bytes: &mut Vec<u8>,
+    limit: usize,
+    stream: &'static str,
+) -> Result<Option<bool>, BorrowError> {
     let mut buf = [0; 8192];
     match pipe.read(&mut buf) {
         Ok(n) => {
@@ -1238,7 +1483,12 @@ pub enum BorrowedCheck {
 /// file (same dev:ino as `lock_path`); a non-blocking exclusive lock on it
 /// succeeds (true for the description that holds the lock, false for a
 /// sibling that opened the file itself while the owner holds it).
-pub fn borrowed_check(slot_file: &File, lock_path: &Path, fgos_lock_fd: Option<&str>, slot: u32) -> BorrowedCheck {
+pub fn borrowed_check(
+    slot_file: &File,
+    lock_path: &Path,
+    fgos_lock_fd: Option<&str>,
+    slot: u32,
+) -> BorrowedCheck {
     let names_slot = fgos_lock_fd
         .and_then(|value| value.rsplit_once(':'))
         .is_some_and(|(name, s)| !name.is_empty() && s.parse::<u32>().ok() == Some(slot));
@@ -1273,7 +1523,9 @@ pub fn borrowed_check(slot_file: &File, lock_path: &Path, fgos_lock_fd: Option<&
             drop(Locked::new(drv, slot_file));
             BorrowedCheck::Borrower
         }
-        Ok(TryLock::WouldBlock) => BorrowedCheck::NotBorrower(NotBorrowerReason::LockNotHeldByDescription),
+        Ok(TryLock::WouldBlock) => {
+            BorrowedCheck::NotBorrower(NotBorrowerReason::LockNotHeldByDescription)
+        }
         Err(_) => BorrowedCheck::NotBorrower(NotBorrowerReason::FdMissing),
     }
 }
@@ -1284,9 +1536,16 @@ pub fn borrowed_check(slot_file: &File, lock_path: &Path, fgos_lock_fd: Option<&
 pub fn probe(resource: &Resource) -> io::Result<Probe> {
     let drv = driver::current();
     if !drv.supported() {
-        return Err(io::Error::new(io::ErrorKind::Unsupported, drv.unsupported_detail()));
+        return Err(io::Error::new(
+            io::ErrorKind::Unsupported,
+            drv.unsupported_detail(),
+        ));
     }
-    let file = match OpenOptions::new().read(true).write(true).open(&resource.path) {
+    let file = match OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(&resource.path)
+    {
         Ok(file) => file,
         Err(err) if err.kind() == io::ErrorKind::NotFound => return Ok(Probe::Free),
         Err(err) => return Err(err),
@@ -1367,39 +1626,83 @@ pub enum LockFd {
 /// `fd` must be an open lock file descriptor that stays open for the whole
 /// call and that no other thread closes meanwhile.
 #[cfg(unix)]
-pub unsafe fn lock_fd(fd: std::os::fd::RawFd, mode: Mode, wait: Wait, kill_wait_ms: u64, predecessor_kinds: &[String]) -> LockFd {
+pub unsafe fn lock_fd(
+    fd: std::os::fd::RawFd,
+    mode: Mode,
+    wait: Wait,
+    kill_wait_ms: u64,
+    predecessor_kinds: &[String],
+) -> LockFd {
     use std::os::fd::BorrowedFd;
     let drv = driver::current();
     let unavailable = |reason, detail: String| LockFd::Unavailable { reason, detail };
     if !drv.supported() {
-        return unavailable(UnavailableReason::UnsupportedPlatform, drv.unsupported_detail().to_string());
+        return unavailable(
+            UnavailableReason::UnsupportedPlatform,
+            drv.unsupported_detail().to_string(),
+        );
     }
     let file = match unsafe { BorrowedFd::borrow_raw(fd) }.try_clone_to_owned() {
         Ok(owned) => File::from(owned),
-        Err(err) => return unavailable(UnavailableReason::IoError, format!("duplicate fd {fd}: {err}")),
+        Err(err) => {
+            return unavailable(
+                UnavailableReason::IoError,
+                format!("duplicate fd {fd}: {err}"),
+            )
+        }
     };
     let opened_after = fgos_process::facts::creation_mark();
     match drv.file_guarantee(&file) {
-        Ok(g) if !g.usable() => return unavailable(UnavailableReason::UnsupportedFilesystem, g.notes.join("; ")),
+        Ok(g) if !g.usable() => {
+            return unavailable(UnavailableReason::UnsupportedFilesystem, g.notes.join("; "))
+        }
         Ok(_) => {}
-        Err(err) => return unavailable(UnavailableReason::IoError, format!("fstatfs fd {fd}: {err}")),
+        Err(err) => {
+            return unavailable(
+                UnavailableReason::IoError,
+                format!("fstatfs fd {fd}: {err}"),
+            )
+        }
     }
     match lock_description(&file, mode, wait) {
         Ok(DescriptionLock::Locked) => {}
-        Ok(DescriptionLock::Held) => return LockFd::Held { reason: HeldReason::KernelLockHeld, domain: None },
+        Ok(DescriptionLock::Held) => {
+            return LockFd::Held {
+                reason: HeldReason::KernelLockHeld,
+                domain: None,
+            }
+        }
         Ok(DescriptionLock::Timeout { waited_ms }) => return LockFd::Timeout { waited_ms },
-        Err(err) => return unavailable(UnavailableReason::IoError, format!("flock fd {fd}: {err}")),
+        Err(err) => {
+            return unavailable(UnavailableReason::IoError, format!("flock fd {fd}: {err}"))
+        }
     }
     let record = match drv.description_path(&file) {
         Ok(path) => predecessor::record_path(&path),
-        Err(err) => return unavailable(UnavailableReason::IoError, format!("cannot name the lock file behind fd {fd}: {err}")),
+        Err(err) => {
+            return unavailable(
+                UnavailableReason::IoError,
+                format!("cannot name the lock file behind fd {fd}: {err}"),
+            )
+        }
     };
     if let Some(domain) = predecessor::disallowed_kind(&record, predecessor_kinds) {
-        return LockFd::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) };
+        return LockFd::Held {
+            reason: HeldReason::PredecessorDomainNotEmpty,
+            domain: Some(domain),
+        };
     }
     match predecessor::admit(&record, Duration::from_millis(kill_wait_ms)) {
-        Admit::Proceed => LockFd::Acquired(NodeLock { file: Some(file), mode, kill_wait_ms, since: std::sync::Mutex::new((opened_after, opened_after)) }),
-        Admit::NotEmpty { domain } => LockFd::Held { reason: HeldReason::PredecessorDomainNotEmpty, domain: Some(domain) },
+        Admit::Proceed => LockFd::Acquired(NodeLock {
+            file: Some(file),
+            mode,
+            kill_wait_ms,
+            since: std::sync::Mutex::new((opened_after, opened_after)),
+        }),
+        Admit::NotEmpty { domain } => LockFd::Held {
+            reason: HeldReason::PredecessorDomainNotEmpty,
+            domain: Some(domain),
+        },
     }
 }
 
@@ -1425,11 +1728,23 @@ impl NodeLock {
     /// `lock_path` must still be the file this description locks, and the
     /// recorded domain must be empty.
     pub fn clear_domain(&self, lock_path: &Path) -> io::Result<()> {
-        let file = self.file.as_ref().ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "the lock is closed"))?;
-        if self.mode != Mode::Ex || borrowed_check(file, lock_path, Some("lease:3"), BORROW_SLOT) != BorrowedCheck::Borrower {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, "clear requires the held exclusive description"));
+        let file = self
+            .file
+            .as_ref()
+            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "the lock is closed"))?;
+        if self.mode != Mode::Ex
+            || borrowed_check(file, lock_path, Some("lease:3"), BORROW_SLOT)
+                != BorrowedCheck::Borrower
+        {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "clear requires the held exclusive description",
+            ));
         }
-        predecessor::clear(&predecessor::record_path(lock_path), Duration::from_millis(self.kill_wait_ms))
+        predecessor::clear(
+            &predecessor::record_path(lock_path),
+            Duration::from_millis(self.kill_wait_ms),
+        )
     }
 }
 
@@ -1438,7 +1753,9 @@ impl NodeLock {
 /// and prove the lock gone, as [`release`] does for a [`Handle`].
 #[cfg(unix)]
 pub fn release_description(lock: &mut NodeLock) -> Release {
-    let Some(file) = lock.file.take() else { return Release::Released { killed: 0 } };
+    let Some(file) = lock.file.take() else {
+        return Release::Released { killed: 0 };
+    };
     #[cfg(target_os = "linux")]
     if lock.mode == Mode::Ex {
         return driver::flock::settle_release(file, Duration::from_millis(lock.kill_wait_ms));
@@ -1451,13 +1768,28 @@ pub fn release_description(lock: &mut NodeLock) -> Release {
 /// holds the lock's description, apart from this process and the sibling
 /// domains in `protected_roots`, and advance the lock's marks on success.
 #[cfg(target_os = "linux")]
-pub fn drain_borrowed_description(lock: &NodeLock, child_pid: u32, protected_roots: &[u32]) -> Result<u32, driver::Leftovers> {
+pub fn drain_borrowed_description(
+    lock: &NodeLock,
+    child_pid: u32,
+    protected_roots: &[u32],
+) -> Result<u32, driver::Leftovers> {
     let (Some(file), Some(floor)) = (lock.file.as_ref(), lock.since()) else {
-        return Err(driver::Leftovers { killed: 0, foreign: false, pids: Vec::new() });
+        return Err(driver::Leftovers {
+            killed: 0,
+            foreign: false,
+            pids: Vec::new(),
+        });
     };
     let started = fgos_process::facts::creation_mark();
     let owner = std::process::id();
-    let drained = driver::flock::drain_description(file, Some(child_pid), owner, Duration::from_millis(lock.kill_wait_ms), driver::flock::Reach::Since(floor), protected_roots);
+    let drained = driver::flock::drain_description(
+        file,
+        Some(child_pid),
+        owner,
+        Duration::from_millis(lock.kill_wait_ms),
+        driver::flock::Reach::Since(floor),
+        protected_roots,
+    );
     if drained.is_ok() {
         advance(&lock.since, started);
     }
@@ -1478,7 +1810,16 @@ mod proof_tests {
             Acquire::Acquired(h) => h,
             other => panic!("{other:?}"),
         };
-        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 2000, owner.since(), vec![]) }.unwrap();
+        let loan = unsafe {
+            BorrowedHandle::from_acquired_description(
+                owner.file().as_raw_fd(),
+                resource.clone(),
+                2000,
+                owner.since(),
+                vec![],
+            )
+        }
+        .unwrap();
         // The mark a lock carries is the full creation mark, never one rebuilt at handover.
         let carried = loan.as_ref().since().unwrap();
         assert!(carried.ticks >= floor.ticks);
@@ -1506,14 +1847,34 @@ mod proof_tests {
         let (path, resource, file, mut lock) = node_lock("loan-mismatch");
         // A second description of the same file is a sibling: it can neither hold the lock nor be lent as the holder's.
         let sibling = open_lock_file(&path).unwrap();
-        let refused = unsafe { BorrowedHandle::from_acquired_description(sibling.as_raw_fd(), resource.clone(), 2000, lock.since(), vec![]) };
+        let refused = unsafe {
+            BorrowedHandle::from_acquired_description(
+                sibling.as_raw_fd(),
+                resource.clone(),
+                2000,
+                lock.since(),
+                vec![],
+            )
+        };
         assert_eq!(refused.unwrap_err().to_string(), "lock-resource-replaced");
         // The holder's own description is accepted and its marks travel with it.
-        let loan = unsafe { BorrowedHandle::from_acquired_description(file.as_raw_fd(), resource, 2000, lock.since(), vec![]) }.unwrap();
+        let loan = unsafe {
+            BorrowedHandle::from_acquired_description(
+                file.as_raw_fd(),
+                resource,
+                2000,
+                lock.since(),
+                vec![],
+            )
+        }
+        .unwrap();
         assert_eq!(loan.as_ref().since(), lock.since());
         drop(loan);
         drop(file);
-        assert_eq!(release_description(&mut lock), Release::Released { killed: 0 });
+        assert_eq!(
+            release_description(&mut lock),
+            Release::Released { killed: 0 }
+        );
         std::fs::remove_file(path).unwrap();
     }
 
@@ -1527,15 +1888,33 @@ mod proof_tests {
             Acquire::Acquired(h) => h,
             other => panic!("{other:?}"),
         };
-        let request = borrowed_request(&owner, &BorrowSpec { argv: vec!["sleep".into(), "30".into()], ..Default::default() }).unwrap();
+        let request = borrowed_request(
+            &owner,
+            &BorrowSpec {
+                argv: vec!["sleep".into(), "30".into()],
+                ..Default::default()
+            },
+        )
+        .unwrap();
         let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), owner.file())]).unwrap();
         // Cross a real clock tick: a handover-time floor would miss this copy.
         std::thread::sleep(Duration::from_millis(30));
-        let loan = unsafe { BorrowedHandle::from_acquired_description(owner.file().as_raw_fd(), resource.clone(), 25, Some(floor), vec![]) }.unwrap();
+        let loan = unsafe {
+            BorrowedHandle::from_acquired_description(
+                owner.file().as_raw_fd(),
+                resource.clone(),
+                25,
+                Some(floor),
+                vec![],
+            )
+        }
+        .unwrap();
         let result = validate_quiescent(loan.as_ref());
         child.kill().unwrap();
         child.wait().unwrap();
-        assert!(matches!(result, Err(BorrowError::ForeignHolder { pids }) if pids.contains(&child.id())));
+        assert!(
+            matches!(result, Err(BorrowError::ForeignHolder { pids }) if pids.contains(&child.id()))
+        );
         validate_quiescent(loan.as_ref()).unwrap();
         drop(loan);
         assert_eq!(probe(&resource).unwrap(), Probe::Held);
@@ -1545,7 +1924,8 @@ mod proof_tests {
 
     fn node_lock(name: &str) -> (PathBuf, Resource, File, NodeLock) {
         use std::os::fd::AsRawFd;
-        let path = std::env::temp_dir().join(format!("fgos-node-lock-{name}-{}", std::process::id()));
+        let path =
+            std::env::temp_dir().join(format!("fgos-node-lock-{name}-{}", std::process::id()));
         let file = open_lock_file(&path).unwrap();
         let lock = match unsafe { lock_fd(file.as_raw_fd(), Mode::Ex, Wait::Try, 2000, &[]) } {
             LockFd::Acquired(lock) => lock,
@@ -1559,17 +1939,32 @@ mod proof_tests {
     fn a_lock_on_a_descriptor_the_caller_opened_holds_until_the_caller_closes_and_settles() {
         use std::os::fd::AsRawFd;
         let (path, resource, file, mut lock) = node_lock("plain");
-        assert!(lock.since().unwrap().last_pid.is_some(), "the full creation mark is taken per acquire");
+        assert!(
+            lock.since().unwrap().last_pid.is_some(),
+            "the full creation mark is taken per acquire"
+        );
         assert_eq!(probe(&resource).unwrap(), Probe::Held);
         // A second description of the same file is refused while the first is held.
         let other = open_lock_file(&path).unwrap();
-        assert!(matches!(unsafe { lock_fd(other.as_raw_fd(), Mode::Ex, Wait::Try, 2000, &[]) }, LockFd::Held { reason: HeldReason::KernelLockHeld, .. }));
+        assert!(matches!(
+            unsafe { lock_fd(other.as_raw_fd(), Mode::Ex, Wait::Try, 2000, &[]) },
+            LockFd::Held {
+                reason: HeldReason::KernelLockHeld,
+                ..
+            }
+        ));
         drop(file);
         // The caller's close alone does not release: the duplicate still carries the lock.
         assert_eq!(probe(&resource).unwrap(), Probe::Held);
-        assert_eq!(release_description(&mut lock), Release::Released { killed: 0 });
+        assert_eq!(
+            release_description(&mut lock),
+            Release::Released { killed: 0 }
+        );
         assert_eq!(probe(&resource).unwrap(), Probe::Free);
-        assert_eq!(release_description(&mut lock), Release::Released { killed: 0 });
+        assert_eq!(
+            release_description(&mut lock),
+            Release::Released { killed: 0 }
+        );
         std::fs::remove_file(path).unwrap();
     }
 
@@ -1577,11 +1972,21 @@ mod proof_tests {
     fn settling_a_released_node_lock_ends_a_copy_that_escaped_to_a_child() {
         let (path, resource, file, mut lock) = node_lock("escaped");
         // Hand the description to a child the way a spawn with the descriptor mapped does, then lose track of it.
-        let request = MappedSpawn { argv: vec!["sleep".into(), "30".into()], env: vec![], clear_env: false, cwd: None, lead: MappedLead::Caller, stdio: [MappedStdio::Null; 3] };
+        let request = MappedSpawn {
+            argv: vec!["sleep".into(), "30".into()],
+            env: vec![],
+            clear_env: false,
+            cwd: None,
+            lead: MappedLead::Caller,
+            stdio: [MappedStdio::Null; 3],
+        };
         let mut escaped = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), &file)]).unwrap();
         drop(file);
         assert_eq!(probe(&resource).unwrap(), Probe::Held);
-        assert!(matches!(release_description(&mut lock), Release::Released { killed } if killed >= 1), "the escaped copy is ended");
+        assert!(
+            matches!(release_description(&mut lock), Release::Released { killed } if killed >= 1),
+            "the escaped copy is ended"
+        );
         escaped.wait().unwrap();
         assert_eq!(probe(&resource).unwrap(), Probe::Free);
         std::fs::remove_file(path).unwrap();
@@ -1590,18 +1995,41 @@ mod proof_tests {
     #[test]
     fn old_or_unreadable_pid_marks_use_the_start_time_fallback_and_kill_holders() {
         for unreadable in [false, true] {
-            let path = std::env::temp_dir().join(format!("fgos-proof-fallback-{}-{unreadable}", std::process::id()));
+            let path = std::env::temp_dir().join(format!(
+                "fgos-proof-fallback-{}-{unreadable}",
+                std::process::id()
+            ));
             let handle = match acquire(&Resource::new("proof", &path), Mode::Ex, Wait::Try, 2000) {
                 Acquire::Acquired(h) => h,
                 other => panic!("{other:?}"),
             };
             let mut mark = fgos_process::facts::creation_mark().unwrap();
-            if unreadable { mark.last_pid = None; } else { mark.at -= Duration::from_secs(60); }
+            if unreadable {
+                mark.last_pid = None;
+            } else {
+                mark.at -= Duration::from_secs(60);
+            }
             assert!(fgos_process::facts::created_since(&mark).is_none());
-            let request = borrowed_request(&handle, &BorrowSpec { argv: vec!["sh".into(), "-c".into(), "sleep 30 &".into()], ..Default::default() }).unwrap();
-            let mut child = spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), handle.file())]).unwrap();
+            let request = borrowed_request(
+                &handle,
+                &BorrowSpec {
+                    argv: vec!["sh".into(), "-c".into(), "sleep 30 &".into()],
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let mut child =
+                spawn_mapped(&request, &[(FdSlot(BORROW_SLOT), handle.file())]).unwrap();
             wait_exited_unreaped(child.id()).unwrap();
-            let killed = driver::current().end_leftovers(handle.file(), child.id(), Duration::from_secs(2), Some(mark), &[]).unwrap();
+            let killed = driver::current()
+                .end_leftovers(
+                    handle.file(),
+                    child.id(),
+                    Duration::from_secs(2),
+                    Some(mark),
+                    &[],
+                )
+                .unwrap();
             assert!(killed > 0);
             child.wait().unwrap();
             drop(handle);
@@ -1618,7 +2046,10 @@ mod proof_tests {
         };
         let first = fgos_process::facts::creation_mark().unwrap();
         handle.proven_alone_at(Some(first));
-        let mut child = std::process::Command::new("sleep").arg("30").spawn().unwrap();
+        let mut child = std::process::Command::new("sleep")
+            .arg("30")
+            .spawn()
+            .unwrap();
         let second = fgos_process::facts::creation_mark().unwrap();
         // Model an in-flight fork absent from proof two's table snapshot.
         handle.proven_alone_at(Some(second));
@@ -1627,7 +2058,10 @@ mod proof_tests {
         if let Some(candidates) = fgos_process::facts::created_since(&floor) {
             assert!(candidates.iter().any(|r| r.pid.0 == child.id()));
         } else {
-            assert!(fgos_process::facts::relations().unwrap().iter().any(|r| r.pid.0 == child.id() && r.start_ticks >= floor.ticks));
+            assert!(fgos_process::facts::relations()
+                .unwrap()
+                .iter()
+                .any(|r| r.pid.0 == child.id() && r.start_ticks >= floor.ticks));
         }
         // Failed or older concurrent proofs never advance or reverse the floor.
         handle.proven_alone_at(None);

@@ -5,25 +5,25 @@
 //! --init|--new`, `identity session --register|--drop-role`, `identity list --prune` and
 //! `identity pins --forget <machine-id>`, `identity pins --confirm <machine-id> --fingerprint <fp>` and `identity mint <kind>` write (`identity.write`).
 
+use crate::attempt::is_attempt_writer_id;
 use crate::current::{current_session, machine_info, os_pid_facts, session_info, set_alias};
 pub use crate::current::{MachineInfo, SessionInfo};
 use crate::directory;
 use crate::mint;
-use crate::proc_tree::os_process_tree;
 use crate::pins;
+use crate::proc_tree::os_process_tree;
 use crate::project;
 pub use crate::refusal::Refusal;
-use crate::attempt::is_attempt_writer_id;
 use crate::resolve::{resolve, WriterId, WriterIdentity};
 use crate::session::PidFacts;
 use crate::shared::{self, LogDoor, SharedView};
 use crate::signing;
-use fgos_process::facts::judge_here;
 use fgos_host_runtime::{
     ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome, OperationId,
     OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
     ProviderOutcome,
 };
+use fgos_process::facts::judge_here;
 use std::borrow::Cow;
 use std::future::Future;
 use std::path::{Path, PathBuf};
@@ -35,7 +35,9 @@ pub const IDENTITY_READ_OPERATION_ID: &str = "identity.read";
 pub const IDENTITY_WRITE_OPERATION_ID: &str = "identity.write";
 
 /// Subcommands after `identity`; bare `identity` is `writer`.
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["writer", "machine", "session", "project", "resolve", "list", "mint", "pins"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
+    "writer", "machine", "session", "project", "resolve", "list", "mint", "pins",
+];
 
 pub const IDENTITY_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
     provider_id: Cow::Borrowed("identity.writer"),
@@ -99,7 +101,11 @@ pub enum Verb {
     /// `resolve <handle|role|full id>`: the one live session it names.
     Resolve { query: String },
     /// `list [--project] [--prune] [--machine <handle|id>]`: the sessions the machine knows.
-    List { project: bool, prune: bool, machine: Option<String> },
+    List {
+        project: bool,
+        prune: bool,
+        machine: Option<String>,
+    },
     /// `project [--init|--new] [--handle <h>]`.
     Project(ProjectAction),
     /// `mint <kind> [--release <number>]`: a new id, or a sequence number given back.
@@ -117,7 +123,10 @@ pub enum PinsAction {
     /// `--forget`: remove one pin after a legitimate re-key.
     Forget { machine_id: String },
     /// `--confirm --fingerprint`: the owner compared the fingerprint; mark the pin confirmed.
-    Confirm { machine_id: String, fingerprint: String },
+    Confirm {
+        machine_id: String,
+        fingerprint: String,
+    },
 }
 
 /// What `identity session` does.
@@ -228,7 +237,10 @@ impl IdentityProvider {
 
     /// The provider of one of this component's three descriptors.
     pub fn for_descriptor(descriptor: ProviderDescriptor) -> Self {
-        Self { descriptor, log_door: None }
+        Self {
+            descriptor,
+            log_door: None,
+        }
     }
 
     /// The same provider publishing to and reading from the shared directory through `door`.
@@ -260,9 +272,10 @@ pub fn writer_answer(
     let object = value.as_object_mut().expect("WriterIdentity is an object");
     object.insert(
         "machine".into(),
-        machine.map_or(serde_json::Value::Null, |m| {
-            serde_json::json!({ "id": m.id, "handle": m.handle })
-        }),
+        machine.map_or(
+            serde_json::Value::Null,
+            |m| serde_json::json!({ "id": m.id, "handle": m.handle }),
+        ),
     );
     object.insert(
         "session".into(),
@@ -274,11 +287,18 @@ pub fn writer_answer(
 /// `identity mint <kind>`: a random id needs nothing but the kernel; a
 /// sequence number is claimed (or, with `release`, given back) on the
 /// repository containing the working directory.
-fn mint_answer(state_root: &Path, kind: &str, release: Option<u64>) -> Result<serde_json::Value, Refusal> {
+fn mint_answer(
+    state_root: &Path,
+    kind: &str,
+    release: Option<u64>,
+) -> Result<serde_json::Value, Refusal> {
     let parsed = mint::Kind::parse(kind).ok_or_else(|| Refusal {
         candidates: Vec::new(),
         reason: "unknown-kind",
-        detail: format!("unknown id kind {kind:?}. Available: {}", mint::KIND_NAMES.join(", ")),
+        detail: format!(
+            "unknown id kind {kind:?}. Available: {}",
+            mint::KIND_NAMES.join(", ")
+        ),
     })?;
     match (parsed, release) {
         (mint::Kind::Random(random), None) => {
@@ -292,7 +312,9 @@ fn mint_answer(state_root: &Path, kind: &str, release: Option<u64>) -> Result<se
         (mint::Kind::Random(_), Some(_)) => Err(Refusal {
             candidates: Vec::new(),
             reason: "not-a-sequence",
-            detail: format!("{kind} ids are random; only a sequence kind has a number to give back"),
+            detail: format!(
+                "{kind} ids are random; only a sequence kind has a number to give back"
+            ),
         }),
         (mint::Kind::Sequence(sequence), release) => {
             let dir = std::env::current_dir().map_err(|e| Refusal {
@@ -326,11 +348,18 @@ fn working_directory() -> Result<PathBuf, Refusal> {
 /// verb runs in. The local write already happened and is this machine's
 /// truth, so a fault here is one stderr line, never a failed verb. A clone
 /// without a project id or a migrated Event Store publishes nothing.
-fn publish(request: &IdentityRequest, door: Option<&dyn LogDoor>, root: &Path, own: Option<&directory::Listed>) {
+fn publish(
+    request: &IdentityRequest,
+    door: Option<&dyn LogDoor>,
+    root: &Path,
+    own: Option<&directory::Listed>,
+) {
     let Some(door) = door else { return };
     let attempt = || -> Result<(), Refusal> {
         let cwd = working_directory()?;
-        let Ok((_, main_root)) = project::project_at(root, &cwd) else { return Ok(()) };
+        let Ok((_, main_root)) = project::project_at(root, &cwd) else {
+            return Ok(());
+        };
         if own.is_some_and(|listed| listed.project_id.is_none()) {
             return Ok(());
         }
@@ -345,19 +374,34 @@ fn publish(request: &IdentityRequest, door: Option<&dyn LogDoor>, root: &Path, o
         Ok(())
     };
     if let Err(refusal) = attempt() {
-        eprintln!("identity-publish-failed: {}: {}", refusal.reason, refusal.detail);
+        eprintln!(
+            "identity-publish-failed: {}: {}",
+            refusal.reason, refusal.detail
+        );
     }
 }
 
 /// Reads the clone's log, folds it with what the cache already verified, and
 /// keeps the result in the cache. The unfiltered view: other projects' entries
 /// stay in the cache for the doctor to name.
-fn refresh(root: &Path, main_root: &Path, log: &dyn shared::EntryLog) -> Result<SharedView, Refusal> {
+fn refresh(
+    root: &Path,
+    main_root: &Path,
+    log: &dyn shared::EntryLog,
+) -> Result<SharedView, Refusal> {
     let (events, fetched_at) = log.read()?;
     let path = shared::cache_path(main_root);
-    let view = shared::fold(root, &events, fetched_at, shared::read_cache(&path).as_ref());
+    let view = shared::fold(
+        root,
+        &events,
+        fetched_at,
+        shared::read_cache(&path).as_ref(),
+    );
     if let Err(refusal) = shared::write_cache(&path, &view.cache()) {
-        eprintln!("identity-cache-failed: {}: {}", refusal.reason, refusal.detail);
+        eprintln!(
+            "identity-cache-failed: {}: {}",
+            refusal.reason, refusal.detail
+        );
     }
     Ok(view)
 }
@@ -365,11 +409,17 @@ fn refresh(root: &Path, main_root: &Path, log: &dyn shared::EntryLog) -> Result<
 /// The other machines' sessions of the clone's project, folded from its log;
 /// `None` when there is nothing to ask (no door, no project id, no migrated
 /// store) or the log cannot be read (one stderr line says why).
-fn remote_view(request: &IdentityRequest, door: Option<&dyn LogDoor>, root: &Path) -> Option<SharedView> {
+fn remote_view(
+    request: &IdentityRequest,
+    door: Option<&dyn LogDoor>,
+    root: &Path,
+) -> Option<SharedView> {
     let door = door?;
     let attempt = || -> Result<Option<SharedView>, Refusal> {
         let cwd = working_directory()?;
-        let Ok((project, main_root)) = project::project_at(root, &cwd) else { return Ok(None) };
+        let Ok((project, main_root)) = project::project_at(root, &cwd) else {
+            return Ok(None);
+        };
         let Some(log) = door.open(&cwd, &resolve_identity(request).id.to_string())? else {
             return Ok(None);
         };
@@ -378,12 +428,18 @@ fn remote_view(request: &IdentityRequest, door: Option<&dyn LogDoor>, root: &Pat
         Ok(Some(view))
     };
     attempt().unwrap_or_else(|refusal| {
-        eprintln!("identity-shared-unavailable: {}: {}", refusal.reason, refusal.detail);
+        eprintln!(
+            "identity-shared-unavailable: {}: {}",
+            refusal.reason, refusal.detail
+        );
         None
     })
 }
 
-fn answer(request: &IdentityRequest, door: Option<&dyn LogDoor>) -> Result<serde_json::Value, Refusal> {
+fn answer(
+    request: &IdentityRequest,
+    door: Option<&dyn LogDoor>,
+) -> Result<serde_json::Value, Refusal> {
     let root = state_root();
     match &request.verb {
         Verb::Writer => Ok(writer_answer(
@@ -410,7 +466,10 @@ fn answer(request: &IdentityRequest, door: Option<&dyn LogDoor>) -> Result<serde
         Verb::Pins(PinsAction::Forget { machine_id }) => {
             Ok(serde_json::json!({ "forgotten": pins::forget(&root, machine_id)? }))
         }
-        Verb::Pins(PinsAction::Confirm { machine_id, fingerprint }) => {
+        Verb::Pins(PinsAction::Confirm {
+            machine_id,
+            fingerprint,
+        }) => {
             Ok(serde_json::json!({ "confirmed": pins::confirm(&root, machine_id, fingerprint)? }))
         }
         Verb::Project(action) => {
@@ -421,24 +480,35 @@ fn answer(request: &IdentityRequest, door: Option<&dyn LogDoor>) -> Result<serde
             })?;
             let value = match action {
                 ProjectAction::Read => serde_json::to_value(project::project_info(&root, &dir)?),
-                ProjectAction::Init { handle } => {
-                    serde_json::to_value(project::project_init(&root, &dir, handle.as_deref(), false)?)
-                }
-                ProjectAction::New { handle } => {
-                    serde_json::to_value(project::project_init(&root, &dir, handle.as_deref(), true)?)
-                }
+                ProjectAction::Init { handle } => serde_json::to_value(project::project_init(
+                    &root,
+                    &dir,
+                    handle.as_deref(),
+                    false,
+                )?),
+                ProjectAction::New { handle } => serde_json::to_value(project::project_init(
+                    &root,
+                    &dir,
+                    handle.as_deref(),
+                    true,
+                )?),
             };
             Ok(value.expect("project answers always serialize"))
         }
         Verb::Mint { kind, release } => mint_answer(&root, kind, *release),
         Verb::Session(action) => match action {
             SessionAction::Read => {
-                let current = current_session(&root, caller_pid(request), request.fgos_dir.as_deref())?;
+                let current =
+                    current_session(&root, caller_pid(request), request.fgos_dir.as_deref())?;
                 Ok(serde_json::to_value(current.info).expect("SessionInfo always serializes"))
             }
             SessionAction::DropRole { role } => {
-                let listed =
-                    directory::drop_current_role(&root, caller_pid(request), request.fgos_dir.as_deref(), role)?;
+                let listed = directory::drop_current_role(
+                    &root,
+                    caller_pid(request),
+                    request.fgos_dir.as_deref(),
+                    role,
+                )?;
                 publish(request, door, &root, Some(&listed));
                 Ok(serde_json::to_value(listed).expect("Listed always serializes"))
             }
@@ -462,15 +532,21 @@ fn answer(request: &IdentityRequest, door: Option<&dyn LogDoor>) -> Result<serde
         Verb::Resolve { query } => {
             let listed = match directory::resolve(&root, query, &judge_here, None) {
                 // Local first: other machines are asked only when this one has no answer.
-                Err(missing) if missing.reason == "not-found" => match remote_view(request, door, &root) {
-                    Some(view) => directory::resolve(&root, query, &judge_here, Some(&view))?,
-                    None => return Err(missing),
-                },
+                Err(missing) if missing.reason == "not-found" => {
+                    match remote_view(request, door, &root) {
+                        Some(view) => directory::resolve(&root, query, &judge_here, Some(&view))?,
+                        None => return Err(missing),
+                    }
+                }
                 other => other?,
             };
             Ok(serde_json::to_value(listed).expect("Listed always serializes"))
         }
-        Verb::List { project, prune, machine } => {
+        Verb::List {
+            project,
+            prune,
+            machine,
+        } => {
             let project_id = if *project {
                 let dir = std::env::current_dir().map_err(|e| Refusal {
                     candidates: Vec::new(),
@@ -482,7 +558,13 @@ fn answer(request: &IdentityRequest, door: Option<&dyn LogDoor>) -> Result<serde
                 None
             };
             let view = remote_view(request, door, &root);
-            let sessions = directory::list(&root, project_id.as_deref(), *prune, &judge_here, view.as_ref())?;
+            let sessions = directory::list(
+                &root,
+                project_id.as_deref(),
+                *prune,
+                &judge_here,
+                view.as_ref(),
+            )?;
             if *prune {
                 publish(request, door, &root, None);
             }
@@ -490,7 +572,9 @@ fn answer(request: &IdentityRequest, door: Option<&dyn LogDoor>) -> Result<serde
             if let Some(wanted) = machine {
                 let own = machine_info(&root)?;
                 sessions.sessions.retain(|session| match &session.remote {
-                    Some(remote) => remote.machine.id == *wanted || remote.machine.handle == *wanted,
+                    Some(remote) => {
+                        remote.machine.id == *wanted || remote.machine.handle == *wanted
+                    }
                     None => own.id == *wanted || own.handle == *wanted,
                 });
             }
@@ -519,10 +603,11 @@ impl OperationProvider for IdentityProvider {
                 .ok_or_else(|| {
                     ProviderError::SemanticValidation("input is not IdentityRequest".into())
                 })?;
-            let output: Box<dyn std::any::Any + Send> = match answer(request, self.log_door.as_deref()) {
-                Ok(value) => Box::new(JsonOutcome(value)),
-                Err(refusal) => Box::new(refusal),
-            };
+            let output: Box<dyn std::any::Any + Send> =
+                match answer(request, self.log_door.as_deref()) {
+                    Ok(value) => Box::new(JsonOutcome(value)),
+                    Err(refusal) => Box::new(refusal),
+                };
             Ok(ProviderOutcome::completed(
                 self.descriptor().outcome_contract.clone(),
                 output,

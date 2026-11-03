@@ -19,7 +19,9 @@ pub fn publish_once(dir: &Path, name: &str, bytes: &[u8]) -> io::Result<Publishe
     publication_result(fgos_durable_file::install_once(dir, name, bytes))
 }
 
-fn publication_result(result: Result<fgos_durable_file::Installed, fgos_durable_file::InstallError>) -> io::Result<Published> {
+fn publication_result(
+    result: Result<fgos_durable_file::Installed, fgos_durable_file::InstallError>,
+) -> io::Result<Published> {
     use fgos_durable_file::Installed;
     let installed = match result {
         Ok(installed) => installed,

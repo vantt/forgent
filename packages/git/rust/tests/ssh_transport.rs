@@ -356,7 +356,14 @@ fn a_changed_ssh_account_on_the_origin_is_refused() {
     }];
     let err = f
         .driver
-        .push_refs(&f.repo, vec![], &pinned, &mappings, "fixture", "other-account")
+        .push_refs(
+            &f.repo,
+            vec![],
+            &pinned,
+            &mappings,
+            "fixture",
+            "other-account",
+        )
         .expect_err("a different ssh account than the pinned one");
     assert!(
         err.cause
@@ -381,7 +388,19 @@ fn a_push_the_remote_refuses_for_another_reason_keeps_that_refusal() {
     f.set_origin(&format!("ssh://example.invalid{}", f.bare()));
     // The counter already exists on the origin at number 1, written by plain git.
     let tree = git(&origin, &["hash-object", "-t", "tree", "-w", "/dev/null"]);
-    let first = git(&origin, &["-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid", "commit-tree", &tree, "-m", "1"]);
+    let first = git(
+        &origin,
+        &[
+            "-c",
+            "user.name=Fixture",
+            "-c",
+            "user.email=fixture@example.invalid",
+            "commit-tree",
+            &tree,
+            "-m",
+            "1",
+        ],
+    );
     git(&origin, &["update-ref", "refs/fgos/seq/d-adr", &first]);
     let home = f.driver.sequence_home(&f.repo).unwrap();
     let tip = f
@@ -395,7 +414,10 @@ fn a_push_the_remote_refuses_for_another_reason_keeps_that_refusal() {
     let hook = origin.join("hooks/pre-receive");
     fs::write(
         &hook,
-        format!("#!/bin/sh\necho ran > '{}'\necho 'declined by policy' >&2\nexit 1\n", marker.display()),
+        format!(
+            "#!/bin/sh\necho ran > '{}'\necho 'declined by policy' >&2\nexit 1\n",
+            marker.display()
+        ),
     )
     .unwrap();
     fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();

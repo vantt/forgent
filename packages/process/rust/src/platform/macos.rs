@@ -8,7 +8,9 @@ use std::process::{Child, Command};
 
 use super::{as_pid_t, unix_hostname, ProcessPlatform};
 use crate::control::{self, Signal, SignalOutcome};
-use crate::facts::{Holders, Observed, PidNs, ProcTuple, Relation, Scan, ScanFilter, UnreadableCause};
+use crate::facts::{
+    Holders, Observed, PidNs, ProcTuple, Relation, Scan, ScanFilter, UnreadableCause,
+};
 use crate::{FdSlot, ProcId};
 
 /// `pbi_status` of a process that has exited but is not yet reaped.
@@ -29,7 +31,13 @@ impl ProcessPlatform for Macos {
         let mut len = buf.len();
         // SAFETY: sysctlbyname writes at most `len` bytes into `buf` and updates `len`.
         let rc = unsafe {
-            libc::sysctlbyname(name.as_ptr() as *const libc::c_char, buf.as_mut_ptr() as *mut libc::c_void, &mut len, std::ptr::null_mut(), 0)
+            libc::sysctlbyname(
+                name.as_ptr() as *const libc::c_char,
+                buf.as_mut_ptr() as *mut libc::c_void,
+                &mut len,
+                std::ptr::null_mut(),
+                0,
+            )
         };
         if rc != 0 {
             return None;
@@ -40,7 +48,10 @@ impl ProcessPlatform for Macos {
     }
 
     fn pid_ns(&self) -> PidNs {
-        PidNs { id: "none".to_string(), is_initial: true }
+        PidNs {
+            id: "none".to_string(),
+            is_initial: true,
+        }
     }
 
     fn observe(&self, pid: ProcId) -> Observed {
@@ -51,7 +62,9 @@ impl ProcessPlatform for Macos {
         if info.pbi_status == SZOMB {
             return Observed::Zombie;
         }
-        Observed::Live { start_time: format!("{}.{:06}", info.pbi_start_tvsec, info.pbi_start_tvusec) }
+        Observed::Live {
+            start_time: format!("{}.{:06}", info.pbi_start_tvsec, info.pbi_start_tvusec),
+        }
     }
 
     fn relation_of(&self, pid: ProcId) -> Option<Relation> {
@@ -66,7 +79,8 @@ impl ProcessPlatform for Macos {
             session: u32::try_from(session).ok()?,
             tty_nr: i64::from(info.e_tdev),
             // Wall-clock microseconds of the start: ordered like the Linux ticks, on another clock.
-            start_ticks: u64::from(info.pbi_start_tvsec) * 1_000_000 + u64::from(info.pbi_start_tvusec),
+            start_ticks: u64::from(info.pbi_start_tvsec) * 1_000_000
+                + u64::from(info.pbi_start_tvusec),
             // Zombies are filtered out above; a live process's kernel state is not read.
             state: '?',
         })
@@ -94,8 +108,11 @@ impl ProcessPlatform for Macos {
 pub(crate) fn child_identity(pid: ProcId) -> Option<ProcTuple> {
     let info = bsd_info(pid).ok()?;
     Some(ProcTuple {
-        host: Macos.host(), boot_id: Macos.boot_id(), pid_ns: Macos.pid_ns().id,
-        pid, start_time: format!("{}.{:06}", info.pbi_start_tvsec, info.pbi_start_tvusec),
+        host: Macos.host(),
+        boot_id: Macos.boot_id(),
+        pid_ns: Macos.pid_ns().id,
+        pid,
+        start_time: format!("{}.{:06}", info.pbi_start_tvsec, info.pbi_start_tvusec),
     })
 }
 
@@ -105,7 +122,13 @@ fn bsd_info(pid: ProcId) -> Result<libc::proc_bsdinfo, Observed> {
     let mut info: libc::proc_bsdinfo = unsafe { std::mem::zeroed() };
     let size = std::mem::size_of::<libc::proc_bsdinfo>() as libc::c_int;
     let got = unsafe {
-        libc::proc_pidinfo(raw, libc::PROC_PIDTBSDINFO, 0, &mut info as *mut _ as *mut libc::c_void, size)
+        libc::proc_pidinfo(
+            raw,
+            libc::PROC_PIDTBSDINFO,
+            0,
+            &mut info as *mut _ as *mut libc::c_void,
+            size,
+        )
     };
     if got != size {
         return Err(match io::Error::last_os_error().raw_os_error() {

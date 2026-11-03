@@ -84,7 +84,10 @@ enum Inner {
     #[cfg_attr(all(target_os = "linux", target_env = "gnu"), allow(dead_code))]
     Std(std::process::Child),
     #[cfg_attr(not(all(target_os = "linux", target_env = "gnu")), allow(dead_code))]
-    Spawned { pid: u32, status: Option<ExitStatus> },
+    Spawned {
+        pid: u32,
+        status: Option<ExitStatus>,
+    },
 }
 
 impl MappedChild {
@@ -101,7 +104,9 @@ impl MappedChild {
     pub fn kill(&mut self) -> io::Result<()> {
         match &mut self.inner {
             Inner::Std(child) => child.kill(),
-            Inner::Spawned { status: Some(_), .. } => Ok(()),
+            Inner::Spawned {
+                status: Some(_), ..
+            } => Ok(()),
             Inner::Spawned { pid, status: None } => {
                 // SAFETY: kill on our own unreaped child.
                 if unsafe { libc::kill(*pid as libc::pid_t, libc::SIGKILL) } == 0 {
@@ -117,7 +122,9 @@ impl MappedChild {
     pub fn wait(&mut self) -> io::Result<ExitStatus> {
         match &mut self.inner {
             Inner::Std(child) => child.wait(),
-            Inner::Spawned { pid, status } => reap(*pid, status, 0).map(|s| s.expect("a blocking waitpid returns a status")),
+            Inner::Spawned { pid, status } => {
+                reap(*pid, status, 0).map(|s| s.expect("a blocking waitpid returns a status"))
+            }
         }
     }
 
@@ -132,7 +139,11 @@ impl MappedChild {
 
 /// `waitpid` once (retrying on `EINTR`) unless already reaped; `None` only
 /// under `WNOHANG` while the child runs.
-fn reap(pid: u32, status: &mut Option<ExitStatus>, flags: libc::c_int) -> io::Result<Option<ExitStatus>> {
+fn reap(
+    pid: u32,
+    status: &mut Option<ExitStatus>,
+    flags: libc::c_int,
+) -> io::Result<Option<ExitStatus>> {
     use std::os::unix::process::ExitStatusExt;
     if status.is_some() {
         return Ok(*status);
@@ -188,7 +199,13 @@ pub fn spawn_detached(
 ) -> io::Result<u32> {
     use std::os::unix::fs::OpenOptionsExt;
     let log = log
-        .map(|path| std::fs::OpenOptions::new().append(true).create(true).mode(0o600).open(path))
+        .map(|path| {
+            std::fs::OpenOptions::new()
+                .append(true)
+                .create(true)
+                .mode(0o600)
+                .open(path)
+        })
         .transpose()?;
     let sink = log.as_ref().map_or(MappedStdio::Null, MappedStdio::File);
     let request = MappedSpawn {
@@ -221,7 +238,13 @@ fn with_command(request: &MappedSpawn, fd_map: &[(FdSlot, &File)]) -> io::Result
         MappedLead::Group => _ = cmd.process_group(0),
         // SAFETY: setsid is async-signal-safe and touches no memory of the parent.
         MappedLead::Session => unsafe {
-            cmd.pre_exec(|| if libc::setsid() < 0 { Err(io::Error::last_os_error()) } else { Ok(()) });
+            cmd.pre_exec(|| {
+                if libc::setsid() < 0 {
+                    Err(io::Error::last_os_error())
+                } else {
+                    Ok(())
+                }
+            });
         },
     }
     let stdio = |s: MappedStdio| -> io::Result<Stdio> {
@@ -232,12 +255,19 @@ fn with_command(request: &MappedSpawn, fd_map: &[(FdSlot, &File)]) -> io::Result
             MappedStdio::File(file) => Stdio::from(file.try_clone()?),
         })
     };
-    cmd.stdin(stdio(request.stdio[0])?).stdout(stdio(request.stdio[1])?).stderr(stdio(request.stdio[2])?);
+    cmd.stdin(stdio(request.stdio[0])?)
+        .stdout(stdio(request.stdio[1])?)
+        .stderr(stdio(request.stdio[2])?);
     let mut child = crate::control::spawn_with_fds(cmd, fd_map)?;
     let stdin = child.stdin.take().map(owned_file);
     let stdout = child.stdout.take().map(owned_file);
     let stderr = child.stderr.take().map(owned_file);
-    Ok(MappedChild { inner: Inner::Std(child), stdin, stdout, stderr })
+    Ok(MappedChild {
+        inner: Inner::Std(child),
+        stdin,
+        stdout,
+        stderr,
+    })
 }
 
 #[cfg_attr(all(target_os = "linux", target_env = "gnu"), allow(dead_code))]
@@ -276,7 +306,8 @@ mod posix {
     }
 
     fn cstring(bytes: Vec<u8>) -> io::Result<CString> {
-        CString::new(bytes).map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "argument holds a NUL byte"))
+        CString::new(bytes)
+            .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "argument holds a NUL byte"))
     }
 
     fn pipe() -> io::Result<(OwnedFd, OwnedFd)> {
@@ -302,7 +333,13 @@ mod posix {
             .rev()
             .find(|(k, _)| k == "PATH")
             .map(|(_, v)| v.clone())
-            .or_else(|| if request.clear_env { None } else { std::env::var_os("PATH") })
+            .or_else(|| {
+                if request.clear_env {
+                    None
+                } else {
+                    std::env::var_os("PATH")
+                }
+            })
             .unwrap_or_else(|| OsString::from("/usr/bin:/bin"));
         let cwd = match &request.cwd {
             Some(p) if p.is_absolute() => p.clone(),
@@ -314,27 +351,47 @@ mod posix {
         let mut denied = false;
         for dir in std::env::split_paths(&path) {
             let candidate = cwd.join(dir).join(name);
-            if !candidate.is_file() { continue; }
-            let Ok(c) = cstring(candidate.into_os_string().into_vec()) else { continue };
+            if !candidate.is_file() {
+                continue;
+            }
+            let Ok(c) = cstring(candidate.into_os_string().into_vec()) else {
+                continue;
+            };
             // SAFETY: access only reads a NUL-terminated path.
             if unsafe { libc::access(c.as_ptr(), libc::X_OK) } == 0 {
                 return Ok(c);
             }
             denied |= io::Error::last_os_error().raw_os_error() == Some(libc::EACCES);
         }
-        if denied { return Err(io::Error::from_raw_os_error(libc::EACCES)); }
-        Err(io::Error::new(io::ErrorKind::NotFound, format!("program not found: {}", name.to_string_lossy())))
+        if denied {
+            return Err(io::Error::from_raw_os_error(libc::EACCES));
+        }
+        Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("program not found: {}", name.to_string_lossy()),
+        ))
     }
 
-    pub(super) fn spawn(request: &MappedSpawn, fd_map: &[(FdSlot, &File)]) -> io::Result<MappedChild> {
+    pub(super) fn spawn(
+        request: &MappedSpawn,
+        fd_map: &[(FdSlot, &File)],
+    ) -> io::Result<MappedChild> {
         let mut slots: Vec<libc::c_int> = Vec::with_capacity(fd_map.len());
         for (slot, _) in fd_map {
             let slot = libc::c_int::try_from(slot.0)
                 .ok()
                 .filter(|s| *s >= 3)
-                .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, format!("slot {} is below 3 or not a descriptor number", slot.0)))?;
+                .ok_or_else(|| {
+                    io::Error::new(
+                        io::ErrorKind::InvalidInput,
+                        format!("slot {} is below 3 or not a descriptor number", slot.0),
+                    )
+                })?;
             if slots.contains(&slot) {
-                return Err(io::Error::new(io::ErrorKind::InvalidInput, format!("slot {slot} is mapped twice")));
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    format!("slot {slot} is mapped twice"),
+                ));
             }
             slots.push(slot);
         }
@@ -350,10 +407,21 @@ mod posix {
             // SAFETY: just created.
             Ok(unsafe { OwnedFd::from_raw_fd(dup) })
         };
-        let sources: Vec<OwnedFd> = fd_map.iter().map(|(_, file)| duplicate(file)).collect::<io::Result<_>>()?;
+        let sources: Vec<OwnedFd> = fd_map
+            .iter()
+            .map(|(_, file)| duplicate(file))
+            .collect::<io::Result<_>>()?;
         let program = program(request)?;
-        let argv: Vec<CString> = request.argv.iter().map(|a| cstring(a.clone().into_vec())).collect::<io::Result<_>>()?;
-        let mut env: Vec<(OsString, OsString)> = if request.clear_env { Vec::new() } else { std::env::vars_os().collect() };
+        let argv: Vec<CString> = request
+            .argv
+            .iter()
+            .map(|a| cstring(a.clone().into_vec()))
+            .collect::<io::Result<_>>()?;
+        let mut env: Vec<(OsString, OsString)> = if request.clear_env {
+            Vec::new()
+        } else {
+            std::env::vars_os().collect()
+        };
         for (k, v) in &request.env {
             env.retain(|(have, _)| have != k);
             env.push((k.clone(), v.clone()));
@@ -367,9 +435,11 @@ mod posix {
                 cstring(kv)
             })
             .collect::<io::Result<_>>()?;
-        let mut argv_ptrs: Vec<*mut libc::c_char> = argv.iter().map(|a| a.as_ptr() as *mut _).collect();
+        let mut argv_ptrs: Vec<*mut libc::c_char> =
+            argv.iter().map(|a| a.as_ptr() as *mut _).collect();
         argv_ptrs.push(std::ptr::null_mut());
-        let mut envp_ptrs: Vec<*mut libc::c_char> = envp.iter().map(|e| e.as_ptr() as *mut _).collect();
+        let mut envp_ptrs: Vec<*mut libc::c_char> =
+            envp.iter().map(|e| e.as_ptr() as *mut _).collect();
         envp_ptrs.push(std::ptr::null_mut());
 
         // SAFETY: zeroed storage initialised by the libc init calls below.
@@ -387,22 +457,50 @@ mod posix {
             match stdio {
                 MappedStdio::Inherit => {}
                 MappedStdio::Null => {
-                    let flags = if target == 0 { libc::O_RDONLY } else { libc::O_WRONLY };
+                    let flags = if target == 0 {
+                        libc::O_RDONLY
+                    } else {
+                        libc::O_WRONLY
+                    };
                     // SAFETY: the actions object is initialised; the path is NUL-terminated.
-                    check(unsafe { libc::posix_spawn_file_actions_addopen(&mut actions.0, target, dev_null.as_ptr(), flags, 0) })?;
+                    check(unsafe {
+                        libc::posix_spawn_file_actions_addopen(
+                            &mut actions.0,
+                            target,
+                            dev_null.as_ptr(),
+                            flags,
+                            0,
+                        )
+                    })?;
                 }
                 MappedStdio::Piped => {
                     let (read, write) = pipe()?;
-                    let (parent, child) = if target == 0 { (write, read) } else { (read, write) };
+                    let (parent, child) = if target == 0 {
+                        (write, read)
+                    } else {
+                        (read, write)
+                    };
                     // SAFETY: both descriptors are open for the call's duration.
-                    check(unsafe { libc::posix_spawn_file_actions_adddup2(&mut actions.0, child.as_raw_fd(), target) })?;
+                    check(unsafe {
+                        libc::posix_spawn_file_actions_adddup2(
+                            &mut actions.0,
+                            child.as_raw_fd(),
+                            target,
+                        )
+                    })?;
                     parent_ends[target as usize] = Some(parent);
                     child_ends.push(child);
                 }
                 MappedStdio::File(file) => {
                     let child = duplicate(file)?;
                     // SAFETY: the duplicate stays open until posix_spawn returns.
-                    check(unsafe { libc::posix_spawn_file_actions_adddup2(&mut actions.0, child.as_raw_fd(), target) })?;
+                    check(unsafe {
+                        libc::posix_spawn_file_actions_adddup2(
+                            &mut actions.0,
+                            child.as_raw_fd(),
+                            target,
+                        )
+                    })?;
                     child_ends.push(child);
                 }
             }
@@ -410,17 +508,24 @@ mod posix {
         for (slot, source) in slots.iter().zip(&sources) {
             // dup2 onto the slot clears close-on-exec on the child's copy only.
             // SAFETY: the source stays open until posix_spawn returns.
-            check(unsafe { libc::posix_spawn_file_actions_adddup2(&mut actions.0, source.as_raw_fd(), *slot) })?;
+            check(unsafe {
+                libc::posix_spawn_file_actions_adddup2(&mut actions.0, source.as_raw_fd(), *slot)
+            })?;
         }
         // Everything else that would survive exec is closed in the child.
-        for fd in crate::control::inheritable_fds().into_iter().filter(|fd| !slots.contains(fd)) {
+        for fd in crate::control::inheritable_fds()
+            .into_iter()
+            .filter(|fd| !slots.contains(fd))
+        {
             // SAFETY: closing a number in the child only.
             check(unsafe { libc::posix_spawn_file_actions_addclose(&mut actions.0, fd) })?;
         }
         if let Some(cwd) = &request.cwd {
             let cwd = cstring(cwd.clone().into_os_string().into_vec())?;
             // SAFETY: NUL-terminated path; glibc copies it.
-            check(unsafe { libc::posix_spawn_file_actions_addchdir_np(&mut actions.0, cwd.as_ptr()) })?;
+            check(unsafe {
+                libc::posix_spawn_file_actions_addchdir_np(&mut actions.0, cwd.as_ptr())
+            })?;
         }
         let mut flags = libc::POSIX_SPAWN_SETSIGMASK | libc::POSIX_SPAWN_SETSIGDEF;
         match request.lead {
@@ -442,17 +547,38 @@ mod posix {
             libc::sigemptyset(&mut default);
             libc::sigaddset(&mut default, libc::SIGPIPE);
             check(libc::posix_spawnattr_setsigdefault(&mut attr.0, &default))?;
-            check(libc::posix_spawnattr_setflags(&mut attr.0, flags as libc::c_short))?;
+            check(libc::posix_spawnattr_setflags(
+                &mut attr.0,
+                flags as libc::c_short,
+            ))?;
         }
         let mut pid: libc::pid_t = 0;
         // SAFETY: every pointer stays valid until posix_spawn returns.
-        let rc = unsafe { libc::posix_spawn(&mut pid, program.as_ptr(), &actions.0, &attr.0, argv_ptrs.as_ptr(), envp_ptrs.as_ptr()) };
+        let rc = unsafe {
+            libc::posix_spawn(
+                &mut pid,
+                program.as_ptr(),
+                &actions.0,
+                &attr.0,
+                argv_ptrs.as_ptr(),
+                envp_ptrs.as_ptr(),
+            )
+        };
         if rc == libc::ENOEXEC {
             let shell = cstring(b"/bin/sh".to_vec())?;
             let mut shell_argv = vec![shell.as_ptr() as *mut _, program.as_ptr() as *mut _];
             shell_argv.extend_from_slice(&argv_ptrs[1..]);
             // SAFETY: same owned actions/environment, with shell argv alive.
-            check(unsafe { libc::posix_spawn(&mut pid, shell.as_ptr(), &actions.0, &attr.0, shell_argv.as_ptr(), envp_ptrs.as_ptr()) })?;
+            check(unsafe {
+                libc::posix_spawn(
+                    &mut pid,
+                    shell.as_ptr(),
+                    &actions.0,
+                    &attr.0,
+                    shell_argv.as_ptr(),
+                    envp_ptrs.as_ptr(),
+                )
+            })?;
         } else {
             check(rc)?;
         }
@@ -460,7 +586,10 @@ mod posix {
         drop(sources);
         let [stdin, stdout, stderr] = parent_ends;
         Ok(MappedChild {
-            inner: Inner::Spawned { pid: pid as u32, status: None },
+            inner: Inner::Spawned {
+                pid: pid as u32,
+                status: None,
+            },
             stdin: stdin.map(File::from),
             stdout: stdout.map(File::from),
             stderr: stderr.map(File::from),

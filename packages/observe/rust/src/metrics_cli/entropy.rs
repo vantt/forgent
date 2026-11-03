@@ -95,13 +95,18 @@ pub fn calculate_entropy_score_and_parts(
 /// The most recent snapshot by instant; an unreadable store is an error, a bad
 /// line is named and skipped.
 pub fn read_last_snapshot(root: &Path) -> Result<Option<Value>, String> {
-    let store = shard::read_store(root, "snapshots", shard::UnsafeShard::Fail).map_err(|e| e.to_string())?;
+    let store = shard::read_store(root, "snapshots", shard::UnsafeShard::Fail)
+        .map_err(|e| e.to_string())?;
     shard::warn_skipped("snapshots", &store.invalid);
     Ok(store
         .records
         .into_iter()
         .filter_map(|record| {
-            let millis = record.value.get("ts").and_then(Value::as_str).and_then(parse_rfc3339_millis)?;
+            let millis = record
+                .value
+                .get("ts")
+                .and_then(Value::as_str)
+                .and_then(parse_rfc3339_millis)?;
             Some((millis, record.value))
         })
         .max_by_key(|(millis, _)| *millis)

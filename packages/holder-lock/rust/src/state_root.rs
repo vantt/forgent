@@ -82,7 +82,10 @@ pub fn state_root_from(get: impl Fn(&str) -> Option<String>) -> (PathBuf, Source
         return (PathBuf::from(home).join(".local/state/fgos"), Source::Home);
     }
     if let Some(profile) = get("USERPROFILE") {
-        return (PathBuf::from(profile).join(".local/state/fgos"), Source::Userprofile);
+        return (
+            PathBuf::from(profile).join(".local/state/fgos"),
+            Source::Userprofile,
+        );
     }
     (PathBuf::from(".local/state/fgos"), Source::RelativeFallback)
 }

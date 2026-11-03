@@ -17,7 +17,13 @@ pub fn dispatch_harness(
     req: &ObserveRequest,
     sources: &[Box<dyn ObservationSource>],
 ) -> Result<serde_json::Value, String> {
-    let flags = parse_flags("harness", &req.args, &["--case", "--since", "--until"], &[], false)?;
+    let flags = parse_flags(
+        "harness",
+        &req.args,
+        &["--case", "--since", "--until"],
+        &[],
+        false,
+    )?;
 
     let mut warnings = Vec::new();
 
