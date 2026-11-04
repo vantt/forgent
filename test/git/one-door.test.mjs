@@ -159,16 +159,19 @@ test('the spawn spy charges a command run through runBorrowed to the code that c
 
 // The static scan accepts an owner-declared tooling exemption by path and call digest; the runtime
 // spy must accept the same declaration (by path and holding function) or a test that runs the tool fails the suite.
+// The declarations live in a fixture root, so the proof holds while the repository declares none.
 test('the spawn spy classes a spawn from an owner-declared tooling function and still charges an undeclared one', () => {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-  const declared = JSON.parse(fs.readFileSync(path.join(root, 'scripts/lib/git-one-door-declarations.v1.json'), 'utf8')).declarations.find((d) => d.class === 'declared-tooling-exemption');
-  assert.ok(declared, 'scripts/lib/git-one-door-declarations.v1.json no longer declares a tooling exemption: point this proof at a fixture declarations root');
+  const declRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-one-door-decl-'));
+  const declared = { path: 'scripts/size-reader.mjs', siteId: 'readSizes:0000', class: 'declared-tooling-exemption', reason: 'fixture', retireWhen: 'fixture' };
+  fs.mkdirSync(path.join(declRoot, 'scripts', 'lib'), { recursive: true });
+  fs.writeFileSync(path.join(declRoot, 'scripts', 'lib', 'git-one-door-declarations.v1.json'), JSON.stringify({ declarations: [declared] }));
   const [fn] = declared.siteId.split(':');
   const stack = (name) => ['Error', `    at spiedSpawn (file://${root}/test/helpers/git-spawn-spy.mjs:110:20)`, `    at ${name} (file://${root}/${declared.path}:7:3)`].join('\n');
   assert.deepEqual(productSite(stack(fn)), { frame: `${declared.path}:7`, fn });
-  assert.equal(declaredToolingSite(root, declared.path, fn), true);
-  assert.equal(declaredToolingSite(root, declared.path, 'aFunctionNoOwnerDeclared'), false);
-  assert.equal(declaredToolingSite(root, 'src/runner/goal-check.mjs', fn), false, 'a declaration names its own file');
+  assert.equal(declaredToolingSite(declRoot, declared.path, fn), true);
+  assert.equal(declaredToolingSite(declRoot, declared.path, 'aFunctionNoOwnerDeclared'), false);
+  assert.equal(declaredToolingSite(declRoot, 'src/runner/goal-check.mjs', fn), false, 'a declaration names its own file');
   assert.equal(isReadGitCommand('git', ['-C', '/x', 'rev-parse', 'HEAD']), true);
   assert.equal(isReadGitCommand('/usr/bin/git', ['commit', '-m', 'x']), false, 'a write verb from a declared function is still charged');
   assert.equal(isReadGitCommand('sh', ['rev-parse']), false, 'only a Git binary is a read');
