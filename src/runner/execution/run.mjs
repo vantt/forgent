@@ -1240,8 +1240,14 @@ async function runUnitBody(options, scope) {
     const writeScope = effectiveWriteScope(unitRecord);
     // A merge a sync left open for this round is concluded first (unit-sync.mjs), then the rest.
     let nativeBaseline = recorded[0]?.nativeBaseline;
-    if (!readOnly && recorded.length > 0 && !nativeBaseline) return {outcome:'policy-refusal',role,round,
-      refused:{reason:'native-baseline-missing',detail:'this writing attempt has no native pre-producer baseline; start a new Unit run'}};
+    if (!readOnly && recorded.length > 0 && !nativeBaseline) {
+      return {
+        outcome: 'policy-refusal',
+        ...seatTag,
+        round,
+        refused: { reason: 'native-baseline-missing', detail: 'this writing attempt has no native pre-producer baseline; start a new Unit run' },
+      };
+    }
     const commitWork = (summarySource, runResult, excludePaths) => {
       const operationId = crypto.randomUUID();
       const attempt = unitRecord.bindings[key]?.at(-1);

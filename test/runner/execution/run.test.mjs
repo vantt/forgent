@@ -1440,6 +1440,27 @@ test('a resumed unit recorded before write scopes existed hands its own writes t
   assert.equal(JSON.parse(fs.readFileSync(unitJson, 'utf8')).writeScope, undefined);
 });
 
+test('a resumed writing seat whose recorded attempt has no native baseline is refused by name, not thrown', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  const first = await runUnit({
+    unitData: { id: 'u-no-baseline', objective: 'Edit a doc', capability: 'docs:write', writes: ['docs/x.md'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+  const unitJson = path.join(repoRoot, '.fgos', 'assignments', first.unitRunId, 'unit.json');
+  const record = JSON.parse(fs.readFileSync(unitJson, 'utf8'));
+  const attempts = record.bindings['producer/1'];
+  assert.ok(attempts?.length > 0, 'the first run recorded a binding');
+  for (const attempt of attempts) delete attempt.nativeBaseline;
+  fs.writeFileSync(unitJson, JSON.stringify(record, null, 2));
+  const resumed = await runUnit({ resumeUnitRunId: first.unitRunId, repoRoot, cwd: worktreeDir });
+  assert.equal(resumed.outcome, 'policy-refusal');
+  const refusal = resumed.results.at(-1);
+  assert.equal(refusal.role, 'producer');
+  assert.equal(refusal.refused.reason, 'native-baseline-missing');
+});
+
 test('a resumed unit keeps the run timeout it started with; an override passed to the resume does not change it', async (t) => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
