@@ -130,6 +130,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'pi-hook-wired',
       'mailbox-hook',
       'mailbox-claude-accept',
+      'mailbox-sync-timer',
       'task-specs-resolve',
       'agent-claims-resolve',
       'agent-type-names-unique',

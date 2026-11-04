@@ -227,6 +227,7 @@
     "src/setup/agent-hooks.mjs": "infra",
     "src/setup/mailbox-limits.mjs": "infra",
     "src/setup/mailbox-claude-accept.mjs": "infra",
+    "src/setup/mailbox-sync-timer.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/holder-lock-checks.mjs": "infra",
     "src/setup/git-checks.mjs": "infra",

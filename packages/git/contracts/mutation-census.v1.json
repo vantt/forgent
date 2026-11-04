@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ca711c5bf63738091094f3bb952f56547d7068b51e23468edf5fefba2b4ee247",
+  "payloadDigest": "cefbee982f251345b83a6cebefc959bd9451d35a1286cca2b0d7db82207e81b7",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1127,9 +1127,10 @@
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
     "src/setup/mailbox-claude-accept.mjs": "0b6377d2c99d704c163b8d53db8f68c5f12ed4628843c768d0d2ddc3129bdc6c",
     "src/setup/mailbox-limits.mjs": "ba0ec014f188f3d84842b0997c60a524fc4e5df2a79f7216d2df471878d51513",
+    "src/setup/mailbox-sync-timer.mjs": "af73eff527cc3c3266ee36e847bd91a96622d6cdf711c07457e563ca6caf667d",
     "src/setup/model-pool-checks.mjs": "a770f17808c6a02cd2d5e50e145711635587f78eddf0639eb5525a7d442a9246",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "b65e8d98a21fc703365ba3e1051aafd83bd29a752dd96dd4bcaeffcb2abd3a80",
+    "src/setup/registrations.mjs": "b363bd8846126ea1911bb47e72acc5b70fd7312bca54740e55468e1bb588ccde",
     "src/setup/run-supervisor-checks.mjs": "4e96ce52ec646c77d628ad05701a21729f3330afe95c0a6e15e8d406aebb2db3",
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
     "src/setup/seat-binding-checks.mjs": "1620c36971e9f1ba1e113715b334b1b3b326dd62bfd2d557656fade19aa73691",
@@ -3511,28 +3512,21 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2213,
+      "line": 2214,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2537,
+      "line": 2549,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2551,
-      "spawn": "execFileSync",
-      "binary": "(env FGOS_CLAUDE_COMMAND)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/setup/registrations.mjs",
-      "line": 2605,
+      "line": 2563,
       "spawn": "execFileSync",
       "binary": "(env FGOS_CLAUDE_COMMAND)",
       "class": "configured-binary"
@@ -3546,42 +3540,49 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4872,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1645",
+      "line": 2629,
+      "spawn": "execFileSync",
+      "binary": "(env FGOS_CLAUDE_COMMAND)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "line": 4884,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1646",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4919,
+      "line": 4931,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:826",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4960,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1645",
+      "line": 4972,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1646",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4967,
+      "line": 4979,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5430,
+      "line": 5442,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:56",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5506,
+      "line": 5518,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:127",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
