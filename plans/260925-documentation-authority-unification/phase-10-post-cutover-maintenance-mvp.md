@@ -22,12 +22,12 @@ dependencies: [9]
 1. **No new `fgos doc` verbs (Q3).** Two existing doors own the work: `fgos convention` owns path and kind, and doc-health owns the body. The reasons for each cut verb are in the report, section "Cut". This narrows the surface list in the original phase text: L10 forbids adding a door beside an existing one, and RUL104 asks for "better, not bigger".
 2. **The dead-reference rule is in scope (Q2).** Every backticked repo-root path in a canonical doc must exist at HEAD, unless the same line pins a commit sha. Two kinds of file are exempt:
    - decision records and history files, because they record past state;
-   - files that convention classifies as `history`, `decision` or `metadataExempt`.
+   - files that convention classifies as `history`, `decision` or `verification` (dated evidence), or as `metadataExempt`.
 
    The sweep also fixes the 9 code comments that still cite retired doc roots.
 3. **The documentation-cutover lease is retired as its own item after Phase 10 (Q4).** Its only job was protecting the cutover. The request to HARDEN to extend it into `fgos workflow gate` is withdrawn.
 4. **Activating a release that has the Phase 9 guards (Q1, G1)** belongs to the landing lane, and the owner gives the go. It is not a Phase 10 step.
-5. **Plan files stay put.** `plan.md` stays where it is, because the sealed history README links to it. `scripts/generate-shipped-path-inventory.mjs` stays, because the census suite uses it.
+5. **Plan files stay put.** `plan.md` stays where it is, because the sealed history README links to it. `scripts/generate-shipped-path-inventory.mjs` is retired with the other migration tools: on main its only use was the census JSON listing it as a Git writer, no test or script outside the migration tools called it, and no CONV2 plan cites it. This amends the earlier decision to keep it "because the census suite uses it".
 
 ## Steps
 

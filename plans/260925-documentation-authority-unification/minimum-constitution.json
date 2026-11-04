@@ -814,8 +814,9 @@
     ],
     "evidence": "The six candidateCore fields are present in all 72 headered documents under docs/platform/** (measured by script on the plan branch, 2026-10-06) and in all three promoted area portals; only 13 carry the whole governance baseline. Owner decision 2026-10-06: six at migration time, the full baseline plus Supersedes and Superseded by at promotion.",
     "checkedBy": {
-      "kind": "script",
-      "path": "scripts/check-doc-constitution.mjs",
+      "kind": "retired",
+      "was": "scripts/check-doc-constitution.mjs",
+      "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention",
       "note": "--promotion reports missing promotion fields (report only); the candidate-field check itself is planned."
     },
     "governanceRef": "5. Metadata"
@@ -894,8 +895,9 @@
         "id": "owner-per-claim",
         "rule": "Every retained claim row has exactly one targetOwner and no unknown-blocking row remains for the promoted sources.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-inventory-gates.mjs"
+          "kind": "retired",
+          "was": "scripts/check-doc-inventory-gates.mjs",
+          "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention"
         }
       },
       {
@@ -926,8 +928,9 @@
         "id": "claims-reviewed",
         "rule": "Every claim row of the document has reviewStatus reviewed.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-inventory-gates.mjs"
+          "kind": "retired",
+          "was": "scripts/check-doc-inventory-gates.mjs",
+          "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention"
         }
       },
       {
@@ -947,40 +950,45 @@
         "id": "file-disposition",
         "rule": "The file has one non-blocking file-level disposition.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-inventory-gates.mjs"
+          "kind": "retired",
+          "was": "scripts/check-doc-inventory-gates.mjs",
+          "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention"
         }
       },
       {
         "id": "claims-closed",
         "rule": "No claim row of the file is unknown-blocking or unreviewed.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-inventory-gates.mjs"
+          "kind": "retired",
+          "was": "scripts/check-doc-inventory-gates.mjs",
+          "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention"
         }
       },
       {
         "id": "dropped-claims-resolved",
         "rule": "Every entry of the dropped-claims register has a reviewed disposition.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-inventory-gates.mjs"
+          "kind": "retired",
+          "was": "scripts/check-doc-inventory-gates.mjs",
+          "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention"
         }
       },
       {
         "id": "aliases-cover-immutable-refs",
         "rule": "Immutable historical references to the file resolve through the alias table.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "retired with the script; a retirement is now a deletion that doc-health fails on while any link dangles"
+          "kind": "retired",
+          "was": "scripts/check-doc-retirement.mjs",
+          "note": "script retired by the post-cutover maintenance phase; a retirement is now a deletion that doc-health fails on while any link dangles"
         }
       },
       {
         "id": "consumers-rewritten",
         "rule": "Every consumer edge is rewritten or proven non-authority.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "retired with the script; a retirement is now a deletion that doc-health fails on while any link dangles"
+          "kind": "retired",
+          "was": "scripts/check-doc-retirement.mjs",
+          "note": "script retired by the post-cutover maintenance phase; a retirement is now a deletion that doc-health fails on while any link dangles"
         }
       },
       {
@@ -1011,40 +1019,45 @@
         "id": "row-set-conserved",
         "rule": "Every claim identity of the previous ledger and identity registry is present in the current row set, or has a recorded removal with rationale and disposition.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-inventory-gates.mjs"
+          "kind": "retired",
+          "was": "scripts/check-doc-inventory-gates.mjs",
+          "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention"
         }
       },
       {
         "id": "one-owner-per-semantic-claim",
         "rule": "Rows that share a semanticClaimId name one distinct targetOwner.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-inventory-gates.mjs"
+          "kind": "retired",
+          "was": "scripts/check-doc-inventory-gates.mjs",
+          "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention"
         }
       },
       {
         "id": "cutover-mode",
         "rule": "The ledger validator runs in a cutover mode: every retained claim has an owner, an anchor, a classified kind and review status reviewed, and vocabulary usage drift is fatal.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-constitution.mjs"
+          "kind": "retired",
+          "was": "scripts/check-doc-constitution.mjs",
+          "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention"
         }
       },
       {
         "id": "reviewed-rationale",
         "rule": "A row reviewed at cutover carries its own reviewed rationale on the row; the inventory item's proposedRationale fallback is not enough.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-constitution.mjs"
+          "kind": "retired",
+          "was": "scripts/check-doc-constitution.mjs",
+          "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention"
         }
       },
       {
         "id": "canonical-metadata-complete",
         "rule": "Every maintained canonical document under docs/platform/** carries all promotionFields (the validator --promotion report lists the gaps).",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-constitution.mjs"
+          "kind": "retired",
+          "was": "scripts/check-doc-constitution.mjs",
+          "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention"
         }
       }
     ]

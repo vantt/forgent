@@ -407,6 +407,10 @@ Use links to preserve the reading graph.
   tests/proof, and compatibility notes.
 - Decision links to affected docs, evidence, and supersession.
 - Verification links to the claim it proves and any known limitations.
+- A backticked repo-root path in a current-state doc names a file that exists.
+  When the file is gone, say so and pin the commit that removed it; doc-health
+  fails on any other dead path (history, decision and verification docs record
+  past state and are exempt).
 
 Related-file rule:
 
