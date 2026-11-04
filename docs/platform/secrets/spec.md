@@ -66,7 +66,7 @@ Evidence is split by class: read from source, read from a machine file by name o
 | A copy of the key sits in `~/.pi/accounts/openrouter/auth.json`, mode 0600, created by hand as an interim measure; `auth.json` entries were added to `~/.fgos/config.json` and `.fgos/config.json` | machine file, names and mode only | `ls -l`, `grep -n auth.json` |
 | Two functions expand `${VAR}` and replace a missing variable with an empty string, so a typo yields an empty key and a later opaque failure | source | `src/runner/dispatch/provider-adapter.mjs` line 189 (`resolveEnvPatch`), `src/runner/dispatch/adapters.mjs` line 147 (`resolveExecutorEnv`) |
 | Three further functions expand `${HOME}` only | source | `src/setup/agy-permissions.mjs` line 153, `src/runner/dispatch/provider-credential-probe.mjs` line 34, `src/setup/registrations.mjs` line 4459 |
-| The OpenRouter key variable left the committed pi invocation env because pi reads the key from its login store `auth.json`; a test pins it | source | `git show 4f6fc44d7`; `test/runner/provider-adapter.test.mjs` line 402 |
+| The OpenRouter key variable left the committed pi invocation env because pi reads the key from its login store `auth.json`; a test pins it | source | `git show 4f6fc44d7`; `test/runner/herdr-claude-invocations.test.mjs` line 37 |
 | The privacy hook patterns cover `.env`, `.env.*`, `credentials`, `secrets.yaml`, `*.pem`, `*.key`, `id_rsa`, `id_ed25519`. They do not match `secrets.local.env` or `auth.json` | source | `.claude/hooks/lib/privacy-checker.cjs` lines 43 to 52 |
 | `herdr pane --env KEY=VALUE` puts a secret value in the argv of the `herdr` process for the length of one call; the owner accepted this risk | decision | `git show 76d8539d1` |
 
@@ -258,7 +258,7 @@ Each step is a change on the owner's machine or in the repository. None of them 
 1. Remove the zsh hook that exports the project secrets file from `~/.zshrc`.
 2. Move the key out of the `glm2` function in `~/.zshrc`. The function takes the value from the component's resolver, not from a literal.
 3. Delete the interim `~/.pi/accounts/openrouter/auth.json` once the writer materializes it at lease time. Remove the `auth.json` entries added to `~/.fgos/config.json` and `.fgos/config.json` for that interim, after checking which of the existing `auth.json` entries are person-made logins that must stay (`.fgos/config.json` lines 818, 944, 1135, 1168; `~/.fgos/config.json` line 288).
-4. Rename the shared variable to one name. Candidate `OPENROUTER_API_KEY`; today `GLM_OPENROUTER_API_KEY`. This is a decision to confirm (section 15 question 5). Rename the file entry, the test reference in `test/runner/provider-adapter.test.mjs`, and the config references in one change.
+4. Rename the shared variable to one name. Candidate `OPENROUTER_API_KEY`; today `GLM_OPENROUTER_API_KEY`. This is a decision to confirm (section 15 question 5). Rename the file entry, the test reference in `test/runner/herdr-claude-invocations.test.mjs`, and the config references in one change.
 5. Rotate the key that sits as a literal in `~/.zshrc`. A value that has lived in a shell profile and in a transcript is treated as exposed.
 6. Replace the two `${VAR}` functions with the one expansion function and delete both.
 

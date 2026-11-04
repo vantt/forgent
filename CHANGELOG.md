@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- The `shadow-binder-divergence` doctor row is removed together with the claude argv shadow binder it reported on: a launch always used the argv built from the executor's own template (the second rendering never won), so nothing is recorded in `.fgos/dispatch/shadow-binder-divergence.jsonl` any more and an existing file there is unused.
 - A pipe, link or oversized file planted by an agent in place of the project's `.mcp.json`, `.codex/hooks.json` or a private home's ownership marker no longer hangs or redirects dispatch: those files are read through the bounded, no-follow agent-file door and refused by name.
 - The blind-pool doctor row now reads an executor's provider family the way a run does, so an executor with no command of its own that takes the global `executor.command` is no longer judged as `claude`.
 - `fgos doctor` runs about a third of the host seat-binding calls it did (559 to 183 on this machine): the blind-pool row no longer walks each seat's whole fallback chain to read its candidates.

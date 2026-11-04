@@ -198,9 +198,9 @@ const EXPECTED_CLOSURE = [
   'src/runner/dispatch/tier-cell.mjs',
   // The config facade reconcile.mjs reads the machine's runner through (one native door call; reconcile reaches `readMachineConfig` only).
   'src/config/facade.mjs',
-  // Pure leaf (node:crypto + worker_threads' threadId): unique temp-file
-  // names for the planner's and visibility-session's write-then-rename.
-  'src/util/unique-tmp-tag.mjs',
+  // The durable-file publish door the planner replaces a run record through (node:fs, node:path,
+  // node:crypto and the native door; no process control).
+  'src/runner/dispatch/proof-helpers.mjs',
   // Read-only assignment layout (node:fs + node:path only): runtime
   // inspection and findRunningRuns enumerate nested runs through it.
   'src/runner/dispatch/assignment-layout.mjs',
@@ -208,8 +208,7 @@ const EXPECTED_CLOSURE = [
   // no imports of its own. Reached now that run-result.mjs is walked through.
   'src/runner/dispatch/agent-result-claim-contract.mjs',
   // provider-capacity.mjs's own imports, reached now that it is walked through:
-  // provider-family normalization (node:fs/node:path; its only write is a
-  // best-effort shadow-binder telemetry append, no process control) ...
+  // provider-family normalization (node:path only, no process control) ...
   'src/runner/dispatch/provider-adapter.mjs',
   // ... the auth-failure wording table, a leaf with no imports, kept apart
   // so provider-capacity never imports a process-control module for it ...

@@ -196,7 +196,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'operation-capability-resolves',
       'runner-patterns-config',
       'runner-generated-paths',
-      'shadow-binder-divergence',
       'tier-vocabulary-dead-keys',
       'executor-family-unique',
       'executor-skills-installed',

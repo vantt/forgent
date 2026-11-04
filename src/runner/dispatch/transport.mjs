@@ -29,7 +29,7 @@ import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
 import { RunnerConfigError, assertReasoningEffort } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
-import { resolveVerifiedProviderArgs, recordShadowBinderDivergence, renderReasoningEffortArgs, checkLaunchedModel } from './provider-adapter.mjs';
+import { renderReasoningEffortArgs, checkLaunchedModel } from './provider-adapter.mjs';
 import { resolveHerdrBin } from './terminal-slot.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 
@@ -181,33 +181,7 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     }
     return arg.split('{prompt}').join(prompt).split('{model}').join(model);
   });
-  // Phase E step 1 (executor-profile-schema-migration): ProviderAdapter
-  // argv-rendering production binder, self-verifying -- same safety
-  // posture as Phase 07/08. `legacyArgs` above is UNCHANGED, always
-  // computed first; ProviderAdapter's rendering is used ONLY when it
-  // agrees byte-for-byte, so real dispatch can never regress. Scoped to
-  // the "claude" provider family only (this phase's own stated scope,
-  // plans/260917-executor-profile-schema-migration/plan.md) -- every
-  // other provider family's argv stays 100% legacy, this binder never
-  // even attempts them.
-  let args = legacyArgs;
-  if (executor.governance?.providerFamily === 'claude') {
-    const { args: verifiedArgs, divergence } = resolveVerifiedProviderArgs({
-      providerFamily: executor.governance.providerFamily,
-      command: executor.command,
-      baseArgs: argsTemplate,
-      promptPlaceholder: prompt,
-      model,
-      legacyArgs,
-    });
-    args = verifiedArgs;
-    if (divergence) {
-      process.stderr.write(
-        `fgos: ProviderAdapter argv divergence (falling back to legacy) executor=${executorId ?? ''} legacyArgs=${JSON.stringify(divergence.legacyArgs)} renderedArgs=${JSON.stringify(divergence.renderedArgs)}\n`,
-      );
-      recordShadowBinderDivergence(fgosDir, 'provider-args', { executorId: executorId ?? null, ...divergence });
-    }
-  }
+  const args = legacyArgs;
   const MAX_ARG_STRLEN = 131072;
   for (let i = 0; i < args.length; i++) {
     if (typeof args[i] === 'string' && Buffer.byteLength(args[i]) > MAX_ARG_STRLEN) {

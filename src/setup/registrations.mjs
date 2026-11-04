@@ -5105,45 +5105,6 @@ registerCheck({
   check: (cwd) => checkConfinementHerdrMaturity(cwd),
 });
 
-// dispatch-engine-liveness-hardening Phase 7 (C1): shadow binder
-// (`resolveVerifiedProviderArgs`, `recordShadowBinderDivergence`) now writes
-// a real disagreement to a durable local JSONL instead of only an ephemeral
-// stderr line. Informational, not a gate: a fallback-to-legacy disagreement
-// is handled safely by design (the real spawn never regresses on
-// divergence), so this never fails the check -- it only makes the
-// otherwise-invisible event visible to `fgos doctor`, closing the exact gap
-// this track's own investigation had to work around by manually grepping
-// ~800 historical stderr.log files.
-function checkShadowBinderDivergence(cwd) {
-  const logPath = path.join(cwd, '.fgos', 'dispatch', 'shadow-binder-divergence.jsonl');
-  if (!fs.existsSync(logPath)) {
-    return { passed: true, message: 'no shadow-binder divergence recorded' };
-  }
-  let lines;
-  try {
-    lines = fs.readFileSync(logPath, 'utf8').split('\n').filter((line) => line.trim());
-  } catch {
-    return { passed: true, message: `${logPath} exists but could not be read` };
-  }
-  if (lines.length === 0) {
-    return { passed: true, message: 'no shadow-binder divergence recorded' };
-  }
-  let last;
-  try {
-    last = JSON.parse(lines[lines.length - 1]);
-  } catch {
-    last = null;
-  }
-  const lastDesc = last ? `${last.binder ?? '(unknown)'} at ${last.ts ?? '(unknown)'}` : '(last entry unreadable)';
-  return { passed: true, message: `${lines.length} shadow-binder divergence event(s) recorded — most recent: ${lastDesc}` };
-}
-
-registerCheck({
-  id: 'shadow-binder-divergence',
-  description: 'real PlacementPolicy/ProviderAdapter shadow-binder divergence is durably recorded, not only ephemeral stderr (dispatch-engine-liveness-hardening Phase 7, C1)',
-  check: (cwd) => checkShadowBinderDivergence(cwd),
-});
-
 // ─── Observe Component (Phase F8, plans/260929-1501-metrics-friction-rust-native) ─
 
 export function checkObserveDirWritable(cwd) {

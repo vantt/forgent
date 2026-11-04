@@ -346,7 +346,6 @@
     "test/runner/prompt-templates.test.mjs": 0.1,
     "test/runner/proof-helpers.test.mjs": 1.2,
     "test/runner/provider-account-probe.test.mjs": 0.1,
-    "test/runner/provider-adapter.test.mjs": 1,
     "test/runner/provider-auth-failure.test.mjs": 0.6,
     "test/runner/provider-capacity.test.mjs": 10.9,
     "test/runner/provider-credential-probe.test.mjs": 0.1,

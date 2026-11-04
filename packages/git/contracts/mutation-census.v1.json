@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ea3e4df53c63fe64e42ac51c3a7d4c651dc48098797d6822865ed34f9941c562",
+  "payloadDigest": "f6b2e0001c22a2119248b5f134d1527271e4217a5cf94aaca711aba053c047d8",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1006,7 +1006,7 @@
     "src/runner/dispatch/process-identity.mjs": "37fd2e1b2fa509428bfe64a962b8716dc7f4952beb7efc84e32212b83d739b2f",
     "src/runner/dispatch/proof-helpers.mjs": "526f4f54bd357e87887fc160b0da80ac38bb148da91189147ab063298f841b81",
     "src/runner/dispatch/provider-account-probe.mjs": "bfded5e8a1deeb6bae30950f84ae8a587c4e911892761c50cdab0cf4bfd7e86e",
-    "src/runner/dispatch/provider-adapter.mjs": "d750985427a85fd25309d3d54fed014758e6a1a57ebc9c1cd240f4e314103723",
+    "src/runner/dispatch/provider-adapter.mjs": "df1f9a898ed9b05cb336dd6620c74e41b5c54c4ae38c30ef50008566c5d8cb7a",
     "src/runner/dispatch/provider-auth-failure.mjs": "ad3d07cc29e54f6758694ed861afbf66fa30e6568905e9f9383ac7b6943f19f7",
     "src/runner/dispatch/provider-capacity.mjs": "b24ee0603886fdb7376ca108bf5688db6e57e73fd5d73edd92365135e909ff6c",
     "src/runner/dispatch/provider-credential-probe.mjs": "b1773175ff065ce80e9bb2b5123de15cc4d9b04a9bc0f249d9a1c971653bae74",
@@ -1024,7 +1024,7 @@
     "src/runner/dispatch/stray-writes.mjs": "8ab287ef44a7e731d4c22fb50e820017645d707e9b41b63a75b7fb4bc028f2ff",
     "src/runner/dispatch/terminal-slot.mjs": "82ed4279c054f2486bb8f3223182c9a1043426d0cae2a846449eda29967665df",
     "src/runner/dispatch/tier-cell.mjs": "3c1a50df77c26c22c6bc88d00da6b90012008e633bdbb27c4d854fb1a369b722",
-    "src/runner/dispatch/transport.mjs": "01d89783f0c3b4591be227d58ecc808401f306133388d4985f52bb53ad3e5f11",
+    "src/runner/dispatch/transport.mjs": "6fe4625eb94940639db2ca62d0a4976365dd9a216e1b31f0a6e4c21be6c60351",
     "src/runner/dispatch/trust-store.mjs": "980091da229ab962857f16acc955c5fa577a0c4f2f5c1ca3ffa9cec6af4f871f",
     "src/runner/dispatch/usage-parsers.mjs": "e1dab633033d43fe88fc0bf0db6595897c0b999205619ef1efdee7c2e9db7d18",
     "src/runner/dispatch/visibility-session.mjs": "1b86398bfd72140eecd23ef8b3c6cc66cf628f228d465929bc157df350ed0713",
@@ -1122,7 +1122,7 @@
     "src/setup/mailbox-sync-timer.mjs": "6628ebdd706138f32b9733bba2880b075c9d5c701695b85bf55347e47d3756ef",
     "src/setup/model-pool-checks.mjs": "a770f17808c6a02cd2d5e50e145711635587f78eddf0639eb5525a7d442a9246",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "2353647cc5f7bee89911f7381c2e02e1889382de866b526838763c8545dbab92",
+    "src/setup/registrations.mjs": "e2eeb9d85d5d576e4e71f6c9160d7afe39cdd54cdb302d4cfd22d55d542c31ad",
     "src/setup/run-supervisor-checks.mjs": "8e8a3ab775342280d0fbae74652d769222d783db60c691d05c231b7e35bb6c16",
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
     "src/setup/seat-binding-checks.mjs": "1620c36971e9f1ba1e113715b334b1b3b326dd62bfd2d557656fade19aa73691",
@@ -3505,14 +3505,14 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5417,
+      "line": 5378,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:56",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5493,
+      "line": 5454,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:127",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
