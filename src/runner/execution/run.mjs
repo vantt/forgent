@@ -162,6 +162,15 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
 }
 
 /**
+ * The account inventory, read from the config on every call and never from a copy kept for the run, so an
+ * account added or removed while a unit runs is seen by the next bind. A caller-supplied config is its own
+ * inventory.
+ */
+export function readAccountInventory(mainRoot, suppliedConfig) {
+  return accountInventoryConfigOf(suppliedConfig ?? loadRunnerConfigForDir(mainRoot));
+}
+
+/**
  * A producer attempt whose agent turn passed but whose runner commit failed: a resume commits it
  * again without spawning the agent. Not when the failed commit is still on the branch carrying
  * paths outside the scope; a person has to take that commit off first.
@@ -621,7 +630,7 @@ async function runUnitBody(options, scope) {
   // Read at first use, so a resume that is refused for its record never needs the config.
   let liveConfigRead;
   const liveConfig = () => (liveConfigRead ??= options.runnerConfig ?? loadRunnerConfigForDir(mainRoot));
-  const withAccounts = (runner) => ({ ...runner, ...accountInventoryConfigOf(liveConfig()) });
+  const withAccounts = (runner) => ({ ...runner, ...readAccountInventory(mainRoot, options.runnerConfig) });
 
   let unit;
   let unitRunId;
@@ -1159,7 +1168,6 @@ async function runUnitBody(options, scope) {
     assertSeatId(seatId);
     const seatTag = { seat: seatId, role: seat.role, posture: seat.posture };
     const readOnly = seat.posture.readOnly;
-    const runnerConfig = withAccounts(unitRecord.configSnapshot.runner);
     const session = {
       provider: options.session?.provider,
       tier: options.session?.tier,
@@ -1186,7 +1194,7 @@ async function runUnitBody(options, scope) {
     });
     const assignmentIdOf = (n) => (n === 0 ? `${unitRunId}/${seatId}/${round}` : `${unitRunId}/${seatId}/${round}-fb${n}`);
     // Account lease state is read for the next attempt (the account this assignment already holds ranks first).
-    const bindCtxFor = (n) => ({ runnerConfig, session, accounts: { runtimeDir: options.providerCapacityRuntimeDir, assignmentId: assignmentIdOf(n) } });
+    const bindCtxFor = (n) => ({ runnerConfig: withAccounts(unitRecord.configSnapshot.runner), session, accounts: { runtimeDir: options.providerCapacityRuntimeDir, assignmentId: assignmentIdOf(n) } });
 
     const key = `${seatId}/${round}`;
     const recorded = unitRecord.bindings[key] ?? [];
@@ -1491,7 +1499,7 @@ async function runUnitBody(options, scope) {
       if (bound.account) {
         return stopRetry('account-pinned', `account "${bound.account.pool}/${bound.account.id}" was pinned, so the seat is not moved to another account or executor; pin another account or wait for this one`);
       }
-      const rotation = bound.pool ? inspectAccountRotation({ runnerConfig, pool: bound.pool, runtimeDir: options.providerCapacityRuntimeDir }) : null;
+      const rotation = bound.pool ? inspectAccountRotation({ runnerConfig: withAccounts(unitRecord.configSnapshot.runner), pool: bound.pool, runtimeDir: options.providerCapacityRuntimeDir }) : null;
       if (mayRotateAccount(rotation, rotationsSpent)) {
         // The same candidate again: the lease picks the next account of its pool.
         const again = bind(askOf(), bindCtxFor(attemptNo + 1), { walk: { continuity: bound, from: bound, rotation: true, failedAccounts: failedAccountsOf(attempts), detail: { accountsHealthy: rotation.healthy } } });

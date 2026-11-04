@@ -12,7 +12,7 @@ import crypto from 'node:crypto';
 import { nativeDoor } from '../../../src/native/door.mjs';
 import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
-import { runUnit as coreRunUnit, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
+import { runUnit as coreRunUnit, readAccountInventory, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError, loadRunnerConfigForDir, runnerOriginsOf } from '../../../src/runner/dispatch/config.mjs';
 import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
 import { writeUnitSummary, buildUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
@@ -26,7 +26,7 @@ seedFileLocalBwrapRegistry();
 // must reach (command, worker script, worktree) live outside it.
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
-import { writeProjectConfig, writeGlobalConfig, readProjectConfig, withHome } from '../../helpers/config-fixture.mjs';
+import { writeAccountsFile, writeProjectConfig, writeGlobalConfig, readProjectConfig, withHome } from '../../helpers/config-fixture.mjs';
 
 function setupGitRepo() {
   const tmp = makeFixtureDir('fgos-run-test-');
@@ -2498,4 +2498,19 @@ test('an unpinned schema-1 record resumes through the decoder', async () => {
   assert.equal(secondResume.outcome, 'pass');
   const secondStored = JSON.parse(fs.readFileSync(path.join(critDir, 'unit.json'), 'utf8'));
   assert.ok(secondStored.collaboration.effective.seats.some((s) => s.seat === 'tester'), 'tester seat preserved across second resume');
+});
+
+test('the account inventory is read from the config on every call, so an account added while a unit runs is seen by the next bind', () => {
+  const root = makeFixtureDir('fgos-run-inventory-root-');
+  const home = makeFixtureDir('fgos-run-inventory-home-');
+  writeProjectConfig(root, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { openai: {} } } });
+  const accountsOf = (inventory) => Object.keys(inventory.llmAccounts?.openai ?? {});
+  withHome(home, () => {
+    writeAccountsFile(path.join(home, '.fgos'), { llmAccounts: { openai: { first: { credentialStore: { codex: '/srv/codex-first' } } } } });
+    assert.deepEqual(accountsOf(readAccountInventory(root)), ['first']);
+    writeAccountsFile(path.join(home, '.fgos'), { llmAccounts: { openai: { first: { credentialStore: { codex: '/srv/codex-first' } }, second: { credentialStore: { codex: '/srv/codex-second' } } } } });
+    assert.deepEqual(accountsOf(readAccountInventory(root)), ['first', 'second']);
+    const supplied = { llmAccounts: { openai: { only: {} } } };
+    assert.deepEqual(accountsOf(readAccountInventory(root, supplied)), ['only'], 'a config the caller supplied is its own inventory');
+  });
 });
