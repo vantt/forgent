@@ -329,7 +329,7 @@ Resolution có thứ tự cố định:
 5. Registry nội bộ lookup driver bằng `instance.type`; đây là lookup type đã
    công bố trong schema, không phải routing key mà user phải đoán.
 6. Driver kiểm tra host + instance config + request có cover policy hay không.
-7. Authority execute hoặc refuse/degrade theo mode; không thử instance thứ hai.
+7. Authority prepare hoặc refuse/degrade theo mode; không thử instance thứ hai. Agent chạy sau đó như một attempt dưới run supervisor.
 
 `enabled` mặc định là `true` khi entry tồn tại. Setup có thể tạo instance
 `bwrap` thuận tiện trên machine hỗ trợ, nhưng đó chỉ là một entry có tên để

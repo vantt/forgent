@@ -7,7 +7,7 @@ source_capture_ids: []
 ---
 # How to Configure and Operate Agent Confinement
 
-The Agent Confinement Authority provides a single runtime execution door (`executeThroughConfinement`) for every external agent dispatch in fgOS. It translates declarative policies into operating-system sandboxing and session boundaries before any agent can execute, guarantees fail-closed enforcement for required policies, and produces durable, audited attestation records.
+The Agent Confinement Authority provides a single runtime launch door (`prepareConfinementForLaunch`) for every external agent dispatch in fgOS. It translates declarative policies into operating-system sandboxing and session boundaries before any agent can run, guarantees fail-closed enforcement for required policies, and produces durable, audited attestation records.
 
 ---
 

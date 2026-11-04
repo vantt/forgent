@@ -326,7 +326,6 @@ This table is selective for the Event Store: it lists the two rows a project own
 | `coordination-protocol-fixtures-valid` | Coordination protocol definitions validate | `coordination protocol fixtures retired` | info | none |
 | `operation-prompt-templates-valid` | Operation prompt templates validate | names the template | you | Fix the named template |
 | `coordination-example-requests-valid` | Published coordination example requests validate | `coordination example requests retired` | info | none |
-| `shadow-binder-divergence` | Placement shadow-binder divergence is recorded durably | names the divergence | info | Report it |
 | `observe-dir-writable` | `.fgos/observe` is writable | names the path | you | Fix directory permissions |
 | `observe-friction-migrated` | Legacy friction records are migrated to `.fgos/observe/friction` | `N legacy work.friction record(s) newer than cursor (not migrated) -- run: <host binary> friction migrate --dir <project>` | you | Run the named command. `friction` is a Rust host verb (`.fgos/installation/bin/fgos`, or `FGOS_HOST_BIN`); the Node `fgos` entry has no such verb and no registered fix does it |
 | `observe-host-resolvable` | The Rust host resolves and reads the friction store | `host binary unavailable (FGOS_HOST_BIN unset and no active installation ...)` | you | `fgctl repair` |

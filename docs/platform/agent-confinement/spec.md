@@ -29,8 +29,8 @@ Superseded by: None
 
 
 > **Trạng thái:** IMPLEMENTED. Đã được hiện thực hoá hoàn chỉnh qua track `confinement-authority-implementation` (P00-P07).
-> Một cửa runtime duy nhất `executeThroughConfinement` bảo vệ mọi dispatch ngoại trình (`cli-spawn`, `herdr-spawn`, `http`)
-> trước khi adapter được spawn agent. Backend registry `~/.fgos/confinement-backends.json` quản lý backend instances máy chủ,
+> Một cửa runtime duy nhất `prepareConfinementForLaunch` (chạy `assessAndPrepare`, `confinement/authority.mjs`) bảo vệ mọi attempt ngoại trình (`cli-spawn`, `herdr-spawn`)
+> trước khi run supervisor chạy agent; không còn cửa "vừa chuẩn bị vừa chạy adapter" (`executeThroughConfinement`) nào. Backend registry `~/.fgos/confinement-backends.json` quản lý backend instances máy chủ,
 > driver `bwrap` v1 bảo đảm fail-closed cho `required` với 9 falsification probes (8 probe gốc cộng `machine-private-hidden`, §9.3; probe thứ mười `peer-run-hidden` chỉ cho blind). Các invocation bwrap hiện dùng backend reference `confinement.backend: bwrap`;
 > các executor id cũ `claude-bwrap`, `agy-bwrap`, `codex-bwrap` đã được hợp nhất thành các invocation cli/cli-bwrap.
 > Live migration đã được thực hiện, không còn chỉ ở fixture hay deferred. Live dogfood
@@ -48,28 +48,31 @@ Superseded by: None
 fgOS sẽ có **một cửa runtime duy nhất** cho mỗi lần đưa agent ra ngoài process:
 
 ```text
-executeThroughConfinement(request, adapterPort) -> result + attestation
+prepareConfinementForLaunch(request, opts) -> attempt đã prepare (invocation, descriptor finalization, launch envelope) + attestation `prepared`
 ```
 
 Mọi đường dispatch phải đi qua cửa này sau khi đã có đầy đủ `cwd`,
-`repoRoot`, `runDir`, executor, invocation và adapter, nhưng trước khi adapter
-được phép spawn hoặc giao việc cho agent. Agent Confinement Authority là thành phần
-duy nhất được gọi executor adapter.
+`repoRoot`, `runDir`, executor, invocation và adapter, nhưng trước khi agent
+được chạy. Agent chạy như một attempt dưới run supervisor
+(`docs/platform/run-supervisor/spec.md`), nên Authority chỉ chuẩn bị và attest; không
+production call site nào tra hay gọi execute function của adapter, và adapter
+`cli-spawn`/`herdr-spawn` từ chối bằng tên khi bị gọi trực tiếp (`transport.mjs`).
+Guard R8 trong `test/architecture.test.mjs` giữ bất biến này.
 
-Bên trong cửa có nhiều bước: resolve policy, compile plan, prepare backend,
-execute, attest và cleanup. Đó là **nhiều phase trong một authority**, không
+Bên trong cửa có nhiều bước: resolve policy, compile plan, prepare backend và
+attest; execute và dọn home thuộc attempt (run supervisor, finalize-home của adopt). Đó là **nhiều phase trong một authority**, không
 phải hai cửa. Config validation cũng không phải cửa runtime; nó chỉ từ chối
 cấu hình sai trước khi có dispatch.
 
 Kết luận “không thể một cửa vì `runDir` sinh muộn” của RUN2 chỉ đúng nếu vẫn
 đặt cửa ở `resolveExecutorConfig`. Nó không phải ràng buộc kiến trúc. Điểm kích
-hoạt đúng là seam chung ngay trước adapter, sau `openDispatchRun`. Ở seam này,
-cả hai đường hiện tại trong `dispatch/cli.mjs` đều đã có invocation đã resolve
-và `runDir` cụ thể.
+hoạt đúng là seam chung ngay trước khi attempt được giao cho supervisor
+(`executeAssignment`, `assignment-runner.mjs`). Ở seam này đã có invocation đã
+resolve và `runDir` cụ thể.
 
 ### 1.1 Vì sao một cửa quan trọng
 
-- Không adapter nào có thể quên đọc `confinement`, như `cliSpawnAdapter` hôm nay.
+- Không adapter nào có thể quên đọc `confinement`, như adapter `cli-spawn` từng quên.
 - Attestation và hành vi được sinh bởi cùng một authority; không còn đường
   “khai một nơi, spawn một nơi khác”.
 - Thêm adapter hoặc backend mới không tạo thêm enforcement point.
@@ -87,7 +90,7 @@ Bốn đường fail-open đã được xác nhận và đóng triệt để:
 
 | ID | Đường hở lịch sử | Giải pháp đã đóng (Settled) |
 |---|---|---|
-| F-a | `cliSpawnAdapter` bỏ qua field `confinement` | Hoàn thành ở P04: `cliSpawnAdapter` bắt buộc tiêu thụ invocation đã prepare bởi Authority; không còn đường unconfined ngầm. |
+| F-a | Adapter `cli-spawn` bỏ qua field `confinement` | Hoàn thành ở P04: adapter bắt buộc tiêu thụ invocation đã prepare bởi Authority. Nay thân adapter đã bị xoá: attempt chạy dưới run supervisor với invocation đã prepare, và gọi adapter trực tiếp bị từ chối bằng tên; không còn đường unconfined ngầm. |
 | F-b | `invocations[].confinement` không validate nhưng lại ưu tiên hơn | Hoàn thành ở P02/P04: validate nghiêm ngặt invocation override; cấm hạ cấp control, cấm thêm grant, cấm đổi policy id hay flip unconfined. |
 | F-c | capability không có `prefer` rơi về executor không confinement | Hoàn thành ở P04: fallback preserve anchor gốc và mang theo policy của anchor đó. |
 | F-d | `establishConfinement` không có khai báo vẫn trả kết quả thành công | Hoàn thành ở P04/P05: `ownWorktree` đơn lẻ không còn được coi là `confined: true`; hàm dùng chung `evaluateBypassPairing` ép buộc bypass phải có đủ privateHome, isolatedSession và ownWorktree. |
@@ -194,8 +197,8 @@ Agent Confinement Authority sở hữu:
 - prepare invocation/context cho adapter;
 - validate resource binding rồi giao resolved binding cho backend driver; driver
   materialize sandbox invocation từ binding đã được duyệt;
-- gọi đúng một adapter qua `adapterPort`;
-- phát attestation trước/sau execution và cleanup resource tạm;
+- chuẩn bị launch (invocation đã duyệt, descriptor finalization, launch envelope) cho đúng một adapter; việc chạy agent thuộc run supervisor;
+- phát attestation `prepared` hoặc `refused` trước khi agent chạy;
 - từ chối trước spawn khi requirement không thể đáp ứng.
 
 Agent Confinement Authority không sở hữu:
@@ -211,16 +214,15 @@ Agent Confinement Authority không sở hữu:
 
 1. Hai đường trong `dispatch/cli.mjs` resolve executor như hiện tại.
 2. Mỗi đường tạo hoặc nhận `runDir` trước.
-3. Mỗi đường gọi cùng `executeThroughConfinement`.
-4. Chỉ Agent Confinement Authority tra adapter execute function từ registry và gọi nó.
+3. Mỗi đường gọi cùng `prepareConfinementForLaunch`.
+4. Không production code nào tra adapter execute function từ registry (`EXECUTOR_ADAPTERS[...]`); guard R8 kiểm.
 5. Config validator chỉ đọc metadata registry, không nắm execute handle.
 6. Backend không được tự spawn agent. Backend chỉ prepare guarded invocation và
    lifecycle cleanup; Authority vẫn giữ quyền execute.
 
 Quy tắc 4 và 6 làm cho “một cửa” kiểm được bằng code, không chỉ là cách gọi tên.
-`adapterPort` là execute handle do Authority nhận từ registry tin cậy của
-process dispatch; caller không được tự truyền implementation hoặc đổi handle
-sau khi plan đã compile.
+Registry adapter chỉ còn metadata (`locus`, contract invocation và receipt đã
+prepare); execute handle của nó từ chối bằng tên vì agent chạy dưới supervisor.
 
 Adapter metadata có `locus: local-process | remote-http | herdr-pane`. cli-spawn là
 local-process; http là remote-http; herdr-spawn là herdr-pane dù request được gửi từ host. Bwrap chỉ nhận
@@ -239,42 +241,38 @@ sequenceDiagram
     participant D as Run allocator
     participant A as Agent Confinement Authority
     participant B as Backend registry
-    participant X as Executor adapter
+    participant S as Run supervisor
     participant G as Agent
 
     C->>R: resolve capability/executor/invocation
     R-->>C: resolved invocation + policy source
     C->>D: open or accept runDir
     D-->>C: concrete runDir
-    C->>A: executeThroughConfinement(request, adapterPort)
+    C->>A: prepareConfinementForLaunch(request)
     A->>A: normalize requirement + resolve grants
     alt explicit unconfined
         A->>A: record opt-out plan
-        A->>X: execute original invocation
-        X->>G: spawn/deliver
-        G-->>X: result
-        X-->>A: execution result
-        A-->>C: result + unconfined attestation
+        A-->>C: original invocation + unconfined attestation
     else required or preferred
         A->>B: resolve instance + assess coverage
         B-->>A: coverage + mismatches
         A->>A: decide + compile immutable plan
         alt required control unavailable or mismatch
-            A-->>C: refused attestation (no spawn)
+            A-->>C: refused attestation (no launch)
         else allowed
             A->>B: prepare approved plan
             B-->>A: prepared invocation + exact claims + cleanup
-            A->>X: execute prepared invocation
-            X->>G: spawn/deliver
-            G-->>X: result
-            X-->>A: execution result
-            A->>A: observe + attest + cleanup
-            A-->>C: result + completed attestation
+            A->>A: attest prepared + publish finalization descriptor and launch envelope
+            A-->>C: prepared attempt
         end
     end
+    C->>S: hand over the prepared attempt
+    S->>G: launch gate starts the agent under the prepared invocation
+    G-->>S: result
+    S-->>C: receipt (home removed later by finalize-home)
 ```
 
-Không có mũi tên `C -> X`. Đây là bất biến kiến trúc cốt lõi.
+Không có mũi tên từ caller tới adapter hay tới agent mà không qua Authority. Đây là bất biến kiến trúc cốt lõi.
 
 ## 8. Policy resolution và edge cases
 
@@ -339,8 +337,8 @@ thường, không phải backend fallback ẩn.
 
 ### 8.5 Adapter mới
 
-Adapter mới chỉ chạy khi đã đăng ký metadata và được Authority gọi qua
-`adapterPort`. Adapter không hiểu confinement policy; nó chỉ nhận prepared
+Adapter mới chỉ chạy khi đã đăng ký metadata và là một attempt dưới run supervisor
+(execute handle của nó không được gọi trực tiếp). Adapter không hiểu confinement policy; nó chỉ nhận prepared
 invocation/context. Invocation khai `credentialStore` (store nó đọc, biến env trỏ
 tới home, file cần chép) chuẩn trước cửa; Authority resolve và validate, còn
 backend driver chỉ trỏ biến đó vào private home và chép đúng file đã khai.
@@ -737,7 +735,7 @@ config vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `conf
 
 1. `credentialStore: { use: <codex | pi | omp>, homeEnv: <CODEX_HOME | PI_CODING_AGENT_DIR>, files?: [...] }` trên invocation (cùng dạng `codex-cli-bwrap`; runner.md RUL105 (an invocation declares the login store it reads)). Config viết trước field này (config toàn máy, project khác) vẫn khai `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <biến> } }]`; một hàm (`credentialStoreOf`) suy `credentialStore` từ đó, và nhánh suy này bị xoá khi các config ấy đã chuyển.
 2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn, theo `credentialStore.files` của invocation nếu có, không thì theo danh sách của account. **Luật chép (2026-10-19, thay luật "thiếu một file thì từ chối"):** file có mặt thì chép, file vắng thì bỏ qua, không file nào có mặt thì từ chối `credential-provisioning` (`credential-store-empty`); symlink treo hay trỏ ra ngoài home, file không thường, đường dẫn có `..` vẫn bị từ chối. Invocation không khai store thì không được chép gì dù account nào được lease (bài học `569f72d3b`), và `assessBwrap` từ chối policy không cấp `private-home` cho invocation đọc store. Account có thể khai `credentialSources` (một store cho mỗi CLI, key là `credentialStore.use` của invocation); request của Authority (`buildConfinementRequest`) chọn store theo khoá đó, và khoá không có store thì bị từ chối trước khi worker chạy (runner.md RUL80 (account trước, CLI sau: một login store cho mỗi CLI)). Không mount thư mục account thật, không bypass flag thay sandbox.
-3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state."<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; `fgos doctor` check `confined-pane-accounts` báo invocation confine nào đọc store mà account không có file nào của store đó (agent sẽ khởi động chưa đăng nhập), và ghi chú file vắng.
+3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật — store của chính account được lease (credential source mà Authority chuyển cho adapter qua `trustAccountSource`), không phải account mà env tĩnh của invocation chỉ tới (runner.md RUL78 (a confined pane reads its folder trust from the leased account's own store)); với codex, trust từng hook của `<cwd>/.codex/hooks.json` (`[hooks.state."<đường dẫn tuyệt đối>:<event>:<nhóm>:<handler>"] trusted_hash`, băm theo luật của codex, ghim bằng test) được gieo cùng lúc, chỉ vào config của private home (không bao giờ vào config thật của account; private home bị xoá sau dispatch nên không có bước gỡ) và chỉ khi gốc repo đã được người dùng tin; với claude, các MCP server do `<cwd>/.mcp.json` khai báo được duyệt riêng cho tiến trình worker bằng `--settings` (`enabledMcpjsonServers`, thêm vào args khi chuẩn bị worker invocation; không ghi file dùng chung), cũng chỉ khi gốc repo đã được tin; cả hai file là file trong worktree mà agent ghi được nên được đọc có giới hạn (`.codex/hooks.json` tối đa 1 MiB) qua cửa agent-file và không theo link: `.codex/hooks.json` là symlink thì bị từ chối (`unreadable-store`) thay vì được theo như trước; `fgos doctor` check `confined-pane-accounts` báo invocation confine nào đọc store mà account không có file nào của store đó (agent sẽ khởi động chưa đăng nhập), và ghi chú file vắng.
 
 **Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` "dormant" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only). 2026-10-19 (đợt model pool B2): binding chung `resourceBindings` được thay bằng `credentialStore` trên invocation, khoá chọn store là `use` thay vì tên lệnh, và id invocation bỏ tên account (`codex-herdr-fgovn` thành `codex-herdr`).
 
@@ -748,7 +746,7 @@ config vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `conf
 Private home nhận một **bản chép** của login, bị xoá sau dispatch. Hai điều đi kèm (chi tiết và luật ở `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules`, RUL75 (login xoay vòng được gia hạn một lần tại nguồn, trong bản chép fgOS giữ, và login được gia hạn trong private home được ghi ngược)):
 
 - **Kho SQLite chép dạng snapshot.** File `agent.db` (omp) trong danh sách `files` được chép bằng `VACUUM INTO` qua `node:sqlite` — snapshot nhất quán, gồm cả phần còn nằm trong write-ahead log — thay vì chép file thô thiếu WAL; không có `node:sqlite` thì chép file như trước. Danh sách file được phép chép không đổi, thư mục account thật vẫn không bao giờ được mount.
-- **Bản mới hơn được ghi ngược lúc xoá home.** Khi dispatch được opt-in (caller truyền hàm gia hạn), ownership marker của private home ghi thêm `credentialWriteBack` (provider, account, home nguồn, layout, runtime dir; chỉ tên và đường dẫn, không giá trị credential) sau khi chép xong. Mọi đường xoá home — cleanup của driver, `finalizeConfinementResources` và orphan reaper — đi qua một hàm xoá duy nhất (`removeConfinementDir`, `confinement/cleanup.mjs`): trước khi xoá, login trong home mới hơn login nguồn thì được dàn (staging) rồi áp lên nguồn dưới lock của account, một lần thử không chờ; lock bận thì để `pending/` cho lần refresh-ahead kế tiếp. Lỗi ghi ngược chỉ báo bằng mã cố định trên stderr và chỉ chặn việc xoá trong đúng một trường hợp: việc dàn thất bại (xem dưới). Bản dàn không bao giờ bị xoá khi nguồn không đọc được (đang ghi dở, `agent.db` không mở được, hoặc không xác định được entry) hay khi bản chép không đọc được vì lý do có thể qua (thiếu `node:sqlite`, `agent.db` không mở được): bản chép được giữ ở `pending/` (giới hạn 5 bản mỗi kho login (mỗi account với một kho, mỗi `stores/<cli>` với kho theo CLI), nhưng chỉ bản dư thừa mới bị bỏ: sau khi áp các bản pending dưới account lock, bản có login trùng hệt một bản pending khác thì bị bỏ khi account vượt giới hạn, bản mới nhất của mỗi nhóm trùng được giữ; bản không chứng minh được là dư thừa hay lỗi thời thì không bao giờ bị bỏ để nhường chỗ, nên account có thể vượt giới hạn và check doctor báo; bản do probe ghi dở được giữ ở `torn/` cho việc khôi phục thủ công, không bao giờ tự áp hay tự bỏ, và doctor báo ở mọi tuổi; `torn/` chỉ áp cho bản scratch của probe, còn scratch do runner đã chết để lại và pane home có store bị cắt vẫn bị xoá khi JSON không đọc được; bản không parse được thì so theo byte của file store và của write-ahead log hoặc rollback journal không rỗng (file không đọc được, trừ khi không tồn tại, không bao giờ bị coi là không có; index `-shm` không tính); home có file store trùng từng byte với nguồn và không bên nào có write-ahead log hay journal không rỗng thì không renew gì nên không được dàn) và báo `staged`/`apply-deferred`; chỉ xoá khi nguồn đọc được và chứng minh bản chép không mới hơn, hoặc bản chép được chứng minh hỏng (JSON hỏng, hay không có entry dùng được). Lỗi đọc file của hệ điều hành (quyền, I/O; mã `unreadable-file`) có thể qua nên bản chép được giữ; chỉ file kho không tồn tại (`missing-file`) mới được coi là rỗng và bị xoá. Nếu việc dàn thất bại, private home và marker được giữ lại (việc xoá báo lỗi, một dòng stderr mã cố định) để lần xoá sau, kể cả của reaper, thử lại; mỗi lần thất bại được đếm trong marker (`credentialKept`; hai lần cách nhau dưới 15 phút chỉ tính một, để lỗi tạm thời không dùng hết hạn mức), marker được ghi qua file tạm rồi rename và marker có mặt nhưng đọc không được thì việc xoá dừng lại. Sau 5 lần home bị giữ hẳn: không thử xoá nữa, không bao giờ bị xoá vì quá tuổi. Home bị giữ được kiểm lại dưới account lock khi account đó được gia hạn lần kế tiếp và bởi `fgos doctor --fix` (tập temp root tìm kiếm giống của doctor: root mặc định cộng `tempRoot` của từng backend đã đăng ký, lấy qua hook do phía dispatch truyền xuống; home nằm dưới `privateHomeRoot` riêng của backend không thuộc tập này nên không check, repair, reaper hay lần gia hạn nào thấy, và cũng không bao giờ bị xoá), và chỉ với home thuộc đúng runtime dir của lock đang giữ: chỉ xoá khi nguồn đọc được và chứng minh login trong home không mới hơn, hoặc login đó đã dàn được cạnh nguồn (và được áp); không thì vẫn giữ. Bản đã dàn và thư mục `pending/` được đồng bộ xuống đĩa trước khi home bị xoá. File marker không nhận ra được là marker nào cả (không phải JSON, không phải object, hay không có tên contract) thì mọi việc xoá home đó dừng lại. Finalizer so digest của marker không tính `credentialKept` (cleanup của driver thêm trường này sau khi digest được lấy) và không dừng ở home đó mà vẫn xoá các resource còn lại của dispatch (dispatch ghi là `retained`, kèm lý do của home). Check `credential-copies-retained` của `fgos doctor` báo theo provider/account: home bị giữ hẳn (fail, nêu thư mục home), home đang thử lại và các bản `pending/`/scratch quá một ngày (cảnh báo); chỉ có số đếm và tuổi, không bao giờ in giá trị, và check không xoá gì. Provisioning Codex đóng kín (fail closed): `auth.json` là symlink trỏ ra ngoài home, hoặc `home` tương đối, làm dispatch thất bại trước khi worker chạy (trước đây symlink được theo, home tương đối được hiểu theo cwd). Đường xoá home gọi module gia hạn credential (`provider-credential-renewal.mjs`) và qua đó phụ thuộc vào provider capacity, chỉ để lấy account lock. Home không có field này được xoá y như trước.
+- **Bản mới hơn được ghi ngược lúc xoá home.** Khi attempt được opt-in (caller truyền hàm gia hạn), driver bwrap trả đích ghi ngược (`credentialWriteBack`: provider, account, home nguồn, layout, runtime dir; chỉ tên và đường dẫn, không giá trị credential) về Confinement Authority, và Authority ghi nó vào mục private-home của descriptor finalization của attempt (dưới `runDir/protected/confinement-finalization/`, ngoài mọi grant). Đích **không bao giờ nằm trong home hay marker của home**: home được bind đọc-ghi vào sandbox nên agent sửa được cả hai. Marker chỉ nhận diện home, và cũng được đọc qua cửa agent-file (không theo link, không chờ pipe, file thường có giới hạn). Việc ghi ngược duy nhất là bước finalize-home của adopt (`finalizeAttemptHome`, `confinement/authority.mjs`): login trong home mới hơn login nguồn thì được dàn (staging) rồi áp lên nguồn dưới lock của account, một lần thử không chờ; lock bận thì để `pending/` cho lần refresh-ahead kế tiếp. Home của dispatch ngoài cửa assignment (`removeConfinementDir`, `confinement/cleanup.mjs`) không bao giờ opt-in nên bị xoá không ghi ngược, bất kể marker nói gì. File login trong home (`auth.json`, `agent.db` và sidecar) được đọc qua cửa agent-file khi đánh giá và dàn bản chép: link, pipe, socket, device hay file quá lớn bị từ chối trước khi SQLite mở và bản chép đó bị coi là không có login. Luật chi tiết của bước dàn và áp (so sánh trước khi ghi, giới hạn `pending/`, `torn/`) nằm ở `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` (RUL75). Nếu việc dàn thất bại, private home và marker được giữ lại (một dòng stderr mã cố định) để lần finalize sau thử lại; mỗi lần thất bại được đếm trong marker (`credentialKept`; hai lần cách nhau dưới 15 phút chỉ tính một, để lỗi tạm thời không dùng hết hạn mức). Sau 5 lần home bị **giữ hẳn**: không thử lại, không bao giờ bị xoá vì quá tuổi, và **không có đường tự động nào xử lý nó**: refresh-ahead của dispatch và `fgos doctor --fix` không đụng tới, vì nơi duy nhất ghi login nó thuộc về là file agent sửa được. Chủ máy khôi phục login từ home đó bằng tay (hoặc xoá home). Check `credential-copies-retained` của `fgos doctor` báo theo provider/account: home bị giữ hẳn (fail, nêu thư mục home và cách khôi phục bằng tay, không nêu account), home đang thử lại và các bản `pending/`/scratch quá một ngày (cảnh báo); chỉ có số đếm và tuổi, không bao giờ in giá trị, và check không xoá gì. Provisioning Codex đóng kín (fail closed): `auth.json` là symlink trỏ ra ngoài home, hoặc `home` tương đối, làm dispatch thất bại trước khi worker chạy. Bước finalize-home gọi module gia hạn credential (`provider-credential-renewal.mjs`) và qua đó phụ thuộc vào provider capacity, chỉ để lấy account lock. Home không có mục `credentialWriteBack` trong descriptor được xoá không ghi ngược.
 
 ### 13.3 Pane Codex chạy `--no-daemon`: sandbox riêng của Codex phải tắt suốt phiên
 
@@ -771,7 +769,7 @@ Private home nhận một **bản chép** của login, bị xoá sau dispatch. H
 
 - `src/runner/dispatch/cli.mjs`: hai seam trước adapter; `runDir` có tại đây.
 - `src/runner/dispatch/transport.mjs`: `resolveExecutorCommand`, adapter registry
-  và `cliSpawnAdapter` hiện bỏ `confinement`.
+  và các adapter chỉ-supervised (`registerSupervisedOnlyAdapter`).
 - `src/runner/dispatch/resolve.mjs`: resolve executor và fallback path.
 - `src/runner/dispatch/config.mjs`: validation của shape confinement cũ.
 - `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại.

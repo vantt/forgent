@@ -64,9 +64,7 @@ adapter (`cli-spawn`/`herdr-spawn`/mcp/api), prompt delivery (argv vs
 file-pointer), visible/headless mode, confinement backend/envelope, resource
 bindings, provider adapter id. Confinement is normally an invocation
 envelope, not identity — it only becomes identity when it changes principal,
-backend trust, or egress boundary materially (the same rule design.md's
-ProviderAdapter section already states for the shadow-mode Phase 01 module,
-`src/runner/dispatch/provider-adapter.mjs`).
+backend trust, or egress boundary materially.
 
 **Correction — migration status correction:** The following table
 records the migration mapping, rather than a migration still awaiting Phase

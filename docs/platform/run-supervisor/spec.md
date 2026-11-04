@@ -63,7 +63,7 @@ The `BoundInvocationSupervisor` of `packages/host-runtime` is a different thing:
 
 - **Hostile input.** Every read of a path the agent can write (capture files, `gate-exit.json`, the outbox) goes through one bounded reader that does not follow a link and does not wait on a FIFO: `FsOutbox` of the agent-protocol crate in Rust, the capped no-follow reader of `proof-helpers.mjs` in Node. The newest-result rule exists once, in the agent-protocol crate.
 - **No orphan children.** Every child of the supervisor except the gate dies with it (a step process does, on Linux).
-- **Node decides nothing about the receipt outcome or the attempt lifecycle.** `src/run-supervisor` outside `steps/` holds the controller's envelope build and lock handover (`direct-launch.mjs`), the Ctrl-C policy (`cancel-registry.mjs`) and the thin route client (`client.mjs`), with a target of at most 1 000 lines (`wc -l src/run-supervisor/*.mjs`); 1 057 at the layer close, no trim scheduled. The step bodies (`settle-attempt`, `finalize-home`, `cleanup-trust`) are Execution Core and confinement code and stay in Node until the Execution Core moves.
+- **Node decides nothing about the receipt outcome or the attempt lifecycle.** `src/run-supervisor` outside `steps/` holds the controller's envelope build and lock handover (`direct-launch.mjs`), the Ctrl-C policy (`cancel-registry.mjs`) and the thin route client (`client.mjs`), with a target of at most 1 000 lines (`wc -l src/run-supervisor/*.mjs`); 1 000 since `ad929af93`. The step bodies (`settle-attempt`, `finalize-home`, `cleanup-trust`) are Execution Core and confinement code and stay in Node until the Execution Core moves.
 
 ## 3. Attempt directory and publication
 

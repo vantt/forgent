@@ -29,7 +29,7 @@ The implementation column below bounds the retained text. Proposed typed interfa
 | Section | Status | Evidence / limit |
 |---|---|---|
 | 3. Coarse Matrix Mapping | Mixed implementation and proposal; no blanket implementation claim | src/runner/dispatch/herdr-round.mjs:350-357 ERROR_CLASS_FOR_OUTCOME (died->worker-spawn-fail, others->worker-timeout); src/runner/recovery.mjs:106-115,133 resolveAction; src/runner/loop.mjs:515 resolveStaleDoing; blocked/paused-limit park is explicitly "Proposed behavior change" |
-| 5. EffectGuaranteePort | Unimplemented design proposal | EffectGuaranteePort absent in code; related live subset: src/runner/dispatch/recovery.mjs:201 assess(plan, repeatMode, confinement, attestation) with ASSESS_OUTCOMES :56 and REPEAT_MODE never inferred from Assignment.mutation :202-206 |
+| 5. EffectGuaranteePort | Unimplemented design proposal | EffectGuaranteePort absent in code; the former `assess` (plan, repeat mode, confinement, attestation) lived in a module removed from main with no caller, so nothing live is left of it |
 | 7. Proof, Rollout And Future Work | Unimplemented design proposal | Refers to proof matrix runtime-recovery-design.md#10 (E-a..E-f, X01..X06) and future work; no code symbols |
 
 ## 1. Responsibility And Inputs

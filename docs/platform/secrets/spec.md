@@ -21,7 +21,7 @@ Related:
 - docs/platform/agent-confinement/spec.md (hostRead, "secret, not blind" limit)
 - docs/history/glm-openrouter-executor/plan.md (decision that the key lives in an untracked file)
 - src/runner/dispatch/provider-capacity.mjs (credentialSource, per-run private home)
-- src/runner/dispatch/provider-adapter.mjs, src/runner/dispatch/adapters.mjs (variable expansion)
+- src/runner/dispatch/adapters.mjs (variable expansion)
 - src/config/facade.mjs (global and project config merge)
 - src/setup/checks.mjs, src/setup/registrations.mjs (doctor checks, setup registrations)
 - .claude/settings.json (PreToolUse registration of the privacy hook; the hook scripts are untracked per-machine files)
@@ -64,7 +64,7 @@ Evidence is split by class: read from source, read from a machine file by name o
 | An interactive zsh hook in `~/.zshrc` walks up from the working directory and exports every variable of the file into the shell. Every child process, including an agent's Bash tool, inherits it | machine file | `~/.zshrc`, block "fgos project secrets" |
 | A key is hard-coded in the `glm2` function of `~/.zshrc` (value not reproduced here) | machine file | `~/.zshrc` |
 | A copy of the key sits in `~/.pi/accounts/openrouter/auth.json`, mode 0600, created by hand as an interim measure; `auth.json` entries were added to `~/.fgos/config.json` and `.fgos/config.json` | machine file, names and mode only | `ls -l`, `grep -n auth.json` |
-| Two functions expand `${VAR}` and replace a missing variable with an empty string, so a typo yields an empty key and a later opaque failure | source | `src/runner/dispatch/provider-adapter.mjs` line 189 (`resolveEnvPatch`), `src/runner/dispatch/adapters.mjs` line 147 (`resolveExecutorEnv`) |
+| One function expands `${VAR}` and replaces a missing variable with an empty string, so a typo yields an empty key and a later opaque failure (a second one in the provider adapter module went with that module's adapter classes) | source | `src/runner/dispatch/adapters.mjs` (`resolveExecutorEnv`) |
 | Three further functions expand `${HOME}` only | source | `src/setup/agy-permissions.mjs` line 153, `src/runner/dispatch/provider-credential-probe.mjs` line 34, `src/setup/registrations.mjs` line 4459 |
 | The OpenRouter key variable left the committed pi invocation env because pi reads the key from its login store `auth.json`; a test pins it | source | `git show 4f6fc44d7`; `test/runner/herdr-claude-invocations.test.mjs` line 37 |
 | The privacy hook patterns cover `.env`, `.env.*`, `credentials`, `secrets.yaml`, `*.pem`, `*.key`, `id_rsa`, `id_ed25519`. They do not match `secrets.local.env` or `auth.json` | source | `.claude/hooks/lib/privacy-checker.cjs` lines 43 to 52 |
