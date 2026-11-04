@@ -620,6 +620,63 @@ test("H9: the assignment/Run-owned launch door attests outcome:'enforced' on a g
   }
 });
 
+test("a supervised attempt that opts in to credential write-back gets its target recorded on the private-home entry of the finalization descriptor, and its home marker names none", { skip: !BWRAP_PRESENT }, async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-writeback-descriptor-"));
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  try {
+    const registryPath = path.join(tmp, "confinement-backends.json");
+    ensureMachineBackendRegistryDefaults(registryPath);
+    process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registryPath;
+    const runDir = path.join(tmp, ".fgos", "assignments", "asgn_wb", "runs", "01");
+    fs.mkdirSync(runDir, { recursive: true });
+    const accountHome = path.join(tmp, "account-home");
+    fs.mkdirSync(accountHome, { recursive: true });
+    fs.writeFileSync(path.join(accountHome, "auth.json"), JSON.stringify({ xai: { type: "oauth", refresh: "FAKE-REFRESH", expires: Date.now() + 3600000 } }));
+    const runtimeDir = path.join(tmp, "runtime");
+
+    const req = buildConfinementRequest({
+      capability: "code:implement",
+      executorId: "agent-bwrap",
+      backendId: "bwrap",
+      requirement: { mode: "required", policyId: "host-write-denied", policy: resolveConfinementPolicy("host-write-denied") },
+      invocation: { command: process.execPath, args: ["-e", "0"], adapter: "cli-spawn", credentialStore: { use: "agent-cli", homeEnv: "AGENT_HOME" } },
+      providerCapacity: {
+        provider: "xai", accountId: "acct",
+        credentialSource: { kind: "home-files", home: accountHome, files: ["auth.json"] },
+        credentialWriteBack: { runtimeDir },
+      },
+      attemptId: "lc-wb-01",
+      launchMode: "direct",
+      context: { cwd: tmp, repoRoot: tmp, runDir, fgosDir: path.join(tmp, ".fgos") },
+      assignmentLaunchContext: {
+        contract: "assignment-cli-spawn-launch-context.v1",
+        run: {
+          runId: "run_wb",
+          assignmentId: "asgn_wb",
+          attempt: 1,
+          dispatchPlanDigest: `sha256:${"a".repeat(64)}`,
+          evaluatorBaselineDigest: `sha256:${"b".repeat(64)}`,
+        },
+        command: { launchCommandId: "lc-wb-01", controlEpoch: 1, controlTokenDigest: `sha256:${"c".repeat(64)}` },
+      },
+    });
+
+    const prepared = await prepareConfinementForLaunch(req);
+    const descriptor = JSON.parse(fs.readFileSync(prepared.finalizationPath, "utf8"));
+    const home = descriptor.resources.find((r) => r.resourceId === "private-home");
+    assert.ok(home, JSON.stringify(descriptor.resources));
+    assert.deepEqual(home.credentialWriteBack, {
+      provider: "xai", accountId: "acct", kind: "home-files", home: accountHome, layout: "pi-auth-json", runtimeDir,
+    });
+    const markerText = fs.readFileSync(path.join(home.pathRef, ".fgos-confinement-owner.json"), "utf8");
+    assert.equal(markerText.includes(accountHome), false, "the home marker names no login store");
+  } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 test("MED-A: production bwrap executor argvs yield process: unverified while hostWrite: deny is satisfied and writable exception recorded as grant", () => {
   const prodExecutors = [
     {

@@ -12,8 +12,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import * as cleanup from '../cleanup.mjs';
-import { cleanupConfinementResource, writeOwnershipMarker, extendOwnershipMarker, ensurePrivateDir } from '../cleanup.mjs';
-import { copyCredentialFiles, credentialWriteBackMarker } from '../../provider-credential-renewal.mjs';
+import { cleanupConfinementResource, writeOwnershipMarker, ensurePrivateDir } from '../cleanup.mjs';
+import { copyCredentialFiles, credentialWriteBackTarget } from '../../provider-credential-renewal.mjs';
 import { expandCredentialHome } from '../../provider-capacity.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
@@ -89,20 +89,20 @@ function provisionSelectedCredential(privateHomeTarget, request) {
 }
 
 /**
- * When the dispatch opted in to credential renewal, the ownership marker records which account login this
- * home was copied from, so removing the home can write a login renewed inside it back to its source.
- * Only names and paths go into the marker, never a credential value.
+ * When an attempt opted in to credential renewal, where a login renewed inside its private home goes back
+ * to: returned to the Confinement Authority, which records it in the attempt's finalization descriptor
+ * (host state outside every grant). It is never written into the home, which the agent can rewrite. Only
+ * names and paths, never a credential value.
  */
-function recordCredentialWriteBack(privateHomeTarget, request) {
+function credentialWriteBackOf(request) {
   const capacity = request?.providerCapacity;
-  if (!capacity?.credentialWriteBack) return;
-  const credentialWriteBack = credentialWriteBackMarker({
+  if (!capacity?.credentialWriteBack) return null;
+  return credentialWriteBackTarget({
     provider: capacity.provider,
     accountId: capacity.accountId,
     credentialSource: capacity.credentialSource,
     runtimeDir: capacity.credentialWriteBack.runtimeDir,
   });
-  if (credentialWriteBack) extendOwnershipMarker(privateHomeTarget, { credentialWriteBack });
 }
 
 const ALLOWED_BWRAP_CONFIG_KEYS = Object.freeze([
@@ -552,6 +552,7 @@ export function prepareBwrapSync(plan, request, backend) {
 
   const allocatedPaths = [];
   let credentialProvisioned = false;
+  let credentialWriteBack = null;
 
   try {
     const executable = backend?.config?.executable || '/usr/bin/bwrap';
@@ -609,7 +610,9 @@ export function prepareBwrapSync(plan, request, backend) {
         if (res.resource === 'private-home') {
           const provisioned = provisionSelectedCredential(res.hostTarget, request);
           credentialProvisioned = provisioned || credentialProvisioned;
-          if (provisioned) recordCredentialWriteBack(res.hostTarget, request);
+          // Only an attempt home is written back: its finalize-home step is the one removal that reads the
+          // descriptor; a dispatch outside the assignment door removes its home without write-back.
+          if (provisioned && attemptId) credentialWriteBack = credentialWriteBackOf(request);
         }
       }
 
@@ -696,6 +699,7 @@ export function prepareBwrapSync(plan, request, backend) {
       claims: { ...plan.coverage },
       ...(attemptId ? { bwrapPrefix: [...bwrapArgs], agentArgv, ...(Array.isArray(request.gateCommand) ? { launchDigest: computeLaunchDigest({ bwrapPrefix: bwrapArgs, gateCommand: request.gateCommand, agentArgv }) } : {}) } : {}),
       providerCapacity: credentialProvisioned ? { credentialProvisioned: true } : undefined,
+      ...(credentialWriteBack ? { credentialWriteBack } : {}),
       cleanup,
     };
   } catch (err) {

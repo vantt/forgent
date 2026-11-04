@@ -28,6 +28,7 @@ import { replaceDurably } from '../../native/door.mjs';
 import { createRequire } from 'node:module';
 
 import { resolveHolderLiveness } from './process-identity.mjs';
+import { readAgentFileSync } from './proof-helpers.mjs';
 import { acquireAccountLock, tryAcquireAccountLock, credentialStoreDir, expandCredentialHome } from './provider-capacity.mjs';
 import {
   credentialProbeCommand,
@@ -79,13 +80,29 @@ export function defaultRefreshAheadThresholdMs(probeTimeoutMs = DEFAULT_CREDENTI
 // Files
 // ---------------------------------------------------------------------------------------------------
 
-function readJsonFile(file) {
+// A copy in a private home was written by the confined agent: it is read through the agent-file door (no
+// link followed, no blocking on a pipe, regular files only, at most this many bytes). A link, a non-file or
+// an oversized file there is no login (`unsafe-file`), whatever it points at.
+const MAX_COPY_FILE_BYTES = 64 * 1024 * 1024;
+const UNSAFE_COPY_ERRORS = new Set(['ELOOP', 'ENOTREGULAR', 'E2BIG']);
+
+function readCopyBytes(file) {
+  return readAgentFileSync(file, MAX_COPY_FILE_BYTES);
+}
+
+// The code of a failed read: only a file that is not there is proven empty; a copy that is not a plain,
+// bounded file is unsafe; any other read error (EACCES, EIO, EMFILE) may pass.
+function readFailCode(err) {
+  if (err?.code === 'ENOENT') return 'missing-file';
+  return UNSAFE_COPY_ERRORS.has(err?.code) ? 'unsafe-file' : 'unreadable-file';
+}
+
+function readJsonFile(file, { agent = false } = {}) {
   let raw;
   try {
-    raw = fs.readFileSync(file, 'utf8');
+    raw = agent ? readCopyBytes(file).toString('utf8') : fs.readFileSync(file, 'utf8');
   } catch (err) {
-    // Only a file that is not there is proven empty; any other read error (EACCES, EIO, EMFILE) may pass.
-    return fail(err?.code === 'ENOENT' ? 'missing-file' : 'unreadable-file');
+    return fail(readFailCode(err));
   }
   try {
     return { ok: true, raw, doc: JSON.parse(raw) };
@@ -241,8 +258,8 @@ function isReplacement(copyEntry, sourceEntry, { now, requireFuture }) {
 const piLayout = {
   name: 'pi-auth-json',
   files: ['auth.json'],
-  read(home) {
-    const parsed = readJsonFile(path.join(home, 'auth.json'));
+  read(home, { agent } = {}) {
+    const parsed = readJsonFile(path.join(home, 'auth.json'), { agent });
     if (!parsed.ok) return parsed;
     if (!isObject(parsed.doc)) return fail('unexpected-shape');
     const entries = [];
@@ -290,10 +307,14 @@ const piLayout = {
     throw new Error('source-changing');
   },
   stage(copyHome, stagingDir) {
-    fs.copyFileSync(path.join(copyHome, 'auth.json'), path.join(stagingDir, 'auth.json'));
-    fs.chmodSync(path.join(stagingDir, 'auth.json'), 0o600);
+    stageCopyFile(path.join(copyHome, 'auth.json'), path.join(stagingDir, 'auth.json'));
   },
 };
+
+// One file of a private home into the staging directory, through the agent-file door.
+function stageCopyFile(from, to) {
+  fs.writeFileSync(to, readCopyBytes(from), { mode: 0o600, flag: 'wx' });
+}
 
 // The file is replaced only when it still holds what the merge was based on; the owner's own CLI does not
 // take the account lock, so a change in between means the merge is recomputed from the new content.
@@ -308,8 +329,8 @@ function writeIfUnchanged(file, expectedRaw, content) {
 const codexLayout = {
   name: 'codex-auth-json',
   files: ['auth.json'],
-  read(home) {
-    const parsed = readJsonFile(path.join(home, 'auth.json'));
+  read(home, { agent } = {}) {
+    const parsed = readJsonFile(path.join(home, 'auth.json'), { agent });
     if (!parsed.ok) return parsed;
     const tokens = parsed.doc?.tokens;
     if (!isObject(parsed.doc) || !isObject(tokens) || typeof tokens.access_token !== 'string') return fail('unexpected-shape');
@@ -356,8 +377,7 @@ const codexLayout = {
     throw new Error('source-changing');
   },
   stage(copyHome, stagingDir) {
-    fs.copyFileSync(path.join(copyHome, 'auth.json'), path.join(stagingDir, 'auth.json'));
-    fs.chmodSync(path.join(stagingDir, 'auth.json'), 0o600);
+    stageCopyFile(path.join(copyHome, 'auth.json'), path.join(stagingDir, 'auth.json'));
   },
 };
 
@@ -402,12 +422,13 @@ const ompLayout = {
   // for the files it guards, not for a newer login: a copy staged with one stays for hand recovery. The
   // shared-memory index (`-shm`) carries no data, and SQLite rebuilds it from the log.
   sidecars: ['agent.db-wal', 'agent.db-journal'],
-  read(home, { loadSqlite }) {
+  read(home, { loadSqlite, agent }) {
     const file = path.join(home, 'agent.db');
     try {
-      fs.statSync(file);
+      if (agent) ompAgentFilesCheck(home);
+      else fs.statSync(file);
     } catch (err) {
-      return fail(err?.code === 'ENOENT' ? 'missing-file' : 'unreadable-file');
+      return fail(readFailCode(err));
     }
     try {
       const entries = withDatabase(file, { loadSqlite, readOnly: true }, ompEntries);
@@ -462,6 +483,8 @@ const ompLayout = {
   },
   stage(copyHome, stagingDir, { loadSqlite }) {
     const destination = path.join(stagingDir, 'agent.db');
+    // SQLite opens the store and its log by path: each must be a plain file of the home before it does.
+    ompAgentFilesCheck(copyHome);
     if (snapshotSqliteFile(path.join(copyHome, 'agent.db'), destination, { loadSqlite })) return;
     // No snapshot (the module is unavailable, or the file cannot be opened): the files as they are, write-ahead
     // log and rollback journal included. The pane's processes are already stopped, so nothing is writing to them.
@@ -474,11 +497,29 @@ const ompLayout = {
         if (err?.code === 'ENOENT' && suffix !== '') continue;
         throw new Error('stage-failed');
       }
-      fs.copyFileSync(from, `${destination}${suffix}`);
-      fs.chmodSync(`${destination}${suffix}`, 0o600);
+      stageCopyFile(from, `${destination}${suffix}`);
     }
   },
 };
+
+// The omp store of a private home and every sidecar SQLite would open beside it (it maps and writes the
+// shared-memory index even read-only): none may be a link, a pipe, a socket or a device, which SQLite
+// would follow or block on. A directory or an unreadable file is left to the reads that follow, as before.
+// Throws ENOTREGULAR for such an entry; a missing store throws ENOENT.
+function ompAgentFilesCheck(home) {
+  for (const name of ['agent.db', ...ompLayout.sidecars, 'agent.db-shm']) {
+    let stat;
+    try {
+      stat = fs.lstatSync(path.join(home, name));
+    } catch (err) {
+      if (err?.code === 'ENOENT' && name !== 'agent.db') continue;
+      throw err;
+    }
+    if (stat.isSymbolicLink() || stat.isFIFO() || stat.isSocket() || stat.isCharacterDevice() || stat.isBlockDevice()) {
+      throw Object.assign(new Error(`not a plain file: ${name}`), { code: 'ENOTREGULAR' });
+    }
+  }
+}
 
 const LAYOUTS = Object.freeze({ [piLayout.name]: piLayout, [codexLayout.name]: codexLayout, [ompLayout.name]: ompLayout });
 
@@ -540,7 +581,7 @@ function selectProviderEntry(entries, provider) {
 // Codes that say the copy itself is unusable (it can never be applied); every other failure code, and every
 // failure to read the source, is a reason that may pass and leaves the copy where it is.
 // `unreadable-file` is an operating-system read error and is deliberately absent: it may pass.
-const COPY_UNUSABLE_CODES = new Set(['missing-file', 'unreadable-json', 'unexpected-shape', 'unknown-layout']);
+const COPY_UNUSABLE_CODES = new Set(['missing-file', 'unsafe-file', 'unreadable-json', 'unexpected-shape', 'unknown-layout']);
 const SOURCE_SIDE_THROWS = new Set(['missing-file', 'unreadable-file', 'unreadable-json', 'unexpected-shape', 'unreadable-db', 'sqlite-unavailable', 'entry-unidentified']);
 
 /**
@@ -583,7 +624,7 @@ export function applyRenewedCredential({ layoutName, sourceHome, copyHome, provi
 // Codes that prove a copy holds nothing usable: its store file is not there, its JSON is corrupt, or it
 // parses to no usable entry. A read error or a database that cannot be opened may pass, so such a copy is
 // not proven malformed.
-const COPY_MALFORMED_CODES = new Set(['missing-file', 'unreadable-json', 'unexpected-shape', 'unknown-layout']);
+const COPY_MALFORMED_CODES = new Set(['missing-file', 'unsafe-file', 'unreadable-json', 'unexpected-shape', 'unknown-layout']);
 
 // Whether the copy holds a login newer than the source's: 'newer', 'not-newer' (the source was read and
 // proves it, or the copy is proven malformed), or 'undetermined' when nothing proves it: the copy cannot
@@ -593,12 +634,13 @@ const COPY_MALFORMED_CODES = new Set(['missing-file', 'unreadable-json', 'unexpe
 // The non-empty sidecar files of a layout in `dir`, by name: `{found: [[name, bytes]], unreadable}`. A zero-byte
 // file, or one that is not there (ENOENT), counts as absent; any other read error (permissions, I/O, a
 // directory) means nothing can be said about it, and callers must not conclude anything from a copy like that.
-function sidecarBytes(layout, dir) {
+function sidecarBytes(layout, dir, { agent = false } = {}) {
   const found = [];
   let unreadable = false;
   for (const name of layout.sidecars ?? []) {
     try {
-      const bytes = fs.readFileSync(path.join(dir, name));
+      const file = path.join(dir, name);
+      const bytes = agent ? readCopyBytes(file) : fs.readFileSync(file);
       if (bytes.length > 0) found.push([name, bytes]);
     } catch (err) {
       if (err?.code !== 'ENOENT') unreadable = true;
@@ -610,14 +652,10 @@ function sidecarBytes(layout, dir) {
 function filesIdentical(layout, sourceHome, copyHome) {
   // A login renewed after the last checkpoint sits in the log or journal, not in the main file: a copy or a
   // source with one (or one that cannot be read) cannot be shown identical by its main file alone.
-  const sides = [sidecarBytes(layout, copyHome), sidecarBytes(layout, sourceHome)];
+  const sides = [sidecarBytes(layout, copyHome, { agent: true }), sidecarBytes(layout, sourceHome)];
   if (sides.some((side) => side.unreadable || side.found.length > 0)) return false;
   try {
-    return layout.files.every((name) => {
-      const a = path.join(sourceHome, name);
-      const b = path.join(copyHome, name);
-      return fs.statSync(a).size === fs.statSync(b).size && fs.readFileSync(a).equals(fs.readFileSync(b));
-    });
+    return layout.files.every((name) => fs.readFileSync(path.join(sourceHome, name)).equals(readCopyBytes(path.join(copyHome, name))));
   } catch { return false; }
 }
 
@@ -629,7 +667,7 @@ function copyIsNewer(args) {
 }
 
 function judgeCopy({ layout, provider, sourceHome, copyHome, now, loadSqlite }) {
-  const copy = layout.read(copyHome, { loadSqlite });
+  const copy = layout.read(copyHome, { loadSqlite, agent: true });
   if (!copy.ok) {
     if (COPY_MALFORMED_CODES.has(copy.code)) return 'not-newer';
     return 'undetermined';
@@ -1147,8 +1185,12 @@ export function createCredentialRenewal(options = {}) {
 // Write-back at private-home removal
 // ---------------------------------------------------------------------------------------------------
 
-/** What a private home's ownership marker records so its removal can write a renewed login back. */
-export function credentialWriteBackMarker({ provider, accountId, credentialSource, runtimeDir }) {
+/**
+ * Where a login renewed inside a private home is written back: the account's store and its pending copies.
+ * Only the host records it (the attempt's finalization descriptor, outside every grant of the sandbox);
+ * nothing inside the home ever names it.
+ */
+export function credentialWriteBackTarget({ provider, accountId, credentialSource, runtimeDir }) {
   const layoutName = credentialLayout(credentialSource);
   const home = expandCredentialHome(credentialSource?.home);
   if (!layoutName || !home || typeof runtimeDir !== 'string' || !path.isAbsolute(runtimeDir)) return null;
@@ -1166,18 +1208,18 @@ function validWriteBack(value) {
 }
 
 /**
- * Called just before a private home is deleted. When its marker asks for it and the home holds a login
- * newer than the source's, stage a copy beside the source and apply it under the account lock (tried
- * once, never waited for; if busy, the next refresh-ahead applies it). Never throws. Returns
+ * Called just before a private home is deleted. `writeBack` is the target the host recorded for the home
+ * (`credentialWriteBackTarget`), never anything read from inside the home; the home's own files are read
+ * only through the agent-file door. When the home holds a login newer than the source's, stage a copy
+ * beside the source and apply it under the account lock (tried once, never waited for; if busy, the next refresh-ahead applies it). Never throws. Returns
  * `{status: 'none'|'unchanged'|'applied'|'staged'|'failed', code?, keepHome?}` (`keepHome`: no copy is safe in the pending copies yet and the home may hold the only good pair, so it must not be removed; `staged`: the copy is kept for the next holder of the account lock, because the lock was busy or the source could not say whether the copy is newer); `code` is a fixed word.
  */
-export function writeBackRenewedCredential(homeDir, marker, { loadSqlite = defaultLoadSqlite, now = Date.now, tryLock = tryAcquireAccountLock } = {}) {
-  const writeBack = marker?.credentialWriteBack;
-  if (writeBack === undefined) return { status: 'none' };
-  if (!validWriteBack(writeBack)) return { status: 'failed', code: 'invalid-marker' };
+export function writeBackRenewedCredential(homeDir, writeBack, { loadSqlite = defaultLoadSqlite, now = Date.now, tryLock = tryAcquireAccountLock } = {}) {
+  if (writeBack === undefined || writeBack === null) return { status: 'none' };
+  if (!validWriteBack(writeBack)) return { status: 'failed', code: 'invalid-target' };
   const layout = LAYOUTS[writeBack.layout];
   const accountDir = credentialStoreDir(writeBack.runtimeDir, writeBack.provider, writeBack.accountId, writeBack.store ?? null);
-  if (!accountDir) return { status: 'failed', code: 'invalid-marker' };
+  if (!accountDir) return { status: 'failed', code: 'invalid-target' };
   // Until a copy is safe in pending/, the private home may hold the only good pair: a failure before that
   // says `keepHome`, and the caller must not remove it.
   let safe = false;

@@ -19,7 +19,7 @@ import {
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { createCredentialProbe } from '../../src/runner/dispatch/provider-credential-probe.mjs';
 import {
-  credentialWriteBackMarker,
+  credentialWriteBackTarget,
   refreshAhead,
   writeBackRenewedCredential,
 } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
@@ -196,14 +196,14 @@ test('the store key the invocation declares picks the login store, not the basen
   } finally { w.cleanup(); }
 });
 
-test('renewal of a per-CLI store keeps its copies in that store directory; the write-back marker names it', async () => {
+test('renewal of a per-CLI store keeps its copies in that store directory; the write-back target names it', async () => {
   const w = workspace();
   try {
     const piSource = { kind: 'home-files', home: w.piHome, files: ['auth.json'], cli: 'pi' };
-    const marker = credentialWriteBackMarker({ provider: 'openai-codex', accountId: 'acct', credentialSource: piSource, runtimeDir: w.runtimeDir });
-    assert.equal(marker.store, 'pi');
-    assert.equal(marker.layout, 'pi-auth-json');
-    assert.equal(credentialWriteBackMarker({ provider: 'openai-codex', accountId: 'acct', credentialSource: { kind: 'codex-home', home: w.codexHome }, runtimeDir: w.runtimeDir }).store, undefined);
+    const target = credentialWriteBackTarget({ provider: 'openai-codex', accountId: 'acct', credentialSource: piSource, runtimeDir: w.runtimeDir });
+    assert.equal(target.store, 'pi');
+    assert.equal(target.layout, 'pi-auth-json');
+    assert.equal(credentialWriteBackTarget({ provider: 'openai-codex', accountId: 'acct', credentialSource: { kind: 'codex-home', home: w.codexHome }, runtimeDir: w.runtimeDir }).store, undefined);
 
     const accountDir = providerAccountDir(w.runtimeDir, 'openai-codex', 'acct');
     const piStoreDir = credentialStoreDir(w.runtimeDir, 'openai-codex', 'acct', 'pi');
@@ -237,7 +237,7 @@ test('renewal of a per-CLI store keeps its copies in that store directory; the w
     fs.writeFileSync(path.join(home, 'auth.json'), JSON.stringify({ 'openai-codex': { type: 'oauth', access: 'FAKE-PANE-A', refresh: 'FAKE-PANE-R', expires: Date.now() + 9 * HOUR } }));
     const held = tryAcquireAccountLock({ runtimeDir: w.runtimeDir, provider: 'openai-codex', accountId: 'acct' });
     try {
-      assert.equal(writeBackRenewedCredential(home, { credentialWriteBack: marker }).status, 'staged');
+      assert.equal(writeBackRenewedCredential(home, target).status, 'staged');
     } finally { held.release(); }
     assert.equal(fs.readdirSync(path.join(piStoreDir, 'pending')).length, 1);
     assert.equal(fs.existsSync(path.join(accountDir, 'pending')), false, 'nothing lands where the account-wide store keeps its copies');

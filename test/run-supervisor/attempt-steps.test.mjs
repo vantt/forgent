@@ -12,7 +12,7 @@ import { spawnSync } from 'node:child_process';
 import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { AGENT_RESULT_CLAIM_CONTRACT } from '../../src/runner/dispatch/agent-result-claim-contract.mjs';
 import { acquireRunControl, buildRunControlHolder, settleRunControl, listGenerations, controlDirs } from '../../src/runner/dispatch/run-lock.mjs';
-import { copyCredentialFiles, credentialWriteBackMarker } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
+import { copyCredentialFiles, credentialWriteBackTarget } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import { providerAccountDir, providerCapacityStatePaths } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { providerStopOf } from '../../src/run-supervisor/steps/settle-attempt.mjs';
 import { runAttemptStep, verifyPayload } from '../../src/run-supervisor/attempt-step.mjs';
@@ -227,13 +227,14 @@ function homeOf(w, runDir, { marker = {}, renewed = true } = {}) {
   fs.mkdirSync(home, { recursive: true });
   copyCredentialFiles(home, source, ['auth.json']);
   if (renewed) writePi(home, piDoc(Date.now() + 6 * HOUR, NEW));
-  const credentialWriteBack = credentialWriteBackMarker({ provider: 'xai', accountId: 'acct', credentialSource: { kind: 'home-files', home: source, files: ['auth.json'] }, runtimeDir });
+  // The host records the target in the descriptor; the marker in the home only identifies it.
+  const credentialWriteBack = credentialWriteBackTarget({ provider: 'xai', accountId: 'acct', credentialSource: { kind: 'home-files', home: source, files: ['auth.json'] }, runtimeDir });
   fs.writeFileSync(path.join(home, '.fgos-confinement-owner.json'), JSON.stringify({
-    contract: 'confinement-resource-ownership.v2', creator: 'fgos-confinement', attemptId: ATTEMPT_ID, runDir, dispatchId, resource: 'private-home', createdAt: new Date().toISOString(), credentialWriteBack, ...marker,
+    contract: 'confinement-resource-ownership.v2', creator: 'fgos-confinement', attemptId: ATTEMPT_ID, runDir, dispatchId, resource: 'private-home', createdAt: new Date().toISOString(), ...marker,
   }));
   const dir = path.join(runDir, 'protected', 'confinement-finalization');
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'cmd-1.json'), JSON.stringify({ contract: 'confinement-finalization.v1', launchCommandId: 'cmd-1', resources: [{ pathRef: home }], cleanupState: 'pending', cleanupResult: null }));
+  fs.writeFileSync(path.join(dir, 'cmd-1.json'), JSON.stringify({ contract: 'confinement-finalization.v1', launchCommandId: 'cmd-1', resources: [{ pathRef: home, resourceId: 'private-home', credentialWriteBack }], cleanupState: 'pending', cleanupResult: null }));
   return { home, source, runtimeDir };
 }
 
@@ -252,6 +253,25 @@ test('finalize-home after a timeout writes the renewed login back to its account
     const descriptor = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'confinement-finalization', 'cmd-1.json'), 'utf8'));
     assert.equal(descriptor.cleanupState, 'cleaned');
     assert.equal((await run('finalize-home', w, runDir)).exit, 0, 'running it again is harmless');
+  } finally { w.cleanup(); }
+});
+
+test('finalize-home writes back only where the descriptor says: a marker in the home naming another store changes nothing', async () => {
+  const w = workspace();
+  try {
+    const { runDir } = attempt(w, { receipt: { outcome: 'exited', gateExit: gateExit() } });
+    // What a confined agent can do from inside: rewrite its marker to name another login store.
+    const victim = path.join(w.root, 'victim-home');
+    writePi(victim, piDoc(Date.now() + 10 * 60 * 1000, OLD));
+    const victimBefore = fs.readFileSync(path.join(victim, 'auth.json'), 'utf8');
+    const planted = credentialWriteBackTarget({ provider: 'xai', accountId: 'acct', credentialSource: { kind: 'home-files', home: victim, files: ['auth.json'] }, runtimeDir: path.join(w.root, 'victim-runtime') });
+    const { home, source } = homeOf(w, runDir, { marker: { credentialWriteBack: planted } });
+    const done = await run('finalize-home', w, runDir);
+    assert.equal(done.exit, 0, JSON.stringify(done.out));
+    assert.equal(fs.existsSync(home), false);
+    assert.equal(fs.readFileSync(path.join(victim, 'auth.json'), 'utf8'), victimBefore, 'the store the marker names is untouched');
+    assert.equal(fs.existsSync(path.join(w.root, 'victim-runtime')), false, 'nothing was staged beside it');
+    assert.equal(readPi(source).xai.refresh, NEW.refresh, 'the login went to the store the descriptor names');
   } finally { w.cleanup(); }
 });
 

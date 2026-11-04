@@ -112,7 +112,7 @@ import { CONFIG_CHECKS, CONFIG_FIXES, checkConfigOnce, isConfigDoorFailure } fro
 import { retiredJsonAdvice } from './runner-config-conversion.mjs';
 import { inspectProviderCapacity, defaultProviderCapacityRuntimeDir, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
 import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
-import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackMarker, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
+import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackTarget, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { createTerminalControl } from '../terminal-control/client.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
@@ -4796,8 +4796,8 @@ function stagingStoreResolver(inventory, runtimeDir) {
     if (!account) return 'stranded';
     const source = store ? (account.credentialSources && Object.hasOwn(account.credentialSources, store) ? account.credentialSources[store] : undefined) : (account.credentialSources ? undefined : account.credentialSource);
     if (!source) return 'stranded';
-    const marker = credentialWriteBackMarker({ provider, accountId, credentialSource: source, runtimeDir });
-    return marker ? { layoutName: marker.layout, sourceHome: marker.home } : null;
+    const target = credentialWriteBackTarget({ provider, accountId, credentialSource: source, runtimeDir });
+    return target ? { layoutName: target.layout, sourceHome: target.home } : null;
   };
 }
 

@@ -36,6 +36,7 @@ import {
   publishSecretSideFile,
   updateCommandEnvelope,
   commitCommandOutcome,
+  readAgentFileSync,
 } from "../proof-helpers.mjs";
 
 export {
@@ -1408,6 +1409,11 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
         planEntryDigest: computeSha256Digest(res),
         ownershipMarkerDigest,
         pathRef: res.hostTarget,
+        // Where finalize-home writes a login renewed in the private home back to. Recorded only here, in
+        // host state outside every grant: the home and its marker are the agent's to rewrite.
+        ...(res.resource === 'private-home' && preparedConfinement?.credentialWriteBack
+          ? { credentialWriteBack: preparedConfinement.credentialWriteBack }
+          : {}),
       });
     }
 
@@ -1831,9 +1837,13 @@ function attemptFinalizationDescriptors(runDir) {
   return found;
 }
 
+// The marker sits in the home the agent could write: read through the agent-file door (no link followed, no
+// blocking on a pipe, a bounded regular file). It only identifies the home; it never says where a login goes.
+const MAX_HOME_MARKER_BYTES = 64 * 1024;
+
 function readAttemptHomeMarker(homeDir, attemptId, runDir) {
   let marker;
-  try { marker = JSON.parse(fs.readFileSync(path.join(homeDir, OWNERSHIP_MARKER_FILE), 'utf8')); } catch {
+  try { marker = JSON.parse(readAgentFileSync(path.join(homeDir, OWNERSHIP_MARKER_FILE), MAX_HOME_MARKER_BYTES).toString('utf8')); } catch {
     throw new AttemptHomeError('home-marker-unreadable', `${homeDir} has no readable ownership marker`);
   }
   if (marker?.contract !== ATTEMPT_HOME_MARKER_CONTRACT || marker.creator !== 'fgos-confinement' || marker.attemptId !== attemptId || marker.runDir !== runDir) {
@@ -1849,7 +1859,8 @@ function readAttemptHomeMarker(homeDir, attemptId, runDir) {
  * for the kind of ending; it keeps one only when its renewed login is not safe anywhere else yet.
  *
  * Every marker is checked before anything is removed: a marker that is not version 2 or names another
- * attempt throws `AttemptHomeError` and leaves all homes in place.
+ * attempt throws `AttemptHomeError` and leaves all homes in place. Where a renewed login goes back to is
+ * taken only from the descriptor's resource entry (`credentialWriteBack`), never from the home.
  *
  * @returns {{state: 'cleaned'|'credential-home-kept'|'credential-home-held', homes: number}}
  */
@@ -1863,16 +1874,16 @@ export function finalizeAttemptHome({ runDir, attemptId } = {}) {
     for (const res of descriptor.resources || descriptor.temporaryDirectories || []) {
       const target = res.pathRef || res.path;
       if (!target || homes.some((h) => h.target === target) || !fs.existsSync(target)) continue;
-      homes.push({ target, marker: readAttemptHomeMarker(target, attemptId, runDir) });
+      homes.push({ target, marker: readAttemptHomeMarker(target, attemptId, runDir), writeBack: res.credentialWriteBack });
     }
   }
   let kept = 0;
   let held = 0;
-  for (const { target, marker } of homes) {
+  for (const { target, marker, writeBack } of homes) {
     // A home whose staging already failed the allowed number of times is not tried again; adopt stops
     // retrying and `fgos doctor` reports it.
     if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) { held += 1; continue; }
-    const result = writeBackRenewedCredential(target, marker);
+    const result = writeBackRenewedCredential(target, writeBack);
     if (result.status === 'failed' && result.keepHome) {
       const isHeld = countCredentialKeep(target, marker) >= CREDENTIAL_KEEP_MAX_ATTEMPTS;
       if (isHeld) held += 1; else kept += 1;
