@@ -12,7 +12,7 @@ blocks: []
 # Documentation Authority Unification — active migration plan
 
 ```txt
-Plan status: In-progress (Phases 1-8 closed; Phase 9 PRE-FLIP gate work authorized on the plan branch only (2026-10-23, L12-137); the cutover itself awaits the owner's separate approval. Phase 10 remains unauthorized.)
+Plan status: In-progress (Phases 1-9 closed; Phase 9 landed on main `97dd62aa7` on 2026-11-03 as one product commit, with the plan evidence kept local at tag `archive/doc-260925-lineage` and off main; Phase 10 authorized by the owner on 2026-11-04.)
 Primary objective: Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**
 Long-horizon source: docs/platform/proposals/documentation-system-unification.md
 Parent: docs/platform/proposals/documentation-system-unification.md (this plan delivers its first steps up to the maintenance system; the full authoring door and agent context engine stay with later plans)
@@ -257,8 +257,8 @@ Each phase lives in its own `phase-NN-*.md` file (AgentKit plan format). Phases 
 | 6 | Transform all platform areas as candidate material | 05 | completed (2026-10-17, closed by the owner) | [phase-06-transform-all-platform-areas-as-candidate-material.md](phase-06-transform-all-platform-areas-as-candidate-material.md) |
 | 7 | Cross-area integrity and fresh-reader review | 06 | completed (closed 2026-10-19, A48) | [phase-07-cross-area-integrity-and-fresh-reader-review.md](phase-07-cross-area-integrity-and-fresh-reader-review.md) |
 | 8 | Eliminate switchboard bypasses and prepare consumers | 07 | completed (closed 2026-10-23, L12-136) | [phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md](phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md) |
-| 9 | Atomic platform-authority cutover | 08 | in progress: PRE-FLIP gates only (L12-137); cutover not authorized | [phase-09-atomic-platform-authority-cutover.md](phase-09-atomic-platform-authority-cutover.md) |
-| 10 | Post-cutover maintenance MVP | 09 | pending (not authorized) | [phase-10-post-cutover-maintenance-mvp.md](phase-10-post-cutover-maintenance-mvp.md) |
+| 9 | Atomic platform-authority cutover | 08 | landed 2026-11-03, main `97dd62aa7` | [phase-09-atomic-platform-authority-cutover.md](phase-09-atomic-platform-authority-cutover.md) |
+| 10 | Post-cutover maintenance MVP | 09 | in progress (authorized 2026-11-04) | [phase-10-post-cutover-maintenance-mvp.md](phase-10-post-cutover-maintenance-mvp.md) |
 | 11 | Retrospective post series | 10 | pending (owner request 2026-10-20; starts after this plan finishes) | [phase-11-retrospective-post-series.md](phase-11-retrospective-post-series.md) |
 
 ### 7.1. Detailed status and authorization (snapshot)
@@ -277,8 +277,8 @@ permission to execute it.
 | 6 | `completed` | Authorized by the owner on 2026-10-07; closed by the owner on 2026-10-17 (A44) | Gate passed; Phase 7 authorized | Complete candidate corpus and Step 10 close evidence are indexed in `reports/phase-06/step-10-report.md`; owner obligations remain in `reports/phase-06/owner-queue.md` |
 | 7 | `completed` | Authorized by the owner on 2026-10-17 (A44); A42 standing delegation applies; A46 narrowed the close | Closed by the owner on 2026-10-19 (A48) after A47 ratified A46 on the corrected 6/29 attribution; Phase 8 detailing authorized under A49 | Scorecard: `reports/phase-07/phase-07-scorecard.md`; decisions L11-1..L11-28 in `reports/phase-07/owner-answers.md`; Phase 9 blockers P7-DOC-GAP-05/06 | Inputs: `reports/phase-06/owner-queue.md` (32 Phase 7/8 conflict groups, CTR010 numbering collision, missing switchboard routes, stale coordination-engine tables, wording/citation queue) |
 | 8 | `completed` | Authorized by the owner on 2026-10-19 (A49); A42 standing delegation; A38 Lead-started independent review | Closed by the Lead under A42 on 2026-10-23 (L12-136) after closure reviews A r3 and B r3 APPROVE and C r5 passed; every unmet duty became an owned Phase 9 PRE-FLIP gate | `reports/phase-08/progress.md`, `owner-answers.md` (L12-136), `step-08-preflip-gates.json`; records and code on the plan branch only, nothing landed on main |
-| 9 | `in-progress` (PRE-FLIP gates) | Owner authorized PRE-FLIP gate work on the plan branch only on 2026-10-23 (L12-137); A42 standing delegation; L13-6 approval packet | Gates G0-G3 and G5-G9 met-local, G4/G10/G11 external; next: the owner's cutover approval (lease, final main import F, composition, archive ref), then a separate Land approval | `reports/phase-09/preflip-gate-status.json`, `owner-answers.md` (L13-n), `cutover-approval-packet.md`; no lease, promotion, migration, deletion, alias activation or legacy retirement has occurred |
-| 10 | `not-started`, `not-authorized` | None | Follow-on only after verified Phase 9 cutover | Maintenance MVP remains a handoff, not current work |
+| 9 | `closed` (landed) | Owner Land grant 2026-11-03 (L13-155), single product commit (L13-156) | Landed: main `97dd62aa7`, pushed; full suite and cargo red only where main is red or a file passes alone; post-Land records closed as recorded (L13-159) | Plan evidence (7.5 GB) is not on main: tag `archive/doc-260925-lineage` and `.doc-work/plan-260925-evidence-84bbfa7b8.tar.zst` on design-lap; release activation belongs to the landing lane |
+| 10 | `in-progress` | Owner authorized 2026-11-04 | Smallest maintenance surface; reuse `fgos convention` and the Phase 9 guards before adding a checker | Phase 10 file |
 
 
 ## 7.2. Execution harness and observation
