@@ -17,7 +17,7 @@ import { recordCustodyHandoff } from './cwd-lock.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
-import { normalizeRunResultV2, interpretRunResult, readSettledResult, ASSESSMENT_VERDICTS, runOutcome, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
+import { normalizeRunResultV2, readSettledResult, ASSESSMENT_VERDICTS, runOutcome, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
 import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 import {
   commitRunSettlement,
@@ -1520,15 +1520,8 @@ export async function executeAssignment(assignment, opts = {}) {
         const refusalControl = acquireRunControl(runDir, { holder: refusalControlHolder, purpose: 'provider-capacity-refusal' });
         if (refusalControl.status !== 'acquired') {
           // Already settled by another path — rehydrate and return.
-          try {
-            const resultJsonPath = path.join(runDir, 'result.json');
-            if (fs.existsSync(resultJsonPath)) {
-              const res = interpretRunResult(resultJsonPath, { expectedRunId: runId });
-              if (!res.corrupt && !res.contractCorrupt && !res.resultCorrupt && res.classification?.provenance !== 'contract-corrupt') {
-                return Object.freeze(res);
-              }
-            }
-          } catch {}
+          const alreadySettled = readSettledResult(runDir, runId);
+          if (alreadySettled) return Object.freeze(alreadySettled);
           throw new RunnerConfigError(
             `executeAssignment: provider-capacity refusal could not acquire control for Run "${runId}" (status: "${refusalControl.status}")`,
             { code: 'run-control-held', phase: 'provider-capacity-refusal' },
@@ -1594,28 +1587,17 @@ export async function executeAssignment(assignment, opts = {}) {
     const resultJsonPath = path.join(runDir, 'result.json');
     if (admitted.resumed) {
       if (fs.existsSync(resultJsonPath)) {
-        try {
-          const settledResult = interpretRunResult(resultJsonPath, { expectedRunId: runId });
-          if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
-            throw new RunnerConfigError(
-              `executeAssignment: Run "${runId}" resume found an existing result.json that failed validation or is contract-corrupt -- refusing to relaunch over corrupt settlement evidence`,
-              { code: 'result-corrupt', phase: 'post-admission' },
-            );
-          }
-          return Object.freeze(settledResult);
-        } catch (err) {
-          if (err instanceof RunnerConfigError) throw err;
-          // H3: result.json EXISTS (checked above) but failed to read/parse --
-          // a torn or corrupt write, not "no result yet". Falling through here
-          // used to silently continue toward launching a brand-new worker over
-          // a Run slot that already has terminal evidence, just unreadable
-          // evidence. Refuse instead; a human/recovery door decides next, this
-          // path never guesses by relaunching over it.
+        // result.json EXISTS: a result that cannot be read soundly (torn write, failed validation,
+        // contract-corrupt) is not "no result yet". Refuse instead of launching a brand-new worker over
+        // a Run slot that already has terminal evidence; a human/recovery door decides next.
+        const settledResult = readSettledResult(runDir, runId);
+        if (!settledResult) {
           throw new RunnerConfigError(
-            `executeAssignment: Run "${runId}" resume found an existing result.json that failed to parse (${err.message}) -- refusing to relaunch over unreadable settlement evidence`,
+            `executeAssignment: Run "${runId}" resume found an existing result.json that failed validation, failed to parse or is contract-corrupt -- refusing to relaunch over corrupt settlement evidence`,
             { code: 'result-corrupt', phase: 'post-admission' },
           );
         }
+        return Object.freeze(settledResult);
       }
       // An attempt of the supervisor era carries an envelope: the adopt door judges it, and a resume
       // never starts a second agent over it.
