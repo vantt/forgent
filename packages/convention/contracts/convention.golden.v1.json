@@ -130,7 +130,7 @@
       "name": "classify singleton",
       "operation": "classify",
       "input": {"path":"fixtures/demo/spec.md"},
-      "expected": {"kind":"fixture-singleton","cardinality":"singleton","scope":["fixtures/**"]}
+      "expected": {"kind":"fixture-singleton","cardinality":"singleton","scope":["fixtures/**"],"canonical":false,"metadataExempt":true,"generated":false}
     },
     {
       "name": "reject singleton near miss",
@@ -148,19 +148,37 @@
       "name": "classify collection nested item",
       "operation": "classify",
       "input": {"path":"fixtures/demo/contracts/nested/item.json"},
-      "expected": {"kind":"fixture-collection","cardinality":"collection","scope":["fixtures/**"]}
+      "expected": {"kind":"fixture-collection","cardinality":"collection","scope":["fixtures/**"],"canonical":false,"metadataExempt":true,"generated":false}
     },
     {
       "name": "classify collection at double-star zero segment boundary",
       "operation": "classify",
       "input": {"path":"fixtures/demo/contracts"},
-      "expected": {"kind":"fixture-collection","cardinality":"collection","scope":["fixtures/**"]}
+      "expected": {"kind":"fixture-collection","cardinality":"collection","scope":["fixtures/**"],"canonical":false,"metadataExempt":true,"generated":false}
     },
     {
       "name": "reject collection near miss",
       "operation": "classify",
       "input": {"path":"fixtures/demo/contract/item.json"},
       "expectedError": "unknown-kind: path does not match a placement rule"
+    },
+    {
+      "name": "classify canonical documentation row exposes the canonical flag",
+      "operation": "classify",
+      "input": {"path":"docs/platform/README.md"},
+      "expected": {"kind":"platform-portal","cardinality":"singleton","scope":["docs/platform/README.md"],"canonical":true,"metadataExempt":false,"generated":false}
+    },
+    {
+      "name": "classify evidence payload exposes the metadata exemption",
+      "operation": "classify",
+      "input": {"path":"docs/platform/verification/some-collection/run/payload.json"},
+      "expected": {"kind":"evidence-payload","cardinality":"collection","scope":["docs/platform/verification/<collection>/**"],"canonical":false,"metadataExempt":true,"generated":false}
+    },
+    {
+      "name": "classify generated documentation exposes the generated flag",
+      "operation": "classify",
+      "input": {"path":"docs/generated/summary.md"},
+      "expected": {"kind":"generated-doc","cardinality":"collection","scope":["docs/generated/**"],"canonical":false,"metadataExempt":false,"generated":true}
     },
     {
       "name": "classify unknown",

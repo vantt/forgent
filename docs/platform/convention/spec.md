@@ -168,7 +168,7 @@ Enforcement scope for the initial `report`, `plan`, and `journal` rules is delib
 fgos convention classify [--dir <root>] -- <path>
 ```
 
-This operation classifies only `placement-glob` rules; `name-template` kinds are checked through `check` and never receive an invented cardinality. It does not read the filesystem or document body. A match returns `{kind, cardinality, scope}`. No placement match is `unknown-kind`. The packaged documentation kinds and the synthetic schema fixtures are both classified through the same path-only implementation.
+This operation classifies only `placement-glob` rules; `name-template` kinds are checked through `check` and never receive an invented cardinality. It does not read the filesystem or document body. A match returns `{kind, cardinality, scope, canonical, metadataExempt, generated}`; the three booleans are the matching rule's reserved document flags (false when the rule does not set them), so a caller such as doc-health learns the document's exemptions from the same one door. No placement match is `unknown-kind`. The packaged documentation kinds and the synthetic schema fixtures are both classified through the same path-only implementation.
 
 ## 5. Time rule
 

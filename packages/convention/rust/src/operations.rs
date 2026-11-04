@@ -49,10 +49,14 @@ pub struct Violation {
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct ClassifyOutcome {
     pub kind: String,
     pub cardinality: Cardinality,
     pub scope: Vec<String>,
+    pub canonical: bool,
+    pub metadata_exempt: bool,
+    pub generated: bool,
 }
 
 #[derive(Debug, Clone, thiserror::Error, PartialEq, Eq)]
@@ -263,6 +267,9 @@ pub fn classify_with_rules(
         kind: rule.kind.clone(),
         cardinality: rule.cardinality.expect("validated placement rule"),
         scope: rule.scope.clone(),
+        canonical: rule.canonical,
+        metadata_exempt: rule.metadata_exempt,
+        generated: rule.generated,
     })
 }
 
