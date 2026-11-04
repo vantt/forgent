@@ -1,6 +1,6 @@
 # Hướng dẫn cho máy owner: làm cứng run supervisor và launch gate (T4)
 
-Hướng dẫn này áp dụng cho máy owner và máy thứ ba. Mỗi phase của T4 có một mục riêng. fg-server2 đã tự land và đã chạy cổng cho từng phase. Anh chọn giờ cập nhật; nên cập nhật một lần sau khi P07 land. Mục P07 sẽ được thêm vào sau và có một bước kiểm trước khi cập nhật.
+Hướng dẫn này áp dụng cho máy owner và máy thứ ba. Mỗi phase của T4 có một mục riêng. fg-server2 đã tự land và đã chạy cổng cho từng phase. Anh chọn giờ cập nhật; nên cập nhật một lần sau khi P07 land. P07 cần hai bước kiểm **trước** khi cập nhật, ghi ở mục "Trước khi cập nhật".
 
 Plan: [`plans/261103-1347-harden-t4-run-supervisor`](../261103-1347-harden-t4-run-supervisor/plan.md).
 
@@ -15,8 +15,20 @@ Plan: [`plans/261103-1347-harden-t4-run-supervisor`](../261103-1347-harden-t4-ru
 | P04 một bước theo dõi gate | `fad7e0fab` | File `supervisor-heartbeat.json` không còn được ghi. File do agent ghi được đọc an toàn: không đi theo symlink, không treo khi gặp FIFO. |
 | P01 adopt giữ quyền | `3a940e2a8` | `fgos doctor` của lớp này còn 5 dòng: `run-supervisor-route` (gồm containment), `runtime-socket-dir`, `run-attempts-stuck` (gồm unit chờ resume), `run-supervisor-config` (gộp `gate-kill-grace` và `cancel-wait`), `legacy-attempts-stuck`. Attempt mà release viết ra nó đã bị xoá giờ chỉ cảnh báo, không còn là lỗi. |
 | P06 cấu trúc test | `4e86aec63`, `1dc20857b` | Chỉ test và một dòng spec, không cần làm gì. |
+| P07 đóng attempt chưa bắt đầu, xoá legacy sweep | `7b82bf9b2`, `b6f9a545c` | Một dispatch bị giết trước khi agent khởi chạy giờ được `fgos run` kế tiếp hoặc `fgos doctor --fix` đóng lại, và unit của nó resume được. Controller giữ khoá attempt ngay sau khi nhận run, nên cwd lease bị giữ lâu hơn vài giây. Doctor còn 4 dòng: `legacy-attempts-stuck` bị xoá. `fgos dispatch recover --intent abandon-legacy` bị xoá. |
 
 Ngoài các phase: `c37d76811` format toàn bộ Rust (không đổi hành vi). Hai hồi quy do lần format này đã được sửa: `45e07caf2` (bộ quét census) và `b6260e061` (một test).
+
+## Trước khi cập nhật (bắt buộc cho P07)
+
+Làm trên **cả ba workspace**, với release **cũ** đang kích hoạt:
+
+1. Chạy `fgos doctor </dev/null`. Dòng `legacy-attempts-stuck` phải pass và không giữ lại run nào. Nếu dòng này fail hoặc cảnh báo, chạy `fgos doctor --fix </dev/null` với release cũ trước, rồi chạy lại doctor. Sau khi cập nhật, không còn gì đóng được một run kiểu cũ còn sót.
+2. Đếm attempt có khoá mà không có envelope (chỉ đọc, không sửa gì):
+   ```
+   find .fgos/assignments -name attempt.lock 2>/dev/null | while read f; do d=$(dirname "$f"); [ -e "$d/envelope.json" ] || echo "$d"; done
+   ```
+   Kết quả mong đợi: không in ra dòng nào. Nếu có dòng in ra, dừng lại và báo em đường dẫn. Trên fg-server2 kết quả là 0.
 
 ## Cập nhật
 
@@ -33,14 +45,14 @@ Ngoài các phase: `c37d76811` format toàn bộ Rust (không đổi hành vi). 
 - `runtime-socket-dir`: pass.
 - `run-attempts-stuck`: pass. Nếu nó cảnh báo một attempt có release đã bị xoá, đó là attempt cũ; cách xử lý được ghi ngay trong dòng cảnh báo.
 - `run-supervisor-config`: pass, kèm hai giá trị và nguồn của từng giá trị.
-- `legacy-attempts-stuck`: pass. Dòng này sẽ bị xoá ở P07.
 
-Các dòng `process-containment`, `gate-kill-grace`, `cancel-wait`, `units-awaiting-resume` không còn xuất hiện; đó là đúng.
+Các dòng `process-containment`, `gate-kill-grace`, `cancel-wait`, `units-awaiting-resume`, `legacy-attempts-stuck` không còn xuất hiện; đó là đúng.
 
 ## Định dạng trên đĩa
 
 - Receipt có thêm trường `outboxResult` và thêm giá trị cho `reason`. Đây là phần thêm vào; release trước bỏ qua trường lạ.
 - `supervisor-heartbeat.json` không còn được ghi. Trước đây cũng không có gì đọc file này.
+- File mới `attempt-intent.json` trong thư mục attempt (P07): controller ghi ngay sau khi lấy khoá; adopt dùng nó để đóng attempt chưa bắt đầu. Envelope do adopt viết có `origin: "adopt-not-started"` và không có `launch.command`.
 
 ## Cách quay lại
 
@@ -48,4 +60,4 @@ Các dòng `process-containment`, `gate-kill-grace`, `cancel-wait`, `units-await
 2. Kích hoạt lại release trước đó.
 3. Nếu cần quay lại cả mã nguồn, revert các commit trong bảng trên main theo thứ tự ngược lại.
 
-Release trước đọc được receipt do release mới viết, vì phần đổi chỉ là phần thêm vào.
+Release trước đọc được receipt do release mới viết, vì phần đổi chỉ là phần thêm vào. Với P07: release trước bỏ qua `attempt-intent.json`; envelope do adopt viết được nó đọc như một attempt v3 đã đóng; thư mục chỉ có khoá và intent thì legacy sweep cũ coi là run kiểu cũ đang `running` và xử lý như trước.
