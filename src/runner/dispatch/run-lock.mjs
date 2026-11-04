@@ -170,8 +170,16 @@ export function publishNextGeneration(generationsDir, decide) {
       return { published: false, ...decision };
     }
 
-    if (installOnce(generationsDir, generationFileName(nextEpoch), JSON.stringify(decision.record), 0o644) === 'already-exists') {
-      continue; // lost the race -- reread and let `decide` re-evaluate
+    const name = generationFileName(nextEpoch);
+    if (installOnce(generationsDir, name, JSON.stringify(decision.record), 0o644) === 'already-exists') {
+      // A name that exists is taken. A contender's record is complete (it is linked in whole), so the reread
+      // lists it and moves on; one the ledger cannot read would be met again at this same epoch for ever.
+      if (!fs.existsSync(path.join(generationsDir, name)) || parseJsonFile(path.join(generationsDir, name)) !== null) {
+        continue; // lost the race -- reread and let `decide` re-evaluate
+      }
+      const err = new Error(`generation record ${path.join(generationsDir, name)} exists but cannot be read`);
+      err.code = 'generation-unreadable';
+      throw err;
     }
     return { published: true, epoch: nextEpoch, record: decision.record };
   }

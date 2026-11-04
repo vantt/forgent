@@ -78,3 +78,16 @@ test('racing processes publish one marker and one next generation, never a repla
   assert.deepEqual(publishMarkerOnce(marker, { winner: 'late' }), { published: false });
   assert.equal(publishNextGeneration(generations, () => ({ stop: true })).published, false);
 });
+
+test('a generation file the ledger cannot read refuses by name instead of publishing in a loop', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-generation-unreadable-'));
+  try {
+    publishNextGeneration(dir, () => ({ record: { first: true } }));
+    fs.writeFileSync(path.join(dir, '0000000002.json'), '{"torn":');
+    assert.throws(
+      () => publishNextGeneration(dir, ({ nextEpoch }) => ({ record: { nextEpoch } })),
+      (err) => err.code === 'generation-unreadable' && /0000000002\.json/.test(err.message),
+    );
+    assert.deepEqual(listGenerations(dir).map((g) => g.epoch), [1], 'nothing was published past the unreadable record');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
