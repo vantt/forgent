@@ -53,6 +53,7 @@ import {
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { crossMachineNote, mailboxOptIn, refusedConfigName } from './mailbox-limits.mjs';
 import { checkMailboxClaudeAccept, fixMailboxClaudeAccept } from './mailbox-claude-accept.mjs';
+import { checkMailboxSyncTimer, fixMailboxSyncTimer } from './mailbox-sync-timer.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import {
   loadWorkflowDefinitions,
@@ -2261,6 +2262,17 @@ registerCheck({
 registerFix({
   id: 'mailbox-claude-accept',
   fix: (cwd) => fixMailboxClaudeAccept(cwd),
+});
+
+registerCheck({
+  id: 'mailbox-sync-timer',
+  description: 'agent mailbox: when cross-machine mail is on, an OS timer runs the mailbox sync child every eventStore.sync.intervalSec, so mail is taken on a machine where no session runs a tool',
+  check: (cwd) => checkMailboxSyncTimer(cwd),
+});
+
+registerFix({
+  id: 'mailbox-sync-timer',
+  fix: (cwd) => fixMailboxSyncTimer(cwd),
 });
 
 // Every capability a core/domain Workflow unit names must resolve the way
