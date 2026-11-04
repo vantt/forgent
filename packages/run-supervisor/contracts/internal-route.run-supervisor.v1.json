@@ -72,12 +72,12 @@
       "stateMeaning": {
         "running": "the attempt lock is held and no adopting.json names the holder; on Windows also reason `starting`: lock free, no binding or receipt, envelope `createdAt` younger than 60 s on this boot (the supervisor takes the lock itself, so the lock is free between the controller letting go and the binding); a named run dir whose bound gate is not provably dead is also `running` with reason `gate-alive`, whatever the lock says",
         "being-adopted": "the attempt lock is held by an adopter (adopting.json present)",
-        "needs-adopt": "probe-only: lock free and domain empty, not closed",
+        "needs-adopt": "probe-only: lock free and domain empty, not closed (reason `no-envelope` when the controller died before it wrote the envelope and left an attempt-intent.json: a call that takes the lock publishes the envelope from the intent, a start refusal with code no-envelope, and goes on as for an attempt that was never bound)",
         "held": "the lock is free but the domain its holder declared could not be emptied within the kill wait (reason predecessor-domain-not-empty), or the driver is best-effort and the agent the gate published is still alive after the kill wait (reason agent-alive): nothing was done",
         "adopted": "this call took the lock and drove the attempt to closed",
         "open": "this call took the lock but a step returned retry or failed; the attempt stays for a later adopt",
         "closed": "closed.json present (skipped without probing the lock)",
-        "legacy-run": "no attempt.lock or no envelope v3: not this door's run (the legacy sweep, src/run-supervisor/legacy-sweep.mjs, settles it)"
+        "legacy-run": "no attempt.lock, or no envelope v3 and no valid attempt-intent.json (attempt-intent.v1.json): not this door's run; nothing settles it, `fgos dispatch inspect` shows it"
       },
       "rule": "lock free is not enough: adopt proceeds only when containment.is_empty(binding.domain) == empty (unknown counts as not empty); under a best-effort binding the agent named by agent-binding.json must also judge dead"
     },

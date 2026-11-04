@@ -502,7 +502,7 @@ fn record_start_refusal(envelope_path: &Path, refusal: &Refusal) {
 }
 
 /// `start-refused.json` for an attempt that was never bound; the one writer.
-fn publish_start_refusal(run_dir: &Path, attempt_id: &str, code: &str, why: &str) {
+pub(crate) fn publish_start_refusal(run_dir: &Path, attempt_id: &str, code: &str, why: &str) {
     let note =
         json!({"v": 1, "attemptId": attempt_id, "code": code, "why": why, "at": iso_utc_now()});
     if let Ok(bytes) = serde_json::to_vec(&note) {

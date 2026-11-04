@@ -1531,7 +1531,8 @@ test('executeAssignment: concurrent identical admission (same retryId/tuple, two
   // already-committed runId, or be refused by per-Run control fencing if
   // it genuinely raced the first call's still-in-flight execution -- a
   // correct, desired refusal ("second controller on an un-settled Run
-  // refused"), never a second, DIFFERENT Run.
+  // refused"), never a second, DIFFERENT Run. The attempt lock is taken right after admission, so a second
+  // controller on the same attempt is most often refused there (`attempt-in-flight`).
   const outcomes = [a, b];
   const succeeded = outcomes.filter((o) => o.ok);
   assert.ok(succeeded.length >= 1, `at least one call must succeed: ${JSON.stringify(outcomes)}`);
@@ -1540,7 +1541,7 @@ test('executeAssignment: concurrent identical admission (same retryId/tuple, two
   for (const o of outcomes) {
     if (!o.ok) {
       assert.ok(
-        ['run-control-held', 'run-in-flight', 'run-unreconciled', 'admission-invalid-predecessor', 'admission-duplicate-retry'].includes(o.code),
+        ['attempt-in-flight', 'run-control-held', 'run-in-flight', 'run-unreconciled', 'admission-invalid-predecessor', 'admission-duplicate-retry'].includes(o.code),
         `an unsuccessful call must fail for an expected admission/control reason, got code: ${o.code} (${o.message})`,
       );
     }

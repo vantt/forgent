@@ -16,16 +16,16 @@
   },
   "attemptState": {
     "enum": ["running", "being-adopted", "closed", "legacy-run", "abandoned-not-started", "abandoned-before-brief", "abandoned-legacy", "superseded"],
-    "source": "the adopt probe (src/run-supervisor/client.mjs adoptRun/adoptScan, read-only) over <attemptDir>; abandoned-legacy is the one exception: the doctor fix writes it, the probe never reports it",
+    "source": "the adopt probe (src/run-supervisor/client.mjs adoptRun/adoptScan, read-only) over <attemptDir>; abandoned-legacy is the one exception: an earlier release's doctor fix wrote it into run.json, the probe never reports it and nothing writes it any more",
     "rules": {
       "running": "attempt.lock is held and no adopting.json: a supervisor owns it",
       "being-adopted": "attempt.lock is held and adopting.json names the holder: an adopter owns it",
       "closed": "closed.json exists; every step has a step receipt. A scan skips it",
-      "legacy-run": "run written before the supervisor (no attempt.lock); adopt cannot judge it",
+      "legacy-run": "run written before the supervisor (no attempt.lock), or an attempt lock with neither an envelope nor an attempt-intent.json; adopt cannot judge it and nothing settles it. An attempt lock with an attempt-intent.json and no envelope is not legacy: it is a controller that died before it wrote the envelope, and adopt closes it as abandoned-not-started",
       "abandoned-not-started": "no binding, receipt outcome abandoned-not-started (receipt.v1.json); a resume launches a new attempt with supersedesRunId",
       "abandoned-before-brief": "terminal mode; receipt outcome abandoned-before-brief, nothing ran after GO. Counts as closed once closed.json exists; a resume treats it like abandoned-not-started and launches a new attempt with supersedesRunId",
       "superseded": "inspect and show-run only: a closed (or abandoned) attempt that a later `--resume` replaced with a new attempt whose run.json names it in supersedesRunId. Reported with supersededBy (the new run id) and attemptOutcome (what the attempt itself was)",
-      "abandoned-legacy": "a legacy-run attempt settled by the doctor fix once every recorded pid judged dead and no home marker points at it"
+      "abandoned-legacy": "a legacy-run attempt an earlier release settled; still read, never written"
     }
   },
   "resumeRule": {
@@ -33,7 +33,7 @@
     "running|being-adopted": "refuse with the named error `attempt-still-running`; print the state and the `fgos dispatch inspect` command; do not wait",
     "gate-lost": "binding present, gate dead, no gate-exit: adopt cannot prove the agent never ran, so the attempt settles gate-lost and a resume does not relaunch it (fail closed; the person starts a new run). Relaunching it is deferred: it needs a gate-side marker written before GO",
     "abandoned-not-started|abandoned-before-brief": "launch a new attempt with supersedesRunId set to the abandoned one",
-    "legacy-run": "refuse with `attempt-legacy-run`; the doctor check legacy-attempts-stuck owns it",
+    "legacy-run": "refuse with `attempt-legacy-run`, naming `fgos dispatch inspect`",
     "neverSecondSupervisor": "a resume goes through adopt and never starts a supervisor for an attempt that already has a binding or receipt (supervise refuses to start there)",
     "concurrentResume": "the controller seat of the unit (unit-control ledger) is taken before unit.json is read; a second resumer finds a live holder and refuses with `resume-in-progress`; a holder proven dead is taken over"
   },

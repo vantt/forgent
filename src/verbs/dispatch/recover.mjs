@@ -124,13 +124,9 @@ function listAttemptFiles(runDir) {
   return names;
 }
 
-function buildSnapshot(runDir, ctx) {
+function buildSnapshot(runDir) {
   const { run, visibility, outbox, controller = [], visibilityError = null } = readRunSnapshot(runDir);
   const attempt = probeAttempt(runDir);
-  // Whoever settles a legacy run supplies the proof that every process it recorded is dead; without a
-  // judge the door has no such proof and asks for it.
-  const legacyHolders = attempt.state === 'legacy-run' && typeof ctx?.judgeLegacyHolders === 'function'
-    ? ctx.judgeLegacyHolders(runDir) : null;
   const controlEpoch = readRealControlEpoch(runDir);
   const settled = classifyRunOutcome(runDir, { liveness: 'unknown' });
   return {
@@ -142,7 +138,6 @@ function buildSnapshot(runDir, ctx) {
     controlEpoch,
     attempt,
     attemptFiles: listAttemptFiles(runDir),
-    legacyHolders,
     settledSignal: { outcome: settled.outcome, resultPath: settled.resultPath ? path.relative(runDir, settled.resultPath) : null },
   };
 }
@@ -157,7 +152,7 @@ export function recoverObserveUseCase(ctx, { runId, intent = DEFAULT_INTENT, now
   requireRunId(runId);
   const runDir = resolveRunDir(ctx, runId);
   const nowFn = typeof now === 'function' ? now : now ? () => now : undefined;
-  const snapshot = buildSnapshot(runDir, ctx);
+  const snapshot = buildSnapshot(runDir);
   const evidence = collectEvidence(snapshot, nowFn ? { now: nowFn } : {});
   let recommendation;
   try {
@@ -286,16 +281,8 @@ function applyAdopt(runId, runDir, params, nowIso) {
   return { runId, runDir, outcome: 'applied', ...record };
 }
 
-// `abandon-legacy` settles a run from before the run supervisor that was left `running`: the legality check
-// already required proof that every process it recorded is dead.
-function applyAbandonLegacy(runId, runDir, params, nowIso) {
-  writeRunJsonPatch(runDir, { status: 'died', settlement: 'abandoned-legacy', settledAt: nowIso });
-  const record = recordApplied(runDir, params, nowIso);
-  return { runId, runDir, outcome: 'applied', ...record };
-}
-
 // Actions that finish or settle a run: never over a run a CoordinationSession owns.
-const SESSION_REFUSED_ACTIONS = ['resume-driver', 'adopt', 'abandon-legacy'];
+const SESSION_REFUSED_ACTIONS = ['resume-driver', 'adopt'];
 
 const REQUIRED_APPLY_FIELDS = ['action', 'expectedSnapshot', 'expectedControlEpoch', 'expectedExpiresAt', 'actionKey'];
 
@@ -357,7 +344,7 @@ export function recoverApplyUseCase(ctx, params = {}) {
       return { runId, runDir, outcome: 'already-applied', ...already };
     }
 
-    const snapshot = buildSnapshot(runDir, ctx);
+    const snapshot = buildSnapshot(runDir);
     const evidence = collectEvidence(snapshot, { now: nowIso });
     const check = checkApply({
       snapshot,
@@ -374,7 +361,6 @@ export function recoverApplyUseCase(ctx, params = {}) {
     }
 
     if (params.action?.type === 'adopt') return applyAdopt(runId, runDir, params, nowIso);
-    if (params.action?.type === 'abandon-legacy') return applyAbandonLegacy(runId, runDir, params, nowIso);
 
     // H1: the actual control-epoch mutation goes through run-lock's own
     // real CAS primitive -- the same generation ledger a live controller's

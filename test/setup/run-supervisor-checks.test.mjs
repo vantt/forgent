@@ -16,13 +16,9 @@ import {
   checkRunAttemptsStuck,
   fixRunAttemptsStuck,
   checkRunSupervisorConfig,
-  checkLegacyAttemptsStuck,
-  fixLegacyAttemptsStuck,
 } from '../../src/setup/run-supervisor-checks.mjs';
 import { readGateKillGraceMs, readCancelWaitMs, DEFAULT_GATE_KILL_GRACE_MS } from '../../src/run-supervisor/gate-kill-grace.mjs';
-import { recoverApplyUseCase, recoverObserveUseCase } from '../../src/verbs/dispatch/recover.mjs';
 import { fileHolders } from '../../src/holder-lock/index.mjs';
-import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
 import { writeProjectConfig, writeGlobalConfig, globalConfigPath as globalConfigFile } from '../helpers/config-fixture.mjs';
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -60,12 +56,12 @@ const probeLine = (containment) => JSON.stringify({ v: 1, protocol: 1, result: '
 
 test('the run supervisor checks and fixes are registered', () => {
   const ids = DOCTOR_CHECKS.map((check) => check.id);
-  for (const id of ['run-supervisor-route', 'runtime-socket-dir', 'run-attempts-stuck', 'run-supervisor-config', 'legacy-attempts-stuck']) {
+  for (const id of ['run-supervisor-route', 'runtime-socket-dir', 'run-attempts-stuck', 'run-supervisor-config']) {
     assert.ok(ids.includes(id), `${id} is a doctor check`);
   }
   for (const id of ['process-containment', 'gate-kill-grace', 'units-awaiting-resume', 'cancel-wait']) assert.ok(!ids.includes(id), `${id} is folded into another row`);
   const fixIds = FIX_REGISTRATIONS.map((fix) => fix.id);
-  for (const id of ['runtime-socket-dir', 'run-attempts-stuck', 'legacy-attempts-stuck']) assert.ok(fixIds.includes(id), `${id} has a fix`);
+  for (const id of ['runtime-socket-dir', 'run-attempts-stuck']) assert.ok(fixIds.includes(id), `${id} has a fix`);
 });
 
 // ─── run-supervisor-route ───────────────────────────────────────────────
@@ -377,61 +373,6 @@ test('run-attempts-stuck: a held lock is a running attempt, not a finding', { sk
   assert.equal(res.passed, true, res.message);
   assert.match(res.message, /1 open attempt\(s\), none stuck \(1 running\)/);
   holder.kill('SIGKILL');
-});
-
-// ─── legacy-attempts-stuck ──────────────────────────────────────────────
-
-const LEGACY_FIXTURE = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'fixtures', 'run-layout', 'legacy-stuck', 'assignments');
-const door = { observe: recoverObserveUseCase, apply: recoverApplyUseCase };
-
-/** A workspace holding the two legacy runs of the spike fixture; `confinementRoot` is empty (no v1 home left). */
-function legacyWorkspace(name) {
-  const root = workspace(name);
-  fs.cpSync(LEGACY_FIXTURE, path.join(root, '.fgos', 'assignments'), { recursive: true });
-  const confinementRoot = path.join(root, 'confinement');
-  fs.mkdirSync(confinementRoot);
-  return { root, confinementRoot, herdr: path.join(root, '.fgos', 'assignments', 'unit-run-herdr/producer/1/runs/01'), cli: path.join(root, '.fgos', 'assignments', 'unit-run-cli/producer/1/runs/01') };
-}
-
-test('legacy-attempts-stuck: nothing left running passes', () => {
-  const root = workspace('legacy-none');
-  assert.equal(checkLegacyAttemptsStuck(root).passed, true);
-  assert.equal(fixLegacyAttemptsStuck(root, { door }).changed, false);
-});
-
-test('legacy-attempts-stuck: runs whose processes are all dead fail, the fix settles them and the check then passes', () => {
-  process.env.FGOS_HOST_BIN = HOST_BIN;
-  const w = legacyWorkspace('legacy-dead');
-  const before = checkLegacyAttemptsStuck(w.root, { confinementRoot: w.confinementRoot });
-  assert.equal(before.passed, false, before.message);
-  assert.match(before.message, /2 run\(s\) from before the run supervisor are left running and every process they recorded is dead/);
-  assert.match(before.message, /fgos doctor --fix/);
-  assert.equal(JSON.parse(fs.readFileSync(path.join(w.cli, 'run.json'), 'utf8')).status, 'running', 'the check wrote nothing');
-
-  const fixed = fixLegacyAttemptsStuck(w.root, { door, confinementRoot: w.confinementRoot });
-  assert.equal(fixed.changed, true);
-  assert.match(fixed.message, /settled 2 run\(s\) as abandoned-legacy/);
-  assert.equal(JSON.parse(fs.readFileSync(path.join(w.cli, 'run.json'), 'utf8')).settlement, 'abandoned-legacy');
-  assert.equal(checkLegacyAttemptsStuck(w.root, { confinementRoot: w.confinementRoot }).passed, true);
-});
-
-test('legacy-attempts-stuck: a run with a live recorded process is kept and the reason is printed, by the check and by the fix', () => {
-  process.env.FGOS_HOST_BIN = HOST_BIN;
-  const w = legacyWorkspace('legacy-alive');
-  const generation = path.join(w.herdr, 'control', 'generations', '0000000001.json');
-  const record = JSON.parse(fs.readFileSync(generation, 'utf8'));
-  record.holder = { id: 'live', pid: process.pid, processStartTime: selfRecord().startTime };
-  fs.writeFileSync(generation, JSON.stringify(record));
-
-  const res = checkLegacyAttemptsStuck(w.root, { confinementRoot: w.confinementRoot });
-  assert.equal(res.passed, false, 'one run can still be settled');
-  assert.match(res.message, /kept: .*unit-run-herdr.*pid-alive \(controller \d+\)/);
-
-  const fixed = fixLegacyAttemptsStuck(w.root, { door, confinementRoot: w.confinementRoot });
-  assert.match(fixed.message, /settled 1 run\(s\) as abandoned-legacy; kept: .*unit-run-herdr.*pid-alive/);
-  const after = checkLegacyAttemptsStuck(w.root, { confinementRoot: w.confinementRoot });
-  assert.equal(after.passed, true, 'nothing left to fix: the kept run only warns');
-  assert.match(after.message, /^warning: 1 run\(s\) from before the run supervisor are left running and stay open: .*pid-alive/);
 });
 
 // ─── units awaiting resume (judged by run-attempts-stuck) ───────────────

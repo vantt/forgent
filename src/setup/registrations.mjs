@@ -135,8 +135,7 @@ import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding
 import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
 import { listAssignmentRuns, scanAssignmentLayout } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
-import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkRunSupervisorConfig, checkLegacyAttemptsStuck, fixLegacyAttemptsStuck } from './run-supervisor-checks.mjs';
-import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/recover.mjs';
+import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkRunSupervisorConfig } from './run-supervisor-checks.mjs';
 import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
@@ -2069,7 +2068,7 @@ registerCheck({
 });
 registerCheck({
   id: 'run-attempts-stuck',
-  description: 'no attempt with a v3 envelope is left without a closed.json while its lock is free (fgos doctor --fix adopts it; an attempt whose release was removed only warns); lists unit runs awaiting fgos run --resume (a warning, never a failure)',
+  description: 'no attempt with a v3 envelope, or with the intent a controller left when it died before writing one, is left without a closed.json while its lock is free (fgos doctor --fix adopts it; an attempt whose release was removed only warns); lists unit runs awaiting fgos run --resume (a warning, never a failure)',
   check: (cwd) => checkRunAttemptsStuck(cwd),
 });
 registerCheck({
@@ -2077,14 +2076,8 @@ registerCheck({
   description: 'dispatch.gateKillGraceMs is an integer of at least 1000 ms (default 10000) and dispatch.cancelWaitMs is an integer of at least 1000 ms and not shorter than it (default gateKillGraceMs + 5000)',
   check: (cwd) => checkRunSupervisorConfig(cwd),
 });
-registerCheck({
-  id: 'legacy-attempts-stuck',
-  description: 'no run from before the run supervisor is left running with every recorded process dead (fgos doctor --fix settles it as abandoned-legacy; a run that cannot be proven dead is kept and its reason named)',
-  check: (cwd) => checkLegacyAttemptsStuck(cwd),
-});
 registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
 registerFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });
-registerFix({ id: 'legacy-attempts-stuck', fix: (cwd) => fixLegacyAttemptsStuck(cwd, { door: { observe: recoverObserveUseCase, apply: recoverApplyUseCase } }) });
 
 // The curated capability slots. The standard (core/config-standard/runner.yaml) holds the same entries and is
 // what a run reads; this list stays as the reference the doctrine-table tests and the plan lint's registered

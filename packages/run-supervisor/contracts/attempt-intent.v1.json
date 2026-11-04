@@ -1,0 +1,22 @@
+{
+  "contract": { "id": "run-supervisor-attempt-intent", "version": 1 },
+  "description": "<attemptDir>/attempt-intent.json. The controller writes it right after it takes the attempt lock, before its first await, and replaces it atomically while it holds the lock (a resumed attempt that never got an envelope carries the intent of its new launch). It holds what the adopt door needs to close the attempt if the controller dies before it writes envelope.json: the lock is free, no envelope exists, the intent is valid. Adopt then publishes an envelope from it (envelope.v3.json origin adopt-not-started), a start refusal with code no-envelope, and goes on as for any attempt that was never bound (receipt abandoned-not-started, the steps, closed.json). A controller that settles the run without a launch (refused, or already answered) removes it. No secrets. A directory with controller/commands (the pre-supervisor launch record) is never closed from an intent.",
+  "fields": {
+    "v": { "const": 1 },
+    "attemptId": "string, the id the envelope of this launch would carry",
+    "unitRunId": "string",
+    "runDir": "absolute path of the attempt directory; adopt accepts the intent only when it names the directory it was found in",
+    "mode": { "enum": ["direct", "terminal"], "meaning": "what the controller would have launched. The adopt-written envelope is always direct: a not-started attempt has no pane to address" },
+    "cwd": "absolute working directory of the agent",
+    "launch": {
+      "capture": { "stdout": "absolute path", "stderr": "absolute path" },
+      "outboxDir": "absolute path"
+    },
+    "steps": "array of process step items exactly as envelope.v3.json `steps.item` (settle-attempt, finalize-home, and cleanup-trust for a terminal attempt); never the release-slot builtin, because no pane is recorded yet. Built by the same function that builds the envelope's steps. The first one names hostBin and payloadRoot, which become the envelope's",
+    "sideFile": "absolute path of the side file the envelope would name (it does not exist for a not-started attempt)"
+  },
+  "invariants": [
+    "written under the attempt lock, so a reader that finds the lock free and the file present has a complete file",
+    "its absence with a lock and no envelope reads legacy-run: nothing is closed from a directory without one"
+  ]
+}

@@ -66,7 +66,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'runtime-socket-dir',
       'run-attempts-stuck',
       'run-supervisor-config',
-      'legacy-attempts-stuck',
       'credential-copies-retained',
       'dependencies-installed',
       'root-drift',

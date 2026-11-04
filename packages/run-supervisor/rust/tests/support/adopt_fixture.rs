@@ -22,21 +22,7 @@ pub struct Fixture {
 
 /// `<root>/<name>/`, empty. `steps`: ids of fixture steps; each appends one line to `ran-<id>`.
 pub fn attempt_in(root: &Path, name: &str, steps: &[&str]) -> Fixture {
-    let dir = root.join(name);
-    let _ = fs::remove_dir_all(&dir);
-    fs::create_dir_all(&dir).unwrap();
-    let attempt_id = format!("att-adopt-{name}");
-    let step_values: Vec<Value> = steps
-        .iter()
-        .map(|id| {
-            shell_step(
-                &dir,
-                id,
-                &format!("echo x >> {}/ran-{id}", dir.display()),
-                10_000,
-            )
-        })
-        .collect();
+    let (dir, attempt_id, step_values) = empty_attempt(root, name, steps);
     let mut value = json!({
         "v": 3,
         "attemptId": attempt_id,
@@ -67,6 +53,53 @@ pub fn attempt_in(root: &Path, name: &str, steps: &[&str]) -> Fixture {
     fs::write(
         dir.join("envelope.json"),
         serde_json::to_vec(&value).unwrap(),
+    )
+    .unwrap();
+    fs::write(dir.join("attempt.lock"), "").unwrap();
+    Fixture { dir, attempt_id }
+}
+
+/// The directory, the attempt id and the fixture steps every state of an attempt starts from.
+fn empty_attempt(root: &Path, name: &str, steps: &[&str]) -> (PathBuf, String, Vec<Value>) {
+    let dir = root.join(name);
+    let _ = fs::remove_dir_all(&dir);
+    fs::create_dir_all(&dir).unwrap();
+    let step_values = steps
+        .iter()
+        .map(|id| {
+            shell_step(
+                &dir,
+                id,
+                &format!("echo x >> {}/ran-{id}", dir.display()),
+                10_000,
+            )
+        })
+        .collect();
+    (dir, format!("att-adopt-{name}"), step_values)
+}
+
+/// What a controller that took the attempt lock and died before it wrote the envelope leaves: the lock
+/// file and `attempt-intent.json`, no envelope.
+pub fn not_started(name: &str, steps: &[&str]) -> Fixture {
+    let root = std::env::temp_dir().join(format!("fgos-adopt-{}", std::process::id()));
+    let (dir, attempt_id, step_values) = empty_attempt(&root, name, steps);
+    let intent = json!({
+        "v": 1,
+        "attemptId": attempt_id,
+        "unitRunId": "unit-1",
+        "runDir": dir,
+        "mode": "direct",
+        "cwd": dir,
+        "launch": {
+            "outboxDir": dir.join("outbox"),
+            "capture": {"stdout": dir.join("capture-stdout.log"), "stderr": dir.join("capture-stderr.log")},
+        },
+        "steps": step_values,
+        "sideFile": dir.join("protected").join("attempt-secrets.json"),
+    });
+    fs::write(
+        dir.join("attempt-intent.json"),
+        serde_json::to_vec(&intent).unwrap(),
     )
     .unwrap();
     fs::write(dir.join("attempt.lock"), "").unwrap();

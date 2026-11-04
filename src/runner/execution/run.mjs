@@ -273,8 +273,8 @@ function assertCollaborationPinUsable(unitRunId, collaboration, configSnapshot, 
 }
 /**
  * A resume never starts a second agent over an attempt the previous controller left: an attempt whose
- * supervisor still works (or an adopter) is named and refused, an attempt from before the run supervisor
- * is refused for the doctor to settle. Only a closed attempt is carried on from. Asks the adopt door,
+ * supervisor still works (or an adopter) is named and refused, an attempt no door can judge (a run from
+ * before the run supervisor) is refused by name. Only a closed attempt is carried on from. Asks the adopt door,
  * read-only, for every attempt whose outcome the dead controller never recorded.
  */
 function assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir) {
@@ -285,7 +285,7 @@ function assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir) {
     if (state === 'closed') continue;
     const look = 'fgos dispatch inspect';
     if (state === 'legacy-run') {
-      throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": attempt "${prior.runId}" ran before the run supervisor and cannot be judged (${prior.dir}); fgos doctor --fix settles it`, { code: 'attempt-legacy-run' });
+      throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": attempt "${prior.runId}" ran before the run supervisor and cannot be judged (${prior.dir}); look with \`${look}\``, { code: 'attempt-legacy-run' });
     }
     throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": attempt "${prior.runId}" is still ${state} (${prior.dir}); look with \`${look}\` and resume once it has closed`, { code: 'attempt-still-running', attemptState: state });
   }
@@ -301,7 +301,7 @@ function admissionIdentityFor(attempt, { unitRunId, assignmentId, worktree, assi
   const current = currentAttemptOf(assignmentsDir, assignmentId);
   const abandoned = () => {
     if (!current) return false;
-    // A run from before the supervisor that the legacy sweep settled has no result to carry on from.
+    // A run from before the supervisor that an earlier release settled as abandoned has no result to carry on from.
     try {
       if (JSON.parse(fs.readFileSync(path.join(current.dir, 'run.json'), 'utf8')).settlement === 'abandoned-legacy') return true;
     } catch { /* no status record: judged by its envelope below */ }

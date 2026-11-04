@@ -6,6 +6,11 @@
 //! rule ends and waits out a domain a dead supervisor left), writes
 //! `adopting.json`, completes the receipt the matrix calls for, runs the steps
 //! that have no receipt and publishes `closed.json`.
+//!
+//! An attempt whose controller took the lock and died before it wrote the
+//! envelope has `attempt-intent.json` instead: adopt publishes the envelope
+//! from it (`origin: "adopt-not-started"`) and goes on as for any attempt that
+//! was never bound.
 
 use std::io::{BufRead, Write};
 use std::path::{Path, PathBuf};
@@ -23,7 +28,7 @@ use crate::envelope;
 use crate::publish::publish_once;
 use crate::route::{refuse, report, ArgsError, Flags, EXIT_INTERNAL};
 use crate::steps::{run_steps, StepsOutcome};
-use crate::supervise::publish_receipt_as;
+use crate::supervise::{publish_receipt_as, publish_start_refusal};
 use fgos_identity::text::iso_utc_now;
 
 /// Parsed argv of `fgos internal adopt`.
@@ -149,7 +154,9 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
         return Verdict::state("closed");
     }
     let lock_path = dir.join("attempt.lock");
-    if !lock_path.exists() || !is_v3_envelope(&dir.join("envelope.json")) {
+    let envelope_path = dir.join("envelope.json");
+    let not_started = !envelope_path.exists() && read_intent(dir).is_some();
+    if !lock_path.exists() || !(not_started || is_v3_envelope(&envelope_path)) {
         return Verdict::state("legacy-run");
     }
     let resource = Resource::new("attempt", &lock_path);
@@ -159,7 +166,7 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
         Err(err) => return Verdict::because("open", format!("lock probe failed: {err}")),
     }
     let binding = read_json(&dir.join("supervisor-binding.json"));
-    let envelope_json = read_json(&dir.join("envelope.json"));
+    let envelope_json = read_json(&envelope_path);
     // A run dir named on purpose may wait out a domain, so a bound gate that is not provably dead still owns it: where the lock dies with the
     // supervisor (Windows) a free lock says nothing, and ending the domain would kill a live agent.
     // (a scan already refuses a non-empty domain)
@@ -205,9 +212,10 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
     };
     if args.probe_only {
         return match domain_state {
-            DomainState::Empty => match &refusal {
-                Some(code) => Verdict::because("needs-adopt", format!("start-refused:{code}")),
-                None => Verdict::state("needs-adopt"),
+            DomainState::Empty => match (&refusal, not_started) {
+                (Some(code), _) => Verdict::because("needs-adopt", format!("start-refused:{code}")),
+                (None, true) => Verdict::because("needs-adopt", NO_ENVELOPE),
+                (None, false) => Verdict::state("needs-adopt"),
             },
             _ => Verdict::because("running", "domain-not-empty"),
         };
@@ -297,6 +305,11 @@ fn drive(dir: &Path, bound_hint: bool) -> Verdict {
     if dir.join("closed.json").exists() {
         return Verdict::state("closed");
     }
+    if !dir.join("envelope.json").exists() {
+        if let Err(why) = publish_not_started_envelope(dir) {
+            return Verdict::because("open", why);
+        }
+    }
     let envelope = match envelope::read_verified(&dir.join("envelope.json")) {
         Ok(envelope) => envelope,
         Err(why) => return Verdict::because("open", why),
@@ -358,6 +371,90 @@ fn ensure_receipt(envelope: &Value, dir: &Path, bound: bool) -> std::io::Result<
         }
     }
     publish_receipt_as(envelope, dir, "adopt", !bound)
+}
+
+/// The reason a not-started attempt is closed: its controller never wrote the envelope.
+const NO_ENVELOPE: &str = "no-envelope";
+
+/// `attempt-intent.json` of this directory when it is one an attempt of the supervisor era left: what the
+/// controller wrote under the attempt lock before anything else, naming this very directory and a step
+/// host. A pre-supervisor directory (launch record under `controller/commands`) never has one.
+fn read_intent(dir: &Path) -> Option<Value> {
+    if dir.join("controller").join("commands").exists() {
+        return None;
+    }
+    let intent = read_json(&dir.join("attempt-intent.json"))?;
+    let names_this_dir = intent["runDir"]
+        .as_str()
+        .and_then(|named| std::fs::canonicalize(named).ok())
+        .is_some_and(|named| std::fs::canonicalize(dir).is_ok_and(|here| here == named));
+    let strings = [
+        &intent["attemptId"],
+        &intent["unitRunId"],
+        &intent["cwd"],
+        &intent["sideFile"],
+        &intent["launch"]["outboxDir"],
+        &intent["launch"]["capture"]["stdout"],
+        &intent["launch"]["capture"]["stderr"],
+    ];
+    (intent["v"] == 1
+        && names_this_dir
+        && strings.iter().all(|v| v.is_string())
+        && step_host(&intent).is_some())
+    .then_some(intent)
+}
+
+/// The host binary and payload root of the first process step of an intent.
+fn step_host(intent: &Value) -> Option<(&str, &str)> {
+    let step = intent["steps"]
+        .as_array()?
+        .iter()
+        .find(|step| step["builtin"] != true)?;
+    Some((step["hostBin"].as_str()?, step["payloadRoot"].as_str()?))
+}
+
+/// Under the lock: the envelope of an attempt that has an intent and no envelope, and the note that says
+/// why it was never started. No launch, no containment and no deadlines: nothing ever runs from it but the
+/// steps, always as `direct` (there is no pane to address).
+fn publish_not_started_envelope(dir: &Path) -> Result<(), String> {
+    let intent = read_intent(dir).ok_or("attempt-intent.json is missing or invalid")?;
+    let (host, payload) = step_host(&intent).ok_or("attempt-intent.json names no step")?;
+    let attempt_id = intent["attemptId"].as_str().unwrap_or_default();
+    let mut envelope = json!({
+        "v": 3,
+        "origin": "adopt-not-started",
+        "attemptId": attempt_id,
+        "unitRunId": intent["unitRunId"],
+        "runDir": intent["runDir"],
+        "mode": "direct",
+        "protocolId": 1,
+        "hostBin": host,
+        "payloadRoot": payload,
+        "cwd": intent["cwd"],
+        "mutation": "read-only",
+        "launch": {
+            "env": {},
+            "stdinPolicy": "null",
+            "briefPath": null,
+            "outboxDir": intent["launch"]["outboxDir"],
+            "capture": intent["launch"]["capture"],
+        },
+        "steps": intent["steps"],
+        "sideFile": intent["sideFile"],
+    });
+    let digest =
+        envelope::digest(&envelope).map_err(|e| format!("intent has no canonical form: {e:?}"))?;
+    envelope["digest"] = Value::String(digest);
+    publish_start_refusal(
+        dir,
+        attempt_id,
+        NO_ENVELOPE,
+        "the controller ended before it wrote the envelope",
+    );
+    let bytes = serde_json::to_vec(&envelope).map_err(|e| e.to_string())?;
+    publish_once(dir, "envelope.json", &bytes)
+        .map(|_| ())
+        .map_err(|e| format!("envelope.json not published: {e}"))
 }
 
 /// The code the supervisor named in `start-refused.json` for this attempt.

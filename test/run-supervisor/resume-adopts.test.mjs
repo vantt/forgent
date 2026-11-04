@@ -212,13 +212,13 @@ test('8. controller, supervisor and gate all dead with the lock free: --resume a
   assert.ok(exists(dir, 'closed.json'), 'the resume adopted and settled the attempt');
 });
 
-test('9. an attempt the legacy sweep settled is not carried on from: --resume launches a new attempt that supersedes it', { skip, timeout: 300_000 }, async () => {
+test('9. an attempt an earlier release settled as abandoned-legacy is not carried on from: --resume launches a new attempt that supersedes it', { skip, timeout: 300_000 }, async () => {
   const project = createProject({ agent: { runMs: 1500 } });
   const first = startRun(project, project.unitFile('resume-legacy'));
   assert.equal((await first.exited).code, 0, first.output().stderr);
   const unitDir = unitDirOf(project);
   const [dir] = project.attemptDirs();
-  // Shape of a run from before the supervisor that the legacy sweep settled: a launch record, no envelope, no
+  // Shape of a run from before the supervisor that an earlier release settled as abandoned: a launch record, no envelope, no
   // closed marker, and nothing in the unit recording how it ended.
   for (const name of ['envelope.json', 'closed.json', 'receipt.json', 'result.json', 'exit.json']) fs.rmSync(here(dir, name), { force: true });
   for (const name of fs.readdirSync(dir).filter((n) => n.startsWith('attempt.lock'))) fs.rmSync(here(dir, name), { recursive: true, force: true });

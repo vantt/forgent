@@ -44,8 +44,7 @@ test('cancel-requested names who asked and keeps the fields the supervisor reads
 });
 
 test('recover offers adopt beside the existing actions', () => {
-  assert.deepEqual(Object.keys(recover.actions), ['adopt', 'abandon-legacy', 'resume-driver', 'reassign-driver']);
-  assert.equal(recover.actions['abandon-legacy'].shape.type, 'abandon-legacy');
+  assert.deepEqual(Object.keys(recover.actions), ['adopt', 'resume-driver', 'reassign-driver']);
   assert.equal(recover.actions.adopt.shape.type, 'adopt');
   assert.match(recover.actions.adopt.stillLegal, /running or being-adopted makes it illegal/);
 });

@@ -164,6 +164,45 @@ export function withIdentityEnv(env, identity) {
   return { ...out, FGOS_SESSION_ID: identity.writerId, ...(identity.parentWriterId ? { FGOS_PARENT_WRITER_ID: identity.parentWriterId } : {}) };
 }
 
+/** The process steps an attempt runs after its receipt, in order: the one list the envelope and the intent both carry. */
+function attemptSteps({ runDir, host, stepEnv, extraSteps = [] }) {
+  return ['settle-attempt', 'finalize-home', ...extraSteps].map((stepId) => ({
+    stepId,
+    hostBin: host.hostBin,
+    payloadRoot: host.payloadRoot,
+    argv: ['internal', 'attempt-step', stepId, '--protocol', String(PROTOCOL), '--run-dir', runDir],
+    cwd: runDir,
+    env: stepEnv,
+    stepTimeoutMs: STEP_TIMEOUT_MS,
+  }));
+}
+
+/**
+ * Publish `attempt-intent.json` (contract attempt-intent.v1.json) right after the attempt lock is taken:
+ * what the adopt door needs to close this attempt if the controller dies before it writes the envelope.
+ * It is written under the lock and replaced atomically, so a reader never sees a half file; a resumed
+ * attempt that never got an envelope gets the intent of its new launch.
+ */
+export function writeAttemptIntent({ runDir, attemptId, unitRunId, terminal, cwd, host, stepEnv }) {
+  const paths = attemptPaths(runDir, attemptId);
+  publishMutableProjection(path.join(paths.runDir, 'attempt-intent.json'), {
+    v: 1,
+    attemptId,
+    unitRunId,
+    runDir: paths.runDir,
+    mode: terminal ? 'terminal' : 'direct',
+    cwd,
+    launch: { capture: { stdout: paths.stdout, stderr: paths.stderr }, outboxDir: paths.outboxDir },
+    steps: attemptSteps({ runDir: paths.runDir, host, stepEnv, extraSteps: terminal ? ['cleanup-trust'] : [] }),
+    sideFile: paths.sideFile,
+  });
+}
+
+/** Take the intent back once the run is settled without a launch: nothing is left for adopt to close. */
+export function removeAttemptIntent(runDir) {
+  fs.rmSync(path.join(runDir, 'attempt-intent.json'), { force: true });
+}
+
 /**
  * Build the envelope v3 body (without digest) and the side file of one attempt.
  *
@@ -177,15 +216,6 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
   if (2 + extraSteps.length > MAX_ATTEMPT_STEPS) throw new DispatchError('too-many-steps', `an attempt runs at most ${MAX_ATTEMPT_STEPS} steps`, { runDir });
   const paths = attemptPaths(runDir, attemptId);
   const sideFile = paths.sideFile;
-  const step = (stepId) => ({
-    stepId,
-    hostBin: host.hostBin,
-    payloadRoot: host.payloadRoot,
-    argv: ['internal', 'attempt-step', stepId, '--protocol', String(PROTOCOL), '--run-dir', runDir],
-    cwd: runDir,
-    env: stepEnv,
-    stepTimeoutMs: STEP_TIMEOUT_MS,
-  });
   const confined = Array.isArray(attempt.bwrapPrefix);
   const mode = terminal ? 'terminal' : 'direct';
   const body = {
@@ -221,9 +251,7 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
     agentProtocol: { cli, mode },
     identity,
     steps: [
-      step('settle-attempt'),
-      step('finalize-home'),
-      ...extraSteps.map(step),
+      ...attemptSteps({ runDir, host, stepEnv, extraSteps }),
       ...(terminal ? [{ stepId: 'release-slot', builtin: true, disposition: { onSuccess: 'close', onFailure: 'retain' } }] : []),
     ],
     sideFile,

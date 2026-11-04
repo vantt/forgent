@@ -4,6 +4,7 @@
   "layout": {
     "attemptDir": "<assignmentDir>/runs/<NN> (NN = attempt number, two digits); the envelope field runDir names this directory",
     "lockFile": "<attemptDir>/attempt.lock (lock-registry.v1.json row `attempt`, rank 15, kind lease)",
+    "intent": "<attemptDir>/attempt-intent.json (attempt-intent.v1.json): written under the lock before the envelope; adopt builds the envelope from it when the controller died first",
     "envelope": "<attemptDir>/envelope.json",
     "sideFile": "<attemptDir>/protected/attempt-secrets.json, mode 0600, directory 0700",
     "binding": "<attemptDir>/supervisor-binding.json",
@@ -42,6 +43,7 @@
     "cwdLeaseFile": "string: required for every mutating attempt; the supervisor declares its domain on this existing lease predecessor record. Unix also receives its description at fd 4; Windows uses the controller-held lease when cwdLeaseOwner is present",
     "cwdLeaseOwner": "string, Windows only: the private request channel of the controller-held lock-hold helper. The supervisor must receive its declare-domain acknowledgement before GO; helper death refuses a late producer start. No OS handle or new lock record",
     "terminal.retainFailedPaneMs": "terminal mode only: integer >= 1 or null. How long a pane kept for a person (any end but a clean exit) stays before terminal-control may close it; null keeps it until a person closes it; absent means 24 hours. Source: config terminal.retainFailedPaneMs",
+    "origin": "string, optional. \"adopt-not-started\": the adopt door wrote this envelope from attempt-intent.json because the controller died before it wrote its own. Such an envelope has no launch.command, launch.args, launch.maxOutputBytes, containment, deadlines, agentProtocol or identity, mode direct, mutation read-only and no createdAt; only the steps run from it. Absent means the controller wrote it",
     "createdAt": "object {bootId, boottimeNs}: the controller's boot id and monotonic boot time (CLOCK_BOOTTIME ns; Windows GetTickCount64 ms * 1e6) when it wrote the envelope. Windows adopt gives an unbound attempt with a free lock a 60 s start grace measured from it, on the same boot only; absent or another boot means no grace. File times are never used"
   },
   "fields": {
@@ -57,7 +59,7 @@
     "cwd": "absolute working directory of the agent",
     "mutation": { "enum": ["mutating", "read-only"], "meaning": "mutating attempts also hold the dispatch-cwd lease (rank 30) handed to the supervisor at fd 4. Windows: a LockFileEx lock is never inherited, so the supervisor takes the attempt lock and, when mutating, the lease itself; see optionalFields.cwdLeaseFile" },
     "launch": {
-      "command": "string, absolute executable path of the agent CLI (resolved by resolveExecutorCommand in src/runner/dispatch/transport.mjs)",
+      "command": "string, absolute executable path of the agent CLI (resolved by resolveExecutorCommand in src/runner/dispatch/transport.mjs); absent when origin is adopt-not-started",
       "args": "string[]",
       "env": "object string -> string; the non-secret environment of the agent. Secret values are absent here and present in sideFile.env; the gate merges sideFile.env over this map",
       "stdinPolicy": { "enum": ["brief-file", "null"], "meaning": "brief-file: the gate opens briefPath read-only as stdin; null: stdin is /dev/null (NUL on Windows)" },

@@ -4,12 +4,10 @@
 //
 // Checks only read (the stuck-attempt probe asks adopt for `--probe-only`, which writes
 // nothing). The fixes write: `runtime-socket-dir` creates or tightens the socket directory,
-// `run-attempts-stuck` sends the unclosed attempts through the adopt door, `legacy-attempts-stuck`
-// settles runs from before the supervisor through the legacy sweep (the recover door is passed in by
-// the registration: it is a use case above this layer).
-// Five rows cover the layer: `run-supervisor-route` (routes and containment driver), `runtime-socket-dir`,
-// `run-attempts-stuck` (stuck attempts, attempts whose release is gone, units awaiting resume),
-// `run-supervisor-config` (kill grace and cancel wait) and `legacy-attempts-stuck`.
+// `run-attempts-stuck` sends the unclosed attempts through the adopt door.
+// Four rows cover the layer: `run-supervisor-route` (routes and containment driver), `runtime-socket-dir`,
+// `run-attempts-stuck` (stuck attempts, attempts whose release is gone, units awaiting resume) and
+// `run-supervisor-config` (kill grace and cancel wait).
 //
 // Levels follow the doctor convention: `passed: false` fails, a message that starts with
 // `warning:` warns, `info:` is informational, anything else passes.
@@ -23,7 +21,6 @@ import { routeEnv } from '../util/host-bin-path.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from '../run-supervisor/protocol.mjs';
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES } from '../run-supervisor/runtime-dir.mjs';
 import { adoptScan, listOpenAttemptDirs, sweepAttempts } from '../run-supervisor/client.mjs';
-import { findLegacyStuck, judgeLegacyHolders, sweepLegacy } from '../run-supervisor/legacy-sweep.mjs';
 import { GATE_KILL_GRACE_KEY, readDispatchConfig, resolveGateKillGrace, gateKillGraceProblem, CANCEL_WAIT_KEY, resolveCancelWait, cancelWaitProblem } from '../run-supervisor/gate-kill-grace.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { fgosDirFromRoot } from '../runner/paths.mjs';
@@ -358,46 +355,6 @@ export function fixRunAttemptsStuck(repoRoot) {
   const left = (result.adopt ?? []).filter((verdict) => STUCK_STATES.has(verdict.state));
   const message = `adopted ${adopted.length} attempt(s)${left.length > 0 ? `; ${left.length} still open: ${listed(left.map(stuckEntry))}` : ''}`;
   return { changed: adopted.length > 0, message };
-}
-
-// ---------------------------------------------------------------------
-// legacy-attempts-stuck
-// ---------------------------------------------------------------------
-
-/**
- * Runs from before the run supervisor still `running` with no attempt lock. Each is judged on its own
- * records (every recorded pid dead, no version-1 home left): the ones that can be settled fail the check
- * (the fix settles them), the ones kept warn with the reason that keeps them. Nothing is written.
- * `judgeOptions` (`judgeRecord`, `confinementRoot`) reach `judgeLegacyHolders`.
- */
-export function checkLegacyAttemptsStuck(repoRoot, judgeOptions = {}) {
-  const stuck = findLegacyStuck({ assignmentsRoot: assignmentsRootOf(repoRoot) });
-  if (stuck.length === 0) return { passed: true, message: 'no run from before the run supervisor is left running' };
-  const settleable = [];
-  const kept = [];
-  for (const { runDir, runId } of stuck) {
-    const verdict = judgeLegacyHolders(runDir, judgeOptions);
-    if (verdict.allDead) settleable.push(`${runDir} (${runId})`);
-    else kept.push(`${runDir} (${runId}): ${verdict.reason}`);
-  }
-  if (settleable.length > 0) {
-    const tail = kept.length > 0 ? `; kept: ${listed(kept)}` : '';
-    return { passed: false, message: `${settleable.length} run(s) from before the run supervisor are left running and every process they recorded is dead: ${listed(settleable)} -- run "fgos doctor --fix"${tail}` };
-  }
-  return { passed: true, message: warn(`${kept.length} run(s) from before the run supervisor are left running and stay open: ${listed(kept)}`) };
-}
-
-/**
- * Settle the provably dead ones as `abandoned-legacy` through the recover door and name each run kept.
- * @param {string} repoRoot
- * @param {{door: {observe: Function, apply: Function}}} options the recover door, passed in by the caller
- */
-export function fixLegacyAttemptsStuck(repoRoot, { door, ...judgeOptions }) {
-  const assignmentsRoot = assignmentsRootOf(repoRoot);
-  if (findLegacyStuck({ assignmentsRoot }).length === 0) return { changed: false, message: 'no run from before the run supervisor is left running' };
-  const { settled, kept } = sweepLegacy({ assignmentsRoot, door, repoRoot: path.resolve(repoRoot), ...judgeOptions });
-  const left = kept.length > 0 ? `; kept: ${listed(kept.map((entry) => `${entry.runDir}: ${entry.reason}`))}` : '';
-  return { changed: settled.length > 0, message: `settled ${settled.length} run(s) as abandoned-legacy${left}` };
 }
 
 // ---------------------------------------------------------------------

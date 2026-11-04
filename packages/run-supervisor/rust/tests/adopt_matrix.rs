@@ -10,7 +10,7 @@ use fgos_holder_lock::predecessor;
 use fgos_process::Domain;
 use serde_json::json;
 use support::adopt_fixture::{
-    adopt, adopt_with, attempt, dead_tuple, hold_lock, live_process, lock_is_free,
+    adopt, adopt_with, attempt, dead_tuple, hold_lock, live_process, lock_is_free, not_started,
 };
 
 const STEPS: [&str; 2] = ["settle-attempt", "finalize-home"];
@@ -43,6 +43,74 @@ fn adopt_no_binding_and_no_receipt_is_abandoned_not_started_and_the_steps_run_on
         (1, 1),
         "no step ran again"
     );
+}
+
+#[test]
+fn adopt_a_lock_and_an_intent_without_an_envelope_is_closed_as_not_started_and_the_steps_run_once()
+{
+    let a = not_started("matrix-intent", &STEPS);
+    let before = a.snapshot();
+    let probe = adopt(&a.dir, &["--probe-only"]);
+    assert_eq!(
+        (probe["state"].as_str(), probe["reason"].as_str()),
+        (Some("needs-adopt"), Some("no-envelope")),
+        "{probe}"
+    );
+    assert_eq!(a.snapshot(), before, "a probe writes nothing");
+
+    let line = adopt(&a.dir, &[]);
+    assert_eq!(line["state"], "adopted", "{line}");
+    assert_eq!(line["outcome"], "abandoned-not-started");
+    assert_eq!(line["reason"], "start-refused:no-envelope");
+    let envelope = a.json("envelope.json").unwrap();
+    assert_eq!(envelope["origin"], "adopt-not-started");
+    assert_eq!(envelope["attemptId"], a.attempt_id.as_str());
+    assert!(envelope["launch"].get("command").is_none());
+    let receipt = a.json("receipt.json").unwrap();
+    assert_eq!(receipt["outcome"], "abandoned-not-started");
+    assert_eq!(receipt["reason"], "start-refused:no-envelope");
+    assert_eq!(receipt["synthesizedBy"], "adopt");
+    assert_eq!(a.json("closed.json").unwrap()["closedBy"], "adopt");
+    assert!(lock_is_free(&a.dir) && !a.path("adopting.json").exists());
+    assert_eq!(
+        (a.runs_of("settle-attempt"), a.runs_of("finalize-home")),
+        (1, 1)
+    );
+
+    assert_eq!(adopt(&a.dir, &[])["state"], "closed");
+    assert_eq!(
+        (a.runs_of("settle-attempt"), a.runs_of("finalize-home")),
+        (1, 1),
+        "no step ran again"
+    );
+}
+
+#[test]
+fn adopt_an_intent_is_closed_only_while_its_controller_is_gone_and_only_when_it_names_this_directory(
+) {
+    let held = not_started("matrix-intent-held", &STEPS);
+    let _lock = hold_lock(&held.dir);
+    let before = held.snapshot();
+    assert_eq!(adopt(&held.dir, &[])["state"], "running");
+    assert_eq!(
+        held.snapshot(),
+        before,
+        "a live controller keeps its attempt"
+    );
+
+    let elsewhere = not_started("matrix-intent-elsewhere", &STEPS);
+    let mut intent = elsewhere.json("attempt-intent.json").unwrap();
+    intent["runDir"] = json!(held.dir);
+    fs::write(elsewhere.path("attempt-intent.json"), intent.to_string()).unwrap();
+    let before = elsewhere.snapshot();
+    assert_eq!(adopt(&elsewhere.dir, &[])["state"], "legacy-run");
+    assert_eq!(elsewhere.snapshot(), before);
+
+    let old = not_started("matrix-intent-pre-supervisor", &STEPS);
+    fs::create_dir_all(old.path("controller/commands")).unwrap();
+    let before = old.snapshot();
+    assert_eq!(adopt(&old.dir, &[])["state"], "legacy-run");
+    assert_eq!(old.snapshot(), before);
 }
 
 #[test]

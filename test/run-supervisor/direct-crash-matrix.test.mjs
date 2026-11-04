@@ -96,7 +96,7 @@ test('3. a supervisor killed midway: the agent runs to its end and the next fgos
 /**
  * Start `fgos run` and SIGKILL it the moment `edge(dir)` holds for an attempt directory; retried (fresh
  * project) until the kill landed on that edge, because the edge is a few milliseconds wide.
- * `confirm(project, dir)` says whether the state left behind is the one the edge names.
+ * `edge(dir, project)` names the edge; `confirm(project, dir)` says whether the state left behind is the one the edge names.
  */
 async function killAtEdge(label, makeProject, edge, confirm, { tries = 8 } = {}) {
   for (let attempt = 1; attempt <= tries; attempt += 1) {
@@ -105,7 +105,7 @@ async function killAtEdge(label, makeProject, edge, confirm, { tries = 8 } = {})
     const deadline = Date.now() + 30_000;
     let dir = null;
     while (!dir && Date.now() < deadline) {
-      dir = project.attemptDirs().find(edge) ?? null;
+      dir = project.attemptDirs().find((d) => edge(d, project)) ?? null;
       if (!dir) await new Promise((resolve) => setImmediate(resolve));
     }
     run.child.kill('SIGKILL');
@@ -115,31 +115,22 @@ async function killAtEdge(label, makeProject, edge, confirm, { tries = 8 } = {})
   assert.fail(`the controller was never stopped on the "${label}" edge in ${tries} tries`);
 }
 
+/** The prepare published the descriptor that lets a finalizer find the home it made. */
+const homeIsRecorded = (dir) => { try { return fs.readdirSync(here(dir, 'protected/confinement-finalization')).some((name) => name.endsWith('.json')); } catch { return false; } };
+
 const edgeProject = () => createProject({ agent: { runMs: 1500 } });
 
-test('7a. a controller that dies before it took the lock leaves nothing to adopt', { skip, timeout: 240_000 }, async () => {
-  const { project, dir } = await killAtEdge('before-lock', edgeProject, (d) => exists(d, 'run.json') && !exists(d, 'attempt.lock'), (p, d) => !exists(d, 'attempt.lock'));
-  await sleep(1500);
-  assert.equal(exists(dir, 'supervisor-binding.json'), false);
-  assert.equal(exists(dir, 'envelope.json'), false);
-  assert.equal(fs.existsSync(here(dir, 'worker-output/outbox/agent-starts.txt')), false, 'no agent ever started');
-  assert.equal(adoptRun(dir).state, 'legacy-run', 'no envelope means no attempt for the adopt door');
-  assert.deepEqual(project.homesLeft(), []);
-});
-
-test('7b. a controller that dies after the lock and before the prepare leaves no home and no envelope', { skip, timeout: 240_000 }, async () => {
-  const { project, dir } = await killAtEdge('after-lock', edgeProject, (d) => exists(d, 'attempt.lock') && exists(d, 'controller/evaluator-baseline.json') && !exists(d, 'envelope.json'), (p, d) => !exists(d, 'envelope.json') && p.homesLeft().length === 0);
+test('7b. a controller that dies after its prepare made the home and before it wrote the envelope: adopt closes it abandoned-not-started and removes the home', { skip, timeout: 240_000 }, async () => {
+  const { project, dir } = await killAtEdge('after-home', edgeProject, (d, p) => exists(d, 'attempt.lock') && homeIsRecorded(d) && !exists(d, 'envelope.json') && p.homesLeft().length === 1, (p, d) => homeIsRecorded(d) && !exists(d, 'envelope.json') && p.homesLeft().length === 1);
   await sleep(1500);
   assert.equal(exists(dir, 'supervisor-binding.json'), false);
   assert.equal(attemptLockState(project, dir), 'free', 'the lock went with the dead controller');
-  assert.equal(adoptRun(dir).state, 'legacy-run');
-});
-
-test('7c. a controller that dies after the prepare and before the spawn: adopt closes it abandoned-not-started and removes the home', { skip, timeout: 240_000 }, async () => {
-  const { project, dir } = await killAtEdge('after-prepare', edgeProject, (d) => exists(d, 'envelope.json') && !exists(d, 'supervisor.log'), async (p, d) => { await sleep(300); return !exists(d, 'supervisor-binding.json') && !exists(d, 'supervisor.log'); });
-  assert.equal(project.homesLeft().length, 1, 'the prepare had made the home');
-  await sweepWith(project, 'edge-after-prepare-sweep');
-  assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'abandoned-not-started');
+  assert.ok(exists(dir, 'attempt-intent.json'), 'the controller left what adopt closes it from');
+  await sweepWith(project, 'edge-after-home-sweep');
+  const receipt = readJson(here(dir, 'receipt.json'));
+  assert.equal(receipt.outcome, 'abandoned-not-started');
+  assert.equal(receipt.reason, 'start-refused:no-envelope');
+  assert.equal(readJson(here(dir, 'envelope.json')).origin, 'adopt-not-started');
   assert.equal(fs.existsSync(here(dir, 'worker-output/outbox/agent-starts.txt')), false, 'the agent never started');
   await assertSettledAttempt(project, dir);
 });

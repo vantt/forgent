@@ -95,7 +95,9 @@ import {
   resolveAttemptHost,
   startSupervisor,
   waitForBinding,
+  removeAttemptIntent,
   writeAttemptFiles,
+  writeAttemptIntent,
   writeSettleContext,
 } from '../../run-supervisor/direct-launch.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
@@ -1327,413 +1329,15 @@ export async function executeAssignment(assignment, opts = {}) {
   const effectiveContractPath = path.join(runDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
   let providerCapacitySelection = null;
   let providerCapacityEvidence = null;
-
-  // M6: normalized ('openai' ≡ 'openai-codex') so leases, quarantine, and
-  // the fault classifier all key the same provider inventory bucket
-  // regardless of which spelling a config or resolved command happened to use. A seat bound to a
-  // pool leases from that pool (`bound.pool`, passed as `cliOverride.pool`); the pool named after the
-  // family keeps the family's key.
-  const boundPool = opts.cliOverride?.pool && opts.cliOverride.preferExecutor === resolvedExecutorId ? opts.cliOverride.pool : null;
-  const providerCapacityProvider = boundPool
-    ? legacyStateKey(boundPool)
-    : normalizeProviderFamily(effectivePolicy.providerModel || deriveProviderFamily(cfg.executors?.[resolvedExecutorId] ?? cfg.executor));
-  // The login store the launch reads: only an account that holds one for it is leased.
-  const leaseCli = declaredStoreCli(cfg, resolvedExecutorId, hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : null);
-  // H8 (resume re-acquire): control only reaches this point on a resumed
-  // Run when reconcile already proved there is no live or settled worker
-  // to reattach to (both cases return earlier, well above this line) --
-  // i.e. a genuinely new worker process is about to be relaunched, which
-  // needs its own lease exactly like a fresh dispatch does. The excluded
-  // `!admitted.resumed` used to skip leasing here unconditionally, leaving
-  // a relaunched resumed Run to run with no provider-capacity account at
-  // all instead of re-acquiring (the account the binding names, which ranks
-  // the account this assignment already held first, once reclaimDeadLeases
-  // frees its now-dead lease).
-  const shouldSelectProviderAccount =
-    compiledPlan.mechanism === 'out-of-process' &&
-    cfg.executors?.[resolvedExecutorId]?.kind !== 'tool' &&
-    hasProviderAccounts(cfg, providerCapacityProvider);
-  if (shouldSelectProviderAccount) {
-    // C2c: this call happens AFTER admitRunAttempt already committed
-    // run.json status:"running" -- exactly the same post-admission window
-    // H2's comment below already documents for a `status:'refused'`
-    // RETURN value. A THROW here (e.g. ProviderCapacityLockError on lock
-    // contention timeout, or a corrupt state.json) used to escape this
-    // function entirely instead, leaving that same Run permanently
-    // "running"/unsettled with no orphan marker. Route it through the
-    // exact same status:'refused' settle path below instead of inventing
-    // a second one.
-    // When no account of the provider is usable only because a login died, one real call may show the
-    // owner has logged in again. A probe problem never blocks the dispatch: the selection decides.
-    if (typeof opts.providerCredentialProbe === 'function') {
-      try {
-        await probeQuarantinedAccounts({
-          runnerConfig: cfg,
-          provider: providerCapacityProvider,
-          runtimeDir: opts.providerCapacityRuntimeDir,
-          probe: opts.providerCredentialProbe,
-          cli: launchCandidateClis(cfg, resolvedExecutorId, hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : null)[0] ?? null,
-        });
-      } catch { /* the selection below reports what is unusable */ }
-    }
-    try {
-      // The account is named by the binding (Seat Binding ranked it); the lease only takes it. A caller that
-      // names none (a launch with no binding) cannot lease.
-      providerCapacitySelection = opts.cliOverride?.leaseAccount
-        ? acquireNamedAccountLease({
-          runnerConfig: cfg,
-          provider: providerCapacityProvider,
-          accountId: opts.cliOverride.leaseAccount,
-          accountViewDigest: opts.cliOverride.accountViewDigest ?? null,
-          assignmentId: effectiveAssignment.assignmentId,
-          runId,
-          runtimeDir: opts.providerCapacityRuntimeDir,
-          runIsDead: opts.providerCapacityRunIsDead,
-          isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
-          cli: leaseCli,
-        })
-        : { status: 'refused', provider: providerCapacityProvider, reason: 'provider-capacity.no-named-account', detail: 'the launch names no account to lease (it carries no binding)' };
-    } catch (err) {
-      providerCapacitySelection = {
-        status: 'refused',
-        provider: providerCapacityProvider,
-        reason: err.code === 'provider-capacity-lock-stale' ? 'provider-capacity.lock-stale' : 'provider-capacity.acquire-failed',
-        cause: err.message,
-      };
-    }
-    // H8: a lease can be selected (an account/credentialSource chosen) for
-    // a dispatch shape nothing can actually provision that credential
-    // into -- only the confined bwrap driver's own prepare() copies
-    // credentialSource into the worker's private home (confinement/drivers/
-    // bwrap.mjs's provisionSelectedCredential), and both cli-spawn and
-    // herdr-spawn reach that prepare() through prepareConfinementForLaunch
-    // with the same providerCapacity. Narrowly scoped to
-    // `confinement.mode: 'required'`: that is the one case where the
-    // CALLER explicitly declared it needs confinement, so silently
-    // running with no credential provisioned (and no sandbox either) is a
-    // real, undisclosed contract violation, not the accepted interim gap.
-    // An unconfined (or confinement-unspecified) dispatch keeps today's
-    // existing, already-honest behavior unchanged: it proceeds and
-    // records `credentialProvisioned: false` in its evidence (below) --
-    // choosing between "refuse this too" and "provision via env for
-    // cli-spawn" for THAT broader case belongs to account-rotator's own
-    // plan owner (the review names both as valid fixes), not this phase.
-    if (providerCapacitySelection?.status === 'selected') {
-      const confinementMode = compiledPlan?.policy?.confinement?.mode;
-      const requiresConfinement = confinementMode === 'required';
-      const canProvisionCredential = !requiresConfinement || resolvedAdapter === 'cli-spawn' || resolvedAdapter === 'herdr-spawn';
-      if (requiresConfinement && !canProvisionCredential) {
-        releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
-        providerCapacitySelection = {
-          status: 'refused',
-          provider: providerCapacityProvider,
-          reason: 'credential-provisioning-unsupported',
-          cause: `confinement mode "required" was declared but adapter "${resolvedAdapter}" has no path to provision the selected account's credential into a confined worker`,
-        };
-      }
-    }
-    if (providerCapacitySelection?.status === 'refused') {
-      // Pre-Phase-05 gate H2 (executor-policy-dispatch-seams plan.md): this
-      // refusal happens AFTER admitRunAttempt already created runId/runDir
-      // (run.json written `status: "running"` above) -- an unclassified
-      // throw here used to leave that Run permanently `running`/unsettled,
-      // with nothing to tell an orphan apart from one still genuinely in
-      // flight. Settle it properly instead, using the exact same
-      // result.json/run.json/markRunSettled sequence the normal completion
-      // path below uses, classified via runtime.executionError so
-      // normalizeRunResultV2 derives execStatus:"failed",
-      // failure:{family:"provider", code:"provider-capacity-refused"}, and
-      // policy:{disposition:"needs-input"} through its own existing rules --
-      // no new override channel invented. `predecessorRunId`/`retryId` are
-      // executeAssignment's EXISTING admission-time retry channel (see
-      // admitRunAttempt above): a caller that wants to reattempt calls
-      // executeAssignment again with `predecessorRunId: runId`, which
-      // supersedes this settled attempt through the same path every other
-      // retry already uses -- this settlement does not need its own retry
-      // loop, only to stop being unsettled.
-      // A refusal is settled as a provider failure the runner's walk answers: the lease takes exactly the account
-      // Seat Binding named, so there is no second choice to make here.
-      const settledAt = new Date().toISOString();
-      const stderrText = `provider capacity refused for "${providerCapacityProvider}": ${providerCapacitySelection.reason}${providerCapacitySelection.detail ? ` (${providerCapacitySelection.detail})` : ''}`;
-      fs.writeFileSync(path.join(runDir, 'stdout.log'), '');
-      fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
-      const evidenceData = {
-        operationMutability: isReadOnlyAssignment(effectiveAssignment) ? 'read-only' : 'mutates-repo',
-        gitBefore: null,
-        gitAfter: null,
-        gitBeforeSource: 'pre-launch',
-        dirtyBefore: [],
-        dirtyAfter: [],
-        mutatedDirtyBeforeFiles: [],
-        changedFiles: [],
-        changedFileReasons: {},
-        attribution: [],
-        artifacts: [],
-        tests: [],
-      };
-      fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
-      const refusedRunResult = normalizeRunResultV2({
-        runId,
-        assignmentId: effectiveAssignment.assignmentId,
-        workId: effectiveAssignment.workId,
-        executorId: resolvedExecutorId,
-        policy: effectivePolicy,
-        settledAt,
-        role: effectiveAssignment.role,
-        operation: effectiveAssignment.operation,
-        isReadOnlyOperation: evidenceData.operationMutability === 'read-only',
-        runtime: {
-          exitCode: null,
-          executionError: { code: providerCapacitySelection.reason === LEASE_CONFLICT_REASON ? LEASE_CONFLICT_FAILURE_CODE : 'provider-capacity-refused', message: stderrText },
-          stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
-          stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
-        },
-        evidence: evidenceData,
-      });
-      // This early-exit runs BEFORE the main acquireRunControl at line 2231, so
-      // no control token exists yet. Acquire one now, use the shared atomic
-      // settlement primitive (CAS + immutable publication), and return.
-      // The settled generation record fences any future controller from acquiring
-      // this Run — consistent with every other settlement path (F-01).
-      const refusalControlHolder = buildRunControlHolder(`${runId}:${process.pid}:provider-capacity-refusal`);
-      const refusalControl = acquireRunControl(runDir, { holder: refusalControlHolder, purpose: 'provider-capacity-refusal' });
-      if (refusalControl.status !== 'acquired') {
-        // Already settled by another path — rehydrate and return.
-        try {
-          const resultJsonPath = path.join(runDir, 'result.json');
-          if (fs.existsSync(resultJsonPath)) {
-            const res = interpretRunResult(resultJsonPath, { expectedRunId: runId });
-            if (!res.corrupt && !res.contractCorrupt && !res.resultCorrupt && res.classification?.provenance !== 'contract-corrupt') {
-              return Object.freeze(res);
-            }
-          }
-        } catch {}
-        throw new RunnerConfigError(
-          `executeAssignment: provider-capacity refusal could not acquire control for Run "${runId}" (status: "${refusalControl.status}")`,
-          { code: 'run-control-held', phase: 'provider-capacity-refusal' },
-        );
-      }
-      return commitRunSettlement({
-        runDir,
-        runId,
-        controlEpoch: refusalControl.controlEpoch,
-        controlToken: refusalControl.controlToken,
-        runResult: refusedRunResult,
-      });
-    }
-    if (providerCapacitySelection?.status === 'selected') {
-      providerCapacityEvidence = {
-        ...redactProviderCapacitySelection(providerCapacitySelection),
-        credentialProvisioned: false,
-      };
-      const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
-      fs.writeFileSync(selectionPath, `${JSON.stringify(providerCapacityEvidence, null, 2)}\n`);
-      fsyncFileBestEffort(selectionPath);
-      const runJsonPath = path.join(runDir, 'run.json');
-      try {
-        const runJson = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-        fs.writeFileSync(
-          runJsonPath,
-          `${JSON.stringify({ ...runJson, providerCapacitySelectionPath: path.relative(root, selectionPath) }, null, 2)}\n`,
-        );
-        fsyncFileBestEffort(runJsonPath);
-      } catch {}
-    }
-  }
-  let effectiveContract;
-  if (fs.existsSync(effectiveContractPath)) {
-    try {
-      effectiveContract = JSON.parse(fs.readFileSync(effectiveContractPath, 'utf8'));
-    } catch {
-      effectiveContract = null;
-    }
-  } else {
-    effectiveContract = buildEffectiveExecutionContract({
-      assignment: effectiveAssignment,
-      dispatchPlan: compiledPlan,
-      runId,
-      runDir,
-      cwd,
-      repoRoot: root,
-      runnerConfig: cfg,
-      timeoutMs,
-      executorId: resolvedExecutorId,
-      adapter: resolvedAdapter,
-      providerCapacity: providerCapacityEvidence,
-      templateProvenance: templateResolution?.templateProvenance ?? effectiveAssignment.provenance?.template,
-      // The prompt is built before Authority preparation. Derive its posture
-      // from the same requirement that will be handed to Authority, never
-      // from an executor profile's merely requested confinement fragment.
-      confinement: confinementRequirement.mode === 'unconfined'
-        ? { requirement: { mode: 'unconfined' }, backend: { id: 'none', type: 'none' } }
-        : { requirement: confinementRequirement },
-    });
-  }
-
-  const resultJsonPath = path.join(runDir, 'result.json');
-  if (admitted.resumed) {
-    if (fs.existsSync(resultJsonPath)) {
-      try {
-        const settledResult = interpretRunResult(resultJsonPath, { expectedRunId: runId });
-        if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
-          throw new RunnerConfigError(
-            `executeAssignment: Run "${runId}" resume found an existing result.json that failed validation or is contract-corrupt -- refusing to relaunch over corrupt settlement evidence`,
-            { code: 'result-corrupt', phase: 'post-admission' },
-          );
-        }
-        return Object.freeze(settledResult);
-      } catch (err) {
-        if (err instanceof RunnerConfigError) throw err;
-        // H3: result.json EXISTS (checked above) but failed to read/parse --
-        // a torn or corrupt write, not "no result yet". Falling through here
-        // used to silently continue toward launching a brand-new worker over
-        // a Run slot that already has terminal evidence, just unreadable
-        // evidence. Refuse instead; a human/recovery door decides next, this
-        // path never guesses by relaunching over it.
-        throw new RunnerConfigError(
-          `executeAssignment: Run "${runId}" resume found an existing result.json that failed to parse (${err.message}) -- refusing to relaunch over unreadable settlement evidence`,
-          { code: 'result-corrupt', phase: 'post-admission' },
-        );
-      }
-    }
-    // An attempt of the supervisor era carries an envelope: the adopt door judges it, and a resume
-    // never starts a second agent over it.
-    if (fs.existsSync(path.join(runDir, 'envelope.json'))) {
-      let judged;
-      try {
-        judged = adoptRun(runDir);
-      } catch (err) {
-        throw new RunnerConfigError(
-          `executeAssignment: Run "${runId}" resume could not ask the adopt door about its attempt (${err.message})`,
-          { code: 'run-unreconciled', phase: 'post-admission' },
-        );
-      }
-      const settledAttempt = readSettledResult(runDir, runId);
-      if (settledAttempt) return settledAttempt;
-      const live = judged.state === 'running' || judged.state === 'being-adopted' || judged.state === 'held';
-      throw new RunnerConfigError(
-        `executeAssignment: Run "${runId}" resume found its attempt in state "${judged.state}"${judged.reason ? ` (${judged.reason})` : ''} -- refusing to launch a second worker over it`,
-        { code: live ? 'run-in-flight' : 'run-unreconciled', phase: 'post-admission', reconcileStatus: judged.state, ...(judged.reason ? { reconcileReason: judged.reason } : {}) },
-      );
-    }
-    // A launch record that is not an envelope is a run from before the run supervisor: it is refused by
-    // name rather than relaunched.
-    if (fs.existsSync(path.join(runDir, 'controller', 'commands'))) {
-      throw new RunnerConfigError(
-        `executeAssignment: Run "${runId}" resume found a launch record from before the run supervisor -- refusing to launch a second worker over it`,
-        { code: 'run-unreconciled', phase: 'post-admission', reconcileReason: 'legacy-run' },
-      );
-    }
-  }
-
-  // Dispatched-run membership: record every run attempt THIS runner actually
-  // dispatched, so cross-pass consumption can refuse run dirs no runner ever
-  // dispatched (a planted runs/NN directory must never look like evidence of
-  // a real run). H3: a one-file-per-attempt marker under dispatched/<NN>
-  // instead of a full assignment.json rewrite -- a torn write here can only
-  // ever cost this ONE marker, never corrupt the whole manifest (assignment
-  // fields stay the immutable input per Step 03 §2, untouched by this write
-  // either way). operation-choice.mjs reads this marker first, falling back
-  // to the legacy dispatchedRuns array for one release.
-  try {
-    const dispatchedDir = path.join(assignmentDir, 'dispatched');
-    publishMarkerOnce(path.join(dispatchedDir, attemptStr), { attemptStr, dispatchedAt: new Date().toISOString() });
-  } catch {
-    // Bookkeeping must never abort a dispatch that already started; a missing
-    // entry only costs this run its cross-pass consumability (fail closed).
-  }
-
-  // Step 04 §5.1: pass concrete runDir so worker knows exactly where to write
-  // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
-  // Phase 02 (executor-policy-dispatch-seams): thread the ALREADY-resolved
-  // persona (effectivePolicy.persona/provenance.persona, computed above by
-  // the same the dispatch policy every dispatch path shares)
-  // into the actual worker-visible prompt -- previously resolved but never
-  // delivered. Additive: `undefined` when no persona resolved, byte-identical
-  // to the pre-Phase-02 prompt for every such assignment.
-  const prompt = renderAssignmentPrompt(effectiveAssignment, {
-    cwd,
-    runDir: path.resolve(runDir),
-    effectiveContract,
-    ...(effectivePolicy.persona
-      ? {
-        persona: {
-          value: effectivePolicy.persona,
-          source: effectivePolicy.provenance?.persona?.source ?? null,
-          // Text pinned by whoever bound the persona; the renderer reads it instead of a file.
-          ...(effectiveAssignment.policy?.personaPin?.name === effectivePolicy.persona
-            ? { pinnedText: effectiveAssignment.policy.personaPin.text }
-            : {}),
-        },
-      }
-      : {}),
-  });
-
-  // Step 04 §5.3: snapshot dirty state BEFORE the run so pre-existing dirty files
-  // are never counted as post-run evidence.
-  const dirtyBefore = safeGitStatusFiles(cwd);
-  const dirtyBeforeSnapshots = snapshotDirtyBeforeFiles(cwd, dirtyBefore);
-
-  // Cell 6.7 G6: capture gitBefore BEFORE the worker launches, unconditionally
-  // (not only on a settled/happy path) -- a worker that commits then crashes
-  // must never have gitBefore/gitAfter read at the same post-crash instant,
-  // which would silently hide that a commit happened during the run. This
-  // pre-launch capture is the ONLY source for gitBefore below; a settled
-  // the settled result's own headBefore is intentionally not consulted, so provenance stays
-  // consistent across both the settle and the crash path.
-  const gitBefore = safeGitHead(cwd);
-  // safeGitHead already fails closed to null internally and never throws,
-  // so no runtime path today fails to reach the capture above --
-  // gitBeforeSource is always 'pre-launch'. The literal is still named
-  // (rather than inlined at each write site below) and 'post-crash-fallback'
-  // kept as the sibling value so a future change that captures gitBefore
-  // through a different path is forced to say so explicitly instead of
-  // silently inheriting this call's provenance.
-  const gitBeforeSource = 'pre-launch';
-
-  // Per-Run control fencing (AD-02/AD-10): a monotonic controlEpoch plus a
-  // unique controlToken, acquired synchronously (no adapter I/O runs inside
-  // the acquisition itself) and re-checked before this attempt is allowed
-  // to append a settlement. Two acquisitions of the same Run always
-  // receive distinct epochs/tokens; a live holder is never reclaimed on
-  // heartbeat/TTL alone (see run-lock.mjs). Failure to acquire here means a
-  // different controller already holds this exact Run -- refuse outright
-  // rather than race it for the same subprocess/files.
-  const controlHolder = buildRunControlHolder(`${runId}:${process.pid}:${crypto.randomUUID()}`);
-  const control = acquireRunControl(runDir, { holder: controlHolder, purpose: 'worker-spawn', ttlMs: opts.controlTtlMs });
-  if (control.status !== 'acquired') {
-    if (providerCapacitySelection?.status === 'selected') {
-      releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
-    }
-    throw new RunnerConfigError(
-      `executeAssignment: could not acquire control for Run "${runId}" (status: "${control.status}") -- another controller currently holds it`,
-      { code: 'run-control-held', phase: 'post-admission' },
-    );
-  }
-  const { controlEpoch, controlToken } = control;
-
-  // What the launch rendered for effort and model.
-  let launchModelCheck = null;
-  let launchReasoningEffort;
-
-  const executorId = resolvedExecutorId;
-  // ADR-006 R7 sibling bug (RT059-F1): `compiledPlan.policy` (the object
-  // the dispatch policy returns -- tier/model/providerModel/
-  // confinement/executorId) has never carried an `adapter` field.
-  // The real resolved adapter lives at `compiledPlan.invocation.adapter`
-  // (plan.mjs: `invocation = { via: 'cli', adapter: resolvedForDispatch.adapter
-  // ?? executor?.adapter ?? 'cli-spawn', ... }`). Reading the wrong (always
-  // undefined) field silently defaulted every executor to 'cli-spawn',
-  // including a real herdr-spawn `invocations[]` executor -- misrouting it
-  // into the cli-spawn supervisor, which then spawns against a herdr
-  // launch-command file it cannot parse.
   // Both shapes run under the run supervisor: `direct` keeps the agent in a process tree the supervisor
   // owns, `terminal` runs it in a pane of the terminal-control port. The controller prepares and hands
-  // over; it never settles, signals the agent or closes a pane.
+  // over; it never settles, signals the agent or closes a pane. (`compiledPlan.policy` carries no adapter:
+  // the resolved one is `resolvedAdapter`, read from the plan's invocation above.)
   const terminalMode = resolvedAdapter === 'herdr-spawn';
-
-  let launchCommandId = opts.launchCommandId || `cmd_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
-  let assignmentLaunchContext = null;
+  const launchCommandId = opts.launchCommandId || `cmd_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+  const unitRunIdOf = effectiveAssignment.unitRunId
+    ?? effectiveAssignment.provenance?.unitRunId
+    ?? effectiveAssignment.assignmentId;
 
   // The unit's cwd lease stays with its controller across attempts and commit.
   // Standalone Assignments own the same lease until their settled handoff.
@@ -1747,66 +1351,480 @@ export async function executeAssignment(assignment, opts = {}) {
   let attemptHandedOver = false;
   // Set once a terminal attempt has its pane; until the handover it is this controller's to give back.
   let terminalPrep = null;
+  // The run control of this controller, taken once the run is known to launch; null before.
+  let controlEpoch = null;
+  let controlToken = null;
 
-  // Opted in with a renewal function: a login close to expiry is renewed once, in a copy fgOS holds, and
-  // applied to the account's real store BEFORE the private home is copied from it (so no pane has to
-  // renew in a throwaway copy, which would use up the source's single-use refresh token). The account is
-  // the one actually selected for this launch, the executor-fallback lease included. A home whose login a
-  // pane renewed anyway is offered back to the source when it is removed: the request carries the opt-in.
-  // Only a confined launch copies a login, and which invocation is confined is settled later, so any
-  // executor that can be confined (by posture, executor config or a confined invocation) counts; renewal
-  // never blocks or fails the dispatch.
-  const launchExecutor = cfg.executors?.[resolvedExecutorId] ?? cfg.executor;
-  const isConfined = (entry) => entry?.confinement && typeof entry.confinement === 'object' && Object.keys(entry.confinement).length > 0;
-  const mayCopyCredential = confinementRequirement.mode !== 'unconfined'
-    || isConfined(launchExecutor)
-    || (Array.isArray(launchExecutor?.invocations) && launchExecutor.invocations.some(isConfined));
-  let providerCapacityForLaunch = providerCapacitySelection;
-  if (typeof opts.providerCredentialRenew === 'function' && providerCapacitySelection?.status === 'selected' && mayCopyCredential) {
-    const credentialRuntimeDir = opts.providerCapacityRuntimeDir ?? defaultProviderCapacityRuntimeDir();
-    // An account with one login store per CLI renews the store of each CLI this launch may still run (the
-    // invocation is settled later); a single-store account renews its one store, as before.
-    const renewSources = providerCapacitySelection.credentialSources
-      ? launchCandidateClis(cfg, resolvedExecutorId, hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : null)
-        .map((cli) => credentialSourceForCli(providerCapacitySelection, cli)).filter(Boolean)
-      : [providerCapacitySelection.credentialSource];
-    for (const credentialSource of renewSources) {
-      try {
-        const renewal = await opts.providerCredentialRenew({
-          provider: providerCapacitySelection.provider,
-          accountId: providerCapacitySelection.accountId,
-          credentialSource,
-          runtimeDir: credentialRuntimeDir,
-        });
-        // Anything but "nothing was due" is visible, so a renewal that keeps failing is not mistaken for success.
-        const quiet = renewal?.status === 'fresh' || (renewal?.status === 'skipped' && renewal?.reason === 'unsupported-layout');
-        if (renewal && !quiet) {
-          const store = credentialSource?.cli ? ` (${credentialSource.cli})` : '';
-          process.stderr.write(`fgos: credential refresh-ahead for ${providerCapacitySelection.provider}/${providerCapacitySelection.accountId}${store}: ${renewal.status} (${renewal.reason})\n`);
-        }
-      } catch { /* the launch goes on with the login as it is */ }
-    }
-    providerCapacityForLaunch = { ...providerCapacitySelection, credentialWriteBack: { runtimeDir: credentialRuntimeDir } };
-  }
+  // An earlier controller's attempt (an envelope or a pre-supervisor launch record) is judged below by
+  // the adopt door and never launched again, so this controller holds no lock over it.
+  const resumedOver = admitted.resumed
+    && (fs.existsSync(path.join(runDir, 'envelope.json')) || fs.existsSync(path.join(runDir, 'controller', 'commands')));
+  // The host and the step environment are resolved before the lock and outside any state transaction.
+  const attemptHost = resumedOver ? null : resolveAttemptHost();
+  const attemptStepEnv = attemptStepEnvOf();
+  let intentWritten = false;
 
   try {
-    // Everything that can still refuse the launch without side effects (the host binary, the settings
-    // the envelope carries) is resolved before the first lock, and outside any state transaction.
-    const attemptHost = resolveAttemptHost();
+    // The attempt lock comes right after admission, before the first await: every moment from here an attempt
+    // can be killed in leaves a lock and an intent the adopt door closes. Nothing between the run record
+    // and this lock awaits (a kill on the instruction between them is the one moment no door owns).
+    if (!resumedOver) {
+      attemptLocks = acquireAttemptLocks({
+        executorId: resolvedExecutorId, capability: compiledPlan.capability,
+        fgosDir,
+        assignmentDir,
+        attemptStr,
+        cwd,
+        mutating: effectiveMutation === 'mutating',
+        custody: opts.custody,
+      });
+      writeAttemptIntent({
+        runDir: path.resolve(runDir),
+        attemptId: launchCommandId,
+        unitRunId: unitRunIdOf,
+        terminal: terminalMode,
+        cwd,
+        host: attemptHost,
+        stepEnv: attemptStepEnv,
+      });
+      intentWritten = true;
+    }
+
+    // M6: normalized ('openai' ≡ 'openai-codex') so leases, quarantine, and
+    // the fault classifier all key the same provider inventory bucket
+    // regardless of which spelling a config or resolved command happened to use. A seat bound to a
+    // pool leases from that pool (`bound.pool`, passed as `cliOverride.pool`); the pool named after the
+    // family keeps the family's key.
+    const boundPool = opts.cliOverride?.pool && opts.cliOverride.preferExecutor === resolvedExecutorId ? opts.cliOverride.pool : null;
+    const providerCapacityProvider = boundPool
+      ? legacyStateKey(boundPool)
+      : normalizeProviderFamily(effectivePolicy.providerModel || deriveProviderFamily(cfg.executors?.[resolvedExecutorId] ?? cfg.executor));
+    // The login store the launch reads: only an account that holds one for it is leased.
+    const leaseCli = declaredStoreCli(cfg, resolvedExecutorId, hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : null);
+    // H8 (resume re-acquire): control only reaches this point on a resumed
+    // Run when reconcile already proved there is no live or settled worker
+    // to reattach to (both cases return earlier, well above this line) --
+    // i.e. a genuinely new worker process is about to be relaunched, which
+    // needs its own lease exactly like a fresh dispatch does. The excluded
+    // `!admitted.resumed` used to skip leasing here unconditionally, leaving
+    // a relaunched resumed Run to run with no provider-capacity account at
+    // all instead of re-acquiring (the account the binding names, which ranks
+    // the account this assignment already held first, once reclaimDeadLeases
+    // frees its now-dead lease).
+    const shouldSelectProviderAccount =
+      compiledPlan.mechanism === 'out-of-process' &&
+      cfg.executors?.[resolvedExecutorId]?.kind !== 'tool' &&
+      hasProviderAccounts(cfg, providerCapacityProvider);
+    if (shouldSelectProviderAccount) {
+      // C2c: this call happens AFTER admitRunAttempt already committed
+      // run.json status:"running" -- exactly the same post-admission window
+      // H2's comment below already documents for a `status:'refused'`
+      // RETURN value. A THROW here (e.g. ProviderCapacityLockError on lock
+      // contention timeout, or a corrupt state.json) used to escape this
+      // function entirely instead, leaving that same Run permanently
+      // "running"/unsettled with no orphan marker. Route it through the
+      // exact same status:'refused' settle path below instead of inventing
+      // a second one.
+      // When no account of the provider is usable only because a login died, one real call may show the
+      // owner has logged in again. A probe problem never blocks the dispatch: the selection decides.
+      if (typeof opts.providerCredentialProbe === 'function') {
+        try {
+          await probeQuarantinedAccounts({
+            runnerConfig: cfg,
+            provider: providerCapacityProvider,
+            runtimeDir: opts.providerCapacityRuntimeDir,
+            probe: opts.providerCredentialProbe,
+            cli: launchCandidateClis(cfg, resolvedExecutorId, hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : null)[0] ?? null,
+          });
+        } catch { /* the selection below reports what is unusable */ }
+      }
+      try {
+        // The account is named by the binding (Seat Binding ranked it); the lease only takes it. A caller that
+        // names none (a launch with no binding) cannot lease.
+        providerCapacitySelection = opts.cliOverride?.leaseAccount
+          ? acquireNamedAccountLease({
+            runnerConfig: cfg,
+            provider: providerCapacityProvider,
+            accountId: opts.cliOverride.leaseAccount,
+            accountViewDigest: opts.cliOverride.accountViewDigest ?? null,
+            assignmentId: effectiveAssignment.assignmentId,
+            runId,
+            runtimeDir: opts.providerCapacityRuntimeDir,
+            runIsDead: opts.providerCapacityRunIsDead,
+            isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
+            cli: leaseCli,
+          })
+          : { status: 'refused', provider: providerCapacityProvider, reason: 'provider-capacity.no-named-account', detail: 'the launch names no account to lease (it carries no binding)' };
+      } catch (err) {
+        providerCapacitySelection = {
+          status: 'refused',
+          provider: providerCapacityProvider,
+          reason: err.code === 'provider-capacity-lock-stale' ? 'provider-capacity.lock-stale' : 'provider-capacity.acquire-failed',
+          cause: err.message,
+        };
+      }
+      // H8: a lease can be selected (an account/credentialSource chosen) for
+      // a dispatch shape nothing can actually provision that credential
+      // into -- only the confined bwrap driver's own prepare() copies
+      // credentialSource into the worker's private home (confinement/drivers/
+      // bwrap.mjs's provisionSelectedCredential), and both cli-spawn and
+      // herdr-spawn reach that prepare() through prepareConfinementForLaunch
+      // with the same providerCapacity. Narrowly scoped to
+      // `confinement.mode: 'required'`: that is the one case where the
+      // CALLER explicitly declared it needs confinement, so silently
+      // running with no credential provisioned (and no sandbox either) is a
+      // real, undisclosed contract violation, not the accepted interim gap.
+      // An unconfined (or confinement-unspecified) dispatch keeps today's
+      // existing, already-honest behavior unchanged: it proceeds and
+      // records `credentialProvisioned: false` in its evidence (below) --
+      // choosing between "refuse this too" and "provision via env for
+      // cli-spawn" for THAT broader case belongs to account-rotator's own
+      // plan owner (the review names both as valid fixes), not this phase.
+      if (providerCapacitySelection?.status === 'selected') {
+        const confinementMode = compiledPlan?.policy?.confinement?.mode;
+        const requiresConfinement = confinementMode === 'required';
+        const canProvisionCredential = !requiresConfinement || resolvedAdapter === 'cli-spawn' || resolvedAdapter === 'herdr-spawn';
+        if (requiresConfinement && !canProvisionCredential) {
+          releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
+          providerCapacitySelection = {
+            status: 'refused',
+            provider: providerCapacityProvider,
+            reason: 'credential-provisioning-unsupported',
+            cause: `confinement mode "required" was declared but adapter "${resolvedAdapter}" has no path to provision the selected account's credential into a confined worker`,
+          };
+        }
+      }
+      if (providerCapacitySelection?.status === 'refused') {
+        // Pre-Phase-05 gate H2 (executor-policy-dispatch-seams plan.md): this
+        // refusal happens AFTER admitRunAttempt already created runId/runDir
+        // (run.json written `status: "running"` above) -- an unclassified
+        // throw here used to leave that Run permanently `running`/unsettled,
+        // with nothing to tell an orphan apart from one still genuinely in
+        // flight. Settle it properly instead, using the exact same
+        // result.json/run.json/markRunSettled sequence the normal completion
+        // path below uses, classified via runtime.executionError so
+        // normalizeRunResultV2 derives execStatus:"failed",
+        // failure:{family:"provider", code:"provider-capacity-refused"}, and
+        // policy:{disposition:"needs-input"} through its own existing rules --
+        // no new override channel invented. `predecessorRunId`/`retryId` are
+        // executeAssignment's EXISTING admission-time retry channel (see
+        // admitRunAttempt above): a caller that wants to reattempt calls
+        // executeAssignment again with `predecessorRunId: runId`, which
+        // supersedes this settled attempt through the same path every other
+        // retry already uses -- this settlement does not need its own retry
+        // loop, only to stop being unsettled.
+        // A refusal is settled as a provider failure the runner's walk answers: the lease takes exactly the account
+        // Seat Binding named, so there is no second choice to make here.
+        const settledAt = new Date().toISOString();
+        const stderrText = `provider capacity refused for "${providerCapacityProvider}": ${providerCapacitySelection.reason}${providerCapacitySelection.detail ? ` (${providerCapacitySelection.detail})` : ''}`;
+        fs.writeFileSync(path.join(runDir, 'stdout.log'), '');
+        fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
+        const evidenceData = {
+          operationMutability: isReadOnlyAssignment(effectiveAssignment) ? 'read-only' : 'mutates-repo',
+          gitBefore: null,
+          gitAfter: null,
+          gitBeforeSource: 'pre-launch',
+          dirtyBefore: [],
+          dirtyAfter: [],
+          mutatedDirtyBeforeFiles: [],
+          changedFiles: [],
+          changedFileReasons: {},
+          attribution: [],
+          artifacts: [],
+          tests: [],
+        };
+        fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+        const refusedRunResult = normalizeRunResultV2({
+          runId,
+          assignmentId: effectiveAssignment.assignmentId,
+          workId: effectiveAssignment.workId,
+          executorId: resolvedExecutorId,
+          policy: effectivePolicy,
+          settledAt,
+          role: effectiveAssignment.role,
+          operation: effectiveAssignment.operation,
+          isReadOnlyOperation: evidenceData.operationMutability === 'read-only',
+          runtime: {
+            exitCode: null,
+            executionError: { code: providerCapacitySelection.reason === LEASE_CONFLICT_REASON ? LEASE_CONFLICT_FAILURE_CODE : 'provider-capacity-refused', message: stderrText },
+            stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
+            stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
+          },
+          evidence: evidenceData,
+        });
+        // This early-exit runs BEFORE the main acquireRunControl at line 2231, so
+        // no control token exists yet. Acquire one now, use the shared atomic
+        // settlement primitive (CAS + immutable publication), and return.
+        // The settled generation record fences any future controller from acquiring
+        // this Run — consistent with every other settlement path (F-01).
+        const refusalControlHolder = buildRunControlHolder(`${runId}:${process.pid}:provider-capacity-refusal`);
+        const refusalControl = acquireRunControl(runDir, { holder: refusalControlHolder, purpose: 'provider-capacity-refusal' });
+        if (refusalControl.status !== 'acquired') {
+          // Already settled by another path — rehydrate and return.
+          try {
+            const resultJsonPath = path.join(runDir, 'result.json');
+            if (fs.existsSync(resultJsonPath)) {
+              const res = interpretRunResult(resultJsonPath, { expectedRunId: runId });
+              if (!res.corrupt && !res.contractCorrupt && !res.resultCorrupt && res.classification?.provenance !== 'contract-corrupt') {
+                return Object.freeze(res);
+              }
+            }
+          } catch {}
+          throw new RunnerConfigError(
+            `executeAssignment: provider-capacity refusal could not acquire control for Run "${runId}" (status: "${refusalControl.status}")`,
+            { code: 'run-control-held', phase: 'provider-capacity-refusal' },
+          );
+        }
+        return commitRunSettlement({
+          runDir,
+          runId,
+          controlEpoch: refusalControl.controlEpoch,
+          controlToken: refusalControl.controlToken,
+          runResult: refusedRunResult,
+        });
+      }
+      if (providerCapacitySelection?.status === 'selected') {
+        providerCapacityEvidence = {
+          ...redactProviderCapacitySelection(providerCapacitySelection),
+          credentialProvisioned: false,
+        };
+        const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
+        fs.writeFileSync(selectionPath, `${JSON.stringify(providerCapacityEvidence, null, 2)}\n`);
+        fsyncFileBestEffort(selectionPath);
+        const runJsonPath = path.join(runDir, 'run.json');
+        try {
+          const runJson = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+          fs.writeFileSync(
+            runJsonPath,
+            `${JSON.stringify({ ...runJson, providerCapacitySelectionPath: path.relative(root, selectionPath) }, null, 2)}\n`,
+          );
+          fsyncFileBestEffort(runJsonPath);
+        } catch {}
+      }
+    }
+    let effectiveContract;
+    if (fs.existsSync(effectiveContractPath)) {
+      try {
+        effectiveContract = JSON.parse(fs.readFileSync(effectiveContractPath, 'utf8'));
+      } catch {
+        effectiveContract = null;
+      }
+    } else {
+      effectiveContract = buildEffectiveExecutionContract({
+        assignment: effectiveAssignment,
+        dispatchPlan: compiledPlan,
+        runId,
+        runDir,
+        cwd,
+        repoRoot: root,
+        runnerConfig: cfg,
+        timeoutMs,
+        executorId: resolvedExecutorId,
+        adapter: resolvedAdapter,
+        providerCapacity: providerCapacityEvidence,
+        templateProvenance: templateResolution?.templateProvenance ?? effectiveAssignment.provenance?.template,
+        // The prompt is built before Authority preparation. Derive its posture
+        // from the same requirement that will be handed to Authority, never
+        // from an executor profile's merely requested confinement fragment.
+        confinement: confinementRequirement.mode === 'unconfined'
+          ? { requirement: { mode: 'unconfined' }, backend: { id: 'none', type: 'none' } }
+          : { requirement: confinementRequirement },
+      });
+    }
+
+    const resultJsonPath = path.join(runDir, 'result.json');
+    if (admitted.resumed) {
+      if (fs.existsSync(resultJsonPath)) {
+        try {
+          const settledResult = interpretRunResult(resultJsonPath, { expectedRunId: runId });
+          if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
+            throw new RunnerConfigError(
+              `executeAssignment: Run "${runId}" resume found an existing result.json that failed validation or is contract-corrupt -- refusing to relaunch over corrupt settlement evidence`,
+              { code: 'result-corrupt', phase: 'post-admission' },
+            );
+          }
+          return Object.freeze(settledResult);
+        } catch (err) {
+          if (err instanceof RunnerConfigError) throw err;
+          // H3: result.json EXISTS (checked above) but failed to read/parse --
+          // a torn or corrupt write, not "no result yet". Falling through here
+          // used to silently continue toward launching a brand-new worker over
+          // a Run slot that already has terminal evidence, just unreadable
+          // evidence. Refuse instead; a human/recovery door decides next, this
+          // path never guesses by relaunching over it.
+          throw new RunnerConfigError(
+            `executeAssignment: Run "${runId}" resume found an existing result.json that failed to parse (${err.message}) -- refusing to relaunch over unreadable settlement evidence`,
+            { code: 'result-corrupt', phase: 'post-admission' },
+          );
+        }
+      }
+      // An attempt of the supervisor era carries an envelope: the adopt door judges it, and a resume
+      // never starts a second agent over it.
+      if (fs.existsSync(path.join(runDir, 'envelope.json'))) {
+        let judged;
+        try {
+          judged = adoptRun(runDir);
+        } catch (err) {
+          throw new RunnerConfigError(
+            `executeAssignment: Run "${runId}" resume could not ask the adopt door about its attempt (${err.message})`,
+            { code: 'run-unreconciled', phase: 'post-admission' },
+          );
+        }
+        const settledAttempt = readSettledResult(runDir, runId);
+        if (settledAttempt) return settledAttempt;
+        const live = judged.state === 'running' || judged.state === 'being-adopted' || judged.state === 'held';
+        throw new RunnerConfigError(
+          `executeAssignment: Run "${runId}" resume found its attempt in state "${judged.state}"${judged.reason ? ` (${judged.reason})` : ''} -- refusing to launch a second worker over it`,
+          { code: live ? 'run-in-flight' : 'run-unreconciled', phase: 'post-admission', reconcileStatus: judged.state, ...(judged.reason ? { reconcileReason: judged.reason } : {}) },
+        );
+      }
+      // A launch record that is not an envelope is a run from before the run supervisor: it is refused by
+      // name rather than relaunched.
+      if (fs.existsSync(path.join(runDir, 'controller', 'commands'))) {
+        throw new RunnerConfigError(
+          `executeAssignment: Run "${runId}" resume found a launch record from before the run supervisor -- refusing to launch a second worker over it`,
+          { code: 'run-unreconciled', phase: 'post-admission', reconcileReason: 'legacy-run' },
+        );
+      }
+    }
+
+    // Dispatched-run membership: record every run attempt THIS runner actually
+    // dispatched, so cross-pass consumption can refuse run dirs no runner ever
+    // dispatched (a planted runs/NN directory must never look like evidence of
+    // a real run). H3: a one-file-per-attempt marker under dispatched/<NN>
+    // instead of a full assignment.json rewrite -- a torn write here can only
+    // ever cost this ONE marker, never corrupt the whole manifest (assignment
+    // fields stay the immutable input per Step 03 §2, untouched by this write
+    // either way). operation-choice.mjs reads this marker first, falling back
+    // to the legacy dispatchedRuns array for one release.
+    try {
+      const dispatchedDir = path.join(assignmentDir, 'dispatched');
+      publishMarkerOnce(path.join(dispatchedDir, attemptStr), { attemptStr, dispatchedAt: new Date().toISOString() });
+    } catch {
+      // Bookkeeping must never abort a dispatch that already started; a missing
+      // entry only costs this run its cross-pass consumability (fail closed).
+    }
+
+    // Step 04 §5.1: pass concrete runDir so worker knows exactly where to write
+    // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
+    // Phase 02 (executor-policy-dispatch-seams): thread the ALREADY-resolved
+    // persona (effectivePolicy.persona/provenance.persona, computed above by
+    // the same the dispatch policy every dispatch path shares)
+    // into the actual worker-visible prompt -- previously resolved but never
+    // delivered. Additive: `undefined` when no persona resolved, byte-identical
+    // to the pre-Phase-02 prompt for every such assignment.
+    const prompt = renderAssignmentPrompt(effectiveAssignment, {
+      cwd,
+      runDir: path.resolve(runDir),
+      effectiveContract,
+      ...(effectivePolicy.persona
+        ? {
+          persona: {
+            value: effectivePolicy.persona,
+            source: effectivePolicy.provenance?.persona?.source ?? null,
+            // Text pinned by whoever bound the persona; the renderer reads it instead of a file.
+            ...(effectiveAssignment.policy?.personaPin?.name === effectivePolicy.persona
+              ? { pinnedText: effectiveAssignment.policy.personaPin.text }
+              : {}),
+          },
+        }
+        : {}),
+    });
+
+    // Step 04 §5.3: snapshot dirty state BEFORE the run so pre-existing dirty files
+    // are never counted as post-run evidence.
+    const dirtyBefore = safeGitStatusFiles(cwd);
+    const dirtyBeforeSnapshots = snapshotDirtyBeforeFiles(cwd, dirtyBefore);
+
+    // Cell 6.7 G6: capture gitBefore BEFORE the worker launches, unconditionally
+    // (not only on a settled/happy path) -- a worker that commits then crashes
+    // must never have gitBefore/gitAfter read at the same post-crash instant,
+    // which would silently hide that a commit happened during the run. This
+    // pre-launch capture is the ONLY source for gitBefore below; a settled
+    // the settled result's own headBefore is intentionally not consulted, so provenance stays
+    // consistent across both the settle and the crash path.
+    const gitBefore = safeGitHead(cwd);
+    // safeGitHead already fails closed to null internally and never throws,
+    // so no runtime path today fails to reach the capture above --
+    // gitBeforeSource is always 'pre-launch'. The literal is still named
+    // (rather than inlined at each write site below) and 'post-crash-fallback'
+    // kept as the sibling value so a future change that captures gitBefore
+    // through a different path is forced to say so explicitly instead of
+    // silently inheriting this call's provenance.
+    const gitBeforeSource = 'pre-launch';
+
+    // Per-Run control fencing (AD-02/AD-10): a monotonic controlEpoch plus a
+    // unique controlToken, acquired synchronously (no adapter I/O runs inside
+    // the acquisition itself) and re-checked before this attempt is allowed
+    // to append a settlement. Two acquisitions of the same Run always
+    // receive distinct epochs/tokens; a live holder is never reclaimed on
+    // heartbeat/TTL alone (see run-lock.mjs). Failure to acquire here means a
+    // different controller already holds this exact Run -- refuse outright
+    // rather than race it for the same subprocess/files.
+    const controlHolder = buildRunControlHolder(`${runId}:${process.pid}:${crypto.randomUUID()}`);
+    const control = acquireRunControl(runDir, { holder: controlHolder, purpose: 'worker-spawn', ttlMs: opts.controlTtlMs });
+    if (control.status !== 'acquired') {
+      if (providerCapacitySelection?.status === 'selected') {
+        releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
+      }
+      throw new RunnerConfigError(
+        `executeAssignment: could not acquire control for Run "${runId}" (status: "${control.status}") -- another controller currently holds it`,
+        { code: 'run-control-held', phase: 'post-admission' },
+      );
+    }
+    ({ controlEpoch, controlToken } = control);
+
+    // What the launch rendered for effort and model.
+    let launchModelCheck = null;
+    let launchReasoningEffort;
+
+    let assignmentLaunchContext = null;
+
+    // Opted in with a renewal function: a login close to expiry is renewed once, in a copy fgOS holds, and
+    // applied to the account's real store BEFORE the private home is copied from it (so no pane has to
+    // renew in a throwaway copy, which would use up the source's single-use refresh token). The account is
+    // the one actually selected for this launch, the executor-fallback lease included. A home whose login a
+    // pane renewed anyway is offered back to the source when it is removed: the request carries the opt-in.
+    // Only a confined launch copies a login, and which invocation is confined is settled later, so any
+    // executor that can be confined (by posture, executor config or a confined invocation) counts; renewal
+    // never blocks or fails the dispatch.
+    const launchExecutor = cfg.executors?.[resolvedExecutorId] ?? cfg.executor;
+    const isConfined = (entry) => entry?.confinement && typeof entry.confinement === 'object' && Object.keys(entry.confinement).length > 0;
+    const mayCopyCredential = confinementRequirement.mode !== 'unconfined'
+      || isConfined(launchExecutor)
+      || (Array.isArray(launchExecutor?.invocations) && launchExecutor.invocations.some(isConfined));
+    let providerCapacityForLaunch = providerCapacitySelection;
+    if (typeof opts.providerCredentialRenew === 'function' && providerCapacitySelection?.status === 'selected' && mayCopyCredential) {
+      const credentialRuntimeDir = opts.providerCapacityRuntimeDir ?? defaultProviderCapacityRuntimeDir();
+      // An account with one login store per CLI renews the store of each CLI this launch may still run (the
+      // invocation is settled later); a single-store account renews its one store, as before.
+      const renewSources = providerCapacitySelection.credentialSources
+        ? launchCandidateClis(cfg, resolvedExecutorId, hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : null)
+          .map((cli) => credentialSourceForCli(providerCapacitySelection, cli)).filter(Boolean)
+        : [providerCapacitySelection.credentialSource];
+      for (const credentialSource of renewSources) {
+        try {
+          const renewal = await opts.providerCredentialRenew({
+            provider: providerCapacitySelection.provider,
+            accountId: providerCapacitySelection.accountId,
+            credentialSource,
+            runtimeDir: credentialRuntimeDir,
+          });
+          // Anything but "nothing was due" is visible, so a renewal that keeps failing is not mistaken for success.
+          const quiet = renewal?.status === 'fresh' || (renewal?.status === 'skipped' && renewal?.reason === 'unsupported-layout');
+          if (renewal && !quiet) {
+            const store = credentialSource?.cli ? ` (${credentialSource.cli})` : '';
+            process.stderr.write(`fgos: credential refresh-ahead for ${providerCapacitySelection.provider}/${providerCapacitySelection.accountId}${store}: ${renewal.status} (${renewal.reason})\n`);
+          }
+        } catch { /* the launch goes on with the login as it is */ }
+      }
+      providerCapacityForLaunch = { ...providerCapacitySelection, credentialWriteBack: { runtimeDir: credentialRuntimeDir } };
+    }
+
     const attemptSettings = readLaunchSettings(root);
     // The main checkout as it is before the agent starts: what is dirty outside the workspace afterwards
     // and was not before is reported on the result.
     const strayWatch = watchWritesOutsideWorkspace({ repoRoot: root, cwd });
-    const attemptStepEnv = attemptStepEnvOf();
-    attemptLocks = acquireAttemptLocks({
-      executorId, capability: compiledPlan.capability,
-      fgosDir,
-      assignmentDir,
-      attemptStr,
-      cwd,
-      mutating: effectiveMutation === 'mutating',
-      custody: opts.custody,
-    });
     const depth = currentDispatchDepth();
     if (depth >= MAX_DISPATCH_DEPTH) {
       throw new DispatchError(
@@ -2023,9 +2041,6 @@ export async function executeAssignment(assignment, opts = {}) {
 
     // 6. The envelope, the secret side file and the context the settle step needs. The envelope is
     // immutable from here on; nothing the controller still learns changes what the attempt runs.
-    const unitRunIdOf = effectiveAssignment.unitRunId
-      ?? effectiveAssignment.provenance?.unitRunId
-      ?? effectiveAssignment.assignmentId;
     const attemptEnvelopeBody = buildEnvelope({
       attemptId: launchCommandId,
       unitRunId: unitRunIdOf,
@@ -2165,16 +2180,23 @@ export async function executeAssignment(assignment, opts = {}) {
     // the adopt door's): its run control token stays, the settle step uses it.
     if (attemptLocks) {
       try {
+        // A run that settled without ever writing an envelope (refused, or already answered) has nothing for
+        // the adopt door to close.
+        if (intentWritten && !fs.existsSync(path.join(runDir, 'envelope.json')) && readSettledResult(runDir, runId)) removeAttemptIntent(path.resolve(runDir));
         if (!opts.custody && attemptSettled) recordCustodyHandoff(attemptLocks.cwdLease, handedOffResult);
         if (handedOffResult) Object.freeze(handedOffResult);
       } finally { attemptLocks.release(); }
     }
     if (terminalPrep && !attemptHandedOver) await terminalPrep.abandon();
-    // An agent the supervisor still owns keeps the account it was given; the lease is reclaimed through
-    // isSupervisedAttemptStillWorking once its attempt has really ended.
-    if (providerCapacitySelection?.status === 'selected' && (!attemptHandedOver || attemptSettled)) {
-      releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
+    // Before the run control was taken the run was refused, settled or judged by the adopt door in the
+    // lines above, which gave back what they took.
+    if (controlToken !== null) {
+      // An agent the supervisor still owns keeps the account it was given; the lease is reclaimed through
+      // isSupervisedAttemptStillWorking once its attempt has really ended.
+      if (providerCapacitySelection?.status === 'selected' && (!attemptHandedOver || attemptSettled)) {
+        releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
+      }
+      if (!attemptHandedOver || attemptSettled) releaseRunControl(runDir, { controlEpoch, controlToken });
     }
-    if (!attemptHandedOver || attemptSettled) releaseRunControl(runDir, { controlEpoch, controlToken });
   }
 }
