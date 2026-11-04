@@ -23,6 +23,7 @@ import path from 'node:path';
 import { inspectRepo, statusEntries } from './lib/git-ports.mjs';
 import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { governanceBaselineFields, headerBlock, headerFields } from './doc-health.mjs';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import { INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
 import { regenerateCommand, applyDecisions, loadDecisionShards, buildConservationUnitLookup, validateCommitBlobIntegrity, validateSourceUnitCoverage } from './check-doc-inventory-gates.mjs';
@@ -217,26 +218,7 @@ export function checkPlacement(files, constitution, readHeader) {
   return { files: files.length, matched, leftovers, exceptions, ambiguous, evidenceWithoutOwner, byKind };
 }
 
-/** Fields of the "Required baseline" block of doc-governance.md §5, read from the file so they are never copied. */
-export function governanceBaselineFields(repoRoot) {
-  const file = path.resolve(repoRoot, 'docs/platform/governance.md');
-  if (!fs.existsSync(file)) return [];
-  const text = fs.readFileSync(file, 'utf8');
-  const start = text.indexOf('Required baseline:');
-  const block = start >= 0 ? text.slice(start).match(/```txt\n([\s\S]*?)\n```/) : null;
-  return block ? block[1].split('\n').map((l) => l.replace(/:\s*$/, '').trim()).filter(Boolean) : [];
-}
-
-/** The text of the fenced txt header block directly under the H1, or null when the document has none. */
-export function headerBlock(text) {
-  const block = text.match(/^# .+\n+```txt\n([\s\S]*?)\n```/m);
-  return block ? block[1] : null;
-}
-
-export function headerFields(text) {
-  const block = headerBlock(text);
-  return block !== null ? new Set([...block.matchAll(/^([A-Za-z][A-Za-z ]*):/gm)].map((m) => m[1])) : null;
-}
+export { governanceBaselineFields, headerBlock, headerFields };
 
 /** Report-only: which canonical documents lack which promotion-gate header fields. */
 export function checkPromotion(files, constitution, readFile, repoRoot) {

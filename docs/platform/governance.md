@@ -181,6 +181,10 @@ Last reviewed:
 Related:
 ```
 
+`scripts/doc-health.mjs` enforces the baseline: every platform doc that
+`fgos convention classify` does not mark `metadataExempt` carries all fields in
+this block, as a fenced `txt` block directly under the H1.
+
 Metadata is an orientation block, not the only navigation surface. Because this
 project keeps metadata inside fenced code blocks, `Related:` entries are plain
 text and do not render as clickable links. Any maintained doc that lists related

@@ -911,7 +911,7 @@
         "rule": "Source material carries candidateCore; a document becoming canonical carries the full promotionFields list and meets its placement pattern.",
         "enforcedBy": {
           "kind": "script",
-          "path": "scripts/check-doc-candidate-status.mjs"
+          "path": "scripts/doc-health.mjs"
         }
       },
       {
@@ -919,7 +919,7 @@
         "rule": "Every relative link and Related path resolves.",
         "enforcedBy": {
           "kind": "script",
-          "path": "scripts/check-doc-candidate-status.mjs"
+          "path": "scripts/doc-health.mjs"
         }
       },
       {
@@ -971,16 +971,16 @@
         "id": "aliases-cover-immutable-refs",
         "rule": "Immutable historical references to the file resolve through the alias table.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-retirement.mjs"
+          "kind": "planned",
+          "deliverable": "retired with the script; a retirement is now a deletion that doc-health fails on while any link dangles"
         }
       },
       {
         "id": "consumers-rewritten",
         "rule": "Every consumer edge is rewritten or proven non-authority.",
         "enforcedBy": {
-          "kind": "script",
-          "path": "scripts/check-doc-retirement.mjs"
+          "kind": "planned",
+          "deliverable": "retired with the script; a retirement is now a deletion that doc-health fails on while any link dangles"
         }
       },
       {

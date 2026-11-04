@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "04717410acd3a91166490758561302f621058742c7c82934574475fb825809f1",
+  "payloadDigest": "65d8fc79d2d40344470e6a8f92b50a9147b3abedc02217cc7de780127291b660",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -805,10 +805,8 @@
     "scripts/check-decision-citation-drift.mjs": "414bbeb1ec669330158bae0f5b48a0f2573ca07a2e7b4b8821b417446a8212d9",
     "scripts/check-decision-codes.mjs": "c9f0ae0dbb6f6368eec818de11a785428d4517736f180359a344c73ad789571c",
     "scripts/check-decision-supersession.mjs": "1fc95bddf36b4485338125d5f902e69b95d66b6e34e5e60dc06cc822096a8f90",
-    "scripts/check-doc-candidate-status.mjs": "106c44397556121cbfc4cdf67665ced74ca7d744599bad5016610f9da7b162b6",
-    "scripts/check-doc-constitution.mjs": "d3795baf86d1dbf023a34b47c07e7415fd604cf8dd44ae88d57ff5857cb03f2f",
+    "scripts/check-doc-constitution.mjs": "113679fd9042dcd41396d284e6f6f9504ae30272ef55415a0220b4a470d3f4a5",
     "scripts/check-doc-inventory-gates.mjs": "3cf46d3dba0eb0ddddb56d9f1950afc9cd376e21f1210f28e2f0f003b84eabd3",
-    "scripts/check-doc-retirement.mjs": "93bc3ee2216e293f775c91771ec2d23ddebae16726b9e6bbc2cd5af9386c2374",
     "scripts/check-evidence-relocation.mjs": "c2079a53a7cc234d284d538c902e63a2f594a4f7dea7cf9c818daa1a07c497cd",
     "scripts/check-glibc-ceiling.sh": "6ce52ee1a3197104aded910b937b593153f51915001a5946e2c822702df07e99",
     "scripts/check-hook-registrations-guarded.mjs": "eb287ab7bec0368418f04d650e20cb4a3c6ce348844152a9e6112f9643e551ae",
@@ -820,6 +818,7 @@
     "scripts/dispatch-decide-hook.mjs": "0c57af75d5ef5309ebdd10903403649802f8dfca77785d7801df81f64fe2d4ea",
     "scripts/doc-alias-resolver.mjs": "8f9d33e109752670e70f8bcc51c54bcb3f9182a6c6bd6eb1fd42f2842fd5844c",
     "scripts/doc-binding-repair.mjs": "39b05039c7f8856197e646d6e88b5b9961f047cb4b1133dba69b4539bf61f8eb",
+    "scripts/doc-health.mjs": "d3740f5c9840c5f57ca36492a01431d0b54a9f74afa44759accfed51701d4710",
     "scripts/doc-inventory-artifact.mjs": "13c6868d7529320f20d35a9b769b84189bfcd595ed5361bcc26ca7da2266d166",
     "scripts/doc-link-pass.mjs": "90c4821cac2f9e9e5a039cfa42af6ac896dd0acc38d8a8374c9e0c96af302555",
     "scripts/doc-rationale-facts.mjs": "8ff477ce52800e0b787ced49d280e8172baf3709f1f3dee5adb213ac80ef0eb2",
@@ -3047,7 +3046,7 @@
       "family": "spawn",
       "callers": [
         "scripts/check-doc-inventory-gates.mjs:1242",
-        "scripts/check-doc-constitution.mjs:698"
+        "scripts/check-doc-constitution.mjs:680"
       ],
       "siteId": "validateSourceUnitCoverage:a985982eb27efbdd1763c452a4780d2dab2de98793ded58807b6a0c724fbb2ec",
       "class": "declared-tooling-exemption",
@@ -3062,7 +3061,7 @@
       "family": "spawn",
       "callers": [
         "scripts/check-doc-inventory-gates.mjs:1241",
-        "scripts/check-doc-constitution.mjs:698"
+        "scripts/check-doc-constitution.mjs:680"
       ],
       "siteId": "validateCommitBlobIntegrity:a985982eb27efbdd1763c452a4780d2dab2de98793ded58807b6a0c724fbb2ec",
       "class": "declared-tooling-exemption",
@@ -3076,8 +3075,7 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "scripts/check-doc-inventory-gates.mjs:1422",
-        "scripts/check-doc-retirement.mjs:242"
+        "scripts/check-doc-inventory-gates.mjs:1422"
       ],
       "siteId": "loadPreviousRegistries:15b3120da8596a3cce1e4f87d4c97fdd8b2cbb220755f3d21e4abdc6e950fed7",
       "class": "declared-tooling-exemption",

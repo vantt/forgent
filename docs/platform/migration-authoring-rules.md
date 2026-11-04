@@ -40,8 +40,8 @@ The migration procedure below is preserved as dated evidence, not as a live auth
 
 Historical source: this procedure and its script/baseline/exception paths below
 record the retired migration-time ratchet. They are not post-cutover commands
-or live inputs. After cutover, author the exact current owner once; retirement
-enforcement uses `scripts/check-doc-retirement.mjs`.
+or live inputs. After cutover, author the exact current owner once; a retirement is a
+deletion, and `scripts/doc-health.mjs` fails on any link left dangling.
 
 The legacy platform roots (`docs/specs` and `docs/architect`) are frozen against unreviewed growth:
 
