@@ -101,6 +101,8 @@ Checked on current main by the arbiter (file:line opened): B-2, B-3, B-6, B-7, B
 | A4 | No-undef pass in the gate (correctness P-3) | B-3 survived with no linter over 35 000 lines | Catches the class before runtime | script +40 |
 | A5 | Run Result derivation in Rust through the addon (simplicity option A) | Two derivations | One owner in code | Rust +40, addon dependency; Node −180 |
 | A6 | Network namespace unshare for read-only policies (red-team P-2) | Abstract sockets and localhost services reachable (R-7) | Closes what masks cannot | out of T5 scope |
+| A7 | Host-only record beside each private home (`<tempRoot>/<dispatchId>/`, 0700, not bound), added after the write-back fix | The fix removed automatic settle of held homes: a temp-root scan reaches only the home's own marker (agent-writable), and a fake descriptor can be planted in the home, a writable worktree or the outbox | Held homes settle automatically again without trusting the agent | Node +40, test +40 (estimate) |
+| A8 | Probe gate before a renewed login is written back (existing `provider-credential-probe`, account identity must match), added after the write-back fix | A forged login can still replace the leased account's own login (shown in the fix's attack rerun) | Closes the remaining write-back residual | Node +30, test +30 (estimate) |
 
 ## 5. Net size (HARDEN commits, estimate)
 
@@ -149,7 +151,7 @@ Em gom năm câu; mỗi câu theo mẫu câu hỏi quyết định. Hai việc �
 **Q4. Duyệt hình dạng §2 và các addition §4.**
 - **Chuyện gì đang xảy ra:** bốn seat đồng ý hướng chính: Rust giữ quyết định seat, Node giữ luồng nhưng cắt nhỏ; mỗi thành phần có ngân sách Node ở §2.
 - **Nguyên nhân:** số dòng lấy từ baseline và seat simplicity; config −500 đến −900 còn là ước lượng, sub-plan đo từng hàm.
-- **Các lựa chọn:** (a) duyệt §2 như viết, không lấy addition nào; (b) duyệt §2 và lấy thêm addition anh chọn (A1–A6, chi phí ở bảng §4); (c) sửa §2 ở điểm anh chỉ ra.
+- **Các lựa chọn:** (a) duyệt §2 như viết, không lấy addition nào; (b) duyệt §2 và lấy thêm addition anh chọn (A1–A8, chi phí ở bảng §4; A7, A8 thêm sau bản sửa write-back); (c) sửa §2 ở điểm anh chỉ ra.
 - **Khuyến nghị:** (a), có thể kèm A3 (10 dòng test giữ cho O-1/O-2 không mọc lại).
 - **Phạm vi:** "có" ghi hình dạng vào spec runner, confinement, seat-binding và cho T5 sub-plan làm mục §3; addition nào không được chọn vẫn chờ trong danh sách RUL104 của plan.
 
