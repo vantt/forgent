@@ -11,22 +11,15 @@ import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { capabilityServedBy, writeProjectConfig } from '../../helpers/config-fixture.mjs';
+import { sleep, waitUntil as pollUntil } from './direct-harness.mjs';
 
 export const FAKE_HERDR = path.resolve('packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py');
 const AGENT = path.resolve('test/run-supervisor/fixtures/terminal-agent.mjs');
 const CONTROLLER = path.resolve('test/run-supervisor/fixtures/terminal-controller.mjs');
 
-export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-export async function waitUntil(predicate, { timeoutMs = 60_000, intervalMs = 20, what = 'condition' } = {}) {
-  const deadline = Date.now() + timeoutMs;
-  for (;;) {
-    const value = predicate();
-    if (value) return value;
-    if (Date.now() > deadline) throw new Error(`timed out after ${timeoutMs} ms waiting for ${what}`);
-    await sleep(intervalMs);
-  }
-}
+// One poll loop for both harnesses (direct-harness owns it); the pane tests wait longer and look less often.
+export { sleep };
+export const waitUntil = (predicate, { timeoutMs = 60_000, intervalMs = 20, ...rest } = {}) => pollUntil(predicate, { timeoutMs, intervalMs, ...rest });
 
 export const readJson = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
 const readLines = (file) => { try { return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean); } catch { return []; } };

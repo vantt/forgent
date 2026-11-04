@@ -19,6 +19,9 @@ use serde_json::{json, Value};
 
 use super::{agent_exe, boot_id, driver_name, example};
 
+#[allow(unused_imports)] // each test binary uses a subset of the shared helpers
+pub use super::wait::wait_until;
+
 pub fn internal_harness() -> PathBuf {
     example("internal_harness")
 }
@@ -315,12 +318,4 @@ pub fn finish(mut child: Child, limit: Duration) -> (i32, Value) {
         .and_then(|l| serde_json::from_str::<Value>(l).ok())
         .unwrap_or(Value::Null);
     (out.status.code().unwrap_or(-1), line)
-}
-
-pub fn wait_until(limit: Duration, what: &str, mut cond: impl FnMut() -> bool) {
-    let start = Instant::now();
-    while !cond() {
-        assert!(start.elapsed() < limit, "timed out waiting for {what}");
-        sleep(Duration::from_millis(10));
-    }
 }

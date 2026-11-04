@@ -410,6 +410,13 @@ fn receipt_of_a_deadline_stop(name: &str, screen: &str) -> Value {
     unsafe { libc::kill(agent_pid(&run), libc::SIGKILL) };
     assert_eq!(code, 0, "{}", run.log());
     assert_eq!(line["outcome"], "timeout");
+    assert_eq!(
+        run.json("steps/release-slot.json")
+            .expect("release-slot receipt")["detail"]["disposition"],
+        "close",
+        "the stopped worker output is captured, so the slot closes"
+    );
+    assert_eq!(pane_closes(&herdr).len(), 1, "the stopped pane closes once");
     run.json("receipt.json").expect("receipt")
 }
 

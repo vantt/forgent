@@ -1,6 +1,8 @@
-// Every row of the adopt recovery matrix under a real crash, in both launch modes, and what `fgos run
+// One crash per distinct resume branch of the adopt recovery matrix, in both launch modes, and what `fgos run
 // --resume` makes of the attempt that is left: the unit runs to its summary, the agent ran once, the private
-// home went back once, the pane (terminal) closed once. Processes are real (controller, supervisor, gate, steps,
+// home went back once, the pane (terminal) closed once. The other matrix rows (a receipt that stands, a step
+// that retries, steps all done) and two adopters racing are owned by the host's adopt_matrix and
+// adopt_concurrency tests. Processes are real (controller, supervisor, gate, steps,
 // bwrap); the crash is made from outside by stopping processes when a file of the attempt shows up, or by
 // holding a step through the host command the envelope carries (helpers/envelope-fixture.mjs).
 import '../helpers/process-tmp-root.mjs';
@@ -11,8 +13,6 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { probe } from '../../src/holder-lock/index.mjs';
-import { settleRunControl } from '../../src/runner/dispatch/run-lock.mjs';
-import { adoptRun } from '../../src/run-supervisor/client.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
 import { createTerminalProject, noHost, sleep } from './support/terminal-harness.mjs';
 import { bindingPids, stepProcess, supervisorProcess } from './helpers/envelope-fixture.mjs';
@@ -45,14 +45,6 @@ function startResume(project, unitRunId) {
 
 /** The gate publishes its exit record a moment before it lets go of the attempt lock; an adopter that looks in between sees a live attempt. */
 const attemptLockFree = (repoDir, dir) => probe('attempt', { fgosDir: path.join(repoDir, '.fgos'), runDir: path.dirname(path.dirname(dir)), NN: path.basename(dir) }).result === 'free';
-
-const controlSettled = (dir) => { try { return fs.readdirSync(here(dir, 'control/generations')).some((n) => readJson(path.join(dir, 'control', 'generations', n))?.purpose === 'settled'); } catch { return false; } };
-
-/** What the settle step does just before it publishes result.json: run control reads `settled` under the attempt's token. */
-function settleControlAsTheStepDid(dir) {
-  const side = readJson(here(dir, 'protected/attempt-secrets.json'));
-  return side && settleRunControl(dir, { controlEpoch: side.controlEpoch, controlToken: side.controlToken }).status === 'settled';
-}
 
 const unitRunIdOf = (project) => fs.readdirSync(path.join(project.repoDir, '.fgos', 'assignments')).find((n) => n.startsWith('unit-run-'));
 const unitDirOf = (project) => path.join(project.repoDir, '.fgos', 'assignments', unitRunIdOf(project));
@@ -132,37 +124,9 @@ const DIRECT_CRASH = {
     },
     confirm: (ctx, dir) => !published(dir, 'receipt.json'),
   },
-  // The settle step dies before it ran; the ledger then gets the one record the step writes before result.json,
-  // through the same primitive and the attempt's own token: the window between the two is microseconds wide in one
-  // synchronous path, so it cannot be hit by a kill from outside.
-  'settled-no-result': {
-    async attempt(ctx, id) {
-      const dir = await holdStepAndKill(ctx.project, (p, n) => startRun(p, p.unitFile(n)), id, 'settle-attempt');
-      return dir && settleControlAsTheStepDid(dir) ? dir : null;
-    },
-    confirm: (ctx, dir) => published(dir, 'receipt.json') && !exists(dir, 'result.json') && !exists(dir, 'steps/settle-attempt.json') && controlSettled(dir),
-  },
-  'receipt-not-settled': {
-    attempt: ({ project }, id) => holdStepAndKill(project, (p, n) => startRun(p, p.unitFile(n)), id, 'settle-attempt'),
-    confirm: (ctx, dir) => published(dir, 'receipt.json') && !exists(dir, 'result.json') && !exists(dir, 'steps/settle-attempt.json'),
-  },
   'result-no-finalize': {
     attempt: ({ project }, id) => holdStepAndKill(project, (p, n) => startRun(p, p.unitFile(n)), id, 'finalize-home'),
     confirm: (ctx, dir) => exists(dir, 'result.json') && exists(dir, 'steps/settle-attempt.json') && !exists(dir, 'steps/finalize-home.json'),
-  },
-  'all-steps-no-closed': {
-    async attempt({ project }, id) {
-      const run = startRun(project, project.unitFile(id));
-      let dir = null;
-      await killOnFile({
-        appears: () => { dir = project.attemptDirs().find((d) => exists(d, 'steps/finalize-home.json')) ?? null; return dir; },
-        targets: () => [run.child.pid, ...bindingPids(dir)],
-      });
-      await run.exited;
-      if (dir) await waitGone(bindingPids(dir));
-      return dir;
-    },
-    confirm: (ctx, dir) => exists(dir, 'steps/finalize-home.json') && !exists(dir, 'closed.json'),
   },
 };
 
@@ -264,42 +228,10 @@ const TERMINAL_CRASH = {
     },
     confirm: (ctx, dir) => !published(dir, 'receipt.json'),
   },
-  'settled-no-result': {
-    async attempt({ project }, id) {
-      const dir = await holdStepAndKill(project, startTerminalRun, id, 'settle-attempt', (run) => playAgentUntil(project, 0, run.exited));
-      return dir && settleControlAsTheStepDid(dir) ? dir : null;
-    },
-    confirm: (ctx, dir) => published(dir, 'receipt.json') && !exists(dir, 'result.json') && !exists(dir, 'steps/settle-attempt.json') && controlSettled(dir),
-  },
-  'receipt-not-settled': {
-    attempt: ({ project }, id) => holdStepAndKill(project, startTerminalRun, id, 'settle-attempt', (run) => playAgentUntil(project, 0, run.exited)),
-    confirm: (ctx, dir) => published(dir, 'receipt.json') && !exists(dir, 'result.json') && !exists(dir, 'steps/settle-attempt.json'),
-  },
-  'result-no-finalize': {
-    attempt: ({ project }, id) => holdStepAndKill(project, startTerminalRun, id, 'finalize-home', (run) => playAgentUntil(project, 0, run.exited)),
-    confirm: (ctx, dir) => exists(dir, 'result.json') && exists(dir, 'steps/settle-attempt.json') && !exists(dir, 'steps/finalize-home.json'),
-  },
   // The slot is released by the supervisor itself after the last step: its herdr call is frozen on the way.
   'release-slot-pending': {
     attempt: ({ project }, id) => holdStepAndKill(project, startTerminalRun, id, () => (args) => args.includes('pane') && args.includes('close'), (run) => playAgentUntil(project, 0, run.exited)),
     confirm: (ctx, dir) => exists(dir, 'steps/finalize-home.json') && !exists(dir, 'steps/release-slot.json') && ctx.project.callsStarting('pane close').length === 0,
-  },
-  'all-steps-no-closed': {
-    async attempt({ project }, id) {
-      const run = startTerminalRun(project, id);
-      let dir = null;
-      const play = playAgentUntil(project, 0, run.exited);
-      await killOnFile({
-        appears: () => { dir = terminalAttempts(project).find((d) => exists(d, 'steps/release-slot.json')) ?? null; return dir; },
-        targets: () => [run.child.pid, ...bindingPids(dir)],
-        timeoutMs: 120_000,
-      });
-      await run.exited;
-      await play;
-      if (dir) await waitGone(bindingPids(dir));
-      return dir;
-    },
-    confirm: (ctx, dir) => exists(dir, 'steps/release-slot.json') && !exists(dir, 'closed.json'),
   },
 };
 
@@ -393,39 +325,26 @@ for (const [modeName, mode] of Object.entries(MODES)) {
       assert.deepEqual(stepReceipts(dir).filter((n) => n !== 'settle-attempt.json' && n !== 'finalize-home.json' && n !== 'cleanup-trust.json' && n !== 'release-slot.json'), [], 'only the named steps left receipts');
       assert.deepEqual(mode.homesLeft(ctx), [], 'every private home is gone');
     });
-
-    if (row === 'no-binding') continue;
-    test(`${modeName}: ${row}: two adopters at once, one adopts and the side effects happen once`, { skip: mode.skip, timeout: 600_000 }, async () => {
-      const ctx = await crashUntilAsync(row, mode.make, def.attempt, def.confirm);
-      const { dir } = ctx;
-      const env = mode.adoptEnv(ctx);
-      const [a, b] = await Promise.all([spawnAdopt(dir, env), spawnAdopt(dir, env)]);
-      const states = [a.answer?.state, b.answer?.state].sort();
-      assert.equal(states.filter((st) => st === 'adopted' || st === 'closed').length >= 1, true, JSON.stringify([a, b]));
-      assert.ok(states.filter((st) => st === 'adopted').length <= 1, `at most one adopter adopted: ${JSON.stringify([a, b])}`);
-      await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 60_000, what: 'the attempt to close' });
-      const receipts = stepReceipts(dir);
-      assert.ok(receipts.includes('settle-attempt.json') && receipts.includes('finalize-home.json'), receipts.join(','));
-      assert.equal(adoptRun(dir, {}).state, 'closed');
-    });
   }
-
-  test(`${modeName}: a resume after adopt already closed the attempt uses its result and adopts nothing again`, { skip: mode.skip, timeout: 600_000 }, async () => {
-    const row = 'gate-exit-no-receipt';
-    const ctx = await crashUntilAsync(row, mode.make, mode.rows[row].attempt, mode.rows[row].confirm);
-    const { dir } = ctx;
-    const env = mode.adoptEnv(ctx);
-    await spawnAdopt(dir, env);
-    await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 60_000, what: 'adopt to close the attempt' });
-    const before = Object.fromEntries(['receipt.json', 'result.json', 'closed.json', ...stepReceipts(dir).map((n) => `steps/${n}`)].map((n) => [n, fs.readFileSync(here(dir, n), 'utf8')]));
-    const resume = mode.startResume(ctx);
-    const play = mode.playWhile(ctx, resume.exited);
-    const { code } = await resume.exited;
-    await play;
-    assert.equal(code, 0, resume.output().stderr);
-    assert.ok(exists(mode.unitDir(ctx), 'unit-summary.json'));
-    assert.equal(mode.attempts(ctx).length, 1, 'no second attempt');
-    assert.equal(mode.agentStarts(ctx), 1, 'the agent did not run again');
-    for (const [name, text] of Object.entries(before)) assert.equal(fs.readFileSync(here(dir, name), 'utf8'), text, `${name} was left as adopt wrote it`);
-  });
 }
+
+// What adopt already closed stands: a resume reuses the result and adopts nothing again (the same code for both modes; direct is the cheaper one to run).
+const mode = MODES.direct;
+test('direct: a resume after adopt already closed the attempt uses its result and adopts nothing again', { skip: mode.skip, timeout: 600_000 }, async () => {
+  const row = 'gate-exit-no-receipt';
+  const ctx = await crashUntilAsync(row, mode.make, mode.rows[row].attempt, mode.rows[row].confirm);
+  const { dir } = ctx;
+  const env = mode.adoptEnv(ctx);
+  await spawnAdopt(dir, env);
+  await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 60_000, what: 'adopt to close the attempt' });
+  const before = Object.fromEntries(['receipt.json', 'result.json', 'closed.json', ...stepReceipts(dir).map((n) => `steps/${n}`)].map((n) => [n, fs.readFileSync(here(dir, n), 'utf8')]));
+  const resume = mode.startResume(ctx);
+  const play = mode.playWhile(ctx, resume.exited);
+  const { code } = await resume.exited;
+  await play;
+  assert.equal(code, 0, resume.output().stderr);
+  assert.ok(exists(mode.unitDir(ctx), 'unit-summary.json'));
+  assert.equal(mode.attempts(ctx).length, 1, 'no second attempt');
+  assert.equal(mode.agentStarts(ctx), 1, 'the agent did not run again');
+  for (const [name, text] of Object.entries(before)) assert.equal(fs.readFileSync(here(dir, name), 'utf8'), text, `${name} was left as adopt wrote it`);
+});

@@ -18,6 +18,11 @@ use fgos_run_supervisor::go_channel::{read_frame, write_frame};
 use serde_json::{json, Value};
 
 pub mod supervisor;
+#[path = "../support/wait.rs"]
+pub mod wait;
+
+#[allow(unused_imports)] // each test binary uses a subset of the shared helpers
+pub use wait::wait_for;
 
 pub trait Channel: Read + Write + Send {}
 impl<T: Read + Write + Send> Channel for T {}
@@ -54,19 +59,6 @@ pub fn driver_name() -> &'static str {
 
 pub fn boot_id() -> String {
     fgos_process::facts::boot_id().unwrap_or_else(|| "no-boot-id".into())
-}
-
-pub fn wait_for(path: &Path, limit: Duration) -> String {
-    let start = Instant::now();
-    loop {
-        if let Ok(text) = fs::read_to_string(path) {
-            if !text.trim().is_empty() {
-                return text;
-            }
-        }
-        assert!(start.elapsed() < limit, "{} never written", path.display());
-        sleep(Duration::from_millis(10));
-    }
 }
 
 pub struct Options {

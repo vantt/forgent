@@ -8,6 +8,10 @@ pub mod adopt_fixture;
 pub mod herdr;
 pub mod supervisor;
 pub mod terminal;
+pub mod wait;
+
+#[allow(unused_imports)] // each test binary uses a subset of the shared helpers
+pub use wait::wait_for;
 
 use std::collections::BTreeMap;
 use std::fs::{self, File};
@@ -72,19 +76,6 @@ pub fn boottime_ns() -> u64 {
     // SAFETY: clock_gettime writes one timespec.
     unsafe { libc::clock_gettime(clock, &mut ts) };
     ts.tv_sec as u64 * 1_000_000_000 + ts.tv_nsec as u64
-}
-
-pub fn wait_for(path: &Path, limit: Duration) -> String {
-    let start = Instant::now();
-    loop {
-        if let Ok(text) = fs::read_to_string(path) {
-            if !text.trim().is_empty() {
-                return text;
-            }
-        }
-        assert!(start.elapsed() < limit, "{} never written", path.display());
-        sleep(Duration::from_millis(10));
-    }
 }
 
 pub struct Options {

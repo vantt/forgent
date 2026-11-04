@@ -20,6 +20,9 @@ use serde_json::{json, Value};
 
 use super::{boot_id, boottime_ns, fixture, node};
 
+#[allow(unused_imports)] // each test binary uses a subset of the shared helpers
+pub use super::wait::wait_until;
+
 /// The binary that plays the host: `internal <route> ...`.
 pub fn internal_harness() -> PathBuf {
     let exe = std::env::current_exe().expect("current_exe");
@@ -297,14 +300,6 @@ pub fn finish(child: Child, limit: Duration) -> (i32, Value) {
         .and_then(|l| serde_json::from_str::<Value>(l).ok())
         .unwrap_or(Value::Null);
     (out.status.code().unwrap_or(-1), line)
-}
-
-pub fn wait_until(limit: Duration, what: &str, mut cond: impl FnMut() -> bool) {
-    let start = Instant::now();
-    while !cond() {
-        assert!(start.elapsed() < limit, "timed out waiting for {what}");
-        sleep(Duration::from_millis(10));
-    }
 }
 
 pub fn env_of(pairs: &[(&str, &str)]) -> BTreeMap<String, String> {

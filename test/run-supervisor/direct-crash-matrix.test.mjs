@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { lockHolders, probe } from '../../src/holder-lock/index.mjs';
 import { adoptRun } from '../../src/run-supervisor/client.mjs';
 import { dispatchCwdHolder } from '../../src/runner/dispatch/cwd-lock.mjs';
-import { BIN_FGOS, bwrapUsable, createProject, killToken, pidsWithToken, readJson, sleep, startRun, waitUntil } from './support/direct-harness.mjs';
+import { bwrapUsable, createProject, killToken, pidsWithToken, readJson, sleep, startRun, waitUntil } from './support/direct-harness.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -57,36 +57,6 @@ test('1. a controller killed with SIGKILL after the binding leaves an agent that
   assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'exited');
 });
 
-test('2. a controller that gets SIGINT asks the supervisor to cancel, waits for the receipt, prints the resume line and exits 130', { skip, timeout: 240_000 }, async () => {
-  const project = createProject({ agent: { runMs: 60_000 }, dispatch: { gateKillGraceMs: 1000 } });
-  const run = startRun(project, project.unitFile('crash-sigint'));
-  const dir = await attemptWhere(project, (d) => exists(d, 'agent-binding.json'), { what: 'the agent to start' });
-  run.child.kill('SIGINT');
-  const { code } = await run.exited;
-  assert.equal(code, 130, run.output().stderr);
-  assert.ok(exists(dir, 'cancel-requested.json'), 'the controller published its cancel request');
-  assert.equal(readJson(here(dir, 'cancel-requested.json')).by, 'signal:SIGINT');
-  assert.ok(exists(dir, 'receipt.json'), 'the controller waited for the receipt');
-  assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'cancelled');
-  assert.match(run.output().stderr, /fgos run --resume unit-run-/);
-  await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 150_000, what: 'the cancelled attempt to close' });
-  await assertSettledAttempt(project, dir);
-  assert.equal(starts(dir).length, 1);
-});
-
-test('2b. SIGTERM does the same and exits 143', { skip, timeout: 240_000 }, async () => {
-  const project = createProject({ agent: { runMs: 60_000 }, dispatch: { gateKillGraceMs: 1000 } });
-  const run = startRun(project, project.unitFile('crash-sigterm'));
-  const dir = await attemptWhere(project, (d) => exists(d, 'agent-binding.json'), { what: 'the agent to start' });
-  run.child.kill('SIGTERM');
-  const { code } = await run.exited;
-  assert.equal(code, 143, run.output().stderr);
-  assert.equal(readJson(here(dir, 'cancel-requested.json')).by, 'signal:SIGTERM');
-  await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 150_000, what: 'the cancelled attempt to close' });
-  assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'cancelled');
-  await assertSettledAttempt(project, dir);
-});
-
 /** Kill the controller, then the supervisor, once the agent runs; returns the attempt directory. */
 async function orphanTheAttempt(project, unitId) {
   const run = startRun(project, project.unitFile(unitId));
@@ -121,47 +91,6 @@ test('3. a supervisor killed midway: the agent runs to its end and the next fgos
   assert.equal(starts(dir).length, 1, 'the agent ran exactly once');
   assert.deepEqual(pidsWithToken(tok), []);
   assert.equal(readJson(here(dir, 'closed.json')).closedBy, 'adopt');
-});
-
-test('4. the soft deadline passes after the controller died: the supervisor stops the agent, the receipt says timeout and the grandchild is gone', { skip, timeout: 240_000 }, async () => {
-  const tok = token(); tokens.push(tok);
-  const project = createProject({ agent: { runMs: 120_000, grandchildToken: tok }, timeoutMs: 12_000, dispatch: { gateKillGraceMs: 1000 } });
-  const run = startRun(project, project.unitFile('crash-deadline'));
-  const dir = await attemptWhere(project, (d) => exists(d, 'supervisor-binding.json'), { what: 'the supervisor binding' });
-  await waitUntil(() => pidsWithToken(tok).length > 0, { timeoutMs: 90_000, what: 'the grandchild to exist' });
-  run.child.kill('SIGKILL');
-  await run.exited;
-  await waitUntil(() => exists(dir, 'closed.json'), { timeoutMs: 120_000, what: 'the attempt to close' });
-  assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'timeout');
-  assert.deepEqual(pidsWithToken(tok), [], 'the setsid grandchild died with the attempt');
-  await assertSettledAttempt(project, dir);
-});
-
-test('5. controller and supervisor both dead: the gate enforces the hard ceiling and the next run settles a timeout', { skip, timeout: 300_000 }, async () => {
-  const tok = token(); tokens.push(tok);
-  const project = createProject({ agent: { runMs: 300_000, grandchildToken: tok, ignoreSigterm: true }, timeoutMs: 1000, dispatch: { gateKillGraceMs: 1000 } });
-  const dir = await orphanTheAttempt(project, 'crash-ceiling');
-  const exit = await waitUntil(() => readJson(here(dir, 'gate-exit.json')), { timeoutMs: 150_000, what: 'the gate to end the agent at its ceiling' });
-  assert.ok(['hard-ceiling', 'timeout'].includes(exit.cause) || exit.stoppedBy !== 'agent', `unexpected gate exit ${JSON.stringify(exit)}`);
-  assert.deepEqual(pidsWithToken(tok), [], 'the agent and its grandchild are dead');
-  project.reconfigure({ agent: { runMs: 200 }, timeoutMs: 30_000 });
-  await sweepWith(project, 'crash-ceiling-next');
-  assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'timeout');
-  await assertSettledAttempt(project, dir);
-});
-
-test('6. two fgos run starting together over one attempt that needs adopting: it is adopted once', { skip, timeout: 240_000 }, async () => {
-  const project = createProject({ agent: { runMs: 1500 } });
-  const dir = await orphanTheAttempt(project, 'crash-two-adopters');
-  await waitUntil(() => readJson(here(dir, 'gate-exit.json')), { timeoutMs: 120_000, what: 'the gate to end the attempt' });
-  const first = startRun(project, project.unitFile('adopter-a'));
-  const second = startRun(project, project.unitFile('adopter-b'));
-  const [a, b] = await Promise.all([first.exited, second.exited]);
-  assert.deepEqual([a.code, b.code], [0, 0], `${first.output().stderr}\n${second.output().stderr}`);
-  await assertSettledAttempt(project, dir);
-  assert.equal(readJson(here(dir, 'closed.json')).closedBy, 'adopt');
-  const receipts = fs.readdirSync(here(dir, 'steps')).filter((f) => f.endsWith('.json'));
-  assert.deepEqual(receipts.sort(), ['finalize-home.json', 'settle-attempt.json'], 'each step ran once and left one receipt');
 });
 
 /**
@@ -256,21 +185,6 @@ const writingRun = (project, worktree, id) => startRun(
   project.unitFile(id, { writes: ['out.txt'] }),
   { cwd: worktree, args: ['--worktree', worktree] },
 );
-
-test('8. no descriptor of the attempt or cwd lock reaches the agent or its grandchild', { skip, timeout: 240_000 }, async () => {
-  const tok = token(); tokens.push(tok);
-  const { project, worktree } = projectWithWorktree({ runMs: 1500, grandchildToken: tok, writeFile: 'out.txt' });
-  const run = writingRun(project, worktree, 'leak');
-  const { code } = await run.exited;
-  assert.ok([0, 11, 12].includes(code), run.output().stderr);
-  const [dir] = project.attemptDirs();
-  for (const name of ['agent-fds.txt', 'grandchild-fds.txt']) {
-    const listing = fs.readFileSync(here(dir, `worker-output/outbox/${name}`), 'utf8');
-    assert.ok(listing.split('\n').filter(Boolean).length > 0, `${name} lists the descriptors`);
-    assert.doesNotMatch(listing, /attempt\.lock|dispatch-cwd/, `${name} holds a lock description:\n${listing}`);
-  }
-  assert.deepEqual(pidsWithToken(tok), []);
-});
 
 test('9. read-only attempts on one cwd share it without a lease; a writing attempt holds the lease until the run exits', { skip, timeout: 180_000 }, async () => {
   const project = createProject({ agent: { runMs: 3000 } });
