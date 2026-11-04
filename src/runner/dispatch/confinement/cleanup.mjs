@@ -32,7 +32,8 @@ export function resolveConfinementTempRoot(base = os.tmpdir()) {
   const uid = typeof process.getuid === 'function' ? process.getuid() : null;
   if (uid === null) return shared;
   try {
-    if (fs.statSync(shared).uid !== uid) return `${shared}-${uid}`;
+    // lstat: a link another user left under the shared name is theirs, whatever it points at.
+    if (fs.lstatSync(shared).uid !== uid) return `${shared}-${uid}`;
   } catch {
     // Absent: the shared name is ours to create.
   }

@@ -136,6 +136,25 @@ test('ensurePrivateDir refuses a path outside its root and never touches levels 
   } finally { f.cleanup(); }
 });
 
+test('a link under the shared root name owned by another user is not followed into a directory of this user', () => {
+  if (typeof process.getuid !== 'function' || process.getuid() === 0) return;
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-root-link-'));
+  try {
+    const mine = path.join(base, 'mine');
+    fs.mkdirSync(mine);
+    const link = path.join(base, 'fgos-confinement');
+    fs.symlinkSync(mine, link);
+    const realLstat = fs.lstatSync;
+    fs.lstatSync = (p, ...rest) => {
+      const st = realLstat(p, ...rest);
+      return p === link ? Object.assign(Object.create(Object.getPrototypeOf(st)), st, { uid: process.getuid() + 1 }) : st;
+    };
+    try {
+      assert.equal(resolveConfinementTempRoot(base), `${link}-${process.getuid()}`);
+    } finally { fs.lstatSync = realLstat; }
+  } finally { fs.rmSync(base, { recursive: true, force: true }); }
+});
+
 test('a root owned by another user is not reused: a per-uid root is chosen', () => {
   if (typeof process.getuid !== 'function') return;
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-root-owner-'));
@@ -145,14 +164,14 @@ test('a root owned by another user is not reused: a per-uid root is chosen', () 
     if (process.getuid() !== 0) {
       const foreign = path.join(base, 'fgos-confinement');
       fs.mkdirSync(foreign);
-      const realStat = fs.statSync;
-      fs.statSync = (p, ...rest) => {
-        const st = realStat(p, ...rest);
+      const realLstat = fs.lstatSync;
+      fs.lstatSync = (p, ...rest) => {
+        const st = realLstat(p, ...rest);
         return p === foreign ? Object.assign(Object.create(Object.getPrototypeOf(st)), st, { uid: process.getuid() + 1 }) : st;
       };
       try {
         assert.equal(resolveConfinementTempRoot(base), `${foreign}-${process.getuid()}`);
-      } finally { fs.statSync = realStat; }
+      } finally { fs.lstatSync = realLstat; }
     }
   } finally { fs.rmSync(base, { recursive: true, force: true }); }
 });

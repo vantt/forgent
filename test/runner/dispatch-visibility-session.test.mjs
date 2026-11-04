@@ -176,6 +176,22 @@ test('the latest round is chosen by number, not by filename', () => {
 });
 
 
+test('a claim is only a regular file named by the protocol rule: no link, no leading zero', () => {
+  const dir = makeRunDir();
+  try {
+    const outbox = path.join(dir, 'outbox');
+    fs.mkdirSync(outbox, { recursive: true });
+    const real = path.join(dir, 'elsewhere.json');
+    fs.writeFileSync(real, JSON.stringify({ status: 'settled' }));
+    fs.writeFileSync(path.join(outbox, 'result-007.json'), JSON.stringify({ round: 7 }));
+    fs.symlinkSync(real, path.join(outbox, 'result-9.json'));
+    assert.equal(findWorkerResult(dir), null, 'neither a zero-padded name nor a link is a claim');
+
+    fs.writeFileSync(path.join(outbox, 'result-3.json'), JSON.stringify({ round: 3 }));
+    assert.equal(findWorkerResult(dir), path.join(outbox, 'result-3.json'), 'the newest real result wins over what was ignored');
+  } finally { cleanup(dir); }
+});
+
 test('classifyRunOutcome decides without writing anything', () => {
   const dir = makeRunDir({ withResult: true });
   try {

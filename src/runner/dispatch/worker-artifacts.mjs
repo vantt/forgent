@@ -45,17 +45,22 @@ export function resolveWorkerArtifactPath(runDir, roundPattern, legacyName) {
   for (const dir of candidateDirs) {
     let entries = [];
     try {
-      entries = fs.readdirSync(dir);
+      entries = fs.readdirSync(dir, { withFileTypes: true });
     } catch {
       continue;
     }
     const latest = entries
-      .map((name) => ({ name, round: Number((name.match(roundPattern) ?? [])[1]) }))
+      // A link planted among the results is never the newest result.
+      .filter((entry) => entry.isFile())
+      .map((entry) => ({ name: entry.name, digits: (entry.name.match(roundPattern) ?? [])[1] }))
+      // The agent protocol's rule for result names: plain decimal, no sign and no leading zero.
+      .filter((e) => typeof e.digits === 'string' && /^(?:0|[1-9]\d*)$/.test(e.digits))
+      .map((e) => ({ name: e.name, round: Number(e.digits) }))
       .filter((e) => Number.isFinite(e.round))
       .sort((a, b) => a.round - b.round)
       .pop();
     if (latest) return path.join(dir, latest.name);
-    if (legacyName && entries.includes(legacyName)) return path.join(dir, legacyName);
+    if (legacyName && entries.some((entry) => entry.name === legacyName)) return path.join(dir, legacyName);
   }
   return path.join(runDir, legacyName);
 }
@@ -65,5 +70,7 @@ export function resolveWorkerArtifactPath(runDir, roundPattern, legacyName) {
  * a worker left an account of its work. */
 export function findWorkerClaim(runDir) {
   const claim = resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
-  return fs.existsSync(claim) ? claim : null;
+  // Present means something is there, a link or a pipe included: the reader refuses what it cannot trust,
+  // and an attempt that left such a thing failed instead of leaving nothing.
+  return fs.lstatSync(claim, { throwIfNoEntry: false }) ? claim : null;
 }

@@ -12,7 +12,7 @@ import { acquireRunControl, buildRunControlHolder } from '../../runner/dispatch/
 import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs';
 import { strayWriteWarning, watchWritesOutsideWorkspace } from '../../runner/dispatch/stray-writes.mjs';
 import { createTerminalControl } from '../../terminal-control/client.mjs';
-import { resolveWorkerArtifactPath } from '../../runner/dispatch/worker-artifacts.mjs';
+import { findWorkerClaim } from '../../runner/dispatch/worker-artifacts.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
 
 /** The last lines of a pane screen that may carry the reset time a provider printed. */
@@ -116,8 +116,7 @@ function claimOf(runDir, envelope, receipt) {
     if (path.basename(receipt.outboxResult) !== receipt.outboxResult) throw new StepError('io', 'receipt.json names an outbox result outside the outbox');
     return path.join(envelope.launch.outboxDir, receipt.outboxResult);
   }
-  const found = resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
-  return fs.existsSync(found) ? found : null;
+  return findWorkerClaim(runDir);
 }
 
 /** Why a terminal attempt was stopped, in the words of its screen: a person reads this, not a log. */

@@ -201,6 +201,20 @@ test('a terminal config that cannot build the control gives the private home bac
   } finally { fake.cleanup(); }
 });
 
+test('a link left where this round\'s result will be written settles nothing: the round is refused before a pane opens', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}] });
+  try {
+    const runDir = path.join(dir, 'run-link');
+    fs.mkdirSync(path.join(runDir, 'outbox'), { recursive: true });
+    fs.symlinkSync(path.join(dir, 'nowhere.json'), path.join(runDir, 'outbox', 'result-1.json'));
+    await assert.rejects(prepareTerminalAttempt({
+      attemptId: 'cmd_link', runId: 'run_link', runDir, cwd: dir, repoRoot: dir, prompt: 'p', workId: 'w', tier: 'standard', model: 'sonnet',
+      herdrBin: fake.herdrBin, fullEnv: { ...process.env }, agentKind: 'claude', dispatchBatchKey: 'g-link',
+    }), (error) => error.reason === 'stale-result-in-run-dir');
+    assert.equal(verbs(fake, 'pane', 'split').length + verbs(fake, 'tab', 'create').length, 0);
+  } finally { fake.cleanup(); }
+});
+
 test('an entry a person vouched for is never named for removal', { skip, timeout: 120_000 }, async () => {
   const { dir, fake } = fakeWith({ panes: [{}] });
   try {

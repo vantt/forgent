@@ -351,7 +351,7 @@ export async function prepareTerminalAttempt(ctx) {
   // A run directory that already holds this round's result would settle the attempt before the agent just
   // briefed has done anything. The result file outranks everything; what it cannot know is whether the
   // file belongs to THIS round, and this is the only place that distinction still exists.
-  if (fs.existsSync(paths.resultPath)) {
+  if (fs.lstatSync(paths.resultPath, { throwIfNoEntry: false })) {
     throw new DispatchError(
       'invalid-config',
       `executor for work "${workId}" refused: ${paths.resultPath} already exists before this round started, so the attempt would settle on somebody else's result. Use a fresh run directory or a new round.`,
