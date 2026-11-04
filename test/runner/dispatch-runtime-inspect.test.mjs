@@ -223,3 +223,23 @@ test('real fixture run with cwd strictly conforms to RunObservation closed vocab
   assert.ok(VALID_COMPLETENESS.has(unadmittedObs.evidenceCompleteness.ownership), 'ownership completeness must be in VALID_COMPLETENESS');
   assert.equal(unadmittedObs.evidenceCompleteness.ownership, 'missing');
 });
+
+test('inspecting a workspace reads each bound run result once, however many times the aggregate uses it', (t) => {
+  const root = fixture(), work = path.join(root, 'work');
+  fs.mkdirSync(path.join(work, '.git'), { recursive: true });
+  fs.writeFileSync(path.join(work, '.git', 'commondir'), '.');
+  for (const id of ['a', 'b', 'c']) {
+    assignment(root, id);
+    run(root, id, '01', { runId: `run-${id}`, cwd: work }, v1(`run-${id}`, id));
+    admit(root, id, 1, { runId: `run-${id}`, attempt: 1 });
+  }
+  const reads = [];
+  const original = fs.readFileSync;
+  t.mock.method(fs, 'readFileSync', (file, ...rest) => {
+    if (typeof file === 'string' && file.endsWith(`${path.sep}result.json`)) reads.push(file);
+    return original.call(fs, file, ...rest);
+  });
+  const got = inspectDispatchRuntime(root, { cwd: work });
+  assert.equal(got.observations[0].value.historicalRunIds.length, 3);
+  assert.equal(reads.length, 3);
+});
