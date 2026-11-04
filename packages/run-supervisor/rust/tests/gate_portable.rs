@@ -182,7 +182,7 @@ fn the_hard_ceiling_is_enforced_with_no_supervisor_left() {
     let ran = marker("ceiling");
     let mut options = Options::new(&["stubborn", &ran.to_string_lossy()]);
     options.grace_ms = 500;
-    options.ceiling = Some((boot_id(), boottime_ns() + 6_000_000_000));
+    options.ceiling = Some((boot_id(), boottime_ns() + 4_000_000_000));
     let started = Instant::now();
     let attempt = Attempt::new("ceiling", &options);
     let mut gate = start_gate(&attempt);
@@ -211,7 +211,7 @@ fn the_hard_ceiling_is_enforced_with_no_supervisor_left() {
     assert_eq!(code, 0);
     let took = started.elapsed();
     assert!(
-        took >= Duration::from_millis(5_500),
+        took >= Duration::from_millis(3_500),
         "the ceiling is absolute: {took:?}"
     );
     let exit = attempt.gate_exit().unwrap();

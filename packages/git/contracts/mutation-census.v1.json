@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "57060b88d9dd8f1382623c38f6bf9d3efbe16f08292d7028c2a5f80821b1e8de",
+  "payloadDigest": "c214b7a0eaf77942962067cb486e8cc1e09aaea7d49a02d7a8ba99c7654d377d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -680,8 +680,8 @@
     "packages/run-supervisor/rust/tests/gate_ceiling.rs": "13867988acec887378fe4f867d5c4996b2228c3b2a3ee9d10f1a041caa02af48",
     "packages/run-supervisor/rust/tests/gate_go.rs": "add8f380fab8a05bc84afe05b1519ee39be51238968fcb8ebaa8b401425154d5",
     "packages/run-supervisor/rust/tests/gate_orphan.rs": "8260848ef2a6ac3d0a9e4e7784bdc0064b078817a4e33c8b81d2a2d24aeebd87",
-    "packages/run-supervisor/rust/tests/gate_pid1.rs": "44dec887fb8b30957842dd32e45220cc14f680f5067353eb5628dfe99f006fdf",
-    "packages/run-supervisor/rust/tests/gate_portable.rs": "33257a50e8effd7b202a7ee94f4087654d3533dd0de7a89755744baeacc4bfda",
+    "packages/run-supervisor/rust/tests/gate_pid1.rs": "26ee9e7182c8ef26690ef45b7158b9cd81a7c7bbd9b09945c36f5f5813a1f220",
+    "packages/run-supervisor/rust/tests/gate_portable.rs": "3ba7d91a871916435581b24204e3f885b3584454b462d58fac48712995ff17cd",
     "packages/run-supervisor/rust/tests/gate_terminal_socket.rs": "cba60e64b6f41309553c78216e66937d164b70bc2f1b37e49d657882daf2ce00",
     "packages/run-supervisor/rust/tests/portable/mod.rs": "6153ea7719f18ef0cc293fde0d603101df1308a4b2980edcc8dff57ad6d37363",
     "packages/run-supervisor/rust/tests/portable/supervisor.rs": "7c927cf97a970c37493f26e5ffedf3aefd59e294254d3b73583ab3db4cada1b2",
@@ -692,7 +692,7 @@
     "packages/run-supervisor/rust/tests/supervise_guard.rs": "d79b6760183e60ae29306ad0bf0a80918be8767fc03a7ae267ca80536e225839",
     "packages/run-supervisor/rust/tests/supervise_lifecycle.rs": "83c25fe34ab217ba4b5b1e679599ca44f9f787ccf5be351cb88a0a888f8c528f",
     "packages/run-supervisor/rust/tests/supervise_portable.rs": "0f667d7d6e87a540194a2619710f88981bdf4e43a8b65ca0bd8b98d7f7341cc3",
-    "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs": "449c95e352a8a417823a462e5844c9f2d4576eaa0516d1ca0a3550aa61978556",
+    "packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs": "81f0993cf698087433cc477960905f489b682bb32fb10a760f6c5760a2c83838",
     "packages/run-supervisor/rust/tests/support/adopt_fixture.rs": "6502d05ca84340edb98ff6d27907c30f1e438a5c9341d802ccec29fc10b0971c",
     "packages/run-supervisor/rust/tests/support/herdr.rs": "2e0517015a00e1e40c4a0cb7c8dcf572a65f5332812936be33269605d5c10cee",
     "packages/run-supervisor/rust/tests/support/mod.rs": "728910e2ab68b8f0e1c541da067dfb5d6e0916f7d431c21497ca469d04353404",

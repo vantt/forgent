@@ -302,14 +302,14 @@ fn a_pane_that_disappears_is_a_lost_carrier_and_nothing_is_closed() {
 fn only_new_words_on_the_screen_keep_a_working_agent_from_idling_never_a_spinner_or_a_clock() {
     let herdr = FakeHerdr::new("alive");
     let mut run = terminal_run_with("talive", &herdr, "sleep 600", 500, |opts| {
-        opts.idle_ms = Some(6_000)
+        opts.idle_ms = Some(3_000)
     });
     let supervisor = run.start_with_env(&herdr.env());
 
     brief_taken(&herdr, &run);
     let screen = herdr.dir.join("screen.txt");
     // More than an idle period of new output: the agent is making progress.
-    for line in 0..20 {
+    for line in 0..10 {
         let words: String = (0..=line)
             .map(|n| format!("step {}\n", "abcdefghijklmnopqrstu".chars().nth(n).unwrap()))
             .collect();
@@ -367,8 +367,8 @@ fn only_new_words_on_the_screen_keep_a_working_agent_from_idling_never_a_spinner
 fn a_pane_that_cannot_be_read_is_blind_time_that_runs_to_the_deadline_never_idle() {
     let herdr = FakeHerdr::new("blind");
     let mut run = terminal_run_with("tblind", &herdr, "sleep 600", 500, |opts| {
-        opts.idle_ms = Some(6_000);
-        opts.soft_ms = Some(16_000);
+        opts.idle_ms = Some(3_000);
+        opts.soft_ms = Some(10_000);
     });
     let supervisor = run.start_with_env(&herdr.env());
 
@@ -400,7 +400,7 @@ fn a_pane_that_cannot_be_read_is_blind_time_that_runs_to_the_deadline_never_idle
 fn receipt_of_a_deadline_stop(name: &str, screen: &str) -> Value {
     let herdr = FakeHerdr::new(name);
     let mut run = terminal_run_with(&format!("t{name}"), &herdr, "sleep 600", 500, |opts| {
-        opts.soft_ms = Some(12_000)
+        opts.soft_ms = Some(6_000)
     });
     let supervisor = run.start_with_env(&herdr.env());
     brief_taken(&herdr, &run);
@@ -562,7 +562,7 @@ fn a_supervisor_killed_after_the_brief_leaves_the_gate_running_and_adopt_release
 fn a_fifo_named_like_a_result_does_not_stop_the_orphaned_gate_from_enforcing_the_hard_ceiling() {
     let herdr = FakeHerdr::new("fifo-ceiling");
     let mut run = terminal_run_with("tfifo", &herdr, "sleep 600", 1_000, |opts| {
-        opts.ceiling_in_ms = 9_000
+        opts.ceiling_in_ms = 6_000
     });
     let mut supervisor = run.start_with_env(&herdr.env());
 
