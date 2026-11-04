@@ -344,7 +344,7 @@ test('one settled run keeps effort and model drift provenance beside a correlate
     effectivePolicy: { tier: 'standard', model: 'm1', reasoningEffort: 'high', provenance: { reasoningEffort: { value: 'high', source: { scope: 'cliOverride' } } } },
     reasoningEffort: 'high',
     modelWarnings: [{ code: 'model-drift', requested: 'm1', launched: 'm2' }],
-    opts: { cwd, repoRoot: base },
+    opts: { cwd, repoRoot: base, adapter: 'cli-spawn' },
   });
   const stored = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
   for (const r of [runResult, stored]) {

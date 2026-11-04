@@ -535,6 +535,9 @@ export async function settleRunOutcome({
   dispatchWarnings = [],
   opts = {},
 }) {
+  if (typeof opts?.adapter !== 'string' || opts.adapter === '') {
+    throw new RunnerConfigError('settleRunOutcome requires opts.adapter: the adapter the run declares (cli-spawn or herdr-spawn).', { code: 'adapter-required' });
+  }
   const root = resolveSafeRoot(runDir, opts?.repoRoot);
 
   fs.writeFileSync(path.join(runDir, 'stdout.log'), stdoutText || '');
@@ -720,7 +723,7 @@ export async function settleRunOutcome({
   try { if (fs.existsSync(stdoutPath)) stdoutContent = fs.readFileSync(stdoutPath, 'utf8'); } catch {}
   try { if (fs.existsSync(stderrPath)) stderrContent = fs.readFileSync(stderrPath, 'utf8'); } catch {}
 
-  const usage = parseUsageForAdapter(resolvedExecutorId || opts?.adapter || 'cli-spawn', {
+  const usage = parseUsageForAdapter(resolvedExecutorId || opts.adapter, {
     stdout: stdoutContent,
     stderr: stderrContent,
   });
@@ -756,7 +759,7 @@ export async function settleRunOutcome({
     controlEpoch,
     controlToken,
     executorId: resolvedExecutorId || runMeta.executorId || null,
-    adapter: opts?.adapter || (resolvedExecutorId?.includes('herdr') ? 'herdr-spawn' : 'cli-spawn'),
+    adapter: opts.adapter,
     confinement: ranConfinementBackend(runDir, launchCommandId, attestation),
     warnings: [
       ...(lostUncommittedPaths.length > 0 ? [{ code: 'uncommitted-paths-lost', paths: lostUncommittedPaths }] : []),

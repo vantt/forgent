@@ -120,7 +120,7 @@ test('settlement takes a provider stop and its cause from the caller, never from
         effectiveCwd: cwd,
         gitBefore: git('rev-parse', 'HEAD'),
         dirtyBefore: [],
-        opts: { cwd, repoRoot: base },
+        opts: { cwd, repoRoot: base, adapter: 'cli-spawn' },
         ...stop,
       });
       return runResult.classification.failure;

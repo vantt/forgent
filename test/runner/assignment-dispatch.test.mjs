@@ -2322,7 +2322,7 @@ test('M12 lock: settlement evaluates changedFiles and classification in opts.cwd
     effectiveCwd: effectiveCwdDir,
     gitBefore: null,
     dirtyBefore: [],
-    opts: { cwd: cwdDir, repoRoot: cwdDir },
+    opts: { cwd: cwdDir, repoRoot: cwdDir, adapter: 'cli-spawn' },
   });
 
   assert.ok(

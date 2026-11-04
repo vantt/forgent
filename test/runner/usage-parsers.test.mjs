@@ -9,7 +9,6 @@ import {
   parsePiUsage,
   parseCodexCliUsage,
   parseClaudeUsage,
-  parseHerdrUsage,
   parseUsageForAdapter,
 } from '../../src/runner/dispatch/usage-parsers.mjs';
 
@@ -126,18 +125,6 @@ test('parseClaudeUsage: returns transcript source marker', () => {
   });
 });
 
-test('parseHerdrUsage: returns unavailable-herdr marker', () => {
-  const usage = parseHerdrUsage();
-  assert.deepEqual(usage, {
-    inputTokens: null,
-    outputTokens: null,
-    totalTokens: null,
-    cacheReadTokens: null,
-    cacheCreationTokens: null,
-    source: 'unavailable-herdr',
-  });
-});
-
 test('parseUsageForAdapter: dispatches correctly by adapter name', () => {
   const piFile = path.join(FIXTURES_DIR, 'pi-multiturn-normal.jsonl');
   const codexFile = path.join(FIXTURES_DIR, 'codex-cli-normal.stderr.log');
@@ -157,10 +144,6 @@ test('parseUsageForAdapter: dispatches correctly by adapter name', () => {
   // claude adapter
   const claudeResult = parseUsageForAdapter('claude-bwrap');
   assert.equal(claudeResult.source, 'transcript');
-
-  // herdr adapter
-  const herdrResult = parseUsageForAdapter('codex-herdr');
-  assert.equal(herdrResult.source, 'unavailable-herdr');
 
   // unsupported adapter
   const unknownResult = parseUsageForAdapter('unknown-worker');

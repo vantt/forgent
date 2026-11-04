@@ -39,7 +39,7 @@ async function settle(runDir, extra = {}) {
     dirtyBefore: [],
     // The policy a caller asked for is not evidence of what ran.
     effectivePolicy: { confinement: { mode: 'required', policyId: 'host-write-denied' } },
-    opts: { cwd: runDir, repoRoot: runDir },
+    opts: { cwd: runDir, repoRoot: runDir, adapter: 'cli-spawn' },
     ...extra,
   });
   return outcome.runResult;

@@ -135,22 +135,6 @@ export function parseClaudeUsage() {
 }
 
 /**
- * Herdr tokens are unavailable through herdr runner output.
- *
- * @returns {object}
- */
-export function parseHerdrUsage() {
-  return Object.freeze({
-    inputTokens: null,
-    outputTokens: null,
-    totalTokens: null,
-    cacheReadTokens: null,
-    cacheCreationTokens: null,
-    source: 'unavailable-herdr',
-  });
-}
-
-/**
  * Parse usage for a given adapter and output files.
  *
  * @param {string} adapter Adapter key or executor name
@@ -162,9 +146,6 @@ export function parseHerdrUsage() {
 export function parseUsageForAdapter(adapter, { stdout, stderr } = {}) {
   try {
     const normalized = typeof adapter === 'string' ? adapter.toLowerCase() : '';
-    if (normalized.includes('herdr')) {
-      return parseHerdrUsage();
-    }
     if (normalized.includes('claude')) {
       return parseClaudeUsage();
     }

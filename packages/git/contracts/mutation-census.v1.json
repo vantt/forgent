@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "78a4633c802ae57d22b39debbbe50e18e0ab36f337ca50dd61afe4d799aa5f47",
+  "payloadDigest": "0d1c7ea0354ff97333892e1dab81379b5ea78bc95f48ea42daddd46aef7ae665",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1018,7 +1018,7 @@
     "src/runner/dispatch/run-result.mjs": "d3132edd5709611b42425ddc900a47c037119c63377323eb6a3f8411b437ee26",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runtime-inspection.mjs": "ac654520c2b447ce69fa883feb5e5486b0ba679cfd95bbc5438f94e091eb5b2e",
-    "src/runner/dispatch/settlement.mjs": "9afae42dde3674b86df2efb2eaffa9263dd4cef5cbf785662a76538231d9cedf",
+    "src/runner/dispatch/settlement.mjs": "c64656379355af86c9daf33e169888fad6794b030b56aba1b0eff42c7b4ee3ac",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/stop-processes-inside.mjs": "ae37ac4e4b33d235d7da1a3bfca849980ce8816f6db86b9aec285bcccdb58c2b",
     "src/runner/dispatch/stray-writes.mjs": "8ab287ef44a7e731d4c22fb50e820017645d707e9b41b63a75b7fb4bc028f2ff",
@@ -1026,7 +1026,7 @@
     "src/runner/dispatch/tier-cell.mjs": "3c1a50df77c26c22c6bc88d00da6b90012008e633bdbb27c4d854fb1a369b722",
     "src/runner/dispatch/transport.mjs": "01d89783f0c3b4591be227d58ecc808401f306133388d4985f52bb53ad3e5f11",
     "src/runner/dispatch/trust-store.mjs": "980091da229ab962857f16acc955c5fa577a0c4f2f5c1ca3ffa9cec6af4f871f",
-    "src/runner/dispatch/usage-parsers.mjs": "18e1755935c8b7c769e7775a2c28964f3c2e87d689e730db2baf8ca0cbc4515d",
+    "src/runner/dispatch/usage-parsers.mjs": "e1dab633033d43fe88fc0bf0db6595897c0b999205619ef1efdee7c2e9db7d18",
     "src/runner/dispatch/visibility-session.mjs": "b341ffa4fac38a9e0867332c85e9486b4004bb4c1bb3860da83c849ac5b722ec",
     "src/runner/dispatch/work-item-input.mjs": "0a6a5be598723f70d53f01bbb0274f3e5ae3a18a24dc1cd9e822799972fb428d",
     "src/runner/dispatch/worker-artifacts.mjs": "2df63327a80ce692096c1563cbea09699cccfb1f6153400aa9f2a6581328e20d",
