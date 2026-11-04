@@ -257,19 +257,25 @@ impl SentSummary {
                     Answer::None => "no answer yet".to_owned(),
                     Answer::Offered(at) => format!("offered to the session after {} s", took(*at)),
                     Answer::Refused(reason, at) => {
-                        format!("refused ({reason}) after {} s", took(*at))
+                        format!("refused ({}) after {} s", printable(reason), took(*at))
                     }
                 };
                 let to = row.to.rsplit('/').next().unwrap_or(&row.to);
                 format!(
                     "  sent {} ago to {} \"{}\": {answer}",
                     ago(age),
-                    to.chars().take(8).collect::<String>(),
-                    row.preview
+                    printable(&to.chars().take(8).collect::<String>()),
+                    printable(&row.preview)
                 )
             })
             .collect()
     }
+}
+
+/// Text from a message body or a receiver's reason reaches the terminal on one row: a control
+/// character (newline, escape) becomes a space so it can neither split the row nor drive the terminal.
+fn printable(text: &str) -> String {
+    text.chars().map(|c| if c.is_control() { ' ' } else { c }).collect()
 }
 
 fn ago(secs: u64) -> String {
@@ -506,7 +512,12 @@ pub fn send(
 
 #[cfg(test)]
 mod tests {
-    use super::{SENT_DOMAIN, SENT_DOMAIN_WAKE, SETTLED_DOMAIN, WIRE_MAX_BODY_BYTES};
+    use super::{printable, SENT_DOMAIN, SENT_DOMAIN_WAKE, SETTLED_DOMAIN, WIRE_MAX_BODY_BYTES};
+
+    #[test]
+    fn a_listed_send_keeps_to_one_row_with_no_terminal_control_characters() {
+        assert_eq!(printable("a\nb\u{1b}[31mc"), "a b [31mc");
+    }
 
     #[test]
     fn the_wire_cap_and_signing_domain_equal_the_remote_contract() {
