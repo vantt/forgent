@@ -177,6 +177,30 @@ test('the folder-trust entry a seat wrote is taken back by the cleanup step, fro
   } finally { fake.cleanup(); }
 });
 
+test('a terminal config that cannot build the control gives the private home back', { skip, timeout: 120_000 }, async () => {
+  const { dir, fake } = fakeWith({ panes: [{}] });
+  try {
+    const sourceHome = path.join(dir, 'source-home');
+    fs.mkdirSync(path.join(sourceHome, '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(sourceHome, '.claude', '.credentials.json'), JSON.stringify({ claudeAiOauth: { accessToken: 'x' } }));
+    fs.writeFileSync(path.join(sourceHome, '.claude.json'), JSON.stringify({ projects: { [dir]: trustedProjectEntry() } }));
+    const homesBefore = new Set(fs.readdirSync(os.tmpdir()));
+    const runDir = path.join(dir, 'run-home');
+    fs.mkdirSync(runDir, { recursive: true });
+    await assert.rejects(prepareTerminalAttempt({
+      attemptId: 'cmd_home', runId: 'run_home', runDir, cwd: dir, repoRoot: dir, prompt: 'p', workId: 'w', tier: 'standard', model: 'sonnet',
+      herdrBin: fake.herdrBin, fullEnv: { ...process.env, HOME: sourceHome }, agentKind: 'claude', dispatchBatchKey: 'g-home',
+      confinement: { privateHome: true },
+      terminalConfig: { get unusable() { throw new Error('terminal config unusable'); } },
+    }), /terminal config unusable/);
+    const homes = fs.readdirSync(os.tmpdir()).filter((name) => name.startsWith('worker-') && !homesBefore.has(name));
+    assert.equal(homes.length, 1);
+    try {
+      assert.equal(fs.existsSync(path.join(os.tmpdir(), homes[0], '.claude', '.credentials.json')), false, 'the login copy is taken out of the home');
+    } finally { fs.rmSync(path.join(os.tmpdir(), homes[0]), { recursive: true, force: true }); }
+  } finally { fake.cleanup(); }
+});
+
 test('an entry a person vouched for is never named for removal', { skip, timeout: 120_000 }, async () => {
   const { dir, fake } = fakeWith({ panes: [{}] });
   try {

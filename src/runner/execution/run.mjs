@@ -1152,7 +1152,7 @@ async function runUnitBody(options, scope) {
   };
 
   // Helper to run one seat: bind it, publish the binding, then launch it.
-  const runRole = async ({ seat, unit: rUnit, round = 1, independentOf = [], preferIndependentOf = [], inputs = [], batch }) => {
+  const runRoleBody = async ({ seat, unit: rUnit, round = 1, independentOf = [], preferIndependentOf = [], inputs = [], batch }) => {
     assertNotCancelled();
     const seatId = seat.seat;
     // A seat id names a directory and a ref segment of this run; only Convention's ids reach a path.
@@ -1536,6 +1536,15 @@ async function runUnitBody(options, scope) {
       bound = next;
       attemptNo += 1;
     }
+  };
+
+  // A seat of a group arrives at the group's barrier exactly once however it ends, so a seat that throws
+  // before it is bound never leaves its siblings waiting for the group to be bound.
+  const runRole = async (args) => {
+    const barrier = args.batch;
+    let arrived = false;
+    const batch = barrier && { ...barrier, arrive() { if (!arrived) { arrived = true; barrier.arrive(); } } };
+    try { return await runRoleBody({ ...args, batch }); } finally { batch?.arrive(); }
   };
 
   // The deterministic check a round ends with: the unit's own `verify`, else its capability's. It

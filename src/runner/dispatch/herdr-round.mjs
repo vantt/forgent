@@ -389,20 +389,23 @@ export async function prepareTerminalAttempt(ctx) {
 
   const projectRoot = repoRoot ?? cwd;
   const groupKey = portKey(dispatchBatchKey ?? runId ?? workId ?? key);
-  const tc = createRoundTerminalControl({
-    herdrBin,
-    herdrEnv: sessionEnv,
-    config: { ...terminalRouteConfig(projectRoot), ...(terminalConfig ?? {}) },
-  });
+  // Built inside the try below: the private home exists from here on, and a terminal config that cannot
+  // build a control must give it back like every other failure of this function.
+  let tc;
   const display = slotDisplay({ ...workLabel, agent: agentKind, model, role: rawContract?.assignment?.role });
 
   const abandon = async () => {
-    try { await tc.releaseAsync({ key, groupKey, disposition: 'close' }); } catch { /* the pane is the port's to reconcile */ }
+    if (tc) { try { await tc.releaseAsync({ key, groupKey, disposition: 'close' }); } catch { /* the pane is the port's to reconcile */ } }
     try { await cleanupTrust({ runDir }); } catch { /* a leftover entry costs one line in the store */ }
     if (workerHomePath) { try { redactWorkerHome(workerHomePath); } catch { /* nothing further to do about a home we cannot read */ } }
   };
 
   try {
+    tc = createRoundTerminalControl({
+      herdrBin,
+      herdrEnv: sessionEnv,
+      config: { ...terminalRouteConfig(projectRoot), ...(terminalConfig ?? {}) },
+    });
     // A pane already sitting in the caller's own tab joins the group, so the batch opens beside it. A pane
     // that cannot be taken is no anchor: the group simply opens its own tab.
     if (anchorPaneId) {

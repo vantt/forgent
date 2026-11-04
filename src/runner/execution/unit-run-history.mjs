@@ -43,54 +43,56 @@ export function outcomeOfRunResult(runResult) {
 export function readUnitRunSeats(unitDir) {
   const seats = [];
   if (!fs.existsSync(unitDir)) return seats;
-  try {
-    for (const entry of fs.readdirSync(unitDir, { withFileTypes: true })) {
-      if (!entry.isDirectory()) continue;
-      const seatId = entry.name;
-      const seatDir = path.join(unitDir, seatId);
-      const byRound = new Map();
-      for (const roundEntry of fs.readdirSync(seatDir, { withFileTypes: true })) {
-        if (!roundEntry.isDirectory()) continue;
-        const match = /^(\d+)(?:-fb(\d+))?$/.exec(roundEntry.name);
-        if (!match) continue;
-        const round = Number.parseInt(match[1], 10);
-        const fallbackNo = match[2] ? Number.parseInt(match[2], 10) : 0;
-        const assignmentDir = path.join(seatDir, roundEntry.name);
-        const runsDir = path.join(assignmentDir, 'runs');
-        const runNames = fs.existsSync(runsDir)
-          ? fs.readdirSync(runsDir).filter((name) => /^\d+$/.test(name)).sort(compareRunNames)
-          : [];
-        const settled = runNames.filter((name) => fs.existsSync(path.join(runsDir, name, 'result.json')));
-        if (settled.length === 0) continue;
-        const roundRecord = byRound.get(round) ?? { seat: seatId, round, attempts: [], selected: null };
-        byRound.set(round, roundRecord);
-        let assignment = null;
-        try { assignment = JSON.parse(fs.readFileSync(path.join(assignmentDir, 'assignment.json'), 'utf8')); } catch { /* optional metadata */ }
-        for (const runName of settled) {
-          const resultFile = path.join(runsDir, runName, 'result.json');
-          let attempt = null;
-          try {
-            const runResult = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
-            attempt = {
-              assignmentId: `${path.basename(unitDir)}/${seatId}/${roundEntry.name}`,
-              assignment, fallbackNo, runName, runResult,
-              outcome: outcomeOfRunResult(runResult),
-            };
-            roundRecord.attempts.push(attempt);
-          } catch { /* Ignore corrupted result. */ }
-          if (runName === settled[settled.length - 1]
-            && (!roundRecord.selected || fallbackNo > roundRecord.selected.fallbackNo)) {
-            roundRecord.selected = { fallbackNo, attempt };
-          }
-        }
-      }
-      for (const roundRecord of byRound.values()) {
-        roundRecord.attempts.sort((a, b) => a.fallbackNo - b.fallbackNo || compareRunNames(a.runName, b.runName));
-        seats.push({ seat: seatId, round: roundRecord.round, attempts: roundRecord.attempts, final: roundRecord.selected?.attempt ?? null });
+  for (const entry of fs.readdirSync(unitDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    // A seat directory that vanishes mid-walk holds nothing to read; any other failure is not "the seat never ran".
+    try { seats.push(...readSeatDirectory(unitDir, entry.name)); } catch (err) { if (err?.code !== 'ENOENT' && err?.code !== 'ENOTDIR') throw err; }
+  }
+  return seats;
+}
+
+function readSeatDirectory(unitDir, seatId) {
+  const seatDir = path.join(unitDir, seatId);
+  const byRound = new Map();
+  for (const roundEntry of fs.readdirSync(seatDir, { withFileTypes: true })) {
+    if (!roundEntry.isDirectory()) continue;
+    const match = /^(\d+)(?:-fb(\d+))?$/.exec(roundEntry.name);
+    if (!match) continue;
+    const round = Number.parseInt(match[1], 10);
+    const fallbackNo = match[2] ? Number.parseInt(match[2], 10) : 0;
+    const assignmentDir = path.join(seatDir, roundEntry.name);
+    const runsDir = path.join(assignmentDir, 'runs');
+    const runNames = fs.existsSync(runsDir)
+      ? fs.readdirSync(runsDir).filter((name) => /^\d+$/.test(name)).sort(compareRunNames)
+      : [];
+    const settled = runNames.filter((name) => fs.existsSync(path.join(runsDir, name, 'result.json')));
+    if (settled.length === 0) continue;
+    const roundRecord = byRound.get(round) ?? { seat: seatId, round, attempts: [], selected: null };
+    byRound.set(round, roundRecord);
+    let assignment = null;
+    try { assignment = JSON.parse(fs.readFileSync(path.join(assignmentDir, 'assignment.json'), 'utf8')); } catch { /* optional metadata */ }
+    for (const runName of settled) {
+      const resultFile = path.join(runsDir, runName, 'result.json');
+      let attempt = null;
+      try {
+        const runResult = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
+        attempt = {
+          assignmentId: `${path.basename(unitDir)}/${seatId}/${roundEntry.name}`,
+          assignment, fallbackNo, runName, runResult,
+          outcome: outcomeOfRunResult(runResult),
+        };
+        roundRecord.attempts.push(attempt);
+      } catch { /* Ignore corrupted result. */ }
+      if (runName === settled[settled.length - 1]
+        && (!roundRecord.selected || fallbackNo > roundRecord.selected.fallbackNo)) {
+        roundRecord.selected = { fallbackNo, attempt };
       }
     }
-  } catch { /* Best effort history read. */ }
-  return seats;
+  }
+  return [...byRound.values()].map((roundRecord) => {
+    roundRecord.attempts.sort((a, b) => a.fallbackNo - b.fallbackNo || compareRunNames(a.runName, b.runName));
+    return { seat: seatId, round: roundRecord.round, attempts: roundRecord.attempts, final: roundRecord.selected?.attempt ?? null };
+  });
 }
 
 /** One final settled record per seat/round, preserving the pattern history vocabulary. */

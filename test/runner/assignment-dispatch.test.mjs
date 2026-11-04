@@ -1675,6 +1675,32 @@ test('executeAssignment: a live sibling staging directory is never removed durin
   fs.rmSync(liveStagingDir, { recursive: true, force: true });
 });
 
+test('executeAssignment: admission cleanup removes only the staging directories of its own attempt number, never one whose number merely starts the same', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-staging-prefix', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
+  fs.mkdirSync(runsDir, { recursive: true });
+  const retryId = 'retry-prefix-test';
+  const payloadDigest = 'digest-test-prefix';
+  const plant = (name) => {
+    const dir = path.join(runsDir, name);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'run.json'), JSON.stringify({ retryId, payloadDigest: `sha256:${payloadDigest}` }));
+    return dir;
+  };
+  const own = plant(`.staging-01-99999999-${crypto.randomUUID()}`);
+  const otherAttempt = plant(`.staging-010-99999999-${crypto.randomUUID()}`);
+
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, retryId, predecessorRunId: null, destination: tempDir, payloadDigest });
+
+  assert.equal(result.status, 'done');
+  assert.equal(fs.existsSync(own), false, 'the abandoned staging of this attempt is removed');
+  assert.equal(fs.existsSync(otherAttempt), true, 'a staging directory of another attempt number is not this attempt\'s to remove');
+});
+
 test('executeAssignment: fenced caller on pre-ledger runs/NN directory allocates next attempt, never adopting legacy settlement', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);

@@ -98,7 +98,7 @@ function interpret({ status, signal, stdout, stderr, error }, bin, op) {
  * ask, config, peers, walk, accountView, launchView and `now`) and returns the
  * crate's BindOutput plus `hostVersion`. A refusal comes back as a result
  * (`ok: false`, `refusal`), not as an exception: it is a decision. The host is
- * resolved once per client.
+ * resolved once per client, and again when the resolved binary has gone.
  */
 export function createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, timeoutMs = SEAT_BINDING_TIMEOUT_MS } = {}) {
   let resolved = hostBin ?? null;
@@ -123,8 +123,7 @@ export function createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, ti
         'a seat binding would exec the host while the hot mutex is held; bind before taking the lock',
       );
     }
-    const hostPath = bin();
-    const res = spawnSync(hostPath, ['internal', 'seat-binding', op, '--protocol', String(PROTOCOL)], {
+    const run = (hostPath) => spawnSync(hostPath, ['internal', 'seat-binding', op, '--protocol', String(PROTOCOL)], {
       input: JSON.stringify({ v: PROTOCOL, ...body }),
       env: routeEnv(),
       encoding: 'utf8',
@@ -133,6 +132,15 @@ export function createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, ti
       killSignal: 'SIGKILL',
       windowsHide: true,
     });
+    let hostPath = bin();
+    let res = run(hostPath);
+    // A host resolved earlier that is gone now (the release was switched or removed under a long-lived
+    // process) is looked up once more; a host the caller named is never replaced.
+    if (res.error?.code === 'ENOENT' && !hostBin) {
+      resolved = null;
+      hostPath = bin();
+      res = run(hostPath);
+    }
     return interpret(res, hostPath, op);
   };
 

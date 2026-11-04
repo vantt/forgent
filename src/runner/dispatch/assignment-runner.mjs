@@ -847,7 +847,7 @@ function admitRunAttempt(
     if (fs.existsSync(runsDir)) {
       const entries = fs.readdirSync(runsDir);
       for (const name of entries) {
-        if (name.startsWith(`.staging-${record.attemptStr}`)) {
+        if (name === `.staging-${record.attemptStr}` || name.startsWith(`.staging-${record.attemptStr}-`)) {
           const abandonedPath = path.join(runsDir, name);
           try {
             // Live sibling protection: never delete a staging directory belonging to a live process

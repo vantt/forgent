@@ -149,6 +149,19 @@ test('inside an activated release the activation host answers and FGOS_HOST_BIN 
   assert.equal(client.tierLadder().hostVersion, 'activation-fixture');
 });
 
+test('a host that has gone since it was resolved is looked up again once; a host the caller named is not replaced', () => {
+  const { project, release, host } = activatedProject();
+  const client = createSeatBindingClient({ cwd: project, fgosDir: path.join(project, '.fgos'), payloadRoot: release });
+  assert.equal(client.tierLadder().hostVersion, 'activation-fixture');
+  fs.rmSync(host);
+  assert.notEqual(client.tierLadder().hostVersion, 'activation-fixture', 'the answer now comes from the host the lookup finds next (FGOS_HOST_BIN)');
+
+  const gone = script('named-host.sh', 'exit 0');
+  const named = createSeatBindingClient({ hostBin: gone });
+  fs.rmSync(gone);
+  expectCode(() => named.tierLadder(), 'seat-binding-no-host-binary');
+});
+
 test('outside an activated release (a checkout, the dev door) FGOS_HOST_BIN is honoured', () => {
   const { project } = activatedProject();
   const resolved = resolveSeatBindingHost({ cwd: project, fgosDir: path.join(project, '.fgos'), payloadRoot: REPO_ROOT });

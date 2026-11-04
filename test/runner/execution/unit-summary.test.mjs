@@ -100,6 +100,22 @@ test('a published summary is replaced through the durable-file door', (t) => {
   assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8')).outcome, 'pass');
 });
 
+test('a seat directory that cannot be read fails the history read, and one that vanished mid-walk is skipped', (t) => {
+  const { dir } = fixture(t, { settlement: { outcome: 'pass', settledAt } });
+  result(dir, 'panelist-1', '1', '01');
+  result(dir, 'panelist-2', '1', '01');
+  const readdir = fs.readdirSync;
+  const failing = (code) => t.mock.method(fs, 'readdirSync', (target, ...rest) => {
+    if (target === path.join(dir, 'panelist-2')) throw Object.assign(new Error(`${code} reading the seat`), { code });
+    return readdir(target, ...rest);
+  });
+  const mocked = failing('EIO');
+  assert.throws(() => readUnitRunHistory(dir), /EIO reading the seat/);
+  mocked.mock.restore();
+  failing('ENOENT');
+  assert.deepEqual(readUnitRunHistory(dir).map((entry) => entry.seat), ['panelist-1']);
+});
+
 test('stance extraction is tolerant, exact and question-local', () => {
   assert.deepEqual(extractStance({}, ['a']), { status: 'missing' });
   assert.deepEqual(extractStance({ stance: { choice: 'other' } }, ['a']), { status: 'valid', choice: 'other', confidence: null });

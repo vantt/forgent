@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e4545f7f363463edf9f02739f8f507435b5d99401c7c3d5a3a853ddd8242f387",
+  "payloadDigest": "e3f4113de328a7793324e658bfe9c1d80e9463320ce682ba1305ad6209b9fdb4",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -976,7 +976,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "6b35618fbb2349be178c672a52f05de765939d0eb68f1a1fa4a7535e291828f1",
-    "src/runner/dispatch/assignment-runner.mjs": "9a119ca57ec9b0aafde93fdfb0643886df391fdd2e604b6aef040f8ac4d1762f",
+    "src/runner/dispatch/assignment-runner.mjs": "5d6c4c3e230afb5f0a64c8c337bfefef9095b2f8d0ba8b12d214f7b498268726",
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "07d517329e94649193ba415c13e396c580e97b198ccd150e657d51694c420703",
@@ -998,7 +998,7 @@
     "src/runner/dispatch/execution-contract.mjs": "f16b8adfe36849cb6f48255a742bb6b6d4cf4973b30280961b9ba95bdb12efb6",
     "src/runner/dispatch/executor-governance.mjs": "f4d179122ee78207bd235afbedeb185a9d1e3eb747d31e659db77f5ad8f5d31f",
     "src/runner/dispatch/herdr-deadlines.mjs": "cdaaaeaeb55d5296078e0a0e56d73eebacff514896bc741941ea57aa46c6596b",
-    "src/runner/dispatch/herdr-round.mjs": "f98191357b56895bd7eecb99db0b95a5396aa0ddc176fe4dce437e5d21405c36",
+    "src/runner/dispatch/herdr-round.mjs": "2d42f5647cb266497dae75461b3d319e02e89f61d9356ad93498a6ed300821a9",
     "src/runner/dispatch/llm-accounts.mjs": "246105c8c967302ccaf988274f2ca502ce203328ef1742033de5544a336dbfec",
     "src/runner/dispatch/mechanism.mjs": "8f272b51172f4b3f15418b43242d8b877ea4ed0ac974890bd7fd991ca3d87afe",
     "src/runner/dispatch/operation-prompt-templates.mjs": "45b0a234f2d0917e3555ee4bc913eee10522e1c7aa21f02f8473bae63383256a",
@@ -1056,12 +1056,12 @@
     "src/runner/execution/patterns/catalog.mjs": "56a10c97fa3d7caaf7b7b70bcac38a300284e24aa6bcb316a07e30c9335a9af9",
     "src/runner/execution/patterns/retired-keys.mjs": "c07f8407d169c7db410aba99db2b7bb1119f5a20ec7a7b63f8cb81d1324e0f40",
     "src/runner/execution/run-request.mjs": "b8ba8003a695f457ab1ebdc22808a994c4f3c4dbfc5d05cd1ab88bd65b823645",
-    "src/runner/execution/run.mjs": "c96d1c9f52712499df812d73b00757aec4811e7edfdc099d0e80af0317a40e71",
+    "src/runner/execution/run.mjs": "098cd3f3711c3e6d7ae3e67ae80c3201a5ef2bb5a03631a7ad50123c82f8d42d",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
     "src/runner/execution/seat-resolver.mjs": "cd60f09a5cb679223a05a7c79bb390e8ed0e596890b8d795431fb16aae9d09ba",
     "src/runner/execution/unit-control.mjs": "7758226c1321bda3cd53e5018c7030b714adf138ba8e3fccbeb8a4f5337f9022",
-    "src/runner/execution/unit-run-history.mjs": "a6d21e90b0f95e7d0c3f0d1faa19b64cd98f970bab5b89cc7bf9a6909eea9c58",
+    "src/runner/execution/unit-run-history.mjs": "88bcd7e1301aeab46b8ea9962ccc4751e03197d99cb505e35998203f39a491a0",
     "src/runner/execution/unit-state.mjs": "fa446821758bdebae8ed5d4858c37780796e98352c14641f6a59abf904157e90",
     "src/runner/execution/unit-summary.mjs": "343a452327e8e68e50b2279c3322abb1d4b599ef6fc6b415c07cfb14ac862c4f",
     "src/runner/execution/unit-sync.mjs": "a5dcbcd15d189d8a943f3e5ee87543a4ffb466f15b1534684b111034d7da89e5",
@@ -1094,7 +1094,7 @@
     "src/runner/worker-log.mjs": "c5b978ff9fa7533a62213c77cf7b6241d7b10e43d9fd5cf07f15209b7335a793",
     "src/runner/worktree.mjs": "0be5c3b08aea849b98351235805c08120c83f86ac6cd8fa54e2cab12123f07d5",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
-    "src/seat-binding/client.mjs": "2716bd10d87c7382677c1f936d6d4eca961be82fc40d498daed82c3482e47e4f",
+    "src/seat-binding/client.mjs": "206a9ecbbc301f2c3c9688535dbeb60fabbe67052b870a62e23e7481ae82fdd8",
     "src/setup/agent-cli-trust.mjs": "6a70801d94f369a216d626b240022c5291ab8efdf742d0e1ce63721ac1669537",
     "src/setup/agent-hooks.mjs": "4628abc1592c9f3033f8e22d0ea937cc549bb669ddf26ba30aaa5cfb42d5d5ae",
     "src/setup/agy-permissions.mjs": "dee3b431b2d84c1bad0eeb107a26981bf348d7d2557c68e288f1fe082f7d2a84",
@@ -3333,14 +3333,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1552,
+      "line": 1561,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1552,
+      "line": 1561,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
@@ -3421,8 +3421,15 @@
     },
     {
       "path": "src/seat-binding/client.mjs",
-      "line": 127,
-      "spawn": "spawnSync",
+      "line": 136,
+      "spawn": "run -> src/seat-binding/client.mjs:126",
+      "binary": "(env FGOS_HOST_BIN)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/seat-binding/client.mjs",
+      "line": 142,
+      "spawn": "run -> src/seat-binding/client.mjs:126",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -3513,7 +3520,7 @@
     {
       "path": "src/setup/registrations.mjs",
       "line": 5454,
-      "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:127",
+      "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:142",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
