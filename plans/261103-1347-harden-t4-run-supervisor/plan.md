@@ -49,7 +49,8 @@ Also done by the big lead (decision 59, question 2a, 13:46): 502 side files of c
 | P05 controller side | `864a390fd..23740e065`, `fab7438dd` | 2026-11-03 15:06 |
 | P04 one watch step, hostile reads | `fad7e0fab` | 2026-11-03 15:33 |
 | P01 adopt custody, sweep into client, doctor 8 → 5 | `3a940e2a8` (with the `sweep.mjs` manifest row and the doctor list in `packaging-distribution` spec and contract, DOC agreed 2026-11-04) | 2026-11-04 16:21 |
-| P06, P07, P08 | open | — |
+| P06 test structure | `4e86aec63` ([report](../reports/lead-261104-1620-harden-t4-p06-test-structure.md)); with `1dc20857b`, the `agent-confinement` spec line P01 left pointing at `sweep.mjs` | 2026-11-04 16:49 |
+| P07, P08 | open | — |
 
 Outside the phases, from this plan's work: `c37d76811` workspace rustfmt (decision 60); two regressions it caused, fixed: `45e07caf2` (one-door scanner read only one-line chains) and `b6260e061` (machine-private test read `herdr.rs` with a one-line regex).
 
