@@ -470,7 +470,7 @@ rules. Do not update this file with new topology decisions; update
 
 ## Retained Distribution Source Detail
 
-Retained source material — complete source units from `docs/specs/distribution.md` at blob `13d2e172de35a570d148022d4c859cac05223acb`, after the boundary main sync. Dated decisions, implementation rules and recorded gaps are retained; current assertions remain subject to the independent truth sample.
+Retained source material — complete source units from `docs/specs/distribution.md` (deleted in 97dd62aa7) at blob `13d2e172de35a570d148022d4c859cac05223acb`, after the boundary main sync. Dated decisions, implementation rules and recorded gaps are retained; current assertions remain subject to the independent truth sample.
 
 ---
 area: distribution

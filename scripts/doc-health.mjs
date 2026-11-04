@@ -19,6 +19,7 @@
 // (one door); this script owns only the body.
 
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { listAnchors } from './list-doc-anchors.mjs';
@@ -120,7 +121,7 @@ export function checkPlatformMetadata({ files, readFile, baseline, classify }) {
 }
 
 const REPO_PATH = /`((?:src|scripts|bin|apps|packages|core|test|docs|plans)\/[^`\s]+)`/g;
-const COMMIT_SHA = /\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b/;
+const COMMIT_CANDIDATE = /\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b/g;
 // Kinds that record past state or dated evidence, not current claims.
 const PAST_STATE_KINDS = new Set(['history', 'decision', 'verification']);
 
@@ -138,16 +139,18 @@ function referencedPath(raw) {
 /**
  * Dead-reference rule. In a document that classify reports as canonical and not
  * past-state, every backticked repo-root path must exist, unless the same line
- * pins a commit sha (a provenance coordinate). `classify(file)` is called only
- * for documents that have at least one dead candidate.
+ * pins a commit that resolves (a provenance coordinate). `classify(file)` is
+ * called only for documents that have at least one dead candidate; `isCommit(token)`
+ * says whether a hex token names a real commit.
  */
-export function checkDeadReferences({ files, readFile, exists, classify }) {
+export function checkDeadReferences({ files, readFile, exists, classify, isCommit }) {
   const findings = [];
+  const pins = (line) => (line.match(COMMIT_CANDIDATE) || []).some(isCommit);
   for (const file of [...files].filter((f) => f.startsWith('docs/platform/') && f.endsWith('.md')).sort()) {
     const lines = proseOf(readFile(file)).split('\n');
     const dead = [];
     lines.forEach((line, index) => {
-      if (COMMIT_SHA.test(line)) return;
+      if (pins(line)) return;
       for (const match of line.matchAll(REPO_PATH)) {
         const target = referencedPath(match[1]);
         if (target && !exists(target)) dead.push({ line: index + 1, target });
@@ -155,12 +158,25 @@ export function checkDeadReferences({ files, readFile, exists, classify }) {
     });
     if (dead.length === 0) continue;
     const { canonical, kind } = classify(file);
+    if (typeof canonical !== 'boolean') throw new Error(`classify returned no canonical flag for ${file}; the Convention host predates the reserved document flags`);
     if (!canonical || PAST_STATE_KINDS.has(kind)) continue;
     for (const { line, target } of dead) {
       findings.push({ type: 'dead-reference', path: file, line, target, message: `backticked path does not exist: ${target}` });
     }
   }
   return { findings, counts: { findings: findings.length } };
+}
+
+/** Whether a hex token names a commit of the repository; one git call per distinct token. */
+export function gitCommitResolver(repoRoot) {
+  const cache = new Map();
+  return (token) => {
+    if (!cache.has(token)) {
+      try { execFileSync('git', ['cat-file', '-e', `${token}^{commit}`], { cwd: repoRoot, stdio: 'ignore' }); cache.set(token, true); }
+      catch { cache.set(token, false); }
+    }
+    return cache.get(token);
+  };
 }
 
 export function runCli(argv, cwd = process.cwd(), { classify } = {}) {
@@ -177,7 +193,7 @@ export function runCli(argv, cwd = process.cwd(), { classify } = {}) {
       classify: classifyDoc,
     });
     const exists = (file) => fs.existsSync(path.resolve(repoRoot, file));
-    const dead = checkDeadReferences({ files, readFile, exists, classify: classifyDoc });
+    const dead = checkDeadReferences({ files, readFile, exists, classify: classifyDoc, isCommit: gitCommitResolver(repoRoot) });
     const findings = [...links.findings, ...metadata.findings, ...dead.findings];
     const counts = { files: files.length, links: links.counts.links, metadataExempt: metadata.counts.exempt, findings: findings.length };
     if (asJson) console.log(JSON.stringify({ counts, findings }));

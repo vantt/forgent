@@ -88,12 +88,13 @@ test('metadata rule exempts classified evidence, and reports a missing field or 
 
 // Owns the dead-reference rule: a backticked repo-root path must exist unless the
 // line pins a commit, and only canonical, current-state documents are held to it.
-test('dead-reference rule reports a missing path, but not a pinned, fenced, pattern or past-state reference', () => {
+test('dead-reference rule reports a missing path, but not a pinned (real commit), fenced, pattern or past-state reference, and fails without the canonical flag', () => {
   const docs = {
     'docs/platform/a/spec.md': [
       'Exists: `src/alive.mjs` and `src/alive.mjs:10-20`.',
       'Dead: `src/gone.mjs` and `plans/gone/plan.md#top`.',
       'Pinned: `src/old.mjs` was deleted in 53523a917.',
+      'Fake pin: `src/fake.mjs` per 2e92b7a5.',
       'Pattern: `src/**/*.mjs`, `src/<name>.mjs`, `~/.fgos/x`.',
       '```',
       '`src/fenced-gone.mjs`',
@@ -107,12 +108,15 @@ test('dead-reference rule reports a missing path, but not a pinned, fenced, patt
     'docs/platform/a/notes.md': { canonical: false, kind: 'unplaced-platform' } };
   const { findings } = checkDeadReferences({
     files: Object.keys(docs), readFile: (f) => docs[f], exists: (f) => f === 'src/alive.mjs',
-    classify: (f) => kinds[f],
+    classify: (f) => kinds[f], isCommit: (token) => token === '53523a917',
   });
   assert.deepEqual(findings.map((f) => [f.path, f.line, f.target]), [
     ['docs/platform/a/spec.md', 2, 'src/gone.mjs'],
     ['docs/platform/a/spec.md', 2, 'plans/gone/plan.md'],
+    ['docs/platform/a/spec.md', 4, 'src/fake.mjs'],
   ]);
+  assert.throws(() => checkDeadReferences({ files: ['docs/platform/a/spec.md'], readFile: (f) => docs[f], exists: () => false,
+    classify: () => ({ kind: 'spec' }), isCommit: () => false }), /no canonical flag/);
 });
 
 // One wiring proof for both rules over the real repository and the real host.
