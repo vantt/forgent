@@ -50,13 +50,13 @@ ${blindLine}
 `;
 }
 
-async function run(workflowYaml, capabilities) {
+async function run(workflowYaml, capabilities, extra = {}) {
   const packageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-pools-'));
   fs.mkdirSync(path.join(packageRoot, 'core', 'workflows'), { recursive: true });
   fs.writeFileSync(path.join(packageRoot, 'core', 'workflows', 'fixture.yaml'), workflowYaml);
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-pools-project-'));
   try {
-    return await checkBlindStepsUseProvenPools(cwd, { packageRoot, loadRunnerConfig: () => runnerConfig(capabilities) });
+    return await checkBlindStepsUseProvenPools(cwd, { packageRoot, loadRunnerConfig: () => ({ ...runnerConfig(capabilities), ...extra }) });
   } finally {
     fs.rmSync(packageRoot, { recursive: true, force: true });
     fs.rmSync(cwd, { recursive: true, force: true });
@@ -107,6 +107,14 @@ test('a proven family on a transport that was not proven still fails', async () 
 test('an unconfined invocation is never a candidate, so it is not reported here', async () => {
   const result = await run(BLIND, { 'fixture:propose': prefer('deepseek-bare', 'deepseek') });
   assert.equal(result.passed, true, result.message);
+});
+
+test('an executor with no command of its own takes the family bind gives it from the global command', async () => {
+  const inherits = { kind: 'agent', invocations: [{ id: 'bare-cli', via: 'cli', args: ['{prompt}'], confinement: { backend: 'bwrap' } }] };
+  const extra = { executors: { ...EXECUTORS, inherits }, executor: { command: 'gemini' } };
+  const result = await run(BLIND, { 'fixture:propose': prefer('inherits') }, extra);
+  assert.equal(result.passed, false, result.message);
+  assert.match(result.message, /inherits via bare-cli \(family gemini,/);
 });
 
 test('a capability pool from a prefix entry is resolved by bind like at run time, and a bare verb entry is not one', async () => {

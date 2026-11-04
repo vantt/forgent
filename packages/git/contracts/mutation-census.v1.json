@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bba19aa44caec84aa4880f4e9f1d8dc0e5fd1da36f39d6d01a4c05c7602f8144",
+  "payloadDigest": "60f68353891da924fed770e2b1b279c58688d04c9a7c6481e6ecd9c103f6c62c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1103,7 +1103,7 @@
     "src/setup/agy-permissions.mjs": "dee3b431b2d84c1bad0eeb107a26981bf348d7d2557c68e288f1fe082f7d2a84",
     "src/setup/ansi.mjs": "02c0e971ac01c71fb7db8d6506debd3c35d55feedceeb93eac7843b83fa0d430",
     "src/setup/bin-discovery.mjs": "d7d3536129adcbe5c6fc5297ef1f6ba1fcdc86d5195b7e968c14480b10e77101",
-    "src/setup/blind-steps-proven-pools.mjs": "6bca1f6157d5bb806ebc67dbfe1d4002e56c212e068750e1f0f9d4e7dfd46ab1",
+    "src/setup/blind-steps-proven-pools.mjs": "348d03a61241be3c9a09d3cc465504000d8b4712d53f8e4448fb7c2cf82c95e8",
     "src/setup/checks.mjs": "1019d14b95b22854cf980623668fb0f73d6ae85a7e322382979e979338bc6327",
     "src/setup/claude-code-hooks.mjs": "d9f4cdbe8c4cec4cb3ea7c67798d24b49e3c86a0d97a041b202dec8def2332fe",
     "src/setup/config-checks.mjs": "492701afa5fc250dc1e431e0213015f9f85a72265a215a644a2f9650fc94b4b7",

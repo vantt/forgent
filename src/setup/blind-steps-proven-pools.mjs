@@ -10,9 +10,8 @@
 // (the pool a first binding and a quota fallback both choose from), so nothing is dispatched, written
 // or paid for.
 
-import { explainSeat } from '../runner/execution/bind.mjs';
+import { explainSeat, getProviderFamily } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
 
 /**
@@ -54,11 +53,10 @@ function describeCandidate(runnerConfig, bound) {
   const entry = (runnerConfig.executors ?? runnerConfig.runner?.executors ?? {})[bound.executor];
   const invocations = Array.isArray(entry?.invocations) ? entry.invocations : [];
   const invocation = invocations.find((inv) => inv?.id === bound.invocation);
-  const cli = invocations.find((inv) => inv?.via === 'cli');
   return {
     executor: bound.executor,
     invocation: bound.invocation,
-    family: deriveProviderFamily(entry, cli?.command ?? entry?.command ?? 'claude'),
+    family: getProviderFamily(runnerConfig, bound.executor),
     transport: TRANSPORT_BY_ADAPTER[invocation?.adapter] ?? 'unknown',
     backend: invocation?.confinement?.backend ?? 'none',
   };
