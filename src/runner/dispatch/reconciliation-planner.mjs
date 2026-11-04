@@ -15,7 +15,7 @@ import { inspectDispatchRuntime, clearAllRunsCache, withRunsCache } from './runt
 // boundary (see the file-top comment and the static import-graph test in
 // test/runner/dispatch-reconciliation-import-graph.test.mjs).
 import { RUN_STATUSES } from './visibility-session.mjs';
-import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
+import { publishMutableProjection } from './proof-helpers.mjs';
 import { canonicalJson } from '../../native/door.mjs';
 // The lock door: reconcile's own apply mutex and the per-cwd dispatch lock it
 // reports on are kernel locks (the import-graph test pins the door's files).
@@ -261,9 +261,7 @@ function applyCollectResult(root, plan, { now }) {
       if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'the run record was removed since planning' };
       throw err;
     }
-    const tmp = `${plan.proposedAction.path}.tmp-${uniqueTmpTag()}`;
-    fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, resultCollectedAt: now }, null, 2)}\n`);
-    fs.renameSync(tmp, plan.proposedAction.path);
+    publishMutableProjection(plan.proposedAction.path, { ...runMeta, resultCollectedAt: now });
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
     clearAllRunsCache(root);
     return { outcome: 'applied', actionKey: plan.actionKey };
@@ -326,9 +324,7 @@ function applyRepairProjection(root, plan, { now }) {
       if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'the run record was removed since planning' };
       throw err;
     }
-    const tmp = `${plan.proposedAction.path}.tmp-${uniqueTmpTag()}`;
-    fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, status: SETTLED_STATUS, settledAt: now }, null, 2)}\n`);
-    fs.renameSync(tmp, plan.proposedAction.path);
+    publishMutableProjection(plan.proposedAction.path, { ...runMeta, status: SETTLED_STATUS, settledAt: now });
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
     clearAllRunsCache(root);
     return { outcome: 'applied', actionKey: plan.actionKey };

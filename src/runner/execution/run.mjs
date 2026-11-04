@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
+import { publishMutableProjection } from '../dispatch/proof-helpers.mjs';
 import { createGitInspect, gitWriter } from '../../git/inspect.mjs';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
@@ -53,19 +53,6 @@ import { listGenerations } from '../dispatch/run-lock.mjs';
 import { acquireUnitControl } from './unit-control.mjs';
 import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
 import { createLockScope, resolveStateRoot } from '../../holder-lock/index.mjs';
-
-/** Write `file` atomically so a reader never sees half a record. */
-function writeJsonAtomic(file, value) {
-  const tmp = `${file}.${uniqueTmpTag()}.tmp`;
-  try {
-    fs.writeFileSync(tmp, JSON.stringify(value, null, 2));
-    fs.renameSync(tmp, file);
-  } catch (error) {
-    // Removing the partial temp file is best effort; the write error is the one to report.
-    try { fs.rmSync(tmp, { force: true }); } catch { /* keep the write error */ }
-    throw error;
-  }
-}
 
 function publishUnitSummary(unitDir) {
   try { writeUnitSummary(unitDir); }
@@ -968,11 +955,11 @@ async function runUnitBody(options, scope) {
   }
   delete unitRecord.settlement;
   unitRecord.execution = { status: 'running' };
-  writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
+  publishMutableProjection(path.join(unitDir, 'unit.json'), unitRecord);
   const settle = (outcome) => {
     unitRecord.settlement = { outcome, settledAt: new Date().toISOString() };
     unitRecord.execution = { status: 'settled' };
-    writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
+    publishMutableProjection(path.join(unitDir, 'unit.json'), unitRecord);
     publishUnitSummary(unitDir);
   };
 
@@ -1024,7 +1011,7 @@ async function runUnitBody(options, scope) {
   // Pools whose login failed in this unit and that a seat then walked away from: no later fallback
   // walk of the unit lands on one (a resumed run rebuilds the set from its attempts).
   const credentialFaultPoolSet = credentialFaultPools(unitRecord);
-  const persistUnitRecord = () => writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
+  const persistUnitRecord = () => publishMutableProjection(path.join(unitDir, 'unit.json'), unitRecord);
 
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
   const dispatchBound = async ({ bound, seat, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective, admission, batchSize }) => {

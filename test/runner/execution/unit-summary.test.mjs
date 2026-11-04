@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
+import { nativeDoor } from '../../../src/native/door.mjs';
 import path from 'node:path';
 import { buildUnitSummary, writeUnitSummary, extractStance, serializeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { readUnitRunHistory } from '../../../src/runner/execution/unit-run-history.mjs';
@@ -83,6 +84,20 @@ test('owner refusal has zero seats, and creation is never used as settlement', (
   delete record.settlement;
   fs.writeFileSync(path.join(dir, 'unit.json'), JSON.stringify(record));
   assert.equal(buildUnitSummary(dir).settledAt, null);
+});
+
+test('a published summary is replaced through the durable-file door', (t) => {
+  const { dir } = fixture(t, { settlement: { outcome: 'pass', settledAt } });
+  result(dir, 'panelist-1', '1', '01');
+  const replaced = [];
+  const replace = nativeDoor().durableFile.replaceDurably;
+  t.mock.method(nativeDoor().durableFile, 'replaceDurably', (target, name, ...rest) => {
+    replaced.push(path.join(target, name));
+    return replace(target, name, ...rest);
+  });
+  writeUnitSummary(dir);
+  assert.deepEqual(replaced, [path.join(dir, 'unit-summary.json')]);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8')).outcome, 'pass');
 });
 
 test('stance extraction is tolerant, exact and question-local', () => {

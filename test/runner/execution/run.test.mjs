@@ -9,6 +9,7 @@ import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
 import crypto from 'node:crypto';
+import { nativeDoor } from '../../../src/native/door.mjs';
 import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { runUnit as coreRunUnit, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
@@ -1232,10 +1233,10 @@ test('a reopened unit cannot retain its prior terminal summary when republishing
     runId: 'settled-producer', settledAt: '2026-10-05T01:02:00Z', classification: { outcome: { category: 'ok' } },
   }));
   const summaryFile = path.join(fixture.unitDir, 'unit-summary.json');
-  const rename = fs.renameSync;
-  t.mock.method(fs, 'renameSync', (from, to) => {
-    if (to === summaryFile) throw new Error('summary storage unavailable');
-    return rename(from, to);
+  const replace = nativeDoor().durableFile.replaceDurably;
+  t.mock.method(nativeDoor().durableFile, 'replaceDurably', (dir, name, ...rest) => {
+    if (path.join(dir, name) === summaryFile) throw new Error('summary storage unavailable');
+    return replace(dir, name, ...rest);
   });
   t.mock.method(console, 'warn', () => {});
   const resumed = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
@@ -1346,8 +1347,7 @@ test('a failed settlement write never replaces the execution error that caused i
   fixture.record.configSnapshot = snapshotRunnerConfig(fixture.repoRoot);
   fs.writeFileSync(path.join(fixture.unitDir, 'unit.json'), JSON.stringify(fixture.record));
   const unitFile = path.join(fixture.unitDir, 'unit.json');
-  const rename = fs.renameSync;
-  const read = fs.readFileSync;
+  const replace = nativeDoor().durableFile.replaceDurably;
   const failure = new Error('the producer attempt could not be prepared');
   const producerDir = path.join(fixture.unitDir, 'producer');
   const mkdir = fs.mkdirSync;
@@ -1355,12 +1355,12 @@ test('a failed settlement write never replaces the execution error that caused i
     if (typeof dir === 'string' && (dir === producerDir || dir.startsWith(producerDir + path.sep))) throw failure;
     return mkdir(dir, ...args);
   });
-  t.mock.method(fs, 'renameSync', (from, to) => {
+  t.mock.method(nativeDoor().durableFile, 'replaceDurably', (dir, name, bytes, ...rest) => {
     // Only the settlement record fails to land; the earlier running-state writes succeed.
-    if (to === unitFile && JSON.parse(read(from, 'utf8')).execution?.status === 'settled') {
+    if (path.join(dir, name) === unitFile && JSON.parse(Buffer.from(bytes).toString('utf8')).execution?.status === 'settled') {
       throw Object.assign(new Error('unit record storage unavailable'), { code: 'EIO' });
     }
-    return rename(from, to);
+    return replace(dir, name, bytes, ...rest);
   });
   const warning = t.mock.method(console, 'warn', () => {});
   await assert.rejects(runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,

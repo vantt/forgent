@@ -1,7 +1,7 @@
 // Derived discussion read model. Execution owns selection; Observe only consumes it.
 import fs from 'node:fs';
 import path from 'node:path';
-import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
+import { publishMutableProjection } from '../dispatch/proof-helpers.mjs';
 import { readUnitRunSeats } from './unit-run-history.mjs';
 import { normalizeWorkflowLink } from './unit.mjs';
 import { patternHistoryOutcome } from './loops/history-outcome.mjs';
@@ -192,9 +192,7 @@ export function writeUnitSummary(unitDir, options = {}) {
   const content = serializeUnitSummary(summary);
   const changed = content !== readStoredUnitSummary(unitDir);
   if (changed && !options.dryRun) {
-    const tmp = `${file}.${uniqueTmpTag()}.tmp`;
-    try { fs.writeFileSync(tmp, content); fs.renameSync(tmp, file); }
-    finally { fs.rmSync(tmp, { force: true }); }
+    publishMutableProjection(file, content);
   }
   return { summary, changed };
 }
