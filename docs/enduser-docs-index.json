@@ -143,7 +143,7 @@
     "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
     "audience": "A user seeking understanding of the design, not a task to complete.",
     "docPath": "docs/explanation/citation-drift-runner-md-cleanup.md",
-    "title": "`docs/specs/runner.md`'s citation-format cleanup",
+    "title": "`docs/platform/runner/spec.md#spec-runner-vòng-tự-hành`'s citation-format cleanup",
     "sourceCaptureId": null
   },
   {
@@ -1049,17 +1049,6 @@
     "docPath": "docs/explanation/wontfix-worktree-reclaim-startup-reap.md",
     "title": "`wontfix` items now get their worktree/branch reclaimed during startup reap",
     "sourceCaptureId": null
-  },
-  {
-    "quadrant": "explanation",
-    "purpose": "Clarify why the system is shaped the way it is, and the tradeoffs behind it.",
-    "audience": "A user seeking understanding of the design, not a task to complete.",
-    "docPath": "docs/explanation/work-item-lifecycle-and-domain-model.md",
-    "title": "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
-    "sourceCaptureId": "tsk-2zv",
-    "aliases": [
-      "docs/explanation/work-item-lifecycle-and-domain-model.md"
-    ]
   },
   {
     "quadrant": "explanation",
@@ -3561,18 +3550,6 @@
     "docPath": "docs/how-to/author-a-plan-loop-track.md",
     "title": "How To: Author A Plan-Loop Track",
     "sourceCaptureId": null
-  },
-  {
-    "quadrant": "how-to",
-    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
-    "audience": "A user who already knows the system and wants a concrete recipe.",
-    "docPath": "docs/how-to/check-rollup-progress.md",
-    "title": "How to check a root item's progress with `fgos rollup`",
-    "sourceCaptureId": "doc-fgos-rollup-howto",
-    "aliases": [
-      "docs/how-to/check-rollup-progress.md",
-      "docs/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md"
-    ]
   },
   {
     "quadrant": "how-to",
