@@ -64,7 +64,7 @@ Checked on current main by the arbiter (file:line opened): B-2, B-3, B-6, B-7, B
 | R-4 | Med | yes, FIFO blocks > 5 s | `.mcp.json`, `.codex/hooks.json`, the marker and the credential copy read through `readAgentFileSync` with a cap | T5 |
 | B-5 | Med | yes | `codexSectionPattern` ends at the next header line, not the first `[`; `removeAgyTrust` reports a write failure instead of `already-gone`; the seeded TOML key is escaped | T5 |
 | B-6 | Med | yes; arbiter confirmed two derivations | The doctor row imports `getProviderFamily`; second derivation deleted | T5 (`src/setup`) |
-| B-7 | Med | measured, 636 entries | `reclaimDeadLeases` drops an `assignments` entry once its attempt is closed | T5 |
+| B-7 | Med | measured, 636 entries | `reclaimDeadLeases` drops an `assignments` entry once its attempt is closed. **Held back from batch A (2026-11-04):** the state has no closed-attempt signal, and the entry is also the sticky account of a re-dispatched assignment (`provider-capacity.mjs:614`), so an age bound (the lead tried 1 h) can move a late resume to another account; the sub-plan finds a real closed signal first | T5 |
 | B-8 | Med | no (needs herdr) | Memoise the pending boot per session name; cross-process case under the existing holder-lock door | T5 |
 | B-9 = Simpl. 3 | Med | read | Run Result authority as in §2; V3 only, V4 gone | T5 |
 | B-10 | Med | no | Audit when the provider state record names a lease, not when the worker-reachable receipt file exists; unreadable file = mismatch | T5 |
