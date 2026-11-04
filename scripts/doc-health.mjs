@@ -22,7 +22,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { listAnchors } from './list-doc-anchors.mjs';
-import { clickable, relatedLinks, localDestination } from './lib/doc-links.mjs';
+import { clickable, relatedLinks, localDestination, headerBlock } from './lib/doc-links.mjs';
 import { invokeHost } from '../src/util/host-bin.mjs';
 
 /** The baseline field names of docs/platform/governance.md section 5. */
@@ -33,15 +33,6 @@ export function governanceBaselineFields(repoRoot) {
   const start = text.indexOf('Required baseline:');
   const block = start >= 0 ? text.slice(start).match(/```txt\n([\s\S]*?)\n```/) : null;
   return block ? block[1].split('\n').map((l) => l.replace(/:\s*$/, '').trim()).filter(Boolean) : [];
-}
-
-/** The text of the fenced txt block directly under the first H1, or null. */
-export function headerBlock(text) {
-  const h1 = text.match(/^# .+\n/m);
-  if (!h1) return null;
-  const after = text.slice(h1.index + h1[0].length);
-  const block = after.match(/^\n*```txt\n([\s\S]*?)\n```/);
-  return block ? block[1] : null;
 }
 
 export function headerFields(text) {

@@ -7,10 +7,10 @@ import { listAnchors, anchorExists, githubSlug, runCli } from '../../scripts/lis
 
 const DOC = ['# Title', '', '## 4. Exit Codes', '', 'A paragraph that is long enough to be a unit.', '', '## Install/setup & gate', '', 'Another paragraph that is long enough to be a unit.'].join('\n');
 
-test('lists heading and block anchors with the numbering prefix kept', () => {
+test('lists heading anchors with the numbering prefix kept and ignores headings inside fences', () => {
   const anchors = listAnchors(DOC);
   assert.ok(anchors.some((a) => a.anchor === '4-exit-codes' && a.kind === 'heading'));
-  assert.ok(anchors.some((a) => a.anchor === 'unheaded-block-1'));
+  assert.equal(listAnchors('# A\n\n```md\n# not a heading\n```\n\n# A').map((a) => a.anchor).join(), 'a,a-1');
   assert.equal(anchorExists(DOC, 'exit-codes'), false);
   assert.equal(anchorExists(DOC, '4-exit-codes'), true);
 });

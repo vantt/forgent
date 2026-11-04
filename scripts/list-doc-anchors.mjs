@@ -10,22 +10,48 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
-import { extractMarkdownConservationUnits } from './generate-doc-inventory.mjs';
 
 /** GitHub's own slug of a heading, which differs from the extractor's for headings with punctuation. */
 export function githubSlug(title) {
   return title.trim().toLowerCase().replace(/[^\p{L}\p{N}\- _]/gu, '').replace(/ /g, '-');
 }
 
+/** GitHub's heading slug as the platform links spell it (markup stripped, duplicates numbered). */
+function headingAnchor(title) {
+  return String(title || '').trim().toLowerCase()
+    .replace(/<[^>]*>/g, '').replace(/[`*~]/g, '')
+    .replace(/[^\p{L}\p{N}_\s -]/gu, '').trim().replace(/\s+/g, '-') || 'section';
+}
+
+/** Every heading outside a fenced block, with the numbering prefix kept. */
 export function listAnchors(content) {
-  return extractMarkdownConservationUnits(content).map((u) => ({
-    anchor: u.anchor,
-    githubSlug: u.unitKind === 'heading' ? githubSlug(u.title) : null,
-    kind: u.unitKind,
-    startLine: u.startLine,
-    endLine: u.endLine,
-    sample: String(u.sample || '').replace(/\s+/g, ' ').slice(0, 70),
-  }));
+  const anchors = [];
+  const seen = new Map();
+  let fence = null;
+  content.split(/\r?\n/).forEach((line, index) => {
+    const fenceMatch = line.match(/^\s{0,3}(`{3,}|~{3,})/);
+    if (fenceMatch) {
+      if (!fence) fence = fenceMatch[1];
+      else if (fenceMatch[1][0] === fence[0] && fenceMatch[1].length >= fence.length) fence = null;
+      return;
+    }
+    if (fence) return;
+    const heading = line.match(/^(#{1,6})\s+(.+?)\s*#*\s*$/);
+    if (!heading) return;
+    const title = heading[2].trim();
+    const base = headingAnchor(title);
+    const count = seen.get(base) || 0;
+    seen.set(base, count + 1);
+    anchors.push({
+      anchor: count > 0 ? `${base}-${count}` : base,
+      githubSlug: githubSlug(title),
+      kind: 'heading',
+      startLine: index + 1,
+      endLine: index + 1,
+      sample: title.replace(/\s+/g, ' ').slice(0, 70),
+    });
+  });
+  return anchors;
 }
 
 export function anchorExists(content, anchor) {

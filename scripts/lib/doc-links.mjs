@@ -1,7 +1,6 @@
 // Body-reader shared by doc-health's candidate checker. Grammar ported from
 // fchain/links.py; source offsets survive masking so agreement can compare edges.
 import path from 'node:path';
-import { headerBlock } from '../check-doc-constitution.mjs';
 
 export function prose(text) {
   const out = text.split('');
@@ -64,6 +63,15 @@ export function clickable(text) {
     links.push(record(m, m[2] !== undefined ? 2 : 3));
   }
   return links;
+}
+
+/** The text of the fenced txt block directly under the first H1, or null. */
+export function headerBlock(text) {
+  const h1 = text.match(/^# .+\n/m);
+  if (!h1) return null;
+  const after = text.slice(h1.index + h1[0].length);
+  const block = after.match(/^\n*```txt\n([\s\S]*?)\n```/);
+  return block ? block[1] : null;
 }
 
 // Related is the sole structured header field containing link operands. A
