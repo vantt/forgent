@@ -1378,9 +1378,11 @@ async function runUnitBody(options, scope) {
       lastResult = result;
 
       // The receipt is read from a directory the worker can reach. A pass is only a pass when the provider
-      // record agrees the lease it names was granted, so nothing is committed on a receipt it never gave.
+      // record agrees the lease it names was granted, and when the record holds a lease for this assignment
+      // the attempt must show its receipt: nothing is committed on a receipt the provider never gave or one
+      // the worker removed or corrupted.
       const receipt = readLeaseReceipt(assignmentsDir, assignmentId);
-      const receiptDiffers = receipt && result.outcome === 'pass' ? auditLeaseReceipt(receipt, { assignmentId, runtimeDir: options.providerCapacityRuntimeDir }) : null;
+      const receiptDiffers = result.outcome === 'pass' ? auditLeaseReceipt(receipt, { assignmentId, runtimeDir: options.providerCapacityRuntimeDir }) : null;
       if (receiptDiffers) {
         result.outcome = 'policy-refusal';
         result.refused = { reason: 'lease-receipt-mismatch', detail: receiptDiffers };

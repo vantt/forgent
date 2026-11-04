@@ -679,14 +679,22 @@ export function acquireNamedAccountLease({
 
 /**
  * Audit a lease receipt against the provider's own record of the lease it granted. The receipt is read
- * from the attempt directory, which a worker can reach; the record in the provider state is not. Returns
- * null when they agree, and what differs when they do not (including a receipt the provider never granted).
+ * from the attempt directory, which a worker can reach; the record in the provider state is not, so the
+ * record decides whether there is anything to audit: an assignment the record holds a lease for needs a
+ * receipt that agrees (`null` when it is missing or unreadable is a mismatch). Returns null when they
+ * agree, or when neither exists, and what differs when they do not (including a receipt the provider
+ * never granted).
  */
 export function auditLeaseReceipt(receipt, { assignmentId, runtimeDir } = {}) {
   const { statePath } = providerCapacityStatePaths(runtimeDir);
-  const held = readState(statePath).assignments?.[`${receipt?.provider}:${assignmentId}`];
-  if (held?.accountId === receipt?.accountId && held?.selectedAt === receipt?.acquiredAt) return null;
-  return `the receipt names ${receipt?.provider}/${receipt?.accountId} acquired ${receipt?.acquiredAt}, the provider record names ${held ? `${held.accountId} selected ${held.selectedAt}` : 'no lease for this assignment'}`;
+  const { assignments = {} } = readState(statePath);
+  if (!receipt) {
+    const held = Object.keys(assignments).find((key) => key.endsWith(`:${assignmentId}`));
+    return held ? `the provider record names a lease for this assignment (${held.slice(0, -assignmentId.length - 1)}), the attempt has no readable receipt` : null;
+  }
+  const held = assignments[`${receipt.provider}:${assignmentId}`];
+  if (held?.accountId === receipt.accountId && held?.selectedAt === receipt.acquiredAt) return null;
+  return `the receipt names ${receipt.provider}/${receipt.accountId} acquired ${receipt.acquiredAt}, the provider record names ${held ? `${held.accountId} selected ${held.selectedAt}` : 'no lease for this assignment'}`;
 }
 
 export function releaseProviderAccountLease({ provider, accountId, runId, runtimeDir } = {}) {

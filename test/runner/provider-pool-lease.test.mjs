@@ -149,6 +149,15 @@ test('a lease receipt is audited against the provider record: the lease it grant
   assert.match(audit(selected.leaseReceipt, 'unit-run-1/producer/2'), /no lease for this assignment/);
 });
 
+test('an assignment the provider record holds a lease for fails the audit when its receipt is missing or unreadable; one with no lease and no receipt passes', () => {
+  const runner = config({ openrouter: { ...openrouter } });
+  const runtimeDir = mkRuntimeDir();
+  acquireNamedAccountLease({ runnerConfig: runner, provider: 'openrouter', accountId: 'or-b', assignmentId: 'unit-run-1/producer/1', runId: 'run1', runtimeDir, cli: 'pi' });
+
+  assert.match(auditLeaseReceipt(null, { assignmentId: 'unit-run-1/producer/1', runtimeDir }), /names a lease for this assignment \(openrouter\), the attempt has no readable receipt/);
+  assert.equal(auditLeaseReceipt(null, { assignmentId: 'unit-run-1/reviewer/1', runtimeDir }), null);
+});
+
 test('a disabled account is refused by the lease and shown by inspect', () => {
   const runner = config({ openrouter: { ...openrouter, 'or-a': { ...openrouter['or-a'], disabled: true } } });
   const runtimeDir = mkRuntimeDir();
