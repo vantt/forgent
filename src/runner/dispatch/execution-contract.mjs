@@ -121,21 +121,6 @@ export function extractProtocolOperationStamp(constraints) {
 }
 
 /**
- * `true` when a declared operation's own resolved definition (`operation`,
- * as returned by `definition.spec.operations.find(...)`) declares
- * `result.kind: 'work-product'` (Phase 01 mutation-unlock R2). Shared,
- * trivial predicate -- both session-engine.mjs's pre-check and
- * assignment-runner.mjs's dispatch-layer re-verification read the SAME
- * field the SAME way.
- *
- * @param {object|undefined|null} operation
- * @returns {boolean}
- */
-export function operationDeclaresWorkProduct(operation) {
-  return Boolean(operation) && operation.result?.kind === 'work-product';
-}
-
-/**
  * Resolve whether `cwd` is safe for a mutating dispatch (Phase 01
  * mutation-unlock R3): it must resolve to a LINKED git worktree, never the
  * main checkout, and never fail open on an unresolvable root. Never throws

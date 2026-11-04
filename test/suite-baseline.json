@@ -253,7 +253,6 @@
     "test/runner/dispatch-confinement-p05.test.mjs": 1.2,
     "test/runner/dispatch-confinement-policies.test.mjs": 0.3,
     "test/runner/dispatch-confinement-reaper-fence.test.mjs": 0.3,
-    "test/runner/dispatch-effect-guarantee.test.mjs": 0.3,
     "test/runner/dispatch-execute-effort.test.mjs": 8.2,
     "test/runner/dispatch-execute-for-capability.test.mjs": 1.6,
     "test/runner/dispatch-executor-profile.test.mjs": 0.7,

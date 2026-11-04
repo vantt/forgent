@@ -204,47 +204,6 @@ function declaredStoreCli(cfg, executorId, pinnedInvocationId) {
 }
 
 /**
- * Validate that an evidenceRef is substantive and not a placeholder or fabricated reference.
- *
- * @param {string} ref
- * @param {object} [opts]
- * @returns {boolean}
- */
-export function isSubstantiveEvidenceRef(ref, opts = {}) {
-  if (typeof ref !== 'string') return false;
-  const trimmed = ref.trim();
-  if (!trimmed) return false;
-  if (/^(todo|n\/?a|na|none|none\.txt|placeholder|tbd|null|undefined)[\s.!\-#]*$/i.test(trimmed)) {
-    return false;
-  }
-
-  if (/^(evidence|diff|verify|test|doc|file|git):/i.test(trimmed)) {
-    const value = trimmed.split(':')[1]?.trim();
-    if (!value || /^(todo|n\/?a|na|none|placeholder|tbd)$/i.test(value)) return false;
-    return true;
-  }
-
-  const cwd = opts.cwd || opts.repoRoot;
-  if (cwd && fs.existsSync(path.resolve(cwd, trimmed))) {
-    return true;
-  }
-
-  const known = new Set([
-    ...(opts.assignment?.contextRefs || []),
-    ...(opts.choice?.contextRefs || []),
-  ]);
-  if (known.has(trimmed)) {
-    return true;
-  }
-
-  if (cwd || known.size > 0) {
-    return false;
-  }
-
-  return !/^[a-z0-9_-]+$/i.test(trimmed) || trimmed.includes('/') || trimmed.includes('.');
-}
-
-/**
  * Classify RunResult status and confidence from execution outcome and evidence
  * (Step 01 §11 / Step 03 §5.1 / Step 04 §5.2).
  *

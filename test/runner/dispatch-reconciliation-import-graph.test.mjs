@@ -369,7 +369,6 @@ test('boundary test: dispatch core does not import operation-choice, fanout-batc
     'src/runner/dispatch/resolve.mjs',
     'src/runner/dispatch/mechanism.mjs',
     'src/runner/dispatch/transport.mjs',
-    'src/runner/dispatch/prepare.mjs',
     'src/runner/dispatch/cli.mjs',
     'src/runner/dispatch/plan.mjs',
   ];
@@ -463,7 +462,6 @@ test('boundary test: dispatch core modules import no Work-layer module and name 
     'src/runner/dispatch/transport.mjs',
     'src/runner/dispatch/plan.mjs',
     'src/runner/dispatch/resolve.mjs',
-    'src/runner/dispatch/prepare.mjs',
     'src/runner/dispatch/settlement.mjs',
     'src/runner/dispatch/run-result.mjs',
     'src/runner/dispatch/runtime-inspection.mjs',
@@ -536,9 +534,7 @@ test('boundary test: dispatch core modules import no Work-layer module and name 
   // Work Driver compatibility lookups (executorIdForWork, resolveCapabilityIdentityDetails, buildPrompt)
   // are relocated to leaf module src/runner/work-compat.mjs, avoiding cyclic dependencies.
   const resolveSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/resolve.mjs'), 'utf8');
-  const prepareSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/prepare.mjs'), 'utf8');
   assert.equal(resolveSource.includes('operation-choice'), false, 'resolve.mjs must not import operation-choice');
-  assert.equal(prepareSource.includes('operation-choice'), false, 'prepare.mjs must not import operation-choice');
 
   // The Work layer may build on dispatch's generic resolvers; the reverse is what the rules above forbid.
 
@@ -624,8 +620,7 @@ test('boundary test: dispatch core has no cyclic dependencies > 2 (SCC analysis,
         const rels = scc.map((p) => path.relative(root, p));
         const bannedInCycle = [
           'src/runner/dispatch/resolve.mjs',
-          'src/runner/dispatch/prepare.mjs',
-          'src/runner/operation-choice.mjs',
+                'src/runner/operation-choice.mjs',
           'src/runner/fanout-batch.mjs',
         ];
         for (const b of bannedInCycle) {

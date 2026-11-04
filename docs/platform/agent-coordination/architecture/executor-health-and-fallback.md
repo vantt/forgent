@@ -151,8 +151,8 @@ recoveryMaterialRef, destinationExecutorFacts, now})` returns a typed verdict:
 
 An operation's repeat mode must be explicit; it is not inferred from
 `Assignment.mutation`. Supported current policy values are checked by
-`assignment-policy.mjs:439-453` (former module; removed from main before source capture, not a current owner), and recovery assessment refuses to infer mode
-(`src/runner/dispatch/recovery.mjs:201-206`). No current review/red-team YAML
+`assignment-policy.mjs:439-453` (former module; removed from main before source capture, not a current owner), and recovery assessment refused to infer mode
+(`assess` in the former module `dispatch/recovery.mjs`, removed from main with no caller; not a current owner). No current review/red-team YAML
 profile is claimed here to declare `repeatMode: read-only`.
 
 The following effect-sink, deduplication and guarantee model belongs to the

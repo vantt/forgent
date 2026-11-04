@@ -2455,7 +2455,7 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
   };
 }
 
-// Re-exported for backward compatibility from resolve.mjs and prepare.mjs
+// Re-exported for backward compatibility from resolve.mjs
 export {
   executorIdForWork,
   resolveCapabilityIdentityDetails,

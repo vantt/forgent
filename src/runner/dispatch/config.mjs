@@ -1261,33 +1261,6 @@ function validateExecutorSupportsShape(supports, label) {
 
 
 /**
- * Shape-check `runner.placementPolicy` (Phase D correction,
- * executor-profile-schema-migration): PlacementPolicy's own declarative
- * config surface, deliberately NOT nested on any `executors.<id>` entry.
- *
- * The first-round Phase D relocated the retired top-level
- * `runner.readOnlyExecutorRedirects.<sourceExecutorId>` map onto
- * `executors.<sourceExecutorId>.readOnlyRedirect` -- self-verified safe (zero
- * behavior change, full test gate green) but architecturally wrong: "for a
- * read-only OPERATION, which executor to substitute" is a POLICY/ranking
- * decision (design.md §3.6: "PlacementPolicy owns provider/model/executor
- * ranking"), not a fact about the source executor's own identity --
- * the exact same category of mistake as baking a persona
- * ("claude-reviewer") into an executor id, just one layer removed. Design.md
- * §7 step 9 is explicit: "Retire readOnlyExecutorRedirects only after
- * production PlacementPolicy proof" -- meaning PlacementPolicy itself must
- * own the declaration, not merely the selection algorithm among an opaque
- * pool handed to it (which Phase 08's `resolveVerifiedRedirectExecutor`
- * already did, unchanged by this correction).
-/**
- * Shape-check `runner.placementPolicy`: retired in Phase 6.
- */
-function validatePlacementPolicyShape(placementPolicy, label) {
-  if (placementPolicy !== undefined) {
-    throw new RunnerConfigError(`runner config (${label}) "placementPolicy" was retired. Posture is enforced via OS confinement.`);
-  }
-}
-/**
  * tool-registry entry (`toolsFromExecutors`, `src/state/tool-registry.mjs`)
  * and `executors.<id>.for` (a executor's declared purpose, D15 — its own
  * validation against this catalog is a later task's scope, not this one's).
@@ -1882,9 +1855,6 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     throw new RunnerConfigError(
       `runner config (${sourceLabel}) "readOnlyExecutorRedirects" / "placementPolicy" was removed. Read-only posture is enforced by OS confinement.`,
     );
-  }
-  if (cfg.placementPolicy !== undefined) {
-    validatePlacementPolicyShape(cfg.placementPolicy, `${sourceLabel} placementPolicy`);
   }
   // The default executor is optional: none set and no assistant CLI on PATH still loads, so a caller
   // that names its executor runs; resolving the default refuses where it is used (resolveExecutorConfig).

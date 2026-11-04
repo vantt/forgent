@@ -679,10 +679,6 @@ export function normalizeRunResultV3(params) {
   return normalizeRunResult({ ...params, contractVersion: 3 });
 }
 
-export function normalizeRunResultV4(params) {
-  return normalizeRunResult({ ...params, contractVersion: 4 });
-}
-
 /**
  * Validate a RunResult v4 object against v4 schema and invariants.
  *
@@ -1135,11 +1131,6 @@ export function readSettledResult(runDir, runId) {
     return result && !result.corrupt && !result.contractCorrupt && !result.resultCorrupt && result.classification?.provenance !== 'contract-corrupt' ? result : null;
   } catch { return null; }
 }
-
-/**
- * Outcome categories ordered from highest to lowest confidence/precedence.
- */
-export const OUTCOME_CATEGORIES = Object.freeze(['ok', 'verdict', 'blocked', 'policy', 'infra', 'corrupt']);
 
 /**
  * Derive high-level outcome from RunResult classification.

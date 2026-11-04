@@ -130,11 +130,6 @@ export function resolveCapabilityDetailsFromHints({
   return { capability, anchorCapability };
 }
 
-/** What a seat that needs a model is told when its family has no cell at the tier it runs at. */
-export function tierCellMissingDetail(family, tier) {
-  return `no model for tier "${tier}" under family "${family}" (runner.modelPolicies.${family}.${tier})`;
-}
-
 /**
  * Derive a executor's PROVIDER FAMILY (tsk-2uf-1, Phase 00 R6, fixes H2a):
  * the executor's own declared `providerModel` field wins, then `provider`,
@@ -479,35 +474,4 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
     ...(executorEntry?.supports && !executor.supports ? { supports: executorEntry.supports } : {}),
     governance,
   };
-}
-
-/**
- * executor-id-consolidation Step 2 (fallback confinement preservation): the
- * first `via:"cli"` invocation on `executorEntry` whose EFFECTIVE
- * confinement (its own, or inherited from the executor entry -- the exact
- * same `cliInvocation.confinement ?? executorEntry.confinement` fallback
- * Gate B2's own `byExecutor` construction above already applies) is a
- * non-empty object. Returns `undefined` when the executor has no
- * `invocations[]` at all, or none of them declare any confinement.
- *
- * This is a STRUCTURAL check only ("is anything declared for Confinement
- * Authority to enforce"), never a semantic one ("does it satisfy policy
- * X") -- that verification is Confinement Authority's own job
- * (`confinement/authority.mjs`), already a large, separate subsystem this
- * function does not reach into. The one rule this enforces, mirroring
- * `validateOverrideConfinementShape`'s own documented invariant ("override
- * can only harden posture... downgrades are rejected"): a caller
- * substituting one executor for another (e.g. a provider-capacity
- * fallback) must never silently trade a confined primary for an
- * unconfined substitute.
- */
-export function selectConfinedInvocationId(executorEntry) {
-  const invocations = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations : undefined;
-  if (!invocations) return undefined;
-  const confined = invocations.find((inv) => {
-    if (inv.via !== 'cli') return false;
-    const effective = inv.confinement ?? executorEntry.confinement;
-    return effective && typeof effective === 'object' && Object.keys(effective).length > 0;
-  });
-  return confined?.id;
 }

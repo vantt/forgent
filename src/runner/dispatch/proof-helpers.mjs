@@ -138,8 +138,6 @@ export function consumeSecretSideFile(targetPath) {
   return parsed;
 }
 
-export const readSecretSideFile = consumeSecretSideFile;
-
 export function updateCommandEnvelope({
   runDir,
   launchCommandId,
@@ -201,31 +199,4 @@ export function commitCommandOutcome({
   };
   publishMutableProjection(commandPath, updated);
   return updated;
-}
-
-export function patchCommandRecord({ runDir, launchCommandId, controlEpoch, controlToken, patch }) {
-  const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
-  if (!fs.existsSync(commandPath)) {
-    throw new Error(`Command state file "${commandPath}" does not exist.`);
-  }
-  const existing = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-  if (controlToken !== undefined && controlToken !== null) {
-    const controlTokenDigest = computeSha256Digest(controlToken);
-    if (existing.controlEpoch !== controlEpoch || existing.controlTokenDigest !== controlTokenDigest) {
-      throw new Error(`Control token/epoch mismatch for command "${launchCommandId}".`);
-    }
-  }
-  const updated = { ...existing, ...patch };
-  publishMutableProjection(commandPath, updated);
-  return updated;
-}
-
-export function readCommandState(runDir, launchCommandId) {
-  const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
-  if (!fs.existsSync(commandPath)) return null;
-  try {
-    return JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-  } catch {
-    return null;
-  }
 }

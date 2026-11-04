@@ -327,28 +327,6 @@ export function loadOperationPromptTemplate(templateId, options = {}) {
   );
 }
 
-/**
- * Check if an operation prompt template exists and is valid.
- * Returns true if found and valid.
- * Returns false if not found.
- * Throws TemplateResolutionError if ambiguous, invalid, or path-escaped.
- *
- * @param {string} templateId
- * @param {object} [options]
- * @returns {boolean}
- */
-export function hasOperationPromptTemplate(templateId, options = {}) {
-  try {
-    loadOperationPromptTemplate(templateId, options);
-    return true;
-  } catch (err) {
-    if (err instanceof TemplateResolutionError && err.code === 'template-not-found') {
-      return false;
-    }
-    throw err;
-  }
-}
-
 function formatItemList(items) {
   if (!Array.isArray(items) || items.length === 0) {
     return '- (none)';

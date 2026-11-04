@@ -20,7 +20,6 @@ export { seatLaunchesOf } from './seat-resolver.mjs';
 
 export const PORT_MISSING = 'case-admission-port-missing';
 export const SEAT_LAUNCH_CEILING = 'seat-launch-ceiling';
-export const CONSENT_STALE = 'consent-stale';
 
 const OPERATIONS = Object.freeze(['resolveBinding', 'admit', 'settle', 'recheckEffect']);
 
