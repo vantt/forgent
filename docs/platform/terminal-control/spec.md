@@ -10,7 +10,7 @@ Canonical: Yes
 Owner: Terminal Control component
 Source: packages/terminal-control/rust
 Contracts: packages/terminal-control/contracts/
-Provenance: First committed in 9574d09e4 (2026-10-16); moved to docs/platform by 97dd62aa7
+Provenance: First committed in 9574d09e4 (2026-10-16)
 Writer type: Human + agent coauthor
 Canonical for: Which terminal pane a key runs in on a multiplexer, and whether that pane is still alive
 Use this when: Changing the herdr driver, the pane key model or the terminal client and its dispatch migration

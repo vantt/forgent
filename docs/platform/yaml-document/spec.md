@@ -10,7 +10,7 @@ Canonical: Yes
 Owner: YAML Document component (proposed)
 Source: packages/yaml-doc/rust (crate fgos-yaml-doc)
 Contracts: packages/yaml-doc/contracts/
-Provenance: First committed in 3c4930691 (2026-10-22); moved to docs/platform by 97dd62aa7
+Provenance: First committed in 3c4930691 (2026-10-22)
 Writer type: Human + agent coauthor
 Canonical for: Reading, editing and merging YAML text while keeping every byte a caller did not change, comments included
 Use this when: Parsing or editing YAML anywhere in fgOS, or upgrading the vendored parser

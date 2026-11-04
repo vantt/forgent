@@ -13,7 +13,7 @@ Node facade (proposed): src/git/; every Node-reachable Git operation goes throug
  N-API addon that links fgos-event-store and fgos-git (owner decision Q1)
 Contracts (proposed): packages/git/contracts/
 Dependencies: holder-lock, process facts/control, Session Identity, hardened Git CLI
-Provenance: First committed in fa8c7611d (2026-10-17); moved to docs/platform by 97dd62aa7; assembled from the settled output of an architecture council (council run in the second block below), signed as D-ADR0057 on 2026-10-18
+Provenance: First committed in fa8c7611d (2026-10-17); assembled from the settled output of an architecture council (council run in the second block below), signed as D-ADR0057 on 2026-10-18
 Writer type: Human + agent coauthor
 Canonical for: Repository operations and their recovery in every domain: the typed Git ports, the operation WAL and the Publication port
 Use this when: Changing or reviewing anything that mutates local objects, refs, index or worktrees, or the local side of fetch and push

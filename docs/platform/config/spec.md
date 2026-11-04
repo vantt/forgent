@@ -10,7 +10,7 @@ Canonical: Yes
 Owner: Config component (proposed)
 Source: packages/config/rust (crate fgos-config); section schemas (JSON Schema authored as YAML) core/config-schema/, section standards (the release's standard values) core/config-standard/
 Contracts: packages/config/contracts/
-Provenance: First committed in 3c4930691 (2026-10-22); moved to docs/platform by 97dd62aa7; amended 2026-10-23 (JSON Schema, separate standard file)
+Provenance: First committed in 3c4930691 (2026-10-22); amended 2026-10-23 (JSON Schema, separate standard file)
 Writer type: Human + agent coauthor
 Canonical for: Which fgOS configuration files exist, their schema, which value wins, who may write and the comments every writer leaves
 Use this when: Reading, validating or writing fgOS configuration, or adding a setting with its schema and standard value

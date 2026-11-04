@@ -10,7 +10,7 @@ Canonical: Yes
 Owner: Run supervisor component (L4)
 Source: packages/run-supervisor/rust (crate fgos-run-supervisor), src/run-supervisor/ (Node client, steps)
 Contracts: packages/run-supervisor/contracts/
-Provenance: First committed in ea9584116 (2026-10-18); moved to docs/platform by 97dd62aa7
+Provenance: First committed in ea9584116 (2026-10-18)
 Writer type: Human + agent coauthor
 Canonical for: The one process per attempt that owns a launched agent after handover: launch gate, receipts and the post-handover protocol
 Use this when: Changing how an attempt is launched, contained, observed or reported in direct or terminal mode

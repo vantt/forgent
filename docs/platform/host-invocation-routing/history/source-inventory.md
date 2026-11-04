@@ -9,7 +9,7 @@ Implementation: Current migration snapshot
 Canonical: Yes, after review, for source disposition only
 Owner: Host invocation
 Source type: Inventory of docs/architect/host-invocation-routing/**
-Provenance: First committed in 05b6bf861 (2026-09-14) as an inventory of docs/architect/host-invocation-routing/**; carried to docs/platform by 97dd62aa7
+Provenance: First committed in 05b6bf861 (2026-09-14) as an inventory of docs/architect/host-invocation-routing/**
 Writer type: Agent draft writer
 Canonical for: Source disposition of the old host-invocation documents at the time of the migration
 Use this when: Finding where an old host-invocation source was split, redirected or archived

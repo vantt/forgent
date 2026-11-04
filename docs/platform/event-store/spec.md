@@ -11,7 +11,7 @@ Canonical: Yes (D-ADR0055, 2026-10-17)
 Owner: Event Store component
 Source (planned): packages/event-store/rust (crate fgos-event-store); Node facade src/event-store/ over the one combined N-API addon that links fgos-event-store and fgos-git (section 17)
 Contracts (planned): packages/event-store/contracts/
-Provenance: First committed in 6a614a669 (2026-10-17); moved to docs/platform by 97dd62aa7; signed as D-ADR0055 the same day
+Provenance: First committed in 6a614a669 (2026-10-17); signed as D-ADR0055 the same day
 Writer type: Human + agent coauthor
 Canonical for: How an fgOS event becomes durable, is sealed into git objects on per-machine refs, is shared across machines and is read back
 Use this when: Changing or reviewing the event store, its seals, refs or readers, or a consumer such as Work or porting that registers with it

@@ -10,7 +10,7 @@ Canonical: No (becomes canonical when signed)
 
 Owner: Secrets component (proposed)
 Source (planned): language not decided (section 15 question 1); thin wiring for `fgos secrets` and a `fgos doctor` check
-Provenance: First committed in 675dd41a8 (2026-10-19); carried to docs/platform by 97dd62aa7
+Provenance: First committed in 675dd41a8 (2026-10-19)
 Writer type: Agent draft writer
 Canonical for: Nothing yet; it is the draft proposal for where an fgOS secret lives and who may resolve it, and becomes canonical only when signed
 Use this when: Reviewing the SecretSource port proposal and the owner questions in section 15

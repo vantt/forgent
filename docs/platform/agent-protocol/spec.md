@@ -10,7 +10,7 @@ Canonical: Yes
 Owner: Agent-protocol component (L3)
 Source: packages/agent-protocol/rust (crate fgos-agent-protocol)
 Contracts: packages/agent-protocol/contracts/
-Provenance: First committed in ea9584116 (2026-10-18); moved to docs/platform by 97dd62aa7
+Provenance: First committed in ea9584116 (2026-10-18)
 Writer type: Human + agent coauthor
 Canonical for: The pure per-CLI adapters that read what an agent CLI showed and name what happened, for the run supervisor
 Use this when: Adding or changing an adapter for claude, codex, agy, pi or omp, or checking what an adapter may and may not decide

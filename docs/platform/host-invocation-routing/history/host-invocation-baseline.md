@@ -9,7 +9,7 @@ Implementation: Historical/current source snapshot
 Canonical: Yes, after review, for migration history only
 Owner: Host invocation
 Source type: Summary of docs/architect/host-invocation-routing/**
-Provenance: First committed in 05b6bf861 (2026-09-14) as a summary of docs/architect/host-invocation-routing/**; carried to docs/platform by 97dd62aa7
+Provenance: First committed in 05b6bf861 (2026-09-14) as a summary of docs/architect/host-invocation-routing/**
 Writer type: Agent draft writer
 Canonical for: Migration history of the old host-invocation baseline after promotion
 Use this when: Looking up the old command-readiness classification and the historical decisions the migration preserved

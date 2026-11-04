@@ -9,7 +9,7 @@ Implementation: Historical implemented-preview record, not recertified by this r
 Canonical: No; navigation does not replace the historical execution record
 Owner: Host invocation
 Source type: Redirect after plan/docs boundary cleanup
-Provenance: First committed in ebe10614d (2026-09-17) as a redirect after the plan/docs boundary cleanup; carried to docs/platform by 97dd62aa7
+Provenance: First committed in ebe10614d (2026-09-17) as a redirect after the plan/docs boundary cleanup
 Writer type: Agent draft writer
 Canonical for: Pointing readers to the archived R3 execution record and the platform R3 proof; nothing else
 Use this when: Following the old R3 rollout plan reference to its archived record

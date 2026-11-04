@@ -9,7 +9,7 @@ Implementation: R1/R2/R3 implemented preview; route migration and stable/default
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Created after 2026-09-14 code scan of host-runtime, apps/fgos, GitHub release state, and packaging-distribution links
-Provenance: First committed in 05b6bf861 (2026-09-14) from a code scan of host-runtime, apps/fgos, release state and packaging-distribution links; carried to docs/platform by 97dd62aa7
+Provenance: First committed in 05b6bf861 (2026-09-14) from a code scan of host-runtime, apps/fgos, release state and packaging-distribution links
 Writer type: Agent draft writer
 Canonical for: Which host-invocation proofs are done and which migration fronts remain after the R1/R2/R3 preview closeout
 Use this when: Planning the next host-invocation migration slice or checking the dated route snapshot

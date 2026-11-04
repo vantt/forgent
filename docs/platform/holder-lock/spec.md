@@ -10,7 +10,7 @@ Canonical: Yes
 Owner: Holder-lock component
 Source: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)
 Contracts: packages/holder-lock/contracts/
-Provenance: First committed in 0e377d7b6 (2026-10-16); moved to docs/platform by 97dd62aa7
+Provenance: First committed in 0e377d7b6 (2026-10-16)
 Writer type: Human + agent coauthor
 Canonical for: The single lock port for every cold fgOS lock, the lock registry, lock order and the guarantee levels per filesystem
 Use this when: Adding or changing a lock, its registry row or scope, or deciding who holds a resource as the kernel reports it
@@ -359,7 +359,7 @@ Until Git phase 03 owns removal/recovery, preserve the refused checkout and use 
 
 ### Documentation-cutover write lease
 
-The lease freezes documentation writes across processes without a TTL. Its authority is the committed blob plans/documentation-cutover-lease.json on `refs/heads/main` (the file exists only while a lease is held). Working-tree copies are not authority. A held sidecar keeps refusing non-holders after process death or loss of the kernel lock resource.
+The lease freezes documentation writes across processes without a TTL. Its authority is the committed blob plans/documentation-cutover-lease.json on `refs/heads/main` (the file is absent until the first acquire is committed; afterwards it stays committed with its `state` set to `held`, `released` or `abandoned`). Working-tree copies are not authority. A held sidecar keeps refusing non-holders after process death or loss of the kernel lock resource.
 
 | Command | Result |
 |---|---|
@@ -376,7 +376,7 @@ The fixed scope is:
 - root `AGENTS.md` and `CLAUDE.md`;
 - the [switchboard JSON](../../../plans/260925-documentation-authority-unification/transitional-switchboard.json);
 - `core/skills/**`, `.agents/skills/**` and `plugins/fgOS/skills/**`;
-- the lease sidecar blob itself (plans/documentation-cutover-lease.json, present only while held).
+- the lease sidecar blob itself (plans/documentation-cutover-lease.json; absent until the first acquire is committed, then always committed with its state).
 
 Other plan evidence and code/test roots are outside the freeze. The sidecar is transition evidence and is excluded from its own scope digest.
 

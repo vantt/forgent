@@ -10,7 +10,7 @@ Canonical: Yes for what G0 signs (section 14); No for the numeric values, the in
 
 Owner: Agent Mailbox component (proposed)
 Source: on branch `mailbox/v1-v3` only, not on main: packages/mailbox/rust/core (crate fgos-mailbox-core), packages/mailbox/contracts/limits.v1.json and frame.v1.txt; packages/mailbox/rust/store (crate fgos-mailbox: hook drain, adapters, head judgement), packages/mailbox/contracts/adapters.v1.json and contracts/fixtures/hooks/, recorded by scripts/record-mailbox-hook-fixtures.mjs; since V5 also store src/{limits.rs,ancestry.rs,hook/breaker.rs,hook/resolve.rs,adapters/codex_head.rs,adapters/version.rs}, and the host wiring apps/fgos/src/wiring/mailbox_{hook,root,verbs}.rs. No shared terminal crate in the first slice (section 15.8)
-Provenance: First committed in 6b5e5119e (2026-10-19); moved to docs/platform by 97dd62aa7; revised through two panel rounds and the owner's G0 signature of 2026-10-20 (section 17)
+Provenance: First committed in 6b5e5119e (2026-10-19); revised through two panel rounds and the owner's G0 signature of 2026-10-20 (section 17)
 Writer type: Human + agent coauthor
 Canonical for: The first-slice scope, bounds, architecture and semantics of agent-to-agent messaging on one machine that the owner signed at gate G0 (section 14)
 Use this when: Building or reviewing the mailbox crates, the hook drain, the adapters or the mailbox verbs, or judging whether a delivery report is honest
