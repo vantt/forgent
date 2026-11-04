@@ -1,7 +1,7 @@
 ---
 title: "HARDEN T4 sub-plan: Run Supervisor + Launch gate"
 description: "Step 4 of the HARDEN per-layer loop for T4: the accepted council findings and owner decision 59 split into eight sub-phases with strict file ownership, net size below zero, self-landing on fg-server2 and a Vietnamese owner-machine guide."
-status: in-progress
+status: completed
 priority: P1
 effort: ~6d lead time (wave 1 P01 ∥ P02 ∥ P03 ≈ 1.5d, wave 2 P04 ∥ P05 ≈ 1.5d, P06 ≈ 1d, P07 ≈ 1d after OQ-1/OQ-2, P08 ≈ 1d)
 branch: main (plan only; each phase runs on its own track branch `harden/t4-pNN-<slug>` in its own linked worktree)
@@ -51,7 +51,7 @@ Also done by the big lead (decision 59, question 2a, 13:46): 502 side files of c
 | P01 adopt custody, sweep into client, doctor 8 → 5 | `3a940e2a8` (with the `sweep.mjs` manifest row and the doctor list in `packaging-distribution` spec and contract, DOC agreed 2026-11-04) | 2026-11-04 16:21 |
 | P06 test structure | `4e86aec63` ([report](../reports/lead-261104-1620-harden-t4-p06-test-structure.md)); with `1dc20857b`, the `agent-confinement` spec line P01 left pointing at `sweep.mjs` | 2026-11-04 16:49 |
 | P07 not-started close, legacy sweep deleted | `7b82bf9b2`, `b6f9a545c` ([report](../reports/lead-261104-1651-harden-t4-p07-not-started-close.md)); accepted deviation: the intent is replaced under the lock on each launch and removed when a run settles with no envelope; accepted limits: a kill between the run record and the lock, a home made before its finalization record | 2026-11-04 17:33 |
-| P08 | open; [owner-machine guide](../reports/guide-261104-1651-owner-machine-harden-t4-run-supervisor.md) drafted | — |
+| P08 close | [closing report](../reports/closing-261104-1734-harden-t4-run-supervisor.md), [owner-machine guide](../reports/guide-261104-1651-owner-machine-harden-t4-run-supervisor.md) | 2026-11-04 17:54 |
 
 Outside the phases, from this plan's work: `c37d76811` workspace rustfmt (decision 60); two regressions it caused, fixed: `45e07caf2` (one-door scanner read only one-line chains) and `b6260e061` (machine-private test read `herdr.rs` with a one-line regex).
 

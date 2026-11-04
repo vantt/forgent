@@ -1,7 +1,7 @@
 ---
 phase: 05
 title: "T4: Run Supervisor + Launch gate"
-status: pending
+status: completed
 depends_on: [04 closed]
 effort: ~4d (rough)
 ---
