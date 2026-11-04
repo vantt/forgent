@@ -134,7 +134,7 @@ test('the machine-private roots are data in the contract: the private directory,
   assert.deepEqual([...MACHINE_PRIVATE_ROOTS], ['{home}/.fgos/private', '{runtimeDir}', '{claudeSocketBase}/cc-socks', '{home}/.config/herdr', '{xdgConfigHome}/herdr', '{herdrSocketDir}']);
   // herdr's layout is herdr's: the terminal-control herdr driver reads the same directory under the home.
   const driver = fs.readFileSync(new URL('../../packages/terminal-control/rust/src/driver/herdr.rs', import.meta.url), 'utf8');
-  assert.match(driver, /\.join\("\.config"\)\.join\("herdr"\)/, 'the herdr driver and the list name the same directory');
+  assert.match(driver, /\.join\("\.config"\)\s*\.join\("herdr"\)/, 'the herdr driver and the list name the same directory');
 });
 
 test('the Claude socket base follows Claude Code: the user runtime dir, else CLAUDE_CODE_TMPDIR, else the temp dir', () => {
