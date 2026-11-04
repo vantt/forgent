@@ -47,3 +47,19 @@ Problem: a machine fetches only when a hook of one of its own sessions runs. A r
 | C. Keep as is | Document that a wake arrives with the next fgOS activity on the receiver | None | None, but in practice agent machines have activity |
 
 Recommendation: C now, A only if the owner wants wake delivery on idle machines. B leaves the gap on the machines where it matters. Lane MAIL does not start A or B without the owner's choice, and OPC reviews any new process or Git call site.
+
+## Round trip on an idle machine, 2026-11-04 (no manual step)
+
+Outcome: a mail with `--wake` from fg-server2 reached an idle receiver session on fg-server, which displayed it and answered; the answer came back to fg-server2. Both machines run main `d44d89e15` or later with the systemd user timer (`fgos doctor --fix`, row `mailbox-sync-timer`).
+
+| Leg | Time (+07) |
+|---|---|
+| Sent on fg-server2 (record `d5b25d2f6d30db5e`) | 13:37:42 |
+| Receiver `claude-cher@fg-server` replied (its own clock) | 13:38:17 |
+| Reply seen on fg-server2 | 13:38:38 |
+
+The whole round trip took 56 seconds. This is a best case: fg-server's timer ticks every 300 s on the :00 phase (13:38:00 here, 18 s after the send), and the sender side polled with `fgos hook mailbox-sync` every 5 s instead of waiting for its own timer. The bound is the timer interval on each side, so the worst case is about two intervals plus a few seconds.
+
+What stood between the first mail and this result, in order: a sync killed halfway left a transfer blocking publications (fixed `5eeff5062`, `8c09919bf`); a plain `fgos events sync` made the hook skip its mail-taking child for a whole interval (fixed `811bb3da5`: the child leaves its own stamp); an idle machine took no mail at all (fixed `46f242d9a`, `d44d89e15`, `da7ae4237`: OS timer, ownership marker, removal); the receiver session must have run one tool call before it has a mailbox address, otherwise the wake is refused `unknown-name`. A first receiver (`claude-sh6w`) got no nudge for wakes sent after 16:56 on 11-03 and the cause is not proven: `remoteLifetimeCap` was already 50 on fg-server when it was set, so the cap of 5 was not shown to be the reason.
+
+Open: the display on the receiver was not captured by a pane dump (only its reply text); OPC has not yet answered whether Node `execFileSync` with a cleared environment is acceptable for `systemctl`/`launchctl` instead of the Rust `fgos_process` door.
