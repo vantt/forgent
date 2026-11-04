@@ -65,6 +65,19 @@ test('two entries of one cell are two candidates in cell order, taken before the
   assert.equal(third.provenance.fallbackFrom.walk, 'family');
 });
 
+test('explaining a seat with the fallback walk off still ranks every candidate and walks no chain', () => {
+  const cfg = config({
+    modelPolicies: { alpha: cells('alpha', ['alpha-m@alpha', 'alpha-via-router@router']) },
+    llmAccounts: { router: { r1: { credentialStore: { alpha: '/nonexistent/r1' } } } },
+  });
+  const full = explainSeat(ask, ctx(cfg));
+  const bare = explainSeat(ask, ctx(cfg), { chain: false });
+  assert.deepEqual(bare.ranked.candidates, full.ranked.candidates);
+  assert.deepEqual(bare.walk, []);
+  assert.deepEqual(bare.binding, full.binding);
+  assert.ok(full.walk.length > 1);
+});
+
 test('a pool no account can serve gives no candidate, and explain material says why', () => {
   const cfg = config({
     prefer: ['alpha'],

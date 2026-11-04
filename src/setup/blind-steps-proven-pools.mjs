@@ -73,6 +73,7 @@ function candidatesForRole(unit, seat, runnerConfig, session) {
   const { ranked, launchView } = explainSeat(
     { unit, seat: seat.seat, role: seat.role, posture: seat.posture, independentOf: [], overrides: [], blind: true },
     { runnerConfig, session: { headless: true, ...session } },
+    { chain: false },
   );
   const named = (c) => ({ executor: c.executor, invocation: c.invocation ?? null });
   return [

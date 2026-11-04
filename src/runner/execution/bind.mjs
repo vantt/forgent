@@ -538,17 +538,18 @@ export function bindWorkSeat({ runnerConfig, unit, role = 'producer', readOnly =
 /**
  * Why a seat lands where it does, read-only: the same crate call as `bind` (nothing is leased, spawned or
  * written), its ranked candidates and skip reasons, its explanation text, and the walk a failure would
- * take, one binding per step.
+ * take, one binding per step. `chain: false` skips that walk (one binding instead of one host call per step)
+ * for a caller that reads only the ranked candidates.
  *
  * @returns {{ binding: object, policy?: object, ranked?: object, explain?: {lines: string[]}, launchView?: object, walk: object[] }}
  */
-export function explainSeat(ask, ctx, { walk = {} } = {}) {
+export function explainSeat(ask, ctx, { walk = {}, chain: walkChain = true } = {}) {
   const decided = decide(ask, ctx, walk);
   if (decided.refused) return { binding: { refused: decided.refused }, walk: [] };
   const { out, prep } = decided;
   const binding = bindingOf({ out, prep, ask, ctx, walk });
   const chain = [];
-  if (!binding.refused) {
+  if (walkChain && !binding.refused) {
     const seen = new Set();
     let current = binding;
     while (current && !current.refused && !seen.has(bindingIdentity(current))) {
