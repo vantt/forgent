@@ -1,6 +1,5 @@
-// Thin client of the adopt door: `fgos internal adopt` does the work, this
-// module lists attempt directories, calls the route and names what went wrong.
-// It never reads or writes an attempt directory's state itself.
+// Thin client of the adopt door: `fgos internal adopt` does the work; this module lists attempt
+// directories, calls the route and names what went wrong. It never touches an attempt's state itself.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -60,10 +59,7 @@ function runAdopt(args, { input, hostBin, killWaitMs } = {}) {
   return lines;
 }
 
-/**
- * Judge one attempt directory (and adopt it unless `probeOnly`).
- * @returns {{attemptDir:string,state:string,outcome?:string,pendingStep?:string,reason?:string}}
- */
+/** Judge one attempt directory (and adopt it unless `probeOnly`): `{attemptDir, state, outcome?, pendingStep?, reason?}`. */
 export function adoptRun(runDir, { probeOnly = false, ...options } = {}) {
   const lines = runAdopt(['--run-dir', path.resolve(runDir), ...(probeOnly ? ['--probe-only'] : [])], options);
   if (lines.length !== 1) {
@@ -72,7 +68,7 @@ export function adoptRun(runDir, { probeOnly = false, ...options } = {}) {
   return lines[0];
 }
 
-// Attempt directories (`runs/<name>`, anywhere under `assignmentsRoot`) that have no `closed.json`.
+// Attempt directories (`runs/<name>` under `assignmentsRoot`) with no `closed.json`.
 export function listOpenAttemptDirs(assignmentsRoot) {
   const found = [];
   const walk = (dir) => {
@@ -95,10 +91,7 @@ export function listOpenAttemptDirs(assignmentsRoot) {
   return found.sort();
 }
 
-/**
- * Judge every attempt directory that is not closed, in one route process.
- * @returns {Array<object>} one verdict per directory, in listing order
- */
+/** Judge every attempt directory that is not closed, in one route process: one verdict per directory, in listing order. */
 export function adoptScan({ assignmentsRoot, probeOnly = false, ...options }) {
   const dirs = listOpenAttemptDirs(assignmentsRoot);
   if (dirs.length === 0) return [];
@@ -113,10 +106,8 @@ export function adoptScan({ assignmentsRoot, probeOnly = false, ...options }) {
  * The one door that cleans up after attempts nobody finished: adopt judges every attempt directory that
  * is not closed and finishes the steps a dead supervisor left. Only adopt's finalize-home step removes a
  * private home, and only while the attempt's lock is free and its process domain is empty.
- * @param {{assignmentsRoot?: string, adoptOptions?: object}} options
- *   `assignmentsRoot` absent: no attempt directories are looked at (a caller that has no run root).
+ * `assignmentsRoot` absent: no attempt directories are looked at. An adopt failure never throws.
  * @returns {{adopt: Array<object>|null, adoptError: string|null}}
- *   An adopt failure (no host binary, route refused) never throws.
  */
 export function sweepAttempts({ assignmentsRoot, adoptOptions = {} } = {}) {
   let adopt = null;

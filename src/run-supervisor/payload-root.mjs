@@ -1,5 +1,5 @@
-// The legacy-node payload root of a release, read from the manifest that sits next to its host binary.
-// The controller writes it into the envelope; the attempt step checks it again from the other side.
+// The legacy-node payload root of a release, read from the manifest next to its host binary: the
+// controller writes it into the envelope, the attempt step checks it from the other side.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -13,9 +13,9 @@ export function realpathOrNull(p) {
 }
 
 /**
- * The legacy-node payload root of the release that holds `hostBin`, read from that release's
- * manifest the way apps/fgos/src/legacy_exec.rs finds it: next to the host binary, never through
- * PATH, the cwd or the active-release variables (the active release may be another one by now).
+ * The legacy-node payload root of the release that holds `hostBin`, read from the manifest next to it
+ * the way apps/fgos/src/legacy_exec.rs does: never through PATH, the cwd or the active-release
+ * variables (the active release may be another one by now).
  */
 export function releasePayloadRoot(hostBin) {
   const found = releasePayloadManifest(hostBin);

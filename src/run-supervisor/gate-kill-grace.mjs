@@ -1,9 +1,8 @@
 // `dispatch.gateKillGraceMs`: how long the gate waits between SIGTERM and SIGKILL when it stops an
-// agent, and `dispatch.cancelWaitMs`: how long a controller that was asked to stop waits for the
-// receipts of its attempts (its default is the grace plus a slack, so both keys have one reader).
-// Read through the config facade (project over global). Setup never writes either key
-// into a config file (a key an older release does not know would make that release refuse the
-// whole file); an absent key is the default.
+// agent, and `dispatch.cancelWaitMs`: how long a controller asked to stop waits for the receipts of its
+// attempts (default: the grace plus a slack, so both keys have one reader). Read through the config
+// facade (project over global). Setup never writes either key (an older release that does not know a
+// key would refuse the whole file); an absent key is the default.
 
 import path from 'node:path';
 import { isConfigRefusal, readConfig, readMachineConfig } from '../config/facade.mjs';
@@ -21,9 +20,9 @@ export function gateKillGraceProblem(value) {
 }
 
 /**
- * The `dispatch` section of the effective config with the layer of each key: `{ value, origins }` as the facade
- * returns it. Without `projectRoot` it is the machine alone; `globalConfigPath` names a global config file whose
- * directory replaces `~/.fgos`. A config file the door refuses throws.
+ * The `dispatch` section of the effective config with the layer of each key (`{ value, origins }`, as the
+ * facade returns it). Without `projectRoot` it is the machine alone; `globalConfigPath` names a global
+ * config file whose directory replaces `~/.fgos`. A config file the door refuses throws.
  */
 export function readDispatchConfig({ projectRoot, globalConfigPath } = {}) {
   const options = { globalDir: globalConfigPath ? path.dirname(globalConfigPath) : undefined, sections: ['dispatch'], origins: ['dispatch'] };
@@ -52,10 +51,7 @@ function readOrUnset(projectRoot, resolve) {
   return resolve(snapshot);
 }
 
-/**
- * The grace for the project rooted at `projectRoot`. A refused config file reads as "nothing
- * configured" (doctor reports it); a present but unusable value throws a named validation error (`RunnerConfigError`, the same message the doctor check prints), never guessed around.
- */
+/** The grace for the project at `projectRoot`; a present but unusable value throws `RunnerConfigError` (the doctor check's message). */
 export function readGateKillGraceMs({ projectRoot } = {}) {
   const { value } = readOrUnset(projectRoot, resolveGateKillGrace);
   const problem = gateKillGraceProblem(value);
@@ -74,10 +70,7 @@ export function cancelWaitProblem(value) {
   return `${CANCEL_WAIT_KEY} must be an integer of at least ${MIN_CANCEL_WAIT_MS} ms, got ${JSON.stringify(value)}`;
 }
 
-/**
- * The cancel wait and where it came from, from a `readDispatchConfig` result: the configured value, else
- * the effective kill grace plus the slack (`source: 'default'`). `grace` is the grace that default used.
- */
+/** The cancel wait and its source, from a `readDispatchConfig` result: the configured value, else the kill grace plus the slack (`grace` is the one used). */
 export function resolveCancelWait(snapshot) {
   const grace = resolveGateKillGrace(snapshot).value;
   const configured = dispatchSetting(snapshot, 'cancelWaitMs');

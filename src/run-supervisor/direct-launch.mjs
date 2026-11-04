@@ -1,8 +1,8 @@
-// The controller half of a supervised attempt, `direct` or `terminal` (r6 §9.4): take the attempt lock (and the cwd lease when the
-// agent writes), let the caller prepare, write the immutable envelope and the secret side file, start
-// `fgos internal supervise` detached with the locks handed over as descriptors, wait for its binding, and
-// then only read: progress from the capture files, the answer from `result.json` that the settle step
-// writes. The controller never settles, never signals the agent and never owns a process of the attempt.
+// The controller half of a supervised attempt, `direct` or `terminal` (r6 §9.4): take the attempt lock (and
+// the cwd lease when the agent writes), write the immutable envelope and the secret side file, start
+// `fgos internal supervise` detached with the locks handed over as descriptors, wait for its binding, then
+// only read: progress from the capture files, the answer from the `result.json` the settle step writes.
+// The controller never settles, never signals the agent and never owns a process of the attempt.
 
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -10,7 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { StringDecoder } from 'node:string_decoder';
 import { spawn } from 'node:child_process';
-import { acquireSync, createLockScope, spawnWithLocks, resolveLock, resolveStateRoot, HolderLockError } from '../holder-lock/index.mjs';
+import { acquireSync, createLockScope, spawnWithLocks, resolveLock, resolveStateRoot } from '../holder-lock/index.mjs';
 import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
 import { admitSuccessor } from '../runner/dispatch/cwd-lock.mjs';
 import { DispatchError } from '../runner/dispatch/dispatch-error.mjs';
@@ -23,16 +23,14 @@ import { ensureRuntimeSocketDir } from './runtime-dir.mjs';
 import { OWN_PAYLOAD_ROOT, realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL, ATTEMPT_STEP_TIMEOUT_MS, MAX_ATTEMPT_STEPS } from './protocol.mjs';
 
-// The supervisor's own start budgets for a terminal seat, summed, plus slack for the herdr calls:
-// DEFAULT_SHELL_READY_TIMEOUT_MS 10 000 and DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS 5 000 (terminal-control
-// route.rs) and HELLO_LIMIT 15 000 (supervise.rs), + 15 000.
+// The supervisor's start budgets for a terminal seat, summed, plus 15 000 slack for the herdr calls:
+// shell-ready 10 000 and launch-identify 5 000 (terminal-control route.rs), HELLO_LIMIT 15 000 (supervise.rs).
 const BINDING_WAIT_MS = 45_000;
 const POLL_MS = 25;
 const CLOSE_WAIT_MS = 60_000;
 const TAIL_CHUNK_BYTES = 1024 * 1024;
 const ADOPT_POLL_MS = 250;
 const ADOPT_WAIT_MS = 60_000;
-const STEP_TIMEOUT_MS = ATTEMPT_STEP_TIMEOUT_MS;
 /** Slack past the soft deadline for SIGTERM, the kill grace and the supervisor's own domain sweep. */
 const HARD_CEILING_SLACK_MS = 15_000;
 const ENV_ALLOW = ['PATH', 'HOME', 'USERPROFILE', 'TMPDIR', 'TEMP', 'TMP', 'LANG', 'LC_ALL', 'SYSTEMROOT', 'XDG_RUNTIME_DIR'];
@@ -48,7 +46,7 @@ export function resolveAttemptHost() {
 
 /**
  * Take `attempt` (rank 15) and, for an agent that writes, `dispatch-cwd` (rank 30), in one scope so the
- * order is checked. Throws `attempt-in-flight` / `dispatch-in-flight` by name; nothing stays held.
+ * order is checked. Throws `attempt-in-flight` / `dispatch-in-flight`; nothing stays held.
  */
 export function acquireAttemptLocks({ fgosDir, assignmentDir, attemptStr, cwd, mutating, custody = null, executorId = null, capability = null }) {
   if (custody && (custody.released || custody.name !== 'dispatch-cwd' || custody.path !== resolveLock('dispatch-cwd', { fgosDir, cwd }).v3Path)) {
@@ -82,7 +80,7 @@ export function acquireAttemptLocks({ fgosDir, assignmentDir, attemptStr, cwd, m
   };
 }
 
-/** Where one attempt keeps the files its gate and its agent write, derived from the attempt directory. */
+/** Where one attempt keeps the files its gate and its agent write. */
 export function attemptPaths(runDir, attemptId) {
   const dir = path.resolve(runDir);
   const captureDir = path.join(dir, 'protected', 'capture', attemptId);
@@ -98,9 +96,9 @@ export function attemptPaths(runDir, attemptId) {
 }
 
 /**
- * Create, empty, the files a sandboxed gate must write (its exit record and the two capture files) and
- * the outbox. The sandbox binds exactly these files writable; the attempt directory around them stays
- * read-only. Returns the list the sandbox is asked to bind.
+ * Create, empty, the files a sandboxed gate must write (exit record, two capture files) and the outbox.
+ * The sandbox binds exactly these writable; the attempt directory around them stays read-only.
+ * Returns the list the sandbox is asked to bind.
  */
 export function prepareAttemptFiles(runDir, attemptId) {
   const paths = attemptPaths(runDir, attemptId);
@@ -112,30 +110,23 @@ export function prepareAttemptFiles(runDir, attemptId) {
   return binds;
 }
 
-/**
- * The command the sandbox runs: the gate of this attempt. `direct`: GO channel at descriptor 5 (what the
- * supervisor appends). `terminal`: the gate dials the attempt's unix socket `goSocket`.
- */
+/** The sandbox command: the gate of this attempt. `direct`: GO channel at descriptor 5; `terminal`: the gate dials `goSocket`. */
 export function attemptGateCommand(hostBin, runDir, { goSocket = null } = {}) {
   const base = [hostBin, 'internal', 'gate', '--protocol', String(PROTOCOL), '--envelope', path.join(path.resolve(runDir), 'envelope.json')];
   return goSocket ? [...base, '--go-socket', goSocket] : [...base, '--go-fd', '5'];
 }
 
-/**
- * Where the gate of a `terminal` attempt reaches its supervisor: the owner-only runtime socket directory,
- * a name derived from the attempt id so no id can name another attempt's socket.
- */
+/** Where the gate of a `terminal` attempt reaches its supervisor: a hashed name in the owner-only runtime socket directory. */
 export function terminalSocketPath(attemptId) {
   const name = crypto.createHash('sha256').update(attemptId).digest('hex').slice(0, 16);
   return path.join(ensureRuntimeSocketDir(), `${name}.sock`);
 }
 
-/** CLOCK_BOOTTIME now, in the shape the envelope uses. */
+/** CLOCK_BOOTTIME now, in the envelope's shape. */
 function boottimeNow() {
   return { bootId: selfRecord().bootId ?? 'unknown-boot', boottimeNs: Math.round(os.uptime() * 1e9) };
 }
 
-/** The same boot, `afterMs` from now. */
 function boottimeAfter(afterMs) {
   const now = boottimeNow();
   return { bootId: now.bootId, boottimeNs: now.boottimeNs + Math.round(afterMs * 1e6) };
@@ -153,9 +144,8 @@ export function attemptStepEnv({ env = process.env } = {}) {
 }
 
 /**
- * `env` with the attempt's writer id applied: `FGOS_SESSION_ID` set, `FGOS_PARENT_WRITER_ID` set or removed,
- * so what the controller itself carried never reaches the agent. Both env sources of an attempt (the
- * envelope's launch env and the side file) go through here; the gate only merges them.
+ * `env` with the attempt's writer id applied (`FGOS_SESSION_ID` set, `FGOS_PARENT_WRITER_ID` set or removed),
+ * so what the controller carried never reaches the agent. Both env sources of an attempt go through here.
  */
 export function withIdentityEnv(env, identity) {
   if (!identity) return env;
@@ -164,7 +154,7 @@ export function withIdentityEnv(env, identity) {
   return { ...out, FGOS_SESSION_ID: identity.writerId, ...(identity.parentWriterId ? { FGOS_PARENT_WRITER_ID: identity.parentWriterId } : {}) };
 }
 
-/** The process steps an attempt runs after its receipt, in order: the one list the envelope and the intent both carry. */
+/** The steps an attempt runs after its receipt, in order: the one list the envelope and the intent both carry. */
 function attemptSteps({ runDir, host, stepEnv, extraSteps = [] }) {
   return ['settle-attempt', 'finalize-home', ...extraSteps].map((stepId) => ({
     stepId,
@@ -173,15 +163,14 @@ function attemptSteps({ runDir, host, stepEnv, extraSteps = [] }) {
     argv: ['internal', 'attempt-step', stepId, '--protocol', String(PROTOCOL), '--run-dir', runDir],
     cwd: runDir,
     env: stepEnv,
-    stepTimeoutMs: STEP_TIMEOUT_MS,
+    stepTimeoutMs: ATTEMPT_STEP_TIMEOUT_MS,
   }));
 }
 
 /**
  * Publish `attempt-intent.json` (contract attempt-intent.v1.json) right after the attempt lock is taken:
  * what the adopt door needs to close this attempt if the controller dies before it writes the envelope.
- * It is written under the lock and replaced atomically, so a reader never sees a half file; a resumed
- * attempt that never got an envelope gets the intent of its new launch.
+ * Written under the lock and replaced atomically; a resumed attempt with no envelope gets its new launch's intent.
  */
 export function writeAttemptIntent({ runDir, attemptId, unitRunId, terminal, cwd, host, stepEnv }) {
   const paths = attemptPaths(runDir, attemptId);
@@ -204,21 +193,16 @@ export function removeAttemptIntent(runDir) {
 }
 
 /**
- * Build the envelope v3 body (without digest) and the side file of one attempt.
- *
- * @param {object} p
- * @param {string} p.attemptId        minted by the controller; equals the launch command id
- * @param {string} p.runDir           absolute attempt directory (`runs/<NN>`)
- * @param {object} p.attempt          `prepareConfinementForLaunch(...).attempt`
- * @param {string} p.capture          directory that holds the agent's stdout and stderr files
+ * Build the envelope v3 body (without digest) of one attempt.
+ * `attemptId` is minted by the controller and equals the launch command id; `runDir` is the absolute
+ * attempt directory (`runs/<NN>`); `attempt` is `prepareConfinementForLaunch(...).attempt`.
  */
 export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, cwdLeaseOwner, identity, terminal = null, extraSteps = [] }) {
   if (2 + extraSteps.length > MAX_ATTEMPT_STEPS) throw new DispatchError('too-many-steps', `an attempt runs at most ${MAX_ATTEMPT_STEPS} steps`, { runDir });
   const paths = attemptPaths(runDir, attemptId);
-  const sideFile = paths.sideFile;
   const confined = Array.isArray(attempt.bwrapPrefix);
   const mode = terminal ? 'terminal' : 'direct';
-  const body = {
+  return {
     v: 3,
     attemptId,
     unitRunId,
@@ -244,7 +228,7 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
     deadlines: {
       softAt: timeoutMs ? boottimeAfter(timeoutMs) : null,
       idleMs: idleTimeoutMs || null,
-      hardCeiling: boottimeAfter((timeoutMs || STEP_TIMEOUT_MS) + gateKillGraceMs + HARD_CEILING_SLACK_MS),
+      hardCeiling: boottimeAfter((timeoutMs || ATTEMPT_STEP_TIMEOUT_MS) + gateKillGraceMs + HARD_CEILING_SLACK_MS),
       gateKillGraceMs,
       killWaitMs,
     },
@@ -254,7 +238,7 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
       ...attemptSteps({ runDir, host, stepEnv, extraSteps }),
       ...(terminal ? [{ stepId: 'release-slot', builtin: true, disposition: { onSuccess: 'close', onFailure: 'retain' } }] : []),
     ],
-    sideFile,
+    sideFile: paths.sideFile,
     createdAt: boottimeNow(),
     ...(terminal ? {
       slot: { key: attemptId, groupKey: terminal.groupKey },
@@ -262,7 +246,6 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
     } : {}),
     ...(cwdLeaseFile ? { cwdLeaseFile, ...(cwdLeaseOwner ? { cwdLeaseOwner } : {}) } : {}),
   };
-  return body;
 }
 
 /** Write envelope.json (digest included) and the 0600 side file; both exactly once. */
@@ -282,7 +265,7 @@ export function writeSettleContext(runDir, context) {
   publishMutableProjection(path.join(runDir, 'controller', 'settle-context.json'), { v: 1, ...context });
 }
 
-/** Read the controller side settings once: the kill grace, and the predecessor kill wait the envelope carries. */
+/** The kill grace and the predecessor kill wait the envelope carries. */
 export function readLaunchSettings(projectRoot) {
   return { gateKillGraceMs: readGateKillGraceMs({ projectRoot }), killWaitMs: DEFAULT_KILL_WAIT_MS };
 }
@@ -292,7 +275,6 @@ export function readLaunchSettings(projectRoot) {
  * keeps cwd custody through commit, closing only the attempt copy at binding. Windows: the controller
  * releases the attempt copy after spawn; its existing helper keeps the cwd lease and the supervisor
  * declares its job on that same lease without reacquiring.
- * @returns {{child: import('node:child_process').ChildProcess}}
  */
 export function startSupervisor({ envelope, locks, stepEnv, extraEnv = {} }) {
   const runDir = envelope.runDir;
@@ -318,13 +300,9 @@ export function startSupervisor({ envelope, locks, stepEnv, extraEnv = {} }) {
   }
 }
 
-function readJson(file) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
-}
-
 /**
- * Follow the capture files by offset and hand new text to `onChunk(stream, text)`; no IPC. The agent writes
- * these files, so each look reads at most TAIL_CHUNK_BYTES and never follows a link; a multibyte character
+ * Follow the capture files by offset and hand new text to `onChunk(stream, text)`. The agent writes these
+ * files, so each look reads at most TAIL_CHUNK_BYTES and never follows a link; a multibyte character
  * that straddles two looks is held back until its rest arrives.
  */
 export function captureTail(paths, onChunk) {
@@ -350,17 +328,14 @@ export function captureTail(paths, onChunk) {
   };
 }
 
-/**
- * Wait until the supervisor has bound the attempt. Returns `'bound'`, `'exited'` (the supervisor ended
- * without a binding, its exit code in `exit`) or `'unknown'` (still alive, no binding in time).
- */
+/** Wait for the supervisor's binding: `{state}` is `'bound'`, `'exited'` (ended without one; `exit` has its code) or `'unknown'` (alive, none in time). */
 export async function waitForBinding(runDir, child, { timeoutMs = BINDING_WAIT_MS } = {}) {
   const binding = path.join(runDir, 'supervisor-binding.json');
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     if (fs.existsSync(binding)) return { state: 'bound' };
     if (child.spawnError || child.exitCode !== null || child.signalCode !== null) {
-      // The binding may have been published in the instant before it exited.
+      // The binding may have been published just before it exited.
       return fs.existsSync(binding) ? { state: 'bound' } : { state: 'exited', exit: child.exitCode, signal: child.signalCode, ...(child.spawnError ? { error: child.spawnError.code ?? String(child.spawnError.message) } : {}) };
     }
     await sleep(POLL_MS);
@@ -370,16 +345,15 @@ export async function waitForBinding(runDir, child, { timeoutMs = BINDING_WAIT_M
 
 /**
  * The result is written by the first step; the supervisor still runs the steps after it and holds the
- * attempt lock until it has written `closed.json`. Whoever dispatches next over the same cwd or attempt must
- * not meet that tail, so the controller waits for it (bounded: a stuck step never holds the caller).
+ * attempt lock until it wrote `closed.json`. The next dispatch over the same cwd or attempt must not meet
+ * that tail, so the controller waits for it (bounded: a stuck step never holds the caller).
  */
 async function waitForClosed(runDir, child, { timeoutMs = CLOSE_WAIT_MS } = {}) {
   const closed = path.join(runDir, 'closed.json');
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
-    const gone = child.exitCode !== null || child.signalCode !== null;
     // The supervisor drops the attempt lock when its process ends, a moment after it wrote closed.json.
-    if (gone) return fs.existsSync(closed);
+    if (child.exitCode !== null || child.signalCode !== null) return fs.existsSync(closed);
     await sleep(POLL_MS);
   }
   return fs.existsSync(closed);
@@ -405,8 +379,8 @@ export async function awaitSettledResult({ runDir, runId, child, capture, onChun
     }
     const supervisorGone = child.exitCode !== null || child.signalCode !== null;
     if (supervisorGone || Date.now() >= giveUpAt) {
-      // No supervisor left to write the answer: the adopt door judges the attempt and finishes whatever it
-      // left (the steps). An agent that still lives (the gate holds the attempt lock) is waited for here.
+      // No supervisor left to write the answer: the adopt door judges the attempt and finishes its steps;
+      // an agent that still lives (the gate holds the attempt lock) is waited for here.
       let judged;
       try { judged = adoptRun(runDir); } catch { return readSettledResult(runDir, runId); }
       const waiting = judged.state === 'running' || judged.state === 'being-adopted' || judged.state === 'held' || judged.state === 'needs-adopt';
@@ -420,5 +394,3 @@ export async function awaitSettledResult({ runDir, runId, child, capture, onChun
     await sleep(POLL_MS);
   }
 }
-
-export { HolderLockError };

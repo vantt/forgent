@@ -1,5 +1,5 @@
-// Shared by the attempt-step entry and the steps: exit codes, the step error, and the readers of
-// the envelope and the side file. The host route has already verified the envelope digest.
+// Shared by the attempt-step entry and the steps: exit codes, the step error, and the envelope and side
+// file readers. The host route has already verified the envelope digest.
 
 import fs from 'node:fs';
 import path from 'node:path';

@@ -1,5 +1,5 @@
-// Runtime socket directory: where per-attempt control sockets live. Owner-only, outside any
-// run directory, and short enough that `<dir>/<attempt hash>.sock` fits a unix socket path.
+// Where per-attempt control sockets live: owner-only, outside any run directory, short enough that
+// `<dir>/<attempt hash>.sock` fits a unix socket path.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -24,10 +24,7 @@ export function userRuntimeDir({ env = process.env } = {}) {
   return typeof xdg === 'string' && path.isAbsolute(xdg) ? xdg : null;
 }
 
-/**
- * `$XDG_RUNTIME_DIR/fgos`, else `/tmp/fgos-<uid>`. Pure path resolution: `ensureRuntimeSocketDir`
- * creates and checks it.
- */
+/** `$XDG_RUNTIME_DIR/fgos`, else `/tmp/fgos-<uid>`; pure path resolution (`ensureRuntimeSocketDir` creates and checks it). */
 export function resolveRuntimeSocketDir({ env = process.env, uid = process.getuid?.() ?? 0 } = {}) {
   const xdg = userRuntimeDir({ env });
   return xdg ? path.join(xdg, 'fgos') : path.join('/tmp', `fgos-${uid}`);

@@ -1,11 +1,10 @@
 // What a controller does when a person presses Ctrl-C (r6 §16): ask the supervisor of every attempt it
 // handed over to stop that attempt, wait a bounded time for the receipt, say how to continue, and leave.
 // The controller never signals an agent itself; it only publishes `cancel-requested.json`, which the
-// supervisor polls. An attempt that is being handed over (`beginLaunch` until its binding is known, or the
-// launch fails) is asked at once, like a delivered one: its envelope exists before the launch begins, and
-// the supervisor reads the request on its first tick, so a slow launch is cancelled without waiting for its
-// binding. After the first signal no new launch and no new step starts (`assertNotCancelled`): the
-// controller only waits for the receipts of every attempt it asked and leaves.
+// supervisor polls. An attempt being handed over (`beginLaunch` until its binding is known, or the launch
+// fails) is asked at once, like a delivered one: its envelope exists before the launch begins, so a slow
+// launch is cancelled without waiting for its binding. After the first signal no new launch and no new
+// step starts (`assertNotCancelled`).
 //
 // Handlers are installed only by a process that asked for it (`enableCancelOnSignal`, the CLI entry);
 // an in-process caller of the runner keeps its own signal handling.
@@ -20,9 +19,9 @@ const EXIT_CODES = Object.freeze({ SIGINT: 130, SIGTERM: 143 });
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Attempt directories this process delivered to a supervisor and has not yet read the answer of. */
+/** Attempt directories delivered to a supervisor whose answer is not read yet. */
 const delivered = new Set();
-/** Attempt directories handed to a supervisor whose binding is not known yet. */
+/** Attempt directories handed to a supervisor with no binding yet. */
 const launching = new Set();
 
 // Set by the first signal and never cleared by a running process: the controller is on its way out.
@@ -42,12 +41,12 @@ export class RunCancelledError extends Error {
   }
 }
 
-/** Throws `RunCancelledError` once a signal asked this process to cancel; called before every new step. */
+/** Throws `RunCancelledError` once a signal asked this process to cancel. */
 export function assertNotCancelled() {
   if (cancelSignal) throw new RunCancelledError(cancelSignal);
 }
 
-/** Mark `runDir` as handed to a supervisor; refuses once a cancel was requested (nothing starts after it). */
+/** Mark `runDir` as handed to a supervisor; refuses once a cancel was requested. */
 export function beginLaunch(runDir) {
   assertNotCancelled();
   launching.add(path.resolve(runDir));
@@ -72,9 +71,6 @@ export function registeredRuns() {
   return [...delivered].sort();
 }
 
-// The tuple as the door gives it: the form Rust compares (`pidNs` as `pid:[N]` or `none`).
-const selfTuple = selfRecord;
-
 function readEnvelope(runDir) {
   try { return JSON.parse(fs.readFileSync(path.join(runDir, 'envelope.json'), 'utf8')); } catch { return null; }
 }
@@ -92,7 +88,7 @@ export function requestCancel(runDir, signal) {
       attemptId,
       requestedBy: `controller pid ${process.pid}`,
       by: `signal:${signal}`,
-      requester: selfTuple(),
+      requester: selfRecord(),
       at: new Date().toISOString(),
     });
   } catch { return false; }
@@ -100,9 +96,9 @@ export function requestCancel(runDir, signal) {
 }
 
 /**
- * Handle SIGINT and SIGTERM: the first one writes the cancel request of every attempt this process delivered
- * or is still handing over at once, waits for the receipts (at most `cancelWaitMs`), prints the resume line
- * and exits 130 or 143; the second exits at once (the cancel files are already written, the supervisors still stop their attempts).
+ * Handle SIGINT and SIGTERM: the first writes the cancel request of every attempt delivered or being
+ * handed over, waits for the receipts (at most `cancelWaitMs`), prints the resume line and exits 130 or
+ * 143; the second exits at once (the cancel files are written, the supervisors still stop their attempts).
  * @returns {() => void} removes the handlers
  */
 export function installCancelOnSignal({ cancelWaitMs, exit = (code) => process.exit(code), stderr = process.stderr } = {}) {

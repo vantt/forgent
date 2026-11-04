@@ -1,9 +1,6 @@
-// Entry of a post-receipt step of one attempt. The Rust host route `fgos internal attempt-step`
-// execs this file from the payload of the release that wrote the envelope:
-//
-//   node attempt-step.mjs <stepId> --run-dir <attemptDir>
-//
-// It never goes through bin/fgos.mjs. Stdout carries one JSON line (step-receipt.v1 stepProcess):
+// Entry of a post-receipt step of one attempt. The Rust host route `fgos internal attempt-step` execs
+// `node attempt-step.mjs <stepId> --run-dir <attemptDir>` from the payload of the release that wrote the
+// envelope; it never goes through bin/fgos.mjs. Stdout carries one JSON line (step-receipt.v1 stepProcess):
 // done, retry or error. Exit codes: 0 done, 65 envelope-invalid, 66 payload-missing, 70 error,
 // 75 retry (no receipt, adopt runs the step again).
 
@@ -25,9 +22,9 @@ const STEP_LOADERS = Object.freeze({
 const REQUIRED_ENV = Object.freeze(['FGOS_STATE_ROOT', process.platform === 'win32' ? 'USERPROFILE' : 'HOME']);
 
 /**
- * The host route already verified the envelope digest, the step id and the payload it execs from.
- * What only Node can read is the release manifest next to `hostBin`: it must declare the payload the
- * envelope names. A host with no manifest is a development host and has nothing to cross-check.
+ * The host route already verified the envelope digest, the step id and the payload it execs from. Node
+ * checks that the release manifest next to `hostBin` declares the payload the envelope names; a host
+ * with no manifest is a development host with nothing to cross-check.
  */
 export function verifyPayload(envelope) {
   const named = realpathOrNull(envelope.payloadRoot);
