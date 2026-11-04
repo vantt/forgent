@@ -192,12 +192,24 @@ fn classify_golden_outputs_match_the_published_outcome_schema() {
         .map(|name| name.as_str().unwrap())
         .collect();
     required.sort_unstable();
-    assert_eq!(declared, required, "the host always emits every declared field");
+    assert_eq!(
+        declared, required,
+        "the host always emits every declared field"
+    );
     let fixture: GoldenFile = serde_json::from_str(GOLDEN).unwrap();
     let mut checked = 0;
-    for case in fixture.cases.iter().filter(|case| case.operation == "classify") {
+    for case in fixture
+        .cases
+        .iter()
+        .filter(|case| case.operation == "classify")
+    {
         if let Some(expected) = &case.expected {
-            let mut keys: Vec<&str> = expected.as_object().unwrap().keys().map(String::as_str).collect();
+            let mut keys: Vec<&str> = expected
+                .as_object()
+                .unwrap()
+                .keys()
+                .map(String::as_str)
+                .collect();
             keys.sort_unstable();
             assert_eq!(keys, declared, "{}", case.name);
             checked += 1;
