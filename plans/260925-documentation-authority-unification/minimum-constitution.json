@@ -816,8 +816,7 @@
     "checkedBy": {
       "kind": "retired",
       "was": "scripts/check-doc-constitution.mjs",
-      "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention",
-      "note": "--promotion reports missing promotion fields (report only); the candidate-field check itself is planned."
+      "note": "script retired by the post-cutover maintenance phase; body health is scripts/doc-health.mjs and placement is fgos convention. Its former --promotion mode reported missing promotion fields (report only); the candidate-field check was never built."
     },
     "governanceRef": "5. Metadata"
   },

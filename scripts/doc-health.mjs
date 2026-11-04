@@ -173,8 +173,9 @@ export function gitCommitResolver(repoRoot) {
   const cache = new Map();
   return (token) => {
     if (!cache.has(token)) {
-      let sha = null;
-      try { sha = git.resolveCommit({ name: token }); } catch { sha = null; }
+      // The door answers null for a token that is not a commit; any other
+      // failure is a driver fault and propagates.
+      const sha = git.resolveCommit({ name: token });
       cache.set(token, typeof sha === 'string' && sha.length > 0);
     }
     return cache.get(token);
