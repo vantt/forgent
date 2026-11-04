@@ -6,7 +6,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { acquireDocumentationCutoverLease } from '../../src/runner/documentation-cutover-lease.mjs';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 
 import {
@@ -16,7 +15,6 @@ import {
   resumeWorkflow,
   resumeWorkflowDetached,
   answerWorkflow,
-  answerWorkflowDetached,
   statusWorkflow,
   closeWorkflow,
   gateWorkflow,
@@ -27,7 +25,6 @@ import { readBinding } from '../../src/workflow/case-bindings.mjs';
 import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
-import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { appendAll, conductorWorkflow, settle, verifyReceipt } from '../helpers/workflow-case-fixture.mjs';
 
 ensureScriptAddon();
@@ -52,56 +49,7 @@ const opts = (tmp) => ({ repoRoot: tmp, cwd: tmp, worktree: tmp });
 const eventsOf = (tmp, id) => readWorkflowEvents({ repoRoot: tmp, workflowRunId: id });
 const unit = (id, extra = {}) => ({ id, template: { capability: 'docs:write', pattern: 'solo', objective: 'Read', writes: [], ...extra } });
 
-// Case-port tests do not prove documentation admission. Exercise start and
-// all four later execute doors, including a foreign origin recorded before
-// the freeze; answering from the holder must never upgrade that origin.
-for (const originKind of ['main', 'foreign', 'non-Git']) test(`workflow start, resume and answer refuse a ${originKind} non-holder origin before effects`, async () => {
-  const tmp = setupRepo();
-  const git = (...args) => execFileSync('git', args, { cwd: tmp, encoding: 'utf8' });
-  const holder = path.join(tmp, 'holder');
-  git('worktree', 'add', '-qb', 'holder', holder);
-  const origin = originKind === 'main' ? tmp : originKind === 'foreign' ? setupRepo() : makeFixtureDir('fgos-workflow-outside-');
-  const workflow = validateWorkflow({ id: 'lease-gated', steps: [
-    { id: 'consent', gate: { kind: 'human', question: 'Approve?' } },
-    { id: 'write', dependsOn: ['consent'], units: [unit('writer', originKind === 'non-Git' ? {} : { objective: 'WRITE:docs/new.md', writes: ['docs'] })] },
-    { id: 'land', kind: 'integrate', dependsOn: ['write'] },
-  ] });
-  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: origin, worktree: origin });
-  assert.equal(state.status, 'parked');
-  acquireDocumentationCutoverLease({ repoRoot: holder });
-  const snapshot = () => {
-    const files = {};
-    const walk = (dir) => {
-      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-        const file = path.join(dir, entry.name);
-        if (entry.isDirectory()) walk(file);
-        else files[path.relative(tmp, file)] = entry.isSymbolicLink() ? fs.readlinkSync(file) : fs.readFileSync(file).toString('base64');
-      }
-    };
-    walk(path.join(tmp, '.fgos'));
-    return { files, refs: git('show-ref'), worktrees: git('worktree', 'list', '--porcelain'), status: git('status', '--porcelain') };
-  };
-  const before = snapshot();
-  const readOnly = validateWorkflow({ id: 'frozen-read', steps: [{ id: 'read', units: [unit('reader')] }] });
-  const startOptions = { workflow: readOnly, repoRoot: tmp, cwd: origin, worktree: origin };
-  await assert.rejects(() => startWorkflow(startOptions), { code: 'documentation-cutover-lease' });
-  assert.deepEqual(snapshot(), before);
-  assert.throws(() => startWorkflowDetached(startOptions), { code: 'documentation-cutover-lease' });
-  assert.deepEqual(snapshot(), before, 'no ledger or detached spawn on a refused start');
-  // Naming the holder on a later call must not rewrite this run's origin.
-  const options = { repoRoot: tmp, cwd: holder, worktree: holder };
-  const answer = { ...options, stepId: 'consent', answer: 'yes', approved: true };
-  await assert.rejects(() => resumeWorkflow(state.workflowRunId, options), { code: 'documentation-cutover-lease' });
-  assert.deepEqual(snapshot(), before);
-  assert.throws(() => resumeWorkflowDetached(state.workflowRunId, options), { code: 'documentation-cutover-lease' });
-  assert.deepEqual(snapshot(), before);
-  await assert.rejects(() => answerWorkflow(state.workflowRunId, answer), { code: 'documentation-cutover-lease' });
-  assert.deepEqual(snapshot(), before);
-  assert.throws(() => answerWorkflowDetached(state.workflowRunId, answer), { code: 'documentation-cutover-lease' });
-  assert.deepEqual(snapshot(), before, 'no answer round, advance, detached log, worktree or branch');
-});
-
-test('a holder workflow keeps its recorded checkout through resume, answer and integration from main', async () => {
+test('an answered gate lets the integrate step land the writing unit branch on main', async () => {
   const tmp = setupRepo();
   const git = (...args) => execFileSync('git', args, { cwd: tmp, encoding: 'utf8' }).trim();
   git('checkout', '-qb', 'incoming');
@@ -111,17 +59,13 @@ test('a holder workflow keeps its recorded checkout through resume, answer and i
   git('checkout', '-q', 'main');
   const writer = path.join(tmp, 'writer');
   git('worktree', 'add', writer, 'incoming');
-  const holder = path.join(tmp, 'holder');
-  git('worktree', 'add', '-qb', 'holder', holder);
-  acquireDocumentationCutoverLease({ repoRoot: holder });
-  const workflow = validateWorkflow({ id: 'holder-gate', steps: [
+  const workflow = validateWorkflow({ id: 'integrate-gate', steps: [
     { id: 'consent', gate: { kind: 'human', question: 'Approve?' } },
     { id: 'write', dependsOn: ['consent'], units: [unit('writer', { writes: ['docs'] })] },
     { id: 'land', kind: 'integrate', dependsOn: ['write'] },
   ] });
-  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: holder });
+  const state = await startWorkflow({ workflow, ...opts(tmp) });
   assert.equal(state.status, 'parked');
-  assert.equal(eventsOf(tmp, state.workflowRunId).find(e => e.type === 'case.opened').payload.callerCheckout, holder);
   const resumed = await resumeWorkflow(state.workflowRunId, opts(tmp));
   assert.equal(resumed.status, 'parked');
   // Seed only the earlier worker's settled output. The owning writing test

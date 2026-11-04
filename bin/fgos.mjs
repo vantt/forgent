@@ -114,12 +114,6 @@ import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
 import { resolveStateRoot as worktreeStateRoot } from '../src/holder-lock/state-root.mjs';
 import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSessionWorktree, SessionError } from '../src/runner/session.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
-import {
-  acquireDocumentationCutoverLease,
-  inspectDocumentationCutoverLease,
-  releaseDocumentationCutoverLease,
-  abandonDocumentationCutoverLease,
-} from '../src/runner/documentation-cutover-lease.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
@@ -2307,14 +2301,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           cwd: process.cwd(),
           worktree: flags.worktree,
         };
-        // CLI seat preflight may bootstrap config. Admit the execution first,
-        // and hand that same result to start rather than reading twice.
-        if (startParams.seats !== undefined) {
-          const { admitDocumentationExecution } = await import('../src/runner/execution/run.mjs');
-          startParams.documentationAdmission = admitDocumentationExecution({
-            repoRoot: flags.dir, callerCheckout: flags.worktree ?? process.cwd(),
-          });
-        }
         // --seats: dry-bind the rebuilt definition first; a refusal creates no run, shared-family notes ride along.
         const seatsPreflight = startParams.seats === undefined ? undefined : await preflightWorkflowSeats(startParams);
         // Default: record the run, hand advancing to a detached process, return the run id.
@@ -2800,7 +2786,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
     }
     case 'run': {
-      const { runUnit, resolveGitRoots, admitDocumentationExecution } = await import('../src/runner/execution/run.mjs');
+      const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
       const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
       const unitPath = flags.unit;
       const resumeUnitRunId = flags.resume;
@@ -2882,12 +2868,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const confined = confinedWriteRefusal({ mainRoot: portRoot ?? process.cwd(), caseId: typeof flags.case === 'string' ? flags.case : null });
         if (confined) throw new RunnerConfigError(`nested-write-from-confined-worker: a writing dispatch from inside a confined worker is refused: ${confined}; a confined worker may dispatch read-only work only`, { code: 'nested-write-from-confined-worker', phase: 'pre-admission' });
       }
-      // Admit before prompt/provider config bootstrap or port construction can
-      // write. Reuse this operation-local result in runUnit without re-reading
-      // the lease or reinterpreting the declared caller checkout.
-      const documentationAdmission = admitDocumentationExecution({
-        repoRoot: portRoot ?? process.cwd(), callerCheckout: worktree ?? process.cwd(),
-      });
       const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
       // Everything about the one-liner is checked here, before runUnit creates a unit run.
       const unitData = !buildsUnit ? undefined : await adhocUnitFromPrompt(prompt, flags, {
@@ -2938,7 +2918,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
       try {
         return attachDirWarning(await runUnit({
-          documentationAdmission,
           unitPath,
           unitData,
           ...(portRoot ? { caseAdmission: createCaseAdmissionPort({ repoRoot: portRoot }) } : {}),
@@ -2955,7 +2934,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           resumeUnitRunId,
           repoRoot,
           cwd: process.cwd(),
-          callerCheckout: worktree ?? process.cwd(),
           worktree,
         }), runWarning);
       } catch (err) {
@@ -3727,7 +3705,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
       const { approveUseCase } = await import('../src/verbs/merge/approve.mjs');
       return await approveUseCase(
-        { dir, repoRoot, cwd: process.cwd() },
+        { dir, repoRoot },
         parseMergeClusterOptions('approve', flags, dir, { id }),
       );
     }
@@ -3756,7 +3734,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // to today when the flag is omitted.
       const repoRoot = flags['trust-dir'] === true ? path.dirname(dir) : process.cwd();
       const { syncRootUseCase } = await import('../src/verbs/merge/sync-root.mjs');
-      return await syncRootUseCase({ dir, repoRoot, cwd: process.cwd() }, parseMergeClusterOptions('sync-root', flags, dir, { id }));
+      return await syncRootUseCase({ dir, repoRoot }, parseMergeClusterOptions('sync-root', flags, dir, { id }));
     }
 
     // tsk-3gx-3: Layer 2 action — takes N flat sibling item ids (D2: caller's
@@ -3795,7 +3773,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const timeoutMs = flags.timeout !== undefined ? Number(flags.timeout) : undefined;
       const { promoteToComponentUseCase } = await import('../src/verbs/merge/promote-to-component.mjs');
       return await promoteToComponentUseCase(
-        { dir, repoRoot, cwd: process.cwd() },
+        { dir, repoRoot },
         { ids, rootId: flags['root-id'], rootTitle: flags['root-title'], timeoutMs },
       );
     }
@@ -3865,38 +3843,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         });
       }
       throw new Error(`unknown worktree sub-verb: ${sub}`);
-    }
-    case 'docs-lease': {
-      const sub = requireField(positional[0], 'docs-lease requires a sub-verb: acquire | status | release | abandon');
-      const cwd = process.cwd();
-      const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
-      if (sub === 'acquire') {
-        const res = acquireDocumentationCutoverLease({ repoRoot: cwd, worktree: flags.worktree ? path.resolve(flags.worktree) : undefined });
-        if (flags.json) return { result: res.result, tokenHash: res.tokenHash, tokenPath: res.tokenPath, sidecar: res.sidecar };
-        return `acquired documentation-cutover lease (token hash: ${res.tokenHash})\n`;
-      }
-      if (sub === 'status') {
-        const res = inspectDocumentationCutoverLease({ repoRoot });
-        if (flags.json) return res;
-        if (res.state === 'corrupt') return 'documentation-cutover lease sidecar is corrupt; failing closed\nrepair with: fgos docs-lease abandon --owner-confirmed --reason "<reason>"\n';
-        if (!res.held) return `documentation-cutover lease is ${res.state}\n`;
-        return `documentation-cutover lease is held (age: ${Math.round(res.ageMs / 1000)}s, kernel lock: ${res.kernelLock})\nholder token hash: ${res.holderTokenHash}\nworktree: ${res.worktree}\n`;
-      }
-      if (sub === 'release') {
-        const res = releaseDocumentationCutoverLease({ repoRoot: cwd });
-        if (flags.json) return res;
-        return `released documentation-cutover lease at ${res.releasedAt}; drift: ${res.drift.length ? res.drift.join(', ') : 'none'}\n`;
-      }
-      if (sub === 'abandon') {
-        const res = abandonDocumentationCutoverLease({
-          repoRoot: cwd,
-          ownerConfirmed: Boolean(flags['owner-confirmed']),
-          reason: flags.reason,
-        });
-        if (flags.json) return res;
-        return `abandoned documentation-cutover lease: ${res.reason}\n`;
-      }
-      throw new Error(`unknown docs-lease sub-verb: ${sub}`);
     }
     // Opt-in per-session git worktree lifecycle (fgos-multi-session-checkout
     // Epic 1, D6/D7): a first-class `session` verb family wiring session.mjs's
@@ -5353,8 +5299,6 @@ async function main() {
     const data = await runVerb(verb, flags, positional, dir, rest);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
-    } else if (verb === 'docs-lease' && !flags.json) {
-      process.stdout.write(data);
     } else if (verb === 'plan-lint' && !flags.json) {
       process.stdout.write(renderPlanLintReport(data));
     } else {

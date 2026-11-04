@@ -11,7 +11,6 @@ import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { execFileSync } from 'node:child_process';
 
 import { startWorkflow, resumeWorkflow, statusWorkflow, validateWorkflow, readWorkflowEvents } from '../../src/workflow/index.mjs';
-import { acquireDocumentationCutoverLease, DEFAULT_SIDECAR_PATH } from '../../src/runner/documentation-cutover-lease.mjs';
 import { mergeWorkflowBranch } from '../../src/workflow/runner.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { resolveLock } from '../../src/holder-lock/index.mjs';
@@ -137,124 +136,8 @@ const unitRecordOf = (tmp, unitRunId) => JSON.parse(fs.readFileSync(path.join(tm
 const producerAssignment = (tmp, unitRunId) => JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'producer', '1', 'assignment.json'), 'utf8'));
 const opts = (tmp) => ({ repoRoot: tmp, cwd: tmp, worktree: tmp });
 
-// The ordinary writing-chain test owns worker completion. This boundary proof
-// observes admission/replay in a generated worktree whose token is absent.
-test('a holder workflow admits its writing unit using its origin, with one sidecar read for execution', async (t) => {
-  const tmp = setupRepo();
-  const holder = path.join(tmp, 'holder');
-  git(tmp, ['worktree', 'add', '-qb', 'holder', holder]);
-  acquireDocumentationCutoverLease({ repoRoot: holder });
-  const native = loadNativeAddon();
-  const call = native.GitInspect.prototype.call;
-  let reads = 0;
-  t.mock.method(native.GitInspect.prototype, 'call', function(method, args) {
-    if (method === 'pathsAtRevision' && args.paths?.some(p => Buffer.from(p).toString() === DEFAULT_SIDECAR_PATH)) reads++;
-    return call.call(this, method, args);
-  });
-  const workflow = validateWorkflow({ id: 'holder-write', steps: [
-    { id: 'write', units: [{ id: 'writer', template: { capability: 'docs:write', objective: 'WRITE:docs/a.md', writes: ['docs'] } }] },
-  ] });
-  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: holder });
-  const writing = state.steps.write.units.writer;
-  assert.ok(writing, JSON.stringify(state.steps));
-  assert.ok(writing.worktreePath && writing.worktreePath !== holder, JSON.stringify(writing));
-  assert.equal(fs.existsSync(path.join(writing.worktreePath, '.fgos/documentation-cutover.token')), false);
-  const record = unitRecordOf(tmp, writing.unitRunId);
-  assert.deepEqual(record.unit.writes, ['docs']);
-  assert.ok(writing.results[0].runResult.runId, 'reached a real assignment, not a lease refusal');
-  assert.doesNotMatch(JSON.stringify(writing.results), /documentation-cutover-lease|recomputed binding refused/);
-  assert.equal(reads, 1, 'start, writing unit and assignment replay share one admission');
-  assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).find(e => e.type === 'case.opened').payload.callerCheckout, holder);
-});
-
-// Runner Land tests cannot observe Workflow's independent Land door.
-test('workflow integration gates scoped branch paths before Land and admits a linked holder', async () => {
-  const tmp = setupRepo();
-  git(tmp, ['checkout', '-qb', 'incoming']);
-  fs.mkdirSync(path.join(tmp, 'docs'));
-  fs.writeFileSync(path.join(tmp, 'docs/new.md'), 'from workflow\n');
-  git(tmp, ['add', 'docs']); git(tmp, ['commit', '-qm', 'documentation']);
-  git(tmp, ['checkout', '-q', 'main']);
-  const holder = path.join(tmp, 'holder');
-  git(tmp, ['worktree', 'add', '-qb', 'holder', holder]);
-  acquireDocumentationCutoverLease({ repoRoot: holder });
-  const head = git(tmp, ['rev-parse', 'main']);
-  const operations = path.join(tmp, '.git/fgos/git/operations');
-  const before = fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [];
-  const foreign = setupRepo();
-  const outside = makeFixtureDir('fgos-workflow-land-outside-');
-  for (const callerCheckout of [tmp, foreign, outside]) {
-    await assert.rejects(() => mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout }), { code: 'documentation-cutover-lease' });
-    assert.equal(git(tmp, ['rev-parse', 'main']), head);
-    assert.deepEqual(fs.existsSync(operations) ? fs.readdirSync(operations).sort() : [], before);
-    assert.equal(fs.existsSync(path.join(tmp, '.fgos/runtime/git-candidates')), false);
-  }
-  const result = await mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout: holder });
-  assert.equal(result.merged, true);
-  assert.equal(git(tmp, ['show', 'main:docs/new.md']), 'from workflow');
-  // Even an already-integrated/no-op land must fail closed on corrupt authority.
-  fs.writeFileSync(path.join(tmp, DEFAULT_SIDECAR_PATH), '{broken');
-  git(tmp, ['add', DEFAULT_SIDECAR_PATH]); git(tmp, ['commit', '-qm', 'corrupt authority fixture']);
-  const afterLand = fs.readdirSync(operations).sort();
-  await assert.rejects(() => mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout: holder }), { code: 'documentation-cutover-lease-corrupt' });
-  assert.deepEqual(fs.readdirSync(operations).sort(), afterLand);
-});
-
-// Existing Workflow admission cases start with a held lease. Interleave a
-// real acquire around native prepare/publish without replacing Git behavior.
-test('workflow Land refuses a scoped branch when the lease is acquired after admission', async (t) => {
-  for (const timing of ['before prepare', 'after prepare', 'before publish']) await t.test(timing, async (t) => {
-    const tmp = setupRepo();
-    git(tmp, ['checkout', '-qb', 'incoming']);
-    fs.mkdirSync(path.join(tmp, 'docs'));
-    fs.writeFileSync(path.join(tmp, 'docs/new.md'), 'must not publish\n');
-    git(tmp, ['add', 'docs']); git(tmp, ['commit', '-qm', 'documentation']);
-    git(tmp, ['checkout', '-q', 'main']);
-    const holder = path.join(tmp, 'holder');
-    git(tmp, ['worktree', 'add', '-qb', 'holder', holder]);
-    const admittedTarget = git(tmp, ['rev-parse', 'main']);
-    const source = git(tmp, ['rev-parse', 'incoming']);
-    const native = loadNativeAddon();
-    const prepare = native.GitLand.prototype.prepare;
-    const publish = native.GitLand.prototype.publish;
-    let preparedTarget;
-    let heldTarget;
-    let publishes = 0;
-    const acquire = () => {
-      acquireDocumentationCutoverLease({ repoRoot: holder });
-      heldTarget = git(tmp, ['rev-parse', 'main']);
-    };
-    t.mock.method(native.GitLand.prototype, 'prepare', async function(args, loans) {
-      assert.equal(args.request.target, undefined, 'Workflow lets Land select the target under its slot');
-      if (timing === 'before prepare') acquire();
-      const result = await prepare.call(this, args, loans);
-      preparedTarget = result.candidate.target;
-      assert.equal(result.candidate.source, source, 'the admitted source stays pinned');
-      if (timing === 'after prepare') acquire();
-      return result;
-    });
-    t.mock.method(native.GitLand.prototype, 'publish', function(...args) {
-      publishes++;
-      if (timing === 'before publish') acquire();
-      return publish.apply(this, args);
-    });
-    await assert.rejects(() => mergeWorkflowBranch({
-      repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main', callerCheckout: tmp,
-    }), { code: 'documentation-cutover-lease' });
-    assert.equal(preparedTarget, timing === 'before prepare' ? heldTarget : admittedTarget, 'lease admission covers the actual prepared target');
-    assert.notEqual(heldTarget, admittedTarget);
-    assert.equal(publishes, timing === 'before publish' ? 1 : 0);
-    assert.equal(git(tmp, ['rev-parse', 'main']), heldTarget);
-    assert.equal(git(tmp, ['rev-parse', 'incoming']), source);
-    assert.throws(() => git(tmp, ['show', 'main:docs/new.md']));
-    assert.equal(fs.existsSync(path.join(tmp, 'docs/new.md')), false);
-    assert.equal(JSON.parse(git(tmp, ['show', `main:${DEFAULT_SIDECAR_PATH}`])).state, 'held');
-  });
-});
-
-// The race proof above rejects a newly held lease; it cannot prove that an
-// unrelated target advance remains legal at Workflow's independent door.
-test('workflow integration admits the actual prepared target after an unrelated advance', async (t) => {
+// Workflow's integrate door lands on the target Land selects under its slot, even after an unrelated advance.
+test('workflow integration lands on the actual prepared target after an unrelated advance', async (t) => {
   const tmp = setupRepo();
   git(tmp, ['checkout', '-qb', 'incoming']);
   fs.writeFileSync(path.join(tmp, 'incoming.txt'), 'incoming\n');

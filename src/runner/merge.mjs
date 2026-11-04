@@ -59,7 +59,6 @@ import { gitPortOptions } from '../git/inspect.mjs';
 import { createGitSync } from '../git/sync.mjs';
 import { nativeError } from '../git/native.mjs';
 import { createGitWorktree } from '../git/worktree.mjs';
-import { leaseAdmission } from './documentation-cutover-lease.mjs';
 
 /**
  * The invariant-check commands of the project at `repoRoot` (`invariantChecks.commands`). The door reads
@@ -869,21 +868,10 @@ export async function landRunnerItem(repoRoot, item, {
   lockWaitMs = DEFAULT_LOCK_WAIT_MS,
   ownFileSet = null,
   operationId = crypto.randomUUID(),
-  callerCheckout = repoRoot,
 } = {}) {
   const destination = `refs/heads/${target}`;
-  // Authenticate the caller before any write, then re-admit the exact prepared
-  // pair before publish: a lease transition takes main-50, not Land's slot-20.
   let pinned = resolveRefSha(repoRoot, target);
   const source = resolveRefSha(repoRoot, branch);
-  const inspect = inspectGit(repoRoot);
-  const admitLease = (source, targetOid) => {
-    const base = inspect.compareCommits({ left: targetOid, right: source }).mergeBase;
-    const paths = diffPaths(inspect, base, source, { renames: false });
-    const admission = leaseAdmission({ repoRoot, worktreePath: callerCheckout, paths });
-    if (!admission.allowed) throw new MergeError(admission.message, { code: admission.reason, branch, targetRef: target });
-  };
-  admitLease(source, pinned);
   const fgosDir = path.join(repoRoot, '.fgos');
   const mergeSlot = ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`];
   const lockHeld = ([lock, params, label]) => {
@@ -912,10 +900,7 @@ export async function landRunnerItem(repoRoot, item, {
   sealProjectBeforeLand(fgosDir, branch);
   // Trusted-side resolutions are bytes bound to the target they were read
   // against; only then is that target pinned, otherwise Land pins its own.
-  // Re-admit after any checkpoint/wait, before declaring files against this
-  // exact target. A concurrent lease acquire may also have advanced main.
   pinned = resolveRefSha(repoRoot, target);
-  admitLease(source, pinned);
   const declared = declareLandFiles(repoRoot, item, pinned, source);
   if (declared.outcome) return { ...declared, branch };
   const { files } = declared;
@@ -955,9 +940,6 @@ export async function landRunnerItem(repoRoot, item, {
         check: { passed: true, status: 0, timedOut: false, skipped: true, output: `publication already verified and recorded by Land operation ${operationId}; awaiting Work settlement` },
         receipt: previous }, 'delivered');
     }
-    // Slot admission may follow another successful land. Authenticate the
-    // actual prepared pair, not a target observed before waiting for the slot.
-    admitLease(candidate.source, candidate.target);
     // Eligibility still belongs to Work, decided against the exact source and
     // target Land pinned for this candidate, never a target read before it.
     const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, candidate.source, candidate.target);
@@ -982,9 +964,6 @@ export async function landRunnerItem(repoRoot, item, {
       };
     }
     if (!check.passed) return settled({ outcome: 'verify-fail', branch, check });
-    // Verification can outlive admission. Check committed authority again for
-    // this candidate's merge base; exact-old CAS covers a later acquire on main.
-    admitLease(candidate.source, candidate.target);
     phase = 'publish';
     const receipt = await port.publish({
       source: candidate.source, target: candidate.target,
@@ -1026,9 +1005,6 @@ export async function landRunnerItem(repoRoot, item, {
     // Preserve Land's stale result, including operation identity and recovery
     // evidence. Never re-run verification or CAS against a different target.
     if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') {
-      // Acquire may win while prepare/publish waits for its own locks. Keep
-      // the named lease refusal when it blocks this pair, otherwise keep stale.
-      admitLease(source, pinned);
       throw err;
     }
     // A publication whose effect is unknown is never claimed abandoned: no

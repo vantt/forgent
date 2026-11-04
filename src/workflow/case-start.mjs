@@ -10,7 +10,7 @@ import { normalizeContextRefs } from './definition.mjs';
 import { loadWorkflow, workflowPersonaScope } from './loader.mjs';
 import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents, projectWorkflowState } from './store.mjs';
 import { translateUnitsToWorkflow } from './units-source.mjs';
-import { snapshotRunnerConfig, resolveGitRoots, assertRepositoryForWrites, detectHerdrPresent, admitDocumentationExecution } from '../runner/execution/run.mjs';
+import { snapshotRunnerConfig, resolveGitRoots, assertRepositoryForWrites, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { loopOf, resolveCollaboration } from '../runner/execution/patterns/catalog.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
@@ -95,9 +95,6 @@ export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = wo
       requestDigest: digestText(request ?? ''),
       baseCommit: inherits?.baseCommit ?? workflowCommit(worktreePath ?? mainRoot, 'HEAD'),
       openedAt: new Date().toISOString(),
-      // The caller checkout is origin, not a token or an admission grant.
-      // Every later operation reads it here, never from a generated wf/ checkout.
-      callerCheckout: worktreePath,
       ...(inherits ? { inherits } : {}),
       ...(parent ? { parent: { caseId: parent.parentCaseId, reservationId: parent.reservationId } } : {}),
       ...(legacy ? { legacy: true } : {}),
@@ -216,15 +213,6 @@ function resolveStart(params) {
   return { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account, runnerConfig };
 }
 
-/** Read the origin from this run's own record before a resume/answer takes
- * advance or writes an answer. Pre-origin runs are anchored to main, never
- * upgraded to holder by a later caller's --worktree or ambient cwd. */
-export function admitRecordedWorkflow({ mainRoot, workflowRunId }) {
-  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-  const callerCheckout = events.find((event) => event.type === 'case.opened')?.payload.callerCheckout ?? mainRoot;
-  return admitDocumentationExecution({ repoRoot: mainRoot, callerCheckout });
-}
-
 /**
  * Dry-bind a seated definition before anything is spent: every panel unit's seats and synthesizer are
  * bound against the pool exactly as a run would bind them, nothing is dispatched or written.
@@ -312,7 +300,6 @@ export function refundIfNotOpened({ mainRoot, parent, opened }) {
  */
 export function prepareWorkflowRun(params) {
   const { mainRoot, worktreePath, workflow, workflowId, contextRefs, seats, effort, timeoutMs, account, runnerConfig } = resolveStart(params);
-  const documentationAdmission = params.documentationAdmission ?? admitDocumentationExecution({ repoRoot: mainRoot, callerCheckout: worktreePath });
   // A frame flag that widens the guide's defaults refuses here, so it creates no run.
   const frame = resolveFrame(workflow.guide, params.frame);
   const liveConfig = runnerConfig;
@@ -365,5 +352,5 @@ export function prepareWorkflowRun(params) {
   }
   const { workflowRunId, runDir } = created;
 
-  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null, parent, documentationAdmission, inherits };
+  return { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request: params.request ?? null, parent, inherits };
 }

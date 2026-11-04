@@ -140,7 +140,6 @@ import { recoverApplyUseCase, recoverObserveUseCase } from '../verbs/dispatch/re
 import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
-import { checkDocumentationCutoverLeaseDoctor } from '../runner/documentation-cutover-lease.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -2051,11 +2050,6 @@ registerCheck({
   id: 'lock-holders',
   description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, no predecessor domain is left running, and the state and porting-events hot records parse and their holder can be judged',
   check: (cwd) => checkLockHolders(cwd),
-});
-registerCheck({
-  id: 'documentation-cutover-lease',
-  description: 'repository documentation-cutover hooks are wired and no committed lease freezes the documentation scope',
-  check: (cwd) => checkDocumentationCutoverLeaseDoctor(cwd),
 });
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
 

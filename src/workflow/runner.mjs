@@ -20,7 +20,7 @@ import {
 import { PROGRESS_LINE_LIMIT, ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 import { drainCaseInbox } from './case-runtime.mjs';
 import { projectCase } from './case-projection.mjs';
-import { admitRecordedWorkflow, openCaseOnLedger, resolveFrame, assertUnitAcceptOutcomes } from './case-start.mjs';
+import { openCaseOnLedger, resolveFrame, assertUnitAcceptOutcomes } from './case-start.mjs';
 import {
   approvedReportDigests,
   buildUnitHandoff,
@@ -49,7 +49,6 @@ import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
 import { loopOf, resolveCollaboration } from '../runner/execution/patterns/catalog.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { RunnerConfigError, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
-import { leaseAdmission } from '../runner/documentation-cutover-lease.mjs';
 
 /** One log line for the events that mark a step's progress, null for every other event. */
 function progressLine({ ts, type, payload }) {
@@ -75,8 +74,7 @@ const APPROVAL_REFUSALS = new Set(['consent-stale', 'consent-missing', 'consent-
  * Run loop of the Playbook proposer: advance the ready steps of a Workflow run until it completes,
  * fails, or parks, under the `advance` hold the caller took.
  */
-export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, documentationAdmission, onLog = detachedChildLog }) {
-  documentationAdmission ??= admitRecordedWorkflow({ mainRoot, workflowRunId });
+export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog = detachedChildLog }) {
   // Every event is recorded in the event log under the run's advance hold; a step's start, end or
   // park also reaches onLog as one line.
   const recordEvent = (args) => {
@@ -230,7 +228,6 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                   repoRoot: mainRoot,
                   sourceBranch: unit.branch,
                   targetBranch: integrationTarget,
-                  callerCheckout: documentationAdmission.callerCheckout,
                   commitMessage: `integrate: merge step ${depId} unit ${unit.unitId}`,
                 });
                 if (merged.operationId) landed.push(merged.operationId);
@@ -362,7 +359,6 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 unitData,
                 acceptedReports: approvedReportDigests({ events: fresh.events, state: fresh.state, workflow, mainRoot }),
                 repoRoot: mainRoot,
-                documentationAdmission,
                 cwd: unitWorktree,
                 worktree: unitWorktree,
                 pattern: unitPatternOf(u.template),
@@ -605,30 +601,14 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
  * already contains is integrated and lands nothing (Land refuses a fresh identity for it).
  * Workflow runs no verification command of its own, so the evidence it binds says exactly that.
  */
-export async function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch, callerCheckout = repoRoot, commitMessage, squash = false }) {
+export async function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch, commitMessage, squash = false }) {
   if (!repoRoot || !sourceBranch || !targetBranch) throw new RunnerConfigError('mergeWorkflowBranch requires repoRoot, sourceBranch and targetBranch');
   const destination = targetBranch.startsWith('refs/') ? targetBranch : `refs/heads/${targetBranch}`;
   const source = workflowCommit(repoRoot, sourceBranch);
   const target = workflowCommit(repoRoot, destination);
   if (!source) throw new RunnerConfigError(`workflow branch "${sourceBranch}" is gone`);
   if (!target) throw new RunnerConfigError(`integration target "${targetBranch}" is unknown`);
-  // Inspect the pinned branch's complete merge-base diff before a Land port
-  // can create a candidate or WAL. No rename folding: both old and new paths
-  // must count, including a move out of frozen scope.
   const inspect = workflowInspect(repoRoot);
-  const admitLease = (source, target) => {
-    const base = inspect.compareCommits({ left: target, right: source }).mergeBase;
-    const paths = [];
-    let cursor;
-    do {
-      const page = inspect.diff({ before: base, after: source, renames: false, cursor, maxEntries: 4096 });
-      paths.push(...page.entries.map(entry => Buffer.from(entry.path).toString('utf8')));
-      cursor = page.nextCursor;
-    } while (cursor);
-    const admission = leaseAdmission({ repoRoot, worktreePath: callerCheckout, paths });
-    if (!admission.allowed) throw new RunnerConfigError(admission.message, { code: admission.reason });
-  };
-  admitLease(source, target);
   if (inspect.ancestry({ ancestor: source, descendant: target }).answer === 'yes') {
     return { merged: false, sourceBranch, targetBranch, operationId: null };
   }
@@ -641,25 +621,11 @@ export async function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch
       // Only the paths the branch brings count against the main checkout's own edits.
       squash, footprint: [], subtree: null, files: [],
     } });
-    if (!prior) {
-      // Land chooses the target under its slot, possibly after another land.
-      // Admit that exact pair; a later acquire on main makes its CAS stale.
-      admitLease(candidate.source, candidate.target);
-    }
     const receipt = prior ?? await port.publish({ source: candidate.source, target: candidate.target,
       candidate: candidate.candidate, treeDigest: candidate.treeDigest,
       evidenceDigest: crypto.createHash('sha256').update(JSON.stringify({ policy: 'workflow integration runs no verification command', source: candidate.source, target: candidate.target, candidate: candidate.candidate })).digest('hex'),
     });
     return { merged: true, sourceBranch, targetBranch, operationId, receipt };
-  } catch (err) {
-    let detail;
-    try { detail = JSON.parse(err.message); } catch { detail = {}; }
-    if (detail.errorClass === 'stale' || detail.cause === 'land-target-changed' || detail.cause === 'land-cas-lost') {
-      // If acquire changed main during native lock admission, report the lease
-      // refusal; unrelated target movement keeps Git's existing stale result.
-      admitLease(source, target);
-    }
-    throw err;
   } finally { port.close(); }
 }
 

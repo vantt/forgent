@@ -393,51 +393,6 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
     nativeOnly: true,
   }),
-  withSubcommands({
-    name: 'docs-lease',
-    invoke: 'fgos docs-lease <acquire|status|release|abandon>',
-    description: 'Manage the exclusive documentation-cutover write lease (acquire, inspect status, release, abandon).',
-    subcommands: {
-      acquire: {
-        description: 'Acquire the documentation-cutover write lease and commit its held sidecar on main through ScopedCommit.',
-        parameters: { type: 'object', properties: { worktree: { type: 'string' } }, required: [] },
-        examples: ['fgos docs-lease acquire'],
-      },
-      status: {
-        description: 'Inspect status of the documentation-cutover write lease (held/free, age, digests, worktree).',
-        parameters: { type: 'object', properties: {}, required: [] },
-        examples: ['fgos docs-lease status', 'fgos docs-lease status --json'],
-      },
-      release: {
-        description: 'Release the documentation-cutover write lease (holder only), recording and reporting scope drift.',
-        parameters: { type: 'object', properties: {}, required: [] },
-        examples: ['fgos docs-lease release'],
-      },
-      abandon: {
-        description: 'Owner door to abandon a held documentation-cutover write lease when its transition lock is free (requires confirmation and reason).',
-        parameters: {
-          type: 'object',
-          properties: {
-            'owner-confirmed': { type: 'boolean' },
-            reason: { type: 'string' },
-          },
-          required: [],
-        },
-        examples: ['fgos docs-lease abandon --owner-confirmed --reason "Session crashed"'],
-      },
-    },
-    examples: [
-      'fgos docs-lease status',
-      'fgos docs-lease acquire',
-      'fgos docs-lease release',
-      'fgos docs-lease abandon --owner-confirmed --reason "..."',
-    ],
-    touchesState: false,
-    requiresExistingStore: false,
-    externalEffect: true,
-    paginated: false,
-    deprecated: null,
-  }),
   {
     name: 'init',
     invoke: 'fgos init',

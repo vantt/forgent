@@ -38,8 +38,7 @@ export function resolveIntegrationBranch(repoRoot, rootId) {
  * untouched; the caller (tsk-3gx-3) sets it only after seeing this outcome.
  *
  * `repoRoot` must be the main checkout (mirrors `sync-root`'s own
- * `isMainWorktree` discipline). `opts.callerCheckout` names the caller
- * independently, and may be a linked holder checkout.
+ * `isMainWorktree` discipline).
  *
  * @returns {Promise<
  *   {id: string, outcome: 'skipped', reason: 'is-root'} |
@@ -73,7 +72,6 @@ export async function retargetMember(repoRoot, memberItem, rootId, opts = {}) {
   // merge and its verify.
   const result = await landRunnerItem(repoRoot, memberItem, {
     target: branchNameFor(rootId),
-    callerCheckout: opts.callerCheckout ?? repoRoot,
     ...(opts.timeoutMs ? { timeoutMs: opts.timeoutMs } : {}),
   });
 

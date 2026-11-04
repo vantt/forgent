@@ -151,7 +151,7 @@ Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 
 | Rank | Locks | Kind |
 |---|---|---|
-| 10 | `runner`, `gateway`, `documentation-cutover` | lease |
+| 10 | `runner`, `gateway` | lease |
 | 15 | `attempt` | lease |
 | 20 | `merge-slot` | mutex |
 | 30 | `dispatch-cwd` | lease |
@@ -176,12 +176,6 @@ Locks cut over by the Rust-callers track (registry owner `4.4`), all leaves of r
 | `observe` | repo | `<fgosDir>/locks/observe.lock` | `.fgos/observe/.lock` | Observe store (`fgos metrics`, `fgos friction`) |
 
 Git adds `repo-config`, a repo mutex at rank 80, `<fgosDir>/locks/repo-config.lock`, with no legacy path. It serializes the local fetch-mapping writer; Git's native `config.lock` also excludes ordinary Git config writers.
-
-| Name | Kind | Scope | Rank | v3Path | Owner | Note |
-|---|---|---|---|---|---|---|
-| `documentation-cutover` | lease | repo | 10 | `<fgosDir>/locks/documentation-cutover.lock` | `documentation` | Public acquire API only; no private holder-lock route. |
-
-For this row, `<fgosDir>` is always the main checkout's `.fgos`, including calls from linked worktrees. The kernel handle serializes transitions only. The committed sidecar carries the persistent freeze described in section 19.
 
 Mailbox adds `mailbox`, a repo mutex at rank 80, `<fgosDir>/locks/mailbox.lock`, with no legacy path. It serializes every mutation of the agent mailbox's snapshot (docs/platform/agent-mailbox/spec.md §6.4); held briefly, never across an emit. Only the mailbox's Rust store (`packages/mailbox/rust/store/src/record`) takes it. The row's `<fgosDir>` template is one Node's `resolveLock` can fill, as for `repo-config`, so this is a rule of use rather than a refusal: no Node code takes `mailbox`, and refusing it in Node would need a second owner list in the facade.
 
@@ -357,61 +351,13 @@ The dispatch-cwd key includes the real cwd's device, inode and nanosecond birth 
 
 Until Git phase 03 owns removal/recovery, preserve the refused checkout and use a fresh worktree. To recover that same checkout manually: stop all dispatchers for it, identify the exact lock path in the refusal, inspect its `.predecessor.json` (`fgos doctor` prints it with the host's judgement in `lock-holders`), fence the recorded producer and every possible descendant (including escaped sessions), and verify no writer remains. Only under that quiescence may an operator archive/remove that **predecessor record**; retain the lock file itself. An empty group or a free kernel lock alone does not authorize this action. Unprovable process membership means keep the record and use the replacement tree. Do not automate record deletion by age or PID liveness.
 
-### Documentation-cutover write lease
+### Documentation-cutover write lease (retired)
 
-The lease freezes documentation writes across processes without a TTL. Its authority is the committed blob plans/documentation-cutover-lease.json on `refs/heads/main` (the file is absent until the first acquire is committed; afterwards it stays committed with its `state` set to `held`, `released` or `abandoned`). Working-tree copies are not authority. A held sidecar keeps refusing non-holders after process death or loss of the kernel lock resource.
-
-| Command | Result |
-|---|---|
-| `fgos docs-lease acquire [--worktree <path>]` | Select a registered holder checkout in this repository, create its random token, record main's base commit and scope digests, and commit the held sidecar. Without `--worktree`, use the caller's checkout root. A held lease refuses another acquire, including by its holder. |
-| `fgos docs-lease status [--json]` | Report state and, while held, age, holder worktree, token hash, scope digests and kernel-lock probe. Corrupt authority is reported as held/corrupt. |
-| `fgos docs-lease release` | Authenticate the caller checkout's token, commit released state with `releaseScopeDigests` and `drift`, then remove that checkout's token. Drift is reported and does not prevent release. |
-| `fgos docs-lease abandon --owner-confirmed --reason "<reason>"` | Commit owner-confirmed abandoned state with a non-empty written reason. This is the only repair door for a corrupt committed sidecar. Token possession is not required. |
-
-Each successful transition makes one sidecar-only ScopedCommit in main. It takes `documentation-cutover` (10), then `main-checkout` (50), in one LockScope, and releases both handles afterwards. Busy transition/main locks refuse. Main must be checked out on `refs/heads/main`; a moved baseline refuses as `base-moved` without an internal retry. Acquire validates repository membership, rejects a holder nested inside frozen scope, and records tree/blob OIDs at the pinned main baseline, including explicit absent roots. It does not run the cutover's worktree-cleanliness, unmerged-branch, inventory or rehearsal checks; the cutover operator owns those checks. If acquisition publishes held state but receipt validation fails, cleanup keeps the token when committed main still names its hash or committed evidence is corrupt/unreadable, preserving recovery access.
-
-The fixed scope is:
-
-- `docs/**`, including `docs/platform/documentation/switchboard.md#transitional-documentation-authority-switchboard`;
-- root `AGENTS.md` and `CLAUDE.md`;
-- the [switchboard JSON](../../../plans/260925-documentation-authority-unification/transitional-switchboard.json);
-- `core/skills/**`, `.agents/skills/**` and `plugins/fgOS/skills/**`;
-- the lease sidecar blob itself (plans/documentation-cutover-lease.json; absent until the first acquire is committed, then always committed with its state).
-
-Other plan evidence and code/test roots are outside the freeze. The sidecar is transition evidence and is excluded from its own scope digest.
-
-Pre-commit refuses scoped non-holder commits in every worktree. Raw moves of main into frozen scope refuse even for holders; the [Git hook contract](../git/spec.md#7-hardened-git-backend-parsers-and-hook-contract) defines the sidecar-transition exception.
-
-Production admission doors explicitly declare the caller checkout; holder identity is never inferred from ambient cwd. The shared `leaseAdmission` gate always reads authority from the gated `repoRoot` repository's `refs/heads/main`. While held, the declared caller must resolve to the same main checkout as that repository before its token or a code-only footprint can admit it. Foreign-repository and non-Git callers are refused, including for read-only work; a copied foreign token or a foreign repository's free sidecar cannot authorize them. The low-level gate falls back to `process.cwd()` only when no `repoRoot` is supplied; every production door supplies one. The execution door's non-repository read-only exception applies only when the gated root itself is outside Git.
-
-| Admission door | Caller and effect boundary |
-|---|---|
-| Unit execution (`runUnit`) | Declared caller checkout; refuses all non-holder work, including read-only Units, before execution effects. |
-| Workflow start | Declared origin checkout; admits before config, ledger, advance, spawn or generated worktree effects, and records origin in `case.opened.payload.callerCheckout`. |
-| Workflow resume/answer | Recorded origin decides admission before advance, answer writes or spawn. An answer from another checkout of the same repository is admitted for a holder-origin Workflow; the answerer's checkout does not replace its origin. Generated writer checkouts never become holder identity. |
-| Runner Land (`landRunnerItem`) | Explicit caller checkout, separately from destination/main; checks before checkpoint or Land effects. |
-| Workflow Land (`mergeWorkflowBranch`) | Recorded Workflow origin passed as caller; checks before native Land, including for an already-integrated branch. |
-
-Admission is reused only within its operation; detached children refresh it, and each Land checks authority separately. `bind()`, dry-binds, seat walks and assignment replay do not consult the lease. For same-repository callers, scope-touching non-holder lands refuse and code-only lands proceed, except for the stray-main-token refusal below. Corrupt authority refuses execution and Land regardless of footprint.
-
-The persistent token is the mode-0600, ignored `.fgos/documentation-cutover.token` file in the holder checkout root. Gates hash the token read from the declared checkout, subject to the repository and stray-main checks. The sidecar stores its hash; argv, environment, Unit/assignment records and refusal messages do not carry the token. Within those checks, any process under the same OS user that can read that file can act as holder, including at `landRunnerItem`. This protects against accidents, not deliberate bypass. `--owner-confirmed` is an explicit owner assertion in this single-owner repository, not proof of a human or of holder death.
-
-`git clean -fdX` deletes the ignored token. Losing it does not reopen the freeze; owner abandon is the recovery door. For release by a linked holder, the door temporarily lends its authenticated token to main's token path under main-50 so the commit hooks can check it. Normal success or failure restores main's previous bytes, removing the lent copy only if no file existed there before. A crash, SIGKILL or power loss before `finally` can leave that copy in main.
-
-When a token file exists in main but main is not the recorded holder checkout, doctor fails and acquire refuses (error `stray-main-token`). While the lease is held, admission also refuses a main-checkout caller with that file as `stray-main-token`, before token-hash admission or any scoped, code-only or empty-path exception. The real linked holder can still release. Release removes its holder token after committing, but preserves any pre-existing stray main copy by restoring its previous bytes. After checking committed lease state and the recorded holder, the owner removes the stray main file by hand; no automatic residue cleanup is provided.
-
-The `documentation-cutover-lease` doctor check diagnoses wiring, committed state, stray main tokens and the kernel lock resource; a held lease is a failing check with age. Held/corrupt authority still fails if the reference hook disappears. See the [doctor registry contract](../packaging-distribution/contracts/setup-doctor-registry.md#3-doctor-contract) for applicability. Release drift values are diagnostic evidence only. Cutover must recompute digests directly from Git and must never trust sidecar `drift` or `releaseScopeDigests` as authority.
-
-Known limits:
-
-- Corrupt committed sidecars also refuse no-op main maintenance transactions such as `pack-refs --all`/`gc`; owner-confirmed abandon/repair is the recovery door.
-- Composite Work-item/fanout dispatch can `pick` (claim/create a worktree) before `runUnit` refuses. Claim worktrees have no holder token, so even a holder's Work-item dispatch through them refuses. The execution-door check does not undo the earlier claim/worktree effects.
-- Legacy pre-case runs resumed without a held lease may record the resumer's checkout as origin on first case creation. During a held lease, missing recorded origin falls back to main and cannot gain holder identity from a later caller's token-bearing checkout. No retroactive origin correction is provided.
-
-Implementation: [lease module](../../../src/runner/documentation-cutover-lease.mjs). Owning proofs: [lease transitions](../../../test/runner/documentation-cutover-lease.test.mjs), [hook boundaries](../../../test/e2e/documentation-cutover-lease-hooks.test.mjs), [execution admission](../../../test/runner/execution/run-case-admission.test.mjs), [Workflow admission](../../../test/workflow/case-admission-port.test.mjs), [runner Land](../../../test/runner/merge-land.test.mjs) and [Workflow integration](../../../test/workflow/units-runner.test.mjs).
+The documentation-cutover write lease, its `fgos docs-lease` verb, the `documentation-cutover` lock row, the commit and reference-transaction hooks and the `documentation-cutover-lease` doctor check were retired on 2026-11-04, after the documentation cutover landed (`97dd62aa7`). Nothing freezes `docs/**` or the skill trees now; the decision history keeps the original design narrative.
 
 ## 20. Lịch sử quyết định
 
+- **2026-11-04 — documentation-cutover lease retired after the cutover landed; mechanism, verb, hook, lock row and doctor check removed.** The rank-10 `documentation-cutover` row, its band note and the section 19 lease contract are gone; the 2026-10-22 registration entry below stays as history.
 - **2026-10-22 — documentation lease registration, hardening lane:** Register `documentation-cutover` as a rank-10 repo lease, owner `documentation`, fence `none`, no legacy path, public acquire only; the main-ref sidecar owns persistent freeze and the kernel lock serializes transitions (sections 7 and 19).
 - **2026-10-23 — Config thêm hai leaf.** `project-config` (repo, `<fgosDir>/locks/project-config.lock`) và `global-config` (machine, `<lockRoot>/global-config.lock`, phủ file global, accounts và token), cả hai mutex rank 80, owner `config`. Là leaf: một transaction ghi chỉ chạm một nguồn nên hai khoá không lồng nhau, và được lấy bên trong `main-checkout` (50), `event-seal` (58), `state` (60), `event-append` (70) mà không lấy gì bên dưới. Không có predecessor v1. Bằng chứng: `packages/config/rust/tests/lock_rows.rs`.
 - **2026-10-22 — In-process doors, fences and the kill-wait key removed, doctor 9 to 5.** Owner decisions 9, 10 and 12 of the low-layers plan. The Node facade takes locks, probes, drains and lists holders in process through the `holderLock` namespace of the combined addon (Linux and macOS; Windows keeps `lock-hold`), as the Git component's loan already did with its one-shot capability; the lock-fd route modes that served it are deleted and only `--borrowed-check` and `--shared-try` stay for the git hook. The checkout channel (`node bin/fgos.mjs`) is unsupported for the lock verbs and the `state-root` route and its Node fallback are removed: the state root is the host's pin, else the door's answer over the same Rust formula. The cutover fences and their doctor row and fix are removed under the one-release policy, the key `lock.predecessorKillWaitMs` and its row are removed (the kill wait is fixed at 2000 ms), and `lock-record-unreadable` and `state-root` merge into `lock-holders` and `lock-kernel-semantics`, so the registered `lock-*` rows are three and no condition is lost. Bounded in-process blocking (section 9) and the Windows release limit (section 15) are the two accepted limits. Reused: the Git loan precedent (capability, External, marks); deleted: `fences.mjs`, the registry fence columns, three route modes' Node callers.

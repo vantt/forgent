@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos docs-lease` and the documentation-cutover lease are removed: the cutover has landed, so nothing freezes `docs/**` or the skill trees any more. The `documentation-cutover-lease` doctor check, the `documentation-cutover` lock, the commit and reference-transaction hook guards and the `documentationAdmission` option of `runUnit` and workflow start go with it.
 - Ctrl-C (or SIGTERM) during a slow launch now cancels the attempt at once instead of waiting for the supervisor to bind it first; the wait for the supervisor's binding is now 45 s, the sum of its own start budgets plus slack.
 - The `http` executor adapter and `via: "api"` invocations are removed (no shipped config used them): a config naming `via: "api"` is refused as an unknown `via`, and an executor whose adapter cannot run as a supervised attempt is refused with `supervised-adapter-required`.
 - An agent now always gets the attempt's own writer id and lineage, on every OS: a parent writer id the controller carried no longer reaches a Windows agent. The launch gate also tells a missing program (exit 127) from any other start failure such as a missing brief file or a program the OS refuses to run (exit 126) by the error kind instead of its English text.

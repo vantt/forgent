@@ -7,13 +7,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
-import { execFileSync, spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
-import { acquireDocumentationCutoverLease, DEFAULT_SIDECAR_PATH } from '../../../src/runner/documentation-cutover-lease.mjs';
-import { loadNativeAddon } from '../../../src/git/native.mjs';
 import { runUnit } from '../../../src/runner/execution/run.mjs';
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 import { runReviewed } from '../../../src/runner/execution/loops/reviewed.mjs';
@@ -26,7 +22,7 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
-import { projectConfigPath, writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 const { openCase, eventsOf } = await import('../../helpers/workflow-case-fixture.mjs');
 
 seedFileLocalBwrapRegistry();
@@ -128,99 +124,6 @@ function recordingPort({ binding = 'unbound', admit, recheck, onSettle } = {}) {
 }
 const names = (port) => port.calls.map((c) => c[0]);
 const WRITE_UNIT = { id: 'u-write', objective: 'WRITE:docs/a.md', capability: 'docs:write', writes: ['docs'] };
-
-// Existing admission tests prove the case port, not the documentation freeze.
-// A missing resume record also must not get far enough to acquire its control.
-// The standalone writing test owns completion; this boundary proof reaches
-// assignment replay from a non-holder cwd with a holder's writing checkout.
-test('documentation lease admission refuses non-holder runs before writes and lets its holder reach a worker attempt', async (t) => {
-  const { repoRoot, worktreeDir } = setup();
-  acquireDocumentationCutoverLease({ repoRoot: worktreeDir });
-  const port = recordingPort();
-  const before = fs.readdirSync(path.join(repoRoot, '.fgos')).sort();
-  const sentinel = path.join(repoRoot, '.fgos', 'workflow-runs', '.bindings', '.root');
-  assert.equal(fs.existsSync(sentinel), false, 'fixture has no bindings sentinel');
-  // One CLI wiring proof: the recording port cannot expose the real port's
-  // host-side constructor write. This child models the host, not a nested
-  // dispatch, and must refuse before any worker or unit-control lock starts.
-  const bootstrap = `data:text/javascript,import { ensureScriptAddon } from ${JSON.stringify(new URL('../../../scripts/lib/git-ports.mjs', import.meta.url).href)}; ensureScriptAddon();`;
-  const configPath = projectConfigPath(repoRoot);
-  const configBefore = fs.readFileSync(configPath);
-  // The old CLI probe covered the constructor write but not prompt-provider
-  // validation, which fills missing config defaults before constructing a Unit.
-  const unitPath = path.join(repoRoot, 'unit.json');
-  fs.writeFileSync(unitPath, JSON.stringify({ ...WRITE_UNIT, writes: [], objective: 'Read' }));
-  for (const args of [
-    ['--resume', 'not-created'],
-    ['Read'],
-    ['Read', '--provider', 'okay'],
-    ['--unit', unitPath],
-  ]) {
-    const cli = spawnSync(process.execPath, [
-      '--import', bootstrap, fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url)),
-      'run', ...args, '--dir', repoRoot, '--worktree', repoRoot, '--json',
-    ], {
-      cwd: repoRoot, env: { ...process.env, FGOS_DISPATCH_DEPTH: '0' }, encoding: 'utf8', timeout: 60_000,
-    });
-    assert.equal(cli.status, 4, cli.stderr + cli.stdout);
-    assert.match(cli.stderr + cli.stdout, /documentation cutover lease is held/);
-    assert.deepEqual(fs.readFileSync(configPath), configBefore, `CLI refusal leaves config bytes unchanged: ${args.join(' ')}`);
-    assert.equal(fs.existsSync(sentinel), false, 'CLI lease refusal precedes even the bindings sentinel');
-  }
-  for (const extra of [
-    { unitData: WRITE_UNIT },
-    { unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' } },
-    { resumeUnitRunId: 'not-created' },
-  ]) {
-    await assert.rejects(() => runUnit({
-      ...extra, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'scout' },
-      repoRoot, cwd: repoRoot, worktree: repoRoot,
-    }), { code: 'documentation-cutover-lease' });
-    assert.equal(fs.existsSync(sentinel), false, 'lease refusal leaves no bindings sentinel');
-  }
-  const foreign = setup().repoRoot;
-  const outside = makeFixtureDir('fgos-outside-');
-  for (const caller of [foreign, outside]) {
-    // Explicit caller checkout (like --dir from another project), not just cwd.
-    for (const extra of [
-      { unitData: WRITE_UNIT },
-      { unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' } },
-      { resumeUnitRunId: 'not-created' },
-    ]) await assert.rejects(() => runUnit({
-      ...extra, caseAdmission: port, repoRoot, cwd: caller, worktree: caller,
-    }), { code: 'documentation-cutover-lease' });
-  }
-  await assert.rejects(() => runUnit({
-    unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
-    repoRoot, cwd: outside, worktree: repoRoot,
-  }), { code: 'documentation-cutover-lease' });
-  assert.deepEqual(names(port), [], 'no admission, reservation, settlement or custody');
-  assert.deepEqual(assignmentsOf(repoRoot), []);
-  assert.deepEqual(fs.readdirSync(path.join(repoRoot, '.fgos')).sort(), before, 'no sweep or runtime directory');
-  assert.equal(dispatchCwdHolder(path.join(repoRoot, '.fgos'), repoRoot), null);
-  const native = loadNativeAddon();
-  const call = native.GitInspect.prototype.call;
-  let reads = 0;
-  t.mock.method(native.GitInspect.prototype, 'call', function(method, args) {
-    if (method === 'pathsAtRevision' && args.paths?.some(p => Buffer.from(p).toString() === DEFAULT_SIDECAR_PATH)) reads++;
-    return call.call(this, method, args);
-  });
-  const allowed = await runUnit({
-    unitData: WRITE_UNIT, caseAdmission: port,
-    repoRoot, cwd: repoRoot, worktree: worktreeDir,
-  });
-  assert.equal(allowed.results[0].refused, undefined);
-  assert.equal(allowed.results[0].binding.executor, 'okay', 'ctx carries the holder checkout rather than the host cwd');
-  assert.ok(allowed.results[0].runResult.runId, 'a real worker attempt was dispatched');
-  assert.doesNotMatch(JSON.stringify(allowed), /recomputed binding refused|documentation-cutover-lease/);
-  assert.deepEqual(unitJson(repoRoot, allowed.unitRunId).unit.writes, ['docs']);
-  assert.equal(reads, 1, 'binding, replay and attempts do not re-read documentation authority');
-  fs.writeFileSync(path.join(repoRoot, DEFAULT_SIDECAR_PATH), '{broken');
-  for (const args of [['add', DEFAULT_SIDECAR_PATH], ['commit', '-qm', 'corrupt authority fixture']]) execFileSync('git', args, { cwd: repoRoot, stdio: 'ignore' });
-  const assignments = assignmentsOf(repoRoot);
-  await assert.rejects(() => runUnit({ unitData: WRITE_UNIT, caseAdmission: port, repoRoot, cwd: repoRoot, worktree: worktreeDir }), { code: 'documentation-cutover-lease-corrupt' });
-  assert.deepEqual(assignmentsOf(repoRoot), assignments);
-});
 
 test('a writing Unit with no port is refused before anything exists, and so is a Unit that names a case', async () => {
   const { repoRoot, worktreeDir } = setup();

@@ -14,7 +14,6 @@ import {
 } from './case-admission-port.mjs';
 import { expandGenerated, partitionPaths } from '../dispatch/write-scope.mjs';
 import { bind } from './bind.mjs';
-import { leaseAdmission } from '../documentation-cutover-lease.mjs';
 import { credentialFaultPools, failedAccountsOf, inspectAccountRotation, keptBindingOf, mayRotateAccount, triedBindingsOf } from './account-rotation.mjs';
 import { assertPinnedAccountsUsable, runnerConfigForBinding } from './account-pin.mjs';
 import { simulateUnitBindings } from './dry-bind.mjs';
@@ -138,26 +137,6 @@ export function resolveGitRoots(cwd = process.cwd(), { allowNoRepository = false
   } catch (error) {
     throw new RunnerConfigError(`fgos run must run inside a git repository (cwd: ${cwd}): ${error.message}`);
   }
-}
-
-/** Admit once at an execution door, against its declared caller checkout.
- * Workflow passes this operation-local result to its Units; it is never stored
- * as a grant or reused by a later resume/answer operation. */
-export function admitDocumentationExecution({ repoRoot, callerCheckout }) {
-  if (!callerCheckout) throw new RunnerConfigError('execution admission requires callerCheckout');
-  const checkout = path.resolve(callerCheckout);
-  let admission;
-  try {
-    admission = leaseAdmission({ repoRoot, worktreePath: checkout });
-  } catch (error) {
-    // Only the gated repoRoot's typed non-repository answer permits read-only
-    // work outside Git. The gate refuses foreign/non-Git callers of a held
-    // repository lease; inspection errors and corrupt sidecars fail closed.
-    if (error.code !== 'not-a-repository') throw error;
-    admission = { allowed: true };
-  }
-  if (!admission.allowed) throw new RunnerConfigError(admission.message, { code: admission.reason, phase: 'pre-admission' });
-  return { ...admission, callerCheckout: checkout };
 }
 
 /** A unit that writes or syncs needs a repository; a read-only one runs where roots say there is none. */
@@ -518,9 +497,6 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options, collabora
  * @param {string} [options.cwd] Current working directory / worktree
  * @param {{ workflowDir?: string|null, owningDomain?: string|null }} [options.personaScope] Where the persona lookup starts for the workflow this unit belongs to (a case passes it); omitted, workspace and core only
  * @param {string} [options.worktree] Explicit worktree path
- * @param {string} [options.callerCheckout] Caller checkout declared by the entry; defaults to worktree/cwd
- * @param {object} [options.documentationAdmission] Trusted in-process admission from this Workflow operation,
- *   not a persisted grant; every later resume/answer must obtain a new result
  * @param {object} [options.session] Session context { provider, tier, hasNativeAgent, herdrPresent, headless }
  * @param {object} [options.declared] Work step operation this unit runs: { workId, domain, workflow,
  *   stage, operation, operations } (operations are the step's operation objects). Stored in unit.json.
@@ -647,15 +623,6 @@ async function runUnitBody(options, scope) {
   const roots = resolveGitRoots(cwd, { allowNoRepository: true });
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
   const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
-  // Check fresh and resumed runs before the sweep, config, case reservation,
-  // custody or unit-control locks can write anything. No path filter on dispatch.
-  // An in-process Workflow operation already admitted its recorded origin,
-  // before creating wf/ worktrees. Seat retries and assignment replay do not
-  // consult the sidecar again or reinterpret that origin as the unit checkout.
-  const documentationAdmission = options.documentationAdmission ?? admitDocumentationExecution({
-    repoRoot: mainRoot, callerCheckout: options.callerCheckout ?? worktreePath,
-  });
-  if (!documentationAdmission.allowed) throw new RunnerConfigError('documentation execution was not admitted');
   try {
     sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined });
   } catch { /* best effort */ }

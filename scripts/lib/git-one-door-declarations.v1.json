@@ -1,24 +1,4 @@
 {
   "schema": "git-one-door-declarations.v1",
-  "declarations": [
-    {
-      "path": ".githooks/pre-commit",
-      "siteId": "leaseGitRead:fde3f196247ca9899debc1bcfa212e8f8994581863af09df7f22a20dd4866dfc",
-      "class": "hook-read-context",
-      "reason": "the cold hook's leaseGitRead callback authenticates committed/staged lease authority for guardCommit and guardReferenceTransaction without loading the checkout addon; its callers only read Git facts.",
-      "retireWhen": "The lease reader retires, or the Git owner supplies an approved cold-client door preserving hook authentication.",
-      "verbs": [
-        "cat-file",
-        "ls-tree",
-        "show-ref",
-        "diff",
-        "show",
-        "symbolic-ref read",
-        "rev-parse",
-        "diff-tree",
-        "rev-list",
-        "merge-base"
-      ]
-    }
-  ]
+  "declarations": []
 }
