@@ -10,7 +10,7 @@ import path from "node:path";
 import os from "node:os";
 
 import {
-  executeThroughConfinement,
+  assessAndPrepare,
   buildConfinementAttestation,
 } from "../../src/runner/dispatch/confinement/authority.mjs";
 import {
@@ -114,64 +114,12 @@ test("R1: buildConfinementRequest normalizes legacy flags on invocation.confinem
   fs.rmSync(runDir, { recursive: true, force: true });
 });
 
-// ─── R2: herdr-spawn Routes Through Confinement Authority ─────────────────────
-
-test("R2: herdr-spawn execution returns confinement-execution.v1 with attestation", async () => {
-  const runDir = mkTemp("p05-r2-exec-");
-  let adapterCalled = false;
-
-  const mockAdapter = async (invocation, opts) => {
-    adapterCalled = true;
-    return {
-      status: 0,
-      stdout: "herdr mock completed",
-      stderr: "",
-      outcome: "settled",
-    };
-  };
-
-  const req = buildConfinementRequest({
-    capability: "code:implement",
-    executorId: "test-herdr",
-    invocation: {
-      command: "claude",
-      adapter: "herdr-spawn",
-      interactiveMode: { exitCommand: "/exit", kind: "claude" },
-      confinement: {
-        privateHome: true,
-        isolatedSession: true,
-      },
-    },
-    context: {
-      cwd: "/repo/worktree",
-      repoRoot: "/repo",
-      runDir,
-    },
-  });
-
-  const res = await executeThroughConfinement(req, mockAdapter);
-  assert.ok(adapterCalled, "adapter must be called through Authority");
-  assert.equal(res.contract, "confinement-execution.v1");
-  assert.equal(res.status, "completed");
-  assert.ok(res.attestation, "attestation must be attached");
-  assert.equal(res.attestation.contract, "confinement-attestation.v1");
-  assert.equal(res.attestation.phase, "completed");
-
-  fs.rmSync(runDir, { recursive: true, force: true });
-});
-
 // ─── R3: Pre-Adapter Preparation & Partial Maturity Attestation ────────────────
 
-test("R3: Authority pre-adapter preparation refuses ownWorktree in repo root with own-worktree-unavailable", async () => {
+test("R3: Authority preparation refuses ownWorktree in repo root with own-worktree-unavailable", async () => {
   const rootDir = mkTemp("p05-r3-reporoot-");
   const runDir = path.join(rootDir, "rundir");
   fs.mkdirSync(runDir, { recursive: true });
-
-  let adapterCalled = false;
-  const mockAdapter = async () => {
-    adapterCalled = true;
-    return { status: 0 };
-  };
 
   const req = buildConfinementRequest({
     capability: "code:implement",
@@ -192,7 +140,7 @@ test("R3: Authority pre-adapter preparation refuses ownWorktree in repo root wit
   });
 
   await assert.rejects(
-    () => executeThroughConfinement(req, mockAdapter),
+    () => assessAndPrepare(req),
     (err) => {
       assert.equal(err.errorClass, "invalid-config");
       assert.equal(err.reason, "own-worktree-unavailable");
@@ -203,14 +151,11 @@ test("R3: Authority pre-adapter preparation refuses ownWorktree in repo root wit
     },
   );
 
-  assert.equal(adapterCalled, false, "adapter must not be called when pre-adapter check fails");
-
   fs.rmSync(rootDir, { recursive: true, force: true });
 });
 
 test("R3: herdr-spawn attestation includes herdr-partial-maturity mismatch and evidence", async () => {
   const runDir = mkTemp("p05-r3-mismatch-");
-  const mockAdapter = async () => ({ status: 0, outcome: "settled" });
 
   const req = buildConfinementRequest({
     capability: "code:implement",
@@ -230,64 +175,9 @@ test("R3: herdr-spawn attestation includes herdr-partial-maturity mismatch and e
     },
   });
 
-  const res = await executeThroughConfinement(req, mockAdapter);
-  const att = res.attestation;
+  const att = buildConfinementAttestation({ request: req });
   assert.ok(att.mismatches.some((m) => m.code === "herdr-partial-maturity"));
   assert.ok(att.evidence.some((e) => e.ref === "herdr-partial-maturity:herdr-round"));
-
-  fs.rmSync(runDir, { recursive: true, force: true });
-});
-
-// ─── R4: Interactive Behavior Preserved ────────────────────────────────────────
-
-test("R4: herdr interactive dispatch options and invocations preserved through Authority", async () => {
-  const runDir = mkTemp("p05-r4-interactive-");
-  let capturedInvocation = null;
-  let capturedOpts = null;
-
-  const mockAdapter = async (invocation, opts) => {
-    capturedInvocation = invocation;
-    capturedOpts = opts;
-    return {
-      status: 0,
-      stdout: "interactive prompt delivered and round completed",
-      outcome: "settled",
-    };
-  };
-
-  const req = buildConfinementRequest({
-    capability: "code:implement",
-    executorId: "interactive-agent",
-    invocation: {
-      command: "claude",
-      args: ["--interactive"],
-      prompt: "please do the work",
-      promptDelivery: "inline",
-      interactiveMode: { exitCommand: "/exit", kind: "claude" },
-      permissionMode: "ask",
-      adapter: "herdr-spawn",
-      confinement: {
-        ownWorktree: true,
-      },
-    },
-    context: {
-      cwd: "/tmp/worktree",
-      repoRoot: "/tmp/repo",
-      runDir,
-      workId: "w100",
-      tier: "standard",
-      model: "claude-3-5-sonnet",
-    },
-  });
-
-  const res = await executeThroughConfinement(req, mockAdapter);
-  assert.equal(res.status, "completed");
-  assert.equal(capturedInvocation.interactiveMode.exitCommand, "/exit");
-  assert.equal(capturedInvocation.promptDelivery, "inline");
-  assert.equal(capturedInvocation.permissionMode, "ask");
-  assert.equal(capturedOpts.workId, "w100");
-  assert.equal(capturedOpts.tier, "standard");
-  assert.equal(capturedOpts.model, "claude-3-5-sonnet");
 
   fs.rmSync(runDir, { recursive: true, force: true });
 });
@@ -296,11 +186,6 @@ test("R4: herdr interactive dispatch options and invocations preserved through A
 
 test("R5: permissionMode: 'bypass' without full confinement is refused before spawn", async () => {
   const runDir = mkTemp("p05-r5-bypass-refuse-");
-  let adapterCalled = false;
-  const mockAdapter = async () => {
-    adapterCalled = true;
-    return { status: 0 };
-  };
 
   // Missing privateHome and isolatedSession
   const req = buildConfinementRequest({
@@ -323,7 +208,7 @@ test("R5: permissionMode: 'bypass' without full confinement is refused before sp
   });
 
   await assert.rejects(
-    () => executeThroughConfinement(req, mockAdapter),
+    () => assessAndPrepare(req),
     (err) => {
       assert.equal(err.errorClass, "invalid-config");
       assert.equal(err.reason, "bypass-confinement-incomplete");
@@ -333,17 +218,11 @@ test("R5: permissionMode: 'bypass' without full confinement is refused before sp
     },
   );
 
-  assert.equal(adapterCalled, false);
   fs.rmSync(runDir, { recursive: true, force: true });
 });
 
-test("R5: permissionMode: 'bypass' with full v1 controls passes pre-adapter gate", async () => {
+test("R5: permissionMode: 'bypass' with full v1 controls passes the preparation gate", async () => {
   const runDir = mkTemp("p05-r5-bypass-ok-");
-  let adapterCalled = false;
-  const mockAdapter = async () => {
-    adapterCalled = true;
-    return { status: 0, outcome: "settled" };
-  };
 
   const req = buildConfinementRequest({
     capability: "code:implement",
@@ -366,9 +245,7 @@ test("R5: permissionMode: 'bypass' with full v1 controls passes pre-adapter gate
     },
   });
 
-  const res = await executeThroughConfinement(req, mockAdapter);
-  assert.equal(adapterCalled, true);
-  assert.equal(res.status, "completed");
+  await assert.doesNotReject(() => assessAndPrepare(req));
 
   fs.rmSync(runDir, { recursive: true, force: true });
 });
@@ -566,7 +443,6 @@ test("R5: evaluateBypassPairing table test covers valid and invalid pairings", (
 
 test("R6: herdr-spawn attestation marks host-ipc out-of-scope and controls unverified", async () => {
   const runDir = mkTemp("p05-r6-overclaim-");
-  const mockAdapter = async () => ({ status: 0, outcome: "settled" });
 
   const req = buildConfinementRequest({
     capability: "code:implement",
@@ -588,8 +464,7 @@ test("R6: herdr-spawn attestation marks host-ipc out-of-scope and controls unver
     },
   });
 
-  const res = await executeThroughConfinement(req, mockAdapter);
-  const att = res.attestation;
+  const att = buildConfinementAttestation({ request: req });
 
   // Outcome must NOT be claimed as "enforced"
   assert.notEqual(att.outcome, "enforced");

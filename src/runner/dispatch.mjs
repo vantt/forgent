@@ -43,7 +43,6 @@ export {
 
 export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, resolveHerdrBin, DEFAULT_ADAPTER, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from './dispatch/transport.mjs';
 
-export { executeThroughConfinement } from './dispatch/confinement/authority.mjs';
 
 export { resolveAgentTypeForTaskSpec } from './dispatch/cli.mjs';
 

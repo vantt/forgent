@@ -2,7 +2,7 @@
 // "bypass" is paired with full confinement (R5).
 //
 // Two entry points reach a live dispatch: Authority's
-// executeThroughConfinement (the canonical production door, which every real
+// assessAndPrepare (the canonical production door, which every real
 // dispatch goes through) and herdr-round's establishConfinement (an adapter
 // primitive reachable directly by a caller that bypasses Authority entirely —
 // tests, or a future direct caller). A "bypass" permission mode with an

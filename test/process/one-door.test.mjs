@@ -14,7 +14,6 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 
 // Each entry is a file that may keep a site until the work named in its reason lands.
 const KILL_ALLOWED = new Map([
-  ['src/runner/dispatch/transport.mjs', 'kills the process group of its own spawned child'],
   ['src/runner/dispatch/provider-credential-probe.mjs', 'kills the process group of its own spawned probe child'],
   ['src/holder-lock/index.mjs', 'kills the process group of its own spawned lock-hold child'],
 ]);

@@ -6,13 +6,11 @@ import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { executeThroughConfinement, buildConfinementAttestation, prepareConfinementForLaunch } from "../../src/runner/dispatch/confinement/authority.mjs";
-import { normalizeAgentName } from "../../src/runner/dispatch/proof-helpers.mjs";
+import { buildConfinementAttestation, prepareConfinementForLaunch } from "../../src/runner/dispatch/confinement/authority.mjs";
 import { buildConfinementRequest, validateConfinementRequest } from "../../src/runner/dispatch/confinement/request.mjs";
 import { ensureMachineBackendRegistryDefaults } from "../../src/runner/dispatch/confinement/backend-registry.mjs";
 import { resolveConfinementPolicy } from "../../src/runner/dispatch/confinement/policies.mjs";
-import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
-import { loadRunnerConfigForDir, RunnerConfigError } from "../../src/runner/dispatch/config.mjs";
+import { loadAttestationRecord } from "../../src/runner/dispatch/confinement/attestation-store.mjs";
 
 test("buildConfinementRequest builds valid confinement-request.v1 shape at dispatch seam", () => {
   const req = buildConfinementRequest({
@@ -45,53 +43,6 @@ test("buildConfinementRequest builds valid confinement-request.v1 shape at dispa
   assert.doesNotThrow(() => validateConfinementRequest(req));
 });
 
-test("fake adapter receives only prepared invocation through Authority (R1-R3)", async () => {
-  let receivedInvocation = null;
-  let receivedOpts = null;
-
-  const fakeAdapter = async (invocation, opts) => {
-    receivedInvocation = invocation;
-    receivedOpts = opts;
-    return { status: 0, stdout: "fake stdout", stderr: "" };
-  };
-
-  const req = buildConfinementRequest({
-    capability: "code:implement",
-    executorId: "test-exec",
-    invocation: {
-      command: "echo",
-      args: ["hello"],
-      prompt: "do something",
-      adapter: "cli-spawn",
-    },
-    context: {
-      cwd: "/test/cwd",
-      runDir: "/test/runDir",
-      timeoutMs: 5000,
-      workId: "w123",
-      tier: "standard",
-      model: "test-model",
-    },
-  });
-
-  const res = await executeThroughConfinement(req, fakeAdapter);
-
-  assert.equal(res.status, "completed");
-  assert.equal(res.result.status, 0);
-  assert.equal(res.stdout, "fake stdout");
-  assert.ok(res.attestation, "attestation is attached to result");
-  assert.equal(res.attestation.contract, "confinement-attestation.v1");
-  assert.equal(res.attestation.dispatchId, req.dispatchId);
-  assert.equal(res.attestation.outcome, "unknown", "observe mode emits unknown for omitted policy");
-
-  assert.deepEqual(receivedInvocation.args, ["hello"]);
-  assert.equal(receivedInvocation.command, "echo");
-  assert.equal(receivedInvocation.prompt, "do something");
-  assert.equal(receivedOpts.cwd, "/test/cwd");
-  assert.equal(receivedOpts.runDir, "/test/runDir");
-  assert.equal(receivedOpts.timeoutMs, 5000);
-});
-
 test("malformed required policy is rejected at the request door before any spawn", async () => {
   let spawnCount = 0;
   const fakeAdapter = async () => {
@@ -111,60 +62,7 @@ test("malformed required policy is rejected at the request door before any spawn
   assert.equal(spawnCount, 0, "malformed policy cannot reach an adapter");
 });
 
-test("in-process dispatch gets authorityScope: external-harness with null attestation (R6)", async () => {
-  const inProcessReq = buildConfinementRequest({
-    capability: "in-proc-task",
-    executorId: "agent-task",
-    authorityScope: "external-harness",
-    invocation: {
-      command: "agent",
-      args: [],
-    },
-    context: {
-      cwd: "/cwd",
-      runDir: "/runDir",
-    },
-  });
-
-  const res = await executeThroughConfinement(inProcessReq);
-  assert.equal(res.authorityScope, "external-harness");
-  assert.equal(res.attestation, null);
-});
-
-test("in-process dispatch with required confinement refuses without trusted harness attestation (R6)", async () => {
-  const inProcessReq = buildConfinementRequest({
-    capability: "in-proc-required",
-    executorId: "agent-task",
-    authorityScope: "external-harness",
-    requirement: {
-      mode: "required",
-      policyId: "host-write-denied",
-      policy: null,
-    },
-    invocation: {
-      command: "agent",
-      args: [],
-    },
-    context: {
-      cwd: "/cwd",
-      runDir: "/runDir",
-    },
-  });
-
-  await assert.rejects(
-    () => executeThroughConfinement(inProcessReq),
-    (err) => {
-      assert.ok(err instanceof DispatchError);
-      assert.equal(err.errorClass, "confinement-unsupported");
-      assert.match(err.message, /external-harness/);
-      return true;
-    },
-  );
-});
-
-test("observe mode emits unknown attestation for omitted policy and unconfined for explicit unconfined (R7)", async () => {
-  const fakeAdapter = async () => ({ status: 0 });
-
+test("observe mode emits unknown attestation for omitted policy and unconfined for explicit unconfined (R7)", () => {
   // 1. Omitted policy (legacy default)
   const omittedReq = buildConfinementRequest({
     capability: "legacy-cap",
@@ -172,9 +70,9 @@ test("observe mode emits unknown attestation for omitted policy and unconfined f
     invocation: { command: "cmd", args: [] },
     context: { cwd: "/cwd", runDir: "/runDir" },
   });
-  const omittedRes = await executeThroughConfinement(omittedReq, fakeAdapter);
-  assert.equal(omittedRes.attestation.outcome, "unknown");
-  assert.notEqual(omittedRes.attestation.outcome, "enforced");
+  const omittedAtt = buildConfinementAttestation({ request: omittedReq });
+  assert.equal(omittedAtt.outcome, "unknown");
+  assert.notEqual(omittedAtt.outcome, "enforced");
 
   // 2. Explicit unconfined
   const unconfinedReq = buildConfinementRequest({
@@ -184,34 +82,9 @@ test("observe mode emits unknown attestation for omitted policy and unconfined f
     invocation: { command: "cmd", args: [] },
     context: { cwd: "/cwd", runDir: "/runDir" },
   });
-  const unconfinedRes = await executeThroughConfinement(unconfinedReq, fakeAdapter);
-  assert.equal(unconfinedRes.attestation.outcome, "unconfined");
-  assert.equal(unconfinedRes.attestation.channels[0].coverage, "out-of-scope");
-});
-
-test("confinement execution failure wraps into named DispatchError with attestation (R5)", async () => {
-  const failingAdapter = async () => {
-    throw new Error("underlying process crashed with SIGSEGV");
-  };
-
-  const req = buildConfinementRequest({
-    capability: "test",
-    executorId: "exec",
-    invocation: { command: "crash", args: [] },
-    context: { cwd: "/cwd", runDir: "/runDir" },
-  });
-
-  await assert.rejects(
-    () => executeThroughConfinement(req, failingAdapter),
-    (err) => {
-      assert.ok(err instanceof DispatchError);
-      assert.equal(err.errorClass, "confinement-execution-failed");
-      assert.equal(err.dispatchId, req.dispatchId);
-      assert.ok(err.attestation);
-      assert.equal(err.attestation.phase, "failed");
-      return true;
-    },
-  );
+  const unconfinedAtt = buildConfinementAttestation({ request: unconfinedReq });
+  assert.equal(unconfinedAtt.outcome, "unconfined");
+  assert.equal(unconfinedAtt.channels[0].coverage, "out-of-scope");
 });
 
 // spawnWorker no longer builds a confinement request of its own: it runs the worker as a Unit
@@ -258,36 +131,6 @@ test("M1: buildConfinementAttestation surfaces legacy confinement and bwrap obse
   assert.ok(att.evidence.some((e) => e.ref.includes("legacy-confinement")));
 });
 
-test("M3: executeThroughConfinement returns spec 6.9 confinement-execution.v1 shape and failure preserves cleanup/result", async () => {
-  const fakeAdapter = async () => ({ exitCode: 0, stdout: "done" });
-  const req = buildConfinementRequest({
-    capability: "m3-cap",
-    executorId: "m3-exec",
-    invocation: { command: "echo", args: [] },
-    context: { cwd: "/cwd", runDir: "/runDir" },
-  });
-
-  const res = await executeThroughConfinement(req, fakeAdapter);
-  assert.equal(res.contract, "confinement-execution.v1");
-  assert.equal(res.status, "completed");
-  assert.equal(res.result.exitCode, 0);
-  assert.ok(res.attestation);
-
-  const failingAdapter = async () => {
-    throw new Error("fail with partial");
-  };
-  await assert.rejects(
-    () => executeThroughConfinement(req, failingAdapter),
-    (err) => {
-      assert.ok(err instanceof DispatchError);
-      assert.equal(err.contract, "confinement-execution.v1");
-      assert.equal(err.status, "failed");
-      assert.ok(err.cleanup);
-      return true;
-    },
-  );
-});
-
 test("M4: validateConfinementRequest rejects unknown keys and buildConfinementRequest rejects omitted runDir", () => {
   const validReq = buildConfinementRequest({
     capability: "cap",
@@ -315,24 +158,6 @@ test("M4: validateConfinementRequest rejects unknown keys and buildConfinementRe
   assert.throws(
     () => validateConfinementRequest({ ...validReq, requirement: { ...validReq.requirement, mode: "sorta-confined" } }),
     /requirement\.mode must be one of "unconfined", "preferred", "required"/,
-  );
-});
-
-test("L3: missing executor adapter produces async rejection with RunnerConfigError", async () => {
-  const req = buildConfinementRequest({
-    capability: "cap",
-    executorId: "exec",
-    invocation: { command: "c", args: [], adapter: "non-existent-adapter-name" },
-    context: { cwd: "/cwd", runDir: "/runDir" },
-  });
-
-  await assert.rejects(
-    () => executeThroughConfinement(req),
-    (err) => {
-      assert.ok(err instanceof RunnerConfigError);
-      assert.match(err.message, /no executor adapter registered for "non-existent-adapter-name"/);
-      return true;
-    },
   );
 });
 
@@ -365,51 +190,6 @@ test("L5: throw in resolveConfinementPolicy upstream of door creates zero spawn"
   assert.equal(spawnCount, 0, "zero spawn occurs when policy resolution throws upstream of door");
 });
 
-test("Red-team MEDIUM: ExecutorResult attaches confinement attestation per R5 deliberate contract", async () => {
-  // Per Phase 02 R5 contract ('confinement attestation attached where the caller can carry it'),
-  // successful execution attaches an attestation key while preserving external result fields.
-  const fakeAdapter = async () => ({ status: 0, stdout: "output", stderr: "" });
-  const req = buildConfinementRequest({
-    capability: "rt-cap",
-    executorId: "rt-exec",
-    invocation: { command: "echo", args: [] },
-    context: { cwd: "/cwd", runDir: "/runDir" },
-  });
-
-  const res = await executeThroughConfinement(req, fakeAdapter);
-  assert.equal(res.status, "completed");
-  assert.equal(res.result.status, 0);
-  assert.equal(res.stdout, "output");
-  assert.equal(res.stderr, "");
-  assert.ok("attestation" in res, "attestation key is present per R5 contract");
-  assert.equal(res.attestation.contract, "confinement-attestation.v1");
-});
-
-test("HIGH-1 regression: fake adapter returning status/contract/result does not clobber spec 6.9 tokens", async () => {
-  const fakeAdapter = async () => ({
-    status: 123,
-    contract: "custom-adapter.v9",
-    result: { custom: true },
-    stdout: "adapter stdout",
-    stderr: "",
-  });
-
-  const req = buildConfinementRequest({
-    capability: "high1-cap",
-    executorId: "high1-exec",
-    invocation: { command: "echo", args: [] },
-    context: { cwd: "/cwd", runDir: "/runDir" },
-  });
-
-  const res = await executeThroughConfinement(req, fakeAdapter);
-  assert.equal(res.contract, "confinement-execution.v1", "spec 6.9 contract token is preserved");
-  assert.equal(res.status, "completed", "spec 6.9 status token is completed, not adapter status 123");
-  assert.ok(res.attestation, "attestation is attached");
-  assert.equal(res.result.status, 123, "wrapped result preserves adapter status");
-  assert.equal(res.result.contract, "custom-adapter.v9", "wrapped result preserves adapter contract");
-  assert.deepEqual(res.result.result, { custom: true }, "wrapped result preserves adapter result key");
-});
-
 test("MED-4: executor named bwrap without real bwrap invocation does not claim satisfied/covered", () => {
   const req = buildConfinementRequest({
     capability: "nobwrap-cap",
@@ -435,126 +215,8 @@ test("MED-4: executor named bwrap without real bwrap invocation does not claim s
   assert.ok(!att.evidence.some((e) => e.ref.startsWith("bwrap-argv:")), "must not emit bwrap-argv evidence");
 });
 
-test("HIGH-1: required confinement threads requirement through the REAL production door (executeThroughConfinement) into herdr-spawn adapterOpts", async () => {
-  // Reviewer HIGH-1: `herdrSpawnInteractiveAdapter` (transport.mjs) decides
-  // whether `runHerdrRound` may take the confined bwrap-launcher path by
-  // reading `invocation.requirement ?? opts.requirement` -- but nothing on
-  // the REAL dispatch door (`executeThroughConfinement` -> `adapterOpts`)
-  // ever set either side of that before the fix, so a real "required"
-  // dispatch silently fell through to the legacy `agent start --kind`
-  // branch. A direct unit call into `runHerdrRound`/`herdrSpawnAdapter`
-  // (passing `confinementRequirement` by hand, as most tests in this file
-  // and in herdr-reconciliation.test.mjs do) cannot catch that: it never
-  // exercises the wire this bug was in. This test goes through the actual
-  // door instead.
-  const bwrapPath = fs.existsSync('/usr/bin/bwrap') ? '/usr/bin/bwrap' : null;
-  if (!bwrapPath) return; // no real bwrap on this machine to falsification-probe against
-
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-high1-door-'));
-  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-  try {
-    const registryPath = path.join(tmp, 'backends.json');
-    fs.writeFileSync(registryPath, JSON.stringify({
-      contract: 'confinement-backend-registry.v1',
-      confinementBackends: { bwrap: { type: 'bwrap', enabled: true, executable: bwrapPath } },
-    }));
-    process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registryPath;
-
-    const runDir = path.join(tmp, '.fgos', 'runs', 'one');
-    fs.mkdirSync(runDir, { recursive: true });
-
-    let capturedOpts = null;
-    const fakeAdapter = async (invocation, opts) => {
-      capturedOpts = opts;
-      return { status: 0, stdout: 'ok' };
-    };
-
-    const req = buildConfinementRequest({
-      capability: 'code:implement',
-      executorId: 'claude-bwrap',
-      backendId: 'bwrap',
-      invocation: {
-        command: 'claude',
-        args: [],
-        adapter: 'herdr-spawn',
-        interactiveMode: { kind: 'claude' },
-        prompt: 'do the work',
-      },
-      requirement: {
-        mode: 'required',
-        policyId: 'host-write-denied',
-        policy: {
-          contract: 'confinement-policy.v1',
-          controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
-          grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }],
-        },
-      },
-      context: { cwd: tmp, repoRoot: tmp, runDir, fgosDir: path.join(tmp, '.fgos'), workId: 'w-high1' },
-    });
-
-    let res;
-    try {
-      res = await executeThroughConfinement(req, fakeAdapter);
-    } catch (err) {
-      // This machine's bwrap cannot pass the real falsification probe (e.g.
-      // no unprivileged user namespaces) -- an environment gap, not a wiring
-      // bug this test exists to catch.
-      if (err instanceof DispatchError && (err.errorClass === 'confinement-probe-failed' || err.errorClass === 'confinement-backend-missing')) return;
-      throw err;
-    }
-
-    assert.equal(res.status, 'completed');
-    assert.ok(capturedOpts, 'the real herdr-spawn adapter door must have been invoked');
-    assert.equal(capturedOpts.requirement?.mode, 'required',
-      'adapterOpts.requirement must carry the real requirement mode through the production door so herdr-round.mjs can route into the confined launcher path');
-  } finally {
-    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-test("the leased account's credential source reaches the herdr-spawn adapter so its private home derives trust from that account", async () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-herdr-trust-account-test-"));
-  try {
-    const credentialSource = { kind: "codex-home", home: path.join(tmp, "leased-codex-home") };
-    const req = buildConfinementRequest({
-      capability: "code:implement",
-      executorId: "herdr-agent",
-      invocation: {
-        command: "codex",
-        args: [],
-        adapter: "herdr-spawn",
-        interactiveMode: { kind: "codex", trustStore: { kind: "codex-toml" } },
-        prompt: "do the work",
-        credentialStore: { use: "codex", homeEnv: "CODEX_HOME" },
-      },
-      providerCapacity: { provider: "openai-codex", accountId: "leased", credentialSource },
-      requirement: { mode: "unconfined" },
-      context: { cwd: tmp, repoRoot: tmp, runDir: path.join(tmp, "run"), timeoutMs: 5000, workId: "w1" },
-    });
-
-    let capturedOpts = null;
-    const res = await executeThroughConfinement(req, async (invocation, opts) => {
-      capturedOpts = opts;
-      return { status: 0, stdout: "ok" };
-    });
-    assert.equal(res.status, "completed");
-    assert.deepEqual(capturedOpts.trustAccountSource, credentialSource);
-  } finally {
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-// ─── H9 (Phase 04 R1): assignment/Run-owned launch door must attest
-// outcome:'enforced', matching P06 evidence shape (plans/260910-1243-
-// confinement-authority-implementation/reports/phase-06-evidence/
-// attestation-host-write-denied-*.json) -- the direct-door "required" path
-// (backendId only, no assignmentLaunchContext) already attested this
-// correctly; the assignment door regressed to outcome:'unknown' when
-// prepareConfinementForLaunch was split out as its own function with its
-// own local backendPlan/preparedConfinement never written back to the
-// caller's same-named outer variables. ─────────────────────────────────────
+// ─── The launch door returns the prepared backend plan and sandbox to its caller, so the
+// attempt that follows can attest what was genuinely prepared rather than "unknown". ───
 
 // bwrap must be able to build a sandbox here, not merely be installed: a host
 // that blocks unprivileged user namespaces (Ubuntu 24.04's AppArmor default)
@@ -567,7 +229,7 @@ const BWRAP_PRESENT = (() => {
   }
 })();
 
-test("H9: the assignment/Run-owned launch door attests outcome:'enforced' on a genuinely prepared+successful required dispatch (P06 evidence regression)", { skip: !BWRAP_PRESENT }, async () => {
+test("the launch door returns the prepared backend plan and sandbox, and saves a prepared attestation naming the bwrap backend, for a required dispatch", { skip: !BWRAP_PRESENT }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-h9-assignment-door-enforced-"));
   const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
   try {
@@ -606,13 +268,14 @@ test("H9: the assignment/Run-owned launch door attests outcome:'enforced' on a g
       },
     });
 
-    const fakeAdapter = async () => ({ status: 0, stdout: "h9-assignment-door-ok" });
-    const res = await executeThroughConfinement(req, fakeAdapter);
+    const prepared = await prepareConfinementForLaunch(req);
 
-    assert.equal(res.status, "completed");
-    assert.equal(res.attestation.phase, "completed");
-    assert.equal(res.attestation.outcome, "enforced", "assignment door must attest enforced, not unknown, when confinement was genuinely prepared");
-    assert.equal(res.attestation.backend.id, "bwrap");
+    assert.equal(prepared.backendPlan.backend.type, "bwrap");
+    assert.equal(prepared.backendPlan.decision, "execute");
+    assert.ok(prepared.preparedConfinement, "a genuinely prepared sandbox is returned to the caller");
+    const record = loadAttestationRecord(req.dispatchId, "prepared", req.context);
+    assert.equal(record.phase, "prepared");
+    assert.equal(record.backend.id, "bwrap");
   } finally {
     if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
     else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;

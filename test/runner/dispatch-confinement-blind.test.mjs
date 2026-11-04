@@ -13,7 +13,7 @@ import path from 'node:path';
 
 import { assessBwrap, prepareBwrap, CONFINED_MARKER_ENV } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
-import { executeThroughConfinement } from '../../src/runner/dispatch/confinement/authority.mjs';
+import { assessAndPrepare } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { loadAttestationRecord, saveProbeCacheRecord } from '../../src/runner/dispatch/confinement/attestation-store.mjs';
 import { createBlindRootsWhenMissing, resolveBlindHiddenRoots } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { refIsHiddenFromBlind } from '../../src/runner/execution/handoff-refs.mjs';
@@ -480,20 +480,9 @@ test('doctor names a backend that cannot enforce blind reads', () => {
 // Refusals: named, before anything launches
 // ---------------------------------------------------------------------------
 
-function countingAdapter() {
-  const adapter = async () => {
-    adapter.calls += 1;
-    return { status: 0, stdout: '', stderr: '' };
-  };
-  adapter.calls = 0;
-  adapter.preparedInvocationContract = 'exact-v1';
-  return adapter;
-}
-
 async function assertRefused(project, options, code) {
-  const adapter = countingAdapter();
   await assert.rejects(
-    async () => executeThroughConfinement(requestFor(project, options), adapter),
+    async () => assessAndPrepare(requestFor(project, options)),
     (err) => {
       assert.ok(err instanceof DispatchError, String(err));
       assert.equal(err.code, code);
@@ -501,7 +490,6 @@ async function assertRefused(project, options, code) {
       return true;
     },
   );
-  assert.equal(adapter.calls, 0, 'nothing launched');
 }
 
 test('a blind dispatch is refused, with a named reason, when it cannot be enforced', async () => {
@@ -570,10 +558,8 @@ test('the attestation records the override, the effective hostRead and the hidde
   const previousSocket = process.env.HERDR_SOCKET_PATH;
   process.env.HERDR_SOCKET_PATH = project.socket;
   try {
-    const adapter = countingAdapter();
     // The standard policy's backend config is the machine registry's; the temp root is the machine's.
-    await executeThroughConfinement(requestFor(project, {}), adapter);
-    assert.equal(adapter.calls, 1);
+    await assessAndPrepare(requestFor(project, {}));
     const record = loadAttestationRecord('disp_self', 'prepared');
     assert.deepEqual(record.requested.override, { controls: { hostRead: 'blind' } });
     assert.equal(record.effectiveControls.hostRead, 'blind');

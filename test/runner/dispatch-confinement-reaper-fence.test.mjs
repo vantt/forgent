@@ -10,7 +10,8 @@
 //       test/run-supervisor/direct-crash-matrix.test.mjs kills real controllers and supervisors
 //   (3)(4)(7)(9)   pane, retained-pane and herdr-endpoint rules, pane-less binding kept for doctor -> removed
 //       with the pane rules: terminal-control owns panes by key, the home belongs to the attempt
-//   (5)            finalizer field contract -> below: the marker at removal must equal the marker at prepare
+//   (5)            finalizer field contract -> removed with the digest comparison; finalizeAttemptHome refuses a home whose
+//                  version 2 marker names another attempt or run (test/run-supervisor/attempt-steps.test.mjs)
 //   (6)            two reapers over one home -> test/run-supervisor/sweep.test.mjs, two adopters remove it once
 //   (8)            one binding over every prepared home -> removed with the binding
 //
@@ -24,15 +25,11 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {
-  writeOwnershipMarker,
   extendOwnershipMarker,
-  readOwnershipMarker,
   ensurePrivateDir,
   writeOwnershipMarkerV2,
   removeConfinementDir,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { finalizeConfinementResources } from '../../src/runner/dispatch/confinement/authority.mjs';
-import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
 
 const exists = (p) => fs.existsSync(p);
 
@@ -40,68 +37,6 @@ function workspace() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-s2-fence-'));
   const root = path.join(tmp, 'fgos-confinement');
   return { tmp, root, cleanup: () => fs.rmSync(tmp, { recursive: true, force: true }) };
-}
-
-/** A private home as a dispatch outside the assignment door prepares it (ensurePrivateDir + marker). */
-function preparedHome(w, { dispatchId = 'disp_s2' } = {}) {
-  const dir = path.join(w.root, dispatchId, 'home');
-  ensurePrivateDir(dir, { root: w.root });
-  writeOwnershipMarker(dir, { dispatchId, pid: 424242 });
-  fs.writeFileSync(path.join(dir, 'auth.json'), '{"fake":"login copy"}');
-  return dir;
-}
-
-async function finalizeWithPrepareDigest(w, dir, digest) {
-  const runDir = path.join(w.tmp, 'run');
-  fs.mkdirSync(runDir, { recursive: true });
-  return finalizeConfinementResources({
-    runDir,
-    launchCommandId: 'launch_s2',
-    receipt: { completion: { kind: 'exited' } },
-    descriptor: { resources: [{ kind: 'temporary-directory', pathRef: dir, ownershipMarkerDigest: digest }] },
-  });
-}
-
-test('a home whose marker is exactly as prepared finalizes and is cleaned', async () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w);
-    const result = await finalizeWithPrepareDigest(w, dir, computeSha256Digest(readOwnershipMarker(dir)));
-    assert.equal(result.cleanupState, 'cleaned', `finalizer said ${JSON.stringify(result.cleanupResult)}`);
-    assert.equal(exists(dir), false);
-  } finally { w.cleanup(); }
-});
-
-test('the count of a failed removal is the only change to the marker the finalizer accepts', async () => {
-  const w = workspace();
-  try {
-    const dir = preparedHome(w);
-    const digest = computeSha256Digest(readOwnershipMarker(dir));
-    extendOwnershipMarker(dir, { credentialKept: { attempts: 1, since: new Date().toISOString() } });
-    const result = await finalizeWithPrepareDigest(w, dir, digest);
-    assert.equal(result.cleanupState, 'cleaned', `finalizer said ${JSON.stringify(result.cleanupResult)}`);
-  } finally { w.cleanup(); }
-});
-
-for (const [label, change] of [
-  ['an unauthorized new field', { evil: 'x' }],
-  ['a pane the home was never bound to', { paneId: 'w1:p7', terminalKey: 'k', boundAt: new Date().toISOString() }],
-  ['a changed dispatchId', { dispatchId: 'disp_other' }],
-  ['a changed resource kind', { resource: 'scratch' }],
-  ['a changed createdAt', { createdAt: new Date(0).toISOString() }],
-  ['a rewritten pid', { pid: 424243 }],
-]) {
-  test(`a marker that also carries ${label}: ownership-marker-mismatch, home kept`, async () => {
-    const w = workspace();
-    try {
-      const dir = preparedHome(w);
-      const digest = computeSha256Digest(readOwnershipMarker(dir));
-      extendOwnershipMarker(dir, change);
-      const result = await finalizeWithPrepareDigest(w, dir, digest);
-      assert.equal(result.cleanupResult?.reason, 'ownership-marker-mismatch');
-      assert.equal(exists(dir), true);
-    } finally { w.cleanup(); }
-  });
 }
 
 test('writeOwnershipMarkerV2 refuses a missing attempt or run directory and leaves no marker', () => {

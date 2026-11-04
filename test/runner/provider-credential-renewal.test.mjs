@@ -35,8 +35,6 @@ import {
   extendOwnershipMarker,
   writeOwnershipMarker,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
-import { finalizeConfinementResources } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { prepareBwrap, prepareBwrapSync } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 
@@ -1324,23 +1322,6 @@ test('the marker is rewritten whole, and a marker that cannot be read stops the 
     fs.writeFileSync(marker, '{"contract": "');
     assert.throws(() => removeConfinementDir(dir), /ownership-marker-unreadable/);
     assert.equal(fs.existsSync(path.join(dir, 'auth.json')), true, 'the renewed login is still in the home');
-  } finally { w.cleanup(); }
-});
-
-test('a marker changed by anything other than a failed removal still reads as an ownership mismatch', async () => {
-  const w = workspace();
-  try {
-    const dir = privateHomeWithRenewedLogin(w);
-    const digest = computeSha256Digest(markerOf(dir));
-    extendOwnershipMarker(dir, { pid: 1 }); // a real change to the marker
-    const runDir = path.join(w.tmp, 'run');
-    fs.mkdirSync(runDir, { recursive: true });
-    const result = await finalizeConfinementResources({
-      runDir, launchCommandId: 'launch_1', receipt: { completion: { kind: 'exited' } },
-      descriptor: { resources: [{ kind: 'temporary-directory', pathRef: dir, ownershipMarkerDigest: digest }] },
-    });
-    assert.equal(result.cleanupResult.reason, 'ownership-marker-mismatch');
-    assert.equal(fs.existsSync(dir), true);
   } finally { w.cleanup(); }
 });
 

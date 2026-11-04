@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "fe0e7b18d2884e552a4360f46b5db86273bd1da1bac6fa800d9c00381011d027",
+  "payloadDigest": "8178ccecf1ec2b82f795c6ec92ec6db36d9f08aad1d61f8e6a7ce73a25eb189c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -971,7 +971,7 @@
     "src/runner/attestation-guard.mjs": "a7fcde36b4580892f22f160fb4331bcdddfa483554c726b6d606f8e8707b35b4",
     "src/runner/claim-liveness.mjs": "81343f229916449e5ec0b4531cb3d9414a90b6b75c738e9fc10586f8adbee567",
     "src/runner/claim-port.mjs": "4b3eafd94c29e504d624a44a60b9ba27ca51fac14d5d19e946938b92aaca658e",
-    "src/runner/dispatch.mjs": "086c81d631e603c44a05d68ac354a8a871803a2bff470565b52462024a5cd1e1",
+    "src/runner/dispatch.mjs": "102a94dc933e766a0b7c766e38d6cc23f7bbbe41c3d616fe6d5c0f5be896e941",
     "src/runner/dispatch/adapters.mjs": "273f7428b0d532e8e1b0b9a3ef3fc1682f87e64eced2a13fdc6893cb20d20f5f",
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
@@ -982,9 +982,9 @@
     "src/runner/dispatch/cli.mjs": "07d517329e94649193ba415c13e396c580e97b198ccd150e657d51694c420703",
     "src/runner/dispatch/config.mjs": "deda4babdc09321e501109892ca24455737a618d029161aa7bb927c06839c736",
     "src/runner/dispatch/confinement/attestation-store.mjs": "79e413d77b1a92e5f5016fe5c0da789bb6810824c0c747ce7c1e38c70fbea284",
-    "src/runner/dispatch/confinement/authority.mjs": "bc90b94801d37b744fe81986f8458de44fe561b924a54e800a3d887125e14ccc",
+    "src/runner/dispatch/confinement/authority.mjs": "2ab6c0ae4b59e7b852ca6a0f1ffce5b61c3d4f7ebefaa2511965e29b688db8af",
     "src/runner/dispatch/confinement/backend-registry.mjs": "91e15d2902b8fa8fcf0087b69de714b6651f906713ebf2969b18e0644993d7cd",
-    "src/runner/dispatch/confinement/bypass-pairing.mjs": "0414c5c19c96bbdd2a53dfbbdefd0eae0fd69d02abd09d37e69e03981f472f62",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "93fc1f7a32b1513cf08bf6812a0d52d4b3744884c139d8e9277cf87c19e2fe01",
     "src/runner/dispatch/confinement/cleanup.mjs": "f5cabc3140a972f50947b6b490e23d008483384b6d09dbfedc2cd19e3d8972b6",
     "src/runner/dispatch/confinement/drivers/bwrap.mjs": "d55e8f71148f4143c109526215d3cc3b233de81a2916d316c8a413268dcba931",
     "src/runner/dispatch/confinement/policies.mjs": "f823c3997b82eabea91dc6343d1f8ae38a35de17f14ed1c1da1091712f9541a3",
@@ -998,7 +998,7 @@
     "src/runner/dispatch/execution-contract.mjs": "df3747d8745fc2986669d73a2b4cf2e66e59693c99978aa94349d03479f8e5f6",
     "src/runner/dispatch/executor-governance.mjs": "f4d179122ee78207bd235afbedeb185a9d1e3eb747d31e659db77f5ad8f5d31f",
     "src/runner/dispatch/herdr-deadlines.mjs": "cdaaaeaeb55d5296078e0a0e56d73eebacff514896bc741941ea57aa46c6596b",
-    "src/runner/dispatch/herdr-round.mjs": "86389ff78ed60ad30747026315287820f2e04b04e876a355f42a7fb0cba91bca",
+    "src/runner/dispatch/herdr-round.mjs": "f98191357b56895bd7eecb99db0b95a5396aa0ddc176fe4dce437e5d21405c36",
     "src/runner/dispatch/llm-accounts.mjs": "246105c8c967302ccaf988274f2ca502ce203328ef1742033de5544a336dbfec",
     "src/runner/dispatch/mechanism.mjs": "8f272b51172f4b3f15418b43242d8b877ea4ed0ac974890bd7fd991ca3d87afe",
     "src/runner/dispatch/operation-prompt-templates.mjs": "19a15d560c4ba017932a5456aa079e5c0459b2943a29ebaaf987ed3d5949dc1c",
@@ -1026,7 +1026,7 @@
     "src/runner/dispatch/stray-writes.mjs": "8ab287ef44a7e731d4c22fb50e820017645d707e9b41b63a75b7fb4bc028f2ff",
     "src/runner/dispatch/terminal-slot.mjs": "82ed4279c054f2486bb8f3223182c9a1043426d0cae2a846449eda29967665df",
     "src/runner/dispatch/tier-cell.mjs": "3c1a50df77c26c22c6bc88d00da6b90012008e633bdbb27c4d854fb1a369b722",
-    "src/runner/dispatch/transport.mjs": "31b3c6728dd3eb274a59808b7c2227f1e9539a2f447610b9f301dd0812bdd51b",
+    "src/runner/dispatch/transport.mjs": "01d89783f0c3b4591be227d58ecc808401f306133388d4985f52bb53ad3e5f11",
     "src/runner/dispatch/trust-store.mjs": "980091da229ab962857f16acc955c5fa577a0c4f2f5c1ca3ffa9cec6af4f871f",
     "src/runner/dispatch/usage-parsers.mjs": "18e1755935c8b7c769e7775a2c28964f3c2e87d689e730db2baf8ca0cbc4515d",
     "src/runner/dispatch/visibility-session.mjs": "b341ffa4fac38a9e0867332c85e9486b4004bb4c1bb3860da83c849ac5b722ec",
@@ -3314,33 +3314,10 @@
     },
     {
       "path": "src/runner/dispatch/confinement/authority.mjs",
-      "line": 799,
-      "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:152",
+      "line": 797,
+      "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:151",
       "binary": "(configuration file data)",
       "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/dispatch/confinement/authority.mjs",
-      "line": 1118,
-      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:395",
-      "binary": "(configuration file data)",
-      "class": "configured-binary"
-    },
-    {
-      "path": "src/runner/dispatch/confinement/authority.mjs",
-      "line": 1118,
-      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:395",
-      "binary": "param driver",
-      "class": "uncalled-wrapper",
-      "function": "registerBackendDriver"
-    },
-    {
-      "path": "src/runner/dispatch/confinement/authority.mjs",
-      "line": 1118,
-      "spawn": "cliSpawnAdapter -> src/runner/dispatch/transport.mjs:395",
-      "binary": "param request",
-      "class": "uncalled-wrapper",
-      "function": "executeThroughConfinement"
     },
     {
       "path": "src/runner/dispatch/worker-session-boot.mjs",

@@ -73,9 +73,8 @@ import {
 } from '../../src/runner/dispatch/confinement/probes/harness.mjs';
 
 import { checkConfinementProbeFreshness } from '../../src/setup/registrations.mjs';
-import { executeThroughConfinement, buildConfinementAttestation } from '../../src/runner/dispatch/confinement/authority.mjs';
+import { assessAndPrepare, buildConfinementAttestation } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
-import { DispatchError } from '../../src/runner/dispatch/transport.mjs';
 
 function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
   if (os.platform() !== 'linux') return false;
@@ -1108,21 +1107,13 @@ test('R8: checkConfinementProbeFreshness in doctor passes on Linux with working 
 // Lifecycle & Authority Door Integration
 // =========================================================================
 
-test('Authority Door: required mode with bwrap backend assesses, prepares, executes, cleans up, and records attestation', async () => {
+test('Authority Door: required mode with bwrap backend assesses, prepares, and records a prepared attestation', async () => {
   if (!HAS_WORKING_BWRAP) return;
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-door-test-'));
   try {
     const runDir = path.join(tmp, 'run');
     fs.mkdirSync(runDir, { recursive: true });
-
-    let adapterSpawned = false;
-    const fakeAdapter = async (invocation, opts) => {
-      adapterSpawned = true;
-      assert.equal(invocation.command, '/usr/bin/bwrap');
-      assert.ok(invocation.args.includes('--bind'));
-      return { status: 0, stdout: 'success' };
-    };
 
     const req = buildConfinementRequest({
       capability: 'code:review',
@@ -1152,20 +1143,15 @@ test('Authority Door: required mode with bwrap backend assesses, prepares, execu
     });
 
     req.context.attestationStoreDir = path.join(tmp, 'machine-state', 'attestations');
-    const execResult = await executeThroughConfinement(req, fakeAdapter);
-    assert.equal(adapterSpawned, true);
-    assert.equal(execResult.status, 'completed');
-    assert.ok(execResult.attestation);
-    assert.equal(execResult.attestation.phase, 'completed');
-    assert.ok(execResult.attestation.evidence.some((entry) => entry.kind === 'falsification-probe' && entry.freshness === 'current'));
+    const prep = await assessAndPrepare(req);
+    assert.equal(prep.preparedConfinement.invocation.command, '/usr/bin/bwrap');
+    assert.ok(prep.preparedConfinement.invocation.args.includes('--bind'));
 
     // Attestation records persisted outside write grants
     const storeContext = { attestationStoreDir: req.context.attestationStoreDir };
     const loadedPrep = loadAttestationRecord(req.dispatchId, 'prepared', storeContext);
     assert.ok(loadedPrep);
-    const loadedTerm = loadAttestationRecord(req.dispatchId, 'completed', storeContext);
-    assert.equal(execResult.attestation.outcome, 'enforced');
-    assert.ok(loadedTerm);
+    assert.equal(loadedPrep.phase, 'prepared');
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -1207,77 +1193,6 @@ test('Cleanup: prepare failure triggers immediate cleanup of allocated resources
 
     // Verify allocatedHome was cleaned up on error
     assert.ok(!fs.existsSync(allocatedHome), 'allocated temporary home directory was cleaned up on prepare failure');
-  } finally {
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-});
-
-test('Cleanup: adapter failure and timeout/cancel clean up temporary resources in finally block', async () => {
-  if (!HAS_WORKING_BWRAP) return;
-
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-adapt-fail-'));
-  try {
-    const runDir = path.join(tmp, 'run');
-    fs.mkdirSync(runDir, { recursive: true });
-
-    let allocatedHomePath = null;
-    const failingAdapter = async (invocation, opts) => {
-      // Find the allocated private home mount from invocation args
-      const bindIdx = invocation.args.indexOf('--bind');
-      for (let i = 0; i < invocation.args.length - 1; i++) {
-        if (invocation.args[i] === '--bind' && invocation.args[i + 1].includes('disp_fail_adapter')) {
-          allocatedHomePath = invocation.args[i + 1];
-        }
-      }
-      throw new DispatchError('worker-timeout', 'simulated adapter execution timeout');
-    };
-
-    const req = buildConfinementRequest({
-      dispatchId: 'disp_fail_adapter',
-      capability: 'code:review',
-      executorId: 'bwrap-exec',
-      requirement: {
-        mode: 'required',
-        policyId: 'host-write-denied',
-        policy: {
-          contract: 'confinement-policy.v1',
-          controls: {
-            hostWrite: 'deny',
-            hostRead: 'allow',
-            networkEgress: 'allow',
-            process: 'host',
-            home: 'host',
-            session: 'shared',
-            workspace: 'shared',
-          },
-          grants: [
-            { resource: 'run-output', access: 'write', scope: 'dispatch' },
-            { resource: 'private-home', access: 'read-write', scope: 'dispatch' },
-          ],
-        },
-      },
-      context: { cwd: tmp, runDir, fgosDir: tmp },
-      backendId: 'bwrap',
-    });
-
-    await assert.rejects(
-      () => executeThroughConfinement(req, failingAdapter),
-      (err) => {
-        assert.ok(err instanceof DispatchError);
-        assert.equal(err.errorClass, 'worker-timeout');
-        return true;
-      },
-    );
-
-    // Verify private-home allocated directory was cleaned up in finally block
-    if (allocatedHomePath) {
-      assert.ok(!fs.existsSync(allocatedHomePath), 'allocated private home was cleaned up in finally block after adapter failure');
-    }
-
-    // Verify failure attestation was recorded
-    const failedAttestation = loadAttestationRecord('disp_fail_adapter', 'failed', { fgosDir: tmp });
-    assert.ok(failedAttestation);
-    assert.equal(failedAttestation.phase, 'failed');
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

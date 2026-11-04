@@ -343,13 +343,11 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
 const RUN_DOOR_CALLERS = {
   executeAssignment: ['src/runner/execution/run.mjs', 'src/runner/dispatch/cli.mjs'],
   commitUnitWork: ['src/runner/execution/run.mjs', 'scripts/git/e3-bench.mjs'], // Paired E3 baseline calls the real legacy writer.
-  executeThroughConfinement: [], // Every dispatch runs as a supervised attempt; the direct confinement door has no production caller left.
 };
 // Where each symbol is defined. Its home and the dispatch barrel may define or re-export it; calling it still counts.
 const RUN_DOOR_HOMES = {
   executeAssignment: 'src/runner/dispatch/assignment-runner.mjs',
   commitUnitWork: 'src/runner/execution/commit-unit-work.mjs',
-  executeThroughConfinement: 'src/runner/dispatch/confinement/authority.mjs',
 };
 
 /**
@@ -411,7 +409,7 @@ function runDoorUses() {
   return uses;
 }
 
-test('run-door call sites: executeAssignment, commitUnitWork and executeThroughConfinement are called only from their named files', () => {
+test('run-door call sites: executeAssignment and commitUnitWork are called only from their named files', () => {
   const uses = runDoorUses();
   assert.deepEqual(checkRunDoorCallers(uses), []);
   // Each named caller still calls it: a door nobody uses any more leaves this table.
@@ -521,34 +519,21 @@ export function findExecutorAdapterCallSites(files = mjsFilesUnder('src')) {
 }
 
 export function checkExecutorAdapterCallSitePostures(sites) {
-  const violations = [];
-  for (const site of sites) {
-    if (site.file !== 'src/runner/dispatch/confinement/authority.mjs') {
-      violations.push(`${site.file}:${site.line} direct EXECUTOR_ADAPTERS[...] lookup outside authority.mjs: ${site.callText}`);
-    }
-  }
-  return violations;
+  return sites.map((site) => `${site.file}:${site.line} direct EXECUTOR_ADAPTERS[...] lookup in production dispatch code: ${site.callText}`);
 }
 
-test('R8 one-door confinement authority: EXECUTOR_ADAPTERS execute-handle lookups in src/** are confined to authority.mjs', () => {
+test('R8 EXECUTOR_ADAPTERS execute-handle lookups do not exist in src/**: every dispatch runs as a supervised attempt', () => {
   const sites = findExecutorAdapterCallSites();
   assert.deepEqual(
     checkExecutorAdapterCallSitePostures(sites),
     [],
-    'direct EXECUTOR_ADAPTERS[...] lookup reintroduced in production dispatch code outside authority.mjs',
+    'direct EXECUTOR_ADAPTERS[...] lookup reintroduced in production dispatch code',
   );
-  assert.equal(
-    sites.length,
-    1,
-    `expected exactly one EXECUTOR_ADAPTERS[...] lookup in authority.mjs, found ${sites.length} (in: ${sites.map((s) => s.file).join(', ')})`,
-  );
-  assert.equal(sites[0].file, 'src/runner/dispatch/confinement/authority.mjs');
 
-  // Also assert that no production files other than authority.mjs, adapters.mjs (definition),
-  // transport.mjs, and config.mjs (metadata reader) import or reference EXECUTOR_ADAPTERS.
+  // Only the adapter table's definition, the transport that registers it and the config
+  // metadata reader may reference EXECUTOR_ADAPTERS at all.
   const allowedReferences = new Set([
     'src/runner/dispatch/adapters.mjs',
-    'src/runner/dispatch/confinement/authority.mjs',
     'src/runner/dispatch/transport.mjs',
     'src/runner/dispatch/config.mjs',
   ]);
@@ -579,25 +564,12 @@ test('R8 cycle cut: src/runner/dispatch/config.mjs does not import src/runner/di
 });
 
 test('R8 posture check actually catches an EXECUTOR_ADAPTERS direct call site violation', () => {
-  assert.ok(
-    checkExecutorAdapterCallSitePostures([
-      { file: 'src/runner/dispatch/cli.mjs', line: 312, callText: 'const adapterFn = EXECUTOR_ADAPTERS[adapter];' },
-    ]).length > 0,
-    'a direct EXECUTOR_ADAPTERS[...] lookup in cli.mjs must be flagged as a violation',
-  );
-  assert.ok(
-    checkExecutorAdapterCallSitePostures([
-      { file: 'src/runner/dispatch/transport.mjs', line: 100, callText: 'EXECUTOR_ADAPTERS[name]()' },
-    ]).length > 0,
-    'a direct lookup in transport.mjs must be flagged',
-  );
-  assert.deepEqual(
-    checkExecutorAdapterCallSitePostures([
-      { file: 'src/runner/dispatch/confinement/authority.mjs', line: 80, callText: 'adapterFn = EXECUTOR_ADAPTERS[adapterName];' },
-    ]),
-    [],
-    'authority.mjs lookup must be valid',
-  );
+  for (const file of ['src/runner/dispatch/cli.mjs', 'src/runner/dispatch/transport.mjs', 'src/runner/dispatch/confinement/authority.mjs']) {
+    assert.ok(
+      checkExecutorAdapterCallSitePostures([{ file, line: 1, callText: 'EXECUTOR_ADAPTERS[name]()' }]).length > 0,
+      `a direct EXECUTOR_ADAPTERS[...] lookup in ${file} must be flagged as a violation`,
+    );
+  }
 });
 
 function extractFunctionBody(source, functionName) {

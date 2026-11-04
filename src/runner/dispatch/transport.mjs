@@ -1,50 +1,29 @@
-// dispatch/transport.mjs — adapters, spawn, attestation, tee (D7,
+// dispatch/transport.mjs — executor adapters, command resolution, attestation (D7,
 // tsk-2uf-1).
 //
-// WHERE THE HERDR PATH LIVES: not here. `EXECUTOR_ADAPTERS` is registered at
-// the bottom of this file, so a reader looking for the interactive dispatch
-// mechanism lands here first and finds only the forty lines that unpack an
-// invocation. The round itself -- pane, agent, brief, receipt, exit -- is
-// `herdr-round.mjs`. This file unpacks config and hands it over; that file
-// runs the worker.
+// WHERE THE AGENT RUNS: not here. `EXECUTOR_ADAPTERS` is registered at the
+// bottom of this file, but both adapters only name what a seat is; the agent
+// itself runs as an attempt of the run supervisor (`executeAssignment`,
+// `src/run-supervisor/`), and the interactive round -- pane, agent, brief,
+// receipt, exit -- is `herdr-round.mjs`.
 //
 // What IS here: the worktree-dispatch attestation
 // (`captureDispatchAttestation`), `resolveExecutorCommand` (the
-// prompt/model → argv substitution + cross-provider gate), live per-chunk
-// teeing (`teeChunk`), and the C9 v2 executor-adapter port
-// (`cliSpawnAdapter`/`EXECUTOR_ADAPTERS`). Split out of the
-// former `src/runner/dispatch.mjs` (2204 lines, 6 concerns in one file) —
+// prompt/model → argv substitution + cross-provider gate) and the executor
+// adapter port (`EXECUTOR_ADAPTERS`). Split out of the former
+// `src/runner/dispatch.mjs` (2204 lines, 6 concerns in one file) —
 // pure move, no behavior change; `src/runner/dispatch.mjs` re-exports every
 // name below unchanged as a barrel. See `docs/history/dispatch-activation-
 // and-handoff-redesign/CONTEXT.md` D7 for the split rationale.
 //
-// SECURITY (security panel, unchanged from the pre-split file): the
-// executor is always spawned via an argv array with `shell: false`
-// (spawnSync's default) — the prompt and model are substituted
-// per-array-element into `executor.args`, never concatenated into a single
-// shell string. This is what keeps arbitrary shell metachars inside a work
-// item's title/refs/verify text inert here (they still reach the child
+// SECURITY (security panel): the executor command is always an argv array,
+// never a shell string — the prompt and model are substituted
+// per-array-element into `executor.args`, so arbitrary shell metachars inside
+// a work item's title/refs/verify text stay inert (they reach the child
 // process as literal argv, never interpreted by a shell).
-//
-// PROCESS-GROUP KILL (closes the former GRANDCHILD-SIGTERM CAVEAT): the
-// child is spawned `detached: true` (its own process-group leader), and
-// every kill below targets `-pid` (the whole group) via `killChildTree`,
-// not just the directly-spawned pid — a headless agent CLI that shells out
-// further (e.g. `agy`) no longer survives its own parent's timeout kill.
-//
-// NESTED DISPATCH DEPTH CAP: an executor spawned here may itself be another
-// dispatch-capable CLI that dispatches again through fgOS (e.g.
-// `agy` fanning out its own sub-agents). `DISPATCH_DEPTH_ENV` threads a
-// counter through the child's environment so that nested call can see how
-// deep it already is; `MAX_DISPATCH_DEPTH` refuses the spawn outright once
-// the cap is reached, rather than letting an unbounded dispatch chain fork
-// forever. No live evidence of this happening yet — anticipated per the
-// design, not a reaction to an observed incident.
 
 import path from 'node:path';
 import fs from 'node:fs';
-import os from 'node:os';
-import { spawn } from 'node:child_process';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
 import { RunnerConfigError, assertReasoningEffort } from './config.mjs';
@@ -65,7 +44,6 @@ import {
   MAX_DISPATCH_DEPTH,
   currentDispatchDepth,
   resolveExecutorEnv,
-  workerBaseEnv,
 } from './adapters.mjs';
 
 // Raised by every adapter here and by `herdr-round.mjs`; owned by neither, so
@@ -297,305 +275,6 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
 }
 
 /**
- * Run the headless executor for `work` inside `cwd` (the worktree checkout
- * — this function never touches the main working tree itself; the caller
- * decides `cwd`). Builds the prompt, resolves tier -> model, substitutes the
- * config template, and spawns via argv array with `shell: false` (always —
- * per the security panel, never templated into a shell string).
- *
- * Throws `DispatchError('worker-timeout', ...)` when the executor is killed
- * for exceeding `cfg.timeoutMs` (or `opts.timeoutMs`, test-only override),
- * and `DispatchError('worker-spawn-fail', ...)` when the process could not
- * be started at all (e.g. the configured command does not exist). A
- * non-zero exit status from a process that *did* run is NOT an error here —
- * that is the runner's goal-check's concern (per D3: the worker's own exit
- * status/report is never trusted on its own; only `verify` decides).
- */
-/**
- * Live per-chunk teeing (P39): `opts.onChunk(stream, chunk)`, when provided,
- * is called synchronously on every stdout/stderr 'data' event — BEFORE the
- * maxBuffer accounting below, so a chunk is teed even on the event that
- * crosses the cap and triggers the kill. Wrapped in try/catch: an event
- * handler that throws is an uncaught exception in Node (not something a
- * Promise reject can catch), and this module's job is spawning the worker,
- * never crashing on a caller's logging callback. dispatch.mjs itself still
- * touches no filesystem outside the child process's own cwd — the callback
- * (loop.mjs, via worker-log.mjs's sole writer) owns `.fgos/logs/`.
- */
-function teeChunk(onChunk, stream, chunk) {
-  if (!onChunk) return;
-  try {
-    onChunk(stream, chunk);
-  } catch {
-    // observability must never crash dispatch
-  }
-}
-
-/**
- * The executor port is a NAMED interface: `EXECUTOR_ADAPTERS` maps an adapter name to a function
- * `(invocation, opts) => Promise<result>`. `invocation` is whatever shape that one adapter needs
- * (`cliSpawnAdapter` reads `command`/`args`), never a fixed argv shape. `opts` stays uniform across
- * adapters (`cwd`, `timeoutMs`, `maxBuffer`, `onChunk`, `workId`, `tier`, `model`). Two adapters are
- * registered: `cli-spawn` (this process-spawning body: timeout-on-'exit', hand-tracked maxBuffer kill,
- * onChunk teed before accounting, process-group kill, optional idle-timeout, nested-depth cap) and
- * `herdr-spawn` (a pane, run only as a terminal attempt of the run supervisor).
- */
-
-/** Kill the spawned child's entire process GROUP, not just the directly-
- * spawned pid — `detached: true` at spawn time (below) makes the child its
- * own process-group leader, so `process.kill(-pid, signal)` reaches every
- * descendant it may have shelled out to (e.g. an executor CLI that itself
- * shells out further), closing the former GRANDCHILD-SIGTERM CAVEAT this
- * file used to document as an accepted limitation. Falls back to killing
- * just the child's own pid when the negative-pid form throws (no
- * process-group support on the current platform, or the child already
- * exited) — a kill attempt must never itself throw into dispatch. */
-function killChildTree(child, signal) {
-  if (!child.pid) return;
-  try {
-    process.kill(-child.pid, signal);
-  } catch {
-    try {
-      child.kill(signal);
-    } catch {
-      // already dead -- nothing left to kill
-    }
-  }
-}
-
-/**
- * The short-call cli-spawn adapter: it starts the agent as a child of the caller and returns when the
- * child has exited. It serves the callers whose agent lives and dies with the calling process (an account
- * probe, a panel judge, a goal check). An attempt of a unit that must survive its
- * controller never comes here: it runs through `fgos internal supervise`
- * (src/run-supervisor/direct-launch.mjs), whose supervisor owns the agent's process tree.
- */
-export function cliSpawnAdapter(invocation, opts) {
-  const { command, args, env: rawEnv } = invocation;
-  const { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
-
-  const depth = currentDispatchDepth();
-  if (depth >= MAX_DISPATCH_DEPTH) {
-    return Promise.reject(new DispatchError(
-      'dispatch-depth-exceeded',
-      `executor for work "${workId}" refused: nested out-of-process dispatch depth ${depth} is already at the cap (${MAX_DISPATCH_DEPTH}) -- a dispatched executor tried to dispatch another executor too many levels deep.`,
-      { workId, tier, model, depth },
-    ));
-  }
-
-  const resolvedEnv = resolveExecutorEnv(rawEnv);
-
-  return new Promise((resolve, reject) => {
-    // `stdin: 'ignore'` (never the 'pipe' default): an executor that checks
-    // for piped stdin (codex's own "Reading additional input from stdin..."
-    // probe, tsk-3tkc) blocks forever on an open-but-unwritten pipe here,
-    // since nothing in this adapter ever writes to or closes child.stdin.
-    // `detached: true` + the depth counter in `env`: see killChildTree and
-    // this file's own header comment.
-    const child = spawn(command, args, {
-      cwd,
-      shell: false,
-      stdio: ['ignore', 'pipe', 'pipe'],
-      detached: true,
-      env: { ...workerBaseEnv(), ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) },
-    });
-    child.stdout.setEncoding('utf8');
-    child.stderr.setEncoding('utf8');
-
-    let stdout = '';
-    let stderr = '';
-    let stdoutLen = 0;
-    let stderrLen = 0;
-    let settled = false;
-    let timedOut = false;
-    let idleTimedOut = false;
-    // MAXBUFFER DEVIATION (per this cell's action (1)): spawnSync enforces
-    // maxBuffer natively and surfaces overflow as `result.error` (falling
-    // into the worker-spawn-fail branch below, the same branch any other
-    // non-timeout spawn failure already used) — the event-based `spawn` API
-    // has no built-in equivalent, so accumulated stdout+stderr length is
-    // tracked by hand on every 'data' event and the child is killed the
-    // moment it crosses `maxBuffer`, reusing that same worker-spawn-fail
-    // outcome. The intent (never let one runaway worker exhaust memory)
-    // holds; the exact error text is not byte-for-byte identical to
-    // spawnSync's own maxBuffer message.
-    let maxBufferExceeded = false;
-    let timer = null;
-    let idleTimer = null;
-
-    const clearTimers = () => {
-      if (timer) clearTimeout(timer);
-      if (idleTimer) clearTimeout(idleTimer);
-    };
-
-    // RELEASE OUR OWN READ END ON EVERY SETTLE PATH (self-review finding,
-    // real, 2026-08-26, confirmed live): rejecting immediately on timeout
-    // (below) bounds the PROMISE, but the parent process's own event loop
-    // stays alive as long as `child.stdout`/`child.stderr` remain open
-    // Node-side handles — and an escaped descendant (e.g. `setsid ...
-    // sleep 5 &`) inherits the pipe's write end independent of process
-    // groups, so it alone can keep that pipe from ever closing. Confirmed
-    // live: even with the promise settling at ~112ms, a caller that never
-    // force-exits hung for the full ~5s the escaped descendant kept
-    // running. Destroying our own read-side streams (never the writer's
-    // problem to close) drops that handle immediately regardless of what
-    // any descendant does afterward. Harmless on the normal 'close' path
-    // too — the streams have already ended themselves by then.
-    const releaseStdio = () => {
-      try { child.stdout.destroy(); } catch {}
-      try { child.stderr.destroy(); } catch {}
-    };
-
-    const finish = (fn) => {
-      if (settled) return;
-      settled = true;
-      clearTimers();
-      releaseStdio();
-      fn();
-    };
-
-    // TIMEOUT/MAXBUFFER SETTLE IMMEDIATELY ON KILL, NEVER WAIT FOR 'close'
-    // (self-review finding, real, 2026-08-26, confirmed live): switching
-    // normal completion to 'close' (below) fixed a real stdout-loss race,
-    // but it also made a rejection that USED TO fire on the killed child's
-    // own 'exit'/'close' start waiting on the SAME event instead — and
-    // `killChildTree`'s process-group SIGTERM only reaches descendants
-    // still in the child's own process group. A descendant that escaped it
-    // (e.g. `setsid sh -c 'sleep 1' &`) keeps inheriting the stdout pipe
-    // open for as long as IT runs, regardless of the SIGTERM — confirmed
-    // live: `timeoutMs: 100` against `sh -c "setsid sh -c 'sleep 1' &
-    // echo parent-done"` rejected worker-timeout after ~1006ms, not
-    // ~100ms. `timeoutMs` is a promised ceiling on how long a caller waits
-    // for an ANSWER, not on how long an escaped grandchild is allowed to
-    // keep a pipe open — so the timeout/idle-timeout/maxBuffer paths each
-    // settle THEMSELVES, synchronously, right after killing, with whatever
-    // stdout/stderr has been captured so far. `close` (below) still owns
-    // NORMAL completion (no kill involved, so no escape risk) — `finish`'s
-    // `settled` guard makes it a harmless no-op on the already-settled path.
-    const settleTimeout = () => {
-      finish(() => {
-        reject(new DispatchError(
-          'worker-timeout',
-          idleTimedOut
-            ? `executor for work "${workId}" was killed after ${idleTimeoutMs}ms with no output (idle timeout).`
-            : `executor timed out after ${timeoutMs}ms for work "${workId}".`,
-          { workId, tier, model, stdout, stderr },
-        ));
-      });
-    };
-    const settleMaxBuffer = () => {
-      finish(() => {
-        reject(new DispatchError(
-          'worker-spawn-fail',
-          `executor for work "${workId}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
-          { workId, tier, model, cause: 'maxBuffer exceeded', stdout, stderr },
-        ));
-      });
-    };
-
-    if (timeoutMs) {
-      timer = setTimeout(() => {
-        timedOut = true;
-        killChildTree(child, 'SIGTERM');
-        settleTimeout();
-      }, timeoutMs);
-    }
-
-    // IDLE TIMEOUT (opt-in via cfg.idleTimeoutMs/opts.idleTimeoutMs, never
-    // armed when absent -- every pre-existing caller that never configured
-    // it keeps the single-hard-cap `timeoutMs` behavior byte-identical):
-    // reset on every stdout/stderr chunk, so a worker that is genuinely
-    // still producing output never trips it, only one that has gone
-    // completely silent for `idleTimeoutMs`. `timeoutMs` above still stands
-    // as the unconditional absolute ceiling regardless of activity.
-    const armIdleTimer = () => {
-      if (!idleTimeoutMs) return;
-      if (idleTimer) clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => {
-        timedOut = true;
-        idleTimedOut = true;
-        killChildTree(child, 'SIGTERM');
-        settleTimeout();
-      }, idleTimeoutMs);
-    };
-    armIdleTimer();
-
-    child.stdout.on('data', (chunk) => {
-      teeChunk(opts.onChunk, 'stdout', chunk);
-      armIdleTimer();
-      stdoutLen += Buffer.byteLength(chunk);
-      if (stdoutLen + stderrLen > maxBuffer) {
-        if (!maxBufferExceeded) {
-          maxBufferExceeded = true;
-          killChildTree(child, 'SIGTERM');
-          settleMaxBuffer();
-        }
-        return;
-      }
-      stdout += chunk;
-    });
-    child.stderr.on('data', (chunk) => {
-      teeChunk(opts.onChunk, 'stderr', chunk);
-      armIdleTimer();
-      stderrLen += Buffer.byteLength(chunk);
-      if (stdoutLen + stderrLen > maxBuffer) {
-        if (!maxBufferExceeded) {
-          maxBufferExceeded = true;
-          killChildTree(child, 'SIGTERM');
-          settleMaxBuffer();
-        }
-        return;
-      }
-      stderr += chunk;
-    });
-
-    child.on('error', (err) => {
-      finish(() => {
-        reject(new DispatchError(
-          'worker-spawn-fail',
-          `executor failed to start for work "${workId}": ${err.message}`,
-          { workId, tier, model, cause: err.message, stdout, stderr },
-        ));
-      });
-    });
-
-    // 'close' (waits for the child's stdio PIPES to fully close, not just
-    // the process itself to terminate), NOT 'exit' (self-review finding,
-    // real, 2026-08-26): Node's own docs are explicit that 'exit' can fire
-    // BEFORE all buffered stdout/stderr 'data' events have been delivered —
-    // the OS pipe can still hold output at the instant the child terminates,
-    // with the final 'data' event landing on a later event-loop tick. Under
-    // light load this race resolves in 'data''s favor almost every time,
-    // which is why this went unnoticed until a CONCURRENT dispatch test
-    // (two workers' stdout competing for CPU) reproducibly captured an empty
-    // `stdout` for one of them — a live-tee log silently losing entire
-    // worker output under load, not a test-only artifact: `result.stdout`
-    // itself would have been truncated the same way for any real caller.
-    // 'close' is what Node's OWN `child_process.exec`/`execFile` wait for
-    // internally, for exactly this reason. Only the NORMAL completion path
-    // waits for it now — timeout/idle-timeout/maxBuffer each settle
-    // themselves the instant they kill (see settleTimeout/settleMaxBuffer
-    // above), so this handler firing after one of them already has is
-    // always a no-op via `finish`'s `settled` guard.
-    child.on('close', (code, signal) => {
-      finish(() => {
-        const res = { status: code, signal, stdout, stderr, tier, model };
-        Object.defineProperty(res, 'exitCode', { value: code, enumerable: false, writable: true, configurable: true });
-        resolve(res);
-      });
-    });
-  });
-}
-
-/**
- * The `herdr-spawn` executor adapter is registered so the executor config, the planner and the
- * confinement authority know what a herdr seat is (a pane a person can watch, a prepared exact
- * invocation, a receipt), but it is never run through `execute`: an interactive agent runs as a
- * `terminal` attempt of the run supervisor (`executeAssignment`, which prepares the brief, the pane
- * and the folder-trust entry and hands the attempt over; docs/platform/run-supervisor/spec.md). A caller that reaches
- * this function directly has no attempt to hand over and is refused by name.
- */
-/**
  * The agent's own argv, with the prompt taken out of it.
  *
  * `argsTemplate` is the executor's args BEFORE substitution, so an entry that
@@ -615,31 +294,31 @@ export function agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }) {
   return effective.filter((arg) => !String(arg).includes(prompt));
 }
 
-export function herdrSpawnAdapter(invocation, opts) {
-  return Promise.reject(new DispatchError(
-    'herdr-spawn-supervised-only',
-    `executor for work "${opts?.workId}" refused: herdr-spawn runs as an attempt of the run supervisor, started by executeAssignment (fgos run); it cannot be executed directly.`,
+/**
+ * Both executor adapters are registered so the executor config, the planner and the confinement
+ * authority know what a seat is (a local process or a pane a person can watch, a prepared exact
+ * invocation, a receipt), but neither is run through `execute`: every agent runs as an attempt of the
+ * run supervisor (`executeAssignment`, which prepares the brief, the sandbox and, for a pane, the
+ * folder-trust entry and hands the attempt over; docs/platform/run-supervisor/spec.md). A caller that
+ * reaches an adapter directly has no attempt to hand over and is refused by name.
+ */
+function registerSupervisedOnlyAdapter(adapterName, meta) {
+  const adapter = (invocation, opts) => Promise.reject(new DispatchError(
+    `${adapterName}-supervised-only`,
+    `executor for work "${opts?.workId}" refused: ${adapterName} runs as an attempt of the run supervisor, started by executeAssignment (fgos run); it cannot be executed directly.`,
     { workId: opts?.workId, tier: opts?.tier, model: opts?.model },
   ));
+  Object.assign(adapter, { execute: adapter, ...meta });
+  registerExecutorAdapter(adapterName, adapter, meta);
 }
 
-cliSpawnAdapter.execute = cliSpawnAdapter;
-cliSpawnAdapter.locus = 'local-process';
-cliSpawnAdapter.preparedInvocationContract = 'exact-v1';
-cliSpawnAdapter.receiptContract = 'confinement-adapter-receipt.v1';
-
-herdrSpawnAdapter.execute = herdrSpawnAdapter;
-herdrSpawnAdapter.locus = 'herdr-pane';
-herdrSpawnAdapter.preparedInvocationContract = 'exact-v1';
-herdrSpawnAdapter.receiptContract = 'herdr-adapter-receipt.v1';
-
-registerExecutorAdapter(DEFAULT_ADAPTER, cliSpawnAdapter, {
+registerSupervisedOnlyAdapter(DEFAULT_ADAPTER, {
   locus: 'local-process',
   preparedInvocationContract: 'exact-v1',
   receiptContract: 'confinement-adapter-receipt.v1',
 });
 
-registerExecutorAdapter('herdr-spawn', herdrSpawnAdapter, {
+registerSupervisedOnlyAdapter('herdr-spawn', {
   locus: 'herdr-pane',
   preparedInvocationContract: 'exact-v1',
   receiptContract: 'herdr-adapter-receipt.v1',

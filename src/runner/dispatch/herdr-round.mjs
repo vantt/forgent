@@ -112,7 +112,7 @@ function openRound({ runDir, workId, tier, model, agentName }) {
  * socket it is handed controls only worker panes.
  *
  * Declared, never inferred. An executor that declares nothing keeps the old
- * behaviour exactly, and Confinement Authority (`executeThroughConfinement`,
+ * behaviour exactly, and Confinement Authority (`assessAndPrepare`,
  * src/runner/dispatch/confinement/authority.mjs) has already refused any
  * `bypass` that did not declare all three confinement flags before this
  * function is ever reached on the real dispatch path.

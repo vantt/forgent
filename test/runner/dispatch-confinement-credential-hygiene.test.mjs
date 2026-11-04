@@ -4,12 +4,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import cp from 'node:child_process';
-import { executeThroughConfinement } from '../../src/runner/dispatch/confinement/authority.mjs';
-import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
-import { resolveConfinementPolicy } from '../../src/runner/dispatch/confinement/policies.mjs';
-import { registerBackendDriver, getBackendDriver } from '../../src/runner/dispatch/confinement/backend-registry.mjs';
-import { DispatchError } from '../../src/runner/dispatch/transport.mjs';
 import { prepareBwrap } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 import {
@@ -162,66 +156,3 @@ test('a root owned by another user is not reused: a per-uid root is chosen', () 
     }
   } finally { fs.rmSync(base, { recursive: true, force: true }); }
 });
-
-// --- The authority decides, per failure, whether the home goes or stays -------
-
-const HAS_WORKING_BWRAP = os.platform() === 'linux'
-  && cp.spawnSync('/usr/bin/bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' }).status === 0;
-
-async function runFailingDispatch(adapterError) {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-authority-hygiene-'));
-  const regPath = path.join(tmp, 'confinement-backends.json');
-  fs.writeFileSync(regPath, JSON.stringify({
-    contract: 'confinement-backend-registry.v1',
-    confinementBackends: { bwrap: { type: 'bwrap', enabled: true, executable: '/usr/bin/bwrap' } },
-  }));
-  const previousRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
-
-  const calls = { cleanup: 0 };
-  const originalDriver = getBackendDriver('bwrap');
-  registerBackendDriver({
-    type: 'bwrap',
-    version: 'mock-v1',
-    validateConfig: () => true,
-    assess: (req) => {
-      const coverage = {};
-      for (const k of Object.keys(req.requirement.policy.controls || {})) coverage[`control:${k}`] = 'satisfied';
-      return { coverage, resources: [], readiness: {}, mismatches: [] };
-    },
-    prepare: async (plan) => ({
-      invocation: { command: 'echo', args: ['mocked'] },
-      claims: { ...plan.coverage },
-      cleanup: async () => { calls.cleanup += 1; },
-    }),
-  });
-
-  try {
-    const req = buildConfinementRequest({
-      capability: 'advise',
-      executorId: 'test-exec',
-      requirement: { mode: 'required', policyId: 'host-write-denied', policy: resolveConfinementPolicy('host-write-denied') },
-      backendId: 'bwrap',
-      invocation: { command: 'echo', args: ['hi'], adapter: 'cli-spawn' },
-      context: { cwd: tmp, runDir: tmp },
-    });
-    let thrown;
-    try {
-      await executeThroughConfinement(req, async () => { throw adapterError; });
-    } catch (err) { thrown = err; }
-    return { calls, thrown };
-  } finally {
-    registerBackendDriver(originalDriver);
-    if (previousRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = previousRegistry;
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
-}
-
-test('an adapter failure removes the home', async () => {
-  if (!HAS_WORKING_BWRAP) return;
-  const { calls, thrown } = await runFailingDispatch(new DispatchError("worker-timeout", "timed out"));
-  assert.ok(thrown, 'the failure still propagates');
-  assert.equal(calls.cleanup, 1);
-});
-
