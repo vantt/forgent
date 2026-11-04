@@ -2862,8 +2862,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const worktree = flags.worktree;
       const { createCaseAdmissionPort, activityUnitOf, confinedWriteRefusal } = await import('../src/workflow/case-admission-port.mjs');
       const portRoot = repoRoot ? path.resolve(repoRoot) : (() => { try { return resolveGitRoots(process.cwd()).mainCheckoutRoot; } catch { return null; } })();
-      // A confined writer must be refused before lease admission needs a lock or
-      // an addon; the case port uses this same read-only/masked-view check.
+      // A confined writer must be refused before anything needs a lock or an
+      // addon; the case port uses this same read-only/masked-view check.
       if (flags.writes !== undefined) {
         const confined = confinedWriteRefusal({ mainRoot: portRoot ?? process.cwd(), caseId: typeof flags.case === 'string' ? flags.case : null });
         if (confined) throw new RunnerConfigError(`nested-write-from-confined-worker: a writing dispatch from inside a confined worker is refused: ${confined}; a confined worker may dispatch read-only work only`, { code: 'nested-write-from-confined-worker', phase: 'pre-admission' });

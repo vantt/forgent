@@ -618,14 +618,16 @@ async function runUnitBody(options, scope) {
   // goes through, so it is also where the ones whose pane has since closed are
   // reclaimed. Best effort: a reap problem never blocks the run.
   const cwd = options.cwd ?? process.cwd();
-  // Resolve first: only a typed notARepository answer permits read-only work
-  // outside Git. Other root failures stop before reclamation or any writes.
-  const roots = resolveGitRoots(cwd, { allowNoRepository: true });
-  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
-  const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
+  // A directory that is no git checkout still gets its homes reclaimed; the run then refuses as before.
+  let roots = null;
+  let rootsFailure = null;
+  try { roots = resolveGitRoots(cwd, { allowNoRepository: true }); } catch (err) { rootsFailure = err; }
+  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots?.mainCheckoutRoot;
   try {
     sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined });
   } catch { /* best effort */ }
+  if (rootsFailure) throw rootsFailure;
+  const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
   const caseRef = normalizeCaseRef(options.caseRef);
   const port = options.caseAdmission === undefined ? null : assertCaseAdmissionPort(options.caseAdmission);
 

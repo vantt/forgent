@@ -870,8 +870,6 @@ export async function landRunnerItem(repoRoot, item, {
   operationId = crypto.randomUUID(),
 } = {}) {
   const destination = `refs/heads/${target}`;
-  let pinned = resolveRefSha(repoRoot, target);
-  const source = resolveRefSha(repoRoot, branch);
   const fgosDir = path.join(repoRoot, '.fgos');
   const mergeSlot = ['merge-slot', { fgosDir, ref: encodeURIComponent(destination) }, `merge slot of "${destination}"`];
   const lockHeld = ([lock, params, label]) => {
@@ -881,8 +879,7 @@ export async function landRunnerItem(repoRoot, item, {
       branch, targetRef: target, code: 'lock-held', holders, lock,
     });
   };
-  // After read-only admission, no-wait refuses a held slot before any write;
-  // Land's own try stays the decision.
+  // No-wait refuses a held slot before any read; Land's own try stays the decision.
   if (lockWaitMs === 0 && probe(mergeSlot[0], mergeSlot[1]).result === 'held') throw lockHeld(mergeSlot);
   // Only a destination the main checkout holds involves its index at all.
   const onMain = checkedOutRef(repoRoot) === destination;
@@ -900,7 +897,8 @@ export async function landRunnerItem(repoRoot, item, {
   sealProjectBeforeLand(fgosDir, branch);
   // Trusted-side resolutions are bytes bound to the target they were read
   // against; only then is that target pinned, otherwise Land pins its own.
-  pinned = resolveRefSha(repoRoot, target);
+  const pinned = resolveRefSha(repoRoot, target);
+  const source = resolveRefSha(repoRoot, branch);
   const declared = declareLandFiles(repoRoot, item, pinned, source);
   if (declared.outcome) return { ...declared, branch };
   const { files } = declared;
@@ -972,7 +970,6 @@ export async function landRunnerItem(repoRoot, item, {
     }, { waitMs: lockWaitMs });
     return settled({ outcome: 'merged', branch, check, receipt }, 'delivered');
   } catch (err) {
-    if (err instanceof MergeError) throw err;
     let detail;
     try { detail = JSON.parse(err.message); } catch { detail = {}; }
     const cause = detail.cause;
@@ -1004,9 +1001,7 @@ export async function landRunnerItem(repoRoot, item, {
     }
     // Preserve Land's stale result, including operation identity and recovery
     // evidence. Never re-run verification or CAS against a different target.
-    if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') {
-      throw err;
-    }
+    if (detail.errorClass === 'stale' || cause === 'land-target-changed' || cause === 'land-cas-lost') throw err;
     // A publication whose effect is unknown is never claimed abandoned: no
     // Work result is recorded, the candidate stays, and Land recovery
     // decides what happened before this id is published again.

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a7e39996f114164c5d8348670047be37c11e9d5181ab54198aa32aa3e2929547",
+  "payloadDigest": "848b9971d519bdc6d0b243ec874ab12c11d9285d7094e89a74b0d0d9c67396ba",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -112,7 +112,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "fe8cac0ffb92d6bf8c6f8c001df35b66aeea4518192b2e22df060cd3266f9f83",
-    "bin/fgos.mjs": "9b38db8ce7f841f1f0eeae94e573e2eb8d9f0f4cc41b4e6115cc1b5c026c6969",
+    "bin/fgos.mjs": "45d379c60d41733628d78225363cde7f248f1c0d1e94164a51eb19c9784fd089",
     "core/skills/_shared/ak-cook-worker-contract.md": "1e005478387f64d521153b92948d3de5bf93f99d7b5c27dd78fbcaa8e6a9bd61",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -1060,7 +1060,7 @@
     "src/runner/execution/patterns/catalog.mjs": "56a10c97fa3d7caaf7b7b70bcac38a300284e24aa6bcb316a07e30c9335a9af9",
     "src/runner/execution/patterns/retired-keys.mjs": "c07f8407d169c7db410aba99db2b7bb1119f5a20ec7a7b63f8cb81d1324e0f40",
     "src/runner/execution/run-request.mjs": "b8ba8003a695f457ab1ebdc22808a994c4f3c4dbfc5d05cd1ab88bd65b823645",
-    "src/runner/execution/run.mjs": "aac68be7e98aebc5fb6184e983379ef9606542b586524f16c05656df6fb10386",
+    "src/runner/execution/run.mjs": "9dd8edc12a6a6655b02f1b2bfc18f5f9e4fc2bc60354a67319616135648c4499",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
     "src/runner/execution/seat-resolver.mjs": "cd60f09a5cb679223a05a7c79bb390e8ed0e596890b8d795431fb16aae9d09ba",
@@ -1082,7 +1082,7 @@
     "src/runner/loop.mjs": "ee2671560bdf52f0b4cccb32b1e012bd7022cc5fda538b26a8a85cfa0fee7ed9",
     "src/runner/main-checkout-activity.mjs": "84cd9b95e28c0c1004322b6edba0d2b4b45f9445eddc30613abd53314f13c071",
     "src/runner/main-checkout-reset-guard.mjs": "446d216c411dd5f59d512b5baf52b3a46eeb8ae03320f1d40be85e9447072d0c",
-    "src/runner/merge.mjs": "e74ffd16602a369686642be97d0b5035a1e79294d772fbe02ec791b8003f54bf",
+    "src/runner/merge.mjs": "a5a4b5722aae662fdbfd60118e3c31d99e25df674480fc9026cdd1447cb6ebb2",
     "src/runner/operation-capability.mjs": "6683b7da84274722aa5d464ccc8ec9d9e34b110f779e8ea5b6f6c1d0b3c820f5",
     "src/runner/operation-choice.mjs": "f1254eb54d4285f3abb91752731069a000884d83cdb8cbfc1af6f2095118f75a",
     "src/runner/paths.mjs": "1c20a7dab2f568b281f4b6eb5aff0a4465ab492cb16f5665c2b6d1d19c4a5ea7",
@@ -3361,14 +3361,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1557,
+      "line": 1559,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1557,
+      "line": 1559,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
@@ -3428,14 +3428,14 @@
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 957,
+      "line": 955,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 988,
+      "line": 985,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
       "class": "configured-binary"

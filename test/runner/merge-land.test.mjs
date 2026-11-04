@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fixture } from '../git/land-fixture.mjs';
+import { loadNativeAddon } from '../../src/git/native.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
 import { branchKey } from '../../src/event-store/index.mjs';
@@ -126,6 +127,27 @@ test('root verification reuse tolerates a pinned target that advanced only on pa
     assert.equal(result.outcome, 'merged', JSON.stringify(result));
     assert.equal(result.check.skipped, true);
     assert.deepEqual(f.git('show', '-s', '--format=%P', 'main').split(' '), [target, f.request.source]);
+  } finally { f.close(); }
+});
+
+// Only this test moves the target between the runner's read and Land's prepare, so
+// it alone fails if the runner pins a target when it carries no declared resolution bytes.
+test('with no declared resolution files, runner Land lets Land choose the current target and lands on a target that advanced meanwhile', async (t) => {
+  const f = rootFixture();
+  try {
+    const native = loadNativeAddon();
+    const prepare = native.GitLand.prototype.prepare;
+    let selectedTarget;
+    t.mock.method(native.GitLand.prototype, 'prepare', function(args, loans) {
+      assert.equal(args.request.target, undefined, 'no resolution bytes require a pre-slot target');
+      fs.writeFileSync(path.join(f.repo, 'unrelated'), 'prior land\n'); f.git('add', 'unrelated'); f.git('commit', '-qm', 'unrelated advance');
+      selectedTarget = f.git('rev-parse', 'main');
+      return prepare.call(this, args, loans);
+    });
+    const result = await landRunnerItem(f.repo, { id: 'source', verify: 'true' }, { branch: 'source' });
+    assert.equal(result.outcome, 'merged', JSON.stringify(result));
+    assert.deepEqual(f.git('show', '-s', '--format=%P', 'main').split(' '), [selectedTarget, f.request.source]);
+    assert.equal(f.git('show', 'main:unrelated'), 'prior land');
   } finally { f.close(); }
 });
 
