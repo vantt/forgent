@@ -19,6 +19,20 @@ Plan: [`plans/261103-1347-harden-t4-run-supervisor`](../261103-1347-harden-t4-ru
 
 Ngoài các phase: `c37d76811` format toàn bộ Rust (không đổi hành vi). Hai hồi quy do lần format này đã được sửa: `45e07caf2` (bộ quét census) và `b6260e061` (một test).
 
+## Cũng có trong lần cập nhật này: các bản sửa đầu của T5 (4/11)
+
+Đã land trên main sau T4; không có bước kiểm riêng, chỉ cần biết những gì thay đổi:
+
+| Commit | Thay đổi người dùng thấy |
+|---|---|
+| `0f6843fc6`, `a56d56541` | **Sửa lỗ bảo mật:** agent chạy trong confinement không còn ghi đè được login của tài khoản khác qua bước ghi ngược login. Đổi kèm: home riêng bị giữ lại (sau nhiều lần staging lỗi) không còn tự được giải quyết qua refresh-ahead hay `fgos doctor --fix`; `fgos doctor` vẫn báo và ghi cách xử lý tay. |
+| `fc0d237d3` | Resume một ghế ghi mà bản ghi thiếu baseline giờ trả lời từ chối `native-baseline-missing` thay vì lỗi `ReferenceError`. |
+| `77861ee63..7b25e0b3c` | Bản ghi run thiếu classification không còn bị tính là `pass`. `fgos doctor` nhanh hơn (dòng `blind-steps-use-proven-pools` gọi host 183 lần thay vì 559) và hết báo pass sai khi `executor.command` global là gemini. `.codex/hooks.json` là symlink giờ bị từ chối. |
+| `8dabc57d1..8af1a6b71` | Chỉ xoá code chết; không đổi hành vi. |
+| `eab8601b9..a6251673a` | Dòng doctor `shadow-binder-divergence` bị xoá (trước giờ chỉ thông tin, chưa ghi nhận lần lệch nào). |
+
+Định dạng trên đĩa: descriptor finalize của attempt có thêm `credentialWriteBack`, marker trong home không còn trường đó. Một attempt do release cũ chuẩn bị được release cũ finalize; nếu release mới finalize nó thì home bị xoá mà không ghi ngược login (login được gia hạn trong attempt đó mất, tài khoản vẫn dùng login cũ). Vì vậy, như bước 1 bên dưới, chờ không còn dispatch nào chạy rồi mới cập nhật.
+
 ## Trước khi cập nhật (bắt buộc cho P07)
 
 Làm trên **cả ba workspace**, với release **cũ** đang kích hoạt:
