@@ -22,7 +22,7 @@ Superseded by: None
 fgOS đôi khi chạy trong một project **cùng lúc với một harness agent khác** đã
 có mặt (một công cụ điều phối agent bên ngoài fgOS — ví dụ có thể là quy trình
 quản lý phiên, hook chặn ghi, hay bộ skill riêng của công cụ đó). Tài liệu này
-là doctrine thi hành cho yêu cầu nền tảng ở `docs/decisions/0009-chong-giao-thoa-luc-cai.md`:
+là doctrine thi hành cho yêu cầu nền tảng ở `docs/decisions/0009-chong-giao-thoa-luc-cai.md` (deleted in 4722361ae):
 fgOS không giao thoa tiến trình với harness khác cùng máy. Nội dung dưới đây
 mô tả hành vi của fgOS — không mô tả, không sửa, hành vi phía harness khác.
 
@@ -136,7 +136,7 @@ có bằng chứng sống, không phải bị che giấu — flip khi phía kia 
 
 ## Pointers
 
-- `docs/decisions/0009-chong-giao-thoa-luc-cai.md` — quyết định nguồn của 4
+- `docs/decisions/0009-chong-giao-thoa-luc-cai.md` (deleted in 4722361ae) — quyết định nguồn của 4
   nguyên tắc trên.
 - `src/install/coexist.mjs` — cài đặt detection + manifest.
 - `bin/fgos.mjs` verb `init` — điểm gọi detection.

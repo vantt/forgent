@@ -181,7 +181,7 @@ this roadmap in the same review so the project-level plan stays visible.
 5. Do not solve self-development by nested repositories. Solve it through
    payload/projection ownership, quarantine, and product-package exclusion.
 6. Do not edit generated specs during live architecture churn. Distill under
-   `docs/architect/`, then update generated sources once decisions settle.
+   `docs/architect/` (deleted in 97dd62aa7), then update generated sources once decisions settle.
 7. Prefer proof slices that test an authority boundary, not cosmetic command
    wiring.
 8. Activation is workspace-scoped: acquire artifact, stage shared release,
@@ -271,7 +271,7 @@ Recommended split:
 
 ## 9. Spec Update Rule
 
-For now, new architecture writing stays under `docs/architect/`.
+For now, new architecture writing stays under `docs/architect/` (deleted in 97dd62aa7).
 
 `docs/specs/*` is treated as generated/curated state. It should not be edited
 opportunistically while the design is still moving. Once a decision settles,

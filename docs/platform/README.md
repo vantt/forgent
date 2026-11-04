@@ -70,7 +70,7 @@ Target area docs live at `docs/platform/<area>/`.
 | Status | Question | Where |
 |---|---|---|
 | Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/platform/governance.md` |
-| Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/platform/governance.md` |
+| Settled | No `system` folder and no `areas` layer under `docs/platform/` | `docs/platform/governance.md` |
 | Historical migration record | Authority-unification execution order | `plans/260925-documentation-authority-unification/plan.md`; this portal does not certify implementation or authorize a further phase |
 | Open | Final area list and naming | Inventory and minimum constitution in the historical H1 migration plan |
 | Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |

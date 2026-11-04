@@ -104,7 +104,7 @@ libexec/legacy-node/
 manifest.json
 ```
 
-The Rust host can execute the native `bin/fgos`, while the legacy Node payload remains staged under `libexec/legacy-node/` for compatibility.
+The Rust host can execute the native `<release>/bin/fgos`, while the legacy Node payload remains staged under `libexec/legacy-node/` for compatibility.
 
 ## 7. Projection Boundary
 
@@ -348,7 +348,7 @@ identity. The first release tree may use the existing Node `fgos` host; Rust
 
 #### 15. Open Decisions
 
-The `rust-host-r1-kernel` track (`plans/260910-1700-rust-host-r1-kernel/plan.md`,
+The `rust-host-r1-kernel` track (`archive/plans/260910-1700-rust-host-r1-kernel/plan.md`,
 Decisions table, 2026-09-10) fixes V1 defaults for every item below so its
 `fgctl` cells can execute; a default becomes settled here only when the track's
 proof lands, and any override is recorded there first.

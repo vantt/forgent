@@ -25,7 +25,7 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 ## Migration Status
 
 This target directory preserves operational and bootstrap material from
-`docs/architect/agent-coordination/playbooks/`. It is navigationally promoted,
+`docs/architect/agent-coordination/playbooks/` (deleted in 97dd62aa7). It is navigationally promoted,
 but remains non-normative: contracts, architecture, decisions, and runtime
 code own their respective claims.
 

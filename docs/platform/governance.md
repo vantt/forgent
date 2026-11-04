@@ -93,7 +93,7 @@ docs/
   history/
 ```
 
-There is no `docs/platform/system/` and no `docs/platform/areas/`.
+There is no `system` folder and no `areas` layer under `docs/platform/`.
 Platform-wide authority lives directly under `docs/platform/`; area-specific
 documentation lives under `docs/platform/<area>/`.
 

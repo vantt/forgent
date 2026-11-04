@@ -88,7 +88,7 @@ Gap:
 
 Observed code:
 
-- `src/config/shared-config-file.mjs` says `.fgos/config.json` is a normal
+- `src/config/shared-config-file.mjs` (deleted in 38361f01d) says `.fgos/config.json` is a normal
   git-tracked project config file and every worktree checkout carries its own
   copy.
 - `src/runner/dispatch/config.mjs` reads `.fgos/config.json` and merges global
@@ -206,7 +206,7 @@ Gap:
 
 Observed code:
 
-- `src/runner/coordination/store.mjs` roots sessions at
+- `src/runner/coordination/store.mjs` (deleted in 2180b4e72) roots sessions at
   `.fgos/coordination/sessions/<id>/`.
 - It validates coordination ids before path construction.
 - Manifest writes use atomic rename.
@@ -227,7 +227,7 @@ Gap:
 
 Observed code:
 
-- `src/runner/main-checkout-lock.mjs` guards direct main checkout activity.
+- `src/runner/main-checkout-lock.mjs` (deleted in cd7ed1207) guards direct main checkout activity.
 - It has ambiguity handling, self-recognition, TTL distinction, and hook support.
 - Doctor checks stuck merge state and points to manual recovery.
 

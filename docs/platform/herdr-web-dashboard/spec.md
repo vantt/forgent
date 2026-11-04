@@ -58,7 +58,7 @@ Three things bound this surface:
 **Out of scope for this spec.** Question authoring quality at the source
 (`tsk-539`, deliberately decoupled — tsk-ldb and tsk-539 stay scope-separated). Multi-project port/identity
 mechanics (`tsk-3b0` — multi-project port/identity handling is deferred to tsk-3b0). The concrete visual layout, colour and
-typography (`tsk-3x6`, `docs/reference/herdr-web-dashboard-layout.md`) — this
+typography (`tsk-3x6`, `docs/reference/herdr-web-dashboard-layout.md` (deleted in b4c8b1a5c)) — this
 spec states what an actor expects to be able to do, never how it is drawn.
 
 ## Entry Points & Triggers
@@ -322,7 +322,7 @@ leaving a reader to discover them:
 
 Not specified here by design. The concrete layout, userflow, empty/error
 presentation, colour and typography are `tsk-3x6`'s deliverable:
-`docs/reference/herdr-web-dashboard-layout.md`, which takes this spec as its
+`docs/reference/herdr-web-dashboard-layout.md` (deleted in b4c8b1a5c), which takes this spec as its
 product input. The one direction this spec pins is the actor-facing
 expectation recorded under "View the taskboard": a Monday.com/ClickUp-style
 grouped board with in-place quick actions and filtering, not a flat table.
@@ -342,11 +342,11 @@ grouped board with in-place quick actions and filtering, not a flat table.
   one token per machine, gateway is the sole runner of fgOS verbs,
   where gateway lives (that web is an independent client), and the API
   contract still to be written.
-- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` — why a non-terminal
+- `docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (deleted in 4722361ae) — why a non-terminal
   UI is a client of a network gate rather than its own server.
 - `docs/platform/work-state/contracts/cli-io-contract.md` — the CLI's in/out contract, and the explicit boundary
   saying the authorization layer (STR38) and the attention channel (STR48) are
   outside it.
 - `docs/platform/work-state/spec.md` — the lifecycle meaning behind every status,
   stage, question and answer this surface displays.
-- `docs/reference/herdr-web-dashboard-layout.md` — the UI layer (`tsk-3x6`).
+- `docs/reference/herdr-web-dashboard-layout.md` (deleted in b4c8b1a5c) — the UI layer (`tsk-3x6`).

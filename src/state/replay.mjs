@@ -767,7 +767,7 @@ function applyEvent(view, event) {
           endedAt: endedAt || event.ts,
           ...(claimId !== undefined ? { claimId } : {}),
           ...(actor !== undefined ? { actor } : {}),
-          // tsk-40m (docs/architect/doing-coordination-redesign.md §7.2):
+          // tsk-40m (docs/platform/proposals/doing-coordination-redesign.md §7.2):
           // work.attempt is now the complete durable record of an attempt
           // (no durable intermediate work.move(->doing) to infer from/to
           // from) — fold its own richer fields the same additive way as

@@ -47,7 +47,7 @@ The target documentation system separates these concerns into clearer anchors:
 | Component ownership and authority | `component-boundary.md` |
 | Area-specific behavior | `docs/platform/<area>/spec.md` |
 | Area-specific rationale | `docs/platform/<area>/architecture/` |
-| Exact cross-area rules | `docs/platform/<area>/contracts/` or `docs/platform/contracts/` |
+| Exact cross-area rules | `docs/platform/<area>/contracts/` or a cross-area `contracts/` folder directly under `docs/platform/` |
 
 ## 3. Current Shape
 
@@ -305,7 +305,7 @@ Ghi chú ranh giới nghĩa (v0.2):
 - **Luật một-cửa hôm nay là per-process.** Nhiều tiến trình ghi đồng thời cần
   lease/lock chưa tồn tại — chỗ yếu thật khi đi multi-process, ghi thẳng vào CTR002
   (§7) làm nợ có tên, không giấu.
-- **`docs/specs/` KHÔNG nằm trong Kernel.** Kernel là truth máy-vận-hành (schema +
+- **`docs/specs/` (deleted in 97dd62aa7) KHÔNG nằm trong Kernel.** Kernel là truth máy-vận-hành (schema +
   log + views, mỗi artifact một schema máy-đọc). Specs là tri thức người-viết cho
   người-và-agent đọc — chất liệu của vai memory (§5), sống ở tầng tài liệu, không
   phải component runtime. Chung "bền", khác họ.
@@ -406,7 +406,7 @@ máy bắt được lỗi đếm tay này.)
 | `src/state/frontier.mjs` — truy vấn ready | Domain | state (derived) | control | — (nội bộ) |
 | `src/state/replay.mjs` — fold/rebuild view | Domain | state | memory | CTR002 |
 | `src/state/dep-graph.mjs` — kiểm tra chu trình trên đồ thị hợp nhất blocks+parent-child (supersede record ADR0012; trước v0.3 chỉ xét `deps`) | Domain | — | governance | — (nội bộ) |
-| `src/state/events.mjs` — engine đọc/ghi log | Kernel | event | memory | CTR002 |
+| `src/state/events.mjs` (deleted in 53523a917) — engine đọc/ghi log | Kernel | event | memory | CTR002 |
 | `src/state/work.mjs` — schema + DEFAULTS | Kernel | — (schema) | memory | CTR002 (schema v2) |
 | `src/runner/dispatch/confinement/` — Agent Confinement Authority | Infra | — | control + execution + tool | CTR011 (`confinement-authority.v1`, documentation-only registry label), CTR009, CTR003 |
 | *(test/{state,runner,cli,e2e} — đi theo nhà module nó kiểm, không row riêng)* | | | | |
@@ -650,7 +650,7 @@ Bản tóm tắt — nguồn đầy đủ + bằng chứng file:line: `docs/plat
 Ranh giới: cột fgOS là **sản phẩm vĩnh viễn** (fgOS tự sinh/tự đọc được, không
 phụ thuộc bee); cột bee là **giàn giáo tạm** cho giai đoạn xây fgOS — giữ
 nguyên định dạng hiện tại, không đầu tư đổi tên/migrate (khung quyết định:
-`docs/decisions/0004-pham-vi-va-non-goal.md`, chốt tại `docs/decisions/0017-...md`).
+`docs/decisions/0004-pham-vi-va-non-goal.md` (deleted in 4722361ae), chốt tại `docs/decisions/0017-...md`).
 
 ---
 
@@ -750,7 +750,7 @@ nghĩa/ranh giới/maturity của bất kỳ contract nào.
    câu hỏi mở), theo đúng nghi thức đổi bản đồ của chính nó (§9 luật 5: qua
    decision record + nâng version, không sửa ngầm) — nâng v0.4 → v0.5.
 4. **Mọi nơi khác cite `C1`-`C9`** (specs, `platform-foundations.md`,
-   `docs/decisions/0000-index.md`, `docs/backlog.md`) đổi theo cùng quy ước,
+   `docs/decisions/0000-index.md` (deleted in 4722361ae), `docs/backlog.md`) đổi theo cùng quy ước,
    trừ các chỗ đã xác nhận không phải citation của registry này (ví dụ một
    bảng verdict nội bộ không liên quan dùng trùng ký hiệu `C1`/`C2`/`C3`) —
    những chỗ đó giữ nguyên, không đổi.

@@ -30,7 +30,7 @@ CoordinationSession engine. Use current Unit/Workflow execution and governed
 dispatch when running requests; manual roles cannot bypass their authority.
 
 New selected manual tracks write evidence under the current platform
-`verification/<track>/` owner, not the frozen `docs/architect/` tree. The
+`verification/<track>/` owner, not the frozen `docs/architect/` (deleted in 97dd62aa7) tree. The
 conventions below apply only when a track actually adopts this manual harness.
 They neither define Workflow storage nor prove a rollout was executed.
 

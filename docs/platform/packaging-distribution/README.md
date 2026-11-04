@@ -99,7 +99,7 @@ For implemented legacy setup, doctor and npm compatibility read [spec.md](spec.m
 | Front | Status | What is done | What remains |
 | --- | --- | --- | --- |
 | Code-panel rollout | `done` | P1-P9 merged to `main`; whole-track proof is recorded in [reports/track-closeout.md](reports/track-closeout.md). | No active packet remains; use the closeout's remaining partial claims as the next tracker. |
-| Release tree and Rust packaging records | `implemented` | Native `bin/fgos`, runner shim, `libexec/legacy-node`, manifest schemas, `artifactDigest`, activation binding, distribution pin, and topology root binding have tests and V1 contract docs. | Keep golden/schema tests current when manifest fields evolve. |
+| Release tree and Rust packaging records | `implemented` | Native `<release>/bin/fgos`, runner shim, `libexec/legacy-node`, manifest schemas, `artifactDigest`, activation binding, distribution pin, and topology root binding have tests and V1 contract docs. | Keep golden/schema tests current when manifest fields evolve. |
 | `fgctl` stage/init/upgrade/repair | `implemented preview` | Staging, verification, activation publish, local runtime tail, no-op upgrade, repair, published `v0.1.0` release assets, and external-consumer proof are recorded. | Stable/default release graduation remains a release-owner decision. |
 | Legacy Node/npm compatibility | `implemented legacy deprecated` | Legacy npm install and `fgos setup` remain reachable as compatibility surfaces with deprecation guidance. | Retire only after the preview fallback window and release-owner policy permit it. |
 | Doctor/fix registry | `implemented` | Checks, fixes, config defaults, and legacy setup compatibility use the shared registry. | Keep new infra/config assumptions registered here instead of ad hoc checks. |
@@ -133,7 +133,7 @@ It does not own:
 | --- | --- |
 | `fgctl` | Machine/global bootstrap command. Installs, stages, verifies, activates, repairs, and upgrades fgOS runtimes. |
 | local `fgos` | Workspace runtime command entered through `.fgos/installation/bin/fgos` when present. |
-| release tree | Immutable runtime payload with `bin/fgos`, `bin/fgos-runner`, `libexec/legacy-node/`, and `manifest.json`. |
+| release tree | Immutable runtime payload with `<release>/bin/fgos`, `<release>/bin/fgos-runner`, `libexec/legacy-node/`, and `manifest.json`. |
 | repository runtime layout | Boundary between source checkout, workspace `.fgos/installation`, work-history roots, runtime-coordination roots, machine release store, worker capsules, and host-visible projections. |
 | `artifactDigest` | Canonical digest of the release manifest/tree identity, not the compressed tarball checksum. |
 | activation binding | Workspace-local `.fgos/installation/activation.json` selecting the active release. |

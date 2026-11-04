@@ -245,7 +245,7 @@ knowledge attestation / legacy compound:
   reject if the target would violate activeDoc(topicId, role) <= 1
 ```
 
-This closes the rollout window where the corpus has been migrated but an old writer still self-names a fresh path. Even if a legacy writer commits `docs/explanation/new-random.md`, attestation fails because the path is not a registry current path.
+This closes the rollout window where the corpus has been migrated but an old writer still self-names a fresh path. Even if a legacy writer commits `docs/explanation/<tên-tự-đặt>.md`, attestation fails because the path is not a registry current path.
 
 ### 8.1 Reserved Slots
 
@@ -325,7 +325,7 @@ Producer tests:
 - attestation rejects a registered path that is not committed at `HEAD`;
 - attestation rejects retired topics and retired documents;
 - legacy compound compatibility uses the same gate;
-- a legacy writer that self-names `docs/explanation/new-random.md` and commits it still fails attestation because the path is not a registry current path.
+- a legacy writer that self-names `docs/explanation/<tên-tự-đặt>.md` and commits it still fails attestation because the path is not a registry current path.
 
 ## End-user documentation carriage
 
@@ -370,7 +370,7 @@ write-side, đối trọng với mặt read-side (area `enduser-docs-index` — 
 | # | Trường | Nghĩa | Miền giá trị |
 |---|---|---|---|
 | 1 | quadrant | Ngăn Diataxis của tài liệu — quyết định cả **hình dạng** tài liệu lẫn thư mục chứa nó | `tutorial` / `how-to` / `reference` / `explanation` |
-| 2 | docPath | Vị trí tài liệu — đồng thời là **danh tính** của tài liệu sống; các capture cùng docPath tích luỹ vào cùng một tệp | chuỗi đường dẫn (vd `docs/how-to/x.md`) |
+| 2 | docPath | Vị trí tài liệu — đồng thời là **danh tính** của tài liệu sống; các capture cùng docPath tích luỹ vào cùng một tệp | chuỗi đường dẫn (vd `docs/how-to/<tên>.md`) |
 | 3 | capture | Bản ghi outcome thật của việc (dự-đoán/thực-tế, friction ghi được, và tham chiếu lịch sử nếu có) — nguồn DUY NHẤT được phép tổng hợp ra tài liệu | bản ghi capture của một việc |
 | 4 | chế-độ grow-vs-create | Nuôi tài liệu có sẵn hay tạo mới — suy hoàn toàn từ việc tệp tại `docPath` đã tồn tại trên đĩa hay chưa | `create` (tệp chưa có) / `grow` (tệp đã có) |
 
@@ -511,7 +511,7 @@ tả đúng một tài liệu người-dùng-cuối:
 | 1 | quadrant | Ngăn Diataxis của tài liệu, suy ra từ thư mục chứa nó | `tutorial` / `how-to` / `reference` / `explanation` |
 | 2 | purpose | Mục đích của ngăn — "tài liệu loại này dùng để làm gì" — lấy từ một bảng ánh xạ CỐ ĐỊNH theo quadrant, nên chỉ mục tự-mô-tả, không buộc người đọc đã thuộc Diataxis | câu mô tả mục đích của ngăn (xem Business Rules R4) |
 | 3 | audience | Đối tượng của ngăn — "ai đọc tài liệu loại này" — lấy từ cùng bảng ánh xạ cố định | câu mô tả đối tượng của ngăn (xem R4) |
-| 4 | docPath | Đường dẫn tới tệp tài liệu trong repo | chuỗi đường dẫn (vd `docs/how-to/x.md`) |
+| 4 | docPath | Đường dẫn tới tệp tài liệu trong repo | chuỗi đường dẫn (vd `docs/how-to/<tên>.md`) |
 | 5 | title | Tiêu đề tài liệu — dòng tiêu đề cấp cao nhất đầu tiên bên trong tệp | chuỗi; rỗng nếu tệp không có tiêu đề |
 | 6 | sourceCaptureId | Móc truy ngược: mã của bản ghi capture (outcome) đã khai `docPath` đúng bằng tệp này — tức việc đã sinh ra tài liệu; `null` khi không việc nào khai linkage tới nó (tài liệu di sản soạn trước khi có cơ chế linkage) | mã item, hoặc `null` |
 

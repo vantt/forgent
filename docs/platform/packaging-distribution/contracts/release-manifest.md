@@ -308,7 +308,7 @@ minimum useful fingerprint set is:
 
 - public entry binaries;
 - provider descriptors;
-- active host entry at `bin/fgos` whether implemented by Node first or Rust
+- active host entry at `<release>/bin/fgos` whether implemented by Node first or Rust
   later;
 - legacy Node payload;
 - runner;

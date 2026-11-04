@@ -26,7 +26,7 @@ Superseded by: None recorded
 
 Hợp đồng giao tiếp VÀO/RA hạng nhất cho bề mặt CLI của fgOS (`bin/fgos.mjs`)
 và bề mặt stdout của vòng tự hành (`bin/fgos-runner.mjs`), theo record
-`0014` (`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md`) (kiến trúc cửa, đã
+`0014` (`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (deleted in 4722361ae)) (kiến trúc cửa, đã
 khoá) và [0011](../decisions/retired-decision-history.md#0011-version-tường-minh-cho-mọi-contract) (mọi
 contract mang version tường minh `<name>/v<N>`). Tài liệu này là bản chốt
 bằng văn xuôi hợp nhất những gì `str46-io-contract` đã dựng qua ba lát —
@@ -431,8 +431,8 @@ cửa ra tới người).
 
 ## 12. References
 
-`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (kiến trúc cửa) ·
-`docs/decisions/0011-version-tuong-minh-cho-moi-contract.md` (version) ·
+`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md` (deleted in 4722361ae) (kiến trúc cửa) ·
+`docs/decisions/0011-version-tuong-minh-cho-moi-contract.md` (deleted in 4722361ae) (version) ·
 `docs/platform/work-state/spec.md#11-business-rules` (envelope, sổ verb máy-đọc, danh tính người ghi) (chi tiết trường/hành vi) · `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md#business-rules` RUL61 (envelope
 stdout runner) · `docs/platform/architecture-map.md` CTR001/CTR003/CTR004 (sổ đăng
 ký contract) · hồ sơ xưởng str46-io-contract (nguồn ngoài repo) (CONTEXT.md 37 quyết định

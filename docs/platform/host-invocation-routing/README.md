@@ -117,7 +117,7 @@ Every design claim in this area must have an implementation status or a proof ga
 ## 8. Migration Notes
 
 After accepted source conservation and the atomic cutover, the maintained
-`docs/architect/host-invocation-routing/` tree is retired. Its spelling is
+`docs/architect/host-invocation-routing/` (deleted in 97dd62aa7) tree is retired. Its spelling is
 source provenance, not a live compatibility route. Use [spec.md](spec.md) and
 the exact contracts, architecture, decisions and verification linked by this
 portal; preserved snapshots remain non-authority history.

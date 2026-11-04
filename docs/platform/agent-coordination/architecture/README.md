@@ -25,7 +25,7 @@ Complete pre-rework input: [historical snapshot](../history/retired-engine/files
 ## Migration Status
 
 This directory has been promoted from
-`docs/architect/agent-coordination/architecture/` during the platform
+`docs/architect/agent-coordination/architecture/` (deleted in 97dd62aa7) during the platform
 documentation migration.
 
 Current contracts and explicitly proposed designs are distinguished by their

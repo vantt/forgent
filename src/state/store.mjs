@@ -765,7 +765,7 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
   if (parentSnapshotAtAsk !== undefined) {
     rawEvent.payload.parentSnapshotAtAsk = parentSnapshotAtAsk;
   }
-  // Status-at-ask split (claim-lock §5.1, tsk-40m P1 fix — docs/architect/
+  // Status-at-ask split (claim-lock §5.1, tsk-40m P1 fix — docs/platform/proposals/
   // doing-coordination-redesign.md): two SEPARATE fields, never conflated.
   //
   // `statusAtAsk` — informational/audit only, whatever the CALLER supplies
@@ -1045,7 +1045,7 @@ function revisionDriftIsSelfCaused(events, id, claim) {
 
 /**
  * Settle an active runtime claim on item `id`, transitioning it DIRECTLY
- * from its preClaimStatus to `finalStatus` (D2; docs/architect/
+ * from its preClaimStatus to `finalStatus` (D2; docs/platform/proposals/
  * doing-coordination-redesign.md §7.3/§9.2) — no durable intermediate
  * work.move(->doing) leg. Validates active runtime claim ownership
  * (claimId, writerId) and durable revision (preClaimRevision) FRESH,
@@ -1171,7 +1171,7 @@ export function settleClaim(dir, {
         }
       }
 
-      // tsk-40m (docs/architect/doing-coordination-redesign.md §7.3/§9.2,
+      // tsk-40m (docs/platform/proposals/doing-coordination-redesign.md §7.3/§9.2,
       // design target confirmed 2026-08-25): settle DIRECTLY from
       // preClaimStatus to finalStatus — no durable intermediate
       // work.move(->doing) leg at all. transitionWork validates the real
@@ -1340,7 +1340,7 @@ export function settleClaim(dir, {
  * decision-question template); only its `source` is stored apart, as
  * `askSource`, so a later `answer` never overwrites it.
  *
- * tsk-40m P1 fix (docs/architect/doing-coordination-redesign.md): `ask`ing
+ * tsk-40m P1 fix (docs/platform/proposals/doing-coordination-redesign.md): `ask`ing
  * an item under an ACTIVE runtime claim must not leave that claim orphaned
  * — a plain `moveWork` durably moves the item away from the claim's own
  * `preClaimStatus` (to `awaiting-human`) without ever touching the claim

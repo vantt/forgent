@@ -27,7 +27,7 @@ Canonical for: nothing
 ## Migration Status
 
 This target directory preserves historical material from
-`docs/architect/agent-coordination/history/` and the temporary migration
+`docs/architect/agent-coordination/history/` (deleted in 97dd62aa7) and the temporary migration
 ledgers. It is retained for context and evidence, never as current runtime or
 contract authority.
 

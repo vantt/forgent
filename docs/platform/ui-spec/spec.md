@@ -37,7 +37,7 @@ spec, `tsk-54j`). Every surface, rule and behaviour here traces back to a
 section of that document. This layer never settles a product question —
 where the area spec has an Open Gap, so does this spec.
 
-**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md`
+**Human-readable companion:** `docs/reference/herdr-web-dashboard-layout.md` (deleted in b4c8b1a5c)
 — the read-in-one-pass layout document that `tsk-5jr` (taskboard) and
 `tsk-4id` (task detail) open while building.
 

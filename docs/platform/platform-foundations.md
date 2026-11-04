@@ -38,7 +38,7 @@ Platform laws are durable constraints. Changing a law requires superseding its d
 
 - this file is the reader entry and holds the carried non-law Business Rules and decision narratives below;
 - `docs/platform/platform-foundations.md` remains the exclusive complete binding law source;
-- the former `docs/specs/platform-foundations.md` projection is retired source lineage, not a reader or writer route.
+- the former `docs/specs/platform-foundations.md` (deleted in 97dd62aa7) projection is retired source lineage, not a reader or writer route.
 
 ## 3. Law Summary
 
@@ -257,7 +257,7 @@ theo `repository-harness:maturity-ladder-h0-h5` — "không tự phán".
 predicted→actual đủ 2 nửa; capture 2 kênh (settlement role-attributed
 runner/human, friction 5-layer); entropy-trend + seal-digest qua hai lần
 `check`; câu-6 tự động lúc đóng. Chi tiết + toàn bộ output dán nguyên văn:
-`docs/history/phase-3-compound-learning/reports/f4-benchmark.md` (round 2,
+docs/history/phase-3-compound-learning/reports/f4-benchmark.md (round 2, báo cáo ngoài repo này, không có trong git,
 6/6 delta PASS).
 
 **Ngưỡng xem lại.** Nội dung từng bậc tinh chỉnh được khi vào phase tương ứng;
@@ -483,7 +483,7 @@ Not applicable — không có màn hình.
 
 - `docs/platform/platform-foundations.md` — văn bản gốc đầy đủ của 8 luật (phát biểu + nguồn `nguồn:slug` + hệ quả + ngưỡng xem lại)
 - `.bee/decisions.jsonl` — decision log mang các D-ID trích ở trên (đọc qua `node .bee/bin/bee_decisions.mjs`)
-- `plans/reports/distill-consult-260713-2323-compound-learning-stack-report.md` — chất liệu consult gốc
+- `plans/reports/distill-consult-260713-2323-compound-learning-stack-report.md` (deleted in e99998633) — chất liệu consult gốc
 - `docs/distillery/deep-dives/` — deep-dives state / compound-engineering / routing
 
 ## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
@@ -737,7 +737,7 @@ có consumer cơ học nào cần phân biệt, cả hai chỉ cần biết "hos
 phải là chính fgOS".
 
 **Vị trí vật lý (sửa lại theo quy ước retire corpus của tsk-1lv-4).** Quyết định này ban đầu định vị sống
-ở `docs/decisions/0035` — nhưng corpus `docs/decisions/000N-*.md` đã
+ở docs/decisions/0035 — nhưng corpus `docs/decisions/000N-*.md` đã
 retired trọn bộ (`tsk-1lv-4`) trước khi record này được thi công thật; áp
 dụng đúng quy ước tsk-1lv-4 đã đặt cho 34 record trước: narrative đầy đủ
 sống ở đây (`docs/platform/platform-foundations.md`), `state.decisions` (qua
@@ -773,7 +773,7 @@ nhân đôi chỗ ghi, vi phạm KISS.
   bằng chứng scout đầy đủ.
 - `tsk-1js` — Iron Law `MODULE_RULES` bug, ứng viên thi công đầu tiên
   (không phải dependency).
-- `docs/distillery/sources/beegog.md` — nguồn upstream: `evolving-loop-
+- `docs/distillery/sources/beegog.md` (deleted in dd4816c0f) — nguồn upstream: `evolving-loop-
   two-gates`, `grooming-project-first`, `product-root-repo-divorce-topology`.
 
 ### 0036 — Khoá RUL11 (tùm lum không phải nặng): "tùm lum", không phải "nặng"

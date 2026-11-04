@@ -92,7 +92,7 @@ This keeps bootstrap authority, runtime identity, workflow semantics, and enviro
 
 ## 6. Superseded Vision Notes
 
-The source document `docs/distribution-vision.md` recorded several things as not yet implemented on 2026-08-01. Some are now done or partially done:
+The source document `docs/distribution-vision.md` (deleted in 97dd62aa7) recorded several things as not yet implemented on 2026-08-01. Some are now done or partially done:
 
 | Old concern | Current reading |
 | --- | --- |

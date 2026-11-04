@@ -63,7 +63,7 @@ Success/config/launch outcomes do not require fabricated ladder values.
 
 ## 2. Production Ladder Semantics
 
-The order and behavior in `src/runner/dispatch/liveness.mjs` are ported:
+The order and behavior in `src/runner/dispatch/liveness.mjs` (deleted in 340cc7d85) are ported:
 1. Worker result file beats all runtime readings; it still requires normalization.
 2. Blocked beats timeout in the ladder, but the Herdr adapter maps `blocked` to `worker-timeout` (`herdr-round.mjs:356-367`); the recovery matrix may retry it (`src/runner/recovery.mjs:105-107`). Answering the existing question without retry is the proposed correction, not current end-to-end behavior.
 3. Death requires consecutive absent readings (default 3); unknown/present reset.

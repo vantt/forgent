@@ -46,7 +46,7 @@ an agent doing grooming/scribing).
   is no scheduled or CI trigger yet (see Open Gaps).
 - Optional flags override the default locations: `--decisions-dir <path>`
   (default `docs/decisions`), `--backlog <path>` (default `docs/backlog.md`),
-  `--specs-dir <path>` (default `docs/specs`).
+  `--specs-dir <path>` (default `docs/specs` (deleted in 97dd62aa7)).
 
 ## Data Dictionary
 

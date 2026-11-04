@@ -285,7 +285,7 @@ The domainization material decomposes into these implementation slices:
 
 - split domain declaration into `manifest.yaml` plus `workflows/*.yaml`, with core
   aggregation and normalization;
-- move coding task-specs from `docs/task-specs/coding/` to
+- move coding task-specs from `docs/task-specs/coding/` (deleted in 2921bd3e0) to
   `domains/coding/task-specs/`;
 - add `resolveTaskSpecPath(domain, specId)`;
 - add `bundleForStage(domain, stage, item kind)` returning `{skill, taskSpec}`;

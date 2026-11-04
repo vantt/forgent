@@ -134,7 +134,7 @@ Doctor/fix paths may repair environment readiness. They must not silently select
 | Doctor default path is read-only | `bin/fgos.mjs`, `test/setup/*.test.mjs` |
 | Doctor fix runs registered fixes | `src/setup/registrations.mjs`, `bin/fgos.mjs`, `test/setup/*.test.mjs` |
 | Legacy setup runs registered fixes and declares its deprecation path | `bin/fgos.mjs`, `src/cli/command-registry.mjs`, `docs/history/setup-runs-registered-fixes/CONTEXT.md`, `test/cli/fgos-manifest.test.mjs`, `test/setup/checks-setup-rc-line.test.mjs` |
-| Project config overrides global config | `src/config/global-config.mjs`, `test/config/global-config.test.mjs` |
+| Project config overrides global config | `src/config/global-config.mjs` (deleted in 38361f01d), `test/config/global-config.test.mjs` (deleted in 38361f01d) |
 
 ## 8. Open Follow-Up
 

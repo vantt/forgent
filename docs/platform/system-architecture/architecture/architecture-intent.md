@@ -782,9 +782,9 @@ This avoids two distortions:
 ## 20. Evidence Pointers
 
 - Step 08 plan:
-  `plans/260901-1542-step08-standalone-coordination/plan.md`
+  `archive/plans/260901-1542-step08-standalone-coordination/plan.md`
 - Isolation-heavy fixture:
-  `core/coordination-protocols/group-cognition-framework.yaml`
+  `core/coordination-protocols/group-cognition-framework.yaml` (deleted in 2180b4e72)
 - P05.2 live null result and infrastructure failures:
   `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P05.2.md`
 - CoordinationSession contract:
@@ -794,5 +794,5 @@ This avoids two distortions:
 - Master-coordinator playbook:
   `docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md`
 - Hardened runtime primitives:
-  `src/runner/coordination/session-engine.mjs`,
-  `src/runner/coordination/store.mjs`
+  `src/runner/coordination/session-engine.mjs` (deleted in 2180b4e72),
+  `src/runner/coordination/store.mjs` (deleted in 2180b4e72)

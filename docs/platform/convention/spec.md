@@ -238,21 +238,24 @@ Therefore `fgos.component.v1` does not currently provide provider-to-host callba
 
 ## 9. Initial golden vectors
 
-The contract fixture is authoritative; this table records the required behavioral boundary.
+The contract fixture is authoritative; this list records the required behavioral boundary.
 
-| Operation | Input | Expected |
-|---|---|---|
-| `name` | report, type `report`, slug `harness-audit`, at `2026-10-06T14:15:00+07:00` | `report-261006-1415-harness-audit.md` |
-| `path` | same, no plan | `plans/reports/report-261006-1415-harness-audit.md` |
-| `path` | same, plan `261006-1415-fgos-convention-component` | `plans/261006-1415-fgos-convention-component/reports/report-261006-1415-harness-audit.md` |
-| `check` | `plans/reports/harness-audit-261006.md` | `pattern-mismatch` |
-| `check` | `plans/reports/report-261006-x.md` | `pattern-mismatch` |
-| `check` | `plans/reports/report-261399-2561-x.md` | `invalid-timestamp` |
-| `check` | `plans/report-261006-1415-x.md` | `wrong-location` |
-| `check` | `plans/reports/report-261006-1415-x.md` | no violation |
-| `check` | `plans/261006-1415-fgos-convention-component/plan.md` | no violation |
-| `classify` | synthetic singleton and collection placement paths | matching kind/cardinality/scope |
-| `classify` | unmatched synthetic path | `unknown-kind` |
+The paths are illustrative values, not files in the repository:
+
+```text
+operation  input                                                                        expected
+name       report, type `report`, slug `harness-audit`, at `2026-10-06T14:15:00+07:00`  report-261006-1415-harness-audit.md
+path       same, no plan                                                                plans/reports/report-261006-1415-harness-audit.md
+path       same, plan `261006-1415-fgos-convention-component`                           plans/261006-1415-fgos-convention-component/reports/report-261006-1415-harness-audit.md
+check      plans/reports/harness-audit-261006.md                                        pattern-mismatch
+check      plans/reports/report-261006-x.md                                             pattern-mismatch
+check      plans/reports/report-261399-2561-x.md                                        invalid-timestamp
+check      plans/report-261006-1415-x.md                                                wrong-location
+check      plans/reports/report-261006-1415-x.md                                        no violation
+check      plans/261006-1415-fgos-convention-component/plan.md                          no violation
+classify   synthetic singleton and collection placement paths                           matching kind/cardinality/scope
+classify   unmatched synthetic path                                                     unknown-kind
+```
 
 Golden data must include every kind × supported operation success, every stable error, an explicit non-`+07:00` offset, `placement-glob` match/non-match for singleton/collection, and rejection of an unknown `shape`. Synthetic placement rules must not encode a real fgOS document kind.
 
@@ -275,7 +278,7 @@ The release containing the native verb must be staged and activated before plain
 |---|---|---|
 | `branchNameFor` / `fgw/<id>` | Later candidate | Deterministic generation/checking, but no demonstrated cross-language drift yet. |
 | `nextFreeDecisionId` | Never allocate here; formatting may be reconsidered | Allocation depends on repository state and belongs to the decision-state writer. |
-| `scripts/next-doc-id.mjs` | Never allocate here; formatting may be reconsidered | Scans mutable state to choose the next number. |
+| `scripts/next-doc-id.mjs` (deleted in 2d38cd92b) | Never allocate here; formatting may be reconsidered | Scans mutable state to choose the next number. |
 | Run-directory artifact names | Not Convention | Execution/run-result contract owns fixed artifact identity. |
 
 Review deterministic id formatting only after evidence of drift between owners or after the Rust host owns the corresponding writer.
@@ -288,7 +291,7 @@ Review deterministic id formatting only after evidence of drift between owners o
 | Q2 WASM | Design-only/future. | `docs/platform/host-invocation-routing/intent-preservation-ledger.md` HI-I018; no Rust/Cargo match for `ExternalWasm` or `wasm`. |
 | Q3 extension host access | Extensions invoke user-visible `fgos`; `FGOS_HOST_BIN` is not a provider contract. | `apps/fgos/src/legacy_exec.rs` (`FGOS_HOST_BIN` injection); external supervisor `Command` environment setup. |
 | Q4 composition | Built-in provider registered in catalog, static composition provider table, invocation service, CLI projector; no wiring source. | `packages/host-runtime/rust/src/catalog.rs`; `apps/fgos/src/main.rs`; `apps/fgos/src/cli_projector.rs`. |
-| Q5 later generators | Branch naming may qualify later; stateful number allocation never belongs here. | `src/runner/worktree.mjs::branchNameFor`; `src/runner/merge.mjs::nextFreeDecisionId`; `scripts/next-doc-id.mjs`. |
+| Q5 later generators | Branch naming may qualify later; stateful number allocation never belongs here. | `src/runner/worktree.mjs::branchNameFor`; `src/runner/merge.mjs::nextFreeDecisionId`; `scripts/next-doc-id.mjs` (deleted in 2d38cd92b). |
 | Q6 journal | Canonical `plans/journals/` with canonical `journal-YYMMDD-HHMM-slug.md`; accept external `YYYY-MM-DD-slug.md`; do not move journals. | Existing two writers/locations and red-team correction in the approved plan. |
 | Q7 report type | Open, shape-checked vocabulary; accept external `GH-<n>` and `-report` compatibility forms. | Existing report inventory and red-team correction. |
 | Q8 slug | ASCII normalization without transliteration; empty is `invalid-slug`. | Rust standard-library boundary; no Unicode dependency needed. |

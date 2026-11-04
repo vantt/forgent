@@ -3270,7 +3270,7 @@ function checkDocRoleUnderused(cwd, run) {
   return { passed: true, message: `${underused.length} roles used by single doc: ${underused.map(([r]) => r).join(', ')}` };
 }
 
-// docs/architect/knowledge-registry-redesign.md §14.6: "current path absent
+// docs/platform/proposals/knowledge-registry-redesign.md §14.6: "current path absent
 // at HEAD" -- a doc's own currentPath is the thing every other check
 // (resolver, migration, doc-alias-broken) treats as ground truth; if the
 // file isn't actually committed there, every one of those checks is
@@ -3295,7 +3295,7 @@ function checkDocCurrentPathMissing(cwd, run) {
   return { passed: false, message: `${missing.length} doc(s) with currentPath absent at HEAD: ${missing.join(', ')}` };
 }
 
-// docs/architect/knowledge-registry-redesign.md §14.6: "source capture
+// docs/platform/proposals/knowledge-registry-redesign.md §14.6: "source capture
 // linkage cannot be reached through current or alias paths." Only checks
 // sourceCaptureIds entries that are themselves a repo-relative doc path
 // (the shape scripts/knowledge-bootstrap.mjs seeds -- the doc's own
@@ -3328,7 +3328,7 @@ function checkDocSourceUnreachable(cwd, run) {
   return { passed: false, message: `${unreachable.length} unreachable source capture(s): ${unreachable.join('; ')}` };
 }
 
-// docs/architect/knowledge-registry-redesign.md §13.4/§14.6: "migration
+// docs/platform/proposals/knowledge-registry-redesign.md §13.4/§14.6: "migration
 // inventory or apply loses a source." Four real conservation properties,
 // not just the original outcome-reachability check:
 //   1. every source captures reachable (pre-existing: view.outcomes[].docPath
@@ -4417,7 +4417,7 @@ registerCheck({
   check: (cwd) => checkCommandRoutesDrift(cwd),
 });
 
-// ─── Confinement Authority (Phase 01 R7, docs/specs/confinement-authority.md) ─
+// ─── Confinement Authority (Phase 01 R7, docs/platform/agent-confinement/README.md) ─
 
 export function checkConfinementPoliciesDeclared(cwd) {
   let runner;

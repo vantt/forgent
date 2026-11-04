@@ -41,7 +41,7 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `archive/plan
 ### Must Not Own
 - Không sở hữu trạng thái hoặc vòng đời của Work Items (do `packages/work-state` sở hữu).
 - Không tự ý phân loại hoặc đánh giá lại kết quả RunResult (do `packages/run-result` sở hữu).
-- Không can thiệp vào logic điều phối hoặc trạng thái của Agent Coordination (do `packages/coordination-state` sở hữu).
+- Không can thiệp vào logic điều phối hoặc trạng thái của Agent Coordination (do `packages/coordination-state` (deleted in 2180b4e72) sở hữu).
 - Không ép buộc các component khác phụ thuộc ngược vào Observe: composition root (`apps/fgos`) nối các nguồn dữ liệu vào. Observe không tự dựng lại phán quyết của owner nguồn (xem § Lịch sử quyết định 2026-10-24 về doctor và run admission).
 
 ## 2. Shared Entities & Subjects
@@ -50,7 +50,7 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `archive/plan
 |---|---|---|---|
 | `run` | `run:<runId>` | `run:run_1a2b3c` | `packages/run-result/rust` |
 | `run` (unit observation) | `unit-run:<unitRunId>` | `unit-run:unit-run-example` | Node execution writer; Rust run-result read contract |
-| `session` | `session:<id>` | `session:coord_4d5e6f` | `packages/coordination-state/rust` |
+| `session` | `session:<id>` | `session:coord_4d5e6f` | `packages/coordination-state/rust` (deleted in 2180b4e72) |
 | `executor` | `executor:<id>` | `executor:judge-discovery` | `.fgos/config.json` |
 | `case` | `case:<name>` | `case:observe-f2` | `packages/observe/rust` |
 | `work` | `work:<id>` | `work:tsk-abc` | `packages/work-state/rust` |

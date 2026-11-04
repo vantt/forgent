@@ -186,7 +186,7 @@ One event is one JSON line.
 
 Canonical serialization: keys sorted, no insignificant whitespace, UTF-8, one trailing newline. `h` is the event identity. The batch commit marker of section 9 is a line of the open log and of a sealed `events.jsonl`, but it is not an event: it has no `h`, takes no `seq` and is never folded.
 
-Legacy v3 lines (`{seq, ts, type, payload, v, src, h}` with a 16-hex `h` of `JSON.stringify` in insertion order, `src/state/events.mjs:480-498`; baseline lines with no `h`) are verified and deduplicated by their own rule (`src/state/replay.mjs:882-889`: `h` when present, else the raw line), never re-canonicalized and never rewritten.
+Legacy v3 lines (`{seq, ts, type, payload, v, src, h}` with a 16-hex `h` of `JSON.stringify` in insertion order, `src/state/events.mjs:480-498` (deleted in 53523a917); baseline lines with no `h`) are verified and deduplicated by their own rule (`src/state/replay.mjs:882-889`: `h` when present, else the raw line), never re-canonicalized and never rewritten.
 
 ## 7. Streams, scopes and refs
 
@@ -385,7 +385,7 @@ Today every Work mutation runs read, precondition and append as one critical sec
 
 | Mechanism today | Code |
 |---|---|
-| The lock and its reason (duplicate `seq` without it) | `src/state/events.mjs:26-52`, `withEventsLock` at `:416` |
+| The lock and its reason (duplicate `seq` without it) | `src/state/events.mjs:26-52` (deleted in 53523a917), `withEventsLock` at `:416` |
 | Read-check-append plus view refresh in one section (tsk-1q5 lost-update fix) | `src/state/store.mjs:222-255` (`refreshView`, `withEventsLockAndRefresh`) |
 | Lock deliberately scoped to the whole `.fgos/`, because a per-file lock would stop serializing the CAS preconditions | `src/state/store.mjs:132-140` |
 | `moveWork` lookup, `expectedStatus` CAS and append | `src/state/store.mjs:646-668` |
@@ -586,10 +586,10 @@ Each item is deleted in the cutover change (section 18), with every consumer mov
 |---|---|---|
 | Tracked event files and per-writer shard naming | `src/state/store.mjs:157-176` (`resolveWriterLogPath`) | Events live in open logs and refs |
 | `merge=union` for events | `.gitattributes:15` | No event file is merged |
-| Truncation guard, its sidecar and its fallback `git commit` (a second git caller beside the main door) | `src/state/events-jsonl-truncation-guard.mjs` (520 lines, commit at `:502`); doctor `events-jsonl-not-truncated` (`src/setup/registrations.mjs:2034-2102`) | Nothing tracked is appended; the seal verifies hashes and contiguity |
-| File compaction and its verifier | `src/state/events-compaction.mjs` (263 lines, no production caller); doctor `events-compaction-verified` (`registrations.mjs:2104-2197`) | It moves tracked files; ref-chain compaction is a later item |
+| Truncation guard, its sidecar and its fallback `git commit` (a second git caller beside the main door) | `src/state/events-jsonl-truncation-guard.mjs` (deleted in 9f23f7438) (520 lines, commit at `:502`); doctor `events-jsonl-not-truncated` (`src/setup/registrations.mjs:2034-2102`) | Nothing tracked is appended; the seal verifies hashes and contiguity |
+| File compaction and its verifier | `src/state/events-compaction.mjs` (deleted in 9f23f7438) (263 lines, no production caller); doctor `events-compaction-verified` (`registrations.mjs:2104-2197`) | It moves tracked files; ref-chain compaction is a later item |
 | Event-shard handling in `fgos-write-rejected` restore and self-heal | `src/runner/merge.mjs:683-1077` (event parts only), sweep at `:1362` | Branches never carry event files |
-| `events.lock` as a file lock | Already replaced on main by the `state` hot mutex (`lockOfLog`, `src/state/events.mjs:102`; wave S of plan 4.3) | Its read-check-append role is the `state` gate (section 13); what goes at cutover is its byte role on event files, which moves to `event-append` |
+| `events.lock` as a file lock | Already replaced on main by the `state` hot mutex (`lockOfLog`, `src/state/events.mjs:102` (deleted in 53523a917); wave S of plan 4.3) | Its read-check-append role is the `state` gate (section 13); what goes at cutover is its byte role on event files, which moves to `event-append` |
 | File discovery, `(ts, file, seq)` ordering for new events and the T4 fast path | `src/state/replay.mjs:838-912` (`discoverEventFilePaths`, `readAllEventsFromDir`) and the fast path `:913-998` | The store reader and cursor replace them; the legacy order survives only as the legacy rule |
 | Direct readers of `.fgos/events` | `src/setup/registrations.mjs:2064`, `:2121`, `:6275`; `scripts/regenerate-observe-fixtures.mjs:100`; `packages/work-state/rust/src/work_source.rs:470-491` | They read through the crate or the facade |
 | Tracked stale view and backups | `.fgos/state.json`, two `events.jsonl.backup-*` | Views are never tracked; backups are not truth |
@@ -611,7 +611,7 @@ Not removed here: stripping `.fgos` from worktrees and the general `fgos-write-r
 
 Migration selects its attempt id inside `import_legacy` under event-seal and returns it with the pin as execution metadata; the tracked fence keeps only `legacyRefOid`, `sealDigest` and `fromCommit`. The quiesce gate excludes another running `fgos events migrate` process; the seal is released before ScopedCommit, and Git's known-id refusal remains the final arbiter. A settled committed attempt whose HEAD was subsequently reset by hand retains its id and fails closed into Git recovery; it is not silently retried. This checkout predates Git 05's `Outcome::CommitRejected` variant, so attempt selection decodes the existing serialized outcome tag until integration permits a direct enum match.
 
-Routine consumers use fixed roots (`.fgos/`, `docs/distillery/state/porting/`, `porting/`) plus porting roots discovered by a previous import. There is no configured porting-directory setting. Before cutover, doctor's `event-store-legacy-layout` warning is the guard for a tracked porting log outside those roots; run the full migration before admitting v4 writes on that layout.
+Routine consumers use fixed roots (`.fgos/`, `docs/distillery/state/porting/` (deleted in 51bee6b53), `porting/`) plus porting roots discovered by a previous import. There is no configured porting-directory setting. Before cutover, doctor's `event-store-legacy-layout` warning is the guard for a tracked porting log outside those roots; run the full migration before admitting v4 writes on that layout.
 
 Config defaults merged by `fgos setup` (added only when missing, global then project):
 

@@ -109,7 +109,7 @@ or override their source.
 The target model keeps platform-wide authority at `docs/platform/` and keeps
 area-specific docs under `docs/platform/<area>/`.
 
-There is no `docs/platform/system/` folder and no `docs/platform/areas/` layer.
+There is no `system` folder and no `areas` layer under `docs/platform/`.
 `system/` would look like another area, and `areas/` adds an unnecessary level.
 
 ```txt

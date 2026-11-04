@@ -269,7 +269,7 @@ A variable whose value is blank is unset; a non-blank value is used untrimmed. `
 
 ## 12. Cutover history
 
-The locks of this track moved to their kernel-lock paths in a stop-everything cutover (2026-10-17): every writer in every workspace was stopped, each lock moved to its new path and the legacy path was deleted in the same phase, with no family marker and no protocol floor. Each retired path was fenced once so an older binary failed loudly (`EISDIR`, or "held by pid 1" for the provider ledgers) rather than holding a legacy lock beside a kernel lock: tombstone directories for the fixed paths, per-run, per-cwd, `main-checkout`, `merge-slot`, `state` and `porting-events`, `activation`, `install` and `observe`, and a blocking generation for the provider ledgers. The Node mechanism that placed and checked them (`src/holder-lock/fences.mjs`, the doctor row `lock-fences` and its fix) was removed on 2026-10-22 under the one-release policy: no code reads a legacy lock path, and the tombstones already on disk stay as they are. Rollback to a pre-cutover release is by hand: remove the `TOMBSTONE` directories of exactly the registry paths, and publish one more generation with `releasedAt` on each blocked ledger. The WAL activation fence is Git's: `fgctl` places it inside its activation critical section, and the doctor row `git-operation-journal` reports `git-fence-missing` when it is absent. The stop-everything scan that `fgos events migrate` needs is `quiesce-scan` (section 10) with its caller in that verb.
+The locks of this track moved to their kernel-lock paths in a stop-everything cutover (2026-10-17): every writer in every workspace was stopped, each lock moved to its new path and the legacy path was deleted in the same phase, with no family marker and no protocol floor. Each retired path was fenced once so an older binary failed loudly (`EISDIR`, or "held by pid 1" for the provider ledgers) rather than holding a legacy lock beside a kernel lock: tombstone directories for the fixed paths, per-run, per-cwd, `main-checkout`, `merge-slot`, `state` and `porting-events`, `activation`, `install` and `observe`, and a blocking generation for the provider ledgers. The Node mechanism that placed and checked them (`src/holder-lock/fences.mjs` (deleted in 51e36b06b), the doctor row `lock-fences` and its fix) was removed on 2026-10-22 under the one-release policy: no code reads a legacy lock path, and the tombstones already on disk stay as they are. Rollback to a pre-cutover release is by hand: remove the `TOMBSTONE` directories of exactly the registry paths, and publish one more generation with `releasedAt` on each blocked ledger. The WAL activation fence is Git's: `fgctl` places it inside its activation critical section, and the doctor row `git-operation-journal` reports `git-fence-missing` when it is absent. The stop-everything scan that `fgos events migrate` needs is `quiesce-scan` (section 10) with its caller in that verb.
 
 ## 13. Setup, doctor and activation
 
@@ -359,7 +359,7 @@ Until Git phase 03 owns removal/recovery, preserve the refused checkout and use 
 
 ### Documentation-cutover write lease
 
-The lease freezes documentation writes across processes without a TTL. Its authority is the committed `plans/documentation-cutover-lease.json` blob on `refs/heads/main`. Working-tree copies are not authority. A held sidecar keeps refusing non-holders after process death or loss of the kernel lock resource.
+The lease freezes documentation writes across processes without a TTL. Its authority is the committed blob plans/documentation-cutover-lease.json on `refs/heads/main` (the file exists only while a lease is held). Working-tree copies are not authority. A held sidecar keeps refusing non-holders after process death or loss of the kernel lock resource.
 
 | Command | Result |
 |---|---|
@@ -376,7 +376,7 @@ The fixed scope is:
 - root `AGENTS.md` and `CLAUDE.md`;
 - the [switchboard JSON](../../../plans/260925-documentation-authority-unification/transitional-switchboard.json);
 - `core/skills/**`, `.agents/skills/**` and `plugins/fgOS/skills/**`;
-- `plans/documentation-cutover-lease.json` itself.
+- the lease sidecar blob itself (plans/documentation-cutover-lease.json, present only while held).
 
 Other plan evidence and code/test roots are outside the freeze. The sidecar is transition evidence and is excluded from its own scope digest.
 

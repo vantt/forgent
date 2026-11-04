@@ -25,13 +25,13 @@ Superseded by: None
 ## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)
 
 Target vocabulary from design.md §3.7 of
-`plans/260915-executor-policy-dispatch-seams/design.md` — documented here so
+`archive/plans/260915-executor-policy-dispatch-seams/design.md` — documented here so
 config/doctor warnings (`executor-profile-warnings` check,
 `src/setup/executor-profile-warnings.mjs`) have a named migration target to
 point at. The **Invocation** half of this vocabulary was already real config
 before this section existed (`executors.<id>.invocations[]`, each entry's
 own `via`/`command`/`args`/`adapter` — `src/runner/dispatch/config.mjs`'s
-`validateInvocationShape`). Phase C (`plans/260917-executor-profile-schema-migration/plan.md`)
+`validateInvocationShape`). Phase C (`archive/plans/260917-executor-profile-schema-migration/plan.md`)
 made the **ExecutorProfile** half real too: `executors.<id>.identity`
 (all four fields required together when declared) and `executors.<id>.supports`
 (each field independently optional) are now validated, additive config
@@ -45,7 +45,7 @@ including executor-id consolidation. The legacy reviewer ids no longer exist
 as registered executors; `EXECUTOR_KINDS` is now `agent|tool`. These facts
 come from code and the completed plan, without reading live configuration.
 Evidence: `src/runner/dispatch/transport.mjs:176`,
-`src/runner/dispatch/assignment-policy.mjs:88-98` (former module; removed from main before source capture, not a current owner),
+`src/runner/dispatch/assignment-policy.mjs:88-98` (deleted in 3133ed474) (former module; removed from main before source capture, not a current owner),
 `src/runner/dispatch/config.mjs:457`, and
 `archive/plans/260917-executor-profile-schema-migration/plan.md:1-14,733-741`.
 
@@ -54,7 +54,7 @@ this?" — a stable runtime boundary, never a policy choice:
 
 | Field | Answers | Must NOT be derived from |
 |---|---|---|
-| `identity.principalRef` | which account/credential family | a concrete rotating account id (Provider Capacity Rotator's own scope, `plans/260916-account-rotator/`) |
+| `identity.principalRef` | which account/credential family | a concrete rotating account id (Provider Capacity Rotator's own scope, `archive/plans/260916-account-rotator/`) |
 | `identity.runtimeBackendRef` | which CLI/runtime this is | model, quality tier, reasoning effort |
 | `identity.trustDomain` | how privileged this principal is | persona/role/business case |
 | `identity.egressClass` | what it may reach over the network | visibility (visible/headless) alone |
@@ -80,7 +80,7 @@ D/E. The completed archived plan records consolidation as merged
 | legacy model overrides on an executor | `runner.modelPolicies.<provider>` tier entry |
 | adapter choice encoded as a separate executor id | an `invocation` on one `ExecutorProfile` |
 | bwrap/confinement encoded as a separate executor id | an invocation's confinement envelope, unless trust/egress genuinely differs |
-| account pool / credential home env on an executor (e.g. the retired `FGOS_CODEX_CREDENTIAL_HOMES`) | Provider Capacity Rotator's global `runner.providers.<provider>.accounts` inventory (`plans/260916-account-rotator/`) |
+| account pool / credential home env on an executor (e.g. the retired `FGOS_CODEX_CREDENTIAL_HOMES`) | Provider Capacity Rotator's global `runner.providers.<provider>.accounts` inventory (`archive/plans/260916-account-rotator/`) |
 
 **Correction — consolidation correction:** Phase E is complete;
 the archived plan records `claude`/`codex`/`agy` as multi-invocation
@@ -88,4 +88,4 @@ executors and the former separate ids as removed. The assignment-policy
 module confirms retirement of its legacy-id alias seam. The doctor warning
 check remains a migration diagnostic, not evidence that Phase E is pending.
 Evidence: `archive/plans/260917-executor-profile-schema-migration/plan.md:733-741`
-and `src/runner/dispatch/assignment-policy.mjs:88-98` (former module; removed from main before source capture, not a current owner).
+and `src/runner/dispatch/assignment-policy.mjs:88-98` (deleted in 3133ed474) (former module; removed from main before source capture, not a current owner).

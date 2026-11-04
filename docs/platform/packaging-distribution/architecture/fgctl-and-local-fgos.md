@@ -117,7 +117,7 @@ release bin/fgos-runner = existing Node runner
 release libexec/legacy-node = compatibility payload if needed
 ```
 
-Later, Rust host replaces release `bin/fgos` inside the same release tree
+Later, Rust host replaces release `<release>/bin/fgos` inside the same release tree
 contract. Packaging does not need to change for that swap.
 
 `doctor --fix` during `fgctl init` runs after the ready binding is published,

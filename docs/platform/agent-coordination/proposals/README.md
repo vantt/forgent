@@ -27,7 +27,7 @@ Proposals remain subordinate to the surviving boundaries in [Vision](../vision.m
 ## Migration Status
 
 This target directory preserves the proposal frontier from
-`docs/architect/agent-coordination/proposals/`. A target-path copy does not
+`docs/architect/agent-coordination/proposals/` (deleted in 97dd62aa7). A target-path copy does not
 promote its design: the status of every frontier source remains governed by
 [Proposal Status](../history/documentation-migration/proposal-status.md).
 

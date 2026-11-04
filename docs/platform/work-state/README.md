@@ -55,7 +55,7 @@ This portal owns work-state navigation, not a second state contract. Read [spec.
 
 ## 4. Legacy Source Pointers
 
-Prior-source lineage: `docs/specs/work-state.md` (retired). Current state owns [spec.md](spec.md); retained [docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md) owns its root CLI I/O contract.
+Prior-source lineage: `docs/specs/work-state.md` (deleted in 97dd62aa7) (retired). Current state owns [spec.md](spec.md); retained [docs/platform/work-state/contracts/cli-io-contract.md](contracts/cli-io-contract.md) owns its root CLI I/O contract.
 
 The platform vision lives at [vision.md](../vision.md), outside this area’s scope. Source coordinate (provenance only; not navigation): `docs/platform/vision.md#platform-vision`.
 
