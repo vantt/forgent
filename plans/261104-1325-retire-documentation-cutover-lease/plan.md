@@ -1,6 +1,6 @@
 # Retire the documentation-cutover lease
 
-Status: in progress (DOC, 2026-11-04)
+Status: closed (landed on main `ad72e3a46`, 2026-11-04; review [report](../reports/review-261104-1355-retire-cutover-lease-branch.md) REWORK fixed in `93c5aabe4`)
 Owner: `lead:DOC`
 Parent: [plan 260925](../260925-documentation-authority-unification/plan.md) (closed; Phase 10 landed `97cc4b432`, release `a454e189`)
 Facts: [scout report](../reports/scout-261104-1320-documentation-cutover-lease-retirement-facts.md)
