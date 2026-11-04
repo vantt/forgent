@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // doc-health.mjs -- body health of the platform documents under docs/platform.
 //
-// Two rules, both strict (any finding is a non-zero exit), neither gated by a
-// migration status or a history allowlist:
+// Three rules, all strict (any finding is a non-zero exit), none gated by a
+// migration status:
 //   - links-resolve: every local link and anchor, including Related and clickable
 //     historical-source references, resolves to a real file and heading. The
 //     link/anchor reader is shared; code spans and fences remain literal.
@@ -10,6 +10,10 @@
 //     not `metadataExempt` carries the governance baseline header (a fenced txt
 //     block directly under the H1) with every baseline field. The field list is
 //     read from docs/platform/governance.md, never copied here.
+//   - dead references: in a canonical document that is not past-state (kinds
+//     history, decision, verification), every backticked repo-root path exists,
+//     unless the same line pins a commit sha. Fenced blocks, patterns and
+//     <placeholders> are not references.
 //
 // Path kind and the metadata exemption come from the native Convention host
 // (one door); this script owns only the body.
@@ -124,6 +128,50 @@ export function checkPlatformMetadata({ files, readFile, baseline, classify }) {
   return { findings, counts: { files: docs.length, exempt, findings: findings.length } };
 }
 
+const REPO_PATH = /`((?:src|scripts|bin|apps|packages|core|test|docs|plans)\/[^`\s]+)`/g;
+const COMMIT_SHA = /\b(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b/;
+// Kinds that record past state or dated evidence, not current claims.
+const PAST_STATE_KINDS = new Set(['history', 'decision', 'verification']);
+
+function proseOf(text) {
+  return text.replace(/^(```|~~~)[^\n]*\n[\s\S]*?^\1[^\n]*$/gm, (block) => block.replace(/[^\n]/g, ''));
+}
+
+/** A backticked repo-root path as a literal file reference, or null when it is a pattern, an elision or a URL. */
+function referencedPath(raw) {
+  const target = raw.replace(/[#?].*$/, '').replace(/::.*$/, '').replace(/:\d.*$/, '').replace(/\(.*$/, '').replace(/[.,;:)]+$/, '');
+  if (/[*<>{}$|]|\.\.\.|\s/.test(target) || target.includes('://')) return null;
+  return target;
+}
+
+/**
+ * Dead-reference rule. In a document that classify reports as canonical and not
+ * past-state, every backticked repo-root path must exist, unless the same line
+ * pins a commit sha (a provenance coordinate). `classify(file)` is called only
+ * for documents that have at least one dead candidate.
+ */
+export function checkDeadReferences({ files, readFile, exists, classify }) {
+  const findings = [];
+  for (const file of [...files].filter((f) => f.startsWith('docs/platform/') && f.endsWith('.md')).sort()) {
+    const lines = proseOf(readFile(file)).split('\n');
+    const dead = [];
+    lines.forEach((line, index) => {
+      if (COMMIT_SHA.test(line)) return;
+      for (const match of line.matchAll(REPO_PATH)) {
+        const target = referencedPath(match[1]);
+        if (target && !exists(target)) dead.push({ line: index + 1, target });
+      }
+    });
+    if (dead.length === 0) continue;
+    const { canonical, kind } = classify(file);
+    if (!canonical || PAST_STATE_KINDS.has(kind)) continue;
+    for (const { line, target } of dead) {
+      findings.push({ type: 'dead-reference', path: file, line, target, message: `backticked path does not exist: ${target}` });
+    }
+  }
+  return { findings, counts: { findings: findings.length } };
+}
+
 export function runCli(argv, cwd = process.cwd(), { classify } = {}) {
   const idx = argv.indexOf('--repo-root');
   const repoRoot = path.resolve(cwd, idx >= 0 ? argv[idx + 1] : '.');
@@ -132,11 +180,14 @@ export function runCli(argv, cwd = process.cwd(), { classify } = {}) {
     const files = platformDocs(repoRoot);
     const readFile = (file) => fs.statSync(path.resolve(repoRoot, file)).isDirectory() ? '' : fs.readFileSync(path.resolve(repoRoot, file), 'utf8');
     const links = checkPlatformLinks({ files, readFile, exists: (file) => fs.existsSync(path.resolve(repoRoot, file)) });
+    const classifyDoc = classify || ((file) => invokeHost(['convention', 'classify', '--json', '--', file], { dir: repoRoot, dirScope: 'caller' }));
     const metadata = checkPlatformMetadata({
       files, readFile, baseline: governanceBaselineFields(repoRoot),
-      classify: classify || ((file) => invokeHost(['convention', 'classify', '--json', '--', file], { dir: repoRoot, dirScope: 'caller' })),
+      classify: classifyDoc,
     });
-    const findings = [...links.findings, ...metadata.findings];
+    const exists = (file) => fs.existsSync(path.resolve(repoRoot, file));
+    const dead = checkDeadReferences({ files, readFile, exists, classify: classifyDoc });
+    const findings = [...links.findings, ...metadata.findings, ...dead.findings];
     const counts = { files: files.length, links: links.counts.links, metadataExempt: metadata.counts.exempt, findings: findings.length };
     if (asJson) console.log(JSON.stringify({ counts, findings }));
     else {

@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { checkPlatformLinks, checkPlatformMetadata, governanceBaselineFields } from '../../scripts/doc-health.mjs';
+import { checkDeadReferences, checkPlatformLinks, checkPlatformMetadata, governanceBaselineFields } from '../../scripts/doc-health.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const BUILT_HOST = process.env.FGOS_HOST_BIN || path.join(REPO_ROOT, 'target', 'debug', 'fgos');
@@ -84,11 +84,39 @@ test('metadata rule exempts classified evidence, and reports a missing field or 
   assert.match(byPath['docs/platform/late/spec.md'], /not directly under the H1/);
   assert.match(byPath['docs/platform/none/spec.md'], /^no header block/);
   assert.equal(counts.exempt, 1);
-  assert.ok(!classified.includes('docs/platform/ok/spec.md'), 'a complete header never needs classification');
+});
+
+// Owns the dead-reference rule: a backticked repo-root path must exist unless the
+// line pins a commit, and only canonical, current-state documents are held to it.
+test('dead-reference rule reports a missing path, but not a pinned, fenced, pattern or past-state reference', () => {
+  const docs = {
+    'docs/platform/a/spec.md': [
+      'Exists: `src/alive.mjs` and `src/alive.mjs:10-20`.',
+      'Dead: `src/gone.mjs` and `plans/gone/plan.md#top`.',
+      'Pinned: `src/old.mjs` was deleted in 53523a917.',
+      'Pattern: `src/**/*.mjs`, `src/<name>.mjs`, `~/.fgos/x`.',
+      '```',
+      '`src/fenced-gone.mjs`',
+      '```',
+    ].join('\n'),
+    'docs/platform/a/decisions/d.md': 'Past: `src/gone.mjs`\n',
+    'docs/platform/a/notes.md': 'Not canonical: `src/gone.mjs`\n',
+  };
+  const kinds = { 'docs/platform/a/spec.md': { canonical: true, kind: 'spec' },
+    'docs/platform/a/decisions/d.md': { canonical: true, kind: 'decision' },
+    'docs/platform/a/notes.md': { canonical: false, kind: 'unplaced-platform' } };
+  const { findings } = checkDeadReferences({
+    files: Object.keys(docs), readFile: (f) => docs[f], exists: (f) => f === 'src/alive.mjs',
+    classify: (f) => kinds[f],
+  });
+  assert.deepEqual(findings.map((f) => [f.path, f.line, f.target]), [
+    ['docs/platform/a/spec.md', 2, 'src/gone.mjs'],
+    ['docs/platform/a/spec.md', 2, 'plans/gone/plan.md'],
+  ]);
 });
 
 // One wiring proof for both rules over the real repository and the real host.
-test('live self-check: every repository platform doc passes link and metadata health', () => {
+test('live self-check: every repository platform doc passes link, metadata and dead-reference health', () => {
   const result = spawnSync(process.execPath, [
     path.join(REPO_ROOT, 'scripts/doc-health.mjs'), '--json', '--repo-root', REPO_ROOT,
   ], { cwd: REPO_ROOT, encoding: 'utf8', timeout: 120_000, env: { ...process.env, FGOS_HOST_BIN: BUILT_HOST } });

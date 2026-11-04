@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1dec1c24564117f70e727728653f280dd09cde80ae3e72d2bfa7846e08e997dd",
+  "payloadDigest": "30514ddc2d5d17c1290d72d437dc70b68dca66987345088c2f6ed2df3ba21944",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -818,7 +818,7 @@
     "scripts/dispatch-decide-hook.mjs": "0c57af75d5ef5309ebdd10903403649802f8dfca77785d7801df81f64fe2d4ea",
     "scripts/doc-alias-resolver.mjs": "8f9d33e109752670e70f8bcc51c54bcb3f9182a6c6bd6eb1fd42f2842fd5844c",
     "scripts/doc-binding-repair.mjs": "39b05039c7f8856197e646d6e88b5b9961f047cb4b1133dba69b4539bf61f8eb",
-    "scripts/doc-health.mjs": "1e2b0552c1c2f8340b885e07ef4bcfa710f7b65a7226527c9720640c474b4b5f",
+    "scripts/doc-health.mjs": "263a4b9bd2ebefb915117de2a9e6a4672fa35161f474d7080c227be474bf3a27",
     "scripts/doc-inventory-artifact.mjs": "13c6868d7529320f20d35a9b769b84189bfcd595ed5361bcc26ca7da2266d166",
     "scripts/doc-link-pass.mjs": "90c4821cac2f9e9e5a039cfa42af6ac896dd0acc38d8a8374c9e0c96af302555",
     "scripts/doc-rationale-facts.mjs": "8ff477ce52800e0b787ced49d280e8172baf3709f1f3dee5adb213ac80ef0eb2",
