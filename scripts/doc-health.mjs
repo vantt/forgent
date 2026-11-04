@@ -19,10 +19,10 @@
 // (one door); this script owns only the body.
 
 import fs from 'node:fs';
-import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { listAnchors } from './list-doc-anchors.mjs';
+import { inspectRepo } from './lib/git-ports.mjs';
 import { clickable, relatedLinks, localDestination, headerBlock } from './lib/doc-links.mjs';
 import { invokeHost } from '../src/util/host-bin.mjs';
 
@@ -167,13 +167,15 @@ export function checkDeadReferences({ files, readFile, exists, classify, isCommi
   return { findings, counts: { findings: findings.length } };
 }
 
-/** Whether a hex token names a commit of the repository; one git call per distinct token. */
+/** Whether a hex token names a commit of the repository (through the Git door); resolved once per distinct token. */
 export function gitCommitResolver(repoRoot) {
+  const git = inspectRepo(repoRoot);
   const cache = new Map();
   return (token) => {
     if (!cache.has(token)) {
-      try { execFileSync('git', ['cat-file', '-e', `${token}^{commit}`], { cwd: repoRoot, stdio: 'ignore' }); cache.set(token, true); }
-      catch { cache.set(token, false); }
+      let sha = null;
+      try { sha = git.resolveCommit({ name: token }); } catch { sha = null; }
+      cache.set(token, typeof sha === 'string' && sha.length > 0);
     }
     return cache.get(token);
   };

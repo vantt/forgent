@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c83c4ca6da766eb4bbc24d18ad4ea7239eea60b5c517ff14e0eccbd51c008407",
+  "payloadDigest": "38faa2515cd1875090236f74909b7fc9572334483f6d58c5440673fcbcfae779",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -812,7 +812,7 @@
     "scripts/ci-external-consumer.sh": "d097aeeacae5d35e7e2163e8d4fcc859df69efe57c05c22ca940e83beb6ab954",
     "scripts/decision-question-hook.mjs": "5f4d242754bea6fa460288e790a4354d6780d847305ef3779c4547137d6872d1",
     "scripts/dispatch-decide-hook.mjs": "0c57af75d5ef5309ebdd10903403649802f8dfca77785d7801df81f64fe2d4ea",
-    "scripts/doc-health.mjs": "8f98f6ecc551833b92c42a2d0436413440275414a8024ef95408789b12380f51",
+    "scripts/doc-health.mjs": "91f42a0f0f03595cf6016a20d2f9f9f69492f2ef8f6c69e2b81293151da24274",
     "scripts/event-store/forge-probe.sh": "bb76c3b89630c72d5bfc67100caf8848a8f2a02022a9070cb67ff1aa21e119f4",
     "scripts/event-store/power-loss-driver.mjs": "f7f88a6d9e80fe17027d7d6981c04f544d4b49e6629e46b0cfbdcbdeac75a7a3",
     "scripts/event-store/power-loss.sh": "f0023c1352dc57b85aba68c844d5abc28e8967a9a892c557d80b77434b9b2136",
@@ -1245,16 +1245,7 @@
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3",
     "scripts/lib/git-one-door-declarations.v1.json": "87e2578ba146cdd57e3c49970952cfe5db18706dbaaf2baa728da8ce38149ed5"
   },
-  "sites": [
-    {
-      "path": "scripts/doc-health.mjs",
-      "line": 175,
-      "spawn": "execFileSync",
-      "binary": "git",
-      "family": "spawn",
-      "siteId": "return:c7b32c82e919a6e40bc52b5955d7b39fef0d8b74cc46e16a378f69e600e0e107"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
