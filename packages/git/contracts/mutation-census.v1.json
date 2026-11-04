@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "15f63023cb598a3803885fdb02912cc982dcc9243923e4a538e20661a088b1d4",
+  "payloadDigest": "c83c4ca6da766eb4bbc24d18ad4ea7239eea60b5c517ff14e0eccbd51c008407",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -267,7 +267,7 @@
     "packages/convention/rust/src/operations.rs": "98d5eaa19a1fe20960e7ed8f2e35205dad2e7d470985034020a1400049230a6d",
     "packages/convention/rust/src/provider.rs": "9c7421733033e3355e94f94b6ba64d38801032cd8c53357206c161bde1b997c1",
     "packages/convention/rust/src/rules.rs": "21167e9924715492dd8f6e6e6eeed968e18f8f9a398aa61a1bec754f3cfd7c1e",
-    "packages/convention/rust/tests/golden.rs": "ed9430616f9c8041998d954d22f712305cfa5fed8ede201f06e85fc725f1605a",
+    "packages/convention/rust/tests/golden.rs": "f385fafb0e5c152ee0d778eb55172162ab97b5581bfb132b29a3642d328d9b3e",
     "packages/distribution/rust/examples/print-workspace-shim.rs": "767a8d526d1b030dd4327509a63c9e194ed03fe2ae5a2a263682cd62724dc6d4",
     "packages/distribution/rust/src/canonical.rs": "6393eb2ae3203601b37945293dadcb1385a33b074362d5cf7fa3fe95e8a5c364",
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
@@ -812,7 +812,7 @@
     "scripts/ci-external-consumer.sh": "d097aeeacae5d35e7e2163e8d4fcc859df69efe57c05c22ca940e83beb6ab954",
     "scripts/decision-question-hook.mjs": "5f4d242754bea6fa460288e790a4354d6780d847305ef3779c4547137d6872d1",
     "scripts/dispatch-decide-hook.mjs": "0c57af75d5ef5309ebdd10903403649802f8dfca77785d7801df81f64fe2d4ea",
-    "scripts/doc-health.mjs": "8fcbb3c53bd4a574667d5439926d854b5242d90fec0ee95699b3a411e4871124",
+    "scripts/doc-health.mjs": "8f98f6ecc551833b92c42a2d0436413440275414a8024ef95408789b12380f51",
     "scripts/event-store/forge-probe.sh": "bb76c3b89630c72d5bfc67100caf8848a8f2a02022a9070cb67ff1aa21e119f4",
     "scripts/event-store/power-loss-driver.mjs": "f7f88a6d9e80fe17027d7d6981c04f544d4b49e6629e46b0cfbdcbdeac75a7a3",
     "scripts/event-store/power-loss.sh": "f0023c1352dc57b85aba68c844d5abc28e8967a9a892c557d80b77434b9b2136",
@@ -1245,7 +1245,16 @@
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3",
     "scripts/lib/git-one-door-declarations.v1.json": "87e2578ba146cdd57e3c49970952cfe5db18706dbaaf2baa728da8ce38149ed5"
   },
-  "sites": [],
+  "sites": [
+    {
+      "path": "scripts/doc-health.mjs",
+      "line": 175,
+      "spawn": "execFileSync",
+      "binary": "git",
+      "family": "spawn",
+      "siteId": "return:c7b32c82e919a6e40bc52b5955d7b39fef0d8b74cc46e16a378f69e600e0e107"
+    }
+  ],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",

@@ -66,11 +66,14 @@
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["kind", "cardinality", "scope"],
+          "required": ["kind", "cardinality", "scope", "canonical", "metadataExempt", "generated"],
           "properties": {
             "kind": {"type": "string"},
             "cardinality": {"enum": ["singleton", "collection"]},
-            "scope": {"type": "array", "items": {"type": "string"}}
+            "scope": {"type": "array", "items": {"type": "string"}},
+            "canonical": {"type": "boolean"},
+            "metadataExempt": {"type": "boolean"},
+            "generated": {"type": "boolean"}
           }
         }
       ]

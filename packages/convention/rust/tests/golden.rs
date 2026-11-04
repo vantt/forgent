@@ -166,6 +166,45 @@ fn typed_request_uses_the_versioned_wire_keys_and_defaults() {
         "convention.query.outcome"
     );
 }
+// The outcome schema is the published contract; the classify golden outputs must
+// carry exactly the properties it declares, so the two cannot drift apart.
+#[test]
+fn classify_golden_outputs_match_the_published_outcome_schema() {
+    let schema: Value =
+        serde_json::from_str(include_str!("../../contracts/convention.query.v1.json")).unwrap();
+    let branch = schema["definitions"]["outcome"]["oneOf"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|branch| branch["properties"].get("cardinality").is_some())
+        .expect("classify branch of the outcome schema");
+    let mut declared: Vec<&str> = branch["properties"]
+        .as_object()
+        .unwrap()
+        .keys()
+        .map(String::as_str)
+        .collect();
+    declared.sort_unstable();
+    let mut required: Vec<&str> = branch["required"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|name| name.as_str().unwrap())
+        .collect();
+    required.sort_unstable();
+    assert_eq!(declared, required, "the host always emits every declared field");
+    let fixture: GoldenFile = serde_json::from_str(GOLDEN).unwrap();
+    let mut checked = 0;
+    for case in fixture.cases.iter().filter(|case| case.operation == "classify") {
+        if let Some(expected) = &case.expected {
+            let mut keys: Vec<&str> = expected.as_object().unwrap().keys().map(String::as_str).collect();
+            keys.sort_unstable();
+            assert_eq!(keys, declared, "{}", case.name);
+            checked += 1;
+        }
+    }
+    assert!(checked > 0);
+}
 // Owns guard 2, replacing the reservation-only proof: document placement is
 // now installed. Guard 1's refusal cases live in golden_cases_are_the_behavior_source.
 #[test]
