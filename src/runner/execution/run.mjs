@@ -44,7 +44,7 @@ import { dispatchCwdHolder, dispatchInFlightError, admitSuccessor, recordCustody
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
-import { createConfinementCredentialRenewal } from '../dispatch/confinement/cleanup.mjs';
+import { createCredentialRenewal } from '../dispatch/provider-credential-renewal.mjs';
 import { adoptRun, sweepAttempts } from '../../run-supervisor/client.mjs';
 import { installCancelOnSignal, assertNotCancelled, RunCancelledError } from '../../run-supervisor/cancel-registry.mjs';
 import { cancelOnSignalEnabled } from '../../run-supervisor/cancel-opt-in.mjs';
@@ -53,7 +53,6 @@ import { listGenerations } from '../dispatch/run-lock.mjs';
 import { acquireUnitControl } from './unit-control.mjs';
 import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
 import { createLockScope, resolveStateRoot } from '../../holder-lock/index.mjs';
-import { defaultConfinementTempRoots } from '../dispatch/confinement/backend-registry.mjs';
 
 /** Write `file` atomically so a reader never sees half a record. */
 function writeJsonAtomic(file, value) {
@@ -1128,7 +1127,7 @@ async function runUnitBody(options, scope) {
       // copy kept in unit.json.
       committedRunnerConfig: liveConfig(),
       providerCredentialProbe: createCredentialProbe(),
-      providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
+      providerCredentialRenew: createCredentialRenewal(),
       cliOverride: {
         preferExecutor: bound.executor,
         // bind() already chose the invocation that carries bound.transport: the executor's

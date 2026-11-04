@@ -83,7 +83,7 @@ import {
   credentialScanRoots,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
+import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
@@ -4689,6 +4689,14 @@ function summarizeByAccount(items, label) {
   return [...groups].map(([key, g]) => `${key}: ${g.count} ${label}, oldest ${formatAge(g.oldestMs)}`);
 }
 
+// How the owner recovers a held home. Nothing fgOS reads from the home itself can name the account store (the
+// confined agent wrote it), so the store is looked up in the host's own record of the attempt.
+const HELD_HOME_RECOVERY = 'It may hold the only valid login of the account its attempt leased, and nothing settles it by itself. '
+  + 'Recover by hand: the attempt that made it ran from a run directory under the .fgos/assignments of its project, whose '
+  + 'protected/confinement-finalization/<launch>.json names, on the resource whose pathRef is this home, the account store (credentialWriteBack.home); '
+  + 'copy the home\'s login files (auth.json, or agent.db with any agent.db-wal and agent.db-journal) over that store only if their login expires later, then delete the home. '
+  + 'Deleting the home without copying drops the login it holds.';
+
 export function checkCredentialCopiesRetained({
   runtimeDir = defaultProviderCapacityRuntimeDir(),
   roots = credentialScanRoots(),
@@ -4704,8 +4712,8 @@ export function checkCredentialCopiesRetained({
   const copies = inspectRetainedCredentialCopies({ runtimeDir, now, minAgeMs: unjudged ? 0 : minAgeMs, inventory });
   const stranded = copies.filter((c) => c.stranded);
   // A kept home under a root no reaper or dispatch retries (a registered backend's own root) never counts its
-  // own attempts up, so it is held from the start: doctor fails naming it and --fix settles it. A root nested
-  // inside another lists a home twice; it is counted once.
+  // own attempts up, so it is held from the start: doctor fails naming it. A root nested inside another lists
+  // a home twice; it is counted once.
   const retried = new Set(retriedRoots.map(canonicalRoot));
   const seenHomes = new Set();
   const homes = roots.flatMap((root) => listKeptCredentialHomes(root).map((home) => ({ ...home, held: home.held || !retried.has(canonicalRoot(root)) })))
@@ -4740,8 +4748,8 @@ export function checkCredentialCopiesRetained({
       ? 'interrupted staging(s) of a login copy (a crash cut the copy short; "fgos doctor --fix" removes one that is empty or identical to a copy already kept, and cannot judge one against the source login of the account until the provider inventory can be read, any other stays for hand recovery)'
       : 'interrupted staging(s) of a login copy (a crash cut the copy short; "fgos doctor --fix" removes one that is empty, identical to a copy already kept, or shown by the source login of the account to be no newer, any other stays for hand recovery)'),
     ...summarizeByAccount(copies.filter((c) => c.kind === 'torn' && !c.stranded), 'half-written login copy(ies) kept for hand recovery (never applied or dropped automatically)'),
-    ...held.map((home) => `${home.provider}/${home.accountId}: private home held ${home.attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS ? 'after repeated staging failures' : 'under a root that nothing retries by itself'}, ${formatAge(home.ageMs)} old, at ${home.dir} ("fgos doctor --fix" re-checks it and removes it once its login is shown to be applied or obsolete; otherwise recover the login from it by hand)`),
-    ...summarizeByAccount(retrying, 'private home(s) kept after a staging failure, retried by the reaper'),
+    ...held.map((home) => `private home held ${home.attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS ? 'after repeated staging failures' : 'under a root that nothing retries by itself'}, ${formatAge(home.ageMs)} old, at ${home.dir}. ${HELD_HOME_RECOVERY}`),
+    ...(retrying.length > 0 ? [`${retrying.length} private home(s) kept after a staging failure, retried by the finalize-home step of their attempt, oldest ${formatAge(Math.max(...retrying.map((home) => home.ageMs)))}`] : []),
   ];
   const text = problems.join('; ');
   return held.length > 0 || stranded.length > 0 || overLimit.some((a) => a.stranded) || unjudgedCopies ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
@@ -4793,20 +4801,14 @@ function stagingStoreResolver(inventory, runtimeDir) {
   };
 }
 
-export function fixCredentialCopiesRetained({ roots = credentialScanRoots(), retriedRoots = defaultConfinementTempRoots(), inventory, stagingRuntimeDir = defaultProviderCapacityRuntimeDir(), ...options } = {}) {
-  const total = { settled: 0, held: 0 };
+// Held private homes are never settled here: nothing outside the home records which store a home's login
+// belongs to in a place the fix could find, and the home's own marker is the agent's word.
+export function fixCredentialCopiesRetained({ inventory, stagingRuntimeDir = defaultProviderCapacityRuntimeDir() } = {}) {
   const stagings = sweepInterruptedStagings({ runtimeDir: stagingRuntimeDir, resolveStore: stagingStoreResolver(inventory, stagingRuntimeDir) });
-  const retried = new Set(retriedRoots.map(canonicalRoot));
-  const { settled, held } = settleHeldCredentialHomes({ tempRoots: roots, unretriedRoots: roots.filter((root) => !retried.has(canonicalRoot(root))), ...options });
-  total.settled += settled;
-  total.held += held;
-  const homes = total.settled + total.held === 0
-    ? 'no held private home to re-check'
-    : `re-checked ${total.settled + total.held} held private home(s): ${total.settled} removed, ${total.held} still held`;
-  const staged = stagings.removed + stagings.kept === 0
-    ? ''
-    : `; interrupted staging(s): ${stagings.removed} removed, ${stagings.kept} kept for hand recovery`;
-  return { changed: total.settled > 0 || stagings.removed > 0, message: `${homes}${staged}` };
+  const message = stagings.removed + stagings.kept === 0
+    ? 'no interrupted staging to sweep (held private homes are recovered by hand)'
+    : `interrupted staging(s): ${stagings.removed} removed, ${stagings.kept} kept for hand recovery (held private homes are recovered by hand)`;
+  return { changed: stagings.removed > 0, message };
 }
 
 registerCheck({

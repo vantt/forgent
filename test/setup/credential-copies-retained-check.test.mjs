@@ -87,23 +87,24 @@ test('a pending copy that has sat for a day is reported by provider, account and
   } finally { w.cleanup(); }
 });
 
-test('a held home fails the check, a home still being retried is only noted, and nothing leaks a path or a value', () => {
+test('a held home fails the check with how to recover it by hand, a home still being retried is only noted, and nothing the home says is repeated', () => {
   const w = workspace();
   try {
     addKeptHome(w, 'disp_held', CREDENTIAL_KEEP_MAX_ATTEMPTS);
     const held = run(w);
     assert.equal(held.passed, false);
-    assert.match(held.message, /xai\/acct: private home held after repeated staging failures, 2d old, at /);
+    assert.match(held.message, /private home held after repeated staging failures, 2d old, at /);
     assert.equal(held.message.includes(path.join(w.tempRoot, 'disp_held', 'home')), true, 'the home is named');
-    assert.match(held.message, /doctor --fix/);
-    for (const secret of [FAKE_TOKEN, 'secret-source-home']) assert.equal(held.message.includes(secret), false);
+    assert.match(held.message, /Recover by hand: .*protected\/confinement-finalization\/<launch>\.json names.* the account store .*then delete the home/);
+    // The account and the store in the home's own marker are the agent's word: never repeated as fact.
+    for (const agentWord of [FAKE_TOKEN, 'secret-source-home', 'xai/acct']) assert.equal(held.message.includes(agentWord), false, agentWord);
 
     fs.rmSync(path.join(w.tempRoot, 'disp_held'), { recursive: true, force: true });
     addKeptHome(w, 'disp_retry', 1);
     const retrying = run(w);
     assert.equal(retrying.passed, true);
     assert.match(retrying.message, /^warning: /);
-    assert.match(retrying.message, /1 private home\(s\) kept after a staging failure, retried by the reaper/);
+    assert.match(retrying.message, /1 private home\(s\) kept after a staging failure, retried by the finalize-home step of their attempt, oldest 2d/);
   } finally { w.cleanup(); }
 });
 
@@ -130,17 +131,23 @@ test('the orphan count skips a held home owned by a dead process but still count
   }
 });
 
-test('the fix re-checks held homes: one whose login is gone is removed, one that cannot be judged stays', () => {
+test('the fix never removes a held home nor writes the login its marker names anywhere: held homes are recovered by hand', () => {
   const w = workspace();
   try {
-    const gone = addKeptHome(w, 'disp_gone', CREDENTIAL_KEEP_MAX_ATTEMPTS); // no store file inside: nothing to keep
-    const stuck = addKeptHome(w, 'disp_stuck', CREDENTIAL_KEEP_MAX_ATTEMPTS);
-    extendOwnershipMarker(stuck, { credentialWriteBack: { provider: '../bad', accountId: 'acct' } });
-    const result = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir });
-    assert.equal(result.changed, true);
-    assert.match(result.message, /1 removed, 1 still held/);
-    assert.equal(fs.existsSync(gone), false);
-    assert.equal(fs.existsSync(stuck), true);
+    const source = path.join(w.tmp, 'secret-source-home');
+    fs.mkdirSync(source, { recursive: true });
+    fs.writeFileSync(path.join(source, 'auth.json'), JSON.stringify({ xai: { type: 'oauth', refresh: 'FAKE-REFRESH-OLD', expires: Date.now() + HOUR } }));
+    const before = fs.readFileSync(path.join(source, 'auth.json'), 'utf8');
+    const gone = addKeptHome(w, 'disp_gone', CREDENTIAL_KEEP_MAX_ATTEMPTS); // no store file inside
+    const renewed = addKeptHome(w, 'disp_renewed', CREDENTIAL_KEEP_MAX_ATTEMPTS);
+    fs.writeFileSync(path.join(renewed, 'auth.json'), JSON.stringify({ xai: { type: 'oauth', refresh: 'FAKE-REFRESH-NEW', expires: Date.now() + 12 * HOUR } }));
+    const result = fixCredentialCopiesRetained({ stagingRuntimeDir: w.runtimeDir });
+    assert.equal(result.changed, false);
+    assert.match(result.message, /held private homes are recovered by hand/);
+    assert.equal(fs.existsSync(gone), true);
+    assert.equal(fs.existsSync(renewed), true);
+    assert.equal(fs.readFileSync(path.join(source, 'auth.json'), 'utf8'), before, 'the store the marker names is untouched');
+    assert.equal(fs.existsSync(path.join(w.runtimeDir, 'account-locks')), false, 'nothing was staged');
   } finally { w.cleanup(); }
 });
 
@@ -305,7 +312,7 @@ test('an interrupted staging is reported with its own wording, and the fix remov
     assert.match(before.message, /xai\/acct: 2 interrupted staging\(s\)/);
     assert.equal(before.message.includes(FAKE_TOKEN), false);
     assert.equal(before.message.includes('ONLY-COPY-BYTES'), false);
-    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir });
+    const fixed = fixCredentialCopiesRetained({ stagingRuntimeDir: w.runtimeDir });
     assert.equal(fixed.changed, true);
     assert.match(fixed.message, /interrupted staging\(s\): 1 removed, 1 kept/);
     assert.equal(fs.existsSync(same), false);
@@ -325,7 +332,7 @@ test('a staging in a store the account layout no longer reads is reported once, 
     assert.match(result.message, /openai\/acct: 1 login copy\(ies\) that no dispatch applies/);
     assert.equal(result.message.includes('interrupted staging'), false, 'not a second row for the same directory');
     assert.equal(result.message.split(';').filter((row) => row.includes('openai/acct')).length, 1);
-    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, inventory });
+    const fixed = fixCredentialCopiesRetained({ stagingRuntimeDir: w.runtimeDir, inventory });
     assert.equal(fixed.changed, false);
     assert.equal(fs.existsSync(staging), true);
   } finally { w.cleanup(); }
@@ -347,7 +354,7 @@ test('the fix reads each store through the inventory: a staging the source login
     const noSource = addStaging(otherDir, `.tmp-${deadPid()}-older`, doc(Date.now() + HOUR, 'FAKE-REFRESH-A'));
     inventory.xai.accounts.other = { credentialSource: { kind: 'home-files', home: source, files: ['other.json'] } };
     const newer = addStaging(accountDir, `.tmp-${deadPid()}-newer`, doc(Date.now() + 12 * HOUR, 'FAKE-REFRESH-B'));
-    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, inventory });
+    const fixed = fixCredentialCopiesRetained({ stagingRuntimeDir: w.runtimeDir, inventory });
     assert.equal(fs.existsSync(older), false, fixed.message);
     assert.equal(fs.existsSync(newer), true, 'a staging the source cannot show to be no newer stays');
     assert.equal(fs.existsSync(noSource), true, 'a store with no source login to judge by keeps its staging');
@@ -363,7 +370,7 @@ test('an over-limit store is named by its CLI in the doctor line', () => {
   } finally { w.cleanup(); }
 });
 
-test('a kept home under a root nothing retries is held at once: doctor fails naming it, never says it is retried, and the fix settles it', () => {
+test('a kept home under a root nothing retries is held at once: doctor fails naming it and never says it is retried', () => {
   const w = workspace();
   try {
     const scanOnly = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-scan-only-root-'));
@@ -382,11 +389,7 @@ test('a kept home under a root nothing retries is held at once: doctor fails nam
       assert.ok(result.message.includes(dir), 'the home under the scan-only root is named');
       assert.match(result.message, /under a root that nothing retries by itself/);
       assert.equal(result.message.includes(retried), false, 'the home a reaper retries is still only a note');
-      assert.equal(result.message.split('retried by the reaper').length - 1, 1, 'the wording is kept for the one home a reaper does retry');
-      const fixed = fixCredentialCopiesRetained({ ...args, stagingRuntimeDir: w.runtimeDir });
-      assert.equal(fs.existsSync(dir), false, 'the fix settles it (no store file inside: nothing to keep)');
-      assert.equal(fs.existsSync(retried), true, 'a home that is only being retried is left to its reaper');
-      assert.equal(fixed.changed, true);
+      assert.match(result.message, /1 private home\(s\) kept after a staging failure, retried/, 'the wording is kept for the one home that is retried');
     } finally { fs.rmSync(scanOnly, { recursive: true, force: true }); }
   } finally { w.cleanup(); }
 });
@@ -397,8 +400,6 @@ test('a home reachable through two spellings of one root is counted once', () =>
     addKeptHome(w, 'disp_twice', CREDENTIAL_KEEP_MAX_ATTEMPTS);
     const result = checkCredentialCopiesRetained({ runtimeDir: w.runtimeDir, roots: [w.tempRoot, `${w.tempRoot}/`], retriedRoots: [w.tempRoot] });
     assert.equal(result.message.split('private home held').length - 1, 1);
-    const fixed = fixCredentialCopiesRetained({ roots: [w.tempRoot, `${w.tempRoot}/`], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir });
-    assert.match(fixed.message, /re-checked 1 held private home/);
   } finally { w.cleanup(); }
 });
 
@@ -495,7 +496,7 @@ test('the doctor fix leaves a stranded copy in place', () => {
   try {
     const now = Date.now();
     addPendingIn(w, 'openai', 'acct', '.', now - 3 * 24 * HOUR);
-    fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, inventory: { openai: { accounts: { acct: perCliAccount } } } });
+    fixCredentialCopiesRetained({ stagingRuntimeDir: w.runtimeDir, inventory: { openai: { accounts: { acct: perCliAccount } } } });
     assert.equal(fs.readdirSync(path.join(storeDir(w, 'openai', 'acct'), 'pending')).length, 1);
     assert.equal(runWith(w, { openai: { accounts: { acct: perCliAccount } } }, now).passed, false);
   } finally { w.cleanup(); }
@@ -564,7 +565,7 @@ test('the fix never sweeps a stores/constructor staging that the check calls str
     const staging = addStaging(dir, `.tmp-${deadPid()}-proto`, 'ONLY-COPY-BYTES');
     const inventory = { openai: { accounts: { acct: perCliAccount } } };
     assert.match(runWith(w, inventory).message, /that no dispatch applies/);
-    fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, inventory });
+    fixCredentialCopiesRetained({ stagingRuntimeDir: w.runtimeDir, inventory });
     assert.equal(fs.existsSync(staging), true);
   } finally { w.cleanup(); }
 });
@@ -595,48 +596,3 @@ test('a registry root that is a symlink to the retried root is the same root: it
   } finally { w.cleanup(); }
 });
 
-// A home under a root no reaper retries holds a login renewed inside it: the fix writes it back before the home goes.
-function renewedHomeUnderScanOnlyRoot(w, scanOnly) {
-  const source = path.join(w.tmp, 'source-home');
-  fs.mkdirSync(source, { recursive: true });
-  const doc = (expires, refresh) => JSON.stringify({ xai: { type: 'oauth', access: 'FAKE-ACCESS', refresh, expires } });
-  fs.writeFileSync(path.join(source, 'auth.json'), doc(Date.now() + HOUR, 'FAKE-REFRESH-OLD'));
-  const dir = path.join(scanOnly, 'disp_renewed', 'home');
-  fs.mkdirSync(dir, { recursive: true });
-  writeOwnershipMarker(dir, { dispatchId: 'disp_renewed' });
-  fs.writeFileSync(path.join(dir, 'auth.json'), doc(Date.now() + 12 * HOUR, 'FAKE-REFRESH-NEW'));
-  extendOwnershipMarker(dir, {
-    credentialWriteBack: { provider: 'xai', accountId: 'acct', home: source, layout: 'pi-auth-json', runtimeDir: w.runtimeDir },
-    credentialKept: { attempts: 1, since: new Date(Date.now() - HOUR).toISOString() },
-  });
-  return { dir, source };
-}
-
-test('the fix settles a renewed home under a scan-only root by writing the newer login back before it removes the home', () => {
-  const w = workspace();
-  const scanOnly = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-scan-only-root-'));
-  try {
-    const { dir, source } = renewedHomeUnderScanOnlyRoot(w, scanOnly);
-    const result = fixCredentialCopiesRetained({ roots: [w.tempRoot, scanOnly], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, runtimeDir: w.runtimeDir });
-    assert.equal(result.changed, true, result.message);
-    assert.equal(fs.existsSync(dir), false, 'the home goes once its login is safe');
-    const written = fs.readFileSync(path.join(source, 'auth.json'), 'utf8');
-    assert.equal(written.includes('FAKE-REFRESH-NEW') || fs.readdirSync(path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'pending')).length > 0, true, 'the newer login is in the source or staged beside it');
-  } finally { fs.rmSync(scanOnly, { recursive: true, force: true }); w.cleanup(); }
-});
-
-test('the fix keeps a renewed home under a scan-only root when its login cannot be made safe', () => {
-  const w = workspace();
-  const scanOnly = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-scan-only-root-'));
-  try {
-    const { dir, source } = renewedHomeUnderScanOnlyRoot(w, scanOnly);
-    const before = fs.readFileSync(path.join(source, 'auth.json'), 'utf8');
-    // The login cannot be staged beside the account: a file stands where its pending directory would be.
-    fs.mkdirSync(path.join(w.runtimeDir, 'account-locks', 'xai', 'acct'), { recursive: true });
-    fs.writeFileSync(path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'pending'), 'not a directory');
-    const result = fixCredentialCopiesRetained({ roots: [w.tempRoot, scanOnly], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir, runtimeDir: w.runtimeDir });
-    assert.equal(fs.existsSync(dir), true, `the home stays: ${result.message}`);
-    assert.equal(fs.readFileSync(path.join(source, 'auth.json'), 'utf8'), before, 'the source is untouched');
-    assert.equal(fs.readFileSync(path.join(dir, 'auth.json'), 'utf8').includes('FAKE-REFRESH-NEW'), true, 'and still holds the newer login');
-  } finally { fs.rmSync(scanOnly, { recursive: true, force: true }); w.cleanup(); }
-});

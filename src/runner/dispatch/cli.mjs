@@ -26,8 +26,7 @@ import { compileDispatchPlan } from './plan.mjs';
 import { executeAssignment } from './assignment-runner.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { runAccountProbe } from './provider-account-probe.mjs';
-import { createConfinementCredentialRenewal } from './confinement/cleanup.mjs';
-import { defaultConfinementTempRoots } from './confinement/backend-registry.mjs';
+import { createCredentialRenewal } from './provider-credential-renewal.mjs';
 import { createRoundTerminalControl } from './terminal-slot.mjs';
 import { envForSession } from './worker-session.mjs';
 import { resolveHerdrBin } from './transport.mjs';
@@ -442,7 +441,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             runnerConfig,
             cliOverride,
             isReadOnlyMode: true,
-            providerCredentialRenew: createConfinementCredentialRenewal({ tempRoots: defaultConfinementTempRoots }),
+            providerCredentialRenew: createCredentialRenewal(),
           }),
           closePane: ({ paneId, herdrSession, terminalKey }) => {
             // A run record that carries no key was written before panes were addressed by key:

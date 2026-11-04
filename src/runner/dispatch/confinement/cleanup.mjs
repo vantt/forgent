@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
-import { writeBackRenewedCredential, settleHeldCredentialHome, writeFileAtomic, createCredentialRenewal } from '../provider-credential-renewal.mjs';
+import { writeFileAtomic } from '../provider-credential-renewal.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 
@@ -201,18 +201,15 @@ export function countCredentialKeep(dirPath, marker, now = Date.now) {
 }
 
 /**
- * Delete a confinement directory. The one removal every path goes through (the driver's cleanup, the
- * finalizer of a settled dispatch and adopt's finalize-home step), so a login renewed inside a private home is
- * offered to its source before the home is gone, whichever path gets there. A home whose marker does not
- * ask for write-back is removed exactly as before; a write-back problem is reported by a fixed code on
- * stderr and never stops the removal, except that a home whose renewed login could not be staged is kept
- * (the call throws `credential-home-kept`, and the attempt is counted in the marker) so a later removal
- * retries; after CREDENTIAL_KEEP_MAX_ATTEMPTS the call throws `credential-home-held` without trying again.
+ * Delete a confinement directory of a dispatch outside the assignment door (the driver's cleanup and the
+ * finalizer of a settled dispatch). Such a home is never written back: only an attempt opts in to credential
+ * write-back, and an attempt home is removed only by adopt's finalize-home step. Nothing a home's own marker
+ * says can make this removal write a login anywhere.
  *
  * @param {string} dirPath
  * @param {{stopProcesses?: boolean}} [options] `stopProcesses`: end whatever still runs from inside first
  */
-export function removeConfinementDir(dirPath, { stopProcesses = false, now = Date.now } = {}) {
+export function removeConfinementDir(dirPath, { stopProcesses = false } = {}) {
   // An attempt home is removed only by adopt's finalize-home step, never through this door.
   if (readAttemptOwnershipMarker(dirPath)) throw new Error('attempt-home-owned-by-adopt');
   if (stopProcesses) {
@@ -224,27 +221,6 @@ export function removeConfinementDir(dirPath, { stopProcesses = false, now = Dat
   // else) does not prove the home holds no login: leave it alone.
   if (!marker && markerIsUnrecognisable(dirPath)) {
     throw new Error('ownership-marker-unreadable');
-  }
-  if (marker?.credentialWriteBack !== undefined) {
-    // A home whose staging already failed the allowed number of times is not retried any more and is
-    // never deleted for being old: `fgos doctor` reports it, and a later renewal of its account or
-    // `fgos doctor --fix` settles it once that can be shown safe.
-    if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) {
-      throw new Error(CREDENTIAL_HOME_HELD);
-    }
-    const result = writeBackRenewedCredential(dirPath, marker);
-    if (result.status === 'failed') {
-      if (result.keepHome) {
-        // The home may hold the only good refresh token and no copy of it is safe yet: leave it and its
-        // marker so a later removal retries (up to the bound), and say so with a fixed code (no paths, no
-        // values). An attempt close after the last counted one is not counted again.
-        const attempts = countCredentialKeep(dirPath, marker, now);
-        const held = attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS;
-        process.stderr.write(`fgos: credential write-back not done (${result.code}); private home ${held ? 'held for the owner' : 'kept for a later retry'}\n`);
-        throw new Error(held ? CREDENTIAL_HOME_HELD : CREDENTIAL_HOME_KEPT);
-      }
-      process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
-    }
   }
   fs.rmSync(dirPath, { recursive: true, force: true });
 }
@@ -280,8 +256,10 @@ export function cleanupConfinementResource(dirPath, dispatchId) {
 
 /**
  * Private homes under `tempRoot` that were kept because their renewed login could not be staged
- * (`credentialKept` in the marker). Read-only; names, counts, times and the home directory, never a value.
- * `held` homes have used up CREDENTIAL_KEEP_MAX_ATTEMPTS and are no longer retried.
+ * (`credentialKept` in the marker). Read-only; counts, times and the home directory, never a value. The
+ * marker is written inside the home, so nothing in it names an account or a store here: it would be the
+ * agent's word. `held` homes have used up CREDENTIAL_KEEP_MAX_ATTEMPTS and are no longer retried; nothing
+ * settles one by itself, the owner recovers its login by hand.
  */
 export function listKeptCredentialHomes(tempRoot) {
   const found = [];
@@ -302,12 +280,9 @@ export function listKeptCredentialHomes(tempRoot) {
       if (!Number.isInteger(attempts) || attempts < 1) continue;
       found.push({
         dir: cand,
-        provider: typeof marker.credentialWriteBack?.provider === 'string' ? marker.credentialWriteBack.provider : 'unknown',
-        accountId: typeof marker.credentialWriteBack?.accountId === 'string' ? marker.credentialWriteBack.accountId : 'unknown',
         attempts,
         held: attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS,
         since: marker.credentialKept.since ?? marker.createdAt ?? null,
-        marker,
       });
     }
   }
@@ -315,66 +290,9 @@ export function listKeptCredentialHomes(tempRoot) {
 }
 
 /**
- * Re-check the held homes under `tempRoots` (optionally only one account's) and remove the ones that can
- * now be shown safe to remove: the source proves the login in the home is not newer, or it has been
- * staged beside the source. Every other held home stays exactly as it was; age never removes one.
- * `unretriedRoots`: roots nothing retries by itself (a registered backend's own roots); a kept home there counts
- * as held. `lockHeld`: the caller already holds the account lock. Returns `{settled, held}` as counts.
- */
-/**
  * A root as the file system sees it: the real path when it exists (a symlink to another root is the same
  * root), the resolved path otherwise. Roots are compared by this, never by how they were spelled.
  */
 export function canonicalRoot(root) {
   try { return fs.realpathSync(root); } catch { return path.resolve(root); }
-}
-
-export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempRoot()], unretriedRoots = [], provider, accountId, runtimeDir, lockHeld = false, loadSqlite, now, tryLock } = {}) {
-  let settled = 0;
-  let held = 0;
-  const seen = new Set();
-  const unretried = new Set(unretriedRoots.map(canonicalRoot));
-  for (const root of tempRoots) {
-    for (const home of listKeptCredentialHomes(root)) {
-      // A root nested inside another is listed twice; a home is looked at once.
-      const dir = path.join(canonicalRoot(path.dirname(home.dir)), path.basename(home.dir));
-      if (seen.has(dir)) continue;
-      seen.add(dir);
-      // A home under a root no dispatch retries is never going to count its own attempts up, so
-      // it is treated as held from the start.
-      if (!home.held && !unretried.has(canonicalRoot(root))) continue;
-      if (provider !== undefined && (home.provider !== provider || home.accountId !== accountId)) continue;
-      if (runtimeDir !== undefined && home.marker.credentialWriteBack?.runtimeDir !== runtimeDir) continue;
-      const result = settleHeldCredentialHome(home.dir, home.marker, { lockHeld, loadSqlite, now, tryLock });
-      if (result.status === 'settled') {
-        try {
-          fs.rmSync(home.dir, { recursive: true, force: true });
-          removeEmptyDispatchParent(home.dir, home.marker.dispatchId);
-          settled += 1;
-          continue;
-        } catch { /* it stays; the next pass retries */ }
-      }
-      held += 1;
-    }
-  }
-  return { settled, held };
-}
-
-/**
- * The renewal function a dispatch is opted in with, wired to this module's held homes: refresh-ahead of an
- * account re-checks that account's held homes under the account lock it already holds. Every dispatch
- * caller passes this one (the renewal module itself knows nothing of confinement).
- */
-export function createConfinementCredentialRenewal({ tempRoots, ...options } = {}) {
-  // `tempRoots`: an array, or a function returning one (read at each use, so a registry change is seen).
-  const roots = () => (typeof tempRoots === 'function' ? tempRoots() : tempRoots) ?? [resolveConfinementTempRoot()];
-  const ofAccount = (home, provider, accountId, runtimeDir) => home.held && home.provider === provider && home.accountId === accountId
-    && home.marker.credentialWriteBack?.runtimeDir === runtimeDir;
-  return createCredentialRenewal({
-    ...options,
-    heldHomes: {
-      has: ({ provider, accountId, runtimeDir }) => roots().some((root) => listKeptCredentialHomes(root).some((h) => ofAccount(h, provider, accountId, runtimeDir))),
-      settle: ({ provider, accountId, runtimeDir, loadSqlite, now }) => settleHeldCredentialHomes({ tempRoots: roots(), provider, accountId, runtimeDir, lockHeld: true, loadSqlite, now }),
-    },
-  });
 }
