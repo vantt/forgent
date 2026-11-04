@@ -182,7 +182,32 @@ pub struct SentSummary {
     pub waiting: usize,
     /// Refusals by the receiver's reason code.
     pub refused: std::collections::BTreeMap<String, usize>,
+    /// The most recent sends, oldest first, one per message.
+    pub recent: Vec<SentRow>,
 }
+
+/// What became of one send: when it left, who it went to and the receiving machine's answer.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SentRow {
+    pub id: String,
+    /// The recipient's full session id.
+    pub to: String,
+    pub sent_secs: u64,
+    pub preview: String,
+    pub answer: Answer,
+}
+
+/// The receiving machine's signed settlement of a send, with the time it signed it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Answer {
+    None,
+    Offered(u64),
+    Refused(String, u64),
+}
+
+/// How many sends `fgos mailbox status` lists.
+const RECENT_SENDS: usize = 8;
+const PREVIEW_CHARS: usize = 60;
 
 impl SentSummary {
     pub fn text(&self) -> String {
@@ -198,9 +223,60 @@ impl SentSummary {
             format!(" ({})", reasons.join(", "))
         };
         format!(
-            "cross-machine: {} sent in the last 24 hours; {} offered, {} refused{tail}, {} waiting for the receiver's fetch",
+            "cross-machine: {} sent in the last 24 hours; {} offered, {} refused{tail}, {} with no answer yet from the receiving machine",
             self.sent, self.offered, refused, self.waiting
         )
+    }
+
+    /// The recent sends as the envelope carries them.
+    pub fn recent_json(&self) -> Value {
+        self.recent
+            .iter()
+            .map(|row| {
+                let answer = match &row.answer {
+                    Answer::None => json!({ "state": "none" }),
+                    Answer::Offered(at) => json!({ "state": "offered", "at": at }),
+                    Answer::Refused(reason, at) => {
+                        json!({ "state": "refused", "reason": reason, "at": at })
+                    }
+                };
+                json!({ "id": row.id, "to": row.to, "sentSecs": row.sent_secs, "preview": row.preview, "answer": answer })
+            })
+            .collect()
+    }
+
+    /// One line per recent send: its age, the recipient, the start of the body and what the
+    /// receiving machine answered, with the seconds the answer took.
+    pub fn recent_lines(&self, now_secs: u64) -> Vec<String> {
+        self.recent
+            .iter()
+            .map(|row| {
+                let age = now_secs.saturating_sub(row.sent_secs);
+                let took = |at: u64| at.saturating_sub(row.sent_secs);
+                let answer = match &row.answer {
+                    Answer::None => "no answer yet".to_owned(),
+                    Answer::Offered(at) => format!("offered to the session after {} s", took(*at)),
+                    Answer::Refused(reason, at) => {
+                        format!("refused ({reason}) after {} s", took(*at))
+                    }
+                };
+                let to = row.to.rsplit('/').next().unwrap_or(&row.to);
+                format!(
+                    "  sent {} ago to {} \"{}\": {answer}",
+                    ago(age),
+                    to.chars().take(8).collect::<String>(),
+                    row.preview
+                )
+            })
+            .collect()
+    }
+}
+
+fn ago(secs: u64) -> String {
+    match secs {
+        0..=119 => format!("{secs} s"),
+        120..=7199 => format!("{} min", secs / 60),
+        _ => format!("{} h", secs / 3600),
     }
 }
 
@@ -223,6 +299,8 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
     // id -> the machine it went to, and what the latest settlement of it says.
     let mut sent: std::collections::BTreeMap<String, (String, Option<Result<(), String>>)> =
         Default::default();
+    let mut rows: Vec<SentRow> = Vec::new();
+    let mut answered_at: std::collections::BTreeMap<String, u64> = Default::default();
     for event in events
         .iter()
         .filter(|e| e.event_type == MESSAGE_SENT && e.origin == own_origin && recent(&e.ts))
@@ -230,6 +308,18 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
         let payload = &event.payload;
         if let (Some(id), Some(to)) = (payload["id"].as_str(), payload["to"]["machine"].as_str()) {
             sent.insert(id.to_owned(), (to.to_owned(), None));
+            rows.push(SentRow {
+                id: id.to_owned(),
+                to: payload["to"]["id"].as_str().unwrap_or_default().to_owned(),
+                sent_secs: iso_utc_secs(&event.ts).unwrap_or(0),
+                preview: payload["body"]
+                    .as_str()
+                    .unwrap_or_default()
+                    .chars()
+                    .take(PREVIEW_CHARS)
+                    .collect(),
+                answer: Answer::None,
+            });
         }
     }
     for event in events.iter().filter(|e| e.event_type == MESSAGE_SETTLED) {
@@ -260,6 +350,10 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
         if verified.is_none_or(|v| v.machine_id != by) {
             continue;
         }
+        answered_at.insert(
+            id.to_owned(),
+            payload["at"].as_str().and_then(iso_utc_secs).unwrap_or(0),
+        );
         *settled = match outcome {
             "offered" => Some(Ok(())),
             "refused" => Some(Err(payload["reason"]
@@ -273,6 +367,14 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
         sent: sent.len(),
         ..Default::default()
     };
+    for row in &mut rows {
+        let at = answered_at.get(&row.id).copied().unwrap_or(0);
+        row.answer = match sent.get(&row.id).and_then(|(_, settled)| settled.as_ref()) {
+            None => Answer::None,
+            Some(Ok(())) => Answer::Offered(at),
+            Some(Err(reason)) => Answer::Refused(reason.clone(), at),
+        };
+    }
     for (_, settled) in sent.into_values() {
         match settled {
             None => summary.waiting += 1,
@@ -280,6 +382,8 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
             Some(Err(reason)) => *summary.refused.entry(reason).or_default() += 1,
         }
     }
+    let skip = rows.len().saturating_sub(RECENT_SENDS);
+    summary.recent = rows.split_off(skip);
     Ok(summary)
 }
 

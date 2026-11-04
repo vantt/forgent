@@ -1280,7 +1280,7 @@ test('the cross-machine note counts the mail and names a machine key that is sti
   assert.equal(crossMachineNote(undefined), '');
   assert.equal(
     crossMachineNote({ sent: 2, offered: 1, waiting: 1, refused: { 'unknown-name': 1 }, unconfirmedMachines: [] }),
-    '; cross-machine: 2 sent, 1 offered, 1 waiting for the receiver, 1 refused',
+    '; cross-machine: 2 sent, 1 offered, 1 with no answer yet, 1 refused',
   );
   assert.match(
     crossMachineNote({ sent: 0, offered: 0, waiting: 0, refused: {}, unconfirmedMachines: ['fg-server-sqs7es'] }),

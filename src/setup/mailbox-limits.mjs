@@ -52,7 +52,7 @@ export function mailboxRefusalLine(optIn) {
 export function crossMachineNote(cross) {
   if (!cross) return '';
   const refused = Object.values(cross.refused ?? {}).reduce((sum, n) => sum + n, 0);
-  const counts = `cross-machine: ${cross.sent} sent, ${cross.offered} offered, ${cross.waiting} waiting for the receiver, ${refused} refused`;
+  const counts = `cross-machine: ${cross.sent} sent, ${cross.offered} offered, ${cross.waiting} with no answer yet, ${refused} refused`;
   const unconfirmed = cross.unconfirmedMachines ?? [];
   if (unconfirmed.length === 0) return `; ${counts}`;
   return `; ${counts}; warning: mail from ${unconfirmed.join(', ')} is held until you confirm its key (fgos identity pins --confirm <machine-id> --fingerprint <fingerprint>)`;

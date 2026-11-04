@@ -350,8 +350,12 @@ fn status(json: bool) -> MailboxAnswer {
                         "offered": summary.offered,
                         "waiting": summary.waiting,
                         "refused": summary.refused,
+                        "recent": summary.recent_json(),
                     });
                     text.push_str(&format!("\n{}", summary.text()));
+                    for line in summary.recent_lines(secs) {
+                        text.push_str(&format!("\n{line}"));
+                    }
                 }
                 Err(why) => text.push_str(&format!("\ncross-machine: unavailable ({why})")),
             }

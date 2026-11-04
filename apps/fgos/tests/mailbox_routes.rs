@@ -2080,7 +2080,16 @@ fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_r
         serde_json::from_slice::<serde_json::Value>(&out.stdout).unwrap()["data"]["crossMachine"]
             .clone()
     };
-    assert_eq!(status()["waiting"], 1, "no settlement yet: {}", status());
+    let waiting = status();
+    assert_eq!(waiting["waiting"], 1, "no settlement yet: {waiting}");
+    assert_eq!(
+        (
+            &waiting["recent"][0]["preview"],
+            &waiting["recent"][0]["answer"]["state"]
+        ),
+        (&"hello from alpha".into(), &"none".into()),
+        "the send is listed with its body and no answer: {waiting}"
+    );
     sync(&beta);
     sync(&alpha);
     let folded = status();
@@ -2092,6 +2101,10 @@ fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_r
         ),
         (1.into(), 1.into(), 0.into()),
         "{folded}"
+    );
+    assert_eq!(
+        folded["recent"][0]["answer"]["state"], "offered",
+        "the listed send carries beta's signed answer: {folded}"
     );
 
     let over = send(&"x".repeat(2049));
