@@ -5,11 +5,16 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single lock port for every cold fgOS lock: kernel locks on open file descriptions behind one OS-neutral port
 Design status: Accepted
-Implementation status: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.
+Implementation: Implemented. The Node facade reaches the crate in process on Linux and macOS through the `holderLock` namespace of the combined addon (2026-10-22), and through the `lock-hold` helper on Windows. The main checkout single door, `worktree-admin` and `fgos lock fence` are specified in sections 14, 16 and 17; the hot state mutex is section 15.
 Canonical: Yes
 Owner: Holder-lock component
 Source: packages/holder-lock/rust (crate fgos-holder-lock), src/holder-lock/ (Node facade)
 Contracts: packages/holder-lock/contracts/
+Provenance: First committed in 0e377d7b6 (2026-10-16); moved to docs/platform by 97dd62aa7
+Writer type: Human + agent coauthor
+Canonical for: The single lock port for every cold fgOS lock, the lock registry, lock order and the guarantee levels per filesystem
+Use this when: Adding or changing a lock, its registry row or scope, or deciding who holds a resource as the kernel reports it
+Do not use this for: Writer identity, process liveness judgment, the attempt lock's lifecycle or the state store's hot mutex
 Last reviewed: 2026-10-17
 Related:
 - docs/platform/process/spec.md

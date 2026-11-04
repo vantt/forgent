@@ -5,6 +5,12 @@ Document type: Contract
 Audience: Maintainer, implementer, agent
 Purpose: Preserve native-first dispatch, session merge isolation and operation-template contracts with their historical boundaries
 Design status: Accepted at atomic cutover
+Implementation: Conserved doctrine; no new execution mechanism
+Provenance: Conserved at the documentation cutover (97dd62aa7) from docs/specs/runner.md at 947dc310396071a4d530216d5c06d05993d63bf5 and the return guard in bin/fgos.mjs
+Writer type: Agent source carriage
+Canonical for: Native-first dispatch, session merge isolation and operation-template contracts, each with its historical boundary
+Use this when: Checking why dispatch is native-first or why a merge into main must not run from a session worktree
+Do not use this for: The full verbatim rules, which live in the runner decision record linked in Related, or any new execution mechanism
 Last reviewed: 2026-10-24
 Related:
 - docs/platform/runner/spec.md

@@ -5,6 +5,12 @@ Document type: History
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Dated narrative record of how the multi-role team harness decision was distilled and what happened after the distill.
 Design status: Archived
+Implementation: Not applicable; dated historical record, no implementation claim
+Provenance: docs/specs/work-state.md at 947dc310396071a4d530216d5c06d05993d63bf5 (the journey and distill-state sections); conserved at the documentation cutover (97dd62aa7)
+Writer type: Agent source carriage
+Canonical for: Nothing current; it retains how the multi-role team harness decision was distilled and what followed
+Use this when: Tracing the origin of the multi-role harness decision
+Do not use this for: Current work-state behavior, which the work-state spec owns
 Last reviewed: 2026-10-06
 Related:
 - docs/platform/work-state/README.md

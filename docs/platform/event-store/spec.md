@@ -5,12 +5,17 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for how an fgOS event becomes durable, how it is sealed into git objects on per-machine refs, how it is shared across machines, and how it is read back
 Design status: Signed by the owner on 2026-10-17 (D-ADR0055). It is the contract for starting implementation under the gates of section 23; it does not claim the design is proven.
-Implementation status: Store layer proven by the store part of the section 23.2 gate on 2026-10-20 (plans/reports/verification-261020-2012-event-store-store-proof-gate.md). Work and porting are registered consumers on the Work cutover branch (`work/es-cutover`): the readers, triggers, Land policy, verbs and doctor rows are implemented, parity is exact on copies of all three workspace repositories and the retired families are gone from the tree (plans/reports/verification-261023-1630-work-cutover-parity-and-docs.md). Still open before acceptance: the candidate-release runs of section 23.2 items 1-4, 5 (real forge), 6-8 and 10-11, and the repository's own `fgos events migrate` (the report's matrix lists each)
+Implementation: Store layer proven by the store part of the section 23.2 gate on 2026-10-20 (plans/reports/verification-261020-2012-event-store-store-proof-gate.md). Work and porting are registered consumers on the Work cutover branch (`work/es-cutover`): the readers, triggers, Land policy, verbs and doctor rows are implemented, parity is exact on copies of all three workspace repositories and the retired families are gone from the tree (plans/reports/verification-261023-1630-work-cutover-parity-and-docs.md). Still open before acceptance: the candidate-release runs of section 23.2 items 1-4, 5 (real forge), 6-8 and 10-11, and the repository's own `fgos events migrate` (the report's matrix lists each)
 Canonical: Yes (D-ADR0055, 2026-10-17)
 
 Owner: Event Store component
 Source (planned): packages/event-store/rust (crate fgos-event-store); Node facade src/event-store/ over the one combined N-API addon that links fgos-event-store and fgos-git (section 17)
 Contracts (planned): packages/event-store/contracts/
+Provenance: First committed in 6a614a669 (2026-10-17); moved to docs/platform by 97dd62aa7; signed as D-ADR0055 the same day
+Writer type: Human + agent coauthor
+Canonical for: How an fgOS event becomes durable, is sealed into git objects on per-machine refs, is shared across machines and is read back
+Use this when: Changing or reviewing the event store, its seals, refs or readers, or a consumer such as Work or porting that registers with it
+Do not use this for: Proof that the candidate-release gates of section 23.2 passed; the Implementation field lists what is still open
 Last reviewed: 2026-10-23
 Supersedes: L3 clauses 1 and 4 in docs/platform/platform-foundations.md#l3-luật-store-truth-ở-jsonl-db-là-view (D-ID ae461c8b, superseded by D-ADR0055); D-ADR0003 data layout
 Related:

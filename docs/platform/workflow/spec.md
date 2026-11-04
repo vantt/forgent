@@ -7,6 +7,12 @@ Purpose: Preserve the Workflow contract, rules, decisions and implementation poi
 Design status: Accepted at atomic cutover
 Owner: Workflow component
 Source: docs/specs/workflow.md at 947dc310396071a4d530216d5c06d05993d63bf5
+Implementation: Partial (carried source coverage: partial); the design is settled and was not re-verified at cutover
+Provenance: docs/specs/workflow.md at 947dc310396071a4d530216d5c06d05993d63bf5; first committed in 9ec72efbc (2026-10-19)
+Writer type: Human + agent coauthor
+Canonical for: The Workflow contract: guide, case and admission, with its rules, decisions and implementation pointers
+Use this when: Changing how a workflow guide is admitted or how a case runs, or reading the workflow decisions
+Do not use this for: Claims that every settled rule is implemented; consult the implementation pointers and tests
 Last reviewed: 2026-10-23
 Related:
 - docs/platform/component-boundary.md

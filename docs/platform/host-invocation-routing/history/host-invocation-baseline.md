@@ -5,10 +5,15 @@ Document type: History
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the old host-invocation baseline and migration context after promotion
 Design status: Draft
-Implementation status: Historical/current source snapshot
+Implementation: Historical/current source snapshot
 Canonical: Yes, after review, for migration history only
 Owner: Host invocation
 Source type: Summary of docs/architect/host-invocation-routing/**
+Provenance: First committed in 05b6bf861 (2026-09-14) as a summary of docs/architect/host-invocation-routing/**; carried to docs/platform by 97dd62aa7
+Writer type: Agent draft writer
+Canonical for: Migration history of the old host-invocation baseline after promotion
+Use this when: Looking up the old command-readiness classification and the historical decisions the migration preserved
+Do not use this for: Current routes (see the area spec and command-routes.json) or any claim that a command is still near-thin or not-thin
 Last reviewed: 2026-09-14
 Related:
 - docs/platform/host-invocation-routing/history/source-inventory.md

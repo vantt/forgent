@@ -5,6 +5,12 @@ Document type: Contract
 Audience: Maintainer, implementer, agent
 Purpose: Preserve machine-token startup refusal and the web client's baseUrl-only reachability interpretation
 Design status: Accepted at atomic cutover
+Implementation: Existing behavior: the gateway reads the machine token from the global config and refuses startup without it; no new startup path
+Provenance: Conserved at the documentation cutover (97dd62aa7) from docs/specs/distribution.md at 947dc310396071a4d530216d5c06d05993d63bf5 (distribution row 5b and the R5 client contract)
+Writer type: Agent source carriage
+Canonical for: Machine-token startup refusal of the gateway and the web client's baseUrl-only reachability reading
+Use this when: Changing gateway startup, the gateway-token doctor fix or the client's network-reachability display
+Do not use this for: Static-serving, lifecycle or bind defaults, or any new startup path for the gateway
 Last reviewed: 2026-10-24
 Related:
 - docs/platform/herdr-web-dashboard/spec.md

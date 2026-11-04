@@ -5,6 +5,11 @@ Document type: History
 Audience: Reviewer, maintainer, history reader
 Purpose: Retain the retired area documentation policy and migration plan verbatim as non-authority history
 Design status: Draft
+Implementation: Not applicable; retained retired migration plan, no implementation claim
+Writer type: Human + agent coauthor
+Canonical for: Nothing current; it retains the retired host-invocation documentation migration plan as history
+Use this when: Reconstructing how the host-invocation docs were migrated in September 2026
+Do not use this for: Current documentation policy, current runtime behavior or implementation truth
 Last reviewed: No current review date recorded; retained source dates are historical
 Related: docs/platform/host-invocation-routing/README.md
 Provenance: docs/architect/host-invocation-routing/documentation-standardization-plan.md at 83d757f4d693ae13d3fd50e0a454fb95c78f1ff4

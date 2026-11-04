@@ -5,11 +5,16 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for "is this process tuple alive, dead or unknown" and for signalling a process by identity
 Design status: Accepted
-Implementation status: Implemented (judge vectors, the crate, the domain primitives and the Node door)
+Implementation: Implemented (judge vectors, the crate, the domain primitives and the Node door)
 Canonical: Yes
 Owner: Process component (facts + control, L0)
 Source: packages/process/rust (crate fgos-process); Node door src/native/door.mjs and thin client src/runner/dispatch/process-identity.mjs
 Contracts: packages/process/contracts/
+Provenance: First committed in 0e377d7b6 (2026-10-16); moved to docs/platform by 97dd62aa7
+Writer type: Human + agent coauthor
+Canonical for: Whether a process tuple is alive, dead or unknown, and signalling or containing a process by identity
+Use this when: Changing the judge table, boot id and start time reads, lock-holder scans or the domain primitives
+Do not use this for: Which lock anyone holds, writer identity, or what to do with a holder or scanned process
 Last reviewed: 2026-10-21
 Related:
 - docs/platform/holder-lock/spec.md

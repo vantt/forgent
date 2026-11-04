@@ -5,11 +5,16 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the pure per-CLI adapters that read what an agent CLI showed and name what happened, for the run supervisor
 Design status: Accepted
-Implementation status: Built (direct and terminal adapters for claude, codex, agy, pi, omp)
+Implementation: Built (direct and terminal adapters for claude, codex, agy, pi, omp)
 Canonical: Yes
 Owner: Agent-protocol component (L3)
 Source: packages/agent-protocol/rust (crate fgos-agent-protocol)
 Contracts: packages/agent-protocol/contracts/
+Provenance: First committed in ea9584116 (2026-10-18); moved to docs/platform by 97dd62aa7
+Writer type: Human + agent coauthor
+Canonical for: The pure per-CLI adapters that read what an agent CLI showed and name what happened, for the run supervisor
+Use this when: Adding or changing an adapter for claude, codex, agy, pi or omp, or checking what an adapter may and may not decide
+Do not use this for: Launching, supervising or retrying a run, picking a model or opening a terminal pane; those belong to the run supervisor, terminal control and the runner
 Last reviewed: 2026-10-24
 Related:
 - docs/platform/run-supervisor/spec.md

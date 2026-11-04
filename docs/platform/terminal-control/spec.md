@@ -5,11 +5,16 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for "which pane does this key run in" on a terminal multiplexer
 Design status: Accepted
-Implementation status: Built (Rust core, herdr driver, internal route, Node client and dispatch migration, setup and doctor); `/fgOS:terminal` migrated; tmux and herdr-dashboard deferred
+Implementation: Built (Rust core, herdr driver, internal route, Node client and dispatch migration, setup and doctor); `/fgOS:terminal` migrated; tmux and herdr-dashboard deferred
 Canonical: Yes
 Owner: Terminal Control component
 Source: packages/terminal-control/rust
 Contracts: packages/terminal-control/contracts/
+Provenance: First committed in 9574d09e4 (2026-10-16); moved to docs/platform by 97dd62aa7
+Writer type: Human + agent coauthor
+Canonical for: Which terminal pane a key runs in on a multiplexer, and whether that pane is still alive
+Use this when: Changing the herdr driver, the pane key model or the terminal client and its dispatch migration
+Do not use this for: Run state, deadlines or attempts; tmux and the herdr dashboard are deferred and not specified here
 Last reviewed: 2026-10-23
 Related:
 - docs/platform/run-supervisor/spec.md

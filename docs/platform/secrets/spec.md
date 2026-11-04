@@ -5,11 +5,16 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define where an fgOS secret lives, who may resolve it, and how it reaches the one process that needs it, so that it does not leak through git and a confined agent cannot read it by trying, within what is physically possible. Config loading is a separate, later component that depends on this one.
 Design status: Draft proposal. Not signed. Open questions for the owner stand in section 15.
-Implementation status: Not started
+Implementation: Not started
 Canonical: No (becomes canonical when signed)
 
 Owner: Secrets component (proposed)
 Source (planned): language not decided (section 15 question 1); thin wiring for `fgos secrets` and a `fgos doctor` check
+Provenance: First committed in 675dd41a8 (2026-10-19); carried to docs/platform by 97dd62aa7
+Writer type: Agent draft writer
+Canonical for: Nothing yet; it is the draft proposal for where an fgOS secret lives and who may resolve it, and becomes canonical only when signed
+Use this when: Reviewing the SecretSource port proposal and the owner questions in section 15
+Do not use this for: Current secret handling: the spec is unsigned and not started, so the practice recorded in section 2 still applies
 Last reviewed: 2026-10-19
 Supersedes: nothing. It replaces the hand-made practice recorded in section 2.
 Related:

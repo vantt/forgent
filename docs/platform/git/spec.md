@@ -1,5 +1,31 @@
 # Git Component Specification
 
+```txt
+Document type: BA-grade area specification
+Audience: reviewer, maintainer, implementation agent
+Purpose: One authority for fgOS repository operations and recovery in every domain
+Design status: Accepted G0, D-ADR0057 (2026-10-18). Owner answered Q1-Q7 and R30 on 2026-10-17; proofs runnable at G0 re-checked 2026-10-18 (§19).
+Implementation: every typed port of §3 (Inspect, Refs, Worktree, ScopedCommit, Sync, Land, SafeRestore, RepositoryConfig, Remote, Recovery, Publication), the durable file WAL and its scans, the combined Node addon and release manifest support, the controller-owned activation fence and C5 admission, and the Git doctor rows are implemented on Linux; Git phase 07 moves the remaining Node callers onto the ports. Not complete: the whole-product one-door gate (`git-mutation-one-door`, V-GATE) lands with the last phase 07 unit, and implementation done (§17) still needs the phase 08 proofs recorded in §19 "Implementation runs" (E1, E3 Land budget, P-SPACE after-effect, P-CUTOVER; V-CONSUMER, P-RELEASE and E4 on `bwrap-pidns` are recorded in the 2026-10-21 follow-up runs).
+Canonical: Yes (docs/platform/git/spec.md)
+Owner: Git component
+Source (proposed): packages/git/rust, crate fgos-git
+Node facade (proposed): src/git/; every Node-reachable Git operation goes through one combined
+ N-API addon that links fgos-event-store and fgos-git (owner decision Q1)
+Contracts (proposed): packages/git/contracts/
+Dependencies: holder-lock, process facts/control, Session Identity, hardened Git CLI
+Provenance: First committed in fa8c7611d (2026-10-17); moved to docs/platform by 97dd62aa7; assembled from the settled output of an architecture council (council run in the second block below), signed as D-ADR0057 on 2026-10-18
+Writer type: Human + agent coauthor
+Canonical for: Repository operations and their recovery in every domain: the typed Git ports, the operation WAL and the Publication port
+Use this when: Changing or reviewing anything that mutates local objects, refs, index or worktrees, or the local side of fetch and push
+Do not use this for: Business approval, Work lifecycle, event envelopes or verify/build steps; these are consumers of Git, not Git operations
+Last reviewed: 2026-10-26 (date of the last text change in git; no separate review recorded)
+Related: docs/platform/event-store/spec.md; docs/platform/holder-lock/spec.md;
+ docs/platform/component-boundary.md; docs/platform/runner/spec.md;
+ docs/platform/packaging-distribution/README.md; docs/platform/packaging-distribution/spec.md;
+ plans/reports/brief-261017-1907-git-g0-spec-council-inputs.md;
+ plans/reports/research-261017-1032-git-lessons-catalogue.md
+```
+
 Status: Accepted G0, canonical. Signed by the owner 2026-10-18 as D-ADR0057 (Git là một thành phần nền). Proofs runnable at G0 passed in finite models and probes (§19); vectors that need an implementation, a real device or owner-written budgets stay implementation-time conditions (§19).
 
 Amended 2026-10-18 (owner, A1): Publication supersession, §10 rule 4a; amends D-ADR0057 as D-ADR0058; re-checked 2026-10-18 (a1-model-recheck `wf-run-1792294509927-9dd08319`, a1-vcas-recheck `wf-run-1792294510067-c73acc31`), two wording fixes folded (holder-lock admission, not a raw kernel acquire; backend native lock artifacts).
@@ -29,26 +55,6 @@ Re-check fold: 2026-10-18 (Asia/Saigon), five re-check runs folded into §§2-6,
   P-WAL-ID unit-run-1792258831821-6bcbac29; V-CAS recovery unit-run-1792258831977-3ff6a365;
   P-SYM-HOOK race unit-run-1792258832134-b64a7405.
   Fold report: plans/reports/review-261018-0140-git-g0-recheck-fold-verdicts.md
-```
-
-```txt
-Document type: BA-grade area specification
-Audience: reviewer, maintainer, implementation agent
-Purpose: One authority for fgOS repository operations and recovery in every domain
-Design status: Accepted G0, D-ADR0057 (2026-10-18). Owner answered Q1-Q7 and R30 on 2026-10-17; proofs runnable at G0 re-checked 2026-10-18 (§19).
-Implementation status: every typed port of §3 (Inspect, Refs, Worktree, ScopedCommit, Sync, Land, SafeRestore, RepositoryConfig, Remote, Recovery, Publication), the durable file WAL and its scans, the combined Node addon and release manifest support, the controller-owned activation fence and C5 admission, and the Git doctor rows are implemented on Linux; Git phase 07 moves the remaining Node callers onto the ports. Not complete: the whole-product one-door gate (`git-mutation-one-door`, V-GATE) lands with the last phase 07 unit, and implementation done (§17) still needs the phase 08 proofs recorded in §19 "Implementation runs" (E1, E3 Land budget, P-SPACE after-effect, P-CUTOVER; V-CONSUMER, P-RELEASE and E4 on `bwrap-pidns` are recorded in the 2026-10-21 follow-up runs).
-Canonical: Yes (docs/platform/git/spec.md)
-Owner: Git component
-Source (proposed): packages/git/rust, crate fgos-git
-Node facade (proposed): src/git/; every Node-reachable Git operation goes through one combined
- N-API addon that links fgos-event-store and fgos-git (owner decision Q1)
-Contracts (proposed): packages/git/contracts/
-Dependencies: holder-lock, process facts/control, Session Identity, hardened Git CLI
-Related: docs/platform/event-store/spec.md; docs/platform/holder-lock/spec.md;
- docs/platform/component-boundary.md; docs/platform/runner/spec.md;
- docs/platform/packaging-distribution/README.md; docs/platform/packaging-distribution/spec.md;
- plans/reports/brief-261017-1907-git-g0-spec-council-inputs.md;
- plans/reports/research-261017-1032-git-lessons-catalogue.md
 ```
 
 This text applies framing A as document skeleton, panelist 1 authority/schema/receipt, panelist 3 C1–C6, and the round-1 critique's freeze bar. It does **not** fold B's host-spawn route or ref-only journal. The owner's Q1 answer adopts LockScope option (a) of §5, a Rust-owned scope that receives the caller's held ranks and lease descriptors as explicit, kernel-verifiable parameters; this is B's `heldRanks` made kernel-verifiable, never a bitmap. The reachability pin is installed and read back in prepare, **before** the single-ref target CAS; a multi-ref `update-ref --stdin` transaction is never treated as crash-atomic (the Git floor proof killed one between ref installs, §4, §10). The file WAL remains the only receipt authority.

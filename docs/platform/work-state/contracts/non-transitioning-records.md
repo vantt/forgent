@@ -5,6 +5,12 @@ Document type: Contract
 Audience: Maintainer, implementer, agent
 Purpose: Preserve decision and outcome record semantics without changing work-item status or workflow step
 Design status: Accepted at atomic cutover
+Implementation: Existing two-verb precedent (decision and outcome); not an implementation of STR70a
+Provenance: docs/specs/work-state.md at 947dc310396071a4d530216d5c06d05993d63bf5; conserved at the documentation cutover (97dd62aa7)
+Writer type: Agent source carriage
+Canonical for: Decision and outcome record semantics that never change a work item's status or workflow step
+Use this when: Adding a record verb that must append to a work item without transitioning it
+Do not use this for: The STR70a proposal, or engine bookkeeping, which is not a design decision
 Last reviewed: 2026-10-24
 Related:
 - docs/platform/work-state/spec.md

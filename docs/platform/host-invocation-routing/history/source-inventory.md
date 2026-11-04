@@ -5,10 +5,15 @@ Document type: History
 Audience: Human reviewer, architect, maintainer, documentation agent
 Purpose: Classify old host-invocation source docs and record migration disposition
 Design status: Draft
-Implementation status: Current migration snapshot
+Implementation: Current migration snapshot
 Canonical: Yes, after review, for source disposition only
 Owner: Host invocation
 Source type: Inventory of docs/architect/host-invocation-routing/**
+Provenance: First committed in 05b6bf861 (2026-09-14) as an inventory of docs/architect/host-invocation-routing/**; carried to docs/platform by 97dd62aa7
+Writer type: Agent draft writer
+Canonical for: Source disposition of the old host-invocation documents at the time of the migration
+Use this when: Finding where an old host-invocation source was split, redirected or archived
+Do not use this for: Current document locations, which the area portal and links own
 Last reviewed: 2026-09-14
 Related:
 - docs/platform/host-invocation-routing/intent-preservation-ledger.md

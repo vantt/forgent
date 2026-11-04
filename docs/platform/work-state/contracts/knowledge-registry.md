@@ -5,6 +5,12 @@ Document type: Contract
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define registry identity and attestation constraints plus end-user authoring and index contracts
 Design status: Accepted at atomic cutover
+Implementation: Existing registry in src/state/knowledge-registry.mjs; the whole redesign, migration and resolver are not claimed
+Provenance: docs/architect/knowledge-registry-redesign.md at 947dc310396071a4d530216d5c06d05993d63bf5; conserved at the documentation cutover (97dd62aa7)
+Writer type: Agent source carriage
+Canonical for: Framework and role vocabulary, durable document identity, lifecycle and attestation constraints consumed by the registry, the CLI and the producer skill
+Use this when: Changing the knowledge registry schema, its attestation gate or the end-user index contract
+Do not use this for: The redesign as a whole, migration or resolver hosting, which this contract does not claim
 Last reviewed: 2026-10-23
 Related:
 - docs/platform/work-state/spec.md

@@ -5,7 +5,7 @@ Document type: BA-grade area specification (draft)
 Audience: Owner, maintainer, implementation agent
 Purpose: One authority that mints and resolves the identities of machines, projects, clones and agent sessions, globally unique across machines and independent of any one project
 Design status: G0 signed 2026-10-22 for rungs I1-I4; I5 (authenticity mechanism) open
-Implementation status: Rungs I1 (project id), I2 (machine id and handle), I3a (session full id and handle), I3b (local directory, role aliases, resolve, list), the mint door, I5 (signing key, pins) and I4 (shared directory across machines, section 5) implemented; the two-machine proof on real machines pending
+Implementation: Rungs I1 (project id), I2 (machine id and handle), I3a (session full id and handle), I3b (local directory, role aliases, resolve, list), the mint door, I5 (signing key, pins) and I4 (shared directory across machines, section 5) implemented; the two-machine proof on real machines pending
 Canonical: Yes for rungs I1-I4 (G0 signed 2026-10-22, section 10)
 Owner: Identity component (proposed)
 Source: packages/identity/rust

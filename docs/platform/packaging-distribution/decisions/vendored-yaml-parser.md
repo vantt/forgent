@@ -5,6 +5,12 @@ Document type: Historical decision pointer
 Audience: Maintainer, implementer, agent
 Purpose: Locate the superseded vendored-parser decision and the current native YAML maintenance contract
 Design status: Superseded historical decision pointer; historical provenance only, no current authority
+Implementation: Not applicable; superseded decision pointer. Current YAML parsing goes through the native door
+Provenance: docs/specs/distribution.md at 947dc310396071a4d530216d5c06d05993d63bf5; conserved at the documentation cutover (97dd62aa7)
+Writer type: Agent source carriage
+Canonical for: Nothing current; it locates the superseded vendored-parser decision and the current native YAML maintenance contract
+Use this when: Following an old reference to RUL101 or the vendored js-yaml bundle to the current rule (RUL108)
+Do not use this for: Maintenance instructions: there is no JavaScript fallback or vendored bundle to maintain
 Last reviewed: 2026-10-24
 Related:
 - docs/platform/packaging-distribution/spec.md

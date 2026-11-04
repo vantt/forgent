@@ -7,6 +7,13 @@ Purpose: Preserve the Seat Binding contract, rules, decisions and implementation
 Design status: Accepted at atomic cutover
 Owner: Seat Binding component
 Source: docs/specs/seat-binding.md at 947dc310396071a4d530216d5c06d05993d63bf5
+Implementation: Implemented per the carried source status: owner approved the full text on 2026-10-20 and the code landed on 2026-10-21; not re-verified at cutover
+Provenance: docs/specs/seat-binding.md at 947dc310396071a4d530216d5c06d05993d63bf5; first committed in e0e52312a (2026-10-20)
+Writer type: Human + agent coauthor
+Canonical for: Which single authority answers "what does this seat run on": the seat binding contract, rules, decisions and implementation pointers
+Use this when: Changing how a seat resolves to a provider, model or tier, or reading the seat binding decisions
+Do not use this for: Per-run executor selection outside seat binding, or implementation claims beyond the cited code pointers
+Canonical: Yes
 Last reviewed: 2026-10-23
 Related:
 - docs/platform/component-boundary.md

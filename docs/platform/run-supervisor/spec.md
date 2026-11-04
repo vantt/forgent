@@ -5,11 +5,16 @@ Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the one process per attempt that owns a launched agent (in a headless process or in a terminal pane) after the controller handed it over, the launch gate that is the process root of the agent, the receipts, the post-receipt steps and the adopt door
 Design status: Accepted
-Implementation status: Built for `direct` (all platforms) and `terminal` (Linux and macOS; Windows reports `terminal-mode-unsupported`): contracts, crate, containment drivers, routes, Node steps, controller cutover of both modes, doctor checks
+Implementation: Built for `direct` (all platforms) and `terminal` (Linux and macOS; Windows reports `terminal-mode-unsupported`): contracts, crate, containment drivers, routes, Node steps, controller cutover of both modes, doctor checks
 Canonical: Yes
 Owner: Run supervisor component (L4)
 Source: packages/run-supervisor/rust (crate fgos-run-supervisor), src/run-supervisor/ (Node client, steps)
 Contracts: packages/run-supervisor/contracts/
+Provenance: First committed in ea9584116 (2026-10-18); moved to docs/platform by 97dd62aa7
+Writer type: Human + agent coauthor
+Canonical for: The one process per attempt that owns a launched agent after handover: launch gate, receipts and the post-handover protocol
+Use this when: Changing how an attempt is launched, contained, observed or reported in direct or terminal mode
+Do not use this for: Choosing the executor, model or retry policy, or the Windows terminal mode, which reports terminal-mode-unsupported
 Last reviewed: 2026-10-18
 Related:
 - docs/platform/process/spec.md
