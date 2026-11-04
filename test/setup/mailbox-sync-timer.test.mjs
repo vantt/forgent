@@ -79,3 +79,34 @@ test('the timer names the project installation shim when there is one, so an upg
   const service = fs.readdirSync(path.join(w.home, 'units')).find((name) => name.endsWith('.service'));
   assert.ok(fs.readFileSync(path.join(w.home, 'units', service), 'utf8').includes(shim));
 });
+
+test('turning cross-machine mail off makes doctor name the leftover timer and --fix remove only the unit files carrying the marker', () => {
+  const w = world();
+  const options = { schedule: on, scheduler: w.scheduler, bin, run: w.run };
+  assert.equal(fixMailboxSyncTimer('/p', options).fixed, true);
+  const units = path.join(w.home, 'units');
+  const foreign = path.join(units, 'someone-elses.timer');
+  fs.writeFileSync(foreign, '[Timer]\n');
+
+  const off = { ...options, schedule: () => null };
+  const found = checkMailboxSyncTimer('/p', off);
+  assert.equal(found.passed, false);
+  assert.match(found.message, /still installed/);
+
+  const removed = fixMailboxSyncTimer('/p', off);
+  assert.equal(removed.fixed, true, removed.message);
+  assert.ok(w.calls.some((call) => call.includes('disable --now fgos-mailbox-sync-')), w.calls.join('\n'));
+  assert.deepEqual(fs.readdirSync(units), ['someone-elses.timer']);
+  assert.equal(checkMailboxSyncTimer('/p', off).passed, true);
+});
+
+test('a unit file without the marker is never removed, even under this project\'s unit name', () => {
+  const w = world();
+  const units = path.join(w.home, 'units');
+  fs.mkdirSync(units, { recursive: true });
+  const stem = unitStem('/p');
+  fs.writeFileSync(path.join(units, `${stem}.timer`), '[Timer]\nOnBootSec=1\n');
+  const result = fixMailboxSyncTimer('/p', { schedule: () => null, scheduler: w.scheduler, bin, run: w.run });
+  assert.equal(result.fixed, false);
+  assert.ok(fs.existsSync(path.join(units, `${stem}.timer`)));
+});

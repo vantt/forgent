@@ -4,9 +4,10 @@
 // when some session of the machine runs a tool. A machine that is idle gets no hook, so its mail
 // waits without an upper bound. This registers one OS timer per project that runs the same child
 // every `eventStore.sync.intervalSec`: a systemd user timer on Linux, a launchd agent on macOS.
-// `fgos doctor` reports it and `--fix` writes the unit files and enables them; `--fix` on a
-// project that does not use cross-machine mail removes nothing, and a project that turns it off
-// leaves its timer for the person to remove (the unit names are printed).
+// `fgos doctor` reports it and `--fix` writes the unit files and enables them. Every unit carries
+// a marker line, and only a unit with that marker is ever removed: `--fix` removes the timer of a
+// project that turned cross-machine mail off or set `eventStore.sync.intervalSec` to 0, and never
+// touches a unit it did not write.
 import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -37,12 +38,16 @@ export function unitStem(projectRoot) {
   return `fgos-mailbox-sync-${crypto.createHash('sha256').update(path.resolve(projectRoot)).digest('hex').slice(0, 8)}`;
 }
 
+/** The line every unit file this module writes carries; a file without it is not ours to remove. */
+export const MARKER = 'fgos-managed: mailbox-sync-timer';
+
 const quote = (text) => `"${String(text).replace(/(["\\])/g, '\\$1')}"`;
 
 /** The two systemd user units. The service runs the child once; the timer repeats it. */
 export function renderSystemd({ stem, bin, projectRoot, remote, intervalSec }) {
   return {
     [`${stem}.service`]: [
+      `# ${MARKER}`,
       '[Unit]',
       'Description=fgOS mailbox sync (takes mail from other machines)',
       '',
@@ -52,6 +57,7 @@ export function renderSystemd({ stem, bin, projectRoot, remote, intervalSec }) {
       '',
     ].join('\n'),
     [`${stem}.timer`]: [
+      `# ${MARKER}`,
       '[Unit]',
       'Description=fgOS mailbox sync timer',
       '',
@@ -74,6 +80,7 @@ export function renderLaunchd({ stem, bin, projectRoot, remote, intervalSec }) {
   return {
     [`dev.fgos.${stem}.plist`]: [
       '<?xml version="1.0" encoding="UTF-8"?>',
+      `<!-- ${MARKER} -->`,
       '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
       '<plist version="1.0">',
       '<dict>',
@@ -99,6 +106,10 @@ export function schedulerFor({ platform = process.platform, home = os.homedir(),
       dir: path.join(process.env.XDG_CONFIG_HOME || path.join(home, '.config'), 'systemd', 'user'),
       render: renderSystemd,
       enabled: (stem, run) => run('systemctl', ['--user', 'is-enabled', `${stem}.timer`]),
+      disable: (stem, run) => {
+        run('systemctl', ['--user', 'disable', '--now', `${stem}.timer`]);
+        run('systemctl', ['--user', 'daemon-reload']);
+      },
       enable: (stem, run) => {
         run('systemctl', ['--user', 'daemon-reload']);
         run('systemctl', ['--user', 'enable', '--now', `${stem}.timer`]);
@@ -111,6 +122,7 @@ export function schedulerFor({ platform = process.platform, home = os.homedir(),
       dir: path.join(home, 'Library', 'LaunchAgents'),
       render: renderLaunchd,
       enabled: (stem, run) => run('launchctl', ['print', `gui/${uid}/dev.fgos.${stem}`]),
+      disable: (stem, run) => run('launchctl', ['bootout', `gui/${uid}/dev.fgos.${stem}`]),
       enable: (stem, run, dir) => {
         const file = path.join(dir, `dev.fgos.${stem}.plist`);
         try {
@@ -125,9 +137,15 @@ export function schedulerFor({ platform = process.platform, home = os.homedir(),
   return null;
 }
 
-// The only two programs this module starts, each named where it is called.
+// The only two programs this module starts, each named where it is called. They run with a
+// cleared environment plus the few variables a per-user service manager needs to find its bus.
+function minimalEnv() {
+  const keep = ['HOME', 'USER', 'LOGNAME', 'XDG_RUNTIME_DIR', 'DBUS_SESSION_BUS_ADDRESS'];
+  return { PATH: '/usr/local/bin:/usr/bin:/bin', ...Object.fromEntries(keep.filter((k) => process.env[k]).map((k) => [k, process.env[k]])) };
+}
+
 const defaultRun = (command, args) => {
-  const options = { stdio: 'pipe', timeout: 15000 };
+  const options = { stdio: 'pipe', timeout: 15000, env: minimalEnv() };
   if (command === 'systemctl') return execFileSync('systemctl', args, options);
   if (command === 'launchctl') return execFileSync('launchctl', args, options);
   throw new Error(`mailbox sync timer does not start ${command}`);
@@ -160,9 +178,26 @@ function isExecutable(file) {
   }
 }
 
+/** The unit files of this project's timer that carry our marker, by name. */
+function ownedUnits(scheduler, stem) {
+  const names = scheduler.render({ stem, bin: 'x', projectRoot: 'x', remote: 'x', intervalSec: 1 });
+  return Object.keys(names).filter((name) => {
+    try {
+      return fs.readFileSync(path.join(scheduler.dir, name), 'utf8').includes(MARKER);
+    } catch {
+      return false;
+    }
+  });
+}
+
 function plan(cwd, { schedule, scheduler, bin }) {
   const found = schedule();
-  if (!found) return { skip: 'cross-machine mail is not enabled here, so no timer is needed' };
+  if (!found) {
+    const chosen = scheduler();
+    const owned = chosen ? ownedUnits(chosen, unitStem(cwd)) : [];
+    if (owned.length > 0) return { orphan: { chosen, stem: unitStem(cwd), owned } };
+    return { skip: 'cross-machine mail is not enabled here (or eventStore.sync.intervalSec is 0), so no timer is needed' };
+  }
   const chosen = scheduler();
   if (!chosen) return { skip: `no supported scheduler on ${process.platform}; mail is taken when a session runs a tool` };
   // The project's installation shim outlives an upgrade; a release path would not.
@@ -178,6 +213,9 @@ export function checkMailboxSyncTimer(
   { schedule = () => crossMachineSchedule(cwd), scheduler = () => schedulerFor(), bin = (dir) => resolveFgosBin(dir), run = defaultRun } = {},
 ) {
   const p = plan(cwd, { schedule, scheduler, bin });
+  if (p.orphan) {
+    return { passed: false, message: `${p.orphan.chosen.kind} timer ${p.orphan.stem} is still installed but cross-machine mail is off here (fgos doctor --fix removes it; only files with the ${MARKER} marker are touched)` };
+  }
   if (p.skip) return { passed: true, message: p.skip };
   const state = stateOf({ scheduler: p.chosen, files: p.files, stem: p.stem, run });
   if (state === 'ok') {
@@ -195,6 +233,7 @@ export function fixMailboxSyncTimer(
   { schedule = () => crossMachineSchedule(cwd), scheduler = () => schedulerFor(), bin = (dir) => resolveFgosBin(dir), run = defaultRun } = {},
 ) {
   const p = plan(cwd, { schedule, scheduler, bin });
+  if (p.orphan) return removeOwned(p.orphan, run);
   if (p.skip) return { fixed: false, message: `skipped: ${p.skip}` };
   fs.mkdirSync(p.chosen.dir, { recursive: true });
   for (const [name, text] of Object.entries(p.files)) {
@@ -209,4 +248,15 @@ export function fixMailboxSyncTimer(
     return { fixed: false, message: `wrote ${Object.keys(p.files).join(', ')} under ${p.chosen.dir}, but enabling failed: ${err.message.split('\n')[0]}` };
   }
   return { fixed: true, message: `enabled ${p.chosen.kind} timer ${p.stem} (every ${p.found.intervalSec} s); remove the files under ${p.chosen.dir} to undo` };
+}
+
+/** Disables the timer and deletes the unit files that carry our marker; any other file stays. */
+function removeOwned({ chosen, stem, owned }, run) {
+  try {
+    chosen.disable(stem, run);
+  } catch {
+    // not loaded: the files are still removed
+  }
+  for (const name of owned) fs.rmSync(path.join(chosen.dir, name), { force: true });
+  return { fixed: true, message: `removed ${chosen.kind} timer ${stem}: cross-machine mail is off here` };
 }
