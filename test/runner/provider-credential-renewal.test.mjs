@@ -1368,6 +1368,24 @@ test('staging a login syncs the staged file, its directory and the pending direc
   } finally { w.cleanup(); }
 });
 
+test('a pipe or a link in place of the home marker stops the removal at once, never waited on or followed', () => {
+  const w = workspace();
+  try {
+    const cleanupUrl = pathToFileURL(path.resolve('src/runner/dispatch/confinement/cleanup.mjs')).href;
+    for (const plant of [(file) => execFileSync('mkfifo', [file]), (file) => fs.symlinkSync(path.join(w.home, 'auth.json'), file)]) {
+      const dir = privateHomeWithRenewedLogin(w);
+      const marker = path.join(dir, OWNERSHIP_MARKER_FILE);
+      fs.rmSync(marker, { force: true });
+      plant(marker);
+      const script = `import { removeConfinementDir } from ${JSON.stringify(cleanupUrl)}; try { removeConfinementDir(${JSON.stringify(dir)}); } catch (err) { process.stdout.write(err.message); }`;
+      const said = execFileSync(process.execPath, ['--input-type=module', '-e', script], { timeout: 5000, encoding: 'utf8' });
+      assert.match(said, /ownership-marker-unreadable/);
+      assert.equal(fs.existsSync(path.join(dir, 'auth.json')), true, 'the renewed login is still in the home');
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  } finally { w.cleanup(); }
+});
+
 test('a marker file that is no fgOS marker at all stops the removal; one that names a contract is the caller\'s question', () => {
   const w = workspace();
   try {

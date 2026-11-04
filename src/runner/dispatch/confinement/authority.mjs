@@ -26,7 +26,7 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE, CREDENTIAL_HOME_KEPT, CREDENTIAL_HOME_HELD, CREDENTIAL_KEEP_MAX_ATTEMPTS, ATTEMPT_HOME_MARKER_CONTRACT, countCredentialKeep, removeEmptyDispatchParent, removeConfinementDir } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, CREDENTIAL_HOME_KEPT, CREDENTIAL_HOME_HELD, CREDENTIAL_KEEP_MAX_ATTEMPTS, ATTEMPT_HOME_MARKER_CONTRACT, countCredentialKeep, removeEmptyDispatchParent, removeConfinementDir, MAX_HOME_MARKER_BYTES } from "./cleanup.mjs";
 import { writeBackRenewedCredential } from "../provider-credential-renewal.mjs";
 import {
   canonicalJson,
@@ -1836,10 +1836,6 @@ function attemptFinalizationDescriptors(runDir) {
   }
   return found;
 }
-
-// The marker sits in the home the agent could write: read through the agent-file door (no link followed, no
-// blocking on a pipe, a bounded regular file). It only identifies the home; it never says where a login goes.
-const MAX_HOME_MARKER_BYTES = 64 * 1024;
 
 function readAttemptHomeMarker(homeDir, attemptId, runDir) {
   let marker;

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A pipe, link or oversized file planted by an agent in place of the project's `.mcp.json`, `.codex/hooks.json` or a private home's ownership marker no longer hangs or redirects dispatch: those files are read through the bounded, no-follow agent-file door and refused by name.
 - The blind-pool doctor row now reads an executor's provider family the way a run does, so an executor with no command of its own that takes the global `executor.command` is no longer judged as `claude`.
 - `fgos doctor` runs about a third of the host seat-binding calls it did (559 to 183 on this machine): the blind-pool row no longer walks each seat's whole fallback chain to read its candidates.
 - A settled run record with no classification is no longer counted as a pass: it is judged from its legacy fields, and one that cannot be read is an execution failure, so a seat whose result was lost no longer satisfies its unit.

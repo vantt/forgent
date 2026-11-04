@@ -32,6 +32,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
+import { readAgentFileSync } from './proof-helpers.mjs';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 
 /** Raised for every refusal and every failure. Carries a `code` so a caller can
@@ -162,6 +163,10 @@ export function trustRoots(projectPath, repoRoot) {
   return [...new Set(roots)];
 }
 
+// A project file the agent can write (`.mcp.json`, `.codex/hooks.json`) is read through the agent-file door: no link
+// followed, no blocking on a pipe, a bounded regular file.
+const MAX_PROJECT_FILE_BYTES = 1024 * 1024;
+
 /**
  * Per-process approval of the MCP servers a project declares in its own `.mcp.json`, as extra
  * claude arguments. claude asks a person to approve each such server before it starts, which
@@ -173,7 +178,7 @@ export function trustRoots(projectPath, repoRoot) {
 export function claudeMcpApprovalArgs({ cwd, repoRoot, storePath }) {
   let names;
   try {
-    const declared = JSON.parse(fs.readFileSync(path.join(cwd, '.mcp.json'), 'utf8'))?.mcpServers;
+    const declared = JSON.parse(readAgentFileSync(path.join(cwd, '.mcp.json'), MAX_PROJECT_FILE_BYTES).toString('utf8'))?.mcpServers;
     names = declared && typeof declared === 'object' ? Object.keys(declared) : [];
     // A linked worktree is trusted through the main checkout that owns it, as for folder trust.
     if (names.length === 0 || !trustRoots(path.resolve(cwd), repoRoot).some((root) => readTrust(storePath, root) === true)) return [];
@@ -399,7 +404,7 @@ export function codexHookTrustHash(eventName, matcher, handler) {
 export function codexHookTrustEntries(hooksJsonPath) {
   let parsed;
   try {
-    parsed = JSON.parse(fs.readFileSync(hooksJsonPath, 'utf8'));
+    parsed = JSON.parse(readAgentFileSync(hooksJsonPath, MAX_PROJECT_FILE_BYTES).toString('utf8'));
   } catch (err) {
     if (err.code === 'ENOENT') return { entries: [], skipped: 0 };
     throw new TrustStoreError('unreadable-store', `could not read codex hooks at ${hooksJsonPath}: ${err.message}`, { hooksJsonPath });

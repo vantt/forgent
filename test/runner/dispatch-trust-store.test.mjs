@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, seedCodexTrust, removeCodexTrust, claudeMcpApprovalArgs, TrustStoreError } from '../../src/runner/dispatch/trust-store.mjs';
 
 // Phase 01 group B. Every test here runs against a FIXTURE store, never the real
@@ -332,6 +334,36 @@ test('claudeMcpApprovalArgs trusts a linked worktree through the main checkout t
     const args = claudeMcpApprovalArgs({ cwd: wt, repoRoot: wt, storePath: store });
 
     assert.deepEqual(JSON.parse(args[1]), { enabledMcpjsonServers: ['skillhub'] });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// A pipe where the agent-writable project file should be would block a plain read forever, so the read
+// runs in a child process that is killed if it waits.
+test('a pipe or a link in place of .mcp.json or .codex/hooks.json is refused at once, never waited on or followed', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-agent-file-'));
+  try {
+    const project = path.join(dir, 'proj');
+    fs.mkdirSync(path.join(project, '.codex'), { recursive: true });
+    const store = path.join(dir, 'claude.json');
+    fs.writeFileSync(store, JSON.stringify({ projects: { [project]: { hasTrustDialogAccepted: true } } }));
+    const real = path.join(dir, 'real.json');
+    fs.writeFileSync(real, JSON.stringify({ mcpServers: { skillhub: {} }, hooks: {} }));
+    const script = `
+      import { claudeMcpApprovalArgs, codexHookTrustEntries } from ${JSON.stringify(pathToFileURL(path.resolve('src/runner/dispatch/trust-store.mjs')).href)};
+      const approved = claudeMcpApprovalArgs({ cwd: ${JSON.stringify(project)}, repoRoot: ${JSON.stringify(project)}, storePath: ${JSON.stringify(store)} });
+      let hooks;
+      try { codexHookTrustEntries(${JSON.stringify(path.join(project, '.codex', 'hooks.json'))}); hooks = 'read'; } catch (err) { hooks = err.code; }
+      process.stdout.write(JSON.stringify({ approved, hooks }));`;
+    const run = () => JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { timeout: 5000, encoding: 'utf8' }));
+    for (const plant of [
+      (file) => execFileSync('mkfifo', [file]),
+      (file) => fs.symlinkSync(real, file),
+    ]) {
+      for (const file of [path.join(project, '.mcp.json'), path.join(project, '.codex', 'hooks.json')]) { fs.rmSync(file, { force: true }); plant(file); }
+      assert.deepEqual(run(), { approved: [], hooks: 'unreadable-store' });
+    }
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

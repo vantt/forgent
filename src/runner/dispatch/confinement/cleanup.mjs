@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 import { writeFileAtomic } from '../provider-credential-renewal.mjs';
+import { readAgentFileSync } from '../proof-helpers.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 
@@ -110,10 +111,19 @@ export function writeOwnershipMarkerV2(dirPath, { attemptId, runDir, dispatchId,
   return markerPath;
 }
 
+// The marker sits in a home the agent could write: read through the agent-file door (no link followed, no
+// blocking on a pipe, a bounded regular file). It only identifies the home; it never says where a login goes.
+export const MAX_HOME_MARKER_BYTES = 64 * 1024;
+const UNSAFE_MARKER_ERRORS = new Set(['ELOOP', 'ENOTREGULAR', 'E2BIG']);
+
+function readMarkerText(dirPath) {
+  return readAgentFileSync(path.join(dirPath, OWNERSHIP_MARKER_FILE), MAX_HOME_MARKER_BYTES).toString('utf8');
+}
+
 /** The marker of an attempt home (version 2), or null when the directory has none of ours. */
 export function readAttemptOwnershipMarker(dirPath) {
   try {
-    const parsed = JSON.parse(fs.readFileSync(path.join(dirPath, OWNERSHIP_MARKER_FILE), 'utf8'));
+    const parsed = JSON.parse(readMarkerText(dirPath));
     if (parsed?.contract === ATTEMPT_HOME_MARKER_CONTRACT && parsed.creator === OWNERSHIP_CREATOR) return parsed;
   } catch { /* absent or malformed: not an attempt home */ }
   return null;
@@ -148,8 +158,7 @@ export function readOwnershipMarker(dirPath) {
     return null;
   }
   try {
-    const raw = fs.readFileSync(markerPath, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(readMarkerText(dirPath));
     if (parsed && parsed.contract === OWNERSHIP_CONTRACT && parsed.creator === OWNERSHIP_CREATOR) {
       return parsed;
     }
@@ -175,7 +184,10 @@ export function removeEmptyDispatchParent(removedPath, dispatchId) {
 // contract but is not this module's own is the caller's ownership question.
 function markerIsUnrecognisable(dirPath) {
   let raw;
-  try { raw = fs.readFileSync(path.join(dirPath, OWNERSHIP_MARKER_FILE), 'utf8'); } catch { return false; }
+  try { raw = readMarkerText(dirPath); } catch (err) {
+    // A link, a pipe or an oversized file in the marker's place is not a marker, and says nothing about the login.
+    return UNSAFE_MARKER_ERRORS.has(err?.code);
+  }
   try {
     const parsed = JSON.parse(raw);
     return parsed === null || typeof parsed !== 'object' || Array.isArray(parsed) || typeof parsed.contract !== 'string';
