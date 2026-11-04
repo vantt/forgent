@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "6ad47a24743744bfef29ddfaf34c888fe373302718e1438ec68944c05cf0f325",
+  "payloadDigest": "28c99cad2e6661f5ebc7dc78d99f66b13f7f48c17d606e10b85f8591cc1a1d0c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1141,7 +1141,7 @@
     "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
     "src/setup/mailbox-claude-accept.mjs": "0b6377d2c99d704c163b8d53db8f68c5f12ed4628843c768d0d2ddc3129bdc6c",
     "src/setup/mailbox-limits.mjs": "ba0ec014f188f3d84842b0997c60a524fc4e5df2a79f7216d2df471878d51513",
-    "src/setup/mailbox-sync-timer.mjs": "5f02015f55c440fd65a0d239651b298b675fad40cc165c333154f209fcda454b",
+    "src/setup/mailbox-sync-timer.mjs": "af73eff527cc3c3266ee36e847bd91a96622d6cdf711c07457e563ca6caf667d",
     "src/setup/model-pool-checks.mjs": "a770f17808c6a02cd2d5e50e145711635587f78eddf0639eb5525a7d442a9246",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
     "src/setup/registrations.mjs": "7eda6cbb65551c4e52c7c7631e8286d5cc53c5994e228e12a30d54ff7e246fc2",

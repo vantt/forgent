@@ -67,3 +67,15 @@ test('a timer that is written but refused by the OS is reported, not claimed fix
   assert.equal(result.fixed, false);
   assert.match(result.message, /enabling failed: Failed to connect to bus/);
 });
+
+test('the timer names the project installation shim when there is one, so an upgrade does not leave it pointing at a removed release', () => {
+  const w = world();
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'sync-timer-project-'));
+  const shim = path.join(project, '.fgos', 'installation', 'bin', 'fgos');
+  fs.mkdirSync(path.dirname(shim), { recursive: true });
+  fs.writeFileSync(shim, '#!/bin/sh\n', { mode: 0o755 });
+  const result = fixMailboxSyncTimer(project, { schedule: on, scheduler: w.scheduler, bin, run: w.run });
+  assert.equal(result.fixed, true, result.message);
+  const service = fs.readdirSync(path.join(w.home, 'units')).find((name) => name.endsWith('.service'));
+  assert.ok(fs.readFileSync(path.join(w.home, 'units', service), 'utf8').includes(shim));
+});

@@ -151,12 +151,23 @@ function stateOf({ scheduler, files, stem, run }) {
   return 'ok';
 }
 
+function isExecutable(file) {
+  try {
+    fs.accessSync(file, fs.constants.X_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function plan(cwd, { schedule, scheduler, bin }) {
   const found = schedule();
   if (!found) return { skip: 'cross-machine mail is not enabled here, so no timer is needed' };
   const chosen = scheduler();
   if (!chosen) return { skip: `no supported scheduler on ${process.platform}; mail is taken when a session runs a tool` };
-  const resolved = bin(cwd);
+  // The project's installation shim outlives an upgrade; a release path would not.
+  const shim = path.join(cwd, '.fgos', 'installation', 'bin', 'fgos');
+  const resolved = isExecutable(shim) ? { path: shim } : bin(cwd);
   if (!resolved) return { skip: 'no fgos binary resolves here, so the timer cannot name one' };
   const stem = unitStem(cwd);
   return { chosen, stem, files: chosen.render({ stem, bin: resolved.path, projectRoot: cwd, ...found }), found };
