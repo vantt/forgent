@@ -57,7 +57,6 @@
     "src/runner/dispatch/plan.mjs": "infra",
     "src/runner/dispatch/transport.mjs": "infra",
     "src/runner/dispatch/prepare.mjs": "infra",
-    "src/runner/dispatch/result-ladder.mjs": "infra",
     "src/runner/dispatch/assignment.mjs": "infra",
     "src/runner/dispatch/assignment-layout.mjs": "infra",
     "src/runner/dispatch/assignment-normalizer.mjs": "infra",

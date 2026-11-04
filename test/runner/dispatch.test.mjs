@@ -35,7 +35,6 @@ import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.m
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
 import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
-import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
@@ -2739,100 +2738,6 @@ function writeRunnerConfigFixture(root, cfg) {
   const patterns = { ...cfg.patterns, seatBinding: { schema: 1 } };
   writeProjectConfig(root, { runner: { ...cfg, capabilities, patterns } });
 }
-
-// --- buildDispatchResult (extract-dispatch-result-normalization-ladder):
-// direct unit tests against the pure helper itself, isolated from the real
-// subprocess/git-repo machinery: the ladder (reported/legacy-signal/inferred). ---
-
-test('buildDispatchResult: reported rung — every field on the raw adapter result is spread through unchanged, alongside mechanism/provider/command', () => {
-  const result = buildDispatchResult({
-    mechanism: 'out-of-process',
-    result: { status: 0, signal: null, stdout: '[DONE]', stderr: '', tier: 'standard', model: 'sonnet' },
-    headBefore: 'sha-before',
-    headAfter: 'sha-after',
-    provider: 'agy',
-    command: '/usr/local/bin/agy',
-  });
-  assert.equal(result.mechanism, 'out-of-process');
-  assert.equal(result.status, 0);
-  assert.equal(result.signal, null);
-  assert.equal(result.stdout, '[DONE]');
-  assert.equal(result.stderr, '');
-  assert.equal(result.tier, 'standard');
-  assert.equal(result.model, 'sonnet');
-  assert.equal(result.provider, 'agy');
-  assert.equal(result.command, '/usr/local/bin/agy');
-});
-
-test('buildDispatchResult: legacy-signal rung — a real [DONE]/[BLOCKED] token in stdout omits outcome/headBefore/headAfter entirely', () => {
-  const done = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'task complete [DONE]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
-  assert.equal(done.outcome, undefined);
-  assert.equal(done.headBefore, undefined);
-  assert.equal(done.headAfter, undefined);
-
-  const blocked = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'stuck [BLOCKED]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
-  assert.equal(blocked.outcome, undefined);
-  assert.equal(blocked.headBefore, undefined);
-  assert.equal(blocked.headAfter, undefined);
-});
-
-test('buildDispatchResult: inferred rung — no [DONE]/[BLOCKED] anywhere in stdout resolves outcome:"unsignaled" carrying headBefore/headAfter', () => {
-  const result = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'no contract signal here' }, headBefore: 'sha-before', headAfter: 'sha-after', provider: 'p', command: 'c' });
-  assert.equal(result.outcome, 'unsignaled');
-  assert.equal(result.headBefore, 'sha-before');
-  assert.equal(result.headAfter, 'sha-after');
-});
-
-test('buildDispatchResult: a [DONE]/[BLOCKED] mention inside backtick-quoted text never counts as a real signal (tsk-5gd) — falls to the inferred rung', () => {
-  const quotedOnly = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'implemented the `[DONE]` and `[BLOCKED]` token scan' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
-  assert.equal(quotedOnly.outcome, 'unsignaled');
-  assert.equal(quotedOnly.headBefore, 'a');
-  assert.equal(quotedOnly.headAfter, 'b');
-
-  // A quoted mention ALONGSIDE a real, unquoted token still counts as signaled.
-  const quotedAndReal = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: 'implemented `[DONE]` scan\n\n[DONE]' }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
-  assert.equal(quotedAndReal.outcome, undefined);
-});
-
-test('buildDispatchResult: verifiedSha is added only for a real [DONE] with a truthy headAfter AND status:0, never for [BLOCKED], a null headAfter, or a non-zero/missing status', () => {
-  const done = buildDispatchResult({ mechanism: 'out-of-process', result: { status: 0, stdout: '[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
-  assert.equal(done.verifiedSha, 'sha-after');
-
-  const blocked = buildDispatchResult({ mechanism: 'out-of-process', result: { status: 0, stdout: '[BLOCKED]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
-  assert.equal(blocked.verifiedSha, undefined);
-
-  const doneNoHeadAfter = buildDispatchResult({ mechanism: 'out-of-process', result: { status: 0, stdout: '[DONE]' }, headBefore: 'a', headAfter: null, provider: 'p', command: 'c' });
-  assert.equal(doneNoHeadAfter.verifiedSha, undefined);
-});
-
-// H5 (dispatch-execution-engine architecture review 260920): process/token
-// success must never substitute for semantic success. A worker that printed
-// [DONE] and then exited non-zero, or was killed by a signal (code null),
-// reaches this ladder on the direct cli-spawn path — transport.mjs's normal
-// `close` handler resolves on ANY exit code, it only rejects on timeout or
-// spawn-fail. `fgos return` trusts `verifiedSha` to skip its own verify, so
-// stamping one here on a failed process would be a false-success path
-// entirely outside RunResult's own fail-closed machinery.
-test('buildDispatchResult: a real [DONE] token does NOT get verifiedSha when the process itself did not succeed (non-zero exit, killed by signal, or no status field at all)', () => {
-  const nonZeroExit = buildDispatchResult({ mechanism: 'out-of-process', result: { status: 1, stdout: 'work done\n[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
-  assert.equal(nonZeroExit.verifiedSha, undefined);
-  assert.equal(nonZeroExit.status, 1);
-
-  const killedBySignal = buildDispatchResult({ mechanism: 'out-of-process', result: { status: null, signal: 'SIGKILL', stdout: '[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
-  assert.equal(killedBySignal.verifiedSha, undefined);
-
-  const noStatusField = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
-  assert.equal(noStatusField.verifiedSha, undefined);
-});
-
-
-test('buildDispatchResult: a missing or non-string result.stdout is treated as empty, never throws, and resolves the inferred rung', () => {
-  const noResult = buildDispatchResult({ mechanism: 'out-of-process', result: undefined, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
-  assert.equal(noResult.outcome, 'unsignaled');
-
-  const nonStringStdout = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: null }, headBefore: 'a', headAfter: 'b', provider: 'p', command: 'c' });
-  assert.equal(nonStringStdout.outcome, 'unsignaled');
-});
 
 // --- executors.<id>.carries (D15, tsk-5td; first real consumer tsk-2ie5/
 // tsk-2c1) — closed enum at config-load, plus a real pre-dispatch gate on
