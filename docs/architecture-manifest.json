@@ -115,7 +115,6 @@
     "src/runner/attestation-guard.mjs": "infra",
     "src/runner/claim-port.mjs": "infra",
     "src/runner/claim-liveness.mjs": "infra",
-    "src/runner/lock-wait.mjs": "infra",
     "src/runner/write-queue.mjs": "domain",
     "src/runner/root-affinity.mjs": "domain",
     "src/state/status-fsm.mjs": "domain",

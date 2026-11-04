@@ -177,10 +177,6 @@
     "test('footprintDiffHits: NO declared footprint (absent) exempts the whole diff -- empty hits (D5)', () => {",
     "test('footprintDiffHits: NO declared footprint (empty array) also exempts the whole diff (D5)', () => {"
   ],
-  "test/runner/lock-wait.test.mjs": [
-    "test('withLockRetry: prints a progress line on the default (no explicit waitMs) path (tsk-mgb)', async () => {",
-    "test('withLockRetry: does not busy-spin in the BOUNDARY_GRACE_MS tail -- bounded call count even for a tiny budget (tsk-mgb)', async () => {"
-  ],
   "test/runner/loop.test.mjs": [
     "test('runOnce\\'s executor.dispatch audit event records the REAL spawned command even when a executor declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge)', async () => {",
     "test('runOnce: an item already advanced to decompose (via an explicit prior discover call, the only live path left post-tsk-5mj) still gets swept to executing and dispatched in the SAME runOnce pass; the clarify-pass settlement recorded at that prior call reads role \"session\"', async () => {",

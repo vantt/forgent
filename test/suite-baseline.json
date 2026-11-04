@@ -329,7 +329,6 @@
     "test/runner/herdr-spawn-adapter.test.mjs": 0.4,
     "test/runner/land-vs-manual-commit.test.mjs": 7.3,
     "test/runner/llm-accounts.test.mjs": 0.1,
-    "test/runner/lock-wait.test.mjs": 0.1,
     "test/runner/lock.test.mjs": 17.1,
     "test/runner/loop-rununit.test.mjs": 45.2,
     "test/runner/loop.test.mjs": 186.8,

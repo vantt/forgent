@@ -100,7 +100,6 @@ import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatc
 import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, gitWorktrees, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
-import { withLockRetry } from '../src/runner/lock-wait.mjs';
 import { withMainCheckout } from '../src/runner/repo-locks.mjs';
 import { gitPortOptions, gitWriter } from '../src/git/inspect.mjs';
 import { nativeError } from '../src/git/native.mjs';
@@ -335,9 +334,9 @@ function optionalField(value, message) {
 // value) is a harmless no-op alias for the default. `--no-wait` is the
 // opt-out, restoring today's exact immediate-fail-on-HELD behavior.
 //
-// tsk-2rf D2/D3: an *explicit* `--wait <ms>` is now the true wall-clock
-// ceiling for the retry (`withLockRetry`, `src/runner/lock-wait.mjs`) --
-// no longer capped by the lock's own remainingTtlMs -- so a caller who
+// tsk-2rf D2/D3: an *explicit* `--wait <ms>` is the true wall-clock
+// ceiling for the merge lock wait (`landRunnerItem`'s `lockWaitMs`) --
+// not capped by the lock's own remainingTtlMs -- so a caller who
 // knows the holder is a legitimate long-running session can outlast it.
 // MAX_WAIT_MS bounds that ceiling: a mistyped value must not hang a CLI
 // call near-indefinitely against a holder that never actually releases.
@@ -3207,7 +3206,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
 
       // Delegate to claim-port.mjs — single choke-point for all claim flows
       // (tsk-53f D1). take uses isolate:false (no worktree creation).
-      const { noWait, waitMs } = parseWaitFlags(flags, 'take');
+      // Validated only: the claim door takes no wait budget.
+      parseWaitFlags(flags, 'take');
       const doTake = () => claimWork(dir, {
         id,
         actor: role,
@@ -3215,7 +3215,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         repoRoot,
       });
       try {
-        return noWait ? await doTake() : await withLockRetry(doTake, { waitMs });
+        return await doTake();
       } catch (err) {
         if (err instanceof ClaimError) {
           throw new StoreError(err.category, `take: ${err.message}`);
@@ -3262,7 +3262,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // stands (released back to `todo` at the clarify/decompose ->
       // executing boundary, claim-lock §3b) reattaches to that same branch
       // tip via createWorktree's reuse path instead of forking a new one.
-      const { noWait, waitMs } = parseWaitFlags(flags, 'pick');
+      // Validated only: the claim door takes no wait budget.
+      parseWaitFlags(flags, 'pick');
       // repoRoot from --dir, never raw process.cwd() (tsk-k8u D1/D2): a
       // claim-release + re-pick run from inside the very worktree being
       // torn down (e.g. the claim-lock §3b reattach above) must never
@@ -3288,7 +3289,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         worktreeDir: path.join(repoRoot, '.claude', 'worktrees'),
       });
       try {
-        return noWait ? await doPick() : await withLockRetry(doPick, { waitMs });
+        return await doPick();
       } catch (err) {
         if (err instanceof ClaimError) {
           throw new StoreError(err.category, `pick: ${err.message}`);

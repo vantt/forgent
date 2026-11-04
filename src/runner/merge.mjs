@@ -51,7 +51,6 @@ import { branchKey } from '../event-store/index.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { openLeavesSharingTarget, classifyPostLandDrift } from '../state/graph-harness.mjs';
 import { withMainCheckout } from './repo-locks.mjs';
-import { DEFAULT_LOCK_WAIT_MS } from './lock-wait.mjs';
 import { LockScope, acquireSync, createLockScope, lockHolders, probe } from '../holder-lock/index.mjs';
 import { createGitLand } from '../git/land.mjs';
 import { createGitRecovery } from '../git/recovery.mjs';
@@ -59,6 +58,13 @@ import { gitPortOptions } from '../git/inspect.mjs';
 import { createGitSync } from '../git/sync.mjs';
 import { nativeError } from '../git/native.mjs';
 import { createGitWorktree } from '../git/worktree.mjs';
+
+/** Wait budget for the target's merge slot and the main checkout when the caller gave no `--wait <ms>`:
+ * waiting is the default, `--no-wait` (`lockWaitMs: 0`) is the opt-out. Other holders keep these locks
+ * for short git operations or one verify run, so a minute covers the usual contention without hanging
+ * a CLI call against a holder that never lets go. The kernel locks wait for real (`acquire({ waitMs })`
+ * polls until the holder releases or the budget is spent), so there is no retry loop here. */
+const DEFAULT_LOCK_WAIT_MS = 60 * 1000;
 
 /**
  * The invariant-check commands of the project at `repoRoot` (`invariantChecks.commands`). The door reads
