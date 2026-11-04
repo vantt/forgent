@@ -16,12 +16,11 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { matchAuthFailureLine } from './provider-auth-failure.mjs';
+import { matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
 import { accountCredentialSources, credentialSourceForCli, expandCredentialHome } from './provider-capacity.mjs';
 
 const PROMPT = 'Reply with the single word OK.';
 const OUTPUT_LIMIT = 16 * 1024;
-const QUOTA_PATTERN = /usage limit|quota|rate limit/i;
 export const DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS = 90 * 1000;
 
 /**
@@ -76,7 +75,7 @@ export function credentialProbeCommand(credentialSource) {
 export function judgeProbeOutput({ exitCode, timedOut, output }) {
   if (timedOut) return { ok: false, detail: 'the call did not finish in time' };
   if (matchAuthFailureLine(output)) return { ok: false, detail: 'the login is still rejected' };
-  if (QUOTA_PATTERN.test(output) && exitCode !== 0) return { ok: false, detail: 'the account answers with a usage limit' };
+  if (matchQuotaLimitLine(output) && exitCode !== 0) return { ok: false, detail: 'the account answers with a usage limit' };
   if (exitCode !== 0) return { ok: false, detail: `the call exited with code ${exitCode}` };
   return { ok: true };
 }

@@ -49,6 +49,7 @@ test('a call is judged by exit code and by what it printed, not by the exit code
   assert.deepEqual(judgeProbeOutput({ exitCode: 0, timedOut: false, output: 'OK' }), { ok: true });
   assert.equal(judgeProbeOutput({ exitCode: 0, timedOut: false, output: 'Error: OAuth refresh failed for xai' }).ok, false);
   assert.equal(judgeProbeOutput({ exitCode: 1, timedOut: false, output: "You've hit your usage limit" }).ok, false);
+  assert.match(judgeProbeOutput({ exitCode: 1, timedOut: false, output: 'Error: 402: {"message":"This request requires more credits"}' }).detail, /usage limit/, 'every wording the classifier reads as a used-up quota is one here too');
   assert.match(judgeProbeOutput({ exitCode: 1, timedOut: false, output: '' }).detail, /code 1/);
   assert.match(judgeProbeOutput({ exitCode: null, timedOut: true, output: '' }).detail, /in time/);
 });

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f9fca8bf025ad04ab28ee3ca112063334af41a04925df9b6461764df80134641",
+  "payloadDigest": "57060b88d9dd8f1382623c38f6bf9d3efbe16f08292d7028c2a5f80821b1e8de",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1005,11 +1005,11 @@
     "src/runner/dispatch/plan.mjs": "355cc52529ad4186609fb663412150b764e7d10ca66de04f9888c98c651379d7",
     "src/runner/dispatch/process-identity.mjs": "37fd2e1b2fa509428bfe64a962b8716dc7f4952beb7efc84e32212b83d739b2f",
     "src/runner/dispatch/proof-helpers.mjs": "526f4f54bd357e87887fc160b0da80ac38bb148da91189147ab063298f841b81",
-    "src/runner/dispatch/provider-account-probe.mjs": "bfded5e8a1deeb6bae30950f84ae8a587c4e911892761c50cdab0cf4bfd7e86e",
+    "src/runner/dispatch/provider-account-probe.mjs": "1ac9ba5c5cb5bd27240a42edbee5b6c60316bb37079c1d6332b2016feb4de1eb",
     "src/runner/dispatch/provider-adapter.mjs": "df1f9a898ed9b05cb336dd6620c74e41b5c54c4ae38c30ef50008566c5d8cb7a",
     "src/runner/dispatch/provider-auth-failure.mjs": "ad3d07cc29e54f6758694ed861afbf66fa30e6568905e9f9383ac7b6943f19f7",
     "src/runner/dispatch/provider-capacity.mjs": "5c89283793ea991d6f2e0887d1956261660d36f1ab208786b7ae79a1b982541b",
-    "src/runner/dispatch/provider-credential-probe.mjs": "b1773175ff065ce80e9bb2b5123de15cc4d9b04a9bc0f249d9a1c971653bae74",
+    "src/runner/dispatch/provider-credential-probe.mjs": "77fbd646f415f657f7444af45662f13b1af0dc9ecf1e8f07588f5a1d336f94a0",
     "src/runner/dispatch/provider-credential-renewal.mjs": "502d2116a1264b78c9dfae18d952703fc9132eee64f19159dea8bfb7286276fe",
     "src/runner/dispatch/reconciliation-planner.mjs": "08042da6f1ff6ed998d25b37877d58cd8b555c5bace2a61614211a3a2a38799c",
     "src/runner/dispatch/recovery-planner.mjs": "b23bfcfaef05584b7066e7d1ee8099dd4eae84094664f1b1979a4dca64b52f4e",
@@ -1056,7 +1056,7 @@
     "src/runner/execution/patterns/catalog.mjs": "56a10c97fa3d7caaf7b7b70bcac38a300284e24aa6bcb316a07e30c9335a9af9",
     "src/runner/execution/patterns/retired-keys.mjs": "c07f8407d169c7db410aba99db2b7bb1119f5a20ec7a7b63f8cb81d1324e0f40",
     "src/runner/execution/run-request.mjs": "b8ba8003a695f457ab1ebdc22808a994c4f3c4dbfc5d05cd1ab88bd65b823645",
-    "src/runner/execution/run.mjs": "098cd3f3711c3e6d7ae3e67ae80c3201a5ef2bb5a03631a7ad50123c82f8d42d",
+    "src/runner/execution/run.mjs": "bd404f7bcda90edec855a918e39300f402fae07647f5dd3798ac064b19a836f5",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
     "src/runner/execution/seat-resolver.mjs": "cd60f09a5cb679223a05a7c79bb390e8ed0e596890b8d795431fb16aae9d09ba",
@@ -3333,14 +3333,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1561,
+      "line": 1569,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1561,
+      "line": 1569,
       "spawn": "runCommand -> src/runner/goal-check.mjs:61",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"

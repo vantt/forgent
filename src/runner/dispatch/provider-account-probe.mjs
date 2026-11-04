@@ -7,14 +7,14 @@
 //
 // It reuses what exists instead of adding a second engine: the Assignment door itself (the same object a
 // Workflow unit dispatch hands it), the credential wordings of provider-auth-failure.mjs, the quota
-// wording of the unlock probe, the herdr diagnosis a blocked round already writes, and the RUL75 renewal
+// wordings of the classifier, the herdr diagnosis a blocked round already writes, and the RUL75 renewal
 // opt-in. The account is pinned by handing the door a runner config whose inventory holds only that
 // account, so the lease cannot pick another one and a quarantine still refuses it, as it would for real.
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { matchAuthFailureLine } from './provider-auth-failure.mjs';
+import { matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
 import { accountCredentialSources, commandCli, expandCredentialHome, credentialSourceForCli, credentialStoreOf, providerAccountInventory } from './provider-capacity.mjs';
@@ -23,7 +23,6 @@ import { runOutcome } from './run-result.mjs';
 export const ACCOUNT_PROBE_PROMPT = 'Account probe: there is no task. Reply with the single word OK.';
 export const DEFAULT_ACCOUNT_PROBE_TIMEOUT_MS = 3 * 60 * 1000;
 
-const QUOTA_PATTERN = /usage limit|quota|rate limit/i;
 const TRUST_PATTERN = /trust this folder|do you trust|trust the files/i;
 const SANDBOX_PATTERN = /read-only file system|\bEROFS\b|bwrap:|operation not permitted|confinement (?:was declared|refused)|confinement-/i;
 const TIMEOUT_PATTERN = /time[sd]?[-_ ]?out/i;
@@ -137,7 +136,7 @@ export function classifyAccountProbe({ ok = false, text = '', failureCode = null
   }
   const auth = matchAuthFailureLine(all);
   if (auth) return { outcome: 'auth', evidence: auth, ...extra };
-  const quota = lineMatching(all, QUOTA_PATTERN);
+  const quota = matchQuotaLimitLine(all);
   if (quota) return { outcome: 'quota', evidence: quota, ...extra };
   const sandbox = lineMatching(all, SANDBOX_PATTERN);
   if (sandbox) return { outcome: 'sandbox', evidence: sandbox, ...extra };

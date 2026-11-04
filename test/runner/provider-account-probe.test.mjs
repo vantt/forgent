@@ -85,6 +85,7 @@ test('outcome classes come from what the run settled with, what it printed and t
   assert.equal(classifyAccountProbe({ ok: true, text: 'Please run /login' }).outcome, 'auth', 'a settled run that printed a dead login is not ok');
 
   assert.equal(classifyAccountProbe({ text: "You've hit your usage limit. Try again at 5pm." }).outcome, 'quota');
+  assert.equal(classifyAccountProbe({ text: 'Error: individual quota reached' }).outcome, 'quota', 'every wording the classifier reads as a used-up quota is one here too');
   assert.equal(classifyAccountProbe({ text: "EROFS: read-only file system, mkdir '/home/x/.pi/accounts/a/settings.json.lock'" }).outcome, 'sandbox');
   assert.equal(classifyAccountProbe({ text: 'herdr could not bring a "codex" agent to ready', failureCode: 'execution-timeout' }).outcome, 'timeout');
   assert.equal(classifyAccountProbe({ text: 'panic: unexpected' }).outcome, 'other');
