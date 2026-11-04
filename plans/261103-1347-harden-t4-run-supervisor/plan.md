@@ -1,7 +1,7 @@
 ---
 title: "HARDEN T4 sub-plan: Run Supervisor + Launch gate"
 description: "Step 4 of the HARDEN per-layer loop for T4: the accepted council findings and owner decision 59 split into eight sub-phases with strict file ownership, net size below zero, self-landing on fg-server2 and a Vietnamese owner-machine guide."
-status: pending
+status: in-progress
 priority: P1
 effort: ~6d lead time (wave 1 P01 ∥ P02 ∥ P03 ≈ 1.5d, wave 2 P04 ∥ P05 ≈ 1.5d, P06 ≈ 1d, P07 ≈ 1d after OQ-1/OQ-2, P08 ≈ 1d)
 branch: main (plan only; each phase runs on its own track branch `harden/t4-pNN-<slug>` in its own linked worktree)
@@ -39,6 +39,19 @@ Each verified with `git show --stat <hash>` on `fcd42ecdc`; all are ancestors of
 | `5f7d4c54d` | S10 (not S9) | dead-field warnings gated with `cfg(unix)` | `gate.rs`, `supervise.rs`, `supervise/terminal.rs` |
 
 Also done by the big lead (decision 59, question 2a, 13:46): 502 side files of closed attempts deleted on fg-server2.
+
+## Phase landings
+
+| Phase | Main commits | Landed |
+|---|---|---|
+| P03 gate one door | `fa9e84c1c..8e0f53264` | 2026-11-03 14:36 |
+| P02 one outcome authority | `0c1e509e2..231c91f51` | 2026-11-03 |
+| P05 controller side | `864a390fd..23740e065`, `fab7438dd` | 2026-11-03 15:06 |
+| P04 one watch step, hostile reads | `fad7e0fab` | 2026-11-03 15:33 |
+| P01 adopt custody, sweep into client, doctor 8 → 5 | `3a940e2a8` (with the `sweep.mjs` manifest row and the doctor list in `packaging-distribution` spec and contract, DOC agreed 2026-11-04) | 2026-11-04 16:21 |
+| P06, P07, P08 | open | — |
+
+Outside the phases, from this plan's work: `c37d76811` workspace rustfmt (decision 60); two regressions it caused, fixed: `45e07caf2` (one-door scanner read only one-line chains) and `b6260e061` (machine-private test read `herdr.rs` with a one-line regex).
 
 ## Where each accepted item goes
 
