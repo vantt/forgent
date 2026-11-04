@@ -4,7 +4,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { deriveOutcome, LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
+import { deriveOutcome, interpretRunResult, LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
 
 function compareRunNames(a, b) {
   return Number(a) - Number(b) || a.localeCompare(b);
@@ -16,11 +16,12 @@ function compareRunNames(a, b) {
  * "this provider has no quota" from any other infrastructure failure.
  */
 export function outcomeOfRunResult(runResult) {
-  const classification = runResult?.classification;
+  // A record without a classification is read like any other settled record; one that cannot be
+  // interpreted comes back corrupt, which is a failure and never a pass.
+  const classification = runResult?.classification ?? interpretRunResult(runResult).classification;
   // A result settled without an outcome (a refused provider capacity is one) is judged from its
   // classification like any other; treating the missing outcome as `ok` made a failed seat a pass.
-  const category = classification?.outcome?.category
-    ?? (classification && typeof classification === 'object' ? deriveOutcome(classification).category : 'ok');
+  const category = classification?.outcome?.category ?? deriveOutcome(classification).category;
   const failureCode = classification?.failure?.code;
   if (category === 'ok') return 'pass';
   if (category === 'verdict' && runResult?.classification?.assessment?.verdict === 'findings') return 'findings';

@@ -15,9 +15,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const FIXTURE_PATH = path.resolve(__dirname, '../fixtures/run-outcome/legacy-derivation.json');
 
-test('legacy-derivation fixture suite: all 17 cases match expected outcomes', () => {
+test('legacy-derivation fixture suite: all fixture cases match expected outcomes', () => {
   const cases = JSON.parse(fs.readFileSync(FIXTURE_PATH, 'utf8'));
-  assert.ok(cases.length >= 17, `Expected at least 17 cases, found ${cases.length}`);
+  assert.ok(cases.length >= 19, `Expected at least 19 cases, found ${cases.length}`);
 
   for (const c of cases) {
     const outcome = runOutcome(c.record);

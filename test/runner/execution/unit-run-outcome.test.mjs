@@ -43,8 +43,14 @@ test('a completed result with no outcome field is still derived from its classif
   }), 'pass');
 });
 
-test('an explicit outcome wins over derivation, and a result with no classification keeps counting as done', () => {
+test('an explicit outcome wins over derivation', () => {
   assert.equal(outcomeOfRunResult({ classification: { outcome: { category: 'blocked' } } }), 'blocked');
   assert.equal(outcomeOfRunResult({ classification: { outcome: { category: 'infra' }, failure: { code: 'provider-limit' } } }), 'provider-limit');
-  assert.equal(outcomeOfRunResult(undefined), 'pass');
+});
+
+test('a result with no classification is judged from its legacy record, and one that cannot be read is a failure', () => {
+  assert.equal(outcomeOfRunResult({ status: 'failed' }), 'execution-failure');
+  assert.equal(outcomeOfRunResult({ status: 'done', confidence: 'verified' }), 'pass');
+  assert.equal(outcomeOfRunResult({}), 'execution-failure');
+  assert.equal(outcomeOfRunResult(undefined), 'execution-failure');
 });

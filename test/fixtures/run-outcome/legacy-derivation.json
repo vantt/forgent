@@ -4352,5 +4352,25 @@
       "satisfied": false,
       "infraFailure": true
     }
+  },
+  {
+    "id": "18-v1-failed-bare",
+    "record": {
+      "status": "failed"
+    },
+    "expected": {
+      "category": "infra",
+      "satisfied": false,
+      "infraFailure": true
+    }
+  },
+  {
+    "id": "19-empty-object",
+    "record": {},
+    "expected": {
+      "category": "corrupt",
+      "satisfied": false,
+      "infraFailure": true
+    }
   }
 ]
