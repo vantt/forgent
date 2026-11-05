@@ -122,7 +122,7 @@ Ngày lập: 2026-11-05 (Asia/Saigon). Đây là nguồn dữ liệu cho chuỗi
 | DOCOS: "not-planned", chưa có plan | `plans/261017-1313-fgos-platform-program-board/plan.md:80`; R-built §4 |
 | doc-health chỉ chạy trong `npm test`, không ở pre-commit, không có doctor row | `docs/platform/convention/spec.md:382`; R-built §4 |
 | Evidence chỉ có ở máy owner (tag local + một tar). Trên main chỉ còn bản ghi digest của sealed ledger (68.441 dòng, ghim `2a028cdc9`) và 28 file trong thư mục plan (27 lúc cutover) | Lead check 2026-11-05; R-built §4; fact-check #89, #96 |
-| `plan.md` ở main lệch trạng thái: frontmatter `status: in-progress`, H1 "active migration plan", dòng 15 vẫn ghi việc gỡ lease "follows as its own item", Phase 11 "pending" | writer check 2026-11-05 (`plans/260925-documentation-authority-unification/plan.md` dòng 4, 12, 15, 262) |
+| `plan.md` ở main lệch trạng thái lúc viết (đã sửa trong `36737e5d6`): frontmatter `status: in-progress`, H1 "active migration plan", dòng 15 vẫn ghi việc gỡ lease "follows as its own item", Phase 11 "pending" | writer check 2026-11-05 (`plans/260925-documentation-authority-unification/plan.md` dòng 4, 12, 15, 262) |
 | Guard Phase 9 không có hiệu lực qua host đã cài lúc landing (gap G1); release `47e1016d` sau đó chưa được kiểm lại | R-built §2 (UNVERIFIED cho release sau) |
 
 ## 5. Những gì đã bỏ vì thiếu nguồn
