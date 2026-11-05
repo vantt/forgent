@@ -35,7 +35,7 @@ Plan đánh mã **ít nhất 368** quyết định qua năm chuỗi, và đây l
 | 10/10 | 21 lần sửa section đã duyệt làm 99 proof hoặc digest không còn khớp |
 | 11/10 | Owner: "tài liệu thôi mà sao kì công vậy ta" |
 | 19/10 | Review từng tham chiếu không hội tụ sau 7 lần sinh lại; owner đổi cổng |
-| 22/10 | Ổ SSD máy owner bão hoà, ghi mất 765 ms |
+| 22/10 | Ổ SSD máy owner bão hoà, ghi mất 765 ms (chủ yếu do việc khác chạy cùng máy) |
 | khoảng 27/10 | Một phần việc đang đỏ bị merge vào nhánh plan |
 | 29/10 | Owner: "làm lâu quá. Cả 5 tuần rồi." |
 | 30/10 | Doer sửa oracle của chính nó; 5 trên 8 thay đổi nới lỏng check hoặc thay bằng dữ liệu của chính tác giả |
