@@ -1,7 +1,7 @@
 ---
 phase: 10
 title: "Post-cutover maintenance MVP"
-status: in-progress
+status: completed
 priority: P1
 effort: "1.5d"
 dependencies: [9]
@@ -11,7 +11,7 @@ dependencies: [9]
 
 ## Overview
 
-**Status:** `in-progress`. The owner authorized the phase on 2026-11-04. Phase 9 landed on main at `97dd62aa7`.
+**Status:** `completed`. The owner authorized the phase on 2026-11-04; it landed on main at `97cc4b432` the same day. Phase 9 landed on main at `97dd62aa7`.
 
 **Purpose:** stop documentation drifting again, using the smallest maintenance surface that does the job.
 

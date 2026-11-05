@@ -1,7 +1,7 @@
 ---
 title: "Documentation Authority Unification"
 description: "Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**"
-status: in-progress
+status: completed
 priority: P1
 created: 2026-09-25
 revised: 2026-10-06 (resume after main sync: coordination harness retired, Observe blockers completed, dropped-claim register, ordering with Plans A/B/C; Phase 4 authorized and pre-steps 0a/0b done; earlier 2026-09-29 AgentKit format conversion)
@@ -9,10 +9,10 @@ blockedBy: []
 blocks: []
 ---
 
-# Documentation Authority Unification — active migration plan
+# Documentation Authority Unification
 
 ```txt
-Plan status: Closed (Phases 1-10 closed; Phase 9 landed on main `97dd62aa7` on 2026-11-03 as one product commit, with the plan evidence kept local at tag `archive/doc-260925-lineage` and off main; Phase 10 landed on main `97cc4b432` on 2026-11-04; retiring the documentation-cutover lease follows as its own item.)
+Plan status: Closed (Phases 1-10 closed; Phase 9 landed on main `97dd62aa7` on 2026-11-03 as one product commit, with the plan evidence kept local at tag `archive/doc-260925-lineage` and off main; Phase 10 landed on main `97cc4b432` on 2026-11-04; the documentation-cutover lease was retired as its own item at `ad72e3a46` on 2026-11-04; Phase 11 drafts reviewed on 2026-11-05 and wait for the owner.)
 Primary objective: Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**
 Long-horizon source: docs/platform/proposals/documentation-system-unification.md
 Parent: docs/platform/proposals/documentation-system-unification.md (this plan delivers its first steps up to the maintenance system; the full authoring door and agent context engine stay with later plans)
@@ -259,7 +259,7 @@ Each phase lives in its own `phase-NN-*.md` file (AgentKit plan format). Phases 
 | 8 | Eliminate switchboard bypasses and prepare consumers | 07 | completed (closed 2026-10-23, L12-136) | [phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md](phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md) |
 | 9 | Atomic platform-authority cutover | 08 | landed 2026-11-03, main `97dd62aa7` | [phase-09-atomic-platform-authority-cutover.md](phase-09-atomic-platform-authority-cutover.md) |
 | 10 | Post-cutover maintenance MVP | 09 | closed (landed `97cc4b432`, 2026-11-04) | [phase-10-post-cutover-maintenance-mvp.md](phase-10-post-cutover-maintenance-mvp.md) |
-| 11 | Retrospective post series | 10 | pending (owner request 2026-10-20; starts after this plan finishes) | [phase-11-retrospective-post-series.md](phase-11-retrospective-post-series.md) |
+| 11 | Retrospective post series | 10 | drafted and fact-checked 2026-11-05 (two fact-check rounds; the one edit left by round 2 applied verbatim by the Lead); waits for owner approval before any publishing | [evidence pack](../reports/retrospective-261105-1416-doc-260925-evidence-pack.md), [post 1](../reports/retrospective-261105-1416-doc-260925-post-1-genesis-and-compound.md), [review](../reports/review-261105-1423-doc-260925-retrospective-claims.md); phase file at tag `archive/doc-260925-lineage` |
 
 ### 7.1. Detailed status and authorization (snapshot)
 
