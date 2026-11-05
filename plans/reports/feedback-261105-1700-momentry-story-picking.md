@@ -91,3 +91,19 @@ Xếp theo lợi ích trên chi phí. Mỗi ý có bằng chứng từ dữ li�
 - Bước harvest có trả phí có bắt lại được giọng chủ dự án từ toàn văn không? Chưa kiểm.
 - Luật privacy của momentry có cho ghi SHA hoặc đường dẫn file vào hộp không, hay chỉ ghi trong hộp riêng tư?
 - Góp ý này sẽ được đưa vào repo momentry dưới dạng nào (issue, plan, backlog), và ai làm? Việc này chờ chủ dự án quyết định.
+
+## 7. Đã làm (2026-11-05, chủ dự án cho phép làm hết)
+
+- **momentry `main` `e040cbf`** (epic E20, plan `plans/261105-story-material/plan.md` trong repo momentry):
+  - M1, M2, M3 thành bộ dò: `ownerVoice`, `lessonWrite`, `blocked`, lọc nhiễu `metricPair`/`gitReversal`.
+  - Sửa lỗi id điểm nóng lạ làm mất cả cửa sổ.
+  - 370 test pass.
+- **Đo có trả phí** ([mốc](research-261105-1737-momentry-harvest-baseline-doc-sessions.md), [nhánh so với mốc](research-261105-1812-momentry-branch-vs-baseline-doc-sessions.md)), tổng khoảng 6 USD:
+  - Bước LLM bắt lại gần đủ những chỗ `reduce` trượt.
+  - Code mới giảm điểm nóng rác. Số chuyện nêu tên quyết định của chủ dự án tăng từ 14 lên 24.
+  - p@k nằm trong độ lệch của một lần chụp.
+- **Gốc của việc chuyện quyết định bị xếp thấp:** `hook-tension` chấm các chuyện này là `none`, và tầng tension đặt mọi chuyện `none` xuống dưới.
+  - Đề xuất M.5 (đổi xếp hạng) được giao cho E17, phải chạy lại trên bộ eval của E17 trước khi đổi.
+  - M.6 (prompt) chờ một lần chụp có trả phí.
+- **Bộ eval thứ hai:** `~/projects/momentry-eval/docs/_private/eval-forgentx/` (labels-v2), không commit.
+- **Loạt bài forgentX:** được viết lại từ danh sách ứng viên đã xếp hạng, có thêm transcript làm nguồn. Fact-check vòng 3 và 4 đã áp dụng hết.
