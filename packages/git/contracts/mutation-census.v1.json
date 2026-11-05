@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "75802d97e0ab3ce1beaa9d7e6b5a9e50333699d93fb22cc565030ca51fda9b68",
+  "payloadDigest": "d2c1e07043d19ac402dce1fd4d53c979b42fb8415b9e0538efbab517690fb3b3",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -980,7 +980,7 @@
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "b9500f6594e4ddad3f5cd470762f09ba830358435e5d5f5e9d751e40b780dc85",
-    "src/runner/dispatch/config.mjs": "8a42aec4f94dbd8cef260de9c7e8eb7a7b3503350c4579c30340e21e80072eb3",
+    "src/runner/dispatch/config.mjs": "1292c3ea2a07af99747b7b7d9bfaa2071a49cb202a39715ab6eb77cf64e0447e",
     "src/runner/dispatch/confinement/attestation-store.mjs": "0ee09fba4a188487716c53ceb7a054b2e1e9d6550ebaef4b4c0f4a3b0241bbee",
     "src/runner/dispatch/confinement/authority.mjs": "2ab6c0ae4b59e7b852ca6a0f1ffce5b61c3d4f7ebefaa2511965e29b688db8af",
     "src/runner/dispatch/confinement/backend-registry.mjs": "91e15d2902b8fa8fcf0087b69de714b6651f906713ebf2969b18e0644993d7cd",
@@ -1070,7 +1070,7 @@
     "src/runner/frozen-judge.mjs": "96265fab86a2a57ae4b191c83a864a4f285942f2c35318fbdae435a832bb75ed",
     "src/runner/gateway-control.mjs": "85e73dcdabf3dd78ca1fb356a800350da0735592166514f7d110df5605c49e43",
     "src/runner/github-adapter.mjs": "162d7b2064b9b311ea88afba25567601420626743dff6b72b0aba78f42220c00",
-    "src/runner/goal-check.mjs": "f21520e58727a016945c052c2b04f72ec9120192c4cdfaaaf34526ea0bb090e0",
+    "src/runner/goal-check.mjs": "bed1a778d1f702695160cab5896bb65a96e6c18c7a446ed6bc3b530c7b8ab66c",
     "src/runner/iron-law-gate.mjs": "37e253ef40240e535e6587d41b393e6ddecc7cb174104760d0f48ba168203d43",
     "src/runner/lock-fence.mjs": "8fbfbf4cfc12f6e0f1437f45ad2b0afca94badf76190db7e32e5ef55c97cba1f",
     "src/runner/lock-status.mjs": "fc33d73f4e3fe2b65e6a1bdefaed2b59870a54edac15936c20f9681773910bcc",
@@ -2001,14 +2001,14 @@
     {
       "path": "bin/fgos.mjs",
       "line": 3474,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
       "line": 3618,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
@@ -3335,14 +3335,14 @@
     {
       "path": "src/runner/execution/run.mjs",
       "line": 1569,
-      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "spawn": "runCommand -> src/runner/goal-check.mjs:60",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
       "line": 1569,
-      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "spawn": "runCommand -> src/runner/goal-check.mjs:60",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
     },
@@ -3387,29 +3387,29 @@
     },
     {
       "path": "src/runner/goal-check.mjs",
-      "line": 61,
+      "line": 60,
       "spawn": "runBorrowed",
       "binary": "(env ComSpec)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/goal-check.mjs",
-      "line": 165,
-      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "line": 164,
+      "spawn": "runCommand -> src/runner/goal-check.mjs:60",
       "binary": "(consumer verify command (item.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/merge.mjs",
       "line": 961,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/merge.mjs",
       "line": 991,
-      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:181",
+      "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
       "class": "configured-binary"
     },
@@ -3563,14 +3563,14 @@
     {
       "path": "src/workflow/case-gate.mjs",
       "line": 100,
-      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "spawn": "runCommand -> src/runner/goal-check.mjs:60",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/workflow/case-gate.mjs",
       "line": 100,
-      "spawn": "runCommand -> src/runner/goal-check.mjs:61",
+      "spawn": "runCommand -> src/runner/goal-check.mjs:60",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"
     },

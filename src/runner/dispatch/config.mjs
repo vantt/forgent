@@ -1962,10 +1962,9 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   if (cfg.timeoutMs > RUN_TIMEOUT_MAX_MS) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) "timeoutMs" must be at most ${RUN_TIMEOUT_MAX_MS / 3600000}h, got ${cfg.timeoutMs}ms.`);
   }
-  // OPTIONAL `idleTimeoutMs` (dispatch-execute optimization pass): absent
-  // entirely keeps `cliSpawnAdapter`'s idle-timeout disarmed, byte-identical
-  // to before this field existed — same additive-optional shape as
-  // `parallel` below. When present, kills a worker that has gone
+  // OPTIONAL `idleTimeoutMs`: absent keeps a headless worker's idle timeout
+  // disarmed — same additive-optional shape as `parallel` below. When
+  // present, kills a worker that has gone
   // completely silent for this long, distinct from `timeoutMs`'s
   // unconditional absolute ceiling.
   if (cfg.idleTimeoutMs !== undefined) {

@@ -55,8 +55,7 @@ export function runCommand(command, cwd, timeoutMs, { custody } = {}) {
     // checks for piped stdin (codex's own "Reading additional input from
     // stdin..." probe, tsk-3tkc) blocks forever on an open-but-unwritten
     // pipe here, since nothing in this runner ever writes to or closes
-    // child.stdin -- same fix as src/runner/dispatch/transport.mjs's
-    // cliSpawnAdapter.
+    // child.stdin.
     const child = custody
       ? runBorrowed(custody, { command: shellCommand(), args: shellArgs(command), cwd, detached: true, stdin: 'ignore', maxOutputBytes: maxBuffer }, { sync: false })
       : spawn(command, { shell: true, cwd, stdio: ['ignore', 'pipe', 'pipe'], [CONSUMER_COMMAND]: true });
