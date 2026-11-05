@@ -2,56 +2,54 @@
 
 *Chuỗi hồi cứu plan 260925, bài 6/6. Bài trước: [Cái giá](retrospective-261105-1416-doc-260925-post-5-the-cost.md). Quay về đầu chuỗi: [Bài 1](retrospective-261105-1416-doc-260925-post-1-genesis-and-compound.md).*
 
-Năm bài trước kể vì sao có plan 260925, nó làm gì, và nó tốn bao nhiêu. Bài cuối này trả lời hai câu: repo có được gì mà trước đây không có, và cái gì vẫn chưa có. Sau đó là các bài học, mỗi bài gắn với một sự kiện cụ thể trong chuỗi.
+Sáng 3/11, owner chọn "Land gọn": từ đó chỉ những kiểm tra trên chính sản phẩm (tài liệu, link, test) mới được chặn việc đưa lên main, còn sổ sách chứng minh nội bộ của plan được làm sau. Khoảng 13 tiếng sau (23:41), commit cutover lên main; commit được tạo lúc 22:07. Trước đó, mốc land đã lùi từ 29/10 sang 1/11 rồi 3/11.
+
+## 3/11: Land gọn
+
+Câu hỏi ở đầu bài 1 tới lúc 10:57 ngày 2/11. Lead trả lời ngay: "Phần tài liệu thật ra không khó; cái làm chậm là bộ máy chứng minh mà em dựng quanh nó". Hôm đó sửa 119 link chết mất trọn một ngày, gần hết cho sổ sách.
+
+Trong ba lựa chọn Lead đưa ra, owner chọn Land gọn lúc 10:22 ngày 3/11, gần một ngày sau câu hỏi.
+
+Cổng gọn cũng bị audit. Một auditor độc lập trả REWORK: cổng mới đã hạ một loại lỗi xuống "ghi lại sau Land", trong khi cùng loại lỗi đó còn báo hai bản sửa đè lên cùng một dòng, tức xung đột ngay trong sản phẩm, và phải tiếp tục chặn Land.
+
+Lúc 14:14, owner viết: "tưởng sáng cho quyền rồi. anh thấy cả 2 tiến trình đều ngồi đợi". Theo Lead, phán quyết buổi sáng chỉ chọn hình dạng cổng và vẫn để "Land do owner duyệt riêng". Lead nhận: "Lẽ ra em nên hỏi gộp ngay lúc đó: gate qua thì Land luôn", và ghi quyền Land thành một phán quyết riêng.
 
 ## Cutover: một commit
 
-`97dd62aa7` (3/11, giờ commit 22:07), "docs: cut documentation authority over to docs/platform and retire the legacy roots", thay đổi 1.677 file, +182.794 / -239.220 dòng: 166 file thêm, 943 file xoá, 446 file sửa, 122 file đổi tên. Trong số file xoá, 908 nằm dưới `docs/architect` và 6 nằm dưới `docs/specs` (R-built §2).
-
-Commit này cũng gộp hai reading map thành một, viết lại `AGENTS.md`, sửa `.githooks/pre-commit`, thêm `.githooks/reference-transaction` (hook phục vụ lease, bị xoá lại ngày 4/11 theo fact-check #84), và cài ba guard thay cho ratchet (phán quyết L12-89): gốc đã retire bị từ chối, check vị trí trong Convention, và check link/anchor trong doc-health (R-built §2).
+Commit cutover thay đổi 1.677 file, +182.794 / -239.220 dòng, trong đó 943 file bị xoá. Nó gộp hai bản đồ đọc, viết lại `AGENTS.md`, và cài ba guard thay cho ratchet: chặn file mới ở các gốc cũ, kiểm vị trí file, và kiểm link/anchor. Guard có mặt trong cutover vì owner hỏi ngày 21/10: "bộ quy định, ràng buộc để docs không sinh bậy cũng được land trong phase 9?". Phán quyết sau đó ghi lý do: để tới Phase 10 thì khoảng hở sau khi bỏ ratchet sẽ tái tạo thẩm quyền chia đôi.
 
 ## Những gì đã đạt được, có bằng chứng
 
-1. **Một cây thẩm quyền.** `docs/specs` và `docs/architect` không còn tồn tại. `docs/platform/` có 628 file Markdown trong 34 thư mục khu vực. `docs/decisions/` vẫn còn, nhưng theo luật chỉ được chứa `index.md` sinh tự động (R-built §3.1).
-2. **Một bản đồ đọc.** `docs/reading-map.md` chứa bản gộp, có dòng Provenance dẫn về cả hai bản cũ (R-built §3.2).
-3. **Một check tái lập được.** `node scripts/doc-health.mjs` chạy ngày 5/11 cho kết quả: "628 platform documents, 2607 local links, 302 metadata-exempt, 0 finding(s)". `test/scripts/doc-health.test.mjs` có một wiring proof chạy trong suite (R-built §3.3).
-4. **Luật đường dẫn ở một chỗ.** Convention sở hữu tên và vị trí. Các dòng forbidden chặn gốc đã retire (`packages/convention/contracts/convention.rules.v1.json:143-148`). Pre-commit gọi `convention check` trên `docs/**` được stage (R-built §3.4).
-5. **Tra được đường dẫn cũ.** Alias table 9.235 mục trên main cho phép tra đường dẫn cũ sau khi gốc cũ đã bị xoá. `docs/platform/history/documentation-authority-unification/sealed-claim-ledger.json` (kèm `.sha256`) trên main là một bản ghi digest của ledger 68.441 dòng, ghim tại snapshot `2a028cdc9`; bản thân các dòng ledger chỉ nằm trong tag local (R-built §2, §3.5; fact-check `review-261105-1423-doc-260925-retrospective-claims.md` #89). Theo cách đọc của người viết, đây là phần trả lời cho phát hiện C2 của review ngày 25/9 (bài 3): đường dẫn tra được trên main, còn danh tính claim chi tiết thì phụ thuộc vào tag local.
-6. **Câu trả lời L5 cho người lạ.** `AGENTS.md` giờ dẫn sáu câu hỏi definition-of-done qua `docs/reading-map.md`, `docs/platform/platform-foundations.md` (L1 tới L10) và spec từng khu. Ba bản luật nền giờ chỉ còn một: `git ls-files` chỉ thấy `docs/platform/platform-foundations.md` (writer check 2026-11-05). Lưu ý: sau cutover chưa có lần test fresh-reader nào mới; kết quả gần nhất là ở Phase 5 và Phase 7 (R-built §3.6).
-7. **Ít bộ phận phải mang theo hơn.** Commit `159971615` của Phase 10 xoá 7.426 dòng script và 22 file test (xoá 35 file; cả commit chạm 41 file, -13.856 dòng; fact-check #93, writer check 2026-11-05). Việc gỡ lease xoá 2.734 dòng trên 39 file (`c7a354e1d`; R-built §3.7).
-
-Phase 10 land ở đỉnh fast-forward `97cc4b432` ngày 4/11, với các commit công việc `46310f968..00c64d5a5`. Ngoài các mục trên, Phase 10 thêm `fgos convention classify` và ba luật của doc-health (link, header metadata, đường dẫn chết), gắn header governance cho 26 tài liệu, và quét 166 đường dẫn backtick chết (Lead check 2026-11-05; R-built §1, §2).
+1. **Một cây thẩm quyền.** `docs/specs` và `docs/architect` không còn. `docs/platform/` có 628 file Markdown trong 34 khu. Chỉ còn một bản đồ đọc và một bản luật nền, và `AGENTS.md` dẫn tới chúng.
+2. **Một check tái lập được.** Chạy ngày 5/11: "628 platform documents, 2607 local links, 302 metadata-exempt, 0 finding(s)". `scripts/doc-health.mjs` hôm nay dài 214 dòng cho ba luật (link, metadata, đường dẫn chết), dùng chung khoảng 200 dòng helper; bản nháp 7/10 dự đoán khoảng 400–500 dòng cho sáu kiểm, trong đó ba kiểm (đường dẫn đã retire, claim hai chủ, tài liệu sinh lỗi thời) chưa được làm.
+3. **Tra được đường dẫn cũ.** Bảng tra trên main có 9.235 mục. Sổ claim 68.441 dòng chỉ có bản tóm tắt digest trên main; các dòng nằm trong tag local. Theo cách đọc của người viết, đây là phần trả lời cho nhu cầu tra cứu mà review đầu tiên nêu (bài 3).
 
 ## Những gì chưa đạt hoặc còn mở
 
-- **DOCOS: "not-planned".** Hệ điều hành tài liệu mà proposal ngày 20/9 hướng tới chưa được dựng và chưa có plan (`plans/261017-1313-fgos-platform-program-board/plan.md:80`). Dòng ledger PF-I024 liệt kê ba thứ chưa làm: một cửa ghi duy nhất (`fgos doc new`), check owner ở mức claim, và check rằng skill hoặc lệnh được nhắc trong tài liệu canonical có tồn tại thật. Lý do được đo: `Canonical for` có 18 giá trị khác nhau và một chuỗi được dùng chung bởi 60 tài liệu (R-built §4). Plan này giải quyết thẩm quyền, chưa giải quyết việc viết.
-- **doc-health chỉ chạy trong `npm test`.** Nó không ở pre-commit, và đó là chủ ý ("It is not duplicated in pre-commit", `docs/platform/convention/spec.md:382`). Nó cũng không có doctor row. Một commit làm gãy link chỉ bị bắt khi suite chạy, không bị bắt lúc commit (R-built §4).
-- **Evidence chỉ có ở máy owner.** Tag `archive/doc-260925-lineage` (`84bbfa7b8`) không được push lên origin, theo quyết định giữ 7,5 GB ngoài main (Lead check 2026-11-05). Bản nén 575,4 MiB cũng nằm trên cùng máy (R-cost §1). Nếu mất đĩa, các quyết định chi tiết theo từng claim sẽ mất; chỉ còn digest của sealed ledger và 28 file trong thư mục plan trên main (27 lúc cutover; Phase 10 thêm file phase của nó) (R-built §4; fact-check #96).
-- **Trạng thái `plan.md` từng lỗi thời.** Lúc viết loạt bài, `plans/260925-documentation-authority-unification/plan.md` trên main vẫn có frontmatter `status: in-progress` (dòng 4), H1 "active migration plan" (dòng 12), dòng 15 nói việc gỡ lease "follows as its own item" dù lease đã gỡ ở `ad72e3a46`, và Phase 11 ghi "pending" (dòng 262) (writer check 2026-11-05). Lead sửa cả bốn chỗ trong cùng commit `36737e5d6` đưa loạt bài này lên. Board là nguồn đúng hiện tại.
-- **Guard Phase 9 lúc landing chưa có hiệu lực qua host đã cài.** Release đã kích hoạt lúc đó không mang luật mới (gap G1). Release `47e1016d` sau đó chưa được kiểm lại trong nghiên cứu này (R-built §2, §4).
-- **Giới hạn phương pháp chưa truy hết.** 247 finding của audit độc lập ở Phase 8 được ghi "not green and not waived" (`phase-08/owner-answers.md:2821`); biên nhận audit Phase 6 là một lệnh do chính tác giả viết. Nghiên cứu chưa tìm được cách xử lý cuối cùng của chúng (R-built §4). (E6/E7 của Phase 5 không nằm trong danh sách này: chúng đạt sau một vòng sửa, xem bài 4.)
+- **Hệ điều hành tài liệu chưa có plan.** Proposal 20/9 hướng tới một hệ có một cửa ghi duy nhất cho tài liệu; nó đang ở trạng thái "not-planned". Plan này giải quyết thẩm quyền, chưa giải quyết việc viết.
+- **Check tài liệu chỉ chạy trong bộ test**, không ở pre-commit, và đó là chủ ý: link gãy chỉ bị bắt khi suite chạy.
+- **Evidence chỉ có ở máy owner.** Tag lưu evidence không được push lên origin; trên main chỉ còn digest của sổ claim và 28 file trong thư mục plan. Sáng 4/11, Lead hỏi chỗ lưu bằng chứng ngoài máy; owner duyệt các việc 1-4 (gồm các bản ghi sau Land) và viết thêm: "Nếu ổn thì anh không cần giữ dữ liệu đâu". Lead hiểu câu đó là không cần bản sao ngoài máy, và cũng dựa vào nó để dừng phần sổ sách sau Land (L13-159).
+- **Guard lúc landing chưa có hiệu lực qua bản fgOS đã cài**; bản sau đó chưa được kiểm lại.
 
 ## Bài học
 
-1. **Đặt luật thẩm quyền trước khi đặt cơ chế sinh tài liệu.** Ngày 20/7, cổng compound-learn bắt mỗi item sinh một tài liệu (`3ee30977a`, `1739a83d5`), trong khi luật nền đã có hai bản từ 14/7 (`ad65f59fd`). Cùng giai đoạn đó, `docs/` tăng từ 365 lên 4.301 file trong tám tuần mà specs chỉ có 11 tới 13 file (bài 1, bài 2); việc cổng này là một nguyên nhân chính là cách đọc của người viết. Cộng dồn tri thức đòi hỏi trước hết phải có một chỗ duy nhất để cộng vào.
-2. **Dời là dời. Chép mà gọi là "migrate" thì sinh ra bản sao tách nhánh.** `e1307d33f` thêm 943 file và không xoá bản gốc; một ngày sau đã có 67 bản khác nhau (bài 2). Việc di trú tài liệu lớn không nên nằm trong một commit có tiêu đề "fix(dispatch)".
-3. **Chuyển bên đọc trước, hoặc cùng lúc.** Switchboard tồn tại từ 15/9, nhưng `AGENTS.md` và `core/instructions` vẫn trỏ cây cũ (bài 2). Phase 8 chuẩn bị bên tiêu thụ, và cutover chuyển chúng trong cùng một commit (bài 4, bài 6). Việc đó là điều kiện để cutover có tác dụng là cách đọc của người viết.
-4. **Pilot phải được phép thất bại.** Pilot A tìm ra 16 drop mà audit trước khai là đã giữ. Vòng đầu trượt E6 và E7, owner phán METHOD-MUST-CHANGE, và sau một vòng sửa cả hai đạt (bài 4). Theo cách đọc của người viết, nếu bỏ pilot thì những drop đó đã đi thẳng vào cutover.
-5. **Báo chi phí kiểm chứng sớm, đừng để owner phải hỏi.** Ngày 11/10, owner phải tự hỏi "tài liệu thôi mà sao kì công vậy ta" trong khi rework chỉ là 1,8% và Lead vẫn đang viết thêm amendment (bài 4, bài 5). Khi chi phí chứng minh lớn hơn rủi ro nhiều lần, hãy đề xuất cách chia rẻ hơn ngay.
-6. **Một review không hội tụ sau vài vòng thì phải đổi đơn vị review, không chạy thêm vòng.** Gói review từng cạnh A36 (338 phần, cho 5.427 cạnh mà thực chất chỉ có 1.018 ánh xạ) bị bỏ ở A50 trước khi được review. Sau đó mẫu ngữ nghĩa 1.275 cạnh vẫn trượt qua bảy lần sinh lại (8,3% rework). Nó chỉ dừng khi cổng được đổi ở A51: kiểm kê cơ học, còn patch được viết và review theo từng file tiêu thụ (bài 4).
-7. **Tác giả không bao giờ được chạm vào thước đo của chính mình.** Ngày 30/10, ngay cả với giới hạn "only by named negative fixtures", 5 trên 8 thay đổi của Doer đã nới lỏng check hoặc thay bằng dữ liệu của chính tác giả (bài 4).
-8. **Không merge một partial đang đỏ vào nhánh chung.** Khoảng 27/10, một partial đỏ làm hỏng mọi lần chạy proof ở HEAD (bài 4).
-9. **Giàn giáo dùng một lần thì ghi rõ ngày gỡ ngay từ lúc dựng.** Write lease được thiết kế ở Phase 4, dựng ở Phase 8 và xoá ngày 4/11 với -2.734 dòng (bài 4, bài 5). Nó có thể đáng, nhưng chi phí của nó nên được nhìn thấy ngay từ đầu.
-10. **Evidence chỉ ở một máy thì chưa phải evidence bền.** Theo L9 ("run ≠ merge ≠ durable", `AGENTS.md`), land chưa có nghĩa là bền. 7,5 GB evidence hiện chỉ có trên một máy (bài 5, bài 6). Owner cần chọn: chấp nhận rủi ro này, hoặc có thêm một bản sao thứ hai.
-11. **Đổi định dạng plan thì cập nhật trạng thái theo.** `plan.md` ở main từng ghi "Proposed — not authorized" khi plan đã chạy (bài 3), và vẫn ghi `status: in-progress` sau khi đã đóng, tới lúc viết loạt bài này mới được sửa (`36737e5d6`). Ngay trong plan dọn thẩm quyền, file trạng thái của chính plan từng có hai nguồn nói khác nhau.
+1. **Cổng release chỉ gồm kiểm tra trên sản phẩm, và khi người chọn hình dạng cổng thì hỏi luôn: qua cổng thì được làm luôn không.** Sổ sách nội bộ ghi lại, không chặn. Land gọn lên main khoảng 13 tiếng sau khi được chọn. Thiếu câu đó, chiều 3/11 owner thấy cả hai tiến trình như đang chờ và phải hỏi lại; quyền Land được ghi thêm thành L13-155.
+2. **Lời nhắc của người là chi phí của hệ thống, và một khúc cắt không thành quy trình thì lời nhắc quay lại.** Owner phải nhắc ít nhất chín lần (bài 4) và hỏi tiến độ ít nhất 33 lần (bài 5). Đo số lần người phải đi hỏi như một chỉ số chi phí.
+3. **Giữ đủ câu không có nghĩa là giữ câu đúng.** Mẫu 30 câu cho 13,3% và 26,7% câu sai so với hiện trạng (bài 4). Lấy mẫu đúng-sai trước khi dựng kế toán.
+4. **Đặt luật thẩm quyền trước cơ chế sinh tài liệu, và khi di trú thì dời chứ không chép, chuyển cả bên đọc cùng lúc.** Bước compound-learn (20/7) ra đời khi luật nền đã có hai bản; theo cách đọc của người viết, nó là một nguyên nhân chính của 365 lên 4.301 file (bài 1, 2).
+5. **Quyết định chấp nhận rủi ro phải được hỏi và ghi rõ, không suy ra từ một câu chat.** Ngày 4/11, câu "Nếu ổn thì anh không cần giữ dữ liệu đâu" được Lead hiểu thành chấp nhận để evidence ở một máy, nhưng `plan.md` trên main chỉ ghi nơi evidence nằm (dòng 280).
+
+Các bài học khác (pilot phải được phép thất bại, đổi đơn vị review khi không hội tụ, không ai được dời thước đo, không merge phần việc đang đỏ, ghi ngày gỡ giàn giáo) nằm ở evidence pack §7.
+
+Câu hỏi ở đầu bài 1 là "6 tuần rồi". Câu trả lời: phần tài liệu không khó, cái chậm là bộ máy chứng minh, và nó dừng khi cổng chỉ còn hỏi sản phẩm có đúng không. Theo cách đọc của người viết, hai nửa của chuỗi là một chuyện: bài 1–2 cho thấy tài liệu phình ra vì được sinh trước khi có luật nói bản nào đúng, và bài 4–6 cho thấy việc dọn chậm vì phải chứng minh lại từng câu của chính đống tài liệu đó.
 
 ## Nguồn
 
-- Cutover: `97dd62aa7`. Phase 10: `97cc4b432`, `46310f968..00c64d5a5`. Lease: `c7a354e1d`, `ad72e3a46`.
-- Lead check 2026-11-05 (tag chỉ có trên máy owner; đỉnh Phase 10; thời điểm gỡ lease).
-- Writer check 2026-11-05: `plans/260925-documentation-authority-unification/plan.md` dòng 4, 12, 15, 262; `git ls-files 'docs/**/platform-foundations.md'`.
-- `docs/platform/convention/spec.md:382`; `packages/convention/contracts/convention.rules.v1.json:143-148`; `plans/261017-1313-fgos-platform-program-board/plan.md:80`.
-- Commit `159971615` (gỡ script plan-era).
-- [Fact-check](review-261105-1423-doc-260925-retrospective-claims.md) #84, #89, #90, #93, #96, #99, #100, #101, #102.
-- [R-built](research-261105-1412-retrospective-plan-260925-built-and-gained.md) §2, §3, §4; [R-cost](research-261105-1411-retrospective-plan-260925-execution-cost.md) §1.
-- Các bài trước trong chuỗi và [evidence pack](retrospective-261105-1416-doc-260925-evidence-pack.md) §4.
+- Transcript Lead `~/.claude/projects/-home-vantt-projects-forgentX/a4954387-fafa-46d2-911f-4ea15b20d08d.jsonl`: dòng 82549 (ba mốc land), 84830, 84838 (2/11), 84842 (ba lựa chọn), 84844 (chọn Land gọn, 2026-11-03T03:22:06Z), 85139 (auditor REWORK, `sameLinesTwice`), 85763, 85790 (14:14), 37706 (câu hỏi guard, 2026-10-21T09:07:37Z), 87026, 87031, 87304 (4/11). Giờ UTC: evidence pack §6.
+- Land gọn: L13-152 (`ee695a632`, 3/11 10:22). Quyền Land: L13-155 (`c8b02bd67`, 14:14). Guard: phán quyết L12-89, `TAG:plans/260925-documentation-authority-unification/reports/phase-08/owner-answers.md:1285-1291`.
+- Cutover: `97dd62aa7` (tạo 22:07:32; lên main 23:41:14 theo `git reflog show --date=iso main`; board log 23:50); R-built §2.
+- Đã đạt: R-built §3; `node scripts/doc-health.mjs` (5/11); helper `scripts/lib/doc-links.mjs` (126 dòng), `scripts/list-doc-anchors.mjs` (82 dòng); dự đoán: transcript `4df9e88c…jsonl` dòng 2674. Alias table; sealed ledger digest `2a028cdc9`; fact-check #89.
+- Còn mở: DOCOS (`plans/261017-1313-fgos-platform-program-board/plan.md:80`); `docs/platform/convention/spec.md:382`; tag `archive/doc-260925-lineage` (Lead check 2026-11-05); fact-check #96; gap G1, release `47e1016d` (R-built §4).
+- Writer check 2026-11-05: `plans/260925-documentation-authority-unification/plan.md:280`; `git ls-files 'docs/**/platform-foundations.md'`.
+- Bài học 4: `3ee30977a`, `ad65f59fd`; fact-check #100.
+- [R-built](research-261105-1412-retrospective-plan-260925-built-and-gained.md); [fact-check](review-261105-1423-doc-260925-retrospective-claims.md); [round 3](review-261105-1800-doc-260925-retrospective-claims-round3.md) W2, W3, O2, O4, m1; [evidence pack](retrospective-261105-1416-doc-260925-evidence-pack.md) §4, §6, §7.

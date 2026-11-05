@@ -2,92 +2,66 @@
 
 *Chuỗi hồi cứu plan 260925, bài 3/6. Bài trước: [Tài liệu đã trôi dạt thế nào](retrospective-261105-1416-doc-260925-post-2-how-docs-drifted.md). Bài sau: [Phương pháp, và vì sao nó chậm](retrospective-261105-1416-doc-260925-post-4-the-method-and-why-slow.md).*
 
-Người ta thường nghĩ một đợt dọn dẹp lớn bắt đầu bằng một sự cố: agent đọc nhầm tài liệu, một bản build hỏng, một lần merge sai. Với plan 260925 thì không phải vậy. Nghiên cứu hồi cứu **không tìm thấy** sự cố, báo cáo hỏng hay đoạn chat nào làm cú hích (R-trigger §1.1). Cú hích là một cuộc thảo luận thiết kế, được lưu lại thành proposal, rồi một phần của proposal đó được cắt ra thành plan.
+Nghiên cứu hồi cứu **không tìm thấy** sự cố, báo cáo hỏng hay đoạn chat nào làm cú hích cho plan 260925. Thứ làm nó cấp bách là một review của bản nháp plan, nói thẳng: "Three authority rules are live at the same time and disagree". Bản nháp đó được cắt ra từ một proposal ghi lại một cuộc thảo luận thiết kế.
 
-## Nền: di trú từng khu, có redirect
+## Ngày 25/9: review bác tiền đề của bản nháp
 
-Ngày 15/9, `23fb220e3` thêm `docs/doc-governance.md` (458 dòng) và `docs/platform/README.md` (79 dòng). Mục 13 của governance quy định cách di trú: "Migrate one area at a time, with redirect/stub pointers" (trích lại trong review độc lập ngày 25/9, R-trigger §1.2). Vậy là từ 15/9, repo có cây `docs/platform/**` mới nằm cạnh `docs/specs/**` và `docs/architect/**`, với từng khu được promote một.
+Ngày 25/9, bản nháp plan được đưa cho hai model khác nhau review độc lập. Hai review chỉ tư vấn, không quyết định.
 
-Bài 2 đã cho thấy cách này dẫn tới đâu: ba khu promoted mà vẫn giữ nguồn legacy, và lần chép 943 file ngày 18/9.
-
-## Proposal ngày 20/9
-
-Proposal `docs/platform/proposals/documentation-system-unification.md` ghi `Last reviewed: 2026-09-20`. Nó được commit lần đầu ở `ca854f443` (21/9 23:23), trong một commit có tiêu đề "refactor coordination action legality and test fixtures" và thêm 991 dòng (R-trigger §1.1). Giống commit 18/9, đây lại là một thay đổi lớn về tài liệu nằm lẫn trong một commit có tiêu đề về chuyện khác.
-
-Proposal tự nói nó "preserves the complete discussion so it can continue without chat history". Phiên chat gốc không có trong repo, và prompt ban đầu cũng không. Nguồn gốc này **chưa kiểm chứng được**.
-
-Proposal nêu vấn đề như sau (mục 1, đọc tại `2085d88fe^`):
-
-> "An agent asked to 'write the architecture doc' must still reconstruct the workflow: classify the claim, find its owner, choose a type and path, locate a template, update related links and proof, regenerate projections, and determine which checks apply."
-
-Và nêu ý định của owner:
-
-> "Every retained detail in `docs/specs/**` and `docs/architect/**` must be migrated to the new system. Those legacy trees must then be retired and removed; they must not remain indefinitely as compatibility or 'legacy-current' sources."
-
-Câu thứ hai là yêu cầu thật của plan: không để lại một cái split vĩnh viễn nào.
-
-## Ngày 25/9: hai review, rồi truth reset, cùng một commit
-
-Lúc đó đã có một bản nháp plan. Hai review độc lập đọc bản nháp này và chỉ đưa ra tư vấn, không quyết định. Review thứ nhất do Claude Opus chạy qua fgOS dispatch. Kết luận: "PROCEED WITH REQUIRED CHANGES, for Phase 00 only". Phát hiện quan trọng nhất của nó sửa lại chính tiền đề của plan:
+Review thứ nhất, do Claude Opus chạy, khuyên đi tiếp nhưng chỉ cho bước đầu tiên, kèm những thay đổi bắt buộc. Phát hiện quan trọng nhất của nó không phải một lỗi trong plan, mà là tiền đề của plan sai:
 
 > "The plan is aimed at a clean two-system repository. The live repository already has per-area authority flips, three user-doc systems, and decision history stored in `docs/specs`."
 
-Phát hiện C1 ghi: "Three authority rules are live at the same time and disagree": `docs/reading-map.md` mục 3, `docs/specs/reading-map.md:7`, và portal agent-coordination. C2 ghi: "Deleting legacy platform paths needs a way to look them up afterwards, and that doesn't exist before cutover." Alias table (Phase 4) và sealed claim ledger (Phase 9) về sau đáp đúng nhu cầu mà C2 nêu (R-built §1); việc C2 trực tiếp dẫn tới chúng là cách đọc của người viết.
+Bản nháp tưởng repo có hai hệ tài liệu, một cũ một mới, và chỉ cần chuyển từ hệ này sang hệ kia. Review cho thấy repo đang có nhiều hơn thế: thẩm quyền đã bị lật theo từng khu, có ba hệ tài liệu end-user, và lịch sử quyết định nằm trong spec. Phát hiện đầu tiên của nó chính là câu đã dẫn ở đầu bài: ba luật thẩm quyền, ở hai bản đồ đọc và một cổng vào của khu Agent Coordination, cùng có hiệu lực và nói khác nhau. Phát hiện thứ hai: "Deleting legacy platform paths needs a way to look them up afterwards, and that doesn't exist before cutover."
 
-Khuyến nghị đầu tiên của review Opus là: "Phase 00 must first inventory the current authority state". Review này cũng tự nhận giới hạn: shell của nó bị chặn, nên tổ tiên của `5c948d2a4`, kết quả `fgos doctor` và số consumer đếm bằng `rg` đều "not independently verified".
+Khuyến nghị đầu tiên của review là: "Phase 00 must first inventory the current authority state". Trước khi dời gì, phải biết hiện tại cái gì đang là bản đúng.
 
-"Truth reset" là câu trả lời cho khuyến nghị đó. Nó tạo `current-authority-map-2026-09-25.md`, snapshot tại `ac19f6d1e`. Map tự giới hạn: "Records current authority; does not promote, migrate, delete, or supersede any source". Quy tắc routing của nó bắt đầu bằng: "Use explicit declarations, not path, date, prose quality, or a bare `Canonical:` metadata field" (R-trigger §1.4). Một quy tắc như vậy chỉ cần viết ra khi không có cơ chế nào làm việc đó.
+Câu trả lời là "truth reset": một bản đồ thẩm quyền hiện tại theo từng khu, chỉ ghi lại, không dời hay xoá gì. Quy tắc định tuyến của nó mở đầu bằng: "Use explicit declarations, not path, date, prose quality, or a bare `Canonical:` metadata field". Một quy tắc như vậy chỉ cần viết ra khi không có cơ chế nào làm việc đó.
 
-Re-review do Gemini 3.1 Pro High chạy trên bản plan đã sửa. Nó ghi rằng plan "incorporates critical corrections from the prior review". Kết luận: "PROCEED WITH REQUIRED CHANGES for Phase 00 only; migration execution remains unauthorized". Nó nêu năm phát hiện, gồm bốn phát hiện chính dưới đây và L1 về số tài liệu provisional/active:
+Review thứ hai, do Gemini chạy trên bản plan đã sửa, ghi rằng plan "incorporates critical corrections from the prior review", nhưng vẫn giữ: "migration execution remains unauthorized". Nó nêu năm phát hiện, trong đó hai điều về sau thành việc thật: phát hiện drift không có nghĩa là đã chặn được việc ghi, và sổ claim chưa có chỗ lưu bền.
 
-- H1: phát hiện drift không phải là đóng băng ghi.
-- H2: dời payload evidence có thể làm hỏng bên đọc lúc runtime.
-- M1: chưa chứng minh được L5/L8 có hardcode đường dẫn bị dời hay không.
-- M2: claim ledger chưa có chỗ lưu bền.
+Bản đồ thẩm quyền, hai review và plan được commit cùng nhau trên nhánh riêng của plan ngày 25/9, lúc 13:57.
 
-Authority map, hai review và `plan.md` (724 dòng, ghi Phase 00 "authorized and completed") được commit cùng nhau trên nhánh plan ở `a725d4788` (25/9 13:57), commit đánh dấu "complete phase 00 truth reset" (writer check 2026-11-05: `git show a725d4788:plans/260925-documentation-authority-unification/plan.md | wc -l` = 724; fact-check `review-261105-1423-doc-260925-retrospective-claims.md` #32, #35).
+## Trước đó: một proposal và một yêu cầu
 
-## Ngày 26/9: bản plan lên main
+Từ 15/9, quy định quản lý tài liệu cho phép di trú từng khu một, có con trỏ chuyển hướng: "Migrate one area at a time, with redirect/stub pointers". Bài 2 đã cho thấy cách này dẫn tới đâu.
 
-`plan.md` xuất hiện lần đầu trên nhánh plan ở `a725d4788`. Phải tới `2085d88fe` (26/9 22:43), "docs: establish documentation authority unification plan", main mới nhận một bản 704 dòng, kèm ba file review và các sửa đổi ở governance, portal, reading map, intent ledger và proposal. Commit này gồm 10 file, 1.524 dòng thêm (R-trigger §2). `a725d4788` không phải tổ tiên của `2085d88fe`, nên từ đây plan có hai bản song song: bản trên nhánh đang chạy, và bản trên main (fact-check #35). Trong khi đó trên nhánh, Phase 1 tới 3 đã đóng vào 25 và 26/9 (bài 4). Phần đầu bản trên main ghi:
+Một proposal ghi ngày review cuối 20/9 lật lại cách làm đó. Nó được commit lần đầu đêm 21/9, trong một commit có tiêu đề về chuyện khác ("refactor coordination action legality and test fixtures"), giống lần chép ngày 18/9. Proposal tự nói nó "preserves the complete discussion so it can continue without chat history", nhưng phiên chat gốc không có trong repo, nên nguồn gốc này **chưa kiểm chứng được**. Nó nêu ý định của owner:
 
-> "Plan status: Proposed — not authorized for execution
-> Primary objective: Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**
-> Risk: Critical documentation migration"
+> "Every retained detail in `docs/specs/**` and `docs/architect/**` must be migrated to the new system. Those legacy trees must then be retired and removed; they must not remain indefinitely as compatibility or 'legacy-current' sources."
 
-Mục tiêu được viết như một công thức: "one platform claim → one canonical owner → one explicit authority route → one maintained physical document". Plan cũng nói rõ đây "is not a cleaner-looking directory tree". Phần sứ mệnh đòi kết thúc split "without losing any retained claim, rationale, contract, decision, proof, or preserved intent" (R-trigger §3).
+Đây là yêu cầu thật của plan: không để lại một cái split vĩnh viễn nào.
 
-Hai nguyên tắc định hình toàn bộ chi phí phía sau:
+## Hai nguyên tắc, và hai bản plan
 
-- **Quyết định 5**: "Completion of the authority flip is atomic for the platform-documentation system." Không có trạng thái nửa vời.
-- **Bảo toàn từng claim**: đến từ phần sứ mệnh ở trên, cùng các quyết định 2 và 6. Quyết định 12 thì hẹp hơn: "No scope reduction by omission. Deferred architecture is recorded with a revisit trigger in the intent-preservation ledger." (fact-check #38).
+Ngày 26/9, một bản plan được commit lên main, ghi "Proposed — not authorized for execution", trong khi trên nhánh riêng, bản đang chạy đã đóng ba phase đầu. Từ đây plan có hai bản song song.
+
+Phần sứ mệnh đòi kết thúc split "without losing any retained claim, rationale, contract, decision, proof, or preserved intent". Hai nguyên tắc định hình toàn bộ chi phí phía sau:
+
+- **Chuyển thẩm quyền một lần**: "Completion of the authority flip is atomic for the platform-documentation system." Không có trạng thái nửa vời.
+- **Bảo toàn từng claim**: đến từ phần sứ mệnh ở trên và hai quyết định khác của plan.
 
 Hai nguyên tắc này đúng về mặt nguyên tắc. Nhưng chính chúng biến một việc "dọn tài liệu" thành việc kế toán từng claim một, như bài 4 và bài 5 sẽ cho thấy.
 
-Cùng commit đó, plan knowledge-registry cũ (`plans/260825-1841-knowledge-registry/plan.md`) bị hạ xuống thành "historical implementation plan".
+## 29/9 đến 6/10: đổi định dạng, dừng, rồi chạy tiếp
 
-## Ngày 29/9 đến 6/10: đổi định dạng, rồi dừng, rồi chạy tiếp
+Ngày 29/9, plan được đổi sang định dạng mười file phase, đánh số lại từ 1. Từ 30/9 tới 5/10 không có commit nào trên nhánh plan. Ngày 6/10, owner nhắc lại lý do khi hỏi: plan "đã dừng khá lâu để đợi cơ chế harness ổn định và quay lại, nhưng liệu đợi lâu như vậy có nên hay không, hay chỉnh lại thành ak-plan và làm luôn vì nó đang giữ một đống tài liệu không chuẩn hóa". Cùng ngày, một bản tổng hợp phát hiện plan đã chạy được một phần trên nhánh riêng, trong khi bản trên main vẫn ghi "chưa duyệt".
 
-- `4d80eaf29` (29/9 18:51) đổi plan sang định dạng phase-file của AgentKit: `plan.md` trên nhánh, khi đó 800 dòng, rút còn 454 dòng: một index với mười file `phase-NN`, đánh số lại từ 1. Vì vậy trong lịch sử, tag và tên artifact giữ số cũ (00 đến 09) trong khi phase file dùng số mới (R-built, phần đầu).
-- Cùng tối đó, một báo cáo tư vấn (`plans/reports/advice-260929-2345-doc-authority-harness-executor-routing.md`) chẩn đoán rằng harness đang định tuyến việc tài liệu như việc code (`capability: code:*`).
-- Từ 30/9 tới 5/10 không có commit nào trên nhánh plan (R-cost §2).
-- Ngày 6/10, bản tổng hợp harness (`plans/reports/harness-investigation-261006-synthesis.md`, mục H6) phát hiện plan đã chạy được một phần trên nhánh riêng, trong khi `plan.md` ở main vẫn ghi "Proposed — not authorized". Bản tổng hợp tự nhận một câu sai trước đó: "Em đã nói sai ở lượt trước ('không thấy dấu hiệu phase nào chạy')" (R-trigger §2).
-- Resume: main được merge vào nhánh plan (`b9fee1e56`, `6b8ef0e8d`); lúc đó main đi trước 400 commit và nhánh có 59 commit chưa lên main. Inventory sinh lại tăng từ 4.305 lên 4.311 file và từ 85.772 lên 86.085 claim unit. Generator hết bộ nhớ hai lần: exit 134 ở heap 4 GB, rồi exit 137 ở 7,5 GB sau 44 phút, vì nó đọc lại chính file JSON khoảng 250 MB do nó sinh ra. Báo cáo resume ghi 43 claim unit biến mất là "UNPROVEN" (mất thật hay chỉ đổi chỗ) (`plans/reports/resume-261006-1635-doc-authority-unification.md`, R-trigger §2).
-
-Owner quyết định plan chạy trong một phiên chat riêng. Phiên điều tra chỉ hoàn thiện plan và ý định, không chạy phase nào (R-trigger §2).
+Plan chạy lại ngay hôm đó. Main được merge vào nhánh plan, khi main đã đi trước 400 commit. Bộ sinh inventory hết bộ nhớ hai lần trước khi chạy được (bài 5), và báo cáo resume ghi 43 claim biến mất là "UNPROVEN": chưa rõ mất thật hay chỉ đổi chỗ. Owner quyết định plan chạy trong một phiên chat riêng: "ở đây chúng ta chỉ hoàn thiện plan và ý định cho nó, không chạy nhé".
 
 ## Nhìn lại
 
-Không có cú hích dạng sự cố. Có một trạng thái tích tụ suốt hai tháng, một proposal ghi lại ý định "xoá hẳn cây legacy", và hai review cho thấy thực tế tệ hơn tiền đề của bản nháp. Lựa chọn atomic và bảo toàn từng claim được đưa ra từ ngày đầu. Bài 4 kể về phương pháp mà hai lựa chọn đó đòi hỏi.
+Không có cú hích dạng sự cố. Có hai tháng tích tụ, một proposal đòi "xoá hẳn cây legacy", và một review cho thấy thực tế tệ hơn tiền đề của bản nháp. Bài 4 kể phương pháp mà lựa chọn atomic và bảo toàn từng claim đòi hỏi, và lần đầu owner hỏi vì sao nó to như vậy.
 
 ## Nguồn
 
-- Governance và portal: `23fb220e3`.
-- Proposal: `ca854f443`; nội dung đọc tại `2085d88fe^:docs/platform/proposals/documentation-system-unification.md`.
-- Truth reset: `a725d4788`, snapshot `ac19f6d1e`; `TAG:P/current-authority-map-2026-09-25.md`.
-- Review: `TAG:P/independent-frontier-review-2026-09-25.md`, `TAG:P/independent-frontier-rereview-2026-09-25.md` (TAG = `archive/doc-260925-lineage`, P = `plans/260925-documentation-authority-unification`).
-- Plan: `a725d4788` (nhánh), `2085d88fe` (main); đổi định dạng `4d80eaf29`.
-- [Fact-check](review-261105-1423-doc-260925-retrospective-claims.md) #32, #34, #35, #38, #40.
-- Báo cáo: `plans/reports/advice-260929-2345-doc-authority-harness-executor-routing.md`, `plans/reports/harness-investigation-261006-synthesis.md`, `plans/reports/resume-261006-1635-doc-authority-unification.md`.
-- [research-261105-1411-retrospective-plan-260925-trigger.md](research-261105-1411-retrospective-plan-260925-trigger.md) (R-trigger) §1, §2, §3.
-- [Evidence pack](retrospective-261105-1416-doc-260925-evidence-pack.md) §1.
+- Không có sự cố khởi động: R-trigger §1.1.
+- Review: `TAG:P/independent-frontier-review-2026-09-25.md` (Opus: "PROCEED WITH REQUIRED CHANGES, for Phase 00 only"; C1, C2; khuyến nghị 1 ở :190), `TAG:P/independent-frontier-rereview-2026-09-25.md` (Gemini 3.1 Pro High; năm phát hiện H1, H2, M1, M2, L1). TAG = `archive/doc-260925-lineage`, P = `plans/260925-documentation-authority-unification`. C1 trỏ `docs/reading-map.md` mục 3, `docs/specs/reading-map.md:7` và portal agent-coordination.
+- Truth reset: `TAG:P/current-authority-map-2026-09-25.md`, snapshot `ac19f6d1e`; R-trigger §1.4. Map, hai review và `plan.md` (724 dòng) cùng ở `a725d4788` (25/9 13:57); fact-check #32, #34, #35.
+- Quy định 15/9: `23fb220e3` (`docs/doc-governance.md` mục 13); R-trigger §1.2.
+- Proposal: `docs/platform/proposals/documentation-system-unification.md`, `Last reviewed: 2026-09-20`, commit lần đầu `ca854f443` (21/9 23:23, 991 dòng), đọc tại `2085d88fe^`; R-trigger §1.1.
+- Plan trên main: `2085d88fe` (26/9 22:43, 704 dòng; `a725d4788` không phải tổ tiên); quyết định 5; bảo toàn từ sứ mệnh và quyết định 2, 6; R-trigger §2, §3; fact-check #35, #38.
+- Đổi định dạng: `4d80eaf29` (29/9 18:51, 800 còn 454 dòng); fact-check #40. Không commit 30/9 tới 5/10: R-cost §2.
+- Transcript điều tra harness `~/.claude/projects/-home-vantt-projects-forgentX/dc747f94-5283-4c29-9790-177f2aa7ee33.jsonl` dòng 2097 (owner, 2026-10-06T08:30:10Z) và 2428 (owner, 09:49:04Z).
+- Bản tổng hợp: `plans/reports/harness-investigation-261006-synthesis.md` mục H6. Resume: `b9fee1e56`, `6b8ef0e8d`; `plans/reports/resume-261006-1635-doc-authority-unification.md`.
+- [R-trigger](research-261105-1411-retrospective-plan-260925-trigger.md); [fact-check](review-261105-1423-doc-260925-retrospective-claims.md); [round 3](review-261105-1800-doc-260925-retrospective-claims-round3.md) O1; [evidence pack](retrospective-261105-1416-doc-260925-evidence-pack.md) §1, §6.

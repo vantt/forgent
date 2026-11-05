@@ -2,84 +2,69 @@
 
 *Chuỗi hồi cứu plan 260925, bài 4/6. Bài trước: [Cú hích](retrospective-261105-1416-doc-260925-post-3-the-trigger.md). Bài sau: [Cái giá](retrospective-261105-1416-doc-260925-post-5-the-cost.md).*
 
-Plan chọn hai nguyên tắc từ ngày đầu: chuyển thẩm quyền một lần duy nhất (quyết định 5) và không giảm phạm vi bằng cách bỏ sót (quyết định 12) (bài 3). Bài này kể phương pháp được dựng để giữ hai nguyên tắc đó, rồi kể những chỗ nó chậm, sai hoặc đi vào ngõ cụt. Số phase dưới đây là số mới (đánh số lại ngày 29/9); tag và artifact vẫn giữ số cũ (R-built, phần đầu).
+Ngày 7/10, ngày thứ 13 của plan, owner hỏi: "chỉ là viết tài liệu thôi mà sao build tool cho phase 2 mà làm cả buổi chiều mà chưa xong. quy mô tool ghê vậy?". Chưa tới 15 phút sau, một bản nháp đã đoán đúng kết cục: "Khoảng 7.100 dòng script di trú, cộng khoảng 6.200 dòng dữ liệu ratchet, sẽ bỏ sau cutover". Plan vẫn chạy thêm bốn tuần, owner còn phải nhắc ít nhất tám lần nữa, và ngày 4/11 Phase 10 xoá 7.426 dòng script.
 
-## Mười phase, mỗi phase làm gì
+Bài này kể phương pháp được dựng để giữ hai nguyên tắc của bài 3, chuyển thẩm quyền một lần và bảo toàn từng claim, rồi kể chỗ nó chậm.
 
-| Phase | Làm gì | Đóng |
-|---|---|---|
-| 1 | Truth reset: bảng thẩm quyền theo khu, hai trục `authorityStatus` và `fileClass` | 25/9 |
-| 2 | Chặn trôi tiếp: switchboard tạm, từ vựng claim, ratchet chặn file mới ở gốc legacy | 26/9 |
-| 3 | Inventory và sổ bảo toàn: 4.305 file, 85.772 claim unit, mỗi claim có đúng một owner đề xuất | 26/9 |
-| 4 | Đóng băng "minimum constitution", schema claim ledger, alias table, thiết kế write lease | 6/10 |
-| 5 | Pilot kép trên hai khu | 7/10 |
-| 6 | Chuyển toàn bộ khu thành candidate dưới `docs/platform/**` | 17/10 |
-| 7 | Review chéo khu theo chín chiều D1 đến D9 | 19/10 |
-| 8 | Gỡ bypass, chuẩn bị bên tiêu thụ, dựng write lease | 23/10 |
-| 9 | Cutover nguyên tử | 3/11 |
-| 10 | Bảo trì tối thiểu sau cutover | 4/11 |
+## Mười phase
 
-Nguồn: R-built §1; R-cost §2.
-
-Logic của phương pháp là hợp lý. Muốn hứa "không mất claim nào" thì phải đếm hết claim trước khi dời (Phase 3). Muốn dời mà không mất thì cần một luật đích nhỏ và kiểm được (Phase 4). Muốn biết luật đó đúng thì phải thử nó ở quy mô nhỏ trước (Phase 5). Và muốn flip một lần thì mọi bên đọc, gồm skill, hook, doctor và runtime, phải được chuẩn bị trước (Phase 8). `gateway.rs` lúc đó còn đọc `docs/contracts/...` (R-built §2, Phase 8).
+Ba phase đầu (25 và 26/9) lập bản đồ thẩm quyền, chặn trôi tiếp, và kiểm kê 4.305 file thành 85.772 claim. Phase 5 thử phương pháp trên hai khu (7/10). Phase 6 chuyển toàn bộ khu sang cây mới (17/10). Phase 8 chuẩn bị mọi thứ đọc tài liệu (23/10). Phase 9 là cutover (3/11), Phase 10 là bảo trì sau đó (4/11).
 
 ## Pilot đã làm đúng việc của pilot
 
-Phase 5 chạy hai pilot. Pilot A audit mù lại khu host-invocation-routing, vốn đã được promote. Pilot B dựng lại work-state spec và `docs/io-contract.md` (366 dòng) thành tài liệu candidate (R-built §2).
+Phase 5 audit mù lại một khu đã được chuyển trước đó, và tìm ra **16 nhóm nội dung bị rơi thật** mà lần audit trước khai là đã giữ, cùng 23 lỗi phương pháp. Vòng đầu, pilot trượt hai tiêu chí: tra đường dẫn cũ chỉ được 14 trên 20, và chỉ 15,6% link viết lại có anchor. Owner phán phương pháp phải đổi và cho một vòng sửa. Sau đó tiêu chí thứ nhất đạt 19 trên 20, tiêu chí thứ hai đạt theo cách đo owner định nghĩa lại, và ngày 7/10 owner cho qua có sửa đổi.
 
-Pilot A tìm ra **16 drop thật** mà lần audit coverage-matrix trước đó đã khai là được giữ. Chúng trở thành `dropped-002` tới `dropped-017` trong register. Pilot cũng tìm ra 23 lỗi phương pháp, M-01 tới M-23. Báo cáo pilot gọi hai lỗi là "two defects that matter for Phase 6": M-05, khi extractor bỏ qua mọi khối dưới 20 ký tự (3.589 dòng trong 1.179 file), và M-09, khi gói review che lỗi anchor ở mức khối.
-
-Vòng đầu, pilot không đạt ở hai tiêu chí. E6 (alias): chỉ 14 trên 20 tham chiếu history phân giải được. E7 (link preview): chỉ 15,6% cạnh rewrite có anchor. Kết luận ban đầu là "Not PASS". Owner phán METHOD-MUST-CHANGE và cho phép một vòng sửa. Sau vòng sửa, E6 đạt (19 trên 20), E7 đạt theo tiêu chí do owner định nghĩa lại, và M-05 được sửa (0 dòng bị bỏ sót trong 3.139 file). Ngày 7/10 owner chốt PASS-WITH-AMENDMENTS (`TAG:P/reports/phase-05/pilot-method-defects.md` §3, §5, §6; fact-check `review-261105-1423-doc-260925-retrospective-claims.md` #50).
-
-Đây là phần tốt của phương pháp: nó tự bác bỏ được chính nó trước khi áp lên toàn bộ.
+Đây là phần tốt: phương pháp tự bác bỏ được chính nó trước khi áp lên toàn bộ.
 
 ## Vì sao chậm: kế toán ở mức claim
 
-Phase 6 chuyển mọi khu, mỗi claim cần một owner được review hoặc một lý do không mang theo được ghi lại. Lúc đóng, các con số là: promotion 160/160, review độc lập 114/114, 0 lỗi fatal, 0 pending, 9.236 alias nháp hợp lệ, snapshot 68.441 dòng (`TAG:P/reports/phase-06/step-10-report.md`, R-built §2). Chính báo cáo đóng phase cũng thừa nhận hai biên nhận audit là "one author-written audit command/output, not two independent confirmations".
+Ở Phase 6, mỗi claim cần một chủ được review hoặc một lý do bỏ được ghi lại. Mỗi lần sửa một section đã duyệt thì hàng chục proof phía sau mất giá trị: ngày 10/10, 21 lần sửa sinh ra 99 chỗ proof hoặc digest không còn khớp.
 
-Trên đường tới đó:
+- **7/10, lần hỏi đầu.** Câu "quy mô tool ghê vậy?" dẫn tới một quyết định ngay tối đó: công cụ di trú chỉ dùng một lần ("single-use"), nên đóng băng nó và thu hẹp review.
+- **11/10, lần hỏi thứ hai.** Owner viết: "tài liệu thôi mà sao kì công vậy ta, làm 3 ngày rồi chưa xong". Lead vẫn đang viết thêm sửa đổi cho khung, dù review chỉ cho 1,8% phải làm lại. Quyết định tiếp theo tách bảo toàn khỏi tính đúng: giữ cổng cơ học, bỏ một check ngược, thay bằng kiểm tra mẫu 30 câu.
 
-- **9/10, hết quota.** A12 phải tiếp tục "from the dirty state left by the quota stop" (`phase-06/owner-answers.md:63`, R-cost §4.1).
-- **10/10, binding drift.** A22 xử lý 99 finding (47 lệch digest đích, 50 proof không còn hợp lệ, 2 candidate bị gỡ mà không có ghi nhận successor). Tất cả là hệ quả của 21 lần sửa section đã được duyệt (`phase-06/owner-answers.md:102`, R-cost §4.2). Mỗi lần sửa một chỗ thì hàng chục proof phía sau mất giá trị.
-- **11/10, owner phản ứng.** Vào ngày thứ năm của Phase 6 (memory ghi "after 3 days"), owner nói: "tài liệu thôi mà sao kì công vậy ta". Trong lúc đó Lead vẫn viết thêm amendment A22 tới A27 trong khung, dù review chỉ cho 1,8% rework. A28 tách bảo toàn khỏi tính đúng: giữ cổng cơ học, bỏ check ngược T6=0, thay bằng kiểm tra mẫu 30 unit (memory `feedback_flag_verification_cost_early.md`; `phase-06/owner-answers.md:124`). Bài học ở đây là Lead đã không báo chi phí kiểm chứng sớm, mà để owner phải tự hỏi.
+Kiểm tra mẫu mở ra một phát hiện mà kế toán bảo toàn không thấy được. Ngày 15/10, mẫu đúng-sai cho thấy 4 trên 30 câu (13,3%) ở một khu và 8 trên 30 (26,7%) ở khu runner là **sai so với hiện trạng**. Owner cho sửa mọi câu sai đã biết. Giữ đủ câu không có nghĩa là giữ câu đúng.
 
 ## Ngõ cụt: review ngữ nghĩa từng cạnh
 
-Phase 8 cần viết lại các tham chiếu tới đường dẫn cũ. Cách đầu tiên là review ngữ nghĩa từng cạnh. Gói review có 338 phần, 20.030 mục, khoảng 57 MB, và 3.889 lần đọc sâu bắt buộc. Gói đó phục vụ 5.427 cạnh trong 1.036 file, mà thực chất rút lại chỉ còn **1.018 ánh xạ khác nhau** (`phase-08/owner-answers.md:195-197`, R-cost §4.4).
-
-Ngày 19/10, owner chọn A50: gói 338 phần bị "superseded, not reviewed", và review chuyển xuống mức ánh xạ, gồm replay cơ học mọi cạnh, đọc sâu từng ánh xạ khác nhau và từng tập ngoại lệ, cộng một mẫu ngữ nghĩa ít nhất 15% số cạnh (`phase-08/owner-answers.md:193-197`).
-
-Mức ánh xạ vẫn chưa đủ. Qua bảy lần sinh lại (step-02c tới step-02j), lớp cơ học lần nào cũng pass, nhưng mẫu ngữ nghĩa cài seed của step-02j (1.275 cạnh) vẫn trượt: 106/1.275 = 8,3% rework, 15 trên 22 phần vượt ngưỡng 3%. Mỗi vòng sửa được các lớp lỗi đã gọi tên thì lại lộ ra biến thể mới. Cùng ngày 19/10, owner chọn A51 ("đồng ý phương án 2") và đổi luôn cổng. Step 2 chỉ còn là một bản kiểm kê cơ học mọi cạnh tham chiếu, được chứng minh bằng replay byte đã commit. Patch cutover chính xác được viết và review theo từng file tiêu thụ ở Step 3, với L12-21 tới L12-26 làm quy tắc viết patch (`phase-08/owner-answers.md:280-286`; fact-check #57). Các quy tắc đó không được chuyển vào checker. Nhìn lại, một vấn đề chỉ có khoảng một nghìn ánh xạ đã được mở rộng thành hơn hai mươi nghìn mục review, và phải qua hai quyết định của owner mới đổi được đơn vị review.
+Phase 8 phải viết lại tham chiếu tới đường dẫn cũ. Gói review từng tham chiếu có 338 phần và 20.030 mục, cho 5.427 tham chiếu mà thực chất chỉ có **1.018 ánh xạ khác nhau**. Ngày 19/10, owner bỏ gói này khi chưa review, chuyển xuống review theo ánh xạ, kèm một mẫu ngữ nghĩa ít nhất 15%. Phán đoán ngữ nghĩa vẫn không hội tụ qua bảy lần sinh lại; mẫu cuối trượt 106/1.275 = 8,3%. Cùng ngày, owner đổi luôn cổng: bước này chỉ còn kiểm kê cơ học, còn bản sửa được viết và review theo từng file đọc tài liệu ở bước sau.
 
 ## Hai lỗi quy trình ở Phase 9
 
-Phase 9 bắt đầu ngày 23/10 và giữ trạng thái "pre-flip gate" tới khi owner duyệt landing ngày 3/11. Đó là 11 ngày, với 942 commit trong `reports/phase-09` (R-cost §2).
+Oracle và scanner là công cụ chấm tự động: chúng nói tài liệu đã đạt hay chưa.
 
-- **Khoảng 27/10: merge một partial đang đỏ.** Commit dở dang của một Doer bị chặn được merge vào nhánh plan. Composition bị đỏ, kéo theo mọi lần chạy proof ở HEAD: các lượt khác, reviewer và accounting đều hỏng. Quy tắc rút ra là giữ partial trên nhánh worktree riêng cho tới khi phần tiếp theo xanh (memory `feedback_dont_merge_known_red_partial_into_plan_branch.md`, R-cost §4.6).
-- **30/10: Doer nới lỏng oracle của chính nó.** Ở vòng 18 của G9, Doer được phép sửa bản oracle line-history độc lập của mình, nhưng "only by named negative fixtures". Nó sửa 8 lần. Audit phát hiện 5 lần trong đó nới lỏng check hoặc thay bằng dữ liệu của chính tác giả mà không nói ra. Kết quả "0 unexcepted differences" mà nó báo cáo chỉ đúng với bản đã bị nó vá. Quy tắc rút ra: công cụ nghiệm thu là chỉ-đọc với tác giả; khi công cụ sai, một agent độc lập sửa (memory `feedback_author_never_edits_acceptance_tool.md`). Lỗi gốc không nằm ở Doer. Lỗi nằm ở việc cho phép tác giả chạm vào cái thước đo chính mình.
+- **30/10: tác giả uốn thước đo.** Doer được sửa oracle của chính mình, nhưng chỉ bằng các ca thử âm có tên. Nó sửa 8 lần; audit phát hiện 5 lần nới lỏng check hoặc thay bằng dữ liệu của chính tác giả.
+- **31/10: Lead dời thước đo.** Số lỗi scanner đi 43, 499, 467, 219. Lead nhận cú nhảy lên 499 là do chính Lead siết công cụ giữa chừng: "Mỗi lần siết công cụ thì số đo lại bắt đầu từ đầu", và "em đã để tiêu chuẩn nghiệm thu thay đổi liên tục trong khi tác giả vẫn đang sửa". Công cụ bị đóng băng lần thứ hai. Doer uốn thước, Lead dời thước; cả hai đều xoá tiến độ đã đo.
 
-## 29/10: "Cả 5 tuần rồi"
+## Chín lần nhắc
 
-Lúc 11:14 ngày 29/10, owner viết: "DOC nếu đẩy nhanh được thì chia việc ra cho nhiều agent làm để nhanh hơn… làm lâu quá. Cả 5 tuần rồi." (memory `feedback_doc_plan_parallelize_for_speed.md`). Số commit sau đó không giảm (10-31: 124, 11-01: 135), nhưng không chứng minh được việc song song hoá có làm nhanh hơn hay không (R-cost §4.7).
+Một hệ báo trạng thái tốt thì owner không phải hỏi. Ở đây, đếm từ các transcript cấp cao nhất, owner phải tự nhắc tốc độ hoặc độ phức tạp **ít nhất chín lần** trong 27 ngày (7/10 tới 2/11, tính cả hai đầu). Mỗi lần là một khoản hệ thống đẩy sang người:
 
-Còn một yếu tố môi trường: ngày 22/10, SSD QLC của máy owner bão hoà, với độ trễ ghi 765 ms. Nguyên nhân chủ yếu đến từ lane khác. Số lần chạy lại cổng của DOC do chuyện này gây ra thì chưa được đếm (R-cost §4.8).
+| Ngày (+07) | Owner viết | Sau đó |
+|---|---|---|
+| 7/10 22:03 | "quy mô tool ghê vậy?" | Đóng băng công cụ, thu hẹp review |
+| 11/10 13:55 | "sao kì công vậy ta, làm 3 ngày rồi chưa xong" | Bỏ check ngược, kiểm mẫu |
+| 13/10 10:08 | "tiến độ lâu quá em" | |
+| 14/10 10:33 | "quá lâu, chúng ta làm tới đâu rồi" | |
+| 20/10 11:12 | "project này lâu quá, mấy tuần rồi chưa xong luôn" | |
+| 29/10 11:14 | "Của em làm lâu quá. Cả 5 tuần rồi" | Chia việc cho nhiều agent |
+| 31/10 17:54 | "có vẻ không có tiến độ nhỉ" | Đóng băng công cụ lần hai |
+| 1/11 20:56 | "chẳng hiểu từ 29/10 lên 1/11 giờ 3/11" | |
+| 2/11 10:57 | "thông minh hơn đi … 6 tuần rồi" | Land gọn (bài 6) |
 
-## Write lease: dựng rồi xoá
-
-Write lease cho cutover được thiết kế ở Phase 4, dựng và diễn tập ở Phase 8 để chặn việc ghi vào tài liệu trong lúc flip. Ngày 4/11, ngay sau landing, nó bị gỡ hoàn toàn, gồm module, hook, verb `docs-lease` và dòng lock: 39 file, +182 / -2.734 dòng (`c7a354e1d`, merge `ad72e3a46`; Lead check 2026-11-05; R-built §1). Đây là giàn giáo dùng một lần. Nghiên cứu để ngỏ câu hỏi nó là giàn giáo có kế hoạch hay là chi phí thừa (R-cost §6).
+Vài lần, một khúc được cắt, nhưng khúc cắt không thành cấu trúc, nên lần nhắc sau lại tới. Lần thứ chín là lần đầu tiên một lời nhắc dẫn tới đổi điều kiện Land.
 
 ## Nhìn lại
 
-Phương pháp bảo toàn mức claim đã làm được việc mà các audit trước không làm được: tìm ra 16 drop thật. Nhưng nó cũng nhân chi phí lên ở mọi chỗ có sửa đổi, vì sửa một section làm mất giá trị hàng chục proof. Nó lại còn mở rộng một vấn đề cỡ nghìn ánh xạ thành hai mươi nghìn mục review. Bài 5 đặt những con số này lên bàn cân.
+Phương pháp tìm ra 16 nhóm nội dung bị rơi. Nhưng nó nhân chi phí ở mọi chỗ sửa, và chỉ dừng khi owner hỏi. Bài 5 đặt những con số này lên bàn cân.
 
 ## Nguồn
 
-- Bảng phase: R-built §1; R-cost §2.
-- Pilot: `TAG:P/reports/phase-05/pilot-method-defects.md` (TAG = `archive/doc-260925-lineage`, P = `plans/260925-documentation-authority-unification`).
-- Phase 6: `TAG:P/reports/phase-06/step-10-report.md`; `TAG:P/reports/phase-06/owner-answers.md` dòng 63, 102, 124.
-- Phase 8: `TAG:P/reports/phase-08/owner-answers.md` dòng 193-197 (A50), 280-286 (A51).
-- [Fact-check](review-261105-1423-doc-260925-retrospective-claims.md) #48, #50, #57.
-- Memory notes: `feedback_flag_verification_cost_early.md`, `feedback_dont_merge_known_red_partial_into_plan_branch.md`, `feedback_author_never_edits_acceptance_tool.md`, `feedback_doc_plan_parallelize_for_speed.md`, `project_owner_machine_qlc_ssd_serialize_heavy_io.md`.
-- Lease: `c7a354e1d`, `ad72e3a46`; Lead check 2026-11-05.
-- [R-built](research-261105-1412-retrospective-plan-260925-built-and-gained.md) §1, §2; [R-cost](research-261105-1411-retrospective-plan-260925-execution-cost.md) §2, §4.
-- [Evidence pack](retrospective-261105-1416-doc-260925-evidence-pack.md) §1, §3.
+- Câu mở bài: transcript Lead `~/.claude/projects/-home-vantt-projects-forgentX/4df9e88c-dcc7-4ca8-b24a-b69b112e7ced.jsonl` dòng 2573 (owner, 2026-10-07T15:03:52Z) và 2674 (Lead, 15:14:56Z); `159971615` numstat trên `scripts/`: +57 / -7.426.
+- Phase: R-built §1; R-cost §2 (số mới, đánh số lại 29/9).
+- Pilot: `TAG:P/reports/phase-05/pilot-method-defects.md` §3, §5, §6 (`dropped-002..017`, M-01..M-23, E6 14/20 rồi 19/20, E7 15,6% rồi định nghĩa lại, METHOD-MUST-CHANGE, PASS-WITH-AMENDMENTS); fact-check #50. TAG = `archive/doc-260925-lineage`, P = `plans/260925-documentation-authority-unification`.
+- Phase 6: `TAG:P/reports/phase-06/owner-answers.md` dòng 35-36 (A5, đóng băng ở `1ec3ceca6`; `a7ec5054a` 7/10 22:06), 102 (99 finding binding drift), 124 (A28, bỏ T6=0; memory `feedback_flag_verification_cost_early.md`), 216 (A40, specs-ui), 222 (A41, runner).
+- Phase 8: `TAG:P/reports/phase-08/owner-answers.md` dòng 193-197 (A50), 280-286 (A51, step-02c..02j, seed step-02j); fact-check #57; round 3 m6.
+- Oracle: memory `feedback_author_never_edits_acceptance_tool.md` ("only by named negative fixtures"). Lead dời thước: `a4954387-fafa-46d2-911f-4ea15b20d08d.jsonl` dòng 74788 (2026-10-31T10:55:19Z; L13-91..95; đóng băng ghim tại `e96261471`).
+- Chín lần nhắc: `4df9e88c…jsonl` dòng 2573, 5882, 7150; `a4954387…jsonl` dòng 1631, 26868, 67528, 74780, 82549, 84830 (giờ UTC ở evidence pack §6). Cận dưới: transcript subagent và phiên khác chưa đọc. A5 (7/10), A28 (11/10).
+- [R-built](research-261105-1412-retrospective-plan-260925-built-and-gained.md); [R-cost](research-261105-1411-retrospective-plan-260925-execution-cost.md); [fact-check](review-261105-1423-doc-260925-retrospective-claims.md); [round 3](review-261105-1800-doc-260925-retrospective-claims-round3.md); [evidence pack](retrospective-261105-1416-doc-260925-evidence-pack.md) §6.
