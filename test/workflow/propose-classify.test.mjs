@@ -171,9 +171,10 @@ test('a malformed table is refused by name instead of classifying slices low', (
     return file;
   };
   const rule = (extra = '') => `  - id: code\n    kind: code\n    capability: code:implement\n    pattern: reviewed\n    rigor: standard\n    match: ["src/**"]\n${extra}`;
-  const good = `version: 1\ndefault:\n  kind: code\nrules:\n${rule()}`;
+  const request = 'request:\n  singleRunMaxPaths: 3\n  singleRunMaxRigor: standard\n';
+  const good = `version: 1\ndefault:\n  kind: code\n${request}rules:\n${rule()}`;
   const protectedRules = (extra = '') => `  - id: contract\n    kind: contract\n    capability: code:implement\n    pattern: reviewed\n    rigor: high\n    match: ["a/**"]\n  - id: platform\n    kind: platform\n    capability: code:implement\n    pattern: reviewed\n    rigor: high\n    match: ["b/**"]\n  - id: irreversible\n    kind: irreversible\n    rigor: critical\n    askOwnerFirst: true\n    match: ["c/**"]\n${extra}`;
-  const full = `version: 1\ndefault:\n  kind: code\nrules:\n${rule()}${protectedRules()}`;
+  const full = `version: 1\ndefault:\n  kind: code\n${request}rules:\n${rule()}${protectedRules()}`;
   assert.doesNotThrow(() => loadSliceTable({ tablePath: write('full.yaml', full) }));
   const cases = {
     'missing-protected.yaml': good,
@@ -182,6 +183,9 @@ test('a malformed table is refused by name instead of classifying slices low', (
     'match.yaml': full.replace('match: ["src/**"]', 'match: []'),
     'default.yaml': full.replace('default:\n  kind: code', 'default:\n  kind: nothing'),
     'twice.yaml': `${full}${rule()}`,
+    'request-missing.yaml': full.replace(request, ''),
+    'request-no-paths.yaml': full.replace('singleRunMaxPaths: 3', 'singleRunMaxPaths: 0'),
+    'request-low-rigor.yaml': full.replace('singleRunMaxRigor: standard', 'singleRunMaxRigor: low'),
     'capability.yaml': full.replace('    capability: code:implement\n', ''),
     'code-low.yaml': full.replace('rigor: standard', 'rigor: low'),
     'contract-standard.yaml': full.replace('kind: contract\n    capability: code:implement\n    pattern: reviewed\n    rigor: high', 'kind: contract\n    capability: code:implement\n    pattern: reviewed\n    rigor: standard'),

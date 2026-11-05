@@ -2383,7 +2383,7 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'workflow',
-    invoke: 'fgos workflow <start|status|answer|resume|close|operations> [id]',
+    invoke: 'fgos workflow <start|status|answer|resume|close|gate|propose|operations> [id]',
     description: 'Door for planned work: a registered Workflow preset or a file of several Units run as steps (DAG ordering, human review gates, pure git integration). One task with no planning takes the other door, `fgos run "<prompt>"`. start/answer/resume advance in a detached process by default; read progress with "status", which also shows the case: milestones, routes, frame left, open gates. A guide with its own activities opens a conductor case with no process: the agent reads "status" and proposes through the doors.',
     subcommands: {
       start: {
@@ -2420,6 +2420,27 @@ export const COMMAND_REGISTRY = [
           'fgos workflow start delphi --request "Should we split the billing service?"',
           'fgos workflow start --units units.yaml --effort high --foreground',
           'fgos workflow start group-cognition --request "Why does month-end close slip?" --seats "reconciliation bottlenecks|handoff timing|automation failure modes" --context-ref docs/finance/close-policy.md',
+        ],
+      },
+      propose: {
+        description: 'Read-only: turn the slices an agent wrote for a plan into one proposal for the owner to approve, and write nothing (no case, no run). Each slice is classified by its write paths from a versioned table (domains/coding/slice-kinds.yaml: kind, capability, pattern, rigor; a contract, a Rust crate or a lock file is never below high; data and migrations ask the owner first and are never dispatched), the case frame is computed (dispatches, writing dispatches, seat launches per dispatch, rigor floor, with a spare dispatch and a fix dispatch for high-rigor slices), the whole proposal is checked against the repository (paths exist, no two slices write the same path, tests that exercise changed code are added visibly, capabilities are registered) and refused by name when it does not match. The answer holds the structured proposal, the owner\'s decision question in the five-part template (Vietnamese), and the command sequence to run after approval: worktree create, workflow start with the frame (with --inherit when a closed case of the same plan and base commit can be continued), one fgos run per slice naming the case, and workflow gate. With --request instead of --slices, a request with no plan is only sized: one fgos run, a slice list to write, or a plan to shape first. Prints text unless --json.',
+        parameters: {
+          type: 'object',
+          properties: {
+            slices: { type: 'string', description: 'JSON file: { request?, gate?, slices: [{ id, objective, writes, verify, dependsOn?, raise?: { rigor, reason }, followUp?: { capability, pattern }, earlyReview?, inputs?, capability?, pattern?, rigor?, activity? }] }. A slice with no writes is read-only and takes capability, pattern and rigor from itself; a writing slice takes them from the table and may only raise its rigor, with a reason. "gate" is the command of the whole-worktree check.' },
+            plan: { type: 'string', description: 'Repository path of the plan file the slices come from; it is read as input by the slices and by the validation and decision passes.' },
+            guide: { type: 'string', description: 'The conductor guide the case runs (default coding/feature).' },
+            request: { type: 'string', description: 'A request with no plan: size it from --writes and say what to do next. Not combinable with --slices.' },
+            writes: { type: 'string', description: 'With --request: comma-separated paths the request would change.' },
+            verify: { type: 'string', description: 'With --request: the narrow pass/fail command of a single run.' },
+            worktree: { type: 'string', description: 'Where the case worktree goes (default ../<slug>-worktree).' },
+            branch: { type: 'string', description: 'Branch of the case worktree (default case/<slug>).' },
+          },
+          required: [],
+        },
+        examples: [
+          'fgos workflow propose --slices slices.json --plan plans/260101-1200-example/plan.md',
+          'fgos workflow propose --request "Rename the flag in the help text" --writes bin/fgos.mjs --verify "node scripts/run-tests.mjs test/cli/help.test.mjs"',
         ],
       },
       status: {

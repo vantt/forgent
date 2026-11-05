@@ -6,7 +6,14 @@
 # tools, herdr-dashboard) so a glob over one of those trees reaches them.
 # An agent may raise a slice's rigor with a reason; nothing lowers it below this table.
 # `ask-owner-first` kinds are never dispatched: the owner is asked before any seat is launched.
+#
+# `request` sizes a free-form request that comes without a plan, from the paths it names: nothing named means
+# the plan is shaped first; at most `singleRunMaxPaths` paths, none above `singleRunMaxRigor`, is one `fgos run`;
+# anything bigger or riskier is a case that needs a list of slices.
 version: 1
+request:
+  singleRunMaxPaths: 3
+  singleRunMaxRigor: standard
 default:
   kind: code
   reason: the path matches no rule, so it is treated as ordinary code

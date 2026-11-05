@@ -86,7 +86,7 @@ function validateRule(rule, index, ids) {
  * classify slices low.
  *
  * @param {{ tablePath?: string }} [options] test seam: another table file
- * @returns {Readonly<{ version: number, defaultRuleId: string, rules: ReadonlyArray<object> }>}
+ * @returns {Readonly<{ version: number, defaultRuleId: string, request: { singleRunMaxPaths: number, singleRunMaxRigor: string }, rules: ReadonlyArray<object> }>}
  */
 export function loadSliceTable({ tablePath = TABLE_PATH } = {}) {
   const raw = parseYaml(fs.readFileSync(tablePath, 'utf8'), { filename: tablePath });
@@ -101,12 +101,16 @@ export function loadSliceTable({ tablePath = TABLE_PATH } = {}) {
   const defaultRule = raw.rules.find((rule) => rule.kind === raw.default.kind);
   if (!defaultRule) throw refuse(`slice-kinds default kind "${raw.default.kind}" has no rule`, 'slice-table-invalid');
   if (rigorRank(defaultRule.rigor) < rigorRank('standard')) throw refuse('the default kind cannot be below standard', 'slice-table-invalid');
+  const request = raw.request ?? {};
+  if (!Number.isInteger(request.singleRunMaxPaths) || request.singleRunMaxPaths < 1) throw refuse('slice-kinds request.singleRunMaxPaths must be a whole number of at least 1', 'slice-table-invalid');
+  if (!RIGOR_ORDER.includes(request.singleRunMaxRigor) || rigorRank(request.singleRunMaxRigor) < rigorRank('standard')) throw refuse(`slice-kinds request.singleRunMaxRigor must be one of ${RIGOR_ORDER.filter((r) => rigorRank(r) >= rigorRank('standard')).join(', ')}`, 'slice-table-invalid');
   const rules = raw.rules.map((rule, order) => Object.freeze({ ...rule, order, globs: Object.freeze(rule.match.map((glob) => glob.split('/'))) }));
-  return Object.freeze({ version: raw.version, defaultRuleId: defaultRule.id, rules: Object.freeze(rules) });
+  return Object.freeze({ version: raw.version, defaultRuleId: defaultRule.id, request: Object.freeze({ singleRunMaxPaths: request.singleRunMaxPaths, singleRunMaxRigor: request.singleRunMaxRigor }), rules: Object.freeze(rules) });
 }
 
 let cachedTable = null;
-const defaultTable = () => (cachedTable ??= loadSliceTable());
+export const defaultSliceTable = () => (cachedTable ??= loadSliceTable());
+const defaultTable = defaultSliceTable;
 
 /**
  * Canonical form of a write path: no `//` or `.` segments, no trailing slash. `.` is the whole repository.

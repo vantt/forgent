@@ -90,6 +90,7 @@ import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
 import { unknownFlagMessage } from '../src/cli/flag-check.mjs';
+import { parseArgs } from '../src/cli/parse-args.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
 import { listUseCase, graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
@@ -522,33 +523,6 @@ async function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }
     ...(inputs.length > 0 ? { inputs } : {}),
     ...(flags.verify !== undefined ? { verify: requireField(flags.verify, '--verify requires a command, e.g. --verify "npm test"') } : {}),
   };
-}
-
-// Minimal argv parser: `--flag value` or bare `--flag` (boolean), plus
-// positional args. No dependency, no dashes-in-values ambiguity handling
-// beyond what this CLI's own verbs need.
-// Flags that may be given more than once; each use is collected into a list.
-const REPEATABLE_FLAGS = new Set(['context-ref', 'param']);
-
-function parseArgs(args) {
-  const flags = {};
-  const positional = [];
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg.startsWith('--')) {
-      const key = arg.slice(2);
-      const next = args[i + 1];
-      if (next !== undefined && !next.startsWith('--')) {
-        flags[key] = REPEATABLE_FLAGS.has(key) ? [...(flags[key] ?? []), next] : next;
-        i += 1;
-      } else {
-        flags[key] = REPEATABLE_FLAGS.has(key) ? [...(flags[key] ?? []), true] : true;
-      }
-    } else {
-      positional.push(arg);
-    }
-  }
-  return { flags, positional };
 }
 
 function parseListFlag(value) {
@@ -2330,6 +2304,22 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const { closeWorkflow } = await import('../src/workflow/index.mjs');
         const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow close requires a workflowRunId: fgos workflow close <id>');
         return closeWorkflow(workflowRunId, { repoRoot: flags.dir, reason: typeof flags.reason === 'string' ? flags.reason : undefined });
+      }
+      if (sub === 'propose') {
+        // Reads the slice list (or sizes a request) and answers with a proposal; it writes nothing and opens no case.
+        const { runPropose } = await import('../src/workflow/propose.mjs');
+        return runPropose({
+          slices: typeof flags.slices === 'string' ? flags.slices : undefined,
+          plan: typeof flags.plan === 'string' ? flags.plan : undefined,
+          guide: typeof flags.guide === 'string' ? flags.guide : undefined,
+          request: typeof flags.request === 'string' ? flags.request : undefined,
+          writes: typeof flags.writes === 'string' ? flags.writes : undefined,
+          verify: typeof flags.verify === 'string' ? flags.verify : undefined,
+          worktree: typeof flags.worktree === 'string' ? flags.worktree : undefined,
+          branch: typeof flags.branch === 'string' ? flags.branch : undefined,
+          dir: typeof flags.dir === 'string' ? flags.dir : undefined,
+          cwd: process.cwd(),
+        });
       }
       if (sub === 'gate') {
         const { gateWorkflow } = await import('../src/workflow/index.mjs');
@@ -5302,6 +5292,9 @@ async function main() {
       process.stdout.write(renderPretty(verb, data));
     } else if (verb === 'plan-lint' && !flags.json) {
       process.stdout.write(renderPlanLintReport(data));
+    } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
+      const { renderProposalText } = await import('../src/workflow/propose.mjs');
+      process.stdout.write(renderProposalText(data));
     } else {
       process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
     }
@@ -5323,7 +5316,7 @@ async function main() {
       process.exitCode = exitCodeForOutcome(data.outcome);
     } else if (isForegroundWorkflow) {
       process.exitCode = exitCodeForOutcome(data.outcome);
-    } else if (verb === 'plan-lint') {
+    } else if (verb === 'plan-lint' || (verb === 'workflow' && positional[0] === 'propose')) {
       process.exitCode = data.ok ? 0 : 1;
     } else if (doctorFailed) {
       process.exitCode = 1;

@@ -70,7 +70,7 @@ export function resolveFrame(guide, flags) {
   return frame;
 }
 
-const guideSha256 = (guide) => crypto.createHash('sha256').update(JSON.stringify(guide)).digest('hex');
+export const guideSha256 = (guide) => crypto.createHash('sha256').update(JSON.stringify(guide)).digest('hex');
 
 /**
  * Open the case on its ledger, under the run's `advance` hold: `case.opened` with the guide snapshot

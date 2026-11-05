@@ -92,13 +92,16 @@ function seatLaunchesOfSlice(slice, { runnerConfig, shipped, fallbackPerSeat }) 
  * @param {object} params.catalog `{ runnerConfig, shipped }`: what `resolveCollaboration` reads
  * @param {{ fallbackPerSeat: number, deviationsBeforeAsk: number }} params.frameDefaults the guide's own counts, passed through
  * @param {boolean} [params.inherit] the case continues a closed one (its validation and lock are not repeated)
+ * @param {Array<{ id: string, pattern: string, rigor: string }>} [params.readPasses] read-only dispatches the case will
+ *   run besides its slices (the plan validation, the ambiguity pass). They are already counted in `reads`; here only
+ *   their seat launches are taken, because the frame's ceiling per dispatch must admit them too
  * @param {object} [params.allowance] a calibration instead of FRAME_ALLOWANCE
  * @returns {{
  *   frame: { dispatches: number, mutatingDispatches: number, seatLaunchesPerDispatch: number, fallbackPerSeat: number, deviationsBeforeAsk: number, rigorFloor: string },
  *   breakdown: { writingSlices: number, fixes: number, spareWrites: number, reads: Record<string, number>, seatLaunches: Array<{ id: string, perDispatch: number }> },
  * }}
  */
-export function proposeFrame({ slices, catalog, frameDefaults, inherit = false, allowance = FRAME_ALLOWANCE }) {
+export function proposeFrame({ slices, catalog, frameDefaults, inherit = false, readPasses = [], allowance = FRAME_ALLOWANCE }) {
   if (!Array.isArray(slices) || slices.length === 0) throw new ProposeFrameError('a frame needs at least one slice', 'no-slices');
   if (!isCount(frameDefaults?.fallbackPerSeat) || !isCount(frameDefaults?.deviationsBeforeAsk)) {
     throw new ProposeFrameError('the guide must state numeric fallbackPerSeat and deviationsBeforeAsk', 'frame-defaults-missing');
@@ -131,7 +134,13 @@ export function proposeFrame({ slices, catalog, frameDefaults, inherit = false, 
   };
   const dispatches = mutatingDispatches + Object.values(reads).reduce((a, b) => a + b, 0);
 
-  const launches = slices.map((s) => ({ id: s.id, perDispatch: seatLaunchesOfSlice(s, { ...catalog, fallbackPerSeat }) }));
+  const passes = readPasses.map((pass, index) => {
+    if (!pass || typeof pass.id !== 'string' || typeof pass.pattern !== 'string' || !RIGOR_ORDER.includes(pass.rigor)) {
+      throw new ProposeFrameError(`read pass ${index} needs an id, a pattern and a rigor of [${RIGOR_ORDER.join(', ')}]`, 'slice-invalid');
+    }
+    return { id: pass.id, pattern: pass.pattern, rigor: pass.rigor, writes: [] };
+  });
+  const launches = [...slices, ...passes].map((s) => ({ id: s.id, perDispatch: seatLaunchesOfSlice(s, { ...catalog, fallbackPerSeat }) }));
   const seatLaunchesPerDispatch = Math.max(...launches.map((l) => l.perDispatch));
 
   const floor = slices.reduce((lowest, s) => (RIGOR_ORDER.indexOf(s.rigor) < RIGOR_ORDER.indexOf(lowest) ? s.rigor : lowest), 'critical');

@@ -200,3 +200,14 @@ test('a document slice whose kind names a follow-up review adds one read-only di
   assert.equal(withFollowUp.frame.dispatches - without.frame.dispatches, 1);
   assert.equal(withFollowUp.frame.mutatingDispatches, without.frame.mutatingDispatches);
 });
+
+test('a read pass the case runs besides its slices raises the seat-launch ceiling without adding a dispatch', () => {
+  const docs = { id: 'note', writes: ['docs/note.md'], pattern: 'solo', rigor: 'low', kind: 'docs' };
+  const alone = propose([docs]);
+  const withPass = propose([docs], { readPasses: [{ id: 'validate-plan', pattern: 'reviewed', rigor: 'standard' }] });
+  assert.equal(alone.frame.seatLaunchesPerDispatch, 2);
+  assert.equal(withPass.frame.seatLaunchesPerDispatch, 8, 'a reviewed pass at standard plans four seat launches, twice with fallback');
+  assert.equal(withPass.frame.dispatches, alone.frame.dispatches, 'the pass is already counted among the reads');
+  assert.deepEqual(withPass.breakdown.seatLaunches.map((l) => l.id), ['note', 'validate-plan']);
+  assert.throws(() => propose([docs], { readPasses: [{ id: 'x', pattern: 'reviewed', rigor: 'medium' }] }), (err) => err instanceof ProposeFrameError && err.code === 'slice-invalid');
+});
