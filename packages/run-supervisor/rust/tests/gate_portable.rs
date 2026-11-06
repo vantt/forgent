@@ -23,8 +23,14 @@ fn marker(name: &str) -> std::path::PathBuf {
 
 #[test]
 fn the_agent_starts_only_after_go_and_its_output_lands_in_the_capture_files() {
-    let ran = marker("go");
-    let options = Options::new(&["say", &ran.to_string_lossy()]);
+    let (ran, release) = (marker("go"), marker("go-release"));
+    // The agent stays alive until released: one that has already exited when the gate looks it up
+    // is reported without an identity, which says nothing about the AGENT frame.
+    let options = Options::new(&[
+        "say-held",
+        &ran.to_string_lossy(),
+        &release.to_string_lossy(),
+    ]);
     let attempt = Attempt::new("go", &options);
     let mut gate = start_gate(&attempt);
     let hello = read_hello(&mut gate);
@@ -39,6 +45,7 @@ fn the_agent_starts_only_after_go_and_its_output_lands_in_the_capture_files() {
         "the AGENT frame names the agent: {agent}"
     );
     wait_for(&ran, Duration::from_secs(10));
+    fs::write(&release, "go on").unwrap();
     assert_eq!(
         wait_exit(&mut gate, &attempt, Duration::from_secs(15)),
         0,

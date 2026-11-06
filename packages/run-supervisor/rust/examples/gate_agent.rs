@@ -2,6 +2,7 @@
 //! executable (no shell, no Node) whose mode is its first argument.
 //!
 //! - `say <marker>`: write a line to stdout and stderr, write the marker, exit 0;
+//! - `say-held <marker> <releasefile>`: as `say`, but stay alive until `releasefile` exists (at most 60 s), so a test can read the live agent's identity before it exits;
 //! - `sleep <marker>`: write the marker, then wait for ever;
 //! - `stubborn <marker>`: as `sleep`, with termination requests ignored;
 //! - `tree <marker> <pidfile>`: start a child, record its pid, then wait for ever;
@@ -28,6 +29,17 @@ fn main() {
             println!("agent says hello");
             eprintln!("agent says hello on stderr");
             mark(&arg(1));
+        }
+        "say-held" => {
+            println!("agent says hello");
+            eprintln!("agent says hello on stderr");
+            mark(&arg(1));
+            let start = std::time::Instant::now();
+            while !std::path::Path::new(&arg(2)).exists()
+                && start.elapsed() < Duration::from_secs(60)
+            {
+                std::thread::sleep(Duration::from_millis(10));
+            }
         }
         "sleep" => {
             mark(&arg(1));
