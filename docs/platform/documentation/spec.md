@@ -3,8 +3,8 @@
 ```txt
 Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
-Purpose: Define the Knowledge and Documentation Engine (horizon H2): the one door an agent uses to write or change maintained documentation, and the checks that keep one owner per claim, built by extending the doors that already run
-Design status: Draft proposal. Not signed. Owner questions stand in section 11.
+Purpose: Define the Knowledge and Documentation Engine (horizon H2): the one door an agent uses to write or change maintained documentation, the admission that keeps a writer from opening new authority without review, and the checks behind them, built by extending the doors that already run
+Design status: Draft proposal, revised after the 2026-11-06 architecture panel and owner decisions (section 7.7). Not signed. Remaining owner questions in section 11.2; the topic admission contract is open (section 11.4).
 Implementation: Not started for the write door and the two new checks; the registry, Convention placement rules, doc-health and the decision index it extends are implemented
 Canonical: No (becomes canonical when signed)
 Provenance: First committed 2026-11-06 by the DOCOS lead from the H2 scout report plans/reports/scout-261106-1430-docos-h2-knowledge-documentation-engine-facts.md and the proposal docs/platform/proposals/documentation-system-unification.md
@@ -20,9 +20,10 @@ Related:
 - docs/platform/work-state/contracts/knowledge-registry.md
 - docs/platform/intent-preservation-ledger.md
 - plans/reports/scout-261106-1430-docos-h2-knowledge-documentation-engine-facts.md
+- plans/reports/council-261106-2216-docos-h2-document-identity-architecture-panel-outcome.md
 ```
 
-Read with: [proposal](../proposals/documentation-system-unification.md) (objectives A1–A6 and B1–B6, sections 0.2, 0.3, 4.3–4.7, 9.2 and 10), [governance](../governance.md), [Convention spec](../convention/spec.md), [knowledge-registry contract](../work-state/contracts/knowledge-registry.md), [intent ledger](../intent-preservation-ledger.md), [scout facts](../../../plans/reports/scout-261106-1430-docos-h2-knowledge-documentation-engine-facts.md).
+Read with: [proposal](../proposals/documentation-system-unification.md) (objectives A1–A6 and B1–B6, sections 0.2, 0.3, 4.3–4.7, 9.2 and 10), [governance](../governance.md), [Convention spec](../convention/spec.md), [knowledge-registry contract](../work-state/contracts/knowledge-registry.md), [intent ledger](../intent-preservation-ledger.md), [scout facts](../../../plans/reports/scout-261106-1430-docos-h2-knowledge-documentation-engine-facts.md), [panel outcome](../../../plans/reports/council-261106-2216-docos-h2-document-identity-architecture-panel-outcome.md).
 
 ## 1. Current Summary
 
@@ -35,6 +36,8 @@ This spec covers H2 **slice 1**, the write door. It meets objective A4 and accep
 - doc-health, which handles body health;
 - `state.decisions`, which handles decisions.
 
+Slice 1 changes the default from "a writer may create" to "a writer must be admitted". It promises one bounded thing: an ordinary writer cannot open new authority (a new platform area, a user topic that becomes authority, a role outside the admitted set, a document that starts active, a supersede to an unaccepted successor, a move across areas) without passing an existing reviewed door. A lookup that finds nothing never grants create. It does not promise that duplicate meaning is caught: the only mechanical duplicate check is the rule-claim backstop (6.4), whose limit is declared.
+
 Slice 1 adds no store, no graph, no daemon and no new `fgos doc` verb. The capabilities it defers are recorded in section 11.3 and in the intent ledger, as section 0.3 of the proposal requires.
 
 The engine is not a new component. It is the documentation area made of these existing doors. The registry keeps its contract in the work-state area until a later slice moves it here.
@@ -45,6 +48,8 @@ The engine is not a new component. It is the documentation area made of these ex
 
 - One documentation door: a skill that every agent reaches through one always-loaded pointer line.
 - The owner rule: an owner is found by claim and claim kind, never by topic; the audience decides only the surface (section 5.1).
+- Admission by effect: every transition that opens or moves authority passes admission at the existing door that records it (section 6.7).
+- The admitted role set for new user-document writes (section 5.1).
 - `fgos authoritative-match` extended to every documentation root and to the platform `Canonical for` header, so declared subjects are searched in one place.
 - Live templates the door copies.
 - One documented check command over changed documents.
@@ -52,18 +57,20 @@ The engine is not a new component. It is the documentation area made of these ex
   - a referenced `fgos` verb exists;
   - a rule claim has one owner.
 - Running the check on staged documents in pre-commit.
-- Repairing the registry defects the door would inherit.
+- Repairing the registry defects the door would inherit, and making the commit gate honest (section 6.5).
 - Answers to the proposal's two open questions (section 7.5).
 
 ### 2.2. Out Of Scope
 
-- Claim identity beyond rule ids; the typed graph; claim-level supersession.
+- Claim identity beyond rule ids (durable claim identity, deferred by the owner on 2026-11-06); the typed graph; claim-level supersession.
 - A `platform-docs` profile in the registry.
 - The Agent Context Engine (H3, PF-I007).
 - Moving user documentation roots (PF-I010).
 - The Convention project overlay (Convention Q13).
 - A shipped `fgos doc check` verb.
 - A skill-name existence check.
+- A new coordinate or identity system for documents.
+- Remapping the 479 existing topics, or reviving the H1 migration engine.
 
 Each deferral has a row in section 11.3.
 
@@ -91,7 +98,7 @@ Each deferral has a row in section 11.3.
 
 Ownership is keyed on the **claim**, never on the topic. The audience decides how a claim is **shown**, never who owns it.
 
-- **Claim.** One statement the documentation asserts: a rule, a behavior, a contract field, a decision, a user task procedure. Each claim has exactly one owner (A1), whoever reads it.
+- **Claim.** One statement the documentation asserts: a rule, a behavior, a contract field, a decision, a user task procedure. The aim is one owner per claim (A1), whoever reads it. Slice 1 does not promise it: claims carry no durable identity, so only rule claims are checked (6.4), and the rest is held by admission (6.7) and by asking (6.1).
 - **Claim kind.** The kind of question a claim answers. The owning document type follows from the kind (proposal section 3.2), not from the topic:
 
   | Question the claim answers | Owning document |
@@ -116,7 +123,7 @@ Ownership is keyed on the **claim**, never on the topic. The audience decides ho
   - all 136 under `docs/explanation` carry it.
 - **Identity axes of a user document.** These were settled by the compound-learn registry discussion (D-tsk28x-1, 3, 4 and 14) and are kept:
   - purpose: one value, the folder;
-  - role: one value from a closed set, the file name;
+  - role: one value from a closed set, the file name. The admitted set for new writes is `decision`, `runbook`, `pitfall`, `pattern`, `evidence`, `lookup-table` (owner, 2026-11-06). The first five are the examples of the signed [knowledge-registry contract](../work-state/contracts/knowledge-registry.md); `lookup-table` is added. The 365 roles already recorded replay and stay readable, and are never admitted into the set by being old;
   - entity: several values, tags only;
   - writing framework and mode, e.g. Diataxis, kept separate from identity.
 
@@ -138,8 +145,8 @@ Ownership is keyed on the **claim**, never on the topic. The audience decides ho
 
 ```txt
 Runs when: a request to write, change, move or retire maintained documentation reaches the documentation skill.
-Blocked when: the claim already has an owner and the request would create a second one; the target path fails Convention; the check command fails.
-What changes: the agent finds the owner, grows the existing document (or creates one only when no owner exists), copies the live template for a new document, edits it and runs the check.
+Blocked when: the claim already has an owner and the request would create a second one; the change would open or move authority without admission (6.7); the target path fails Convention; the check command fails.
+What changes: the agent finds the owner and grows the existing document. It creates a document only when a person asked for it and admission passed. It copies the live template for a new document, edits it and runs the check.
 Afterwards / side effects: generated projections are regenerated through their existing verbs (decision-index, docs-index, doc-registry); mdview preview runs when governance requires it; the agent reports the disposition (grew, created, moved, retired) and the check output.
 ```
 
@@ -149,8 +156,8 @@ The skill's steps, in order:
 2. Find each claim's owner, stopping at the first answer:
    1. **Exact keys.** A rule id inside its holder (governance holder table). A Convention singleton path for the owning type and area, checked with `fgos convention classify`. A registry slot (purpose, role) for a user task.
    2. **Declared subjects.** Match the claim against the declared subjects of documents of the owning type (`Canonical for`, `authoritative_for`) through `fgos authoritative-match`, extended to every documentation root.
-   3. **Still ambiguous.** Two candidates, or a candidate whose subject is boilerplate: stop and ask with the decision-question template. Never guess an owner (A5).
-3. Choose grow, create, discuss, promote, supersede or retire. Grow is the default; create only when step 2 finds no owner. When the agent grows a document whose declared subject is boilerplate, it writes the real subject in the same change. Coverage therefore rises with use, with no bulk sweep.
+   3. **Still ambiguous or not found.** Two candidates, a candidate whose subject is boilerplate, or no candidate: stop and ask with the decision-question template. Never guess an owner (A5). Finding nothing is not permission to create: the lookup is by words and misses a claim written differently.
+3. Choose grow, create, discuss, promote, supersede or retire. Grow is the default. Create only when a person asked for a new document and the admission in 6.7 passes; otherwise leave the content as material for the owner of the nearest document and report it. When the agent grows a document whose declared subject is boilerplate, it writes the real subject in the same change. Coverage therefore rises with use, with no bulk sweep.
 4. Get the path. Use Convention for a platform document, or `fgos doc reserve` for a user document. Never construct a path by hand.
 5. Copy the live template when creating.
 6. Edit the document.
@@ -189,15 +196,20 @@ The same rule id with the same title must not be defined in two holders. A secon
 
 This catches the 7 duplicated claims found today: the event-log rules numbered 1–3 and 5–8 (single append-only log, one write door, write order, expectation-checked writes, exit-code categories, item schema, dependency targets), each defined in both `docs/platform/work-state/spec.md` and `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`. It does not use the `Canonical for` header, which is boilerplate (one string is shared by 60 documents).
 
-### 6.5. Registry repairs the door depends on
+### 6.5. Registry repairs and an honest commit gate
 
-The repairs, which change no contract:
+These change no contract. The commit-gate part is its own item, `p-cd2ejz7wa5`, opened before the identity work because a promise that "commit refuses" needs it:
 
-- `doc-provisional-aged` parses `updatedAt` before subtracting. Today it subtracts an ISO string, gets `NaN` and never fires.
+- doc-health reads the staged content (the Git index) for the paths it checks, not the working tree. Today `scripts/doc-health.mjs` reads files on disk, so a commit can pass on unstaged edits.
+- The pre-commit document block selects changed files with `ACMRD`, not `ACR`, so modified and deleted documents are checked.
+- In an activated workspace, a host error or timeout in that block refuses the commit. Today it warns and continues (`.githooks/pre-commit`, the Convention block).
+- Classify runs once for all staged paths, in one host call.
+- `doc-provisional-aged` parses `updatedAt` before subtracting. Today it subtracts an ISO string, gets `NaN` and never fires. Choosing its age cutoff is a policy change and is named as one.
+- `docRegistry.topicMaxDocs`, which the doctor reads, is declared in the config schema.
 - The 19 tracked user documents missing from the registry are registered, and the one registered path missing on disk is resolved.
 - The tracked, empty `.fgos/docs/enduser-docs-index.json` is removed if no reader is found; otherwise the readers move to `docs/enduser-docs-index.json`.
 
-Closing the free-form role set (365 roles for 479 documents) needs a vocabulary decision and is deferred.
+The free-form role set (365 roles for 479 documents) is closed for new writes by the admitted set in 5.1, enforced by admission (6.7). Old roles are not rewritten.
 
 ### 6.6. Search declared subjects
 
@@ -210,17 +222,35 @@ Afterwards / side effects: returns the documents whose declared subject matches,
 
 Today `fgos authoritative-match` reads `authoritative_for` only under a quadrant directory passed with `--quadrant`. Slice 1 extends the same verb so that, with no `--quadrant`, it reads every documentation root. It also reads the platform `Canonical for` header field as the same concept, and skips boilerplate subjects. This is an extension of an existing read verb, not a new one.
 
+### 6.7. Admission by effect
+
+Admission is decided by what a change does, not by which verb carries it. Each effect below passes admission at the existing door that records it, for new events only. Replay of events already recorded is unchanged, and no enum is tightened inside replay.
+
+| Effect | Door that records it today | Slice 1 admission |
+|---|---|---|
+| A user topic is created with authority (`topic register`, `topic split`) | registry reducer, `fgos topic` | open: mechanism undecided (11.4); until then the door never calls these on its own |
+| A slot is opened with a role | `fgos doc reserve` | role must be in the admitted set (5.1) |
+| A document starts `active` (register or bootstrap) | registry reducer, `scripts/knowledge-bootstrap.mjs` | refused for a new document; it reaches `active` only by promote with a person |
+| Authority moves to a successor (`doc supersede`) | registry reducer | successor must already be `active` |
+| A document moves across area or holder (`doc move-path`, platform rename) | registry reducer; Convention for platform paths | needs the same admission as a create |
+| A new platform area appears | Convention's open `<area>` patterns | doc-health checks the area against one list of admitted areas; the plan names that list's source (the panel did not; candidates are the area rows of [component-boundary](../component-boundary.md) and the governance holder table). Convention classify alone still passes a new area, so the promise rests on this check, not on classify |
+
+Not admission: a writer id prefix, the mere existence of a decision id, or a matcher verdict.
+
 ## 7. Rules And Invariants
 
 1. **One door.** Maintained documentation is written through the documentation skill; an always-loaded line points to it and holds no rules itself (proposal 4.4, L8).
 2. **Extend, never alongside.** Path and kind stay in Convention, body rules stay in doc-health, user identity stays in the registry, decisions stay in `state.decisions`. Slice 1 adds no second checker, store or write door (L10, PF-I024, and the canonical-decision-projection rulings of tsk-1lv: no stored graph or daemon, no second decision store).
-3. **Owner by claim, not by topic.** Ownership is decided by the claim and its kind. Audience decides only the surface. The same topic legitimately has a spec claim, a contract claim and a user task claim, each with its own owner. The same claim never has two owners.
-4. **Grow before create.** The door creates a document only when it finds no owner for the claim.
-5. **Ask, never guess.** When exact keys and declared subjects do not settle the owner, the door asks.
+3. **Owner by claim, not by topic.** Ownership is decided by the claim and its kind. Audience decides only the surface. The same topic legitimately has a spec claim, a contract claim and a user task claim, each with its own owner. The door never gives an owned claim a second owner.
+4. **Grow by default; create only when admitted.** The door creates a document only when a person asked for it and admission (6.7) passes. A lookup that finds no owner is never, by itself, permission to create.
+5. **Ask, never guess.** When exact keys and declared subjects do not settle the owner, or find none, the door asks.
 6. **One owner per rule claim.** A rule claim is keyed by (holder, id); a repeated definition is a finding, not a style issue.
 7. **Named verbs exist.** A canonical document names only `fgos` verbs that run, unless it pins the commit that removed them.
 8. **Checks run where writing happens.** The check command runs at the door and in pre-commit on staged docs, not only in the test suite.
 9. **No new verb in slice 1.** This reconciles proposal 4.5 with Phase 10 decision 1. Classify stays `fgos convention classify`, the check stays doc-health, and lifecycle stays `fgos doc`. A shipped check verb becomes due only when project-owned rules exist (Convention Q13), because before that the rules describe only fgOS's own layout.
+10. **Admission by effect.** Any change that opens or moves authority passes admission at the door that records it, whatever verb carries it (6.7). Old events replay as they are.
+11. **Promise only what is checked.** The spec promises that new authority is admitted, not that every duplicate meaning is caught; the rule-claim check (6.4) is a backstop with a declared limit.
+
 
 ### 7.5. Answers to the proposal's open questions
 
@@ -239,6 +269,16 @@ D-tsk28x-8 (2026-08-25) set one engine with two tiers: a human tier that accepts
 - The source is single.
 - Repetition on the human surface is allowed only as a generated or linked projection.
 - The clause "two registries" of D-tsk28x-8 is superseded. When this spec is signed, that supersession is recorded as a decision with `--relation supersedes`.
+
+### 7.7. Owner decisions after the architecture panel, 2026-11-06
+
+The panel ([outcome](../../../plans/reports/council-261106-2216-docos-h2-document-identity-architecture-panel-outcome.md)) rejected the earlier rule "no match, then create" and recommended admission first, through existing doors. The owner accepted the recommendations ("ok, theo đề xuất"):
+
+1. The bounded promise of section 1 is accepted. Durable claim identity, and any profile for platform documents in the event store, are deferred.
+2. The admitted role set for new writes is the six roles in 5.1.
+3. Two items open now, apart from the identity contract: `p-cd2ejz7wa5` (honest commit gate, 6.5) and `p-ixrbglli5o` (the retrospective writer grows or re-attests by default, once its material-only branch has a legitimate completion path).
+
+No new coordinate system is adopted.
 
 ## 8. Contracts Owned
 
@@ -263,6 +303,8 @@ None new in slice 1. The output format of the check command (file, line, rule id
 - A planned verb in a signed spec is a finding. A spec that plans a verb stays `Canonical: No` until the verb exists.
 - The same RUL id with a different title under two holders is allowed: ids are holder-local.
 - A user document written outside the retrospective flow still goes through the door and the registry.
+- A retrospective item whose knowledge fits no existing document and has no request for a new one leaves material. Today the cleanup gate (`checkRetrospectiveContent` in `src/state/cleanup-harness.mjs`) accepts only a non-engine decision, a linked existing document or a registry attestation, so such an item parks at cleanup. Item `p-ixrbglli5o` must give it a legitimate path first; it never weakens the gate or manufactures a decision.
+- A provisional or reserved document resolves through the knowledge resolver with its lifecycle attached. That is provenance and attestation, not authority. A surface that drops the lifecycle is the leak (11.1).
 
 ## 11. Open Gaps
 
@@ -272,9 +314,18 @@ None new in slice 1. The output format of the check command (file, line, rule id
 - The 7 duplicated rule claims (the event-log rules numbered 1–3 and 5–8): work-state keeps them, because they are event-log and write-door rules and the holder table names work-state for them; the runner subcomponent cites them.
 - Removed or planned verbs named without a sha: `docs-lease` (holder-lock spec), `repair` (work-state spec), `evolve` (runner subcomponents) and `unlock` (runner spec). The planned `secrets` sits in an unsigned draft and is exempt.
 
+- `src/report/enduser-index.mjs` and `enduser-index-generate.mjs` emit user-document entries without lifecycle, so a reader of the index cannot tell provisional from active.
+- `scripts/knowledge-classifier.mjs` (`sanitizeRole`) maps to `recipe`, `concept`, `walkthrough` and `guide`, which are outside the admitted role set; its new-write callers are mapped or retired in the plan.
+- The cause of 479 topics for 479 documents is not proven. The bootstrap script registering documents directly active is a confirmed source; the per-item retrospective writer is a suspected one.
+
 ### 11.2. Owner questions
 
-Listed in the review request that accompanies this draft (Q1 cross-project reach, Q2 pre-commit posture).
+- Q1, cross-project reach: slice 1 serves the fgOS repo first, with the cross-project route recorded in 11.3 (recommended), or waits for the Convention overlay.
+- Q2, pre-commit posture: answered by item `p-cd2ejz7wa5`; documentation findings refuse the commit, and a host error refuses it too in an activated workspace.
+
+### 11.4. Open contract work (lead, not owner)
+
+- **Topic admission mechanism.** The panel left it open: a `proposed` topic status lacks its activation path, replay compatibility, merge disposition and reader meaning; a writer-prefix gate is not authorization. The lead writes this contract before signing. Missing expertise named by the panel: the identity owner, to prove a person at promote, and the Event Store owner, for replay of any new status.
 
 ### 11.3. Deferred, preserved (non-preclusion, proposal 0.3)
 
@@ -285,7 +336,7 @@ Listed in the review request that accompanies this draft (Q1 cross-project reach
 | Generated agent surface (A6) | Surfaces link to the owner | Every claim keeps a single source from which a distilled surface can be generated | H3 opens |
 | `platform-docs` registry profile, document and claim identity, typed graph | Path identity from Convention, claim key (holder, id) | Registry fields becoming profile-specific; a graph derived, never stored (tsk-1lv ruling: no stored graph or daemon) | A claim check needs identity beyond rule ids |
 | Skill-name check | none | A single listing of skill names across core and domains | A dead skill reference is found that review missed |
-| Closed role vocabulary | none | Roles moving into a closed list per profile | Registry generalization starts |
+| Durable claim identity (deferred by the owner, 2026-11-06) | Rule claims keyed by (holder, id); other claims held by admission and asking | Claim ids added later without rewriting documents | A duplicate meaning slips past admission and is found in use |
 | User-doc topology (PF-I010) | Keep the four Diataxis roots plus `docs/knowledge` | One profile root for user docs | After slice 1 lands |
 | Agent Context Engine (PF-I007) | none | Rule claims keyed so a reducer can select them | H3 opens |
 | Migration tooling retirement (proposal 9.2 step 5) | Already done in `159971615` | — | — |
@@ -299,8 +350,11 @@ Listed in the review request that accompanies this draft (Q1 cross-project reach
 | One check command over paths | partial | `scripts/doc-health.mjs` checks the whole corpus only | add path input and Convention check |
 | Verb reference rule | planned | scout section 3 | add rule and sweep |
 | Rule-claim owner rule | planned | scout section 7 | add rule and sweep |
-| Pre-commit runs the check | planned | the Convention spec states doc-health is not in pre-commit | Q2 |
-| Registry repairs | planned | scout section 2 | fix |
+| Pre-commit runs the check | planned | the Convention spec states doc-health is not in pre-commit | item `p-cd2ejz7wa5` |
+| Registry repairs and honest commit gate | planned | scout section 2; panel outcome section 2 | item `p-cd2ejz7wa5` |
+| Admission by effect | planned | panel outcome section 2 (seven paths, cited lines) | role set at reserve; active-on-create refused; supersede and move rules; topic mechanism open (11.4) |
+| Admitted role set | decided | owner 2026-11-06 (7.7) | enforce at `fgos doc reserve`; map or retire classifier roles |
+| Retrospective writer grows by default | planned | panel outcome R5 (cleanup gate) | item `p-ixrbglli5o` |
 | Owner by claim, audience by surface | planned | prior discussion `docs/history/compound-learn-artifact-registry/DISCUSSION.md` section 4; proposal 3.2, 3.3, A6 | skill text |
 | Declared-subject search over every root | partial | `fgos authoritative-match` needs `--quadrant`; subjects: 0 of 618 platform, 67 of 332 knowledge | extend the verb |
 
@@ -334,3 +388,4 @@ Done means: `npm test` and `cargo test --workspace` are green apart from tests t
 
 - 2026-11-06: draft. Slice 1 is the write door, built by extending the existing doors. No new verb (reconciles proposal 4.5 with Phase 10 decision 1). Platform documents keep path identity. Rule claims are keyed by (holder, id). Unsigned.
 - 2026-11-06, owner review: an owner is found by claim and claim kind, never by topic. The audience (agent, developer, user) decides only the surface. This builds on the settled identity axes of the compound-learn registry discussion (D-tsk28x-1, 3, 4, 13 and 14) and on proposal 3.2 and 3.3. Following A6, it supersedes the "two registries" clause of D-tsk28x-8 (to be recorded on signing).
+- 2026-11-06, architecture panel and owner decisions (7.7): the rule "no match, then create" is withdrawn; a writer must be admitted to open or move authority (6.7), and a missed lookup never grants create. The headline promise is narrowed to admission. Six roles are admitted for new writes. No new coordinate system, no durable claim identity in slice 1. Two items opened: `p-cd2ejz7wa5`, `p-ixrbglli5o`.
