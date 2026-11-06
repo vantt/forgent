@@ -570,3 +570,50 @@ test('a confined worker cannot read a login store the account inventory names', 
     assert.equal(seen.store, 'ENOENT', 'the worker read a login store the account inventory names');
   });
 });
+
+// A CLI may install itself inside its own login home: pi's launcher in <home>/.pi/agent/bin reads the version
+// its sibling install directory names, codex's entry reaches its release through a `current` link inside
+// <home>/.codex/packages. The home is masked for its login files, yet both CLIs must start, and those login
+// files stay unreadable.
+test('a CLI installed inside a masked login home starts confined, while the login files in that home stay unreadable', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const host = makeHost({ outsideTmp: true });
+  const piHome = path.join(host.home, '.pi', 'agent');
+  const codexHome = path.join(host.home, '.codex');
+  const localBin = path.join(host.home, '.local', 'bin');
+  const logins = [path.join(piHome, 'auth.json'), path.join(codexHome, 'auth.json'), path.join(codexHome, 'config.toml')];
+  const look = logins.map((file) => `if cat ${JSON.stringify(file)} >/dev/null 2>&1; then echo READ; else echo HIDDEN; fi`).join('\n');
+  const writeExec = (file, body) => { fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, `#!/bin/sh\n${body}\n`, { mode: 0o755 }); };
+  // pi: <home>/.local/bin/pi -> <piHome>/bin/pi, a launcher reading <piHome>/install/current-version.
+  writeExec(path.join(piHome, 'bin', 'pi'), 'd=$(dirname "$(readlink -f "$0")")\nv=$(cat "$d/../install/current-version") || exit 3\nexec "$d/../install/releases/$v/pi"');
+  writeExec(path.join(piHome, 'install', 'releases', '1.0', 'pi'), `echo started\n${look}`);
+  fs.writeFileSync(path.join(piHome, 'install', 'current-version'), '1.0\n');
+  // codex: <home>/.local/bin/codex -> <codexHome>/packages/standalone/current/bin/codex, current -> releases/1.0.
+  writeExec(path.join(codexHome, 'packages', 'standalone', 'releases', '1.0', 'bin', 'codex'), `echo started\n${look}`);
+  fs.symlinkSync('releases/1.0', path.join(codexHome, 'packages', 'standalone', 'current'));
+  for (const file of logins) fs.writeFileSync(file, 'PLANTED-LOGIN');
+  fs.mkdirSync(localBin, { recursive: true });
+  fs.symlinkSync('../../.pi/agent/bin/pi', path.join(localBin, 'pi'));
+  fs.symlinkSync(path.join(codexHome, 'packages', 'standalone', 'current', 'bin', 'codex'), path.join(localBin, 'codex'));
+  for (const cli of ['pi', 'codex']) {
+    await withHome(host, async () => {
+      const request = buildConfinementRequest({
+        capability: 'code:review',
+        executorId: 'bwrap-exec',
+        dispatchId: `disp_${cli}`,
+        requirement: { mode: 'required', policyId: 'workspace-write', policy: resolveConfinementPolicy('workspace-write') },
+        backendId: 'bwrap',
+        // A leased launch: the CLI reads a login copy in its own home, so its login home in place is masked.
+        invocation: { command: path.join(localBin, cli), args: [], env: {}, adapter: 'herdr-spawn', credentialStore: { use: cli, homeEnv: cli === 'pi' ? 'PI_CODING_AGENT_DIR' : 'CODEX_HOME' } },
+        context: { cwd: host.project, repoRoot: host.project, runDir: host.runDir, fgosDir: host.fgosDir },
+      });
+      const assessment = assessBwrap(request, backendFor(host));
+      assert.deepEqual(assessment.mismatches, []);
+      const out = await prepareBwrap({ resources: assessment.resources, coverage: assessment.coverage }, request, backendFor(host));
+      const worker = cp.spawnSync(out.invocation.command, out.invocation.args, { encoding: 'utf8' });
+      await out.cleanup();
+      assert.equal(worker.status, 0, `${cli} did not start confined: ${worker.stderr}`);
+      assert.deepEqual(worker.stdout.trim().split('\n'), ['started', 'HIDDEN', 'HIDDEN', 'HIDDEN'], `${cli}: started, every login file hidden`);
+    });
+  }
+});
