@@ -127,7 +127,7 @@ Ownership is keyed on the **claim**, never on the topic. The audience decides ho
 - **Document profile.** Slice 1 has two profiles and no new store.
   - User profile: registry slots `topicId:role`, written under `docs/knowledge/` and the Diataxis roots.
   - Platform profile: paths admitted by Convention under `docs/platform/`. Identity is the path, which is unique wherever Convention's cardinality is `singleton`.
-- **Rule claim.** A rule definition written as a bold rule id with its title in parentheses, e.g. `**RUL7 (title)**`, plus D-ADR numbers and the L1–L10 laws. The claim key is (holder document, id). An id is unique only inside its holder: 48 RUL ids are reused across holders with different meanings (scout section 7).
+- **Rule claim.** A rule definition written as a bold rule id with its title in parentheses, e.g. `**RULn (title)**`, plus D-ADR numbers and the L1–L10 laws. The claim key is (holder document, id). An id is unique only inside its holder: 48 RUL ids are reused across holders with different meanings (scout section 7).
 - **Holder.** The document that owns a claim, resolved through the governance [holder table](../governance.md#decision-scope-to-holder-table).
 - **Command listing.** The `commands[].name` set printed by `fgos --help --json`, which is the one machine list of `fgos` verbs, plus the hidden verb `internal`.
 - **Template.** A starting file for one document type. Today's templates sit under the documentation history folder and carry a `Document type: History` header, so a copy of one starts with a wrong header. Slice 1 moves them under this area's operations folder, where Convention row `doc-guide-runbook-1` already admits them, and gives them their real headers.
@@ -187,7 +187,7 @@ The exemptions are those of the dead-path rule. No regex on prose context words 
 
 The same rule id with the same title must not be defined in two holders. A second holder cites the owner instead of repeating the definition.
 
-This catches the 7 duplicated claims found today: `RUL1`–`RUL3` and `RUL5`–`RUL8`, each defined in both `docs/platform/work-state/spec.md` and `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`. It does not use the `Canonical for` header, which is boilerplate (one string is shared by 60 documents).
+This catches the 7 duplicated claims found today: the event-log rules numbered 1–3 and 5–8 (single append-only log, one write door, write order, expectation-checked writes, exit-code categories, item schema, dependency targets), each defined in both `docs/platform/work-state/spec.md` and `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`. It does not use the `Canonical for` header, which is boilerplate (one string is shared by 60 documents).
 
 ### 6.5. Registry repairs the door depends on
 
@@ -213,7 +213,7 @@ Today `fgos authoritative-match` reads `authoritative_for` only under a quadrant
 ## 7. Rules And Invariants
 
 1. **One door.** Maintained documentation is written through the documentation skill; an always-loaded line points to it and holds no rules itself (proposal 4.4, L8).
-2. **Extend, never alongside.** Path and kind stay in Convention, body rules stay in doc-health, user identity stays in the registry, decisions stay in `state.decisions`. Slice 1 adds no second checker, store or write door (L10, PF-I024, tsk-1lv D2 and D3).
+2. **Extend, never alongside.** Path and kind stay in Convention, body rules stay in doc-health, user identity stays in the registry, decisions stay in `state.decisions`. Slice 1 adds no second checker, store or write door (L10, PF-I024, and the canonical-decision-projection rulings of tsk-1lv: no stored graph or daemon, no second decision store).
 3. **Owner by claim, not by topic.** Ownership is decided by the claim and its kind. Audience decides only the surface. The same topic legitimately has a spec claim, a contract claim and a user task claim, each with its own owner. The same claim never has two owners.
 4. **Grow before create.** The door creates a document only when it finds no owner for the claim.
 5. **Ask, never guess.** When exact keys and declared subjects do not settle the owner, the door asks.
@@ -269,7 +269,7 @@ None new in slice 1. The output format of the check command (file, line, rule id
 ### 11.1. Sweep needed when the rules land (known findings)
 
 - `core/skills/_shared/private-cell-worktree.md:58` tells agents to run `fgos coordination run`. That verb was removed in `2180b4e72` and the active release answers "unknown verb". The file is reached from the coding cell policy.
-- The 7 duplicated rule claims: work-state keeps `RUL1`–`RUL3` and `RUL5`–`RUL8`, because they are event-log and write-door rules and the holder table names work-state for them; the runner subcomponent cites them.
+- The 7 duplicated rule claims (the event-log rules numbered 1–3 and 5–8): work-state keeps them, because they are event-log and write-door rules and the holder table names work-state for them; the runner subcomponent cites them.
 - Removed or planned verbs named without a sha: `docs-lease` (holder-lock spec), `repair` (work-state spec), `evolve` (runner subcomponents) and `unlock` (runner spec). The planned `secrets` sits in an unsigned draft and is exempt.
 
 ### 11.2. Owner questions
@@ -283,7 +283,7 @@ Listed in the review request that accompanies this draft (Q1 cross-project reach
 | Cross-project documentation rules (B6) | User profile works in any project through the shipped registry verbs; platform-profile rules apply in the fgOS repo only | A project-owned rule file merged by rule id (Convention 3.3) and a shipped check verb reading it | Convention Q13 is decided |
 | Real declared subjects on every platform document | Written when the door grows a document; boilerplate is skipped by the matcher | One subject field name across profiles (`Canonical for` and `authoritative_for` merged) | Coverage stalls, or a duplicate owner slips past the matcher |
 | Generated agent surface (A6) | Surfaces link to the owner | Every claim keeps a single source from which a distilled surface can be generated | H3 opens |
-| `platform-docs` registry profile, document and claim identity, typed graph | Path identity from Convention, claim key (holder, id) | Registry fields becoming profile-specific; a graph derived, never stored (D2) | A claim check needs identity beyond rule ids |
+| `platform-docs` registry profile, document and claim identity, typed graph | Path identity from Convention, claim key (holder, id) | Registry fields becoming profile-specific; a graph derived, never stored (tsk-1lv ruling: no stored graph or daemon) | A claim check needs identity beyond rule ids |
 | Skill-name check | none | A single listing of skill names across core and domains | A dead skill reference is found that review missed |
 | Closed role vocabulary | none | Roles moving into a closed list per profile | Registry generalization starts |
 | User-doc topology (PF-I010) | Keep the four Diataxis roots plus `docs/knowledge` | One profile root for user docs | After slice 1 lands |
