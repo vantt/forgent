@@ -55,8 +55,8 @@ thực thi/phục hồi của V1 — nghĩa là một phiên bị crash/resume t
 qua đúng bản ghi này, không qua đâu khác. CoordinationSession sở hữu tiến độ
 điều phối, KHÔNG BAO GIỜ sở hữu vòng đời Work (bất biến cũ vẫn giữ nguyên,
 xem `docs/platform/agent-coordination/README.md`).
-Chi tiết schema: `docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md#historical-file-coordinationsession-persistence-and-recovery-contract`;
-quyết định nền: `docs/platform/agent-coordination/history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#historical-file-adr-008-coordinationsession-as-v1-recovery-root-one-way-assignment-membership-and-mission-deferral`.
+Chi tiết schema: `docs/platform/agent-coordination/history/retired-engine/contracts/coordination-session.md#historical-file-coordinationsession-persistence-and-recovery-contract`;
+quyết định nền: `docs/platform/agent-coordination/history/retired-engine/decisions/ADR-008-coordination-session-and-mission-deferral.md#historical-file-adr-008-coordinationsession-as-v1-recovery-root-one-way-assignment-membership-and-mission-deferral`.
 
 **Recheck-discharge quorum fix (2026-09-18).** `closeSessionByQuorum`'s
 multi-operation-per-actor path (P10-KERNEL-FIX) trước đây chấm một gating

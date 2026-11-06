@@ -20,7 +20,7 @@ Superseded by: None for the surviving current subject
 Carriage note: Liveness evidence and explicit implementation/proposal distinction
 ```
 
-Complete pre-rework input: [historical snapshot](history/retired-engine/files/vision.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](history/retired-engine/vision.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Authority And Reading Rule
 
@@ -32,7 +32,7 @@ architecture, contracts, proposals, roadmaps, Skills, and implementation define
 more specific behavior underneath it. They may refine this Vision but must not
 silently narrow or contradict it.
 
-The [original intent ledger](history/retired-engine/files/intent-preservation-ledger.md#literal-snapshot)
+The [original intent ledger](history/retired-engine/intent-preservation-ledger.md#literal-snapshot)
 is dated preservation evidence, not a required current second read or an approval
 authority. It records earlier scope and deferred intent without making retired
 engine choices current.
@@ -381,8 +381,8 @@ Vision. They must be answered without reopening V-001 through V-013 implicitly.
    distinguishes current execution/evidence boundaries from historical schemas.
 4. [Decisions](decisions/README.md) distinguishes surviving boundaries from
    retired-engine acceptance.
-5. [Historical Step 07](history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot)
-   and [Step 08](history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot)
+5. [Historical Step 07](history/retired-engine/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot)
+   and [Step 08](history/retired-engine/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot)
    preserve their earlier frontier; they do not define current execution doors.
 6. Current sequencing and binding implementation is linked by
    [the runner spec](../runner/spec.md). The two recorded spec/code conflicts

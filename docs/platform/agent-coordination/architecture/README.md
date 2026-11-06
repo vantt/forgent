@@ -20,7 +20,7 @@ Superseded by: None for the surviving current subject
 Carriage note: Liveness evidence and explicit implementation/proposal distinction
 ```
 
-Complete pre-rework input: [historical snapshot](../history/retired-engine/files/architecture/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](../history/retired-engine/architecture/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Migration Status
 
@@ -30,7 +30,7 @@ documentation migration.
 
 Current contracts and explicitly proposed designs are distinguished by their
 own section status and implementation evidence, not by placement alone.
-[Implementation Alignment](../history/retired-engine/files/verification/implementation-alignment.md#literal-snapshot)
+[Implementation Alignment](../history/retired-engine/verification/implementation-alignment.md#literal-snapshot)
 is a historical preservation/retirement pointer, not a current alignment
 ledger. The [proof-preservation record](../history/documentation-migration/proof-preservation.md)
 retains old proof roots without certifying today's runtime.
@@ -40,9 +40,9 @@ retains old proof roots without certifying today's runtime.
 Read the [Agent Coordination Foundation Vision](../vision.md) before this
 directory. Architecture refines that direction into accepted system boundaries.
 
-1. [System Context](../history/retired-engine/files/architecture/system-context.md#literal-snapshot)
+1. [System Context](../history/retired-engine/architecture/system-context.md#literal-snapshot)
    preserves the retired engine's earlier system context.
-2. [Coordination Foundation Baseline](../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot)
+2. [Coordination Foundation Baseline](../history/retired-engine/architecture/coordination-foundation-baseline.md#literal-snapshot)
    preserves the earlier Step 00-08 baseline; it is not current runtime authority.
 3. [Protocol Model](protocol-model.md) describes planning sources and the
    current Workflow-step/operation, TaskSpec, Skill and Role boundaries.
@@ -60,7 +60,7 @@ directory. Architecture refines that direction into accepted system boundaries.
    work material: repository/runtime ports, a guard service, independent
    execution/attachment/observation facts, pending-command reconciliation and
    adapter-owned incarnation. In-cell takeover needs no worker checkpoint.
-10. [Coordination Continuation And Recovery](../history/retired-engine/files/architecture/coordination-continuation-recovery.md#literal-snapshot)
+10. [Coordination Continuation And Recovery](../history/retired-engine/architecture/coordination-continuation-recovery.md#literal-snapshot)
     is the retired session continuation proposal, not an existing engine door.
 11. [Executor Fallback Activation And Health](executor-health-and-fallback.md)
     proposes activating the reserved `fallbackExecutors` on signal-ladder
@@ -106,11 +106,11 @@ Shared by documents 9–11; each applies them without restating them.
   worker nor opening a child session constitutes cell acceptance.
 
 The earlier CoordinationSession/FlowDefinition decisions
-[ADR-008](../history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot)
-and [ADR-009](../history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot)
+[ADR-008](../history/retired-engine/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot)
+and [ADR-009](../history/retired-engine/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot)
 remain historical decisions about the engine retired in 2180b4e72, not accepted
 current session/IR contracts. Their
-[baseline](../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot)
+[baseline](../history/retired-engine/architecture/coordination-foundation-baseline.md#literal-snapshot)
 is retained for provenance.
 
 For current natural-language advisory selection, read

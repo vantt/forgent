@@ -38,16 +38,16 @@ Current investigation status and next steps:
 
 Read [Reading Map](../../reading-map.md), [Runner spec](../runner/spec.md),
 [Agent Coordination Vision](../agent-coordination/vision.md),
-[Intent Preservation Ledger](../agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md), and
+[Intent Preservation Ledger](../agent-coordination/history/retired-engine/intent-preservation-ledger.md), and
 [System Vision: Trong Mem Ngoai Cung](../system-architecture/architecture/system-vision-trong-mem-ngoai-cung.md) first.
 
 Inputs:
 
 - Independent review, 2026-09-05.
 - Repository source/contracts inspected on 2026-09-06.
-- [Foundation baseline](../agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md),
-  [FlowDefinition contract](../agent-coordination/history/retired-engine/files/contracts/flow-definition.md),
-  [CoordinationSession contract](../agent-coordination/history/retired-engine/files/contracts/coordination-session.md).
+- [Foundation baseline](../agent-coordination/history/retired-engine/architecture/coordination-foundation-baseline.md),
+  [FlowDefinition contract](../agent-coordination/history/retired-engine/contracts/flow-definition.md),
+  [CoordinationSession contract](../agent-coordination/history/retired-engine/contracts/coordination-session.md).
 - [Raw master-coordination prompt](../agent-coordination/playbooks/prompts/master-coordinator.md),
   [Architecture Advisory proposal](architecture-advisory-panel.md), and
   [Plan Loop proposal](../agent-coordination/history/proposals-redesigns/group-thinking-plan-loop.md).

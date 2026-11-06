@@ -6,7 +6,7 @@ Audience: Human reviewer, maintainer and implementation agent
 Purpose: Route current execution to its code and runner-spec owners, retaining verified boundaries
 Design status: Accepted at atomic cutover
 Implementation: Current execution is owned by CollaborationPattern and the Workflow runner
-Provenance: Whole-area reframe recorded conservation authority; complete classified input preserved in history/retired-engine/files
+Provenance: Whole-area reframe recorded conservation authority; complete classified input preserved in history/retired-engine (one snapshot per retired document)
 Writer type: Human + agent coauthor
 Canonical for: Current-owner navigation and verified boundaries; not a second runtime specification
 Use this when: Locating current execution owners or auditing historical claims

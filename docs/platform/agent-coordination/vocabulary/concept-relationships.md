@@ -20,7 +20,7 @@ Superseded by: None for the surviving current subject
 Carriage note: Liveness evidence and explicit implementation/proposal distinction
 ```
 
-Complete pre-rework input: [historical snapshot](../history/retired-engine/files/vocabulary/concept-relationships.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](../history/retired-engine/vocabulary/concept-relationships.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Layer Map
 

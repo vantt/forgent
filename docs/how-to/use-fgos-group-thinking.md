@@ -39,7 +39,7 @@ This "launch, resume" pattern is exactly what a real kernel bug in this
 platform used to break — a session could silently, permanently close
 after an actor's *first* settled step, even with real work still declared
 and pending. That bug is fixed (see
-`docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md`'s
+`docs/platform/agent-coordination/history/retired-engine/contracts/coordination-session.md`'s
 "Multi-Operation Quorum Completion" section for the full mechanism); the
 examples below exercise the fix directly, not around it.
 
@@ -204,7 +204,7 @@ around by hand-composing a request that pretends otherwise.
 - `core/skills/fgos-group-thinking/SKILL.md` — the skill's own real
   contract: the exact gate mechanism, the five bypasses it cannot allow,
   and why.
-- `docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md` —
+- `docs/platform/agent-coordination/history/retired-engine/contracts/coordination-session.md` —
   "Multi-Operation Quorum Completion" and "Group-Thinking Protocol Pack"
   sections: the full proof trail for everything this guide demonstrates.
 - `docs/how-to/run-a-coordination-session.md` — the underlying

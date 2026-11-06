@@ -20,7 +20,7 @@ Superseded by: None for the surviving current subject
 Carriage note: Liveness evidence and explicit implementation/proposal distinction
 ```
 
-Complete pre-rework input: [historical snapshot](../history/retired-engine/files/playbooks/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](../history/retired-engine/playbooks/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Migration Status
 
@@ -37,9 +37,9 @@ code own their respective claims.
 - [Master Multi-Agent Implementation Coordinator](prompts/master-coordinator.md)
   is an owner-retained manual engineering prompt, not a runtime sequencer or
   authority to bypass the registered execution/review doors.
-- [Step 07 Design Discussion Handoff](../history/retired-engine/files/playbooks/prompts/step-07-design-discussion-handoff.md#literal-snapshot)
+- [Step 07 Design Discussion Handoff](../history/retired-engine/playbooks/prompts/step-07-design-discussion-handoff.md#literal-snapshot)
   preserves the earlier engine-design discussion; it is historical context.
-- [MVP6+ Dogfood Handoff](../history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md#literal-snapshot)
+- [MVP6+ Dogfood Handoff](../history/retired-engine/playbooks/mvp6-dogfood-handoff.md#literal-snapshot)
   preserves the old `fgos coordination` procedure, retired in 2180b4e72.
   It is not a current operating command or standalone execution door.
 - Advisory cognitive references consumed by the registered skill:

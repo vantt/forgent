@@ -20,7 +20,7 @@ Superseded by: None for the surviving current subject
 Carriage note: Liveness evidence and explicit implementation/proposal distinction
 ```
 
-Complete pre-rework input: [historical snapshot](../history/retired-engine/files/contracts/assignment-run-runresult.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](../history/retired-engine/contracts/assignment-run-runresult.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Implementation And Design Status
 
@@ -337,6 +337,6 @@ or merge; lifecycle actions go through the authorized Work verbs.
 - superseded Run's late result stored and validated, never accepted as the
   Assignment's authoritative result.
 
-Implementation-era detail remains in [Step 03](../history/retired-engine/files/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#literal-snapshot)
-and [Step 04](../history/retired-engine/files/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md#literal-snapshot).
+Implementation-era detail remains in [Step 03](../history/retired-engine/roadmap/team-dispatch-v1/step-03-assignment-runresult.md#literal-snapshot)
+and [Step 04](../history/retired-engine/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md#literal-snapshot).
 

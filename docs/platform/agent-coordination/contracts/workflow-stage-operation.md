@@ -20,7 +20,7 @@ Superseded by: None for the surviving current subject
 Carriage note: Liveness evidence and explicit implementation/proposal distinction
 ```
 
-Complete pre-rework input: [historical snapshot](../history/retired-engine/files/contracts/workflow-stage-operation.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](../history/retired-engine/contracts/workflow-stage-operation.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Contract
 
@@ -95,4 +95,4 @@ Assignment builder and governed execution path.
 - driver cannot select an operation from another Workflow step.
 
 Implementation-era detail and task history remain in
-[Step 02](../history/retired-engine/files/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md#literal-snapshot).
+[Step 02](../history/retired-engine/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md#literal-snapshot).

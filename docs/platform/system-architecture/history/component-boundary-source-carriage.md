@@ -247,7 +247,7 @@ settled decision is later extracted into the owning canonical document.
   for the Agent Coordination architecture set.
 - [Agent Coordination Foundation Vision](../../agent-coordination/vision.md) —
   foundation/domain split, runtime contracts, and small-core constraints.
-- [System Context](../../agent-coordination/history/retired-engine/legacy/architecture/system-context.md) —
+- [System Context](../../agent-coordination/history/retired-engine/architecture/system-context.md) —
   boundaries, runtime profiles, and trust boundaries.
 - [Runtime Model](../../agent-coordination/architecture/runtime-model.md) —
   assignment execution chain, invariants, and failure domains.

@@ -13,7 +13,7 @@ Use this when: Maintaining advisory interpretation, evidence, dissent and owner 
 Do not use this for: Replaying historical commands, selecting executors/models or bypassing the registered skill
 Last reviewed: No current review date recorded; retained source dates are historical
 Related:
-- docs/platform/agent-coordination/history/retired-engine/files/playbooks/prompts/master-coordinator.md
+- docs/platform/agent-coordination/history/retired-engine/playbooks/prompts/master-coordinator.md
 - docs/platform/agent-coordination/playbooks/architecture-advisory-role-doctrine.md
 - docs/platform/agent-coordination/playbooks/architecture-advisory-artifact-templates.md
 Supersedes: None; the retained source records the historical design
@@ -34,7 +34,7 @@ Read the [role doctrine](../architecture-advisory-role-doctrine.md) for reasonin
 
 ## Historical Manual Prompt
 
-The complete prior manual prompt, input examples, roster and retirement proposal are [preserved verbatim](../../history/retired-engine/files/playbooks/prompts/architecture-advisory-coordinator.md#literal-snapshot). They are dated history, not current APIs or safety proof. The former coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; `docs/specs/runner.md` recorded that retirement in its historical CoordinationSession section.
+The complete prior manual prompt, input examples, roster and retirement proposal are [preserved verbatim](../../history/retired-engine/playbooks/prompts/architecture-advisory-coordinator.md#literal-snapshot). They are dated history, not current APIs or safety proof. The former coordination engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; `docs/specs/runner.md` recorded that retirement in its historical CoordinationSession section.
 
 ## Upstream Execution Door Transition
 

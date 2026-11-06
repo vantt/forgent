@@ -20,7 +20,7 @@ Superseded by: None for the surviving current subject
 Carriage note: Liveness evidence and explicit implementation/proposal distinction
 ```
 
-Complete pre-rework input: [historical snapshot](../history/retired-engine/files/proposals/dispatch-control-plane-redesign.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](../history/retired-engine/proposals/dispatch-control-plane-redesign.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 Reading boundary: sections 1 and 4 record dated 2026-08-26 findings, not present defects. Sections 8–9, 11 and 13 retain explicitly unimplemented design targets; current implementations and limits are stated locally elsewhere. Section 14 records the dated narrow candidate, including a removed sentinel adapter, and section 17 records its historical task sets. Neither is current execution proof. Read src/runner/execution/bind.mjs and current dispatch modules for live behavior; no proposed schema or historical count becomes a current contract.
 

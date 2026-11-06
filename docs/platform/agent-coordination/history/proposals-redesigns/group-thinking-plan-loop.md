@@ -46,8 +46,8 @@ Canonical for: the design decision this proposal's own plan
 accepted contract.
 
 Related: Master Multi-Agent Implementation Coordinator,
-[MVP6+ Dogfood Handoff](../retired-engine/files/playbooks/mvp6-dogfood-handoff.md),
-[CoordinationSession Contract](../retired-engine/files/contracts/coordination-session.md),
+[MVP6+ Dogfood Handoff](../retired-engine/playbooks/mvp6-dogfood-handoff.md),
+[CoordinationSession Contract](../retired-engine/contracts/coordination-session.md),
 [Step 09 Group Thinking Substrate](../../../proposals/step-09-group-thinking-substrate.md),
 [`docs/how-to/run-a-coordination-session.md`](../../../../how-to/run-a-coordination-session.md),
 [`docs/how-to/use-fgos-group-thinking.md`](../../../../how-to/use-fgos-group-thinking.md)

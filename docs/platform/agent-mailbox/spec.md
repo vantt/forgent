@@ -19,7 +19,7 @@ Last reviewed: 2026-10-23
 Supersedes: nothing. V-011 was narrowed by V-013 (section 2).
 Related:
 - docs/platform/agent-coordination/vision.md#v-011-the-foundation-core-stays-small (V-011)
-- docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md
+- docs/platform/agent-coordination/history/retired-engine/contracts/coordination-session.md
 - docs/platform/event-store/spec.md (sections 3, 6, 7, 14, 16; D-ADR0055)
 - docs/platform/identity/spec.md
 - docs/platform/component-boundary.md

@@ -22,13 +22,13 @@ Carriage note: Liveness evidence and explicit implementation/proposal distinctio
 
 2026-11-03 cutover note: The legacy runner citation above is a historical coordinate, not a post-cutover link. Prepared successors: `docs/platform/runner/decisions/h-aabefc85f0c9.md`.
 
-Complete pre-rework input: [historical snapshot](../history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](../history/retired-engine/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Current Boundary
 
 The registered `fgos-architecture-panel` skill consumes this document for cognitive quality (`core/skills/fgos-architecture-panel/SKILL.md:135-142`). It starts only the registered architecture-advisory definitions and leaves routing to config/bind and execution/human gates to Workflow (`core/skills/fgos-architecture-panel/SKILL.md:17-24`). Provider/model strings in worked examples are dated examples, not a current roster or permission to dispatch.
 
-The complete classified input, including the historical operational sections, is [preserved verbatim](../history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot). The former engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/platform/runner/decisions/h-aabefc85f0c9.md#coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner`’s historical CoordinationSession section.
+The complete classified input, including the historical operational sections, is [preserved verbatim](../history/retired-engine/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot). The former engine was retired in `2180b4e72701bb090288af8fe8021008d9d42079`; see `docs/platform/runner/decisions/h-aabefc85f0c9.md#coordinationsession-lịch-sử-đã-thu-hồi-per-p4-thay-bằng-collaborationpattern-workflow-runner`’s historical CoordinationSession section.
 
 ## How To Read This
 
@@ -1541,4 +1541,4 @@ confinement evidence, not rhetorical diversity, determine safe execution.
 
 ## Historical Operational Roster
 
-The prior roster, tier/model derivations, direct dispatch commands and bwrap recipe are [historical sections](../history/retired-engine/files/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot), not current execution support. Current model and executor selection remains with config/bind through the registered Workflow.
+The prior roster, tier/model derivations, direct dispatch commands and bwrap recipe are [historical sections](../history/retired-engine/playbooks/architecture-advisory-role-doctrine.md#literal-snapshot), not current execution support. Current model and executor selection remains with config/bind through the registered Workflow.

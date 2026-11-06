@@ -788,9 +788,9 @@ This avoids two distortions:
 - P05.2 live null result and infrastructure failures:
   `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P05.2.md`
 - CoordinationSession contract:
-  `docs/platform/agent-coordination/history/retired-engine/files/contracts/coordination-session.md` — history of the retired engine; not current runtime authority
+  `docs/platform/agent-coordination/history/retired-engine/contracts/coordination-session.md` — history of the retired engine; not current runtime authority
 - FlowDefinition contract:
-  `docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md` — history of the retired engine; not current runtime authority
+  `docs/platform/agent-coordination/history/retired-engine/contracts/flow-definition.md` — history of the retired engine; not current runtime authority
 - Master-coordinator playbook:
   `docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md`
 - Hardened runtime primitives:

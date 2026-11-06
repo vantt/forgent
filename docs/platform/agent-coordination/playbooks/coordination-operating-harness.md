@@ -20,7 +20,7 @@ Superseded by: None for the surviving current subject
 Carriage note: Liveness evidence and explicit implementation/proposal distinction
 ```
 
-Complete pre-rework input: [historical snapshot](../history/retired-engine/files/playbooks/coordination-operating-harness.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](../history/retired-engine/playbooks/coordination-operating-harness.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Runtime And Lifecycle Notice
 
@@ -34,7 +34,7 @@ New selected manual tracks write evidence under the current platform
 conventions below apply only when a track actually adopts this manual harness.
 They neither define Workflow storage nor prove a rollout was executed.
 
-The [earlier Step 07 discussion](../history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot)
+The [earlier Step 07 discussion](../history/retired-engine/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot)
 is preserved history, not a current architecture milestone.
 
 ## 1. Goal

@@ -20,7 +20,7 @@ Superseded by: None for the surviving current subject
 Carriage note: Liveness evidence and explicit implementation/proposal distinction
 ```
 
-Complete pre-rework input: [historical snapshot](../history/retired-engine/files/decisions/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](../history/retired-engine/decisions/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
 ## Migration Status
 
@@ -49,15 +49,15 @@ parts of a retained ADR still apply; this index does not revive retired runtime.
 
 Historical decisions, not current session/IR authority:
 
-- [ADR-008: CoordinationSession And Mission Deferral](../history/retired-engine/files/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot)
-- [ADR-009: FlowDefinition Shared IR And Typed Profiles](../history/retired-engine/files/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot)
-- [ADR-010: Interactive/Headless Parity And Work Isolation](../history/retired-engine/files/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md#literal-snapshot)
+- [ADR-008: CoordinationSession And Mission Deferral](../history/retired-engine/decisions/ADR-008-coordination-session-and-mission-deferral.md#literal-snapshot)
+- [ADR-009: FlowDefinition Shared IR And Typed Profiles](../history/retired-engine/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md#literal-snapshot)
+- [ADR-010: Interactive/Headless Parity And Work Isolation](../history/retired-engine/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md#literal-snapshot)
 
 Their Step 07/08 acceptance and proof records describe the engine at that time,
 not the current runtime after retirement in 2180b4e72. Surviving parity/isolation
 obligations require current implementation evidence; historical proof does not
 make CoordinationSession, FlowDefinition or Cohort Planner current entities.
-The [original intent ledger](../history/retired-engine/files/intent-preservation-ledger.md#literal-snapshot)
+The [original intent ledger](../history/retired-engine/intent-preservation-ledger.md#literal-snapshot)
 preserves that provenance without acting as today's approval gate.
 
 Other discussion-stage schema and implementation choices from Step 07 and

@@ -3450,7 +3450,7 @@ registerFix({
   fix: (cwd) => fixNoStuckMergeAbort(cwd),
 });
 
-// Phase 02 R8 (docs/platform/agent-coordination/history/retired-engine/files/contracts/flow-definition.md,
+// Phase 02 R8 (docs/platform/agent-coordination/history/retired-engine/contracts/flow-definition.md,
 // ADR-009), AGENTS.md's install/setup/doctor gate: the new FlowDefinition
 // definition surface (Workflow projection adapter + CoordinationProtocol
 // loader, src/runner/definitions/) is a real infra dependency (it shells

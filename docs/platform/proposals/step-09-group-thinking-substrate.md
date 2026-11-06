@@ -40,8 +40,8 @@ definitions, and the `fgos-group-thinking` skill) implemented and closed by
 `step-09-mvp6-to-mvp9` (Phases 00/06/07/08/09/10, including the
 user-authorized P10-KERNEL-FIX quorum fix) — see that track's own
 verification index for the full per-phase evidence trail and the
-[CoordinationSession Contract](../agent-coordination/history/retired-engine/files/contracts/coordination-session.md)/
-[FlowDefinition Contract](../agent-coordination/history/retired-engine/files/contracts/flow-definition.md)
+[CoordinationSession Contract](../agent-coordination/history/retired-engine/contracts/coordination-session.md)/
+[FlowDefinition Contract](../agent-coordination/history/retired-engine/contracts/flow-definition.md)
 for the promoted contract text, each with its own named limitations.
 Last reviewed: 2026-09-04
 Canonical for: nothing until explicitly accepted; the implemented MVP0-9 +
@@ -55,16 +55,16 @@ Step 08: make fgOS able to express richer group-thinking and problem-solving
 collaboration patterns without weakening the isolation-heavy fixtures already
 proved by Step 08.
 Intent traceability: [Architecture Intent](../system-architecture/architecture/architecture-intent.md),
-[Agent Coordination Intent Preservation Ledger](../agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md)
-Related: [Coordination Foundation Baseline](../agent-coordination/history/retired-engine/files/architecture/coordination-foundation-baseline.md),
-[CoordinationSession Contract](../agent-coordination/history/retired-engine/files/contracts/coordination-session.md),
-[FlowDefinition Contract](../agent-coordination/history/retired-engine/files/contracts/flow-definition.md),
+[Agent Coordination Intent Preservation Ledger](../agent-coordination/history/retired-engine/intent-preservation-ledger.md)
+Related: [Coordination Foundation Baseline](../agent-coordination/history/retired-engine/architecture/coordination-foundation-baseline.md),
+[CoordinationSession Contract](../agent-coordination/history/retired-engine/contracts/coordination-session.md),
+[FlowDefinition Contract](../agent-coordination/history/retired-engine/contracts/flow-definition.md),
 [Team Communication Protocol V1](../agent-coordination/proposals/team-communication-protocol-v1.md),
 [Component Authority Boundary Map](component-authority-boundary-map.md),
 [Step 10 Coding Domain Adoption](step-10-coding-domain-adoption.md),
 [Step 09 MVP1/MVP2 group-thinking verification](../agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/index.md),
 [Step 09 MVP3-MVP5 verification](../agent-coordination/verification/step-09-mvp3-to-mvp5/index.md),
-[MVP6+ Dogfood Handoff](../agent-coordination/history/retired-engine/files/playbooks/mvp6-dogfood-handoff.md)
+[MVP6+ Dogfood Handoff](../agent-coordination/history/retired-engine/playbooks/mvp6-dogfood-handoff.md)
 
 Implementation note (updated by `step-09-mvp6-to-mvp9`'s own closing cell,
 P10.10 — Step 09 is now closed): MVP1-MVP5 promoted starting Phase 00 — see

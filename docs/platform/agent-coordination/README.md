@@ -6,7 +6,7 @@ Audience: Human reviewer, maintainer and implementation agent
 Purpose: Route current execution to its owners and retain historical evidence
 Design status: Accepted
 Implementation: Current-owner navigation; former coordination engine retired
-Provenance: recorded conservation authority whole-area reframe; complete classified input retained in history/retired-engine/files
+Provenance: recorded conservation authority whole-area reframe; complete classified input retained in history/retired-engine (one snapshot per retired document)
 Writer type: Human + agent coauthor
 Canonical for: Area navigation, not runtime schema or old engine status
 Use this when: Locating current execution owners or historical coordination claims
@@ -64,7 +64,7 @@ FlowDefinition, CoordinationProtocol or `fgos coordination` contract is retained
 | Provenance, compatibility and domain harness decisions | [Decision index](decisions/README.md), including current ADR-002, ADR-004, ADR-006 and ADR-007 |
 | Current intended design, not blanket implementation | [Proposal index](proposals/README.md), [foundation vision](vision.md); section status distinguishes proposals from implemented behavior |
 | Owner-retained manual operating material | [Operating harness](playbooks/coordination-operating-harness.md), [master coordinator](playbooks/prompts/master-coordinator.md); these are not the registered architecture-advisory runtime |
-| Classified prior files | [Whole-input history](history/retired-engine/files/README.md#literal-snapshot); historical statuses and links do not establish present implementation |
+| Classified prior files | [Whole-input history](history/retired-engine/README.md#literal-snapshot); historical statuses and links do not establish present implementation |
 
 The registered skill explicitly retains the four cognitive companions and
 rejects historical runtime recipes (`core/skills/fgos-architecture-panel/SKILL.md:135-142`).

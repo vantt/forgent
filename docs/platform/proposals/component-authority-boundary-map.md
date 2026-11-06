@@ -29,7 +29,7 @@ Design status: Draft / architect-level discussion
 Implementation: Not started
 Last reviewed: 2026-09-02
 Canonical for: nothing until promoted or replaced by an accepted boundary document
-Related: [Group Thinking Substrate](step-09-group-thinking-substrate.md), [Coding Domain Adoption](step-10-coding-domain-adoption.md), [Agent Coordination Vision](../agent-coordination/vision.md), [Intent Preservation Ledger](../agent-coordination/history/retired-engine/legacy/intent-preservation-ledger.md), [Architecture Intent](../system-architecture/architecture/architecture-intent.md), [Component Boundary Advisory](../component-boundary.md), [Repo Layout Vision](../component-boundary.md), [Host Invocation And Provider Routing](../host-invocation-routing/spec.md), [Node To Rust Component Migration](../host-invocation-routing/architecture/node-to-rust-migration.md)
+Related: [Group Thinking Substrate](step-09-group-thinking-substrate.md), [Coding Domain Adoption](step-10-coding-domain-adoption.md), [Agent Coordination Vision](../agent-coordination/vision.md), [Intent Preservation Ledger](../agent-coordination/history/retired-engine/intent-preservation-ledger.md), [Architecture Intent](../system-architecture/architecture/architecture-intent.md), [Component Boundary Advisory](../component-boundary.md), [Repo Layout Vision](../component-boundary.md), [Host Invocation And Provider Routing](../host-invocation-routing/spec.md), [Node To Rust Component Migration](../host-invocation-routing/architecture/node-to-rust-migration.md)
 
 ## 1. Status And Reading Rule
 

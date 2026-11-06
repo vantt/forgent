@@ -20,9 +20,9 @@ Superseded by: None for the surviving current subject
 Carriage note: Liveness evidence and explicit implementation/proposal distinction
 ```
 
-Complete pre-rework input: [historical snapshot](../history/retired-engine/files/proposals/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
+Complete pre-rework input: [historical snapshot](../history/retired-engine/proposals/README.md#literal-snapshot). This is preservation evidence, not a replacement for the current contract below.
 
-Proposals remain subordinate to the surviving boundaries in [Vision](../vision.md). A current design frontier does not implicitly reopen an accepted boundary. The original [intent-preservation ledger](../history/retired-engine/files/intent-preservation-ledger.md#literal-snapshot) is dated preservation evidence, not current authority or an additional mandatory approval gate.
+Proposals remain subordinate to the surviving boundaries in [Vision](../vision.md). A current design frontier does not implicitly reopen an accepted boundary. The original [intent-preservation ledger](../history/retired-engine/intent-preservation-ledger.md#literal-snapshot) is dated preservation evidence, not current authority or an additional mandatory approval gate.
 
 ## Migration Status
 
@@ -46,15 +46,15 @@ These snapshots record the retired coordination engine and its earlier design
 frontier. Links into history preserve discussion and provenance; they do not
 declare those contracts canonical or the engine delivered in the current release.
 
-1. [Step 07: CoordinationSession, AdhocTask, And Planning Boundary](../history/retired-engine/files/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot)
+1. [Step 07: CoordinationSession, AdhocTask, And Planning Boundary](../history/retired-engine/proposals/step-07-coordination-session-adhoc-task.md#literal-snapshot)
    records the old session/planning discussion. Current inline validation is
    implemented in `src/runner/dispatch/execution-contract.mjs`; it is not waiting
    for acceptance of that retired proposal.
-2. [Step 08: Standalone Coordination And Optional Protocols](../history/retired-engine/files/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot)
+2. [Step 08: Standalone Coordination And Optional Protocols](../history/retired-engine/proposals/step-08-standalone-coordination-protocols.md#literal-snapshot)
    records the former coordination door and optional-protocol design, retired
-   in 2180b4e72. Its [foundation baseline](../history/retired-engine/files/architecture/coordination-foundation-baseline.md#literal-snapshot),
-   [CoordinationSession](../history/retired-engine/files/contracts/coordination-session.md#literal-snapshot)
-   and [FlowDefinition](../history/retired-engine/files/contracts/flow-definition.md#literal-snapshot)
+   in 2180b4e72. Its [foundation baseline](../history/retired-engine/architecture/coordination-foundation-baseline.md#literal-snapshot),
+   [CoordinationSession](../history/retired-engine/contracts/coordination-session.md#literal-snapshot)
+   and [FlowDefinition](../history/retired-engine/contracts/flow-definition.md#literal-snapshot)
    links are historical evidence, not current runtime contracts.
 
 ## Related Architect-Level Intentions
