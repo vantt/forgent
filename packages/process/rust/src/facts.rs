@@ -691,7 +691,7 @@ mod tests {
 
     #[test]
     fn parses_parent_group_terminal_and_start_from_a_stat_line_with_spaces_in_comm() {
-        let line = "4242 (weird) name (x)) S 100 4242 77 34816 4242 4194304 0 0 0 0 1 2 0 0 20 0 1 0 987654 1 2 3";
+        let line = "4242 (weird) name (x)) S 100 4242 77 34816 4243 4194304 0 0 0 0 1 2 0 0 20 0 1 0 987654 1 2 3";
         assert_eq!(
             parse_relation(ProcId(4242), line),
             Some(Relation {
@@ -700,7 +700,7 @@ mod tests {
                 group: 4242,
                 session: 77,
                 tty_nr: 34816,
-                tty_foreground_group: 4242,
+                tty_foreground_group: 4243,
                 start_ticks: 987654,
                 state: 'S'
             })
