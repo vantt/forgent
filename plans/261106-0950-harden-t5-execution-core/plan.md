@@ -222,6 +222,8 @@ Rejected: none.
 
 ## Unresolved questions
 
+**Answered 2026-11-06 12:1x: (a)** (HARDEN decision 64): census first, values move to each machine's global file and out of each project in its own commit, then the schema change.
+
 ### UQ-1. Where do the executor commands that projects already commit go, once command and args are global-only (Q2b)?
 
 **What is happening.** Decision 61 Q2b makes executor `command` and `args` global-only. This repo's committed `.fgos/config.yaml` (`:18-25` default executor, `:159` gitnexus, `:181` herdr, more entries below) names them, and so does any project whose config carries executor entries. When the schema change activates, the config door refuses those files on every machine at once (`packages/config/rust/src/scope.rs:66-75`: a global-only key, or a list above one such as `invocations`, in a project file is `config-key-out-of-scope`), so every `fgos run` in those projects stops until the files change.
