@@ -93,7 +93,7 @@ Settled without a phase: H-T4e closed (arbitration §2: short calls stay unconfi
 | 10 | [Execution core cut](phase-10-execution-core-cut.md) **landed 11-06 `0029e325b..c5242df59` except the parts that need `assignment.mjs` (after P09); also the never-started seat retry** | 07, 09 | 11 (if 11 done, n/a) | −250 / 0 / −50 |
 | 11 | [Config type rules to schema](phase-11-config-to-schema.md) **landed 11-06 `68c426c31..e5ac48e88`** | 03, 04 | 08, 10 | −600 to −1 000 / 0 / −200 |
 | 12 | [Test structure and doctor fold](phase-12-test-structure-and-doctor-fold.md) **landed 11-06 `cfff2aa7f..e3de56c54`** | 10, 11 | — | −85 / 0 / −1 100 |
-| 13 | [Spec, hand-off, close, land](phase-13-spec-handoff-close-land.md) | 01–12 | — | 0 / 0 / 0 |
+| 13 | [Spec, hand-off, close, land](phase-13-spec-handoff-close-land.md) **docs landed 11-06 `57149ebe9..9251c0190`; layer close waits on owner (budgets: P14 or close as is) and on P04 half B** | 01–12 | — | 0 / 0 / 0 |
 
 ```
 wave 0:  P01 (red proofs on a branch)
