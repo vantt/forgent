@@ -11,7 +11,7 @@ import { parseFrontmatter, renderFrontmatter } from '../src/report/frontmatter.m
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
 import { isLiveDocLifecycle } from '../src/state/knowledge-registry.mjs';
 
-// docs/architect/knowledge-registry-redesign.md §13.4 (Conservation): "every
+// docs/platform/proposals/knowledge-registry-redesign.md §13.4 (Conservation): "every
 // old file must appear exactly once ... missing files, duplicate source
 // assignments, and target documents with no source all fail." Computed once
 // from the planned-move list, before any file or store mutation happens --
@@ -151,7 +151,7 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true, fgosRoot = repo
     const purposeSlug = topic?.purposeSlug || item.topicId;
     const targetPath = `docs/knowledge/${purposeSlug}/${item.role}.md`;
 
-    // Idempotency (docs/architect/knowledge-registry-redesign.md §13.5,
+    // Idempotency (docs/platform/proposals/knowledge-registry-redesign.md §13.5,
     // "apply does not reduce the number of reachable source captures" on a
     // repeat run): the registry's own `currentPath` for this docId, when
     // the doc is already registered, is the single source of truth for
@@ -314,7 +314,7 @@ export function runKnowledgeMigration(repoRoot, { dryRun = true, fgosRoot = repo
     // Record moveDocPathStore event
     moveDocPathStore(fgosDir, { docId: move.docId, topicId: move.topicId, role: move.role, newPath: move.newPath });
 
-    // docs/architect/knowledge-registry-redesign.md §13.5 rule 6: "leaves
+    // docs/platform/proposals/knowledge-registry-redesign.md §13.5 rule 6: "leaves
     // every migrated document provisional unless explicitly promoted."
     // Only an 'active' doc needs demoting -- a 'provisional'/'reserved' doc
     // is already below 'active' and doc.demote itself requires 'active'.

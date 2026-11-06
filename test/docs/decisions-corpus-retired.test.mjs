@@ -2,9 +2,9 @@
 // hand-authored docs/decisions/*.md corpus (35 files: 34 numbered ADRs +
 // 0000-index.md) is retired -- docs/decisions/ persists as a directory
 // holding ONLY the generated index.md (fgos decision-index, tsk-1lv-2);
-// every ADR's narrative moved into the docs/specs/<area>.md (or
-// docs/platform/architecture-map.md) its own frontmatter already declared via
-// relates_specs, under a new "## Lịch sử quyết định retired từ
+// every ADR's narrative moved into the area spec or decision-history file
+// under docs/platform/ (or docs/platform/architecture-map.md) its own
+// frontmatter already declared, under a new "## Lịch sử quyết định retired từ
 // docs/decisions/" section.
 //
 // What this file does NOT assert: live `state.decisions` content. The 34
@@ -13,7 +13,7 @@
 // "operator action on .fgos/, never through a branch's own commit" shape
 // ADR0019/ADR0024's own migration scripts already established) -- that
 // data is not part of this branch's portable git history the way
-// docs/specs/*.md's edits are, so asserting on it here would pass on this
+// the platform spec edits are, so asserting on it here would pass on this
 // machine and fail on any other clone/CI checkout. The `--scope` field and
 // `fgos decision-index` verb's own capability is already covered by
 // tsk-1lv-2's test/state/decision-scope-field.test.mjs and
@@ -64,7 +64,7 @@ test('docs/decisions/ still exists as a directory (D5: "docs/decisions/ giữ l�
   assert.equal(fs.statSync(DECISIONS_DIR).isDirectory(), true);
 });
 
-test('every one of the 34 retired ADR ids has its narrative present in a docs/specs/<area>.md or docs/platform/architecture-map.md "Lịch sử quyết định" section', () => {
+test('every one of the 34 retired ADR ids has its narrative present in a docs/platform area narrative or docs/platform/architecture-map.md "Lịch sử quyết định" section', () => {
   const combined = NARRATIVE_TARGETS.map((rel) => ({ rel, content: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8') }));
   const missing = [];
   for (const id of RETIRED_ADR_HEADINGS) {

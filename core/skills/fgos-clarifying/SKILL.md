@@ -97,8 +97,8 @@ itself is genuinely unclear, not when a detail is merely unspecified.
   as an ad hoc sub-dispatch. Deciding "is the intent clear" and "which
   domain does this belong to" are exactly the kind of judgment a live,
   same-provider soul already holds full context for (Native-First Dispatch
-  Doctrine rule 2, `docs/decisions/0026-vision-orchestrator-roottask-
-  capacity-native-vs-cli-spawn.md`); spawning a subagent to re-derive
+  Doctrine rule 2, D-ADR0026 in
+  `docs/platform/runner/decisions/h-36d872fbb0e5.md`); spawning a subagent to re-derive
   either from less context is pure overhead, not a transparency question.
 
 ## Flow

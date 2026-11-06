@@ -16,6 +16,13 @@ import {
 } from
   '../../scripts/check-decision-citation-drift.mjs';
 
+// A spec file inside the scanned platform-style root: <root>/area/spec.md.
+function specFile(specsDir) {
+  const dir = path.join(specsDir, 'area');
+  fs.mkdirSync(dir, { recursive: true });
+  return path.join(dir, 'spec.md');
+}
+
 const scriptPath = fileURLToPath(
   new URL(
     '../../scripts/check-decision-citation-drift.mjs',
@@ -110,7 +117,7 @@ test(
   () => {
     const sourceFiles = [
       {
-        file: 'docs/specs/work-state.md',
+        file: 'docs/platform/work-state/spec.md',
         lines: ['ADR0012, supersede ADR0002'],
       },
     ];
@@ -176,7 +183,7 @@ test(
         'no ack here\n',
     );
     fs.writeFileSync(
-      path.join(specsDir, 'a.md'),
+      specFile(specsDir),
       'unrelated ADR0010 (does not apply here) mention\n',
     );
 
@@ -228,7 +235,7 @@ test(
         'ADR0012 (typed edge model) (ack)\n',
     );
     fs.writeFileSync(
-      path.join(specsDir, 'a.md'),
+      specFile(specsDir),
       'nothing relevant here\n',
     );
 
@@ -279,7 +286,7 @@ test(
   () => {
     const findings = findCitationFormatFindings([
       {
-        file: 'docs/specs/a.md',
+        file: 'docs/platform/area/spec.md',
         lines: ['see ADR0002 for the model'],
       },
     ]);
@@ -294,7 +301,7 @@ test(
   () => {
     const findings = findCitationFormatFindings([
       {
-        file: 'docs/specs/a.md',
+        file: 'docs/platform/area/spec.md',
         lines: [
           'see ADR0002 (event log is the truth) for the model',
         ],
@@ -579,7 +586,7 @@ test(
       'nothing here\n',
     );
     fs.writeFileSync(
-      path.join(specsDir, 'a.md'),
+      specFile(specsDir),
       'see ADR0002 for the model\n',
     );
     const baselinePath = path.join(dir, 'baseline.json');
@@ -638,7 +645,7 @@ test(
       'nothing here\n',
     );
     fs.writeFileSync(
-      path.join(specsDir, 'a.md'),
+      specFile(specsDir),
       'see ADR0002 for the model\n',
     );
     const baselinePath = path.join(dir, 'baseline.json');
@@ -661,7 +668,7 @@ test(
     );
 
     fs.appendFileSync(
-      path.join(specsDir, 'a.md'),
+      specFile(specsDir),
       'also see RUL42 without a gloss\n',
     );
 
@@ -701,7 +708,7 @@ test(
       'nothing here\n',
     );
     fs.writeFileSync(
-      path.join(specsDir, 'a.md'),
+      specFile(specsDir),
       'see ADR0002 for the model\n',
     );
     const baselinePath = path.join(dir, 'baseline.json');
@@ -724,7 +731,7 @@ test(
     );
 
     fs.writeFileSync(
-      path.join(specsDir, 'a.md'),
+      specFile(specsDir),
       '<!-- an unrelated inserted line -->\n' +
         'see ADR0002 for the model\n',
     );
@@ -780,12 +787,11 @@ test(
 
 // Existing CLI fixtures prove explicit override scopes; none observes the default
 // post-cutover nested platform spec/decision read set. This is its owning proof.
-test('default citation scan includes nested area rules and decision narratives without losing legacy specs', () => {
+test('default citation scan reads nested area specs and decision narratives under the platform root', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'citation-successors-'));
   try {
     const files = {
       'docs/decisions/.keep': '',
-      'docs/specs/old.md': 'RUL901 bare legacy rule\n',
       'docs/platform/sample/subcomponents/child/spec.md': 'RUL902 bare child rule\n',
       'docs/platform/sample/decisions/settled.md': 'RUL903 bare narrative citation\n',
       'docs/platform/sample/operations/not-a-spec.md': 'RUL904 outside the declared default read set\n',
@@ -799,8 +805,8 @@ test('default citation scan includes nested area rules and decision narratives w
     }
     const result = spawnSync(process.execPath, [scriptPath], { cwd: dir, encoding: 'utf8' });
     assert.equal(result.status, 1);
-    assert.match(result.stdout, /3 finding/);
-    for (const id of ['RUL901', 'RUL902', 'RUL903']) assert.ok(result.stdout.includes(id));
+    assert.match(result.stdout, /2 finding/);
+    for (const id of ['RUL902', 'RUL903']) assert.ok(result.stdout.includes(id));
     assert.ok(!result.stdout.includes('RUL904'));
     assert.ok(!result.stdout.includes('RUL905'));
     assert.ok(!result.stdout.includes('RUL906'));

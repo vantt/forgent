@@ -26,12 +26,12 @@
 //
 // tsk-1lv-1 additive exports (below `runCli`): the write-time sweep
 // `fgos decision --relation supersedes:<id>|touches:<id>` runs widens
-// this file's own citation scan from backlog.md+specs/*.md-only to
+// this file's own citation scan from backlog.md+platform specs/decisions only to
 // docs/**+src/**+plugins/**, for an arbitrary relation id (not only the
 // 4-digit ADR ids `extractCitedIds` above assumes) — see
 // `collectWideSourceFiles`/`findWideCitationFindings`. These are pure,
 // additive, and never called by this file's own CLI mode above, so the
-// existing backlog/specs-only default stays byte-identical.
+// existing backlog/platform-specs default stays byte-identical.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -280,32 +280,14 @@ function loadSourceFiles(
         .split('\n'),
     });
   }
-  if (fs.existsSync(specsDir)) {
-    const specFiles = fs
-      .readdirSync(specsDir)
-      .filter((f) => f.endsWith('.md'));
-    for (const file of specFiles) {
-      const fullPath = path.join(specsDir, file);
-      sources.push({
-        file: path.relative(cwd, fullPath).replaceAll('\\', '/'),
-        lines: fs
-          .readFileSync(fullPath, 'utf8')
-          .split('\n'),
-      });
-    }
-  }
-  // Add successor homes without dropping an explicit --specs-dir or retained
-  // legacy source. Split decisions/rules must not disappear from the read set.
-  const seen = new Set(sources.map((source) => source.file));
-  const platformRoot = path.resolve(specsDir) === path.resolve(cwd, 'docs/specs')
-    ? path.join(cwd, 'docs/platform') : null;
-  for (const full of platformRoot ? collectMarkdownFiles(platformRoot) : []) {
+  // Read set under the platform root: area specs, decision narratives and the
+  // platform foundations; retired history trees are never scanned.
+  for (const full of collectMarkdownFiles(specsDir)) {
+    const rel = `/${path.relative(specsDir, full).replaceAll('\\', '/')}`;
+    if (rel.split('/').includes('history')) continue;
+    if (!(rel.endsWith('/spec.md') || rel.includes('/decisions/') ||
+          rel === '/platform-foundations.md')) continue;
     const file = path.relative(cwd, full).replaceAll('\\', '/');
-    if (file.split('/').includes('history')) continue;
-    if (!(file.endsWith('/spec.md') || file.includes('/decisions/') ||
-          file === 'docs/platform/platform-foundations.md')) continue;
-    if (seen.has(file)) continue;
-    seen.add(file);
     sources.push({ file, lines: fs.readFileSync(full, 'utf8').split('\n') });
   }
   for (const dir of skillsDirs) {
@@ -439,7 +421,7 @@ function parseArgs(argv) {
         ? argv[backlogIdx + 1]
         : 'docs/backlog.md',
     specsDir:
-      specsIdx >= 0 ? argv[specsIdx + 1] : 'docs/specs',
+      specsIdx >= 0 ? argv[specsIdx + 1] : 'docs/platform',
     skillsDirs,
     baselinePath:
       baselineIdx >= 0

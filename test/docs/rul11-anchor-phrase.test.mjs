@@ -27,7 +27,7 @@ test('AGENTS.md (doctrine layer, loaded every turn) contains the RUL11 anchor ph
   assert.ok(hit, `AGENTS.md must contain the anchor phrase "${ANCHOR_PHRASE}" verbatim on its own line`);
 });
 
-test('docs/specs/platform-foundations.md Business Rules carries a **RUL11.** line', () => {
+test('platform-foundations Business Rules carries a **RUL11.** line', () => {
   const spec = fs.readFileSync(PLATFORM_FOUNDATIONS_SPEC, 'utf8');
   assert.match(spec, /^- \*\*RUL11.*\.\*\* /m, 'Business Rules section must have a "- **RUL11.**" line');
 });

@@ -401,7 +401,7 @@ test('dead vocabulary guard: Request-to-Run P2 retired symbols (DemandFacts, mat
   assert.deepEqual(violations, [], `P2 dead symbols detected:\n${violations.join('\n')}`);
 });
 
-test('dead vocabulary guard: Request-to-Run P5 retired symbols (FlowDefinition, CoordinationProtocol, DemandFacts, readOnlyRedirects, matchCapability, deriveForm, retired facades) do not appear in docs/specs, core, domains, AGENTS.md, or README.md', () => {
+test('dead vocabulary guard: Request-to-Run P5 retired symbols (FlowDefinition, CoordinationProtocol, DemandFacts, readOnlyRedirects, matchCapability, deriveForm, retired facades) do not appear in platform specs, core, domains, AGENTS.md, or README.md', () => {
   const p5DeadSymbols = [
     'FlowDefinition',
     'CoordinationProtocol',
@@ -415,7 +415,7 @@ test('dead vocabulary guard: Request-to-Run P5 retired symbols (FlowDefinition, 
     'fgos-capability-dispatching',
   ];
 
-  const searchDirs = ['docs/specs', 'core', 'domains'].map((d) => path.join(REPO_ROOT, d));
+  const searchDirs = ['core', 'domains'].map((d) => path.join(REPO_ROOT, d));
   const docFiles = [...searchDirs.flatMap((d) => collectFiles(d, ['.md'])), ...collectPlatformSpecs()];
   const agentsMd = path.join(REPO_ROOT, 'AGENTS.md');
   if (fs.existsSync(agentsMd)) docFiles.push(agentsMd);

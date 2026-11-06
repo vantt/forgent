@@ -73,7 +73,7 @@ The deployment configuration impacts system availability and resource allocation
 // D2/D3's exact map for the six front-segment statuses. Each case walks the
 // item through a real, legal status-fsm.mjs edge to reach `to`, so this also
 // pins that the schema task made zero changes to which edges are legal.
-// tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
+// tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): `todo -> doing`
 // is retired from status-fsm.mjs's TRANSITIONS table — nothing durably
 // writes INTO `doing` anymore (it is derived purely from the active-claim
 // overlay). There is therefore no durable `work.move` event landing on

@@ -5,7 +5,7 @@ import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 // a write whose text narrates a supersession without declaring one (STR72's
 // own root cause), and `supersedes` runs a write-time citation sweep across
 // docs/**+src/**+plugins/** (widened from the pre-existing backlog.md+
-// docs/specs/*.md-only scope) so a dangling old-id citation is surfaced,
+// platform-specs-only scope) so a dangling old-id citation is surfaced,
 // not silently lost.
 //
 // Split across the two layers the feature itself is split across

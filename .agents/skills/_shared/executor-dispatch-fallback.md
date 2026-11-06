@@ -237,8 +237,8 @@ different tier (and, optionally, a non-default provider) for one specific
 dispatch, judge it INLINE, as the session's own reasoning — never via a
 second subprocess judge call spawned just to answer this. That would be
 the exact same "soul re-deriving what a live soul already knows" waste
-`docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-
-spawn.md`'s own "Lớp còn thiếu" section already names for
+D-ADR0026 (`docs/platform/runner/decisions/h-36d872fbb0e5.md`, section
+"0026")'s own "Lớp còn thiếu" section already names for
 `judgeDiscovery`/`judgeDecompose` — spawning one here would repeat that
 mistake one layer further down the stack. The evidence to reason FROM,
 when dispatching an ad-hoc task (see the section above), is the
