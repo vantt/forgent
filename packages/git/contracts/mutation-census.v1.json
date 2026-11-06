@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "6361ab94a811f51e9fda602412736b75e20323ab8d7ad2f0c6b0ad61f5e7eaa2",
+  "payloadDigest": "3e56ba1178a97e1747faad94c471ad711be5e7fe9993f5967ab50c5563b76a5b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -656,7 +656,7 @@
     "packages/run-supervisor/rust/examples/gate_agent.rs": "fc6a2cd59318b4085145622ccf0e39afd3785ff0ecc4ef9f8c239dc536cb95bd",
     "packages/run-supervisor/rust/examples/gate_harness.rs": "7412bfe67e635bdc37b2c100b0498670209bd54faa2714830929ce346b603742",
     "packages/run-supervisor/rust/examples/internal_harness.rs": "8801bb6f1b52e89a113be1b1392b577d7db603c407e903038a4199a9fdf0e76e",
-    "packages/run-supervisor/rust/src/adopt.rs": "e8b19aba919fcea45ecb72f4103fee6b7fd1393e6f341e0a9678c482953667b9",
+    "packages/run-supervisor/rust/src/adopt.rs": "66aa8f598111b84f869257220d42e323c3e6740dfdc8a9bd208e3d2b00c4e587",
     "packages/run-supervisor/rust/src/attempt_step.rs": "26e1265bdecfc91814e86c925ba9f58fa60c7c858a17496ced1dbad65607deef",
     "packages/run-supervisor/rust/src/envelope.rs": "3b21c3a57d6a80d4d9a74cc7bd4f8b9fa0d9f291baf2477ffdd3565d6eeafe63",
     "packages/run-supervisor/rust/src/gate.rs": "7ccff8f1160b285be93cb43dcc51916c3a4bac11bb2b2155577606ab9a13a768",
@@ -667,14 +667,14 @@
     "packages/run-supervisor/rust/src/lib.rs": "0e23de96a451f96352d8395ed1a3745dd1154c9046006d0ef835fc58ae9486e9",
     "packages/run-supervisor/rust/src/publish.rs": "008072f32aa305e4f2feabe554455d9f7c680a4cd4aa912514e55ac922257a62",
     "packages/run-supervisor/rust/src/route.rs": "707891c1da2ad85f17fb1cd6a49f90e7c68b5dbce638bef95a2eb5c03ac8bdcd",
-    "packages/run-supervisor/rust/src/steps.rs": "9db0ce20ee2dec4da237317a0b251ee3f00be1aff9b4ae7014f0326124e3443e",
+    "packages/run-supervisor/rust/src/steps.rs": "ccdb9e2512008c2c71c534ca2dfe649365ff888aeb0db689602e27a7f0c573d9",
     "packages/run-supervisor/rust/src/supervise.rs": "0f0c0746f436d3b20a2f3778cc1a8bbd4190933f867380f31780cd25b7404e2c",
     "packages/run-supervisor/rust/src/supervise/terminal.rs": "72cd41f827a30cdf8c68bf0b41a6bc894f5ea07fcdc2eddc9fd0a3ec271ebd49",
     "packages/run-supervisor/rust/src/supervise/unix.rs": "d9510693da158bf18e139257b3672c6641247b76cf5ac68a9dd892792e7509ad",
     "packages/run-supervisor/rust/src/supervise/windows.rs": "6b7de2b3ee80cb63ea33e77a6837e3838eb558223f34a8b83e79c7861ab4e4a4",
-    "packages/run-supervisor/rust/src/terminal_slot.rs": "b049ad77513a954907f0a17344b738e0fa1ada82f369eb0d1b93e2dc833b69bb",
+    "packages/run-supervisor/rust/src/terminal_slot.rs": "2b22bda70b444bcd59db8ed9afeecc2e031dd5e85cb159fbdf3c50191d0a9707",
     "packages/run-supervisor/rust/tests/adopt_concurrency.rs": "c7d8287e421c1931388a0b79dad8f03c5e7dffcace9b907efbe6b0889d6d3a7e",
-    "packages/run-supervisor/rust/tests/adopt_matrix.rs": "33cddf521be090c03ec96e34a8584f091962905e22f76e060ab053d789269aed",
+    "packages/run-supervisor/rust/tests/adopt_matrix.rs": "06a11829d71e10966a7a1a9790ebbcc1b6f15471de4653befde9f615f8258464",
     "packages/run-supervisor/rust/tests/adopt_scan_perf.rs": "e7c7c69ebb474fb9e070340b9c48888c603ef93f7024545b0887130fddedd3d1",
     "packages/run-supervisor/rust/tests/envelope_digest_vectors.rs": "593eacf90542d07acb74ce2917ece2c9f82e6e63a205045aeb2a022106fee153",
     "packages/run-supervisor/rust/tests/fixtures/ignore-sigterm.sh": "5e83e7c47f0c6dd3ee7c21e7aa6c3854b39535fe7593d1becd6a89e806419d0a",
@@ -962,7 +962,7 @@
     "src/run-supervisor/cancel-registry.mjs": "c2e4eda5761ecf342e5b1916bc5e7d3995d6fd1a9e65c7070d53e5ef43c30779",
     "src/run-supervisor/client.mjs": "85ae738b9cd395977d80343a81603bd3e61133c3e9df386a1f9f36dc1a881e57",
     "src/run-supervisor/cwd-lock.mjs": "dbadfb61ec01a3d9614d734d78f24fb87ff363bcbaa13d8120e62338fe21ab36",
-    "src/run-supervisor/direct-launch.mjs": "befa7e6185b4e9c50651ec045e7f6b0abd3109d6544f594f977b1fb6ee528091",
+    "src/run-supervisor/direct-launch.mjs": "c86a8885daecee6a783aad49dccb6497a9bf9b87c0277cfb0a64f76b5c98dea3",
     "src/run-supervisor/dispatch-error.mjs": "53d164ad2b08fc1caeb3089b12ed987cfac3df6ba6c28e43ac0c844b61b75d86",
     "src/run-supervisor/gate-kill-grace.mjs": "695e4583ea46eddf636b2d825124888667b618ac6dda818c28cddae4b9f3d2ee",
     "src/run-supervisor/payload-root.mjs": "1231aa5b558578ff592c5b071ee6dc151d738227534a76fcf355d7200183eb43",
@@ -988,7 +988,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "6b35618fbb2349be178c672a52f05de765939d0eb68f1a1fa4a7535e291828f1",
-    "src/runner/dispatch/assignment-runner.mjs": "893809d0f8f319d517406918ad12b838a985030ddc477099eddddb836ffba0c0",
+    "src/runner/dispatch/assignment-runner.mjs": "cdc715407865355e15bec68577c591200fe37ca2e9209c90edddbe89e3b3d8f4",
     "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "2b2c18f391cd2521c3350c9b71007a33b732a56d09596d13768be48c759f8eb7",
@@ -1007,7 +1007,7 @@
     "src/runner/dispatch/evidence-attribution.mjs": "e286beb61bc988049d44645db9a7a0900ba2431132ce694861ac7c43390b229f",
     "src/runner/dispatch/execution-contract.mjs": "f16b8adfe36849cb6f48255a742bb6b6d4cf4973b30280961b9ba95bdb12efb6",
     "src/runner/dispatch/executor-governance.mjs": "f4d179122ee78207bd235afbedeb185a9d1e3eb747d31e659db77f5ad8f5d31f",
-    "src/runner/dispatch/herdr-round.mjs": "81320dcedd07759a2a8c8897cb8be1d545555e8940208feb528d5e842609bd9f",
+    "src/runner/dispatch/herdr-round.mjs": "d18e4e487159399718651536fed80c5a05d0bf79800aabcbebe7a199e70adf2a",
     "src/runner/dispatch/llm-accounts.mjs": "df2abb45dbdaa4cb949c04b04db1af8b3669ef45163315818fdb19d6989bcd1c",
     "src/runner/dispatch/mechanism.mjs": "8f272b51172f4b3f15418b43242d8b877ea4ed0ac974890bd7fd991ca3d87afe",
     "src/runner/dispatch/operation-prompt-templates.mjs": "45b0a234f2d0917e3555ee4bc913eee10522e1c7aa21f02f8473bae63383256a",
@@ -1126,7 +1126,7 @@
     "src/setup/mailbox-sync-timer.mjs": "6628ebdd706138f32b9733bba2880b075c9d5c701695b85bf55347e47d3756ef",
     "src/setup/model-pool-checks.mjs": "a770f17808c6a02cd2d5e50e145711635587f78eddf0639eb5525a7d442a9246",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
-    "src/setup/registrations.mjs": "da2787370155dab74532ac125d9d811a90c60a3ff7ae1742d10db13be0622b23",
+    "src/setup/registrations.mjs": "d6fe2b608a365b7056a5b70cd29930f7aab4e862f48a941145372363ae107b2e",
     "src/setup/run-supervisor-checks.mjs": "8e8a3ab775342280d0fbae74652d769222d783db60c691d05c231b7e35bb6c16",
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
     "src/setup/seat-binding-checks.mjs": "1620c36971e9f1ba1e113715b334b1b3b326dd62bfd2d557656fade19aa73691",
@@ -2860,8 +2860,8 @@
     },
     {
       "path": "packages/run-supervisor/rust/src/steps.rs",
-      "line": 184,
-      "spawn": "Command::new <- packages/run-supervisor/rust/src/steps.rs:304",
+      "line": 192,
+      "spawn": "Command::new <- packages/run-supervisor/rust/src/steps.rs:312",
       "binary": "(parsed configuration (step[\"hostBin\"] .as_str() .ok_or_else(|| fail(\"step has no h))",
       "class": "configured-binary"
     },
@@ -2895,14 +2895,14 @@
     },
     {
       "path": "packages/run-supervisor/rust/src/terminal_slot.rs",
-      "line": 65,
+      "line": 66,
       "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:393",
       "binary": "(env *)",
       "class": "configured-binary"
     },
     {
       "path": "packages/run-supervisor/rust/tests/adopt_matrix.rs",
-      "line": 434,
+      "line": 429,
       "spawn": "Command::new",
       "binary": "? internal_harness()",
       "class": "rust-test"
@@ -3317,15 +3317,15 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1948,
-      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:387",
+      "line": 1970,
+      "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:389",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 2053,
-      "spawn": "startSupervisor -> src/run-supervisor/direct-launch.mjs:292",
+      "line": 2076,
+      "spawn": "startSupervisor -> src/run-supervisor/direct-launch.mjs:295",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -3504,42 +3504,42 @@
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4479,
+      "line": 4507,
       "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1531",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4526,
+      "line": 4554,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:834",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4567,
+      "line": 4595,
       "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:1531",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4574,
+      "line": 4602,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 4999,
+      "line": 5027,
       "spawn": "probeIdentity -> src/util/session-identity.mjs:56",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 5069,
+      "line": 5097,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:142",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

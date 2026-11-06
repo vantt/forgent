@@ -413,15 +413,8 @@ fn adopt_a_best_effort_attempt_with_a_live_agent_outside_its_domain_ends_the_age
     assert_eq!(a.runs_of("settle-attempt"), 1);
 }
 
-/// A controller that opened a pane for its attempt and died before it wrote the envelope leaves the pane
-/// with nobody who knows its key: the attempt-intent names no slot, so the envelope adopt publishes has
-/// none and no step ever decides what becomes of the pane. The intent states the slot the controller
-/// allocated (the key is the attempt id), and adopt hands it to the existing `release-slot` step.
-#[test]
-fn adopt_an_intent_whose_controller_opened_a_pane_decides_what_becomes_of_that_pane() {
-    let herdr = FakeHerdr::new("adopt-intent-pane");
-    let a = not_started("matrix-intent-pane", &STEPS);
-    herdr.allocate(&a.attempt_id);
+/// The intent of a terminal attempt whose controller died after it named the pane it was about to allocate.
+fn intent_names_its_pane(a: &support::adopt_fixture::Fixture) {
     let mut intent = a.json("attempt-intent.json").unwrap();
     intent["mode"] = json!("terminal");
     intent["terminal"] = json!({
@@ -429,8 +422,10 @@ fn adopt_an_intent_whose_controller_opened_a_pane_decides_what_becomes_of_that_p
         "endpointEnv": {"FGOS_HERDR_BIN": FakeHerdr::bin()},
     });
     fs::write(a.path("attempt-intent.json"), intent.to_string()).unwrap();
+}
 
-    // The adopter is in reach of the same herdr the controller used.
+/// `fgos internal adopt` of one directory, in reach of the herdr the controller used; its one line.
+fn adopt_in_reach_of(herdr: &FakeHerdr, a: &support::adopt_fixture::Fixture) -> serde_json::Value {
     let out = Command::new(internal_harness())
         .args(["internal", "adopt", "--protocol", "1", "--run-dir"])
         .arg(&a.dir)
@@ -441,7 +436,21 @@ fn adopt_an_intent_whose_controller_opened_a_pane_decides_what_becomes_of_that_p
         .stderr(Stdio::inherit())
         .output()
         .unwrap();
-    let line: serde_json::Value = serde_json::from_slice(&out.stdout).expect("one adopt line");
+    serde_json::from_slice(&out.stdout).expect("one adopt line")
+}
+
+/// A controller that opened a pane for its attempt and died before it wrote the envelope leaves the pane
+/// with nobody who knows its key: the attempt-intent names no slot, so the envelope adopt publishes has
+/// none and no step ever decides what becomes of the pane. The intent states the slot the controller
+/// allocated (the key is the attempt id), and adopt hands it to the existing `release-slot` step.
+#[test]
+fn adopt_an_intent_whose_controller_opened_a_pane_decides_what_becomes_of_that_pane() {
+    let herdr = FakeHerdr::new("adopt-intent-pane");
+    let a = not_started("matrix-intent-pane", &STEPS);
+    herdr.allocate(&a.attempt_id);
+    intent_names_its_pane(&a);
+
+    let line = adopt_in_reach_of(&herdr, &a);
     assert_eq!(line["state"], "adopted", "{line}");
     assert_eq!(line["outcome"], "abandoned-not-started");
 
@@ -450,4 +459,22 @@ fn adopt_an_intent_whose_controller_opened_a_pane_decides_what_becomes_of_that_p
         "adopt closed the attempt and never decided what becomes of its pane (calls: {:?})",
         herdr.calls_starting("pane")
     );
+}
+
+/// A controller can die after it named the pane and before terminal-control recorded it. No incarnation
+/// knows the key, so no pane was ever allocated for it: the attempt closes with nothing to release,
+/// instead of asking terminal-control about that key forever.
+#[test]
+fn adopt_an_intent_whose_pane_was_never_allocated_closes_with_nothing_to_release() {
+    let herdr = FakeHerdr::new("adopt-intent-no-pane");
+    let a = not_started("matrix-intent-no-pane", &STEPS);
+    intent_names_its_pane(&a);
+
+    let line = adopt_in_reach_of(&herdr, &a);
+    assert_eq!(line["state"], "adopted", "{line}");
+    let receipt = a
+        .json("steps/release-slot.json")
+        .expect("release-slot receipt");
+    assert_eq!(receipt["detail"]["noRecord"], true, "{receipt}");
+    assert!(herdr.calls_starting("pane close").is_empty());
 }

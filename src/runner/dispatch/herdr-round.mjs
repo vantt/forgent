@@ -329,6 +329,7 @@ function seedAttemptTrust({ trustStore, round, runDir, cwd, repoRoot, fullEnv, w
  * failure leave nothing behind but the pane's key: the stale-result check, the brief, the confinement
  * homes, the pane, the trust entry.
  *
+ * `beforeAllocate({slot, endpointEnv})`, when given, is called right before the pane is allocated.
  * Returns what the envelope names (`briefPath`, `outboxDir`, `slot`), the herdr endpoint the supervisor
  * is started with, and `abandon()`: what a controller that fails before the handover calls to give the
  * pane back and take the credential and the trust entry out again. After the handover none of it is the
@@ -339,6 +340,7 @@ export async function prepareTerminalAttempt(ctx) {
     attemptId, runDir: rawRunDir, cwd, repoRoot, prompt, workId, tier, model, runId,
     herdrBin, fullEnv, confinement, permissionMode, agentKind, delivery = 'inline',
     trustStore, trustAccountSource, attemptEnv, dispatchBatchKey, dispatchBatchSize, anchorPaneId, terminalConfig, workLabel,
+    beforeAllocate,
   } = ctx;
   const roundNumber = 1;
   const runDir = path.resolve(rawRunDir);
@@ -393,6 +395,11 @@ export async function prepareTerminalAttempt(ctx) {
 
   const projectRoot = repoRoot ?? cwd;
   const groupKey = portKey(dispatchBatchKey ?? runId ?? workId ?? key);
+  // The herdr endpoint the pane lives behind: the session this round lives in.
+  const endpointEnv = {
+    ...(herdrBin ? { FGOS_HERDR_BIN: herdrBin } : {}),
+    ...Object.fromEntries(Object.entries(sessionEnv ?? {}).filter(([name, value]) => name.startsWith('HERDR_') && typeof value === 'string')),
+  };
   // Built inside the try below: the private home exists from here on, and a terminal config that cannot
   // build a control must give it back like every other failure of this function.
   let tc;
@@ -415,6 +422,9 @@ export async function prepareTerminalAttempt(ctx) {
     if (anchorPaneId) {
       try { tc.attach({ key: portKey(`anchor-${groupKey}`), pane: anchorPaneId, groupKey, display }); } catch { /* no anchor */ }
     }
+    // The caller records the pane's key and endpoint before the pane exists, so a controller killed from
+    // here on leaves a record that names the pane to give back.
+    beforeAllocate?.({ slot: { key, groupKey }, endpointEnv });
     let slot;
     try {
       // The batch size, when the caller knows it, lets the placement policy plan equal panes.
@@ -454,11 +464,8 @@ export async function prepareTerminalAttempt(ctx) {
     slot: { key, groupKey },
     paneId: round.paneId,
     workerHomePath,
-    // The herdr endpoint the supervisor reaches the pane through: the session this round lives in.
-    endpointEnv: {
-      ...(herdrBin ? { FGOS_HERDR_BIN: herdrBin } : {}),
-      ...Object.fromEntries(Object.entries(sessionEnv ?? {}).filter(([name, value]) => name.startsWith('HERDR_') && typeof value === 'string')),
-    },
+    // The herdr endpoint the supervisor reaches the pane through.
+    endpointEnv,
     tc,
     display,
     abandon,

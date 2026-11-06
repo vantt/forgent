@@ -13,13 +13,14 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use fgos_terminal_control::core::{Core, CoreConfig};
 use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
+use fgos_terminal_control::driver::TerminalDriver;
 use fgos_terminal_control::policy::{policy_by_name, PlacementPolicy};
 use fgos_terminal_control::port::{Disposition, ReleaseOutcome};
 use fgos_terminal_control::route::{
     DEFAULT_ALLOCATION_GRACE_MS, DEFAULT_LAUNCH_IDENTIFY_TIMEOUT_MS, DEFAULT_LIMITS,
     DEFAULT_SHELL_READY_TIMEOUT_MS,
 };
-use fgos_terminal_control::store::default_state_root;
+use fgos_terminal_control::store::{default_state_root, incarnation_ids, Store};
 use serde_json::Value;
 
 /// How long a pane kept for a person stays before terminal-control's reconcile may close it, when the
@@ -81,6 +82,16 @@ impl Backend {
 
     pub fn core(&self) -> Core<'_> {
         Core::new(&self.driver, self.policy.as_ref(), self.config.clone())
+    }
+
+    /// Whether the store of any server incarnation, current or earlier, holds an allocation record for
+    /// `key`. A record that cannot be read counts as one: only a proven absence says no pane was allocated.
+    fn ever_recorded(&self, key: &str) -> bool {
+        let (root, driver) = (&self.config.state_root, self.driver.name());
+        incarnation_ids(root, driver).iter().any(|id| {
+            Store::existing(root, driver, id)
+                .is_some_and(|store| !matches!(store.read_record(key), Ok(None)))
+        })
     }
 }
 
@@ -146,6 +157,8 @@ pub enum ReleaseFailure {
     Retry(String),
     /// This machine cannot release the slot at all.
     Unsupported(String),
+    /// No server incarnation ever recorded a slot under this key: no pane was allocated for it.
+    NoRecord(String),
 }
 
 /// `release(key, disposition)`; `Ok` carries the detail the step receipt records.
@@ -165,6 +178,9 @@ pub fn release(
     match backend.core().release(key, disposition, until) {
         Ok(ReleaseOutcome::Released { disposition }) => {
             Ok(serde_json::json!({"disposition": disposition, "key": key}))
+        }
+        Ok(ReleaseOutcome::KeptUnknown { reason }) if !backend.ever_recorded(key) => {
+            Err(ReleaseFailure::NoRecord(reason))
         }
         Ok(ReleaseOutcome::KeptUnknown { reason }) => Err(ReleaseFailure::Retry(reason)),
         Err(Refusal::Unknown { reason }) => Err(ReleaseFailure::Retry(reason)),

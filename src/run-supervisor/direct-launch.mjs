@@ -170,8 +170,10 @@ function attemptSteps({ runDir, host, stepEnv, extraSteps = [] }) {
  * Publish `attempt-intent.json` (contract attempt-intent.v1.json) right after the attempt lock is taken:
  * what the adopt door needs to close this attempt if the controller dies before it writes the envelope.
  * Written under the lock and replaced atomically; a resumed attempt with no envelope gets its new launch's intent.
+ * A terminal attempt publishes it again with `pane` (`{slot: {key, groupKey}, endpointEnv}`) right before its
+ * pane is allocated, so adopt can release that pane by its key.
  */
-export function writeAttemptIntent({ runDir, attemptId, unitRunId, terminal, cwd, host, stepEnv }) {
+export function writeAttemptIntent({ runDir, attemptId, unitRunId, terminal, cwd, host, stepEnv, pane = null }) {
   const paths = attemptPaths(runDir, attemptId);
   publishMutableProjection(path.join(paths.runDir, 'attempt-intent.json'), {
     v: 1,
@@ -183,6 +185,7 @@ export function writeAttemptIntent({ runDir, attemptId, unitRunId, terminal, cwd
     launch: { capture: { stdout: paths.stdout, stderr: paths.stderr }, outboxDir: paths.outboxDir },
     steps: attemptSteps({ runDir: paths.runDir, host, stepEnv, extraSteps: terminal ? ['cleanup-trust'] : [] }),
     sideFile: paths.sideFile,
+    ...(terminal && pane ? { terminal: { slot: pane.slot, endpointEnv: pane.endpointEnv } } : {}),
   });
 }
 

@@ -10,7 +10,8 @@
 //! An attempt whose controller took the lock and died before it wrote the
 //! envelope has `attempt-intent.json` instead: adopt publishes the envelope
 //! from it (`origin: "adopt-not-started"`) and goes on as for any attempt that
-//! was never bound.
+//! was never bound. When the intent names the pane the controller was about to
+//! allocate, that envelope carries its slot and the `release-slot` step.
 
 use std::io::{BufRead, Write};
 use std::path::{Path, PathBuf};
@@ -400,8 +401,36 @@ fn read_intent(dir: &Path) -> Option<Value> {
     (intent["v"] == 1
         && names_this_dir
         && strings.iter().all(|v| v.is_string())
-        && step_host(&intent).is_some())
+        && step_host(&intent).is_some()
+        && pane_is_this_attempts(&intent))
     .then_some(intent)
+}
+
+/// A pane the intent names is addressed by the attempt id alone (the controller refuses any other key),
+/// so a key that is not this attempt's names a pane adopt must never release.
+fn pane_is_this_attempts(intent: &Value) -> bool {
+    let Some(terminal) = intent.get("terminal") else {
+        return true;
+    };
+    intent["mode"] == "terminal"
+        && terminal["slot"]["key"] == intent["attemptId"]
+        && terminal["slot"]["groupKey"].is_string()
+        && terminal["endpointEnv"].as_object().is_some_and(|env| {
+            env.iter().all(|(name, value)| {
+                (name.starts_with("FGOS_HERDR_") || name.starts_with("HERDR_")) && value.is_string()
+            })
+        })
+}
+
+/// The herdr endpoint of the intent's pane, recorded where the supervisor would have recorded it, so the
+/// `release-slot` step reaches that pane from the adopter's environment too.
+fn record_intent_endpoint(dir: &Path, env: &Value) -> Result<(), String> {
+    let var = |name: &str| env[name].as_str().filter(|v| !v.is_empty());
+    let body = json!({"v": 1, "bin": var("FGOS_HERDR_BIN"), "session": var("HERDR_SESSION"), "socket": var("HERDR_SOCKET_PATH")});
+    let bytes = serde_json::to_vec(&body).map_err(|e| e.to_string())?;
+    publish_once(dir, crate::terminal_slot::ENDPOINT_FILE, &bytes)
+        .map(|_| ())
+        .map_err(|e| format!("terminal endpoint not recorded: {e}"))
 }
 
 /// The host binary and payload root of the first process step of an intent.
@@ -415,11 +444,17 @@ fn step_host(intent: &Value) -> Option<(&str, &str)> {
 
 /// Under the lock: the envelope of an attempt that has an intent and no envelope, and the note that says
 /// why it was never started. No launch, no containment and no deadlines: nothing ever runs from it but the
-/// steps, always as `direct` (there is no pane to address).
+/// steps, always as `direct` (no agent runs in a pane). A pane the intent names gets the slot and the
+/// `release-slot` step, so the pane the controller may have opened is released by its key.
 fn publish_not_started_envelope(dir: &Path) -> Result<(), String> {
     let intent = read_intent(dir).ok_or("attempt-intent.json is missing or invalid")?;
     let (host, payload) = step_host(&intent).ok_or("attempt-intent.json names no step")?;
     let attempt_id = intent["attemptId"].as_str().unwrap_or_default();
+    let mut steps = intent["steps"].clone();
+    if let (Some(terminal), Some(items)) = (intent.get("terminal"), steps.as_array_mut()) {
+        record_intent_endpoint(dir, &terminal["endpointEnv"])?;
+        items.push(json!({"stepId": "release-slot", "builtin": true, "disposition": {"onSuccess": "close", "onFailure": "retain"}}));
+    }
     let mut envelope = json!({
         "v": 3,
         "origin": "adopt-not-started",
@@ -439,9 +474,12 @@ fn publish_not_started_envelope(dir: &Path) -> Result<(), String> {
             "outboxDir": intent["launch"]["outboxDir"],
             "capture": intent["launch"]["capture"],
         },
-        "steps": intent["steps"],
+        "steps": steps,
         "sideFile": intent["sideFile"],
     });
+    if let Some(slot) = intent.get("terminal").map(|terminal| &terminal["slot"]) {
+        envelope["slot"] = slot.clone();
+    }
     let digest =
         envelope::digest(&envelope).map_err(|e| format!("intent has no canonical form: {e:?}"))?;
     envelope["digest"] = Value::String(digest);

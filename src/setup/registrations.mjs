@@ -83,7 +83,7 @@ import {
   credentialScanRoots,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
+import { readOwnershipMarker, readAttemptOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { MODEL_POLICY_TIERS, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
@@ -4310,6 +4310,31 @@ const HELD_HOME_RECOVERY = 'It may hold the only valid login of the account its 
   + 'copy the home\'s login files (auth.json, or agent.db with any agent.db-wal and agent.db-journal) over that store only if their login expires later, then delete the home. '
   + 'Deleting the home without copying drops the login it holds.';
 
+const UNFINALIZED_HOME_RECOVERY = 'It may hold the only valid login of the account its attempt leased. Recover by hand: '
+  + 'protected/confinement-finalization/<launch>.json of that run directory, if it is still there, names on the resource whose pathRef is this home the account store (credentialWriteBack.home); '
+  + 'copy the home\'s login files over that store only if their login expires later, then delete the home.';
+
+// Attempt homes (version 2 marker) whose run directory has neither an envelope nor an attempt intent: the
+// finalize-home step runs only from one of the two, so nothing will ever stage such a home's login or remove it.
+function unfinalizableAttemptHomes(tempRoot) {
+  const found = [];
+  let dispatches = [];
+  try { dispatches = fs.readdirSync(tempRoot, { withFileTypes: true }); } catch { return found; }
+  for (const entry of dispatches) {
+    if (!entry.isDirectory()) continue;
+    const dispatchDir = path.join(tempRoot, entry.name);
+    let subs = [];
+    try { subs = fs.readdirSync(dispatchDir, { withFileTypes: true }).filter((sub) => sub.isDirectory()); } catch { continue; }
+    for (const dir of [dispatchDir, ...subs.map((sub) => path.join(dispatchDir, sub.name))]) {
+      const marker = readAttemptOwnershipMarker(dir);
+      if (typeof marker?.runDir !== 'string' || typeof marker.attemptId !== 'string') continue;
+      if (['envelope.json', 'attempt-intent.json'].some((name) => fs.existsSync(path.join(marker.runDir, name)))) continue;
+      found.push({ dir, attemptId: marker.attemptId, runDir: marker.runDir });
+    }
+  }
+  return found;
+}
+
 export function checkCredentialCopiesRetained({
   runtimeDir = defaultProviderCapacityRuntimeDir(),
   roots = credentialScanRoots(),
@@ -4329,13 +4354,15 @@ export function checkCredentialCopiesRetained({
   // a home twice; it is counted once.
   const retried = new Set(retriedRoots.map(canonicalRoot));
   const seenHomes = new Set();
+  const firstSight = (home) => { const dir = path.join(canonicalRoot(path.dirname(home.dir)), path.basename(home.dir)); if (seenHomes.has(dir)) return false; seenHomes.add(dir); return true; };
   const homes = roots.flatMap((root) => listKeptCredentialHomes(root).map((home) => ({ ...home, held: home.held || !retried.has(canonicalRoot(root)) })))
-    .filter((home) => { const dir = path.join(canonicalRoot(path.dirname(home.dir)), path.basename(home.dir)); if (seenHomes.has(dir)) return false; seenHomes.add(dir); return true; })
+    .filter(firstSight)
     .map((home) => ({ ...home, ageMs: home.since ? now - Date.parse(home.since) : 0 }));
   const held = homes.filter((home) => home.held);
   const retrying = homes.filter((home) => !home.held);
+  const unfinalized = roots.flatMap(unfinalizableAttemptHomes).filter(firstSight);
   const overLimit = inspectPendingCopiesOverLimit({ runtimeDir, inventory });
-  if (copies.length === 0 && homes.length === 0 && overLimit.length === 0) {
+  if (copies.length === 0 && homes.length === 0 && unfinalized.length === 0 && overLimit.length === 0) {
     return { passed: true, message: 'no login copy is being retained past its dispatch' };
   }
   // Each of these may hold the only valid refresh token, so none is ever deleted for its age. A held home is
@@ -4367,9 +4394,10 @@ export function checkCredentialCopiesRetained({
       ? 'Its host record names where its login goes: "fgos doctor --fix", or the next attempt that ends under the same root, stages the login beside the account store and removes the home once that works.'
       : HELD_HOME_RECOVERY}`),
     ...(retrying.length > 0 ? [`${retrying.length} private home(s) kept after a staging failure, retried by the finalize-home step of their attempt, oldest ${formatAge(Math.max(...retrying.map((home) => home.ageMs)))}`] : []),
+    ...unfinalized.map((home) => `private home of attempt ${home.attemptId} at ${home.dir}: its run directory ${home.runDir} has neither envelope.json nor attempt-intent.json, so no step will ever finalize it. ${UNFINALIZED_HOME_RECOVERY}`),
   ];
   const text = problems.join('; ');
-  return held.length > 0 || stranded.length > 0 || overLimit.some((a) => a.stranded) || unjudgedCopies ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
+  return held.length > 0 || unfinalized.length > 0 || stranded.length > 0 || overLimit.some((a) => a.stranded) || unjudgedCopies ? { passed: false, message: text } : { passed: true, message: `warning: ${text}` };
 }
 
 function strandedByStore(copies, what) {

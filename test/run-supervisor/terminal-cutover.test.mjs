@@ -221,4 +221,6 @@ FAKE_HERDR_DIR=${project.herdrDir} exec ${FAKE_HERDR} "$@"
     });
   assert.deepEqual(homesOfThisProject, [], 'the refused launch left its private home behind');
   assert.equal(project.callsStarting('pane run').length, 0, 'no pane was started');
+  // The intent stays for the adopt door, but a pane given back (here: never opened) is not left for it to wait on.
+  assert.equal(readJson(path.join(project.attemptDir(), 'attempt-intent.json')).terminal, undefined, 'the intent still names the pane');
 });

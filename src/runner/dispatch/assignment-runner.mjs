@@ -107,7 +107,8 @@ import { resolveLock } from '../../holder-lock/index.mjs';
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, PANE_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
 import { resolveHerdrBin, workLabelOf } from './terminal-slot.mjs';
 import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
-import { prepareConfinementForLaunch } from './confinement/authority.mjs';
+import { finalizeAttemptHome, prepareConfinementForLaunch } from './confinement/authority.mjs';
+import { CREDENTIAL_HOME_KEPT } from './confinement/cleanup.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import { resolvePosture } from './confinement/policies.mjs';
 import { sha256FileSync } from '../../native/proof-helpers.mjs';
@@ -1024,6 +1025,20 @@ function unfrozenCopy(result) {
   return Object.create(Object.getPrototypeOf(result), descriptors);
 }
 
+/**
+ * Give back the private homes of an attempt that never reached its supervisor, through the door the
+ * finalize-home step uses (a renewed login is staged first). False when a home stays for a retry (its login is
+ * not staged yet) or cannot be judged: the intent then stays, so the adopt door's finalize-home step retries it.
+ */
+function giveBackAttemptHome(runDir, attemptId) {
+  try {
+    return finalizeAttemptHome({ runDir: path.resolve(runDir), attemptId }).state !== CREDENTIAL_HOME_KEPT;
+  } catch (err) {
+    process.stderr.write(`fgos: private home of attempt ${attemptId} not given back (${err.message})\n`);
+    return false;
+  }
+}
+
 export async function executeAssignment(assignment, opts = {}) {
   refuseWorkItemInput(opts, 'executeAssignment()');
   validateAssignmentLegality(assignment, opts);
@@ -1322,6 +1337,22 @@ export async function executeAssignment(assignment, opts = {}) {
   const attemptHost = resumedOver ? null : resolveAttemptHost();
   const attemptStepEnv = attemptStepEnvOf();
   let intentWritten = false;
+  let intentNamesPane = false;
+  // Only ever under the attempt lock; a terminal attempt publishes it again with its pane before allocating it.
+  const publishIntent = (pane = null) => {
+    writeAttemptIntent({
+      runDir: path.resolve(runDir),
+      attemptId: launchCommandId,
+      unitRunId: unitRunIdOf,
+      terminal: terminalMode,
+      cwd,
+      host: attemptHost,
+      stepEnv: attemptStepEnv,
+      pane,
+    });
+    intentWritten = true;
+    intentNamesPane = pane !== null;
+  };
 
   try {
     // The attempt lock comes right after admission, before the first await: every moment from here an attempt
@@ -1337,16 +1368,7 @@ export async function executeAssignment(assignment, opts = {}) {
         mutating: effectiveMutation === 'mutating',
         custody: opts.custody,
       });
-      writeAttemptIntent({
-        runDir: path.resolve(runDir),
-        attemptId: launchCommandId,
-        unitRunId: unitRunIdOf,
-        terminal: terminalMode,
-        cwd,
-        host: attemptHost,
-        stepEnv: attemptStepEnv,
-      });
-      intentWritten = true;
+      publishIntent();
     }
 
     // M6: normalized ('openai' ≡ 'openai-codex') so leases, quarantine, and
@@ -1974,6 +1996,7 @@ export async function executeAssignment(assignment, opts = {}) {
         anchorPaneId: process.env.FGOS_HERDR_ANCHOR_PANE?.trim() || undefined,
         terminalConfig: opts.terminalConfig,
         workLabel: workLabelOf(effectiveAssignment),
+        beforeAllocate: intentWritten ? publishIntent : undefined,
         // The persisted contract does not name the role; the brief a pane worker reads has to
         // (an assessment role must be told its claim needs assessment.verdict).
         effectiveContract: { ...effectiveContract, assignment: { role: effectiveAssignment.role, posture: effectiveAssignment.posture, operation: effectiveAssignment.operation } },
@@ -2118,18 +2141,30 @@ export async function executeAssignment(assignment, opts = {}) {
     handedOffResult = unfrozenCopy(settledResult);
     return handedOffResult;
   } finally {
+    // One order rule: what the launch made before the handover (the pane, the private home) is given back here,
+    // still under the attempt lock, and only then may the intent go; a controller killed in between leaves the
+    // intent, and the adopt door closes the attempt from it.
+    let homeGivenBack = true;
+    if (!attemptHandedOver) {
+      if (terminalPrep) await terminalPrep.abandon();
+      if (attemptLocks) homeGivenBack = giveBackAttemptHome(runDir, launchCommandId);
+    }
     // A supervised attempt that never produced its result is still the supervisor's (and, after it,
     // the adopt door's): its run control token stays, the settle step uses it.
     if (attemptLocks) {
       try {
+        // The pane was given back above (or never opened): an intent that still named it would have adopt wait
+        // for a slot terminal-control may never have recorded.
+        if (intentNamesPane && !attemptHandedOver) {
+          try { publishIntent(); } catch (err) { process.stderr.write(`fgos: attempt intent not replaced (${err.message})\n`); }
+        }
         // A run that settled without ever writing an envelope (refused, or already answered) has nothing for
-        // the adopt door to close.
-        if (intentWritten && !fs.existsSync(path.join(runDir, 'envelope.json')) && readSettledResult(runDir, runId)) removeAttemptIntent(path.resolve(runDir));
+        // the adopt door to close, unless a private home of it is still kept.
+        if (homeGivenBack && intentWritten && !fs.existsSync(path.join(runDir, 'envelope.json')) && readSettledResult(runDir, runId)) removeAttemptIntent(path.resolve(runDir));
         if (!opts.custody && attemptSettled) recordCustodyHandoff(attemptLocks.cwdLease, handedOffResult);
         if (handedOffResult) Object.freeze(handedOffResult);
       } finally { attemptLocks.release(); }
     }
-    if (terminalPrep && !attemptHandedOver) await terminalPrep.abandon();
     // Before the run control was taken the run was refused, settled or judged by the adopt door in the
     // lines above, which gave back what they took.
     if (controlToken !== null) {

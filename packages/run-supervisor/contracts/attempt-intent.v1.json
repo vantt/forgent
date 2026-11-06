@@ -6,13 +6,14 @@
     "attemptId": "string, the id the envelope of this launch would carry",
     "unitRunId": "string",
     "runDir": "absolute path of the attempt directory; adopt accepts the intent only when it names the directory it was found in",
-    "mode": { "enum": ["direct", "terminal"], "meaning": "what the controller would have launched. The adopt-written envelope is always direct: a not-started attempt has no pane to address" },
+    "mode": { "enum": ["direct", "terminal"], "meaning": "what the controller would have launched. The adopt-written envelope is always direct: no agent of a not-started attempt runs in a pane" },
     "cwd": "absolute working directory of the agent",
     "launch": {
       "capture": { "stdout": "absolute path", "stderr": "absolute path" },
       "outboxDir": "absolute path"
     },
-    "steps": "array of process step items exactly as envelope.v3.json `steps.item` (settle-attempt, finalize-home, and cleanup-trust for a terminal attempt); never the release-slot builtin, because no pane is recorded yet. Built by the same function that builds the envelope's steps. The first one names hostBin and payloadRoot, which become the envelope's",
+    "steps": "array of process step items exactly as envelope.v3.json `steps.item` (settle-attempt, finalize-home, and cleanup-trust for a terminal attempt); never the release-slot builtin: adopt adds it when the intent has `terminal`. Built by the same function that builds the envelope's steps. The first one names hostBin and payloadRoot, which become the envelope's",
+    "terminal": "object {slot: {key, groupKey}, endpointEnv}, optional; only with mode terminal. The controller replaces the intent with this field right before it allocates the attempt's pane, so a controller killed from then on leaves the pane's key. slot.key equals attemptId (an intent whose key differs is invalid); endpointEnv holds only FGOS_HERDR_* and HERDR_* string values (the herdr endpoint, no secrets). Adopt copies slot into the envelope it publishes, appends the release-slot builtin to its steps and records the endpoint as terminal-endpoint.json, so the pane is released by its key",
     "sideFile": "absolute path of the side file the envelope would name (it does not exist for a not-started attempt)"
   },
   "invariants": [

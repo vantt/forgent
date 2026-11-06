@@ -133,7 +133,15 @@ fn release_slot(envelope: &Value, run_dir: &Path) -> Result<Option<Value>, StepF
         retain_window(envelope),
     ) {
         Ok(detail) => Ok(Some(detail)),
-        Err(ReleaseFailure::Retry(reason)) => Err(StepFailure::Retry(reason)),
+        // An attempt closed before it started may have died before its pane was allocated: with no
+        // record of the key there is nothing to release. A started attempt always had its slot recorded,
+        // so a missing record there stays a question for the next adopt.
+        Err(ReleaseFailure::NoRecord(_)) if envelope["origin"] == "adopt-not-started" => {
+            Ok(Some(serde_json::json!({"key": key, "noRecord": true})))
+        }
+        Err(ReleaseFailure::Retry(reason) | ReleaseFailure::NoRecord(reason)) => {
+            Err(StepFailure::Retry(reason))
+        }
         Err(ReleaseFailure::Unsupported(reason)) => Err(StepFailure::Failed(format!(
             "terminal-mode-unsupported: {reason}"
         ))),

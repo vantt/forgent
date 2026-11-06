@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { checkCredentialCopiesRetained, fixCredentialCopiesRetained, checkConfinementOrphanedResourcesReaped, DOCTOR_CHECKS } from '../../src/setup/registrations.mjs';
-import { writeOwnershipMarker, writeAttemptHomeRecord, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { writeOwnershipMarker, writeOwnershipMarkerV2, writeAttemptHomeRecord, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { writeRawGlobalConfig, writeAccountsFile } from '../helpers/config-fixture.mjs';
 import { rewriteOwnershipMarker } from '../helpers/ownership-marker.mjs';
 
@@ -643,3 +643,22 @@ test('a registry root that is a symlink to the retried root is the same root: it
   } finally { w.cleanup(); }
 });
 
+
+test('an attempt home whose run has neither an envelope nor an intent fails naming the attempt, and one whose run still has its intent is not counted', () => {
+  const w = workspace();
+  try {
+    const runDir = path.join(w.tmp, 'runs', '01');
+    fs.mkdirSync(runDir, { recursive: true });
+    const home = path.join(w.tempRoot, 'disp_orphan', 'home');
+    fs.mkdirSync(home, { recursive: true });
+    writeOwnershipMarkerV2(home, { attemptId: 'att-orphan', runDir, dispatchId: 'disp_orphan' });
+
+    fs.writeFileSync(path.join(runDir, 'attempt-intent.json'), '{}');
+    assert.equal(run(w).passed, true, 'the adopt door finalizes a home whose run still has its intent');
+
+    fs.rmSync(path.join(runDir, 'attempt-intent.json'));
+    const result = run(w);
+    assert.equal(result.passed, false);
+    assert.match(result.message, /private home of attempt att-orphan at .*disp_orphan.*neither envelope\.json nor attempt-intent\.json/);
+  } finally { w.cleanup(); }
+});
