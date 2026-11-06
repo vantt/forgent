@@ -4,11 +4,12 @@
 mod common;
 
 use std::fs;
+use std::path::PathBuf;
 
 use common::{cases, files, refs};
 use fgos_config::detect::Detectors;
 use fgos_config::schema::Schemas;
-use fgos_config::snapshot::{snapshot, AccountsState, Context, SnapshotError};
+use fgos_config::snapshot::{snapshot, AccountsState, Context, Snapshot, SnapshotError};
 use fgos_config::standard::Standard;
 use fgos_yaml_doc::path::{format_path, parse_path};
 use fgos_yaml_doc::{Segment, Value as Doc};
@@ -188,12 +189,9 @@ fn a_comment_only_edit_changes_the_revision_and_not_the_value() {
     let _ = fs::remove_dir_all(&dir);
 }
 
-/// A capability confinement is one decision, so a higher layer replaces the standard's whole entry.
-/// A project that sets `mode: unconfined` must not inherit the standard's `policy`, which the
-/// runner refuses for an unconfined mode. The fixture cases use their own schemas, so only the
-/// bundled schema can show that this entry carries the replace rule.
-#[test]
-fn an_unconfined_capability_does_not_inherit_the_standard_policy() {
+/// The bundled schema and standard, which alone carry the real confinement entries, read with the
+/// given files laid out under a scratch directory.
+fn bundled_snapshot(name: &str, files: Value) -> (Result<Snapshot, SnapshotError>, PathBuf) {
     let (schemas, digest) = Schemas::bundled().unwrap();
     let standard = Standard::bundled(&schemas).unwrap();
     let ctx = Context {
@@ -202,56 +200,60 @@ fn an_unconfined_capability_does_not_inherit_the_standard_policy() {
         digest: &digest,
         detectors: &Fixed(json!({})),
     };
-    let path = "runner.capabilities.advise.confinement";
-    assert!(at(standard.value(), &format!("{path}.policy")).is_some());
-    let dir = common::temp("snap", "confinement-replace");
-    let req = common::lay_out(
-        &dir,
-        &json!({"files": {"project/.fgos/config.yaml": [
+    let dir = common::temp("snap", name);
+    let req = common::lay_out(&dir, &json!({ "files": files }));
+    (snapshot(&ctx, &req), dir)
+}
+
+const ADVISE: &str = "runner.capabilities.advise.confinement";
+
+fn standard_policy() -> Value {
+    let (schemas, _) = Schemas::bundled().unwrap();
+    let standard = Standard::bundled(&schemas).unwrap();
+    at(standard.value(), &format!("{ADVISE}.policy"))
+        .unwrap()
+        .clone()
+}
+
+/// A capability confinement is one decision, so a higher layer replaces the standard's whole entry.
+/// A global file that sets `mode: unconfined` must not inherit the standard's `policy`, which the
+/// runner refuses for an unconfined mode.
+#[test]
+fn an_unconfined_capability_does_not_inherit_the_standard_policy() {
+    assert!(standard_policy().is_string());
+    let (snap, dir) = bundled_snapshot(
+        "confinement-replace",
+        json!({"home/.fgos/config.yaml": [
             "runner:",
             "  capabilities:",
             "    advise:",
             "      confinement:",
             "        mode: unconfined"
-        ]}}),
+        ]}),
     );
-    let snap = snapshot(&ctx, &req).unwrap();
-    assert_eq!(at(&snap.value, path), Some(&json!({"mode": "unconfined"})));
+    assert_eq!(
+        at(&snap.unwrap().value, ADVISE),
+        Some(&json!({"mode": "unconfined"}))
+    );
     let _ = fs::remove_dir_all(&dir);
 }
 
-/// The test above shows a project's `unconfined` replacing the standard's policy; nothing yet says a project
-/// may not do that. A project file is committed by whoever can push to the repository, so over a stricter layer
-/// below it a capability's confinement may be equalled or raised, never lowered: the file is refused by name.
-/// Only the bundled schema and standard carry the real confinement entry, so the proof runs on them.
+/// A project file is committed by whoever can push to the repository, so over a stricter layer
+/// below it a capability's confinement may be equalled or raised, never lowered: the file is
+/// refused by name, at the project's line.
 #[test]
 fn a_project_file_cannot_lower_a_capability_confinement() {
-    let (schemas, digest) = Schemas::bundled().unwrap();
-    let standard = Standard::bundled(&schemas).unwrap();
-    let ctx = Context {
-        schemas: &schemas,
-        standard: &standard,
-        digest: &digest,
-        detectors: &Fixed(json!({})),
-    };
-    let path = "runner.capabilities.advise.confinement";
-    assert_eq!(
-        at(standard.value(), &format!("{path}.mode")),
-        Some(&json!("required")),
-        "the standard must hold a stricter mode for this proof to mean anything"
-    );
-    let dir = common::temp("snap", "confinement-lowered");
-    let req = common::lay_out(
-        &dir,
-        &json!({"files": {"project/.fgos/config.yaml": [
+    let (snap, dir) = bundled_snapshot(
+        "confinement-lowered",
+        json!({"project/.fgos/config.yaml": [
             "runner:",
             "  capabilities:",
             "    advise:",
             "      confinement:",
             "        mode: unconfined"
-        ]}}),
+        ]}),
     );
-    match snapshot(&ctx, &req) {
+    match snap {
         Err(SnapshotError::Refused(found)) => {
             assert_eq!(found.len(), 1, "{found:?}");
             assert_eq!(
@@ -259,12 +261,105 @@ fn a_project_file_cannot_lower_a_capability_confinement() {
                 "{:?}",
                 found[0]
             );
-            assert_eq!(found[0].path.as_deref(), Some(path));
+            assert_eq!(found[0].path.as_deref(), Some(ADVISE));
+            assert_eq!(found[0].line, Some(4), "{:?}", found[0]);
         }
         other => panic!(
-            "a project file lowered {path} from required to {:?} and was accepted",
-            other.map(|snap| at(&snap.value, path).cloned())
+            "a project file lowered {ADVISE} from required to {:?} and was accepted",
+            other.map(|snap| at(&snap.value, ADVISE).cloned())
         ),
     }
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn a_project_file_may_equal_or_raise_a_capability_confinement() {
+    let policy = standard_policy();
+    let policy = policy.as_str().unwrap();
+    let project = |mode: &str| {
+        json!({"project/.fgos/config.yaml": [
+            "runner:",
+            "  capabilities:",
+            "    advise:",
+            "      confinement:",
+            format!("        mode: {mode}"),
+            format!("        policy: {policy}")
+        ]})
+    };
+    let global = json!({"home/.fgos/config.yaml": [
+        "runner:",
+        "  capabilities:",
+        "    advise:",
+        "      confinement:",
+        "        mode: preferred",
+        format!("        policy: {policy}")
+    ]});
+    for (name, mode, below) in [
+        ("equal", "required", json!({})),
+        ("raise", "required", global.clone()),
+        ("same", "preferred", global.clone()),
+    ] {
+        let mut files = project(mode);
+        files
+            .as_object_mut()
+            .unwrap()
+            .extend(below.as_object().unwrap().clone());
+        let (snap, dir) = bundled_snapshot(&format!("confinement-{name}"), files);
+        let snap = snap.unwrap_or_else(|e| panic!("{name}: {e:?}"));
+        assert_eq!(
+            at(&snap.value, &format!("{ADVISE}.mode")),
+            Some(&json!(mode)),
+            "{name}"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+}
+
+/// Another policy name than the one beneath counts as lowering, since policies have no order.
+#[test]
+fn a_project_file_cannot_swap_the_confinement_policy_of_the_layer_below() {
+    let (snap, dir) = bundled_snapshot(
+        "confinement-policy-swap",
+        json!({"project/.fgos/config.yaml": [
+            "runner:",
+            "  capabilities:",
+            "    advise:",
+            "      confinement:",
+            "        mode: required",
+            "        policy: some-other-policy"
+        ]}),
+    );
+    match snap {
+        Err(SnapshotError::Refused(found)) => {
+            assert_eq!(found[0].code, "config-confinement-lowered", "{found:?}");
+        }
+        other => panic!("{:?}", other.map(|s| s.value)),
+    }
+    let _ = fs::remove_dir_all(&dir);
+}
+
+/// `strict` may be turned on by a project file, never off over a global one that has it on.
+#[test]
+fn a_project_file_cannot_turn_strict_confinement_off() {
+    let project = |on: bool| {
+        json!({
+            "home/.fgos/config.yaml": ["runner:", "  confinement:", "    strict: true"],
+            "project/.fgos/config.yaml": ["runner:", "  confinement:", format!("    strict: {on}")]
+        })
+    };
+    let (snap, dir) = bundled_snapshot("strict-off", project(false));
+    match snap {
+        Err(SnapshotError::Refused(found)) => {
+            assert_eq!(found[0].code, "config-confinement-lowered", "{found:?}");
+            assert_eq!(found[0].path.as_deref(), Some("runner.confinement.strict"));
+        }
+        other => panic!("{:?}", other.map(|s| s.value)),
+    }
+    let _ = fs::remove_dir_all(&dir);
+    let (snap, dir) = bundled_snapshot("strict-on", project(true));
+    assert_eq!(
+        at(&snap.unwrap().value, "runner.confinement.strict"),
+        Some(&json!(true))
+    );
     let _ = fs::remove_dir_all(&dir);
 }

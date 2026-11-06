@@ -42,6 +42,19 @@ fn global_only_below<'a>(s: &'a Schemas, at: &At<'a>, inh: &Inherited<'a>, depth
         })
 }
 
+/// Whether a filled mapping at `path` holds a key that no schema describes.
+fn hides_undescribed(schemas: &Schemas, path: &[Segment], node: &Value) -> bool {
+    let mut at = path.to_vec();
+    node.as_object().is_some_and(|map| {
+        map.keys().any(|key| {
+            at.push(Segment::Key(key.clone()));
+            let found = schemas.locate(&at).is_none();
+            at.pop();
+            found
+        })
+    })
+}
+
 /// Every key of `value` that `source` may not hold, sorted by path. `document` gives each refusal
 /// its file, line and column. A refusal on a mapping with entries is raised on its entries, so it
 /// lands on the line the person wrote; the mapping itself is refused only when it replaces or
@@ -72,6 +85,13 @@ pub fn judge(
             && global_only_below(schemas, &at, &inh, DEPTH)
         {
             // A null, scalar, list or replaced map above a global-only key hides or overwrites it.
+            ("config-key-out-of-scope", "global")
+        } else if source == SourceKind::Project
+            && r.scope == "global-only"
+            && hides_undescribed(schemas, path, node)
+        {
+            // An entry of a global-only map whose own keys no schema describes cannot be reached
+            // key by key, so the entry is refused whole.
             ("config-key-out-of-scope", "global")
         } else {
             return true;

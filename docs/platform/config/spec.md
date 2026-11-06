@@ -117,8 +117,10 @@ The file name before the first `.` is the top-level key (`runner.schema.yaml` an
 | `x-fgos-scope` | `both` (default), `project-only`, `global-only` | which file may hold the key (section 3) |
 | `x-fgos-sensitivity` | `public` (default); `command` (the value is executed or becomes argv: `invariantChecks.commands`, `worktreeSetup.commands`, `runner.executor` and `runner.executors.<name>` command, args and env, confinement backend references and the `unconfined` mode); `secret-reference` (section 9); `secret-value` (interim, `gateway.token` only, deleted when the token moves to Secrets) | how the value is treated |
 | `x-fgos-file` | `config` (default), `accounts`, `token` | the one file the key may live in |
-| `x-fgos-merge` | `deep`, `replace`, `leaf` | the YAML Document merge primitive's rule for this path |
+| `x-fgos-merge` | `deep`, `replace`, `tighten`, `leaf` | the YAML Document merge primitive's rule for this path; `tighten` merges like `replace` and in addition refuses a project value that is weaker than what the layers beneath it merge to (below) |
 | `x-fgos-absent` | `detected`, `required`, `off`; used only where the standard file holds no value for the key | `detected`: no standard value, detected at read time (section 8); `required`: no standard value, missing is a reported error; `off`: missing means the feature is off. `fgos config standard` prints `required` and `detected` keys as commented placeholders |
+
+**`x-fgos-merge: tighten`** is for a setting a project may only make firmer: a capability's `confinement` and `runner.confinement.strict`. The project value replaces the lower one like `replace`, but it may only equal or raise what the layers beneath it merge to. For a confinement entry the mode ranks `required` over `preferred` over `unconfined`; with the same mode, a policy name other than the lower layer's (policy names have no order) or an `allowInvocationOverride: true` the lower layer did not allow counts as lowering; `strict: true` is not lowered to `false`. A lowering is refused by name (`config-confinement-lowered`), never ignored. Where nothing lies beneath, any value is accepted. Only the project layer is judged: the global file is the machine owner's own. `runner.confinementPolicies` is `global-only`, so a project can neither define a policy nor name another one to weaken a capability; an entry of a `global-only` map whose own keys no schema describes is refused whole, at the entry.
 
 The other facts the earlier annotation list carried live where JSON Schema already puts them or belong elsewhere:
 
@@ -320,6 +322,7 @@ Owner decision 2026-10-22: native door. As built:
 | A confined session calls a write door | `config-write-confined`; nothing written |
 | A config file or `.fgos` directory is a symlink, or resolves outside its root | `config-path-symlink`; nothing read or written |
 | A project value sits on or above a `global-only` path | refused by name, naming the global file |
+| A project value on a `tighten` path is weaker than the layers beneath it | `config-confinement-lowered`, naming the path and the project's line, never a value |
 | An account pool or the gateway token found in a config file | `config-key-in-wrong-file`, naming the file it belongs in |
 | A confined worker calls a verb that needs the account pool | `config-accounts-unavailable-confined` |
 

@@ -289,7 +289,7 @@ fn differing(
     // path a machine file holds it under, never at the keys it carries or drops.
     let whole = matches!(
         schemas.resolve(path).and_then(|r| r.merge),
-        Some("replace" | "leaf")
+        Some("replace" | "tighten" | "leaf")
     );
     if let (Value::Object(x), Value::Object(y), false) = (a, b, whole) {
         for key in x.keys().chain(y.keys()).collect::<BTreeSet<_>>() {

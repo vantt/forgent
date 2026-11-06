@@ -5,7 +5,7 @@
     { "name": "x-fgos-scope", "values": ["both", "project-only", "global-only"], "default": "both" },
     { "name": "x-fgos-sensitivity", "values": ["public", "command", "secret-reference", "secret-value"], "default": "public" },
     { "name": "x-fgos-file", "values": ["config", "accounts", "token"], "default": "config" },
-    { "name": "x-fgos-merge", "values": ["deep", "replace", "leaf"] },
+    { "name": "x-fgos-merge", "values": ["deep", "replace", "tighten", "leaf"] },
     { "name": "x-fgos-absent", "values": ["detected", "required", "off"] }
   ]
 }

@@ -24,12 +24,23 @@ import {
   effectiveSection,
 } from '../../src/setup/registrations.mjs';
 import { writeOwnershipMarker, writeOwnershipMarkerV2 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 function mkTempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-doctor-'));
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   return dir;
+}
+
+// A confinement policy is defined by the machine's own file only (a project file may not define one or pick another),
+// so a test that needs one writes the scratch HOME's global config for the length of `body`.
+function withGlobalConfig(value, body) {
+  writeGlobalConfig(os.homedir(), value);
+  try {
+    return body();
+  } finally {
+    fs.rmSync(path.join(os.homedir(), '.fgos', 'config.yaml'), { force: true });
+  }
 }
 
 function hasWorkingBwrap(binary = 'bwrap') {
@@ -204,7 +215,7 @@ test('confinement-policies-declared passes when all referenced policies are decl
           },
           'advise': {
             confinement: {
-              mode: 'preferred',
+              mode: 'required',
               policy: 'host-write-denied',
             },
           },
@@ -224,7 +235,7 @@ test('confinement-policies-declared passes when all referenced policies are decl
 test('confinement-policies-declared passes with custom policies defined in confinementPolicies', () => {
   const dir = mkTempProject();
   try {
-    writeProjectConfig(dir, {
+    withGlobalConfig({
       runner: {
         confinementPolicies: {
           'custom-isolated': {
@@ -250,10 +261,10 @@ test('confinement-policies-declared passes with custom policies defined in confi
           },
         },
       },
+    }, () => {
+      const res = checkConfinementPoliciesDeclared(dir);
+      assert.equal(res.passed, true);
     });
-
-    const res = checkConfinementPoliciesDeclared(dir);
-    assert.equal(res.passed, true);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -286,7 +297,7 @@ test('confinement-policies-declared fails when unknown policy is referenced', ()
 test('confinement-policies-declared fails when custom policy document is malformed', () => {
   const dir = mkTempProject();
   try {
-    writeProjectConfig(dir, {
+    withGlobalConfig({
       runner: {
         confinementPolicies: {
           'bad-policy': {
@@ -296,11 +307,11 @@ test('confinement-policies-declared fails when custom policy document is malform
         },
         capabilities: {},
       },
+    }, () => {
+      const res = checkConfinementPoliciesDeclared(dir);
+      assert.equal(res.passed, false);
+      assert.match(res.message, /custom confinement policy "bad-policy" is malformed/);
     });
-
-    const res = checkConfinementPoliciesDeclared(dir);
-    assert.equal(res.passed, false);
-    assert.match(res.message, /custom confinement policy "bad-policy" is malformed/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -508,7 +519,7 @@ test('confinement-strict-readiness passes when all capabilities have valid polic
     }));
 
     // Strict mode needs an anchor on every capability, the standard's included.
-    const anchored = Object.fromEntries(Object.keys(effectiveSection(dir, 'runner').capabilities).map((name) => [name, { confinement: { mode: 'unconfined' } }]));
+    const anchored = Object.fromEntries(Object.entries(effectiveSection(dir, 'runner').capabilities).map(([name, cap]) => [name, { confinement: cap.confinement ?? { mode: 'unconfined' } }]));
     writeProjectConfig(dir, {
       runner: {
         confinement: { strict: true },

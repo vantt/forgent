@@ -57,6 +57,12 @@
       "meaning": "A key sits in a file its scope does not allow, or on or above a global-only path."
     },
     {
+      "id": "config-confinement-lowered",
+      "origin": "chosen",
+      "section": "3, 14",
+      "meaning": "A project file sets a tighten-only path (a capability's confinement, the strict flag) to a weaker value than the layers beneath it; names the path and the project's line, never the value."
+    },
+    {
       "id": "config-format-legacy-json",
       "origin": "chosen",
       "section": "5, 13",

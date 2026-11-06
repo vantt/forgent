@@ -151,11 +151,12 @@ properties:
     type: object
     properties:
       strict:
+        x-fgos-merge: tighten
         description: "When true every capability must declare its own confinement."
         type: boolean
   confinementPolicies:
-    $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; the entry decides what runs on this machine"
-    x-fgos-scope: both
+    $comment: "justification: a policy decides what a confined session may do on this machine, so only the machine's own file defines one; a project could otherwise define a weak policy and require it"
+    x-fgos-scope: global-only
     x-fgos-sensitivity: command
     description: "Custom confinement policies by name; a built-in policy name cannot be redefined."
     type: object
@@ -421,8 +422,8 @@ $defs:
     $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; the entry decides what runs on this machine"
     x-fgos-scope: both
     x-fgos-sensitivity: command
-    x-fgos-merge: replace
-    description: "How a capability is confined: required or preferred names a confinement policy, unconfined runs without one. A higher layer replaces the whole entry, so an unconfined entry never inherits a lower layer's policy."
+    x-fgos-merge: tighten
+    description: "How a capability is confined: required or preferred names a confinement policy, unconfined runs without one. A higher layer replaces the whole entry, so an unconfined entry never inherits a lower layer's policy. A project file may equal or raise the confinement of the layers beneath it (required over preferred over unconfined), never lower it; a policy other than the lower layer's counts as lowering."
     type: object
     properties:
       mode:
