@@ -1,0 +1,17 @@
+agy
+
+
+      ▄▀▀▄        Antigravity CLI 1.5.2
+     ▀▀▀▀▀▀       user@example.com (Google AI Pro)
+    ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)
+   ▄▀▀    ▀▀▄     /work/project
+  ▄▀▀      ▀▀▄
+
+
+ ┃ Changes to third-party model access
+ ┃ Opus 5.5 and Sonnet 5.5 are available on paid Pro and Ultra plans. Third-party model access will no longer be available on your current plan starting on November 18, 2026.
+ ┃ esc to dismiss
+────────────────────────────────────────────────────────────────────────────────
+>
+────────────────────────────────────────────────────────────────────────────────
+? for shortcuts                                                                 Gemini 3.8 Flash · medium

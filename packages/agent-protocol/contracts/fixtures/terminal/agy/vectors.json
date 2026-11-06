@@ -734,6 +734,40 @@
       "source": "start-banner screen synthesized from the backlog description of agy's banner (no real capture exists; marker wording to be replaced by a real capture); detector verdict copied from the recorded ready screen"
     },
     {
+      "name": "the-third-party-model-access-banner-of-1-5-2-is-dismissed-before-the-brief-is-submitted",
+      "step": "await-ready-then-deliver",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "start-banner-third-party-access"
+          },
+          {
+            "at": 300,
+            "screen": "agy\n\n\n      ▄▀▀▄        Antigravity CLI 1.5.2\n     ▀▀▀▀▀▀       user@example.com (Google AI Pro)\n    ▀▀▀▀▀▀▀▀      Gemini 3.8 Flash (Medium)\n   ▄▀▀    ▀▀▄     /work/project\n  ▄▀▀      ▀▀▄\n\n\n────────────────────────────────────────────────────────────────────────────────\n>\n────────────────────────────────────────────────────────────────────────────────\n? for shortcuts                                                                 Gemini 3.8 Flash · medium\n"
+          },
+          {
+            "at": 4000,
+            "inspection": {
+              "state": "working",
+              "visibleWorking": true,
+              "promptText": ""
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "delivered",
+        "readiness": "ready",
+        "sentKeys": [
+          "esc"
+        ],
+        "sentTexts": 1
+      },
+      "message": "Reply with the single word ok. Do not use any tools.",
+      "source": "agy 1.5.2 start screen as quoted from a real herdr pane in the provider route faults report (banner lines verbatim; account, path and the dismissed screen filled in); detector verdict copied from the recorded start-banner screen"
+    },
+    {
       "name": "the-ready-screen-with-the-esc-to-dismiss-footer-sends-no-key",
       "step": "await-ready",
       "script": {

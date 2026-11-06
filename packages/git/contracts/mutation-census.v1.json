@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8711fcd9a965e5a9c650281bc9a5327b8dd6954859feb3853959503ed8af6d8a",
+  "payloadDigest": "f0828fa2ebcfb9f86c503549a13b54b43074779d45791647721ec5a76163a997",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -193,7 +193,7 @@
     "packages/agent-protocol/rust/src/lib.rs": "37952b9d8bdca0433d049834e205da623e4fc5d2631754ac7f35bdd8c35697e7",
     "packages/agent-protocol/rust/src/outcome.rs": "e5ab8b75e5c53fe7f1e996a1762a580809b0a3d67680136db4ace54d16d550ba",
     "packages/agent-protocol/rust/src/port.rs": "e7114a49dc37bffd9e5cbaae36b4a8a7f22be5892d8062d4c63f96d09d402e43",
-    "packages/agent-protocol/rust/src/terminal/agy.rs": "e25c8e2b1d31efb5fabec87df97fc12584408280ff676e7f5b04f0bde1f5d5eb",
+    "packages/agent-protocol/rust/src/terminal/agy.rs": "f5362dace92aba76fa0a63043cd32436dc64198a2101206455d5bca52bad1916",
     "packages/agent-protocol/rust/src/terminal/claude.rs": "30603dcba3c52317c9278f74f71c69135baded8e0865bbe33e4a818b173c46bd",
     "packages/agent-protocol/rust/src/terminal/codex.rs": "3ffb4de7b61daa202f06634b6914c505dbb402f2b40e8b45235f79bbf83d03aa",
     "packages/agent-protocol/rust/src/terminal/common.rs": "6dfb6d011a247da4c7fd3d580ef0030c91bd8ccbdac19dfb4d8b939f386fd744",
@@ -201,7 +201,7 @@
     "packages/agent-protocol/rust/src/terminal/omp.rs": "16a2742fde44dbfdf2f4af46e43b6fbba424394c869280ef256bdc379db3e96f",
     "packages/agent-protocol/rust/src/terminal/pi.rs": "d8cf3ecd74a5a9ee026ae0cb95309bfc3f5d756715b2cc21dfd905cdc7f40943",
     "packages/agent-protocol/rust/tests/direct_vectors.rs": "59cd38599630eba934f2297b2e986dc6a6860c22a213146de7fb871d7c23692d",
-    "packages/agent-protocol/rust/tests/terminal_vectors.rs": "e49c5c6d26664b1b3a9a8edaabd8c3a961a820bea829fa49095bf12564a3fba3",
+    "packages/agent-protocol/rust/tests/terminal_vectors.rs": "c23336c219e2de25e321d2c9b9a12051a837424b159f8e2fe566534466d9fa07",
     "packages/canonical-json/rust/src/lib.rs": "e390b41a00319d727bd0f0d44ad7f6fda85218a53bae914186699f91a27b7944",
     "packages/config/rust/src/bundle.rs": "b909b72b7f7f291b3ae251b65330894bf26e30956eb8a43a512e85eae03ab550",
     "packages/config/rust/src/cache.rs": "a7f20461334a2ead32208e1cb89b573688f142e62320360f592c4ca2d795c4b2",

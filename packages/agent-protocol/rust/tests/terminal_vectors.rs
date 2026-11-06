@@ -240,6 +240,20 @@ fn terminal_every_cli_vector_resolves_as_recorded() {
                     wire(&readiness.outcome())
                 }
                 "deliver-brief" => wire(&adapter.deliver_brief(&mut pane, message, &mut outbox)),
+                // A launch as the supervisor runs it: wait for the prompt, then type the brief.
+                "await-ready-then-deliver" => {
+                    let readiness = adapter
+                        .await_ready(&mut pane, vector["readyMs"].as_u64().unwrap_or(20_000));
+                    if let Some(want) = expect["readiness"].as_str() {
+                        assert_eq!(readiness_name(readiness), want, "{name}");
+                    }
+                    assert_eq!(
+                        sent_texts(&pane),
+                        0,
+                        "{name}: nothing is typed while waiting"
+                    );
+                    wire(&adapter.deliver_brief(&mut pane, message, &mut outbox))
+                }
                 "detect-completed" => match adapter.detect_completed(&mut pane, &mut outbox) {
                     Some(outcome) => wire(&outcome),
                     None => json!({ "outcome": "none" }),
