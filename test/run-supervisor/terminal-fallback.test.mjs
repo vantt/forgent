@@ -142,13 +142,15 @@ test('a seat whose pane shell never gave up the foreground is handed back to the
   // the supervisor judges the agent gone before a brief was typed.
   project.setVerdict('working');
   const door = project.startFgosRun({ executorIds: ['alpha'], caseRef: { caseId: run.caseId, activity: 'scout' } });
-  await waitUntil(() => project.attemptDir() && readJson(path.join(project.attemptDir(), 'agent-binding.json')), { what: 'the gate to report the agent' });
+  // The seat is launched once more after a lost brief, so the first launch is named by its directory.
+  const firstAttempt = () => project.attemptDirs().find((dir) => dir.endsWith(path.join('producer', '1', 'runs', '01')));
+  await waitUntil(() => firstAttempt() && readJson(path.join(firstAttempt(), 'agent-binding.json')), { what: 'the gate to report the agent' });
   project.setFlag('no-process', true);
   project.setVerdict('idle');
   const exit = await door.exited;
   assert.notEqual(exit.code, 0, door.output().stderr.slice(-1500));
   assert.deepEqual(project.sent(), [], 'nothing was typed at the pane');
-  assert.equal(readJson(path.join(project.attemptDir(), 'receipt.json')).reason, 'terminal:foreground-not-agent');
+  assert.equal(readJson(path.join(firstAttempt(), 'receipt.json')).reason, 'terminal:foreground-not-agent');
 
   const projection = projectionOf(run);
   assert.equal(projection.frameUsed.dispatches, 0, 'the case frame counts no dispatch for a brief that never reached an agent');
