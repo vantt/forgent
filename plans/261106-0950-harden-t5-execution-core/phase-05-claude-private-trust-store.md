@@ -26,7 +26,7 @@ Code read on `4b116c27e` (`trust-store.mjs` is at `src/run-supervisor/trust-stor
 
 - A scratch `CLAUDE_CONFIG_DIR` holding a private `.claude.json` (onboarding, theme, trust for the scratch cwd) and `.credentials.json` as a **symlink** to the operator's login: `claude -p` answered, exit 0. The operator's `~/.claude.json` hash and the login file's mtime were unchanged. So reading the login through a link works.
 - No refresh happened in the run. Claude's credential writer (bundle function `Un` → `Xne`, read in the binary) stages a temp file and **renames it over the target path**, and its in-place fallback opens with `O_NOFOLLOW`. A refresh inside the pane would therefore replace the link with a regular file in the private dir: the rotated login lands only in the private copy, and the operator's file keeps a login the provider may already have invalidated.
-- Outcome: the "credential copy required, refreshed tokens land only in the private copy" branch of the requirement holds. Stopped and asked the owner (UQ-2 in plan.md terms) before code.
+- Outcome: the "credential copy required, refreshed tokens land only in the private copy" branch of the requirement holds. Stopped and asked the owner before code. **Owner 2026-11-06 11:59 (decision 63): (a)** every claude pane takes the confined path's provisioning (`createWorkerHome` login copy, renewal at the source, write-back through the door phase 03 hardened); runs after phase 03 lands.
 
 ## Requirements
 
