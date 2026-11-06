@@ -314,3 +314,116 @@ fn a_project_file_may_equal_or_raise_a_capability_confinement() {
         let _ = fs::remove_dir_all(&dir);
     }
 }
+
+/// A project file is committed by whoever can push to the repository, so a key that decides which
+/// program runs or how little it is confined belongs to the machine's own file: the project file is
+/// refused by name at its line, and the same text in the global file is accepted.
+#[test]
+fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
+    let cases: [(&str, &[&str], &str); 11] = [
+        (
+            "executor-command",
+            &["runner:", "  executor:", "    command: tool"],
+            "runner.executor.command",
+        ),
+        (
+            "executor-args",
+            &["runner:", "  executor:", "    args: [a]"],
+            "runner.executor.args",
+        ),
+        (
+            "executor-entry-command",
+            &["runner:", "  executors:", "    ex:", "      command: tool"],
+            "runner.executors.ex.command",
+        ),
+        (
+            "executor-entry-args",
+            &["runner:", "  executors:", "    ex:", "      args: [a]"],
+            "runner.executors.ex.args",
+        ),
+        (
+            "invocation-list",
+            &[
+                "runner:",
+                "  executors:",
+                "    ex:",
+                "      invocations:",
+                "        - via: cli",
+                "          command: tool",
+                "          args: [a]",
+            ],
+            "runner.executors.ex.invocations",
+        ),
+        (
+            "invocation-permission-mode",
+            &["runner:", "  executors:", "    ex:", "      permissionMode: bypass"],
+            "runner.executors.ex.permissionMode",
+        ),
+        (
+            "confinement-backend",
+            &[
+                "runner:",
+                "  executors:",
+                "    ex:",
+                "      confinement:",
+                "        backend: none",
+            ],
+            "runner.executors.ex.confinement.backend",
+        ),
+        (
+            "confinement-private-home",
+            &[
+                "runner:",
+                "  executors:",
+                "    ex:",
+                "      confinement:",
+                "        privateHome: false",
+            ],
+            "runner.executors.ex.confinement.privateHome",
+        ),
+        (
+            "confinement-isolated-session",
+            &[
+                "runner:",
+                "  executors:",
+                "    ex:",
+                "      confinement:",
+                "        isolatedSession: false",
+            ],
+            "runner.executors.ex.confinement.isolatedSession",
+        ),
+        (
+            "capability-prefer",
+            &["runner:", "  capabilities:", "    advise:", "      prefer: [ex]"],
+            "runner.capabilities.advise.prefer",
+        ),
+        (
+            "capability-aliases",
+            &["runner:", "  capabilities:", "    advise:", "      aliases: [open]"],
+            "runner.capabilities.advise.aliases",
+        ),
+    ];
+    for (name, lines, path) in cases {
+        let (snap, dir) = bundled_snapshot(
+            &format!("global-only-{name}"),
+            json!({"project/.fgos/config.yaml": lines}),
+        );
+        match snap {
+            Err(SnapshotError::Refused(found)) => {
+                assert_eq!(found.len(), 1, "{name}: {found:?}");
+                assert_eq!(found[0].code, "config-key-out-of-scope", "{name}");
+                assert_eq!(found[0].path.as_deref(), Some(path), "{name}");
+                assert_eq!(found[0].line, Some(lines.len() as u32), "{name}");
+            }
+            other => panic!("{name}: a project file set {path} and it was accepted: {other:?}"),
+        }
+        let _ = fs::remove_dir_all(&dir);
+        let (snap, dir) = bundled_snapshot(
+            &format!("global-allowed-{name}"),
+            json!({"home/.fgos/config.yaml": lines}),
+        );
+        let snap = snap.unwrap_or_else(|e| panic!("{name}: the global file was refused: {e:?}"));
+        assert!(at(&snap.value, path).is_some(), "{name}");
+        let _ = fs::remove_dir_all(&dir);
+    }
+}
