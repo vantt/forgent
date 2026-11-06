@@ -88,7 +88,7 @@ Settled without a phase: H-T4e closed (arbitration §2: short calls stay unconfi
 | 05 | [Claude private trust store (Q1a)](phase-05-claude-private-trust-store.md) **landed 11-06: codex/agy `de7454638..8f521eb2f`, claude `ca69911f6..6b5c80f9b` (decision 66)** | 02 | 03, 04, 07 | −35 / 0 / −40 |
 | 06 | [Launch failure path (R-6, H-T4f)](phase-06-launch-failure-path.md) | 03, 05, 08, 11 | — | +15 / +15 / +40 |
 | 07 | [Small fixes (B-7, B-8, B-13, H-T4d, D-T2-7)](phase-07-small-fixes.md) **landed 11-06 `3f81fa916..36b59f731`** | 02 | 03, 04, 05 | −310 / 0 / −50 |
-| 08 | [Run Result one derivation (A5)](phase-08-run-result-one-derivation.md) | 02, 05 | 11 | −270 / +60 / −100 |
+| 08 | [Run Result one derivation (A5)](phase-08-run-result-one-derivation.md) **landed 11-06 `eba902022..7cb2cd535` (OPC MERGE on the addon)** | 02, 05 | 11 | −270 / +60 / −100 |
 | 09 | [Dispatch cut](phase-09-dispatch-cut.md) | 06, 07 | — | −300 / 0 / −50 |
 | 10 | [Execution core cut](phase-10-execution-core-cut.md) | 07, 09 | 11 (if 11 done, n/a) | −250 / 0 / −50 |
 | 11 | [Config type rules to schema](phase-11-config-to-schema.md) **landed 11-06 `68c426c31..e5ac48e88`** | 03, 04 | 08, 10 | −600 to −1 000 / 0 / −200 |
