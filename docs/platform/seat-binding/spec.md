@@ -14,7 +14,7 @@ Canonical for: Which single authority answers "what does this seat run on": the 
 Use this when: Changing how a seat resolves to a provider, model or tier, or reading the seat binding decisions
 Do not use this for: Per-run executor selection outside seat binding, or implementation claims beyond the cited code pointers
 Canonical: Yes
-Last reviewed: 2026-10-23
+Last reviewed: 2026-11-06
 Related:
 - docs/platform/component-boundary.md
 - docs/platform/work-state/contracts/knowledge-registry.md
@@ -112,7 +112,7 @@ Bảng là một file hợp đồng chung `packages/seat-binding/contracts/seat-
 |---|---|---|
 | tier | model mạnh cỡ nào | mục 5.4 |
 | effective rigor | cẩn thận cỡ nào | mạnh hơn của rigor capability (entry cap, không có thì prefix) và rigor của unit |
-| ↳ số checker | bao nhiêu ghế checker | `patterns.reviewed.checkersByRigor[effectiveRigor]` ∪ `params.minCheckers` |
+| ↳ số checker | bao nhiêu ghế checker | `runner.loops.reviewed.checkersByRigor[effectiveRigor]` ∪ `params.minCheckers` |
 | ↳ độc lập cứng | các ghế có buộc khác family | bảng pattern mục 7.3, độ chặt theo effective rigor |
 | trần ngân sách | nhiều nhất một ghế được | `maxTier` (mục 5.4 bước 4) |
 
@@ -191,6 +191,9 @@ Workflow khai ghế tường minh; workflow không bao giờ khai `prefer`. Kh�
 
 - `prefer` là khoá duy nhất, giữ hình sẵn có: id executor, hoặc `{executor, invocation}` cho ghim. Không có khoá `families`: capability còn do tool executor phục vụ (`impact-analysis: prefer "gitnexus"`), nên "family" không phải khái niệm config chung. Với agent executor, id gọi tên family của nó (một executor mỗi family, `executor-family-unique`, `src/setup/registrations.mjs:1473`), nhờ đó `prefer` gặp được `tierFallback` và `modelPolicies` khoá theo family (ví dụ executor `glm` ↔ family `z-ai`). Spec viết ghim invocation là `family#invocation`; trong config là entry `{executor, invocation}`.
 - Khoá capability hiện có (`description`, `aliases`, `confinement`, `serves`, `persona`, `minCheckers`, `verify`) giữ nguyên.
+- `red-team` là `minCheckers` mặc định của capability `code` và `code:*`. Một mục `minCheckers` tường minh **thay** mặc định đó (khoá khớp đúng được xét trước, rồi theo tiền tố; `[]` xoá nó). Hệ quả: một mục tường minh không có `red-team` thì capability `code:*` không còn nhận `red-team`.
+- `checkersByRigor` nằm ở `runner.loops.reviewed` (không còn dưới `runner.patterns.reviewed`). Một rigor dưới `standard` không có dòng riêng rơi về dòng `standard`; thiếu dòng `high` hoặc `critical` là lỗi cấu hình.
+- Id ghế dành riêng là `verify` và `verifier`: một ghế khai trùng bị từ chối `param-invalid`. Tên dành riêng trong catalog pattern là `seatBinding` và `defaultRule`.
 
 ### 6.3 Thứ tự ưu tiên theo từng thuộc tính
 
@@ -235,7 +238,7 @@ Luật:
 - Một seat resolver sinh danh sách ghế cho thực thi, mô phỏng, doctor và đếm launch của admission. Nó kiểm id ghế duy nhất và bội số role của pattern.
 - Thành phần:
   - `solo`: một ghế `producer` trừ khi khai khác.
-  - `reviewed`: ghế `producer` cộng một **ghế checker** mỗi tên từ `checkersByRigor[effectiveRigor]` ∪ `minCheckers` (và `red-team` cho capability `code:*`), id ghế = tên ghế checker trừ khi khai. Ghế checker là `reviewer`, `red-team` hoặc `tester`; `tester` mang role `reviewer` (chỉ để tra khẩu vị) nhưng posture không phải verdict: kết quả của nó không đòi assessment và không đỡ verdict receipt. Một unit khai ghế phải khớp đúng tập ghế checker cần, thiếu hay thừa bị từ chối `seat-multiplicity`. Rigor chỉ quyết tập này, không quyết tier. (Erratum E1.)
+  - `reviewed`: ghế `producer` cộng một **ghế checker** mỗi tên từ `checkersByRigor[effectiveRigor]` ∪ `minCheckers` (`red-team` là `minCheckers` mặc định của capability `code` và `code:*`, xem mục 6.2), id ghế = tên ghế checker trừ khi khai. Ghế checker là `reviewer`, `red-team` hoặc `tester`; `tester` mang role `reviewer` (chỉ để tra khẩu vị) nhưng posture không phải verdict: kết quả của nó không đòi assessment và không đỡ verdict receipt. Một unit khai ghế phải khớp đúng tập ghế checker cần, thiếu hay thừa bị từ chối `seat-multiplicity`. Rigor chỉ quyết tập này, không quyết tier. (Erratum E1.)
   - `panel` và `debate`: bắt buộc `seats:`. `params.members`, `params.role`, `params.synthesizeRole` và khoá `panelist-N` của `roleTasks` bị xoá; `roleTasks` và `workflow start --seats` khoá theo ghế.
   - `debate`: `thesis` và `antithesis` thành ghế role `producer`; `judge` là ghế role `judge` (trước đợt `patterns/debate.mjs:35-43` khoá chúng theo role).
 - `CHECKER_ROLES` (`bind.mjs:19-24`, ép out-of-process theo tên role và tiền tố `panelist-`) được thay bằng posture.
@@ -266,7 +269,7 @@ Luật cứng không đạt thì từ chối ghế `independence-unsatisfiable`,
 
 Đợt chuyển từ "rigor chọn tier" sang "config khai tier" đã chạy xong trên mọi workspace; mã chuyển đổi, doctor `seat-binding-drain` và test hàng rào đã gỡ ngày 2026-10-23 (mục 15). Những gì còn sống:
 
-1. **Config.** Config project mang tier khai trực tiếp; `runner.rigorToTier` không còn trong schema. Một config project còn khoá đó bị validation thường từ chối, tên khoá trong thông báo, và người dùng xoá khoá rồi khai `tier` (`validateRunnerConfigShape`, `test/runner/dispatch.test.mjs`). `fgos setup` không chuyển config cũ nữa. Marker `runner.patterns.seatBinding.schema` vẫn do config project mới ghi và validator vẫn đọc giá trị của nó; thiếu marker không bị từ chối.
+1. **Config.** Config project mang tier khai trực tiếp; `runner.rigorToTier` không còn trong schema. Một config project còn khoá đó bị validation thường từ chối, tên khoá trong thông báo, và người dùng xoá khoá rồi khai `tier` (`validateRunnerConfigShape`, `test/runner/dispatch.test.mjs`). `fgos setup` không chuyển config cũ nữa. Marker `runner.patterns.seatBinding.schema` là tên dành riêng trong catalog pattern; config project đã chuyển mang `schema: 2`, validator đọc `1` và `2`, và một release cũ không đọc được `2` nên từ chối file đó (hàng rào có chủ ý). Thiếu marker không bị từ chối, nhưng `fgos doctor` cảnh báo khi project có `runner.loops.*` mà marker thiếu hoặc dưới `2`.
 2. **File global.** File global không nhận khoá seat binding. Một `runner.rigorToTier` trong `~/.fgos/config.json` bị từ chối lúc nạp, thông báo nêu tên file global; doctor `tier-vocabulary-dead-keys` báo khoá đó ở cả hai cấp. Đoạn bỏ khoá trong bộ nhớ (`dropRetiredGlobalKeys`) đã gỡ 2026-10-24, sau khi chủ máy xoá khoá khỏi file global trên cả ba máy.
 3. **Hash.** `snapshotRunnerConfig` (`run.mjs`) phủ `defaults`, `maxTier`, `tierFallback` và không có `rigorToTier`.
 4. **Bản ghi cũ.** `unit.json` trước hàng rào (không có `seatSchema`) không resume được: bị từ chối `record-predates-seat-binding`; lịch sử của nó và ref theo role vẫn đọc qua `legacy-seat-read.mjs`, giữ vĩnh viễn theo quyết định của owner.

@@ -169,6 +169,17 @@ hook and the Claude Code dispatch hook all still say "run fgos setup", and only
 `setup` writes them (its help now says so too). Run `fgos setup` once in the
 project when those checks are red. It never overwrites a value you already set.
 
+`fgos setup` also converts a project config file that still holds the retired
+collaboration keys (`runner.patterns.reviewed.maxRounds`,
+`runner.patterns.reviewed.checkersByRigor`, `runner.patterns.defaultRule`,
+`runner.patterns.research-fan-out-gated`) to the `runner.loops` layout with
+`runner.patterns.seatBinding.schema: 2`, and keeps a copy of the old file next to
+it. It never rewrites the global file: when the global file holds a retired key,
+setup prints the `fgos config patch <patch-file> --global --reason ...` command to
+run from a directory outside any fgOS project. The schema 2 marker exists so that
+a release older than the conversion refuses the converted file instead of
+misreading it.
+
 ## 3. Reading doctor output
 
 ```bash
@@ -230,7 +241,7 @@ file or key in their message; the message always names the exact target.
 
 | Id | Checks | Typical failing message | Who | Fix |
 |---|---|---|---|---|
-| `runner-patterns-config` | `runner.patterns` is present, well formed and cumulative | `runner.patterns missing -- falling back to setup defaults` | setup | `fgos setup` |
+| `runner-patterns-config` | The pattern catalog (`runner.patterns`) and the loop tuning (`runner.loops`) are well formed; no retired key remains; a project that sets `runner.loops.*` carries `runner.patterns.seatBinding.schema: 2` (a warning otherwise) | `<file>:<line>: runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.` | you | `fgos setup` converts the project YAML file (a backup is kept beside it); for a legacy JSON file edit the keys the message lists, then run `fgos config migrate` |
 | `runner-generated-paths` | `runner.generatedPaths` maps a generated source to its render targets with well-formed write-scope entries | `runner.generatedPaths missing -- write scopes are not widened to generated trees` | setup | `fgos setup` |
 | `tier-vocabulary-dead-keys` | No retired tier keys (`runner.models`, `minTier`, `rigorOverrides`) | names the dead key | you | Delete or migrate the named key |
 | `executor-family-unique` | Each agent family has one executor | `one family, several executors: claude (claude, claude-herdr)` | you | Merge them: keep one executor and move the other's transports into it as invocations |

@@ -14,10 +14,17 @@ not the end user. The canonical request-kind to route map ships with the skill, 
 [`request-kinds-and-routes.md`](../../core/skills/fgos-advise/references/request-kinds-and-routes.md).
 
 This guide is deliberately example-driven. Workflow definitions live in
-`core/workflows/*.yaml`, and single-unit presets live in
-`src/runner/execution/patterns/presets.mjs`. Read the skill's own `SKILL.md`
+`core/workflows/*.yaml`, and single-unit patterns live in the pattern catalog,
+`runner.patterns` in the shipped standard
+([`core/config-standard/runner.yaml`](../../core/config-standard/runner.yaml)) with
+your project's own entries layered over it. Read the skill's own `SKILL.md`
 ([`core/skills/fgos-group-thinking/SKILL.md`](../../core/skills/fgos-group-thinking/SKILL.md))
 for the execution doors and safety invariants.
+
+Pattern names come from that catalog. `--seats` rebuilds every workflow panel
+whose pattern runs the `panel` loop, not only a pattern named `panel`; a panel whose
+seats carry curated persona, tier or per-seat tasks is refused. The skill states
+the exact `--seats` rules.
 
 ## Operator path: discover available Workflows
 
