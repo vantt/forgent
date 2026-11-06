@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "aad21895b5a1e7895fa88855bb0958903e4d581b36de88e6bac1e1c8185f87ec",
+  "payloadDigest": "fcf41a69f4c9ce7a3e7f7f90380bdeff43065e6ff12b3bf5502e21c809c83abb",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -859,7 +859,7 @@
     "scripts/lib/mailbox-behaviour-v7i.mjs": "0059548c4a97e93061c0951d87c4b156d19211b4e05ae47cde089bb6f456aff9",
     "scripts/lib/mailbox-behaviour-v7j.mjs": "5b65f8e7db99ef19ca4a62cacadacd29f8de6b95021916c4809f97cabd217707",
     "scripts/lib/mailbox-live-cli.mjs": "084b02bbadd408f0cecb4888ba37cf760005931887b5ec31f5ba2d6e1c0ba484",
-    "scripts/lib/mailbox-live-confined.mjs": "fde5fef9c641ddec9430ae9eac1993a7ff1a2d4e3ccf0d784d6f46e74463950b",
+    "scripts/lib/mailbox-live-confined.mjs": "ea6931c73f0662ba182e99a1cd7b7d442385b55488bd4bc0d08db9a1a98bc591",
     "scripts/lib/mailbox-role-recorder.mjs": "b45702d191ab0ce223c9be0795fd9b573d73ff5a88a89007457de1da24f4c8ae",
     "scripts/lib/mailbox-wake-probe.mjs": "bdba8f043335de5c70149d48ed656e3c359531426b2f98c1c4037cc0b6970085",
     "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",
@@ -1007,7 +1007,7 @@
     "src/runner/dispatch/execution-contract.mjs": "f16b8adfe36849cb6f48255a742bb6b6d4cf4973b30280961b9ba95bdb12efb6",
     "src/runner/dispatch/executor-governance.mjs": "f4d179122ee78207bd235afbedeb185a9d1e3eb747d31e659db77f5ad8f5d31f",
     "src/runner/dispatch/herdr-round.mjs": "eb6daa624f1bba5a67eaec4f640f44b0a3b183fc462642295eb808661871d8b5",
-    "src/runner/dispatch/llm-accounts.mjs": "d9b24ce6ddcb6ec7f762ce7ee58079567fdafa6763215ebbabe248de0d68110c",
+    "src/runner/dispatch/llm-accounts.mjs": "6b2636b2c421f8157400d8fbb81b9dbc5c6255580aba2031d1c409a893c2bfc7",
     "src/runner/dispatch/mechanism.mjs": "8f272b51172f4b3f15418b43242d8b877ea4ed0ac974890bd7fd991ca3d87afe",
     "src/runner/dispatch/operation-prompt-templates.mjs": "45b0a234f2d0917e3555ee4bc913eee10522e1c7aa21f02f8473bae63383256a",
     "src/runner/dispatch/plan.mjs": "355cc52529ad4186609fb663412150b764e7d10ca66de04f9888c98c651379d7",

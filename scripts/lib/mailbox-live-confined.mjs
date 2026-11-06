@@ -321,6 +321,9 @@ export function prepareConfinedRun({ base, runId, command, args = [], env = {}, 
     context,
     grants: [{ resource: 'workspace', access: 'write' }, { resource: 'private-home', access: 'write' }],
     backendConfig: { tempRoot: base },
+    // `base` holds every run of this harness and is bound read-only by the masks below, so it is not masked as
+    // a root of private homes: runs share their mailbox record through it.
+    confinementRoots: [],
   });
   const spec = login ? LOGINS[login.cli] : null;
   if (login && !spec) throw new ConfinedLaunchError(`no login rule for ${login.cli}`);

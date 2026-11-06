@@ -302,7 +302,8 @@ export function machineLoginStores({ homeDir = os.homedir(), env = process.env, 
   for (const executor of plainValues(runner.executors)) {
     for (const invocation of [executor, ...(Array.isArray(executor?.invocations) ? executor.invocations : [])]) {
       const store = credentialStoreOf(invocation);
-      if (typeof store?.homeEnv === 'string' && store.use !== inPlaceCli) add(env[store.homeEnv]);
+      // `HOME` names the user's home, not a login directory: the CLI's own login home under it is listed above.
+      if (typeof store?.homeEnv === 'string' && store.homeEnv !== 'HOME' && store.use !== inPlaceCli) add(env[store.homeEnv]);
     }
   }
   return [...stores];
