@@ -19,15 +19,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readRunSnapshot } from './show-run.mjs';
-import { assignmentDir, findRunDir, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
+import { findRunDir, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
 import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { plan, checkApply, collectEvidence, RecoveryPlannerError } from '../../runner/dispatch/recovery-planner.mjs';
-import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, buildRunControlHolder } from '../../run-supervisor/run-lock.mjs';
+import { currentGeneration, controlDirs } from '../../run-supervisor/run-lock.mjs';
 import { findCoordinationSessionOwningAssignment } from '../../runner/dispatch/runtime-inspection.mjs';
 import { classifyRunOutcome } from '../../runner/dispatch/visibility-session.mjs';
 import { acquireSync, createLockScope, resolveLock } from '../../holder-lock/index.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
-import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 
 export class RecoveryError extends Error {
   constructor(code, message, details = {}) {
@@ -41,7 +40,6 @@ export class RecoveryError extends Error {
 
 const DEFAULT_INTENT = 'resume';
 const RECOVERY_LOG_FILE = 'recovery-commands.jsonl';
-const RUN_FILE = 'run.json';
 
 function requireRunId(runId) {
   if (typeof runId !== 'string' || !runId.trim()) {
@@ -74,14 +72,6 @@ function resolveRunDir(ctx, runId) {
 function readRealControlEpoch(runDir) {
   const { generationsDir } = controlDirs(runDir);
   return currentGeneration(generationsDir)?.epoch ?? 0;
-}
-
-/** run-lock.mjs's own "no generation published yet" convention is a `null`
- * current epoch, not `0` -- translate at the one boundary that calls into
- * its real CAS primitive (acquireRunControl), so this module's public
- * 0-based convention never leaks a mismatched literal into that check. */
-function toRunLockExpectedEpoch(epoch) {
-  return epoch === 0 ? null : epoch;
 }
 
 /** The logical facts snapshot recovery-planner.mjs reasons over: run status,
@@ -153,7 +143,7 @@ export function recoverObserveUseCase(ctx, { runId, intent = DEFAULT_INTENT, now
   const runDir = resolveRunDir(ctx, runId);
   const nowFn = typeof now === 'function' ? now : now ? () => now : undefined;
   const snapshot = buildSnapshot(runDir);
-  const evidence = collectEvidence(snapshot, nowFn ? { now: nowFn } : {});
+  const evidence = collectEvidence(snapshot);
   let recommendation;
   try {
     recommendation = plan(snapshot, evidence, intent, nowFn ? { now: nowFn } : {});
@@ -189,16 +179,6 @@ function withRunLock(repoRoot, runDir, fn) {
   }
 }
 
-function writeRunJsonPatch(runDir, patch) {
-  const file = path.join(runDir, RUN_FILE);
-  const current = JSON.parse(fs.readFileSync(file, 'utf8'));
-  const next = { ...current, ...patch };
-  const tmp = `${file}.tmp-${uniqueTmpTag()}`;
-  fs.writeFileSync(tmp, `${JSON.stringify(next, null, 2)}\n`);
-  fs.renameSync(tmp, file);
-  return next;
-}
-
 function readRecoveryLog(runDir) {
   const file = path.join(runDir, RECOVERY_LOG_FILE);
   if (!fs.existsSync(file)) return [];
@@ -212,42 +192,6 @@ function readRecoveryLog(runDir) {
 function appendRecoveryCommand(runDir, record) {
   const file = path.join(runDir, RECOVERY_LOG_FILE);
   fs.appendFileSync(file, `${JSON.stringify(record)}\n`);
-}
-
-// R3: routing this through `planReconciliation`/`applyReconciliation`'s
-// `clear-assignment-claim` action was tried and reverted -- verified by
-// tracing every real writer of `dispatch.claim` (session-engine.mjs's
-// `createAndExecuteSessionTask`/`retrySessionTask`, the only two): both
-// create it with `fs.closeSync(fs.openSync(path, 'wx'))`, an always-empty
-// file, never `{pid, startTime}`. `planClearAssignmentClaim`'s dead-holder
-// proof (reconciliation-planner.mjs's `holder()`) requires exactly that
-// shape to ever resolve 'dead' -- against the real, always-empty file it
-// can only ever return 'needs-input' ("corrupt or unparseable"), which
-// would make `dispatchClaimCleared` permanently false in production. That
-// is not this fix applied correctly; it is a regression wearing this fix's
-// clothes (caught by `test/verbs/dispatch-recovery.test.mjs`'s own
-// dead-driver fixture, which fails against the exact real file shape).
-//
-// The actual dead-holder proof for THIS call site does not need to come
-// from the claim file's own content at all: `resume-driver` only reaches
-// this point after `recoverApplyUseCase`'s CAS/legality re-check already
-// required `liveness.fresh === false` (R3, `recovery-planner.mjs`) for
-// THIS Run, and the session-ownership refusal above already ran. Both are
-// real proof, just carried by the surrounding apply rather than by
-// `dispatch.claim`'s own bytes -- so a plain, unconditional unlink here is
-// safe given they already gated the call, not despite them.
-function clearDispatchClaimForRecoveredDriver(repoRoot, assignmentId, action) {
-  if (action?.type !== 'resume-driver' || !assignmentId) return { cleared: false };
-  const dir = assignmentDir(fgosDirFromRoot(repoRoot), assignmentId);
-  if (!dir) throw new RecoveryError('invalid-assignment-id', 'assignmentId must not escape the assignments directory.');
-  const claimPath = path.join(dir, 'dispatch.claim');
-  try {
-    fs.unlinkSync(claimPath);
-    return { cleared: true };
-  } catch (err) {
-    if (err.code === 'ENOENT') return { cleared: false, claimOutcome: 'blocked', claimReason: 'no assignment claim exists' };
-    throw err;
-  }
 }
 
 function recordApplied(runDir, params, nowIso, extra = {}) {
@@ -280,9 +224,6 @@ function applyAdopt(runId, runDir, params, nowIso) {
   const record = recordApplied(runDir, params, nowIso, { adoptState: verdict.state, ...(verdict.outcome ? { adoptOutcome: verdict.outcome } : {}) });
   return { runId, runDir, outcome: 'applied', ...record };
 }
-
-// Actions that finish or settle a run: never over a run a CoordinationSession owns.
-const SESSION_REFUSED_ACTIONS = ['resume-driver', 'adopt'];
 
 const REQUIRED_APPLY_FIELDS = ['action', 'expectedSnapshot', 'expectedControlEpoch', 'expectedExpiresAt', 'actionKey'];
 
@@ -317,16 +258,9 @@ export function recoverApplyUseCase(ctx, params = {}) {
   const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
   const assignmentId = readRunSnapshot(runDir).run?.assignmentId ?? null;
 
-  // R3: `resume-driver` specifically -- not every recovery action -- is
-  // refused outright when the Run belongs to a CoordinationSession. This
-  // module's own header comment ("never imports from src/runner/
-  // coordination/") is about not folding a standalone Run back under
-  // session authority by READING/WRITING session state here; asking
-  // whether one owns this assignment, so this door can name the RIGHT one
-  // and get out of the way, is the opposite of that -- the same refusal
-  // `planClearAssignmentClaim` already applies for the narrower guard-repair
-  // action this action's own claim-clear now routes through below.
-  if (SESSION_REFUSED_ACTIONS.includes(params.action?.type) && assignmentId) {
+  // An adopt over a run a CoordinationSession owns is refused: that session's own recovery door decides it.
+  // (Asking whether one owns this assignment only names it; no session state is read or written here.)
+  if (params.action?.type === 'adopt' && assignmentId) {
     const sessionOwner = findCoordinationSessionOwningAssignment(repoRoot, assignmentId);
     if (sessionOwner) {
       throw new RecoveryError(
@@ -345,7 +279,7 @@ export function recoverApplyUseCase(ctx, params = {}) {
     }
 
     const snapshot = buildSnapshot(runDir);
-    const evidence = collectEvidence(snapshot, { now: nowIso });
+    const evidence = collectEvidence(snapshot);
     const check = checkApply({
       snapshot,
       evidence,
@@ -360,90 +294,6 @@ export function recoverApplyUseCase(ctx, params = {}) {
       return { runId, runDir, outcome: check.outcome, reason: check.reason };
     }
 
-    if (params.action?.type === 'adopt') return applyAdopt(runId, runDir, params, nowIso);
-
-    // H1: the actual control-epoch mutation goes through run-lock's own
-    // real CAS primitive -- the same generation ledger a live controller's
-    // acquireRunControl/releaseRunControl calls fence against -- instead of
-    // bumping the shadow run.json.controlEpoch field directly. A live
-    // controller genuinely holding the run is refused here, never silently
-    // overwritten. This is also the one exclusive resource this door can
-    // acquire before its own write, so F5's fresh settled re-check (below)
-    // is deliberately sequenced AFTER this, not before it.
-    const controlResult = acquireRunControl(runDir, {
-      holder: buildRunControlHolder('dispatch-recover'),
-      purpose: `recovery-apply:${params.action?.type ?? 'unknown'}`,
-      expectedControlEpoch: toRunLockExpectedEpoch(params.expectedControlEpoch),
-      now: Date.now(),
-    });
-    if (controlResult.status === 'stale') {
-      return {
-        runId,
-        runDir,
-        outcome: 'plan-stale',
-        reason: `the run's real control epoch has advanced since this recommendation was issued (expected ${params.expectedControlEpoch}, now ${controlResult.controlEpoch ?? 0})`,
-      };
-    }
-    if (controlResult.status === 'held') {
-      return {
-        runId,
-        runDir,
-        outcome: 'held',
-        reason: `run control is currently held by a live driver (epoch ${controlResult.controlEpoch}) -- refusing to apply recovery over an active controller`,
-        holder: controlResult.holder,
-      };
-    }
-
-    // F5: the LAST read before the write, not the first read after the CAS
-    // checks -- markRunSettled/reconcileRun touch run.json OUTSIDE this
-    // lock/epoch, so this has to run after acquireRunControl above (the one
-    // exclusive resource this door holds) to actually shrink the race
-    // window down to the length of the write itself, rather than covering
-    // the acquireRunControl call too. A settle-writer that never routes
-    // through acquireRunControl at all (e.g. cli.mjs's closeRun, a
-    // status-only flip) is a documented residual this reordering narrows
-    // but cannot close -- fixing that writer's own locking is out of this
-    // door's lease.
-    const freshOutcome = classifyRunOutcome(runDir, { liveness: 'unknown' });
-    if (freshOutcome.outcome === 'settled') {
-      // The control epoch was already bumped by acquireRunControl above;
-      // release it immediately rather than leaving it held with no
-      // corresponding recovery action, so a resumed/reassigned real driver
-      // is never blocked behind an apply that ultimately refused.
-      releaseRunControl(runDir, { controlEpoch: controlResult.controlEpoch, controlToken: controlResult.controlToken });
-      return {
-        runId,
-        runDir,
-        outcome: 'plan-stale',
-        reason: 'the run settled moments before this recovery apply reached its write -- refusing to record a recovery action against a settled run',
-      };
-    }
-
-    const controlEpochBefore = params.expectedControlEpoch;
-    const controlEpochAfter = controlResult.controlEpoch;
-    // The recovery decision is ephemeral, not an ongoing hold: release
-    // immediately so a resumed/reassigned real driver's own
-    // acquireRunControl call is never blocked behind this door's token.
-    releaseRunControl(runDir, { controlEpoch: controlEpochAfter, controlToken: controlResult.controlToken });
-    writeRunJsonPatch(runDir, { controlEpoch: controlEpochAfter });
-    const record = {
-      actionKey: params.actionKey,
-      action: params.action,
-      appliedAt: nowIso,
-      controlEpochBefore,
-      controlEpochAfter,
-      snapshotHash: params.expectedSnapshot,
-    };
-    appendRecoveryCommand(runDir, record);
-    const claimResult = clearDispatchClaimForRecoveredDriver(repoRoot, assignmentId, params.action);
-    return {
-      runId,
-      runDir,
-      outcome: 'applied',
-      ...record,
-      dispatchClaimCleared: claimResult.cleared,
-      ...(claimResult.claimOutcome ? { dispatchClaimClearOutcome: claimResult.claimOutcome } : {}),
-      ...(claimResult.claimReason ? { dispatchClaimClearReason: claimResult.claimReason } : {}),
-    };
+    return applyAdopt(runId, runDir, params, nowIso);
   });
 }

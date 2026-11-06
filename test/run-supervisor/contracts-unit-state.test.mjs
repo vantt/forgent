@@ -43,8 +43,8 @@ test('cancel-requested names who asked and keeps the fields the supervisor reads
   assert.equal(unitState.signalExit.firstSignal.includes('143'), true);
 });
 
-test('recover offers adopt beside the existing actions', () => {
-  assert.deepEqual(Object.keys(recover.actions), ['adopt', 'resume-driver', 'reassign-driver']);
+test('recover offers adopt as its only action', () => {
+  assert.deepEqual(Object.keys(recover.actions), ['adopt']);
   assert.equal(recover.actions.adopt.shape.type, 'adopt');
   assert.match(recover.actions.adopt.stillLegal, /running or being-adopted makes it illegal/);
 });

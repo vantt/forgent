@@ -1,6 +1,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -103,7 +104,7 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
 test('RunObservation vocabulary derives phase, delivery, resourceState and workspace completeness from facts', () => {
   const root = fixture();
   assignment(root, 'asgn1');
-  // 1. In-flight run with controller commands -> phase: bound, delivery: not-sent -> not-started, visibility: working with fresh heartbeat -> live-proven, no cwd -> workspace: unsupported
+  // 1. In-flight run with controller commands -> phase: bound, delivery: not-sent -> not-started, visibility: working while the supervisor holds the attempt lock -> live-proven (the same run with nobody holding it is ambiguous), no cwd -> workspace: unsupported
   const run1Dir = run(root, 'asgn1', '01', { runId: 'run1', delivery: 'not-sent' });
   const cmdFile = path.join(run1Dir, 'controller', 'commands', 'cmd1.json');
   fs.mkdirSync(path.dirname(cmdFile), { recursive: true });
@@ -111,11 +112,15 @@ test('RunObservation vocabulary derives phase, delivery, resourceState and works
   fs.writeFileSync(path.join(run1Dir, 'visibility.json'), JSON.stringify({ status: 'working', lastSeenAt: new Date().toISOString() }));
   admit(root, 'asgn1', 1, { runId: 'run1', attempt: 1 });
 
-  const inspect1 = inspectDispatchRuntime(root, { run: 'run1' });
+  const held = acquireSync(createLockScope('test-supervisor'), 'attempt', { runDir: path.dirname(path.dirname(run1Dir)), NN: '01' });
+  assert.equal(held.result, 'acquired');
+  let inspect1;
+  try { inspect1 = inspectDispatchRuntime(root, { run: 'run1' }); } finally { held.handle.release(); }
   const obs1 = inspect1.runObservation;
   assert.equal(obs1.phase, 'bound');
   assert.equal(obs1.delivery, 'not-started');
   assert.equal(obs1.resourceState, 'live-proven');
+  assert.equal(inspectDispatchRuntime(root, { run: 'run1' }).runObservation.resourceState, 'ambiguous', 'a fresh heartbeat alone proves nothing once nobody holds the attempt lock');
   assert.equal(obs1.evidenceCompleteness.resource, 'complete');
   assert.equal(obs1.evidenceCompleteness.workspace, 'unsupported');
 

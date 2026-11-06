@@ -70,7 +70,7 @@ test('nested runs without assignment metadata are discoverable by inspection, sh
   assert.deepEqual(inspectDispatchRuntime(root, { run: runId }).links.assignmentIds, [id]);
   const active = inspectDispatchRuntime(root, { cwd: root }).observations[0].value.activeRunIds;
   assert.ok(active.includes(runId), 'nested orphan participates in the existing cwd guard');
-  const running = findRunningRuns(fgosDir, { now: () => Date.parse('2026-10-06T12:00:00Z') });
+  const running = findRunningRuns(fgosDir);
   assert.deepEqual(running.map((run) => ({ runDir: run.runDir, runId: run.runId, assignmentId: run.assignmentId })), [{ runDir, runId, assignmentId: id }]);
   writeJson(path.join(runDir, 'result.json'), { runId, assignmentId: id, status: 'done', confidence: 'reported', timestamp: fixture.timestamp });
   const shown = showRunUseCase({ repoRoot: root }, { runId });
@@ -171,7 +171,7 @@ for (const identities of [['metadata', 'metadata'], ['result', 'result'], ['meta
     assert.equal(ticks, 0);
     assert.throws(() => recoverObserveUseCase({ repoRoot: root }, { runId }), ambiguous(RecoveryError));
     assert.throws(() => recoverApplyUseCase({ repoRoot: root }, {
-      runId, action: { type: 'resume-driver' }, expectedSnapshot: 'snapshot',
+      runId, action: { type: 'adopt', attemptId: 'att' }, expectedSnapshot: 'snapshot',
       expectedControlEpoch: 0, expectedExpiresAt: fixture.timestamp, actionKey: 'action',
     }), ambiguous(RecoveryError));
     locations.forEach((dir, i) => {

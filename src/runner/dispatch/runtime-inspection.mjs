@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { interpretRunResult } from './run-result.mjs';
 import { assignmentDir, listAssignmentRuns } from './assignment-layout.mjs';
+import { attemptLockState } from './visibility-session.mjs';
 
 const INSPECTION_STATUSES = new Set(['resolved', 'partial', 'ambiguous', 'conflicting', 'not-found']);
 const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
@@ -199,7 +200,7 @@ function deriveDelivery(l) {
   return 'unknown';
 }
 
-function deriveResourceState(l, nowFn) {
+function deriveResourceState(l) {
   const vis = json(path.join(l.runDir, 'visibility.json'));
   if (!vis) {
     return 'unobserved';
@@ -207,13 +208,8 @@ function deriveResourceState(l, nowFn) {
   const s = vis.status;
   if (VALID_RESOURCE_STATES.has(s)) return s;
   if (s === 'died') return 'dead-proven';
-  if (['working', 'briefed', 'agent-ready'].includes(s) && vis.lastSeenAt) {
-    const ts = new Date(vis.lastSeenAt).getTime();
-    const curr = typeof nowFn === 'function' ? new Date(nowFn()).getTime() : Date.now();
-    if (!Number.isNaN(ts) && curr - ts >= 0 && curr - ts < 60000) {
-      return 'live-proven';
-    }
-  }
+  // The driver is alive exactly while the supervisor holds the attempt lock.
+  if (['working', 'briefed', 'agent-ready'].includes(s) && attemptLockState(l.runDir) === 'held') return 'live-proven';
   return 'ambiguous';
 }
 
@@ -225,7 +221,7 @@ function deriveWorkspaceCompleteness(l) {
 function one(l, root, now, all) {
   const terminal = result(l), runResult = terminal.value, o = owner(l, root, all);
   const phase = derivePhase(l, terminal);
-  const resourceState = deriveResourceState(l, now);
+  const resourceState = deriveResourceState(l);
   const delivery = deriveDelivery(l);
   const workspaceCompleteness = deriveWorkspaceCompleteness(l);
   const observation = {

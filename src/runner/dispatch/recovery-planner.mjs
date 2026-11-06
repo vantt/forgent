@@ -33,7 +33,7 @@ export class RecoveryPlannerError extends Error {
 // The only evidence types this planner can interpret. Evidence of any other
 // type is never guessed at -- it parks the recommendation (Staleness Rules:
 // "unknown/unrecognized external evidence -> park, never a guessed action").
-const RECOGNIZED_EVIDENCE_TYPES = Object.freeze(['liveness', 'worker-result', 'replacement-authority', 'attempt-receipt']);
+const RECOGNIZED_EVIDENCE_TYPES = Object.freeze(['worker-result', 'attempt-receipt']);
 
 // The only requestedIntent values a caller may declare. An intent outside
 // this set is a malformed call (not a park-worthy runtime fact), so it
@@ -50,14 +50,6 @@ const ADOPTABLE_ATTEMPT_STATES = Object.freeze(['needs-adopt', 'open']);
 const LIVE_ATTEMPT_STATES = Object.freeze(['running', 'being-adopted']);
 const attemptStateOf = (snapshot) => snapshot.attempt?.state ?? null;
 const isAdoptable = (snapshot) => ADOPTABLE_ATTEMPT_STATES.includes(attemptStateOf(snapshot));
-
-// Mirrors visibility-session.mjs's own DRIVER_FRESH_MS rationale (six
-// missed 10s heartbeats): long enough that a slow filesystem or a busy
-// machine never costs a live driver its "fresh" reading, short enough that
-// a killed dispatch shows up within a minute. Duplicated rather than
-// imported -- that constant is private to visibility-session.mjs, and this
-// module may not import fs-adjacent modules regardless.
-const DRIVER_FRESH_MS = 60000;
 
 // How long a fresh recommendation stays applicable. Long enough for a
 // person to read a recommendation and decide; short enough that a
@@ -112,11 +104,8 @@ function checkPreconditions(snapshot, evidence) {
   if (LIVE_ATTEMPT_STATES.includes(attemptStateOf(snapshot))) {
     return { status: 'park', reason: `attempt is ${attemptStateOf(snapshot)}: a supervisor or an adopter owns it -- nothing to recover while it runs` };
   }
-  // R3: consult the settled-outcome signal (F1's own snapshot field), not
-  // just run.json.status -- a run whose result.json already landed is
-  // "nothing to recover" even before run.json.status has been reconciled to
-  // 'settled'. Read-door defense-in-depth alongside recover.mjs's own F5
-  // write-door re-check, not a substitute for it.
+  // Consult the settled-outcome signal, not just run.json.status -- a run whose result.json already landed is
+  // "nothing to recover" even before run.json.status has been reconciled to 'settled'.
   if (!isAdoptable(snapshot) && (snapshot.run?.status === 'settled' || snapshot.settledSignal?.outcome === 'settled')) {
     return { status: 'park', reason: 'run already settled -- there is nothing to recover' };
   }
@@ -129,7 +118,7 @@ function checkPreconditions(snapshot, evidence) {
  * question (unlike the coordination session's authorize, which checks a
  * caller identity against a fixed provenance root).
  *
- * @param {object} snapshot {run, visibility, outbox, visibilityError}
+ * @param {object} snapshot {run, visibility, outbox, visibilityError, attempt}
  * @param {Array<{id:string, type:string}>} evidence
  * @param {'resume'|'reassign'} requestedIntent
  * @returns {{status:'ok', action:object, reason:string} | {status:'needs-input'|'park', reason:string}}
@@ -144,63 +133,23 @@ export function deriveRecoveryFacts(snapshot, evidence, requestedIntent) {
   const blocked = checkPreconditions(snapshot, evidence);
   if (blocked) return blocked;
 
-  if (requestedIntent === 'resume') {
-    // An attempt of the supervisor era is finished through the adopt door, never by a second driver.
-    const state = attemptStateOf(snapshot);
-    if (isAdoptable(snapshot)) {
-      const attemptId = snapshot.attempt?.attemptId;
-      if (typeof attemptId !== 'string') {
-        return { status: 'park', reason: 'the attempt has no readable attemptId in its envelope -- never guessing what to adopt' };
-      }
-      return {
-        status: 'ok',
-        action: { type: 'adopt', attemptId },
-        reason: `attempt ${attemptId} is ${state} (no holder, not closed) -- adopt settles it and closes it`,
-      };
-    }
-    // Phase 03 R3/M15a: `collectEvidence` already computes a `liveness`
-    // entry (`fresh` from `visibility.lastSeenAt` vs. the same freshness
-    // window a live driver's own heartbeat renews), but this branch never
-    // consulted it -- resume was authorized purely on "not settled", which
-    // is also true of a Run whose driver is still very much alive and
-    // heartbeating. That is exactly how a second worker got spawned over a
-    // live one: resume-driver told the caller it was safe to clear the
-    // dispatch claim and relaunch while the original driver was still
-    // running. Strict `=== false`, not merely falsy -- missing evidence or
-    // an unconfirmed reading must never default to "safe to resume",
-    // matching this module's "never guessing an action" rule.
-    const liveness = evidence.find((e) => e.type === 'liveness');
-    if (!liveness) {
-      return {
-        status: 'needs-input',
-        reason: 'resume requested but no liveness evidence was supplied -- fresh/not-fresh cannot be guessed',
-      };
-    }
-    if (liveness.fresh !== false) {
-      return {
-        status: 'park',
-        reason: 'resume refused: the driver\'s last heartbeat is still fresh (or freshness could not be confirmed) -- a live driver may still be running this Run',
-      };
-    }
-    return {
-      status: 'ok',
-      action: { type: 'resume-driver' },
-      reason: 'run is not settled, no unrecognized evidence was found, and the driver has no fresh heartbeat (liveness.fresh === false) -- the current driver may resume',
-    };
+  // An attempt is finished through the adopt door, never by a second driver. Only an attempt nobody holds
+  // that is not closed can be adopted; there is no action that replaces a driver.
+  if (requestedIntent === 'reassign') {
+    return { status: 'park', reason: 'reassign has no action: a dead controller\'s attempt is finished through adopt (intent resume)' };
   }
-
-  // requestedIntent === 'reassign'
-  const authority = evidence.find((e) => e.type === 'replacement-authority');
-  if (!authority) {
-    return {
-      status: 'needs-input',
-      reason: 'reassign requested but no replacement-authority evidence names a fresh driver -- a fresh driver never gets a silent default action',
-    };
+  const state = attemptStateOf(snapshot);
+  if (!isAdoptable(snapshot)) {
+    return { status: 'park', reason: `the attempt is ${state ?? 'unprobed'}: only an attempt with no holder that is not closed can be adopted` };
+  }
+  const attemptId = snapshot.attempt?.attemptId;
+  if (typeof attemptId !== 'string') {
+    return { status: 'park', reason: 'the attempt has no readable attemptId in its envelope -- never guessing what to adopt' };
   }
   return {
     status: 'ok',
-    action: { type: 'reassign-driver', toDriverId: authority.driverId },
-    reason: `replacement-authority evidence "${authority.id}" names driver "${authority.driverId}"`,
+    action: { type: 'adopt', attemptId },
+    reason: `attempt ${attemptId} is ${state} (no holder, not closed) -- adopt settles it and closes it`,
   };
 }
 
@@ -225,31 +174,6 @@ export function isActionLegal(snapshot, evidence, action) {
     }
     if (isAdoptable(snapshot)) return { status: 'ok', reason: `adopt remains legal: attempt is ${state}` };
     return { status: 'park', reason: `adopt no longer legal: attempt is ${state ?? 'unprobed'}` };
-  }
-  if (action.type === 'resume-driver') {
-    // Phase 03 R3/M15a: the same strict `fresh === false` requirement
-    // `deriveRecoveryFacts`'s `resume` branch now applies -- this function's
-    // own doc comment says "legal right now can never diverge between the
-    // two paths", so a live-driver check missing from ONE of them is a
-    // divergence, not an independent bug to fix once.
-    const liveness = evidence.find((e) => e.type === 'liveness');
-    if (!liveness) {
-      return { status: 'needs-input', reason: 'resume-driver re-check found no liveness evidence -- fresh/not-fresh cannot be guessed' };
-    }
-    if (liveness.fresh !== false) {
-      return { status: 'park', reason: 'resume-driver no longer legal: the driver\'s last heartbeat is fresh (or freshness could not be confirmed) at re-check time' };
-    }
-    return { status: 'ok', reason: 'resume-driver remains legal: run is not settled, evidence is recognized, and the driver has no fresh heartbeat' };
-  }
-  if (action.type === 'reassign-driver') {
-    const authority = evidence.find((e) => e.type === 'replacement-authority' && e.driverId === action.toDriverId);
-    if (!authority) {
-      return {
-        status: 'needs-input',
-        reason: `no replacement-authority evidence for driver "${action.toDriverId}" -- a fresh driver never gets a silent default action`,
-      };
-    }
-    return { status: 'ok', reason: `replacement-authority evidence still names driver "${action.toDriverId}"` };
   }
   return { status: 'park', reason: `unrecognized action type "${action.type}"` };
 }
@@ -356,38 +280,13 @@ export function checkApply({ snapshot, evidence, action, expectedSnapshot, expec
   return { outcome: 'ok' };
 }
 
-/** Derive evidence from an already-read snapshot's own controller/outbox/visibility --
+/** Derive evidence from an already-read snapshot's own attempt files and outbox --
  * pure, no fs of its own (the snapshot was already read by the caller).
- * Authority invariant (§7 "never worker-supplied ownership"): replacement-authority
- * MUST be issued by a controller/supervisor into controller/, never read from the
- * worker-writable outbox/.
- * File-naming convention: `replacement-authority--<driverId>.json` in controller/
- * names a fresh driver's authorization; `ack-*`/`report-*`/`result-*.json`/`result.json` in outbox/
- * are the worker's own result artifacts (same prefixes findWorkerResult/the outbox
- * convention already use elsewhere); anything else is `unknown` -- which is
- * exactly what routes a recommendation to `park` rather than a guess. */
-export function collectEvidence(snapshot, opts = {}) {
-  const { now = () => new Date().toISOString() } = opts;
-  const nowIso = typeof now === 'function' ? now() : now;
-  const nowMs = Date.parse(nowIso);
+ * `ack-*`/`report-*`/`result-*.json`/`result.json` in outbox/ are the worker's own result artifacts
+ * (same prefixes findWorkerResult/the outbox convention already use elsewhere); anything else is
+ * `unknown` -- which is exactly what routes a recommendation to `park` rather than a guess. */
+export function collectEvidence(snapshot) {
   const evidence = [];
-
-  const lastSeenAt = snapshot.visibility?.lastSeenAt;
-  const seenAtMs = lastSeenAt ? Date.parse(lastSeenAt) : NaN;
-  const fresh = Number.isFinite(seenAtMs) && Number.isFinite(nowMs) && nowMs - seenAtMs < DRIVER_FRESH_MS;
-  evidence.push({ id: 'liveness', type: 'liveness', fresh });
-
-  // R7: replacement-authority evidence comes strictly from controller-owned state (snapshot.controller),
-  // never from the worker-writable outbox. Controller bookkeeping files (evaluator-baseline.json,
-  // commands, generations) are supervisor-internal and not external evidence, so non-authority files
-  // in controller/ are ignored, never pushed as unknown evidence.
-  for (const entry of snapshot.controller ?? []) {
-    const name = entry.name;
-    const authorityMatch = /^replacement-authority--(.+)\.json$/.exec(name);
-    if (authorityMatch) {
-      evidence.push({ id: name, type: 'replacement-authority', driverId: authorityMatch[1] });
-    }
-  }
 
   // The attempt directory's own contract files (receipt, gate exit, step receipts) are named evidence.
   for (const name of snapshot.attemptFiles ?? []) evidence.push({ id: name, type: 'attempt-receipt' });

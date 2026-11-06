@@ -27,6 +27,7 @@ import path from 'node:path';
 import { findWorkerClaim } from '../../run-supervisor/worker-artifacts.mjs';
 import { publishMutableProjection } from '../../native/proof-helpers.mjs';
 import { listAssignmentRuns } from './assignment-layout.mjs';
+import { probe } from '../../holder-lock/index.mjs';
 
 export class VisibilityError extends Error {
   constructor(code, message, details = {}) {
@@ -57,12 +58,6 @@ export const VISIBILITY_STATES = Object.freeze([
  * and wrote a RunResult -- it says nothing about whether the work succeeded.
  * `died` and `unknown` are reachable only through reconciliation. */
 export const RUN_STATUSES = Object.freeze(['running', 'settled', 'died', 'unknown']);
-
-/** How long a driver's last heartbeat stays evidence that it is still driving.
- * The adapter beats every 10s, so this is six missed beats -- long enough that
- * a slow filesystem or a busy machine never costs a live run its status, short
- * enough that a killed dispatch shows up within a minute. */
-const DRIVER_FRESH_MS = 60000;
 
 const VISIBILITY_FILE = 'visibility.json';
 const RUN_FILE = 'run.json';
@@ -205,11 +200,27 @@ export function classifyRunOutcome(runDir, { liveness = 'unknown' } = {}) {
   return { outcome, resultPath, runMeta, changed: runMeta.status !== outcome };
 }
 
-/** Running assignment runs and legacy dispatch-runs with no fresh driver heartbeat. */
-export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now = Date.now } = {}) {
+/**
+ * Whether the supervisor of an attempt holds its attempt lock: `held` while the attempt lives, `free` when
+ * nobody does (also an attempt of a run from before the supervisor, which has no lock file), `unknown` when
+ * the lock cannot be read. Reads only; a lock file that was never made is not made here.
+ */
+export function attemptLockState(attemptDir) {
+  const dir = path.resolve(attemptDir);
+  if (!fs.existsSync(path.join(dir, 'attempt.lock'))) return 'free';
+  const runsDir = path.dirname(dir);
+  if (path.basename(runsDir) !== 'runs') return 'unknown';
+  try {
+    return probe('attempt', { runDir: path.dirname(runsDir), NN: path.basename(dir) }).result;
+  } catch {
+    return 'unknown';
+  }
+}
+
+/** Runs whose record says running although nobody holds their attempt lock: the orphans a reconcile may settle. */
+export function findRunningRuns(fgosDir) {
   const candidates = [...listAssignmentRuns(fgosDir)].map(({ runDir, assignmentId }) => ({ runDir, assignmentId }));
   const found = [];
-  const at = now();
   const listDirs = (d) => {
     try {
       if (!fs.lstatSync(d).isDirectory()) return [];
@@ -229,11 +240,8 @@ export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now 
   for (const { runDir: dir, assignmentId } of candidates) {
     const meta = readJson(path.join(dir, RUN_FILE));
     if (!meta || meta.status !== 'running') continue;
-    // Driver evidence has the same freshness policy at every assignment depth.
-    const seen = readJson(path.join(dir, VISIBILITY_FILE))?.lastSeenAt;
-    const seenAt = seen ? Date.parse(seen) : NaN;
-    if (Number.isFinite(seenAt) && at - seenAt < driverFreshMs) continue;
-    found.push({ runDir: dir, runId: meta.runId ?? null, startedAt: meta.startedAt ?? null, lastSeenAt: seen ?? null, ...(assignmentId ? { assignmentId } : {}) });
+    if (attemptLockState(dir) !== 'free') continue;
+    found.push({ runDir: dir, runId: meta.runId ?? null, startedAt: meta.startedAt ?? null, ...(assignmentId ? { assignmentId } : {}) });
   }
   return found;
 }

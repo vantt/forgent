@@ -1,6 +1,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -12,6 +13,7 @@ import {
   findWorkerResult,
   classifyRunOutcome,
   findRunningRuns,
+  attemptLockState,
   reconcileRun,
   markRunSettled,
   VisibilityError,
@@ -247,30 +249,39 @@ test('the actor lease is gone, not merely unused', async () => {
   assert.equal(mod.releaseActor, undefined);
 });
 
-test('a run whose driver just checked in is busy, not orphaned', () => {
+test('a run whose attempt lock is held is busy, not orphaned, however old its last heartbeat', () => {
   const fgosDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-beat-'));
+  let held;
   try {
-    const mk = (rel, runId, lastSeenAt) => {
+    const mk = (rel, runId, { lock = false, lastSeenAt = null } = {}) => {
       const d = path.join(fgosDir, rel);
       fs.mkdirSync(d, { recursive: true });
       fs.writeFileSync(path.join(d, 'run.json'), JSON.stringify({ runId, status: 'running' }));
       if (lastSeenAt) fs.writeFileSync(path.join(d, 'visibility.json'), JSON.stringify({ status: 'briefed', lastSeenAt }));
+      if (lock) fs.writeFileSync(path.join(d, 'attempt.lock'), '');
+      return d;
     };
-    const now = Date.now();
-    mk('dispatch-runs/w/1', 'beating', new Date(now - 5000).toISOString());
-    mk('dispatch-runs/w/2', 'silent', new Date(now - 600000).toISOString());
-    mk('dispatch-runs/w/3', 'never-wrote-one', null);
-    mk('assignments/unit-run-live/producer/1/runs/01', 'nested-beating', new Date(now - 5000).toISOString());
+    const longAgo = new Date(Date.now() - 600000).toISOString();
+    mk('assignments/unit-run-live/producer/1/runs/01', 'supervised', { lock: true, lastSeenAt: longAgo });
+    mk('assignments/unit-run-gone/producer/1/runs/01', 'supervisor-gone', { lock: true, lastSeenAt: new Date().toISOString() });
+    mk('dispatch-runs/w/1', 'before-the-supervisor', { lastSeenAt: new Date().toISOString() });
+    const acquired = acquireSync(createLockScope('test-supervisor'), 'attempt', { runDir: path.join(fgosDir, 'assignments/unit-run-live/producer/1'), NN: '01' });
+    assert.equal(acquired.result, 'acquired');
+    held = acquired.handle;
 
-    // Writing `unknown` over a run five minutes into a 35-minute ceiling
-    // stops every watcher on a run that is still being driven.
-    const ids = findRunningRuns(fgosDir, { now: () => now }).map((r) => r.runId).sort();
-    assert.deepEqual(ids, ['never-wrote-one', 'silent']);
+    // Writing `unknown` over a run whose supervisor still holds its attempt lock stops every watcher
+    // on a run that is still being driven; a fresh heartbeat does not keep a run nobody holds alive.
+    const ids = findRunningRuns(fgosDir).map((r) => r.runId).sort();
+    assert.deepEqual(ids, ['before-the-supervisor', 'supervisor-gone']);
+    assert.equal(attemptLockState(path.join(fgosDir, 'assignments/unit-run-live/producer/1/runs/01')), 'held');
 
-    // The window is a parameter, not a belief: shrink it and the same live
-    // run reads as abandoned.
-    assert.equal(findRunningRuns(fgosDir, { now: () => now, driverFreshMs: 1000 }).length, 4);
-  } finally { fs.rmSync(fgosDir, { recursive: true, force: true }); }
+    held.release();
+    held = null;
+    assert.equal(findRunningRuns(fgosDir).length, 3, 'once the supervisor lets go the run is an orphan');
+  } finally {
+    held?.release();
+    fs.rmSync(fgosDir, { recursive: true, force: true });
+  }
 });
 
 test('a crashed confined run whose claim is only under worker-output/outbox reconciles to settled', () => {

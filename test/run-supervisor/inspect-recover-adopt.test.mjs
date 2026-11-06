@@ -150,12 +150,12 @@ test('a closed attempt a later resume replaced reads superseded', { skip }, () =
   assert.equal(view.attemptOutcome, 'closed');
 });
 
-test('a run from before the supervisor reads legacy-run and recovers as it always did', { skip }, () => {
+test('a run from before the supervisor reads legacy-run and has nothing to adopt', { skip }, () => {
   const p = project({ supervised: false, extraRun: { visibility: null } });
   assert.equal(showRunUseCase(p.ctx, { runId: 'run-1' }).attemptState, 'legacy-run');
   const rec = recoverObserveUseCase(p.ctx, { runId: 'run-1' });
-  assert.equal(rec.kind, 'recommendation');
-  assert.deepEqual(rec.action, { type: 'resume-driver' });
+  assert.equal(rec.kind, 'park');
+  assert.match(rec.reason, /legacy-run/);
 });
 
 test('a run from before the supervisor that left a worker result nobody read parks as already settled', { skip }, () => {

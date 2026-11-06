@@ -1429,7 +1429,7 @@ export const COMMAND_REGISTRY = [
           properties: {
             'run-id': { type: 'string', description: 'The runId to recover (positional, --run-id or --run).' },
             run: { type: 'string', description: 'Same as --run-id.' },
-            intent: { type: 'string', description: 'Without --action only: "resume" (default; for an attempt of the run supervisor the recommendation is `adopt`), or "reassign" (needs replacement-authority evidence in the run\'s controller directory, or the recommendation comes back "needs-input").' },
+            intent: { type: 'string', description: 'Without --action only: "resume" (default; the recommendation is `adopt` for an attempt nobody holds that is not closed, otherwise the run is parked with the reason). "reassign" is parked: no action replaces a driver.' },
             action: { type: 'string', description: 'JSON-encoded action object to apply, exactly as returned by a prior recover call\'s own `action` field. Its presence selects the apply path.' },
             'expected-snapshot': { type: 'string', description: 'Apply only: the `snapshotHash` from the recommendation being applied.' },
             'expected-control-epoch': { type: 'string', description: 'Apply only: the `expectedControlEpoch` from the recommendation being applied.' },
@@ -1441,8 +1441,7 @@ export const COMMAND_REGISTRY = [
         },
         examples: [
           'fgos dispatch recover run_abc123',
-          'fgos dispatch recover run_abc123 --intent reassign',
-          'fgos dispatch recover run_abc123 --action \'{"type":"resume-driver"}\' --expected-snapshot <hash> --expected-control-epoch 0 --expected-expires-at <iso> --action-key <key>',
+          'fgos dispatch recover run_abc123 --action \'{"type":"adopt","attemptId":"<attempt-id>"}\' --expected-snapshot <hash> --expected-control-epoch 0 --expected-expires-at <iso> --action-key <key>',
         ],
       },
       reconcile: {
