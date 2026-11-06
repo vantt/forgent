@@ -11,7 +11,10 @@ import path from 'node:path';
 import { createTerminalControl, TerminalControlError } from '../terminal-control/client.mjs';
 import { resolveTerminalConfig, terminalConfigProblems, terminalRouteConfig } from '../terminal-control/config.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
-import { READY_TIMEOUT_MS } from '../runner/dispatch/herdr-deadlines.mjs';
+
+/** `agent start`'s own documented default: how long a launched agent gets to become ready.
+ * `terminal.allocationGraceMs` must stay larger than this. */
+export const READY_TIMEOUT_MS = 30000;
 
 /** An empty `FGOS_HERDR_ANCHOR_PANE` is the variable's own shape, judged here; the route says whether a named pane resolves. */
 const anchorVerdict = (named, answer) => (named === '' ? { failure: 'FGOS_HERDR_ANCHOR_PANE is empty' }

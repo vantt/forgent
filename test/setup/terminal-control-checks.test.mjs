@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import {
   checkTerminalControl,
   checkTerminalAllocations,
+  READY_TIMEOUT_MS,
 } from '../../src/setup/terminal-control-checks.mjs';
 import { createTerminalControl } from '../../src/terminal-control/client.mjs';
 import {
@@ -20,7 +21,6 @@ import {
   retainFailedPaneMsOf,
   terminalRouteConfig,
 } from '../../src/terminal-control/config.mjs';
-import { READY_TIMEOUT_MS } from '../../src/runner/dispatch/herdr-deadlines.mjs';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/registrations.mjs';
 import { globalConfigPath as globalConfigFile, writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 

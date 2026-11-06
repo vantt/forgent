@@ -263,7 +263,6 @@
     "src/run-supervisor/cwd-lock.mjs": "infra",
     "src/run-supervisor/dispatch-error.mjs": "infra",
     "src/native/proof-helpers.mjs": "infra",
-    "src/runner/dispatch/herdr-deadlines.mjs": "infra",
     "src/runner/dispatch/terminal-slot.mjs": "infra",
     "src/runner/dispatch/herdr-round.mjs": "infra",
     "src/run-supervisor/worker-artifacts.mjs": "infra",
