@@ -291,6 +291,8 @@ function holdCancelOnSignal(options) {
 
 /** How many times in a row a seat's named account may be taken from it before the seat is refused. */
 const MAX_LEASE_CONFLICTS = 8;
+/** How many times a seat whose brief never reached its agent is launched again on the same candidate. */
+const MAX_BRIEF_RETRIES = 1;
 
 /** Whether an attempt ended because the lease refused the account Seat Binding named (nothing ran). */
 function isLeaseConflict(runResult) {
@@ -590,13 +592,14 @@ async function runRoleBody(ctx, { seat, unit: seatUnit, round = 1, independentOf
     if (spent) return spent;
     const result = await runAttempt(ctx, role, { attempts, attemptNo, bound, preExistingInScope, nativeBaseline });
     lastResult = result;
-    if (result.outcome !== 'provider-limit') return result;
+    const briefNotDelivered = result.outcome !== 'provider-limit' && result.outcome !== 'pass' && attempts[attemptNo].briefNotDelivered === true;
+    if (result.outcome !== 'provider-limit' && !briefNotDelivered) return result;
     const leaseConflict = isLeaseConflict(result.runResult);
     const answer = answerProviderLimit({
-      result, bound, attempts, attemptNo,
+      result, bound, attempts, attemptNo, briefNotDelivered,
       ...(leaseConflict ? {} : {
         changed: writesSinceLaunch(ctx, attempts[attemptNo].writeBaseline),
-        rotation: bound.pool ? inspectAccountRotation({ runnerConfig: ctx.withAccounts(unitRecord.configSnapshot.runner), pool: bound.pool, runtimeDir: ctx.options.providerCapacityRuntimeDir }) : null,
+        rotation: bound.pool && !briefNotDelivered ? inspectAccountRotation({ runnerConfig: ctx.withAccounts(unitRecord.configSnapshot.runner), pool: bound.pool, runtimeDir: ctx.options.providerCapacityRuntimeDir }) : null,
       }),
     });
     if (answer.stop) {
@@ -609,8 +612,8 @@ async function runRoleBody(ctx, { seat, unit: seatUnit, round = 1, independentOf
       return { ...result, fallbackExhausted };
     }
     if (answer.rebind) {
-      // The account Seat Binding named could not be taken any more: nothing ran. Bound again, in the queue,
-      // from a fresh view of the accounts; a rebind, not a step of the walk and not a launch.
+      // Bound again, in the queue: after a lease conflict (nothing ran) from a fresh view of the accounts, a
+      // rebind and not a launch; after a brief that never reached the agent, the same candidate as a new launch.
       const rebound = await bindInQueue(ctx, role, attemptNo + 1, answer.rebind);
       if (rebound.refused) return refusedSeat(role, rebound.refused);
       bound = rebound;
@@ -834,16 +837,19 @@ function writesSinceLaunch(ctx, baseline) {
 }
 
 /**
- * What a seat does after an attempt that ended on a provider limit. Pure: it binds, persists and reads
+ * What a seat does after an attempt that ended on a provider limit, or whose brief never reached its agent
+ * (`briefNotDelivered`: the launch was abandoned before the brief, or the pane's foreground was no agent; a
+ * brief whose delivery is unknown is not one, the agent may have it). Pure: it binds, persists and reads
  * nothing; the caller performs the answer.
  *
  * - A lease that could not take the account Seat Binding named (nothing ran): `{ rebind }` from a fresh
  *   view of the accounts, unless the account was pinned or the seat lost its account more than
  *   MAX_LEASE_CONFLICTS times in a row (`{ stop }`).
- * - Otherwise two cases end the seat and leave the decision to a person: a writing seat that already
- *   changed the worktree is never run again on top of its own half-done work (checked first, so a pinned
- *   seat still names what it changed), and a pinned account is never answered with another account or
- *   executor.
+ * - A writing seat that already changed the worktree is never run again on top of its own half-done work
+ *   (checked first, so a pinned seat still names what it changed).
+ * - A brief that never reached the agent: `{ rebind }` on the same candidate, at most MAX_BRIEF_RETRIES
+ *   times for the seat's round.
+ * - A pinned account is never answered with another account or executor.
  * - Else `{ walk }`: first another account of the same candidate (`rotation`, while a usable account is
  *   left and fewer retries than the pool has accounts were spent, never a loop on one account), then the
  *   next candidate (`step`). `faultPool` is a pool whose login failed, which no later walk of the unit
@@ -854,12 +860,13 @@ function writesSinceLaunch(ctx, baseline) {
  * @param {object} args.bound the binding the attempt ran on
  * @param {object[]} args.attempts the seat's recorded attempts of this round, the current one included
  * @param {number} args.attemptNo index of the current attempt
+ * @param {boolean} [args.briefNotDelivered] the attempt ended without its agent ever receiving the brief
  * @param {{ total: number, healthy: number } | null} [args.rotation] from inspectAccountRotation
  * @param {{ paths: string[], headMoved: boolean } | { error: string } | null} [args.changed] what the seat changed since its launch
  * @returns {{ stop: { refused?: object, fallbackExhausted?: object, retryStopped?: object } }
  *   | { rebind: object } | { walk: { rotation?: object, step: object, faultPool?: string, accountRotations?: number } }}
  */
-export function answerProviderLimit({ result, bound, attempts, attemptNo, rotation = null, changed = null }) {
+export function answerProviderLimit({ result, bound, attempts, attemptNo, briefNotDelivered = false, rotation = null, changed = null }) {
   const from = launchedFrom(bound);
   const pinnedAccount = bound.account ? `${bound.account.pool}/${bound.account.id}` : null;
   if (isLeaseConflict(result.runResult)) {
@@ -877,14 +884,19 @@ export function answerProviderLimit({ result, bound, attempts, attemptNo, rotati
   const stop = (reason, detail, extra = {}) => ({
     stop: { retryStopped: { reason, ...extra }, fallbackExhausted: { from, reason, detail, ...extra, ...accountRotations } },
   });
+  if (briefNotDelivered && attempts.filter((a) => a.briefNotDelivered === true).length > MAX_BRIEF_RETRIES) {
+    return { stop: { fallbackExhausted: { from, reason: 'brief-not-delivered', detail: `the agent never received its brief in ${MAX_BRIEF_RETRIES + 1} launches in a row` } } };
+  }
   const pinned = pinnedAccount ? { accountPinned: pinnedAccount } : {};
+  const ending = briefNotDelivered ? 'its brief was lost' : 'its provider limit';
   if (changed?.error !== undefined) {
     return stop('partial-writes', `could not tell whether the seat changed the worktree (${changed.error}), so it is not run again by itself`, { paths: [], ...pinned });
   }
   if (changed && (changed.paths.length > 0 || changed.headMoved)) {
     const what = [changed.paths.join(', '), changed.headMoved ? 'HEAD moved' : ''].filter(Boolean).join('; ');
-    return stop('partial-writes', `the seat changed the worktree before its provider limit (${what}); it is not run again on top of that work: keep, finish or undo the changes, then resume`, { paths: changed.paths, headMoved: changed.headMoved, ...pinned });
+    return stop('partial-writes', `the seat changed the worktree before ${ending} (${what}); it is not run again on top of that work: keep, finish or undo the changes, then resume`, { paths: changed.paths, headMoved: changed.headMoved, ...pinned });
   }
+  if (briefNotDelivered) return { rebind: { continuity: bound, from: bound, reason: 'brief-not-delivered' } };
   if (pinnedAccount) {
     return stop('account-pinned', `account "${pinnedAccount}" was pinned, so the seat is not moved to another account or executor; pin another account or wait for this one`);
   }

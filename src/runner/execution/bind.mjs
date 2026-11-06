@@ -406,7 +406,8 @@ function timeoutOf(matchingOverride, unit) {
 function fallbackFrom(previous, binding, { reason, rotation, detail, runnerConfig }) {
   const base = { executor: previous.executor, invocation: previous.invocation ?? null, transport: previous.transport ?? null, pool: previous.pool ?? null, reason };
   if (rotation) return { ...base, kind: 'account-rotation', ...detail };
-  if (reason === 'lease-conflict') return { ...base, kind: 'lease-conflict' };
+  // Not a step of the walk: the same candidate again after its lease or its brief failed.
+  if (reason === 'lease-conflict' || reason === 'brief-not-delivered') return { ...base, kind: reason };
   const sameFamily = getProviderFamily(runnerConfig, previous.executor) === getProviderFamily(runnerConfig, binding.executor);
   return { ...base, kind: 'next-candidate', walk: sameFamily ? 'entry' : 'family' };
 }
