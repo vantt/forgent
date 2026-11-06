@@ -34,7 +34,7 @@ test('ordinary source is code, reviewed at standard rigor, and code outranks tes
 });
 
 test('a slice that touches a locked contract, a schema or a locked law is high, whatever else it writes', () => {
-  for (const file of ['packages/git/contracts/receipt.v1.schema.json', 'core/config-schema/runner.schema.yaml', 'docs/platform-foundations.md', 'docs/specs/platform-foundations.md', 'domains/coding/slice-kinds.yaml']) {
+  for (const file of ['packages/git/contracts/receipt.v1.schema.json', 'core/config-schema/runner.schema.yaml', 'docs/platform/platform-foundations.md', 'domains/coding/slice-kinds.yaml']) {
     for (const writes of [[file], ['docs/notes.md', file], ['test/a.test.mjs', 'src/a.mjs', file]]) {
       const slice = classify(writes);
       assert.equal(slice.kind, 'contract', `${writes.join(', ')}`);
@@ -98,10 +98,17 @@ test('a directory dotted like a file is still a directory: the data directory ne
   }
 });
 
+test('the locked-law file the table names exists in this checkout and an edit of it is high', () => {
+  const law = 'docs/platform/platform-foundations.md';
+  assert.ok(fs.existsSync(path.join(path.dirname(new URL(import.meta.url).pathname), '..', '..', law)), `${law} must be a real file, or the table protects nothing`);
+  const slice = classify([law]);
+  assert.deepEqual([slice.kind, slice.rigor, slice.pattern], ['contract', 'high', 'reviewed']);
+});
+
 test('a path written with doubled slashes or dot segments is judged as the path it names', () => {
   for (const [alias, kind] of [
-    ['docs//platform-foundations.md', 'contract'],
-    ['docs/./platform-foundations.md', 'contract'],
+    ['docs/platform//platform-foundations.md', 'contract'],
+    ['docs/platform/./platform-foundations.md', 'contract'],
     ['packages/git//contracts/mutation-census.v1.json', 'contract'],
     ['./packages/./git/contracts/x.json', 'contract'],
     ['src/./git/scoped-commit.mjs', 'platform'],

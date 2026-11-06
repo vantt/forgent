@@ -10,6 +10,7 @@
 // `proposeFromSlices` and `proposeFromRequest` are pure over injected reads; `runPropose` is the CLI's shell over
 // the real checkout, config and case ledgers.
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -38,6 +39,19 @@ const rank = (rigor) => RIGOR_ORDER.indexOf(rigor);
 const isText = (value) => typeof value === 'string' && value.trim() !== '';
 const slugOf = (text) => String(text).normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[đĐ]/g, 'd').toLowerCase()
   .replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '').slice(0, 40).replace(/-+$/, '') || 'case';
+
+/**
+ * What a plan's case is called when the person names no worktree or branch. Every plan file is called plan.md, so
+ * the plan's own directory tells two plans apart; two directories with the same leaf name (or the same first
+ * forty letters) are told apart by a short hash of the plan's directory path, added after the name is cut.
+ */
+export function planCaseSlug(plan) {
+  const posix = path.posix.normalize(plan.split(path.sep).join('/'));
+  const dir = path.posix.dirname(posix);
+  const base = path.posix.basename(posix, path.posix.extname(posix));
+  const name = slugOf(base.toLowerCase() === 'plan' ? path.posix.basename(dir) : base);
+  return `${name}-${crypto.createHash('sha256').update(dir).digest('hex').slice(0, 6)}`;
+}
 
 /** A value `fgos`'s argument parser reads as one argument: no leading `--`, which it takes for a flag. */
 const argumentSafe = (value) => typeof value === 'string' && !value.trimStart().startsWith('--');
@@ -220,19 +234,22 @@ function commandsFor({ proposal, guide, plan, request, worktree, branch, baseCom
   for (const slice of slices) {
     const inputs = [...new Set([...(plan ? [plan] : []), ...slice.inputs])];
     const inputFlag = inputs.length > 0 ? ['--input', inputs.join(',')] : [];
-    if (slice.writes.length === 0) {
+    const readOnly = slice.writes.length === 0;
+    if (readOnly) {
       run(`slice-${slice.id}`, `read-only slice "${slice.id}"`, slice.objective, ['--activity', slice.activity, '--capability', slice.capability, '--rigor', slice.rigor, '--pattern', slice.pattern, '--worktree', worktree, ...inputFlag, ...(slice.activity === 'review-item' ? ['--route', 'may-instead', '--reason', 'the slice reads work and writes nothing'] : [])]);
-      continue;
+    } else {
+      const swap = implementPattern !== undefined && implementPattern !== slice.pattern;
+      run(`slice-${slice.id}`, `writing slice "${slice.id}" (${slice.kind}, ${slice.rigor})`, slice.objective, [
+        '--activity', 'implement-item', '--capability', slice.capability, '--rigor', slice.rigor, '--pattern', slice.pattern,
+        ...(swap ? ['--reason', `${slice.kind} slices are ${slice.pattern}: ${slice.kind === 'docs' ? 'a document is written once and read by a reviewer afterwards' : 'the table names this pattern for the kind'}`] : []),
+        '--writes', slice.finalWrites.join(','), '--worktree', worktree, '--verify', slice.verify, ...inputFlag,
+      ]);
     }
-    const swap = implementPattern !== undefined && implementPattern !== slice.pattern;
-    run(`slice-${slice.id}`, `writing slice "${slice.id}" (${slice.kind}, ${slice.rigor})`, slice.objective, [
-      '--activity', 'implement-item', '--capability', slice.capability, '--rigor', slice.rigor, '--pattern', slice.pattern,
-      ...(swap ? ['--reason', `${slice.kind} slices are ${slice.pattern}: ${slice.kind === 'docs' ? 'a document is written once and read by a reviewer afterwards' : 'the table names this pattern for the kind'}`] : []),
-      '--writes', slice.finalWrites.join(','), '--worktree', worktree, '--verify', slice.verify, ...inputFlag,
-    ]);
-    const review = (id, capability, pattern, why) => run(id, why, `Review the change of slice "${slice.id}" (${slice.finalWrites.join(', ')}): say what is wrong with it, or that nothing is.`, ['--activity', 'review-item', '--route', 'may-instead', '--reason', why, '--capability', capability, '--pattern', pattern, '--rigor', slice.rigor, '--worktree', worktree]);
+    // The frame counted these reviews, so every slice that asks for one gets the line, a read-only slice included.
+    const subject = readOnly ? `the findings of read-only slice "${slice.id}"` : `the change of slice "${slice.id}" (${slice.finalWrites.join(', ')})`;
+    const review = (id, capability, pattern, why) => run(id, why, `Review ${subject}: say what is wrong with ${readOnly ? 'them' : 'it'}, or that nothing is.`, ['--activity', 'review-item', '--route', 'may-instead', '--reason', why, '--capability', capability, '--pattern', pattern, '--rigor', slice.rigor, '--worktree', worktree]);
     if (slice.earlyReview === true) review(`early-review-${slice.id}`, 'review', 'solo', `an early read of slice "${slice.id}" before the rest is built on it`);
-    if (slice.followUp) review(`follow-up-${slice.id}`, slice.followUp.capability, slice.followUp.pattern, `${slice.kind} slices are read by a reviewer after they are written`);
+    if (slice.followUp) review(`follow-up-${slice.id}`, slice.followUp.capability, slice.followUp.pattern, readOnly ? `the findings of slice "${slice.id}" are read by a reviewer after it ran` : `${slice.kind} slices are read by a reviewer after they are written`);
   }
   const writing = slices.filter((s) => s.writes.length > 0);
   if (writing.length > 0) {
@@ -444,7 +461,7 @@ export function proposeFromSlices({ manifest, plan, guide, runnerConfig, shipped
   if (writing.length > 0 && gate === null && !runnerConfig?.capabilities?.['code:implement']?.verify) {
     refusals.push({ code: 'gate-command-missing', detail: 'the whole-worktree gate needs a command: give "gate" in the slice list, or configure a verify command for code:implement' });
   }
-  const slug = slugOf(plan ? path.basename(plan, path.extname(plan)) : request);
+  const slug = plan ? planCaseSlug(plan) : slugOf(request);
   proposal.worktree = worktree ?? `../${slug}-worktree`;
   proposal.branch = branch ?? `case/${slug}`;
   if (refusals.length > 0 || proposal.frame === null) {

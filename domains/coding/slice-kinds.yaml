@@ -36,8 +36,7 @@ rules:
       - "core/config-schema/**"
       - "**/*.schema.json"
       - "**/*.schema.yaml"
-      - "docs/platform-foundations.md"
-      - "docs/specs/platform-foundations.md"
+      - "docs/platform/platform-foundations.md"
       - "domains/coding/slice-kinds.yaml"
   - id: platform
     kind: platform

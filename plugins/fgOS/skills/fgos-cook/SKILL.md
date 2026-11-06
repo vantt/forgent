@@ -3,10 +3,12 @@ name: fgos-cook
 user-invocable: false
 description: >-
   Entry for delivering a whole plan written by AgentKit's `ak:plan` (a plan.md
-  with phase files): reads all of it, opens a conductor case on the coding guide
-  with a frame the owner approves, then picks slices one at a time, dispatches
-  them through `fgos run` / `fgos workflow` naming the case, checks every result
-  itself, judges review findings, adapts, integrates on one branch and reports.
+  with phase files): reads all of it, writes its slices, gets one proposal from
+  `fgos workflow propose` (frame, slice kinds, rigor, commands) for the owner to
+  approve, opens a conductor case inside that frame, then dispatches the slices one
+  at a time through `fgos run` / `fgos workflow` naming the case, checks every
+  result itself, judges review findings, adapts, integrates on one branch and
+  reports.
   Use for "run this plan", "cook this plan", "deliver phases 1-3 of <plan>". Not
   for one ad-hoc task or a single phase to run as-is (use `fgos-run`), not the
   `/fgOS:deliver` Work-item command, and not AgentKit's own `ak:cook`, which
@@ -29,36 +31,50 @@ skill fills its hook slots below and does not restate it.
 
 **Limits, stated up front.** Slices run **one at a time in one worktree** bound
 to the case: the Git component's land operation is not ready, so there is no safe
-way to integrate parallel writing branches. The route table (which capability,
-rigor, pattern and persona per slice kind) is **pending** on Seat Binding, see
-[`references/route-table-pending.md`](references/route-table-pending.md). You
-never set a provider, model or tier.
+way to integrate parallel writing branches. Capability, pattern and rigor per slice
+kind come from the versioned slice table (`domains/coding/slice-kinds.yaml`)
+through `fgos workflow propose`: you may raise a slice's rigor with a reason, never
+lower it. You never set a provider, model or tier.
 
 ## Route
 
 1. **Read the whole plan.** `plan.md`, every phase file, the decisions it locks,
    any "after red-team" corrections (they beat the older text). Compare it with
-   the code as it is now. How to read an `ak:plan` plan, and how to size the frame
-   from it: [`references/reading-ak-plans.md`](references/reading-ak-plans.md).
-2. **Ask for the frame, once.** Put the proposed frame (outcome, scope and
-   non-goals, counts, rigor floor, consent points) and every ambiguity of the
-   plan into one batched message in the decision-question template
-   (`../_shared/decision-question.md`). Inside the approved frame you decide and
-   report; you ask again only for the triggers in the hook table.
-3. **Open the case.** One worktree for the whole case, then
-   `fgos workflow start coding/feature --request "<outcome>" --frame <counts> --worktree <path>`.
-   Exact commands: [`references/case-and-doors.md`](references/case-and-doors.md).
-   Check once that the case really records progress (section "Self-check of the
-   case" there); if it does not, stop with `milestone-not-recorded`.
+   the code as it is now. How to read an `ak:plan` plan:
+   [`references/reading-ak-plans.md`](references/reading-ak-plans.md).
+2. **Write the slices and propose.** Slicing is your judgment: cut at capability
+   and file boundaries, name each slice's writes, one narrow `verify`, its real
+   dependencies, a rigor raise with its reason where the paths hide a risk. Put
+   them in a slice list and run
+   `fgos workflow propose --slices <file> --plan <plan.md>` (a small task with no
+   plan: `--request "<text>" --writes <paths> --verify "<cmd>"`). The command
+   classifies each slice by its write paths, sizes the frame, checks the proposal
+   against the repository and prints the owner's question and the commands that
+   follow an approval; it writes nothing. Fields, exit codes and every refusal:
+   [`references/propose.md`](references/propose.md). Never size a frame or pick a
+   pattern by hand.
+3. **Ask once.** Show the question it printed, in the decision-question template
+   (`../_shared/decision-question.md`), together with every ambiguity of the plan,
+   in one batched message. A slice that must wait for the owner (data, migrations,
+   anything irreversible) is in that question, never dispatched. Inside the
+   approved frame you decide and report; you ask again only for the triggers in the
+   hook table.
+   After the owner approves, run the printed commands in order and exactly as
+   printed (worktree and branch names, `--base`, the frame, `--inherit` when it
+   continues a closed case, then the slices and the final gate). What each line
+   means: [`references/case-and-doors.md`](references/case-and-doors.md). Check once that
+   the case really records progress (section "Self-check of the case" there); if it
+   does not, stop with `milestone-not-recorded`.
 4. **Loop, one slice at a time:** read `fgos workflow status <caseId>`, pick the
    next ready slice (the plan's order is a hint, the milestones and the code
-   decide), run `fgos dispatch decide --for <capability>`, dispatch with
-   `--case <caseId> --activity <id>`, then verify the result yourself (re-run the
-   slice's check, read the diff against the declared writes, read the checker's
-   report). Record the finding dispositions in the notebook. Questions that wait
+   decide), run `fgos dispatch decide --for <capability>`, dispatch with the
+   printed `fgos run` line (`--case <caseId> --activity <id>`), then verify the
+   result yourself (re-run the slice's check, read the diff against the declared
+   writes, read the checker's report). Record the finding dispositions in the notebook. Questions that wait
    for the owner are parked and batched; slices that do not depend on them go on.
 5. **Integrate and hand off.** All slices already sit on the case branch. Run the
-   plan's full verification in that worktree yourself, reconcile what the plan
+   printed `workflow gate`, then the plan's own full verification in that worktree
+   yourself when it is wider than the gate's command, reconcile what the plan
    says against what was built, and report to the owner with branch, evidence and
    what is missing. Merge is the owner's decision at the approve door: you never
    merge, never write consent, never edit plan status.
@@ -75,6 +91,8 @@ never set a provider, model or tier.
 - Call a door for a case nested in your worker's own Unit, or let a confined
   worker dispatch a writer: workers ask you.
 - Invent a rigor-to-tier rule, pin an executor, or write a persona file.
+- Compute the frame, the slice kinds or the commands yourself: `propose` owns them,
+  and a proposal it refuses is fixed at its cause, not worked around.
 
 ## Facade hook values
 
@@ -97,5 +115,5 @@ never set a provider, model or tier.
 - Never claim a slice is verified because a worker or a checker said so; claim only
   what you re-ran or read.
 - Do not touch Work items: the old Work-item path is `/fgOS:deliver`.
-- The route table is not here and not in this skill's references until Seat Binding
-  settles what rigor and tier mean.
+- The frame is the owner's once approved: you may narrow it, never widen it. A
+  widened frame is a new proposal and a question.

@@ -3,10 +3,12 @@ name: fgos-cook
 user-invocable: false
 description: >-
   Entry for delivering a whole plan written by AgentKit's `ak:plan` (a plan.md
-  with phase files): reads all of it, opens a conductor case on the coding guide
-  with a frame the owner approves, then picks slices one at a time, dispatches
-  them through `fgos run` / `fgos workflow` naming the case, checks every result
-  itself, judges review findings, adapts, integrates on one branch and reports.
+  with phase files): reads all of it, writes its slices, gets one proposal from
+  `fgos workflow propose` (frame, slice kinds, rigor, commands) for the owner to
+  approve, opens a conductor case inside that frame, then dispatches the slices one
+  at a time through `fgos run` / `fgos workflow` naming the case, checks every
+  result itself, judges review findings, adapts, integrates on one branch and
+  reports.
   Use for "run this plan", "cook this plan", "deliver phases 1-3 of <plan>". Not
   for one ad-hoc task or a single phase to run as-is (use `fgos-run`), not the
   `/fgOS:deliver` Work-item command, and not AgentKit's own `ak:cook`, which

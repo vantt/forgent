@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { readStandardValue } from '../../src/config/facade.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { loadSliceTable } from '../../src/workflow/propose-classify.mjs';
-import { CASE_PLACEHOLDER, createProposePorts, proposeFromRequest, proposeFromSlices, readPassRigor, renderProposalText } from '../../src/workflow/propose.mjs';
+import { CASE_PLACEHOLDER, createProposePorts, planCaseSlug, proposeFromRequest, proposeFromSlices, readPassRigor, renderProposalText } from '../../src/workflow/propose.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const runnerConfig = readStandardValue('runner').value;
@@ -189,6 +189,35 @@ test('every generated line survives the shell: flags stay bare, values arrive wh
   const literal = p.commands.find((c) => c.id === 'slice-lit');
   assert.equal(literal.argv[1], CASE_PLACEHOLDER, 'the objective is the text the agent wrote, even when it spells the placeholder');
   assert.deepEqual(literal.caseSlots, [3]);
+});
+
+test('without an explicit worktree the case is named after the plan directory, and two plans never share a name', () => {
+  const named = 'plans/261101-1200-cool-thing/plan.md';
+  const p = proposeFromSlices({ manifest: { gate: 'node gate.mjs', slices: [slice('a', ['src/a.mjs'])] }, plan: named, guide, runnerConfig, shipped, ports: fakePorts({ files: [named, 'src/a.mjs'] }) });
+  assert.equal(p.ok, true, JSON.stringify(p.refusals));
+  assert.match(p.worktree, /^\.\.\/261101-1200-cool-thing-[0-9a-f]{6}-worktree$/);
+  assert.match(p.branch, /^case\/261101-1200-cool-thing-[0-9a-f]{6}$/);
+  const slugs = [
+    'plans/team-a/auth/plan.md', 'plans/team-b/auth/plan.md', 'plans/Feature_A/plan.md', 'plans/feature-a/plan.md',
+    'plans/very-long-name-that-exceeds-forty-characters-here/plan.md', 'plans/very-long-name-that-exceeds-forty-characters-herf/plan.md',
+  ].map(planCaseSlug);
+  assert.equal(new Set(slugs).size, slugs.length, slugs.join(' '));
+  assert.equal(planCaseSlug('plans/team-a/auth/PLAN.md'), planCaseSlug('plans/team-a/auth/plan.md'), 'the file name is compared without case: both are the plan of that directory');
+  assert.equal(planCaseSlug('plans/x//y/./plan.md'), planCaseSlug('plans/x/y/plan.md'), 'a path spelled differently is the same plan');
+});
+
+test('a read-only slice that asks for an early review or a follow-up gets those review lines too, as the frame counted them', () => {
+  const audit = { id: 'audit', objective: 'Audit the plan', writes: [], earlyReview: true, followUp: { capability: 'review', pattern: 'solo' } };
+  const p = propose([audit, slice('code', ['src/a.mjs'])]);
+  assert.equal(p.ok, true, JSON.stringify(p.refusals));
+  const ids = idsOf(p);
+  assert.ok(ids.indexOf('slice-audit') < ids.indexOf('early-review-audit') && ids.indexOf('early-review-audit') < ids.indexOf('follow-up-audit'), ids.join(','));
+  for (const id of ['early-review-audit', 'follow-up-audit']) {
+    const line = p.commands.find((c) => c.id === id);
+    assert.equal(flagValue(line, '--worktree'), '/wt/case', id);
+    assert.match(line.argv[1], /findings of read-only slice "audit"/, id);
+  }
+  assert.equal(p.breakdown.reads.followUps, 1, 'the frame counts the follow-up it now emits');
 });
 
 test('a review or a read-only slice reads the case worktree, where the change it reviews is', () => {

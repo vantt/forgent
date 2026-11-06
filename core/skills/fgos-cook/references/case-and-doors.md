@@ -6,32 +6,35 @@ refusals) are in `docs/platform/workflow/spec.md` and the shared doctrine
 file only fixes which command each step of this skill runs. Run every `fgos` command
 with stdin closed (`</dev/null`).
 
-## 1. One worktree for the case
+## 1. One worktree and the case
+
+`fgos workflow propose` prints, as its first two lines, the commands that create the
+case's worktree and open the case; run them as printed, with the names and numbers it
+chose (do not pick your own branch name or frame):
+
+```sh
+fgos worktree create <path> --branch <name> [--base <commit>]
+fgos workflow start coding/feature --request "<outcome>" \
+  --frame dispatches=<n>,mutatingDispatches=<n>,seatLaunchesPerDispatch=<n>,rigorFloor=<floor> \
+  [--inherit <closedCaseId>] --worktree <path> --json
+```
 
 Slices run serially, so one linked worktree and one branch carry the whole case; the
 runner commits each slice's declared `writes` onto it after a passing round.
+`worktree create` provisions dependencies and the skill directories (so a worker that
+declares `ak:cook` finds it). `workflow start` returns the `workflowRunId`, which is the
+`caseId` every later line names. When a closed case with the same plan and base commit
+is continued (`--inherit`), the proposal has no judge and validate lines: that case
+already did them. The guide `coding/feature` has activities and no process: nothing
+advances unless you run a line. Start only after the owner approved the frame. A frame
+flag may narrow the guide's defaults, never widen them, so a widened frame later means
+a new proposal and a question.
 
-```sh
-fgos worktree create <path> --branch <name>
-```
+## 2. The rest of the printed lines
 
-`worktree create` provisions dependencies and the skill directories (so a worker
-that declares `ak:cook` finds it). Pick a branch name that says what the plan is;
-take no name from the plan's own branch rules.
-
-## 2. Open the case
-
-```sh
-fgos workflow start coding/feature --request "<the outcome, one paragraph>" \
-  --frame dispatches=<n>,mutatingDispatches=<n>,seatLaunchesPerDispatch=<n>,rigorFloor=<floor> \
-  --worktree <path> --json
-```
-
-It returns the `workflowRunId`, which is the `caseId`. The guide `coding/feature`
-has activities and no process: nothing advances unless you propose. Start only
-after the owner approved the frame (sizing in `reading-ak-plans.md`). A frame flag
-may narrow the guide's defaults, never widen them, so a widened frame later means a
-new case and a question.
+After the two lines above come, in order, the read passes, one `fgos run` per slice
+(with any early or follow-up review), and a last `workflow gate`. Section 5 says what
+each flag of a `fgos run` line means; they are printed, not composed.
 
 ## 3. Observe
 
@@ -64,8 +67,10 @@ a question for the owner. Do not work around it by running writes outside the ca
 ## 5. Dispatch a slice
 
 First `fgos dispatch decide --for <capability>` (the answer tells you whether
-anything serves it; `unavailable` is a blocker to ask about). Then one door, always
-naming the case:
+anything serves it; `unavailable` is a blocker to ask about). Then run the slice's
+printed `fgos run` line, replacing the case slot with the `caseId`. It always names
+the case. The shape of such a line, for reading and for the rare change you must make
+to one with a reason:
 
 ```sh
 fgos run "<slice objective, with the plan phase and locked decisions it rests on>" \
@@ -92,8 +97,8 @@ and why.
   a verify command also verifies nothing. When driving from an installed release
   older than this branch, still pass `--pattern reviewed` by hand with a verify
   command, because an older solo run does not verify.
-- Writes are exactly the files the slice may change after your expansion (see the
-  reading guide); a path the worker needs outside them comes back as `needsWrites`,
+- Writes are exactly the files the slice may change after the expansion `propose`
+  showed; a path the worker needs outside them comes back as `needsWrites`,
   and you decide whether to widen this slice or add another.
 - Several independent read-only checks may go as one bounded wave nested in the
   case: `fgos workflow start --units <file> --case <caseId>` (charged to the frame
@@ -137,14 +142,16 @@ frame's checkpoints, all together. Slices independent of a parked question go on
 
 ## 9. Integrate and hand off
 
-All slices are on the case branch, so there is nothing to merge. Run the plan's full
-verification in the case worktree yourself (use a long `--timeout` or run it directly;
-a short limit reads as a failure). The guide's `integrate` activity carries the receipt
-for the integrated tree: dispatch it when the case offers it; what that dispatch looks
-like on a single serial branch is a measurement for the first live run. Then report:
-branch and commits, evidence you ran, plan vs built, parked questions, frame used vs
-approved. Do not edit plan status, do not write consent, do not merge. Leave the case
-open until the owner decides; `fgos workflow close <caseId>` follows their decision.
+All slices are on the case branch, so there is nothing to merge. The proposal's last
+line is `fgos workflow gate <caseId> --worktree <path> --writes <paths> ...`: run it as
+printed. The runner, not a seat, runs the whole-worktree check in the case worktree and
+settles the receipt of the integrated tree; only a passing gate reaches `integrated`.
+Run the plan's own full verification in the worktree yourself as well when it is wider
+than the gate's command (use a long `--timeout` or run it directly; a short limit reads
+as a failure). Then report: branch and commits, evidence you ran, plan vs built, parked
+questions, frame used vs approved. Do not edit plan status, do not write consent, do not
+merge. Leave the case open until the owner decides; `fgos workflow close <caseId>`
+follows their decision.
 
 ## 10. Notebook
 
