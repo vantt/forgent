@@ -24,7 +24,7 @@ import {
   effectiveSection,
 } from '../../src/setup/registrations.mjs';
 import { writeOwnershipMarker, writeOwnershipMarkerV2 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { withHome, writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 function mkTempProject() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-doctor-'));
@@ -33,13 +33,14 @@ function mkTempProject() {
 }
 
 // A confinement policy is defined by the machine's own file only (a project file may not define one or pick another),
-// so a test that needs one writes the scratch HOME's global config for the length of `body`.
+// so a test that needs one writes the global config of a scratch home for the length of `body`.
 function withGlobalConfig(value, body) {
-  writeGlobalConfig(os.homedir(), value);
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-home-'));
   try {
-    return body();
+    writeGlobalConfig(home, value);
+    return withHome(home, body);
   } finally {
-    fs.rmSync(path.join(os.homedir(), '.fgos', 'config.yaml'), { force: true });
+    fs.rmSync(home, { recursive: true, force: true });
   }
 }
 

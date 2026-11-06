@@ -1859,6 +1859,40 @@
     "global": [],
     "accounts": []
    }
+  },
+  {
+   "id": "scope-global-only-map-entry-with-undescribed-keys",
+   "why": "a project cannot define an entry of a global-only map whose own keys no schema describes: the entry is refused whole, at its line; the global file may hold it",
+   "input": {
+    "schemas": {
+     "runner": [
+      "type: object",
+      "properties:",
+      "  policies:",
+      "    x-fgos-scope: global-only",
+      "    type: object",
+      "    additionalProperties: {type: object}"
+     ]
+    },
+    "value": [
+     "runner:",
+     "  policies:",
+     "    weak:",
+     "      grants: []"
+    ]
+   },
+   "expect": {
+    "project": [
+     [
+      "config-key-out-of-scope",
+      "runner.policies.weak",
+      "global",
+      3,
+      5
+     ]
+    ],
+    "global": []
+   }
   }
  ]
 }

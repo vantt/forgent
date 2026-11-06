@@ -74,35 +74,3 @@ fn a_refusal_names_the_global_role_and_never_a_value() {
         "{shown}"
     );
 }
-
-/// A policy entry carries keys no schema describes, so a project file defining one must still be
-/// refused (the entry is refused whole); the machine's own file may define it.
-#[test]
-fn a_project_cannot_define_an_entry_of_a_global_only_map() {
-    let schema_files = files(
-        &json!({"runner": [
-            "type: object",
-            "properties:",
-            "  policies:",
-            "    x-fgos-scope: global-only",
-            "    type: object",
-            "    additionalProperties: {type: object}"
-        ]}),
-        true,
-    );
-    let schemas = Schemas::parse(&refs(&schema_files)).unwrap();
-    let yaml = "runner:\n  policies:\n    weak:\n      grants: []\n";
-    let got: Vec<_> = judged(&schemas, SourceKind::Project, yaml)
-        .iter()
-        .map(|r| (r.code, r.path.clone(), r.line))
-        .collect();
-    assert_eq!(
-        got,
-        [(
-            "config-key-out-of-scope",
-            Some("runner.policies.weak".to_string()),
-            Some(3)
-        )]
-    );
-    assert!(judged(&schemas, SourceKind::Global, yaml).is_empty());
-}

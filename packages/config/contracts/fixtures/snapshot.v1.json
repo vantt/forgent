@@ -4259,6 +4259,395 @@
      "s.m.$comment"
     ]
    }
+  },
+  {
+   "id": "snapshot-tighten-refuses-a-weaker-mode",
+   "why": "a project may not lower the mode of the layer beneath it",
+   "input": {
+    "schemas": {
+     "t": [
+      "type: object",
+      "properties:",
+      "  conf:",
+      "    type: object",
+      "    x-fgos-merge: tighten",
+      "    x-fgos-sensitivity: command",
+      "    properties:",
+      "      mode: {type: string, enum: [required, preferred, unconfined]}",
+      "      policy: {type: string}",
+      "      allowInvocationOverride: {type: boolean}",
+      "    required: [mode]",
+      "  strict: {type: boolean, x-fgos-merge: tighten}"
+     ]
+    },
+    "standard": {},
+    "files": {
+     "home/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: required",
+      "    policy: p1"
+     ],
+     "project/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: unconfined"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-confinement-lowered",
+      "t.conf",
+      "project:config.yaml",
+      2,
+      3,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-tighten-accepts-a-raised-mode-with-the-same-policy",
+   "why": "raising the mode and keeping the policy is allowed",
+   "input": {
+    "schemas": {
+     "t": [
+      "type: object",
+      "properties:",
+      "  conf:",
+      "    type: object",
+      "    x-fgos-merge: tighten",
+      "    x-fgos-sensitivity: command",
+      "    properties:",
+      "      mode: {type: string, enum: [required, preferred, unconfined]}",
+      "      policy: {type: string}",
+      "      allowInvocationOverride: {type: boolean}",
+      "    required: [mode]",
+      "  strict: {type: boolean, x-fgos-merge: tighten}"
+     ]
+    },
+    "standard": {},
+    "files": {
+     "home/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: preferred",
+      "    policy: p1"
+     ],
+     "project/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: required",
+      "    policy: p1"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "t.conf.mode": "required"
+    }
+   }
+  },
+  {
+   "id": "snapshot-tighten-refuses-a-raise-that-swaps-the-policy",
+   "why": "a raised mode does not make another policy name stricter: policies have no order",
+   "input": {
+    "schemas": {
+     "t": [
+      "type: object",
+      "properties:",
+      "  conf:",
+      "    type: object",
+      "    x-fgos-merge: tighten",
+      "    x-fgos-sensitivity: command",
+      "    properties:",
+      "      mode: {type: string, enum: [required, preferred, unconfined]}",
+      "      policy: {type: string}",
+      "      allowInvocationOverride: {type: boolean}",
+      "    required: [mode]",
+      "  strict: {type: boolean, x-fgos-merge: tighten}"
+     ]
+    },
+    "standard": {},
+    "files": {
+     "home/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: preferred",
+      "    policy: p1"
+     ],
+     "project/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: required",
+      "    policy: p2"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-confinement-lowered",
+      "t.conf",
+      "project:config.yaml",
+      2,
+      3,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-tighten-refuses-opening-the-invocation-override",
+   "why": "a project may not allow an invocation override the layer beneath did not",
+   "input": {
+    "schemas": {
+     "t": [
+      "type: object",
+      "properties:",
+      "  conf:",
+      "    type: object",
+      "    x-fgos-merge: tighten",
+      "    x-fgos-sensitivity: command",
+      "    properties:",
+      "      mode: {type: string, enum: [required, preferred, unconfined]}",
+      "      policy: {type: string}",
+      "      allowInvocationOverride: {type: boolean}",
+      "    required: [mode]",
+      "  strict: {type: boolean, x-fgos-merge: tighten}"
+     ]
+    },
+    "standard": {},
+    "files": {
+     "home/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: required",
+      "    policy: p1"
+     ],
+     "project/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: required",
+      "    policy: p1",
+      "    allowInvocationOverride: true"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-confinement-lowered",
+      "t.conf",
+      "project:config.yaml",
+      2,
+      3,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-tighten-lets-a-project-name-a-policy-over-a-lower-layer-without-one",
+   "why": "the layer beneath names no policy, so a policy name lowers nothing",
+   "input": {
+    "schemas": {
+     "t": [
+      "type: object",
+      "properties:",
+      "  conf:",
+      "    type: object",
+      "    x-fgos-merge: tighten",
+      "    x-fgos-sensitivity: command",
+      "    properties:",
+      "      mode: {type: string, enum: [required, preferred, unconfined]}",
+      "      policy: {type: string}",
+      "      allowInvocationOverride: {type: boolean}",
+      "    required: [mode]",
+      "  strict: {type: boolean, x-fgos-merge: tighten}"
+     ]
+    },
+    "standard": {},
+    "files": {
+     "home/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: unconfined"
+     ],
+     "project/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: required",
+      "    policy: p2"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "t.conf.policy": "p2"
+    }
+   }
+  },
+  {
+   "id": "snapshot-tighten-refuses-turning-strict-off",
+   "why": "a project may turn a flag on, never off over a layer that has it on",
+   "input": {
+    "schemas": {
+     "t": [
+      "type: object",
+      "properties:",
+      "  conf:",
+      "    type: object",
+      "    x-fgos-merge: tighten",
+      "    x-fgos-sensitivity: command",
+      "    properties:",
+      "      mode: {type: string, enum: [required, preferred, unconfined]}",
+      "      policy: {type: string}",
+      "      allowInvocationOverride: {type: boolean}",
+      "    required: [mode]",
+      "  strict: {type: boolean, x-fgos-merge: tighten}"
+     ]
+    },
+    "standard": {},
+    "files": {
+     "home/.fgos/config.yaml": [
+      "t:",
+      "  strict: true"
+     ],
+     "project/.fgos/config.yaml": [
+      "t:",
+      "  strict: false"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-confinement-lowered",
+      "t.strict",
+      "project:config.yaml",
+      2,
+      3,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-tighten-refusal-from-the-trusted-checkout-names-its-file",
+   "why": "the confinement is a command value, so it comes from the main checkout and the refusal names that file",
+   "input": {
+    "schemas": {
+     "t": [
+      "type: object",
+      "properties:",
+      "  conf:",
+      "    type: object",
+      "    x-fgos-merge: tighten",
+      "    x-fgos-sensitivity: command",
+      "    properties:",
+      "      mode: {type: string, enum: [required, preferred, unconfined]}",
+      "      policy: {type: string}",
+      "      allowInvocationOverride: {type: boolean}",
+      "    required: [mode]",
+      "  strict: {type: boolean, x-fgos-merge: tighten}"
+     ]
+    },
+    "standard": {},
+    "files": {
+     "home/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: required",
+      "    policy: p1"
+     ],
+     "main/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: unconfined"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "errors": [
+     [
+      "config-confinement-lowered",
+      "t.conf",
+      "project@trusted:config.yaml",
+      2,
+      3,
+      "",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "snapshot-tighten-ignores-a-lowering-held-only-by-a-worktree",
+   "why": "a worktree copy of a command value never reaches the merge, so its lowering is not judged",
+   "input": {
+    "schemas": {
+     "t": [
+      "type: object",
+      "properties:",
+      "  conf:",
+      "    type: object",
+      "    x-fgos-merge: tighten",
+      "    x-fgos-sensitivity: command",
+      "    properties:",
+      "      mode: {type: string, enum: [required, preferred, unconfined]}",
+      "      policy: {type: string}",
+      "      allowInvocationOverride: {type: boolean}",
+      "    required: [mode]",
+      "  strict: {type: boolean, x-fgos-merge: tighten}"
+     ]
+    },
+    "standard": {},
+    "files": {
+     "home/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: required",
+      "    policy: p1"
+     ],
+     "project/.fgos/config.yaml": [
+      "t:",
+      "  conf:",
+      "    mode: unconfined"
+     ],
+     "main/.fgos/config.yaml": [
+      "t:",
+      "  strict: true"
+     ]
+    },
+    "class": "unconfined",
+    "detect": {}
+   },
+   "expect": {
+    "at": {
+     "t.conf.mode": "required"
+    }
+   }
   }
  ]
 }

@@ -58,7 +58,8 @@ fn hides_undescribed(schemas: &Schemas, path: &[Segment], node: &Value) -> bool 
 /// Every key of `value` that `source` may not hold, sorted by path. `document` gives each refusal
 /// its file, line and column. A refusal on a mapping with entries is raised on its entries, so it
 /// lands on the line the person wrote; the mapping itself is refused only when it replaces or
-/// misplaces everything below it.
+/// misplaces everything below it, or when it is an entry of a project's `global-only` map whose own
+/// keys no schema describes (the refusal is then raised on the entry, not on its keys).
 pub fn judge(
     schemas: &Schemas,
     source: SourceKind,

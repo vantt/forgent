@@ -348,24 +348,19 @@ fn mode_rank(mode: Option<&str>) -> u8 {
 type Entry = serde_json::Map<String, Value>;
 
 /// Whether `higher` is a weaker setting than `lower` for a path that may only be tightened: a
-/// `strict` flag turned off, a confinement of a weaker mode, or one of the same mode that names
-/// another policy or opens the policy to an invocation override the lower layer did not allow. A
-/// lower layer that names no policy is not lowered by a policy name.
+/// `strict` flag turned off, a confinement of a weaker mode, or, at any mode, one that names another
+/// policy (policies have no order) or opens the policy to an invocation override the lower layer did
+/// not allow. A lower layer that names no policy leaves the policy name free.
 fn lowers(lower: &Value, higher: &Value) -> bool {
     let (Some(lower), Some(higher)) = (lower.as_object(), higher.as_object()) else {
         return lower.as_bool() == Some(true) && higher.as_bool() != Some(true);
     };
     let rank = |m: &Entry| mode_rank(m.get("mode").and_then(Value::as_str));
-    match rank(higher).cmp(&rank(lower)) {
-        std::cmp::Ordering::Less => true,
-        std::cmp::Ordering::Greater => false,
-        std::cmp::Ordering::Equal => {
-            let opens = |m: &Entry| m.get("allowInvocationOverride") == Some(&Value::Bool(true));
-            let policy = lower.get("policy").filter(|p| !p.is_null());
-            policy.is_some_and(|p| higher.get("policy") != Some(p))
-                || (opens(higher) && !opens(lower))
-        }
-    }
+    let opens = |m: &Entry| m.get("allowInvocationOverride") == Some(&Value::Bool(true));
+    let policy = lower.get("policy").filter(|p| !p.is_null());
+    rank(higher) < rank(lower)
+        || policy.is_some_and(|p| higher.get("policy") != Some(p))
+        || (opens(higher) && !opens(lower))
 }
 
 /// Every path of the project layer whose schema node is `x-fgos-merge: tighten` and whose value
@@ -374,23 +369,22 @@ fn lowered(
     ctx: &Context,
     layers: &[Layer],
     provenance: &dyn Fn(usize, &[Segment]) -> Provenance,
-) -> Vec<ConfigRefusal> {
+) -> Result<Vec<ConfigRefusal>, ConfigRefusal> {
     let [project, below @ ..] = layers else {
-        return Vec::new();
+        return Ok(Vec::new());
     };
     if project.layer != "project" || below.is_empty() {
-        return Vec::new();
+        return Ok(Vec::new());
     }
-    let Ok(below) = merge(&docs_of(below), &|path: &[Segment]| rule_at(ctx, path)) else {
-        return Vec::new();
-    };
+    let below = merge(&docs_of(below), &|path: &[Segment]| rule_at(ctx, path))
+        .map_err(|refusal| mismatch(below, refusal))?;
     let below = below.value.to_json();
     let mut out = Vec::new();
     descend(&project.json, &mut Vec::new(), &mut |path, value| {
         if ctx.schemas.resolve(path).and_then(|r| r.merge) != Some("tighten") {
             return true;
         }
-        if json_at(&below, path).is_some_and(|lower| lowers(lower, value)) {
+        if !value.is_null() && json_at(&below, path).is_some_and(|lower| lowers(lower, value)) {
             let at = provenance(0, path);
             let mut refusal = ConfigRefusal::new("config-confinement-lowered").at_path(path);
             refusal.file = at.file;
@@ -399,7 +393,7 @@ fn lowered(
         }
         false
     });
-    out
+    Ok(out)
 }
 
 /// A merge that cannot combine two layers: `config-schema` naming the layers that hold the path.
@@ -500,10 +494,10 @@ pub(crate) fn build(
             refusal
         })
         .collect();
+    errors.extend(lowered(ctx, &layers, &provenance).map_err(|r| SnapshotError::Refused(vec![r]))?);
     errors.sort_by(|a, b| {
         (&a.file, a.line, a.column, &a.path).cmp(&(&b.file, b.line, b.column, &b.path))
     });
-    errors.extend(lowered(ctx, &layers, &provenance));
     fail_if_any(errors)?;
     Ok(Snapshot {
         value: merged.value.to_json(),
