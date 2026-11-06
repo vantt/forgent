@@ -548,3 +548,21 @@ test('a resumed unit recorded before bindings carried a pool restarts its walk a
   assert.deepEqual(attempts.map((a) => [a.binding.executor, a.binding.pool ?? null, a.outcome]), [['alpha', null, 'provider-limit'], ['alpha', 'alpha', 'provider-limit'], ['alpha', 'alpha', 'provider-limit'], ['beta', 'beta', 'pass']]);
   assert.deepEqual(attempts.map((a) => a.fallbackFrom?.kind ?? null), [null, 'next-candidate', 'account-rotation', 'next-candidate']);
 });
+
+// No existing test reads the provider record's assignment entries after a run: the lease tests stop at the
+// lease itself. An attempt whose outcome the controller has recorded is never asked for again (every later
+// bind of the seat takes a new attempt number), so its entry must not stay behind in the provider state.
+test('an attempt whose outcome is recorded leaves no assignment record in the provider state', { skip: SKIP }, async () => {
+  const fx = setup(
+    { alpha: { family: 'alpha', logins: { dead1: 'dead', live1: 'live' } }, beta: { family: 'beta' } },
+    { recentlyUsed: { alpha: ['live1'] } },
+  );
+  const res = await run(fx, solo('u-assignment-record'));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  const recorded = attemptsOf(fx.repoRoot, res).map((attempt) => attempt.outcome);
+  assert.deepEqual(recorded, ['provider-limit', 'pass'], 'both attempts recorded their outcome');
+
+  const { assignments } = readJson(path.join(fx.runtimeDir, 'state.json'));
+  const left = Object.keys(assignments).filter((key) => key.includes(res.unitRunId));
+  assert.deepEqual(left, [], 'the provider state still holds entries for attempts whose outcome is recorded');
+});
