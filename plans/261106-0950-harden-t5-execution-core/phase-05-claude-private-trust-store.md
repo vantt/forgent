@@ -22,6 +22,12 @@ Code read on `4b116c27e` (`trust-store.mjs` is at `src/run-supervisor/trust-stor
 - `assignment-runner.mjs:1960-1970` (`prepareTerminalAttempt` args: `attemptEnv`, `trustStore`), `:1985` (`buildEnvelope`, launch env) — the one line that carries the private store's env into the launch.
 - Settled fact needed: which variable points claude at a private config (`CLAUDE_CONFIG_DIR`, read for the mailbox at `src/setup/mailbox-claude-accept.mjs:17`) and whether claude, run with it, keeps its login, writes refreshed tokens there and shows no trust dialog. Not measured for a pane (plan fact 3).
 
+## Measured run (big lead, 2026-11-06 11:2x, claude 2.1.314)
+
+- A scratch `CLAUDE_CONFIG_DIR` holding a private `.claude.json` (onboarding, theme, trust for the scratch cwd) and `.credentials.json` as a **symlink** to the operator's login: `claude -p` answered, exit 0. The operator's `~/.claude.json` hash and the login file's mtime were unchanged. So reading the login through a link works.
+- No refresh happened in the run. Claude's credential writer (bundle function `Un` → `Xne`, read in the binary) stages a temp file and **renames it over the target path**, and its in-place fallback opens with `O_NOFOLLOW`. A refresh inside the pane would therefore replace the link with a regular file in the private dir: the rotated login lands only in the private copy, and the operator's file keeps a login the provider may already have invalidated.
+- Outcome: the "credential copy required, refreshed tokens land only in the private copy" branch of the requirement holds. Stopped and asked the owner (UQ-2 in plan.md terms) before code.
+
 ## Requirements
 
 - **Measured live run first (big lead, live provider).** One real claude pane through `fgos run` with a scratch private config built the way this phase builds it. Record: no folder-trust dialog; login works; the operator's `~/.claude.json` bytes and mtime unchanged; where claude writes a refreshed token, if it refreshes. Evidence goes into the phase report.
