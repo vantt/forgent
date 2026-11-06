@@ -3,17 +3,16 @@
 // starts no process and writes nothing: it drives the SAME pattern code the runner drives, with a
 // seat runner that only calls bind().
 
-import { bind } from './bind.mjs';
+import { askFor, bind } from './bind.mjs';
 import { runLoop } from './loops/index.mjs';
 import { createSeatLedger } from './seat-ledger.mjs';
-import { workflowTierOf } from './seat-resolver.mjs';
 import { resolveCollaboration } from './patterns/catalog.mjs';
 import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 
 /**
  * Bind every seat a unit's pattern would dispatch, in the order the pattern dispatches them,
- * without running any of them. A seat that binds is recorded in the ledger so a later seat's
- * `independentOf` excludes its provider family, exactly as in a real run.
+ * without running any of them. Each seat is asked exactly as a real run asks it (`askFor`), and a seat
+ * that binds is recorded in the ledger, so independence holds both ways as in the run.
  *
  * @param {object} unit Unit contract subset: { id, capability, rigor?, writes?, pattern?, seats? }.
  * @param {object} runnerConfig Runner config (capabilities, executors, patterns, ...).
@@ -27,41 +26,32 @@ import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 export async function simulateUnitBindings(unit, runnerConfig, { session = {}, overrides = [], raiseAuthorized = false, workflowId, collaboration } = {}) {
   const ledger = createSeatLedger();
   const seats = [];
-  const runRole = async ({ seat, unit: seatUnit, independentOf = [], preferIndependentOf = [], batch }) => {
-    const workflowTier = workflowTierOf(seat, seatUnit || unit, workflowId);
-    const record = await ledger.serialize(() => {
-      const bound = bind(
-        {
-          unit: seatUnit || unit,
+  const unitContext = { overrides, workflowId, raiseAuthorized, blind: unit?.blind === true };
+  const runRole = async (request) => {
+    const { seat, batch } = request;
+    let record;
+    try {
+      record = await ledger.serialize(() => {
+        const bound = bind(askFor({ ...request, unit: request.unit || unit }, ledger, unitContext), { runnerConfig, session: { headless: true, ...session } });
+        if (bound.refused) return { seat: seat.seat, role: seat.role, refused: bound.refused };
+        ledger.note(seat.seat, bound.executor);
+        ledger.noteDependence(seat.seat, request.independentOf);
+        return {
           seat: seat.seat,
           role: seat.role,
-          posture: seat.posture,
-          ...(seat.persona ? { persona: seat.persona } : {}),
-          ...(workflowTier ? { workflowTier } : {}),
-          raiseAuthorized: raiseAuthorized === true,
-          readOnly: seat.posture.readOnly,
-          independentOf: ledger.resolve(independentOf),
-          ...(preferIndependentOf.length > 0 ? { preferIndependentOf: ledger.seats(preferIndependentOf) } : {}),
-          overrides,
-        },
-        { runnerConfig, session: { headless: true, ...session } },
-      );
-      if (bound.refused) return { seat: seat.seat, role: seat.role, refused: bound.refused };
-      ledger.note(seat.seat, bound.executor);
-      return {
-        seat: seat.seat,
-        role: seat.role,
-        executor: bound.executor,
-        invocation: bound.invocation,
-        tier: bound.tier,
-        ...(bound.provenance?.tier?.loweredFrom ? { loweredFrom: bound.provenance.tier.loweredFrom } : {}),
-        ...(bound.account ? { account: bound.account } : {}),
-        ...(bound.provenance?.account?.skipped ? { accountSkipped: bound.provenance.account.skipped } : {}),
-        ...(bound.provenance?.familySpread?.value.sharedWith.length ? { sharesFamilyWith: bound.provenance.familySpread.value.sharedWith } : {}),
-      };
-    });
+          executor: bound.executor,
+          invocation: bound.invocation,
+          tier: bound.tier,
+          ...(bound.provenance?.tier?.loweredFrom ? { loweredFrom: bound.provenance.tier.loweredFrom } : {}),
+          ...(bound.account ? { account: bound.account } : {}),
+          ...(bound.provenance?.account?.skipped ? { accountSkipped: bound.provenance.account.skipped } : {}),
+          ...(bound.provenance?.familySpread?.value.sharedWith.length ? { sharesFamilyWith: bound.provenance.familySpread.value.sharedWith } : {}),
+        };
+      });
+    } finally {
+      batch?.arrive();
+    }
     seats.push(record);
-    batch?.arrive();
     return record.refused
       ? { outcome: 'policy-refusal', seat: seat.seat, role: seat.role, refused: record.refused }
       : { outcome: 'pass', seat: seat.seat, role: seat.role };

@@ -7,7 +7,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
-import { bind, BIND_CONTRACT_VERSION } from '../../../src/runner/execution/bind.mjs';
+import { askFor, bind, BIND_CONTRACT_VERSION } from '../../../src/runner/execution/bind.mjs';
+import { createSeatLedger } from '../../../src/runner/execution/seat-ledger.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 // posture filtering consults the machine backend registry; keep it file-local
@@ -261,6 +262,25 @@ test('bind: independence filter selects candidate of different provider family',
   assert.equal(result.executor, 'codex');
   assert.equal(result.tier, 'standard');
   assert.equal(result.model, 'gpt-4o');
+});
+
+// The run and the dry bind both ask through askFor, so this is the one proof that both hold independence both ways.
+test('the bind ask holds a seat to the executor of a seat bound earlier that must differ from it', () => {
+  const runnerConfig = createMockRunnerConfig();
+  const unit = { id: 'u1', capability: 'docs:write', writes: [] };
+  const ledger = createSeatLedger();
+  const seat = (id) => ({ ...CHECKER, seat: id });
+  // The checker binds first and names the producer, not bound yet: nothing is excluded, it takes codex.
+  const checker = bind(askFor({ seat: seat('checker'), unit, independentOf: ['producer'] }, ledger), { runnerConfig, session: {} });
+  assert.equal(checker.executor, 'codex');
+  ledger.note('checker', checker.executor);
+  ledger.noteDependence('checker', ['producer']);
+  // The producer names no independence of its own, yet it may not share the checker's family.
+  const ask = askFor({ seat: seat('producer'), unit }, ledger);
+  assert.deepEqual(ask.independentOf, ['codex']);
+  assert.equal(bind(ask, { runnerConfig, session: {} }).executor, 'claude');
+  const onlyCodex = { ...runnerConfig, capabilities: { 'docs:write': { prefer: [{ executor: 'codex', invocation: 'codex-cli' }] } } };
+  assert.equal(bind(ask, { runnerConfig: onlyCodex, session: {} }).refused?.reason, 'independence-unsatisfiable');
 });
 
 test('bind: independence violation refuses, and accepting the dependence needs an authorized door', () => {

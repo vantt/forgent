@@ -651,7 +651,7 @@ test('a panel with enough provider families lands every seat on its own family, 
   assert.ok(synthObjective.includes('Review the design'), 'the panel\'s task is quoted to the synthesizer');
 });
 
-test('a unit-run input reaches the roles as the absolute path of that role\'s report, resolved once into unit.json; a resume refuses a record from a newer release', async () => {
+test('a unit-run input reaches the roles as the absolute path of that role\'s report, resolved once into unit.json; a resume refuses a record from a newer release or one that does not parse', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha']);
   const run = (unitData, extra = {}) =>
@@ -694,6 +694,16 @@ test('a unit-run input reaches the roles as the absolute path of that role\'s re
     (err) => err.code === 'record-from-newer-release' && /seatSchema/.test(err.message),
   );
   assert.equal(JSON.parse(fs.readFileSync(firstPath, 'utf8')).seatSchema, 3, 'the refused record is left untouched');
+
+  // A record that does not parse is refused by name, with its path, and left as it was.
+  const unreadable = fs.readFileSync(firstPath, 'utf8');
+  fs.writeFileSync(firstPath, '{ not json');
+  await assert.rejects(
+    () => run(undefined, { resumeUnitRunId: first.unitRunId }),
+    (err) => err.code === 'unit-record-unreadable' && err.message.includes(firstPath),
+  );
+  assert.equal(fs.readFileSync(firstPath, 'utf8'), '{ not json');
+  fs.writeFileSync(firstPath, unreadable);
 
   // Schema 1 and 2 records are accepted by the fence
   fs.writeFileSync(firstPath, JSON.stringify({ ...JSON.parse(fs.readFileSync(firstPath, 'utf8')), seatSchema: 1 }));

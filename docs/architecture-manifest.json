@@ -297,6 +297,7 @@
     "src/runner/execution/unit-summary.mjs": "infra",
     "src/runner/execution/case-admission-port.mjs": "infra",
     "src/runner/execution/run.mjs": "use-case",
+    "src/runner/execution/unit-run-start.mjs": "use-case",
     "src/runner/execution/loops/index.mjs": "domain",
     "src/runner/execution/loops/debate.mjs": "domain",
     "src/runner/execution/loops/panel.mjs": "domain",

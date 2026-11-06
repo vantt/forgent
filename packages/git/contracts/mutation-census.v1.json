@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "934786714bbfabe750f392d9ae0c52f8bf46d0a1121adb6f9db831b92424572f",
+  "payloadDigest": "c09f2afdc250bcbff77100d511dae95958b44082b4c71af944eb2c3db255d2de",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1039,10 +1039,10 @@
     "src/runner/dispatch/write-scope.mjs": "b926332413077cfb8246da969373de205ecf003b3a263baf6c08177a27d3885a",
     "src/runner/execution/account-pin.mjs": "0a9d8f632bd5b814c056139df3b4e340aac0574d8bd7db6b60c7a7b0305d4cfe",
     "src/runner/execution/account-rotation.mjs": "3f7263e6d0a291ce33aa9c44381138a6ca436f20543565ef857c8f7936388cbe",
-    "src/runner/execution/bind.mjs": "30f4a5e9126b043253cf696f4ff5f038bb7202262a5f8c120ce5774c03e21853",
+    "src/runner/execution/bind.mjs": "bb026be83741bab68bd15e034f98733dd968c27484e745f10cb5657d12a1ea50",
     "src/runner/execution/case-admission-port.mjs": "05bd4f698fd0028e9cb8297b9164cba8074aca26b492c939b4dc245e368fe151",
-    "src/runner/execution/commit-unit-work.mjs": "a2e0904e351cb6382f84f81f98dd0cd6a2464f15ca48b61f86933479982b8d50",
-    "src/runner/execution/dry-bind.mjs": "7515265f65486bad77a344e923a52c0999caccbcbf75fbe06cc518d8912a8771",
+    "src/runner/execution/commit-unit-work.mjs": "d8853dc5d42a53fa2578304de8ef38d55f04e4c9250a4185999a9d7b1f86a158",
+    "src/runner/execution/dry-bind.mjs": "94acf7f1b659f663e4d8727f4984d6a8fb577e984a79b69f158892eca6cbd07a",
     "src/runner/execution/explain.mjs": "4fd3c5a6ae3b9c0d28ca0c333403d7d10e7b38aa29a4318326d02c6ffd8b1689",
     "src/runner/execution/handoff-refs.mjs": "2514d408d19a7145239025f449b16a308d9a740e9edb8285ed328da941fd1678",
     "src/runner/execution/legacy-seat-read.mjs": "a3f142beb163948e9739fd6eab98c4a620f7aaee133f94ae07f9c9efb96cca6d",
@@ -1059,12 +1059,13 @@
     "src/runner/execution/patterns/catalog.mjs": "56a10c97fa3d7caaf7b7b70bcac38a300284e24aa6bcb316a07e30c9335a9af9",
     "src/runner/execution/patterns/retired-keys.mjs": "c07f8407d169c7db410aba99db2b7bb1119f5a20ec7a7b63f8cb81d1324e0f40",
     "src/runner/execution/run-request.mjs": "b8ba8003a695f457ab1ebdc22808a994c4f3c4dbfc5d05cd1ab88bd65b823645",
-    "src/runner/execution/run.mjs": "7ae4c06b66a919e47f4b9dfcebfc15d18f57894f2a77ea3064c1e96716ac9d8a",
+    "src/runner/execution/run.mjs": "3d7ad0214b572d6795ba3c88228dd13ae3377637799c6bcb0c2442a1037970a9",
     "src/runner/execution/seat-ledger.mjs": "e033ac97585dc96b22b35d69d361d96d04b2e2b84703bcde241442ec84e74680",
     "src/runner/execution/seat-policy.mjs": "6a0b9671a9ceb020be1e74d306ea2e277cb324244faf391e85feff10ee7d2eaf",
     "src/runner/execution/seat-resolver.mjs": "cd60f09a5cb679223a05a7c79bb390e8ed0e596890b8d795431fb16aae9d09ba",
     "src/runner/execution/unit-control.mjs": "039d11a4fc003664db5fc0dabd2a3d44835a0d43f1e3826faaadee4339a7d7cf",
     "src/runner/execution/unit-run-history.mjs": "41cdf2b8fd9bbc01ffa797c0a44ed14ce109143ced03afac1993d940390cf6c8",
+    "src/runner/execution/unit-run-start.mjs": "f7c485029ec9917e015106a9542d46bec3977d26ca2d8564cb88d5f370ea1eeb",
     "src/runner/execution/unit-state.mjs": "70e84ac79254919aece01fb93088479fd62d58d2eda5100fc7df85f06791f9c3",
     "src/runner/execution/unit-summary.mjs": "d3f4baf62a716a31b70761dd792909b3683a64ade2197f562ab8057ff64296ca",
     "src/runner/execution/unit-sync.mjs": "a5dcbcd15d189d8a943f3e5ee87543a4ffb466f15b1534684b111034d7da89e5",
@@ -3345,14 +3346,14 @@
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1570,
+      "line": 456,
       "spawn": "runCommand -> src/runner/goal-check.mjs:60",
       "binary": "(consumer verify command (cfg?.capabilities?.[unit?.capability]?.verify))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/execution/run.mjs",
-      "line": 1570,
+      "line": 456,
       "spawn": "runCommand -> src/runner/goal-check.mjs:60",
       "binary": "(consumer verify command (unit?.verify))",
       "class": "configured-binary"

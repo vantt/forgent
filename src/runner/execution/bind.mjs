@@ -18,7 +18,7 @@ import { MODEL_POLICY_TIERS, RunnerConfigError, assertReasoningEffort, assertRun
 import { credentialSourceForCli, credentialStoreOf, providerAccountInventory, readAccountStates } from '../dispatch/provider-capacity.mjs';
 import { parseTierCell } from '../dispatch/tier-cell.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
-import { PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf } from './seat-resolver.mjs';
+import { PRODUCER_POSTURE, capabilityEntriesOf, effectiveRigorOf, workflowTierOf } from './seat-resolver.mjs';
 import { seatBinding } from './seat-policy.mjs';
 
 export const BIND_CONTRACT_VERSION = 'v1alpha1';
@@ -242,6 +242,32 @@ function crateOverrideOf(override) {
   if (override.acceptDependence === true) out.acceptDependence = true;
   if (!override.scope && override.executor) out.runWide = true;
   return Object.keys(out).length > 0 ? out : undefined;
+}
+
+/**
+ * The ask of one seat, built alike by the run and the dry bind from what the pattern hands its seat runner.
+ * Independence and spread are read from the seat ledger now, so they see exactly the seats bound before this
+ * one; independence is symmetric (a seat bound earlier that must differ from this one holds it to that too).
+ *
+ * @param {{ seat: object, unit: object, independentOf?: string[], preferIndependentOf?: string[] }} request
+ * @param {{ overrides?: object[], workflowId?: string, raiseAuthorized?: boolean, blind?: boolean }} unitContext
+ */
+export function askFor({ seat, unit, independentOf = [], preferIndependentOf = [] }, ledger, { overrides = [], workflowId, raiseAuthorized, blind } = {}) {
+  const workflowTier = workflowTierOf(seat, unit, workflowId);
+  return {
+    unit,
+    seat: seat.seat,
+    role: seat.role,
+    posture: seat.posture,
+    ...(seat.persona ? { persona: seat.persona } : {}),
+    ...(workflowTier ? { workflowTier } : {}),
+    raiseAuthorized: raiseAuthorized === true,
+    readOnly: seat.posture.readOnly,
+    independentOf: [...ledger.resolve(independentOf), ...ledger.dependentExecutors(seat.seat)],
+    ...(preferIndependentOf.length > 0 ? { preferIndependentOf: ledger.seats(preferIndependentOf) } : {}),
+    overrides,
+    ...(blind ? { blind: true } : {}),
+  };
 }
 
 /**
@@ -496,9 +522,8 @@ function decide(ask, ctx, walk) {
 /**
  * The binding of one seat, or `{ refused: { reason, detail } }`.
  *
- * @param {object} ask unit, seat, role, posture, persona, overrides, independentOf (executors or seats the
- *   seat must differ from), preferIndependentOf ([{ seat, executor }] it should differ from), blind,
- *   workflowTier, raiseAuthorized
+ * @param {object} ask what `askFor` builds: unit, seat, role, posture, persona, overrides, independentOf (executors
+ *   or seats to differ from), preferIndependentOf ([{ seat, executor }]), blind, workflowTier, raiseAuthorized
  * @param {object} ctx { runnerConfig, session }
  *   Execution admission belongs to the calling door, not seat choice or replay.
  * @param {object} [options]

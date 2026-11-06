@@ -133,6 +133,37 @@ export function commitUnitWork(args) {
     return { status: 'committed', ...commit };
   } catch (error) { return { ...base, ...refusal(error) }; }
 }
+/**
+ * What `commitUnitWork` is asked for one seat's round, read when the commit runs: the round's in-scope files
+ * on the native baseline the seat launched on (moved onto the sync merge when the round made one first),
+ * resuming the native operation a dead controller left pending. The operation is recorded on the attempt
+ * before it runs.
+ */
+export function seatRoundCommitArgs({ unitRecord, repoRoot, custody, baseline, attempt, persist, operationId, unitId, objective, runResult, scope, excludePaths }) {
+  const head = unitRecord.sync?.commit?.sha ?? unitRecord.sync?.nativeHead;
+  return {
+    worktree: unitRecord.worktree,
+    // The gitdir and hooks come from the main checkout, never from the worker-writable worktree.
+    repoRoot, custody, writer: unitRecord.gitWriter,
+    baseline: baseline && head ? { ...baseline, head } : baseline,
+    operationId,
+    resumeOperation: attempt?.commitOperation?.state === 'pending' ? attempt.commitOperation : undefined,
+    onPrepared: (prepared) => { attempt.commitOperation = { ...prepared, state: 'pending' }; persist(); },
+    unitId, summary: runResult?.agentClaim?.summary, objective, scope,
+    changedFiles: runResult?.evidence?.changedFiles ?? null, excludePaths, needsWrites: runResult?.agentClaim?.needsWrites,
+  };
+}
+/** A pending native commit operation is settled once its commit landed, or was refused for good. */
+export function settleCommitOperation(attempt, commit) {
+  if (!attempt?.commitOperation) return;
+  if (commit.status !== 'failed' || ['commit-rejected', 'hook-refused'].includes(commit.nativeCause) || commit.reason === 'committed-set-mismatch') attempt.commitOperation.state = 'settled';
+}
+/** The case admission's consent, checked again just before a writing round commits: `{ reason, detail }` refuses. */
+export function recheckWriteConsent(admission, changedFiles) {
+  if (!admission) return null;
+  const verdict = admission.port.recheckEffect(admission.reservationId, { caseId: admission.caseId, paths: changedFiles ?? [] });
+  return verdict?.refused ? { reason: verdict.refused.code, detail: verdict.refused.condition } : null;
+}
 export function commitOnBranch(worktree, sha, repoRoot, custody, loaderOptions) {
   const ctx = gitContext({ worktree, repoRoot, custody, loaderOptions });
   try {
