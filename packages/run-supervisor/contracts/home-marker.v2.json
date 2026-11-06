@@ -10,7 +10,7 @@
     "resource": "string, the confined resource name, as in version 1",
     "createdAt": "string, ISO-8601 UTC"
   },
-  "extension": "extendOwnershipMarker may add facts known after the home is filled (e.g. the account login it was copied from); it never adds pid, pane or binder fields",
+  "extension": "none: the marker only identifies the home; what is known later (where its login goes, failed stagings) lives in the host record attempt-home.json beside the home, never in the home",
   "forbiddenFields": ["pid", "timeoutMs", "paneId", "launchedAt", "binder"],
   "removalRule": "remove only through finalize-home run by the supervisor or by adopt while it holds the attempt lock and containment.is_empty(domain) == empty"
 }

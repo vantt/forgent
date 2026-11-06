@@ -117,27 +117,6 @@ export function publishMutableProjection(targetPath, record) {
   replaceDurably(dir, path.basename(targetPath), content, 0o644);
 }
 
-export function publishSecretSideFile(targetPath, record) {
-  const dir = path.dirname(targetPath);
-  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-  try { fs.chmodSync(dir, 0o700); } catch {}
-  const content = typeof record === 'string' ? record : JSON.stringify(record);
-  fs.writeFileSync(targetPath, content, { mode: 0o600 });
-  try { fs.chmodSync(targetPath, 0o600); } catch {}
-}
-
-export function consumeSecretSideFile(targetPath) {
-  let parsed = null;
-  try {
-    parsed = JSON.parse(fs.readFileSync(targetPath, 'utf8'));
-  } catch {
-    return null;
-  } finally {
-    try { fs.unlinkSync(targetPath); } catch {}
-  }
-  return parsed;
-}
-
 export function updateCommandEnvelope({
   runDir,
   launchCommandId,

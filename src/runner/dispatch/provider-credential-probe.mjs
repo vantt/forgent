@@ -47,6 +47,7 @@ export function credentialProbeCommand(credentialSource) {
       command: 'codex',
       args: ['exec', '--skip-git-repo-check', '-s', 'read-only', PROMPT],
       env: { CODEX_HOME: home },
+      home,
     };
   }
   // omp keeps its login in `agent.db`; the layout is tested before pi's `auth.json`, since an omp profile
@@ -56,6 +57,7 @@ export function credentialProbeCommand(credentialSource) {
       command: 'omp',
       args: ['-p', PROMPT, '--mode', 'json', '--tools', 'read'],
       env: { PI_CODING_AGENT_DIR: home },
+      home,
     };
   }
   if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files) && credentialSource.files.includes('auth.json')) {
@@ -63,6 +65,7 @@ export function credentialProbeCommand(credentialSource) {
       command: 'pi',
       args: ['-p', PROMPT, '--mode', 'json', '--tools', 'read', '--approve'],
       env: { PI_CODING_AGENT_DIR: home },
+      home,
     };
   }
   return null;
@@ -80,6 +83,17 @@ export function judgeProbeOutput({ exitCode, timedOut, output }) {
   return { ok: true };
 }
 
+// What a probe call inherits from its runner: the shell basics only, never a token or a variable that points a
+// CLI at another login. HOME and the working directory are the login home the call is pointed at, so whatever the
+// CLI writes stays there.
+const PROBE_ENV_ALLOW = ['PATH', 'LANG', 'LC_ALL', 'TZ', 'TERM'];
+
+function probeEnv(env, plan) {
+  const out = {};
+  for (const name of PROBE_ENV_ALLOW) if (typeof env?.[name] === 'string') out[name] = env[name];
+  return { ...out, HOME: plan.home, ...plan.env };
+}
+
 /**
  * Run one planned call and judge what it printed. `spawnFn` has `spawn`'s signature: the account lock's
  * own `spawnHolding` lends the lock to the call, and tests inject a fake. A child that carries a `borrowed`
@@ -92,7 +106,7 @@ export function runCredentialProbe(plan, { spawnFn = spawn, timeoutMs = DEFAULT_
     let timedOut = false;
     let child;
     try {
-      child = spawnFn(plan.command, plan.args, { env: { ...env, ...plan.env }, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
+      child = spawnFn(plan.command, plan.args, { env: probeEnv(env, plan), cwd: plan.home, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
     } catch (err) {
       resolve({ ok: false, detail: `could not start ${plan.command}: ${err.message}` });
       return;

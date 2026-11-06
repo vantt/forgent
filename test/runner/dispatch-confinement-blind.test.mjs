@@ -350,20 +350,25 @@ test('the blind argv masks before it binds back, binds its own directory read-on
   }
 });
 
-test('a non-blind dispatch\'s argv has the pid namespace but no mask, binds in resource order', async () => {
+test('a non-blind dispatch\'s argv has the pid namespace, masks only its confinement root, and binds its own home back after that mask', async () => {
   const project = makeProject();
-  // With no machine-private root on the host (here: no herdr socket directory) nothing is masked.
+  // With no other machine-private root on the host (here: no herdr socket directory) only the root the private
+  // homes live under is masked.
   fs.rmSync(project.herdrDir, { recursive: true });
   const { prepared, assessment } = await prepare(project, { blind: false });
   const args = prepared.invocation.args;
   const head = args.slice(0, args.indexOf('--'));
+  const tempRoot = fs.realpathSync(project.tempRoot);
+  assert.deepEqual(assessment.resources.filter((r) => r.resource === 'hidden-root').map((r) => [r.hostTarget, r.confinementRoot]), [[tempRoot, true]]);
   const expected = ['--ro-bind', '/', '/', '--dev', '/dev', '--proc', '/proc', '--tmpfs', '/tmp', '--unshare-pid', '--as-pid-1', '--setenv', CONFINED_MARKER_ENV, '1'];
-  for (const res of assessment.resources) {
-    const writable = res.access === 'write' || res.access === 'read-write';
-    expected.push(writable ? '--bind' : '--ro-bind', res.hostTarget, res.executionTarget.path);
-  }
+  const mounts = assessment.resources.filter((r) => r.resource !== 'hidden-root');
+  const bind = (res) => expected.push(res.access === 'write' || res.access === 'read-write' ? '--bind' : '--ro-bind', res.hostTarget, res.executionTarget.path);
+  mounts.filter((r) => r.resource !== 'private-home').forEach(bind);
+  expected.push('--tmpfs', tempRoot);
+  mounts.filter((r) => r.resource === 'private-home').forEach(bind);
+  expected.push('--remount-ro', tempRoot);
   assert.deepEqual(head, expected);
-  assert.equal(assessment.resources.some((r) => r.resource === 'hidden-root' || r.resource === 'own-assignment'), false);
+  assert.equal(assessment.resources.some((r) => r.resource === 'own-assignment'), false);
   assert.equal(fs.existsSync(path.join(project.fgosDir, 'runtime')), false, 'only a blind launch creates the mailbox root');
   await prepared.cleanup();
 });
@@ -372,13 +377,17 @@ test('a non-blind dispatch\'s argv has the pid namespace but no mask, binds in r
 // Behaviour under real bwrap
 // ---------------------------------------------------------------------------
 
-test('a blind worker cannot read a peer, a gate answer, a peer home, a mailbox body, a peer process or the herdr socket; unblind it still reaches files but neither processes nor the herdr socket', async (t) => {
+test('a blind worker cannot read a peer, a gate answer, a peer home, a mailbox body, a peer process or the herdr socket; unblind it still reaches files but neither processes, a peer home nor the herdr socket', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
 
-  const open = await observe(plantMailbox(makeProject()), { blind: false });
+  const openProject = plantMailbox(makeProject());
+  const open = await observe(openProject, { blind: false });
   assert.equal(open.peerReport, 'ok');
   assert.equal(open.gateAnswer, 'ok');
-  assert.equal(open.peerHome, 'ok');
+  // Sibling private homes live under a confinement root, which is machine-private: hidden whatever the hostRead.
+  assert.equal(open.peerHome, 'ENOENT');
+  assert.ok(!openProject.tempRoot.startsWith('/tmp/'), 'the peer home sits where the sandbox would otherwise see the host');
+  assert.equal(open.home, 'ok', 'its own home is bound back after the mask');
   assert.equal(open.mailbox, 'ok');
   // Every launch has its own pid namespace now, so a peer's process is out of reach blind or not.
   assert.equal(open.peerProcess, 'ENOENT');

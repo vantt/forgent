@@ -25,11 +25,11 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {
-  extendOwnershipMarker,
   ensurePrivateDir,
   writeOwnershipMarkerV2,
   removeConfinementDir,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { rewriteOwnershipMarker } from '../helpers/ownership-marker.mjs';
 
 const exists = (p) => fs.existsSync(p);
 
@@ -67,7 +67,7 @@ test('extending an attempt home marker keeps it a version 2 marker', () => {
     const dir = path.join(w.root, 'disp_v2', 'home');
     ensurePrivateDir(dir, { root: w.root });
     writeOwnershipMarkerV2(dir, { attemptId: 'att-1', runDir: path.join(w.tmp, 'runs', '01'), dispatchId: 'disp_v2' });
-    extendOwnershipMarker(dir, { createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString() });
+    rewriteOwnershipMarker(dir, { createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString() });
     assert.equal(JSON.parse(fs.readFileSync(path.join(dir, '.fgos-confinement-owner.json'), 'utf8')).attemptId, 'att-1');
   } finally { w.cleanup(); }
 });

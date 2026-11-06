@@ -14,7 +14,7 @@ import path from 'node:path';
 import * as cleanup from '../cleanup.mjs';
 import { cleanupConfinementResource, writeOwnershipMarker, ensurePrivateDir, writeAttemptHomeRecord } from '../cleanup.mjs';
 import { copyCredentialFiles, credentialWriteBackTarget } from '../../provider-credential-renewal.mjs';
-import { expandCredentialHome } from '../../provider-capacity.mjs';
+import { commandCli, credentialStoreOf, expandCredentialHome } from '../../provider-capacity.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 import { resolveRuntimeSocketDir } from '../../../../run-supervisor/runtime-dir.mjs';
@@ -219,27 +219,35 @@ function blindRefusals(request, resolvedResources) {
   return mismatches;
 }
 
+// Mounts bound back inside a machine-private root after its mask (the dispatch's own home, the program it runs).
+const BOUND_BACK = new Set(['hidden-root', 'own-assignment', 'private-home', 'launch-program']);
+
 /**
  * Refusal specific to machine-private roots (spec section 9.3), for every confined request: the
  * workspace, cwd, repo root or a granted mount that lies inside one would be masked away from the
- * worker that was given it.
+ * worker that was given it; a confinement root inside a writable mount would let the agent plant homes and records.
  */
 function machinePrivateRefusals(request, resolvedResources) {
   const roots = hiddenRootTargets(resolvedResources, true);
   if (roots.length === 0) return [];
   const context = request.context || {};
-  return hiddenWorkspaceRefusals(
-    [
-      ['cwd', context.cwd],
-      ['repoRoot', context.repoRoot],
-      ...resolvedResources
-        .filter((r) => r.resource !== 'hidden-root' && r.resource !== 'own-assignment')
-        .map((r) => [`${r.resource} mount`, r.hostTarget]),
-    ],
-    roots,
-    'machine-private-hides-workspace',
-    (name, real, root) => `the ${name} "${real}" lies inside the machine-private root "${root}", which is hidden from every confined dispatch.`,
-  );
+  const writable = resolvedResources.filter((r) => !BOUND_BACK.has(r.resource) && (r.access === 'write' || r.access === 'read-write'));
+  return [
+    ...hiddenWorkspaceRefusals(
+      [
+        ['cwd', context.cwd],
+        ['repoRoot', context.repoRoot],
+        ...resolvedResources.filter((r) => !BOUND_BACK.has(r.resource)).map((r) => [`${r.resource} mount`, r.hostTarget]),
+      ],
+      roots,
+      'machine-private-hides-workspace',
+      (name, real, root) => `the ${name} "${real}" lies inside the machine-private root "${root}", which is hidden from every confined dispatch.`,
+    ),
+    ...resolvedResources.filter((r) => r.confinementRoot).flatMap((r) => writable.filter((w) => isInsideRoot(r.hostTarget, realPathOrResolved(w.hostTarget))).map((w) => ({
+      code: 'confinement-root-in-writable-grant',
+      detail: `the confinement root "${r.hostTarget}" lies inside the writable ${w.resource} mount "${w.hostTarget}"; move the backend's tempRoot or privateHomeRoot out of it.`,
+    }))),
+  ];
 }
 
 /**
@@ -448,6 +456,10 @@ export function assessBwrap(request, backend) {
         // actually going to run in the sandbox to bind the right outbox
         // subdirectory writable -- see resources.mjs's own comment.
         adapter: request.invocation?.adapter,
+        // A launch that declares no login store reads its CLI's login in place; its program is bound back if masked.
+        inPlaceLoginCli: credentialStoreOf(request.invocation) ? null : commandCli(request.invocation?.command),
+        launchCommand: request.invocation?.command,
+        launchPath: request.invocation?.env?.PATH ?? process.env.PATH,
       },
       grants: policyGrants,
       resourceNeeds: request.resourceNeeds,
@@ -615,7 +627,7 @@ export function prepareBwrapSync(plan, request, backend) {
           // descriptor; a dispatch outside the assignment door removes its home without write-back.
           if (provisioned && attemptId) credentialWriteBack = credentialWriteBackOf(request);
           // The host's record beside the home, outside every grant: what a settle reads, never the home.
-          if (attemptId) writtenRecords.push(writeAttemptHomeRecord(res.hostTarget, { attemptId, runDir: request.context?.runDir, dispatchId: request.dispatchId, credentialWriteBack }));
+          if (attemptId) writtenRecords.push(writeAttemptHomeRecord(res.hostTarget, { attemptId, runDir: request.context?.runDir, dispatchId: request.dispatchId, launchCommandId: request.assignmentLaunchContext?.command?.launchCommandId ?? attemptId }));
         }
       }
 
@@ -640,26 +652,16 @@ export function prepareBwrapSync(plan, request, backend) {
       const goSocket = terminal ? gateGoSocket(request.gateCommand) : null;
       if (goSocket) bwrapArgs.push('--ro-bind', goSocket, goSocket);
     };
-    if (!blind) {
-      // Only machine-private roots are hidden here (spec section 9.3); with none on the host this
-      // is the mounts and the attempt binds, byte for byte.
-      mounts.forEach(materialize);
-      for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
-      bindAttemptFiles();
-      for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
-    } else {
-      // A later mount over a parent hides an earlier one beneath it, so the order is the
-      // contract: mounts that do not sit inside a hidden root (a workspace may contain one),
-      // then the masks, then the dispatch's own directory read-only, then the mounts inside
-      // a hidden root (its outbox, its private home), and last the masks made read-only.
-      const insideMasked = (res) => [...hidden, own].some((h) => res.executionTarget?.path && isInsideRoot(res.executionTarget.path, h.executionTarget.path));
-      mounts.filter((r) => !insideMasked(r)).forEach(materialize);
-      for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
-      bwrapArgs.push('--ro-bind', own.hostTarget, own.executionTarget.path);
-      mounts.filter(insideMasked).forEach(materialize);
-      bindAttemptFiles();
-      for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
-    }
+    // A later mount over a parent hides an earlier one beneath it, so the order is the contract: mounts outside
+    // every hidden root, the masks, a blind dispatch's own directory read-only, the mounts inside a hidden root
+    // (outbox, own home, program file), and last the masks made read-only.
+    const insideMasked = (res) => [...hidden, ...(own ? [own] : [])].some((h) => res.executionTarget?.path && isInsideRoot(res.executionTarget.path, h.executionTarget.path));
+    mounts.filter((r) => !insideMasked(r)).forEach(materialize);
+    for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
+    if (own) bwrapArgs.push('--ro-bind', own.hostTarget, own.executionTarget.path);
+    mounts.filter(insideMasked).forEach(materialize);
+    bindAttemptFiles();
+    for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
 
     // The invocation names the variable its CLI reads its login home from; it points at the private home
     // (spec §6.5: no provider branching, only the name the invocation declared). It wins over a value the

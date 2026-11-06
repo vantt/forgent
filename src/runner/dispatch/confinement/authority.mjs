@@ -21,6 +21,7 @@ import {
   loadMachineBackendRegistry,
   createBackendRegistrySnapshot,
   getBackendDriver,
+  credentialScanRoots,
 } from "./backend-registry.mjs";
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
@@ -715,7 +716,8 @@ export async function assessAndPrepare(request, opts = {}) {
       );
     }
 
-    const assessment = driver.assess(request, backendInstance);
+    // Every root private homes live under is masked: the registry names them, the driver cannot read it.
+    const assessment = driver.assess({ ...request, context: { ...request.context, confinementRoots: credentialScanRoots() } }, backendInstance);
     try {
       assertAttestationStoreIsolated(request.context, assessment.resources || []);
       if (request.assignmentLaunchContext && request.context?.runDir) {
@@ -904,10 +906,11 @@ export async function assessAndPrepare(request, opts = {}) {
 }
 
 /**
- * Prepare confinement for launch (Producer Ordering, spec & contracts).
+ * Prepare confinement for the launch of one supervised attempt (Producer Ordering, spec & contracts).
  *
- * Persists prepared attestation, publishes authority-prepared-invocation.v1,
- * publishes confinement-finalization.v1 descriptor, and publishes launch-envelope.v1.
+ * Persists the prepared attestation, publishes authority-prepared-invocation.v1 and the
+ * confinement-finalization.v1 descriptor, and returns the attempt's command, env and sandbox prefix;
+ * the attempt envelope itself is the controller's.
  */
 export async function prepareConfinementForLaunch(request, opts = {}) {
   validateConfinementRequest(request);
@@ -932,7 +935,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
     );
   }
   // H11: 0700 at first creation -- everything this function publishes under
-  // here (prepared-invocation, launch-envelope, the secrets side file) is
+  // here (prepared-invocation, finalization descriptor) is
   // host-private evidence, never meant to be world/group-readable. A
   // subsequent mkdirSync(..., {recursive:true}) by the generic publish
   // helpers below is a no-op on an already-existing directory and never
@@ -1269,17 +1272,17 @@ export function finalizeAttemptHome({ runDir, attemptId } = {}) {
   }
   const descriptors = attemptFinalizationDescriptors(runDir);
   const homes = [];
-  for (const { descriptor } of descriptors) {
+  for (const { file, descriptor } of descriptors) {
     for (const res of descriptor.resources || descriptor.temporaryDirectories || []) {
       const target = res.pathRef || res.path;
       if (!target || homes.some((h) => h.target === target) || !fs.existsSync(target)) continue;
-      homes.push({ target, marker: readAttemptHomeMarker(target, attemptId, runDir), writeBack: res.credentialWriteBack });
+      homes.push({ target, marker: readAttemptHomeMarker(target, attemptId, runDir), writeBack: res.credentialWriteBack, launchCommandId: path.basename(file, '.json') });
     }
   }
   let kept = 0;
   let held = 0;
-  for (const { target, marker, writeBack } of homes) {
-    const record = { attemptId, runDir, dispatchId: marker.dispatchId, credentialWriteBack: writeBack ?? null };
+  for (const { target, marker, writeBack, launchCommandId } of homes) {
+    const record = { attemptId, runDir, dispatchId: marker.dispatchId, launchCommandId };
     // A home whose staging failed the allowed number of times is left to a later settle; doctor reports it.
     if ((readAttemptHomeRecord(target, record)?.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) { held += 1; continue; }
     const result = writeBackRenewedCredential(target, writeBack);

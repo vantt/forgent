@@ -22,7 +22,6 @@ import {
   ensureSessionSocketDir,
   resolveClaudeSocketBase,
   resolveMachinePrivateRoots,
-  machineLoginStores,
   runtimeDirForMask,
   isInsideRoot,
 } from '../../src/runner/dispatch/confinement/resources.mjs';
@@ -30,6 +29,7 @@ import { BUILTIN_POLICY_IDS, resolveConfinementPolicy } from '../../src/runner/d
 import { computeProbeFingerprint, probeMachinePrivateHidden, MACHINE_PRIVATE_FALSIFIERS } from '../../src/runner/dispatch/confinement/probes/harness.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { writeAccountsFile } from '../helpers/config-fixture.mjs';
+import { machineLoginStores } from '../../src/runner/dispatch/llm-accounts.mjs';
 
 const HAS_WORKING_BWRAP = os.platform() === 'linux'
   && cp.spawnSync('/usr/bin/bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' }).status === 0;
@@ -134,8 +134,8 @@ test('every confined launch sets the one marker variable the Config session clas
   assert.match(rustSource, new RegExp(`pub const CONFINED_MARKER: &str = "${CONFINED_MARKER_ENV}";`), 'the crate and the driver name the same variable');
 });
 
-test('the machine-private roots are data in the contract: the private directory, the user runtime directory, the Claude Code session sockets, herdr\'s sockets and the login stores', () => {
-  assert.deepEqual([...MACHINE_PRIVATE_ROOTS], ['{home}/.fgos/private', '{runtimeDir}', '{claudeSocketBase}/cc-socks', '{home}/.config/herdr', '{xdgConfigHome}/herdr', '{herdrSocketDir}', '{loginStore}']);
+test('the machine-private roots are data in the contract: the private directory, the user runtime directory, the Claude Code session sockets, herdr\'s sockets, the login stores and the confinement roots', () => {
+  assert.deepEqual([...MACHINE_PRIVATE_ROOTS], ['{home}/.fgos/private', '{runtimeDir}', '{claudeSocketBase}/cc-socks', '{home}/.config/herdr', '{xdgConfigHome}/herdr', '{herdrSocketDir}', '{loginStore}', '{confinementRoot}']);
   // herdr's layout is herdr's: the terminal-control herdr driver reads the same directory under the home.
   const driver = fs.readFileSync(new URL('../../packages/terminal-control/rust/src/driver/herdr.rs', import.meta.url), 'utf8');
   assert.match(driver, /\.join\("\.config"\)\s*\.join\("herdr"\)/, 'the herdr driver and the list name the same directory');
@@ -274,16 +274,19 @@ test('every login store the inventory and the executors name is masked, and one 
   const host = makeHost({ withPrivate: false });
   const named = path.join(host.home, '.stand-in-pi');
   const ownCodex = path.join(host.root, 'own-codex');
-  for (const dir of [named, ownCodex, path.join(host.home, '.pi', 'agent')]) fs.mkdirSync(dir, { recursive: true });
+  const defaults = ['.codex', path.join('.pi', 'agent'), '.claude'].map((dir) => path.join(host.home, dir));
+  for (const dir of [named, ownCodex, ...defaults]) fs.mkdirSync(dir, { recursive: true });
   writeAccountsFile(path.join(host.home, '.fgos'), { llmAccounts: { xai: { standin: { credentialStore: { pi: '~/.stand-in-pi' } } } } });
   await withHome(host, () => {
-    // The bundled executors read their logins through CODEX_HOME and PI_CODING_AGENT_DIR: the runner's own value
-    // is the store, else the CLI's default under the home.
+    // Every CLI's default login home and the one its variable names are stores, whichever the runner set.
     const stores = machineLoginStores({ homeDir: host.home, env: { CODEX_HOME: ownCodex } });
-    for (const dir of [named, ownCodex, path.join(host.home, '.pi', 'agent'), path.join(host.home, '.omp', 'agent')]) assert.ok(stores.includes(dir), dir);
-    assert.equal(stores.includes(path.join(host.home, '.codex')), false, 'the runner\'s CODEX_HOME replaces the default');
+    for (const dir of [named, ownCodex, ...defaults, path.join(host.home, '.omp', 'agent'), path.join(host.home, '.gemini')]) assert.ok(stores.includes(dir), dir);
     const roots = resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath: null, loginStores: stores });
-    assert.deepEqual(roots.sort(), [host.privateDir, named, ownCodex, path.join(host.home, '.pi', 'agent')].sort(), 'each store that exists is masked, an absent one is skipped');
+    assert.deepEqual(roots.sort(), [host.privateDir, named, ownCodex, ...defaults].sort(), 'each store that exists is masked, an absent one is skipped');
+    // A launch that reads its own CLI's login in place (it declares no login store) keeps that CLI's homes.
+    const claudeSeat = machineLoginStores({ homeDir: host.home, env: {}, inPlaceCli: 'claude' });
+    assert.equal(claudeSeat.includes(path.join(host.home, '.claude')), false);
+    assert.ok(claudeSeat.includes(path.join(host.home, '.codex')));
   });
   const file = path.join(host.root, 'a-file');
   fs.writeFileSync(file, '');
@@ -291,6 +294,18 @@ test('every login store the inventory and the executors name is masked, and one 
   for (const [store, code] of [['relative/login', 'login-store-not-a-directory'], [file, 'login-store-not-a-directory'], [host.home, 'login-store-is-home'], [host.root, 'login-store-is-home']]) {
     assert.throws(() => refusal([store]), (e) => e.code === code, store);
   }
+});
+
+// The host writes homes and their records under a confinement root; inside a writable grant the agent could plant
+// what the host later reads there.
+test('a confinement root inside a writable mount refuses the launch by name', async () => {
+  const host = makeHost({ withPrivate: false });
+  const inside = path.join(host.project, 'homes');
+  fs.mkdirSync(inside, { recursive: true });
+  await withHome(host, () => {
+    const assessment = assessBwrap(requestFor(host), { id: 'bwrap', type: 'bwrap', config: { type: 'bwrap', executable: '/usr/bin/bwrap', tempRoot: inside } });
+    assert.ok(assessment.mismatches.some((m) => m.code === 'confinement-root-in-writable-grant'), JSON.stringify(assessment.mismatches));
+  });
 });
 
 test('herdr\'s directory under $XDG_CONFIG_HOME is masked too, where herdr moves its sockets when that is set', () => {

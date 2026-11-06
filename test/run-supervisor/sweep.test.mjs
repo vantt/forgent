@@ -9,8 +9,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
-import { ensurePrivateDir, writeOwnershipMarkerV2, extendOwnershipMarker } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { ensurePrivateDir, writeOwnershipMarkerV2 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { sweepAttempts } from '../../src/run-supervisor/client.mjs';
+import { rewriteOwnershipMarker } from '../helpers/ownership-marker.mjs';
 
 const REPO = path.resolve(import.meta.dirname, '../..');
 const HOST = process.env.FGOS_HOST_BIN;
@@ -29,7 +30,7 @@ function attemptHome(w, { attemptId, runDir, ageMs = 0 }) {
   const dir = path.join(w.tempRoot, `disp_${attemptId}`, 'home');
   ensurePrivateDir(dir, { root: w.tempRoot });
   writeOwnershipMarkerV2(dir, { attemptId, runDir, dispatchId: `disp_${attemptId}` });
-  if (ageMs) extendOwnershipMarker(dir, { createdAt: new Date(Date.now() - ageMs).toISOString() });
+  if (ageMs) rewriteOwnershipMarker(dir, { createdAt: new Date(Date.now() - ageMs).toISOString() });
   fs.writeFileSync(path.join(dir, 'auth.json'), '{"fake":"login copy"}');
   return dir;
 }

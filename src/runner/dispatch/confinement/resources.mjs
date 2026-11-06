@@ -16,8 +16,7 @@ import os from 'node:os';
 import { resolveConfinementTempRoot } from './cleanup.mjs';
 import { createGitInspect, gitPortOptions } from '../../../git/inspect.mjs';
 import { userRuntimeDir } from '../../../run-supervisor/runtime-dir.mjs';
-import { readMachineConfig } from '../../../config/facade.mjs';
-import { credentialStoreOf, expandCredentialHome } from '../provider-capacity.mjs';
+import { machineLoginStores } from '../llm-accounts.mjs';
 
 /**
  * `hostRead: blind` leaves the host readable except what other dispatches and live agent
@@ -92,6 +91,8 @@ export function createBlindRootsWhenMissing(fgosDir) {
  *   A worker that reaches one can run a command or type into any pane of that session.
  * - `{loginStore}`, every login directory of the machine (machineLoginStores): a worker gets a copy of the
  *   one login it was leased inside its private home, so every store in place is a login it must not read.
+ * - `{confinementRoot}`, every root private homes live under (credentialScanRoots and the backend's own): the
+ *   sibling homes and their host records. The dispatch's own home is bound back after the mask.
  */
 export const MACHINE_PRIVATE_ROOTS = Object.freeze([
   '{home}/.fgos/private',
@@ -101,46 +102,26 @@ export const MACHINE_PRIVATE_ROOTS = Object.freeze([
   '{xdgConfigHome}/herdr',
   '{herdrSocketDir}',
   '{loginStore}',
+  '{confinementRoot}',
 ]);
 
-/** Where a CLI keeps its login when its home variable is not set, under the user's home. */
-const CLI_DEFAULT_LOGIN_HOMES = Object.freeze({ codex: '.codex', pi: path.join('.pi', 'agent'), omp: path.join('.omp', 'agent') });
+/** machineLoginStores of the account inventory module; a config it cannot read refuses the launch by name. */
+function loginStoresOf(options) {
+  try { return machineLoginStores(options); } catch (err) {
+    throw new ConfinementResourceError('login-store-inventory-unreadable', `the config naming the login stores cannot be read: ${err.message}`);
+  }
+}
 
-const plainValues = (value) => (value !== null && typeof value === 'object' && !Array.isArray(value) ? Object.values(value) : []);
+/** The real path of the file `command` runs (looked up on `searchPath` when it names no directory), or null. */
+function launchProgram(command, searchPath = process.env.PATH) {
+  if (typeof command !== 'string' || command === '') return null;
+  const candidates = command.includes(path.sep) ? [path.resolve(command)] : String(searchPath ?? '').split(path.delimiter).filter(Boolean).map((dir) => path.join(dir, command));
+  return candidates.map(realPathOrNull).find((real) => real && fs.statSync(real).isFile()) ?? null;
+}
 
-/**
- * Every login directory this machine names: each store of the account inventory (`runner.llmAccounts`,
- * `runner.providers`) expanded as the lease expands it, and each executor's login home (its `homeEnv` value in
- * `env`, else the CLI default). One that does not expand stays as written, for the resolver to refuse by name.
- */
-export function machineLoginStores({ homeDir = os.homedir(), env = process.env } = {}) {
-  let runner;
-  try {
-    runner = readMachineConfig({ globalDir: path.join(homeDir, '.fgos'), sections: ['runner'] }).value?.runner ?? {};
-  } catch (err) {
-    throw new ConfinementResourceError('login-store-inventory-unreadable', `the machine config naming the login stores cannot be read: ${err.message}`);
-  }
-  const stores = new Set();
-  const add = (value) => { if (typeof value === 'string' && value.trim()) stores.add(expandCredentialHome(value) ?? value); };
-  for (const pool of plainValues(runner.llmAccounts)) {
-    for (const account of plainValues(pool)) plainValues(account?.credentialStore).forEach(add);
-  }
-  for (const provider of plainValues(runner.providers)) {
-    for (const account of plainValues(provider?.accounts)) {
-      add(account?.credentialSource?.home);
-      for (const source of plainValues(account?.credentialSources)) add(source?.home);
-    }
-  }
-  for (const executor of plainValues(runner.executors)) {
-    for (const invocation of [executor, ...(Array.isArray(executor?.invocations) ? executor.invocations : [])]) {
-      const store = credentialStoreOf(invocation);
-      if (typeof store?.homeEnv !== 'string') continue;
-      const own = env[store.homeEnv];
-      const fallback = Object.hasOwn(CLI_DEFAULT_LOGIN_HOMES, store.use) ? path.join(homeDir, CLI_DEFAULT_LOGIN_HOMES[store.use]) : null;
-      add(typeof own === 'string' && own.trim() ? own : fallback);
-    }
-  }
-  return [...stores];
+/** Every root private homes live under: the registered ones the authority passes in, the default and this backend's. */
+function confinementRootsFor(backendConfig, registered = []) {
+  return [...new Set([...registered, resolveConfinementTempRoot(), confinementTempRootFor(backendConfig)])];
 }
 
 /**
@@ -385,7 +366,8 @@ export function resolveMachinePrivateRoots({
   xdgRuntimeDir = runtimeDirForMask(),
   xdgConfigHome = process.env.XDG_CONFIG_HOME,
   herdrSocketPath = process.env.HERDR_SOCKET_PATH,
-  loginStores = machineLoginStores({ homeDir }),
+  loginStores = loginStoresOf({ homeDir }),
+  confinementRoots = [],
 } = {}) {
   const home = path.resolve(homeDir);
   const base = path.resolve(claudeSocketBase);
@@ -399,6 +381,7 @@ export function resolveMachinePrivateRoots({
     '{xdgConfigHome}': configHome,
     '{herdrSocketDir}': herdrSocketDirOf(herdrSocketPath, [home, path.join(home, '.config'), configHome, '/tmp']),
     '{loginStore}': loginStoreRoots(loginStores, home),
+    '{confinementRoot}': confinementRoots,
   });
   return roots.filter((root) => !roots.some((other) => other !== root && isInsideRoot(root, other)));
 }
@@ -465,6 +448,7 @@ export function resolveConfinementResources({
   xdgConfigHome = process.env.XDG_CONFIG_HOME,
   herdrSocketPath = process.env.HERDR_SOCKET_PATH,
   loginStores,
+  confinementRoots = confinementRootsFor(backendConfig, context.confinementRoots),
 } = {}) {
   if (!dispatchId || typeof dispatchId !== 'string') {
     throw new ConfinementResourceError('confinement-grant-invalid', 'dispatchId is required.');
@@ -652,8 +636,15 @@ export function resolveConfinementResources({
     allocation: 'existing',
     ...extra,
   });
-  const machinePrivateRoots = resolveMachinePrivateRoots({ homeDir, claudeSocketBase, xdgRuntimeDir, xdgConfigHome, herdrSocketPath, loginStores });
-  for (const root of machinePrivateRoots) resolved.push(hiddenResource(root, { machinePrivate: true }));
+  const stores = loginStores ?? loginStoresOf({ homeDir, projectRoot: context.repoRoot ?? context.cwd, inPlaceCli: context.inPlaceLoginCli ?? null });
+  const machinePrivateRoots = resolveMachinePrivateRoots({ homeDir, claudeSocketBase, xdgRuntimeDir, xdgConfigHome, herdrSocketPath, loginStores: stores, confinementRoots });
+  const realConfinementRoots = confinementRoots.map((root) => realPathOrNull(root) ?? root);
+  for (const root of machinePrivateRoots) resolved.push(hiddenResource(root, { machinePrivate: true, ...(realConfinementRoots.includes(root) ? { confinementRoot: true } : {}) }));
+  // A program inside a masked home (pi installs itself in ~/.pi/agent/bin) is bound back alone, read-only.
+  const program = launchProgram(context.launchCommand, context.launchPath);
+  if (program && machinePrivateRoots.some((root) => isInsideRoot(program, root))) {
+    resolved.push({ resource: 'launch-program', identity: `launch-program:${path.basename(program)}`, hostTarget: program, executionTarget: { location: 'host', path: program }, delivery: 'mount', collect: 'none', access: 'read', allocation: 'existing' });
+  }
 
   // 7. hostRead: blind — hide the hidden roots, keep the dispatch's own directory
   if (blind) {

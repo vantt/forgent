@@ -140,19 +140,6 @@ export const CREDENTIAL_HOME_HELD = 'credential-home-held';
 export const CREDENTIAL_KEEP_MIN_INTERVAL_MS = 15 * 60 * 1000;
 
 /**
- * Add fields to the marker of a home this process created. Used for facts only known once the home is
- * filled (which account login it was copied from).
- */
-export function extendOwnershipMarker(dirPath, fields) {
-  const marker = readOwnershipMarker(dirPath) ?? readAttemptOwnershipMarker(dirPath);
-  if (!marker) return false;
-  // Temp file and rename: a remover in another process that reads the marker meanwhile sees the old or the
-  // new content, never a half-written one (an unreadable marker would make the home look unowned).
-  writeFileAtomic(path.join(dirPath, OWNERSHIP_MARKER_FILE), JSON.stringify({ ...marker, ...fields }, null, 2));
-  return true;
-}
-
-/**
  * Read and validate ownership marker.
  */
 export function readOwnershipMarker(dirPath) {
@@ -198,38 +185,54 @@ function markerIsUnrecognisable(dirPath) {
 }
 
 // The host-only record of an attempt home, `<tempRoot>/<dispatchId>/attempt-home.json` in the owner-only dispatch
-// directory no sandbox is granted (read-only at most; the default temp root not at all): the attempt, the
-// write-back target the finalization descriptor holds and the count of failed stagings.
+// directory, a machine-private root no sandbox sees: the attempt, where its finalization descriptor is (`runDir`,
+// `launchCommandId`) and the count of failed stagings. Where a login goes is read from that descriptor only.
 const ATTEMPT_HOME_RECORD_FILE = 'attempt-home.json';
-const ATTEMPT_HOME_RECORD_CONTRACT = 'confinement-attempt-home-record.v1';
+const ATTEMPT_HOME_RECORD_CONTRACT = 'confinement-attempt-home-record.v2';
+const MAX_RECORD_BYTES = 64 * 1024;
 
 const recordPathOf = (homeDir) => path.join(path.dirname(homeDir), ATTEMPT_HOME_RECORD_FILE);
 
 /** Write the host record of an attempt home (whole, atomically, 0600). Returns its path. */
-export function writeAttemptHomeRecord(homeDir, { attemptId, runDir, dispatchId, credentialWriteBack = null, credentialKept } = {}) {
+export function writeAttemptHomeRecord(homeDir, { attemptId, runDir, dispatchId, launchCommandId, credentialKept } = {}) {
   const file = recordPathOf(homeDir);
   writeFileAtomic(file, `${JSON.stringify({
-    contract: ATTEMPT_HOME_RECORD_CONTRACT,
-    attemptId,
-    runDir,
-    dispatchId,
-    home: homeDir,
-    credentialWriteBack,
-    ...(credentialKept ? { credentialKept } : {}),
+    contract: ATTEMPT_HOME_RECORD_CONTRACT, attemptId, runDir, dispatchId, launchCommandId, home: homeDir, ...(credentialKept ? { credentialKept } : {}),
   }, null, 2)}\n`);
   return file;
 }
 
+// The record's bytes, only from a regular file of this user with one link, opened without following a link.
+function readRecordBytes(file) {
+  const fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW | fs.constants.O_NONBLOCK);
+  try {
+    const stat = fs.fstatSync(fd);
+    const uid = typeof process.getuid === 'function' ? process.getuid() : stat.uid;
+    if (!stat.isFile() || stat.uid !== uid || stat.nlink !== 1 || stat.size > MAX_RECORD_BYTES) throw new Error('record-not-trusted');
+    return fs.readFileSync(fd, 'utf8');
+  } finally { fs.closeSync(fd); }
+}
+
 /**
- * The host record of `homeDir`, or null when there is none of this contract for exactly that home (an older
- * release wrote none). With `attemptId`/`runDir`, a record of another attempt is none as well.
+ * The host record of `homeDir`, or null when there is none of this contract for exactly that home, it is not a
+ * plain file of this user, or (with `attemptId`/`runDir`) it is another attempt's.
  */
 export function readAttemptHomeRecord(homeDir, { attemptId, runDir } = {}) {
   let record;
-  try { record = JSON.parse(fs.readFileSync(recordPathOf(homeDir), 'utf8')); } catch { return null; }
+  try { record = JSON.parse(readRecordBytes(recordPathOf(homeDir))); } catch { return null; }
   if (record?.contract !== ATTEMPT_HOME_RECORD_CONTRACT || record.home !== homeDir || record.dispatchId !== path.basename(path.dirname(homeDir))) return null;
+  if (typeof record.runDir !== 'string' || !path.isAbsolute(record.runDir) || typeof record.launchCommandId !== 'string' || !/^[\w.-]+$/.test(record.launchCommandId)) return null;
   if ((attemptId !== undefined && record.attemptId !== attemptId) || (runDir !== undefined && record.runDir !== runDir)) return null;
   return record;
+}
+
+/** `{writeBack}` of a recorded home's entry in its finalization descriptor, or undefined when that cannot say. */
+function recordedWriteBack(record) {
+  try {
+    const descriptor = JSON.parse(fs.readFileSync(path.join(record.runDir, 'protected', 'confinement-finalization', `${record.launchCommandId}.json`), 'utf8'));
+    const entry = (descriptor.resources || []).find((res) => (res.pathRef || res.path) === record.home);
+    return entry ? { writeBack: entry.credentialWriteBack ?? null } : undefined;
+  } catch { return undefined; }
 }
 
 /**
@@ -342,9 +345,9 @@ export function listKeptCredentialHomes(tempRoot) {
 }
 
 /**
- * Settle the held homes under `tempRoots` from their host record: the login is staged beside the account's store
- * (never applied here), or proven no newer, and the home is removed. A home without a record, or whose staging
- * still fails, stays held. In `unretriedRoots` a kept home counts as held. Never throws; `{settled, held}`.
+ * Settle the held homes under `tempRoots` from their host record and the descriptor it names: the login is staged
+ * beside the account's store (never applied here), or proven no newer or unreadable, and the home is removed. A
+ * home without a record or descriptor entry, or whose staging still fails, stays held. In `unretriedRoots` a kept home counts as held. Never throws; `{settled, held}`.
  */
 export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempRoot()], unretriedRoots = [] } = {}) {
   let settled = 0;
@@ -359,7 +362,10 @@ export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempR
       seen.add(dir);
       if (!home.held && !unretried.has(canonicalRoot(root))) continue;
       try {
-        if (home.record && writeBackRenewedCredential(home.dir, home.record.credentialWriteBack ?? undefined).status !== 'failed') {
+        const target = home.record ? recordedWriteBack(home.record) : undefined;
+        const result = target ? writeBackRenewedCredential(home.dir, target.writeBack ?? undefined) : null;
+        if (result && (result.status !== 'failed' || result.code === 'home-unreadable')) {
+          if (result.status === 'failed') process.stderr.write(`fgos: credential write-back not done (${result.code}); held private home removed\n`);
           removeAttemptHome(home.dir, home.record.dispatchId);
           settled += 1;
           continue;

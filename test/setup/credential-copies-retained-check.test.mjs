@@ -6,8 +6,9 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { checkCredentialCopiesRetained, fixCredentialCopiesRetained, checkConfinementOrphanedResourcesReaped, DOCTOR_CHECKS } from '../../src/setup/registrations.mjs';
-import { extendOwnershipMarker, writeOwnershipMarker, writeAttemptHomeRecord, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { writeOwnershipMarker, writeAttemptHomeRecord, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { writeRawGlobalConfig, writeAccountsFile } from '../helpers/config-fixture.mjs';
+import { rewriteOwnershipMarker } from '../helpers/ownership-marker.mjs';
 
 // Every default path of the code under test (the provider runtime directory, the global config, the backend
 // registry) is under HOME. A throwaway HOME for the whole file means a call that forgets to name its own
@@ -29,7 +30,7 @@ function workspace() {
 }
 
 function addPending(w, provider, accountId, stagedAtMs) {
-  const dir = path.join(w.runtimeDir, 'account-locks', provider, accountId, 'pending', `${String(stagedAtMs).padStart(15, '0')}-abcd`);
+  const dir = path.join(w.runtimeDir, 'account-locks', provider, accountId, 'pending', `${String(stagedAtMs).padStart(15, '0')}-abcd0123`);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'auth.json'), JSON.stringify({ refresh: FAKE_TOKEN }));
 }
@@ -38,7 +39,7 @@ function addKeptHome(w, dispatchId, attempts, { provider = 'xai', accountId = 'a
   const dir = path.join(w.tempRoot, dispatchId, 'home');
   fs.mkdirSync(dir, { recursive: true });
   writeOwnershipMarker(dir, { dispatchId });
-  extendOwnershipMarker(dir, {
+  rewriteOwnershipMarker(dir, {
     credentialWriteBack: { provider, accountId, home: path.join(w.tmp, 'secret-source-home'), layout: 'pi-auth-json', runtimeDir: w.runtimeDir },
     credentialKept: { attempts, since: new Date(Date.now() - 50 * HOUR).toISOString() },
   });
@@ -117,11 +118,11 @@ test('the orphan count skips a held home owned by a dead process but still count
     fs.mkdirSync(w.tempRoot, { recursive: true, mode: 0o700 });
     const deadPid = 2 ** 22 + 12345;
     const held = addKeptHome(w, 'disp_held', CREDENTIAL_KEEP_MAX_ATTEMPTS);
-    extendOwnershipMarker(held, { pid: deadPid });
+    rewriteOwnershipMarker(held, { pid: deadPid });
     assert.equal(checkConfinementOrphanedResourcesReaped().passed, true, 'a held home is reported by its own check, not as an orphan');
 
     const retrying = addKeptHome(w, 'disp_retry', 1);
-    extendOwnershipMarker(retrying, { pid: deadPid });
+    rewriteOwnershipMarker(retrying, { pid: deadPid });
     const result = checkConfinementOrphanedResourcesReaped();
     assert.equal(result.passed, false);
     assert.match(result.message, /1 confinement resource dir\(s\) owned by a dead process/);
@@ -147,16 +148,33 @@ test('the fix settles a held home from its host record, and never one without a 
     const recorded = path.join(w.tempRoot, 'disp_recorded', 'home');
     fs.mkdirSync(recorded, { recursive: true });
     fs.writeFileSync(path.join(recorded, 'auth.json'), renewedLogin);
+    // The record names the attempt's finalization descriptor; only that descriptor says where the login goes.
+    const runDir = path.join(w.tmp, 'run');
+    fs.mkdirSync(path.join(runDir, 'protected', 'confinement-finalization'), { recursive: true });
+    fs.writeFileSync(path.join(runDir, 'protected', 'confinement-finalization', 'att-recorded.json'), JSON.stringify({
+      contract: 'confinement-finalization.v1', launchCommandId: 'att-recorded',
+      resources: [{ pathRef: recorded, resourceId: 'private-home', credentialWriteBack: { provider: 'xai', accountId: 'acct', kind: 'home-files', home: source, layout: 'pi-auth-json', runtimeDir: w.runtimeDir } }],
+    }));
     writeAttemptHomeRecord(recorded, {
-      attemptId: 'att-recorded', runDir: path.join(w.tmp, 'run'), dispatchId: 'disp_recorded',
-      credentialWriteBack: { provider: 'xai', accountId: 'acct', kind: 'home-files', home: source, layout: 'pi-auth-json', runtimeDir: w.runtimeDir },
+      attemptId: 'att-recorded', runDir, dispatchId: 'disp_recorded', launchCommandId: 'att-recorded',
       credentialKept: { attempts: CREDENTIAL_KEEP_MAX_ATTEMPTS, since: new Date(Date.now() - 50 * HOUR).toISOString(), lastCountedAt: Date.now() },
     });
+    // A record reached through a link is no record, whatever it says: that home stays held.
+    const linked = path.join(w.tempRoot, 'disp_linked', 'home');
+    fs.mkdirSync(linked, { recursive: true });
+    fs.writeFileSync(path.join(linked, 'auth.json'), renewedLogin);
+    fs.mkdirSync(path.join(w.tmp, 'elsewhere', 'disp_linked'), { recursive: true });
+    const planted = writeAttemptHomeRecord(path.join(w.tmp, 'elsewhere', 'disp_linked', 'home'), {
+      attemptId: 'att-recorded', runDir, dispatchId: 'disp_linked', launchCommandId: 'att-recorded',
+      credentialKept: { attempts: CREDENTIAL_KEEP_MAX_ATTEMPTS, since: new Date().toISOString(), lastCountedAt: Date.now() },
+    });
+    fs.symlinkSync(planted, path.join(w.tempRoot, 'disp_linked', 'attempt-home.json'));
     assert.match(run(w).message, /disp_recorded\/home\. Its host record names where its login goes: "fgos doctor --fix"/);
 
     const result = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir });
     assert.equal(result.changed, true);
     assert.match(result.message, /held private home\(s\): 1 settled, 2 still held \(one without a host record is recovered by hand\)/);
+    assert.equal(fs.existsSync(linked), true, 'a home whose record is a link is not settled');
     assert.equal(fs.existsSync(path.join(w.tempRoot, 'disp_recorded')), false, 'the recorded home, its record and its dispatch directory are gone');
     const pending = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'pending');
     assert.deepEqual(fs.readdirSync(pending).map((name) => fs.readFileSync(path.join(pending, name, 'auth.json'), 'utf8')), [renewedLogin], 'its login waits beside the store its record names');
@@ -185,7 +203,7 @@ test('a half-written copy kept for hand recovery is reported as such', () => {
   const w = workspace();
   try {
     const now = Date.now();
-    const dir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'torn', `${String(now - 3 * 24 * HOUR).padStart(15, '0')}-abcd`);
+    const dir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'torn', `${String(now - 3 * 24 * HOUR).padStart(15, '0')}-abcd0123`);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'auth.json'), `{"refresh": "${FAKE_TOKEN}`);
     const result = run(w, now);
@@ -199,7 +217,7 @@ test('a half-written copy is reported at any age', () => {
   const w = workspace();
   try {
     const now = Date.now();
-    const dir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'torn', `${String(now - 1000).padStart(15, '0')}-abcd`);
+    const dir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'torn', `${String(now - 1000).padStart(15, '0')}-abcd0123`);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'auth.json'), '{"refresh"');
     assert.match(run(w, now).message, /xai\/acct: 1 half-written login copy\(ies\) kept for hand recovery/);
@@ -207,7 +225,7 @@ test('a half-written copy is reported at any age', () => {
 });
 
 function addPendingIn(w, provider, accountId, storeSubdir, stagedAtMs) {
-  const dir = path.join(w.runtimeDir, 'account-locks', provider, accountId, storeSubdir, 'pending', `${String(stagedAtMs).padStart(15, '0')}-abcd`);
+  const dir = path.join(w.runtimeDir, 'account-locks', provider, accountId, storeSubdir, 'pending', `${String(stagedAtMs).padStart(15, '0')}-abcd0123`);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'auth.json'), JSON.stringify({ refresh: FAKE_TOKEN }));
 }
@@ -394,7 +412,7 @@ test('a kept home under a root nothing retries is held at once: doctor fails nam
       const dir = path.join(scanOnly, 'disp_scan_only', 'home');
       fs.mkdirSync(dir, { recursive: true });
       writeOwnershipMarker(dir, { dispatchId: 'disp_scan_only' });
-      extendOwnershipMarker(dir, {
+      rewriteOwnershipMarker(dir, {
         credentialWriteBack: { provider: 'xai', accountId: 'acct', home: path.join(w.tmp, 'secret-source-home'), layout: 'pi-auth-json', runtimeDir: w.runtimeDir },
         credentialKept: { attempts: 1, since: new Date(Date.now() - HOUR).toISOString() },
       });
@@ -472,7 +490,7 @@ test('a half-written copy in a stranded directory names that directory', () => {
   const w = workspace();
   try {
     const now = Date.now();
-    const dir = path.join(storeDir(w, 'openai', 'acct'), 'torn', `${String(now - 1000).padStart(15, '0')}-abcd`);
+    const dir = path.join(storeDir(w, 'openai', 'acct'), 'torn', `${String(now - 1000).padStart(15, '0')}-abcd0123`);
     fs.mkdirSync(dir, { recursive: true });
     const result = runWith(w, { openai: { accounts: { acct: perCliAccount } } }, now);
     assert.equal(result.passed, false);
@@ -531,7 +549,7 @@ test('the registered check reads the global inventory even from a directory with
   try {
     writeAccountsFile(path.join(home, '.fgos'), { providers: { openai: { accounts: { acct: perCliCodexOnly } } } });
     // The inventory names "openai" accounts under their normalized provider family, as the runtime does.
-    const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai-codex', 'acct', 'pending', `${String(Date.now() - 3 * 24 * HOUR).padStart(15, '0')}-abcd`);
+    const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai-codex', 'acct', 'pending', `${String(Date.now() - 3 * 24 * HOUR).padStart(15, '0')}-abcd0123`);
     fs.mkdirSync(pending, { recursive: true });
     fs.writeFileSync(path.join(pending, 'auth.json'), JSON.stringify({ refresh: FAKE_TOKEN }));
     const entry = DOCTOR_CHECKS.find((c) => c.id === 'credential-copies-retained');
@@ -541,7 +559,7 @@ test('the registered check reads the global inventory even from a directory with
     assert.equal(result.message.includes(FAKE_TOKEN), false);
     // A copy in the store the account declares waits for a renewal, which only a really read inventory can say:
     // with no global config at all every account directory would read as stranded.
-    const declared = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai-codex', 'acct', 'stores', 'codex', 'pending', `${String(Date.now() - 3 * 24 * HOUR).padStart(15, '0')}-abcd`);
+    const declared = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai-codex', 'acct', 'stores', 'codex', 'pending', `${String(Date.now() - 3 * 24 * HOUR).padStart(15, '0')}-abcd0123`);
     fs.mkdirSync(declared, { recursive: true });
     const again = withHome(home, () => entry.check(home));
     assert.match(again.message, /openai-codex\/acct: 1 pending login copy\(ies\) waiting for a renewal \(a dispatch for that account applies them\)/);
@@ -558,7 +576,7 @@ test('the registered check fails with the reason when the global config cannot b
     try {
       fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
       if (location === 'accounts.yaml') writeAccountsFile(path.join(home, '.fgos'), JSON.parse(content).runner); else writeRawGlobalConfig(home, content);
-      const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai', 'acct', 'pending', `${String(Date.now() - 60 * 1000).padStart(15, '0')}-abcd`);
+      const pending = path.join(home, '.fgos', 'runtime', 'provider-capacity', 'account-locks', 'openai', 'acct', 'pending', `${String(Date.now() - 60 * 1000).padStart(15, '0')}-abcd0123`);
       fs.mkdirSync(pending, { recursive: true });
       const entry = DOCTOR_CHECKS.find((c) => c.id === 'credential-copies-retained');
       const result = withHome(home, () => entry.check(home));

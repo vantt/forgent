@@ -11,8 +11,9 @@
 //                  own CLI does not renew because of us, and a failed renewal leaves it untouched.
 //   write-back     When a private home is removed, a login a pane renewed inside it is staged beside the
 //                  source as a copy of agent origin. The agent could have put any login there, so the next
-//                  refresh-ahead applies it only once the credential probe accepts it and it names the
-//                  leased account (each layout's `identity`); a login that names no account is kept for the owner.
+//                  refresh-ahead applies it only once a renewal made with its own refresh token returns a
+//                  token of the leased account (applyAgentCopies); a login whose tokens name no account the
+//                  provider vouches for is kept for the owner.
 //
 // Applying is always compare-before-write: only an entry whose expiry is strictly later than the source's
 // and whose refresh token is a different one replaces it (a fresh renewal result must also still be in the
@@ -257,13 +258,19 @@ function isReplacement(copyEntry, sourceEntry, { now, requireFuture }) {
 
 const nonEmpty = (value) => (typeof value === 'string' && value !== '' ? value : null);
 
+// The account an access token was issued to, as the provider signed it: the ChatGPT account claim of an OpenAI
+// token (Codex, and the `openai-codex` entries of pi and omp). A plain field beside the token (`accountId`) is
+// the agent's word and never counts; a provider whose tokens carry no such claim (xai's OAuth tokens are opaque,
+// omp asks an endpoint for their identity) names no account, so its copies are never applied automatically.
+const CODEX_AUTH_CLAIM = 'https://api.openai.com/auth';
+const tokenAccount = (token) => nonEmpty(jwtPayload(token)?.payload?.[CODEX_AUTH_CLAIM]?.chatgpt_account_id);
+
 // pi: `auth.json`, an object keyed by provider id; an `oauth` entry carries `expires` (ms, or seconds when
-// below 1e12). An API key entry has no expiry and is not renewable here. The account an entry belongs to is its
-// `accountId`, which pi keeps for the providers that name one.
+// below 1e12). An API key entry has no expiry and is not renewable here.
 const piLayout = {
   name: 'pi-auth-json',
   files: ['auth.json'],
-  identity: (entry) => nonEmpty(entry.value?.accountId),
+  identity: (entry) => tokenAccount(entry.value?.access),
   read(home, { agent } = {}) {
     const parsed = readJsonFile(path.join(home, 'auth.json'), { agent });
     if (!parsed.ok) return parsed;
@@ -331,13 +338,11 @@ function writeIfUnchanged(file, expectedRaw, content) {
 }
 
 // Codex: `auth.json` with `tokens.access_token` (a JWT whose `exp` says when it expires) and
-// `last_refresh`. Renewal replaces `tokens` and `last_refresh` together. The account is the access token's
-// ChatGPT account claim, which the provider checked when the probe used the token.
-const CODEX_AUTH_CLAIM = 'https://api.openai.com/auth';
+// `last_refresh`. Renewal replaces `tokens` and `last_refresh` together.
 const codexLayout = {
   name: 'codex-auth-json',
   files: ['auth.json'],
-  identity: (entry) => nonEmpty(jwtPayload(entry.value?.tokens?.access_token)?.payload?.[CODEX_AUTH_CLAIM]?.chatgpt_account_id),
+  identity: (entry) => tokenAccount(entry.value?.tokens?.access_token),
   read(home, { agent } = {}) {
     const parsed = readJsonFile(path.join(home, 'auth.json'), { agent });
     if (!parsed.ok) return parsed;
@@ -423,9 +428,8 @@ function ompEntries(db) {
   return entries;
 }
 
-// The account of an omp row is the `accountId` in its data, which omp keeps for the providers that name one.
 function ompIdentity(entry) {
-  try { return nonEmpty(JSON.parse(entry.value?.data)?.accountId); } catch { return null; }
+  try { return tokenAccount(JSON.parse(entry.value?.data)?.access); } catch { return null; }
 }
 
 const ompLayout = {
@@ -717,10 +721,13 @@ function listLeftovers(accountDir) {
 
 const hasLeftovers = (accountDir) => listLeftovers(accountDir).length > 0;
 
-// A pending copy staged from an agent's private home carries this in its name (host-only: the pending directory
-// is outside every grant of the sandbox). Only the probe gate applies it (applyAgentCopies).
+// Only fgOS's own copies are applied without the probe gate: a scratch home and a pending copy renewInScratch
+// named `<15 digits>-<8 hex>`. Every other pending copy (a write-back staged as `<ts>-agent-...`, or one an older
+// release staged as `<ts>-<pid>-<hex>`) came from an agent's home and goes through applyAgentCopies.
 const AGENT_ORIGIN = 'agent';
-const isAgentCopy = (dir) => new RegExp(`^\\d{15}-${AGENT_ORIGIN}-`).test(path.basename(dir));
+const HOST_COPY_NAME = /^\d{15}-[0-9a-f]{8}$/;
+const isAgentCopy = (dir) => !path.basename(dir).startsWith(SCRATCH_PREFIX) && !HOST_COPY_NAME.test(path.basename(dir));
+const pendingName = (at, origin) => `${String(at).padStart(15, '0')}-${origin ? `${origin}-` : ''}${crypto.randomBytes(4).toString('hex')}`;
 
 /**
   * Login stores whose pending copies exceed MAX_PENDING_COPIES, `[{provider, accountId, store, count, storeDir,
@@ -1054,11 +1061,10 @@ function clearFailure(accountDir) {
 // ---------------------------------------------------------------------------------------------------
 
 /**
- * Whether the copy's login is the source's account: true or false when both name their account (the layout's `identity`
- * of the dispatched provider's entry), null when either cannot.
+ * Whether the copy's login is the source's account by the provider-signed claim of each (the layout's
+ * `identity` of the dispatched provider's entry): true or false, null when either names none.
  */
 function sameAccount({ layout, provider, sourceHome, copyHome, loadSqlite }) {
-  if (typeof layout.identity !== 'function') return null;
   const source = layout.read(sourceHome, { loadSqlite });
   const copy = layout.read(copyHome, { loadSqlite, agent: true });
   if (!source.ok || !copy.ok) return null;
@@ -1070,39 +1076,71 @@ function sameAccount({ layout, provider, sourceHome, copyHome, loadSqlite }) {
 }
 
 const dropCopy = (dir) => { try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* the next holder retries */ } };
+const refuseCopy = (dir) => { dropCopy(dir); process.stderr.write('fgos: credential-copy-refused (account-mismatch)\n'); };
+
+// What the probe CLI is given of a copy: its login file alone, and for omp a fresh database that holds only the
+// `auth_credentials` rows (column names quoted, values bound), never the agent's other tables or settings.
+function isolateLogin(layout, from, to, { loadSqlite }) {
+  fs.mkdirSync(to, { mode: 0o700 });
+  if (layout !== ompLayout) {
+    for (const name of layout.files) fs.writeFileSync(path.join(to, name), readCopyBytes(path.join(from, name)), { mode: 0o600, flag: 'wx' });
+    return;
+  }
+  const { columns, rows } = withDatabase(path.join(from, 'agent.db'), { loadSqlite, readOnly: true }, (db) => ({
+    columns: db.prepare('PRAGMA table_info(auth_credentials)').all().map((column) => String(column.name)),
+    rows: db.prepare('SELECT * FROM auth_credentials').all(),
+  }));
+  const quote = (name) => `"${name.replace(/"/g, '""')}"`;
+  withDatabase(path.join(to, 'agent.db'), { loadSqlite, readOnly: false }, (db) => {
+    db.exec(`CREATE TABLE auth_credentials (${columns.map((name) => (name === 'id' ? '"id" INTEGER PRIMARY KEY' : quote(name))).join(', ')})`);
+    const insert = db.prepare(`INSERT INTO auth_credentials (${columns.map(quote).join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`);
+    for (const row of rows) insert.run(...columns.map((name) => row[name] ?? null));
+  });
+  fs.chmodSync(path.join(to, 'agent.db'), 0o600);
+}
 
 /**
  * Apply the copies staged from agents' private homes, under the account lock the caller holds. A copy the source
- * proves no newer goes; one that names another account goes unapplied (`credential-copy-refused`); one whose
- * login names no account, or that the source cannot judge, stays for the owner. Any other copy is applied only
- * after the credential probe, run against the copy itself, accepts it and it still names the leased account;
- * a failed probe keeps the copy and cools the account down.
+ * proves no newer goes; one whose token names another account goes unapplied (`credential-copy-refused`); one
+ * that names no account, or that the source cannot judge, stays for the owner. Any other copy is proven by a
+ * renewal: an isolated copy of its login is marked due and the credential probe runs on it (credentialProbeCommand,
+ * scratch cwd, minimal env), so the CLI redeems the copy's own refresh token. Only when that returns a new pair
+ * whose token names the leased account is the renewed pair applied; a pair of another account is dropped, and a
+ * call that renewed nothing keeps the copy and cools the account down.
  */
 async function applyAgentCopies({ accountDir, layout, layoutName, provider, credentialSource, home, lock, probeTimeoutMs, cooldownMs, spawnFn, env, loadSqlite, now }) {
   for (const dir of listLeftovers(accountDir).filter(isAgentCopy)) {
     const verdict = judgeCopy({ layout, provider, sourceHome: home, copyHome: dir, now: now(), loadSqlite });
     if (verdict === 'not-newer') { dropCopy(dir); continue; }
     if (verdict !== 'newer') continue;
-    const before = sameAccount({ layout, provider, sourceHome: home, copyHome: dir, loadSqlite });
-    if (before === false) {
-      dropCopy(dir);
-      process.stderr.write('fgos: credential-copy-refused (account-mismatch)\n');
-      continue;
-    }
-    if (before === null || inCooldown(accountDir, cooldownMs, now())) continue;
-    const plan = withKillTimeout(credentialProbeCommand({ ...credentialSource, home: dir }), probeTimeoutMs, env);
-    const probe = plan ? await runCredentialProbe(plan, { spawnFn: spawnFn ?? lock.spawnHolding, timeoutMs: probeTimeoutMs, env }) : { ok: false };
-    if (!probe.ok) {
-      recordFailure(accountDir, 'agent-copy-probe-failed', now());
-      continue;
-    }
-    // The call may have renewed the copy in place: what is applied is checked again.
-    if (sameAccount({ layout, provider, sourceHome: home, copyHome: dir, loadSqlite }) !== true) continue;
-    let applied;
+    const claimed = sameAccount({ layout, provider, sourceHome: home, copyHome: dir, loadSqlite });
+    if (claimed === false) { refuseCopy(dir); continue; }
+    if (claimed === null || inCooldown(accountDir, cooldownMs, now())) continue;
+    const probeHome = path.join(accountDir, `.probe-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
     try {
-      applied = applyRenewedCredential({ layoutName, sourceHome: home, copyHome: dir, provider, requireFuture: false, now: now(), loadSqlite });
-    } catch { continue; }
-    if (applied.status !== 'apply-deferred') dropCopy(dir);
+      const source = layout.read(home, { loadSqlite });
+      const key = selectProviderEntry(source.entries, provider).entry.key;
+      const refreshIn = (dirPath) => layout.read(dirPath, { loadSqlite, agent: true }).entries?.find((entry) => entry.key === key)?.refresh ?? null;
+      isolateLogin(layout, dir, probeHome, { loadSqlite });
+      const spent = refreshIn(probeHome);
+      layout.markDue(probeHome, [key], { loadSqlite });
+      const plan = withKillTimeout(credentialProbeCommand({ ...credentialSource, home: probeHome }), probeTimeoutMs, env);
+      if (plan) await runCredentialProbe(plan, { spawnFn: spawnFn ?? lock.spawnHolding, timeoutMs: probeTimeoutMs, env });
+      const renewed = refreshIn(probeHome);
+      if (renewed === null || renewed === spent) {
+        recordFailure(accountDir, 'agent-copy-not-renewed', now());
+        continue;
+      }
+      // The copy's refresh token is spent now: the renewed pair is all that is left of it.
+      const proven = sameAccount({ layout, provider, sourceHome: home, copyHome: probeHome, loadSqlite });
+      if (proven === false) { refuseCopy(dir); continue; }
+      let status = 'apply-deferred';
+      if (proven === true) {
+        try { status = applyRenewedCredential({ layoutName, sourceHome: home, copyHome: probeHome, provider, requireFuture: true, now: now(), loadSqlite }).status; } catch { /* kept below */ }
+      }
+      if (status === 'apply-deferred') fs.renameSync(probeHome, path.join(accountDir, PENDING_DIR, pendingName(now(), proven === true ? null : AGENT_ORIGIN)));
+      dropCopy(dir);
+    } catch { /* the copy stays for the next holder */ } finally { dropCopy(probeHome); }
   }
 }
 
@@ -1222,7 +1260,7 @@ async function renewInScratch({ layout, layoutName, provider, credentialSource, 
     try {
       const pendingDir = path.join(accountDir, PENDING_DIR);
       fs.mkdirSync(pendingDir, { recursive: true, mode: 0o700 });
-      fs.renameSync(scratch, path.join(pendingDir, `${String(now()).padStart(15, '0')}-${crypto.randomBytes(4).toString('hex')}`));
+      fs.renameSync(scratch, path.join(pendingDir, pendingName(now())));
       capPendingCopies(accountDir, layout, loadSqlite);
     } catch { /* the copy stays where it is, and is found there */ }
     recordFailure(accountDir, 'apply-deferred', now());
@@ -1235,7 +1273,7 @@ async function renewInScratch({ layout, layoutName, provider, credentialSource, 
     try {
       const tornDir = path.join(accountDir, TORN_DIR);
       fs.mkdirSync(tornDir, { recursive: true, mode: 0o700 });
-      fs.renameSync(scratch, path.join(tornDir, `${String(now()).padStart(15, '0')}-${crypto.randomBytes(4).toString('hex')}`));
+      fs.renameSync(scratch, path.join(tornDir, pendingName(now())));
     } catch { /* the scratch copy stays where it is, and is found there */ }
     recordFailure(accountDir, 'torn-copy', now());
     return { status: 'failed', reason: 'torn-copy-kept' };
@@ -1287,6 +1325,18 @@ function validWriteBack(value) {
     && (value.store === undefined || typeof value.store === 'string');
 }
 
+// A login file that is a link, a pipe or a device is already no login (judgeCopy); any other read error on it, and
+// any error but absence on a sidecar, would otherwise keep the home for a login that cannot be copied.
+function homeFilesReadable(layout, homeDir) {
+  for (const name of [...layout.files, ...(layout.sidecars ?? [])]) {
+    try { readCopyBytes(path.join(homeDir, name)); } catch (err) {
+      if (err?.code === 'ENOENT' || (layout.files.includes(name) && UNSAFE_COPY_ERRORS.has(err?.code))) continue;
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  * Called just before a private home is deleted. `writeBack` is the target the host recorded for the home
  * (`credentialWriteBackTarget`), never anything read from inside the home; the home's own files are read
@@ -1306,13 +1356,16 @@ export function writeBackRenewedCredential(homeDir, writeBack, { loadSqlite = de
   // Until a copy is safe in pending/, the private home may hold the only good pair: a failure before that
   // says `keepHome`, and the caller must not remove it.
   let safe = false;
+  // A home is written back once its attempt's processes are gone: a login file it left that cannot be read (no
+  // permission, a directory, a device) is no login, and must not keep the home forever (`home-unreadable`).
+  if (!homeFilesReadable(layout, homeDir)) return { status: 'failed', code: 'home-unreadable' };
   try {
     if (copyIsNewer({ layout, provider: writeBack.provider, sourceHome: writeBack.home, copyHome: homeDir, now: now(), loadSqlite }) === 'not-newer') return { status: 'unchanged' };
 
     const pendingDir = path.join(accountDir, PENDING_DIR);
     const staging = path.join(pendingDir, `.tmp-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
     fs.mkdirSync(staging, { recursive: true, mode: 0o700 });
-    const final = path.join(pendingDir, `${String(now()).padStart(15, '0')}-${AGENT_ORIGIN}-${path.basename(staging).slice(5)}`);
+    const final = path.join(pendingDir, pendingName(now(), AGENT_ORIGIN));
     try {
       layout.stage(homeDir, staging, { loadSqlite });
       // On disk before the rename, and the rename on disk before the home may go.

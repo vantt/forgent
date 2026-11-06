@@ -199,6 +199,8 @@ test('R2: resolveConfinementResources resolves run-output, workspace, private-ho
       xdgRuntimeDir: null,
       xdgConfigHome: null,
       herdrSocketPath: null,
+      // The temp root here holds the workspace; masking confinement roots is proven on its own.
+      confinementRoots: [],
     });
 
     assert.equal(resolved.length, 3);

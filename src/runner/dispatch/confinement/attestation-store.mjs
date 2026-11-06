@@ -3,13 +3,10 @@
 // Ensures:
 //   - Attestation records are stored in host storage outside all agent write grants,
 //     preventing any dispatched agent from tampering with its own security record.
-//   - Public events and results carry redacted references and digests only.
-//     (Phase 04 H11: this now also covers authority.mjs's own
-//     authority-prepared-invocation.v1 and cli-spawn-launch-envelope.v2
-//     records -- their `env` field is an allow-list, never the real spawn
-//     env; the real env lives only in a 0600 side file the supervisor
-//     reads once and deletes, see authority.mjs's `redactEnvForPersistence`
-//     and detached-run-supervisor.mjs's `publishSecretSideFile`.)
+//   - Public events and results carry redacted references and digests only. The
+//     authority-prepared-invocation.v1 record's `env` is an allow-list
+//     (authority.mjs's `redactEnvForPersistence`); the real env lives only in
+//     the attempt's side file.
 //   - Attestation schema covers all four phases: prepared, completed, failed, refused.
 //   - Channels completeness: filesystem, inherited-fd, stdio, host-ipc, network.
 

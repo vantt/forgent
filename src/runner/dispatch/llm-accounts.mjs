@@ -9,6 +9,9 @@
 // credential source shape the lease, probe and renewal read; a pool declared here replaces the same
 // pool of `runner.providers.<provider>.accounts`, which stays the source for every pool not declared.
 
+import os from 'node:os';
+import path from 'node:path';
+import { readConfig, readMachineConfig } from '../../config/facade.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { credentialStoreOf, expandCredentialHome, validateProviderAccountInventory } from './provider-capacity.mjs';
 
@@ -256,4 +259,51 @@ export function deriveLegacyInventory(runnerConfig) {
     inventory[stateKey] = { accounts };
   }
   return { inventory, unusable };
+}
+
+/** Each agent CLI's login home: the variable that moves it and its default under the user's home. */
+const CLI_LOGIN_HOMES = Object.freeze([
+  { cli: 'codex', env: 'CODEX_HOME', dir: '.codex' },
+  { cli: 'pi', env: 'PI_CODING_AGENT_DIR', dir: path.join('.pi', 'agent') },
+  { cli: 'omp', env: 'PI_CODING_AGENT_DIR', dir: path.join('.omp', 'agent') },
+  { cli: 'claude', env: 'CLAUDE_CONFIG_DIR', dir: '.claude' },
+  { cli: 'agy', env: null, dir: '.gemini' },
+]);
+
+const plainValues = (value) => (isPlainObject(value) ? Object.values(value) : []);
+
+/**
+ * Every login directory this machine names: each store of the account inventory (`runner.llmAccounts`,
+ * `runner.providers`) expanded as the lease expands it, each agent CLI's default login home and the value of its
+ * home variable in `env`, and each executor's `credentialStore.homeEnv` value, read from the config the lease
+ * reads (the project's when `projectRoot` is given). `inPlaceCli` is the CLI of a launch that reads its own login
+ * in place (it declares no credentialStore): its homes stay visible to that launch alone. One that does not
+ * expand stays as written, for the confinement resolver to refuse by name. Throws what the config door throws.
+ */
+export function machineLoginStores({ homeDir = os.homedir(), env = process.env, projectRoot, inPlaceCli = null } = {}) {
+  const request = { globalDir: path.join(homeDir, '.fgos'), sections: ['runner'] };
+  const runner = (projectRoot ? readConfig({ ...request, projectRoot }) : readMachineConfig(request)).value?.runner ?? {};
+  const stores = new Set();
+  const add = (value) => { if (typeof value === 'string' && value.trim()) stores.add(expandCredentialHome(value) ?? value); };
+  for (const pool of plainValues(runner.llmAccounts)) {
+    for (const account of plainValues(pool)) plainValues(account?.credentialStore).forEach(add);
+  }
+  for (const provider of plainValues(runner.providers)) {
+    for (const account of plainValues(provider?.accounts)) {
+      add(account?.credentialSource?.home);
+      for (const source of plainValues(account?.credentialSources)) add(source?.home);
+    }
+  }
+  for (const { cli, env: name, dir } of CLI_LOGIN_HOMES) {
+    if (cli === inPlaceCli) continue;
+    add(path.join(homeDir, dir));
+    if (name) add(env[name]);
+  }
+  for (const executor of plainValues(runner.executors)) {
+    for (const invocation of [executor, ...(Array.isArray(executor?.invocations) ? executor.invocations : [])]) {
+      const store = credentialStoreOf(invocation);
+      if (typeof store?.homeEnv === 'string' && store.use !== inPlaceCli) add(env[store.homeEnv]);
+    }
+  }
+  return [...stores];
 }
