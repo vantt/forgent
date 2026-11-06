@@ -267,3 +267,10 @@ mailbox:
     # @fgos:doc Whether this project's mailbox sends mail to, and takes mail from, sessions on other machines. Off until the two-machine proof has passed on every machine. Default: false.
     # @fgos:why [9514b261-1778-4cbd-a231-bec51e3e04d9] cross-machine mail live proof (owner: install through fg-server, guide 261030-0331)
     enabled: true
+# @fgos:doc Remote, timers and retry limit of the event store.
+eventStore:
+  # @fgos:doc The sync timer of the event store.
+  sync:
+    # @fgos:doc Seconds between syncs with the remote; 0 turns the timer off. Minimum: 0. Default: 300.
+    # @fgos:why [d1289d42-7a12-4c3e-a3bc-dc1d687aaf99] owner 2026-11-06: cross-machine mail should arrive in about a minute; an empty fetch measured 0.64 s
+    intervalSec: 60
