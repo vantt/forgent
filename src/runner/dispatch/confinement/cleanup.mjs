@@ -197,14 +197,10 @@ function markerIsUnrecognisable(dirPath) {
   } catch { return true; }
 }
 
-// ---------------------------------------------------------------------------------------------------
-// The host-only record of an attempt home: `<tempRoot>/<dispatchId>/attempt-home.json`, beside the home in the
-// owner-only dispatch directory, which no sandbox is granted (the sandbox sees the host read-only at most, and
-// the default temp root not at all). It names the attempt, the write-back target the finalization descriptor
-// holds and the count of failed stagings. Nothing written inside the home can change it.
-// ---------------------------------------------------------------------------------------------------
-
-export const ATTEMPT_HOME_RECORD_FILE = 'attempt-home.json';
+// The host-only record of an attempt home, `<tempRoot>/<dispatchId>/attempt-home.json` in the owner-only dispatch
+// directory no sandbox is granted (read-only at most; the default temp root not at all): the attempt, the
+// write-back target the finalization descriptor holds and the count of failed stagings.
+const ATTEMPT_HOME_RECORD_FILE = 'attempt-home.json';
 const ATTEMPT_HOME_RECORD_CONTRACT = 'confinement-attempt-home-record.v1';
 
 const recordPathOf = (homeDir) => path.join(path.dirname(homeDir), ATTEMPT_HOME_RECORD_FILE);
@@ -317,10 +313,9 @@ export function cleanupConfinementResource(dirPath, dispatchId) {
 }
 
 /**
- * Private homes under `tempRoot` that were kept because their renewed login could not be staged. Read-only;
- * counts, times, the home directory and its host `record` (null for a home an older release counted in its
- * marker: such a home names no store anyone may trust, and is recovered by hand), never a value. `held` homes
- * have used up CREDENTIAL_KEEP_MAX_ATTEMPTS and are no longer retried by their attempt.
+ * Private homes under `tempRoot` kept because their renewed login could not be staged, with their host `record`
+ * (null for a home an older release counted in its marker: recovered by hand). Read-only, never a value. `held`
+ * homes used up CREDENTIAL_KEEP_MAX_ATTEMPTS and are no longer retried by their attempt.
  */
 export function listKeptCredentialHomes(tempRoot) {
   const found = [];
@@ -347,11 +342,9 @@ export function listKeptCredentialHomes(tempRoot) {
 }
 
 /**
- * Settle the held homes under `tempRoots` whose host record says where their login goes: the login is staged
- * beside the account's store (`writeBackRenewedCredential`, which never applies it; the next refresh-ahead
- * applies it after the probe), or proven no newer, and the home is removed. A home without a record, or whose
- * staging still fails, stays held. `unretriedRoots`: roots no attempt retries by itself, where a kept home
- * counts as held. Never throws; returns `{settled, held}` as counts.
+ * Settle the held homes under `tempRoots` from their host record: the login is staged beside the account's store
+ * (never applied here), or proven no newer, and the home is removed. A home without a record, or whose staging
+ * still fails, stays held. In `unretriedRoots` a kept home counts as held. Never throws; `{settled, held}`.
  */
 export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempRoot()], unretriedRoots = [] } = {}) {
   let settled = 0;

@@ -229,7 +229,7 @@ const BWRAP_PRESENT = (() => {
   }
 })();
 
-test("the launch door returns the prepared backend plan and sandbox, and saves a prepared attestation naming the bwrap backend, for a required dispatch", { skip: !BWRAP_PRESENT }, async () => {
+test("the launch door refuses a launch that is no supervised attempt, and returns the prepared backend plan and sandbox and saves a prepared attestation naming the bwrap backend for a required one", { skip: !BWRAP_PRESENT }, async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-h9-assignment-door-enforced-"));
   const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
   try {
@@ -266,8 +266,13 @@ test("the launch door returns the prepared backend plan and sandbox, and saves a
         },
         command: { launchCommandId: "lc-h9-01", controlEpoch: 1, controlTokenDigest: `sha256:${"c".repeat(64)}` },
       },
+      attemptId: "lc-h9-01",
+      launchMode: "direct",
     });
 
+    // Every launch is a supervised attempt: one without an attempt id is refused before anything is prepared.
+    await assert.rejects(prepareConfinementForLaunch({ ...req, attemptId: undefined }), (err) => err.code === "attempt-required");
+    assert.equal(fs.existsSync(path.join(runDir, "protected", "confinement-finalization")), false);
     const prepared = await prepareConfinementForLaunch(req);
 
     assert.equal(prepared.backendPlan.backend.type, "bwrap");

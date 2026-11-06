@@ -614,8 +614,7 @@ export function prepareBwrapSync(plan, request, backend) {
           // Only an attempt home is written back: its finalize-home step is the one removal that reads the
           // descriptor; a dispatch outside the assignment door removes its home without write-back.
           if (provisioned && attemptId) credentialWriteBack = credentialWriteBackOf(request);
-          // The host's own record beside the home, outside every grant: what a later settle of a held home
-          // reads instead of anything the agent could write.
+          // The host's record beside the home, outside every grant: what a settle reads, never the home.
           if (attemptId) writtenRecords.push(writeAttemptHomeRecord(res.hostTarget, { attemptId, runDir: request.context?.runDir, dispatchId: request.dispatchId, credentialWriteBack }));
         }
       }

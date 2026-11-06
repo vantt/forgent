@@ -90,9 +90,8 @@ export function createBlindRootsWhenMissing(fgosDir) {
  *   `{herdrSocketDir}` is the directory of the caller's own `$HERDR_SOCKET_PATH` wherever it sits,
  *   refused when that directory is the home, the config directory, `/tmp` or one of their ancestors.
  *   A worker that reaches one can run a command or type into any pane of that session.
- * - `{loginStore}`, every login directory of the machine (machineLoginStores): each account's store the
- *   account inventory names and each executor's own login home. A worker gets a copy of the one login
- *   it was leased inside its private home, so every store in place is a login it must not read.
+ * - `{loginStore}`, every login directory of the machine (machineLoginStores): a worker gets a copy of the
+ *   one login it was leased inside its private home, so every store in place is a login it must not read.
  */
 export const MACHINE_PRIVATE_ROOTS = Object.freeze([
   '{home}/.fgos/private',
@@ -110,11 +109,9 @@ const CLI_DEFAULT_LOGIN_HOMES = Object.freeze({ codex: '.codex', pi: path.join('
 const plainValues = (value) => (value !== null && typeof value === 'object' && !Array.isArray(value) ? Object.values(value) : []);
 
 /**
- * Every login directory this machine names, as written: each account's store in the account inventory
- * (`runner.llmAccounts`, and `runner.providers` while the lease still reads it), expanded as the lease
- * expands it, and each executor's login home (the value of its `credentialStore.homeEnv` in `env`, else
- * the CLI's own default under the home). A value that does not expand stays as written, so the resolver
- * refuses it by name. A broken config file refuses every confined launch: what it would mask is unknown.
+ * Every login directory this machine names: each store of the account inventory (`runner.llmAccounts`,
+ * `runner.providers`) expanded as the lease expands it, and each executor's login home (its `homeEnv` value in
+ * `env`, else the CLI default). One that does not expand stays as written, for the resolver to refuse by name.
  */
 export function machineLoginStores({ homeDir = os.homedir(), env = process.env } = {}) {
   let runner;
@@ -147,9 +144,8 @@ export function machineLoginStores({ homeDir = os.homedir(), env = process.env }
 }
 
 /**
- * The login stores that exist, real-pathed. Each is refused by name rather than skipped when it cannot be
- * masked as a login directory: a relative path or a file (`login-store-not-a-directory`), or the home
- * itself or one of its parents (`login-store-is-home`), which would hide the whole home.
+ * The login stores that exist, real-pathed; one that is relative or a file (`login-store-not-a-directory`), or
+ * the home or a parent of it (`login-store-is-home`), is refused by name, never skipped.
  */
 function loginStoreRoots(stores, home) {
   const realHome = realPathOrNull(home) ?? home;
@@ -497,7 +493,6 @@ export function resolveConfinementResources({
     // HIGH-2: which subdirectory actually needs to be writable depends on
     // which adapter is going to run in the sandbox, not just on whether
     // this is an Assignment-owned run. cli-spawn's own worker contract
-    // (authority.mjs's `cli-spawn-launch-envelope.v1`, `paths.workerOutboxDir`)
     // already commits its worker to `worker-output/outbox`, and that
     // adapter's confined path is shipped and working -- reuse that target
     // verbatim for cli-spawn. herdr-spawn's worker contract is a DIFFERENT

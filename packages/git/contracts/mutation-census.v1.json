@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7d31e67e0eb55ab0ee19fa6c3faf34ebc685252967d3561513823a7ea9375cd2",
+  "payloadDigest": "46f1c2129e71d75d2a8c53243b64fee10a810d5094d24f85c310dbd3f66a56b7",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -993,15 +993,15 @@
     "src/runner/dispatch/cli.mjs": "2b2c18f391cd2521c3350c9b71007a33b732a56d09596d13768be48c759f8eb7",
     "src/runner/dispatch/config.mjs": "1292c3ea2a07af99747b7b7d9bfaa2071a49cb202a39715ab6eb77cf64e0447e",
     "src/runner/dispatch/confinement/attestation-store.mjs": "f5026be95026b57d436ac7e330d49e12b6ffeb8e8c2f95c7ed14fcc6cc6fab88",
-    "src/runner/dispatch/confinement/authority.mjs": "78864f728599c2583278b5a55c27f9bab7d4c12b97a2dec7e5b3632174a2ee38",
+    "src/runner/dispatch/confinement/authority.mjs": "5704c34d06e22d3e448eb37f3075f6d15d0eeb4bebadec39912175beacca5aad",
     "src/runner/dispatch/confinement/backend-registry.mjs": "91e15d2902b8fa8fcf0087b69de714b6651f906713ebf2969b18e0644993d7cd",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "93fc1f7a32b1513cf08bf6812a0d52d4b3744884c139d8e9277cf87c19e2fe01",
-    "src/runner/dispatch/confinement/cleanup.mjs": "4b3d9c381ccd1d543fd90774e449939192dbced462dfe8b9fb38c0cd6c7aafd1",
-    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "f0dbb7ca8de30807d2db92ae2d45958f1fc538addfe95a9458111e93bb377e79",
+    "src/runner/dispatch/confinement/cleanup.mjs": "9fa2c47ac0acf47a4b4e648d6979edb7b8d8afcf48508f40ffb794d392e132a0",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "fb9208a829a71f063cff8f068c4ef3e1110b2f848aeeff01a9135d4ab4cac37c",
     "src/runner/dispatch/confinement/policies.mjs": "f823c3997b82eabea91dc6343d1f8ae38a35de17f14ed1c1da1091712f9541a3",
     "src/runner/dispatch/confinement/probes/harness.mjs": "7ea51a10a96a29a288c838b09b5c53c15c092e98e72719908a9107c4d27f1243",
     "src/runner/dispatch/confinement/request.mjs": "bc482597e942044773334ccd6233db827f342fb77750a8d8229e04b8d3ab9964",
-    "src/runner/dispatch/confinement/resources.mjs": "bbf9287f584312bf21eee43d82f0f76a994d4d121676ddc94a9eef7a5356eced",
+    "src/runner/dispatch/confinement/resources.mjs": "d5bebc9c102e2120a5ca702eef43e23a2bcb8446123d62d5a85fd6a5e817d6a8",
     "src/runner/dispatch/effective-execution-contract.mjs": "2c9f4561cb879685614677eaee0c417b536943059c8c6c36ee567d91cfb54adf",
     "src/runner/dispatch/evidence-attribution.mjs": "e286beb61bc988049d44645db9a7a0900ba2431132ce694861ac7c43390b229f",
     "src/runner/dispatch/execution-contract.mjs": "f16b8adfe36849cb6f48255a742bb6b6d4cf4973b30280961b9ba95bdb12efb6",
@@ -3315,8 +3315,8 @@
     },
     {
       "path": "src/runner/dispatch/confinement/authority.mjs",
-      "line": 797,
-      "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:151",
+      "line": 796,
+      "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:150",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },

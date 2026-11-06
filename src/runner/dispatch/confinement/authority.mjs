@@ -32,7 +32,6 @@ import {
   computeSha256Digest,
   publishImmutableProof,
   publishMutableProjection,
-  publishSecretSideFile,
   updateCommandEnvelope,
   commitCommandOutcome,
   readAgentFileSync,
@@ -948,6 +947,15 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       { contract: 'confinement-execution.v1', status: 'refused', dispatchId: request.dispatchId },
     );
   }
+  // Every launch is an attempt of the run supervisor: the attempt envelope its controller writes is the one
+  // launch record, so a request without one is refused before anything is prepared.
+  if (typeof request.attemptId !== 'string' || request.attemptId === '') {
+    throw new DispatchError('attempt-required', 'a launch needs a supervised attempt (the request carries no attemptId)', {
+      code: 'attempt-required',
+      runId: launchContext.run.runId,
+      launchCommandId,
+    });
+  }
 
   const adapterName = request.invocation?.adapter || DEFAULT_ADAPTER;
   const prep = await assessAndPrepare(request, { adapterPort: opts.adapterPort });
@@ -958,13 +966,10 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
 
   // Prepared Worker Invocation
   const sourceInvocation = preparedConfinement?.invocation || request.invocation;
-  // A supervised attempt runs the agent under the gate: the sandbox prefix travels in the envelope and
-  // the worker is the agent argv itself, never the sandbox wrapper command line.
-  const supervisedAttempt = typeof request.attemptId === 'string' && request.attemptId !== '';
-  const attemptAgentArgv = supervisedAttempt
-    ? (preparedConfinement?.agentArgv ?? [request.invocation.command, ...(request.invocation.args || [])])
-    : null;
-  const workerCommand = supervisedAttempt ? attemptAgentArgv[0] : sourceInvocation.command;
+  // The attempt runs the agent under the gate: the sandbox prefix travels in the envelope and the worker
+  // is the agent argv itself, never the sandbox wrapper command line.
+  const attemptAgentArgv = preparedConfinement?.agentArgv ?? [request.invocation.command, ...(request.invocation.args || [])];
+  const workerCommand = attemptAgentArgv[0];
   const claudeTrust = sourceInvocation.interactiveMode?.trustStore;
   // A prepared record that already exists is the invocation this launch was published with: its
   // args do not change with files that can change between attempts (.mcp.json, the trust store).
@@ -972,7 +977,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   let publishedArgs = null;
   try { publishedArgs = JSON.parse(fs.readFileSync(publishedInvocationPath, 'utf8'))?.workerInvocation?.args ?? null; } catch { /* first attempt */ }
   const workerArgs = Array.isArray(publishedArgs) ? publishedArgs : [
-    ...(supervisedAttempt ? attemptAgentArgv.slice(1) : (sourceInvocation.args || [])),
+    ...attemptAgentArgv.slice(1),
     // The target project's own MCP servers are approved for this worker only, so the claude
     // dialog that asks a person cannot stop an unattended seat.
     ...(claudeTrust?.kind === 'claude-json'
@@ -996,18 +1001,11 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const workerCommandDigest = computeSha256Digest({ command: workerCommand, args: workerArgs });
   const envDigest = computeSha256Digest(workerEnv);
   const attestationPlanDigest = computeSha256Digest(backendPlan);
-  const launchContextDigest = computeSha256Digest(launchContext);
 
-  // H11: the real env (with secrets) goes ONLY into this 0600 side file,
-  // never into a persisted record. Both records below carry `redactedEnv`
-  // (allow-list only) plus `envDigest` (already computed above, over the
-  // FULL real env) as the verifiable commitment to what the real env was.
+  // H11: the real env (with secrets) is never persisted here: the attempt keeps it in the side file its
+  // controller writes next to the envelope. The records below carry `redactedEnv` (allow-list only) plus
+  // `envDigest` (over the FULL real env) as the verifiable commitment to what the real env was.
   const redactedEnv = redactEnvForPersistence(workerEnv);
-  const secretsRefRelative = path.join('protected', 'secrets', `${launchCommandId}.env.json`);
-  const secretsPath = path.join(runDir, secretsRefRelative);
-  // An attempt keeps its secret environment in the attempt side file the controller writes next to the
-  // envelope, so no second copy is published here.
-  if (!supervisedAttempt) publishSecretSideFile(secretsPath, workerEnv);
 
   // Resource bindings with ownership marker digests
   const resourceBindingsList = [];
@@ -1085,12 +1083,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       command: workerCommand,
       args: workerArgs,
       cwd: workerCwd,
-      // H11: real env stays in-memory only -- this in-process return value
-      // (never itself written to disk) is what herdr-spawn's adapter reads
-      // to actually deliver a working env to its launcher script. cli-spawn
-      // never reads this object for its real spawn at all (see below); its
-      // supervisor process reads the redacted on-disk envelope plus the
-      // secrets side file instead.
+      // H11: real env stays in-memory only; the disk record below carries the redacted env.
       env: workerEnv,
       envDigest,
       workerCommandDigest,
@@ -1117,9 +1110,8 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   // SAME launchCommandId always recomputes a byte-different record and thus a
   // DIFFERENT digest than the one the first attempt actually published.
   // `publishImmutableProof` below is itself resume-safe (its EEXIST branch
-  // never overwrites the file), but every caller downstream (the
-  // herdr-launch-command.v1 write and the cli-spawn-launch-envelope.v1 write,
-  // both further down, plus confinement-finalization.v1's own
+  // never overwrites the file), but every caller downstream (the attempt
+  // envelope and confinement-finalization.v1's own
   // `preparedInvocationDigest` field) reads the digest from THIS variable,
   // not from disk -- so on resume they must reuse the ORIGINAL record's
   // digest, never a freshly recomputed one, or `reconcileHerdrSpawnRun`
@@ -1129,8 +1121,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   // clone -- the same shape as `preparedInvocationRecord` but with
   // `workerInvocation.env` swapped for `redactedEnv` -- never over the
   // real-env object. Every downstream consumer of `preparedInvocationDigest`
-  // (the herdr-launch-command.v1 write, cli-spawn-launch-envelope.v1,
-  // confinement-finalization.v1) only ever needs a stable digest a reader
+  // (the attempt envelope, confinement-finalization.v1) only ever needs a stable digest a reader
   // can recompute from the ACTUAL bytes on disk; it was never a digest OF
   // the secrets themselves.
   const preparedInvocationDiskRecord = {
@@ -1199,120 +1190,27 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const finalizationPath = path.join(runDir, 'protected', 'confinement-finalization', `${launchCommandId}.json`);
   publishMutableProjection(finalizationPath, finalizationDescBody);
 
-  if (supervisedAttempt) {
-    return {
-      attempt: {
-        command: workerCommand,
-        args: workerArgs,
-        cwd: workerCwd,
-        env: redactedEnv,
-        secretEnv: workerEnv,
-        envDigest,
-        bwrapPrefix: preparedConfinement?.bwrapPrefix ?? null,
-        bwrapExecutable: preparedConfinement?.bwrapPrefix ? (backendInstance?.config?.executable || '/usr/bin/bwrap') : null,
-        launchDigest: preparedConfinement?.launchDigest ?? null,
-      },
-      preparedInvocation: preparedInvocationRecord,
-      preparedInvocationDigest,
-      providerCapacity: preparedConfinement?.providerCapacity || null,
-      finalizationPath,
-      finalizationDescriptor: finalizationDescBody,
-      backendPlan,
-      preparedConfinement,
-    };
-  }
-
-  if (adapterName === 'herdr-spawn') {
-    // A pane launch is an attempt of the run supervisor (terminal mode); the launch-command file of the
-    // old herdr round has no writer left.
-    throw new DispatchError('attempt-required', 'a herdr-spawn launch needs a supervised attempt (the request carries no attemptId)', {
-      code: 'attempt-required',
-      runId: launchContext.run.runId,
-      launchCommandId,
-    });
-  }
-
-  // 3. Publish cli-spawn-launch-envelope.v2 (H11: v1 -> v2, `env` redacted,
-  // `envDigest` + `secretsRef` added -- the real env moved to the 0600
-  // side file above). The supervisor process (a separate process that
-  // reads this file, not the in-process caller) resolves the real spawn
-  // env by reading+unlinking `secretsRef`; it still accepts a v1 envelope
-  // for one release (a resumed Run whose envelope was published before
-  // this change), falling back to its own inline `env`.
-  const envelopeBody = {
-    contract: 'cli-spawn-launch-envelope.v2',
-    run: {
-      runId: launchContext.run.runId,
-      assignmentId: launchContext.run.assignmentId,
-      attempt: launchContext.run.attempt,
-      dispatchPlanDigest: launchContext.run.dispatchPlanDigest,
-      evaluatorBaselineDigest: launchContext.run.evaluatorBaselineDigest,
-    },
-    command: {
-      launchCommandId,
-      state: 'pending',
-      controlEpoch: launchContext.command.controlEpoch,
-      controlTokenDigest: launchContext.command.controlTokenDigest,
-    },
-    invocation: {
-      adapter: 'cli-spawn',
+  return {
+    attempt: {
       command: workerCommand,
       args: workerArgs,
       cwd: workerCwd,
       env: redactedEnv,
+      secretEnv: workerEnv,
       envDigest,
-      secretsRef: secretsRefRelative,
-      stdin: 'ignore',
-      encoding: 'utf8',
-      dispatchDepth: depth + 1,
-      timeoutMs: request.context.timeoutMs || 900000,
-      idleTimeoutMs: request.context.idleTimeoutMs || null,
-      maxBuffer: request.context.maxBuffer || 10485760,
+      bwrapPrefix: preparedConfinement?.bwrapPrefix ?? null,
+      bwrapExecutable: preparedConfinement?.bwrapPrefix ? (backendInstance?.config?.executable || '/usr/bin/bwrap') : null,
+      launchDigest: preparedConfinement?.launchDigest ?? null,
     },
-    confinement: {
-      decision: 'execute',
-      launchContextDigest,
-      persistedPlanRef: `protected/confinement-finalization/${launchCommandId}.json#preparedPlan`,
-      attestationPlanDigest,
-      preparedInvocationDigest,
-      cleanupDescriptorRef: `protected/confinement-finalization/${launchCommandId}.json`,
-    },
-    paths: {
-      workerOutboxDir: 'worker-output/outbox',
-      protectedCaptureDir: `protected/capture/${launchCommandId}`,
-      protectedDir: 'protected',
-      controllerDir: 'controller',
-    },
-    publishedAt: new Date().toISOString(),
-  };
-
-  const envelopeDigest = computeSha256Digest(envelopeBody);
-  const envelope = {
-    ...envelopeBody,
-    digest: envelopeDigest,
-  };
-
-  const envelopePath = path.join(runDir, 'protected', 'launch-envelope', `${launchCommandId}.json`);
-  publishImmutableProof(envelopePath, envelope);
-  const compatEnvelopePath = path.join(runDir, 'protected', 'launch-envelope.json');
-  try {
-    publishImmutableProof(compatEnvelopePath, envelope);
-  } catch {}
-
-  return {
-    envelope,
-    envelopePath,
     preparedInvocation: preparedInvocationRecord,
     preparedInvocationDigest,
     providerCapacity: preparedConfinement?.providerCapacity || null,
     finalizationPath,
     finalizationDescriptor: finalizationDescBody,
-    // H9: see the herdr-spawn return above for why these are returned.
     backendPlan,
     preparedConfinement,
   };
 }
-
 
 /** A home that does not belong to the attempt, or whose marker cannot be read: nothing is removed. */
 export class AttemptHomeError extends Error {
@@ -1382,8 +1280,7 @@ export function finalizeAttemptHome({ runDir, attemptId } = {}) {
   let held = 0;
   for (const { target, marker, writeBack } of homes) {
     const record = { attemptId, runDir, dispatchId: marker.dispatchId, credentialWriteBack: writeBack ?? null };
-    // A home whose staging already failed the allowed number of times is not tried again by its attempt;
-    // adopt stops retrying, a later settle picks it up and `fgos doctor` reports it meanwhile.
+    // A home whose staging failed the allowed number of times is left to a later settle; doctor reports it.
     if ((readAttemptHomeRecord(target, record)?.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) { held += 1; continue; }
     const result = writeBackRenewedCredential(target, writeBack);
     if (result.status === 'failed' && result.keepHome) {
