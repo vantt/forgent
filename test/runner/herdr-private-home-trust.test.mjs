@@ -9,7 +9,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
 import {
   seedCodexTrust, readCodexTrust, seedAgyTrust, readAgyTrust, removeCodexTrust, TrustStoreError,
@@ -304,22 +305,41 @@ test('codex: a confined round seeds its private home when only the leased accoun
   assert.equal(fs.readFileSync(path.join(leasedHome, 'config.toml'), 'utf8'), leasedBody, 'the leased account store is not edited');
 });
 
-// The cases above cover where codex and agy trust goes. Claude has no private home to write to when its pane
-// runs unconfined, and its trust entry used to go to the operator's own `~/.claude.json`, a file claude itself
-// rewrites while it runs: a read-modify-write from here can drop what claude saved in between. fgOS never
-// writes that file; the home is a scratch directory so nothing here can reach the real one.
-test('an unconfined claude pane never writes the operator\'s claude store', () => {
+// The cases above cover where codex and agy trust goes. An unconfined claude pane keeps the operator's own
+// `~/.claude.json`, so its entry goes there: added, read back, never taken away again. Several panes starting
+// at once each add their own entry; a read-modify-write that overlapped another used to drop entries
+// (4 writers x 100 seeds lost 297). The home is a scratch directory so nothing here can reach the real one.
+test('an unconfined claude pane\'s trust entry survives concurrent seeds, and fgOS never removes a trust entry', async () => {
   const home = tmp('fgos-claude-operator-home-');
   const store = path.join(home, '.claude.json');
-  const before = JSON.stringify({ projects: { [ROOT]: { hasTrustDialogAccepted: true, allowedTools: [] } }, theme: 'dark' }, null, 2);
-  fs.writeFileSync(store, before);
+  fs.writeFileSync(store, JSON.stringify({ projects: { [ROOT]: { hasTrustDialogAccepted: true, allowedTools: [] }, '/kept/by/hand': { hasTrustDialogAccepted: false } }, theme: 'dark' }, null, 2));
+  const WRITERS = 4;
+  const SEEDS = 10;
+  const script = `
+    import { seedTrust } from ${JSON.stringify(pathToFileURL(path.resolve('src/run-supervisor/trust-store.mjs')).href)};
+    const [store, root, writer, seeds] = process.argv.slice(1);
+    for (let i = 0; i < Number(seeds); i += 1) seedTrust(store, { projectPath: \`/var/tmp/wt-\${writer}-\${i}\`, repoRoot: root });`;
+  const runs = Array.from({ length: WRITERS }, (_, writer) => new Promise((resolve, reject) => {
+    execFile(process.execPath, ['--input-type=module', '-e', script, store, ROOT, String(writer), String(SEEDS)], { timeout: 120_000 }, (err, _out, stderr) => (err ? reject(new Error(`writer ${writer}: ${stderr || err.message}`)) : resolve()));
+  }));
+  await Promise.all(runs);
+  const projects = JSON.parse(fs.readFileSync(store, 'utf8')).projects;
+  const missing = [];
+  for (let writer = 0; writer < WRITERS; writer += 1) {
+    for (let i = 0; i < SEEDS; i += 1) if (projects[`/var/tmp/wt-${writer}-${i}`]?.hasTrustDialogAccepted !== true) missing.push(`${writer}-${i}`);
+  }
+  assert.deepEqual(missing, [], 'every seeded entry is in the store afterwards');
+  assert.equal(projects[ROOT].hasTrustDialogAccepted, true, 'the root the operator trusted is kept');
+  assert.equal(projects['/kept/by/hand'].hasTrustDialogAccepted, false, 'an entry fgOS did not write is left as it was');
+
+  // The pane's own round: the entry is written into the operator's store, and nothing records it for removal.
   const previousHome = process.env.HOME;
   process.env.HOME = home;
   try {
     const round = { trustWritten: false, note() {} };
     seedWorkspaceTrust({ trustStore: { kind: 'claude-json' }, round, cwd: WORKSPACE, repoRoot: ROOT, fullEnv: { HOME: home }, workerEnv: null });
-    assert.equal(fs.readFileSync(store, 'utf8'), before, 'the operator\'s claude store was edited by an unconfined pane');
-    assert.equal(round.trustWritten, false);
+    assert.equal(JSON.parse(fs.readFileSync(store, 'utf8')).projects[WORKSPACE]?.hasTrustDialogAccepted, true);
+    assert.equal(round.trustWritten, false, 'a claude entry is never marked for removal');
   } finally {
     if (previousHome === undefined) delete process.env.HOME; else process.env.HOME = previousHome;
   }

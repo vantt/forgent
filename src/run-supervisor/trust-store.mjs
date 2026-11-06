@@ -34,6 +34,7 @@ import path from 'node:path';
 import { readAgentFileSync } from '../native/proof-helpers.mjs';
 import { replaceDurably } from '../native/door.mjs';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
+import { acquireSync, createLockScope, resolveLockRoot } from '../holder-lock/index.mjs';
 
 /** Raised for every refusal and every failure. Carries a `code` so a caller can
  * branch on the reason without matching message text. */
@@ -187,8 +188,17 @@ export function claudeMcpApprovalArgs({ cwd, repoRoot, storePath }) {
   return ['--settings', JSON.stringify({ enabledMcpjsonServers: names })];
 }
 
+// How often a seed writes its entry before it gives up on it staying: claude rewrites its own store while
+// it runs, so an entry can be lost between the write and the read-back.
+const SEED_TRIES = 3;
+const SEED_LOCK_WAIT_MS = 30_000;
+
 /**
- * Record trust for `projectPath`, derived from an already-trusted `repoRoot`.
+ * Record trust for `projectPath`, derived from an already-trusted `repoRoot`, and read it back before
+ * returning: an entry lost in between (another writer of the store saved what it had read earlier) is
+ * added again, at most SEED_TRIES times, then `trust-not-kept`. Add-only: fgOS never removes an entry
+ * from this store, which claude itself rewrites while it runs, so a removal could drop what it saved.
+ * fgOS's own seeds of the store take the machine's `agent-trust-store` lock, one at a time.
  *
  * Refuses, without writing anything, when:
  * - `projectPath` is not absolute (`invalid-path`) — a relative key would name a
@@ -197,7 +207,7 @@ export function claudeMcpApprovalArgs({ cwd, repoRoot, storePath }) {
  *   is B1, the rule the whole module exists for;
  * - the store is missing, unparseable, or shaped unexpectedly.
  *
- * Idempotent: seeding an already-seeded path rewrites nothing.
+ * Returns whether this call wrote the entry; seeding an already-seeded path rewrites nothing.
  */
 export function seedTrust(storePath, { projectPath, repoRoot } = {}) {
   if (typeof projectPath !== 'string' || !path.isAbsolute(projectPath)) {
@@ -206,39 +216,37 @@ export function seedTrust(storePath, { projectPath, repoRoot } = {}) {
   if (typeof repoRoot !== 'string' || !path.isAbsolute(repoRoot)) {
     throw new TrustStoreError('invalid-path', `trust seed refused: repoRoot must be an absolute path, got "${repoRoot}".`, { repoRoot });
   }
-
-  const store = readStore(storePath);
-  const projects = projectsOf(store, storePath);
-
-  if (projects[repoRoot]?.hasTrustDialogAccepted !== true) {
-    throw new TrustStoreError(
-      'untrusted-root',
-      `trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted, so there is nothing to derive trust from.`,
-      { projectPath, repoRoot },
-    );
+  let lock;
+  try {
+    lock = acquireSync(createLockScope('agent-trust-store'), 'agent-trust-store', { lockRoot: resolveLockRoot() }, { waitMs: SEED_LOCK_WAIT_MS });
+  } catch (err) {
+    throw new TrustStoreError('store-busy', `trust seed for "${projectPath}" could not take the trust-store lock: ${err.message}.`, { projectPath });
   }
-
-  if (projects[projectPath]?.hasTrustDialogAccepted === true) return false; // already seeded
-
-  projects[projectPath] = trustedProjectEntry();
-  writeStoreAtomic(storePath, store);
-  return true;
-}
-
-/**
- * Remove one entry. Returns whether there was one to remove.
- *
- * This is the other half of B3, and it is not optional housekeeping: without it
- * the store grows one entry per dispatch forever. Removing an absent entry is a
- * `false` return, never an error, so a teardown path can run unconditionally.
- */
-export function removeTrust(storePath, projectPath) {
-  const store = readStore(storePath);
-  const projects = projectsOf(store, storePath);
-  if (projects[projectPath] === undefined) return false;
-  delete projects[projectPath];
-  writeStoreAtomic(storePath, store);
-  return true;
+  if (lock.result !== 'acquired') {
+    throw new TrustStoreError('store-busy', `trust seed for "${projectPath}" waited ${SEED_LOCK_WAIT_MS}ms for the trust-store lock (${lock.result}).`, { projectPath });
+  }
+  try {
+    let wrote = false;
+    for (let attempt = 0; attempt <= SEED_TRIES; attempt += 1) {
+      const store = readStore(storePath);
+      const projects = projectsOf(store, storePath);
+      if (projects[repoRoot]?.hasTrustDialogAccepted !== true) {
+        throw new TrustStoreError(
+          'untrusted-root',
+          `trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted, so there is nothing to derive trust from.`,
+          { projectPath, repoRoot },
+        );
+      }
+      if (projects[projectPath]?.hasTrustDialogAccepted === true) return wrote;
+      if (attempt === SEED_TRIES) break;
+      projects[projectPath] = trustedProjectEntry();
+      writeStoreAtomic(storePath, store);
+      wrote = true;
+    }
+    throw new TrustStoreError('trust-not-kept', `trust entry for "${projectPath}" was lost from "${storePath}" after ${SEED_TRIES} writes.`, { projectPath, storePath });
+  } finally {
+    lock.handle.release();
+  }
 }
 
 // ---------------------------------------------------------------------------

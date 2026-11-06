@@ -6,7 +6,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, seedCodexTrust, readCodexTrust, removeCodexTrust, claudeMcpApprovalArgs, TrustStoreError } from '../../src/run-supervisor/trust-store.mjs';
+import { readTrust, seedTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, seedCodexTrust, readCodexTrust, removeCodexTrust, claudeMcpApprovalArgs, TrustStoreError } from '../../src/run-supervisor/trust-store.mjs';
 import { cleanupTrust, TRUST_CONTEXT_FILE } from '../../src/run-supervisor/steps/cleanup-trust.mjs';
 
 // Phase 01 group B. Every test here runs against a FIXTURE store, never the real
@@ -136,36 +136,6 @@ test('B2: seedTrust is idempotent -- seeding twice leaves exactly one entry and 
   } finally { f.cleanup(); }
 });
 
-test('B3: removeTrust deletes only its own entry and reports whether there was one', () => {
-  const f = fixtureStore(storeWithTrustedRoot());
-  try {
-    seedTrust(f.file, { projectPath: '/tmp/wt-7', repoRoot: trustedRoot });
-    const before = Object.keys(JSON.parse(fs.readFileSync(f.file, 'utf8')).projects).length;
-
-    assert.equal(removeTrust(f.file, '/tmp/wt-7'), true);
-    const after = JSON.parse(fs.readFileSync(f.file, 'utf8'));
-    assert.equal(after.projects['/tmp/wt-7'], undefined);
-    assert.equal(Object.keys(after.projects).length, before - 1, 'exactly one entry goes');
-    assert.equal(after.projects[trustedRoot].hasTrustDialogAccepted, true, 'the operator root is untouched');
-
-    assert.equal(removeTrust(f.file, '/tmp/wt-7'), false, 'removing an absent entry is false, not an error');
-  } finally { f.cleanup(); }
-});
-
-test('B3: a seed followed by a remove returns the store to its exact prior contents', () => {
-  const f = fixtureStore(storeWithTrustedRoot());
-  try {
-    const original = fs.readFileSync(f.file, 'utf8');
-    seedTrust(f.file, { projectPath: '/tmp/wt-8', repoRoot: trustedRoot });
-    removeTrust(f.file, '/tmp/wt-8');
-    assert.deepEqual(
-      JSON.parse(fs.readFileSync(f.file, 'utf8')),
-      JSON.parse(original),
-      'teardown leaves no residue -- this is what keeps the store from growing without bound',
-    );
-  } finally { f.cleanup(); }
-});
-
 test('B4: the write is atomic -- no partial file is observable and no stray temp file is left behind', () => {
   const f = fixtureStore(storeWithTrustedRoot());
   try {
@@ -253,15 +223,13 @@ test('L11-R1: removeAgyTrust deletes only its own entry and reports whether ther
 
 function modeOf(file) { return fs.statSync(file).mode & 0o777; }
 
-test('a 0600 claude store is still 0600 after seed and after remove, even under a 002 umask', () => {
+test('a 0600 claude store is still 0600 after a seed, even under a 002 umask', () => {
   const f = fixtureStore(storeWithTrustedRoot());
   const previous = process.umask(0o002);
   try {
     fs.chmodSync(f.file, 0o600);
     seedTrust(f.file, { projectPath: '/tmp/wt-mode', repoRoot: trustedRoot });
     assert.equal(modeOf(f.file), 0o600, 'seed must not widen the store');
-    removeTrust(f.file, '/tmp/wt-mode');
-    assert.equal(modeOf(f.file), 0o600, 'remove must not widen the store');
   } finally { process.umask(previous); f.cleanup(); }
 });
 

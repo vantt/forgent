@@ -152,7 +152,7 @@ function claudeStore(dir, repoRoot, extra = []) {
 }
 const trusted = (storePath) => Object.keys(JSON.parse(fs.readFileSync(storePath, 'utf8')).projects).sort();
 
-test('the folder-trust entry a seat wrote is taken back by the cleanup step, from the record the controller left', { skip, timeout: 120_000 }, async () => {
+test('a claude seat\'s folder-trust entry is written before the pane runs and never taken back, not even from a record an older release left', { skip, timeout: 120_000 }, async () => {
   const { dir, fake } = fakeWith({ panes: [{}] });
   try {
     const work = path.join(dir, 'work');
@@ -166,14 +166,13 @@ test('the folder-trust entry a seat wrote is taken back by the cleanup step, fro
       trustStore: { kind: 'claude-json', path: storePath },
     });
     assert.deepEqual(trusted(storePath), [dir, work].sort(), 'the seat\'s directory is trusted while it runs');
-    assert.ok(fs.existsSync(path.join(runDir, 'controller', 'trust-context.json')));
+    assert.equal(fs.existsSync(path.join(runDir, 'controller', 'trust-context.json')), false, 'nothing is recorded for removal');
+    assert.equal((await cleanupTrust({ runDir })).detail.trust, 'none-written');
 
-    // The controller is gone; the step runs from the attempt directory alone.
-    const done = await cleanupTrust({ runDir });
-    assert.equal(done.result, 'done');
-    assert.equal(done.detail.trust, 'removed');
-    assert.deepEqual(trusted(storePath), [dir], 'only the entry the seat wrote is gone');
-    assert.equal((await cleanupTrust({ runDir })).detail.trust, 'already-gone', 'the step is safe to run again');
+    fs.mkdirSync(path.join(runDir, 'controller'), { recursive: true });
+    fs.writeFileSync(path.join(runDir, 'controller', 'trust-context.json'), JSON.stringify({ v: 1, kind: 'claude-json', target: storePath, projectPath: work }));
+    assert.equal((await cleanupTrust({ runDir })).detail.trust, 'not-removed');
+    assert.deepEqual(trusted(storePath), [dir, work].sort(), 'the entry stays after the attempt');
   } finally { fake.cleanup(); }
 });
 
@@ -348,11 +347,13 @@ test('a controller that fails before the handover gives the pane back and takes 
   try {
     const work = path.join(dir, 'work');
     fs.mkdirSync(work);
-    const storePath = claudeStore(dir, dir);
-    const seated = await seat({ dir, fake, name: 'abandon', groupKey: 'g-abandon', cwd: work, trustStore: { kind: 'claude-json', path: storePath } });
-    assert.deepEqual(trusted(storePath), [dir, work].sort());
+    const settingsPath = path.join(dir, 'agy-settings.json');
+    fs.writeFileSync(settingsPath, JSON.stringify({ trustedWorkspaces: [dir] }));
+    const trustedWorkspaces = () => JSON.parse(fs.readFileSync(settingsPath, 'utf8')).trustedWorkspaces.sort();
+    const seated = await seat({ dir, fake, name: 'abandon', groupKey: 'g-abandon', cwd: work, agentKind: 'agy', trustStore: { kind: 'agy', path: settingsPath } });
+    assert.deepEqual(trustedWorkspaces(), [dir, work].sort());
     await seated.abandon();
     assert.deepEqual(fake.closedPaneIds(), ['mock-pane-1'], 'the pane it opened is closed, by its key');
-    assert.deepEqual(trusted(storePath), [dir], 'the entry it wrote is gone');
+    assert.deepEqual(trustedWorkspaces(), [dir], 'the entry it wrote is gone');
   } finally { fake.cleanup(); }
 });

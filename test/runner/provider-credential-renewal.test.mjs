@@ -111,6 +111,16 @@ function readOmpRows(dir) {
 }
 const ompSource = (home) => ({ kind: 'home-files', home, files: ['agent.db'] });
 
+// claude: .claude/.credentials.json under the home, claudeAiOauth with expiresAt in ms
+const CLAUDE_LOGIN = path.join('.claude', '.credentials.json');
+const claudeDoc = (expiresMs, { access = FAKE.oldAccess, refresh = FAKE.oldRefresh } = {}) => ({
+  claudeAiOauth: { accessToken: access, refreshToken: refresh, expiresAt: expiresMs, scopes: ['user:inference'], subscriptionType: 'max' },
+  mcpOAuth: { kept: true },
+});
+const writeClaude = (dir, doc) => { fs.mkdirSync(path.join(dir, '.claude'), { recursive: true }); fs.writeFileSync(path.join(dir, CLAUDE_LOGIN), JSON.stringify(doc)); };
+const readClaude = (dir) => JSON.parse(fs.readFileSync(path.join(dir, CLAUDE_LOGIN), 'utf8'));
+const claudeSource = (home) => ({ kind: 'home-files', home, files: [CLAUDE_LOGIN] });
+
 // What a real CLI does to the home it is pointed at once it decides the login is due: a new token pair
 // and a later expiry, written back to the same store.
 function renewHome(layoutName, dir, { expiresMs = Date.now() + 6 * HOUR } = {}) {
@@ -120,6 +130,10 @@ function renewHome(layoutName, dir, { expiresMs = Date.now() + 6 * HOUR } = {}) 
     writePi(dir, doc);
   } else if (layoutName === 'codex') {
     writeCodex(dir, codexDoc(expiresMs, Date.now(), 'new'));
+  } else if (layoutName === 'claude') {
+    const doc = readClaude(dir);
+    doc.claudeAiOauth = { ...doc.claudeAiOauth, accessToken: FAKE.newAccess, refreshToken: FAKE.newRefresh, expiresAt: expiresMs };
+    writeClaude(dir, doc);
   } else {
     const db = new DatabaseSync(path.join(dir, 'agent.db'));
     db.prepare("UPDATE auth_credentials SET data = ? WHERE credential_type = 'oauth' AND id = 1").run(JSON.stringify(ompData(expiresMs, { access: FAKE.newAccess, refresh: FAKE.newRefresh })));
@@ -132,7 +146,7 @@ function renewHome(layoutName, dir, { expiresMs = Date.now() + 6 * HOUR } = {}) 
 function fakeSpawn({ layoutName, behaviour, output = 'OK', exitCode = 0, delayMs = 0, onStart } = {}) {
   const starts = [];
   const spawnFn = (command, args, options) => {
-    const homeDir = options.env.PI_CODING_AGENT_DIR ?? options.env.CODEX_HOME;
+    const homeDir = options.env.PI_CODING_AGENT_DIR ?? options.env.CODEX_HOME ?? options.env.HOME;
     starts.push({ command, args, homeDir, pid: 424242 + starts.length });
     onStart?.(homeDir);
     const child = new EventEmitter();
@@ -223,7 +237,7 @@ test('codex expiry is due at the earlier of the token expiry and the refresh int
   } finally { w.cleanup(); }
 });
 
-test('claude expiry is read from the login file, never quoted, and is not a renewable layout', () => {
+test('claude expiry is read from the login file, never quoted, and the layout is named from that file', () => {
   const w = workspace();
   try {
     const now = Date.now();
@@ -236,7 +250,7 @@ test('claude expiry is read from the login file, never quoted, and is not a rene
 
     fs.writeFileSync(file, JSON.stringify({ claudeAiOauth: { accessToken: FAKE.oldAccess } }));
     assert.deepEqual(readCredentialExpiry('claude-credentials-json', w.home), { ok: false, code: 'unexpected-shape' });
-    assert.equal(credentialLayout({ kind: 'home-files', home: w.home, files: ['.claude/.credentials.json'] }), null);
+    assert.equal(credentialLayout({ kind: 'home-files', home: w.home, files: ['.claude/.credentials.json'] }), 'claude-credentials-json');
   } finally { w.cleanup(); }
 });
 
@@ -267,6 +281,7 @@ const LAYOUT_CASES = [
   { name: 'pi', write: (dir, expiresMs) => writePi(dir, piDoc(expiresMs)), source: piSource, token: (dir) => readPi(dir).xai.access },
   { name: 'omp', write: (dir, expiresMs) => writeOmp(dir, [{ id: 1, data: ompData(expiresMs) }, { id: 2, provider: 'other', data: ompData(expiresMs + 20 * HOUR, { access: FAKE.other }) }], { wal: true }).close(), source: ompSource, token: (dir) => JSON.parse(readOmpRows(dir)[0].data).access },
   { name: 'codex', write: (dir, expiresMs) => writeCodex(dir, codexDoc(expiresMs, Date.now())), source: codexSource, token: (dir) => readCodex(dir).tokens.refresh_token },
+  { name: 'claude', write: (dir, expiresMs) => writeClaude(dir, claudeDoc(expiresMs)), source: claudeSource, token: (dir) => readClaude(dir).claudeAiOauth.refreshToken },
 ];
 
 for (const layout of LAYOUT_CASES) {
@@ -304,6 +319,7 @@ for (const layout of LAYOUT_CASES) {
         assert.equal(rows[1].note, 'n');
       }
       if (layout.name === 'pi') assert.deepEqual(readPi(w.home).openrouter, { type: 'api_key', key: FAKE.other });
+      if (layout.name === 'claude') assert.deepEqual(readClaude(w.home).mcpOAuth, { kept: true }, 'the rest of the login file is kept');
     } finally { w.cleanup(); }
   });
 }
@@ -835,6 +851,24 @@ test('a renewed login is never applied while its tokens name no account the prov
     assert.equal(readPi(w.home).xai.refresh, FAKE.oldRefresh, 'a forged label is not an account');
     assert.equal(agentCopies(w).length, 1, 'it is kept for the owner');
   } finally { w.cleanup(); }
+
+  // A Claude Code login: its tokens are opaque, so a pane's renewal is staged and listed for the owner, never applied.
+  const c = workspace();
+  try {
+    writeClaude(c.home, claudeDoc(Date.now() + 10 * 60 * 1000));
+    const dir = path.join(c.tmp, 'fgos-confinement', 'disp_claude', 'home');
+    copyCredentialFiles(dir, c.home, [CLAUDE_LOGIN]);
+    renewHome('claude', dir);
+    const target = credentialWriteBackTarget({ provider: 'xai', accountId: 'acct', credentialSource: claudeSource(c.home), runtimeDir: c.runtimeDir });
+    assert.equal(target.layout, 'claude-credentials-json');
+    assert.deepEqual(writeBackRenewedCredential(dir, target), { status: 'staged' });
+    const { spawnFn, starts } = fakeSpawn({ layoutName: 'claude', behaviour: () => {} });
+    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: claudeSource(c.home), runtimeDir: c.runtimeDir, spawnFn });
+    assert.equal(starts.filter((s) => !path.basename(s.homeDir).startsWith('scratch-')).length, 0, 'a copy whose tokens name no account is never probed');
+    assert.equal(readClaude(c.home).claudeAiOauth.refreshToken, FAKE.oldRefresh, 'the source login is not replaced');
+    assert.equal(agentCopies(c).length, 1, 'the renewed login is kept for hand recovery');
+    assert.deepEqual(inspectRetainedCredentialCopies({ runtimeDir: c.runtimeDir }).map(({ kind }) => kind), ['agent'], 'doctor lists it');
+  } finally { c.cleanup(); }
 });
 
 // A copy's token claim is unverified until it renews: one that never renews must not stop the account's own

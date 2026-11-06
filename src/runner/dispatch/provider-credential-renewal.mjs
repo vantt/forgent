@@ -1,7 +1,7 @@
 // Keeping a rotating provider login alive across throwaway private homes.
 //
 // Dispatch copies an account's credential files into a private home that is deleted afterwards. A login
-// whose refresh token is single use (pi, omp and Codex all are) breaks if the renewal happens inside such
+// whose refresh token is single use (pi, omp and Codex all are; a Claude Code login is kept the same way) breaks if the renewal happens inside such
 // a copy: the provider retires the source's refresh token and the new pair goes away with the home. Two
 // halves keep the source usable:
 //
@@ -540,23 +540,51 @@ function ompAgentFilesCheck(home) {
   }
 }
 
-const LAYOUTS = Object.freeze({ [piLayout.name]: piLayout, [codexLayout.name]: codexLayout, [ompLayout.name]: ompLayout });
-
-// Claude Code: `.claude/.credentials.json`, whose `claudeAiOauth.expiresAt` is in ms. Read only: no fgOS
-// dispatch renews a Claude login, so this layout answers only how long a login stays valid, and is not one
-// of the renewable LAYOUTS above.
+// Claude Code: `.claude/.credentials.json` under the home, whose `claudeAiOauth` carries the access token,
+// the refresh token and `expiresAt` (ms). Its tokens are opaque and name no account the provider signs, so a
+// login renewed inside a private home is staged and kept for the owner, never applied (applyAgentCopies);
+// a renewal fgOS makes itself in a scratch copy of the source is applied as for the other layouts.
+const CLAUDE_FILE = path.join('.claude', '.credentials.json');
 const claudeLayout = {
   name: 'claude-credentials-json',
-  read(home) {
-    const parsed = readJsonFile(path.join(home, '.claude', '.credentials.json'));
+  files: [CLAUDE_FILE],
+  identity: () => null,
+  read(home, { agent } = {}) {
+    const parsed = readJsonFile(path.join(home, CLAUDE_FILE), { agent });
     if (!parsed.ok) return parsed;
     const oauth = parsed.doc?.claudeAiOauth;
     if (!isObject(oauth) || !Number.isFinite(oauth.expiresAt)) return fail('unexpected-shape');
     const expiresMs = toMs(oauth.expiresAt);
-    return { ok: true, entries: [{ key: 'claudeAiOauth', owner: null, expiresMs, dueMs: expiresMs }] };
+    return { ok: true, entries: [{ key: 'claudeAiOauth', owner: null, expiresMs, dueMs: expiresMs, refresh: refreshOf(oauth), value: oauth }], doc: parsed.doc, raw: parsed.raw };
+  },
+  // Only the scratch copy's `expiresAt` moves into the past, so claude renews it before its call; the
+  // refresh token is untouched.
+  markDue(home) {
+    const file = path.join(home, CLAUDE_FILE);
+    const parsed = readJsonFile(file);
+    if (!parsed.ok) throw new Error(parsed.code);
+    parsed.doc.claudeAiOauth.expiresAt = Date.now() - 60 * MINUTE_MS;
+    fs.writeFileSync(file, serializeJson(parsed.doc, parsed.raw), { mode: 0o600 });
+  },
+  apply(sourceHome, copyRead, { now, requireFuture }) {
+    const file = path.join(sourceHome, CLAUDE_FILE);
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const source = claudeLayout.read(sourceHome);
+      if (!source.ok) throw new Error(source.code);
+      const next = copyRead.entries[0];
+      if (!next || !isReplacement(next, source.entries[0], { now, requireFuture })) return [];
+      source.doc.claudeAiOauth = next.value;
+      if (writeIfUnchanged(file, source.raw, serializeJson(source.doc, source.raw))) return ['claudeAiOauth'];
+    }
+    throw new Error('source-changing');
+  },
+  stage(copyHome, stagingDir) {
+    fs.mkdirSync(path.join(stagingDir, '.claude'), { mode: 0o700 });
+    stageCopyFile(path.join(copyHome, CLAUDE_FILE), path.join(stagingDir, CLAUDE_FILE));
   },
 };
-const EXPIRY_LAYOUTS = Object.freeze({ ...LAYOUTS, [claudeLayout.name]: claudeLayout });
+
+const LAYOUTS = Object.freeze({ [piLayout.name]: piLayout, [codexLayout.name]: codexLayout, [ompLayout.name]: ompLayout, [claudeLayout.name]: claudeLayout });
 
 /** The layout name of a credential source (the same order the probe command uses), or null. */
 export function credentialLayout(source) {
@@ -564,6 +592,7 @@ export function credentialLayout(source) {
   if (source?.kind === 'home-files' && Array.isArray(source.files)) {
     if (source.files.includes('agent.db')) return ompLayout.name;
     if (source.files.includes('auth.json')) return piLayout.name;
+    if (source.files.includes(CLAUDE_FILE)) return claudeLayout.name;
   }
   return null;
 }
@@ -574,7 +603,7 @@ export function credentialLayout(source) {
  * `unexpected-shape`, `sqlite-unavailable`, `unknown-layout`); values are never part of the result.
  */
 export function readCredentialExpiry(layoutName, home, { loadSqlite = defaultLoadSqlite } = {}) {
-  const layout = EXPIRY_LAYOUTS[layoutName];
+  const layout = LAYOUTS[layoutName];
   if (!layout) return fail('unknown-layout');
   const read = layout.read(home, { loadSqlite });
   if (!read.ok) return read;

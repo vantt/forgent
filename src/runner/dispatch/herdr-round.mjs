@@ -85,8 +85,8 @@ function openRound({ runDir, workId, tier, model, agentName }) {
     terminalKey: null,
     // The herdr session the pane lives in, so a later reaper or recovery asks the right server.
     herdrSession: null,
-    // True only when this round wrote a trust entry, so teardown removes what it wrote and
-    // never an entry a person vouched for.
+    // True only when this round wrote a trust entry fgOS takes back afterwards (codex, agy), so teardown
+    // removes what it wrote and never an entry a person vouched for. A claude entry is never taken back.
     trustWritten: false,
     note(patch) {
       try { writeVisibility(runDir, patch); } catch { /* a courtesy, not a contract */ }
@@ -237,9 +237,10 @@ export function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, 
         wrote = seedTrust(stores.target, { projectPath, repoRoot: root });
       }
       // A seed that finds the entry already there wrote nothing: the person (or an earlier
-      // round) owns it, so this round must not remove it on teardown.
+      // round) owns it, so this round must not remove it on teardown. A claude entry stays in any case:
+      // claude rewrites its own store while it runs, and a removal there could drop what it saved.
       if (wrote) {
-        round.trustWritten = true;
+        round.trustWritten = REMOVABLE_TRUST_KINDS.has(trustStore.kind);
         round.note({ trustSeeded: trustStore.kind });
       }
       return;
@@ -249,6 +250,9 @@ export function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, 
   }
   round.note({ trustSeedFailed: firstError?.message ?? 'no trust root to derive from' });
 }
+
+/** The trust stores whose entry fgOS takes back when the attempt is over (`cleanup-trust`). */
+const REMOVABLE_TRUST_KINDS = new Set(['codex-toml', 'agy', 'agy-json']);
 
 /** codex hook review is a second dialog after folder trust; seed it from the same trusted root.
  * Never throws: a failure is noted and the review it would have cleared is reported by name. */
@@ -308,8 +312,8 @@ function writeTypedBrief({ delivery, briefText, runDir, roundNumber, paths }) {
 
 /**
  * The folder-trust entry for this attempt, written into the store the agent reads, and the record the
- * `cleanup-trust` step needs to take it back when the attempt is over. The record exists only when this
- * call wrote the entry, so an entry a person vouched for is never removed.
+ * `cleanup-trust` step needs to take a codex or agy entry back when the attempt is over. The record exists
+ * only when this call wrote such an entry, so an entry a person vouched for is never removed.
  */
 function seedAttemptTrust({ trustStore, round, runDir, cwd, repoRoot, fullEnv, workerEnv, accountSource }) {
   seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv, accountSource });

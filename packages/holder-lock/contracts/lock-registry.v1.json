@@ -106,6 +106,15 @@
       "note": "serialises bringing one herdr worker session up (src/runner/dispatch/worker-session-boot.mjs); <id> is the session name"
     },
     {
+      "name": "agent-trust-store",
+      "kind": "mutex",
+      "scope": "machine",
+      "rank": 80,
+      "v3Path": "<lockRoot>/agent-trust-store.lock",
+      "owner": "4.2",
+      "note": "serialises fgOS's seeds of the operator's claude folder-trust store (src/run-supervisor/trust-store.mjs seedTrust), so one seed never drops another's entry"
+    },
+    {
       "name": "identity-pins",
       "kind": "mutex",
       "scope": "machine",

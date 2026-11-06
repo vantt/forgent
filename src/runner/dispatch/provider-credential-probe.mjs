@@ -7,8 +7,9 @@
 // original stale; in the home the owner also uses, the renewed token lands where it belongs.
 //
 // Only the credential layouts fgOS can name are probed: a Codex home, an omp profile directory (a
-// home-files source that carries the SQLite store `agent.db`) and a pi account directory (a home-files
-// source that carries `auth.json`). Any other layout answers "no probe", so the account stays locked for a
+// home-files source that carries the SQLite store `agent.db`), a pi account directory (a home-files
+// source that carries `auth.json`) and a Claude Code home (a home-files source that carries
+// `.claude/.credentials.json`). Any other layout answers "no probe", so the account stays locked for a
 // person to clear, exactly as before.
 
 import { spawn } from 'node:child_process';
@@ -68,6 +69,15 @@ export function credentialProbeCommand(credentialSource, { noTools = false } = {
       command: 'pi',
       args: ['-p', PROMPT, '--mode', 'json', ...(noTools ? ['--no-tools'] : ['--tools', 'read', '--approve'])],
       env: { PI_CODING_AGENT_DIR: home },
+      home,
+    };
+  }
+  // Claude Code reads its login from `$HOME/.claude/.credentials.json`; HOME is the login home (probeEnv).
+  if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files) && credentialSource.files.includes(path.join('.claude', '.credentials.json'))) {
+    return {
+      command: 'claude',
+      args: ['-p', PROMPT, '--no-session-persistence', '--tools', noTools ? '' : 'Read'],
+      env: {},
       home,
     };
   }
