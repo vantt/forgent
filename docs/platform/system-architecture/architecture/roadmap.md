@@ -271,12 +271,11 @@ Recommended split:
 
 ## 9. Spec Update Rule
 
-For now, new architecture writing stays under `docs/architect/` (deleted in 97dd62aa7).
-
-`docs/specs/*` is treated as generated/curated state. It should not be edited
+New architecture writing goes to the owning area under `docs/platform/<area>/`
+by the placement map in [governance](../../governance.md). Do not edit a spec
 opportunistically while the design is still moving. Once a decision settles,
-update the generated source or owning workflow first, then regenerate/check the
-spec projection.
+update the owning spec or workflow first, then regenerate or check any
+projection built from it.
 
 ## 10. Roadmap Status
 

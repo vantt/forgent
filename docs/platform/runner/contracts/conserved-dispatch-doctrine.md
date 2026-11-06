@@ -39,7 +39,7 @@ The still-maintained operation-template contract is not the retired FlowDefiniti
 ```text
 // dispatch/operation-prompt-templates.mjs — operation prompt-template registry,
 // deterministic resolver, bounded variable renderer, and provenance tracker (Unit I04 / Phase 3),
-// per docs/architect/agent-coordination/contracts/flow-definition.md and
+// per docs/platform/agent-coordination/history/retired-engine/contracts/flow-definition.md and
 // plans/260919-coordination-skill-harness-simplification/plan.md.
 //
 // Layer: infra (same layer as src/runner/dispatch/assignment.mjs).

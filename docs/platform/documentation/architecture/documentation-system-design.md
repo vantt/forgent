@@ -652,9 +652,8 @@ Known generated/projection classes include:
 - UI spec generated outputs;
 - skill/agent wrapper mirrors.
 
-`docs/specs/**` in the current repo should be treated as hand/agent-curated
-living spec-state, not as generated output, unless a specific file proves
-otherwise.
+The former `docs/specs/**` tree was hand/agent-curated living spec-state, not
+generated output; its content now lives under `docs/platform/<area>/`.
 
 ## 14. Failure Modes
 

@@ -14,7 +14,7 @@ Do not use this for: User-facing task guidance or generated indexes
 Last reviewed: 2026-09-25
 Related:
 - `docs/platform/governance.md`
-- `docs/platform/documentation/switchboard.md`
+- `docs/platform/documentation/history/switchboard.md`
 - `docs/reading-map.md`
 Supersedes: Transitional legacy-source delegations; preserved provenance does not establish current authority
 Superseded by: None recorded
@@ -78,7 +78,7 @@ Target area docs live at `docs/platform/<area>/`.
 ## 4. How To Change Platform Docs
 
 1. Open [governance](governance.md) for document types, metadata and links; its header records source provenance.
-2. Read [migration-authoring-rules.md](migration-authoring-rules.md) for preservation obligations. [The former switchboard](documentation/switchboard.md) is transition evidence, not a second operative router.
+2. Follow governance sections 5 and 8 for the one-owner rule. [The former switchboard](documentation/history/switchboard.md) and [migration authoring rules](documentation/history/migration-authoring-rules.md) are transition evidence, not operative routers.
 3. Read this portal and the relevant area portal/spec.
 4. Read the relevant vision and intent-preservation ledger when the change
    narrows, stages, or simplifies the full design.
@@ -100,8 +100,8 @@ These are reading links; each linked document states its authority and implement
 | Relationship | File |
 |---|---|
 | governs docs | [governance.md](governance.md) |
-| historical transition evidence, not current routing | [documentation/switchboard.md](documentation/switchboard.md) |
-| migration authoring rules | [migration-authoring-rules.md](migration-authoring-rules.md) |
+| historical transition evidence, not current routing | [documentation/history/switchboard.md](documentation/history/switchboard.md) |
+| migration authoring rules (history) | [documentation/history/migration-authoring-rules.md](documentation/history/migration-authoring-rules.md) |
 | routes readers | [../reading-map.md](../reading-map.md) |
 | defines platform direction | [vision.md](vision.md) |
 | preserves platform intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |

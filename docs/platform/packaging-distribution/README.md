@@ -256,10 +256,6 @@ The older discussion order was:
    — old Node/npm distribution baseline and generated-spec fragments preserved
    as input/history.
 
-The older generated specs under `docs/specs/*` are not edited during this
-architecture churn. Once the design settles, update their generated source or
-owning workflow and regenerate/check the spec projections.
-
 #### 2. Historical Supersession Table
 
 | Topic | Active source to follow | Status |
@@ -268,7 +264,6 @@ owning workflow and regenerate/check the spec projections.
 | Release identity and activation | [Promoted Runtime Identity And Activation](architecture/runtime-identity-and-activation.md) | Active architecture target. Uses per-workspace activation binding, not one repository-wide `active.json`. |
 | Shared gateway/web | [Promoted Future Constraints](architecture/future-constraints.md) | Future constraint only; not active delivery scope. |
 | Old npm/global/setup install story | [Distribution Baseline And Scattered Spec Fragments](history/distribution-baseline.md) | Historical input. Do not implement as target without explicit supersession. |
-| `docs/specs/*` distribution wording | Generated specs | Read as current generated state plus historical constraints; not the target while this architecture stream is active. |
 
 #### 3. Boundary Rule
 

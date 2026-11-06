@@ -1,24 +1,24 @@
 # Migration Authoring Rules (One-Owner Discipline)
 
 ```txt
-Document type: Governance guide
+Document type: History
 Audience: Human author, maintainer, implementer, agent
 Purpose: Keep one maintained owner per documentation claim and preserve source evidence separately
-Design status: Accepted
-Implementation: One-owner authoring; historical ratchet procedure retained below
+Design status: Archived
+Implementation: Historical migration procedure retained as evidence
 Provenance: `docs/platform/intent-preservation-ledger.md` at `947dc310396071a4d530216d5c06d05993d63bf5`
 Writer type: Human + agent coauthor
-Canonical for: Migration-time documentation authoring rules
-Use this when: Authoring or editing any documentation when preserving migration evidence
-Do not use this for: Normal post-cutover documentation workflow
+Canonical for: Historical source metadata; no current runtime authority
+Use this when: Reading how the documentation migration preserved evidence
+Do not use this for: Normal post-cutover documentation workflow; use docs/platform/governance.md sections 5 and 8
 Last reviewed: 2026-09-25
 Related:
-- `docs/platform/documentation/switchboard.md`
+- `docs/platform/documentation/history/switchboard.md`
 - `docs/platform/governance.md`
 - `plans/260925-documentation-authority-unification/plan.md`
 ```
 
-Writers (both humans and agents) follow one-owner authoring discipline after cutover.
+Writers follow one-owner authoring discipline (governance sections 5 and 8) after cutover.
 The migration procedure below is preserved as dated evidence, not as a live authoring workflow.
 
 ## 1. Core Principles
@@ -88,8 +88,8 @@ When authoring new platform documentation under `docs/platform/<area>/`:
 
 | Relationship | File |
 |---|---|
-| authority switchboard | [docs/platform/documentation/switchboard.md](documentation/switchboard.md) |
-| documentation governance | [docs/platform/governance.md](governance.md) |
+| authority switchboard | [docs/platform/documentation/history/switchboard.md](switchboard.md) |
+| documentation governance | [docs/platform/governance.md](../../governance.md) |
 | historical retired ratchet script | Historical source: `scripts/check-legacy-docs-ratchet.mjs` at `c4e71152c506d0996b396e803353475f171dbfc4` |
 | historical retired baseline | Historical source: `scripts/check-legacy-docs-ratchet.baseline.json` at `2b2ee26d1394add8beb0e81fcaa00260cab5b3c9` |
 | historical retired exceptions ledger | Historical source: `scripts/check-legacy-docs-ratchet.exceptions.json` at `494828ca63483cd37a9f714bbaf4d685f91ce3ef` |

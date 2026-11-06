@@ -1,20 +1,20 @@
 # Transitional Documentation Authority Switchboard
 
 ```txt
-Document type: Switchboard doc
+Document type: History
 Audience: Maintainer, implementer, agent
 Purpose: Define the stated scope and preserve its source provenance and limits
-Design status: Accepted at atomic cutover
+Design status: Archived
 Implementation: Historical source retained; current truth not certified
 Provenance: docs/transitional-switchboard.md at ad2ca83e245bbd76c0d275cc30366457b26c8df3
 Writer type: Agent draft writer
-Canonical: Yes
-Canonical for: The document scope stated above; source implementation limits remain explicit
+Canonical: No
+Canonical for: Historical source metadata; no current runtime authority
 Use this when: Reading the scope, contracts and implementation limits stated here
 Do not use this for: Standalone implemented-behavior proof or claims outside the stated scope
 Last reviewed: 2026-10-14
 Related:
-- docs/platform/documentation/switchboard.md#transitional-documentation-authority-switchboard
+- docs/platform/documentation/history/switchboard.md#transitional-documentation-authority-switchboard
 Supersedes: The mapped source location at atomic cutover
 Superseded by: None
 ```
@@ -90,12 +90,12 @@ second operative authority router. Source metadata remains historical provenance
 
 | Relationship | File |
 |---|---|
-| reader orientation | [docs/reading-map.md](../../reading-map.md) |
-| platform portal | [docs/platform/README.md](../README.md) |
-| documentation governance | [docs/platform/governance.md](../governance.md) |
-| migration authoring rules | [docs/platform/migration-authoring-rules.md](../migration-authoring-rules.md) |
-| Historical authority map (evidence) | [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../../../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) |
-| historical unification plan | [plans/260925-documentation-authority-unification/plan.md](../../../plans/260925-documentation-authority-unification/plan.md) |
+| reader orientation | [docs/reading-map.md](../../../reading-map.md) |
+| platform portal | [docs/platform/README.md](../../README.md) |
+| documentation governance | [docs/platform/governance.md](../../governance.md) |
+| migration authoring rules | [docs/platform/documentation/history/migration-authoring-rules.md](migration-authoring-rules.md) |
+| Historical authority map (evidence) | [plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md](../../../../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) |
+| historical unification plan | [plans/260925-documentation-authority-unification/plan.md](../../../../plans/260925-documentation-authority-unification/plan.md) |
 
 
 ## Source Metadata
@@ -117,7 +117,7 @@ Related:
 - `docs/reading-map.md`
 - `docs/platform/README.md`
 - `docs/platform/governance.md`
-- `docs/platform/migration-authoring-rules.md`
+- `docs/platform/documentation/history/migration-authoring-rules.md`
 - `plans/260925-documentation-authority-unification/plan.md`
 ```
 ````

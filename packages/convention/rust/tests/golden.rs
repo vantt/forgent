@@ -283,10 +283,7 @@ fn documentation_placement_admits_constitution_shapes_and_refuses_unplaced_paths
         ("docs/history/feature/old.md", "history"),
         ("docs/knowledge/lesson.md", "knowledge"),
         ("docs/generated/index.md", "generated-doc"),
-        (
-            "docs/platform/documentation/switchboard.md",
-            "switchboard-doc",
-        ),
+        ("docs/platform/documentation/history/switchboard.md", "history"),
         (
             "docs/platform/documentation/operations/portals/root.md",
             "portal",

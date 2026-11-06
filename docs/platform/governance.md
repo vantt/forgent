@@ -492,10 +492,9 @@ promotion is per-area or repository-wide; transformation order alone never
 changes authority.
 
 Each area portal records its current canonical owners. The
-[switchboard.md](documentation/switchboard.md) records migration evidence and links,
+[former switchboard](documentation/history/switchboard.md) records migration evidence and links,
 not a second source of ownership.
-Authors must follow [platform/migration-authoring-rules.md](migration-authoring-rules.md)
-(one claim, one canonical owner, never dual-author prose, ratchet enforcement on legacy roots).
+One claim has one canonical owner and prose is never dual-authored (sections 5 and 8).
 Partial or proposed material does not outrank the declared canonical owner, and readers must surface
 conflicts rather than infer authority from path or date. Any redirect/stub must be
 explicitly read-only and temporary. The repository-wide normalization and
@@ -509,8 +508,8 @@ current authority.
 |---|---|
 | documentation portal | [docs-portal.md](documentation/operations/portals/docs-portal.md) |
 | reader routing | [reading-map.md](../reading-map.md) |
-| migration evidence switchboard | [switchboard.md](documentation/switchboard.md) |
-| migration authoring rules | [platform/migration-authoring-rules.md](migration-authoring-rules.md) |
+| migration evidence switchboard | [switchboard.md](documentation/history/switchboard.md) |
+| migration authoring rules (history) | [migration-authoring-rules.md](documentation/history/migration-authoring-rules.md) |
 | platform portal | [platform/README.md](README.md) |
 | source design discussion | Historical source: `docs/architect/documentation-system-design.md` at `23fb220e309f82998a62ae4e62727bc405515035`; live holder: [documentation-system-design.md](documentation/architecture/documentation-system-design.md) |
 
@@ -532,8 +531,8 @@ Do not use this for: Current product behavior or implementation detail
 Last reviewed: 2026-09-25
 Related:
 - `docs/reading-map.md`
-- `docs/platform/documentation/switchboard.md`
-- `docs/platform/migration-authoring-rules.md`
+- `docs/platform/documentation/history/switchboard.md`
+- `docs/platform/documentation/history/migration-authoring-rules.md`
 - `docs/platform/README.md`
 - `docs/platform/documentation/architecture/documentation-system-design.md`
 ```

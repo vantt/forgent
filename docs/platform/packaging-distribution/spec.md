@@ -441,7 +441,7 @@ Retained source material — complete source units from `docs/architect/packagin
 ```txt
 Legacy status: Superseded pointer
 Superseded by:
-- docs/architect/workspace-topology.md
+- docs/platform/system-architecture/architecture/workspace-topology.md
 - docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md
 Current reader entry: docs/platform/packaging-distribution/README.md
 Use this legacy file for: Redirect only

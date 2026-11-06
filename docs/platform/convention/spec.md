@@ -104,7 +104,7 @@ Schema v1 installs the cutover documentation placement policy as path-only rules
 
 Literal segments outrank placeholders, placeholders outrank `*`, and `*` outranks `**`. If equal-specificity rules match the same path, rule loading fails as ambiguous rather than depending on declaration order.
 
-The packaged rows implement the constitution’s minimum placements. Its one-or-more `**` is encoded as `**/<file>` in Convention’s zero-or-more grammar; literal collection-index refinements preserve the constitution’s README ownership under Convention’s literal-first specificity. The frozen migration-authoring-rules placement exception remains explicit until its separate retirement.
+The packaged rows implement the constitution’s minimum placements. Its one-or-more `**` is encoded as `**/<file>` in Convention’s zero-or-more grammar; literal collection-index refinements preserve the constitution’s README ownership under Convention’s literal-first specificity.
 
 `forbidden: true` emits `forbidden-placement` with the rule’s `posture`. Retired specs, architect and decision roots block every new path regardless of extension; the more specific generated `docs/decisions/index.md` row stays admitted as the generated decision-index exception. A forbidden catch-all rejects unplaced platform files; specific constitution rows admit valid paths. `system/` and `areas/` containers remain forbidden. No body or metadata inspection occurs here.
 
