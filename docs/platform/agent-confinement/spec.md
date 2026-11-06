@@ -581,6 +581,25 @@ mục đó. Danh sách là dữ liệu của contract, không phải code của 
   bất kỳ pane nào của session, kể cả shell và phiên Claude của chủ máy. Resolver không còn hỏi
   route terminal-control (lệnh đó gọi `herdr status server` tới server đang chạy) và không còn từ
   chối khi route không trả lời: không có herdr thì không có gì để che.
+- `{loginStore}` (2026-11-06): mọi thư mục login của máy (`machineLoginStores`): mỗi store của account
+  inventory (`runner.llmAccounts`, và `runner.providers` khi lease còn đọc nó), mở rộng `~`/`${HOME}`
+  như lease; home login mặc định của từng agent CLI (`~/.codex`, `~/.pi/agent`, `~/.omp/agent`,
+  `~/.claude`, `~/.gemini`) cùng giá trị biến home của nó trong env runner (`CODEX_HOME`,
+  `PI_CODING_AGENT_DIR`, `CLAUDE_CONFIG_DIR`); và giá trị `credentialStore.homeEnv` của mỗi executor
+  trong config mà lease đọc (của project khi có). Worker nhận bản chép đúng login được lease trong
+  private home của nó, nên mọi store tại chỗ là login nó không được đọc. Một launch không khai
+  `credentialStore` (đọc login của chính CLI tại chỗ, vd. claude trước khi mọi pane claude đi đường
+  private config) giữ các home của chính CLI đó. Store là đường dẫn tương đối hoặc file bị từ chối
+  `login-store-not-a-directory`, là home hay tổ tiên của home bị từ chối `login-store-is-home`, config
+  không đọc được bị từ chối `login-store-inventory-unreadable`: từ chối theo tên, không bỏ qua.
+  Chương trình mà launch chạy nằm trong một home bị che (pi tự cài trong `~/.pi/agent/bin`) thì đúng
+  file đó được `--ro-bind` lại sau mask (resource `launch-program`), không bao giờ cả thư mục.
+- `{confinementRoot}` (2026-11-06): mọi root chứa private home (`credentialScanRoots`: temp root mặc
+  định, `tempRoot` và `privateHomeRoot` của mỗi backend đăng ký, cùng root của chính backend), tức
+  home của dispatch anh em và record host `attempt-home.json` cạnh mỗi home. Trước đó root chỉ bị che
+  khi `blind` hoặc khi nằm dưới `/tmp`. Home của chính dispatch được bind lại sau mask (thứ tự của
+  §9.2: mount ngoài vùng che, mask, mount trong vùng che, `--remount-ro`). Một root nằm trong một
+  mount ghi được bị từ chối `confinement-root-in-writable-grant`.
 
 **Đo trước khi đổi (2026-10-24, bwrap thật, socket giả đang listen trong runtime dir và home giả,
 không đụng socket thật của chủ máy).** Trước thay đổi, dưới cả hai built-in policy, blind hay
