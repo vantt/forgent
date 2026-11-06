@@ -472,7 +472,10 @@ test('a unit\'s timeoutMs in a units file reaches the Unit and its dispatch and 
 
 test('--account pins provider account on every unit of the workflow run, kept for resume', async () => {
   const tmp = setupRepo();
-  fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
+  // The account's login store sits beside the project, never around it: a confined launch masks every store.
+  const store = makeFixtureDir('fgos-login-store-');
+  fixtures.push(store);
+  fs.writeFileSync(path.join(store, 'login'), 'token\n');
   const fakeHome = makeFixtureDir('fgos-home-');
   fixtures.push(fakeHome);
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
@@ -480,7 +483,7 @@ test('--account pins provider account on every unit of the workflow run, kept fo
     providers: {
       node: {
         accounts: {
-          'acct-test': { label: 'acct-test', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
+          'acct-test': { label: 'acct-test', credentialSource: { kind: 'home-files', home: store, files: ['login'] } },
         },
       },
     },
@@ -539,13 +542,16 @@ test('workflow with two units on different providers pins account only on matchi
   const tmp = setupRepo();
   const fakeHome = makeFixtureDir('fgos-diff-home-');
   fixtures.push(fakeHome);
-  fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
+  // The account's login store sits beside the project, never around it: a confined launch masks every store.
+  const store = makeFixtureDir('fgos-login-store-');
+  fixtures.push(store);
+  fs.writeFileSync(path.join(store, 'login'), 'token\n');
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
   writeAccountsFile(path.join(fakeHome, '.fgos'), {
     providers: {
       alpha: {
         accounts: {
-          'acct-alpha': { label: 'acct-alpha', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
+          'acct-alpha': { label: 'acct-alpha', credentialSource: { kind: 'home-files', home: store, files: ['login'] } },
         },
       },
     },
@@ -604,14 +610,17 @@ test('workflow with two units on different providers pins account only on matchi
 test('CLI workflow start accepts --timeout and --account, while resume refuses them', async () => {
   const tmp = setupRepo();
   const fakeHome = makeFixtureDir('fgos-cli-home-');
-  fs.writeFileSync(path.join(tmp, 'login'), 'token\n');
+  // The account's login store sits beside the project, never around it: a confined launch masks every store.
+  const store = makeFixtureDir('fgos-login-store-');
+  fixtures.push(store);
+  fs.writeFileSync(path.join(store, 'login'), 'token\n');
   fixtures.push(fakeHome);
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
   writeAccountsFile(path.join(fakeHome, '.fgos'), {
     providers: {
       node: {
         accounts: {
-          'acct-cli': { label: 'acct-cli', credentialSource: { kind: 'home-files', home: tmp, files: ['login'] } },
+          'acct-cli': { label: 'acct-cli', credentialSource: { kind: 'home-files', home: store, files: ['login'] } },
         },
       },
     },
