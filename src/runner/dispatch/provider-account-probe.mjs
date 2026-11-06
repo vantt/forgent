@@ -19,6 +19,8 @@ import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
 import { accountCredentialSources, commandCli, expandCredentialHome, credentialSourceForCli, credentialStoreOf, providerAccountInventory } from './provider-capacity.mjs';
 import { runOutcome } from './run-result.mjs';
+import { MODEL_POLICY_TIERS } from './config.mjs';
+import { parseTierCell } from './tier-cell.mjs';
 
 export const ACCOUNT_PROBE_PROMPT = 'Account probe: there is no task. Reply with the single word OK.';
 export const DEFAULT_ACCOUNT_PROBE_TIMEOUT_MS = 3 * 60 * 1000;
@@ -96,6 +98,26 @@ export function configPinnedToAccount(cfg, { provider, accountId }) {
     else if (accounts?.[accountId]) llmAccounts[pool] = { [accountId]: accounts[accountId] };
   }
   return { ...cfg, providers, ...(cfg?.llmAccounts !== undefined ? { llmAccounts } : {}) };
+}
+
+/**
+ * The model a real seat would ask `executorId` for on an account of `family`'s pool: the strongest tier whose
+ * cell names an entry that pool serves. A probe on the invocation default (often a light model) proves the
+ * login, not that the account serves the model its seats run. With no such cell the invocation default is
+ * probed, and the row says so.
+ */
+export function probeModelFor(cfg, { executorId, family }) {
+  const executor = cfg?.executors?.[executorId];
+  const cellFamily = executor?.providerModel ?? executor?.provider ?? executorId;
+  const tiers = cfg?.modelPolicies?.[cellFamily] ?? {};
+  for (const tier of [...MODEL_POLICY_TIERS].reverse()) {
+    if (tiers[tier] === undefined) continue;
+    let entries;
+    try { entries = parseTierCell(tiers[tier], cellFamily); } catch { continue; }
+    const served = entries.find((entry) => legacyStateKey(entry.pool) === family);
+    if (served) return { model: served.model, modelSource: `${cellFamily}.${tier}` };
+  }
+  return { model: null, modelSource: 'invocation-default' };
 }
 
 function readJson(file) {
@@ -242,12 +264,13 @@ export async function runAccountProbe({
 
   const rows = await Promise.all(assignments.map(async ({ inv, assignment }) => {
     const startedAt = now();
+    const probed = probeModelFor(cfg, { executorId: inv.executorId, family: plan.provider });
     let run;
     try {
       // The pin travels both on the Assignment (what it is bound to) and as the door's override (what the
       // door actually launches), exactly as a Workflow unit dispatch passes it.
       // The probe names the account it probes; the lease takes exactly that one.
-      const cliOverride = { preferExecutor: inv.executorId, preferInvocation: inv.invocationId, leaseAccount: accountId };
+      const cliOverride = { preferExecutor: inv.executorId, preferInvocation: inv.invocationId, leaseAccount: accountId, ...(probed.model ? { model: probed.model } : {}) };
       run = readRunOutcome(await dispatch(assignment, { runnerConfig, cliOverride }), { repoRoot });
     } catch (err) {
       run = { ok: false, text: err?.message ?? String(err), failureCode: err?.errorClass ?? null, runDir: err?.runDir ?? null, paneId: err?.paneId ?? null, terminalKey: err?.terminalKey ?? null, herdrSession: err?.herdrSession ?? null };
@@ -263,6 +286,8 @@ export async function runAccountProbe({
       confined: inv.confined,
       inVerdict: inv.confined,
       account: inv.via,
+      model: probed.model,
+      modelSource: probed.modelSource,
       outcome,
       evidence,
       ...(matchedRule ? { matchedRule } : {}),

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3647c3bdd83f2d5dbbc227363e9a8243e8ca2ce699eda3ee84208019815234fd",
+  "payloadDigest": "950caa79319ed049c545bdde1962cf2ecd4fbbde4e627bbf6280ee6a8cf6c087",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1012,7 +1012,7 @@
     "src/runner/dispatch/mechanism.mjs": "8f272b51172f4b3f15418b43242d8b877ea4ed0ac974890bd7fd991ca3d87afe",
     "src/runner/dispatch/operation-prompt-templates.mjs": "45b0a234f2d0917e3555ee4bc913eee10522e1c7aa21f02f8473bae63383256a",
     "src/runner/dispatch/plan.mjs": "5ee443a6817c6998dbef36dd6e60235d134557a04b0b27bb9af3959ce081223f",
-    "src/runner/dispatch/provider-account-probe.mjs": "1ac9ba5c5cb5bd27240a42edbee5b6c60316bb37079c1d6332b2016feb4de1eb",
+    "src/runner/dispatch/provider-account-probe.mjs": "374293d51dd9b90c3fac4c98abb840d583f0fe1cd142f60f7477ce098827a248",
     "src/runner/dispatch/provider-adapter.mjs": "df1f9a898ed9b05cb336dd6620c74e41b5c54c4ae38c30ef50008566c5d8cb7a",
     "src/runner/dispatch/provider-auth-failure.mjs": "ad3d07cc29e54f6758694ed861afbf66fa30e6568905e9f9383ac7b6943f19f7",
     "src/runner/dispatch/provider-capacity.mjs": "ebd11367d22117dc11b6d67538abc95aaeaad6684d44a86d48dac1ffa3f0d5f6",

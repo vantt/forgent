@@ -217,3 +217,37 @@ test('every CLI starts before any finishes, each under a read-only posture bindi
   assert.deepEqual(report.results.filter((r) => r.inVerdict).map((r) => r.invocationId).sort(), ['codex-herdr-static', 'pi-cli-bwrap-acct']);
   assert.equal(report.verdict, 'cli-fault');
 });
+
+test('each CLI is probed on the strongest model a tier cell names for the account\'s pool, and the row says which', async () => {
+  const omp = (id) => ({ id, via: 'cli', adapter: 'cli-spawn', command: 'omp', args: ['--model', '{model}'], confinement: { backend: 'bwrap' }, credentialStore: { use: 'omp', homeEnv: 'PI_CODING_AGENT_DIR' } });
+  const geminiCfg = {
+    providers: {
+      gemini: { accounts: { acct: { label: 'acct', credentialSource: { kind: 'home-files', home: '/homes/omp-acct', files: ['agent.db'] } } } },
+    },
+    modelPolicies: {
+      gemini: { standard: 'gemini-flash', flagship: ['gemini-pro@vertex', { model: 'gemini-argon-high' }] },
+    },
+    executors: { gemini: { kind: 'agent', providerModel: 'gemini', invocations: [omp('omp-cli-bwrap')] } },
+  };
+  const repoRoot = tmp('fgos-account-probe-model-');
+  const overrides = [];
+  const probe = (provider, accountId) => runAccountProbe({
+    cfg: geminiCfg, provider, accountId, repoRoot,
+    createAssignment: (contract) => Object.freeze({ assignmentId: `asgn_model_${overrides.length}`, provenance: { kind: 'inline', contract } }),
+    dispatch: async (_assignment, { cliOverride }) => { overrides.push(cliOverride); return null; },
+    closePane: () => false,
+  });
+
+  const flagship = await probe('gemini', 'acct');
+  assert.equal(overrides.at(-1).model, 'gemini-argon-high', 'the flagship entry the account\'s own pool serves, not the default nor another pool\'s');
+  assert.deepEqual([flagship.results[0].model, flagship.results[0].modelSource], ['gemini-argon-high', 'gemini.flagship']);
+
+  const plain = await runAccountProbe({
+    cfg: { ...geminiCfg, modelPolicies: {} }, provider: 'gemini', accountId: 'acct', repoRoot,
+    createAssignment: (contract) => Object.freeze({ assignmentId: 'asgn_model_default', provenance: { kind: 'inline', contract } }),
+    dispatch: async (_assignment, { cliOverride }) => { overrides.push(cliOverride); return null; },
+    closePane: () => false,
+  });
+  assert.equal('model' in overrides.at(-1), false, 'with no cell naming the pool the invocation default is probed');
+  assert.deepEqual([plain.results[0].model, plain.results[0].modelSource], [null, 'invocation-default']);
+});
