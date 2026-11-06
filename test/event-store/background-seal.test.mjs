@@ -97,11 +97,13 @@ test('a seal child killed before it seals loses nothing and the next command sea
 
 test('a seal child that cannot be started never fails the command, and the next command seals', async (t) => {
   const w = workspace();
-  const sealed = w.receipt();
-  const result = spawnSync(process.execPath, ['--require', REFUSE_SPAWN, BIN, 'move', 'bs-1', '--to', 'blocked'], { cwd: w.cwd, env: w.env, encoding: 'utf8' });
+  // Not the receipt: the command's own start trigger may seal the older setup event inline, child or no child.
+  const refused = path.join(w.cwd, 'refused-spawns.log');
+  const result = spawnSync(process.execPath, ['--require', REFUSE_SPAWN, BIN, 'move', 'bs-1', '--to', 'blocked'], { cwd: w.cwd, env: { ...w.env, REFUSED_SPAWN_LOG: refused }, encoding: 'utf8' });
   assert.equal(result.status, 0, result.stderr);
-  await sleep(500);
-  assert.equal(w.receipt(), sealed, 'no child ran');
+  const attempts = fs.readFileSync(refused, 'utf8').trim().split('\n');
+  assert.equal(attempts.filter((args) => args.includes(' events seal ')).length, 1, `the seal child was refused: ${attempts}`);
+  assert.deepEqual(w.sealChildren(), [], 'no seal child runs');
   assert.equal(w.move('todo').status, 0);
   await waitFor('the next command to seal both', () => w.receipt() === w.total());
 });
