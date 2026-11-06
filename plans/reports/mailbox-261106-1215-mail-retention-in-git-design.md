@@ -40,12 +40,11 @@ reachable by id for some time. The goal is bounded exposure, not erasure.
 ## Recommendation
 
 Option 1, after OPC and the Event Store lane agree that the body leaves the signed event. Start with a
-measurement: how many bodies, how large, to size N (7 days is a starting guess, owner to set). Until it
+measurement: how many bodies, how large, to size N (the owner set 7 days on 2026-11-06). Until it
 lands, option 4 stands.
 
 ## Open questions
 
 - Does Event Store accept a signed event that holds a body hash and not the body (spec change to the signing
   domain, owner of that spec: ES lane)?
-- N, the body lifetime in the rotating ref (7 days proposed)?
-- Does a receiver need the body after its own record TTL (1 day)? If not, N could be 2 days.
+- Decided by the owner on 2026-11-06: N is 7 days.
