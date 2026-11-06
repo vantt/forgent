@@ -89,7 +89,7 @@ Settled without a phase: H-T4e closed (arbitration §2: short calls stay unconfi
 | 06 | [Launch failure path (R-6, H-T4f)](phase-06-launch-failure-path.md) **landed 11-06 `9d70a47cd..d481b1cf0`** | 03, 05, 08, 11 | — | +15 / +15 / +40 |
 | 07 | [Small fixes (B-7, B-8, B-13, H-T4d, D-T2-7)](phase-07-small-fixes.md) **landed 11-06 `3f81fa916..36b59f731`** | 02 | 03, 04, 05 | −310 / 0 / −50 |
 | 08 | [Run Result one derivation (A5)](phase-08-run-result-one-derivation.md) **landed 11-06 `eba902022..7cb2cd535` (OPC MERGE on the addon)** | 02, 05 | 11 | −270 / +60 / −100 |
-| 09 | [Dispatch cut](phase-09-dispatch-cut.md) | 06, 07 | — | −300 / 0 / −50 |
+| 09 | [Dispatch cut](phase-09-dispatch-cut.md) **landed 11-06 `8215cc226..d3ed00d67` (with decision 68 and the two P10 items)** | 06, 07 | — | −300 / 0 / −50 |
 | 10 | [Execution core cut](phase-10-execution-core-cut.md) **landed 11-06 `0029e325b..c5242df59` except the parts that need `assignment.mjs` (after P09); also the never-started seat retry** | 07, 09 | 11 (if 11 done, n/a) | −250 / 0 / −50 |
 | 11 | [Config type rules to schema](phase-11-config-to-schema.md) **landed 11-06 `68c426c31..e5ac48e88`** | 03, 04 | 08, 10 | −600 to −1 000 / 0 / −200 |
 | 12 | [Test structure and doctor fold](phase-12-test-structure-and-doctor-fold.md) **landed 11-06 `cfff2aa7f..e3de56c54`** | 10, 11 | — | −85 / 0 / −1 100 |
