@@ -219,3 +219,52 @@ fn an_unconfined_capability_does_not_inherit_the_standard_policy() {
     assert_eq!(at(&snap.value, path), Some(&json!({"mode": "unconfined"})));
     let _ = fs::remove_dir_all(&dir);
 }
+
+/// The test above shows a project's `unconfined` replacing the standard's policy; nothing yet says a project
+/// may not do that. A project file is committed by whoever can push to the repository, so over a stricter layer
+/// below it a capability's confinement may be equalled or raised, never lowered: the file is refused by name.
+/// Only the bundled schema and standard carry the real confinement entry, so the proof runs on them.
+#[test]
+fn a_project_file_cannot_lower_a_capability_confinement() {
+    let (schemas, digest) = Schemas::bundled().unwrap();
+    let standard = Standard::bundled(&schemas).unwrap();
+    let ctx = Context {
+        schemas: &schemas,
+        standard: &standard,
+        digest: &digest,
+        detectors: &Fixed(json!({})),
+    };
+    let path = "runner.capabilities.advise.confinement";
+    assert_eq!(
+        at(standard.value(), &format!("{path}.mode")),
+        Some(&json!("required")),
+        "the standard must hold a stricter mode for this proof to mean anything"
+    );
+    let dir = common::temp("snap", "confinement-lowered");
+    let req = common::lay_out(
+        &dir,
+        &json!({"files": {"project/.fgos/config.yaml": [
+            "runner:",
+            "  capabilities:",
+            "    advise:",
+            "      confinement:",
+            "        mode: unconfined"
+        ]}}),
+    );
+    match snapshot(&ctx, &req) {
+        Err(SnapshotError::Refused(found)) => {
+            assert_eq!(found.len(), 1, "{found:?}");
+            assert_eq!(
+                found[0].code, "config-confinement-lowered",
+                "{:?}",
+                found[0]
+            );
+            assert_eq!(found[0].path.as_deref(), Some(path));
+        }
+        other => panic!(
+            "a project file lowered {path} from required to {:?} and was accepted",
+            other.map(|snap| at(&snap.value, path).cloned())
+        ),
+    }
+    let _ = fs::remove_dir_all(&dir);
+}

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "4e6e5bec191a240bf54f6a38d7df80e4dd4a495e8336244c9c52f597a00f8b24",
+  "payloadDigest": "7904d13cde59ba9c9583e6a3ba91157abac59059d039b5fdb22c4fca36d9195a",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -248,7 +248,7 @@
     "packages/config/rust/tests/golden_no_echo.rs": "b161c4b4c784d6558346ac927c25f57e395d10ca4237e53bf36a19a5814ca51f",
     "packages/config/rust/tests/golden_schema.rs": "bfb95ce662b2840b6ec2ee8e0c9edf66040b11cf220f0f7c888b987b18476e61",
     "packages/config/rust/tests/golden_scope.rs": "ebcf9054e332984689d13529f2cbf7c80600cd2272eebaad99cb0cd639084afb",
-    "packages/config/rust/tests/golden_snapshot.rs": "e92b5075ebd75ebc3c23d7a089b2d3d1593d4873b2b6b61f947f09c1706c66cb",
+    "packages/config/rust/tests/golden_snapshot.rs": "b378d9876983b4dc56b371a89b113f636d57d5817451e925de26f38e4e710d77",
     "packages/config/rust/tests/golden_standard.rs": "3bd34618f08bf494a9866ed803997e993e625e65ce01543e14c531d93cdeec07",
     "packages/config/rust/tests/golden_validate.rs": "5a1555ccbbfb14dc1eeb906b3534bdb35c1d545182888836bf9ce0ca51a3188e",
     "packages/config/rust/tests/inspect_verbs.rs": "4f3ec6affc1ec318f53ba8336d5c9c460c59d437bebc5ebd5f462050aa66cb57",
@@ -673,7 +673,7 @@
     "packages/run-supervisor/rust/src/supervise/windows.rs": "6b7de2b3ee80cb63ea33e77a6837e3838eb558223f34a8b83e79c7861ab4e4a4",
     "packages/run-supervisor/rust/src/terminal_slot.rs": "b049ad77513a954907f0a17344b738e0fa1ada82f369eb0d1b93e2dc833b69bb",
     "packages/run-supervisor/rust/tests/adopt_concurrency.rs": "c7d8287e421c1931388a0b79dad8f03c5e7dffcace9b907efbe6b0889d6d3a7e",
-    "packages/run-supervisor/rust/tests/adopt_matrix.rs": "ddf60f79d6f44dd593ccf22cc0b5b378ec80588c5f1ec3f87ce8c95962f7948a",
+    "packages/run-supervisor/rust/tests/adopt_matrix.rs": "33cddf521be090c03ec96e34a8584f091962905e22f76e060ab053d789269aed",
     "packages/run-supervisor/rust/tests/adopt_scan_perf.rs": "e7c7c69ebb474fb9e070340b9c48888c603ef93f7024545b0887130fddedd3d1",
     "packages/run-supervisor/rust/tests/envelope_digest_vectors.rs": "593eacf90542d07acb74ce2917ece2c9f82e6e63a205045aeb2a022106fee153",
     "packages/run-supervisor/rust/tests/fixtures/ignore-sigterm.sh": "5e83e7c47f0c6dd3ee7c21e7aa6c3854b39535fe7593d1becd6a89e806419d0a",
@@ -2890,6 +2890,13 @@
       "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:393",
       "binary": "(env *)",
       "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/adopt_matrix.rs",
+      "line": 434,
+      "spawn": "Command::new",
+      "binary": "? internal_harness()",
+      "class": "rust-test"
     },
     {
       "path": "packages/run-supervisor/rust/tests/gate_pid1.rs",
