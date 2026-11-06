@@ -129,7 +129,7 @@ Holder identity is `{hostId, bootId, pid, processStartTime}` of the process doin
 control, not a guessed Rust parent. Unknown liveness is not dead. A dead holder
 may leave a remotely queued command: successor first reconciles pending control.
 
-Implemented (Phase 02 H1, `src/runner/dispatch/run-lock.mjs`): holder identity
+Implemented (Phase 02 H1, `src/run-supervisor/run-lock.mjs`): holder identity
 is `{id, pid, bootId, processStartTime, host}` (`buildRunControlHolder`,
 `host` in place of this section's `hostId`), and `resolveHolderLiveness`
 encodes the reclaim decision above as a table — a live pid, a pid whose

@@ -12,7 +12,7 @@
 
 import fs from 'node:fs';
 import { lockHolders, probe, resolveLock, lockEntry, resolveLockRoot, HolderLockError } from '../holder-lock/index.mjs';
-import { judge, signalByIdentity, selfChain } from './dispatch/process-identity.mjs';
+import { judge, signalByIdentity, selfChain } from '../native/process-identity.mjs';
 import { hotPaths, readHotRecord, clearHotRecord, judgeHotRecord } from '../state/hot-lock.mjs';
 
 export const TERM_WAIT_MS = 5000;

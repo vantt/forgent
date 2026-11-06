@@ -19,7 +19,7 @@ import { resolveStateRoot, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
 import { hotPaths, readHotRecord, judgeHotRecord } from '../state/hot-lock.mjs';
 import { fgosDirFromRoot } from '../runner/paths.mjs';
-import { judge } from '../runner/dispatch/process-identity.mjs';
+import { judge } from '../native/process-identity.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
 

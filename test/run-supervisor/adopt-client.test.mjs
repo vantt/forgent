@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
+import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 import { adoptRun, adoptScan, listOpenAttemptDirs, RunSupervisorError } from '../../src/run-supervisor/client.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;

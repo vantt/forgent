@@ -7,7 +7,7 @@
 // lock. It has no TTL and no heartbeat: a holder that dies releases it at once.
 
 import fs from 'node:fs';
-import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../../holder-lock/index.mjs';
+import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../holder-lock/index.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 
 const LOCK_NAME = 'dispatch-cwd';

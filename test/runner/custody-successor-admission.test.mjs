@@ -7,11 +7,11 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import { acquireSync, createLockScope, predecessorState, probe, resolveLock } from '../../src/holder-lock/index.mjs';
-import { admitSuccessor, recordCustodyHandoff } from '../../src/runner/dispatch/cwd-lock.mjs';
+import { admitSuccessor, recordCustodyHandoff } from '../../src/run-supervisor/cwd-lock.mjs';
 import { acquireAttemptLocks } from '../../src/run-supervisor/direct-launch.mjs';
 
 const skip = process.platform !== 'linux' ? 'real Linux flock/process identity vectors' : false;
-const identity = new URL('../../src/runner/dispatch/process-identity.mjs', import.meta.url).href;
+const identity = new URL('../../src/native/process-identity.mjs', import.meta.url).href;
 
 function fixture(t) {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-custody-admit-'));
@@ -97,7 +97,7 @@ test('controller death with a setsid escapee keeps an unconfined worktree inadmi
     import fs from 'node:fs';
     import { spawn } from 'node:child_process';
     import { selfRecord } from ${JSON.stringify(identity)};
-    import { admitSuccessor, recordCustodyHandoff } from ${JSON.stringify(new URL('../../src/runner/dispatch/cwd-lock.mjs', import.meta.url).href)};
+    import { admitSuccessor, recordCustodyHandoff } from ${JSON.stringify(new URL('../../src/run-supervisor/cwd-lock.mjs', import.meta.url).href)};
     import { createLockScope } from ${JSON.stringify(new URL('../../src/holder-lock/index.mjs', import.meta.url).href)};
     const custody = admitSuccessor(createLockScope('controller'), ${JSON.stringify(f.fgosDir)}, ${JSON.stringify(f.cwd)});
     const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });

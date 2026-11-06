@@ -28,7 +28,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { resolveLogsDir, resolveMainCheckoutRoot } from './paths.mjs';
-import { observe, judge, signalByIdentity } from './dispatch/process-identity.mjs';
+import { observe, judge, signalByIdentity } from '../native/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 import { replaceDurably } from '../native/door.mjs';
 import { isConfigRefusal, readMachineConfig } from '../config/facade.mjs';

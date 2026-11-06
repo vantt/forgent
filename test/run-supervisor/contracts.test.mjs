@@ -5,7 +5,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { canonicalJson, computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
+import { canonicalJson, computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const readJson = (rel) => JSON.parse(readFileSync(join(root, rel), 'utf8'));

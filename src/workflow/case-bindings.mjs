@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { cwdDevIno } from '../holder-lock/registry.mjs';
 import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
-import { dispatchCwdHolder } from '../runner/dispatch/cwd-lock.mjs';
+import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 

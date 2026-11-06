@@ -15,7 +15,7 @@ import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs
 import { runReviewed } from '../../../src/runner/execution/loops/reviewed.mjs';
 import { seatLaunchesOf, briefNeverReached, noBriefDelivered, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
-import { dispatchCwdHolder } from '../../../src/runner/dispatch/cwd-lock.mjs';
+import { dispatchCwdHolder } from '../../../src/run-supervisor/cwd-lock.mjs';
 import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-port.mjs';
 import { createPendingBinding, commitBinding } from '../../../src/workflow/case-bindings.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';

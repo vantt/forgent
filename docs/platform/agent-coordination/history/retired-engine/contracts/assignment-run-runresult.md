@@ -158,7 +158,7 @@ Implementation status: deterministic `runId`, pre-spawn `run.json` metadata,
 lock (holder identity above), and a caller-declared `expectedRunId` that
 disagrees with the naturally-computed next attempt refusing rather than being
 silently adopted are implemented (`src/runner/dispatch/assignment-runner.mjs`,
-`src/runner/dispatch/run-lock.mjs`, CoordinationSession store/replay). Atomic
+`src/run-supervisor/run-lock.mjs`, CoordinationSession store/replay). Atomic
 admission durability is partially implemented: `result.json`/`run.json`/the
 effective-execution-contract projection and the per-attempt dispatch-bookkeeping
 marker are all published via a fsynced-temp-then-rename primitive

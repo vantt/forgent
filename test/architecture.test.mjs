@@ -124,6 +124,14 @@ export function extractDomainCouplings(file, source, domainNames = []) {
   return targets;
 }
 
+// Every relative specifier a module imports, static (also multi-line) or dynamic with a string literal.
+function relativeSpecifiers(source) {
+  return [
+    ...[...source.matchAll(/^import\s[^;]*?from\s+['"](\.[^'"]+)['"]/gms)].map((m) => m[1]),
+    ...[...source.matchAll(/\bimport\(\s*['"](\.[^'"]+)['"]\s*\)/g)].map((m) => m[1]),
+  ];
+}
+
 test('đủ sổ: file .mjs trên đĩa ↔ row trong manifest, một-một', () => {
   assert.deepEqual(onDisk, inManifest);
 });
@@ -146,11 +154,7 @@ test('import một chiều xuống: không file nào import ngược lên tầng
     const source = fs.readFileSync(path.join(root, file), 'utf8');
     // Bắt cả import nhiều dòng: `import {\n ... \n} from './x.mjs';`, và import động
     // `import('./x.mjs')` với specifier là string literal (cạnh lazy cũng phải theo luật tầng).
-    const specifiers = [
-      ...[...source.matchAll(/^import\s[^;]*?from\s+['"](\.[^'"]+)['"]/gms)].map((m) => m[1]),
-      ...[...source.matchAll(/\bimport\(\s*['"](\.[^'"]+)['"]\s*\)/g)].map((m) => m[1]),
-    ];
-    for (const specifier of specifiers) {
+    for (const specifier of relativeSpecifiers(source)) {
       const target = path
         .relative(root, path.resolve(root, path.dirname(file), specifier))
         .split(path.sep)
@@ -173,6 +177,20 @@ test('import một chiều xuống: không file nào import ngược lên tầng
           `${file} (${manifest.files[file]}) import ngược lên ${target} (${manifest.files[target]})`,
         );
       }
+    }
+  }
+  assert.deepEqual(violations, []);
+});
+
+test('tầng thấp không import Dispatch: native, state, holder-lock, run-supervisor không chạm src/runner/dispatch', () => {
+  const lower = ['src/native/', 'src/state/', 'src/holder-lock/', 'src/run-supervisor/'];
+  // A step is Dispatch code the supervisor runs after the agent, so it may import its own Dispatch modules.
+  const steps = 'src/run-supervisor/steps/';
+  const violations = [];
+  for (const file of inManifest.filter((f) => lower.some((dir) => f.startsWith(dir)) && !f.startsWith(steps))) {
+    for (const specifier of relativeSpecifiers(fs.readFileSync(path.join(root, file), 'utf8'))) {
+      const target = path.relative(root, path.resolve(root, path.dirname(file), specifier)).split(path.sep).join('/');
+      if (target.startsWith('src/runner/dispatch/')) violations.push(`${file} → ${target}`);
     }
   }
   assert.deepEqual(violations, []);

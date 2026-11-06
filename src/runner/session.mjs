@@ -36,7 +36,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { currentHead, inspectGit, gitWorktrees, compareCommits, removeWorktree, isCheckoutDirty } from './worktree.mjs';
 import { fgosDirFromRoot, resolveMainCheckoutRoot } from './paths.mjs';
-import { resolveHolderLiveness, selfRecord } from './dispatch/process-identity.mjs';
+import { resolveHolderLiveness, selfRecord } from '../native/process-identity.mjs';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
 import { addWorktreeSync } from './repo-locks.mjs';
 import { maintainEventStore } from '../event-store/maintenance.mjs';

@@ -1,4 +1,4 @@
-// src/runner/dispatch/proof-helpers.mjs — leaf module for cryptographic digests,
+// src/native/proof-helpers.mjs — leaf module for cryptographic digests,
 // canonical JSON serialization, fsynced immutable/mutable publication, and command envelopes.
 //
 // Extracted per Phase 09 R4 to decouple the Confinement Authority and execution adapters
@@ -7,9 +7,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { canonicalJson, installOnce, replaceDurably } from '../../native/door.mjs';
+import { canonicalJson, installOnce, replaceDurably } from './door.mjs';
 
-export { canonicalJson } from '../../native/door.mjs';
+export { canonicalJson } from './door.mjs';
 
 export function computeSha256Digest(value) {
   const serialized = typeof value === 'string' ? value : canonicalJson(value);

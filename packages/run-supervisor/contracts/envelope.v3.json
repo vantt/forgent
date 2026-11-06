@@ -32,7 +32,7 @@
       "booleans and null: true, false, null"
     ],
     "implementations": {
-      "node": "canonicalJson / computeSha256Digest in src/runner/dispatch/proof-helpers.mjs",
+      "node": "canonicalJson / computeSha256Digest in src/native/proof-helpers.mjs",
       "rust": "fgos_run_supervisor::envelope::digest"
     },
     "vector": "packages/run-supervisor/contracts/vectors/envelope-digest.v1.json; both implementations must reproduce every vector byte for byte",

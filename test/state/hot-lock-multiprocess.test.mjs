@@ -213,7 +213,7 @@ test('an observer in a foreign pid namespace never judges a record that has no n
   const f = fixture('n4');
   try {
     const script = `
-      import { judge } from ${JSON.stringify(new URL('../../src/runner/dispatch/process-identity.mjs', import.meta.url).href)};
+      import { judge } from ${JSON.stringify(new URL('../../src/native/process-identity.mjs', import.meta.url).href)};
       const record = JSON.parse(process.argv[1]);
       process.stdout.write(judge(record));
     `;

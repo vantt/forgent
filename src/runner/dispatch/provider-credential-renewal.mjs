@@ -27,8 +27,8 @@ import crypto from 'node:crypto';
 import { replaceDurably } from '../../native/door.mjs';
 import { createRequire } from 'node:module';
 
-import { resolveHolderLiveness } from './process-identity.mjs';
-import { readAgentFileSync } from './proof-helpers.mjs';
+import { resolveHolderLiveness } from '../../native/process-identity.mjs';
+import { readAgentFileSync } from '../../native/proof-helpers.mjs';
 import { acquireAccountLock, tryAcquireAccountLock, credentialStoreDir, expandCredentialHome } from './provider-capacity.mjs';
 import {
   credentialProbeCommand,

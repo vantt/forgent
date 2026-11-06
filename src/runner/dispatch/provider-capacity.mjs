@@ -10,7 +10,7 @@ import { readMachineAccounts } from '../../config/facade.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { deriveLegacyInventory } from './llm-accounts.mjs';
 import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
-import { resolveHolderLiveness, selfRecord } from './process-identity.mjs';
+import { resolveHolderLiveness, selfRecord } from '../../native/process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';

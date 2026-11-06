@@ -56,8 +56,8 @@ const PROMPT = [
 
 async function main() {
   const { EXECUTOR_ADAPTERS, resolveExecutorEnv } = await import(`${REPO}/src/runner/dispatch/transport.mjs`);
-  const { seedTrust } = await import(`${REPO}/src/runner/dispatch/trust-store.mjs`);
-  const { removeCodexTrust } = await import(`${REPO}/src/runner/dispatch/trust-store.mjs`);
+  const { seedTrust } = await import(`${REPO}/src/run-supervisor/trust-store.mjs`);
+  const { removeCodexTrust } = await import(`${REPO}/src/run-supervisor/trust-store.mjs`);
 
   const cfg = JSON.parse(fs.readFileSync(CFG, 'utf8'));
   const specs = Object.entries(cfg.runner.executors)

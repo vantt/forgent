@@ -38,7 +38,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { readTrust, trustedProjectEntry, TrustStoreError } from './trust-store.mjs';
+import { readTrust, trustedProjectEntry, TrustStoreError } from '../../run-supervisor/trust-store.mjs';
 import { stopProcessesInside } from './stop-processes-inside.mjs';
 
 /** Marker file written into every home this module creates. `removeWorkerHome`

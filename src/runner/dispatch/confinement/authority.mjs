@@ -5,9 +5,9 @@ import crypto from "node:crypto";
 import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
-import { claudeMcpApprovalArgs } from "../trust-store.mjs";
+import { claudeMcpApprovalArgs } from "../../../run-supervisor/trust-store.mjs";
 import { DEFAULT_ADAPTER, resolveExecutorEnv, workerBaseEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
-import { DispatchError } from "../dispatch-error.mjs";
+import { DispatchError } from "../../../run-supervisor/dispatch-error.mjs";
 import { validateConfinementRequest, validateAssignmentLaunchContext } from "./request.mjs";
 import {
   saveAttestationRecord,
@@ -36,7 +36,7 @@ import {
   updateCommandEnvelope,
   commitCommandOutcome,
   readAgentFileSync,
-} from "../proof-helpers.mjs";
+} from "../../../native/proof-helpers.mjs";
 
 export {
   DispatchError,

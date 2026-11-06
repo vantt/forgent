@@ -9,7 +9,7 @@ import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { leaveOpenWorkEvent } from '../helpers/open-work-event.mjs';
-import { observe } from '../../src/runner/dispatch/process-identity.mjs';
+import { observe } from '../../src/native/process-identity.mjs';
 import { startGateway, stopGateway, gatewayStatus, acquireGatewayLock, GatewayControlError } from '../../src/runner/gateway-control.mjs';
 
 const GATEWAY_CONTROL_MOD_PATH = fileURLToPath(new URL('../../src/runner/gateway-control.mjs', import.meta.url));

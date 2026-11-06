@@ -1,7 +1,7 @@
 // process-identity.mjs — the thin Node client of process facts. Every judgement, observation and signal is the
 // Rust crate's (`packages/process/rust`, vectors `packages/process/contracts/process-facts.judge.v1.json`),
 // reached through the in-process door (`src/native/door.mjs`). No /proc read, no cache, no JS fallback.
-import { nativeDoor } from '../../native/door.mjs';
+import { nativeDoor } from './door.mjs';
 
 const NAMED = { 'git-addon-unavailable': 'process-door-unavailable', 'git-addon-not-shipped': 'process-door-not-shipped' };
 function facts() {

@@ -7,7 +7,7 @@ import { nativeAddonLibraryName } from './build-rust-distribution.mjs';
 import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
 import { gitAddonDirectory } from './lib/git-addon-stage.mjs';
 import { processesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
-import { scan } from '../src/runner/dispatch/process-identity.mjs';
+import { scan } from '../src/native/process-identity.mjs';
 
 const checkoutRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 

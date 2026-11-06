@@ -14,8 +14,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { acquireRunControl, buildRunControlHolder, listGenerations, publishMarkerOnce, publishNextGeneration } from '../../src/runner/dispatch/run-lock.mjs';
-import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
+import { acquireRunControl, buildRunControlHolder, listGenerations, publishMarkerOnce, publishNextGeneration } from '../../src/run-supervisor/run-lock.mjs';
+import { selfRecord } from '../../src/native/process-identity.mjs';
 
 function mkRunDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-lock-identity-'));
@@ -56,7 +56,7 @@ test('acquireRunControl: a holder record whose pid was reused by an unrelated pr
 // one name, exactly one installs it, and no temporary is left behind.
 test('racing processes publish one marker and one next generation, never a replace', async () => {
   const dir = mkRunDir();
-  const lock = new URL('../../src/runner/dispatch/run-lock.mjs', import.meta.url).href;
+  const lock = new URL('../../src/run-supervisor/run-lock.mjs', import.meta.url).href;
   const race = (code) => Promise.all([1, 2, 3, 4].map((n) => new Promise((resolve) => {
     const child = spawn(process.execPath, ['--input-type=module', '-e', code(n)], { stdio: ['ignore', 'pipe', 'inherit'] });
     let out = '';

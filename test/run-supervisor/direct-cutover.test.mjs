@@ -10,7 +10,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { acquireSync, createLockScope, spawnWithLocks } from '../../src/holder-lock/index.mjs';
-import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
+import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
+import { readSettledResult } from '../../src/runner/dispatch/run-result.mjs';
 import { attemptGateCommand, attemptPaths, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, prepareAttemptFiles, waitForBinding, withIdentityEnv, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, killToken, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
 import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
@@ -170,7 +171,7 @@ test('awaitSettledResult returns null for a supervisor that is gone and an attem
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   // No envelope: the adopt door answers legacy-run, nothing will ever settle this directory.
   const capture = { stdout: path.join(dir, 'o'), stderr: path.join(dir, 'e') };
-  const result = await awaitSettledResult({ runDir: dir, runId: 'run-x', child: { exitCode: 1, signalCode: null }, capture, onChunk: null, ceilingMs: 1000 });
+  const result = await awaitSettledResult({ runDir: dir, runId: 'run-x', child: { exitCode: 1, signalCode: null }, capture, onChunk: null, ceilingMs: 1000, readSettledResult });
   assert.equal(result, null);
 });
 

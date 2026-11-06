@@ -8,7 +8,7 @@ Design status: Accepted
 Implementation: Implemented (judge vectors, the crate, the domain primitives and the Node door)
 Canonical: Yes
 Owner: Process component (facts + control, L0)
-Source: packages/process/rust (crate fgos-process); Node door src/native/door.mjs and thin client src/runner/dispatch/process-identity.mjs
+Source: packages/process/rust (crate fgos-process); Node door src/native/door.mjs and thin client src/native/process-identity.mjs
 Contracts: packages/process/contracts/
 Provenance: First committed in 0e377d7b6 (2026-10-16)
 Writer type: Human + agent coauthor
@@ -47,7 +47,7 @@ Facts are almost never on the lock decision path any more (the kernel decides); 
 | `domain_is_empty`, `domain_kill_all` for a declared domain | The attempt, envelope and lock that use the containment port (run supervisor); the port itself is section 10 |
 | The OS-neutral `ProcessPlatform` trait and one driver per OS | mtime of anything; a boot time derived from a clock |
 
-The reconcile planner imports only the thin client `src/runner/dispatch/process-identity.mjs` and, through it, the door; the import-graph test (`test/runner/dispatch-reconciliation-import-graph.test.mjs`) pins that closure. The component-boundary entry is [Process Facts & Control (L0)](../component-boundary.md#4-current-high-level-components).
+The reconcile planner imports only the thin client `src/native/process-identity.mjs` and, through it, the door; the import-graph test (`test/runner/dispatch-reconciliation-import-graph.test.mjs`) pins that closure. The component-boundary entry is [Process Facts & Control (L0)](../component-boundary.md#4-current-high-level-components).
 
 ## 3. Facts: the judge table
 
@@ -76,7 +76,7 @@ Consequence: a holder inside an attempt that dies while holding a hot lock keeps
 
 Authoritative boot id: Linux `/proc/sys/kernel/random/boot_id`; macOS `sysctl kern.bootsessionuuid`; Windows has no boot id and uses the process creation time (`FILETIME`), which does not repeat when a pid is reused. Boot is never inferred from a clock minus uptime, and mtime is never used. The reader never spawns, and a missing start time is `unknown`. Boot id and pid namespace are read once per process (`platform/linux.rs`); no fgOS process that judges ever unshares its pid namespace after it starts, so the cached values stay true.
 
-Node does not judge. It reaches the judge through one in-process door: `src/runner/dispatch/process-identity.mjs` is a thin client of six exports (`judge`, `observe`, `selfRecord`, `signalByIdentity`, `scan`, `resolveHolderLiveness`), at most 60 lines, with no `/proc` read and no `process.kill`. It calls the combined native addon through the loader leaf `src/native/door.mjs`, which Git also uses; the addon is the same crate cargo runs, so the vectors have one table and one runner. Calls are synchronous and never throw on a judgement: an unjudgeable record answers `unknown` (`judge`) or `unreadable` (`observe`), and a process that is gone answers `dead` or `absent`.
+Node does not judge. It reaches the judge through one in-process door: `src/native/process-identity.mjs` is a thin client of six exports (`judge`, `observe`, `selfRecord`, `signalByIdentity`, `scan`, `resolveHolderLiveness`), at most 60 lines, with no `/proc` read and no `process.kill`. It calls the combined native addon through the loader leaf `src/native/door.mjs`, which Git also uses; the addon is the same crate cargo runs, so the vectors have one table and one runner. Calls are synchronous and never throw on a judgement: an unjudgeable record answers `unknown` (`judge`) or `unreadable` (`observe`), and a process that is gone answers `dead` or `absent`.
 
 Two caller policies, both from the verdict and nothing else:
 
@@ -135,7 +135,7 @@ The containment port (`create`, `spawn_in`, `is_empty`, `kill_all`, `guarantee`)
 | consumed by | [holder-lock/spec.md](../holder-lock/spec.md) |
 | sibling L0/L1 authority | [identity/spec.md](../identity/spec.md) |
 | boundary | [component-boundary.md](../component-boundary.md) |
-| Node door and its callers | [door.mjs](../../../src/native/door.mjs), [process-identity.mjs](../../../src/runner/dispatch/process-identity.mjs), [runner spec](../runner/spec.md) |
+| Node door and its callers | [door.mjs](../../../src/native/door.mjs), [process-identity.mjs](../../../src/native/process-identity.mjs), [runner spec](../runner/spec.md) |
 | plan | [plan.md](../../../plans/261016-1104-holder-lock-kernel-lock-foundation/plan.md) |
 | design and evidence | design r6 |
 

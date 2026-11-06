@@ -266,7 +266,7 @@ test('the gate kill grace reader follows the same merge and refuses an unusable 
   writeProjectConfig(root, { dispatch: { gateKillGraceMs: 3000 } });
   assert.equal(readGateKillGraceMs({ projectRoot: root }), 3000);
   writeProjectConfig(root, { dispatch: { gateKillGraceMs: 10 } });
-  assert.throws(() => readGateKillGraceMs({ projectRoot: root }), { name: 'RunnerConfigError', category: 'validation', code: 'invalid-gate-kill-grace', message: /dispatch\.gateKillGraceMs must be an integer of at least 1000/ });
+  assert.throws(() => readGateKillGraceMs({ projectRoot: root }), { code: 'invalid-gate-kill-grace', message: /dispatch\.gateKillGraceMs must be an integer of at least 1000/ });
 });
 
 // ─── run-attempts-stuck ─────────────────────────────────────────────────
@@ -421,7 +421,7 @@ test('the cancel wait reader shares the gate kill grace merge and refuses an unu
   writeProjectConfig(root, { dispatch: { gateKillGraceMs: 3000 } });
   assert.equal(readCancelWaitMs({ projectRoot: root }), 8000);
   writeProjectConfig(root, { dispatch: { cancelWaitMs: 10 } });
-  assert.throws(() => readCancelWaitMs({ projectRoot: root }), { name: 'RunnerConfigError', category: 'validation', code: 'invalid-cancel-wait', message: /dispatch\.cancelWaitMs must be an integer of at least 1000/ });
+  assert.throws(() => readCancelWaitMs({ projectRoot: root }), { code: 'invalid-cancel-wait', message: /dispatch\.cancelWaitMs must be an integer of at least 1000/ });
   // The doctor check names the same key with the same words.
   assert.match(checkRunSupervisorConfig(root, { globalConfigPath: path.join(scratch, 'no-global-config.json') }).message, /dispatch\.cancelWaitMs must be an integer of at least 1000/);
 });

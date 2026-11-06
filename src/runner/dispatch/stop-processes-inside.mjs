@@ -17,7 +17,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { judge, scan, signalByIdentity } from './process-identity.mjs';
+import { judge, scan, signalByIdentity } from '../../native/process-identity.mjs';
 
 const sleepSync = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 

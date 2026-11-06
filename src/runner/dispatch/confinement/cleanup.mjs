@@ -10,7 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 import { writeFileAtomic } from '../provider-credential-renewal.mjs';
-import { readAgentFileSync } from '../proof-helpers.mjs';
+import { readAgentFileSync } from '../../../native/proof-helpers.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 

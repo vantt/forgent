@@ -24,8 +24,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { findWorkerClaim } from './worker-artifacts.mjs';
-import { publishMutableProjection } from './proof-helpers.mjs';
+import { findWorkerClaim } from '../../run-supervisor/worker-artifacts.mjs';
+import { publishMutableProjection } from '../../native/proof-helpers.mjs';
 import { listAssignmentRuns } from './assignment-layout.mjs';
 
 export class VisibilityError extends Error {

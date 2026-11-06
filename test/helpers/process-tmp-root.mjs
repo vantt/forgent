@@ -19,7 +19,7 @@ const SEAL_CHILD_WAIT_MS = 20000;
 // can end before the child does. Before the root is removed this process waits, through the process door (identity,
 // never a bare pid), for the seal children of its own root to finish. Test code only: the product has no such wait.
 let processDoor = null;
-import('../../src/runner/dispatch/process-identity.mjs').then((door) => { processDoor = door; }, () => {});
+import('../../src/native/process-identity.mjs').then((door) => { processDoor = door; }, () => {});
 
 // Directories outside the private root that a test made and drove CLI Work commands in (fixture-dir.mjs): a seal child
 // naming one of them must also end before this process's root, which holds the child's state root, goes away.

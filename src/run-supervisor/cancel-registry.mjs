@@ -11,8 +11,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { publishImmutableProof } from '../runner/dispatch/proof-helpers.mjs';
-import { selfRecord } from '../runner/dispatch/process-identity.mjs';
+import { publishImmutableProof } from '../native/proof-helpers.mjs';
+import { selfRecord } from '../native/process-identity.mjs';
 
 const POLL_MS = 50;
 const EXIT_CODES = Object.freeze({ SIGINT: 130, SIGTERM: 143 });

@@ -21,9 +21,9 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
-import { DispatchError } from './dispatch-error.mjs';
+import { DispatchError } from '../../run-supervisor/dispatch-error.mjs';
 import { terminalRouteConfig } from '../../terminal-control/config.mjs';
-import { normalizeAgentName } from './proof-helpers.mjs';
+import { normalizeAgentName } from '../../native/proof-helpers.mjs';
 import { createRoundTerminalControl, portKey, slotDisplay, refusalError } from './terminal-slot.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { writeVisibility } from './visibility-session.mjs';
@@ -31,13 +31,13 @@ import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-h
 import {
   seedTrust, seedCodexTrust, seedAgyTrust, defaultAgySettingsPath,
   seedCodexHookTrust, trustRoots,
-} from './trust-store.mjs';
+} from '../../run-supervisor/trust-store.mjs';
 export { trustRoots };
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
 import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
 import { expandCredentialHome } from './provider-capacity.mjs';
-import { publishMutableProjection } from './proof-helpers.mjs';
+import { publishMutableProjection } from '../../native/proof-helpers.mjs';
 import { TRUST_CONTEXT_FILE, cleanupTrust } from '../../run-supervisor/steps/cleanup-trust.mjs';
 
 /**

@@ -14,7 +14,7 @@ import { execFileSync } from 'node:child_process';
 import {
   seedCodexTrust, readCodexTrust, seedAgyTrust, readAgyTrust, removeCodexTrust, TrustStoreError,
   codexHookTrustHash, seedCodexHookTrust,
-} from '../../src/runner/dispatch/trust-store.mjs';
+} from '../../src/run-supervisor/trust-store.mjs';
 import { trustRoots, trustStorePaths, seedWorkspaceTrust } from '../../src/runner/dispatch/herdr-round.mjs';
 
 const dirs = [];

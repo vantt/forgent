@@ -18,7 +18,7 @@ import { expandCredentialHome } from '../../provider-capacity.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 import { resolveRuntimeSocketDir } from '../../../../run-supervisor/runtime-dir.mjs';
-import { computeSha256Digest } from '../../proof-helpers.mjs';
+import { computeSha256Digest } from '../../../../native/proof-helpers.mjs';
 
 export const BWRAP_DRIVER_TYPE = 'bwrap';
 export const BWRAP_DRIVER_VERSION = 'local-bwrap-v1';

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 import { mintAttemptWriterId, WriterIdentityError } from '../../src/util/session-identity.mjs';
 import { workerBaseEnv } from '../../src/runner/dispatch/adapters.mjs';
-import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
+import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;

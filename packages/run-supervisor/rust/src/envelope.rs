@@ -1,6 +1,6 @@
 //! Envelope digest: `"sha256:" + hex(sha256(canonical JSON without "digest"))`,
 //! byte-identical to `computeSha256Digest(canonicalJson(...))` in
-//! `src/runner/dispatch/proof-helpers.mjs`.
+//! `src/native/proof-helpers.mjs`.
 
 use serde_json::Value;
 use sha2::{Digest, Sha256};

@@ -86,7 +86,7 @@ function cleanup() {
 
 async function main() {
   const { EXECUTOR_ADAPTERS } = await import(`${REPO}/src/runner/dispatch/transport.mjs`);
-  const { seedTrust } = await import(`${REPO}/src/runner/dispatch/trust-store.mjs`);
+  const { seedTrust } = await import(`${REPO}/src/run-supervisor/trust-store.mjs`);
 
   fs.mkdirSync(WORK, { recursive: true });
   sh('git', ['init', '-q'], { cwd: WORK });

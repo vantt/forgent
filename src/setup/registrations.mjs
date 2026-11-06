@@ -1,5 +1,5 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-import { resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
+import { resolveHolderLiveness } from '../native/process-identity.mjs';
 import { checkGit, checkMutationOneDoor, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixGitOperationRecovery } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / fix registry (CONTEXT.md D1/D2,
@@ -115,7 +115,7 @@ import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs
 import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepInterruptedStagings, credentialWriteBackTarget, inventoryAccount, MAX_PENDING_COPIES } from '../runner/dispatch/provider-credential-renewal.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { createTerminalControl } from '../terminal-control/client.mjs';
-import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
+import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../run-supervisor/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';

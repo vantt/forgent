@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { publishMutableProjection } from '../dispatch/proof-helpers.mjs';
+import { publishMutableProjection } from '../../native/proof-helpers.mjs';
 import { createGitInspect, gitWriter } from '../../git/inspect.mjs';
 
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
@@ -40,7 +40,7 @@ import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktr
 import { assertSyncResumable, commitRoundWithSync, effectiveWriteScope, runPendingSync, seedSync, syncBrief, syncSummary } from './unit-sync.mjs';
 import { AgentNotFoundError, resolveAgentDefinition } from '../agent-definitions.mjs';
 import { parseYaml } from '../../util/yaml.mjs';
-import { dispatchCwdHolder, dispatchInFlightError, admitSuccessor, recordCustodyHandoff } from '../dispatch/cwd-lock.mjs';
+import { dispatchCwdHolder, dispatchInFlightError, admitSuccessor, recordCustodyHandoff } from '../../run-supervisor/cwd-lock.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { writeUnitSummary } from './unit-summary.mjs';
@@ -49,7 +49,7 @@ import { adoptRun, sweepAttempts } from '../../run-supervisor/client.mjs';
 import { installCancelOnSignal, assertNotCancelled, RunCancelledError } from '../../run-supervisor/cancel-registry.mjs';
 import { cancelOnSignalEnabled } from '../../run-supervisor/cancel-opt-in.mjs';
 import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';
-import { listGenerations } from '../dispatch/run-lock.mjs';
+import { listGenerations } from '../../run-supervisor/run-lock.mjs';
 import { acquireUnitControl } from './unit-control.mjs';
 import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
 import { createLockScope, resolveStateRoot } from '../../holder-lock/index.mjs';

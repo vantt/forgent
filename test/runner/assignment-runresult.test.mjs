@@ -14,7 +14,7 @@ import {
 } from '../../src/runner/dispatch/assignment-runner.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { findMutatedDirtyBeforeFiles, safeGitStatusFiles, safeGitCommittedDiffFiles } from '../../src/runner/dispatch/settlement.mjs';
-import { sha256FileSync } from '../../src/runner/dispatch/proof-helpers.mjs';
+import { sha256FileSync } from '../../src/native/proof-helpers.mjs';
 import { validateRunResultV2, validateRunResultV3, runOutcome } from '../../src/runner/dispatch/run-result.mjs';
 import { interpretAssignmentRunResult } from '../../src/runner/operation-choice.mjs';
 

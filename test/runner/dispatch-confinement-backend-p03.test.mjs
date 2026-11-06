@@ -10,7 +10,7 @@ import path from 'node:path';
 import cp from 'node:child_process';
 import { commitUnitWork, preflightUnitWorktree } from '../../src/runner/execution/commit-unit-work.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { admitSuccessor } from '../../src/runner/dispatch/cwd-lock.mjs';
+import { admitSuccessor } from '../../src/run-supervisor/cwd-lock.mjs';
 import { createLockScope } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 

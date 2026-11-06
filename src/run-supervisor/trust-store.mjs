@@ -1,4 +1,4 @@
-// dispatch/trust-store.mjs — the ONE door onto an agent CLI's folder-trust store
+// trust-store.mjs — the ONE door onto an agent CLI's folder-trust store
 // (Phase 01 group B of plans/260906-1831-dispatch-visibility-v0).
 //
 // WHY THIS EXISTS. An agent CLI records which directories a human has vouched
@@ -31,9 +31,9 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
-import { readAgentFileSync } from './proof-helpers.mjs';
-import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
+import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
+import { readAgentFileSync } from '../native/proof-helpers.mjs';
+import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 
 /** Raised for every refusal and every failure. Carries a `code` so a caller can
  * branch on the reason without matching message text. */

@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
+import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 import { inspectDispatchUseCase } from '../../src/verbs/dispatch/inspect.mjs';
 import { showRunUseCase } from '../../src/verbs/dispatch/show-run.mjs';
 import { recoverApplyUseCase, recoverObserveUseCase } from '../../src/verbs/dispatch/recover.mjs';

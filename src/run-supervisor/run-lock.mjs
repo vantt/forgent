@@ -1,4 +1,4 @@
-// dispatch/run-lock.mjs — the one append-only generation/release-marker
+// run-lock.mjs — the one append-only generation/release-marker
 // primitive this cell introduces, per
 // plans/260911-2305-runtime-recovery/phase-designs/run-admission-and-fencing.md
 // ("Lock Protocol") and
@@ -24,8 +24,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { installOnce } from '../../native/door.mjs';
-import { selfRecord, resolveHolderLiveness } from './process-identity.mjs';
+import { installOnce } from '../native/door.mjs';
+import { selfRecord, resolveHolderLiveness } from '../native/process-identity.mjs';
 
 // --- Control holder identity (H1) -----------------------------------------
 

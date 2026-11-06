@@ -211,7 +211,7 @@ test('lock fence state: an unreadable record needs --attest-stopped, then the re
   // A live holder: a real process whose full tuple is in the record.
   const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
   try {
-    const { observe } = await import('../../src/runner/dispatch/process-identity.mjs');
+    const { observe } = await import('../../src/native/process-identity.mjs');
     const { pid, startTime, bootId, pidNs } = observe(child.pid);
     fs.writeFileSync(record, JSON.stringify({ v: 1, pid, startTime, bootId, pidNs }));
     const unconfirmed = await runAsync(cwd, ['lock', 'fence', 'state']);
@@ -239,7 +239,7 @@ test('lock fence state: an unreadable record needs --attest-stopped, then the re
 // the door, so a vanished holder is not-found and nothing is sent (asserted below).
 test('fenceHotRecord on a holder that died between judge and signal returns at once and clears the record; it never waits TERM_WAIT_MS on a dead pid', async () => {
   const { fenceLock } = await import('../../src/runner/lock-fence.mjs');
-  const { observe } = await import('../../src/runner/dispatch/process-identity.mjs');
+  const { observe } = await import('../../src/native/process-identity.mjs');
   const cwd = initGitCwdFast();
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });
@@ -273,7 +273,7 @@ test('fenceHotRecord on a holder that died between judge and signal returns at o
 // never signals, whatever process the pid may name by now.
 test('fenceHotRecord on a record whose holder is already dead signals nothing and clears the record at once', async () => {
   const { fenceLock } = await import('../../src/runner/lock-fence.mjs');
-  const { observe } = await import('../../src/runner/dispatch/process-identity.mjs');
+  const { observe } = await import('../../src/native/process-identity.mjs');
   const cwd = initGitCwdFast();
   const fgosDir = path.join(cwd, '.fgos');
   fs.mkdirSync(path.join(fgosDir, 'locks'), { recursive: true });

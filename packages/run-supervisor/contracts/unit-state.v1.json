@@ -10,7 +10,7 @@
       "failed": "unit-summary.json exists with a failing outcome"
     },
     "liveController": {
-      "record": "<unitDir>/unit-control/: the run-control ledger (src/runner/execution/unit-control.mjs over src/runner/dispatch/run-lock.mjs) whose holder is the controller driving the unit; taken when the unit starts and by a resuming controller",
+      "record": "<unitDir>/unit-control/: the run-control ledger (src/runner/execution/unit-control.mjs over src/run-supervisor/run-lock.mjs) whose holder is the controller driving the unit; taken when the unit starts and by a resuming controller",
       "judge": "inspectRunControl over that ledger: the holder is judged with the same dead-holder proof every run control uses (packages/process/contracts/process-facts.judge.v1.json); only a holder proven dead counts as no controller. alive and unknown both keep the unit `running` (unknown = keep). A unit with no ledger has no controller"
     }
   },

@@ -21,7 +21,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { judge, selfRecord as doorSelfRecord } from '../runner/dispatch/process-identity.mjs';
+import { judge, selfRecord as doorSelfRecord } from '../native/process-identity.mjs';
 import { acquireSync, createLockScope } from '../holder-lock/index.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { HotLockError, hotLockDepth, enterHotLock } from '../holder-lock/hot-guard.mjs';

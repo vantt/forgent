@@ -14,7 +14,7 @@ import { createTerminalControl } from '../../src/terminal-control/client.mjs';
 import { createFakeHerdr } from '../helpers/fake-herdr-pane.mjs';
 import { startTerminalHarness } from '../helpers/terminal-host-harness.mjs';
 import { cleanupTrust } from '../../src/run-supervisor/steps/cleanup-trust.mjs';
-import { trustedProjectEntry } from '../../src/runner/dispatch/trust-store.mjs';
+import { trustedProjectEntry } from '../../src/run-supervisor/trust-store.mjs';
 import { noHost } from './support/terminal-harness.mjs';
 
 const POSIX_ONLY = process.platform === 'win32' && 'the fake herdr is a POSIX shell wrapper';

@@ -4,7 +4,7 @@
 // alive refuses a second one. Nothing here starts, adopts or settles an attempt.
 
 import path from 'node:path';
-import { acquireRunControl, buildRunControlHolder, inspectRunControl, releaseRunControl } from '../dispatch/run-lock.mjs';
+import { acquireRunControl, buildRunControlHolder, inspectRunControl, releaseRunControl } from '../../run-supervisor/run-lock.mjs';
 
 /** The directory whose `control/` ledger records the unit's controller. */
 export function unitControlDir(unitDir) {

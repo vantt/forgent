@@ -17,7 +17,7 @@ import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { deriveOperationCapability } from './operation-capability.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorConfig } from './dispatch/resolve.mjs';
-import { DispatchError } from './dispatch/dispatch-error.mjs';
+import { DispatchError } from '../run-supervisor/dispatch-error.mjs';
 import { resolveAgentTypeForTaskSpec, watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
 import { runUnit, resolveGitRoots } from './execution/run.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';

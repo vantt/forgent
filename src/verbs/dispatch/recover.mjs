@@ -22,7 +22,7 @@ import { readRunSnapshot } from './show-run.mjs';
 import { assignmentDir, findRunDir, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
 import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { plan, checkApply, collectEvidence, RecoveryPlannerError } from '../../runner/dispatch/recovery-planner.mjs';
-import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
+import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, buildRunControlHolder } from '../../run-supervisor/run-lock.mjs';
 import { findCoordinationSessionOwningAssignment } from '../../runner/dispatch/runtime-inspection.mjs';
 import { classifyRunOutcome } from '../../runner/dispatch/visibility-session.mjs';
 import { acquireSync, createLockScope, resolveLock } from '../../holder-lock/index.mjs';

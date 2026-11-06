@@ -6,7 +6,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, seedCodexTrust, removeCodexTrust, claudeMcpApprovalArgs, TrustStoreError } from '../../src/runner/dispatch/trust-store.mjs';
+import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, seedCodexTrust, removeCodexTrust, claudeMcpApprovalArgs, TrustStoreError } from '../../src/run-supervisor/trust-store.mjs';
 
 // Phase 01 group B. Every test here runs against a FIXTURE store, never the real
 // ~/.claude.json -- the module takes the store path as an argument precisely so a
@@ -351,7 +351,7 @@ test('a pipe or a link in place of .mcp.json or .codex/hooks.json is refused at 
     const real = path.join(dir, 'real.json');
     fs.writeFileSync(real, JSON.stringify({ mcpServers: { skillhub: {} }, hooks: {} }));
     const script = `
-      import { claudeMcpApprovalArgs, codexHookTrustEntries } from ${JSON.stringify(pathToFileURL(path.resolve('src/runner/dispatch/trust-store.mjs')).href)};
+      import { claudeMcpApprovalArgs, codexHookTrustEntries } from ${JSON.stringify(pathToFileURL(path.resolve('src/run-supervisor/trust-store.mjs')).href)};
       const approved = claudeMcpApprovalArgs({ cwd: ${JSON.stringify(project)}, repoRoot: ${JSON.stringify(project)}, storePath: ${JSON.stringify(store)} });
       let hooks;
       try { codexHookTrustEntries(${JSON.stringify(path.join(project, '.codex', 'hooks.json'))}); hooks = 'read'; } catch (err) { hooks = err.code; }

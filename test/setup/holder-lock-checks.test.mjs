@@ -22,7 +22,7 @@ const {
   cutOverLockFiles,
 } = await import('../../src/setup/holder-lock-checks.mjs');
 const { fileHolders } = await import('../../src/holder-lock/index.mjs');
-const { observe, selfRecord } = await import('../../src/runner/dispatch/process-identity.mjs');
+const { observe, selfRecord } = await import('../../src/native/process-identity.mjs');
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const STATE_ROOT = process.env.FGOS_STATE_ROOT;

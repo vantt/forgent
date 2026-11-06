@@ -1,7 +1,7 @@
 // stray-writes.mjs -- evidence of work done outside the workspace a dispatch handed its worker.
 
 import path from 'node:path';
-import { checkoutDirtyPaths } from '../worktree.mjs';
+import { checkoutDirtyPaths } from '../runner/worktree.mjs';
 
 /**
  * Watch for work done outside the workspace the dispatch handed the worker.

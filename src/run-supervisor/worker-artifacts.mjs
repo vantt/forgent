@@ -1,4 +1,4 @@
-// dispatch/worker-artifacts.mjs — where a worker's own claim and report are,
+// worker-artifacts.mjs — where a worker's own claim and report are,
 // under either name a worker may have been told to use.
 //
 // Two names exist for one artifact, in up to three directories. A worker

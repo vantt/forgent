@@ -7,12 +7,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { settleRunOutcome } from '../../runner/dispatch/settlement.mjs';
 import { readSettledResult } from '../../runner/dispatch/run-result.mjs';
-import { computeSha256Digest, openAgentFileSync } from '../../runner/dispatch/proof-helpers.mjs';
-import { acquireRunControl, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
+import { computeSha256Digest, openAgentFileSync } from '../../native/proof-helpers.mjs';
+import { acquireRunControl, buildRunControlHolder } from '../run-lock.mjs';
 import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs';
-import { strayWriteWarning, watchWritesOutsideWorkspace } from '../../runner/dispatch/stray-writes.mjs';
+import { strayWriteWarning, watchWritesOutsideWorkspace } from '../stray-writes.mjs';
 import { createTerminalControl } from '../../terminal-control/client.mjs';
-import { findWorkerClaim } from '../../runner/dispatch/worker-artifacts.mjs';
+import { findWorkerClaim } from '../worker-artifacts.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
 
 /** The last lines of a pane screen that may carry the reset time a provider printed. */

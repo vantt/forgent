@@ -227,7 +227,7 @@ test('a staged release resolves its own addon without PATH or cwd fallback, and 
       } else {
         // The descriptor beside the payload is not a channel the door reads: it refuses, naming that no addon is shipped.
         const probe = `import {loadNativeAddon} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/git/native.mjs')}`).href)}; try { loadNativeAddon({hostBin:null}); } catch(e) { console.log(e.code); }`;
-        const door = `import {selfRecord} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/runner/dispatch/process-identity.mjs')}`).href)}; try { console.log(typeof selfRecord().pid); } catch(e) { console.log(e.code + ': ' + e.message); }`;
+        const door = `import {selfRecord} from ${JSON.stringify(new URL(`file://${path.join(payload, 'src/native/process-identity.mjs')}`).href)}; try { console.log(typeof selfRecord().pid); } catch(e) { console.log(e.code + ': ' + e.message); }`;
         assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', probe], { encoding: 'utf8' }).trim(), 'git-addon-not-shipped');
         assert.equal(execFileSync(process.execPath, ['--input-type=module', '-e', door], { cwd: os.tmpdir(), encoding: 'utf8' }).trim(), 'process-door-not-shipped: process-door-not-shipped: onboard this project with fgctl init');
       }

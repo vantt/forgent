@@ -27,7 +27,7 @@ import {
   validateProviderAccountInventory,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { reconcileProviderCapacityQuarantineUseCase } from '../../src/verbs/dispatch/reconcile.mjs';
-import { selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
+import { selfRecord } from '../../src/native/process-identity.mjs';
 import { lockHolders, resolveLockRoot } from '../../src/holder-lock/index.mjs';
 import { globalConfigPath as globalConfigFile, writeAccountsFile } from '../helpers/config-fixture.mjs';
 

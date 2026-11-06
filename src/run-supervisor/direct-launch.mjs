@@ -12,11 +12,10 @@ import { StringDecoder } from 'node:string_decoder';
 import { spawn } from 'node:child_process';
 import { acquireSync, createLockScope, spawnWithLocks, resolveLock, resolveStateRoot } from '../holder-lock/index.mjs';
 import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
-import { admitSuccessor } from '../runner/dispatch/cwd-lock.mjs';
-import { DispatchError } from '../runner/dispatch/dispatch-error.mjs';
-import { computeSha256Digest, openAgentFileSync, publishImmutableProof, publishMutableProjection } from '../runner/dispatch/proof-helpers.mjs';
-import { selfRecord } from '../runner/dispatch/process-identity.mjs';
-import { readSettledResult } from '../runner/dispatch/run-result.mjs';
+import { admitSuccessor } from './cwd-lock.mjs';
+import { DispatchError } from './dispatch-error.mjs';
+import { computeSha256Digest, openAgentFileSync, publishImmutableProof, publishMutableProjection } from '../native/proof-helpers.mjs';
+import { selfRecord } from '../native/process-identity.mjs';
 import { adoptRun, resolveRouteHostBin, RunSupervisorError } from './client.mjs';
 import { readGateKillGraceMs } from './gate-kill-grace.mjs';
 import { ensureRuntimeSocketDir } from './runtime-dir.mjs';
@@ -364,7 +363,7 @@ async function waitForClosed(runDir, child, { timeoutMs = CLOSE_WAIT_MS } = {}) 
  * exists, the adopt door finishes whatever it left (the steps), then the result is read again.
  * Returns the frozen run result, or null when nothing settled it.
  */
-export async function awaitSettledResult({ runDir, runId, child, capture, onChunk, ceilingMs }) {
+export async function awaitSettledResult({ runDir, runId, child, capture, onChunk, ceilingMs, readSettledResult }) {
   const follow = captureTail(capture, onChunk);
   const giveUpAt = Date.now() + ceilingMs;
   // The gate ends the agent by its hard ceiling, so an attempt that is still alive past ours is stuck.

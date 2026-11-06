@@ -87,7 +87,7 @@ try {
 `;
 
 async function main() {
-  const { seedTrust } = await import(`${REPO}/src/runner/dispatch/trust-store.mjs`);
+  const { seedTrust } = await import(`${REPO}/src/run-supervisor/trust-store.mjs`);
   const { readVisibility } = await import(`${REPO}/src/runner/dispatch/visibility-session.mjs`);
 
   fs.mkdirSync(RUN_DIR, { recursive: true });

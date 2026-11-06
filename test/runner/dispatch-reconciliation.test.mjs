@@ -20,7 +20,7 @@ function runDirFor(dir, id, attempt, value, result) { const d = path.join(dir, '
 function admitGen(dir, id, epoch, value) { const d = path.join(dir, '.fgos', 'assignments', id, 'admission', 'generations'); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, `${String(epoch).padStart(10, '0')}.json`), JSON.stringify(value)); }
 const legacyResult = (runId, assignmentId) => ({ runId, assignmentId, status: 'done', confidence: 'reported' });
 // Real control/generations/ ledger a live controller's own
-// acquireRunControl publishes to (src/runner/dispatch/run-lock.mjs) -- F2's
+// acquireRunControl publishes to (src/run-supervisor/run-lock.mjs) -- F2's
 // snapshot.controlEpoch now reads this, never run.json's own shadow field.
 function publishControlGeneration(runDir, epoch) {
   const d = path.join(runDir, 'control', 'generations');

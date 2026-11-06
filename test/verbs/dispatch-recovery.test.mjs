@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { recoverObserveUseCase, recoverApplyUseCase, RecoveryError } from '../../src/verbs/dispatch/recover.mjs';
 import { plan, checkApply, collectEvidence, deriveRecoveryFacts, isActionLegal } from '../../src/runner/dispatch/recovery-planner.mjs';
 import { showRunUseCase } from '../../src/verbs/dispatch/show-run.mjs';
-import { acquireRunControl } from '../../src/runner/dispatch/run-lock.mjs';
+import { acquireRunControl } from '../../src/run-supervisor/run-lock.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));

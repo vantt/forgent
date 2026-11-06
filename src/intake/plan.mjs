@@ -31,6 +31,7 @@ import { listWork, moveStep, moveWork, addWork, putInAwaiting, addDecision, edit
 import { formatDecisionQuestion } from '../state/decision-question.mjs';
 import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { rankImpact } from '../state/impact.mjs';
+import { DEFAULTS } from '../state/work.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT, isRecognizedRisk } from '../state/priority-formula.mjs';
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
 import { readLockedContext, resolveContentRoot } from '../runner/paths.mjs';

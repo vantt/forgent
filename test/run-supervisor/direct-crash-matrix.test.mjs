@@ -10,7 +10,7 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { execFileSync } from 'node:child_process';
 import { lockHolders, probe } from '../../src/holder-lock/index.mjs';
 import { adoptRun } from '../../src/run-supervisor/client.mjs';
-import { dispatchCwdHolder } from '../../src/runner/dispatch/cwd-lock.mjs';
+import { dispatchCwdHolder } from '../../src/run-supervisor/cwd-lock.mjs';
 import { bwrapUsable, createProject, killToken, pidsWithToken, readJson, sleep, startRun, waitUntil } from './support/direct-harness.mjs';
 
 seedFileLocalBwrapRegistry();

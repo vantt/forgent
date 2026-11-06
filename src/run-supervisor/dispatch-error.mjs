@@ -1,4 +1,4 @@
-// dispatch/dispatch-error.mjs — the one error type every executor adapter
+// dispatch-error.mjs — the one error type every executor adapter
 // raises.
 //
 // It lives in its own module because more than one adapter now needs it and

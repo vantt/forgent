@@ -15,7 +15,7 @@ import { fixGitFetchMapping } from '../../src/setup/git-checks.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
-import { scan, signalByIdentity } from '../../src/runner/dispatch/process-identity.mjs';
+import { scan, signalByIdentity } from '../../src/native/process-identity.mjs';
 import { resolveFaultLogPath } from '../../src/cli/invocation-fault-log.mjs';
 
 function workRepo(t, { remote = false } = {}) {

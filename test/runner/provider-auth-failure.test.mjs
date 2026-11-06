@@ -95,7 +95,7 @@ test('settlement takes a provider stop and its cause from the caller, never from
   const path = await import('node:path');
   const { execFileSync } = await import('node:child_process');
   const { settleRunOutcome } = await import('../../src/runner/dispatch/assignment-runner.mjs');
-  const { acquireRunControl } = await import('../../src/runner/dispatch/run-lock.mjs');
+  const { acquireRunControl } = await import('../../src/run-supervisor/run-lock.mjs');
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-quota-transcript-'));
   try {
     const cwd = path.join(base, 'repo');

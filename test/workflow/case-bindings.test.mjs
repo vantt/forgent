@@ -18,7 +18,7 @@ import {
   unbindWorktree,
   SENTINEL_NAME,
 } from '../../src/workflow/case-bindings.mjs';
-import { acquireDispatchCwdLock } from '../../src/runner/dispatch/cwd-lock.mjs';
+import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { conductorWorkflow, eventsOf, openCase, withHold } from '../helpers/workflow-case-fixture.mjs';
 

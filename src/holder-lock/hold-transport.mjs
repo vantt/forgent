@@ -24,7 +24,7 @@ import { Readable } from 'node:stream';
 import { spawn } from 'node:child_process';
 import { HolderLockError, PROTOCOL, parseRouteLine } from './protocol.mjs';
 import { routeLineOrThrow } from './driver.mjs';
-import { observe, resolveHolderLiveness } from '../runner/dispatch/process-identity.mjs';
+import { observe, resolveHolderLiveness } from '../native/process-identity.mjs';
 
 const WORK_PREFIX = 'fgos-lock-hold-';
 const READY_POLL_MS = 2;

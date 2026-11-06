@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { settleRunOutcome } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { acquireRunControl } from '../../src/runner/dispatch/run-lock.mjs';
+import { acquireRunControl } from '../../src/run-supervisor/run-lock.mjs';
 
 function runDirWithPreparedBackend(backend) {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-label-'));

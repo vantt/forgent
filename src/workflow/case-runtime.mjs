@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
-import { dispatchCwdHolder } from '../runner/dispatch/cwd-lock.mjs';
+import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
 import { gateAnswerFile } from '../runner/execution/handoff-refs.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { unbindWorktree } from './case-bindings.mjs';

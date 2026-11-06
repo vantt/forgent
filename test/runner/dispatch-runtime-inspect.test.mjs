@@ -75,13 +75,13 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   // The attempt view also reaches three files for one read each, verified by
   // direct reading: runner/paths.mjs `fgosDirFromRoot` (a path join);
   // dispatch/visibility-session.mjs `readVisibility` (one JSON read);
-  // dispatch/run-lock.mjs `listGenerations` and `inspectRunControl` (directory
+  // run-supervisor/run-lock.mjs `listGenerations` and `inspectRunControl` (directory
   // and JSON reads). Their writers (acquire,
   // release, the visibility session) are not reachable from `inspect.mjs`.
   const isProvenLeaf = (file) => {
     const f = file.replaceAll('\\', '/');
     return f.endsWith('/run-result.mjs') || f.endsWith('/config/facade.mjs') || f.endsWith('/provider-capacity.mjs') || f.endsWith('/run-supervisor/client.mjs')
-      || f.endsWith('/runner/paths.mjs') || f.endsWith('/dispatch/run-lock.mjs') || f.endsWith('/dispatch/visibility-session.mjs');
+      || f.endsWith('/runner/paths.mjs') || f.endsWith('/run-supervisor/run-lock.mjs') || f.endsWith('/dispatch/visibility-session.mjs');
   };
   function walk(file) {
     if (seen.has(file)) return;

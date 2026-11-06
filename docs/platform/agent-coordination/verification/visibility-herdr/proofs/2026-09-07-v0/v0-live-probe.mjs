@@ -99,7 +99,7 @@ function prepareWorkspace() {
 
 async function main() {
   const { EXECUTOR_ADAPTERS } = await import(`${REPO}/src/runner/dispatch/transport.mjs`);
-  const { seedTrust, readTrust } = await import(`${REPO}/src/runner/dispatch/trust-store.mjs`);
+  const { seedTrust, readTrust } = await import(`${REPO}/src/run-supervisor/trust-store.mjs`);
   const { readVisibility } = await import(`${REPO}/src/runner/dispatch/visibility-session.mjs`);
   const { readRunSnapshot } = await import(`${REPO}/src/verbs/dispatch/show-run.mjs`);
 

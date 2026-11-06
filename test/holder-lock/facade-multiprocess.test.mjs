@@ -16,7 +16,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolveActiveHostBin } from '../../src/util/host-bin-path.mjs';
 import { acquire, acquireSync, probe, createLockScope, spawnWithLocks, HolderLockError } from '../../src/holder-lock/index.mjs';
-import { observe, signalByIdentity } from '../../src/runner/dispatch/process-identity.mjs';
+import { observe, signalByIdentity } from '../../src/native/process-identity.mjs';
 import { enterHotLock } from '../../src/holder-lock/hot-guard.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');

@@ -20,7 +20,7 @@ import {
   gateWorkflow,
   readWorkflowEvents,
 } from '../../src/workflow/index.mjs';
-import { acquireDispatchCwdLock } from '../../src/runner/dispatch/cwd-lock.mjs';
+import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { readBinding } from '../../src/workflow/case-bindings.mjs';
 import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';

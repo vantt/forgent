@@ -9,7 +9,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { initGitCwd, addViaCli, run } from '../cli/helpers/fgos-cli-harness.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
-import { scan, judge, signalByIdentity } from '../../src/runner/dispatch/process-identity.mjs';
+import { scan, judge, signalByIdentity } from '../../src/native/process-identity.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 
 const BIN = path.resolve(import.meta.dirname, '../../bin/fgos.mjs');

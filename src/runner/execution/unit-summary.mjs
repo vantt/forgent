@@ -1,7 +1,7 @@
 // Derived discussion read model. Execution owns selection; Observe only consumes it.
 import fs from 'node:fs';
 import path from 'node:path';
-import { publishMutableProjection } from '../dispatch/proof-helpers.mjs';
+import { publishMutableProjection } from '../../native/proof-helpers.mjs';
 import { readUnitRunSeats } from './unit-run-history.mjs';
 import { normalizeWorkflowLink } from './unit.mjs';
 import { patternHistoryOutcome } from './loops/history-outcome.mjs';

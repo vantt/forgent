@@ -10,7 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { withStateTx, hotPaths, readHotRecord, reclaimDeadHolder, clearHotRecord, HotLockError } from '../../src/state/hot-lock.mjs';
-import { observe, selfRecord } from '../../src/runner/dispatch/process-identity.mjs';
+import { observe, selfRecord } from '../../src/native/process-identity.mjs';
 
 function fixture() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-hot-tx-'));

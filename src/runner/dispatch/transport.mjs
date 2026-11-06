@@ -31,7 +31,7 @@ import { resolveExecutorConfig } from './resolve.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
 import { renderReasoningEffortArgs, checkLaunchedModel } from './provider-adapter.mjs';
 import { resolveHerdrBin } from './terminal-slot.mjs';
-import { DispatchError } from './dispatch-error.mjs';
+import { DispatchError } from '../../run-supervisor/dispatch-error.mjs';
 
 import {
   DEFAULT_ADAPTER,

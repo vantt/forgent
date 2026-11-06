@@ -14,7 +14,7 @@ import { execFileSync } from 'node:child_process';
 
 import { spawnWorker } from '../../src/runner/work-dispatch.mjs';
 import { buildPrompt } from '../../src/runner/work-compat.mjs';
-import { DispatchError } from '../../src/runner/dispatch/dispatch-error.mjs';
+import { DispatchError } from '../../src/run-supervisor/dispatch-error.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { MAX_DISPATCH_DEPTH } from '../../src/runner/dispatch/transport.mjs';
 import { resolveAction } from '../../src/runner/recovery.mjs';

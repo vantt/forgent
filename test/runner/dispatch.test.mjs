@@ -39,7 +39,7 @@ import { initStore, addWork, listWork } from '../../src/state/store.mjs';
 import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
-import { dispatchCwdHolder } from '../../src/runner/dispatch/cwd-lock.mjs';
+import { dispatchCwdHolder } from '../../src/run-supervisor/cwd-lock.mjs';
 import { writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this

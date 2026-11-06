@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { sha256FileSync, readAgentFileSync } from './proof-helpers.mjs';
+import { sha256FileSync, readAgentFileSync } from '../../native/proof-helpers.mjs';
 
 // The agent writes its claim and report: a larger file is not one.
 const MAX_AGENT_FILE_BYTES = 4 * 1024 * 1024;
@@ -19,12 +19,12 @@ import {
   fsyncFileBestEffort,
   controlDirs,
   currentGeneration,
-} from './run-lock.mjs';
+} from '../../run-supervisor/run-lock.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { normalizeRunResultV2, normalizeRunResultV3, interpretRunResult } from './run-result.mjs';
 import { isVerdictSeat } from './agent-result-claim-contract.mjs';
 import { validateAgentResultClaim, isReadOnlyAssignment } from './assignment.mjs';
-import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
+import { resolveWorkerArtifactPath } from '../../run-supervisor/worker-artifacts.mjs';
 import { attributeWorkspaceChanges, evaluateAttributionPolicy } from './evidence-attribution.mjs';
 import { matchesWriteScope } from './write-scope.mjs';
 import { parseUsageForAdapter } from './usage-parsers.mjs';
@@ -35,7 +35,7 @@ export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
 import {
   publishMutableProjection,
   publishImmutableProof,
-} from './proof-helpers.mjs';
+} from '../../native/proof-helpers.mjs';
 import {
   classifyProviderCapacityFault,
   quarantineProviderAccount,

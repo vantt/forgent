@@ -33,7 +33,7 @@ import { resolveHerdrBin } from './transport.mjs';
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
-export { watchWritesOutsideWorkspace, strayWriteWarning } from './stray-writes.mjs';
+export { watchWritesOutsideWorkspace, strayWriteWarning } from '../../run-supervisor/stray-writes.mjs';
 
 // Work-driven dispatch (`spawnWorker`, the executor a Work item's step resolves to) lives in
 // the Work layer, src/runner/work-dispatch.mjs; this module takes what that layer resolved.
@@ -464,7 +464,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     case 'reconcile': {
-      const runDir = executorId ?? flagValue('--run-dir') ?? (typeof positional !== 'undefined' ? positional[1] : undefined);
+      const runDir = executorId ?? flagValue('--run-dir');
       if (!runDir) {
         const msg = 'dispatch reconcile requires a run directory: node src/runner/dispatch.mjs reconcile <runDir>\n';
         if (returnResult) throw new StoreError('validation', msg.trim());

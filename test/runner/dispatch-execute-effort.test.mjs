@@ -314,7 +314,7 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
 
 test('one settled run keeps effort and model drift provenance beside a correlated warning and the sandbox that ran', async () => {
   const { settleRunOutcome } = await import('../../src/runner/dispatch/assignment-runner.mjs');
-  const { acquireRunControl } = await import('../../src/runner/dispatch/run-lock.mjs');
+  const { acquireRunControl } = await import('../../src/run-supervisor/run-lock.mjs');
   const base = makeFixtureDir('fgos-settle-effort-warning-');
   const cwd = path.join(base, 'repo');
   fs.mkdirSync(cwd);

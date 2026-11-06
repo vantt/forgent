@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { normalizeAgentName, publishImmutableProof, publishMutableProjection } from '../../src/runner/dispatch/proof-helpers.mjs';
+import { normalizeAgentName, publishImmutableProof, publishMutableProjection } from '../../src/native/proof-helpers.mjs';
 
 test('a mutable projection replaces its file whole, an immutable proof is created once', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'proof-helpers-'));
@@ -22,7 +22,7 @@ test('a mutable projection replaces its file whole, an immutable proof is create
 test('separate processes racing to publish one immutable proof: exactly one wins and nothing else is left in the directory', async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'proof-helpers-race-'));
   const proof = path.join(dir, 'proof.json');
-  const module = new URL('../../src/runner/dispatch/proof-helpers.mjs', import.meta.url).href;
+  const module = new URL('../../src/native/proof-helpers.mjs', import.meta.url).href;
   const results = await Promise.all([1, 2, 3, 4].map((n) => new Promise((resolve) => {
     const child = spawn(process.execPath, ['--input-type=module', '-e',
       `import { publishImmutableProof } from ${JSON.stringify(module)};

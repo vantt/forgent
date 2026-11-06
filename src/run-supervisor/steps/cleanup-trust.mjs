@@ -7,7 +7,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { removeAgyTrust, removeCodexTrust, removeTrust } from '../../runner/dispatch/trust-store.mjs';
+import { removeAgyTrust, removeCodexTrust, removeTrust } from '../trust-store.mjs';
 
 export const TRUST_CONTEXT_FILE = path.join('controller', 'trust-context.json');
 

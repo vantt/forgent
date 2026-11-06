@@ -13,10 +13,10 @@
 // - Step 04: malformed agent-result.json produces failed/failed, not no-evidence.
 // - Step 04: prompt includes concrete runDir paths for worker result artifacts.
 
-import { recordCustodyHandoff } from './cwd-lock.mjs';
+import { recordCustodyHandoff } from '../../run-supervisor/cwd-lock.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
+import { resolveWorkerArtifactPath } from '../../run-supervisor/worker-artifacts.mjs';
 import { normalizeRunResultV2, readSettledResult, ASSESSMENT_VERDICTS, runOutcome, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
 import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 import {
@@ -79,8 +79,8 @@ import {
   fsyncDirBestEffort,
   buildRunControlHolder,
   inspectRunControl,
-} from './run-lock.mjs';
-import { resolveHolderLiveness } from './process-identity.mjs';
+} from '../../run-supervisor/run-lock.mjs';
+import { resolveHolderLiveness } from '../../native/process-identity.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError, agentArgsWithoutPrompt } from './transport.mjs';
 import {
   acquireAttemptLocks,
@@ -102,7 +102,7 @@ import {
 } from '../../run-supervisor/direct-launch.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { register as registerDeliveredAttempt, unregister as unregisterDeliveredAttempt, beginLaunch as beginAttemptLaunch, endLaunch as endAttemptLaunch } from '../../run-supervisor/cancel-registry.mjs';
-import { watchWritesOutsideWorkspace } from './stray-writes.mjs';
+import { watchWritesOutsideWorkspace } from '../../run-supervisor/stray-writes.mjs';
 import { resolveLock } from '../../holder-lock/index.mjs';
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, PANE_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
 import { resolveHerdrBin, workLabelOf } from './terminal-slot.mjs';
@@ -110,13 +110,13 @@ import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
 import { prepareConfinementForLaunch } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import { resolvePosture } from './confinement/policies.mjs';
-import { sha256FileSync } from './proof-helpers.mjs';
+import { sha256FileSync } from '../../native/proof-helpers.mjs';
 import {
   publishImmutableProof,
   publishMutableProjection,
   computeSha256Digest,
   canonicalJson,
-} from './proof-helpers.mjs';
+} from '../../native/proof-helpers.mjs';
 import {
   buildEffectiveExecutionContract,
   EFFECTIVE_EXECUTION_CONTRACT_FILE,
@@ -2094,6 +2094,7 @@ export async function executeAssignment(assignment, opts = {}) {
         capture: attemptEnvelope.launch.capture,
         onChunk: opts.onChunk,
         ceilingMs: timeoutMs + attemptSettings.gateKillGraceMs + 120_000,
+        readSettledResult,
       });
     } finally {
       unregisterDeliveredAttempt(attemptRunDir);

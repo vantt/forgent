@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { readCodexTrust, readAgyTrust, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
+import { readCodexTrust, readAgyTrust, defaultAgySettingsPath } from '../run-supervisor/trust-store.mjs';
 import { findAgySubHomes, resolveSubHomePath } from './agy-permissions.mjs';
 
 /** The config.toml of every codex home a configured executor runs under, deduplicated, each with

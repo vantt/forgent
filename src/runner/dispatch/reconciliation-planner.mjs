@@ -15,12 +15,12 @@ import { inspectDispatchRuntime, clearAllRunsCache, withRunsCache } from './runt
 // boundary (see the file-top comment and the static import-graph test in
 // test/runner/dispatch-reconciliation-import-graph.test.mjs).
 import { RUN_STATUSES } from './visibility-session.mjs';
-import { publishMutableProjection } from './proof-helpers.mjs';
+import { publishMutableProjection } from '../../native/proof-helpers.mjs';
 import { canonicalJson } from '../../native/door.mjs';
 // The lock door: reconcile's own apply mutex and the per-cwd dispatch lock it
 // reports on are kernel locks (the import-graph test pins the door's files).
 import { acquireSync, createLockScope } from '../../holder-lock/index.mjs';
-import { dispatchCwdHolder } from './cwd-lock.mjs';
+import { dispatchCwdHolder } from '../../run-supervisor/cwd-lock.mjs';
 
 const digest = (v) => `sha256:${createHash('sha256').update(canonicalJson(v)).digest('hex')}`;
 const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return undefined; } };

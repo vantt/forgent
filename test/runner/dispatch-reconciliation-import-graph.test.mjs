@@ -84,7 +84,7 @@ const BANNED_FILES = [
   'src/runner/dispatch/terminal-slot.mjs', // a round's pane through terminal-control: launches, types at and closes live panes
   'src/terminal-control/client.mjs', // terminal-control client: runs the host route that drives herdr
   'src/runner/dispatch/worker-home.mjs', // creates/removes a spawned worker's confined home directory
-  'src/runner/dispatch/trust-store.mjs', // seeds trust for a spawned worker
+  'src/run-supervisor/trust-store.mjs', // seeds trust for a spawned worker
   'src/runner/dispatch/worker-session-boot.mjs', // resume/reattach: ensures a live worker session exists
   'src/runner/dispatch/assignment-runner.mjs', // launch/execution and Run-lifecycle driving
   'src/runner/dispatch/plan.mjs', // admission: DispatchPlan compiler, Run generation admission
@@ -92,7 +92,7 @@ const BANNED_FILES = [
   'src/runner/recovery.mjs', // retry decision matrix
   'src/verbs/dispatch/recover.mjs', // recovery verb: observes/applies resume/reassign for a standalone Run
   'src/runner/claim-port.mjs', // work-item claim admission gate
-  'src/runner/dispatch/run-lock.mjs', // run-lock ledger writer
+  'src/run-supervisor/run-lock.mjs', // run-lock ledger writer
   'src/runner/dispatch/confinement/policies.mjs', // worker confinement policy for a spawned process
   'src/runner/dispatch/confinement/bypass-pairing.mjs', // confinement bypass pairing for a spawned process
 ].map((p) => path.join(root, p));
@@ -189,7 +189,7 @@ const EXPECTED_CLOSURE = [
   'src/runner/dispatch/runtime-inspection.mjs',
   'src/runner/dispatch/run-result.mjs',
   'src/runner/dispatch/visibility-session.mjs',
-  'src/runner/dispatch/worker-artifacts.mjs',
+  'src/run-supervisor/worker-artifacts.mjs',
   'src/runner/dispatch/provider-capacity.mjs',
   // The account inventory provider-capacity.mjs reads for a pool declared in runner.llmAccounts
   // (imports only provider-adapter.mjs and provider-capacity.mjs; no process control).
@@ -200,7 +200,7 @@ const EXPECTED_CLOSURE = [
   'src/config/facade.mjs',
   // The durable-file publish door the planner replaces a run record through (node:fs, node:path,
   // node:crypto and the native door; no process control).
-  'src/runner/dispatch/proof-helpers.mjs',
+  'src/native/proof-helpers.mjs',
   // Read-only assignment layout (node:fs + node:path only): runtime
   // inspection and findRunningRuns enumerate nested runs through it.
   'src/runner/dispatch/assignment-layout.mjs',
@@ -215,7 +215,7 @@ const EXPECTED_CLOSURE = [
   'src/runner/dispatch/provider-auth-failure.mjs',
   // ... and the thin client of process facts that decides lease holder
   // identity through the native door (no signals, no spawn, no /proc read).
-  'src/runner/dispatch/process-identity.mjs',
+  'src/native/process-identity.mjs',
   // The door loads the addon lazily through node:module (never at import time);
   // payload-root.mjs locates the release it belongs to (node:fs/node:path only).
   'src/native/door.mjs',
@@ -233,8 +233,8 @@ const EXPECTED_CLOSURE = [
   // The per-cwd dispatch lock the planner reports on (holder list or probe
   // through the door; no process control of its own) and the leaf error type
   // its acquire raises.
-  'src/runner/dispatch/cwd-lock.mjs',
-  'src/runner/dispatch/dispatch-error.mjs',
+  'src/run-supervisor/cwd-lock.mjs',
+  'src/run-supervisor/dispatch-error.mjs',
 ].map((p) => path.join(root, p)).sort();
 
 // The lazy edges inside the closure. These modules are not loaded by reconcile;
@@ -465,7 +465,7 @@ test('boundary test: dispatch core modules import no Work-layer module and name 
     'src/runner/dispatch/run-result.mjs',
     'src/runner/dispatch/runtime-inspection.mjs',
     'src/runner/dispatch/brief.mjs',
-    'src/runner/dispatch/proof-helpers.mjs',
+    'src/native/proof-helpers.mjs',
     'src/runner/dispatch/recovery-planner.mjs',
   ];
 

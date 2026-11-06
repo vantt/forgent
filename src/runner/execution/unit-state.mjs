@@ -4,7 +4,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { listGenerations } from '../dispatch/run-lock.mjs';
+import { listGenerations } from '../../run-supervisor/run-lock.mjs';
 import { assignmentDir } from '../dispatch/assignment-layout.mjs';
 import { unitControllerHeld } from './unit-control.mjs';
 

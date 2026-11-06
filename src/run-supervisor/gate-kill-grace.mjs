@@ -6,7 +6,7 @@
 
 import path from 'node:path';
 import { isConfigRefusal, readConfig, readMachineConfig } from '../config/facade.mjs';
-import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { DispatchError } from './dispatch-error.mjs';
 
 export const GATE_KILL_GRACE_KEY = 'dispatch.gateKillGraceMs';
 export const DEFAULT_GATE_KILL_GRACE_MS = 10_000;
@@ -51,11 +51,11 @@ function readOrUnset(projectRoot, resolve) {
   return resolve(snapshot);
 }
 
-/** The grace for the project at `projectRoot`; a present but unusable value throws `RunnerConfigError` (the doctor check's message). */
+/** The grace for the project at `projectRoot`; a present but unusable value throws `DispatchError` (the doctor check's message). */
 export function readGateKillGraceMs({ projectRoot } = {}) {
   const { value } = readOrUnset(projectRoot, resolveGateKillGrace);
   const problem = gateKillGraceProblem(value);
-  if (problem) throw new RunnerConfigError(problem, { code: 'invalid-gate-kill-grace' });
+  if (problem) throw new DispatchError('validation', problem, { code: 'invalid-gate-kill-grace' });
   return value;
 }
 
@@ -82,6 +82,6 @@ export function resolveCancelWait(snapshot) {
 export function readCancelWaitMs({ projectRoot } = {}) {
   const { value } = readOrUnset(projectRoot, resolveCancelWait);
   const problem = cancelWaitProblem(value);
-  if (problem) throw new RunnerConfigError(problem, { code: 'invalid-cancel-wait' });
+  if (problem) throw new DispatchError('validation', problem, { code: 'invalid-cancel-wait' });
   return value;
 }

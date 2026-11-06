@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { once } from 'node:events';
 import { createLockScope, probe } from '../../src/holder-lock/index.mjs';
-import { admitSuccessor } from '../../src/runner/dispatch/cwd-lock.mjs';
+import { admitSuccessor } from '../../src/run-supervisor/cwd-lock.mjs';
 import { acquireAttemptLocks, buildEnvelope, prepareAttemptFiles, resolveAttemptHost, startSupervisor, waitForBinding, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
 import { mintAttemptWriterId } from '../../src/util/session-identity.mjs';
 

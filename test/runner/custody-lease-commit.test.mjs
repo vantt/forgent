@@ -10,7 +10,7 @@ import { probe, resolveLock } from '../../src/holder-lock/index.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
 const skip = process.platform !== 'linux' ? 'Linux inherited flock and FIFO vectors' : false;
-const admission = new URL('../../src/runner/dispatch/cwd-lock.mjs', import.meta.url).href;
+const admission = new URL('../../src/run-supervisor/cwd-lock.mjs', import.meta.url).href;
 const facade = new URL('../../src/holder-lock/index.mjs', import.meta.url).href;
 const commit = new URL('../../src/runner/execution/commit-unit-work.mjs', import.meta.url).href;
 
@@ -96,7 +96,7 @@ for (const killController of [false, true]) {
 }
 
 test('custody-backed runner commit accepts hook output above 16 MiB within its 64 MiB limit', { skip }, async (t) => {
-  const { admitSuccessor } = await import('../../src/runner/dispatch/cwd-lock.mjs');
+  const { admitSuccessor } = await import('../../src/run-supervisor/cwd-lock.mjs');
   const { createLockScope } = await import('../../src/holder-lock/index.mjs');
   const { commitUnitWork, preflightUnitWorktree } = await import('../../src/runner/execution/commit-unit-work.mjs');
   const f = fixture(t);

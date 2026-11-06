@@ -52,7 +52,7 @@ async function main() {
   const { createWorkerHome } = await import(`${REPO}/src/runner/dispatch/worker-home.mjs`);
   const { ensureWorkerSession } = await import(`${REPO}/src/runner/dispatch/worker-session-boot.mjs`);
   const { createHerdrClient } = await import(`${REPO}/src/runner/dispatch/herdr-agent.mjs`);
-  const { seedTrust } = await import(`${REPO}/src/runner/dispatch/trust-store.mjs`);
+  const { seedTrust } = await import(`${REPO}/src/run-supervisor/trust-store.mjs`);
 
   // What the operator's own session actually holds right now -- the thing a
   // worker must not be able to enumerate.

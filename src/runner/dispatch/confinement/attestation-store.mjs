@@ -17,7 +17,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveStateRoot } from '../../../holder-lock/state-root.mjs';
-import { publishMutableProjection } from '../proof-helpers.mjs';
+import { publishMutableProjection } from '../../../native/proof-helpers.mjs';
 
 export const ATTESTATION_CONTRACT = 'confinement-attestation.v1';
 export const ATTESTATION_REF_CONTRACT = 'confinement-attestation-ref.v1';

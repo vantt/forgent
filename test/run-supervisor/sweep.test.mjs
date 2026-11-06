@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
-import { computeSha256Digest } from '../../src/runner/dispatch/proof-helpers.mjs';
+import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 import { ensurePrivateDir, writeOwnershipMarkerV2, extendOwnershipMarker } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { sweepAttempts } from '../../src/run-supervisor/client.mjs';
 
