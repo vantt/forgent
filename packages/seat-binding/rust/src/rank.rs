@@ -329,6 +329,49 @@ fn run_bases(
         return run;
     }
 
+    let pin = match override_pin(ask) {
+        Ok(pin) => pin,
+        Err(refusal) => {
+            refuse(&mut run, refusal);
+            return run;
+        }
+    };
+
+    // A pinned account launches through an invocation whose CLI it holds a login for: the transport's
+    // choice when it does, else the first invocation that carries the posture and does. Done before the
+    // walk, so continuity and tried identities compare the invocation that actually launches. A pinned
+    // invocation is never swapped; the pin step below refuses it when its CLI has no login there.
+    if let Some((pool, account)) = &pin {
+        let held = accounts
+            .pools
+            .get(pool)
+            .and_then(|list| list.iter().find(|a| &a.id == account));
+        if let Some(held) = held {
+            let holds =
+                |inv: &InvocationFacts| inv.cli.as_ref().is_none_or(|cli| held.clis.contains(cli));
+            for cand in cands
+                .iter_mut()
+                .filter(|c| c.pin.is_none() && c.pool().as_deref() == Some(pool.as_str()))
+            {
+                let facts = cand.facts;
+                let current = cand
+                    .invocation
+                    .as_ref()
+                    .and_then(|id| facts.invocations.iter().find(|i| &i.id == id));
+                if current.is_none_or(holds) {
+                    continue;
+                }
+                if let Some(other) = facts
+                    .invocations
+                    .iter()
+                    .find(|i| i.carries_posture && holds(i))
+                {
+                    cand.invocation = Some(other.id.clone());
+                }
+            }
+        }
+    }
+
     // Order: continuity keeps one identity; a walk follows the failed family, then the tier list.
     if let Some(keep) = &walk.continuity {
         cands.retain(|c| {
@@ -398,14 +441,6 @@ fn run_bases(
         })
         .collect();
 
-    let pin = match override_pin(ask) {
-        Ok(pin) => pin,
-        Err(refusal) => {
-            refuse(&mut run, refusal);
-            return run;
-        }
-    };
-
     let ctx = Ctx {
         policy,
         walk,
@@ -458,29 +493,50 @@ fn run_bases(
             .any(|(c, _)| c.pool.as_deref() == Some(pool))
         {
             survivors.retain(|(c, _)| c.pool.as_deref() == Some(pool));
-            for (c, _) in &mut survivors {
-                let pool_accounts = accounts.pools.get(pool).map(Vec::as_slice).unwrap_or(&[]);
-                match pool_accounts.iter().find(|a| &a.id == account) {
-                    None => {
-                        let known: Vec<&str> =
-                            pool_accounts.iter().map(|a| a.id.as_str()).collect();
-                        let refusal = if known.is_empty() {
-                            Refusal::new("account-pin-no-inventory", format!("account \"{pool}/{account}\" cannot be pinned: pool \"{pool}\" has no account list (runner.llmAccounts.{pool} in ~/.fgos/config.json), so it leases no account"))
-                        } else {
-                            Refusal::new("account-pin-unknown", format!("account \"{pool}/{account}\" does not exist; the accounts of pool \"{pool}\" are: {}", known.join(", ")))
-                        };
-                        refuse(&mut run, refusal);
-                        return run;
-                    }
-                    Some(a) if a.disabled => {
-                        refuse(&mut run, Refusal::new("account-pin-disabled", format!("account \"{pool}/{account}\" is disabled in the config, so it cannot be pinned")));
-                        return run;
-                    }
-                    Some(_) => {
-                        c.accounts = vec![account.clone()];
-                        c.account = Some(account.clone());
-                    }
+            let pool_accounts = accounts.pools.get(pool).map(Vec::as_slice).unwrap_or(&[]);
+            let held = match pool_accounts.iter().find(|a| &a.id == account) {
+                None => {
+                    let known: Vec<&str> = pool_accounts.iter().map(|a| a.id.as_str()).collect();
+                    let refusal = if known.is_empty() {
+                        Refusal::new("account-pin-no-inventory", format!("account \"{pool}/{account}\" cannot be pinned: pool \"{pool}\" has no account list (runner.llmAccounts.{pool} in ~/.fgos/config.json), so it leases no account"))
+                    } else {
+                        Refusal::new("account-pin-unknown", format!("account \"{pool}/{account}\" does not exist; the accounts of pool \"{pool}\" are: {}", known.join(", ")))
+                    };
+                    refuse(&mut run, refusal);
+                    return run;
                 }
+                Some(a) if a.disabled => {
+                    refuse(&mut run, Refusal::new("account-pin-disabled", format!("account \"{pool}/{account}\" is disabled in the config, so it cannot be pinned")));
+                    return run;
+                }
+                Some(a) => a,
+            };
+            // A survivor whose launching CLI the account holds no login for cannot run on it (the lease
+            // would refuse it after the run exists); none left is a refusal at bind, by name.
+            let cli_of = |c: &Candidate| {
+                launch
+                    .find(&c.executor)
+                    .and_then(|(_, f)| {
+                        f.invocations
+                            .iter()
+                            .find(|i| c.invocation.as_ref() == Some(&i.id))
+                    })
+                    .and_then(|i| i.cli.clone())
+            };
+            let first = survivors[0].0.executor.clone();
+            survivors.retain(|(c, _)| cli_of(c).is_none_or(|cli| held.clis.contains(&cli)));
+            if survivors.is_empty() {
+                let holds = if held.clis.is_empty() {
+                    "none".to_string()
+                } else {
+                    held.clis.join(", ")
+                };
+                refuse(&mut run, Refusal::new("account-pin-no-login", format!("account \"{pool}/{account}\" holds no login store for any invocation of executor \"{first}\" that can carry this seat's posture (its login stores: {holds})")));
+                return run;
+            }
+            for (c, _) in &mut survivors {
+                c.accounts = vec![account.clone()];
+                c.account = Some(account.clone());
             }
         } else if !survivors.is_empty() {
             run.skipped.push(Skip {

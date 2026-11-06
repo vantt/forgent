@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A pinned account (`--account pool/account`) now runs its seat through an invocation whose CLI that account is logged in to (for example gemini's `agy` invocation for an account with only an `agy` login, instead of the default `omp` one), and is refused at start with `account-pin-no-login` when the executor has no such invocation, instead of failing at the lease after the run started.
 - `fgos dispatch probe-account` now probes each CLI on the model the strongest tier cell names for the account's pool (the model its seats will ask for), not the CLI's default model, and each result row names it (`model`, `modelSource`); with no such cell it probes the default and says `invocation-default`.
 - A provider stop with cause `provider` (the provider answered with an HTTP error) is recorded as evidence only: it moves the seat on, but no longer quarantines the account as if its quota were used up.
 - When a terminal seat ends with `terminal:foreground-not-agent`, its `supervisor.log` now also has a `pane foreground facts:` line: the terminal's foreground process group as the pane's shell reads it, and the state, process group and session of every process from the shell down to the gate and below it, so the next such failure shows who took the terminal.

@@ -3559,6 +3559,156 @@
           "reason": "no-candidate"
         }
       }
+    },
+    {
+      "name": "an account pin takes the invocation whose CLI the pinned account holds a login for",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "account": "gemini/tetnu"
+          }
+        },
+        "launchView": {
+          "executors": {
+            "gemini": {
+              "invocations": [
+                {
+                  "id": "omp-herdr",
+                  "cli": "omp",
+                  "efforts": [
+                    "low",
+                    "medium",
+                    "high",
+                    "max"
+                  ],
+                  "carriesPosture": true
+                },
+                {
+                  "id": "agy-cli-bwrap",
+                  "cli": "agy",
+                  "efforts": [
+                    "low",
+                    "medium",
+                    "high",
+                    "max"
+                  ],
+                  "carriesPosture": true
+                }
+              ],
+              "defaultInvocation": "omp-herdr"
+            }
+          }
+        },
+        "accountView": {
+          "pools": {
+            "gemini": [
+              {
+                "id": "tetcu72",
+                "clis": [
+                  "omp",
+                  "agy"
+                ]
+              },
+              {
+                "id": "tetnu",
+                "clis": [
+                  "agy"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "gemini",
+              "invocation": "agy-cli-bwrap",
+              "accounts": [
+                "tetnu"
+              ],
+              "account": "tetnu"
+            }
+          ]
+        }
+      },
+      "executors": [
+        "gemini"
+      ]
+    },
+    {
+      "name": "an account pin whose account holds no login for any invocation of the seat is refused by name",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "account": "gemini/tetnu"
+          }
+        },
+        "launchView": {
+          "executors": {
+            "gemini": {
+              "invocations": [
+                {
+                  "id": "omp-herdr",
+                  "cli": "omp",
+                  "efforts": [
+                    "low",
+                    "medium",
+                    "high",
+                    "max"
+                  ],
+                  "carriesPosture": true
+                },
+                {
+                  "id": "agy-cli-bwrap",
+                  "cli": "agy",
+                  "efforts": [
+                    "low",
+                    "medium",
+                    "high",
+                    "max"
+                  ],
+                  "carriesPosture": true
+                }
+              ],
+              "defaultInvocation": "omp-herdr"
+            }
+          }
+        },
+        "accountView": {
+          "pools": {
+            "gemini": [
+              {
+                "id": "tetcu72",
+                "clis": [
+                  "omp",
+                  "agy"
+                ]
+              },
+              {
+                "id": "tetnu",
+                "clis": [
+                  "codex"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "account-pin-no-login"
+        }
+      }
     }
   ]
 }

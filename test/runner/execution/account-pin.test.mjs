@@ -144,3 +144,34 @@ test('the dispatch config of a pinned binding lists only the pinned account of i
   const viaRouter = runnerConfigForBinding(runnerConfig, bind(ask([{ origin: 'human-cli', account: 'router/r1' }]), ctx));
   assert.deepEqual(Object.keys(viaRouter.llmAccounts.router), ['r1']);
 });
+
+test('a pinned account launches through the invocation whose login store it holds, and one holding none is refused', () => {
+  const store = (use) => ({ use, homeEnv: `${use.toUpperCase()}_HOME`, files: ['login'] });
+  const twoClis = {
+    ...runnerConfig,
+    executors: {
+      ...runnerConfig.executors,
+      alpha: {
+        ...agent('alpha'),
+        invocations: [
+          { id: 'alpha-omp', via: 'cli', adapter: 'cli-spawn', command: 'omp', confinement: { backend: 'bwrap' }, credentialStore: store('omp') },
+          { id: 'alpha-agy', via: 'cli', adapter: 'cli-spawn', command: 'agy', confinement: { backend: 'bwrap' }, credentialStore: store('agy') },
+        ],
+      },
+    },
+    providers: {
+      ...runnerConfig.providers,
+      alpha: { accounts: {
+        both: { label: 'both', credentialSources: { omp: account('both').credentialSource, agy: account('both').credentialSource } },
+        agyOnly: { label: 'agyOnly', credentialSources: { agy: account('agyOnly').credentialSource } },
+        none: { label: 'none', credentialSources: { codex: account('none').credentialSource } },
+      } },
+    },
+  };
+  const pinned = bind(ask([{ origin: 'human-cli', account: 'alpha/agyOnly' }]), { ...ctx, runnerConfig: twoClis });
+  assert.equal(pinned.refused, undefined, JSON.stringify(pinned.refused));
+  assert.equal(pinned.invocation, 'alpha-agy');
+  assert.deepEqual(pinned.account, { pool: 'alpha', id: 'agyOnly' });
+  const refused = bind(ask([{ origin: 'human-cli', account: 'alpha/none' }]), { ...ctx, runnerConfig: twoClis });
+  assert.equal(refused.refused?.reason, 'account-pin-no-login');
+});

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "950caa79319ed049c545bdde1962cf2ecd4fbbde4e627bbf6280ee6a8cf6c087",
+  "payloadDigest": "8711fcd9a965e5a9c650281bc9a5327b8dd6954859feb3853959503ed8af6d8a",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -706,7 +706,7 @@
     "packages/seat-binding/rust/src/lib.rs": "68825754d282aaa175e964347b86b0685a6d07375657a43f09cefe4f919ba98a",
     "packages/seat-binding/rust/src/model.rs": "6b362bccbd81df0d4b8ef1e8541bb453f3ca0e1c7bd9cc54d74367037f6817eb",
     "packages/seat-binding/rust/src/policy.rs": "ca93a8c356448adbd935f04a310f82eb53894ea76d25a1a55c065e545e83e8e7",
-    "packages/seat-binding/rust/src/rank.rs": "5ec93a461f94e6961317f1a848c2943742ba9908f4d5ff88708e215a65c85c22",
+    "packages/seat-binding/rust/src/rank.rs": "8810e1f1fe79d363dcd1699fc6063726190da6bbe3de9e0bb0c32b1f4d873e23",
     "packages/seat-binding/rust/src/route.rs": "b14ba0cee5bd2aee535f2b76ea96bc0ef532e4166016a26c98d89c11d2fd484f",
     "packages/seat-binding/rust/src/tier.rs": "367ff6b68c0db941e5b942879a79afac721017ba36e7dec2443cc98383155cb7",
     "packages/seat-binding/rust/tests/golden.rs": "3536ea649db21c346bd59829b33aa461e05e902d4f603ad15bc8db79d71eb561",
