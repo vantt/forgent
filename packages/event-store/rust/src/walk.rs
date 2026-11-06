@@ -78,6 +78,9 @@ pub struct Walked {
     /// The certified commits the walk met as the parent of a commit it read:
     /// proof that the tip descends from them.
     pub stops_reached: BTreeSet<String>,
+    /// The `events.jsonl` digest of each seal commit the walk read, checked
+    /// against the bytes it read.
+    pub segments: BTreeMap<String, String>,
 }
 /// Commits whose blobs one `read_paths_at_many` call returns.
 const READ_GROUP: usize = 64;
@@ -245,6 +248,7 @@ fn walk_inner(
                                 "segment digest mismatch",
                             ));
                         }
+                        out.segments.insert(commit.oid.as_str().into(), hash);
                         let framed = decode(&bytes, &origin, &StreamId::parse(&stream)?, true)
                             .map_err(|e| {
                                 Error::new(ErrorCode::EventStoreRefTampered, e.to_string())

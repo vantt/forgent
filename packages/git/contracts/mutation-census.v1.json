@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "699bc09d73ab681bdfcc987b294f810621e73a55fcad709927a9f7f6c56c0f4b",
+  "payloadDigest": "4e6e5bec191a240bf54f6a38d7df80e4dd4a495e8336244c9c52f597a00f8b24",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -319,10 +319,10 @@
     "packages/event-store/rust/src/refspec.rs": "6b6e65a57ff159b845906d768fe4eec9a9af761115b990f4315c3219f7b2451b",
     "packages/event-store/rust/src/registry.rs": "4dff23fd6e894bbe7fda1a5ca79b2dcd73c171baa19afb72ad42239d651b3d01",
     "packages/event-store/rust/src/rotate.rs": "6daf009b38713e7083eccae22dc88a2d609d3a6b74aa93791718d64f89bb9de9",
-    "packages/event-store/rust/src/seal.rs": "73fd1ee7ea1515dc6ea35d4101b469d7661d02bff2998057e0763fec7146ab2e",
+    "packages/event-store/rust/src/seal.rs": "e8629f101c185155b1b2a9c7021e4ca98e5791ab940b93a770a6df5ad8b1a8db",
     "packages/event-store/rust/src/sync.rs": "9b0fb2973da6205f9aedb3b38049a32f30bc6aed63fa43cb58e461524906f7b3",
     "packages/event-store/rust/src/validation.rs": "9410d9665f97aeadff6eafe8855a92a36f189f3ae5523e39c8e4ece57a266390",
-    "packages/event-store/rust/src/walk.rs": "429928b27ac16e6bc1cb14dbbd56e30e02aafda1b140a479c78502c913b2e392",
+    "packages/event-store/rust/src/walk.rs": "fe1a416da430004395cd486dfcd9a9a0a652c8558f2f8945308e65b5157a6dd8",
     "packages/event-store/rust/tests/append_recovery.rs": "4675e16ad6005544d860cb5f7ce1437e20c8d7cf5891735283beb47f1f84dbb0",
     "packages/event-store/rust/tests/branch_local_refs.rs": "a139b6034b7b9a5fc6fe97592b68d995791157ee9cb39ff3f597e85696132bf8",
     "packages/event-store/rust/tests/checkpoint.rs": "2e326ce391c3feffedc3165cd3b6d792642a6a66883138c8c1f650c2177e6a62",
@@ -330,6 +330,7 @@
     "packages/event-store/rust/tests/cursor_incremental.rs": "873f06dfa27baa155ba2a8169c4bc276d8f80d93a72398b3981a2dfb2ee531cf",
     "packages/event-store/rust/tests/distribution_compatibility.rs": "27a73fa86d90395fb62b98bc7dbc5779538cccae607023ee9e1675235d8b6ac9",
     "packages/event-store/rust/tests/framing_prefixes.rs": "f55b6b0377994d8f71841d666d3f84eae63f4655d001f0e3fe4e0e1b688f98ff",
+    "packages/event-store/rust/tests/git_children.rs": "15dff24f336bd95d2e4c6c00d56728823e0d9117342ac8e5da8500c9f5b54c9f",
     "packages/event-store/rust/tests/kill_append.rs": "cb2994d5e7c635094828133334a6e16e7e535426491a00e0be7ebc75d793adf7",
     "packages/event-store/rust/tests/legacy_import.rs": "12dadfe4495157350690fe0db21afe73f85fc9dfd892abdfda0c52d178e747e7",
     "packages/event-store/rust/tests/legacy_reader.rs": "b60b9170f66d26eac2c8b8037f5fead896625504bed65881c57833d6ce428ff9",

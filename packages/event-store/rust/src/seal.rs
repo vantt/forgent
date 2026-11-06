@@ -320,18 +320,15 @@ pub(crate) fn seal_guarded(
                 new
             };
             let current = port.read_ref(repo, &reference).map_err(git_error)?;
-            if !matches!(&current,RefValue::Direct(o) if tips.contains(o) || *o==commit)
-                || walk::blob(&port, repo, &commit, b"events.jsonl")?.as_deref()
-                    != Some(bytes.as_slice())
-            {
-                return Err(Error::new(
+            let mismatch = || {
+                Error::new(
                     ErrorCode::EventStoreSealMismatch,
                     "ref or published bytes differ",
-                ));
-            }
+                )
+            };
             let current_tip = match current {
-                RefValue::Direct(o) => o,
-                _ => unreachable!(),
+                RefValue::Direct(o) if tips.contains(&o) || o == commit => o,
+                _ => return Err(mismatch()),
             };
             let complete = walk::walk_verified(
                 &port,
@@ -342,6 +339,18 @@ pub(crate) fn seal_guarded(
                 req.machine,
                 req.stream.scope(),
             )?;
+            // The walk checked each segment it read against its seal digest;
+            // a commit behind a certified stop is read here instead.
+            let published = match complete.segments.get(commit.as_str()) {
+                Some(digest) => *digest == sha256(&bytes),
+                None => {
+                    walk::blob(&port, repo, &commit, b"events.jsonl")?.as_deref()
+                        == Some(bytes.as_slice())
+                }
+            };
+            if !published {
+                return Err(mismatch());
+            }
             walk::check_contiguous(&complete.events, &prior.cover)?;
             let ordered = order(&complete.events, &prior.cover, false)?;
             let mut cover = prior.cover.clone();
