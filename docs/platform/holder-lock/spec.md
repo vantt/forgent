@@ -161,7 +161,7 @@ Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 | 58 | `event-seal` | mutex |
 | 60 | `state`, `porting-events` | hot-mutex |
 | 70 | `event-append` | mutex |
-| 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `identity-pins`, `observe`, `activation`, `install`, `project-config`, `global-config`, `mailbox` | mutex, lease |
+| 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `worker-session`, `identity-pins`, `observe`, `activation`, `install`, `project-config`, `global-config`, `mailbox` | mutex, lease |
 
 The ranks 58 (`event-seal`) and 70 (`event-append`) above are declared by the signed [Event Store spec §4](../event-store/spec.md#4-layering-and-locks), D-ADR0055 (event log as sealed changesets on per-machine refs); implementation has not started. They are planned additions to the shipped registry, which currently declares neither rank nor lock. They do not claim a registered kind, path or cutover. The design permits `state` (60) → `event-append` (70) and forbids seal/sync under `state`; registry and implementation must land together under the Event Store proof gates.
 

@@ -2,6 +2,7 @@ import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from '../../src/runner/dispatch/worker-session-boot.mjs';
+import { acquire, createLockScope, resolveLockRoot } from '../../src/holder-lock/index.mjs';
 
 // Everything that touches the outside world is injected, so the whole session
 // lifecycle is exercised here without a herdr install and without a terminal.
@@ -266,4 +267,28 @@ test('two seats starting at once share one worker session server', async () => {
   assert.equal(first.socketPath, SESSION_SOCKET);
   assert.equal(second.socketPath, SESSION_SOCKET);
   assert.equal(spawned, 1, 'a second server was started for a session that was already starting');
+});
+
+// Another process bringing the same session up holds its lock until the server answers; a boot that waited for
+// that lock looks at the socket again and finds the session up, so it starts nothing.
+test('a worker session another process was bringing up is not started a second time', async () => {
+  const other = await acquire(createLockScope('other-process'), 'worker-session', { lockRoot: resolveLockRoot(), id: 'fgos-worker' });
+  assert.equal(other.result, 'acquired');
+  let socketUp = false;
+  let spawned = 0;
+  const terminal = { capabilities: () => ({ result: 'capabilities', driver: 'herdr', capabilities: [], serverIncarnation: socketUp ? { pid: 1 } : null, endpoint: { socketPath: SESSION_SOCKET } }) };
+  const booting = ensureWorkerSession('fgos-worker', baseOpts({
+    existsSync: () => socketUp,
+    terminalControlFor: () => terminal,
+    spawnFn: () => { spawned += 1; return { unref() {} }; },
+    sleepFn: () => new Promise((resolve) => setTimeout(resolve, 5)),
+    pollMs: 5,
+  }));
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  assert.equal(spawned, 0, 'a boot started while another process held the session lock');
+  socketUp = true;
+  other.handle.release();
+  const session = await booting;
+  assert.equal(spawned, 0, 'the server the other process started was started again');
+  assert.equal(session.startedServer, false);
 });

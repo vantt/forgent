@@ -23,9 +23,13 @@ import net from 'node:net';
 import { spawn } from 'node:child_process';
 import { createRoundTerminalControl, resolveHerdrBin } from './terminal-slot.mjs';
 import { isolatedSessionEnv, assertNotOperatorSession, WorkerSessionError } from './worker-session.mjs';
+import { acquire, createLockScope, resolveLockRoot } from '../../holder-lock/index.mjs';
 
 /** The session every confined worker shares unless an executor names another. */
 export const DEFAULT_WORKER_SESSION = 'fgos-worker';
+
+/** The boot of each worker session in progress in this process, by session name. */
+const pendingBoots = new Map();
 
 const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
@@ -136,6 +140,30 @@ export async function ensureWorkerSession(sessionName = DEFAULT_WORKER_SESSION, 
   const terminalControl = terminalControlFor(env);
   const socketPath = sessionSocket(terminalControl, sessionName);
 
+  // Seats started together in one process share one boot; a boot in another process is waited for under the
+  // session's lock, and the socket is looked at again once the lock is held.
+  const joined = pendingBoots.get(sessionName);
+  if (joined) {
+    await joined;
+    return { sessionName, socketPath, env, startedServer: false };
+  }
+  const boot = (async () => {
+    const lock = await acquire(createLockScope('worker-session'), 'worker-session', { lockRoot: resolveLockRoot(), id: sessionName }, { waitMs: 2 * timeoutMs });
+    if (lock.result !== 'acquired') {
+      throw new WorkerSessionError('session-unavailable', `worker session "${sessionName}" is being started by another process that did not finish within ${2 * timeoutMs}ms.`, { sessionName, socketPath });
+    }
+    try {
+      return await startSessionServer({ sessionName, socketPath, terminalControl, herdrBin, spawnFn, existsSync, unlinkFn, statFn, connectFn, sleepFn, timeoutMs, pollMs });
+    } finally {
+      lock.handle.release();
+    }
+  })().finally(() => { pendingBoots.delete(sessionName); });
+  pendingBoots.set(sessionName, boot);
+  return { sessionName, socketPath, env, startedServer: await boot };
+}
+
+/** Look at the session's socket under its lock and start the server when none answers; true when one was started. */
+async function startSessionServer({ sessionName, socketPath, terminalControl, herdrBin, spawnFn, existsSync, unlinkFn, statFn, connectFn, sleepFn, timeoutMs, pollMs }) {
   // A server that died without unlinking leaves its socket file behind. Read
   // as "already up", that file wedges every confined dispatch from then on:
   // nothing listens, the first pane call fails, and each round refuses with
@@ -192,5 +220,5 @@ export async function ensureWorkerSession(sessionName = DEFAULT_WORKER_SESSION, 
     }
   }
 
-  return { sessionName, socketPath, env, startedServer };
+  return startedServer;
 }

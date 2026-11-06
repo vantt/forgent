@@ -97,6 +97,15 @@
       "note": "v1 source: src/runner/dispatch/provider-capacity.mjs state lock"
     },
     {
+      "name": "worker-session",
+      "kind": "mutex",
+      "scope": "machine",
+      "rank": 80,
+      "v3Path": "<lockRoot>/worker-session/<id>.lock",
+      "owner": "4.2",
+      "note": "serialises bringing one herdr worker session up (src/runner/dispatch/worker-session-boot.mjs); <id> is the session name"
+    },
+    {
       "name": "identity-pins",
       "kind": "mutex",
       "scope": "machine",

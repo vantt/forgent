@@ -227,6 +227,7 @@ const LOCK_FILES = {
   install: ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'install.lock')) : []),
   'full-suite': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'full-suite.lock')) : []),
   'provider-state': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'provider-state.lock')) : []),
+  'worker-session': ({ lockRoot }) => (lockRoot ? filesIn(path.join(lockRoot, 'worker-session'), (name) => name.endsWith('.lock')) : []),
   'identity-pins': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'identity-pins.lock')) : []),
   'global-config': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'global-config.lock')) : []),
   'provider-account': ({ lockRoot }) => (lockRoot ? subdirs(path.join(lockRoot, 'provider-account')).flatMap((dir) => filesIn(dir, (name) => name.endsWith('.lock'))) : []),
