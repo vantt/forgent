@@ -769,6 +769,7 @@ test('a dispatch home outside the assignment door is removed without write-back,
   } finally { w.cleanup(); }
 });
 
+const SCRATCH = 'scratch-';
 const agentCopies = (w) => fs.readdirSync(path.join(w.accountDir, 'pending')).filter((n) => /^\d{15}-agent-/.test(n));
 
 // A Codex private home whose pane renewed the login; every access token names its account the way OpenAI signs it.
@@ -813,6 +814,7 @@ test('a login renewed in a private home is staged at write-back without waiting 
     const [options, files] = seen;
     assert.deepEqual(files, ['auth.json'], 'the probe ran once, on an isolated copy of the login file alone');
     assert.equal(options.cwd, options.env.CODEX_HOME, 'its working directory is that copy');
+    assert.match(path.relative(w.accountDir, options.cwd), /^pending\/\.tmp-\d+-/, 'a staging the interrupted-staging sweep finds if the runner dies');
     assert.equal(options.env.HOME, options.env.CODEX_HOME);
     assert.deepEqual(Object.keys(options.env).filter((name) => !['PATH', 'LANG', 'LC_ALL', 'TZ', 'TERM'].includes(name)).sort(), ['CODEX_HOME', 'HOME'], 'nothing else of the runner\'s env');
     assert.equal(result.status, 'fresh');
@@ -833,16 +835,26 @@ test('a renewed login is never applied while its tokens name no account the prov
     assert.equal(readPi(w.home).xai.refresh, FAKE.oldRefresh, 'a forged label is not an account');
     assert.equal(agentCopies(w).length, 1, 'it is kept for the owner');
   } finally { w.cleanup(); }
-  // A Codex copy whose renewal call renews nothing proves nothing.
-  const v = workspace();
+});
+
+// A copy's token claim is unverified until it renews: one that never renews must not stop the account's own
+// renewal, and must not be called again and again.
+test('an agent\'s copy whose renewal returns nothing never cools the account: its own renewal still runs, and after two calls the copy is set aside for the owner', async () => {
+  const w = workspace();
   try {
-    const { dir, target } = codexAgentHome(v);
+    const { dir, target } = codexAgentHome(w);
     writeBackRenewedCredential(dir, target);
-    const { spawnFn } = fakeSpawn({ layoutName: 'codex', behaviour: () => {}, output: 'Error: 401 Unauthorized', exitCode: 1 });
-    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(v.home), runtimeDir: v.runtimeDir, spawnFn });
-    assert.equal(readCodex(v.home).tokens.refresh_token, 'FAKE-CODEX-REFRESH-old');
-    assert.equal(agentCopies(v).length, 1, 'the copy is kept, and the account cools down');
-  } finally { v.cleanup(); }
+    const kinds = (starts) => starts.map((s) => (path.basename(s.homeDir).startsWith(SCRATCH) ? 'account' : 'copy'));
+    const first = fakeSpawn({ layoutName: 'codex', behaviour: () => {}, output: 'Error: 401 Unauthorized', exitCode: 1 });
+    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(w.home), runtimeDir: w.runtimeDir, spawnFn: first.spawnFn });
+    assert.deepEqual(kinds(first.starts), ['copy', 'account'], 'the account\'s own renewal ran after the copy\'s call');
+    assert.equal(agentCopies(w).length, 1, 'one failed call keeps the copy');
+    const second = fakeSpawn({ layoutName: 'codex', behaviour: () => {}, output: 'Error: 401 Unauthorized', exitCode: 1 });
+    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(w.home), runtimeDir: w.runtimeDir, spawnFn: second.spawnFn, cooldownMs: 0 });
+    assert.deepEqual(agentCopies(w), [], 'after the second call the copy leaves the pending copies');
+    assert.equal(fs.readdirSync(path.join(w.accountDir, 'torn')).length, 1, 'it is kept under torn/ for the owner');
+    assert.equal(readCodex(w.home).tokens.refresh_token, 'FAKE-CODEX-REFRESH-old');
+  } finally { w.cleanup(); }
 });
 
 // A copy an older release staged from a private home has no origin in its name: only fgOS's own names skip the gate.
@@ -869,7 +881,7 @@ test('a copy holding the leased account\'s access token and another account\'s r
     writeBackRenewedCredential(dir, target);
     process.stderr.write = () => true;
     // Only the copy's own refresh token belongs to another account; the leased store renews nothing here.
-    const { spawnFn } = fakeSpawn({ layoutName: 'codex', behaviour: (home) => { if (path.basename(home).startsWith('.probe-')) renewCodexAs('FAKE-ACCOUNT-OTHER')(home); } });
+    const { spawnFn } = fakeSpawn({ layoutName: 'codex', behaviour: (home) => { if (path.basename(home).startsWith('.tmp-')) renewCodexAs('FAKE-ACCOUNT-OTHER')(home); } });
     await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
     process.stderr.write = realWrite;
     assert.equal(readCodex(w.home).tokens.refresh_token, 'FAKE-CODEX-REFRESH-old', 'the login of another account reached the leased store');
@@ -891,14 +903,17 @@ test('an omp copy reaches the probe as a fresh database with its login rows alon
     assert.equal(writeBackRenewedCredential(dir, target).status, 'staged');
 
     let tables;
-    const { spawnFn } = fakeSpawn({ layoutName: 'omp', behaviour: (home) => {
+    const inner = fakeSpawn({ layoutName: 'omp', behaviour: (home) => {
       const db = new DatabaseSync(path.join(home, 'agent.db'));
       tables = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all().map((row) => row.name);
       db.prepare('UPDATE auth_credentials SET data = ? WHERE id = 1').run(JSON.stringify(ompData(Date.now() + 8 * HOUR, { access: token(Date.now() + 8 * HOUR, 'probe'), refresh: 'FAKE-OMP-REFRESH-PROBE' })));
       db.close();
     } });
+    let probeArgs = [];
+    const spawnFn = (command, args, options) => { probeArgs = args; return inner.spawnFn(command, args, options); };
     await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
     assert.deepEqual(tables, ['auth_credentials'], 'the agent\'s other tables never reach the CLI');
+    assert.ok(probeArgs.includes('--no-tools') && !probeArgs.includes('--tools'), 'the renewal call gets no tools');
     assert.equal(JSON.parse(readOmpRows(w.home)[0].data).refresh, 'FAKE-OMP-REFRESH-PROBE');
   } finally { w.cleanup(); }
 });

@@ -38,8 +38,11 @@ export function withKillTimeout(plan, timeoutMs, env = process.env) {
   return { ...plan, command: timeoutBin, args: ['--kill-after=5', String(Math.max(1, Math.ceil(timeoutMs / 1000))), plan.command, ...plan.args] };
 }
 
-/** The command that makes one call with this credential, or null when the layout is not one fgOS can probe. */
-export function credentialProbeCommand(credentialSource) {
+/**
+ * The command that makes one call with this credential, or null when the layout is not one fgOS can probe.
+ * `noTools`: the call gets no tools at all (a renewal of a copy needs none).
+ */
+export function credentialProbeCommand(credentialSource, { noTools = false } = {}) {
   const home = expandCredentialHome(credentialSource?.home);
   if (!home) return null;
   if (credentialSource.kind === 'codex-home') {
@@ -55,7 +58,7 @@ export function credentialProbeCommand(credentialSource) {
   if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files) && credentialSource.files.includes('agent.db')) {
     return {
       command: 'omp',
-      args: ['-p', PROMPT, '--mode', 'json', '--tools', 'read'],
+      args: ['-p', PROMPT, '--mode', 'json', ...(noTools ? ['--no-tools'] : ['--tools', 'read'])],
       env: { PI_CODING_AGENT_DIR: home },
       home,
     };
@@ -63,7 +66,7 @@ export function credentialProbeCommand(credentialSource) {
   if (credentialSource.kind === 'home-files' && Array.isArray(credentialSource.files) && credentialSource.files.includes('auth.json')) {
     return {
       command: 'pi',
-      args: ['-p', PROMPT, '--mode', 'json', '--tools', 'read', '--approve'],
+      args: ['-p', PROMPT, '--mode', 'json', ...(noTools ? ['--no-tools'] : ['--tools', 'read', '--approve'])],
       env: { PI_CODING_AGENT_DIR: home },
       home,
     };

@@ -1076,6 +1076,23 @@ function sameAccount({ layout, provider, sourceHome, copyHome, loadSqlite }) {
 }
 
 const dropCopy = (dir) => { try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* the next holder retries */ } };
+
+// Calls an agent's copy gets before it is set aside; the count is kept inside the copy's own directory.
+const AGENT_COPY_TRIES = 2;
+const TRIES_FILE = '.gate-tries';
+function countAgentTry(dir) {
+  const file = path.join(dir, TRIES_FILE);
+  let tries = 0;
+  try { tries = Number.parseInt(fs.readFileSync(file, 'utf8'), 10) || 0; } catch { /* first call */ }
+  try { fs.writeFileSync(file, String(tries + 1), { mode: 0o600 }); } catch { return AGENT_COPY_TRIES; }
+  return tries + 1;
+}
+function moveToTorn(accountDir, dir, at) {
+  try {
+    fs.mkdirSync(path.join(accountDir, TORN_DIR), { recursive: true, mode: 0o700 });
+    fs.renameSync(dir, path.join(accountDir, TORN_DIR, pendingName(at, AGENT_ORIGIN)));
+  } catch { dropCopy(dir); }
+}
 const refuseCopy = (dir) => { dropCopy(dir); process.stderr.write('fgos: credential-copy-refused (account-mismatch)\n'); };
 
 // What the probe CLI is given of a copy: its login file alone, and for omp a fresh database that holds only the
@@ -1106,7 +1123,7 @@ function isolateLogin(layout, from, to, { loadSqlite }) {
  * renewal: an isolated copy of its login is marked due and the credential probe runs on it (credentialProbeCommand,
  * scratch cwd, minimal env), so the CLI redeems the copy's own refresh token. Only when that returns a new pair
  * whose token names the leased account is the renewed pair applied; a pair of another account is dropped, and a
- * call that renewed nothing keeps the copy and cools the account down.
+ * copy whose calls renew nothing is set aside under torn/ after AGENT_COPY_TRIES calls, never cooling the account.
  */
 async function applyAgentCopies({ accountDir, layout, layoutName, provider, credentialSource, home, lock, probeTimeoutMs, cooldownMs, spawnFn, env, loadSqlite, now }) {
   for (const dir of listLeftovers(accountDir).filter(isAgentCopy)) {
@@ -1116,7 +1133,9 @@ async function applyAgentCopies({ accountDir, layout, layoutName, provider, cred
     const claimed = sameAccount({ layout, provider, sourceHome: home, copyHome: dir, loadSqlite });
     if (claimed === false) { refuseCopy(dir); continue; }
     if (claimed === null || inCooldown(accountDir, cooldownMs, now())) continue;
-    const probeHome = path.join(accountDir, `.probe-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
+    // A staging name under pending/: a runner killed after the CLI spent the copy's refresh token leaves the renewed
+    // pair where sweepInterruptedStagings and doctor find it.
+    const probeHome = path.join(accountDir, PENDING_DIR, `.tmp-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
     try {
       const source = layout.read(home, { loadSqlite });
       const key = selectProviderEntry(source.entries, provider).entry.key;
@@ -1124,11 +1143,14 @@ async function applyAgentCopies({ accountDir, layout, layoutName, provider, cred
       isolateLogin(layout, dir, probeHome, { loadSqlite });
       const spent = refreshIn(probeHome);
       layout.markDue(probeHome, [key], { loadSqlite });
-      const plan = withKillTimeout(credentialProbeCommand({ ...credentialSource, home: probeHome }), probeTimeoutMs, env);
+      // Only the renewal is wanted: the call is given no tools.
+      const plan = withKillTimeout(credentialProbeCommand({ ...credentialSource, home: probeHome }, { noTools: true }), probeTimeoutMs, env);
       if (plan) await runCredentialProbe(plan, { spawnFn: spawnFn ?? lock.spawnHolding, timeoutMs: probeTimeoutMs, env });
       const renewed = refreshIn(probeHome);
       if (renewed === null || renewed === spent) {
-        recordFailure(accountDir, 'agent-copy-not-renewed', now());
+        // Never the account's cooldown: an agent's copy must not stop the account's own renewal. After
+        // AGENT_COPY_TRIES calls that renew nothing it goes to torn/, for the owner, and is not called again.
+        if (countAgentTry(dir) >= AGENT_COPY_TRIES) moveToTorn(accountDir, dir, now());
         continue;
       }
       // The copy's refresh token is spent now: the renewed pair is all that is left of it.

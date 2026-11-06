@@ -276,14 +276,15 @@ test('every login store the inventory and the executors name is masked, and one 
   const ownCodex = path.join(host.root, 'own-codex');
   const defaults = ['.codex', path.join('.pi', 'agent'), '.claude'].map((dir) => path.join(host.home, dir));
   for (const dir of [named, ownCodex, ...defaults]) fs.mkdirSync(dir, { recursive: true });
-  writeAccountsFile(path.join(host.home, '.fgos'), { llmAccounts: { xai: { standin: { credentialStore: { pi: '~/.stand-in-pi' } } } } });
+  writeAccountsFile(path.join(host.home, '.fgos'), { llmAccounts: { xai: { standin: { credentialStore: { pi: '~/.stand-in-pi' } } }, anthropic: { main: { credentialStore: { claude: '~/.claude' } } } } });
   await withHome(host, () => {
     // Every CLI's default login home and the one its variable names are stores, whichever the runner set.
     const stores = machineLoginStores({ homeDir: host.home, env: { CODEX_HOME: ownCodex } });
     for (const dir of [named, ownCodex, ...defaults, path.join(host.home, '.omp', 'agent'), path.join(host.home, '.gemini')]) assert.ok(stores.includes(dir), dir);
     const roots = resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath: null, loginStores: stores });
     assert.deepEqual(roots.sort(), [host.privateDir, named, ownCodex, ...defaults].sort(), 'each store that exists is masked, an absent one is skipped');
-    // A launch that reads its own CLI's login in place (it declares no login store) keeps that CLI's homes.
+    // A launch that reads its own CLI's login in place (it declares no login store) keeps that CLI's homes, even
+    // where the inventory names one of them as an account's store.
     const claudeSeat = machineLoginStores({ homeDir: host.home, env: {}, inPlaceCli: 'claude' });
     assert.equal(claudeSeat.includes(path.join(host.home, '.claude')), false);
     assert.ok(claudeSeat.includes(path.join(host.home, '.codex')));

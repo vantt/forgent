@@ -277,14 +277,21 @@ const plainValues = (value) => (isPlainObject(value) ? Object.values(value) : []
  * `runner.providers`) expanded as the lease expands it, each agent CLI's default login home and the value of its
  * home variable in `env`, and each executor's `credentialStore.homeEnv` value, read from the config the lease
  * reads (the project's when `projectRoot` is given). `inPlaceCli` is the CLI of a launch that reads its own login
- * in place (it declares no credentialStore): its homes stay visible to that launch alone. One that does not
+ * in place (it declares no credentialStore): its homes stay visible to that launch alone, whatever names them. One that does not
  * expand stays as written, for the confinement resolver to refuse by name. Throws what the config door throws.
  */
 export function machineLoginStores({ homeDir = os.homedir(), env = process.env, projectRoot, inPlaceCli = null } = {}) {
   const request = { globalDir: path.join(homeDir, '.fgos'), sections: ['runner'] };
   const runner = (projectRoot ? readConfig({ ...request, projectRoot }) : readMachineConfig(request)).value?.runner ?? {};
+  // The homes a launch that reads its own CLI's login in place keeps visible, however a store names them.
+  const own = new Set(CLI_LOGIN_HOMES.filter(({ cli }) => cli === inPlaceCli)
+    .flatMap(({ env: name, dir }) => [path.join(homeDir, dir), name && env[name]]).map((value) => expandCredentialHome(value)).filter(Boolean).map((value) => path.resolve(value)));
   const stores = new Set();
-  const add = (value) => { if (typeof value === 'string' && value.trim()) stores.add(expandCredentialHome(value) ?? value); };
+  const add = (value) => {
+    if (typeof value !== 'string' || !value.trim()) return;
+    const expanded = expandCredentialHome(value);
+    if (!expanded || !own.has(path.resolve(expanded))) stores.add(expanded ?? value);
+  };
   for (const pool of plainValues(runner.llmAccounts)) {
     for (const account of plainValues(pool)) plainValues(account?.credentialStore).forEach(add);
   }
@@ -294,8 +301,7 @@ export function machineLoginStores({ homeDir = os.homedir(), env = process.env, 
       for (const source of plainValues(account?.credentialSources)) add(source?.home);
     }
   }
-  for (const { cli, env: name, dir } of CLI_LOGIN_HOMES) {
-    if (cli === inPlaceCli) continue;
+  for (const { env: name, dir } of CLI_LOGIN_HOMES) {
     add(path.join(homeDir, dir));
     if (name) add(env[name]);
   }
@@ -303,7 +309,7 @@ export function machineLoginStores({ homeDir = os.homedir(), env = process.env, 
     for (const invocation of [executor, ...(Array.isArray(executor?.invocations) ? executor.invocations : [])]) {
       const store = credentialStoreOf(invocation);
       // `HOME` names the user's home, not a login directory: the CLI's own login home under it is listed above.
-      if (typeof store?.homeEnv === 'string' && store.homeEnv !== 'HOME' && store.use !== inPlaceCli) add(env[store.homeEnv]);
+      if (typeof store?.homeEnv === 'string' && store.homeEnv !== 'HOME') add(env[store.homeEnv]);
     }
   }
   return [...stores];
