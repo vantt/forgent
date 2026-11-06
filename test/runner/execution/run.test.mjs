@@ -12,12 +12,11 @@ import crypto from 'node:crypto';
 import { nativeDoor } from '../../../src/native/door.mjs';
 import { resolveSeats } from '../../../src/runner/execution/seat-resolver.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
-import { runUnit as coreRunUnit, readAccountInventory, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
+import { runUnit as coreRunUnit, readAccountInventory, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError, loadRunnerConfigForDir, runnerOriginsOf } from '../../../src/runner/dispatch/config.mjs';
 import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
 import { writeUnitSummary, buildUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
-import { installCancelOnSignal, resetCancelRequest } from '../../../src/run-supervisor/cancel-registry.mjs';
 
 // posture filtering consults the machine backend registry; keep it file-local
 seedFileLocalBwrapRegistry();
@@ -27,89 +26,7 @@ seedFileLocalBwrapRegistry();
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 import { writeAccountsFile, writeProjectConfig, writeGlobalConfig, readProjectConfig, withHome } from '../../helpers/config-fixture.mjs';
-
-function setupGitRepo() {
-  const tmp = makeFixtureDir('fgos-run-test-');
-  execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.name', 'Test Runner'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.email', 'test@runner.local'], { cwd: tmp, stdio: 'ignore' });
-
-  // Commit initial file
-  fs.writeFileSync(path.join(tmp, 'README.md'), '# Test\n');
-  execFileSync('git', ['add', 'README.md'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'initial'], { cwd: tmp, stdio: 'ignore' });
-
-  // Create .fgos/config.json
-  const fgosDir = path.join(tmp, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
-
-  const runnerConfig = {
-    runner: {
-      defaultExecutor: 'test-node',
-      defaults: { tier: 'standard' },
-      modelPolicies: {
-        node: {
-          standard: 'node-std',
-          flagship: 'node-flagship',
-        },
-      },
-      executors: {
-        'test-node': {
-          kind: 'agent',
-          description: 'Test node agent',
-          allowCrossProvider: true,
-          command: process.execPath,
-          args: [],
-          providerModel: 'node',
-          invocations: [
-            {
-              id: 'cli-default',
-              via: 'cli',
-              adapter: 'cli-spawn',
-              confinement: { backend: 'bwrap' },
-              command: process.execPath,
-              args: [],
-            },
-          ],
-        },
-      },
-      capabilities: {
-        'docs:write': {
-          prefer: [{ executor: 'test-node' }],
-          rigor: 'standard',
-        },
-        'docs:review': {
-          prefer: [{ executor: 'test-node' }],
-          persona: 'code-reviewer',
-          rigor: 'standard',
-        },
-        // Declared, but its only executor has no model at the tier it asks for: policy refuses every unit that names it.
-        'unserved:answer': {
-          prefer: [{ executor: 'test-node' }],
-          tier: 'frontier',
-        },
-      },
-      patterns: { seatBinding: { schema: 1 } },
-      loops: {
-        reviewed: {
-          maxRounds: 2,
-          checkersByRigor: {
-            standard: ['reviewer'],
-            high: ['reviewer', 'red-team'],
-            critical: ['reviewer', 'red-team', 'tester'],
-          },
-        },
-      },
-    },
-  };
-  writeProjectConfig(tmp, runnerConfig);
-
-  // Create linked worktree
-  const worktreeDir = makeFixtureDir('fgos-run-wt-');
-  execFileSync('git', ['worktree', 'add', '-b', 'wt-branch', worktreeDir], { cwd: tmp, stdio: 'ignore' });
-
-  return { repoRoot: tmp, worktreeDir };
-}
+import { setupGitRepo, panelSeats, withCancelHandlers } from '../../helpers/run-unit-repo-fixture.mjs';
 
 test('detectHerdrPresent needs the herdr marker and a socket that exists', () => {
   const sock = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-herdr-probe-')), 'herdr.sock');
@@ -127,26 +44,6 @@ test('resolveGitRoots resolves main checkout root and linked worktree', () => {
   assert.equal(fs.realpathSync(roots.mainCheckoutRoot), fs.realpathSync(repoRoot));
   assert.equal(fs.realpathSync(roots.worktreeRoot), fs.realpathSync(worktreeDir));
   assert.equal(roots.isLinkedWorktree, true);
-});
-
-test('outside a repository resolveGitRoots refuses unless the caller is read-only, and a unit that writes is refused there', () => {
-  const dir = fs.realpathSync(makeFixtureDir('fgos-run-norepo-'));
-  assert.throws(() => resolveGitRoots(dir), (err) => err instanceof RunnerConfigError && /must run inside a git repository/.test(err.message));
-  const roots = resolveGitRoots(dir, { allowNoRepository: true });
-  assert.deepEqual(roots, { worktreeRoot: dir, mainCheckoutRoot: dir, isLinkedWorktree: false, notARepository: true });
-  assert.doesNotThrow(() => assertRepositoryForWrites(roots, dir, { writes: false }));
-  assert.throws(() => assertRepositoryForWrites(roots, dir, { writes: true }), (err) => err instanceof RunnerConfigError && /must run inside a git repository/.test(err.message));
-  const { repoRoot } = setupGitRepo();
-  assert.doesNotThrow(() => assertRepositoryForWrites(resolveGitRoots(repoRoot, { allowNoRepository: true }), repoRoot, { writes: true }), 'inside a repository nothing is refused');
-});
-
-test('runUnit refuses a unit that writes in a directory that is no repository, before any unit run exists', async () => {
-  const dir = fs.realpathSync(makeFixtureDir('fgos-run-norepo-write-'));
-  await assert.rejects(
-    () => coreRunUnit({ unitData: { id: 'u-norepo', objective: 'Write a file', capability: 'docs:write', writes: ['docs'] }, cwd: dir, repoRoot: dir }),
-    (err) => err instanceof RunnerConfigError && /must run inside a git repository/.test(err.message),
-  );
-  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'assignments')) && fs.readdirSync(path.join(dir, '.fgos', 'assignments')).some((name) => name.startsWith('unit-run-')), false);
 });
 
 test('snapshotRunnerConfig captures hash and filtered runner config from main checkout without provenance', () => {
@@ -242,28 +139,6 @@ test('architecture guard: src/runner/execution/run.mjs does NOT import state, co
   assert.ok(!/from\s+['"].*coordination\//.test(content));
   assert.ok(!/from\s+['"].*worktree/.test(content));
   assert.ok(!/from\s+['"].*merge/.test(content));
-});
-
-test('mutating gate: refuses mutating unit in main checkout', async () => {
-  const { repoRoot } = setupGitRepo();
-  const unit = {
-    id: 'u-mutate-main',
-    objective: 'Implement feature in main',
-    capability: 'docs:write',
-    writes: ['src/feature.txt'],
-  };
-
-  await assert.rejects(
-    async () => {
-      await runUnit({
-        unitData: unit,
-        repoRoot,
-        cwd: repoRoot, // main checkout, not linked worktree!
-        pattern: 'solo',
-      });
-    },
-    /resolves to the main checkout.*a mutating dispatch must run in a linked git worktree/,
-  );
 });
 
 test('mutating gate: refuses mutating unit when worktree mismatches unit.json', async () => {
@@ -577,11 +452,6 @@ test('a reviewed run with a single provider family refuses the checker instead o
   assert.equal(checker.refused.reason, 'independence-unsatisfiable');
 });
 
-// A panel unit declares its seats: `n` producer members and one synthesizer.
-function panelSeats(n) {
-  return [...Array.from({ length: n }, (_, i) => ({ seat: `member-${i + 1}`, role: 'producer' })), { seat: 'synthesizer', role: 'synthesizer' }];
-}
-
 function panelRun(id, members) {
   const { repoRoot, worktreeDir } = setupGitRepo();
   return { repoRoot, worktreeDir, pattern: 'panel', id };
@@ -754,45 +624,6 @@ test('anonymizeInputs hands the role a copy under a neutral name, keeps the mapp
   assert.equal(resumed.outcome, 'pass');
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dirOfB, 'unit.json'), 'utf8')).resolvedInputs, expected);
   assert.ok(fs.readFileSync(copy).equals(original));
-});
-
-test('an anonymized input that cannot be copied is refused before any unit directory exists', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha']);
-  const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
-  const before = fs.existsSync(assignmentsDir) ? fs.readdirSync(assignmentsDir) : [];
-  await assert.rejects(
-    () =>
-      runUnit({
-        unitData: { id: 'u-bad', objective: 'x', capability: 'docs:write', writes: [], inputs: ['unit-run:unit-run-nope/producer'], anonymizeInputs: true },
-        repoRoot,
-        cwd: worktreeDir,
-        worktree: worktreeDir,
-        pattern: 'solo',
-      }),
-    /handoff-ref-unresolved: unit-run:unit-run-nope\/producer: no-such-run/,
-  );
-  assert.deepEqual(fs.existsSync(assignmentsDir) ? fs.readdirSync(assignmentsDir) : [], before);
-});
-
-test('a unit-run input that cannot be resolved is refused before any unit directory exists', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha']);
-  const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
-  const before = fs.existsSync(assignmentsDir) ? fs.readdirSync(assignmentsDir) : [];
-  await assert.rejects(
-    () =>
-      runUnit({
-        unitData: { id: 'u-bad', objective: 'x', capability: 'docs:write', writes: [], inputs: ['unit-run:unit-run-nope/producer'] },
-        repoRoot,
-        cwd: worktreeDir,
-        worktree: worktreeDir,
-        pattern: 'solo',
-      }),
-    /handoff-ref-unresolved: unit-run:unit-run-nope\/producer: no-such-run/,
-  );
-  const after = fs.existsSync(assignmentsDir) ? fs.readdirSync(assignmentsDir) : [];
-  assert.deepEqual(after, before);
 });
 
 test('a reviewed run never lets the producer family also check its own work; the reviewer is told to review and handed the producer\'s report', async () => {
@@ -1764,41 +1595,6 @@ test('a unit persona defined in the workspace tier reaches the prompt as text pi
   assert.equal(JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).personaPin.text, personaText);
 });
 
-test('a unit persona whose file cannot be parsed or has the wrong shape refuses the run and leaves no unit directory', async (t) => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
-  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
-  fs.mkdirSync(path.join(repoRoot, 'fgos', 'agents'), { recursive: true });
-  fs.writeFileSync(path.join(repoRoot, 'fgos', 'agents', 'broken-keeper.yaml'), 'name: broken-keeper\ndescription: fine\npersona:\n  voice: direct: no hedging\n');
-  fs.writeFileSync(path.join(repoRoot, 'fgos', 'agents', 'mapping-keeper.yaml'), 'name: mapping-keeper\ndescription: fine\ndecision_boundary:\n  must_escalate:\n    - Escalate when: budget exceeded\n');
-  const attempt = (persona) => runUnit({
-    unitData: { id: 'u-bad-persona', objective: 'Write docs', capability: 'docs:write', writes: [], persona },
-    repoRoot, cwd: worktreeDir, worktree: worktreeDir,
-  });
-  await assert.rejects(attempt('broken-keeper'), /persona "broken-keeper" \(fgos\/agents\/broken-keeper\.yaml\) cannot be parsed: .*line 4/);
-  await assert.rejects(attempt('mapping-keeper'), /persona "mapping-keeper" \(fgos\/agents\/mapping-keeper\.yaml\) decision_boundary\.must_escalate\[0\] is a mapping/);
-  const assignments = path.join(repoRoot, '.fgos', 'assignments');
-  assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], [], 'no unit directory is left behind');
-});
-
-test('custody admission refusal creates and announces no Unit run', async (t) => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
-  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
-  const { child, exited } = await holdLockInChild('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir });
-  let announced = false;
-  try {
-    await assert.rejects(() => runUnit({
-      unitData: { id: 'busy-admission', objective: 'Write docs', capability: 'docs:write', writes: ['docs'] },
-      repoRoot, cwd: worktreeDir, worktree: worktreeDir,
-      onUnitRunCreated: () => { announced = true; },
-    }), { code: 'dispatch-in-flight' });
-    assert.equal(announced, false);
-    const assignments = path.join(repoRoot, '.fgos', 'assignments');
-    assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], []);
-  } finally { child.kill('SIGKILL'); await exited; }
-});
-
 test('a committed Unit result survives a failed custody handoff with a warning', async (t) => {
   const { resolveLock } = await import('../../../src/holder-lock/index.mjs');
   const { repoRoot, worktreeDir } = setupGitRepo();
@@ -2004,36 +1800,6 @@ test('a solo run with a failing verify command settles with findings and no seco
   assert.equal(fixture.readSummary().outcome, 'findings');
 });
 
-test('conflicting explicit pattern selectors refuse selector-conflict before admission and reserve nothing', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  const unitData = { id: 'u-conflict', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'reviewed' };
-  await assert.rejects(
-    runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo' }),
-    (err) => err instanceof RunnerConfigError && err.code === 'selector-conflict',
-  );
-  assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')), false);
-});
-
-test('unit-explicit verify on panel or debate refuses before admission', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  await assert.rejects(
-    runUnit({
-      unitData: { id: 'u-panel-verify', objective: 'Panel with verify', capability: 'docs:write', writes: [], pattern: 'panel', verify: 'npm test', seats: panelSeats(3) },
-      repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'panel',
-    }),
-    (err) => err instanceof RunnerConfigError && err.code === 'verify-command-unsupported',
-  );
-  await assert.rejects(
-    runUnit({
-      unitData: { id: 'u-panel-opt-verify', objective: 'Panel with verify flag', capability: 'docs:write', writes: [], pattern: 'panel', seats: panelSeats(3) },
-      verify: 'npm test',
-      repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'panel',
-    }),
-    (err) => err instanceof RunnerConfigError && err.code === 'verify-command-unsupported',
-  );
-  assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')), false);
-});
-
 test('capability-level verify on panel is neither run nor refused', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
@@ -2053,13 +1819,6 @@ test('capability-level verify on panel is neither run nor refused', async () => 
   assert.equal(res.results.some((r) => r.seat === 'verify'), false);
 });
 
-// A signal handled the way the CLI does it, with a stand-in exit so the test process survives.
-async function withCancelHandlers(fn) {
-  const exits = [];
-  const uninstall = installCancelOnSignal({ cancelWaitMs: 1000, exit: (code) => exits.push(code), stderr: { write() {} } });
-  try { await fn(exits); } finally { uninstall(); resetCancelRequest(); }
-}
-
 test('a signal that lands while the unit is set up stops it before any seat starts and leaves the run resumable', async (t) => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
@@ -2077,22 +1836,6 @@ test('a signal that lands while the unit is set up stops it before any seat star
     assert.deepEqual(record.execution, { status: 'running' });
     assert.equal(fs.existsSync(path.join(assignments, unitRunId, 'unit-summary.json')), false);
     assert.deepEqual(record.bindings ?? {}, {}, 'no seat was bound');
-  });
-});
-
-test('after a signal a new unit is refused before anything is created', async (t) => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
-  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
-  await withCancelHandlers(async (exits) => {
-    process.emit('SIGTERM');
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    assert.deepEqual(exits, [143]);
-    await assert.rejects(
-      runUnit({ unitData: { id: 'late', capability: 'unserved:answer', objective: 'x', writes: [] }, repoRoot, cwd: worktreeDir }),
-      { code: 'run-cancelled', signal: 'SIGTERM' },
-    );
-    assert.equal(fs.existsSync(path.join(repoRoot, '.fgos', 'assignments')), false);
   });
 });
 
@@ -2304,68 +2047,6 @@ test('a pinned unit keeps its effective seats on resume after a snapshot refresh
 
 });
 
-
-test('an unreadable pin refuses collaboration-pin-unusable', async () => {
-  const { repoRoot, worktreeDir } = setupGitRepo();
-  reviewedConfig(repoRoot, ['alpha']);
-  const unitDir = path.join(repoRoot, '.fgos', 'assignments', 'unit-run-unreadable-pin');
-  fs.mkdirSync(unitDir, { recursive: true });
-  const record = {
-    unit: { id: 'u-unusable', capability: 'docs:write', writes: [], objective: 'Do write' },
-    pattern: 'solo',
-    seatSchema: 2,
-    collaboration: 'corrupted-string',
-    seats: [{ seat: 'producer', role: 'producer', posture: { writer: true } }],
-    resolvedInputs: [],
-    configSnapshot: snapshotRunnerConfig(repoRoot),
-    worktree: fs.realpathSync(worktreeDir),
-    createdAt: '2026-10-05T01:00:00Z',
-    settlement: { outcome: 'pass', settledAt: '2026-10-05T01:01:00Z' },
-  };
-  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
-
-  await assert.rejects(
-    () => coreRunUnit({
-      resumeUnitRunId: 'unit-run-unreadable-pin',
-      repoRoot,
-      cwd: worktreeDir,
-      worktree: worktreeDir,
-    }),
-    (err) => err instanceof RunnerConfigError && err.code === 'collaboration-pin-unusable',
-  );
-
-  // Unregistered loop refuses
-  record.collaboration = {
-    pattern: { name: 'solo' },
-    effective: { loop: 'unknown-loop', params: {} },
-  };
-  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
-  await assert.rejects(
-    () => coreRunUnit({
-      resumeUnitRunId: 'unit-run-unreadable-pin',
-      repoRoot,
-      cwd: worktreeDir,
-      worktree: worktreeDir,
-    }),
-    (err) => err instanceof RunnerConfigError && err.code === 'collaboration-pin-unusable',
-  );
-
-  // Unregistered pattern refuses
-  record.collaboration = {
-    pattern: { name: 'unknown-pattern-name' },
-    effective: { loop: 'solo', params: {} },
-  };
-  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
-  await assert.rejects(
-    () => coreRunUnit({
-      resumeUnitRunId: 'unit-run-unreadable-pin',
-      repoRoot,
-      cwd: worktreeDir,
-      worktree: worktreeDir,
-    }),
-    (err) => err instanceof RunnerConfigError && err.code === 'collaboration-pin-unusable',
-  );
-});
 
 test('resume ignores a caller --pattern', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
