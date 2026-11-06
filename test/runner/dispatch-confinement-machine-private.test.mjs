@@ -28,6 +28,7 @@ import {
 import { BUILTIN_POLICY_IDS, resolveConfinementPolicy } from '../../src/runner/dispatch/confinement/policies.mjs';
 import { computeProbeFingerprint, probeMachinePrivateHidden, MACHINE_PRIVATE_FALSIFIERS } from '../../src/runner/dispatch/confinement/probes/harness.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { writeAccountsFile } from '../helpers/config-fixture.mjs';
 
 const HAS_WORKING_BWRAP = os.platform() === 'linux'
   && cp.spawnSync('/usr/bin/bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' }).status === 0;
@@ -43,8 +44,10 @@ after(() => {
  * needs. An absent base is one Claude Code cannot bind in either, so nothing is created and nothing
  * is masked there.
  */
-function makeHost({ withPrivate = true, socketBase = 'absent', withHerdr = false } = {}) {
-  const root = fs.realpathSync(makeFixtureDir('fgos-machine-private-'));
+function makeHost({ withPrivate = true, socketBase = 'absent', withHerdr = false, outsideTmp = false } = {}) {
+  // The sandbox starts with an empty /tmp, which hides whatever lives there by itself: a proof that a mask hides
+  // a directory must plant it where the sandbox would otherwise see the host.
+  const root = fs.realpathSync(outsideTmp ? fs.mkdtempSync('/var/tmp/fgos-machine-private-') : makeFixtureDir('fgos-machine-private-'));
   fixtures.push(root);
   const home = path.join(root, 'home');
   const privateDir = path.join(home, '.fgos', 'private');
@@ -481,4 +484,45 @@ test('the machine-private probe passes on the real argv, and each falsifier that
       for (const key of hiddenKeys) assert.equal(seen[key], 'ENOENT', `own-socket: ${key}`);
     }
   }
+});
+
+// The cases above mask what fgOS itself keeps (its private directory, sockets). The login stores of the
+// accounts the machine inventory names are another thing a worker must not read: it is handed a copy of the
+// one login it needs inside its own home, so every store in place is somebody else's login. Stand-in stores
+// under a scratch home; a real login is never touched. The gh config next to them stays readable by design.
+test('a confined worker cannot read a login store the account inventory names', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const host = makeHost({ outsideTmp: true });
+  const store = path.join(host.home, '.stand-in-codex');
+  const ghDir = path.join(host.home, '.config', 'gh');
+  fs.mkdirSync(store, { recursive: true });
+  fs.mkdirSync(ghDir, { recursive: true });
+  fs.writeFileSync(path.join(store, 'auth.json'), 'PLANTED-LOGIN');
+  fs.writeFileSync(path.join(ghDir, 'hosts.yml'), 'PLANTED-GH');
+  writeAccountsFile(path.join(host.home, '.fgos'), { llmAccounts: { openai: { standin: { credentialStore: { codex: store } } } } });
+  const script = `
+    const fs = require('fs');
+    const look = (file) => { try { fs.readFileSync(file); return 'READ'; } catch (e) { return e.code; } };
+    process.stdout.write(JSON.stringify({ store: look(${JSON.stringify(path.join(store, 'auth.json'))}), gh: look(${JSON.stringify(path.join(ghDir, 'hosts.yml'))}) }));
+  `;
+  await withHome(host, async () => {
+    const request = buildConfinementRequest({
+      capability: 'code:review',
+      executorId: 'bwrap-exec',
+      dispatchId: 'disp_self',
+      requirement: { mode: 'required', policyId: 'workspace-write', policy: resolveConfinementPolicy('workspace-write') },
+      backendId: 'bwrap',
+      invocation: { command: 'node', args: ['-e', script], env: {}, adapter: 'herdr-spawn' },
+      context: { cwd: host.project, repoRoot: host.project, runDir: host.runDir, fgosDir: host.fgosDir },
+    });
+    const assessment = assessBwrap(request, backendFor(host));
+    assert.deepEqual(assessment.mismatches, []);
+    const out = await prepareBwrap({ resources: assessment.resources, coverage: assessment.coverage }, request, backendFor(host));
+    const worker = cp.spawnSync(out.invocation.command, out.invocation.args, { encoding: 'utf8' });
+    await out.cleanup();
+    assert.equal(worker.status, 0, worker.stderr);
+    const seen = JSON.parse(worker.stdout);
+    assert.equal(seen.gh, 'READ', 'the sandbox sees the host here, so a store it cannot see was masked');
+    assert.equal(seen.store, 'ENOENT', 'the worker read a login store the account inventory names');
+  });
 });
