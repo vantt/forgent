@@ -233,6 +233,7 @@
     "src/setup/runner-config-conversion.mjs": "infra",
     "src/setup/identity-checks.mjs": "use-case",
     "src/setup/terminal-control-checks.mjs": "infra",
+    "src/setup/omp-natives-checks.mjs": "infra",
     "src/setup/agent-cli-trust.mjs": "infra",
     "src/setup/blind-steps-proven-pools.mjs": "use-case",
     "src/setup/workflow-definition-files.mjs": "use-case",

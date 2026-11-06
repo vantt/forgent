@@ -145,6 +145,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'no-stuck-merge-abort',
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'terminal-control',
+      'omp-natives-present',
       'git-component-compatible',
       'git-worktree-recovery',
       'git-repository-config',

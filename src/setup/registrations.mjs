@@ -137,6 +137,7 @@ import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkRunSupervisorConfig } from './run-supervisor-checks.mjs';
 import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
+import { checkOmpNativesPresent, ompExecutorsOf } from './omp-natives-checks.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -3468,6 +3469,20 @@ registerCheck({
   id: 'terminal-allocations',
   description: 'terminal slots past allocationGraceMs that never launched and retained panes past their time; reports only, closes nothing',
   check: (cwd) => checkTerminalAllocations(cwd),
+});
+
+registerCheck({
+  id: 'omp-natives-present',
+  description: "omp's native addon for its installed version is in the natives directory omp resolves (a confined omp cannot extract it); fails only when an executor runs omp, warns when omp is missing or unused; readiness only, no repair",
+  check: (cwd) => {
+    let ompExecutors = null;
+    try {
+      ompExecutors = ompExecutorsOf(loadRunnerConfigForDir(cwd));
+    } catch {
+      // An unreadable runner config is its own row's failure; here it only means no executor is known to run omp.
+    }
+    return checkOmpNativesPresent({ ompExecutors });
+  },
 });
 
 registerCheck({
