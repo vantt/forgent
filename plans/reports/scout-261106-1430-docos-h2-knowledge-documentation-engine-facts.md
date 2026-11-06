@@ -78,6 +78,15 @@ Locked constraints H2 inherits: no stored graph or daemon (tsk-1lv D2), no secon
 5. **The claim-owner check has no key.** RUL ids in area specs and contract ids are real, unique, machine-greppable owners; `Canonical for` is not. A first claim check can key on RUL id uniqueness (one spec defines each RUL) without a claims engine.
 6. **One live dead instruction** (`fgos coordination run` in a shared skill file) proves the verb-reference check pays off today.
 
+## 7. Addendum: RUL ids as a claim key (measured)
+
+Scan of `- **RULn (title)**` definitions in 258 canonical-path platform docs:
+
+- 198 definitions, 139 distinct ids; **48 ids are defined in more than one file with different meanings** (e.g. `RUL7`, `RUL10`, `RUL11` each in `platform-foundations.md`, `packaging-distribution/spec.md`, `work-state/spec.md` and the runner subcomponent `h-6979005beaf7/spec.md`). An RUL id is unique only inside its holder spec, so the claim key is `(holder, RUL id)`, and a bare "RUL11" in prose is ambiguous.
+- **7 claims have two owners today (A1 violation):** `RUL1`–`RUL3` and `RUL5`–`RUL8` appear with the same id and the same title in both `docs/platform/work-state/spec.md` and `docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`.
+
+So a first claim-owner check needs no claims engine: "the same `(id, title)` must not be defined under two holders" catches a real defect today, and the holder table already names each holder.
+
 ## Unresolved questions
 
 1. Should H2 slice 1 serve other projects now (needs the Convention overlay, Q13), or fgOS's repo first with the cross-project route recorded under §0.3?
