@@ -61,6 +61,234 @@ function checkCarrierDomainValue(key, val, loop, carrierName) {
   }
 }
 
+const invalid = (message) => new CollaborationError('param-invalid', message);
+const isPlainObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
+const nonEmptyString = (v) => (typeof v === 'string' && v ? v : null);
+const hasReason = (reason) => typeof reason === 'string' && reason.trim() !== '';
+
+function requirePlainObject(value, message) {
+  if (value !== undefined && !isPlainObject(value)) throw invalid(message);
+}
+
+/** Checks each declared key against the loop's parameter table and its value domain. */
+function checkCarrierParams(params, table, loop, carrier) {
+  for (const [key, val] of Object.entries(params)) {
+    if (!table || !Object.hasOwn(table, key)) {
+      throw new CollaborationError('param-unknown', `unknown parameter "${key}" in ${carrier} for loop "${loop}"`);
+    }
+    checkCarrierDomainValue(key, val, loop, carrier);
+  }
+}
+
+/** Seats and role tasks a unit or activity declares beside its params object. */
+function loosePartsOf(carrier) {
+  const parts = Object.create(null);
+  for (const key of ['seats', 'roleTasks']) {
+    if (carrier[key] !== undefined) parts[key] = carrier[key];
+  }
+  return parts;
+}
+
+/** Picks the baseline and the explicit selection from the caller, unit and activity selectors. */
+function selectPattern({ unit, selectors, inCase, reason }) {
+  const callerObjPattern = nonEmptyString(selectors?.callerObject) ?? nonEmptyString(selectors?.callerObject?.pattern);
+  const unitPattern = nonEmptyString(unit?.pattern) ?? nonEmptyString(unit?.pattern?.pattern);
+  const callerStrPattern = nonEmptyString(selectors?.callerString);
+  const activityPattern = nonEmptyString(selectors?.activityUnit?.pattern);
+
+  const explicit = [];
+  if (callerObjPattern) explicit.push({ name: callerObjPattern, source: 'caller-object', selector: selectors.callerObject });
+  if (unitPattern) explicit.push({ name: unitPattern, source: 'unit', selector: unit?.pattern ?? unitPattern });
+  if (callerStrPattern) explicit.push({ name: callerStrPattern, source: 'caller-string', selector: callerStrPattern });
+  for (const other of explicit.slice(1)) {
+    if (other.name !== explicit[0].name) {
+      throw new CollaborationError('selector-conflict', `conflicting explicit selectors: "${explicit[0].name}" (${explicit[0].source}) vs "${other.name}" (${other.source})`);
+    }
+  }
+
+  const activityBaseline = activityPattern
+    ? { name: activityPattern, source: 'activity', selector: selectors.activityUnit?.pattern ?? selectors.activityUnit }
+    : null;
+  const isSwap = Boolean(inCase && activityPattern && explicit.length > 0 && explicit[0].name !== activityPattern);
+  const selectedName = explicit.length > 0 ? explicit[0].name : (inCase && activityPattern ? activityPattern : 'solo');
+  let baseline = explicit[0] ?? (inCase && activityBaseline ? activityBaseline : { name: 'solo', source: 'solo', selector: 'solo' });
+  if (isSwap) {
+    baseline = activityBaseline;
+    if (!hasReason(reason)) {
+      throw new CollaborationError('request-reason-required', `an explicit pattern swap from "${activityPattern}" to "${selectedName}" in a case requires a reason`);
+    }
+  }
+  return { baseline, selectedName, isSwap, activityPattern };
+}
+
+function entryNamed(entries, name, label) {
+  if (!Object.hasOwn(entries, name)) {
+    throw new CollaborationError('unknown-pattern', `${label} "${name}" is not in the catalog`);
+  }
+  return entries[name];
+}
+
+function parseScalarValue(key, rawVal, paramDef) {
+  if (paramDef.type === 'integer') {
+    if (typeof rawVal === 'boolean') throw invalid(`invalid integer scalar "${rawVal}" for parameter "${key}"`);
+    if (typeof rawVal === 'number') {
+      if (!Number.isInteger(rawVal) || rawVal < 1) throw invalid(`parameter "${key}" must be an integer >= 1, got ${rawVal}`);
+      return rawVal;
+    }
+    const strVal = String(rawVal);
+    if (!/^-?[0-9]+$/.test(strVal) || !Number.isInteger(Number(strVal))) throw invalid(`invalid integer scalar "${strVal}" for parameter "${key}"`);
+    const num = Number(strVal);
+    if (num < 1) throw invalid(`parameter "${key}" must be an integer >= 1, got ${num}`);
+    return num;
+  }
+  if (paramDef.type === 'boolean') {
+    if (typeof rawVal === 'boolean') return rawVal;
+    if (rawVal === 'true' || rawVal === 'false') return rawVal === 'true';
+    throw invalid(`invalid boolean scalar "${rawVal}" for parameter "${key}"; must be "true" or "false"`);
+  }
+  if (typeof rawVal === 'boolean') throw invalid(`parameter "${key}" expects a string literal, got boolean`);
+  return String(rawVal);
+}
+
+/** Flattens the accepted scalar spellings (key=value strings, pairs, key/value objects, a map) into [key, value] pairs. */
+function scalarPairsOf(scalars) {
+  if (!Array.isArray(scalars)) return Object.entries(scalars);
+  const pairs = [];
+  for (const item of scalars) {
+    if (typeof item === 'string') {
+      const eq = item.indexOf('=');
+      if (eq < 0) throw invalid(`scalar parameter "${item}" missing "=" delimiter`);
+      pairs.push([item.slice(0, eq), item.slice(eq + 1)]);
+    } else if (Array.isArray(item)) {
+      if (item.length === 0 || item.length > 2) throw invalid('scalar array entry must be [key, value]');
+      pairs.push([item[0], item[1]]);
+    } else if (item && typeof item === 'object') {
+      if (item.key !== undefined) {
+        pairs.push([item.key, item.value]);
+      } else {
+        const own = Object.entries(item);
+        if (own.length === 0) throw invalid('scalar object entry cannot be empty');
+        pairs.push(...own);
+      }
+    } else {
+      throw invalid('scalar item must be a string or object');
+    }
+  }
+  return pairs;
+}
+
+function parseRequestScalars(request, paramTable, loop) {
+  const parsed = Object.create(null);
+  if (request?.scalars === undefined) return parsed;
+  if (typeof request.scalars !== 'object' || request.scalars === null) throw invalid('request scalars must be an array or object');
+  for (const [key, rawVal] of scalarPairsOf(request.scalars)) {
+    if (typeof key !== 'string' || !key) throw invalid('scalar parameter key must be a non-empty string');
+    if (Object.hasOwn(parsed, key)) throw new CollaborationError('param-request-conflict', `scalar parameter "${key}" was specified more than once`);
+    if (request?.params && typeof request.params === 'object' && Object.hasOwn(request.params, key)) {
+      throw new CollaborationError('param-request-conflict', `parameter "${key}" was specified in both params and scalars`);
+    }
+    if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" for loop "${loop}"`);
+    const paramDef = paramTable[key];
+    if (!paramDef.scalar) throw invalid(`parameter "${key}" is not a scalar parameter`);
+    if (rawVal === undefined || rawVal === null || rawVal === '') throw invalid(`scalar parameter "${key}" requires a non-empty value`);
+    if (typeof rawVal === 'object' || typeof rawVal === 'symbol' || typeof rawVal === 'function') {
+      throw invalid(`scalar parameter "${key}" value must be a scalar, got ${Array.isArray(rawVal) ? 'array' : typeof rawVal}`);
+    }
+    parsed[key] = parseScalarValue(key, rawVal, paramDef);
+  }
+  return parsed;
+}
+
+/** Validates the request and returns its params with scalars folded in. */
+function normalizeRequest(request, paramTable, loop) {
+  if (request !== null && request !== undefined && !isPlainObject(request)) throw invalid('request must be an object');
+  const parsedScalars = parseRequestScalars(request, paramTable, loop);
+  const normalized = Object.create(null);
+  if (request?.params !== undefined) {
+    if (!isPlainObject(request.params)) throw invalid('request params must be an object');
+    for (const [key, val] of Object.entries(request.params)) {
+      if (key === 'roleTasks') throw new CollaborationError('param-not-requestable', 'roleTasks cannot be requested');
+      if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" for loop "${loop}"`);
+      checkCarrierDomainValue(key, val, loop, 'request');
+      normalized[key] = deepClone(val);
+    }
+  }
+  return Object.assign(normalized, parsedScalars);
+}
+
+/** Validates the activity unit's params against its own loop and returns them with its loose seats and role tasks. */
+function activityDeclaredParamsOf(activityUnit, entries) {
+  const declared = Object.create(null);
+  if (!activityUnit || typeof activityUnit !== 'object') return declared;
+  requirePlainObject(activityUnit.params, 'activity unit params must be an object');
+  Object.assign(declared, activityUnit.params);
+  for (const [key, val] of Object.entries(loosePartsOf(activityUnit))) {
+    if (!Object.hasOwn(declared, key)) declared[key] = val;
+  }
+  const actPattern = nonEmptyString(activityUnit.pattern);
+  const actLoop = actPattern ? entryNamed(entries, actPattern, 'activity pattern').loop : 'solo';
+  checkCarrierParams(declared, paramTableOf(actLoop), actLoop, 'activity unit');
+  return declared;
+}
+
+/** The parameter winning slot for each loop parameter, from request down to built-in defaults. */
+function layerParams({ paramTable, loop, entry, loopConfig, requestParams, selectors, unitDeclared, activityDeclared, activityBaseline }) {
+  const effective = Object.create(null);
+  const provenance = Object.create(null);
+  const take = (param, value, slot) => { effective[param] = value; provenance[param] = slot; };
+  const calleeParams = selectors?.callerObject?.params;
+  for (const param of Object.keys(paramTable)) {
+    if (Object.hasOwn(requestParams, param)) take(param, requestParams[param], 'request');
+    else if (calleeParams && Object.hasOwn(calleeParams, param)) take(param, deepClone(calleeParams[param]), 'selector');
+    else if (param === 'seats' && Object.hasOwn(unitDeclared, 'seats')) take(param, deepClone(unitDeclared.seats), 'unit');
+    else if (activityBaseline && Object.hasOwn(activityDeclared, param)) take(param, deepClone(activityDeclared[param]), 'activity');
+    else if (Object.hasOwn(unitDeclared, param)) take(param, deepClone(unitDeclared[param]), 'unit');
+    else if (entry.defaults && Object.hasOwn(entry.defaults, param)) take(param, deepClone(entry.defaults[param]), 'pattern-default');
+    else if (loopConfig && Object.hasOwn(loopConfig, param)) take(param, deepClone(loopConfig[param]), 'config');
+    else if (loop === 'reviewed' && param === 'maxRounds') take(param, DEFAULT_MAX_ROUNDS, 'builtin');
+    else if (loop === 'debate' && param === 'rebuttal') take(param, DEFAULT_REBUTTAL, 'builtin');
+  }
+  return { effective, provenance };
+}
+
+/** Pins every fixed invariant; a violation throws only when the clashing value came from a slot in `weakeningSlots` (any slot when null). */
+function applyFixedInvariants(invariants, effective, provenance, label, weakeningSlots) {
+  for (const [param, inv] of Object.entries(invariants ?? {})) {
+    if (inv.fixed === undefined) continue;
+    if (effective[param] !== undefined && !deepEqual(effective[param], inv.fixed)
+      && (!weakeningSlots || weakeningSlots.includes(provenance[param]))) {
+      throw new CollaborationError('pattern-invariant-weakened', `parameter "${param}" violates fixed invariant on ${label}`);
+    }
+    effective[param] = deepClone(inv.fixed);
+    provenance[param] = 'pattern-invariant';
+  }
+}
+
+function checkRequestedBounds(bounds, effective, provenance) {
+  if (!bounds || typeof bounds !== 'object') return;
+  for (const [param, bound] of Object.entries(bounds)) {
+    const val = effective[param];
+    if (provenance[param] !== 'request' || typeof val !== 'number' || !bound || typeof bound !== 'object') continue;
+    if (bound.min !== undefined && val < bound.min) {
+      throw new CollaborationError('param-out-of-bounds', `requested "${param}" (${val}) is below loop bound min (${bound.min})`);
+    }
+    if (bound.max !== undefined && val > bound.max) {
+      throw new CollaborationError('param-out-of-bounds', `requested "${param}" (${val}) is above loop bound max (${bound.max})`);
+    }
+  }
+}
+
+function checkersProvenanceOf(plan) {
+  const provenance = Object.create(null);
+  for (const p of plan) {
+    const by = (test) => p.contributions.find(test);
+    provenance[p.seat] = by((c) => c.startsWith('pattern-invariant:')) ?? by((c) => c.startsWith('capability:'))
+      ?? by((c) => c === 'code:default-red-team') ?? by((c) => c.startsWith('rigor:'))
+      ?? p.contributions[p.contributions.length - 1] ?? 'request';
+  }
+  return provenance;
+}
+
 /**
  * Resolves collaboration parameters, seats, launch bounds, and pin for a unit run.
  */
@@ -77,505 +305,116 @@ export function resolveCollaboration(options = {}) {
   } = options;
 
   // A runner config without a patterns section declares no patterns of its own; it must never be read as the map itself.
-  const effectivePatterns = runnerConfig?.runner?.patterns ?? runnerConfig?.patterns ?? {};
-  const shippedPatterns = shipped?.patterns;
   const { entries } = checkCatalog({
-    shipped: shippedPatterns,
-    effective: effectivePatterns,
+    shipped: shipped?.patterns,
+    effective: runnerConfig?.runner?.patterns ?? runnerConfig?.patterns ?? {},
     origins,
     throwOnError: true,
   });
 
-  const callerObjPattern = typeof selectors?.callerObject === 'string'
-    ? selectors.callerObject
-    : (selectors?.callerObject?.pattern && typeof selectors.callerObject.pattern === 'string' ? selectors.callerObject.pattern : null);
-  const unitPattern = typeof unit?.pattern === 'string' && unit.pattern
-    ? unit.pattern
-    : (unit?.pattern?.pattern && typeof unit.pattern.pattern === 'string' ? unit.pattern.pattern : null);
-  if (unit?.params !== undefined && (typeof unit.params !== 'object' || unit.params === null || Array.isArray(unit.params))) {
-    throw new CollaborationError('param-invalid', 'unit params must be an object');
-  }
-  if (typeof unit?.pattern === 'object' && unit?.pattern !== null && unit?.pattern?.params !== undefined) {
-    if (typeof unit.pattern.params !== 'object' || unit.pattern.params === null || Array.isArray(unit.pattern.params)) {
-      throw new CollaborationError('param-invalid', 'unit pattern params must be an object');
-    }
-  }
-  const unitDeclaredParams = Object.create(null);
-  if (typeof unit?.pattern === 'object' && unit?.pattern !== null && typeof unit.pattern.params === 'object' && unit.pattern.params !== null && !Array.isArray(unit.pattern.params)) {
-    for (const [k, v] of Object.entries(unit.pattern.params)) {
-      unitDeclaredParams[k] = v;
-    }
-  }
-  if (unit && typeof unit === 'object') {
-    if (unit.seats !== undefined) {
-      unitDeclaredParams.seats = unit.seats;
-    }
-    if (unit.roleTasks !== undefined) {
-      unitDeclaredParams.roleTasks = unit.roleTasks;
-    }
-  }
-  if (unit?.params && typeof unit.params === 'object' && !Array.isArray(unit.params)) {
-    for (const [k, v] of Object.entries(unit.params)) {
-      unitDeclaredParams[k] = v;
-    }
-  }
-  const callerStrPattern = typeof selectors?.callerString === 'string' && selectors.callerString ? selectors.callerString : null;
-  const activityPattern = typeof selectors?.activityUnit?.pattern === 'string' && selectors.activityUnit.pattern ? selectors.activityUnit.pattern : null;
+  requirePlainObject(unit?.params, 'unit params must be an object');
+  const unitPatternObject = isPlainObject(unit?.pattern) ? unit.pattern : null;
+  requirePlainObject(unitPatternObject?.params, 'unit pattern params must be an object');
+  const unitDeclared = Object.assign(Object.create(null), unitPatternObject?.params, unit && typeof unit === 'object' ? loosePartsOf(unit) : null, unit?.params);
 
-  const explicit = [];
-  if (callerObjPattern) explicit.push({ name: callerObjPattern, source: 'caller-object', selector: selectors.callerObject });
-  if (unitPattern) explicit.push({ name: unitPattern, source: 'unit', selector: unit?.pattern ?? unitPattern });
-  if (callerStrPattern) explicit.push({ name: callerStrPattern, source: 'caller-string', selector: callerStrPattern });
-
-  if (explicit.length >= 2) {
-    const firstName = explicit[0].name;
-    for (let i = 1; i < explicit.length; i++) {
-      if (explicit[i].name !== firstName) {
-        throw new CollaborationError('selector-conflict', `conflicting explicit selectors: "${firstName}" (${explicit[0].source}) vs "${explicit[i].name}" (${explicit[i].source})`);
-      }
-    }
-  }
-
-  let baseline;
-  if (explicit.length > 0) {
-    baseline = explicit[0];
-  } else if (inCase && activityPattern) {
-    baseline = { name: activityPattern, source: 'activity', selector: selectors.activityUnit?.pattern ?? selectors.activityUnit };
-  } else {
-    baseline = { name: 'solo', source: 'solo', selector: 'solo' };
-  }
-
-  const isSwap = Boolean(inCase && activityPattern && explicit.length > 0 && explicit[0].name !== activityPattern);
-  const selectedName = explicit.length > 0 ? explicit[0].name : baseline.name;
-
-  if (isSwap) {
-    baseline = { name: activityPattern, source: 'activity', selector: selectors.activityUnit?.pattern ?? selectors.activityUnit };
-    if (!reason || typeof reason !== 'string' || !reason.trim()) {
-      throw new CollaborationError('request-reason-required', `an explicit pattern swap from "${activityPattern}" to "${selectedName}" in a case requires a reason`);
-    }
-  }
-
-  if (!Object.hasOwn(entries, selectedName)) {
-    throw new CollaborationError('unknown-pattern', `pattern "${selectedName}" is not in the catalog`);
-  }
-  const entry = entries[selectedName];
+  const { baseline, selectedName, isSwap, activityPattern } = selectPattern({ unit, selectors, inCase, reason });
+  const entry = entryNamed(entries, selectedName, 'pattern');
   const loop = entry.loop;
   const paramTable = paramTableOf(loop);
-  if (!paramTable) {
-    throw new CollaborationError('unknown-pattern', `loop "${loop}" for pattern "${selectedName}" is not supported`);
-  }
+  if (!paramTable) throw new CollaborationError('unknown-pattern', `loop "${loop}" for pattern "${selectedName}" is not supported`);
 
   let activityEntry = null;
   if (isSwap) {
-    if (!Object.hasOwn(entries, activityPattern)) {
-      throw new CollaborationError('unknown-pattern', `activity pattern "${activityPattern}" is not in the catalog`);
-    }
-    activityEntry = entries[activityPattern];
-    if (activityEntry.invariants) {
-      for (const invParam of Object.keys(activityEntry.invariants)) {
-        if (!Object.hasOwn(paramTable, invParam)) {
-          throw new CollaborationError('pattern-invariant-weakened', `loop "${loop}" does not read invariant parameter "${invParam}" of activity pattern "${activityPattern}"`);
-        }
+    activityEntry = entryNamed(entries, activityPattern, 'activity pattern');
+    for (const invParam of Object.keys(activityEntry.invariants ?? {})) {
+      if (!Object.hasOwn(paramTable, invParam)) {
+        throw new CollaborationError('pattern-invariant-weakened', `loop "${loop}" does not read invariant parameter "${invParam}" of activity pattern "${activityPattern}"`);
       }
     }
   }
 
-  const parsedScalars = Object.create(null);
-  const seenScalarKeys = new Set();
-
-  if (request !== null && request !== undefined && (typeof request !== 'object' || Array.isArray(request))) {
-    throw new CollaborationError('param-invalid', 'request must be an object');
-  }
-
-  if (request?.scalars !== undefined) {
-    if (typeof request.scalars !== 'object' || request.scalars === null) {
-      throw new CollaborationError('param-invalid', 'request scalars must be an array or object');
-    }
-    const scalarEntries = [];
-    if (Array.isArray(request.scalars)) {
-      for (const item of request.scalars) {
-        if (typeof item === 'string') {
-          const eq = item.indexOf('=');
-          if (eq < 0) throw new CollaborationError('param-invalid', `scalar parameter "${item}" missing "=" delimiter`);
-          scalarEntries.push([item.slice(0, eq), item.slice(eq + 1)]);
-        } else if (item && typeof item === 'object') {
-          if (Array.isArray(item)) {
-            if (item.length === 0 || item.length > 2) {
-              throw new CollaborationError('param-invalid', 'scalar array entry must be [key, value]');
-            }
-            scalarEntries.push([item[0], item[1]]);
-          } else if (item.key !== undefined) {
-            scalarEntries.push([item.key, item.value]);
-          } else {
-            const entries = Object.entries(item);
-            if (entries.length === 0) {
-              throw new CollaborationError('param-invalid', 'scalar object entry cannot be empty');
-            }
-            for (const [k, v] of entries) scalarEntries.push([k, v]);
-          }
-        } else {
-          throw new CollaborationError('param-invalid', 'scalar item must be a string or object');
-        }
-      }
-    } else {
-      for (const [k, v] of Object.entries(request.scalars)) scalarEntries.push([k, v]);
-    }
-
-    for (const [rawKey, rawVal] of scalarEntries) {
-      if (typeof rawKey !== 'string' || !rawKey) {
-        throw new CollaborationError('param-invalid', 'scalar parameter key must be a non-empty string');
-      }
-      const key = rawKey;
-      if (seenScalarKeys.has(key)) throw new CollaborationError('param-request-conflict', `scalar parameter "${key}" was specified more than once`);
-      seenScalarKeys.add(key);
-
-      if (request?.params && typeof request.params === 'object' && Object.hasOwn(request.params, key)) {
-        throw new CollaborationError('param-request-conflict', `parameter "${key}" was specified in both params and scalars`);
-      }
-      if (!Object.hasOwn(paramTable, key)) {
-        throw new CollaborationError('param-unknown', `unknown parameter "${key}" for loop "${loop}"`);
-      }
-      const paramDef = paramTable[key];
-      if (!paramDef.scalar) {
-        throw new CollaborationError('param-invalid', `parameter "${key}" is not a scalar parameter`);
-      }
-      if (rawVal === undefined || rawVal === null || rawVal === '') {
-        throw new CollaborationError('param-invalid', `scalar parameter "${key}" requires a non-empty value`);
-      }
-      if (typeof rawVal === 'object' || typeof rawVal === 'symbol' || typeof rawVal === 'function') {
-        throw new CollaborationError('param-invalid', `scalar parameter "${key}" value must be a scalar, got ${Array.isArray(rawVal) ? 'array' : typeof rawVal}`);
-      }
-
-      if (paramDef.type === 'integer') {
-        if (typeof rawVal === 'boolean') {
-          throw new CollaborationError('param-invalid', `invalid integer scalar "${rawVal}" for parameter "${key}"`);
-        }
-        if (typeof rawVal === 'number') {
-          if (!Number.isInteger(rawVal) || rawVal < 1) {
-            throw new CollaborationError('param-invalid', `parameter "${key}" must be an integer >= 1, got ${rawVal}`);
-          }
-          parsedScalars[key] = rawVal;
-        } else {
-          const strVal = String(rawVal);
-          if (!/^-?[0-9]+$/.test(strVal)) throw new CollaborationError('param-invalid', `invalid integer scalar "${strVal}" for parameter "${key}"`);
-          const num = Number(strVal);
-          if (!Number.isInteger(num)) throw new CollaborationError('param-invalid', `invalid integer scalar "${strVal}" for parameter "${key}"`);
-          if (num < 1) throw new CollaborationError('param-invalid', `parameter "${key}" must be an integer >= 1, got ${num}`);
-          parsedScalars[key] = num;
-        }
-      } else if (paramDef.type === 'boolean') {
-        if (typeof rawVal === 'boolean') {
-          parsedScalars[key] = rawVal;
-        } else if (typeof rawVal === 'string') {
-          if (rawVal !== 'true' && rawVal !== 'false') {
-            throw new CollaborationError('param-invalid', `invalid boolean scalar "${rawVal}" for parameter "${key}"; must be "true" or "false"`);
-          }
-          parsedScalars[key] = (rawVal === 'true');
-        } else {
-          throw new CollaborationError('param-invalid', `invalid boolean scalar "${rawVal}" for parameter "${key}"; must be "true" or "false"`);
-        }
-      } else {
-        if (typeof rawVal === 'boolean') {
-          throw new CollaborationError('param-invalid', `parameter "${key}" expects a string literal, got boolean`);
-        }
-        parsedScalars[key] = String(rawVal);
-      }
-    }
-  }
-
-  const normalizedRequestParams = Object.create(null);
-  if (request?.params !== undefined) {
-    if (typeof request.params !== 'object' || request.params === null || Array.isArray(request.params)) {
-      throw new CollaborationError('param-invalid', 'request params must be an object');
-    }
-    for (const [key, val] of Object.entries(request.params)) {
-      if (key === 'roleTasks') throw new CollaborationError('param-not-requestable', 'roleTasks cannot be requested');
-      if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" for loop "${loop}"`);
-      checkCarrierDomainValue(key, val, loop, 'request');
-      normalizedRequestParams[key] = deepClone(val);
-    }
-  }
-
-  for (const [key, val] of Object.entries(parsedScalars)) {
-    normalizedRequestParams[key] = val;
-  }
-
-  const hasRequestParams = Object.keys(normalizedRequestParams).length > 0;
-  if (inCase && hasRequestParams && (!reason || typeof reason !== 'string' || !reason.trim())) {
+  const requestParams = normalizeRequest(request, paramTable, loop);
+  const hasRequestParams = Object.keys(requestParams).length > 0;
+  if (inCase && hasRequestParams && !hasReason(reason)) {
     throw new CollaborationError('request-reason-required', 'a request in a case requires a reason');
   }
 
-  if (selectors?.callerObject && typeof selectors.callerObject === 'object') {
-    const callerParams = selectors.callerObject.params;
-    if (callerParams !== undefined) {
-      if (typeof callerParams !== 'object' || callerParams === null || Array.isArray(callerParams)) {
-        throw new CollaborationError('param-invalid', 'caller object params must be an object');
-      }
-      for (const [key, val] of Object.entries(callerParams)) {
-        if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" in caller object for loop "${loop}"`);
-        checkCarrierDomainValue(key, val, loop, 'caller object');
-      }
-    }
-  }
+  const callerParams = selectors?.callerObject && typeof selectors.callerObject === 'object' ? selectors.callerObject.params : undefined;
+  requirePlainObject(callerParams, 'caller object params must be an object');
+  checkCarrierParams(callerParams ?? {}, paramTable, loop, 'caller object');
+  checkCarrierParams(unitPatternObject?.params ?? {}, paramTable, loop, 'unit pattern');
+  checkCarrierParams(unit?.params ?? {}, paramTable, loop, 'unit');
+  checkCarrierParams(unit && typeof unit === 'object' ? loosePartsOf(unit) : {}, paramTable, loop, 'unit');
+  const activityDeclared = activityDeclaredParamsOf(selectors?.activityUnit, entries);
 
-  if (typeof unit?.pattern === 'object' && unit?.pattern !== null && unit.pattern.params !== undefined && typeof unit.pattern.params === 'object' && unit.pattern.params !== null && !Array.isArray(unit.pattern.params)) {
-    for (const [key, val] of Object.entries(unit.pattern.params)) {
-      if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" in unit pattern for loop "${loop}"`);
-      checkCarrierDomainValue(key, val, loop, 'unit pattern');
-    }
-  }
-
-  if (unit?.params !== undefined && typeof unit.params === 'object' && unit.params !== null && !Array.isArray(unit.params)) {
-    for (const [key, val] of Object.entries(unit.params)) {
-      if (!Object.hasOwn(paramTable, key)) throw new CollaborationError('param-unknown', `unknown parameter "${key}" in unit for loop "${loop}"`);
-      checkCarrierDomainValue(key, val, loop, 'unit');
-    }
-  }
-
-  if (unit && typeof unit === 'object') {
-    if (unit.seats !== undefined) {
-      if (!Object.hasOwn(paramTable, 'seats')) throw new CollaborationError('param-unknown', `unknown parameter "seats" in unit for loop "${loop}"`);
-      checkCarrierDomainValue('seats', unit.seats, loop, 'unit');
-    }
-    if (unit.roleTasks !== undefined) {
-      if (!Object.hasOwn(paramTable, 'roleTasks')) throw new CollaborationError('param-unknown', `unknown parameter "roleTasks" in unit for loop "${loop}"`);
-      checkCarrierDomainValue('roleTasks', unit.roleTasks, loop, 'unit');
-    }
-  }
-
-  const actDeclaredParams = Object.create(null);
-  if (selectors?.activityUnit && typeof selectors.activityUnit === 'object') {
-    const actParams = selectors.activityUnit.params;
-    if (actParams !== undefined) {
-      if (typeof actParams !== 'object' || actParams === null || Array.isArray(actParams)) {
-        throw new CollaborationError('param-invalid', 'activity unit params must be an object');
-      }
-      for (const [k, v] of Object.entries(actParams)) {
-        actDeclaredParams[k] = v;
-      }
-    }
-    if (selectors.activityUnit.seats !== undefined && !Object.hasOwn(actDeclaredParams, 'seats')) {
-      actDeclaredParams.seats = selectors.activityUnit.seats;
-    }
-    if (selectors.activityUnit.roleTasks !== undefined && !Object.hasOwn(actDeclaredParams, 'roleTasks')) {
-      actDeclaredParams.roleTasks = selectors.activityUnit.roleTasks;
-    }
-
-    const actPattern = typeof selectors.activityUnit.pattern === 'string' && selectors.activityUnit.pattern
-      ? selectors.activityUnit.pattern
-      : null;
-    let actLoop = 'solo';
-    let actTable = paramTableOf('solo');
-    if (actPattern) {
-      if (!Object.hasOwn(entries, actPattern)) {
-        throw new CollaborationError('unknown-pattern', `activity pattern "${actPattern}" is not in the catalog`);
-      }
-      actLoop = entries[actPattern].loop;
-      actTable = paramTableOf(actLoop);
-    }
-    for (const [key, val] of Object.entries(actDeclaredParams)) {
-      if (!actTable || !Object.hasOwn(actTable, key)) {
-        throw new CollaborationError('param-unknown', `unknown parameter "${key}" in activity unit for loop "${actLoop}"`);
-      }
-      checkCarrierDomainValue(key, val, actLoop, 'activity unit');
-    }
-  }
-
-  const effectiveParams = Object.create(null);
-  const provenanceParams = Object.create(null);
   const loopConfig = runnerConfig?.loops?.[loop] ?? runnerConfig?.runner?.loops?.[loop] ?? {};
-
-  for (const param of Object.keys(paramTable)) {
-    let winningVal;
-    let winningSlot;
-
-    if (Object.hasOwn(normalizedRequestParams, param)) {
-      winningVal = normalizedRequestParams[param];
-      winningSlot = 'request';
-    } else if (selectors?.callerObject?.params && Object.hasOwn(selectors.callerObject.params, param)) {
-      winningVal = deepClone(selectors.callerObject.params[param]);
-      winningSlot = 'selector';
-    } else if (param === 'seats' && Object.hasOwn(unitDeclaredParams, 'seats')) {
-      winningVal = deepClone(unitDeclaredParams.seats);
-      winningSlot = 'unit';
-    } else if (baseline.source === 'activity' && !isSwap && Object.hasOwn(actDeclaredParams, param)) {
-      winningVal = deepClone(actDeclaredParams[param]);
-      winningSlot = 'activity';
-    } else if (Object.hasOwn(unitDeclaredParams, param)) {
-      winningVal = deepClone(unitDeclaredParams[param]);
-      winningSlot = 'unit';
-    } else if (entry.defaults && Object.hasOwn(entry.defaults, param)) {
-      winningVal = deepClone(entry.defaults[param]);
-      winningSlot = 'pattern-default';
-    } else if (loopConfig && Object.hasOwn(loopConfig, param)) {
-      winningVal = deepClone(loopConfig[param]);
-      winningSlot = 'config';
-    } else if (loop === 'reviewed' && param === 'maxRounds') {
-      winningVal = DEFAULT_MAX_ROUNDS;
-      winningSlot = 'builtin';
-    } else if (loop === 'debate' && param === 'rebuttal') {
-      winningVal = DEFAULT_REBUTTAL;
-      winningSlot = 'builtin';
-    }
-
-    if (winningSlot !== undefined) {
-      effectiveParams[param] = winningVal;
-      provenanceParams[param] = winningSlot;
-    }
-  }
+  const { effective: effectiveParams, provenance: provenanceParams } = layerParams({
+    paramTable, loop, entry, loopConfig, requestParams, selectors, unitDeclared, activityDeclared,
+    activityBaseline: baseline.source === 'activity' && !isSwap,
+  });
 
   const floorCheckers = [];
-  const floorCheckerNames = new Set();
-
-  if (entry.invariants?.minCheckers?.atLeast) {
-    for (const c of entry.invariants.minCheckers.atLeast) {
-      floorCheckers.push({ name: c, source: `pattern-invariant:${selectedName}` });
-      floorCheckerNames.add(c);
-    }
-  }
-  if (isSwap && activityEntry?.invariants?.minCheckers?.atLeast) {
-    for (const c of activityEntry.invariants.minCheckers.atLeast) {
-      floorCheckers.push({ name: c, source: `pattern-invariant:${activityPattern}` });
-      floorCheckerNames.add(c);
-    }
-  }
-
-  if (floorCheckerNames.size > 0 && Object.hasOwn(paramTable, 'minCheckers')) {
+  const addFloors = (e, name) => {
+    for (const c of e?.invariants?.minCheckers?.atLeast ?? []) floorCheckers.push({ name: c, source: `pattern-invariant:${name}` });
+  };
+  addFloors(entry, selectedName);
+  if (isSwap) addFloors(activityEntry, activityPattern);
+  if (floorCheckers.length > 0 && Object.hasOwn(paramTable, 'minCheckers')) {
     const list = Array.isArray(effectiveParams.minCheckers) ? [...effectiveParams.minCheckers] : [];
-    for (const c of floorCheckerNames) {
-      if (!list.includes(c)) list.push(c);
+    for (const { name } of floorCheckers) {
+      if (!list.includes(name)) list.push(name);
     }
     effectiveParams.minCheckers = list;
-    if (provenanceParams.minCheckers === undefined) provenanceParams.minCheckers = 'pattern-invariant';
+    provenanceParams.minCheckers ??= 'pattern-invariant';
   }
 
-  if (entry.invariants) {
-    for (const [param, inv] of Object.entries(entry.invariants)) {
-      if (inv.fixed !== undefined) {
-        if (effectiveParams[param] !== undefined && !deepEqual(effectiveParams[param], inv.fixed)) {
-          if (provenanceParams[param] === 'request' || provenanceParams[param] === 'selector' || provenanceParams[param] === 'unit' || provenanceParams[param] === 'activity') {
-            throw new CollaborationError('pattern-invariant-weakened', `parameter "${param}" violates fixed invariant on pattern "${selectedName}"`);
-          }
-        }
-        effectiveParams[param] = deepClone(inv.fixed);
-        provenanceParams[param] = 'pattern-invariant';
-      }
-    }
-  }
-  if (isSwap && activityEntry?.invariants) {
-    for (const [param, inv] of Object.entries(activityEntry.invariants)) {
-      if (inv.fixed !== undefined) {
-        if (effectiveParams[param] !== undefined && !deepEqual(effectiveParams[param], inv.fixed)) {
-          throw new CollaborationError('pattern-invariant-weakened', `parameter "${param}" violates fixed invariant on activity pattern "${activityPattern}"`);
-        }
-        effectiveParams[param] = deepClone(inv.fixed);
-        provenanceParams[param] = 'pattern-invariant';
-      }
-    }
-  }
+  applyFixedInvariants(entry.invariants, effectiveParams, provenanceParams, `pattern "${selectedName}"`, ['request', 'selector', 'unit', 'activity']);
+  if (isSwap) applyFixedInvariants(activityEntry.invariants, effectiveParams, provenanceParams, `activity pattern "${activityPattern}"`, null);
+  checkRequestedBounds(loopConfig?.bounds, effectiveParams, provenanceParams);
 
-  const bounds = loopConfig?.bounds;
-  if (bounds && typeof bounds === 'object') {
-    for (const [param, bound] of Object.entries(bounds)) {
-      if (provenanceParams[param] === 'request' && effectiveParams[param] !== undefined) {
-        const val = effectiveParams[param];
-        if (typeof val === 'number' && bound && typeof bound === 'object') {
-          if (bound.min !== undefined && val < bound.min) {
-            throw new CollaborationError('param-out-of-bounds', `requested "${param}" (${val}) is below loop bound min (${bound.min})`);
-          }
-          if (bound.max !== undefined && val > bound.max) {
-            throw new CollaborationError('param-out-of-bounds', `requested "${param}" (${val}) is above loop bound max (${bound.max})`);
-          }
-        }
-      }
-    }
-  }
-
-  const shippedCheckersByRigor = shipped?.loops?.reviewed?.checkersByRigor;
-  const floors = floorCheckers.length > 0 ? { minCheckers: floorCheckers } : undefined;
-  const seats = resolveSeats({
+  const seatInput = {
     loop,
     params: effectiveParams,
-    floors,
+    floors: floorCheckers.length > 0 ? { minCheckers: floorCheckers } : undefined,
     unit,
     runnerConfig,
     slot: provenanceParams.minCheckers,
-    shippedCheckersByRigor,
-  });
-
-  const launchBound = seatLaunchesOf({
-    loop,
-    params: effectiveParams,
-    floors,
-    unit,
-    runnerConfig,
-    slot: provenanceParams.minCheckers,
-    shippedCheckersByRigor,
-  });
+    shippedCheckersByRigor: shipped?.loops?.reviewed?.checkersByRigor,
+  };
+  const seats = resolveSeats(seatInput);
+  const launchBound = seatLaunchesOf(seatInput);
 
   const postures = Object.create(null);
   for (const s of seats) {
     if (s.seat && s.posture) postures[s.seat] = s.posture;
   }
-
-  const checkersProvenance = Object.create(null);
-  if (loop === 'reviewed') {
-    const plan = checkerPlanOf(unit, runnerConfig, {
+  const checkersProvenance = loop === 'reviewed'
+    ? checkersProvenanceOf(checkerPlanOf(unit, runnerConfig, {
       requested: effectiveParams.minCheckers,
-      floors,
+      floors: seatInput.floors,
       slot: provenanceParams.minCheckers,
-      shippedCheckersByRigor,
-    });
-    for (const p of plan) {
-      const inv = p.contributions.find((c) => c.startsWith('pattern-invariant:'));
-      const cap = p.contributions.find((c) => c.startsWith('capability:'));
-      const def = p.contributions.find((c) => c === 'code:default-red-team');
-      const rig = p.contributions.find((c) => c.startsWith('rigor:'));
-      checkersProvenance[p.seat] = inv ?? cap ?? def ?? rig ?? p.contributions[p.contributions.length - 1] ?? 'request';
-    }
-  }
-  let layerName = null;
-  if (origins) layerName = resolveLayer(origins, selectedName);
+      shippedCheckersByRigor: seatInput.shippedCheckersByRigor,
+    }))
+    : Object.create(null);
+
+  let layerName = origins ? resolveLayer(origins, selectedName) : null;
   if (!layerName) {
     const shippedEntry = shipped?.patterns?.[selectedName];
     layerName = (shippedEntry && deepEqual(entry, shippedEntry)) ? 'shipped' : 'project';
   }
+  const roleTasks = effectiveParams.roleTasks ?? entry.defaults?.roleTasks ?? {};
   const hasRequest = Boolean(isSwap || hasRequestParams);
   const pin = {
     requested: hasRequest ? {
       pattern: isSwap ? selectedName : null,
-      params: normalizedRequestParams,
+      params: requestParams,
       reason: reason ? String(reason).trim() : null,
     } : null,
-    baseline: {
-      source: baseline.source,
-      selector: baseline.selector,
-    },
-    pattern: {
-      name: selectedName,
-      layer: layerName,
-    },
-    effective: {
-      loop,
-      params: effectiveParams,
-      seats,
-      postures,
-      roleTasks: effectiveParams.roleTasks ?? entry.defaults?.roleTasks ?? {},
-      launchBound,
-    },
-    provenance: {
-      params: provenanceParams,
-      checkers: checkersProvenance,
-    },
+    baseline: { source: baseline.source, selector: baseline.selector },
+    pattern: { name: selectedName, layer: layerName },
+    effective: { loop, params: effectiveParams, seats, postures, roleTasks, launchBound },
+    provenance: { params: provenanceParams, checkers: checkersProvenance },
   };
 
-  return {
-    loop,
-    params: effectiveParams,
-    seats,
-    roleTasks: effectiveParams.roleTasks ?? entry.defaults?.roleTasks ?? {},
-    launchBound,
-    entry,
-    pin,
-  };
+  return { loop, params: effectiveParams, seats, roleTasks, launchBound, entry, pin };
 }

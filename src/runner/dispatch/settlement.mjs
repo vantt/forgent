@@ -542,9 +542,119 @@ export function settleRefusedLease({ refusal, provider, runDir, runId, repoRoot,
   });
 }
 
+/** Reads the agent's result claim and report from the run directory; a claim that fails validation is recorded as invalid. */
+function readWorkerArtifacts({ runDir, root, givenResultPath, assignment }) {
+  const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
+  // The supervised caller hands over the file its receipt named (null: the receipt names none); a caller that
+  // passes nothing still has settlement look for one.
+  const agentResultPath = givenResultPath === undefined
+    ? resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json')
+    : givenResultPath;
+  const sha256 = (bytes) => crypto.createHash('sha256').update(bytes).digest('hex');
+  const resultExists = Boolean(agentResultPath) && fs.existsSync(agentResultPath);
+
+  let agentClaim = null;
+  let claimInvalid = false;
+  let claimSha256 = null;
+  if (resultExists) {
+    try {
+      const claimBytes = readAgentFileSync(agentResultPath, MAX_AGENT_FILE_BYTES);
+      const parsed = JSON.parse(claimBytes.toString('utf8'));
+      const validation = validateAgentResultClaim(parsed, { role: assignment?.role, posture: assignment?.posture, operation: assignment?.operation });
+      if (validation.valid) {
+        agentClaim = parsed;
+        claimSha256 = sha256(claimBytes);
+      } else {
+        claimInvalid = true;
+      }
+    } catch {
+      claimInvalid = true;
+    }
+  }
+
+  const workerArtifacts = [];
+  const settleReports = [];
+  if (fs.existsSync(agentReportPath)) {
+    let reportSha256 = null;
+    try {
+      const reportBytes = readAgentFileSync(agentReportPath, MAX_AGENT_FILE_BYTES);
+      if (isSubstantiveReportText(reportBytes.toString('utf8'))) reportSha256 = sha256(reportBytes);
+    } catch { /* an unreadable report is an invalid one */ }
+    const reportRel = path.relative(root, agentReportPath);
+    workerArtifacts.push({ path: reportRel, kind: 'agent-report', valid: reportSha256 !== null });
+    if (reportSha256) settleReports.push({ path: reportRel, sha256: reportSha256 });
+  }
+  if (resultExists) {
+    workerArtifacts.push({ path: path.relative(root, agentResultPath), kind: 'agent-result', valid: !claimInvalid });
+  }
+  const workerArtifactPaths = workerArtifacts.filter((a) => a.valid).map((a) => a.path);
+  return { agentClaim, claimInvalid, claimSha256, workerArtifacts, settleReports, workerArtifactPaths };
+}
+
 /**
- * Unified settlement pipeline for successful or evaluated Run outcomes.
+ * Classifies a provider stop on the selected account, quarantines the account when the verdict says so, and
+ * records the reason on the run's capacity selection file. Returns the fault the evidence carries, or null.
  */
+function recordProviderCapacityFault({ selection, evidence, runDir, runMeta, assignment, stderrText, adapterOutcome, stopCause, capacityEvidenceText, agentClaim, runtimeDir }) {
+  const fault = classifyProviderCapacityFault({
+    provider: selection.provider,
+    stderr: stderrText,
+    adapterOutcome,
+    stopCause,
+    capacityEvidenceText,
+    structuredAgent: agentClaim,
+  });
+  if (!fault?.action || fault.action === 'none') return null;
+  const recorded = {
+    provider: selection.provider,
+    accountId: selection.accountId,
+    action: fault.action,
+    reasonCode: fault.reasonCode,
+    quarantineKind: fault.quarantineKind,
+  };
+  if (fault.action === 'quarantine') {
+    recorded.quarantine = quarantineProviderAccount({
+      provider: selection.provider,
+      accountId: selection.accountId,
+      reasonCode: fault.reasonCode,
+      quarantineKind: fault.quarantineKind,
+      until: fault.until,
+      runtimeDir,
+      detail: { kind: 'provider-stderr-classifier', runId: runMeta?.runId, assignmentId: assignment?.assignmentId },
+    });
+  }
+  if (evidence) {
+    const updated = {
+      ...evidence,
+      reasonCodes: [...new Set([...(evidence.reasonCodes || []), fault.reasonCode].filter(Boolean))],
+      ...(recorded.quarantine ? { quarantine: recorded.quarantine } : {}),
+    };
+    const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
+    try {
+      fs.writeFileSync(selectionPath, `${JSON.stringify(updated, null, 2)}\n`);
+      fsyncFileBestEffort(selectionPath);
+    } catch {}
+  }
+  return recorded;
+}
+
+/**
+ * The scope the assignment declared (a unit's writes): a change inside it is covered, one outside it warns.
+ * Coverage says "inside the declared scope", never "written by this run". A read-only seat in a writing unit
+ * carries the unit's writes too, but none of them are its own. A writing seat whose task is to edit the
+ * conflicted files of a merge the runner left open (`assignment.syncConflicts`) changes only files already
+ * dirty at launch, which `changedFiles` never counts: those conflicted files, inside its scope and changed
+ * during the turn, are its evidence. Any other dirt a seat rewrites still is not.
+ */
+function declaredScopeOf({ assignment, isReadOnly, settlementCwd, dirtyBeforeSnapshots }) {
+  const declaredWrites = !isReadOnly && Array.isArray(assignment?.writes) && assignment.writes.length > 0 ? assignment.writes : null;
+  const syncConflicts = declaredWrites && Array.isArray(assignment?.syncConflicts) ? new Set(assignment.syncConflicts) : null;
+  const editedSyncConflicts = syncConflicts && dirtyBeforeSnapshots
+    ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots).filter((p) => syncConflicts.has(p) && matchesWriteScope(p, declaredWrites))
+    : [];
+  return { declaredWrites, declaredCoverage: declaredWrites ? { paths: declaredWrites } : null, editedSyncConflicts };
+}
+
 /**
  * The policy a receipt records, plus what the launch itself did with it: the effort level as
  * the provider CLI's own flag (`provenance.reasoningEffort.rendered`) and every place the model
@@ -563,6 +673,9 @@ function withLaunchProvenance(policy, { reasoningEffort, modelWarnings = [] } = 
   return { ...policy, provenance };
 }
 
+/**
+ * Unified settlement pipeline for successful or evaluated Run outcomes.
+ */
 export async function settleRunOutcome({
   runDir,
   runMeta,
@@ -615,85 +728,20 @@ export async function settleRunOutcome({
   fs.writeFileSync(path.join(runDir, 'stdout.log'), stdoutText || '');
   fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText || (executionError ? executionError.message : ''));
 
-  const exitInfoData = {
-    exitCode,
-    signal,
-    timedOut: Boolean(isTimeout),
-    settledAt,
-    durationMs: typeof durationMs === 'number' ? durationMs : null,
-  };
+  const durationOrNull = typeof durationMs === 'number' ? durationMs : null;
+  const exitInfoData = { exitCode, signal, timedOut: Boolean(isTimeout), settledAt, durationMs: durationOrNull };
   fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
 
-  const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
-  // The supervised caller hands over the file its receipt named (null: the receipt names none); a caller that
-  // passes nothing still has settlement look for one.
-  const agentResultPath = givenResultPath === undefined
-    ? resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json')
-    : givenResultPath;
-
-  let agentClaim = null;
-  let claimInvalid = false;
-  let claimSha256 = null;
-
-  if (agentResultPath && fs.existsSync(agentResultPath)) {
-    try {
-      const claimBytes = readAgentFileSync(agentResultPath, MAX_AGENT_FILE_BYTES);
-      const parsed = JSON.parse(claimBytes.toString('utf8'));
-      const validation = validateAgentResultClaim(parsed, { role: assignment?.role, posture: assignment?.posture, operation: assignment?.operation });
-      if (validation.valid) {
-        agentClaim = parsed;
-        claimSha256 = crypto.createHash('sha256').update(claimBytes).digest('hex');
-      } else {
-        claimInvalid = true;
-      }
-    } catch {
-      claimInvalid = true;
-    }
-  }
-
-  const workerArtifacts = [];
-  const settleReports = [];
-  if (fs.existsSync(agentReportPath)) {
-    let reportValid = false;
-    let reportSha256 = null;
-    try {
-      const reportBytes = readAgentFileSync(agentReportPath, MAX_AGENT_FILE_BYTES);
-      reportValid = isSubstantiveReportText(reportBytes.toString('utf8'));
-      if (reportValid) {
-        reportSha256 = crypto.createHash('sha256').update(reportBytes).digest('hex');
-      }
-    } catch {
-      reportValid = false;
-    }
-    const reportRel = path.relative(root, agentReportPath);
-    workerArtifacts.push({ path: reportRel, kind: 'agent-report', valid: reportValid });
-    if (reportValid && reportSha256) {
-      settleReports.push({ path: reportRel, sha256: reportSha256 });
-    }
-  }
-
-  if (agentResultPath && fs.existsSync(agentResultPath)) {
-    workerArtifacts.push({
-      path: path.relative(root, agentResultPath),
-      kind: 'agent-result',
-      valid: !claimInvalid,
-    });
-  }
-
-  const workerArtifactPaths = workerArtifacts.filter((a) => a.valid).map((a) => a.path);
+  const { agentClaim, claimInvalid, claimSha256, workerArtifacts, settleReports, workerArtifactPaths } = readWorkerArtifacts({
+    runDir, root, givenResultPath, assignment,
+  });
   const isReadOnly = isReadOnlyAssignment(assignment);
 
   const settlementCwd = opts?.cwd || effectiveCwd;
   const resolvedGitAfter = gitAfter ?? safeGitHead(settlementCwd);
   const resolvedDirtyAfter = dirtyAfter ?? safeGitStatusFiles(settlementCwd);
 
-  const { changedFiles, changedFileReasons } = computeChangedFiles(
-    settlementCwd,
-    gitBefore,
-    resolvedGitAfter,
-    dirtyBefore,
-    resolvedDirtyAfter,
-  );
+  const { changedFiles, changedFileReasons } = computeChangedFiles(settlementCwd, gitBefore, resolvedGitAfter, dirtyBefore, resolvedDirtyAfter);
 
   // A disappeared dirty path with unchanged HEAD is lost work, not a producer commit.
   // Settlement owns this observation for supervised producers, including adoption.
@@ -705,72 +753,25 @@ export async function settleRunOutcome({
     process.stderr.write(`fgos: warning: uncommitted path(s) lost across Assignment: ${lostUncommittedPaths.join(', ')}\n`);
   }
 
-  const mutatedDirtyBeforeFiles = isReadOnly && dirtyBeforeSnapshots
-    ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots)
-    : [];
+  const mutatedDirtyBeforeFiles = isReadOnly && dirtyBeforeSnapshots ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots) : [];
 
-  let providerCapacityFault = null;
-  if (providerCapacitySelection?.status === 'selected') {
-    const fault = classifyProviderCapacityFault({
-      provider: providerCapacitySelection.provider,
-      stderr: stderrText,
+  const providerCapacityFault = providerCapacitySelection?.status === 'selected'
+    ? recordProviderCapacityFault({
+      selection: providerCapacitySelection,
+      evidence: providerCapacityEvidence,
+      runDir,
+      runMeta,
+      assignment,
+      stderrText,
       adapterOutcome: adapterOutcome || (exitCode === 0 ? 'success' : 'failed'),
       stopCause: providerStopCause,
       capacityEvidenceText,
-      structuredAgent: agentClaim,
-    });
-    if (fault?.action && fault.action !== 'none') {
-      providerCapacityFault = {
-        provider: providerCapacitySelection.provider,
-        accountId: providerCapacitySelection.accountId,
-        action: fault.action,
-        reasonCode: fault.reasonCode,
-        quarantineKind: fault.quarantineKind,
-      };
-      if (fault.action === 'quarantine') {
-        const quarantine = quarantineProviderAccount({
-          provider: providerCapacitySelection.provider,
-          accountId: providerCapacitySelection.accountId,
-          reasonCode: fault.reasonCode,
-          quarantineKind: fault.quarantineKind,
-          until: fault.until,
-          runtimeDir: opts.providerCapacityRuntimeDir,
-          detail: {
-            kind: 'provider-stderr-classifier',
-            runId: runMeta?.runId,
-            assignmentId: assignment?.assignmentId,
-          },
-        });
-        providerCapacityFault.quarantine = quarantine;
-      }
-      if (providerCapacityEvidence) {
-        providerCapacityEvidence = {
-          ...providerCapacityEvidence,
-          reasonCodes: [...new Set([...(providerCapacityEvidence.reasonCodes || []), fault.reasonCode].filter(Boolean))],
-          ...(providerCapacityFault.quarantine ? { quarantine: providerCapacityFault.quarantine } : {}),
-        };
-        const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
-        try {
-          fs.writeFileSync(selectionPath, `${JSON.stringify(providerCapacityEvidence, null, 2)}\n`);
-          fsyncFileBestEffort(selectionPath);
-        } catch {}
-      }
-    }
-  }
+      agentClaim,
+      runtimeDir: opts.providerCapacityRuntimeDir,
+    })
+    : null;
 
-  // The scope the assignment declared (a unit's writes): a change inside it is covered, one outside
-  // it warns. Coverage says "inside the declared scope", never "written by this run".
-  // A read-only seat in a writing unit carries the unit's writes too, but none of them are its own.
-  const declaredWrites = !isReadOnly && Array.isArray(assignment?.writes) && assignment.writes.length > 0 ? assignment.writes : null;
-  const declaredCoverage = declaredWrites ? { paths: declaredWrites } : null;
-  // A writing seat whose task is to edit the conflicted files of a merge the runner left open for
-  // it (`assignment.syncConflicts`) changes only files already dirty at launch, which
-  // `changedFiles` never counts: those conflicted files, inside its scope and changed during the
-  // turn, are its evidence. Any other dirt a seat rewrites still is not.
-  const syncConflicts = declaredWrites && Array.isArray(assignment?.syncConflicts) ? new Set(assignment.syncConflicts) : null;
-  const editedSyncConflicts = syncConflicts && dirtyBeforeSnapshots
-    ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots).filter((p) => syncConflicts.has(p) && matchesWriteScope(p, declaredWrites))
-    : [];
+  const { declaredWrites, declaredCoverage, editedSyncConflicts } = declaredScopeOf({ assignment, isReadOnly, settlementCwd, dirtyBeforeSnapshots });
   const evidenceData = {
     operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',
     gitBefore,
@@ -788,25 +789,16 @@ export async function settleRunOutcome({
     ...(providerCapacityFault ? { providerCapacity: providerCapacityFault } : {}),
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
-  const stdoutPath = path.join(runDir, 'stdout.log');
-  const stderrPath = path.join(runDir, 'stderr.log');
-  let stdoutContent = null;
-  let stderrContent = null;
-  try { if (fs.existsSync(stdoutPath)) stdoutContent = fs.readFileSync(stdoutPath, 'utf8'); } catch {}
-  try { if (fs.existsSync(stderrPath)) stderrContent = fs.readFileSync(stderrPath, 'utf8'); } catch {}
-
-  const usage = parseUsageForAdapter(resolvedExecutorId || opts.adapter, {
-    stdout: stdoutContent,
-    stderr: stderrContent,
-  });
+  const readLog = (name) => {
+    try { return fs.readFileSync(path.join(runDir, name), 'utf8'); } catch { return null; }
+  };
+  const usage = parseUsageForAdapter(resolvedExecutorId || opts.adapter, { stdout: readLog('stdout.log'), stderr: readLog('stderr.log') });
   // A before/after snapshot of the run's checkout cannot tell the run's writes from
   // another session's (a commit landing on a shared checkout mid-run moves HEAD), so
   // every change it shows is correlated: no attestation is passed, nothing is proven.
   const attributionPolicy = evaluateAttributionPolicy({
     attributions: attributeWorkspaceChanges({ postRunDirt: changedFiles, declaredCoverage }),
-    isReadOnly,
-    writeScope: declaredWrites,
-    mutatedDirtyBeforeFiles,
+    isReadOnly, writeScope: declaredWrites, mutatedDirtyBeforeFiles,
   });
   const evidenceFacts = classifyEvidenceToOutcomeFacts({
     exitCode,
@@ -841,7 +833,7 @@ export async function settleRunOutcome({
     role: assignment?.role ?? null,
     ...(effectivePolicy ? { policy: withLaunchProvenance(effectivePolicy, { reasoningEffort, modelWarnings }), executorRedirected } : {}),
     settledAt,
-    durationMs: typeof durationMs === 'number' ? durationMs : null,
+    durationMs: durationOrNull,
     // The pinned input digests taken at launch; a run settled by recovery reads them from the
     // run.json the admission wrote.
     ...((inputDigests ?? runMeta?.inputDigests)?.length ? { inputDigests: inputDigests ?? runMeta.inputDigests } : {}),

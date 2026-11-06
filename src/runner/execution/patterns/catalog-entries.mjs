@@ -183,81 +183,95 @@ function allowedRoleTaskTargets(loop, entry) {
 }
 
 function checkLoopSeatCardinality(loop, declaredSeats, label) {
+  const refuse = (text) => { throw new SeatResolutionError(`${label}: ${text}`, 'seat-multiplicity'); };
+  const count = (role) => declaredSeats.filter((d) => d.role === role).length;
+  const rejectOtherRoles = (allowed) => {
+    for (const d of declaredSeats) {
+      if (!allowed(d.role)) refuse(`a ${loop} pattern has no use for a seat with role "${d.role}"`);
+    }
+  };
   switch (loop) {
-    case 'solo': {
+    case 'solo':
       if (declaredSeats.length !== 1 || declaredSeats[0].role !== 'producer') {
-        throw new SeatResolutionError(
-          `${label}: a solo pattern declares exactly one seat, with role "producer"`,
-          'seat-multiplicity',
-        );
+        refuse('a solo pattern declares exactly one seat, with role "producer"');
       }
       break;
-    }
     case 'reviewed': {
-      const producers = declaredSeats.filter((d) => d.role === 'producer');
-      if (producers.length !== 1) {
-        throw new SeatResolutionError(
-          `${label}: a reviewed pattern declares exactly one seat with role "producer", has ${producers.length}`,
-          'seat-multiplicity',
-        );
-      }
+      const producers = count('producer');
+      if (producers !== 1) refuse(`a reviewed pattern declares exactly one seat with role "producer", has ${producers}`);
       const checkerRoles = new Set(Object.values(CHECKER_SEATS).map((c) => c.role));
-      for (const d of declaredSeats) {
-        if (d.role !== 'producer' && !checkerRoles.has(d.role)) {
-          throw new SeatResolutionError(
-            `${label}: a reviewed pattern has no use for a seat with role "${d.role}"`,
-            'seat-multiplicity',
-          );
-        }
-      }
+      rejectOtherRoles((role) => role === 'producer' || checkerRoles.has(role));
       break;
     }
     case 'panel': {
-      const producers = declaredSeats.filter((d) => d.role === 'producer');
-      const synths = declaredSeats.filter((d) => d.role === 'synthesizer');
-      if (producers.length < 1) {
-        throw new SeatResolutionError(
-          `${label}: a panel pattern needs at least one seat with role "producer", has ${producers.length}`,
-          'seat-multiplicity',
-        );
-      }
-      if (synths.length !== 1) {
-        throw new SeatResolutionError(
-          `${label}: a panel pattern needs exactly one seat with role "synthesizer", has ${synths.length}`,
-          'seat-multiplicity',
-        );
-      }
-      for (const d of declaredSeats) {
-        if (d.role !== 'producer' && d.role !== 'synthesizer') {
-          throw new SeatResolutionError(
-            `${label}: a panel pattern has no use for a seat with role "${d.role}"`,
-            'seat-multiplicity',
-          );
-        }
-      }
+      const producers = count('producer');
+      const synths = count('synthesizer');
+      if (producers < 1) refuse(`a panel pattern needs at least one seat with role "producer", has ${producers}`);
+      if (synths !== 1) refuse(`a panel pattern needs exactly one seat with role "synthesizer", has ${synths}`);
+      rejectOtherRoles((role) => role === 'producer' || role === 'synthesizer');
       break;
     }
     case 'debate': {
-      const producers = declaredSeats.filter((d) => d.role === 'producer');
-      const judges = declaredSeats.filter((d) => d.role === 'judge');
-      if (producers.length !== 2) {
-        throw new SeatResolutionError(
-          `${label}: a debate pattern needs exactly 2 seats with role "producer", has ${producers.length}`,
-          'seat-multiplicity',
-        );
+      const producers = count('producer');
+      const judges = count('judge');
+      if (producers !== 2) refuse(`a debate pattern needs exactly 2 seats with role "producer", has ${producers}`);
+      if (judges !== 1) refuse(`a debate pattern needs exactly one seat with role "judge", has ${judges}`);
+      rejectOtherRoles((role) => role === 'producer' || role === 'judge');
+      break;
+    }
+  }
+}
+
+const isPlainObject = (v) => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
+const sourceOf = (origins, name, field) => resolveLayer(origins, name, field) ?? resolveLayer(origins, name);
+
+function checkParamDomain(name, loop, param, val, section, src, flag, entry) {
+  const at = `pattern "${name}" ${section}.${param}`;
+  const basePath = section === 'invariants'
+    ? `runner.patterns.${name}.invariants.${param}.fixed`
+    : `runner.patterns.${name}.defaults.${param}`;
+  switch (param) {
+    case 'maxRounds':
+      if (!Number.isInteger(val) || val <= 0) {
+        flag('param-invalid', `${at} must be a positive integer, got ${JSON.stringify(val)}`, src, basePath);
       }
-      if (judges.length !== 1) {
-        throw new SeatResolutionError(
-          `${label}: a debate pattern needs exactly one seat with role "judge", has ${judges.length}`,
-          'seat-multiplicity',
-        );
+      break;
+    case 'minCheckers':
+      if (!Array.isArray(val) || val.length === 0) {
+        flag('param-invalid', `${at} must be a non-empty list of checker seat names`, src, basePath);
+        break;
       }
-      for (const d of declaredSeats) {
-        if (d.role !== 'producer' && d.role !== 'judge') {
-          throw new SeatResolutionError(
-            `${label}: a debate pattern has no use for a seat with role "${d.role}"`,
-            'seat-multiplicity',
-          );
+      val.forEach((chk, i) => {
+        if (typeof chk !== 'string') {
+          flag('param-invalid', `${at} checker seat name must be a string, got ${typeof chk === 'object' ? JSON.stringify(chk) : String(chk)}`, src, `${basePath}[${i}]`);
+        } else if (!Object.hasOwn(CHECKER_SEATS, chk)) {
+          flag('param-invalid', `${at} contains unknown checker seat "${chk}"; valid: [${Object.keys(CHECKER_SEATS).join(', ')}]`, src, `${basePath}[${i}]`);
+        }
+      });
+      break;
+    case 'rebuttal':
+      if (typeof val !== 'boolean') flag('param-invalid', `${at} must be a boolean, got ${JSON.stringify(val)}`, src, basePath);
+      break;
+    case 'seats':
+      try {
+        checkLoopSeatCardinality(loop, checkDeclaredSeats(val, `${at}`), at);
+      } catch (err) {
+        const code = ['invalid-seats', 'invalid-seat-id', 'invalid-seat-role', 'invalid-seat-tier'].includes(err.code)
+          ? 'param-invalid'
+          : (err.code ?? 'param-invalid');
+        flag(code, `${err.message}`, src, err.at ? `${basePath}${err.at}` : basePath);
+      }
+      break;
+    case 'roleTasks': {
+      if (!isPlainObject(val)) {
+        flag('param-invalid', `${at} must be an object mapping seat or kind to text`, src, basePath);
+        break;
+      }
+      const allowedTargets = allowedRoleTaskTargets(loop, entry);
+      for (const [target, text] of Object.entries(val)) {
+        if (typeof text !== 'string') flag('param-invalid', `${at}["${target}"] task text must be a string`, src, `${basePath}.${target}`);
+        if (!allowedTargets.has(target)) {
+          flag('param-invalid', `${at} target "${target}" does not exist for loop "${loop}" (valid targets: [${Array.from(allowedTargets).join(', ')}])`, src, `${basePath}.${target}`);
         }
       }
       break;
@@ -265,106 +279,173 @@ function checkLoopSeatCardinality(loop, declaredSeats, label) {
   }
 }
 
-function checkParamDomain(name, loop, param, val, section, src, problems, entry) {
-  const at = `pattern "${name}" ${section}.${param}`;
-  const basePath = section === 'invariants'
-    ? `runner.patterns.${name}.invariants.${param}.fixed`
-    : `runner.patterns.${name}.defaults.${param}`;
-  switch (param) {
-    case 'maxRounds': {
-      if (!Number.isInteger(val) || val <= 0) {
-        problems.push(new CollaborationError(
-          'param-invalid',
-          `${at} must be a positive integer, got ${JSON.stringify(val)}`,
-          { source: src, path: basePath },
-        ));
-      }
-      break;
+/** Reports retired keys, a reserved seatBinding entry, reserved names, non-object entries, unknown entry keys and non-object defaults or invariants. */
+function checkDeclaredEntries(patterns, origins, flag) {
+  const retiredFindings = detectRetiredPatternKeys(patterns);
+  const retiredKeys = new Set(retiredFindings.map((f) => f.key.replace(/^runner\.patterns\./, '')));
+  for (const finding of retiredFindings) {
+    const name = finding.key.replace(/^runner\.patterns\./, '').split('.')[0];
+    flag('config-key-retired', formatRetiredKeySentence(finding), resolveLayer(origins, name), finding.key);
+  }
+  const sb = Object.hasOwn(patterns, 'seatBinding') ? patterns.seatBinding : null;
+  if (sb && typeof sb === 'object' && ['loop', 'promise', 'defaults', 'invariants'].some((k) => Object.hasOwn(sb, k))) {
+    flag('config-error', 'runner.patterns.seatBinding uses reserved name "seatBinding" as a pattern name', resolveLayer(origins, 'seatBinding'), 'runner.patterns.seatBinding');
+  }
+
+  for (const [name, entry] of Object.entries(patterns)) {
+    if (name === 'seatBinding') continue;
+    const at = `runner.patterns.${name}`;
+    if (RESERVED_PATTERN_NAMES.has(name)) {
+      flag('config-error', `"${name}" is a reserved name and cannot be used as a pattern name`, resolveLayer(origins, name), at);
     }
-    case 'minCheckers': {
-      if (!Array.isArray(val) || val.length === 0) {
-        problems.push(new CollaborationError(
-          'param-invalid',
-          `${at} must be a non-empty list of checker seat names`,
-          { source: src, path: basePath },
-        ));
-      } else {
-        for (let i = 0; i < val.length; i++) {
-          const chk = val[i];
-          if (typeof chk !== 'string') {
-            problems.push(new CollaborationError(
-              'param-invalid',
-              `${at} checker seat name must be a string, got ${typeof chk === 'object' ? JSON.stringify(chk) : String(chk)}`,
-              { source: src, path: `${basePath}[${i}]` },
-            ));
-          } else if (!Object.hasOwn(CHECKER_SEATS, chk)) {
-            problems.push(new CollaborationError(
-              'param-invalid',
-              `${at} contains unknown checker seat "${chk}"; valid: [${Object.keys(CHECKER_SEATS).join(', ')}]`,
-              { source: src, path: `${basePath}[${i}]` },
-            ));
-          }
-        }
-      }
-      break;
+    if (!isPlainObject(entry)) {
+      flag('param-invalid', `pattern "${name}" must be an object`, resolveLayer(origins, name), at);
+      continue;
     }
-    case 'rebuttal': {
-      if (typeof val !== 'boolean') {
-        problems.push(new CollaborationError(
-          'param-invalid',
-          `${at} must be a boolean, got ${JSON.stringify(val)}`,
-          { source: src, path: basePath },
-        ));
+    for (const key of Object.keys(entry)) {
+      if (!retiredKeys.has(`${name}.${key}`) && !ALLOWED_PATTERN_ENTRY_KEYS.has(key)) {
+        flag('param-unknown', `pattern "${name}" has unknown key "${key}"`, sourceOf(origins, name, key), `${at}.${key}`);
       }
-      break;
     }
-    case 'seats': {
-      try {
-        const declared = checkDeclaredSeats(val, `${at}`);
-        checkLoopSeatCardinality(loop, declared, at);
-      } catch (err) {
-        const code = (err.code === 'invalid-seats' || err.code === 'invalid-seat-id' || err.code === 'invalid-seat-role' || err.code === 'invalid-seat-tier')
-          ? 'param-invalid'
-          : (err.code ?? 'param-invalid');
-        const seatPath = err.at ? `${basePath}${err.at}` : basePath;
-        problems.push(new CollaborationError(
-          code,
-          `${err.message}`,
-          { source: src, path: seatPath },
-        ));
+    for (const section of ['defaults', 'invariants']) {
+      if (Object.hasOwn(entry, section) && !isPlainObject(entry[section])) {
+        flag('param-invalid', `pattern "${name}" ${section} must be an object`, sourceOf(origins, name, section), `${at}.${section}`);
       }
-      break;
-    }
-    case 'roleTasks': {
-      if (!val || typeof val !== 'object' || Array.isArray(val)) {
-        problems.push(new CollaborationError(
-          'param-invalid',
-          `${at} must be an object mapping seat or kind to text`,
-          { source: src, path: basePath },
-        ));
-      } else {
-        const allowedTargets = allowedRoleTaskTargets(loop, entry);
-        for (const [target, text] of Object.entries(val)) {
-          if (typeof text !== 'string') {
-            problems.push(new CollaborationError(
-              'param-invalid',
-              `${at}["${target}"] task text must be a string`,
-              { source: src, path: `${basePath}.${target}` },
-            ));
-          }
-          if (!allowedTargets.has(target)) {
-            problems.push(new CollaborationError(
-              'param-invalid',
-              `${at} target "${target}" does not exist for loop "${loop}" (valid targets: [${Array.from(allowedTargets).join(', ')}])`,
-              { source: src, path: `${basePath}.${target}` },
-            ));
-          }
-        }
-      }
-      break;
     }
   }
 }
+
+const ALLOWED_PATTERN_ENTRY_KEYS = new Set(['promise', 'loop', 'defaults', 'invariants']);
+
+/** Shipped entry overlaid by the effective entry's promise, loop, defaults and invariants. */
+function mergeEntry(shippedEntry, effectiveEntry, hasEffective) {
+  if (shippedEntry && !hasEffective) return deepClone(shippedEntry);
+  if (!shippedEntry && hasEffective) return deepClone(effectiveEntry);
+  const merged = deepClone(shippedEntry);
+  if (Object.hasOwn(effectiveEntry, 'promise')) merged.promise = effectiveEntry.promise;
+  if (Object.hasOwn(effectiveEntry, 'loop')) merged.loop = effectiveEntry.loop;
+  for (const section of ['defaults', 'invariants']) {
+    if (Object.hasOwn(effectiveEntry, section) && isPlainObject(effectiveEntry[section])) {
+      merged[section] = Object.assign(Object.create(null), merged[section] ?? {}, deepClone(effectiveEntry[section]));
+    }
+  }
+  return merged;
+}
+
+/** An override of a shipped entry may not change its loop or promise, nor drop or change its invariants. */
+function checkShippedOverride(name, shippedEntry, effectiveEntry, origins, flag) {
+  const at = `runner.patterns.${name}`;
+  if (Object.hasOwn(effectiveEntry, 'loop') && effectiveEntry.loop !== shippedEntry.loop) {
+    flag('pattern-invariant-weakened', `pattern "${name}" cannot change shipped loop "${shippedEntry.loop}" to "${effectiveEntry.loop}"`, sourceOf(origins, name, 'loop'), `${at}.loop`);
+  }
+  if (Object.hasOwn(effectiveEntry, 'promise') && effectiveEntry.promise !== shippedEntry.promise) {
+    flag('pattern-invariant-weakened', `pattern "${name}" cannot change shipped promise`, sourceOf(origins, name, 'promise'), `${at}.promise`);
+  }
+  if (!shippedEntry.invariants || !Object.hasOwn(effectiveEntry, 'invariants') || !isPlainObject(effectiveEntry.invariants)) return;
+
+  for (const [param, shippedInv] of Object.entries(shippedEntry.invariants)) {
+    const src = resolveLayer(origins, name, `invariants.${param}`) ?? sourceOf(origins, name, 'invariants');
+    const weakened = (message, path) => flag('pattern-invariant-weakened', message, src, path);
+    const keepAtLeast = `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry`;
+    const changedFixed = `pattern "${name}" changed or removed fixed invariant for "${param}"`;
+    if (Object.keys(effectiveEntry.invariants).length === 0) {
+      weakened(shippedInv.atLeast !== undefined ? keepAtLeast : changedFixed, `${at}.invariants`);
+      continue;
+    }
+    const effInv = Object.hasOwn(effectiveEntry.invariants, param) ? effectiveEntry.invariants[param] : undefined;
+    if (effInv === undefined) continue;
+    if (shippedInv.atLeast !== undefined) {
+      if (!effInv || typeof effInv !== 'object' || !Array.isArray(effInv.atLeast)) {
+        weakened(keepAtLeast, `${at}.invariants.${param}.atLeast`);
+      } else {
+        const effSet = new Set(effInv.atLeast);
+        for (const required of shippedInv.atLeast) {
+          if (!effSet.has(required)) {
+            weakened(`pattern "${name}" dropped invariant atLeast element "${required}" for "${param}"`, `${at}.invariants.${param}.atLeast`);
+          }
+        }
+      }
+    }
+    if (shippedInv.fixed !== undefined && (!effInv || typeof effInv !== 'object' || !deepEqual(effInv.fixed, shippedInv.fixed))) {
+      weakened(changedFixed, `${at}.invariants.${param}.fixed`);
+    }
+  }
+}
+
+function checkCustomEntry(name, merged, origins, flag) {
+  const src = resolveLayer(origins, name);
+  if (!merged.promise || typeof merged.promise !== 'string' || !merged.promise.trim()) {
+    flag('param-invalid', `custom pattern "${name}" must declare a non-empty "promise"`, src, `runner.patterns.${name}.promise`);
+  }
+  if (!merged.loop || !LOOP_NAMES.includes(merged.loop)) {
+    flag('param-invalid', `custom pattern "${name}" must declare a valid "loop" from [${LOOP_NAMES.join(', ')}], got: ${JSON.stringify(merged.loop)}`, src, `runner.patterns.${name}.loop`);
+  }
+}
+
+/** One invariant: exactly one of "atLeast" (minCheckers only) or "fixed" (any parameter but minCheckers). */
+function checkInvariantForm(name, loop, param, inv, src, merged, flag) {
+  const at = `runner.patterns.${name}.invariants.${param}`;
+  const hasAtLeast = Object.hasOwn(inv, 'atLeast');
+  const hasFixed = Object.hasOwn(inv, 'fixed');
+  if ((!hasAtLeast && !hasFixed) || (hasAtLeast && hasFixed) || Object.keys(inv).length !== 1) {
+    flag('param-invalid', `pattern "${name}" invariant for "${param}" must declare exactly one form: "atLeast" or "fixed"`, src, at);
+    return;
+  }
+  if (hasAtLeast) {
+    if (param !== 'minCheckers') {
+      flag('param-invalid', `pattern "${name}" invariant "atLeast" is only valid for list parameters, got "${param}"`, src, `${at}.atLeast`);
+    } else if (!Array.isArray(inv.atLeast) || inv.atLeast.length === 0) {
+      flag('param-invalid', `pattern "${name}" invariant atLeast for "${param}" must be a non-empty array of checker seats`, src, `${at}.atLeast`);
+    } else {
+      inv.atLeast.forEach((chk, i) => {
+        if (typeof chk !== 'string') {
+          flag('param-invalid', `pattern "${name}" invariant atLeast for "${param}" checker seat name must be a string`, src, `${at}.atLeast[${i}]`);
+        } else if (!Object.hasOwn(CHECKER_SEATS, chk)) {
+          flag('param-invalid', `pattern "${name}" invariant atLeast "${chk}" is not a valid checker seat [${Object.keys(CHECKER_SEATS).join(', ')}]`, src, `${at}.atLeast[${i}]`);
+        }
+      });
+    }
+  }
+  if (hasFixed) {
+    if (param === 'minCheckers') {
+      flag('param-invalid', `pattern "${name}" invariant for list parameter "minCheckers" must use "atLeast", not "fixed"`, src, `${at}.fixed`);
+    } else {
+      checkParamDomain(name, loop, param, inv.fixed, 'invariants', src, flag, merged);
+    }
+  }
+}
+
+/** Checks the merged entry's defaults and invariants against its loop's parameter table. */
+function checkMergedSections(name, merged, origins, flag) {
+  const loop = merged.loop;
+  const paramTable = paramTableOf(loop) ?? {};
+  const at = `runner.patterns.${name}`;
+  for (const [section, label] of [['defaults', 'default'], ['invariants', 'invariant']]) {
+    if (merged[section] === undefined) continue;
+    if (!isPlainObject(merged[section])) {
+      flag('param-invalid', `pattern "${name}" ${section} must be an object`, sourceOf(origins, name, section), `${at}.${section}`);
+      continue;
+    }
+    for (const [param, val] of Object.entries(merged[section])) {
+      const src = sourceOf(origins, name, `${section}.${param}`);
+      if (!Object.hasOwn(paramTable, param)) {
+        flag('param-unknown', `pattern "${name}" ${label} parameter "${param}" is not read by loop "${loop}"`, src, `${at}.${section}.${param}`);
+        continue;
+      }
+      if (section === 'defaults') {
+        checkParamDomain(name, loop, param, val, 'defaults', src, flag, merged);
+      } else if (!isPlainObject(val)) {
+        flag('param-invalid', `pattern "${name}" invariant for "${param}" must be an object`, src, `${at}.invariants.${param}`);
+      } else {
+        checkInvariantForm(name, loop, param, val, src, merged, flag);
+      }
+    }
+  }
+}
+
+const setEntry = (entries, name, value) => Object.defineProperty(entries, name, {
+  value, writable: true, enumerable: true, configurable: true,
+});
 
 /**
  * Validates pattern catalog entries and merges them.
@@ -383,370 +464,31 @@ export function checkCatalog(options = {}) {
   const throwOnError = Boolean(options?.throwOnError);
 
   const problems = [];
-  const ALLOWED_PATTERN_ENTRY_KEYS = new Set(['promise', 'loop', 'defaults', 'invariants']);
-  // 1. Retired keys checks via shared leaf detector
-  const retiredFindings = detectRetiredPatternKeys(effectivePatterns);
-  const retiredKeysSet = new Set(retiredFindings.map((f) => f.key.replace(/^runner\.patterns\./, '')));
-  for (const finding of retiredFindings) {
-    const name = finding.key.replace(/^runner\.patterns\./, '').split('.')[0];
-    const src = resolveLayer(origins, name);
-    problems.push(new CollaborationError(
-      'config-key-retired',
-      `${formatRetiredKeySentence(finding)}`,
-      { source: src, path: finding.key },
-    ));
-  }
-  // 2. Reserved names check
-  if (Object.hasOwn(effectivePatterns, 'seatBinding')) {
-    const sb = effectivePatterns.seatBinding;
-    if (sb && typeof sb === 'object' && (Object.hasOwn(sb, 'loop') || Object.hasOwn(sb, 'promise') || Object.hasOwn(sb, 'defaults') || Object.hasOwn(sb, 'invariants'))) {
-      const src = resolveLayer(origins, 'seatBinding');
-      problems.push(new CollaborationError(
-        'config-error',
-        `runner.patterns.seatBinding uses reserved name "seatBinding" as a pattern name`,
-        { source: src, path: 'runner.patterns.seatBinding' },
-      ));
-    }
-  }
+  const flag = (code, message, source, path) => problems.push(new CollaborationError(code, message, { source, path }));
+  checkDeclaredEntries(effectivePatterns, origins, flag);
 
-  for (const [name, entry] of Object.entries(effectivePatterns)) {
-    if (name === 'seatBinding') continue;
-
-    if (RESERVED_PATTERN_NAMES.has(name)) {
-      const src = resolveLayer(origins, name);
-      problems.push(new CollaborationError(
-        'config-error',
-        `"${name}" is a reserved name and cannot be used as a pattern name`,
-        { source: src, path: `runner.patterns.${name}` },
-      ));
-    }
-
-    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-      const src = resolveLayer(origins, name);
-      problems.push(new CollaborationError(
-        'param-invalid',
-        `pattern "${name}" must be an object`,
-        { source: src, path: `runner.patterns.${name}` },
-      ));
-      continue;
-    }
-
-    for (const key of Object.keys(entry)) {
-      if (retiredKeysSet.has(`${name}.${key}`)) continue;
-      if (!ALLOWED_PATTERN_ENTRY_KEYS.has(key)) {
-        const src = resolveLayer(origins, name, key) ?? resolveLayer(origins, name);
-        problems.push(new CollaborationError(
-          'param-unknown',
-          `pattern "${name}" has unknown key "${key}"`,
-          { source: src, path: `runner.patterns.${name}.${key}` },
-        ));
-      }
-    }
-
-    if (Object.hasOwn(entry, 'defaults')) {
-      if (!entry.defaults || typeof entry.defaults !== 'object' || Array.isArray(entry.defaults)) {
-        const src = resolveLayer(origins, name, 'defaults') ?? resolveLayer(origins, name);
-        problems.push(new CollaborationError(
-          'param-invalid',
-          `pattern "${name}" defaults must be an object`,
-          { source: src, path: `runner.patterns.${name}.defaults` },
-        ));
-      }
-    }
-
-    if (Object.hasOwn(entry, 'invariants')) {
-      if (!entry.invariants || typeof entry.invariants !== 'object' || Array.isArray(entry.invariants)) {
-        const src = resolveLayer(origins, name, 'invariants') ?? resolveLayer(origins, name);
-        problems.push(new CollaborationError(
-          'param-invalid',
-          `pattern "${name}" invariants must be an object`,
-          { source: src, path: `runner.patterns.${name}.invariants` },
-        ));
-      }
-    }
-  }
-
-  // 3. Build merged entries
-  const allNames = new Set([
-    ...Object.keys(shippedPatterns),
-    ...Object.keys(effectivePatterns),
-  ]);
-  for (const n of RESERVED_PATTERN_NAMES) {
-    allNames.delete(n);
-  }
+  const allNames = new Set([...Object.keys(shippedPatterns), ...Object.keys(effectivePatterns)]);
+  for (const n of RESERVED_PATTERN_NAMES) allNames.delete(n);
   allNames.delete(RETIRED_GATED_NAME);
 
   const mergedEntries = Object.create(null);
-
   for (const name of allNames) {
     const shippedEntry = Object.hasOwn(shippedPatterns, name) ? shippedPatterns[name] : undefined;
     const hasEffective = Object.hasOwn(effectivePatterns, name) && effectivePatterns[name] !== undefined;
     const effectiveEntry = hasEffective ? effectivePatterns[name] : undefined;
 
-    if (hasEffective && (!effectiveEntry || typeof effectiveEntry !== 'object' || Array.isArray(effectiveEntry))) {
-      if (shippedEntry) {
-        Object.defineProperty(mergedEntries, name, {
-          value: Object.freeze(deepClone(shippedEntry)),
-          writable: true,
-          enumerable: true,
-          configurable: true,
-        });
-      }
+    if (hasEffective && !isPlainObject(effectiveEntry)) {
+      if (shippedEntry) setEntry(mergedEntries, name, Object.freeze(deepClone(shippedEntry)));
       continue;
     }
 
-    let mergedEntry;
-    if (shippedEntry && !hasEffective) {
-      mergedEntry = deepClone(shippedEntry);
-    } else if (!shippedEntry && hasEffective) {
-      mergedEntry = deepClone(effectiveEntry);
-    } else {
-      mergedEntry = deepClone(shippedEntry);
-      if (Object.hasOwn(effectiveEntry, 'promise')) mergedEntry.promise = effectiveEntry.promise;
-      if (Object.hasOwn(effectiveEntry, 'loop')) mergedEntry.loop = effectiveEntry.loop;
-
-      if (Object.hasOwn(effectiveEntry, 'defaults') && effectiveEntry.defaults && typeof effectiveEntry.defaults === 'object' && !Array.isArray(effectiveEntry.defaults)) {
-        mergedEntry.defaults = Object.assign(
-          Object.create(null),
-          mergedEntry.defaults ?? {},
-          deepClone(effectiveEntry.defaults),
-        );
-      }
-      if (Object.hasOwn(effectiveEntry, 'invariants') && effectiveEntry.invariants && typeof effectiveEntry.invariants === 'object' && !Array.isArray(effectiveEntry.invariants)) {
-        mergedEntry.invariants = Object.assign(
-          Object.create(null),
-          mergedEntry.invariants ?? {},
-          deepClone(effectiveEntry.invariants),
-        );
-      }
-    }
-
-    // Shipped entry override weakening checks
-    if (shippedEntry && hasEffective) {
-      if (Object.hasOwn(effectiveEntry, 'loop') && effectiveEntry.loop !== shippedEntry.loop) {
-        const src = resolveLayer(origins, name, 'loop') ?? resolveLayer(origins, name);
-        problems.push(new CollaborationError(
-          'pattern-invariant-weakened',
-          `pattern "${name}" cannot change shipped loop "${shippedEntry.loop}" to "${effectiveEntry.loop}"`,
-          { source: src, path: `runner.patterns.${name}.loop` },
-        ));
-      }
-
-      if (Object.hasOwn(effectiveEntry, 'promise') && effectiveEntry.promise !== shippedEntry.promise) {
-        const src = resolveLayer(origins, name, 'promise') ?? resolveLayer(origins, name);
-        problems.push(new CollaborationError(
-          'pattern-invariant-weakened',
-          `pattern "${name}" cannot change shipped promise`,
-          { source: src, path: `runner.patterns.${name}.promise` },
-        ));
-      }
-
-      if (shippedEntry.invariants && Object.hasOwn(effectiveEntry, 'invariants') && typeof effectiveEntry.invariants === 'object' && effectiveEntry.invariants !== null && !Array.isArray(effectiveEntry.invariants)) {
-        for (const [param, shippedInv] of Object.entries(shippedEntry.invariants)) {
-          const src = resolveLayer(origins, name, `invariants.${param}`) ?? resolveLayer(origins, name, 'invariants') ?? resolveLayer(origins, name);
-
-          if (Object.keys(effectiveEntry.invariants).length === 0) {
-            const msg = shippedInv.atLeast !== undefined
-              ? `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry`
-              : `pattern "${name}" changed or removed fixed invariant for "${param}"`;
-            problems.push(new CollaborationError('pattern-invariant-weakened', msg, { source: src, path: `runner.patterns.${name}.invariants` }));
-            continue;
-          }
-
-          const effInv = Object.hasOwn(effectiveEntry.invariants, param) ? effectiveEntry.invariants[param] : undefined;
-          if (effInv !== undefined) {
-            if (shippedInv.atLeast !== undefined) {
-              if (!effInv || typeof effInv !== 'object' || !Array.isArray(effInv.atLeast)) {
-                problems.push(new CollaborationError(
-                  'pattern-invariant-weakened',
-                  `pattern "${name}" invariant for "${param}" must keep atLeast list from shipped entry`,
-                  { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast` },
-                ));
-              } else {
-                const effSet = new Set(effInv.atLeast);
-                for (const required of shippedInv.atLeast) {
-                  if (!effSet.has(required)) {
-                    problems.push(new CollaborationError(
-                      'pattern-invariant-weakened',
-                      `pattern "${name}" dropped invariant atLeast element "${required}" for "${param}"`,
-                      { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast` },
-                    ));
-                  }
-                }
-              }
-            }
-
-            if (shippedInv.fixed !== undefined) {
-              if (!effInv || typeof effInv !== 'object' || !deepEqual(effInv.fixed, shippedInv.fixed)) {
-                problems.push(new CollaborationError(
-                  'pattern-invariant-weakened',
-                  `pattern "${name}" changed or removed fixed invariant for "${param}"`,
-                  { source: src, path: `runner.patterns.${name}.invariants.${param}.fixed` },
-                ));
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Custom pattern checks
-    if (!shippedEntry) {
-      const src = resolveLayer(origins, name);
-      if (!mergedEntry.promise || typeof mergedEntry.promise !== 'string' || !mergedEntry.promise.trim()) {
-        problems.push(new CollaborationError(
-          'param-invalid',
-          `custom pattern "${name}" must declare a non-empty "promise"`,
-          { source: src, path: `runner.patterns.${name}.promise` },
-        ));
-      }
-      if (!mergedEntry.loop || !LOOP_NAMES.includes(mergedEntry.loop)) {
-        problems.push(new CollaborationError(
-          'param-invalid',
-          `custom pattern "${name}" must declare a valid "loop" from [${LOOP_NAMES.join(', ')}], got: ${JSON.stringify(mergedEntry.loop)}`,
-          { source: src, path: `runner.patterns.${name}.loop` },
-        ));
-      }
-    }
-
-    // Validate merged entry fields against loop param table
-    const loop = mergedEntry.loop;
-    if (loop && LOOP_NAMES.includes(loop)) {
-      const paramTable = paramTableOf(loop) ?? {};
-
-      // Validate defaults
-      if (mergedEntry.defaults !== undefined) {
-        if (!mergedEntry.defaults || typeof mergedEntry.defaults !== 'object' || Array.isArray(mergedEntry.defaults)) {
-          const src = resolveLayer(origins, name, 'defaults') ?? resolveLayer(origins, name);
-          problems.push(new CollaborationError(
-            'param-invalid',
-            `pattern "${name}" defaults must be an object`,
-            { source: src, path: `runner.patterns.${name}.defaults` },
-          ));
-        } else {
-          for (const [param, val] of Object.entries(mergedEntry.defaults)) {
-            const src = resolveLayer(origins, name, `defaults.${param}`) ?? resolveLayer(origins, name);
-            if (!Object.hasOwn(paramTable, param)) {
-              problems.push(new CollaborationError(
-                'param-unknown',
-                `pattern "${name}" default parameter "${param}" is not read by loop "${loop}"`,
-                { source: src, path: `runner.patterns.${name}.defaults.${param}` },
-              ));
-              continue;
-            }
-            checkParamDomain(name, loop, param, val, 'defaults', src, problems, mergedEntry);
-          }
-        }
-      }
-
-      // Validate invariants
-      if (mergedEntry.invariants !== undefined) {
-        if (!mergedEntry.invariants || typeof mergedEntry.invariants !== 'object' || Array.isArray(mergedEntry.invariants)) {
-          const src = resolveLayer(origins, name, 'invariants') ?? resolveLayer(origins, name);
-          problems.push(new CollaborationError(
-            'param-invalid',
-            `pattern "${name}" invariants must be an object`,
-            { source: src, path: `runner.patterns.${name}.invariants` },
-          ));
-        } else {
-          for (const [param, inv] of Object.entries(mergedEntry.invariants)) {
-            const src = resolveLayer(origins, name, `invariants.${param}`) ?? resolveLayer(origins, name);
-            if (!Object.hasOwn(paramTable, param)) {
-              problems.push(new CollaborationError(
-                'param-unknown',
-                `pattern "${name}" invariant parameter "${param}" is not read by loop "${loop}"`,
-                { source: src, path: `runner.patterns.${name}.invariants.${param}` },
-              ));
-              continue;
-            }
-
-            if (!inv || typeof inv !== 'object' || Array.isArray(inv)) {
-              problems.push(new CollaborationError(
-                'param-invalid',
-                `pattern "${name}" invariant for "${param}" must be an object`,
-                { source: src, path: `runner.patterns.${name}.invariants.${param}` },
-              ));
-              continue;
-            }
-
-            const invKeys = Object.keys(inv);
-            const hasAtLeast = Object.hasOwn(inv, 'atLeast');
-            const hasFixed = Object.hasOwn(inv, 'fixed');
-
-            if ((!hasAtLeast && !hasFixed) || (hasAtLeast && hasFixed) || invKeys.length !== 1) {
-              problems.push(new CollaborationError(
-                'param-invalid',
-                `pattern "${name}" invariant for "${param}" must declare exactly one form: "atLeast" or "fixed"`,
-                { source: src, path: `runner.patterns.${name}.invariants.${param}` },
-              ));
-              continue;
-            }
-
-            if (hasAtLeast) {
-              if (param !== 'minCheckers') {
-                problems.push(new CollaborationError(
-                  'param-invalid',
-                  `pattern "${name}" invariant "atLeast" is only valid for list parameters, got "${param}"`,
-                  { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast` },
-                ));
-              } else {
-                if (!Array.isArray(inv.atLeast) || inv.atLeast.length === 0) {
-                  problems.push(new CollaborationError(
-                    'param-invalid',
-                    `pattern "${name}" invariant atLeast for "${param}" must be a non-empty array of checker seats`,
-                    { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast` },
-                  ));
-                } else {
-                  for (let i = 0; i < inv.atLeast.length; i++) {
-                    const chk = inv.atLeast[i];
-                    if (typeof chk !== 'string') {
-                      problems.push(new CollaborationError(
-                        'param-invalid',
-                        `pattern "${name}" invariant atLeast for "${param}" checker seat name must be a string`,
-                        { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast[${i}]` },
-                      ));
-                    } else if (!Object.hasOwn(CHECKER_SEATS, chk)) {
-                      problems.push(new CollaborationError(
-                        'param-invalid',
-                        `pattern "${name}" invariant atLeast "${chk}" is not a valid checker seat [${Object.keys(CHECKER_SEATS).join(', ')}]`,
-                        { source: src, path: `runner.patterns.${name}.invariants.${param}.atLeast[${i}]` },
-                      ));
-                    }
-                  }
-                }
-              }
-            }
-
-            if (hasFixed) {
-              if (param === 'minCheckers') {
-                problems.push(new CollaborationError(
-                  'param-invalid',
-                  `pattern "${name}" invariant for list parameter "minCheckers" must use "atLeast", not "fixed"`,
-                  { source: src, path: `runner.patterns.${name}.invariants.${param}.fixed` },
-                ));
-              } else {
-                checkParamDomain(name, loop, param, inv.fixed, 'invariants', src, problems, mergedEntry);
-              }
-            }
-          }
-        }
-      }
-    }
-    Object.defineProperty(mergedEntries, name, {
-      value: Object.freeze(mergedEntry),
-      writable: true,
-      enumerable: true,
-      configurable: true,
-    });
+    const mergedEntry = mergeEntry(shippedEntry, effectiveEntry, hasEffective);
+    if (shippedEntry && hasEffective) checkShippedOverride(name, shippedEntry, effectiveEntry, origins, flag);
+    if (!shippedEntry) checkCustomEntry(name, mergedEntry, origins, flag);
+    if (mergedEntry.loop && LOOP_NAMES.includes(mergedEntry.loop)) checkMergedSections(name, mergedEntry, origins, flag);
+    setEntry(mergedEntries, name, Object.freeze(mergedEntry));
   }
 
-  if (throwOnError && problems.length > 0) {
-    throw problems[0];
-  }
-
-  return {
-    entries: mergedEntries,
-    merged: mergedEntries,
-    problems,
-  };
+  if (throwOnError && problems.length > 0) throw problems[0];
+  return { entries: mergedEntries, merged: mergedEntries, problems };
 }

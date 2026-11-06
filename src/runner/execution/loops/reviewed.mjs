@@ -94,35 +94,22 @@ export function extractFindings(res) {
   return [];
 }
 
+/** The history entry a seat recorded in round `r`. */
+const roundEntry = (priorResults, seat, r) => priorResults.find((h) => h.seat === seat && (h.round ?? 1) === r);
+
 /**
  * Check whether a round has fully settled in history.
  *
  * A round is final only once every seat it dispatches has a result (or its producer failed, so no
  * checker was dispatched). Until then, resume reuses the seats that passed and retries every other
  * one, including a checker that failed while a sibling never reported.
- *
- * @param {number} r
- * @param {Array<object>} priorResults
- * @param {Array<string>} checkerList
- * @param {boolean} hasVerify
- * @returns {boolean}
  */
 function isRoundSettledInHistory(r, priorResults, producerSeat, checkerList, hasVerify) {
-  const prod = priorResults.find((h) => h.seat === producerSeat && (h.round ?? 1) === r);
+  const prod = roundEntry(priorResults, producerSeat, r);
   if (!prod) return false;
   if (endsRound(prod, producerSeat)) return true;
-
-  for (const checkerSeat of checkerList) {
-    const chk = priorResults.find((h) => h.seat === checkerSeat && (h.round ?? 1) === r);
-    if (!chk) return false;
-  }
-
-  if (hasVerify) {
-    const ver = priorResults.find((h) => h.seat === VERIFY_SEAT && (h.round ?? 1) === r);
-    if (!ver) return false;
-  }
-
-  return true;
+  const seats = hasVerify ? [...checkerList, VERIFY_SEAT] : checkerList;
+  return seats.every((seat) => roundEntry(priorResults, seat, r));
 }
 
 /** Shared by live/history execution and the legacy summary projection. */
@@ -146,12 +133,10 @@ export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}, sea
   const hasVerify = hasVerifyCommand(unit, cfg);
   for (let round = 1; round <= maxRounds; round++) {
     if (!isRoundSettledInHistory(round, priorResults, producerSeat, checkerList, hasVerify)) return null;
-    const producer = priorResults.find((res) => res.seat === producerSeat && (res.round ?? 1) === round);
+    const producer = roundEntry(priorResults, producerSeat, round);
     if (endsRound(producer, producerSeat)) return producer.outcome;
-    const results = [producer, ...checkerList.map((seat) =>
-      priorResults.find((res) => res.seat === seat && (res.round ?? 1) === round))];
-    if (hasVerify) results.push(priorResults.find((res) =>
-      res.seat === VERIFY_SEAT && (res.round ?? 1) === round));
+    const peerSeats = hasVerify ? [...checkerList, VERIFY_SEAT] : checkerList;
+    const results = [producer, ...peerSeats.map((seat) => roundEntry(priorResults, seat, round))];
     const assessment = assessRound(results.filter(Boolean), producerSeat);
     if (assessment.outcome !== 'findings' || round === maxRounds) return assessment.outcome;
   }
@@ -188,132 +173,67 @@ export async function runReviewed(unit, cfg, hooks = {}, params = {}) {
   const allResults = [];
   const allFindings = [];
   let priorFindings = [];
+  const finish = (outcome, rounds, findings = allFindings) => ({ outcome, rounds, results: allResults, findings });
+  // What a round's assessment decides: an error ends the run; findings go on to the next round, or end
+  // the run at the last one; nothing found passes. Returns null to go on.
+  const concludeRound = (assessment, r) => {
+    if (ERROR_OUTCOMES.includes(assessment.outcome)) return finish(assessment.outcome, r);
+    if (assessment.findings.length === 0) return finish('pass', r, []);
+    allFindings.push(...assessment.findings);
+    if (r >= maxRounds) return finish('findings', r);
+    priorFindings = assessment.findings;
+    return null;
+  };
 
   for (let r = 1; r <= maxRounds; r++) {
-    // Check if this round settled entirely in history
     if (isRoundSettledInHistory(r, priorResults, producerSeat.seat, checkerList, hasVerify)) {
-      const histProducer = priorResults.find((h) => h.seat === producerSeat.seat && (h.round ?? 1) === r);
+      const histProducer = roundEntry(priorResults, producerSeat.seat, r);
       allResults.push(histProducer);
-
-      if (endsRound(histProducer, producerSeat.seat)) {
-        return {
-          outcome: histProducer.outcome,
-          rounds: r,
-          results: allResults,
-          findings: allFindings,
-        };
-      }
-
+      if (endsRound(histProducer, producerSeat.seat)) return finish(histProducer.outcome, r);
       const roundHistoryResults = [histProducer];
-      for (const checkerSeat of checkerList) {
-        const histChk = priorResults.find((h) => h.seat === checkerSeat && (h.round ?? 1) === r);
-        allResults.push(histChk);
-        roundHistoryResults.push(histChk);
+      for (const seat of hasVerify ? [...checkerList, VERIFY_SEAT] : checkerList) {
+        const hist = roundEntry(priorResults, seat, r);
+        allResults.push(hist);
+        roundHistoryResults.push(hist);
       }
-
-      if (hasVerify) {
-        const histVer = priorResults.find((h) => h.seat === VERIFY_SEAT && (h.round ?? 1) === r);
-        allResults.push(histVer);
-        roundHistoryResults.push(histVer);
-      }
-
-      // Check for errors in history
-      const assessment = assessRound(roundHistoryResults, producerSeat.seat);
-      if (ERROR_OUTCOMES.includes(assessment.outcome)) {
-        return {
-          outcome: assessment.outcome,
-          rounds: r,
-          results: allResults,
-          findings: allFindings,
-        };
-      }
-
-      // Check for findings in history
-      const roundFindings = assessment.findings;
-
-      if (roundFindings.length > 0) {
-        allFindings.push(...roundFindings);
-        if (r < maxRounds) {
-          priorFindings = roundFindings;
-          continue; // Move to next round
-        } else {
-          return {
-            outcome: 'findings',
-            rounds: r,
-            results: allResults,
-            findings: allFindings,
-          };
-        }
-      }
-
-      // All passed in this settled round
-      return {
-        outcome: 'pass',
-        rounds: r,
-        results: allResults,
-        findings: [],
-      };
+      const concluded = concludeRound(assessRound(roundHistoryResults, producerSeat.seat), r);
+      if (concluded) return concluded;
+      continue;
     }
 
     // A round that cannot launch its seats under the Unit's seat-launch ceiling does not start: the run
     // ends at the last evaluation it has, which found something (or the loop would not be here).
     if (r > 1 && typeof hasLaunchRoom === 'function' && !hasLaunchRoom(1 + checkerList.length)) {
-      return { outcome: 'findings', rounds: r - 1, results: allResults, findings: allFindings };
+      return finish('findings', r - 1);
     }
 
-    // Round is live (partially or not in history)
-    const currentRoundResults = [];
-
-    // Step A: Run producer role
+    // The round is live (partially or not in history). Producer first: a recorded pass, or a producer that
+    // changed nothing, is reused.
     const existingProducer = priorResults.find((h) => h.seat === producerSeat.seat && (h.round ?? 1) === r && (h.outcome === 'pass' || changedNothing(h, producerSeat.seat)));
-    let producerResult;
-    if (existingProducer) {
-      producerResult = existingProducer;
-    } else {
-      const payload = {
-        seat: producerSeat,
-        // Round 1 is the unit as given; a later round also lists what the checks found, so the
-        // producer knows what to fix.
-        unit: roleUnit(unit, { seat: producerSeat.seat, kind: 'producer', params, findings: r > 1 ? priorFindings : [] }),
-        round: r,
-      };
-      producerResult = await runRole(payload);
-    }
-
-    currentRoundResults.push(producerResult);
+    const producerResult = existingProducer ?? await runRole({
+      seat: producerSeat,
+      // Round 1 is the unit as given; a later round also lists what the checks found, so the
+      // producer knows what to fix.
+      unit: roleUnit(unit, { seat: producerSeat.seat, kind: 'producer', params, findings: r > 1 ? priorFindings : [] }),
+      round: r,
+    });
+    const currentRoundResults = [producerResult];
     allResults.push(producerResult);
+    if (endsRound(producerResult, producerSeat.seat)) return finish(producerResult.outcome, r);
 
-    if (endsRound(producerResult, producerSeat.seat)) {
-      return {
-        outcome: producerResult.outcome,
-        rounds: r,
-        results: allResults,
-        findings: allFindings,
-      };
-    }
-
-    // Step B: Dispatch checkers and verification together, then drain every peer.
+    // Checkers and verification run together, and every peer is drained before the round is judged.
+    const reusedResults = [];
     const pendingCheckerSeats = [];
-    const reusedCheckerResults = [];
-
     for (const checkerSeat of checkerSeats) {
       const existingChecker = priorResults.find((h) => h.seat === checkerSeat.seat && (h.round ?? 1) === r && h.outcome === 'pass');
-      if (existingChecker) {
-        reusedCheckerResults.push(existingChecker);
-      } else {
-        pendingCheckerSeats.push(checkerSeat);
-      }
+      if (existingChecker) reusedResults.push(existingChecker);
+      else pendingCheckerSeats.push(checkerSeat);
     }
-
-    let reusedVerify = null;
     let runPendingVerify = false;
+    let reusedVerify = null;
     if (hasVerify) {
-      const existingVer = priorResults.find((h) => h.seat === VERIFY_SEAT && (h.round ?? 1) === r && h.outcome === 'pass');
-      if (existingVer) {
-        reusedVerify = existingVer;
-      } else if (typeof verify === 'function') {
-        runPendingVerify = true;
-      }
+      reusedVerify = priorResults.find((h) => h.seat === VERIFY_SEAT && (h.round ?? 1) === r && h.outcome === 'pass') ?? null;
+      runPendingVerify = !reusedVerify && typeof verify === 'function';
     }
 
     const barrier = createBindBarrier(pendingCheckerSeats.length);
@@ -328,17 +248,16 @@ export async function runReviewed(unit, cfg, hooks = {}, params = {}) {
         batch: barrier,
       })),
     );
-
     const verifyPromise = runPendingVerify
       ? Promise.resolve().then(async () => {
-          const vRes = await verify(unit);
-          return {
-            seat: VERIFY_SEAT,
-            round: r,
-            outcome: vRes?.pass ? 'pass' : 'findings',
-            findings: vRes?.findings || (vRes?.pass ? [] : ['Verification failed']),
-          };
-        })
+        const vRes = await verify(unit);
+        return {
+          seat: VERIFY_SEAT,
+          round: r,
+          outcome: vRes?.pass ? 'pass' : 'findings',
+          findings: vRes?.findings || (vRes?.pass ? [] : ['Verification failed']),
+        };
+      })
       : null;
 
     let firstRejection;
@@ -355,67 +274,14 @@ export async function runReviewed(unit, cfg, hooks = {}, params = {}) {
     const dispatchedCheckers = settledPeers.slice(0, checkerPromises.length).map((peer) => peer.value);
     const dispatchedVerify = verifyPromise ? settledPeers.at(-1).value : null;
 
-    for (const res of reusedCheckerResults) {
+    for (const res of [...reusedResults, ...dispatchedCheckers, ...[reusedVerify, dispatchedVerify].filter(Boolean)]) {
       currentRoundResults.push(res);
       allResults.push(res);
     }
-    for (const res of dispatchedCheckers) {
-      currentRoundResults.push(res);
-      allResults.push(res);
-    }
-    if (reusedVerify) {
-      currentRoundResults.push(reusedVerify);
-      allResults.push(reusedVerify);
-    }
-    if (dispatchedVerify) {
-      currentRoundResults.push(dispatchedVerify);
-      allResults.push(dispatchedVerify);
-    }
 
-    // Step C: Evaluate results
-    // Check for execution failure / policy refusal / provider limit / blocked
-    const assessment = assessRound(currentRoundResults, producerSeat.seat);
-    if (ERROR_OUTCOMES.includes(assessment.outcome)) {
-      return {
-        outcome: assessment.outcome,
-        rounds: r,
-        results: allResults,
-        findings: allFindings,
-      };
-    }
-
-    // Check for findings or verify failure
-    const roundFindings = assessment.findings;
-
-    if (roundFindings.length > 0) {
-      allFindings.push(...roundFindings);
-      if (r < maxRounds) {
-        priorFindings = roundFindings;
-        continue; // Loop to next round
-      } else {
-        return {
-          outcome: 'findings',
-          rounds: r,
-          results: allResults,
-          findings: allFindings,
-        };
-      }
-    }
-
-    // All checkers pass and verify passes
-    return {
-      outcome: 'pass',
-      rounds: r,
-      results: allResults,
-      findings: [],
-    };
+    const concluded = concludeRound(assessRound(currentRoundResults, producerSeat.seat), r);
+    if (concluded) return concluded;
   }
 
-  // Fallback if loop finishes
-  return {
-    outcome: allFindings.length > 0 ? 'findings' : 'pass',
-    rounds: maxRounds,
-    results: allResults,
-    findings: allFindings,
-  };
+  return finish(allFindings.length > 0 ? 'findings' : 'pass', maxRounds);
 }
