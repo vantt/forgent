@@ -267,7 +267,7 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
     // so `candidates[0]` is exactly the pre-existing `preferred` value for
     // every config that has not adopted the array shape — zero behavior
     // change for every currently-configured capability.
-    const candidates = normalizePreferCandidates(preferred, `capabilities.${executorIdOrPurpose}.prefer`);
+    const candidates = normalizePreferCandidates(preferred);
     const primary = candidates[0];
     const executor = executors[primary.executor];
     if (!executor) {

@@ -162,7 +162,7 @@ function positiveIntOr(value, fallback) {
 
 /** Read the two-tier cap (D10) from the runner config's OPTIONAL `parallel`
  * block, falling back to the in-code defaults when it (or a field) is absent.
- * dispatch.mjs's `loadRunnerConfig` already rejects a malformed block at load
+ * The config door's schema already rejects a malformed block at load
  * time, so this stays lenient: a hand-built test config with no `parallel`
  * key behaves exactly like a real config that omits it. */
 function resolveParallel(config) {

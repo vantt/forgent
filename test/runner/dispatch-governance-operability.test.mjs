@@ -10,10 +10,7 @@ import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import {
-  RunnerConfigError,
-  loadRunnerConfig,
-} from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
@@ -332,77 +329,4 @@ test('RunObservation fields strictly adhere to closed vocabularies', () => {
   }
 
   fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-// ─── 7. Provider Warning for All-non-CLI vs Mixed ─────────────────────────────
-
-test('provider-family warning suppresses for all-non-CLI and warns for bare unverified commands', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-probe-warn-'));
-  const warnings = [];
-  const origWarn = console.warn;
-  console.warn = (msg) => { warnings.push(msg); };
-
-  const baseExecutor = { command: process.execPath, args: [] };
-
-  try {
-    // 7a. All non-CLI (mcp-only): warning suppressed
-    const cfgA = path.join(tmp, 'cfgA.json');
-    fs.writeFileSync(cfgA, JSON.stringify({
-      executor: baseExecutor,
-      modelPolicies: { claude: { standard: 'test-model' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 5000,
-      executors: {
-        'mcp-executor': {
-          kind: 'agent',
-          invocations: [{ via: 'mcp', command: 'test-mcp-server' }],
-        },
-      },
-    }));
-    loadRunnerConfig(cfgA);
-    assert.equal(warnings.length, 0, 'all non-CLI invocations must suppress warning');
-
-    // 7b. Bare CLI with unrecognized command: warning emitted
-    const cfgB = path.join(tmp, 'cfgB.json');
-    fs.writeFileSync(cfgB, JSON.stringify({
-      executor: baseExecutor,
-      modelPolicies: { claude: { standard: 'test-model' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 5000,
-      executors: {
-        'unrecognized-cli-executor': {
-          kind: 'agent',
-          command: 'custom-unrecognized-node-script',
-          args: [],
-        },
-      },
-    }));
-    loadRunnerConfig(cfgB);
-    assert.equal(warnings.length, 1, 'unrecognized command must emit warning');
-    assert.match(warnings[0], /unrecognized-cli-executor/);
-    assert.match(warnings[0], /custom-unrecognized-node-script/);
-
-    // 7c. Explicit providerModel: warning suppressed regardless of command
-    warnings.length = 0;
-    const cfgC = path.join(tmp, 'cfgC.json');
-    fs.writeFileSync(cfgC, JSON.stringify({
-      executor: baseExecutor,
-      modelPolicies: { claude: { standard: 'test-model' }, 'custom-provider': { standard: 'test-model' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 5000,
-      executors: {
-        'explicit-executor': {
-          kind: 'agent',
-          command: 'custom-unrecognized-node-script',
-          args: [],
-          providerModel: 'custom-provider',
-        },
-      },
-    }));
-    loadRunnerConfig(cfgC);
-    assert.equal(warnings.length, 0, 'explicit providerModel must suppress warning');
-  } finally {
-    console.warn = origWarn;
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
 });

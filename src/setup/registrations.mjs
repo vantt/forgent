@@ -85,7 +85,7 @@ import {
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { readOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
-import { MODEL_POLICY_TIERS, validateCapabilityServesShape, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
@@ -468,7 +468,7 @@ function checkShellIntegrationSourced(cwd) {
 }
 
 // The schema states each entry's keys and types; the owner's validator keeps the rule that a source scope opens with a
-// literal directory, and the cumulative rule over the checkers of each rigor.
+// literal directory. The bounds and cumulative-checker rules of runner.loops are checked by runner-patterns-config.
 export function checkRunnerGeneratedPathsConfig(cwd) {
   const generatedPaths = effectiveSection(cwd, 'runner').generatedPaths ?? [];
   try {
@@ -2220,33 +2220,19 @@ registerCheck({
   check: (cwd) => checkWorkflowCapabilitiesConfigured(cwd),
 });
 
-// I19 (core/skills/_shared/capability-matching.md): `serves` is optional at
-// load time (`validateCapabilitiesShape`'s hot path never rejects an old
-// entry with none), but a live config's DECLARED `serves` values still need
-// a doctor signal -- a malformed one, or two capabilities that declare the
-// identical attribute set (permanently tied, capability-matching.md's
-// "Ties and misses" rule), silently degrades Q1 steering with no error
-// anywhere else. `review`'s presence is already covered generically by
-// the standard (which always supplies it).
+// I19 (core/skills/_shared/capability-matching.md): `serves` is optional, and the schema refuses a malformed one,
+// but two capabilities that declare the identical attribute set are permanently tied (capability-matching.md's
+// "Ties and misses" rule) and silently degrade Q1 steering with no error anywhere else. `review`'s presence is
+// already covered generically by the standard (which always supplies it).
 function normalizeServesForComparison(serves) {
   return JSON.stringify(Object.fromEntries(Object.entries(serves).sort(([a], [b]) => a.localeCompare(b))));
 }
 
 function checkCapabilityServesValid(cwd) {
   const capabilities = effectiveSection(cwd, 'runner').capabilities ?? {};
-  const invalid = [];
   const servesByName = new Map();
   for (const [name, entry] of Object.entries(capabilities)) {
-    if (!entry || typeof entry !== 'object' || Array.isArray(entry) || entry.serves === undefined) continue;
-    try {
-      validateCapabilityServesShape(entry.serves, `runner.capabilities.${name}.serves`);
-      servesByName.set(name, entry.serves);
-    } catch (error) {
-      invalid.push(`${name}: ${error.message}`);
-    }
-  }
-  if (invalid.length > 0) {
-    return { passed: false, message: `invalid "serves": ${invalid.join('; ')}` };
+    if (entry?.serves !== undefined) servesByName.set(name, entry.serves);
   }
   const seenBySignature = new Map();
   for (const [name, serves] of servesByName) {
@@ -2268,7 +2254,7 @@ function checkCapabilityServesValid(cwd) {
 
 registerCheck({
   id: 'capability-serves-valid',
-  description: 'runner.capabilities\' "serves" attribute sets are well-formed and mutually distinct (I19)',
+  description: 'runner.capabilities\' "serves" attribute sets are mutually distinct (I19); the schema states their shape',
   check: (cwd) => checkCapabilityServesValid(cwd),
 });
 

@@ -21,7 +21,7 @@
 // a committed path.
 
 import { EXIT_CODES, categoryOf } from '../src/state/store.mjs';
-import { loadRunnerConfigForDir } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfigForDir } from '../src/runner/dispatch/config.mjs';
 import { resolveRepoRoot, runOnce, runWatch } from '../src/runner/loop.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 

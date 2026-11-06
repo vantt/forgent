@@ -9,34 +9,18 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
-import {
-  loadRunnerConfig,
-  loadRunnerConfigForDir,
-  resolveExecutorCommand,
-  resolveExecutorEnv,
-  resolveExecutorAndOverrides,
-  decideDispatchMechanism,
-  decideExecutorDispatchMechanism,
-  decideExecutorCli,
-  compileDispatchPlan as compileDispatchPlanRaw,
-  RunnerConfigError,
-  DispatchError,
-  DEFAULT_ADAPTER,
-  EXECUTOR_KINDS,
-  EXECUTOR_CARRIES,
-  INVOCATION_VIA,
-  resolveAgentTypeForTaskSpec,
-  validateProviderAccountInventory,
-  ProviderCapacityConfigError,
-} from '../../src/runner/dispatch.mjs';
+import { loadRunnerConfigForDir, RunnerConfigError, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { resolveExecutorCommand, resolveExecutorEnv, DispatchError, DEFAULT_ADAPTER, EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
+import { decideDispatchMechanism, decideExecutorDispatchMechanism } from '../../src/runner/dispatch/mechanism.mjs';
+import { decideExecutorCli, resolveAgentTypeForTaskSpec } from '../../src/runner/dispatch/cli.mjs';
+import { validateProviderAccountInventory, ProviderCapacityConfigError } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { buildPrompt, executorIdForWork } from '../../src/runner/work-compat.mjs';
 import { spawnWorker, resolveAgentTypeForWork, resolveWorkForDispatch, workDispatchHint } from '../../src/runner/work-dispatch.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
-import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
-import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveExecutorConfig, resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
-import { effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
+import { compileDispatchPlan as compileDispatchPlanRaw, effectiveDispatchPolicy } from '../../src/runner/dispatch/plan.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { dispatchCwdHolder } from '../../src/run-supervisor/cwd-lock.mjs';
@@ -292,120 +276,20 @@ test('buildPrompt handles a work item with empty refs', () => {
   assert.match(prompt, /\(none\)/);
 });
 
-// --- loadRunnerConfig: valid + malformed shapes -------------------------
+// --- runner config checks that compare two fields: each field's own shape is the runner schema's ---
 
-test('loadRunnerConfig parses a valid committed-shaped config', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'runner-config.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
-      modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 120000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.executor.command, 'claude');
-  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
-  assert.equal(cfg.timeoutMs, 120000);
-});
-
-test('loadRunnerConfig refuses a runner config that still carries rigorToTier, naming the retired key and the fix', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'retired-rigor-map.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
-      modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus' } },
-      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'flagship' },
-      timeoutMs: 120000,
-    }),
-  );
+test('the runner config check refuses a runner config that still carries rigorToTier, naming the retired key and the fix', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'flagship' },
+    timeoutMs: 120000,
+  };
 
   assert.throws(
-    () => loadRunnerConfig(configPath),
+    () => validateRunnerConfigShape(runner, 'test'),
     (err) => err instanceof RunnerConfigError && /retired "rigorToTier".*delete the key/.test(err.message),
   );
-});
-
-test('loadRunnerConfig rejects a missing file', () => {
-  assert.throws(() => loadRunnerConfig('/nonexistent/runner-config.json'), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects invalid JSON', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad.json');
-  fs.writeFileSync(configPath, '{ not valid json');
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a config missing executor.args', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'missing-args.json');
-  fs.writeFileSync(configPath, JSON.stringify({ executor: { command: 'claude' }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 1000 }));
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a config missing modelPolicies', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'missing-models.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 1000 }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig accepts a modelPolicies provider table declaring only some of the 6 policy tiers (Phase 00 R8)', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'partial-model-policies.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: {
-        claude: { standard: 'sonnet' },
-        'z-ai': { standard: 'glm-4.6', frontier: 'glm-4.6-max' },
-      },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
-  assert.equal(cfg.modelPolicies['z-ai'].frontier, 'glm-4.6-max');
-  assert.equal(cfg.modelPolicies.claude.flagship, undefined);
-});
-
-test('loadRunnerConfig rejects a modelPolicies tier key not in MODEL_POLICY_TIERS', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-model-policies-key.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: { claude: { 'not-a-real-tier': 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a modelPolicies entry whose model value is not a non-empty string', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-model-policies-value.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: { claude: { standard: '' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
 test('validateProviderAccountInventory accepts keyed global Codex accounts', () => {
@@ -428,45 +312,35 @@ test('validateProviderAccountInventory accepts keyed global Codex accounts', () 
   assert.equal(inventory['openai-codex'].accounts.tetnu.label, 'tetnu');
 });
 
-test('loadRunnerConfig rejects provider accounts declared as an array', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'provider-accounts-array.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-      providers: { 'openai-codex': { accounts: [] } },
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), ProviderCapacityConfigError);
+test('the runner config check rejects provider accounts declared as an array', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+    providers: { 'openai-codex': { accounts: [] } },
+  };
+  assert.throws(() => validateRunnerConfigShape(runner, 'test'), ProviderCapacityConfigError);
 });
 
-test('loadRunnerConfig rejects provider account entries that declare placement policy', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'provider-account-placement.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-      providers: {
-        'openai-codex': {
-          accounts: {
-            tetnu: {
-              credentialSource: { kind: 'codex-home', home: '${HOME}/.codex-tetnu' },
-              model: 'gpt-5-codex',
-            },
+test('the runner config check rejects provider account entries that declare placement policy', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+    providers: {
+      'openai-codex': {
+        accounts: {
+          tetnu: {
+            credentialSource: { kind: 'codex-home', home: '${HOME}/.codex-tetnu' },
+            model: 'gpt-5-codex',
           },
         },
       },
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), /must not declare "model"/);
+    },
+  };
+  assert.throws(() => validateRunnerConfigShape(runner, 'test'), /must not declare "model"/);
 });
 
 test('loadRunnerConfigForDir refuses a project-local account inventory (providers or llmAccounts), naming the key', () => {
@@ -493,337 +367,10 @@ test('loadRunnerConfigForDir refuses a project-local account inventory (provider
   fs.rmSync(repo.repoRoot, { recursive: true, force: true });
 });
 
-test('loadRunnerConfig rejects a non-positive timeoutMs', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-timeout.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 0 }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig accepts a config with no "idleTimeoutMs" at all -- absent keeps the idle-timeout disarmed, byte-identical to before this field existed', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'no-idle-timeout.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 1000 }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.idleTimeoutMs, undefined);
-});
-
-test('loadRunnerConfig accepts a well-formed positive "idleTimeoutMs"', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'good-idle-timeout.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 1000, idleTimeoutMs: 30000 }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.idleTimeoutMs, 30000);
-});
-
-test('loadRunnerConfig rejects a non-positive "idleTimeoutMs" when present', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-idle-timeout.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 1000, idleTimeoutMs: 0 }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-// --- tsk-in1-2 D6: the OLD `executors.<tier>` (a per-tier override block,
-// a genuinely different, unrelated field) was retired — 0 live entries,
-// had already caused a real bug (tsk-4eu, tsk-5tm D10: a non-tier key
-// like "judge" silently fell through to the global executor with no
-// error). tsk-225 (D1) later renamed the SEPARATE `capacities.<id>` named
-// catalog to `executors.<id>`, reusing the same top-level key name for a
-// real, validated concept going forward — the two `executors` are not the
-// same field across time, just the same string. See
-// `resolveExecutorConfig`'s own dedicated coverage for the resolve-side
-// confirmation (a global `executors` D6 test elsewhere in this file).
-
-test('loadRunnerConfig accepts a config with no "executors" block at all', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'no-executors.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.executors, undefined);
-});
-
-test('loadRunnerConfig rejects a non-object "executors" block (tsk-225 D1: the renamed catalog is real and validated, unlike the unrelated retired executors.<tier> rung above)', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-executors-shape.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: 'nope',
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects an unknown "adapter" value on the global executor', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-adapter-global.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'], adapter: 'rpc' },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-// --- tsk-62v: executor-aware `executors` schema (D1/D2) -----------------
-
-test('EXECUTOR_KINDS is exactly the agent/tool BAN CHAT axis (D5, tsk-in1-4) — no longer reuses tool-registry\'s own KINDS', () => {
-  assert.deepEqual(EXECUTOR_KINDS, ['agent', 'tool']);
-});
-
-test('loadRunnerConfig accepts a config with no "executors" block at all — pre-tsk-62v shape, unchanged', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'no-executors.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.executors, undefined);
-});
-
-test('loadRunnerConfig accepts a well-formed "executors" entry carrying its own executor', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'with-executors.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'] } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.executors['fgos-code-implement'].command, 'agy');
-});
-
-// --- tsk-in1-3: capabilities catalog (D4/D14) — curated, shared between
-// the tool-registry's own free-text `capability` field and, later,
-// executors.<id>.for -- deliberately a DIFFERENT field from `executors`
-// above (D3 kept that name for the executor registry; `capabilities` is
-// the catalog of WHAT a executor can promise) --------------------------
-
-test('loadRunnerConfig accepts a config with no "capabilities" block at all', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'no-capabilities.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.capabilities, undefined);
-});
-
-test('loadRunnerConfig accepts a well-formed "capabilities" catalog entry with description and aliases', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'with-capabilities.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'impact-analysis': { description: 'Code-graph blast radius', aliases: ['impact_analysis', 'Impact Analysis'] } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.capabilities['impact-analysis'].description, 'Code-graph blast radius');
-  assert.deepEqual(cfg.capabilities['impact-analysis'].aliases, ['impact_analysis', 'Impact Analysis']);
-});
-
-test('loadRunnerConfig accepts a "capabilities" entry naming neither description nor aliases (bare {})', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bare-capabilities.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'pane-labeling': {} },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.deepEqual(cfg.capabilities['pane-labeling'], {});
-});
-
-test('loadRunnerConfig rejects a "capabilities" block that is not an object', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-capabilities-shape.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: 'nope',
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a "capabilities.<name>" entry that is not an object', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-capabilities-entry.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'impact-analysis': 'nope' },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a "capabilities.<name>" entry with an empty-string description', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-capabilities-description.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'impact-analysis': { description: '' } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a "capabilities.<name>" entry whose aliases is not an array of non-empty strings', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-capabilities-aliases.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'impact-analysis': { aliases: ['ok', ''] } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
 // --- executors.<id>.invocations[] (tsk-5tm-4 D11): executor-keyed
 // alternative to flat command/args, ADDITIVE -- executors field name
 // itself stays unchanged (cfg.executors already means something else,
 // tier-keyed, tsk-4eu) -----------------------------------------------
-
-test('INVOCATION_VIA is exactly the invocation-mode axis: cli, task and mcp', () => {
-  assert.deepEqual(INVOCATION_VIA, ['cli', 'task', 'mcp']);
-});
-
-test('loadRunnerConfig accepts a "executors.<id>" entry using the invocations[] shape instead of flat command/args', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'invocations-ok.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: {
-        agy: {
-          kind: 'agent',
-          allowCrossProvider: true,
-          invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'agy', args: ['-p', '{prompt}', '--model', '{model}'] }],
-        },
-      },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig rejects a "executors.<id>.invocations" that is not a non-empty array', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-invocations-empty.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', invocations: [] } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig refuses a "via":"api" invocation by name, the http transport having been removed', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-invocations-via.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: {
-        webhook: { kind: 'tool', invocations: [{ via: 'api', adapter: 'http', url: 'http://example.invalid/hook' }] },
-      },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), (err) => err instanceof RunnerConfigError && /"via" must be one of cli\/task\/mcp, got: "api"/.test(err.message));
-});
-
-test('loadRunnerConfig rejects a "executors.<id>.invocations[]" entry with a malformed command/args shape (reuses validateExecutorShape)', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-invocations-shape.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', allowCrossProvider: true, invocations: [{ via: 'cli', command: 'agy' }] } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
 
 test('resolveExecutorCommand resolves command/args/provider from invocations[0] for an invocations[]-shaped executor', () => {
   const cfg = {
@@ -961,116 +508,6 @@ test('resolveExecutorAndOverrides resolves "claude" as a literal registered exec
   const resolved = resolveExecutorAndOverrides(cfg, 'claude');
   assert.equal(resolved.configured, true);
   assert.equal(resolved.executorId, 'claude');
-});
-
-test('loadRunnerConfig accepts a "executors" entry naming only "kind" (metadata-only, falls through for its executor)', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'metadata-only-executor.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { distill: { kind: 'agent', target: 'general-purpose', tier: 'standard' } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig rejects a "executors" block that is not an object', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-executors-shape.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: 'nope',
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a "executors.<id>" entry with an unknown "kind"', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-executor-kind.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { distill: { kind: 'not-a-real-kind' } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig accepts "task" as a "executors.<id>.kind" value (the one kind fgos tool never sees)', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'task-kind-executor.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { distill: { kind: 'agent', target: 'general-purpose' } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig rejects a "executors.<id>" entry declaring "command" without "args"', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-executor-entry.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy' } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-// --- executors.<id>.allowCrossProvider (D1, tsk-32n) --------------------
-
-test('loadRunnerConfig accepts a "executors.<id>" entry with allowCrossProvider: true', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'allow-cross-provider.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig rejects a "executors.<id>" entry whose allowCrossProvider is not a boolean', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-allow-cross-provider.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: 'yes' } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
 test('EXECUTOR_ADAPTERS registers adapters: cli-spawn (default) and herdr-spawn', () => {
@@ -1225,171 +662,57 @@ test('loadRunnerConfigForDir refuses a global file that holds the retired rigorT
   );
 });
 
-test('loadRunnerConfig reads a named YAML file and names the line and column of a parse failure', () => {
-  const dir = mkTempDir();
-  const good = path.join(dir, 'runner.yaml');
-  fs.writeFileSync(good, 'executor:\n  command: claude\n  args: ["{prompt}"]\nmodelPolicies:\n  claude:\n    standard: sonnet\ndefaults:\n  tier: standard\npatterns:\n  seatBinding:\n    schema: 1\ntimeoutMs: 120000\n');
-  assert.equal(loadRunnerConfig(good).timeoutMs, 120000);
-  const bad = path.join(dir, 'bad.yaml');
-  fs.writeFileSync(bad, 'executor:\n  command: [unclosed\n');
-  assert.throws(() => loadRunnerConfig(bad), (err) => err instanceof RunnerConfigError && /line \d+, column \d+/.test(err.message));
-});
-
-test('loadRunnerConfig rejects a runner config declaring retired models map', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'retired-models.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      models: { standard: 'sonnet' },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(
-    () => loadRunnerConfig(configPath),
-    (err) => err instanceof RunnerConfigError && /declares retired "models" map/.test(err.message),
-  );
-});
-
-test('loadRunnerConfig accepts a runner config declaring modelPolicies instead of models', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'model-policies.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
-});
-
-test('loadRunnerConfig rejects a config declaring no modelPolicies', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'no-models.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 1000 }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-test('loadRunnerConfig rejects a modelPolicies entry with an unknown policy tier key', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-tier-key.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: { claude: { 'ultra-mega': 'opus' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), (err) => {
-    assert.ok(err instanceof RunnerConfigError);
-    assert.match(err.message, /ultra-mega/);
-    return true;
-  });
-});
-
-test('loadRunnerConfig rejects a modelPolicies entry whose model value is not a non-empty string', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-model-value.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      modelPolicies: { claude: { standard: '' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a "executors.<id>" entry whose providerModel is not a non-empty string', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-provider-model.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], providerModel: '' } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig does not warn for a "executors.<id>" entry that declares providerModel explicitly', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'has-provider-model.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'glm-cli': { kind: 'agent', providerModel: 'z-ai', command: 'glm', args: [] } },
-      modelPolicies: { claude: { standard: 'sonnet' }, 'z-ai': { standard: 'glm-4.6' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
+test('the runner config check does not warn for a "executors.<id>" entry that declares providerModel explicitly', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { 'glm-cli': { kind: 'agent', providerModel: 'z-ai', command: 'glm', args: [] } },
+    modelPolicies: { claude: { standard: 'sonnet' }, 'z-ai': { standard: 'glm-4.6' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+  };
   const original = console.warn;
   const calls = [];
   console.warn = (...args) => calls.push(args);
   try {
-    loadRunnerConfig(configPath);
+    validateRunnerConfigShape(runner, 'test');
     assert.equal(calls.length, 0);
   } finally {
     console.warn = original;
   }
 });
 
-test('loadRunnerConfig does not warn for a "executors.<id>" entry with a Claude CLI command and no providerModel (correct default case)', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'claude-command-no-provider-model.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'custom-claude-executor': { kind: 'agent', command: 'claude', args: ['{prompt}'] } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
+test('the runner config check does not warn for a "executors.<id>" entry with a Claude CLI command and no providerModel (correct default case)', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { 'custom-claude-executor': { kind: 'agent', command: 'claude', args: ['{prompt}'] } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+  };
   const original = console.warn;
   const calls = [];
   console.warn = (...args) => calls.push(args);
   try {
-    loadRunnerConfig(configPath);
+    validateRunnerConfigShape(runner, 'test');
     assert.equal(calls.length, 0);
   } finally {
     console.warn = original;
   }
 });
 
-test('loadRunnerConfig warns (never throws) for a "executors.<id>" entry with a non-Claude command and no providerModel/provider', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'non-claude-command-no-provider-model.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'bare-nonclaude': { kind: 'agent', command: 'some-other-tool', args: [] } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
+test('the runner config check warns (never throws) for a "executors.<id>" entry with a non-Claude command and no providerModel/provider', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { 'bare-nonclaude': { kind: 'agent', command: 'some-other-tool', args: [] } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+  };
   const original = console.warn;
   const calls = [];
   console.warn = (...args) => calls.push(args);
   try {
-    assert.doesNotThrow(() => loadRunnerConfig(configPath));
+    assert.doesNotThrow(() => validateRunnerConfigShape(runner, 'test'));
     assert.equal(calls.length, 1);
     assert.match(calls[0][0], /bare-nonclaude/);
     assert.match(calls[0][0], /some-other-tool/);
@@ -1398,127 +721,82 @@ test('loadRunnerConfig warns (never throws) for a "executors.<id>" entry with a 
   }
 });
 
-test('loadRunnerConfig does not warn for an "invocations[]"-shaped "executors.<id>" entry with no providerModel/provider and a non-Claude cli command (codex-cli shape) — assignment-policy.mjs and resolve.mjs already agree for this shape', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'invocations-shaped-no-provider-model.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: {
-        'codex-cli': {
-          kind: 'agent',
-          invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['{prompt}'] }],
-        },
+test('the runner config check does not warn for an "invocations[]"-shaped "executors.<id>" entry with no providerModel/provider and a non-Claude cli command (codex-cli shape) — assignment-policy.mjs and resolve.mjs already agree for this shape', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      'codex-cli': {
+        kind: 'agent',
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['{prompt}'] }],
       },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
+    },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+  };
   const original = console.warn;
   const calls = [];
   console.warn = (...args) => calls.push(args);
   try {
-    loadRunnerConfig(configPath);
+    validateRunnerConfigShape(runner, 'test');
     assert.equal(calls.length, 0);
   } finally {
     console.warn = original;
   }
 });
 
-test('loadRunnerConfig skips provider-family warning when every invocation is non-CLI (R8, gitnexus shape: mcp-only)', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'invocations-shaped-mcp-only-no-provider-model.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'impact-analysis': { prefer: 'gitnexus' } },
-      executors: {
-        gitnexus: {
-          kind: 'tool',
-          for: ['impact-analysis'],
-          invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
-        },
+test('the runner config check skips provider-family warning when every invocation is non-CLI (R8, gitnexus shape: mcp-only)', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'impact-analysis': { prefer: 'gitnexus' } },
+    executors: {
+      gitnexus: {
+        kind: 'tool',
+        for: ['impact-analysis'],
+        invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
       },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
+    },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+  };
   const original = console.warn;
   const calls = [];
   console.warn = (...args) => calls.push(args);
   try {
-    assert.doesNotThrow(() => loadRunnerConfig(configPath));
+    assert.doesNotThrow(() => validateRunnerConfigShape(runner, 'test'));
     assert.equal(calls.length, 0, 'warning must be skipped when every invocation is non-CLI');
   } finally {
     console.warn = original;
   }
 });
 
-test('loadRunnerConfig still warns when an executor has a CLI invocation with unrecognized command and no providerModel (R8)', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'invocations-shaped-cli-no-provider-model.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'custom-job': {} },
-      executors: {
-        customTool: {
-          kind: 'agent',
-          for: ['custom-job'],
-          command: 'unrecognized-binary',
-          args: ['{prompt}'],
-        },
+test('the runner config check still warns when an executor has a CLI invocation with unrecognized command and no providerModel (R8)', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'custom-job': {} },
+    executors: {
+      customTool: {
+        kind: 'agent',
+        for: ['custom-job'],
+        command: 'unrecognized-binary',
+        args: ['{prompt}'],
       },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
+    },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+  };
   const original = console.warn;
   const calls = [];
   console.warn = (...args) => calls.push(args);
   try {
-    assert.doesNotThrow(() => loadRunnerConfig(configPath));
+    assert.doesNotThrow(() => validateRunnerConfigShape(runner, 'test'));
     assert.equal(calls.length, 1);
     assert.match(calls[0][0], /customTool/);
   } finally {
     console.warn = original;
   }
-});
-
-test('loadRunnerConfig rejects a "executors.<id>" entry whose rigorOverrides key is not a valid tier', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-rigor-key.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], rigorOverrides: { 'not-a-tier': 'frontier' } } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a "executors.<id>" entry whose rigorOverrides value is not one of MODEL_POLICY_TIERS', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-rigor-value.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], rigorOverrides: { standard: 'ultra-mega' } } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
 // --- tsk-2ig: worktree-dispatch attestation (baseCommit/headRef) ---------
@@ -1668,7 +946,7 @@ test('resolveExecutorCommand falls back to the global executor when no tier is g
   assert.equal(command, process.execPath);
 });
 
-test('resolveExecutorCommand throws for an unknown adapter even on a raw config object that skipped loadRunnerConfig validation', () => {
+test('resolveExecutorCommand throws for an unknown adapter even on a raw config object that skipped the config door', () => {
   const cfg = { executor: { command: 'x', args: ['{prompt}'], adapter: 'not-a-real-adapter' }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 5000 };
   assert.throws(() => resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' }), RunnerConfigError);
 });
@@ -2032,74 +1310,6 @@ test('resolveExecutorCommand falls through to the global executor for a executor
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'fgos-code-implement' });
   assert.equal(resolved.command, 'claude');
-});
-
-// --- executors.<id>.agentType static shape (D1/D2, tsk-3sw), mirrors the
-// existing "model" field validation pattern ---------------------------
-
-test('loadRunnerConfig accepts a "executors.<id>" entry with a non-empty agentType', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'agent-type.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'my-agent-executor': { kind: 'agent', agentType: 'code-simplifier' } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig rejects a "executors.<id>" entry whose agentType is not a non-empty string', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-agent-type.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'my-agent-executor': { kind: 'agent', agentType: '' } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-// --- executors.<id>.forceCliSpawn static shape (tsk-3ik-1), mirrors the
-// existing agentType/allowCrossProvider boolean-field validation pattern ---
-
-test('loadRunnerConfig accepts a "executors.<id>" entry with a boolean forceCliSpawn', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'force-cli-spawn.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'my-task-executor': { kind: 'agent', agentType: 'code-simplifier', forceCliSpawn: true } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig rejects a "executors.<id>" entry whose forceCliSpawn is not a boolean', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-force-cli-spawn.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { 'my-task-executor': { kind: 'agent', forceCliSpawn: 'yes' } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
 // --- decideDispatchMechanism (tsk-3ik-1, Native-First Dispatch Doctrine
@@ -2740,160 +1950,41 @@ function writeRunnerConfigFixture(root, cfg) {
 }
 
 // --- executors.<id>.carries (D15, tsk-5td; first real consumer tsk-2ie5/
-// tsk-2c1) — closed enum at config-load, plus a real pre-dispatch gate on
-// the ACTUAL content class a caller declares it's sending ------------------
-
-test('EXECUTOR_CARRIES is exactly the two D15-locked values, never a free string vocabulary', () => {
-  assert.deepEqual(EXECUTOR_CARRIES, ['user-text', 'repo-content']);
-});
-
-test('loadRunnerConfig accepts a "executors.<id>" entry with a valid carries value', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'carries-ok.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { judge: {} },
-      executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['judge'], carries: 'repo-content', allowCrossProvider: true } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-// --- tsk-34n: the legacy "capability" (singular) field on a executor is no
-// longer read or validated at all -- "for" is the only recognized field ----
-
-test('loadRunnerConfig ignores a "executors.<id>" entry\'s stray "capability" field entirely -- no longer validated against "capabilities", never throws', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'stray-capability.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { gitnexus: { kind: 'tool', capability: 'not-declared-anywhere', invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }] } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig accepts a "executors.<id>" entry naming neither "for" nor the legacy "capability" (a plain dispatch executor)', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'no-capability.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
+// tsk-2c1) — a real pre-dispatch gate on the ACTUAL content class a caller declares it's sending ---
 
 // --- tsk-45f piece 3: an mcp invocation's optional "tools" capability->tool map --
 
-test('loadRunnerConfig accepts an mcp invocation\'s "tools" map when every key is declared in "capabilities"', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'tools-map-ok.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'impact-analysis': { prefer: 'gitnexus' } },
-      executors: {
-        gitnexus: {
-          kind: 'tool',
-          for: ['impact-analysis'],
-          invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
-        },
+test('the runner config check accepts an mcp invocation\'s "tools" map when every key is declared in "capabilities"', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'impact-analysis': { prefer: 'gitnexus' } },
+    executors: {
+      gitnexus: {
+        kind: 'tool',
+        for: ['impact-analysis'],
+        invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
       },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+    },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+  };
+  assert.doesNotThrow(() => validateRunnerConfigShape(runner, 'test'));
 });
 
-test('loadRunnerConfig rejects an mcp invocation\'s "tools" map whose key is not declared in "capabilities"', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'tools-map-bad-key.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: {
-        gitnexus: {
-          kind: 'tool',
-          invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'not-declared-anywhere': 'mcp__gitnexus__impact' } }],
-        },
+test('the runner config check rejects an mcp invocation\'s "tools" map whose key is not declared in "capabilities"', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      gitnexus: {
+        kind: 'tool',
+        invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'not-declared-anywhere': 'mcp__gitnexus__impact' } }],
       },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects an mcp invocation\'s "tools" map whose value is not a non-empty string', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'tools-map-bad-value.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'impact-analysis': { prefer: 'gitnexus' } },
-      executors: {
-        gitnexus: {
-          kind: 'tool',
-          invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': '' } }],
-        },
-      },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig accepts an mcp invocation naming no "tools" at all -- purely additive field', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'no-tools-map.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { gitnexus: { kind: 'tool', invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }] } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig rejects a "executors.<id>" entry whose carries is not one of EXECUTOR_CARRIES', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-carries.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], carries: 'secrets' } },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+    },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    timeoutMs: 1000,
+  };
+  assert.throws(() => validateRunnerConfigShape(runner, 'test'), RunnerConfigError);
 });
 
 function carriesCfg(carries) {
@@ -3043,194 +2134,73 @@ test('resolveExecutorCommand\'s allowCrossProvider error names the REAL resolved
 
 // --- capabilities.<name>.prefer/overrides shape validation (D2) -----------
 
-test('loadRunnerConfig rejects capabilities.<name>.prefer that is not a non-empty string', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-prefer.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'fgos-coding-implement': { prefer: '' } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+test('the runner config check accepts "prefer" naming a real executor that declares no matching "for" (D5 -- supersedes D2\'s own load-time symmetry check)', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { agy: { kind: 'agent' } }, // no "command"/"args"/"for" at all
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+  };
+  assert.doesNotThrow(() => validateRunnerConfigShape(runner, 'test'));
 });
 
-test('loadRunnerConfig rejects capabilities.<name>.overrides with a key outside the allowed 4 fields -- command/args/adapter are never override-able', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-overrides-key.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
-      capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { command: 'not-allowed' } } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects every capabilities.<name>.overrides payload with migration guidance', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'retired-overrides.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
-      capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { tier: 'advanced' } } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), /overrides was removed/);
-});
-
-test('loadRunnerConfig accepts a capability rigor floor with prefer', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'good-prefer-rigor.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } },
-      capabilities: { 'fgos-coding-implement': { description: 'code-implement work', prefer: 'agy', rigor: 'high' } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig accepts "prefer" naming a real executor that declares no matching "for" (D5 -- supersedes D2\'s own load-time symmetry check)', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'prefer-no-for.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent' } }, // no "command"/"args"/"for" at all
-      capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
-});
-
-test('loadRunnerConfig rejects "prefer" naming an executor id that does not exist at all', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'prefer-missing-executor.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { 'fgos-coding-implement': { prefer: 'no-such-executor' } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+test('the runner config check rejects "prefer" naming an executor id that does not exist at all', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'fgos-coding-implement': { prefer: 'no-such-executor' } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    timeoutMs: 1000,
+  };
+  assert.throws(() => validateRunnerConfigShape(runner, 'test'), RunnerConfigError);
 });
 
 // --- executor-id-consolidation Step 2.2: "prefer" as an ORDERED candidate
 // array (cascade, account-rotator-style), each entry a bare executor-id
 // string or {executor, invocation?} ----------------------------------------
 
-test('loadRunnerConfig accepts "prefer" as an array of bare executor-id strings', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'prefer-array-strings.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent' }, claude2: { kind: 'agent' } },
-      capabilities: { advise: { prefer: ['agy', 'claude2'] } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+test('the runner config check accepts "prefer" as an array of bare executor-id strings', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { agy: { kind: 'agent' }, claude2: { kind: 'agent' } },
+    capabilities: { advise: { prefer: ['agy', 'claude2'] } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+  };
+  assert.doesNotThrow(() => validateRunnerConfigShape(runner, 'test'));
 });
 
-test('loadRunnerConfig accepts "prefer" as an array of {executor, invocation} objects when the invocation id is really declared', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'prefer-array-objects.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: {
-        claude: { kind: 'agent', invocations: [{ id: 'cli-bwrap', via: 'cli', command: 'claude', args: ['{prompt}'] }] },
-        agy: { kind: 'agent', invocations: [{ id: 'cli-bwrap', via: 'cli', command: 'agy', args: ['{prompt}'] }] },
-      },
-      capabilities: {
-        advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }, { executor: 'agy', invocation: 'cli-bwrap' }] },
-      },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+test('the runner config check accepts "prefer" as an array of {executor, invocation} objects when the invocation id is really declared', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      claude: { kind: 'agent', invocations: [{ id: 'cli-bwrap', via: 'cli', command: 'claude', args: ['{prompt}'] }] },
+      agy: { kind: 'agent', invocations: [{ id: 'cli-bwrap', via: 'cli', command: 'agy', args: ['{prompt}'] }] },
+    },
+    capabilities: {
+      advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }, { executor: 'agy', invocation: 'cli-bwrap' }] },
+    },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
+    timeoutMs: 1000,
+  };
+  assert.doesNotThrow(() => validateRunnerConfigShape(runner, 'test'));
 });
 
-test('loadRunnerConfig rejects a "prefer" array naming an invocation id that is not declared on that executor', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'prefer-array-bad-invocation.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { claude: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
-      capabilities: { advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }] } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
+test('the runner config check rejects a "prefer" array naming an invocation id that is not declared on that executor', () => {
+  const runner = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: { claude: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
+    capabilities: { advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }] } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    timeoutMs: 1000,
+  };
   assert.throws(
-    () => loadRunnerConfig(configPath),
+    () => validateRunnerConfigShape(runner, 'test'),
     (err) => err instanceof RunnerConfigError && /invocation "cli-bwrap" on executor "claude" but no such invocation id is declared/.test(err.message),
   );
-});
-
-test('loadRunnerConfig rejects an empty "prefer" array', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'prefer-empty-array.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities: { advise: { prefer: [] } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a "prefer" array entry object with an unknown key', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'prefer-array-bad-key.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { claude: { kind: 'agent' } },
-      capabilities: { advise: { prefer: [{ executor: 'claude', model: 'sonnet' }] } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
 test('resolveExecutorAndOverrides picks candidates[0] and threads its invocation as invocationId when "prefer" is an array', () => {
@@ -3960,92 +2930,6 @@ test('resolveExecutorEnv returns empty object when rawEnv is absent or invalid',
   assert.deepEqual(resolveExecutorEnv(undefined), {});
   assert.deepEqual(resolveExecutorEnv(null), {});
   assert.deepEqual(resolveExecutorEnv('not-an-object'), {});
-});
-
-test('loadRunnerConfig accepts well-formed "env" block in executors entry', () => {
-  const dir = mkTempDir();
-  const configPath = path.join(dir, 'env-ok.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: {
-        glm: {
-          kind: 'agent',
-          command: 'claude',
-          args: ['{prompt}'],
-          env: {
-            ANTHROPIC_BASE_URL: 'https://openrouter.ai/api',
-            ANTHROPIC_AUTH_TOKEN: '${GLM_KEY}',
-            ANTHROPIC_API_KEY: '',
-          },
-        },
-      },
-      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  const cfg = loadRunnerConfig(configPath);
-  assert.equal(cfg.executors.glm.env.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
-  assert.equal(cfg.executors.glm.env.ANTHROPIC_AUTH_TOKEN, '${GLM_KEY}');
-  assert.equal(cfg.executors.glm.env.ANTHROPIC_API_KEY, '');
-});
-
-test('loadRunnerConfig rejects malformed "env" in executors entry', () => {
-  const dir = mkTempDir();
-
-  // non-object env
-  const path1 = path.join(dir, 'bad-env-1.json');
-  fs.writeFileSync(
-    path1,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: 'not-an-object' } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(path1), RunnerConfigError);
-
-  // array env
-  const path2 = path.join(dir, 'bad-env-2.json');
-  fs.writeFileSync(
-    path2,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: ['KEY=VAL'] } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(path2), RunnerConfigError);
-
-  // non-string value in env
-  const path3 = path.join(dir, 'bad-env-3.json');
-  fs.writeFileSync(
-    path3,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: { KEY: 123 } } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(path3), RunnerConfigError);
-
-  // empty-string key in env
-  const path4 = path.join(dir, 'bad-env-4.json');
-  fs.writeFileSync(
-    path4,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: { '': 'value' } } },
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      timeoutMs: 1000,
-    }),
-  );
-  assert.throws(() => loadRunnerConfig(path4), RunnerConfigError);
 });
 
 test('resolveExecutorCommand returns env block from resolved executor', () => {

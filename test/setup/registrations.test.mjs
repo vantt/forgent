@@ -780,7 +780,7 @@ test('doctor check runner-patterns-config: attributes catalog defaults problem t
   process.env.HOME = home;
   process.env.USERPROFILE = home;
 
-  const targetPath = 'runner.patterns.solo.defaults.unknownKey';
+  const targetPath = 'runner.patterns.solo.defaults.maxRounds';
   const table = [
     {
       caseName: 'project-only',
@@ -790,7 +790,7 @@ test('doctor check runner-patterns-config: attributes catalog defaults problem t
           runner: {
             patterns: {
               solo: {
-                defaults: { unknownKey: 1 },
+                defaults: { maxRounds: 1 },
               },
             },
           },
@@ -802,7 +802,7 @@ test('doctor check runner-patterns-config: attributes catalog defaults problem t
         assert.match(res.message, /^runner config \(/);
         assert.match(res.message, new RegExp(path.join(repo, '.fgos', 'config.yaml').replace(/[/\\?*]/g, '\\$&')));
         assert.match(res.message, /:\d+.*\)/);
-        assert.match(res.message, /pattern "solo" default parameter "unknownKey" is not read by loop "solo"/);
+        assert.match(res.message, /pattern "solo" default parameter "maxRounds" is not read by loop "solo"/);
         assert.doesNotMatch(res.message, /~[/\\]\.fgos[/\\]config\.yaml/);
       },
     },
@@ -813,7 +813,7 @@ test('doctor check runner-patterns-config: attributes catalog defaults problem t
           runner: {
             patterns: {
               solo: {
-                defaults: { unknownKey: 1 },
+                defaults: { maxRounds: 1 },
               },
             },
           },
@@ -825,7 +825,7 @@ test('doctor check runner-patterns-config: attributes catalog defaults problem t
         assert.equal(res.passed, false);
         assert.match(res.message, /^runner config \(/);
         assert.match(res.message, /~[/\\]\.fgos[/\\]config\.yaml:\d+/);
-        assert.match(res.message, /pattern "solo" default parameter "unknownKey" is not read by loop "solo"/);
+        assert.match(res.message, /pattern "solo" default parameter "maxRounds" is not read by loop "solo"/);
         assert.doesNotMatch(res.message, new RegExp(repo.replace(/[/\\?*]/g, '\\$&')));
       },
     },
@@ -837,7 +837,7 @@ test('doctor check runner-patterns-config: attributes catalog defaults problem t
           runner: {
             patterns: {
               solo: {
-                defaults: { unknownKey: 1 },
+                defaults: { maxRounds: 1 },
               },
             },
           },
@@ -861,7 +861,7 @@ test('doctor check runner-patterns-config: attributes catalog defaults problem t
       assert: (res) => {
         assert.equal(res.passed, false);
         assert.doesNotMatch(res.message, /^runner config \(/);
-        assert.match(res.message, /^pattern "solo" default parameter "unknownKey" is not read by loop "solo"/);
+        assert.match(res.message, /^pattern "solo" default parameter "maxRounds" is not read by loop "solo"/);
       },
     },
   ];

@@ -25,7 +25,6 @@ import {
 import { establishConfinement } from "../../src/runner/dispatch/herdr-round.mjs";
 import { DEFAULT_CAPABILITY_SLOTS } from "../../src/setup/registrations.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
-import { loadRunnerConfig } from "../../src/runner/dispatch/config.mjs";
 import { loadAttestationRecord } from "../../src/runner/dispatch/confinement/attestation-store.mjs";
 import { resolveCapabilityIdentityDetails } from "../../src/runner/work-compat.mjs";
 
@@ -605,7 +604,7 @@ test("R3: explicit unconfined policy produces an audited prepared attestation wi
 // ─── R4 & R5: Migrated Executor Config & Static Check ──────────────────────────
 
 test("R4 & R5: migrated claude-bwrap, agy-bwrap, codex-bwrap config fixture uses confinement.backend without bwrap in argv", () => {
-  const migratedConfig = loadRunnerConfig(path.join(process.cwd(), "test/fixtures/confinement-migrated-executors.json"));
+  const migratedConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), "test/fixtures/confinement-migrated-executors.json"), "utf8"));
 
   for (const [id, exec] of Object.entries(migratedConfig.executors)) {
     // R5: IDs preserved unchanged

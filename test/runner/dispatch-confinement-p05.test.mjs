@@ -495,6 +495,7 @@ test("Doctor check: confinement-herdr-maturity reports partial maturity for herd
             kind: "agent",
             adapter: "herdr-spawn",
             command: "claude",
+            args: [],
             interactiveMode: { exitCommand: "/exit", kind: "claude" },
             confinement: {
               privateHome: true,
@@ -524,6 +525,7 @@ test("Doctor check: confinement-herdr-maturity fails if bypass is missing full c
             kind: "agent",
             adapter: "herdr-spawn",
             command: "claude",
+            args: [],
             permissionMode: "bypass",
             interactiveMode: { exitCommand: "/exit", kind: "claude" },
             confinement: {
@@ -559,6 +561,7 @@ test("Doctor check: confinement-herdr-maturity reports not-applicable when no he
             kind: "agent",
             adapter: "cli-spawn",
             command: "node",
+            args: [],
           },
         },
       },

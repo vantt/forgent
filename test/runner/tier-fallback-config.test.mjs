@@ -58,11 +58,11 @@ test('each shape error fails the load and names the key', () => {
     return true;
   });
   refused([], /runner\.tierFallback \(type\)/);
-  refused({ medium: ['claude'] }, /tierFallback.*tier key must be one of.*"medium"/);
+  refused({ medium: ['claude'] }, /runner\.tierFallback \(additionalProperties\)/);
   refused({ advanced: [] }, /runner\.tierFallback\.advanced \((minItems|type)\)/);
   refused({ advanced: 'claude' }, /runner\.tierFallback\.advanced \((minItems|type)\)/);
   refused({ advanced: ['claude', 7] }, /runner\.tierFallback\.advanced\[1\] \(type\)/);
-  refused({ advanced: ['claude', ' '] }, /tierFallback\.advanced.*non-empty family name/);
+  refused({ advanced: ['claude', ' '] }, /runner\.tierFallback\.advanced\[1\] \(pattern\)/);
   refused({ advanced: ['claude', 'gemini', 'claude'] }, /runner\.tierFallback\.advanced \(uniqueItems\)/);
 });
 
@@ -143,17 +143,17 @@ test('a tier name outside the vocabulary fails the load and names the key path',
 });
 
 test('roles are the five roles only, a seat is a seat id, a persona is a persona name', () => {
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { checker: { tier: 'standard' } } } } }), /roles.*"checker".*one of producer\/synthesizer\/reviewer\/red-team\/judge/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { checker: { tier: 'standard' } } } } }), /runner\.capabilities\.code:\*\.roles \(additionalProperties\)/);
   refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { 'Member One': { tier: 'standard' } } } } }), /seats.*"Member One".*seat id/);
   refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { verify: { tier: 'standard' } } } } }), /seats.*"verify".*seat id/);
   refusedLoad(runnerWith({ capabilities: { 'code:*': { personas: { 'Code Reviewer': { tier: 'standard' } } } } }), /personas.*"Code Reviewer".*persona name/);
 });
 
 test('a role, persona or seat entry holds tier and prefer only; there is no families key', () => {
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { families: ['claude'] } } } } }), /roles\.reviewer.*unknown key "families".*tier, prefer/);
-  refusedLoad(runnerWith({ capabilities: { 'code:*': { families: ['claude'] } } }), /capabilities\.code:\*.*unknown key "families"/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { roles: { reviewer: { families: ['claude'] } } } } }), /roles\.reviewer \(additionalProperties\)/);
+  refusedLoad(runnerWith({ capabilities: { 'code:*': { families: ['claude'] } } }), /runner\.capabilities\.code:\* \(additionalProperties\)/);
   refusedLoad(runnerWith({ capabilities: { 'code:*': { seats: { judge: 'standard' } } } }), /seats\.judge \(type\)/);
-  refusedLoad(runnerWith({ defaults: { tier: 'standard', prefer: ['claude'] } }), /defaults.*unknown key "prefer"/);
+  refusedLoad(runnerWith({ defaults: { tier: 'standard', prefer: ['claude'] } }), /runner\.defaults \(additionalProperties\)/);
 });
 
 test('an empty prefer list is a load error wherever prefer sits, and every prefer names a registered executor', () => {
@@ -170,9 +170,9 @@ test('the schema marker is {schema: 1|2} inside patterns and nothing else', () =
   assert.equal(loadRunner(runnerWith({ patterns: { seatBinding: { schema: 2 } } })).cfg.patterns.seatBinding.schema, 2);
   refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 3 } } }), /runner\.patterns\.seatBinding\.schema/);
   assert.equal(loadRunner(runnerWith({ patterns: { seatBinding: {} } })).cfg.patterns.seatBinding.schema, 2, 'a marker with no schema is filled by the standard');
-  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1, extra: true } } }), /seatBinding.*unknown key "extra"/);
+  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1, extra: true } } }), /runner\.patterns\.seatBinding \(additionalProperties\)/);
   refusedLoad(runnerWith({ patterns: { seatBinding: 1 } }), /runner\.patterns\.seatBinding/);
-  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1 }, somethingElse: { extra: true } } }), /runner\.patterns\.somethingElse/);
+  refusedLoad(runnerWith({ patterns: { seatBinding: { schema: 1 }, somethingElse: { extra: true } } }), /runner\.patterns\.somethingElse \(additionalProperties\)/);
 });
 
 test('the global layer keeps the keys it has always carried: maxTier, tierFallback, capability rigor and prefer; a rigorToTier there is refused by name', () => {

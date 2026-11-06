@@ -4,12 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
-import {
-  loadRunnerConfig,
-  loadRunnerConfigForDir,
-  RunnerConfigError,
-} from '../../src/runner/dispatch/config.mjs';
+import { validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
 import {
   BUILTIN_POLICIES,
   BUILTIN_POLICY_IDS,
@@ -31,19 +26,6 @@ import {
   ensureMachineBackendRegistryDefaults,
   ConfinementBackendRegistryError,
 } from '../../src/runner/dispatch/confinement/backend-registry.mjs';
-
-function mkTempConfig(runnerObj) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-test-'));
-  const file = projectConfigPath(dir);
-  writeProjectConfig(dir, {
-    executor: { command: 'node', args: ['{prompt}'] },
-    modelPolicies: { node: { standard: 'sonnet' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    timeoutMs: 60000,
-    ...runnerObj,
-  });
-  return { dir, file };
-}
 
 // ─── R2: Built-in Policies ──────────────────────────────────────────────────
 
@@ -503,145 +485,61 @@ test('M5: ensureMachineBackendRegistryDefaults strips unknown keys and stale con
 });
 
 // ─── Config Integration: Strict Mode & Capabilities ─────────────────────────
+// The schema owns the shape of `confinement` and of a capability entry (an unknown key, including the retired
+// boolean `unconfined`, is refused by the config door); these cases cover what compares two fields.
+
+const runnerWith = (runnerObj) => ({
+  executor: { command: 'node', args: ['{prompt}'] },
+  modelPolicies: { node: { standard: 'sonnet' } },
+  timeoutMs: 60000,
+  ...runnerObj,
+});
 
 test('Strict mode: throws confinement-policy-missing when strict: true and capability has no policy', () => {
-  const { dir, file } = mkTempConfig({
-    executor: { command: 'node', args: ['{prompt}'] },
-    confinement: { strict: true },
-    capabilities: {
-      'code:implement': {
-        description: 'implementing code',
-        // missing confinement policy
-      },
-    },
-  });
-
-  try {
-    assert.throws(
-      () => loadRunnerConfig(file),
-      /confinement-policy-missing/,
-    );
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+  assert.throws(
+    () => validateRunnerConfigShape(runnerWith({
+      confinement: { strict: true },
+      capabilities: { 'code:implement': { description: 'implementing code' } },
+    }), 'test'),
+    /confinement-policy-missing/,
+  );
 });
 
 test('Strict mode: passes when capability declares valid built-in policy or mode: unconfined', () => {
-  const { dir, file } = mkTempConfig({
-    executor: { command: 'node', args: ['{prompt}'] },
+  assert.doesNotThrow(() => validateRunnerConfigShape(runnerWith({
     confinement: { strict: true },
     capabilities: {
-      'code:implement': {
-        description: 'implementing code',
-        confinement: {
-          mode: 'required',
-          policy: 'workspace-write',
-        },
-      },
-      advise: {
-        description: 'advising',
-        confinement: {
-          mode: 'unconfined',
-        },
-      },
+      'code:implement': { description: 'implementing code', confinement: { mode: 'required', policy: 'workspace-write' } },
+      advise: { description: 'advising', confinement: { mode: 'unconfined' } },
     },
-  });
-
-  try {
-    const cfg = loadRunnerConfig(file);
-    assert.equal(cfg.confinement.strict, true);
-    assert.equal(cfg.capabilities['code:implement'].confinement.policy, 'workspace-write');
-    assert.equal(cfg.capabilities.advise.confinement.mode, 'unconfined');
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('M1/M2: Capability rejects boolean unconfined syntax in favor of mode: unconfined', () => {
-  const { dir, file } = mkTempConfig({
-    executor: { command: 'node', args: ['{prompt}'] },
-    capabilities: {
-      advise: {
-        unconfined: true,
-      },
-    },
-  });
-
-  try {
-    assert.throws(
-      () => loadRunnerConfig(file),
-      /boolean "unconfined" is deprecated\/disallowed/,
-    );
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+  }), 'test'));
 });
 
 test('L6: Non-strict mode rejects mode:required referencing a nonexistent policy', () => {
-  const { dir, file } = mkTempConfig({
-    executor: { command: 'node', args: ['{prompt}'] },
-    confinement: { strict: false },
-    capabilities: {
-      'code:implement': {
-        confinement: {
-          mode: 'required',
-          policy: 'non-existent-policy',
-        },
-      },
-    },
-  });
-
-  try {
-    assert.throws(
-      () => loadRunnerConfig(file),
-      /mode "required" references unknown policy "non-existent-policy"/,
-    );
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+  assert.throws(
+    () => validateRunnerConfigShape(runnerWith({
+      confinement: { strict: false },
+      capabilities: { 'code:implement': { confinement: { mode: 'required', policy: 'non-existent-policy' } } },
+    }), 'test'),
+    /mode "required" references unknown policy "non-existent-policy"/,
+  );
 });
 
 test('Strict mode: rejects capability referencing unknown policy', () => {
-  const { dir, file } = mkTempConfig({
-    executor: { command: 'node', args: ['{prompt}'] },
-    confinement: { strict: true },
-    capabilities: {
-      'code:implement': {
-        description: 'implementing code',
-        confinement: {
-          mode: 'required',
-          policy: 'non-existent-policy',
-        },
-      },
-    },
-  });
-
-  try {
-    assert.throws(
-      () => loadRunnerConfig(file),
-      /references unknown policy "non-existent-policy" in strict mode \(confinement-policy-missing\)/,
-    );
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+  assert.throws(
+    () => validateRunnerConfigShape(runnerWith({
+      confinement: { strict: true },
+      capabilities: { 'code:implement': { description: 'implementing code', confinement: { mode: 'required', policy: 'non-existent-policy' } } },
+    }), 'test'),
+    /references unknown policy "non-existent-policy" in strict mode \(confinement-policy-missing\)/,
+  );
 });
 
 test('Runner config rejects project-local confinementBackends definition', () => {
-  const { dir, file } = mkTempConfig({
-    executor: { command: 'node', args: ['{prompt}'] },
-    confinementBackends: {
-      hackedBackend: { type: 'bwrap' },
-    },
-  });
-
-  try {
-    assert.throws(
-      () => loadRunnerConfig(file),
-      /confinement-backend-registry-forbidden/,
-    );
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+  assert.throws(
+    () => validateRunnerConfigShape(runnerWith({ confinementBackends: { hackedBackend: { type: 'bwrap' } } }), 'test'),
+    /confinement-backend-registry-forbidden/,
+  );
 });
 
 // ─── Tests for L4, N3, N2, N1 ────────────────────────────────────────────────

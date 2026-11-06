@@ -5,9 +5,8 @@ import assert from 'node:assert/strict';
 import {
   SEAT_ROLES, resolveSeats, checkDeclaredSeats, SeatResolutionError, effectiveRigorOf, capabilityRigorOf,
   requiresDistinctFamilies, seatLaunchesOf, seatKind, assertNoSeatTier, bindSeatOf, PRODUCER_POSTURE,
-  checkerPlanOf, RESERVED_SEAT_IDS, DEFAULT_CAPABILITY_MIN_CHECKERS,
+  checkerPlanOf, RESERVED_SEAT_IDS, DEFAULT_CAPABILITY_MIN_CHECKERS, CHECKER_SEATS,
 } from '../../../src/runner/execution/seat-resolver.mjs';
-import { CHECKER_SEATS, VALID_CHECKER_SEATS } from '../../../src/runner/dispatch/config.mjs';
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 
 const shippedCheckersByRigor = shippedCatalog().loops.reviewed.checkersByRigor;
@@ -35,7 +34,7 @@ test('solo is one producer seat; reviewed is the producer plus one seat per chec
 });
 
 test('tester is a checker seat whose role is reviewer for taste lookup, and whose result is not a verdict', () => {
-  assert.deepEqual([...VALID_CHECKER_SEATS], ['reviewer', 'red-team', 'tester']);
+  assert.deepEqual(Object.keys(CHECKER_SEATS), ['reviewer', 'red-team', 'tester']);
   assert.deepEqual(CHECKER_SEATS.tester, { role: 'reviewer', verdict: false });
   const seats = resolveSeats({ pattern: { pattern: 'reviewed', params: { minCheckers: ['tester'] } }, unit, runnerConfig: {}, shippedCheckersByRigor });
   const tester = seats.find((s) => s.seat === 'tester');

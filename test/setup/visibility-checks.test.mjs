@@ -178,9 +178,9 @@ function paneExecutors(providerModel = 'openai') {
       openai: {
         providerModel,
         invocations: [
-          { id: 'codex-herdr', via: 'cli', adapter: 'herdr-spawn', command: 'codex', credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
-          { id: 'codex-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'codex', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
-          { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn' },
+          { id: 'codex-herdr', via: 'cli', adapter: 'herdr-spawn', command: 'codex', args: [], credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
+          { id: 'codex-bwrap', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: [], resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
+          { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: [] },
         ],
       },
     },

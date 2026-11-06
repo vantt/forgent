@@ -5053,7 +5053,7 @@ async function handleHook(rest) {
             : 'general-purpose';
 
       try {
-        const { decideExecutorCli } = await import('../src/runner/dispatch.mjs');
+        const { decideExecutorCli } = await import('../src/runner/dispatch/cli.mjs');
         const decided = await decideExecutorCli(undefined, {
           cwd: payloadCwd,
           for: subagentType,

@@ -4,14 +4,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { projectConfigPath, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { projectConfigPath, writeGlobalConfig, writeProjectConfig, withHome } from '../helpers/config-fixture.mjs';
 import {
-  loadRunnerConfig,
   loadRunnerConfigForDir,
   checkDoorRefusalsForRetiredKeys,
   RunnerConfigError,
   validateRunnerPatternsShape,
   validateRunnerLoopsShape,
+  validateGeneratedPathsShape,
   runnerOriginsOf,
   withRunnerOrigins,
   RUNNER_CONFIG_ORIGINS,
@@ -22,14 +22,6 @@ import { readStandardValue, ConfigDoorError } from '../../src/config/facade.mjs'
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 
 const standardRunner = (key) => JSON.parse(JSON.stringify(readStandardValue(key ? `runner.${key}` : 'runner').value));
-const BASE = { ...standardRunner(), executor: { command: 'claude', args: ['-p', '{prompt}'] } };
-
-function mkTempConfig(runnerObj) {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-config-test-'));
-  const configPath = projectConfigPath(tmpDir);
-  writeProjectConfig(tmpDir, runnerObj);
-  return { tmpDir, configPath };
-}
 
 test('the standard\'s default patterns and loops pass the runner\'s own checks', () => {
   const patterns = standardRunner('patterns');
@@ -74,176 +66,7 @@ test('the standard\'s default patterns and loops pass the runner\'s own checks',
   assert.doesNotThrow(() => validateRunnerLoopsShape(loops, 'test.loops'));
 });
 
-test('validateCapabilitiesShape: allows taste fields persona, minCheckers, verify', () => {
-  const validConfig = {
-    ...BASE,
-    capabilities: {
-      'code:implement': {
-        persona: 'systems-architect',
-        minCheckers: ['reviewer', 'red-team'],
-        verify: 'npm test',
-        prefer: [{ executor: 'claude' }],
-        rigor: 'high',
-      },
-    },
-    executors: {
-      claude: {
-        kind: 'agent',
-        carries: 'repo-content',
-        for: ['code:implement'],
-        invocations: [{ via: 'cli', command: 'claude', args: ['-p', '{prompt}'] }],
-      },
-    },
-  };
-
-  const { configPath } = mkTempConfig(validConfig);
-  const loaded = loadRunnerConfig(configPath);
-  assert.equal(loaded.capabilities['code:implement'].persona, 'systems-architect');
-  assert.deepEqual(loaded.capabilities['code:implement'].minCheckers, ['reviewer', 'red-team']);
-  assert.equal(loaded.capabilities['code:implement'].verify, 'npm test');
-});
-
-test('validateCapabilitiesShape: rejects invalid persona, minCheckers, verify', () => {
-  assert.throws(() => {
-    const { configPath } = mkTempConfig({
-      ...BASE,
-      capabilities: { 'code:implement': { persona: '   ' } },
-    });
-    loadRunnerConfig(configPath);
-  }, /"persona" must be a non-empty string/);
-
-  assert.throws(() => {
-    const { configPath } = mkTempConfig({
-      ...BASE,
-      capabilities: { 'code:implement': { minCheckers: 'reviewer' } },
-    });
-    loadRunnerConfig(configPath);
-  }, /"minCheckers" must be an array of strings/);
-
-  assert.throws(() => {
-    const { configPath } = mkTempConfig({
-      ...BASE,
-      capabilities: { 'code:implement': { minCheckers: ['invalid-checker'] } },
-    });
-    loadRunnerConfig(configPath);
-  }, /"minCheckers" must be an array of strings in \[reviewer, red-team, tester\]/);
-
-  assert.throws(() => {
-    const { configPath } = mkTempConfig({
-      ...BASE,
-      capabilities: { 'code:implement': { verify: '  ' } },
-    });
-    loadRunnerConfig(configPath);
-  }, /"verify" must be a non-empty string command/);
-});
-
-test('validateRunnerPatternsShape: validates catalog entry structure and invariants', () => {
-  assert.throws(() => validateRunnerPatternsShape('invalid', 'patterns'), /must be an object/);
-
-  // Unknown entry key
-  assert.throws(
-    () => validateRunnerPatternsShape({ 'custom-pat': { loop: 'solo', extraKey: true } }, 'patterns'),
-    /contains unknown key "extraKey"/,
-  );
-
-  // Invalid loop
-  assert.throws(
-    () => validateRunnerPatternsShape({ 'custom-pat': { loop: 'unknown-loop' } }, 'patterns'),
-    /must be one of solo\/reviewed\/panel\/debate/,
-  );
-
-  // Invariants: must declare exactly one of atLeast or fixed
-  assert.throws(
-    () => validateRunnerPatternsShape({
-      'custom-pat': {
-        loop: 'reviewed',
-        invariants: { minCheckers: { atLeast: ['reviewer'], fixed: ['reviewer'] } },
-      },
-    }, 'patterns'),
-    /must declare exactly one of "atLeast" or "fixed"/,
-  );
-  assert.throws(
-    () => validateRunnerPatternsShape({
-      'custom-pat': {
-        loop: 'reviewed',
-        invariants: { minCheckers: {} },
-      },
-    }, 'patterns'),
-    /must declare exactly one of "atLeast" or "fixed"/,
-  );
-
-  // Invariants: unknown key inside invariant definition
-  assert.throws(
-    () => validateRunnerPatternsShape({
-      'custom-pat': {
-        loop: 'reviewed',
-        invariants: { minCheckers: { atLeast: ['reviewer'], other: 1 } },
-      },
-    }, 'patterns'),
-    /contains unknown key "other"/,
-  );
-
-  // Defaults: maxRounds must be positive integer
-  assert.throws(
-    () => validateRunnerPatternsShape({
-      'custom-pat': {
-        loop: 'reviewed',
-        defaults: { maxRounds: 0 },
-      },
-    }, 'patterns'),
-    /must be a positive integer/,
-  );
-  assert.throws(
-    () => validateRunnerPatternsShape({
-      'custom-pat': {
-        loop: 'reviewed',
-        defaults: { maxRounds: 1.5 },
-      },
-    }, 'patterns'),
-    /must be a positive integer/,
-  );
-
-  // Defaults: minCheckers invalid seat
-  assert.throws(
-    () => validateRunnerPatternsShape({
-      'custom-pat': {
-        loop: 'reviewed',
-        defaults: { minCheckers: ['invalid-checker'] },
-      },
-    }, 'patterns'),
-    /must be an array of strings in \[reviewer, red-team, tester\]/,
-  );
-});
-
-test('validateRunnerLoopsShape: validates loop tuning and cumulative checkers across rigors', () => {
-  assert.throws(() => validateRunnerLoopsShape('invalid', 'loops'), /must be an object/);
-  assert.throws(() => validateRunnerLoopsShape({ unknownLoop: {} }, 'loops'), /contains unknown loop "unknownLoop"/);
-
-  // Invalid maxRounds in reviewed loop
-  assert.throws(
-    () => validateRunnerLoopsShape({ reviewed: { maxRounds: 0 } }, 'loops'),
-    /must be a positive integer/,
-  );
-  assert.throws(
-    () => validateRunnerLoopsShape({ reviewed: { maxRounds: -1 } }, 'loops'),
-    /must be a positive integer/,
-  );
-  assert.throws(
-    () => validateRunnerLoopsShape({ reviewed: { maxRounds: 1.5 } }, 'loops'),
-    /must be a positive integer/,
-  );
-
-  // Invalid checker seat
-  assert.throws(
-    () => validateRunnerLoopsShape({
-      reviewed: {
-        checkersByRigor: { standard: ['reviewer', 'unknown'] },
-      },
-    }, 'loops'),
-    /must be an array of strings in \[reviewer, red-team, tester\]/,
-  );
-
-  // Non-cumulative checkers
+test('validateRunnerLoopsShape: the checkers of each rigor include those of every weaker rigor', () => {
   assert.throws(
     () => validateRunnerLoopsShape({
       reviewed: {
@@ -256,7 +79,6 @@ test('validateRunnerLoopsShape: validates loop tuning and cumulative checkers ac
     /not cumulative: "high" does not include checker "reviewer" from weaker rigor "standard"/,
   );
 
-  // Valid cumulative passes
   assert.doesNotThrow(() => validateRunnerLoopsShape({
     reviewed: {
       checkersByRigor: {
@@ -268,7 +90,7 @@ test('validateRunnerLoopsShape: validates loop tuning and cumulative checkers ac
   }, 'loops'));
 });
 
-test('bounds validity at load: min > max, non-integer, bound on an unread param', () => {
+test('bounds validity at load: min > max and a bound on a parameter its loop does not read', () => {
   // Bound on unread param for reviewed loop
   assert.throws(
     () => validateRunnerLoopsShape({
@@ -293,20 +115,6 @@ test('bounds validity at load: min > max, non-integer, bound on an unread param'
     /min \(5\) must be <= max \(2\)/,
   );
 
-  // Non-integer min/max
-  assert.throws(
-    () => validateRunnerLoopsShape({
-      reviewed: { bounds: { maxRounds: { min: 1.5, max: 3 } } },
-    }, 'loops'),
-    /must be an integer/,
-  );
-  assert.throws(
-    () => validateRunnerLoopsShape({
-      reviewed: { bounds: { maxRounds: { min: 1, max: 'many' } } },
-    }, 'loops'),
-    /must be an integer/,
-  );
-
   // Valid bounds pass
   assert.doesNotThrow(() => validateRunnerLoopsShape({
     reviewed: { bounds: { maxRounds: { min: 1, max: 4 } } },
@@ -326,24 +134,12 @@ test('retired keys refusal: refuses with config-key-retired naming file and repl
     (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /research-fan-out-gated.*retired/.test(err.message),
   );
 
-  // 5. Named file door: loadRunnerConfig with defaultRule
-  const { configPath: defaultRuleCfg } = mkTempConfig({
-    ...BASE,
-    patterns: { defaultRule: { mutatingMinRigor: 'standard' } },
-  });
+  // 5. The real door: a project file with defaultRule
+  const defaultRuleDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-default-rule-'));
+  writeProjectConfig(defaultRuleDir, { runner: { patterns: { defaultRule: { mutatingMinRigor: 'standard' } } } });
   assert.throws(
-    () => loadRunnerConfig(defaultRuleCfg),
+    () => withHome(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-default-rule-home-')), () => loadRunnerConfigForDir(defaultRuleDir)),
     (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /defaultRule was retired/.test(err.message),
-  );
-
-  // 6. Named file door: loadRunnerConfig with patterns.reviewed tuning
-  const { configPath: reviewedCfg } = mkTempConfig({
-    ...BASE,
-    patterns: { reviewed: { maxRounds: 3 } },
-  });
-  assert.throws(
-    () => loadRunnerConfig(reviewedCfg),
-    (err) => err instanceof RunnerConfigError && err.code === 'config-key-retired' && /runner\.loops\.reviewed/.test(err.message),
   );
 
   // 8. Direct validation: both tuning findings reported in one error
@@ -387,7 +183,6 @@ test('a file holding patterns.reviewed is byte-identical after a refused load', 
   const configPath = projectConfigPath(tmpDir);
   writeProjectConfig(tmpDir, {
     runner: {
-      ...BASE,
       patterns: { reviewed: { maxRounds: 3 } },
     },
   });
@@ -439,7 +234,7 @@ test('loadRunnerConfigForDir: refuses global file holding retired keys with conf
   }
 });
 
-test('loadRunnerConfigForDir: other ConfigDoorError codes pass through unchanged', () => {
+test('loadRunnerConfigForDir: a schema refusal reaches the caller with its code, file, line and path, and other door codes pass through unchanged', () => {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-passthrough-repo-'));
   writeProjectConfig(repo, {
     runner: {
@@ -448,7 +243,7 @@ test('loadRunnerConfigForDir: other ConfigDoorError codes pass through unchanged
   });
   assert.throws(
     () => loadRunnerConfigForDir(repo),
-    (err) => err instanceof RunnerConfigError && err.code !== 'config-key-retired',
+    (err) => err instanceof RunnerConfigError && err.code === 'config-schema' && /project:config\.yaml:\d+:\d+ runner\.timeoutMs \(type\)/.test(err.message),
   );
 
   // Catalog error under runner.patterns.reviewed.* passes through with original code
@@ -525,29 +320,16 @@ test('the standard declares an empty generatedPaths list', () => {
   assert.deepEqual(standardRunner('generatedPaths'), []);
 });
 
-test('runner.generatedPaths: well-formed {from, also} entries load', () => {
-  const { configPath } = mkTempConfig({
-    ...BASE,
-    generatedPaths: [{ from: 'core/skills/**', also: ['.agents/skills/**', 'plugins/fgOS/skills/**'] }],
-  });
-  assert.deepEqual(loadRunnerConfig(configPath).generatedPaths[0].also, ['.agents/skills/**', 'plugins/fgOS/skills/**']);
-});
-
-test('runner.generatedPaths: malformed entries are refused at load', () => {
+test('runner.generatedPaths: a source scope opens with a literal directory and every entry reads as a write-scope entry', () => {
+  assert.doesNotThrow(() => validateGeneratedPathsShape([{ from: 'core/skills/**', also: ['.agents/skills/**', 'plugins/fgOS/skills/**'] }], 'runner'));
   const cases = [
-    ['not-an-array', /generatedPaths must be an array/],
     [[{ from: '**', also: ['x'] }], /generatedPaths\[0\]\.from/],
     [[{ from: '*/x', also: ['y'] }], /generatedPaths\[0\]\.from/],
-    [[{ from: 'core', also: ['x'], extra: 1 }], /unknown key "extra"/],
-    [[{ from: 'core' }], /generatedPaths\[0\]\.also/],
-    [[{ from: 'core', also: [] }], /generatedPaths\[0\]\.also/],
     [[{ from: 'core', also: ['../out'] }], /generatedPaths\[0\]\.also\[0\]/],
     [[{ from: ':!core', also: ['x'] }], /generatedPaths\[0\]\.from/],
-    [['core'], /generatedPaths\[0\] must be an object/],
   ];
   for (const [generatedPaths, pattern] of cases) {
-    const { configPath } = mkTempConfig({ ...BASE, generatedPaths });
-    assert.throws(() => loadRunnerConfig(configPath), (err) => err instanceof RunnerConfigError && pattern.test(err.message), JSON.stringify(generatedPaths));
+    assert.throws(() => validateGeneratedPathsShape(generatedPaths, 'runner'), (err) => err instanceof RunnerConfigError && pattern.test(err.message), JSON.stringify(generatedPaths));
   }
 });
 

@@ -31,7 +31,7 @@
 // `fgos config check`, which lists every one with its fix.
 
 import fs from 'node:fs';
-import { decideExecutorCli, runDoorHint } from '../src/runner/dispatch.mjs';
+import { decideExecutorCli, runDoorHint } from '../src/runner/dispatch/cli.mjs';
 import { isConfigRefusal } from '../src/config/facade.mjs';
 import { RunnerConfigError } from '../src/runner/dispatch/config.mjs';
 

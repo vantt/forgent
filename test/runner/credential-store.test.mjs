@@ -1,15 +1,13 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
 import { credentialStoreOf, credentialStoreProblem } from '../../src/runner/dispatch/provider-capacity.mjs';
-import { loadRunnerConfig, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 import { buildConfinementRequest, validateConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
-import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const binding = (name) => [{ resource: 'private-home', target: { kind: 'env', name } }];
 
@@ -44,36 +42,28 @@ test('credentialStoreProblem names what is wrong with a declaration', () => {
   for (const [store, pattern] of bad) assert.match(credentialStoreProblem(store) ?? '', pattern, JSON.stringify(store));
 });
 
-function writeConfig(executor) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-credential-store-'));
-  const file = projectConfigPath(dir);
-  writeProjectConfig(dir, {
-    executor: { command: 'claude', args: ['{prompt}'] },
-    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-    timeoutMs: 1000,
-    executors: { agent: { kind: 'agent', providerModel: 'claude', allowCrossProvider: true, ...executor } },
-  });
-  return { file, cleanup: () => fs.rmSync(dir, { recursive: true, force: true }) };
-}
+const runnerWith = (executor) => ({
+  executor: { command: 'claude', args: ['{prompt}'] },
+  modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' } },
+  timeoutMs: 1000,
+  executors: { agent: { kind: 'agent', providerModel: 'claude', allowCrossProvider: true, ...executor } },
+});
 
 const cliInvocation = (extra = {}) => ({ id: 'a-cli', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: ['{prompt}'], ...extra });
 const store = { use: 'codex', homeEnv: 'CODEX_HOME' };
 
-test('the config door accepts a store on a confined cli invocation, whichever level names the backend', () => {
+test('the runner config check accepts a store on a confined cli invocation, whichever level names the backend', () => {
   for (const executor of [
     { invocations: [cliInvocation({ confinement: { backend: 'bwrap' }, credentialStore: store })] },
     { confinement: { backend: 'bwrap' }, invocations: [cliInvocation({ credentialStore: store })] },
   ]) {
-    const w = writeConfig(executor);
-    try { assert.equal(loadRunnerConfig(w.file).executors.agent.invocations[0].credentialStore.use, 'codex'); } finally { w.cleanup(); }
+    assert.doesNotThrow(() => validateRunnerConfigShape(runnerWith(executor), 'test'));
   }
 });
 
-test('the config door refuses a malformed store and a store on an invocation with no confinement backend', () => {
+test('the runner config check refuses a malformed store and a store on an invocation with no confinement backend', () => {
   const refuse = (invocation, pattern) => {
-    const w = writeConfig({ invocations: [invocation] });
-    try { assert.throws(() => loadRunnerConfig(w.file), (err) => err instanceof RunnerConfigError && pattern.test(err.message)); } finally { w.cleanup(); }
+    assert.throws(() => validateRunnerConfigShape(runnerWith({ invocations: [invocation] }), 'test'), (err) => err instanceof RunnerConfigError && pattern.test(err.message));
   };
   refuse(cliInvocation({ credentialStore: store }), /"credentialStore" without a confinement backend/);
   refuse(cliInvocation({ confinement: { backend: 'bwrap' }, credentialStore: { use: 'codex' } }), /"credentialStore" "homeEnv"/);
@@ -82,13 +72,7 @@ test('the config door refuses a malformed store and a store on an invocation wit
 });
 
 test('the resolved command carries the declared store, or the one an older binding implies, or none', () => {
-  const resolve = (invocations) => {
-    const w = writeConfig({ invocations });
-    try {
-      const cfg = loadRunnerConfig(w.file);
-      return resolveExecutorCommand(cfg, { prompt: 'p', model: 'm', tier: 'standard', executorId: 'agent', fgosDir: os.tmpdir(), contentCarries: 'repo-content', invocationId: invocations[0].id });
-    } finally { w.cleanup(); }
-  };
+  const resolve = (invocations) => resolveExecutorCommand(runnerWith({ invocations }), { prompt: 'p', model: 'm', tier: 'standard', executorId: 'agent', fgosDir: os.tmpdir(), contentCarries: 'repo-content', invocationId: invocations[0].id });
   const confinement = { backend: 'bwrap' };
   assert.deepEqual(resolve([cliInvocation({ confinement, credentialStore: { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' } })]).credentialStore, { use: 'pi', homeEnv: 'PI_CODING_AGENT_DIR' });
   assert.deepEqual(resolve([cliInvocation({ confinement, resourceBindings: binding('CODEX_HOME') })]).credentialStore, store);

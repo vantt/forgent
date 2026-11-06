@@ -15,22 +15,16 @@ properties:
       command:
         description: "The program to spawn."
         type: string
-        minLength: 1
+        pattern: "\\S"
       args:
         description: "Arguments of the program; {prompt} and {model} are replaced at launch."
         type: array
         items:
           type: string
       adapter:
-        description: "The adapter that spawns it."
-        type: string
-        minLength: 1
+        $ref: "#/$defs/adapterName"
       env:
-        description: "Environment variables of the launch."
-        type: object
-        additionalProperties:
-          description: "Value of the variable."
-          type: string
+        $ref: "#/$defs/envMap"
     required: [command, args]
   executors:
     description: "The executor registry: every executor a seat can be bound to, by id."
@@ -48,6 +42,7 @@ properties:
     additionalProperties:
       description: "The tiers of one family; a tier it omits has no model."
       type: object
+      additionalProperties: false
       properties:
         nano:
           $ref: "#/$defs/tierCell"
@@ -64,13 +59,14 @@ properties:
   tierFallback:
     description: "The families a seat walks after a failure, per tier and in order.\nTier ladder, weakest first:\nnano: cơ học, không suy luận; self-check: chỉ nhận ra hoặc biến đổi theo mẫu?; e.g. classify, extract, format, route, vote\nmini: suy luận nhẹ trên đầu vào cho sẵn, phạm vi hẹp; self-check: đủ thông tin, chỉ hiểu và tóm tắt?; e.g. tóm tắt, trả lời từ tài liệu cho, sửa nhỏ chính xác, review diff nhỏ\nstandard: theo một kế hoạch có sẵn, nhiều bước; self-check: có kế hoạch và hướng dẫn chi tiết?; e.g. code theo plan, viết test, refactor theo mô tả\nadvanced: tự tìm đường, không có đáp án sẵn; self-check: phải điều tra và quyết cách làm?; e.g. debug khó, code phức tạp, nhiều file không có plan\nflagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel\nfrontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng"
     type: object
+    additionalProperties: false
     properties:
       nano:
         description: "Families tried in this order after the primary fails."
         type: array
         items:
           type: string
-          minLength: 1
+          pattern: "\\S"
         minItems: 1
         uniqueItems: true
       mini:
@@ -78,7 +74,7 @@ properties:
         type: array
         items:
           type: string
-          minLength: 1
+          pattern: "\\S"
         minItems: 1
         uniqueItems: true
       standard:
@@ -86,7 +82,7 @@ properties:
         type: array
         items:
           type: string
-          minLength: 1
+          pattern: "\\S"
         minItems: 1
         uniqueItems: true
       advanced:
@@ -94,7 +90,7 @@ properties:
         type: array
         items:
           type: string
-          minLength: 1
+          pattern: "\\S"
         minItems: 1
         uniqueItems: true
       flagship:
@@ -102,7 +98,7 @@ properties:
         type: array
         items:
           type: string
-          minLength: 1
+          pattern: "\\S"
         minItems: 1
         uniqueItems: true
       frontier:
@@ -110,7 +106,7 @@ properties:
         type: array
         items:
           type: string
-          minLength: 1
+          pattern: "\\S"
         minItems: 1
         uniqueItems: true
   maxTier:
@@ -120,6 +116,7 @@ properties:
   defaults:
     description: "What a seat runs at when nothing else names it."
     type: object
+    additionalProperties: false
     properties:
       tier:
         description: "The tier a seat runs at when nothing else names one."
@@ -149,6 +146,7 @@ properties:
   confinement:
     description: "Runner-wide confinement setting."
     type: object
+    additionalProperties: false
     properties:
       strict:
         x-fgos-merge: tighten
@@ -176,7 +174,7 @@ properties:
             type: array
             items:
               type: string
-              minLength: 1
+              pattern: "\\S"
   loops:
     description: "Tuning and bounds of the execution loops."
     type: object
@@ -200,6 +198,7 @@ properties:
           checkersByRigor:
             description: "The checker seats per rigor; each rigor includes the checkers of the weaker ones."
             type: object
+            additionalProperties: false
             properties:
               low:
                 description: "Checker seats at this rigor."
@@ -254,6 +253,7 @@ properties:
       seatBinding:
         description: "Marker that this project reads the seat binding form of the config."
         type: object
+        additionalProperties: false
         properties:
           schema:
             description: "Version of the seat binding form; this release writes 2 and reads 1 and 2."
@@ -267,17 +267,18 @@ properties:
     items:
       description: "One source scope entry and the render targets generated from it."
       type: object
+      additionalProperties: false
       properties:
         from:
           description: "Source write-scope entry, starting with a literal directory."
           type: string
-          minLength: 1
+          pattern: "\\S"
         also:
           description: "Render targets that follow the source."
           type: array
           items:
             type: string
-            minLength: 1
+            pattern: "\\S"
           minItems: 1
       required: [from, also]
   llmAccounts:
@@ -343,20 +344,21 @@ $defs:
   preferList:
     description: "Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider."
     type: [string, array]
-    minLength: 1
+    pattern: "\\S"
     minItems: 1
     items:
       type: [string, object]
-      minLength: 1
+      pattern: "\\S"
+      additionalProperties: false
       properties:
         executor:
           description: "Executor id."
           type: string
-          minLength: 1
+          pattern: "\\S"
         invocation:
           description: "Id of one invocation of that executor."
           type: string
-          minLength: 1
+          pattern: "\\S"
         crossProvider:
           description: "Whether the seat may use this executor across provider families."
           type: boolean
@@ -368,11 +370,11 @@ $defs:
       model:
         description: "Model id."
         type: string
-        minLength: 1
+        pattern: "\\S"
       pool:
         description: "Account pool that serves the model."
         type: string
-        minLength: 1
+        pattern: "\\S"
       effort:
         description: "Reasoning effort sent with the model."
         type: string
@@ -394,11 +396,11 @@ $defs:
       model:
         description: "Model id."
         type: string
-        minLength: 1
+        pattern: "\\S"
       pool:
         description: "Account pool that serves the model."
         type: string
-        minLength: 1
+        pattern: "\\S"
       effort:
         description: "Reasoning effort sent with the model."
         type: string
@@ -413,6 +415,7 @@ $defs:
   seatTaste:
     description: "The tier and executors one role, persona or seat prefers."
     type: object
+    additionalProperties: false
     properties:
       tier:
         $ref: "#/$defs/tierName"
@@ -433,25 +436,27 @@ $defs:
       policy:
         description: "Name of the confinement policy; absent only when mode is unconfined."
         type: string
-        minLength: 1
+        pattern: "\\S"
       allowInvocationOverride:
         description: "Whether an invocation may replace the policy; must be false when mode is unconfined."
         type: boolean
     required: [mode]
   capability:
+    $comment: "Keys that no longer exist are refused as unknown: overrides (set rigor for the floor rigor, or configure the executors), unconfined (write confinement with mode unconfined)."
     description: "One capability: what it is called, which executors serve it and how work on it is held."
     type: object
+    additionalProperties: false
     properties:
       description:
         description: "What the capability is for."
         type: string
-        minLength: 1
+        pattern: "\\S"
       aliases:
         description: "Other names the capability answers to."
         type: array
         items:
           type: string
-          minLength: 1
+          pattern: "\\S"
       prefer:
         $ref: "#/$defs/preferList"
       rigor:
@@ -461,7 +466,7 @@ $defs:
       persona:
         description: "Agent persona a seat of this capability takes."
         type: string
-        minLength: 1
+        pattern: "\\S"
       minCheckers:
         description: "Checker seats a reviewed unit of this capability needs at least."
         type: array
@@ -474,39 +479,50 @@ $defs:
         x-fgos-sensitivity: command
         description: "Shell command that verifies work of this capability."
         type: string
-        minLength: 1
+        pattern: "\\S"
       serves:
         description: "Attributes of the work this capability serves; each value is one scalar or a list of them."
         type: object
+        additionalProperties: false
         properties:
           outputKind:
             description: "Kind of output the work produces."
             type: [string, array]
+            pattern: "\\S"
+            minItems: 1
             items:
               type: string
+              pattern: "\\S"
           domain:
             description: "Domain the work belongs to."
             type: [string, array]
+            pattern: "\\S"
+            minItems: 1
             items:
               type: string
+              pattern: "\\S"
           mutates:
             description: "Whether the work changes files."
             type: [boolean, array]
+            minItems: 1
             items:
               type: boolean
           behaviorPreserving:
             description: "Whether the work keeps behaviour unchanged."
             type: [boolean, array]
+            minItems: 1
             items:
               type: boolean
           needsIndependentReview:
             description: "Whether the work needs a reviewer other than its producer."
             type: [boolean, array]
+            minItems: 1
             items:
               type: boolean
           hasPlanOrTrack:
             description: "Whether the work follows a plan or track."
             type: [boolean, array]
+            minItems: 1
             items:
               type: boolean
       confinement:
@@ -520,6 +536,7 @@ $defs:
       roles:
         description: "Per-role tier and executor taste; a role is producer, synthesizer, reviewer, red-team or judge."
         type: object
+        additionalProperties: false
         properties:
           producer:
             $ref: "#/$defs/seatTaste"
@@ -544,48 +561,106 @@ $defs:
         additionalProperties:
           $ref: "#/$defs/seatTaste"
         x-fgos-scope: project-only
+  adapterName:
+    description: "The adapters that can spawn an executor."
+    type: string
+    enum: [cli-spawn, herdr-spawn]
+  envMap:
+    description: "Environment variables of a launch, by name."
+    type: object
+    propertyNames:
+      pattern: "\\S"
+    additionalProperties:
+      description: "Value of the variable."
+      type: string
+  launchConfinement:
+    description: "Confinement of a launch: a backend, the three isolation flags and the policy parts. A key outside these is refused; sessionName was removed because a worker always goes to the one fgOS worker session."
+    type: object
+    additionalProperties: false
+    properties:
+      backend:
+        description: "Name of the confinement backend that wraps the launch."
+        type: string
+        pattern: "\\S"
+      privateHome:
+        description: "Whether the worker gets a private home."
+        type: boolean
+      isolatedSession:
+        description: "Whether the worker gets an isolated session."
+        type: boolean
+      ownWorktree:
+        description: "Whether the worker gets its own worktree."
+        type: boolean
+      contract:
+        description: "Confinement contract reference."
+        type: string
+      controls:
+        description: "Confinement controls by axis."
+        type: object
+      grants:
+        description: "Resource grants of the launch."
+        type: array
+      networkFilter:
+        description: "Network allowlist of the launch."
+        type: object
+  interactiveMode:
+    description: "How a herdr pane runs the CLI interactively."
+    type: object
+    properties:
+      exitCommand:
+        description: "Command typed to leave the CLI."
+        type: string
+        pattern: "\\S"
+      kind:
+        description: "The agent kind herdr starts: a lowercase name; herdr refuses one it does not know."
+        type: string
+        pattern: "^[a-z][a-z0-9_-]*$"
+      trustStore:
+        description: "Which trust store the CLI keeps; null for none."
+        type: [object, "null"]
+        properties:
+          kind:
+            description: "Trust store format."
+            type: string
+            enum: [claude-json, codex-toml, agy, agy-json]
+          path:
+            description: "Path of the trust store."
+            type: string
+            pattern: "\\S"
+        required: [kind]
+    required: [exitCommand]
   invocation:
-    description: "One way to run an executor: through a CLI, a task, an MCP tool or an API."
+    description: "One way to run an executor: through a CLI, a task or an MCP tool."
     type: object
     properties:
       id:
         description: "Name of the invocation, unique within its executor."
         type: string
-        minLength: 1
+        pattern: "\\S"
       via:
         description: "How the invocation runs."
         type: string
-        enum: [cli, task, mcp, api]
+        enum: [cli, task, mcp]
       adapter:
-        description: "The adapter that spawns or calls it."
-        type: string
-        minLength: 1
+        $ref: "#/$defs/adapterName"
       command:
         description: "The program to spawn, or for an MCP invocation its identifier."
         type: string
-        minLength: 1
+        pattern: "\\S"
       args:
         description: "Arguments of the program; {prompt} and {model} are replaced at launch."
         type: array
         items:
           type: string
-      url:
-        description: "Address of an api invocation."
-        type: string
-        minLength: 1
       tools:
         description: "For an MCP invocation, the tool that serves each capability."
         type: object
         additionalProperties:
           description: "MCP tool identifier."
           type: string
-          minLength: 1
+          pattern: "\\S"
       env:
-        description: "Environment variables of the launch."
-        type: object
-        additionalProperties:
-          description: "Value of the variable."
-          type: string
+        $ref: "#/$defs/envMap"
       permissionMode:
         description: "Whether the worker asks before acting; bypass needs full confinement."
         type: string
@@ -595,34 +670,7 @@ $defs:
         type: string
         enum: [file-pointer, inline]
       confinement:
-        description: "Confinement of the launch: a backend and the three isolation flags."
-        type: object
-        properties:
-          backend:
-            description: "Name of the confinement backend that wraps the launch."
-            type: string
-            minLength: 1
-          privateHome:
-            description: "Whether the worker gets a private home."
-            type: boolean
-          isolatedSession:
-            description: "Whether the worker gets an isolated session."
-            type: boolean
-          ownWorktree:
-            description: "Whether the worker gets its own worktree."
-            type: boolean
-          contract:
-            description: "Confinement contract reference."
-            type: string
-          controls:
-            description: "Confinement controls by axis."
-            type: object
-          grants:
-            description: "Resource grants of the launch."
-            type: array
-          networkFilter:
-            description: "Network allowlist of the launch."
-            type: object
+        $ref: "#/$defs/launchConfinement"
       credentialStore:
         description: "The login store of the CLI, handed to the confined launch through its private home."
         type: object
@@ -630,45 +678,21 @@ $defs:
           use:
             description: "Name of the login store, a lowercase key such as codex or pi."
             type: string
-            minLength: 1
+            pattern: "\\S"
           homeEnv:
             description: "Environment variable that points the CLI at its home."
             type: string
-            minLength: 1
+            pattern: "\\S"
           files:
             description: "Login files copied into the private home, relative paths without parent steps."
             type: array
             items:
               type: string
-              minLength: 1
+              pattern: "\\S"
             minItems: 1
         required: [use, homeEnv]
       interactiveMode:
-        description: "How a herdr pane runs the CLI interactively."
-        type: object
-        properties:
-          exitCommand:
-            description: "Command typed to leave the CLI."
-            type: string
-            minLength: 1
-          kind:
-            description: "The agent kind herdr starts."
-            type: string
-            minLength: 1
-          trustStore:
-            description: "Which trust store the CLI keeps; null for none."
-            type: [object, "null"]
-            properties:
-              kind:
-                description: "Trust store format."
-                type: string
-                enum: [claude-json, codex-toml, agy, agy-json]
-              path:
-                description: "Path of the trust store."
-                type: string
-                minLength: 1
-            required: [kind]
-        required: [exitCommand]
+        $ref: "#/$defs/interactiveMode"
       liveOutput:
         description: "How output is streamed while the worker runs."
         type: object
@@ -681,11 +705,27 @@ $defs:
           renderer:
             description: "Name of the renderer."
             type: string
-            minLength: 1
+            pattern: "\\S"
+        required: [streamFlags, renderer]
       resourceBindings:
         description: "Older form of the login store, read only to infer one."
         type: array
     required: [via]
+    allOf:
+      - if:
+          properties:
+            via:
+              description: "A cli invocation."
+              const: cli
+        then:
+          required: [command, args]
+      - if:
+          properties:
+            via:
+              description: "An mcp invocation."
+              const: mcp
+        then:
+          required: [command]
   executorEntry:
     $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; the entry decides what runs on this machine"
     x-fgos-scope: both
@@ -700,11 +740,11 @@ $defs:
       description:
         description: "What the executor is and how its invocations differ."
         type: string
-        minLength: 1
+        pattern: "\\S"
       providerModel:
         description: "The model family of the executor, the key of modelPolicies."
         type: string
-        minLength: 1
+        pattern: "\\S"
       allowCrossProvider:
         description: "Whether a seat of another provider family may use this executor."
         type: boolean
@@ -714,11 +754,11 @@ $defs:
       agentType:
         description: "Agent definition a native task runs."
         type: string
-        minLength: 1
+        pattern: "\\S"
       model:
         description: "Model of an executor that has its own vocabulary."
         type: string
-        minLength: 1
+        pattern: "\\S"
       carries:
         description: "What the executor may be given."
         type: string
@@ -728,35 +768,29 @@ $defs:
         type: array
         items:
           type: string
-          minLength: 1
+          pattern: "\\S"
         minItems: 1
       scanTarget:
         description: "Directory a tool scans."
         type: string
-        minLength: 1
+        pattern: "\\S"
       responsibility:
         description: "The responsibility a tool fills."
         type: string
-        minLength: 1
+        pattern: "\\S"
       command:
         description: "The program to spawn when the executor has no invocations."
         type: string
-        minLength: 1
+        pattern: "\\S"
       args:
         description: "Arguments of that program."
         type: array
         items:
           type: string
       adapter:
-        description: "The adapter that spawns it."
-        type: string
-        minLength: 1
+        $ref: "#/$defs/adapterName"
       env:
-        description: "Environment variables of the launch."
-        type: object
-        additionalProperties:
-          description: "Value of the variable."
-          type: string
+        $ref: "#/$defs/envMap"
       permissionMode:
         description: "Whether the worker asks before acting."
         type: string
@@ -766,11 +800,9 @@ $defs:
         type: string
         enum: [file-pointer, inline]
       confinement:
-        description: "Confinement shared by the invocations."
-        type: object
+        $ref: "#/$defs/launchConfinement"
       interactiveMode:
-        description: "Interactive mode shared by the invocations."
-        type: object
+        $ref: "#/$defs/interactiveMode"
       identity:
         description: "Who the executor is for audit."
         type: object
@@ -778,19 +810,19 @@ $defs:
           principalRef:
             description: "Principal the executor acts as."
             type: string
-            minLength: 1
+            pattern: "\\S"
           runtimeBackendRef:
             description: "Runtime backend it runs on."
             type: string
-            minLength: 1
+            pattern: "\\S"
           trustDomain:
             description: "Trust domain of the executor."
             type: string
-            minLength: 1
+            pattern: "\\S"
           egressClass:
             description: "Network egress class of the executor."
             type: string
-            minLength: 1
+            pattern: "\\S"
         required: [principalRef, runtimeBackendRef, trustDomain, egressClass]
       supports:
         description: "What the executor can do."
@@ -801,7 +833,7 @@ $defs:
             type: array
             items:
               type: string
-              minLength: 1
+              pattern: "\\S"
             minItems: 1
           reasoningEffort:
             description: "Reasoning efforts it accepts."
@@ -815,7 +847,7 @@ $defs:
             type: array
             items:
               type: string
-              minLength: 1
+              pattern: "\\S"
             minItems: 1
           systemPrompt:
             description: "Whether it takes a system prompt."
@@ -823,7 +855,7 @@ $defs:
           toolGating:
             description: "How its tools are gated."
             type: string
-            minLength: 1
+            pattern: "\\S"
       invocations:
         description: "The ways to start the executor."
         type: array
@@ -831,6 +863,9 @@ $defs:
           $ref: "#/$defs/invocation"
         minItems: 1
     required: [kind]
+    dependentRequired:
+      command: [args]
+      args: [command]
   accountSource:
     description: "Where the login of one account lives."
     type: object
@@ -870,6 +905,7 @@ $defs:
       promise:
         description: "One-sentence promise of what this pattern delivers."
         type: string
+        pattern: "\\S"
       loop:
         description: "The execution loop that runs this pattern."
         type: string
@@ -877,6 +913,7 @@ $defs:
       defaults:
         description: "Default parameter values for the loop."
         type: object
+        additionalProperties: false
         properties:
           maxRounds:
             description: "Most review rounds before the unit stops."
@@ -900,6 +937,7 @@ $defs:
             additionalProperties:
               description: "Task instruction text."
               type: string
+              pattern: "\\S"
           rebuttal:
             description: "Whether rebuttal is enabled in debate."
             type: boolean
@@ -916,7 +954,7 @@ $defs:
       seat:
         description: "Unique name of the seat."
         type: string
-        minLength: 1
+        pattern: "\\S"
       role:
         description: "Role the seat performs in the loop."
         type: string
@@ -924,7 +962,7 @@ $defs:
       persona:
         description: "Persona specialization for the seat."
         type: string
-        minLength: 1
+        pattern: "\\S"
       tier:
         $ref: "#/$defs/tierName"
     required: [seat, role]
@@ -939,6 +977,7 @@ $defs:
         items:
           description: "Required element."
           type: string
+          pattern: "\\S"
       fixed:
         description: "Exact value the parameter must have."
     oneOf:

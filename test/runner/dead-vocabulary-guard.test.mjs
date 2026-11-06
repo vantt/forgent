@@ -3,7 +3,6 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { projectConfigPath, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '../..');
 
@@ -152,70 +151,31 @@ test('dead vocabulary guard: the project config does not contain runner.models o
 });
 
 import os from 'node:os';
-import { loadRunnerConfig, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
 
-function mkTempConfig(runnerObj) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dead-vocab-test-'));
-  const file = projectConfigPath(dir);
-  writeProjectConfig(dir, runnerObj);
-  return file;
-}
-
-test('dead vocabulary guard: loadRunnerConfig rejects dead keys with actionable instructions', () => {
+// A removed key has no schema node to refuse it by name, so `validateRunnerConfigShape` says what replaced it. A
+// removed key inside a capability entry is an unknown key to the schema, which refuses it
+// (packages/config/rust/tests/golden_validate.rs).
+test('dead vocabulary guard: the runner config check rejects dead keys with actionable instructions', () => {
   const base = {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' } },
-    defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
     timeoutMs: 1000,
   };
 
   // 1. runner.models
-  const fModels = mkTempConfig({ ...base, models: { standard: 'sonnet' } });
   assert.throws(
-    () => loadRunnerConfig(fModels),
-    (err) => err instanceof RunnerConfigError && /declares retired "models" map/.test(err.message),
+    () => validateRunnerConfigShape({ ...base, models: { standard: 'sonnet' } }, 'test'),
+    (err) => err instanceof RunnerConfigError && /declares retired "models": use "modelPolicies\.<provider>\.<tier>" instead/.test(err.message),
   );
 
   // 2. executors.*.rigorOverrides
-  const fRigor = mkTempConfig({
-    ...base,
-    executors: { gemini: { kind: 'agent', command: 'gemini', args: [], providerModel: 'gemini', rigorOverrides: { heavy: 'advanced' } } },
-  });
   assert.throws(
-    () => loadRunnerConfig(fRigor),
-    (err) => err instanceof RunnerConfigError && /rigorOverrides was removed; express per-tier models in runner\.modelPolicies\.gemini/.test(err.message),
-  );
-
-  // 3. capabilities.*.overrides.rigorOverrides
-  const fCapRigor = mkTempConfig({
-    ...base,
-    capabilities: {
-      'fgos-coding-implement': {
-        prefer: 'gemini',
-        overrides: { rigorOverrides: { heavy: 'standard' } },
-      },
-    },
-    executors: { gemini: { kind: 'agent', command: 'gemini', args: [] } },
-  });
-  assert.throws(
-    () => loadRunnerConfig(fCapRigor),
-    (err) => err instanceof RunnerConfigError && /capabilities\.fgos-coding-implement\.overrides was removed; use "capabilities\.fgos-coding-implement\.rigor"/.test(err.message),
-  );
-
-  // 4. capabilities.*.overrides.providerModel
-  const fCapProvider = mkTempConfig({
-    ...base,
-    capabilities: {
-      'fgos-coding-implement': {
-        prefer: 'gemini',
-        overrides: { providerModel: 'gemini' },
-      },
-    },
-    executors: { gemini: { kind: 'agent', command: 'gemini', args: [] } },
-  });
-  assert.throws(
-    () => loadRunnerConfig(fCapProvider),
-    (err) => err instanceof RunnerConfigError && /capabilities\.fgos-coding-implement\.overrides was removed; use "capabilities\.fgos-coding-implement\.rigor"/.test(err.message),
+    () => validateRunnerConfigShape({
+      ...base,
+      executors: { gemini: { kind: 'agent', command: 'gemini', args: [], providerModel: 'gemini', rigorOverrides: { heavy: 'advanced' } } },
+    }, 'test'),
+    (err) => err instanceof RunnerConfigError && /"rigorOverrides" was removed\. express per-tier models in runner\.modelPolicies/.test(err.message),
   );
 });
 
@@ -224,7 +184,7 @@ import { bindable } from '../helpers/work-seat-config.mjs';
 const effectiveDispatchPolicy = (args) => policyOf({ ...args, runnerConfig: bindable(args.runnerConfig) });
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
-test('dead vocabulary guard: capabilities.<cap>.rigor is a demand that moves no tier, and capabilities.*.overrides is rejected (D19)', () => {
+test('dead vocabulary guard: capabilities.<cap>.rigor is a demand that moves no tier', () => {
   const baseConfig = {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: {
@@ -234,19 +194,7 @@ test('dead vocabulary guard: capabilities.<cap>.rigor is a demand that moves no 
     timeoutMs: 1000,
   };
 
-  // 1. capabilities.*.overrides is rejected
-  const fOverrides = mkTempConfig({
-    ...baseConfig,
-    capabilities: {
-      'code:review': { overrides: { tier: 'flagship' } },
-    },
-  });
-  assert.throws(
-    () => loadRunnerConfig(fOverrides),
-    (err) => err instanceof RunnerConfigError && /capabilities\.code:review\.overrides was removed; use "capabilities\.code:review\.rigor"/.test(err.message),
-  );
-
-  // 2. capabilities.<cap>.rigor is a demand: it raises the effective rigor and never the tier
+  // capabilities.<cap>.rigor is a demand: it raises the effective rigor and never the tier
   const runnerConfig = {
     ...baseConfig,
     capabilities: {

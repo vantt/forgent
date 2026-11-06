@@ -7,12 +7,11 @@
 import '../helpers/process-tmp-root.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 
 import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
-import { EXECUTOR_KINDS, compileDispatchPlan, loadRunnerConfig, RunnerConfigError } from '../../src/runner/dispatch.mjs';
+import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '../..');
 const SHARED_DIR = path.join(repoRoot, 'core', 'skills', '_shared');
@@ -72,63 +71,10 @@ test('no two DEFAULT_CAPABILITY_SLOTS entries declare the identical "serves" att
   }
 });
 
-function tempConfigPath(capabilities) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'capability-serves-'));
-  const configPath = path.join(dir, 'runner-config.json');
-  fs.writeFileSync(
-    configPath,
-    JSON.stringify({
-      executor: { command: 'claude', args: ['{prompt}'] },
-      capabilities,
-      modelPolicies: { claude: { standard: 'sonnet' } },
-      defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-      timeoutMs: 1000,
-    }),
-  );
-  return configPath;
-}
-
-test('loadRunnerConfig accepts a "capabilities.<name>.serves" entry with scalar and array attribute values', () => {
-  const cfg = loadRunnerConfig(
-    tempConfigPath({
-      'code:implement': { serves: { outputKind: 'change', domain: 'code', mutates: true } },
-      review: { serves: { outputKind: ['finding', 'verification'], mutates: false } },
-    }),
-  );
-  assert.deepEqual(cfg.capabilities['code:implement'].serves, { outputKind: 'change', domain: 'code', mutates: true });
-  assert.deepEqual(cfg.capabilities.review.serves, { outputKind: ['finding', 'verification'], mutates: false });
-});
-
-test('loadRunnerConfig accepts a "capabilities.<name>" entry with no "serves" at all (an old config predating I19 keeps loading)', () => {
-  const cfg = loadRunnerConfig(tempConfigPath({ 'impact-analysis': { description: 'Code-graph blast radius' } }));
-  assert.equal(cfg.capabilities['impact-analysis'].serves, undefined);
-});
-
-test('loadRunnerConfig rejects a "serves" value that is not an object', () => {
-  for (const badServes of ['change', 42, ['change'], null]) {
-    assert.throws(() => loadRunnerConfig(tempConfigPath({ execute: { serves: badServes } })), RunnerConfigError, `serves: ${JSON.stringify(badServes)}`);
-  }
-});
-
-test('loadRunnerConfig rejects a "serves" key not in the DemandFacts vocabulary, including "size"/"rigor" (Q1 never uses those two)', () => {
-  for (const key of ['size', 'rigor', 'notARealAttribute']) {
-    assert.throws(() => loadRunnerConfig(tempConfigPath({ execute: { serves: { [key]: 'heavy' } } })), RunnerConfigError, `key: ${key}`);
-  }
-});
-
-test('loadRunnerConfig rejects a "serves" boolean attribute given a non-boolean value', () => {
-  assert.throws(() => loadRunnerConfig(tempConfigPath({ execute: { serves: { mutates: 'true' } } })), RunnerConfigError);
-});
-
-test('loadRunnerConfig rejects a "serves" string attribute given an empty string', () => {
-  assert.throws(() => loadRunnerConfig(tempConfigPath({ execute: { serves: { outputKind: '' } } })), RunnerConfigError);
-});
+// The shape of `serves` (keys, scalar or list values, non-empty strings, booleans) is the runner schema's; the
+// bundled-schema cases in packages/config/rust/tests/golden_validate.rs own it.
 
 // ─── Capability may resolve to a tool/MCP provider, not only an agent ───
-
-test('EXECUTOR_KINDS registers both agent and tool -- a capability is not agent-only', () => {
-  assert.deepEqual([...EXECUTOR_KINDS].sort(), ['agent', 'tool']);
-});
 
 test('decide --for resolves an unconfigured capability to unavailable (the fallback path)', () => {
   const cfg = { capabilities: {}, executors: {} };
