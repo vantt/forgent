@@ -839,6 +839,60 @@ test('a renewed login is never applied while its tokens name no account the prov
 
 // A copy's token claim is unverified until it renews: one that never renews must not stop the account's own
 // renewal, and must not be called again and again.
+// The CLI may redeem the copy's refresh token and the runner die before the renewed pair is kept: the copy is
+// marked spent before the call, so no later holder redeems the same token again (OpenAI may revoke the whole family).
+test('an agent\'s copy is marked spent before the call, and one found still marked is dropped without a call', async () => {
+  const w = workspace();
+  try {
+    const { dir, target } = codexAgentHome(w);
+    writeBackRenewedCredential(dir, target);
+    const [copy] = agentCopies(w);
+    let markedDuringCall = null;
+    const { spawnFn } = fakeSpawn({ layoutName: 'codex', behaviour: (home) => {
+      if (path.basename(home).startsWith('.tmp-')) markedDuringCall = fs.existsSync(path.join(w.accountDir, 'pending', copy, '.gate-spent'));
+    } });
+    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.equal(markedDuringCall, true, 'the copy carries the spent mark while the CLI may redeem its token');
+    assert.equal(fs.existsSync(path.join(w.accountDir, 'pending', copy, '.gate-spent')), false, 'a call that renewed nothing clears it');
+
+    // What a runner that died during the call leaves: the mark is still there.
+    fs.writeFileSync(path.join(w.accountDir, 'pending', copy, '.gate-spent'), '');
+    const realWrite = process.stderr.write;
+    process.stderr.write = () => true;
+    let again;
+    try {
+      again = fakeSpawn({ layoutName: 'codex', behaviour: () => {} });
+      await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(w.home), runtimeDir: w.runtimeDir, spawnFn: again.spawnFn, cooldownMs: 0 });
+    } finally { process.stderr.write = realWrite; }
+    assert.equal(again.starts.filter((s) => path.basename(s.homeDir).startsWith('.tmp-')).length, 0, 'its spent token is never redeemed again');
+    assert.deepEqual(agentCopies(w), []);
+  } finally { w.cleanup(); }
+});
+
+// A copy the gate cannot even prepare (its isolated copy cannot be written) must not stay forever.
+test('an agent\'s copy whose preparation fails counts its tries and is set aside after two', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    const token = (exp, tag) => fakeJwt(exp, tag, codexAccountClaim('FAKE-ACCOUNT-LEASED'));
+    writeOmp(w.home, [{ id: 1, data: ompData(now + 10 * 60 * 1000, { access: token(now + 10 * 60 * 1000, 'old') }) }]).close();
+    const dir = path.join(w.tmp, 'fgos-confinement', 'disp_prep', 'home');
+    writeOmp(dir, [{ id: 1, data: ompData(now + 6 * HOUR, { access: token(now + 6 * HOUR, 'pane'), refresh: 'FAKE-OMP-REFRESH-PANE' }) }]).close();
+    writeBackRenewedCredential(dir, credentialWriteBackTarget({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir }));
+    // SQLite that cannot write the isolated copy, and works everywhere else.
+    const loadSqlite = () => ({ DatabaseSync: class extends DatabaseSync {
+      constructor(file, options) { if (!options?.readOnly && path.basename(path.dirname(file)).startsWith('.tmp-')) throw new Error('isolated copy not writable'); super(file, options); }
+    } });
+    for (const run of [1, 2]) {
+      const { spawnFn, starts } = fakeSpawn({ layoutName: 'omp', behaviour: () => {} });
+      await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir, spawnFn, loadSqlite, cooldownMs: 0 });
+      assert.equal(starts.filter((s) => path.basename(s.homeDir).startsWith('.tmp-')).length, 0, `no call is made on a copy that was not prepared (${run})`);
+      assert.equal(agentCopies(w).length, run === 1 ? 1 : 0, `after ${run} failed preparation(s)`);
+    }
+    assert.equal(fs.readdirSync(path.join(w.accountDir, 'torn')).length, 1, 'it is set aside for the owner');
+  } finally { w.cleanup(); }
+});
+
 test('an agent\'s copy whose renewal returns nothing never cools the account: its own renewal still runs, and after two calls the copy is set aside for the owner', async () => {
   const w = workspace();
   try {
@@ -853,6 +907,7 @@ test('an agent\'s copy whose renewal returns nothing never cools the account: it
     await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(w.home), runtimeDir: w.runtimeDir, spawnFn: second.spawnFn, cooldownMs: 0 });
     assert.deepEqual(agentCopies(w), [], 'after the second call the copy leaves the pending copies');
     assert.equal(fs.readdirSync(path.join(w.accountDir, 'torn')).length, 1, 'it is kept under torn/ for the owner');
+    assert.deepEqual(inspectRetainedCredentialCopies({ runtimeDir: w.runtimeDir }).map((c) => c.kind), ['set-aside'], 'doctor tells it from a half-written copy');
     assert.equal(readCodex(w.home).tokens.refresh_token, 'FAKE-CODEX-REFRESH-old');
   } finally { w.cleanup(); }
 });

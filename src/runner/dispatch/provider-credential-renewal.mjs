@@ -904,7 +904,8 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
       const ageMs = now - at;
       const torn = path.basename(path.dirname(dir)) === TORN_DIR;
       const staging = STAGING_NAME.test(name);
-      const kind = torn ? 'torn' : staging ? 'staging' : isAgentCopy(dir) ? 'agent' : staged ? 'pending' : 'scratch';
+      // An agent's copy set aside under torn/ after renewals that returned nothing is its own kind.
+      const kind = torn ? (name.includes(`-${AGENT_ORIGIN}-`) ? 'set-aside' : 'torn') : staging ? 'staging' : isAgentCopy(dir) ? 'agent' : staged ? 'pending' : 'scratch';
       if (ageMs >= minAgeMs || torn || staging || stranded) found.push({ provider, accountId, kind, ageMs, storeDir, stranded });
     }
   }
@@ -1095,6 +1096,12 @@ function moveToTorn(accountDir, dir, at) {
 }
 const refuseCopy = (dir) => { dropCopy(dir); process.stderr.write('fgos: credential-copy-refused (account-mismatch)\n'); };
 
+// Written into a copy just before the CLI may redeem its refresh token, and removed when the call renewed nothing.
+// A holder of the account lock that finds it was preceded by a runner that died during the call: the token is
+// spent (redeeming it again could make the provider revoke the renewed pair too), and the renewed pair, if any,
+// is in that runner's `.tmp-` staging, which the interrupted-staging sweep and doctor report.
+const SPENT_FILE = '.gate-spent';
+
 // What the probe CLI is given of a copy: its login file alone, and for omp a fresh database that holds only the
 // `auth_credentials` rows (column names quoted, values bound), never the agent's other tables or settings.
 function isolateLogin(layout, from, to, { loadSqlite }) {
@@ -1127,6 +1134,11 @@ function isolateLogin(layout, from, to, { loadSqlite }) {
  */
 async function applyAgentCopies({ accountDir, layout, layoutName, provider, credentialSource, home, lock, probeTimeoutMs, cooldownMs, spawnFn, env, loadSqlite, now }) {
   for (const dir of listLeftovers(accountDir).filter(isAgentCopy)) {
+    if (fs.existsSync(path.join(dir, SPENT_FILE))) {
+      dropCopy(dir);
+      process.stderr.write('fgos: credential-copy-dropped (spent by a renewal that did not finish)\n');
+      continue;
+    }
     const verdict = judgeCopy({ layout, provider, sourceHome: home, copyHome: dir, now: now(), loadSqlite });
     if (verdict === 'not-newer') { dropCopy(dir); continue; }
     if (verdict !== 'newer') continue;
@@ -1136,6 +1148,7 @@ async function applyAgentCopies({ accountDir, layout, layoutName, provider, cred
     // A staging name under pending/: a runner killed after the CLI spent the copy's refresh token leaves the renewed
     // pair where sweepInterruptedStagings and doctor find it.
     const probeHome = path.join(accountDir, PENDING_DIR, `.tmp-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
+    let called = false;
     try {
       const source = layout.read(home, { loadSqlite });
       const key = selectProviderEntry(source.entries, provider).entry.key;
@@ -1145,9 +1158,12 @@ async function applyAgentCopies({ accountDir, layout, layoutName, provider, cred
       layout.markDue(probeHome, [key], { loadSqlite });
       // Only the renewal is wanted: the call is given no tools.
       const plan = withKillTimeout(credentialProbeCommand({ ...credentialSource, home: probeHome }, { noTools: true }), probeTimeoutMs, env);
+      fs.writeFileSync(path.join(dir, SPENT_FILE), '', { mode: 0o600 });
+      called = true;
       if (plan) await runCredentialProbe(plan, { spawnFn: spawnFn ?? lock.spawnHolding, timeoutMs: probeTimeoutMs, env });
       const renewed = refreshIn(probeHome);
       if (renewed === null || renewed === spent) {
+        fs.rmSync(path.join(dir, SPENT_FILE), { force: true });
         // Never the account's cooldown: an agent's copy must not stop the account's own renewal. After
         // AGENT_COPY_TRIES calls that renew nothing it goes to torn/, for the owner, and is not called again.
         if (countAgentTry(dir) >= AGENT_COPY_TRIES) moveToTorn(accountDir, dir, now());
@@ -1162,7 +1178,11 @@ async function applyAgentCopies({ accountDir, layout, layoutName, provider, cred
       }
       if (status === 'apply-deferred') fs.renameSync(probeHome, path.join(accountDir, PENDING_DIR, pendingName(now(), proven === true ? null : AGENT_ORIGIN)));
       dropCopy(dir);
-    } catch { /* the copy stays for the next holder */ } finally { dropCopy(probeHome); }
+    } catch {
+      // Before the call a copy that cannot be prepared counts as a try like one that renews nothing; after it, the
+      // spent mark stays and the next holder drops the copy.
+      if (!called && countAgentTry(dir) >= AGENT_COPY_TRIES) moveToTorn(accountDir, dir, now());
+    } finally { dropCopy(probeHome); }
   }
 }
 

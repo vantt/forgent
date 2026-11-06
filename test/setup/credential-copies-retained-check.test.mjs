@@ -213,6 +213,20 @@ test('a half-written copy kept for hand recovery is reported as such', () => {
   } finally { w.cleanup(); }
 });
 
+test('an agent\'s copy set aside after renewals that returned nothing has its own wording, not a half-written one', () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    const dir = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'torn', `${String(now - 1000).padStart(15, '0')}-agent-abcd0123`);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'auth.json'), `{"refresh": "${FAKE_TOKEN}"}`);
+    const result = run(w, now);
+    assert.match(result.message, /xai\/acct: 1 login copy\(ies\) renewed inside a private home and set aside after renewals that returned nothing/);
+    assert.equal(result.message.includes('half-written'), false);
+    assert.equal(result.message.includes(FAKE_TOKEN), false);
+  } finally { w.cleanup(); }
+});
+
 test('a half-written copy is reported at any age', () => {
   const w = workspace();
   try {

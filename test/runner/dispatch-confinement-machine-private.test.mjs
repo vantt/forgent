@@ -276,7 +276,7 @@ test('every login store the inventory and the executors name is masked, and one 
   const ownCodex = path.join(host.root, 'own-codex');
   const defaults = ['.codex', path.join('.pi', 'agent'), '.claude'].map((dir) => path.join(host.home, dir));
   for (const dir of [named, ownCodex, ...defaults]) fs.mkdirSync(dir, { recursive: true });
-  writeAccountsFile(path.join(host.home, '.fgos'), { llmAccounts: { xai: { standin: { credentialStore: { pi: '~/.stand-in-pi' } } }, anthropic: { main: { credentialStore: { claude: '~/.claude' } } } } });
+  writeAccountsFile(path.join(host.home, '.fgos'), { llmAccounts: { xai: { standin: { credentialStore: { pi: '~/.stand-in-pi' } } }, anthropic: { main: { credentialStore: { claude: '~/.claude' } }, linked: { credentialStore: { claude: '~/claude-link' } } } } });
   await withHome(host, () => {
     // Every CLI's default login home and the one its variable names are stores, whichever the runner set.
     const stores = machineLoginStores({ homeDir: host.home, env: { CODEX_HOME: ownCodex } });
@@ -285,8 +285,10 @@ test('every login store the inventory and the executors name is masked, and one 
     assert.deepEqual(roots.sort(), [host.privateDir, named, ownCodex, ...defaults].sort(), 'each store that exists is masked, an absent one is skipped');
     // A launch that reads its own CLI's login in place (it declares no login store) keeps that CLI's homes, even
     // where the inventory names one of them as an account's store.
+    fs.symlinkSync(path.join(host.home, '.claude'), path.join(host.home, 'claude-link'));
     const claudeSeat = machineLoginStores({ homeDir: host.home, env: {}, inPlaceCli: 'claude' });
     assert.equal(claudeSeat.includes(path.join(host.home, '.claude')), false);
+    assert.equal(claudeSeat.includes(path.join(host.home, 'claude-link')), false, 'a store spelled through a link to that home is the same home');
     assert.ok(claudeSeat.includes(path.join(host.home, '.codex')));
   });
   const file = path.join(host.root, 'a-file');

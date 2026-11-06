@@ -9,6 +9,7 @@
 // credential source shape the lease, probe and renewal read; a pool declared here replaces the same
 // pool of `runner.providers.<provider>.accounts`, which stays the source for every pool not declared.
 
+import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { readConfig, readMachineConfig } from '../../config/facade.mjs';
@@ -283,14 +284,16 @@ const plainValues = (value) => (isPlainObject(value) ? Object.values(value) : []
 export function machineLoginStores({ homeDir = os.homedir(), env = process.env, projectRoot, inPlaceCli = null } = {}) {
   const request = { globalDir: path.join(homeDir, '.fgos'), sections: ['runner'] };
   const runner = (projectRoot ? readConfig({ ...request, projectRoot }) : readMachineConfig(request)).value?.runner ?? {};
-  // The homes a launch that reads its own CLI's login in place keeps visible, however a store names them.
+  // The homes a launch that reads its own CLI's login in place keeps visible, however a store spells them (a
+  // link to one is the same directory).
+  const real = (value) => { try { return fs.realpathSync(value); } catch { return path.resolve(value); } };
   const own = new Set(CLI_LOGIN_HOMES.filter(({ cli }) => cli === inPlaceCli)
-    .flatMap(({ env: name, dir }) => [path.join(homeDir, dir), name && env[name]]).map((value) => expandCredentialHome(value)).filter(Boolean).map((value) => path.resolve(value)));
+    .flatMap(({ env: name, dir }) => [path.join(homeDir, dir), name && env[name]]).map((value) => expandCredentialHome(value)).filter(Boolean).map(real));
   const stores = new Set();
   const add = (value) => {
     if (typeof value !== 'string' || !value.trim()) return;
     const expanded = expandCredentialHome(value);
-    if (!expanded || !own.has(path.resolve(expanded))) stores.add(expanded ?? value);
+    if (!expanded || !own.has(real(expanded))) stores.add(expanded ?? value);
   };
   for (const pool of plainValues(runner.llmAccounts)) {
     for (const account of plainValues(pool)) plainValues(account?.credentialStore).forEach(add);
