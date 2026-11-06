@@ -94,7 +94,7 @@ Settled without a phase: H-T4e closed (arbitration §2: short calls stay unconfi
 | 11 | [Config type rules to schema](phase-11-config-to-schema.md) **landed 11-06 `68c426c31..e5ac48e88`** | 03, 04 | 08, 10 | −600 to −1 000 / 0 / −200 |
 | 12 | [Test structure and doctor fold](phase-12-test-structure-and-doctor-fold.md) **landed 11-06 `cfff2aa7f..e3de56c54`** | 10, 11 | — | −85 / 0 / −1 100 |
 | 13 | [Spec, hand-off, close, land](phase-13-spec-handoff-close-land.md) **docs landed 11-06 `57149ebe9..9251c0190`; layer close waits on owner (budgets: P14 or close as is) and on P04 half B** | 01–12 | — | 0 / 0 / 0 |
-| 14 | [Budget cut](phase-14-budget-cut.md) (owner decision 69): seven functions over 300 lines, `src/runner/execution` ≤ 7 000, `confinement/` ≤ 5 950, `bind.mjs` ≤ 520, `run.test.mjs` split (H-T5a); three parallel lots | 09, 10, 12, 13 | lots 1 ∥ 2 ∥ 3 (disjoint files) | Node ≈ −700 / 0 / ≈ 0 (estimate) |
+| 14 | [Budget cut](phase-14-budget-cut.md) (owner decision 69): seven functions over 300 lines, `src/runner/execution` ≤ 7 000, `confinement/` ≤ 5 950, `bind.mjs` ≤ 520, `run.test.mjs` split (H-T5a); three parallel lots **landed 11-06: lot 1 `7055cf874..477f96684`, lot 3 `477f96684..dbec1f5f2`, lot 2 `dbec1f5f2..83e4cca9e`** | 09, 10, 12, 13 | lots 1 ∥ 2 ∥ 3 (disjoint files) | Node ≈ −700 / 0 / ≈ 0 (estimate) |
 
 ```
 wave 0:  P01 (red proofs on a branch)

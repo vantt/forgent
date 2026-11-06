@@ -220,3 +220,8 @@ DOC lead: tell before merge (board shared-file rule); this report is the notice.
 Status: DONE_WITH_CONCERNS
 Summary: T5 is landed on main except P04 half B (waits for the owner's config move) and the seat-start follow-ups; spec, boundary and backlog lines are written on `harden/t5-p13` with doc-health and citation drift green; three Node budgets and the 300-line function rule are not met.
 Concerns/Blockers: budgets not met (open item 3) need an owner call; H-T5a and H-T5c have no receiver confirmation on the board; test timings were taken under load from other lanes.
+
+
+## Addendum 2026-11-06 21:5x — phase 14 (owner decision 69)
+
+Three parallel lots landed: lot 1 `7055cf874..477f96684` (confinement `authority.mjs` 1 314 → 984, `confinement/` 5 972 → 5 642; `run.test.mjs` split into four files, 78 tests unchanged), lot 3 `477f96684..dbec1f5f2` (`resolveCollaboration`, `checkCatalog`, `compileDispatchPlan`, `settleRunOutcome` each under 230 lines; −553 lines), lot 2 `dbec1f5f2..83e4cca9e` (seven execution files −584, `bind.mjs` 514). `src/runner/execution` is now 6 453 lines (budget 7 000), `confinement/` 5 642 (5 950), `bind.mjs` 514 (520); no T5 function is over 300 lines. Behaviour unchanged; each lot's full suite red only on the known V7n test. H-T5a (test split) done by HARDEN.
