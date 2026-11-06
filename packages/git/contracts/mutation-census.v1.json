@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e1ce00c749b8ffe946e0504a56a49ad4b351853f1b12b3184d42118756aa8488",
+  "payloadDigest": "dec6ea77a2f9640daea299414e412555ecd5ae8826721a61098d93ba247f7fa1",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -969,11 +969,11 @@
     "src/run-supervisor/run-lock.mjs": "1c556b14b63b421536af3137aa35245879ee116706c82cdb24d20b1d35a9a026",
     "src/run-supervisor/runtime-dir.mjs": "d6f90389164367066eac77a80c86d4053b722beea240b113c09d43bb87bf69a7",
     "src/run-supervisor/step-support.mjs": "b2e44945f42b1e72065cd0de645c09efd6362c75316b069a7c8a835bfec7a5c0",
-    "src/run-supervisor/steps/cleanup-trust.mjs": "0ff3519fc6e9f1b95ddaf87cfa3cb4cdaf817e1e7c4bd6c8cf02410c86078901",
+    "src/run-supervisor/steps/cleanup-trust.mjs": "6e325a7a95f5f83d2b36cc4ff10c63b9dedd779f892ad0467773e24cb76f4611",
     "src/run-supervisor/steps/finalize-home.mjs": "3150a00e4d0742ac817ba1b2939ae6410e87977b70bde31624168cb890a1d97b",
     "src/run-supervisor/steps/settle-attempt.mjs": "01e2b7f841f79f869489f4a90b4f965398b7d54b5028da4fe2447bc0f8482778",
     "src/run-supervisor/stray-writes.mjs": "a089d31b30aefcf02d5fa0880bc521f5c060af8a4bf3da10c59571a896f1a033",
-    "src/run-supervisor/trust-store.mjs": "4eb4aa3beb731e0737b68a1d43f99305ec9682eb5bb4b8440110bd2aa7305a63",
+    "src/run-supervisor/trust-store.mjs": "07aa2314e44ea351b0437898b5688777d0d4bb0daccd6f881b5bbe777da761c1",
     "src/run-supervisor/worker-artifacts.mjs": "1b54f4821c1c2812cb0fe643056f9daf3265e3660d85dd2677f1d4aa31773541",
     "src/runner/agent-definitions.mjs": "c171c5812dad6312f8538b0abda0bf7c9b392847fbe8d7a9ef75bebc44c62434",
     "src/runner/agent-listing.mjs": "8c6bfd84c26fb939cc22bf511c7e5a328d7cfa91bb9c2ba0574b94f6d48b6c4d",

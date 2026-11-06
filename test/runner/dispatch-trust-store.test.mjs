@@ -6,7 +6,8 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, seedCodexTrust, removeCodexTrust, claudeMcpApprovalArgs, TrustStoreError } from '../../src/run-supervisor/trust-store.mjs';
+import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, seedCodexTrust, readCodexTrust, removeCodexTrust, claudeMcpApprovalArgs, TrustStoreError } from '../../src/run-supervisor/trust-store.mjs';
+import { cleanupTrust, TRUST_CONTEXT_FILE } from '../../src/run-supervisor/steps/cleanup-trust.mjs';
 
 // Phase 01 group B. Every test here runs against a FIXTURE store, never the real
 // ~/.claude.json -- the module takes the store path as an argument precisely so a
@@ -289,6 +290,90 @@ test('a 0600 codex config is still 0600 after seed and after remove', () => {
     removeCodexTrust(file, '/tmp/wt-mode');
     assert.equal(modeOf(file), 0o600);
   } finally { process.umask(previous); fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+// The operator keeps a store behind a link (a dotfiles checkout, say): a rewrite goes to the file the link
+// names, so the link and the file it points at both survive.
+test('a codex config or agy settings file reached through a link stays a link, and the file it names gets the entry', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-trust-link-'));
+  try {
+    const codexReal = path.join(dir, 'dotfiles', 'config.toml');
+    fs.mkdirSync(path.dirname(codexReal), { recursive: true });
+    fs.writeFileSync(codexReal, `[projects."${trustedRoot}"]\ntrust_level = "trusted"\n`);
+    const codexLink = path.join(dir, 'codex-home', 'config.toml');
+    fs.mkdirSync(path.dirname(codexLink));
+    fs.symlinkSync(codexReal, codexLink);
+    seedCodexTrust(codexLink, { projectPath: '/tmp/wt-link', repoRoot: trustedRoot });
+    assert.equal(fs.lstatSync(codexLink).isSymbolicLink(), true, 'the codex config is still a link after the seed');
+    assert.equal(readCodexTrust(codexReal, '/tmp/wt-link'), true);
+    removeCodexTrust(codexLink, '/tmp/wt-link');
+    assert.equal(fs.lstatSync(codexLink).isSymbolicLink(), true, 'the codex config is still a link after the removal');
+    assert.equal(readCodexTrust(codexReal, '/tmp/wt-link'), null);
+
+    const agyReal = path.join(dir, 'dotfiles', 'settings.json');
+    fs.writeFileSync(agyReal, JSON.stringify({ trustedWorkspaces: [trustedRoot] }));
+    const agyLink = path.join(dir, 'agy-settings.json');
+    fs.symlinkSync(agyReal, agyLink);
+    seedAgyTrust(agyLink, { projectPath: '/tmp/wt-link', repoRoot: trustedRoot });
+    assert.equal(fs.lstatSync(agyLink).isSymbolicLink(), true, 'the agy settings file is still a link after the seed');
+    assert.equal(readAgyTrust(agyReal, '/tmp/wt-link'), true);
+    assert.equal(removeAgyTrust(agyLink, '/tmp/wt-link'), true);
+    assert.equal(fs.lstatSync(agyLink).isSymbolicLink(), true, 'the agy settings file is still a link after the removal');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('removing a codex trust section keeps the rest of the config valid: the section ends at the next table header, not at the first bracket', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-codex-section-'));
+  const file = path.join(dir, 'config.toml');
+  try {
+    const rest = `[projects."${trustedRoot}"]\ntrust_level = "trusted"\n\n[mcp_servers.x]\ncommand = "y"\n`;
+    fs.writeFileSync(file, `[projects."/tmp/wt-section"]\ntrust_level = "trusted"\nnotes = ["kept by hand", "two"]\n\n${rest}`);
+    assert.equal(removeCodexTrust(file, '/tmp/wt-section'), true);
+    assert.equal(fs.readFileSync(file, 'utf8'), rest, 'the whole section goes and nothing after it');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('a workspace path with a quote or a backslash is written as an escaped TOML key and is found again', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-codex-escape-'));
+  const file = path.join(dir, 'config.toml');
+  const odd = '/tmp/wt "odd" \\ name';
+  try {
+    fs.writeFileSync(file, `[projects."${trustedRoot}"]\ntrust_level = "trusted"\n`);
+    assert.equal(seedCodexTrust(file, { projectPath: odd, repoRoot: trustedRoot }), true);
+    assert.ok(fs.readFileSync(file, 'utf8').includes(`[projects.${JSON.stringify(odd)}]`), 'the key is a TOML basic string');
+    assert.equal(readCodexTrust(file, odd), true);
+    assert.equal(seedCodexTrust(file, { projectPath: odd, repoRoot: trustedRoot }), false, 'seeding twice finds the escaped key');
+    assert.equal(removeCodexTrust(file, odd), true);
+    assert.equal(readCodexTrust(file, odd), null);
+    assert.equal(readCodexTrust(file, trustedRoot), true, 'the root the trust came from is kept');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+// A store whose directory refuses the write still holds the entry: the cleanup step must say so, not claim
+// the entry was already gone.
+test('a trust entry the cleanup step cannot remove is reported as remove-failed, for codex and for agy', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-trust-remove-failed-'));
+  const stores = path.join(dir, 'stores');
+  fs.mkdirSync(stores);
+  try {
+    const codex = path.join(stores, 'config.toml');
+    fs.writeFileSync(codex, `[projects."${trustedRoot}"]\ntrust_level = "trusted"\n\n[projects."/tmp/wt-held"]\ntrust_level = "trusted"\n`);
+    const agy = path.join(stores, 'settings.json');
+    fs.writeFileSync(agy, JSON.stringify({ trustedWorkspaces: [trustedRoot, '/tmp/wt-held'] }));
+    fs.chmodSync(stores, 0o500);
+    for (const [kind, target] of [['codex-toml', codex], ['agy', agy]]) {
+      const runDir = path.join(dir, `run-${kind}`);
+      fs.mkdirSync(path.join(runDir, 'controller'), { recursive: true });
+      fs.writeFileSync(path.join(runDir, TRUST_CONTEXT_FILE), JSON.stringify({ v: 1, kind, target, projectPath: '/tmp/wt-held' }));
+      const done = await cleanupTrust({ runDir });
+      assert.equal(done.detail.trust, 'remove-failed', `${kind}: a removal that could not be written is not "already-gone"`);
+    }
+    assert.equal(readCodexTrust(codex, '/tmp/wt-held'), true);
+    assert.equal(readAgyTrust(agy, '/tmp/wt-held'), true);
+  } finally {
+    fs.chmodSync(stores, 0o700);
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 // claude asks a person to approve each MCP server a project declares; an unattended worker would

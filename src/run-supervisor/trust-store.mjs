@@ -31,8 +31,8 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 import { readAgentFileSync } from '../native/proof-helpers.mjs';
+import { replaceDurably } from '../native/door.mjs';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 
 /** Raised for every refusal and every failure. Carries a `code` so a caller can
@@ -70,33 +70,32 @@ function readStore(storePath) {
   }
 }
 
-/** Write `body` to `tmp` and rename it over `target`, keeping the target's own
- * permission bits. The stores this module edits hold provider credentials or
- * trust decisions (a 0600 file stays 0600); a temp file created with the
- * process default would silently widen it to 0664 under a 002 umask. A target
- * that does not exist yet is created owner-only. */
-function writeFileKeepingMode(tmp, target, body) {
+/** Replace a store's bytes through the durable door (synced file, rename, synced directory), so a reader
+ * sees the whole old store or the whole new one. A store reached through a link is written where the link
+ * points, so the link stays a link. The store's own permission bits are kept (a 0600 store holding provider
+ * credentials stays 0600); one that does not exist yet is created owner-only. */
+function writeStore(storePath, body) {
+  let target = storePath;
   let mode = 0o600;
-  try { mode = fs.statSync(target).mode & 0o777; } catch { /* new file: owner-only */ }
-  fs.writeFileSync(tmp, body, { mode });
-  fs.chmodSync(tmp, mode); // writeFileSync's mode is masked by umask; chmod is not
-  fs.renameSync(tmp, target);
-}
-
-/** Write the store atomically: a temp file in the SAME directory (so the rename
- * cannot cross a filesystem boundary and degrade into a copy), then rename over
- * the target. A reader therefore sees either the whole old file or the whole new
- * one, never a half-written store. The temp file is removed on any failure so a
- * crash leaves no residue beside the operator's own config. */
-function writeStoreAtomic(storePath, data) {
-  const dir = path.dirname(storePath);
-  const tmp = path.join(dir, `.${path.basename(storePath)}.fgos-${process.pid}-${Date.now()}.tmp`);
   try {
-    writeFileKeepingMode(tmp, storePath, `${JSON.stringify(data, null, 2)}\n`);
+    target = fs.realpathSync(storePath);
+    mode = fs.statSync(target).mode & 0o777;
   } catch (err) {
-    try { fs.unlinkSync(tmp); } catch {}
+    if (err.code !== 'ENOENT' || fs.lstatSync(storePath, { throwIfNoEntry: false })) {
+      throw new TrustStoreError('write-failed', `trust store at "${storePath}" could not be resolved: ${err.message}.`, { storePath });
+    }
+  }
+  try {
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    replaceDurably(path.dirname(target), path.basename(target), body, mode);
+  } catch (err) {
     throw new TrustStoreError('write-failed', `trust store at "${storePath}" could not be written: ${err.message}.`, { storePath });
   }
+}
+
+/** Write the claude store as JSON. */
+function writeStoreAtomic(storePath, data) {
+  writeStore(storePath, `${JSON.stringify(data, null, 2)}\n`);
 }
 
 /** The `projects` map, or a typed schema-drift refusal. The shape is another
@@ -278,18 +277,33 @@ export function readCodexTrust(configPath, projectPath) {
     if (err.code === 'ENOENT') return null;
     throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
   }
-  const section = codexSectionPattern(projectPath);
-  const match = body.match(section);
-  if (!match) return null;
-  return /trust_level\s*=\s*"trusted"/.test(match[0]);
+  const section = codexSectionRange(body, projectPath);
+  if (!section) return null;
+  return /trust_level\s*=\s*"trusted"/.test(body.slice(section.start, section.end));
 }
 
-/** The `[projects."<path>"]` block for one path, up to the next section header
- * or end of file. The path is embedded literally, so it is escaped for regex
- * rather than interpolated raw. */
-function codexSectionPattern(projectPath) {
-  const escaped = projectPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`\\[projects\\."${escaped}"\\][^\\[]*`, 'm');
+/** A TOML basic string: JSON string escapes (quote, backslash, control characters) are valid TOML
+ * escapes; DEL is the one extra character TOML requires escaped. */
+function tomlBasicString(value) {
+  return JSON.stringify(value).replace(/\x7f/g, '\\u007f');
+}
+
+const codexProjectHeader = (projectPath) => `[projects.${tomlBasicString(projectPath)}]`;
+
+/** Where the `[projects."<path>"]` table of one path sits in `body`: from its header line up to the next
+ * line that starts a table header, or the end of the file. A `[` inside a value (an array) does not end
+ * it. `null` when the path has no table. */
+function codexSectionRange(body, projectPath) {
+  const header = codexProjectHeader(projectPath);
+  let start = -1;
+  let offset = 0;
+  for (const line of body.split(/(?<=\n)/)) {
+    const opensTable = /^[ \t]*\[/.test(line);
+    if (start >= 0 && opensTable) return { start, end: offset };
+    if (start < 0 && opensTable && line.trim().startsWith(header)) start = offset;
+    offset += line.length;
+  }
+  return start >= 0 ? { start, end: offset } : null;
 }
 
 /**
@@ -331,35 +345,23 @@ export function seedCodexTrust(configPath, { projectPath, repoRoot, rootConfigPa
     }
     body = '';
   }
-  const entry = `\n[projects."${projectPath}"]\ntrust_level = "trusted"\n`;
-  const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
-  try {
-    fs.mkdirSync(path.dirname(configPath), { recursive: true });
-    writeFileKeepingMode(tmp, configPath, `${body.replace(/\n*$/, '\n')}${entry}`);
-  } catch (err) {
-    try { fs.rmSync(tmp, { force: true }); } catch { /* the temp file is not worth a second failure */ }
-    throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
-  }
+  const entry = `\n${codexProjectHeader(projectPath)}\ntrust_level = "trusted"\n`;
+  writeStore(configPath, `${body.replace(/\n*$/, '\n')}${entry}`);
   return true;
 }
 
-/** Drop one workspace's codex trust entry. Returns whether anything was there. */
+/** Drop one workspace's codex trust entry. Returns whether anything was there; throws a TrustStoreError
+ * when the config cannot be read or written, so a failed removal is never mistaken for an absent entry. */
 export function removeCodexTrust(configPath, projectPath) {
   if (readCodexTrust(configPath, projectPath) === null) return false;
   let body;
   try {
     body = fs.readFileSync(configPath, 'utf8');
-  } catch {
-    return false;
-  }
-  const next = body.replace(codexSectionPattern(projectPath), '');
-  const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
-  try {
-    writeFileKeepingMode(tmp, configPath, next);
   } catch (err) {
-    try { fs.rmSync(tmp, { force: true }); } catch { /* nothing further to do */ }
-    throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
+    throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
   }
+  const section = codexSectionRange(body, projectPath);
+  writeStore(configPath, `${body.slice(0, section.start)}${body.slice(section.end)}`);
   return true;
 }
 
@@ -428,10 +430,8 @@ export function codexHookTrustEntries(hooksJsonPath) {
   return { entries, skipped };
 }
 
-/** A TOML basic-string key. JSON string escapes (quote, backslash, control characters) are valid
- * TOML escapes; DEL is the one extra character TOML requires escaped. */
 function codexHookHeader(key) {
-  return `[hooks.state.${JSON.stringify(key).replace(/\x7f/g, '\\u007f')}]`;
+  return `[hooks.state.${tomlBasicString(key)}]`;
 }
 
 /**
@@ -465,14 +465,7 @@ export function seedCodexHookTrust(configPath, { projectPath, repoRoot, rootConf
   const fresh = entries.filter(({ key }) => !body.includes(codexHookHeader(key)) && !body.includes(key));
   if (fresh.length === 0) return { keys: [], skipped };
   const sections = fresh.map(({ key, hash }) => `\n${codexHookHeader(key)}\ntrusted_hash = "${hash}"\n`).join('');
-  const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
-  try {
-    fs.mkdirSync(path.dirname(configPath), { recursive: true });
-    writeFileKeepingMode(tmp, configPath, `${body.replace(/\n*$/, '\n')}${sections}`);
-  } catch (err) {
-    try { fs.rmSync(tmp, { force: true }); } catch { /* the temp file is not worth a second failure */ }
-    throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
-  }
+  writeStore(configPath, `${body.replace(/\n*$/, '\n')}${sections}`);
   return { keys: fresh.map(({ key }) => key), skipped };
 }
 
@@ -599,41 +592,19 @@ export function seedAgyTrust(settingsPath, { projectPath, repoRoot, rootSettings
   if (trustedList.some((entry) => matchesPath(entry, projectPath))) return false; // already seeded
 
   store.trustedWorkspaces = [...trustedList, projectPath];
-
-  const dir = path.dirname(settingsPath);
-  fs.mkdirSync(dir, { recursive: true });
-  const tmp = path.join(dir, `.${path.basename(settingsPath)}.fgos-${process.pid}-${Date.now().toString(36)}.tmp`);
-  try {
-    writeFileKeepingMode(tmp, settingsPath, `${JSON.stringify(store, null, 2)}\n`);
-  } catch (err) {
-    try { fs.unlinkSync(tmp); } catch {}
-    throw new TrustStoreError('write-failed', `agy trust store at "${settingsPath}" could not be written: ${err.message}.`, { settingsPath });
-  }
+  writeStore(settingsPath, `${JSON.stringify(store, null, 2)}\n`);
   return true;
 }
 
-/** Drop one workspace's agy trust entry. Returns whether anything was there. */
+/** Drop one workspace's agy trust entry. Returns whether anything was there; throws a TrustStoreError when
+ * the settings cannot be read or written, so a failed removal is never mistaken for an absent entry. */
 export function removeAgyTrust(settingsPath, projectPath) {
-  try {
-    if (typeof settingsPath !== 'string' || typeof projectPath !== 'string') return false;
-    if (!fs.existsSync(settingsPath)) return false;
-    const raw = fs.readFileSync(settingsPath, 'utf8');
-    const store = JSON.parse(raw);
-    if (!Array.isArray(store?.trustedWorkspaces)) return false;
-    const idx = store.trustedWorkspaces.findIndex((entry) => matchesPath(entry, projectPath));
-    if (idx === -1) return false;
-    store.trustedWorkspaces.splice(idx, 1);
-    const dir = path.dirname(settingsPath);
-    const tmp = path.join(dir, `.${path.basename(settingsPath)}.fgos-${process.pid}-${Date.now().toString(36)}.tmp`);
-    try {
-      writeFileKeepingMode(tmp, settingsPath, `${JSON.stringify(store, null, 2)}\n`);
-    } catch {
-      try { fs.unlinkSync(tmp); } catch {}
-      return false;
-    }
-    return true;
-  } catch {
-    return false;
-  }
+  if (typeof settingsPath !== 'string' || typeof projectPath !== 'string') return false;
+  const store = readAgyStore(settingsPath);
+  if (!Array.isArray(store.trustedWorkspaces)) return false;
+  const idx = store.trustedWorkspaces.findIndex((entry) => matchesPath(entry, projectPath));
+  if (idx === -1) return false;
+  store.trustedWorkspaces.splice(idx, 1);
+  writeStore(settingsPath, `${JSON.stringify(store, null, 2)}\n`);
+  return true;
 }
-

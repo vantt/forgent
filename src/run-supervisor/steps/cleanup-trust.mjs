@@ -3,11 +3,12 @@
 // writes `controller/trust-context.json` only when it wrote the entry itself; an entry a person
 // vouched for is never named there and is never removed. The step runs after the receipt, while the
 // supervisor or adopt holds the attempt lock, so it also runs when the controller is long gone.
-// Removing an entry that is already gone is a success.
+// Removing an entry that is already gone is a success; a store that cannot be read or written keeps
+// the entry, and the step says `remove-failed`.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { removeAgyTrust, removeCodexTrust, removeTrust } from '../trust-store.mjs';
+import { removeAgyTrust, removeCodexTrust, removeTrust, TrustStoreError } from '../trust-store.mjs';
 
 export const TRUST_CONTEXT_FILE = path.join('controller', 'trust-context.json');
 
@@ -23,8 +24,13 @@ export async function cleanupTrust({ runDir }) {
     return { result: 'done', detail: { trust: 'context-unusable' } };
   }
   let removed;
-  if (kind === 'codex-toml') removed = removeCodexTrust(target, projectPath);
-  else if (kind === 'agy' || kind === 'agy-json') removed = removeAgyTrust(target, projectPath);
-  else removed = removeTrust(target, projectPath);
+  try {
+    if (kind === 'codex-toml') removed = removeCodexTrust(target, projectPath);
+    else if (kind === 'agy' || kind === 'agy-json') removed = removeAgyTrust(target, projectPath);
+    else removed = removeTrust(target, projectPath);
+  } catch (err) {
+    if (!(err instanceof TrustStoreError)) throw err;
+    return { result: 'done', detail: { trust: 'remove-failed', kind, code: err.code } };
+  }
   return { result: 'done', detail: { trust: removed ? 'removed' : 'already-gone', kind } };
 }
