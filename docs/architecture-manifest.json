@@ -240,7 +240,6 @@
     "src/setup/checks.mjs": "use-case",
     "src/setup/executor-profile-warnings.mjs": "infra",
     "src/setup/registrations.mjs": "use-case",
-    "src/setup/executor-posture-coverage.mjs": "use-case",
     "src/state/knowledge-registry.mjs": "domain",
     "src/report/knowledge-resolver.mjs": "domain",
     "src/report/knowledge-projection.mjs": "domain",

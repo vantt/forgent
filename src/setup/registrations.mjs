@@ -71,7 +71,6 @@ import {
   checkGlobalModelPoliciesPortable,
 } from './model-pool-checks.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
-import { checkExecutorPostureCoverage } from './executor-posture-coverage.mjs';
 import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape, normalizeLegacyConfinement } from '../runner/dispatch/confinement/policies.mjs';
 import {
@@ -3547,7 +3546,7 @@ registerCheck({
 // awaits every check, so a check may return its result directly or as a promise.
 registerCheck({
   id: 'seat-binding-dry-bind',
-  description: 'every seat of every Workflow unit binds under the committed config in a fixed headless session (no lease, nothing started); a policy refusal fails, no pool, account state, tier caps and shared families are information',
+  description: 'every seat of every Workflow unit, and every core capability (execute, code:implement, any capability declaring an agent pool) as a writing producer, binds under the committed config in a fixed headless session (no lease, nothing started); a policy refusal or a pool with no executor able to carry the confinement posture fails, no pool, account state, tier caps and shared families are information',
   check: (cwd) => checkSeatBindingDryBind(cwd, {
     packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
     loadRunnerConfig: loadRunnerConfigForDir,
@@ -3559,14 +3558,6 @@ registerCheck({
   description: 'every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call)',
   check: (cwd) => checkBlindStepsUseProvenPools(cwd, {
     packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
-    loadRunnerConfig: loadRunnerConfigForDir,
-  }),
-});
-
-registerCheck({
-  id: 'executor-posture-coverage',
-  description: 'core capabilities (execute, code:implement, and capabilities declaring a pool) have at least one candidate executor capable of applying read-only and workspace-write postures',
-  check: (cwd) => checkExecutorPostureCoverage(cwd, {
     loadRunnerConfig: loadRunnerConfigForDir,
   }),
 });

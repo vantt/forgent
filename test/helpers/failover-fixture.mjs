@@ -1,7 +1,7 @@
 // test/helpers/failover-fixture.mjs -- a repo, a linked worktree and one confined fake executor per provider
 // family, whose behaviour depends on the account login the worker was given (a marker file in the account
 // home): `dead` fails the way a worker with no key does, `quota` hits a usage limit, `partial` writes and then
-// hits one, anything else works. Shared by the failover and the exec-budget proofs; everything goes through runUnit.
+// hits one, anything else works. Shared by the failover and resume-order proofs; everything goes through runUnit.
 
 import { after } from 'node:test';
 import fs from 'node:fs';
@@ -28,15 +28,23 @@ after(() => {
   for (const dir of fixtureDirs) fs.rmSync(dir, { recursive: true, force: true });
 });
 
+const BWRAP = '/usr/bin/bwrap';
 function bwrapUsable() {
   try {
-    execFileSync('/usr/bin/bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
+    execFileSync(BWRAP, ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
     return true;
   } catch {
     return false;
   }
 }
-export const SKIP = bwrapUsable() ? false : 'bwrap is not usable in this environment (user namespaces unavailable)';
+
+// A machine that has bwrap installed claims it: a broken bwrap there must fail the file, because a green run
+// that launched nothing proves nothing. Only a machine that does not claim bwrap (no Linux, no binary) skips.
+const claimsBwrap = process.platform === 'linux' && fs.existsSync(BWRAP);
+if (claimsBwrap && !bwrapUsable()) {
+  throw new Error(`${BWRAP} is installed but cannot run a confined command (user namespaces unavailable?): the failover proofs launch real confined workers; fix it before the run (see the bwrap-available row of fgos doctor)`);
+}
+export const SKIP = claimsBwrap ? false : `bwrap is not claimed on this machine (needs Linux with ${BWRAP}), so no confined worker can launch`;
 
 // The login the account provisioned into the worker's home is a marker file: "dead" logins make the
 // worker die the way pi does without a key; any other login (or none, for an unmanaged provider) works.

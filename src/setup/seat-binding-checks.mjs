@@ -1,6 +1,8 @@
 // Doctor row for Seat Binding: `seat-binding-dry-bind` (every seat of every Workflow unit binds under the committed config).
 
+import { bind } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
+import { hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 import { resolveCollaboration, loopOf } from '../runner/execution/patterns/catalog.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { loadWorkflowDefinitions, withUnreadableDefinitions, workflowRoots, workflowUnitContract } from './workflow-definition-files.mjs';
@@ -21,6 +23,60 @@ const INFO_REFUSALS = new Map([
   ['pool-excluded', 'account state'],
   ['not-an-agent-seat', 'tool executor'],
 ]);
+
+const CORE_CAPABILITIES = ['execute', 'code:implement'];
+
+/**
+ * The posture section of the row: the core capabilities (and every capability whose pool holds an agent
+ * executor) must bind a writing producer, so a config whose executors cannot carry the confinement posture
+ * is named before a run refuses it. Returns the failures to add to the row, the information lines, and the
+ * `capability -> executor` coverage list.
+ */
+function bindCapabilityPostures(runnerConfig) {
+  const capabilities = runnerConfig?.capabilities ?? runnerConfig?.runner?.capabilities ?? {};
+  const executors = runnerConfig?.executors ?? runnerConfig?.runner?.executors ?? {};
+  const capsToCheck = new Set(CORE_CAPABILITIES);
+  for (const [name, entry] of Object.entries(capabilities)) {
+    if (!hasUsablePrefer(entry)) continue;
+    const candidates = Array.isArray(entry.prefer) ? entry.prefer : [entry.prefer];
+    const hasAgentCandidate = candidates.some((cand) => {
+      const exec = executors[typeof cand === 'string' ? cand : cand?.executor];
+      return !exec || exec.kind !== 'tool';
+    });
+    if (hasAgentCandidate) capsToCheck.add(name);
+  }
+  const postureFailures = [];
+  const noPool = [];
+  const otherFailures = [];
+  const coverage = [];
+  for (const cap of capsToCheck) {
+    const unit = {
+      id: `posture-check-${cap.replace(/[^a-zA-Z0-9_-]/g, '-')}`,
+      capability: cap,
+      objective: `Check posture for ${cap}`,
+      writes: ['scratch/placeholder'],
+    };
+    const bound = bind({ unit, role: 'producer' }, { runnerConfig, session: DRY_BIND_SESSION });
+    if (bound.refused) {
+      const detail = bound.refused.detail ? ` (${bound.refused.detail})` : '';
+      const reason = bound.refused.reason;
+      if (reason === 'posture-unavailable') postureFailures.push(`${cap}: posture-unavailable${detail}`);
+      else if (reason === 'headless-no-executor' || reason === 'no-candidate') noPool.push(cap);
+      else otherFailures.push(`${cap}: ${reason}${detail}`);
+    } else if (bound.executor) {
+      coverage.push(`${cap} -> ${bound.executor}${bound.invocation ? ` (${bound.invocation})` : ''}`);
+    }
+  }
+  const problems = [];
+  if (postureFailures.length > 0) {
+    problems.push(`executors lack required posture confinement: ${postureFailures.join('; ')}. Fix: (1) Add an invocation with sandbox.backend "bwrap" to executors.<id> in .fgos/config.json, or (2) remove project-level executors.<id> overrides from .fgos/config.json to inherit healthy global executors from ~/.fgos/config.json.`);
+  }
+  if (otherFailures.length > 0) problems.push(`other posture failures: ${otherFailures.join('; ')}.`);
+  const info = noPool.length > 0
+    ? [`no candidate executor available for capabilities: ${noPool.join(', ')}. Fix: Declare runner.capabilities.<cap>.prefer in .fgos/config.json.`]
+    : [];
+  return { problems, info, coverage };
+}
 
 /**
  * Binds every seat of every Workflow unit the way a run would, without a lease and without starting anything
@@ -46,6 +102,9 @@ export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConf
   const shipped = shippedCatalog();
   let units = 0;
   let bound = 0;
+  const posture = bindCapabilityPostures(runnerConfig);
+  problems.push(...posture.problems);
+  info.push(...posture.info);
   for (const wf of loaded.workflows.values()) {
     for (const activity of wf.activities ?? []) {
       const u = activity?.unit;
@@ -99,12 +158,13 @@ export async function checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConf
       }
     }
   }
-  const notes = info.length > 0 ? `; info (${info.length}): ${listed(info)}` : '';
+  const coverage = posture.coverage.length > 0 ? `; posture: ${posture.coverage.join(', ')}` : '';
+  const notes = `${coverage}${info.length > 0 ? `; info (${info.length}): ${listed(info)}` : ''}`;
   if (problems.length > 0) {
     const summary = problems.every((p) => p.includes('refused for'))
       ? `${problems.length} seat(s) are refused by policy`
       : `${problems.length} problem(s) found`;
     return withUnreadableDefinitions({ passed: false, message: `${summary}: ${problems.join(' | ')}${notes}` }, loaded.unreadable);
   }
-  return withUnreadableDefinitions({ passed: true, message: units === 0 ? 'no Workflow unit to bind' : `${bound} seat(s) of ${units} Workflow unit(s) bind${notes}` }, loaded.unreadable);
+  return withUnreadableDefinitions({ passed: true, message: units === 0 ? `no Workflow unit to bind${notes}` : `${bound} seat(s) of ${units} Workflow unit(s) bind${notes}` }, loaded.unreadable);
 }

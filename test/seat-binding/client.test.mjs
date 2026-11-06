@@ -128,6 +128,27 @@ test('a process inside the hot mutex never execs the host: seat-binding-in-lock'
   assert.equal(fs.existsSync(marker), false);
 });
 
+test('every client call is exactly one host exec: a bind costs one, a refused bind costs one, a call in the hot mutex costs none', () => {
+  const counter = path.join(scratch, 'exec-count');
+  fs.rmSync(counter, { force: true });
+  const host = script('counting-host.sh', `echo x >> '${counter}'\ncat >/dev/null\necho '{"v":1,"protocol":1,"hostVersion":"1","op":"ladder","result":"ok","ladder":{"vocabulary":[]}}'`);
+  const client = createSeatBindingClient({ hostBin: host });
+  const execs = () => (fs.existsSync(counter) ? fs.readFileSync(counter, 'utf8').trim().split('\n').length : 0);
+  client.tierLadder();
+  assert.equal(execs(), 1);
+  client.tierLadder();
+  assert.equal(execs(), 2);
+  expectCode(() => client.bindSeat(golden.base), 'seat-binding-route-bad-output');
+  assert.equal(execs(), 3, 'a bind the host answers badly is still one exec, never retried');
+  const leaveHotLock = enterHotLock();
+  try {
+    expectCode(() => client.tierLadder(), 'seat-binding-in-lock');
+  } finally {
+    leaveHotLock();
+  }
+  assert.equal(execs(), 3);
+});
+
 function activatedProject() {
   const project = fs.mkdtempSync(path.join(scratch, 'project-'));
   const release = path.join(project, 'release');

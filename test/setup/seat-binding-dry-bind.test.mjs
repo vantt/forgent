@@ -359,3 +359,84 @@ activities:
   assert.match(badParamsResult.message, /unknown parameter "unsupportedParam" in activity unit for loop "solo"/);
   assert.doesNotMatch(badParamsResult.message, /act-skipped/);
 });
+
+// The posture section of the row: the core capabilities (and every capability whose pool holds an agent executor)
+// bind a writing producer, so an executor that cannot carry the confinement posture is named by the doctor.
+const POSTURE_TIERS = Object.fromEntries(['nano', 'standard', 'advanced', 'flagship', 'frontier'].map((tier) => [tier, `${tier}-model`]));
+const POSTURE_POLICIES = Object.fromEntries(['claude', 'gemini', 'openai', 'xai', 'z-ai', 'deepseek'].map((family) => [family, POSTURE_TIERS]));
+const cliBwrap = (id, command) => ({ id, via: 'cli', adapter: 'cli-spawn', command, args: ['-p', '{prompt}'], confinement: { backend: 'bwrap' } });
+const bwrapAgent = (family) => ({ kind: 'agent', providerModel: family, invocations: [cliBwrap(`${family}-cli-bwrap`, family)] });
+const unconfinedAgent = (family) => ({ kind: 'agent', providerModel: family, command: family, args: ['-p', '{prompt}'] });
+
+async function posture(config) {
+  seedFileLocalBwrapRegistry();
+  const packageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-posture-package-'));
+  fs.mkdirSync(path.join(packageRoot, 'core', 'workflows'), { recursive: true });
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-posture-project-'));
+  try {
+    return await checkSeatBindingDryBind(cwd, { packageRoot, loadRunnerConfig: () => ({ modelPolicies: POSTURE_POLICIES, ...config }) });
+  } finally {
+    fs.rmSync(packageRoot, { recursive: true, force: true });
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+}
+
+test('core capabilities served by bwrap-capable executors and by native agents pass and list their executor', async () => {
+  const result = await posture({
+    executors: { claude: bwrapAgent('claude'), gemini: bwrapAgent('gemini'), nativeClaude: { agentType: 'claude', providerModel: 'claude' } },
+    capabilities: { execute: { prefer: 'claude' }, 'code:implement': { prefer: [{ executor: 'gemini' }] }, 'custom:native': { prefer: 'nativeClaude' } },
+  });
+  assert.equal(result.passed, true, result.message);
+  assert.match(result.message, /execute -> claude/);
+  assert.match(result.message, /code:implement -> gemini/);
+  assert.match(result.message, /custom:native -> nativeClaude/);
+});
+
+test('an agent executor with no bwrap invocation fails as posture-unavailable and names both remedies', async () => {
+  const result = await posture({
+    executors: { openai: unconfinedAgent('openai'), claude: bwrapAgent('claude') },
+    capabilities: { execute: { prefer: 'openai' }, 'code:implement': { prefer: 'claude' } },
+  });
+  assert.equal(result.passed, false, result.message);
+  assert.match(result.message, /executors lack required posture confinement: execute: posture-unavailable/);
+  assert.match(result.message, /sandbox\.backend "bwrap"/);
+  assert.match(result.message, /remove project-level executors\.<id> overrides/);
+});
+
+test('only core capabilities and capabilities declaring an agent pool are bound; a tool-only pool and a description-only entry are not', async () => {
+  const result = await posture({
+    executors: { claude: bwrapAgent('claude'), toolExecutor: { kind: 'tool', description: 'Tool executor', invocations: [{ via: 'mcp', command: 'mcp:tool' }] } },
+    capabilities: {
+      execute: { prefer: 'claude' },
+      'code:implement': { prefer: 'claude' },
+      'custom:no-pool': { description: 'description only without prefer' },
+      'custom:with-pool': { prefer: ['claude'] },
+      'tool:capability': { prefer: 'toolExecutor' },
+    },
+  });
+  assert.equal(result.passed, true, result.message);
+  assert.match(result.message, /custom:with-pool -> claude/);
+  assert.doesNotMatch(result.message, /custom:no-pool|tool:capability/);
+});
+
+test('a core capability with no pool is information that says where to declare it, not a failure', async () => {
+  const result = await posture({
+    executors: { claude: bwrapAgent('claude') },
+    capabilities: { execute: { description: 'a capability with no pool' }, 'code:implement': { prefer: 'claude' } },
+  });
+  assert.equal(result.passed, true, result.message);
+  assert.match(result.message, /no candidate executor available for capabilities: execute\. Fix: Declare runner\.capabilities\.<cap>\.prefer/);
+  assert.doesNotMatch(result.message, /sandbox\.backend "bwrap"/);
+});
+
+test('a posture failure and a missing pool are reported together, each with its own fix', async () => {
+  const result = await posture({
+    modelPolicies: { ...POSTURE_POLICIES, unconfined: POSTURE_TIERS },
+    executors: { unconfinedExec: unconfinedAgent('unconfined') },
+    capabilities: { execute: { prefer: 'unconfinedExec' }, 'code:implement': { description: 'a capability with no pool' } },
+  });
+  assert.equal(result.passed, false, result.message);
+  assert.match(result.message, /executors lack required posture confinement: execute/);
+  assert.match(result.message, /no candidate executor available for capabilities: code:implement/);
+  assert.match(result.message, /runner\.capabilities\.<cap>\.prefer/);
+});
