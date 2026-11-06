@@ -7,10 +7,7 @@
 // resume. Readers do not branch on those names: they ask here which seats the old pattern had and
 // what each one was. This is the only module that knows the retired names.
 
-
-const posture = (fields) => Object.freeze({
-  readOnly: false, writer: false, forceOutOfProcess: false, stance: false, verdict: false, ...fields,
-});
+const posture = (fields) => Object.freeze({ readOnly: false, writer: false, forceOutOfProcess: false, stance: false, verdict: false, ...fields });
 const seat = (name, role, fields) => Object.freeze({ seat: name, role, posture: posture(fields) });
 
 /** The seat key of a result or history entry: its `seat`, or for a pre-fence one the role name it was keyed by. */
@@ -122,24 +119,15 @@ export function seatsOfRecord(record) {
 }
 
 /**
- * The single, pure record-read path for records with no `collaboration` (every in-flight unit at upgrade).
- * Decodes stored selector to a catalog name, reads snapshot `patterns.reviewed.*` as loop tuning,
- * uses shipped catalog for defaults, and presents snapshot `patterns.reviewed` as `loops.reviewed`.
- *
- * @param {object} record parsed `unit.json`
- * @param {object} options
- * @param {object} options.shipped shipped catalog from `shippedCatalog()`
+ * The single, pure record-read path for records with no `collaboration`: the stored selector decoded to a
+ * catalog name, defaults from the shipped catalog (`shipped`), snapshot `patterns.reviewed` read as the
+ * `loops.reviewed` tuning.
  * @returns {{ collaboration: object, effective: object, runner: object }}
  */
 export function collaborationOfRecord(record, { shipped } = {}) {
   if (record?.collaboration) {
-    return {
-      collaboration: record.collaboration,
-      effective: record.collaboration.effective,
-      runner: record.configSnapshot?.runner ?? {},
-    };
+    return { collaboration: record.collaboration, effective: record.collaboration.effective, runner: record.configSnapshot?.runner ?? {} };
   }
-
   const rawPattern = record?.pattern ?? record?.unit?.pattern ?? null;
   let selectorName = null;
   let selectorParams = {};
@@ -151,8 +139,6 @@ export function collaborationOfRecord(record, { shipped } = {}) {
   }
 
   const catalogName = selectorName === 'research-fan-out-gated' ? 'research-fan-out' : (selectorName ?? 'solo');
-
-
   const shippedPatterns = shipped?.patterns ?? shipped ?? {};
   const hist = Object.hasOwn(HISTORICAL_PATTERNS, catalogName) ? HISTORICAL_PATTERNS[catalogName] : null;
   const shippedEntry = shippedPatterns[catalogName] ?? (hist ? { loop: hist.pattern, defaults: hist.params } : {});
@@ -160,55 +146,18 @@ export function collaborationOfRecord(record, { shipped } = {}) {
   const recognized = selectorName !== null && Boolean(hist || shippedEntry.loop || isBaseLoop);
   const loop = shippedEntry.loop ?? (isBaseLoop ? catalogName : 'solo');
   const patternDefaults = { ...(shippedEntry.defaults ?? {}), ...(shippedEntry.params ?? {}) };
-
   const snapshotRunner = record?.configSnapshot?.runner ?? {};
   const reviewedTuning = snapshotRunner?.patterns?.reviewed ?? snapshotRunner?.loops?.reviewed ?? {};
-
   const effectiveParams = { ...patternDefaults, ...selectorParams };
   if (loop === 'reviewed' && selectorParams.maxRounds === undefined && reviewedTuning.maxRounds !== undefined) {
     effectiveParams.maxRounds = reviewedTuning.maxRounds;
   }
-
   const storedSeats = record?.seats ?? seatsOfRecord(record);
   if (storedSeats && storedSeats.length > 0) {
-    effectiveParams.seats = storedSeats.map(({ seat, role, persona, tier }) => ({
-      seat,
-      ...(role ? { role } : {}),
-      ...(persona ? { persona } : {}),
-      ...(tier ? { tier } : {}),
-    }));
+    effectiveParams.seats = storedSeats.map(({ seat, role, persona, tier }) => ({ seat, ...(role ? { role } : {}), ...(persona ? { persona } : {}), ...(tier ? { tier } : {}) }));
   }
-
-  const runnerView = {
-    ...snapshotRunner,
-    loops: {
-      ...snapshotRunner.loops,
-      ...(snapshotRunner?.patterns?.reviewed ? {
-        reviewed: {
-          ...snapshotRunner.loops?.reviewed,
-          ...snapshotRunner.patterns.reviewed,
-        },
-      } : {}),
-    },
-  };
-
-  const collaboration = {
-    pattern: {
-      name: catalogName,
-      layer: 'shipped',
-    },
-    effective: {
-      loop,
-      params: effectiveParams,
-      seats: storedSeats,
-    },
-  };
-
-  return {
-    collaboration,
-    effective: collaboration.effective,
-    runner: runnerView,
-    recognized,
-    selector: selectorName,
-  };
+  const reviewed = snapshotRunner?.patterns?.reviewed ? { reviewed: { ...snapshotRunner.loops?.reviewed, ...snapshotRunner.patterns.reviewed } } : {};
+  const runnerView = { ...snapshotRunner, loops: { ...snapshotRunner.loops, ...reviewed } };
+  const collaboration = { pattern: { name: catalogName, layer: 'shipped' }, effective: { loop, params: effectiveParams, seats: storedSeats } };
+  return { collaboration, effective: collaboration.effective, runner: runnerView, recognized, selector: selectorName };
 }

@@ -51,26 +51,18 @@ function publishUnitSummary(unitDir) {
   }
 }
 
-/**
- * Whether this process runs inside a live herdr session: herdr exports HERDR_ENV=1 and the
- * socket path into every pane it starts. A caller that already knows passes
- * `session.herdrPresent` and skips the probe.
- */
+/** Whether this process runs inside a live herdr session (herdr exports HERDR_ENV=1 and its socket path into every pane). */
 export function detectHerdrPresent(env = process.env) {
   if (env.HERDR_ENV !== '1') return false;
   const socket = env.HERDR_SOCKET_PATH;
   return typeof socket === 'string' && socket !== '' && fs.existsSync(socket);
 }
 
-/**
- * Resolve git main checkout root and worktree path without importing worktree.mjs.
- */
+/** The main checkout root and the worktree path of `cwd`, read through Git Inspect. */
 export function resolveGitRoots(cwd = process.cwd(), { allowNoRepository = false } = {}) {
   try {
-    const result = createGitInspect({stateRoot:resolveStateRoot().stateRoot,
-      repoPath:cwd,trustedMain:cwd}).resolveRepo();
-    // A read-only caller may work in a directory that is no repository: Inspect's typed answer is
-    // `notARepository`, and the directory is its own project root.
+    const result = createGitInspect({ stateRoot: resolveStateRoot().stateRoot, repoPath: cwd, trustedMain: cwd }).resolveRepo();
+    // A read-only caller may work in a directory that is no repository: that directory is its own project root.
     if (result.notARepository && allowNoRepository) {
       let root = cwd;
       try { root = fs.realpathSync(cwd); } catch { /* the directory is as given */ }
@@ -91,14 +83,9 @@ export function assertRepositoryForWrites(roots, cwd, { writes = false } = {}) {
   }
 }
 
-/**
- * Capture snapshot of runner config from the main checkout root.
- */
+/** The runner config a unit run records, and the hash of what seat choice and the run read from it. */
 export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
   const cfg = runnerConfig ?? loadRunnerConfigForDir(mainCheckoutRoot);
-  // What the hash covers is what seat choice and the run read: the tier defaults and ceiling, the
-  // fallback order, the cells, the capability taste, the patterns (with the schema marker), the
-  // executors and governance.
   const filtered = {
     defaults: cfg.defaults || {},
     maxTier: cfg.maxTier ?? null,
@@ -110,30 +97,20 @@ export function snapshotRunnerConfig(mainCheckoutRoot, runnerConfig) {
     executors: cfg.executors || {},
     governance: cfg.governance || null,
   };
-  const serialized = JSON.stringify(filtered);
-  const hash = crypto.createHash('sha256').update(serialized).digest('hex');
-  // The account inventory (`llmAccounts`, `providers`) holds the places logins are kept. It is machine
-  // config read live at every bind and launch, so a unit record never carries it.
+  const hash = crypto.createHash('sha256').update(JSON.stringify(filtered)).digest('hex');
+  // The account inventory (where logins are kept) is read live at every bind and launch, never recorded.
   const { llmAccounts, providers, ...runner } = cfg;
-  return {
-    hash,
-    runner,
-  };
+  return { hash, runner };
 }
 
-/**
- * The account inventory, read from the config on every call and never from a copy kept for the run, so an
- * account added or removed while a unit runs is seen by the next bind. A caller-supplied config is its own
- * inventory.
- */
+/** The account inventory, read from the config on every call (never a copy kept for the run) or from the caller's config. */
 export function readAccountInventory(mainRoot, suppliedConfig) {
   return accountInventoryConfigOf(suppliedConfig ?? loadRunnerConfigForDir(mainRoot));
 }
 
 /**
- * A producer attempt whose agent turn passed but whose runner commit failed: a resume commits it
- * again without spawning the agent. Not when the failed commit is still on the branch carrying
- * paths outside the scope; a person has to take that commit off first.
+ * A producer attempt whose agent turn passed but whose runner commit failed, which a resume commits again
+ * without the agent; not when that commit is still on the branch with paths outside the scope.
  */
 function commitPending(attempt, worktree, mainRoot, custody) {
   const commit = attempt?.commit;
@@ -143,16 +120,15 @@ function commitPending(attempt, worktree, mainRoot, custody) {
 }
 
 /**
- * How one dispatch of `attempt` enters the admission ledger. A dispatch the previous controller started
- * and never read the outcome of keeps its retry id, so the dispatch finds that attempt again and takes
- * its settled result instead of running the agent; a dispatch with no such history, or whose attempt
- * was abandoned before it started or cancelled by the person, gets a new id and names the attempt it follows.
+ * How one dispatch of `attempt` enters the admission ledger: a dispatch admitted earlier whose outcome was
+ * never read keeps its retry id (and takes its settled result); any other, or an abandoned or cancelled
+ * one, gets a new id naming the attempt it follows.
  */
 function admissionIdentityFor(attempt, { unitRunId, assignmentId, worktree, assignmentsDir }) {
   const current = currentAttemptOf(assignmentsDir, assignmentId);
   const abandoned = () => {
     if (!current) return false;
-    // A run from before the supervisor that an earlier release settled as abandoned has no result to carry on from.
+    // A pre-supervisor run an earlier release settled as abandoned, one never started, or one cancelled: no result to carry on from.
     try {
       if (JSON.parse(fs.readFileSync(path.join(current.dir, 'run.json'), 'utf8')).settlement === 'abandoned-legacy') return true;
     } catch { /* no status record: judged by its envelope below */ }
@@ -160,12 +136,10 @@ function admissionIdentityFor(attempt, { unitRunId, assignmentId, worktree, assi
     if (adoptRun(current.dir, { probeOnly: true }).state !== 'closed') return false;
     try {
       const outcome = String(JSON.parse(fs.readFileSync(path.join(current.dir, 'receipt.json'), 'utf8')).outcome);
-      // Never started, or stopped by the person's Ctrl-C: neither is a result to carry on from.
       return outcome.startsWith('abandoned') || outcome === 'cancelled';
     } catch { return false; }
   };
-  // The ledger, not the directory, says whether the previous dispatch was admitted: a controller that
-  // died between the admission commit and the directory's publication is completed by the same id.
+  // The ledger, not the directory, says whether the previous dispatch was admitted.
   const generations = listGenerations(path.join(assignmentsDir, assignmentId, 'admission', 'generations'));
   const admitted = attempt.dispatchRetryId !== undefined && generations.some((g) => g.record?.retryId === attempt.dispatchRetryId);
   const continuing = attempt.outcome === undefined && admitted && !abandoned();
@@ -179,29 +153,14 @@ function admissionIdentityFor(attempt, { unitRunId, assignmentId, worktree, assi
 }
 
 /**
- * Main headless unit execution entrypoint.
+ * Run one unit headless: the one execution door.
  *
- * @param {object} options
- * @param {string} [options.unitPath] Path to unit YAML/JSON file or '-' for stdin
- * @param {object} [options.unitData] Raw unit object (in-memory)
- * @param {string} [options.pattern] Pattern name
- * @param {Array} [options.overrides] Array of overrides [{scope, origin, executor, invocation, tier, persona, reasoningEffort, account, timeoutMs}]
- * @param {boolean} [options.raiseAuthorized] Whether the calling door may raise a tier or accept a dependence.
- *   No door is authorized yet: every caller passes false (the default)
- * @param {string} [options.workflowId] The workflow this unit belongs to, to name where a seat's recommended tier was declared
- * @param {string} [options.resumeUnitRunId] Unit run ID to resume
- * @param {string} [options.repoRoot] Main repository root
- * @param {string} [options.cwd] Current working directory / worktree
- * @param {{ workflowDir?: string|null, owningDomain?: string|null }} [options.personaScope] Where the persona lookup starts for the workflow this unit belongs to (a case passes it); omitted, workspace and core only
- * @param {string} [options.worktree] Explicit worktree path
- * @param {object} [options.session] Session context { provider, tier, hasNativeAgent, herdrPresent, headless }
- * @param {object} [options.declared] Work step operation this unit runs: { workId, domain, workflow,
- *   stage, operation, operations } (operations are the step's operation objects). Stored in unit.json.
- * @param {string[]} [options.pinInputs] Absolute paths whose bytes the dispatch hashes at launch
- *   (`inputDigests` of the result). Stored in unit.json.
- * @param {object} [options.runnerConfig] Runner config the caller already resolved (e.g. from
- *   `--config <path>`); snapshotted into unit.json instead of reading `.fgos/config.json`.
- * @param {Function} [options.onLog] Log callback
+ * @param {object} options `unitPath` (file or '-') or `unitData`; `pattern`; `overrides` ([{ scope, origin,
+ *   executor, invocation, tier, persona, reasoningEffort, account, timeoutMs }]); `raiseAuthorized` (no door is
+ *   authorized yet); `workflowId`; `resumeUnitRunId`; `repoRoot`, `cwd`, `worktree`; `personaScope`
+ *   ({ workflowDir, owningDomain }: where the persona lookup starts); `session` ({ provider, tier,
+ *   hasNativeAgent, herdrPresent, headless }); `declared` (the Work step operation, stored in unit.json);
+ *   `pinInputs` (paths hashed at launch); `runnerConfig` (snapshotted instead of `.fgos/config.json`); `onLog`
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
 export async function runUnit(options = {}) {
@@ -232,9 +191,8 @@ export async function runUnit(options = {}) {
 }
 
 /**
- * Hand the reservation back, once: after the pattern settled, or when the run failed. A cancelled run
- * is not settled: it stays live as a dead controller leaves it, and the resume carries on. A run that
- * never got a unit directory settles as `not-started`. The core writes nothing to the ledger before this.
+ * Hand the reservation back, once, when the pattern settled or the run failed (a run with no unit directory
+ * as `not-started`). A cancelled run is not settled: it stays live, and the resume carries on.
  */
 function settleAdmission(scope, result, failure) {
   const admission = scope.admission;
@@ -259,9 +217,8 @@ function settleAdmission(scope, result, failure) {
   }
 }
 
-// A process that asked for it (the CLI entry, `enableCancelOnSignal`) has Ctrl-C and SIGTERM cancel every
-// attempt it delivered (cancel-registry.mjs). One handler serves all units running in the process:
-// installed with the first, removed with the last. Any other caller keeps its own signal handling.
+// A process that asked for it (`enableCancelOnSignal`) has Ctrl-C and SIGTERM cancel every attempt it delivered;
+// one handler serves all its units, installed with the first and removed with the last.
 let cancelHolders = 0;
 let removeCancelHandlers = null;
 function holdCancelOnSignal(options) {
@@ -301,22 +258,17 @@ async function runUnitBody(options, scope) {
   if (options.resumeUnitRunId && options.stanceOptions !== undefined) {
     throw new RunnerConfigError('cannot provide stanceOptions when resuming a unit run: the stored question is immutable');
   }
-  // Private homes left by an earlier run (a failed round that kept its pane) hold a copy of an account
-  // login; `fgos run` is the one door every such run goes through, so it is also where the ones whose pane
-  // has since closed are reclaimed, even from a directory that is no git checkout. Best effort: a reap
-  // problem never blocks the run.
+  // Private homes of earlier runs whose pane has closed hold a login copy: the one run door reclaims them,
+  // best effort, even outside a git checkout.
   const cwd = options.cwd ?? process.cwd();
   let roots = null;
   let rootsFailure = null;
   try { roots = resolveGitRoots(cwd, { allowNoRepository: true }); } catch (err) { rootsFailure = err; }
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots?.mainCheckoutRoot;
-  try {
-    sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined });
-  } catch { /* best effort */ }
+  try { sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined }); } catch { /* best effort */ }
   if (rootsFailure) throw rootsFailure;
 
-  // The config this run reads live, at first use (a resume refused for its record never needs it): the
-  // account inventory always comes from it, never from unit.json, and a fresh run snapshots the rest.
+  // The config this run reads live, at first use: the account inventory always comes from it, never from unit.json.
   let liveConfigRead;
   const liveConfig = () => (liveConfigRead ??= options.runnerConfig ?? loadRunnerConfigForDir(mainRoot));
   const base = {
@@ -336,9 +288,7 @@ async function runUnitBody(options, scope) {
     Object.assign(ctx, seatStateOf(ctx));
     return await runCollaboration(ctx);
   } catch (error) {
-    // A cancelled run is not a failed one: it stays as a dead controller leaves it, and the resume carries
-    // on. The execution error is what the caller must see; failing to record the settlement is reported
-    // beside it, never instead of it.
+    // A cancelled run is not a failed one. A settlement that cannot be recorded is reported beside the error, never instead.
     if (!ctx.settled && !(error instanceof RunCancelledError)) {
       try { settleUnitRun(ctx, 'execution-failure'); }
       catch (settleError) {
@@ -361,9 +311,7 @@ function openUnitRun(ctx) {
     try {
       if (fs.lstatSync(summaryFile).isFile()) fs.unlinkSync(summaryFile);
     } catch (error) {
-      if (error.code !== 'ENOENT') {
-        throw new RunnerConfigError(`cannot invalidate published summary before resuming "${unitRunId}": ${error.message}`);
-      }
+      if (error.code !== 'ENOENT') throw new RunnerConfigError(`cannot invalidate published summary before resuming "${unitRunId}": ${error.message}`);
     }
   }
   delete unitRecord.settlement;
@@ -389,19 +337,14 @@ function settleUnitRun(ctx, outcome) {
 }
 
 /**
- * What the seats of this run share: the ledger of which executors filled which seat (`independentOf` seat
- * ids resolve through it; see seat-ledger.mjs), the seats a resume binds again, and the pools whose login
- * failed in this unit and that a seat then walked away from (no later walk of the unit lands on one).
- *
- * Bindings are recorded in unit.json per seat/round, one entry per attempt, each stamped with the hash of
- * the config it was bound from. A resumed run reuses the last binding of a seat that passed, or whose
- * commit or adopt result is still pending; a seat whose last attempt ended in a failure is bound again
- * from the current config as a new attempt.
+ * What the seats of this run share: the ledger of which executors filled which seat, the seats a resume
+ * binds again (a seat whose last attempt failed, unless its commit is pending), and the pools whose login
+ * failed in this unit (no later walk lands on one).
  */
 function seatStateOf({ options, unitRecord, mainRoot, scope }) {
   const seatLedger = createSeatLedger();
   if (!unitRecord.bindings || typeof unitRecord.bindings !== 'object') unitRecord.bindings = {};
-  // Read once, before this resume changes any attempt. A seat with no recorded outcome is adopted, never bound again.
+  // Read once, before this resume changes any attempt.
   const rebindKeys = new Set(Object.entries(unitRecord.bindings)
     .filter(([, attempts]) => {
       const last = attempts.at(-1);
@@ -418,10 +361,8 @@ function seatStateOf({ options, unitRecord, mainRoot, scope }) {
 }
 
 /**
- * The results the pattern may stand on. A producer round whose commit is still pending is not settled yet:
- * the pattern asks for it again, and the seat commits it without spawning the agent. The same for a round
- * whose controller died before it read the outcome (the resume carries on from that attempt's result), and
- * for a seat about to be bound again on this resume.
+ * The results the pattern may stand on: not a round whose commit is pending, whose controller died before
+ * reading its outcome, or whose seat is about to be bound again (the pattern asks for those again).
  */
 function historyOf({ unitRecord, mainRoot, scope, assignmentsDir, unitDir, rebindKeys }) {
   const pending = new Set(Object.entries(unitRecord.bindings ?? {})
@@ -434,9 +375,8 @@ function historyOf({ unitRecord, mainRoot, scope, assignmentsDir, unitDir, rebin
 }
 
 /**
- * The deterministic check a round ends with: the unit's own `verify`, else its capability's. It runs
- * through the one bounded command runner (goal-check.mjs), for at most `runner.timeoutMs`, borrowing the
- * Unit's custody lease so a controller death cannot free the worktree while it still writes.
+ * The deterministic check a round ends with (the unit's `verify`, else its capability's): bounded by
+ * `runner.timeoutMs`, holding the Unit's custody so the worktree is not freed while it writes.
  */
 async function verifyUnit({ unitRecord, scope }, targetUnit) {
   assertNotCancelled();
@@ -483,11 +423,7 @@ async function runCollaboration(ctx) {
   const verifyCmd = verifyCommandOf(unit, unitRecord.configSnapshot.runner);
   const unverified = (effective.loop === 'reviewed' && !verifyCmd) || (!loopRunsVerify(effective.loop) && Boolean(verifyCmd));
   return {
-    unitRunId,
-    outcome: patternResult.outcome,
-    rounds: patternResult.rounds,
-    results: patternResult.results,
-    findings: patternResult.findings || [],
+    unitRunId, outcome: patternResult.outcome, rounds: patternResult.rounds, results: patternResult.results, findings: patternResult.findings || [],
     ...(unitRecord.sync ? { sync: syncSummary(unitRecord.sync) } : {}),
     ...(unverified ? { verify: { ran: false, reason: 'no verify command: set unit.verify, pass --verify, or declare capabilities.<capability>.verify' } } : {}),
   };
@@ -527,10 +463,8 @@ async function runRole(ctx, args) {
 }
 
 /**
- * One seat: bind it, then launch it. A provider limit or a dead credential is answered by
- * `answerProviderLimit`: the same executor first runs again on another account of its provider, then the
- * next candidate of the capability's prefer pool runs; each attempt gets a fresh pane/process and the
- * failed one is left exactly as it was. With nothing left the outcome stays provider-limit.
+ * One seat: bind it, then launch it; a provider limit or a dead credential is answered by `answerProviderLimit`,
+ * each attempt on a fresh pane or process, the failed one left as it was.
  */
 async function runRoleBody(ctx, { seat, unit: seatUnit, round = 1, independentOf = [], preferIndependentOf = [], inputs = [], batch }) {
   assertNotCancelled();
@@ -561,9 +495,8 @@ async function runRoleBody(ctx, { seat, unit: seatUnit, round = 1, independentOf
   if (!role.readOnly && commitPending(recorded.at(-1), unitRecord.worktree, mainRoot, scope.custody)) {
     return finishPendingCommit(ctx, role, recorded.at(-1), nativeBaseline);
   }
-  // Before a mutating producer is spawned: an index someone else staged refuses the run (the runner stages
-  // only what it chose), and files already dirty in scope are recorded so the runner never commits them. A
-  // resumed attempt keeps what its first launch saw.
+  // Before a mutating producer is spawned: a foreign staged index refuses it, and files already dirty in scope
+  // are recorded so the runner never commits them (a resumed attempt keeps what its first launch saw).
   let preExistingInScope = [];
   if (!role.readOnly) {
     const preflight = preflightUnitWorktree({ worktree: unitRecord.worktree, repoRoot: mainRoot, custody: scope.custody, writer: unitRecord.gitWriter, scope: role.writeScope, sync: unitRecord.sync });
@@ -600,8 +533,6 @@ async function runRoleBody(ctx, { seat, unit: seatUnit, round = 1, independentOf
       return { ...result, fallbackExhausted };
     }
     if (answer.rebind) {
-      // Bound again, in the queue: after a lease conflict (nothing ran) from a fresh view of the accounts, a
-      // rebind and not a launch; after a brief that never reached the agent, the same candidate as a new launch.
       const rebound = await bindInQueue(ctx, role, attemptNo + 1, answer.rebind);
       if (rebound.refused) return refusedSeat(role, rebound.refused);
       bound = rebound;
@@ -629,11 +560,9 @@ async function runRoleBody(ctx, { seat, unit: seatUnit, round = 1, independentOf
 }
 
 /**
- * The seat's binding for its next attempt. Ledger read, bind and publish are one queued step: seats
- * started together bind one after the other in the order they were listed, each seeing the executors its
- * earlier siblings were just given. A seat that already ran an earlier round of this unit keeps that
- * round's executor, model and effort; a recorded attempt that is not bound again keeps its binding. A
- * group of seats launches only after every seat of the group is bound.
+ * The seat's first binding, as one queued step (seats started together bind in listed order, each seeing its
+ * earlier siblings); an earlier round's executor, model and effort are kept, a recorded attempt keeps its
+ * binding, and a group launches only once all its seats are bound.
  */
 async function bindSeat(ctx, role, { recorded, rebinding, attemptNo, independentOf }) {
   let bound;
@@ -655,10 +584,8 @@ async function bindSeat(ctx, role, { recorded, rebinding, attemptNo, independent
 }
 
 /**
- * A later binding of the seat in the per-unit queue: the independence and the spread are read again now
- * (siblings may have changed executors since this seat first bound, and a hard `independentOf` must hold
- * for the executor it moves to), so two seats whose providers fail at once never both pick from the same
- * stale view of each other. Pools whose login failed in this unit are skipped.
+ * A later binding of the seat in the per-unit queue, with independence and spread read again now (siblings
+ * may have moved); pools whose login failed in this unit are skipped.
  */
 function bindInQueue(ctx, role, attemptNo, walk) {
   return ctx.seatLedger.serialize(() => {
@@ -682,8 +609,7 @@ function finishPendingCommit(ctx, role, lastRecorded, nativeBaseline) {
   const excludePaths = lastRecorded.preExistingInScope ?? [];
   let commit = commitRound(ctx, role, { baseline: nativeBaseline, runResult: prior?.runResult, excludePaths });
   if (commit.status === 'no-changes') {
-    // The agent's in-scope files are gone (cleaned up with the index): that is not a pass. Files a sync
-    // merge commit of this round took are not missing.
+    // In-scope files the agent changed that are gone (not taken by this round's sync merge) are not a pass.
     const inMerge = commit.sync?.files ?? [];
     const missing = partitionPaths((prior?.runResult?.evidence?.changedFiles ?? [])
       .filter((p) => !excludePaths.includes(p) && !inMerge.includes(p)), writeScope).inScope;
@@ -713,9 +639,8 @@ function commitRound(ctx, role, { baseline, runResult, excludePaths }) {
 }
 
 /**
- * The seat-launch ceiling the admission handed this run: a launch that would pass it does not happen. A
- * seat that already ran keeps what it has (a provider limit stays one, with `fallbackExhausted`); a seat
- * that never ran is refused by name, never reported as `blocked`.
+ * A launch past the admission's seat-launch ceiling does not happen: a seat that ran keeps its result (with
+ * `fallbackExhausted`), one that never ran is refused by name.
  */
 function launchCeilingSpent(ctx, role, { attempts, attemptNo, rebinding, lastResult, bound }) {
   const ceiling = ctx.seatLaunchCeiling;
@@ -736,24 +661,16 @@ async function runAttempt(ctx, role, { attempts, attemptNo, bound, preExistingIn
   const assignmentDir = path.join(ctx.unitDir, role.seat.seat, attemptSuffix(role.round, attemptNo));
   if (attempts.length <= attemptNo) {
     attempts.push({
-      seat: role.seat.seat,
-      role: role.seat.role,
-      round: role.round,
-      assignmentId,
-      binding: bound,
-      transport: bound.transport,
-      invocation: bound.invocation,
-      fallbackFrom: bound.provenance?.fallbackFrom ?? null,
+      seat: role.seat.seat, role: role.seat.role, round: role.round, assignmentId,
+      binding: bound, transport: bound.transport, invocation: bound.invocation, fallbackFrom: bound.provenance?.fallbackFrom ?? null,
       ...(role.readOnly ? {} : { preExistingInScope, nativeBaseline }),
-      boundAt: new Date().toISOString(),
-      configHash: unitRecord.configSnapshot.hash,
+      boundAt: new Date().toISOString(), configHash: unitRecord.configSnapshot.hash,
     });
     ctx.persist();
   }
   const attempt = attempts[attemptNo];
-  // What the worktree looks like as this writing seat launches, so a provider limit can tell whether the
-  // seat changed it (partial-writes.mjs). Taken again at every launch, a resumed one included: what a
-  // person kept before resuming is not this launch's work. A read-only seat is sandboxed and records none.
+  // The worktree as this writing seat launches (every launch, a resumed one too), so a provider limit can
+  // tell whether the seat changed it.
   if (!role.readOnly) {
     try {
       attempt.writeBaseline = worktreeSnapshot({ worktree: unitRecord.worktree, repoRoot: mainRoot });
@@ -772,18 +689,15 @@ async function runAttempt(ctx, role, { attempts, attemptNo, bound, preExistingIn
   assertNotCancelled();
   const result = await dispatchBound(ctx, role, { bound, assignmentId, assignmentDir, objective, admission });
 
-  // The receipt is read from a directory the worker can reach. A pass is only a pass when the provider
-  // record agrees the lease it names was granted, and when the record holds a lease for this assignment the
-  // attempt must show its receipt: nothing is committed on a receipt the provider never gave or one the
-  // worker removed or corrupted.
+  // The receipt lies where the worker can reach it: a pass stands only when the provider record agrees the
+  // lease it names was granted, and a lease the record holds must show its receipt.
   const receipt = readAttemptJson(assignmentsDir, assignmentId, 'provider-capacity-selection.json')?.leaseReceipt ?? null;
   const receiptDiffers = result.outcome === 'pass' ? auditLeaseReceipt(receipt, { assignmentId, runtimeDir: options.providerCapacityRuntimeDir }) : null;
   if (receiptDiffers) {
     result.outcome = 'policy-refusal';
     result.refused = { reason: 'lease-receipt-mismatch', detail: receiptDiffers };
   }
-  // No change is recorded as such, a commit that cannot be made fails the round, and paths changed outside
-  // the scope are reported, never committed. A pass whose commit never started is picked up by the resume.
+  // A commit that cannot be made fails the round; paths changed outside the scope are reported, never committed.
   if (!role.readOnly && result.outcome === 'pass') {
     assertNotCancelled();
     const gate = recheckWriteConsent(scope.admission, result.runResult?.evidence?.changedFiles);
@@ -810,10 +724,7 @@ async function runAttempt(ctx, role, { attempts, attemptNo, bound, preExistingIn
   return result;
 }
 
-/**
- * What a writing seat changed in the worktree since its launch (partial-writes.mjs): `{ paths, headMoved }`,
- * `{ error }` when that cannot be told, null for a seat that took no baseline (a read-only one).
- */
+/** What a writing seat changed since its launch: `{ paths, headMoved }`, `{ error }`, or null with no baseline. */
 function writesSinceLaunch(ctx, baseline) {
   if (!baseline) return null;
   try {
@@ -825,32 +736,16 @@ function writesSinceLaunch(ctx, baseline) {
 }
 
 /**
- * What a seat does after an attempt that ended on a provider limit, or whose brief never reached its agent
- * (`briefNotDelivered`: the launch was abandoned before the brief, or the pane's foreground was no agent; a
- * brief whose delivery is unknown is not one, the agent may have it). Pure: it binds, persists and reads
- * nothing; the caller performs the answer.
- *
- * - A lease that could not take the account Seat Binding named (nothing ran): `{ rebind }` from a fresh
- *   view of the accounts, unless the account was pinned or the seat lost its account more than
- *   MAX_LEASE_CONFLICTS times in a row (`{ stop }`).
- * - A writing seat that already changed the worktree is never run again on top of its own half-done work
- *   (checked first, so a pinned seat still names what it changed).
- * - A brief that never reached the agent: `{ rebind }` on the same candidate, at most MAX_BRIEF_RETRIES
- *   times for the seat's round.
+ * What a seat does after an attempt that ended on a provider limit, or whose brief surely never reached its
+ * agent (`briefNotDelivered`). Pure: the caller performs the answer.
+ * - A lease that could not take the named account (nothing ran): `{ rebind }` from a fresh account view,
+ *   unless the account was pinned or lost more than MAX_LEASE_CONFLICTS times in a row (`{ stop }`).
+ * - A writing seat that changed the worktree (`changed`) is never run again on top of that work.
+ * - A lost brief: `{ rebind }` on the same candidate, at most MAX_BRIEF_RETRIES times per round.
  * - A pinned account is never answered with another account or executor.
- * - Else `{ walk }`: first another account of the same candidate (`rotation`, while a usable account is
- *   left and fewer retries than the pool has accounts were spent, never a loop on one account), then the
- *   next candidate (`step`). `faultPool` is a pool whose login failed, which no later walk of the unit
- *   may land on.
- *
- * @param {object} args
- * @param {object} args.result the attempt's settled result
- * @param {object} args.bound the binding the attempt ran on
- * @param {object[]} args.attempts the seat's recorded attempts of this round, the current one included
- * @param {number} args.attemptNo index of the current attempt
- * @param {boolean} [args.briefNotDelivered] the attempt ended without its agent ever receiving the brief
- * @param {{ total: number, healthy: number } | null} [args.rotation] from inspectAccountRotation
- * @param {{ paths: string[], headMoved: boolean } | { error: string } | null} [args.changed] what the seat changed since its launch
+ * - Else `{ walk }`: another account of the same candidate first (`rotation`, never a loop on one account),
+ *   then the next candidate (`step`); `faultPool` names a pool whose login failed.
+ * `attempts` are the seat's attempts of this round, `rotation` comes from inspectAccountRotation.
  * @returns {{ stop: { refused?: object, fallbackExhausted?: object, retryStopped?: object } }
  *   | { rebind: object } | { walk: { rotation?: object, step: object, faultPool?: string, accountRotations?: number } }}
  */
@@ -933,34 +828,23 @@ async function dispatchBound(ctx, role, { bound, assignmentId, assignmentDir, ob
   const contextRefs = contextRefsOf(ctx, role, assignmentDir);
   const assignment = buildUnitRunAssignment(ctx, role, { bound, assignmentId, objective, contextRefs, carriesOperation, writes: effectiveWriteScope(unitRecord) });
   const runResult = await executeAssignment(assignment, {
-    cwd: unitRecord.worktree,
-    repoRoot: mainRoot,
-    custody: readOnly ? null : scope.custody,
+    cwd: unitRecord.worktree, repoRoot: mainRoot, custody: readOnly ? null : scope.custody,
     // The case this launch was admitted into, so the worker's environment names it and no other.
     ...(scope.admission ? { caseContext: { caseId: scope.admission.caseId, reservationId: scope.admission.reservationId } } : {}),
     runnerConfig,
-    // The admission identity of this dispatch: a resume of an attempt whose outcome was never read finds
-    // that attempt again (and its settled result) instead of admitting a new one.
     ...admission,
-    // What the write gate replays a mutating seat's binding against: the config this run reads live, never
-    // the copy kept in unit.json.
+    // The write gate replays a mutating seat's binding against the config read live, never unit.json's copy.
     committedRunnerConfig: ctx.liveConfig(),
     providerCredentialProbe: createCredentialProbe(),
     providerCredentialRenew: createCredentialRenewal(),
     cliOverride: {
-      preferExecutor: bound.executor,
-      // bind() already chose the invocation that carries bound.transport.
-      preferInvocation: bound.invocation,
-      tier: bound.tier,
-      model: bound.model,
-      // The pool that serves `model` and the account Seat Binding named in it: the lease takes exactly that one.
+      preferExecutor: bound.executor, preferInvocation: bound.invocation, tier: bound.tier, model: bound.model,
+      // The lease takes exactly the account Seat Binding named in the pool that serves `model`.
       ...(bound.pool ? { pool: bound.pool } : {}),
       ...(bound.leaseAccount ? { leaseAccount: bound.leaseAccount, accountViewDigest: bound.bindingInput?.accountViewDigest ?? null } : {}),
-      // A level bind() accepted from an override; the launch renders it into the CLI's flag.
       ...(bound.reasoningEffort ? { reasoningEffort: bound.reasoningEffort } : {}),
     },
     isReadOnlyMode: readOnly,
-    // The run's own time when bind() took one (override or unit); otherwise `runner.timeoutMs`.
     ...(bound.timeoutMs ? { timeoutMs: bound.timeoutMs } : {}),
     session: role.session,
     ...(carriesOperation ? { operations: unitRecord.declared.operations, pinInputs: unitRecord.pinInputs ?? [] } : {}),
@@ -970,6 +854,5 @@ async function dispatchBound(ctx, role, { bound, assignmentId, assignmentDir, ob
     // Seats launched together as one group: their panes share the tab in equal parts. A seat alone sends none.
     ...(role.batch?.size > 1 ? { dispatchBatchSize: role.batch.size } : {}),
   });
-  // The run result's category becomes the unit's outcome here (unit-run-history.mjs).
   return { outcome: outcomeOfRunResult(runResult), ...role.tag, round, runResult, binding: bound };
 }

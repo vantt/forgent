@@ -33,10 +33,8 @@ import { acquireUnitControl } from './unit-control.mjs';
 import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
 
 /**
- * The text of a unit's persona, read once from the persona tiers so every attempt and resume
- * renders the same definition, including one that lives only in the workspace tier. A name no tier
- * defines keeps today's rendering by name; the one-liner already refuses it before the run. A definition
- * that exists but cannot be parsed or has the wrong shape throws its named problem.
+ * The text of a unit's persona, read once so every attempt and resume renders the same definition. A name
+ * no tier defines is rendered by name; a definition that cannot be parsed throws its named problem.
  */
 function unitPersonaPin(persona, mainRoot, workflow) {
   if (typeof persona !== 'string') return null;
@@ -55,39 +53,26 @@ function assertNoStrayCommit(unitRunId, unitRecord, mainRoot) {
     const commit = attempt.commit;
     if (commit?.status !== 'failed' || commit.reason !== 'committed-set-mismatch' || !commit.sha) continue;
     if (!commitOnBranch(unitRecord.worktree, commit.sha, mainRoot)) continue;
-    const diff = [
-      ...(commit.unexpected ?? []).map((p) => `+${p}`),
-      ...(commit.missing ?? []).map((p) => `-${p}`),
-    ].join(', ');
+    const diff = [...(commit.unexpected ?? []).map((p) => `+${p}`), ...(commit.missing ?? []).map((p) => `-${p}`)].join(', ');
     throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": commit ${commit.sha} is already on the branch but does not hold exactly the files of its write scope (${diff}; + is outside the scope, - is missing); inspect it and take it off the branch by hand (git reset HEAD~1 keeps its files in the worktree), then resume`);
   }
 }
 
-/**
- * An attempt of the supervisor era whose outcome the controller never recorded: it was handed to a
- * supervisor and the controller went away before reading the answer.
- */
+/** An attempt handed to a supervisor whose controller went away before recording its outcome. */
 export function leftByDeadController(attempt, assignmentsDir) {
   if (!attempt || attempt.outcome !== undefined || typeof attempt.assignmentId !== 'string') return false;
   const prior = currentAttemptOf(assignmentsDir, attempt.assignmentId);
   return prior !== null && fs.existsSync(path.join(prior.dir, 'envelope.json'));
 }
 
-/** The newest `seatSchema` of a unit record this release can resume. It writes schema 2, so a record
- * that carries a later one came from a newer release: resuming it here would run it under rules this
- * release does not know. Read-only inspection of the record is unaffected. */
+/** The newest `seatSchema` this release resumes (it writes 2); a later one came from a newer release. */
 const KNOWN_SEAT_SCHEMA = 2;
 
 function assertRecordNotFromNewerRelease(unitRunId, unitRecord) {
   const schema = unitRecord?.seatSchema;
-  if (schema === undefined || schema === null) return;
-  if (typeof schema === 'number' && schema <= KNOWN_SEAT_SCHEMA) return;
-  throw new RunnerConfigError(
-    `cannot resume unit run "${unitRunId}": unit.json field seatSchema is ${JSON.stringify(schema)}, written by a newer release than this one; resume it with that release`,
-    { code: 'record-from-newer-release' },
-  );
+  if (schema === undefined || schema === null || (typeof schema === 'number' && schema <= KNOWN_SEAT_SCHEMA)) return;
+  throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json field seatSchema is ${JSON.stringify(schema)}, written by a newer release than this one; resume it with that release`, { code: 'record-from-newer-release' });
 }
-
 
 /** The collaboration pin a resume runs under, refused by name when it cannot be read or names nothing registered. */
 function assertCollaborationPinUsable(unitRunId, collaboration, configSnapshot, liveCfg) {
@@ -104,10 +89,8 @@ function assertCollaborationPinUsable(unitRunId, collaboration, configSnapshot, 
 }
 
 /**
- * A resume never starts a second agent over an attempt the previous controller left: an attempt whose
- * supervisor still works (or an adopter) is named and refused, an attempt no door can judge (a run from
- * before the run supervisor) is refused by name. Only a closed attempt is carried on from. Asks the adopt door,
- * read-only, for every attempt whose outcome the dead controller never recorded.
+ * A resume never starts a second agent over an attempt the previous controller left: only a closed one (asked
+ * of the adopt door, read-only) is carried on from; a live or pre-supervisor one is refused by name.
  */
 function assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir) {
   for (const attempt of lastAttempts(unitRecord)) {
@@ -124,39 +107,23 @@ function assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir) {
 }
 
 /**
- * The operation a Work step declared for this unit, checked before anything is dispatched: the
- * operation must be one the step declares, never human-only, its stamped mutation must agree
- * with the unit's write scope, and the unit runs `solo` (one assignment for one operation).
- * Returns the operation fields every producer assignment of the unit carries.
+ * The operation fields every producer assignment carries, checked before dispatch: one the step declares,
+ * never human-only, its mutation agreeing with the write scope, and the unit runs `solo`.
  */
 function declaredOperationOf(declared, unit, loop, { taskSpecRoot } = {}) {
   if (!declared || typeof declared !== 'object') throw new RunnerConfigError('runUnit: declared must be an object');
   for (const key of ['workId', 'domain', 'stage', 'operation']) {
-    if (typeof declared[key] !== 'string' || !declared[key].trim()) {
-      throw new RunnerConfigError(`runUnit: declared.${key} must be a non-empty string`);
-    }
+    if (typeof declared[key] !== 'string' || !declared[key].trim()) throw new RunnerConfigError(`runUnit: declared.${key} must be a non-empty string`);
   }
-  if (!Array.isArray(declared.operations)) {
-    throw new RunnerConfigError('runUnit: declared.operations must be the step\'s operations');
-  }
-  const fields = declaredOperationFields({
-    domain: declared.domain,
-    workflow: declared.workflow ?? null,
-    stage: declared.stage,
-    operation: declared.operation,
-    operations: declared.operations,
-    taskSpecRoot,
-  });
-  if (fields.dispatch === 'human-only') {
-    throw new RunnerConfigError(`runUnit: operation "${declared.operation}" is human-only and is never dispatched`);
-  }
+  if (!Array.isArray(declared.operations)) throw new RunnerConfigError('runUnit: declared.operations must be the step\'s operations');
+  const { domain, stage, operation, operations } = declared;
+  const fields = declaredOperationFields({ domain, workflow: declared.workflow ?? null, stage, operation, operations, taskSpecRoot });
+  if (fields.dispatch === 'human-only') throw new RunnerConfigError(`runUnit: operation "${declared.operation}" is human-only and is never dispatched`);
   const unitReadOnly = (unit.writes ?? []).length === 0;
   if ((fields.mutation === 'read-only') !== unitReadOnly) {
     throw new RunnerConfigError(`runUnit: operation "${declared.operation}" is ${fields.mutation} but the unit ${unitReadOnly ? 'writes nothing' : 'declares writes'}`);
   }
-  if (loop !== 'solo') {
-    throw new RunnerConfigError(`runUnit: a unit carrying operation "${declared.operation}" runs solo, not "${loop}"`);
-  }
+  if (loop !== 'solo') throw new RunnerConfigError(`runUnit: a unit carrying operation "${declared.operation}" runs solo, not "${loop}"`);
   return fields;
 }
 
@@ -178,10 +145,7 @@ function checkedPinInputs(pinInputs) {
   return [...new Set(pinInputs)];
 }
 
-const portMissing = () => new RunnerConfigError(
-  'runUnit: a Unit that writes (or names a case) needs the case admission port in options.caseAdmission; none was given',
-  { code: PORT_MISSING },
-);
+const portMissing = () => new RunnerConfigError('runUnit: a Unit that writes (or names a case) needs the case admission port in options.caseAdmission; none was given', { code: PORT_MISSING });
 
 /** A standalone writing run needs the affirmative `unbound`; every other answer, a missing view included, refuses. */
 function requireFreeWorktree(port, worktree) {
@@ -193,14 +157,9 @@ function requireFreeWorktree(port, worktree) {
 }
 
 /**
- * Refuse what the calling door has no authority for, and a pinned account no seat takes, before a unit
- * run exists.
- *
- * - An override that accepts a dependence, and a tier above the one a seat resolves to (an override's, or
- *   its persona's), are raises. No door is authorized yet, so they
- *   are refused by name: `dependence-acceptance-unauthorized`, `tier-escalation-unauthorized`.
- * - Each seat an `account` override applies to (bound the way the run would bind it) must take that
- *   account, at least one seat must, and the account must not be quarantined now.
+ * Refuse, before a unit run exists, what the calling door has no authority for (accepting a dependence, a
+ * tier raised by an override or its persona: no door is authorized yet) and a pinned account that no seat
+ * takes, that a seat it applies to refuses, or that is quarantined now.
  */
 async function assertDoorChoicesBeforeRun(unit, runnerConfig, options, collaboration, herdrPresent) {
   const overrides = options.overrides ?? [];
@@ -214,17 +173,13 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options, collabora
   const pinsAccount = objects.some((o) => o.account !== undefined);
   const mayRaise = objects.some((o) => o.tier !== undefined) || objects.some((o) => o.persona !== undefined);
   if (!pinsAccount && !mayRaise) return;
-  const { seats } = await simulateUnitBindings(
-    unit,
-    runnerConfig,
-    {
-      session: { herdrPresent: herdrPresent(), ...(options.session ?? {}) },
-      overrides,
-      raiseAuthorized: options.raiseAuthorized === true,
-      workflowId: options.workflowId,
-      collaboration: collaboration ?? options.collaboration,
-    },
-  );
+  const { seats } = await simulateUnitBindings(unit, runnerConfig, {
+    session: { herdrPresent: herdrPresent(), ...(options.session ?? {}) },
+    overrides,
+    raiseAuthorized: options.raiseAuthorized === true,
+    workflowId: options.workflowId,
+    collaboration: collaboration ?? options.collaboration,
+  });
   const unauthorized = seats.find((r) => r.refused?.reason === 'tier-escalation-unauthorized');
   if (unauthorized) {
     throw new RunnerConfigError(`tier-escalation-unauthorized: ${unauthorized.refused.detail}`, { code: 'tier-escalation-unauthorized', phase: 'pre-admission' });
@@ -269,11 +224,7 @@ function readUnitSource(options) {
   }
 }
 
-/**
- * A unit run taken up again from its `unit.json`, under one controller. Refused by name before anything
- * runs: a record from before seats or from a newer release, an unusable collaboration pin, an attempt still
- * running, a live dispatch in the worktree, a stray commit on the branch, a pinned account no longer usable.
- */
+/** A unit run taken up again from its `unit.json`, under one controller; whatever makes it unsafe is refused by name. */
 export function loadResumedUnit({ options, scope, mainRoot, worktreePath, port, assignmentsDir, liveConfig, withAccounts, snapshot, assertRepository }) {
   const unitRunId = options.resumeUnitRunId;
   const unitDir = path.join(assignmentsDir, unitRunId);
@@ -281,14 +232,11 @@ export function loadResumedUnit({ options, scope, mainRoot, worktreePath, port, 
   if (!fs.existsSync(unitJsonPath)) {
     throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json not found at "${unitJsonPath}"`);
   }
-  // A record written before seats existed keys its attempts by role name. It stays readable (history,
-  // summaries, hand-off refs) and is never resumed: that would re-enter it under the new keys.
+  // A record keyed by role name (before seats) stays readable but is never resumed.
   if (!isSeatRecord(readUnitRecord(unitRunId, unitJsonPath))) {
     throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": record-predates-seat-binding (its seats were keyed by role name; start the work again as a new unit run)`, { code: 'record-predates-seat-binding' });
   }
-  // One controller per unit: a live one (the run itself, or another resume) refuses this resume; one that
-  // died is taken over. Taken before unit.json is read, so a resume that waited behind another never works
-  // from a record that other one has since moved on.
+  // One controller per unit (a dead one is taken over), taken before unit.json is read so the record is current.
   const control = acquireUnitControl(unitDir, unitRunId);
   if (control.status !== 'acquired') {
     throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": another controller drives it${control.holder?.pid ? ` (PID ${control.holder.pid})` : ''}`, { code: 'resume-in-progress' });
@@ -324,8 +272,7 @@ export function loadResumedUnit({ options, scope, mainRoot, worktreePath, port, 
   }
   assertAttemptsResumable(unitRunId, unitRecord, assignmentsDir);
 
-  // A resume reads the config as it is now: a seat that did not pass is bound again from it. Attempts
-  // bound before this change are stamped with the config they were bound from first.
+  // A resume binds from the config as it is now; attempts bound earlier keep the hash they were bound from.
   const currentSnapshot = snapshot();
   if (currentSnapshot.hash !== unitRecord.configSnapshot?.hash) {
     for (const attempts of Object.values(unitRecord.bindings ?? {})) {
@@ -333,19 +280,12 @@ export function loadResumedUnit({ options, scope, mainRoot, worktreePath, port, 
     }
     const frozenLoops = runnerConfigForLoop?.loops ?? unitRecord.configSnapshot?.runner?.loops;
     const frozenPatterns = runnerConfigForLoop?.patterns ?? unitRecord.configSnapshot?.runner?.patterns;
-    unitRecord.configSnapshot = {
-      ...currentSnapshot,
-      runner: {
-        ...currentSnapshot.runner,
-        ...(frozenLoops ? { loops: frozenLoops } : {}),
-        ...(frozenPatterns ? { patterns: frozenPatterns } : {}),
-      },
-    };
+    const frozen = { ...(frozenLoops ? { loops: frozenLoops } : {}), ...(frozenPatterns ? { patterns: frozenPatterns } : {}) };
+    unitRecord.configSnapshot = { ...currentSnapshot, runner: { ...currentSnapshot.runner, ...frozen } };
     runnerConfigForLoop = unitRecord.configSnapshot.runner;
   }
 
-  // A mutating dispatch holds the worktree's dispatch-cwd lock while its worker runs; resuming under a live
-  // holder would launch a second worker into the same worktree.
+  // A live dispatch-cwd holder means a worker still runs in this worktree.
   const cwdHolder = dispatchCwdHolder(path.join(mainRoot, '.fgos'), worktreePath);
   if (cwdHolder) throw dispatchInFlightError(worktreePath, cwdHolder);
   assertNoStrayCommit(unitRunId, unitRecord, mainRoot);
@@ -362,17 +302,11 @@ export function loadResumedUnit({ options, scope, mainRoot, worktreePath, port, 
   return { unit, unitRunId, unitRecord, declaredOp, runnerConfigForLoop };
 }
 
-/**
- * A new unit run: everything the caller asked is checked, the case admission answered and custody taken
- * before the unit directory exists, so a refusal leaves nothing behind. Writes the first `unit.json`.
- */
+/** A new unit run: checked, admitted and in custody before its directory and first `unit.json` exist. */
 export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, caseRef, port, assignmentsDir, liveConfig, withAccounts, snapshot, assertRepository, herdrPresent }) {
-  if (options.declared === undefined && options.pinInputs !== undefined) {
-    throw new RunnerConfigError('runUnit: pinInputs needs declared');
-  }
+  if (options.declared === undefined && options.pinInputs !== undefined) throw new RunnerConfigError('runUnit: pinInputs needs declared');
   const raw = readUnitSource(options);
-  // A seat's tier is a recommendation only a registered workflow may make; a unit read from a file or from
-  // stdin never carries one.
+  // A seat's tier is a recommendation only a registered workflow may make, never a unit file.
   if (!options.unitData) assertNoSeatTier(raw?.seats, 'a unit file');
   const unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
   assertRepository(writesWorktree(unit, unit.syncBase));
@@ -394,9 +328,7 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
       origins: options.runnerConfig ? null : runnerOriginsOf(liveConfig()),
     });
   } catch (err) {
-    if (err instanceof CollaborationError || err instanceof SeatResolutionError) {
-      throw new RunnerConfigError(err.message, { code: err.code, phase: 'pre-admission' });
-    }
+    if (err instanceof CollaborationError || err instanceof SeatResolutionError) throw new RunnerConfigError(err.message, { code: err.code, phase: 'pre-admission' });
     throw err;
   }
   const loop = collaboration.pin.effective.loop;
@@ -425,8 +357,7 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
   const sync = seedSync(unit, { worktree: worktreePath, mainRoot });
   const writing = writesWorktree(unit, sync);
   if (writing && options.forceSharedCwd === true) throw sharedCwdRefusal(worktreePath, unit);
-  // Admission comes first, then custody, then the unit directory. A writing Unit with no port is refused
-  // here; a standalone one runs only into a free worktree.
+  // Admission, then custody, then the unit directory; a standalone writing run only into a free worktree.
   if ((writing || caseRef) && !port) throw portMissing();
   const unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
   if (writing && !caseRef) requireFreeWorktree(port, worktreePath);
@@ -455,8 +386,6 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
   }
   if (writing) scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), worktreePath);
   const unitDir = path.join(assignmentsDir, unitRunId);
-  // A persona file that cannot be parsed or has the wrong shape refuses the run here, before the unit
-  // directory exists, instead of seating a silently different persona.
   const personaPin = unitPersonaPin(unit.persona, mainRoot, options.personaScope);
   let resolved;
   try {
@@ -486,8 +415,7 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
     pattern: collaboration.pin.pattern.name,
     overrides: options.overrides || [],
     configSnapshot,
-    // The scope this run may write, widened once to the render targets of generated sources it touches. A
-    // resumed run reads it back and never recomputes it against a changed config.
+    // Widened once to the render targets of generated sources; a resume reads it back, never recomputes it.
     writeScope: expandGenerated(unit.writes, configSnapshot.runner.generatedPaths ?? []),
     ...(personaPin ? { personaPin } : {}),
     resolvedInputs: resolved.refs,
@@ -496,17 +424,11 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
     ...(unit.anonymizeInputs || unit.blind ? { inputMap: resolved.inputMap } : {}),
     worktree: fs.realpathSync(worktreePath),
     ...(sync ? { sync } : {}),
-    // The Work step operation and the files its verdict is bound to; a resume reads them back from here
-    // and never takes them from its caller again.
+    // The Work step operation and the files its verdict is bound to; a resume reads them back from here.
     ...(declared !== undefined ? {
       declared: {
-        workId: declared.workId,
-        ...(declared.title ? { title: declared.title } : {}),
-        domain: declared.domain,
-        ...(declared.workflow ? { workflow: declared.workflow } : {}),
-        stage: declared.stage,
-        operation: declared.operation,
-        operations: declared.operations,
+        workId: declared.workId, ...(declared.title ? { title: declared.title } : {}), domain: declared.domain,
+        ...(declared.workflow ? { workflow: declared.workflow } : {}), stage: declared.stage, operation: declared.operation, operations: declared.operations,
       },
       pinInputs,
     } : {}),
@@ -519,8 +441,7 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
   const control = acquireUnitControl(unitDir, unitRunId);
   if (control.status !== 'acquired') throw new RunnerConfigError(`unit run "${unitRunId}" is already driven by another controller`, { code: 'resume-in-progress' });
   scope.control = control;
-  // Told once, as soon as the run exists and before any seat can start, so a caller can record the id and
-  // resume this run if it dies. Not called for a resumed run: its id is already known.
+  // Told once, before any seat starts, so a caller can record the id to resume a run that dies.
   options.onUnitRunCreated?.(unitRunId);
   return { unit, unitRunId, unitRecord, declaredOp, runnerConfigForLoop: null };
 }

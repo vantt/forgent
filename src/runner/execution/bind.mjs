@@ -1,14 +1,8 @@
 // src/runner/execution/bind.mjs — Seat Binding for Node callers: one seat, one answer.
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/**
-//
-// Every decision (tier, ranking, independence, pins, effort, continuity, the walk after a failure) is the
-// Rust crate's (`fgos internal seat-binding`, through seat-policy.mjs). This module collects what the
-// crate must not read itself and turns its answer into the binding the runner launches:
-//   - the ask: unit, seat, overrides, independence and the persona that sits the seat;
-//   - launchView: per executor, what this machine can launch (family, mechanism, invocations that carry
-//     the posture, the CLI each reads a login from, the effort levels its CLI renders);
-//   - accountView: per pool, the accounts the config declares and the CLIs each holds a login for.
-// It never ranks, filters or orders candidates.
+// Every decision (tier, ranking, independence, pins, effort, continuity, the walk) is the Rust crate's
+// (through seat-policy.mjs). This module only collects what the crate must not read itself (the ask, the
+// launch view, the account view) and turns its answer into the binding; it never ranks or filters.
 
 import { decideExecutorDispatchMechanism } from '../dispatch/mechanism.mjs';
 import { deriveProviderFamily } from '../dispatch/resolve.mjs';
@@ -29,7 +23,7 @@ const identityKey = (executor, invocation, pool, model, effort) => [executor, in
 export const bindingIdentity = (binding) => identityKey(binding?.executor, binding?.invocation, binding?.pool, binding?.model, binding?.reasoningEffort);
 
 /** A binding as the crate's walk state names a candidate. */
-export const identityOf = (binding) => ({
+const identityOf = (binding) => ({
   executor: binding.executor,
   ...(binding.invocation ? { invocation: binding.invocation } : {}),
   ...(binding.pool ? { pool: binding.pool } : {}),
@@ -42,27 +36,18 @@ const overrideSource = (override) => (override?.origin ? `override:${override.or
 
 /** An override that applies to this unit, seat and role (a scope-less one applies to every seat of the run). */
 function findMatchingOverride(overrides, unit, seat, role) {
+  const fits = (want, have) => want === undefined || want === null || want === have;
   if (!Array.isArray(overrides)) return null;
-  return overrides.find((ov) => {
-    if (!ov || typeof ov !== 'object') return false;
-    const scope = ov.scope;
-    if (!scope) return true;
-    const unitMatch = scope.unit === undefined || scope.unit === null || scope.unit === unit?.id;
-    const seatMatch = scope.seat === undefined || scope.seat === null || scope.seat === seat;
-    const roleMatch = scope.role === undefined || scope.role === null || scope.role === role;
-    return unitMatch && seatMatch && roleMatch;
-  }) ?? null;
+  return overrides.find((ov) => ov && typeof ov === 'object'
+    && (!ov.scope || (fits(ov.scope.unit, unit?.id) && fits(ov.scope.seat, seat) && fits(ov.scope.role, role)))) ?? null;
 }
 
 /** The provider family of an executor id: its own `providerModel`/`provider`, else inferred from its command. */
 export function getProviderFamily(runnerConfig, executorId) {
-  const executors = runnerConfig?.executors ?? runnerConfig?.runner?.executors ?? {};
-  const executorEntry = executors[executorId];
-  const globalCommand = runnerConfig?.executor?.command ?? runnerConfig?.runner?.executor?.command;
-  const cliInvocation = executorEntry?.invocations?.find((inv) => inv?.via === 'cli');
-  const hasOwnCommandOrAdapter = cliInvocation?.command || cliInvocation?.adapter || executorEntry?.command || executorEntry?.adapter;
-  const resolvedCommand = cliInvocation?.command ?? executorEntry?.command ?? (!hasOwnCommandOrAdapter ? globalCommand : undefined);
-  return deriveProviderFamily(executorEntry, resolvedCommand);
+  const entry = executorsOf(runnerConfig ?? {})[executorId];
+  const cli = entry?.invocations?.find((inv) => inv?.via === 'cli');
+  const ownCommand = cli?.command || cli?.adapter || entry?.command || entry?.adapter;
+  return deriveProviderFamily(entry, cli?.command ?? entry?.command ?? (ownCommand ? undefined : runnerCommandOf(runnerConfig ?? {})));
 }
 
 /**
@@ -89,19 +74,16 @@ function resolvePersona({ ask, unit, matchingOverride, capEntries }) {
     return { persona: null, source: 'none' };
   };
   const selected = matchingOverride?.persona ?? null;
-  const chosen = matchingOverride?.persona
-    ? { persona: matchingOverride.persona, source: overrideSource(matchingOverride) }
-    : chain(null);
+  const chosen = selected ? { persona: selected, source: overrideSource(matchingOverride) } : chain(null);
   return { ...chosen, selected, base: chain(selected).persona };
 }
 
 // ---- machine facts ------------------------------------------------------------------------------
-
 const executorsOf = (runnerConfig) => runnerConfig.executors ?? runnerConfig.runner?.executors ?? {};
+const runnerCommandOf = (runnerConfig) => runnerConfig.executor?.command ?? runnerConfig.runner?.executor?.command;
 
 /** The command an invocation runs: its own, else the executor's, else the runner's default executor. */
-const commandOf = (runnerConfig, entry, invocation) => invocation.command ?? entry.command
-  ?? runnerConfig.executor?.command ?? runnerConfig.runner?.executor?.command;
+const commandOf = (runnerConfig, entry, invocation) => invocation.command ?? entry.command ?? runnerCommandOf(runnerConfig);
 
 /** Why governance disallows an executor, or undefined when it does not. */
 function disallowedReason(runnerConfig, id, entry, family) {
@@ -174,26 +156,20 @@ function launchViewOf(runnerConfig, session) {
   };
 }
 
-/** The accounts the lease reads, per state key; empty when the inventory cannot be read. */
-function readInventory(runnerConfig) {
-  try {
-    return providerAccountInventory(runnerConfig) ?? {};
-  } catch {
-    return {};
-  }
-}
-
 /**
- * The pools a seat may be served by and the accounts each declares: a pool is named by a cell entry or is
- * the family itself. An account lists the CLIs it holds a login store for (never where it is kept).
- * With `accounts` ({ runtimeDir, assignmentId }) the view also carries what the lease state says, read here
- * and not under the lock: the account this assignment already holds, until when an account is quarantined,
- * and whether a quarantined login may be lifted by one real call (offered, unprobed, only when no account of
- * the pool is healthy). Without it the view is the config alone, which is what a replay and a read-only
- * explanation rank from.
+ * The pools a seat may be served by (named by a cell entry, or the family itself) and the accounts each
+ * declares, each with the CLIs it holds a login store for (never where it is kept); an unreadable inventory
+ * is no accounts. With `accounts` ({ runtimeDir, assignmentId }) the view adds the lease state, read here and
+ * not under the lock: the account held, quarantines, and a quarantined login liftable by one real call (only
+ * when no account of the pool is healthy). Without it the view is the config alone, as replay and explain read.
  */
 function accountViewOf(runnerConfig, launchView, accounts = null, now = Date.now()) {
-  const inventory = readInventory(runnerConfig);
+  let inventory;
+  try {
+    inventory = providerAccountInventory(runnerConfig) ?? {};
+  } catch {
+    inventory = {};
+  }
   const clis = [...new Set(Object.values(launchView.executors).flatMap((facts) => facts.invocations.map((inv) => inv.cli).filter(Boolean)))];
   const pools = new Set(Object.values(launchView.executors).map((facts) => facts.family));
   const policies = runnerConfig.modelPolicies ?? runnerConfig.runner?.modelPolicies ?? {};
@@ -248,9 +224,6 @@ function crateOverrideOf(override) {
  * The ask of one seat, built alike by the run and the dry bind from what the pattern hands its seat runner.
  * Independence and spread are read from the seat ledger now, so they see exactly the seats bound before this
  * one; independence is symmetric (a seat bound earlier that must differ from this one holds it to that too).
- *
- * @param {{ seat: object, unit: object, independentOf?: string[], preferIndependentOf?: string[] }} request
- * @param {{ overrides?: object[], workflowId?: string, raiseAuthorized?: boolean, blind?: boolean }} unitContext
  */
 export function askFor({ seat, unit, independentOf = [], preferIndependentOf = [] }, ledger, { overrides = [], workflowId, raiseAuthorized, blind } = {}) {
   const workflowTier = workflowTierOf(seat, unit, workflowId);
@@ -275,20 +248,10 @@ export function askFor({ seat, unit, independentOf = [], preferIndependentOf = [
  * (an unknown tier or effort name); returns `{ refused }` for a persona conflict.
  */
 function requestOf(ask, ctx, walk) {
-  const {
-    unit,
-    seat = 'producer',
-    role = 'producer',
-    posture: seatPosture = PRODUCER_POSTURE,
-    readOnly = false,
-    independentOf = [],
-    preferIndependentOf = null,
-    overrides = [],
-    blind = false,
-  } = ask ?? {};
+  const { unit, seat = 'producer', role = 'producer', posture: seatPosture = PRODUCER_POSTURE, readOnly = false } = ask ?? {};
+  const { independentOf = [], preferIndependentOf = null, overrides = [], blind = false } = ask ?? {};
   const { runnerConfig = {}, session = {} } = ctx ?? {};
   const executors = executorsOf(runnerConfig);
-
   const isWriteEmpty = !Array.isArray(unit?.writes) || unit.writes.length === 0;
   const isReadOnlyPosture = readOnly === true || seatPosture.readOnly === true || isWriteEmpty;
   const posture = isReadOnlyPosture ? 'read-only' : (seatPosture.writer ? 'workspace-write' : 'read-only');
@@ -304,7 +267,6 @@ function requestOf(ask, ctx, walk) {
       return { refused: { reason: 'reasoning-effort', detail: err.message } };
     }
   }
-
   const persona = resolvePersona({ ask, unit, matchingOverride, capEntries: capabilityEntriesOf(runnerConfig, unit?.capability) });
   if (persona.refused) return { refused: persona.refused };
 
@@ -321,6 +283,7 @@ function requestOf(ask, ctx, walk) {
     const at = peers.findIndex((known) => known.seat === entry.seat);
     if (at >= 0) peers[at] = entry; else peers.push(entry);
   }
+  const override = crateOverrideOf(matchingOverride);
   const crateAsk = {
     capability: unit?.capability,
     seat,
@@ -330,7 +293,7 @@ function requestOf(ask, ctx, walk) {
     ...(ask?.workflowTier ? { workflow: ask.workflowTier } : {}),
     selectors,
     raiseAuthorized: ask?.raiseAuthorized === true,
-    ...(crateOverrideOf(matchingOverride) ? { override: crateOverrideOf(matchingOverride) } : {}),
+    ...(override ? { override } : {}),
     posture: { readOnly: seatPosture.readOnly === true, forceOutOfProcess: seatPosture.forceOutOfProcess === true, blind: blind === true },
     effectiveRigor: effectiveRigorOf(unit, runnerConfig, { fallback: 'standard' }),
     independence: { hard, hardCheckers: [], soft: peers.map((peer) => peer.seat) },
@@ -340,14 +303,7 @@ function requestOf(ask, ctx, walk) {
   const launchView = launchViewOf(runnerConfig, session);
   return {
     persona, matchingOverride, posture, isReadOnlyPosture, launchView,
-    request: {
-      ask: crateAsk,
-      runnerConfig,
-      peers,
-      walk: walkOf(walk),
-      accountView: accountViewOf(runnerConfig, launchView, ctx?.accounts),
-      launchView,
-    },
+    request: { ask: crateAsk, runnerConfig, peers, walk: walkOf(walk), accountView: accountViewOf(runnerConfig, launchView, ctx?.accounts), launchView },
   };
 }
 
@@ -416,7 +372,6 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
   const { unit, seat = 'producer', posture: seatPosture = PRODUCER_POSTURE } = ask ?? {};
   const { runnerConfig = {}, session = {} } = ctx ?? {};
   const { persona: personaChoice, matchingOverride, posture, isReadOnlyPosture, launchView } = prep;
-  const executors = executorsOf(runnerConfig);
   const { policy, ranked } = out;
   // Stage 1 refused (a tier no cell serves, a raise no door may make): there is nothing to rank.
   if (!ranked) return { refused: refusalOf(out.refusal, { session, unit }) };
@@ -430,12 +385,11 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
     return { refused: { reason: 'run-timeout', detail: err.message } };
   }
 
-  const executorEntry = executors[cand.executor];
-  const mechanism = cand.mechanism;
+  const executorEntry = executorsOf(runnerConfig)[cand.executor];
   const { transport, transportSource } = transportOf({ cand, executorEntry, session, launchFacts: launchView.executors[cand.executor] });
+  const { mechanism } = cand;
   const model = cand.model ?? 'default';
   const reasoningEffort = cand.effort ?? null;
-  const mechanismSource = seatPosture.forceOutOfProcess ? 'posture-forced-out-of-process' : 'decideExecutorDispatchMechanism';
 
   // An override pins an account (`fgos run --account pool/account`) only on a seat whose chosen entry is
   // served by that pool; any other seat runs unpinned and says why.
@@ -450,16 +404,13 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
     tier: {
       value: policy.tier,
       source: policy.tierSource,
-      ...(policy.recommendation ? { recommendation: policy.recommendation } : {}),
-      ...(policy.loweredFrom ? { loweredFrom: policy.loweredFrom } : {}),
-      ...(policy.maxTier ? { maxTier: policy.maxTier } : {}),
-      ...(policy.raisedBy ? { raisedBy: policy.raisedBy } : {}),
+      ...Object.fromEntries(['recommendation', 'loweredFrom', 'maxTier', 'raisedBy'].filter((key) => policy[key]).map((key) => [key, policy[key]])),
     },
     model: { value: model, source: cand.modelSource },
     persona: { value: personaChoice.persona, source: personaChoice.source },
     reasoningEffort: { value: reasoningEffort, source: cand.effortSource === 'override' ? overrideSource(matchingOverride) : cand.effortSource },
     timeoutMs: { value: timeout.timeoutMs, source: timeout.timeoutMsSource },
-    mechanism: { value: mechanism, source: mechanismSource },
+    mechanism: { value: mechanism, source: seatPosture.forceOutOfProcess ? 'posture-forced-out-of-process' : 'decideExecutorDispatchMechanism' },
     posture: { value: posture, source: isReadOnlyPosture ? 'read-only-ask-or-writes-empty' : 'producer-writes-declared' },
   };
   if (cand.pool) provenance.pool = { value: cand.pool, source: cand.modelSource };
@@ -510,47 +461,24 @@ function bindingOf({ out, prep, ask, ctx, walk }) {
 }
 
 /**
- * Both stages for one seat through the crate: one exec. Returns the crate's answer and the facts the
- * binding is built from, or `{ refused }` for a refusal Node owns (a persona conflict, an effort name no
- * seat could take).
- */
-function decide(ask, ctx, walk) {
-  const prep = requestOf(ask, ctx, walk);
-  if (prep.refused) return { refused: prep.refused };
-  return { prep, out: seatBinding(prep.request) };
-}
-
-/**
- * The binding of one seat, or `{ refused: { reason, detail } }`.
+ * The binding of one seat (one crate exec), or `{ refused: { reason, detail } }`; execution admission
+ * belongs to the calling door.
  *
- * @param {object} ask what `askFor` builds: unit, seat, role, posture, persona, overrides, independentOf (executors
- *   or seats to differ from), preferIndependentOf ([{ seat, executor }]), blind, workflowTier, raiseAuthorized
- * @param {object} ctx { runnerConfig, session }
- *   Execution admission belongs to the calling door, not seat choice or replay.
- * @param {object} [options]
- * @param {object} [options.walk] where the seat stands after a failure
- * @param {object[]} [options.walk.tried] the seat's earlier bindings, oldest first (empty: the first binding)
- * @param {string[]} [options.walk.excludePools] pools the walk must not land on (a login that just failed)
- * @param {object} [options.walk.continuity] a binding the seat keeps (a later round, or another account of
- *   the same candidate): executor, model and effort stay, else `seat-continuity-unavailable`
- * @param {object} [options.walk.from] the binding the seat is leaving (default: the last of `tried`); a bind
- *   that has one records `fallbackFrom` in its provenance
- * @param {boolean} [options.walk.rotation] the bind retries the kept candidate on another account (not a step)
- * @param {object} [options.walk.detail] extra provenance of a rotation, e.g. `{ accountsHealthy }`
- * @param {string} [options.walk.reason] why the walk moved (default `provider-limit`)
+ * @param {object} ask what `askFor` builds
+ * @param {object} ctx { runnerConfig, session, accounts? }
+ * @param {object} [options.walk] where the seat stands after a failure: `tried` (earlier bindings, oldest
+ *   first), `excludePools`, `continuity` (a binding whose executor, model and effort the seat keeps, else
+ *   `seat-continuity-unavailable`), `from` (the binding left, default the last tried; recorded as
+ *   `fallbackFrom`), `rotation` (same candidate, another account), `detail`, `reason` (default `provider-limit`)
  */
 export function bind(ask, ctx, { walk = {} } = {}) {
-  const decided = decide(ask, ctx, walk);
-  if (decided.refused) return { refused: decided.refused };
-  return bindingOf({ out: decided.out, prep: decided.prep, ask, ctx, walk });
+  return explainSeat(ask, ctx, { walk, chain: false }).binding;
 }
 
 /**
- * The seat a Work operation or a raw dispatch runs, by the same crate call a unit run makes (one headless
- * producer seat; the posture is judged when the assignment launches, not here, so the ask names no writes). A pinned executor, a tier or an effort the caller stated come in as one override. A
- * refusal throws, named; there is no policy of its own behind it.
- *
- * @param {object} args `{ runnerConfig, unit, role, readOnly, overrides }`; `unit` is `{ id, capability, rigor }`
+ * The seat a Work operation or a raw dispatch runs: one headless producer seat by the same crate call a unit
+ * run makes, its posture judged at launch (so the ask names no writes); a stated executor, tier or effort is
+ * one override, and a refusal throws, named. `unit` is `{ id, capability, rigor }`.
  */
 export function bindWorkSeat({ runnerConfig, unit, role = 'producer', readOnly = false, overrides = [] }) {
   const bound = bind(
@@ -562,17 +490,15 @@ export function bindWorkSeat({ runnerConfig, unit, role = 'producer', readOnly =
 }
 
 /**
- * Why a seat lands where it does, read-only: the same crate call as `bind` (nothing is leased, spawned or
- * written), its ranked candidates and skip reasons, its explanation text, and the walk a failure would
- * take, one binding per step. `chain: false` skips that walk (one binding instead of one host call per step)
- * for a caller that reads only the ranked candidates.
- *
+ * Why a seat lands where it does, read-only (nothing leased, spawned or written): the binding, the crate's
+ * ranked candidates, skip reasons and explanation, and the walk a failure would take, one binding per step
+ * (`chain: false` skips the walk: one host call instead of one per step).
  * @returns {{ binding: object, policy?: object, ranked?: object, explain?: {lines: string[]}, launchView?: object, walk: object[] }}
  */
 export function explainSeat(ask, ctx, { walk = {}, chain: walkChain = true } = {}) {
-  const decided = decide(ask, ctx, walk);
-  if (decided.refused) return { binding: { refused: decided.refused }, walk: [] };
-  const { out, prep } = decided;
+  const prep = requestOf(ask, ctx, walk);
+  if (prep.refused) return { binding: { refused: prep.refused }, walk: [] };
+  const out = seatBinding(prep.request);
   const binding = bindingOf({ out, prep, ask, ctx, walk });
   const chain = [];
   if (walkChain && !binding.refused) {
@@ -586,5 +512,3 @@ export function explainSeat(ask, ctx, { walk = {}, chain: walkChain = true } = {
   }
   return { binding, policy: out.policy, ranked: out.ranked, explain: out.explain, launchView: prep.launchView, walk: chain };
 }
-
-export { canApplyPosture };

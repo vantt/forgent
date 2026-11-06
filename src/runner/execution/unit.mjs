@@ -1,4 +1,4 @@
-// src/runner/execution/unit.mjs — Unit data contract and validator (Wave B / Phase 2)
+// src/runner/execution/unit.mjs — Unit data contract and validator
 // Architecture guard: MUST NOT import src/state/**, src/runner/coordination/**, src/runner/worktree.mjs, or src/runner/merge.mjs
 
 import { RunnerConfigError, assertRunTimeoutMs, MODEL_POLICY_TIERS } from '../dispatch/config.mjs';
@@ -6,15 +6,7 @@ import { RIGOR_VALUES } from '../rigor.mjs';
 import { checkDeclaredSeats } from './seat-resolver.mjs';
 import { canonicalizeWriteEntry } from '../dispatch/write-scope.mjs';
 
-const DISALLOWED_UNIT_FIELDS = Object.freeze([
-  'executor',
-  'provider',
-  'model',
-  'tier',
-  'invocation',
-  'actors',
-  'overrides',
-]);
+const DISALLOWED_UNIT_FIELDS = Object.freeze(['executor', 'provider', 'model', 'tier', 'invocation', 'actors', 'overrides']);
 
 const PREFER_ENTRY_KEYS = new Set(['executor', 'invocation']);
 
@@ -23,23 +15,16 @@ const PREFER_ENTRY_KEYS = new Set(['executor', 'invocation']);
  * an array of "<executorId>" or {executor, invocation?}. Shape only; ids are not looked up here.
  */
 function normalizePrefer(value) {
-  if (!Array.isArray(value)) {
-    throw new RunnerConfigError('unit.prefer must be an array of executor ids or {executor, invocation?} entries.');
-  }
+  if (!Array.isArray(value)) throw new RunnerConfigError('unit.prefer must be an array of executor ids or {executor, invocation?} entries.');
   return Object.freeze(value.map((entry, i) => {
     if (typeof entry === 'string' && entry.trim()) return entry.trim();
     const isEntryObject = entry && typeof entry === 'object' && !Array.isArray(entry);
     if (!isEntryObject || typeof entry.executor !== 'string' || !entry.executor.trim()
       || Object.keys(entry).some((key) => !PREFER_ENTRY_KEYS.has(key))
       || (entry.invocation !== undefined && (typeof entry.invocation !== 'string' || !entry.invocation.trim()))) {
-      throw new RunnerConfigError(
-        `unit.prefer[${i}] must be a non-empty executor id or {executor, invocation?} with non-empty strings, got: ${JSON.stringify(entry)}.`,
-      );
+      throw new RunnerConfigError(`unit.prefer[${i}] must be a non-empty executor id or {executor, invocation?} with non-empty strings, got: ${JSON.stringify(entry)}.`);
     }
-    return Object.freeze({
-      executor: entry.executor.trim(),
-      ...(entry.invocation !== undefined ? { invocation: entry.invocation.trim() } : {}),
-    });
+    return Object.freeze({ executor: entry.executor.trim(), ...(entry.invocation !== undefined ? { invocation: entry.invocation.trim() } : {}) });
   }));
 }
 
@@ -75,37 +60,17 @@ export function normalizeWorkflowLink(value) {
   return Object.freeze({ caseId, activity, reservationId: text('reservationId') });
 }
 
-/**
- * Validates whether a path is a safe repo-relative path.
- * - must be string
- * - not empty
- * - cannot start with '/'
- * - cannot contain '..' segments
- * - cannot contain backslashes or null bytes
- */
+/** A safe repo-relative path: a non-empty string, not absolute, no `..` segment, backslash or null byte. */
 function isValidRepoRelativePath(p) {
-  if (typeof p !== 'string' || !p.trim()) return false;
-  if (p.startsWith('/')) return false;
-  if (p.includes('\\') || p.includes('\0')) return false;
-  const segments = p.split('/');
-  for (const seg of segments) {
-    if (seg === '..') return false;
-  }
-  return true;
+  if (typeof p !== 'string' || !p.trim() || p.startsWith('/')) return false;
+  return !p.includes('\\') && !p.includes('\0') && !p.split('/').includes('..');
 }
 
-/**
- * Validates whether an input is a safe repo-relative path, a 'unit-run:<id>/<role>' reference, or a
- * 'gate-answer:<workflowRunId>/<stepId>' reference.
- */
+/** A safe repo-relative path, a 'unit-run:<id>/<role>' or a 'gate-answer:<workflowRunId>/<stepId>' reference. */
 function isValidInput(inp) {
   if (typeof inp !== 'string' || !inp.trim()) return false;
-  if (inp.startsWith('unit-run:')) {
-    return UNIT_RUN_INPUT_PATTERN.test(inp);
-  }
-  if (inp.startsWith('gate-answer:')) {
-    return GATE_ANSWER_INPUT_PATTERN.test(inp);
-  }
+  if (inp.startsWith('unit-run:')) return UNIT_RUN_INPUT_PATTERN.test(inp);
+  if (inp.startsWith('gate-answer:')) return GATE_ANSWER_INPUT_PATTERN.test(inp);
   return isValidRepoRelativePath(inp);
 }
 
@@ -168,23 +133,15 @@ function isSyncRef(ref) {
  * }>}
  */
 export function validateUnit(raw) {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
-    throw new RunnerConfigError('unit must be a non-null plain object.');
-  }
-
-  // G2 constraint check
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new RunnerConfigError('unit must be a non-null plain object.');
+  // A unit never names execution mechanics.
   for (const field of DISALLOWED_UNIT_FIELDS) {
     if (field in raw && raw[field] !== undefined) {
-      throw new RunnerConfigError(
-        `unit violates G2 constraint: contains disallowed field "${field}". Unit contract must not specify execution mechanics (${DISALLOWED_UNIT_FIELDS.join(', ')}).`,
-      );
+      throw new RunnerConfigError(`unit violates G2 constraint: contains disallowed field "${field}". Unit contract must not specify execution mechanics (${DISALLOWED_UNIT_FIELDS.join(', ')}).`);
     }
   }
 
-  // id
-  if (typeof raw.id !== 'string' || !raw.id.trim()) {
-    throw new RunnerConfigError('unit.id must be a non-empty string.');
-  }
+  if (typeof raw.id !== 'string' || !raw.id.trim()) throw new RunnerConfigError('unit.id must be a non-empty string.');
   const id = raw.id.trim();
 
   // syncBase: a ref the runner merges into the unit's branch before any worker runs. A unit with
@@ -201,26 +158,17 @@ export function validateUnit(raw) {
   }
   const syncOnly = syncBase !== undefined && (raw.syncOnly === true || raw.objective === undefined);
 
-  // objective
   if (syncOnly && raw.objective === undefined) raw = { ...raw, objective: `Merge ${syncBase} into this branch.` };
-  if (typeof raw.objective !== 'string' || !raw.objective.trim()) {
-    throw new RunnerConfigError('unit.objective must be a non-empty string.');
-  }
+  if (typeof raw.objective !== 'string' || !raw.objective.trim()) throw new RunnerConfigError('unit.objective must be a non-empty string.');
   const objective = raw.objective.trim();
-
-  // capability
   if (typeof raw.capability !== 'string' || !raw.capability.trim()) {
     throw new RunnerConfigError('unit.capability must be a non-empty string ("domain:verb" or "verb").');
   }
   const capability = raw.capability.trim();
-
-  // rigor
   let rigor;
   if (raw.rigor !== undefined && raw.rigor !== null) {
     if (typeof raw.rigor !== 'string' || !RIGOR_VALUES.includes(raw.rigor)) {
-      throw new RunnerConfigError(
-        `unit.rigor must be one of ${RIGOR_VALUES.join('/')}, got: ${JSON.stringify(raw.rigor)}.`,
-      );
+      throw new RunnerConfigError(`unit.rigor must be one of ${RIGOR_VALUES.join('/')}, got: ${JSON.stringify(raw.rigor)}.`);
     }
     rigor = raw.rigor;
   }
@@ -243,54 +191,29 @@ export function validateUnit(raw) {
     throw new RunnerConfigError('unit.syncBase needs writes: merging a ref changes the branch, so the unit must be a writing unit in a linked worktree.');
   }
 
-  // dependsOn
-  if (raw.dependsOn !== undefined && !Array.isArray(raw.dependsOn)) {
-    throw new RunnerConfigError('unit.dependsOn must be an array of unit ids.');
-  }
-  const rawDependsOn = raw.dependsOn ?? [];
-  const dependsOn = [];
-  for (let i = 0; i < rawDependsOn.length; i += 1) {
-    const dep = rawDependsOn[i];
-    if (typeof dep !== 'string' || !dep.trim()) {
-      throw new RunnerConfigError(
-        `unit.dependsOn[${i}] must be a non-empty string unit id, got: ${JSON.stringify(dep)}.`,
-      );
-    }
-    dependsOn.push(dep.trim());
-  }
-
-  // pattern
+  if (raw.dependsOn !== undefined && !Array.isArray(raw.dependsOn)) throw new RunnerConfigError('unit.dependsOn must be an array of unit ids.');
+  const dependsOn = (raw.dependsOn ?? []).map((dep, i) => {
+    if (typeof dep !== 'string' || !dep.trim()) throw new RunnerConfigError(`unit.dependsOn[${i}] must be a non-empty string unit id, got: ${JSON.stringify(dep)}.`);
+    return dep.trim();
+  });
   let pattern;
   if (raw.pattern !== undefined && raw.pattern !== null) {
-    if (typeof raw.pattern !== 'string' || !raw.pattern.trim()) {
-      throw new RunnerConfigError('unit.pattern must be a non-empty string when present.');
-    }
+    if (typeof raw.pattern !== 'string' || !raw.pattern.trim()) throw new RunnerConfigError('unit.pattern must be a non-empty string when present.');
     pattern = raw.pattern.trim();
   }
-
-  // inputs
   if (raw.inputs !== undefined && !Array.isArray(raw.inputs)) {
     throw new RunnerConfigError('unit.inputs must be an array of repo-relative paths or unit-run references.');
   }
-  const rawInputs = raw.inputs ?? [];
-  const inputs = [];
-  for (let i = 0; i < rawInputs.length; i += 1) {
-    const inp = rawInputs[i];
+  const inputs = (raw.inputs ?? []).map((inp, i) => {
     if (!isValidInput(inp)) {
-      throw new RunnerConfigError(
-        `unit.inputs[${i}] must be a repo-relative path or "unit-run:<id>/<role>" ref (or "gate-answer:<workflowRunId>/<stepId>"), got: ${JSON.stringify(inp)}.`,
-      );
+      throw new RunnerConfigError(`unit.inputs[${i}] must be a repo-relative path or "unit-run:<id>/<role>" ref (or "gate-answer:<workflowRunId>/<stepId>"), got: ${JSON.stringify(inp)}.`);
     }
-    inputs.push(inp);
-  }
-
+    return inp;
+  });
   if (raw.anonymizeInputs !== undefined && typeof raw.anonymizeInputs !== 'boolean') {
     throw new RunnerConfigError('unit.anonymizeInputs must be a boolean when present.');
   }
-
-  if (raw.blind !== undefined && typeof raw.blind !== 'boolean') {
-    throw new RunnerConfigError('unit.blind must be a boolean when present.');
-  }
+  if (raw.blind !== undefined && typeof raw.blind !== 'boolean') throw new RunnerConfigError('unit.blind must be a boolean when present.');
 
   const prefer = raw.prefer !== undefined ? normalizePrefer(raw.prefer) : undefined;
 
@@ -322,21 +245,13 @@ export function validateUnit(raw) {
     skills = Object.freeze([...new Set(raw.skills.map((skill) => skill.trim()))]);
   }
 
-  // expectedOutputs
   if (raw.expectedOutputs !== undefined && !Array.isArray(raw.expectedOutputs)) {
     throw new RunnerConfigError('unit.expectedOutputs must be an array of strings.');
   }
-  const rawExpectedOutputs = raw.expectedOutputs ?? [];
-  const expectedOutputs = [];
-  for (let i = 0; i < rawExpectedOutputs.length; i += 1) {
-    const out = rawExpectedOutputs[i];
-    if (typeof out !== 'string' || !out.trim()) {
-      throw new RunnerConfigError(
-        `unit.expectedOutputs[${i}] must be a non-empty string, got: ${JSON.stringify(out)}.`,
-      );
-    }
-    expectedOutputs.push(out.trim());
-  }
+  const expectedOutputs = (raw.expectedOutputs ?? []).map((out, i) => {
+    if (typeof out !== 'string' || !out.trim()) throw new RunnerConfigError(`unit.expectedOutputs[${i}] must be a non-empty string, got: ${JSON.stringify(out)}.`);
+    return out.trim();
+  });
 
   const normalized = {
     id,

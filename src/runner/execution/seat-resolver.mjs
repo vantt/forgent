@@ -1,18 +1,12 @@
 // src/runner/execution/seat-resolver.mjs — the one place that says which seats a unit's pattern fills.
 // Architecture guard: pure. No I/O, no clock, no state.
-//
-// Execution, the read-only binding simulation, doctor and admission's launch counting all ask here, so
-// they list the same seats in the same order. A seat is { seat, role, posture }:
-//
-//   seat     the id of the seat inside one unit run: a directory name, a ref segment, the key of the
-//            ledger and of every record of that seat. Unique in the unit; its charset is Convention's
-//            (src/convention/seat-id.mjs).
-//   role     one of SEAT_ROLES. It says what the seat does for the pattern and keys taste lookups.
-//   posture  how the seat may run. Launch and write behaviour reads posture and never the role or the
-//            id: readOnly, writer, forceOutOfProcess, stance (a panel member's passive stance
-//            measurement), verdict (the result is a checker's verdict).
-//
-// This module is also the one authority for effective rigor and checker composition.
+// Execution, the binding simulation, doctor and admission's launch counting all ask here, so they list the
+// same seats in the same order; it is also the one authority for effective rigor and checker composition.
+// A seat is { seat, role, posture }:
+//   seat     its id in one unit run (directory name, ref segment, ledger key); unique, Convention's charset.
+//   role     one of SEAT_ROLES: what the seat does for the pattern; keys taste lookups.
+//   posture  how it may run (launch and writes read only this): readOnly, writer, forceOutOfProcess,
+//            stance (a panel member's passive stance measurement), verdict (a checker's verdict).
 
 import { assertSeatId } from '../../convention/seat-id.mjs';
 import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
@@ -43,11 +37,7 @@ export const DEFAULT_CAPABILITY_MIN_CHECKERS = Object.freeze({
 });
 
 const DEFAULT_CAPABILITY_CONFIG = Object.freeze({
-  capabilities: Object.freeze(
-    Object.fromEntries(
-      Object.entries(DEFAULT_CAPABILITY_MIN_CHECKERS).map(([k, v]) => [k, Object.freeze({ minCheckers: v })]),
-    ),
-  ),
+  capabilities: Object.freeze(Object.fromEntries(Object.entries(DEFAULT_CAPABILITY_MIN_CHECKERS).map(([k, v]) => [k, Object.freeze({ minCheckers: v })]))),
 });
 const DECLARED_KEYS = new Set(['seat', 'role', 'persona', 'tier']);
 
@@ -115,18 +105,9 @@ export function effectiveRigorOf(unit, runnerConfig, { fallback } = {}) {
 }
 
 /**
- * The checker plan of a reviewed unit: a list of `{ seat, contributions }` where contributions is
- * an array of provenance strings: `rigor:<level>`, `capability:<key>`, `code:default-red-team`,
- * `pattern-invariant:<name>`, `request`, and `param:<slot>`.
- *
- * Replaces `checkerSeatsOf`.
- *
- * @param {object} unit
- * @param {object} runnerConfig
- * @param {object} [options]
- * @param {Array<string|object>|string|object} [options.requested]
- * @param {object} [options.floors]
- * @param {string} [options.slot]
+ * The checker plan of a reviewed unit: `{ seat, contributions }` per checker, each contribution a provenance
+ * string (`rigor:<level>`, `capability:<key>`, `code:default-red-team`, `pattern-invariant:<name>`,
+ * `request`, `param:<slot>`). `options`: `requested`, `floors`, `slot`, `shippedCheckersByRigor`.
  * @returns {Array<{ seat: string, contributions: Array<string> }>}
  */
 export function checkerPlanOf(unit, runnerConfig, options = {}) {
@@ -134,93 +115,53 @@ export function checkerPlanOf(unit, runnerConfig, options = {}) {
   else if (typeof options === 'string') options = { requested: [options] };
 
   const planMap = new Map();
-  function addContribution(seat, contribution) {
+  const add = (seat, contribution) => {
     if (!planMap.has(seat)) planMap.set(seat, new Set());
     if (contribution) planMap.get(seat).add(contribution);
-  }
+  };
 
-  // 1. Rigor floor: checkersByRigor read from runnerConfig.loops.reviewed (fallback options.shippedCheckersByRigor)
+  // 1. The rigor row of checkersByRigor, configured then shipped; a rigor below standard with no row of its
+  // own falls back to the standard row of the same tables.
   const rigor = effectiveRigorOf(unit, runnerConfig, { fallback: 'standard' });
   const configuredCheckers = runnerConfig?.loops?.reviewed?.checkersByRigor ?? runnerConfig?.runner?.loops?.reviewed?.checkersByRigor;
   const shippedCheckers = options.shippedCheckersByRigor;
-  const configuredRow = configuredCheckers && Object.hasOwn(configuredCheckers, rigor)
-    ? configuredCheckers[rigor]
-    : undefined;
-  const shippedRow = shippedCheckers && Object.hasOwn(shippedCheckers, rigor)
-    ? shippedCheckers[rigor]
-    : undefined;
-  // A rigor ranked below standard with no row of its own falls back to the standard row of the same tables.
   const fallbackStandard = (RIGOR_RANK[rigor] ?? Infinity) < RIGOR_RANK.standard;
   const rowOf = (table, name) => (table && Object.hasOwn(table, name) ? table[name] : undefined);
-  const fromRigor = configuredRow
-    ?? shippedRow
+  const fromRigor = rowOf(configuredCheckers, rigor) ?? rowOf(shippedCheckers, rigor)
     ?? (fallbackStandard ? (rowOf(configuredCheckers, 'standard') ?? rowOf(shippedCheckers, 'standard')) : undefined);
   if (!fromRigor) {
-    const errorDetail = fallbackStandard
-      ? `(neither runnerConfig nor shippedCheckersByRigor defines it or a standard row)`
-      : `(neither runnerConfig nor shippedCheckersByRigor defines it)`;
-    throw new SeatResolutionError(
-      `missing checkersByRigor for rigor "${rigor}" ${errorDetail}`,
-      'configuration-error',
-    );
+    throw new SeatResolutionError(`missing checkersByRigor for rigor "${rigor}" (neither runnerConfig nor shippedCheckersByRigor defines it${fallbackStandard ? ' or a standard row' : ''})`, 'configuration-error');
   }
-  for (const seat of fromRigor) {
-    addContribution(seat, `rigor:${rigor}`);
-  }
+  for (const seat of fromRigor) add(seat, `rigor:${rigor}`);
 
-  // 2. Capability minCheckers: read exact key then <prefix>:* through capabilityEntriesOf.
-  // First defined wins, [] clears the default. When no config defines it, DEFAULT_CAPABILITY_MIN_CHECKERS applies.
-  const entries = capabilityEntriesOf(runnerConfig, unit?.capability);
-  const capEntry = entries.find((e) => e.entry?.minCheckers !== undefined);
+  // 2. The capability's minCheckers (exact key, then `<prefix>:*`; the first defined wins, [] clears the
+  // default), else the shipped default.
+  const capEntry = capabilityEntriesOf(runnerConfig, unit?.capability).find((e) => e.entry?.minCheckers !== undefined);
   if (capEntry) {
     const min = capEntry.entry.minCheckers;
-    const list = Array.isArray(min) ? min : (min ? [min] : []);
-    for (const seat of list) {
-      addContribution(seat, `capability:${capEntry.key}`);
-    }
+    for (const seat of (Array.isArray(min) ? min : (min ? [min] : []))) add(seat, `capability:${capEntry.key}`);
   } else {
-    const defaultEntry = capabilityEntriesOf(DEFAULT_CAPABILITY_CONFIG, unit?.capability)
-      .find((e) => e.entry?.minCheckers !== undefined);
-    if (defaultEntry) {
-      const list = defaultEntry.entry.minCheckers;
-      for (const seat of list) {
-        addContribution(seat, 'code:default-red-team');
-      }
-    }
+    const defaultEntry = capabilityEntriesOf(DEFAULT_CAPABILITY_CONFIG, unit?.capability).find((e) => e.entry?.minCheckers !== undefined);
+    for (const seat of defaultEntry?.entry.minCheckers ?? []) add(seat, 'code:default-red-team');
   }
 
   // 3. Floors: { minCheckers: [{ name, source }] }
   const floors = options.floors;
   if (floors?.minCheckers) {
-    const floorList = Array.isArray(floors.minCheckers) ? floors.minCheckers : [floors.minCheckers];
-    for (const item of floorList) {
+    for (const item of (Array.isArray(floors.minCheckers) ? floors.minCheckers : [floors.minCheckers])) {
       const seat = typeof item === 'string' ? item : (item.name || item.seat);
       const source = item.source || 'pattern-invariant';
-      const contrib = source.startsWith('pattern-invariant:') ? source : `pattern-invariant:${source}`;
-      addContribution(seat, contrib);
+      add(seat, source.startsWith('pattern-invariant:') ? source : `pattern-invariant:${source}`);
     }
   }
 
   // 4. Requested / params
-  let req = options.requested ?? options.minCheckers ?? options.params?.minCheckers;
+  const req = options.requested ?? options.minCheckers ?? options.params?.minCheckers;
   const resolvedSlot = options.slot ?? options.minCheckersSlot ?? options.provenance?.params?.minCheckers;
-  if (req) {
-    const reqList = Array.isArray(req) ? req : [req];
-    for (const item of reqList) {
-      if (typeof item === 'string') {
-        const slot = resolvedSlot;
-        const contrib = (!slot || slot === 'request') ? 'request' : (slot.startsWith('param:') ? slot : `param:${slot}`);
-        addContribution(item, contrib);
-      } else if (item && typeof item === 'object') {
-        const seat = item.name || item.seat;
-        let contrib = item.source;
-        if (!contrib) {
-          const slot = item.slot || resolvedSlot;
-          contrib = (!slot || slot === 'request') ? 'request' : (slot.startsWith('param:') ? slot : `param:${slot}`);
-        }
-        addContribution(seat, contrib);
-      }
-    }
+  const slotContribution = (slot) => ((!slot || slot === 'request') ? 'request' : (slot.startsWith('param:') ? slot : `param:${slot}`));
+  for (const item of (req ? (Array.isArray(req) ? req : [req]) : [])) {
+    if (typeof item === 'string') add(item, slotContribution(resolvedSlot));
+    else if (item && typeof item === 'object') add(item.name || item.seat, item.source || slotContribution(item.slot || resolvedSlot));
   }
 
   // 5. Validation and frozen result array
@@ -229,10 +170,7 @@ export function checkerPlanOf(unit, runnerConfig, options = {}) {
     if (!Object.hasOwn(CHECKER_SEATS, seat)) {
       throw new SeatResolutionError(`"${seat}" is not a checker seat; valid: [${Object.keys(CHECKER_SEATS).join(', ')}]`, 'param-invalid');
     }
-    result.push(Object.freeze({
-      seat,
-      contributions: Object.freeze([...contributions]),
-    }));
+    result.push(Object.freeze({ seat, contributions: Object.freeze([...contributions]) }));
   }
   return Object.freeze(result);
 }
@@ -254,24 +192,15 @@ export function requiresDistinctFamilies(unit, runnerConfig) {
  */
 export function checkDeclaredSeats(raw, label = 'seats', { tiers } = {}) {
   const fail = (displayed, relativeAt, detail, code = 'invalid-seats') => {
-    throw new SeatResolutionError(`${displayed} ${detail}`, code, {
-      at: relativeAt,
-      detail,
-    });
+    throw new SeatResolutionError(`${displayed} ${detail}`, code, { at: relativeAt, detail });
   };
-  if (!Array.isArray(raw) || raw.length === 0) {
-    fail(label, '', 'must be a non-empty array of { seat, role }');
-  }
+  if (!Array.isArray(raw) || raw.length === 0) fail(label, '', 'must be a non-empty array of { seat, role }');
   const seen = new Set();
   return raw.map((entry, index) => {
     const at = `${label}[${index}]`;
-    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
-      fail(at, `[${index}]`, 'must be an object { seat, role, persona?, tier? }');
-    }
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) fail(at, `[${index}]`, 'must be an object { seat, role, persona?, tier? }');
     for (const key of Object.keys(entry)) {
-      if (!DECLARED_KEYS.has(key)) {
-        fail(at, `[${index}].${key}`, `has unknown key "${key}"; a seat declares only seat, role, persona and tier`);
-      }
+      if (!DECLARED_KEYS.has(key)) fail(at, `[${index}].${key}`, `has unknown key "${key}"; a seat declares only seat, role, persona and tier`);
     }
     if (RESERVED_SEAT_IDS.includes(entry.seat)) {
       fail(`${at}.seat`, `[${index}].seat`, `"${entry.seat}" is a reserved seat id; reserved: [${RESERVED_SEAT_IDS.join(', ')}]`, 'param-invalid');
@@ -281,16 +210,12 @@ export function checkDeclaredSeats(raw, label = 'seats', { tiers } = {}) {
     } catch (unlabelled) {
       fail(`${at}.seat`, `[${index}].seat`, unlabelled.message.trimStart(), 'invalid-seat-id');
     }
-    if (seen.has(entry.seat)) {
-      fail(`${at}.seat`, `[${index}].seat`, `"${entry.seat}" is declared twice in this unit`, 'duplicate-seat');
-    }
+    if (seen.has(entry.seat)) fail(`${at}.seat`, `[${index}].seat`, `"${entry.seat}" is declared twice in this unit`, 'duplicate-seat');
     seen.add(entry.seat);
     if (!SEAT_ROLES.includes(entry.role)) {
       fail(`${at}.role`, `[${index}].role`, `must be one of [${SEAT_ROLES.join(', ')}], got ${JSON.stringify(entry.role)}`, 'invalid-seat-role');
     }
-    if (entry.persona !== undefined && (typeof entry.persona !== 'string' || !entry.persona.trim())) {
-      fail(`${at}.persona`, `[${index}].persona`, 'must be a non-empty string');
-    }
+    if (entry.persona !== undefined && (typeof entry.persona !== 'string' || !entry.persona.trim())) fail(`${at}.persona`, `[${index}].persona`, 'must be a non-empty string');
     if (entry.tier !== undefined && tiers && !tiers.includes(entry.tier)) {
       fail(`${at}.tier`, `[${index}].tier`, `must be one of [${tiers.join(', ')}], got ${JSON.stringify(entry.tier)}`, 'invalid-seat-tier');
     }
@@ -301,9 +226,7 @@ export function checkDeclaredSeats(raw, label = 'seats', { tiers } = {}) {
 /** The seats a unit's pattern params declare. Null when none are declared. */
 function declaredSeatsOf(unit, params) {
   const raw = params?.seats;
-  if (Array.isArray(raw) && raw.length > 0 && raw.every((d) => d && typeof d === 'object' && d.posture)) {
-    return raw;
-  }
+  if (Array.isArray(raw) && raw.length > 0 && raw.every((d) => d && typeof d === 'object' && d.posture)) return raw;
   return raw === undefined ? null : checkDeclaredSeats(raw, 'params.seats');
 }
 
@@ -325,20 +248,10 @@ function requireRoles(loop, declared, expected) {
 // ---- the resolver ------------------------------------------------------------------------------
 
 /**
- * The ordered seats a unit's pattern fills.
- *
- * - solo: one producer seat, `producer`, unless one seat is declared.
- * - reviewed: `producer`, then one checker seat per checker name (seat id = the name unless the unit declares
- *   its seats; declared checker roles must match the required checkers exactly).
- * - panel: the declared seats; producers are the members, one synthesizer.
- * - debate: the declared seats; two producer sides, then one judge.
- *
- * @param {object} options
- * @param {string} [options.loop] loop name; when absent the loop comes from `options.pattern` (a pattern name, as `unit.pattern`)
- * @param {object} [options.params] expanded loop params (declared seats, `minCheckers`)
- * @param {{ minCheckers?: Array<{ name: string, source: string }> }} [options.floors] checker floors with their source
- * @param {object} [options.unit]
- * @param {object} [options.runnerConfig]
+ * The ordered seats a unit's pattern fills: solo, one `producer` (or its one declared seat); reviewed,
+ * `producer` then one seat per checker (declared checker roles must match the required checkers exactly);
+ * panel, the declared producers as members and one synthesizer; debate, two producer sides then one judge.
+ * `options`: `loop` (else from `pattern`), `params` (declared seats, `minCheckers`), `floors`, `unit`, `runnerConfig`.
  * @returns {Array<{ seat: string, role: string, posture: object, persona?: string, tier?: string }>}
  */
 export function resolveSeats(options = {}) {
@@ -350,13 +263,9 @@ export function resolveSeats(options = {}) {
   }
   const rawParams = params ?? (typeof pattern === 'object' && pattern !== null ? pattern.params : undefined);
   params = rawParams === undefined || rawParams === null ? {} : { ...rawParams };
-  if (params.seats === undefined && unit?.seats !== undefined) {
-    params.seats = unit.seats;
-  }
+  if (params.seats === undefined && unit?.seats !== undefined) params.seats = unit.seats;
   const declared = declaredSeatsOf(unit, params);
-  if (declared && declared.length > 0 && declared.every((d) => d.posture)) {
-    return declared;
-  }
+  if (declared && declared.length > 0 && declared.every((d) => d.posture)) return declared;
   const readOnly = noWrites(unit);
   switch (resolvedLoop) {
     case 'solo': {
@@ -378,9 +287,7 @@ export function resolveSeats(options = {}) {
           ...required.map((name) => Object.freeze({ seat: name, role: CHECKER_SEATS[name].role, posture: checkerPosture(name) })),
         ];
       }
-      if (declared.length > 0 && declared.every((d) => d.posture)) {
-        return declared;
-      }
+      if (declared.length > 0 && declared.every((d) => d.posture)) return declared;
       // Declared seats name the producer and one seat per checker the unit needs; the roles must match
       // what checkersByRigor[effective rigor] plus minCheckers require, no role missing and none extra.
       const producers = declared.filter((d) => d.role === 'producer');
@@ -391,20 +298,13 @@ export function resolveSeats(options = {}) {
       const have = [];
       for (const d of declaredCheckers) {
         const at = unassignedPlan.findIndex((p) => CHECKER_SEATS[p.seat].role === d.role);
-        if (at >= 0) {
-          unassignedPlan.splice(at, 1);
-        } else {
-          have.push(d.role);
-        }
+        if (at >= 0) unassignedPlan.splice(at, 1); else have.push(d.role);
       }
       const missingRoles = unassignedPlan.map((p) => CHECKER_SEATS[p.seat].role);
       if (unassignedPlan.length > 0 || have.length > 0) {
         const invariantContrib = unassignedPlan.flatMap((p) => p.contributions).find((c) => c.startsWith('pattern-invariant:'));
         if (invariantContrib) {
-          throw new SeatResolutionError(
-            `declared seats weaken pattern invariant ${invariantContrib}: missing required checker role(s) [${missingRoles.join(', ')}]`,
-            'pattern-invariant-weakened',
-          );
+          throw new SeatResolutionError(`declared seats weaken pattern invariant ${invariantContrib}: missing required checker role(s) [${missingRoles.join(', ')}]`, 'pattern-invariant-weakened');
         }
         throw new SeatResolutionError(
           `a reviewed unit's checker seats must be exactly [${wanted.join(', ')}] (checkersByRigor for its effective rigor plus minCheckers)${missingRoles.length ? `; missing [${missingRoles.join(', ')}]` : ''}${have.length ? `; extra [${have.join(', ')}]` : ''}`,
@@ -470,37 +370,24 @@ export function seatOfRecord(unitRecord, seatId) {
   return unitRecord?.seats?.find((s) => s.seat === seatId) ?? null;
 }
 
-/**
- * The tier a workflow recommends on a seat, with where it was declared (`workflow:<id>/<unit>/<seat>`,
- * or `workflow:<unit>/<seat>` when the run does not know its workflow). Undefined when the seat
- * declares none.
- */
+/** The tier a workflow recommends on a seat, with where it was declared (`workflow:[<id>/]<unit>/<seat>`); undefined for none. */
 export function workflowTierOf(seat, unit, workflowId) {
   if (!seat?.tier) return undefined;
   return { tier: seat.tier, source: `workflow:${workflowId ? `${workflowId}/` : ''}${unit?.id ?? 'unit'}/${seat.seat}` };
 }
 
 /**
- * The seat part of a bind ask for a seat already recorded in `unitRecord`: its id, role and posture,
- * the tier its workflow recommended, so a replay asks what the run asked. A seat the record does not list is the unit's own producer seat.
+ * The seat part of a bind ask for a seat recorded in `unitRecord` (id, role, posture, persona, recommended
+ * tier), so a replay asks what the run asked; a seat the record does not list is the unit's producer seat.
  */
 export function bindSeatOf(unitRecord, seatId) {
   const seat = seatOfRecord(unitRecord, seatId);
   if (!seat) return { seat: seatId, role: 'producer', posture: PRODUCER_POSTURE };
   const workflowTier = workflowTierOf(seat, unitRecord.unit, unitRecord.workflowId);
-  return {
-    seat: seat.seat,
-    role: seat.role,
-    posture: seat.posture,
-    ...(seat.persona ? { persona: seat.persona } : {}),
-    ...(workflowTier ? { workflowTier } : {}),
-  };
+  return { seat: seat.seat, role: seat.role, posture: seat.posture, ...(seat.persona ? { persona: seat.persona } : {}), ...(workflowTier ? { workflowTier } : {}) };
 }
 
-/**
- * A seat's `tier` is a recommendation only a registered workflow may make. A unit that comes from a file
- * or from stdin (`fgos run --unit`, `fgos workflow start --units`) never carries one: refused by name.
- */
+/** A seat's `tier` is a recommendation only a registered workflow may make: a unit file or stdin carrying one is refused. */
 export function assertNoSeatTier(rawSeats, source) {
   if (Array.isArray(rawSeats) && rawSeats.some((entry) => entry && typeof entry === 'object' && entry.tier !== undefined)) {
     throw new SeatResolutionError(`${source} cannot carry seats[].tier: a seat's tier is a recommendation only a registered workflow definition may make`, 'seat-tier-not-allowed');
