@@ -303,3 +303,24 @@ test('codex: a confined round seeds its private home when only the leased accoun
   assert.equal(readCodexTrust(path.join(privateHome, 'config.toml'), project), true);
   assert.equal(fs.readFileSync(path.join(leasedHome, 'config.toml'), 'utf8'), leasedBody, 'the leased account store is not edited');
 });
+
+// The cases above cover where codex and agy trust goes. Claude has no private home to write to when its pane
+// runs unconfined, and its trust entry used to go to the operator's own `~/.claude.json`, a file claude itself
+// rewrites while it runs: a read-modify-write from here can drop what claude saved in between. fgOS never
+// writes that file; the home is a scratch directory so nothing here can reach the real one.
+test('an unconfined claude pane never writes the operator\'s claude store', () => {
+  const home = tmp('fgos-claude-operator-home-');
+  const store = path.join(home, '.claude.json');
+  const before = JSON.stringify({ projects: { [ROOT]: { hasTrustDialogAccepted: true, allowedTools: [] } }, theme: 'dark' }, null, 2);
+  fs.writeFileSync(store, before);
+  const previousHome = process.env.HOME;
+  process.env.HOME = home;
+  try {
+    const round = { trustWritten: false, note() {} };
+    seedWorkspaceTrust({ trustStore: { kind: 'claude-json' }, round, cwd: WORKSPACE, repoRoot: ROOT, fullEnv: { HOME: home }, workerEnv: null });
+    assert.equal(fs.readFileSync(store, 'utf8'), before, 'the operator\'s claude store was edited by an unconfined pane');
+    assert.equal(round.trustWritten, false);
+  } finally {
+    if (previousHome === undefined) delete process.env.HOME; else process.env.HOME = previousHome;
+  }
+});
