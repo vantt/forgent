@@ -81,8 +81,8 @@ Settled without a phase: H-T4e closed (arbitration §2: short calls stay unconfi
 
 | # | Phase | Depends on | Parallel with | Δ Node / Rust / tests (estimate) |
 |---|---|---|---|---|
-| 01 | [Red proofs](phase-01-red-proofs.md) (branch only, never landed alone) | — | — | 0 / 0 / 0 (counted where each lands) |
-| 02 | [Layering moves, A3 guard, A4 no-undef gate](phase-02-layering-moves-and-guards.md) | 01 | — (touches import lines everywhere) | +80 / 0 / +20 |
+| 01 | [Red proofs](phase-01-red-proofs.md) (branch only, never landed alone) **done 11-06 on `harden/t5-p01-red-proofs`** | — | — | 0 / 0 / 0 (counted where each lands) |
+| 02 | [Layering moves, A3 guard, A4 no-undef gate](phase-02-layering-moves-and-guards.md) **landed 11-06 `98e1c5824..7a4fa3654`** | 01 | — (touches import lines everywhere) | +80 / 0 / +20 |
 | 03 | [Credential and confinement doors (Q3b, A7, A8)](phase-03-credential-and-confinement-doors.md) | 02 | 04, 05, 07 | +90 / 0 / +100 |
 | 04 | [Config tighten rule (Q2b)](phase-04-config-tighten-rule.md) | 02; command half: UQ-1 | 03, 05, 07 | 0 / +44 / +40 |
 | 05 | [Claude private trust store (Q1a)](phase-05-claude-private-trust-store.md) | 02 | 03, 04, 07 | −35 / 0 / −40 |
