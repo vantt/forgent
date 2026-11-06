@@ -10,4 +10,5 @@ pub const PROFILE: Profile = Profile {
     submit_by_prompt_door: true,
     trust_markers: &[],
     start_banners: &[],
+    setup_markers: &[],
 };

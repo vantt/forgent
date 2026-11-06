@@ -14,4 +14,5 @@ pub const PROFILE: Profile = Profile {
         marker: "meet gemini",
         dismiss_key: "esc",
     }],
+    setup_markers: &[],
 };

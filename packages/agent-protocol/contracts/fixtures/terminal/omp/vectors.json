@@ -104,6 +104,33 @@
       "source": "real screen: omp started with no usable profile"
     },
     {
+      "name": "first-run-setup-wizard-needs-a-person-and-is-never-typed-at",
+      "step": "await-ready",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "launch echo",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": false,
+              "matchedRule": false,
+              "promptText": ""
+            }
+          },
+          {
+            "at": 1000,
+            "file": "setup-wizard"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "needs-human",
+        "readiness": "needs-human"
+      },
+      "source": "real screen: omp 18.11.2 started on an empty agent home, captured with `tmux capture-pane`; omp 18.17 opens the same wizard on a copied profile whose config.yml has an older setupVersion; a still wizard otherwise reads as a ready prompt"
+    },
+    {
       "name": "a-ready-screen-is-not-a-block",
       "step": "classify-blocked",
       "script": {

@@ -25,7 +25,7 @@ use std::time::{Duration, Instant};
 
 use fgos_agent_protocol::port::{AgentIo, Inspection, IoError, SendInput};
 use fgos_agent_protocol::terminal::{
-    adapter_for, ExitCommand, FsOutbox, Terminal, TerminalOutcome, UnreadableResult,
+    adapter_for, ExitCommand, FsOutbox, Readiness, Terminal, TerminalOutcome, UnreadableResult,
     REASON_AGENT_NOT_STARTED, REASON_COMPLETED_NO_EXIT, REASON_FOREGROUND_NOT_AGENT,
     REASON_RESULT_UNREADABLE,
 };
@@ -842,6 +842,15 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
         return;
     }
     if !readiness.takes_brief() {
+        if readiness == Readiness::NeedsHuman {
+            if let Some(line) = io
+                .screen()
+                .ok()
+                .and_then(|screen| adapter.setup_line(&screen))
+            {
+                eprintln!("fgos internal supervise: the agent shows a setup screen only a person can finish: {line}");
+            }
+        }
         return end_early(&mut io, &readiness.outcome());
     }
 

@@ -73,7 +73,7 @@ pub enum Readiness {
     /// The detector has no verdict; typed at without waiting.
     NoDetector,
     Blocked(BlockedReason),
-    /// A dialog that is neither a trust dialog nor a login: only a person can answer it.
+    /// A dialog that is neither a trust dialog nor a login, or a setup screen: only a person can answer it.
     NeedsHuman,
     /// The agent never reached a prompt that takes input. Nothing was typed.
     NotReady,
@@ -242,6 +242,9 @@ pub struct Profile {
     pub trust_markers: &'static [&'static str],
     /// Start banners this CLI draws over its prompt; one is dismissed before anything is typed.
     pub start_banners: &'static [StartBanner],
+    /// Lowercase wordings of a setup screen only a person can finish (a first-run wizard). Never
+    /// answered with a key and never a login: the same profile needs the person, not another account.
+    pub setup_markers: &'static [&'static str],
 }
 
 /// A start banner and the key that closes it.
@@ -311,9 +314,32 @@ impl Terminal {
             .then_some(BlockedReason::Login)
     }
 
+    /// The screen line that shows a setup screen only a person can finish, as evidence.
+    pub fn setup_line(&self, screen: &str) -> Option<String> {
+        bottom_lines(screen, 20)
+            .lines()
+            .find(|line| {
+                let lowered = line.to_lowercase();
+                self.profile
+                    .setup_markers
+                    .iter()
+                    .any(|marker| lowered.contains(marker))
+            })
+            .map(|line| line.trim().to_string())
+    }
+
+    /// What the screen alone says ends the wait for the prompt: a trust dialog or dead login is
+    /// `Blocked`, a setup screen is `NeedsHuman`.
+    fn screen_stop(&self, screen: &str) -> Option<Readiness> {
+        match self.classify_blocked(screen) {
+            Some(reason) => Some(Readiness::Blocked(reason)),
+            None => self.setup_line(screen).map(|_| Readiness::NeedsHuman),
+        }
+    }
+
     /// Why the agent has stopped on this screen: a blocking dialog, a dead login or a used-up
     /// quota. Only for the places that already know the agent stopped (an idle screen, a deadline
-    /// stop); the screen-only checks (start banner, ready gate, unruled wait) use `classify_blocked`,
+    /// stop); the screen-only checks (start banner, ready gate, unruled wait) use `screen_stop`,
     /// so quota text left in scrollback never stops a launch.
     pub fn stop_reason(&self, screen: &str) -> Option<BlockedReason> {
         self.classify_blocked(screen)
@@ -338,14 +364,14 @@ impl Terminal {
         }
     }
 
-    /// The start banner this CLI draws on the screen, if one is up and no trust dialog or dead
-    /// login is on it (those are answered by a person, never by a key press).
+    /// The start banner this CLI draws on the screen, if one is up and no trust dialog, dead
+    /// login or setup screen is on it (those are answered by a person, never by a key press).
     fn start_banner_on(&self, io: &mut dyn AgentIo) -> Option<(&'static StartBanner, String)> {
         if self.profile.start_banners.is_empty() {
             return None;
         }
         let screen = io.screen().ok()?;
-        if self.classify_blocked(&screen).is_some() {
+        if self.screen_stop(&screen).is_some() {
             return None;
         }
         let lowered = bottom_lines(&screen, 20).to_lowercase();
@@ -357,8 +383,8 @@ impl Terminal {
         Some((banner, screen))
     }
 
-    /// A ready verdict is only believed when the screen shows neither a trust
-    /// dialog nor a dead login.
+    /// A ready verdict is only believed when the screen shows no trust dialog,
+    /// dead login or setup screen.
     fn ready_gate(&self, io: &mut dyn AgentIo, verdict: Readiness) -> Readiness {
         // A dialog can open over a prompt that already looked ready (codex asks about the folder a
         // moment after its first screen), so the detector is asked again after the settle wait.
@@ -368,14 +394,10 @@ impl Terminal {
         {
             return self.blocked_readiness(io);
         }
-        match io
-            .screen()
+        io.screen()
             .ok()
-            .and_then(|screen| self.classify_blocked(&screen))
-        {
-            Some(reason) => Readiness::Blocked(reason),
-            None => verdict,
-        }
+            .and_then(|screen| self.screen_stop(&screen))
+            .unwrap_or(verdict)
     }
 
     /// Wait until the prompt is up and takes input, before the brief is typed.
@@ -451,8 +473,8 @@ impl Terminal {
                     io.pause(PROMPT_SETTLE_MS);
                     return Readiness::Unverified;
                 };
-                if let Some(reason) = self.classify_blocked(&screen) {
-                    return Readiness::Blocked(reason);
+                if let Some(stop) = self.screen_stop(&screen) {
+                    return stop;
                 }
                 if io.now_ms().saturating_sub(since) >= UNRULED_READY_MS.min(ready_ms) {
                     return Readiness::Unverified;

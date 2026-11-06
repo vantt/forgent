@@ -9,4 +9,5 @@ pub const PROFILE: Profile = Profile {
     submit_by_prompt_door: false,
     trust_markers: &["is this a project you created or one you trust"],
     start_banners: &[],
+    setup_markers: &[],
 };

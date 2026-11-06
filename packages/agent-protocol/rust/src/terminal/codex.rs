@@ -14,4 +14,5 @@ pub const PROFILE: Profile = Profile {
         "trust this folder?",
     ],
     start_banners: &[],
+    setup_markers: &[],
 };
