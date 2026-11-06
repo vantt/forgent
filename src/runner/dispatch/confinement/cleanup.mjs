@@ -3,13 +3,15 @@
 // Ensures:
 //   - Ownership markers are written before any allocation side effect is exposed.
 //   - A cleanup never removes a directory it did not create.
-//   - An attempt home is removed only by adopt's finalize-home step.
+//   - An attempt home is removed only by adopt's finalize-home step, or settled once it was held.
+//   - Where a home's renewed login goes back to, and how often its staging failed, are kept in a host-only
+//     record beside the home (outside every grant of the sandbox), never in the home itself.
 
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
-import { writeFileAtomic } from '../provider-credential-renewal.mjs';
+import { writeFileAtomic, writeBackRenewedCredential } from '../provider-credential-renewal.mjs';
 import { readAgentFileSync } from '../../../native/proof-helpers.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
@@ -195,22 +197,69 @@ function markerIsUnrecognisable(dirPath) {
   } catch { return true; }
 }
 
+// ---------------------------------------------------------------------------------------------------
+// The host-only record of an attempt home: `<tempRoot>/<dispatchId>/attempt-home.json`, beside the home in the
+// owner-only dispatch directory, which no sandbox is granted (the sandbox sees the host read-only at most, and
+// the default temp root not at all). It names the attempt, the write-back target the finalization descriptor
+// holds and the count of failed stagings. Nothing written inside the home can change it.
+// ---------------------------------------------------------------------------------------------------
+
+export const ATTEMPT_HOME_RECORD_FILE = 'attempt-home.json';
+const ATTEMPT_HOME_RECORD_CONTRACT = 'confinement-attempt-home-record.v1';
+
+const recordPathOf = (homeDir) => path.join(path.dirname(homeDir), ATTEMPT_HOME_RECORD_FILE);
+
+/** Write the host record of an attempt home (whole, atomically, 0600). Returns its path. */
+export function writeAttemptHomeRecord(homeDir, { attemptId, runDir, dispatchId, credentialWriteBack = null, credentialKept } = {}) {
+  const file = recordPathOf(homeDir);
+  writeFileAtomic(file, `${JSON.stringify({
+    contract: ATTEMPT_HOME_RECORD_CONTRACT,
+    attemptId,
+    runDir,
+    dispatchId,
+    home: homeDir,
+    credentialWriteBack,
+    ...(credentialKept ? { credentialKept } : {}),
+  }, null, 2)}\n`);
+  return file;
+}
+
 /**
- * Count one failed removal of a home whose renewed login could not be staged, in its marker. An attempt
- * close after the last counted one is not counted again, so a transient fault cannot use up the budget.
- * Returns the number of counted attempts.
+ * The host record of `homeDir`, or null when there is none of this contract for exactly that home (an older
+ * release wrote none). With `attemptId`/`runDir`, a record of another attempt is none as well.
  */
-export function countCredentialKeep(dirPath, marker, now = Date.now) {
-  const kept = marker.credentialKept;
+export function readAttemptHomeRecord(homeDir, { attemptId, runDir } = {}) {
+  let record;
+  try { record = JSON.parse(fs.readFileSync(recordPathOf(homeDir), 'utf8')); } catch { return null; }
+  if (record?.contract !== ATTEMPT_HOME_RECORD_CONTRACT || record.home !== homeDir || record.dispatchId !== path.basename(path.dirname(homeDir))) return null;
+  if ((attemptId !== undefined && record.attemptId !== attemptId) || (runDir !== undefined && record.runDir !== runDir)) return null;
+  return record;
+}
+
+/**
+ * Count one failed removal of a home whose renewed login could not be staged, in its host record (written from
+ * `fields` when the home has none yet). An attempt close after the last counted one is not counted again, so a
+ * transient fault cannot use up the budget. Returns the number of counted attempts.
+ */
+export function countCredentialKeep(homeDir, fields, now = Date.now) {
+  const record = readAttemptHomeRecord(homeDir, fields) ?? fields;
+  const kept = record.credentialKept;
   const at = now();
   const spaced = !Number.isFinite(kept?.lastCountedAt) || at - kept.lastCountedAt >= CREDENTIAL_KEEP_MIN_INTERVAL_MS;
   const attempts = (kept?.attempts ?? 0) + (spaced ? 1 : 0);
   if (spaced) {
     try {
-      extendOwnershipMarker(dirPath, { credentialKept: { attempts, since: kept?.since ?? new Date(at).toISOString(), lastCountedAt: at } });
+      writeAttemptHomeRecord(homeDir, { ...fields, credentialKept: { attempts, since: kept?.since ?? new Date(at).toISOString(), lastCountedAt: at } });
     } catch { /* the home is kept either way; the next removal counts again */ }
   }
   return attempts;
+}
+
+/** Remove an attempt home, its host record and the dispatch directory once nothing else is in it. */
+export function removeAttemptHome(homeDir, dispatchId) {
+  fs.rmSync(homeDir, { recursive: true, force: true });
+  fs.rmSync(recordPathOf(homeDir), { force: true });
+  removeEmptyDispatchParent(homeDir, dispatchId);
 }
 
 /**
@@ -268,11 +317,10 @@ export function cleanupConfinementResource(dirPath, dispatchId) {
 }
 
 /**
- * Private homes under `tempRoot` that were kept because their renewed login could not be staged
- * (`credentialKept` in the marker). Read-only; counts, times and the home directory, never a value. The
- * marker is written inside the home, so nothing in it names an account or a store here: it would be the
- * agent's word. `held` homes have used up CREDENTIAL_KEEP_MAX_ATTEMPTS and are no longer retried; nothing
- * settles one by itself, the owner recovers its login by hand.
+ * Private homes under `tempRoot` that were kept because their renewed login could not be staged. Read-only;
+ * counts, times, the home directory and its host `record` (null for a home an older release counted in its
+ * marker: such a home names no store anyone may trust, and is recovered by hand), never a value. `held` homes
+ * have used up CREDENTIAL_KEEP_MAX_ATTEMPTS and are no longer retried by their attempt.
  */
 export function listKeptCredentialHomes(tempRoot) {
   const found = [];
@@ -288,18 +336,46 @@ export function listKeptCredentialHomes(tempRoot) {
       }
     } catch { /* vanished meanwhile */ }
     for (const cand of candidates) {
-      const marker = readOwnershipMarker(cand) ?? readAttemptOwnershipMarker(cand);
-      const attempts = marker?.credentialKept?.attempts;
+      const record = readAttemptHomeRecord(cand);
+      const kept = record ? record.credentialKept : (readOwnershipMarker(cand) ?? readAttemptOwnershipMarker(cand))?.credentialKept;
+      const attempts = kept?.attempts;
       if (!Number.isInteger(attempts) || attempts < 1) continue;
-      found.push({
-        dir: cand,
-        attempts,
-        held: attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS,
-        since: marker.credentialKept.since ?? marker.createdAt ?? null,
-      });
+      found.push({ dir: cand, attempts, held: attempts >= CREDENTIAL_KEEP_MAX_ATTEMPTS, since: kept.since ?? null, record });
     }
   }
   return found;
+}
+
+/**
+ * Settle the held homes under `tempRoots` whose host record says where their login goes: the login is staged
+ * beside the account's store (`writeBackRenewedCredential`, which never applies it; the next refresh-ahead
+ * applies it after the probe), or proven no newer, and the home is removed. A home without a record, or whose
+ * staging still fails, stays held. `unretriedRoots`: roots no attempt retries by itself, where a kept home
+ * counts as held. Never throws; returns `{settled, held}` as counts.
+ */
+export function settleHeldCredentialHomes({ tempRoots = [resolveConfinementTempRoot()], unretriedRoots = [] } = {}) {
+  let settled = 0;
+  let held = 0;
+  const seen = new Set();
+  const unretried = new Set(unretriedRoots.map(canonicalRoot));
+  for (const root of tempRoots) {
+    for (const home of listKeptCredentialHomes(root)) {
+      // A root nested inside another is listed twice; a home is looked at once.
+      const dir = path.join(canonicalRoot(path.dirname(home.dir)), path.basename(home.dir));
+      if (seen.has(dir)) continue;
+      seen.add(dir);
+      if (!home.held && !unretried.has(canonicalRoot(root))) continue;
+      try {
+        if (home.record && writeBackRenewedCredential(home.dir, home.record.credentialWriteBack ?? undefined).status !== 'failed') {
+          removeAttemptHome(home.dir, home.record.dispatchId);
+          settled += 1;
+          continue;
+        }
+      } catch { /* it stays; the next pass retries */ }
+      held += 1;
+    }
+  }
+  return { settled, held };
 }
 
 /**

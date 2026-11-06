@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import * as cleanup from '../cleanup.mjs';
-import { cleanupConfinementResource, writeOwnershipMarker, ensurePrivateDir } from '../cleanup.mjs';
+import { cleanupConfinementResource, writeOwnershipMarker, ensurePrivateDir, writeAttemptHomeRecord } from '../cleanup.mjs';
 import { copyCredentialFiles, credentialWriteBackTarget } from '../../provider-credential-renewal.mjs';
 import { expandCredentialHome } from '../../provider-capacity.mjs';
 import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
@@ -551,6 +551,7 @@ export function prepareBwrapSync(plan, request, backend) {
   assertAttestationStoreIsolated(request.context, plan.resources || []);
 
   const allocatedPaths = [];
+  const writtenRecords = [];
   let credentialProvisioned = false;
   let credentialWriteBack = null;
 
@@ -613,6 +614,9 @@ export function prepareBwrapSync(plan, request, backend) {
           // Only an attempt home is written back: its finalize-home step is the one removal that reads the
           // descriptor; a dispatch outside the assignment door removes its home without write-back.
           if (provisioned && attemptId) credentialWriteBack = credentialWriteBackOf(request);
+          // The host's own record beside the home, outside every grant: what a later settle of a held home
+          // reads instead of anything the agent could write.
+          if (attemptId) writtenRecords.push(writeAttemptHomeRecord(res.hostTarget, { attemptId, runDir: request.context?.runDir, dispatchId: request.dispatchId, credentialWriteBack }));
         }
       }
 
@@ -703,7 +707,8 @@ export function prepareBwrapSync(plan, request, backend) {
       cleanup,
     };
   } catch (err) {
-    // On prepare error: clean up any allocated resources before throwing
+    // On prepare error: clean up any allocated resources and host records before throwing
+    for (const file of writtenRecords) fs.rmSync(file, { force: true });
     for (const p of allocatedPaths) {
       try {
         cleanupConfinementResource(p, request.dispatchId);

@@ -238,18 +238,25 @@ function homeOf(w, runDir, { marker = {}, renewed = true } = {}) {
   return { home, source, runtimeDir };
 }
 
-test('finalize-home after a timeout writes the renewed login back to its account and removes the home', async () => {
+/** The renewed logins staged beside an account's store, waiting for the probe of the next refresh-ahead. */
+const stagedRefreshes = (runtimeDir) => {
+  const pending = path.join(providerAccountDir(runtimeDir, 'xai', 'acct'), 'pending');
+  return (fs.existsSync(pending) ? fs.readdirSync(pending) : []).map((name) => readPi(path.join(pending, name)).xai.refresh);
+};
+
+test('finalize-home after a timeout stages the renewed login beside its account and removes the home', async () => {
   const w = workspace();
   try {
     const { runDir, envelope } = attempt(w, { receipt: { outcome: 'timeout', gateExit: gateExit({ exitCode: null, signal: 'SIGKILL', stoppedBy: 'idle' }) } });
-    const { home, source } = homeOf(w, runDir);
+    const { home, source, runtimeDir } = homeOf(w, runDir);
     assert.equal(fs.existsSync(envelope.sideFile), true);
     const done = await run('finalize-home', w, runDir);
     assert.equal(done.exit, 0, JSON.stringify(done.out));
     assert.equal(fs.existsSync(envelope.sideFile), false, 'the attempt secrets are removed once the home is finalized');
     assert.equal(done.out.detail.homes, 1);
     assert.equal(fs.existsSync(home), false);
-    assert.equal(readPi(source).xai.refresh, NEW.refresh, 'the account source received the renewed login');
+    assert.deepEqual(stagedRefreshes(runtimeDir), [NEW.refresh], 'the renewed login waits beside the account');
+    assert.equal(readPi(source).xai.refresh, OLD.refresh, 'it is applied only by a refresh-ahead, after the probe');
     const descriptor = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'confinement-finalization', 'cmd-1.json'), 'utf8'));
     assert.equal(descriptor.cleanupState, 'cleaned');
     assert.equal((await run('finalize-home', w, runDir)).exit, 0, 'running it again is harmless');
@@ -265,13 +272,13 @@ test('finalize-home writes back only where the descriptor says: a marker in the 
     writePi(victim, piDoc(Date.now() + 10 * 60 * 1000, OLD));
     const victimBefore = fs.readFileSync(path.join(victim, 'auth.json'), 'utf8');
     const planted = credentialWriteBackTarget({ provider: 'xai', accountId: 'acct', credentialSource: { kind: 'home-files', home: victim, files: ['auth.json'] }, runtimeDir: path.join(w.root, 'victim-runtime') });
-    const { home, source } = homeOf(w, runDir, { marker: { credentialWriteBack: planted } });
+    const { home, runtimeDir } = homeOf(w, runDir, { marker: { credentialWriteBack: planted } });
     const done = await run('finalize-home', w, runDir);
     assert.equal(done.exit, 0, JSON.stringify(done.out));
     assert.equal(fs.existsSync(home), false);
     assert.equal(fs.readFileSync(path.join(victim, 'auth.json'), 'utf8'), victimBefore, 'the store the marker names is untouched');
     assert.equal(fs.existsSync(path.join(w.root, 'victim-runtime')), false, 'nothing was staged beside it');
-    assert.equal(readPi(source).xai.refresh, NEW.refresh, 'the login went to the store the descriptor names');
+    assert.deepEqual(stagedRefreshes(runtimeDir), [NEW.refresh], 'the login went to the store the descriptor names');
   } finally { w.cleanup(); }
 });
 
@@ -296,26 +303,28 @@ test('finalize-home stops retrying after the kept-home budget: a named outcome, 
   const w = workspace();
   try {
     const { runDir } = attempt(w, { receipt: { outcome: 'timeout', gateExit: gateExit({ exitCode: null, signal: 'SIGKILL', stoppedBy: 'idle' }) } });
-    const { home, runtimeDir } = homeOf(w, runDir);
+    // What the agent could plant in its own marker: a spent budget. It is not read.
+    const { home, runtimeDir } = homeOf(w, runDir, { marker: { credentialKept: { attempts: 99, lastCountedAt: Date.now() } } });
     const accountDir = providerAccountDir(runtimeDir, 'xai', 'acct');
     fs.mkdirSync(accountDir, { recursive: true });
     fs.writeFileSync(path.join(accountDir, 'pending'), 'in the way');
-    const markerFile = path.join(home, '.fgos-confinement-owner.json');
-    const counted = () => JSON.parse(fs.readFileSync(markerFile, 'utf8')).credentialKept;
+    // The count lives in the host's record beside the home, never in the marker the agent can rewrite.
+    const recordFile = path.join(path.dirname(home), 'attempt-home.json');
+    const counted = () => JSON.parse(fs.readFileSync(recordFile, 'utf8')).credentialKept;
     // Two runs closer together than the spacing count once.
     assert.equal((await run('finalize-home', w, runDir)).exit, 75);
     assert.equal((await run('finalize-home', w, runDir)).exit, 75);
     assert.equal(counted().attempts, 1);
     for (let attempts = 2; attempts < 5; attempts += 1) {
-      const marker = JSON.parse(fs.readFileSync(markerFile, 'utf8'));
-      marker.credentialKept.lastCountedAt -= 60 * 60 * 1000;
-      fs.writeFileSync(markerFile, JSON.stringify(marker));
+      const record = JSON.parse(fs.readFileSync(recordFile, 'utf8'));
+      record.credentialKept.lastCountedAt -= 60 * 60 * 1000;
+      fs.writeFileSync(recordFile, JSON.stringify(record));
       assert.equal((await run('finalize-home', w, runDir)).exit, 75, `attempt ${attempts}`);
       assert.equal(counted().attempts, attempts);
     }
-    const marker = JSON.parse(fs.readFileSync(markerFile, 'utf8'));
-    marker.credentialKept.lastCountedAt -= 60 * 60 * 1000;
-    fs.writeFileSync(markerFile, JSON.stringify(marker));
+    const record = JSON.parse(fs.readFileSync(recordFile, 'utf8'));
+    record.credentialKept.lastCountedAt -= 60 * 60 * 1000;
+    fs.writeFileSync(recordFile, JSON.stringify(record));
     const held = await run('finalize-home', w, runDir);
     assert.equal(held.exit, 0, JSON.stringify(held.out));
     assert.equal(held.out.detail.outcome, 'credential-home-held');

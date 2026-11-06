@@ -22,6 +22,7 @@ import {
   ensureSessionSocketDir,
   resolveClaudeSocketBase,
   resolveMachinePrivateRoots,
+  machineLoginStores,
   runtimeDirForMask,
   isInsideRoot,
 } from '../../src/runner/dispatch/confinement/resources.mjs';
@@ -133,8 +134,8 @@ test('every confined launch sets the one marker variable the Config session clas
   assert.match(rustSource, new RegExp(`pub const CONFINED_MARKER: &str = "${CONFINED_MARKER_ENV}";`), 'the crate and the driver name the same variable');
 });
 
-test('the machine-private roots are data in the contract: the private directory, the user runtime directory, the Claude Code session sockets and herdr\'s sockets', () => {
-  assert.deepEqual([...MACHINE_PRIVATE_ROOTS], ['{home}/.fgos/private', '{runtimeDir}', '{claudeSocketBase}/cc-socks', '{home}/.config/herdr', '{xdgConfigHome}/herdr', '{herdrSocketDir}']);
+test('the machine-private roots are data in the contract: the private directory, the user runtime directory, the Claude Code session sockets, herdr\'s sockets and the login stores', () => {
+  assert.deepEqual([...MACHINE_PRIVATE_ROOTS], ['{home}/.fgos/private', '{runtimeDir}', '{claudeSocketBase}/cc-socks', '{home}/.config/herdr', '{xdgConfigHome}/herdr', '{herdrSocketDir}', '{loginStore}']);
   // herdr's layout is herdr's: the terminal-control herdr driver reads the same directory under the home.
   const driver = fs.readFileSync(new URL('../../packages/terminal-control/rust/src/driver/herdr.rs', import.meta.url), 'utf8');
   assert.match(driver, /\.join\("\.config"\)\s*\.join\("herdr"\)/, 'the herdr driver and the list name the same directory');
@@ -176,8 +177,8 @@ test('the session socket directory is created owner-only in a base this user own
 });
 
 test('a machine-private root resolves from the injected home and is skipped when absent or not a directory', () => {
-  // No runtime directory and no herdr socket of the caller: the session socket directory stands on its own.
-  const roots = (host, extra = {}) => resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath: null, ...extra });
+  // No runtime directory, no herdr socket of the caller and no login store: the session socket directory stands on its own.
+  const roots = (host, extra = {}) => resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath: null, loginStores: [], ...extra });
   const host = makeHost();
   assert.deepEqual(roots(host), [host.privateDir]);
 
@@ -265,6 +266,31 @@ test('a herdr socket whose directory is the home, the config directory, /tmp or 
   }
   const ownDir = path.join('/tmp', `fgos-herdr-own-${process.pid}`);
   assert.doesNotThrow(() => roots(path.join(ownDir, 'herdr.sock')), 'a directory of its own under /tmp is fine');
+});
+
+// Nothing else proves which directories count as login stores, nor that a store that cannot be masked as one stops
+// the launch instead of leaving that login readable.
+test('every login store the inventory and the executors name is masked, and one that is relative, a file or the home is refused by name', async () => {
+  const host = makeHost({ withPrivate: false });
+  const named = path.join(host.home, '.stand-in-pi');
+  const ownCodex = path.join(host.root, 'own-codex');
+  for (const dir of [named, ownCodex, path.join(host.home, '.pi', 'agent')]) fs.mkdirSync(dir, { recursive: true });
+  writeAccountsFile(path.join(host.home, '.fgos'), { llmAccounts: { xai: { standin: { credentialStore: { pi: '~/.stand-in-pi' } } } } });
+  await withHome(host, () => {
+    // The bundled executors read their logins through CODEX_HOME and PI_CODING_AGENT_DIR: the runner's own value
+    // is the store, else the CLI's default under the home.
+    const stores = machineLoginStores({ homeDir: host.home, env: { CODEX_HOME: ownCodex } });
+    for (const dir of [named, ownCodex, path.join(host.home, '.pi', 'agent'), path.join(host.home, '.omp', 'agent')]) assert.ok(stores.includes(dir), dir);
+    assert.equal(stores.includes(path.join(host.home, '.codex')), false, 'the runner\'s CODEX_HOME replaces the default');
+    const roots = resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath: null, loginStores: stores });
+    assert.deepEqual(roots.sort(), [host.privateDir, named, ownCodex, path.join(host.home, '.pi', 'agent')].sort(), 'each store that exists is masked, an absent one is skipped');
+  });
+  const file = path.join(host.root, 'a-file');
+  fs.writeFileSync(file, '');
+  const refusal = (loginStores) => resolveMachinePrivateRoots({ homeDir: host.home, claudeSocketBase: host.claudeSocketBase, xdgRuntimeDir: null, xdgConfigHome: null, herdrSocketPath: null, loginStores });
+  for (const [store, code] of [['relative/login', 'login-store-not-a-directory'], [file, 'login-store-not-a-directory'], [host.home, 'login-store-is-home'], [host.root, 'login-store-is-home']]) {
+    assert.throws(() => refusal([store]), (e) => e.code === code, store);
+  }
 });
 
 test('herdr\'s directory under $XDG_CONFIG_HOME is masked too, where herdr moves its sockets when that is set', () => {

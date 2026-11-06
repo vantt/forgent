@@ -9,8 +9,10 @@
 //                  once inside a scratch copy that fgOS owns, under the account lock, and apply the new
 //                  entry to the real store. The real store is never made to look expired, so the owner's
 //                  own CLI does not renew because of us, and a failed renewal leaves it untouched.
-//   write-back     When a private home is removed, a login a pane renewed inside it is applied to the
-//                  source, or staged beside it for the next refresh-ahead when the account lock is busy.
+//   write-back     When a private home is removed, a login a pane renewed inside it is staged beside the
+//                  source as a copy of agent origin. The agent could have put any login there, so the next
+//                  refresh-ahead applies it only once the credential probe accepts it and it names the
+//                  leased account (each layout's `identity`); a login that names no account is kept for the owner.
 //
 // Applying is always compare-before-write: only an entry whose expiry is strictly later than the source's
 // and whose refresh token is a different one replaces it (a fresh renewal result must also still be in the
@@ -253,11 +255,15 @@ function isReplacement(copyEntry, sourceEntry, { now, requireFuture }) {
     && refreshDiffers(copyEntry.refresh, sourceEntry.refresh);
 }
 
+const nonEmpty = (value) => (typeof value === 'string' && value !== '' ? value : null);
+
 // pi: `auth.json`, an object keyed by provider id; an `oauth` entry carries `expires` (ms, or seconds when
-// below 1e12). An API key entry has no expiry and is not renewable here.
+// below 1e12). An API key entry has no expiry and is not renewable here. The account an entry belongs to is its
+// `accountId`, which pi keeps for the providers that name one.
 const piLayout = {
   name: 'pi-auth-json',
   files: ['auth.json'],
+  identity: (entry) => nonEmpty(entry.value?.accountId),
   read(home, { agent } = {}) {
     const parsed = readJsonFile(path.join(home, 'auth.json'), { agent });
     if (!parsed.ok) return parsed;
@@ -325,10 +331,13 @@ function writeIfUnchanged(file, expectedRaw, content) {
 }
 
 // Codex: `auth.json` with `tokens.access_token` (a JWT whose `exp` says when it expires) and
-// `last_refresh`. Renewal replaces `tokens` and `last_refresh` together.
+// `last_refresh`. Renewal replaces `tokens` and `last_refresh` together. The account is the access token's
+// ChatGPT account claim, which the provider checked when the probe used the token.
+const CODEX_AUTH_CLAIM = 'https://api.openai.com/auth';
 const codexLayout = {
   name: 'codex-auth-json',
   files: ['auth.json'],
+  identity: (entry) => nonEmpty(jwtPayload(entry.value?.tokens?.access_token)?.payload?.[CODEX_AUTH_CLAIM]?.chatgpt_account_id),
   read(home, { agent } = {}) {
     const parsed = readJsonFile(path.join(home, 'auth.json'), { agent });
     if (!parsed.ok) return parsed;
@@ -414,9 +423,15 @@ function ompEntries(db) {
   return entries;
 }
 
+// The account of an omp row is the `accountId` in its data, which omp keeps for the providers that name one.
+function ompIdentity(entry) {
+  try { return nonEmpty(JSON.parse(entry.value?.data)?.accountId); } catch { return null; }
+}
+
 const ompLayout = {
   name: 'omp-agent-db',
   files: ['agent.db'],
+  identity: ompIdentity,
   // Written beside the store while it is open. A login renewed after the last checkpoint lives only in the
   // write-ahead log. A hot rollback journal holds the pages as they were before the transaction, so it is kept
   // for the files it guards, not for a newer login: a copy staged with one stays for hand recovery. The
@@ -702,6 +717,11 @@ function listLeftovers(accountDir) {
 
 const hasLeftovers = (accountDir) => listLeftovers(accountDir).length > 0;
 
+// A pending copy staged from an agent's private home carries this in its name (host-only: the pending directory
+// is outside every grant of the sandbox). Only the probe gate applies it (applyAgentCopies).
+const AGENT_ORIGIN = 'agent';
+const isAgentCopy = (dir) => new RegExp(`^\\d{15}-${AGENT_ORIGIN}-`).test(path.basename(dir));
+
 /**
   * Login stores whose pending copies exceed MAX_PENDING_COPIES, `[{provider, accountId, store, count, storeDir,
   * stranded}]` (`store`: the CLI of a per-CLI store, null for an account's single store). Nothing is
@@ -877,7 +897,8 @@ export function inspectRetainedCredentialCopies({ runtimeDir, now = Date.now(), 
       const ageMs = now - at;
       const torn = path.basename(path.dirname(dir)) === TORN_DIR;
       const staging = STAGING_NAME.test(name);
-      if (ageMs >= minAgeMs || torn || staging || stranded) found.push({ provider, accountId, kind: torn ? 'torn' : staging ? 'staging' : staged ? 'pending' : 'scratch', ageMs, storeDir, stranded });
+      const kind = torn ? 'torn' : staging ? 'staging' : isAgentCopy(dir) ? 'agent' : staged ? 'pending' : 'scratch';
+      if (ageMs >= minAgeMs || torn || staging || stranded) found.push({ provider, accountId, kind, ageMs, storeDir, stranded });
     }
   }
   return found;
@@ -982,13 +1003,14 @@ function capPendingCopies(accountDir, layout, loadSqlite) {
 }
 
 /**
- * Apply (see applyRenewedCredential, without the future-expiry rule) and remove every leftover that the
- * source proves is not newer or that is unusable itself. A leftover is kept when the source could not
- * answer (unreadable, entry unidentified, busy, SQLite unavailable). Returns `[{dir, status}]`.
+ * Apply (see applyRenewedCredential, without the future-expiry rule) and remove every leftover fgOS renewed
+ * itself that the source proves is not newer or that is unusable itself. A leftover is kept when the source
+ * could not answer (unreadable, entry unidentified, busy, SQLite unavailable). A copy of agent origin is left to
+ * applyAgentCopies. Returns `[{dir, status}]`.
  */
 function applyLeftovers({ accountDir, layoutName, provider, sourceHome, now, loadSqlite }) {
   const outcomes = [];
-  for (const dir of listLeftovers(accountDir)) {
+  for (const dir of listLeftovers(accountDir).filter((d) => !isAgentCopy(d))) {
     let keep = false;
     let status;
     try {
@@ -1025,6 +1047,63 @@ function recordFailure(accountDir, reason, now) {
 
 function clearFailure(accountDir) {
   try { fs.rmSync(path.join(accountDir, COOLDOWN_FILE), { force: true }); } catch { /* nothing to clear */ }
+}
+
+// ---------------------------------------------------------------------------------------------------
+// Copies of agent origin: the probe gate
+// ---------------------------------------------------------------------------------------------------
+
+/**
+ * Whether the copy's login is the source's account: true or false when both name their account (the layout's `identity`
+ * of the dispatched provider's entry), null when either cannot.
+ */
+function sameAccount({ layout, provider, sourceHome, copyHome, loadSqlite }) {
+  if (typeof layout.identity !== 'function') return null;
+  const source = layout.read(sourceHome, { loadSqlite });
+  const copy = layout.read(copyHome, { loadSqlite, agent: true });
+  if (!source.ok || !copy.ok) return null;
+  const selected = selectProviderEntry(source.entries, provider);
+  const next = selected.ok ? copy.entries.find((entry) => entry.key === selected.entry.key) : undefined;
+  const want = selected.ok ? layout.identity(selected.entry) : null;
+  const got = next ? layout.identity(next) : null;
+  return want === null || got === null ? null : want === got;
+}
+
+const dropCopy = (dir) => { try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* the next holder retries */ } };
+
+/**
+ * Apply the copies staged from agents' private homes, under the account lock the caller holds. A copy the source
+ * proves no newer goes; one that names another account goes unapplied (`credential-copy-refused`); one whose
+ * login names no account, or that the source cannot judge, stays for the owner. Any other copy is applied only
+ * after the credential probe, run against the copy itself, accepts it and it still names the leased account;
+ * a failed probe keeps the copy and cools the account down.
+ */
+async function applyAgentCopies({ accountDir, layout, layoutName, provider, credentialSource, home, lock, probeTimeoutMs, cooldownMs, spawnFn, env, loadSqlite, now }) {
+  for (const dir of listLeftovers(accountDir).filter(isAgentCopy)) {
+    const verdict = judgeCopy({ layout, provider, sourceHome: home, copyHome: dir, now: now(), loadSqlite });
+    if (verdict === 'not-newer') { dropCopy(dir); continue; }
+    if (verdict !== 'newer') continue;
+    const before = sameAccount({ layout, provider, sourceHome: home, copyHome: dir, loadSqlite });
+    if (before === false) {
+      dropCopy(dir);
+      process.stderr.write('fgos: credential-copy-refused (account-mismatch)\n');
+      continue;
+    }
+    if (before === null || inCooldown(accountDir, cooldownMs, now())) continue;
+    const plan = withKillTimeout(credentialProbeCommand({ ...credentialSource, home: dir }), probeTimeoutMs, env);
+    const probe = plan ? await runCredentialProbe(plan, { spawnFn: spawnFn ?? lock.spawnHolding, timeoutMs: probeTimeoutMs, env }) : { ok: false };
+    if (!probe.ok) {
+      recordFailure(accountDir, 'agent-copy-probe-failed', now());
+      continue;
+    }
+    // The call may have renewed the copy in place: what is applied is checked again.
+    if (sameAccount({ layout, provider, sourceHome: home, copyHome: dir, loadSqlite }) !== true) continue;
+    let applied;
+    try {
+      applied = applyRenewedCredential({ layoutName, sourceHome: home, copyHome: dir, provider, requireFuture: false, now: now(), loadSqlite });
+    } catch { continue; }
+    if (applied.status !== 'apply-deferred') dropCopy(dir);
+  }
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -1090,6 +1169,7 @@ export async function refreshAhead({
       return { status: 'skipped', reason: 'lock-busy' };
     }
     try {
+      await applyAgentCopies({ accountDir, layout, layoutName, provider, credentialSource, home, lock, probeTimeoutMs, cooldownMs, spawnFn, env, loadSqlite, now });
       applyLeftovers({ accountDir, layoutName, provider, sourceHome: home, now: now(), loadSqlite });
       const source = layout.read(home, { loadSqlite });
       if (!source.ok) return { status: 'skipped', reason: source.code };
@@ -1210,9 +1290,12 @@ function validWriteBack(value) {
 /**
  * Called just before a private home is deleted. `writeBack` is the target the host recorded for the home
  * (`credentialWriteBackTarget`), never anything read from inside the home; the home's own files are read
- * only through the agent-file door. When the home holds a login newer than the source's, stage a copy
- * beside the source and apply it under the account lock (tried once, never waited for; if busy, the next refresh-ahead applies it). Never throws. Returns
- * `{status: 'none'|'unchanged'|'applied'|'staged'|'failed', code?, keepHome?}` (`keepHome`: no copy is safe in the pending copies yet and the home may hold the only good pair, so it must not be removed; `staged`: the copy is kept for the next holder of the account lock, because the lock was busy or the source could not say whether the copy is newer); `code` is a fixed word.
+ * only through the agent-file door. When the home holds a login newer than the source's, stage a copy of
+ * agent origin beside the source; it is never applied here (the next refresh-ahead applies it after the probe).
+ * When the account lock is free (tried once, never waited for), redundant pending copies are dropped
+ * (capPendingCopies). Never throws. Returns `{status: 'none'|'unchanged'|'staged'|'failed', code?,
+ * keepHome?}` (`keepHome`: no copy is safe in the pending copies yet and the home may hold the only good pair, so
+ * it must not be removed); `code` is a fixed word.
  */
 export function writeBackRenewedCredential(homeDir, writeBack, { loadSqlite = defaultLoadSqlite, now = Date.now, tryLock = tryAcquireAccountLock } = {}) {
   if (writeBack === undefined || writeBack === null) return { status: 'none' };
@@ -1229,7 +1312,7 @@ export function writeBackRenewedCredential(homeDir, writeBack, { loadSqlite = de
     const pendingDir = path.join(accountDir, PENDING_DIR);
     const staging = path.join(pendingDir, `.tmp-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
     fs.mkdirSync(staging, { recursive: true, mode: 0o700 });
-    const final = path.join(pendingDir, `${String(now()).padStart(15, '0')}-${path.basename(staging).slice(5)}`);
+    const final = path.join(pendingDir, `${String(now()).padStart(15, '0')}-${AGENT_ORIGIN}-${path.basename(staging).slice(5)}`);
     try {
       layout.stage(homeDir, staging, { loadSqlite });
       // On disk before the rename, and the rename on disk before the home may go.
@@ -1241,18 +1324,12 @@ export function writeBackRenewedCredential(homeDir, writeBack, { loadSqlite = de
       return { status: 'failed', code: err?.message === 'sqlite-unavailable' ? 'sqlite-unavailable' : 'stage-failed', keepHome: true };
     }
     safe = true;
-
     const lock = tryLock({ runtimeDir: writeBack.runtimeDir, provider: writeBack.provider, accountId: writeBack.accountId });
-    if (!lock) return { status: 'staged' };
-    let outcomes;
-    try {
-      outcomes = applyLeftovers({ accountDir, layoutName: writeBack.layout, provider: writeBack.provider, sourceHome: writeBack.home, now: now(), loadSqlite });
-    } finally {
-      try { lock.release(); } catch { /* the staged copy is already safe */ }
+    if (lock) {
+      try { capPendingCopies(accountDir, layout, loadSqlite); } finally { try { lock.release(); } catch { /* the staged copy is already safe */ } }
     }
-    if (fs.existsSync(final)) return { status: 'staged' };
-    return { status: outcomes.find((outcome) => outcome.dir === final)?.status === 'applied' ? 'applied' : 'unchanged' };
+    return { status: 'staged' };
   } catch {
-    return safe ? { status: 'failed', code: 'write-back-failed' } : { status: 'failed', code: 'write-back-failed', keepHome: true };
+    return safe ? { status: 'staged' } : { status: 'failed', code: 'write-back-failed', keepHome: true };
   }
 }

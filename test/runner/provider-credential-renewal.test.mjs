@@ -68,11 +68,13 @@ function workspace() {
 }
 
 const b64 = (value) => Buffer.from(JSON.stringify(value)).toString('base64url');
-const fakeJwt = (expMs, marker = 'x') => `${b64({ alg: 'none' })}.${b64({ exp: Math.floor(expMs / 1000), marker })}.FAKE-SIGNATURE`;
+const fakeJwt = (expMs, marker = 'x', claims = {}) => `${b64({ alg: 'none' })}.${b64({ exp: Math.floor(expMs / 1000), marker, ...claims })}.FAKE-SIGNATURE`;
+// The ChatGPT account claim a Codex access token carries.
+const codexAccountClaim = (account) => ({ 'https://api.openai.com/auth': { chatgpt_account_id: account } });
 
 // pi: auth.json keyed by provider id
-const piDoc = (expiresMs, { access = FAKE.oldAccess, refresh = FAKE.oldRefresh } = {}) => ({
-  xai: { type: 'oauth', access, refresh, expires: expiresMs },
+const piDoc = (expiresMs, { access = FAKE.oldAccess, refresh = FAKE.oldRefresh, accountId } = {}) => ({
+  xai: { type: 'oauth', access, refresh, expires: expiresMs, ...(accountId ? { accountId } : {}) },
   openrouter: { type: 'api_key', key: FAKE.other },
 });
 const writePi = (dir, doc) => { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'auth.json'), `${JSON.stringify(doc, null, 2)}\n`); };
@@ -720,6 +722,10 @@ test('prepare hands the write-back target of an opted-in attempt home to the hos
     });
     assert.equal(FAKE_FRAGMENTS.some((f) => JSON.stringify(preparedOpted.credentialWriteBack).includes(f)), false);
     markerHasNoTarget(opted.home);
+    // The host's own record of the attempt home sits beside it, outside the home, and names the same target.
+    const record = JSON.parse(fs.readFileSync(path.join(path.dirname(opted.home), 'attempt-home.json'), 'utf8'));
+    assert.deepEqual({ attemptId: record.attemptId, home: record.home, credentialWriteBack: record.credentialWriteBack }, { attemptId: 'att-opted', home: opted.home, credentialWriteBack: preparedOpted.credentialWriteBack });
+    assert.equal(fs.statSync(path.join(path.dirname(opted.home), 'attempt-home.json')).mode & 0o777, 0o600);
   } finally { w.cleanup(); }
 });
 
@@ -732,8 +738,8 @@ const markerOf = (dir) => JSON.parse(fs.readFileSync(path.join(dir, OWNERSHIP_MA
 const targets = new Map();
 const targetOf = (dir) => targets.get(dir);
 
-function privateHomeWithRenewedLogin(w, { writeBack = true, dispatchId = 'disp_wb', accountHomeExpiryMs = Date.now() + 10 * 60 * 1000 } = {}) {
-  writePi(w.home, piDoc(accountHomeExpiryMs));
+function privateHomeWithRenewedLogin(w, { writeBack = true, dispatchId = 'disp_wb', accountHomeExpiryMs = Date.now() + 10 * 60 * 1000, accountId } = {}) {
+  writePi(w.home, piDoc(accountHomeExpiryMs, { accountId }));
   const dir = path.join(w.tmp, 'fgos-confinement', dispatchId, 'home');
   fs.mkdirSync(dir, { recursive: true });
   writeOwnershipMarker(dir, { dispatchId });
@@ -761,27 +767,42 @@ test('a dispatch home outside the assignment door is removed without write-back,
   } finally { w.cleanup(); }
 });
 
-test('a busy account lock stages the copy instead of waiting; the next refresh-ahead applies it', async () => {
+const agentCopies = (w) => fs.readdirSync(path.join(w.accountDir, 'pending')).filter((n) => /^\d{15}-agent-/.test(n));
+
+// A login renewed inside a private home is the agent's word: write-back stages it and never applies it, and only
+// the next refresh-ahead does, after the probe ran against the copy itself and the copy names the leased account.
+test('a login renewed in a private home is staged at write-back, and applied by the next refresh-ahead once the probe accepts it and it names the leased account', async () => {
   const w = workspace();
   try {
-    const dir = privateHomeWithRenewedLogin(w);
-    const held = tryAcquireAccountLock({ runtimeDir: w.runtimeDir, provider: 'xai', accountId: 'acct' });
-    assert.ok(held);
-    const started = Date.now();
+    const dir = privateHomeWithRenewedLogin(w, { accountId: 'FAKE-ACCOUNT-LEASED' });
     assert.deepEqual(writeBackRenewedCredential(dir, targetOf(dir)), { status: 'staged' });
-    assert.ok(Date.now() - started < 1000, 'the write-back did not wait for the lock');
-    assert.equal(readPi(w.home).xai.refresh, FAKE.oldRefresh, 'not applied while the lock is held');
-    const pending = fs.readdirSync(path.join(w.accountDir, 'pending'));
-    assert.equal(pending.length, 1);
-    held.release();
+    assert.equal(readPi(w.home).xai.refresh, FAKE.oldRefresh, 'nothing is applied at write-back, even with the lock free');
+    const [copy] = agentCopies(w);
+    assert.ok(copy, 'the copy is staged as one of agent origin');
 
-    const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi' });
+    const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi', behaviour: () => {} });
     const result = await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+    assert.deepEqual(starts.map((s) => s.homeDir), [path.join(w.accountDir, 'pending', copy)], 'the probe ran once, against the copy');
     assert.equal(result.status, 'fresh');
-    assert.equal(starts.length, 0);
     assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
-    assert.deepEqual(fs.readdirSync(path.join(w.accountDir, 'pending')), []);
+    assert.deepEqual(agentCopies(w), []);
   } finally { w.cleanup(); }
+});
+
+test('a login renewed in a private home is never applied while it names no account, or while the probe rejects it', async () => {
+  for (const [accountId, probe, why] of [[undefined, {}, 'names no account'], ['FAKE-ACCOUNT-LEASED', { output: 'Error: 401 Unauthorized', exitCode: 1 }, 'the probe rejects it']]) {
+    const w = workspace();
+    try {
+      const dir = privateHomeWithRenewedLogin(w, { accountId });
+      assert.deepEqual(writeBackRenewedCredential(dir, targetOf(dir)), { status: 'staged' });
+      const { spawnFn, starts } = fakeSpawn({ layoutName: 'pi', behaviour: () => {}, ...probe });
+      await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
+      const probed = starts.filter((s) => s.homeDir.startsWith(path.join(w.accountDir, 'pending'))).length;
+      assert.equal(probed, accountId ? 1 : 0, `probes of the copy when it ${why}`);
+      assert.equal(readPi(w.home).xai.refresh, FAKE.oldRefresh, `applied although it ${why}`);
+      assert.equal(agentCopies(w).length, 1, `the copy is kept for the owner when it ${why}`);
+    } finally { w.cleanup(); }
+  }
 });
 
 test('a home that holds nothing newer, or an unreadable copy, writes nothing and stages nothing', () => {
@@ -796,23 +817,6 @@ test('a home that holds nothing newer, or an unreadable copy, writes nothing and
     assert.deepEqual(writeBackRenewedCredential(dir, marker), { status: 'unchanged' });
     assert.deepEqual(writeBackRenewedCredential(dir, undefined), { status: 'none' });
     assert.equal(fs.existsSync(w.accountDir), false);
-  } finally { w.cleanup(); }
-});
-
-test('an omp copy renewed inside a pane is written back as a row update', () => {
-  const w = workspace();
-  try {
-    const holder = writeOmp(w.home, [{ id: 1, data: ompData(Date.now() + 10 * 60 * 1000) }], { wal: true });
-    const dir = path.join(w.tmp, 'fgos-confinement', 'disp_omp', 'home');
-    fs.mkdirSync(dir, { recursive: true });
-    writeOwnershipMarker(dir, { dispatchId: 'disp_omp' });
-    copyCredentialFiles(dir, w.home, ['agent.db']);
-    targets.set(dir, credentialWriteBackTarget({ provider: 'xai', accountId: 'acct', credentialSource: ompSource(w.home), runtimeDir: w.runtimeDir }));
-    renewHome('omp', dir);
-
-    assert.equal(writeBackRenewedCredential(dir, targetOf(dir)).status, 'applied');
-    assert.equal(JSON.parse(holder.prepare('SELECT data FROM auth_credentials WHERE id = 1').get().data).refresh, FAKE.newRefresh);
-    holder.close();
   } finally { w.cleanup(); }
 });
 
@@ -840,7 +844,8 @@ test('no token string appears in any result, cooldown record, lock record, marke
     const walk = (d) => {
       for (const name of fs.readdirSync(d)) {
         const full = path.join(d, name);
-        if (fs.statSync(full).isDirectory()) walk(full); else if (!full.startsWith(w.home)) everything.push(fs.readFileSync(full, 'utf8'));
+        // The account's store and the pending copies of it are logins by design; everything else must name none.
+        if (fs.statSync(full).isDirectory()) { if (name !== 'pending') walk(full); } else if (!full.startsWith(w.home)) everything.push(fs.readFileSync(full, 'utf8'));
       }
     };
     walk(w.runtimeDir);
@@ -853,17 +858,6 @@ test('no token string appears in any result, cooldown record, lock record, marke
 // ---------------------------------------------------------------------------------------------------
 // A copy renewed earlier is applied by its refresh token, not by whether its access token is still good
 // ---------------------------------------------------------------------------------------------------
-
-test('a retained home written back after its renewed access token expired still writes the newer refresh token back', () => {
-  const w = workspace();
-  try {
-    const now = Date.now();
-    const dir = privateHomeWithRenewedLogin(w, { accountHomeExpiryMs: now - 3 * HOUR });
-    renewHome('pi', dir, { expiresMs: now - 10 * 60 * 1000 }); // renewed in the pane, and expired again since
-    assert.equal(writeBackRenewedCredential(dir, targetOf(dir)).status, 'applied');
-    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh, 'the source no longer holds the spent token');
-  } finally { w.cleanup(); }
-});
 
 test('a staged copy applied after its access token expired is applied, while a fresh renewal result must still be in the future', () => {
   const w = workspace();
@@ -1152,38 +1146,6 @@ test('write-back stages a renewed home when the source is half-written, and the 
   } finally { w.cleanup(); }
 });
 
-test('write-back reports applied or unchanged from the staged copy\'s own outcome when the lock is free', () => {
-  const w = workspace();
-  try {
-    const dir = privateHomeWithRenewedLogin(w);
-    const marker = targetOf(dir);
-    // The source is torn while the copy is judged, so the copy is staged; it is repaired before the staged
-    // copy is applied. An older source takes the copy; a newer one makes the copy a leftover to drop.
-    const run = (repaired) => {
-      let locked = 0;
-      fs.writeFileSync(path.join(w.home, 'auth.json'), TORN);
-      const tryLock = (args) => {
-        locked += 1;
-        writePi(w.home, repaired);
-        return tryAcquireAccountLock(args);
-      };
-      return { result: writeBackRenewedCredential(dir, marker, { tryLock }), locked };
-    };
-
-    const applied = run(piDoc(Date.now() + 10 * 60 * 1000));
-    assert.equal(applied.locked, 1, 'the copy was staged and then applied under the lock');
-    assert.deepEqual(applied.result, { status: 'applied' });
-    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh);
-    assert.deepEqual(pendingCopies(w), []);
-
-    const dropped = run(piDoc(Date.now() + 10 * HOUR, { access: 'FAKE-NEWER', refresh: 'FAKE-NEWER-REFRESH' }));
-    assert.equal(dropped.locked, 1);
-    assert.deepEqual(dropped.result, { status: 'unchanged' });
-    assert.equal(readPi(w.home).xai.refresh, 'FAKE-NEWER-REFRESH');
-    assert.deepEqual(pendingCopies(w), []);
-  } finally { w.cleanup(); }
-});
-
 test('a copy without a refresh token never replaces a source entry that has one', async () => {
   const w = workspace();
   try {
@@ -1423,7 +1385,7 @@ test('staging while the account lock is busy never drops a pending copy, however
   } finally { process.stderr.write = realWrite; w.cleanup(); }
 });
 
-test('over the limit, identical copies are dropped first, under the lock and after the apply attempt', () => {
+test('over the limit, identical copies are dropped first, under the lock', () => {
   const w = workspace();
   const captured = [];
   const realWrite = process.stderr.write;
@@ -2045,7 +2007,7 @@ test('a renewed login whose account differs from the leased account is never app
   try {
     const now = Date.now();
     const leased = codexDoc(now + 10 * 60 * 1000, now - HOUR, 'old');
-    leased.tokens.account_id = 'FAKE-ACCOUNT-LEASED';
+    leased.tokens.access_token = fakeJwt(now + 10 * 60 * 1000, 'old', codexAccountClaim('FAKE-ACCOUNT-LEASED'));
     writeCodex(w.home, leased);
     const dir = path.join(w.tmp, 'fgos-confinement', 'disp_other_account', 'home');
     fs.mkdirSync(dir, { recursive: true });
@@ -2053,7 +2015,7 @@ test('a renewed login whose account differs from the leased account is never app
     copyCredentialFiles(dir, w.home, ['auth.json']);
     // Inside the home the agent logged in as another account; the login is newer than the leased one.
     const other = codexDoc(now + 6 * HOUR, now, 'new');
-    other.tokens.account_id = 'FAKE-ACCOUNT-OTHER';
+    other.tokens.access_token = fakeJwt(now + 6 * HOUR, 'new', codexAccountClaim('FAKE-ACCOUNT-OTHER'));
     writeCodex(dir, other);
     const target = credentialWriteBackTarget({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(w.home), runtimeDir: w.runtimeDir });
     const before = sha(path.join(w.home, 'auth.json'));
@@ -2064,13 +2026,14 @@ test('a renewed login whose account differs from the leased account is never app
     await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(w.home), runtimeDir: w.runtimeDir, spawnFn, cooldownMs: 0 });
 
     assert.equal(sha(path.join(w.home, 'auth.json')), before, 'the leased account\'s login was replaced by the login of another account');
+    assert.deepEqual(agentCopies(w), [], 'the login of another account is not kept either');
   } finally { w.cleanup(); }
 });
 
 // The only case that kept a held home forbids settling it (the owner recovers it by hand). A home is held only
 // because staging failed while its login was the only good pair; once the login can be staged and applied
 // there is nothing left to hold it for, so a repair settles it instead of leaving the owner a chore.
-test('a held home settles by itself once its login is safe', () => {
+test('a held home settles by itself once its login is safe', async () => {
   const w = workspace();
   const realNow = Date.now;
   const realHome = process.env.HOME;
@@ -2080,7 +2043,7 @@ test('a held home settles by itself once its login is safe', () => {
   try {
     // The repair reads the machine's backend registry from HOME: a scratch home keeps it off the real one.
     process.env.HOME = w.tmp;
-    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000, { accountId: 'FAKE-ACCOUNT-LEASED' }));
     const runDir = path.join(w.tmp, 'run');
     fs.mkdirSync(runDir, { recursive: true });
     const resources = resolveConfinementResources({ dispatchId, context: {}, grants: [{ resource: 'private-home', access: 'read-write', scope: 'dispatch' }], backendConfig: { tempRoot } });
@@ -2122,6 +2085,9 @@ test('a held home settles by itself once its login is safe', () => {
     fs.rmSync(path.join(w.accountDir, 'pending'));
     fixCredentialCopiesRetained({ stagingRuntimeDir: w.runtimeDir });
     assert.equal(fs.existsSync(home), false, 'the held home is still there although its login can now be written back');
+    // Settling stages the login; the next refresh-ahead applies it once the probe accepts it.
+    const { spawnFn } = fakeSpawn({ layoutName: 'pi', behaviour: () => {} });
+    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), runtimeDir: w.runtimeDir, spawnFn });
     assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh, 'the renewed login did not reach the account');
   } finally {
     Date.now = realNow;

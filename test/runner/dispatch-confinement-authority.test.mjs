@@ -70,7 +70,7 @@ test("observe mode emits unknown attestation for omitted policy and unconfined f
     invocation: { command: "cmd", args: [] },
     context: { cwd: "/cwd", runDir: "/runDir" },
   });
-  const omittedAtt = buildConfinementAttestation({ request: omittedReq });
+  const omittedAtt = buildConfinementAttestation({ request: omittedReq, phase: "prepared" });
   assert.equal(omittedAtt.outcome, "unknown");
   assert.notEqual(omittedAtt.outcome, "enforced");
 
@@ -82,7 +82,7 @@ test("observe mode emits unknown attestation for omitted policy and unconfined f
     invocation: { command: "cmd", args: [] },
     context: { cwd: "/cwd", runDir: "/runDir" },
   });
-  const unconfinedAtt = buildConfinementAttestation({ request: unconfinedReq });
+  const unconfinedAtt = buildConfinementAttestation({ request: unconfinedReq, phase: "prepared" });
   assert.equal(unconfinedAtt.outcome, "unconfined");
   assert.equal(unconfinedAtt.channels[0].coverage, "out-of-scope");
 });
@@ -112,7 +112,7 @@ test("M1: buildConfinementAttestation surfaces legacy confinement and bwrap obse
     },
   });
 
-  const att = buildConfinementAttestation({ request: req });
+  const att = buildConfinementAttestation({ request: req, phase: "prepared" });
   assert.equal(att.effectiveControls.hostWrite, "deny");
   assert.equal(att.effectiveControls.process, "isolated");
   assert.equal(att.effectiveControls.session, "isolated");
@@ -201,7 +201,7 @@ test("MED-4: executor named bwrap without real bwrap invocation does not claim s
     context: { cwd: "/cwd", runDir: "/runDir" },
   });
 
-  const att = buildConfinementAttestation({ request: req });
+  const att = buildConfinementAttestation({ request: req, phase: "prepared" });
   assert.notEqual(att.effectiveControls.hostWrite, "deny", "must not claim hostWrite: deny without verified bwrap");
   assert.notEqual(att.effectiveControls.process, "isolated", "must not claim process: isolated without verified bwrap");
   assert.notEqual(att.coverage["control:hostWrite"], "satisfied", "must not claim satisfied coverage");
@@ -391,7 +391,7 @@ test("MED-A: production bwrap executor argvs yield process: unverified while hos
       },
     });
 
-    const att = buildConfinementAttestation({ request: req });
+    const att = buildConfinementAttestation({ request: req, phase: "prepared" });
 
     // hostWrite must be satisfied and deny because --ro-bind / / is present without wider writable re-bind
     assert.equal(att.effectiveControls.hostWrite, "deny", `${executorId}: hostWrite must be deny`);
@@ -424,7 +424,7 @@ test("MED-A: production bwrap executor argvs yield process: unverified while hos
     },
     context: { cwd: "/repo", runDir: "/repo/runs/1" },
   });
-  const bindAllAtt = buildConfinementAttestation({ request: bindAllReq });
+  const bindAllAtt = buildConfinementAttestation({ request: bindAllReq, phase: "prepared" });
   assert.notEqual(bindAllAtt.effectiveControls.hostWrite, "deny", "bwrap --bind / / must not earn hostWrite: deny");
   assert.notEqual(bindAllAtt.effectiveControls.process, "isolated", "bwrap --bind / / must not earn process: isolated");
   assert.equal(bindAllAtt.coverage["control:hostWrite"], "unverified");
@@ -442,7 +442,7 @@ test("MED-A: production bwrap executor argvs yield process: unverified while hos
     },
     context: { cwd: "/repo", runDir: "/repo/runs/1" },
   });
-  const unshareUserAtt = buildConfinementAttestation({ request: unshareUserReq });
+  const unshareUserAtt = buildConfinementAttestation({ request: unshareUserReq, phase: "prepared" });
   assert.notEqual(unshareUserAtt.effectiveControls.process, "isolated", "bwrap --unshare-user must not earn process: isolated");
   assert.notEqual(unshareUserAtt.effectiveControls.hostWrite, "deny", "bwrap --unshare-user must not earn hostWrite: deny");
   assert.equal(unshareUserAtt.coverage["control:process"], "unverified");
@@ -458,7 +458,7 @@ test("MED-A: production bwrap executor argvs yield process: unverified while hos
     },
     context: { cwd: "/repo", runDir: "/repo/runs/1" },
   });
-  const widerRebindAtt = buildConfinementAttestation({ request: widerRebindReq });
+  const widerRebindAtt = buildConfinementAttestation({ request: widerRebindReq, phase: "prepared" });
   assert.notEqual(widerRebindAtt.effectiveControls.hostWrite, "deny", "--ro-bind / / with --bind / / must not earn hostWrite: deny");
   assert.equal(widerRebindAtt.coverage["control:hostWrite"], "unverified");
 
@@ -472,7 +472,7 @@ test("MED-A: production bwrap executor argvs yield process: unverified while hos
     },
     context: { cwd: "/repo", runDir: "/repo/runs/1" },
   });
-  const pidOnlyAtt = buildConfinementAttestation({ request: pidOnlyReq });
+  const pidOnlyAtt = buildConfinementAttestation({ request: pidOnlyReq, phase: "prepared" });
   assert.equal(pidOnlyAtt.effectiveControls.process, "isolated", "--unshare-pid grants process: isolated");
   assert.equal(pidOnlyAtt.coverage["control:process"], "satisfied");
   assert.notEqual(pidOnlyAtt.effectiveControls.hostWrite, "deny");

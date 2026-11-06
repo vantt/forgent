@@ -175,7 +175,7 @@ test("R3: herdr-spawn attestation includes herdr-partial-maturity mismatch and e
     },
   });
 
-  const att = buildConfinementAttestation({ request: req });
+  const att = buildConfinementAttestation({ request: req, phase: "prepared" });
   assert.ok(att.mismatches.some((m) => m.code === "herdr-partial-maturity"));
   assert.ok(att.evidence.some((e) => e.ref === "herdr-partial-maturity:herdr-round"));
 
@@ -464,7 +464,7 @@ test("R6: herdr-spawn attestation marks host-ipc out-of-scope and controls unver
     },
   });
 
-  const att = buildConfinementAttestation({ request: req });
+  const att = buildConfinementAttestation({ request: req, phase: "prepared" });
 
   // Outcome must NOT be claimed as "enforced"
   assert.notEqual(att.outcome, "enforced");

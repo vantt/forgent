@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { checkCredentialCopiesRetained, fixCredentialCopiesRetained, checkConfinementOrphanedResourcesReaped, DOCTOR_CHECKS } from '../../src/setup/registrations.mjs';
-import { extendOwnershipMarker, writeOwnershipMarker, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { extendOwnershipMarker, writeOwnershipMarker, writeAttemptHomeRecord, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { writeRawGlobalConfig, writeAccountsFile } from '../helpers/config-fixture.mjs';
 
 // Every default path of the code under test (the provider runtime directory, the global config, the backend
@@ -131,23 +131,38 @@ test('the orphan count skips a held home owned by a dead process but still count
   }
 });
 
-test('the fix never removes a held home nor writes the login its marker names anywhere: held homes are recovered by hand', () => {
+// A held home is settled only from the host's record beside it. A home an older release counted in its own marker
+// has no record: whatever that marker names, the fix leaves it for the owner.
+test('the fix settles a held home from its host record, and never one without a record, whatever its marker names', () => {
   const w = workspace();
   try {
     const source = path.join(w.tmp, 'secret-source-home');
     fs.mkdirSync(source, { recursive: true });
     fs.writeFileSync(path.join(source, 'auth.json'), JSON.stringify({ xai: { type: 'oauth', refresh: 'FAKE-REFRESH-OLD', expires: Date.now() + HOUR } }));
     const before = fs.readFileSync(path.join(source, 'auth.json'), 'utf8');
+    const renewedLogin = JSON.stringify({ xai: { type: 'oauth', refresh: 'FAKE-REFRESH-NEW', expires: Date.now() + 12 * HOUR } });
     const gone = addKeptHome(w, 'disp_gone', CREDENTIAL_KEEP_MAX_ATTEMPTS); // no store file inside
-    const renewed = addKeptHome(w, 'disp_renewed', CREDENTIAL_KEEP_MAX_ATTEMPTS);
-    fs.writeFileSync(path.join(renewed, 'auth.json'), JSON.stringify({ xai: { type: 'oauth', refresh: 'FAKE-REFRESH-NEW', expires: Date.now() + 12 * HOUR } }));
-    const result = fixCredentialCopiesRetained({ stagingRuntimeDir: w.runtimeDir });
-    assert.equal(result.changed, false);
-    assert.match(result.message, /held private homes are recovered by hand/);
+    const unrecorded = addKeptHome(w, 'disp_renewed', CREDENTIAL_KEEP_MAX_ATTEMPTS);
+    fs.writeFileSync(path.join(unrecorded, 'auth.json'), renewedLogin);
+    const recorded = path.join(w.tempRoot, 'disp_recorded', 'home');
+    fs.mkdirSync(recorded, { recursive: true });
+    fs.writeFileSync(path.join(recorded, 'auth.json'), renewedLogin);
+    writeAttemptHomeRecord(recorded, {
+      attemptId: 'att-recorded', runDir: path.join(w.tmp, 'run'), dispatchId: 'disp_recorded',
+      credentialWriteBack: { provider: 'xai', accountId: 'acct', kind: 'home-files', home: source, layout: 'pi-auth-json', runtimeDir: w.runtimeDir },
+      credentialKept: { attempts: CREDENTIAL_KEEP_MAX_ATTEMPTS, since: new Date(Date.now() - 50 * HOUR).toISOString(), lastCountedAt: Date.now() },
+    });
+    assert.match(run(w).message, /disp_recorded\/home\. Its host record names where its login goes: "fgos doctor --fix"/);
+
+    const result = fixCredentialCopiesRetained({ roots: [w.tempRoot], retriedRoots: [w.tempRoot], stagingRuntimeDir: w.runtimeDir });
+    assert.equal(result.changed, true);
+    assert.match(result.message, /held private home\(s\): 1 settled, 2 still held \(one without a host record is recovered by hand\)/);
+    assert.equal(fs.existsSync(path.join(w.tempRoot, 'disp_recorded')), false, 'the recorded home, its record and its dispatch directory are gone');
+    const pending = path.join(w.runtimeDir, 'account-locks', 'xai', 'acct', 'pending');
+    assert.deepEqual(fs.readdirSync(pending).map((name) => fs.readFileSync(path.join(pending, name, 'auth.json'), 'utf8')), [renewedLogin], 'its login waits beside the store its record names');
+    assert.equal(fs.readFileSync(path.join(source, 'auth.json'), 'utf8'), before, 'nothing is applied by the fix');
     assert.equal(fs.existsSync(gone), true);
-    assert.equal(fs.existsSync(renewed), true);
-    assert.equal(fs.readFileSync(path.join(source, 'auth.json'), 'utf8'), before, 'the store the marker names is untouched');
-    assert.equal(fs.existsSync(path.join(w.runtimeDir, 'account-locks')), false, 'nothing was staged');
+    assert.equal(fs.existsSync(unrecorded), true);
   } finally { w.cleanup(); }
 });
 

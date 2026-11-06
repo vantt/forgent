@@ -25,7 +25,7 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE, CREDENTIAL_HOME_KEPT, CREDENTIAL_HOME_HELD, CREDENTIAL_KEEP_MAX_ATTEMPTS, ATTEMPT_HOME_MARKER_CONTRACT, countCredentialKeep, removeEmptyDispatchParent, MAX_HOME_MARKER_BYTES } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, CREDENTIAL_HOME_KEPT, CREDENTIAL_HOME_HELD, CREDENTIAL_KEEP_MAX_ATTEMPTS, ATTEMPT_HOME_MARKER_CONTRACT, countCredentialKeep, readAttemptHomeRecord, removeAttemptHome, settleHeldCredentialHomes, MAX_HOME_MARKER_BYTES } from "./cleanup.mjs";
 import { writeBackRenewedCredential } from "../provider-credential-renewal.mjs";
 import {
   canonicalJson,
@@ -164,13 +164,13 @@ function verifyRequiredProbe(request, backendInstance, driver) {
 }
 
 /**
- * Build a canonical ConfinementAttestationV1 (spec §6.6).
+ * Build a canonical ConfinementAttestationV1 (spec §6.6). `phase` is what the launch has reached:
+ * "refused" or "prepared", the only two any caller records.
  */
 export function buildConfinementAttestation({
   request,
-  phase = "completed",
+  phase,
   outcome = null,
-  error = null,
   driverClaims = null,
 } = {}) {
   const reqMode = request.requirement?.mode ?? "unconfined";
@@ -1359,7 +1359,9 @@ function readAttemptHomeMarker(homeDir, attemptId, runDir) {
  *
  * Every marker is checked before anything is removed: a marker that is not version 2 or names another
  * attempt throws `AttemptHomeError` and leaves all homes in place. Where a renewed login goes back to is
- * taken only from the descriptor's resource entry (`credentialWriteBack`), never from the home.
+ * taken only from the descriptor's resource entry (`credentialWriteBack`), and how often its staging
+ * failed only from the home's host record, never from the home. Once its own homes are done, the held
+ * homes of other attempts under the same temp roots are settled when their record allows it.
  *
  * @returns {{state: 'cleaned'|'credential-home-kept'|'credential-home-held', homes: number}}
  */
@@ -1379,20 +1381,24 @@ export function finalizeAttemptHome({ runDir, attemptId } = {}) {
   let kept = 0;
   let held = 0;
   for (const { target, marker, writeBack } of homes) {
-    // A home whose staging already failed the allowed number of times is not tried again; adopt stops
-    // retrying and `fgos doctor` reports it.
-    if ((marker.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) { held += 1; continue; }
+    const record = { attemptId, runDir, dispatchId: marker.dispatchId, credentialWriteBack: writeBack ?? null };
+    // A home whose staging already failed the allowed number of times is not tried again by its attempt;
+    // adopt stops retrying, a later settle picks it up and `fgos doctor` reports it meanwhile.
+    if ((readAttemptHomeRecord(target, record)?.credentialKept?.attempts ?? 0) >= CREDENTIAL_KEEP_MAX_ATTEMPTS) { held += 1; continue; }
     const result = writeBackRenewedCredential(target, writeBack);
     if (result.status === 'failed' && result.keepHome) {
-      const isHeld = countCredentialKeep(target, marker) >= CREDENTIAL_KEEP_MAX_ATTEMPTS;
+      const isHeld = countCredentialKeep(target, record) >= CREDENTIAL_KEEP_MAX_ATTEMPTS;
       if (isHeld) held += 1; else kept += 1;
-      process.stderr.write(`fgos: credential write-back not done (${result.code}); private home ${isHeld ? 'held for the owner' : 'kept for a later retry'}\n`);
+      process.stderr.write(`fgos: credential write-back not done (${result.code}); private home ${isHeld ? 'held for a later settle' : 'kept for a later retry'}\n`);
       continue;
     }
     if (result.status === 'failed') process.stderr.write(`fgos: credential write-back not done (${result.code})\n`);
-    fs.rmSync(target, { recursive: true, force: true });
-    removeEmptyDispatchParent(target, marker.dispatchId);
+    removeAttemptHome(target, marker.dispatchId);
   }
+  // Homes held by other attempts under the same roots: whatever kept them may be gone by now.
+  try {
+    settleHeldCredentialHomes({ tempRoots: [...new Set(homes.map(({ target }) => path.dirname(path.dirname(target))))] });
+  } catch { /* they stay held; doctor names them */ }
   if (kept > 0) return { state: CREDENTIAL_HOME_KEPT, homes: homes.length };
   const cleanupState = held > 0 ? 'retained' : 'cleaned';
   for (const { file, descriptor } of descriptors) {

@@ -555,8 +555,8 @@ export function probePeerRunHidden({ bwrapBin = '/usr/bin/bwrap', scratchDir, br
  * Probe 9: machine-private roots (spec section 9.3) are hidden from a worker under every
  * built-in policy, and under `hostRead: blind` as well when `blind` is set, for a direct and a
  * terminal launch. Stand-ins in a short scratch directory, handed to the real resolver and to the
- * worker alike: a home with files planted in `.fgos/private` and a listening herdr socket in
- * `.config/herdr`; a user runtime directory with listening stand-ins of the systemd user manager,
+ * worker alike: a home with files planted in `.fgos/private`, a login store the account inventory
+ * would name and a listening herdr socket in `.config/herdr`; a user runtime directory with listening stand-ins of the systemd user manager,
  * the session bus, ssh-agent and two attempts' GO sockets under `fgos/`; and a Claude socket base
  * outside it (Claude Code's fallback when the runtime directory is unset) with a session socket in
  * `cc-socks/`. The argv comes from the real prepareBwrap. The worker must reach none of them, but a
@@ -573,6 +573,7 @@ export const MACHINE_PRIVATE_FALSIFIERS = Object.freeze({
   'runtime-dir': Object.freeze(['systemd', 'bus', 'sshAgent', 'otherAttempt']),
   'session-sockets': Object.freeze(['sessionSocket']),
   herdr: Object.freeze(['herdr']),
+  'login-stores': Object.freeze(['loginStore']),
 });
 
 export function probeMachinePrivateHidden({ bwrapBin = '/usr/bin/bwrap', scratchDir, blind = false, brokenConfig = false } = {}) {
@@ -631,13 +632,17 @@ function machinePrivateStandIns(short) {
   const privateDir = path.join(home, '.fgos', 'private');
   const herdrDir = path.join(home, '.config', 'herdr');
   for (const dir of [privateDir, runtimeDir, claudeSocketBase]) fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-  const planted = { accounts: path.join(privateDir, 'accounts.yaml'), token: path.join(privateDir, 'gateway-token') };
+  // A login store the account inventory would name, beside the home's own files a worker may still read.
+  const loginStore = path.join(home, '.stand-in-login');
+  fs.mkdirSync(loginStore, { mode: 0o700 });
+  const planted = { accounts: path.join(privateDir, 'accounts.yaml'), token: path.join(privateDir, 'gateway-token'), loginStore: path.join(loginStore, 'auth.json') };
   for (const file of Object.values(planted)) fs.writeFileSync(file, 'PLANTED');
   return {
     home,
     runtimeDir,
     claudeSocketBase,
     privateDir,
+    loginStore,
     planted,
     herdrSocketPath: path.join(herdrDir, 'herdr.sock'),
     ownAttempt: path.join(runtimeDir, 'fgos', 'own-attempt.sock'),
@@ -656,6 +661,7 @@ function machinePrivateStandIns(short) {
       'runtime-dir': runtimeDir,
       'session-sockets': path.join(claudeSocketBase, SESSION_SOCKET_DIR),
       herdr: herdrDir,
+      'login-stores': loginStore,
     },
   };
 }
@@ -700,6 +706,7 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, stand, blind, brokenConfi
       xdgRuntimeDir: stand.runtimeDir,
       xdgConfigHome: null,
       herdrSocketPath: stand.herdrSocketPath,
+      loginStores: [stand.loginStore],
     }).filter((res) => !droppedByFalsifier(res, brokenConfig, stand));
 
     const script = `
@@ -718,6 +725,7 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, stand, blind, brokenConfi
           marker: process.env[${JSON.stringify(CONFINED_MARKER_ENV)}],
           accounts: code(() => fs.readFileSync(${JSON.stringify(stand.planted.accounts)})),
           token: code(() => fs.readFileSync(${JSON.stringify(stand.planted.token)})),
+          loginStore: code(() => fs.readFileSync(${JSON.stringify(stand.planted.loginStore)})),
           entries: (() => { try { return fs.readdirSync(${JSON.stringify(stand.privateDir)}).length; } catch (e) { return e.code; } })(),
           outbox: code(() => fs.writeFileSync(${JSON.stringify(outboxFile)}, 'WRITTEN')),
           workspace: code(() => fs.writeFileSync(${JSON.stringify(workspaceFile)}, 'WRITTEN')),
@@ -773,7 +781,7 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, stand, blind, brokenConfi
     probe: 'machine-private-hidden',
     passed,
     detail: passed
-      ? `a worker under ${variants.length} policy, hostRead and launch combinations cannot read a machine-private directory or reach a runtime-directory, Claude Code session, herdr or other attempt's socket, and keeps its own GO socket, outbox and workspace`
+      ? `a worker under ${variants.length} policy, hostRead and launch combinations cannot read a machine-private directory or a login store or reach a runtime-directory, Claude Code session, herdr or other attempt's socket, and keeps its own GO socket, outbox and workspace`
       : `machine-private probe failed: ${failures.join('; ')}`,
   };
 }
