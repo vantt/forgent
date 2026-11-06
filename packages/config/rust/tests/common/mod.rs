@@ -2,8 +2,10 @@
 #![allow(dead_code)]
 use std::path::{Path, PathBuf};
 
+use fgos_config::schema::Schemas;
+use fgos_config::scope::{judge, SourceKind};
 use fgos_config::snapshot::{SessionClass, SnapshotRequest};
-use serde_json::Value;
+use serde_json::{json, Value};
 
 pub fn contracts() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../contracts")
@@ -187,4 +189,72 @@ pub fn migrate_options(
         lock_root: dir.join("locks"),
         lock_wait_ms: 2000,
     }
+}
+
+/// A config path as its key names.
+pub type KeyPath = Vec<String>;
+
+pub fn paths(list: &Value, key: &str) -> Vec<KeyPath> {
+    let mut out: Vec<KeyPath> = list[key]
+        .as_array()
+        .unwrap_or_else(|| panic!("{key}"))
+        .iter()
+        .map(|row| {
+            let at = if row.is_array() { row } else { &row["path"] };
+            at.as_array()
+                .unwrap()
+                .iter()
+                .map(|s| s.as_str().unwrap().to_string())
+                .collect()
+        })
+        .collect();
+    out.sort();
+    out
+}
+
+pub fn at<'a>(value: &'a Value, path: &KeyPath) -> Option<&'a Value> {
+    path.iter()
+        .try_fold(value, |node, key| node.get(key.as_str()))
+}
+
+pub fn put(root: &mut Value, path: &KeyPath, value: Value) {
+    let mut node = root;
+    for key in &path[..path.len() - 1] {
+        node = node
+            .as_object_mut()
+            .unwrap()
+            .entry(key.clone())
+            .or_insert_with(|| json!({}));
+    }
+    node.as_object_mut()
+        .unwrap()
+        .insert(path[path.len() - 1].clone(), value);
+}
+
+pub fn remove(root: &mut Value, path: &KeyPath) {
+    let mut node = root;
+    for key in &path[..path.len() - 1] {
+        match node.get_mut(key.as_str()) {
+            Some(next) => node = next,
+            None => return,
+        }
+    }
+    if let Some(map) = node.as_object_mut() {
+        map.remove(&path[path.len() - 1]);
+    }
+}
+
+/// The paths among `differences` of `source` that the project file may not hold (the scope judge
+/// refuses them there): they live in the machine's global file.
+pub fn machine_differences(source: &Value, differences: &[KeyPath]) -> Vec<KeyPath> {
+    let (schemas, _) = Schemas::bundled().unwrap();
+    differences
+        .iter()
+        .filter(|path| {
+            let mut probe = json!({});
+            put(&mut probe, path, at(source, path).unwrap().clone());
+            !judge(&schemas, SourceKind::Project, &probe, None).is_empty()
+        })
+        .cloned()
+        .collect()
 }

@@ -16,7 +16,7 @@ import { loadNativeAddon } from '../../src/git/native.mjs';
 import { resolveLock } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { writeAccountsFile, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
+import { moveMachineKeysTo, writeAccountsFile, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 ensureScriptAddon();
 seedFileLocalBwrapRegistry();
@@ -489,6 +489,7 @@ test('--account pins provider account on every unit of the workflow run, kept fo
     },
   });
   const prevHome = process.env.HOME;
+  moveMachineKeysTo(tmp, fakeHome);
   process.env.HOME = fakeHome;
   try {
     const workflow = validateWorkflow({
@@ -577,6 +578,7 @@ test('workflow with two units on different providers pins account only on matchi
   writeProjectConfig(tmp, cfg);
 
   const prevHome = process.env.HOME;
+  moveMachineKeysTo(tmp, fakeHome);
   process.env.HOME = fakeHome;
   try {
     const workflow = validateWorkflow({
@@ -629,6 +631,7 @@ test('CLI workflow start accepts --timeout and --account, while resume refuses t
   const file = unitsFile(tmp, [
     { id: 'w-u', objective: 'Read', capability: 'docs:write' },
   ]);
+  moveMachineKeysTo(tmp, fakeHome);
   const cliEnv = { ...process.env, HOME: fakeHome, USERPROFILE: fakeHome };
   const out = execFileSync(process.execPath, [
     path.resolve('bin/fgos.mjs'), 'workflow', 'start',

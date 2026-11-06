@@ -320,7 +320,7 @@ fn a_project_file_may_equal_or_raise_a_capability_confinement() {
 /// refused by name at its line, and the same text in the global file is accepted.
 #[test]
 fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
-    let cases: [(&str, &[&str], &str); 11] = [
+    let cases: [(&str, &[&str], &str); 10] = [
         (
             "executor-command",
             &["runner:", "  executor:", "    command: tool"],
@@ -333,12 +333,24 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
         ),
         (
             "executor-entry-command",
-            &["runner:", "  executors:", "    ex:", "      command: tool"],
+            &[
+                "runner:",
+                "  executors:",
+                "    ex:",
+                "      kind: agent",
+                "      command: tool",
+            ],
             "runner.executors.ex.command",
         ),
         (
             "executor-entry-args",
-            &["runner:", "  executors:", "    ex:", "      args: [a]"],
+            &[
+                "runner:",
+                "  executors:",
+                "    ex:",
+                "      kind: agent",
+                "      args: [a]",
+            ],
             "runner.executors.ex.args",
         ),
         (
@@ -347,6 +359,7 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
                 "runner:",
                 "  executors:",
                 "    ex:",
+                "      kind: agent",
                 "      invocations:",
                 "        - via: cli",
                 "          command: tool",
@@ -356,7 +369,13 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
         ),
         (
             "invocation-permission-mode",
-            &["runner:", "  executors:", "    ex:", "      permissionMode: bypass"],
+            &[
+                "runner:",
+                "  executors:",
+                "    ex:",
+                "      kind: agent",
+                "      permissionMode: bypass",
+            ],
             "runner.executors.ex.permissionMode",
         ),
         (
@@ -365,6 +384,7 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
                 "runner:",
                 "  executors:",
                 "    ex:",
+                "      kind: agent",
                 "      confinement:",
                 "        backend: none",
             ],
@@ -376,6 +396,7 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
                 "runner:",
                 "  executors:",
                 "    ex:",
+                "      kind: agent",
                 "      confinement:",
                 "        privateHome: false",
             ],
@@ -387,23 +408,48 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
                 "runner:",
                 "  executors:",
                 "    ex:",
+                "      kind: agent",
                 "      confinement:",
                 "        isolatedSession: false",
             ],
             "runner.executors.ex.confinement.isolatedSession",
         ),
         (
-            "capability-prefer",
-            &["runner:", "  capabilities:", "    advise:", "      prefer: [ex]"],
-            "runner.capabilities.advise.prefer",
-        ),
-        (
             "capability-aliases",
-            &["runner:", "  capabilities:", "    advise:", "      aliases: [open]"],
+            &[
+                "runner:",
+                "  capabilities:",
+                "    advise:",
+                "      aliases: [open]",
+            ],
             "runner.capabilities.advise.aliases",
         ),
     ];
+    // A command and its args are valid only together in any one file.
+    let executor = [
+        "runner:",
+        "  executor:",
+        "    command: tool",
+        "    args: [a]",
+    ];
+    let entry = [
+        "runner:",
+        "  executors:",
+        "    ex:",
+        "      kind: agent",
+        "      command: tool",
+        "      args: [a]",
+    ];
     for (name, lines, path) in cases {
+        let global: &[&str] = if path.starts_with("runner.executor.") {
+            &executor
+        } else if path.starts_with("runner.executors.ex.")
+            && (path.ends_with(".command") || path.ends_with(".args"))
+        {
+            &entry
+        } else {
+            lines
+        };
         let (snap, dir) = bundled_snapshot(
             &format!("global-only-{name}"),
             json!({"project/.fgos/config.yaml": lines}),
@@ -413,14 +459,16 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
                 assert_eq!(found.len(), 1, "{name}: {found:?}");
                 assert_eq!(found[0].code, "config-key-out-of-scope", "{name}");
                 assert_eq!(found[0].path.as_deref(), Some(path), "{name}");
-                assert_eq!(found[0].line, Some(lines.len() as u32), "{name}");
+                let key = format!("{}:", path.rsplit('.').next().unwrap());
+                let line = lines.iter().position(|l| l.trim_start().starts_with(&key));
+                assert_eq!(found[0].line, line.map(|n| n as u32 + 1), "{name}");
             }
             other => panic!("{name}: a project file set {path} and it was accepted: {other:?}"),
         }
         let _ = fs::remove_dir_all(&dir);
         let (snap, dir) = bundled_snapshot(
             &format!("global-allowed-{name}"),
-            json!({"home/.fgos/config.yaml": lines}),
+            json!({"home/.fgos/config.yaml": global}),
         );
         let snap = snap.unwrap_or_else(|e| panic!("{name}: the global file was refused: {e:?}"));
         assert!(at(&snap.value, path).is_some(), "{name}");

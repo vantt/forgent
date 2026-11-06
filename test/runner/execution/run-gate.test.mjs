@@ -17,7 +17,7 @@ import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.help
 // posture filtering consults the machine backend registry; keep it file-local
 seedFileLocalBwrapRegistry();
 
-import { writeProjectConfig, writeGlobalConfig, readProjectConfig, withHome } from '../../helpers/config-fixture.mjs';
+import { moveMachineKeysTo, writeProjectConfig, writeGlobalConfig, readProjectConfig, withHome } from '../../helpers/config-fixture.mjs';
 import { setupGitRepo } from '../../helpers/run-unit-repo-fixture.mjs';
 
 test('detectHerdrPresent needs the herdr marker and a socket that exists', () => {
@@ -102,6 +102,7 @@ test('a run pins the layer of the file that declared its pattern', async () => {
       },
     },
   });
+  moveMachineKeysTo(repoRoot, home);
 
   try {
     const res = await withHome(home, () => runUnit({

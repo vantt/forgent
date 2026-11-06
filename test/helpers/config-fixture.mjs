@@ -34,9 +34,96 @@ function writeConfigFile(file, value) {
   fs.writeFileSync(file, `${CONFIG_HEADER}\n\n${JSON.stringify(value, null, 2)}\n`);
 }
 
-/** Write `value` (a plain object) as the project config under `dir`, creating `.fgos/`. */
+/** The machine keys each project fixture was written with, by project directory, so a read-change-write test sees them again. */
+const machineKeysOf = new Map();
+const MACHINE_CAPABILITY_KEYS = ['aliases'];
+
+/**
+ * Splits a fixture's `value` into what a project file may hold and what only the machine's global file may (the
+ * runner keys that decide what program runs and how little it is confined: the default executor, every executor
+ * entry, a capability's `aliases`). `machine` is null when the value holds none.
+ */
+function splitMachineKeys(value) {
+  const runner = value?.runner;
+  if (!runner || typeof runner !== 'object') return { project: value, machine: null };
+  const project = plainConfig(value);
+  const machine = { runner: {} };
+  for (const key of ['executor', 'executors']) {
+    if (runner[key] === undefined) continue;
+    machine.runner[key] = plainConfig(runner[key]);
+    delete project.runner[key];
+  }
+  for (const [name, entry] of Object.entries(runner.capabilities ?? {})) {
+    for (const key of MACHINE_CAPABILITY_KEYS) {
+      if (entry?.[key] === undefined) continue;
+      ((machine.runner.capabilities ??= {})[name] ??= {})[key] = plainConfig(entry[key]);
+      delete project.runner.capabilities[name][key];
+    }
+  }
+  return { project, machine: Object.keys(machine.runner).length > 0 ? machine : null };
+}
+
+const helperHomes = new Set();
+const operatorHome = process.env.HOME;
+/** The HOME a test already pointed away from the operator's own home, else null. */
+function scratchHome() {
+  const home = process.env.HOME;
+  return home && home !== operatorHome && fs.existsSync(home) ? home : null;
+}
+
+/**
+ * The home whose global config receives a fixture's machine keys: the HOME a test already pointed at a scratch
+ * directory, else a fresh one made under this process's temporary root and made the process's HOME, so a fixture
+ * never writes the operator's own global file.
+ */
+export function machineHome() {
+  const home = scratchHome();
+  if (home) return home;
+  const fresh = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-machine-home-'));
+  process.env.HOME = fresh;
+  process.env.USERPROFILE = fresh;
+  helperHomes.add(fresh);
+  return fresh;
+}
+
+/**
+ * The global config `existing` with `machine` laid over it. In a home this helper made, the machine keys of an
+ * earlier fixture are removed first, so one test's executors never reach the next; a home a test made keeps its own.
+ */
+function withMachineKeys(existing, machine, ownHome) {
+  const next = plainConfig(existing);
+  const runner = (next.runner ??= {});
+  if (ownHome) {
+    delete runner.executor;
+    delete runner.executors;
+    for (const [name, entry] of Object.entries(runner.capabilities ?? {})) {
+      for (const key of MACHINE_CAPABILITY_KEYS) delete entry[key];
+      if (Object.keys(entry).length === 0) delete runner.capabilities[name];
+    }
+  }
+  if (machine.runner.executor !== undefined) runner.executor = machine.runner.executor;
+  if (machine.runner.executors !== undefined) runner.executors = { ...runner.executors, ...machine.runner.executors };
+  for (const [name, entry] of Object.entries(machine.runner.capabilities ?? {})) {
+    runner.capabilities = { ...runner.capabilities, [name]: { ...runner.capabilities?.[name], ...entry } };
+  }
+  return next;
+}
+
+/**
+ * Write `value` (a plain object) as the project config under `dir`, creating `.fgos/`. The keys a project file may
+ * not hold (see `splitMachineKeys`) go to the machine's global config instead, as in a real setup; the product still
+ * refuses a project file that holds them, which `writeRawProjectConfig` is for.
+ */
 export function writeProjectConfig(dir, value) {
-  writeConfigFile(configFilePath(dir), value);
+  const { project, machine } = splitMachineKeys(value);
+  writeConfigFile(configFilePath(dir), project);
+  if (value?.runner) machineKeysOf.set(path.resolve(dir), machine);
+  // A value with a runner section replaces the machine keys of the home this helper made, even when it holds none.
+  const ownHome = process.env.HOME && helperHomes.has(process.env.HOME);
+  if (!machine && !(ownHome && value?.runner)) return;
+  const home = machineHome();
+  const laid = machine ?? { runner: {} };
+  writeConfigFile(configFilePath(home), withMachineKeys(readConfigFile(configFilePath(home)), laid, helperHomes.has(home)));
 }
 
 /** Write `value` (a plain object) as the global config under `home`, creating `.fgos/`. */
@@ -80,9 +167,31 @@ export function writeRawGlobalConfig(home, text) {
   writeRaw(globalConfigPath(home), text);
 }
 
-/** The project config under `dir` as an ordinary object (parsed through the product's YAML reader), `{}` when the file is absent. */
+/**
+ * Lays the machine keys the project fixture under `dir` was written with into the global config of `home`, for a test
+ * that runs the product under a HOME of its own (a fixture's executors are the machine's, not the project file's).
+ */
+export function moveMachineKeysTo(dir, home) {
+  const machine = machineKeysOf.get(path.resolve(dir));
+  if (!machine) return;
+  writeConfigFile(configFilePath(home), withMachineKeys(readConfigFile(configFilePath(home)), machine, false));
+}
+
+/**
+ * The project config under `dir` as an ordinary object (parsed through the product's YAML reader), `{}` when the file is absent.
+ * The machine keys `writeProjectConfig` laid in the machine home for this project are put back, so a test that reads a fixture,
+ * changes it and writes it again sees the whole of what it wrote.
+ */
 export function readProjectConfig(dir) {
-  return readConfigFile(projectConfigPath(dir));
+  const project = readConfigFile(projectConfigPath(dir));
+  const machine = machineKeysOf.get(path.resolve(dir));
+  if (!machine) return project;
+  const runner = (project.runner ??= {});
+  for (const key of ['executor', 'executors']) if (machine.runner[key] !== undefined) runner[key] = plainConfig(machine.runner[key]);
+  for (const [name, entry] of Object.entries(machine.runner.capabilities ?? {})) {
+    runner.capabilities = { ...runner.capabilities, [name]: { ...runner.capabilities?.[name], ...plainConfig(entry) } };
+  }
+  return project;
 }
 
 /** The global config under `home` as an ordinary object, `{}` when the file is absent. */

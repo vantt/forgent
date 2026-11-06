@@ -11,6 +11,7 @@ import {
   capabilityServedBy,
   existingProjectConfigPaths,
   gatewayTokenPath,
+  machineHome,
   legacyProjectConfigPath,
   projectConfigExists,
   readGatewayToken,
@@ -94,4 +95,18 @@ test('the raw readers, the existence check and the gateway token helpers name th
   fs.writeFileSync(gatewayTokenPath(path.join(dir, '.fgos')), 'tok\n', { mode: 0o600 });
   assert.equal(readGatewayToken(path.join(dir, '.fgos')), 'tok\n');
   assert.equal(statGatewayToken(path.join(dir, '.fgos')).mode & 0o777, 0o600);
+});
+
+test('a fixture\'s executors and aliases go to the machine home, never the project file, and read back whole', () => {
+  const dir = mkRepo();
+  const value = { runner: { timeoutMs: 1, executor: { command: 'x', args: [] }, executors: { a: { kind: 'agent', command: 'x', args: [] } }, capabilities: { c: { aliases: ['d'], description: 'e' } } } };
+  writeProjectConfig(dir, value);
+  const onDisk = readRawProjectConfig(dir);
+  assert.ok(!/executor|aliases/.test(onDisk), 'the project file holds none of the machine keys');
+  assert.deepEqual(readProjectConfig(dir), value);
+  const home = machineHome();
+  assert.ok(home.startsWith(os.tmpdir()), 'a scratch home, never the operator\'s own');
+  const global = readGlobalConfig(home);
+  assert.deepEqual(global.runner.executors, value.runner.executors);
+  assert.deepEqual(global.runner.capabilities.c, { aliases: ['d'] });
 });

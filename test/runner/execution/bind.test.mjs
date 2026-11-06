@@ -689,3 +689,16 @@ test('a replay (a bind without lease state) names the candidate the runner bound
   const replayed = bind(docsAsk, { runnerConfig, session: {} });
   assert.deepEqual([replayed.executor, replayed.pool, replayed.model, replayed.tier], [bound.executor, bound.pool, bound.model, bound.tier]);
 });
+
+test('bind: a capability that prefers an invocation with no confinement backend is refused, never swapped for another invocation', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.executors.claude.invocations.push({ id: 'claude-plain', via: 'cli', adapter: 'cli-spawn' });
+  runnerConfig.capabilities['docs:write'].prefer = [{ executor: 'claude', invocation: 'claude-plain' }];
+  const ask = { unit: { id: 'u-plain', capability: 'docs:write', writes: [], rigor: 'standard' }, role: 'producer', readOnly: false, independentOf: [] };
+  const refused = bind(ask, { runnerConfig, session: {} });
+  assert.ok(refused.refused, 'the unconfined invocation is not bound');
+  assert.equal(refused.refused.reason, 'pin-unsatisfiable');
+  runnerConfig.capabilities['docs:write'].prefer = [{ executor: 'claude', invocation: 'claude-cli' }];
+  const bound = bind(ask, { runnerConfig, session: {} });
+  assert.equal(bound.invocation, 'claude-cli', 'the confined invocation of the same executor binds');
+});

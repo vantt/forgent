@@ -13,7 +13,7 @@ seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
-import { capabilityServedBy, writeGlobalConfig, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
+import { capabilityServedBy, machineHome, writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
@@ -278,12 +278,8 @@ test('fgos run refuses one-liner flags without a prompt, an unquoted multi-word 
 
 // `--account <pool/account>` pins the account through the same override field `--override` carries.
 // The fixture's executor has no account list, so a pin on it is refused before any unit run exists.
-const accountHome = () => {
-  const home = makeFixtureDir('fgos-cli-run-home-');
-  fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-  writeGlobalConfig(home, { runner: {} });
-  return home;
-};
+// The machine home the fixture's executors were written to: it holds no account list.
+const accountHome = () => machineHome();
 const failCliHome = (args, cwd, home) => {
   try {
     execFileSync(process.execPath, [BIN_FGOS, 'run', ...args], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, HOME: home } });

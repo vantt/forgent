@@ -8,7 +8,7 @@ mod common;
 use std::fs;
 use std::path::PathBuf;
 
-use common::contracts;
+use common::{at, contracts, machine_differences, paths, put, remove, KeyPath as Path};
 use fgos_config::bundle;
 use fgos_config::detect::NoDetectors;
 use fgos_config::grammar::doc_lines;
@@ -18,8 +18,6 @@ use fgos_config::standard::Standard;
 use fgos_yaml_doc::Segment;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-
-type Path = Vec<String>;
 
 fn read(path: PathBuf) -> String {
     fs::read_to_string(&path).unwrap_or_else(|e| panic!("{}: {e}", path.display()))
@@ -34,58 +32,8 @@ fn source_bytes() -> String {
     read(contracts().join("fixtures/authoring-source.config.json"))
 }
 
-fn paths(list: &Value, key: &str) -> Vec<Path> {
-    let mut out: Vec<Path> = list[key]
-        .as_array()
-        .unwrap_or_else(|| panic!("{key}"))
-        .iter()
-        .map(|row| {
-            let at = if row.is_array() { row } else { &row["path"] };
-            at.as_array()
-                .unwrap()
-                .iter()
-                .map(|s| s.as_str().unwrap().to_string())
-                .collect()
-        })
-        .collect();
-    out.sort();
-    out
-}
-
 fn segments(path: &Path) -> Vec<Segment> {
     path.iter().map(|k| Segment::Key(k.clone())).collect()
-}
-
-fn at<'a>(value: &'a Value, path: &Path) -> Option<&'a Value> {
-    path.iter()
-        .try_fold(value, |node, key| node.get(key.as_str()))
-}
-
-fn put(root: &mut Value, path: &Path, value: Value) {
-    let mut node = root;
-    for key in &path[..path.len() - 1] {
-        node = node
-            .as_object_mut()
-            .unwrap()
-            .entry(key.clone())
-            .or_insert_with(|| json!({}));
-    }
-    node.as_object_mut()
-        .unwrap()
-        .insert(path[path.len() - 1].clone(), value);
-}
-
-fn remove(root: &mut Value, path: &Path) {
-    let mut node = root;
-    for key in &path[..path.len() - 1] {
-        match node.get_mut(key.as_str()) {
-            Some(next) => node = next,
-            None => return,
-        }
-    }
-    if let Some(map) = node.as_object_mut() {
-        map.remove(&path[path.len() - 1]);
-    }
 }
 
 fn excluded(path: &Path, exclusions: &[Path]) -> bool {
@@ -134,6 +82,22 @@ fn compare(source: &Value, standard: &Value, exclusions: &[Path]) -> (Vec<Path>,
     d.sort();
     o.sort();
     (d, o)
+}
+
+/// The recorded differences as the project file and the global file hold them: what the project file
+/// may not hold goes to the global file.
+fn split_layers(source: &Value, differences: &[Path]) -> (Value, Value) {
+    let machine = machine_differences(source, differences);
+    let (mut project, mut global) = (json!({}), json!({}));
+    for path in differences {
+        let layer = if machine.contains(path) {
+            &mut global
+        } else {
+            &mut project
+        };
+        put(layer, path, at(source, path).unwrap().clone());
+    }
+    (project, global)
 }
 
 fn temp(id: &str) -> PathBuf {
@@ -226,12 +190,9 @@ fn standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config() 
         );
     }
 
-    let mut layer = json!({});
-    for path in &differences {
-        put(&mut layer, path, at(&source, path).unwrap().clone());
-    }
-    let mut effective =
-        read_back("equivalence", Some(&layer), None).unwrap_or_else(|codes| panic!("{codes:?}"));
+    let (project, global) = split_layers(&source, &differences);
+    let mut effective = read_back("equivalence", Some(&project), Some(&global))
+        .unwrap_or_else(|codes| panic!("{codes:?}"));
     let mut expected = source.clone();
     for path in exclusions.iter().chain(&standard_only) {
         remove(&mut effective, path);
@@ -246,11 +207,8 @@ fn standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config() 
 fn impact_analysis_resolves_to_gitnexus_here_and_to_no_provider_in_a_fresh_project() {
     let fixture = fixture();
     let source: Value = serde_json::from_str(&source_bytes()).unwrap();
-    let mut layer = json!({});
-    for path in paths(&fixture, "differences") {
-        put(&mut layer, &path, at(&source, &path).unwrap().clone());
-    }
-    let here = read_back("impact-here", Some(&layer), None).unwrap();
+    let (project, global) = split_layers(&source, &paths(&fixture, "differences"));
+    let here = read_back("impact-here", Some(&project), Some(&global)).unwrap();
     assert_eq!(
         here["runner"]["capabilities"]["impact-analysis"]["prefer"],
         "gitnexus"
@@ -395,7 +353,6 @@ fn the_real_runner_keys_sit_in_the_files_scopes_and_sensitivities_the_spec_gives
     for path in [
         "runner.executor",
         "runner.executors.any",
-        "runner.executors.any.invocations[0].command",
         "runner.capabilities.any.confinement",
         "runner.capabilities.any.verify",
     ] {
@@ -405,6 +362,24 @@ fn the_real_runner_keys_sit_in_the_files_scopes_and_sensitivities_the_spec_gives
             ("command", "both"),
             "{path}"
         );
+    }
+    // What a program is, what it is called and how little it is confined is the machine's own file's.
+    for path in [
+        "runner.executor.command",
+        "runner.executor.args",
+        "runner.executors.any.command",
+        "runner.executors.any.args",
+        "runner.executors.any.permissionMode",
+        "runner.executors.any.confinement.backend",
+        "runner.executors.any.confinement.privateHome",
+        "runner.executors.any.confinement.isolatedSession",
+        "runner.executors.any.invocations[0].command",
+        "runner.executors.any.invocations[0].args",
+        "runner.executors.any.invocations[0].permissionMode",
+        "runner.executors.any.invocations[0].confinement.backend",
+        "runner.capabilities.any.aliases",
+    ] {
+        assert_eq!(node(path).scope, "global-only", "{path}");
     }
     assert_eq!(node("runner.executor").absent, Some("detected"));
 

@@ -159,11 +159,12 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
       patterns: { seatBinding: { schema: 1 } },
     },
   };
+  const home = fixtureDir('fgos-failover-home-');
+  fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
+  process.env.HOME = home;
   fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
   writeProjectConfig(repoRoot, cfg);
 
-  const home = fixtureDir('fgos-failover-home-');
-  fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
   // llmAccounts: { pool: { accountId: { family, login } } }, each account holding the family's store.
   const globalPools = llmAccounts && Object.fromEntries(Object.entries(llmAccounts).map(([pool, accounts]) => [pool, Object.fromEntries(Object.entries(accounts).map(([accountId, { family, login }]) => {
     const accountHome = fixtureDir(`fgos-failover-pool-${pool}-${accountId}-`);
@@ -176,7 +177,6 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
     ...(globalPools ? { llmAccounts: globalPools } : {}),
   };
   if (Object.keys(accountPools).length > 0) writeAccountsFile(path.join(home, '.fgos'), accountPools);
-  process.env.HOME = home;
 
   // Accounts that ran recently rank last, so the account a test leaves out is tried first.
   const runtimeDir = fixtureDir('fgos-failover-capacity-');

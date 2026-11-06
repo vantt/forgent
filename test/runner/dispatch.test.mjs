@@ -24,7 +24,7 @@ import { compileDispatchPlan as compileDispatchPlanRaw, effectiveDispatchPolicy 
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { dispatchCwdHolder } from '../../src/run-supervisor/cwd-lock.mjs';
-import { writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { moveMachineKeysTo, writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
@@ -611,7 +611,9 @@ test('loadRunnerConfigForDir on a project with no config file reads the standard
 test('with no executor set and no assistant CLI on PATH the config loads, a named executor resolves, and the default refuses where it is used, naming the command that sets one', () => {
   const dir = mkTempDir();
   writeProjectConfig(dir, { runner: { executors: { fake: { kind: 'agent', carries: 'repo-content', allowCrossProvider: true, invocations: [{ via: 'cli', command: 'fake-cli', args: ['{prompt}'] }] } } } });
-  const cfg = withHome(mkTempDir(), () => withOnlyOnPath([], () => loadRunnerConfigForDir(dir)));
+  const home = mkTempDir();
+  moveMachineKeysTo(dir, home);
+  const cfg = withHome(home, () => withOnlyOnPath([], () => loadRunnerConfigForDir(dir)));
   assert.equal(cfg.executor, undefined);
   assert.equal(resolveExecutorConfig(cfg, 'standard', 'fake', undefined, 'repo-content').command, 'fake-cli');
   assert.throws(

@@ -4,7 +4,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { assert, checkById, fs, mkTemp, path, withHome } from './helpers/setup-checks-harness.mjs';
 import { test } from 'node:test';
-import { writeAccountsFile, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { moveMachineKeysTo, writeAccountsFile, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 function agent(providerModel, command = providerModel) {
   return { kind: 'agent', providerModel, command, args: ['{prompt}'], invocations: [{ id: `${command}-cli`, via: 'cli', adapter: 'cli-spawn', command, args: ['{prompt}'] }] };
@@ -34,6 +34,7 @@ function runCheck(id, runner, globalRunner, setup) {
       if (Object.keys(accounts).length > 0) writeAccountsFile(path.join(home, '.fgos'), accounts);
       if (Object.keys(rest).length > 0) writeGlobalConfig(home, { runner: rest });
     }
+    moveMachineKeysTo(dir, home);
     return withHome(home, () => checkById(id).check(dir));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });

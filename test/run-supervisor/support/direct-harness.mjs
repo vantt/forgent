@@ -5,7 +5,7 @@ import path from 'node:path';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
-import { capabilityServedBy, writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
+import { capabilityServedBy, machineHome, writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
 
 export const BIN_FGOS = path.resolve('bin/fgos.mjs');
 const AGENT = path.resolve('test/run-supervisor/fixtures/direct-agent.mjs');
@@ -84,7 +84,7 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
     },
     ...(dispatch ? { dispatch } : {}),
   });
-  const env = { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir, TMPDIR: tmpDir };
+  const env = { ...process.env, XDG_STATE_HOME: stateDir, HOME: machineHome(), TMPDIR: tmpDir };
   delete env.CLAUDE_CODE_SESSION_ID;
   delete env.CODEX_THREAD_ID;
   delete env.FGOS_SESSION_ID;
