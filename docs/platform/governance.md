@@ -108,7 +108,7 @@ User docs live in the four Diataxis roots directly under `docs/`;
 `docs/user/README.md` routes them, and moving them under `docs/user/` is a
 separate future migration ([User Documentation](../user/README.md)).
 `docs/journals/` holds old journals as history; new journals go to
-`plans/journals/`. `docs/storytelling-material/` is the story box a story
+`plans/journals/`. The storytelling-material folder under docs is the story box a story
 harvester writes into.
 
 The placement rules in
