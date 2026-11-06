@@ -31,6 +31,8 @@ Code read on `4b116c27e`:
 - `x-fgos-scope: global-only` on `executor.command`, `executor.args`, and the invocation `command`/`args` of `executorEntry` (scope moves from the entry to the leaves; `kind`, `for`, `description`, tier facts keep `both` where they are not commands). `golden_scope.rs` gains: project `command` refused, project `invocations` list refused, global accepted.
 - What happens to projects that already commit commands is UQ-1's answer; under (a) the guide's census lists every key per workspace and the owner moves them before the window; under (b) or (c) the extra rule is part of this half.
 
+**Half B scope widened by the CFG review (2026-11-06 12:0x, inside decision 61 Q2b "a project may only tighten confinement"):** besides executor `command`/`args`, a project file can still lower confinement through `runner.executors.<id>.invocations[].confinement.backend|privateHome|isolatedSession`, `permissionMode: bypass`, a capability's `prefer` pointing at a non-bwrap invocation, and a capability's `aliases` rebinding to a project-defined unconfined capability (`src/runner/dispatch/resolve.mjs:36-44`: own keys win, aliases do not). Half B covers these with the same census-first move (decision 64). Until half B lands, the board says "a project can no longer lower a capability's confinement or `strict`", not "cannot lower confinement".
+
 ## Files
 
 **Create:** none.
