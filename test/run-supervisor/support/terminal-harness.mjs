@@ -153,7 +153,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
      * `fgos run --unit <file>` as a real process, the door a person uses, in a project whose one executor has
      * a confined headless invocation and a confined herdr-spawn one: with herdr present bind() picks the pane.
      */
-    startFgosRun({ unit = {}, executorId = 'seat', executorIds = [executorId], worktree = null, herdrConfinement = { backend: 'bwrap' } } = {}) {
+    startFgosRun({ unit = {}, executorId = 'seat', executorIds = [executorId], worktree = null, caseRef = null, herdrConfinement = { backend: 'bwrap' } } = {}) {
       const configDir = path.join(repoDir, '.fgos');
       fs.mkdirSync(configDir, { recursive: true });
       const executor = project.executor({ commandName: 'claude', confinement: herdrConfinement });
@@ -180,7 +180,7 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       });
       const unitFile = path.join(repoDir, 'unit.json');
       fs.writeFileSync(unitFile, JSON.stringify({ id: 'u-1', objective: 'Inspect the docs', capability: 'docs:write', writes: [], ...unit }));
-      const child = spawn(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repoDir, ...(worktree ? ['--worktree', worktree] : [])], {
+      const child = spawn(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repoDir, ...(worktree ? ['--worktree', worktree] : []), ...(caseRef ? ['--case', caseRef.caseId, '--activity', caseRef.activity] : [])], {
         cwd: repoDir,
         env: { ...project.env(), HERDR_ENV: '1' },
         stdio: ['ignore', 'pipe', 'pipe'],

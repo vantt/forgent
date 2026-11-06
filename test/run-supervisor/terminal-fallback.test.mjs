@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { openCase, projectionOf } from '../helpers/workflow-case-fixture.mjs';
 import { bwrapUsable, createTerminalProject, noHost, readJson, waitUntil } from './support/terminal-harness.mjs';
 
 const projects = [];
@@ -127,4 +128,41 @@ test('a writing unit whose first candidate hits a limit is committed through the
   assert.equal(attempts[1].commit.status, 'committed');
   const subject = execFileSync('git', ['log', '-1', '--format=%H', '--', 'probe-worktree.txt'], { cwd: project.worktreeDir, encoding: 'utf8' }).trim();
   assert.ok(subject, 'the fallback attempt\'s file is in a commit of the worktree branch');
+});
+
+// Why these live here and not in the run-case-admission test: the receipt that decides the refund is
+// written by the real supervisor for a seat in a pane, and only this harness drives one through `fgos run`.
+// The decision itself (which receipts count as never briefed) has its own proof there.
+
+test('a seat whose pane shell never gave up the foreground is handed back to the case frame: the dispatch is not counted', { skip: SKIP, timeout: 240_000 }, async () => {
+  const project = await newProject('refund');
+  const run = openCase({ repoRoot: project.repoDir });
+  assert.equal(projectionOf(run).frameUsed.dispatches, 0);
+  // The screen reads as working while the agent is reported, then the pane's shell holds the foreground and the screen turns idle:
+  // the supervisor judges the agent gone before a brief was typed.
+  project.setVerdict('working');
+  const door = project.startFgosRun({ executorIds: ['alpha'], caseRef: { caseId: run.caseId, activity: 'scout' } });
+  await waitUntil(() => project.attemptDir() && readJson(path.join(project.attemptDir(), 'agent-binding.json')), { what: 'the gate to report the agent' });
+  project.setFlag('no-process', true);
+  project.setVerdict('idle');
+  const exit = await door.exited;
+  assert.notEqual(exit.code, 0, door.output().stderr.slice(-1500));
+  assert.deepEqual(project.sent(), [], 'nothing was typed at the pane');
+  assert.equal(readJson(path.join(project.attemptDir(), 'receipt.json')).reason, 'terminal:foreground-not-agent');
+
+  const projection = projectionOf(run);
+  assert.equal(projection.frameUsed.dispatches, 0, 'the case frame counts no dispatch for a brief that never reached an agent');
+  assert.equal(projection.frameRemaining.dispatches, 8);
+});
+
+test('a seat that was launched and then stopped on the provider limit keeps its dispatch spent in the case frame', { skip: SKIP, timeout: 240_000 }, async () => {
+  const project = await newProject('nofund');
+  const run = openCase({ repoRoot: project.repoDir });
+  limitOnRuns(project, [1]);
+  const door = project.startFgosRun({ executorIds: ['alpha'], caseRef: { caseId: run.caseId, activity: 'scout' } });
+  const exit = await door.exited;
+  assert.notEqual(exit.code, 0, door.output().stderr.slice(-1500));
+  assert.equal(readJson(path.join(project.attemptDir(), 'result.json')).classification.failure.code, 'provider-limit');
+
+  assert.equal(projectionOf(run).frameUsed.dispatches, 1, 'a seat that read its brief and failed did work the frame pays for');
 });

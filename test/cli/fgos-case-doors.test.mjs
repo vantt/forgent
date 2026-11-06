@@ -10,6 +10,7 @@ import os from 'node:os';
 import { spawnSync, execFileSync } from 'node:child_process';
 
 import { createPendingBinding, commitBinding } from '../../src/workflow/case-bindings.mjs';
+import { appendAll, openCase, settle, verifyReceipt } from '../helpers/workflow-case-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -80,4 +81,38 @@ test('fgos run --case with a request and no --reason refuses request-reason-requ
   const refusedParam = fgos(tmp, 'run', 'look', '--pattern', 'reviewed', '--case', 'wf-bogus', '--activity', 'scout', '--param', 'maxRounds=2');
   assert.notEqual(refusedParam.status, 0);
   assert.match(refusedParam.stderr, /request-reason-required/);
+});
+
+/** An open case that planned and built a child with a verify receipt: the gate is what it may run next. */
+function builtCase(tmp) {
+  const run = openCase({ repoRoot: tmp });
+  appendAll(run, [
+    { type: 'reservation', payload: { reservationId: 'r-plan', activity: 'plan', writes: [], counters: { dispatches: 1, mutatingDispatches: 0 } } },
+    settle('r-plan', { milestone: 'plan-ready', subjectDigest: 'sha256:plan', activity: 'plan' }),
+    { type: 'reservation', payload: { reservationId: 'r-build', activity: 'build-a', writes: ['src/a'], counters: { dispatches: 1, mutatingDispatches: 1 } } },
+    settle('r-build', { milestone: 'child-built', subjectDigest: 'sha256:child', receipts: [verifyReceipt('child-built', 'sha256:child')], activity: 'build-a' }),
+  ]);
+  return run.caseId;
+}
+const nodeExit = (code) => `"${process.execPath}" -e "process.exit(${code})"`;
+const gateArgs = (id, code) => ['workflow', 'gate', id, '--worktree', '.', '--writes', 'README.md', '--verify', nodeExit(code)];
+
+// The settle events, the frame and the refusals by name are proved against `gateWorkflow` in
+// test/workflow/case-verbs.test.mjs; what only the CLI can show is that the verb reaches it and prints the answer. A failed gate is a settled answer, not a CLI error, so the exit code stays 0.
+test('fgos workflow gate: a passing command prints the pass outcome and a failing one prints findings with its exit status; both exit 0, the outcome field carries the verdict', (t) => {
+  const tmp = repo(t);
+  fs.writeFileSync(path.join(tmp, 'README.md'), '# gate\n');
+  const id = builtCase(tmp);
+
+  // boundary: the printed envelope and exit code are the CLI's own contract; no lower layer sees them.
+  const failed = fgos(tmp, ...gateArgs(id, 3));
+  assert.equal(failed.status, 0, failed.stdout + failed.stderr);
+  const findings = JSON.parse(failed.stdout).data;
+  assert.deepEqual({ outcome: findings.outcome, passed: findings.gate.passed, status: findings.gate.status }, { outcome: 'findings', passed: false, status: 3 });
+
+  // boundary: same door, the passing half of the pair.
+  const passed = fgos(tmp, ...gateArgs(id, 0));
+  assert.equal(passed.status, 0, passed.stdout + passed.stderr);
+  const pass = JSON.parse(passed.stdout).data;
+  assert.deepEqual({ caseId: pass.caseId, activity: pass.activity, outcome: pass.outcome, passed: pass.gate.passed, status: pass.gate.status }, { caseId: id, activity: 'integrate', outcome: 'pass', passed: true, status: 0 });
 });
