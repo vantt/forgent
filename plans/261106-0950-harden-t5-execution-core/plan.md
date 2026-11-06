@@ -84,9 +84,9 @@ Settled without a phase: H-T4e closed (arbitration §2: short calls stay unconfi
 | 01 | [Red proofs](phase-01-red-proofs.md) (branch only, never landed alone) **done 11-06 on `harden/t5-p01-red-proofs`** | — | — | 0 / 0 / 0 (counted where each lands) |
 | 02 | [Layering moves, A3 guard, A4 no-undef gate](phase-02-layering-moves-and-guards.md) **landed 11-06 `98e1c5824..7a4fa3654`** | 01 | — (touches import lines everywhere) | +80 / 0 / +20 |
 | 03 | [Credential and confinement doors (Q3b, A7, A8)](phase-03-credential-and-confinement-doors.md) **landed 11-06 `accc31973..51d5d02dd` after three security reviews** | 02 | 04, 05, 07 | +90 / 0 / +100 |
-| 04 | [Config tighten rule (Q2b)](phase-04-config-tighten-rule.md) **half A landed 11-06 `10a6b8425..fcdffd361`; half B open** | 02; command half: UQ-1 | 03, 05, 07 | 0 / +44 / +40 |
+| 04 | [Config tighten rule (Q2b)](phase-04-config-tighten-rule.md) **half A landed 11-06 `10a6b8425..fcdffd361`; half B done on `origin/harden/t5-p04b`, lands after the owner-made config move (decision 64)** | 02; command half: UQ-1 | 03, 05, 07 | 0 / +44 / +40 |
 | 05 | [Claude private trust store (Q1a)](phase-05-claude-private-trust-store.md) **landed 11-06: codex/agy `de7454638..8f521eb2f`, claude `ca69911f6..6b5c80f9b` (decision 66)** | 02 | 03, 04, 07 | −35 / 0 / −40 |
-| 06 | [Launch failure path (R-6, H-T4f)](phase-06-launch-failure-path.md) | 03, 05, 08, 11 | — | +15 / +15 / +40 |
+| 06 | [Launch failure path (R-6, H-T4f)](phase-06-launch-failure-path.md) **landed 11-06 `9d70a47cd..d481b1cf0`** | 03, 05, 08, 11 | — | +15 / +15 / +40 |
 | 07 | [Small fixes (B-7, B-8, B-13, H-T4d, D-T2-7)](phase-07-small-fixes.md) **landed 11-06 `3f81fa916..36b59f731`** | 02 | 03, 04, 05 | −310 / 0 / −50 |
 | 08 | [Run Result one derivation (A5)](phase-08-run-result-one-derivation.md) **landed 11-06 `eba902022..7cb2cd535` (OPC MERGE on the addon)** | 02, 05 | 11 | −270 / +60 / −100 |
 | 09 | [Dispatch cut](phase-09-dispatch-cut.md) | 06, 07 | — | −300 / 0 / −50 |
