@@ -275,7 +275,9 @@ impl SentSummary {
 /// Text from a message body or a receiver's reason reaches the terminal on one row: a control
 /// character (newline, escape) becomes a space so it can neither split the row nor drive the terminal.
 fn printable(text: &str) -> String {
-    text.chars().map(|c| if c.is_control() { ' ' } else { c }).collect()
+    text.chars()
+        .map(|c| if c.is_control() { ' ' } else { c })
+        .collect()
 }
 
 fn ago(secs: u64) -> String {
