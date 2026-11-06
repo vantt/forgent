@@ -98,15 +98,15 @@ const nodeExit = (code) => `"${process.execPath}" -e "process.exit(${code})"`;
 const gateArgs = (id, code) => ['workflow', 'gate', id, '--worktree', '.', '--writes', 'README.md', '--verify', nodeExit(code)];
 
 // The settle events, the frame and the refusals by name are proved against `gateWorkflow` in
-// test/workflow/case-verbs.test.mjs; what only the CLI can show is that the verb reaches it and prints the answer. A failed gate is a settled answer, not a CLI error, so the exit code stays 0.
-test('fgos workflow gate: a passing command prints the pass outcome and a failing one prints findings with its exit status; both exit 0, the outcome field carries the verdict', (t) => {
+// test/workflow/case-verbs.test.mjs; what only the CLI can show is that the verb reaches it and prints the answer. A failed gate is a settled answer that still exits with the canonical code of its outcome (14 for findings), like `fgos run`, so a script can branch on it.
+test('fgos workflow gate: a passing command prints the pass outcome and exits 0; a failing one prints findings and exits with the canonical findings code', (t) => {
   const tmp = repo(t);
   fs.writeFileSync(path.join(tmp, 'README.md'), '# gate\n');
   const id = builtCase(tmp);
 
   // boundary: the printed envelope and exit code are the CLI's own contract; no lower layer sees them.
   const failed = fgos(tmp, ...gateArgs(id, 3));
-  assert.equal(failed.status, 0, failed.stdout + failed.stderr);
+  assert.equal(failed.status, 14, failed.stdout + failed.stderr);
   const findings = JSON.parse(failed.stdout).data;
   assert.deepEqual({ outcome: findings.outcome, passed: findings.gate.passed, status: findings.gate.status }, { outcome: 'findings', passed: false, status: 3 });
 

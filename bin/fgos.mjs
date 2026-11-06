@@ -5298,7 +5298,7 @@ async function main() {
     } else {
       process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
     }
-    // `run` and foreground `workflow` outcomes map to canonical execution exit codes
+    // `run`, foreground `workflow` and `workflow gate` outcomes map to canonical execution exit codes
     // (0 pass, 4 policy-refusal, 10 provider-limit, 11 execution-failure, 12 partial-writes,
     // 13 blocked, 14 findings, RUL99).
     // `plan-lint` is the verb whose exit code is data-dependent (0 clean, 1 a hard finding present).
@@ -5310,11 +5310,12 @@ async function main() {
       && data?.status !== 'running'
       && data?.outcome !== undefined
       && data?.outcome !== null;
+    const isGateSettle = verb === 'workflow' && positional[0] === 'gate' && typeof data?.outcome === 'string';
     const doctorFailed = verb === 'doctor' && flags.strict === true && data.checks.some((c) => !c.passed);
 
     if (isExecutionRun && data?.outcome) {
       process.exitCode = exitCodeForOutcome(data.outcome);
-    } else if (isForegroundWorkflow) {
+    } else if (isForegroundWorkflow || isGateSettle) {
       process.exitCode = exitCodeForOutcome(data.outcome);
     } else if (verb === 'plan-lint' || (verb === 'workflow' && positional[0] === 'propose')) {
       process.exitCode = data.ok ? 0 : 1;
