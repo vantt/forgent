@@ -893,7 +893,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     }
     lines.push(
       readOnly
-        ? `- Also write a human-readable report to ${agentReportPath} -- REQUIRED for this read-only operation: a "done" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.`
+        ? `- Also write a human-readable report to ${agentReportPath} -- REQUIRED for this read-only operation: write one sentence stating what was answered or done; a "done" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.`
         : `- Optional human-readable report: ${agentReportPath}`,
     );
     lines.push('- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.');

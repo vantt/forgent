@@ -207,10 +207,9 @@ test('renderAssignmentPrompt includes concrete result artifact paths when runDir
 
   assert.match(prompt, /Result artifact:/m);
   assert.match(prompt, /Write structured JSON to .*agent-result\.json/m);
-  // tsk-5zim: validate-plan is a reviewer (read-only) operation -- the
-  // companion report is REQUIRED for its "done" status to count as
-  // evidenced (assignment-runner.mjs's classifyRunEvidence), not optional.
-  assert.match(prompt, /agent-report\.md -- REQUIRED for this read-only operation/m);
+  // validate-plan is a reviewer (read-only) operation: the companion report is REQUIRED for its
+  // "done" status to count as evidenced, and the brief asks for one sentence on what was answered or done.
+  assert.match(prompt, /agent-report\.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done;/m);
   assert.match(prompt, /Do not call Work lifecycle verbs/m);
   // Both artifact paths must include the runDir
   assert.ok(prompt.includes(path.join(runDir, 'agent-result.json')), 'prompt must contain absolute agent-result.json path');

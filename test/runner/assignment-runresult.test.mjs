@@ -1197,6 +1197,36 @@ test('executeAssignment with placeholder report text (TODO/N/A/keyword-only) pro
   assert.equal(runOutcome(result).evidence, 'no-evidence');
 });
 
+test('a one-word answer report (ok) with a done claim is a reported pass, not placeholder text', async () => {
+  const tempDir = mkTempDir();
+
+  const executorScript = path.join(tempDir, 'short-answer-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const runsDir = path.join(process.cwd(), '.fgos', 'assignments');
+    for (const asgn of fs.readdirSync(runsDir)) {
+      const runDir = path.join(runsDir, asgn, 'runs', '01');
+      if (fs.existsSync(runDir)) {
+        fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nok\\n');
+        fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Answered' }));
+      }
+    }
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 5000 };
+
+  const assignment = buildAssignment({ workId: 'tsk-short-answer', stage: 'planning', operation: 'validate-plan' });
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  assert.equal(runOutcome(result).category, 'ok');
+  assert.equal(runOutcome(result).evidence, 'reported');
+});
+
 test('executeAssignment with placeholder evidenceRefs (TODO/N/A/fabricated path) produces no-evidence', async () => {
   const tempDir = mkTempDir();
 

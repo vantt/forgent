@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a18763b9f6903fae93a66e13c75dd1299391b45957f9d871db326a7bd387eccd",
+  "payloadDigest": "813ce354d7010a9cd747b18005ac746cd7dfa41e5e963559c4869ceea01994c7",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -989,7 +989,7 @@
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "6b35618fbb2349be178c672a52f05de765939d0eb68f1a1fa4a7535e291828f1",
     "src/runner/dispatch/assignment-runner.mjs": "cdc715407865355e15bec68577c591200fe37ca2e9209c90edddbe89e3b3d8f4",
-    "src/runner/dispatch/assignment.mjs": "a8d4660fe96ff678cb12bc9d34bb7c4c4acbd4bcc1f747fe450e72eb7e97c31f",
+    "src/runner/dispatch/assignment.mjs": "cb86292531aaf491ad93ec51f708fede5dbebed75af3be2ffc7cf176cf1f78f9",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "2b2c18f391cd2521c3350c9b71007a33b732a56d09596d13768be48c759f8eb7",
     "src/runner/dispatch/config.mjs": "301ff4dc6938f69443ec1745a5a75b02b3a8cbb7c94a07d8d1194a485115c4f5",
@@ -1024,7 +1024,7 @@
     "src/runner/dispatch/run-result.mjs": "56cd35cfcfa3373e4992252a5574d9125af8896e8540d1a0b5384892d9d096f5",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runtime-inspection.mjs": "f0f7282c6e2d3d661acb2e725f55140facf520d87392242508885ae4009a7fae",
-    "src/runner/dispatch/settlement.mjs": "58beb296d9bf63087825cee34121ad407ab1fb896365a8c9739e2b86c611a12c",
+    "src/runner/dispatch/settlement.mjs": "af95c58db4e63912b5de7408885fc1df4be9f0bd6e8de8ea6fe201837da2c6fe",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/stop-processes-inside.mjs": "018abac624d8a4f10d5ad6209db9f765134ce4e304688897df076dfa99e2864e",
     "src/runner/dispatch/terminal-slot.mjs": "82ed4279c054f2486bb8f3223182c9a1043426d0cae2a846449eda29967665df",

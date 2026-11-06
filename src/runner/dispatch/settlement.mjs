@@ -101,7 +101,9 @@ export function resolveSafeRoot(runDir, preferredRoot = null, preferMainCheckout
 }
 
 /**
- * Check whether a text string constitutes substantive agent report content.
+ * Check whether a text string constitutes substantive agent report content. Placeholders (TODO, TBD,
+ * N/A, ...) and headings alone are not; a one-word answer (OK, YES, NO) is, since it states what was
+ * answered.
  */
 export function isSubstantiveReportText(text) {
   if (typeof text !== 'string') return false;
@@ -118,7 +120,7 @@ export function isSubstantiveReportText(text) {
   const GENERIC_KEYWORDS = new Set([
     'TODO', 'N', 'A', 'NA', 'NONE', 'TBD', 'PLACEHOLDER', 'NULL', 'UNDEFINED',
     'DONE', 'PASSED', 'PASS', 'FAIL', 'FAILED', 'REJECTED', 'READY', 'SUMMARY',
-    'VERDICT', 'REPORT', 'OK', 'STATUS', 'YES', 'NO', 'RESULT', 'RESULTS',
+    'VERDICT', 'REPORT', 'STATUS', 'RESULT', 'RESULTS',
     'CHECK', 'TITLE', 'HEADER', 'NOTES', 'NOTE', 'DETAILS', 'FINDINGS',
   ]);
 
