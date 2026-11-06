@@ -91,10 +91,9 @@ export function collectExecutorProfileWarnings(cfg) {
 
 /**
  * Doctor check wrapper (registerCheck's own {passed, message} contract).
- * `passed: false` here means "doctor has something to name", not "this
- * config is broken" -- config loading/dispatch behavior is completely
- * unaffected either way (RUL9/H-track precedent: doctor surfaces, never
- * blocks). Legacy executor ids remain fully accepted.
+ * Findings warn (`passed: true`, `warning:` prefix) because they name a
+ * migration, not a broken config -- config loading/dispatch behavior is
+ * completely unaffected. Legacy executor ids remain fully accepted.
  */
 export function checkExecutorProfileWarnings(cwd, cfg) {
   const warnings = collectExecutorProfileWarnings(cfg);
@@ -103,7 +102,7 @@ export function checkExecutorProfileWarnings(cwd, cfg) {
   }
   const summary = warnings.map((w) => `${w.id} -> ${w.migrateTo}`).join('; ');
   return {
-    passed: false,
-    message: `${warnings.length} legacy executor-profile warning(s) (informational, not blocking): ${summary}`,
+    passed: true,
+    message: `warning: ${warnings.length} legacy executor-profile warning(s): ${summary}`,
   };
 }

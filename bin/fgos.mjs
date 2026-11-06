@@ -4848,7 +4848,7 @@ const STORE_MISSING_WARNING_VERBS = new Set([
 
 // Verbs that open the Event Store without being `requiresExistingStore` or a store-missing-warning read: they carry
 // the opportunistic seal and publish triggers of spec §16 at their start and end.
-const EVENT_STORE_LIFECYCLE_VERBS = new Set(['init', 'doctor', 'setup', 'rebuild', 'events', 'decision-index', 'docs-index', 'knowledge']);
+const EVENT_STORE_LIFECYCLE_VERBS = new Set(['init', 'setup', 'rebuild', 'events', 'decision-index', 'docs-index', 'knowledge']);
 // The verbs that run Land (a `merge` sub-verb only when it lands), and so the only ones that can leave a retained
 // candidate behind. Their end trigger releases the candidates whose result Work has recorded: the sweep reads
 // Land's whole operation journal, a cost a land already dwarfs and every other command would pay for nothing.

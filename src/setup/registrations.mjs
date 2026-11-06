@@ -3420,34 +3420,10 @@ function checkNoStuckMergeAbort(cwd) {
   return { passed: true, message: 'no merge in progress or stuck MERGE_HEAD' };
 }
 
-// Unattended automation must never mutate the shared main checkout's git
-// plumbing without a human reviewing real `git status` first (plan.md).
-// Therefore, this fix always returns changed: false and names the manual
-// recovery command `fgos main-checkout-reset --sha <sha> --confirm`.
-function fixNoStuckMergeAbort(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { changed: false, message: 'not inside a git checkout — nothing to fix' };
-  }
-  const sha = getMergeHeadSha(mainCheckout);
-  if (sha === null) {
-    return { changed: false, message: 'no merge in progress — nothing to fix' };
-  }
-  return {
-    changed: false,
-    message: `merge in progress or stuck (MERGE_HEAD=${sha}) — run fgos main-checkout-reset --sha ${sha} --confirm`,
-  };
-}
-
 registerCheck({
   id: 'no-stuck-merge-abort',
   description: 'main checkout has no lingering MERGE_HEAD from an in-progress or stuck merge abort (tsk-40a)',
   check: (cwd) => checkNoStuckMergeAbort(cwd),
-});
-
-registerFix({
-  id: 'no-stuck-merge-abort',
-  fix: (cwd) => fixNoStuckMergeAbort(cwd),
 });
 
 // Phase 02 R8 (docs/platform/agent-coordination/history/retired-engine/contracts/flow-definition.md,
@@ -3826,7 +3802,7 @@ registerCheck({
 
 registerCheck({
   id: 'executor-profile-warnings',
-  description: 'Phase 06 (executor-policy-dispatch-seams): legacy executor entries hardcoding policy-shaped flags or account-pool-like env, each named with its documented migration target',
+  description: 'legacy executor entries hardcoding policy-shaped flags or account-pool-like env, each named with its documented migration target',
   check: (cwd) => {
     try {
       return checkExecutorProfileWarnings(cwd, loadRunnerConfigForDir(cwd));
@@ -5119,8 +5095,9 @@ export function checkObserveDirWritable(cwd) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
   const observeDir = path.join(root, '.fgos', 'observe');
   try {
+    // The observe store creates its own directory on first write; a read-only check never does.
     if (!fs.existsSync(observeDir)) {
-      fs.mkdirSync(observeDir, { recursive: true });
+      return { passed: true, message: 'info: .fgos/observe does not exist yet; the observe store creates it on first write' };
     }
     const probeFile = path.join(observeDir, `.probe-${process.pid}-${Date.now()}`);
     fs.writeFileSync(probeFile, 'ok', 'utf8');

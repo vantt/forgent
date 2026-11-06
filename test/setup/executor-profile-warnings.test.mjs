@@ -70,15 +70,15 @@ test('Phase 06: legacy executor ids remain fully accepted -- collectExecutorProf
   assert.doesNotThrow(() => collectExecutorProfileWarnings(cfg));
 });
 
-test('Phase 06: checkExecutorProfileWarnings reports passed:false as an informational doctor row (never throws, never a hard failure) when warnings are present', () => {
+test('Phase 06: checkExecutorProfileWarnings warns without failing the row when warnings are present', () => {
   const cfg = {
     executors: {
       'claude-reviewer': { invocations: [{ via: 'cli', command: 'claude', args: ['--effort', 'high'] }] },
     },
   };
   const result = checkExecutorProfileWarnings('/irrelevant-cwd', cfg);
-  assert.equal(result.passed, false, 'doctor surfaces it as a row to look at');
-  assert.match(result.message, /informational, not blocking/);
+  assert.equal(result.passed, true, 'a migration hint never fails doctor');
+  assert.match(result.message, /^warning: 1 legacy executor-profile warning/);
   assert.match(result.message, /executor\.claude-reviewer\.policy-shaped-flags/);
 });
 

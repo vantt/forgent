@@ -24,12 +24,20 @@ test('observe doctor checks are registered in DOCTOR_CHECKS', () => {
   assert.ok(ids.includes('observe-host-resolvable'));
 });
 
-test('observe-dir-writable passes and creates .fgos/observe', () => {
+test('observe-dir-writable passes on an existing directory and on an absent one without creating it', () => {
   const cwd = mkTempDir();
   try {
-    const res = checkObserveDirWritable(cwd);
-    assert.equal(res.passed, true);
-    assert.ok(fs.existsSync(path.join(cwd, '.fgos', 'observe')));
+    const observeDir = path.join(cwd, '.fgos', 'observe');
+    fs.rmSync(observeDir, { recursive: true, force: true });
+    const absent = checkObserveDirWritable(cwd);
+    assert.equal(absent.passed, true);
+    assert.match(absent.message, /^info: .*does not exist yet/);
+    assert.equal(fs.existsSync(observeDir), false, 'a read-only check never creates the directory');
+    fs.mkdirSync(observeDir, { recursive: true });
+    const present = checkObserveDirWritable(cwd);
+    assert.equal(present.passed, true);
+    assert.match(present.message, /is writable/);
+    assert.deepEqual(fs.readdirSync(observeDir), [], 'the probe file is removed');
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }

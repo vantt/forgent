@@ -238,5 +238,5 @@ test('a detached seal or sync child that fails leaves a record and exits non-zer
   }
   const faults = faultRecords(repo, dir).filter((record) => record.faultClass === 'event-store-child');
   assert.deepEqual(faults.map((record) => record.argv.slice(0, 2)), [['events', 'seal'], ['events', 'sync']]);
-  for (const record of faults) assert.match(record.message, /fgos setup/);
+  for (const record of faults) assert.match(record.message, /fgos doctor --fix/);
 });

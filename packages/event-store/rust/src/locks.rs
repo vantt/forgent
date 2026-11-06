@@ -129,7 +129,7 @@ fn validate_directory(
         return Err(Error::new(
             ErrorCode::EventStoreLockDirInvalid,
             format!(
-                "{} must be an existing 0700 directory; run fgos setup",
+                "{} must be an existing 0700 directory; run fgos doctor --fix (event-store-lock-dirs)",
                 dir.display()
             ),
         ));

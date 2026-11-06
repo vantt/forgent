@@ -51,6 +51,9 @@ export function postLandDrift(repoRoot, view, { trunk, sessions } = {}) {
     }
   }
 
+  // Nothing to compare means no registry read: reading takes the sessions lock, which creates `.fgos/locks`.
+  if (candidateIds.size === 0) return result;
+
   const activeSessions = sessions ?? listSessions(repoRoot);
   const sessionsByItem = new Map();
   for (const entry of activeSessions) {

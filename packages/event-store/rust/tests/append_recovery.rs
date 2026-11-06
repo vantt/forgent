@@ -343,7 +343,7 @@ fn missing_wide_and_symlink_lock_dirs_refuse() {
     assert!(
         missing
             .detail
-            .ends_with("locks must be an existing 0700 directory; run fgos setup"),
+            .ends_with("locks must be an existing 0700 directory; run fgos doctor --fix (event-store-lock-dirs)"),
         "the refusal names the directory and the next step: {missing}"
     );
     code(missing, "event-store-lock-dir-invalid");

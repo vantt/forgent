@@ -404,6 +404,30 @@ test('fgos doctor (no flags) on a fresh cwd prints the envelope JSON with every 
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
+test('fgos doctor in a git repo that is not set up for fgOS writes no .fgos and starts no events child', async () => {
+  const cwd = mkTemp('doctor-cli-unset-repo-');
+  const homeDir = mkTemp('doctor-cli-unset-repo-home-');
+  const realCwd = fs.realpathSync(cwd);
+  try {
+    execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
+    const result = spawnSync(process.execPath, [FGOS, 'doctor', '--json'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
+    assert.equal(result.status, 0, result.stderr);
+    // A detached publish child outlives doctor, so give it a bounded window to show up in the process table.
+    const deadline = Date.now() + 3000;
+    let children = '';
+    while (Date.now() < deadline && !children) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      const table = spawnSync('ps', ['-eo', 'args'], { encoding: 'utf8' }).stdout ?? '';
+      children = table.split('\n').filter((line) => /\bevents\b/.test(line) && (line.includes(cwd) || line.includes(realCwd))).join('\n');
+    }
+    assert.equal(children, '', 'doctor must not start an events child');
+    assert.equal(fs.existsSync(path.join(cwd, '.fgos')), false, `doctor left ${fs.readdirSync(cwd).join(',')} with a .fgos behind: ${fs.existsSync(path.join(cwd, '.fgos')) ? fs.readdirSync(path.join(cwd, '.fgos')).join(',') : ''}`);
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+});
+
 test('resolveMainCheckout from inside a linked worktree resolves the main checkout, not the worktree', () => {
   const main = initRepo('checks-main-');
   const wt = path.join(mkTemp('checks-wt-parent-'), 'wt');
@@ -521,22 +545,18 @@ test('shell-integration-sourced samples dead paths instead of printing all of th
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('no-stuck-merge-abort check passes and fix reports nothing to fix on a clean repo with no MERGE_HEAD', () => {
+test('no-stuck-merge-abort check passes on a clean repo with no MERGE_HEAD', () => {
   const dir = initRepo('checks-no-stuck-merge-clean-');
   try {
     const { passed, message } = checkById('no-stuck-merge-abort').check(dir);
     assert.equal(passed, true);
     assert.match(message, /no merge in progress/);
-
-    const { changed, message: fixMessage } = fixById('no-stuck-merge-abort').fix(dir);
-    assert.equal(changed, false);
-    assert.match(fixMessage, /nothing to fix/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('no-stuck-merge-abort check fails and fix reports manual command when MERGE_HEAD exists', () => {
+test('no-stuck-merge-abort check fails and names the manual command when MERGE_HEAD exists', () => {
   const dir = initRepo('checks-no-stuck-merge-dirty-');
   try {
     const headSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
@@ -546,11 +566,6 @@ test('no-stuck-merge-abort check fails and fix reports manual command when MERGE
     assert.equal(passed, false);
     assert.match(message, /merge in progress or stuck/);
     assert.match(message, new RegExp(`fgos main-checkout-reset --sha ${headSha} --confirm`));
-
-    const { changed, message: fixMessage } = fixById('no-stuck-merge-abort').fix(dir);
-    assert.equal(changed, false);
-    assert.match(fixMessage, /merge in progress or stuck/);
-    assert.match(fixMessage, new RegExp(`fgos main-checkout-reset --sha ${headSha} --confirm`));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
