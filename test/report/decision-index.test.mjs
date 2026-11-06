@@ -20,6 +20,7 @@ import {
   computeDecisionIndex,
   generateDecisionIndex,
   indexPathFor,
+  narrativeHolderResolver,
 } from '../../src/report/decision-index.mjs';
 import { addDecision } from '../../src/state/store.mjs';
 
@@ -220,4 +221,36 @@ test('buildDecisionIndexMarkdown: historical ADR IDs reused across scopes retain
   assert.match(updated, /updated Iron Law/);
   assert.match(updated, /Team Harness/);
   assert.equal((updated.match(/D-ADR0032/g) ?? []).length, 2);
+});
+
+test('buildDecisionIndexMarkdown: a retired docs/specs pointer carried by an event renders as the holder the resolver names, and an unresolved pointer is left as written', () => {
+  const holders = { runner: 'docs/platform/runner/decisions/' };
+  const md = buildDecisionIndexMarkdown(
+    [{ scope: 'runner', text: 'D-ADR0001: x', rationale: 'narrative di dời sang docs/specs/runner.md; see docs/specs/ghost.md', ts: '2026-01-01' }],
+    '',
+    { holderFor: (name) => holders[name] ?? null },
+  );
+  assert.match(md, /narrative di dời sang docs\/platform\/runner\/decisions\/;/);
+  assert.match(md, /docs\/specs\/ghost\.md/);
+  assert.doesNotMatch(md, /docs\/specs\/runner\.md/);
+});
+
+test('narrativeHolderResolver: reads the governance scope-to-holder table by legacy alias or area name, falls back to the platform file carrying the scope name, and returns null otherwise', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-holder-'));
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'platform', 'system-overview'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'system-overview', 'spec.md'), '# spec\n');
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'platform', 'governance.md'), [
+    '## Decision scope to holder table',
+    '',
+    '| Scope (legacy alias retained) | Read first | Facts and RULs | Narrative home |',
+    '|---|---|---|---|',
+    '| distribution → packaging-distribution | `docs/platform/packaging-distribution/README.md` | `docs/platform/packaging-distribution/spec.md` | `docs/platform/packaging-distribution/decisions/` |',
+    '',
+    '## Next section',
+  ].join('\n'));
+  const holderFor = narrativeHolderResolver(repoRoot);
+  assert.equal(holderFor('distribution'), 'docs/platform/packaging-distribution/decisions/');
+  assert.equal(holderFor('packaging-distribution'), 'docs/platform/packaging-distribution/decisions/');
+  assert.equal(holderFor('system-overview'), 'docs/platform/system-overview/spec.md');
+  assert.equal(holderFor('nowhere'), null);
 });

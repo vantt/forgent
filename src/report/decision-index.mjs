@@ -18,6 +18,42 @@ export function indexPathFor(repoRoot) {
   return path.join(repoRoot, 'docs', 'decisions', 'index.md');
 }
 
+const GOVERNANCE_PATH = path.join('docs', 'platform', 'governance.md');
+const LEGACY_SPEC_PATH = /docs\/specs\/([A-Za-z0-9-]+)\.md/g;
+
+/**
+ * Resolve where a decision scope's narrative lives today. The governance
+ * decision-scope-to-holder table names the narrative home per scope (its scope
+ * cell reads `legacy alias → area`); a scope the table does not list falls back
+ * to the platform file that carries its name. Returns `(scopeName) => path|null`.
+ */
+export function narrativeHolderResolver(repoRoot) {
+  const homes = new Map();
+  try {
+    const governance = fs.readFileSync(path.join(repoRoot, GOVERNANCE_PATH), 'utf8');
+    const section = governance.split(/^## Decision scope to holder table$/m)[1]?.split(/^## /m)[0] ?? '';
+    for (const line of section.split('\n')) {
+      const cells = line.split('|').map((cell) => cell.trim());
+      if (cells.length < 6 || !cells[1] || cells[1] === 'Scope (legacy alias retained)' || /^-+$/.test(cells[1])) continue;
+      const home = /`([^`]+)`/.exec(cells[4])?.[1];
+      if (!home) continue;
+      for (const name of cells[1].split('→').map((part) => part.trim())) homes.set(name, home);
+    }
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+  const exists = (rel) => fs.existsSync(path.join(repoRoot, rel));
+  return (name) => homes.get(name)
+    ?? [`docs/platform/${name}.md`, `docs/platform/${name}/spec.md`].find(exists)
+    ?? null;
+}
+
+// Decision events are immutable and may carry a retired `docs/specs/<scope>.md`
+// pointer; the projection shows the current holder instead.
+function resolveLegacyPaths(text, holderFor) {
+  return holderFor ? String(text ?? '').replace(LEGACY_SPEC_PATH, (match, name) => holderFor(name) ?? match) : text;
+}
+
 function escapeCell(text) {
   return String(text ?? '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
 }
@@ -37,7 +73,7 @@ function escapeCell(text) {
  * this same `type`, and `docs-index`/its own consistency test expect every
  * `.md` file under this dir to keep declaring it, generated index included.
  */
-export function buildDecisionIndexMarkdown(decisions, existingMarkdown = '') {
+export function buildDecisionIndexMarkdown(decisions, existingMarkdown = '', { holderFor } = {}) {
   const rows = new Map();
   const key = (d) => `${d.scope}\0${d.text.match(/^D-ADR\d+\b/)?.[0] ?? d.ts}`;
   for (const line of existingMarkdown.split('\n')) {
@@ -74,7 +110,7 @@ export function buildDecisionIndexMarkdown(decisions, existingMarkdown = '') {
   } else {
     lines.push('| Scope | Decision | Rationale | Recorded |', '|---|---|---|---|');
     for (const d of scoped) {
-      lines.push(`| ${escapeCell(d.scope)} | ${escapeCell(d.text)} | ${escapeCell(d.rationale)} | ${escapeCell(d.ts)} |`);
+      lines.push(`| ${escapeCell(d.scope)} | ${escapeCell(resolveLegacyPaths(d.text, holderFor))} | ${escapeCell(resolveLegacyPaths(d.rationale, holderFor))} | ${escapeCell(d.ts)} |`);
     }
     lines.push('');
   }
@@ -96,7 +132,7 @@ export function computeDecisionIndex(repoRoot, fgosDir) {
     if (err.code !== 'ENOENT') throw err;
   }
   const view = listWork(fgosDir);
-  const nextContent = buildDecisionIndexMarkdown(view.decisions, previousContent);
+  const nextContent = buildDecisionIndexMarkdown(view.decisions, previousContent, { holderFor: narrativeHolderResolver(repoRoot) });
   return { indexPath, nextContent, previousContent, changed: previousContent !== nextContent };
 }
 

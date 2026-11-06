@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseYaml } from '../util/yaml.mjs';
-import { buildDecisionIndexMarkdown } from '../report/decision-index.mjs';
+import { buildDecisionIndexMarkdown, narrativeHolderResolver } from '../report/decision-index.mjs';
 import { listWork } from '../state/store.mjs';
 
 /**
@@ -106,7 +106,7 @@ function readDecisionIds(projectRoot, fgosDir = path.join(projectRoot, '.fgos'))
   } catch {
     return new Set();
   }
-  if (content !== buildDecisionIndexMarkdown(view.decisions)) return new Set();
+  if (content !== buildDecisionIndexMarkdown(view.decisions, '', { holderFor: narrativeHolderResolver(projectRoot) })) return new Set();
 
   const ids = new Set();
   for (const decision of view.decisions ?? []) {

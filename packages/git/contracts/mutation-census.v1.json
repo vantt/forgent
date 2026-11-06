@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b428dd16119b93c756469973767dcc71f95a6b9e2895d660d7a3823273e5fe01",
+  "payloadDigest": "d3c29e89b2f2af909d4dc0d04890b68d79add3f43706cf8a4496cfe0d14d3b44",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -949,7 +949,7 @@
     "src/report/authoritative-match.mjs": "385fd87aaaab0441c290d0203f5903a9b1edc614e7bead7e0970dc6aabd6b596",
     "src/report/capability-plan-lint.mjs": "f001b8dc9a745a4e7296c4f68321b22c5d417c2b457bab987ca3e7bbb583c03b",
     "src/report/context-render.mjs": "21f0d004ecc62a6be3d059f2c4911dd9dd9fcd3c646d348625e8277efb750fdb",
-    "src/report/decision-index.mjs": "5ad753196470debd2f502b3c00994c1d75a9ed0c576c5cf8188eb8600f0a09a2",
+    "src/report/decision-index.mjs": "e32e8f246f8e2cb67e27b754bdb24768b75a7b4b61a7afbcdb5019a9b5dd4e9a",
     "src/report/enduser-index-generate.mjs": "2c6556ee39636d0c10bd3f0db25afc55b4ea7a375139b455fd1f6ea0c94d879b",
     "src/report/enduser-index.mjs": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650",
     "src/report/frontmatter.mjs": "bd3032562a173541285f241d5b05818717b0dc53c086be4075f880e861ecd7da",
@@ -1118,7 +1118,7 @@
     "src/setup/identity-checks.mjs": "ea95efeb0a58dd19a2fa4b57d7fb81f4931379e0cba36ad88c1640a1171a0c2d",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "9d239c9f1d139f07cbc6bfc02701a7f138b38aad9fa2ac3f5061a34ccd357c8f",
-    "src/setup/instruction-registry.mjs": "a16c7a6049418fe6e1959c8297e7b1af2a6e6be3ac7f29570a9be0ade8c2e697",
+    "src/setup/instruction-registry.mjs": "a3f85f7a20cca460daaedd9d8347ec6d1831ab93eacb5d0455e8b82ee8e66833",
     "src/setup/mailbox-claude-accept.mjs": "0b6377d2c99d704c163b8d53db8f68c5f12ed4628843c768d0d2ddc3129bdc6c",
     "src/setup/mailbox-limits.mjs": "4d5342b6631a38e00edc30b8d8a4966f7d94f6848e2b68c45529822d4fdd9068",
     "src/setup/mailbox-sync-timer.mjs": "6628ebdd706138f32b9733bba2880b075c9d5c701695b85bf55347e47d3756ef",
