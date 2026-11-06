@@ -1193,7 +1193,7 @@ test('resolveWorkerArtifactPath falls back to the flat legacy name when the outb
 // Run admission and fencing (runtime-recovery P01): executeAssignment's
 // atomic admission ledger (run-lock.mjs's shared generation primitive),
 // replacing the prior readdirSync + max-attempt scan. See
-// admitRunAttempt's own doc comment in assignment-runner.mjs for the full
+// admitRunAttempt's own doc comment in run-admission.mjs for the full
 // commit algorithm this proves.
 // =============================================================================
 

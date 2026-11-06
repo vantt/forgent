@@ -101,7 +101,7 @@ const ALLOWED = new Map([
   ['src/runner/operation-choice.mjs: findLatestAssignmentRunResult: readdirSync(runsDir)', { count: 1, reason: 'attempts of one known assignment, filtered to dispatched markers' }],
   // Run-attempt admission and command queues of one already-resolved
   // assignment or run directory; never discovery across assignments.
-  ['src/runner/dispatch/assignment-runner.mjs: admitRunAttempt: readdirSync(runsDir)', { count: 2, reason: 'attempt numbering and abandoned-staging cleanup of one resolved assignment' }],
+  ['src/runner/dispatch/run-admission.mjs: admitRunAttempt: readdirSync(runsDir)', { count: 2, reason: 'attempt numbering and abandoned-staging cleanup of one resolved assignment' }],
   ['src/run-supervisor/client.mjs: walk: readdirSync(dir)', { count: 1, reason: 'the adopt scan walks the assignments root it was handed and recurses through every level, collecting the attempt directories that are not closed' }],
   ['src/run-supervisor/client.mjs: walk: readdirSync(child)', { count: 1, reason: 'attempt directories of one resolved runs directory found by that same walk' }],
   ['src/runner/dispatch/runtime-inspection.mjs: admissions: readdirSync(genDir)', { count: 1, reason: 'generation records of one resolved run' }],

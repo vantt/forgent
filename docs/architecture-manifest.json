@@ -78,6 +78,7 @@
     "src/runner/dispatch/provider-account-probe.mjs": "infra",
     "src/runner/dispatch/provider-credential-renewal.mjs": "infra",
     "src/runner/dispatch/assignment-runner.mjs": "infra",
+    "src/runner/dispatch/run-admission.mjs": "infra",
     "src/runner/dispatch/settlement.mjs": "infra",
     "src/run-supervisor/stray-writes.mjs": "infra",
     "src/runner/dispatch/cli.mjs": "infra",

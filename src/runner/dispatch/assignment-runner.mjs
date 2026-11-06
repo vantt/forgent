@@ -17,8 +17,7 @@ import { recordCustodyHandoff } from '../../run-supervisor/cwd-lock.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from '../../run-supervisor/worker-artifacts.mjs';
-import { normalizeRunResultV3, readSettledResult, ASSESSMENT_VERDICTS, runOutcome, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
-import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
+import { normalizeRunResultV3, readSettledResult, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
 import {
   commitRunSettlement,
   settleRunOutcome,
@@ -54,7 +53,7 @@ import { bindSeatOf } from '../execution/seat-resolver.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
 import { RunnerConfigError, loadRunnerConfigForDir, withDefaultExecutor } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
-import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
+import { renderAssignmentPrompt, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 import { withRunDirReadAccess } from './cli.mjs';
 import { mintAttemptWriterId, resolveWriterIdentity } from '../../util/session-identity.mjs';
@@ -63,24 +62,17 @@ import { compileDispatchPlan } from './plan.mjs';
 import { deriveProviderFamily } from './resolve.mjs';
 import { normalizeProviderFamily, checkProviderDisallowed } from './provider-adapter.mjs';
 import { refuseWorkItemInput } from './work-item-input.mjs';
-import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
 import {
-  publishNextGeneration,
-  currentGeneration,
   acquireRunControl,
   releaseRunControl,
-  settleRunControl,
   isRunControlCurrent,
-  readMarker,
   publishMarkerOnce,
   fsyncFileBestEffort,
-  fsyncDirBestEffort,
   buildRunControlHolder,
-  inspectRunControl,
 } from '../../run-supervisor/run-lock.mjs';
-import { resolveHolderLiveness } from '../../native/process-identity.mjs';
+import { admitRunAttempt, isSupervisedAttemptStillWorking } from './run-admission.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError, agentArgsWithoutPrompt } from './transport.mjs';
 import {
   acquireAttemptLocks,
@@ -116,7 +108,6 @@ import {
   publishImmutableProof,
   publishMutableProjection,
   computeSha256Digest,
-  canonicalJson,
 } from '../../native/proof-helpers.mjs';
 import {
   buildEffectiveExecutionContract,
@@ -125,7 +116,6 @@ import {
 } from './effective-execution-contract.mjs';
 import {
   acquireNamedAccountLease,
-  classifyProviderCapacityFault,
   commandCli,
   credentialSourceForCli,
   credentialStoreOf,
@@ -133,7 +123,6 @@ import {
   hasProviderAccounts,
   LEASE_CONFLICT_REASON,
   probeQuarantinedAccounts,
-  quarantineProviderAccount,
   redactProviderCapacitySelection,
   releaseProviderAccountLease,
 } from './provider-capacity.mjs';
@@ -143,12 +132,6 @@ export {
   EFFECTIVE_EXECUTION_CONTRACT_FILE,
   readEffectiveExecutionContract,
 };
-
-function normalizeDigest(digest) {
-  if (!digest || typeof digest !== 'string') return null;
-  return digest.startsWith('sha256:') ? digest.slice(7) : digest;
-}
-
 
 // ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
 // `effectiveAssignment` derivation reads a stored assignment.json back from
@@ -548,385 +531,6 @@ export function terminalAgentArgs({ resolvedCmd, prompt, model, runDir, writerId
   return commandCli(resolvedCmd.command) === 'codex'
     ? [...args, '-c', `shell_environment_policy.set={${settings.join(',')}}`]
     : args;
-}
-
-/**
- * Whether a supervised attempt (`direct` or `terminal`) is still doing real work, independent of whether the RUNNER process that
- * started it (the control holder `inspectRunControl` tracks) is alive. The supervisor and the agent
- * outlive their controller, so a runner-only liveness check reads `held: false` the instant the runner
- * dies even while the agent keeps mutating the cwd. Both `admitRunAttempt`'s in-flight check and
- * provider-capacity's lease reclaim need this SAME real-attempt signal.
- *
- * The answer is the adopt door's own read-only probe of the attempt lock and the domain it declared
- * (`running`, `being-adopted`, `held`). A Run with no v3 envelope (never launched) reads
- * `false`. A probe that cannot run reads `true`: undecidable liveness fails closed.
- */
-function isSupervisedAttemptStillWorking(runDir) {
-  if (!fs.existsSync(path.join(runDir, 'envelope.json'))) return false;
-  try {
-    const { state } = adoptRun(runDir, { probeOnly: true });
-    return state === 'running' || state === 'being-adopted' || state === 'held';
-  } catch {
-    return true;
-  }
-}
-
-/**
- * Atomically admit one Run attempt for `assignmentId` under `runsDir`,
- * replacing the prior readdirSync + max-attempt scan. Fences three
- * outcomes, per the admission door's own commit algorithm:
- *
- * - The SAME `(retryId, destination, payloadDigest)` tuple as an
- *   already-committed generation returns that SAME attempt/runId, never a
- *   new one (idempotent retry).
- * - A DIFFERENT tuple reusing an already-used `retryId` is refused
- *   (`duplicate-retry`) -- a caller's retry identity may not silently
- *   change what it means partway through.
- * - A caller naming `predecessorRunId` (or contending while a Run is
- *   already admitted at all) must supersede the EXACT current committed
- *   Run; any other value is refused (`invalid-predecessor`).
- *
- * The admission-generation ledger (`assignmentDir/admission/generations/`,
- * run-lock.mjs's shared append-only primitive) is the sole source of truth
- * for attempt numbers: concurrent callers race on one hard-linked path,
- * exactly one wins, every loser rereads and re-evaluates against the new
- * current generation. Once an attempt/runId is committed there, it is
- * never reused or leapfrogged, independent of whether the run directory
- * materialization below has completed.
- *
- * The run directory itself (`runs/<NN>/run.json` + `dispatch-plan.json`)
- * is built in a same-filesystem staging directory, fsynced, then published
- * with one atomic rename -- a reader never observes a partially-written
- * attempt directory, and a crash between generation commit and rename
- * leaves the generation record as the sole durable fact (no `runs/<NN>/`
- * at all) until a later call for the same tuple resumes and completes it.
- * Final attempt directories are never created empty.
- */
-function admitRunAttempt(
-  assignmentDir,
-  runsDir,
-  assignmentId,
-  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt, forceNewAttempt = false, refuseIfSettled = false },
-) {
-  const admissionGenerationsDir = path.join(assignmentDir, 'admission', 'generations');
-  const admissionMarkersDir = path.join(assignmentDir, 'admission', 'markers');
-
-  if (retryId !== undefined) {
-    if (readMarker(path.join(admissionMarkersDir, `${retryId}.aborted.json`)) !== null) {
-      throw new RunnerConfigError(
-        `executeAssignment: retryId "${retryId}" for assignment "${assignmentId}" was aborted -- refuse identity reuse`,
-      );
-    }
-  }
-
-  const admission = publishNextGeneration(admissionGenerationsDir, ({ current, nextEpoch, generations }) => {
-    // Strict tuple/predecessor fencing is opt-in, gated on the caller
-    // supplying a `retryId` at all -- every pre-existing caller of
-    // `executeAssignment` (and every legacy retry path that just calls it
-    // again with no new admission opts) never passes one, and must keep
-    // getting "next available attempt" exactly as the replaced
-    // readdirSync scan did. A caller that DOES pass `retryId` opts into
-    // the full admission contract: same tuple resumes idempotently, a
-    // changed tuple under the same retryId is refused, and the caller must
-    // name the exact current Run it supersedes.
-    if (retryId !== undefined) {
-      const priorForRetryId = generations.find((g) => g.record.retryId === retryId);
-      if (priorForRetryId) {
-        if (priorForRetryId.record.destination === destination && priorForRetryId.record.admissionPayloadDigest === payloadDigest) {
-          return { stop: true, status: 'duplicate', epoch: priorForRetryId.epoch, record: priorForRetryId.record };
-        }
-        return { stop: true, status: 'duplicate-retry', epoch: priorForRetryId.epoch, record: priorForRetryId.record };
-      }
-
-      const isGenerationValid = (g) => {
-        if (!g.record?.retryId) return true;
-        const isAborted = readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) !== null;
-        if (!isAborted) return true;
-        const attemptStr = g.record.attemptStr || String(g.record.attempt).padStart(2, '0');
-        const runJsonPath = path.join(runsDir, attemptStr, 'run.json');
-        if (!fs.existsSync(runJsonPath)) return false;
-        try {
-          const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-          return runMeta?.retryId === g.record.retryId;
-        } catch {
-          return false;
-        }
-      };
-
-      const validGenerations = generations.filter(isGenerationValid);
-      const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
-      const currentRunId = currentValid?.record?.runId ?? null;
-      if (predecessorRunId !== currentRunId) {
-        return { stop: true, status: 'invalid-predecessor', currentRunId };
-      }
-    }
-
-    let maxDir = 0;
-    if (fs.existsSync(runsDir)) {
-      try {
-        const entries = fs.readdirSync(runsDir);
-        for (const name of entries) {
-          if (/^\d+$/.test(name)) {
-            const n = parseInt(name, 10);
-            if (!Number.isNaN(n) && n > maxDir) maxDir = n;
-          }
-        }
-      } catch {}
-    }
-    for (const g of generations) {
-      if (g.record?.attempt && g.record.attempt > maxDir) {
-        maxDir = g.record.attempt;
-      }
-    }
-    let attempt = Math.max(nextEpoch, maxDir + 1);
-    while (fs.existsSync(path.join(runsDir, String(attempt).padStart(2, '0')))) {
-      attempt += 1;
-    }
-
-    // L1: expectedRunId is checked below against the naturally-computed
-    // attempt, never used to bump it -- a caller declaring an attempt ahead
-    // of what this ledger would assign gets refused (invalid-predecessor),
-    // never silently adopted as the new attempt number.
-    const attemptStr = String(attempt).padStart(2, '0');
-    const runId = `run_${assignmentId}_${attemptStr}`;
-    if (expectedRunId !== undefined && runId !== expectedRunId) {
-      // A caller (e.g. a schema-2 session retry declaration) that named an
-      // exact expected identity gets exactly that identity or a refusal --
-      // never a silently different runId drifting out of two independent
-      // ledgers (the session's own retry-declaration generations and this
-      // Assignment's admission generations) that were supposed to stay in
-      // lockstep.
-      const isGenerationValid = (g) => {
-        if (!g.record?.retryId) return true;
-        const isAborted = readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) !== null;
-        if (!isAborted) return true;
-        const attemptStr = g.record.attemptStr || String(g.record.attempt).padStart(2, '0');
-        const runJsonPath = path.join(runsDir, attemptStr, 'run.json');
-        if (!fs.existsSync(runJsonPath)) return false;
-        try {
-          const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-          return runMeta?.retryId === g.record.retryId;
-        } catch {
-          return false;
-        }
-      };
-      const validGenerations = generations.filter(isGenerationValid);
-      const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
-      return { stop: true, status: 'invalid-predecessor', currentRunId: currentValid?.record?.runId ?? null, expectedRunId, computedRunId: runId };
-    }
-    // M1: refuse an unfenced new admission when the CURRENT (most recent)
-    // attempt has neither settled (result.json) nor a provably-dead
-    // control holder -- admitting anyway spawns a second worker racing an
-    // unsettled first one, the exact double-materialization this phase
-    // exists to close, one level up from R1's own resume-time check (this
-    // fires on a FRESH dispatch that never resumes anything, so R1's guard
-    // never runs). Only a dead holder (inspectRunControl, Phase 02
-    // identity) AND no live detached supervisor/worker (S1, Phase 2 --
-    // `inspectRunControl` alone only proves the RUNNER is dead; its
-    // detached supervisor/worker is spawned to deliberately outlive it and
-    // keeps mutating the cwd, so a runner-only check would admit a second,
-    // racing worker onto the same Run) authorizes silently proceeding;
-    // alive or undisprovable liveness on either signal refuses unless the
-    // operator explicitly overrides via `forceNewAttempt`
-    // (--force-new-attempt).
-    if (current && !forceNewAttempt) {
-      const priorAttemptStr = current.record.attemptStr || String(current.record.attempt).padStart(2, '0');
-      const priorRunDir = path.join(runsDir, priorAttemptStr);
-      if (!fs.existsSync(path.join(priorRunDir, 'result.json'))) {
-        const priorControl = inspectRunControl(priorRunDir);
-        // S5: a genuinely concurrent sibling caller can reach ITS OWN
-        // admission check for this exact Assignment before it (or a racing
-        // twin) has ever acquired real run control (`acquireRunControl`,
-        // `purpose: 'worker-spawn'`) -- a separate, later step inside
-        // `executeAssignment`, not part of this same CAS commit. In that
-        // narrow window `priorControl.held` is false (no control record
-        // exists at all, `priorControl.controlEpoch` is undefined) and
-        // `isSupervisedAttemptStillWorking` is also false (no supervisor/worker
-        // spawned yet either), so neither signal below would ever catch a
-        // second admission racing INSIDE that window -- confirmed via a
-        // real two-process race (test/runner/coordination-dag-concurrency
-        // .test.mjs's cross-process "identical concurrent writers" case).
-        // The one signal that DOES exist for the whole window, with zero
-        // extra writes: the admitting process's own pid, stamped into this
-        // SAME atomic CAS record as `admittedBy` below. Consulted ONLY when
-        // no real control record exists yet (`!priorControl.controlEpoch`)
-        // -- once one does, `priorControl.held` alone is authoritative and
-        // this fallback is never consulted, so it can never override or go
-        // stale against the real control ledger.
-        const admitterAlive =
-          !priorControl.controlEpoch && current.record.admittedBy && resolveHolderLiveness(current.record.admittedBy) === 'held';
-        // The prior attempt's supervisor and agent outlive the controller that started it, so the adopt
-        // door's own probe of its attempt lock and domain decides whether it still works (cli-spawn and
-        // herdr-spawn alike).
-        const priorDetachedRunStillWorking = isSupervisedAttemptStillWorking(priorRunDir);
-        if (priorControl.held || priorDetachedRunStillWorking || admitterAlive) {
-          return {
-            stop: true,
-            status: 'run-in-flight',
-            priorRunId: current.record.runId,
-            priorAttempt: current.record.attempt,
-            holder: priorControl.holder ?? current.record.admittedBy ?? null,
-          };
-        }
-      } else if (refuseIfSettled) {
-        // S5 (dispatch-engine-liveness-hardening Phase 5): opt-in only, never
-        // the default -- a settled current attempt is exactly what a
-        // legitimate retry (schema-1 or schema-2, `retrySessionTask`) is
-        // SUPPOSED to admit a fresh attempt over, so M1 above never refuses
-        // on settlement alone. But a caller that never intends a retry (a
-        // FIRST, non-retry dispatch of an Assignment/taskKey) has no other
-        // atomic way to tell "a concurrent sibling already finished this
-        // exact dispatch" apart from "nothing has happened yet" -- a plain
-        // re-read from that caller's own process can always be outrun by a
-        // genuinely concurrent cross-process sibling (real wall-clock I/O,
-        // not a same-process race admitRunAttempt's own atomicity already
-        // closes). Refusing here, INSIDE the same CAS critical section that
-        // decides admission, is the only place this can be closed for real.
-        return { stop: true, status: 'run-already-settled', priorRunId: current.record.runId, priorAttempt: current.record.attempt };
-      }
-    }
-    return {
-      record: {
-        attempt,
-        attemptStr,
-        runId,
-        retryId: retryId ?? null,
-        predecessorRunId,
-        destination,
-        admissionPayloadDigest: payloadDigest,
-        admittedAt: new Date().toISOString(),
-        // S5: the admitting process's own identity, stamped into this same
-        // atomic CAS commit -- see the `admitterAlive` check above for why
-        // this exists and when it is (and is not) consulted.
-        admittedBy: buildRunControlHolder(`${runId}:admission:${process.pid}`),
-      },
-    };
-  });
-
-  if (admission.status === 'duplicate-retry') {
-    throw new RunnerConfigError(
-      `executeAssignment: retryId "${retryId}" for assignment "${assignmentId}" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)`,
-      { code: 'admission-duplicate-retry', phase: 'pre-admission' },
-    );
-  }
-  if (admission.status === 'invalid-predecessor') {
-    throw new RunnerConfigError(
-      `executeAssignment: predecessorRunId "${predecessorRunId}" for assignment "${assignmentId}" does not match the current committed Run "${admission.currentRunId}" -- refusing (invalid-predecessor)`,
-      { code: 'admission-invalid-predecessor', phase: 'pre-admission' },
-    );
-  }
-  if (admission.status === 'run-in-flight') {
-    // M1: nothing for THIS new attempt was ever created (no run directory) --
-    // 'pre-admission' is correct, matching every other admission refusal
-    // above.
-    throw new RunnerConfigError(
-      `executeAssignment: assignment "${assignmentId}"'s prior attempt "${admission.priorRunId}" (attempt ${admission.priorAttempt}) has not settled and its control holder is alive or its liveness could not be disproven -- refusing a new attempt that would race it (pass --force-new-attempt to override)`,
-      { code: 'admission-run-in-flight', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt, holder: admission.holder },
-    );
-  }
-  if (admission.status === 'run-already-settled') {
-    // S5: opt-in (`refuseIfSettled`) refusal -- see its own comment above
-    // for why this exists. Nothing for THIS new attempt was ever created.
-    throw new RunnerConfigError(
-      `executeAssignment: assignment "${assignmentId}"'s prior attempt "${admission.priorRunId}" (attempt ${admission.priorAttempt}) already settled -- the caller opted into refuseIfSettled and must resume/link that result instead of dispatching a fresh attempt over it`,
-      { code: 'admission-run-already-settled', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt },
-    );
-  }
-
-  const record = admission.record;
-  const runDir = path.join(runsDir, record.attemptStr);
-
-  if (fs.existsSync(runDir)) {
-    if (retryId !== undefined && admission.status === 'duplicate') {
-      return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: true };
-    }
-  }
-
-  // Remove matching abandoned staging directory only after validating its identity:
-  // "abandoned staging is not admission and is removed only after matching its retry id and digest"
-  try {
-    if (fs.existsSync(runsDir)) {
-      const entries = fs.readdirSync(runsDir);
-      for (const name of entries) {
-        if (name === `.staging-${record.attemptStr}` || name.startsWith(`.staging-${record.attemptStr}-`)) {
-          const abandonedPath = path.join(runsDir, name);
-          try {
-            // Live sibling protection: never delete a staging directory belonging to a live process
-            const pidMatch = /^\.staging-[^-]+-(\d+)-/.exec(name);
-            if (pidMatch) {
-              const stagedPid = parseInt(pidMatch[1], 10);
-              if (resolveHolderLiveness({ pid: stagedPid }) !== 'dead') {
-                continue;
-              }
-            }
-
-            // Legacy staging without PID/UUID (.staging-NN)
-            if (name === `.staging-${record.attemptStr}`) {
-              fs.rmSync(abandonedPath, { recursive: true, force: true });
-              continue;
-            }
-
-            const stagedMetaPath = path.join(abandonedPath, 'run.json');
-            if (fs.existsSync(stagedMetaPath)) {
-              const stagedMeta = JSON.parse(fs.readFileSync(stagedMetaPath, 'utf8'));
-              const normStaged = normalizeDigest(stagedMeta.payloadDigest);
-              const normAdmission = normalizeDigest(record.admissionPayloadDigest);
-              if (
-                stagedMeta.retryId === (record.retryId ?? null) &&
-                normStaged === normAdmission
-              ) {
-                fs.rmSync(abandonedPath, { recursive: true, force: true });
-              }
-            }
-          } catch {}
-        }
-      }
-    }
-  } catch {}
-
-  const stagingDir = path.join(runsDir, `.staging-${record.attemptStr}-${process.pid}-${crypto.randomUUID()}`);
-  fs.mkdirSync(stagingDir, { recursive: true });
-
-  const runMeta = buildRunMeta(record);
-  const runMetaPath = path.join(stagingDir, 'run.json');
-  fs.writeFileSync(runMetaPath, `${JSON.stringify(runMeta, null, 2)}\n`);
-  fsyncFileBestEffort(runMetaPath);
-
-  if (buildDispatchPlan) {
-    const dispatchPlan = buildDispatchPlan(record);
-    if (dispatchPlan) {
-      const dispatchPlanPath = path.join(stagingDir, 'dispatch-plan.json');
-      fs.writeFileSync(dispatchPlanPath, `${JSON.stringify(dispatchPlan, null, 2)}\n`);
-      fsyncFileBestEffort(dispatchPlanPath);
-    }
-  }
-
-  if (buildEffectiveContractOpt) {
-    const effectiveContract = buildEffectiveContractOpt(record);
-    if (effectiveContract) {
-      const contractPath = path.join(stagingDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
-      publishMutableProjection(contractPath, effectiveContract);
-    }
-  }
-  fsyncDirBestEffort(stagingDir);
-
-  try {
-    fs.renameSync(stagingDir, runDir);
-  } catch (err) {
-    if (
-      err.code === 'ENOTEMPTY' ||
-      err.code === 'EEXIST' ||
-      (process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EACCES') && fs.existsSync(runDir))
-    ) {
-      fs.rmSync(stagingDir, { recursive: true, force: true });
-      return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: true };
-    } else {
-      throw err;
-    }
-  }
-  fsyncDirBestEffort(runsDir);
-
-  return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: false };
 }
 
 // The seat a unit-run assignment fills: a unit running a Work step operation stamps the
