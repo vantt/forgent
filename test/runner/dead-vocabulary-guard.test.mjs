@@ -68,16 +68,8 @@ test('dead vocabulary guard: Phase 1-3 retired symbols do not appear in src, bin
   const symbolRegexes = deadSymbols.map((sym) => ({ symbol: sym, regex: new RegExp(`\\b${sym}\\b`) }));
 
   for (const file of codeFiles) {
-    let content = fs.readFileSync(file, 'utf8');
+    const content = fs.readFileSync(file, 'utf8');
     const rel = path.relative(REPO_ROOT, file);
-    if (rel === 'src/setup/registrations.mjs') {
-      // Exclude doctor check functions and registrations that detect dead keys
-      content = content
-        .replace(/export function checkTierVocabularyDeadKeys[\s\S]*?\n\}/, '')
-        .replace(/export function checkCoordinationProtocolDeadVocabulary[\s\S]*?\n\}/, '')
-        .replace(/registerCheck\(\{\s*id:\s*['"]tier-vocabulary-dead-keys['"][\s\S]*?\n\}\);/, '')
-        .replace(/registerCheck\(\{\s*id:\s*['"]coordination-protocol-dead-vocabulary['"][\s\S]*?\n\}\);/, '');
-    }
     for (const { symbol, regex } of symbolRegexes) {
       if (regex.test(content)) {
         violations.push(`${rel}: found dead symbol "${symbol}"`);

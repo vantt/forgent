@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
-import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from '../../src/setup/identity-checks.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from '../../src/setup/identity-checks.mjs';
 
 const HOST = process.env.FGOS_HOST_BIN;
 
@@ -83,21 +83,6 @@ test('ssh-keygen row passes on this machine and fails for a missing tool, an old
   assert.deepEqual(checkIdentitySshKeygen({ probe: probe(true, 'OpenSSH_8.1p1, OpenSSL 1.1.1') }), { passed: true, message: 'OpenSSH 8.1' });
   assert.equal(checkIdentitySshKeygen({ probe: probe(true, 'OpenSSH_10.2p1 Ubuntu') }).passed, true);
   assert.match(checkIdentitySshKeygen({ probe: probe(true, 'something else') }).message, /cannot read the OpenSSH version/);
-});
-
-test('pinned-machines row lists what the host reports and always passes', (t) => {
-  assert.ok(HOST && fs.existsSync(HOST), 'set FGOS_HOST_BIN to a host built from this checkout');
-  const { root, state } = withStateRoot(t);
-  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: 'no machine pinned yet' });
-  fs.mkdirSync(path.join(state, 'identity', 'pins'), { recursive: true });
-  fs.writeFileSync(path.join(state, 'identity', 'pins', 'peer-abc234'), JSON.stringify({
-    v: 1, machineId: 'peer-abc234', publicKey: 'ssh-ed25519 AAAA', fingerprint: 'SHA256:abc', firstSeen: '2026-10-23T00:00:00.000Z',
-  }));
-  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: '1 pinned (1 seen, not yet confirmed: peer-abc234): peer-abc234 SHA256:abc' });
-  fs.writeFileSync(path.join(state, 'identity', 'pins', 'peer-abc234'), JSON.stringify({
-    v: 1, machineId: 'peer-abc234', publicKey: 'ssh-ed25519 AAAA', fingerprint: 'SHA256:abc', firstSeen: '2026-10-23T00:00:00.000Z', state: 'confirmed', confirmedAt: '2026-10-24T00:00:00.000Z',
-  }));
-  assert.deepEqual(checkIdentityPinnedMachines(root, { hostBin: HOST }), { passed: true, message: '1 pinned (all confirmed): peer-abc234 SHA256:abc' });
 });
 
 test('fails when the machine id file is not a valid id', (t) => {

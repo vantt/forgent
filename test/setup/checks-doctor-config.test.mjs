@@ -571,82 +571,40 @@ test('no-stuck-merge-abort check fails and names the manual command when MERGE_H
   }
 });
 
-test('tier-vocabulary-dead-keys check passes on clean config', () => {
-  const dir = mkTemp('checks-tier-dead-clean-');
-  try {
-    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-    writeProjectConfig(dir, {
-      runner: {
-        defaults: { tier: 'standard' },
-        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' } },
-      },
-    });
-    const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
-    assert.equal(passed, true);
-    assert.match(message, /no retired tier vocabulary/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('tier-vocabulary-dead-keys check fails when retired keys are present', () => {
-  const dir = mkTemp('checks-tier-dead-dirty-');
-  try {
-    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-    writeProjectConfig(dir, {
-      runner: {
-        models: { light: 'haiku' },
-        rigorOverrides: { low: 'standard' },
-        capabilities: {
-          'code:review': { overrides: { tier: 'standard' } },
-        },
-      },
-    });
-    const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
-    assert.equal(passed, false);
-    assert.match(message, /runner\.models/);
-    assert.match(message, /runner\.rigorOverrides/);
-    assert.match(message, /capabilities\.code:review\.overrides/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('tier-vocabulary-dead-keys names a rigorToTier as retired, whether the global or the project file carries it', () => {
-  const dir = mkTemp('checks-tier-dead-rigor-');
+test('every runner key a past release retired is reported by the config engine as an unknown key, whichever file carries it', () => {
+  const dir = mkTemp('checks-retired-keys-');
   const fakeHome = mkTemp('fake-home-');
   try {
-    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
     fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
-    const rigorToTier = { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' };
-    writeGlobalConfig(fakeHome, { runner: { rigorToTier } });
+    const retired = {
+      models: { light: 'haiku' },
+      DEFAULT_TIER_TO_POLICY: {},
+      QUALITY_TIER_BRIDGE: {},
+      QUALITY_MODE_VALUES: [],
+      minTier: 'standard',
+      minRigor: 'standard',
+      rigorOverrides: { low: 'standard' },
+      PLACEMENT_POLICY_SHADOW: true,
+      rigorToTier: { low: 'nano' },
+      executors: { agent: { rigorOverrides: {}, models: {} } },
+      capabilities: { 'code:review': { overrides: { tier: 'standard' }, rigorOverrides: {}, minTier: 'standard', minRigor: 'standard' } },
+    };
+    const paths = [
+      'runner.models', 'runner.DEFAULT_TIER_TO_POLICY', 'runner.QUALITY_TIER_BRIDGE', 'runner.QUALITY_MODE_VALUES', 'runner.minTier', 'runner.minRigor',
+      'runner.rigorOverrides', 'runner.PLACEMENT_POLICY_SHADOW', 'runner.rigorToTier', 'runner.executors.agent.rigorOverrides', 'runner.executors.agent.models',
+      'runner.capabilities.code:review.overrides', 'runner.capabilities.code:review.rigorOverrides', 'runner.capabilities.code:review.minTier',
+      'runner.capabilities.code:review.minRigor',
+    ];
+    const expectAll = (message) => { for (const key of paths) assert.ok(message.includes(`config-unknown-key ${key} `), `${key} is not reported as unknown: ${message}`); };
     withHome(fakeHome, () => {
-      writeProjectConfig(dir, { runner: { defaults: { tier: 'standard' } } });
-      const global = checkById('tier-vocabulary-dead-keys').check(dir);
-      assert.equal(global.passed, false);
-      assert.match(global.message, /effective config contains retired key "runner\.rigorToTier".*delete the key/);
-      writeGlobalConfig(fakeHome, { runner: {} });
-      writeProjectConfig(dir, { runner: { rigorToTier } });
-      const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
-      assert.equal(passed, false);
-      assert.match(message, /effective config contains retired key "runner\.rigorToTier".*delete the key/);
+      writeProjectConfig(dir, { runner: retired });
+      expectAll(checkById('config-unknown-key').check(dir).message);
+      writeProjectConfig(dir, {});
+      writeGlobalConfig(fakeHome, { runner: retired });
+      expectAll(checkById('config-unknown-key').check(dir).message);
     });
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
     fs.rmSync(fakeHome, { recursive: true, force: true });
-  }
-});
-
-test('coordination-protocol-dead-vocabulary check fails when minTier is in protocol YAML', () => {
-  const dir = mkTemp('checks-coord-proto-dead-');
-  try {
-    const protoDir = path.join(dir, '.fgos', 'coordination-protocols');
-    fs.mkdirSync(protoDir, { recursive: true });
-    fs.writeFileSync(path.join(protoDir, 'test-proto.yaml'), 'steps:\n  - id: step1\n    policy:\n      minTier: standard\n');
-    const { passed, message } = checkById('coordination-protocol-dead-vocabulary').check(dir);
-    assert.equal(passed, false);
-    assert.match(message, /minTier/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
   }
 });

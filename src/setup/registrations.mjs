@@ -91,7 +91,7 @@ import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
 import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH, formatRetiredKeySentence } from '../runner/execution/patterns/retired-keys.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
-import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
+import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { capabilityEntriesOf, hasUsablePrefer } from '../runner/execution/seat-resolver.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
@@ -119,7 +119,7 @@ import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../run-sup
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { computeKnowledgeProjection } from '../report/knowledge-projection.mjs';
-import { eventStoreDoctor } from './event-store-checks.mjs';
+import { eventStoreDoctorOf } from './event-store-checks.mjs';
 import { fixEventStoreLockDirs } from './event-store-fixes.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { resolveDocPath } from '../report/knowledge-resolver.mjs';
@@ -136,7 +136,7 @@ import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
 import { listAssignmentRuns, scanAssignmentLayout } from '../runner/dispatch/assignment-layout.mjs';
 import { conventionCheck } from '../convention/convention-client.mjs';
 import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkRunSupervisorConfig } from './run-supervisor-checks.mjs';
-import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityPinnedMachines, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
+import { checkIdentityIdsUnique, checkIdentityMachineId, checkIdentityMachineKey, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } from './holder-lock-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -708,107 +708,6 @@ export function checkRunnerPatternsConfig(cwd, run) {
     return { passed: true, message: `runner patterns configuration is valid; ${notes.join('; ')}` };
   }
   return { passed: true, message: 'runner patterns configuration is valid and cumulative' };
-}
-
-export function checkTierVocabularyDeadKeys(cwd) {
-  const levels = [['effective', effectiveSection(cwd, 'runner')]];
-  const problems = [];
-  for (const [level, runner] of levels) {
-    if (!runner || typeof runner !== 'object') continue;
-    if ('models' in runner) {
-      problems.push(`${level} config contains dead key "runner.models"; replace with "runner.modelPolicies"`);
-    }
-    if ('DEFAULT_TIER_TO_POLICY' in runner) {
-      problems.push(`${level} config contains dead key "runner.DEFAULT_TIER_TO_POLICY"`);
-    }
-    if ('QUALITY_TIER_BRIDGE' in runner) {
-      problems.push(`${level} config contains dead key "runner.QUALITY_TIER_BRIDGE"`);
-    }
-    if ('QUALITY_MODE_VALUES' in runner) {
-      problems.push(`${level} config contains dead key "runner.QUALITY_MODE_VALUES"`);
-    }
-    if ('minTier' in runner) {
-      problems.push(`${level} config contains dead key "runner.minTier"; replace with "rigor"`);
-    }
-    if ('minRigor' in runner) {
-      problems.push(`${level} config contains dead key "runner.minRigor"; replace with "rigor"`);
-    }
-    if ('rigorOverrides' in runner) {
-      problems.push(`${level} config contains dead key "runner.rigorOverrides"; replace by adjusting "runner.modelPolicies.<provider>"`);
-    }
-    if ('PLACEMENT_POLICY_SHADOW' in runner) {
-      problems.push(`${level} config contains dead key "runner.PLACEMENT_POLICY_SHADOW"`);
-    }
-    if ('rigorToTier' in runner) {
-      problems.push(`${level} config contains retired key "runner.rigorToTier"; rigor no longer chooses a tier, delete the key and declare "tier" per capability, role, persona or seat`);
-    }
-    for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
-      if (exec && typeof exec === 'object') {
-        if ('rigorOverrides' in exec) {
-          problems.push(`${level} config contains dead key "runner.executors.${execId}.rigorOverrides"; replace by adjusting "runner.modelPolicies.<provider>"`);
-        }
-        if ('models' in exec) {
-          problems.push(`${level} config contains dead key "runner.executors.${execId}.models"`);
-        }
-      }
-    }
-    for (const [capName, cap] of Object.entries(runner.capabilities ?? {})) {
-      if (cap && typeof cap === 'object') {
-        if ('overrides' in cap) {
-          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.overrides"; replace with "runner.capabilities.${capName}.rigor"`);
-        }
-        if ('rigorOverrides' in cap) {
-          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.rigorOverrides"`);
-        }
-        if ('minTier' in cap) {
-          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.minTier"; replace with "rigor"`);
-        }
-        if ('minRigor' in cap) {
-          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.minRigor"; replace with "rigor"`);
-        }
-      }
-    }
-  }
-  return problems.length > 0
-    ? { passed: false, message: problems.join('; ') }
-    : { passed: true, message: 'no retired tier vocabulary keys in the effective config' };
-}
-
-export function checkCoordinationProtocolDeadVocabulary(cwd) {
-  const scanDirs = [
-    path.join(cwd, '.fgos', 'coordination-protocols'),
-    path.join(cwd, 'core', 'coordination-protocols'),
-    path.join(cwd, 'core', 'workflows'),
-    path.join(cwd, 'domains'),
-  ];
-  const yamlFiles = [];
-  function scan(dir) {
-    if (!fs.existsSync(dir)) return;
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        if (entry.name === 'node_modules' || entry.name === '.git') continue;
-        scan(full);
-      } else if (entry.isFile() && (entry.name.endsWith('.yaml') || entry.name.endsWith('.yml'))) {
-        yamlFiles.push(full);
-      }
-    }
-  }
-  for (const dir of scanDirs) scan(dir);
-
-  const deadPattern = /\b(minTier|minRigor|QUALITY_TIER_BRIDGE|QUALITY_MODE_VALUES)\b/;
-  const problems = [];
-  for (const file of yamlFiles) {
-    const content = fs.readFileSync(file, 'utf8');
-    const match = content.match(deadPattern);
-    if (match) {
-      const rel = path.relative(cwd, file);
-      problems.push(`${rel} contains retired "${match[1]}"; replace with "rigor" (low|standard|high|critical)`);
-    }
-  }
-  return problems.length > 0
-    ? { passed: false, message: problems.join('; ') }
-    : { passed: true, message: 'no retired coordination protocol vocabulary in project' };
 }
 
 // tsk-2t9c (multi-role team harness, D6/D9 task-spec A-lite convention;
@@ -1411,12 +1310,6 @@ registerCheck({
 });
 
 registerCheck({
-  id: 'tier-vocabulary-dead-keys',
-  description: 'project and global configs have no retired tier vocabulary keys (runner.models, minTier, rigorOverrides, etc.)',
-  check: (cwd) => checkTierVocabularyDeadKeys(cwd),
-});
-
-registerCheck({
   id: 'executor-family-unique',
   description: 'each agent family (providerModel) is served by exactly one executor; its transports are invocations of that executor',
   check: (cwd) => checkExecutorFamilyUnique(cwd),
@@ -1456,12 +1349,6 @@ registerCheck({
   id: 'global-model-policies-portable',
   description: 'runner.modelPolicies in the global config uses plain model names only, since every fgOS release on the machine reads it',
   check: () => checkGlobalModelPoliciesPortable(),
-});
-
-registerCheck({
-  id: 'coordination-protocol-dead-vocabulary',
-  description: 'coordination protocols and workflows in project do not contain retired minTier or minRigor',
-  check: (cwd) => checkCoordinationProtocolDeadVocabulary(cwd),
 });
 
 registerCheck({
@@ -2385,63 +2272,6 @@ registerCheck({
   check: (cwd) => checkCapabilityServesValid(cwd),
 });
 
-// Unit I21 (Phase 5 item 2): every discoverable CoordinationProtocol
-// operation's declared `policy.capability` resolves against the LIVE runner
-// config -- the SAME `resolveExecutorAndOverrides` (dispatch/resolve.mjs) a
-// real dispatch re-resolves at execution time, never a second, drifting
-// lookup. An operation naming a capability with nothing registered for it
-// does not fail at dispatch time (it quietly falls back to the runner's
-// global default executor, per the dispatch policy's own
-// precedence) -- this check is the only place that quiet degradation is
-// surfaced before it happens for real. Also reports the count of distinct
-// provider families reachable across every resolved capability (design
-// record §12 item 3: "Doctor báo số họ provider cấu hình").
-function checkOperationCapabilitiesResolve() {
-  return { passed: true, message: 'no coordination protocols active (retired in favor of workflows)' };
-}
-
-registerCheck({
-  id: 'operation-capability-resolves',
-  description: 'every discoverable CoordinationProtocol operation\'s declared policy.capability resolves against the live runner config, and reports reachable provider-family diversity (Unit I21)',
-  check: () => checkOperationCapabilitiesResolve(),
-});
-
-// tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra
-// dependency must register into doctor's check registry, not stand alone
-// undiscoverable by doctor): forgent had zero npm dependencies until tsk-slq
-// added `yaml` (D4) as the first one. A bare checkout (e.g. a fresh clone,
-// or a disposable worktree like `fgos return`'s own goal-check checkout)
-// never runs `npm install` on its own — this check makes that gap visible
-// to a human/session running `fgos doctor`, the same "absent capability =
-// clean skip, never hidden" contract `checkToolRegistryConfigured` already
-// gives tool-registry posture. READ-ONLY by construction (same as every
-// other check here) — only fs.existsSync, doctor never writes.
-function checkDependenciesInstalled(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  const root = mainCheckout ?? cwd;
-  const packageJsonPath = path.join(root, 'package.json');
-  if (!fs.existsSync(packageJsonPath)) {
-    return { passed: true, message: 'no package.json — nothing to check' };
-  }
-  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-  const deps = Object.keys(pkg.dependencies ?? {});
-  if (deps.length === 0) {
-    return { passed: true, message: 'no runtime dependencies declared — nothing to check' };
-  }
-  const nodeModulesPath = path.join(root, 'node_modules');
-  const missing = deps.filter((dep) => !fs.existsSync(path.join(nodeModulesPath, dep)));
-  if (missing.length > 0) {
-    return { passed: false, message: `missing from node_modules: ${missing.join(', ')} — run npm install` };
-  }
-  return { passed: true, message: `${deps.length} dependenc${deps.length === 1 ? 'y' : 'ies'} installed` };
-}
-
-registerCheck({
-  id: 'dependencies-installed',
-  description: 'package.json dependencies are present in node_modules (tsk-slq D6)',
-  check: (cwd) => checkDependenciesInstalled(cwd),
-});
-
 // A present-but-unusable `ceiling` is the misconfiguration that actually
 // bites, and it fails SILENTLY: `hasWorkerSlotRoom` treats anything that is
 // not a positive integer as "no ceiling configured" and allows every claim,
@@ -2624,36 +2454,6 @@ registerFix({
   fix: (cwd) => fixClaudePluginMarketplace(cwd),
 });
 
-// tsk-1no D3 (tsk-2qc-1 D2 widened): the plugin skill layer (`plugins/fgOS/
-// skills/*/SKILL.md`) resolves its own CLI independently of this file's
-// other checks, via the same 3-tier resolution (dev-checkout > project-
-// local > global, cache-first) `bin-discovery.mjs` gives every other
-// caller -- this check is now a thin reporting wrapper over
-// `resolveFgosBin`, not its own separate local-bin/PATH try/catch.
-function checkPluginSkillCliReachable(cwd) {
-  const resolved = resolveFgosBin(cwd);
-  if (resolved) {
-    const tierLabel = resolved.tier === 0
-      ? 'workspace installation found'
-      : resolved.tier === 1
-        ? 'local bin/fgos.mjs found'
-        : resolved.tier === 2
-          ? 'project-local install found'
-          : 'fgos resolved from PATH';
-    return { passed: true, message: `${tierLabel} at ${resolved.path}` };
-  }
-  return {
-    passed: false,
-    message: `no bin/fgos.mjs at ${cwd}, no project-local node_modules/.bin/fgos, and no global fgos install on PATH -- every /fgOS:* slash command will fail on first use (run: npm install -g github:vantt/forgent)`,
-  };
-}
-
-registerCheck({
-  id: 'plugin-skill-cli-reachable',
-  description: 'a fgos CLI is reachable from this project (local bin/fgos.mjs, project-local install, or a global PATH install)',
-  check: (cwd) => checkPluginSkillCliReachable(cwd),
-});
-
 // tsk-2qc-1 D4: the tier-3 (global) config-cache is populated/refreshed
 // only here, from `fgos doctor --fix` -- never on every `resolveFgosBin`
 // call, which is the whole point of caching the PATH probe instead of
@@ -2673,52 +2473,6 @@ function fixBinDiscoveryCache() {
 registerFix({
   id: 'bin-discovery-cache',
   fix: () => fixBinDiscoveryCache(),
-});
-
-// tsk-32b: `plugin-skill-cli-reachable` above only confirms the `fgos` CLI
-// binary is reachable -- it says nothing about whether the coding-domain
-// dev-skills the plugin's own slash-command skills (deliver/discover/plan/
-// pick) dispatch into via the Skill tool are actually shipped in
-// plugins/fgOS/skills/ (they were not, before tsk-32b's own fix -- a
-// plugin-only consumer got "Unknown skill: fgos-coding-driving" the first
-// time deliver/discover/plan/pick tried to dispatch into one, with the CLI
-// itself fully reachable the whole time). This check only ever fires
-// against THIS repo's own source tree -- it derives the expected dev-skill
-// set from `.claude/skills/fgos-*` and confirms each one also exists under
-// `plugins/fgOS/skills/`, catching a maintainer who adds/renames a
-// coding-domain dev-skill and forgets to re-copy it into the plugin before
-// a release ships (test/skills/fgos-mirror.test.mjs enforces the same
-// byte-identical content once both sides exist; this check only checks
-// presence, for a fast doctor-level signal). A downstream consumer running
-// doctor against their own project (no `.claude/skills/` of this repo's
-// own shape at their `cwd`) has nothing for this check to compare, so it
-// passes cleanly -- same "absent capability = clean skip" contract every
-// other optional check in this file already follows.
-function checkPluginDevSkillsPackaged(cwd) {
-  const claudeSkillsRoot = path.join(cwd, '.claude', 'skills');
-  const pluginSkillsRoot = path.join(cwd, 'plugins', 'fgOS', 'skills');
-  if (!fs.existsSync(claudeSkillsRoot) || !fs.existsSync(pluginSkillsRoot)) {
-    return { passed: true, message: 'not a forgent checkout (no .claude/skills or plugins/fgOS/skills at this project) -- nothing to check' };
-  }
-  const devSkillNames = fs
-    .readdirSync(claudeSkillsRoot, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && entry.name.startsWith('fgos-'))
-    .map((entry) => entry.name)
-    .sort();
-  const missing = devSkillNames.filter((name) => !fs.existsSync(path.join(pluginSkillsRoot, name, 'SKILL.md')));
-  if (missing.length === 0) {
-    return { passed: true, message: `all ${devSkillNames.length} coding-domain dev-skills are packaged in plugins/fgOS/skills/` };
-  }
-  return {
-    passed: false,
-    message: `${missing.length} coding-domain dev-skill(s) missing from plugins/fgOS/skills/ (present in .claude/skills/): ${missing.join(', ')} -- any repo installing fgOS only as a plugin will hit "Unknown skill" dispatching into these`,
-  };
-}
-
-registerCheck({
-  id: 'plugin-dev-skills-packaged',
-  description: 'every coding-domain dev-skill under .claude/skills/fgos-* is also packaged in plugins/fgOS/skills/, so a plugin-only consumer can dispatch into it',
-  check: (cwd) => checkPluginDevSkillsPackaged(cwd),
 });
 
 // tsk-3ip (docs/history/automated-changelog-compound-learn/DISCUSSION.md
@@ -2750,8 +2504,8 @@ export function unreleasedHasEntries(content) {
 // fs.existsSync/readFileSync, never writes. A missing CHANGELOG.md is a
 // normal state (a fresh fgOS consumer hasn't adopted one yet), never an
 // error -- same "absent capability = clean skip" contract
-// `checkToolRegistryConfigured`/`checkDependenciesInstalled` already give
-// their own missing-prerequisite cases.
+// `checkToolRegistryConfigured` already gives
+// its own missing-prerequisite case.
 function checkChangelogUnreleasedStale(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   const root = mainCheckout ?? cwd;
@@ -3426,39 +3180,6 @@ registerCheck({
   check: (cwd) => checkNoStuckMergeAbort(cwd),
 });
 
-// Phase 02 R8 (docs/platform/agent-coordination/history/retired-engine/contracts/flow-definition.md,
-// ADR-009), AGENTS.md's install/setup/doctor gate: the new FlowDefinition
-// definition surface (Workflow projection adapter + CoordinationProtocol
-// loader, src/runner/definitions/) is a real infra dependency (it shells
-// out to `fs`, discovers files off disk, and validates their shape) --
-// this makes it discoverable through `fgos doctor` rather than standing
-// alone unregistered. Both checks are READ-ONLY (same RUL9 discipline
-// every other check in this file follows): `discoverCoordinationProtocols`
-// only reads from disk, never writes. No new config default is registered
-// alongside these -- discovery is a fixed, deterministic filesystem
-// convention (project `.fgos/coordination-protocols/`, `domains/<name>/
-// coordination-protocols/`, packaged `core/coordination-protocols/`), the
-// same non-configurable style `domain-registry.mjs`'s own
-// `domains/`/`core/task-specs/` discovery already uses -- there is no
-// runtime read of a "coordination protocols path" config key to register
-// a default for.
-
-// tsk-397's `resolveTaskSpecPath`'s own `core: 'core'` convention gives
-// `discoverCoordinationProtocols` its default `cwd`/`packageRoot`
-// resolution already (see protocol-loader.mjs's own header) -- this check
-// only needs to run it and report the FlowDefinitionError's own message,
-// which already carries the offending source path (protocol-loader.mjs's
-// `relativeToPackageRoot` suffix on every thrown error).
-function checkCoordinationProtocolFixturesValid(cwd) {
-  return { passed: true, message: 'coordination protocol fixtures retired' };
-}
-
-registerCheck({
-  id: 'coordination-protocol-fixtures-valid',
-  description: 'every discoverable CoordinationProtocol definition (project/domain/core tiers) normalizes through validateFlowDefinition (Phase 02 R6/R7)',
-  check: (cwd) => checkCoordinationProtocolFixturesValid(cwd),
-});
-
 function checkOperationPromptTemplatesValid(cwd) {
   try {
     const entries = discoverOperationPromptTemplates({ cwd });
@@ -3478,30 +3199,6 @@ registerCheck({
   id: 'operation-prompt-templates-valid',
   description: 'every discoverable operation prompt template (project/domain/core tiers) validates against bounded variables and schema (Phase 03 I04)',
   check: (cwd) => checkOperationPromptTemplatesValid(cwd),
-});
-
-// Step 08 Phase 07 R3, AGENTS.md's install/setup/doctor gate: `fgos
-// coordination run --file <request>`'s own published example request
-// files (docs/how-to/coordination-examples/*.json -- one agent-led
-// request, one declared consult, one research protocol, one Group
-// Cognition framework example, per this phase's own requirement) are real
-// package contents a user copies and edits; this check keeps them from
-// silently rotting the same way `coordination-protocol-fixtures-valid`
-// above already keeps the protocol yaml fixtures themselves honest. Reuses
-// the SAME `validateCoordinationRequest` the CLI itself runs on every
-// invocation (never a second, drifting copy of the schema), plus
-// `loadCoordinationProtocol` for any example that references a protocol by
-// id, so a future protocol rename/removal is caught here too. Read-only
-// (RUL9): only reads the example files and the protocol registry, never
-// writes.
-function checkCoordinationExampleRequestsValid(cwd) {
-  return { passed: true, message: 'coordination example requests retired' };
-}
-
-registerCheck({
-  id: 'coordination-example-requests-valid',
-  description: 'published `fgos coordination run` example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef (Step 08 Phase 07 R3)',
-  check: (cwd) => checkCoordinationExampleRequestsValid(cwd),
 });
 
 // Phase 01 group D (plans/260906-1831-dispatch-visibility-v0): the three things
@@ -4065,8 +3762,7 @@ function checkRustHostBinaryPresent(cwd) {
     // No active release, no manifest, and not this repo's own Rust host
     // checkout -- fgOS runs globally against other projects (D-ADR0035)
     // that legitimately have no rust host binary at all. Not applicable
-    // here is not a failure; matches command-routes-drift's own
-    // pass-with-skip pattern below.
+    // here is not a failure.
     return {
       passed: true,
       message: 'no active fgos rust host release or dev checkout found -- rust-host-binary-present skipped',
@@ -4308,46 +4004,6 @@ function checkActiveReleaseMatchesCheckout(dir) {
   }
 }
 
-function checkCommandRoutesDrift(cwd) {
-  const root = resolveMainCheckout(cwd) ?? cwd;
-  const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);
-  let scriptPath = null;
-  let runCwd = cwd;
-
-  for (const candidate of candidateDirs) {
-    const p = path.join(candidate, 'scripts', 'export-command-selectors.mjs');
-    if (fs.existsSync(p)) {
-      scriptPath = p;
-      runCwd = candidate;
-      break;
-    }
-  }
-
-  if (!scriptPath) {
-    return {
-      passed: true,
-      message: 'scripts/export-command-selectors.mjs not present (release tree install -- command-routes-drift skipped)',
-    };
-  }
-  try {
-    execFileSync(process.execPath, [scriptPath, '--check'], {
-      cwd: runCwd,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
-    return {
-      passed: true,
-      message: 'command routes descriptor matches current command registry and annotations with no drift',
-    };
-  } catch (err) {
-    const detail = (err.stderr || err.stdout || err.message || '').trim();
-    return {
-      passed: false,
-      message: `command routes drift detected: ${detail}`,
-    };
-  }
-}
-
 registerCheck({
   id: 'rust-host-binary-present',
   description: 'the active release\'s entries.fgos binary exists and is executable',
@@ -4370,12 +4026,6 @@ registerCheck({
   id: 'active-release-matches-checkout',
   description: 'activated legacy Node payload matches this source checkout working tree (not Rust freshness)',
   check: checkActiveReleaseMatchesCheckout,
-});
-
-registerCheck({
-  id: 'command-routes-drift',
-  description: 'command routes descriptor matches current command registry and route annotations with no drift',
-  check: (cwd) => checkCommandRoutesDrift(cwd),
 });
 
 // ─── Confinement Authority (Phase 01 R7, docs/platform/agent-confinement/README.md) ─
@@ -5397,12 +5047,6 @@ registerCheck({
 });
 
 registerCheck({
-  id: 'identity-pinned-machines',
-  description: 'lists the machine keys this machine pinned the first time it saw each machine (informational, for the one-time fingerprint comparison across machines; names the pins still `seen`, not yet confirmed with `fgos identity pins --confirm <machine-id> --fingerprint <fp>`); `fgos identity pins --forget <machine-id>` accepts a re-key',
-  check: (cwd) => checkIdentityPinnedMachines(cwd),
-});
-
-registerCheck({
   id: 'identity-project-id',
   description: 'this repository carries one project id in the tracked file .fgos/project.json, the same in every clone; absent only warns, and there is no fix: run `fgos identity project --init` once on one machine, commit, pull elsewhere',
   check: (cwd) => checkIdentityProjectId(cwd),
@@ -5458,12 +5102,12 @@ registerCheck({
   check: (cwd) => checkObserveRunCoverage(cwd),
 });
 
-// Event Store: one setup fix and eight doctor rows. A doctor run builds one `eventStoreDoctor`
+// Event Store: one setup fix and six doctor rows. A doctor run builds one `eventStoreDoctor`
 // (its lazy store snapshot is read at most once) and every row asks it; a row called without a run gets a private one.
 registerFix({ id: 'event-store-lock-dirs', fix: cwd => fixEventStoreLockDirs(cwd) });
-for (const name of ['open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout']) {
+for (const name of ['open-root', 'machine-id', 'unsealed', 'integrity', 'sync', 'legacy-layout']) {
   const id = `event-store-${name}`;
-  registerCheck({ id, description: `Event Store ${name}`, check: (cwd, run = createDoctorRun()) => run.once(`event-store-doctor:${cwd}`, () => eventStoreDoctor(cwd))(id) });
+  registerCheck({ id, description: `Event Store ${name}`, check: (cwd, run = createDoctorRun()) => eventStoreDoctorOf(cwd, run)(id) });
 }
 
 // Git and Event Store share one addon ABI admission row.

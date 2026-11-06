@@ -351,7 +351,10 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
     execFileSync('git', ['init', '-q', repo]);
     git('remote', 'add', 'upstream', '/fixture/remote');
     git('remote', 'add', 'origin', '/fixture/origin');
-    for (const mapping of addon.gitFetchMappings('origin')) git('config', '--add', 'remote.origin.fetch', mapping);
+    const fence = path.join(repo, '.fgos/locks/activation.lock');
+    fs.mkdirSync(fence, {recursive:true});
+    fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({at:'fixture',v:1,lock:'activation',by:'fgos git'}));
+    assert.equal(fixGitFetchMapping(repo, options).changed, true);
     git('config', 'http.https://github.com/.extraheader', 'AUTHORIZATION: secret');
     const transport = checkGit(repo, 'git-repository-config', options);
     assert.equal(transport.passed, false);
@@ -381,9 +384,6 @@ test('umask 002 driver directories are created safely, repaired by setup, and di
 
     const oldOrigin = addon.gitFetchMappings('origin').find(r => r.includes('legacy*')).replaceAll('*', '');
     git('config', '--add', 'remote.origin.fetch', oldOrigin);
-    const fence = path.join(repo, '.fgos/locks/activation.lock');
-    fs.mkdirSync(fence, {recursive:true});
-    fs.writeFileSync(path.join(fence, 'TOMBSTONE'), JSON.stringify({at:'fixture',v:1,lock:'activation',by:'fgos git'}));
     const { writeProjectConfig } = await import(${JSON.stringify(new URL('../helpers/config-fixture.mjs', import.meta.url).href)});
     writeProjectConfig(repo, {eventStore:{remote:'upstream'}});
     const obsolete = addon.gitFetchMappings('upstream').find(r => r.includes('legacy*')).replaceAll('*', '');

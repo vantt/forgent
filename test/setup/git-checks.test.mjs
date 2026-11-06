@@ -9,6 +9,7 @@ import { pathToFileURL } from 'node:url';
 import { checkGit, compatibleGitContracts, fixGitOperationRecovery } from '../../src/setup/git-checks.mjs';
 import { retentionNote } from '../../src/setup/git-retention-note.mjs';
 import { fixture as landFixture } from '../git/land-fixture.mjs';
+import { fixture as storeFixture, installFetchMapping } from '../event-store/phase07-fixture.mjs';
 import { ensureGitAddon, root as addonRoot } from '../../scripts/git-addon.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { resolveStateRoot } from '../../src/holder-lock/state-root.mjs';
@@ -75,7 +76,7 @@ test('the repository rows report information, not a failure, outside a Git repos
   });
 });
 
-test('the Git rows and the Git floor of one doctor run share one repository inspection', { skip: process.platform === 'win32' }, () => {
+test('the Git rows and the Git floor of one doctor run share one repository inspection, and the repository-config row reads the Event Store facts through the run\'s one Event Store doctor', { skip: process.platform === 'win32' }, () => {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-git-run-'));
   try {
     execFileSync('git', ['init', '-q', repo], { stdio: 'ignore' });
@@ -85,7 +86,7 @@ test('the Git rows and the Git floor of one doctor run share one repository insp
     const ids = ['git-worktree-recovery', 'git-component-compatible', 'git-repository-config', 'git-operation-journal', 'git-native-locks'];
     for (const id of ids) assert.equal(typeof DOCTOR_CHECKS.find((row) => row.id === id).check(repo, run).passed, 'boolean', id);
     assert.equal(DOCTOR_CHECKS.find((row) => row.id === 'node-version-and-git').check(repo, run).passed, true);
-    assert.deepEqual(computed.sort(), ['git-inspect', 'git-worktree-recovery']);
+    assert.deepEqual(computed.sort(), ['event-store-doctor', 'git-inspect', 'git-worktree-recovery']);
   } finally { fs.rmSync(repo, { recursive: true, force: true }); }
 });
 
@@ -108,6 +109,47 @@ test('the native-locks row fails with one sentence naming the runbook and keeps 
     assert.equal(result.passed, false);
     assert.match(result.message, /^1 native Git lock\(s\) present and never removed by fgOS; follow the runbook in docs\/platform\/git\/spec\.md section 11$/);
     assert.equal(result.detail.nativeLocks.length, 1);
+  });
+});
+
+const withStateRoot = (f, body) => {
+  const prior = process.env.FGOS_STATE_ROOT;
+  process.env.FGOS_STATE_ROOT = f.stateRoot;
+  try { return body(); } finally { if (prior === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = prior; }
+};
+
+test('the repository-config row fails a missing Event Store fetch mapping, an Event Store push or local-namespace fetch, and a remote that moved since setup', { skip: process.platform === 'win32' }, (t) => {
+  const f = storeFixture(t, { remote: true });
+  const row = () => checkGit(f.repo, 'git-repository-config', f.ctx.loaderOptions);
+  withStateRoot(f, () => {
+    assert.match(row().message, /the required fetch mapping is missing/);
+    installFetchMapping(f);
+    assert.equal(row().passed, true, row().message);
+    f.git('config', '--add', 'remote.origin.fetch', '+refs/*:refs/unsafe/*');
+    assert.match(row().message, /unsafe publication refspec/);
+    f.git('config', '--unset-all', 'remote.origin.fetch');
+    installFetchMapping(f);
+    f.git('config', '--add', 'remote.origin.push', 'refs/fgos/events/*:refs/fgos/events/*');
+    assert.match(row().message, /unsafe publication refspec/);
+    f.git('config', '--unset-all', 'remote.origin.push');
+    f.git('remote', 'set-url', 'origin', path.join(f.temp, 'other'));
+    assert.match(row().message, /event-store-remote-changed/);
+  });
+});
+
+test('the repository-config row allows ordinary pushes and protective negative fetches but refuses Event Store pushes', { skip: process.platform === 'win32' }, (t) => {
+  const f = storeFixture(t, { remote: true });
+  installFetchMapping(f);
+  f.git('config', '--add', 'remote.origin.fetch', '^refs/fgos/local-events/*');
+  withStateRoot(f, () => {
+    for (const refspec of ['HEAD', ':', '+:', 'refs/heads/*:refs/heads/*', ':refs/fgos/events/old']) {
+      f.git('config', 'remote.origin.push', refspec);
+      assert.equal(checkGit(f.repo, 'git-repository-config', f.ctx.loaderOptions).passed, true, refspec);
+    }
+    for (const refspec of ['refs/*:refs/*', '+refs/fgos/*:refs/fgos/*', 'refs/fgos/events/machine']) {
+      f.git('config', 'remote.origin.push', refspec);
+      assert.equal(checkGit(f.repo, 'git-repository-config', f.ctx.loaderOptions).passed, false, refspec);
+    }
   });
 });
 

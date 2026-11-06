@@ -134,25 +134,6 @@ export function checkIdentitySshKeygen({ probe = probeOpenssh } = {}) {
 }
 
 /**
- * Always passes: lists the machine keys this machine pinned the first time it saw them, so the owner
- * can compare the fingerprints across machines once. A key claimed again for a pinned machine is refused
- * at verify time (`machine-key-changed`); `fgos identity pins --forget <machine-id>` accepts a re-key.
- */
-export function checkIdentityPinnedMachines(cwd, { hostBin } = {}) {
-  const { data, result } = askIdentity(cwd, 'pins', {
-    hostBin,
-    missing: '[pins-unreadable]',
-    missingResult: { passed: false, message: 'a pinned machine key file cannot be read; see `fgos identity pins`' },
-    valid: (value) => Array.isArray(value?.pins),
-  });
-  if (result) return result;
-  if (data.pins.length === 0) return { passed: true, message: 'no machine pinned yet' };
-  const seen = data.pins.filter((pin) => pin.state !== 'confirmed').map((pin) => pin.machineId);
-  const unconfirmed = seen.length === 0 ? 'all confirmed' : `${seen.length} seen, not yet confirmed: ${seen.join(', ')}`;
-  return { passed: true, message: `${data.pins.length} pinned (${unconfirmed}): ${data.pins.map((pin) => `${pin.machineId} ${pin.fingerprint}`).join('; ')}` };
-}
-
-/**
  * pass when this repository carries a valid project id, warn when it has none, fail when the
  * file is unreadable. There is no fix: the id is minted once by hand on one machine, committed,
  * and pulled everywhere else (a fix on every machine would mint one id per clone).

@@ -329,7 +329,6 @@ test('R4: Doctor checks rust host packaging checks are registered and report the
     'rust-host-binary-present',
     'rust-host-target-supported',
     'legacy-node-payload-present',
-    'command-routes-drift',
   ];
 
   for (const id of checkIds) {

@@ -153,85 +153,6 @@ test('Data Dictionary #7b names exactly the registered doctor fixes — no missi
   );
 });
 
-// ─── plugin-skill-cli-reachable (tsk-1no D3): the plugin skill layer's own
-// CLI-resolution fallback, mirrored as a doctor check so a future install
-// gap surfaces at `fgos doctor` time instead of at first slash-command use.
-
-function pluginSkillCliReachableCheck() {
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'plugin-skill-cli-reachable');
-  assert.ok(entry, 'plugin-skill-cli-reachable must be registered');
-  return entry.check;
-}
-
-test('plugin-skill-cli-reachable passes when a workspace installation exists, reporting tier 0', () => {
-  const dir = mkTempDir();
-  const installDir = path.join(dir, '.fgos', 'installation');
-  const releaseDir = path.join(dir, 'release');
-  fs.mkdirSync(installDir, { recursive: true });
-  fs.mkdirSync(path.join(releaseDir, 'bin'), { recursive: true });
-  fs.writeFileSync(path.join(releaseDir, 'bin', 'fgos'), '#!/bin/sh\n', { mode: 0o755 });
-  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify({
-    schemaVersion: 1,
-    status: 'ready',
-    releasePath: releaseDir,
-  }));
-  const result = pluginSkillCliReachableCheck()(dir);
-  assert.equal(result.passed, true);
-  assert.match(result.message, /workspace installation found/);
-});
-
-test('plugin-skill-cli-reachable passes when a local bin/fgos.mjs exists, without touching PATH', () => {
-  const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, 'bin'));
-  fs.writeFileSync(path.join(dir, 'bin', 'fgos.mjs'), '// stub\n');
-  const result = pluginSkillCliReachableCheck()(dir);
-  assert.equal(result.passed, true);
-  assert.match(result.message, /local bin\/fgos\.mjs found/);
-});
-
-test('plugin-skill-cli-reachable passes when no local bin/fgos.mjs exists but fgos resolves from PATH', () => {
-  const dir = mkTempDir();
-  const binDir = mkTempDir();
-  const stubPath = path.join(binDir, 'fgos');
-  fs.writeFileSync(stubPath, '#!/bin/sh\necho stub\n');
-  fs.chmodSync(stubPath, 0o755);
-  const originalPath = process.env.PATH;
-  process.env.PATH = `${binDir}${path.delimiter}${originalPath}`;
-  try {
-    const result = pluginSkillCliReachableCheck()(dir);
-    assert.equal(result.passed, true);
-    assert.match(result.message, /fgos resolved from PATH/);
-  } finally {
-    process.env.PATH = originalPath;
-  }
-});
-
-test('plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs, a project-local install, a cached global path, nor a live PATH install exists', () => {
-  const dir = mkTempDir();
-  // HOME override (tsk-2qc-1): resolveFgosBin's tier-3 cache reads
-  // ~/.fgos/config.json by default -- without this override, a real
-  // cached bin.globalFgosPath left on the machine running this test
-  // (from a real `fgos setup`/`doctor --fix` run) would make this check
-  // pass for the wrong reason. Same isolation discipline the
-  // shell-integration-sourced tests already apply via HOME (checks.test.mjs).
-  const homeDir = mkTempDir();
-  const originalPath = process.env.PATH;
-  const originalHome = process.env.HOME;
-  const originalUserProfile = process.env.USERPROFILE;
-  process.env.PATH = '';
-  process.env.HOME = homeDir;
-  process.env.USERPROFILE = homeDir;
-  try {
-    const result = pluginSkillCliReachableCheck()(dir);
-    assert.equal(result.passed, false);
-    assert.match(result.message, /no bin\/fgos\.mjs at .* and no global fgos install on PATH/);
-  } finally {
-    process.env.PATH = originalPath;
-    if (originalHome === undefined) delete process.env.HOME; else process.env.HOME = originalHome;
-    if (originalUserProfile === undefined) delete process.env.USERPROFILE; else process.env.USERPROFILE = originalUserProfile;
-  }
-});
-
 // ─── cli-version-visible (tsk-2ej): the running build's own package
 // version/commit/verb-set resolve cleanly -- the "always green on a
 // healthy build" self-check pattern node-version-and-git already uses, so
@@ -249,47 +170,6 @@ test('cli-version-visible passes and its message embeds the resolved packageVers
   assert.equal(result.passed, true);
   const { version: packageVersion } = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
   assert.ok(result.message.includes(packageVersion), `message "${result.message}" missing packageVersion "${packageVersion}"`);
-});
-
-// ─── plugin-dev-skills-packaged (tsk-32b): confirms the coding-domain
-// dev-skills plugin-skill-cli-reachable never checked (fgos-coding-driving,
-// fgos-routing, ...) are actually present in plugins/fgOS/skills/, so a
-// maintainer who adds/renames one in .claude/skills/ but forgets to copy it
-// forward gets caught at `fgos doctor` time instead of shipping silently.
-
-function pluginDevSkillsPackagedCheck() {
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'plugin-dev-skills-packaged');
-  assert.ok(entry, 'plugin-dev-skills-packaged must be registered');
-  return entry.check;
-}
-
-test('plugin-dev-skills-packaged passes cleanly when the project has no .claude/skills or plugins/fgOS/skills at all', () => {
-  const dir = mkTempDir();
-  const result = pluginDevSkillsPackagedCheck()(dir);
-  assert.equal(result.passed, true);
-  assert.match(result.message, /not a forgent checkout/);
-});
-
-test('plugin-dev-skills-packaged passes when every .claude/skills/fgos-* dev-skill has a matching plugins/fgOS/skills/ copy', () => {
-  const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.claude', 'skills', 'fgos-example'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.claude', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
-  fs.mkdirSync(path.join(dir, 'plugins', 'fgOS', 'skills', 'fgos-example'), { recursive: true });
-  fs.writeFileSync(path.join(dir, 'plugins', 'fgOS', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
-  const result = pluginDevSkillsPackagedCheck()(dir);
-  assert.equal(result.passed, true);
-  assert.match(result.message, /all 1 coding-domain dev-skills are packaged/);
-});
-
-test('plugin-dev-skills-packaged fails and names any .claude/skills/fgos-* dev-skill missing from plugins/fgOS/skills/', () => {
-  const dir = mkTempDir();
-  fs.mkdirSync(path.join(dir, '.claude', 'skills', 'fgos-example'), { recursive: true });
-  fs.writeFileSync(path.join(dir, '.claude', 'skills', 'fgos-example', 'SKILL.md'), '# example\n');
-  fs.mkdirSync(path.join(dir, 'plugins', 'fgOS', 'skills'), { recursive: true });
-  const result = pluginDevSkillsPackagedCheck()(dir);
-  assert.equal(result.passed, false);
-  assert.match(result.message, /fgos-example/);
-  assert.match(result.message, /Unknown skill/);
 });
 
 test('task-specs-resolve doctor check passes when core/task-specs/ and domain task-specs exist', () => {

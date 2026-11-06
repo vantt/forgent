@@ -11,7 +11,7 @@ import { DOCTOR_CHECKS, FIX_REGISTRATIONS, createDoctorRun } from '../../src/set
 
 test('doctor pass bodies are read-only in a real repo; no implicit repair of corrupt logs', t => {
   const f = fixture(t); append(f.store, [{}]);
-  for (const name of ['open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'native-addon', 'sync']) assert.equal(checkEventStore(f.repo, `event-store-${name}`, f.ctx).passed, true, name);
+  for (const name of ['open-root', 'machine-id', 'unsealed', 'integrity', 'sync']) assert.equal(checkEventStore(f.repo, `event-store-${name}`, f.ctx).passed, true, name);
   const active = path.join(f.repo, '.git/fgos/events/project/active.jsonl');
   const bytes = fs.readFileSync(active); fs.writeFileSync(active, Buffer.from(bytes.toString().replace('"title":"one"', '"title":"bad"')));
   const before = fs.readFileSync(active);
@@ -26,22 +26,13 @@ test('unsealed thresholds 599, 601 and 3601 seconds', t => {
     assert.equal(got.message.startsWith('warning:'), expected === 'warn');
   }
 });
-test('mapping facts fail missing/unsafe mappings and changed URL; machine missing fails', t => {
-  const f = fixture(t, { remote: true });
-  assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, false);
-  installFetchMapping(f);
-  assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, true);
-  f.git('config', '--add', 'remote.origin.push', 'refs/fgos/events/*:refs/fgos/events/*');
-  assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, false);
-  f.git('config', '--unset-all', 'remote.origin.push'); f.git('remote', 'set-url', 'origin', path.join(f.temp, 'other'));
-  assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, false);
+test('a missing machine id fails', t => {
   const empty = fixture(t, { machine: false });
   assert.equal(checkEventStore(empty.repo, 'event-store-machine-id', empty.ctx).passed, false);
 });
-test('sync without unpublished events passes; missing addon fails rather than silently passing', t => {
+test('sync without unpublished events passes', t => {
   const f = fixture(t, { remote: true });
   assert.equal(checkEventStore(f.repo, 'event-store-sync', f.ctx).message, 'no unpublished events');
-  assert.equal(checkEventStore(f.repo, 'event-store-native-addon', { loaderOptions: { descriptor: { manifest: {}, releaseRoot: f.repo } } }).passed, false);
 });
 
 test('orphan branches warn, persisted integrity fails, and nonrepositories fail closed', t => {
@@ -68,19 +59,6 @@ test('integrity fails and names a peer mirror the reader skipped and the warning
   assert.match(row.message, /event-store-gap refs\/fgos\/remotes\/origin\/events\/peer-bb: /, 'the read skipped the mirror by name');
   assert.match(row.message, /sync: event-store-gap: /, 'the warning the sync kept fails the row too');
 });
-test('refspec check rejects broad namespace wildcards and agrees with Git on missing/installed mappings', async t => {
-  const { checkGit } = await import('../../src/setup/git-checks.mjs');
-  const f = fixture(t, { remote: true });
-  const prior = process.env.FGOS_STATE_ROOT; process.env.FGOS_STATE_ROOT = f.stateRoot;
-  try {
-    for (const installed of [false, true]) {
-      if (installed) installFetchMapping(f);
-      assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, checkGit(f.repo, 'git-repository-config', f.ctx.loaderOptions).passed);
-    }
-    f.git('config', '--add', 'remote.origin.fetch', '+refs/*:refs/unsafe/*');
-    assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, false);
-  } finally { if (prior === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = prior; }
-});
 test('shared machine ref warns only after reading another clone origin on the own mirror', async t => {
   const { syncUseCase } = await import('../../src/verbs/events/sync.mjs');
   const first = fixture(t, { remote: true });
@@ -92,18 +70,6 @@ test('shared machine ref warns only after reading another clone origin on the ow
   assert.equal(checkEventStore(second.repo, 'event-store-sync', second.ctx).message.startsWith('warning:'), false);
 });
 
-test('refspecs allow ordinary pushes and protective negative fetches but refuse Event Store pushes', t => {
-  const f = fixture(t, { remote: true }); installFetchMapping(f);
-  f.git('config', '--add', 'remote.origin.fetch', '^refs/fgos/local-events/*');
-  for (const refspec of ['HEAD', ':', '+:', 'refs/heads/*:refs/heads/*', ':refs/fgos/events/old']) {
-    f.git('config', 'remote.origin.push', refspec);
-    assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, true, refspec);
-  }
-  for (const refspec of ['refs/*:refs/*', '+refs/fgos/*:refs/fgos/*', 'refs/fgos/events/machine']) {
-    f.git('config', 'remote.origin.push', refspec);
-    assert.equal(checkEventStore(f.repo, 'event-store-refspec', f.ctx).passed, false, refspec);
-  }
-});
 test('live worktree branch keys are not orphaned; removal makes the same stream orphaned', t => {
   const f = fixture(t); f.git('commit', '--allow-empty', '-qm', 'root');
   const linked = path.join(f.temp, 'linked');
@@ -152,9 +118,9 @@ test('doctor reports a malformed seal coalescing window on every row, and a repa
   assert.equal(eventStoreSetupContext(f.repo, f.ctx).config.seal.coalesceSec, 30, 'the default is 30 seconds');
 });
 
-test('the eight Event Store rows and one fix are registered and every row of a run shares one doctor', t => {
+test('the six Event Store rows and one fix are registered and every row of a run shares one doctor', t => {
   const rows = DOCTOR_CHECKS.filter(({ id }) => id.startsWith('event-store-'));
-  assert.deepEqual(rows.map(({ id }) => id).sort(), ['open-root', 'machine-id', 'refspec', 'unsealed', 'integrity', 'sync', 'native-addon', 'legacy-layout'].map(name => `event-store-${name}`).sort());
+  assert.deepEqual(rows.map(({ id }) => id).sort(), ['open-root', 'machine-id', 'unsealed', 'integrity', 'sync', 'legacy-layout'].map(name => `event-store-${name}`).sort());
   assert.deepEqual(FIX_REGISTRATIONS.filter(({ id }) => id.startsWith('event-store-')).map(({ id }) => id).sort(), ['event-store-lock-dirs']);
   const f = fixture(t);
   const run = createDoctorRun();

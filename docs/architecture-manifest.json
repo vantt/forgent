@@ -356,7 +356,7 @@
     "src/verbs/events/sync.mjs": "use-case",
     "src/verbs/events/export.mjs": "use-case",
     "src/verbs/events/rebuild.mjs": "use-case",
-    "src/setup/event-store-checks.mjs": "use-case",
+    "src/setup/event-store-checks.mjs": "infra",
     "src/setup/event-store-fixes.mjs": "use-case",
     "src/event-store/config.mjs": "infra",
     "src/git/scoped-commit.mjs": "infra",

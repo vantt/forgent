@@ -11,6 +11,8 @@ import fs from 'node:fs';
 import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
 import { verifyCensus } from '../../scripts/git-one-door-scan.mjs';
 import { retentionNote } from './git-retention-note.mjs';
+import { eventStoreDoctorOf, eventStoreMappingProblems } from './event-store-checks.mjs';
+import { eventStoreAddonAvailable } from '../event-store/index.mjs';
 
 const transportRemedy = 'For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.';
 // A checkout kept for its owner (dirty) or locked by a still-running process is not a broken registration.
@@ -53,7 +55,10 @@ export function checkGit(cwd, kind, loaderOptions, portOptions, run) {
       }
       case 'git-component-compatible': {
         const detail = { versions: native.versions(), floor: facts.floor };
-        return row(compatibleGitContracts(detail.versions, facts.floor) ? [] : ['the Git addon, its contract versions or the Git feature floor do not match this release; upgrade the active release or its Git binary'],
+        return row([
+          !compatibleGitContracts(detail.versions, facts.floor) && 'the Git addon, its contract versions or the Git feature floor do not match this release; upgrade the active release or its Git binary',
+          !eventStoreAddonAvailable(loaderOptions) && 'the Event Store facade exports of the addon are missing; upgrade the active release',
+        ],
           facts.notARepository ? 'the Git addon, its contracts and the Git feature floor are compatible' : `info: ${facts.commonDir}: ${facts.layout}; ${facts.durability}`, detail);
       }
       case 'git-repository-config': {
@@ -66,6 +71,7 @@ export function checkGit(cwd, kind, loaderOptions, portOptions, run) {
           !native.gitFetchMappings(remote).every(r => facts.fetchRefspecs.includes(r)) && 'the required fetch mapping is missing; run fgos doctor --fix (git-publication-refspecs)',
           obsolete && 'obsolete exact legacy mapping breaks plain fetch when the remote has no refs/fgos/legacy; run fgos doctor --fix (git-publication-refspecs)',
           reserved.length && `reserved legacy mirror refs detected: ${reserved.join(', ')}; inspect and remove the foreign refs at their source and these mirrors`,
+          ...eventStoreMappingProblems(eventStoreDoctorOf(cwd, run, { loaderOptions })),
         ], 'repository transport settings and fetch mappings are as fgOS expects', { fetchRefspecs: facts.fetchRefspecs, untrustedTransportConfig: keys, reservedLegacyRefs: reserved });
       }
       case 'git-operation-journal': {

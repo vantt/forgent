@@ -96,8 +96,7 @@ export function branchNameFor(id) {
  * `verify` against it (tsk-2vd D1/D2): a disposable worktree never inherits
  * the host repo's `node_modules` — git only checks out tracked files.
  * No-ops when `worktreePath/package.json` is absent or declares no
- * `dependencies`/`devDependencies` at all (same skip precedent as
- * `checkDependenciesInstalled`, `src/setup/registrations.mjs`) — keeps
+ * `dependencies`/`devDependencies` at all — keeps
  * every existing zero-dependency caller (this repo's own history until
  * `tsk-slq` added `yaml`) byte-identical, no install cost paid when
  * nothing is declared. Runs `npm ci` when `worktreePath/package-lock.json`

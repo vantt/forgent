@@ -168,6 +168,20 @@ test('resolveFgosBin returns null when no tier resolves', () => {
   }
 });
 
+test('resolveFgosBin falls back to a live PATH probe as tier 3 when no cache and no local bin exist', () => {
+  const dir = mkTempDir('bin-discovery-live-path-');
+  const globalDir = mkTempDir('bin-discovery-live-path-cfg-');
+  const binDir = mkTempDir('bin-discovery-live-path-stub-');
+  writeStub(path.join(binDir, 'fgos'));
+  const originalPath = process.env.PATH;
+  process.env.PATH = `${binDir}${path.delimiter}${originalPath}`;
+  try {
+    assert.deepEqual(resolveFgosBin(dir, { globalDir }), { tier: 3, path: path.join(binDir, 'fgos') });
+  } finally {
+    process.env.PATH = originalPath;
+  }
+});
+
 // Tier 0 follows the fgctl shim rule (src/util/host-bin-path.mjs): a ready
 // activation's `<releasePath>/bin/fgos`. The earlier form with a manifest
 // directly inside .fgos/installation and no releasePath is gone on purpose:

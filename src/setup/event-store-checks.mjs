@@ -1,6 +1,6 @@
 // Event Store doctor row bodies; src/setup/registrations.mjs registers each row through one eventStoreDoctor per run.
 import fs from 'node:fs';
-import { eventStoreFacts, eventStoreAddonAvailable, readEventStoreConfig, prepareStore } from '../event-store/index.mjs';
+import { eventStoreFacts, readEventStoreConfig, prepareStore } from '../event-store/index.mjs';
 
 export function eventStoreSetupContext(cwd, options = {}) {
   const base = { stateRoot: options.stateRoot, trustedMain: options.trustedMain ?? cwd, loaderOptions: options.loaderOptions };
@@ -38,26 +38,34 @@ export function eventStoreDoctor(cwd, options = {}) {
     if ('error' in settled) throw settled.error;
     return settled.value;
   };
-  return kind => checkEventStore(cwd, kind, { ...options, context });
+  const check = kind => checkEventStore(cwd, kind, { ...options, context });
+  // The facts the rows judge, read once per run: Git's repository-config row judges the mapping ones.
+  check.facts = () => context().facts;
+  return check;
+}
+/** The run's one eventStoreDoctor; without a run, a private one. */
+export function eventStoreDoctorOf(cwd, run, options) {
+  return run ? run.once(`event-store-doctor:${cwd}`, () => eventStoreDoctor(cwd)) : eventStoreDoctor(cwd, options);
+}
+/** What is wrong with the Event Store's Git mappings: an unsafe publication refspec, a missing mapping provenance, a remote that moved since setup. */
+export function eventStoreMappingProblems(doctor) {
+  let facts;
+  // Facts that cannot be read are every Event Store row's own failure, from the same remembered error; this judges only what was read.
+  try { facts = doctor.facts(); } catch { return []; }
+  if (facts.pushRefspecs.some(r => overlaps(r, ['refs/fgos'])) || facts.fetchRefspecs.some(r => overlaps(r, ['refs/fgos/local-events', 'refs/fgos/branch-events']))) return ['unsafe publication refspec: push mappings or local/branch namespace fetch'];
+  if (!facts.remoteFact.configured) return [];
+  if (!facts.provenance || facts.expectedFetchRefspecs.some(r => !facts.provenance.refspecs.includes(r))) return ['event-store-refspec-missing: no Git mapping provenance; run setup'];
+  if (facts.provenance.url !== facts.remoteFact.url) return ['event-store-remote-changed; run setup'];
+  return [];
 }
 export function checkEventStore(cwd, kind, options = {}) {
   try {
-    if (kind === 'event-store-native-addon') return eventStoreAddonAvailable(options.loaderOptions)
-      ? pass('Event Store facade exports present; ABI evidence: git-component-compatible') : fail('Event Store facade exports missing; see git-component-compatible');
     const context = options.context ? options.context() : eventStoreSetupContext(cwd, options);
     const { config, facts } = context;
     if (kind === 'event-store-open-root') {
       const meta = fs.lstatSync(facts.openRoot);
       if (!meta.isDirectory() || meta.isSymbolicLink() || facts.guarantee.exclusion === 'none') return fail(`open root unavailable: ${JSON.stringify(facts.guarantee)}`);
       return pass(`${facts.openRoot}: ${JSON.stringify(facts.guarantee)}`);
-    }
-    if (kind === 'event-store-refspec') {
-      if (facts.pushRefspecs.some(r => overlaps(r, ['refs/fgos'])) || facts.fetchRefspecs.some(r => overlaps(r, ['refs/fgos/local-events', 'refs/fgos/branch-events']))) return fail('unsafe publication refspec: push mappings or local/branch namespace fetch');
-      if (!facts.remoteFact.configured) return pass('info: no remote configured');
-      if (facts.expectedFetchRefspecs.some(r => !facts.fetchRefspecs.includes(r))) return fail('event-store-refspec-missing; run setup');
-      if (!facts.provenance || facts.expectedFetchRefspecs.some(r => !facts.provenance.refspecs.includes(r))) return fail('event-store-refspec-missing: no Git mapping provenance; run setup');
-      if (facts.provenance.url !== facts.remoteFact.url) return fail('event-store-remote-changed; run setup');
-      return pass('Git fetch mapping and pinned URL match');
     }
     if (kind === 'event-store-machine-id' && facts.machineError) return fail(facts.machineError);
     if (kind === 'event-store-legacy-layout') {

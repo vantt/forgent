@@ -67,12 +67,9 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'run-attempts-stuck',
       'run-supervisor-config',
       'credential-copies-retained',
-      'dependencies-installed',
       'root-drift',
       'leaf-notify-drift',
       'claude-plugin-marketplace',
-      'plugin-skill-cli-reachable',
-      'plugin-dev-skills-packaged',
       'changelog-unreleased-stale',
       'work-classification-vocabulary',
       'work-step-vocabulary',
@@ -83,16 +80,13 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'event-store-integrity',
       'event-store-legacy-layout',
       'event-store-machine-id',
-      'event-store-native-addon',
       'event-store-open-root',
-      'event-store-refspec',
       'event-store-sync',
       'event-store-unsealed',
       'writer-identity-resolvable',
       'identity-machine-id',
       'identity-machine-key',
       'identity-ssh-keygen',
-      'identity-pinned-machines',
       'identity-project-id',
       'identity-shared-directory',
       'identity-ids-unique',
@@ -149,8 +143,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'bwrap-available',
       'curl-available',
       'no-stuck-merge-abort',
-      'coordination-protocol-fixtures-valid',
-      'coordination-example-requests-valid',
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'terminal-control',
       'git-component-compatible',
@@ -183,7 +175,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'rust-host-target-supported',
       'legacy-node-payload-present',
       'active-release-matches-checkout',
-      'command-routes-drift',
       'confinement-policies-declared',
       'confinement-backend-registry-readable',
       'confinement-bwrap-platform',
@@ -193,10 +184,8 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confinement-blind-read',
       'confinement-strict-readiness',
       'operation-prompt-templates-valid',
-      'operation-capability-resolves',
       'runner-patterns-config',
       'runner-generated-paths',
-      'tier-vocabulary-dead-keys',
       'executor-family-unique',
       'executor-skills-installed',
       'tier-fallback',
@@ -204,7 +193,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'llm-accounts-shape',
       'llm-accounts-vs-legacy',
       'global-model-policies-portable',
-      'coordination-protocol-dead-vocabulary',
     ].sort(),
   );
 });
@@ -934,18 +922,6 @@ test('main-checkout-hook-wired doctor check reports passed/failed matching mainC
 });
 
 // ─── D1/D5: dead source lines are reported as a failed check ────────────────
-
-// ─── operation-capability-resolves (Unit I21 fix, round 3, MEDIUM) ────────
-test('operation-capability-resolves reports passing status for retired coordination protocols', () => {
-  const dir = mkTemp('checks-operation-capability-retired-');
-  try {
-    const { passed, message } = checkById('operation-capability-resolves').check(dir);
-    assert.equal(passed, true, message);
-    assert.match(message, /retired/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
 
 test('a doctor row keeps its facts under detail so its message stays one sentence', () => {
   const root = initRepo('doctor-detail-');
