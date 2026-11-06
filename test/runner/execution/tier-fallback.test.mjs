@@ -43,27 +43,6 @@ function config({ prefer = FAMILIES, tier, tierFallback, modelPolicies = {}, llm
 
 const ask = { unit: { id: 'u', capability: 'docs:write', writes: [] }, role: 'producer', readOnly: true };
 const ctx = (runnerConfig) => ({ runnerConfig, session: { headless: true } });
-const families = (bindings) => bindings.map((b) => b.executor);
-
-test('two entries of one cell are two candidates in cell order, taken before the next family', () => {
-  const cfg = config({
-    modelPolicies: { alpha: cells('alpha', ['alpha-m@alpha', 'alpha-via-router@router']) },
-    llmAccounts: { router: { r1: { credentialStore: { alpha: '/nonexistent/r1' } } } },
-  });
-  const walk = explainSeat(ask, ctx(cfg)).walk;
-  assert.deepEqual(walk.map((b) => [b.executor, b.pool, b.model]), [
-    ['alpha', 'alpha', 'alpha-m'],
-    ['alpha', 'router', 'alpha-via-router'],
-    ['beta', 'beta', 'beta-m'],
-    ['gamma', 'gamma', 'gamma-m'],
-    ['delta', 'delta', 'delta-m'],
-  ]);
-  const second = bind(ask, ctx(cfg), { walk: { tried: [walk[0]] } });
-  assert.equal(second.provenance.fallbackFrom.walk, 'entry');
-  assert.equal(second.provenance.fallbackFrom.pool, 'alpha');
-  const third = bind(ask, ctx(cfg), { walk: { tried: walk.slice(0, 2) } });
-  assert.equal(third.provenance.fallbackFrom.walk, 'family');
-});
 
 test('explaining a seat with the fallback walk off still ranks every candidate and walks no chain', () => {
   const cfg = config({
@@ -78,68 +57,11 @@ test('explaining a seat with the fallback walk off still ranks every candidate a
   assert.ok(full.walk.length > 1);
 });
 
-test('a pool no account can serve gives no candidate, and explain material says why', () => {
-  const cfg = config({
-    prefer: ['alpha'],
-    modelPolicies: { alpha: cells('alpha', ['alpha-via-router@router', 'alpha-m']) },
-    llmAccounts: { router: { r1: { credentialStore: { other: '/nonexistent/r1' } }, r2: { credentialStore: { alpha: '/nonexistent/r2' }, disabled: true } } },
-  });
-  const { ranked } = explainSeat(ask, ctx(cfg));
-  assert.deepEqual(ranked.candidates.map((c) => c.pool), ['alpha']);
-  assert.deepEqual(ranked.skipped.map((s) => [s.pool, s.reason]), [['router', 'pool-unusable']]);
-  assert.match(ranked.skipped[0].detail, /no enabled account of pool "router" holds a "alpha" login store/);
-  const bound = bind(ask, ctx(cfg));
-  assert.equal(bound.pool, 'alpha');
-  assert.equal(bound.provenance.skipped[0].pool, 'router');
-  assert.equal(bound.provenance.skipped[0].reason, 'pool-unusable');
-});
-
-test('a missing tier cell refuses by name for an out-of-process agent seat', () => {
-  const cfg = config({ prefer: ['alpha'] });
-  delete cfg.modelPolicies.alpha.standard;
-  const refused = bind(ask, ctx(cfg));
-  assert.equal(refused.refused.reason, 'tier-cell-missing');
-  assert.match(refused.refused.detail, /no allowed executor has a cell; change capabilities\."docs:write"\.prefer or set /);
-  assert.equal(refused.refused.config, 'capabilities."docs:write".prefer', 'the refusal names the config line to change');
-
-  const noPolicies = config({ prefer: ['alpha'] });
-  delete noPolicies.modelPolicies.alpha;
-  assert.equal(bind(ask, ctx(noPolicies)).refused.reason, 'tier-cell-missing');
-});
-
 test('the executor model is no longer a fallthrough for a missing cell', () => {
   const cfg = config({ prefer: ['alpha'] });
   delete cfg.modelPolicies.alpha.standard;
   cfg.executors.alpha.model = 'executor-model';
   assert.equal(bind(ask, ctx(cfg)).refused.reason, 'tier-cell-missing');
-});
-
-test('in a walk a family with no cell is skipped and recorded, and the skipped family names the cell to configure', () => {
-  const cfg = config({ prefer: ['alpha', 'beta', 'gamma'] });
-  delete cfg.modelPolicies.beta.standard;
-  const first = bind(ask, ctx(cfg));
-  const next = bind(ask, ctx(cfg), { walk: { tried: [first] } });
-  assert.equal(next.executor, 'gamma');
-  assert.deepEqual(next.provenance.skipped.map((s) => [s.family, s.reason]), [['beta', 'tier-cell-missing']]);
-  const last = bind(ask, ctx(cfg), { walk: { tried: [first, next] } });
-  assert.equal(last.refused.reason, 'no-candidate', 'nothing is left after the last candidate');
-
-  const only = config({ prefer: ['alpha', 'beta'] });
-  delete only.modelPolicies.beta.standard;
-  const walk = { tried: [bind(ask, ctx(only))] };
-  assert.equal(bind(ask, ctx(only), { walk }).refused.reason, 'no-candidate');
-  const { ranked } = explainSeat(ask, ctx(only), { walk });
-  assert.deepEqual(ranked.skipped.map((s) => [s.family, s.reason, s.config]), [['beta', 'tier-cell-missing', 'modelPolicies.beta.standard']], 'the skipped family names the cell to configure');
-});
-
-test('a seat that needs no model is not refused for a missing cell', () => {
-  const cfg = config({ prefer: ['alpha'] });
-  delete cfg.modelPolicies.alpha.standard;
-  cfg.executors.alpha = { kind: 'agent', providerModel: 'alpha', agentType: 'generalist' };
-  const bound = bind(ask, { runnerConfig: cfg, session: { headless: true, hasNativeAgent: true } });
-  assert.equal(bound.refused, undefined, JSON.stringify(bound.refused));
-  assert.equal(bound.mechanism, 'in-process');
-  assert.equal(bound.pool, null);
 });
 
 test('the walk state is the earlier bindings: binding N+1 from the recorded ones equals the one the walk made', () => {

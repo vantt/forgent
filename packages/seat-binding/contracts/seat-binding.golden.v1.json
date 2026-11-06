@@ -3012,6 +3012,553 @@
           "reason": "account-pin-no-inventory"
         }
       }
+    },
+    {
+      "name": "seats outnumbering the families share the least used family, pool order breaks the tie, and the seat says whom it shares with",
+      "patch": {
+        "ask": {
+          "capability": "group-cognition:critique",
+          "role": "producer",
+          "seat": "m9",
+          "independence": {
+            "soft": [
+              "m1",
+              "m2",
+              "m3",
+              "m4",
+              "m5"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "m1",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          },
+          {
+            "seat": "m2",
+            "role": "producer",
+            "executor": "openai",
+            "family": "openai"
+          },
+          {
+            "seat": "m3",
+            "role": "producer",
+            "executor": "gemini",
+            "family": "gemini"
+          },
+          {
+            "seat": "m4",
+            "role": "producer",
+            "executor": "xai",
+            "family": "xai"
+          },
+          {
+            "seat": "m5",
+            "role": "producer",
+            "executor": "glm",
+            "family": "z-ai"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude"
+            }
+          ],
+          "sharedWith": [
+            "m1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "a family used twice is passed over for the least used one",
+      "patch": {
+        "ask": {
+          "capability": "group-cognition:critique",
+          "role": "producer",
+          "seat": "m9",
+          "independence": {
+            "soft": [
+              "m1",
+              "m2",
+              "m3",
+              "m4",
+              "m5",
+              "m6"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "m1",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          },
+          {
+            "seat": "m2",
+            "role": "producer",
+            "executor": "openai",
+            "family": "openai"
+          },
+          {
+            "seat": "m3",
+            "role": "producer",
+            "executor": "gemini",
+            "family": "gemini"
+          },
+          {
+            "seat": "m4",
+            "role": "producer",
+            "executor": "xai",
+            "family": "xai"
+          },
+          {
+            "seat": "m5",
+            "role": "producer",
+            "executor": "glm",
+            "family": "z-ai"
+          },
+          {
+            "seat": "m6",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai"
+            }
+          ],
+          "sharedWith": [
+            "m2"
+          ]
+        }
+      }
+    },
+    {
+      "name": "spread never overrides the hard independence filter",
+      "patch": {
+        "ask": {
+          "capability": "group-cognition:critique",
+          "role": "reviewer",
+          "seat": "m9",
+          "independence": {
+            "soft": [
+              "m1",
+              "m2",
+              "m3",
+              "m4",
+              "m5"
+            ],
+            "hard": [
+              "m1",
+              "m2",
+              "m3",
+              "m4",
+              "m5"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "m1",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          },
+          {
+            "seat": "m2",
+            "role": "producer",
+            "executor": "openai",
+            "family": "openai"
+          },
+          {
+            "seat": "m3",
+            "role": "producer",
+            "executor": "gemini",
+            "family": "gemini"
+          },
+          {
+            "seat": "m4",
+            "role": "producer",
+            "executor": "xai",
+            "family": "xai"
+          },
+          {
+            "seat": "m5",
+            "role": "producer",
+            "executor": "glm",
+            "family": "z-ai"
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "independence-unsatisfiable"
+        }
+      }
+    },
+    {
+      "name": "after a failure the walk keeps ranking the remaining candidates by family use",
+      "patch": {
+        "ask": {
+          "capability": "group-cognition:critique",
+          "role": "producer",
+          "seat": "m9",
+          "independence": {
+            "soft": [
+              "m1"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "m1",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          }
+        ],
+        "walk": {
+          "tried": [
+            {
+              "executor": "openai",
+              "invocation": "codex-cli-bwrap",
+              "pool": "openai",
+              "model": "gpt-5.6-terra"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "gemini"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "without a global maxTier there is no ceiling at all",
+      "patch": {
+        "ask": {
+          "capability": "architecture:critique",
+          "seat": "producer",
+          "role": "producer"
+        },
+        "config": {
+          "maxTier": null,
+          "capabilities": {
+            "architecture:critique": {
+              "maxTier": null
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "frontier",
+          "maxTier": null
+        },
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "model": "fable"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a capability maxTier below the global cap lowers its seats further and names its own line",
+      "patch": {
+        "config": {
+          "capabilities": {
+            "architecture:explain": {
+              "maxTier": "standard"
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "policy": {
+          "tier": "standard",
+          "maxTier": {
+            "value": "standard",
+            "source": "capabilities.\"architecture:explain\".maxTier",
+            "applied": true
+          }
+        }
+      }
+    },
+    {
+      "name": "an override effort on a cell that promises none is taken as given",
+      "patch": {
+        "ask": {
+          "override": {
+            "effort": "low"
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "effort": "low",
+              "effortSource": "override",
+              "model": "opus"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "after a lease conflict the same candidate names another account of its pool",
+      "patch": {
+        "walk": {
+          "failedAccounts": [
+            {
+              "pool": "claude",
+              "account": "main"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "pool": "claude",
+              "account": "spare"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "after a lease conflict on every account of the pool the seat is refused by name",
+      "patch": {
+        "walk": {
+          "failedAccounts": [
+            {
+              "pool": "claude",
+              "account": "main"
+            },
+            {
+              "pool": "claude",
+              "account": "spare"
+            }
+          ]
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "claude"
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "no-account-available"
+        }
+      }
+    },
+    {
+      "name": "a unit-preferred executor that a hard filter removes falls to the capability pool, whose source is the capability",
+      "patch": {
+        "ask": {
+          "unitPrefer": [
+            "openai"
+          ],
+          "role": "reviewer",
+          "seat": "reviewer",
+          "independence": {
+            "hard": [
+              "producer"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "producer",
+            "role": "producer",
+            "executor": "openai",
+            "family": "openai"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "source": "capabilities.\"architecture:*\".prefer"
+            }
+          ],
+          "movedBy": [
+            "independence"
+          ]
+        }
+      }
+    },
+    {
+      "name": "a human override that names an executor pins it over the unit preference",
+      "patch": {
+        "ask": {
+          "unitPrefer": [
+            "openai"
+          ],
+          "override": {
+            "executor": "gemini"
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "gemini",
+              "source": "override"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a walk step after a unit-preferred executor goes into the capability pool and never returns to it",
+      "patch": {
+        "ask": {
+          "unitPrefer": [
+            "openai"
+          ]
+        },
+        "walk": {
+          "tried": [
+            {
+              "executor": "openai",
+              "invocation": "codex-cli-bwrap",
+              "pool": "openai",
+              "model": "gpt-6.1-sol"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "source": "capabilities.\"architecture:*\".prefer"
+            }
+          ]
+        }
+      },
+      "executors": [
+        "claude",
+        "gemini",
+        "xai"
+      ]
+    },
+    {
+      "name": "an acceptDependence override from an authorized door still applies when spread is asked",
+      "patch": {
+        "ask": {
+          "capability": "group-cognition:critique",
+          "role": "reviewer",
+          "seat": "m9",
+          "raiseAuthorized": true,
+          "override": {
+            "executor": "claude",
+            "acceptDependence": true
+          },
+          "independence": {
+            "hard": [
+              "m1"
+            ],
+            "soft": [
+              "m1"
+            ]
+          }
+        },
+        "peers": [
+          {
+            "seat": "m1",
+            "role": "producer",
+            "executor": "claude",
+            "family": "claude"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "source": "override"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "a description-only exact entry supplies no pool and the bare verb is not a lookup key",
+      "patch": {
+        "ask": {
+          "capability": "docs:plan",
+          "seat": "producer",
+          "role": "producer"
+        },
+        "config": {
+          "capabilities": {
+            "docs:plan": {
+              "description": "slot with no prefer"
+            },
+            "plan": {
+              "prefer": [
+                "claude"
+              ]
+            }
+          },
+          "tierFallback": null
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "no-candidate"
+        }
+      }
     }
   ]
 }
