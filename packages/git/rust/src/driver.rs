@@ -3659,6 +3659,76 @@ mod tests {
         assert_eq!(kinds(), 3, "only the missed reads ask for the kind");
     }
     #[test]
+    fn a_walk_reads_a_stop_it_reaches_in_the_batch_of_the_commit_naming_it() {
+        let state = Temp::new();
+        let dir = Temp::new();
+        let logs = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        for message in ["root", "stop", "tip"] {
+            git(
+                &dir.0,
+                &[
+                    "-c",
+                    "user.name=t",
+                    "-c",
+                    "user.email=t@t",
+                    "commit",
+                    "-q",
+                    "--allow-empty",
+                    "-m",
+                    message,
+                ],
+            );
+        }
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        let log = log_git_children(&mut driver, &logs.0);
+        let repo = resolve(&driver, &dir.0);
+        let oid = |rev: &str| {
+            Oid::parse(
+                String::from_utf8(git(&dir.0, &["rev-parse", rev]))
+                    .unwrap()
+                    .trim(),
+                repo.object_format(),
+            )
+            .unwrap()
+        };
+        let (tip, stop) = (oid("HEAD"), oid("HEAD~1"));
+        let children = || fs::read_to_string(&log).unwrap_or_default().lines().count();
+        let before = children();
+        let page = driver
+            .walk_commits(
+                &repo,
+                std::slice::from_ref(&tip),
+                std::slice::from_ref(&stop),
+                None,
+                WalkBounds {
+                    max_commits: 256,
+                    max_bytes: 4 * 1024 * 1024,
+                },
+            )
+            .unwrap();
+        // The page is the one a walk that read the stop on its own returned: the stop with its
+        // tree and parents, and nothing of its ancestry.
+        let walked: Vec<_> = page
+            .commits
+            .iter()
+            .map(|c| (c.oid.clone(), c.parents.clone(), c.tree.clone()))
+            .collect();
+        assert_eq!(
+            walked,
+            vec![
+                (tip.clone(), vec![stop.clone()], oid("HEAD^{tree}")),
+                (stop.clone(), vec![oid("HEAD~2")], oid("HEAD~1^{tree}")),
+            ]
+        );
+        assert!(page.complete && page.next_cursor.is_none());
+        assert_eq!(
+            children() - before,
+            3,
+            "one listing, one header read and one object read cover the tip and the stop"
+        );
+    }
+    #[test]
     fn a_main_checkout_lists_its_transport_policy_once_per_config_stamp() {
         let state = Temp::new();
         let dir = Temp::new();
@@ -4234,18 +4304,29 @@ impl GitDriver {
             revisions.push('\n');
         }
         let limit = format!("--max-count={}", count.min(256));
-        let revisions =
-            self.inspect_input(repo, &["rev-list", &limit, "--stdin"], revisions.as_bytes())?;
+        let revisions = self.inspect_input(
+            repo,
+            &["rev-list", "--parents", &limit, "--stdin"],
+            revisions.as_bytes(),
+        )?;
+        let listed: Vec<Vec<&str>> = std::str::from_utf8(&revisions)
+            .map_err(|_| failure("invalid-utf8"))?
+            .lines()
+            .map(|l| l.split(' ').collect())
+            .collect();
+        // A stop the listed commits name as parent is read in this batch too:
+        // the walk returns it, and `^stop` keeps it out of the listing.
+        let reached = listed
+            .iter()
+            .flat_map(|l| l.iter().skip(1))
+            .filter(|p| stop.contains(*p));
         let mut seen = BTreeSet::new();
         let ids: Vec<String> = seeds
             .iter()
-            .cloned()
-            .chain(
-                std::str::from_utf8(&revisions)
-                    .map_err(|_| failure("invalid-utf8"))?
-                    .lines()
-                    .map(str::to_owned),
-            )
+            .map(String::as_str)
+            .chain(listed.iter().filter_map(|l| l.first().copied()))
+            .chain(reached.copied())
+            .map(str::to_owned)
             .filter(|id| seen.insert(id.clone()))
             .collect();
         let input = format!("{}\n", ids.join("\n"));

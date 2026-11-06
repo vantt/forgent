@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3a319c4a44cc29ce939dcfbe7a8961f44f94920c706ee1e6d44cfb835df98cae",
+  "payloadDigest": "ea6d9707b44d82448dc4ae9f18f8878fea826a2d6e87dade8516ba314c43755b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -383,7 +383,7 @@
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
-    "packages/git/rust/src/driver.rs": "9cc7caaa98bcc94e3e849b2306fcc49a77220d6e0e4904d43e4599871cbfd1c3",
+    "packages/git/rust/src/driver.rs": "bae4c39204d5b1ace6872dbc0486b2e86915da2b129ffe72bbe1d14604b89fff",
     "packages/git/rust/src/inspect.rs": "f01f4b4709058650ef9643c8331aa20ab69eef7353abca9769eacb8b829fa2e7",
     "packages/git/rust/src/land.rs": "c6382742bfddfe8453b7026b0be778dd681c238509c3495e5555ff159dcc3836",
     "packages/git/rust/src/lib.rs": "93942398c6568b772a133f8b0c6db70eafa34c759af28380efca01fac93538b6",
