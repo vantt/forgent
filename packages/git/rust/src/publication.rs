@@ -1140,22 +1140,45 @@ impl<F: FileSystem> Publication for PublicationPort<'_, F> {
         self.object_write(repo, "tree", &bytes)
     }
     fn write_commit(&self, repo: &RepoHandle, input: &CommitInput) -> Result<Oid> {
-        self.check_oid(repo, &input.tree)?;
-        if !matches!(
-            self.read_object(repo, &input.tree, ObjectType::Tree)?,
-            ReadObject::Present { .. }
-        ) {
-            return Err(failure("commit-tree-missing"));
+        // The tree and every parent must exist with their kind; one header read
+        // asks for all of them.
+        let named: Vec<(&Oid, ObjectType, &str)> =
+            std::iter::once((&input.tree, ObjectType::Tree, "commit-tree-missing"))
+                .chain(
+                    input
+                        .parents
+                        .iter()
+                        .map(|p| (p, ObjectType::Commit, "commit-parent-missing")),
+                )
+                .collect();
+        let mut asked = String::new();
+        for (oid, _, _) in &named {
+            self.check_oid(repo, oid)?;
+            asked.push_str(oid.as_str());
+            asked.push('\n');
+        }
+        let headers = self.call(repo, &["cat-file", "--batch-check"], asked.as_bytes())?;
+        let headers = text(&headers)?;
+        if headers.lines().count() != named.len() {
+            return Err(failure("invalid-object-header"));
+        }
+        for ((oid, kind, missing), header) in named.iter().zip(headers.lines()) {
+            let fields: Vec<_> = header.split(' ').collect();
+            if fields == [oid.as_str(), "missing"] {
+                if let Some(cause) = crate::driver::object_gap_cause(&repo.layout) {
+                    return Err(failure(cause));
+                }
+                return Err(failure(missing));
+            }
+            if fields.len() != 3 || fields[0] != oid.as_str() {
+                return Err(failure("invalid-object-header"));
+            }
+            if fields[1] != kind_name(*kind) {
+                return Err(failure("object-type-mismatch"));
+            }
         }
         let mut bytes = format!("tree {}\n", input.tree.as_str()).into_bytes();
         for p in &input.parents {
-            self.check_oid(repo, p)?;
-            if !matches!(
-                self.read_object(repo, p, ObjectType::Commit)?,
-                ReadObject::Present { .. }
-            ) {
-                return Err(failure("commit-parent-missing"));
-            }
             bytes.extend_from_slice(format!("parent {}\n", p.as_str()).as_bytes());
         }
         bytes.extend_from_slice(

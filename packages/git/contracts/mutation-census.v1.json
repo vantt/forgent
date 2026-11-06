@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ea6d9707b44d82448dc4ae9f18f8878fea826a2d6e87dade8516ba314c43755b",
+  "payloadDigest": "699bc09d73ab681bdfcc987b294f810621e73a55fcad709927a9f7f6c56c0f4b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -383,13 +383,13 @@
     "packages/git/node-addon/src/single_load.rs": "91190bfaa1e0476b3e65559318f7fd3475844070afaca38d72d0c3018da6d825",
     "packages/git/node-addon/src/yaml.rs": "cdb0ecd0b330966e5fd3c8e41e2069bf87722f1ac16df8363e514e9441d4432c",
     "packages/git/node-addon/tests/yaml_parts.rs": "835efdf2a4183cd1197385f318bfb370db8804ae9f4e8e500548c75fd6a3462f",
-    "packages/git/rust/src/driver.rs": "bae4c39204d5b1ace6872dbc0486b2e86915da2b129ffe72bbe1d14604b89fff",
+    "packages/git/rust/src/driver.rs": "00b8c22e4563251971d93b419f440f6f9b278d1d3f35c7ad0026f69dd73b9d7c",
     "packages/git/rust/src/inspect.rs": "f01f4b4709058650ef9643c8331aa20ab69eef7353abca9769eacb8b829fa2e7",
     "packages/git/rust/src/land.rs": "c6382742bfddfe8453b7026b0be778dd681c238509c3495e5555ff159dcc3836",
     "packages/git/rust/src/lib.rs": "93942398c6568b772a133f8b0c6db70eafa34c759af28380efca01fac93538b6",
     "packages/git/rust/src/native_lock.rs": "49758dea6b6d2f2abae425b31b937817b8c15174a83bf10ce33dd9046cc5139a",
     "packages/git/rust/src/objects.rs": "835dcdc093cbbdad82eb25b82fd28df9de6942789751a57b571f24e389cf23ec",
-    "packages/git/rust/src/publication.rs": "5376ff20ee97d873e3c9c604b86ef7243679d2842ce13156d4cc3f363515eb34",
+    "packages/git/rust/src/publication.rs": "39233e59b389d266fa493846c9f7c54ec38d38f2edd6c3403c89e50013a68e3a",
     "packages/git/rust/src/recovery.rs": "b30f9de2ee0168597c487c09fa11ad1b61e1fdeb5b5047d8a135af4764d33183",
     "packages/git/rust/src/refs.rs": "e4eef25eb241030b7c5b49d146f7b275762d219f49efba8284ab39a93698bc37",
     "packages/git/rust/src/remote.rs": "8600d1b6964f4bba67fbee98520cdf43c92b91ac8eb2b8e94b9b0ef0e68373fa",

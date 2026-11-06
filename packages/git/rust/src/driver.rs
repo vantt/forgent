@@ -3729,6 +3729,89 @@ mod tests {
         );
     }
     #[test]
+    fn a_commit_write_checks_its_tree_and_parents_in_one_header_read() {
+        use crate::{CommitInput, Identity, Publication, TreeEntry};
+        use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait};
+        let state = Temp::new();
+        let dir = Temp::new();
+        let logs = Temp::new();
+        git(&dir.0, &["init", "-q"]);
+        let mut driver = GitDriver::new(&state.0).unwrap();
+        let log = log_git_children(&mut driver, &logs.0);
+        let repo = resolve(&driver, &dir.0);
+        let fence = repo.trusted_main_root().join(".fgos/locks/activation.lock");
+        fs::create_dir_all(&fence).unwrap();
+        fs::write(
+            fence.join("TOMBSTONE"),
+            "{\"at\":\"fixture\",\"v\":1,\"lock\":\"activation\",\"by\":\"fgos git\"}\n",
+        )
+        .unwrap();
+        let lock = logs.0.join("seal.lock");
+        let mut handle = match acquire(
+            &Resource::new("event-seal", &lock),
+            Mode::Ex,
+            Wait::Ms(30_000),
+            2000,
+        ) {
+            Acquire::Acquired(h) => h,
+            other => panic!("{other:?}"),
+        };
+        let reference = RefName::parse("refs/fgos/events/machine").unwrap();
+        let authority =
+            crate::HolderAuthority::new(&repo, &mut handle, &lock, reference, "test-writer")
+                .unwrap();
+        let port = crate::PublicationPort::new(&driver, authority);
+        let children = || fs::read_to_string(&log).unwrap_or_default().lines().count();
+        let blob = port.write_blob(&repo, b"e").unwrap();
+        let tree = port
+            .write_tree(
+                &repo,
+                &[TreeEntry {
+                    name: b"seal.json".to_vec(),
+                    mode: 0o100644,
+                    oid: blob,
+                }],
+            )
+            .unwrap();
+        let commit = |parents: Vec<Oid>, message: &str| {
+            let identity = || Identity {
+                name: "Event Store".into(),
+                email: "store@fgos.invalid".into(),
+            };
+            port.write_commit(
+                &repo,
+                &CommitInput {
+                    tree: tree.clone(),
+                    parents,
+                    author: identity(),
+                    committer: identity(),
+                    author_date: "1792300000 +0700".into(),
+                    committer_date: "1792300000 +0700".into(),
+                    message: message.as_bytes().to_vec(),
+                },
+            )
+        };
+        let a = commit(vec![], "a").unwrap();
+        let b = commit(vec![a.clone()], "b").unwrap();
+        let not_commit = port.write_blob(&repo, b"not a commit").unwrap();
+        let before = children();
+        commit(vec![a.clone(), b.clone()], "merge").unwrap();
+        assert_eq!(
+            children() - before,
+            2,
+            "one header read for the tree and both parents, one object write"
+        );
+        assert_eq!(
+            commit(vec![not_commit], "c").unwrap_err().cause,
+            "object-type-mismatch"
+        );
+        let absent = Oid::parse(&"1".repeat(a.as_str().len()), repo.object_format()).unwrap();
+        assert_eq!(
+            commit(vec![a, absent], "d").unwrap_err().cause,
+            "commit-parent-missing"
+        );
+    }
+    #[test]
     fn a_main_checkout_lists_its_transport_policy_once_per_config_stamp() {
         let state = Temp::new();
         let dir = Temp::new();
