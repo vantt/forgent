@@ -97,8 +97,8 @@ itself is genuinely unclear, not when a detail is merely unspecified.
 - Never delegate this judgment — intent OR domain — to the Agent/Task tool
   as an ad hoc sub-dispatch. Deciding "is the intent clear" and "which
   domain does this belong to" are exactly the kind of judgment a live,
-  same-provider soul already holds full context for (Native-First Dispatch
-  Doctrine rule 2, D-ADR0026 in
+  same-provider soul already holds full context for (rule 2 of
+  D-ADR0026 (Native-First Dispatch Doctrine), narrative in
   `docs/platform/runner/decisions/h-36d872fbb0e5.md`); spawning a subagent to re-derive
   either from less context is pure overhead, not a transparency question.
 

@@ -326,8 +326,8 @@ function escapeRegExp(str) {
  * Recursively collect `{file, lines}` for every markdown/JS source file
  * under `roots` (repo-root-relative), for the write-time citation sweep
  * `fgos decision --relation supersedes:<id>|touches:<id>` runs (D2/D8's
- * "sweep docs/**+src/**+plugins/**", not just docs/backlog.md+docs/specs/
- * *.md like this file's own CLI mode above). `excludeRelDirs` additionally
+ * "sweep docs/**+src/**+plugins/**", not just docs/backlog.md+the platform
+ * specs like this file's own CLI mode above). `excludeRelDirs` additionally
  * skips any file whose repo-relative path starts with one of the given
  * prefixes — the "feature's own docs/history dir" self-citation carve-out
  * (round 3 DISCUSSION: a feature citing its own in-flight D-IDs in its own
