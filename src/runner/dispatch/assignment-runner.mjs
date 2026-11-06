@@ -133,18 +133,8 @@ export {
   readEffectiveExecutionContract,
 };
 
-// ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
-// `effectiveAssignment` derivation reads a stored assignment.json back from
-// disk via raw JSON.parse (below), bypassing buildAssignment()/the
-// normalizer entirely -- so `mutation` is `undefined` on any assignment.json
-// written before that field existed (or otherwise missing it). This is the
-// same read-back gap already fixed for `findLatestAssignmentRunResult`
-// (operation-choice.mjs) and `runMissionAssignment`'s string-ID branch
-// (mission-lite.mjs); mirrors that exact pattern here, at the one location
-// that makes the fix caller-independent: derive the SAME value
-// assignment-normalizer.mjs would stamp for this role/operation pair, from
-// that module's own single source of truth -- never a second,
-// independently hand-maintained table that could drift from it.
+// The `mutation` the normalizer would stamp for this role/operation pair, for an assignment.json written
+// without one: derived from assignment-normalizer.mjs itself, never a second hand-kept table.
 function fallbackMutationForAssignment(asgn) {
   const operation = asgn?.operation;
   if (typeof operation !== 'string' || !operation) return undefined;
@@ -643,6 +633,78 @@ function giveBackAttemptHome(runDir, attemptId) {
   }
 }
 
+/**
+ * The Assignment this Run executes: `assignment.json` under `assignmentDir` is its immutable input. A first
+ * call publishes it atomically (template provenance resolved first, so the file on disk carries it); a later
+ * call, or one that lost the publish race, reads it back and fails hard when it cannot be read or parsed
+ * rather than run a different assignment from memory. `mutation` is backfilled on a record written without it,
+ * from the normalizer's own rule, and the result is checked again before its template is rendered.
+ */
+function loadImmutableAssignment(assignment, { assignmentDir, cwd, opts }) {
+  const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
+  let loaded = assignment;
+  let published = false;
+  if (!fs.existsSync(assignmentJsonPath)) {
+    if (assignment.contractTemplate && !assignment.provenance?.template?.templateSnapshot) {
+      const initialResolution = resolveAndRenderOperationPrompt(assignment, { cwd, domain: assignment.domain });
+      loaded = Object.freeze({
+        ...assignment,
+        provenance: Object.freeze({ ...(assignment.provenance || {}), template: initialResolution.templateProvenance }),
+      });
+    }
+    // Atomic publish (fsynced temp + exclusive hard link): a crash mid-write never leaves a partial file that
+    // would brick this Assignment id. `false` means a concurrent writer won: read its file back below.
+    published = publishImmutableProof(assignmentJsonPath, loaded);
+  }
+  if (!published) {
+    let raw;
+    try {
+      raw = fs.readFileSync(assignmentJsonPath, 'utf8');
+    } catch (err) {
+      throw new RunnerConfigError(
+        `assignment.json for "${assignment.assignmentId}" exists but could not be read: ${err.message}`,
+      );
+    }
+    let parsedAssignment;
+    try {
+      parsedAssignment = JSON.parse(raw);
+    } catch (err) {
+      throw new RunnerConfigError(
+        `assignment.json for "${assignment.assignmentId}" is corrupt (invalid JSON): ${err.message}`,
+      );
+    }
+    try {
+      const normalizedPolicy = normalizeSavedPolicyTier(parsedAssignment.policy, { allowAdditionalFields: true });
+      loaded = Object.freeze(
+        normalizedPolicy === parsedAssignment.policy
+          ? parsedAssignment
+          : { ...parsedAssignment, policy: normalizedPolicy },
+      );
+    } catch (err) {
+      throw new RunnerConfigError(
+        `assignment.json for "${assignment.assignmentId}" is corrupt or invalid: ${err.message}`,
+      );
+    }
+  }
+
+  const effectiveMutation = loaded.mutation === 'read-only' || loaded.mutation === 'mutating'
+    ? loaded.mutation
+    : fallbackMutationForAssignment(loaded);
+  let effectiveAssignment = Object.freeze({ ...loaded, mutation: effectiveMutation });
+
+  validateAssignmentLegality(effectiveAssignment, opts);
+
+  let templateResolution = null;
+  if (effectiveAssignment.contractTemplate) {
+    templateResolution = resolveAndRenderOperationPrompt(effectiveAssignment, { cwd, domain: effectiveAssignment.domain });
+    effectiveAssignment = Object.freeze({
+      ...effectiveAssignment,
+      provenance: Object.freeze({ ...(effectiveAssignment.provenance || {}), template: templateResolution.templateProvenance }),
+    });
+  }
+  return { effectiveAssignment, effectiveMutation, templateResolution };
+}
+
 export async function executeAssignment(assignment, opts = {}) {
   refuseWorkItemInput(opts, 'executeAssignment()');
   validateAssignmentLegality(assignment, opts);
@@ -677,104 +739,7 @@ export async function executeAssignment(assignment, opts = {}) {
 
   fs.mkdirSync(runsDir, { recursive: true });
 
-  // Ensure persisted assignment.json is the immutable input for this Run (Step 03 §2).
-  // Contract: if assignment.json already exists on disk it is THE immutable input — read it.
-  // If it exists but is unreadable or corrupt, FAIL HARD rather than silently executing
-  // a different assignment from memory (which would violate the immutability guarantee).
-  const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
-  let effectiveAssignment = assignment;
-  let assignmentJsonPublished = false;
-  if (!fs.existsSync(assignmentJsonPath)) {
-    // I04-REV-01: Ensure template resolution happens before assignment.json is persisted,
-    // so the immutable assignment.json on disk carries complete template provenance (including templateSnapshot).
-    if (assignment.contractTemplate && !assignment.provenance?.template?.templateSnapshot) {
-      const initialResolution = resolveAndRenderOperationPrompt(assignment, {
-        cwd,
-        domain: assignment.domain,
-      });
-      assignment = Object.freeze({
-        ...assignment,
-        provenance: Object.freeze({
-          ...(assignment.provenance || {}),
-          template: initialResolution.templateProvenance,
-        }),
-      });
-    }
-    effectiveAssignment = assignment;
-    // Atomic publish (fsynced temp + exclusive hard link, same primitive as
-    // result.json/run.json): a crash mid-write must never leave a partial
-    // assignment.json on disk -- that used to make the read-back branch
-    // below throw "corrupt (invalid JSON)" forever, permanently bricking
-    // this Assignment id (S6). `publishImmutableProof` either lands the
-    // complete file or leaves it cleanly absent; `false` here means a
-    // concurrent writer won the race in the TOCTOU window above, so fall
-    // through to the read-back branch exactly as if it had existed from
-    // the start.
-    assignmentJsonPublished = publishImmutableProof(assignmentJsonPath, assignment);
-  }
-  if (!assignmentJsonPublished) {
-    let raw;
-    try {
-      raw = fs.readFileSync(assignmentJsonPath, 'utf8');
-    } catch (err) {
-      throw new RunnerConfigError(
-        `assignment.json for "${assignment.assignmentId}" exists but could not be read: ${err.message}`,
-      );
-    }
-    let parsedAssignment;
-    try {
-      parsedAssignment = JSON.parse(raw);
-    } catch (err) {
-      throw new RunnerConfigError(
-        `assignment.json for "${assignment.assignmentId}" is corrupt (invalid JSON): ${err.message}`,
-      );
-    }
-    try {
-      const normalizedPolicy = normalizeSavedPolicyTier(parsedAssignment.policy, { allowAdditionalFields: true });
-      effectiveAssignment = Object.freeze(
-        normalizedPolicy === parsedAssignment.policy
-          ? parsedAssignment
-          : { ...parsedAssignment, policy: normalizedPolicy },
-      );
-    } catch (err) {
-      throw new RunnerConfigError(
-        `assignment.json for "${assignment.assignmentId}" is corrupt or invalid: ${err.message}`,
-      );
-    }
-  }
-
-  // ADR-006 R7 (P02.4 Red-Team HIGH fix): backfill `mutation` on
-  // `effectiveAssignment` before it is used anywhere below -- covers BOTH
-  // branches above (the fresh-write branch already carries a valid
-  // `mutation` from buildAssignment()/the normalizer, so this is a
-  // value-preserving no-op there; the raw disk read-back branch is the one
-  // that actually needs it). `effectiveAssignment` is reassigned to a new
-  // frozen object here (never mutated in place -- it may already be
-  // frozen per the read-back branch above), mirroring the exact
-  // `Object.freeze({ ...x, mutation: effective })` pattern already applied
-  // in `operation-choice.mjs` and `mission-lite.mjs`.
-  const effectiveMutation =
-    effectiveAssignment.mutation === 'read-only' || effectiveAssignment.mutation === 'mutating'
-      ? effectiveAssignment.mutation
-      : fallbackMutationForAssignment(effectiveAssignment);
-  effectiveAssignment = Object.freeze({ ...effectiveAssignment, mutation: effectiveMutation });
-
-  validateAssignmentLegality(effectiveAssignment, opts);
-
-  let templateResolution = null;
-  if (effectiveAssignment.contractTemplate) {
-    templateResolution = resolveAndRenderOperationPrompt(effectiveAssignment, {
-      cwd,
-      domain: effectiveAssignment.domain,
-    });
-    effectiveAssignment = Object.freeze({
-      ...effectiveAssignment,
-      provenance: Object.freeze({
-        ...(effectiveAssignment.provenance || {}),
-        template: templateResolution.templateProvenance,
-      }),
-    });
-  }
+  const { effectiveAssignment, effectiveMutation, templateResolution } = loadImmutableAssignment(assignment, { assignmentDir, cwd, opts });
 
   // Enforce decide-first governance gate (Step 06). Dispatch Core Contract
   // Normalization Slice D: compileDispatchPlan() now merges

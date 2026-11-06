@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "41bf466ed0b40a74b1065e10304ec9cdc70dfded6cbdf910e12de5b2a2612aa0",
+  "payloadDigest": "7d0924cfe700ba81818a62654d68257f945aebba1e1790ffe653ced11181442d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -988,7 +988,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "6b35618fbb2349be178c672a52f05de765939d0eb68f1a1fa4a7535e291828f1",
-    "src/runner/dispatch/assignment-runner.mjs": "a0c409430547aa6564f5b603dfdeac8424590702d47678a52166989902c819c5",
+    "src/runner/dispatch/assignment-runner.mjs": "950775db7a4d7c28eda7bde1e8c286f7a7dbfb3631e2e96577d5dd92556e4bab",
     "src/runner/dispatch/assignment.mjs": "cb86292531aaf491ad93ec51f708fede5dbebed75af3be2ffc7cf176cf1f78f9",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "2b2c18f391cd2521c3350c9b71007a33b732a56d09596d13768be48c759f8eb7",
@@ -3317,14 +3317,14 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1574,
+      "line": 1539,
       "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:389",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1680,
+      "line": 1645,
       "spawn": "startSupervisor -> src/run-supervisor/direct-launch.mjs:295",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
