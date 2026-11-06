@@ -237,6 +237,32 @@ fn an_attempt_that_cannot_go_on_closes_the_captured_pane_and_names_why() {
     );
 }
 
+#[test]
+fn a_cli_that_opens_its_first_run_setup_ends_as_needs_setup_and_nothing_is_typed() {
+    let herdr = FakeHerdr::new("setup");
+    herdr.set_explain(Verdict::Idle);
+    let setup = fs::read_to_string(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../agent-protocol/contracts/fixtures/terminal/omp/setup-wizard.txt"
+    ))
+    .unwrap();
+    fs::write(herdr.dir.join("screen.txt"), setup).unwrap();
+    let mut run = terminal_run_with("tsetup", &herdr, "sleep 600", 3_000, |opts| {
+        opts.cli = "omp".into()
+    });
+    let supervisor = run.start_with_env(&herdr.env());
+
+    let (code, _) = finish(supervisor, LIMIT);
+    assert_eq!(code, 0, "{}", run.log());
+    assert!(
+        herdr.sent().is_empty(),
+        "nothing is typed at a setup screen"
+    );
+    let receipt = run.json("receipt.json").expect("receipt");
+    assert_eq!(receipt["outcome"], "cancelled");
+    assert_eq!(receipt["reason"], "terminal:needs-setup");
+}
+
 /// An agent child that makes its own process group the terminal's foreground, as a CLI's tool can.
 const TAKES_THE_FOREGROUND: &str = "python3 -c 'import os, signal, time\n\
 os.setpgid(0, 0)\n\

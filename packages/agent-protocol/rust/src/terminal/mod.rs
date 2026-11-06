@@ -34,6 +34,9 @@ pub const REASON_FOREGROUND_NOT_AGENT: &str = "terminal:foreground-not-agent";
 pub const REASON_AGENT_NOT_STARTED: &str = "terminal:agent-not-started";
 pub const REASON_RESULT_UNREADABLE: &str = "terminal:result-unreadable";
 pub const REASON_COMPLETED_NO_EXIT: &str = "terminal:completed-no-exit";
+/// A `needs-human` wait whose screen is the CLI's own first-run setup: a person finishes it once on that
+/// profile, which answering a prompt in the pane does not do.
+pub const REASON_NEEDS_SETUP: &str = "terminal:needs-setup";
 
 /// One outcome per step, exactly the contract's `outcomes`.
 #[derive(Debug, Clone, PartialEq, Eq)]

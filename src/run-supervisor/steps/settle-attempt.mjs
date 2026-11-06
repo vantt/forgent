@@ -88,7 +88,7 @@ function paneScreenOf(runDir, envelope) {
  * `*:blocked:usage-limit`, `*:blocked:login` and `*:blocked:provider-error` are a provider limit, which
  * moves the caller to another account or candidate (a login is also a credential fault, so the walk does
  * not land on the provider whose login just failed; a provider error is the provider's own fault, such as
- * an HTTP 404 for the model); every other blocked name and `terminal:needs-human` is a
+ * an HTTP 404 for the model); every other blocked name, `terminal:needs-human` and `terminal:needs-setup` (a CLI's first-run setup) is a
  * person to wait for, never a success. A result in the outbox is judged as reported whatever else the
  * receipt says. The outcome stays the receipt's own: a deadline stop that names the provider is still
  * a timeout. A name this table does not know settles on the receipt outcome alone.
@@ -103,7 +103,7 @@ export function providerStopOf(receipt, claimed = Boolean(receipt.outboxResult))
     if (blocked[1] === 'provider-error') return { adapterOutcome: 'provider-limit', cause: 'provider' };
     return { adapterOutcome: 'blocked', cause: null };
   }
-  return reason === 'terminal:needs-human' ? { adapterOutcome: 'blocked', cause: null } : null;
+  return reason === 'terminal:needs-human' || reason === 'terminal:needs-setup' ? { adapterOutcome: 'blocked', cause: null } : null;
 }
 
 /**
@@ -121,11 +121,25 @@ function claimOf(runDir, envelope, receipt) {
   return findWorkerClaim(runDir);
 }
 
-/** Why a terminal attempt was stopped, in the words of its screen: a person reads this, not a log. */
-function terminalStopMessage(receipt, screenText) {
+const FALLS_BACK = 'the seat walk falls back to another account or candidate.';
+const ANSWER_PROMPT = 'Next: answer the prompt in the pane, then run again.';
+
+/** What a person does next for each stop the supervisor named; a stop that waits on nobody has none. */
+const STOP_REMEDY = {
+  'terminal:blocked:trust-dialog': "Next: grant trust for this project in the agent's own home, then run again.",
+  'terminal:blocked:login': "Next: log the agent in again on this account (in the agent's own home), then run again.",
+  'terminal:blocked:usage-limit': `The account's quota or credits are used up: wait for the reset or add credits; ${FALLS_BACK}`,
+  'terminal:blocked:provider-error': `The provider refused the round with an API error (a fault on its side, such as a model it does not serve to this account); ${FALLS_BACK}`,
+  'terminal:needs-setup': "Next: finish the CLI's first-run setup once by hand on the same profile (for omp, `omp --profile=<profile>`), then run again.",
+  'terminal:needs-human': ANSWER_PROMPT,
+};
+
+/** Why a terminal attempt was stopped, in the words of its screen, and the remedy for that reason: a person reads this, not a log. */
+export function terminalStopMessage(receipt, screenText) {
   const tail = String(screenText ?? '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(-6).join(' / ');
-  const waitingOnPerson = /^terminal:(blocked|needs-human)/.test(receipt.reason);
-  return `the agent was stopped: ${receipt.reason}.${tail ? ` Its screen ended with: ${tail}.` : ''}${waitingOnPerson ? " Answer the prompt in the pane, or grant trust for this project in the agent's own home, then run again. The pane is left open." : ''}`;
+  // A blocked name this table does not know is still a person to wait for (providerStopOf).
+  const remedy = STOP_REMEDY[receipt.reason] ?? (/^terminal:blocked:/.test(receipt.reason) ? ANSWER_PROMPT : '');
+  return `the agent was stopped: ${receipt.reason}.${tail ? ` Its screen ended with: ${tail}.` : ''}${remedy ? ` ${remedy}` : ''}`;
 }
 
 /** The process facts settleRunOutcome takes, from what the receipt says happened. */

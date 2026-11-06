@@ -6,7 +6,7 @@ use std::rc::Rc;
 use fgos_agent_protocol::terminal::{
     adapter_for, ExitCommand, FsOutbox, Outbox, Readiness, TerminalOutcome, MAX_RESULT_BYTES,
     REASON_AGENT_NOT_STARTED, REASON_COMPLETED_NO_EXIT, REASON_FOREGROUND_NOT_AGENT,
-    REASON_RESULT_UNREADABLE,
+    REASON_NEEDS_SETUP, REASON_RESULT_UNREADABLE,
 };
 use fgos_agent_protocol::{AgentIo, BlockedReason, Inspection, IoError, SendInput};
 use serde_json::{json, Value};
@@ -485,6 +485,7 @@ fn every_receipt_reason_and_stop_constant_is_named_in_the_contract() {
         REASON_AGENT_NOT_STARTED,
         REASON_RESULT_UNREADABLE,
         REASON_COMPLETED_NO_EXIT,
+        REASON_NEEDS_SETUP,
     ]) {
         assert!(
             prose.contains(reason),

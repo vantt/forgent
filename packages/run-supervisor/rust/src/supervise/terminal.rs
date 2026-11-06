@@ -27,7 +27,7 @@ use fgos_agent_protocol::port::{AgentIo, Inspection, IoError, SendInput};
 use fgos_agent_protocol::terminal::{
     adapter_for, ExitCommand, FsOutbox, Readiness, Terminal, TerminalOutcome, UnreadableResult,
     REASON_AGENT_NOT_STARTED, REASON_COMPLETED_NO_EXIT, REASON_FOREGROUND_NOT_AGENT,
-    REASON_RESULT_UNREADABLE,
+    REASON_NEEDS_SETUP, REASON_RESULT_UNREADABLE,
 };
 use fgos_agent_protocol::BlockedReason;
 use fgos_process::facts::{self, ProcTuple};
@@ -908,9 +908,10 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
                 .and_then(|screen| adapter.setup_line(&screen))
             {
                 eprintln!("fgos internal supervise: the agent shows a setup screen only a person can finish: {line}");
+                return end_early(&mut io, Some(REASON_NEEDS_SETUP.to_string()));
             }
         }
-        return end_early(&mut io, &readiness.outcome());
+        return end_early(&mut io, readiness.outcome().receipt_reason());
     }
 
     let delivery = adapter.deliver_brief(&mut io, &plan.brief, &mut outbox);
@@ -918,7 +919,7 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
         return;
     }
     if delivery != TerminalOutcome::Delivered {
-        return end_early(&mut io, &delivery);
+        return end_early(&mut io, delivery.receipt_reason());
     }
     // Once, and the connection stays open: the gate reads an early close as a dead supervisor.
     if write_frame(&mut io.sup.go, &json!({"type": "BRIEF_DELIVERED"})).is_err() {
@@ -934,7 +935,7 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
         if let Some(outcome) = adapter.detect_completed(&mut io, &mut outbox) {
             match outcome {
                 TerminalOutcome::Completed { .. } => return ask_to_leave(plan, &adapter, &mut io),
-                other => return end_early(&mut io, &other),
+                other => return end_early(&mut io, other.receipt_reason()),
             }
         }
         let file = outbox.newest_unreadable(&mut io);
@@ -953,14 +954,13 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
     }
 }
 
-/// An adapter outcome that ends the run early. A pane that vanished is the better explanation
-/// for an agent that stopped answering, so the carrier is looked at first.
-fn end_early(io: &mut TermIo, outcome: &TerminalOutcome) {
+/// An early end, named by its receipt reason (an adapter outcome's, or one the supervisor names). A pane that vanished
+/// is the better explanation for an agent that stopped answering, so the carrier is looked at first.
+fn end_early(io: &mut TermIo, reason: Option<String>) {
     io.sup.carrier_check(io.core, io.key);
     if io.sup.finished() {
         return;
     }
-    let reason = outcome.receipt_reason();
     io.sup.begin_stop("cancel", reason.as_deref());
 }
 

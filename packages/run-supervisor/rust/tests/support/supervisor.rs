@@ -49,6 +49,8 @@ pub struct RunOpts {
     pub ceiling_in_ms: i64,
     /// `launch.maxOutputBytes`: the budget of the two capture files together.
     pub max_output: Option<u64>,
+    /// `agentProtocol.cli`: which CLI's adapter reads the agent.
+    pub cli: String,
 }
 
 impl RunOpts {
@@ -65,6 +67,7 @@ impl RunOpts {
             grace_ms: 3_000,
             ceiling_in_ms: 600_000,
             max_output: None,
+            cli: "claude".into(),
         }
     }
 }
@@ -182,7 +185,7 @@ impl SupRun {
                 "hardCeiling": {"bootId": boot_id(), "boottimeNs": (boottime_ns() as i64 + opts.ceiling_in_ms * 1_000_000) as u64},
                 "gateKillGraceMs": opts.grace_ms,
             },
-            "agentProtocol": {"cli": "claude", "mode": "direct"},
+            "agentProtocol": {"cli": opts.cli, "mode": "direct"},
             "steps": opts.steps,
             "sideFile": side_file,
         });

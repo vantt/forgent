@@ -133,7 +133,8 @@ test('an agent stopped on a trust prompt ends as blocked, not as a timeout, and 
   assert.equal(result.classification.failure.code, 'blocked');
   assert.equal(result.classification.outcome.category, 'blocked');
   assert.match(result.runnerNote.summary, /Back to Agent Command Center/);
-  assert.match(result.runnerNote.summary, /grant trust for this project in the agent's own home/);
+  // The fake pane's detector says blocked without a trust rule for this CLI: a person answers the prompt.
+  assert.match(result.runnerNote.summary, /answer the prompt in the pane/);
   assert.equal(project.callsStarting('pane close').length, 1, 'the stopped trust-prompt worker has captured output');
   assert.equal(project.callsStarting('tab create').length, 1, 'no second candidate was tried');
 });

@@ -14,7 +14,7 @@ import { AGENT_RESULT_CLAIM_CONTRACT } from '../../src/runner/dispatch/agent-res
 import { acquireRunControl, buildRunControlHolder, settleRunControl, listGenerations, controlDirs } from '../../src/run-supervisor/run-lock.mjs';
 import { copyCredentialFiles, credentialWriteBackTarget } from '../../src/runner/dispatch/provider-credential-renewal.mjs';
 import { providerAccountDir, providerCapacityStatePaths } from '../../src/runner/dispatch/provider-capacity.mjs';
-import { providerStopOf } from '../../src/run-supervisor/steps/settle-attempt.mjs';
+import { providerStopOf, terminalStopMessage } from '../../src/run-supervisor/steps/settle-attempt.mjs';
 import { runAttemptStep, verifyPayload } from '../../src/run-supervisor/attempt-step.mjs';
 import { releasePayloadRoot } from '../../src/run-supervisor/payload-root.mjs';
 
@@ -385,9 +385,28 @@ test('the receipt reason names the provider stop and one table turns the name in
     assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:something-new` }), stop('blocked'));
   }
   assert.deepEqual(providerStopOf({ reason: 'terminal:needs-human' }), stop('blocked'));
+  assert.deepEqual(providerStopOf({ reason: 'terminal:needs-setup' }), stop('blocked'));
   // A stop that is not the provider's names no adapter outcome.
   for (const reason of ['terminal:delivery-unknown', 'terminal:result-unreadable', 'start-refused:lock-held', undefined]) assert.equal(providerStopOf({ reason }), null, String(reason));
   assert.equal(providerStopOf({ reason: 'direct:blocked:login', outboxResult: 'result-2.json' }), null);
+});
+
+test('a stopped pane seat names the remedy for its own reason, never the trust remedy for every stop', () => {
+  const remedy = (reason) => terminalStopMessage({ reason }, 'last line on screen');
+  for (const reason of ['terminal:blocked:trust-dialog', 'terminal:blocked:login', 'terminal:blocked:usage-limit', 'terminal:blocked:provider-error', 'terminal:needs-setup', 'terminal:needs-human']) {
+    assert.match(remedy(reason), new RegExp(`^the agent was stopped: ${reason}\\. Its screen ended with: last line on screen\\.`), reason);
+  }
+  assert.match(remedy('terminal:blocked:trust-dialog'), /grant trust for this project in the agent's own home/);
+  assert.match(remedy('terminal:blocked:login'), /log the agent in again/);
+  assert.match(remedy('terminal:blocked:usage-limit'), /quota or credits .*falls back to another account or candidate/);
+  assert.match(remedy('terminal:blocked:provider-error'), /provider refused the round .*falls back to another account or candidate/);
+  assert.match(remedy('terminal:needs-setup'), /finish the CLI's first-run setup once by hand/);
+  assert.match(remedy('terminal:needs-human'), /answer the prompt in the pane/);
+  for (const reason of ['terminal:blocked:login', 'terminal:blocked:usage-limit', 'terminal:blocked:provider-error', 'terminal:needs-setup', 'terminal:needs-human']) {
+    assert.doesNotMatch(remedy(reason), /trust/, `${reason} gets no trust remedy`);
+  }
+  // A stop that waits on nobody names no remedy.
+  assert.equal(remedy('terminal:delivery-unknown'), 'the agent was stopped: terminal:delivery-unknown. Its screen ended with: last line on screen.');
 });
 
 test('a pane seat stopped at its deadline whose receipt names the provider settles as a provider limit and stays a timeout', async () => {
