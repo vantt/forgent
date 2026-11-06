@@ -91,7 +91,7 @@ Settled without a phase: H-T4e closed (arbitration §2: short calls stay unconfi
 | 08 | [Run Result one derivation (A5)](phase-08-run-result-one-derivation.md) | 02, 05 | 11 | −270 / +60 / −100 |
 | 09 | [Dispatch cut](phase-09-dispatch-cut.md) | 06, 07 | — | −300 / 0 / −50 |
 | 10 | [Execution core cut](phase-10-execution-core-cut.md) | 07, 09 | 11 (if 11 done, n/a) | −250 / 0 / −50 |
-| 11 | [Config type rules to schema](phase-11-config-to-schema.md) | 03, 04 | 08, 10 | −600 to −1 000 / 0 / −200 |
+| 11 | [Config type rules to schema](phase-11-config-to-schema.md) **landed 11-06 `68c426c31..e5ac48e88`** | 03, 04 | 08, 10 | −600 to −1 000 / 0 / −200 |
 | 12 | [Test structure and doctor fold](phase-12-test-structure-and-doctor-fold.md) | 10, 11 | — | −85 / 0 / −1 100 |
 | 13 | [Spec, hand-off, close, land](phase-13-spec-handoff-close-land.md) | 01–12 | — | 0 / 0 / 0 |
 
