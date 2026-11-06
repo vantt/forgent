@@ -27,6 +27,7 @@ Code read on `4b116c27e` (lines move with P05/P06/P08; the lead re-reads before 
 - `settlement.mjs` (831 lines) already owns "commit a settlement".
 
 ## Requirements
+- **Added by owner decision 68:** in `settlement.mjs` `isSubstantiveReportText`, OK, YES and NO stop counting as generic filler (placeholders such as TODO, TBD, N/A still refuse); the dispatch brief's `agent-report.md` line (`assignment.mjs:896`, asserted in `test/runner/assignment.test.mjs:213`, `dispatch-brief.test.mjs:105`) asks for one sentence stating what was answered or done. Proof: `test/runner/assignment-runresult.test.mjs` next to the placeholder case (`# Report\nok` with claim `done` → verdict pass, confidence reported).
 
 - Cut along the shape above, each function in the file that owns its concept: `loadImmutableAssignment` (stays in `assignment-runner.mjs` or goes to `assignment.mjs` as the arbitration's simplicity source says; one place, lead decides by importers), `leaseAccountForAttempt`, `settleRefusedLease` → `settlement.mjs`, `buildLaunch` (command, confinement request, terminal prep, envelope; returns what `startSupervisor` needs), `awaitBinding`. One `attempt` object replaces the loose locals; the `finally` reads only it. Behaviour unchanged, including P06's order rule.
 - `admitRunAttempt` moves to its own module under `src/runner/dispatch/` (name from `fgos convention name`), with its private helpers; its importers updated (L10, no re-export).
