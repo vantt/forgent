@@ -6,23 +6,23 @@ Branch `worktree-agent-a462a12d57f6743fa`, worktree `/home/vantt/projects/forgen
 
 | Item | Result | Commit |
 |---|---|---|
-| O1 reading map routes | done: authority route is platform README + governance, switchboard listed as transition evidence, `:150` BA-reference wording fixed | `fa51ef0f1` |
-| O2 governance migration-rules clause | done: one-owner rule stated inline citing sections 5 and 8, ratchet clause dropped | `fa51ef0f1` |
-| O3 switchboard classification | done: both files moved by `git mv` into `docs/platform/documentation/history/`, headers set to History / Canonical: No, rules `doc-switchboard-doc-1` and `migration-authoring-rules` deleted, golden case moved to the history path, convention spec sentence removed, all inbound links repointed | `fa51ef0f1` |
-| O4 drift spec text | done | `164d4787b` |
-| O5 drift default | done: default `--specs-dir` is `docs/platform`, sentinel and flat legacy scan deleted, one filtered read set (spec.md, decisions folders, platform-foundations, no history); fixtures use `<root>/area/spec.md`; the legacy-spec case removed from the default-scan test (behaviour gone) | `164d4787b` |
-| O6 roadmap section 9 | done | `fa51ef0f1` |
-| O7 packaging README and spec pointer | done | `fa51ef0f1` |
-| O8 documentation-system-design | done (past tense) | `fa51ef0f1` |
-| O9 skills | done: core sources cite D-ADR0026 with gloss and the runner decisions holder, `npm run build:skills` regenerated `.agents` and `plugins` | `164d4787b`, `2c8ca0684` |
-| O10 test titles and dead search dir | done, no assertion changed | `164d4787b` |
-| O11 comments | done (knowledge-migration, status-category, decision-relation, conserved-dispatch-doctrine) | `164d4787b`, `fa51ef0f1` |
-| O12 decision-index | done: `narrativeHolderResolver` reads the governance scope-to-holder table (alias or area name, fallback to the platform file carrying the scope name); `buildDecisionIndexMarkdown` takes an optional `holderFor`; computeDecisionIndex and the instruction-registry equality check both pass it; index regenerated with `npm run fgos:dev -- decision-index` (34 rows changed, 0 `docs/specs` pointers left); 2 new tests | `7427a57da` |
-| O13 ledger | done: PF-I005 and PF-I020 set to implemented with current facts and evidence | `0cd18df70` |
-| O14 L13-159 ruling | done: copied into plan.md as 7.5c | `0cd18df70` |
-| O15 stale lines | done: execution-authority and resume-state lines replaced, tag note added | `0cd18df70` |
+| O1 reading map routes | done: authority route is platform README + governance, switchboard listed as transition evidence, `:150` BA-reference wording fixed | `21adb6750` |
+| O2 governance migration-rules clause | done: one-owner rule stated inline citing sections 5 and 8, ratchet clause dropped | `21adb6750` |
+| O3 switchboard classification | done: both files moved by `git mv` into `docs/platform/documentation/history/`, headers set to History / Canonical: No, rules `doc-switchboard-doc-1` and `migration-authoring-rules` deleted, golden case moved to the history path, convention spec sentence removed, all inbound links repointed | `21adb6750` |
+| O4 drift spec text | done | `3e2c17b1b` |
+| O5 drift default | done: default `--specs-dir` is `docs/platform`, sentinel and flat legacy scan deleted, one filtered read set (spec.md, decisions folders, platform-foundations, no history); fixtures use `<root>/area/spec.md`; the legacy-spec case removed from the default-scan test (behaviour gone) | `3e2c17b1b` |
+| O6 roadmap section 9 | done | `21adb6750` |
+| O7 packaging README and spec pointer | done | `21adb6750` |
+| O8 documentation-system-design | done (past tense) | `21adb6750` |
+| O9 skills | done: core sources cite D-ADR0026 with gloss and the runner decisions holder, `npm run build:skills` regenerated `.agents` and `plugins` | `3e2c17b1b`, `91655e129` |
+| O10 test titles and dead search dir | done, no assertion changed | `3e2c17b1b` |
+| O11 comments | done (knowledge-migration, status-category, decision-relation, conserved-dispatch-doctrine) | `3e2c17b1b`, `21adb6750` |
+| O12 decision-index | done: `narrativeHolderResolver` reads the governance scope-to-holder table (alias or area name, fallback to the platform file carrying the scope name); `buildDecisionIndexMarkdown` takes an optional `holderFor`; computeDecisionIndex and the instruction-registry equality check both pass it; index regenerated with `npm run fgos:dev -- decision-index` (34 rows changed, 0 `docs/specs` pointers left); 2 new tests | `c9ac34abf` |
+| O13 ledger | done: PF-I005 and PF-I020 set to implemented with current facts and evidence | `f2e99b64e` |
+| O14 L13-159 ruling | done: copied into plan.md as 7.5c | `f2e99b64e` |
+| O15 stale lines | done: execution-authority and resume-state lines replaced, tag note added | `f2e99b64e` |
 | O16 board | done: DOC row leads with closed, branch cell cleared, roster line 51 closed with DOCOS as follow-on, one line on top of `log.md` | board commit (last) |
-| CHANGELOG | done: `unplaced-docs` line under Unreleased | `0cd18df70` |
+| CHANGELOG | done: `unplaced-docs` line under Unreleased | `f2e99b64e` |
 
 ## Blast radius (O12)
 
