@@ -158,6 +158,21 @@ test('plan() is pure and deterministic: same snapshot+evidence+intent -> same ac
   assert.deepEqual(first.action, { type: 'resume-driver' });
 });
 
+// The cases around it prove what plan() returns for the actions it offers; none asks whether an offered action
+// does anything. resume and reassign driver only record that they were applied (the dispatch claim they clear is
+// one no code writes), so a person who follows the advice is told "applied" while nothing happens. The only
+// action that changes the run is adopt.
+test('recover offers no action that only reports success, whatever the intent', () => {
+  const now = () => '2026-01-01T00:00:00.000Z';
+  const stale = { run: { runId: 'run_1', status: 'running', controlEpoch: 0 }, visibility: null, outbox: [], visibilityError: null, controller: [{ name: 'replacement-authority--agent-9.json' }] };
+  const offered = [];
+  for (const intent of ['resume', 'reassign']) {
+    const result = plan(stale, collectEvidence(stale, { now }), intent, { now });
+    if (result.kind === 'recommendation') offered.push(result.action.type);
+  }
+  assert.deepEqual(offered, [], `plan offered ${offered.join(', ')}, which only records that it was applied`);
+});
+
 test('replay parity: repeated observe calls against an unchanged run reproduce the same action/reason/evidenceIds', () => {
   const { root } = makeRepo({ controller: ['replacement-authority--agent-9.json'] });
   try {
