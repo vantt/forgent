@@ -72,13 +72,11 @@ lower it. You never set a provider, model or tier.
    result yourself (re-run the slice's check, read the diff against the declared
    writes, read the checker's report). Record the finding dispositions in the notebook. Questions that wait
    for the owner are parked and batched; slices that do not depend on them go on.
-   A seat can fail to start (the dispatch ends `execution-failure`; read the unit
-   run's receipt). When the receipt shows the brief never reached the agent
-   (outcome `abandoned-*`, or reason `terminal:foreground-not-agent`) the case hands
-   the dispatch back to the frame, so run the same printed line once more. A second
-   failure of the same kind, or any other failure, spends the dispatch: stop and
-   report the unit run id and the receipt reason instead of looping. This is not a
-   refusal: a refused dispatch is never re-run unchanged.
+   A seat that never received its brief is retried once by the Execution Core on
+   the same executor; do not rerun it yourself. When a dispatch still ends
+   `execution-failure`, read the unit run's receipt, stop, and report the unit run
+   id and the receipt reason instead of looping. A refused dispatch is never re-run
+   unchanged.
 5. **Integrate and hand off.** All slices already sit on the case branch. Run the
    printed `workflow gate`, then the plan's own full verification in that worktree
    yourself when it is wider than the gate's command, reconcile what the plan
