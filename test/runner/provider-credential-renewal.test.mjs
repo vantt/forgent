@@ -37,6 +37,9 @@ import {
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import { prepareBwrap, prepareBwrapSync } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
+import { finalizeAttemptHome } from '../../src/runner/dispatch/confinement/authority.mjs';
+import { resolveConfinementTempRoot, CREDENTIAL_KEEP_MAX_ATTEMPTS, CREDENTIAL_KEEP_MIN_INTERVAL_MS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { fixCredentialCopiesRetained } from '../../src/setup/registrations.mjs';
 
 // The account lock is machine-scoped under the state root: a private root keeps this file's locks off
 // the machine's real ones, and every child process started below inherits it.
@@ -2028,4 +2031,103 @@ test('a writer whose staging was claimed by the sweep fails its own rename and k
     assert.equal(result.keepHome, true, 'the home stays: its login is not safe anywhere else');
     assert.equal(fs.existsSync(dir), true);
   } finally { w.cleanup(); }
+});
+
+// ---------------------------------------------------------------------------------------------------
+// What a login written back from an agent's private home must prove before it replaces the account's own
+// ---------------------------------------------------------------------------------------------------
+
+// The cases above prove that a newer copy is applied; none of them gives the copy an identity of its own.
+// A confined agent can log its home in as someone else and, in the same stroke, make that login look newer,
+// so a copy is applied only when it is the login of the account that was leased.
+test('a renewed login whose account differs from the leased account is never applied', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    const leased = codexDoc(now + 10 * 60 * 1000, now - HOUR, 'old');
+    leased.tokens.account_id = 'FAKE-ACCOUNT-LEASED';
+    writeCodex(w.home, leased);
+    const dir = path.join(w.tmp, 'fgos-confinement', 'disp_other_account', 'home');
+    fs.mkdirSync(dir, { recursive: true });
+    writeOwnershipMarker(dir, { dispatchId: 'disp_other_account' });
+    copyCredentialFiles(dir, w.home, ['auth.json']);
+    // Inside the home the agent logged in as another account; the login is newer than the leased one.
+    const other = codexDoc(now + 6 * HOUR, now, 'new');
+    other.tokens.account_id = 'FAKE-ACCOUNT-OTHER';
+    writeCodex(dir, other);
+    const target = credentialWriteBackTarget({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(w.home), runtimeDir: w.runtimeDir });
+    const before = sha(path.join(w.home, 'auth.json'));
+
+    writeBackRenewedCredential(dir, target);
+    // The next refresh-ahead is where an unproven copy would be applied; its renewal call changes nothing.
+    const { spawnFn } = fakeSpawn({ layoutName: 'codex', behaviour: () => {} });
+    await refreshAhead({ provider: 'xai', accountId: 'acct', credentialSource: codexSource(w.home), runtimeDir: w.runtimeDir, spawnFn, cooldownMs: 0 });
+
+    assert.equal(sha(path.join(w.home, 'auth.json')), before, 'the leased account\'s login was replaced by the login of another account');
+  } finally { w.cleanup(); }
+});
+
+// The only case that kept a held home forbids settling it (the owner recovers it by hand). A home is held only
+// because staging failed while its login was the only good pair; once the login can be staged and applied
+// there is nothing left to hold it for, so a repair settles it instead of leaving the owner a chore.
+test('a held home settles by itself once its login is safe', () => {
+  const w = workspace();
+  const realNow = Date.now;
+  const realHome = process.env.HOME;
+  const realWrite = process.stderr.write;
+  const dispatchId = `disp_held_${process.pid}`;
+  const tempRoot = resolveConfinementTempRoot();
+  try {
+    // The repair reads the machine's backend registry from HOME: a scratch home keeps it off the real one.
+    process.env.HOME = w.tmp;
+    writePi(w.home, piDoc(Date.now() + 10 * 60 * 1000));
+    const runDir = path.join(w.tmp, 'run');
+    fs.mkdirSync(runDir, { recursive: true });
+    const resources = resolveConfinementResources({ dispatchId, context: {}, grants: [{ resource: 'private-home', access: 'read-write', scope: 'dispatch' }], backendConfig: { tempRoot } });
+    const plan = { contract: 'confinement-plan.v1', dispatchId, decision: 'execute', coverage: {}, resources };
+    const request = {
+      dispatchId,
+      attemptId: 'att-held',
+      executorId: 'omp-bwrap',
+      invocation: { command: 'agent-cli', args: [], env: {}, credentialStore: { use: 'agent-cli', homeEnv: 'AGENT_HOME' } },
+      providerCapacity: { provider: 'xai', accountId: 'acct', credentialSource: piSource(w.home), credentialWriteBack: { runtimeDir: w.runtimeDir } },
+      context: { cwd: os.tmpdir(), runDir },
+    };
+    const prepared = prepareBwrapSync(plan, request, { id: 'bwrap', type: 'bwrap', config: {} });
+    const home = resources[0].hostTarget;
+    assert.ok(prepared.credentialWriteBack, 'the attempt home opted in to write-back');
+    const descriptors = path.join(runDir, 'protected', 'confinement-finalization');
+    fs.mkdirSync(descriptors, { recursive: true });
+    fs.writeFileSync(path.join(descriptors, 'cmd-1.json'), JSON.stringify({
+      contract: 'confinement-finalization.v1', launchCommandId: 'cmd-1', resources: [{ pathRef: home, resourceId: 'private-home', credentialWriteBack: prepared.credentialWriteBack }], cleanupState: 'pending', cleanupResult: null,
+    }));
+    renewHome('pi', home);
+
+    // Staging is impossible (a file where the pending directory belongs) until the budget of retries is spent.
+    fs.mkdirSync(w.accountDir, { recursive: true });
+    fs.writeFileSync(path.join(w.accountDir, 'pending'), 'in the way');
+    process.stderr.write = () => true;
+    const start = realNow();
+    let state;
+    for (let attempt = 1; attempt <= CREDENTIAL_KEEP_MAX_ATTEMPTS; attempt += 1) {
+      Date.now = () => start + attempt * 2 * CREDENTIAL_KEEP_MIN_INTERVAL_MS;
+      state = finalizeAttemptHome({ runDir, attemptId: 'att-held' }).state;
+    }
+    Date.now = realNow;
+    process.stderr.write = realWrite;
+    assert.equal(state, 'credential-home-held', 'the home is held after the retry budget');
+    assert.equal(fs.existsSync(path.join(home, 'auth.json')), true);
+
+    // The obstacle is gone: the login can be staged and applied, so the repair settles the home.
+    fs.rmSync(path.join(w.accountDir, 'pending'));
+    fixCredentialCopiesRetained({ stagingRuntimeDir: w.runtimeDir });
+    assert.equal(fs.existsSync(home), false, 'the held home is still there although its login can now be written back');
+    assert.equal(readPi(w.home).xai.refresh, FAKE.newRefresh, 'the renewed login did not reach the account');
+  } finally {
+    Date.now = realNow;
+    process.stderr.write = realWrite;
+    if (realHome === undefined) delete process.env.HOME; else process.env.HOME = realHome;
+    fs.rmSync(path.join(tempRoot, dispatchId), { recursive: true, force: true });
+    w.cleanup();
+  }
 });
