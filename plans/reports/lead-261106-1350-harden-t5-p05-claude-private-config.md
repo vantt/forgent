@@ -1,70 +1,101 @@
-# Claude private config per pane, codex/agy trust-store writes (branch `harden/t5-p05`, base `84f36c8f3`)
+# Claude folder trust and claude logins; codex/agy trust-store writes (branch `harden/t5-p05`)
 
-Status of the phase: **half done, half stopped.** The codex/agy store-write fixes are done and committed. The claude half (owner decision 63) is stopped before any code: its write-back and renewal need a claude layout in `src/runner/dispatch/provider-credential-renewal.mjs` and a claude probe in `provider-credential-probe.mjs`. The brief gives the first file to the parallel credential-renewal follow-up and says to stop if this phase must touch it.
+The phase is done in the scope of owner decision 66, which replaced decision 63.
 
-## Commits on the branch
+- The codex/agy half landed on main as `de7454638..8f521eb2f`; its earlier report section is summarised at the end.
+- The claude half is on `harden/t5-p05`, based on `61bc1428b`: commits `ef1f42132` (the red row) and `4ef0b4079` (the fix).
+
+## Commits (claude half)
 
 | Commit | What |
 |---|---|
-| `4be153d75` | Red row cherry-picked from `f66cc72e0`: "an unconfined claude pane never writes the operator's claude store" (`test/runner/herdr-private-home-trust.test.mjs`). **Still red.** It turns green with the claude half. |
-| `cc21769d3` | Fixes the codex and agy trust-store writers. Changes `cleanup-trust` to report `remove-failed`. Adds a CHANGELOG line and regenerates the census. |
+| `ef1f42132` | Red row cherry-picked from the red-proofs branch. Its content was rewritten in `4ef0b4079` to match decision 66; see red → green below. |
+| `4ef0b4079` | Folder-trust entries in claude's store are add-only and serialised. Claude logins become a renewable layout with a probe call. Includes tests, CHANGELOG, a run-supervisor spec line, the lock-registry row and the regenerated census. |
 
-## What changed (codex/agy, `cc21769d3`)
+## What changed
 
-- `src/run-supervisor/trust-store.mjs`:
-  - `writeFileKeepingMode` and `writeStoreAtomic`'s temp-and-rename are replaced by one `writeStore`. It resolves the store's `realpath`, keeps the mode, and writes through `replaceDurably` (`src/native/door.mjs`), which syncs the file, renames it and syncs the directory. Effect: a store behind a link stays a link. A dangling link is refused as `write-failed` and is not replaced by a file.
-  - Every writer now goes through `writeStore`: codex seed and remove, codex hook trust, agy seed and remove, and the claude JSON writer (it stays until the claude half lands).
-  - `codexSectionPattern` (a regex that ended at the first `[`) is replaced by `codexSectionRange`. A section now ends at the next line that starts a table header.
-  - The project key is written as a TOML basic string (`tomlBasicString`, shared with the hook header).
-  - `removeCodexTrust` and `removeAgyTrust` throw a `TrustStoreError` when the store cannot be read or written. An absent entry or a missing file still returns `false`.
-  - `uniqueTmpTag` is no longer imported.
-- `src/run-supervisor/steps/cleanup-trust.mjs`: a `TrustStoreError` from a removal becomes `{ result: 'done', detail: { trust: 'remove-failed', kind, code } }`.
+**1. Unconfined claude pane: add-only trust, read back, never removed.**
+
+- `src/run-supervisor/trust-store.mjs` `seedTrust`:
+  - It takes the new machine lock `agent-trust-store`, so fgOS's own seeds run one at a time.
+  - It reads the store, adds the entry, and reads it back. An entry that was lost is added again, at most 3 writes; after that it fails with `trust-not-kept`.
+  - It never removes anything. `removeTrust` is deleted.
+  - Writes go through the durable writer `writeStore`, the same one codex and agy use (realpath, so a linked store stays a link; mode kept).
+- `herdr-round.mjs`: a claude entry no longer sets `trustWritten`, so no `controller/trust-context.json` is written for claude and `abandon()` cannot remove it. Codex and agy behave as before (`REMOVABLE_TRUST_KINDS`).
+- `cleanup-trust.mjs`: the claude branch is gone. A record of kind claude, left by an older release, is answered `not-removed`.
+- New lock row: `packages/holder-lock/contracts/lock-registry.v1.json` gets `agent-trust-store` (mutex, machine scope, rank 80, `<lockRoot>/agent-trust-store.lock`). `src/setup/holder-lock-checks.mjs` gets its lock-file scan entry, the same pattern as the recent `worker-session` row.
+
+**2. Confined claude pane: login renewed at the source before the run.**
+
+- `provider-credential-renewal.mjs`: Claude Code (`.claude/.credentials.json`, `claudeAiOauth`) is now one of the renewable `LAYOUTS`. It reads, marks a login due, applies a renewal and stages a copy, following the codex pattern.
+- `credentialLayout` names a home-files source by that file. `EXPIRY_LAYOUTS` is deleted, since claude is now in `LAYOUTS`.
+- `provider-credential-probe.mjs`: claude call `claude -p <prompt> --no-session-persistence --tools ''` (`Read` when tools are allowed), with HOME set to the login home.
+- No new wiring was needed. The existing opt-in in `assignment-runner.mjs` (refresh-ahead for every launch that may copy a credential) now renews claude sources.
+- Scope note: the standard `claude-herdr-bwrap` invocation declares no `credentialStore`, so it reads `~/.claude` in place and nothing is copied or renewed. This path applies only to an account or executor that declares a claude store with `files: ['.claude/.credentials.json']`.
+
+**3. A login renewed inside a confined claude home is kept for hand recovery.**
+
+- `credentialWriteBackTarget` now returns a target for claude, so `finalize-home` stages the copy as agent origin.
+- The layout's `identity` is always `null`: claude tokens are opaque and name no account the provider signs. `applyAgentCopies` therefore never probes or applies the copy; it stays in `pending/`.
+- The existing `credential-copies-retained` doctor row lists it, in the wording that a copy whose tokens name no signed account is never applied. The gate was not changed.
 
 ## Red → green evidence
 
-The four new cases in `test/runner/dispatch-trust-store.test.mjs` were run on the base before the fix (`node scripts/run-tests.mjs`, `HERDR_*`/`CLAUDE*` unset):
+| Case | On base (`61bc1428b` src) | After `4ef0b4079` |
+|---|---|---|
+| `herdr-private-home-trust`: an unconfined claude pane's trust entry survives concurrent seeds (4 child writers × 10 seeds), and fgOS never removes a trust entry | red: `every seeded entry is in the store afterwards` | green |
+| Same case with the read-back and re-add but the lock taken out (experiment, not committed) | red in 3 of 3 runs | — |
+| `provider-credential-renewal`: claude in the per-layout refresh-ahead case (fake CLI renews the scratch copy, source gets the new pair, rest of the file kept) | new; claude was `unsupported-layout` | green |
+| `provider-credential-renewal`: renewed login never applied while its tokens name no signed account (claude half: staged, not probed, source untouched, doctor lists `agent`) | new | green |
+| `provider-credential-probe`: claude call built with HOME, no tools | new | green |
 
-| Case | Red on base |
-|---|---|
-| a codex config or agy settings file reached through a link stays a link, and the file it names gets the entry | `the codex config is still a link after the seed` |
-| removing a codex trust section keeps the rest of the config valid: the section ends at the next table header, not at the first bracket | `the whole section goes and nothing after it` |
-| a workspace path with a quote or a backslash is written as an escaped TOML key and is found again | `the key is a TOML basic string` |
-| a trust entry the cleanup step cannot remove is reported as remove-failed, for codex and for agy | `TrustStoreError ... EACCES` thrown out of `cleanupTrust` (no `remove-failed`) |
+The lock experiment is why the lock exists. Read-back alone cannot keep an entry that another fgOS writer drops after the read-back. Concurrent panes are the case that dropped 297 of 400 entries.
 
-After the fix, all four pass. Focused runs: `dispatch-trust-store`, `worktree-config-trust`, `herdr-private-home-trust` (only the P01 claude row fails, as expected), `terminal-groups`, `terminal-cutover`, `terminal-crash-matrix`, `agent-cli-trust-check`, `dispatch-reconciliation-import-graph` and `architecture`: 0 failures apart from that row. `git-one-door-scan --root .`: 0 undeclared. The full suite was **not** run: the phase is not complete and the branch cannot land as it is, so the full run belongs to the resumed phase.
+## Tests retired or moved
 
-Tests retired: none. Net size of `cc21769d3`: Node src −23 (trust-store −29, cleanup-trust +6), tests +85, Rust 0.
+| Test | Reason | New owner |
+|---|---|---|
+| `dispatch-trust-store`: "B3: removeTrust deletes only its own entry…" | Behaviour removed | — |
+| `dispatch-trust-store`: "B3: a seed followed by a remove returns the store to its exact prior contents" | Behaviour removed | — |
+| `dispatch-trust-store`: claude store mode case | Remove half dropped (behaviour removed); the seed half stays | Same test |
+| `terminal-groups`: "the folder-trust entry a seat wrote is taken back by the cleanup step…" | Claude take-back removed; rewritten as the wiring proof that a claude entry is written and never taken back, including from an old record (`not-removed`) | Same test, rewritten |
+| `terminal-groups`: "a controller that fails before the handover … takes the trust entry out again" | Moved from a claude store to an agy store; take-back still exists for agy | Same test |
+| `holder-lock-checks`: lock count | 24 → 25 locks | Same test |
 
-## Why the claude half stopped (facts, read on `84f36c8f3`)
+## Checks run
 
-Decision 63 asks for three things for every claude pane: copy the login into a private `CLAUDE_CONFIG_DIR`, renew it once at the source before the run, and write a login renewed in the pane back through the hardened door. On main today none of the three exists for claude:
+- Focused (`node scripts/run-tests.mjs`, `HERDR_*`/`CLAUDE*` unset, 31 files: trust-store, herdr trust, renewal, probe, per-cli sources, confinement p04/p05, terminal-*, attempt-steps, contracts, crash matrices, holder-lock contract tests, holder-lock-checks, architecture, doc-health, decision-citation drift, …): all pass. The only failures were `release-tree` and `install-packaging`, which fail the same way on base in a focused run: the release addon is not built in my cargo dir.
+- Rust: `cargo test -p fgos-holder-lock`, `-p fgos-config --test lock_rows` and `-p fgos-event-store --test registry_rows` all pass (these read the registry). No Rust source changed, so I skipped clippy, cross-target checks and fmt.
+- `git-one-door-scan --root .`: 0 undeclared; census regenerated.
+- **Full suite** (`/dev/shm/t5p05-full.log`): 8751 tests, 8718 pass, **1 fail**, 32 skipped.
+  - The failure is the known frozen V7n addendum test.
+  - **One `run-tests: ERROR`:** the suite left one `fgos-tp-*` directory behind. It is not from this change: the six changed test files, run alone, leave nothing behind and print no ERROR. The log does not name the file that left it.
 
-1. **No claude write-back.** `writeBackRenewedCredential` accepts only `LAYOUTS` (pi, codex, omp). The comment says claude's layout is `read only: no fgOS dispatch renews a Claude login` (`provider-credential-renewal.mjs:545-559`). For a claude source `credentialLayout()` returns `null`, so `credentialWriteBackTarget()` returns `null` (`:1333-1340`). Even a bwrap-confined claude pane today drops a login it renewed when its home is removed.
-2. **No claude renewal at the source.** `refreshAhead` returns `skipped/unsupported-layout` for claude (`:1199`). `credentialProbeCommand` has no claude branch (`provider-credential-probe.mjs:45-77`), so no scratch renewal can run either.
-3. **No provider-signed account claim for claude.** Claude stores `.claude/.credentials.json` → `claudeAiOauth { accessToken, refreshToken, expiresAt, ... }`. The tokens are opaque, not JWTs, and carry no account claim; `oauthAccount` in `.claude.json` is the agent's own word. Under the A8 gate (`applyAgentCopies`: `claimed === null` → the copy is kept), **a claude login renewed in a pane is never applied automatically. It is kept for hand recovery, the same as xai.** The gate must not be weakened. A renewal fgOS makes itself in a scratch copy (`renewInScratch`) does not need the claim, so renewal at the source can work once a claude layout and probe exist.
-4. **Unconfined panes have no account to write back to.** `credentialStoreDir` needs `provider` and `accountId`. A claude pane with no `runner.llmAccounts` lease (the operator's own `~/.claude`) has neither.
+## Net size (`4ef0b4079`)
 
-So the claude half needs, in files this phase does not own:
-- `provider-credential-renewal.mjs`: move claude into `LAYOUTS` with `files`, `markDue`, `apply`, `stage` and `identity: () => null`, and make `credentialLayout` recognise a claude source.
-- `provider-credential-probe.mjs`: a claude probe command (`claude -p`, `CLAUDE_CONFIG_DIR=<scratch>`, no tools).
-- A decision on case 4.
+- Node src: +53 (renewal +29, probe +10, trust-store +8, herdr-round +4, cleanup-trust +1, holder-lock-checks +1).
+- Tests: +30. Lock registry JSON: +9.
+- The phase estimate (Node −35, tests −40) was for decision 63's private-config design. Decision 66 keeps the claude seed and adds a layout, a probe call and a lock, so this phase grows instead of shrinking.
 
-## Decision needed (owner or big lead)
+## Deviations
 
-- **What is happening:** decision 63's claude write-back and renewal need the credential-renewal module, which the parallel follow-up owns. A pane-renewed claude login can only be kept for hand recovery, because claude tokens name no account.
-- **Cause:** claude was left out of the renewable layouts on purpose ("no fgOS dispatch renews a Claude login"), and its tokens are opaque.
-- **Options:**
-  - (a) Hand this phase the claude-layout and probe edits after the follow-up lands, and rebase on it. About +60 Node lines in the renewal and probe modules. The cost is waiting for the follow-up.
-  - (b) The follow-up adds the claude layout and probe, and this phase only wires them. Its scope grows, but no file is shared between the two phases.
-  - (c) Keep unconfined claude panes in place (no private config). Remove only the `~/.claude.json` write by moving folder trust to a per-process flag. Measured: none exists for claude folder trust. Not viable without a new measurement.
-- **Recommendation:** (b) if the follow-up is still open, else (a). For case 4: unconfined panes with no lease use a fixed account id for the operator's own login (`provider: anthropic`, account `operator`), so pending copies go under one known store directory. **Risk to accept explicitly:** if Anthropic rotates refresh tokens, a pane that refreshes inside its private copy logs the operator's own claude out until someone recovers the staged copy by hand. Renewal at the source before each run makes this rare (only runs longer than the access-token lifetime) but does not prevent it.
-- **Scope of the answer:** only the claude half of this phase. The codex/agy half is done.
+- **The `agent-trust-store` lock is not in decision 66's wording.** The decision names add-only plus read-back. The experiment above shows read-back alone fails the coordinator's test ("every entry present afterwards") every time, so I serialised fgOS's own seeds through the existing holder-lock door, the same way `worker-session` was added.
+- **Still open: claude itself can drop the entry.** Claude can save an older copy of `~/.claude.json` between fgOS's read-back and its own start. That pane then stops at the trust dialog, reported by name. The run-supervisor spec now states this.
+- **No live claude call was run.** That the claude probe actually renews depends on Claude Code refreshing a login whose `expiresAt` has passed, and on its refresh token rotating. Both are assumed, not measured. If the token does not rotate, the renewal is judged `not-renewed` and the source stays as it was.
+
+## Codex/agy half (landed `de7454638..8f521eb2f`)
+
+- Durable writes keep links.
+- A codex section ends at the next table header, and the key is written escaped.
+- A failed removal is reported `remove-failed`.
+- Four cases went red → green; details are in the main-branch version of this report.
 
 ## Items for other phases
 
-- P06 (`herdr-round.mjs` after this phase): unchanged until the claude half lands.
-- The CHANGELOG line about claude (no `~/.claude.json` writes, private config, hand recovery like xai) will be written with the claude half. It is not written yet.
+- P06 (`herdr-round.mjs`): only the `REMOVABLE_TRUST_KINDS` lines changed.
+- The guide for the owner machine should note the new lock row and that `~/.claude.json` keeps fgOS worktree entries; they are no longer removed.
+- Backlog row H-T4c was not created; it goes to P13 per the phase file.
 
-Status: NEEDS_CONTEXT
-Summary: Codex/agy trust-store fixes are done and committed (`cc21769d3`, four red→green cases). The claude private-config half is stopped: its write-back and renewal need a claude layout in the parallel-owned `provider-credential-renewal.mjs` plus a claude probe, and claude logins carry no signed account claim, so a pane-renewed login can only be kept for hand recovery.
-Concerns/Blockers: needs the owner or big lead to pick option (a) or (b), and to decide the account id used for unconfined claude panes with no lease; the P01 claude row stays red until then.
+Status: DONE_WITH_CONCERNS
+Summary: Claude folder trust is add-only, serialised by a new `agent-trust-store` lock row and read back before the pane runs; the claude remove path is gone. Confined claude logins renew at the source through a new claude layout and probe call, and a pane-renewed claude login is staged and kept for hand recovery.
+Concerns/Blockers: the lock row goes beyond the decision's wording (needed by the evidence above); the claude probe renewal is proven only with a fake CLI; the full suite reported one leftover `fgos-tp-*` directory that does not come from this change.
