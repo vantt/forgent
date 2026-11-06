@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "39d69fa8676b48c911095ab1fd4476143a55e050a3bce2022ee0b8afcd06fae4",
+  "payloadDigest": "4080378130bf9c7ba7e0df6bec39af9e9b5e89289705464760407e3818b5867b",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -963,7 +963,7 @@
     "src/run-supervisor/cwd-lock.mjs": "dbadfb61ec01a3d9614d734d78f24fb87ff363bcbaa13d8120e62338fe21ab36",
     "src/run-supervisor/direct-launch.mjs": "befa7e6185b4e9c50651ec045e7f6b0abd3109d6544f594f977b1fb6ee528091",
     "src/run-supervisor/dispatch-error.mjs": "53d164ad2b08fc1caeb3089b12ed987cfac3df6ba6c28e43ac0c844b61b75d86",
-    "src/run-supervisor/gate-kill-grace.mjs": "4f4c55c15414932b85aed2266f20ababa8a6b48933af5a08aeefa9b9af53481f",
+    "src/run-supervisor/gate-kill-grace.mjs": "695e4583ea46eddf636b2d825124888667b618ac6dda818c28cddae4b9f3d2ee",
     "src/run-supervisor/payload-root.mjs": "1231aa5b558578ff592c5b071ee6dc151d738227534a76fcf355d7200183eb43",
     "src/run-supervisor/protocol.mjs": "63bb68a1f04dc6d58a0d7a8d7711308fdcdf718d61d09da4f09047e24d05badd",
     "src/run-supervisor/run-lock.mjs": "1c556b14b63b421536af3137aa35245879ee116706c82cdb24d20b1d35a9a026",
