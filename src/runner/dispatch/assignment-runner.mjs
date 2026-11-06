@@ -1,17 +1,11 @@
-// dispatch/assignment-runner.mjs — Assignment execution, Run lifecycle,
-// and RunResult evidence persistence for Team Dispatch V1 (Step 01 Slices 4 & 5 / Step 03 / Step 04).
+// dispatch/assignment-runner.mjs — execute one Assignment: load its immutable input, admit a Run attempt, lease
+// its account, launch it under the run supervisor and return the settled Run Result.
 //
 // Rules:
-// - Run belongs to Assignment, not Work.
-// - Always writes assignment.json before execution.
-// - Always writes run.json before process spawn.
-// - Always writes stdout.log, stderr.log, exit.json, evidence.json, and result.json after settlement.
-// - Control-plane files are never evidence for themselves; worker-produced files or git diffs prove work.
-// - Never mutates Work lifecycle state as a side effect.
-// - Step 04: dirtyBefore is subtracted from post-run dirty state; pre-existing dirty files
-//   are never counted as run evidence.
-// - Step 04: malformed agent-result.json produces failed/failed, not no-evidence.
-// - Step 04: prompt includes concrete runDir paths for worker result artifacts.
+// - Run belongs to Assignment, not Work; Work lifecycle state is never mutated as a side effect.
+// - assignment.json is written before execution, run.json before the launch.
+// - Control-plane files are never evidence for themselves; worker-produced files or git diffs prove work, and
+//   files already dirty before the launch never count.
 
 import { recordCustodyHandoff } from '../../run-supervisor/cwd-lock.mjs';
 import fs from 'node:fs';
@@ -176,20 +170,7 @@ function declaredStoreCli(cfg, executorId, pinnedInvocationId) {
   return invocation ? (credentialStoreOf({ ...invocation, command: invocation.command ?? entry.command })?.use ?? null) : null;
 }
 
-/**
- * Classify RunResult status and confidence from execution outcome and evidence
- * (Step 01 §11 / Step 03 §5.1 / Step 04 §5.2).
- *
- * Confidence ladder:
- * - `failed`: timeout, nonzero exit, invalid result, or explicit failure.
- *   Step 04: malformed/invalid agent-result.json also produces failed/failed.
- * - `verified`: structured claim says done + external evidence (such as git delta or external verification).
- *   Step 04: only post-run evidence (new dirty files or committed diffs) qualifies.
- * - `reported`: structured claim (valid) says done + consult/review read-only operation + worker-produced result/report artifact exists.
- *   Step 04: requires a valid claim; invalid claim must not produce reported.
- * - `inferred`: no structured claim, but external evidence (git/artifact delta) exists.
- * - `no-evidence`: process settled, but no structured claim with worker artifact, and no external proof.
- */
+/** The existence and sha256 of each file dirty before the launch, so a later change to one is seen. */
 export function snapshotDirtyBeforeFiles(dir, dirtyBefore) {
   const snapshots = new Map();
   if (!dir || !Array.isArray(dirtyBefore)) return snapshots;
@@ -207,74 +188,22 @@ export function snapshotDirtyBeforeFiles(dir, dirtyBefore) {
 }
 
 /**
-
-/**
- * Execute an Assignment through the dispatch control plane and record full RunResult evidence (Step 01 Slice 4/5).
- *
- * @param {object} assignment Assignment object
- * @param {object} [opts]
- * @param {string} [opts.cwd]
- * @param {string} [opts.repoRoot]
- * @param {object} [opts.runnerConfig]
- * @param {object} [opts.cliOverride]
- * @param {number} [opts.timeoutMs]
- * @param {object} [opts.work]
- * @param {object} [opts.options]
- * @returns {Promise<Readonly<object>>} Stored RunResult object
- */
-/**
  * Fail-closed gate PLUS mistake-proofing for an inline mutating
  * Assignment, whichever caller reaches `executeAssignment`.
  *
- * Trust boundary, stated plainly so a future reader does not mistake this
- * for authentication against a hostile caller: a caller able to `import`
- * this codebase's own dispatch modules and write files under `.fgos/` is,
- * by this repo's own already-locked architecture, in the SAME trust class
- * as the user who invoked it -- not an external attacker class. See
- * `docs/platform/runner/contracts/routing-handoff.md`'s three locked invariants
- * (containment is instructions plus a throwaway branch, never a sandbox;
- * work items must originate from the real user; `.fgos/config.json`'s
- * `runner` section is executable config, whoever can edit it decides what
- * the runner spawns) and `dispatch/config.mjs`'s own TRUSTED-CONFIG NOTE
- * and `runner/worktree.mjs`'s SAME-USER TRUST INVARIANT -- both already
- * state this codebase never treats "can run code in this process" as a
- * hostile boundary. Every worker this runner spawns, including read-only
- * ones, already runs with `--permission-mode acceptEdits`; "read-only" is
- * graded/rolled back after the fact, never OS-enforced. Chasing an
- * on-disk cross-check against that trust class is unwinnable: the
- * attacker already has the same read/write access as the check itself, so
- * any file the check trusts, the attacker can also just write.
+ * Trust boundary: a caller able to `import` these modules and write under `.fgos/` is in the same trust
+ * class as the user who invoked it (`docs/platform/runner/contracts/routing-handoff.md`), so this is
+ * mistake-proofing, not authentication. It stops an accidental in-process caller that imports
+ * `buildAssignment`/`executeAssignment` without the mediated dispatch door from mutating real files with no
+ * interlock. Two independent conditions, both required:
  *
- * What this function actually protects against, in scope: an
- * ACCIDENTAL or well-behaved-but-unaware in-process caller -- code that
- * imports `buildAssignment`/`executeAssignment` (both pre-existing,
- * already-exported primitives) without going through
- * `session-engine.mjs`'s own mediated `dispatchDeclaredOperation` door,
- * and would otherwise silently mutate real files with no interlock at
- * all. Two independent conditions, both required:
+ * 1. The caller asserts `opts.isReadOnlyMode === false` explicitly; an omitted or truthy flag is refused.
+ * 2. A unit-run assignment runs in its unit's linked worktree (never the main checkout) and carries the
+ *    binding bind() produced, which is replayed from the committed config and must match. An inline
+ *    assignment claiming the retired protocol-operation stamp, or with no unit-run gate, is refused.
  *
- * 1. The caller must explicitly assert `opts.isReadOnlyMode === false` --
- *    an omitted or truthy flag is refused, never treated as permission.
- *    `runExecutorAttempt` (session-engine.mjs) already computes and
- *    passes this from the Assignment's own stamped `mutation` field for
- *    every real dispatch, so this is a no-op for the legitimate path and
- *    a hard stop for any caller that forgot the flag entirely.
- * 2. The claimed `definitionId@version#operationId` stamp must resolve to
- *    a REAL, on-disk CoordinationProtocol operation declaring
- *    `result.kind: 'work-product'`, and `cwd` must resolve to a linked
- *    git worktree, never the main checkout -- catching the realistic
- *    accident of a well-behaved caller dispatching mutating work into the
- *    wrong place, not a hostile forgery (a caller in the trust class
- *    above can already write whatever `cwd`/stamp it wants; this is
- *    mistake-proofing, not a barrier to it).
- *
- * Scoped to `provenance.kind === 'inline'` only: before this cell, an
- * inline contract's `mutation: 'mutating'` was unconditionally refused
- * (ADR-006 §6) regardless of any stamp -- this cell is what first made an
- * inline mutating Assignment constructible at all. A declared-shape
- * Assignment's mutation posture is the pre-existing, unrelated
- * `classifyDeclaredMutation` mechanism (assignment-normalizer.mjs),
- * untouched and out of scope here.
+ * Scoped to inline and unit-run assignments; a declared assignment's mutation posture is
+ * `classifyDeclaredMutation` (assignment-normalizer.mjs).
  *
  * @param {object} asgn
  * @param {object} opts
@@ -291,7 +220,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
 
   const cwd = opts.cwd ?? process.cwd();
 
-  // Check 1: Engine protocol-operation stamp exception (named legacy path until P4 phase 6)
+  // The protocol-operation stamp path is retired: a claim of it is refused.
   const stamp = extractProtocolOperationStamp(asgn.provenance?.inline?.contract?.constraints);
   if (stamp) {
     throw new RunnerConfigError(
@@ -299,7 +228,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
     );
   }
 
-  // Check 2: Verifiable Unit run mutating gate (Q9, supersede ADR-006 §6)
+  // A unit run's mutating gate: its worktree and its replayed binding.
   if (asgn.provenance?.kind === 'unit-run' || asgn.unitRunId) {
     const unitRunId = asgn.unitRunId || asgn.provenance?.unitRunId || asgn.assignmentId?.split('/')[0];
     if (!unitRunId) {
@@ -424,26 +353,12 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
   );
 }
 
-
 function validateAssignmentLegality(asgn, opts = {}) {
   if (!asgn || typeof asgn !== 'object') {
     throw new RunnerConfigError('executeAssignment requires an assignment object');
   }
 
-  // ADR-006 R8: an inline Assignment (provenance.kind === 'inline') never
-  // carries domain/stage/operation -- buildInlineAssignment sets none of
-  // these (ADR-006 R4), so the declared-operation legality check below
-  // (matchedOp, and the matchedOp-driven human-only
-  // dispatch check it feeds) is meaningless for it and is skipped
-  // entirely; `matchedOp` stays `undefined` in that case, which is safe --
-  // its return value is never consumed by either call site of this
-  // function (both are bare statements). This is the ONLY change to this
-  // function (and its caller, `executeAssignment`, is untouched beyond
-  // this one branch) -- the existing hardening here (the mission-refusal
-  // gate immediately below, and `executeAssignment`'s own
-  // `effectiveAssignment` mutation backfill) stays exactly as-is and
-  // still runs unconditionally for both shapes.
-  let matchedOp = undefined;
+  // An inline Assignment carries no domain, stage or operation, so the declared-operation check is skipped for it.
   if (asgn.provenance?.kind !== 'inline' && asgn.stage && asgn.operation) {
     // The legal operations of the step come from the Workflow the Work layer built
     // this Assignment from: either handed in now (`opts.operations`, stricter) or
@@ -462,7 +377,7 @@ function validateAssignmentLegality(asgn, opts = {}) {
         `unknown operation "${asgn.operation}" for stage "${asgn.stage}" in domain "${asgn.domain}" (declared operations: [${legalIds.join(', ')}])`,
       );
     }
-    matchedOp = Array.isArray(opts.operations) ? opts.operations.find((o) => o.id === asgn.operation) : undefined;
+    const matchedOp = Array.isArray(opts.operations) ? opts.operations.find((o) => o.id === asgn.operation) : undefined;
     if (matchedOp?.dispatch === 'human-only') {
       throw new RunnerConfigError(`cannot execute human-only operation "${asgn.operation}" via cli-spawn`);
     }
@@ -470,17 +385,8 @@ function validateAssignmentLegality(asgn, opts = {}) {
   if (asgn.dispatch === 'human-only') {
     throw new RunnerConfigError(`cannot execute human-only operation "${asgn.operation}" via cli-spawn`);
   }
-  // Step 07 §7 / Step 08 Phase 01 R4: some callers require strictly
-  // read-only execution and reject a mutating Assignment outright.
-  // `opts.isReadOnlyMode` is an explicit, caller-supplied flag (mission-lite's
-  // `runMissionAssignment()` was the original caller of this gate under its
-  // former name `isMissionLite`; a standalone CoordinationSession's
-  // read-only proof, R6/R8, is the same mechanism under its new name) --
-  // not re-derived from `missionId`/`workId` here (ADR-006 R7 retires that
-  // heuristic; read-only status now comes solely from the stamped
-  // `mutation` field below). Applies identically to declared and inline
-  // Assignments (ADR-006 R8) -- this gate is unconditional and runs for
-  // BOTH shapes, regardless of the inline-only skip above.
+  // A caller that requires strictly read-only execution (`opts.isReadOnlyMode`) refuses a mutating Assignment;
+  // read-only status comes solely from the stamped `mutation`. Runs for declared and inline Assignments alike.
   const requireReadOnly = Boolean(opts.isReadOnlyMode);
   if (requireReadOnly && !isReadOnlyAssignment(asgn)) {
     throw new RunnerConfigError(
@@ -488,14 +394,8 @@ function validateAssignmentLegality(asgn, opts = {}) {
     );
   }
 
-  // Phase 01 mutation-unlock HIGH-finding fix: re-verify R2/R3 at the actual
-  // point mutation is honored, independent of `opts.isReadOnlyMode` (a
-  // direct `buildAssignment` + `executeAssignment` caller controls `opts`
-  // itself and can simply omit this flag) -- see
-  // `assertInlineMutatingAssignmentAuthorized`'s own doc comment.
+  // Checked where mutation is honored, whatever `opts.isReadOnlyMode` says (a direct caller controls `opts`).
   assertInlineMutatingAssignmentAuthorized(asgn, opts);
-
-  return matchedOp;
 }
 
 /** The CLIs whose screens the terminal adapters of the agent protocol know. */
@@ -527,22 +427,6 @@ export function terminalAgentArgs({ resolvedCmd, prompt, model, runDir, writerId
 function seatIdOf(asgn) {
   return asgn.provenance?.kind === 'unit-run' ? (asgn.provenance.seat ?? asgn.role) : asgn.role;
 }
-
-/**
- * Execute an assignment by dispatching a worker and recording the Run & RunResult (Step 03 §5).
- *
- * @param {object} assignment Assignment object
- * @param {object} [opts] Options
- * @param {string} [opts.cwd]
- * @param {string} [opts.repoRoot]
- * @param {object} [opts.runnerConfig]
- * @param {object} [opts.cliOverride]
- * @param {number} [opts.timeoutMs]
- * @param {object} [opts.work]
- * @param {boolean} [opts.isReadOnlyMode]
- * @param {object} [opts.options]
- * @returns {Promise<Readonly<object>>} Stored RunResult object
- */
 
 /**
  * Give back the provider account lease a Run selected. A failure is reported and never thrown: the
@@ -1302,6 +1186,13 @@ async function closeAttempt(attempt) {
   }
 }
 
+/**
+ * Execute an assignment by dispatching a worker and recording the Run and its Run Result.
+ *
+ * @param {object} assignment Assignment object
+ * @param {object} [opts] Options (`cwd`, `repoRoot`, `runnerConfig`, `cliOverride`, `timeoutMs`, `isReadOnlyMode`, ...)
+ * @returns {Promise<Readonly<object>>} Stored RunResult object
+ */
 export async function executeAssignment(assignment, opts = {}) {
   refuseWorkItemInput(opts, 'executeAssignment()');
   validateAssignmentLegality(assignment, opts);
@@ -1321,16 +1212,8 @@ export async function executeAssignment(assignment, opts = {}) {
 
   const { effectiveAssignment, effectiveMutation, templateResolution } = loadImmutableAssignment(assignment, { assignmentDir, cwd, opts });
 
-  // Enforce decide-first governance gate (Step 06). Dispatch Core Contract
-  // Normalization Slice D: compileDispatchPlan() now merges
-  // the dispatch policy's tier/model/providerModel/provenance
-  // into the plan itself (compiledPlan.policy) and enforces the
-  // decided-executor-vs-policy-executor agreement internally -- this call
-  // site no longer resolves policy a second time or re-checks that
-  // agreement; both used to happen here, separately, and could only ever
-  // agree or throw, never usefully disagree. Rigor monotonicity reads the
-  // assignment's own policy and `rigor` (the caller's demand); dispatch is
-  // never handed a Work item.
+  // Decide first: the compiled plan carries the dispatch policy and enforces that the decided executor agrees
+  // with it. Dispatch is never handed a Work item.
   const compiledPlan = compileDispatchPlan(cfg, {
     assignment: effectiveAssignment.assignmentId,
     assignmentItem: effectiveAssignment,

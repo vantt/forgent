@@ -1,4 +1,4 @@
-// dispatch/settlement.mjs — Unified Run settlement pipeline and primitives (R3, Phase 09)
+// dispatch/settlement.mjs — Unified Run settlement pipeline and primitives
 //
 // The one settlement pipeline: the settle-attempt step of a supervised attempt
 // (src/run-supervisor/steps/settle-attempt.mjs) and the inline paths both end in
@@ -215,7 +215,7 @@ export function ranConfinementBackend(runDir, launchCommandId, attestation = nul
 }
 
 /**
- * Compute changed files produced during the run (Step 04 §5.3).
+ * Compute changed files produced during the run.
  */
 export function computeChangedFiles(dir, gitBefore, gitAfter, dirtyBefore, dirtyAfter) {
   const dirtyBeforeSet = new Set(dirtyBefore ?? []);
@@ -386,7 +386,7 @@ function classifyEvidenceToOutcomeFacts({
 /**
  * Atomically commit a RunResult settlement to disk via CAS and immutable hard link.
  *
- * S8 recovery: `settleRunControl` publishes the 'settled' generation BEFORE
+ * Recovery: `settleRunControl` publishes the 'settled' generation BEFORE
  * `publishImmutableProof(result.json)` runs below -- a crash in that exact
  * window leaves control settled with no result.json. `settleRunControl`
  * always publishes 'settled' as the NEXT generation (current.epoch + 1), so

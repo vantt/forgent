@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cdc2944d23941f7ba393995b950ad9e6e6bafa042de17914af34cd0b58ae964e",
+  "payloadDigest": "e61470e43836ac4ad95e267289791f69d6f2b63196afe96bf274e0ccf15342b6",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -988,7 +988,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "6b35618fbb2349be178c672a52f05de765939d0eb68f1a1fa4a7535e291828f1",
-    "src/runner/dispatch/assignment-runner.mjs": "a6a439ef30c4eddac2c3bc3f3f854898b03edff26541b54940b7354bfd920891",
+    "src/runner/dispatch/assignment-runner.mjs": "5b262d5ce242acdf15e912c6192179196aba246f2bccbb6831648eb1fd9256bf",
     "src/runner/dispatch/assignment.mjs": "cb86292531aaf491ad93ec51f708fede5dbebed75af3be2ffc7cf176cf1f78f9",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "2b2c18f391cd2521c3350c9b71007a33b732a56d09596d13768be48c759f8eb7",
@@ -1025,7 +1025,7 @@
     "src/runner/dispatch/run-result.mjs": "56cd35cfcfa3373e4992252a5574d9125af8896e8540d1a0b5384892d9d096f5",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runtime-inspection.mjs": "f0f7282c6e2d3d661acb2e725f55140facf520d87392242508885ae4009a7fae",
-    "src/runner/dispatch/settlement.mjs": "e513d118b44bb1d5ed041d8724d2181e39d261065824a25b05f249485cf57dbe",
+    "src/runner/dispatch/settlement.mjs": "32f89ec7142095b13e6bc8201cdcfceeb80f58239b71ad1309b5d6bb9bfbbfe6",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/stop-processes-inside.mjs": "018abac624d8a4f10d5ad6209db9f765134ce4e304688897df076dfa99e2864e",
     "src/runner/dispatch/terminal-slot.mjs": "82ed4279c054f2486bb8f3223182c9a1043426d0cae2a846449eda29967665df",
@@ -3317,15 +3317,15 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1091,
+      "line": 975,
       "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:389",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1585,
-      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1200",
+      "line": 1468,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1084",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
