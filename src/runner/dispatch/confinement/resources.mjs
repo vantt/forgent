@@ -119,6 +119,30 @@ function launchProgram(command, searchPath = process.env.PATH) {
   return candidates.map(realPathOrNull).find((real) => real && fs.statSync(real).isFile()) ?? null;
 }
 
+/**
+ * The install directories an agent CLI keeps inside its own login home, relative to that home; none holds a
+ * login file. pi: `bin` (its launcher) and `install` (the version file the launcher reads and the releases).
+ * codex: `packages` (the `standalone/current` link and the releases it points to).
+ */
+const CLI_INSTALL_SUBTREES = Object.freeze(['bin', 'install', 'packages']);
+
+/**
+ * What is bound back, read-only, after the masks so a program that resolves inside a masked root starts: the
+ * install directories of that root that exist (CLI_INSTALL_SUBTREES), else the program file alone. A named
+ * list rather than the directories on the program's link chain: pi's launcher reads its sibling `install`,
+ * which no link names. A directory whose real path is or holds a masked root is never bound back.
+ */
+function launchProgramBindBacks(program, maskedRoots) {
+  const root = program && maskedRoots.find((masked) => isInsideRoot(program, masked));
+  if (!root) return [];
+  const exposesMasked = (real) => maskedRoots.some((masked) => isInsideRoot(masked, real));
+  const subtrees = CLI_INSTALL_SUBTREES.map((name) => path.join(root, name)).filter((dir) => {
+    const real = realPathOrNull(dir);
+    return real && fs.statSync(real).isDirectory() && !exposesMasked(real);
+  });
+  return subtrees.some((dir) => isInsideRoot(program, dir)) ? subtrees : [program];
+}
+
 /** Every root private homes live under: the registered ones the authority passes in, the default and this backend's. */
 function confinementRootsFor(backendConfig, registered = []) {
   return [...new Set([...registered, resolveConfinementTempRoot(), confinementTempRootFor(backendConfig)])];
@@ -640,10 +664,8 @@ export function resolveConfinementResources({
   const machinePrivateRoots = resolveMachinePrivateRoots({ homeDir, claudeSocketBase, xdgRuntimeDir, xdgConfigHome, herdrSocketPath, loginStores: stores, confinementRoots });
   const realConfinementRoots = confinementRoots.map((root) => realPathOrNull(root) ?? root);
   for (const root of machinePrivateRoots) resolved.push(hiddenResource(root, { machinePrivate: true, ...(realConfinementRoots.includes(root) ? { confinementRoot: true } : {}) }));
-  // A program inside a masked home (pi installs itself in ~/.pi/agent/bin) is bound back alone, read-only.
-  const program = launchProgram(context.launchCommand, context.launchPath);
-  if (program && machinePrivateRoots.some((root) => isInsideRoot(program, root))) {
-    resolved.push({ resource: 'launch-program', identity: `launch-program:${path.basename(program)}`, hostTarget: program, executionTarget: { location: 'host', path: program }, delivery: 'mount', collect: 'none', access: 'read', allocation: 'existing' });
+  for (const target of launchProgramBindBacks(launchProgram(context.launchCommand, context.launchPath), machinePrivateRoots)) {
+    resolved.push({ resource: 'launch-program', identity: `launch-program:${target}`, hostTarget: realPathOrNull(target), executionTarget: { location: 'host', path: target }, delivery: 'mount', collect: 'none', access: 'read', allocation: 'existing' });
   }
 
   // 7. hostRead: blind — hide the hidden roots, keep the dispatch's own directory

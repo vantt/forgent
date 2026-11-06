@@ -219,7 +219,8 @@ function blindRefusals(request, resolvedResources) {
   return mismatches;
 }
 
-// Mounts bound back inside a machine-private root after its mask (the dispatch's own home, the program it runs).
+// Mounts bound back inside a machine-private root after its mask (the dispatch's own home, the program it runs and
+// the install directories of its CLI).
 const BOUND_BACK = new Set(['hidden-root', 'own-assignment', 'private-home', 'launch-program']);
 
 /**
@@ -654,7 +655,7 @@ export function prepareBwrapSync(plan, request, backend) {
     };
     // A later mount over a parent hides an earlier one beneath it, so the order is the contract: mounts outside
     // every hidden root, the masks, a blind dispatch's own directory read-only, the mounts inside a hidden root
-    // (outbox, own home, program file), and last the masks made read-only.
+    // (outbox, own home, the program and its install directories), and last the masks made read-only.
     const insideMasked = (res) => [...hidden, ...(own ? [own] : [])].some((h) => res.executionTarget?.path && isInsideRoot(res.executionTarget.path, h.executionTarget.path));
     mounts.filter((r) => !insideMasked(r)).forEach(materialize);
     for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
