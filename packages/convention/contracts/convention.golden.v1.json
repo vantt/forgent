@@ -2,14 +2,25 @@
   "contract": "convention.golden.v1",
   "cases": [
     {
-      "name": "retired roots refuse every file while the generated decision index stays admitted",
+      "name": "retired roots refuse every file by their own rule while the generated decision index stays admitted and a near-miss root falls to the docs catch-all",
       "operation": "check",
       "input": {"paths":["docs/specs/new.md","docs/architect/nested/proof.json","docs/specs/.hidden","docs/decisions/0099-new.md","docs/decisions/index.md","docs/specs-other/new.md"]},
       "expected": {"checked":6,"violations":[
         {"path":"docs/specs/new.md","code":"forbidden-placement","message":"path is forbidden by placement rule 'retired-specs'","posture":"block"},
         {"path":"docs/architect/nested/proof.json","code":"forbidden-placement","message":"path is forbidden by placement rule 'retired-architect'","posture":"block"},
         {"path":"docs/specs/.hidden","code":"forbidden-placement","message":"path is forbidden by placement rule 'retired-specs'","posture":"block"},
-        {"path":"docs/decisions/0099-new.md","code":"forbidden-placement","message":"path is forbidden by placement rule 'retired-decisions'","posture":"block"}
+        {"path":"docs/decisions/0099-new.md","code":"forbidden-placement","message":"path is forbidden by placement rule 'retired-decisions'","posture":"block"},
+        {"path":"docs/specs-other/new.md","code":"forbidden-placement","message":"path is forbidden by placement rule 'unplaced-docs'","posture":"block"}
+      ]}
+    },
+    {
+      "name": "a docs path no placement rule names is refused, while user docs, story material and the root registers stay admitted",
+      "operation": "check",
+      "input": {"paths":["docs/new-root/note.md","docs/stray.md","docs/user/how-to/x.md","docs/how-to/nested/x.md","docs/tutorials/.gitkeep","docs/storytelling-material/2026-11-06-x.md","docs/journals/old.md","docs/backlog.md","docs/doc-registry.json"]},
+      "expected": {"checked":9,"violations":[
+        {"path":"docs/new-root/note.md","code":"forbidden-placement","message":"path is forbidden by placement rule 'unplaced-docs'","posture":"block"},
+        {"path":"docs/stray.md","code":"forbidden-placement","message":"path is forbidden by placement rule 'unplaced-docs'","posture":"block"},
+        {"path":"docs/user/how-to/x.md","code":"forbidden-placement","message":"path is forbidden by placement rule 'unplaced-docs'","posture":"block"}
       ]}
     },
     {

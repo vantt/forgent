@@ -12,7 +12,7 @@ Canonical: Yes
 Canonical for: The stated document scope; source implementation limits remain explicit
 Use this when: Creating, reviewing, moving, or promoting maintained documentation
 Do not use this for: Current product behavior or implementation detail
-Last reviewed: 2026-10-14
+Last reviewed: 2026-11-06
 Related:
 - docs/platform/governance.md#documentation-governance
 - docs/reading-map.md
@@ -82,16 +82,40 @@ docs/
       proposals/
       history/
 
+  tutorials/
+  how-to/
+  reference/
+  explanation/
   user/
-    tutorials/
-    how-to/
-    reference/
-    explanation/
+    README.md
 
   generated/
   knowledge/
   history/
+  journals/
+  distillery/
+  ui-spec/
+  storytelling-material/
+
+  backlog.md
+  architecture-manifest.json
+  doc-registry.md
+  doc-registry.json
+  enduser-docs-index.json
 ```
+
+User docs live in the four Diataxis roots directly under `docs/`;
+`docs/user/README.md` routes them, and moving them under `docs/user/` is a
+separate future migration ([User Documentation](../user/README.md)).
+`docs/journals/` holds old journals as history; new journals go to
+`plans/journals/`. `docs/storytelling-material/` is the story box a story
+harvester writes into.
+
+The placement rules in
+[`convention.rules.v1.json`](../../packages/convention/contracts/convention.rules.v1.json)
+name every path above. Any other path under `docs/` falls to the `unplaced-docs`
+rule, and the pre-commit convention check refuses it; a new root needs a rule
+first.
 
 There is no `system` folder and no `areas` layer under `docs/platform/`.
 Platform-wide authority lives directly under `docs/platform/`; area-specific
