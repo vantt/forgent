@@ -35,13 +35,6 @@ test('with a tail window only the last lines of a process count, so an old log l
   assert.equal(matchAuthFailureLine(`${longLog}\n${PI_STDERR}`, { tailLines: AUTH_FAILURE_TAIL_LINES }), 'No API key found for openrouter.');
 });
 
-test('a round that stopped on a missing key quarantines the account as an auth fault for any provider', () => {
-  const fault = classifyProviderCapacityFault({ provider: 'openrouter', stderr: PI_STDERR, adapterOutcome: 'provider-limit' });
-  assert.equal(fault.action, 'quarantine');
-  assert.equal(fault.reasonCode, 'auth-token');
-  assert.equal(fault.quarantineKind, 'manual-clear');
-});
-
 test('a stop on a quota keeps its quota classification when the text has no dead credential', () => {
   const fault = classifyProviderCapacityFault({ provider: 'openrouter', stderr: 'rate limit reached, try again later', adapterOutcome: 'provider-limit' });
   assert.equal(fault.reasonCode, 'quota-limit');

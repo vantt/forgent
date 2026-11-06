@@ -33,7 +33,7 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
 import { declaredOperationFields } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
-import { accountInventoryConfigOf, auditLeaseReceipt } from '../dispatch/provider-capacity.mjs';
+import { accountInventoryConfigOf, auditLeaseReceipt, dropAssignmentRecord } from '../dispatch/provider-capacity.mjs';
 import { LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
 import { loadRunnerConfigForDir, RunnerConfigError, assertRunTimeoutMs, runnerOriginsOf } from '../dispatch/config.mjs';
 import { commitOnBranch, commitUnitWork, foreignIndexDetail, preflightUnitWorktree } from './commit-unit-work.mjs';
@@ -1422,6 +1422,7 @@ async function runUnitBody(options, scope) {
       const credentialFault = result.outcome === 'provider-limit' && result.runResult?.classification?.failure?.cause === 'credential';
       if (credentialFault) attempts[attemptNo].failureCause = 'credential';
       persistUnitRecord();
+      dropAssignmentRecord({ assignmentId, runtimeDir: options.providerCapacityRuntimeDir });
 
       // The account Seat Binding named could not be taken any more: nothing ran. The seat is bound again, in
       // the queue, from a fresh view of the accounts and the same policy (a family change is checked against

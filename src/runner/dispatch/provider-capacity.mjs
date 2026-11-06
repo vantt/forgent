@@ -9,7 +9,6 @@ import { replaceDurably } from '../../native/door.mjs';
 import { readMachineAccounts } from '../../config/facade.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { deriveLegacyInventory } from './llm-accounts.mjs';
-import { AUTH_FAILURE_TAIL_LINES, matchAuthFailureLine, matchQuotaLimitLine } from './provider-auth-failure.mjs';
 import { resolveHolderLiveness, selfRecord } from '../../native/process-identity.mjs';
 import { acquire, acquireSync, createLockScope, lockHolders, resolveLock, resolveLockRoot, runBorrowed } from '../../holder-lock/index.mjs';
 
@@ -710,6 +709,25 @@ export function releaseProviderAccountLease({ provider, accountId, runId, runtim
   });
 }
 
+/**
+ * Forget which account an attempt's assignment held, once the controller has recorded the attempt's
+ * outcome: from then on no bind or audit of that assignment id happens again (a later attempt of the seat
+ * has its own id). An attempt whose controller died before recording its outcome keeps the entry, which a
+ * rebind of the same id reads as its sticky account.
+ */
+export function dropAssignmentRecord({ assignmentId, runtimeDir } = {}) {
+  if (!assignmentId) return false;
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  return withProviderStateLock(() => {
+    const state = readState(statePath);
+    const keys = Object.keys(state.assignments ?? {}).filter((key) => key.endsWith(`:${assignmentId}`));
+    if (keys.length === 0) return false;
+    for (const key of keys) delete state.assignments[key];
+    writeState(statePath, state);
+    return true;
+  });
+}
+
 export function quarantineProviderAccount({ provider, accountId, reasonCode, quarantineKind = 'temporary', until, runtimeDir, detail } = {}) {
   const { statePath } = providerCapacityStatePaths(runtimeDir);
   return withProviderStateLock(() => {
@@ -938,31 +956,9 @@ function quotaQuarantineUntil(text, now) {
   return new Date(clock ?? now + DEFAULT_QUOTA_QUARANTINE_TTL_MS).toISOString();
 }
 
-// C2b: the auth-fault regex used to scan the ENTIRE stderr text for the
-// bare words "token"/"auth"/"login" anywhere near "failed"/"expired"/etc,
-// with no provider check at all when `provider` was omitted (a wildcard
-// that matched every provider's stderr). Measured false positive: a plain
-// JS test failure whose output happens to contain both "token" (e.g. a
-// SyntaxError "Unexpected token") and "failed" (e.g. "1 test failed")
-// several lines apart got classified as `auth-token` -- the WORSE of the
-// two outcomes (`manual-clear`, requiring an operator, vs `temporary`).
-// Anchored instead to actual observed provider CLI error phrases, and only
-// within the last few lines (the real failure surface a CLI prints at
-// the end of a crash, never scattered incidentally through earlier
-// output).
-const AUTH_ANCHOR_LINE_WINDOW = 5;
-const AUTH_ANCHOR_PATTERNS = [
-  /no api key found/i,
-  /use\s+\/login/i,
-  /authentication failed/i,
-  /api key is invalid/i,
-  /api key.{0,20}(missing|invalid|expired)/i,
-  /login required/i,
-];
-
 /**
  * `stopCause` ('credential' or 'quota') is the supervisor's verdict on why the provider stopped the agent, taken
- * from its receipt: when given it decides auth fault versus quota, and the text is not re-read for the class.
+ * from its receipt: it decides auth fault versus quota, and the text is never read for the class.
  * `capacityEvidenceText` (a pane screen, which leaves no stderr) only dates a quota stop's reset time.
  */
 export function classifyProviderCapacityFault({ provider, stderr = '', adapterOutcome, structuredAgent, stopCause = null, capacityEvidenceText = '', now = Date.now() } = {}) {
@@ -976,13 +972,9 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
   const text = typeof stderr === 'string' ? stderr : '';
   if (adapterOutcome === 'paused-limit' || adapterOutcome === 'provider-limit' || structuredAgent?.stopReason === 'paused-limit' || structuredAgent?.stopReason === 'provider-limit') {
     // A round that ended on a dead credential is not a quota hit: the account stays out until a
-    // person logs in again, and the reset-window rule below must not retry it in an hour.
-    // A dead-credential line in the tail decides; further up it only decides when the tail does
-    // not end on a quota sentence (a streamed transcript may quote a login error).
-    const authInTail = matchAuthFailureLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES });
-    const quotaInTail = !authInTail && matchQuotaLimitLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES });
-    const deadCredential = stopCause ? stopCause === 'credential' : authInTail || (!quotaInTail && matchAuthFailureLine(text));
-    if (deadCredential) {
+    // person logs in again, and the reset-window rule below must not retry it in an hour. The supervisor's
+    // receipt names the cause; the text is never read for it.
+    if (stopCause === 'credential') {
       return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
     }
     // The text carries the reset window when the provider named one; otherwise the
@@ -993,31 +985,6 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
       quarantineKind: 'temporary',
       until: quotaQuarantineUntil(`${text}\n${typeof capacityEvidenceText === 'string' ? capacityEvidenceText : ''}`, now),
     };
-  }
-  if (provider === 'openai' || provider === 'openai-codex') {
-    // The shared quota wordings, read from the stderr tail only: codex streams the agent's whole
-    // transcript to stderr, so a wording anywhere in it may be the agent quoting it.
-    if (matchQuotaLimitLine(text, { tailLines: AUTH_FAILURE_TAIL_LINES })) {
-      // Missing/unparseable reset text falls back to the SAME conservative
-      // default TTL -- never an expiry-less "temporary" quarantine, which
-      // isQuarantined() would otherwise have to catch defensively instead.
-      return { action: 'quarantine', reasonCode: 'quota-limit', quarantineKind: 'temporary', until: quotaQuarantineUntil(text, now) };
-    }
-    // C2b: auth-token is the manual-clear (operator-intervention) outcome,
-    // the more disruptive of the two -- require BOTH a corroborating
-    // adapterOutcome (the process actually failed/errored, not a clean
-    // settle) AND an anchored phrase in only the trailing lines, never
-    // text-anywhere alone.
-    const adapterCorroborates = adapterOutcome !== undefined
-      && adapterOutcome !== 0
-      && adapterOutcome !== 'settled'
-      && adapterOutcome !== 'done';
-    if (adapterCorroborates) {
-      const lastLines = text.split('\n').slice(-AUTH_ANCHOR_LINE_WINDOW).join('\n');
-      if (AUTH_ANCHOR_PATTERNS.some((pattern) => pattern.test(lastLines))) {
-        return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
-      }
-    }
   }
   return { action: 'evidence-only', reasonCode: 'unknown-or-low-confidence' };
 }

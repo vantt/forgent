@@ -488,8 +488,9 @@ test('a state-lock holder killed by SIGKILL frees the lock at once', { timeout: 
 });
 
 test('classifier quarantines only high-confidence stderr/provider outcomes', () => {
-  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: "ERROR: You've hit your usage limit" }).reasonCode, 'quota-limit');
-  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: 'No API key found for the selected model. Use /login.', adapterOutcome: 1 }).reasonCode, 'auth-token');
+  // The wording of a failed process alone never quarantines: the supervisor's receipt names the stop.
+  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: "ERROR: You've hit your usage limit" }).action, 'evidence-only');
+  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: 'No API key found for the selected model. Use /login.', adapterOutcome: 1 }).action, 'evidence-only');
   assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: '', adapterOutcome: 'paused-limit' }).reasonCode, 'quota-limit');
   assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: '', structuredAgent: { stopReason: 'paused-limit' } }).reasonCode, 'quota-limit');
   assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: 'tests mention quota in a report' }).action, 'evidence-only');
@@ -551,6 +552,8 @@ test('H1: a quota message with no parseable reset window still gets a conservati
   const withoutResetWindow = classifyProviderCapacityFault({
     provider: 'openai',
     stderr: 'ERROR: usage limit has been reached.',
+    adapterOutcome: 'provider-limit',
+    stopCause: 'quota',
   });
   assert.equal(withoutResetWindow.reasonCode, 'quota-limit');
   assert.equal(withoutResetWindow.quarantineKind, 'temporary');
@@ -561,6 +564,8 @@ test('H1: a quota message with no parseable reset window still gets a conservati
   const withResetWindow = classifyProviderCapacityFault({
     provider: 'openai',
     stderr: "You've hit your usage limit. It resets in 3h.",
+    adapterOutcome: 'provider-limit',
+    stopCause: 'quota',
     now,
   });
   assert.equal(withResetWindow.until, new Date(now + 3 * 60 * 60 * 1000).toISOString(), 'a real parsed reset window is used verbatim, not overridden by the conservative default');
@@ -665,17 +670,6 @@ test('a quota quarantine lasts as long as the provider says, in hours, minutes a
   assert.equal(parseQuotaResetWindowMs('no window named here'), null);
 });
 
-test('a round that ended on a dead credential quarantines the account as an auth fault until a person clears it', () => {
-  const fault = classifyProviderCapacityFault({
-    provider: 'xai',
-    stderr: 'executor ended as provider-limit: Last line on screen: Error: OAuth refresh failed for xai: xAI OAuth token refresh failed (HTTP 400): invalid_grant',
-    adapterOutcome: 'provider-limit',
-  });
-  assert.equal(fault.reasonCode, 'auth-token');
-  assert.equal(fault.quarantineKind, 'manual-clear');
-  assert.equal(fault.until, undefined);
-});
-
 // A pane seat leaves no stderr: the supervisor's receipt names why the provider stopped it, and the
 // settlement hands that stop to the classifier as typed input; the screen is only reset-time evidence.
 test('a pane seat stopped on a dead login quarantines the account as an auth fault, whatever its stderr says', () => {
@@ -734,7 +728,7 @@ test('the clock time codex prints ("try again at 6:02 PM") becomes the next such
   const nextDay = new Date(parseQuotaResetClockTime('try again at 9:30 AM', now));
   assert.equal(nextDay.getDate(), 10, 'a time already past today means tomorrow');
   assert.equal(parseQuotaResetClockTime('no reset named here', now), null);
-  const classified = classifyProviderCapacityFault({ provider: 'openai', stderr: "You've hit your usage limit. try again at 6:02 PM.", now });
+  const classified = classifyProviderCapacityFault({ provider: 'openai', stderr: "You've hit your usage limit. try again at 6:02 PM.", adapterOutcome: 'provider-limit', stopCause: 'quota', now });
   assert.equal(new Date(classified.until).getHours(), 18);
 });
 

@@ -210,9 +210,6 @@ const EXPECTED_CLOSURE = [
   // provider-capacity.mjs's own imports, reached now that it is walked through:
   // provider-family normalization (node:path only, no process control) ...
   'src/runner/dispatch/provider-adapter.mjs',
-  // ... the auth-failure wording table, a leaf with no imports, kept apart
-  // so provider-capacity never imports a process-control module for it ...
-  'src/runner/dispatch/provider-auth-failure.mjs',
   // ... and the thin client of process facts that decides lease holder
   // identity through the native door (no signals, no spawn, no /proc read).
   'src/native/process-identity.mjs',
