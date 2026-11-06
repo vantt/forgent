@@ -15,6 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -101,16 +102,18 @@ test('a run that already settled is not an orphan and is left out of the report'
   assert.deepEqual(envelopeData(run(cwd, ['stale']).stdout).orphanedRuns, []);
 });
 
-test('a run being driven right now is left alone, even by --reconcile', () => {
+test('a run whose supervisor holds its attempt lock is left alone, even by --reconcile', () => {
   const cwd = tmpCwd();
-  const dir = plantRun(cwd, 'dispatch-runs/tsk-live/1700000000001');
-  // The adapter stamps this every ten seconds for as long as it is driving.
-  fs.writeFileSync(path.join(dir, 'visibility.json'), JSON.stringify({
-    status: 'briefed', lastSeenAt: new Date().toISOString(),
-  }));
-
-  assert.deepEqual(envelopeData(run(cwd, ['stale']).stdout).orphanedRuns, [],
-    'a busy run is not an orphan');
-  run(cwd, ['stale', '--reconcile']);
-  assert.equal(statusOf(dir), 'running', 'and --reconcile does not stop it either');
+  const dir = plantRun(cwd, 'assignments/asgn_live/runs/01');
+  // However old its last heartbeat, a run is driven for as long as the supervisor holds the attempt lock.
+  fs.writeFileSync(path.join(dir, 'visibility.json'), JSON.stringify({ status: 'briefed', lastSeenAt: '2020-01-01T00:00:00.000Z' }));
+  const held = acquireSync(createLockScope('test-supervisor'), 'attempt', { runDir: path.join(cwd, '.fgos', 'assignments', 'asgn_live'), NN: '01' });
+  assert.equal(held.result, 'acquired');
+  try {
+    assert.deepEqual(envelopeData(run(cwd, ['stale']).stdout).orphanedRuns, [], 'a busy run is not an orphan');
+    run(cwd, ['stale', '--reconcile']);
+    assert.equal(statusOf(dir), 'running', 'and --reconcile does not stop it either');
+  } finally {
+    held.handle.release();
+  }
 });
