@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "ef40008e4a0b1e766fe1c906775fb8a15a8604038abb4958899225b8fdf66e9e",
+  "payloadDigest": "a134c1211edb3f2cc8a2e78d05ec46eb96da69c5c9f28fc861a88fd3590ef5c2",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -994,7 +994,7 @@
     "src/runner/dispatch/cli.mjs": "2b2c18f391cd2521c3350c9b71007a33b732a56d09596d13768be48c759f8eb7",
     "src/runner/dispatch/config.mjs": "301ff4dc6938f69443ec1745a5a75b02b3a8cbb7c94a07d8d1194a485115c4f5",
     "src/runner/dispatch/confinement/attestation-store.mjs": "bcfc9d06ef3eec84bb2d1d9ad4f11bc6a9179ccdf08be15cede4f035e7c73494",
-    "src/runner/dispatch/confinement/authority.mjs": "7bb86af53e91048958aa77fd7df5ac220e52a0f5c9d17da9a1df54fc8c8dca63",
+    "src/runner/dispatch/confinement/authority.mjs": "3dc8a155527e495ec298715c6a431264c8e08c6dddd62bcfec2f44d545dbdee3",
     "src/runner/dispatch/confinement/backend-registry.mjs": "91e15d2902b8fa8fcf0087b69de714b6651f906713ebf2969b18e0644993d7cd",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "93fc1f7a32b1513cf08bf6812a0d52d4b3744884c139d8e9277cf87c19e2fe01",
     "src/runner/dispatch/confinement/cleanup.mjs": "5ebcb1f095850244f1152589aed2ef194a78176f54037713b23afc89a03c1200",
@@ -3331,8 +3331,8 @@
     },
     {
       "path": "src/runner/dispatch/confinement/authority.mjs",
-      "line": 798,
-      "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:151",
+      "line": 586,
+      "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:135",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
