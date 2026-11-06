@@ -23,6 +23,7 @@ import { ERROR_OUTCOMES } from './loops/reviewed.mjs';
 import { verifyCommandOf } from './loops/verify.mjs';
 import { runCommand } from '../goal-check.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
+import { buildUnitRunAssignment } from '../dispatch/assignment.mjs';
 import { createCredentialProbe } from '../dispatch/provider-credential-probe.mjs';
 import { accountInventoryConfigOf, auditLeaseReceipt, dropAssignmentRecord } from '../dispatch/provider-capacity.mjs';
 import { LEASE_CONFLICT_FAILURE_CODE } from '../dispatch/run-result.mjs';
@@ -48,19 +49,6 @@ function publishUnitSummary(unitDir) {
   catch (error) {
     console.warn(`fgos: could not write derived unit summary for "${path.basename(unitDir)}": ${error.message}`);
   }
-}
-
-/**
- * `{ personaPin }` for an assignment policy when the persona bound for this seat carries pinned
- * text, else nothing. An override scoped to this very seat wins; otherwise the unit's own persona,
- * pinned when the unit run started, applies to whichever seat bound that same name. Matching on
- * name keeps a pin from reaching a seat that resolved a different persona.
- */
-function pinnedPersonaFor(unitRecord, seatId, persona) {
-  const hit = (unitRecord.overrides ?? []).find((o) => o?.personaPin && o.scope?.seat === seatId && o.persona === persona);
-  if (hit) return { personaPin: hit.personaPin };
-  const unitPin = unitRecord.personaPin;
-  return unitPin && unitPin.name === persona ? { personaPin: unitPin } : {};
 }
 
 /**
@@ -913,71 +901,6 @@ export function answerProviderLimit({ result, bound, attempts, attemptNo, briefN
   };
 }
 
-/**
- * The assignment one attempt of a seat dispatches. A unit that runs a Work step operation is that
- * operation's assignment: the seat that does the unit's own work (its posture says it writes) carries the
- * operation's role and stamp, and keeps its own name in provenance.role and its directory.
- */
-function unitAssignmentOf(ctx, role, { bound, assignmentId, objective, contextRefs, carriesOperation }) {
-  const { unitRecord, unitRunId, declaredOp, unit } = ctx;
-  const { seat, round, readOnly } = role;
-  return {
-    assignmentId,
-    unitRunId,
-    seat: seat.seat,
-    role: carriesOperation ? declaredOp.role : seat.role,
-    posture: seat.posture,
-    round,
-    ...(carriesOperation ? {
-      workId: unitRecord.declared.workId,
-      ...(unitRecord.declared.title ? { title: unitRecord.declared.title } : {}),
-      domain: declaredOp.domain,
-      ...(declaredOp.workflow ? { workflow: declaredOp.workflow } : {}),
-      stage: declaredOp.stage,
-      operation: declaredOp.operation,
-      dispatch: declaredOp.dispatch,
-      taskSpec: declaredOp.taskSpec,
-      skills: declaredOp.skills,
-      ...(declaredOp.contractTemplate ? { contractTemplate: declaredOp.contractTemplate } : {}),
-      evidence: declaredOp.evidence,
-      resultKind: declaredOp.resultKind,
-      ...(declaredOp.onAdvance ? { onAdvance: declaredOp.onAdvance } : {}),
-    } : {}),
-    // The role's own task when the pattern gave it a unit of its own (a reviewer is told to review, not to
-    // redo the work); otherwise the unit's objective.
-    objective,
-    mutation: readOnly ? 'read-only' : 'mutating',
-    binding: bound,
-    provenance: {
-      kind: 'unit-run',
-      unitRunId,
-      seat: seat.seat,
-      role: seat.role,
-      posture: seat.posture,
-      round,
-      binding: bound,
-      ...(carriesOperation ? { declared: declaredOp.declared } : {}),
-    },
-    expectedOutputs: unit.expectedOutputs || [],
-    contextRefs,
-    writes: effectiveWriteScope(unitRecord),
-    // The conflicted files of a merge the runner left open for this writing seat: settlement counts the
-    // seat's edits to them as its evidence, though they were dirty at launch.
-    ...(!readOnly && unitRecord.sync?.status === 'conflicted' ? { syncConflicts: [...unitRecord.sync.conflicts] } : {}),
-    policy: {
-      tier: bound.tier,
-      preferExecutor: bound.executor,
-      preferInvocation: bound.invocation,
-      preferPersona: bound.persona,
-      // The rigor the unit asked for, so the policy's own rigor reads match what bind tiered on.
-      ...(unit.rigor ? { rigor: unit.rigor } : {}),
-      // The persona text a caller pinned for this role when it supplied the override: the prompt renders
-      // that text, never a file read again at dispatch time.
-      ...pinnedPersonaFor(unitRecord, seat.seat, bound.persona),
-    },
-  };
-}
-
 /** What a seat reads: the unit's inputs (already resolved to paths), then the accounts of the seats whose work it judges. */
 function contextRefsOf({ unitRecord, unit, mainRoot }, role, assignmentDir) {
   let contextRefs = [...new Set([...unitRecord.resolvedInputs, ...reportRefsOf(role.inputs, { mainRoot })])];
@@ -1008,7 +931,7 @@ async function dispatchBound(ctx, role, { bound, assignmentId, assignmentDir, ob
   fs.mkdirSync(assignmentDir, { recursive: true });
   const carriesOperation = Boolean(declaredOp && seat.posture.writer);
   const contextRefs = contextRefsOf(ctx, role, assignmentDir);
-  const assignment = unitAssignmentOf(ctx, role, { bound, assignmentId, objective, contextRefs, carriesOperation });
+  const assignment = buildUnitRunAssignment(ctx, role, { bound, assignmentId, objective, contextRefs, carriesOperation, writes: effectiveWriteScope(unitRecord) });
   const runResult = await executeAssignment(assignment, {
     cwd: unitRecord.worktree,
     repoRoot: mainRoot,
