@@ -40,6 +40,15 @@ test('a stop on a quota keeps its quota classification when the text has no dead
   assert.equal(fault.reasonCode, 'quota-limit');
 });
 
+test('a provider HTTP error stop moves the walk on but does not quarantine the account as quota or credential', () => {
+  // omp's last event on a refused model: stopReason "error" with errorStatus 404; the supervisor names it a
+  // provider stop with cause "provider", and the account itself is not known to be at fault.
+  const stderr = 'Cloud Code Assist API error (404): Requested entity was not found.';
+  const fault = classifyProviderCapacityFault({ provider: 'gemini', stderr, adapterOutcome: 'provider-limit', stopCause: 'provider' });
+  assert.equal(fault.action, 'evidence-only');
+  assert.equal(fault.reasonCode, 'provider-error');
+});
+
 // Measured 2026-10-13: the end of a codex round cut off by the account's usage limit.
 const CODEX_QUOTA_LINE = 'ERROR: You’ve hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro), visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 11:39 PM.';
 const CODEX_QUOTA_STDERR = `exec\nsucceeded in 480ms:\n${CODEX_QUOTA_LINE}\n${CODEX_QUOTA_LINE}\ntokens used\n379,854\n`;
@@ -120,6 +129,8 @@ test('settlement takes a provider stop and its cause from the caller, never from
     };
     const given = await settle('given', { adapterOutcome: 'provider-limit', providerStopCause: 'quota' });
     assert.deepEqual({ code: given.code, cause: given.cause }, { code: 'provider-limit', cause: 'quota' });
+    const providerError = await settle('provider-error', { adapterOutcome: 'provider-limit', providerStopCause: 'provider' });
+    assert.deepEqual({ code: providerError.code, cause: providerError.cause }, { code: 'provider-limit', cause: 'provider' });
     // The same stderr with no stop from the caller is an ordinary failure: the text is not judged here.
     assert.notEqual((await settle('none', {}))?.code, 'provider-limit');
   } finally {

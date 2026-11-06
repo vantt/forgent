@@ -957,8 +957,10 @@ function quotaQuarantineUntil(text, now) {
 }
 
 /**
- * `stopCause` ('credential' or 'quota') is the supervisor's verdict on why the provider stopped the agent, taken
- * from its receipt: it decides auth fault versus quota, and the text is never read for the class.
+ * `stopCause` ('credential', 'quota' or 'provider') is the supervisor's verdict on why the provider stopped the
+ * agent, taken from its receipt: it decides auth fault versus quota, and the text is never read for the class.
+ * A 'provider' stop (the provider answered the call with an HTTP error) moves the walk on but says nothing
+ * against the account, so it quarantines nothing.
  * `capacityEvidenceText` (a pane screen, which leaves no stderr) only dates a quota stop's reset time.
  */
 export function classifyProviderCapacityFault({ provider, stderr = '', adapterOutcome, structuredAgent, stopCause = null, capacityEvidenceText = '', now = Date.now() } = {}) {
@@ -977,6 +979,7 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
     if (stopCause === 'credential') {
       return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
     }
+    if (stopCause === 'provider') return { action: 'evidence-only', reasonCode: 'provider-error' };
     // The text carries the reset window when the provider named one; otherwise the
     // conservative default, never an expiry-less quarantine.
     return {

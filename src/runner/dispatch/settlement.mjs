@@ -709,7 +709,7 @@ export async function settleRunOutcome({
   receipt = null,
   adapterOutcome = null,
   // Why a provider stopped the agent is the supervisor's verdict: `adapterOutcome`, and `providerStopCause`
-  // ('credential' or 'quota'). Settlement never re-reads the agent's text for it.
+  // ('credential', 'quota' or 'provider'). Settlement never re-reads the agent's text for it.
   providerStopCause = null,
   // Text that only dates a quota stop's reset time for the capacity classifier (a pane screen); never judged.
   capacityEvidenceText = '',

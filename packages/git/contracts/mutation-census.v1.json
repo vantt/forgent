@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "36f617b99895cae2a0fe8a732a19c6eec50c5f860b229f52370f73e7e000926f",
+  "payloadDigest": "3647c3bdd83f2d5dbbc227363e9a8243e8ca2ce699eda3ee84208019815234fd",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1015,7 +1015,7 @@
     "src/runner/dispatch/provider-account-probe.mjs": "1ac9ba5c5cb5bd27240a42edbee5b6c60316bb37079c1d6332b2016feb4de1eb",
     "src/runner/dispatch/provider-adapter.mjs": "df1f9a898ed9b05cb336dd6620c74e41b5c54c4ae38c30ef50008566c5d8cb7a",
     "src/runner/dispatch/provider-auth-failure.mjs": "ad3d07cc29e54f6758694ed861afbf66fa30e6568905e9f9383ac7b6943f19f7",
-    "src/runner/dispatch/provider-capacity.mjs": "ca379acb5d5b3b43423ddd7295e1fc99d90d1b80b44ac442b865ced69693cc98",
+    "src/runner/dispatch/provider-capacity.mjs": "ebd11367d22117dc11b6d67538abc95aaeaad6684d44a86d48dac1ffa3f0d5f6",
     "src/runner/dispatch/provider-credential-probe.mjs": "636e65b7078eeb5a659c4eb38fff92306b8263f09748f50ac443dfa14c39dc71",
     "src/runner/dispatch/provider-credential-renewal.mjs": "e7d5db54388fede40b4432d1efd4ef9009fdce82804655482fbbc4b770778ad6",
     "src/runner/dispatch/reconciliation-planner.mjs": "470b4cc079d13accf997044c96dd037da3bcf41d89cb79427a248284e03ccf06",
@@ -1025,7 +1025,7 @@
     "src/runner/dispatch/run-result.mjs": "56cd35cfcfa3373e4992252a5574d9125af8896e8540d1a0b5384892d9d096f5",
     "src/runner/dispatch/run-timeout.mjs": "9d0bb5adca999cf689b8a0c6dce0cfc28f122de1393785fcb620f6f669086d40",
     "src/runner/dispatch/runtime-inspection.mjs": "f0f7282c6e2d3d661acb2e725f55140facf520d87392242508885ae4009a7fae",
-    "src/runner/dispatch/settlement.mjs": "14ce6f7d090dc1c8f4f16a5b3876753fc9f03463cd7883e78a830e236a3dace9",
+    "src/runner/dispatch/settlement.mjs": "36c49a10b38e568b76a2d8a44267fc88cc922eaf820a1d04ad92f04e5c6b0b5d",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/stop-processes-inside.mjs": "018abac624d8a4f10d5ad6209db9f765134ce4e304688897df076dfa99e2864e",
     "src/runner/dispatch/terminal-slot.mjs": "82ed4279c054f2486bb8f3223182c9a1043426d0cae2a846449eda29967665df",
