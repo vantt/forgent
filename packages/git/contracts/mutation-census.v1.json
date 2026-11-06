@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "da3dd330d8de8b3ba9a99ea329a65fb55e4274521ef2f5cb0bf41259b6273cf7",
+  "payloadDigest": "cdc2944d23941f7ba393995b950ad9e6e6bafa042de17914af34cd0b58ae964e",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -988,7 +988,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "6de1dfce1581cb914d56bbc5591362379f7f808e5db4e03f80ede09b51754855",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "6b35618fbb2349be178c672a52f05de765939d0eb68f1a1fa4a7535e291828f1",
-    "src/runner/dispatch/assignment-runner.mjs": "bcbdfee885a327575f39fb6dcc6aa37f384ecae4cfc52d627e2b66d796ee0248",
+    "src/runner/dispatch/assignment-runner.mjs": "a6a439ef30c4eddac2c3bc3f3f854898b03edff26541b54940b7354bfd920891",
     "src/runner/dispatch/assignment.mjs": "cb86292531aaf491ad93ec51f708fede5dbebed75af3be2ffc7cf176cf1f78f9",
     "src/runner/dispatch/brief.mjs": "7ec9287da887ff7022b0d1085dcac6e44847aef6bc81e533bed2595ecb02522b",
     "src/runner/dispatch/cli.mjs": "2b2c18f391cd2521c3350c9b71007a33b732a56d09596d13768be48c759f8eb7",
@@ -3317,15 +3317,15 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1405,
+      "line": 1091,
       "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:389",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1510,
-      "spawn": "startSupervisor -> src/run-supervisor/direct-launch.mjs:295",
+      "line": 1585,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1200",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
