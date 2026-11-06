@@ -13,7 +13,7 @@ import { ensureScriptAddon } from '../../../scripts/lib/git-ports.mjs';
 import { runUnit } from '../../../src/runner/execution/run.mjs';
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 import { runReviewed } from '../../../src/runner/execution/loops/reviewed.mjs';
-import { seatLaunchesOf, briefNeverReached, noBriefDelivered, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
+import { seatLaunchesOf, seatLaunchesUsed, briefNeverReached, noBriefDelivered, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 import { dispatchCwdHolder } from '../../../src/run-supervisor/cwd-lock.mjs';
 import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-port.mjs';
@@ -296,6 +296,13 @@ test('the seat-launch ceiling stops the fallback chain: a provider limit stays o
     unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' }, caseAdmission: recordingPort(), caseRef: { caseId: 'case-test', activity: 'scout' }, repoRoot: free.repoRoot, cwd: free.worktreeDir, worktree: free.worktreeDir,
   });
   assert.equal(open.outcome, 'pass');
+});
+
+test('an attempt whose account could not be leased started no worker, so it is not a launch of the seat', () => {
+  const attempt = (extra = {}) => ({ dispatchRetryId: 'r1', ...extra });
+  const record = { bindings: { 'producer/1': [attempt({ leaseConflict: true }), attempt({ outcome: 'provider-limit' }), attempt()], 'reviewer/1': [attempt()] } };
+  assert.equal(seatLaunchesUsed(record), 3);
+  assert.equal(seatLaunchesUsed({ bindings: { 'producer/1': [attempt({ leaseConflict: true })] } }), 0);
 });
 
 test('a run whose agents were never given their brief hands its dispatch back; one that was given it keeps it spent', async () => {

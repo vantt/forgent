@@ -45,6 +45,14 @@ test('an untouched worktree, dirty or not, is no change', () => {
   assert.deepEqual(writesSince(before, { worktree, repoRoot }), { paths: [], headMoved: false });
 });
 
+test('a file already dirty at the snapshot that changes again is a change, named by its path', () => {
+  const { repoRoot, worktree } = repoWithWorktree();
+  fs.writeFileSync(path.join(worktree, 'notes.txt'), 'mine');
+  const before = worktreeSnapshot({ worktree, repoRoot });
+  fs.writeFileSync(path.join(worktree, 'notes.txt'), 'mine and more');
+  assert.deepEqual(writesSince(before, { worktree, repoRoot }), { paths: ['notes.txt'], headMoved: false });
+});
+
 test('a dirty file that cannot be read is recorded, not a crash', { skip: process.getuid?.() === 0 ? 'root reads every file' : false }, () => {
   const { repoRoot, worktree } = repoWithWorktree();
   const file = path.join(worktree, 'locked.txt');
