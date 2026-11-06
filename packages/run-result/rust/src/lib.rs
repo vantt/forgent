@@ -895,24 +895,22 @@ mod tests {
 
         assert!(!entries.is_empty(), "fixture entries should not be empty");
 
+        // Every row is checked so one run lists every row the derivation answers differently.
+        let mut mismatches = Vec::new();
         for entry in entries {
-            let id = entry
-                .get("id")
-                .and_then(|v| v.as_str())
-                .unwrap_or("unknown");
-            let record = entry.get("record").expect("entry.record");
-            let expected_cat = entry
-                .get("expected")
-                .and_then(|e| e.get("category"))
-                .and_then(|c| c.as_str())
-                .expect("expected.category");
-
-            let outcome = derive_legacy_outcome(record);
-            assert_eq!(
-                outcome.category, expected_cat,
-                "Fixture mismatch for id {}: expected {}, got {}",
-                id, expected_cat, outcome.category
-            );
+            let id = entry["id"].as_str().unwrap_or("unknown");
+            let expected = &entry["expected"];
+            let outcome = derive_legacy_outcome(&entry["record"]);
+            let category = expected["category"].as_str().expect("expected.category");
+            if outcome.category != category {
+                mismatches.push(format!("{id}: category {} != {category}", outcome.category));
+            }
+            if let Some(reason) = expected["reason"].as_str() {
+                if outcome.reason != reason {
+                    mismatches.push(format!("{id}: reason {} != {reason}", outcome.reason));
+                }
+            }
         }
+        assert!(mismatches.is_empty(), "{}", mismatches.join("\n"));
     }
 }

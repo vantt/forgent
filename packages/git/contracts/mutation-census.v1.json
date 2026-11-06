@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3a8d4a7251fdd49add40a36b8932c0b8dd7f7a43f720aa6531d8c7e3dec7454d",
+  "payloadDigest": "7e3002a0b4ccc2a3d0451448a412d1791274a00d09a92ba0f8f42ed07e0aa35d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -648,7 +648,7 @@
     "packages/process/rust/tests/spawn_mapped.rs": "042440edb240a6b1c88c10fd554715ae3ec7b50f141871a2742571b65be8aac1",
     "packages/process/rust/tests/windows_job_domain.rs": "ef875f367c2bd361ba1e9743eb021bedfd7fac299781cc650e72fe06d6ba419c",
     "packages/process/rust/tests/windows_spawn.rs": "ac45d3b618d92790e926c41e7910f95f46440aab35ce1100e7f16c7a6b73fa97",
-    "packages/run-result/rust/src/lib.rs": "c1e91e32b70635407348994f24dafdce723d4cd5803a436c1a9577ad9982af35",
+    "packages/run-result/rust/src/lib.rs": "32eb339437e772b76d4fe7bf4f3e78b3beb784a54cca87dbcac4ce6b2f66f5f4",
     "packages/run-result/rust/src/unit_summary.rs": "175e44b839255d969d8ee959f85f1e1c7f35f47d9cd795a6f767242cdb370c09",
     "packages/run-result/rust/tests/layout_fixture.rs": "3fa57f7b3ee9292dd3b1242a971b276659a7684d90e67daa62119c6c1a08acb6",
     "packages/run-result/rust/tests/unit_summary.rs": "ae411edda54151b8b400760e7df0f8e457c72b779027828456ed17361f2bd606",
