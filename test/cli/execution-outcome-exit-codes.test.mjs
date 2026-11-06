@@ -129,7 +129,7 @@ test('fgos run exits with code 0 on pass while emitting valid json envelope', ()
     const res = spawnSync(process.execPath, [BIN_FGOS, 'run', '--unit', unitFile, '--dir', repoDir], {
       cwd: repoDir,
       encoding: 'utf8',
-      env: { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir },
+      env: { ...process.env, XDG_STATE_HOME: stateDir },
     });
 
     assert.equal(res.status, 0, `Expected exit 0, got ${res.status}: ${res.stderr}`);
@@ -156,7 +156,7 @@ test('fgos run exits with code 4 on policy-refusal while emitting valid json env
     const res = spawnSync(process.execPath, [BIN_FGOS, 'run', '--unit', unitFile, '--dir', repoDir], {
       cwd: repoDir,
       encoding: 'utf8',
-      env: { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir },
+      env: { ...process.env, XDG_STATE_HOME: stateDir },
     });
 
     assert.equal(res.status, 4, `Expected exit 4 (policy-refusal), got ${res.status}`);
@@ -210,7 +210,7 @@ test('fgos run exits with code 11 on execution-failure via real CLI', () => {
     const res = spawnSync(process.execPath, [BIN_FGOS, 'run', '--unit', unitFile, '--dir', repoDir], {
       cwd: repoDir,
       encoding: 'utf8',
-      env: { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir },
+      env: { ...process.env, XDG_STATE_HOME: stateDir },
     });
 
     assert.equal(res.status, 11, `Expected exit 11 (execution-failure), got ${res.status}: ${res.stderr}`);
@@ -234,7 +234,7 @@ test('fgos workflow start detached exits 0 on successful process spawn', () => {
     const res = spawnSync(process.execPath, [BIN_FGOS, 'workflow', 'start', '--units', unitsFile, '--dir', repoDir], {
       cwd: repoDir,
       encoding: 'utf8',
-      env: { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir },
+      env: { ...process.env, XDG_STATE_HOME: stateDir },
     });
 
     assert.equal(res.status, 0, `Expected exit 0 for detached spawn, got ${res.status}: ${res.stderr}`);
@@ -248,7 +248,7 @@ test('fgos workflow start detached exits 0 on successful process spawn', () => {
       const statusRes = spawnSync(process.execPath, [BIN_FGOS, 'workflow', 'status', envelope.data.workflowRunId, '--dir', repoDir], {
         cwd: repoDir,
         encoding: 'utf8',
-        env: { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir },
+        env: { ...process.env, XDG_STATE_HOME: stateDir },
       });
       if (statusRes.status === 0) {
         const s = JSON.parse(statusRes.stdout).data?.status;
@@ -273,7 +273,7 @@ test('fgos workflow start --foreground exits with non-zero matching the workflow
     const res = spawnSync(process.execPath, [BIN_FGOS, 'workflow', 'start', '--units', unitsFile, '--foreground', '--dir', repoDir], {
       cwd: repoDir,
       encoding: 'utf8',
-      env: { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir },
+      env: { ...process.env, XDG_STATE_HOME: stateDir },
     });
 
     assert.equal(res.status, 4, `Expected exit 4 for failed unit outcome, got ${res.status}`);
@@ -298,7 +298,7 @@ test('fgos workflow status on a failed run always exits 0', () => {
     const resRun = spawnSync(process.execPath, [BIN_FGOS, 'workflow', 'start', '--units', unitsFile, '--foreground', '--dir', repoDir], {
       cwd: repoDir,
       encoding: 'utf8',
-      env: { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir },
+      env: { ...process.env, XDG_STATE_HOME: stateDir },
     });
     assert.equal(resRun.status, 4);
     const runData = JSON.parse(resRun.stdout).data;
@@ -307,7 +307,7 @@ test('fgos workflow status on a failed run always exits 0', () => {
     const resStatus = spawnSync(process.execPath, [BIN_FGOS, 'workflow', 'status', runData.workflowRunId, '--dir', repoDir], {
       cwd: repoDir,
       encoding: 'utf8',
-      env: { ...process.env, XDG_STATE_HOME: stateDir, HOME: stateDir },
+      env: { ...process.env, XDG_STATE_HOME: stateDir },
     });
     assert.equal(resStatus.status, 0, `workflow status must exit 0, got ${resStatus.status}: ${resStatus.stderr}`);
     const statusData = JSON.parse(resStatus.stdout).data;

@@ -8,7 +8,7 @@ import os from 'node:os';
 import { loadRunnerConfigForDir, RunnerConfigError, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
 import { normalizeLegacyConfinement } from '../../src/runner/dispatch/confinement/policies.mjs';
 import { resolveExecutorConfig, resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
-import { writeProjectConfig, withHome } from '../helpers/config-fixture.mjs';
+import { writeGlobalConfig, writeProjectConfig, withHome } from '../helpers/config-fixture.mjs';
 
 // Phase 01 groups A and C5. The subject here is what an executor may declare about itself that the
 // schema cannot state: the one combination that must be refused before anything runs, and the removed fields
@@ -40,16 +40,17 @@ const FULL_CONFINEMENT = { privateHome: true, isolatedSession: true, ownWorktree
 
 test('A1: the loader keeps the declared profile and normalizes its legacy confinement flags', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-profile-cfg-'));
-  writeProjectConfig(dir, {
-    runner: runnerWith({
-      executors: {
-        sample: {
-          kind: 'agent', command: 'claude', args: ['{prompt}'], promptDelivery: 'file-pointer', permissionMode: 'bypass', confinement: FULL_CONFINEMENT,
-        },
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-profile-home-'));
+  const { executor, executors, ...project } = runnerWith({
+    executors: {
+      sample: {
+        kind: 'agent', command: 'claude', args: ['{prompt}'], promptDelivery: 'file-pointer', permissionMode: 'bypass', confinement: FULL_CONFINEMENT,
       },
-    }),
+    },
   });
-  const cfg = withHome(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-profile-home-')), () => loadRunnerConfigForDir(dir));
+  writeProjectConfig(dir, { runner: project });
+  writeGlobalConfig(home, { runner: { executor, executors } });
+  const cfg = withHome(home, () => loadRunnerConfigForDir(dir));
   const e = cfg.executors.sample;
   assert.equal(e.permissionMode, 'bypass');
   assert.deepEqual(e.confinement, normalizeLegacyConfinement(FULL_CONFINEMENT));

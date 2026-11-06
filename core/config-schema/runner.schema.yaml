@@ -13,10 +13,12 @@ properties:
     type: object
     properties:
       command:
+        x-fgos-scope: global-only
         description: "The program to spawn."
         type: string
         pattern: "\\S"
       args:
+        x-fgos-scope: global-only
         description: "Arguments of the program; {prompt} and {model} are replaced at launch."
         type: array
         items:
@@ -452,6 +454,7 @@ $defs:
         type: string
         pattern: "\\S"
       aliases:
+        x-fgos-scope: global-only
         description: "Other names the capability answers to."
         type: array
         items:
@@ -579,13 +582,16 @@ $defs:
     additionalProperties: false
     properties:
       backend:
+        x-fgos-scope: global-only
         description: "Name of the confinement backend that wraps the launch."
         type: string
         pattern: "\\S"
       privateHome:
+        x-fgos-scope: global-only
         description: "Whether the worker gets a private home."
         type: boolean
       isolatedSession:
+        x-fgos-scope: global-only
         description: "Whether the worker gets an isolated session."
         type: boolean
       ownWorktree:
@@ -644,10 +650,12 @@ $defs:
       adapter:
         $ref: "#/$defs/adapterName"
       command:
+        x-fgos-scope: global-only
         description: "The program to spawn, or for an MCP invocation its identifier."
         type: string
         pattern: "\\S"
       args:
+        x-fgos-scope: global-only
         description: "Arguments of the program; {prompt} and {model} are replaced at launch."
         type: array
         items:
@@ -662,6 +670,7 @@ $defs:
       env:
         $ref: "#/$defs/envMap"
       permissionMode:
+        x-fgos-scope: global-only
         description: "Whether the worker asks before acting; bypass needs full confinement."
         type: string
         enum: [ask, bypass]
@@ -779,10 +788,12 @@ $defs:
         type: string
         pattern: "\\S"
       command:
+        x-fgos-scope: global-only
         description: "The program to spawn when the executor has no invocations."
         type: string
         pattern: "\\S"
       args:
+        x-fgos-scope: global-only
         description: "Arguments of that program."
         type: array
         items:
@@ -792,6 +803,7 @@ $defs:
       env:
         $ref: "#/$defs/envMap"
       permissionMode:
+        x-fgos-scope: global-only
         description: "Whether the worker asks before acting."
         type: string
         enum: [ask, bypass]

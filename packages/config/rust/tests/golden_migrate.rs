@@ -169,18 +169,46 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
     let dir = common::temp("migrate", "real");
     fs::create_dir_all(dir.join("project/.fgos")).unwrap();
     fs::create_dir_all(dir.join("home/.fgos")).unwrap();
-    fs::write(dir.join("project/.fgos/config.json"), &source).unwrap();
+    // What the project file may not hold (the programs, their confinement, the executor order) is
+    // this machine's global file's; the project file keeps the rest.
+    let whole: Value = serde_json::from_slice(&source).unwrap();
+    let machine = common::machine_differences(&whole, &common::paths(&record, "differences"));
+    assert!(!machine.is_empty());
+    let (mut project_file, mut global_file) = (whole.clone(), json!({}));
+    for path in &machine {
+        common::put(
+            &mut global_file,
+            path,
+            common::at(&whole, path).unwrap().clone(),
+        );
+        common::remove(&mut project_file, path);
+    }
+    fs::write(
+        dir.join("project/.fgos/config.json"),
+        project_file.to_string(),
+    )
+    .unwrap();
+    fs::write(dir.join("home/.fgos/config.json"), global_file.to_string()).unwrap();
     let roots = common::lay_out(&dir, &json!({}));
     let opts = common::migrate_options(&dir, false, false);
     let writer = common::writer(&json!({"session": "vantt"}));
     let report = project(&ctx, &roots, &writer, &opts, |_| Ok(())).unwrap();
-    // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 37 values stay (the two tool executors, the impact-analysis pool and nine pools that never fall back to Codex are this repository's own).
-    assert_eq!(report.kept.len(), 37);
-    assert_eq!(report.dropped_redundant.len(), 257);
+    // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 24 values stay (the programs and tool executors are the global file's; the rest is this repository's own).
+    assert_eq!(report.kept.len(), 24);
+    assert_eq!(report.dropped_redundant.len(), 250);
     assert_eq!(report.dropped_retired, ["lock.predecessorKillWaitMs"]);
-    assert_eq!(
-        report.dropped_out_of_scope,
-        ["gateway.port", "gateway.token"]
+    // The two gateway keys, and the copies of the standard's own global-only values (executor
+    // order, invocation lists) the old file carried: none holds anything the standard lacks.
+    let (rest, gateway): (Vec<_>, Vec<_>) = report
+        .dropped_out_of_scope
+        .iter()
+        .partition(|p| !p.starts_with("gateway."));
+    assert_eq!(gateway, ["gateway.port", "gateway.token"]);
+    assert!(
+        rest.iter().all(|p| ["prefer", "aliases", "invocations"]
+            .iter()
+            .any(|key| p.ends_with(&format!(".{key}")))),
+        "{rest:?}"
     );
     assert_eq!(report.doc_converted, ["runner.$comment"]);
     assert!(report.machine_overrides.is_empty() && report.unknown_kept.is_empty());
@@ -196,15 +224,21 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
     );
     // The migrated project reads back through the snapshot with the value the old file means once
     // the dropped sections and the comment are set aside (read through its own legacy-JSON source).
-    let mut old: Value = serde_json::from_slice(&source).unwrap();
+    let mut old = project_file;
     old.as_object_mut()
         .unwrap()
         .retain(|k, _| k != "gateway" && k != "lock");
     old["runner"].as_object_mut().unwrap().remove("$comment");
+    // The migration drops the standard's own copies a project may no longer hold; read through the
+    // standard they mean the same value.
+    for path in &report.dropped_out_of_scope {
+        common::remove(&mut old, &path.split('.').map(str::to_string).collect());
+    }
     let twin = common::temp("migrate", "real-twin");
     fs::create_dir_all(twin.join("project/.fgos")).unwrap();
     fs::create_dir_all(twin.join("home/.fgos")).unwrap();
     fs::write(twin.join("project/.fgos/config.json"), old.to_string()).unwrap();
+    fs::write(twin.join("home/.fgos/config.json"), global_file.to_string()).unwrap();
     let before = snapshot(&ctx, &common::lay_out(&twin, &json!({})))
         .unwrap()
         .value;

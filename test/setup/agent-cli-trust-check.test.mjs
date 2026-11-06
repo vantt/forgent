@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { checkAgentCliProjectTrusted } from '../../src/setup/agent-cli-trust.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { moveMachineKeysTo, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const SECRET_LINE = 'api_key = "sk-do-not-print-this-value"';
 
@@ -165,6 +165,7 @@ test('the registered check reads the project config and the overridden HOME, nev
     const dir = codexHome(fixture.home, '.codex-reg');
     fs.mkdirSync(path.join(fixture.project, '.fgos'), { recursive: true });
     writeProjectConfig(fixture.project, { runner: { executor: { command: 'claude', args: [] }, timeoutMs: 1000, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, modelPolicies: { openai: { nano: 'm', mini: 'm', standard: 'm', advanced: 'm', flagship: 'm', frontier: 'm' } }, executors: { 'codex-trust': { kind: 'agent', providerModel: 'openai', invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', command: 'codex', args: [], env: { CODEX_HOME: dir } }] } } } });
+    moveMachineKeysTo(fixture.project, fixture.home);
     process.env.HOME = fixture.home;
     const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-cli-project-trusted');
     const result = entry.check(fixture.project);
