@@ -83,7 +83,7 @@ Settled without a phase: H-T4e closed (arbitration §2: short calls stay unconfi
 |---|---|---|---|---|
 | 01 | [Red proofs](phase-01-red-proofs.md) (branch only, never landed alone) **done 11-06 on `harden/t5-p01-red-proofs`** | — | — | 0 / 0 / 0 (counted where each lands) |
 | 02 | [Layering moves, A3 guard, A4 no-undef gate](phase-02-layering-moves-and-guards.md) **landed 11-06 `98e1c5824..7a4fa3654`** | 01 | — (touches import lines everywhere) | +80 / 0 / +20 |
-| 03 | [Credential and confinement doors (Q3b, A7, A8)](phase-03-credential-and-confinement-doors.md) | 02 | 04, 05, 07 | +90 / 0 / +100 |
+| 03 | [Credential and confinement doors (Q3b, A7, A8)](phase-03-credential-and-confinement-doors.md) **landed 11-06 `accc31973..51d5d02dd` after three security reviews** | 02 | 04, 05, 07 | +90 / 0 / +100 |
 | 04 | [Config tighten rule (Q2b)](phase-04-config-tighten-rule.md) **half A landed 11-06 `10a6b8425..fcdffd361`; half B open** | 02; command half: UQ-1 | 03, 05, 07 | 0 / +44 / +40 |
 | 05 | [Claude private trust store (Q1a)](phase-05-claude-private-trust-store.md) | 02 | 03, 04, 07 | −35 / 0 / −40 |
 | 06 | [Launch failure path (R-6, H-T4f)](phase-06-launch-failure-path.md) | 03, 05, 08, 11 | — | +15 / +15 / +40 |
