@@ -386,6 +386,61 @@ fn namespace_init_under(root: u32, sandboxed: bool) -> Option<u32> {
     Some(root)
 }
 
+/// Who held the pane's terminal when a send found the agent out of the foreground, for a person
+/// reading `supervisor.log`; nothing is decided from it. The terminal's foreground group as the gate's
+/// session leader (the pane's shell) reads it, then the state, group and session of each process from
+/// that leader down to the gate and of every descendant of the gate.
+fn foreground_facts(gate: u32) -> String {
+    const MOST: usize = 64;
+    let Some(table) = facts::relations() else {
+        return "the process table could not be read".into();
+    };
+    let of = |pid: u32| table.iter().find(|r| r.pid.0 == pid);
+    let Some(mut at) = of(gate) else {
+        return format!("the gate (pid {gate}) is gone");
+    };
+    let leader = at.session;
+    let mut chain = vec![gate];
+    while at.pid.0 != leader && chain.len() < MOST {
+        let Some(parent) = of(at.parent) else { break };
+        chain.push(parent.pid.0);
+        at = parent;
+    }
+    chain.reverse();
+    let mut below = vec![gate];
+    let mut next = 0;
+    while next < below.len() && below.len() < MOST {
+        let pid = below[next];
+        below.extend(table.iter().filter(|r| r.parent == pid).map(|r| r.pid.0));
+        next += 1;
+    }
+    let shown: Vec<String> = chain
+        .iter()
+        .chain(below.iter().skip(1))
+        .filter_map(|pid| of(*pid))
+        .map(|r| {
+            let role = match r.pid.0 {
+                pid if pid == gate => " gate",
+                pid if pid == leader => " shell",
+                _ => "",
+            };
+            let name = facts::command_name_of(r.pid).unwrap_or_else(|| "?".into());
+            format!(
+                "{}{role} ({name}) {} pgid {} sid {}",
+                r.pid.0, r.state, r.group, r.session
+            )
+        })
+        .collect();
+    let terminal = of(leader).map_or_else(
+        || "unknown (the session leader is gone)".to_string(),
+        |r| r.tty_foreground_group.to_string(),
+    );
+    format!(
+        "pane shell (session {leader}) terminal foreground group {terminal}; {}",
+        shown.join(", ")
+    )
+}
+
 /// The process a `{host, bootId, pidNs, pid, startTime}` record names.
 fn tuple_of(record: &Value) -> Option<ProcTuple> {
     Some(ProcTuple {
@@ -591,6 +646,10 @@ impl AgentIo for TermIo<'_, '_> {
             // brief: the attempt ends with the reason on its receipt, a failed attempt for the settlement.
             SendOutcome::ForegroundNotAgent { reason } => {
                 eprintln!("fgos internal supervise: nothing typed into the pane: {reason}");
+                eprintln!(
+                    "fgos internal supervise: pane foreground facts: {}",
+                    foreground_facts(self.sup.gate.pid.0)
+                );
                 self.sup
                     .begin_stop("cancel", Some(REASON_FOREGROUND_NOT_AGENT));
                 Err(IoError::Io(format!("nothing was typed: {reason}")))

@@ -237,22 +237,44 @@ fn an_attempt_that_cannot_go_on_closes_the_captured_pane_and_names_why() {
     );
 }
 
+/// An agent child that makes its own process group the terminal's foreground, as a CLI's tool can.
+const TAKES_THE_FOREGROUND: &str = "python3 -c 'import os, signal, time\n\
+os.setpgid(0, 0)\n\
+signal.signal(signal.SIGTTOU, signal.SIG_IGN)\n\
+tty = os.open(\"/dev/tty\", os.O_RDWR)\n\
+os.tcsetpgrp(tty, os.getpgrp())\n\
+open(\"{dir}/took-foreground.pid\", \"w\").write(str(os.getpid()))\n\
+time.sleep(600)' & sleep 600";
+
 #[test]
-fn a_brief_the_pane_refuses_because_its_shell_holds_the_foreground_ends_the_attempt_with_that_reason(
+fn a_brief_the_pane_refuses_because_its_shell_holds_the_foreground_ends_the_attempt_with_that_reason_and_logs_the_terminal_facts(
 ) {
     let herdr = FakeHerdr::new("shellfg");
     // Not at the prompt yet: the supervisor waits while the test takes the agent out of the foreground.
     herdr.set_explain(Verdict::Working);
-    let mut run = terminal_run("tshellfg", &herdr, "sleep 600", 3_000);
+    let mut run = terminal_run("tshellfg", &herdr, TAKES_THE_FOREGROUND, 3_000);
     let supervisor = run.start_with_env(&herdr.env());
 
-    wait_until(STEP, "the gate to report the agent", || {
-        run.json("agent-binding.json").is_some()
-    });
+    wait_until(
+        STEP,
+        "the agent's child to take the terminal foreground",
+        || {
+            run.json("agent-binding.json").is_some()
+                && fs::read_to_string(run.path("took-foreground.pid"))
+                    .is_ok_and(|pid| !pid.is_empty())
+        },
+    );
+    let taker: i32 = fs::read_to_string(run.path("took-foreground.pid"))
+        .unwrap()
+        .parse()
+        .unwrap();
     herdr.set_flag("no-process", true);
     herdr.set_explain(Verdict::Idle);
 
     let (code, line) = finish(supervisor, LIMIT);
+    // The child leads a group of its own, outside the gate's: end it here.
+    // SAFETY: SIGKILL to the process this test's agent script started.
+    unsafe { libc::kill(taker, libc::SIGKILL) };
     assert_eq!(code, 0, "{}", run.log());
     assert!(
         herdr.sent().is_empty(),
@@ -264,6 +286,29 @@ fn a_brief_the_pane_refuses_because_its_shell_holds_the_foreground_ends_the_atte
     assert_eq!(receipt["outcome"], "cancelled");
     assert_eq!(receipt["reason"], "terminal:foreground-not-agent");
     assert_eq!(run.json("stop-requested.json").unwrap()["cause"], "cancel");
+
+    // The log names who holds the terminal and where every process of the launch stands.
+    let gate = run.json("supervisor-binding.json").unwrap()["gate"]["pid"]
+        .as_u64()
+        .unwrap();
+    let log = run.log();
+    let facts = log
+        .lines()
+        .find(|l| l.contains("pane foreground facts:"))
+        .unwrap_or_else(|| panic!("no foreground facts in the log: {log}"));
+    assert!(
+        facts.contains(&format!("terminal foreground group {taker};")),
+        "{facts}"
+    );
+    assert!(
+        facts.contains(&format!("{gate} gate (")),
+        "the gate is listed: {facts}"
+    );
+    let taker_entry = format!("{taker} (python3) S pgid {taker} sid ");
+    assert!(
+        facts.contains(&taker_entry),
+        "the child is listed with its own group: {facts}"
+    );
 }
 
 #[test]

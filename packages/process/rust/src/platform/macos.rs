@@ -78,6 +78,7 @@ impl ProcessPlatform for Macos {
             group: info.pbi_pgid,
             session: u32::try_from(session).ok()?,
             tty_nr: i64::from(info.e_tdev),
+            tty_foreground_group: i64::from(info.e_tpgid),
             // Wall-clock microseconds of the start: ordered like the Linux ticks, on another clock.
             start_ticks: u64::from(info.pbi_start_tvsec) * 1_000_000
                 + u64::from(info.pbi_start_tvusec),

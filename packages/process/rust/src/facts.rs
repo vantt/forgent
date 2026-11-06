@@ -381,6 +381,9 @@ pub struct Relation {
     pub session: u32,
     /// Its controlling terminal device number; 0 means none (Linux `tty_nr`).
     pub tty_nr: i64,
+    /// The foreground process group of its controlling terminal (Linux `tpgid`); -1 or 0 when it
+    /// has none. Every process on one terminal reads the same value.
+    pub tty_foreground_group: i64,
     /// Start time in clock ticks since boot (Linux `starttime`): a process
     /// created later never has a smaller value.
     pub start_ticks: u64,
@@ -522,6 +525,8 @@ pub(crate) struct Stat {
     pub group: u32,
     pub session: u32,
     pub tty_nr: i64,
+    /// Foreground process group of the controlling terminal (field 8).
+    pub tty_foreground_group: i64,
     /// Start time in clock ticks since boot (field 22).
     pub start_ticks: u64,
 }
@@ -543,11 +548,12 @@ pub(crate) fn parse_stat(line: &str) -> Option<Stat> {
         group: fields.next()?.parse().ok()?,
         session: fields.next()?.parse().ok()?,
         tty_nr: fields.next()?.parse().ok()?,
-        start_ticks: fields.nth(14)?.parse().ok()?,
+        tty_foreground_group: fields.next()?.parse().ok()?,
+        start_ticks: fields.nth(13)?.parse().ok()?,
     })
 }
 
-/// Parent, group, state and start time from one `/proc/<pid>/stat` line.
+/// Parent, group, session, terminal, state and start time from one `/proc/<pid>/stat` line.
 pub fn parse_relation(pid: ProcId, line: &str) -> Option<Relation> {
     let stat = parse_stat(line)?;
     Some(Relation {
@@ -556,6 +562,7 @@ pub fn parse_relation(pid: ProcId, line: &str) -> Option<Relation> {
         group: stat.group,
         session: stat.session,
         tty_nr: stat.tty_nr,
+        tty_foreground_group: stat.tty_foreground_group,
         start_ticks: stat.start_ticks,
         state: stat.state,
     })
@@ -683,7 +690,7 @@ mod tests {
     }
 
     #[test]
-    fn parses_parent_group_and_start_from_a_stat_line_with_spaces_in_comm() {
+    fn parses_parent_group_terminal_and_start_from_a_stat_line_with_spaces_in_comm() {
         let line = "4242 (weird) name (x)) S 100 4242 77 34816 4242 4194304 0 0 0 0 1 2 0 0 20 0 1 0 987654 1 2 3";
         assert_eq!(
             parse_relation(ProcId(4242), line),
@@ -693,6 +700,7 @@ mod tests {
                 group: 4242,
                 session: 77,
                 tty_nr: 34816,
+                tty_foreground_group: 4242,
                 start_ticks: 987654,
                 state: 'S'
             })
