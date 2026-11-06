@@ -85,9 +85,10 @@ function paneScreenOf(runDir, envelope) {
 
 /**
  * The provider stop a receipt reason names: the one table from the supervisor's name to an outcome.
- * `*:blocked:usage-limit` and `*:blocked:login` are a provider limit, which moves the caller to
- * another account or candidate (a login is also a credential fault, so the walk does not land on
- * the provider whose login just failed); every other blocked name and `terminal:needs-human` is a
+ * `*:blocked:usage-limit`, `*:blocked:login` and `*:blocked:provider-error` are a provider limit, which
+ * moves the caller to another account or candidate (a login is also a credential fault, so the walk does
+ * not land on the provider whose login just failed; a provider error is the provider's own fault, such as
+ * an HTTP 404 for the model); every other blocked name and `terminal:needs-human` is a
  * person to wait for, never a success. A result in the outbox is judged as reported whatever else the
  * receipt says. The outcome stays the receipt's own: a deadline stop that names the provider is still
  * a timeout. A name this table does not know settles on the receipt outcome alone.
@@ -99,6 +100,7 @@ export function providerStopOf(receipt, claimed = Boolean(receipt.outboxResult))
   if (blocked) {
     if (blocked[1] === 'usage-limit') return { adapterOutcome: 'provider-limit', cause: 'quota' };
     if (blocked[1] === 'login') return { adapterOutcome: 'provider-limit', cause: 'credential' };
+    if (blocked[1] === 'provider-error') return { adapterOutcome: 'provider-limit', cause: 'provider' };
     return { adapterOutcome: 'blocked', cause: null };
   }
   return reason === 'terminal:needs-human' ? { adapterOutcome: 'blocked', cause: null } : null;

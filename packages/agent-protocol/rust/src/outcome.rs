@@ -2,12 +2,14 @@
 
 use std::path::PathBuf;
 
-/// What only a person can fix before the CLI can serve a round.
+/// What stops the CLI from serving a round: something only a person can fix, or a provider that
+/// refused the round (a used-up quota, or an API error such as a 404 for the model).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BlockedReason {
     TrustDialog,
     Login,
     UsageLimit,
+    ProviderError,
 }
 
 impl BlockedReason {
@@ -17,6 +19,7 @@ impl BlockedReason {
             BlockedReason::TrustDialog => "trust-dialog",
             BlockedReason::Login => "login",
             BlockedReason::UsageLimit => "usage-limit",
+            BlockedReason::ProviderError => "provider-error",
         }
     }
 }

@@ -397,6 +397,42 @@
       }
     },
     {
+      "name": "a-provider-api-error-on-an-idle-screen-is-blocked-provider-error",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "provider-error"
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "blocked",
+        "reason": "provider-error"
+      },
+      "source": "error line verbatim from a real omp 18.17.0 pane on herdr (gemini-4-argon over google-antigravity, 2026-11-06, provider route faults report); prompt and status line filled in around it; detector verdict copied from the recorded turn-finished screen"
+    },
+    {
+      "name": "an-api-error-the-agent-mentions-mid-sentence-keeps-waiting",
+      "step": "detect-completed",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "working...\nThe old log shows a Cloud Code Assist API error (404) from yesterday's run.\n π > ◒ Gemini 4 Argon",
+            "inspection": {
+              "state": "idle"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "outcome": "none"
+      },
+      "source": "agent prose quoting the error wording; only a line that starts with the error is the CLI speaking"
+    },
+    {
       "name": "login-wording-inside-agent-text-on-a-blocked-screen-is-needs-human",
       "step": "await-ready",
       "script": {

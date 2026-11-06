@@ -482,6 +482,10 @@ fn a_deadline_stop_names_a_provider_stop_on_the_screen_and_keeps_the_timeout_out
             "dlogin",
             "working...\nNot logged in \u{b7} Please run /login\n".to_string(),
         ),
+        (
+            "dapierror",
+            "working...\n\u{2718} Cloud Code Assist API error (404): { \"error\": { \"code\": 404,\n".to_string(),
+        ),
         // The agent may have been working: its own prose about a rate limit, or a dialog, names nothing.
         (
             "dprose",
@@ -499,8 +503,9 @@ fn a_deadline_stop_names_a_provider_stop_on_the_screen_and_keeps_the_timeout_out
     assert_eq!(receipts[0]["gateExit"]["stoppedBy"], "soft-deadline");
     assert_eq!(receipts[0]["reason"], "terminal:blocked:usage-limit");
     assert_eq!(receipts[1]["reason"], "terminal:blocked:login");
-    assert!(receipts[2].get("reason").is_none(), "{}", receipts[2]);
+    assert_eq!(receipts[2]["reason"], "terminal:blocked:provider-error");
     assert!(receipts[3].get("reason").is_none(), "{}", receipts[3]);
+    assert!(receipts[4].get("reason").is_none(), "{}", receipts[4]);
 }
 
 #[test]

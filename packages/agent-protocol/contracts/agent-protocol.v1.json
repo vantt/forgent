@@ -10,7 +10,7 @@
   },
   "results": {
     "ready": "terminal: the CLI shows an empty prompt and can take the brief",
-    "blocked": { "reason": { "enum": ["trust-dialog", "login", "usage-limit"] }, "meaning": "the CLI waits for something only a person can do" },
+    "blocked": { "reason": { "enum": ["trust-dialog", "login", "usage-limit", "provider-error"] }, "meaning": "the CLI waits for something only a person can do, or its provider refused the round (provider-error: an HTTP 4xx/5xx other than 401/403, from the last JSON event in direct mode or an `api error (<status>)` line on a terminal screen)" },
     "delivered": "terminal: the brief is confirmed submitted (not merely visible)",
     "delivery-unknown": "terminal: could not confirm; never resend blind",
     "completed": { "resultPath": "absolute path of outbox/result-<N>.json", "meaning": "the agent finished and its result file exists" },
@@ -22,7 +22,7 @@
     "decides": [
       "activity source for idle: growth of the stdout capture (any new text, a JSON event line included)",
       "completion: agent exited and outbox/result-<N>.json exists -> completed; exited without it -> exited(code) unless a blocked/needs-human pattern was read",
-      "named blocked results from known output patterns (login prompt, trust dialog, usage limit)",
+      "named blocked results from known output patterns on the stderr tail (login prompt, usage limit), and provider-error from the stdout tail's last JSON event (stopReason error with an errorStatus of 4xx/5xx other than 401/403)",
       "the supervisor puts a blocked result in the receipt's `reason` as `direct:blocked:<reason>` (only for a non-zero exit with no outbox result); the settle step maps it to an outcome"
     ]
   },

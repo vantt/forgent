@@ -557,15 +557,15 @@ impl Sup<'_> {
         }
     }
 
-    /// A deadline stop reads the screen once and names the provider when it ends on a dead login or a used-up
-    /// quota, so the caller moves to another account. The outcome stays `timeout`. A trust dialog or any other
-    /// screen names nothing: the agent may simply have been working.
+    /// A deadline stop reads the screen once and names the provider when it ends on a dead login, a used-up
+    /// quota or a provider's API error, so the caller moves to another account. The outcome stays `timeout`.
+    /// A trust dialog or any other screen names nothing: the agent may simply have been working.
     fn provider_stop_reason(&self, core: &Core, key: &str) -> Option<String> {
         let screen = core.read(key, None, Some("visible")).ok()?;
         match self.adapter.stop_reason(&screen)? {
-            reason @ (BlockedReason::Login | BlockedReason::UsageLimit) => {
-                TerminalOutcome::Blocked(reason).receipt_reason()
-            }
+            reason @ (BlockedReason::Login
+            | BlockedReason::UsageLimit
+            | BlockedReason::ProviderError) => TerminalOutcome::Blocked(reason).receipt_reason(),
             BlockedReason::TrustDialog => None,
         }
     }

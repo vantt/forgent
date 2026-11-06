@@ -57,7 +57,7 @@ In direct mode the adapter needs no port at all: the gate gave the brief to the 
 | Result | Meaning | Mode |
 |---|---|---|
 | `completed(resultPath)` | The agent finished and `outbox/result-<N>.json` exists (the newest by number) | both |
-| `blocked(reason)` with `login`, `trust-dialog`, `usage-limit` | The CLI waits for something only a person can do, or its quota is used up. `usage-limit` is named in both modes by the same anchored wording rule (below) | both |
+| `blocked(reason)` with `login`, `trust-dialog`, `usage-limit`, `provider-error` | The CLI waits for something only a person can do, its quota is used up, or its provider refused the round with an HTTP error (`provider-error`, for example a 404 for the model). `usage-limit` is named in both modes by the same anchored wording rule (below) | both |
 | `needs-human` | The agent asked a question only a person can answer | both |
 | `exited(code)` | The process exited without a result file | direct |
 | `ready` | The CLI shows an empty prompt and can take the brief | terminal |
@@ -68,18 +68,20 @@ Rules for direct mode, as implemented:
 
 1. A result file wins over everything else: `completed`, whatever the tail says (a wording quoted inside the agent's own output is not a block).
 2. Without a result file the **final words** decide: only the last 5 non-empty lines of the capture are examined (`TAIL_LINES`). A login or quota wording far up a long capture is not a block.
-3. Login wordings (for example `oauth refresh failed`, `invalid_grant`, `run /login`, `not logged in`, an API key reported missing, invalid or expired) give `blocked(login)`. Quota wordings (`you've hit your usage limit`, `usage limit has been reached`, `individual quota reached`) give `blocked(usage-limit)`. The wordings are those the Node runner already classifies at settlement (`provider-auth-failure.mjs`), cut down to what a live round needs.
-4. Otherwise `exited(code)`.
+3. Login wordings (for example `oauth refresh failed`, `invalid_grant`, `run /login`, `not logged in`, an API key reported missing, invalid or expired) give `blocked(login)`. Quota wordings (`you've hit your usage limit`, `usage limit has been reached`, `individual quota reached`) give `blocked(usage-limit)`. The wordings are those the Node runner already classifies at settlement (`provider-auth-failure.mjs`), cut down to what a live round needs. These are read on the stderr capture.
+4. A json-mode CLI writes its provider's refusal as an event on stdout: when the newest parseable line of the stdout tail is a pi-family event (`message_end`, `turn_end`, or `agent_end`'s last message) with `stopReason: error` and an `errorStatus` of 4xx or 5xx other than 401 and 403, the result is `blocked(provider-error)`. 401 and 403 are a login, named only by a login wording.
+5. Otherwise `exited(code)`.
 
 The same wording rule holds in both modes and on every path that judges a stop:
 
 - A wording joins the matchers only with a recorded vector (a real capture under `packages/agent-protocol/contracts/fixtures/`) that shows it.
 - On a terminal screen, login and quota wordings match from the **start of the line**, after an optional `error` (login also `warning` or `fatal`) label. The screen also carries the agent's own text, so a wording in the middle of a sentence is not the CLI speaking. Direct mode reads the last 5 capture lines (`TAIL_LINES`) and matches a login wording anywhere on one of them (a glog line carries it mid-line); quota is anchored in both.
-- The terminal paths that already know the agent stopped use one rule: the detector said `blocked` (at the ready gate or after delivery), or the screen is idle after delivery. All three call the same classification (trust dialog, login, then quota). The screen-only checks that run before any stop is known (start banner, the ready gate's own screen look, the unruled wait) skip quota, so quota text left in scrollback never stops a launch.
+- A provider's API error on a terminal screen (omp: `✘ Cloud Code Assist API error (404): {...`) is a line that starts, after a marker symbol and an `error` label, with at most four words naming the API and then `api error (<status>)`, the status 4xx or 5xx other than 401 and 403; it gives `blocked(provider-error)`. An agent's sentence that mentions such an error is not the CLI speaking.
+- The terminal paths that already know the agent stopped use one rule: the detector said `blocked` (at the ready gate or after delivery), or the screen is idle after delivery. All three call the same classification (trust dialog, login, quota, then provider API error). The screen-only checks that run before any stop is known (start banner, the ready gate's own screen look, the unruled wait) skip quota and provider API errors, so such text left in scrollback never stops a launch.
 
 `trust-dialog` and `needs-human` exist in the contract; the direct adapters have no output pattern for them (they belong to the interactive prompt). Only the terminal adapters return them (section 5.1). 
 
-Receipt reasons the protocol renders (`TerminalOutcome::receipt_reason` and the `REASON_*` constants in `packages/agent-protocol/rust/src/terminal/mod.rs`; the full list with their meanings is `toReceiptReason` in [terminal-outcomes.v1.json](../../../packages/agent-protocol/contracts/terminal-outcomes.v1.json)): `terminal:blocked:<login|trust-dialog|usage-limit>`, `terminal:needs-human`, `terminal:delivery-unknown`, and the four early ends the supervisor itself names, `terminal:foreground-not-agent`, `terminal:agent-not-started`, `terminal:result-unreadable`, `terminal:completed-no-exit`. The direct mode's `direct:blocked:<reason>` arm arrives when the supervisor's settle step calls `Direct::classify` (not wired yet; the Node settle step still re-reads the screen, section 8).
+Receipt reasons the protocol renders (`TerminalOutcome::receipt_reason` and the `REASON_*` constants in `packages/agent-protocol/rust/src/terminal/mod.rs`; the full list with their meanings is `toReceiptReason` in [terminal-outcomes.v1.json](../../../packages/agent-protocol/contracts/terminal-outcomes.v1.json)): `terminal:blocked:<login|trust-dialog|usage-limit|provider-error>`, `terminal:needs-human`, `terminal:delivery-unknown`, and the four early ends the supervisor itself names, `terminal:foreground-not-agent`, `terminal:agent-not-started`, `terminal:result-unreadable`, `terminal:completed-no-exit`. The direct mode's `direct:blocked:<reason>` arm arrives when the supervisor's settle step calls `Direct::classify` (not wired yet; the Node settle step still re-reads the screen, section 8).
 
 ## 5. Adapter per CLI and mode
 
@@ -138,7 +140,7 @@ The supervisor tails the stdout and stderr capture files (up to 64 KiB per tick)
 - No stdin policy: the envelope states it and the gate applies it (section 6).
 - One dependency outside the crate: the L0 leaf `fgos-durable-file`, for the outbox's no-follow bounded read. Nothing else below terminal-control, locks or attempts.
 - The protocol is the one place that names an outcome. The settle step in Node still re-reads the screen to classify it again; deleting that re-read is the run-supervisor work that wires `Direct::classify` and the `direct:blocked:<reason>` receipt arm, not this component's.
-- No retry decision: `blocked(login)` and `blocked(usage-limit)` are facts the controller turns into provider-capacity behavior (fail over to another account, lock a dead login) elsewhere.
+- No retry decision: `blocked(login)`, `blocked(usage-limit)` and `blocked(provider-error)` are facts the controller turns into provider-capacity behavior (fail over to another account, lock a dead login) elsewhere.
 - The terminal adapters read screens through the supervisor's `AgentIo` over terminal-control, by key; they never call terminal-control themselves.
 
 ## 9. Lịch sử quyết định
@@ -149,6 +151,8 @@ The supervisor tails the stdout and stderr capture files (up to 64 KiB per tick)
 - **2026-10-18 — Adapters `terminal` portable từ vòng canh của controller.** Regex và logic chờ cũ (`PASTE_CHIP_RE`, `isDraftStillInComposer`, `MAX_RESENDS`) chuyển nguyên sang Rust; test Node cũ thành vector màn hình thật. Gõ lại chỉ khi lời gõ lỗi và pane không đổi; một lời gõ thành công không bao giờ lặp. Kết quả chỉ tính khi file parse được và kích thước ổn định (đo: pi tạo file rỗng rồi mới điền).
 
 - **2026-10-24 — Một cơ quan định danh kết quả cho cả hai mode.** `blocked(usage-limit)` được đặt tên ở `terminal` như ở `direct`; cách ghi lời (neo đầu dòng trên màn hình, chỉ thêm khi có vector thu thật) là một quy tắc cho mọi đường. Bỏ khỏi protocol những gì không ai đọc hoặc thuộc nơi khác: `read()`/`activity()` của `AgentIo`, `Activity::Event`, `StdinPolicy` (stdin là của envelope và gate), sáu adapter `direct` giống nhau (thành một struct). Outbox đọc có chặn trên (16 MiB), no-follow, chỉ file thường, và mọi lần chờ đi qua `pause`. Nguồn: phiên chốt `plans/reports/council-261024-1947-harden-t3a-arbitration.md` §2 và quyết định chủ 30 trong `plans/261021-1118-harden-low-layers-bottom-up/plan.md`. Bước settle của Node vẫn đọc lại màn hình; nối `classify` của `direct` và xoá đoạn đọc lại đó thuộc tầng run-supervisor.
+
+- **2026-11-06 — Lỗi API của provider là một lý do chặn riêng, `provider-error`.** omp gặp `Cloud Code Assist API error (404)` rồi ngồi yên ở prompt, nên lượt chạy chỉ dừng khi hết giờ. Không lý do sẵn có nào khớp: `usage-limit` là hết quota (cách ly theo giờ reset), `login` là hỏng đăng nhập (khoá tới khi người đăng nhập lại), còn 404 là lỗi phía provider. Tên mới `provider-error` (settle: `provider-limit`, cause `provider`) cho vòng chọn ghế chuyển sang ứng viên khác. Màn hình: dòng neo đầu `<tối đa bốn từ> api error (<4xx|5xx>)`; headless: sự kiện JSON cuối trên stdout có `stopReason: error` và `errorStatus`. 401/403 không bao giờ là `provider-error`.
 
 ## 10. Related files
 

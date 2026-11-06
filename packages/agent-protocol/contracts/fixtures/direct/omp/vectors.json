@@ -78,6 +78,32 @@
         "kind": "blocked",
         "reason": "login"
       }
+    },
+    {
+      "name": "blocked-provider-error-from-the-last-json-event",
+      "cli": "omp",
+      "exitCode": 1,
+      "captureTail": "",
+      "stdoutTail": "{\"type\":\"message_start\",\"message\":{\"role\":\"assistant\",\"content\":[],\"api\":\"google-gemini-cli\",\"provider\":\"google-antigravity\",\"model\":\"gemini-4-argon\",\"stopReason\":\"pending\"}}\n{\"type\":\"message_end\",\"message\":{\"role\":\"assistant\",\"content\":[],\"api\":\"google-gemini-cli\",\"provider\":\"google-antigravity\",\"model\":\"gemini-4-argon\",\"stopReason\":\"error\",\"errorMessage\":\"Cloud Code Assist API error (404): {\\n  \\\"error\\\": {\\n    \\\"code\\\": 404,\\n    \\\"message\\\": \\\"Requested entity was not found.\\\",\\n    \\\"status\\\": \\\"NOT_FOUND\\\"\\n  }\\n}\\n\",\"errorStatus\":404,\"credentialId\":2}}\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "blocked",
+        "reason": "provider-error"
+      },
+      "source": "`omp --mode json -p` event fields verbatim from a real gemini-4-argon run that got HTTP 404 (2026-11-06, provider route faults report); the event envelope is the pi-family message_end shape"
+    },
+    {
+      "name": "an-http-401-in-the-last-json-event-is-not-a-provider-error",
+      "cli": "omp",
+      "exitCode": 1,
+      "captureTail": "",
+      "stdoutTail": "{\"type\":\"message_start\",\"message\":{\"role\":\"assistant\",\"content\":[],\"api\":\"google-gemini-cli\",\"provider\":\"google-antigravity\",\"model\":\"gemini-4-argon\",\"stopReason\":\"pending\"}}\n{\"type\":\"message_end\",\"message\":{\"role\":\"assistant\",\"content\":[],\"api\":\"google-gemini-cli\",\"provider\":\"google-antigravity\",\"model\":\"gemini-4-argon\",\"stopReason\":\"error\",\"errorMessage\":\"Cloud Code Assist API error (401): {\\n  \\\"error\\\": {\\n    \\\"code\\\": 404,\\n    \\\"message\\\": \\\"Requested entity was not found.\\\",\\n    \\\"status\\\": \\\"NOT_FOUND\\\"\\n  }\\n}\\n\",\"errorStatus\":401,\"credentialId\":2}}\n",
+      "resultFile": null,
+      "expect": {
+        "kind": "exited",
+        "code": 1
+      },
+      "source": "the 404 event with its status set to 401: an auth refusal is a login, which only a login wording names"
     }
   ]
 }

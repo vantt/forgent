@@ -119,6 +119,13 @@ fn a_direct_agent_that_exits_on_a_provider_stop_names_it_in_the_receipt_unless_i
         direct_receipt("dquota", &format!("{quota}; exit 1")).unwrap()["reason"],
         "direct:blocked:usage-limit"
     );
+    // The provider's API error is read from the last JSON event on stdout, where a json-mode CLI writes it.
+    let api_error =
+        r#"echo '{"type":"message_end","message":{"stopReason":"error","errorStatus":404}}'"#;
+    assert_eq!(
+        direct_receipt("dapi", &format!("{api_error}; exit 1")).unwrap()["reason"],
+        "direct:blocked:provider-error"
+    );
     // A result in the outbox wins over whatever the agent printed last.
     let reported = direct_receipt(
         "dwon",

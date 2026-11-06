@@ -1,0 +1,8 @@
+
+ Reply with exactly one line: the model name you are running as.
+
+
+ ✘ Cloud Code Assist API error (404): { "error": { "code": 404, "message": "Requested entity was not found.",
+
+ π > ◒ Gemini 4 Argon > 🗑 …/work/project > ▶────────0%────────────────────────────────────────────────────
+╰─

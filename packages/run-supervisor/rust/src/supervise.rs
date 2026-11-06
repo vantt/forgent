@@ -153,8 +153,9 @@ fn capture_tail(path: &Path) -> String {
     }
 }
 
-/// The provider stop a direct agent's last words name, as the receipt's `reason`. Only an agent that exited
-/// non-zero with no result in the outbox is read; a result in the outbox always wins.
+/// The provider stop a direct agent's last words name, as the receipt's `reason`: a login or quota wording on
+/// stderr, or a provider's API error in its last JSON event on stdout. Only an agent that exited non-zero
+/// with no result in the outbox is read; a result in the outbox always wins.
 fn direct_reason(
     envelope: &Value,
     gate_exit: Option<&Value>,
@@ -164,7 +165,12 @@ fn direct_reason(
     let code = gate_exit?["exitCode"]
         .as_i64()
         .filter(|code| *code != 0 && outcome == "exited" && outbox_result.is_none())?;
-    let stderr = capture_tail(Path::new(envelope["launch"]["capture"]["stderr"].as_str()?));
+    let capture = &envelope["launch"]["capture"];
+    let stderr = capture_tail(Path::new(capture["stderr"].as_str()?));
+    // A FIFO or absent stdout capture reads as empty: only a file holds the CLI's last JSON event.
+    let stdout = capture["stdout"]
+        .as_str()
+        .map_or_else(String::new, |path| capture_tail(Path::new(path)));
     let adapter = adapter_for(
         envelope["agentProtocol"]["cli"]
             .as_str()
@@ -176,6 +182,7 @@ fn direct_reason(
                 code: i32::try_from(code).ok(),
             },
             &stderr,
+            &stdout,
             None,
         )
         .receipt_reason()

@@ -460,6 +460,7 @@ fn every_receipt_reason_and_stop_constant_is_named_in_the_contract() {
         TerminalOutcome::Blocked(BlockedReason::TrustDialog),
         TerminalOutcome::Blocked(BlockedReason::Login),
         TerminalOutcome::Blocked(BlockedReason::UsageLimit),
+        TerminalOutcome::Blocked(BlockedReason::ProviderError),
         TerminalOutcome::NeedsHuman,
         TerminalOutcome::DeliveryUnknown,
     ]
@@ -474,6 +475,7 @@ fn every_receipt_reason_and_stop_constant_is_named_in_the_contract() {
             "terminal:blocked:trust-dialog",
             "terminal:blocked:login",
             "terminal:blocked:usage-limit",
+            "terminal:blocked:provider-error",
             "terminal:needs-human",
             "terminal:delivery-unknown",
         ]

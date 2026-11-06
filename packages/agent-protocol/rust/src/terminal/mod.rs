@@ -11,7 +11,7 @@ use std::time::SystemTime;
 
 use serde_json::Value;
 
-use crate::direct::{is_quota_limit, newest_result, screen_login};
+use crate::direct::{is_provider_error, is_quota_limit, newest_result, screen_login};
 use crate::outcome::BlockedReason;
 use crate::port::{AgentIo, Inspection, IoError, SendInput};
 
@@ -275,10 +275,17 @@ pub fn adapter_for(cli: &str) -> Option<Terminal> {
     Some(Terminal { profile })
 }
 
-fn quota_on(screen: &str) -> bool {
-    lines_of_interest(screen)
+/// The provider's refusal the bottom of a screen shows where the agent has stopped: a used-up quota, or
+/// an API error.
+fn provider_stop_on(screen: &str) -> Option<BlockedReason> {
+    let lines = lines_of_interest(screen);
+    if lines.iter().any(|line| is_quota_limit(line)) {
+        return Some(BlockedReason::UsageLimit);
+    }
+    lines
         .iter()
-        .any(|line| is_quota_limit(line))
+        .any(|line| is_provider_error(line))
+        .then_some(BlockedReason::ProviderError)
 }
 
 fn lines_of_interest(screen: &str) -> Vec<String> {
@@ -337,13 +344,13 @@ impl Terminal {
         }
     }
 
-    /// Why the agent has stopped on this screen: a blocking dialog, a dead login or a used-up
-    /// quota. Only for the places that already know the agent stopped (an idle screen, a deadline
+    /// Why the agent has stopped on this screen: a blocking dialog, a dead login, a used-up
+    /// quota or a provider's API error. Only for the places that already know the agent stopped (an idle screen, a deadline
     /// stop); the screen-only checks (start banner, ready gate, unruled wait) use `screen_stop`,
     /// so quota text left in scrollback never stops a launch.
     pub fn stop_reason(&self, screen: &str) -> Option<BlockedReason> {
         self.classify_blocked(screen)
-            .or_else(|| quota_on(screen).then_some(BlockedReason::UsageLimit))
+            .or_else(|| provider_stop_on(screen))
     }
 
     fn blocked_readiness(&self, io: &mut dyn AgentIo) -> Readiness {
@@ -661,8 +668,8 @@ impl Terminal {
     }
 
     /// One look while the agent works: a complete result file wins over
-    /// anything on screen; otherwise a dialog or a provider limit the agent
-    /// cannot get past without a person ends the wait, named `blocked`. `None` keeps waiting.
+    /// anything on screen; otherwise a dialog, a provider limit or a provider's API error the agent
+    /// cannot get past ends the wait, named `blocked`. `None` keeps waiting.
     pub fn detect_completed(
         &self,
         io: &mut dyn AgentIo,
@@ -678,8 +685,8 @@ impl Terminal {
         }
         if state != "working" && !seen.visible_working {
             let screen = io.screen().ok()?;
-            if quota_on(&screen) {
-                return Some(TerminalOutcome::Blocked(BlockedReason::UsageLimit));
+            if let Some(reason) = provider_stop_on(&screen) {
+                return Some(TerminalOutcome::Blocked(reason));
             }
         }
         None

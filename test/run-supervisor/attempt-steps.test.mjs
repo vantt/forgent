@@ -379,6 +379,7 @@ test('the receipt reason names the provider stop and one table turns the name in
   for (const prefix of ['terminal', 'direct']) {
     assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:usage-limit` }), stop('provider-limit', 'quota'));
     assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:login` }), stop('provider-limit', 'credential'));
+    assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:provider-error` }), stop('provider-limit', 'provider'));
     assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:trust-dialog` }), stop('blocked'));
     // A name the table does not know is a person to wait for, never a success.
     assert.deepEqual(providerStopOf({ reason: `${prefix}:blocked:something-new` }), stop('blocked'));

@@ -42,11 +42,13 @@ impl Direct {
         }
     }
 
-    /// `result_path` is the newest `outbox/result-<N>.json`, when one exists.
+    /// `result_path` is the newest `outbox/result-<N>.json`, when one exists. `stderr_tail` is read
+    /// for a login or quota wording; `stdout_tail` only for the CLI's last JSON event.
     pub fn classify(
         &self,
         exit: ExitInfo,
-        capture_tail: &str,
+        stderr_tail: &str,
+        stdout_tail: &str,
         result_path: Option<&Path>,
     ) -> Outcome {
         if let Some(path) = result_path {
@@ -54,8 +56,11 @@ impl Direct {
                 result_path: path.to_path_buf(),
             };
         }
-        if let Some(reason) = blocked_reason(capture_tail) {
+        if let Some(reason) = blocked_reason(stderr_tail) {
             return Outcome::Blocked(reason);
+        }
+        if last_event_is_provider_error(stdout_tail) {
+            return Outcome::Blocked(BlockedReason::ProviderError);
         }
         Outcome::Exited { code: exit.code }
     }
@@ -168,6 +173,52 @@ pub(crate) fn is_quota_limit(line: &str) -> bool {
         || rest.starts_with("usage limit has been reached")
         || rest.starts_with("individual quota reached")
         || out_of_credits(rest)
+}
+
+/// The provider refused the round with an HTTP error, as the CLI's last JSON event says: a pi-family
+/// event (`message_end`, `turn_end`) whose message has `stopReason: error` and an `errorStatus` of 4xx or
+/// 5xx, or an `agent_end` whose last message does. 401 and 403 are a login, never this. The newest line
+/// that parses is the last event: a capture tail can start inside a longer line.
+fn last_event_is_provider_error(stdout_tail: &str) -> bool {
+    let Some(event) = tail(stdout_tail)
+        .iter()
+        .rev()
+        .find_map(|line| serde_json::from_str::<serde_json::Value>(line).ok())
+    else {
+        return false;
+    };
+    let message = match &event["messages"] {
+        serde_json::Value::Array(messages) => messages.last().unwrap_or(&serde_json::Value::Null),
+        _ => &event["message"],
+    };
+    message["stopReason"] == "error"
+        && message["errorStatus"]
+            .as_u64()
+            .is_some_and(|status| (400..600).contains(&status) && status != 401 && status != 403)
+}
+
+/// A provider's API error on a terminal screen, as omp draws it: `✘ Cloud Code Assist API error (404): {...`.
+/// The line starts with the error (after a marker symbol and an `error` label), at most four words name the
+/// API before `api error (<status>)`, so the agent's own sentence that mentions one is not the CLI speaking.
+/// 401 and 403 are a login, never this.
+pub(crate) fn is_provider_error(line: &str) -> bool {
+    let line = line.to_lowercase();
+    let rest = strip_label(strip_marker(&line), &["error"]);
+    let Some((api, after)) = rest.split_once("api error (") else {
+        return false;
+    };
+    let words: Vec<&str> = api.split_whitespace().collect();
+    let status = after.get(..4).and_then(|s| s.strip_suffix(')'));
+    words.len() <= 4
+        && words
+            .iter()
+            .all(|word| word.chars().all(|c| c.is_alphanumeric() || c == '-'))
+        && status.is_some_and(|s| {
+            s.bytes().all(|b| b.is_ascii_digit())
+                && matches!(s.as_bytes()[0], b'4' | b'5')
+                && s != "401"
+                && s != "403"
+        })
 }
 
 /// Drops one leading symbol a TUI draws before an error line (`■ `, `⚠ `): a non-ASCII character that is

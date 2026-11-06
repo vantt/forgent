@@ -24,6 +24,7 @@ fn expected(expect: &Value, outbox: &Path) -> Outcome {
         "blocked" => Outcome::Blocked(match expect["reason"].as_str().unwrap() {
             "login" => BlockedReason::Login,
             "usage-limit" => BlockedReason::UsageLimit,
+            "provider-error" => BlockedReason::ProviderError,
             other => panic!("unknown reason {other}"),
         }),
         other => panic!("unknown kind {other}"),
@@ -50,6 +51,7 @@ fn every_cli_vector_classifies_as_recorded() {
             let got = adapter.classify(
                 exit,
                 vector["captureTail"].as_str().unwrap(),
+                vector["stdoutTail"].as_str().unwrap_or_default(),
                 result.as_deref(),
             );
             assert_eq!(
@@ -68,6 +70,7 @@ fn only_a_provider_stop_of_a_direct_run_names_a_receipt_reason() {
         BlockedReason::TrustDialog,
         BlockedReason::Login,
         BlockedReason::UsageLimit,
+        BlockedReason::ProviderError,
     ]
     .map(|reason| Outcome::Blocked(reason).receipt_reason());
     assert_eq!(
@@ -75,7 +78,8 @@ fn only_a_provider_stop_of_a_direct_run_names_a_receipt_reason() {
         [
             Some("direct:blocked:trust-dialog".to_string()),
             Some("direct:blocked:login".into()),
-            Some("direct:blocked:usage-limit".into())
+            Some("direct:blocked:usage-limit".into()),
+            Some("direct:blocked:provider-error".into())
         ]
     );
     for ended in [
@@ -99,12 +103,12 @@ fn unknown_cli_is_named_generic_and_still_has_its_last_words_read() {
     assert_eq!(adapter.cli(), "generic");
     let login = "No API key found for openrouter.\n";
     assert_eq!(
-        adapter.classify(ExitInfo { code: Some(1) }, login, None),
+        adapter.classify(ExitInfo { code: Some(1) }, login, "", None),
         Outcome::Blocked(BlockedReason::Login)
     );
     let done = Path::new("/run/outbox/result-1.json");
     assert_eq!(
-        adapter.classify(ExitInfo { code: Some(0) }, login, Some(done)),
+        adapter.classify(ExitInfo { code: Some(0) }, login, "", Some(done)),
         Outcome::Completed {
             result_path: done.to_path_buf()
         }
@@ -161,7 +165,7 @@ fn later_api_key_wording_on_a_line_still_blocks() {
     let adapter = adapter_for("claude");
     let tail = "the api key you gave is wrong; api key invalid\n";
     assert_eq!(
-        adapter.classify(ExitInfo { code: Some(1) }, tail, None),
+        adapter.classify(ExitInfo { code: Some(1) }, tail, "", None),
         Outcome::Blocked(BlockedReason::Login)
     );
 }
