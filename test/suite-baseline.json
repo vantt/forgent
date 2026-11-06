@@ -1,8 +1,8 @@
 {
-  "sha": "c1c5b6973af5c23f48f5a996cbb4fbe8e2f49498",
-  "files": 612,
-  "tests": 8088,
-  "rustTests": 2204,
+  "sha": "8cb30d76f646a26e2915dbc0c2398b452d64bef1",
+  "files": 611,
+  "tests": 8009,
+  "rustTests": 2267,
   "wallSeconds": 635,
   "cpuSeconds": 6720,
   "fileCpu": {
@@ -442,6 +442,7 @@
     "test/scripts/write-test-marker.test.mjs": 0.1,
     "test/scripts/write-wrapper-script.test.mjs": 0.2,
     "test/seat-binding/client.test.mjs": 0.2,
+    "test/seat-binding/exec-budget.test.mjs": 7.4,
     "test/seat-binding/route-doctor-check.test.mjs": 0.6,
     "test/session-identity/attempt-writer-id.test.mjs": 0.3,
     "test/setup/active-release-drift-check.test.mjs": 2.8,
@@ -472,6 +473,7 @@
     "test/setup/doctor-strict-exit.test.mjs": 24.6,
     "test/setup/event-store-checks.test.mjs": 9.8,
     "test/setup/event-store-fixes.test.mjs": 0.8,
+    "test/setup/executor-posture-coverage-check.test.mjs": 0.3,
     "test/setup/executor-profile-warnings.test.mjs": 0.1,
     "test/setup/git-checks.test.mjs": 2.9,
     "test/setup/gitignore-docs-history-not-excluded.test.mjs": 0.1,
