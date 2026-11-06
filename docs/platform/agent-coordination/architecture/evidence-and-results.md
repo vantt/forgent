@@ -28,8 +28,9 @@ The implementation column below bounds the retained text. Proposed typed interfa
 
 | Section | Status | Evidence / limit |
 |---|---|---|
-| Evidence Sources | Current contract/invariant | src/runner/dispatch/run-result.mjs:19 CONFIDENCE_LEVELS; src/runner/dispatch/evidence-attribution.mjs:25-76 (pre/post hashes, dirty-before exclusion); run-result.mjs:520-532 policy refusals; assignment-runner.mjs:9 |
-| Aggregation | Normative evidence-quality boundary, not a shipped majority-scoring module | Run outcome interpretation is in run-result.mjs:1305-1377; synthesis must retain unsupported branches rather than treating consensus as external evidence. |
+| Evidence Sources | Current contract/invariant | `CONFIDENCE_LEVELS` in src/runner/dispatch/run-result.mjs; src/runner/dispatch/evidence-attribution.mjs:25-76 (pre/post hashes, dirty-before exclusion); policy refusals in `normalizeRunResultV3` (run-result.mjs); assignment-runner.mjs:9 |
+| Outcome derivation | Current contract | One derivation: the Rust crate `fgos-run-result` through the combined addon (`runResult.deriveOutcome`, called by `deriveOutcome` in run-result.mjs); one vector file `test/fixtures/run-outcome/legacy-derivation.json` (28 rows, category and reason) proves it. Every writer writes contract version 3 (the lease refusal included); version 2 and 3 records stay readable, version 4 is refused as corrupt (`d40d74ea1`, 2026-11-06). |
+| Aggregation | Normative evidence-quality boundary, not a shipped majority-scoring module | Run outcome interpretation is `interpretRunResult` and `runOutcome` in run-result.mjs; synthesis must retain unsupported branches rather than treating consensus as external evidence. |
 
 ## Principle
 
@@ -57,13 +58,13 @@ No one source proves every operation type.
 
 ## Confidence Boundaries
 
-- Worker self-report alone cannot produce externally verified confidence (src/runner/dispatch/run-result.mjs:1276-1285).
-- Exit code zero cannot satisfy missing semantic outputs: the evidence floor still requires the appropriate worker report or external delta (src/runner/dispatch/run-result.mjs:1250-1285).
+- Worker self-report alone cannot produce externally verified confidence (`classifyEvidenceToOutcomeFacts` in src/runner/dispatch/settlement.mjs).
+- Exit code zero cannot satisfy missing semantic outputs: the evidence floor still requires the appropriate worker report or external delta (`classifyEvidenceToOutcomeFacts` in src/runner/dispatch/settlement.mjs).
 - Pre-existing dirty files cannot count as changes produced by the Run (src/runner/dispatch/evidence-attribution.mjs:55-70).
-- RunResult records with another Run's identity are rejected (src/runner/dispatch/run-result.mjs:153-157,295-299). This is not a worker-claim runId check: agent-result-claim-contract.mjs:52-90 validates claim shape without that identity check. Delta attribution uses the current Run's pre/post state; it is not a general age-based stale-evidence validator.
-- Read-only output may remain `reported`; the runtime gates this by assignment.mutation === read-only, not an unstamped TaskSpec permission (src/runner/dispatch/assignment.mjs:938-940; run-result.mjs:1276-1285).
-- Mutating success requires post-run external evidence appropriate to the claim (src/runner/dispatch/run-result.mjs:1276-1285).
-- Missing required reports/deltas yield `no-evidence` under the evidence floor (src/runner/dispatch/run-result.mjs:1276-1285); corrupt result records fail closed separately (run-result.mjs:1305-1333).
+- RunResult records with another Run's identity are rejected (`expectedRunId` in `validateRunResultV2` and `validateRunResultV3`, src/runner/dispatch/run-result.mjs). This is not a worker-claim runId check: agent-result-claim-contract.mjs:52-90 validates claim shape without that identity check. Delta attribution uses the current Run's pre/post state; it is not a general age-based stale-evidence validator.
+- Read-only output may remain `reported`; the runtime gates this by assignment.mutation === read-only, not an unstamped TaskSpec permission (`isReadOnlyAssignment` in src/runner/dispatch/assignment.mjs; `classifyEvidenceToOutcomeFacts` in settlement.mjs).
+- Mutating success requires post-run external evidence appropriate to the claim (`classifyEvidenceToOutcomeFacts` in src/runner/dispatch/settlement.mjs).
+- Missing required reports/deltas yield `no-evidence` under the evidence floor (`classifyEvidenceToOutcomeFacts` in src/runner/dispatch/settlement.mjs, `deriveEvidenceFloor` in run-result.mjs); corrupt result records fail closed separately (`interpretRunResult`).
 
 ## Aggregation
 
