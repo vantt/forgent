@@ -1,6 +1,6 @@
 # P04 half A: a project config may only tighten confinement
 
-Branch `harden/t5-p04`, commits `7cfb3f4e0` (red) and `81a0ec844` (fix). Half B (executor command/args global-only) NOT done: waits on the owner question.
+Branch `harden/t5-p04`, rebased on origin/main `166afbc53`: red `c228ca8d6`, fix `2a8ba5fc5`, CFG review fixes `f9719d5df` (hashes after rebase). Half B (executor command/args global-only) NOT done: waits on the owner question.
 
 ## What changed
 - New `x-fgos-merge: tighten` (annotations list, meta schema). Merges like `replace`; after the merge `snapshot.rs::lowered` compares the project layer's value at each `tighten` path with the merge of the layers beneath it and refuses a lowering as `config-confinement-lowered` (path + project file/line/column, no value). Registered in `failure-codes.v1.json` and `failure-matrix.v1.json` (proven in `golden_snapshot.rs`).
@@ -45,5 +45,15 @@ Rust src +111 (snapshot +89 incl. docs and two small helpers `rule_at`/`docs_of`
 
 ## For other phases / owner
 - Half B waits on the owner question; this checkout's committed project config holds executor commands (plan fact 2), not touched.
+
+## CFG review fixes
+- H1: `lowers` now refuses a lower rank, and at any rank a policy name other than the lower layer's (a lower layer naming none leaves it free) or an opened `allowInvocationOverride`. Spec wording aligned with the schema description and CHANGELOG.
+- M1/L4: the tighten proof moved to shared fixtures `snapshot.v1.json` (8 cases: weaker mode, raise with same policy, raise plus swap, override opened, no lower policy accepts a name, strict off, refusal from the trusted checkout naming `project@trusted:config.yaml`, worktree-only lowering ignored) and `scope.v1.json` (global-only map entry). The Rust policy-swap, strict and scope tests were retired; owners are those fixtures. Kept in Rust: the bundled-schema wiring tests (lowered, equal/raise, replace-whole). `config-confinement-lowered` is no longer in `proven-in-rust` (fixture cases own it).
+- M2: `withGlobalConfig` now writes a scratch home and runs the body under `withHome`; the real home is never touched.
+- L1: a merge failure of the lower layers returns the mismatch (fail closed). L2: lowering refusals are added before the sort; a null project value is skipped. L3: `judge` doc comment states the entry-level refusal.
+- Gates: cargo test/clippy/fmt/msvc/darwin green; focused Node green except `doc-health live self-check`: dead reference `docs/storytelling-material/` at `docs/platform/governance.md:111`, present on origin/main, not touched by this branch. Full suite: pass 8698, fail 2 = the V7n addendum and that doc-health check; no `run-tests: ERROR`.
+
+## Half B scope (recorded, not done)
+Other project-settable surfaces that lower confinement, found by the reviewer: `runner.executors.<id>.invocations[].confinement.backend|privateHome|isolatedSession`, `permissionMode: bypass`, a capability's `prefer` pointing at a non-bwrap invocation, and a capability's `aliases` rebinding to a project-defined unconfined capability (resolve.mjs ~:36-44). Half B covers them with the command/args move.
 
 Status: DONE_WITH_CONCERNS
