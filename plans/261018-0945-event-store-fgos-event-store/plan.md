@@ -11,6 +11,8 @@ blocks: []   # Git 07 and 08 wait for ES-11 and ES-05 by phase edge, see Cross-p
 created: 2026-10-18
 ---
 
+> **Reviewer 2026-11-06.** On the owner's word (15:39) the `lead:ES` reviewer role is merged into `lead:OPC` (`claude-muyt@fg-server2`, mailbox `forgent-claude-5f`). OPC reviews every Event Store change: the full diff, the crate tests, clippy and the census. Open items: the `background-seal.test.mjs:98` flake reported by TEST; MAIL's `mailbox.message-sent` schemaVersion bump to a signed body hash (mail retention); the post-land check of TEST's seal cuts.
+>
 > **Status 2026-10-25: completed.** Phases 09–11 are done. Work and porting cut over on all three machines on 2026-10-24: fg-server2 at 20:58 (grant `51bee6b53`), fg-server at 21:58 (IDENT) and design-lap forgentX at 21:45 (SEAT); revision `af617cb5…` on each. The owner confirmed on 2026-10-24 23:3x that the other projects are done too. Fixes after the cutover landed: `55018b032` (merge hook, legacy-layout check, F17), `7349fe1e0` (`fgos events import-legacy`), `0a5143717` (a moved clone keeps its store id) and `work/close-out` (admission mirror proof, quiesce test). What remains is in "Hand-offs received for after the cutover": the stray-shard import runs on fg-server and design-lap, and H33 with D4–D7, D13 and D14 at the fence release. Further Event Store changes (HARDEN 04b) are reviewed by `lead:ES`. The role is vacant from 2026-10-25 19:05 (session `claude-uygd@fg-server2` closed on the owner's word); whoever takes 04b part 2 runs `fgos identity session --role lead:ES`, fills the board row and reviews against the hand-off table below.
 >
 > **Status 2026-10-22.** Phases 01–08 are done on main:
