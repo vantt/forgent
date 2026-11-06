@@ -17,7 +17,7 @@ import { recordCustodyHandoff } from '../../run-supervisor/cwd-lock.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from '../../run-supervisor/worker-artifacts.mjs';
-import { normalizeRunResultV2, readSettledResult, ASSESSMENT_VERDICTS, runOutcome, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
+import { normalizeRunResultV3, readSettledResult, ASSESSMENT_VERDICTS, runOutcome, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
 import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 import {
   commitRunSettlement,
@@ -1462,7 +1462,7 @@ export async function executeAssignment(assignment, opts = {}) {
         // flight. Settle it properly instead, using the exact same
         // result.json/run.json/markRunSettled sequence the normal completion
         // path below uses, classified via runtime.executionError so
-        // normalizeRunResultV2 derives execStatus:"failed",
+        // normalizeRunResultV3 derives execStatus:"failed",
         // failure:{family:"provider", code:"provider-capacity-refused"}, and
         // policy:{disposition:"needs-input"} through its own existing rules --
         // no new override channel invented. `predecessorRunId`/`retryId` are
@@ -1493,7 +1493,7 @@ export async function executeAssignment(assignment, opts = {}) {
           tests: [],
         };
         fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
-        const refusedRunResult = normalizeRunResultV2({
+        const refusedRunResult = normalizeRunResultV3({
           runId,
           assignmentId: effectiveAssignment.assignmentId,
           workId: effectiveAssignment.workId,

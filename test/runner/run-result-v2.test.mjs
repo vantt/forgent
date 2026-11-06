@@ -14,9 +14,22 @@ import {
   DELIVERY_MODES,
   PROVENANCE_VALUES,
   validateRunResultV2,
-  normalizeRunResultV2,
+  validateRunResultV3,
+  normalizeRunResultV3,
   interpretRunResult,
 } from '../../src/runner/dispatch/run-result.mjs';
+
+/** The version-2 record the retired version-2 writer made of the same facts: no outcome, legacy status and confidence stored. */
+function asV2(v3) {
+  const { outcome: _outcome, ...classification } = v3.classification;
+  return {
+    ...v3,
+    contract: { id: 'assignment-run-result', version: 2 },
+    classification: { ...classification, provenance: 'native-v2' },
+    status: v3.status,
+    confidence: v3.confidence,
+  };
+}
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-runresult-v2-test-'));
@@ -30,11 +43,11 @@ test('closed vocabularies are defined and frozen', () => {
   assert.deepEqual(FAILURE_FAMILIES, ['provider', 'resource', 'contract', 'policy', 'external-interference', 'unknown']);
   assert.deepEqual(POLICY_DISPOSITIONS, ['allow', 'refuse', 'needs-input', 'not-applicable']);
   assert.deepEqual(DELIVERY_MODES, ['fresh', 'resumed', 'replayed', 'recovered', 'legacy-derived']);
-  assert.deepEqual(PROVENANCE_VALUES, ['native-v2', 'native-v3', 'native-v4', 'legacy-derived', 'contract-corrupt']);
+  assert.deepEqual(PROVENANCE_VALUES, ['native-v2', 'native-v3', 'legacy-derived', 'contract-corrupt']);
 });
 
-test('normalizeRunResultV2: clean pass produces done status and native-v2 provenance', () => {
-  const res = normalizeRunResultV2({
+test('normalizeRunResultV3: clean pass produces done status and native-v3 provenance', () => {
+  const res = normalizeRunResultV3({
     runId: 'run_clean_001',
     assignmentId: 'asgn_001',
     runtime: { exitCode: 0, stdoutLog: 'stdout.log' },
@@ -43,7 +56,7 @@ test('normalizeRunResultV2: clean pass produces done status and native-v2 proven
   });
 
   assert.equal(res.contract.id, 'assignment-run-result');
-  assert.equal(res.contract.version, 2);
+  assert.equal(res.contract.version, 3);
   assert.equal(res.status, 'done');
   assert.equal(res.confidence, 'reported');
   assert.equal(res.classification.execution.status, 'completed');
@@ -51,14 +64,14 @@ test('normalizeRunResultV2: clean pass produces done status and native-v2 proven
   assert.equal(res.classification.assessment.verdict, 'pass');
   assert.equal(res.classification.failure, null);
   assert.equal(res.classification.policy.disposition, 'allow');
-  assert.equal(res.classification.provenance, 'native-v2');
+  assert.equal(res.classification.provenance, 'native-v3');
 
-  const validation = validateRunResultV2(res);
+  const validation = validateRunResultV3(res);
   assert.ok(validation.valid, `Validation failed: ${validation.reasons?.join(', ')}`);
 });
 
-test('normalizeRunResultV2: reviewer finding is execution.completed plus assessment.findings (not provider failure)', () => {
-  const res = normalizeRunResultV2({
+test('normalizeRunResultV3: reviewer finding is execution.completed plus assessment.findings (not provider failure)', () => {
+  const res = normalizeRunResultV3({
     runId: 'run_rev_001',
     assignmentId: 'asgn_rev_001',
     role: 'reviewer',
@@ -85,12 +98,12 @@ test('normalizeRunResultV2: reviewer finding is execution.completed plus assessm
   assert.equal(res.status, 'failed');
   assert.equal(res.confidence, 'reported');
 
-  const validation = validateRunResultV2(res);
+  const validation = validateRunResultV3(res);
   assert.ok(validation.valid, `Validation failed: ${validation.reasons?.join(', ')}`);
 });
 
-test('normalizeRunResultV2: provider crash maps to failure.family: provider', () => {
-  const res = normalizeRunResultV2({
+test('normalizeRunResultV3: provider crash maps to failure.family: provider', () => {
+  const res = normalizeRunResultV3({
     runId: 'run_err_001',
     assignmentId: 'asgn_err_001',
     runtime: { exitCode: 1, stderrLog: 'stderr.log' },
@@ -104,12 +117,12 @@ test('normalizeRunResultV2: provider crash maps to failure.family: provider', ()
   assert.equal(res.status, 'failed');
   assert.equal(res.confidence, 'failed');
 
-  const validation = validateRunResultV2(res);
+  const validation = validateRunResultV3(res);
   assert.ok(validation.valid, `Validation failed: ${validation.reasons?.join(', ')}`);
 });
 
-test('normalizeRunResultV2: timeout maps to failure.family: resource and code: execution-timeout', () => {
-  const res = normalizeRunResultV2({
+test('normalizeRunResultV3: timeout maps to failure.family: resource and code: execution-timeout', () => {
+  const res = normalizeRunResultV3({
     runId: 'run_to_001',
     assignmentId: 'asgn_to_001',
     runtime: { exitCode: 124, isTimeout: true },
@@ -122,12 +135,12 @@ test('normalizeRunResultV2: timeout maps to failure.family: resource and code: e
   assert.equal(res.status, 'failed');
   assert.equal(res.confidence, 'failed');
 
-  const validation = validateRunResultV2(res);
+  const validation = validateRunResultV3(res);
   assert.ok(validation.valid, `Validation failed: ${validation.reasons?.join(', ')}`);
 });
 
-test('normalizeRunResultV2: completion-unknown maps to status: no-evidence and confidence: no-evidence', () => {
-  const res = normalizeRunResultV2({
+test('normalizeRunResultV3: completion-unknown maps to status: no-evidence and confidence: no-evidence', () => {
+  const res = normalizeRunResultV3({
     runId: 'run_unk_001',
     assignmentId: 'asgn_unk_001',
     runtime: { exitCode: null },
@@ -140,12 +153,12 @@ test('normalizeRunResultV2: completion-unknown maps to status: no-evidence and c
   assert.equal(res.status, 'no-evidence');
   assert.equal(res.confidence, 'no-evidence');
 
-  const validation = validateRunResultV2(res);
+  const validation = validateRunResultV3(res);
   assert.ok(validation.valid, `Validation failed: ${validation.reasons?.join(', ')}`);
 });
 
-test('normalizeRunResultV2: policy refusal preserves execution and assessment facts without erasing artifacts', () => {
-  const res = normalizeRunResultV2({
+test('normalizeRunResultV3: policy refusal preserves execution and assessment facts without erasing artifacts', () => {
+  const res = normalizeRunResultV3({
     runId: 'run_pol_001',
     assignmentId: 'asgn_pol_001',
     role: 'reviewer',
@@ -175,12 +188,12 @@ test('normalizeRunResultV2: policy refusal preserves execution and assessment fa
   assert.equal(res.evidence.artifacts.length, 1);
   assert.equal(res.evidence.findingRefs[0], 'review:F-1');
 
-  const validation = validateRunResultV2(res);
+  const validation = validateRunResultV3(res);
   assert.ok(validation.valid, `Validation failed: ${validation.reasons?.join(', ')}`);
 });
 
-test('normalizeRunResultV2: same-task replay records delivery.mode: replayed and sourceRunId', () => {
-  const res = normalizeRunResultV2({
+test('normalizeRunResultV3: same-task replay records delivery.mode: replayed and sourceRunId', () => {
+  const res = normalizeRunResultV3({
     runId: 'run_rep_002',
     assignmentId: 'asgn_rep_001',
     deliveryMode: 'replayed',
@@ -192,7 +205,7 @@ test('normalizeRunResultV2: same-task replay records delivery.mode: replayed and
   assert.equal(res.classification.delivery.mode, 'replayed');
   assert.equal(res.classification.delivery.sourceRunId, 'run_original_001');
 
-  const validation = validateRunResultV2(res);
+  const validation = validateRunResultV3(res);
   assert.ok(validation.valid, `Validation failed: ${validation.reasons?.join(', ')}`);
 });
 
@@ -201,39 +214,43 @@ test('validateRunResultV2 detects contract corruption', () => {
   const corrupt1 = { contract: { id: 'assignment-run-result', version: 2 }, runId: 'r1' };
   assert.ok(validateRunResultV2(corrupt1).corrupt);
 
+  // A record each case below breaks in one place is valid as it stands.
+  const sound = validateRunResultV2(asV2(normalizeRunResultV3({ runId: 'r0', runtime: { exitCode: 0 }, agentClaim: { status: 'done', summary: 'ok' } })));
+  assert.ok(sound.valid, `Validation failed: ${sound.reasons.join(', ')}`);
+
   // 2. Projection mismatch
-  const corrupt2 = normalizeRunResultV2({
+  const corrupt2 = asV2(normalizeRunResultV3({
     runId: 'r2',
     runtime: { exitCode: 0 },
     agentClaim: { status: 'done', summary: 'ok' },
-  });
+  }));
   corrupt2.status = 'corrupted-status';
   assert.ok(validateRunResultV2(corrupt2).corrupt);
 
   // 3. execution.completed with non-null provider failure
-  const corrupt3 = normalizeRunResultV2({
+  const corrupt3 = asV2(normalizeRunResultV3({
     runId: 'r3',
     runtime: { exitCode: 0 },
     agentClaim: { status: 'done', summary: 'ok' },
-  });
+  }));
   corrupt3.classification.failure = { family: 'provider', code: 'fake' };
   assert.ok(validateRunResultV2(corrupt3).corrupt);
 
   // 4. policy.refuse with no policy code
-  const corrupt4 = normalizeRunResultV2({
+  const corrupt4 = asV2(normalizeRunResultV3({
     runId: 'r4',
     runtime: { exitCode: 0 },
     agentClaim: { status: 'done', summary: 'ok' },
-  });
+  }));
   corrupt4.classification.policy = { disposition: 'refuse', code: null };
   assert.ok(validateRunResultV2(corrupt4).corrupt);
 
   // 5. delivery.replayed without sourceRunId
-  const corrupt5 = normalizeRunResultV2({
+  const corrupt5 = asV2(normalizeRunResultV3({
     runId: 'r5',
     runtime: { exitCode: 0 },
     agentClaim: { status: 'done', summary: 'ok' },
-  });
+  }));
   corrupt5.classification.delivery = { mode: 'replayed' };
   assert.ok(validateRunResultV2(corrupt5).corrupt);
 });
@@ -286,17 +303,18 @@ test('interpretRunResult interprets legacy v1 deterministically and preserves fi
 });
 
 test('interpretRunResult treats a present unsupported contract as corrupt, never as legacy v1', () => {
-  const nativeV2 = normalizeRunResultV2({
+  const nativeV2 = asV2(normalizeRunResultV3({
     runId: 'run_contract_demoted',
     assignmentId: 'asgn_contract_demoted',
     runtime: { exitCode: 0, stdoutLog: 'stdout.log' },
     agentClaim: { status: 'done', summary: 'Worker supplied a forged legacy-looking projection.' },
     confidenceLevel: 'reported',
-  });
+  }));
 
   for (const contract of [
     { id: 'assignment-run-result', version: 1 },
     { id: 'assignment-run-result', version: 3 },
+    { id: 'assignment-run-result', version: 4 },
     { id: 'other-run-result', version: 2 },
   ]) {
     const interpreted = interpretRunResult({ ...nativeV2, contract });
@@ -319,10 +337,10 @@ test('interpretRunResult treats an object missing contract, status, and runId as
   }
 });
 
-// ─── Phase 02 (executor-policy-dispatch-seams): PromptEnvelope evidence ────
+// ─── PromptEnvelope evidence ────
 
-test('normalizeRunResultV2: promptEnvelope.persona is derived from policy.persona/provenance.persona, delivery "section", applied true', () => {
-  const res = normalizeRunResultV2({
+test('normalizeRunResultV3: promptEnvelope.persona is derived from policy.persona/provenance.persona, delivery "section", applied true', () => {
+  const res = normalizeRunResultV3({
     runId: 'run_persona_001',
     assignmentId: 'asgn_persona_001',
     policy: {
@@ -344,15 +362,15 @@ test('normalizeRunResultV2: promptEnvelope.persona is derived from policy.person
   });
 });
 
-test('normalizeRunResultV2: promptEnvelope is absent when no persona resolved (additive no-op)', () => {
-  const withNoPolicy = normalizeRunResultV2({
+test('normalizeRunResultV3: promptEnvelope is absent when no persona resolved (additive no-op)', () => {
+  const withNoPolicy = normalizeRunResultV3({
     runId: 'run_persona_002',
     assignmentId: 'asgn_persona_002',
     runtime: { exitCode: 0, stdoutLog: 'stdout.log' },
     agentClaim: { status: 'done', summary: 'Clean pass' },
     confidenceLevel: 'reported',
   });
-  const withPolicyNoPersona = normalizeRunResultV2({
+  const withPolicyNoPersona = normalizeRunResultV3({
     runId: 'run_persona_003',
     assignmentId: 'asgn_persona_003',
     policy: { tier: 'standard', persona: undefined },

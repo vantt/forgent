@@ -419,6 +419,7 @@ dependencies = [
  "fgos-holder-lock",
  "fgos-identity",
  "fgos-process",
+ "fgos-run-result",
  "fgos-write-scope",
  "fgos-yaml-doc",
  "libc",

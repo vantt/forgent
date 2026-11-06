@@ -32,7 +32,7 @@ The implementation column below bounds the retained text. Proposed typed interfa
 | Run | Current contract/invariant | src/runner/dispatch/assignment-runner.mjs:697-940 (admitRunAttempt, attempt numbering, prior Runs kept), :1563-1582 (run.json contents) |
 | Run Phases And Admission | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:932 admission-run-in-flight, :784 expectedRunId refusal, :1941 result-corrupt, :1016/2024 publishMutableProjection/publishMarkerOnce; run-lock.mjs acquireRunControl/buildRunControlHolder/resolveHolderLiveness (assignment-runner.mjs:70-81); runtime-inspection.mjs:160 VALID_PHASES; git grep run-retried src -> none |
 | Proposed Runtime Recovery Amendment | Mixed implementation and proposal; no blanket implementation claim | assignment-runner.mjs:1563-1582 writes contract 'assignment-run.v2' with phase/delivery/supersedesRunId/retryId/payloadDigest; launchCommandId at :2118; recovery-planner.mjs:251-327 (snapshotHash, expectedControlEpoch, actionKey); admission-* refusal codes at :917-940; admitRun/admissionKey/authorityRef/writerRuntime not in src |
-| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs:350-385 (normalizeRunResult fields), :1305-1325 (runOutcome) |
+| RunResult | Current contract/invariant | src/runner/dispatch/run-result.mjs (normalizeRunResultV3 fields, runOutcome); packages/run-result/rust/src/lib.rs derive_outcome (the outcome rules, reached from Node through the addon's `runResult.deriveOutcome`); test/fixtures/run-outcome/legacy-derivation.json (shared vectors) |
 | Dispatch Operability Addendum | Current contract/invariant | src/runner/dispatch/run-result.mjs:7,22-23 (legacy-derived, contract-corrupt); agent-result-claim-contract.mjs:5 (claim v2); runtime-inspection.mjs:255; test/runner/dispatch-operability-production-door.test.mjs |
 | Confidence | Current contract/invariant | src/runner/dispatch/run-result.mjs:1276-1285; packages/run-result/rust/src/lib.rs:129 CONFIDENCE_LEVELS; assignment-normalizer.mjs:67-69 |
 | Evidence Freshness | Current contract/invariant | src/runner/dispatch/evidence-attribution.mjs:10 (levels proven/correlated/excluded/unattributed), :69,:197; test/runner/evidence-attribution.test.mjs |
@@ -268,10 +268,13 @@ v2 interpretation and read-only Dispatch runtime inspection while preserving
 - `ProviderOutcome` is a host-invocation wrapper, not Run truth.
 - `agent-result.json` becomes `agent-result-claim.v2`, a worker claim consumed
   by the normalizer, never independent proof.
-- Current normalization defaults to RunResult v3 and also supports v4
-  (`run-result.mjs:350-351,557-563`); v2 is the historical interpretation
-  recorded by this design addendum, not the current default. Execution,
-  assessment, confidence, failure, policy, delivery and provenance stay separate.
+- Normalization writes RunResult v3 only (`normalizeRunResultV3`, the provider
+  capacity refusal included); v2 is the historical interpretation recorded by
+  this design addendum, still read and validated, and a v4 record is
+  `contract-corrupt`. The outcome category and reason of a classification are
+  derived once, by the Run Result crate (`derive_outcome`), which Node calls
+  through the combined addon. Execution, assessment, confidence, failure,
+  policy, delivery and provenance stay separate.
 - Historical v1 results are interpreted deterministically as `legacy-derived`
   and are not rewritten on read.
 - A v2 result whose compatibility `status`/`confidence` disagrees with its

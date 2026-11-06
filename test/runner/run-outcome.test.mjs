@@ -5,16 +5,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import {
-  deriveOutcome,
-  deriveLegacyOutcome,
-  runOutcome,
-} from '../../src/runner/dispatch/run-result.mjs';
+import { runOutcome } from '../../src/runner/dispatch/run-result.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const FIXTURE_PATH = path.resolve(__dirname, '../fixtures/run-outcome/legacy-derivation.json');
 
+// The rules of the outcome derivation are proven by the Rust vector test over the same rows; this one proves that
+// Node's reading of each record, and its call into the derivation, give the category the vectors name.
 test('legacy-derivation fixture suite: all fixture cases match expected outcomes', () => {
   const cases = JSON.parse(fs.readFileSync(FIXTURE_PATH, 'utf8'));
   assert.ok(cases.length >= 19, `Expected at least 19 cases, found ${cases.length}`);
@@ -88,86 +86,4 @@ test('runOutcome: applies evidenceFloor to downgrade spoofed pass', () => {
   assert.equal(downgraded.category, 'infra');
   assert.equal(downgraded.satisfied, false);
   assert.equal(downgraded.infraFailure, true);
-});
-
-test('deriveOutcome: an agent waiting on a person is blocked, not an infra failure', () => {
-  const outcome = deriveOutcome({
-    execution: { status: 'failed' },
-    failure: { family: 'provider', code: 'blocked' },
-    policy: { disposition: 'needs-input', code: 'blocked' },
-  });
-  assert.equal(outcome.category, 'blocked');
-  assert.equal(outcome.reason, 'blocked');
-});
-
-test('deriveOutcome: strict rule order verification', () => {
-  // 1. execution failed + provider failure -> infra
-  assert.equal(
-    deriveOutcome({
-      execution: { status: 'failed' },
-      failure: { family: 'provider', code: 'timeout' },
-      policy: { disposition: 'refuse' },
-    }).category,
-    'infra',
-  );
-
-  // 2. execution completed + policy refuse -> policy
-  assert.equal(
-    deriveOutcome({
-      execution: { status: 'completed' },
-      policy: { disposition: 'refuse', code: 'denied' },
-      assessment: { verdict: 'pass' },
-    }).category,
-    'policy',
-  );
-
-  // 3. execution completed + policy needs-input -> infra
-  assert.equal(
-    deriveOutcome({
-      execution: { status: 'completed' },
-      policy: { disposition: 'needs-input' },
-      assessment: { verdict: 'pass' },
-    }).category,
-    'infra',
-  );
-
-  // 4. verdict findings -> verdict
-  assert.equal(
-    deriveOutcome({
-      execution: { status: 'completed' },
-      policy: { disposition: 'allow' },
-      assessment: { verdict: 'findings' },
-    }).category,
-    'verdict',
-  );
-
-  // 5. verdict blocked -> blocked
-  assert.equal(
-    deriveOutcome({
-      execution: { status: 'completed' },
-      policy: { disposition: 'allow' },
-      assessment: { verdict: 'blocked' },
-    }).category,
-    'blocked',
-  );
-
-  // 6. execution completed + verdict pass -> ok
-  assert.equal(
-    deriveOutcome({
-      execution: { status: 'completed' },
-      policy: { disposition: 'allow' },
-      assessment: { verdict: 'pass' },
-    }).category,
-    'ok',
-  );
-
-  // 7. execution completed + verdict inconclusive -> verdict
-  assert.equal(
-    deriveOutcome({
-      execution: { status: 'completed' },
-      policy: { disposition: 'allow' },
-      assessment: { verdict: 'inconclusive' },
-    }).category,
-    'verdict',
-  );
 });

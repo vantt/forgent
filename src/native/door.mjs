@@ -1,5 +1,5 @@
 // The one in-process door to the combined native addon: locate, verify and load it once per process.
-// Lazy: nothing loads at import time. Git, process facts, durable files, canonical JSON and YAML all go through here.
+// Lazy: nothing loads at import time. Git, process facts, durable files, canonical JSON, YAML and Run Result outcomes all go through here.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -32,7 +32,7 @@ function ownRelease(bin) {
  * the first with `snapshot`, `init` and `standardValue`, so an addon from before them fails by name instead of at its first call. */
 export const combinedAbiMatches = (v, napiVersion) => v.napi === napiVersion && typeof v.git === 'string' && typeof v.eventStore === 'string'
   && typeof v.process === 'number' && typeof v.durableFile === 'string' && typeof v.canonicalJson === 'number' && typeof v.holderLock === 'number'
-  && typeof v.sessionIdentity === 'number' && typeof v.yaml === 'number' && v.config >= 3;
+  && typeof v.sessionIdentity === 'number' && typeof v.yaml === 'number' && v.config >= 3 && typeof v.runResult === 'number';
 /** Load the addon named by `descriptor`, else this payload's own release: FGOS_HOST_BIN, then the cwd's activation.
  * `hostBin: null` skips the host lookups. A second, different file in one process is refused by name. */
 export function loadNativeAddon({ hostBin, descriptor } = {}) {

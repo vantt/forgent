@@ -19,8 +19,8 @@ export function outcomeOfRunResult(runResult) {
   // A record without a classification is read like any other settled record; one that cannot be
   // interpreted comes back corrupt, which is a failure and never a pass.
   const classification = runResult?.classification ?? interpretRunResult(runResult).classification;
-  // A result settled without an outcome (a refused provider capacity is one) is judged from its
-  // classification like any other; treating the missing outcome as `ok` made a failed seat a pass.
+  // A result settled without an outcome (a version-2 record, a refused provider capacity among them) is judged
+  // from its classification like any other; treating the missing outcome as `ok` made a failed seat a pass.
   const category = classification?.outcome?.category ?? deriveOutcome(classification).category;
   const failureCode = classification?.failure?.code;
   if (category === 'ok') return 'pass';

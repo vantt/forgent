@@ -1,20 +1,20 @@
-// dispatch/run-result.mjs — RunResult Version 2 contract, normalization, validation,
-// and deterministic legacy-v1 interpretation (Step 08 / DOEA-03 / DOEA-04 / DOEA-09 / DOEA-11).
+// dispatch/run-result.mjs — the RunResult contract: the version-3 writer, the readers of versions 3 and 2,
+// and the deterministic legacy-v1 interpretation. The outcome of a classification is derived by the Run Result
+// crate through the native door.
 //
 // Rules:
 // - RunResult is the only terminal truth for a Run.
-// - Normalizer is the single v2 writer.
+// - normalizeRunResultV3 is the single writer; it writes version 3 only.
 // - Legacy result files are read deterministically as legacy-derived v1 without rewriting bytes.
 // - Compatibility projections preserve legacy top-level status and confidence.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { isAssessmentRequired } from './agent-result-claim-contract.mjs';
+import { nativeDoor } from '../../native/door.mjs';
 
 export const RUN_RESULT_CONTRACT = Object.freeze({ id: 'assignment-run-result', version: 3 });
-export const RUN_RESULT_CONTRACT_V2 = Object.freeze({ id: 'assignment-run-result', version: 2 });
-export const RUN_RESULT_CONTRACT_V3 = Object.freeze({ id: 'assignment-run-result', version: 3 });
-export const RUN_RESULT_CONTRACT_V4 = Object.freeze({ id: 'assignment-run-result', version: 4 });
+const RUN_RESULT_CONTRACT_V2 = Object.freeze({ id: 'assignment-run-result', version: 2 });
 export const EXECUTION_STATUSES = Object.freeze(['completed', 'failed', 'cancelled', 'completion-unknown']);
 export const ASSESSMENT_VERDICTS = Object.freeze(['pass', 'findings', 'blocked', 'inconclusive', 'not-applicable']);
 export const CONFIDENCE_LEVELS = Object.freeze(['verified', 'reported', 'inferred', 'no-evidence', 'failed']);
@@ -27,7 +27,7 @@ export const FAILURE_FAMILIES = Object.freeze(['provider', 'resource', 'contract
 export const LEASE_CONFLICT_FAILURE_CODE = 'provider-capacity-lease-conflict';
 export const POLICY_DISPOSITIONS = Object.freeze(['allow', 'refuse', 'needs-input', 'not-applicable']);
 export const DELIVERY_MODES = Object.freeze(['fresh', 'resumed', 'replayed', 'recovered', 'legacy-derived']);
-export const PROVENANCE_VALUES = Object.freeze(['native-v2', 'native-v3', 'native-v4', 'legacy-derived', 'contract-corrupt']);
+export const PROVENANCE_VALUES = Object.freeze(['native-v2', 'native-v3', 'legacy-derived', 'contract-corrupt']);
 export const RECOGNIZED_LEGACY_STATUSES = Object.freeze(['done', 'failed', 'blocked', 'no-evidence']);
 
 export const CORRUPT_CLASSIFICATION = Object.freeze({
@@ -124,19 +124,6 @@ function projectLegacyConfidence(classification) {
   }
 
   return confLevel || 'reported';
-}
-
-/**
- * Project both legacy status and confidence.
- *
- * @param {object} classification
- * @returns {{ status: string, confidence: string }}
- */
-function projectLegacyStatusAndConfidence(classification) {
-  return {
-    status: projectLegacyStatus(classification),
-    confidence: projectLegacyConfidence(classification),
-  };
 }
 
 /**
@@ -331,13 +318,12 @@ export function validateRunResultV3(result, { expectedRunId } = {}) {
     reasons.push(`classification.confidence.level must be one of [${CONFIDENCE_LEVELS.join(', ')}]`);
   }
 
-  // Invariant (Red Team #2): category is a checked cache:
-  // validateRunResultV3 rejects record where classification.outcome.category !== deriveOutcome(classification).category
-  const derivedOutcome = deriveOutcome(c);
+  // The recorded category is a checked cache: a record whose classification derives another category is corrupt.
   if (!c.outcome || typeof c.outcome !== 'object') {
     reasons.push('classification.outcome must be an object in contract v3');
-  } else if (c.outcome.category !== derivedOutcome.category) {
-    reasons.push(`classification.outcome.category "${c.outcome.category}" does not match deriveOutcome "${derivedOutcome.category}"`);
+  } else {
+    const derived = deriveOutcome(c).category;
+    if (c.outcome.category !== derived) reasons.push(`classification.outcome.category "${c.outcome.category}" does not match deriveOutcome "${derived}"`);
   }
 
   const isValid = reasons.length === 0;
@@ -349,13 +335,12 @@ export function validateRunResultV3(result, { expectedRunId } = {}) {
 }
 
 /**
- * Construct and normalize a RunResult v2 object.
+ * Construct and normalize a RunResult: the one writer, version 3.
  *
  * @param {object} params
- * @returns {object} Canonical RunResult v2
+ * @returns {object} Canonical RunResult v3
  */
-export function normalizeRunResult({
-  contractVersion = 3,
+export function normalizeRunResultV3({
   runId,
   assignmentId = null,
   unitRunId = null,
@@ -394,7 +379,6 @@ export function normalizeRunResult({
   // while the run was in flight); reported, never a reason to refuse.
   warnings = null,
 } = {}) {
-  const isV2 = contractVersion === 2;
   const exitCode = typeof runtime.exitCode === 'number' ? runtime.exitCode : null;
   const isTimeout = runtime.isTimeout === true;
   const isCancelled = runtime.isCancelled === true;
@@ -563,31 +547,23 @@ export function normalizeRunResult({
     failure,
     policy,
     delivery,
-    provenance: isV2 ? 'native-v2' : (contractVersion === 4 ? 'native-v4' : 'native-v3'),
+    provenance: 'native-v3',
   };
-  const contract = isV2
-    ? { ...RUN_RESULT_CONTRACT_V2 }
-    : (contractVersion === 4 ? { ...RUN_RESULT_CONTRACT_V4 } : { ...RUN_RESULT_CONTRACT_V3 });
-
-  if (!isV2) {
-    classification.outcome = deriveOutcome(classification);
-  }
+  classification.outcome = deriveOutcome(classification);
 
   const finalRunResult = {
-    contract,
+    contract: { ...RUN_RESULT_CONTRACT },
     runId,
     assignmentId: assignmentId ?? null,
-    ...(contractVersion === 4 || unitRunId !== null ? { unitRunId } : {}),
-    ...(contractVersion === 4 || round !== null ? { round } : {}),
+    ...(unitRunId !== null ? { unitRunId } : {}),
+    ...(round !== null ? { round } : {}),
     ...(workId !== undefined ? { workId } : {}),
     ...(controlEpoch !== undefined ? { controlEpoch } : {}),
     ...(controlToken !== undefined ? { controlToken } : {}),
     ...(executorId !== undefined && executorId !== null ? { executorId } : {}),
-    ...(isV2 ? {} : {
-      adapter: adapter ?? 'cli-spawn',
-      confinement: confinement ?? null,
-      role: role ?? null,
-    }),
+    adapter: adapter ?? 'cli-spawn',
+    confinement: confinement ?? null,
+    role: role ?? null,
     ...(executorRedirected !== undefined ? { executorRedirected } : {}),
     ...(dispatchPolicy !== undefined ? { policy: dispatchPolicy } : {}),
     ...(dispatchPolicy?.persona
@@ -609,10 +585,6 @@ export function normalizeRunResult({
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports: settleReports ?? [],
     classification,
-    ...(isV2 ? {
-      status: projectLegacyStatus(classification),
-      confidence: projectLegacyConfidence(classification),
-    } : {}),
     runtime: {
       exitCode,
       ...(runtime.stdoutLog ? { stdoutLog: runtime.stdoutLog } : {}),
@@ -643,112 +615,30 @@ export function normalizeRunResult({
     },
   };
 
-  if (!isV2) {
-    Object.defineProperty(finalRunResult, 'status', {
-      get() {
-        if (this.classification?.outcome?.category === 'ok') return 'done';
-        if (this.classification?.outcome?.category === 'blocked') return 'blocked';
-        if (this.classification?.confidence?.level === 'no-evidence') return 'no-evidence';
-        return 'failed';
-      },
-      set(v) {
-        Object.defineProperty(this, 'status', { value: v, writable: true, configurable: true, enumerable: true });
-      },
-      enumerable: false,
-      configurable: true,
-    });
-    Object.defineProperty(finalRunResult, 'confidence', {
-      get() {
-        return this.classification?.confidence?.level ?? null;
-      },
-      set(v) {
-        Object.defineProperty(this, 'confidence', { value: v, writable: true, configurable: true, enumerable: true });
-      },
-      enumerable: false,
-      configurable: true,
-    });
-  }
-  return finalRunResult;
-}
-
-export function normalizeRunResultV2(params) {
-  return normalizeRunResult({ ...params, contractVersion: 2 });
-}
-
-export function normalizeRunResultV3(params) {
-  return normalizeRunResult({ ...params, contractVersion: 3 });
+  return withLegacyView(finalRunResult);
 }
 
 /**
- * Validate a RunResult v4 object against v4 schema and invariants.
- *
- * @param {object} result
- * @param {object} [options]
- * @param {string} [options.expectedRunId]
- * @returns {{ valid: boolean, corrupt: boolean, reasons: string[] }}
+ * A version-3 record with the legacy `status` and `confidence` read from its classification; assigning either
+ * replaces the reading with the assigned value.
  */
-export function validateRunResultV4(result, { expectedRunId } = {}) {
-  const reasons = [];
-  if (!result || typeof result !== 'object' || Array.isArray(result)) {
-    return { valid: false, corrupt: true, reasons: ['RunResult must be an object'] };
-  }
-
-  if (!result.contract || typeof result.contract !== 'object') {
-    reasons.push('contract field is required');
-  } else if (result.contract.id !== RUN_RESULT_CONTRACT.id || result.contract.version !== 4) {
-    reasons.push(`contract must be {id: "${RUN_RESULT_CONTRACT.id}", version: 4}`);
-  }
-
-  if (typeof result.runId !== 'string' || !result.runId.trim()) {
-    reasons.push('runId must be a non-empty string');
-  } else if (expectedRunId && result.runId !== expectedRunId) {
-    reasons.push(`runId "${result.runId}" does not match expectedRunId "${expectedRunId}"`);
-  }
-
-  const c = result.classification;
-  if (!c || typeof c !== 'object' || Array.isArray(c)) {
-    return { valid: false, corrupt: true, reasons: ['classification is required and must be an object'] };
-  }
-
-  if (!c.execution || typeof c.execution !== 'object') {
-    reasons.push('classification.execution must be an object');
-  } else if (!EXECUTION_STATUSES.includes(c.execution.status)) {
-    reasons.push(`classification.execution.status must be one of [${EXECUTION_STATUSES.join(', ')}]`);
-  }
-
-  if (!c.assessment || typeof c.assessment !== 'object') {
-    reasons.push('classification.assessment must be an object');
-  } else if (!ASSESSMENT_VERDICTS.includes(c.assessment.verdict)) {
-    reasons.push(`classification.assessment.verdict must be one of [${ASSESSMENT_VERDICTS.join(', ')}]`);
-  }
-
-  if (!c.confidence || typeof c.confidence !== 'object') {
-    reasons.push('classification.confidence must be an object');
-  } else if (!CONFIDENCE_LEVELS.includes(c.confidence.level)) {
-    reasons.push(`classification.confidence.level must be one of [${CONFIDENCE_LEVELS.join(', ')}]`);
-  }
-
-  const derivedOutcome = deriveOutcome(c);
-  if (!c.outcome || typeof c.outcome !== 'object') {
-    reasons.push('classification.outcome must be an object in contract v4');
-  } else if (c.outcome.category !== derivedOutcome.category) {
-    reasons.push(`classification.outcome.category "${c.outcome.category}" does not match deriveOutcome "${derivedOutcome.category}"`);
-  }
-
-  if (result.unitRunId !== undefined && result.unitRunId !== null && typeof result.unitRunId !== 'string') {
-    reasons.push('unitRunId must be a string when present');
-  }
-  if (result.round !== undefined && result.round !== null && typeof result.round !== 'number') {
-    reasons.push('round must be a number when present');
-  }
-
-  const isValid = reasons.length === 0;
-  return {
-    valid: isValid,
-    corrupt: !isValid,
-    reasons,
-  };
+function withLegacyView(record) {
+  const view = (name, read) => Object.defineProperty(record, name, {
+    get: read,
+    set(v) { Object.defineProperty(this, name, { value: v, writable: true, configurable: true, enumerable: true }); },
+    enumerable: false,
+    configurable: true,
+  });
+  view('status', function status() {
+    if (this.classification?.outcome?.category === 'ok') return 'done';
+    if (this.classification?.outcome?.category === 'blocked') return 'blocked';
+    if (this.classification?.confidence?.level === 'no-evidence') return 'no-evidence';
+    return 'failed';
+  });
+  view('confidence', function confidence() { return this.classification?.confidence?.level ?? null; });
+  return record;
 }
+
 /**
  * Pure interpreter: reads and interprets RunResult deterministically.
  *
@@ -853,48 +743,6 @@ export function interpretRunResult(input, options = {}) {
   // complete absence of that field is historical v1; a partial, unknown, or
   // mismatched contract must never demote itself into attacker-controlled v1
   // projections.
-  if (rawObj.contract?.version === 4 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
-    const validation = validateRunResultV4(rawObj, { expectedRunId });
-    if (!validation.valid) {
-      return {
-        ...rawObj,
-        contract: { id: RUN_RESULT_CONTRACT.id, version: 4 },
-        classification: { ...CORRUPT_CLASSIFICATION },
-        status: 'no-evidence',
-        confidence: 'failed',
-        contractCorrupt: true,
-        resultCorrupt: true,
-        corrupt: true,
-        corruptionReasons: validation.reasons,
-      };
-    }
-    const resultObj = { ...rawObj };
-    Object.defineProperty(resultObj, 'status', {
-      get() {
-        if (this.classification?.outcome?.category === 'ok') return 'done';
-        if (this.classification?.outcome?.category === 'blocked') return 'blocked';
-        if (this.classification?.confidence?.level === 'no-evidence') return 'no-evidence';
-        return 'failed';
-      },
-      set(v) {
-        Object.defineProperty(this, 'status', { value: v, writable: true, configurable: true, enumerable: true });
-      },
-      enumerable: false,
-      configurable: true,
-    });
-    Object.defineProperty(resultObj, 'confidence', {
-      get() {
-        return this.classification?.confidence?.level ?? null;
-      },
-      set(v) {
-        Object.defineProperty(this, 'confidence', { value: v, writable: true, configurable: true, enumerable: true });
-      },
-      enumerable: false,
-      configurable: true,
-    });
-    return resultObj;
-  }
-
   if (rawObj.contract?.version === 3 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
     const validation = validateRunResultV3(rawObj, { expectedRunId });
     if (!validation.valid) {
@@ -910,31 +758,7 @@ export function interpretRunResult(input, options = {}) {
         corruptionReasons: validation.reasons,
       };
     }
-    const resultObj = { ...rawObj };
-    Object.defineProperty(resultObj, 'status', {
-      get() {
-        if (this.classification?.outcome?.category === 'ok') return 'done';
-        if (this.classification?.outcome?.category === 'blocked') return 'blocked';
-        if (this.classification?.confidence?.level === 'no-evidence') return 'no-evidence';
-        return 'failed';
-      },
-      set(v) {
-        Object.defineProperty(this, 'status', { value: v, writable: true, configurable: true, enumerable: true });
-      },
-      enumerable: false,
-      configurable: true,
-    });
-    Object.defineProperty(resultObj, 'confidence', {
-      get() {
-        return this.classification?.confidence?.level ?? null;
-      },
-      set(v) {
-        Object.defineProperty(this, 'confidence', { value: v, writable: true, configurable: true, enumerable: true });
-      },
-      enumerable: false,
-      configurable: true,
-    });
-    return resultObj;
+    return withLegacyView({ ...rawObj });
   }
 
   if (rawObj.contract?.version === 2 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
@@ -959,7 +783,7 @@ export function interpretRunResult(input, options = {}) {
     return {
       ...rawObj,
       contract: { ...RUN_RESULT_CONTRACT },
-        classification: { ...CORRUPT_CLASSIFICATION },
+      classification: { ...CORRUPT_CLASSIFICATION },
       status: 'no-evidence',
       confidence: 'failed',
       contractCorrupt: true,
@@ -1133,114 +957,13 @@ export function readSettledResult(runDir, runId) {
 }
 
 /**
- * Derive high-level outcome from RunResult classification.
- * Rules evaluated in strict order (Red Team finding #1):
- * 0. failure.code === 'blocked' (an agent waiting on a person) -> blocked
- * 1. execution.status in {failed, cancelled, completion-unknown} and failure.family in {provider, resource, unknown} (or no failure) -> infra
- * 2. policy.disposition === 'refuse' OR failure.family in {contract, policy} -> policy
- * 3. policy.disposition === 'needs-input' -> infra
- * 4. verdict === 'findings' -> verdict
- * 5. verdict === 'blocked' -> blocked
- * 6. execution.status === 'completed' and verdict in {pass, not-applicable} -> ok
- * 7. remaining (e.g. inconclusive) -> verdict
+ * The outcome `{category, reason}` of a classification. The Run Result crate owns the rules; this is its door.
  *
  * @param {object} classification
- * @returns {Readonly<{category: 'ok'|'infra'|'verdict'|'policy'|'blocked'|'corrupt', reason: string}>}
+ * @returns {{category: 'ok'|'infra'|'verdict'|'policy'|'blocked'|'corrupt', reason: string}}
  */
 export function deriveOutcome(classification) {
-  if (!classification || typeof classification !== 'object') {
-    return Object.freeze({
-      category: 'corrupt',
-      reason: 'classification must be a non-null object',
-    });
-  }
-
-  if (classification.provenance === 'contract-corrupt') {
-    return Object.freeze({
-      category: 'corrupt',
-      reason: 'classification provenance is contract-corrupt',
-    });
-  }
-
-  const execStatus = classification.execution?.status;
-  const failureFamily = classification.failure?.family;
-  const policyDisp = classification.policy?.disposition;
-  const verdict = classification.assessment?.verdict;
-
-  // An agent waiting on a prompt only a person can answer is blocked, whatever exit the stop produced.
-  if (failureFamily === 'provider' && classification.failure?.code === 'blocked') {
-    return Object.freeze({
-      category: 'blocked',
-      reason: 'blocked',
-    });
-  }
-
-  // Rule 1: execution failed/cancelled/unknown with provider/resource/unknown failure (or no failure)
-  const isFailedExec = execStatus === 'failed' || execStatus === 'cancelled' || execStatus === 'completion-unknown';
-  const isInfraFailure = failureFamily === 'provider' || failureFamily === 'resource' || failureFamily === 'unknown' || !failureFamily;
-  if (isFailedExec && isInfraFailure) {
-    return Object.freeze({
-      category: 'infra',
-      reason: classification.failure?.code ?? (execStatus || 'execution-failed'),
-    });
-  }
-
-  // Rule 2: policy refusal or contract/policy failure family
-  if (policyDisp === 'refuse' || failureFamily === 'contract' || failureFamily === 'policy') {
-    return Object.freeze({
-      category: 'policy',
-      reason: classification.policy?.code ?? classification.failure?.code ?? 'policy-refused',
-    });
-  }
-
-  // Rule 3: policy disposition needs-input -> infra (provider/resource requires human)
-  if (policyDisp === 'needs-input') {
-    return Object.freeze({
-      category: 'infra',
-      reason: classification.policy?.code ?? 'needs-input',
-    });
-  }
-
-  // Rule 4: reviewer findings
-  if (verdict === 'findings') {
-    return Object.freeze({
-      category: 'verdict',
-      reason: 'reviewer-findings',
-    });
-  }
-
-  // Rule 5: blocked verdict
-  if (verdict === 'blocked') {
-    return Object.freeze({
-      category: 'blocked',
-      reason: 'verdict-blocked',
-    });
-  }
-
-  // Rule 6: completed execution with pass or not-applicable verdict
-  if (execStatus === 'completed' && (verdict === 'pass' || verdict === 'not-applicable')) {
-    return Object.freeze({
-      category: 'ok',
-      reason: 'completed-pass',
-    });
-  }
-
-  // Rule 7: remaining (e.g. inconclusive) -> verdict
-  return Object.freeze({
-    category: 'verdict',
-    reason: `verdict-${verdict ?? 'inconclusive'}`,
-  });
-}
-
-/**
- * Derive outcome for legacy v1 RunResult.
- *
- * @param {object} recordV1
- * @returns {Readonly<{category: 'ok'|'infra'|'verdict'|'policy'|'blocked'|'corrupt', reason: string}>}
- */
-export function deriveLegacyOutcome(recordV1) {
-  const interpreted = interpretRunResult(recordV1);
-  return deriveOutcome(interpreted.classification);
+  return nativeDoor().runResult.deriveOutcome(JSON.stringify(classification ?? null));
 }
 
 function deriveEvidenceFloor(evidenceFloor) {

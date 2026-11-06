@@ -16,14 +16,17 @@ import {
   INSPECTION_STATUSES,
 } from '../../src/runner/dispatch/runtime-inspection.mjs';
 import { invokeDispatchInspectOperation } from '../../src/verbs/dispatch/inspect.mjs';
-import { normalizeRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
 
 const fixture = () => fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-'));
 function assignment(root, id) { const dir = path.join(root, '.fgos', 'assignments', id); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'assignment.json'), JSON.stringify({ assignmentId: id })); return dir; }
 function run(root, id, attempt, value, result) { const dir = path.join(root, '.fgos', 'assignments', id, 'runs', attempt); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'run.json'), JSON.stringify({ assignmentId: id, ...value })); if (result) fs.writeFileSync(path.join(dir, 'result.json'), JSON.stringify(result)); return dir; }
 function admit(root, id, epoch, value) { const dir = path.join(root, '.fgos', 'assignments', id, 'admission', 'generations'); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, `${String(epoch).padStart(10, '0')}.json`), JSON.stringify(value)); }
 const v1 = (runId, assignmentId) => ({ runId, assignmentId, status: 'done', confidence: 'reported' });
-const v2 = (runId, assignmentId) => normalizeRunResultV2({ runId, assignmentId, runtime: { exitCode: 0 }, agentClaim: { status: 'done', summary: 'ok' } });
+// A version-2 record as runs written before version 3 left it on disk.
+const v2 = (runId, assignmentId) => ({
+  contract: { id: 'assignment-run-result', version: 2 }, runId, assignmentId, status: 'done', confidence: 'reported',
+  classification: { execution: { status: 'completed', exitCode: 0 }, assessment: { verdict: 'pass' }, confidence: { level: 'reported', basis: ['valid-agent-result-claim'] }, failure: null, policy: { disposition: 'allow', code: null }, delivery: { mode: 'fresh' }, provenance: 'native-v2' },
+});
 
 test('inspection requires exactly one typed selector', () => { assert.throws(() => validateInspectionSelector({}), /exactly one selector/); assert.throws(() => validateInspectionSelector({ run: 'r', cwd: '/tmp' }), /exactly one selector/); });
 test('run and assignment not-found include no authority hint', () => { const root = fixture(); assert.equal(inspectDispatchRuntime(root, { run: 'none' }).inspectionStatus, 'not-found'); assert.equal(inspectDispatchRuntime(root, { assignment: 'none' }).inspectionStatus, 'not-found'); });

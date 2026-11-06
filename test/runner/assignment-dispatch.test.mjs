@@ -22,7 +22,7 @@ import { canonicalJson, computeSha256Digest } from '../../src/native/proof-helpe
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 import { inspectProviderCapacity, providerCapacityStatePaths, PROVIDER_CAPACITY_STATE_CONTRACT } from '../../src/runner/dispatch/provider-capacity.mjs';
-import { normalizeRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
+import { normalizeRunResultV3 } from '../../src/runner/dispatch/run-result.mjs';
 
 // The store directory of a fixture repository: the Event Store opens from `<repo>/.fgos`.
 function storeOf(root) {
@@ -668,8 +668,10 @@ test('provider capacity refusal after Run admission settles the attempt (never a
     providerCapacityRuntimeDir: runtimeDir,
   });
 
-  // Settled, not thrown: the caller gets a real result back.
+  // Settled, not thrown: the caller gets a real result back, written as every other result is (version 3, outcome derived).
   assert.equal(result.status, 'failed');
+  assert.deepEqual(result.contract, { id: 'assignment-run-result', version: 3 });
+  assert.deepEqual(result.classification.outcome, { category: 'infra', reason: 'infra-exec-failed' });
   assert.equal(result.classification.execution.status, 'failed');
   assert.equal(result.classification.failure.family, 'provider');
   assert.equal(result.classification.failure.code, 'provider-capacity-lease-conflict');
@@ -2236,7 +2238,7 @@ test('commitRunSettlement: a crash between control-settlement and result-publica
   const control = acquireRunControl(runDir, { holder: { id: 's8-controller', pid: process.pid }, purpose: 'worker-spawn' });
   assert.equal(control.status, 'acquired');
 
-  const runResult = normalizeRunResultV2({
+  const runResult = normalizeRunResultV3({
     runId,
     assignmentId: assignment.assignmentId,
     controlEpoch: control.controlEpoch,

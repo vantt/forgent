@@ -21,7 +21,7 @@ import {
   currentGeneration,
 } from '../../run-supervisor/run-lock.mjs';
 import { markRunSettled } from './visibility-session.mjs';
-import { normalizeRunResultV2, normalizeRunResultV3, interpretRunResult } from './run-result.mjs';
+import { normalizeRunResultV3, interpretRunResult } from './run-result.mjs';
 import { isVerdictSeat } from './agent-result-claim-contract.mjs';
 import { validateAgentResultClaim, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveWorkerArtifactPath } from '../../run-supervisor/worker-artifacts.mjs';

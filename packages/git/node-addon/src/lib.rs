@@ -13,6 +13,7 @@ pub mod durable_file;
 pub mod holder_lock;
 pub mod marshal;
 pub mod process;
+pub mod run_result;
 pub mod session_identity;
 mod single_load;
 pub mod yaml;
@@ -42,7 +43,7 @@ pub fn versions() -> Result<Value> {
                 "addon": env!("CARGO_PKG_VERSION"), "git": fgos_git::VERSION, "eventStore": env!("CARGO_PKG_VERSION"), "napi": 8, "contracts": contracts,
                 "process": process::contract_version().map_err(|e| e.to_string())?,
                 // The crates carry the workspace version; the canonical vectors are the `canonical.v1` file.
-                "durableFile": env!("CARGO_PKG_VERSION"), "canonicalJson": 1, "holderLock": 1, "sessionIdentity": 1, "yaml": 1, "config": 3,
+                "durableFile": env!("CARGO_PKG_VERSION"), "canonicalJson": 1, "holderLock": 1, "sessionIdentity": 1, "yaml": 1, "config": 3, "runResult": 1,
             }))
         })
         .clone()

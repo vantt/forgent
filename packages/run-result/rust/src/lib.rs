@@ -19,111 +19,57 @@ pub struct Outcome {
     pub reason: String,
 }
 
-/// Pure outcome derivation from classification per Step 01 §11 & Phase 2 closed rules.
+/// The outcome of a classification: the one derivation every writer and reader of a Run Result uses (Node
+/// reaches it through the combined addon). Rules in strict order; the first that matches decides.
 pub fn derive_outcome(classification: &Value) -> Outcome {
-    let c = match classification.as_object() {
-        Some(obj) => obj,
-        None => {
-            return Outcome {
-                category: "corrupt".to_string(),
-                reason: "corrupt-classification".to_string(),
-            }
-        }
+    let outcome = |category: &str, reason: String| Outcome {
+        category: category.to_string(),
+        reason,
     };
-
-    let exec_status = c
-        .get("execution")
-        .and_then(|e| e.get("status"))
-        .and_then(|s| s.as_str())
-        .unwrap_or("unknown");
-
-    let verdict = c
-        .get("assessment")
-        .and_then(|a| a.get("verdict"))
-        .and_then(|v| v.as_str())
-        .unwrap_or("inconclusive");
-
-    let policy_disp = c
-        .get("policy")
-        .and_then(|p| p.get("disposition"))
-        .and_then(|d| d.as_str())
-        .unwrap_or("allow");
-
-    let failure_family = c
-        .get("failure")
-        .and_then(|f| f.get("family"))
-        .and_then(|fam| fam.as_str());
-
-    let failure_code = c
-        .get("failure")
-        .and_then(|f| f.get("code"))
-        .and_then(|code| code.as_str());
-
-    // Rule 1: execution failure
-    // execution.status in {failed, cancelled, completion-unknown} and failure.family in {provider, resource, unknown} (or no failure)
-    if (exec_status == "failed"
-        || exec_status == "cancelled"
-        || exec_status == "completion-unknown")
-        && (failure_family == Some("provider")
-            || failure_family == Some("resource")
-            || failure_family == Some("unknown")
-            || failure_family.is_none())
-    {
-        return Outcome {
-            category: "infra".to_string(),
-            reason: format!("infra-exec-{}", exec_status),
-        };
+    let Some(c) = classification.as_object() else {
+        return outcome("corrupt", "corrupt-classification".to_string());
+    };
+    if c.get("provenance").and_then(Value::as_str) == Some("contract-corrupt") {
+        return outcome("corrupt", "contract-corrupt".to_string());
     }
+    let text = |section: &str, field: &str| {
+        c.get(section)
+            .and_then(|v| v.get(field))
+            .and_then(Value::as_str)
+    };
+    let exec_status = text("execution", "status").unwrap_or("unknown");
+    let verdict = text("assessment", "verdict").unwrap_or("inconclusive");
+    let policy_disp = text("policy", "disposition").unwrap_or("allow");
+    let failure_family = text("failure", "family").filter(|f| !f.is_empty());
+    let failure_code = text("failure", "code");
 
-    // Rule 2: policy refusal or contract/policy failure
-    // policy.disposition === 'refuse' or failure.family in {contract, policy}
-    if policy_disp == "refuse"
-        || failure_family == Some("contract")
-        || failure_family == Some("policy")
+    // An agent waiting on a prompt only a person can answer is blocked, whatever exit the stop produced.
+    if failure_family == Some("provider") && failure_code == Some("blocked") {
+        return outcome("blocked", "provider-blocked".to_string());
+    }
+    // An execution that did not complete, for an infrastructure cause or none named.
+    if matches!(exec_status, "failed" | "cancelled" | "completion-unknown")
+        && matches!(
+            failure_family,
+            None | Some("provider" | "resource" | "unknown")
+        )
     {
+        return outcome("infra", format!("infra-exec-{exec_status}"));
+    }
+    if policy_disp == "refuse" || matches!(failure_family, Some("contract" | "policy")) {
         let code = failure_code.unwrap_or("policy-refused");
-        return Outcome {
-            category: "policy".to_string(),
-            reason: format!("policy-{}", code),
-        };
+        return outcome("policy", format!("policy-{code}"));
     }
-
-    // Rule 3: policy disposition === 'needs-input'
     if policy_disp == "needs-input" {
-        return Outcome {
-            category: "infra".to_string(),
-            reason: "infra-policy-needs-input".to_string(),
-        };
+        return outcome("infra", "infra-policy-needs-input".to_string());
     }
-
-    // Rule 4: verdict === 'findings'
-    if verdict == "findings" {
-        return Outcome {
-            category: "verdict".to_string(),
-            reason: "reviewer-findings".to_string(),
-        };
-    }
-
-    // Rule 5: verdict === 'blocked'
-    if verdict == "blocked" {
-        return Outcome {
-            category: "blocked".to_string(),
-            reason: "verdict-blocked".to_string(),
-        };
-    }
-
-    // Rule 6: completed execution with pass or not-applicable verdict
-    if exec_status == "completed" && (verdict == "pass" || verdict == "not-applicable") {
-        return Outcome {
-            category: "ok".to_string(),
-            reason: "completed-pass".to_string(),
-        };
-    }
-
-    // Rule 7: remaining (e.g. inconclusive) -> verdict
-    Outcome {
-        category: "verdict".to_string(),
-        reason: format!("verdict-{}", verdict),
+    match verdict {
+        "findings" => outcome("verdict", "reviewer-findings".to_string()),
+        "blocked" => outcome("blocked", "verdict-blocked".to_string()),
+        "pass" | "not-applicable" if exec_status == "completed" => {
+            outcome("ok", "completed-pass".to_string())
+        }
+        _ => outcome("verdict", format!("verdict-{verdict}")),
     }
 }
 
@@ -187,7 +133,8 @@ fn is_classification_valid(c: &serde_json::Map<String, Value>) -> bool {
     true
 }
 
-/// Derive outcome for any RunResult record (v3 native, v2 validated, v1 legacy, or corrupt).
+/// The outcome of any Run Result record: version 3 (its recorded outcome, checked), version 2, legacy
+/// version 1 (no contract), or corrupt.
 pub fn derive_legacy_outcome(record: &Value) -> Outcome {
     let raw = match record.as_object() {
         Some(r) => r,
@@ -199,60 +146,49 @@ pub fn derive_legacy_outcome(record: &Value) -> Outcome {
         }
     };
 
-    // If v3 record has classification.outcome.category, read it directly without re-derivation
-    if let Some(cat) = record
-        .get("classification")
-        .and_then(|c| c.get("outcome"))
-        .and_then(|o| o.get("category"))
-        .and_then(|s| s.as_str())
-    {
-        let reason = record
-            .get("classification")
-            .and_then(|c| c.get("outcome"))
-            .and_then(|o| o.get("reason"))
-            .and_then(|s| s.as_str())
-            .unwrap_or("recorded-outcome");
-        return Outcome {
-            category: cat.to_string(),
+    if let Some(contract) = raw.get("contract") {
+        let corrupt = |reason: &str| Outcome {
+            category: "corrupt".to_string(),
             reason: reason.to_string(),
         };
-    }
-
-    // If contract is present:
-    if let Some(contract) = raw.get("contract") {
-        let version = contract.get("version").and_then(|v| v.as_u64());
-        let id = contract.get("id").and_then(|i| i.as_str());
-
-        if id != Some("assignment-run-result") {
-            return Outcome {
-                category: "corrupt".to_string(),
-                reason: "unsupported-contract".to_string(),
-            };
+        if contract.get("id").and_then(Value::as_str) != Some("assignment-run-result") {
+            return corrupt("unsupported-contract");
         }
-
-        if version == Some(2) || version == Some(3) || version == Some(4) {
-            if let Some(c) = raw.get("classification").and_then(|v| v.as_object()) {
-                if !is_classification_valid(c) {
-                    return Outcome {
-                        category: "corrupt".to_string(),
-                        reason: "corrupt-classification".to_string(),
-                    };
-                }
-                return derive_outcome(&Value::Object(c.clone()));
-            }
-            return Outcome {
-                category: "corrupt".to_string(),
-                reason: "missing-classification".to_string(),
-            };
+        let version = contract.get("version").and_then(Value::as_u64);
+        if version != Some(2) && version != Some(3) {
+            return corrupt("unsupported-contract-version");
         }
-        return Outcome {
-            category: "corrupt".to_string(),
-            reason: "unsupported-contract-version".to_string(),
+        let Some(c) = raw.get("classification").and_then(Value::as_object) else {
+            return corrupt("missing-classification");
+        };
+        if !is_classification_valid(c) {
+            return corrupt("corrupt-classification");
+        }
+        let derived = derive_outcome(&Value::Object(c.clone()));
+        if version == Some(2) {
+            return derived;
+        }
+        // A version-3 outcome is a checked cache: kept as recorded when the classification derives its category.
+        let recorded = c.get("outcome");
+        return match recorded
+            .and_then(|o| o.get("category"))
+            .and_then(Value::as_str)
+        {
+            Some(category) if category == derived.category => Outcome {
+                category: category.to_string(),
+                reason: recorded
+                    .and_then(|o| o.get("reason"))
+                    .and_then(Value::as_str)
+                    .unwrap_or("recorded-outcome")
+                    .to_string(),
+            },
+            Some(_) => corrupt("outcome-contradicts-classification"),
+            None => corrupt("missing-outcome"),
         };
     }
 
     // Legacy v1 interpretation (contract is absent):
-    if raw.get("contract").is_none() && raw.get("status").is_none() && raw.get("runId").is_none() {
+    if raw.get("status").is_none() && raw.get("runId").is_none() {
         return Outcome {
             category: "corrupt".to_string(),
             reason: "missing-status-and-run-id".to_string(),
