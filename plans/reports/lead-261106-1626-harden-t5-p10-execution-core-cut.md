@@ -2,14 +2,15 @@
 
 Branch `harden/t5-p10`, worktree `/home/vantt/projects/forgent-worktrees/harden-t5-p10`, fast-forwarded to origin/main `bf3546fdd`. Phase file: `plans/261106-0950-harden-t5-execution-core/phase-10-execution-core-cut.md`. Not pushed. P09 has not run, so `src/runner/dispatch/assignment.mjs` is untouched; what needs it is listed under "After P09".
 
-Commits:
+Commits (after the rebase onto `92095f40a`):
 
-- `07b2d2332` refactor(runner): cut the unit run into named steps and share one bind ask with the dry bind
-- `df07689eb` fix(runner): launch a seat once more when its brief never reached the agent (the coordinator's addition, a separate behaviour change)
+- `02f0f4f3a` refactor(runner): cut the unit run into named steps and share one bind ask with the dry bind
+- `5ecf5f2ba` fix(runner): launch a seat once more when its brief never reached the agent (the coordinator's addition, a separate behaviour change)
+- `5f2b23988` test(run-supervisor): the refund case reads the first launch's receipt
 
 ## What changed
 
-### The cut (`07b2d2332`)
+### The cut (`02f0f4f3a`)
 
 - `runUnitBody` (1 036 lines) is gone. In its place:
   - `runUnitBody` builds one run context (≈50 lines).
@@ -41,7 +42,7 @@ Commits:
 - **One rename.** `runPattern` became `runCollaboration`, because `test/architecture.test.mjs` forbids the old vocabulary symbol.
 - `CHANGELOG.md` has one line for the dry bind and the unreadable record.
 
-### Lost brief (`df07689eb`, coordinator's addition, backlog `p-d2dc4f2e`)
+### Lost brief (`5ecf5f2ba`, coordinator's addition, backlog `p-d2dc4f2e`)
 
 - **Trigger.** An attempt marked `briefNotDelivered` (from `briefNeverReached(receipt)`: `abandoned*`, or `terminal:foreground-not-agent`) whose outcome is neither `pass` nor `provider-limit` now goes to `answerProviderLimit` with `briefNotDelivered: true`. Before, it returned at the `outcome !== 'provider-limit'` check.
 - **The answer:**
@@ -71,7 +72,10 @@ The coordinator asked for the lost-brief proofs "next to `run-case-admission.tes
 - **Focused set (phase list plus everything that imports or names the changed modules, 41 files including `architecture`, `doc-health`, `check-decision-citation-drift`, failover, terminal-fallback, terminal-cutover):** 707/707 pass after the cut. After the fix, 271/271 pass for run, failover, case-admission, bind, account-rotation, terminal-fallback, terminal-cutover, run-herdr and architecture. The new file passes 3/3.
 - `node --expose-internals scripts/check-undefined-names.mjs`: clean.
 - `node scripts/git-one-door-scan.mjs --root .`: 0 undeclared. The census was regenerated in both commits.
-- **Full suite: NOT RUN YET.** It was queued, and stopped with SIGTERM while still waiting in the machine-wide queue (no test had started, exit 143), because the coordinator asked to yield the queue to an urgent production fix. It will be run once the coordinator says the fix has landed.
+- Rebased onto origin/main `92095f40a`. CHANGELOG conflicts kept both sides; the census was taken from main and regenerated at each step.
+- After the rebase, main's new refund case in `test/run-supervisor/terminal-fallback.test.mjs` ("a seat whose pane shell never gave up the foreground is handed back to the case frame") failed. Its seat is now launched twice, and `project.attemptDir()` sorts `producer/1-fb1` first, so it read the second launch's receipt (`start-refused:terminal-launch-not-started`). The coordinator approved the fix: both receipt reads now name the first launch's directory (commit `5f2b23988`). The refund assertions are unchanged and still hold: the frame counts no dispatch, and nothing was typed in either launch. Terminal-fallback: 6/6 pass.
+- **Focused set after the rebase (41 files, now including `run-brief-not-delivered` and `terminal-cutover`):** 719/719 pass.
+- **Full suite** (`node scripts/run-tests.mjs`, queued, on the rebased branch): tests 8 653, pass 8 620, fail 1, skipped 32, no `run-tests: ERROR` line. The one failure is the known red "frozen V7n addendum".
 - **Retired tests:** none.
 - **Changed tests:**
   - `run-herdr.test.mjs` guard regex now names the new walk call: `bind(role.ask(), bindCtxOf(ctx, role, attemptNo + 1), { walk:`. No behavioural test proves transport, so I kept this guard rather than retire it.
@@ -137,8 +141,8 @@ A read-only unit's run-result category becomes the unit outcome in `run.mjs` `di
   - Re-measure the layer budgets.
   - `patterns/catalog.mjs` functions over 300 lines.
   - Close `p-3e6b1a52` after the deletion above.
-  - Close backlog `p-d2dc4f2e` when `df07689eb` lands.
+  - Close backlog `p-d2dc4f2e` when `5ecf5f2ba` lands.
 
 Status: DONE_WITH_CONCERNS
-Summary: `runUnitBody` is cut into named steps under one run context, with a pure `answerProviderLimit` and one `askFor` shared by the run and the dry bind; the brief-not-delivered retry landed as its own commit with three red-then-green proofs. Focused tests are green.
-Concerns/Blockers: the full suite has not run yet: I stopped it while it was still queued, at the coordinator's request. The `bind.mjs` (590 > 520) and `src/runner/execution` (7 667 > 7 000) budgets are not met, and the Node net is −29 + 13, not −250. The assignment builder move and the `legacyPersonaProjection` deletion wait for P09.
+Summary: `runUnitBody` is cut into named steps under one run context, with a pure `answerProviderLimit` and one `askFor` shared by the run and the dry bind; the brief-not-delivered retry is its own commit with three red-then-green proofs. Focused tests pass 719/719 and the full suite has only the known V7n failure.
+Concerns/Blockers: the `bind.mjs` (590 > 520) and `src/runner/execution` (7 667 > 7 000) budgets are not met, and the Node net is −29 + 13, not −250. The assignment builder move and the `legacyPersonaProjection` deletion wait for P09. For COOK: `fgos-cook` (`628c81c8e`) also reruns a dispatch whose brief was lost, so a seat that loses its brief every time can now launch up to 4 times.
