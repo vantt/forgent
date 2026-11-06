@@ -243,3 +243,27 @@ test('a server that wrote its socket but never answers is reported by name', asy
     (e) => e.code === 'session-unavailable' && /did not answer/.test(e.message),
   );
 });
+
+// No test above starts two boots together: each one sees a socket that is already there or one that never
+// appears. The server writes its socket a moment after it is spawned, so two seats that both look in that
+// moment each see "no socket" and each start a server unless the second one waits for the first.
+test('two seats starting at once share one worker session server', async () => {
+  let socketUp = false;
+  let spawned = 0;
+  const terminal = { capabilities: () => ({ result: 'capabilities', driver: 'herdr', capabilities: [], serverIncarnation: socketUp ? { pid: 1 } : null, endpoint: { socketPath: SESSION_SOCKET } }) };
+  const opts = baseOpts({
+    existsSync: () => socketUp,
+    terminalControlFor: () => terminal,
+    spawnFn: () => {
+      spawned += 1;
+      setTimeout(() => { socketUp = true; }, 30);
+      return { unref() {} };
+    },
+    sleepFn: () => new Promise((resolve) => setTimeout(resolve, 5)),
+    pollMs: 5,
+  });
+  const [first, second] = await Promise.all([ensureWorkerSession('fgos-worker', opts), ensureWorkerSession('fgos-worker', opts)]);
+  assert.equal(first.socketPath, SESSION_SOCKET);
+  assert.equal(second.socketPath, SESSION_SOCKET);
+  assert.equal(spawned, 1, 'a second server was started for a session that was already starting');
+});
