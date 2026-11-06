@@ -627,66 +627,6 @@ function buildInlineAssignment({ provenance, workId, createdBy, options = {} }) 
   return Object.freeze(assignment);
 }
 
-// The line-based reader that rendered personas before definitions were read with a real YAML parser.
-// It exists only for text pinned into a run record by a release that predates that change. Pinned text
-// renders through the legacy projection in exactly two cases: the parser rejects it (`voice: direct: no
-// hedging`), or it parses but a rendered section holds a value that is not text (a list item such as
-// `- Escalate when: budget exceeded` reads as a mapping). The line reader shows what those releases showed,
-// so a run resumed from such text seats the persona it was started with. Pinned text that parses to text
-// renders through the parser, like a fresh file. A fresh file never uses the legacy reader: a definition
-// with those faults is refused where it is resolved. Remove this, with its fallback in
-// renderPersonaSection, once no run pinned by those releases can still resume.
-function legacyPersonaProjection(raw) {
-  try {
-    const result = { persona: {}, decision_boundary: { can_decide: [], must_escalate: [] } };
-    const lines = raw.split('\n');
-    let currentSection = null;
-    let currentSubSection = null;
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-
-      const topMatch = line.match(/^([a-zA-Z0-9_-]+):\s*(.*)$/);
-      if (topMatch && !line.startsWith(' ') && !line.startsWith('\t')) {
-        const key = topMatch[1];
-        const val = topMatch[2].trim();
-        if (val) {
-          result[key] = val.replace(/^["'](.*)["']$/, '$1');
-          currentSection = null;
-          currentSubSection = null;
-        } else {
-          currentSection = key;
-          currentSubSection = null;
-        }
-        continue;
-      }
-
-      if (currentSection === 'persona') {
-        const pMatch = line.match(/^\s+([a-zA-Z0-9_-]+):\s*(.*)$/);
-        if (pMatch) {
-          result.persona[pMatch[1]] = pMatch[2].trim().replace(/^["'](.*)["']$/, '$1');
-        }
-      } else if (currentSection === 'decision_boundary') {
-        const dMatch = line.match(/^\s{2}([a-zA-Z0-9_-]+):\s*$/);
-        if (dMatch) {
-          currentSubSection = dMatch[1];
-        } else if (currentSubSection) {
-          const itemMatch = line.match(/^\s+-\s*(.*)$/);
-          if (itemMatch) {
-            if (!result.decision_boundary[currentSubSection]) {
-              result.decision_boundary[currentSubSection] = [];
-            }
-            result.decision_boundary[currentSubSection].push(itemMatch[1].trim());
-          }
-        }
-      }
-    }
-    return result;
-  } catch {
-    return null;
-  }
-}
-
 function renderPersonaSection(personaRef, options = {}) {
   const root = options.repoRoot ?? options.cwd ?? process.cwd();
   const personaFile = path.join(root, 'core', 'agents', `${personaRef}.yaml`);
@@ -695,16 +635,10 @@ function renderPersonaSection(personaRef, options = {}) {
   // Text a caller pinned when it bound the persona wins over any file: the same definition
   // reaches every attempt and every resume, whatever the file says by then.
   const pinned = options.persona?.pinnedText;
-  if (typeof pinned === 'string') {
+  if (typeof pinned === 'string' || fs.existsSync(personaFile)) {
     try {
-      const parsed = parseYaml(pinned, { filename: `${personaRef}.yaml` });
-      content = nonTextPersonaValues(parsed).length > 0 ? legacyPersonaProjection(pinned) : projectPersona(parsed);
-    } catch {
-      content = legacyPersonaProjection(pinned);
-    }
-  } else if (fs.existsSync(personaFile)) {
-    try {
-      const parsed = parseYaml(fs.readFileSync(personaFile, 'utf8'), { filename: `${personaRef}.yaml` });
+      const text = typeof pinned === 'string' ? pinned : fs.readFileSync(personaFile, 'utf8');
+      const parsed = parseYaml(text, { filename: `${personaRef}.yaml` });
       const [nonText] = nonTextPersonaValues(parsed);
       if (nonText) parseFailure = `Persona "${personaRef}" cannot be rendered: ${nonText}`;
       else content = projectPersona(parsed);
