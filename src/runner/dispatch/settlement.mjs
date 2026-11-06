@@ -14,6 +14,8 @@ const MAX_AGENT_FILE_BYTES = 4 * 1024 * 1024;
 import { RunnerConfigError } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 import {
+  acquireRunControl,
+  buildRunControlHolder,
   isRunControlCurrent,
   settleRunControl,
   fsyncFileBestEffort,
@@ -21,7 +23,7 @@ import {
   currentGeneration,
 } from '../../run-supervisor/run-lock.mjs';
 import { markRunSettled } from './visibility-session.mjs';
-import { normalizeRunResultV3, interpretRunResult } from './run-result.mjs';
+import { normalizeRunResultV3, interpretRunResult, readSettledResult, LEASE_CONFLICT_FAILURE_CODE } from './run-result.mjs';
 import { isVerdictSeat } from './agent-result-claim-contract.mjs';
 import { validateAgentResultClaim, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveWorkerArtifactPath } from '../../run-supervisor/worker-artifacts.mjs';
@@ -39,6 +41,7 @@ import {
 import {
   classifyProviderCapacityFault,
   quarantineProviderAccount,
+  LEASE_CONFLICT_REASON,
 } from './provider-capacity.mjs';
 import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
@@ -470,6 +473,73 @@ export function commitRunSettlement({
   markRunSettled(runDir);
   Object.defineProperty(runResult, 'runResult', { value: runResult, enumerable: false, configurable: true });
   return Object.freeze(runResult);
+}
+
+/**
+ * Settle a Run whose provider account lease was refused after admission: its run.json already says
+ * `running`, so leaving it would make an orphan indistinguishable from a Run in flight. It is settled as a
+ * provider failure through `runtime.executionError` (the Run Result rules derive the failure family and the
+ * `needs-input` disposition), under a run control of its own since none was taken yet. A caller that wants
+ * another attempt supersedes this one through admission (`predecessorRunId`).
+ */
+export function settleRefusedLease({ refusal, provider, runDir, runId, repoRoot, assignment, executorId, policy }) {
+  const settledAt = new Date().toISOString();
+  const stderrText = `provider capacity refused for "${provider}": ${refusal.reason}${refusal.detail ? ` (${refusal.detail})` : ''}`;
+  fs.writeFileSync(path.join(runDir, 'stdout.log'), '');
+  fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
+  const evidenceData = {
+    operationMutability: isReadOnlyAssignment(assignment) ? 'read-only' : 'mutates-repo',
+    gitBefore: null,
+    gitAfter: null,
+    gitBeforeSource: 'pre-launch',
+    dirtyBefore: [],
+    dirtyAfter: [],
+    mutatedDirtyBeforeFiles: [],
+    changedFiles: [],
+    changedFileReasons: {},
+    attribution: [],
+    artifacts: [],
+    tests: [],
+  };
+  fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+  const refusedRunResult = normalizeRunResultV3({
+    runId,
+    assignmentId: assignment.assignmentId,
+    workId: assignment.workId,
+    executorId,
+    policy,
+    settledAt,
+    role: assignment.role,
+    operation: assignment.operation,
+    isReadOnlyOperation: evidenceData.operationMutability === 'read-only',
+    runtime: {
+      exitCode: null,
+      executionError: { code: refusal.reason === LEASE_CONFLICT_REASON ? LEASE_CONFLICT_FAILURE_CODE : 'provider-capacity-refused', message: stderrText },
+      stdoutLog: path.relative(repoRoot, path.join(runDir, 'stdout.log')),
+      stderrLog: path.relative(repoRoot, path.join(runDir, 'stderr.log')),
+    },
+    evidence: evidenceData,
+  });
+  const refusalControl = acquireRunControl(runDir, {
+    holder: buildRunControlHolder(`${runId}:${process.pid}:provider-capacity-refusal`),
+    purpose: 'provider-capacity-refusal',
+  });
+  if (refusalControl.status !== 'acquired') {
+    // Already settled by another path: its result is the answer.
+    const alreadySettled = readSettledResult(runDir, runId);
+    if (alreadySettled) return Object.freeze(alreadySettled);
+    throw new RunnerConfigError(
+      `executeAssignment: provider-capacity refusal could not acquire control for Run "${runId}" (status: "${refusalControl.status}")`,
+      { code: 'run-control-held', phase: 'provider-capacity-refusal' },
+    );
+  }
+  return commitRunSettlement({
+    runDir,
+    runId,
+    controlEpoch: refusalControl.controlEpoch,
+    controlToken: refusalControl.controlToken,
+    runResult: refusedRunResult,
+  });
 }
 
 /**
