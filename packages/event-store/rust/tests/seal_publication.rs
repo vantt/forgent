@@ -986,3 +986,78 @@ fn seal_all_attempts_later_streams_and_aggregates_failures() {
         1
     );
 }
+/// Moves the own ref back to `to` right after the seal's compare-and-swap, as an outside writer would.
+struct RevertRef {
+    root: std::path::PathBuf,
+    reference: String,
+    to: String,
+}
+impl FileSystem for RevertRef {
+    fn checkpoint(&self, p: Point) -> std::io::Result<()> {
+        if p == Point::AfterSealCas {
+            let out = std::process::Command::new("git")
+                .current_dir(&self.root)
+                .args(["update-ref", &self.reference, &self.to])
+                .output()?;
+            assert!(out.status.success(), "{out:?}");
+        }
+        Ok(())
+    }
+}
+#[test]
+fn a_seal_whose_ref_moves_back_after_its_publish_keeps_the_segment_and_the_next_seal_publishes_it()
+{
+    let r = Repo::new();
+    r.append(2);
+    run(&r);
+    let sealed = r.layout.stream(&r.stream).sealed();
+    let before = Receipt::read(&sealed).unwrap();
+    r.append(1);
+    let d = GitDriver::new(&r.root).unwrap();
+    let repo = match d.resolve_repo(&r.root, &r.root).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!(),
+    };
+    let err = seal_with_fs(
+        &d,
+        &repo,
+        SealRequest {
+            layout: &r.layout,
+            machine: "test-aa2345",
+            stream: &r.stream,
+            held_ranks: &[],
+            hot_lock_depth: 0,
+            opportunistic: false,
+        },
+        &RevertRef {
+            root: r.root.clone(),
+            reference: before.reference.clone(),
+            to: before.commit.clone(),
+        },
+    )
+    .unwrap_err();
+    assert_eq!(err.code, ErrorCode::EventStoreSealMismatch, "{err}");
+    let after = Receipt::read(&sealed).unwrap();
+    assert_eq!((after.last_seq, &after.commit), (2, &before.commit));
+    assert!(sealed.parent().unwrap().join("closed/3-3.jsonl").exists());
+    r.append(1);
+    assert_eq!(run(&r).last_seq, 4);
+    let tip = Receipt::read(&sealed).unwrap();
+    let oid = fgos_git::Oid::parse(&tip.commit, repo.object_format()).unwrap();
+    let walked = walk::walk(
+        &d,
+        &repo,
+        &[oid],
+        &fgos_event_store::append::Positions::new(),
+        &Default::default(),
+    )
+    .unwrap();
+    assert_eq!(
+        walked
+            .events
+            .iter()
+            .map(|e| e.seq)
+            .collect::<std::collections::BTreeSet<_>>(),
+        std::collections::BTreeSet::from([1, 2, 3, 4])
+    );
+}

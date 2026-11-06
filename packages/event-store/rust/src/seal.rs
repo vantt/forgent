@@ -239,7 +239,8 @@ pub(crate) fn seal_guarded(
                     "receipt above walked history",
                 ));
             }
-            let commit = if last <= high {
+            let recovering = last <= high;
+            let commit = if recovering {
                 // Recovery must authenticate the actual published bytes, even
                 // when cached emitted coverage prunes the normal walk.
                 let recovered = find_segment(
@@ -326,8 +327,11 @@ pub(crate) fn seal_guarded(
                     "ref or published bytes differ",
                 )
             };
+            // A fresh publish leaves the ref on its own commit: any other value, a
+            // prior tip included, means the events are not published. Only a
+            // recovered segment may already sit behind a known tip.
             let current_tip = match current {
-                RefValue::Direct(o) if tips.contains(&o) || o == commit => o,
+                RefValue::Direct(o) if o == commit || (recovering && tips.contains(&o)) => o,
                 _ => return Err(mismatch()),
             };
             let complete = walk::walk_verified(

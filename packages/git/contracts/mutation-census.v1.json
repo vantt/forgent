@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "11d8fdd161e660c1760f70fd132dd22ed6043230c8e97278beb60176746ec59f",
+  "payloadDigest": "3a8d4a7251fdd49add40a36b8932c0b8dd7f7a43f720aa6531d8c7e3dec7454d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -319,7 +319,7 @@
     "packages/event-store/rust/src/refspec.rs": "6b6e65a57ff159b845906d768fe4eec9a9af761115b990f4315c3219f7b2451b",
     "packages/event-store/rust/src/registry.rs": "4dff23fd6e894bbe7fda1a5ca79b2dcd73c171baa19afb72ad42239d651b3d01",
     "packages/event-store/rust/src/rotate.rs": "6daf009b38713e7083eccae22dc88a2d609d3a6b74aa93791718d64f89bb9de9",
-    "packages/event-store/rust/src/seal.rs": "e8629f101c185155b1b2a9c7021e4ca98e5791ab940b93a770a6df5ad8b1a8db",
+    "packages/event-store/rust/src/seal.rs": "a0473d83d4974fc60a65b8947c57e9d33df00b98d3ed87cf0659ab3e8a05c81b",
     "packages/event-store/rust/src/sync.rs": "9b0fb2973da6205f9aedb3b38049a32f30bc6aed63fa43cb58e461524906f7b3",
     "packages/event-store/rust/src/validation.rs": "9410d9665f97aeadff6eafe8855a92a36f189f3ae5523e39c8e4ece57a266390",
     "packages/event-store/rust/src/walk.rs": "fe1a416da430004395cd486dfcd9a9a0a652c8558f2f8945308e65b5157a6dd8",
@@ -347,7 +347,7 @@
     "packages/event-store/rust/tests/review_fixes.rs": "d3aa5b3493b5f55d8fe3cd8809d63e9abe69598a5d26166addabd63bd1b617bb",
     "packages/event-store/rust/tests/seal_cas_race.rs": "11f9f9bd62131b0d069cfd91bc7da8f3ee313ffd101f9cce275d6d9a92f8973c",
     "packages/event-store/rust/tests/seal_checkpoint.rs": "7dd8f6a9461d65abe73a43a4252d12bdce75ef692f5949adccc2bea06f6f77fd",
-    "packages/event-store/rust/tests/seal_publication.rs": "f845d443b07f2345d41970554d3df157d904297361876d67456fc8a717aa006b",
+    "packages/event-store/rust/tests/seal_publication.rs": "222d562224576947a7b9634ba0beee5cad0348c1ea85b9b15cde2fb19d379ef6",
     "packages/event-store/rust/tests/shared_machine_id.rs": "c02a8b04cd56e4dcd7e96242f5b7cf45f85032ee1e87613c7a92dbe464b88575",
     "packages/event-store/rust/tests/support/driver.rs": "531d3acdb8c5ca85339b913238efce2114f42b1c9017d2410f622af140d55cee",
     "packages/event-store/rust/tests/sync_review.rs": "02dde7f2851185698ac6ab13d0155d3682383cda512605c06cca982379d3eba9",
@@ -2266,6 +2266,13 @@
     {
       "path": "packages/event-store/rust/tests/seal_publication.rs",
       "line": 902,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/event-store/rust/tests/seal_publication.rs",
+      "line": 998,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
