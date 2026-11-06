@@ -6,7 +6,8 @@ import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { bwrapUsable, createTerminalProject, noHost, readJson, waitUntil } from './support/terminal-harness.mjs';
+import os from 'node:os';
+import { FAKE_HERDR, bwrapUsable, createTerminalProject, noHost, readJson, waitUntil } from './support/terminal-harness.mjs';
 
 const projects = [];
 after(() => { for (const project of projects) project.stop(); });
@@ -191,4 +192,33 @@ test('fgos run with herdr present runs a confined read-only unit in a pane: the 
   const result = readJson(path.join(project.attemptDir(), 'result.json'));
   assert.equal(result.adapter, 'herdr-spawn');
   assert.equal(result.classification.outcome.reason, 'completed-pass', JSON.stringify(result.classification));
+});
+
+// The confined test above ends with a settled attempt, whose supervisor finalizes the home. A launch the
+// controller itself refuses (here: herdr cannot open the pane) never reaches a supervisor and writes no
+// envelope, so nothing downstream knows the attempt's private home exists; the home may hold a copy of the leased
+// account's login and has to be given back by the controller, through the door that stages a renewed login first.
+test('a launch refused before the handover leaves no attempt home and no pane', { skip: noHost || (!bwrapUsable() && 'bwrap with a pid namespace is not usable here'), timeout: 240_000 }, async () => {
+  const project = await newProject('refused', { confined: true });
+  // herdr answers everything as the fake does, except that it cannot open a tab for the pane.
+  fs.writeFileSync(project.herdrBin, `#!/bin/sh
+if [ "$1" = tab ] && [ "$2" = create ]; then
+  echo '{"id":"cli:fake","error":{"code":"pane_split_failed","message":"no room for a pane"}}' >&2
+  exit 1
+fi
+FAKE_HERDR_DIR=${project.herdrDir} exec ${FAKE_HERDR} "$@"
+`, { mode: 0o755 });
+  const run = project.startFgosRun();
+  const exit = await run.exited;
+  assert.notEqual(exit.code, 0, 'the launch is refused');
+  assert.equal(fs.existsSync(path.join(project.attemptDir(), 'envelope.json')), false, 'the refusal came before the handover');
+
+  const root = path.join(os.tmpdir(), 'fgos-confinement');
+  const homesOfThisProject = (fs.existsSync(root) ? fs.readdirSync(root) : [])
+    .map((dispatch) => path.join(root, dispatch, 'home'))
+    .filter((home) => {
+      try { return path.resolve(readJson(path.join(home, '.fgos-confinement-owner.json')).runDir).startsWith(project.repoDir); } catch { return false; }
+    });
+  assert.deepEqual(homesOfThisProject, [], 'the refused launch left its private home behind');
+  assert.equal(project.callsStarting('pane run').length, 0, 'no pane was started');
 });
