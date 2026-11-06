@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "17292bf7eb035555a63acd808beee4f274940861abcdf31fbaf56a048d8be707",
+  "payloadDigest": "6361ab94a811f51e9fda602412736b75e20323ab8d7ad2f0c6b0ad61f5e7eaa2",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -674,7 +674,7 @@
     "packages/run-supervisor/rust/src/supervise/windows.rs": "6b7de2b3ee80cb63ea33e77a6837e3838eb558223f34a8b83e79c7861ab4e4a4",
     "packages/run-supervisor/rust/src/terminal_slot.rs": "b049ad77513a954907f0a17344b738e0fa1ada82f369eb0d1b93e2dc833b69bb",
     "packages/run-supervisor/rust/tests/adopt_concurrency.rs": "c7d8287e421c1931388a0b79dad8f03c5e7dffcace9b907efbe6b0889d6d3a7e",
-    "packages/run-supervisor/rust/tests/adopt_matrix.rs": "ddf60f79d6f44dd593ccf22cc0b5b378ec80588c5f1ec3f87ce8c95962f7948a",
+    "packages/run-supervisor/rust/tests/adopt_matrix.rs": "33cddf521be090c03ec96e34a8584f091962905e22f76e060ab053d789269aed",
     "packages/run-supervisor/rust/tests/adopt_scan_perf.rs": "e7c7c69ebb474fb9e070340b9c48888c603ef93f7024545b0887130fddedd3d1",
     "packages/run-supervisor/rust/tests/envelope_digest_vectors.rs": "593eacf90542d07acb74ce2917ece2c9f82e6e63a205045aeb2a022106fee153",
     "packages/run-supervisor/rust/tests/fixtures/ignore-sigterm.sh": "5e83e7c47f0c6dd3ee7c21e7aa6c3854b39535fe7593d1becd6a89e806419d0a",
@@ -2899,6 +2899,13 @@
       "spawn": "Command::new <- packages/terminal-control/rust/src/driver/herdr.rs:393",
       "binary": "(env *)",
       "class": "configured-binary"
+    },
+    {
+      "path": "packages/run-supervisor/rust/tests/adopt_matrix.rs",
+      "line": 434,
+      "spawn": "Command::new",
+      "binary": "? internal_harness()",
+      "class": "rust-test"
     },
     {
       "path": "packages/run-supervisor/rust/tests/gate_pid1.rs",
