@@ -14,22 +14,6 @@ herdrOrchestrator:
 # flagship: phán đoán, thiết kế, phê bình; self-check: kết quả là một ý kiến hay một thiết kế?; e.g. review, red-team, thiết kế giải pháp, synthesis của panel
 # frontier: quyết định đắt nhất; self-check: khó đảo, đắt nếu sai?; e.g. khoá kiến trúc, synthesis cuối của hội đồng quan trọng
 runner:
-  # @fgos:doc The default executor a run spawns when no capability names one; detected from PATH when the project names none.
-  executor:
-    # @fgos:doc The program to spawn.
-    # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
-    command: claude
-    # @fgos:doc Arguments of the program; {prompt} and {model} are replaced at launch.
-    # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
-    args:
-      - -p
-      - "{prompt}"
-      - --model
-      - "{model}"
-      - --permission-mode
-      - acceptEdits
-      - --allowedTools
-      - Bash(cargo build:*),Bash(cargo check:*),Bash(cargo test:*),Bash(cargo clippy:*),Bash(cargo fmt:*),Bash(node --test:*),Bash(rtk cargo:*),Bash(rtk node:*),Bash(rtk proxy cargo:*),Bash(rtk proxy node:*),Skill
   # @fgos:doc The capability catalog: what each capability is called, which executors serve it and how it is held.
   capabilities:
     # @fgos:doc One capability: what it is called, which executors serve it and how work on it is held.
@@ -152,13 +136,6 @@ runner:
       # @fgos:doc The responsibility a tool fills.
       # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
       responsibility: Verification
-      # @fgos:doc The ways to start the executor.
-      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
-      invocations:
-        - via: mcp
-          command: mcp:gitnexus
-          tools:
-            impact-analysis: mcp__gitnexus__impact
     # @fgos:doc One executor: an agent that runs work or a tool that is only present, with the invocations that start it.
     herdr:
       # @fgos:doc agent runs work for a seat, tool is only called. Values: agent | tool.
@@ -174,12 +151,6 @@ runner:
       # @fgos:doc What the executor is and how its invocations differ.
       # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
       description: herdr pane label writer (herdr pane rename) for /fgOS:terminal
-      # @fgos:doc The ways to start the executor.
-      # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
-      invocations:
-        - via: cli
-          command: herdr
-          args: []
     # @fgos:doc One executor: an agent that runs work or a tool that is only present, with the invocations that start it.
     gemini:
       # @fgos:doc What the executor is and how its invocations differ.
