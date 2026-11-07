@@ -31,9 +31,10 @@ pub enum Resolved {
     Malformed,
 }
 
-/// The one writer id of the mail-body fetch. A transfer left half done is recovered only under the
-/// writer that began it, so this never varies.
-const FETCH_WRITER: &str = "mailbox-body-fetch";
+/// The one writer id of every transfer on this machine's mail-body ref, fetch and push alike. A
+/// transfer left half done is recovered only under the writer that began it, so it is named for the
+/// ref, never for the operation, and never varies.
+pub(crate) const BODY_WRITER: &str = "mailbox-body";
 
 /// Whether this sync brought the mail-body mirrors up to date after its event fetch. A header whose
 /// body is absent is expired only after a [`BodyFetch::Fetched`]; otherwise nothing is known about
@@ -47,7 +48,7 @@ pub enum BodyFetch {
 
 /// Fetches the mail-body mirrors of `remote` into the clone `main` is in. Call it only after the
 /// Event Store sync of the same run returned. The transfer runs under the machine's own
-/// `event-seal` hold, bound to `refs/fgos/mail-bodies/<this machine>` and [`FETCH_WRITER`], the way
+/// `event-seal` hold, bound to `refs/fgos/mail-bodies/<this machine>` and [`BODY_WRITER`], the way
 /// every outside caller of the publication port borrows the seal.
 pub fn fetch(main: &Path, remote: &str) -> BodyFetch {
     match try_fetch(main, remote) {
@@ -97,7 +98,7 @@ fn try_fetch(main: &Path, remote: &str) -> Result<(), String> {
     };
     let fetched = (|| {
         let authority =
-            HolderAuthority::new(&clone.repo, &mut handle, &seal, reference, FETCH_WRITER)
+            HolderAuthority::new(&clone.repo, &mut handle, &seal, reference, BODY_WRITER)
                 .map_err(|e| format!("{e:?}"))?;
         let port = PublicationPort::new(&clone.driver, authority).with_remote(RemoteGrant {
             name: remote.to_owned(),
