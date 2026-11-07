@@ -4,7 +4,7 @@
 Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent, documentation agent
 Purpose: Define the Knowledge and Documentation Engine (horizon H2): the one door an agent uses to write or change maintained documentation, the admission that keeps a writer from opening new authority without review, and the checks behind them, built by extending the doors that already run
-Design status: Draft proposal, revised after the 2026-11-06 architecture panel and owner decisions (section 7.7). Not signed. Remaining owner questions in section 11.2; the topic admission contract is open (section 11.4).
+Design status: Draft proposal, revised after the 2026-11-06 architecture panel and owner decisions (section 7.7). Not signed. Remaining owner questions in section 11.2; the topic admission contract is written (section 6.8).
 Implementation: Not started for the write door and the two new checks; the registry, Convention placement rules, doc-health and the decision index it extends are implemented
 Canonical: No (becomes canonical when signed)
 Provenance: First committed 2026-11-06 by the DOCOS lead from the H2 scout report plans/reports/scout-261106-1430-docos-h2-knowledge-documentation-engine-facts.md and the proposal docs/platform/proposals/documentation-system-unification.md
@@ -12,7 +12,7 @@ Writer type: Agent draft writer
 Canonical for: Nothing yet; it is the draft for the documentation write door and claim-owner checks, and becomes canonical only when signed
 Use this when: Reviewing what H2 slice 1 builds, what it reuses, and what it defers
 Do not use this for: Current documentation rules: until signed, governance.md, the Convention spec and the knowledge-registry contract hold them
-Last reviewed: 2026-11-06
+Last reviewed: 2026-11-07
 Related:
 - docs/platform/proposals/documentation-system-unification.md
 - docs/platform/governance.md
@@ -228,14 +228,40 @@ Admission is decided by what a change does, not by which verb carries it. Each e
 
 | Effect | Door that records it today | Slice 1 admission |
 |---|---|---|
-| A user topic is created with authority (`topic register`, `topic split`) | registry reducer, `fgos topic` | open: mechanism undecided (11.4); until then the door never calls these on its own |
+| A user topic is created or its purpose renamed (`topic register`, `topic split` successors, `topic rename`) | registry store door, `fgos topic`; `scripts/knowledge-bootstrap.mjs` | an approved ask names the topic (6.8) |
 | A slot is opened with a role | `fgos doc reserve` | role must be in the admitted set (5.1) |
-| A document starts `active` (register or bootstrap) | registry reducer, `scripts/knowledge-bootstrap.mjs` | refused for a new document; it reaches `active` only by promote with a person |
+| A document starts `active` (register or bootstrap) | registry reducer, `scripts/knowledge-bootstrap.mjs` | refused for a new document; it reaches `active` only by `doc promote`. Promote proves no person today; that limit is declared in 6.8, not closed |
 | Authority moves to a successor (`doc supersede`) | registry reducer | successor must already be `active` |
 | A document moves across area or holder (`doc move-path`, platform rename) | registry reducer; Convention for platform paths | needs the same admission as a create |
 | A new platform area appears | Convention's open `<area>` patterns | doc-health checks the area against one list of admitted areas; the plan names that list's source (the panel did not; candidates are the area rows of [component-boundary](../component-boundary.md) and the governance holder table). Convention classify alone still passes a new area, so the promise rests on this check, not on classify |
 
 Not admission: a writer id prefix, the mere existence of a decision id, or a matcher verdict.
+
+### 6.8. Topic admission contract
+
+A new topic is the one effect that opens a new authority namespace for user documents: with at most one active document per (topic, role) and six roles, the number of admitted topics bounds new authority. This contract decides how a topic is admitted. It adds no topic status and no event type.
+
+**Door.** The admission is an approved answer at the human gate that already exists on work items: `fgos ask <workId> "<question>"` parks the item in `awaiting-human`, and `fgos answer <workId> --approve "<answer>"` records `gates[workId].approved = true` with the ask text (`src/state/replay.mjs`, the ask and answer fold). A fresh ask or a plain answer clears `approved`, so consent never carries over.
+
+**Who asks.** A writer that finds no fitting topic does not create one. It submits one work item for the proposed topic (`fgos submit`), and asks on it. The question carries the proposed topic id, its purpose title, the existing topics it checked and why none fits. A retrospective item cannot be parked (`status-fsm.mjs` has no edge from `retrospective` to `awaiting-human`), so the proposal is always its own item; the retrospective item keeps its material and does not wait. Several proposals from one pass are batched into one item and one question, listing every id (priority 2, "Release con người").
+
+**Check at the door.** `fgos topic register`, `fgos topic split` and `fgos topic rename` take `--admitted-by <workId>` for every new event. The store door refuses the write unless:
+
+1. `gates[workId].approved` is true;
+2. the recorded ask text names each topic id the event creates or renames, as a whole token;
+3. no topic already registered cites the same `workId` for the same id (one admission, one use).
+
+The event payload records `admission: { workId }` for audit. `scripts/knowledge-bootstrap.mjs` registers topics through the same door, so it needs the same flag for any new topic.
+
+**Replay.** The check runs in the store door before append, never in `applyKnowledgeEvent`. Old events without `admission` replay unchanged; no reducer enum is tightened.
+
+**Refusal text.** The four refusal strings that today steer writers to `fgos topic split` (`src/state/knowledge-registry.mjs` lines 182, 202, 248, 534; `bin/fgos.mjs:1591`) change to name the ask door instead: grow the existing document, or propose a topic through an ask.
+
+**Not covered.** `topic merge` moves documents into a topic that already exists, so it opens no namespace and needs no admission. `topic retire` closes authority and needs none.
+
+**Declared limit.** fgOS has no proof of a person: the Identity spec leaves out human accounts, and `fgos answer --approve` can be typed by any session, including the one that asked. The promise is that a new topic always leaves an approved question naming it, on a work item a person can find, and that no writer path opens a topic without one. It is not a proof that a person typed the answer. The same limit holds for `doc promote`, which checks lifecycle, slot and commit, not who runs it. Closing either limit needs the Identity owner (panel missing expertise) and is not in slice 1.
+
+**Alternatives rejected.** A `proposed` topic status: its activation, replay, merge and reader meaning are not written, and the reader leak in `src/report/enduser-index.mjs` already shows how an unaccepted state reaches readers (11.1). A writer-prefix gate (`att-*`): an id prefix is not authorization. A reviewed batch file of admitted topics: a second registry beside the event store.
 
 ## 7. Rules And Invariants
 
@@ -325,7 +351,7 @@ None new in slice 1. The output format of the check command (file, line, rule id
 
 ### 11.4. Open contract work (lead, not owner)
 
-- **Topic admission mechanism.** The panel left it open: a `proposed` topic status lacks its activation path, replay compatibility, merge disposition and reader meaning; a writer-prefix gate is not authorization. The lead writes this contract before signing. Missing expertise named by the panel: the identity owner, to prove a person at promote, and the Event Store owner, for replay of any new status.
+- **Topic admission mechanism.** Written in 6.8 (2026-11-07): an approved ask names the topic, checked at the store door for new events only. Still open: proof of a person, which needs the Identity owner; the Event Store owner is not needed because no status or event type is added.
 
 ### 11.3. Deferred, preserved (non-preclusion, proposal 0.3)
 
@@ -352,7 +378,7 @@ None new in slice 1. The output format of the check command (file, line, rule id
 | Rule-claim owner rule | planned | scout section 7 | add rule and sweep |
 | Pre-commit runs the check | planned | the Convention spec states doc-health is not in pre-commit | item `p-cd2ejz7wa5` |
 | Registry repairs and honest commit gate | planned | scout section 2; panel outcome section 2 | item `p-cd2ejz7wa5` |
-| Admission by effect | planned | panel outcome section 2 (seven paths, cited lines) | role set at reserve; active-on-create refused; supersede and move rules; topic mechanism open (11.4) |
+| Admission by effect | planned | panel outcome section 2 (seven paths, cited lines) | role set at reserve; active-on-create refused; supersede and move rules; topic admission by approved ask (6.8) |
 | Admitted role set | decided | owner 2026-11-06 (7.7) | enforce at `fgos doc reserve`; map or retire classifier roles |
 | Retrospective writer grows by default | planned | panel outcome R5 (cleanup gate) | item `p-ixrbglli5o` |
 | Owner by claim, audience by surface | planned | prior discussion `docs/history/compound-learn-artifact-registry/DISCUSSION.md` section 4; proposal 3.2, 3.3, A6 | skill text |
@@ -389,3 +415,4 @@ Done means: `npm test` and `cargo test --workspace` are green apart from tests t
 - 2026-11-06: draft. Slice 1 is the write door, built by extending the existing doors. No new verb (reconciles proposal 4.5 with Phase 10 decision 1). Platform documents keep path identity. Rule claims are keyed by (holder, id). Unsigned.
 - 2026-11-06, owner review: an owner is found by claim and claim kind, never by topic. The audience (agent, developer, user) decides only the surface. This builds on the settled identity axes of the compound-learn registry discussion (D-tsk28x-1, 3, 4, 13 and 14) and on proposal 3.2 and 3.3. Following A6, it supersedes the "two registries" clause of D-tsk28x-8 (to be recorded on signing).
 - 2026-11-06, architecture panel and owner decisions (7.7): the rule "no match, then create" is withdrawn; a writer must be admitted to open or move authority (6.7), and a missed lookup never grants create. The headline promise is narrowed to admission. Six roles are admitted for new writes. No new coordinate system, no durable claim identity in slice 1. Two items opened: `p-cd2ejz7wa5`, `p-ixrbglli5o`.
+- 2026-11-07, lead: topic admission contract written (6.8). A new, split or renamed topic needs an approved answer on a work item whose question names it, checked at the store door for new events; no topic status or event type is added. The limit that no person is proven is declared, for topics and for promote.
