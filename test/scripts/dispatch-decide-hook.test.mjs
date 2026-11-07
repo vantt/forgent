@@ -6,16 +6,16 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { machineHome, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 // Real, live runs of the actual hook script -- no fixture stands in for
 // `decide`'s own real subprocess call (tsk-60f's own verify field demands
 // this be proven "bằng lần chạy thật, không phải fixture").
 
 const hookPath = fileURLToPath(new URL('../../scripts/dispatch-decide-hook.mjs', import.meta.url));
-// An empty home: the hook reads the machine's global config too, and a developer's own file must not decide a test.
-const emptyHome = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-decide-hook-home-'));
-const env = { ...process.env, HOME: emptyHome };
+// A scratch home: the hook reads the machine's global config too, and a developer's own file must not decide a test.
+// It is the home the config fixture lays a project fixture's machine-only keys (executors) into.
+const env = { ...process.env, HOME: machineHome() };
 
 function mkTempGitRepo() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-decide-hook-'));
