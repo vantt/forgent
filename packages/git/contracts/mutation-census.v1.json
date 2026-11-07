@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d68bebeecd0833e9f5b89d0e8f3cc1c225f2a562e2bf2a44f8a7c51abd97993a",
+  "payloadDigest": "0e34339948626090d6aff31476d14abb0f7093e7a63b6cce021e061f3996a237",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -334,7 +334,7 @@
     "packages/event-store/rust/tests/kill_append.rs": "cb2994d5e7c635094828133334a6e16e7e535426491a00e0be7ebc75d793adf7",
     "packages/event-store/rust/tests/legacy_import.rs": "12dadfe4495157350690fe0db21afe73f85fc9dfd892abdfda0c52d178e747e7",
     "packages/event-store/rust/tests/legacy_reader.rs": "b60b9170f66d26eac2c8b8037f5fead896625504bed65881c57833d6ce428ff9",
-    "packages/event-store/rust/tests/offline_sync.rs": "3bb91255c19a732217c8cfa92b86a15145dbe0e30dee1f6d3a1629f68c37c658",
+    "packages/event-store/rust/tests/offline_sync.rs": "e4d0e7bce0836e4a6a97c1b0c579c95b2e2b6ada20786daf6005ccec84eeda60",
     "packages/event-store/rust/tests/order_kahn.rs": "c2b1004b8772de30aace61b1f8279c2131b1678a3be45f64b15b171c1728b6e1",
     "packages/event-store/rust/tests/p02_review.rs": "5a560dd163330beb32cac8881bc37b3cd558471d1aa7ffead138b7b686e23fe3",
     "packages/event-store/rust/tests/read_head_children.rs": "45b5b72c696d2d80043e19f5ec13cd54122f2534ed1d6195eff5bcdbba5132b2",
@@ -391,7 +391,7 @@
     "packages/git/rust/src/lib.rs": "31764b59700b9495f73cccf3137f43d2cf6ea0d26489a7ce784485d83571eb04",
     "packages/git/rust/src/native_lock.rs": "49758dea6b6d2f2abae425b31b937817b8c15174a83bf10ce33dd9046cc5139a",
     "packages/git/rust/src/objects.rs": "835dcdc093cbbdad82eb25b82fd28df9de6942789751a57b571f24e389cf23ec",
-    "packages/git/rust/src/publication.rs": "fe025bcef9234e1095df2e33cbc85290b6673d31d483ac41ed2b6bbf6d6ff614",
+    "packages/git/rust/src/publication.rs": "6505729966b3bc003de2697ad64a130de8d421eac1904ca97144b8582536f8ee",
     "packages/git/rust/src/recovery.rs": "b30f9de2ee0168597c487c09fa11ad1b61e1fdeb5b5047d8a135af4764d33183",
     "packages/git/rust/src/refs.rs": "e4eef25eb241030b7c5b49d146f7b275762d219f49efba8284ab39a93698bc37",
     "packages/git/rust/src/remote.rs": "8600d1b6964f4bba67fbee98520cdf43c92b91ac8eb2b8e94b9b0ef0e68373fa",

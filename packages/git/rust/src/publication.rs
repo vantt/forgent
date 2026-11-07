@@ -1058,6 +1058,32 @@ impl<F: FileSystem> RecoveryReader for BoundReader<'_, '_, F> {
     }
 }
 
+/// Reads the porcelain result line of one pushed ref. A forced update (`+`) is
+/// the leased replace of a mail-body ref; anywhere else it would mean the
+/// fast-forward guarantee broke, so it is a rejection, never an acknowledgement.
+fn push_outcome(line: Option<&str>, success: bool, mail_body: bool) -> PushOutcome {
+    match line {
+        Some(l)
+            if l.starts_with("!\t")
+                && (l.contains("[rejected] (non-fast-forward)")
+                    || l.contains("[rejected] (fetch first)")
+                    || l.contains("[rejected] (stale info)")) =>
+        {
+            PushOutcome::RejectedNonFastForward {
+                advertised_tip: None,
+            }
+        }
+        Some(l) if l.starts_with("!\t") => PushOutcome::RejectedOther { reason: l.into() },
+        Some(l) if success && l.starts_with("+\t") && !mail_body => {
+            PushOutcome::RejectedOther { reason: l.into() }
+        }
+        Some(l) if success && matches!(l.as_bytes()[0], b' ' | b'=' | b'*') => {
+            PushOutcome::Accepted
+        }
+        Some(l) if success && l.starts_with("+\t") => PushOutcome::Accepted,
+        _ => PushOutcome::RemoteOutcomeUnknown,
+    }
+}
 fn kind_name(kind: ObjectType) -> &'static str {
     match kind {
         ObjectType::Blob => "blob",
@@ -1743,31 +1769,13 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                     // establish a winner or an acknowledgement on their own.
                     let lines = text(&out.stdout)?;
                     let line = lines.lines().find(|l| l.as_bytes().get(1) == Some(&b'\t'));
-                    match line {
-                        Some(l)
-                            if l.starts_with("!\t")
-                                && (l.contains("[rejected] (non-fast-forward)")
-                                    || l.contains("[rejected] (fetch first)")
-                                    || l.contains("[rejected] (stale info)")) =>
-                        {
-                            details.push(l.into());
-                            PushOutcome::RejectedNonFastForward {
-                                advertised_tip: None,
-                            }
-                        }
-                        Some(l) if l.starts_with("!\t") => {
-                            details.push(l.into());
-                            PushOutcome::RejectedOther { reason: l.into() }
-                        }
-                        Some(l)
-                            if out.success
-                                && matches!(l.as_bytes()[0], b' ' | b'+' | b'=' | b'*') =>
-                        {
-                            details.push(l.into());
-                            PushOutcome::Accepted
-                        }
-                        _ => PushOutcome::RemoteOutcomeUnknown,
+                    let outcome = push_outcome(line, out.success, is_mail_body_ref(local.as_str()));
+                    if let (Some(l), false) =
+                        (line, matches!(outcome, PushOutcome::RemoteOutcomeUnknown))
+                    {
+                        details.push(l.into());
                     }
+                    outcome
                 }
                 Err(_) => PushOutcome::RemoteOutcomeUnknown,
             };
@@ -1945,5 +1953,28 @@ impl<F: FileSystem> Inspect for PublicationPort<'_, F> {
     }
     fn resolve_repo(&self, path: &Path) -> Result<ResolveRepo> {
         Inspect::resolve_repo(self.driver, path)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_forced_update_is_accepted_only_for_a_mail_body_ref() {
+        let line = Some("+\trefs/fgos/x:refs/fgos/x\ta..b (forced update)");
+        assert!(matches!(
+            push_outcome(line, true, true),
+            PushOutcome::Accepted
+        ));
+        assert!(matches!(
+            push_outcome(line, true, false),
+            PushOutcome::RejectedOther { .. }
+        ));
+        let stale = Some("!\trefs/fgos/x:refs/fgos/x\t[rejected] (stale info)");
+        assert!(matches!(
+            push_outcome(stale, true, true),
+            PushOutcome::RejectedNonFastForward { .. }
+        ));
     }
 }

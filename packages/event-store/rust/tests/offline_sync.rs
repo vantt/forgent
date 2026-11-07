@@ -129,3 +129,38 @@ fn an_opportunistic_sync_skips_a_held_seal_lock_instead_of_waiting_for_it() {
     assert!(!ran.busy);
     assert!(a.layout.root.join("sync.json").exists());
 }
+
+#[test]
+fn mail_body_refs_in_the_repo_change_neither_what_sync_verifies_nor_what_read_returns() {
+    let w = World::new();
+    let a = w.clone("a", "machine-aa");
+    let b = w.clone("b", "machine-bb");
+    a.setup();
+    b.setup();
+    a.append(2);
+    a.sync(false).unwrap();
+    b.append(1);
+    b.sync(false).unwrap();
+    let events = b.hashes();
+    let certified = fgos_event_store::sync::sync_status(&b.layout)
+        .unwrap()
+        .positions;
+    assert_eq!(events.len(), 3);
+    // A body ref of this machine, one on the remote, and the mirror of a peer's.
+    let anchor = a.tip();
+    for (root, name) in [
+        (&b.root, "refs/fgos/mail-bodies/machine-bb"),
+        (&b.root, "refs/fgos/remotes/origin/mail-bodies/machine-aa"),
+        (&w.remote, "refs/fgos/mail-bodies/machine-aa"),
+    ] {
+        git(root, &["update-ref", name, &anchor]);
+    }
+    b.sync(false).unwrap();
+    assert_eq!(b.hashes(), events);
+    assert_eq!(
+        fgos_event_store::sync::sync_status(&b.layout)
+            .unwrap()
+            .positions,
+        certified
+    );
+}
