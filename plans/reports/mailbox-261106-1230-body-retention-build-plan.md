@@ -25,9 +25,16 @@ GitHub's unreachable objects keep what they saw, even after step 7. Windows sche
 2. **Mailbox: receiver understands payload v3.** Verify `fgos-mailbox-message/3`, read the body from the body
    mirror by hash, header-without-body is the expired state, older receivers still drop v3 as
    remote-malformed. Register the new schemaVersion (ES reviews). No sender change yet.
+2b. **Mailbox sync child fetches the body mirror (added 2026-11-07, OPC ruling).** After the Event Store sync returns,
+   `PublicationPort::fetch_refs` takes the mail-bodies mapping alone (events first, then bodies, then ingest), under the
+   body ref's own authority and the fixed writer id. A v3 header without its blob is settled `remote-body-expired` only
+   when a body fetch started after this sync's event fetch succeeded on a clone that has the third mapping; in every
+   other case (mapping missing, fetch failed, Git read error) the header is held: the cursor for that origin stops
+   before it, bounded by the existing MAX_AGE stale rule. No Event Store change. Step 2 landed (`336073f11`, `60a430f8e`).
+   **Gate: no machine sends v3 until 2b has landed and every receiver runs it.**
 3. **Upgrade every receiver.** fg-server2, fg-server (via RULE), design-lap. `fgos mailbox status` shows
    the payload version each machine accepts. Nothing is sent as v3 before all three accept it.
-4. **Mailbox: sender switches to v3.** Write the body to the body ref, push it before the event ref, keep
+4. **Mailbox: sender switches to v3.** (Condition: the body push is acknowledged before the event is appended; test it on the sender side.) Write the body to the body ref, push it before the event ref, keep
    v2 only for a receiver that has not been upgraded (decided by a per-remote setting, off by default).
 5. **Rotation.** Every 7 days the owner machine builds a new root with the bodies younger than 7 days and
    replaces the ref under the lease. `fgos mailbox status` lists the oldest body kept.
@@ -51,6 +58,7 @@ Phase 7 is a separate design first (Event Store truncation), about 2 days with r
 
 ## Risks
 
+- Known downgrade limit: `CounterReason` (counters.rs) has no `#[serde(other)]`, so a binary older than step 2 cannot load a record that counted `remote-body-expired`; every earlier reason was added the same way.
 - A sender switches before a receiver is upgraded: mail is dropped as remote-malformed. Mitigation: phase 3
   gate and the per-remote setting.
 - The leased replace loses a race with another writer: the push is refused, rotation retries next sync.
