@@ -16,8 +16,8 @@
     "scripts/lib/mailbox-behaviour-v7f.mjs": "38e67d4b4e41672a42af2b7cd5ca2ac80349f8d7163b6578b88ab7b84c902fa7",
     "scripts/lib/mailbox-behaviour-v7.mjs": "3fe42c79f56a07e707bda26c74f2bc6cd0d12dc035229af403db1e5c23996961",
     "scripts/lib/mailbox-behaviour-run.mjs": "e4f2904c8d53726e1b48529079c9050ecad6e542f29f82295e50255361bacfe4",
-    "scripts/lib/mailbox-live-confined.mjs": "fde5fef9c641ddec9430ae9eac1993a7ff1a2d4e3ccf0d784d6f46e74463950b",
-    "packages/mailbox/contracts/adapters.v1.json": "5c38a3bb2ffa3db4e722e3639f3359336f27d362c748af6550f170e049a7aa9d",
+    "scripts/lib/mailbox-live-confined.mjs": "ea6931c73f0662ba182e99a1cd7b7d442385b55488bd4bc0d08db9a1a98bc591",
+    "packages/mailbox/contracts/adapters.v1.json": "bdcd112e35faa9a9269fe505cf0b340840951e2465cb54a5b4511fb7edfa8280",
     "test/live/mailbox-behaviour.live.mjs": "5ce621039834c008f736895c8ad045da18a4e56020a7ef7d4195ab759bd174bd"
   },
   "instruction": {
