@@ -3,6 +3,8 @@
 pub mod event_store_clone;
 pub mod identity_log;
 #[cfg(unix)]
+pub mod mailbox_body;
+#[cfg(unix)]
 pub mod mailbox_config;
 #[cfg(unix)]
 pub mod mailbox_hook;

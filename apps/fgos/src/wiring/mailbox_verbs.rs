@@ -361,6 +361,16 @@ fn status(json: bool) -> MailboxAnswer {
             }
             let unconfirmed = mailbox_remote::unconfirmed_machines(&root);
             data["crossMachine"]["requireConfirmed"] = Value::from(cross.require_confirmed);
+            data["crossMachine"]["acceptedPayloadVersions"] =
+                json!(mailbox_remote::ACCEPTED_PAYLOAD_VERSIONS);
+            text.push_str(&format!(
+                "\ncross-machine: this machine takes mail payload versions {}",
+                mailbox_remote::ACCEPTED_PAYLOAD_VERSIONS
+                    .iter()
+                    .map(u64::to_string)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ));
             data["crossMachine"]["unconfirmedMachines"] = unconfirmed
                 .iter()
                 .map(|(id, _)| Value::from(id.as_str()))

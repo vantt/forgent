@@ -13,11 +13,12 @@
 //! binds it to the recipient's current generation. A message that fails
 //! verification is dropped and counted; it never stops the others.
 use super::identity_log::StoreLogDoor;
+use super::mailbox_body::{BodyMirror, Resolved};
 use super::mailbox_config::CrossMachine;
 use super::mailbox_identity::{session_of, state_root};
 use super::mailbox_remote::{
-    settled_payload, signed_bytes, MESSAGE_SENT, MESSAGE_SETTLED, SENT_DOMAIN, SENT_DOMAIN_WAKE,
-    STREAM, WIRE_MAX_BODY_BYTES,
+    settled_payload, signed_bytes, MESSAGE_SENT, MESSAGE_SETTLED, SENT_DOMAIN,
+    SENT_DOMAIN_BODY_REF, SENT_DOMAIN_WAKE, STREAM, WIRE_MAX_BODY_BYTES,
 };
 use fgos_identity::current::machine_info;
 use fgos_identity::pins::PinState;
@@ -58,6 +59,14 @@ pub struct Report {
     pub nudges: Vec<(String, NudgeReport)>,
 }
 
+/// What a verified message says its body is: the text itself (versions 1 and 2), or the hash and
+/// length of the blob that holds it in the sender's mail-body ref (version 3).
+#[derive(Debug, PartialEq, Eq)]
+enum Body {
+    Inline(String),
+    Held { hash: String, bytes: u64 },
+}
+
 /// A message that passed verification, owned so the record can borrow it.
 struct Verified {
     machine: String,
@@ -65,7 +74,7 @@ struct Verified {
     from: WriterKey,
     from_id: String,
     to_id: String,
-    body: String,
+    body: Body,
     /// The signed event asked for a wake and its machine's key is confirmed here.
     wake: bool,
 }
@@ -88,24 +97,48 @@ fn verify(
         .unwrap_or("?")
         .to_owned();
     // Version 1 is a plain message; version 2 is the same with a signed `wake: true` under its own
-    // domain. Any other version, or a version 2 without the flag, is malformed.
-    let wake_asked = match payload.get("v").and_then(Value::as_u64) {
-        Some(1) if payload.get("wake").is_none() => false,
-        Some(2) if payload.get("wake") == Some(&Value::Bool(true)) => true,
+    // domain; version 3 holds the body's hash and length instead of the body, with `wake` optional
+    // (and then `true`) under its own domain. Any other version, or a flag that does not belong to
+    // its version, is malformed.
+    let (domain, wake_asked, held) = match payload.get("v").and_then(Value::as_u64) {
+        Some(1) if payload.get("wake").is_none() => (SENT_DOMAIN, false, false),
+        Some(2) if payload.get("wake") == Some(&Value::Bool(true)) => {
+            (SENT_DOMAIN_WAKE, true, false)
+        }
+        Some(3) if matches!(payload.get("wake"), None | Some(Value::Bool(true))) => {
+            (SENT_DOMAIN_BODY_REF, payload.get("wake").is_some(), true)
+        }
         _ => return Err(malformed(&claimed)),
     };
-    let shape = || -> Option<(String, String, String, String, String)> {
+    let shape = || -> Option<(String, String, String, String, Body)> {
         if text(payload, "kind")? != "message" {
             return None;
         }
         let from = payload.get("from")?;
         let to = payload.get("to")?;
+        let body = if held {
+            let hash = text(payload, "bodyHash")?;
+            let bytes = payload.get("bodyBytes")?.as_u64()?;
+            let lowercase_hex = hash.len() == 64
+                && hash
+                    .bytes()
+                    .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c));
+            if payload.get("body").is_some() || !lowercase_hex || bytes > WIRE_MAX_BODY_BYTES {
+                return None;
+            }
+            Body::Held {
+                hash: hash.to_owned(),
+                bytes,
+            }
+        } else {
+            Body::Inline(text(payload, "body")?.to_owned())
+        };
         Some((
             text(payload, "id")?.to_owned(),
             text(from, "id")?.to_owned(),
             text(from, "machine")?.to_owned(),
             text(to, "id")?.to_owned(),
-            text(payload, "body")?.to_owned(),
+            body,
         ))
     };
     let Some((id, from_id, machine, to_id, body)) = shape() else {
@@ -129,15 +162,7 @@ fn verify(
     let verified = signature
         .as_ref()
         .and_then(|signature| {
-            let bytes = signed_bytes(
-                if wake_asked {
-                    SENT_DOMAIN_WAKE
-                } else {
-                    SENT_DOMAIN
-                },
-                &unsigned,
-            )
-            .ok()?;
+            let bytes = signed_bytes(domain, &unsigned).ok()?;
             signing::verify(root, &bytes, signature).ok()
         })
         .filter(|verified| verified.machine_id == machine);
@@ -220,6 +245,7 @@ pub fn ingest(
     // sender's owner can see why it did not arrive.
     let mut refusals: Vec<(String, &'static str)> = Vec::new();
     let now_secs = now.as_millis() / 1000;
+    let mut bodies = BodyMirror::new(main, &cross.remote);
     for event in &envelopes {
         let top = reached.entry(event.origin.clone()).or_insert(0);
         *top = (*top).max(event.seq);
@@ -245,7 +271,25 @@ pub fn ingest(
             continue;
         }
         match verify(&root, &event.payload, &event.ts, now_secs, cross) {
-            Ok(mail) => verified.push(mail),
+            Ok(mut mail) => {
+                // A version 3 body is read from the sender's mirror only after its header verified.
+                if let Body::Held { hash, bytes } = &mail.body {
+                    match bodies.resolve(&mail.machine, hash, *bytes)? {
+                        Resolved::Body(text) => mail.body = Body::Inline(text),
+                        Resolved::Expired => {
+                            refusals
+                                .push((mail.id.clone(), CounterReason::RemoteBodyExpired.code()));
+                            drops.push((CounterReason::RemoteBodyExpired, mail.machine));
+                            continue;
+                        }
+                        Resolved::Malformed => {
+                            drops.push((CounterReason::RemoteMalformed, mail.machine));
+                            continue;
+                        }
+                    }
+                }
+                verified.push(mail);
+            }
             Err(drop) => {
                 if drop.0 == CounterReason::RemoteUnconfirmed {
                     if let Some(id) = event.payload["id"].as_str() {
@@ -287,13 +331,19 @@ pub fn ingest(
             report.dropped += 1;
             continue;
         };
+        // A held body was read when its header verified; one still held has no text to give.
+        let Body::Inline(body) = &mail.body else {
+            drops.push((CounterReason::RemoteMalformed, mail.machine.clone()));
+            report.dropped += 1;
+            continue;
+        };
         mails.push(RemoteMail {
             machine: &mail.machine,
             id: &mail.id,
             from: &mail.from,
             handle: handle.as_deref(),
             to,
-            body: &mail.body,
+            body,
             max_body_bytes: WIRE_MAX_BODY_BYTES,
             wake: mail.wake,
             stop_drains: &stop_drains,
@@ -426,9 +476,11 @@ fn settle(
 
 #[cfg(test)]
 mod tests {
-    use super::{verify, MAX_AGE_SEC};
+    use super::{verify, Body, MAX_AGE_SEC};
     use crate::wiring::mailbox_config::CrossMachine;
-    use crate::wiring::mailbox_remote::{sign_payload, SENT_DOMAIN, SENT_DOMAIN_WAKE};
+    use crate::wiring::mailbox_remote::{
+        sign_payload, SENT_DOMAIN, SENT_DOMAIN_BODY_REF, SENT_DOMAIN_WAKE,
+    };
     use fgos_identity::{machine, pins, signing};
     use fgos_mailbox_core::CounterReason;
     use serde_json::{json, Value};
@@ -487,13 +539,10 @@ mod tests {
         let taken = verify(&receiver, &good, TS, NOW, &cross(true))
             .expect("a confirmed machine's message is taken");
         assert_eq!(
-            (
-                taken.from.as_str(),
-                taken.machine.as_str(),
-                taken.body.as_str()
-            ),
-            ("s1", machine.as_str(), "hi")
+            (taken.from.as_str(), taken.machine.as_str()),
+            ("s1", machine.as_str())
         );
+        assert_eq!(taken.body, Body::Inline("hi".into()));
 
         let mut forged = good.clone();
         forged["body"] = json!("changed after signing");
@@ -596,6 +645,97 @@ mod tests {
         assert_eq!(
             reason(verify(&receiver, &v3, TS, NOW, &cross(true))),
             Some(CounterReason::RemoteMalformed)
+        );
+    }
+
+    #[test]
+    fn a_body_reference_message_is_signed_under_its_own_domain_with_an_optional_signed_wake() {
+        let sender = state_root("ref-sender");
+        let receiver = state_root("ref-receiver");
+        let machine = machine::read(&sender).unwrap();
+        let from_id = format!("{machine}/s1");
+        let hash = "a".repeat(64);
+        let reason =
+            |result: Result<_, (CounterReason, String)>| result.err().map(|(reason, _)| reason);
+        let header = |edit: &dyn Fn(&mut Value), domain: &str| {
+            let mut payload = json!({
+                "v": 3, "id": "r1", "from": { "id": from_id, "machine": machine },
+                "to": { "id": "recv/abc", "machine": "recv" }, "kind": "message",
+                "bodyHash": hash, "bodyBytes": 5, "sentAt": "2026-10-29T00:00:00.000Z",
+            });
+            edit(&mut payload);
+            sign_payload(&sender, domain, payload).unwrap()
+        };
+        let plain = header(&|_| {}, SENT_DOMAIN_BODY_REF);
+        let taken = verify(&receiver, &plain, TS, NOW, &cross(false)).expect(
+            "a body reference from a seen machine is taken when confirmation is not required",
+        );
+        assert_eq!(
+            taken.body,
+            Body::Held {
+                hash: hash.clone(),
+                bytes: 5
+            }
+        );
+        assert!(!taken.wake);
+        assert_eq!(
+            reason(verify(&receiver, &plain, TS, NOW, &cross(true))),
+            Some(CounterReason::RemoteUnconfirmed)
+        );
+
+        // Wake rides the same domain as a signed field, and only a confirmed machine ever wakes.
+        let woken = header(&|p| p["wake"] = json!(true), SENT_DOMAIN_BODY_REF);
+        assert!(
+            !verify(&receiver, &woken, TS, NOW, &cross(false))
+                .unwrap()
+                .wake
+        );
+        let fingerprint = signing::key_fingerprint(&sender).unwrap().unwrap();
+        pins::confirm(&receiver, &machine, &fingerprint).unwrap();
+        assert!(
+            verify(&receiver, &woken, TS, NOW, &cross(true))
+                .unwrap()
+                .wake
+        );
+
+        let malformed = |edit: &dyn Fn(&mut Value)| {
+            reason(verify(
+                &receiver,
+                &header(edit, SENT_DOMAIN_BODY_REF),
+                TS,
+                NOW,
+                &cross(true),
+            ))
+        };
+        let expect = Some(CounterReason::RemoteMalformed);
+        assert_eq!(malformed(&|p| p["body"] = json!("inline too")), expect);
+        assert_eq!(malformed(&|p| p["wake"] = json!(false)), expect);
+        assert_eq!(
+            malformed(&|p| p["bodyHash"] = json!("A".repeat(64))),
+            expect
+        );
+        assert_eq!(
+            malformed(&|p| p["bodyHash"] = json!("a".repeat(63))),
+            expect
+        );
+        assert_eq!(malformed(&|p| p["bodyBytes"] = json!("5")), expect);
+        assert_eq!(malformed(&|p| p["bodyBytes"] = json!(2049)), expect);
+        assert_eq!(
+            malformed(&|p| {
+                p.as_object_mut().unwrap().remove("bodyBytes");
+            }),
+            expect
+        );
+        assert_eq!(
+            reason(verify(
+                &receiver,
+                &header(&|_| {}, SENT_DOMAIN),
+                TS,
+                NOW,
+                &cross(true)
+            )),
+            Some(CounterReason::RemoteSignature),
+            "version 3 is not valid under the version 1 domain"
         );
     }
 }

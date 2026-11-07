@@ -34,6 +34,11 @@ pub const SENT_DOMAIN: &str = "fgos-mailbox-message/1\n";
 /// send stays version 1, so a receiver that does not know version 2 still takes plain mail and
 /// never reads a wake mail without its wake flag.
 pub const SENT_DOMAIN_WAKE: &str = "fgos-mailbox-message/2\n";
+/// A payload that carries the hash and length of its body instead of the body, as version 3. The
+/// wake flag, when asked, is a signed field of the payload, not a second domain.
+pub const SENT_DOMAIN_BODY_REF: &str = "fgos-mailbox-message/3\n";
+/// The payload versions of `mailbox.message-sent` this build takes from other machines.
+pub const ACCEPTED_PAYLOAD_VERSIONS: [u64; 3] = [1, 2, 3];
 pub const SETTLED_DOMAIN: &str = "fgos-mailbox-settled/1\n";
 /// `mailbox.remote.maxBodyBytes` of the wire contract.
 pub const WIRE_MAX_BODY_BYTES: u64 = 2048;
@@ -514,7 +519,10 @@ pub fn send(
 
 #[cfg(test)]
 mod tests {
-    use super::{printable, SENT_DOMAIN, SENT_DOMAIN_WAKE, SETTLED_DOMAIN, WIRE_MAX_BODY_BYTES};
+    use super::{
+        printable, SENT_DOMAIN, SENT_DOMAIN_BODY_REF, SENT_DOMAIN_WAKE, SETTLED_DOMAIN,
+        WIRE_MAX_BODY_BYTES,
+    };
 
     #[test]
     fn a_listed_send_keeps_to_one_row_with_no_terminal_control_characters() {
@@ -543,6 +551,11 @@ mod tests {
         assert_eq!(domain["signingDomain"], SENT_DOMAIN);
         assert_eq!(domain["wakeVersion"]["signingDomain"], SENT_DOMAIN_WAKE);
         assert_eq!(domain["wakeVersion"]["v"], 2);
+        assert_eq!(
+            domain["bodyRefVersion"]["signingDomain"],
+            SENT_DOMAIN_BODY_REF
+        );
+        assert_eq!(domain["bodyRefVersion"]["v"], 3);
         let settled = contract["types"]
             .as_array()
             .unwrap()

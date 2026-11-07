@@ -67,6 +67,9 @@ pub enum CounterReason {
     RemoteMisaddressed,
     /// A message older than the ingest's maximum age.
     RemoteStale,
+    /// A message whose body is held in its sender's mail-body ref and is gone from it, or never
+    /// reached this machine's mirror of that ref.
+    RemoteBodyExpired,
 }
 
 impl CounterReason {
@@ -97,6 +100,7 @@ impl CounterReason {
             Self::RemoteUnconfirmed => "remote-unconfirmed",
             Self::RemoteMisaddressed => "remote-misaddressed",
             Self::RemoteStale => "remote-stale",
+            Self::RemoteBodyExpired => "remote-body-expired",
         }
     }
 }

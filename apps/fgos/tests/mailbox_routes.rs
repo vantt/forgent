@@ -2346,6 +2346,11 @@ fn mail_from_a_machine_whose_key_is_not_confirmed_is_not_taken_and_the_sender_is
         counted["data"]["signals"]["refusals"]["remote-unconfirmed"], 1,
         "{counted}"
     );
+    assert_eq!(
+        counted["data"]["crossMachine"]["acceptedPayloadVersions"],
+        serde_json::json!([1, 2, 3]),
+        "{counted}"
+    );
     let alpha_machine = fgos_identity::machine::read(&alpha_root).unwrap();
     assert_eq!(
         counted["data"]["crossMachine"]["unconfirmedMachines"],
@@ -2358,4 +2363,10 @@ fn mail_from_a_machine_whose_key_is_not_confirmed_is_not_taken_and_the_sender_is
             .stdout
     )
     .contains("seen, not confirmed"));
+    assert!(String::from_utf8_lossy(
+        &beta
+            .run(&beta.main(), Some(WRITER), &["mailbox", "status"], b"")
+            .stdout
+    )
+    .contains("takes mail payload versions 1, 2, 3"));
 }
