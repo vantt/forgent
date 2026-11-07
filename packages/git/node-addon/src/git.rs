@@ -326,7 +326,7 @@ pub fn ensure_git_fetch_mapping(
 #[napi]
 pub fn git_fetch_mappings(remote: String) -> Result<Vec<String>> {
     check()?;
-    publication_fetch_mappings(&remote).map_err(operation)
+    granted_fetch_mappings(&remote).map_err(operation)
 }
 
 #[napi]

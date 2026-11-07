@@ -2256,6 +2256,32 @@ fn fetch_mapping_is_additive_idempotent_and_records_remote_url() {
         .records()
         .iter()
         .any(|r| matches!(r.phase, wal::Phase::TargetAttempt { .. })));
+    // A clone configured before the mail-body mirror existed gains only that
+    // mapping; the two it already has stay and still satisfy event sync.
+    let granted = granted_fetch_mappings("origin").unwrap();
+    assert_eq!(granted[..2], maps[..]);
+    assert_eq!(
+        granted[2],
+        "+refs/fgos/mail-bodies/*:refs/fgos/remotes/origin/mail-bodies/*"
+    );
+    driver
+        .ensure_fetch_mapping(&repo, "origin", &granted, "mapping-bodies")
+        .unwrap();
+    assert_eq!(
+        driver
+            .configured_fetch_refspecs(&repo, "origin")
+            .unwrap()
+            .len(),
+        4
+    );
+    assert_eq!(
+        driver
+            .fetch_mapping_provenance(&repo, "origin")
+            .unwrap()
+            .unwrap()
+            .refspecs,
+        granted
+    );
 
     assert_eq!(
         wal::Wal::open(&repo).unwrap().scan(100).unwrap().unresolved,
@@ -3014,5 +3040,199 @@ fn fetch_of_more_machine_refs_than_one_wal_record_holds_installs_every_mirror() 
     assert_eq!(
         wal::Wal::open(&repo).unwrap().scan(100).unwrap().unresolved,
         0
+    );
+}
+
+fn body_reference() -> RefName {
+    RefName::parse("refs/fgos/mail-bodies/machine").unwrap()
+}
+fn body_authority<'a>(repo: &RepoHandle, h: &'a mut Handle) -> HolderAuthority<'a> {
+    let path = h.path().to_path_buf();
+    HolderAuthority::new(repo, h, &path, body_reference(), "test-writer").unwrap()
+}
+/// A parentless commit built outside the port, as another writer's reset would be.
+fn foreign_root(path: &Path, msg: &str) -> String {
+    let tree = String::from_utf8(git(path, &["mktree"])).unwrap();
+    String::from_utf8(git(
+        path,
+        &[
+            "-c",
+            "user.name=Other",
+            "-c",
+            "user.email=other@example.invalid",
+            "commit-tree",
+            "-m",
+            msg,
+            tree.trim(),
+        ],
+    ))
+    .unwrap()
+    .trim()
+    .to_owned()
+}
+
+#[test]
+fn a_mail_body_ref_is_reset_to_a_new_root_under_lease_and_peers_mirror_the_reset() {
+    for format in ["sha1", "sha256"] {
+        let t = Temp::new();
+        let remote = t.0.join("remote");
+        let owner = t.0.join("owner");
+        let peer = t.0.join("peer");
+        let other = t.0.join("other");
+        for path in [&remote, &owner, &peer, &other] {
+            init(path, format, "files");
+        }
+        for path in [&owner, &peer] {
+            git(path, &["remote", "add", "origin", remote.to_str().unwrap()]);
+        }
+        let driver = GitDriver::new(&t.0).unwrap();
+        let repo = resolve(&driver, &owner);
+        let mut h = handle(&t.0.join("owner-seal.lock"));
+        let port =
+            PublicationPort::new(&driver, body_authority(&repo, &mut h)).with_remote(RemoteGrant {
+                name: "origin".into(),
+                pinned_url: remote.to_str().unwrap().into(),
+            });
+        let push = || {
+            port.push_refs(&repo, "origin", &[(body_reference(), body_reference())])
+                .unwrap()
+                .refs
+                .remove(0)
+                .1
+        };
+        let cas = |old: ExpectedTip, next: &Oid, id: &str| {
+            port.compare_and_swap(
+                &repo,
+                &body_reference(),
+                &old,
+                &ExpectedTip::Oid(next.clone()),
+                id,
+            )
+            .unwrap();
+        };
+        // The same port that builds an event commit builds the root: no parents.
+        let first = commit(&port, &repo, vec![], "bodies-1");
+        cas(ExpectedTip::Absent, &first, "body-create");
+        assert!(matches!(push(), PushOutcome::Accepted));
+        // The reset is not a descendant of what the remote holds, and still lands.
+        let second = commit(&port, &repo, vec![], "bodies-2");
+        cas(ExpectedTip::Oid(first.clone()), &second, "body-reset");
+        assert!(matches!(push(), PushOutcome::Accepted));
+        assert_eq!(
+            git(&remote, &["rev-parse", body_reference().as_str()]),
+            format!("{}\n", second.as_str()).as_bytes()
+        );
+        // A peer with the third mapping mirrors the ref, and a reset to an
+        // unrelated root mirrors as cleanly as a fast-forward.
+        let peer_repo = resolve(&driver, &peer);
+        let mut ph = handle(&t.0.join("peer-seal.lock"));
+        let peer_port = PublicationPort::new(
+            &driver,
+            HolderAuthority::new(
+                &peer_repo,
+                &mut ph,
+                &t.0.join("peer-seal.lock"),
+                RefName::parse("refs/fgos/events/peer").unwrap(),
+                "peer-writer",
+            )
+            .unwrap(),
+        )
+        .with_remote(RemoteGrant {
+            name: "origin".into(),
+            pinned_url: remote.to_str().unwrap().into(),
+        });
+        let mirror = RefName::parse("refs/fgos/remotes/origin/mail-bodies/machine").unwrap();
+        let events_only = &publication_fetch_mappings("origin").unwrap();
+        peer_port
+            .fetch_refs(&peer_repo, "origin", events_only)
+            .unwrap();
+        assert!(matches!(
+            peer_port.read_ref(&peer_repo, &mirror).unwrap(),
+            RefValue::Absent
+        ));
+        let granted = granted_fetch_mappings("origin").unwrap();
+        peer_port
+            .fetch_refs(&peer_repo, "origin", &granted)
+            .unwrap();
+        assert!(matches!(
+            peer_port.read_ref(&peer_repo, &mirror).unwrap(),
+            RefValue::Direct(o) if o == second
+        ));
+        let fourth = commit(&port, &repo, vec![], "bodies-4");
+        cas(ExpectedTip::Oid(second.clone()), &fourth, "body-reset-last");
+        assert!(matches!(push(), PushOutcome::Accepted));
+        peer_port
+            .fetch_refs(&peer_repo, "origin", &granted)
+            .unwrap();
+        assert!(matches!(
+            peer_port.read_ref(&peer_repo, &mirror).unwrap(),
+            RefValue::Direct(o) if o == fourth
+        ));
+    }
+}
+
+/// Runs a closure at the checkpoint just before the push child starts.
+struct BeforePush<G: Fn() + Send + Sync>(G);
+impl<G: Fn() + Send + Sync> FileSystem for BeforePush<G> {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        if step == "before-push" {
+            (self.0)();
+        }
+        Ok(())
+    }
+}
+
+#[test]
+fn a_mail_body_reset_loses_to_a_remote_that_moved_after_its_tip_was_read() {
+    let t = Temp::new();
+    let remote = t.0.join("remote");
+    let owner = t.0.join("owner");
+    let other = t.0.join("other");
+    for path in [&remote, &owner, &other] {
+        init(path, "sha1", "files");
+    }
+    git(
+        &owner,
+        &["remote", "add", "origin", remote.to_str().unwrap()],
+    );
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &owner);
+    let mut h = handle(&t.0.join("owner-seal.lock"));
+    let stolen = foreign_root(&other, "stolen");
+    let steal = || {
+        let target = format!("{stolen}:{}", body_reference().as_str());
+        git(
+            &other,
+            &["push", "--force", remote.to_str().unwrap(), &target],
+        );
+    };
+    let port =
+        PublicationPort::with_filesystem(&driver, body_authority(&repo, &mut h), BeforePush(steal))
+            .with_remote(RemoteGrant {
+                name: "origin".into(),
+                pinned_url: remote.to_str().unwrap().into(),
+            });
+    let first = commit(&port, &repo, vec![], "bodies-1");
+    port.compare_and_swap(
+        &repo,
+        &body_reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(first),
+        "body-create",
+    )
+    .unwrap();
+    // The remote was absent when read; the other writer creates it before the
+    // push child runs, so the lease for "absent" is stale.
+    let pushed = port
+        .push_refs(&repo, "origin", &[(body_reference(), body_reference())])
+        .unwrap();
+    assert!(
+        matches!(pushed.refs[0].1, PushOutcome::RejectedNonFastForward { .. }),
+        "{:?}",
+        pushed.refs
+    );
+    assert_eq!(
+        git(&remote, &["rev-parse", body_reference().as_str()]),
+        format!("{stolen}\n").as_bytes()
     );
 }

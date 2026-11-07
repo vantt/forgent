@@ -49,7 +49,8 @@ fn receipt(id: &str, digest: &str) -> Receipt {
         warnings: vec![],
     }
 }
-/// RepositoryConfig owns the mirror mapping policy for every consumer.
+/// RepositoryConfig owns the mirror mapping policy for every consumer. This is
+/// the set Event Store sync requires before it fetches.
 /// A wildcard also matches the empty suffix, preserving the legacy mirror name
 /// while allowing ordinary fetch to succeed before the cutover creates the ref.
 pub fn publication_fetch_mappings(remote: &str) -> Result<Vec<String>> {
@@ -60,6 +61,17 @@ pub fn publication_fetch_mappings(remote: &str) -> Result<Vec<String>> {
         format!("+refs/fgos/events/*:refs/fgos/remotes/{remote}/events/*"),
         legacy_fetch_mapping(remote),
     ])
+}
+
+/// Everything a clone's fetch config may carry: the mappings above plus the
+/// mail-body mirror. Setup installs this set; Event Store sync keeps requiring
+/// only the set above, so a clone that has not run setup yet still syncs.
+pub fn granted_fetch_mappings(remote: &str) -> Result<Vec<String>> {
+    let mut all = publication_fetch_mappings(remote)?;
+    all.push(format!(
+        "+refs/fgos/mail-bodies/*:refs/fgos/remotes/{remote}/mail-bodies/*"
+    ));
+    Ok(all)
 }
 
 fn legacy_fetch_mapping(remote: &str) -> String {
@@ -133,7 +145,7 @@ impl GitDriver {
     ) -> Result<Receipt> {
         require_lock_scope_platform()?;
         let allowed = if hooks_request.is_none() {
-            publication_fetch_mappings(remote)?
+            granted_fetch_mappings(remote)?
         } else {
             vec![]
         };

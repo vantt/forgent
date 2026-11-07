@@ -123,8 +123,13 @@ test('the repository-config row fails a missing Event Store fetch mapping, an Ev
   const row = () => checkGit(f.repo, 'git-repository-config', f.ctx.loaderOptions);
   withStateRoot(f, () => {
     assert.match(row().message, /the required fetch mapping is missing/);
+    // A clone set up before the mail-body mirror existed carries only the event and legacy mappings.
+    f.git('config', '--add', 'remote.origin.fetch', '+refs/fgos/events/*:refs/fgos/remotes/origin/events/*');
+    f.git('config', '--add', 'remote.origin.fetch', '+refs/fgos/legacy*:refs/fgos/remotes/origin/legacy*');
+    assert.match(row().message, /the required fetch mapping is missing/);
     installFetchMapping(f);
     assert.equal(row().passed, true, row().message);
+    assert.match(String(f.git('config', '--get-all', 'remote.origin.fetch')), /\+refs\/fgos\/mail-bodies\/\*:refs\/fgos\/remotes\/origin\/mail-bodies\/\*/);
     f.git('config', '--add', 'remote.origin.fetch', '+refs/*:refs/unsafe/*');
     assert.match(row().message, /unsafe publication refspec/);
     f.git('config', '--unset-all', 'remote.origin.fetch');

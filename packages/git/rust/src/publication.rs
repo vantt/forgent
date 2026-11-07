@@ -31,9 +31,15 @@ fn own_ref(name: &RefName) -> bool {
         "refs/fgos/events/",
         "refs/fgos/local-events/",
         "refs/fgos/branch-events/",
+        "refs/fgos/mail-bodies/",
     ]
     .iter()
     .any(|p| name.as_str().starts_with(p))
+}
+/// A mail-body ref is reset to a new root by its owner, so its push is a leased
+/// replace; every other granted ref only ever fast-forwards.
+fn is_mail_body_ref(name: &str) -> bool {
+    name.starts_with("refs/fgos/mail-bodies/")
 }
 
 /// Trusted caller binds its acquired event-seal to one stream/ref and writer.
@@ -1469,25 +1475,28 @@ impl<F: FileSystem> PublicationPort<'_, F> {
     }
     fn fetch(&self, repo: &RepoHandle, remote: &str, refspecs: &[String]) -> Result<Receipt> {
         let (url, scheme) = self.remote_url(repo, remote)?;
-        if refspecs.is_empty() || refspecs.len() > 2 {
+        if refspecs.is_empty() || refspecs.len() > 3 {
             return Err(failure("invalid-publication-fetch-mapping"));
         }
-        let allowed = crate::publication_fetch_mappings(remote)?;
+        let allowed = crate::granted_fetch_mappings(remote)?;
         if refspecs.iter().any(|r| !allowed.contains(r)) {
             return Err(failure("fetch-destination-not-granted"));
         }
-        let advertised = self.remote_call(
-            repo,
-            scheme,
-            &[
-                "ls-remote".into(),
-                "--refs".into(),
-                "--".into(),
-                url.clone(),
-                "refs/fgos/events/*".into(),
-                "refs/fgos/legacy".into(),
-            ],
-        )?;
+        let mut patterns = vec!["refs/fgos/events/*".to_string(), "refs/fgos/legacy".into()];
+        let bodies = refspecs
+            .iter()
+            .any(|r| r.starts_with("+refs/fgos/mail-bodies/"));
+        if bodies {
+            patterns.push("refs/fgos/mail-bodies/*".into());
+        }
+        let mut ls_remote = vec![
+            "ls-remote".to_string(),
+            "--refs".into(),
+            "--".into(),
+            url.clone(),
+        ];
+        ls_remote.extend(patterns);
+        let advertised = self.remote_call(repo, scheme, &ls_remote)?;
         if !advertised.success {
             return Err(advertised.error("remote-advertisement-failed"));
         }
@@ -1505,6 +1514,11 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                 format!(
                     "refs/fgos/remotes/{remote}/events/{}",
                     &source["refs/fgos/events/".len()..]
+                )
+            } else if bodies && source.starts_with("refs/fgos/mail-bodies/") {
+                format!(
+                    "refs/fgos/remotes/{remote}/mail-bodies/{}",
+                    &source["refs/fgos/mail-bodies/".len()..]
                 )
             } else if source == "refs/fgos/legacy"
                 && refspecs
@@ -1651,6 +1665,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
             || refs[0].0 != self.authority.reference
             || refs[0].1 != self.authority.reference
             || !(refs[0].0.as_str().starts_with("refs/fgos/events/")
+                || is_mail_body_ref(refs[0].0.as_str())
                 || refs[0].0.as_str() == "refs/fgos/legacy")
         {
             return Err(failure("push-ref-not-granted"));
@@ -1702,20 +1717,24 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         let chain = self.transfer_start(repo, &wal, &id, intent)?;
         let result = (|| {
             self.point("before-push")?;
-            let output = self.remote_call(
-                repo,
-                scheme,
-                &[
-                    "push".into(),
-                    "--atomic".into(),
-                    "--porcelain".into(),
-                    "--no-verify".into(),
-                    "--recurse-submodules=no".into(),
-                    "--".into(),
-                    url,
-                    spec,
-                ],
-            );
+            let mut args: Vec<String> = vec![
+                "push".into(),
+                "--atomic".into(),
+                "--porcelain".into(),
+                "--no-verify".into(),
+                "--recurse-submodules=no".into(),
+            ];
+            if is_mail_body_ref(local.as_str()) {
+                // The lease holds the remote tip read above; an empty value
+                // means the ref must still be absent.
+                let held = match &remote_old {
+                    ExpectedTip::Absent => "",
+                    ExpectedTip::Oid(o) => o.as_str(),
+                };
+                args.push(format!("--force-with-lease={}:{held}", local.as_str()));
+            }
+            args.extend(["--".into(), url, spec]);
+            let output = self.remote_call(repo, scheme, &args);
             self.point("after-push")?;
             let mut details = vec![];
             let outcome = match output {
@@ -1728,7 +1747,8 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                         Some(l)
                             if l.starts_with("!\t")
                                 && (l.contains("[rejected] (non-fast-forward)")
-                                    || l.contains("[rejected] (fetch first)")) =>
+                                    || l.contains("[rejected] (fetch first)")
+                                    || l.contains("[rejected] (stale info)")) =>
                         {
                             details.push(l.into());
                             PushOutcome::RejectedNonFastForward {
@@ -1739,7 +1759,10 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                             details.push(l.into());
                             PushOutcome::RejectedOther { reason: l.into() }
                         }
-                        Some(l) if out.success && matches!(l.as_bytes()[0], b' ' | b'=' | b'*') => {
+                        Some(l)
+                            if out.success
+                                && matches!(l.as_bytes()[0], b' ' | b'+' | b'=' | b'*') =>
+                        {
                             details.push(l.into());
                             PushOutcome::Accepted
                         }
