@@ -3,7 +3,16 @@
 //! clone mirrors it (`refs/fgos/remotes/<remote>/mail-bodies/<machine>`). The read goes through the
 //! Git driver's ref and path reads, the same door the Event Store reads through; the mirror is
 //! never part of the Event Store.
-use fgos_git::{Inspect, Oid, PathValue};
+//!
+//! The mirror is filled by [`fetch`], which the sync child runs after the Event Store sync and
+//! before ingest: events first, then bodies, so a header never waits on a body that the same sync
+//! could have brought.
+use fgos_event_store::locks::{APPEND_WAIT_MS, SEAL_NAME};
+use fgos_git::{
+    granted_fetch_mappings, publication_fetch_mappings, HolderAuthority, Inspect, Oid, PathValue,
+    Publication, PublicationPort, RefName, RemoteGrant,
+};
+use fgos_holder_lock::{Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -20,6 +29,93 @@ pub enum Resolved {
     Expired,
     /// A blob is there but is not the body the header names.
     Malformed,
+}
+
+/// The one writer id of the mail-body fetch. A transfer left half done is recovered only under the
+/// writer that began it, so this never varies.
+const FETCH_WRITER: &str = "mailbox-body-fetch";
+
+/// Whether this sync brought the mail-body mirrors up to date after its event fetch. A header whose
+/// body is absent is expired only after a [`BodyFetch::Fetched`]; otherwise nothing is known about
+/// the body and the header is held.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BodyFetch {
+    Fetched,
+    /// Why the mirrors were not fetched.
+    NotFetched(String),
+}
+
+/// Fetches the mail-body mirrors of `remote` into the clone `main` is in. Call it only after the
+/// Event Store sync of the same run returned. The transfer runs under the machine's own
+/// `event-seal` hold, bound to `refs/fgos/mail-bodies/<this machine>` and [`FETCH_WRITER`], the way
+/// every outside caller of the publication port borrows the seal.
+pub fn fetch(main: &Path, remote: &str) -> BodyFetch {
+    match try_fetch(main, remote) {
+        Ok(()) => BodyFetch::Fetched,
+        Err(why) => BodyFetch::NotFetched(why),
+    }
+}
+
+fn try_fetch(main: &Path, remote: &str) -> Result<(), String> {
+    let clone = event_store_clone::open(main)
+        .map_err(|f| format!("{}: {}", f.reason, f.detail))?
+        .ok_or("not a repository")?;
+    // The mapping the clone needs is the granted one the Event Store sync does not require; a clone
+    // that has not run setup again lacks it, and nothing is fetched without it.
+    let required = publication_fetch_mappings(remote).map_err(|e| format!("{e:?}"))?;
+    let mut bodies = granted_fetch_mappings(remote).map_err(|e| format!("{e:?}"))?;
+    bodies.retain(|mapping| !required.contains(mapping));
+    let [mapping] = bodies.as_slice() else {
+        return Err("no mail-body fetch mapping is granted".into());
+    };
+    let configured = clone
+        .driver
+        .configured_fetch_refspecs(&clone.repo, remote)
+        .map_err(|e| format!("fetch mapping read: {e:?}"))?;
+    if !configured
+        .iter()
+        .any(|fact| fact.value == mapping.as_bytes())
+    {
+        return Err("the mail-body fetch mapping is not installed; run doctor --fix".into());
+    }
+    if !fgos_identity::machine::valid_machine_id(&clone.machine) {
+        return Err("this machine id is not a ref component".into());
+    }
+    let reference = RefName::parse(&format!("refs/fgos/mail-bodies/{}", clone.machine))
+        .map_err(|e| e.to_string())?;
+    let pinned_url = fgos_event_store::refspec::pinned_url(&clone.driver, &clone.repo, remote)
+        .map_err(|e| e.to_string())?;
+    let seal = clone.layout.seal_lock();
+    let mut handle = match fgos_holder_lock::acquire(
+        &Resource::new(SEAL_NAME, seal.clone()),
+        Mode::Ex,
+        Wait::Ms(APPEND_WAIT_MS),
+        DEFAULT_KILL_WAIT_MS,
+    ) {
+        Acquire::Acquired(handle) => handle,
+        other => return Err(format!("event-seal not taken: {other:?}")),
+    };
+    let fetched = (|| {
+        let authority =
+            HolderAuthority::new(&clone.repo, &mut handle, &seal, reference, FETCH_WRITER)
+                .map_err(|e| format!("{e:?}"))?;
+        let port = PublicationPort::new(&clone.driver, authority).with_remote(RemoteGrant {
+            name: remote.to_owned(),
+            pinned_url,
+        });
+        port.recover_own_transfers(&clone.repo)
+            .map_err(|e| format!("body fetch recovery: {e:?}"))?;
+        port.fetch_refs(&clone.repo, remote, std::slice::from_ref(mapping))
+            .map(|_| ())
+            .map_err(|e| format!("body fetch: {e:?}"))
+    })();
+    // A release that cannot be proven is reported, never ignored; the fetch result stands.
+    let released = fgos_holder_lock::release(handle);
+    match (fetched, released) {
+        (Err(why), _) => Err(why),
+        (Ok(()), fgos_holder_lock::Release::Released { .. }) => Ok(()),
+        (Ok(()), stuck) => Err(format!("event-seal release: {stuck:?}")),
+    }
 }
 
 /// The mirror of `machine`'s mail-body ref in this clone, for fetch remote `remote`.

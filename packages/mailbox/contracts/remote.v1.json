@@ -38,7 +38,8 @@
         "bodyHome": "the tree of the tip of the sender machine's mail-body ref, as this clone mirrors it at refs/fgos/remotes/<remote>/mail-bodies/<sender machine>: one blob per message, named bodyHash, holding the body bytes",
         "receiverStates": {
           "delivered": "the blob is there, sha256 of its bytes equals bodyHash and its length equals bodyBytes: the message is taken exactly like a version 1 or 2 message with that body",
-          "expired": "the ref or the blob is absent: the message is not delivered and the receiver settles it as refused with reason remote-body-expired",
+          "expired": "the blob is absent after a body fetch that started after this sync's event fetch succeeded, on a clone that has the mail-body fetch mapping: the message is not delivered and the receiver settles it as refused with reason remote-body-expired",
+          "held": "the blob is absent and that fetch condition does not hold (the clone lacks the mail-body fetch mapping, the body fetch or the event sync failed, or a Git read failed): the receiver settles nothing and sends no refusal, and the cursor for the sender's store origin stops before the message, so the next sync reads it again; later mail of that origin is taken meanwhile and read again without being taken twice, because a message is taken once by (machine, id). A hold ends when the message is delivered, or is dropped as remote-stale once its age passes mailbox.remote.maxAgeSec plus the skew tolerance, so a clone that never gets the mapping holds it for at most that long. The sender sees no refusal during a hold: its status keeps counting the message as waiting, and when the hold ends in remote-stale no settlement is signed either, so the message stays waiting as unanswered, the same as mail that never arrived",
           "malformed": "the blob is there but its hash, length or UTF-8 is wrong, or the name is not a blob: dropped with the counted reason remote-malformed, never delivered"
         },
         "olderReaders": "a receiver that does not know version 3 drops the event at its shape check with the counted reason remote-malformed"
@@ -65,7 +66,7 @@
     { "key": "mailbox.remote.requireConfirmed", "default": true, "unit": "boolean", "enforcedAt": "ingest: only a machine whose key pin is confirmed is accepted; a seen or re-keyed machine is dropped and counted", "source": "identity spec pins" }
   ],
   "refusalsToSender": [
-    { "reason": "remote-body-expired", "meaning": "a version 3 message whose body is no longer in the sender's mail-body ref, or never reached this machine's mirror of it; the header is all that is left, so the message is not delivered" },
+    { "reason": "remote-body-expired", "meaning": "a version 3 message whose body is no longer in the sender's mail-body ref, as found by a body fetch of this sync; the header is all that is left, so the message is not delivered" },
     { "reason": "before-first-sync", "meaning": "the message was in the shared log before this machine's first ingest, which takes a baseline and delivers nothing older; the receiver answers it at that ingest so the sender stops waiting" }
   ],
   "perSenderCaps": {

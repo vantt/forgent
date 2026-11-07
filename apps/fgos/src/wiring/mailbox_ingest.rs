@@ -12,8 +12,16 @@
 //! mailbox has to each verified sender, takes it once by `(machine, id)` and
 //! binds it to the recipient's current generation. A message that fails
 //! verification is dropped and counted; it never stops the others.
+//!
+//! A version 3 message whose body cannot be judged yet is held, not settled: its origin's cursor
+//! stops before it and the next ingest reads it again. A body is judged absent (expired) only after
+//! a body fetch that followed this sync's event fetch; a clone without the mail-body fetch mapping,
+//! a failed body fetch and a failed Git read all leave the message held. Later mail of that origin
+//! is still taken now and read again later, which the core's once-per-`(machine, id)` rule makes
+//! harmless; what is only counted or refused is left for that later read, so nothing is counted
+//! twice. A hold ends when the message is delivered or goes stale under the age rule below.
 use super::identity_log::StoreLogDoor;
-use super::mailbox_body::{BodyMirror, Resolved};
+use super::mailbox_body::{BodyFetch, BodyMirror, Resolved};
 use super::mailbox_config::CrossMachine;
 use super::mailbox_identity::{session_of, state_root};
 use super::mailbox_remote::{
@@ -53,6 +61,9 @@ pub struct Report {
     pub dropped: usize,
     /// Whether this run only took the baseline.
     pub baseline: bool,
+    /// Verified version 3 messages held back, by local message id and the reason; their origins'
+    /// cursors stop before them.
+    pub held: Vec<(String, String)>,
     /// Settlement events appended to the shared log, which still have to be pushed.
     pub settled: usize,
     /// What the nudge for each recorded wake mail came to, by the local id of the message.
@@ -206,13 +217,17 @@ fn handle_of(main: &Path, root: &Path, writer: &str, full_id: &str) -> Option<St
 /// nothing is to be read (no store, cross-machine mail off).
 pub fn ingest(
     fgos_dir: &Path,
-    record: &Record,
-    limits: &Limits,
+    hold: &Hold<'_>,
     cross: &CrossMachine,
-    wait: Wait,
-    now: Timestamp,
+    body_fetch: &BodyFetch,
     nudge: &dyn Fn(&RemoteWake) -> Option<NudgeReport>,
 ) -> Result<Report, String> {
+    let Hold {
+        record,
+        limits,
+        wait,
+        now,
+    } = *hold;
     let mut report = Report::default();
     let (Some(main), Some(root)) = (fgos_dir.parent(), state_root()) else {
         return Ok(report);
@@ -246,6 +261,8 @@ pub fn ingest(
     let mut refusals: Vec<(String, &'static str)> = Vec::new();
     let now_secs = now.as_millis() / 1000;
     let mut bodies = BodyMirror::new(main, &cross.remote);
+    // The first held sequence of each origin; each origin's events come in ascending sequence.
+    let mut held_at: BTreeMap<String, u64> = BTreeMap::new();
     for event in &envelopes {
         let top = reached.entry(event.origin.clone()).or_insert(0);
         *top = (*top).max(event.seq);
@@ -270,34 +287,65 @@ pub fn ingest(
         if event.payload["to"]["machine"].as_str() != Some(machine.id.as_str()) {
             continue;
         }
+        // What this event adds to the counts and refusals; kept back while an earlier message of
+        // its origin is held, because the next ingest reads this event again.
+        let again = held_at.get(&event.origin).is_some_and(|at| event.seq > *at);
+        let mut event_drops: Vec<(CounterReason, String)> = Vec::new();
+        let mut event_refusals: Vec<(String, &'static str)> = Vec::new();
         match verify(&root, &event.payload, &event.ts, now_secs, cross) {
             Ok(mut mail) => {
                 // A version 3 body is read from the sender's mirror only after its header verified.
                 if let Body::Held { hash, bytes } = &mail.body {
-                    match bodies.resolve(&mail.machine, hash, *bytes)? {
-                        Resolved::Body(text) => mail.body = Body::Inline(text),
-                        Resolved::Expired => {
-                            refusals
-                                .push((mail.id.clone(), CounterReason::RemoteBodyExpired.code()));
-                            drops.push((CounterReason::RemoteBodyExpired, mail.machine));
+                    // Absence is a verdict only after a body fetch; a failed read is never one.
+                    let verdict = match (bodies.resolve(&mail.machine, hash, *bytes), body_fetch) {
+                        (Err(why), _) => Err(why),
+                        (Ok(Resolved::Expired), BodyFetch::NotFetched(why)) => Err(why.clone()),
+                        (Ok(found), _) => Ok(found),
+                    };
+                    match verdict {
+                        Err(why) => {
+                            if !again {
+                                held_at.insert(event.origin.clone(), event.seq);
+                                report.held.push((mail.id.clone(), why));
+                            }
                             continue;
                         }
-                        Resolved::Malformed => {
-                            drops.push((CounterReason::RemoteMalformed, mail.machine));
-                            continue;
+                        Ok(Resolved::Body(text)) => mail.body = Body::Inline(text),
+                        Ok(Resolved::Expired) => {
+                            event_refusals
+                                .push((mail.id.clone(), CounterReason::RemoteBodyExpired.code()));
+                            event_drops
+                                .push((CounterReason::RemoteBodyExpired, mail.machine.clone()));
+                        }
+                        Ok(Resolved::Malformed) => {
+                            event_drops
+                                .push((CounterReason::RemoteMalformed, mail.machine.clone()));
                         }
                     }
                 }
-                verified.push(mail);
+                if matches!(mail.body, Body::Inline(_)) {
+                    verified.push(mail);
+                }
             }
             Err(drop) => {
                 if drop.0 == CounterReason::RemoteUnconfirmed {
                     if let Some(id) = event.payload["id"].as_str() {
-                        refusals.push((id.to_owned(), CounterReason::RemoteUnconfirmed.code()));
+                        event_refusals
+                            .push((id.to_owned(), CounterReason::RemoteUnconfirmed.code()));
                     }
                 }
-                drops.push(drop);
+                event_drops.push(drop);
             }
+        }
+        if !again {
+            drops.extend(event_drops);
+            refusals.extend(event_refusals);
+        }
+    }
+    // A held message keeps its origin's cursor just before it.
+    for (origin, at) in &held_at {
+        if let Some(top) = reached.get_mut(origin) {
+            *top = (*top).min(at.saturating_sub(1));
         }
     }
     report.baseline = !baselined;
@@ -385,28 +433,17 @@ pub fn ingest(
             }
         }
     }
-    report.settled = settle(
-        &log,
-        &root,
-        &machine.id,
-        &Hold {
-            record,
-            limits,
-            wait,
-            now,
-        },
-    )
-    .map_err(|e| format!("settle: {e}"))?;
+    report.settled = settle(&log, &root, &machine.id, hold).map_err(|e| format!("settle: {e}"))?;
     Ok(report)
 }
 
 /// What one hold of the record is asked with.
 #[derive(Clone, Copy)]
-struct Hold<'a> {
-    record: &'a Record,
-    limits: &'a Limits,
-    wait: Wait,
-    now: Timestamp,
+pub struct Hold<'a> {
+    pub record: &'a Record,
+    pub limits: &'a Limits,
+    pub wait: Wait,
+    pub now: Timestamp,
 }
 
 /// Tells the senders what their messages came to here: each refusal the record kept, and an offer or
@@ -645,6 +682,34 @@ mod tests {
         assert_eq!(
             reason(verify(&receiver, &v3, TS, NOW, &cross(true))),
             Some(CounterReason::RemoteMalformed)
+        );
+    }
+
+    #[test]
+    fn a_body_reference_header_goes_stale_by_the_same_age_rule_which_ends_any_hold() {
+        let sender = state_root("ref-stale-sender");
+        let receiver = state_root("ref-stale-receiver");
+        let machine = machine::read(&sender).unwrap();
+        let payload = json!({
+            "v": 3, "id": "r1", "from": { "id": format!("{machine}/s1"), "machine": machine },
+            "to": { "id": "recv/abc", "machine": "recv" }, "kind": "message",
+            "bodyHash": "a".repeat(64), "bodyBytes": 5, "sentAt": "2026-10-29T00:00:00.000Z",
+        });
+        let header = sign_payload(&sender, SENT_DOMAIN_BODY_REF, payload).unwrap();
+        // Age is judged before any body is looked up, so a header held for want of its body is
+        // dropped the first time it is read past the age limit.
+        assert!(verify(&receiver, &header, TS, NOW + MAX_AGE_SEC, &cross(false)).is_ok());
+        assert_eq!(
+            verify(
+                &receiver,
+                &header,
+                TS,
+                NOW + MAX_AGE_SEC + 301,
+                &cross(false)
+            )
+            .err()
+            .map(|(reason, _)| reason),
+            Some(CounterReason::RemoteStale)
         );
     }
 

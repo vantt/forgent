@@ -1947,8 +1947,8 @@ fn two_machines() -> Cross {
     }
 }
 
-/// One run of `scene`'s detached sync child, in the foreground; it says nothing but the outcome of a nudge it tried.
-fn sync_child(scene: &Scene) {
+/// One run of `scene`'s detached sync child, in the foreground; what it says on stderr.
+fn sync_child_said(scene: &Scene) -> String {
     let main = scene.main();
     let out = scene.run(
         &main,
@@ -1964,7 +1964,12 @@ fn sync_child(scene: &Scene) {
         b"",
     );
     assert_eq!(out.status.code(), Some(0), "{out:?}");
-    let stderr = String::from_utf8_lossy(&out.stderr);
+    String::from_utf8_lossy(&out.stderr).into_owned()
+}
+
+/// One run of `scene`'s sync child; it says nothing but the outcome of a nudge it tried.
+fn sync_child(scene: &Scene) {
+    let stderr = sync_child_said(scene);
     assert!(
         stderr
             .lines()
@@ -2369,4 +2374,325 @@ fn mail_from_a_machine_whose_key_is_not_confirmed_is_not_taken_and_the_sender_is
             .stdout
     )
     .contains("takes mail payload versions 1, 2, 3"));
+}
+
+/// A message alpha appends for beta's head: its text inline (version 1), or only the hash and length
+/// of a body kept in alpha's mail-body ref (version 3).
+enum Mail<'a> {
+    Inline(&'a str),
+    BodyRef(&'a str),
+}
+
+fn sha256_hex(text: &str) -> String {
+    use sha2::{Digest, Sha256};
+    Sha256::digest(text.as_bytes())
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect()
+}
+
+/// Appends to alpha's mailbox stream one signed `mailbox.message-sent` for beta's head, the way a
+/// sender of that payload version would; no sender emits version 3 yet.
+fn append_mail(cross: &Cross, id: &str, mail: &Mail<'_>) {
+    use fgos_event_store::{
+        append::{append, AppendRequest, EventInput},
+        layout::{Layout, StreamId},
+        registry::Registry,
+    };
+    use fgos_git::{GitDriver, ResolveRepo};
+    let alpha_machine = fgos_identity::machine::read(&cross.alpha_root).unwrap();
+    let beta_machine = fgos_identity::machine::read(&cross.beta_root).unwrap();
+    let from = identity_of(&cross.alpha_root, "CLAUDE_CODE_SESSION_ID", WRITER).id;
+    let mut payload = serde_json::json!({
+        "id": id,
+        "from": { "id": from, "machine": alpha_machine },
+        "to": { "id": cross.target, "machine": beta_machine },
+        "kind": "message",
+        "sentAt": fgos_identity::text::iso_utc_now(),
+    });
+    let domain = match mail {
+        Mail::Inline(body) => {
+            payload["v"] = 1.into();
+            payload["body"] = (*body).into();
+            "fgos-mailbox-message/1\n"
+        }
+        Mail::BodyRef(body) => {
+            payload["v"] = 3.into();
+            payload["bodyHash"] = sha256_hex(body).into();
+            payload["bodyBytes"] = body.len().into();
+            "fgos-mailbox-message/3\n"
+        }
+    };
+    let canonical = fgos_canonical_json::canonical_json(&payload).unwrap();
+    let signature =
+        fgos_identity::signing::sign(&cross.alpha_root, format!("{domain}{canonical}").as_bytes())
+            .unwrap();
+    payload["sig"] = serde_json::to_value(signature).unwrap();
+    let main = cross.alpha.main();
+    let driver = GitDriver::new(&cross.alpha_root).unwrap();
+    let repo = match driver.resolve_repo(&main, &main).unwrap() {
+        ResolveRepo::Repository(repo) => repo,
+        _ => panic!("the main checkout is a repository"),
+    };
+    let layout = Layout::from_common_dir(Some(repo.common_dir())).unwrap();
+    append(
+        &layout,
+        &Registry::shipped().unwrap(),
+        AppendRequest {
+            stream: &StreamId::parse("project:mailbox").unwrap(),
+            events: &[EventInput {
+                event_type: "mailbox.message-sent".to_owned(),
+                schema_version: 1,
+                payload,
+                ts: fgos_identity::text::iso_utc_now(),
+            }],
+            cursor: &Default::default(),
+            writer: "test",
+            machine: &alpha_machine,
+            held_ranks: &[],
+        },
+    )
+    .unwrap();
+}
+
+/// `git` with `args` in `dir`, `stdin` given to it; what it printed.
+fn git_out(dir: &Path, args: &[&str], stdin: &str) -> String {
+    let mut child = Command::new("git")
+        .arg("-C")
+        .arg(dir)
+        .args(args)
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env("GIT_AUTHOR_NAME", "t")
+        .env("GIT_AUTHOR_EMAIL", "t@t")
+        .env("GIT_COMMITTER_NAME", "t")
+        .env("GIT_COMMITTER_EMAIL", "t@t")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(stdin.as_bytes())
+        .unwrap();
+    let out = child.wait_with_output().unwrap();
+    assert!(out.status.success(), "git {args:?}: {out:?}");
+    String::from_utf8_lossy(&out.stdout).trim().to_owned()
+}
+
+/// Alpha's mail-body ref becomes one commit holding `bodies`, a blob each named by its sha256, and
+/// is pushed to the shared remote: what a sender does before it appends the event.
+fn push_bodies(cross: &Cross, bodies: &[&str]) {
+    let main = cross.alpha.main();
+    let machine = fgos_identity::machine::read(&cross.alpha_root).unwrap();
+    let mut entries = String::new();
+    for body in bodies {
+        let blob = git_out(&main, &["hash-object", "-w", "--stdin"], body);
+        entries.push_str(&format!("100644 blob {blob}\t{}\n", sha256_hex(body)));
+    }
+    let tree = git_out(&main, &["mktree"], &entries);
+    let commit = git_out(&main, &["commit-tree", &tree, "-m", "bodies"], "");
+    let reference = format!("refs/fgos/mail-bodies/{machine}");
+    git_out(&main, &["update-ref", &reference, &commit], "");
+    git_out(
+        &main,
+        &["push", "-q", "origin", &format!("+{reference}:{reference}")],
+        "",
+    );
+}
+
+/// Beta's clone gets the mail-body fetch mapping, as `fgos doctor --fix` installs it.
+fn install_body_mapping(cross: &Cross) {
+    use fgos_git::{GitDriver, ResolveRepo};
+    let main = cross.beta.main();
+    let driver = GitDriver::new(&cross.beta_root).unwrap();
+    let repo = match driver.resolve_repo(&main, &main).unwrap() {
+        ResolveRepo::Repository(repo) => repo,
+        _ => panic!("the main checkout is a repository"),
+    };
+    fgos_git::RepositoryConfig::ensure_fetch_mapping(
+        &driver,
+        &repo,
+        "origin",
+        &fgos_git::granted_fetch_mappings("origin").unwrap(),
+        "test-body-mapping",
+    )
+    .unwrap();
+}
+
+/// How far beta's ingest cursor has read alpha's store origin (0: nothing).
+fn cursor_on_alpha(cross: &Cross) -> u64 {
+    use fgos_event_store::{identity::StoreIdentity, layout::Layout};
+    use fgos_git::{GitDriver, ResolveRepo};
+    let main = cross.alpha.main();
+    let driver = GitDriver::new(&cross.alpha_root).unwrap();
+    let repo = match driver.resolve_repo(&main, &main).unwrap() {
+        ResolveRepo::Repository(repo) => repo,
+        _ => panic!("the main checkout is a repository"),
+    };
+    let layout = Layout::from_common_dir(Some(repo.common_dir())).unwrap();
+    let machine = fgos_identity::machine::read(&cross.alpha_root).unwrap();
+    let origin = StoreIdentity::open(&layout, &machine).unwrap().store_id;
+    let snapshot: serde_json::Value = serde_json::from_slice(
+        &fs::read(cross.beta.mailbox_dir().join("record/snapshot.json")).unwrap(),
+    )
+    .unwrap();
+    snapshot["remote"]["cursor"][origin.as_str()]
+        .as_u64()
+        .unwrap_or(0)
+}
+
+/// What alpha's status counts as refused by a receiver, by code.
+fn alpha_refusals(cross: &Cross) -> serde_json::Value {
+    let status = cross.alpha.run(
+        &cross.alpha.main(),
+        Some("sender-a"),
+        &["mailbox", "status", "--json"],
+        b"",
+    );
+    serde_json::from_slice::<serde_json::Value>(&status.stdout).unwrap()["data"]["crossMachine"]
+        ["refused"]
+        .clone()
+}
+
+/// A body pushed before its event reaches the head with one sync of the receiver: the child fetches
+/// the events, then the bodies, then takes the mail, so the header never meets a mirror that lacks
+/// the body its sender already pushed.
+#[test]
+fn a_body_pushed_before_its_event_is_delivered_by_one_sync_of_the_receiver() {
+    let cross = two_machines();
+    confirm_alpha_on_beta(&cross);
+    install_body_mapping(&cross);
+    let body = "body that travelled through the body ref";
+    push_bodies(&cross, &[body]);
+    append_mail(&cross, "v3-delivered", &Mail::BodyRef(body));
+    sync_child(&cross.alpha);
+    sync_child(&cross.beta);
+
+    assert_eq!(cross.beta.message_states().len(), 1);
+    let frame = cross.beta.claude_hook("post-tool-use", &post_tool_use());
+    assert!(
+        String::from_utf8_lossy(&frame.stdout).contains(body),
+        "{frame:?}"
+    );
+}
+
+/// A clone without the mail-body fetch mapping cannot tell a gone body from one it never fetched, so
+/// the header is held: the origin's cursor stays before it, nothing is refused to the sender, and the
+/// mail after it is still taken, once, however often it is read again. When the mapping is installed
+/// the next sync delivers the held mail.
+#[test]
+fn a_clone_without_the_body_mapping_holds_the_header_and_delivers_it_once_the_mapping_is_installed()
+{
+    let cross = two_machines();
+    confirm_alpha_on_beta(&cross);
+    let body = "body held for a clone without the mapping";
+    push_bodies(&cross, &[body]);
+    append_mail(&cross, "v3-held", &Mail::BodyRef(body));
+    append_mail(
+        &cross,
+        "v1-after",
+        &Mail::Inline("plain mail after the held one"),
+    );
+    sync_child(&cross.alpha);
+    let before = cursor_on_alpha(&cross);
+
+    let said = sync_child_said(&cross.beta);
+    assert!(said.contains("mailbox-sync: held "), "{said}");
+    assert_eq!(cross.beta.message_states().len(), 1, "only the plain mail");
+    assert_eq!(
+        cursor_on_alpha(&cross),
+        before,
+        "the cursor stays before the held header"
+    );
+
+    sync_child_said(&cross.beta);
+    assert_eq!(
+        cross.beta.message_states().len(),
+        1,
+        "reading the plain mail again takes nothing twice"
+    );
+    sync_child(&cross.alpha);
+    assert_eq!(
+        alpha_refusals(&cross),
+        serde_json::json!({}),
+        "a hold refuses nothing to the sender"
+    );
+
+    install_body_mapping(&cross);
+    sync_child(&cross.beta);
+    assert_eq!(
+        cross.beta.message_states().len(),
+        2,
+        "the held mail arrived"
+    );
+    assert_ne!(cursor_on_alpha(&cross), before, "the cursor moved past it");
+    sync_child(&cross.beta);
+    assert_eq!(cross.beta.message_states().len(), 2);
+}
+
+/// A body fetch that ran after the event fetch and found the blob gone (the sender's ref was reset
+/// without it) settles the header as expired, and the sender is told.
+#[test]
+fn a_header_whose_blob_is_absent_after_a_successful_body_fetch_is_expired_and_the_sender_is_told() {
+    let cross = two_machines();
+    confirm_alpha_on_beta(&cross);
+    install_body_mapping(&cross);
+    push_bodies(&cross, &["a different body the ref still holds"]);
+    append_mail(
+        &cross,
+        "v3-expired",
+        &Mail::BodyRef("a body the ref no longer holds"),
+    );
+    sync_child(&cross.alpha);
+    let before = cursor_on_alpha(&cross);
+    let said = sync_child_said(&cross.beta);
+    assert!(!said.contains("held"), "{said}");
+    assert_eq!(cross.beta.message_states().len(), 0);
+    assert_ne!(
+        cursor_on_alpha(&cross),
+        before,
+        "an expired header is settled, not held"
+    );
+    sync_child(&cross.alpha);
+    assert_eq!(alpha_refusals(&cross)["remote-body-expired"], 1);
+}
+
+/// A body fetch that fails proves nothing about the blob: the header is held, not expired, and is
+/// delivered by the first sync whose fetch works.
+#[test]
+fn a_failed_body_fetch_holds_the_header_instead_of_expiring_it() {
+    let cross = two_machines();
+    confirm_alpha_on_beta(&cross);
+    install_body_mapping(&cross);
+    let body = "body behind a broken advertisement";
+    push_bodies(&cross, &[body]);
+    append_mail(&cross, "v3-fetch-failed", &Mail::BodyRef(body));
+    sync_child(&cross.alpha);
+    // The remote advertises a mail-body ref whose object it does not have: the fetch of the
+    // mail-body mirrors fails, while the event sync does not look at that namespace.
+    let broken = cross
+        .alpha
+        .root
+        .join("remote.git/refs/fgos/mail-bodies/zz-broken-aaaaaa");
+    fs::write(&broken, "1234567890123456789012345678901234567890\n").unwrap();
+    let before = cursor_on_alpha(&cross);
+
+    let said = sync_child_said(&cross.beta);
+    assert!(said.contains("mailbox-sync: held "), "{said}");
+    assert_eq!(cross.beta.message_states().len(), 0);
+    assert_eq!(cursor_on_alpha(&cross), before);
+    sync_child(&cross.alpha);
+    assert_eq!(alpha_refusals(&cross), serde_json::json!({}));
+
+    fs::remove_file(&broken).unwrap();
+    sync_child(&cross.beta);
+    assert_eq!(
+        cross.beta.message_states().len(),
+        1,
+        "delivered once the fetch worked"
+    );
 }

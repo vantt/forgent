@@ -12,9 +12,10 @@
 //! ends with status 0 on every path: nobody waits for it.
 use super::event_store_clone;
 use super::identity_log::StoreLogDoor;
+use super::mailbox_body::{self, BodyFetch};
 use super::mailbox_config::{project_mailbox, CrossMachine};
 use super::mailbox_identity::{session_of, state_root};
-use super::mailbox_ingest;
+use super::mailbox_ingest::{self, Hold};
 use fgos_event_store::sync::{sync, SyncRequest};
 use fgos_identity::current::machine_info;
 use fgos_identity::directory;
@@ -69,12 +70,23 @@ fn run(args: &[OsString]) {
     if let Err(why) = publish_heads(&dir, &fgos_dir, &loaded.limits) {
         eprintln!("mailbox-sync: {why}");
     }
-    if let Err(why) = publish(&dir, &remote) {
-        eprintln!("mailbox-sync: {why}");
-    }
+    // Bodies are fetched only after an event sync that ran to its end: a body fetch that did not
+    // follow an event fetch says nothing about whether a body is gone.
+    let events_fetched = match publish(&dir, &remote) {
+        Ok(ran) => ran,
+        Err(why) => {
+            eprintln!("mailbox-sync: {why}");
+            false
+        }
+    };
+    let bodies = if events_fetched {
+        mailbox_body::fetch(&dir, &remote)
+    } else {
+        BodyFetch::NotFetched("the event sync did not run to its end".into())
+    };
     // The mail taken may leave settlements for the senders in the log; one more sync pushes them now
     // instead of at the next interval.
-    match take_mail(&fgos_dir, &loaded, &cross) {
+    match take_mail(&fgos_dir, &loaded, &cross, &bodies) {
         Ok(true) => {
             if let Err(why) = publish(&dir, &remote) {
                 eprintln!("mailbox-sync: {why}");
@@ -97,7 +109,12 @@ fn stamp(fgos_dir: &Path, remote: &str) {
 /// Takes the mail the fetch brought into the record. A project that has no record yet takes none:
 /// the record is made by the first hook call of a session, not by the child. Whether settlements
 /// were appended.
-fn take_mail(fgos_dir: &Path, loaded: &Loaded, cross: &CrossMachine) -> Result<bool, String> {
+fn take_mail(
+    fgos_dir: &Path,
+    loaded: &Loaded,
+    cross: &CrossMachine,
+    bodies: &BodyFetch,
+) -> Result<bool, String> {
     let record = Record::open(fgos_dir).map_err(|e| e.to_string())?;
     let wait = Wait::Ms(loaded.hook.verbs.lock_wait_ms);
     // The wake of mail from another machine runs here, after the record's hold is released and
@@ -107,14 +124,21 @@ fn take_mail(fgos_dir: &Path, loaded: &Loaded, cross: &CrossMachine) -> Result<b
     let wake = |wake: &fgos_mailbox_core::RemoteWake| {
         fgos_mailbox::verbs::nudge_remote(wake, &versions, &nudge)
     };
-    mailbox_ingest::ingest(fgos_dir, &record, &loaded.limits, cross, wait, now(), &wake).map(
-        |report| {
-            for (id, sent) in &report.nudges {
-                eprintln!("mailbox-sync: nudge for {id}: {sent:?}");
-            }
-            report.settled > 0
-        },
-    )
+    let hold = Hold {
+        record: &record,
+        limits: &loaded.limits,
+        wait,
+        now: now(),
+    };
+    mailbox_ingest::ingest(fgos_dir, &hold, cross, bodies, &wake).map(|report| {
+        for (id, sent) in &report.nudges {
+            eprintln!("mailbox-sync: nudge for {id}: {sent:?}");
+        }
+        for (id, why) in &report.held {
+            eprintln!("mailbox-sync: held {id}: {why}");
+        }
+        report.settled > 0
+    })
 }
 
 fn now() -> Timestamp {
@@ -189,12 +213,13 @@ fn publish_heads(main: &Path, fgos_dir: &Path, limits: &Limits) -> Result<(), St
 
 /// One opportunistic sync of the clone `dir` is in; nothing for a directory
 /// in no repository. The hook starts this child only for a clone with a store
-/// or a migrated-events fence.
-fn publish(dir: &Path, remote: &str) -> Result<(), String> {
+/// or a migrated-events fence. Whether the sync ran to its end: false for a
+/// directory in no repository and when another process held the seal.
+fn publish(dir: &Path, remote: &str) -> Result<bool, String> {
     let Some(clone) =
         event_store_clone::open(dir).map_err(|f| format!("{}: {}", f.reason, f.detail))?
     else {
-        return Ok(());
+        return Ok(false);
     };
     let request = SyncRequest {
         layout: &clone.layout,
@@ -206,7 +231,7 @@ fn publish(dir: &Path, remote: &str) -> Result<(), String> {
         hot_lock_depth: 0,
     };
     sync(&clone.driver, &clone.repo, request)
-        .map(|_| ())
+        .map(|synced| !synced.busy)
         .map_err(|e| e.to_string())
 }
 
