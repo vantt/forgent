@@ -13,6 +13,7 @@ import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { loadSliceTable } from '../../src/workflow/propose-classify.mjs';
 import { CASE_PLACEHOLDER, createProposePorts, planCaseSlug, proposeFromRequest, proposeFromSlices, readPassRigor, renderProposalText } from '../../src/workflow/propose.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { appendAll, conductorWorkflow, openCase } from '../helpers/workflow-case-fixture.mjs';
 
 const runnerConfig = readStandardValue('runner').value;
 const shipped = shippedCatalog();
@@ -304,4 +305,29 @@ test('proposing writes nothing: no case, no ledger event, nothing in the checkou
   assert.equal(p.inherit, null, 'a checkout with no closed case has nothing to continue');
   assert.equal(snapshot(), before);
   assert.equal(fs.existsSync(path.join(root, '.fgos')), false, 'no workflow run directory was created');
+});
+
+test('continuing a closed case reads each ledger once and skips directories that are not cases', () => {
+  const root = makeFixtureDir('fgos-propose-scan-');
+  for (const requestDigest of ['sha256:one', 'sha256:two', 'sha256:three']) {
+    const run = openCase({ repoRoot: root, requestDigest });
+    appendAll(run, [{ type: 'case.closed', payload: { closedAt: new Date().toISOString() } }]);
+  }
+  fs.mkdirSync(path.join(root, '.fgos', 'workflow-runs', '.bindings'), { recursive: true });
+  fs.mkdirSync(path.join(root, '.fgos', 'workflow-runs', 'stray-directory'), { recursive: true });
+  const ledgerReads = [];
+  const read = fs.readFileSync;
+  fs.readFileSync = (file, ...rest) => {
+    if (String(file).endsWith('events.jsonl')) ledgerReads.push(String(file));
+    return read.call(fs, file, ...rest);
+  };
+  let found;
+  try {
+    found = createProposePorts({ checkoutRoot: root, mainRoot: root }).findInherit({ guide: conductorWorkflow().guide, request: 'Ship the change', baseCommit: 'c0ffee' });
+  } finally {
+    fs.readFileSync = read;
+  }
+  assert.equal(found, null, 'no closed case served this request on this guide');
+  assert.equal(ledgerReads.length, 3, `one read per case ledger, none for a directory that is not a case: ${ledgerReads.map((f) => path.basename(path.dirname(f)))}`);
+  assert.equal(new Set(ledgerReads).size, 3, 'no ledger is read twice');
 });
