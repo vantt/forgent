@@ -3093,7 +3093,10 @@ fn a_mail_body_ref_is_reset_to_a_new_root_under_lease_and_peers_mirror_the_reset
                 name: "origin".into(),
                 pinned_url: remote.to_str().unwrap().into(),
             });
+        // The lease is the mirror tip, so each push follows a fetch of the namespace.
+        let granted = granted_fetch_mappings("origin").unwrap();
         let push = || {
+            port.fetch_refs(&repo, "origin", &granted).unwrap();
             port.push_refs(&repo, "origin", &[(body_reference(), body_reference())])
                 .unwrap()
                 .refs
@@ -3150,7 +3153,6 @@ fn a_mail_body_ref_is_reset_to_a_new_root_under_lease_and_peers_mirror_the_reset
             peer_port.read_ref(&peer_repo, &mirror).unwrap(),
             RefValue::Absent
         ));
-        let granted = granted_fetch_mappings("origin").unwrap();
         peer_port
             .fetch_refs(&peer_repo, "origin", &granted)
             .unwrap();
@@ -3221,8 +3223,8 @@ fn a_mail_body_reset_loses_to_a_remote_that_moved_after_its_tip_was_read() {
         "body-create",
     )
     .unwrap();
-    // The remote was absent when read; the other writer creates it before the
-    // push child runs, so the lease for "absent" is stale.
+    // The mirror holds no tip, so the lease is "absent"; the other writer creates the ref
+    // before the push child runs, so that lease is stale.
     let pushed = port
         .push_refs(&repo, "origin", &[(body_reference(), body_reference())])
         .unwrap();
@@ -3234,5 +3236,76 @@ fn a_mail_body_reset_loses_to_a_remote_that_moved_after_its_tip_was_read() {
     assert_eq!(
         git(&remote, &["rev-parse", body_reference().as_str()]),
         format!("{stolen}\n").as_bytes()
+    );
+}
+
+#[test]
+fn a_mail_body_push_built_on_a_mirror_that_differs_from_the_remote_is_refused_and_the_remote_keeps_its_tip(
+) {
+    let t = Temp::new();
+    let remote = t.0.join("remote");
+    let owner = t.0.join("owner");
+    let other = t.0.join("other");
+    for path in [&remote, &owner, &other] {
+        init(path, "sha1", "files");
+    }
+    git(
+        &owner,
+        &["remote", "add", "origin", remote.to_str().unwrap()],
+    );
+    let driver = GitDriver::new(&t.0).unwrap();
+    let repo = resolve(&driver, &owner);
+    let mut h = handle(&t.0.join("owner-seal.lock"));
+    let port =
+        PublicationPort::new(&driver, body_authority(&repo, &mut h)).with_remote(RemoteGrant {
+            name: "origin".into(),
+            pinned_url: remote.to_str().unwrap().into(),
+        });
+    let granted = granted_fetch_mappings("origin").unwrap();
+    let push = || {
+        port.push_refs(&repo, "origin", &[(body_reference(), body_reference())])
+            .unwrap()
+            .refs
+            .remove(0)
+            .1
+    };
+    let first = commit(&port, &repo, vec![], "bodies-1");
+    port.compare_and_swap(
+        &repo,
+        &body_reference(),
+        &ExpectedTip::Absent,
+        &ExpectedTip::Oid(first.clone()),
+        "body-create",
+    )
+    .unwrap();
+    port.fetch_refs(&repo, "origin", &granted).unwrap();
+    assert!(matches!(push(), PushOutcome::Accepted));
+    // Another writer of the same ref moves the remote after the mirror was fetched.
+    let moved = foreign_root(&other, "moved");
+    git(
+        &other,
+        &[
+            "push",
+            "--force",
+            remote.to_str().unwrap(),
+            &format!("{moved}:{}", body_reference().as_str()),
+        ],
+    );
+    let second = commit(&port, &repo, vec![first.clone()], "bodies-2");
+    port.compare_and_swap(
+        &repo,
+        &body_reference(),
+        &ExpectedTip::Oid(first),
+        &ExpectedTip::Oid(second),
+        "body-extend",
+    )
+    .unwrap();
+    assert!(
+        matches!(push(), PushOutcome::RejectedNonFastForward { .. }),
+        "a commit built on a stale mirror must not replace what the remote holds"
+    );
+    assert_eq!(
+        git(&remote, &["rev-parse", body_reference().as_str()]),
+        format!("{moved}\n").as_bytes()
     );
 }

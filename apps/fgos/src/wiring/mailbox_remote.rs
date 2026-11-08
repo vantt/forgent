@@ -525,7 +525,9 @@ pub fn send(
             mailbox_body::publish(main, &cross.remote, &machine.id, body).map_err(|why| {
                 Refusal {
                     reason: "body-not-published",
-                    detail: why,
+                    detail: format!(
+                        "{why}; retry when the remote is reachable, or set mailbox.remote.bodyRef to false to send the body inside the event"
+                    ),
                     candidates: Vec::new(),
                 }
             })?;

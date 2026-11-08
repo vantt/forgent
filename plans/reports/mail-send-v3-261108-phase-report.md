@@ -45,6 +45,19 @@ Cost of this choice, stated plainly: with bodyRef on, `fgos mailbox send` to ano
 4. `fgos mailbox send` caps were counted before the push; a refused push over-counts the sender, the existing documented direction.
 5. The `send` timeout bound is my choice (30 s), not from a spec.
 
+## Follow-up fix: the push builds on what the remote holds (review change)
+
+Hole found in review: `publish` built its commit on the local own ref (or a possibly stale mirror), and the Git crate leased the push on a fresh `ls-remote`, which only guards the milliseconds before the push. A remote holding bodies the commit lacked (two full clones sharing a machine id; own ref absent with the mirror behind) could be force-replaced, losing blobs that receivers then settle as `remote-body-expired`.
+
+Fix, in a new commit:
+- `publish` first fetches the mail-body mapping through `on_body_ref` (same seal, same `BODY_WRITER`, `fetch_refs` with the mail-bodies mapping only, shared `body_mapping` helper with the receiver's fetch). The new tree is the union of the mirror tip's tree, the own tip's tree and the new blob; the parent is the mirror tip; the own ref is moved by compare-and-swap. When nothing is to add the own ref is only aligned to the mirror tip.
+- `packages/git/rust/src/publication.rs` `push()`: for a mail-body ref the lease is the local mirror tip `refs/fgos/remotes/<remote>/mail-bodies/<machine>` (absent when there is no mirror), with no `ls-remote`. Any remote move since the fetch fails the lease and the push is refused (`RejectedNonFastForward`); other refs keep the `ls-remote` path unchanged. Callers checked by grep over all crates: only `tests/publication.rs` drives the mail-body push (the event-store `offline_sync` test only checks refs are ignored).
+- The `body-not-published` refusal now says to retry when the remote is reachable or set `mailbox.remote.bodyRef` to false.
+
+Tests: Git crate `a_mail_body_push_built_on_a_mirror_that_differs_from_the_remote_is_refused_and_the_remote_keeps_its_tip` (new; remote moved after the mirror was fetched, push refused, remote ref unchanged); `a_mail_body_ref_is_reset_to_a_new_root_under_lease_...` now fetches the mirror before each push; `a_mail_body_reset_loses_to_a_remote_that_moved_...` kept with its comment fixed (mirror absent, lease "absent", remote created before the push). Routes: `two_clones_of_one_machine_sending_one_message_each_leave_both_bodies_on_the_remote` (new): the second clone succeeds via the union, no refusal needed; both blobs are on the remote. It does not assert delivery of both headers: two clones of one machine also share one events ref, which is the Event Store's concern. Without the fetch-and-union fix this test fails (the second send replaces the ref and the first blob is gone).
+
+Commands: `cargo test -p fgos-git --test publication` 41 passed (1 ignored, pre-existing), `--lib` 84, `--test ssh_transport` 6; `cargo test -p fgos-event-store --test offline_sync` 5; `cargo test -p fgos --test mailbox_routes` 42; `--test mailbox_sync_child` 2; `--bin fgos mailbox` 14; `cargo clippy -p fgos -p fgos-git --all-targets -- -D warnings` clean; rustfmt check ok; msvc check ok (only the known `envelopes` warning), aarch64-apple-darwin ok; census regenerated, 0 undeclared. Config mapping code untouched, so `test/setup/git-checks` not run.
+
 ## Unresolved questions
 
 - Is a synchronous push at send time acceptable to the owner, or should a machine that wants offline recording keep v1/v2 (current behaviour when bodyRef is off)? A queued variant would need every event-publishing path to know about pending bodies, which is Event Store territory.

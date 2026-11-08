@@ -2829,3 +2829,67 @@ fn a_failed_body_fetch_holds_the_header_instead_of_expiring_it() {
         "delivered once the fetch worked"
     );
 }
+
+/// A second full clone of alpha's machine: same state root (so the same machine id and key), its own
+/// checkout of the same remote, bodyRef on.
+fn second_clone_of_alpha(cross: &Cross) -> Scene {
+    let clone = Scene::new("xsend-alpha-two");
+    let state = clone.home().join(".local/state");
+    fs::create_dir_all(&state).unwrap();
+    let copied = Command::new("cp")
+        .arg("-a")
+        .arg(&cross.alpha_root)
+        .arg(state.join("fgos"))
+        .status()
+        .unwrap();
+    assert!(copied.success());
+    migrate_main_to(
+        &clone,
+        &state.join("fgos"),
+        "0123456789abcdef0123456789abcdef",
+        &cross.alpha.root.join("remote.git"),
+    );
+    let out = clone.claude_hook("post-tool-use", &post_tool_use());
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    fs::write(
+        clone.main().join(".fgos/config.json"),
+        r#"{"mailbox":{"crossMachine":{"enabled":true},"remote":{"bodyRef":true}}}"#,
+    )
+    .unwrap();
+    sync_child(&clone);
+    clone
+}
+
+/// Two full clones of one machine share its machine id, so they share one mail-body ref, and each
+/// builds on what the remote holds: the second clone fetches the mirror first and its tree is the
+/// mirror's plus its own blob, so the remote ends with both bodies and nothing is replaced.
+#[test]
+fn two_clones_of_one_machine_sending_one_message_each_leave_both_bodies_on_the_remote() {
+    let cross = two_machines();
+    turn_on_body_ref(&cross);
+    let other = second_clone_of_alpha(&cross);
+    let first = "body sent from the first clone";
+    let second = "body sent from the second clone";
+    let out = alpha_send(&cross, &[first]);
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    let out = other.run(
+        &other.main(),
+        Some("sender-a"),
+        &["mailbox", "send", "--to", &cross.target, second],
+        b"",
+    );
+    assert_eq!(
+        out.status.code(),
+        Some(0),
+        "{} {}",
+        String::from_utf8_lossy(&out.stdout),
+        String::from_utf8_lossy(&out.stderr)
+    );
+    for body in [first, second] {
+        assert_eq!(
+            remote_body(&cross, &sha256_hex(body)).as_deref(),
+            Some(body),
+            "{body}"
+        );
+    }
+}

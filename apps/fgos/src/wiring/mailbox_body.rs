@@ -63,12 +63,7 @@ fn try_fetch(main: &Path, remote: &str) -> Result<(), String> {
     let clone = open_clone(main)?;
     // The mapping the clone needs is the granted one the Event Store sync does not require; a clone
     // that has not run setup again lacks it, and nothing is fetched without it.
-    let required = publication_fetch_mappings(remote).map_err(|e| format!("{e:?}"))?;
-    let mut bodies = granted_fetch_mappings(remote).map_err(|e| format!("{e:?}"))?;
-    bodies.retain(|mapping| !required.contains(mapping));
-    let [mapping] = bodies.as_slice() else {
-        return Err("no mail-body fetch mapping is granted".into());
-    };
+    let mapping = &body_mapping(remote)?;
     let configured = clone
         .driver
         .configured_fetch_refspecs(&clone.repo, remote)
@@ -84,6 +79,17 @@ fn try_fetch(main: &Path, remote: &str) -> Result<(), String> {
             .map(|_| ())
             .map_err(|e| format!("body fetch: {e:?}"))
     })
+}
+
+/// The one granted fetch mapping the Event Store sync does not require: the mail-body namespace.
+fn body_mapping(remote: &str) -> Result<String, String> {
+    let required = publication_fetch_mappings(remote).map_err(|e| format!("{e:?}"))?;
+    let mut bodies = granted_fetch_mappings(remote).map_err(|e| format!("{e:?}"))?;
+    bodies.retain(|mapping| !required.contains(mapping));
+    match <[String; 1]>::try_from(bodies) {
+        Ok([mapping]) => Ok(mapping),
+        Err(_) => Err("no mail-body fetch mapping is granted".into()),
+    }
 }
 
 fn open_clone(main: &Path) -> Result<EventStoreClone, String> {
@@ -156,10 +162,13 @@ const PUSH_TIMEOUT: Duration = Duration::from_secs(30);
 /// id the event will name as its sender: a receiver looks the blob up under that id, so a store
 /// that names its refs otherwise is refused.
 ///
-/// The new commit holds the tip's tree plus the blob (an absent ref starts empty; a ref this clone
-/// has not written yet continues from its own mirror, so a fresh clone of the machine does not
-/// cut the bodies the remote still holds). A body already in the tree adds nothing but is pushed
-/// again, so a push that failed earlier is made up by the next send of the same text.
+/// The push builds on what the remote holds: it first fetches the mail-body mirrors, and the new
+/// commit's tree is the union of the mirror tip's tree, this clone's own tip's tree (bodies a
+/// refused earlier push left only here) and the new blob, with the mirror tip as its parent. The
+/// push is leased on that mirror tip, so a remote that moved since the fetch (another clone of the
+/// same machine, a rotation) refuses it and nothing the remote holds is replaced. A body already
+/// in the tree adds nothing but is pushed again, so a push that failed earlier is made up by the
+/// next send of the same text.
 pub fn publish(main: &Path, remote: &str, machine: &str, body: &str) -> Result<(), String> {
     let clone = open_clone(main)?;
     if clone.machine != machine {
@@ -168,44 +177,33 @@ pub fn publish(main: &Path, remote: &str, machine: &str, body: &str) -> Result<(
             clone.machine
         ));
     }
+    let mapping = body_mapping(remote)?;
     on_body_ref(&clone, remote, Some(PUSH_TIMEOUT), |port, reference| {
         let repo = &clone.repo;
         let failed = |what: &str, e: &dyn std::fmt::Debug| format!("{what}: {e:?}");
-        let own = port
+        port.fetch_refs(repo, remote, std::slice::from_ref(&mapping))
+            .map_err(|e| failed("mail body fetch", &e))?;
+        let mirror = clone
+            .driver
+            .resolve_commit_ref(repo, &mirror_ref(remote, machine))
+            .map_err(|e| failed("mail body mirror read", &e))?;
+        let (own, expected) = match port
             .read_ref(repo, reference)
-            .map_err(|e| failed("mail body ref read", &e))?;
-        let (tip, expected) = match own {
+            .map_err(|e| failed("mail body ref read", &e))?
+        {
             RefValue::Direct(tip) => (Some(tip.clone()), ExpectedTip::Oid(tip)),
-            RefValue::Absent => {
-                let mirrored = clone
-                    .driver
-                    .resolve_commit_ref(repo, &mirror_ref(remote, machine))
-                    .map_err(|e| failed("mail body mirror read", &e))?;
-                (mirrored, ExpectedTip::Absent)
-            }
+            RefValue::Absent => (None, ExpectedTip::Absent),
             RefValue::Symbolic(_) => return Err("the mail-body ref is symbolic".into()),
         };
-        let mut entries = Vec::new();
-        if let Some(tip) = &tip {
-            let mut cursor = None;
-            loop {
-                let page = clone
-                    .driver
-                    .list_tree(repo, tip, b"", cursor, 10_000)
-                    .map_err(|e| failed("mail body tree read", &e))?;
-                for listed in page.entries {
-                    if listed.kind != ObjectType::Blob || listed.path.contains(&b'/') {
-                        return Err("the mail-body ref holds an entry that is not a blob".into());
-                    }
-                    entries.push(TreeEntry {
-                        name: listed.path,
-                        mode: listed.mode,
-                        oid: listed.oid,
-                    });
-                }
-                match page.next_cursor {
-                    Some(next) if !page.complete => cursor = Some(next),
-                    _ => break,
+        let mut entries = match &mirror {
+            Some(tip) => tree_entries(&clone, tip)?,
+            None => Vec::new(),
+        };
+        let mirrored = entries.len();
+        if let Some(tip) = &own {
+            for entry in tree_entries(&clone, tip)? {
+                if !entries.iter().any(|e| e.name == entry.name) {
+                    entries.push(entry);
                 }
             }
         }
@@ -219,6 +217,8 @@ pub fn publish(main: &Path, remote: &str, machine: &str, body: &str) -> Result<(
                 mode: 0o100644,
                 oid: blob,
             });
+        }
+        let next = if entries.len() > mirrored {
             let tree = port
                 .write_tree(repo, &entries)
                 .map_err(|e| failed("mail body tree write", &e))?;
@@ -230,12 +230,12 @@ pub fn publish(main: &Path, remote: &str, machine: &str, body: &str) -> Result<(
                 email: "mailbox@fgos.invalid".into(),
             };
             let date = format!("{seconds} +0000");
-            let commit = port
-                .write_commit(
+            Some(
+                port.write_commit(
                     repo,
                     &CommitInput {
                         tree,
-                        parents: tip.into_iter().collect(),
+                        parents: mirror.iter().cloned().collect(),
                         author: identity(),
                         committer: identity(),
                         author_date: date.clone(),
@@ -243,13 +243,19 @@ pub fn publish(main: &Path, remote: &str, machine: &str, body: &str) -> Result<(
                         message: b"mail bodies".to_vec(),
                     },
                 )
-                .map_err(|e| failed("mail body commit", &e))?;
-            let operation = format!("mail-body-{}-{}", std::process::id(), commit.as_str());
+                .map_err(|e| failed("mail body commit", &e))?,
+            )
+        } else {
+            // Everything is on the mirror already: the own ref only has to stand on it.
+            mirror.clone()
+        };
+        if let Some(next) = next.filter(|next| own.as_ref() != Some(next)) {
+            let operation = format!("mail-body-{}-{}", std::process::id(), next.as_str());
             port.compare_and_swap(
                 repo,
                 reference,
                 &expected,
-                &ExpectedTip::Oid(commit),
+                &ExpectedTip::Oid(next),
                 &operation,
             )
             .map_err(|e| failed("mail body ref update", &e))?;
@@ -262,6 +268,33 @@ pub fn publish(main: &Path, remote: &str, machine: &str, body: &str) -> Result<(
             other => Err(format!("mail body push not acknowledged: {other:?}")),
         }
     })
+}
+
+/// The blobs of the flat tree of the commit `tip`; an entry that is not a blob is refused.
+fn tree_entries(clone: &EventStoreClone, tip: &Oid) -> Result<Vec<TreeEntry>, String> {
+    let failed = |e: &dyn std::fmt::Debug| format!("mail body tree read: {e:?}");
+    let mut entries = Vec::new();
+    let mut cursor = None;
+    loop {
+        let page = clone
+            .driver
+            .list_tree(&clone.repo, tip, b"", cursor, 10_000)
+            .map_err(|e| failed(&e))?;
+        for listed in page.entries {
+            if listed.kind != ObjectType::Blob || listed.path.contains(&b'/') {
+                return Err("the mail-body ref holds an entry that is not a blob".into());
+            }
+            entries.push(TreeEntry {
+                name: listed.path,
+                mode: listed.mode,
+                oid: listed.oid,
+            });
+        }
+        match page.next_cursor {
+            Some(next) if !page.complete => cursor = Some(next),
+            _ => return Ok(entries),
+        }
+    }
 }
 
 /// The mirror of `machine`'s mail-body ref in this clone, for fetch remote `remote`.

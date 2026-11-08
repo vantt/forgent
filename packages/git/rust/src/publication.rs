@@ -1699,32 +1699,46 @@ impl<F: FileSystem> PublicationPort<'_, F> {
         let local = &refs[0].0;
         // transfer_intent reads the local ref (refusing a symbolic one).
         let spec = format!("{}:{}", local.as_str(), refs[0].1.as_str());
-        let advertised = self.remote_call(
-            repo,
-            scheme,
-            &[
-                "ls-remote".into(),
-                "--refs".into(),
-                "--".into(),
-                url.clone(),
-                refs[0].1.as_str().into(),
-            ],
-        )?;
-        if !advertised.success {
-            return Err(advertised.error("remote-advertisement-failed"));
-        }
-        let mut remote_old = ExpectedTip::Absent;
-        for line in text(&advertised.stdout)?.lines() {
-            let (oid, name) = line
-                .split_once('\t')
-                .ok_or_else(|| failure("invalid-remote-advertisement"))?;
-            if name != refs[0].1.as_str() {
-                return Err(failure("unexpected-remote-ref"));
+        let mail_body = is_mail_body_ref(local.as_str());
+        let remote_old = if mail_body {
+            // The lease is the mirror tip the new commit was built on, not a fresh read of the
+            // remote: a remote that moved since the last fetch holds bodies that commit lacks,
+            // and replacing it would lose them.
+            let machine = &local.as_str()["refs/fgos/mail-bodies/".len()..];
+            self.ref_tip(
+                repo,
+                &format!("refs/fgos/remotes/{remote}/mail-bodies/{machine}"),
+            )?
+        } else {
+            let advertised = self.remote_call(
+                repo,
+                scheme,
+                &[
+                    "ls-remote".into(),
+                    "--refs".into(),
+                    "--".into(),
+                    url.clone(),
+                    refs[0].1.as_str().into(),
+                ],
+            )?;
+            if !advertised.success {
+                return Err(advertised.error("remote-advertisement-failed"));
             }
-            remote_old = ExpectedTip::Oid(
-                Oid::parse(oid, repo.object_format()).map_err(|_| failure("invalid-remote-oid"))?,
-            );
-        }
+            let mut tip = ExpectedTip::Absent;
+            for line in text(&advertised.stdout)?.lines() {
+                let (oid, name) = line
+                    .split_once('\t')
+                    .ok_or_else(|| failure("invalid-remote-advertisement"))?;
+                if name != refs[0].1.as_str() {
+                    return Err(failure("unexpected-remote-ref"));
+                }
+                tip = ExpectedTip::Oid(
+                    Oid::parse(oid, repo.object_format())
+                        .map_err(|_| failure("invalid-remote-oid"))?,
+                );
+            }
+            tip
+        };
 
         let (id, intent) = self.transfer_intent(
             repo,
@@ -1750,8 +1764,8 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                 "--no-verify".into(),
                 "--recurse-submodules=no".into(),
             ];
-            if is_mail_body_ref(local.as_str()) {
-                // The lease holds the remote tip read above; an empty value
+            if mail_body {
+                // The lease holds the mirror tip read above; an empty value
                 // means the ref must still be absent.
                 let held = match &remote_old {
                     ExpectedTip::Absent => "",
@@ -1769,7 +1783,7 @@ impl<F: FileSystem> PublicationPort<'_, F> {
                     // establish a winner or an acknowledgement on their own.
                     let lines = text(&out.stdout)?;
                     let line = lines.lines().find(|l| l.as_bytes().get(1) == Some(&b'\t'));
-                    let outcome = push_outcome(line, out.success, is_mail_body_ref(local.as_str()));
+                    let outcome = push_outcome(line, out.success, mail_body);
                     if let (Some(l), false) =
                         (line, matches!(outcome, PushOutcome::RemoteOutcomeUnknown))
                     {
