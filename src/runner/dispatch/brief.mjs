@@ -46,14 +46,33 @@ export function briefPaths(runDir, round) {
   };
 }
 
+const pad2 = (n) => String(n).padStart(2, '0');
+
+/** `YYYY-MM-DD HH:MM:SS` on the machine's local clock, with its UTC offset (`UTC+07:00`). */
+function localClock(date) {
+  const offsetMin = -date.getTimezoneOffset();
+  const sign = offsetMin < 0 ? '-' : '+';
+  const abs = Math.abs(offsetMin);
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())} `
+    + `${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())} UTC${sign}${pad2(Math.floor(abs / 60))}:${pad2(abs % 60)}`;
+}
+
+/** The wall-clock moment the round's time budget runs out, as local time and UTC; null when no budget is known. */
+export function deadlineText(timeoutMs, now) {
+  if (!Number.isInteger(timeoutMs) || timeoutMs <= 0) return null;
+  const end = new Date(now + timeoutMs);
+  return `${localClock(end)} (${end.toISOString().slice(0, 19).replace('T', ' ')} UTC)`;
+}
+
 /**
  * Render the brief the worker reads. Wraps the prompt, renders the execution
  * contract, harmonizes the claim path to the brief's result path, and aligns
  * report requirements.
  */
-export function renderBrief({ prompt, round, runDir, agentName, effectiveContract }) {
+export function renderBrief({ prompt, round, runDir, agentName, effectiveContract, now = Date.now() }) {
   const p = briefPaths(runDir, round);
   const targetResultPath = effectiveContract?.resultClaim?.path || p.resultPath;
+  const deadline = deadlineText(effectiveContract?.limits?.executorTimeoutMs ?? effectiveContract?.limits?.timeoutMs, now);
   const contractSection = effectiveContract
     ? `\n## Execution contract\n\n` +
       `- Mutation: ${effectiveContract.mutation}\n` +
@@ -136,7 +155,14 @@ ${renderAgentResultClaimInstructions(effectiveContract?.assignment || {})}
    in this file fails schema validation and the round is scored failed.
 
 The second file is what ends this round, so write it last and only once the
-first one is on disk. Nothing you write is treated as proof on its own; it is
+first one is on disk.${deadline ? `
+
+Your time for this round ends at ${deadline}. The moment the report is saved, write the
+result file; improve the report afterwards only if time remains (the round may be read
+as soon as the result file exists). A round whose result file is missing when time runs
+out is scored as not finished, however complete the report is.` : ''}
+
+Nothing you write is treated as proof on its own; it is
 your account of the work, and it is read alongside the repository itself.
 
 Write only inside \`${p.outbox}\`. Everything else under

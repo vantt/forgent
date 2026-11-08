@@ -20,6 +20,18 @@ test('every path a worker is given is absolute -- its cwd is its own worktree', 
   assert.equal(p.briefPath, path.join(RUN_DIR, 'brief-1.md'));
 });
 
+test('the brief states when the round ends as local and UTC clock time and says to write the result as soon as the report is saved', () => {
+  const now = Date.UTC(2026, 10, 8, 1, 31, 55);
+  const brief = renderBrief({
+    prompt: 'do it', round: 1, runDir: RUN_DIR, agentName: 'fgos-w1', now,
+    effectiveContract: { mutation: 'read-only', limits: { executorTimeoutMs: 2_100_000 } },
+  });
+  assert.match(brief, /Your time for this round ends at \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC[+-]\d{2}:\d{2} \(2026-11-08 02:06:55 UTC\)\./);
+  assert.match(brief, /The moment the report is saved, write the\s+result file/);
+  const noBudget = renderBrief({ prompt: 'do it', round: 1, runDir: RUN_DIR, agentName: 'fgos-w1', now });
+  assert.doesNotMatch(noBudget, /Your time for this round ends/, 'no budget, no invented deadline');
+});
+
 test('the round number is in every filename, so a stale report cannot pass for a current one', () => {
   const p = briefPaths(RUN_DIR, 7);
   assert.match(p.briefPath, /brief-7\.md$/);
