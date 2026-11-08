@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9be93085f0f612435847ca6b97145ce792db1b843a3e3d9d13215dc96164e315",
+  "payloadDigest": "03b03a19ee66f8c75e9d1549337e0bd6132d71f4970c0772a30cfc207945b98d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1047,7 +1047,7 @@
     "src/runner/execution/account-rotation.mjs": "3f7263e6d0a291ce33aa9c44381138a6ca436f20543565ef857c8f7936388cbe",
     "src/runner/execution/bind.mjs": "6985e329763234f90f80cbbceb21526135deae5c99a474839b4fe1816d3829f3",
     "src/runner/execution/case-admission-port.mjs": "05bd4f698fd0028e9cb8297b9164cba8074aca26b492c939b4dc245e368fe151",
-    "src/runner/execution/case-run-paths.mjs": "00af7dd61bcfbdfbe91693c799b135f2ba183908f897644eaf32d8c8fc6d5262",
+    "src/runner/execution/case-run-paths.mjs": "32457ec6b87cf338a05e0ba745ee2d075653b2e2f2957e37197c8d5eaaea4faa",
     "src/runner/execution/commit-unit-work.mjs": "d8853dc5d42a53fa2578304de8ef38d55f04e4c9250a4185999a9d7b1f86a158",
     "src/runner/execution/dry-bind.mjs": "94acf7f1b659f663e4d8727f4984d6a8fb577e984a79b69f158892eca6cbd07a",
     "src/runner/execution/explain.mjs": "4fd3c5a6ae3b9c0d28ca0c333403d7d10e7b38aa29a4318326d02c6ffd8b1689",

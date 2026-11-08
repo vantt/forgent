@@ -18,7 +18,7 @@ export const runsRoot = (mainRoot) => path.join(mainRoot, '.fgos', 'workflow-run
 
 /** The directory of one case; refuses an id that is not a case id. */
 export function runDirOf(mainRoot, caseId) {
-  if (!isCaseId(caseId)) throw new RunnerConfigError(`"${String(caseId)}" is not a case id`, { code: 'invalid-case-id' });
+  if (!isCaseId(caseId)) throw new RunnerConfigError(`"${String(caseId)}" is not a case id (invalid-case-id)`, { code: 'invalid-case-id' });
   return path.join(runsRoot(mainRoot), caseId);
 }
 
