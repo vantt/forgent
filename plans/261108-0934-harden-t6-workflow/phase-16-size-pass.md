@@ -1,7 +1,7 @@
 ---
 phase: 16
 title: "Size pass, no behaviour change: projectCase cut to one small fold per event kind (at most 120 lines), one workflow test repository fixture instead of two"
-status: pending
+status: landed
 depends_on: ["01-15 on main (T6 as closed 2026-11-08)"]
 parallel: "final wave, with 17, 18, 19 and 20 step 1 (disjoint files)"
 effort: ~1d
