@@ -27,7 +27,6 @@ const DISALLOWED_G2_FIELDS = new Set([
 ]);
 
 const VALID_RIGORS = new Set(['low', 'standard', 'high', 'critical']);
-const VALID_STEP_KINDS = new Set(['standard', 'integrate']);
 // Coarse role a step plays when a Work item walks the workflow: which pool a
 // reader files the item under and which step is the entry/exit of that part.
 const VALID_STEP_PHASES = new Set(['clarify', 'discover', 'plan', 'execute']);
@@ -194,22 +193,13 @@ export function validateWorkflow(raw, { source } = {}) {
         })
       : [];
 
-    const kind = typeof s.kind === 'string' && s.kind.trim() ? s.kind.trim() : 'standard';
-    if (!VALID_STEP_KINDS.has(kind)) {
-      throw new WorkflowDefinitionError(`${stepLabel} unknown kind "${kind}", must be one of [${[...VALID_STEP_KINDS].join(', ')}]`);
+    if (s.kind !== undefined && s.kind !== null && s.kind !== 'standard') {
+      throw new WorkflowDefinitionError(s.kind === 'integrate'
+        ? `${stepLabel} kind "integrate" is no longer a Playbook step kind: a unit's branch is merged at the approve door, not by the Playbook`
+        : `${stepLabel} unknown kind ${JSON.stringify(s.kind)}, the only step kind is "standard"`);
     }
-
-    // Where an integrate step lands its units' branches. Absent means "the
-    // repository's own trunk" (resolved at run time), never a literal name.
-    let target;
     if (s.target !== undefined && s.target !== null) {
-      if (kind !== 'integrate') {
-        throw new WorkflowDefinitionError(`${stepLabel} "target" is only valid on a step of kind "integrate"`);
-      }
-      if (typeof s.target !== 'string' || !s.target.trim()) {
-        throw new WorkflowDefinitionError(`${stepLabel} "target" must be a non-empty branch name`);
-      }
-      target = s.target.trim();
+      throw new WorkflowDefinitionError(`${stepLabel} "target" is not a Playbook step field: a unit's branch is merged at the approve door, not by the Playbook`);
     }
 
     let gate = null;
@@ -398,8 +388,6 @@ export function validateWorkflow(raw, { source } = {}) {
         id: sId,
         title: typeof s.title === 'string' ? s.title.trim() : sId,
         dependsOn,
-        kind,
-        ...(target ? { target } : {}),
         ...(phase ? { phase } : {}),
         ...(skill ? { skill } : {}),
         operations: Object.freeze(operations),

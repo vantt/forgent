@@ -11,8 +11,6 @@ import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { execFileSync } from 'node:child_process';
 
 import { startWorkflow, resumeWorkflow, statusWorkflow, validateWorkflow, readWorkflowEvents } from '../../src/workflow/index.mjs';
-import { mergeWorkflowBranch } from '../../src/workflow/runner.mjs';
-import { loadNativeAddon } from '../../src/git/native.mjs';
 import { resolveLock } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
@@ -136,30 +134,6 @@ const unitRecordOf = (tmp, unitRunId) => JSON.parse(fs.readFileSync(path.join(tm
 const producerAssignment = (tmp, unitRunId) => JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', unitRunId, 'producer', '1', 'assignment.json'), 'utf8'));
 const opts = (tmp) => ({ repoRoot: tmp, cwd: tmp, worktree: tmp });
 
-// Workflow's integrate door lands on the target Land selects under its slot, even after an unrelated advance.
-test('workflow integration lands on the actual prepared target after an unrelated advance', async (t) => {
-  const tmp = setupRepo();
-  git(tmp, ['checkout', '-qb', 'incoming']);
-  fs.writeFileSync(path.join(tmp, 'incoming.txt'), 'incoming\n');
-  git(tmp, ['add', 'incoming.txt']); git(tmp, ['commit', '-qm', 'incoming']);
-  const source = git(tmp, ['rev-parse', 'HEAD']);
-  git(tmp, ['checkout', '-q', 'main']);
-  const native = loadNativeAddon();
-  const prepare = native.GitLand.prototype.prepare;
-  let selectedTarget;
-  t.mock.method(native.GitLand.prototype, 'prepare', function(args, loans) {
-    fs.writeFileSync(path.join(tmp, 'unrelated.txt'), 'prior land\n');
-    git(tmp, ['add', 'unrelated.txt']); git(tmp, ['commit', '-qm', 'unrelated advance']);
-    selectedTarget = git(tmp, ['rev-parse', 'main']);
-    return prepare.call(this, args, loans);
-  });
-  const result = await mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: 'incoming', targetBranch: 'main' });
-  assert.equal(result.merged, true);
-  assert.deepEqual(git(tmp, ['show', '-s', '--format=%P', 'main']).split(' '), [selectedTarget, source]);
-  assert.equal(git(tmp, ['show', 'main:incoming.txt']), 'incoming');
-  assert.equal(git(tmp, ['show', 'main:unrelated.txt']), 'prior land');
-});
-
 test('a units file runs through startWorkflow, and a unit\'s prefer and persona reach the Unit it runs', async () => {
   const tmp = setupRepo();
   const file = unitsFile(tmp, [
@@ -210,7 +184,6 @@ test('a unit that wrote outside its writes ends findings and its branch is not i
     id: 'stray',
     steps: [
       { id: 'w', units: [{ id: 'w', template: { capability: 'docs:write', objective: 'WRITE:a.txt WRITE:stray.txt', writes: ['a.txt'] } }] },
-      { id: 'land', kind: 'integrate', dependsOn: ['w'] },
     ],
   });
   const state = await startWorkflow({ workflow, ...opts(tmp) });
@@ -314,39 +287,21 @@ test('an out-of-scope file left uncommitted on a writer does not hold back the c
     steps: [
       { id: 'a', units: [{ id: 'w-a', template: { capability: 'docs:write', pattern: 'reviewed', acceptOutcomes: ['pass', 'findings'], objective: 'WRITE:a.txt WRITE:stray.txt', writes: ['a.txt'] } }] },
       { id: 'b', dependsOn: ['a'], units: [{ id: 'w-b', template: { capability: 'docs:write', pattern: 'reviewed', acceptOutcomes: ['pass', 'findings'], objective: 'WRITE:b.txt', writes: ['b.txt'] } }] },
-      { id: 'land', kind: 'integrate', dependsOn: ['b'] },
     ],
   });
   const state = await startWorkflow({ workflow, ...opts(tmp) });
   assert.equal(state.steps.a.units['w-a'].outcome, 'findings', JSON.stringify(state.steps.a));
   assert.deepEqual(state.steps.a.units['w-a'].outOfScope, ['stray.txt']);
   // The runner commits only the write scope, so stray.txt never reached w-a's branch: w-b, built on
-  // that branch, carries nothing out of scope, passes, and lands with the in-scope work under it.
+  // that branch, carries nothing out of scope, passes, and its branch holds the in-scope work under it.
   assert.equal(git(tmp, ['show', '--name-only', '--format=', state.steps.a.units['w-a'].branch]), 'a.txt');
   assert.equal(state.steps.b.units['w-b'].outOfScope, undefined);
   assert.equal(state.steps.b.units['w-b'].outcome, 'pass');
-  assert.equal(state.status, 'completed', JSON.stringify(state.steps.land));
-  assert.equal(git(tmp, ['show', 'HEAD:b.txt']), 'b.txt written');
-  assert.equal(git(tmp, ['show', 'HEAD:a.txt']), 'a.txt written');
-  assert.throws(() => git(tmp, ['show', 'HEAD:stray.txt']), 'the stray file never reached the trunk');
-});
-
-test('an integrate step that would land a unit with out-of-scope writes fails and says so', async () => {
-  const tmp = setupRepo();
-  useTwoFamilies(tmp);
-  const workflow = validateWorkflow({
-    id: 'land-flagged',
-    steps: [
-      { id: 'a', units: [{ id: 'w-a', template: { capability: 'docs:write', pattern: 'reviewed', acceptOutcomes: ['pass', 'findings'], objective: 'WRITE:a.txt WRITE:stray.txt', writes: ['a.txt'] } }] },
-      { id: 'land', kind: 'integrate', dependsOn: ['a'] },
-    ],
-  });
-  const state = await startWorkflow({ workflow, ...opts(tmp) });
-  assert.equal(state.steps.a.units['w-a'].outcome, 'findings');
-  assert.equal(state.status, 'failed');
-  assert.equal(state.steps.land.status, 'failed');
-  assert.match(state.steps.land.reason, /w-a.*out-of-scope-writes.*stray\.txt/);
-  assert.throws(() => git(tmp, ['show', 'HEAD:a.txt']), 'nothing was merged');
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps.b));
+  const bBranch = state.steps.b.units['w-b'].branch;
+  assert.equal(git(tmp, ['show', `${bBranch}:b.txt`]), 'b.txt written');
+  assert.equal(git(tmp, ['show', `${bBranch}:a.txt`]), 'a.txt written');
+  assert.throws(() => git(tmp, ['show', `${bBranch}:stray.txt`]), 'the stray file never reached the branch');
 });
 
 test('a units file refuses a unit id that cannot name a branch, and --seats with a units file', async () => {

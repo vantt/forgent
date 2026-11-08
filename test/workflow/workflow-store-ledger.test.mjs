@@ -13,6 +13,7 @@ import {
   appendWorkflowEvent,
   readWorkflowEvents,
   recoverWorkflowLedgerTail,
+  projectWorkflowState,
   startWorkflow,
   statusWorkflow,
   answerWorkflow,
@@ -148,6 +149,35 @@ test('the next advance of a run whose ledger ends in an unfinished line repairs 
   const types = readWorkflowEvents({ repoRoot, workflowRunId: id }).map((e) => e.type);
   assert.ok(types.includes('ledger.recovered'));
   assert.ok(types.indexOf('ledger.recovered') < types.indexOf('gate.answer'), 'repaired before the answer was recorded');
+});
+
+test('a ledger written when the Playbook had an integrate step still folds and prints', () => {
+  const repoRoot = makeFixtureDir('fgos-ledger-old-');
+  const workflow = { id: 'old/integrate', steps: [
+    { id: 'write', kind: 'standard', dependsOn: [], units: [{ id: 'u1', template: { capability: 'docs:write', writes: ['out.txt'] } }] },
+    { id: 'land', kind: 'integrate', target: 'main', dependsOn: ['write'], units: [] },
+  ] };
+  const { workflowRunId } = createWorkflowRun({ repoRoot, workflowId: workflow.id, workflow });
+  const hold = acquireAdvanceLock(repoRoot, workflowRunId);
+  try {
+    for (const [type, payload] of [
+      ['step.start', { stepId: 'write' }],
+      ['unit.scheduled', { stepId: 'write', unitId: 'u1', branch: `wf/${workflowRunId}/u1`, worktreePath: '/gone/wt' }],
+      ['unit.complete', { stepId: 'write', unitId: 'u1', outcome: 'pass' }],
+      ['step.complete', { stepId: 'write', outcome: 'pass' }],
+      ['step.start', { stepId: 'land' }],
+      ['step.complete', { stepId: 'land', outcome: 'pass' }],
+      ['workflow.complete', { outcome: 'pass' }],
+    ]) appendWorkflowEvent({ repoRoot, workflowRunId, event: { type, payload }, hold });
+  } finally { hold.release(); }
+
+  const state = projectWorkflowState(readWorkflowEvents({ repoRoot, workflowRunId }));
+  assert.equal(state.status, 'completed');
+  assert.equal(state.steps.land.status, 'completed');
+  assert.equal(state.steps.write.units.u1.outcome, 'pass');
+  const printed = statusWorkflow(workflowRunId, { repoRoot, cwd: repoRoot });
+  assert.equal(printed.status, 'completed');
+  assert.equal(printed.steps.land.status, 'completed');
 });
 
 test('no code but the store names the run ledger file or writes to it, and the store writes through one fsynced function', () => {

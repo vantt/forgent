@@ -50,39 +50,6 @@ const opts = (tmp) => ({ repoRoot: tmp, cwd: tmp, worktree: tmp });
 const eventsOf = (tmp, id) => readWorkflowEvents({ repoRoot: tmp, workflowRunId: id });
 const unit = (id, extra = {}) => ({ id, template: { capability: 'docs:write', pattern: 'solo', objective: 'Read', writes: [], ...extra } });
 
-test('an answered gate lets the integrate step land the writing unit branch on main', async () => {
-  const tmp = setupRepo();
-  const git = (...args) => execFileSync('git', args, { cwd: tmp, encoding: 'utf8' }).trim();
-  git('checkout', '-qb', 'incoming');
-  fs.mkdirSync(path.join(tmp, 'docs'));
-  fs.writeFileSync(path.join(tmp, 'docs/delivery.md'), 'workflow delivery\n');
-  git('add', 'docs'); git('commit', '-qm', 'writing unit output');
-  git('checkout', '-q', 'main');
-  const writer = path.join(tmp, 'writer');
-  git('worktree', 'add', writer, 'incoming');
-  const workflow = validateWorkflow({ id: 'integrate-gate', steps: [
-    { id: 'consent', gate: { kind: 'human', question: 'Approve?' } },
-    { id: 'write', dependsOn: ['consent'], units: [unit('writer', { writes: ['docs'] })] },
-    { id: 'land', kind: 'integrate', dependsOn: ['write'] },
-  ] });
-  const state = await startWorkflow({ workflow, ...opts(tmp) });
-  assert.equal(state.status, 'parked');
-  const resumed = await resumeWorkflow(state.workflowRunId, opts(tmp));
-  assert.equal(resumed.status, 'parked');
-  // Seed only the earlier worker's settled output. The owning writing test
-  // covers execution; this wiring proof runs the real integrate step and Land.
-  appendAll({ repoRoot: tmp, caseId: state.workflowRunId }, [
-    { type: 'step.start', payload: { stepId: 'write' } },
-    { type: 'unit.scheduled', payload: { stepId: 'write', unitId: 'writer', branch: 'incoming', worktreePath: writer } },
-    { type: 'unit.complete', payload: { stepId: 'write', unitId: 'writer', outcome: 'pass', results: [] } },
-    { type: 'step.complete', payload: { stepId: 'write', outcome: 'pass' } },
-  ]);
-  const answered = await answerWorkflow(state.workflowRunId, { ...opts(tmp), stepId: 'consent', answer: 'yes', approved: true });
-  assert.equal(answered.status, 'completed', JSON.stringify(answered.steps));
-  assert.equal(answered.steps.land.status, 'completed');
-  assert.equal(git('show', 'main:docs/delivery.md'), 'workflow delivery');
-});
-
 test('a guide with its own activities opens a conductor case: no process, a case id, the frame narrowed, its worktree bound', async () => {
   const tmp = setupRepo();
   const state = await startWorkflow({ workflow: conductorWorkflow(), frame: { dispatches: 4, rigorFloor: 'high' }, ...opts(tmp) });

@@ -159,10 +159,8 @@ function activitiesFromSteps(steps, explicitMilestones) {
     stepMilestones.push(Object.freeze({
       id: settled, subject: `unit reports of ${step.id}`, evidence: 'unit-report', acceptedBy: 'runner',
     }));
-    const writes = step.kind === 'integrate' || step.units.some((unit) => unit.template.writes.length > 0);
-    const unit = step.kind === 'integrate'
-      ? { kind: 'integrate', ...(step.target ? { target: step.target } : {}) }
-      : (step.units.length > 0 ? { step: step.id, units: step.units.map((u) => u.id) } : undefined);
+    const writes = step.units.some((unit) => unit.template.writes.length > 0);
+    const unit = step.units.length > 0 ? { step: step.id, units: step.units.map((u) => u.id) } : undefined;
     activities.push(Object.freeze({
       id: step.id,
       entry: Object.freeze(step.dependsOn.map((dep) => `${dep}.settled`)),

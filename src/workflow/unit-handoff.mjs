@@ -209,8 +209,7 @@ export function unitOverridesOf(unit, seatPersonas = [], options = {}) {
 
 /**
  * The writing unit whose branch a writing unit of `stepId` starts from: the nearest writing unit
- * among the steps it builds on, directly or through read-only steps. An integrate step ends the
- * walk -- what came before it is on the integration target. Null when it builds on none.
+ * among the steps it builds on, directly or through read-only steps. Null when it builds on none.
  * Building on two or more writing units (none built on the other) is refused: nothing here merges.
  */
 function writeBaseOf(workflow, stepId) {
@@ -221,7 +220,7 @@ function writeBaseOf(workflow, stepId) {
       for (const dep of byId.get(cur)?.dependsOn ?? []) {
         if (seen.has(dep)) continue;
         seen.add(dep);
-        if (byId.get(dep)?.kind !== 'integrate') walk(dep);
+        walk(dep);
       }
     };
     walk(id);
@@ -230,7 +229,6 @@ function writeBaseOf(workflow, stepId) {
   const writers = [];
   for (const id of ancestorsOf(stepId)) {
     const step = byId.get(id);
-    if (step.kind === 'integrate') continue;
     for (const unit of step.units) if (unit.template.writes?.length) writers.push({ stepId: id, unitId: unit.id });
   }
   // Drop a writer some other writer already builds on: its work is on that writer's branch.
@@ -322,14 +320,9 @@ function workflowChangedPaths(cwd, before, after) {
   return paths;
 }
 
-export function resolveIntegrationTarget({ repoRoot, workflow } = {}) {
-  const declared = workflow?.steps?.find(step => step.kind === 'integrate' && step.target)?.target;
+export function resolveIntegrationTarget({ repoRoot } = {}) {
   try {
     const inspect = workflowInspect(repoRoot);
-    if (declared) {
-      const name = declared.startsWith('refs/') ? declared : `refs/heads/${declared}`;
-      return inspect.resolveRef({ name }).kind === 'direct' ? declared : null;
-    }
     const target = inspect.resolveTrunk();
     if (target.kind !== 'known') return null;
     return target.value.replace(/^refs\/heads\//, '').replace(/^refs\/remotes\/[^/]+\//, '');
@@ -356,15 +349,15 @@ export function cleanupWorkflowWorktree({ repoRoot, worktreePath, branch, delete
 
 /**
  * Remove the worktrees of Units whose work reached the main line; keep the rest and say where
- * they are. A passed Unit counts as integrated only when its branch is already part of the integration target (the integrate step's `target`, else the repository trunk) and
+ * they are. A passed Unit counts as integrated only when its branch is already part of the integration target (the repository trunk) and
  * its worktree holds nothing uncommitted -- removing a worktree forgets anything left in it. A
  * Unit that failed, was refused, or never finished keeps its worktree for investigation.
  */
-export function settleUnitWorktrees({ mainRoot, state, workflow }) {
+export function settleUnitWorktrees({ mainRoot, state }) {
   const removed = [];
   const kept = [];
   if (!Object.values(state.steps).some(step => Object.values(step.units).some(unit => unit.worktreePath))) return { removed, kept };
-  const integrationTarget = resolveIntegrationTarget({ repoRoot: mainRoot, workflow });
+  const integrationTarget = resolveIntegrationTarget({ repoRoot: mainRoot });
   const deliveredTo = integrationTarget ? workflowCommit(mainRoot, integrationTarget) : null;
   for (const step of Object.values(state.steps)) {
     for (const unit of Object.values(step.units)) {
