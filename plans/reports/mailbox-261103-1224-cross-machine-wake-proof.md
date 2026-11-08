@@ -65,3 +65,18 @@ What stood between the first mail and this result, in order: a sync killed halfw
 Second demo (13:41:33 to 13:43:29, 1 min 56 s) and the receiver's pane dump (taken by RULE with `tmux capture-pane`, fg-server clock) show the receiver displaying each sentence word for word and answering: first mail arrived 13:38:17 (35 s), second 13:43:14 (1 min 41 s). A working session that only sees mail at its next tool call (lead:RULE, tier turn) read the same mail 27 minutes later; only a receiver opened for wakes (accept key in its own settings) answers in minutes. OPC accepted the timer (46f242d9a, d44d89e15, da7ae4237), including Node `execFileSync` for systemctl and launchctl, and asked that Windows be named in the backlog row (not done: docs/backlog.md is outside this lane's files).
 
 Open: the Windows scheduler is not built (no Windows machine runs mail).
+
+## Mail bodies in the mail-body ref: two-machine proof (2026-11-08, lane MAIL)
+
+Result: a message whose body travels in `refs/fgos/mail-bodies/<machine>` instead of the signed event was sent from fg-server2 and read in full on fg-server. Rotation and the expired state were not run on real machines (see Not proven).
+
+Setup: fg-server2 on release `93288a84b` with `mailbox.remote.bodyRef` on (set with `fgos config set`, with a reason); fg-server on `bbbf52f00` (takes payload versions 1, 2, 3, no sender or rotation code needed to receive).
+
+- Test 1, sent 09:42:09: the body reached fg-server with the exact text and marker `BODYREF-PROOF-7f3a`, seen by fg-server at about 09:42. `git ls-remote origin` then listed `refs/fgos/mail-bodies/fg-server2-jdp2bv`, and `fgos mailbox status` on fg-server2 read `1 kept, the oldest was sent 11 s ago; a body is kept for 168 h`.
+- Test 2, sent about 09:45 (marker `BODYREF-PROOF-9c21`): received on fg-server, seen about 09:45. The remote ref then held 2 blobs, so the second body was added to the first, not a replacement.
+- Two sends of test 2 were refused first with `body-not-published: event-seal not taken: Timeout { waited_ms: 5000 }`: a `fgos hook mailbox-sync` was running on a loaded machine and held the event seal; the third try recorded. The refusal names the way out (retry, or set `bodyRef` false). Open item: a send waits 5 s for the seal and does not queue; on a busy machine a bodyRef send can need a retry.
+- Cleanup: `bodyRef` removed from the project config (file restored byte for byte), and the test ref deleted from the remote with a leased delete, so no test body remains on `origin`. The two signed headers remain in the event refs (they carry a hash and a length, no text).
+
+Not proven on real machines: the 7-day rotation (the lifetime cannot be set below 86700 s, so it cannot be shown within a day) and the expired state a receiver settles when a blob is gone. Both are proven by tests in `apps/fgos/tests/mailbox_routes.rs` and `packages/git/rust/tests/publication.rs`. Not covered: design-lap as sender or receiver of a v3 body (it takes v3, per its own status line).
+
+Open decisions: a machine that turns `bodyRef` off keeps its last bodies on the remote until it turns it on again, because rotation runs only while the setting is on.
