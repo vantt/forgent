@@ -39,7 +39,7 @@ export function admitSuccessor(scope, fgosDir, cwd) {
   try { return acquireDispatchCwdLockIn(scope, fgosDir, cwd, { predecessorKinds: ['linux-gate', 'windows-job'] }); }
   catch (error) {
     if (error.code === 'lock-predecessor-domain-not-empty') {
-      throw new DispatchError('custody-predecessor-unknown', `preserve cwd "${cwd}": the predecessor domain is not proven empty`, { cwd, lockPath, recovery: { check: 'git-worktree-recovery', disposition: 'preserve', next: 'new-worktree' } });
+      throw new DispatchError('custody-predecessor-unknown', `preserve cwd "${cwd}": the predecessor domain is not proven empty`, { cwd, lockPath, recovery: { check: 'fgos git status', disposition: 'preserve', next: 'new-worktree' } });
     }
     throw error;
   }

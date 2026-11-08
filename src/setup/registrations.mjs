@@ -1,7 +1,6 @@
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-import { readMergeHead } from '../git/status.mjs';
 import { resolveHolderLiveness } from '../native/process-identity.mjs';
-import { checkGit, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixGitOperationRecovery } from './git-checks.mjs';
+import { checkGit, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
 // registrations.mjs — the doctor-check / fix registry (CONTEXT.md D1/D2,
 // docs/history/setup-doctor-config-registry/): the one place a module declares
@@ -2453,27 +2452,6 @@ registerFix({
   fix: () => fixBinDiscoveryCache(),
 });
 
-function checkNoStuckMergeAbort(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { passed: true, message: 'not inside a git checkout — nothing to check' };
-  }
-  const sha = readMergeHead(mainCheckout);
-  if (sha !== null) {
-    return {
-      passed: false,
-      message: `merge in progress or stuck (MERGE_HEAD=${sha}) — run fgos main-checkout-reset --sha ${sha} --confirm`,
-    };
-  }
-  return { passed: true, message: 'no merge in progress or stuck MERGE_HEAD' };
-}
-
-registerCheck({
-  id: 'no-stuck-merge-abort',
-  description: 'main checkout has no lingering MERGE_HEAD from an in-progress or stuck merge abort (tsk-40a)',
-  check: (cwd) => checkNoStuckMergeAbort(cwd),
-});
-
 function checkOperationPromptTemplatesValid(cwd) {
   try {
     const entries = discoverOperationPromptTemplates({ cwd });
@@ -4237,14 +4215,13 @@ for (const name of ['open-root', 'machine-id', 'unsealed', 'integrity', 'sync', 
 }
 
 // Git and Event Store share one addon ABI admission row.
-for (const id of ['git-worktree-recovery', 'git-component-compatible', 'git-repository-config', 'git-operation-journal', 'git-native-locks']) {
+for (const id of ['git-component-compatible', 'git-repository-config', 'git-operation-journal', 'git-incidents']) {
   registerCheck({ id, description: {
-    'git-worktree-recovery': 'Orphan, dirty/stale checkout and pending worktree operations (read-only)',
     'git-component-compatible': 'Combined addon contracts and Git feature floor, with the repository layout and measured durability',
     'git-repository-config': 'Repository transport settings refused by Publication/Remote, and the Event Store mirror fetch mappings',
-    'git-operation-journal': 'Readable Git WAL with no unresolved operations, under the controller activation fence (`git-fence-missing` when the fence is gone); warns about retained Land candidates awaiting Work acknowledgement',
-    'git-native-locks': 'Native Git lock residue (read-only detection)',
-  }[id], check: (cwd, run = createDoctorRun()) => checkGit(cwd, id, undefined, undefined, run) });
+    'git-operation-journal': 'Readable Git WAL under the controller activation fence (`git-fence-missing` when the fence is gone); open operations are `git-incidents`',
+    'git-incidents': 'read-only pointer: open Git incidents, read and recovered through fgos git status / fgos git recover',
+  }[id], check: (cwd, run = createDoctorRun()) => checkGit(cwd, id, undefined, run) });
 }
 // Workflow case bindings (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27): the binding records are a view of each
 // case's ledger. Bodies live in workflow-case-checks.mjs.
@@ -4261,5 +4238,4 @@ registerCheck({
 registerFix({ id: 'workflow-case-bindings', fix: (cwd) => fixWorkflowCaseBindings(cwd) });
 registerFix({ id: 'git-driver-directories', fix: fixGitDriverDirectories });
 registerFix({ id: 'git-wal-dir', fix: fixGitWal });
-registerFix({ id: 'git-land-recovery', fix: (cwd) => fixGitOperationRecovery(cwd) });
 registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });

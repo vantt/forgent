@@ -119,15 +119,13 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'agy-sub-homes-configured',
       'bwrap-available',
       'curl-available',
-      'no-stuck-merge-abort',
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'terminal-control',
       'omp-natives-present',
       'git-component-compatible',
-      'git-worktree-recovery',
       'git-repository-config',
       'git-operation-journal',
-      'git-native-locks',
+      'git-incidents',
       'terminal-allocations',
       'trust-store-readable',
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had

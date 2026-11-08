@@ -545,32 +545,6 @@ test('shell-integration-sourced samples dead paths instead of printing all of th
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('no-stuck-merge-abort check passes on a clean repo with no MERGE_HEAD', () => {
-  const dir = initRepo('checks-no-stuck-merge-clean-');
-  try {
-    const { passed, message } = checkById('no-stuck-merge-abort').check(dir);
-    assert.equal(passed, true);
-    assert.match(message, /no merge in progress/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('no-stuck-merge-abort check fails and names the manual command when MERGE_HEAD exists', () => {
-  const dir = initRepo('checks-no-stuck-merge-dirty-');
-  try {
-    const headSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
-    fs.writeFileSync(path.join(dir, '.git', 'MERGE_HEAD'), `${headSha}\n`);
-
-    const { passed, message } = checkById('no-stuck-merge-abort').check(dir);
-    assert.equal(passed, false);
-    assert.match(message, /merge in progress or stuck/);
-    assert.match(message, new RegExp(`fgos main-checkout-reset --sha ${headSha} --confirm`));
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
 test('every runner key a past release retired is reported by the config engine as an unknown key, whichever file carries it', () => {
   const dir = mkTemp('checks-retired-keys-');
   const fakeHome = mkTemp('fake-home-');

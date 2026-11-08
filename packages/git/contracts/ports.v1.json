@@ -150,6 +150,6 @@
     "create": "full immutable base, optional new branch, validated session id; detached parent/session allocation uses mkdtemp; worker .fgos stripped and intentionally absent paths marked skip-worktree",
     "remove": "one rank-40 hold; identity, live cwd, custody, full status, pending WAL, expected tip, delivery ancestry and evidence digest; no force or recursive fallback",
     "recovery": "operation-specific registration/inode evidence; recorded destination only; no repeated TargetAttempt; unknown and dirty residues preserved",
-    "doctor": "git-worktree-recovery is read-only; phase 04 adds custody diagnostics to the same row"
+    "doctor": "fgos git status reads worktree findings and custody diagnostics without changing anything"
   }
 }
