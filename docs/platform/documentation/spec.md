@@ -205,7 +205,8 @@ These change no contract. The commit-gate part is its own item, `p-cd2ejz7wa5`, 
 - In an activated workspace, a host error or timeout in that block refuses the commit. Today it warns and continues (`.githooks/pre-commit`, the Convention block).
 - Classify runs once for all staged paths, in one host call.
 - `doc-provisional-aged` parses `updatedAt` before subtracting. Today it subtracts an ISO string, gets `NaN` and never fires. Choosing its age cutoff is a policy change and is named as one.
-- `docRegistry.topicMaxDocs`, which the doctor reads, is declared in the config schema.
+- `docRegistry.topicMaxDocs`, which the registry lints read, is declared in the config schema.
+- The registry lints (`doc-alias-broken`, `doc-active-duplicate`, `doc-current-path-missing`, `doc-source-unreachable`, `doc-near-duplicate`, `doc-provisional-aged`, `doc-topic-oversized`, `doc-role-underused`, `doc-source-conservation`) judge history-derived state, so they run in `fgos knowledge status` (its `findings`, module `src/report/knowledge-lints.mjs`), not in `fgos doctor`; `fgos doc-registry --check` reports a stale projection without writing, and doctor no longer refreshes the registry.
 - The 19 tracked user documents missing from the registry are registered, and the one registered path missing on disk is resolved.
 - The tracked, empty `.fgos/docs/enduser-docs-index.json` is removed if no reader is found; otherwise the readers move to `docs/enduser-docs-index.json`.
 
@@ -393,7 +394,7 @@ One owning proof per behavior, in the file that owns the module:
 | Path input, the verb rule and the claim rule | Synthetic cases in `test/scripts/doc-health.test.mjs` |
 | Whole-corpus wiring | The existing live case in the same file |
 | Pre-commit wiring | One case in the existing hook test |
-| Aging-check fix | A case beside the existing doctor doc-check tests |
+| Aging-check fix | A case in `test/report/knowledge-lints.test.mjs` |
 | Declared-subject search over every root and the `Canonical for` header | The existing `authoritative-match` test, extended |
 
 Done means: `npm test` and `cargo test --workspace` are green apart from tests that fail the same way on main, and the check command passes on the swept corpus.

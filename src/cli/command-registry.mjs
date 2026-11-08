@@ -2014,7 +2014,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'knowledge',
     invoke: 'fgos knowledge <subcommand>',
-    description: 'Knowledge ecosystem verbs: status (view summary) and attest (validate a doc path and record the required --capture-id linkage).',
+    description: 'Knowledge ecosystem verbs: status (view summary plus `findings`, the registry lints: broken aliases, duplicate active docs, missing current paths, unreachable or unconserved sources, near-duplicate claims, aged provisional docs, oversized topics, underused roles) and attest (validate a doc path and record the required --capture-id linkage).',
     parameters: {
       type: 'object',
       properties: {
@@ -2038,9 +2038,15 @@ export const COMMAND_REGISTRY = [
   {
     name: 'doc-registry',
     invoke: 'fgos doc-registry',
-    description: 'Generate machine (docs/doc-registry.json) and human (docs/doc-registry.md) projection files for the knowledge registry.',
-    parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos doc-registry'],
+    description: 'Generate machine (docs/doc-registry.json) and human (docs/doc-registry.md) projection files for the knowledge registry. --check never writes: it refuses (validation) when either file differs from a fresh regenerate.',
+    parameters: {
+      type: 'object',
+      properties: {
+        check: { type: 'boolean', description: 'Never write; refuse (validation) if either projection file would change on a fresh regenerate.' },
+      },
+      required: [],
+    },
+    examples: ['fgos doc-registry', 'fgos doc-registry --check'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: true,

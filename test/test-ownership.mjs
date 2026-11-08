@@ -49,7 +49,8 @@ export const MANIFEST = [
   { id: 'report-frontmatter', status: 'shadow', pattern: 'src/report/frontmatter.mjs', directTests: ['test/report/frontmatter.test.mjs'], boundaryTests: [] },
   { id: 'report-knowledge-resolver', status: 'shadow', pattern: 'src/report/knowledge-resolver.mjs', directTests: ['test/report/knowledge-resolver.test.mjs'], boundaryTests: [] },
   { id: 'report-enduser-index-generate', status: 'shadow', pattern: 'src/report/enduser-index-generate.mjs', directTests: [], boundaryTests: ['test/report/enduser-index.test.mjs'] },
-  { id: 'report-knowledge-projection', status: 'shadow', pattern: 'src/report/knowledge-projection.mjs', directTests: [], boundaryTests: ['test/setup/knowledge-doctor.test.mjs'] },
+  { id: 'report-knowledge-lints', status: 'shadow', pattern: 'src/report/knowledge-lints.mjs', directTests: ['test/report/knowledge-lints.test.mjs'], boundaryTests: [] },
+  { id: 'report-knowledge-projection', status: 'shadow', pattern: 'src/report/knowledge-projection.mjs', directTests: ['test/report/knowledge-lints.test.mjs'], boundaryTests: [] },
   // src/report/item-trace.mjs intentionally NOT listed: no direct or
   // boundary test located. Falls through to unknown -> full.
 

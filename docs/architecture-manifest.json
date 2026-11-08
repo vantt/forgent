@@ -246,6 +246,7 @@
     "src/state/knowledge-registry.mjs": "domain",
     "src/report/knowledge-resolver.mjs": "domain",
     "src/report/knowledge-projection.mjs": "domain",
+    "src/report/knowledge-lints.mjs": "infra",
     "src/run-supervisor/attempt-step.mjs": "infra",
     "src/run-supervisor/cancel-opt-in.mjs": "infra",
     "src/run-supervisor/cancel-registry.mjs": "infra",

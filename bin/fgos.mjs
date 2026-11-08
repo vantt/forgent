@@ -35,6 +35,7 @@ import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason,
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
+import { knowledgeFindings } from '../src/report/knowledge-lints.mjs';
 import { collectWideSourceFiles, findWideCitationFindings, isDLocalId } from '../scripts/check-decision-citation-drift.mjs';
 import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
@@ -1667,10 +1668,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           }
         }
 
+        const root = path.dirname(dir);
+        const topicMaxDocs = readConfig({ projectRoot: root, sections: ['docRegistry'] }).value.docRegistry?.topicMaxDocs;
         return {
           topics: { active: activeTopics, retired: retiredTopics, total: Object.keys(topics).length },
           docs: docCounts,
           totalDocs: Object.keys(docs).length,
+          findings: knowledgeFindings(view, { root, ...(topicMaxDocs === undefined ? {} : { topicMaxDocs }) }),
         };
       } else if (sub === 'attest') {
         const docPath = requireField(flags['doc-path'] ?? positional[1], 'knowledge attest requires --doc-path');
@@ -1734,6 +1738,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const root = path.dirname(dir);
       const mdPath = path.join(root, 'docs/doc-registry.md');
       const jsonPath = path.join(root, 'docs/doc-registry.json');
+      if (flags.check) {
+        const fresh = (file, content) => fs.existsSync(file) && fs.readFileSync(file, 'utf8') === content;
+        if (!fresh(mdPath, mdContent) || !fresh(jsonPath, jsonContent)) {
+          throw new StoreError('validation', 'docs/doc-registry.md or docs/doc-registry.json is stale -- run "fgos doc-registry" (no --check) to refresh it.');
+        }
+        return { stale: false, mdPath, jsonPath };
+      }
       fs.mkdirSync(path.dirname(mdPath), { recursive: true });
       fs.writeFileSync(mdPath, mdContent, 'utf8');
       fs.writeFileSync(jsonPath, jsonContent, 'utf8');

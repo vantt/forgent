@@ -330,21 +330,13 @@ This table is selective for the Event Store: it lists the one row a project owne
 
 ### 4.6. Docs and generated projections
 
-| Id | Checks | Typical failing message | Who | Fix |
-|---|---|---|---|---|
-| `doc-registry-stale` | `docs/doc-registry.md` and `.json` are current | `docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry` | tool | `fgos doctor --fix` |
-| `doc-alias-broken` | Doc aliases point to valid paths | names the alias | you | Fix the alias target |
-| `doc-active-duplicate` | No duplicate active docs for one topic and role | names the pair | you | Retire one |
-| `doc-current-path-missing` | A doc's `currentPath` exists at HEAD | `1 doc(s) with currentPath absent at HEAD` | you | Restore the file or update the registry entry |
-| `doc-source-unreachable` | Source capture linkage is reachable | names the capture | you | Repair the link |
-| `doc-near-duplicate` | No near-duplicate authoritative claims | names the pair | you | Merge the docs |
-| `doc-provisional-aged` | No provisional doc is past its age limit | names the doc | you | Promote or retire it |
-| `doc-topic-oversized` | No topic is over its size ceiling | names the topic | you | Split the topic |
-| `doc-role-underused` | Role usage frequency | `362 roles used by single doc ...` | info | none |
-| `doc-source-conservation` | Source captures are conserved | `4 outcome source capture(s) unresolvable` | info | Report it |
-
-The doc-* checks pass with "skipped" in a project that has no knowledge
-registry (no events log yet).
+`fgos doctor` no longer judges the knowledge registry. Run `fgos knowledge status`
+to see the registry lints (`doc-alias-broken`, `doc-active-duplicate`,
+`doc-current-path-missing`, `doc-source-unreachable`, `doc-near-duplicate`,
+`doc-provisional-aged`, `doc-topic-oversized`, `doc-role-underused`,
+`doc-source-conservation`) as `findings`, `fgos doc-registry --check` to see
+whether `docs/doc-registry.md` and `.json` are current, and `fgos doc-registry`
+to refresh them.
 
 ## 5. Before your first Workflow run
 
