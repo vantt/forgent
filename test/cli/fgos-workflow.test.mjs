@@ -144,3 +144,34 @@ test('workflow status carries the case block, a finished Playbook case has close
   assert.notEqual(widened.status, 0);
   assert.match(widened.stderr, /states none/, 'a guide with no frame defaults has nothing to narrow');
 });
+
+test('workflow prune is a dry run until --apply, refuses a malformed age, and a young case stays at the default age', (t) => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-prune-'));
+  t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
+  execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
+  execFileSync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '--allow-empty', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+  const workflowId = writeTrivialWorkflow(tmp);
+  const invoke = (...args) => spawnSync(process.execPath, [FGOS, 'workflow', ...args, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
+  const started = invoke('start', workflowId, '--foreground');
+  assert.equal(started.status, 0, started.stderr);
+  const id = JSON.parse(started.stdout).data.workflowRunId;
+  const caseDir = path.join(tmp, '.fgos', 'workflow-runs', id);
+
+  const young = JSON.parse(invoke('prune').stdout).data;
+  assert.equal(young.applied, false);
+  assert.deepEqual(young.cases, []);
+  assert.equal(fs.existsSync(caseDir), true, 'a case that closed just now is younger than the default age');
+
+  const dry = JSON.parse(invoke('prune', '--older-than', '0d').stdout).data;
+  assert.deepEqual(dry.cases, [id]);
+  assert.equal(fs.existsSync(caseDir), true, 'a dry run removes nothing');
+
+  const bad = invoke('prune', '--older-than', 'soon');
+  assert.notEqual(bad.status, 0);
+  assert.match(bad.stderr, /whole number of days/);
+
+  const applied = JSON.parse(invoke('prune', '--older-than', '0d', '--apply').stdout).data;
+  assert.equal(applied.applied, true);
+  assert.deepEqual(applied.cases, [id]);
+  assert.equal(fs.existsSync(caseDir), false);
+});

@@ -165,6 +165,25 @@ test('a quiet conductor case closes and lets go of its worktree', async () => {
   assert.equal(readBinding({ mainRoot: tmp, worktree: tmp, caseId: 'another' }).answer, 'unbound');
 });
 
+test('closing a case retires a case that closed more than two weeks ago and leaves a recent one', async () => {
+  const tmp = setupRepo();
+  const ledgerOf = (id) => path.join(tmp, '.fgos', 'workflow-runs', id, 'events.jsonl');
+  const old = await startWorkflow({ workflow: conductorWorkflow(), ...opts(tmp) });
+  closeWorkflow(old.caseId, { repoRoot: tmp });
+  const days = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000).toISOString();
+  // Move the close of the first case 30 days back; the ledger stays a valid chain.
+  fs.writeFileSync(ledgerOf(old.caseId), fs.readFileSync(ledgerOf(old.caseId), 'utf8').split('\n').map((line) => {
+    if (!line.includes('"type":"case.closed"')) return line;
+    const event = JSON.parse(line);
+    return JSON.stringify({ ...event, payload: { ...event.payload, closedAt: days(30) } });
+  }).join('\n'));
+  const recent = await startWorkflow({ workflow: conductorWorkflow(), ...opts(tmp) });
+  closeWorkflow(recent.caseId, { repoRoot: tmp });
+
+  assert.equal(fs.existsSync(path.dirname(ledgerOf(old.caseId))), false);
+  assert.equal(fs.existsSync(ledgerOf(recent.caseId)), true);
+});
+
 // A closed case that planned, built a child with a verify receipt, and closed; the plan and the child are what a successor could take over.
 async function closedPlannedCase(tmp, request = 'Ship the change') {
   const first = await startWorkflow({ workflow: conductorWorkflow(), request, ...opts(tmp) });

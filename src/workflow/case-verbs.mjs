@@ -24,7 +24,7 @@ import { drainCaseInbox, recordGateAnswerRound } from './case-runtime.mjs';
 import { gateOfStep, readCaseProjection } from './case-projection.mjs';
 import { CONFINED_WRITE_CODE, confinedWriteRefusal, confinedWriteText } from './case-admission-port.mjs';
 import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
-import { closeCaseUnderHold } from './case-close.mjs';
+import { DEFAULT_PRUNE_DAYS, closeCaseUnderHold, pruneFinishedCases } from './case-close.mjs';
 import { detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
 import { inspectCaseBindings } from './case-bindings.mjs';
 import { runCaseGate } from './case-gate.mjs';
@@ -42,6 +42,13 @@ function rootsOf(workflowRunId, options, verb) {
     mainRoot: options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot,
     worktreePath: options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot,
   };
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Retire finished cases once a case has closed, after its hold is released; an error or a held lock never changes what closed. */
+function pruneQuietly(mainRoot) {
+  try { pruneFinishedCases({ mainRoot, olderThanMs: DEFAULT_PRUNE_DAYS * DAY_MS, apply: true }); } catch { /* best effort */ }
 }
 
 /** The case as an agent reads it: the projection with the digests the playbook's subjects have now. */
@@ -131,6 +138,7 @@ export async function startWorkflow(params = {}) {
   } finally {
     refundIfNotOpened({ mainRoot, parent, opened });
   }
+  if (settled?.status === 'completed') pruneQuietly(mainRoot);
   return settled ?? handOff({ mainRoot, workflowRunId, worktreePath, options: params });
 }
 
@@ -234,12 +242,17 @@ export async function answerWorkflow(workflowRunId, params = {}) {
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, params, 'answerWorkflow');
   const hold = takeAndRecord(workflowRunId, params, mainRoot);
   if (hold === null) return recordedByLiveProposer(mainRoot, workflowRunId);
+  let advanced;
   try {
     const { state, projection } = readCase(mainRoot, workflowRunId);
     if (isConductor(projection)) return conductorResult(mainRoot, workflowRunId);
-    if (!params.detached) return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
+    if (!params.detached) advanced = await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
   } finally {
     hold.release();
+  }
+  if (advanced) {
+    if (advanced.status === 'completed') pruneQuietly(mainRoot);
+    return advanced;
   }
   return handOff({ mainRoot, workflowRunId, worktreePath, options: params });
 }
@@ -305,16 +318,21 @@ export async function resumeWorkflow(workflowRunId, options = {}) {
     if (heldConductor(mainRoot, workflowRunId)) return conductorResult(mainRoot, workflowRunId);
     hold = acquireAdvanceLock(mainRoot, workflowRunId); // refuses, naming the holder; the hold is the caller's when the holder let go meanwhile
   }
+  let advanced;
   try {
     const { state, conductor, reopenStepId } = readResumeState(workflowRunId, mainRoot, options);
     if (conductor) return conductorResult(mainRoot, workflowRunId);
     if (!options.detached) {
       // The only way a failed step runs again: this one reopening, which the next advance acts on once.
       if (reopenStepId) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'step.start', payload: { stepId: reopenStepId } }, hold });
-      return await advanceWorkflowRun({ workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
+      advanced = await advanceWorkflowRun({ workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
     }
   } finally {
     hold.release();
+  }
+  if (advanced) {
+    if (advanced.status === 'completed') pruneQuietly(mainRoot);
+    return advanced;
   }
   return handOff({ mainRoot, workflowRunId, worktreePath, options });
 }
@@ -331,7 +349,7 @@ export async function resumeWorkflow(workflowRunId, options = {}) {
  */
 export function closeWorkflow(workflowRunId, options = {}) {
   const { mainRoot } = rootsOf(workflowRunId, options, 'closeWorkflow');
-  return withAdvanceLockSync(mainRoot, workflowRunId, (hold) => {
+  const closed = withAdvanceLockSync(mainRoot, workflowRunId, (hold) => {
     readCase(mainRoot, workflowRunId);
     const result = closeCaseUnderHold({ mainRoot, workflowRunId, hold, reason: options.reason });
     if (!result.closed) {
@@ -341,6 +359,27 @@ export function closeWorkflow(workflowRunId, options = {}) {
     }
     return { closed: true, caseId: workflowRunId, unbound: result.unbound, kept: result.kept };
   });
+  pruneQuietly(mainRoot);
+  return closed;
+}
+
+/**
+ * Remove the cases that ended more than `options.olderThan` (`<N>d`, default 14d) ago with the Unit runs they
+ * name. A dry run unless `options.apply` is true; see `pruneFinishedCases` for what is kept and why.
+ *
+ * @param {object} [options]
+ * @param {string} [options.olderThan] `<N>d`
+ * @param {boolean} [options.apply]
+ * @param {string} [options.repoRoot]
+ * @param {string} [options.cwd]
+ */
+export function pruneWorkflow(options = {}) {
+  const given = options.olderThan ?? `${DEFAULT_PRUNE_DAYS}d`;
+  const days = /^(\d+)d$/.exec(String(given))?.[1];
+  if (days === undefined) throw new RunnerConfigError(`--older-than takes a whole number of days such as 14d (got "${given}")`, { code: 'invalid-older-than' });
+  const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : resolveGitRoots(options.cwd ?? process.cwd(), { allowNoRepository: true }).mainCheckoutRoot;
+  const result = pruneFinishedCases({ mainRoot, olderThanMs: Number(days) * DAY_MS, apply: options.apply === true });
+  return { applied: options.apply === true, olderThanDays: Number(days), ...result };
 }
 
 /**

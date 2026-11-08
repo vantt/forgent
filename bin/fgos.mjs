@@ -2341,6 +2341,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const { closeWorkflow } = await import('../src/workflow/index.mjs');
         return closeWorkflow(runIdOf('fgos workflow close <id>'), { repoRoot: flags.dir, reason: text(flags.reason) });
       }
+      if (sub === 'prune') {
+        const { pruneWorkflow } = await import('../src/workflow/index.mjs');
+        return pruneWorkflow({ olderThan: text(flags['older-than']), apply: flags.apply === true || flags.apply === 'true', repoRoot: flags.dir, cwd: process.cwd() });
+      }
       if (sub === 'propose') {
         // Reads the slice list (or sizes a request) and answers with a proposal; it writes nothing and opens no case.
         const { runPropose } = await import('../src/workflow/propose.mjs');

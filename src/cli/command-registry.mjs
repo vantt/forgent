@@ -2405,7 +2405,7 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'workflow',
-    invoke: 'fgos workflow <start|status|answer|resume|close|gate|propose|operations> [id]',
+    invoke: 'fgos workflow <start|status|answer|resume|close|prune|gate|propose|operations> [id]',
     description: 'Door for planned work: a registered Workflow preset or a file of several Units run as steps (DAG ordering, human review gates, pure git integration). One task with no planning takes the other door, `fgos run "<prompt>"`. start/answer/resume advance in a detached process by default; read progress with "status", which also shows the case: milestones, routes, frame left, open gates. A guide with its own activities opens a conductor case with no process: the agent reads "status" and proposes through the doors.',
     subcommands: {
       start: {
@@ -2533,6 +2533,18 @@ export const COMMAND_REGISTRY = [
           required: ['run-id'],
         },
         examples: ['fgos workflow close wf-run-1234'],
+      },
+      prune: {
+        description: 'Remove the cases that ended more than N days ago (default 14) with the Unit runs their ledgers name. A dry run unless --apply: it lists what would go and why the rest stays. Kept: open and failed cases, cases an open case or a worktree binding still names, and Unit runs that are unsettled, controlled, in custody, linked, named by another case or recorded under another case. Unit runs no case names (plain fgos run) are never touched. A case that closes also prunes at the default age, best effort.',
+        parameters: {
+          type: 'object',
+          properties: {
+            'older-than': { type: 'string', description: 'Age of the end of a case, in whole days: 14d (default).' },
+            apply: { type: 'boolean', description: 'Delete what the dry run lists; without it nothing is removed.' },
+          },
+          required: [],
+        },
+        examples: ['fgos workflow prune --json', 'fgos workflow prune --older-than 30d --apply'],
       },
       gate: {
         description: 'Run the project\'s whole-worktree check for a case as the runner (no seat) and settle it as the receipt of an activity (default integrate). Admitted like any dispatch: it counts against the frame and needs the case worktree. A failing check leaves the milestone unachieved. The command is the one declared as capabilities.<capability>.verify for --capability; there is no flag to pass a different one.',

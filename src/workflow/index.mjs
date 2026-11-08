@@ -8,5 +8,6 @@ export {
   answerWorkflow,
   resumeWorkflow,
   closeWorkflow,
+  pruneWorkflow,
   gateWorkflow,
 } from './case-verbs.mjs';
