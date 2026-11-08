@@ -96,7 +96,7 @@ Settled without a phase: D5 (`fgos-cook` retry) closed by `b75259cbd`; W-6, W-7 
 | 03 | [One case reader, one run-directory door, durable writes](phase-03-case-reader-and-path-doors.md) (**landed** 2026-11-08 `639bf6986..b353b95bf`) | 01, 02 | wave 1 (alone) | `store.mjs`, `case-verbs.mjs`, `runner.mjs` | −60 / 0 / +20 |
 | 04 | [Case runtime and bindings](phase-04-case-runtime-and-bindings.md) | 03; release commit after 08 lands | wave 2 | — | −75 / 0 / +70 |
 | 05 | [Playbook runner cut, slim ledger, resume](phase-05-playbook-runner-cut.md) | 03; dry-bind deletion after 08 lands | wave 2 | `runner.mjs`, `store.mjs`, `case-verbs.mjs` (resume only) | −105 / 0 / +35 |
-| 06 | [Guide cut](phase-06-guide-cut.md) | 03 | wave 2 | `definition.mjs` | −55 / 0 / +10 |
+| 06 | [Guide cut](phase-06-guide-cut.md) (**landed** 2026-11-08 `35436e8a5..d07b8b3c6`) | 03 | wave 2 | `definition.mjs` | −55 / 0 / +10 |
 | 07 | [Conductor entry](phase-07-conductor-entry.md) | 03 | wave 2 | — | −70 / 0 / −50 |
 | 08 | [Execution Core seams](phase-08-execution-core-seams.md) (**landed** 2026-11-08 `2465e26c8`) | 03 | wave 2 | — | −20 / 0 / +15 |
 | 09 | [Seat pin rule (Q3 a)](phase-09-seat-pin-rule.md) (**landed** 2026-11-08 `4225e0397..3ed9a6741`) | 01 (`command-registry.mjs`); lands after Q-1 is answered | wave 2 | — | 0 / +5 / −5 |
