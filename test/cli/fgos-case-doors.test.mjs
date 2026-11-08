@@ -7,9 +7,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import os from 'node:os';
-import { spawnSync, execFileSync } from 'node:child_process';
+import { spawn, spawnSync, execFileSync } from 'node:child_process';
 
 import { createPendingBinding, commitBinding } from '../../src/workflow/case-bindings.mjs';
+import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
+import { readWorkflowEvents } from '../../src/workflow/index.mjs';
 import { readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { appendAll, openCase, settle, verifyReceipt } from '../helpers/workflow-case-fixture.mjs';
 
@@ -129,4 +131,33 @@ test('fgos workflow gate: a passing command prints the pass outcome and exits 0;
   const named = fgos(tmp, ...gateArgs(id), '--verify', nodeExit(0));
   assert.notEqual(named.status, 0);
   assert.match(named.stderr, /--verify/);
+});
+
+// boundary: only the real CLI process can be killed mid-gate; the release rules themselves are proved against the drain in test/workflow/case-runtime.test.mjs.
+test('fgos workflow gate: a killed gate\'s command keeps the worktree custody, so its reservation stays until the command ends and is then given back as not-started', { skip: process.platform === 'win32' }, async (t) => {
+  const tmp = repo(t);
+  fs.writeFileSync(path.join(tmp, 'README.md'), '# gate\n');
+  const id = builtCase(tmp);
+  const pidFile = path.join(tmp, 'gate-command.pid');
+  const script = path.join(tmp, 'linger.mjs');
+  fs.writeFileSync(script, `import fs from 'node:fs'; fs.writeFileSync(${JSON.stringify(pidFile)}, String(process.pid)); setInterval(() => {}, 1000);`);
+  declareGate(tmp, `"${process.execPath}" "${script}"`);
+  const gate = spawn(process.execPath, [FGOS, ...gateArgs(id), '--dir', tmp], { cwd: tmp, stdio: 'ignore' });
+  const exited = new Promise((resolve) => gate.once('exit', resolve));
+  const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
+  const until = async (condition) => { for (let i = 0; i < 150 && !condition(); i += 1) await new Promise((resolve) => setTimeout(resolve, 100)); };
+  await until(() => fs.existsSync(pidFile) && fs.readFileSync(pidFile, 'utf8') !== '');
+  const command = Number(fs.readFileSync(pidFile, 'utf8'));
+  t.after(() => { if (alive(command)) process.kill(command, 'SIGKILL'); });
+  const gateSettles = () => readWorkflowEvents({ repoRoot: tmp, workflowRunId: id }).filter((e) => e.type === 'settle' && e.payload.activity === 'integrate');
+
+  gate.kill('SIGKILL');
+  await exited;
+  acquireAdvanceLock(tmp, id).release();
+  assert.deepEqual(gateSettles(), [], 'the command still holds the custody, so the reservation is not proven dead');
+
+  process.kill(command, 'SIGKILL');
+  await until(() => !alive(command));
+  acquireAdvanceLock(tmp, id).release();
+  assert.deepEqual(gateSettles().map((e) => e.payload.outcome), ['not-started']);
 });

@@ -14,13 +14,16 @@ import path from 'node:path';
 
 import { RunnerConfigError, assertRunTimeoutMs, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { runCommand } from '../runner/goal-check.mjs';
+import { createLockScope } from '../holder-lock/index.mjs';
+import { admitSuccessor, recordCustodyHandoff } from '../run-supervisor/cwd-lock.mjs';
 import { verifyCommandOf } from '../runner/execution/loops/verify.mjs';
 import { VERIFY_SEAT } from '../runner/execution/seat-resolver.mjs';
 import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
+import { GATE_RUN_PREFIX } from './case-runtime.mjs';
 
 /** The default activity a gate settles: the one that produces the integrated tree's receipt. */
-export const GATE_ACTIVITY = 'integrate';
+const GATE_ACTIVITY = 'integrate';
 
 const TAIL_LINES = 20;
 
@@ -75,27 +78,37 @@ export async function runCaseGate({
 
   const realWorktree = fs.realpathSync(worktree);
   const port = createCaseAdmissionPort({ repoRoot: mainRoot, env });
-  const unitRunId = `gate-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
-  const admitted = port.admit({
-    unitRunId,
-    caseRef: { caseId, activity, ...(reason ? { reason } : {}) },
-    activity,
-    writes,
-    worktree: realWorktree,
-    readOnly: false,
-    seatLaunches: 0,
-    blind: false,
-    handoffRefs: [],
-    reason: reason ?? null,
-  });
-  if (admitted.refused) throw new CaseAdmissionRefusedError(admitted.refused);
-
-  const startedAt = Date.now();
+  const unitRunId = `${GATE_RUN_PREFIX}${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+  // The gate's command runs as a borrower of the worktree's custody lease, so killing the gate ends the command
+  // with it and a reservation whose custody is free is provably dead.
+  const custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), realWorktree);
+  let admitted;
   let result;
+  let startedAt;
   try {
-    result = await runCommand(verify, realWorktree, limit);
-  } catch (error) {
-    result = { passed: false, status: null, timedOut: false, output: String(error?.message ?? error) };
+    admitted = port.admit({
+      unitRunId,
+      caseRef: { caseId, activity, ...(reason ? { reason } : {}) },
+      activity,
+      writes,
+      worktree: realWorktree,
+      readOnly: false,
+      seatLaunches: 0,
+      blind: false,
+      handoffRefs: [],
+      reason: reason ?? null,
+    });
+    if (admitted.refused) throw new CaseAdmissionRefusedError(admitted.refused);
+    startedAt = Date.now();
+    try {
+      result = await runCommand(verify, realWorktree, limit, { custody });
+      recordCustodyHandoff(custody, result);
+    } catch (error) {
+      result = { passed: false, status: null, timedOut: false, output: String(error?.message ?? error) };
+    }
+  } finally {
+    // Released before the settle, so the worktree is quiet when the port gives its binding back.
+    custody.release();
   }
   const passed = result.passed === true;
   const outcome = passed ? 'pass' : 'findings';

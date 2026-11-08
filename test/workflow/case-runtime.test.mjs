@@ -122,6 +122,13 @@ test('a settle that could not take advance is a file the next holder appends fir
   assert.equal(eventsOf(run).filter((e) => e.type === 'settle').length, 1);
 });
 
+test('taking advance while another process holds it is refused with its own code, naming the holder', () => {
+  const run = openCase();
+  withHold(run, () => {
+    assert.throws(() => acquireAdvanceLock(run.repoRoot, run.caseId), (err) => err.code === 'case-advance-busy' && /already being advanced/.test(err.message));
+  });
+});
+
 const inboxDir = (run, name) => path.join(run.repoRoot, '.fgos', 'workflow-runs', run.caseId, name);
 
 test('a settle file naming no reservation of the case is refused and kept, never applied', () => {
@@ -130,7 +137,7 @@ test('a settle file naming no reservation of the case is refused and kept, never
   const drained = withHold(run, (hold) => drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold }));
   assert.equal(drained.settles, 0);
   assert.equal(eventsOf(run).filter((e) => e.type === 'settle').length, 0);
-  assert.match(drained.skipped[0].problem, /no reservation/);
+  assert.match(drained.skipped[0].problem, /never made/);
   assert.equal(fs.readdirSync(inboxDir(run, 'settle-pending')).length, 1, 'the file stays for the owner to see');
 });
 

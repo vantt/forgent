@@ -12,6 +12,7 @@ import { startWorkflow, statusWorkflow, readWorkflowEvents } from '../../src/wor
 import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
 import { createPendingBinding, commitBinding } from '../../src/workflow/case-bindings.mjs';
 import { runUnit } from '../../src/runner/execution/run.mjs';
+import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { CaseAdmissionRefusedError } from '../../src/runner/execution/case-admission-port.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
@@ -46,10 +47,15 @@ const planned = (options) => {
   ]);
   return run;
 };
+/** A running Unit holds its worktree's custody; a reservation nobody holds custody of is a dead one and is given back. */
+const holdCustody = (t, repoRoot, worktree) => {
+  const custody = acquireDispatchCwdLock(path.join(repoRoot, '.fgos'), worktree);
+  t.after(() => custody.release());
+};
 const unitOf = (writes) => ({ id: 'u-build', objective: 'Do the work', capability: 'docs:write', writes });
 const asRef = (run, activity) => ({ caseId: run.caseId, activity });
 
-test('two writing dispatches into one case with overlapping writes: the second is refused at reservation, before anything exists', async () => {
+test('two writing dispatches into one case with overlapping writes: the second is refused at reservation, before anything exists', async (t) => {
   const tmp = setupRepo();
   const run = planned({ repoRoot: tmp });
   const wtA = worktreeOf(tmp, 'a');
@@ -57,6 +63,7 @@ test('two writing dispatches into one case with overlapping writes: the second i
   const port = createCaseAdmissionPort({ repoRoot: tmp, env: {} });
   const first = port.admit({ unitRunId: 'unit-run-first', caseRef: asRef(run, 'build-a'), activity: 'build-a', writes: ['src/a/**'], worktree: wtA, readOnly: false, pattern: 'solo', seatLaunches: 1 });
   assert.equal(first.admitted, true, JSON.stringify(first));
+  holdCustody(t, tmp, wtA);
 
   await assert.rejects(
     () => runUnit({ unitData: unitOf(['src/a/deep']), caseAdmission: port, caseRef: asRef(run, 'build-b'), repoRoot: tmp, cwd: wtB, worktree: wtB }),
@@ -66,7 +73,7 @@ test('two writing dispatches into one case with overlapping writes: the second i
   assert.equal(projectionOf(run).liveReservations.length, 1, 'only the first holds a reservation');
 });
 
-test('a writing dispatch of a conductor case runs, settles once, and a disjoint one runs while another is still reserved', async () => {
+test('a writing dispatch of a conductor case runs, settles once, and a disjoint one runs while another is still reserved', async (t) => {
   const tmp = setupRepo();
   const run = planned({ repoRoot: tmp });
   const wtA = worktreeOf(tmp, 'a');
@@ -74,6 +81,7 @@ test('a writing dispatch of a conductor case runs, settles once, and a disjoint 
   const port = createCaseAdmissionPort({ repoRoot: tmp, env: {} });
   const hold = port.admit({ unitRunId: 'unit-run-held', caseRef: asRef(run, 'build-a'), activity: 'build-a', writes: ['src/a/**'], worktree: wtA, readOnly: false, pattern: 'solo', seatLaunches: 1 });
   assert.equal(hold.admitted, true);
+  holdCustody(t, tmp, wtA);
 
   // The disjoint dispatch is admitted, executed outside advance, and settled; the first reservation stays live.
   let result;

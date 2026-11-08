@@ -16,18 +16,15 @@ import path from 'node:path';
 
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { tryAcquireAdvanceLock } from './case-lock.mjs';
-import { applySettle, drainCaseInbox, writeReservationFile, writeSettlePending } from './case-runtime.mjs';
+import { applySettle, drainCaseInbox, writeSettlePending } from './case-runtime.mjs';
 import { isDeliveryMilestone, projectCase, readCaseProjection, receiptsFromResults } from './case-projection.mjs';
 import { digestSubject, digestUnitRunReports } from './ref-digests.mjs';
 import { admitProposal, newReservationId, recheckReservation } from './case-admission.mjs';
-import { bindWorktree, ensureBindingsSentinel, readBinding } from './case-bindings.mjs';
+import { bindingsDir, bindWorktree, ensureBindingsSentinel, readBinding, SENTINEL_NAME } from './case-bindings.mjs';
 import { workflowCheckout } from './unit-handoff.mjs';
 import { CASE_ID_ENV, CASE_RESERVATION_ENV, currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
-import { bindingsDir } from './case-bindings.mjs';
 import { isCaseId, runDirOf } from '../runner/execution/case-run-paths.mjs';
-
-const worktreeFacts = workflowCheckout;
 
 /** Admission reads without `advance`, so it can meet an append in flight. */
 const readEvents = (mainRoot, caseId) => readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId, retryTail: true });
@@ -92,14 +89,15 @@ function proposedAchievements({ mainRoot, projection, reservation, result }) {
   return { achieved, receipts: receipts.length > 0 ? receipts : base };
 }
 
-const refusal = (code, condition) => ({ refused: { code, condition } });
+/** A refusal as the port answers it: `{ code, condition }`, wrapped as `{ refused }` where an operation returns one. */
+const refusal = (code, condition) => ({ code, condition });
 
 /**
  * The case a caller's environment names: null when it names none, `{ malformed }` when it names half of
  * one or something that is no id, else `{ caseId, reservationId }`. The door is the only writer of these
  * variables; they are a claim to check, never an authority.
  */
-export function caseEnvOf(env) {
+function caseEnvOf(env) {
   const caseId = env[CASE_ID_ENV];
   const reservationId = env[CASE_RESERVATION_ENV];
   if (caseId === undefined && reservationId === undefined) return null;
@@ -126,16 +124,16 @@ export function confinedWriteRefusal({ mainRoot, caseId = null }) {
   if (currentDispatchDepth() === 0) return null;
   const dir = caseId === null ? null : runDirOf(mainRoot, caseId);
   if (dir !== null && fs.existsSync(dir) && !writable(dir)) return 'its view of the case ledger is read-only';
-  if (!fs.existsSync(path.join(bindingsDir(mainRoot), '.root'))) return 'it cannot see the real bindings directory';
+  if (!fs.existsSync(path.join(bindingsDir(mainRoot), SENTINEL_NAME))) return 'it cannot see the real bindings directory';
   if (!writable(bindingsDir(mainRoot))) return 'its view of the bindings is read-only';
   return null;
 }
 
 /** The case `id` as it is now, or why it cannot be named: unknown and closed are both `authority-context-invalid`. */
 function openCaseFacts(mainRoot, id, what) {
-  if (!fs.existsSync(runDirOf(mainRoot, id))) return { refused: refusal('authority-context-invalid', `${what} names case ${id}, which does not exist`).refused };
+  if (!fs.existsSync(runDirOf(mainRoot, id))) return { refused: refusal('authority-context-invalid', `${what} names case ${id}, which does not exist`) };
   const { projection } = readCase(mainRoot, id);
-  if (!projection.open) return { refused: refusal('authority-context-invalid', `${what} names case ${id}, which is closed`).refused };
+  if (!projection.open) return { refused: refusal('authority-context-invalid', `${what} names case ${id}, which is closed`) };
   return { projection };
 }
 
@@ -153,19 +151,19 @@ function isChildOf(mainRoot, childId, parentId) {
  */
 function authorityRefusal({ mainRoot, env, refCase, bound = null }) {
   const claimed = caseEnvOf(env);
-  if (claimed?.malformed) return refusal('authority-context-invalid', `${CASE_ID_ENV} and ${CASE_RESERVATION_ENV} must both name a case and a reservation; the environment carries something else`).refused;
+  if (claimed?.malformed) return refusal('authority-context-invalid', `${CASE_ID_ENV} and ${CASE_RESERVATION_ENV} must both name a case and a reservation; the environment carries something else`);
   if (claimed) {
     const envCase = openCaseFacts(mainRoot, claimed.caseId, `the environment (${CASE_ID_ENV})`);
     if (envCase.refused) return envCase.refused;
     if (!envCase.projection.liveReservations.some((r) => r.reservationId === claimed.reservationId)) {
-      return refusal('authority-context-invalid', `the environment names reservation ${claimed.reservationId} of case ${claimed.caseId}, which is not live`).refused;
+      return refusal('authority-context-invalid', `the environment names reservation ${claimed.reservationId} of case ${claimed.caseId}, which is not live`);
     }
     if (claimed.caseId !== refCase && !isChildOf(mainRoot, refCase, claimed.caseId)) {
-      return refusal('authority-context-conflict', `the environment names case ${claimed.caseId} and the call names case ${refCase}, which was not opened under a reservation of it`).refused;
+      return refusal('authority-context-conflict', `the environment names case ${claimed.caseId} and the call names case ${refCase}, which was not opened under a reservation of it`);
     }
   }
   if (bound?.caseId && bound.caseId !== refCase) {
-    return refusal('authority-context-conflict', `the worktree is bound to case ${bound.caseId} and the call names case ${refCase}; a case needs its own reservation to write another case's worktree`).refused;
+    return refusal('authority-context-conflict', `the worktree is bound to case ${bound.caseId} and the call names case ${refCase}; a case needs its own reservation to write another case's worktree`);
   }
   return null;
 }
@@ -180,9 +178,60 @@ export function nestedStartRefusal({ repoRoot, parentCaseId, env = process.env }
   const named = openCaseFacts(mainRoot, parentCaseId, 'the call');
   if (named.refused) return named.refused;
   if (named.projection.kind === 'playbook') {
-    return refusal('playbook-case-admits-via-proposer-only', `case ${parentCaseId} is a Playbook case: it opens nothing but through its own proposer; a call from outside it is refused, not queued`).refused;
+    return refusal('playbook-case-admits-via-proposer-only', `case ${parentCaseId} is a Playbook case: it opens nothing but through its own proposer; a call from outside it is refused, not queued`);
   }
   return authorityRefusal({ mainRoot, env, refCase: parentCaseId });
+}
+
+/** Why a worktree cannot be bound for a case; a record a crash left unsettled names the case that owns it and the verbs that settle it. */
+function bindRefusal({ answer, record }, worktree, id) {
+  if (answer === 'binding-unsettled' && record?.caseId) {
+    return refusal(answer, `worktree ${worktree} has a binding record of case ${record.caseId} that a crash left unsettled; fgos workflow resume ${record.caseId} or fgos workflow close ${record.caseId} settles it`);
+  }
+  return refusal(answer, `worktree ${worktree} cannot be bound to case ${id}: ${answer}`);
+}
+
+/**
+ * The admission itself, under the case's `advance`: the inbox and the crash leftovers first, then either the
+ * live reservation of the same Unit asked again (its controller died before its run existed) or a new one.
+ * A writing Unit's worktree is bound before anything is appended, so a refusal leaves nothing behind.
+ */
+function admitUnderHold({ mainRoot, hold, id, proposal, writing }) {
+  drainCaseInbox({ mainRoot, caseId: id, hold });
+  const { projection } = readCase(mainRoot, id);
+  const unitId = proposal.caseRef.unitId ?? null;
+  const live = unitId === null ? undefined : projection.liveReservations.find((r) => r.activity === proposal.activity && r.unitId === unitId);
+  const target = writing ? readBinding({ mainRoot, worktree: proposal.worktree, caseId: id }) : null;
+  if (target?.answer === 'binding-unsettled') return { refused: bindRefusal(target, proposal.worktree, id) };
+
+  let verdict = null;
+  if (!live) {
+    verdict = admitProposal({
+      projection,
+      proposal: {
+        activity: proposal.activity,
+        unitId: proposal.caseRef.unitId,
+        writes: proposal.writes,
+        worktree: writing ? proposal.worktree : undefined,
+        blind: proposal.blind,
+        handoffRefs: proposal.handoffRefs,
+        rigor: proposal.rigor,
+        seatLaunches: proposal.seatLaunches,
+        unitRunId: proposal.unitRunId,
+        reason: proposal.caseRef.reason,
+        claimedRoute: proposal.caseRef.route,
+        proposer: projection.kind === 'playbook' ? 'playbook' : 'agent',
+      },
+      bindingAnswers: target ? { [proposal.worktree]: target } : {},
+      reservationId: newReservationId(),
+    });
+    if (verdict.refused) return { refused: verdict.refused };
+  }
+  const bound = writing ? bindWorktree({ mainRoot, hold, caseId: id, worktree: proposal.worktree, ...workflowCheckout(proposal.worktree) }) : null;
+  if (bound && !bound.ok) return { refused: bindRefusal(bound, proposal.worktree, id) };
+  for (const event of verdict?.events ?? []) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId: id, event, hold });
+  const reservation = live ?? verdict.reservation;
+  return { admitted: true, reservationId: reservation.reservationId, caseId: id, seatLaunchCeiling: reservation.seatLaunchCeiling ?? null };
 }
 
 /**
@@ -196,11 +245,12 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
   const mainRoot = path.resolve(repoRoot);
   // A host-side sentinel tells a later reader that an empty bindings directory is the real one.
   ensureBindingsSentinel(mainRoot);
+  const refuse = (code, condition) => ({ refused: refusal(code, condition) });
 
   /** Run `section(hold)` under `advance`; `null` when another process holds it. */
-  const underAdvance = (id, section) => {
+  const underAdvance = (id, section, options) => {
     if (heldAdvance) return section(heldAdvance);
-    const hold = tryAcquireAdvanceLock(mainRoot, id);
+    const hold = tryAcquireAdvanceLock(mainRoot, id, options);
     if (hold === null) return null;
     try {
       return section(hold);
@@ -209,14 +259,12 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
     }
   };
 
-  const confinedRefusal = (why) => refusal(CONFINED_WRITE_CODE, confinedWriteText(why));
-
   return {
     resolveBinding({ worktree, caseId: asked = null }) {
       // No case is named. A call that carries case variables, or a masked view, is not standalone.
       if (asked === null && caseId === null) {
         const confined = confinedWriteRefusal({ mainRoot });
-        if (confined) return { answer: CONFINED_WRITE_CODE, condition: confinedRefusal(confined).refused.condition };
+        if (confined) return { answer: CONFINED_WRITE_CODE, condition: confinedWriteText(confined) };
         const claimed = caseEnvOf(env);
         if (claimed) {
           return { answer: 'authority-context-invalid', condition: claimed.malformed
@@ -230,81 +278,30 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
         return { answer: 'bound-worktree-requires-case-authority', ...(binding.record ? { record: binding.record } : {}), condition: `worktree ${worktree} is bound to case ${owner}; a writing run there must name it: --case ${owner} --activity <id>` };
       }
       if (binding.answer === 'binding-view-unavailable' && currentDispatchDepth() > 0) {
-        return { answer: CONFINED_WRITE_CODE, condition: confinedRefusal('it cannot see the real bindings directory').refused.condition };
+        return { answer: CONFINED_WRITE_CODE, condition: confinedWriteText('it cannot see the real bindings directory') };
       }
       return { answer: binding.answer, ...(binding.record ? { record: binding.record } : {}) };
     },
 
     admit(proposal) {
       const id = proposal.caseRef.caseId;
-      if (caseId && caseId !== id) return refusal('authority-context-conflict', `this port serves case ${caseId}, the Unit names case ${id}`);
-      if (heldAdvance && heldAdvance.workflowRunId !== id) return refusal('authority-context-conflict', `advance of case ${heldAdvance.workflowRunId} is held; a scope never holds two`);
+      if (caseId && caseId !== id) return refuse('authority-context-conflict', `this port serves case ${caseId}, the Unit names case ${id}`);
+      if (heldAdvance && heldAdvance.workflowRunId !== id) return refuse('authority-context-conflict', `advance of case ${heldAdvance.workflowRunId} is held; a scope never holds two`);
       const writing = proposal.writes.length > 0;
       // A confined caller is refused by name before anything else is looked at, whatever it names.
-      if (writing) {
-        const confined = confinedWriteRefusal({ mainRoot, caseId: id });
-        if (confined) return confinedRefusal(confined);
-      }
+      const confined = writing ? confinedWriteRefusal({ mainRoot, caseId: id }) : null;
+      if (confined) return refuse(CONFINED_WRITE_CODE, confinedWriteText(confined));
       const named = openCaseFacts(mainRoot, id, 'the call');
       if (named.refused) return { refused: named.refused };
       // A Playbook case admits through its own proposer and nobody else: no waiting, no negotiation.
       if (named.projection.kind === 'playbook' && !(heldAdvance && heldAdvance.workflowRunId === id)) {
-        return refusal('playbook-case-admits-via-proposer-only', `case ${id} is a Playbook case: its Units are admitted by its own proposer, in order; a call from outside it is refused, not queued`);
+        return refuse('playbook-case-admits-via-proposer-only', `case ${id} is a Playbook case: its Units are admitted by its own proposer, in order; a call from outside it is refused, not queued`);
       }
       const targetBinding = writing ? readBinding({ mainRoot, worktree: proposal.worktree, caseId: id }) : null;
       const conflict = authorityRefusal({ mainRoot, env, refCase: id, bound: targetBinding?.answer === 'worktree-already-bound' ? targetBinding.record : null });
       if (conflict) return { refused: conflict };
-
-      const answer = underAdvance(id, (hold) => {
-        drainCaseInbox({ mainRoot, caseId: id, hold });
-        const { projection } = readCase(mainRoot, id);
-
-        // The same Unit asked again (its controller died before its run existed) keeps its reservation.
-        const unitId = proposal.caseRef.unitId ?? null;
-        const live = unitId === null ? undefined : projection.liveReservations.find((r) => r.activity === proposal.activity && r.unitId === unitId);
-        if (live) {
-          let binding = null;
-          if (writing) {
-            const made = bindWorktree({ mainRoot, hold, caseId: id, worktree: proposal.worktree, ...worktreeFacts(proposal.worktree) });
-            if (!made.ok) return refusal(made.answer, `worktree ${proposal.worktree} cannot be bound to case ${id}: ${made.answer}`);
-            if (!made.already) binding = { key: made.key, generation: made.generation, created: true };
-          }
-          writeReservationFile({ mainRoot, caseId: id, reservation: { ...live, worktree: writing ? proposal.worktree : null, unitRunId: proposal.unitRunId, ...(binding ? { binding } : {}) } });
-          return { admitted: true, reservationId: live.reservationId, caseId: id, seatLaunchCeiling: live.seatLaunchCeiling ?? null };
-        }
-
-        const verdict = admitProposal({
-          projection,
-          proposal: {
-            activity: proposal.activity,
-            unitId: proposal.caseRef.unitId,
-            writes: proposal.writes,
-            worktree: writing ? proposal.worktree : undefined,
-            blind: proposal.blind,
-            handoffRefs: proposal.handoffRefs,
-            rigor: proposal.rigor,
-            seatLaunches: proposal.seatLaunches,
-            unitRunId: proposal.unitRunId,
-            reason: proposal.caseRef.reason,
-            claimedRoute: proposal.caseRef.route,
-            proposer: projection.kind === 'playbook' ? 'playbook' : 'agent',
-          },
-          bindingAnswers: writing ? { [proposal.worktree]: readBinding({ mainRoot, worktree: proposal.worktree, caseId: id }) } : {},
-          reservationId: newReservationId(),
-        });
-        if (verdict.refused) return { refused: verdict.refused };
-
-        let binding = null;
-        if (writing) {
-          const made = bindWorktree({ mainRoot, hold, caseId: id, worktree: proposal.worktree, ...worktreeFacts(proposal.worktree) });
-          if (!made.ok) return refusal(made.answer, `worktree ${proposal.worktree} cannot be bound to case ${id}: ${made.answer}`);
-          if (!made.already) binding = { key: made.key, generation: made.generation, created: true };
-        }
-        for (const event of verdict.events) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId: id, event, hold });
-        writeReservationFile({ mainRoot, caseId: id, reservation: { ...verdict.reservation, ...(binding ? { binding } : {}) } });
-        return { admitted: true, reservationId: verdict.reservation.reservationId, caseId: id, seatLaunchCeiling: verdict.reservation.seatLaunchCeiling };
-      });
-      return answer ?? refusal('case-admission-busy', `case ${id} is being advanced by another process; ask again`);
+      const answer = underAdvance(id, (hold) => admitUnderHold({ mainRoot, hold, id, proposal, writing }));
+      return answer ?? refuse('case-admission-busy', `case ${id} is being advanced by another process; ask again`);
     },
 
     settle(reservationId, result) {
@@ -327,16 +324,16 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
         blind: reservation.blind === true,
         settledAt: new Date().toISOString(),
       };
-      const done = underAdvance(id, (hold) => applySettle({ mainRoot, caseId: id, hold, settle: payload }));
+      const done = underAdvance(id, (hold) => applySettle({ mainRoot, caseId: id, hold, settle: payload }), { drain: false });
       if (done === null) writeSettlePending({ mainRoot, caseId: id, settle: payload });
     },
 
     recheckEffect(reservationId, { caseId: id }) {
       const { projection } = readCase(mainRoot, id);
       const reservation = projection.liveReservations.find((r) => r.reservationId === reservationId);
-      if (!reservation) return refusal('reservation-not-live', `reservation ${reservationId} of case ${id} is not live`);
+      if (!reservation) return refuse('reservation-not-live', `reservation ${reservationId} of case ${id} is not live`);
       const broken = recheckReservation({ projection, reservation });
-      return broken ? refusal(broken[0].code, broken.map((v) => v.condition).join('; ')) : { ok: true };
+      return broken ? refuse(broken[0].code, broken.map((v) => v.condition).join('; ')) : { ok: true };
     },
   };
 }

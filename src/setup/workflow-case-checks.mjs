@@ -1,58 +1,20 @@
-// workflow-case-checks.mjs — doctor checks and the repair of the worktree binding records of Workflow cases
+// workflow-case-checks.mjs — doctor checks of the worktree binding records of Workflow cases
 // (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27). Bodies live here; `registrations.mjs` registers them.
 //
-// The ledger is the truth (L3); a binding record is a view of it. The check reads every record and every
-// ledger that has a `binding` event and says where they disagree; the fix settles what a crash left
-// (commits a pending record whose event exists, removes one with none), writes the sentinel that marks
-// the directory as the real one, and rebuilds a missing record of an open case from its ledger.
+// The ledger is the truth (L3); a binding record is a view of it. `workflow-case-bindings` reports where
+// they disagree through the Workflow's own reader (`inspectCaseBindings`); the repair runs on the Workflow's
+// normal path, under the owning case's hold, never from here. The one readiness fix is the sentinel that marks
+// the bindings directory as the real one.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
-import { runsRoot } from '../runner/execution/case-run-paths.mjs';
-import {
-  bindingsDir,
-  bindingKeyOf,
-  commitBinding,
-  createPendingBinding,
-  ensureBindingsSentinel,
-  listBindingRecords,
-  repairCaseBindings,
-  SENTINEL_NAME,
-} from '../workflow/case-bindings.mjs';
-import { tryAcquireAdvanceLock } from '../workflow/case-lock.mjs';
-import { projectCase } from '../workflow/case-projection.mjs';
-import { readWorkflowEvents } from '../workflow/store.mjs';
+import { bindingsDir, ensureBindingsSentinel, inspectCaseBindings, SENTINEL_NAME } from '../workflow/case-bindings.mjs';
 
 const MAX_LISTED = 5;
 
 function rootOf(cwd) {
   return resolveMainCheckoutRoot(cwd) ?? cwd;
-}
-
-/** Cases whose ledger has a `binding` event: `{ caseId, events }`. A ledger that cannot be read is reported, not skipped. */
-function casesWithBindings(root) {
-  const runsDir = runsRoot(root);
-  if (!fs.existsSync(runsDir)) return { cases: [], unreadable: [] };
-  const cases = [];
-  const unreadable = [];
-  for (const name of fs.readdirSync(runsDir)) {
-    if (name.startsWith('.') || !fs.statSync(path.join(runsDir, name)).isDirectory()) continue;
-    try {
-      const events = readWorkflowEvents({ repoRoot: root, workflowRunId: name });
-      if (events.some((e) => e.type === 'binding')) cases.push({ caseId: name, events });
-    } catch (err) {
-      unreadable.push(`${name}: ${err.message}`);
-    }
-  }
-  return { cases, unreadable };
-}
-
-/** The bindings a ledger says are held now, by identity key: the last `binding` event of each key. */
-function boundByLedger(events, caseId) {
-  const latest = new Map();
-  for (const e of events) if (e.type === 'binding' && e.payload?.caseId === caseId) latest.set(e.payload.key ?? e.payload.worktreeRoot, e.payload);
-  return [...latest.values()].filter((b) => b.state === 'bound');
 }
 
 const listed = (items) => (items.length > MAX_LISTED ? `${items.slice(0, MAX_LISTED).join('; ')}; and ${items.length - MAX_LISTED} more` : items.join('; '));
@@ -69,57 +31,15 @@ export function checkWorkflowCaseBindingSentinel(cwd) {
 
 /** Doctor check `workflow-case-bindings`: every binding record matches the ledger of its case, and the other way round. */
 export function checkWorkflowCaseBindings(cwd) {
-  const root = rootOf(cwd);
-  const problems = [];
-  const { cases, unreadable } = casesWithBindings(root);
-  for (const item of unreadable) problems.push(`ledger unreadable (${item})`);
-  const byCase = new Map(cases.map((c) => [c.caseId, c]));
-
-  for (const { key, record } of listBindingRecords(root)) {
-    if (!record) { problems.push(`record ${key} does not parse (binding-unsettled)`); continue; }
-    if (record.state !== 'committed') { problems.push(`record ${key} of case ${record.caseId} is ${record.state} (binding-unsettled)`); continue; }
-    const owner = byCase.get(record.caseId);
-    const projection = owner ? projectCase(owner.events) : null;
-    const held = owner ? boundByLedger(owner.events, record.caseId).some((b) => b.generation === record.generation && (b.key ?? b.worktreeRoot) === key) : false;
-    if (!owner || !held) problems.push(`record ${key} names case ${record.caseId} generation ${record.generation}, which its ledger does not show as bound`);
-    else if (!projection.open) problems.push(`record ${key} belongs to closed case ${record.caseId} and is still held; unbind it once the attempt is quiet`);
-  }
-
-  const files = new Set(listBindingRecords(root).map((r) => r.key));
-  for (const { caseId, events } of cases) {
-    if (!projectCase(events).open) continue;
-    for (const b of boundByLedger(events, caseId)) {
-      if (!files.has(b.key ?? '')) problems.push(`case ${caseId} is bound to ${b.worktreeRoot} on its ledger but has no record; run fgos doctor --fix`);
-    }
-  }
+  const { problems, records } = inspectCaseBindings(rootOf(cwd));
   return problems.length === 0
-    ? { passed: true, message: `${files.size} binding record(s) match their ledgers` }
+    ? { passed: true, message: `${records} binding record(s) match their ledgers` }
     : { passed: false, message: listed(problems) };
 }
 
-/** Fix `workflow-case-bindings`: sentinel, crash leftovers, missing records rebuilt from open cases' ledgers. */
+/** Fix `workflow-case-bindings`: the sentinel. Settling a record is the owning case's own hold. */
 export function fixWorkflowCaseBindings(cwd) {
   const root = rootOf(cwd);
-  const actions = [];
-  if (fs.existsSync(bindingsDir(root)) && !fs.existsSync(path.join(bindingsDir(root), SENTINEL_NAME)) && ensureBindingsSentinel(root)) actions.push('wrote the sentinel');
-  const { cases } = casesWithBindings(root);
-  for (const { caseId } of cases) {
-    // A binder that is alive holds `advance`; settling a record under it would race that binder.
-    const hold = tryAcquireAdvanceLock(root, caseId);
-    if (hold === null) { actions.push(`skipped ${caseId}: its advance lock is held`); continue; }
-    try {
-      for (const done of repairCaseBindings({ mainRoot: root, caseId })) actions.push(`${done.action} record ${done.key}`);
-      const events = readWorkflowEvents({ repoRoot: root, workflowRunId: caseId });
-      if (!projectCase(events).open) continue;
-      const existing = new Set(listBindingRecords(root).map((r) => r.key));
-      for (const b of boundByLedger(events, caseId)) {
-        if (existing.has(b.key) || !fs.existsSync(b.worktreeRoot) || bindingKeyOf(b.worktreeRoot) !== b.key) continue;
-        const made = createPendingBinding({ mainRoot: root, caseId, generation: b.generation, worktree: b.worktreeRoot, commonDir: b.commonDir ?? null, ref: b.ref ?? null });
-        if (made.created && commitBinding({ mainRoot: root, key: made.key, caseId, generation: b.generation }).committed) actions.push(`rebuilt record ${made.key}`);
-      }
-    } finally {
-      hold.release();
-    }
-  }
-  return { changed: actions.length > 0, message: actions.length > 0 ? actions.join('; ') : 'no binding record needed repair' };
+  const wrote = fs.existsSync(bindingsDir(root)) && !fs.existsSync(path.join(bindingsDir(root), SENTINEL_NAME)) && ensureBindingsSentinel(root);
+  return { changed: wrote, message: wrote ? 'wrote the sentinel' : 'the sentinel is in place' };
 }

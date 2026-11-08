@@ -21,12 +21,6 @@ function advanceLockParams(mainRoot, workflowRunId) {
   return { fgosDir: path.join(mainRoot, '.fgos'), workflowRunDir: runDirOf(mainRoot, workflowRunId) };
 }
 
-/** Pid of a process holding the run's advance lock, or null when the kernel cannot list one. */
-function advanceHolderPid(params) {
-  const holders = lockHolders('advance', params);
-  return holders.kind === 'list' && holders.holders.length > 0 ? holders.holders[0].pid : null;
-}
-
 /** `{ pid }` of the process currently advancing the run (pid null when unlistable), null when nothing holds it. */
 function liveAdvanceHolder(mainRoot, workflowRunId) {
   const params = advanceLockParams(mainRoot, workflowRunId);
@@ -43,6 +37,7 @@ function advanceRefusal(workflowRunId, pid) {
   const holder = pid ? `process ${pid}` : 'another process';
   return new RunnerConfigError(
     `Workflow run "${workflowRunId}" is already being advanced by ${holder}; read progress with "fgos workflow status ${workflowRunId}" and retry once it parks or finishes`,
+    { code: 'case-advance-busy' },
   );
 }
 
@@ -50,9 +45,11 @@ function advanceRefusal(workflowRunId, pid) {
  * Take the run's `advance` once. Returns the hold the ledger demands for every append, or null when
  * another process holds it. A ledger that ends in an unfinished line (an append cut short by a crash)
  * is repaired here, by the one process allowed to, and whatever was left beside the ledger while nobody
- * held `advance` (settles, gate answers) is folded in, before anything reads or appends.
+ * held `advance` (settles, gate answers) is folded in, before anything reads or appends. A caller that is
+ * itself bringing one result to the ledger (a settle) passes `drain: false` and appends it first: the drain
+ * gives back reservations whose controller is gone, and a settle in flight is the last thing it may meet.
  */
-export function tryAcquireAdvanceLock(mainRoot, workflowRunId) {
+export function tryAcquireAdvanceLock(mainRoot, workflowRunId, { drain = true } = {}) {
   const params = advanceLockParams(mainRoot, workflowRunId);
   // Taking the lock creates its directory; never bring back a run that was deleted.
   if (!fs.existsSync(params.workflowRunDir)) throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
@@ -61,7 +58,7 @@ export function tryAcquireAdvanceLock(mainRoot, workflowRunId) {
   const hold = createAdvanceHold({ workflowRunId, release: () => res.handle.release() });
   try {
     recoverWorkflowLedgerTail({ repoRoot: mainRoot, workflowRunId, hold });
-    drainCaseInbox({ mainRoot, caseId: workflowRunId, hold });
+    if (drain) drainCaseInbox({ mainRoot, caseId: workflowRunId, hold });
   } catch (err) {
     hold.release();
     throw err;
@@ -72,7 +69,7 @@ export function tryAcquireAdvanceLock(mainRoot, workflowRunId) {
 /** Hold the run for this process while it advances, so two processes never advance one run at once; refuses when it is held. */
 export function acquireAdvanceLock(mainRoot, workflowRunId) {
   const hold = tryAcquireAdvanceLock(mainRoot, workflowRunId);
-  if (hold === null) throw advanceRefusal(workflowRunId, advanceHolderPid(advanceLockParams(mainRoot, workflowRunId)));
+  if (hold === null) throw advanceRefusal(workflowRunId, liveAdvanceHolder(mainRoot, workflowRunId)?.pid);
   return hold;
 }
 

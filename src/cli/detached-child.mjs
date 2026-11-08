@@ -10,16 +10,17 @@ import { fileURLToPath } from 'node:url';
 const OWN_CLI = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
 
 /**
- * @param {{ args: string[], cwd?: string, env?: object, logPath?: string, cliPath?: string }} spec
- *   `args` are the CLI arguments after the entry file; `logPath` collects the child's output (none: discarded).
+ * @param {{ args: string[], cwd?: string, env?: object, logPath?: string, logStdout?: boolean, cliPath?: string }} spec
+ *   `args` are the CLI arguments after the entry file; `logPath` collects the child's output (none: discarded),
+ *   its standard output too unless `logStdout` is false (then only its standard error, where progress goes).
  * @returns {{ pid: number | null, logPath: string | null, error?: string }}
  */
-export function spawnDetachedCli({ args, cwd = process.cwd(), env = process.env, logPath = null, cliPath = OWN_CLI }) {
+export function spawnDetachedCli({ args, cwd = process.cwd(), env = process.env, logPath = null, logStdout = true, cliPath = OWN_CLI }) {
   let logFd = null;
   try {
     if (logPath) logFd = fs.openSync(logPath, 'a');
     const out = logFd ?? 'ignore';
-    const child = spawn(process.execPath, [cliPath, ...args], { cwd, detached: true, env, stdio: ['ignore', out, out], windowsHide: true });
+    const child = spawn(process.execPath, [cliPath, ...args], { cwd, detached: true, env, stdio: ['ignore', logStdout ? out : 'ignore', out], windowsHide: true });
     // A program that cannot start reports asynchronously; swallow it so it never ends the caller.
     child.on('error', () => {});
     child.unref();

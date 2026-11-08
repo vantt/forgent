@@ -19,6 +19,7 @@ import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
 import { appendWorkflowEvent, fsyncDirectory, readWorkflowEvents } from './store.mjs';
+import { projectCase } from './case-projection.mjs';
 import { runsRoot } from '../runner/execution/case-run-paths.mjs';
 
 export const SENTINEL_NAME = '.root';
@@ -104,7 +105,7 @@ export function commitBinding({ mainRoot, key, caseId, generation }) {
 }
 
 /** The next generation a case's bindings use: one past the highest its ledger has recorded. */
-export function nextGeneration(events, caseId) {
+function nextGeneration(events, caseId) {
   return events
     .filter((e) => e.type === 'binding' && e.payload?.caseId === caseId)
     .reduce((max, e) => Math.max(max, e.payload.generation ?? 0), 0) + 1;
@@ -166,24 +167,100 @@ export function listBindingRecords(mainRoot) {
     .map((name) => ({ key: name.slice(0, -'.json'.length), file: path.join(dir, name), record: parseRecord(path.join(dir, name)) }));
 }
 
+/** The bindings a ledger says are held now, by identity key: the last `binding` event of each key. */
+function boundByLedger(events, caseId) {
+  const latest = new Map();
+  for (const e of events) if (e.type === 'binding' && e.payload?.caseId === caseId) latest.set(e.payload.key ?? e.payload.worktreeRoot, e.payload);
+  return [...latest.values()].filter((b) => b.state === 'bound');
+}
+
+/** Cases whose ledger has a `binding` event: `{ caseId, events }`. A ledger that cannot be read is reported, not skipped. */
+function casesWithBindings(mainRoot) {
+  const runsDir = runsRoot(mainRoot);
+  const cases = [];
+  const unreadable = [];
+  if (!fs.existsSync(runsDir)) return { cases, unreadable };
+  for (const name of fs.readdirSync(runsDir)) {
+    if (name.startsWith('.') || !fs.statSync(path.join(runsDir, name)).isDirectory()) continue;
+    try {
+      const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: name });
+      if (events.some((e) => e.type === 'binding')) cases.push({ caseId: name, events });
+    } catch (err) {
+      unreadable.push(`${name}: ${err.message}`);
+    }
+  }
+  return { cases, unreadable };
+}
+
 /**
- * Settle the records a crash left for one case, under its `advance` hold: a pending record whose
- * `binding` event is on the ledger is committed; one with no event never reached anything and is removed.
+ * Where the binding records and the ledgers disagree, as plain sentences: a record that does not parse, is
+ * unsettled, is not bound on its case's ledger, or belongs to a closed case; an open case bound on its
+ * ledger with no record; a ledger that cannot be read. Reads only; the case's own hold repairs.
+ *
+ * @returns {{ problems: string[], records: number }}
  */
-export function repairCaseBindings({ mainRoot, caseId }) {
-  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
+export function inspectCaseBindings(mainRoot) {
+  const problems = [];
+  const { cases, unreadable } = casesWithBindings(mainRoot);
+  for (const item of unreadable) problems.push(`ledger unreadable (${item})`);
+  const byCase = new Map(cases.map((c) => [c.caseId, c]));
+  const records = listBindingRecords(mainRoot);
+
+  for (const { key, record } of records) {
+    if (!record) { problems.push(`record ${key} does not parse (binding-unsettled)`); continue; }
+    if (record.state !== 'committed') { problems.push(`record ${key} of case ${record.caseId} is ${record.state} (binding-unsettled); fgos workflow resume ${record.caseId} or close ${record.caseId} settles it`); continue; }
+    const owner = byCase.get(record.caseId);
+    const held = owner ? boundByLedger(owner.events, record.caseId).some((b) => b.generation === record.generation && (b.key ?? b.worktreeRoot) === key) : false;
+    if (!held) problems.push(`record ${key} names case ${record.caseId} generation ${record.generation}, which its ledger does not show as bound`);
+    else if (!projectCase(owner.events).open) problems.push(`record ${key} belongs to closed case ${record.caseId} and is still held; unbind it once the attempt is quiet`);
+  }
+
+  const files = new Set(records.map((r) => r.key));
+  for (const { caseId, events } of cases) {
+    if (!projectCase(events).open) continue;
+    for (const b of boundByLedger(events, caseId)) {
+      if (!files.has(b.key ?? '')) problems.push(`case ${caseId} is bound to ${b.worktreeRoot} on its ledger but has no record; fgos workflow resume ${caseId} rebuilds it`);
+    }
+  }
+  return { problems, records: files.size };
+}
+
+/**
+ * Settle what a crash left of one case's bindings, under that case's own `advance` hold and nobody else's.
+ * It walks the records, so a record of a case that never recorded it is found too: a pending record whose
+ * `binding` event is on the ledger is committed, one with no event never reached anything and is removed, a
+ * committed one whose ledger's last event for its key is `unbound` at its generation lost only the unlink and
+ * is removed; and an open case's bound worktree whose record is missing gets it back.
+ */
+export function repairCaseBindings({ mainRoot, caseId, events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId }) }) {
   const actions = [];
-  for (const { key, file, record } of listBindingRecords(mainRoot)) {
-    if (!record || record.caseId !== caseId || record.state !== 'pending') continue;
-    const recorded = events.some((e) => e.type === 'binding' && e.payload?.caseId === caseId
-      && e.payload.generation === record.generation && e.payload.state === 'bound');
-    if (recorded) {
-      commitBinding({ mainRoot, key, caseId, generation: record.generation });
-      actions.push({ key, action: 'committed' });
-    } else {
+  const records = listBindingRecords(mainRoot);
+  for (const { key, file, record } of records) {
+    if (!record || record.caseId !== caseId) continue;
+    const last = events.findLast((e) => e.type === 'binding' && e.payload?.caseId === caseId && e.payload.key === key);
+    if (record.state === 'pending') {
+      const recorded = events.some((e) => e.type === 'binding' && e.payload?.caseId === caseId
+        && e.payload.generation === record.generation && e.payload.state === 'bound');
+      if (recorded) {
+        commitBinding({ mainRoot, key, caseId, generation: record.generation });
+        actions.push({ key, action: 'committed' });
+      } else {
+        fs.unlinkSync(file);
+        actions.push({ key, action: 'removed' });
+      }
+    } else if (last?.payload.state === 'unbound' && last.payload.generation === record.generation) {
       fs.unlinkSync(file);
+      fsyncDirectory(bindingsDir(mainRoot));
       actions.push({ key, action: 'removed' });
     }
+  }
+  const bound = boundByLedger(events, caseId);
+  if (bound.length === 0 || !projectCase(events).open) return actions;
+  const existing = new Set(records.map((r) => r.key));
+  for (const b of bound) {
+    if (existing.has(b.key) || !fs.existsSync(b.worktreeRoot) || bindingKeyOf(b.worktreeRoot) !== b.key) continue;
+    const made = createPendingBinding({ mainRoot, caseId, generation: b.generation, worktree: b.worktreeRoot, commonDir: b.commonDir ?? null, ref: b.ref ?? null });
+    if (made.created && commitBinding({ mainRoot, key: made.key, caseId, generation: b.generation }).committed) actions.push({ key: made.key, action: 'rebuilt' });
   }
   return actions;
 }

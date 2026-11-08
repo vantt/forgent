@@ -1,21 +1,30 @@
 // src/workflow/case-runtime.mjs — runtime state beside a case's ledger, and the one drain that folds it in
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/** (A4 boundary)
 //
-// None of these files is a ledger line. A reservation file says an attempt may still be running. A
-// settle-pending file is a settle that could not take `advance`. A gate-answer round is one answer, made
-// once and never rewritten: its file is created exclusively, and the `gate.answer` event that consumes
-// it is appended by whoever holds `advance` next (`drainCaseInbox`), so an `answer` never writes the
-// ledger itself. Everything here is rebuilt from, or folded into, the ledger; the ledger is the truth.
+// None of these files is a ledger line. A settle-pending file is a settle that could not take `advance`. A
+// gate-answer round is one answer, made once and never rewritten: its file is created exclusively, and the
+// `gate.answer` event that consumes it is appended by whoever holds `advance` next (`drainCaseInbox`), so an
+// `answer` never writes the ledger itself. Both are written by processes other than the one that folds them,
+// so they are read as agent-written input. Everything here is folded into the ledger; the ledger is the truth.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
+import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
 import { gateAnswerFile, runDirOf } from '../runner/execution/case-run-paths.mjs';
+import { unitControllerHeld } from '../runner/execution/unit-control.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
-import { gateOfStep } from './case-projection.mjs';
-import { unbindWorktree } from './case-bindings.mjs';
+import { gateOfStep, projectCase } from './case-projection.mjs';
+import { repairCaseBindings, unbindWorktree } from './case-bindings.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
+import { readAgentFileSync } from '../native/proof-helpers.mjs';
+
+/** The id prefix of the Unit run a case gate makes; a gate has no unit record to resume. */
+export const GATE_RUN_PREFIX = 'gate-run-';
+
+// The largest real inbox file seen was 763 bytes (an answer round); a settle carries a few receipts.
+const INBOX_FILE_MAX_BYTES = 256 * 1024;
 
 function writeText(file, text) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -32,34 +41,52 @@ const readJson = (file) => {
   }
 };
 
-const listJson = (dir) => (fs.existsSync(dir) ? fs.readdirSync(dir).filter((n) => n.endsWith('.json')).sort() : []);
-
-// --- reservations -------------------------------------------------------------------------------
-
-const reservationsDir = (mainRoot, caseId) => path.join(runDirOf(mainRoot, caseId), 'reservations');
-
-export function writeReservationFile({ mainRoot, caseId, reservation }) {
-  writeJsonAtomic(path.join(reservationsDir(mainRoot, caseId), `${reservation.reservationId}.json`), reservation);
+/** `{ value }` of a file another process may have written, or `{ problem }`: never follows a link, never waits on a pipe. */
+function readInbox(file) {
+  try {
+    return { value: JSON.parse(readAgentFileSync(file, INBOX_FILE_MAX_BYTES).toString('utf8')) };
+  } catch (err) {
+    if (err.code === 'ENOTREGULAR' || err.code === 'ELOOP') return { problem: 'it is not a regular file (a pipe, a link or a directory)' };
+    return { problem: err.code === 'E2BIG' ? `it is larger than ${INBOX_FILE_MAX_BYTES} bytes` : `it cannot be read (${err.code ?? err.message})` };
+  }
 }
 
-export function removeReservationFile({ mainRoot, caseId, reservationId }) {
-  fs.rmSync(path.join(reservationsDir(mainRoot, caseId), `${reservationId}.json`), { force: true });
-}
+const inboxName = (mainRoot, caseId, file) => path.relative(runDirOf(mainRoot, caseId), file).split(path.sep).join('/');
 
-export function readReservationFile(mainRoot, caseId, reservationId) {
-  return readJson(path.join(reservationsDir(mainRoot, caseId), `${reservationId}.json`));
-}
-
-export function readReservationFiles(mainRoot, caseId) {
-  return listJson(reservationsDir(mainRoot, caseId)).map((name) => readJson(path.join(reservationsDir(mainRoot, caseId), name))).filter(Boolean);
-}
+const listJson = (dir) => {
+  try {
+    if (!fs.lstatSync(dir).isDirectory()) return [];
+  } catch {
+    return [];
+  }
+  return fs.readdirSync(dir).filter((n) => n.endsWith('.json')).sort();
+};
 
 /**
- * Whether the attempt of a reservation is quiet: nothing holds the custody lease of its worktree. A
- * reservation is released only then (or when custody was settled), so a controller's death never frees it.
+ * Whether nothing can still be running or resumed for a live reservation. Only positive evidence counts: a
+ * writing worktree that exists, whose custody lease nobody holds, and a Unit run that is not resumable (no
+ * record, or one settled with no controller left); a gate's run never has a record. A read-only reservation,
+ * a missing worktree, a lock that cannot be listed and a record that cannot be read are all "not proven".
  */
-export function reservationQuiet(mainRoot, reservation) {
-  return !reservation.worktree || dispatchCwdHolder(path.join(mainRoot, '.fgos'), reservation.worktree) === null;
+function reservationDead(mainRoot, { worktree, unitRunId }) {
+  const fgosDir = path.join(mainRoot, '.fgos');
+  if (!worktree || !fs.existsSync(worktree) || dispatchCwdHolder(fgosDir, worktree) !== null) return false;
+  if (typeof unitRunId === 'string' && unitRunId.startsWith(GATE_RUN_PREFIX)) return true;
+  const unitDir = typeof unitRunId === 'string' ? assignmentDir(fgosDir, unitRunId) : null;
+  const record = unitDir && path.join(unitDir, 'unit.json');
+  if (!record || !fs.existsSync(record)) return true;
+  return readJson(record)?.execution?.status === 'settled' && !unitControllerHeld(unitDir);
+}
+
+/** Give back, as `not-started`, each live reservation proven dead, under the hold. @returns {boolean} whether any was */
+function releaseDeadReservations({ mainRoot, caseId, hold, events }) {
+  if (!events.some((e) => e.type === 'reservation')) return false;
+  const dead = projectCase(events).liveReservations.filter((r) => reservationDead(mainRoot, r));
+  for (const r of dead) {
+    const settle = { reservationId: r.reservationId, activity: r.activity, unitId: r.unitId ?? null, unitRunId: null, outcome: 'not-started', receipts: [], achieved: [], seatLaunchesUsed: 0, blind: r.blind === true, settledAt: new Date().toISOString() };
+    applySettle({ mainRoot, caseId, hold, settle, events });
+  }
+  return dead.length > 0;
 }
 
 // --- settle-pending -----------------------------------------------------------------------------
@@ -72,9 +99,9 @@ export function writeSettlePending({ mainRoot, caseId, settle }) {
 }
 
 /**
- * Record a settle on the ledger under the hold, once, and let go of what the reservation held: the
- * binding the admission created (only when its attempt is quiet) and the reservation file. A settle
- * already on the ledger is not appended again.
+ * Record a settle on the ledger under the hold, once, and let go of the binding the ledger shows for the
+ * reservation's worktree (the unbind waits for a quiet attempt). A settle already on the ledger is not
+ * appended again.
  *
  * @returns {boolean} whether the settle was appended now
  */
@@ -82,11 +109,9 @@ export function applySettle({ mainRoot, caseId, hold, settle, events = null }) {
   const known = events ?? readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
   const fresh = !known.some((e) => e.type === 'settle' && e.payload?.reservationId === settle.reservationId);
   if (fresh) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId: caseId, event: { type: 'settle', payload: settle }, hold });
-  const file = readReservationFile(mainRoot, caseId, settle.reservationId);
-  if (file?.binding?.created) {
-    unbindWorktree({ mainRoot, hold, caseId, generation: file.binding.generation, key: file.binding.key, worktree: file.worktree });
-  }
-  removeReservationFile({ mainRoot, caseId, reservationId: settle.reservationId });
+  const { worktree } = known.find((e) => e.type === 'reservation' && e.payload?.reservationId === settle.reservationId)?.payload ?? {};
+  const held = worktree ? known.findLast((e) => e.type === 'binding' && e.payload?.worktreeRoot === worktree)?.payload : null;
+  if (held?.state === 'bound') unbindWorktree({ mainRoot, hold, caseId, generation: held.generation, key: held.key, worktree });
   return fresh;
 }
 
@@ -98,14 +123,17 @@ function roundsDir(mainRoot, caseId, stepId) {
   return { file, dir: file.replace(/\.md$/, '.rounds') };
 }
 
-/** The rounds kept under the gate directory of `stepId`, each with `source`: the gate directory and file it was read from. */
-function roundsOf(mainRoot, caseId, stepId) {
+/**
+ * The rounds kept under the gate directory of `stepId`, each with `source`: the gate directory and file it was
+ * read from. A file that cannot be read as input is left out and named in `skipped`.
+ */
+function roundsOf(mainRoot, caseId, stepId, skipped = []) {
   const { dir } = roundsDir(mainRoot, caseId, stepId);
-  return listJson(dir).map((name) => {
-    const record = readJson(path.join(dir, name));
-    return record && typeof record === 'object' ? { ...record, source: { stepId, file: name } } : null;
-  }).filter(Boolean)
-    .sort((a, b) => a.occurrence - b.occurrence || a.round - b.round);
+  return listJson(dir).flatMap((name) => {
+    const { value, problem } = readInbox(path.join(dir, name));
+    if (problem) skipped.push({ file: inboxName(mainRoot, caseId, path.join(dir, name)), problem });
+    return value && typeof value === 'object' ? [{ ...value, source: { stepId, file: name } }] : [];
+  }).sort((a, b) => a.occurrence - b.occurrence || a.round - b.round);
 }
 
 /**
@@ -224,11 +252,11 @@ export function recordGateAnswerRound({ mainRoot, caseId, events, stepId, answer
 }
 
 /** Rounds of any gate of the case whose `gate.answer` event is not on the ledger yet. */
-export function unconsumedGateRounds(mainRoot, caseId, events) {
+export function unconsumedGateRounds(mainRoot, caseId, events, skipped = []) {
   const dir = path.join(runDirOf(mainRoot, caseId), 'gate-answers');
   if (!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir).filter((n) => n.endsWith('.rounds'))
-    .flatMap((name) => roundsOf(mainRoot, caseId, name.slice(0, -'.rounds'.length)))
+    .flatMap((name) => roundsOf(mainRoot, caseId, name.slice(0, -'.rounds'.length), skipped))
     .filter((r) => !roundConsumed(events, r))
     .sort((a, b) => a.answeredAt.localeCompare(b.answeredAt));
 }
@@ -236,58 +264,66 @@ export function unconsumedGateRounds(mainRoot, caseId, events) {
 // --- the drain ----------------------------------------------------------------------------------
 
 /**
- * Fold the runtime inbox into the ledger. Called first by whoever takes `advance`: settles that could not
- * take it, then gate-answer rounds nobody recorded yet. Idempotent: a settle or round already on the
- * ledger is skipped.
+ * What every hold of `advance` does first, in this order: settle the binding records a crash left of this
+ * case, fold in the settles that could not take `advance`, give back the reservations of dead controllers
+ * (after the settles, so a result already on its way is never replaced), then fold in the gate-answer rounds
+ * nobody recorded yet. Idempotent: a settle or round already on the ledger is skipped.
  *
- * A round that fails `roundProblem` stays unfolded and is listed in `refused`.
+ * A round that fails `roundProblem`, a settle that names no reservation of the case and an inbox file that
+ * cannot be read stay where they are and are listed: rounds in `refused`, the rest in `skipped`.
  *
- * @returns {{ settles: number, answers: number, refused: Array<{ stepId: string, occurrence: number, round: number, problem: string }> }}
+ * @returns {{ settles: number, answers: number, refused: Array<{ stepId: string, occurrence: number, round: number, problem: string }>, skipped: Array<{ file: string, problem: string }> }}
  */
 export function drainCaseInbox({ mainRoot, caseId, hold }) {
-  const inbox = [settlePendingDir(mainRoot, caseId), path.join(runDirOf(mainRoot, caseId), 'gate-answers')];
-  if (!inbox.some((dir) => fs.existsSync(dir))) return { settles: 0, answers: 0, refused: [] };
-  let events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
-  const append = (event) => {
-    const stored = appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId: caseId, event, hold });
-    events = [...events, stored];
-  };
-  let settles = 0;
-  let answers = 0;
-
+  const read = () => readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
+  let events = read();
+  repairCaseBindings({ mainRoot, caseId, events });
+  const result = { settles: 0, answers: 0, refused: [], skipped: [] };
   const pendingDir = settlePendingDir(mainRoot, caseId);
-  for (const name of listJson(pendingDir)) {
-    const settle = readJson(path.join(pendingDir, name));
-    if (!settle) continue;
-    if (applySettle({ mainRoot, caseId, hold, settle, events })) settles += 1;
-    events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
-    fs.rmSync(path.join(pendingDir, name), { force: true });
-  }
 
-  const steps = new Set();
-  const refused = [];
-  for (const round of unconsumedGateRounds(mainRoot, caseId, events)) {
-    const problem = roundProblem({ events, round });
-    if (problem) {
-      refused.push({ stepId: round.stepId, occurrence: round.occurrence, round: round.round, problem });
+  for (const name of listJson(pendingDir)) {
+    const file = path.join(pendingDir, name);
+    const { value: settle, problem } = readInbox(file);
+    const unknown = !problem && !events.some((e) => e.type === 'reservation' && e.payload?.reservationId === settle?.reservationId);
+    if (problem || unknown) {
+      result.skipped.push({ file: inboxName(mainRoot, caseId, file), problem: problem ?? 'it settles a reservation this case never made' });
       continue;
     }
-    append({
-      type: 'gate.answer',
-      payload: {
-        stepId: round.stepId,
-        answer: round.answer,
-        approved: round.approved,
-        answeredAt: round.answeredAt,
-        occurrence: round.occurrence,
-        round: round.round,
-        mode: round.mode,
-        subjectDigest: round.subjectDigest,
+    if (applySettle({ mainRoot, caseId, hold, settle, events })) result.settles += 1;
+    events = read();
+    fs.rmSync(file, { force: true });
+  }
+  if (releaseDeadReservations({ mainRoot, caseId, hold, events })) events = read();
+
+  const steps = new Set();
+  for (const round of unconsumedGateRounds(mainRoot, caseId, events, result.skipped)) {
+    const problem = roundProblem({ events, round });
+    if (problem) {
+      result.refused.push({ stepId: round.stepId, occurrence: round.occurrence, round: round.round, problem });
+      continue;
+    }
+    const stored = appendWorkflowEvent({
+      repoRoot: mainRoot,
+      workflowRunId: caseId,
+      hold,
+      event: {
+        type: 'gate.answer',
+        payload: {
+          stepId: round.stepId,
+          answer: round.answer,
+          approved: round.approved,
+          answeredAt: round.answeredAt,
+          occurrence: round.occurrence,
+          round: round.round,
+          mode: round.mode,
+          subjectDigest: round.subjectDigest,
+        },
       },
     });
+    events = [...events, stored];
     steps.add(round.stepId);
-    answers += 1;
+    result.answers += 1;
   }
   for (const stepId of steps) renderGateAnswerFile(mainRoot, caseId, stepId);
-  return { settles, answers, refused };
+  return result;
 }

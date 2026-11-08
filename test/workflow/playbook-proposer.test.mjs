@@ -22,7 +22,6 @@ import {
 import { conductorWorkflow } from '../helpers/workflow-case-fixture.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { projectCase } from '../../src/workflow/case-projection.mjs';
-import { readReservationFiles } from '../../src/workflow/case-runtime.mjs';
 import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
@@ -78,7 +77,7 @@ test('every Unit is admitted before it runs and settled after it, with the propo
   }
   const bindings = events.filter((e) => e.type === 'binding').map((e) => e.payload.state);
   assert.deepEqual(bindings, ['bound', 'unbound'], 'the writing Unit\'s worktree is bound for its attempt only');
-  assert.deepEqual(readReservationFiles(tmp, state.workflowRunId), [], 'no reservation outlives its settle');
+  assert.deepEqual(projectCase(events).liveReservations, [], 'no reservation outlives its settle');
 
   const status = statusWorkflow(state.workflowRunId, opts(tmp));
   assert.equal(status.case.kind, 'playbook');
@@ -242,7 +241,7 @@ test('a proposer killed while its Unit runs leaves the reservation in place; the
   const reservation = mid.find((e) => e.type === 'reservation');
   assert.ok(reservation, 'admitted before it ran');
   assert.equal(mid.some((e) => e.type === 'settle'), false, 'the proposer\'s death settles nothing');
-  assert.deepEqual(readReservationFiles(tmp, id).map((r) => r.reservationId), [reservation.payload.reservationId], 'the reservation is not released');
+  assert.deepEqual(projectCase(mid).liveReservations.map((r) => r.reservationId), [reservation.payload.reservationId], 'the reservation is not released');
 
   await new Promise((resolve) => setTimeout(resolve, 3500)); // the worker that outlived it finishes
   const state = await resumeWorkflow(id, opts(tmp));
@@ -251,7 +250,7 @@ test('a proposer killed while its Unit runs leaves the reservation in place; the
   assert.equal(after.filter((e) => e.type === 'reservation').length, 1, 'the same dispatch, not a second one');
   assert.equal(after.filter((e) => e.type === 'unit.started').length, 1, 'the same Unit run is continued');
   assert.equal(after.find((e) => e.type === 'settle').payload.reservationId, reservation.payload.reservationId);
-  assert.deepEqual(readReservationFiles(tmp, id), []);
+  assert.deepEqual(projectCase(after).liveReservations, []);
 });
 
 test('an answer kept as a file by the detached door is folded in by the next proposer', async () => {

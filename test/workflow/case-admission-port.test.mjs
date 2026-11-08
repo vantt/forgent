@@ -10,6 +10,7 @@ import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { createCaseAdmissionPort, activityUnitOf } from '../../src/workflow/case-admission-port.mjs';
 import { assertCaseAdmissionPort, seatLaunchesOf } from '../../src/runner/execution/case-admission-port.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
+import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { createPendingBinding, readBinding, listBindingRecords } from '../../src/workflow/case-bindings.mjs';
 import { appendAll, FRAME, eventsOf, openCase, projectionOf, withHold, conductorWorkflow } from '../helpers/workflow-case-fixture.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
@@ -57,7 +58,7 @@ test('admit records route and reservation under advance, and lets go of advance'
   hold.release();
 });
 
-test('two writers with overlapping writes: the second is refused at reservation, a disjoint one is admitted', () => {
+test('two writers with overlapping writes: the second is refused at reservation, a disjoint one is admitted', (t) => {
   const run = planned();
   const port = createCaseAdmissionPort({ repoRoot: run.repoRoot });
   const wtA = makeFixtureDir('fgos-port-wt-a-');
@@ -65,6 +66,9 @@ test('two writers with overlapping writes: the second is refused at reservation,
   const wtC = makeFixtureDir('fgos-port-wt-c-');
   const write = (activity, writes, worktree, id) => port.admit(proposal(run, { activity, caseRef: { caseId: run.caseId, activity }, writes, worktree, readOnly: false, unitRunId: id }));
   assert.equal(write('build-a', ['src/a/**'], wtA, 'u1').admitted, true);
+  // A running Unit holds its worktree's custody; a reservation nobody holds custody of is a dead one and is given back.
+  const custody = acquireDispatchCwdLock(path.join(run.repoRoot, '.fgos'), wtA);
+  t.after(() => custody.release());
   const second = write('build-b', ['src/a/deep.mjs'], wtB, 'u2');
   assert.equal(second.refused.code, 'writes-overlap');
   assert.equal(readBinding({ mainRoot: run.repoRoot, worktree: wtB, caseId: run.caseId }).answer, 'unbound', 'a refusal binds nothing');

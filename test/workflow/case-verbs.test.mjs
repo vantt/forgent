@@ -360,3 +360,16 @@ test('answer accepts the activity of a decision point that carries a gate, and r
   const answers = eventsOf(tmp, run.caseId).filter((e) => e.type === 'gate.answer');
   assert.deepEqual(answers.map((e) => [e.payload.stepId, e.payload.mode]), [['approve-gate', 'consent']]);
 });
+
+test('the detached advance child leaves progress lines in advance.log and no dump of its result', async () => {
+  const tmp = setupRepo();
+  const started = startWorkflowDetached({ workflow: validateWorkflow({ id: 'test/log-progress', steps: [{ id: 'only', dependsOn: [] }] }), ...opts(tmp) });
+  const { pid, logPath } = started.detached;
+  const alive = () => { try { process.kill(pid, 0); return true; } catch { return false; } };
+  for (let i = 0; i < 150 && alive(); i += 1) await new Promise((resolve) => setTimeout(resolve, 200));
+  assert.equal(alive(), false, 'the child finished');
+  assert.equal(statusWorkflow(started.caseId, opts(tmp)).status, 'completed');
+  const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
+  assert.ok(lines.some((l) => /step only (started|completed)/.test(l)), lines.join('\n'));
+  assert.ok(lines.every((l) => !l.startsWith('{') && !l.startsWith('"')), `no result JSON in the log: ${lines.join('\n')}`);
+});

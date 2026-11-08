@@ -118,7 +118,7 @@ export function openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide = wo
 
 /**
  * Spawn `fgos workflow resume <id> --foreground` as a detached process whose output goes to
- * advance.log beside the event log. `--foreground` is what keeps the child from detaching again.
+ * advance.log beside the event log (progress lines only; the ledger is the record of the result). `--foreground` is what keeps the child from detaching again.
  */
 export function spawnDetachedAdvance({ mainRoot, workflowRunId, runDir, worktree, cwd, cliPath }) {
   const args = ['workflow', 'resume', workflowRunId, '--dir', mainRoot];
@@ -126,7 +126,7 @@ export function spawnDetachedAdvance({ mainRoot, workflowRunId, runDir, worktree
   args.push('--foreground');
 
   const logPath = path.join(runDir, 'advance.log');
-  const child = spawnDetachedCli({ args, cwd, logPath, cliPath, env: { ...process.env, [ADVANCE_DETACHED_ENV]: '1' } });
+  const child = spawnDetachedCli({ args, cwd, logPath, logStdout: false, cliPath, env: { ...process.env, [ADVANCE_DETACHED_ENV]: '1' } });
   if (child.error) throw new Error(`cannot start the detached advance: ${child.error}`);
   return { pid: child.pid, logPath, statusCommand: `fgos workflow status ${workflowRunId}` };
 }
