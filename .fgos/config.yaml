@@ -238,6 +238,11 @@ mailbox:
     # @fgos:doc Whether this project's mailbox sends mail to, and takes mail from, sessions on other machines. Off until the two-machine proof has passed on every machine. Default: false.
     # @fgos:why [9514b261-1778-4cbd-a231-bec51e3e04d9] cross-machine mail live proof (owner: install through fg-server, guide 261030-0331)
     enabled: true
+  # @fgos:doc Rules for mail that arrives from another machine.
+  remote:
+    # @fgos:doc Whether a message to another machine leaves its body out of the signed event: the body is written to this machine's mail-body ref and pushed before the event is recorded, and the event carries the body's hash and length (payload version 3). Turn it on only when every machine of the project runs a build that takes version 3 (fgos mailbox status names the versions each takes); an older receiver drops such mail. Default: false.
+    # @fgos:why [d1289d42-7a12-4c3e-a3bc-dc1d687aaf99] owner 2026-11-08: bật thường trực trên cả ba máy, dọn tay khi tắt; fg-server2, fg-server, design-lap đều chạy bản có 2d43cdf23
+    bodyRef: true
 # @fgos:doc Remote, timers and retry limit of the event store.
 eventStore:
   # @fgos:doc The sync timer of the event store.
