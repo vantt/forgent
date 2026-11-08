@@ -375,7 +375,7 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
       writes: unit.writes,
       worktree: fs.realpathSync(worktreePath),
       readOnly: !writing,
-      pattern: loop,
+      pattern: collaboration.pin.pattern.name,
       seatLaunches: collaboration.launchBound,
       blind: unit.blind === true,
       handoffRefs: unit.inputs,

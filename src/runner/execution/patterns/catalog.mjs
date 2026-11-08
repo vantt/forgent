@@ -90,7 +90,7 @@ function loosePartsOf(carrier) {
 }
 
 /** Picks the baseline and the explicit selection from the caller, unit and activity selectors. */
-function selectPattern({ unit, selectors, inCase, reason }) {
+function selectPattern({ unit, selectors, inCase }) {
   const callerObjPattern = nonEmptyString(selectors?.callerObject) ?? nonEmptyString(selectors?.callerObject?.pattern);
   const unitPattern = nonEmptyString(unit?.pattern) ?? nonEmptyString(unit?.pattern?.pattern);
   const callerStrPattern = nonEmptyString(selectors?.callerString);
@@ -114,9 +114,6 @@ function selectPattern({ unit, selectors, inCase, reason }) {
   let baseline = explicit[0] ?? (inCase && activityBaseline ? activityBaseline : { name: 'solo', source: 'solo', selector: 'solo' });
   if (isSwap) {
     baseline = activityBaseline;
-    if (!hasReason(reason)) {
-      throw new CollaborationError('request-reason-required', `an explicit pattern swap from "${activityPattern}" to "${selectedName}" in a case requires a reason`);
-    }
   }
   return { baseline, selectedName, isSwap, activityPattern };
 }
@@ -317,7 +314,7 @@ export function resolveCollaboration(options = {}) {
   requirePlainObject(unitPatternObject?.params, 'unit pattern params must be an object');
   const unitDeclared = Object.assign(Object.create(null), unitPatternObject?.params, unit && typeof unit === 'object' ? loosePartsOf(unit) : null, unit?.params);
 
-  const { baseline, selectedName, isSwap, activityPattern } = selectPattern({ unit, selectors, inCase, reason });
+  const { baseline, selectedName, isSwap, activityPattern } = selectPattern({ unit, selectors, inCase });
   const entry = entryNamed(entries, selectedName, 'pattern');
   const loop = entry.loop;
   const paramTable = paramTableOf(loop);

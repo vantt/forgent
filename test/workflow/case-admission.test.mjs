@@ -8,7 +8,7 @@ import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { admitProposal, newReservationId, recheckReservation } from '../../src/workflow/case-admission.mjs';
 import { loadWorkflow } from '../../src/workflow/loader.mjs';
 import { reserveParentFrame, refundParentFrame } from '../../src/workflow/case-frame.mjs';
-import { appendAll, FRAME, openCase, projectionOf, settle, verifyReceipt, withHold, eventsOf } from '../helpers/workflow-case-fixture.mjs';
+import { appendAll, conductorWorkflow, FRAME, openCase, projectionOf, settle, verifyReceipt, withHold, eventsOf } from '../helpers/workflow-case-fixture.mjs';
 
 const UNBOUND = (worktree) => ({ [worktree]: { answer: 'unbound' } });
 
@@ -157,6 +157,34 @@ test('an unlisted route is proposed and recorded with its reason; one violating 
   // A point that lists routes only refuses the way outside the list, reason or not.
   const strict = propose(run, { activity: 'late-rogue', reason: 'because' });
   assert.equal(codes(strict)[0], 'unlisted-route-refused');
+});
+
+/** A guide whose `review` activity declares the `reviewed` pattern; `strict` makes its decision point list routes only. */
+function patternedWorkflow({ strict }) {
+  return conductorWorkflow({
+    milestones: [{ id: 'request-received' }, { id: 'review-done' }],
+    activities: [{ id: 'review', entry: ['request-received'], produces: ['review-done'], effects: 'none', unit: { pattern: 'reviewed' } }],
+    decisions: [{ at: 'request-received', should: ['review'], reason: 'review first', ...(strict ? { listedRoutesOnly: true } : {}) }],
+    must: [],
+    closure: ['review-done'],
+  });
+}
+
+test('running an activity under another pattern than it declares is an unlisted route: a reason is required and the deviation is charged', () => {
+  const run = openCase({ workflow: patternedWorkflow({ strict: false }) });
+  const declared = propose(run, { activity: 'review', pattern: 'reviewed' });
+  assert.equal(declared.events[0].payload.routeKind, 'should', 'the declared pattern is the listed route');
+
+  assert.deepEqual(codes(propose(run, { activity: 'review', pattern: 'solo' })), ['route-reason-required']);
+  const swapped = propose(run, { activity: 'review', pattern: 'solo', reason: 'a lighter check is enough' });
+  assert.equal(swapped.events[0].payload.routeKind, 'unlisted');
+  assert.equal(projectionOf(run).deviations, 1);
+});
+
+test('a pattern swap at a point that lists routes only is refused, reason or not', () => {
+  const run = openCase({ workflow: patternedWorkflow({ strict: true }) });
+  const refused = propose(run, { activity: 'review', pattern: 'solo', reason: 'a lighter check is enough' });
+  assert.deepEqual(codes(refused), ['unlisted-route-refused']);
 });
 
 test('deviations stop at the frame limit: the next one waits for the owner', () => {

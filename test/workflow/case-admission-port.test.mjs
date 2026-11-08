@@ -58,6 +58,21 @@ test('admit records route and reservation under advance, and lets go of advance'
   hold.release();
 });
 
+test('admit passes the Unit\'s selected pattern to the predicate: a swap needs a reason, the declared pattern does not', () => {
+  const run = openCase({ workflow: conductorWorkflow({
+    milestones: [{ id: 'request-received' }, { id: 'review-done' }],
+    activities: [{ id: 'review', entry: ['request-received'], produces: ['review-done'], effects: 'none', unit: { pattern: 'reviewed' } }],
+    decisions: [{ at: 'request-received', should: ['review'], reason: 'review first' }],
+    must: [],
+    closure: ['review-done'],
+  }) });
+  const port = createCaseAdmissionPort({ repoRoot: run.repoRoot });
+  const ask = (pattern, reason) => port.admit(proposal(run, { activity: 'review', caseRef: { caseId: run.caseId, activity: 'review', ...(reason ? { reason } : {}) }, pattern, ...(reason ? { reason } : {}) }));
+  assert.equal(ask('solo').refused.code, 'route-reason-required');
+  assert.equal(ask('solo', 'docs-only task').admitted, true);
+  assert.equal(eventsOf(run).filter((e) => e.type === 'route').at(-1).payload.routeKind, 'unlisted');
+});
+
 test('two writers with overlapping writes: the second is refused at reservation, a disjoint one is admitted', (t) => {
   const run = planned();
   const port = createCaseAdmissionPort({ repoRoot: run.repoRoot });

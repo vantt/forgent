@@ -418,11 +418,11 @@ test('solo-shaped seats with no pattern on reviewed activity refuse seat-multipl
   assert.equal(port.calls.filter((c) => c[0] === 'admit').length, 0);
 });
 
-test('pattern swap in case requires reason and records swap in pin', async () => {
+test('pattern swap in case reaches admission with the selected pattern, and admission alone refuses it without a reason', async () => {
   const { repoRoot, worktreeDir } = setup(['okay']);
-  const port = recordingPort();
+  const port = recordingPort({ admit: (proposal) => (proposal.reason ? { admitted: true, reservationId: 'rsv-test', caseId: 'case-test', seatLaunchCeiling: null } : { refused: { code: 'route-reason-required', condition: 'say why' } }) });
 
-  // Without reason: refuses before admission
+  // Without reason: the catalog lets it through and the port's refusal is what stops it
   await assert.rejects(runUnit({
     unitData: { ...WRITE_UNIT, writes: [], objective: 'Read' },
     pattern: 'solo',
@@ -430,8 +430,8 @@ test('pattern swap in case requires reason and records swap in pin', async () =>
     caseRef: { caseId: 'case-test', activity: 'review' },
     activityUnit: { pattern: 'reviewed' },
     repoRoot, cwd: worktreeDir, worktree: worktreeDir,
-  }));
-  assert.equal(port.calls.filter((c) => c[0] === 'admit').length, 0);
+  }), (err) => err instanceof CaseAdmissionRefusedError && err.code === 'route-reason-required');
+  assert.deepEqual(port.calls.filter((c) => c[0] === 'admit').map((c) => c[1].pattern), ['solo']);
 
   // With reason: runs and pin records swap
   const res = await runUnit({

@@ -216,6 +216,7 @@ function admitUnderHold({ mainRoot, hold, id, proposal, writing }) {
         blind: proposal.blind,
         handoffRefs: proposal.handoffRefs,
         rigor: proposal.rigor,
+        pattern: proposal.pattern,
         seatLaunches: proposal.seatLaunches,
         unitRunId: proposal.unitRunId,
         reason: proposal.caseRef.reason,

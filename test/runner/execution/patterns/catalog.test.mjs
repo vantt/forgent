@@ -1700,18 +1700,9 @@ test('loop parameter bounds constrain request parameters while leaving declarati
   assert.equal(resNullBound.params.maxRounds, 3);
 });
 
-test('case dispatch pattern swap requires a reason and preserves activity pattern invariants', () => {
+// The reason a swap needs is admission's rule (test/workflow/case-admission.test.mjs); the catalog keeps the invariants.
+test('case dispatch pattern swap preserves activity pattern invariants', () => {
   const shipped = shippedCatalog();
-
-  assert.throws(
-    () => resolveCollaboration({
-      selectors: { callerString: 'solo', activityUnit: { pattern: 'code-change' } },
-      inCase: true,
-      runnerConfig: {},
-      shipped,
-    }),
-    (err) => err instanceof CollaborationError && err.code === 'request-reason-required',
-  );
 
   assert.throws(
     () => resolveCollaboration({

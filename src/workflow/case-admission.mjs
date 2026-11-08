@@ -89,6 +89,11 @@ function routeKindOf({ guide, projection, activity, proposal }) {
     // The Playbook proposer is the guide's single SHOULD among the eligible activities.
     return { kind: 'should', governing };
   }
+  // Running the activity under another pattern than the one it declares leaves the listed routes.
+  const declaredPattern = activity.unit?.pattern;
+  if (typeof declaredPattern === 'string' && typeof proposal.pattern === 'string' && proposal.pattern !== declaredPattern) {
+    return { kind: 'unlisted', governing, swappedFrom: declaredPattern };
+  }
   if (governing.some((point) => listed(point.should, activity.id))) return { kind: 'should', governing };
   if (governing.some((point) => listed(point.mayInstead, activity.id))) return { kind: 'may-instead', governing };
   return { kind: governing.length > 0 ? 'unlisted' : 'eligible', governing };
@@ -210,12 +215,15 @@ function guardFrame({ projection, proposal, writing }) {
  * Guard 6, route: listed routes are named as such; the way outside the list needs a reason and is refused
  * where the point lists routes only. Every guard above still applies to it.
  */
-function guardRoute({ projection, proposal, activity, routeKind, governing }) {
+function guardRoute({ projection, proposal, activity, routeKind, governing, swappedFrom }) {
   if (routeKind !== 'unlisted') return [];
   const violations = [];
-  if (!proposal.reason || !String(proposal.reason).trim()) violations.push(violation('route-reason-required', 'route', `"${activity.id}" is not a listed route at ${governing.map((p) => p.at).join(', ')}; say why`));
+  const where = swappedFrom !== undefined
+    ? `"${activity.id}" declares pattern "${swappedFrom}" and this run uses "${proposal.pattern}"`
+    : `"${activity.id}" is not a listed route at ${governing.map((p) => p.at).join(', ')}`;
+  if (!proposal.reason || !String(proposal.reason).trim()) violations.push(violation('route-reason-required', 'route', `${where}; say why`));
   const strict = governing.filter((point) => point.listedRoutesOnly);
-  if (strict.length > 0) violations.push(violation('unlisted-route-refused', 'route', `"${activity.id}" is not a listed route and ${strict.map((p) => p.at).join(', ')} lists routes only`));
+  if (strict.length > 0) violations.push(violation('unlisted-route-refused', 'route', `${swappedFrom !== undefined ? where : `"${activity.id}" is not a listed route`} and ${strict.map((p) => p.at).join(', ')} lists routes only`));
   if (projection.frameRemaining.deviationsBeforeAsk === 0) violations.push(violation('deviation-limit-reached', 'frame-allowance', 'the frame allows no further deviation before asking the owner'));
   return violations;
 }
@@ -227,6 +235,7 @@ function guardRoute({ projection, proposal, activity, routeKind, governing }) {
  * @param {string} input.proposal.activity
  * @param {string} [input.proposal.unitId]
  * @param {string} [input.proposal.decisionPoint] the decision point the choice is made at
+ * @param {string} [input.proposal.pattern] the pattern the run will use; one other than the activity's declared pattern is an unlisted route
  * @param {string} [input.proposal.reason] why, when the route is not a listed one
  * @param {string[]} [input.proposal.writes] repo-relative write scope; empty for a read-only dispatch
  * @param {string} [input.proposal.worktree] the worktree a writing dispatch runs in
@@ -250,8 +259,8 @@ export function admitProposal({ projection, proposal, bindingAnswers = {}, reser
   if (!activity) return refuse([violation('unknown-activity', 'guide', `the guide has no activity "${proposal.activity}"`)]);
 
   const writes = canonicalizeWrites(proposal.writes ?? []);
-  const { kind: routeKind, governing } = routeKindOf({ guide, projection, activity, proposal });
-  const ctx = { projection, proposal, guide, activity, writes, writing: writes.length > 0, bindingAnswers, routeKind, governing };
+  const { kind: routeKind, governing, swappedFrom } = routeKindOf({ guide, projection, activity, proposal });
+  const ctx = { projection, proposal, guide, activity, writes, writing: writes.length > 0, bindingAnswers, routeKind, governing, swappedFrom };
   const violations = [guardEntry, guardMustRows, guardWriteScope, guardBinding, guardFrame, guardRoute].flatMap((guard) => guard(ctx));
   if (violations.length > 0) return refuse(violations);
 
