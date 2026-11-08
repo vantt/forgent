@@ -84,3 +84,47 @@ test('--effort, --timeout and --account reach every seat as overrides that raise
   const result = await simulateUnitBindings(unit, runnerConfig('frontier'), { overrides, session: { headless: true } });
   assert.equal(result.seats.every((seat) => !seat.refused), true, JSON.stringify(result.seats.filter((seat) => seat.refused)));
 });
+
+test('--effort, --timeout and --account are one fallback no seat or origin narrows; a unit that carries its own timeout keeps it', () => {
+  const soloUnit = { id: 'u', capability: 'docs:write' };
+  for (const options of [undefined, null, {}, { effort: null, timeoutMs: null, account: null }]) {
+    assert.deepEqual(unitOverridesOf(soloUnit, [], options), [], 'a run started with none of them adds no override');
+  }
+  assert.deepEqual(unitOverridesOf(soloUnit, [], { effort: 'high' }), [{ reasoningEffort: 'high' }], 'no scope and no origin that claims a person typed it');
+  assert.deepEqual(unitOverridesOf(soloUnit, [], { timeoutMs: 5_400_000 }), [{ timeoutMs: 5_400_000 }]);
+  assert.deepEqual(unitOverridesOf(soloUnit, [], { account: 'node/acct' }), [{ account: 'node/acct', origin: 'workflow' }]);
+
+  // The unit's own timeout wins over the run's, wherever the unit carries it; the other two still apply.
+  for (const own of [{ ...soloUnit, timeoutMs: 120_000 }, { ...soloUnit, template: { timeoutMs: 120_000 } }]) {
+    assert.deepEqual(unitOverridesOf(own, [], { effort: 'low', timeoutMs: 5_400_000 }), [{ reasoningEffort: 'low' }]);
+    assert.deepEqual(unitOverridesOf(own, [], { timeoutMs: 5_400_000 }), [], 'the run timeout alone is dropped for such a unit');
+  }
+});
+
+test('a persona chosen for a seat is an override of that seat alone, with the pinned text, and carries the run options; no other seat has one', () => {
+  const personas = [
+    { seat: 'member-2', name: 'finance-controller', digest: 'd2', text: 't2', identity: 'workspace:fgos/agents/finance-controller' },
+    { seat: 'member-3', name: 'council-assumptions', digest: 'd3', text: 't3' },
+  ];
+  const loopOf = (pattern) => (pattern === 'panel' ? 'panel' : 'solo');
+  const panel = { ...unit, template: { pattern: 'panel' } };
+
+  const named = unitOverridesOf(panel, personas, { loopOf });
+  assert.deepEqual(named.map((o) => [o.scope.unit, o.scope.seat, o.persona, o.origin]), [
+    ['explore-perspectives', 'member-2', 'finance-controller', 'workflow'],
+    ['explore-perspectives', 'member-3', 'council-assumptions', 'workflow'],
+  ], 'no fallback without a run option; the lens seat and the synthesizer have no override');
+  assert.deepEqual(named[0].personaPin, { name: 'finance-controller', digest: 'd2', text: 't2', identity: 'workspace:fgos/agents/finance-controller' });
+  assert.deepEqual(named[1].personaPin, { name: 'council-assumptions', digest: 'd3', text: 't3' }, 'a persona with no identity pins none');
+
+  const withOptions = unitOverridesOf(panel, personas, { loopOf, effort: 'high', timeoutMs: 60_000, account: 'openai/work' });
+  assert.equal(withOptions.length, 3, 'one override per named seat and one fallback');
+  for (const seatOverride of withOptions.slice(0, 2)) {
+    assert.deepEqual([seatOverride.reasoningEffort, seatOverride.timeoutMs, seatOverride.account], ['high', 60_000, 'openai/work']);
+  }
+  assert.equal(withOptions[2].scope, undefined);
+
+  // A pattern that is not a panel, or a door that cannot say what a pattern is, takes no seat persona.
+  assert.deepEqual(unitOverridesOf({ ...unit, template: { pattern: 'solo' } }, personas, { loopOf }), []);
+  assert.deepEqual(unitOverridesOf(panel, personas), []);
+});

@@ -293,3 +293,91 @@ test('a unit.complete written with the full seat evidence folds as before: the n
   assert.equal(full.steps.s1.units.a.outcome, slim.steps.s1.units.a.outcome);
   assert.equal(slim.steps.s1.units.a.results[0].runResult.agentClaim.summary, 's');
 });
+
+// The fold of a case's events into the state a run is read by: what a step, a gate and a unit look like after each event.
+function foldRun(workflow, extra = {}) {
+  const repoRoot = makeFixtureDir('fgos-ledger-fold-');
+  const { workflowRunId } = createWorkflowRun({ repoRoot, workflowId: workflow.id, workflow, ...extra });
+  const read = () => projectWorkflowState(readWorkflowEvents({ repoRoot, workflowRunId }));
+  const appendAll = (...events) => {
+    const hold = acquireAdvanceLock(repoRoot, workflowRunId);
+    try {
+      for (const [type, payload] of events) appendWorkflowEvent({ repoRoot, workflowRunId, event: { type, payload }, hold });
+    } finally {
+      hold.release();
+    }
+  };
+  return { repoRoot, workflowRunId, read, appendAll };
+}
+
+test('a gate parks the run while its question is open and an answer releases it, keeping the answer on the step', () => {
+  const run = foldRun({
+    id: 'test/store-wf',
+    steps: [
+      { id: 's1', dependsOn: [] },
+      { id: 's2', dependsOn: ['s1'], gate: { kind: 'human', question: 'Continue?' } },
+    ],
+  });
+  const started = run.read();
+  assert.equal(started.status, 'running');
+  assert.equal(started.steps.s1.status, 'pending');
+  assert.equal(readWorkflowEvents(run).length, 1);
+
+  run.appendAll(['step.start', { stepId: 's1' }], ['step.complete', { stepId: 's1', outcome: 'pass' }], ['gate.park', { stepId: 's2', question: 'Continue?' }]);
+  const parked = run.read();
+  assert.equal(parked.status, 'parked');
+  assert.equal(parked.questions.length, 1);
+  assert.equal(parked.questions[0].question, 'Continue?');
+
+  run.appendAll(['gate.answer', { stepId: 's2', answer: 'yes', approved: true }]);
+  const answered = run.read();
+  assert.equal(answered.status, 'running');
+  assert.equal(answered.questions.length, 0);
+  assert.equal(answered.steps.s2.answer, 'yes');
+});
+
+test('a completed unit keeps the id of the Unit run that produced it, and a scheduled one has none yet', () => {
+  const workflow = validateWorkflow({
+    id: 'unit-run-id-projection',
+    steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', objective: 'x' } }] }],
+  });
+  const run = foldRun(workflow);
+  const unitOf = () => run.read().steps.s1.units.u1;
+
+  run.appendAll(['unit.scheduled', { stepId: 's1', unitId: 'u1' }]);
+  assert.equal(unitOf().unitRunId, undefined, 'a scheduled unit has no Unit run id yet');
+  run.appendAll(['unit.complete', { stepId: 's1', unitId: 'u1', unitRunId: 'unit-run-123-abcd', outcome: 'pass', results: [] }]);
+  assert.equal(unitOf().unitRunId, 'unit-run-123-abcd');
+});
+
+test('what a run was started with is on its start event and comes back from every later read: request, stance options, context refs, effort, timeout, account and seats; a run started with none of them carries none', () => {
+  const seats = { seats: ['a lens', '@finance-controller'], baseId: 'seat-base', personas: [{ seat: 'member-2', name: 'finance-controller', digest: 'abc', text: 't' }] };
+  const run = foldRun(WORKFLOW, {
+    request: 'Which retainer?', stanceOptions: ['incremental', 'full'], contextRefs: ['owner.txt'], seats, effort: 'high', timeoutMs: 5_400_000, account: 'node/acct-test',
+  });
+  const [start] = readWorkflowEvents(run);
+  assert.deepEqual(
+    [start.payload.request, start.payload.stanceOptions, start.payload.contextRefs, start.payload.effort, start.payload.timeoutMs, start.payload.account],
+    ['Which retainer?', ['incremental', 'full'], ['owner.txt'], 'high', 5_400_000, 'node/acct-test'],
+  );
+  assert.deepEqual(start.payload.seats, seats);
+
+  run.appendAll(['step.start', { stepId: 's1' }], ['step.complete', { stepId: 's1', outcome: 'pass' }], ['workflow.complete', { outcome: 'pass' }]);
+  const state = run.read();
+  assert.equal(state.status, 'completed');
+  assert.deepEqual(
+    [state.request, state.stanceOptions, state.contextRefs, state.effort, state.timeoutMs, state.account],
+    ['Which retainer?', ['incremental', 'full'], ['owner.txt'], 'high', 5_400_000, 'node/acct-test'],
+  );
+  assert.deepEqual(state.seats, seats);
+
+  // A run started with none of them projects none: no seat data, no effort, timeout or account keys.
+  const plainRun = foldRun(WORKFLOW);
+  const plain = plainRun.read();
+  assert.deepEqual([plain.request, plain.stanceOptions, plain.contextRefs], [null, [], []]);
+  const [plainStart] = readWorkflowEvents(plainRun);
+  for (const key of ['seats', 'effort', 'timeoutMs', 'account']) {
+    assert.equal(key in plainStart.payload, false, `start event: ${key}`);
+    assert.equal(key in plain, false, `projection: ${key}`);
+  }
+});

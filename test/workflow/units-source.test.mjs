@@ -146,3 +146,13 @@ test('a workflow definition refuses a unit template with an empty verify or a ma
   assert.throws(() => validateWorkflow(template({ skills: [] })), /skills must be a non-empty array/);
   assert.throws(() => validateWorkflow(template({ skills: ['ok', 3] })), /skills must be a non-empty array/);
 });
+
+test('a unit\'s timeoutMs is carried into its workflow unit template; a unit without one carries none', () => {
+  const file = unitsFile('timed.json', [
+    { id: 'u-default', objective: 'Read', capability: 'docs:write' },
+    { id: 'u-custom', objective: 'Read with own timeout', capability: 'docs:write', timeoutMs: 120000 },
+  ]);
+  const wf = translateUnitsToWorkflow(file);
+  assert.equal(wf.steps[1].units[0].template.timeoutMs, 120000);
+  assert.equal('timeoutMs' in wf.steps[0].units[0].template, false);
+});

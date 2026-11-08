@@ -43,6 +43,7 @@ test('a gate answer is one round file made once; a second answer to an answered 
   const text = fs.readFileSync(answerFile(run), 'utf8');
   assert.match(text, /^---\napproved: yes\noccurrence: 1\nround: 1\nsubjectDigest: sha256:copy\n---/);
   assert.ok(text.includes('Approve the copy?') && text.includes('looks right'));
+  assert.match(text, /### Round at 20\d\d-\d\d-\d\dT[^ ]+ \(Approved\)/, 'the round is dated');
 
   assert.throws(() => answer(run, { answer: 'actually no', approved: false }), (err) => err.code === 'gate-already-answered');
   assert.equal(fs.readFileSync(answerFile(run), 'utf8'), text, 'the answered file did not change');
