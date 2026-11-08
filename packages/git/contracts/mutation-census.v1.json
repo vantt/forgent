@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5d54eb5f5d4e72e518b6bb94ca24a7c008280f73cdfc455870a7e3550c97fab4",
+  "payloadDigest": "0c2e4f913cf64332b0ed1aa65d38beb7bb50ee268c6a63abf3710045b70635d9",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -922,7 +922,7 @@
     "src/git/index.mjs": "c3c78933e8be4cc565bfda7e1878b5f9a7ae57a5c94df42a754180628da29f1c",
     "src/git/inspect.mjs": "f412a1c5d33388c7f44cf68b4eb811e0fc1622975a349908a1173a29528fff47",
     "src/git/land.mjs": "aa9a26de3c4a984d03ff53e498bc34bb4210b29ba1ee3a09b81b11221ffb591f",
-    "src/git/main-checkout-delete-guard.mjs": "80efa4a3b0180ac22dcc42775ba21b53db71e5406c3232cd94e134da1df61ad4",
+    "src/git/main-checkout-delete-guard.mjs": "5d827d14ac2c72a5c842cf4ae57acdea6fba536c6d7d32b9d03aa4fd73aa47c2",
     "src/git/native.mjs": "3a86255cd7b3d703bc7b688795ee3c0805f9d9f670ed6ee683dafdbc3a5a69d2",
     "src/git/recovery.mjs": "7aaf152c8696e4a1954bfb33b9288cac33c8bb67489b3d1c9101bcd7f8010e44",
     "src/git/refs.mjs": "eb8dfa75531652a19f0c524357d8e1c57d54bf281548f3d0e3a7657a4ee18502",

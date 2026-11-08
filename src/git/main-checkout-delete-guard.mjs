@@ -13,6 +13,10 @@
 //   - `rm -r` whose target is a main checkout root, an ancestor of one, or one of its top-level
 //     runtime directories (globs judged by their static directory);
 //   - `find ... -delete` or `-exec rm` whose start path lies in a main checkout or above one.
+// The inner command of `xargs` and `find -exec` is unwrapped (sudo and the like), and a shell's
+// script is judged too: its -c operand or a heredoc fed to it.
+// Scope is mass deletes only: `rm -r` of a deeper path such as `.fgos/installation` is a named
+// delete and stays allowed.
 // A command whose directory or operand cannot be resolved (a variable, a command substitution,
 // `cd -`) is refused when it may run in a main checkout, because nothing proves it is safe.
 //
@@ -22,8 +26,9 @@
 // and the hook runs before every shell call, so it never starts a git process.
 //
 // Directory tracking: `cd T` joined by `&&` narrows the directory to T, since the rest of the
-// and-list runs only when `cd` succeeded. Any `;`, newline, `||`, `|` or `&` puts the directory the
-// and-list started in back into play, because after a failed `cd` the shell keeps going there.
+// and-list runs only when `cd` succeeded; a pipeline binds tighter, so `|` keeps it. Any `;`,
+// newline, `||` or `&` puts the directory the and-list started in back into play, because after a
+// failed `cd` the shell keeps going there. `NAME=literal` and `export NAME=literal` are followed.
 // A subshell or command substitution keeps its `cd` to itself.
 
 import fs from 'node:fs';
@@ -63,12 +68,15 @@ function readSubstitution(src, i, closer) {
 /**
  * Splits `src` into words and operators. A word records its text with known variables expanded,
  * whether any part could not be resolved (`dynamic`), whether it carries an unquoted glob or brace
- * character (`glob`), and the scripts of its command substitutions (`subs`).
+ * character (`glob`), and the scripts of its command substitutions (`subs`). A heredoc or
+ * here-string becomes a `heredoc` item in the command it feeds, carrying its body: a shell reading
+ * it runs the body as its script, any other command reads it as data.
  */
 function* lex(src, vars) {
   const items = [];
   let word = null;
-  const heredocs = [];
+  // Where the next heredoc body starts (the line after the one being read), or null when none is pending.
+  let bodyAt = null;
   const startWord = () => { if (!word) word = { text: '', dynamic: false, glob: false, quoted: false, subs: [] }; };
   const endWord = () => { if (word) items.push({ type: 'word', ...word }); word = null; };
 
@@ -142,7 +150,20 @@ function* lex(src, vars) {
       while (src[i] === ' ' || src[i] === '\t') i += 1;
       const target = [...lex(readRawWord(src, i), {})].find((it) => it.type === 'word');
       i += readRawWord(src, i).length;
-      if (op === '<<' || op === '<<-') heredocs.push({ delimiter: target?.text ?? '', stripTabs: op === '<<-' });
+      if (op === '<<<') items.push({ type: 'heredoc', text: target?.text ?? '', dynamic: Boolean(target?.dynamic) });
+      if (op === '<<' || op === '<<-') {
+        if (bodyAt === null) { const eol = src.indexOf('\n', i); bodyAt = eol < 0 ? src.length : eol + 1; }
+        const delimiter = target?.text ?? '';
+        const lines = [];
+        while (bodyAt < src.length) {
+          const eol = src.indexOf('\n', bodyAt);
+          const line = src.slice(bodyAt, eol < 0 ? src.length : eol);
+          bodyAt = eol < 0 ? src.length : eol + 1;
+          if ((op === '<<-' ? line.replace(/^\t+/, '') : line) === delimiter) break;
+          lines.push(line);
+        }
+        items.push({ type: 'heredoc', text: lines.join('\n'), dynamic: false });
+      }
       continue;
     }
     const op = OPERATORS.find((o) => src.startsWith(o, i));
@@ -150,17 +171,8 @@ function* lex(src, vars) {
       endWord();
       items.push({ type: 'op', op: op === ';;' ? ';' : op === '|&' ? '|' : op });
       i += op.length;
-      if (op === '\n' && heredocs.length) {
-        // Skip every pending heredoc body: its lines are data, not commands.
-        for (const doc of heredocs.splice(0)) {
-          while (i < src.length) {
-            const eol = src.indexOf('\n', i);
-            const line = src.slice(i, eol < 0 ? src.length : eol);
-            i = eol < 0 ? src.length : eol + 1;
-            if ((doc.stripTabs ? line.replace(/^\t+/, '') : line) === doc.delimiter) break;
-          }
-        }
-      }
+      // The heredoc bodies of this line were read with their commands; the shell goes on after them.
+      if (op === '\n' && bodyAt !== null) { i = bodyAt; bodyAt = null; }
       continue;
     }
     startWord();
@@ -290,16 +302,20 @@ function analyze(script, startDirs, vars, ctx, depth) {
   let chainBase = [...dirs];
   const stack = [];
   let words = [];
+  let heredocs = [];
   const union = (a, b) => [...new Set([...a, ...b])];
 
   const runCommand = () => {
     const current = words;
+    const fed = heredocs;
     words = [];
+    heredocs = [];
     if (current.length === 0) return;
     for (const w of current) for (const sub of w.subs) analyze(sub, dirs, { ...vars }, ctx, depth + 1);
     // An assignment-only command sets shell variables for what follows.
-    if (current.every((w) => ASSIGNMENT.test(w.text) && !w.quoted)) {
-      for (const w of current) {
+    const assignments = current[0].text === 'export' && !current[0].quoted && current.length > 1 ? current.slice(1) : current;
+    if (assignments.every((w) => ASSIGNMENT.test(w.text) && !w.quoted)) {
+      for (const w of assignments) {
         const name = w.text.slice(0, w.text.indexOf('='));
         vars[name] = w.dynamic || w.glob ? UNKNOWN : w.text.slice(name.length + 1);
       }
@@ -317,11 +333,12 @@ function analyze(script, startDirs, vars, ctx, depth) {
       dirs.forEach(ctx.noteRoots);
       return;
     }
-    judgeCommand(cmd, dirs, vars, ctx, depth);
+    judgeCommand(cmd, dirs, vars, ctx, depth, fed);
   };
 
   for (const item of items) {
     if (item.type === 'word') { words.push(item); continue; }
+    if (item.type === 'heredoc') { heredocs.push(item); continue; }
     runCommand();
     if (item.op === '(') { stack.push({ dirs, chainBase }); chainBase = [...dirs]; continue; }
     if (item.op === ')') { const saved = stack.pop(); if (saved) ({ dirs, chainBase } = saved); continue; }
@@ -353,7 +370,7 @@ function staticPart(text) {
   return at < 0 ? text : parts.slice(0, at).join('/') || (text.startsWith('/') ? '/' : '.');
 }
 
-function judgeCommand(cmd, dirs, vars, ctx, depth) {
+function judgeCommand(cmd, dirs, vars, ctx, depth, heredocs = []) {
   const name = base(cmd[0]);
   const args = cmd.slice(1);
   const refuse = (form, root) => ctx.reasons.push(root ? `${form} would delete inside the main checkout ${root}` : `${form}: the directory or operand cannot be resolved, so it may run in a main checkout`);
@@ -374,9 +391,14 @@ function judgeCommand(cmd, dirs, vars, ctx, depth) {
 
   if (SHELLS.has(name)) {
     const at = args.findIndex((w) => /^-[a-zA-Z]*c[a-zA-Z]*$/.test(w.text));
-    if (at >= 0 && args[at + 1]) {
-      if (args[at + 1].dynamic) refuseInMain(`${name} -c with a computed script`, dirs, true);
-      else analyze(args[at + 1].text, dirs, { ...vars }, ctx, depth + 1);
+    // The script: the -c operand, else a heredoc or here-string fed to the shell. A script file
+    // operand is not read; a shell left reading its script from a pipe is refused in a main checkout.
+    const script = at >= 0 ? args[at + 1] : heredocs.at(-1);
+    if (script) {
+      if (script.dynamic) refuseInMain(`${name} with a computed script`, dirs, true);
+      else analyze(script.text, dirs, { ...vars }, ctx, depth + 1);
+    } else if (at < 0 && !args.some((w) => !w.text.startsWith('-'))) {
+      refuseInMain(`${name} reading its script from standard input`, dirs, true);
     }
     return;
   }
@@ -399,15 +421,28 @@ function judgeCommand(cmd, dirs, vars, ctx, depth) {
     if (flags.some((w) => /[xX]/.test(w.text))) refuseInMain('git clean -x/-X', gitDirs);
     return;
   }
+  /** The command xargs or find -exec runs: true when it is `rm` (after wrappers such as sudo); a
+   * shell with -c is judged as a command of its own here, so its computed operands are refused. */
+  const runsRm = (words) => {
+    const inner = commandWords(words);
+    if (!inner.length) return false;
+    if (base(inner[0]) === 'rm') return true;
+    if (SHELLS.has(base(inner[0]))) judgeCommand(inner, dirs, vars, ctx, depth + 1);
+    return false;
+  };
   if (name === 'xargs') {
     let k = 0;
     while (k < args.length && args[k].text.startsWith('-')) k += XARGS_ARG_OPTIONS.has(args[k].text) ? 2 : 1;
-    const inner = commandWords(args.slice(k));
-    if (inner.length && base(inner[0]) === 'rm') refuseInMain('xargs rm', dirs);
+    if (runsRm(args.slice(k))) refuseInMain('xargs rm', dirs);
     return;
   }
   if (name === 'find') {
-    const deletes = args.some((w, k) => w.text === '-delete' || (['-exec', '-execdir', '-ok', '-okdir'].includes(w.text) && args[k + 1] && base(args[k + 1]) === 'rm'));
+    let deletes = args.some((w) => w.text === '-delete');
+    for (let k = 0; k < args.length; k += 1) {
+      if (!['-exec', '-execdir', '-ok', '-okdir'].includes(args[k].text)) continue;
+      const end = args.findIndex((w, j) => j > k && (w.text === ';' || w.text === '+'));
+      if (runsRm(args.slice(k + 1, end < 0 ? args.length : end))) deletes = true;
+    }
     if (!deletes) return;
     let k = 0;
     while (k < args.length && /^-[HLP]$|^-O[0-9]$/.test(args[k].text)) k += 1;

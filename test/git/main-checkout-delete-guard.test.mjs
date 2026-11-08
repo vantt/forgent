@@ -122,6 +122,41 @@ test('find -delete or -exec rm under the main checkout is refused, under a workt
   assert.equal(judge('find . -name "*.tmp" -print', main).blocked, false, 'no delete');
 });
 
+test('a heredoc, here-string or pipe that feeds a shell is the shell\'s script and is judged', () => {
+  const { main, worktree } = layout();
+  for (const cmd of [
+    "bash <<'X'\nrm -rf ./*\nX",
+    'sh -s <<EOF\ngit clean -fdx\nEOF',
+    "cat <<'A' > notes.txt; zsh <<'B'\nrm -rf x\nA\nrm -rf .fgos\nB",
+    "bash <<< 'rm -rf .fgos'",
+    "echo 'rm -rf .fgos' | sh",
+  ]) {
+    assert.equal(judge(cmd, main).blocked, true, cmd);
+  }
+  assert.equal(judge("bash <<'X'\nrm -rf ./*\nX", worktree).blocked, false, 'the same script in a linked worktree');
+  assert.equal(judge("cat > run.sh <<'X'\nrm -rf ./*\nX\nbash -n run.sh", main).blocked, false, 'a heredoc fed to cat is data, a script file operand is not read');
+});
+
+test('the inner command of xargs and find -exec is unwrapped through wrappers and shells', () => {
+  const { main, worktree } = layout();
+  for (const cmd of [
+    'find . -exec sudo rm -rf {} +',
+    'find . -name x -exec /bin/rm -f {} \\;',
+    "ls | xargs sh -c 'rm -rf \"$@\"' _",
+    "find . -type d -exec bash -c 'rm -r \"$0\"' {} \\;",
+  ]) {
+    assert.equal(judge(cmd, main).blocked, true, cmd);
+  }
+  assert.equal(judge('find . -exec sudo rm -rf {} +', worktree).blocked, false);
+  assert.equal(judge("find . -name '*.md' -exec grep -l rm {} +", main).blocked, false, 'an -exec that is not rm');
+});
+
+test('export of a literal path is followed like a plain assignment', () => {
+  const { main, worktree } = layout();
+  assert.equal(judge(`export W=${worktree}; cd "$W" && rm -rf ./*`, main).blocked, false);
+  assert.equal(judge('export W=$(pwd); cd "$W"; rm -rf ./*', main).blocked, true);
+});
+
 test('words inside quotes, comments and heredoc bodies are not commands', () => {
   const { main } = layout();
   const commit = `git commit -m "$(cat <<'EOF'\nfix: never xargs rm -rf after a failed cd; git clean -fdx\nEOF\n)"`;
