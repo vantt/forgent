@@ -66,6 +66,9 @@ pub fn is_config_reason(reason: &str) -> bool {
 pub struct CrossMachine {
     pub enabled: bool,
     pub require_confirmed: bool,
+    /// `mailbox.remote.bodyRef`: send as payload version 3, the body kept in this machine's
+    /// mail-body ref.
+    pub body_ref: bool,
     /// `eventStore.remote`; the Event Store's own default when unset.
     pub remote: String,
     /// `eventStore.sync.intervalSec`; 0 turns the scheduled sync off.
@@ -94,6 +97,7 @@ impl CrossMachine {
         Ok(Self {
             enabled: flag(&["mailbox", "crossMachine", "enabled"])?,
             require_confirmed: flag(&["mailbox", "remote", "requireConfirmed"])?,
+            body_ref: flag(&["mailbox", "remote", "bodyRef"])?,
             remote: at(&remote)
                 .and_then(Value::as_str)
                 .ok_or_else(|| refused(&remote, "text"))?
@@ -219,7 +223,7 @@ mod tests {
     ) {
         let snapshot = |enabled: Value, interval: Value| {
             serde_json::json!({
-                "mailbox": { "crossMachine": { "enabled": enabled }, "remote": { "requireConfirmed": true } },
+                "mailbox": { "crossMachine": { "enabled": enabled }, "remote": { "requireConfirmed": true, "bodyRef": true } },
                 "eventStore": { "remote": "upstream", "sync": { "intervalSec": interval } },
             })
         };
@@ -228,6 +232,7 @@ mod tests {
             Ok(CrossMachine {
                 enabled: true,
                 require_confirmed: true,
+                body_ref: true,
                 remote: "upstream".into(),
                 sync_interval_sec: 0
             })

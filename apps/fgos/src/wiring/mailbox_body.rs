@@ -9,13 +9,15 @@
 //! could have brought.
 use fgos_event_store::locks::{APPEND_WAIT_MS, SEAL_NAME};
 use fgos_git::{
-    granted_fetch_mappings, publication_fetch_mappings, HolderAuthority, Inspect, Oid, PathValue,
-    Publication, PublicationPort, RefName, RemoteGrant,
+    granted_fetch_mappings, publication_fetch_mappings, CommitInput, ExpectedTip, HolderAuthority,
+    Identity, Inspect, ObjectType, Oid, PathValue, Publication, PublicationPort, PushOutcome,
+    RefName, RefValue, RemoteGrant, TreeEntry,
 };
 use fgos_holder_lock::{Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::path::Path;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use super::event_store_clone::{self, EventStoreClone};
 use super::mailbox_remote::WIRE_MAX_BODY_BYTES;
@@ -58,9 +60,7 @@ pub fn fetch(main: &Path, remote: &str) -> BodyFetch {
 }
 
 fn try_fetch(main: &Path, remote: &str) -> Result<(), String> {
-    let clone = event_store_clone::open(main)
-        .map_err(|f| format!("{}: {}", f.reason, f.detail))?
-        .ok_or("not a repository")?;
+    let clone = open_clone(main)?;
     // The mapping the clone needs is the granted one the Event Store sync does not require; a clone
     // that has not run setup again lacks it, and nothing is fetched without it.
     let required = publication_fetch_mappings(remote).map_err(|e| format!("{e:?}"))?;
@@ -79,6 +79,28 @@ fn try_fetch(main: &Path, remote: &str) -> Result<(), String> {
     {
         return Err("the mail-body fetch mapping is not installed; run doctor --fix".into());
     }
+    on_body_ref(&clone, remote, None, |port, _| {
+        port.fetch_refs(&clone.repo, remote, std::slice::from_ref(mapping))
+            .map(|_| ())
+            .map_err(|e| format!("body fetch: {e:?}"))
+    })
+}
+
+fn open_clone(main: &Path) -> Result<EventStoreClone, String> {
+    event_store_clone::open(main)
+        .map_err(|f| format!("{}: {}", f.reason, f.detail))?
+        .ok_or_else(|| "not a repository".to_owned())
+}
+
+/// Runs `work` on a publication port bound to this machine's mail-body ref and [`BODY_WRITER`],
+/// under the machine's own `event-seal` hold, after recovering a transfer an earlier run left half
+/// done. Fetch and push share this one door, so both run under the same authority and writer.
+fn on_body_ref<T>(
+    clone: &EventStoreClone,
+    remote: &str,
+    timeout: Option<Duration>,
+    work: impl FnOnce(&PublicationPort<'_>, &RefName) -> Result<T, String>,
+) -> Result<T, String> {
     if !fgos_identity::machine::valid_machine_id(&clone.machine) {
         return Err("this machine id is not a ref component".into());
     }
@@ -96,27 +118,150 @@ fn try_fetch(main: &Path, remote: &str) -> Result<(), String> {
         Acquire::Acquired(handle) => handle,
         other => return Err(format!("event-seal not taken: {other:?}")),
     };
-    let fetched = (|| {
-        let authority =
-            HolderAuthority::new(&clone.repo, &mut handle, &seal, reference, BODY_WRITER)
-                .map_err(|e| format!("{e:?}"))?;
-        let port = PublicationPort::new(&clone.driver, authority).with_remote(RemoteGrant {
+    let done = (|| {
+        let authority = HolderAuthority::new(
+            &clone.repo,
+            &mut handle,
+            &seal,
+            reference.clone(),
+            BODY_WRITER,
+        )
+        .map_err(|e| format!("{e:?}"))?;
+        let mut port = PublicationPort::new(&clone.driver, authority).with_remote(RemoteGrant {
             name: remote.to_owned(),
             pinned_url,
         });
+        if let Some(timeout) = timeout {
+            port = port.with_transport_timeout(timeout);
+        }
         port.recover_own_transfers(&clone.repo)
-            .map_err(|e| format!("body fetch recovery: {e:?}"))?;
-        port.fetch_refs(&clone.repo, remote, std::slice::from_ref(mapping))
-            .map(|_| ())
-            .map_err(|e| format!("body fetch: {e:?}"))
+            .map_err(|e| format!("body transfer recovery: {e:?}"))?;
+        work(&port, &reference)
     })();
-    // A release that cannot be proven is reported, never ignored; the fetch result stands.
+    // A release that cannot be proven is reported, never ignored; the work's result stands.
     let released = fgos_holder_lock::release(handle);
-    match (fetched, released) {
+    match (done, released) {
         (Err(why), _) => Err(why),
-        (Ok(()), fgos_holder_lock::Release::Released { .. }) => Ok(()),
-        (Ok(()), stuck) => Err(format!("event-seal release: {stuck:?}")),
+        (Ok(value), fgos_holder_lock::Release::Released { .. }) => Ok(value),
+        (Ok(_), stuck) => Err(format!("event-seal release: {stuck:?}")),
     }
+}
+
+/// What a body push may take. A send waits on it, so it is bounded well under the publication
+/// port's default; an acknowledgement that did not arrive in time refuses the send.
+const PUSH_TIMEOUT: Duration = Duration::from_secs(30);
+
+/// Stores `body` as one blob, named by its sha256, in the tree of this machine's mail-body ref and
+/// pushes the ref to `remote`; `Ok` only after the remote acknowledged the push. `machine` is the
+/// id the event will name as its sender: a receiver looks the blob up under that id, so a store
+/// that names its refs otherwise is refused.
+///
+/// The new commit holds the tip's tree plus the blob (an absent ref starts empty; a ref this clone
+/// has not written yet continues from its own mirror, so a fresh clone of the machine does not
+/// cut the bodies the remote still holds). A body already in the tree adds nothing but is pushed
+/// again, so a push that failed earlier is made up by the next send of the same text.
+pub fn publish(main: &Path, remote: &str, machine: &str, body: &str) -> Result<(), String> {
+    let clone = open_clone(main)?;
+    if clone.machine != machine {
+        return Err(format!(
+            "the store names this machine {}, not {machine}",
+            clone.machine
+        ));
+    }
+    on_body_ref(&clone, remote, Some(PUSH_TIMEOUT), |port, reference| {
+        let repo = &clone.repo;
+        let failed = |what: &str, e: &dyn std::fmt::Debug| format!("{what}: {e:?}");
+        let own = port
+            .read_ref(repo, reference)
+            .map_err(|e| failed("mail body ref read", &e))?;
+        let (tip, expected) = match own {
+            RefValue::Direct(tip) => (Some(tip.clone()), ExpectedTip::Oid(tip)),
+            RefValue::Absent => {
+                let mirrored = clone
+                    .driver
+                    .resolve_commit_ref(repo, &mirror_ref(remote, machine))
+                    .map_err(|e| failed("mail body mirror read", &e))?;
+                (mirrored, ExpectedTip::Absent)
+            }
+            RefValue::Symbolic(_) => return Err("the mail-body ref is symbolic".into()),
+        };
+        let mut entries = Vec::new();
+        if let Some(tip) = &tip {
+            let mut cursor = None;
+            loop {
+                let page = clone
+                    .driver
+                    .list_tree(repo, tip, b"", cursor, 10_000)
+                    .map_err(|e| failed("mail body tree read", &e))?;
+                for listed in page.entries {
+                    if listed.kind != ObjectType::Blob || listed.path.contains(&b'/') {
+                        return Err("the mail-body ref holds an entry that is not a blob".into());
+                    }
+                    entries.push(TreeEntry {
+                        name: listed.path,
+                        mode: listed.mode,
+                        oid: listed.oid,
+                    });
+                }
+                match page.next_cursor {
+                    Some(next) if !page.complete => cursor = Some(next),
+                    _ => break,
+                }
+            }
+        }
+        let name = sha256_hex(body.as_bytes()).into_bytes();
+        if !entries.iter().any(|e| e.name == name) {
+            let blob = port
+                .write_blob(repo, body.as_bytes())
+                .map_err(|e| failed("mail body write", &e))?;
+            entries.push(TreeEntry {
+                name,
+                mode: 0o100644,
+                oid: blob,
+            });
+            let tree = port
+                .write_tree(repo, &entries)
+                .map_err(|e| failed("mail body tree write", &e))?;
+            let seconds = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map_or(0, |d| d.as_secs());
+            let identity = || Identity {
+                name: "fgOS Mailbox".into(),
+                email: "mailbox@fgos.invalid".into(),
+            };
+            let date = format!("{seconds} +0000");
+            let commit = port
+                .write_commit(
+                    repo,
+                    &CommitInput {
+                        tree,
+                        parents: tip.into_iter().collect(),
+                        author: identity(),
+                        committer: identity(),
+                        author_date: date.clone(),
+                        committer_date: date,
+                        message: b"mail bodies".to_vec(),
+                    },
+                )
+                .map_err(|e| failed("mail body commit", &e))?;
+            let operation = format!("mail-body-{}-{}", std::process::id(), commit.as_str());
+            port.compare_and_swap(
+                repo,
+                reference,
+                &expected,
+                &ExpectedTip::Oid(commit),
+                &operation,
+            )
+            .map_err(|e| failed("mail body ref update", &e))?;
+        }
+        let pushed = port
+            .push_refs(repo, remote, &[(reference.clone(), reference.clone())])
+            .map_err(|e| failed("mail body push", &e))?;
+        match pushed.refs.first() {
+            Some((_, PushOutcome::Accepted)) => Ok(()),
+            other => Err(format!("mail body push not acknowledged: {other:?}")),
+        }
+    })
 }
 
 /// The mirror of `machine`'s mail-body ref in this clone, for fetch remote `remote`.
@@ -189,13 +334,17 @@ impl<'a> BodyMirror<'a> {
     }
 }
 
-/// `blob` is the body of a header that signed `hash` and `bytes`: same digest, same length, text.
-pub fn check(blob: &[u8], hash: &str, bytes: u64) -> Resolved {
-    let digest: String = Sha256::digest(blob)
+/// The sha256 of `bytes` as 64 lowercase hex digits: a body's `bodyHash` and the name of its blob.
+pub fn sha256_hex(bytes: &[u8]) -> String {
+    Sha256::digest(bytes)
         .iter()
         .map(|b| format!("{b:02x}"))
-        .collect();
-    if digest != hash || blob.len() as u64 != bytes {
+        .collect()
+}
+
+/// `blob` is the body of a header that signed `hash` and `bytes`: same digest, same length, text.
+pub fn check(blob: &[u8], hash: &str, bytes: u64) -> Resolved {
+    if sha256_hex(blob) != hash || blob.len() as u64 != bytes {
         return Resolved::Malformed;
     }
     match std::str::from_utf8(blob) {

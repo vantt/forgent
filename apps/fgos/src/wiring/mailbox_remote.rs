@@ -8,10 +8,15 @@
 //! fetch. A local head always wins: this runs only for a name no head of
 //! this record answers.
 //!
+//! With `mailbox.remote.bodyRef` on, the body is not in the event: it is pushed to this machine's
+//! mail-body ref first, and the event, version 3, is appended only once the remote acknowledged
+//! that push (`mailbox_body::publish`).
+//!
 //! Order matters. The attempt is counted (and saved) in one hold of the
 //! record before anything is written to the store, so a failure between the
 //! two can only over-count the sender, never let a cap be passed.
 use super::identity_log::StoreLogDoor;
+use super::mailbox_body;
 use super::mailbox_config::CrossMachine;
 use fgos_identity::current::{current_session, machine_info};
 use fgos_identity::pins::{self, PinState};
@@ -128,10 +133,14 @@ struct Outgoing<'a> {
     body: &'a str,
     reply_to: Option<&'a str>,
     wake: bool,
+    /// The body is kept in this machine's mail-body ref and the event carries only its hash and
+    /// length.
+    body_ref: bool,
 }
 
-/// The event payload of one message, signed. A message that asks for a wake is version 2 under
-/// its own domain; any other is version 1.
+/// The event payload of one message, signed. A message whose body is kept in the mail-body ref is
+/// version 3 under its own domain, a wake being a signed field of it; otherwise a message that
+/// asks for a wake is version 2 under its own domain and any other is version 1.
 fn sent_payload(
     root: &Path,
     msg: &Outgoing<'_>,
@@ -139,26 +148,32 @@ fn sent_payload(
     target: &Target,
 ) -> Result<Value, Refusal> {
     let wake = msg.wake;
+    let (version, domain) = match (msg.body_ref, wake) {
+        (true, _) => (3, SENT_DOMAIN_BODY_REF),
+        (false, true) => (2, SENT_DOMAIN_WAKE),
+        (false, false) => (1, SENT_DOMAIN),
+    };
     let mut payload = json!({
-        "v": if wake { 2 } else { 1 },
+        "v": version,
         "id": msg.id,
         "from": { "id": msg.from, "machine": machine.id },
         "to": { "id": target.id, "machine": target.machine.id },
         "kind": KIND,
-        "body": msg.body,
         "sentAt": iso_utc_now(),
     });
+    if msg.body_ref {
+        payload["bodyHash"] = Value::String(mailbox_body::sha256_hex(msg.body.as_bytes()));
+        payload["bodyBytes"] = Value::from(msg.body.len());
+    } else {
+        payload["body"] = Value::String(msg.body.to_owned());
+    }
     if let Some(reply_to) = msg.reply_to {
         payload["reply_to"] = Value::String(reply_to.to_owned());
     }
     if wake {
         payload["wake"] = Value::Bool(true);
     }
-    sign_payload(
-        root,
-        if wake { SENT_DOMAIN_WAKE } else { SENT_DOMAIN },
-        payload,
-    )
+    sign_payload(root, domain, payload)
 }
 
 /// The signed event that tells a sender what its message came to on this machine: `outcome` is
@@ -213,6 +228,8 @@ pub enum Answer {
 /// How many sends `fgos mailbox status` lists.
 const RECENT_SENDS: usize = 8;
 const PREVIEW_CHARS: usize = 60;
+/// What a listed send shows in place of a body that is kept in the mail-body ref, not in the event.
+const BODY_REF_PREVIEW: &str = "(body in the mail-body ref)";
 
 impl SentSummary {
     pub fn text(&self) -> String {
@@ -327,7 +344,7 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
                 sent_secs: iso_utc_secs(&event.ts).unwrap_or(0),
                 preview: payload["body"]
                     .as_str()
-                    .unwrap_or_default()
+                    .unwrap_or(BODY_REF_PREVIEW)
                     .chars()
                     .take(PREVIEW_CHARS)
                     .collect(),
@@ -497,8 +514,22 @@ pub fn send(
             body,
             reply_to,
             wake,
+            body_ref: cross.body_ref,
         };
         let payload = sent_payload(&root, &msg, &machine, &target)?;
+        // The event names a body that has to be readable by the time any machine can read the
+        // event, so the body is on the remote, acknowledged, before the event exists: a push that
+        // fails or is refused records nothing, and no later sync can publish a header whose body
+        // was never published.
+        if cross.body_ref {
+            mailbox_body::publish(main, &cross.remote, &machine.id, body).map_err(|why| {
+                Refusal {
+                    reason: "body-not-published",
+                    detail: why,
+                    candidates: Vec::new(),
+                }
+            })?;
+        }
         let log = StoreLogDoor
             .open_stream(main, from.as_str(), STREAM)?
             .ok_or_else(|| Refusal {

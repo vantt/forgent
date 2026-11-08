@@ -299,3 +299,8 @@ properties:
         type: boolean
         x-fgos-scope: both
         x-fgos-file: config
+      bodyRef:
+        description: "Whether a message to another machine leaves its body out of the signed event: the body is written to this machine's mail-body ref and pushed before the event is recorded, and the event carries the body's hash and length (payload version 3). Turn it on only when every machine of the project runs a build that takes version 3 (fgos mailbox status names the versions each takes); an older receiver drops such mail."
+        type: boolean
+        x-fgos-scope: both
+        x-fgos-file: config

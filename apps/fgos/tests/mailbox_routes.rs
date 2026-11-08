@@ -2392,7 +2392,8 @@ fn sha256_hex(text: &str) -> String {
 }
 
 /// Appends to alpha's mailbox stream one signed `mailbox.message-sent` for beta's head, the way a
-/// sender of that payload version would; no sender emits version 3 yet.
+/// sender of that payload version would; the receiver tests use it for headers a real send never
+/// leaves (a body that is not on the remote, an event ahead of its body).
 fn append_mail(cross: &Cross, id: &str, mail: &Mail<'_>) {
     use fgos_event_store::{
         append::{append, AppendRequest, EventInput},
@@ -2558,26 +2559,158 @@ fn alpha_refusals(cross: &Cross) -> serde_json::Value {
         .clone()
 }
 
-/// A body pushed before its event reaches the head with one sync of the receiver: the child fetches
-/// the events, then the bodies, then takes the mail, so the header never meets a mirror that lacks
-/// the body its sender already pushed.
+/// Alpha's config with `mailbox.remote.bodyRef` on: its sends keep the body out of the event.
+fn turn_on_body_ref(cross: &Cross) {
+    fs::write(
+        cross.alpha.main().join(".fgos/config.json"),
+        r#"{"mailbox":{"crossMachine":{"enabled":true},"remote":{"bodyRef":true}}}"#,
+    )
+    .unwrap();
+}
+
+/// A send from alpha to beta's head; the verb's output.
+fn alpha_send(cross: &Cross, args: &[&str]) -> Output {
+    let mut argv = vec!["mailbox", "send", "--to", &cross.target];
+    argv.extend_from_slice(args);
+    cross
+        .alpha
+        .run(&cross.alpha.main(), Some("sender-a"), &argv, b"")
+}
+
+/// The remote's tree of alpha's mail-body ref: the blob named `hash`, if the ref has one.
+fn remote_body(cross: &Cross, hash: &str) -> Option<String> {
+    let machine = fgos_identity::machine::read(&cross.alpha_root).unwrap();
+    let remote = cross.alpha.root.join("remote.git");
+    let spec = format!("refs/fgos/mail-bodies/{machine}:{hash}");
+    Command::new("git")
+        .arg("-C")
+        .arg(&remote)
+        .args(["cat-file", "blob", &spec])
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .output()
+        .ok()
+        .filter(|out| out.status.success())
+        .map(|out| String::from_utf8_lossy(&out.stdout).into_owned())
+}
+
+/// With `bodyRef` on a send is version 3: the signed event holds the body's hash and length (and the
+/// wake flag, under the same domain), the body is a blob named by that hash on the sender's mail-body
+/// ref at the remote, and one sync of the receiver delivers it to the head, wake included.
 #[test]
-fn a_body_pushed_before_its_event_is_delivered_by_one_sync_of_the_receiver() {
+fn a_send_with_the_body_ref_on_signs_a_version_three_header_and_the_body_reaches_the_head_through_the_body_ref(
+) {
     let cross = two_machines();
     confirm_alpha_on_beta(&cross);
     install_body_mapping(&cross);
+    turn_on_body_ref(&cross);
     let body = "body that travelled through the body ref";
-    push_bodies(&cross, &[body]);
-    append_mail(&cross, "v3-delivered", &Mail::BodyRef(body));
+    let out = alpha_send(&cross, &["--wake", body]);
+    let text = String::from_utf8_lossy(&out.stdout).into_owned();
+    assert_eq!(out.status.code(), Some(0), "{text} {out:?}");
+    assert!(text.contains("Wake requested"), "{text}");
+
+    let events = sent_events(&cross.alpha_root, &cross.alpha.main());
+    assert_eq!(events.len(), 1, "{events:?}");
+    let mut header = events[0].clone();
+    let hash = sha256_hex(body);
+    assert_eq!(header["v"], 3);
+    assert_eq!(header["bodyHash"], hash.as_str());
+    assert_eq!(header["bodyBytes"], body.len());
+    assert_eq!(header["wake"], true);
+    assert!(
+        header.get("body").is_none(),
+        "the body is not in the event: {header}"
+    );
+    let sig: fgos_identity::Signature =
+        serde_json::from_value(header.as_object_mut().unwrap().remove("sig").unwrap()).unwrap();
+    let canonical = fgos_canonical_json::canonical_json(&header).unwrap();
+    let bytes = format!("fgos-mailbox-message/3\n{canonical}").into_bytes();
+    let verified = fgos_identity::signing::verify(&cross.beta_root, &bytes, &sig).unwrap();
+    assert_eq!(
+        verified.machine_id,
+        header["from"]["machine"].as_str().unwrap()
+    );
+    assert_eq!(
+        remote_body(&cross, &hash).as_deref(),
+        Some(body),
+        "the remote holds the body under the sender's mail-body ref"
+    );
+
     sync_child(&cross.alpha);
     sync_child(&cross.beta);
-
     assert_eq!(cross.beta.message_states().len(), 1);
+    assert!(recorded_wakes(&cross.beta)[0].0, "the wake survived");
     let frame = cross.beta.claude_hook("post-tool-use", &post_tool_use());
     assert!(
         String::from_utf8_lossy(&frame.stdout).contains(body),
         "{frame:?}"
     );
+}
+
+/// Every commit of every event ref the remote holds, with its files, as text.
+fn remote_event_history(cross: &Cross) -> String {
+    let remote = cross.alpha.root.join("remote.git");
+    let refs = git_out(
+        &remote,
+        &["for-each-ref", "--format=%(refname)", "refs/fgos/events/"],
+        "",
+    );
+    refs.lines()
+        .map(|name| git_out(&remote, &["log", "-p", "--format=%H", name], ""))
+        .collect()
+}
+
+/// The body is on the remote, acknowledged, before the event exists. A remote that refuses the body
+/// push makes the send refuse and record nothing: no event is appended, so no sync of either machine
+/// can publish a header without its body; the same send repeated once the remote takes the push
+/// records the event and delivers.
+#[test]
+fn a_body_push_the_remote_refuses_leaves_the_send_unrecorded_and_no_header_published_until_it_is_retried(
+) {
+    use std::os::unix::fs::PermissionsExt;
+    let cross = two_machines();
+    confirm_alpha_on_beta(&cross);
+    install_body_mapping(&cross);
+    turn_on_body_ref(&cross);
+    // The remote cannot create a ref under the mail-body namespace: its directory is read-only.
+    let namespace = cross.alpha.root.join("remote.git/refs/fgos/mail-bodies");
+    fs::create_dir_all(&namespace).unwrap();
+    fs::set_permissions(&namespace, fs::Permissions::from_mode(0o555)).unwrap();
+
+    let body = "body the remote will not take at first";
+    let out = alpha_send(&cross, &[body]);
+    let text = String::from_utf8_lossy(&out.stdout).into_owned();
+    assert_eq!(out.status.code(), Some(1), "{text} {out:?}");
+    assert!(
+        text.contains("not recorded") && text.contains("body-not-published"),
+        "{text}"
+    );
+    assert_eq!(
+        sent_events(&cross.alpha_root, &cross.alpha.main()).len(),
+        0,
+        "a refused body push appends no event"
+    );
+    sync_child(&cross.alpha);
+    sync_child(&cross.beta);
+    sync_child(&cross.alpha);
+    assert!(
+        !remote_event_history(&cross).contains("mailbox.message-sent"),
+        "no header reached the remote while its body is not there"
+    );
+    assert_eq!(cross.beta.message_states().len(), 0);
+
+    fs::set_permissions(&namespace, fs::Permissions::from_mode(0o755)).unwrap();
+    let out = alpha_send(&cross, &[body]);
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    assert_eq!(
+        remote_body(&cross, &sha256_hex(body)).as_deref(),
+        Some(body)
+    );
+    assert_eq!(sent_events(&cross.alpha_root, &cross.alpha.main()).len(), 1);
+    sync_child(&cross.alpha);
+    sync_child(&cross.beta);
+    assert_eq!(cross.beta.message_states().len(), 1);
 }
 
 /// A clone without the mail-body fetch mapping cannot tell a gone body from one it never fetched, so

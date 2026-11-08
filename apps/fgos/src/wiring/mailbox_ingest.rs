@@ -538,6 +538,7 @@ mod tests {
         CrossMachine {
             enabled: true,
             require_confirmed,
+            body_ref: false,
             remote: "origin".into(),
             sync_interval_sec: 60,
         }

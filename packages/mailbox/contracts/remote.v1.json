@@ -28,7 +28,7 @@
       "bodyRefVersion": {
         "v": 3,
         "signingDomain": "fgos-mailbox-message/3\n",
-        "when": "the body leaves the event: the sender writes it to its mail-body ref and signs a header that names it. Receivers take version 3 before any sender writes it",
+        "when": "the body leaves the event, only for a sender whose `mailbox.remote.bodyRef` is on (off by default; turn it on once every machine takes version 3): the sender writes the body to its mail-body ref and pushes that ref, and only when the remote acknowledged the push does it sign and append the header that names it, so no event is ever recorded whose body was not already published. A body push that fails or is refused refuses the send and records nothing. Receivers take version 3 before any sender writes it",
         "replaces": ["body"],
         "adds": [
           { "field": "bodyHash", "type": "string, 64 lowercase hex", "meaning": "sha256 of the body bytes; also the name of the blob that holds the body" },
@@ -63,7 +63,8 @@
     { "key": "mailbox.remote.maxBodyBytes", "default": 2048, "unit": "bytes (UTF-8)", "enforcedAt": "send: the sender refuses a larger body and does not cut it; ingest: the receiver drops an event whose body is larger, counted", "source": "owner-approved V8 plan; lead:ES accepted the figure 2026-10-28" },
     { "key": "mailbox.remote.maxAgeSec", "default": 86400, "unit": "seconds", "enforcedAt": "ingest: an event older than this by the receiver's clock, less skew tolerance, is dropped with a counted reason", "source": "equal to mailbox.record.ttlSec" },
     { "key": "mailbox.remote.clockSkewSec", "default": 300, "unit": "seconds", "enforcedAt": "ingest: tolerance when ageing an event; measured skew between two machines was 0.77 s on 2026-10-28", "status": "placeholder" },
-    { "key": "mailbox.remote.requireConfirmed", "default": true, "unit": "boolean", "enforcedAt": "ingest: only a machine whose key pin is confirmed is accepted; a seen or re-keyed machine is dropped and counted", "source": "identity spec pins" }
+    { "key": "mailbox.remote.requireConfirmed", "default": true, "unit": "boolean", "enforcedAt": "ingest: only a machine whose key pin is confirmed is accepted; a seen or re-keyed machine is dropped and counted", "source": "identity spec pins" },
+    { "key": "mailbox.remote.bodyRef", "default": false, "unit": "boolean", "enforcedAt": "send: when true a message to another machine is sent as payload version 3 and its body is pushed to the sender's mail-body ref first; when false it is sent as version 1 or 2 with the body inline, as before", "source": "mailbox body retention plan, owner approval 2026-11-06" }
   ],
   "refusalsToSender": [
     { "reason": "remote-body-expired", "meaning": "a version 3 message whose body is no longer in the sender's mail-body ref, as found by a body fetch of this sync; the header is all that is left, so the message is not delivered" },
