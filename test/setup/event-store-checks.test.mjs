@@ -18,7 +18,7 @@ test('doctor pass bodies are read-only in a real repo; no implicit repair of cor
   checkEventStore(f.repo, 'event-store-incidents', f.ctx);
   assert.deepEqual(fs.readFileSync(active), before);
 });
-test('incidents is a pointer: it warns past twice the seal interval and never fails, even far past the old failing age', t => {
+test('incidents warns past twice the seal interval and does not fail on unsealed age, even far past the old failing age', t => {
   for (const [age, expected] of [[599, 'pass'], [601, 'warn'], [3601, 'warn']]) {
     const f = fixture(t); append(f.store, [{ ts: new Date(Date.now() - age * 1000).toISOString() }]);
     const got = checkEventStore(f.repo, 'event-store-incidents', f.ctx);
@@ -38,7 +38,9 @@ test('incidents counts orphan branch streams and persisted integrity problems, a
   assert.equal(checkEventStore(f.repo, 'event-store-incidents', f.ctx).message, 'warning: 1 orphan branch stream(s); run `fgos events status`');
   append(f.store, [{}]);
   fs.writeFileSync(path.join(f.repo, '.git/fgos/events/project/integrity.json'), JSON.stringify({ code: 'event-store-ref-moved', ranges: [] }));
-  assert.match(checkEventStore(f.repo, 'event-store-incidents', f.ctx).message, /^warning: 1 orphan branch stream\(s\); 1 integrity problem\(s\); run `fgos events status`$/);
+  const broken = checkEventStore(f.repo, 'event-store-incidents', f.ctx);
+  assert.equal(broken.passed, false, 'an integrity error fails: the store does not heal and events status exits 0');
+  assert.match(broken.message, /^1 orphan branch stream\(s\); 1 integrity problem\(s\); run `fgos events status`$/);
   assert.equal(checkEventStore(f.temp, 'event-store-open-root', { ...f.ctx, trustedMain: f.temp }).passed, false);
 });
 test('incidents reports a peer mirror the reader skipped and the warning the last sync kept for it', async t => {
@@ -52,8 +54,8 @@ test('incidents reports a peer mirror the reader skipped and the warning the las
   remote('update-ref', 'refs/fgos/events/peer-bb', remote('commit-tree', '-m', 'not a seal', remote('mktree')));
   syncUseCase(f.ctx);
   const row = checkEventStore(f.repo, 'event-store-incidents', f.ctx);
-  assert.equal(row.passed, true, 'a pointer never fails');
-  assert.match(row.message, /^warning: 2 integrity problem\(s\); run `fgos events status`$/, 'the skipped mirror and the sync warning are both counted');
+  assert.equal(row.passed, false, 'a skipped peer mirror fails like an integrity error');
+  assert.match(row.message, /^2 integrity problem\(s\); run `fgos events status`$/, 'the skipped mirror and the sync warning are both counted');
 });
 test('shared machine ref warns only after reading another clone origin on the own mirror', async t => {
   const { syncUseCase } = await import('../../src/verbs/events/sync.mjs');
@@ -84,7 +86,7 @@ test('one doctor invocation reuses its status snapshot; a new invocation observe
   append(f.store, [{}]);
   fs.writeFileSync(path.join(f.repo, '.git/fgos/events/project/integrity.json'), JSON.stringify({ code: 'event-store-ref-moved' }));
   assert.equal(check('event-store-incidents').message.startsWith('warning:'), false, 'the run keeps its snapshot');
-  assert.match(eventStoreDoctor(f.repo, f.ctx)('event-store-incidents').message, /^warning: 1 integrity problem/);
+  assert.match(eventStoreDoctor(f.repo, f.ctx)('event-store-incidents').message, /^1 integrity problem/);
 });
 
 test('a doctor run remembers a failed setup context instead of retrying it per row, and doctor reports an unreadable shared config', t => {

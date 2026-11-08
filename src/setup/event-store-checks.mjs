@@ -76,7 +76,9 @@ export function checkEventStore(cwd, kind, options = {}) {
     switch (kind) {
       case 'event-store-machine-id': return status.machineRefShared ? warn(`event-store-machine-ref-shared: ${facts.machineId}; set git config fgos.machineId <other-id> in one clone`) : pass(facts.machineId);
       case 'event-store-incidents': {
-        // A read-only pointer: counts what `fgos events status` reports from the same snapshot, never judges or repairs.
+        // A read-only pointer: counts what `fgos events status` reports from the same snapshot and never repairs. Integrity
+        // problems (errors, skipped peer mirrors, their sync warnings) fail: a broken store does not heal on the normal path
+        // and the status verb always exits 0, so this row is the failing signal. Every other count only warns.
         const age = Math.max(0, ...status.streams.map(s => s.oldestUnsealedAgeSec));
         const integrity = status.integrityErrors.length + status.skippedMirrors.length
           + status.sync.warnings.filter(w => !w.startsWith('event-store-machine-ref-shared:')).length;
@@ -90,12 +92,13 @@ export function checkEventStore(cwd, kind, options = {}) {
           integrity > 0 && `${integrity} integrity problem(s)`,
           unpublished && 'unpublished events',
         ].filter(Boolean);
+        if (integrity > 0) return fail(`${open.join('; ')}; run \`fgos events status\``);
         return open.length > 0 ? warn(`${open.join('; ')}; run \`fgos events status\``) : pass('no unsealed backlog, integrity problem or unpublished event');
       }
       default: throw new Error(`unknown Event Store check: ${kind}`);
     }
   } catch (error) {
-    // A pointer never fails: the open-root row already fails on the same unreadable setup.
+    // The open-root row already fails on the same unreadable setup; the pointer only warns that it could not read.
     return kind === 'event-store-incidents' ? warn(`incidents not read: ${error.message}`) : fail(error.message);
   }
 }
