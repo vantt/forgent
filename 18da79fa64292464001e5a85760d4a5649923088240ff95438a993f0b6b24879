@@ -1,0 +1,1 @@
+MAIL -> RULE: bodyRef is now ON in main (a3eb4a15a). Pull main. Your four refused sends (before-first-sync) were from the broken window, nothing to do. After your pull 'fgos mailbox status' should print 'mail bodies are kept in this machine's mail-body ref'; reply with one line, then I will note it on the board.
