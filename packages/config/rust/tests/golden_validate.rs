@@ -60,9 +60,16 @@ fn a_violation_carries_no_value_of_the_input() {
     assert!(!format!("{violations:?}").contains("sentinel-7c1e"));
 }
 
+/// One runner schema case: its title, the runner yaml, and the (path, rule) refusals it must give.
+type RunnerCase = (
+    &'static str,
+    &'static str,
+    &'static [(&'static str, &'static str)],
+);
+
 /// Each rule the runner schema owns, as the refusal it gives: type, enum, range, required and unknown-key
 /// rules that no Node code repeats. A case with no refusal is a shape the schema must keep accepting.
-const RUNNER_CASES: &[(&str, &str, &[(&str, &str)])] = &[
+const RUNNER_CASES: &[RunnerCase] = &[
     ("executor keeps keys the schema does not name", "executors:\n  x:\n    kind: agent\n    capability: legacy\n", &[]),
     ("default executor adapter is a registered one", "executor:\n  command: node\n  args: []\n  adapter: nope\n", &[("runner.executor.adapter", "enum")]),
     ("executor adapter is a registered one", "executors:\n  x:\n    kind: agent\n    adapter: nope\n", &[("runner.executors.x.adapter", "enum")]),

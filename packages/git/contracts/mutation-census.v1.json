@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "05922a14f46b8f540291b29b64efbcec95dbfe757ca48960641228fde0312a15",
+  "payloadDigest": "43acc06a85ed29ba0761de069de52fa1447933ff40b0f4b5578c4c97a0d4344f",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -251,7 +251,7 @@
     "packages/config/rust/tests/golden_scope.rs": "ebcf9054e332984689d13529f2cbf7c80600cd2272eebaad99cb0cd639084afb",
     "packages/config/rust/tests/golden_snapshot.rs": "5b2c129a24cd0a70bd17008642c82761977f9db35cfbbca57979f0cceacc5dbd",
     "packages/config/rust/tests/golden_standard.rs": "3bd34618f08bf494a9866ed803997e993e625e65ce01543e14c531d93cdeec07",
-    "packages/config/rust/tests/golden_validate.rs": "0a1ac43d68c81e270d127bb3863d22a3d67c139bb21b49e5d39a6b1bc3b3480a",
+    "packages/config/rust/tests/golden_validate.rs": "c424f48adb477a416b14344e6be574429c6315f5abef0eff02597682d7148ff3",
     "packages/config/rust/tests/inspect_verbs.rs": "4f3ec6affc1ec318f53ba8336d5c9c460c59d437bebc5ebd5f462050aa66cb57",
     "packages/config/rust/tests/lock_rows.rs": "271a60b5f310401dbf8f4ea395f6a4c82a60628428c2549d3c16804d89737a41",
     "packages/config/rust/tests/machine_files.rs": "a5f68680b61a0f92b62e466689f09a9591b4014dc5ac217301fdeba4f323149d",
@@ -267,7 +267,7 @@
     "packages/convention/rust/src/operations.rs": "98d5eaa19a1fe20960e7ed8f2e35205dad2e7d470985034020a1400049230a6d",
     "packages/convention/rust/src/provider.rs": "9c7421733033e3355e94f94b6ba64d38801032cd8c53357206c161bde1b997c1",
     "packages/convention/rust/src/rules.rs": "21167e9924715492dd8f6e6e6eeed968e18f8f9a398aa61a1bec754f3cfd7c1e",
-    "packages/convention/rust/tests/golden.rs": "82f235a517b01775e402bcb4ba01dd01d833f5bbf6b1963561253dc4327b4cfa",
+    "packages/convention/rust/tests/golden.rs": "1dcc65df4784f25dbdbe8609765eba2faba6c482da5894cf56523760af7cec03",
     "packages/distribution/rust/examples/print-workspace-shim.rs": "767a8d526d1b030dd4327509a63c9e194ed03fe2ae5a2a263682cd62724dc6d4",
     "packages/distribution/rust/src/canonical.rs": "6393eb2ae3203601b37945293dadcb1385a33b074362d5cf7fa3fe95e8a5c364",
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
