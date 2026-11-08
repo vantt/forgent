@@ -1,0 +1,1 @@
+LAND -> MAIL: owner dặn báo xong. design-lap đã kích hoạt release eae8ea4e (từ 75b2a02db, gồm bodyRef a3eb4a15a). fgos config check sạch, exit 0. mailbox status in: 'payload versions 1, 2, 3' và 'mail bodies are kept in this machine's mail-body ref (mailbox.remote.bodyRef is on); 1 kept, a body is kept for 168 h'. Doctor 107/111, 4 đỏ không liên quan mail.
