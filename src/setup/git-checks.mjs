@@ -1,5 +1,4 @@
 // Thin doctor/setup adapter: repository trust, configuration and WAL parsing stay in Rust.
-import path from 'node:path';
 import { readConfig } from '../config/facade.mjs';
 import { randomUUID } from 'node:crypto';
 import { loadNativeAddon, nativeError } from '../git/native.mjs';
@@ -7,9 +6,6 @@ import { createGitRecovery } from '../git/recovery.mjs';
 import { gitPortOptions } from '../git/inspect.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
-import fs from 'node:fs';
-import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
-import { verifyCensus } from '../../scripts/git-one-door-scan.mjs';
 import { retentionNote } from './git-retention-note.mjs';
 import { eventStoreDoctorOf, eventStoreMappingProblems } from './event-store-checks.mjs';
 import { eventStoreAddonAvailable } from '../event-store/index.mjs';
@@ -96,12 +92,6 @@ export function checkGit(cwd, kind, loaderOptions, portOptions, run) {
     if (kind === 'git-repository-config' && /repository-config-untrusted: credential\.helper/.test(err.message)) return { passed: false, message: `${err.message}; ${transportRemedy}` };
     return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel: onboard this project with `fgctl init`' : err.message };
   }
-}
-/** The release's mutation census (built from its own payload) lists no Git spawn outside the driver. */
-export function checkMutationOneDoor(payloadRoot = OWN_PAYLOAD_ROOT) {
-  let doc = null;
-  try { doc = JSON.parse(fs.readFileSync(path.join(payloadRoot, 'packages/git/contracts/mutation-census.v1.json'), 'utf8')); } catch { /* reported below */ }
-  return verifyCensus(doc, payloadRoot);
 }
 /** The Git binary fgos-git runs and its floor verdict; Git is only ever spawned by the driver. */
 export function gitFloor(cwd, loaderOptions, run) {

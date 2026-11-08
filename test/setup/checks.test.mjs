@@ -6,8 +6,7 @@
 // checks-setup-*.test.mjs bên cạnh.
 //
 // tsk-25b: main đã thêm nhiều check mới (root-drift, leaf-notify-drift,
-// events-jsonl-*, work-*-vocabulary,
-// enduser-docs-index-stale, decision-index-stale, ...) từ sau lần chẻ đầu,
+// events-jsonl-*, work-*-vocabulary, ...) từ sau lần chẻ đầu,
 // khiến file này lại vượt ngưỡng ~30s. Phần drift/vocabulary/index-staleness
 // của chính work-item store ở lại đây; phần config/CLI-wiring/doctor runtime
 // tách sang checks-doctor-config.test.mjs cạnh đó -- cùng D2 (chẻ cơ học,
@@ -17,13 +16,11 @@ import { test } from 'node:test';
 import { writeProjectConfig, writeAccountsFile } from '../helpers/config-fixture.mjs';
 import {
   DOCTOR_CHECKS,
-  FIX_REGISTRATIONS,
   addWork,
   appendEvent,
   assert,
   checkById,
   execFileSync,
-  fixById,
   fs,
   initRepo,
   initStore,
@@ -32,10 +29,7 @@ import {
   path,
   spawnSync,
   withHome,
-  writeEnduserDoc,
-  writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
-import { addDecision } from '../../src/state/store.mjs';
 import { createSession } from '../../src/runner/session.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
@@ -44,15 +38,14 @@ import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 // Keep Git's probe cache in this test process's private temporary tree.
 process.env.FGOS_STATE_ROOT = mkTemp('fgos-checks-state-');
 ensureScriptAddon();
-import { initializeWorkRepository, freezeLegacyWorkFixture } from '../helpers/work-store-release.mjs';
+import { freezeLegacyWorkFixture } from '../helpers/work-store-release.mjs';
 
 // ─── Unit tests: DOCTOR_CHECKS ─────────────────────────────────────────────
 
-test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including instruction-projections-stale', () => {
+test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo-rule row', () => {
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
-      'convention-conformance',
       'main-checkout-hook-wired',
       'node-version-and-git',
       'shell-integration-sourced',
@@ -70,13 +63,11 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'root-drift',
       'leaf-notify-drift',
       'claude-plugin-marketplace',
-      'changelog-unreleased-stale',
       'work-classification-vocabulary',
       'work-step-vocabulary',
       'work-recorded-conflicts',
       'domain-workflow-operations-coverage',
       'delivered-not-on-trunk',
-      'enduser-docs-index-stale',
       'event-store-integrity',
       'event-store-legacy-layout',
       'event-store-machine-id',
@@ -89,7 +80,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'identity-ssh-keygen',
       'identity-project-id',
       'identity-shared-directory',
-      'identity-ids-unique',
       'seat-binding-route',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
@@ -112,7 +102,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'config-global-permissions',
       'config-secret-outside-private',
       'config-migrate-backup-stale',
-      'readme-install-tag-exists',
       'dispatch-decide-hook-wired',
       'codex-hook-wired',
       'agy-hook-wired',
@@ -126,8 +115,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'agent-type-names-unique',
       'domain-registry-compiled',
       'capability-serves-valid',
-      'decision-index-stale',
-      'instruction-projections-stale',
       'doc-registry-stale',
       'doc-alias-broken',
       'doc-active-duplicate',
@@ -151,7 +138,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'git-repository-config',
       'git-operation-journal',
       'git-native-locks',
-      'git-mutation-one-door',
       'terminal-allocations',
       'trust-store-readable',
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
@@ -163,7 +149,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'blind-steps-use-proven-pools',
       'observe-dir-writable',
       'observe-host-resolvable',
-      'observe-run-coverage',
       'executor-confinement',
       'invocation-git-write-grants',
       'herdr-executor-kinds',
@@ -552,266 +537,6 @@ test('work-step-vocabulary lists every violating id, not just the first', () => 
   assert.match(message, /bad-one/);
   assert.match(message, /bad-two/);
   fs.rmSync(dir, { recursive: true, force: true });
-});
-
-// ─── changelog-unreleased-stale (tsk-3ip, docs/history/ ────────────────────
-// automated-changelog-compound-learn/DISCUSSION.md §6.1/§6.4): observe/
-// remind only, never blocks merge. Three required branches per the item's
-// own acceptance criteria: no CHANGELOG.md (normal, not an error); file
-// present with a pending Unreleased entry; file present with Unreleased
-// still empty.
-
-test('changelog-unreleased-stale passes when CHANGELOG.md does not exist', () => {
-  const tmp = mkTemp('fgos-changelog-check-');
-  const { passed, message } = checkById('changelog-unreleased-stale').check(tmp);
-  assert.equal(passed, true);
-  assert.match(message, /not found/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('changelog-unreleased-stale fails when CHANGELOG.md exists but ## [Unreleased] has no pending entries', () => {
-  const tmp = mkTemp('fgos-changelog-check-');
-  fs.writeFileSync(
-    path.join(tmp, 'CHANGELOG.md'),
-    '# Changelog\n\n## [Unreleased]\n\n### Added\n\n### Changed\n\n### Fixed\n\n### Removed\n\n## [0.1.0]\n\n### Added\n\n- baseline\n',
-  );
-  const { passed, message } = checkById('changelog-unreleased-stale').check(tmp);
-  assert.equal(passed, false);
-  assert.match(message, /no pending entries/);
-  assert.match(message, /never blocks merge/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('changelog-unreleased-stale passes when ## [Unreleased] has a pending entry', () => {
-  const tmp = mkTemp('fgos-changelog-check-');
-  fs.writeFileSync(
-    path.join(tmp, 'CHANGELOG.md'),
-    '# Changelog\n\n## [Unreleased]\n\n### Added\n\n- new thing\n\n### Changed\n\n### Fixed\n\n### Removed\n\n## [0.1.0]\n\n### Added\n\n- baseline\n',
-  );
-  const { passed, message } = checkById('changelog-unreleased-stale').check(tmp);
-  assert.equal(passed, true);
-  assert.match(message, /pending entr/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('enduser-docs-index-stale passes when docs/enduser-docs-index.json does not exist yet', () => {
-  const tmp = mkTemp('fgos-enduser-index-check-');
-  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
-  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
-  assert.equal(passed, true);
-  assert.match(message, /not found/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('enduser-docs-index-stale fails and reports a count (not a path list) when a doc on disk is missing from the index', () => {
-  const tmp = mkTemp('fgos-enduser-index-check-');
-  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
-  writeEnduserDoc(tmp, 'how-to', 'second.md', 'Second Doc');
-  writeEnduserManifest(tmp, [
-    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/sample.md', title: 'Sample Doc', sourceCaptureId: null },
-  ]);
-  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
-  assert.equal(passed, false);
-  assert.match(message, /1\/2/);
-  assert.doesNotMatch(message, /second\.md/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('enduser-docs-index-stale passes when the index already covers every on-disk doc', () => {
-  const tmp = mkTemp('fgos-enduser-index-check-');
-  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
-  writeEnduserManifest(tmp, [
-    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/sample.md', title: 'Sample Doc', sourceCaptureId: null },
-  ]);
-  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
-  assert.equal(passed, true);
-  assert.match(message, /1\/1/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('enduser-docs-index-stale fails and reports orphan count when an index entry has no matching doc on disk', () => {
-  const tmp = mkTemp('fgos-enduser-index-check-');
-  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
-  writeEnduserManifest(tmp, [
-    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/sample.md', title: 'Sample Doc', sourceCaptureId: null },
-    { quadrant: 'how-to', purpose: 'x', audience: 'y', docPath: 'docs/how-to/deleted.md', title: 'Deleted Doc', sourceCaptureId: null },
-  ]);
-  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
-  assert.equal(passed, false);
-  assert.match(message, /1 tài liệu dư thừa/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6)', () => {
-  const tmp = mkTemp('fgos-enduser-index-check-');
-  writeEnduserDoc(tmp, 'decisions', '0001-example.md', 'Example Decision');
-  writeEnduserManifest(tmp, []);
-  const { passed, message } = checkById('enduser-docs-index-stale').check(tmp);
-  assert.equal(passed, false);
-  assert.match(message, /1\/1/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('enduser-docs-index-stale fix regenerates the index via the same path fgos docs-index uses, resolving the drift', () => {
-  const tmp = mkTemp('fgos-enduser-index-fix-');
-  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
-  writeEnduserManifest(tmp, []);
-  assert.equal(checkById('enduser-docs-index-stale').check(tmp).passed, false);
-
-  const { changed, message } = fixById('enduser-docs-index-stale').fix(tmp);
-  assert.equal(changed, true);
-  assert.match(message, /regenerated/);
-
-  const after = checkById('enduser-docs-index-stale').check(tmp);
-  assert.equal(after.passed, true);
-  assert.match(after.message, /1\/1/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('enduser-docs-index-stale fix is idempotent -- a second run reports changed:false', () => {
-  const tmp = mkTemp('fgos-enduser-index-fix-');
-  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
-  fs.writeFileSync(path.join(tmp, 'docs', 'enduser-docs-index.json'), '[]\n');
-  fixById('enduser-docs-index-stale').fix(tmp);
-  const second = fixById('enduser-docs-index-stale').fix(tmp);
-  assert.equal(second.changed, false);
-  assert.match(second.message, /already up to date/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('outside the fgOS source repo, doctor --fix never creates the end-user or decision index -- it only refreshes an adopted one', () => {
-  const tmp = mkTemp('fgos-outside-project-fixes-');
-  const fgosDir = initializeWorkRepository(tmp);
-  initStore(fgosDir);
-  writeEnduserDoc(tmp, 'how-to', 'sample.md', 'Sample Doc');
-  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
-
-  assert.match(fixById('enduser-docs-index-stale').fix(tmp).message, /skipped/);
-  assert.match(fixById('decision-index-stale').fix(tmp).message, /skipped/);
-  assert.equal(checkById('decision-index-stale').check(tmp).passed, true);
-  assert.equal(fs.existsSync(path.join(tmp, 'docs', 'enduser-docs-index.json')), false);
-  assert.equal(fs.existsSync(path.join(tmp, 'docs', 'decisions', 'index.md')), false);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-// A fixture that looks like the fgOS source repo, where the decision index is
-// mandatory and doctor --fix creates it; any other project only refreshes it.
-function markFgosSourceCheckout(root) {
-  fs.mkdirSync(path.join(root, 'apps', 'fgos'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'apps', 'fgos', 'Cargo.toml'), '[package]\nname = "fgos"\n');
-}
-
-test('decision-index-stale passes when docs/decisions/index.md does not exist yet (tsk-1lv review-fix F10)', () => {
-  const tmp = mkTemp('fgos-decision-index-check-');
-  const fgosDir = initializeWorkRepository(tmp);
-  initStore(fgosDir);
-  const { passed, message } = checkById('decision-index-stale').check(tmp);
-  assert.equal(passed, true);
-  assert.match(message, /not found/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('decision-index-stale fails when state.decisions has a scope-carrying decision the on-disk index does not reflect', () => {
-  const tmp = mkTemp('fgos-decision-index-check-');
-  const fgosDir = initializeWorkRepository(tmp);
-  initStore(fgosDir);
-  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\n\n_No platform/repo-wide decisions recorded yet._\n');
-  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
-
-  const { passed, message } = checkById('decision-index-stale').check(tmp);
-  assert.equal(passed, false);
-  assert.match(message, /stale/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('decision-index-stale passes when the on-disk index already matches state.decisions', () => {
-  const tmp = mkTemp('fgos-decision-index-check-');
-  const fgosDir = initializeWorkRepository(tmp);
-  initStore(fgosDir);
-  markFgosSourceCheckout(tmp);
-  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
-  fixById('decision-index-stale').fix(tmp);
-
-  const { passed, message } = checkById('decision-index-stale').check(tmp);
-  assert.equal(passed, true);
-  assert.match(message, /up to date/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('decision-index-stale fix regenerates the index via the same path fgos decision-index uses, resolving the drift', () => {
-  const tmp = mkTemp('fgos-decision-index-fix-');
-  const fgosDir = initializeWorkRepository(tmp);
-  initStore(fgosDir);
-  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '# Decisions index\n\n_No platform/repo-wide decisions recorded yet._\n');
-  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
-  assert.equal(checkById('decision-index-stale').check(tmp).passed, false);
-
-  const { changed, message } = fixById('decision-index-stale').fix(tmp);
-  assert.equal(changed, true);
-  assert.match(message, /regenerated/);
-
-  const after = checkById('decision-index-stale').check(tmp);
-  assert.equal(after.passed, true);
-  const indexContent = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
-  assert.match(indexContent, /D-ADR9999: example/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('decision-index-stale fix is idempotent -- a second run reports changed:false', () => {
-  const tmp = mkTemp('fgos-decision-index-fix-');
-  const fgosDir = initializeWorkRepository(tmp);
-  initStore(fgosDir);
-  markFgosSourceCheckout(tmp);
-  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
-  fixById('decision-index-stale').fix(tmp);
-  const second = fixById('decision-index-stale').fix(tmp);
-  assert.equal(second.changed, false);
-  assert.match(second.message, /already up to date/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('decision-index-stale check FAILS when the index is missing but state.decisions has real rows to index -- H2 tsk-1lv round-2 regression (a missing index with real decisions to project is drift, not "nothing to check")', () => {
-  const tmp = mkTemp('fgos-decision-index-check-');
-  const fgosDir = initializeWorkRepository(tmp);
-  initStore(fgosDir);
-  markFgosSourceCheckout(tmp);
-  addDecision(fgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
-
-  const { passed, message } = checkById('decision-index-stale').check(tmp);
-  assert.equal(passed, false);
-  assert.match(message, /not found/);
-  assert.doesNotMatch(message, /nothing to check/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('decision-index-stale check and fix preserve committed decisions absent from the local store', () => {
-  const tmp = mkTemp('fgos-decision-index-fix-');
-  const populatedFgosDir = initializeWorkRepository(tmp);
-  initStore(populatedFgosDir);
-  markFgosSourceCheckout(tmp);
-  addDecision(populatedFgosDir, { text: 'D-ADR9999: example', rationale: 'r', scope: 'example-area', relation: 'none' });
-  fixById('decision-index-stale').fix(tmp);
-  const before = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
-
-  // Simulate the real-world trigger: the .fgos store this check/fix pair
-  // reads from is unreadable/empty relative to an already-populated
-  // on-disk index -- exactly what a fresh clone or a worktree missing
-  // .fgos/ (ADR0020) looks like once this branch's own committed index.md
-  // lands.
-  fs.rmSync(populatedFgosDir, { recursive: true, force: true });
-
-  let result;
-  assert.doesNotThrow(() => {
-    result = fixById('decision-index-stale').fix(tmp);
-  });
-  assert.equal(result.changed, false);
-  assert.equal(checkById('decision-index-stale').check(tmp).passed, true);
-
-  const after = fs.readFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), 'utf8');
-  assert.equal(after, before, 'the real index must survive the refused fix untouched');
-  fs.rmSync(tmp, { recursive: true, force: true });
 });
 
 // ─── capability-serves-valid (I19, core/skills/_shared/capability-matching.md) ───

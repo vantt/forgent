@@ -5,12 +5,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
-import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
-import { checkConventionConformance } from '../../src/setup/registrations.mjs';
+import { checkConventionConformance } from '../../scripts/convention-conformance.mjs';
 
 function initSourceRepo(t) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-convention-doctor-'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-convention-conformance-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const git = (args) => execFileSync('git', args, {
     cwd: root,
@@ -23,8 +23,8 @@ function initSourceRepo(t) {
     fs.writeFileSync(destination, content);
   };
   git(['init', '-q', '-b', 'main']);
-  git(['config', 'user.name', 'Convention doctor fixture']);
-  git(['config', 'user.email', 'convention-doctor@example.invalid']);
+  git(['config', 'user.name', 'Convention conformance fixture']);
+  git(['config', 'user.email', 'convention-conformance@example.invalid']);
   put('apps/fgos/Cargo.toml', '[package]\nname="fixture"\n');
   put('plans/reports/old-bad.md');
   git(['add', 'apps/fgos/Cargo.toml', 'plans/reports/old-bad.md']);
@@ -44,34 +44,18 @@ function violation(relativePath) {
   };
 }
 
-test('convention-conformance is registered once in the doctor registry', () => {
-  assert.equal(DOCTOR_CHECKS.filter((entry) => entry.id === 'convention-conformance').length, 1);
-});
-
-test('convention doctor pass-skips outside the fgOS source repository', (t) => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-convention-consumer-'));
-  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-  let called = false;
-  const result = checkConventionConformance(root, {
-    hostRunner: () => { called = true; },
-  });
-  assert.equal(called, false);
-  assert.equal(result.passed, true);
-  assert.match(result.message, /not the fgOS source repository/);
-});
-
-test('convention doctor pass-skips missing, old, and failed hosts with the reason', (t) => {
+test('convention conformance fails, naming the reason, when the host is missing, old or failed', (t) => {
   const { root } = initSourceRepo(t);
   for (const code of ['host-unavailable', 'host-version-mismatch', 'host-exec-error', 'host-invalid-envelope']) {
     const result = checkConventionConformance(root, {
       hostRunner: () => { const error = new Error(`${code} detail`); error.code = code; throw error; },
     });
-    assert.equal(result.passed, true, code);
+    assert.equal(result.passed, false, code);
     assert.match(result.message, new RegExp(code), code);
   }
 });
 
-test('convention doctor passes for pre-cutoff violations but fails for post-cutoff violations', (t) => {
+test('convention conformance passes for pre-cutoff violations but fails for post-cutoff violations', (t) => {
   const { root, cutoff } = initSourceRepo(t);
   const oldViolation = violation('plans/reports/old-bad.md');
   const newViolation = violation('plans/reports/new-bad.md');
@@ -94,7 +78,7 @@ test('convention doctor passes for pre-cutoff violations but fails for post-cuto
 });
 
 // One wiring proof only: path/placement cases belong to Convention's Rust golden suite.
-test('convention doctor honors native blocking posture without applying the historical warning cutoff', (t) => {
+test('convention conformance honors native blocking posture without applying the historical warning cutoff', (t) => {
   const { root } = initSourceRepo(t);
   const result = checkConventionConformance(root, {
     hostRunner: () => ({ checked: 1, violations: [{ ...violation('docs/specs/new.md'), posture: 'block' }] }),
@@ -104,7 +88,7 @@ test('convention doctor honors native blocking posture without applying the hist
   assert.match(result.message, /placement refused: 1 blocking/);
 });
 
-test('convention doctor reports a clean host result as passed', (t) => {
+test('convention conformance reports a clean host result as passed', (t) => {
   const { root } = initSourceRepo(t);
   const result = checkConventionConformance(root, {
     hostRunner: () => ({ checked: 12, violations: [] }),
@@ -113,4 +97,11 @@ test('convention doctor reports a clean host result as passed', (t) => {
     passed: true,
     message: 'convention check passed: 12 scoped file(s), no violations',
   });
+});
+
+// The wiring proof over the real repository and the real host.
+test('this repository has no blocking convention violation and no post-cutoff naming violation', () => {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  const result = checkConventionConformance(root);
+  assert.equal(result.passed, true, result.message);
 });

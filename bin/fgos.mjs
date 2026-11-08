@@ -102,7 +102,7 @@ import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktre
 import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { withMainCheckout } from '../src/runner/repo-locks.mjs';
-import { gitPortOptions, gitWriter } from '../src/git/inspect.mjs';
+import { commitAt, gitPortOptions, gitWriter, pathExistsAt } from '../src/git/inspect.mjs';
 import { nativeError } from '../src/git/native.mjs';
 import { createGitSafeRestore } from '../src/git/restore.mjs';
 import { HolderLockError, createLockScope } from '../src/holder-lock/index.mjs';
@@ -223,8 +223,7 @@ function changedFilesSince(cwd, from, to) {
 
 // Whether HEAD of `repoRoot` holds `relativePath` (a blob or a tree); false outside a repository or
 // before the first commit.
-async function existsAtHead(repoRoot, relativePath) {
-  const { pathExistsAt, commitAt } = await import('../src/setup/registrations.mjs');
+function existsAtHead(repoRoot, relativePath) {
   try { return pathExistsAt(repoRoot, commitAt(repoRoot, 'HEAD'), relativePath); } catch { return false; }
 }
 
@@ -1593,7 +1592,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
 
         const repoRoot = path.dirname(dir);
-        if (!(await existsAtHead(repoRoot, targetDoc.currentPath))) {
+        if (!(existsAtHead(repoRoot, targetDoc.currentPath))) {
           throw new StoreError(
             'validation',
             `doc promote: file '${targetDoc.currentPath}' is not committed at git HEAD. Remedy: commit file '${targetDoc.currentPath}' to git HEAD before promoting.`
@@ -1654,7 +1653,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const resolved = resolveDocPath(view, docPath);
 
         const repoRoot = path.dirname(dir);
-        if (!(await existsAtHead(repoRoot, docPath))) {
+        if (!(existsAtHead(repoRoot, docPath))) {
           throw new StoreError('validation', `knowledge attest: path '${docPath}' is not committed at git HEAD. Remedy: commit file '${docPath}' to git HEAD first.`);
         }
 
@@ -1748,7 +1747,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // while their tags still claimed they existed.
       if (docPath !== undefined) {
         const repoRoot = path.dirname(dir);
-        if (!(await existsAtHead(repoRoot, docPath))) {
+        if (!(existsAtHead(repoRoot, docPath))) {
           throw new StoreError('validation', `compound: --doc-path "${docPath}" is not committed at the main checkout's HEAD ("${repoRoot}") — write and commit the document there before tagging it.`);
         }
         // docs/platform/work-state/contracts/knowledge-registry.md §8: "The new
@@ -2983,9 +2982,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // quadrant dir is skipped cleanly, never a crash. All I/O (readdir,
     // first-H1 extraction, folding the event log, writing the manifest)
     // lives in enduser-index-generate.mjs's `generateEnduserDocsIndex`
-    // (tsk-1m0: extracted from this case so the enduser-docs-index-stale
-    // doctor check/fix can share the identical generation path, never a
-    // duplicate); `buildEnduserIndex` itself stays a PURE transform (zero
+    // (tsk-1m0: extracted from this case); `buildEnduserIndex` itself stays a PURE transform (zero
     // imports, mirrors entropy.mjs) that only assembles the manifest rows
     // and resolves each doc's `sourceCaptureId` by matching `docPath`
     // against the rebuilt outcomes view (D13's fidelity/back-link
@@ -3012,9 +3009,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // one true root regardless of where this command was invoked from.
       //
       // The actual enumeration/fold/write logic lives in
-      // enduser-index-generate.mjs (tsk-1m0) — the one generation path this
-      // verb shares with the enduser-docs-index-stale doctor check/fix
-      // (src/setup/registrations.mjs), so neither duplicates the other.
+      // enduser-index-generate.mjs (tsk-1m0) — the one generation path of this verb.
       const repoRoot = path.dirname(dir);
       const { path: manifestRelPath, count, entries } = generateEnduserDocsIndex(repoRoot, dir);
       return { path: manifestRelPath, count, entries };

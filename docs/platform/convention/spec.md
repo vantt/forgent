@@ -261,7 +261,7 @@ Golden data must include every kind × supported operation success, every stable
 
 ## 10. Doctor and release behavior
 
-`convention-conformance` is a registered doctor check and is listed in the Packaging-Distribution check registry and legacy distribution spec. It calls the thin client against the caller's working-tree top level.
+Conformance of this source repository is a repository test, not a doctor row: `test/scripts/convention-conformance.test.mjs` runs `scripts/convention-conformance.mjs`, which calls the thin client with `--all` against the repository root. Any `block`-posture violation fails regardless of path age; a `warn`-posture violation fails only for a path introduced after the rule cutoff; a host that cannot answer fails by name.
 
 - Native `block`-posture violations: `passed: false` regardless of cutoff or path age.
 - Pre-cutoff `warn`-posture naming violations: `passed: true` with counts and at most three examples.
@@ -339,7 +339,7 @@ The merge-by-rule-id semantic is reserved, but overlay location, setup merge, do
   `resolveContentRoot` in `src/runner/paths.mjs`. They resolve storage and
   execution roots rather than documentation conventions. Move one only when
   its caller is host-owned; do not add a process spawn to a hot path.
-- The source pre-commit hook and `convention-conformance` doctor check now call
+- The source pre-commit hook and the repository conformance test now call
   Convention through the thin Node client.
 - No current JavaScript source generates report names from a duplicated
   template. `scripts/measure-verify-cost.mjs` writes a fixed historical name;

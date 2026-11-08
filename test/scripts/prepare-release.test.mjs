@@ -61,6 +61,12 @@ test('updateChangelogText moves Unreleased entries under the release heading', (
   assert.match(next, /## \[v0\.1\.0\] - 2026-01-01/);
 });
 
+test('updateChangelogText refuses a release whose Unreleased section is empty or missing', () => {
+  const released = '## [v0.1.0] - 2026-01-01\n\n### Added\n\n- Bootstrap.\n';
+  assert.throws(() => updateChangelogText(`# Changelog\n\n## [Unreleased]\n\n${released}`, 'v0.2.0', '2026-09-18'), /no Unreleased entries/);
+  assert.throws(() => updateChangelogText(`# Changelog\n\n${released}`, 'v0.2.0', '2026-09-18'), /does not contain "## \[Unreleased\]"/);
+});
+
 test('prepareRelease writes package files and changelog, but never tags', () => {
   const root = tmpRepo();
   const result = prepareRelease({
