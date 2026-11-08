@@ -41,6 +41,7 @@ GitHub's unreachable objects keep what they saw, even after step 7. Windows sche
    **Landed 2026-11-08 (`340c86f9a`, `833da4b4a`, OPC MERGE):** `mailbox.remote.bodyRef` (default false). With it on, `send` signs v3, builds the tree on the fetched mirror (union of mirror, own tip and the new blob), pushes under a lease on the local mirror tip, and appends the event only after the push is accepted; a refused push records nothing (`body-not-published`). No machine has the setting on yet.
 5. **Rotation.** Every 7 days the owner machine builds a new root with the bodies younger than 7 days and
    replaces the ref under the lease. `fgos mailbox status` lists the oldest body kept.
+   **Landed 2026-11-08 (`54f883f07`, `ded0fdd1a`, OPC MERGE):** key `mailbox.remote.bodyLifetimeSec` (604800, refused below 86700 = receiver's age limit + skew); age from the signed `sentAt` of every clone's verified sends of this machine; orphan blobs dropped after a 600 s grace; the leased push refuses a rotation if the remote moved since the fetch. **Open (owner's call):** a machine that turns `bodyRef` off keeps its last bodies on the remote until it is on again, because rotating while off would break "off changes nothing".
 6. **Proof on two machines.** Send, receive, rotate, show the expired state; add the numbers to the existing
    cross-machine report.
 
