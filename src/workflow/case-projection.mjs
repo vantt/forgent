@@ -76,6 +76,145 @@ function remaining(limit, used) {
   return isCount(limit) ? Math.max(0, limit - used) : null;
 }
 
+// A milestone reached again for the same subject keeps what an earlier guard left on it: the receipts of a
+// settle and of a gate answer sit side by side, and consent once given is not dropped by a later receipt.
+function achieve({ milestones }, id, digest, extra = {}) {
+  if (!(id in milestones)) return;
+  const prior = milestones[id];
+  const same = prior.state === 'achieved' && prior.digest === (digest ?? null);
+  const { receipt, ...fields } = extra;
+  const receipts = [...(same ? prior.receipts ?? [] : []), ...(fields.receipts ?? []), ...(receipt ? [receipt] : [])];
+  const consent = (same && prior.consent === true) || fields.consent === true;
+  milestones[id] = {
+    ...(same ? prior : {}),
+    state: 'achieved',
+    digest: digest ?? null,
+    ...fields,
+    ...(receipts.length > 0 || fields.receipts !== undefined ? { receipts } : {}),
+    ...(fields.consent !== undefined || (same && prior.consent !== undefined) ? { consent } : {}),
+  };
+}
+
+const activityOf = ({ guide }, id) => guide?.activities.find((a) => a.id === id);
+
+/** One fold per event type, each over the same context, applied in ledger order. */
+const CASE_FOLD = {
+  'case.opened'(ctx, _event, p) {
+    achieve(ctx, 'request-received', p.requestDigest);
+    // Taken over from a closed case of the same plan; the source and its receipts stay on the milestone.
+    for (const item of p.inherits?.milestones ?? []) {
+      achieve(ctx, item.milestone, item.subjectDigest, { receipts: item.receipts ?? [], outcome: item.outcome ?? null, inherited: { fromCase: p.inherits.fromCase } });
+    }
+  },
+  'step.complete'(ctx, _event, p) {
+    // The step's own milestone (and any the guide says it settles); a digest recorded by the
+    // settle of its units is already there and stays.
+    for (const id of activityOf(ctx, p.stepId)?.produces ?? []) {
+      if (ctx.milestones[id]?.state === 'unreached') achieve(ctx, id, p.subjectDigest);
+    }
+  },
+  'gate.answer'(ctx, _event, p) {
+    const mode = ctx.legacy.steps[p.stepId]?.gate?.mode ?? p.mode ?? 'consent';
+    if (!(mode === 'input' || p.approved === true)) return;
+    const receipt = { kind: 'gate-answer', evaluator: 'gate-answer', passed: true, approved: p.approved === true, answeredAt: p.answeredAt ?? null };
+    for (const id of p.milestones ?? activityOf(ctx, p.stepId)?.produces ?? []) {
+      // A milestone that needs a verify receipt is reached only by the settle that carries one.
+      if (isDeliveryMilestone(ctx.guide, id)) continue;
+      achieve(ctx, id, p.subjectDigest ?? null, { receipt, consent: mode === 'consent' });
+    }
+  },
+  reservation(ctx, _event, p) {
+    ctx.reservations.set(p.reservationId, { ...p, settled: false });
+  },
+  settle(ctx, _event, p) {
+    const reservation = ctx.reservations.get(p.reservationId);
+    if (reservation) Object.assign(reservation, { settled: true, outcome: p.outcome, seatLaunchesUsed: p.seatLaunchesUsed ?? null, unitRunId: p.unitRunId ?? reservation.unitRunId ?? null });
+    if (p.frameExhausted) ctx.frameExhausted = true;
+    if (p.blind && p.unitRunId) ctx.blindUnitRuns.set(p.unitRunId, p.activity ?? reservation?.activity ?? null);
+    for (const item of p.achieved ?? []) {
+      const delivery = isDeliveryMilestone(ctx.guide, item.milestone);
+      const accepted = (p.outcome === 'pass' && (!delivery || (p.receipts ?? []).some((r) => isValidReceipt(r, item.milestone, item.subjectDigest))))
+        || (p.outcome === 'findings' && !delivery);
+      if (accepted) achieve(ctx, item.milestone, item.subjectDigest, { receipts: p.receipts ?? [], outcome: p.outcome });
+      else ctx.refusedAchievements.push({ milestone: item.milestone, reservationId: p.reservationId, reason: delivery && p.outcome === 'pass' ? 'receipt-missing' : `outcome-${p.outcome}` });
+    }
+  },
+  route(ctx, event, p) {
+    ctx.routes.push({ ...p, seq: event.seq });
+  },
+  binding(ctx, _event, p) {
+    if (p.state === 'unbound') ctx.bindings.delete(p.key ?? p.worktreeRoot);
+    else ctx.bindings.set(p.key ?? p.worktreeRoot, { ...p });
+  },
+  'case.closed'(ctx, _event, p) {
+    ctx.closed = { closedAt: p.closedAt ?? null, reason: p.reason ?? null };
+  },
+};
+
+/** A parked gate blocks the milestones its step produces, with the question that blocks it. */
+function blockParkedGates(ctx) {
+  for (const question of ctx.legacy.questions) {
+    for (const id of activityOf(ctx, question.stepId)?.produces ?? []) {
+      if (ctx.milestones[id]?.state === 'unreached') ctx.milestones[id] = { state: 'blocked', question: question.question };
+    }
+  }
+}
+
+/** A milestone recorded with a digest is stale once its subject has another one now. */
+function markStaleMilestones({ milestones }, currentDigests) {
+  for (const [id, entry] of Object.entries(milestones)) {
+    if (entry.state !== 'achieved' || entry.digest === null || !(id in currentDigests)) continue;
+    const current = currentDigests[id];
+    if (current === entry.digest) continue;
+    milestones[id] = { ...entry, state: 'stale', prior: entry.digest, current: current ?? null, ...(current == null ? { reason: 'current-digest-unknown' } : {}) };
+  }
+}
+
+/** What the frame has spent and what is left of it. */
+function frameUse(frame, all, routes) {
+  // A reservation given back (refunded, or its run never started) spends nothing of the frame.
+  const counting = all.filter((r) => !(r.settled && (r.outcome === 'refunded' || r.outcome === 'not-started')));
+  const used = {
+    dispatches: counting.reduce((sum, r) => sum + (r.counters?.dispatches ?? 1), 0),
+    mutatingDispatches: counting.reduce((sum, r) => sum + (r.counters?.mutatingDispatches ?? 0), 0),
+  };
+  const deviations = routes.filter((r) => r.routeKind === 'unlisted').length;
+  const frameRemaining = {
+    dispatches: remaining(frame?.dispatches, used.dispatches),
+    mutatingDispatches: remaining(frame?.mutatingDispatches, used.mutatingDispatches),
+    deviationsBeforeAsk: remaining(frame?.deviationsBeforeAsk, deviations),
+    seatLaunchesPerDispatch: isCount(frame?.seatLaunchesPerDispatch) ? frame.seatLaunchesPerDispatch : null,
+    fallbackPerSeat: isCount(frame?.fallbackPerSeat) ? frame.fallbackPerSeat : null,
+    rigorFloor: frame?.rigorFloor ?? null,
+  };
+  return { used, deviations, frameRemaining };
+}
+
+/** The decision points of the guide, each open once the milestone it stands at is achieved. */
+function routePointsOf({ guide, milestones }) {
+  return (guide?.decisions ?? []).map((d) => ({
+    at: d.at,
+    open: milestones[d.at]?.state === 'achieved',
+    should: d.should,
+    mayInstead: d.mayInstead,
+    reason: d.reason,
+    listedRoutesOnly: d.listedRoutesOnly,
+    ...(d.gate ? { gate: d.gate } : {}),
+  }));
+}
+
+/** Why the case cannot be closed now, empty when it can. */
+function closureReasonsOf({ guide, legacy, milestones, closed }) {
+  const reasons = [];
+  if (closed) reasons.push('case-closed');
+  for (const id of guide?.closure ?? []) if (milestones[id]?.state === 'stale') reasons.push(`closure-milestone-stale:${id}`);
+  for (const question of legacy.questions) {
+    const mode = legacy.steps[question.stepId]?.gate?.mode ?? 'consent';
+    if (mode === 'consent') reasons.push(`consent-gate-parked:${question.stepId}`);
+  }
+  return reasons;
+}
+
 /**
  * @param {Array<object>} events the ledger
  * @param {object} [options]
@@ -92,149 +231,29 @@ export function projectCase(events, { currentDigests = {}, state: legacy = proje
 
   const milestones = {};
   for (const m of guide?.milestones ?? []) milestones[m.id] = { state: 'unreached' };
-  // A milestone reached again for the same subject keeps what an earlier guard left on it: the receipts of a
-  // settle and of a gate answer sit side by side, and consent once given is not dropped by a later receipt.
-  const achieve = (id, digest, extra = {}) => {
-    if (!(id in milestones)) return;
-    const prior = milestones[id];
-    const same = prior.state === 'achieved' && prior.digest === (digest ?? null);
-    const { receipt, ...fields } = extra;
-    const receipts = [...(same ? prior.receipts ?? [] : []), ...(fields.receipts ?? []), ...(receipt ? [receipt] : [])];
-    const consent = (same && prior.consent === true) || fields.consent === true;
-    milestones[id] = {
-      ...(same ? prior : {}),
-      state: 'achieved',
-      digest: digest ?? null,
-      ...fields,
-      ...(receipts.length > 0 || fields.receipts !== undefined ? { receipts } : {}),
-      ...(fields.consent !== undefined || (same && prior.consent !== undefined) ? { consent } : {}),
-    };
+  const ctx = {
+    guide,
+    legacy,
+    milestones,
+    reservations: new Map(),
+    bindings: new Map(),
+    routes: [],
+    blindUnitRuns: new Map(),
+    refusedAchievements: [],
+    closed: null,
+    frameExhausted: false,
   };
-  const achieveIfUnreached = (id, digest) => {
-    if (milestones[id]?.state === 'unreached') achieve(id, digest);
-  };
-  const activityOf = (id) => guide?.activities.find((a) => a.id === id);
+  for (const event of events) if (Object.hasOwn(CASE_FOLD, event.type)) CASE_FOLD[event.type](ctx, event, event.payload ?? {});
+  blockParkedGates(ctx);
+  markStaleMilestones(ctx, currentDigests);
 
-  const reservations = new Map();
-  const bindings = new Map();
-  const routes = [];
-  const blindUnitRuns = new Map();
-  const refusedAchievements = [];
-  let closed = null;
-  let frameExhausted = false;
-
-  for (const event of events) {
-    const p = event.payload ?? {};
-    switch (event.type) {
-      case 'case.opened':
-        achieve('request-received', p.requestDigest);
-        // Taken over from a closed case of the same plan; the source and its receipts stay on the milestone.
-        for (const item of p.inherits?.milestones ?? []) {
-          achieve(item.milestone, item.subjectDigest, { receipts: item.receipts ?? [], outcome: item.outcome ?? null, inherited: { fromCase: p.inherits.fromCase } });
-        }
-        break;
-      case 'step.complete':
-        // The step's own milestone (and any the guide says it settles); a digest recorded by the
-        // settle of its units is already there and stays.
-        for (const id of activityOf(p.stepId)?.produces ?? []) achieveIfUnreached(id, p.subjectDigest);
-        break;
-      case 'gate.answer': {
-        const mode = legacy.steps[p.stepId]?.gate?.mode ?? p.mode ?? 'consent';
-        const settles = mode === 'input' || p.approved === true;
-        if (!settles) break;
-        const receipt = { kind: 'gate-answer', evaluator: 'gate-answer', passed: true, approved: p.approved === true, answeredAt: p.answeredAt ?? null };
-        for (const id of p.milestones ?? activityOf(p.stepId)?.produces ?? []) {
-          // A milestone that needs a verify receipt is reached only by the settle that carries one.
-          if (isDeliveryMilestone(guide, id)) continue;
-          achieve(id, p.subjectDigest ?? null, { receipt, consent: mode === 'consent' });
-        }
-        break;
-      }
-      case 'reservation':
-        reservations.set(p.reservationId, { ...p, settled: false });
-        break;
-      case 'settle': {
-        const reservation = reservations.get(p.reservationId);
-        if (reservation) Object.assign(reservation, { settled: true, outcome: p.outcome, seatLaunchesUsed: p.seatLaunchesUsed ?? null, unitRunId: p.unitRunId ?? reservation.unitRunId ?? null });
-        if (p.frameExhausted) frameExhausted = true;
-        if (p.blind && p.unitRunId) blindUnitRuns.set(p.unitRunId, p.activity ?? reservation?.activity ?? null);
-        for (const item of p.achieved ?? []) {
-          const delivery = isDeliveryMilestone(guide, item.milestone);
-          const accepted = (p.outcome === 'pass' && (!delivery || (p.receipts ?? []).some((r) => isValidReceipt(r, item.milestone, item.subjectDigest))))
-            || (p.outcome === 'findings' && !delivery);
-          if (accepted) achieve(item.milestone, item.subjectDigest, { receipts: p.receipts ?? [], outcome: p.outcome });
-          else refusedAchievements.push({ milestone: item.milestone, reservationId: p.reservationId, reason: delivery && p.outcome === 'pass' ? 'receipt-missing' : `outcome-${p.outcome}` });
-        }
-        break;
-      }
-      case 'route':
-        routes.push({ ...p, seq: event.seq });
-        break;
-      case 'binding':
-        if (p.state === 'unbound') bindings.delete(p.key ?? p.worktreeRoot);
-        else bindings.set(p.key ?? p.worktreeRoot, { ...p });
-        break;
-      case 'case.closed':
-        closed = { closedAt: p.closedAt ?? null, reason: p.reason ?? null };
-        break;
-      default:
-        break;
-    }
-  }
-
-  // A parked gate blocks the milestones its step produces, with the question that blocks it.
-  for (const question of legacy.questions) {
-    for (const id of activityOf(question.stepId)?.produces ?? []) {
-      if (milestones[id]?.state === 'unreached') milestones[id] = { state: 'blocked', question: question.question };
-    }
-  }
-
-  // A milestone recorded with a digest is stale once its subject has another one now.
-  for (const [id, entry] of Object.entries(milestones)) {
-    if (entry.state !== 'achieved' || entry.digest === null || !(id in currentDigests)) continue;
-    const current = currentDigests[id];
-    if (current === entry.digest) continue;
-    milestones[id] = { ...entry, state: 'stale', prior: entry.digest, current: current ?? null, ...(current == null ? { reason: 'current-digest-unknown' } : {}) };
-  }
-
-  const all = [...reservations.values()];
-  // A reservation given back (refunded, or its run never started) spends nothing of the frame.
-  const counting = all.filter((r) => !(r.settled && (r.outcome === 'refunded' || r.outcome === 'not-started')));
-  const used = {
-    dispatches: counting.reduce((sum, r) => sum + (r.counters?.dispatches ?? 1), 0),
-    mutatingDispatches: counting.reduce((sum, r) => sum + (r.counters?.mutatingDispatches ?? 0), 0),
-  };
-  const deviations = routes.filter((r) => r.routeKind === 'unlisted').length;
-  const frameRemaining = {
-    dispatches: remaining(frame?.dispatches, used.dispatches),
-    mutatingDispatches: remaining(frame?.mutatingDispatches, used.mutatingDispatches),
-    deviationsBeforeAsk: remaining(frame?.deviationsBeforeAsk, deviations),
-    seatLaunchesPerDispatch: isCount(frame?.seatLaunchesPerDispatch) ? frame.seatLaunchesPerDispatch : null,
-    fallbackPerSeat: isCount(frame?.fallbackPerSeat) ? frame.fallbackPerSeat : null,
-    rigorFloor: frame?.rigorFloor ?? null,
-  };
-
-  const eligible = closed ? [] : (guide?.activities ?? [])
+  const all = [...ctx.reservations.values()];
+  const { used, deviations, frameRemaining } = frameUse(frame, all, ctx.routes);
+  const eligible = ctx.closed ? [] : (guide?.activities ?? [])
     .filter((a) => a.entry.every((id) => milestones[id]?.state === 'achieved'))
     .map((a) => a.id);
-
-  const points = (guide?.decisions ?? []).map((d) => ({
-    at: d.at,
-    open: milestones[d.at]?.state === 'achieved',
-    should: d.should,
-    mayInstead: d.mayInstead,
-    reason: d.reason,
-    listedRoutesOnly: d.listedRoutesOnly,
-    ...(d.gate ? { gate: d.gate } : {}),
-  }));
-
-  const closureReasons = [];
-  if (closed) closureReasons.push('case-closed');
-  for (const id of guide?.closure ?? []) if (milestones[id]?.state === 'stale') closureReasons.push(`closure-milestone-stale:${id}`);
-  for (const question of legacy.questions) {
-    const mode = legacy.steps[question.stepId]?.gate?.mode ?? 'consent';
-    if (mode === 'consent') closureReasons.push(`consent-gate-parked:${question.stepId}`);
-  }
+  const points = routePointsOf(ctx);
+  const closureReasons = closureReasonsOf(ctx);
 
   return {
     caseId: legacy.workflowRunId ?? null,
@@ -243,26 +262,26 @@ export function projectCase(events, { currentDigests = {}, state: legacy = proje
     guideRef: opened?.payload?.guide ?? null,
     frame,
     status: legacy.status,
-    open: !closed,
-    closed,
+    open: !ctx.closed,
+    closed: ctx.closed,
     milestones,
-    refusedAchievements,
+    refusedAchievements: ctx.refusedAchievements,
     reservations: all,
     // A nested case's charge spends frame but is no attempt that may still be running.
     liveReservations: all.filter((r) => !r.settled && !r.nested),
-    blindUnitRuns,
+    blindUnitRuns: ctx.blindUnitRuns,
     frameUsed: used,
     frameRemaining,
-    frameExhausted,
+    frameExhausted: ctx.frameExhausted,
     deviations,
-    routes,
+    routes: ctx.routes,
     eligible,
     routePoints: points,
     // The way outside the list is always shown: it needs a reason, MUST rules still apply to it, and a
     // listed-routes-only point refuses it by name.
     unlistedPath: { proposable: true, requires: 'reason', refusedAt: points.filter((d) => d.listedRoutesOnly).map((d) => d.at) },
     openGates: legacy.questions,
-    bindings: [...bindings.values()],
+    bindings: [...ctx.bindings.values()],
     closable: { ok: closureReasons.length === 0, reasons: closureReasons },
   };
 }

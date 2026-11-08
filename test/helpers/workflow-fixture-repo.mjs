@@ -12,7 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { withProviderFamilies } from './provider-families.mjs';
 import { makeFixtureDir } from './fixture-dir.mjs';
 import { capabilityServedBy, writeProjectConfig } from './config-fixture.mjs';
-import { activateGitFixture } from './git-fixture.mjs';
+import { activateGitFixture, initFixtureRepo } from './git-fixture.mjs';
 
 /**
  * @param {object} options
@@ -23,6 +23,8 @@ import { activateGitFixture } from './git-fixture.mjs';
  * @param {string} options.workerBody Worker code that writes the unit's outputs into `runDir`
  * @param {object} [options.modelPolicies] Model policy per provider model
  * @param {object} [options.reviewed] The `reviewed` pattern config
+ * @param {string} [options.ignore] `.gitignore` text; given, the repo starts from a seed commit that carries it
+ * @param {(name: string) => object} [options.capabilityEntry] The config entry of one capability
  * @returns {string} The repo root
  */
 export function setupWorkflowFixtureRepo({
@@ -34,16 +36,22 @@ export function setupWorkflowFixtureRepo({
   // A cell for every tier a seat of a shipped workflow may recommend (a panel judge asks for flagship, one design seat for frontier).
   modelPolicies = { node: { standard: 'node-std', flagship: 'node-high', frontier: 'node-top' } },
   reviewed = { maxRounds: 1, checkersByRigor: { standard: ['reviewer'] } },
+  ignore,
+  capabilityEntry = (name) => capabilityServedBy('test-node', name),
 }) {
   const tmp = makeFixtureDir(prefix);
-  execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.name', gitName], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['config', 'user.email', 'wf@test.local'], { cwd: tmp, stdio: 'ignore' });
+  if (ignore === undefined) {
+    execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.name', gitName], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 'wf@test.local'], { cwd: tmp, stdio: 'ignore' });
+  } else {
+    initFixtureRepo(tmp, { branch: 'main', ignore });
+  }
 
   fs.writeFileSync(path.join(tmp, 'README.md'), `${readme}\n`);
   execFileSync('git', ['add', 'README.md'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'initial commit'], { cwd: tmp, stdio: 'ignore' });
-  activateGitFixture(tmp);
+  if (ignore === undefined) activateGitFixture(tmp);
 
   const echoScript = path.join(tmp, 'echo-worker.mjs');
   fs.writeFileSync(
@@ -80,7 +88,7 @@ export function setupWorkflowFixtureRepo({
           invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
         },
       },
-      capabilities: Object.fromEntries(capabilities.map((name) => [name, capabilityServedBy('test-node', name)])),
+      capabilities: Object.fromEntries(capabilities.map((name) => [name, capabilityEntry(name)])),
       patterns: { seatBinding: { schema: 1 } },
       loops: {
         reviewed,

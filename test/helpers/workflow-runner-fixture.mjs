@@ -7,10 +7,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync, spawn } from 'node:child_process';
+import { spawn } from 'node:child_process';
 
-import { initFixtureRepo } from './git-fixture.mjs';
-import { makeFixtureDir } from './fixture-dir.mjs';
+import { setupWorkflowFixtureRepo } from './workflow-fixture-repo.mjs';
 import { writeProjectConfig, readProjectConfig } from './config-fixture.mjs';
 import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
@@ -27,59 +26,19 @@ const FIXTURE_SEAT_TIMEOUT_MS = 45_000;
 
 /** A repository with one executor (`test-node`) whose worker writes a done report for every unit it is given. */
 export function setupTestRepo() {
-  const tmp = makeFixtureDir('fgos-wf-test-');
-  initFixtureRepo(tmp, { branch: 'main', ignore: '.fgos/\necho-worker.mjs\n' });
-
-  fs.writeFileSync(path.join(tmp, 'README.md'), '# Workflow Test\n');
-  execFileSync('git', ['add', 'README.md'], { cwd: tmp, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'initial commit'], { cwd: tmp, stdio: 'ignore' });
-
-  const echoScript = path.join(tmp, 'echo-worker.mjs');
-  fs.writeFileSync(
-    echoScript,
-    `
-    import fs from 'node:fs';
-    import path from 'node:path';
-    const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
-    let runDir;
-    if (match) {
-      runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
-      fs.mkdirSync(runDir, { recursive: true });
+  return setupWorkflowFixtureRepo({
+    prefix: 'fgos-wf-test-',
+    readme: '# Workflow Test',
+    gitName: 'Test',
+    ignore: '.fgos/\necho-worker.mjs\n',
+    capabilities: ['docs:write', 'code:implement'],
+    capabilityEntry: () => ({ prefer: [{ executor: 'test-node' }], rigor: 'standard', tier: 'standard' }),
+    modelPolicies: { node: { standard: 'node-std' } },
+    reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } },
+    workerBody: `
       fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nAssignment execution completed successfully with full report content.\\n');
-      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
-    }
-    `,
-  );
-
-  fs.mkdirSync(path.join(tmp, '.fgos'), { recursive: true });
-  writeProjectConfig(tmp, {
-    runner: {
-      defaultExecutor: 'test-node',
-      defaults: { tier: 'standard' },
-      modelPolicies: { node: { standard: 'node-std' } },
-      executors: {
-        'test-node': {
-          kind: 'agent',
-          description: 'Test node executor',
-          allowCrossProvider: true,
-          command: process.execPath,
-          args: [echoScript, '{prompt}'],
-          providerModel: 'node',
-          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
-        },
-      },
-      capabilities: {
-        'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard', tier: 'standard' },
-        'code:implement': { prefer: [{ executor: 'test-node' }], rigor: 'standard', tier: 'standard' },
-      },
-      patterns: { seatBinding: { schema: 1 } },
-      loops: {
-        reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } },
-      },
-    },
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));`,
   });
-  return tmp;
 }
 
 /** Panel seats: `n` producers and a synthesizer. */
