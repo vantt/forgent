@@ -38,6 +38,7 @@ GitHub's unreachable objects keep what they saw, even after step 7. Windows sche
    `git-repository-config` is green on each, so no `doctor --fix` was needed for the mapping (fg-server2 release `b99f0ca2`, design-lap `0a4455cc`).
 4. **Mailbox: sender switches to v3.** (Condition: the body push is acknowledged before the event is appended; test it on the sender side.) Write the body to the body ref, push it before the event ref, keep
    v2 only for a receiver that has not been upgraded (decided by a per-remote setting, off by default).
+   **Landed 2026-11-08 (`340c86f9a`, `833da4b4a`, OPC MERGE):** `mailbox.remote.bodyRef` (default false). With it on, `send` signs v3, builds the tree on the fetched mirror (union of mirror, own tip and the new blob), pushes under a lease on the local mirror tip, and appends the event only after the push is accepted; a refused push records nothing (`body-not-published`). No machine has the setting on yet.
 5. **Rotation.** Every 7 days the owner machine builds a new root with the bodies younger than 7 days and
    replaces the ref under the lease. `fgos mailbox status` lists the oldest body kept.
 6. **Proof on two machines.** Send, receive, rotate, show the expired state; add the numbers to the existing
