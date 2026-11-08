@@ -5,10 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
-
-// Set by a detached advance for the process it spawns; that process carries the decision made
-// by the caller that spawned it, so it does not warn a second time.
-const ADVANCE_DETACHED_ENV = 'FGOS_WORKFLOW_ADVANCE_DETACHED';
+import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 
 function realOrResolved(p) {
   try {
@@ -39,7 +36,7 @@ function isInside(inner, outer) {
 /**
  * The warning for a `--dir` that points at another project than the working directory, or null.
  * Null when there is no `--dir`, an explicit `--worktree` already says where workers run, the
- * process is a detached child, either side is not a git repository, both are the same repository
+ * process is a detached child (it carries the decision of the caller that spawned it), either side is not a git repository, both are the same repository
  * (linked worktrees), or one project sits inside the other.
  *
  * @returns {{ code: string, message: string, fix: string } | null}

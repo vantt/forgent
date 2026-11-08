@@ -35,15 +35,13 @@ import {
   unitPatternOf,
 } from './unit-handoff.mjs';
 import { stepSubjectDigest } from './ref-digests.mjs';
-import { runUnit, detectHerdrPresent } from '../runner/execution/run.mjs';
+import { runUnit } from '../runner/execution/run.mjs';
 import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { closeCaseUnderHold } from './case-close.mjs';
 import { workflowPersonaScope } from './loader.mjs';
 import { unitFieldsOfTemplate } from './steps.mjs';
-import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { loopOf, resolveCollaboration } from '../runner/execution/patterns/catalog.mjs';
-import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
+import { loopOf } from '../runner/execution/patterns/catalog.mjs';
 import { RunnerConfigError, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 
 /** One log line for the events that mark a step's progress, null for every other event. */
@@ -54,7 +52,6 @@ function progressLine({ ts, type, payload }) {
   else if (type === 'step.complete') what = 'completed';
   else if (type === 'step.fail') what = `failed: ${payload.reason ?? payload.outcome}`;
   else if (type === 'gate.park') what = 'parked, waiting for an answer';
-  else if (type === 'unit.account-unpinned') what = `unit ${payload.unitId} runs without account ${payload.account}: none of its seats is on that provider`;
   else return null;
   return `[${ts}] step ${step} ${what}`.slice(0, PROGRESS_LINE_LIMIT);
 }
@@ -138,33 +135,6 @@ function unitFailureReason(unitId, { outcome, results, error }, outOfScope) {
 }
 
 /**
- * The overrides of one unit. A run-level account the unit's seats do not run on is dropped for that
- * unit, and the run says so instead of dropping the pin silently.
- */
-async function unitOverrides(run, { step, u, unitData, state, runnerConfig, loopFn }) {
-  let account = state.account ?? null;
-  const overrides = (pinned) => unitOverridesOf(u, state.seats?.personas, { effort: state.effort, timeoutMs: state.timeoutMs, account: pinned, loopOf: loopFn });
-  if (account !== null) {
-    const collaboration = resolveCollaboration({
-      unit: unitData,
-      selectors: { callerString: unitPatternOf(u.template) },
-      runnerConfig,
-      shipped: shippedCatalog(),
-    });
-    const dry = await simulateUnitBindings(
-      { ...unitData, pattern: unitPatternOf(u.template) || 'solo' },
-      runnerConfig,
-      { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: overrides(account), collaboration },
-    );
-    if (!dry.seats.some((r) => r.account)) {
-      run.emit('unit.account-unpinned', { stepId: step.id, unitId: u.id, account });
-      account = null;
-    }
-  }
-  return overrides(account);
-}
-
-/**
  * Run one Unit through the Execution Core. A Unit whose predecessor's custody cannot be proven is run
  * again in a new worktree and branch from the trusted base, never from commits an unproven predecessor
  * may still be changing; the predecessor's checkout and branch are kept.
@@ -191,7 +161,7 @@ async function runUnitWithRecovery(run, { step, u, unitData, state, base, attemp
     pattern: unitPatternOf(u.template),
     personaScope: run.personaScope,
     workflowId: workflow.id,
-    overrides: await unitOverrides(run, { step, u, unitData, state, runnerConfig, loopFn }),
+    overrides: unitOverridesOf(u, state.seats?.personas, { effort: state.effort, timeoutMs: state.timeoutMs, account: state.account ?? null, loopOf: loopFn }),
     caseAdmission: run.port,
     caseRef: { caseId: workflowRunId, activity: step.id, unitId: u.id },
     onCaseAdmitted: ({ reservationId }) => recordScheduled(reservationId),

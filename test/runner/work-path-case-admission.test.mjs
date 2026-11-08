@@ -86,7 +86,7 @@ test('every production call of runUnit injects the case admission port, so no wr
       calls += 1;
       const block = callBlock(source, match.index);
       if (match[0].includes('runOptions') || block.includes('...runOptions')) {
-        assert.match(source, /const runOptions = \{[\s\S]*?caseAdmission: port,[\s\S]*?\n {14}\};/, `${rel}: the shared options carry the port`);
+        assert.match(source, /const runOptions = \{[\s\S]*?caseAdmission: run\.port,[\s\S]*?\n {2}\};/, `${rel}: the shared options carry the port`);
       } else {
         assert.match(block, /caseAdmission/, `${rel}: runUnit call without caseAdmission`);
       }
