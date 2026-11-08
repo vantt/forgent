@@ -101,16 +101,18 @@ export function writeSettlePending({ mainRoot, caseId, settle }) {
 /**
  * Record a settle on the ledger under the hold, once, and let go of the binding the ledger shows for the
  * reservation's worktree (the unbind waits for a quiet attempt). A settle already on the ledger is not
- * appended again.
+ * appended again, except that a real settle follows a `not-started` release (a hold that saw the Unit run
+ * finished and unheld first): the projection reads the later settle, and only the first one unbinds.
  *
  * @returns {boolean} whether the settle was appended now
  */
 export function applySettle({ mainRoot, caseId, hold, settle, events = null }) {
   const known = events ?? readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
-  const fresh = !known.some((e) => e.type === 'settle' && e.payload?.reservationId === settle.reservationId);
+  const earlier = known.filter((e) => e.type === 'settle' && e.payload?.reservationId === settle.reservationId);
+  const fresh = earlier.every((e) => e.payload.outcome === 'not-started') && (earlier.length === 0 || settle.outcome !== 'not-started');
   if (fresh) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId: caseId, event: { type: 'settle', payload: settle }, hold });
   const { worktree } = known.find((e) => e.type === 'reservation' && e.payload?.reservationId === settle.reservationId)?.payload ?? {};
-  const held = worktree ? known.findLast((e) => e.type === 'binding' && e.payload?.worktreeRoot === worktree)?.payload : null;
+  const held = worktree && earlier.length === 0 ? known.findLast((e) => e.type === 'binding' && e.payload?.worktreeRoot === worktree)?.payload : null;
   if (held?.state === 'bound') unbindWorktree({ mainRoot, hold, caseId, generation: held.generation, key: held.key, worktree });
   return fresh;
 }

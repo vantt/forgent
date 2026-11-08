@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b0118be339a7d0be7d85d91b8212ed80dfdc3b9f2bb63f9c2f7fa5caf5ea2c3c",
+  "payloadDigest": "c52a56daee8b77434fffebd42af61e4408aae6b2e76b9c5296e75c8a30da4de5",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1229,7 +1229,7 @@
     "src/workflow/case-inherit.mjs": "5d2811d88258fcaddfb643ee9030377ed9e6c2e7f25c76f7be08e62a22a7f4fc",
     "src/workflow/case-lock.mjs": "c5f5df8c003ba78ff4d2983ce578a3dee022c4595f5c0f2a2804f56649a83e33",
     "src/workflow/case-projection.mjs": "c418e9756fdae9378d39a1d343131cbed90cfd8e66d405f5928b02d89e058723",
-    "src/workflow/case-runtime.mjs": "10443da890b7886ffc57f7ed075fdb6da52927440863243aab61ae6495a745e1",
+    "src/workflow/case-runtime.mjs": "4bfa66a4b63a7d8791942a2e485537c747b9057741fe607d87a014c8db56ae74",
     "src/workflow/case-start.mjs": "67a2290752f5303782fa60d7c5cc9b61757fc84ba9f1e7e17e8de985545b4b70",
     "src/workflow/case-verbs.mjs": "a58ebb509e8c493ae08dfe5575601f60ace846144787e4c3f563818a7e2d361b",
     "src/workflow/checked.mjs": "ff61a4c3ecd3d492dcd4a97c91efc12250fd1ffd99ebd598b1c458691a6bc038",

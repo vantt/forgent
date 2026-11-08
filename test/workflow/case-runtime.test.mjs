@@ -248,8 +248,8 @@ test('a reservation released as not-started by a hold and then settled for real 
 test('a real settle that waited in the settle-pending file supersedes a release a hold made first', () => {
   const { run } = releasedAfterSettling('r1');
   writeSettlePending({ mainRoot: run.repoRoot, caseId: run.caseId, settle: realSettle('r1') });
-  const drained = withHold(run, (hold) => drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold }));
-  assert.equal(drained.settles, 1);
+  withHold(run, (hold) => drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold }));
+  assert.equal(fs.readdirSync(inboxDir(run, 'settle-pending')).length, 0, 'the pending settle was folded');
   assert.equal(projectionOf(run).milestones['plan-ready'].state, 'achieved');
   assert.deepEqual(settledAs(run), { r1: 'pass' });
 });
