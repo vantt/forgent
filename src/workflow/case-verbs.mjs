@@ -170,6 +170,7 @@ function recordAnswer(workflowRunId, params, mainRoot) {
   if (params.answer === undefined) throw new RunnerConfigError('answerWorkflow requires answer');
   const { events, state } = readCase(mainRoot, workflowRunId);
   const gate = state.workflow.steps.find((s) => s.id === params.stepId)?.gate;
+  if (!gate) throw new RunnerConfigError(`step "${params.stepId}" of "${workflowRunId}" is not a gate; a gate answer needs a gate`, { code: 'gate-unknown' });
   recordGateAnswerRound({
     mainRoot,
     caseId: workflowRunId,
@@ -177,8 +178,8 @@ function recordAnswer(workflowRunId, params, mainRoot) {
     stepId: params.stepId,
     answer: String(params.answer),
     approved: params.approved === true || params.approved === 'true',
-    question: state.questions.find((q) => q.stepId === params.stepId)?.question ?? gate?.question ?? '',
-    mode: gate?.mode === 'input' ? 'input' : 'consent',
+    question: state.questions.find((q) => q.stepId === params.stepId)?.question ?? gate.question ?? '',
+    mode: gate.mode === 'input' ? 'input' : 'consent',
     subjectDigest: stepSubjectDigest({ state, workflow: state.workflow, stepId: params.stepId, mainRoot }),
   });
   return state;

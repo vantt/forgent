@@ -170,7 +170,10 @@ const roundConsumed = (events, r) => events.some((e) => e.type === 'gate.answer'
 export function recordGateAnswerRound({ mainRoot, caseId, events, stepId, answer, approved, question, subjectDigest = null, mode = 'consent', answeredAt = new Date().toISOString() }) {
   const { dir } = roundsDir(mainRoot, caseId, stepId);
   const parks = events.filter((e) => e.type === 'gate.park' && e.payload?.stepId === stepId);
-  const occurrence = Math.max(1, parks.length);
+  if (parks.length === 0) {
+    throw new RunnerConfigError(`gate "${stepId}" of "${caseId}" has not been asked yet; it can be answered only after it parks`, { code: 'gate-not-parked' });
+  }
+  const occurrence = parks.length;
   const lastParkSeq = parks.at(-1)?.seq ?? 0;
   const settlesNow = mode === 'input' || approved === true;
   const rounds = roundsOf(mainRoot, caseId, stepId).filter((r) => r.occurrence === occurrence);

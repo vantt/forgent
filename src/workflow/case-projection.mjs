@@ -116,6 +116,8 @@ export function projectCase(events, { currentDigests = {} } = {}) {
         if (!settles) break;
         const receipt = { kind: 'gate-answer', evaluator: 'gate-answer', passed: true, approved: p.approved === true, answeredAt: p.answeredAt ?? null };
         for (const id of p.milestones ?? activityOf(p.stepId)?.produces ?? []) {
+          // A milestone that needs a verify receipt is reached only by the settle that carries one.
+          if (isDeliveryMilestone(guide, id)) continue;
           achieve(id, p.subjectDigest ?? null, { receipt, consent: mode === 'consent' });
         }
         break;

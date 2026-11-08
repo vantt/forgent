@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b0a304783cca21428ef7f117710e5f80064dc539fc1723597bd16cd4e21ff556",
+  "payloadDigest": "12cf621f711584ac5e984d10556683b42d94b8fbe3061471b84bd8d4ab0b4ff2",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1224,10 +1224,10 @@
     "src/workflow/case-gate.mjs": "a7e134d5041cbf18a4966c5523d75fb97f7ea3ba5920d28be426f26152f31581",
     "src/workflow/case-inherit.mjs": "57b8d34fa804f36899fef759688d23a2b3421713bb1d693dcde6c2956d1cf048",
     "src/workflow/case-lock.mjs": "2277fb6db0004b5365c0d5add23a6e72ca67cc407d8d052ed3817364eccd8349",
-    "src/workflow/case-projection.mjs": "7e992d666aef39ace5649a8e6b0befeb99c8540b7b7939252d4a6ebdbb19d6f9",
-    "src/workflow/case-runtime.mjs": "3d1854436cd15939fcdc9b7752804de354c9122a35ee205e912813ead93473c0",
+    "src/workflow/case-projection.mjs": "50c8f8df5f0aa8a0b4699ff75e0bfd1a9b156f339fea6a381cf73b5031e21026",
+    "src/workflow/case-runtime.mjs": "0e07009186dc9bcfa93773e5237bd9e3448581bc3fd6d10b1d8a067b73746677",
     "src/workflow/case-start.mjs": "99ada7edc944a99ab57afc055e856fea093fd4c3b8ce6e4847164ae831d4220e",
-    "src/workflow/case-verbs.mjs": "870b69c5477ebaf74b188963da0f05a080d0ba513be37a959ee177cf96949693",
+    "src/workflow/case-verbs.mjs": "148b8970c7e9d37c74975a8289e35d1be534f5941a802ec048483afa00ca7c1c",
     "src/workflow/checked.mjs": "a620d840253269121e89ebb7c4cada29d38752e55f16909edb7e3a92a8dad8bf",
     "src/workflow/definition.mjs": "20c32afca9b0138196a13bbe0bca16fbf97766aa4d0f61e1acd8bbb0046cc757",
     "src/workflow/dir-guard.mjs": "2999283b51f2d4e25d7d1428dd37b886b1d2826fa78eb02170328a35ac14ff03",
@@ -3620,7 +3620,7 @@
     },
     {
       "path": "src/workflow/case-verbs.mjs",
-      "line": 378,
+      "line": 379,
       "spawn": "runCaseGate -> src/workflow/case-gate.mjs:100",
       "binary": "(consumer verify command (options.verify))",
       "class": "configured-binary"
