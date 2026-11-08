@@ -142,6 +142,7 @@ test('fgos workflow gate: a killed gate\'s command keeps the worktree custody, s
   const script = path.join(tmp, 'linger.mjs');
   fs.writeFileSync(script, `import fs from 'node:fs'; fs.writeFileSync(${JSON.stringify(pidFile)}, String(process.pid)); setInterval(() => {}, 1000);`);
   declareGate(tmp, `"${process.execPath}" "${script}"`);
+  // boundary: only the real CLI process can be killed mid-gate.
   const gate = spawn(process.execPath, [FGOS, ...gateArgs(id), '--dir', tmp], { cwd: tmp, stdio: 'ignore' });
   const exited = new Promise((resolve) => gate.once('exit', resolve));
   const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
