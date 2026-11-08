@@ -335,6 +335,19 @@ fn a_brief_the_pane_refuses_because_its_shell_holds_the_foreground_ends_the_atte
         facts.contains(&taker_entry),
         "the child is listed with its own group: {facts}"
     );
+    let members = facts
+        .split("members of that group by the OS: [")
+        .nth(1)
+        .unwrap_or_else(|| panic!("the OS's foreground group members are listed: {facts}"));
+    assert!(
+        members.contains(&format!("{taker} (python3) S")),
+        "the foreground group's member is listed: {facts}"
+    );
+    // The refusal also carries the pane's own answer.
+    assert!(
+        log.contains("pane answered foreground group "),
+        "the pane's answer is in the refusal: {log}"
+    );
 }
 
 #[test]

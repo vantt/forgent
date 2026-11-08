@@ -74,6 +74,40 @@ pub fn is_bare_shell(info: &ProcessInfo) -> bool {
     first_non_shell(info).is_none()
 }
 
+/// What the pane answered, for a person reading a refusal: its foreground group and every process
+/// it listed as `pid:name`, then the pids it listed without a command line. Bounded, so a pane with
+/// a long list cannot flood a log. Nothing is decided from it.
+pub fn answer_of(info: &ProcessInfo) -> String {
+    const MOST: usize = 16;
+    let more = |len: usize| {
+        if len > MOST {
+            format!(" (+{} more)", len - MOST)
+        } else {
+            String::new()
+        }
+    };
+    let listed: Vec<String> = info
+        .foreground
+        .iter()
+        .take(MOST)
+        .map(|p| format!("{}:{}", p.pid, p.argv.first().map_or("?", String::as_str)))
+        .collect();
+    let unlisted: Vec<String> = info
+        .unlisted
+        .iter()
+        .take(MOST)
+        .map(u32::to_string)
+        .collect();
+    format!(
+        "pane answered foreground group {}, listed [{}]{}, without a command line [{}]{}",
+        info.foreground_pgid,
+        listed.join(", "),
+        more(info.foreground.len()),
+        unlisted.join(", "),
+        more(info.unlisted.len()),
+    )
+}
+
 /// Full identity of `pid` as the OS reports it; `None` when it already exited.
 pub fn identity_of(pid: u32, pgid: u32) -> Option<ProcessIdentity> {
     let tuple = facts::identity_of(ProcId(pid))?;
@@ -133,6 +167,7 @@ mod tests {
                     argv: argv.iter().map(|a| a.to_string()).collect(),
                 })
                 .collect(),
+            unlisted: vec![],
         }
     }
 

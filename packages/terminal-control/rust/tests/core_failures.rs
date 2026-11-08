@@ -467,6 +467,41 @@ fn an_empty_foreground_list_proves_no_ownership() {
 }
 
 #[test]
+fn a_refused_send_reports_what_the_pane_answered_including_entries_without_a_command_line() {
+    // The refusal is the only record of why the pane showed no agent: it names the foreground group,
+    // every listed process and the entries the decision ignored, so the next occurrence proves the cause.
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("send-refusal-answer"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    driver.set_foreground(
+        &slot.pane_id,
+        900,
+        vec![ForegroundProcess {
+            pid: 900,
+            argv: vec!["zsh".into()],
+        }],
+        4321,
+    );
+    driver.set_unlisted(&slot.pane_id, vec![4321, 4322]);
+    let SendOutcome::ForegroundNotAgent { reason } =
+        core.send("a", Some("hi"), None, true).unwrap()
+    else {
+        panic!("a pane with only its shell listed takes nothing");
+    };
+    assert!(
+        reason.contains("shell (pid 900) is in the foreground"),
+        "{reason}"
+    );
+    assert!(
+        reason.contains(
+            "pane answered foreground group 4321, listed [900:zsh], without a command line [4321, 4322]"
+        ),
+        "{reason}"
+    );
+    assert!(driver.calls("send.").is_empty());
+}
+
+#[test]
 fn immediate_close_without_process_info_is_kept_without_a_release_marker() {
     let driver = MemDriver::with_caps(
         352,

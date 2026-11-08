@@ -201,9 +201,13 @@ pub fn parse_process_info(result: &Value) -> Option<ProcessInfo> {
     let info = result.get("process_info")?;
     // herdr leaves `argv` out for a process with no command line, which is a
     // zombie waiting to be reaped: it holds nothing, so it is not listed.
-    let foreground = info
-        .get("foreground_processes")?
-        .as_array()?
+    let listed = info.get("foreground_processes")?.as_array()?;
+    let unlisted = listed
+        .iter()
+        .filter(|p| p.get("argv").is_none())
+        .filter_map(|p| number(p, "pid"))
+        .collect();
+    let foreground = listed
         .iter()
         .filter(|p| p.get("argv").is_some())
         .map(|p| {
@@ -223,6 +227,7 @@ pub fn parse_process_info(result: &Value) -> Option<ProcessInfo> {
         shell_pid: number(info, "shell_pid")?,
         foreground_pgid: number(info, "foreground_process_group_id")?,
         foreground,
+        unlisted,
     })
 }
 

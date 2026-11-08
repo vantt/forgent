@@ -91,6 +91,7 @@ fn process_info_separates_shell_from_foreground() {
             argv: vec!["sleep".into(), "300".into()]
         }]
     );
+    assert_eq!(zombie.unlisted, vec![1972480]);
 }
 
 #[test]

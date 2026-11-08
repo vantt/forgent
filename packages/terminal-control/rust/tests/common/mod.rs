@@ -169,7 +169,12 @@ impl MemDriver {
             shell_pid,
             foreground_pgid: pgid,
             foreground,
+            unlisted: vec![],
         };
+    }
+    /// Pids the pane lists without a command line.
+    pub fn set_unlisted(&self, pane: &str, unlisted: Vec<u32>) {
+        self.panes.borrow_mut().get_mut(pane).unwrap().info.unlisted = unlisted;
     }
     pub fn set_script(&self, pane: &str, script: ShellScript) {
         let mut panes = self.panes.borrow_mut();
@@ -198,6 +203,7 @@ impl MemDriver {
                 shell_pid,
                 foreground_pgid: pgid,
                 foreground,
+                unlisted: vec![],
             });
         }
     }
@@ -243,6 +249,7 @@ pub fn bare(shell: u32) -> ProcessInfo {
             pid: shell,
             argv: vec!["bash".into()],
         }],
+        unlisted: vec![],
     }
 }
 

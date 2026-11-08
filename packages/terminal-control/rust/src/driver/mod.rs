@@ -93,6 +93,10 @@ pub struct ProcessInfo {
     pub shell_pid: u32,
     pub foreground_pgid: u32,
     pub foreground: Vec<ForegroundProcess>,
+    /// Pids the pane listed with no command line (zombies waiting to be reaped). They are not in
+    /// `foreground` and decide nothing; they are kept so a refusal can report what the pane answered.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub unlisted: Vec<u32>,
 }
 
 /// Agent activity of a pane, when the driver declares `activity.state`.

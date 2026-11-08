@@ -817,7 +817,7 @@ impl<'a> Core<'a> {
             }
         };
         if self.foreground_of(&store, key, &info).is_none() {
-            let reason = if identity::is_bare_shell(&info) {
+            let why = if identity::is_bare_shell(&info) {
                 format!(
                     "the pane's shell (pid {}) is in the foreground",
                     info.shell_pid
@@ -825,6 +825,7 @@ impl<'a> Core<'a> {
             } else {
                 "no live process in the pane's foreground could be identified".to_string()
             };
+            let reason = format!("{why} ({})", identity::answer_of(&info));
             return Ok(SendOutcome::ForegroundNotAgent { reason });
         }
         match text {

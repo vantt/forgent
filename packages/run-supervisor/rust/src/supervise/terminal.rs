@@ -431,13 +431,32 @@ fn foreground_facts(gate: u32) -> String {
             )
         })
         .collect();
-    let terminal = of(leader).map_or_else(
+    let foreground_group = of(leader).map(|r| r.tty_foreground_group);
+    let terminal = foreground_group.map_or_else(
         || "unknown (the session leader is gone)".to_string(),
-        |r| r.tty_foreground_group.to_string(),
+        |group| group.to_string(),
     );
+    // Every member of the foreground group as the OS lists it, inside the gate's tree or not; a
+    // zombie is marked, since it holds the group's id while running nothing.
+    let members: Vec<String> = foreground_group
+        .filter(|group| *group > 0)
+        .map(|group| {
+            table
+                .iter()
+                .filter(|r| i64::from(r.group) == group)
+                .take(MOST)
+                .map(|r| {
+                    let name = facts::command_name_of(r.pid).unwrap_or_else(|| "?".into());
+                    let zombie = if r.state == 'Z' { " zombie" } else { "" };
+                    format!("{} ({name}) {}{zombie}", r.pid.0, r.state)
+                })
+                .collect()
+        })
+        .unwrap_or_default();
     format!(
-        "pane shell (session {leader}) terminal foreground group {terminal}; {}",
-        shown.join(", ")
+        "pane shell (session {leader}) terminal foreground group {terminal}; {}; members of that group by the OS: [{}]",
+        shown.join(", "),
+        members.join(", ")
     )
 }
 
