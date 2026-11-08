@@ -11,9 +11,10 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, mdview, mcp-skil
 - Một định nghĩa workflow mà các step chờ nhau thành vòng bị từ chối lúc nạp, nêu tên các step.
 - `fgos run --account X` mà lựa chọn đầu của seat là họ model khác bị từ chối bằng tên; thêm `--provider <họ của X>`. Account ghim không bao giờ chuyển seat sang pool khác.
 - Đổi pattern giữa case được xét như một đường ngoài danh sách (unlisted route).
-- `workflow start`, `answer`, `resume` mỗi cái một cửa; case không có thì từ chối `case-not-found`. `workflow status` hiện phán quyết binding, và với run có `--seats` thì cả account của từng seat.
+- `workflow start`, `answer`, `resume` mỗi cái một cửa; case không có thì từ chối `case-not-found`. `workflow status` hiện phán quyết binding và account của từng seat đã xong, cho mọi run (P19).
 - Lệnh mới `fgos workflow prune` dọn lịch sử case cũ (mặc định chạy thử, không xoá).
 - `fgos workflow resume` chạy lại step hỏng vì hạ tầng; ledger nhỏ hơn nhiều.
+- Settle thật thắng một lần nhả `not-started` đã có trên ledger (P17). `prune` chỉ xoá Unit run của một case khi cả case đi (P18). `workflow status` hiện account của từng seat cho mọi run (P19). Run `fgos run` thường chưa có luật giữ lại; đo bằng công thức ở P20.
 
 ## Thứ tự và lưu ý khi kích hoạt
 
@@ -24,6 +25,7 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, mdview, mcp-skil
   - Release trước T6 (trước main `00b322fa4`): `674c76fb...`.
   - Release `ccc27c90...` đang chạy trên fg-server2 từ main `00b322fa4`.
   - Release `6f1fd31f3850...0729` đang chạy trên fg-server2 từ main `1ff899aac` (có đủ T6 từ bước đầu tới bước cuối; bản đóng T6 chỉ thêm tài liệu, một dòng chú thích và một dòng import). Lấy main mới nhất rồi build, stage, kích hoạt như thường lệ.
+  - Đợt cuối (P16 đến P20, main sau `21e52e58c`) chưa nằm trong release nào đã kích hoạt: build release mới từ main để có P17 (settle thắng), P18 (dọn nguyên cả case) và P19 (status cho mọi run).
 - Không đổi schema `~/.fgos/config.json`; không cần kích hoạt đồng loạt mọi máy. Riêng P09 đổi một crate Rust nên release phải build lại và kích hoạt (xem P09).
 
 ## Đổi lớn: `fgos workflow gate` không còn `--verify`
@@ -90,7 +92,7 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, mdview, mcp-skil
 - **Doctor mong đợi:** dòng `workflow-case-bindings` đọc cùng thư mục binding như trước; không dòng mới nào khác.
 - **Kiểm nhanh:** `fgos workflow status <case>` in phán quyết binding; `fgos doctor </dev/null` không báo `workflow-case-bindings`.
 - **Quay lại:** release cũ đọc được `advance.log` mới. Release cũ settle một reservation do bản mới tạo thì không tìm thấy file và không gỡ được binding. Trước rollback: kết thúc hoặc đóng mọi case conductor đang mở. Sau rollback: `fgos doctor --fix` của release cũ gỡ binding sót. Revert P04 trước P08.
-- **Còn mở:** một Unit đã settled mà gặp hold khác giữa lúc nhả controller và lúc settle có thể bị trả lại `not-started`. Cửa sổ rất hẹp; chưa xử lý.
+- **Còn mở:** (đã đóng bởi P17) một Unit đã settled mà gặp hold khác giữa lúc nhả controller và lúc settle có thể bị trả lại `not-started`.
 
 ## P05: Playbook runner gọn, ledger nhẹ, resume chạy lại lỗi hạ tầng
 
@@ -204,6 +206,44 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, mdview, mcp-skil
 - **Commit trên main:** `e9255a3e6`.
 - `RunnerConfigError` nay nằm trong một file lá không import gì (`src/runner/dispatch/runner-config-error.mjs`) và mọi nơi import từ đó. Không đổi gì cho người dùng, không có thay đổi trên đĩa. Quay lại: không cần.
 
+## P15: spec, đo, đóng (chỉ tài liệu)
+
+- **Commit trên main:** `17f4d92c3`.
+- Spec Workflow ghi các luật đã chốt (RUL-WF-34 đến 41), hình component, ngân sách và số đo; hướng dẫn này viết cho mọi phase. Không đổi gì cho người dùng, không có thay đổi trên đĩa. Quay lại: không cần.
+
+## P16: `projectCase` gọn hơn, một fixture repo cho test (không đổi hành vi)
+
+- **Commit trên main:** `59929ab1b`.
+- **Người dùng thấy gì:** không gì cả. Phép gấp ledger của case (`projectCase`) từ 181 xuống 61 dòng, mỗi loại event một hàm gấp; test workflow dùng chung một fixture repo. Không đổi byte nào trên đĩa.
+- **Lệnh trên từng workspace:** `git pull --rebase`; build, stage, kích hoạt release như thường lệ; `fgos doctor </dev/null`.
+- **Doctor mong đợi:** không có dòng mới.
+- **Quay lại:** không cần.
+
+## P17: settle thắng một lần nhả `not-started`
+
+- **Commit trên main:** `7ffd0a0e5` (bằng chứng đỏ) và `6b45c34c5`.
+- **Người dùng thấy gì:** một Unit run đã settle không còn bị đọc là chưa từng chạy khi một tiến trình khác đang giữ case lúc nhả controller. Settle thật được ghi nối sau lần nhả `not-started` đã có trên ledger; chỉ settle đầu tiên gỡ binding. Đóng cửa sổ hẹp nêu ở mục P04.
+- **Lệnh trên từng workspace:** `git pull --rebase`; build, stage, kích hoạt release như thường lệ; `fgos doctor </dev/null`. Kích hoạt khi không có `fgos run --case` nào đang chạy.
+- **Doctor mong đợi:** không có dòng mới.
+- **Quay lại:** release cũ đọc được ledger mới (thêm một dòng settle); không cần làm gì.
+
+## P18: dọn nguyên cả case hoặc không Unit run nào
+
+- **Người dùng thấy gì:** một case có một Unit run phải giữ (chưa settle, controller hoặc custody đang giữ, link, đường dẫn không an toàn, thiếu bản ghi) giờ giữ **mọi** Unit run của nó cùng ledger; trước đây các run đã settle bị xoá trước, ledger ở lại và gọi tên thư mục không còn. Mỗi run lẽ ra đi được nằm trong `kept` với lý do `case-kept`, cả ở chạy thử lẫn `--apply`. Dung lượng được giải phóng muộn hơn cho case dở dang: lần `prune` hay close sau khi case xong sẽ dọn nguyên cả case.
+- **Ngoại lệ còn lại:** một lần xoá lỗi giữa chừng (`delete-failed`, quyền hoặc I/O) vẫn có thể để ledger gọi tên run đã xoá; run bị xoá dở không còn đủ bản ghi nên lần dọn sau giữ nó (`unsettled` hoặc `unit-record-missing`) và cần người gỡ tay. Cây đã dọn theo luật cũ giữ nguyên tên treo, không sửa, không migrate.
+- **Lệnh trên từng workspace:** như P12; không bước riêng. Doctor: không có dòng mới.
+- **Kiểm nhanh:** `fgos workflow prune --json` (chạy thử): không case nào trong `cases` mà cùng case đó còn Unit run `unit-run-kept`.
+- **Quay lại:** revert; những gì prune đã xoá không lấy lại được.
+
+## P19: `workflow status` hiện account cho mọi run
+
+- **Commit trên main:** `66567ab26`.
+- **Người dùng thấy gì:** `fgos workflow status <id>` luôn có `seatProviders`: executor, family, model và account (hoặc lý do ghim bị bỏ qua) của từng ghế đã xong, cho cả preset, `--units` và `--seats`. Đọc từ `binding` trong kết quả đã ghi trên ledger; không có trạng thái mới trên đĩa. Run chưa có ghế nào xong, hoặc case conductor, trả mảng rỗng.
+- **Lệnh trên từng workspace:** `git pull --rebase`; build, stage, kích hoạt release như thường lệ; `fgos doctor </dev/null`.
+- **Doctor mong đợi:** không có dòng mới.
+- **Kiểm nhanh:** `fgos workflow status <run preset đã xong>` in `seatProviders` không rỗng.
+- **Quay lại:** không cần (không đổi byte).
+
 ## P20: đo run `fgos run` thường (không có case) trên máy owner, chỉ đọc
 
 - **Mục đích:** `fgos workflow prune` chỉ xoá Unit run mà một case đã đóng nhắc tới. Unit run của `fgos run` thường (không case) không ai xoá. Quyết định 73 (e) yêu cầu đo phần này trên máy owner trước khi bàn luật giữ lại. Đoạn lệnh dưới đếm số thư mục và số byte theo bốn nhóm: `case`, `plain` (run thường), `no-record` (không đọc được `unit.json`), `link` (liên kết, không đi vào trong).
@@ -250,18 +290,6 @@ console.log(JSON.stringify(out,null,2));
 - **Câu hỏi sẽ hỏi sau khi có số (chưa quyết, chưa khuyến nghị):** giữ nguyên chờ thêm; hay thêm `fgos workflow prune --plain --older-than <N>d` (chạy thử mặc định, tự gõ khi muốn); hay đưa luật tuổi đó vào dọn tự động khi đóng case; hay giới hạn dung lượng mỗi run ngay từ nguồn; hay thêm một trường `plain` vào `prune --json` để khỏi cần đoạn lệnh này. Các lựa chọn không loại trừ nhau; mỗi lựa chọn có chi phí và rủi ro, và đều không được xoá run còn controller, attempt hay custody, run chưa xong, liên kết, hay run mà case đang mở nhắc tới.
 - **Quay lại:** không có gì để quay lại, đoạn lệnh không ghi gì.
 
-## P18: dọn nguyên cả case hoặc không Unit run nào
-
-- **Người dùng thấy gì:** một case có một Unit run phải giữ (chưa settle, controller hoặc custody đang giữ, link, đường dẫn không an toàn, thiếu bản ghi) giờ giữ **mọi** Unit run của nó cùng ledger; trước đây các run đã settle bị xoá trước, ledger ở lại và gọi tên thư mục không còn. Mỗi run lẽ ra đi được nằm trong `kept` với lý do `case-kept`, cả ở chạy thử lẫn `--apply`. Dung lượng được giải phóng muộn hơn cho case dở dang: lần `prune` hay close sau khi case xong sẽ dọn nguyên cả case.
-- **Ngoại lệ còn lại:** một lần xoá lỗi giữa chừng (`delete-failed`, quyền hoặc I/O) vẫn có thể để ledger gọi tên run đã xoá; run bị xoá dở không còn đủ bản ghi nên lần dọn sau giữ nó (`unsettled` hoặc `unit-record-missing`) và cần người gỡ tay. Cây đã dọn theo luật cũ giữ nguyên tên treo, không sửa, không migrate.
-- **Lệnh trên từng workspace:** như P12; không bước riêng. Doctor: không có dòng mới.
-- **Kiểm nhanh:** `fgos workflow prune --json` (chạy thử): không case nào trong `cases` mà cùng case đó còn Unit run `unit-run-kept`.
-- **Quay lại:** revert; những gì prune đã xoá không lấy lại được.
-
-## P19: `workflow status` hiện account cho mọi run
-
-- `fgos workflow status <id>` luôn có `seatProviders`: executor, family, model và account (hoặc lý do ghim bị bỏ qua) của từng ghế đã xong, cho cả preset, `--units` và `--seats`. Đọc từ `binding` trong kết quả đã ghi trên ledger; không có trạng thái mới trên đĩa. Run chưa có ghế nào xong, hoặc case conductor, trả mảng rỗng. Quay lại: không cần.
-
 ## Bảng quay lại
 
 | Phase | Release cũ đọc được dữ liệu đĩa mới? | Làm gì trước khi rollback |
@@ -279,5 +307,7 @@ console.log(JSON.stringify(out,null,2));
 | P11 | Có (không đổi byte) | Không cần |
 | P12 | Có (chỉ thiếu lịch sử) | `--apply` không có rollback; đọc chạy thử trước |
 | P18 | Có (không đổi byte) | Không cần; `--apply` vẫn không có rollback |
-| P13, P14 | Có (không đổi byte) | Không cần |
+| P13, P14, P16 | Có (không đổi byte) | Không cần |
+| P17 | Có (thêm một dòng settle) | Không cần |
+| P19 | Có (không đổi byte) | Không cần |
 | P20 | Có (chỉ đọc) | Không cần |

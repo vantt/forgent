@@ -96,3 +96,52 @@ Kept. It is 292 lines; each branch is the owner of one safety rule with a red te
 9. **One repository fixture for the workflow tests** (from the test phase). Reason: `setupTestRepo` and `setupWorkflowFixtureRepo` build the same repository twice with small differences. Benefit: about 90 lines fewer; touches six test files, so it needs its own pass.
 10. **Parallel order-guard presets** (from the test phase). Reason: `playbook-observable-order` runs eight presets in sequence (80 s wall here), each in its own fixture repo. Benefit: running them concurrently would cut wall time (test time is already 531 s); needs a proof that concurrency in one process is safe first.
 11. **A way to test a launch failure without hiding `PATH`.** Reason: the live resume smoke needed a `PATH` without the agent CLIs to cause an infrastructure failure. Benefit: a documented doctor-level or dev hook would make activation smokes repeatable on every machine; adds a mechanism, so only if the owner wants activation smokes routine.
+
+## Final wave (decision 73)
+
+Owner decision 73 (2026-11-08 21:00, «Thu nhỏ rồi đóng» and all four ideas) added phases 16-20 before T6 closed. All five are on main (`21e52e58c`); docs and plan only in this close.
+
+**What each phase delivered**
+
+| Phase | Commit | Delivered |
+|---|---|---|
+| 16 | `59929ab1b` | `projectCase` 181 -> 61 lines (one fold per event kind); `setupTestRepo` is a preset over one workflow fixture repository; no behaviour change |
+| 17 | `7ffd0a0e5`, `6b45c34c5` | a real settle is appended after a `not-started` release already on the ledger, so a finished Unit run is never read as never started (closes the open item of the first close); RUL-WF-37 |
+| 18 | `c9aecc8e5` | prune deletes a case's Unit runs only when the whole case goes (a kept case keeps every run, `case-kept`, dry run equals apply); case-level keep reasons are one ordered table; RUL-WF-40 |
+| 19 | `66567ab26` | `workflow status` returns `seatProviders` (executor, family, model, account) for every run, from the ledger bindings, no new state; RUL-WF-39 |
+| 20 step 1 | `e12b0f419` | read-only recipe in the owner guide that measures plain `fgos run` Unit runs against case runs by count, bytes and age |
+
+**Net size over all T6 commits** (same method as the table above: `git show --numstat`, doc and data files excluded; the five wave commits add to the 28 of the first close):
+
+| Language | Added | Removed | Net | Target |
+|---|---|---|---|---|
+| Node (src, bin, scripts) | 2 548 | 2 504 | **+44** (+34 from the wave) | at most -300: **missed** |
+| Rust | 5 | 4 | **+1** | at most +10: met |
+| tests | 4 106 | 3 411 | **+695** (+85 from the wave) | at most -200: **missed** |
+
+The wave estimate was Node about +30 and tests about +30 (range 0..+60); tests came in higher because the settle and prune cases are red-tested rules (+72 and +45 test lines) and the fixture merge removed only 33 net lines (`setupTestRepo` kept as a preset, Q-7).
+
+**Budgets after the wave** (`wc -l`, same grouping as the table above)
+
+| Component | Budget | Now | Met |
+|---|---|---|---|
+| Guide | at most 1 290 | 1 216 | yes |
+| Case ledger | at most 1 200; prune at most 150 | 1 640; prune about 240 | **no** |
+| Admission | at most 930 | 1 049 | **no** |
+| Conductor entry | at most 2 040 | 2 135 | **no** |
+| Playbook runner | at most 1 300 | 1 309 | **no (9 over)** |
+| `workflow` arm of `bin/fgos.mjs` | at most 120 | 116 | yes |
+| Doctor side | at most 180 | 150 | yes |
+| `src/workflow` whole | about 6 900 | 7 349 | **no** |
+| `projectCase` | at most 120 | **61** | yes (was 181) |
+| largest function | under 300 | 96 (`createCaseAdmissionPort`) | yes |
+
+**Verdict.** Behaviour acceptance stays met; the function budget is now met everywhere. Size acceptance (net) and four of the five component budgets stay missed. The gap is accepted under decision 73: ledger and admission growth waits for the coding cutover (`wf-coding-cutover`), because cutting before it would cut code the cutover still needs, and no remaining deletion removes a rule without dropping a proof-backed behaviour. Spec: RUL-WF-37, -39, -40, the stale `:191` reference and the decision 73 entry are written; section 9 is re-measured.
+
+**Open items**
+
+- **Plain `fgos run` retention** (`p-tslryr3buq`, the retention half). Waits for the owner's numbers: run the P20 recipe in the owner guide on the owner machine and fg-server and paste the output back; step 2 (the retention question, options only) follows. Not done, no rule exists.
+- **P19 live smoke.** `fgos workflow status <preset run>` on an activated release; waits for the next release built from main (the guide notes that P16-P20 are not in the activated release `6f1fd31f3850…`).
+- **Half-removed run.** A prune whose removal fails midway (`delete-failed`) leaves a half-removed run that later prunes keep as `unsettled` or `unit-record-missing` until it is removed by hand, and the kept ledger still names it. Accepted with no repair mechanism (lead decision Q-6; a two-phase delete or trash directory would be a new mechanism). Written in RUL-WF-40.
+- **Size gap, accepted under decision 73** (Node +44, tests +695; the four budgets above). Reopens with the coding cutover.
+- Still open from the first close and unchanged: `dispatch inspect --cwd .` under 1 s (not measured), `p-d2dc4f2e` launch-never-starts clauses, run-output size cap (arbitration addition 5, T5), the live smoke of a verdict refused on resume.
