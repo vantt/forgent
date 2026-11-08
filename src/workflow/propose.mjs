@@ -31,7 +31,7 @@ import { validateProposal, createRepoPorts } from './propose-validate.mjs';
 export const DEFAULT_GUIDE = 'coding/feature';
 
 const SLICE_KEYS = Object.freeze(['id', 'objective', 'writes', 'verify', 'dependsOn', 'raise', 'followUp', 'earlyReview', 'inputs', 'capability', 'pattern', 'rigor', 'activity']);
-const MANIFEST_KEYS = Object.freeze(['request', 'slices', 'gate']);
+const MANIFEST_KEYS = Object.freeze(['request', 'slices']);
 const READ_ONLY_DEFAULTS = Object.freeze({ capability: 'review', pattern: 'solo', rigor: 'standard', activity: 'review-item' });
 const WHOLE_REPO = /^(\.|\*\*|\.\/?\*\*?)\/?$/;
 
@@ -79,7 +79,6 @@ function checkManifest(manifest, { stat }) {
   }
   for (const key of Object.keys(manifest)) if (!MANIFEST_KEYS.includes(key)) refuse('manifest-invalid', `unknown key "${key}" (allowed: ${MANIFEST_KEYS.join(', ')})`);
   if (manifest.request !== undefined && !(isText(manifest.request) && argumentSafe(manifest.request))) refuse('manifest-invalid', '"request" must be text that does not start with "--"');
-  if (manifest.gate !== undefined && !(isText(manifest.gate) && argumentSafe(manifest.gate))) refuse('manifest-invalid', '"gate" must be a command that does not start with "--"');
   if (!Array.isArray(manifest.slices) || manifest.slices.length === 0) {
     refuse('manifest-invalid', '"slices" must be a non-empty list');
     return { refusals, slices: [] };
@@ -213,7 +212,7 @@ function activityPatternOf(guide, activityId) {
   return activity === undefined ? undefined : (activity.unit?.pattern ?? null);
 }
 
-function commandsFor({ proposal, guide, plan, request, worktree, branch, baseCommit, inherit, gate, runnerConfig }) {
+function commandsFor({ proposal, guide, plan, request, worktree, branch, baseCommit, inherit }) {
   const commands = [];
   const caseId = CASE_PLACEHOLDER;
   const slices = proposal.slices.filter((s) => s.dispatch);
@@ -254,8 +253,7 @@ function commandsFor({ proposal, guide, plan, request, worktree, branch, baseCom
   const writing = slices.filter((s) => s.writes.length > 0);
   if (writing.length > 0) {
     const tested = [...new Set(writing.flatMap((s) => s.finalWrites))];
-    const gateFlags = gate ? ['--verify', gate] : ['--capability', 'code:implement'];
-    commands.push(command('gate', 'the runner, not a seat, runs the whole-worktree check and settles the integrated receipt', ['workflow', 'gate', caseId, '--worktree', worktree, '--writes', tested.join(','), ...gateFlags, '--json'], { caseSlots: [2] }));
+    commands.push(command('gate', 'the runner, not a seat, runs the whole-worktree check and settles the integrated receipt', ['workflow', 'gate', caseId, '--worktree', worktree, '--writes', tested.join(','), '--capability', 'code:implement', '--json'], { caseSlots: [2] }));
   }
   return commands;
 }
@@ -369,7 +367,7 @@ function finish(proposal) {
  * Propose how a list of slices is run as one case.
  *
  * @param {object} params
- * @param {object} params.manifest `{ request?, gate?, slices: [{ id, objective, writes, verify, dependsOn?, raise?, followUp?, earlyReview?, inputs?, capability?, pattern?, rigor?, activity? }] }`
+ * @param {object} params.manifest `{ request?, slices: [{ id, objective, writes, verify, dependsOn?, raise?, followUp?, earlyReview?, inputs?, capability?, pattern?, rigor?, activity? }] }`
  * @param {string} [params.plan] the plan file, a repository path
  * @param {object} params.guide the guide the case runs
  * @param {object} params.runnerConfig
@@ -457,9 +455,8 @@ export function proposeFromSlices({ manifest, plan, guide, runnerConfig, shipped
   }
 
   const writing = dispatching.filter((s) => s.writes.length > 0);
-  const gate = manifest.gate ?? null;
-  if (writing.length > 0 && gate === null && !runnerConfig?.capabilities?.['code:implement']?.verify) {
-    refusals.push({ code: 'gate-command-missing', detail: 'the whole-worktree gate needs a command: give "gate" in the slice list, or configure a verify command for code:implement' });
+  if (writing.length > 0 && !runnerConfig?.capabilities?.['code:implement']?.verify) {
+    refusals.push({ code: 'gate-command-missing', detail: 'the whole-worktree gate runs the command declared as capabilities.code:implement.verify: declare it' });
   }
   const slug = plan ? planCaseSlug(plan) : slugOf(request);
   proposal.worktree = worktree ?? `../${slug}-worktree`;
@@ -468,7 +465,7 @@ export function proposeFromSlices({ manifest, plan, guide, runnerConfig, shipped
     if (refusals.length === 0) proposal.summary = 'Mọi mảnh đều phải hỏi chủ trước: không có gì để chạy.';
     return finish(proposal);
   }
-  proposal.commands = commandsFor({ proposal, guide, plan, request, worktree: proposal.worktree, branch: proposal.branch, baseCommit, inherit, gate, runnerConfig });
+  proposal.commands = commandsFor({ proposal, guide, plan, request, worktree: proposal.worktree, branch: proposal.branch, baseCommit, inherit });
   return finish(proposal);
 }
 

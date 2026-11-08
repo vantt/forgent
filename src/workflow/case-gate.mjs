@@ -27,9 +27,9 @@ const TAIL_LINES = 20;
 /**
  * Run the gate command in `worktree` for `activity` of case `caseId`, and settle the result.
  *
- * The command is `command`, else the `verify` of `capability` in the runner config; with neither the gate
- * refuses by name, so a gate never passes for want of something to run. `writes` are the tested paths: the
- * subject whose digest the receipt carries, the same way a slice's write scope is.
+ * The command is the `verify` the runner config declares for `capability`, never one a caller supplies; with
+ * none declared the gate refuses by name, so a gate never passes for want of something to run. `writes` are the
+ * tested paths: the subject whose digest the receipt carries, the same way a slice's write scope is.
  *
  * @param {object} params
  * @param {string} params.mainRoot
@@ -37,7 +37,6 @@ const TAIL_LINES = 20;
  * @param {string} params.worktree
  * @param {string[]} params.writes
  * @param {string} [params.activity]
- * @param {string} [params.command]
  * @param {string} [params.capability]
  * @param {number} [params.timeoutMs]
  * @param {string} [params.reason]
@@ -51,7 +50,6 @@ export async function runCaseGate({
   worktree,
   writes,
   activity = GATE_ACTIVITY,
-  command,
   capability,
   timeoutMs,
   reason,
@@ -65,12 +63,10 @@ export async function runCaseGate({
     throw new RunnerConfigError(`a gate runs in a worktree that exists: ${worktree ?? '(none given)'}`, { code: 'gate-worktree-missing' });
   }
   const cfg = runnerConfig ?? loadRunnerConfigForDir(mainRoot);
-  const verify = typeof command === 'string' && command.trim()
-    ? command.trim()
-    : verifyCommandOf({ capability }, cfg);
+  const verify = verifyCommandOf({ capability }, cfg)?.trim();
   if (!verify) {
     throw new RunnerConfigError(
-      'a gate needs a command: pass --verify "<command>" or declare capabilities.<capability>.verify and pass --capability',
+      'a gate runs the command declared as capabilities.<capability>.verify: declare it and pass --capability <capability>',
       { code: 'gate-command-missing' },
     );
   }

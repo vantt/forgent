@@ -10,6 +10,7 @@ import os from 'node:os';
 import { spawnSync, execFileSync } from 'node:child_process';
 
 import { createPendingBinding, commitBinding } from '../../src/workflow/case-bindings.mjs';
+import { readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { appendAll, openCase, settle, verifyReceipt } from '../helpers/workflow-case-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -95,7 +96,13 @@ function builtCase(tmp) {
   return run.caseId;
 }
 const nodeExit = (code) => `"${process.execPath}" -e "process.exit(${code})"`;
-const gateArgs = (id, code) => ['workflow', 'gate', id, '--worktree', '.', '--writes', 'README.md', '--verify', nodeExit(code)];
+const gateArgs = (id) => ['workflow', 'gate', id, '--worktree', '.', '--writes', 'README.md', '--capability', 'code:implement'];
+/** The project declares the command its gate runs; the gate has no flag to name another. */
+function declareGate(tmp, command) {
+  const cfg = readProjectConfig(tmp);
+  cfg.runner = { ...cfg.runner, capabilities: { ...cfg.runner?.capabilities, 'code:implement': { verify: command } } };
+  writeProjectConfig(tmp, cfg);
+}
 
 // The settle events, the frame and the refusals by name are proved against `gateWorkflow` in
 // test/workflow/case-verbs.test.mjs; what only the CLI can show is that the verb reaches it and prints the answer. A failed gate is a settled answer that still exits with the canonical code of its outcome (14 for findings), like `fgos run`, so a script can branch on it.
@@ -105,14 +112,21 @@ test('fgos workflow gate: a passing command prints the pass outcome and exits 0;
   const id = builtCase(tmp);
 
   // boundary: the printed envelope and exit code are the CLI's own contract; no lower layer sees them.
-  const failed = fgos(tmp, ...gateArgs(id, 3));
+  declareGate(tmp, nodeExit(3));
+  const failed = fgos(tmp, ...gateArgs(id));
   assert.equal(failed.status, 14, failed.stdout + failed.stderr);
   const findings = JSON.parse(failed.stdout).data;
   assert.deepEqual({ outcome: findings.outcome, passed: findings.gate.passed, status: findings.gate.status }, { outcome: 'findings', passed: false, status: 3 });
 
   // boundary: same door, the passing half of the pair.
-  const passed = fgos(tmp, ...gateArgs(id, 0));
+  declareGate(tmp, nodeExit(0));
+  const passed = fgos(tmp, ...gateArgs(id));
   assert.equal(passed.status, 0, passed.stdout + passed.stderr);
   const pass = JSON.parse(passed.stdout).data;
   assert.deepEqual({ caseId: pass.caseId, activity: pass.activity, outcome: pass.outcome, passed: pass.gate.passed, status: pass.gate.status }, { caseId: id, activity: 'integrate', outcome: 'pass', passed: true, status: 0 });
+
+  // boundary: a command named on the line is an unknown flag at the arg layer; the declared one is the only one that runs.
+  const named = fgos(tmp, ...gateArgs(id), '--verify', nodeExit(0));
+  assert.notEqual(named.status, 0);
+  assert.match(named.stderr, /--verify/);
 });

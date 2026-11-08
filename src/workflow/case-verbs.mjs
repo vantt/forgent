@@ -382,7 +382,6 @@ export async function gateWorkflow(workflowRunId, options = {}) {
     worktree: options.worktree ? path.resolve(options.worktree) : worktreePath,
     writes: options.writes,
     activity: options.activity,
-    command: options.verify,
     capability: options.capability,
     timeoutMs: options.timeoutMs,
     reason: options.reason,

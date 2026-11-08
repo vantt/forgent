@@ -143,7 +143,7 @@ frame's checkpoints, all together. Slices independent of a parked question go on
 ## 9. Integrate and hand off
 
 All slices are on the case branch, so there is nothing to merge. The proposal's last
-line is `fgos workflow gate <caseId> --worktree <path> --writes <paths> ...`: run it as
+line is `fgos workflow gate <caseId> --worktree <path> --writes <paths> --capability code:implement`: run it as
 printed. The runner, not a seat, runs the whole-worktree check in the case worktree and
 settles the receipt of the integrated tree; only a passing gate reaches `integrated`.
 Run the plan's own full verification in the worktree yourself as well when it is wider

@@ -14,7 +14,6 @@ case worktree (`../<slug>-worktree`, `case/<slug>`).
 | Field | Meaning |
 |---|---|
 | `request` (top level, optional) | The case outcome in one paragraph; defaults to "Deliver the plan at <plan>". |
-| `gate` (top level) | The command of the whole-worktree check. Required when any slice writes, unless `code:implement` has a configured `verify`. |
 | `id` | Lowercase letters, digits and dashes; unique. |
 | `objective` | What the slice does and the plan phase and decisions it rests on. It is the brief of the run. |
 | `writes` | Repository paths the slice may change, no commas. A directory or glob is expanded to real files; empty means a read-only slice. |
@@ -76,6 +75,6 @@ everything is the owner's own decision, not a proposal.
 | `test-scan-too-wide` | The slice changes so much code that its tests cannot be sized. Split it. |
 | `capability-unregistered` | A capability is not registered in the runner config. Pick one from `../../_shared/capability-catalog.md`. |
 | `rigor-below-floor`, `slice-rigor-below-table`, `slice-raise-invalid`, `slice-raise-needs-reason` | A rigor may only be raised, with a reason, to a value of `low`, `standard`, `high`, `critical`. |
-| `gate-command-missing` | Add `gate` to the list. |
+| `gate-command-missing` | Declare `capabilities.code:implement.verify` in the runner config; the final gate runs only that command. |
 | `guide-activity-missing` | The guide lacks an activity the commands need; use `coding/feature` or ask. |
 | `code-slice-below-standard`, `pattern-unresolved`, `launch-bound-unknown`, `frame-defaults-missing`, `slice-writes-missing`, `slice-write-invalid`, `slice-table-invalid` | The catalog, the table or the guide is inconsistent with the proposal. This is a blocker for the owner, not something to patch around. |

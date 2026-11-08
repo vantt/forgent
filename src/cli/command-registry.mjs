@@ -2447,7 +2447,7 @@ export const COMMAND_REGISTRY = [
         parameters: {
           type: 'object',
           properties: {
-            slices: { type: 'string', description: 'JSON file: { request?, gate?, slices: [{ id, objective, writes, verify, dependsOn?, raise?: { rigor, reason }, followUp?: { capability, pattern }, earlyReview?, inputs?, capability?, pattern?, rigor?, activity? }] }. A slice with no writes is read-only and takes capability, pattern and rigor from itself; a writing slice takes them from the table and may only raise its rigor, with a reason. "gate" is the command of the whole-worktree check.' },
+            slices: { type: 'string', description: 'JSON file: { request?, slices: [{ id, objective, writes, verify, dependsOn?, raise?: { rigor, reason }, followUp?: { capability, pattern }, earlyReview?, inputs?, capability?, pattern?, rigor?, activity? }] }. A slice with no writes is read-only and takes capability, pattern and rigor from itself; a writing slice takes them from the table and may only raise its rigor, with a reason.' },
             plan: { type: 'string', description: 'Repository path of the plan file the slices come from; it is read as input by the slices and by the validation and decision passes.' },
             guide: { type: 'string', description: 'The conductor guide the case runs (default coding/feature).' },
             request: { type: 'string', description: 'A request with no plan: size it from --writes and say what to do next. Not combinable with --slices.' },
@@ -2533,7 +2533,7 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos workflow close wf-run-1234'],
       },
       gate: {
-        description: 'Run the project\'s whole-worktree check for a case as the runner (no seat) and settle it as the receipt of an activity (default integrate). Admitted like any dispatch: it counts against the frame and needs the case worktree. A failing check leaves the milestone unachieved. The command is --verify, else capabilities.<capability>.verify.',
+        description: 'Run the project\'s whole-worktree check for a case as the runner (no seat) and settle it as the receipt of an activity (default integrate). Admitted like any dispatch: it counts against the frame and needs the case worktree. A failing check leaves the milestone unachieved. The command is the one declared as capabilities.<capability>.verify for --capability; there is no flag to pass a different one.',
         parameters: {
           type: 'object',
           properties: {
@@ -2542,15 +2542,14 @@ export const COMMAND_REGISTRY = [
             worktree: { type: 'string', description: 'The case worktree the command runs in.' },
             writes: { type: 'string', description: 'The tested paths (comma-separated); the receipt carries their digest.' },
             activity: { type: 'string', description: 'Activity to settle (default integrate).' },
-            verify: { type: 'string', description: 'The command to run; else the verify of --capability.' },
-            capability: { type: 'string', description: 'Capability whose configured verify command is used when --verify is absent.' },
+            capability: { type: 'string', description: 'Capability whose declared verify command (capabilities.<capability>.verify) the gate runs.' },
             timeout: { type: 'string', description: 'Longest the command may run, e.g. 45m (default: runner timeoutMs).' },
             reason: { type: 'string', description: 'Why, recorded on the route.' },
           },
           positional: ['run-id'],
-          required: ['run-id', 'worktree', 'writes'],
+          required: ['run-id', 'worktree', 'writes', 'capability'],
         },
-        examples: ['fgos workflow gate wf-run-1234 --worktree ../wt --writes src,test --verify "npm test" --timeout 45m'],
+        examples: ['fgos workflow gate wf-run-1234 --worktree ../wt --writes src,test --capability code:implement --timeout 45m'],
       },
       operations: {
         description: 'Read-only: the operations a stage step offers, read from the Workflow definition.',

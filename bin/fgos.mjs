@@ -2359,14 +2359,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (sub === 'gate') {
         const { gateWorkflow } = await import('../src/workflow/index.mjs');
         const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
-        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow gate requires a workflowRunId: fgos workflow gate <id> --worktree <path> --writes <paths> --verify "<command>"');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow gate requires a workflowRunId: fgos workflow gate <id> --worktree <path> --writes <paths> --capability <capability>');
         const gateWrites = parseListFlag(flags.writes);
         return gateWorkflow(workflowRunId, {
           repoRoot: flags.dir,
           worktree: requireField(flags.worktree, 'workflow gate requires --worktree <path>'),
           writes: gateWrites,
           activity: typeof flags.activity === 'string' ? flags.activity : undefined,
-          verify: typeof flags.verify === 'string' ? flags.verify : undefined,
           capability: typeof flags.capability === 'string' ? flags.capability : undefined,
           timeoutMs: flags.timeout === undefined ? undefined : parseRunTimeout(requireField(flags.timeout, '--timeout requires a duration, e.g. 45m or 2700s')),
           reason: typeof flags.reason === 'string' ? flags.reason : undefined,

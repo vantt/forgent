@@ -16,6 +16,9 @@ import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const runnerConfig = readStandardValue('runner').value;
 const shipped = shippedCatalog();
+const implement = runnerConfig.capabilities['code:implement'];
+// The project declares the command the final gate runs; the standard config declares none.
+const declaredGate = { ...runnerConfig, capabilities: { ...runnerConfig.capabilities, 'code:implement': { ...implement, verify: 'node gate.mjs' } } };
 
 const guide = {
   id: 'coding/feature',
@@ -49,7 +52,7 @@ function fakePorts({ files = FILES, tests = {}, inherit = null } = {}) {
 }
 
 const slice = (id, writes, extra = {}) => ({ id, objective: `Do ${id}`, writes, verify: `node check-${id}.mjs`, ...extra });
-const propose = (slices, { ports = fakePorts(), manifest = {}, ...rest } = {}) => proposeFromSlices({ manifest: { gate: 'node gate.mjs', slices, ...manifest }, plan: PLAN, guide, runnerConfig, shipped, ports, worktree: '/wt/case', branch: 'case/p', ...rest });
+const propose = (slices, { ports = fakePorts(), manifest = {}, ...rest } = {}) => proposeFromSlices({ manifest: { slices, ...manifest }, plan: PLAN, guide, runnerConfig: declaredGate, shipped, ports, worktree: '/wt/case', branch: 'case/p', ...rest });
 const idsOf = (p) => p.commands.map((c) => c.id);
 const flagValue = (command, flag) => command.argv[command.argv.indexOf(flag) + 1];
 const codes = (p) => p.refusals.map((r) => r.code);
@@ -72,7 +75,9 @@ test('a plan with a document, a code and a locked-contract slice gets a frame, a
   assert.equal(flagValue(doc, '--pattern'), 'solo');
   assert.ok(doc.argv.includes('--reason'), 'a pattern other than the activity\'s is a swap and carries its reason');
   assert.equal(p.commands.find((c) => c.id === 'slice-code').argv.includes('--reason'), false, 'the activity\'s own pattern needs none');
-  assert.equal(flagValue(p.commands.find((c) => c.id === 'gate'), '--verify'), 'node gate.mjs');
+  const gate = p.commands.find((c) => c.id === 'gate');
+  assert.equal(flagValue(gate, '--capability'), 'code:implement');
+  assert.equal(gate.argv.includes('--verify'), false, 'the final gate carries no command of its own');
 });
 
 test('the frame admits the plan validation: a plan of documents only still gets a ceiling for the reviewed pass that validates it', () => {
@@ -134,8 +139,9 @@ test('a proposal that does not match the repository is refused by name, with no 
     assert.deepEqual(p.commands, [], code);
     assert.deepEqual(p.questions.map((q) => q.id), ['refusals'], code);
   }
-  assert.ok(codes(propose([slice('a', ['src/a.mjs'])], { manifest: { gate: undefined } })).includes('gate-command-missing') || runnerConfig.capabilities['code:implement']?.verify, 'no gate command and no configured verify is refused');
-  assert.ok(codes(proposeFromSlices({ manifest: { gate: 'g', slices: [slice('a', ['src/a.mjs'])] }, plan: 'plans/absent.md', guide, runnerConfig, shipped, ports: fakePorts() })).includes('plan-missing'));
+  assert.ok(codes(propose([slice('a', ['src/a.mjs'])], { runnerConfig })).includes('gate-command-missing'), 'a writing slice with no declared code:implement verify is refused');
+  assert.ok(codes(propose([slice('a', ['src/a.mjs'])], { manifest: { gate: 'node gate.mjs' } })).includes('manifest-invalid'), 'a slice list can no longer carry its own gate command');
+  assert.ok(codes(propose([slice('a', ['src/a.mjs'])], { plan: 'plans/absent.md' })).includes('plan-missing'));
 });
 
 test('a slice that writes the whole repository is refused with the owner\'s note, never classified low', () => {
@@ -193,7 +199,7 @@ test('every generated line survives the shell: flags stay bare, values arrive wh
 
 test('without an explicit worktree the case is named after the plan directory, and two plans never share a name', () => {
   const named = 'plans/261101-1200-cool-thing/plan.md';
-  const p = proposeFromSlices({ manifest: { gate: 'node gate.mjs', slices: [slice('a', ['src/a.mjs'])] }, plan: named, guide, runnerConfig, shipped, ports: fakePorts({ files: [named, 'src/a.mjs'] }) });
+  const p = proposeFromSlices({ manifest: { slices: [slice('a', ['src/a.mjs'])] }, plan: named, guide, runnerConfig: declaredGate, shipped, ports: fakePorts({ files: [named, 'src/a.mjs'] }) });
   assert.equal(p.ok, true, JSON.stringify(p.refusals));
   assert.match(p.worktree, /^\.\.\/261101-1200-cool-thing-[0-9a-f]{6}-worktree$/);
   assert.match(p.branch, /^case\/261101-1200-cool-thing-[0-9a-f]{6}$/);
@@ -293,7 +299,7 @@ test('proposing writes nothing: no case, no ledger event, nothing in the checkou
   const snapshot = () => execFileSync('find', ['.', '-not', '-path', './.git/*'], { cwd: root, encoding: 'utf8' }).split('\n').sort().join('\n');
   const before = snapshot();
   const ports = createProposePorts({ checkoutRoot: root, mainRoot: root });
-  const p = proposeFromSlices({ manifest: { gate: 'node gate.mjs', slices: [slice('a', ['src/a.mjs'])] }, plan: 'plan.md', guide, runnerConfig, shipped, ports: { ...ports, headCommit: () => 'c0ffee' } });
+  const p = proposeFromSlices({ manifest: { slices: [slice('a', ['src/a.mjs'])] }, plan: 'plan.md', guide, runnerConfig: declaredGate, shipped, ports: { ...ports, headCommit: () => 'c0ffee' } });
   assert.equal(p.ok, true, JSON.stringify(p.refusals));
   assert.equal(p.inherit, null, 'a checkout with no closed case has nothing to continue');
   assert.equal(snapshot(), before);
