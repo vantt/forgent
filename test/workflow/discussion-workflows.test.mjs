@@ -1,39 +1,15 @@
-// test/workflow/discussion-workflows.test.mjs — Integration tests for discussion Workflows (P4 Wave B Phase 5)
+// test/workflow/discussion-workflows.test.mjs — what the shipped discussion workflows declare: their steps, patterns, gates and blind
+// panels, and the skills that route to them. Running each of them to its end is owned by playbook-observable-order.test.mjs.
 
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { parseYaml } from '../../src/util/yaml.mjs';
 
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
-import { startWorkflow, statusWorkflow, answerWorkflow, resumeWorkflow } from '../../src/workflow/index.mjs';
 import { loadWorkflow, discoverWorkflows } from '../../src/workflow/loader.mjs';
-import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
-
-seedFileLocalBwrapRegistry();
-
-const BIN_FGOS = path.resolve('bin/fgos.mjs');
-
-function setupTestRepo() {
-  return setupWorkflowFixtureRepo({
-    prefix: 'fgos-disc-wf-test-',
-    readme: '# Discussion Workflows Test',
-    gitName: 'Workflow Test',
-    capabilities: [
-      'delphi:propose', 'delphi:synthesize',
-      'nominal-group:generate', 'nominal-group:share', 'nominal-group:vote', 'nominal-group:rank',
-      'group-cognition:explore', 'group-cognition:critique', 'group-cognition:synthesize',
-    ],
-    workerBody: `
-      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Discussion Report\\nCompleted finding.\\n');
-      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
-    `,
-  });
-}
 
 test('delphi.yaml schema validation & discovery', () => {
   const filePath = path.resolve('core/workflows/delphi.yaml');
@@ -175,130 +151,6 @@ test('group-cognition.yaml schema validation & discovery', () => {
   assert.ok(discovered.has('group-cognition'));
   const loaded = loadWorkflow('group-cognition');
   assert.equal(loaded.id, 'group-cognition');
-});
-
-test('runner: executes delphi workflow end-to-end', async () => {
-  const tmp = setupTestRepo();
-
-  const loaded = loadWorkflow('delphi');
-  const state = await startWorkflow({
-    workflow: loaded,
-    repoRoot: tmp,
-    cwd: tmp,
-  });
-
-  assert.equal(state.status, 'completed');
-  assert.equal(state.outcome, 'pass');
-
-  // Verify all 4 steps completed
-  assert.equal(state.steps['blind-proposals'].status, 'completed');
-  assert.equal(state.steps['feedback-synthesis'].status, 'completed');
-  assert.equal(state.steps['second-round'].status, 'completed');
-  assert.equal(state.steps['final-consensus'].status, 'completed');
-
-  const readState = statusWorkflow(state.workflowRunId, { repoRoot: tmp });
-  assert.equal(readState.status, 'completed');
-  assert.equal(readState.workflowId, 'delphi');
-});
-
-test('runner: executes nominal-group workflow with human gate', async () => {
-  const tmp = setupTestRepo();
-
-  const loaded = loadWorkflow('nominal-group');
-  let state = await startWorkflow({
-    workflow: loaded,
-    repoRoot: tmp,
-    cwd: tmp,
-  });
-
-  // Steps before human gate should complete, and runner should park at voting-ranking!
-  assert.equal(state.status, 'parked');
-  assert.equal(state.questions.length, 1);
-  assert.equal(state.questions[0].stepId, 'voting-ranking');
-  assert.equal(state.steps['silent-generation'].status, 'completed');
-  assert.equal(state.steps['round-robin-sharing'].status, 'completed');
-
-  // Answer human gate
-  state = await answerWorkflow(state.workflowRunId, {
-    stepId: 'voting-ranking',
-    answer: 'Rankings approved: Option A (1), Option B (2), Option C (3)',
-    repoRoot: tmp,
-    cwd: tmp,
-  });
-
-  // After gate answered, workflow should complete final-ranking
-  assert.equal(state.status, 'completed');
-  assert.equal(state.outcome, 'pass');
-  assert.equal(state.steps['voting-ranking'].status, 'completed');
-  assert.equal(state.steps['final-ranking'].status, 'completed');
-});
-
-test('runner: executes group-cognition workflow end-to-end', async () => {
-  const tmp = setupTestRepo();
-
-  const loaded = loadWorkflow('group-cognition');
-  const state = await startWorkflow({
-    workflow: loaded,
-    repoRoot: tmp,
-    cwd: tmp,
-  });
-
-  assert.equal(state.status, 'completed');
-  assert.equal(state.outcome, 'pass');
-
-  // Verify all 3 steps completed
-  assert.equal(state.steps['sense-making'].status, 'completed');
-  assert.equal(state.steps['dialectical-inquiry'].status, 'completed');
-  assert.equal(state.steps['action-synthesis'].status, 'completed');
-
-  const readState = statusWorkflow(state.workflowRunId, { repoRoot: tmp });
-  assert.equal(readState.status, 'completed');
-  assert.equal(readState.workflowId, 'group-cognition');
-});
-
-test('CLI: fgos workflow start and status for discussion workflows', () => {
-  const tmp = setupTestRepo();
-
-  // Test delphi CLI
-  const startDelphi = execFileSync(
-    process.execPath,
-    [BIN_FGOS, 'workflow', 'start', 'delphi', '--dir', tmp, '--foreground'],
-    { cwd: tmp, encoding: 'utf8' },
-  );
-  assert.ok(startDelphi.includes('wf-run-'), 'start should print workflowRunId');
-  const matchDelphi = /"workflowRunId":\s*"([^"]+)"/.exec(startDelphi);
-  assert.ok(matchDelphi, 'must capture workflowRunId');
-
-  const statusDelphi = execFileSync(
-    process.execPath,
-    [BIN_FGOS, 'workflow', 'status', matchDelphi[1], '--dir', tmp],
-    { cwd: tmp, encoding: 'utf8' },
-  );
-  assert.ok(statusDelphi.includes('completed'), 'delphi status should show completed');
-
-  // Test nominal-group CLI (parks at human gate)
-  const startNominal = execFileSync(
-    process.execPath,
-    [BIN_FGOS, 'workflow', 'start', 'nominal-group', '--dir', tmp, '--foreground'],
-    { cwd: tmp, encoding: 'utf8' },
-  );
-  const matchNominal = /"workflowRunId":\s*"([^"]+)"/.exec(startNominal);
-  assert.ok(matchNominal, 'must capture nominal workflowRunId');
-
-  const statusNominal = execFileSync(
-    process.execPath,
-    [BIN_FGOS, 'workflow', 'status', matchNominal[1], '--dir', tmp],
-    { cwd: tmp, encoding: 'utf8' },
-  );
-  assert.ok(statusNominal.includes('parked'), 'nominal-group status should show parked');
-
-  // Answer nominal-group gate via CLI
-  const answerNominal = execFileSync(
-    process.execPath,
-    [BIN_FGOS, 'workflow', 'answer', matchNominal[1], '--step', 'voting-ranking', '--answer', 'Priority 1,2,3', '--dir', tmp, '--foreground'],
-    { cwd: tmp, encoding: 'utf8' },
-  );
-  assert.ok(answerNominal.includes('completed'), 'workflow answer should resume and complete');
 });
 
 test('skills: fgos-advise and fgos-group-thinking route to named discussion workflows', () => {

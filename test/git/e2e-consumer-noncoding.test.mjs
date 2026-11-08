@@ -1,7 +1,7 @@
 import '../helpers/process-tmp-root.mjs';
 // V-CONSUMER (Git spec §15, §1): the real business-discussion Workflow, a read-only Unit route,
 // runs where a business project lives. No other test runs a registered Workflow on a detached HEAD
-// without origin/HEAD or outside a repository: test/workflow/business-discussion-workflow.test.mjs
+// without origin/HEAD or outside a repository: test/workflow/playbook-observable-order.test.mjs
 // owns the preset's step order and gate on an ordinary branch checkout, and
 // test/git/inspect.test.mjs owns Inspect's typed `notARepository` answer. The labelled writing
 // fixture below is the one noncoding Unit that writes and lands; it is never a production caller.

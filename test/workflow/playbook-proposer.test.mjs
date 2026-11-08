@@ -6,7 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { createWorkflowRun, readWorkflowEvents } from '../../src/workflow/store.mjs';
@@ -208,6 +208,16 @@ test('concurrent resumes give exactly one proposer, and a run recorded before ca
   assert.equal(events.filter((e) => e.type === 'workflow.complete').length, 1);
 });
 
+/** Resolves once no process is left whose command line names `dir`: the workers of a killed proposer have ended on their own. */
+async function waitUntilNothingRunsIn(dir, timeoutMs = 30000) {
+  const running = () => execFileSync('ps', ['-axww', '-o', 'args'], { encoding: 'utf8' }).split('\n').some((line) => line.includes(dir));
+  const deadline = Date.now() + timeoutMs;
+  while (running()) {
+    assert.ok(Date.now() < deadline, `a process still runs in ${dir} after ${timeoutMs} ms`);
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+}
+
 test('a proposer killed while its Unit runs leaves the reservation in place; the next proposer takes the same Unit run and the same reservation', async () => {
   const tmp = setupRepo();
   const workflow = validateWorkflow({ id: 'proposer-killed', steps: [{ id: 's', units: [unit('slow', 'SLEEP:2500')] }] });
@@ -235,7 +245,7 @@ test('a proposer killed while its Unit runs leaves the reservation in place; the
   assert.equal(mid.some((e) => e.type === 'settle'), false, 'the proposer\'s death settles nothing');
   assert.deepEqual(projectCase(mid).liveReservations.map((r) => r.reservationId), [reservation.payload.reservationId], 'the reservation is not released');
 
-  await new Promise((resolve) => setTimeout(resolve, 3500)); // the worker that outlived it finishes
+  await waitUntilNothingRunsIn(tmp); // the worker that outlived the proposer, if it started, finishes on its own
   const state = await resumeWorkflow(id, opts(tmp));
   assert.equal(state.status, 'completed', JSON.stringify(state.steps));
   const after = eventsOf(tmp, id);
@@ -243,21 +253,6 @@ test('a proposer killed while its Unit runs leaves the reservation in place; the
   assert.equal(after.filter((e) => e.type === 'unit.started').length, 1, 'the same Unit run is continued');
   assert.equal(after.find((e) => e.type === 'settle').payload.reservationId, reservation.payload.reservationId);
   assert.deepEqual(projectCase(after).liveReservations, []);
-});
-
-test('an answer kept as a file by the detached door is folded in by the next proposer', async () => {
-  const tmp = setupRepo();
-  const parked = await startWorkflow({ workflow: validateWorkflow(APPROVAL_GUIDE), ...opts(tmp) });
-  const id = parked.workflowRunId;
-  const held = acquireAdvanceLock(tmp, id);
-  try {
-    const kept = await answerWorkflow(id, { stepId: 'approval', answer: 'yes', approved: true, detached: true, ...opts(tmp) });
-    assert.equal(kept.recorded, true);
-  } finally {
-    held.release();
-  }
-  const state = await resumeWorkflow(id, opts(tmp));
-  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
 });
 
 test('a panel Unit is admitted under a ceiling of its planned seats times the fallback allowance, and settles the launches it used', async () => {

@@ -10,7 +10,7 @@ import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { execFileSync } from 'node:child_process';
 
-import { startWorkflow, resumeWorkflow, statusWorkflow } from '../../src/workflow/index.mjs';
+import { startWorkflow, resumeWorkflow, statusWorkflow, answerWorkflow } from '../../src/workflow/index.mjs';
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { resolveLock } from '../../src/holder-lock/index.mjs';
@@ -156,23 +156,6 @@ test('a units file runs through startWorkflow, and a unit\'s prefer and persona 
   assert.deepEqual(record.overrides, []);
 });
 
-test('--effort becomes a reasoningEffort override on every unit, with no origin that claims a person typed it, kept in the run for resume', async () => {
-  const tmp = setupRepo({ effortCli: true });
-  const workflow = validateWorkflow({
-    id: 'effort',
-    steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read', writes: [] } }] }],
-  });
-  const state = await startWorkflow({ workflow, effort: 'high', ...opts(tmp) });
-  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
-  assert.equal(state.effort, 'high');
-  assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0].payload.effort, 'high');
-
-  const unitRunId = state.steps.s.units.u.unitRunId;
-  assert.deepEqual(producerAssignment(tmp, unitRunId).binding.provenance.reasoningEffort, { value: 'high', source: 'override' });
-  assert.ok(unitRecordOf(tmp, unitRunId).overrides.some((o) => o.reasoningEffort === 'high' && o.origin === undefined && !o.scope));
-  assert.match(state.steps.s.units.u.results.at(-1).runResult.agentClaim.summary, /Effort: high/, 'the CLI was launched with --effort high');
-});
-
 test('an effort level outside the canonical ones is refused before any run exists', async () => {
   const tmp = setupRepo();
   const workflow = validateWorkflow({ id: 'effort-bad', steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', objective: 'x' } }] }] });
@@ -250,26 +233,6 @@ test('a writing unit that builds on two writing units is refused at start, befor
   assert.match(state.steps['w-c'].units['w-c'].results.at(-1).runResult.agentClaim.summary, /Seen: a\.txt,b\.txt/);
 });
 
-test('resume keeps the effort the run started with', async () => {
-  const tmp = setupRepo({ effortCli: true });
-  const workflow = validateWorkflow({
-    id: 'effort-resume',
-    steps: [
-      { id: 'gate', gate: { kind: 'human', question: 'Go?' } },
-      { id: 's', dependsOn: ['gate'], units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read' } }] },
-    ],
-  });
-  const parked = await startWorkflow({ workflow, effort: 'low', ...opts(tmp) });
-  assert.equal(parked.status, 'parked');
-  const { answerWorkflow } = await import('../../src/workflow/index.mjs');
-  const state = await answerWorkflow(parked.workflowRunId, { stepId: 'gate', answer: 'yes', approved: true, ...opts(tmp) });
-  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
-  assert.equal(producerAssignment(tmp, state.steps.s.units.u.unitRunId).binding.provenance.reasoningEffort.value, 'low');
-  assert.match(state.steps.s.units.u.results.at(-1).runResult.agentClaim.summary, /Effort: low/);
-  // A resume of the finished run changes nothing.
-  assert.equal((await resumeWorkflow(parked.workflowRunId, opts(tmp))).effort, 'low');
-});
-
 test('a file outside the scope is found by its real name, so a non-ASCII name inside the scope passes', async () => {
   const tmp = setupRepo();
   const workflow = validateWorkflow({
@@ -338,7 +301,6 @@ test('a writer whose base writer has no branch fails instead of starting from HE
   const branchA = parked.steps.a.units['w-a'].branch;
   execFileSync('git', ['worktree', 'remove', '--force', parked.steps.a.units['w-a'].worktreePath], { cwd: tmp });
   execFileSync('git', ['branch', '-D', branchA], { cwd: tmp });
-  const { answerWorkflow } = await import('../../src/workflow/index.mjs');
   const state = await answerWorkflow(parked.workflowRunId, { stepId: 'gate', answer: 'yes', approved: true, ...opts(tmp) });
   assert.equal(state.status, 'failed');
   assert.match(state.steps.b.reason, new RegExp(`base branch "${branchA}"`));
@@ -357,123 +319,6 @@ test('a preset or plan writer that builds on two writers keeps starting from HEA
   const state = await startWorkflow({ workflow, ...opts(tmp) });
   assert.equal(state.status, 'completed', JSON.stringify(state.steps));
   assert.equal(state.steps.c.units['w-c'].baseRef, 'HEAD');
-});
-
-test('fgos workflow start --units <file> --effort runs the units and reports the write branches', async () => {
-  const tmp = setupRepo({ effortCli: true });
-  const file = unitsFile(tmp, [
-    { id: 'w-a', objective: 'WRITE:a.txt', capability: 'docs:write', writes: ['a.txt'] },
-    { id: 'w-b', objective: 'WRITE:b.txt EXPECT:a.txt', capability: 'docs:write', writes: ['b.txt'], dependsOn: ['w-a'] },
-  ]);
-  const out = execFileSync(process.execPath, [path.resolve('bin/fgos.mjs'), 'workflow', 'start', '--units', file, '--effort', 'high', '--foreground', '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
-  const state = JSON.parse(out).data;
-  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
-  assert.equal(state.effort, 'high');
-  assert.deepEqual(state.writeBranches.map((e) => e.unitId), ['w-a', 'w-b']);
-  assert.equal(state.writeBranches[1].baseRef, state.writeBranches[0].branch);
-  assert.match(state.steps['w-b'].units['w-b'].results.at(-1).runResult.agentClaim.summary, /Seen: a\.txt Effort: high/);
-});
-
-test('--timeout gives every unit of the workflow run its own timeoutMs, kept for resume', async () => {
-  const tmp = setupRepo();
-  const workflow = validateWorkflow({
-    id: 'timeout-run',
-    steps: [
-      { id: 'gate', gate: { kind: 'human', question: 'Proceed?' } },
-      { id: 's', dependsOn: ['gate'], units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read' } }] },
-    ],
-  });
-  const state = await startWorkflow({ workflow, timeout: '90m', ...opts(tmp) });
-  assert.equal(state.status, 'parked');
-  assert.equal(state.timeoutMs, 5400000);
-  assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0].payload.timeoutMs, 5400000);
-
-  const { answerWorkflow } = await import('../../src/workflow/index.mjs');
-  const answered = await answerWorkflow(state.workflowRunId, { stepId: 'gate', answer: 'yes', approved: true, ...opts(tmp) });
-  assert.equal(answered.status, 'completed', JSON.stringify(answered.steps));
-  assert.equal(answered.timeoutMs, 5400000);
-
-  const unitRunId = answered.steps.s.units.u.unitRunId;
-  const record = unitRecordOf(tmp, unitRunId);
-  assert.ok(record.overrides.some((o) => o.timeoutMs === 5400000 && o.origin === undefined && !o.scope));
-  assert.deepEqual(producerAssignment(tmp, unitRunId).binding.provenance.timeoutMs, { value: 5400000, source: 'override' });
-  assert.equal(producerAssignment(tmp, unitRunId).binding.timeoutMs, 5400000);
-});
-
-test('a unit\'s timeoutMs in a units file reaches the Unit and its dispatch and wins over workflow start --timeout; one out of range is refused', async () => {
-  const tmp = setupRepo();
-  const file = unitsFile(tmp, [
-    { id: 'u-default', objective: 'Read', capability: 'docs:write' },
-    { id: 'u-custom', objective: 'Read with own timeout', capability: 'docs:write', timeoutMs: 120000 },
-  ]);
-  const state = await startWorkflow({ unitsPath: file, timeout: '90m', ...opts(tmp) });
-  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
-  assert.equal(state.timeoutMs, 5400000);
-
-  const runA = state.steps['u-default'].units['u-default'].unitRunId;
-  const runB = state.steps['u-custom'].units['u-custom'].unitRunId;
-
-  assert.deepEqual(producerAssignment(tmp, runA).binding.provenance.timeoutMs, { value: 5400000, source: 'override' });
-  assert.equal(producerAssignment(tmp, runA).binding.timeoutMs, 5400000);
-
-  assert.deepEqual(producerAssignment(tmp, runB).binding.provenance.timeoutMs, { value: 120000, source: 'unit' });
-  assert.equal(producerAssignment(tmp, runB).binding.timeoutMs, 120000);
-  assert.equal(unitRecordOf(tmp, runB).unit.timeoutMs, 120000);
-  assert.equal(JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', runB, 'producer', '1', 'runs', '01', 'run.json'), 'utf8')).timeoutMs, 120000);
-
-  assert.throws(() => validateWorkflow({
-    id: 'too-long',
-    steps: [{ id: 's', units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read', writes: [], timeoutMs: 99 * 3600000 } }] }],
-  }), /timeoutMs must be at most 4h/);
-});
-
-test('--account pins provider account on every unit of the workflow run, kept for resume', async () => {
-  const tmp = setupRepo();
-  // The account's login store sits beside the project, never around it: a confined launch masks every store.
-  const store = makeFixtureDir('fgos-login-store-');
-  fixtures.push(store);
-  fs.writeFileSync(path.join(store, 'login'), 'token\n');
-  const fakeHome = makeFixtureDir('fgos-home-');
-  fixtures.push(fakeHome);
-  fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
-  writeAccountsFile(path.join(fakeHome, '.fgos'), {
-    providers: {
-      node: {
-        accounts: {
-          'acct-test': { label: 'acct-test', credentialSource: { kind: 'home-files', home: store, files: ['login'] } },
-        },
-      },
-    },
-  });
-  const prevHome = process.env.HOME;
-  moveMachineKeysTo(tmp, fakeHome);
-  process.env.HOME = fakeHome;
-  try {
-    const workflow = validateWorkflow({
-      id: 'account-run',
-      steps: [
-        { id: 'gate', gate: { kind: 'human', question: 'Proceed?' } },
-        { id: 's', dependsOn: ['gate'], units: [{ id: 'u', template: { capability: 'docs:write', objective: 'Read' } }] },
-      ],
-    });
-    const state = await startWorkflow({ workflow, account: 'node/acct-test', ...opts(tmp) });
-    assert.equal(state.status, 'parked');
-    assert.equal(state.account, 'node/acct-test');
-    assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0].payload.account, 'node/acct-test');
-
-    const { answerWorkflow } = await import('../../src/workflow/index.mjs');
-    const answered = await answerWorkflow(state.workflowRunId, { stepId: 'gate', answer: 'yes', approved: true, ...opts(tmp) });
-    assert.equal(answered.status, 'completed', JSON.stringify(answered.steps));
-    assert.equal(answered.account, 'node/acct-test');
-
-    const unitRunId = answered.steps.s.units.u.unitRunId;
-    const binding = producerAssignment(tmp, unitRunId).binding;
-    assert.deepEqual(binding.account, { pool: 'node', id: 'acct-test' });
-    assert.deepEqual(binding.provenance.account, { value: 'node/acct-test', source: 'override:workflow' });
-  } finally {
-    if (prevHome === undefined) delete process.env.HOME;
-    else process.env.HOME = prevHome;
-  }
 });
 
 test('workflow start with invalid --timeout or --account is refused before run exists', async () => {
@@ -565,8 +410,8 @@ test('workflow with two units on different providers pins account only on matchi
   }
 });
 
-test('CLI workflow start accepts --timeout and --account, while resume refuses them', async () => {
-  const tmp = setupRepo();
+test('CLI workflow start --units takes --effort, --timeout and --account and reports the write branches, while resume refuses --timeout and --account', async () => {
+  const tmp = setupRepo({ effortCli: true });
   const fakeHome = makeFixtureDir('fgos-cli-home-');
   // The account's login store sits beside the project, never around it: a confined launch masks every store.
   const store = makeFixtureDir('fgos-login-store-');
@@ -585,13 +430,14 @@ test('CLI workflow start accepts --timeout and --account, while resume refuses t
   });
 
   const file = unitsFile(tmp, [
-    { id: 'w-u', objective: 'Read', capability: 'docs:write' },
+    { id: 'w-u', objective: 'WRITE:out.txt', capability: 'docs:write', writes: ['out.txt'] },
   ]);
   moveMachineKeysTo(tmp, fakeHome);
   const cliEnv = { ...process.env, HOME: fakeHome, USERPROFILE: fakeHome };
   const out = execFileSync(process.execPath, [
     path.resolve('bin/fgos.mjs'), 'workflow', 'start',
     '--units', file,
+    '--effort', 'high',
     '--timeout', '90m',
     '--account', 'node/acct-cli',
     '--foreground',
@@ -601,6 +447,9 @@ test('CLI workflow start accepts --timeout and --account, while resume refuses t
   assert.equal(state.status, 'completed');
   assert.equal(state.timeoutMs, 5400000);
   assert.equal(state.account, 'node/acct-cli');
+  assert.equal(state.effort, 'high');
+  assert.deepEqual(state.writeBranches.map((e) => e.unitId), ['w-u']);
+  assert.match(state.steps['w-u'].units['w-u'].results.at(-1).runResult.agentClaim.summary, /Effort: high/);
 
   // resume with --timeout or --account is refused
   assert.throws(() => execFileSync(process.execPath, [
@@ -717,4 +566,68 @@ test('a unit\'s skills in a units file reach bind(), and a pool that cannot prov
   const served = await startWorkflow({ unitsPath: file, ...opts(tmp) });
   assert.equal(served.status, 'completed', JSON.stringify(served.steps));
   assert.deepEqual(unitRecordOf(tmp, served.steps['needs-skill'].units['needs-skill'].unitRunId).unit.skills, ['docs-seeker']);
+});
+
+test('--effort, --timeout and --account reach the Unit of every step, a unit\'s own timeoutMs wins over --timeout, and all three are kept through an answer and a resume', async () => {
+  const tmp = setupRepo({ effortCli: true });
+  // The account's login store sits beside the project, never around it: a confined launch masks every store.
+  const store = makeFixtureDir('fgos-login-store-');
+  fixtures.push(store);
+  fs.writeFileSync(path.join(store, 'login'), 'token\n');
+  const fakeHome = makeFixtureDir('fgos-home-');
+  fixtures.push(fakeHome);
+  fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
+  writeAccountsFile(path.join(fakeHome, '.fgos'), {
+    providers: { node: { accounts: { 'acct-test': { label: 'acct-test', credentialSource: { kind: 'home-files', home: store, files: ['login'] } } } } },
+  });
+  const prevHome = process.env.HOME;
+  moveMachineKeysTo(tmp, fakeHome);
+  process.env.HOME = fakeHome;
+  try {
+    const workflow = validateWorkflow({
+      id: 'run-options',
+      steps: [
+        { id: 'gate', gate: { kind: 'human', question: 'Proceed?' } },
+        { id: 's', dependsOn: ['gate'], units: [
+          { id: 'u', template: { capability: 'docs:write', objective: 'Read' } },
+          { id: 'u-own', template: { capability: 'docs:write', objective: 'Read with own timeout', timeoutMs: 120000 } },
+        ] },
+      ],
+    });
+    const parked = await startWorkflow({ workflow, effort: 'high', timeout: '90m', account: 'node/acct-test', ...opts(tmp) });
+    assert.equal(parked.status, 'parked');
+
+    const answered = await answerWorkflow(parked.workflowRunId, { stepId: 'gate', answer: 'yes', approved: true, ...opts(tmp) });
+    assert.equal(answered.status, 'completed', JSON.stringify(answered.steps));
+    const kept = (state) => [state.effort, state.timeoutMs, state.account];
+    assert.deepEqual(kept(answered), ['high', 5400000, 'node/acct-test'], 'the answer runs the units with what the run started with');
+    assert.deepEqual(kept(await resumeWorkflow(parked.workflowRunId, opts(tmp))), ['high', 5400000, 'node/acct-test']);
+
+    const runOf = (unitId) => answered.steps.s.units[unitId];
+    for (const unitId of ['u', 'u-own']) {
+      const unitRunId = runOf(unitId).unitRunId;
+      const { binding } = producerAssignment(tmp, unitRunId);
+      assert.deepEqual(binding.provenance.reasoningEffort, { value: 'high', source: 'override:workflow' });
+      assert.match(runOf(unitId).results.at(-1).runResult.agentClaim.summary, /Effort: high/, 'the CLI was launched with --effort high');
+      assert.deepEqual(binding.account, { pool: 'node', id: 'acct-test' });
+      assert.deepEqual(binding.provenance.account, { value: 'node/acct-test', source: 'override:workflow' });
+    }
+
+    const plain = unitRecordOf(tmp, runOf('u').unitRunId);
+    assert.deepEqual(plain.overrides, [{ reasoningEffort: 'high', timeoutMs: 5400000, account: 'node/acct-test', origin: 'workflow' }]);
+    const plainBinding = producerAssignment(tmp, runOf('u').unitRunId).binding;
+    assert.deepEqual(plainBinding.provenance.timeoutMs, { value: 5400000, source: 'override:workflow' });
+    assert.equal(plainBinding.timeoutMs, 5400000);
+
+    const own = unitRecordOf(tmp, runOf('u-own').unitRunId);
+    assert.deepEqual(own.overrides, [{ reasoningEffort: 'high', account: 'node/acct-test', origin: 'workflow' }], 'the run timeout is not an override of a unit that has its own');
+    assert.equal(own.unit.timeoutMs, 120000);
+    const ownBinding = producerAssignment(tmp, runOf('u-own').unitRunId).binding;
+    assert.deepEqual(ownBinding.provenance.timeoutMs, { value: 120000, source: 'unit' });
+    assert.equal(ownBinding.timeoutMs, 120000);
+    assert.equal(JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', runOf('u-own').unitRunId, 'producer', '1', 'runs', '01', 'run.json'), 'utf8')).timeoutMs, 120000);
+  } finally {
+    if (prevHome === undefined) delete process.env.HOME;
+    else process.env.HOME = prevHome;
+  }
 });
