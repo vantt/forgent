@@ -1,6 +1,6 @@
 # HARDEN T6 seat pin rule (owner decision 71, 3a) - lead report
 
-Status: branch `harden/t6-p09-seat-pin-rule` pushed, NOT landed: waiting on owner Q-1 (effect on `fgos run --account`).
+Status: landed on main (owner answered Q-1 = (a)).
 
 ## What changed
 - `packages/seat-binding/rust/src/rank.rs`: the account pin applies only when the seat's first survivor (its choice before the pin) is served by the pinned pool. One condition: `survivors.first().is_some_and(pool == pin pool)` replaces `survivors.iter().any(...)`. Otherwise survivors stay unchanged and `account-pin-other-pool` is recorded (text now says "the first choice of this seat is not served by pool"). Inventory, disabled and login checks unchanged.
@@ -27,7 +27,5 @@ Capability `docs:write` prefers [alpha, beta]; accounts alpha/a1, beta/b1.
 - Full `npm test` (no COOK HOLD active): pass 8549, fail 1 (known V7n addendum), 0 run-tests ERROR lines.
 - Net size: Rust +5/-4, Node tests about -12 net, golden JSON +93 lines.
 
-## Left for after Q-1
-- `src/cli/command-registry.mjs:1570` and `:2403` help sentences (hot file, after P01 lands): `--account`: "It pins only a seat whose first choice that pool serves (it never moves a seat to another pool); pair it with --provider to make the pool's executor the first choice." `workflow start --account`: "A seat whose first choice another pool serves runs unpinned."
-- Runner spec RUL106 "Pin" sentence (`docs/platform/runner/subcomponents/h-6979005beaf7/spec.md`, outside this phase's file list) still says "selects the candidate of the chosen family whose pool matches": needs the same rule (DOC phase).
-- Smoke on fg-server2 and rebase/census/baseline regeneration at landing.
+## After Q-1 = (a) (decision 72)
+Landed with the rebase: help text of `fgos run --account` and `workflow start --account` states the rule, runner spec RUL106 Pin sentence corrected, census regenerated, suite baseline regenerated. Full `npm test` after rebase: pass 8561, fail 1 (known V7n addendum), 0 run-tests ERROR lines.

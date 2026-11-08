@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f952934a907106a11c1e0a9db8848cbb26781d79e7de09a37f12cf20e3836393",
+  "payloadDigest": "ef815f607bbd7d56b5d69fbb6add9312873f5beb26ce8e70637b40e35c89a2c9",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -707,7 +707,7 @@
     "packages/seat-binding/rust/src/lib.rs": "68825754d282aaa175e964347b86b0685a6d07375657a43f09cefe4f919ba98a",
     "packages/seat-binding/rust/src/model.rs": "6b362bccbd81df0d4b8ef1e8541bb453f3ca0e1c7bd9cc54d74367037f6817eb",
     "packages/seat-binding/rust/src/policy.rs": "ca93a8c356448adbd935f04a310f82eb53894ea76d25a1a55c065e545e83e8e7",
-    "packages/seat-binding/rust/src/rank.rs": "8810e1f1fe79d363dcd1699fc6063726190da6bbe3de9e0bb0c32b1f4d873e23",
+    "packages/seat-binding/rust/src/rank.rs": "f7e745682f6a6e0c967567e795e4a90a33ac617b7fed9700f4b7716036e6dadf",
     "packages/seat-binding/rust/src/route.rs": "b14ba0cee5bd2aee535f2b76ea96bc0ef532e4166016a26c98d89c11d2fd484f",
     "packages/seat-binding/rust/src/tier.rs": "367ff6b68c0db941e5b942879a79afac721017ba36e7dec2443cc98383155cb7",
     "packages/seat-binding/rust/tests/golden.rs": "3536ea649db21c346bd59829b33aa461e05e902d4f603ad15bc8db79d71eb561",
@@ -898,7 +898,7 @@
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "a8ecea5b3e88edee075579ee256fae18aae2188bd87aea6d9165d89c9e587122",
-    "src/cli/command-registry.mjs": "ae1c523e1f3497bf945765d95a985f9ff3016acd23adacffefa9771ad3653ef7",
+    "src/cli/command-registry.mjs": "20c8c64b8eb09812def133ffa7a8eb8bfad5ca72481805445abc0e9aa55afaf4",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
     "src/cli/detached-child.mjs": "905d006eb7d43212e552a0ef543bbdbc59c4f033b886cb3410ebf3a9681a2e4c",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
