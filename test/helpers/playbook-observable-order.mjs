@@ -9,7 +9,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadWorkflow, startWorkflow, answerWorkflow, readWorkflowEvents } from '../../src/workflow/index.mjs';
+import { loadWorkflow } from '../../src/workflow/loader.mjs';
+import { startWorkflow, answerWorkflow } from '../../src/workflow/index.mjs';
+import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { setupWorkflowFixtureRepo } from './workflow-fixture-repo.mjs';
 
 export const PLAYBOOKS = [

@@ -33,6 +33,9 @@ function liveAdvanceHolder(mainRoot, workflowRunId) {
   return probe('advance', params).result === 'free' ? null : { pid: null };
 }
 
+/** The refusal every verb gives for an id that names no case. */
+export const caseNotFound = (workflowRunId) => new RunnerConfigError(`Workflow run "${workflowRunId}" not found`, { code: 'case-not-found' });
+
 function advanceRefusal(workflowRunId, pid) {
   const holder = pid ? `process ${pid}` : 'another process';
   return new RunnerConfigError(
@@ -52,7 +55,7 @@ function advanceRefusal(workflowRunId, pid) {
 export function tryAcquireAdvanceLock(mainRoot, workflowRunId, { drain = true } = {}) {
   const params = advanceLockParams(mainRoot, workflowRunId);
   // Taking the lock creates its directory; never bring back a run that was deleted.
-  if (!fs.existsSync(params.workflowRunDir)) throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
+  if (!fs.existsSync(params.workflowRunDir)) throw caseNotFound(workflowRunId);
   const res = acquireSync(createLockScope('advance'), 'advance', params);
   if (res.result !== 'acquired') return null;
   const hold = createAdvanceHold({ workflowRunId, release: () => res.handle.release() });

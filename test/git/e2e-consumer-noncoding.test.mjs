@@ -14,7 +14,8 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { landRunnerItem } from '../../src/runner/merge.mjs';
-import { startWorkflow, answerWorkflow, validateWorkflow } from '../../src/workflow/index.mjs';
+import { startWorkflow, answerWorkflow } from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 

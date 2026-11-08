@@ -8,15 +8,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { parseYaml } from '../../src/util/yaml.mjs';
 
-import {
-  validateWorkflow,
-  startWorkflow,
-  statusWorkflow,
-  answerWorkflow,
-  resumeWorkflow,
-  loadWorkflow,
-  discoverWorkflows,
-} from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
+import { startWorkflow, statusWorkflow, answerWorkflow, resumeWorkflow } from '../../src/workflow/index.mjs';
+import { loadWorkflow, discoverWorkflows } from '../../src/workflow/loader.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 

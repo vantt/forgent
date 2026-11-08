@@ -10,23 +10,10 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync, spawn } from 'node:child_process';
 
-import {
-  validateWorkflow,
-  createWorkflowRun,
-  appendWorkflowEvent,
-  readWorkflowEvents,
-  projectWorkflowState,
-  createWorkflowWorktree,
-  resolveIntegrationTarget,
-  cleanupWorkflowWorktree,
-  startWorkflow,
-  statusWorkflow,
-  answerWorkflow,
-  resumeWorkflow,
-  answerWorkflowDetached,
-  resumeWorkflowDetached,
-  preflightWorkflowSeats,
-} from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
+import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents, projectWorkflowState } from '../../src/workflow/store.mjs';
+import { createWorkflowWorktree, resolveIntegrationTarget, cleanupWorkflowWorktree } from '../../src/workflow/unit-handoff.mjs';
+import { startWorkflow, statusWorkflow, answerWorkflow, resumeWorkflow, preflightWorkflowSeats } from '../../src/workflow/index.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { normalizeContextRefs, WorkflowDefinitionError } from '../../src/workflow/definition.mjs';
@@ -513,12 +500,12 @@ test('a run already being advanced by a live process refuses a second advance; a
   const opts = { repoRoot: tmp, cwd: tmp };
   const answer = { stepId: 'step-gate', answer: 'yes', approved: true, ...opts };
 
-  assert.throws(() => resumeWorkflowDetached(id, opts), new RegExp(`already being advanced by process ${process.pid}`));
+  await assert.rejects(resumeWorkflow(id, { ...opts, detached: true }), new RegExp(`already being advanced by process ${process.pid}`));
   await assert.rejects(resumeWorkflow(id, opts), /already being advanced/);
   assert.equal(eventCount(), before, 'a refused resume records nothing');
 
   // An answer never writes the ledger itself: it is kept as a file and the live holder records it.
-  const kept = answerWorkflowDetached(id, answer);
+  const kept = await answerWorkflow(id, { ...answer, detached: true });
   assert.equal(kept.recorded, true);
   assert.equal(kept.appliedBy, 'live proposer');
   assert.equal(kept.detached, undefined, 'no second process is started');
@@ -1963,6 +1950,7 @@ test('workflow start --seats through the real CLI stores the expanded definition
   assert.deepEqual(state.seatsEcho.refs, { count: 1, totalBytes: 14, unreadable: [] }, 'the start echoes what it pinned');
   assert.deepEqual(state.seatsEcho.personas, [], 'lenses carry no persona');
   assert.ok(status.seatProviders.length >= 3 && status.seatProviders.every((row) => typeof row.executor === 'string'), 'status says which executor served each seat');
+  assert.ok(status.seatProviders.every((row) => 'account' in row), 'status says which account each seat ran on, or null when no account was pinned');
   assert.deepEqual(status.workflow.steps[1].units[0].template.contextRefs, ['docs/note.md'], 'the shared ref is copied to the step run-level refs cannot reach');
   const startEvent = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId })[0];
   assert.deepEqual(startEvent.payload.workflow.steps[0].units[0].template.params, panel.params);

@@ -2268,18 +2268,23 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // resolution/RESEARCH.md).
     case 'workflow': {
       const sub = positional[0];
-      // start, answer and resume return at once with the run id and where to read progress,
-      // handing the advancing to a detached process; --foreground keeps it in this process.
-      // The arg parser hands `--foreground <id>` the id as the flag's value.
-      const foreground = flags.foreground !== undefined && flags.foreground !== 'false';
+      // start, answer and resume return at once with the run id and where to read progress, handing the
+      // advancing to a detached process; --foreground keeps it in this process. The arg parser hands
+      // `--foreground <id>` the id as the flag's value.
+      const detached = flags.foreground === undefined || flags.foreground === 'false';
       const swallowedId = typeof flags.foreground === 'string' && flags.foreground !== 'true' ? flags.foreground : undefined;
+      const runIdOf = (usage) => requireField(positional[1] ?? flags.id ?? swallowedId, `workflow ${sub} requires a workflowRunId: ${usage}`);
+      const withDirWarning = async (run) => {
+        const warning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
+        return attachDirWarning(await run(), warning);
+      };
+      const text = (value) => (typeof value === 'string' ? value : undefined);
       if (sub === 'start') {
-        const { startWorkflow, startWorkflowDetached, preflightWorkflowSeats } = await import('../src/workflow/index.mjs');
+        const { startWorkflow, preflightWorkflowSeats } = await import('../src/workflow/index.mjs');
         const workflowId = positional[1] ?? flags.id ?? swallowedId;
         // --units <file>: a list of Units run as a one-off Workflow, one step per Unit.
         const unitsPath = flags.units === undefined ? undefined : requireField(flags.units, '--units requires a file path (YAML or JSON list of units)');
-        const sources = [workflowId, unitsPath].filter((value) => value !== undefined);
-        if (sources.length !== 1) {
+        if ([workflowId, unitsPath].filter((value) => value !== undefined).length !== 1) {
           throw new StoreError('validation', 'workflow start requires exactly one of <workflowId> or --units <file>');
         }
         if (unitsPath !== undefined && flags.seats !== undefined) {
@@ -2292,7 +2297,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           effort: flags.effort === undefined ? undefined : requireField(flags.effort, '--effort requires a level (low, medium, high, max)'),
           timeout: flags.timeout === undefined ? undefined : requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'),
           account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires pool/account (an account of a pool in ~/.fgos/private/accounts.yaml, for example openai/work)'),
-          request: typeof flags.request === 'string' ? flags.request : undefined,
+          request: text(flags.request),
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
           // --frame k=v,k=v: narrows the guide's frame defaults for this case, never widens them.
@@ -2308,100 +2313,69 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           repoRoot: flags.dir,
           cwd: process.cwd(),
           worktree: flags.worktree,
+          detached,
         };
         // --seats: dry-bind the rebuilt definition first; a refusal creates no run, shared-family notes ride along.
         const seatsPreflight = startParams.seats === undefined ? undefined : await preflightWorkflowSeats(startParams);
-        // Default: record the run, hand advancing to a detached process, return the run id.
-        // --foreground keeps the run in this process until it completes, fails, or parks.
-        const startWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
-        const started = foreground ? await startWorkflow(startParams) : startWorkflowDetached(startParams);
-        // What the start pinned, stated before the first seat spends anything (see src/workflow/ref-digests.mjs).
-        const { seatsEcho } = await import('../src/workflow/ref-digests.mjs');
-        const echoed = started.seats ? { ...started, seatsEcho: seatsEcho(started.seats) } : started;
-        return attachDirWarning(seatsPreflight?.warnings.length ? { ...echoed, seatsPreflight } : echoed, startWarning);
+        return withDirWarning(async () => {
+          const started = await startWorkflow(startParams);
+          // What the start pinned, stated before the first seat spends anything (see src/workflow/ref-digests.mjs).
+          const { seatsEcho } = await import('../src/workflow/ref-digests.mjs');
+          const echoed = started.seats ? { ...started, seatsEcho: seatsEcho(started.seats) } : started;
+          return seatsPreflight?.warnings.length ? { ...echoed, seatsPreflight } : echoed;
+        });
       }
       if (sub === 'status') {
         const { statusWorkflow } = await import('../src/workflow/index.mjs');
-        const workflowRunId = requireField(positional[1] ?? flags.id, 'workflow status requires a workflowRunId: fgos workflow status <id>');
-        return statusWorkflow(workflowRunId, { repoRoot: flags.dir });
+        return statusWorkflow(runIdOf('fgos workflow status <id>'), { repoRoot: flags.dir });
       }
       if (sub === 'answer') {
-        const { answerWorkflow, answerWorkflowDetached } = await import('../src/workflow/index.mjs');
-        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow answer requires a workflowRunId: fgos workflow answer <id> --step <stepId> --answer <text> [--approve]');
+        const { answerWorkflow } = await import('../src/workflow/index.mjs');
+        const workflowRunId = runIdOf('fgos workflow answer <id> --step <stepId> --answer <text> [--approve]');
         const stepId = requireField(flags.step, 'workflow answer requires --step <stepId>');
         const answer = requireField(flags.answer, 'workflow answer requires --answer <text>');
         const approved = flags.approve === true || flags.approve === 'true';
-        const answerParams = { stepId, answer, approved, repoRoot: flags.dir, cwd: process.cwd(), worktree: flags.worktree };
-        const answerWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
-        return attachDirWarning(foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams), answerWarning);
+        return withDirWarning(() => answerWorkflow(workflowRunId, { stepId, answer, approved, repoRoot: flags.dir, cwd: process.cwd(), worktree: flags.worktree, detached }));
       }
       if (sub === 'close') {
         const { closeWorkflow } = await import('../src/workflow/index.mjs');
-        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow close requires a workflowRunId: fgos workflow close <id>');
-        return closeWorkflow(workflowRunId, { repoRoot: flags.dir, reason: typeof flags.reason === 'string' ? flags.reason : undefined });
+        return closeWorkflow(runIdOf('fgos workflow close <id>'), { repoRoot: flags.dir, reason: text(flags.reason) });
       }
       if (sub === 'propose') {
         // Reads the slice list (or sizes a request) and answers with a proposal; it writes nothing and opens no case.
         const { runPropose } = await import('../src/workflow/propose.mjs');
         return runPropose({
-          slices: typeof flags.slices === 'string' ? flags.slices : undefined,
-          plan: typeof flags.plan === 'string' ? flags.plan : undefined,
-          guide: typeof flags.guide === 'string' ? flags.guide : undefined,
-          request: typeof flags.request === 'string' ? flags.request : undefined,
-          writes: typeof flags.writes === 'string' ? flags.writes : undefined,
-          verify: typeof flags.verify === 'string' ? flags.verify : undefined,
-          worktree: typeof flags.worktree === 'string' ? flags.worktree : undefined,
-          branch: typeof flags.branch === 'string' ? flags.branch : undefined,
-          dir: typeof flags.dir === 'string' ? flags.dir : undefined,
-          cwd: process.cwd(),
+          slices: text(flags.slices), plan: text(flags.plan), guide: text(flags.guide), request: text(flags.request), writes: text(flags.writes),
+          verify: text(flags.verify), worktree: text(flags.worktree), branch: text(flags.branch), dir: text(flags.dir), cwd: process.cwd(),
         });
       }
       if (sub === 'gate') {
         const { gateWorkflow } = await import('../src/workflow/index.mjs');
         const { parseRunTimeout } = await import('../src/runner/dispatch/config.mjs');
-        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow gate requires a workflowRunId: fgos workflow gate <id> --worktree <path> --writes <paths> --capability <capability>');
-        const gateWrites = parseListFlag(flags.writes);
-        return gateWorkflow(workflowRunId, {
+        return gateWorkflow(runIdOf('fgos workflow gate <id> --worktree <path> --writes <paths> --capability <capability>'), {
           repoRoot: flags.dir,
           worktree: requireField(flags.worktree, 'workflow gate requires --worktree <path>'),
-          writes: gateWrites,
-          activity: typeof flags.activity === 'string' ? flags.activity : undefined,
-          capability: typeof flags.capability === 'string' ? flags.capability : undefined,
+          writes: parseListFlag(flags.writes),
+          activity: text(flags.activity),
+          capability: text(flags.capability),
           timeoutMs: flags.timeout === undefined ? undefined : parseRunTimeout(requireField(flags.timeout, '--timeout requires a duration, e.g. 45m or 2700s')),
-          reason: typeof flags.reason === 'string' ? flags.reason : undefined,
+          reason: text(flags.reason),
         });
       }
       if (sub === 'resume') {
-        const { resumeWorkflow, resumeWorkflowDetached } = await import('../src/workflow/index.mjs');
-        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow resume requires a workflowRunId: fgos workflow resume <id>');
+        const { resumeWorkflow } = await import('../src/workflow/index.mjs');
+        const workflowRunId = runIdOf('fgos workflow resume <id>');
         if (flags.timeout !== undefined) throw new StoreError('validation', '--timeout cannot change a resumed workflow run: it keeps the timeout it was started with');
         if (flags.account !== undefined) throw new StoreError('validation', '--account cannot change a resumed workflow run: it keeps the account its seats were bound to');
         // --seats on resume is only a consistency check: the run keeps the seats it started with.
-        const resumeOptions = {
-          repoRoot: flags.dir,
-          cwd: process.cwd(),
-          worktree: flags.worktree,
-          seats: flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|'),
-        };
-        const resumeWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
-        return attachDirWarning(foreground ? await resumeWorkflow(workflowRunId, resumeOptions) : resumeWorkflowDetached(workflowRunId, resumeOptions), resumeWarning);
+        const seats = flags.seats === undefined ? undefined : requireField(flags.seats, '--seats requires pipe-separated lenses').split('|');
+        return withDirWarning(() => resumeWorkflow(workflowRunId, { repoRoot: flags.dir, cwd: process.cwd(), worktree: flags.worktree, seats, detached }));
       }
 
       // Operations a step offers, read from the Workflow definition
-      let step = flags.step;
-      if (!step) {
-        if (positional[0] === 'operations') {
-          step = positional[1] || flags.step;
-        } else if (positional[0]) {
-          step = positional[0];
-        }
-      }
-      if (!step) {
-        throw new StoreError('validation', 'workflow operations requires --step <step>');
-      }
-      const domain = flags.domain || DEFAULT_DOMAIN;
-      const workflow = flags.workflow || undefined;
-      return workflowUseCase({ dir }, { step, domain, workflow });
+      const step = flags.step || (positional[0] === 'operations' ? positional[1] : positional[0]);
+      if (!step) throw new StoreError('validation', 'workflow operations requires --step <step>');
+      return workflowUseCase({ dir }, { step, domain: flags.domain || DEFAULT_DOMAIN, workflow: flags.workflow || undefined });
     }
 
     case 'gate-check': {

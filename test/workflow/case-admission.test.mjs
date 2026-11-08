@@ -4,7 +4,7 @@ import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { validateWorkflow } from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { admitProposal, newReservationId, recheckReservation } from '../../src/workflow/case-admission.mjs';
 import { loadWorkflow } from '../../src/workflow/loader.mjs';
 import { reserveParentFrame, refundParentFrame } from '../../src/workflow/case-frame.mjs';

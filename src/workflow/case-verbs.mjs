@@ -15,6 +15,7 @@ import { appendWorkflowEvent, projectWorkflowState, readWorkflowEvents } from '.
 import {
   acquireAdvanceLock,
   advanceReport,
+  caseNotFound,
   tryAcquireAdvanceLock,
   withAdvanceLock,
   withAdvanceLockSync,
@@ -25,6 +26,7 @@ import { CONFINED_WRITE_CODE, confinedWriteRefusal, confinedWriteText } from './
 import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { closeCaseUnderHold } from './case-close.mjs';
 import { detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
+import { inspectCaseBindings } from './case-bindings.mjs';
 import { runCaseGate } from './case-gate.mjs';
 import { advanceWorkflowRun } from './runner.mjs';
 import { normalizeSeats } from './seats.mjs';
@@ -45,7 +47,7 @@ function rootsOf(workflowRunId, options, verb) {
 /** The case as an agent reads it: the projection with the digests the playbook's subjects have now. */
 function readCase(mainRoot, workflowRunId) {
   const read = readCaseProjection(mainRoot, workflowRunId);
-  if (read.events.length === 0) throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
+  if (read.events.length === 0) throw caseNotFound(workflowRunId);
   return read;
 }
 
@@ -76,42 +78,30 @@ function conductorResult(mainRoot, workflowRunId, extra = {}) {
   return { ...state, caseId: workflowRunId, case: caseBlock(projection), ...extra };
 }
 
-/**
- * Start a new Workflow run and hand its advancing to a detached process, returning as soon as
- * the run is recorded. The caller gets the run id (the case id) and where to read progress
- * (`fgos workflow status <id>`); the detached process is `fgos workflow resume <id>`, so it
- * survives the caller exiting or being killed and stays readable through the same event log. A
- * conductor case (a guide with its own activities) is opened and returned with no process at all.
- *
- * Same params as startWorkflow, plus `params.cliPath` to override the CLI entry that is spawned.
- *
- * @returns {object} Projected state of the just-recorded run plus `detached: { pid, logPath, statusCommand }`
- */
-export function startWorkflowDetached(params = {}) {
-  const { workflowRunId, runDir, workflow, mainRoot, worktreePath, frame, request, parent, inherits } = prepareWorkflowRun(params);
-  let opened = false;
-  try {
-    withAdvanceLockSync(mainRoot, workflowRunId, (hold) => openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath, parent, inherits }));
-    opened = true;
-  } finally {
-    refundIfNotOpened({ mainRoot, parent, opened });
-  }
-  if (workflow.guide.kind === 'guide') return conductorResult(mainRoot, workflowRunId);
+/** Hand advancing a recorded case to a detached `fgos workflow resume <id> --foreground`; returns at once. */
+function handOff({ mainRoot, workflowRunId, worktreePath, options }) {
   const detached = spawnDetachedAdvance({
     mainRoot,
     workflowRunId,
-    runDir,
-    worktree: params.worktree ? worktreePath : undefined,
-    cwd: params.cwd,
-    cliPath: params.cliPath,
+    runDir: runDirOf(mainRoot, workflowRunId),
+    worktree: options.worktree ? worktreePath : undefined,
+    cwd: options.cwd,
+    cliPath: options.cliPath,
   });
   return detachedResult({ mainRoot, workflowRunId, detached });
 }
 
 /**
- * Start a new Workflow run and advance it in this process until it completes, fails, or parks.
+ * Start a new Workflow run. By default it is advanced in this process until it completes, fails, or parks.
+ * With `params.detached` it is recorded and advancing is handed to a detached process, returning as soon as the
+ * run is recorded: the caller gets the run id (the case id) and where to read progress (`fgos workflow status
+ * <id>`); the detached process is `fgos workflow resume <id> --foreground`, so it survives the caller exiting or
+ * being killed and stays readable through the same event log. A conductor case (a guide with its own
+ * activities) is opened and returned with no process at all, detached or not.
  *
  * @param {object} params
+ * @param {boolean} [params.detached] Hand advancing to a detached process and return at once
+ * @param {string} [params.cliPath] With `detached`: override the CLI entry that is spawned
  * @param {string} [params.workflowId] Id of registered workflow
  * @param {object} [params.workflow] In-memory workflow object
  * @param {string} [params.unitsPath] Path to a units file (YAML/JSON list of Units), one step per Unit
@@ -123,29 +113,38 @@ export function startWorkflowDetached(params = {}) {
  * @param {string} [params.cwd]
  * @param {string} [params.worktree]
  * @param {Function} [params.onLog]
- * @returns {Promise<object>} Projected workflow state
+ * @returns {Promise<object>} Projected state; with `detached`, plus `detached: { pid, logPath, statusCommand }`
  */
 export async function startWorkflow(params = {}) {
   const { workflowRunId, workflow, mainRoot, worktreePath, frame, request, parent, inherits } = prepareWorkflowRun(params);
 
   let opened = false;
+  let settled;
   try {
-    return await withAdvanceLock(mainRoot, workflowRunId, async (hold) => {
+    settled = await withAdvanceLock(mainRoot, workflowRunId, async (hold) => {
       openCaseOnLedger({ mainRoot, workflowRunId, workflow, frame, request, hold, worktreePath, parent, inherits });
       opened = true;
       if (workflow.guide.kind === 'guide') return conductorResult(mainRoot, workflowRunId);
+      if (params.detached) return null;
       return advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog: params.onLog });
     });
   } finally {
     refundIfNotOpened({ mainRoot, parent, opened });
   }
+  return settled ?? handOff({ mainRoot, workflowRunId, worktreePath, options: params });
+}
+
+/** What the bindings check says about this case's worktree bindings; reads only, repairs nothing. */
+function judgeBindings(mainRoot, caseId) {
+  const problems = inspectCaseBindings(mainRoot).problems.filter((problem) => problem.includes(`case ${caseId} `));
+  return { sound: problems.length === 0, problems };
 }
 
 /**
  * Get current projected status of a Workflow run: its own fields, `advance: { running, pid, logPath,
  * lastLines?, hint? }` for the process that advances it, and `case`: milestones with their digests, the
  * routes (listed, and the way outside the list), what is left of the frame, open gates and live
- * reservations. A playbook case is `running` while someone holds `advance`; a conductor case while an
+ * reservations; `bindingsJudgment`: whether the bindings of the case's worktree agree with its ledger; and, for a seated run, `seatProviders` with each seat's account. A playbook case is `running` while someone holds `advance`; a conductor case while an
  * attempt of its is still alive, and it never suggests a resume.
  *
  * @param {string} workflowRunId
@@ -164,7 +163,7 @@ export function statusWorkflow(workflowRunId, options = {}) {
     const { hint, ...rest } = advance;
     advance = { ...rest, running: projection.liveReservations.length > 0, pid: null };
   }
-  return { ...state, ...served, advance, case: caseBlock(projection) };
+  return { ...state, ...served, advance, case: caseBlock(projection), bindingsJudgment: judgeBindings(mainRoot, workflowRunId) };
 }
 
 /** Keep the answer as a round (a file made once), with the digest of what the gate shows. */
@@ -218,53 +217,31 @@ const recordedByLiveProposer = (mainRoot, workflowRunId) => ({
 /**
  * Answer a parked human gate in a Workflow run. The answer is kept as a round file; then `advance` is
  * tried once. Taken: the answer is appended to the ledger, and a playbook case carries on in this
- * process. Held: the answer waits for the proposer that holds it, which records it before it acts.
+ * process, or with `params.detached` in a detached one that is started at once. Held: the answer
+ * waits for the proposer that holds it, which records it before it acts and nothing is spawned. A
+ * conductor case has no process to hand it to.
  *
  * @param {string} workflowRunId
  * @param {object} params
  * @param {string} params.stepId
  * @param {string} params.answer
+ * @param {boolean} [params.detached] Hand advancing to a detached process; `params.cliPath` overrides its CLI entry
  * @param {string} [params.repoRoot]
  * @param {string} [params.cwd]
- * @returns {Promise<object>} Projected state after advancing
+ * @returns {Promise<object>} Projected state after advancing; with `detached`, plus `detached: { pid, logPath, statusCommand }`
  */
 export async function answerWorkflow(workflowRunId, params = {}) {
-  if (!workflowRunId) throw new RunnerConfigError('answerWorkflow requires workflowRunId');
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, params, 'answerWorkflow');
   const hold = takeAndRecord(workflowRunId, params, mainRoot);
   if (hold === null) return recordedByLiveProposer(mainRoot, workflowRunId);
   try {
     const { state, projection } = readCase(mainRoot, workflowRunId);
     if (isConductor(projection)) return conductorResult(mainRoot, workflowRunId);
-    return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
+    if (!params.detached) return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
   } finally {
     hold.release();
   }
-}
-
-/**
- * Record a gate answer and hand advancing the run to a detached process, returning as soon as the
- * answer is stored. While a proposer is alive it is left to record the answer and nothing is spawned;
- * a conductor case has no process to hand it to. Same params as answerWorkflow, plus `params.cliPath`.
- *
- * @returns {object} Projected state with the answer recorded plus `detached: { pid, logPath, statusCommand }`
- */
-export function answerWorkflowDetached(workflowRunId, params = {}) {
-  if (!workflowRunId) throw new RunnerConfigError('answerWorkflow requires workflowRunId');
-  const { mainRoot, worktreePath } = rootsOf(workflowRunId, params, 'answerWorkflow');
-  const hold = takeAndRecord(workflowRunId, params, mainRoot);
-  if (hold === null) return recordedByLiveProposer(mainRoot, workflowRunId);
-  hold.release();
-  if (isConductor(readCase(mainRoot, workflowRunId).projection)) return conductorResult(mainRoot, workflowRunId);
-  const detached = spawnDetachedAdvance({
-    mainRoot,
-    workflowRunId,
-    runDir: runDirOf(mainRoot, workflowRunId),
-    worktree: params.worktree ? worktreePath : undefined,
-    cwd: params.cwd,
-    cliPath: params.cliPath,
-  });
-  return detachedResult({ mainRoot, workflowRunId, detached });
+  return handOff({ mainRoot, workflowRunId, worktreePath, options: params });
 }
 
 /**
@@ -309,68 +286,37 @@ function heldConductor(mainRoot, workflowRunId) {
 }
 
 /**
- * Resume execution of an existing Workflow run. A playbook case runs a proposer in this process, and is
- * refused while another holds it. A conductor case only has what waits beside its ledger folded in.
+ * Resume execution of an existing Workflow run. A playbook case runs a proposer in this process, or with
+ * `options.detached` hands advancing to a detached process and returns at once; either way it is refused while
+ * another process holds `advance`, naming the holder. A conductor case only has what waits beside its ledger
+ * folded in and spawns nothing.
  *
  * @param {string} workflowRunId
  * @param {object} [options]
+ * @param {boolean} [options.detached] Hand advancing to a detached process; `options.cliPath` overrides its CLI entry
  * @param {string} [options.repoRoot]
  * @param {string} [options.cwd]
- * @returns {Promise<object>} Projected state
+ * @returns {Promise<object>} Projected state; with `detached`, plus `detached: { pid, logPath, statusCommand }`
  */
 export async function resumeWorkflow(workflowRunId, options = {}) {
   const { mainRoot, worktreePath } = rootsOf(workflowRunId, options, 'resumeWorkflow');
   let hold = tryAcquireAdvanceLock(mainRoot, workflowRunId);
   if (hold === null) {
-    if (heldConductor(mainRoot, workflowRunId)) {
-      return conductorResult(mainRoot, workflowRunId);
-    }
-    hold = acquireAdvanceLock(mainRoot, workflowRunId); // refuses, naming the holder
+    if (heldConductor(mainRoot, workflowRunId)) return conductorResult(mainRoot, workflowRunId);
+    hold = acquireAdvanceLock(mainRoot, workflowRunId); // refuses, naming the holder; the hold is the caller's when the holder let go meanwhile
   }
   try {
     const { state, conductor, reopenStepId } = readResumeState(workflowRunId, mainRoot, options);
     if (conductor) return conductorResult(mainRoot, workflowRunId);
-    // The only way a failed step runs again: this one reopening, which the next advance acts on once.
-    if (reopenStepId) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'step.start', payload: { stepId: reopenStepId } }, hold });
-    return await advanceWorkflowRun({ workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
+    if (!options.detached) {
+      // The only way a failed step runs again: this one reopening, which the next advance acts on once.
+      if (reopenStepId) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'step.start', payload: { stepId: reopenStepId } }, hold });
+      return await advanceWorkflowRun({ workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
+    }
   } finally {
     hold.release();
   }
-}
-
-/**
- * Hand advancing an existing run to a detached process, returning at once. Refuses while a live
- * process is already advancing the run. A conductor case spawns nothing. Same options as resumeWorkflow,
- * plus `options.cliPath`.
- *
- * @returns {object} Projected state plus `detached: { pid, logPath, statusCommand }`
- */
-export function resumeWorkflowDetached(workflowRunId, options = {}) {
-  const { mainRoot, worktreePath } = rootsOf(workflowRunId, options, 'resumeWorkflow');
-  // Holding the run while it is checked refuses when a live process is advancing it, and repairs an
-  // unfinished last ledger line; the hold is released before the detached advance takes it.
-  let conductor = false;
-  const hold = tryAcquireAdvanceLock(mainRoot, workflowRunId);
-  if (hold === null) {
-    if (!heldConductor(mainRoot, workflowRunId)) acquireAdvanceLock(mainRoot, workflowRunId); // refuses, naming the holder
-    conductor = true;
-  } else {
-    try {
-      ({ conductor } = readResumeState(workflowRunId, mainRoot, options));
-    } finally {
-      hold.release();
-    }
-  }
-  if (conductor) return conductorResult(mainRoot, workflowRunId);
-  const detached = spawnDetachedAdvance({
-    mainRoot,
-    workflowRunId,
-    runDir: runDirOf(mainRoot, workflowRunId),
-    worktree: options.worktree ? worktreePath : undefined,
-    cwd: options.cwd,
-    cliPath: options.cliPath,
-  });
-  return detachedResult({ mainRoot, workflowRunId, detached });
+  return handOff({ mainRoot, workflowRunId, worktreePath, options });
 }
 
 /**

@@ -130,6 +130,10 @@ test('workflow status carries the case block, a finished Playbook case has close
   assert.equal(status.case.open, false);
   assert.equal(status.case.milestones['only-step.settled'].state, 'achieved');
   assert.deepEqual(Object.keys(status.case.routes), ['points', 'unlisted']);
+  assert.deepEqual(status.bindingsJudgment, { sound: true, problems: [] }, 'status prints the bindings judgment of the case');
+  const missing = invoke('status', 'wf-run-0000-missing');
+  assert.notEqual(missing.status, 0);
+  assert.match(missing.stderr, /not found/);
   const closed = invoke('close', id, '--reason', 'finished');
   assert.notEqual(closed.status, 0);
   assert.match(closed.stderr, /already closed/);

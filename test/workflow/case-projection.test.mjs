@@ -4,7 +4,8 @@ import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { validateWorkflow, createWorkflowRun, readWorkflowEvents } from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
+import { createWorkflowRun, readWorkflowEvents } from '../../src/workflow/store.mjs';
 import fs from 'node:fs';
 import { projectCase, readCaseProjection } from '../../src/workflow/case-projection.mjs';
 import { projectWorkflowState, eventsFilePath } from '../../src/workflow/store.mjs';

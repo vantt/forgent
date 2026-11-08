@@ -11,7 +11,7 @@ import { spawn, spawnSync, execFileSync } from 'node:child_process';
 
 import { createPendingBinding, commitBinding } from '../../src/workflow/case-bindings.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
-import { readWorkflowEvents } from '../../src/workflow/index.mjs';
+import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { appendAll, openCase, settle, verifyReceipt } from '../helpers/workflow-case-fixture.mjs';
 

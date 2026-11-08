@@ -10,7 +10,8 @@ import { validateWorkflow, WorkflowDefinitionError } from '../../src/workflow/de
 import { GUARD_PRIMITIVES, PLATFORM_GUARDS } from '../../src/workflow/guide-schema.mjs';
 import { discoverWorkflows, loadWorkflow } from '../../src/workflow/loader.mjs';
 import { translateUnitsToWorkflow } from '../../src/workflow/units-source.mjs';
-import { readWorkflowEvents, startWorkflow } from '../../src/workflow/index.mjs';
+import { readWorkflowEvents } from '../../src/workflow/store.mjs';
+import { startWorkflow } from '../../src/workflow/index.mjs';
 import { domainSteps, getDomain } from '../../src/state/domain-registry.mjs';
 import { compileDomain } from '../../scripts/build-domain-registry.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';

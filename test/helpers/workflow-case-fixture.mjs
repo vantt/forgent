@@ -1,7 +1,8 @@
 // test/helpers/workflow-case-fixture.mjs — a conductor-shaped guide and helpers to put a case on a ledger,
 // so the case model is exercised through real ledger events and no worker.
 
-import { validateWorkflow, createWorkflowRun, appendWorkflowEvent, readWorkflowEvents } from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
+import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { projectCase } from '../../src/workflow/case-projection.mjs';
 import { makeFixtureDir } from './fixture-dir.mjs';

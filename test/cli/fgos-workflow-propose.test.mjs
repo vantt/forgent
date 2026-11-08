@@ -12,7 +12,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import { unknownFlagMessage } from '../../src/cli/flag-check.mjs';
 import { parseArgs } from '../../src/cli/parse-args.mjs';
-import { readWorkflowEvents } from '../../src/workflow/index.mjs';
+import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';

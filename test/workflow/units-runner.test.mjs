@@ -10,7 +10,9 @@ import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { execFileSync } from 'node:child_process';
 
-import { startWorkflow, resumeWorkflow, statusWorkflow, validateWorkflow, readWorkflowEvents } from '../../src/workflow/index.mjs';
+import { startWorkflow, resumeWorkflow, statusWorkflow } from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
+import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { resolveLock } from '../../src/holder-lock/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';

@@ -6,12 +6,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import {
-  startWorkflow,
-  statusWorkflow,
-  answerWorkflow,
-  loadWorkflow,
-} from '../../src/workflow/index.mjs';
+import { startWorkflow, statusWorkflow, answerWorkflow } from '../../src/workflow/index.mjs';
+import { loadWorkflow } from '../../src/workflow/loader.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 

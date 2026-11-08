@@ -8,7 +8,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { startWorkflow, statusWorkflow, readWorkflowEvents } from '../../src/workflow/index.mjs';
+import { startWorkflow, statusWorkflow } from '../../src/workflow/index.mjs';
+import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { createCaseAdmissionPort } from '../../src/workflow/case-admission-port.mjs';
 import { createPendingBinding, commitBinding } from '../../src/workflow/case-bindings.mjs';
 import { runUnit } from '../../src/runner/execution/run.mjs';

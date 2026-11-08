@@ -14,7 +14,7 @@ import { loadSliceTable } from '../../src/workflow/propose-classify.mjs';
 import { createProposePorts, planCaseSlug, proposeFromRequest, proposeFromSlices, readPassRigor, renderProposalText } from '../../src/workflow/propose.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { FRAME, append, conductorWorkflow, openCase, settle, withHold } from '../helpers/workflow-case-fixture.mjs';
-import { createWorkflowRun } from '../../src/workflow/index.mjs';
+import { createWorkflowRun } from '../../src/workflow/store.mjs';
 import { guideSha256 } from '../../src/workflow/case-start.mjs';
 import { digestText } from '../../src/workflow/ref-digests.mjs';
 

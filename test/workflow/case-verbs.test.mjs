@@ -8,18 +8,10 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 
-import {
-  validateWorkflow,
-  startWorkflow,
-  startWorkflowDetached,
-  resumeWorkflow,
-  resumeWorkflowDetached,
-  answerWorkflow,
-  statusWorkflow,
-  closeWorkflow,
-  gateWorkflow,
-  readWorkflowEvents,
-} from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
+import { startWorkflow, resumeWorkflow, answerWorkflow, statusWorkflow, closeWorkflow, gateWorkflow } from '../../src/workflow/index.mjs';
+import { readWorkflowEvents } from '../../src/workflow/store.mjs';
+import { acquireAdvanceLock, tryAcquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { readBinding } from '../../src/workflow/case-bindings.mjs';
 import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
@@ -75,7 +67,7 @@ test('a guide with its own activities opens a conductor case: no process, a case
   // The detached door is the same: a case id back, no child.
   const sub = path.join(tmp, 'sub');
   fs.mkdirSync(sub);
-  const detachedLike = startWorkflowDetached({ workflow: conductorWorkflow({ id: 'case-fixture-two' }), repoRoot: tmp, cwd: tmp, worktree: sub });
+  const detachedLike = await startWorkflow({ workflow: conductorWorkflow({ id: 'case-fixture-two' }), repoRoot: tmp, cwd: tmp, worktree: sub, detached: true });
   assert.equal(detachedLike.detached, undefined);
 });
 
@@ -99,7 +91,7 @@ test('a conductor case is running while an attempt of it lives, never stale, and
   // resume takes advance once and starts nothing.
   const resumed = await resumeWorkflow(id, opts(tmp));
   assert.equal(resumed.caseId, id);
-  assert.equal(resumeWorkflowDetached(id, opts(tmp)).detached, undefined);
+  assert.equal((await resumeWorkflow(id, { ...opts(tmp), detached: true })).detached, undefined);
 });
 
 test('findings without delivery fail no case: a diagnostic milestone takes them, a delivery milestone does not', async () => {
@@ -363,13 +355,61 @@ test('answer accepts the activity of a decision point that carries a gate, and r
 
 test('the detached advance child leaves progress lines in advance.log and no dump of its result', async () => {
   const tmp = setupRepo();
-  const started = startWorkflowDetached({ workflow: validateWorkflow({ id: 'test/log-progress', steps: [{ id: 'only', dependsOn: [] }] }), ...opts(tmp) });
+  const started = await startWorkflow({ workflow: validateWorkflow({ id: 'test/log-progress', steps: [{ id: 'only', dependsOn: [] }] }), ...opts(tmp), detached: true });
   const { pid, logPath } = started.detached;
   const alive = () => { try { process.kill(pid, 0); return true; } catch { return false; } };
   for (let i = 0; i < 150 && alive(); i += 1) await new Promise((resolve) => setTimeout(resolve, 200));
   assert.equal(alive(), false, 'the child finished');
-  assert.equal(statusWorkflow(started.caseId, opts(tmp)).status, 'completed');
+  const status = statusWorkflow(started.caseId, opts(tmp));
+  assert.equal(status.status, 'completed');
+  assert.equal(status.advance.running, false);
+  assert.ok(status.advance.logPath.endsWith('advance.log'));
   const lines = fs.readFileSync(logPath, 'utf8').split('\n').filter(Boolean);
-  assert.ok(lines.some((l) => /step only (started|completed)/.test(l)), lines.join('\n'));
+  const stepLines = lines.filter((l) => l.includes('step only'));
+  assert.equal(stepLines.length, 2, `one line when the step starts and one when it ends, got: ${lines.join('\n')}`);
+  assert.match(stepLines[0], /started/);
+  assert.match(stepLines[1], /completed/);
   assert.ok(lines.every((l) => !l.startsWith('{') && !l.startsWith('"')), `no result JSON in the log: ${lines.join('\n')}`);
+});
+
+test('every verb names a case that does not exist case-not-found, and a malformed id invalid-case-id, before any path is built', async () => {
+  const tmp = setupRepo();
+  const missing = 'wf-run-0000-missing';
+  const notFound = (err) => err.code === 'case-not-found' && /not found/.test(err.message);
+  assert.throws(() => statusWorkflow(missing, opts(tmp)), notFound);
+  assert.throws(() => closeWorkflow(missing, opts(tmp)), notFound);
+  await assert.rejects(resumeWorkflow(missing, opts(tmp)), notFound);
+  await assert.rejects(resumeWorkflow(missing, { ...opts(tmp), detached: true }), notFound);
+  await assert.rejects(answerWorkflow(missing, { ...opts(tmp), stepId: 'a', answer: 'yes' }), notFound);
+  for (const bad of ['../escape', '.bindings', 'a/b']) {
+    assert.throws(() => statusWorkflow(bad, opts(tmp)), (err) => err.code === 'invalid-case-id');
+  }
+});
+
+test('a resume that finds the case held refuses naming the holder, takes nothing, and leaves the lock free when it ends', async () => {
+  const tmp = setupRepo();
+  const { workflowRunId: id } = await startWorkflow({ workflow: validateWorkflow({ id: 'held-playbook', steps: [{ id: 'a', units: [unit('ua')] }, { id: 'ok', dependsOn: ['a'], gate: { kind: 'human', question: 'Approve?' } }] }), ...opts(tmp) });
+  const held = acquireAdvanceLock(tmp, id);
+  for (const detached of [false, true]) {
+    await assert.rejects(resumeWorkflow(id, { ...opts(tmp), detached }), (err) => err.code === 'case-advance-busy' && err.message.includes(`process ${process.pid}`));
+  }
+  held.release();
+  const free = tryAcquireAdvanceLock(tmp, id);
+  assert.ok(free, 'no refused resume kept the advance lock');
+  free.release();
+});
+
+test('status judges the case\'s bindings without repairing them: sound while the record is there, naming the case when it is gone', async () => {
+  const tmp = setupRepo();
+  const { caseId: id } = await startWorkflow({ workflow: conductorWorkflow(), ...opts(tmp) });
+  assert.deepEqual(statusWorkflow(id, opts(tmp)).bindingsJudgment, { sound: true, problems: [] });
+
+  const dir = path.join(tmp, '.fgos', 'workflow-runs', '.bindings');
+  const records = fs.readdirSync(dir).filter((n) => n.endsWith('.json'));
+  assert.equal(records.length, 1);
+  fs.rmSync(path.join(dir, records[0]));
+  const judged = statusWorkflow(id, opts(tmp)).bindingsJudgment;
+  assert.equal(judged.sound, false);
+  assert.ok(judged.problems.length === 1 && judged.problems[0].includes(id), judged.problems.join('\n'));
+  assert.equal(fs.readdirSync(dir).filter((n) => n.endsWith('.json')).length, 0, 'a status read repairs nothing');
 });

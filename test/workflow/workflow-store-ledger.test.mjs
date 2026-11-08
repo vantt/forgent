@@ -7,17 +7,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import {
-  validateWorkflow,
-  createWorkflowRun,
-  appendWorkflowEvent,
-  readWorkflowEvents,
-  recoverWorkflowLedgerTail,
-  projectWorkflowState,
-  startWorkflow,
-  statusWorkflow,
-  answerWorkflow,
-} from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
+import { createWorkflowRun, appendWorkflowEvent, readWorkflowEvents, recoverWorkflowLedgerTail, projectWorkflowState } from '../../src/workflow/store.mjs';
+import { startWorkflow, statusWorkflow, answerWorkflow } from '../../src/workflow/index.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';

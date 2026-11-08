@@ -9,13 +9,9 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import path from 'node:path';
 
-import {
-  validateWorkflow,
-  startWorkflow,
-  resumeWorkflow,
-  answerWorkflow,
-  readWorkflowEvents,
-} from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
+import { startWorkflow, resumeWorkflow, answerWorkflow } from '../../src/workflow/index.mjs';
+import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { projectCase } from '../../src/workflow/case-projection.mjs';
 import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';

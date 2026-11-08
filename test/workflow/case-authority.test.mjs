@@ -6,7 +6,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { validateWorkflow, createWorkflowRun } from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
+import { createWorkflowRun } from '../../src/workflow/store.mjs';
 import { createCaseAdmissionPort, nestedStartRefusal } from '../../src/workflow/case-admission-port.mjs';
 import { createPendingBinding, commitBinding } from '../../src/workflow/case-bindings.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';

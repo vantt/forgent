@@ -8,17 +8,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
-import {
-  validateWorkflow,
-  createWorkflowRun,
-  startWorkflow,
-  resumeWorkflow,
-  answerWorkflow,
-  answerWorkflowDetached,
-  statusWorkflow,
-  closeWorkflow,
-  readWorkflowEvents,
-} from '../../src/workflow/index.mjs';
+import { validateWorkflow } from '../../src/workflow/definition.mjs';
+import { createWorkflowRun, readWorkflowEvents } from '../../src/workflow/store.mjs';
+import { startWorkflow, resumeWorkflow, answerWorkflow, statusWorkflow, closeWorkflow } from '../../src/workflow/index.mjs';
 import { conductorWorkflow } from '../helpers/workflow-case-fixture.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { projectCase } from '../../src/workflow/case-projection.mjs';
@@ -259,7 +251,7 @@ test('an answer kept as a file by the detached door is folded in by the next pro
   const id = parked.workflowRunId;
   const held = acquireAdvanceLock(tmp, id);
   try {
-    const kept = answerWorkflowDetached(id, { stepId: 'approval', answer: 'yes', approved: true, ...opts(tmp) });
+    const kept = await answerWorkflow(id, { stepId: 'approval', answer: 'yes', approved: true, detached: true, ...opts(tmp) });
     assert.equal(kept.recorded, true);
   } finally {
     held.release();
