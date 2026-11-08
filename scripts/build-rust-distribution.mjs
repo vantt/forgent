@@ -501,8 +501,8 @@ export function buildRustDistribution({
 
 /**
  * The payload's source files, read with the addon at `descriptor`, after writing the one-door
- * census of the product this checkout declares (Git spec §12, V-GATE; doctor's
- * git-mutation-one-door checks it is empty and was built from the payload it sits in). It runs in
+ * census of the product this checkout declares (Git spec §12, V-GATE; the
+ * census test checks it is empty and was built from the payload it sits in). It runs in
  * a child process: a process loads one addon (Git spec §4), and the caller may already hold its own.
  */
 function readCheckoutWithAddon(repoRoot, releaseRoot, hostBin) {

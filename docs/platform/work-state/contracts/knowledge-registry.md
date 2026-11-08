@@ -331,7 +331,7 @@ Producer tests:
 
 The following two source contracts are conserved with their original source metadata. Their original metadata is retained in fenced YAML; heading depth alone is adapted for this contract. Dated implementation pointers, gaps and historical vocabulary are preserved, not silently modernized. The maintained registry constraints above still apply to producers; these source passages do not restore alias write targets or bypass attestation.
 
-Code truth for the index is `src/report/enduser-index-generate.mjs`; the `enduser-docs-index-stale` doctor check/fix in `src/setup/registrations.mjs` calls that same generator.
+Code truth for the index is `src/report/enduser-index-generate.mjs`; `fgos docs-index` calls that generator and `test/scripts/doc-health.test.mjs` judges that the committed index is current.
 
 ## Spec: Soạn & nuôi tài liệu người-dùng-cuối (enduser-docs-authoring)
 
@@ -688,10 +688,10 @@ duy nhất của linkage vẫn là nhật ký capture, tra qua `fgos doc-sources
 - I/O + sinh chỉ mục: `repo/src/report/enduser-index-generate.mjs` (tsk-1m0) — quét thư
   mục ngăn CHÍNH và mọi vị trí thay thế trong `QUADRANT_DIR_ALIASES`, rút tiêu đề H1 đầu,
   fold nhật ký qua bề mặt đọc-thuần `listWork`, và (chỉ ở `generateEnduserDocsIndex`) ghi
-  manifest — đây là MỘT đường sinh duy nhất mà cả nhánh `docs-index` trong
-  `repo/bin/fgos.mjs` lẫn doctor check/fix `enduser-docs-index-stale`
-  (`repo/src/setup/registrations.mjs`) cùng gọi, không bên nào lặp lại logic của bên kia.
-  `computeEnduserDocsIndex` là nửa đọc-thuần (không ghi) mà doctor check dùng để tính độ
+  manifest — đây là MỘT đường sinh duy nhất mà nhánh `docs-index` trong
+  `repo/bin/fgos.mjs` gọi (doctor không còn hàng/fix cho chỉ mục này; bài test
+  `test/scripts/doc-health.test.mjs` phán chỉ mục đã commit còn khớp).
+  `computeEnduserDocsIndex` là nửa đọc-thuần (không ghi) để tính độ
   lệch mà không đụng đĩa. Nhánh `doc-sources` vẫn ở `repo/bin/fgos.mjs` (gom nguồn của một
   đường dẫn qua `findSourceCaptureIds` + `listWork`); đăng ký cả hai verb ở
   `repo/src/cli/command-registry.mjs` với quyền `read`.

@@ -16,7 +16,7 @@ domain: core | role: indexer | scope: enduser-docs | requires-skill: fgos-indexi
 - Hard: Reads `purpose`/`audience` strictly from `QUADRANT_META` in `src/report/enduser-index.mjs`; never hand-edits `docs/enduser-docs-index.json`. Does not write or classify documents itself (that belongs to `fgos-coding-compounding`).
 
 ## Verify-template
-- Verification check `fgos doctor` (check `enduser-docs-index-stale`).
+- Verification: `node scripts/run-tests.mjs test/scripts/doc-health.test.mjs` (the committed end-user docs index covers every end-user doc).
 
 ## Collaboration
 

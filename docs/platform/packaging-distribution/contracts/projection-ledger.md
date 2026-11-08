@@ -53,7 +53,7 @@ The ledger should answer:
 
 ## 4. Current Status
 
-Instruction projections now write a managed `AGENTS.md` block, effective-set JSON, and an entry in `.fgos/installation/projections/ledger.json`. The check/fix path lives in `src/setup/instruction-projections.mjs` and is registered as `instruction-projections-stale`.
+Instruction projections now write a managed `AGENTS.md` block, effective-set JSON, and an entry in `.fgos/installation/projections/ledger.json`. The materialize/inspect path lives in `src/setup/instruction-projections.mjs`; `npm run build:skills` regenerates the projections and `test/setup/instruction-projections.test.mjs` judges that this repository's are current.
 
 This does not yet prove ledger coverage for every host-visible projection. Skill packaging projections and future host adapters still need their own ledger entries before this contract can be promoted to fully implemented.
 

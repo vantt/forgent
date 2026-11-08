@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "78f7c80d5b7d11bb06ef823dd04c8419180f2ef1c0b1e0580e08604c54a7dad6",
+  "payloadDigest": "413cd8cc2bcd76e46e1c3f4eb7ec4badb67b61ab113e42fec45c225f5415413e",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -802,7 +802,7 @@
     "packages/yaml-doc/third-party/saphyr-parser-0.2.2/tools/time_parse.rs": "670e368656d0d860059d31288991be29fdc2484e4fa3069da9155ae745e99c32",
     "scripts/backfill-unit-summaries.mjs": "f42d32b5f9dd889a7a16f1debe8d564eb2dccecae02fd39e80a705cd99ecbc04",
     "scripts/build-domain-registry.mjs": "8d3e550baaaf56b8366ab6d6d9710793837961443a3ec918a37efcd2f12ab729",
-    "scripts/build-rust-distribution.mjs": "6c5b170c97f1529e54e40489fb8dab522eeafe50f502b30e81687cf69c469200",
+    "scripts/build-rust-distribution.mjs": "9373d1e7963f0deee72517d58bae2e835bfc1416cc3250917a9468a4e23a8cad",
     "scripts/build-skill-wrappers.mjs": "924c0a3aaa1a88f279bbe5b381b7c914506df0d81c49a934b00eb5113f8a1d1d",
     "scripts/check-backlog-reconciliation.mjs": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
     "scripts/check-decision-citation-drift.mjs": "0f115f59053bfe71e14adcc84efedd445fcd1a5ceedb71f3d691543d8c3a7c9a",

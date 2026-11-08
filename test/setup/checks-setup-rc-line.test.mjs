@@ -29,8 +29,6 @@ import {
   resolveMainCheckout,
   spawnSync,
   withHome,
-  writeEnduserDoc,
-  writeEnduserManifest,
 } from './helpers/setup-checks-harness.mjs';
 import { projectConfigExists } from '../helpers/config-fixture.mjs';
 

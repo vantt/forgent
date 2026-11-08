@@ -4,8 +4,16 @@ authoritative_for: enduser-docs-index-stale doctor check one-directional blind s
 
 # Why `enduser-docs-index-stale` used to miss orphan entries, and how it was widened
 
-`fgos doctor`'s `enduser-docs-index-stale` check
-(`checkEnduserDocsIndexStale`, `src/setup/registrations.mjs`) exists to
+> Status: the `enduser-docs-index-stale` and `decision-index-stale` doctor
+> rows and their fixes were removed, because they judged this repository's
+> own files, not whether fgOS can run. The same two-way judgment now lives
+> in `test/scripts/doc-health.test.mjs` (the committed index `docPath` set
+> equals `enumerateDocEntries`; the decisions index is a fixpoint of its
+> generator), and `fgos docs-index` / `fgos decision-index` regenerate. The
+> account below is the history of why the comparison must run both ways.
+
+`fgos doctor` once had an `enduser-docs-index-stale` check
+(`checkEnduserDocsIndexStale`, `src/setup/registrations.mjs`) to
 catch drift between `docs/enduser-docs-index.json` and the real end-user
 docs on disk. Until tsk-uky, that comparison only ran in one direction.
 
