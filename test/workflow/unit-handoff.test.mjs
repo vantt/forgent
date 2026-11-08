@@ -24,7 +24,7 @@ function settledProducer({ report, packet = null, touchedAfterSettle = false }) 
   const unitRunId = 'unit-run-gate';
   const runDir = path.join(root, '.fgos', 'assignments', unitRunId, 'producer', '1', 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
-  const reportFile = path.join(runDir, 'agent-report.md');
+  const reportFile = path.join(runDir, 'report-1.md');
   fs.writeFileSync(reportFile, report);
   const settledMs = Date.now();
   if (packet !== null) {

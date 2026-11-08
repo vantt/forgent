@@ -53,7 +53,7 @@ The CLI presenter owns the public `fgos.v1` envelope. The component returns type
 ### Must not own
 
 - `.fgos` storage-root resolution; `src/runner/paths.mjs` remains its owner until Rust owns those callers.
-- Fixed artifacts inside a run directory, including `agent-report.md`; Execution/run-result owns them.
+- Fixed artifacts inside a run directory, including `report-<N>.md`; Execution/run-result owns them.
 - Stateful id or sequence allocation, including decision ids.
 - Plan-directory creation or naming behavior of external `ak plan create`; Convention checks compatible output but does not replace that tool.
 - AgentKit/ClaudeKit `## Naming` prompt blocks or any external kit implementation.

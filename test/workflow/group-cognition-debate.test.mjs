@@ -22,8 +22,8 @@ function setupRepo() {
         : prompt.includes('answer the original position') ? 'antithesis-rebuttal'
         : prompt.includes('argue the opposing side') ? 'antithesis'
         : prompt.includes('argue one side') ? 'thesis' : 'other';
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'ROLE-REPORT ' + role + '\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'said ' + role }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), 'ROLE-REPORT ' + role + '\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'said ' + role }));
     `,
   });
 }

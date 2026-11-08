@@ -87,7 +87,7 @@ test('a panel with enough provider families lands every seat on its own family, 
   for (const [i, ref] of refs.entries()) {
     assert.ok(path.isAbsolute(ref), `ref is absolute: ${ref}`);
     assert.ok(ref.includes(`/member-${i + 1}/`), `ref ${i} points at member-${i + 1}: ${ref}`);
-    assert.ok(/(report-\d+|agent-report)\.md$/.test(ref), `ref is a report: ${ref}`);
+    assert.ok(/report-\d+\.md$/.test(ref), `ref is a report: ${ref}`);
     assert.ok(fs.existsSync(ref), `ref exists: ${ref}`);
   }
   for (const n of [1, 2, 3]) assert.deepEqual(assignmentOf(`member-${n}`).contextRefs, []);
@@ -262,7 +262,7 @@ function writeFileWritingWorker(repoRoot, verdict = 'pass') {
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (true) {
       fs.mkdirSync('src', { recursive: true });
       fs.writeFileSync('src/feature.txt', 'feature\\n');
@@ -272,8 +272,8 @@ function writeFileWritingWorker(repoRoot, verdict = 'pass') {
       const outbox = path.join(claimDir, 'worker-output', 'outbox');
       const runDir = fs.existsSync(outbox) ? outbox : claimDir;
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Added the feature file', assessment: { verdict: ${JSON.stringify(verdict)} } }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Added the feature file', assessment: { verdict: ${JSON.stringify(verdict)} } }));
     }
     `,
   );
@@ -330,7 +330,7 @@ function writePeerProbingWorker(dir, peerReport) {
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       const code = (fn) => { try { fn(); return 'ok'; } catch (e) { return e.code; } };
       const peer = code(() => fs.readFileSync(${JSON.stringify(peerReport)}));
@@ -338,8 +338,8 @@ function writePeerProbingWorker(dir, peerReport) {
       const outbox = path.join(claimDir, 'worker-output', 'outbox');
       const runDir = fs.existsSync(outbox) ? outbox : claimDir;
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\npeer-read: ' + peer + '\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\npeer-read: ' + peer + '\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
     }
     `,
   );
@@ -373,7 +373,7 @@ function writeRefReadingWorker(dir, sources) {
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       const code = (fn) => { try { return fn(); } catch (e) { return e.code; } };
       const claimDir = path.dirname(match[1]);
@@ -384,8 +384,8 @@ function writeRefReadingWorker(dir, sources) {
       const outbox = path.join(claimDir, 'worker-output', 'outbox');
       const runDir = fs.existsSync(outbox) ? outbox : claimDir;
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\n' + lines.join('\\n') + '\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\n' + lines.join('\\n') + '\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
     }
     `,
   );

@@ -106,7 +106,7 @@ export function roleUnit(unit, { seat, kind = seat, stance = false, params = {},
     objective += `\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n${findings.map((f) => `- ${f}`).join('\n')}`;
   }
   if (hasStance) {
-    objective += `\n\nPassive stance measurement for this question. Declared choices: ${JSON.stringify(stanceOptions)}; \"other\" is also allowed.\nEnd your report by stating your stance and include \"stance\": {\"choice\": <one declared choice or \"other\">, \"confidence\": <number from 0 to 1>} in your agent-result.json claim. This optional measurement never changes whether your work passes.`;
+    objective += `\n\nPassive stance measurement for this question. Declared choices: ${JSON.stringify(stanceOptions)}; \"other\" is also allowed.\nEnd your report by stating your stance and include \"stance\": {\"choice\": <one declared choice or \"other\">, \"confidence\": <number from 0 to 1>} in your result claim. This optional measurement never changes whether your work passes.`;
   }
   return { ...unit, objective };
 }

@@ -181,7 +181,7 @@ test('a reviewed execution error publishes its summary only after the dispatched
   fs.writeFileSync(path.join(fixture.unitDir, 'unit.json'), JSON.stringify(fixture.record));
   const producerDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');
   fs.mkdirSync(producerDir, { recursive: true });
-  const reportFile = path.join(producerDir, 'agent-report.md');
+  const reportFile = path.join(producerDir, 'report-1.md');
   fs.writeFileSync(reportFile, '# Producer report\nThe requested source evidence was inspected and the proposed change was documented.\n');
   fs.writeFileSync(path.join(producerDir, 'result.json'), JSON.stringify({
     runId: 'prior-producer', settledAt: '2026-10-05T01:01:00Z', executorId: 'alpha',

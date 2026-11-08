@@ -184,8 +184,8 @@ const runsDir = path.join(process.cwd(), '.fgos', 'assignments');
 for (const asgn of fs.readdirSync(runsDir)) {
   const runDir = path.join(runsDir, asgn, 'runs', '01');
   if (!fs.existsSync(runDir)) continue;
-  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nPlan is sound.\\n');
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Plan sound' }));
+  fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), '# Validation Report\\nPlan is sound.\\n');
+  fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Plan sound' }));
 }
 process.stdout.write('reviewed\\n');
 `);
@@ -259,8 +259,8 @@ for (const top of [process.cwd(), ${JSON.stringify(root)}]) {
   for (const asgn of fs.readdirSync(runsDir)) {
     const runDir = path.join(runsDir, asgn, 'runs', '01');
     if (!fs.existsSync(runDir)) continue;
-    fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nPlan is sound.\\n');
-    fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Plan sound' }));
+    fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), '# Validation Report\\nPlan is sound.\\n');
+    fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Plan sound' }));
   }
 }
 process.stdout.write('reviewed\\n');

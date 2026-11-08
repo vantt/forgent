@@ -100,7 +100,7 @@ function writeFakeExecutor(dir, payloadOverrides = {}) {
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
     let resultPath = null;
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       resultPath = match[1];
     } else {
@@ -112,14 +112,14 @@ function writeFakeExecutor(dir, payloadOverrides = {}) {
           .filter((p) => fs.existsSync(p));
         subdirs.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
         if (subdirs.length > 0) {
-          resultPath = path.join(subdirs[0], 'agent-result.json');
+          resultPath = path.join(subdirs[0], 'worker-output', 'outbox', 'result-1.json');
         }
       }
     }
     if (resultPath) {
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Reality Gate Validation & Feasibility Matrix Report\\n## Reality Gate Score\\n- Mode fit: PASS (citation: src/main.mjs:L1)\\n- Repo fit: PASS (citation: src/main.mjs:L1)\\n- Assumptions: PASS (citation: src/main.mjs:L1)\\n- Smaller path: PASS (citation: src/main.mjs:L1)\\n- Proof surface: PASS (citation: src/main.mjs:L1)\\n- Impact-analysis posture: PASS (citation: src/main.mjs:L1)\\n## Feasibility Matrix\\n- Feasibility matrix: verified (citation: src/main.mjs:L1).\\n## Review Evaluation\\n- Candidate diff: evidence:candidate-diff verified.\\n- Verify result: evidence:verify-pass evidence:verify-fail test pass confirmed.\\n- Rationale: APPROVED clean implementation.\\n## Scout Blast Radius\\n- Symbol: execute in src/core.js\\n- Search posture: active rg cross-check\\n- Callers: src/main.mjs\\n- Affected processes: none\\n- Risk read: low risk\\n## Question Resolution\\n- Answer: verified.\\n- Citations: ref: src/main.mjs:L1\\n- Verdict: clear\\n- Remaining uncertainty: None.\\nPlan holds up under reality check.\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Reality Gate Validation & Feasibility Matrix Report\\n## Reality Gate Score\\n- Mode fit: PASS (citation: src/main.mjs:L1)\\n- Repo fit: PASS (citation: src/main.mjs:L1)\\n- Assumptions: PASS (citation: src/main.mjs:L1)\\n- Smaller path: PASS (citation: src/main.mjs:L1)\\n- Proof surface: PASS (citation: src/main.mjs:L1)\\n- Impact-analysis posture: PASS (citation: src/main.mjs:L1)\\n## Feasibility Matrix\\n- Feasibility matrix: verified (citation: src/main.mjs:L1).\\n## Review Evaluation\\n- Candidate diff: evidence:candidate-diff verified.\\n- Verify result: evidence:verify-pass evidence:verify-fail test pass confirmed.\\n- Rationale: APPROVED clean implementation.\\n## Scout Blast Radius\\n- Symbol: execute in src/core.js\\n- Search posture: active rg cross-check\\n- Callers: src/main.mjs\\n- Affected processes: none\\n- Risk read: low risk\\n## Question Resolution\\n- Answer: verified.\\n- Citations: ref: src/main.mjs:L1\\n- Verdict: clear\\n- Remaining uncertainty: None.\\nPlan holds up under reality check.\\n');
       fs.writeFileSync(resultPath, JSON.stringify(${JSON.stringify(payloadObj)}, null, 2));
       if (${Boolean(payloadOverrides.appendConstraintsToPlan)}) {
         const cwd = process.cwd();
@@ -196,9 +196,9 @@ function assertAssignmentRunFiles(root, assignmentId) {
   assert.ok(fs.existsSync(path.join(assignmentDir, 'assignment.json')), 'assignment.json must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'run.json')), 'run.json must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'dispatch-plan.json')), 'dispatch-plan.json must exist');
-  // A confined worker writes only its run's outbox; the runner reads its artifacts from there.
-  assert.ok(fs.existsSync(resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json')), 'agent-result.json must exist');
-  assert.ok(fs.existsSync(resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md')), 'agent-report.md must exist');
+  // A headless worker writes only its run's outbox, under the agent protocol's names; the runner reads its artifacts from there.
+  assert.ok(fs.existsSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json')), 'result-1.json must exist');
+  assert.ok(fs.existsSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md')), 'report-1.md must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'evidence.json')), 'evidence.json must exist');
   assert.ok(fs.existsSync(path.join(runDir, 'result.json')), 'result.json must exist');
 }
@@ -1186,7 +1186,7 @@ test('the Work layer turns docsRef and refs into the Unit inputs, and dispatch d
     'extra-ref.txt',
   ]);
   const assignment = buildAssignment({ workId: work.id, stage: 'planning', operation: 'validate-plan' });
-  assert.ok(assignment.expectedOutputs.some((o) => o.includes('agent-result.json')));
+  assert.ok(assignment.expectedOutputs.some((o) => o.includes('result-1.json')));
 });
 
 test('executeAssignment rejects execution of an undeclared operation (Finding 3)', async () => {
@@ -1532,12 +1532,12 @@ test('executing.scout-blast-radius that tries to write the repository is refused
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/operation-choice.mjs\\nSearch posture: active rg cross-check\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/operation-choice.mjs\\nSearch posture: active rg cross-check\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Scouted 2 symbols' }));
     }
     fs.writeFileSync(path.join(process.cwd(), 'accidental.txt'), 'unintended mutation\\n');

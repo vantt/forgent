@@ -27,7 +27,7 @@
 //   - appends a repository read-only scope constraint: this is a
 //     read-only-only slice, ADR-006 §6 still applies to inline.
 //   - when the (already-validated) contract's `evidence.required` is
-//     `'reported'`, appends a concrete `agent-report.md` expected-output
+//     `'reported'`, appends a concrete `report-1.md` expected-output
 //     instruction, mirroring `buildDeclaredAssignment`'s own
 //     `derivedExpectedOutputs` for `validate-plan`/`review-item` -- a
 //     worker gets the same kind of concrete instruction, not a bare
@@ -51,7 +51,7 @@ function fail(reason) {
 }
 
 const REPOSITORY_READ_ONLY_SCOPE_CONSTRAINT = 'scope: repository (read-only)';
-const AGENT_REPORT_EXPECTED_OUTPUT = 'agent-report.md (reviewer findings and evaluation)';
+const AGENT_REPORT_EXPECTED_OUTPUT = 'report-1.md (reviewer findings and evaluation)';
 
 /**
  * Merge an operation's declared policy hints with an optional caller
@@ -136,7 +136,7 @@ export function enrichAndValidateContract(contract, { domain, work } = {}) {
   }
 
   // ADR-007 §1: "sets the coding read-only evidence rule: reported
-  // evidence requires an agent-report.md artifact" -- mirrors
+  // evidence requires a report-1.md artifact" -- mirrors
   // buildDeclaredAssignment's derivedExpectedOutputs concrete-instruction
   // shape for validate-plan/review-item.
   const expectedOutputs = Array.isArray(contract.expectedOutputs) ? [...contract.expectedOutputs] : [];

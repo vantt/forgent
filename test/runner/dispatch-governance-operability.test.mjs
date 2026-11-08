@@ -177,8 +177,8 @@ test('an opted-in cross-provider executor runs and records executor + provider i
       for (const asgn of fs.readdirSync(runsDir)) {
         const rDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(rDir)) {
-          fs.writeFileSync(path.join(rDir, 'agent-report.md'), '# Planning Report\\nArchitecture validation and design specifications completed successfully.\\n');
-          fs.writeFileSync(path.join(rDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Planning completed successfully' }));
+          fs.writeFileSync(path.join(rDir, 'worker-output', 'outbox', 'report-1.md'), '# Planning Report\\nArchitecture validation and design specifications completed successfully.\\n');
+          fs.writeFileSync(path.join(rDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Planning completed successfully' }));
         }
       }
     }

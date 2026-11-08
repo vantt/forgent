@@ -111,20 +111,20 @@ test('enrichAndValidateContract appends the repository read-only scope constrain
   assert.deepEqual(contract.constraints, ['no external network calls', 'scope: repository (read-only)']);
 });
 
-test('enrichAndValidateContract appends the agent-report.md expected-output instruction when evidence.required is "reported"', () => {
+test('enrichAndValidateContract appends the report-1.md expected-output instruction when evidence.required is "reported"', () => {
   const { contract } = enrichAndValidateContract(validContract({ evidence: { required: 'reported' } }), {
     domain: 'coding',
     work: planningWork(),
   });
-  assert.ok(contract.expectedOutputs.includes('agent-report.md (reviewer findings and evaluation)'));
+  assert.ok(contract.expectedOutputs.includes('report-1.md (reviewer findings and evaluation)'));
 });
 
-test('enrichAndValidateContract does not append the agent-report.md instruction when evidence.required is "verified"', () => {
+test('enrichAndValidateContract does not append the report-1.md instruction when evidence.required is "verified"', () => {
   const { contract } = enrichAndValidateContract(validContract({ evidence: { required: 'verified' } }), {
     domain: 'coding',
     work: planningWork(),
   });
-  assert.ok(!contract.expectedOutputs.includes('agent-report.md (reviewer findings and evaluation)'));
+  assert.ok(!contract.expectedOutputs.includes('report-1.md (reviewer findings and evaluation)'));
 });
 
 test('enrichAndValidateContract preserves contract.supports on the returned (enriched) contract', () => {

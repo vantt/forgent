@@ -27,8 +27,8 @@ function businessProject(prefix) {
     capabilities: ['business:frame', 'business:perspectives', 'business:critique', 'business:synthesize', 'business:plan'],
     reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } },
     workerBody: `
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Strategic Report\\nComprehensive strategic business analysis completed with clear market viability and financial risk assessments.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Strategic Report\\nComprehensive strategic business analysis completed with clear market viability and financial risk assessments.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     `,
   });
 }
@@ -78,8 +78,8 @@ test('a labelled noncoding writing fixture lands its one declared file on main',
     capabilities: ['business:plan'],
     workerBody: `
       if (match[1].includes('/producer/')) fs.writeFileSync('business-plan.md', '# Business plan\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Business plan\\nThe plan was written to its declared file and checked against the brief in full.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Business plan\\nThe plan was written to its declared file and checked against the brief in full.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
     `,
   });
   const git = (args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' }).trim();

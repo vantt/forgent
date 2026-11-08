@@ -33,7 +33,7 @@ function setupTestRepo() {
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     let runDir;
     if (match) {
       runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
@@ -48,8 +48,8 @@ function setupTestRepo() {
     }
     if (runDir) {
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAssignment execution completed successfully.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nAssignment execution completed successfully.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     }
     `,
   );

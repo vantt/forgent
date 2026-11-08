@@ -1,13 +1,12 @@
 // worker-artifacts.mjs — where a worker's own claim and report are,
 // under either name a worker may have been told to use.
 //
-// Two names exist for one artifact, in up to three directories. A worker
-// launched through `cli-spawn` is told by the assignment prompt to write
-// `agent-result.json` / `agent-report.md` flat in the run directory, or under
-// `worker-output/outbox/` when it runs confined. One launched through `herdr-spawn` is told by its
-// brief to write `outbox/result-<round>.json` / `outbox/report-<round>.md`,
-// because the outbox is the one directory an interactive worker is allowed to
-// write in at all.
+// Every worker is told the agent protocol's names: `result-<round>.json` /
+// `report-<round>.md` in its attempt's outbox (`worker-output/outbox/` for a headless
+// worker, `outbox/` for an interactive one). Run directories written before that
+// carry `agent-result.json` / `agent-report.md` flat in the run directory or under
+// `worker-output/outbox/`; the readers below still find those so a historical run
+// reads as it always did. Nothing writes the old names any more.
 //
 // Two readers need this: the collector, which turns a finished run into a
 // RunResult, and reconciliation, which decides what became of a run nobody was

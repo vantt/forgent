@@ -27,12 +27,12 @@ function setupTestRepo() {
     modelPolicies: { node: { standard: 'node-std', flagship: 'node-high', frontier: 'node-top' } },
     reviewed: { maxRounds: 1, checkersByRigor: { standard: ['reviewer'], high: ['reviewer', 'red-team'] } },
     workerBody: `
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), JSON.stringify({
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), JSON.stringify({
         verdict: 'Reversible advisory recommendation with dissent preserved',
         evidence: ['The fixed fixture report, not a production architecture judgement'],
         'missing expertise': ['authorization boundaries'],
       }));
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Advisory report settled', assessment: { verdict: 'pass' } }));
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Advisory report settled', assessment: { verdict: 'pass' } }));
     `,
   });
 }

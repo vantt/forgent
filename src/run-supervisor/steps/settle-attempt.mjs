@@ -12,7 +12,6 @@ import { acquireRunControl, buildRunControlHolder } from '../run-lock.mjs';
 import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs';
 import { strayWriteWarning, watchWritesOutsideWorkspace } from '../stray-writes.mjs';
 import { createTerminalControl } from '../../terminal-control/client.mjs';
-import { findWorkerClaim } from '../worker-artifacts.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
 
 /** The last lines of a pane screen that may carry the reset time a provider printed. */
@@ -108,17 +107,13 @@ export function providerStopOf(receipt, claimed = Boolean(receipt.outboxResult))
 
 /**
  * The claim file this attempt's settlement judges, or null. The receipt names the newest result in the
- * attempt's outbox by the agent protocol's rule, and that is the answer whenever it names one. A cli-spawn
- * worker may still write its claim elsewhere (`agent-result.json` flat in the run directory, or a
- * `result-<N>.json` beside it): places the supervisor's outbox does not watch, so a receipt that names nothing
- * is not proof of no claim and the older lookup answers for those workers.
+ * attempt's outbox by the agent protocol's rule, and every worker, headless or interactive, is told to write
+ * its claim there, so a receipt that names nothing means the attempt left no claim.
  */
-function claimOf(runDir, envelope, receipt) {
-  if (receipt.outboxResult) {
-    if (path.basename(receipt.outboxResult) !== receipt.outboxResult) throw new StepError('io', 'receipt.json names an outbox result outside the outbox');
-    return path.join(envelope.launch.outboxDir, receipt.outboxResult);
-  }
-  return findWorkerClaim(runDir);
+function claimOf(envelope, receipt) {
+  if (!receipt.outboxResult) return null;
+  if (path.basename(receipt.outboxResult) !== receipt.outboxResult) throw new StepError('io', 'receipt.json names an outbox result outside the outbox');
+  return path.join(envelope.launch.outboxDir, receipt.outboxResult);
 }
 
 const FALLS_BACK = 'the seat walk falls back to another account or candidate.';
@@ -200,7 +195,7 @@ export async function settleAttempt({ runDir, envelope }) {
     : null;
   const strayWarnings = strayWarning ? [strayWarning] : [];
   const screenText = paneScreenOf(runDir, envelope).replace(/\s+$/, '');
-  const claimPath = claimOf(runDir, envelope, receipt);
+  const claimPath = claimOf(envelope, receipt);
   const raw = rawResultOf(receipt, claimPath !== null, screenText);
   // The screen is evidence for a person (the stop message, the stdout of a pane that writes no capture),
   // never a judge: why a provider stopped the agent is the receipt's reason.

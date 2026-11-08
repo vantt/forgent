@@ -88,14 +88,14 @@ function writeWorker(script, { files = {}, settle = true } = {}) {
       fs.mkdirSync(path.dirname(rel), { recursive: true });
       fs.writeFileSync(rel, content);
     }
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match && ${JSON.stringify(settle)}) {
       const claimDir = path.dirname(match[1]);
       const outbox = path.join(claimDir, 'worker-output', 'outbox');
       const runDir = fs.existsSync(outbox) ? outbox : claimDir;
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe prompt this worker was given, kept for the test:\\n' + prompt + '\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'docs: write the page', assessment: { verdict: 'pass' } }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nThe prompt this worker was given, kept for the test:\\n' + prompt + '\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'docs: write the page', assessment: { verdict: 'pass' } }));
     }
   `);
 }
@@ -117,7 +117,7 @@ function reportsOf(repoRoot, unitRunId) {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const p = path.join(dir, entry.name);
       if (entry.isDirectory()) walk(p);
-      else if (entry.name === 'agent-report.md') found.push(fs.readFileSync(p, 'utf8'));
+      else if (entry.name === 'report-1.md') found.push(fs.readFileSync(p, 'utf8'));
     }
   };
   walk(path.join(repoRoot, '.fgos', 'assignments', unitRunId));

@@ -488,7 +488,7 @@ function nanoOnlyInlineAssignment(overrides = {}) {
         objective: 'Read-only, bounded research task',
         contextRefs: [],
         constraints: [],
-        expectedOutputs: ['agent-result.json (status, summary)'],
+        expectedOutputs: ['result-1.json (status, summary)'],
         mutation: 'read-only',
         evidence: { required: 'reported' },
         role: 'researcher',

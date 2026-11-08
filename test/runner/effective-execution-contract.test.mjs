@@ -100,7 +100,7 @@ test('buildEffectiveExecutionContract projects a well-formed read-only contract'
   assert.equal(contract.limits.executorTimeoutMs, 45000);
   assert.equal(contract.resultClaim.contract.id, 'agent-result-claim');
   assert.equal(contract.resultClaim.contract.version, 2);
-  assert.equal(contract.resultClaim.path, path.join(path.resolve(runDir), 'agent-result.json'));
+  assert.equal(contract.resultClaim.path, path.join(path.resolve(runDir), 'worker-output', 'outbox', 'result-1.json'));
   assert.equal(contract.provenance.executorId, 'claude');
   assert.equal(contract.provenance.adapter, 'cli-spawn');
   assert.ok(contract.provenance.dispatchPlanHash.startsWith('sha256:'));
@@ -357,7 +357,7 @@ test('prompt and brief agree with effective execution contract on claim path, mu
   assert.ok(brief.includes('effective-execution-contract.json'), 'brief must link to persisted contract file');
 });
 
-test('a confined cli-spawn worker is told to write its claim and report where the sandbox lets it', () => {
+test('a headless worker, confined or not, is told to write the agent protocol result and report in the outbox its supervisor watches', () => {
   const assignment = validAssignment({ mutation: 'read-only' });
   const runDir = '/tmp/assignment-1/runs/01';
   const outbox = path.join(runDir, 'worker-output', 'outbox');
@@ -371,20 +371,16 @@ test('a confined cli-spawn worker is told to write its claim and report where th
   });
   const required = { requirement: { mode: 'required', policyId: 'host-write-denied' } };
 
-  const confined = build('cli-spawn', required);
-  assert.equal(confined.resultClaim.path, path.join(outbox, 'agent-result.json'));
-  const confinedPrompt = renderAssignmentPrompt(assignment, { runDir, effectiveContract: confined });
-  assert.ok(confinedPrompt.includes(`Write structured JSON to ${path.join(outbox, 'agent-result.json')}`));
-  assert.ok(confinedPrompt.includes(path.join(outbox, 'agent-report.md')));
-  assert.ok(!confinedPrompt.includes(path.join(runDir, 'agent-result.json')), 'no flat path the sandbox keeps read-only');
-
-  const unconfined = build('cli-spawn');
-  assert.equal(unconfined.resultClaim.path, path.join(runDir, 'agent-result.json'));
-  const unconfinedPrompt = renderAssignmentPrompt(assignment, { runDir, effectiveContract: unconfined });
-  assert.ok(unconfinedPrompt.includes(path.join(runDir, 'agent-report.md')));
+  for (const contract of [build('cli-spawn', required), build('cli-spawn')]) {
+    assert.equal(contract.resultClaim.path, path.join(outbox, 'result-1.json'));
+    const prompt = renderAssignmentPrompt(assignment, { runDir, effectiveContract: contract });
+    assert.ok(prompt.includes(`Write structured JSON to ${path.join(outbox, 'result-1.json')}`));
+    assert.ok(prompt.includes(path.join(outbox, 'report-1.md')));
+    assert.ok(!prompt.includes('agent-result.json') && !prompt.includes('agent-report.md'), 'the retired names are never taught');
+  }
 
   // herdr-spawn keeps its own outbox contract: the brief rewrites the claim path.
-  assert.equal(build('herdr-spawn', required).resultClaim.path, path.join(runDir, 'agent-result.json'));
+  assert.equal(build('herdr-spawn', required).resultClaim.path, path.join(outbox, 'result-1.json'));
 });
 
 test('readEffectiveExecutionContract reads, parses, and validates the contract on disk', () => {
@@ -454,7 +450,7 @@ test('PRODUCTION-DOOR FIXTURE: executeAssignment persists effective-execution-co
 
   // Write a mock script that acts as the executor CLI:
   // It verifies effective-execution-contract.json ALREADY exists when it runs,
-  // then writes agent-result.json and agent-report.md
+  // then writes result-1.json and report-1.md
   const mockScript = `#!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
@@ -496,8 +492,8 @@ if (runDir) {
     assessment: { verdict: 'pass' },
     evidenceRefs: [],
   };
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify(claim, null, 2));
-  fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'Substantive report content for read-only validation.\\n');
+  fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify(claim, null, 2));
+  fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), 'Substantive report content for read-only validation.\\n');
 }
 process.exit(0);
 `;
@@ -552,7 +548,7 @@ process.exit(0);
   assert.equal(contractOnDisk.workspace.cwd, tempDir);
   assert.deepEqual(contractOnDisk.workspace.writeScope, []);
   assert.equal(contractOnDisk.limits.executorTimeoutMs, 25000);
-  assert.equal(contractOnDisk.resultClaim.path, path.join(runDir, 'agent-result.json'));
+  assert.equal(contractOnDisk.resultClaim.path, path.join(runDir, 'worker-output', 'outbox', 'result-1.json'));
   // No executor is selected, so the configured default executor's command identifies it (it reaches Seat Binding as a pin).
   assert.equal(contractOnDisk.executorId, updatedCfg.executor.command);
   assert.equal(contractOnDisk.adapter, 'cli-spawn');

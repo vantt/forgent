@@ -9,7 +9,7 @@ import { spawn } from 'node:child_process';
 
 const opts = JSON.parse(process.env.AGENT_OPTS ?? '{}');
 const prompt = process.argv.slice(2).join(' ');
-const match = /Write structured JSON to (\S+agent-result\.json)/.exec(prompt);
+const match = /Write structured JSON to (\S+result-1\.json)/.exec(prompt);
 const claimDir = match ? path.dirname(match[1]) : process.cwd();
 const outbox = path.join(claimDir, 'worker-output', 'outbox');
 const dir = fs.existsSync(outbox) ? outbox : claimDir;
@@ -42,7 +42,7 @@ const chatter = setInterval(() => process.stdout.write(`tick ${Date.now() - star
 
 setTimeout(() => {
   clearInterval(chatter);
-  fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Report\nThe assigned work was carried out and verified in full.\n');
-  fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'The assigned work was carried out and verified in full.', assessment: { verdict: 'pass' } }));
+  fs.writeFileSync(path.join(dir, 'report-1.md'), '# Report\nThe assigned work was carried out and verified in full.\n');
+  fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'The assigned work was carried out and verified in full.', assessment: { verdict: 'pass' } }));
   process.exit(0);
 }, opts.runMs ?? 1500);

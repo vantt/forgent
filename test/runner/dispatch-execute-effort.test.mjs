@@ -146,10 +146,10 @@ import path from 'node:path';
 const args = process.argv.slice(2);
 fs.writeFileSync('argv.json', JSON.stringify(args));
 const prompt = args[args.length - 1];
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 if (match) {
   const runDir = path.dirname(match[1]);
-  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAssignment execution completed with a full report.\\n');
+  fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nAssignment execution completed with a full report.\\n');
   fs.writeFileSync(match[1], JSON.stringify({ status: 'done', summary: 'Done' }));
 }
 process.stderr.write('model: some-other-model\\n');

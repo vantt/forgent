@@ -59,7 +59,7 @@ function writeEchoExecutor(dir) {
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     let runDir;
     if (match) {
       runDir = path.dirname(match[1]);
@@ -77,8 +77,8 @@ function writeEchoExecutor(dir) {
     }
     if (runDir) {
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAssignment execution completed successfully with full report content.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nAssignment execution completed successfully with full report content.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     }
     process.stdout.write("All good\\n");
     process.exit(0);
@@ -112,12 +112,12 @@ function writeArgvRecordingExecutor(dir, label) {
     import path from 'node:path';
     fs.writeFileSync(${JSON.stringify(argvCapturePath)}, JSON.stringify(process.argv.slice(2)));
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       const runDir = path.dirname(match[1]);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAssignment execution completed successfully with full report content.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nAssignment execution completed successfully with full report content.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     }
     process.exit(0);
     `,
@@ -483,13 +483,13 @@ test('read-only assignment whose checkout gains a commit during the run is accep
     }
 
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     let runDir;
     if (match) {
       runDir = path.dirname(match[1]);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nDone.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     }
     process.exit(0);
     `,
@@ -1033,11 +1033,11 @@ test('Cell 6.3 Fix Round 1: absent claude-reviewer config entry falls back uncha
   assert.equal(fs.existsSync(worker.argvCapturePath), true, 'absent config must still fall back to spawning plain claude');
 });
 
-// Two dispatch contracts, one collector. A worker launched through cli-spawn
-// writes agent-result.json flat; one launched through herdr-spawn writes
-// outbox/result-<round>.json, because the outbox is the only place it is
-// allowed to write. Before this, the second one's claim was silently
-// discarded and the run was classified off git alone.
+// One protocol, one collector. A worker launched through cli-spawn writes
+// worker-output/outbox/result-<round>.json; one launched through herdr-spawn writes
+// outbox/result-<round>.json, because the outbox is the only place it may write.
+// Run directories written before that carry the flat agent-result.json name, which
+// the collector still reads.
 
 function writeOutboxRound(runDir, round, { status = 'done', summary = 'did the thing', report = 'A real report about the work that was done.' } = {}) {
   const outbox = path.join(runDir, 'outbox');
@@ -1046,20 +1046,20 @@ function writeOutboxRound(runDir, round, { status = 'done', summary = 'did the t
   if (report !== null) fs.writeFileSync(path.join(outbox, `report-${round}.md`), report);
 }
 
-test('a claim written to the worker outbox is collected, not thrown away', async () => {
+test('a headless worker\'s result-1.json in its worker-output outbox is collected, not thrown away', async () => {
   const tempDir = mkTempDir();
   const executorScript = path.join(tempDir, 'outbox-worker.mjs');
   const runDirFor = path.join(tempDir, '.fgos', 'assignments');
   fs.writeFileSync(executorScript, `
 import fs from 'node:fs';
 import path from 'node:path';
-// Behaves like an interactive worker: writes only inside its own outbox.
+// Behaves like a confined headless worker: writes only inside its own outbox.
 const root = ${JSON.stringify(runDirFor)};
 const asgn = fs.readdirSync(root)[0];
 const runDir = path.join(root, asgn, 'runs', '01');
-fs.mkdirSync(path.join(runDir, 'outbox'), { recursive: true });
-fs.writeFileSync(path.join(runDir, 'outbox', 'report-1.md'), 'The worker explains what it actually changed here.');
-fs.writeFileSync(path.join(runDir, 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'wrote the thing', findings: [], evidenceRefs: [] }));
+fs.mkdirSync(path.join(runDir, 'worker-output', 'outbox'), { recursive: true });
+fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), 'The worker explains what it actually changed here.');
+fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'wrote the thing', findings: [], evidenceRefs: [] }));
 console.log('done');
 `);
 
@@ -1074,30 +1074,6 @@ console.log('done');
   assert.notEqual(result.confidence, 'no-evidence', 'a settled round with a real claim is never no-evidence');
 });
 
-test('the flat legacy name still works, so cli-spawn workers are untouched', async () => {
-  const tempDir = mkTempDir();
-  const executorScript = path.join(tempDir, 'flat-worker.mjs');
-  const runDirFor = path.join(tempDir, '.fgos', 'assignments');
-  fs.writeFileSync(executorScript, `
-import fs from 'node:fs';
-import path from 'node:path';
-const root = ${JSON.stringify(runDirFor)};
-const asgn = fs.readdirSync(root)[0];
-const runDir = path.join(root, asgn, 'runs', '01');
-fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'The worker explains what it actually changed here.');
-fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'legacy shape', findings: [], evidenceRefs: [] }));
-console.log('done');
-`);
-
-  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, timeoutMs: 20000 };
-  const work = { id: 'tsk-flat', status: 'doing', workflowStep: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
-
-  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
-  assert.equal(result.agentClaim?.summary, 'legacy shape');
-  assert.equal(result.status, 'done');
-});
-
 test('executeAssignment rejects a reviewer v2 claim without assessment.verdict at the production classification gate', async () => {
   const tempDir = mkTempDir();
   const executorScript = path.join(tempDir, 'reviewer-missing-assessment.mjs');
@@ -1105,9 +1081,9 @@ test('executeAssignment rejects a reviewer v2 claim without assessment.verdict a
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
-const runDir = path.dirname(/Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt)[1]);
-fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'Reviewer report with substantive detail.');
-fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ contract: { id: 'agent-result-claim', version: 2 }, status: 'done', summary: 'Reviewed.' }));
+const runDir = path.dirname(/Write structured JSON to (\\S+result-1\\.json)/.exec(prompt)[1]);
+fs.writeFileSync(path.join(runDir, 'report-1.md'), 'Reviewer report with substantive detail.');
+fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ contract: { id: 'agent-result-claim', version: 2 }, status: 'done', summary: 'Reviewed.' }));
 `);
   const assignment = buildAssignment({
     work: { id: 'tsk-reviewer-assessment-gate', status: 'todo', workflowStep: 'planning', domain: 'coding' },
@@ -1134,8 +1110,8 @@ test('executeAssignment rejects a legacy failed claim with an object error at th
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
-const runDir = path.dirname(/Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt)[1]);
-fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'failed', summary: 'Legacy failure.', error: { code: 'ELEGACY' } }));
+const runDir = path.dirname(/Write structured JSON to (\\S+result-1\\.json)/.exec(prompt)[1]);
+fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'failed', summary: 'Legacy failure.', error: { code: 'ELEGACY' } }));
 `);
   const assignment = buildAssignment({
     work: { id: 'tsk-legacy-error-gate', status: 'todo', workflowStep: 'planning', domain: 'coding' },
@@ -1246,12 +1222,12 @@ test('executeAssignment: the same (retryId, destination, payloadDigest) tuple re
     const prior = fs.existsSync(${JSON.stringify(counterPath)}) ? Number(fs.readFileSync(${JSON.stringify(counterPath)}, 'utf8')) : 0;
     fs.writeFileSync(${JSON.stringify(counterPath)}, String(prior + 1));
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       const runDir = path.dirname(match[1]);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nDone.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     }
     process.exit(0);
     `,
@@ -1322,14 +1298,14 @@ test('executeAssignment: admission refuses a second attempt while a SIGKILLed ru
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       const runDir = path.dirname(match[1]);
       fs.mkdirSync(runDir, { recursive: true });
       // Prove liveness to the test, then hang forever -- never produce
-      // agent-result.json, so the Run never settles and stays "in flight"
+      // result-1.json, so the Run never settles and stays "in flight"
       // exactly like the audit's own live-probed scenario.
-      fs.writeFileSync(path.join(runDir, 'worker-alive.pid'), String(process.pid));
+      fs.writeFileSync(path.resolve(runDir, '..', '..', 'worker-alive.pid'), String(process.pid));
     }
     setInterval(() => {}, 60000);
     `,
@@ -1744,12 +1720,12 @@ test('executeAssignment: a control token that is superseded mid-flight (a freshe
     import path from 'node:path';
     setTimeout(() => {
       const prompt = process.argv.slice(2).join(' ');
-      const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+      const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
       if (match) {
         const runDir = path.dirname(match[1]);
         fs.mkdirSync(runDir, { recursive: true });
-        fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
-        fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+        fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nDone.\\n');
+        fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
       }
       process.exit(0);
     }, 300);
@@ -1810,12 +1786,12 @@ test('executeAssignment: late superseded writer cannot overwrite authoritative r
     import path from 'node:path';
     setTimeout(() => {
       const prompt = process.argv.slice(2).join(' ');
-      const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+      const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
       if (match) {
         const runDir = path.dirname(match[1]);
         fs.mkdirSync(runDir, { recursive: true });
-        fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDelayed worker product.\\n');
-        fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Delayed worker outcome' }));
+        fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nDelayed worker product.\\n');
+        fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Delayed worker outcome' }));
       }
       process.exit(0);
     }, 200);

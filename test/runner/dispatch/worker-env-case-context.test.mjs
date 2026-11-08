@@ -19,8 +19,8 @@ seedFileLocalBwrapRegistry();
 // The worker reports the case variables it was started with, as its own report.
 const WORKER_BODY = `
   const seen = { id: process.env.FGOS_CASE_ID ?? null, reservation: process.env.FGOS_CASE_RESERVATION ?? null };
-  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe worker saw the case variables: ' + JSON.stringify(seen) + '. Nothing else was inspected.\\n');
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+  fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nThe worker saw the case variables: ' + JSON.stringify(seen) + '. Nothing else was inspected.\\n');
+  fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
 `;
 
 function setupRepo() {

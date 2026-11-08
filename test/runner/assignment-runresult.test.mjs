@@ -150,8 +150,8 @@ test('executeAssignment produces status: done and confidence: reported when work
       for (const asgn of asgnDirs) {
         const runDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nPlan is sound.\\n');
-          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Plan sound' }));
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), '# Validation Report\\nPlan is sound.\\n');
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Plan sound' }));
         }
       }
     }
@@ -223,9 +223,9 @@ test('executeAssignment backfills mutation for its own effectiveAssignment re-re
       for (const a of fs.readdirSync(asgnDir)) {
         const runDir = path.join(asgnDir, a, 'runs', '01');
         if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Background Brief\\nFound existing code paths.\\n');
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), '# Background Brief\\nFound existing code paths.\\n');
           fs.writeFileSync(
-            path.join(runDir, 'agent-result.json'),
+            path.join(runDir, 'worker-output', 'outbox', 'result-1.json'),
             JSON.stringify({ status: 'done', summary: 'Background evidence gathered' }),
           );
         }
@@ -540,7 +540,7 @@ test('executeAssignment fails closed on malformed agent-result.json (Step 04 §5
       for (const asgn of fs.readdirSync(runsDir)) {
         const runDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-result.json'), 'THIS IS NOT JSON {{{{');
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), 'THIS IS NOT JSON {{{{');
         }
       }
     }
@@ -570,7 +570,7 @@ test('executeAssignment fails closed on malformed agent-result.json (Step 04 §5
   assert.match(result.runnerNote.summary, /schema validation/i);
 });
 
-// The agent writes agent-result.json, so settlement must neither follow a link it left there nor block on a
+// The agent writes its claim in the outbox, so settlement must neither follow a link it left there nor block on a
 // pipe. The run happens in a child process: a settlement that blocks would otherwise hang this whole file,
 // and the child's timeout turns that into a plain failure.
 function settleWithPlantedClaim(plantClaim) {
@@ -586,7 +586,7 @@ function settleWithPlantedClaim(plantClaim) {
     for (const asgn of fs.readdirSync(runsDir)) {
       const runDir = path.join(runsDir, asgn, 'runs', '01');
       if (!fs.existsSync(runDir)) continue;
-      const claim = path.join(runDir, 'agent-result.json');
+      const claim = path.join(runDir, 'worker-output', 'outbox', 'result-1.json');
       ${plantClaim}
     }
     process.stdout.write('Done.\\n');
@@ -608,13 +608,13 @@ function settleWithPlantedClaim(plantClaim) {
   return JSON.parse(run.stdout.slice(run.stdout.indexOf('{')));
 }
 
-test('settlement treats a named pipe left as agent-result.json as no valid claim instead of blocking on it', { skip: process.platform === 'win32' }, () => {
+test('settlement treats a named pipe left as the claim as no valid claim instead of blocking on it', { skip: process.platform === 'win32' }, () => {
   const out = settleWithPlantedClaim(`execFileSync('mkfifo', [claim]);`);
   assert.equal(out.agentClaim, null);
   assert.equal(out.outcome.evidence, 'failed');
 });
 
-test('settlement does not follow a symlink left as agent-result.json to a file elsewhere', { skip: process.platform === 'win32' }, () => {
+test('settlement does not follow a symlink left as the claim to a file elsewhere', { skip: process.platform === 'win32' }, () => {
   const out = settleWithPlantedClaim(`
       const target = path.join(path.dirname(runDir), 'elsewhere.json');
       fs.writeFileSync(target, JSON.stringify({ status: 'done', summary: 'Plan sound' }));
@@ -638,7 +638,7 @@ test('executeAssignment fails closed on invalid agent-result.json schema (Step 0
       for (const asgn of fs.readdirSync(runsDir)) {
         const runDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-result.json'),
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'),
             JSON.stringify({ status: 'success', summary: 'All done' }));
         }
       }
@@ -1106,7 +1106,7 @@ test('executeAssignment with bare agent-result.json (no evidenceRefs, no compani
         const runDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(runDir)) {
           // Write bare agent-result.json with status done but NO evidenceRefs and NO agent-report.md
-          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Bare claim without evidence' }));
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Bare claim without evidence' }));
         }
       }
     }
@@ -1142,7 +1142,7 @@ test('executeAssignment with malformed evidenceRefs: [""] fails closed with stat
         const runDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(runDir)) {
           // Write agent-result.json with malformed evidenceRefs containing empty string
-          fs.writeFileSync(path.join(runDir, 'agent-result.json'),
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'),
             JSON.stringify({ status: 'done', summary: 'Claim only', evidenceRefs: [''] }));
         }
       }
@@ -1178,8 +1178,8 @@ test('executeAssignment with placeholder report text (TODO/N/A/keyword-only) pro
       for (const asgn of fs.readdirSync(runsDir)) {
         const runDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nTODO\\n');
-          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), '# Validation Report\\nTODO\\n');
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
         }
       }
     }
@@ -1210,8 +1210,8 @@ test('a one-word answer report (ok) with a done claim is a reported pass, not pl
     for (const asgn of fs.readdirSync(runsDir)) {
       const runDir = path.join(runsDir, asgn, 'runs', '01');
       if (fs.existsSync(runDir)) {
-        fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nok\\n');
-        fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Answered' }));
+        fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), '# Report\\nok\\n');
+        fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Answered' }));
       }
     }
     process.exit(0);
@@ -1242,7 +1242,7 @@ test('executeAssignment with placeholder evidenceRefs (TODO/N/A/fabricated path)
       for (const asgn of fs.readdirSync(runsDir)) {
         const runDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-result.json'),
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'),
             JSON.stringify({ status: 'done', summary: 'Done', evidenceRefs: ['TODO', 'fake_fabricated_file.txt'] }));
         }
       }
@@ -1276,8 +1276,8 @@ test('executeAssignment with real substantive report text produces confidence: r
       for (const asgn of fs.readdirSync(runsDir)) {
         const runDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nPlan is sound and verified against codebase.\\n');
-          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Plan sound' }));
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), '# Validation Report\\nPlan is sound and verified against codebase.\\n');
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Plan sound' }));
         }
       }
     }
@@ -1488,8 +1488,8 @@ test('executeAssignment persists effective-execution-contract.json pre-launch an
       assessment: { verdict: 'pass' },
       evidenceRefs: [],
     };
-    fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify(claim, null, 2));
-    fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'Evidence report text for validation.\\n');
+    fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), JSON.stringify(claim, null, 2));
+    fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), 'Evidence report text for validation.\\n');
     process.exit(0);
     `,
   );
@@ -1524,7 +1524,7 @@ test('executeAssignment persists effective-execution-contract.json pre-launch an
   assert.equal(contract.assignmentId, assignment.assignmentId);
   assert.equal(contract.mutation, 'read-only');
   assert.equal(contract.limits.executorTimeoutMs, 15000);
-  assert.equal(contract.resultClaim.path, path.join(runDir, 'agent-result.json'));
+  assert.equal(contract.resultClaim.path, path.join(runDir, 'worker-output', 'outbox', 'result-1.json'));
 });
 
 test('executeAssignment writes RunResult v3 with contract version 3, valid classification, and attribution', async () => {
@@ -1543,9 +1543,9 @@ test('executeAssignment writes RunResult v3 with contract version 3, valid class
       for (const asgn of asgnDirs) {
         const runDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nAll good.\\n');
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), '# Validation Report\\nAll good.\\n');
           fs.writeFileSync(
-            path.join(runDir, 'agent-result.json'),
+            path.join(runDir, 'worker-output', 'outbox', 'result-1.json'),
             JSON.stringify({
               contract: { id: 'agent-result-claim', version: 2 },
               status: 'done',
@@ -1618,9 +1618,9 @@ test('executeAssignment for reviewer findings produces execution.completed with 
       for (const asgn of asgnDirs) {
         const runDir = path.join(runsDir, asgn, 'runs', '01');
         if (fs.existsSync(runDir)) {
-          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nIdentified security flaw.\\n');
+          fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'report-1.md'), '# Review Report\\nIdentified security flaw.\\n');
           fs.writeFileSync(
-            path.join(runDir, 'agent-result.json'),
+            path.join(runDir, 'worker-output', 'outbox', 'result-1.json'),
             JSON.stringify({
               contract: { id: 'agent-result-claim', version: 2 },
               status: 'failed',
@@ -1692,11 +1692,11 @@ test('done findings survive both settlement branches; verified mutating work sti
     const executorScript = path.join(tempDir, 'done-findings.mjs');
     fs.writeFileSync(executorScript, `
       import fs from 'node:fs'; import path from 'node:path';
-      const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.at(-1));
+      const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(process.argv.at(-1));
       if (!match) process.exit(2);
       if (${mutating}) fs.writeFileSync(path.join(process.cwd(), 'tracked.txt'), 'Reviewed revision with unresolved authorization findings\\n');
       const dir = path.dirname(match[1]);
-      fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Review\\nThe review is complete, but the recommendation lacks evidence for its authorization boundary. This dissent must remain visible to the owner.\\n');
+      fs.writeFileSync(path.join(dir, 'report-1.md'), '# Review\\nThe review is complete, but the recommendation lacks evidence for its authorization boundary. This dissent must remain visible to the owner.\\n');
       fs.writeFileSync(match[1], JSON.stringify({
         contract: { id: 'agent-result-claim', version: 2 }, status: 'done',
         summary: 'Review completed with unresolved authorization findings',
@@ -1752,7 +1752,7 @@ function scopedWriteRun({ writes, claim, stage = 'executing', operation = 'imple
     const runsDir = path.join(cwd, '.fgos', 'assignments');
     for (const asgn of fs.readdirSync(runsDir)) {
       const runDir = path.join(runsDir, asgn, 'runs', '01');
-      if (fs.existsSync(runDir)) fs.writeFileSync(path.join(runDir, 'agent-result.json'), ${JSON.stringify(JSON.stringify(claim))});
+      if (fs.existsSync(runDir)) fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'result-1.json'), ${JSON.stringify(JSON.stringify(claim))});
     }
     process.exit(0);
   `);

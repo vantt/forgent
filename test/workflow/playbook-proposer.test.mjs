@@ -34,8 +34,8 @@ const WORKER_BODY = `
   for (const m of prompt.matchAll(/WRITE:(\\S+)/g)) { fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], m[1] + ' written\\n'); }
   const sleep = /SLEEP:(\\d+)/.exec(prompt);
   if (sleep) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, Number(sleep[1]));
-  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+  fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
+  fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
 `;
 
 function setupRepo() {

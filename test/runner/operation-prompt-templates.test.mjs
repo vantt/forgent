@@ -239,7 +239,7 @@ Evidence: {evidenceContract}`;
     role: 'tester-role',
     objective: 'Run test suite',
     contextRefs: ['ref1.md', 'ref2.md'],
-    expectedOutputs: ['agent-result.json'],
+    expectedOutputs: ['result-1.json'],
     constraints: [
       'must be fast',
       'protocol-operation:core.coordination-protocol.test@1.0.0#op1', // reserved stamp MUST NOT leak!
@@ -250,7 +250,7 @@ Evidence: {evidenceContract}`;
   assert.ok(rendered.includes('Role: tester-role'));
   assert.ok(rendered.includes('Objective: Run test suite'));
   assert.ok(rendered.includes('- ref1.md\n- ref2.md'));
-  assert.ok(rendered.includes('- agent-result.json'));
+  assert.ok(rendered.includes('- result-1.json'));
   assert.ok(rendered.includes('- must be fast'));
   assert.ok(!rendered.includes('protocol-operation:'), 'engine-reserved stamp must never leak into rendered prompt');
   assert.ok(rendered.includes('Evidence: verified'));
@@ -282,7 +282,7 @@ test('resolveAndRenderOperationPrompt produces rendered body and complete templa
     objective: 'Review the candidate changes',
     contractTemplate: 'master-loop-review-candidate',
     contextRefs: ['plans/test/plan.md'],
-    expectedOutputs: ['agent-result.json', 'agent-report.md'],
+    expectedOutputs: ['result-1.json', 'report-1.md'],
     constraints: ['read-only'],
     evidence: { required: 'reported' },
   };
@@ -290,7 +290,7 @@ test('resolveAndRenderOperationPrompt produces rendered body and complete templa
   const { renderedBody, templateProvenance } = resolveAndRenderOperationPrompt(assignment);
   assert.ok(renderedBody.includes('Review the candidate changes'));
   assert.ok(renderedBody.includes('- plans/test/plan.md'));
-  assert.ok(renderedBody.includes('- agent-result.json'));
+  assert.ok(renderedBody.includes('- result-1.json'));
 
   assert.equal(templateProvenance.id, 'master-loop-review-candidate');
   assert.equal(templateProvenance.tier, 'core');
@@ -312,7 +312,7 @@ test('renderAssignmentPrompt uses contractTemplate when declared', () => {
     objective: 'Review candidate diff',
     contractTemplate: 'master-loop-review-candidate',
     contextRefs: ['file1.js'],
-    expectedOutputs: ['agent-result.json'],
+    expectedOutputs: ['result-1.json'],
     constraints: [],
   };
 
@@ -782,12 +782,12 @@ test('I04-REV-01 regression: executeAssignment retry uses pinned template snapsh
       import path from 'node:path';
       const prompt = process.argv.slice(2).join(' ');
       fs.appendFileSync(${JSON.stringify(argvLog)}, JSON.stringify({ prompt }) + '\\n');
-      const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+      const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
       if (match) {
         const runDir = path.dirname(match[1]);
         fs.mkdirSync(runDir, { recursive: true });
-        fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAssignment execution completed successfully with full substantive report content.\\n');
-        fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+        fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nAssignment execution completed successfully with full substantive report content.\\n');
+        fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
       }
       process.exit(0);
       `,

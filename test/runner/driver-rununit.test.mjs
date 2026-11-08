@@ -30,7 +30,7 @@ const WORKER = `
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 if (!match) process.exit(0);
 const claimDir = path.dirname(match[1]);
 const outbox = path.join(claimDir, 'worker-output', 'outbox');
@@ -38,13 +38,13 @@ const dir = fs.existsSync(outbox) ? outbox : claimDir;
 fs.mkdirSync(dir, { recursive: true });
 if (process.env.FGOS_FIXTURE_WORKER_MODE === 'write' || prompt.includes('scoped-subtask')) {
   fs.writeFileSync('feature.txt', 'feature\\n');
-  fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Report\\nWrote feature.txt (citation: src/main.mjs:L1)\\n');
-  fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Wrote feature.txt', evidenceRefs: ['feature.txt'] }));
+  fs.writeFileSync(path.join(dir, 'report-1.md'), '# Report\\nWrote feature.txt (citation: src/main.mjs:L1)\\n');
+  fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Wrote feature.txt', evidenceRefs: ['feature.txt'] }));
   process.exit(0);
 }
 const cite = 'PASS (citation: src/main.mjs:L1)';
-fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Reality Gate Validation & Feasibility Matrix Report\\n## Reality Gate Score\\n- Mode fit: ' + cite + '\\n- Repo fit: ' + cite + '\\n- Assumptions: ' + cite + '\\n- Smaller path: ' + cite + '\\n- Proof surface: ' + cite + '\\n- Impact-analysis posture: ' + cite + '\\n## Feasibility Matrix\\n- Feasibility matrix: verified (citation: src/main.mjs:L1).\\nPlan holds up under reality check.\\n');
-fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({
+fs.writeFileSync(path.join(dir, 'report-1.md'), '# Reality Gate Validation & Feasibility Matrix Report\\n## Reality Gate Score\\n- Mode fit: ' + cite + '\\n- Repo fit: ' + cite + '\\n- Assumptions: ' + cite + '\\n- Smaller path: ' + cite + '\\n- Proof surface: ' + cite + '\\n- Impact-analysis posture: ' + cite + '\\n## Feasibility Matrix\\n- Feasibility matrix: verified (citation: src/main.mjs:L1).\\nPlan holds up under reality check.\\n');
+fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({
   status: 'done', summary: 'Plan is feasible', verdict: 'READY',
   realityGate: { 'mode-fit': cite, 'repo-fit': cite, 'assumptions-fit': cite, 'smaller-path-fit': cite, 'proof-surface-fit': cite, 'impact-analysis-posture': cite },
   feasibilityMatrix: [{ risk: 'Risk 1', rating: 'Low', citation: 'src/main.mjs:L1' }],

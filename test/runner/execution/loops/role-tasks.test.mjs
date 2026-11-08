@@ -74,7 +74,7 @@ test('declared choices and the stance request reach a panelist only, never a syn
   const panelist = roleUnit(measured, { seat: 'member-2', kind: 'panelist', stance: true });
   assert.match(panelist.objective, /Declared choices: \["incremental","full"\]/);
   assert.match(panelist.objective, /"stance": \{"choice"/);
-  assert.match(panelist.objective, /agent-result\.json/);
+  assert.match(panelist.objective, /result claim/);
   assert.match(panelist.objective, /never changes whether your work passes/);
   assert.ok(panelist.objective.startsWith(unit.objective), 'the question itself is still what the panelist answers');
   // The posture decides, not the label: a differently named voter is asked, a seat named like one is not.

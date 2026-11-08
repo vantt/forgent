@@ -8,12 +8,12 @@ domain: coding | role: reviewer | reason: review | requires-skill: fgos-coding-v
   direct `handoff --reason review`).
 
 ## Output
-- `agent-result.json` containing:
+- `result-1.json` containing:
   - `status`: `"done"` | `"blocked"` | `"failed"`
   - `verdict`: `"APPROVED"` | `"REJECT"`
   - `summary`: concise summary of review findings
   - `evidenceRefs`: array containing both a candidate diff reference (`evidence:candidate-diff` or `diff:...`) and a verify result reference (`evidence:verify-...` or `verify:...`).
-- `agent-report.md`: reviewer review findings and evaluation (required on reject with actionable specifics; required on approval with clean code rationale).
+- `report-1.md`: reviewer review findings and evaluation (required on reject with actionable specifics; required on approval with clean code rationale).
 
 ## Gates
 - None owned here — the outer approve/merge gate (CTR005, hard, D5) is a

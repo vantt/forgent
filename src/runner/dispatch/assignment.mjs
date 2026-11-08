@@ -56,6 +56,7 @@ import {
 import { CONTRACT_POLICY_VERSION, validateExecutionContract } from './execution-contract.mjs';
 import {
   ALLOWED_AGENT_CLAIM_STATUSES as CONTRACT_AGENT_CLAIM_STATUSES,
+  claimReportPath,
   renderAgentResultClaimInstructions,
   validateAgentResultClaimContract,
 } from './agent-result-claim-contract.mjs';
@@ -386,11 +387,11 @@ function buildDeclaredAssignment({
   const derivedExpectedOutputs = Array.isArray(expectedOutputs) ? [...expectedOutputs] : [];
   if (derivedExpectedOutputs.length === 0) {
     if (operation === 'validate-plan') {
-      derivedExpectedOutputs.push('agent-result.json (verdict: READY | NOT READY | READY WITH CONSTRAINTS)');
-      derivedExpectedOutputs.push('agent-report.md (reviewer findings and evaluation)');
+      derivedExpectedOutputs.push('result-1.json (verdict: READY | NOT READY | READY WITH CONSTRAINTS)');
+      derivedExpectedOutputs.push('report-1.md (reviewer findings and evaluation)');
     } else if (operation === 'review-item') {
-      derivedExpectedOutputs.push('agent-result.json (verdict: APPROVED | REJECT, evidenceRefs: [candidate diff ref, verify result ref])');
-      derivedExpectedOutputs.push('agent-report.md (reviewer findings and evaluation)');
+      derivedExpectedOutputs.push('result-1.json (verdict: APPROVED | REJECT, evidenceRefs: [candidate diff ref, verify result ref])');
+      derivedExpectedOutputs.push('report-1.md (reviewer findings and evaluation)');
     }
   }
 
@@ -689,8 +690,8 @@ function renderPersonaSection(personaRef, options = {}) {
  * Render standard prompt text for an Assignment (Step 03 / Step 04).
  * Keeps prompt references as refs rather than embedding large file contents.
  * When `options.runDir` is supplied, the prompt includes concrete result artifact
- * paths so the worker knows exactly where to write agent-result.json and
- * agent-report.md (Step 04 §5.1).
+ * paths so the worker knows exactly where to write its result claim and
+ * report (Step 04 §5.1).
  *
  * @param {object} assignment Assignment object
  * @param {object} [options]
@@ -790,8 +791,8 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     lines.push(...(scope.length > 0 ? scope.map((entry) => `  - ${entry}`) : ['  - (none declared: the runner commits nothing)']));
     lines.push('- Do not run `git add` or `git commit`, even if the task above asks you to: the runner commits after the round passes, and only the files inside the scope.');
     lines.push('- The first line of "summary" is the commit subject, in conventional form: `type(scope): ...`.');
-    lines.push('- Need to write a file outside the scope? Do not write it: list it in "needsWrites": [<path>, ...] in agent-result.json and say why in "summary".');
-    lines.push('- Your result files (agent-result.json and its report, named below) are the exception: they sit outside the workspace, writing them is required, and they never go in "needsWrites".');
+    lines.push('- Need to write a file outside the scope? Do not write it: list it in "needsWrites": [<path>, ...] in your result claim and say why in "summary".');
+    lines.push('- Your result files (the claim and its report, named below) are the exception: they sit outside the workspace, writing them is required, and they never go in "needsWrites".');
   }
 
   // Step 04 §5.1: include concrete result artifact paths when runDir is known.
@@ -812,8 +813,8 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     // The contract names where this worker may write (a sandboxed worker's
     // claim lives under worker-output/outbox); the report sits beside it.
     const agentResultPath = options.effectiveContract?.resultClaim?.path
-      ?? path.join(options.runDir, 'agent-result.json');
-    const agentReportPath = path.join(path.dirname(agentResultPath), 'agent-report.md');
+      ?? path.join(options.runDir, 'worker-output', 'outbox', 'result-1.json');
+    const agentReportPath = claimReportPath(agentResultPath);
     const readOnly = isReadOnlyAssignment(assignment);
     lines.push('Result artifact:');
     // "Read-only" and "write these files" side by side read as a contradiction: a worker told the write
@@ -838,7 +839,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     lines.push('Effective execution contract:');
     lines.push(`- Contract: ${ec.contract?.id || 'effective-execution-contract'}.v${ec.contract?.version || 1}`);
     lines.push(`- Mutation: ${ec.mutation}`);
-    lines.push(`- Claim path: ${ec.resultClaim?.path || (options.runDir ? path.join(options.runDir, 'agent-result.json') : '(none)')}`);
+    lines.push(`- Claim path: ${ec.resultClaim?.path || (options.runDir ? path.join(options.runDir, 'worker-output', 'outbox', 'result-1.json') : '(none)')}`);
     lines.push(`- Timeout: ${ec.limits?.executorTimeoutMs ?? ec.limits?.timeoutMs}ms`);
     const mount = ec.workspace?.writeScope ?? [];
     // The mount is the whole worktree; next to a declared scope it must not read as leave to write anywhere in it.

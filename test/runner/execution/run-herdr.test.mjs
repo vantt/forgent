@@ -44,7 +44,7 @@ test('Claude cross-repo handoffs grant only referenced report parents, not sibli
   const reportDir = path.join(store, 'previous', 'producer', '1', 'runs', '01');
   const unrelated = path.join(store, 'unrelated', 'runs', '01');
   for (const dir of [runDir, reportDir, unrelated]) fs.mkdirSync(dir, { recursive: true });
-  const report = path.join(reportDir, 'agent-report.md');
+  const report = path.join(reportDir, 'report-1.md');
   fs.writeFileSync(report, '# Settled recommendation with attributed dissent\n');
   fs.writeFileSync(path.join(assignment, 'assignment.json'), JSON.stringify({
     contextRefs: [report, report, path.join(store, 'absent.md'), unrelated, 'unit-run:previous/producer', 'relative.md'],

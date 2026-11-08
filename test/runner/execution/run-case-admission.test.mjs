@@ -41,14 +41,14 @@ if (family.startsWith('quota')) {
 }
 const prompt = process.argv.slice(3).join(' ');
 for (const m of prompt.matchAll(/WRITE:(\\S+)/g)) { fs.mkdirSync(path.dirname(m[1]), { recursive: true }); fs.writeFileSync(m[1], 'written\\n'); }
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 if (match) {
   const claimDir = path.dirname(match[1]);
   const outbox = path.join(claimDir, 'worker-output', 'outbox');
   const dir = fs.existsSync(outbox) ? outbox : claimDir;
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
-  fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
+  fs.writeFileSync(path.join(dir, 'report-1.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
+  fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
 }
 `;
 

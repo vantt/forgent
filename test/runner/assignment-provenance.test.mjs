@@ -398,7 +398,7 @@ test('buildAssignment (inline) re-validates the harness-enriched contract: an ad
       provenance: {
         kind: 'inline',
         contract: {
-          objective: 'probe', contextRefs: [], constraints: [], expectedOutputs: ['agent-report.md'],
+          objective: 'probe', contextRefs: [], constraints: [], expectedOutputs: ['report-1.md'],
           mutation: 'read-only', evidence: { required: 'reported' }, role: 'researcher',
           capabilities: [], budget: { timeoutMs: 1000, maxRuns: 1 },
         },

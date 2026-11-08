@@ -116,15 +116,15 @@ export function writeSettlingWorker(dir) {
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       // A confined worker may only write the run's outbox; an unconfined one writes the run dir.
       const claimDir = path.dirname(match[1]);
       const outbox = path.join(claimDir, 'worker-output', 'outbox');
       const runDir = fs.existsSync(outbox) ? outbox : claimDir;
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
     }
     `,
   );
@@ -218,7 +218,7 @@ export function writeScopedWorker(repoRoot, { files, waitFor = null, summary = '
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     const files = ${JSON.stringify(files)};
     for (const [rel, content] of Object.entries(files)) {
       fs.mkdirSync(path.dirname(rel), { recursive: true });
@@ -235,8 +235,8 @@ export function writeScopedWorker(repoRoot, { files, waitFor = null, summary = '
       const outbox = path.join(claimDir, 'worker-output', 'outbox');
       const runDir = fs.existsSync(outbox) ? outbox : claimDir;
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: ${JSON.stringify(summary)}, assessment: { verdict: 'pass' } }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: ${JSON.stringify(summary)}, assessment: { verdict: 'pass' } }));
     }
     `,
   );

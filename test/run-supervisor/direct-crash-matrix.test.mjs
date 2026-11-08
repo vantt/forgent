@@ -54,7 +54,10 @@ test('1. a controller killed with SIGKILL after the binding leaves an agent that
   await assertSettledAttempt(project, dir);
   assert.equal(starts(dir).length, 1, 'the agent ran exactly once');
   assert.deepEqual(pidsWithToken(tok), [], 'the setsid grandchild did not outlive the attempt');
-  assert.equal(readJson(here(dir, 'receipt.json')).outcome, 'exited');
+  const receipt = readJson(here(dir, 'receipt.json'));
+  assert.equal(receipt.outcome, 'exited');
+  assert.equal(receipt.outboxPresent, true, 'a headless agent writes the protocol result name, so its receipt sees the claim');
+  assert.equal(receipt.outboxResult, 'result-1.json');
 });
 
 /** Kill the controller, then the supervisor, once the agent runs; returns the attempt directory. */

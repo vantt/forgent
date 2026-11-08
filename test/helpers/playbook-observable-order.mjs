@@ -44,12 +44,12 @@ const WORKER_BODY = `
     fs.mkdirSync(path.dirname(rel), { recursive: true });
     fs.writeFileSync(rel, rel + ' written\\n');
   }
-  fs.writeFileSync(path.join(runDir, 'agent-report.md'), JSON.stringify({
+  fs.writeFileSync(path.join(runDir, 'report-1.md'), JSON.stringify({
     verdict: 'Reversible recommendation with dissent preserved',
     evidence: ['fixed fixture report'],
     'missing expertise': ['authorization boundaries'],
   }));
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Settled', assessment: { verdict: 'pass' } }));
+  fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Settled', assessment: { verdict: 'pass' } }));
 `;
 
 function fixtureRepo() {

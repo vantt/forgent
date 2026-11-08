@@ -2278,13 +2278,13 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
     const prompt = process.argv.slice(2).join(' ');
     // The loop's own worker prompt (# Goal) carries the claim line too, since it
     // runs as a Unit; only a driver operation's prompt is answered with a claim.
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     const operationPrompt = match && !prompt.includes('# Goal');
     if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/operation-choice.mjs\\nSearch posture: active rg cross-check\\nCallers: src/runner/loop.mjs\\nAffected processes: none\\nRisk read: low risk\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/operation-choice.mjs\\nSearch posture: active rg cross-check\\nCallers: src/runner/loop.mjs\\nAffected processes: none\\nRisk read: low risk\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Scouted 2 symbols', findings: [] }));
     } else {
       fs.writeFileSync('output.txt', 'done\\n');
@@ -2394,19 +2394,19 @@ test('driver loop routes done review findings with REJECT to fix-verify-red inst
     const prompt = process.argv.slice(2).join(' ');
     // The loop's own worker prompt (# Goal) carries the claim line too, since it
     // runs as a Unit; only a driver operation's prompt is answered with a claim.
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     const operationPrompt = match && !prompt.includes('# Goal');
     if (match && prompt.includes('review-item')) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nREJECT: evidence:candidate-diff implementation failed verify check in evidence:verify-fail.\\nEvaluation: REJECT.\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Review Report\\nREJECT: evidence:candidate-diff implementation failed verify check in evidence:verify-fail.\\nEvaluation: REJECT.\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'REJECT', assessment: { verdict: 'findings' }, summary: 'Verify failed', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-fail'] }));
     } else if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Fix Report\\nFix applied.\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Fix Report\\nFix applied.\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Fix applied', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] }));
       fs.writeFileSync('output.txt', 'done\\n');
     } else {
@@ -2469,13 +2469,13 @@ test('driver loop runOnce: executing review-item with APPROVED verdict and passi
     const prompt = process.argv.slice(2).join(' ');
     // The loop's own worker prompt (# Goal) carries the claim line too, since it
     // runs as a Unit; only a driver operation's prompt is answered with a claim.
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     const operationPrompt = match && !prompt.includes('# Goal');
     if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nAPPROVED: evidence:candidate-diff changes verified against evidence:verify-pass.\\nEvaluation: APPROVED.\\nRationale: Clean code implementation.\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Review Report\\nAPPROVED: evidence:candidate-diff changes verified against evidence:verify-pass.\\nEvaluation: APPROVED.\\nRationale: Clean code implementation.\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'APPROVED', summary: 'Clean code', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] }));
     } else {
       fs.writeFileSync('output.txt', 'done\\n');
@@ -2540,13 +2540,13 @@ test('driver loop runOnce: executing review-item with APPROVED verdict but faili
     const prompt = process.argv.slice(2).join(' ');
     // The loop's own worker prompt (# Goal) carries the claim line too, since it
     // runs as a Unit; only a driver operation's prompt is answered with a claim.
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     const operationPrompt = match && !prompt.includes('# Goal');
     if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nAPPROVED: evidence:candidate-diff changes verified against evidence:verify-fail.\\nEvaluation: APPROVED.\\nRationale: Clean code implementation.\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Review Report\\nAPPROVED: evidence:candidate-diff changes verified against evidence:verify-fail.\\nEvaluation: APPROVED.\\nRationale: Clean code implementation.\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'APPROVED', summary: 'Clean code', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-fail'] }));
     } else {
       fs.writeFileSync('output.txt', 'done\\n');
@@ -2599,13 +2599,13 @@ test('driver loop runOnce: executing review-item on Work with NO candidate diff/
     const prompt = process.argv.slice(2).join(' ');
     // The loop's own worker prompt (# Goal) carries the claim line too, since it
     // runs as a Unit; only a driver operation's prompt is answered with a claim.
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     const operationPrompt = match && !prompt.includes('# Goal');
     if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nAPPROVED\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Review Report\\nAPPROVED\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', verdict: 'APPROVED', summary: 'Clean code', evidenceRefs: ['evidence:candidate-diff', 'evidence:verify-pass'] }));
     }
     process.exit(0);
@@ -2654,13 +2654,13 @@ test('Finding 5 regression test: scout-blast-radius/review-item assignment paths
     const prompt = process.argv.slice(2).join(' ');
     // The loop's own worker prompt (# Goal) carries the claim line too, since it
     // runs as a Unit; only a driver operation's prompt is answered with a claim.
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     const operationPrompt = match && !prompt.includes('# Goal');
     if (operationPrompt) {
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nFiles: src/main.js\\nPosture: active\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Scout Report\\nFiles: src/main.js\\nPosture: active\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', files: ['src/main.js'], posture: 'active', summary: 'Scouted' }));
     }
     process.exit(0);
@@ -2743,11 +2743,11 @@ test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assig
     import fs from 'node:fs';
     import path from 'node:path';
     const cwd = process.cwd();
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '));
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(process.argv.slice(2).join(' '));
     if (match) {
       const runDir = path.dirname(match[1]);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nPlan in worktree is sound.\\ncwd: ' + cwd + '\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Validation Report\\nPlan in worktree is sound.\\ncwd: ' + cwd + '\\n');
       fs.writeFileSync(
         match[1],
         JSON.stringify({
@@ -2785,7 +2785,7 @@ test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assig
 
   const [asgnId] = validatePlanDispatches(repoRoot).asgnIds;
   assert.ok(asgnId, 'executor was called');
-  const report = fs.readFileSync(resolveRunWorkerArtifactPath(path.join(repoRoot, '.fgos', 'assignments', asgnId, 'runs', '01'), /^report-(\d+)\.md$/, 'agent-report.md'), 'utf8');
+  const report = fs.readFileSync(resolveRunWorkerArtifactPath(path.join(repoRoot, '.fgos', 'assignments', asgnId, 'runs', '01'), /^report-(\d+)\.md$/, 'report-1.md'), 'utf8');
   const executedCwd = /^cwd: (.*)$/m.exec(report)?.[1] ?? '';
   assert.ok(executedCwd, 'executor was called');
   assert.equal(fs.existsSync(path.join(executedCwd, docsRef, 'plan.md')), true, 'cwd was content root containing plan.md');
@@ -2800,7 +2800,7 @@ test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assig
 // ---------------------------------------------------------------------------
 
 /** Fake executor for the validate-plan happy path: assignment prompts (the
- * "Write structured JSON to ...agent-result.json" instruction) get a valid
+ * "Write structured JSON to ...result-1.json" instruction) get a valid
  * READY claim + a substantive report into the run dir parsed from the prompt;
  * any other prompt (the drain run's primary worker, when the planning edge
  * actually advances) produces and commits output.txt so the engine's own
@@ -2816,17 +2816,17 @@ import { execFileSync } from 'node:child_process';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 const operationPrompt = match && !prompt.includes('# Goal');
 if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(
-    path.join(runDir, 'agent-report.md'),
+    path.join(runDir, 'report-1.md'),
     '# Validation Report\\nReality gate: all six dimensions PASS with citations (src/index.mjs).\\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\\nConclusion: the plan is sound and ready.\\n',
   );
   fs.writeFileSync(
-    path.join(runDir, 'agent-result.json'),
+    path.join(runDir, 'result-1.json'),
     JSON.stringify({
       status: 'done',
       verdict: 'READY',
@@ -2976,9 +2976,9 @@ test('Cell 6.1 happy path: run evidence is complete and the verdict artifact is 
     assert.ok(fs.existsSync(path.join(runDir, f)), `runs/01 must contain ${f}`);
   }
   // The worker's own artifacts: a confined worker writes only its run's outbox.
-  const claimPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
-  assert.ok(fs.existsSync(claimPath), 'runs/01 must hold agent-result.json');
-  assert.ok(fs.existsSync(resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md')), 'runs/01 must hold agent-report.md');
+  const claimPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'result-1.json');
+  assert.ok(fs.existsSync(claimPath), 'runs/01 must hold result-1.json');
+  assert.ok(fs.existsSync(resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'report-1.md')), 'runs/01 must hold report-1.md');
 
   const evidence = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
   assert.equal(evidence.operationMutability, 'read-only');
@@ -2988,7 +2988,7 @@ test('Cell 6.1 happy path: run evidence is complete and the verdict artifact is 
     'evidence lists exactly the worker-produced artifacts',
   );
 
-  // The verdict artifact (agent-result.json) is worker output — none of the
+  // The verdict artifact (result-1.json) is worker output — none of the
   // runner's control-plane files are ever presented as worker artifacts.
   const controlPlane = ['assignment.json', 'run.json', 'result.json', 'evidence.json', 'stdout.log', 'stderr.log', 'exit.json', 'dispatch-plan.json'];
   for (const entry of evidence.artifacts) {
@@ -3121,11 +3121,11 @@ test('Cell P01.2: a child spec without a cited D-ID in plan.md\'s own split JSON
 
 const CELL62_READY_ARTIFACTS = `
   fs.writeFileSync(
-    path.join(runDir, 'agent-report.md'),
+    path.join(runDir, 'report-1.md'),
     '# Validation Report\\nReality gate: all six dimensions PASS with citations (src/index.mjs).\\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\\nConclusion: the plan is sound and ready.\\n',
   );
   fs.writeFileSync(
-    path.join(runDir, 'agent-result.json'),
+    path.join(runDir, 'result-1.json'),
     JSON.stringify({
       status: 'done',
       verdict: 'READY',
@@ -3157,7 +3157,7 @@ import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (\"# Goal\") also carries the claim line now
     // (it runs as a Unit); only a driver operation's prompt is answered with a claim.
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     const operationPrompt = match && !prompt.includes('# Goal');
 if (operationPrompt) {
   const assignmentsDir = match[1].slice(0, match[1].indexOf('/.fgos/assignments/') + '/.fgos/assignments'.length);
@@ -3167,9 +3167,9 @@ if (operationPrompt) {
   if (count === 1) {
     const runDir = path.dirname(match[1]);
     fs.mkdirSync(runDir, { recursive: true });
-    ${'fs.writeFileSync(\n      path.join(runDir, "agent-report.md"),\n      "# Validation Report\\\\nReality gate: all six dimensions PASS with citations (src/index.mjs).\\\\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\\\\nConclusion: the plan is sound and ready.\\\\n",\n    );'.replace(/# Validation Report/g, '# Validation Report')}
+    ${'fs.writeFileSync(\n      path.join(runDir, "report-1.md"),\n      "# Validation Report\\\\nReality gate: all six dimensions PASS with citations (src/index.mjs).\\\\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\\\\nConclusion: the plan is sound and ready.\\\\n",\n    );'.replace(/# Validation Report/g, '# Validation Report')}
     fs.writeFileSync(
-      path.join(runDir, 'agent-result.json'),
+      path.join(runDir, 'result-1.json'),
       JSON.stringify({
         status: 'done',
         verdict: 'READY',
@@ -3193,7 +3193,7 @@ process.exit(0);
   return scriptPath;
 }
 
-/** Forged-claim executor: writes ONLY agent-result.json whose evidenceRefs
+/** Forged-claim executor: writes ONLY result-1.json whose evidenceRefs
  * are prefixed strings — no companion report artifact ever exists on disk. */
 function writeEvidenceRefsOnlyExecutor(scriptDir) {
   const scriptPath = path.join(scriptDir, 'validate-plan-refs-only-executor.mjs');
@@ -3205,13 +3205,13 @@ import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 const operationPrompt = match && !prompt.includes('# Goal');
 if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(
-    path.join(runDir, 'agent-result.json'),
+    path.join(runDir, 'result-1.json'),
     JSON.stringify({
       status: 'done',
       verdict: 'READY',
@@ -3235,7 +3235,7 @@ process.exit(0);
   return scriptPath;
 }
 
-/** Broken-claim executor: writes an agent-result.json that is not valid JSON. */
+/** Broken-claim executor: writes an result-1.json that is not valid JSON. */
 function writeBrokenResultExecutor(scriptDir) {
   const scriptPath = path.join(scriptDir, 'validate-plan-broken-executor.mjs');
   fs.writeFileSync(
@@ -3246,12 +3246,12 @@ import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 const operationPrompt = match && !prompt.includes('# Goal');
 if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), '{ "status": "done", ');
+  fs.writeFileSync(path.join(runDir, 'result-1.json'), '{ "status": "done", ');
 }
 process.exit(0);
 `,
@@ -3271,17 +3271,17 @@ import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 const operationPrompt = match && !prompt.includes('# Goal');
 if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(
-    path.join(runDir, 'agent-report.md'),
+    path.join(runDir, 'report-1.md'),
     '# Validation Report\\nReality gate: five dimensions PASS with citations (src/index.mjs); the impact posture is not acceptable for this plan.\\nFeasibility matrix: the medium risk row is backed by src/index.mjs but does not clear the review bar.\\nConclusion: the plan needs another planning pass before it is ready.\\n',
   );
   fs.writeFileSync(
-    path.join(runDir, 'agent-result.json'),
+    path.join(runDir, 'result-1.json'),
     JSON.stringify({
       status: 'done',
       verdict: 'NOT READY',
@@ -3325,13 +3325,13 @@ import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 const operationPrompt = match && !prompt.includes('# Goal');
 if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(
-    path.join(runDir, 'agent-result.json'),
+    path.join(runDir, 'result-1.json'),
     JSON.stringify({
       status: 'done',
       verdict: 'READY',
@@ -3368,17 +3368,17 @@ import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
 // The loop's own worker prompt (# Goal) carries the claim line too, since it
 // runs as a Unit; only a driver operation's prompt is answered with a claim.
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 const operationPrompt = match && !prompt.includes('# Goal');
 if (operationPrompt) {
   const runDir = path.dirname(match[1]);
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(
-    path.join(runDir, 'agent-report.md'),
+    path.join(runDir, 'report-1.md'),
     '# Validation Report\\nReality gate: all six dimensions PASS with citations (src/index.mjs).\\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\\nConclusion: the plan is sound and ready.\\n',
   );
   fs.writeFileSync(
-    path.join(runDir, 'agent-result.json'),
+    path.join(runDir, 'result-1.json'),
     JSON.stringify({
       status: 'done',
       verdict: 'READY',
@@ -3538,13 +3538,13 @@ test('Cell 6.2 read-back tamper: a schema-broken agentClaim in the stored result
   assert.deepEqual(item, itemBefore, 'neither the settle nor the tamper pass may mutate any work-record field');
 });
 
-test('Cell 6.2 read-back tamper: a deleted agent-report.md is never consumed cross-pass', async () => {
+test('Cell 6.2 read-back tamper: a deleted report-1.md is never consumed cross-pass', async () => {
   const { repoRoot, dir, cfg, worktreeDir, id } = setupValidatePlanFixture({ executorFactory: writeValidatePlanOnceExecutor });
   const itemBefore = readWorkSnapshot(dir, id);
 
   await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
   const { runsDir } = cell62RunDirs(repoRoot);
-  fs.rmSync(resolveRunWorkerArtifactPath(path.join(runsDir, '01'), /^report-(\d+)\.md$/, 'agent-report.md'));
+  fs.rmSync(resolveRunWorkerArtifactPath(path.join(runsDir, '01'), /^report-(\d+)\.md$/, 'report-1.md'));
 
   const secondLogs = [];
   await runOnce({ repoRoot, config: cfg, worktreeDir, log: (l) => secondLogs.push(l) });
@@ -3577,7 +3577,7 @@ test('Cell 6.2 no-evidence stop: an executor that writes nothing leaves Work unt
   assert.deepEqual(item, itemBefore, 'the no-evidence stop must not mutate any work-record field');
 });
 
-test('Cell 6.2 failed stop: malformed agent-result.json fails closed and leaves Work untouched', async () => {
+test('Cell 6.2 failed stop: malformed result-1.json fails closed and leaves Work untouched', async () => {
   const { repoRoot, dir, cfg, worktreeDir, id } = setupValidatePlanFixture({ executorFactory: writeBrokenResultExecutor });
   const itemBefore = readWorkSnapshot(dir, id);
 
@@ -3679,7 +3679,7 @@ test('F2c composed: a schema-valid NOT READY -> READY flip in the stored result.
   const first = cell62RunDirs(repoRoot);
   assert.deepEqual(first.runs, ['01']);
 
-  // The run's own agent-result.json bytes are untouched (the recorded claim
+  // The run's own result-1.json bytes are untouched (the recorded claim
   // binding still holds); only the agentClaim copy inside result.json is
   // flipped to a schema-valid READY.
   const resultPath = path.join(first.runsDir, '01', 'result.json');
@@ -3746,7 +3746,7 @@ test('F2d(c) composed: a result.json-only tamper cannot relocate evidence to a p
   const first = cell62RunDirs(repoRoot);
   assert.deepEqual(first.runs, ['01']);
 
-  // Post-exit result.json-only tamper (the worker's own agent-result.json
+  // Post-exit result.json-only tamper (the worker's own result-1.json
   // and the stored agentClaim copy are untouched, so the claim-bytes
   // binding still holds): corrupt the runId, redirect the recorded evidence
   // fields at a substantive report planted OUTSIDE the assignment tree,
@@ -3758,7 +3758,7 @@ test('F2d(c) composed: a result.json-only tamper cannot relocate evidence to a p
   const plantedDir = path.join(repoRoot, 'docs', 'history', 'planted-evidence');
   fs.mkdirSync(plantedDir, { recursive: true });
   fs.writeFileSync(
-    path.join(plantedDir, 'agent-report.md'),
+    path.join(plantedDir, 'report-1.md'),
     '# Validation Report\nReality gate: five dimensions PASS with citations (src/index.mjs); the impact posture is acceptable.\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\nConclusion: the plan is validated and ready.\n',
   );
   const resultPath = path.join(first.runsDir, '01', 'result.json');
@@ -3769,7 +3769,7 @@ test('F2d(c) composed: a result.json-only tamper cannot relocate evidence to a p
     status: 'done',
     confidence: 'reported',
     planContentHash: crypto.createHash('sha256').update(planV2).digest('hex'),
-    evidence: { ...res.evidence, artifacts: [path.join('docs', 'history', 'planted-evidence', 'agent-report.md')] },
+    evidence: { ...res.evidence, artifacts: [path.join('docs', 'history', 'planted-evidence', 'report-1.md')] },
     runtime: { ...res.runtime, stdoutLog: path.join('docs', 'history', 'planted-evidence', 'run.log') },
   }, null, 2));
   const future = new Date(Date.now() + 5000);
@@ -3805,9 +3805,9 @@ test('P4a composed: a planted pinned-dir report and result.json field edits cann
   // settle set), (2) edit plan.md to V2 tiny with a rewound mtime, (3)
   // result.json FIELD EDITS ONLY — recompute the plan hash for V2, flip
   // status/confidence, point evidence.artifacts at the planted report. The
-  // agentClaim copy and agent-result.json are untouched, so the claim-bytes
+  // agentClaim copy and result-1.json are untouched, so the claim-bytes
   // binding still holds.
-  fs.writeFileSync(path.join(first.runsDir, '01', 'agent-report.md'), '# Validation Report\nReality gate: all six dimensions PASS with citations (src/index.mjs).\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\nConclusion: the plan is sound and ready.\n');
+  fs.writeFileSync(path.join(first.runsDir, '01', 'report-1.md'), '# Validation Report\nReality gate: all six dimensions PASS with citations (src/index.mjs).\nFeasibility matrix: the medium risk row is backed by src/index.mjs.\nConclusion: the plan is sound and ready.\n');
   const planPath = path.join(repoRoot, docsRef, 'plan.md');
   const planV2 = `${fs.readFileSync(planPath, 'utf8')}<!-- V2: unvalidated edit -->\n`;
   fs.writeFileSync(planPath, planV2);
@@ -3821,8 +3821,8 @@ test('P4a composed: a planted pinned-dir report and result.json field edits cann
     // The plan identity recorded at launch, recomputed for V2 the same way.
     inputDigests: (res.inputDigests ?? []).map((d) => ({ ...d, sha256: crypto.createHash('sha256').update(planV2).digest('hex') })),
     evidence: { ...res.evidence, artifacts: [
-      path.join('.fgos', 'assignments', first.asgnId, 'runs', '01', 'agent-report.md'),
-      path.join('.fgos', 'assignments', first.asgnId, 'runs', '01', 'agent-result.json'),
+      path.join('.fgos', 'assignments', first.asgnId, 'runs', '01', 'report-1.md'),
+      path.join('.fgos', 'assignments', first.asgnId, 'runs', '01', 'result-1.json'),
     ] },
   }, null, 2));
   const future = new Date(Date.now() + 5000);

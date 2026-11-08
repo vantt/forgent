@@ -3,7 +3,7 @@
 // Only the external worker is fake: settlement, bounded review, report handoff and the Workflow
 // runner's own advance and projection stay in the execution path. The worker body is the code that
 // writes a unit's outputs; it sees `fs`, `path`, `prompt` and `runDir` (the directory the worker
-// leaves `agent-report.md` and `agent-result.json` in). bwrap mounts a tmpfs over /tmp, so the repo
+// leaves `report-1.md` and `result-1.json` in). bwrap mounts a tmpfs over /tmp, so the repo
 // lives in a fixture directory a confined worker can see.
 
 import fs from 'node:fs';
@@ -52,7 +52,7 @@ export function setupWorkflowFixtureRepo({
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       const runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
       fs.mkdirSync(runDir, { recursive: true });

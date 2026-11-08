@@ -48,7 +48,7 @@ const PROBE_WORKER = `
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 if (match) {
   const claimDir = path.dirname(match[1]);
   const outbox = path.join(claimDir, 'worker-output', 'outbox');
@@ -64,8 +64,8 @@ if (match) {
   fs.mkdirSync(dir, { recursive: true });
   results.outbox = attempt(path.join(dir, 'probe-outbox.txt'));
   fs.writeFileSync(path.join(dir, 'probe-results.json'), JSON.stringify(results));
-  fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Report\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
-  fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
+  fs.writeFileSync(path.join(dir, 'report-1.md'), '# Report\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
+  fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
 }
 `;
 

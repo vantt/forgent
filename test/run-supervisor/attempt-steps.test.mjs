@@ -43,7 +43,7 @@ function workspace() {
 }
 
 /** A real attempt directory at runs/01 of an assignment, as the controller leaves it. */
-function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles = {}, terminal = false } = {}) {
+function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles = {}, terminal = false, outboxSub = 'outbox' } = {}) {
   const assignmentDir = path.join(w.root, 'assignments', 'asg-1');
   const runDir = path.join(assignmentDir, 'runs', '01');
   fs.mkdirSync(path.join(runDir, 'controller'), { recursive: true });
@@ -60,8 +60,8 @@ function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles
     fs.writeFileSync(path.join(runDir, 'controller', 'evaluator-baseline.json'), JSON.stringify({ ...body, digest: computeSha256Digest(body) }));
   }
   if (claim) {
-    fs.mkdirSync(path.join(runDir, 'outbox'), { recursive: true });
-    fs.writeFileSync(path.join(runDir, 'outbox', 'result-1.json'), JSON.stringify({ contract: AGENT_RESULT_CLAIM_CONTRACT, status: 'done', summary: 'finished' }));
+    fs.mkdirSync(path.join(runDir, outboxSub), { recursive: true });
+    fs.writeFileSync(path.join(runDir, outboxSub, 'result-1.json'), JSON.stringify({ contract: AGENT_RESULT_CLAIM_CONTRACT, status: 'done', summary: 'finished' }));
   }
   const control = acquireRunControl(runDir, { holder: buildRunControlHolder('controller'), purpose: 'attempt' });
   const sideFile = path.join(runDir, 'protected', 'attempt-secrets.json');
@@ -73,7 +73,7 @@ function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles
   const envelope = {
     v: 3, attemptId: ATTEMPT_ID, unitRunId: 'unit-1', runDir, mode: 'direct', protocolId: 1,
     hostBin: path.join(w.release, 'bin', 'fgos'), payloadRoot: REPO, cwd, mutation: 'read-only',
-    launch: { command: '/bin/true', args: [], env: {}, stdinPolicy: 'null', briefPath: null, outboxDir: path.join(runDir, 'outbox'), capture },
+    launch: { command: '/bin/true', args: [], env: {}, stdinPolicy: 'null', briefPath: null, outboxDir: path.join(runDir, outboxSub), capture },
     containment: { preferred: 'linux-gate' },
     deadlines: { softAt: null, idleMs: null, hardCeiling: null, gateKillGraceMs: 1000 },
     agentProtocol: { cli: 'claude', mode: 'direct' },
@@ -133,6 +133,23 @@ test('settle-attempt on an exited receipt with an outbox writes result.json; a s
     assert.deepEqual(fs.readFileSync(path.join(runDir, 'result.json')), bytes);
     assert.equal(generationCount(runDir), generations, 'no new run-control epoch');
   } finally { w.cleanup(); }
+});
+
+test('a headless attempt settles from the protocol result in its worker-output outbox; a claim under a retired name is no claim', async () => {
+  const w = workspace();
+  try {
+    const { runDir } = attempt(w, { receipt: { outcome: 'exited', gateExit: gateExit() }, claim: true, outboxSub: path.join('worker-output', 'outbox') });
+    assert.equal((await run('settle-attempt', w, runDir)).exit, 0);
+    assert.equal(resultOf(runDir).agentClaim?.status, 'done');
+  } finally { w.cleanup(); }
+  const w2 = workspace();
+  try {
+    const { runDir } = attempt(w2, { receipt: { outcome: 'exited', gateExit: gateExit() }, outboxSub: path.join('worker-output', 'outbox') });
+    fs.mkdirSync(path.join(runDir, 'worker-output', 'outbox'), { recursive: true });
+    fs.writeFileSync(path.join(runDir, 'worker-output', 'outbox', 'agent-result.json'), JSON.stringify({ contract: AGENT_RESULT_CLAIM_CONTRACT, status: 'done', summary: 'finished' }));
+    assert.equal((await run('settle-attempt', w2, runDir)).exit, 0);
+    assert.equal(resultOf(runDir).agentClaim, undefined, 'the receipt names no result, so the retired name is not judged');
+  } finally { w2.cleanup(); }
 });
 
 test("a terminal attempt stopped as needs-human is not a provider limit because the agent's own text on its screen mentions one", async () => {

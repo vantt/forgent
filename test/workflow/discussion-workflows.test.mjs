@@ -35,8 +35,8 @@ function setupTestRepo() {
       'group-cognition:explore', 'group-cognition:critique', 'group-cognition:synthesize',
     ],
     workerBody: `
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Discussion Report\\nCompleted finding.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Discussion Report\\nCompleted finding.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     `,
   });
 }

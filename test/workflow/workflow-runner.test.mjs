@@ -67,13 +67,13 @@ function setupTestRepo() {
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     let runDir;
     if (match) {
       runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAssignment execution completed successfully with full report content.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nAssignment execution completed successfully with full report content.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     }
     `,
   );
@@ -881,13 +881,13 @@ test('the owner request and earlier step output reach each unit objective', asyn
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       const runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
       fs.mkdirSync(runDir, { recursive: true });
       fs.writeFileSync(path.join(runDir, 'prompt.txt'), prompt);
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nFINDING-FROM-FIRST-STEP is the finding the second step must see in full detail.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'first step summary' }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nFINDING-FROM-FIRST-STEP is the finding the second step must see in full detail.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'first step summary' }));
     }
     `,
   );
@@ -1419,7 +1419,7 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const target = /Write structured JSON to (\S+agent-result\.json)/.exec(prompt)?.[1];
+    const target = /Write structured JSON to (\S+result-1\.json)/.exec(prompt)?.[1];
     if (!target) throw new Error('worker received no claim destination');
     const choices = /Declared choices: (\[[^\n]+?\]);/.exec(prompt);
     const claim = { status: 'done', summary: 'Completed the assigned question analysis.' };
@@ -1429,7 +1429,7 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
       claim.stance = { choice: options[1], confidence: target.includes('/member-2/') ? 'malformed' : 0.9 };
     }
     fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.writeFileSync(path.join(path.dirname(target), 'agent-report.md'), '# Report\nThe second strategy favors a simpler implementation and bounded rebuild cost. Review correctness against the stated workload.\n');
+    fs.writeFileSync(path.join(path.dirname(target), 'report-1.md'), '# Report\nThe second strategy favors a simpler implementation and bounded rebuild cost. Review correctness against the stated workload.\n');
     fs.writeFileSync(target, JSON.stringify(claim));
   `);
   const dispatchedPrompt = (dir, role) => {
@@ -1736,13 +1736,13 @@ test('producer expertise gate parks clearly on malformed packets and remains ans
     t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
     fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), `
       import fs from 'node:fs'; import path from 'node:path';
-      const target = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
+      const target = /Write structured JSON to (\\S+result-1\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
       if (!target) process.exit(1);
       const base = path.dirname(target), outbox = path.join(base, 'worker-output', 'outbox');
       const dir = fs.existsSync(outbox) ? outbox : base;
       fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, 'agent-report.md'), ${JSON.stringify(typeof packet === 'string' ? packet : JSON.stringify({ recommendation: 'Bound the design to its approved scope', ...packet }))});
-      fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Recommendation packet settled' }));
+      fs.writeFileSync(path.join(dir, 'report-1.md'), ${JSON.stringify(typeof packet === 'string' ? packet : JSON.stringify({ recommendation: 'Bound the design to its approved scope', ...packet }))});
+      fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Recommendation packet settled' }));
     `);
     const workflow = { id: 'gate-report', steps: [
       { id: 'synthesis', units: [{ id: 'synthesize-recommendation', template: { capability: 'docs:write' } }] },
@@ -1785,18 +1785,18 @@ test('an expertise gate reads the packet file a producer wrote beside its prose 
     t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
     fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), `
       import fs from 'node:fs'; import path from 'node:path';
-      const target = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
+      const target = /Write structured JSON to (\\S+result-1\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
       if (!target) process.exit(1);
       const base = path.dirname(target), outbox = path.join(base, 'worker-output', 'outbox');
       const dir = fs.existsSync(outbox) ? outbox : base;
       fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, 'agent-report.md'), ${JSON.stringify(scenario.report)});
+      fs.writeFileSync(path.join(dir, 'report-1.md'), ${JSON.stringify(scenario.report)});
       if (${JSON.stringify(scenario.packet ?? null)} !== null) {
         const packet = path.join(dir, 'packet-1.json');
         fs.writeFileSync(packet, ${JSON.stringify(scenario.packet ?? '')});
         if (${JSON.stringify(Boolean(scenario.future))}) { const later = new Date(Date.now() + 86400000); fs.utimesSync(packet, later, later); }
       }
-      fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Recommendation packet settled' }));
+      fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Recommendation packet settled' }));
     `);
     const workflow = { id: 'gate-packet-file', steps: [
       { id: 'synthesis', units: [{ id: 'synthesize-recommendation', template: { capability: 'docs:write' } }] },
@@ -1816,13 +1816,13 @@ test('reviewed findings acceptance proceeds while default and execution failure 
     writeProjectConfig(tmp, withProviderFamilies(readProjectConfig(tmp)));
     fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), `
       import fs from 'node:fs'; import path from 'node:path';
-      const target = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
+      const target = /Write structured JSON to (\\S+result-1\\.json)/.exec(process.argv.slice(2).join(' '))?.[1];
       if (!target || ${failed}) process.exit(1);
       const base = path.dirname(target), outbox = path.join(base, 'worker-output', 'outbox');
       const dir = fs.existsSync(outbox) ? outbox : base;
       fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Review\\nThe recommendation has a substantive correctness issue requiring owner consideration.\\n');
-      fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify(target.includes('/reviewer/') ?
+      fs.writeFileSync(path.join(dir, 'report-1.md'), '# Review\\nThe recommendation has a substantive correctness issue requiring owner consideration.\\n');
+      fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify(target.includes('/reviewer/') ?
         { status: 'done', summary: 'Review found a correctness issue', assessment: { verdict: 'findings' }, findings: ['Correctness issue'] } :
         { status: 'done', summary: 'Producer completed' }));
     `);

@@ -7,12 +7,12 @@ import { spawnSync } from 'node:child_process';
 
 const { bin, repo, args, env = {} } = JSON.parse(process.env.AGENT_OPTS ?? '{}');
 const prompt = process.argv.slice(2).join(' ');
-const match = /Write structured JSON to (\S+agent-result\.json)/.exec(prompt);
+const match = /Write structured JSON to (\S+result-1\.json)/.exec(prompt);
 const claimDir = match ? path.dirname(match[1]) : process.cwd();
 const outbox = path.join(claimDir, 'worker-output', 'outbox');
 const dir = fs.existsSync(outbox) ? outbox : claimDir;
 
 const command = spawnSync(process.execPath, [bin, ...args, '--dir', repo], { cwd: repo, encoding: 'utf8', env: { ...process.env, ...env } });
 fs.writeFileSync(path.join(dir, 'command.json'), JSON.stringify({ status: command.status, stdout: command.stdout.slice(0, 2000), stderr: command.stderr.slice(0, 2000) }));
-fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Report\nThe assigned work was carried out and verified in full.\n');
-fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'The assigned work was carried out and verified in full.', assessment: { verdict: 'pass' } }));
+fs.writeFileSync(path.join(dir, 'report-1.md'), '# Report\nThe assigned work was carried out and verified in full.\n');
+fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'The assigned work was carried out and verified in full.', assessment: { verdict: 'pass' } }));

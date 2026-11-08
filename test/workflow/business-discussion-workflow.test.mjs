@@ -23,8 +23,8 @@ function setupTestRepo() {
     capabilities: ['business:frame', 'business:perspectives', 'business:critique', 'business:synthesize', 'business:plan'],
     reviewed: { maxRounds: 2, checkersByRigor: { standard: ['reviewer'] } },
     workerBody: `
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Strategic Report\\nComprehensive strategic business analysis completed with clear market viability and financial risk assessments.\\n');
-      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Strategic Report\\nComprehensive strategic business analysis completed with clear market viability and financial risk assessments.\\n');
+      fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
     `,
   });
 }

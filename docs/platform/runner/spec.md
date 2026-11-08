@@ -112,7 +112,7 @@ Approved by the owner on 2026-11-06 as the HARDEN T5 target shape (HARDEN decisi
 ~~~~text
 ## Edge Cases Settled
 
-- Worker `cli-spawn` chạy trong sandbox (bwrap) chỉ ghi được dưới `runs/<n>/worker-output/outbox`: effective contract và prompt gọi tên claim/report ở đó (không phải thư mục run phẳng, vốn read-only → `EROFS`); collector, reconcile run chết và lần chọn thao tác sau đều tìm claim/report qua cùng một lookup (`worker-output/outbox`, rồi `worker-output`, rồi `outbox`, rồi tên phẳng). herdr-spawn giữ outbox riêng của brief.
+- Worker `cli-spawn` chạy trong sandbox (bwrap) chỉ ghi được dưới `runs/<n>/worker-output/outbox`: effective contract và prompt gọi tên claim/report ở đó bằng tên của agent protocol (`result-1.json`, `report-1.md`), có sandbox hay không (không phải thư mục run phẳng, vốn read-only → `EROFS`), nên receipt của supervisor thấy claim như với worker tương tác (`outboxPresent`) và settle không cần tìm chỗ khác; tên cũ `agent-result.json`/`agent-report.md` không còn được dạy hay ghi, còn run đã ghi trước đó vẫn đọc được qua cùng một lookup (`worker-output/outbox`, rồi `worker-output`, rồi `outbox`, rồi tên phẳng cũ). herdr-spawn giữ outbox riêng của brief.
 - Runner bị giết giữa việc: lần chạy sau gặt lại đúng trạng thái (proof đạt → awaiting-approval, không → blocked), nhánh có ĐÚNG MỘT commit worker — test giết thật.
 - Nhánh bị worktree mồ côi giữ (path còn hoặc đã mất) đều đòi lại được — bug thật do e2e bắt sau khi code ship, vá bằng cell fix-first (phase-2-routing-10).
 - Đề xuất bị người duyệt trả (`awaiting-approval→todo` kèm lý do): việc vào lại frontier, chống-lặp đếm và chặn lặp vô hạn.

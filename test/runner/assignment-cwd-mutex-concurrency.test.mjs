@@ -67,7 +67,7 @@ function isPidAliveForTest(pid) {
   }
 }
 
-// Writes agent-result.json's runDir a liveness marker, then hangs forever --
+// Writes result-1.json's runDir a liveness marker, then hangs forever --
 // never settles, so the Run (and the supervisor/worker subprocess tree
 // underneath it) stays genuinely alive for as long as the test needs it.
 function writeStallingExecutor(dir) {
@@ -78,11 +78,11 @@ function writeStallingExecutor(dir) {
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       const runDir = path.dirname(match[1]);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'worker-alive.pid'), String(process.pid));
+      fs.writeFileSync(path.resolve(runDir, '..', '..', 'worker-alive.pid'), String(process.pid));
     }
     setInterval(() => {}, 60000);
     `,
@@ -247,7 +247,7 @@ test('a settled standalone Assignment survives a failed custody handoff with a w
   fs.writeFileSync(script, `
     import fs from 'node:fs';
     import path from 'node:path';
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '));
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(process.argv.slice(2).join(' '));
     if (!match) throw new Error('result path missing');
     process.stdout.write('handoff barrier\\n');
     const until = Date.now() + 15000;
@@ -255,7 +255,7 @@ test('a settled standalone Assignment survives a failed custody handoff with a w
       if (Date.now() > until) throw new Error('controller did not release barrier');
       await new Promise(r => setTimeout(r, 10));
     }
-    fs.writeFileSync(path.join(path.dirname(match[1]), 'agent-report.md'), 'Successfully completed the handoff failure fixture with real supervisor settlement.');
+    fs.writeFileSync(path.join(path.dirname(match[1]), 'report-1.md'), 'Successfully completed the handoff failure fixture with real supervisor settlement.');
     fs.writeFileSync(match[1], JSON.stringify({ status: 'done', summary: 'Completed fixture' }));
   `);
   const assignment = buildAssignment({

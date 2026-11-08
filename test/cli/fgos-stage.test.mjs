@@ -138,7 +138,7 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
     import path from 'node:path';
     let resultPath = null;
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (match) {
       resultPath = match[1];
     } else {
@@ -149,14 +149,14 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
           .filter((p) => fs.existsSync(p));
         subdirs.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
         if (subdirs.length > 0) {
-          resultPath = path.join(subdirs[0], 'agent-result.json');
+          resultPath = path.join(subdirs[0], 'result-1.json');
         }
       }
     }
     if (resultPath) {
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Reality Gate Validation & Feasibility Matrix Report\\n## Reality Gate Score\\n- Mode fit: PASS (citation: src/main.mjs:L1)\\n- Repo fit: PASS (citation: src/main.mjs:L1)\\n- Assumptions: PASS (citation: src/main.mjs:L1)\\n- Smaller path: PASS (citation: src/main.mjs:L1)\\n- Proof surface: PASS (citation: src/main.mjs:L1)\\n- Impact-analysis posture: PASS (citation: src/main.mjs:L1)\\n## Feasibility Matrix\\n- Feasibility matrix: verified (citation: src/main.mjs:L1).\\nPlan holds up under reality check.\\n');
+      fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Reality Gate Validation & Feasibility Matrix Report\\n## Reality Gate Score\\n- Mode fit: PASS (citation: src/main.mjs:L1)\\n- Repo fit: PASS (citation: src/main.mjs:L1)\\n- Assumptions: PASS (citation: src/main.mjs:L1)\\n- Smaller path: PASS (citation: src/main.mjs:L1)\\n- Proof surface: PASS (citation: src/main.mjs:L1)\\n- Impact-analysis posture: PASS (citation: src/main.mjs:L1)\\n## Feasibility Matrix\\n- Feasibility matrix: verified (citation: src/main.mjs:L1).\\nPlan holds up under reality check.\\n');
       const claim = {
         status: 'done',
         verdict: 'READY',

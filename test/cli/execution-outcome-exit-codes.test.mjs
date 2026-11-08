@@ -30,14 +30,14 @@ function setupTestRepo() {
 import fs from 'node:fs';
 import path from 'node:path';
 const prompt = process.argv.slice(2).join(' ');
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 if (match) {
   const claimDir = path.dirname(match[1]);
   const outbox = path.join(claimDir, 'worker-output', 'outbox');
   const runDir = fs.existsSync(outbox) ? outbox : claimDir;
   fs.mkdirSync(runDir, { recursive: true });
-  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe assigned work was carried out and verified in full.\\n');
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'The assigned work was carried out and verified in full.', assessment: { verdict: 'pass' } }));
+  fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nThe assigned work was carried out and verified in full.\\n');
+  fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'The assigned work was carried out and verified in full.', assessment: { verdict: 'pass' } }));
 }
 `);
 

@@ -33,7 +33,7 @@ function fixture(t, mode) {
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv[2];
-    const target = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt)?.[1];
+    const target = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt)?.[1];
     if (!target) throw new Error('missing output contract');
     const reviewer = target.split(path.sep).includes('reviewer');
     if (reviewer && ${JSON.stringify(mode)} === 'transport-failure') process.exit(19);
@@ -51,8 +51,8 @@ function fixture(t, mode) {
     // a last-step report or reviewer's competing packet.
     if (prompt.includes('Explain the settled final packet')) packet['missing expertise'] = [];
     if (reviewer) packet['missing expertise'] = ['not the producer packet'];
-    fs.writeFileSync(path.join(output, 'agent-report.md'), JSON.stringify(packet));
-    fs.writeFileSync(path.join(output, 'agent-result.json'), JSON.stringify(reviewer ? {
+    fs.writeFileSync(path.join(output, 'report-1.md'), JSON.stringify(packet));
+    fs.writeFileSync(path.join(output, 'result-1.json'), JSON.stringify(reviewer ? {
       contract: { id: 'agent-result-claim', version: 2 },
       status: 'done', summary: 'M-CONTRACT-DISSENT survives review',
       assessment: { verdict: 'findings', severityFloor: 'high' },

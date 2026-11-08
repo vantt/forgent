@@ -74,14 +74,14 @@ if (login.startsWith('quota') || login.startsWith('partial') || process.argv[2].
 }
 try { fs.writeFileSync(path.join(process.cwd(), 'notes.txt'), 'notes'); } catch { /* a read-only posture keeps the repo untouched */ }
 const prompt = process.argv.slice(3).join(' ');
-const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
 if (match) {
   const claimDir = path.dirname(match[1]);
   const outbox = path.join(claimDir, 'worker-output', 'outbox');
   const dir = fs.existsSync(outbox) ? outbox : claimDir;
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Report\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
-  fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' }, stance: { choice: 'a' } }));
+  fs.writeFileSync(path.join(dir, 'report-1.md'), '# Report\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
+  fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' }, stance: { choice: 'a' } }));
 }
 `;
 

@@ -24,8 +24,8 @@ const FGOS = path.resolve(here, '../../bin/fgos.mjs');
 const REPO = path.resolve(here, '../..');
 
 const WORKER_BODY = `
-  fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe request is clear enough to plan from; no decision is open.\\n');
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Clear' }));
+  fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Report\\nThe request is clear enough to plan from; no decision is open.\\n');
+  fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Clear' }));
 `;
 
 const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();

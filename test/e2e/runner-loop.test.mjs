@@ -190,13 +190,13 @@ function writeEditOnlyExecutor(scriptDir, produce = 'output.txt', { summary } = 
 import fs from 'node:fs';
 ${produce ? `fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');` : ''}
 ${summary ? `import path from 'node:path';
-const claim = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.slice(2).join(' '));
+const claim = /Write structured JSON to (\\S+result-1\\.json)/.exec(process.argv.slice(2).join(' '));
 if (claim) {
   const outbox = path.join(path.dirname(claim[1]), 'worker-output', 'outbox');
   const dir = fs.existsSync(outbox) ? outbox : path.dirname(claim[1]);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'agent-report.md'), '# Report\\nWrote the output file the item verify checks for, and checked it exists.\\n');
-  fs.writeFileSync(path.join(dir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: ${JSON.stringify(summary)}, assessment: { verdict: 'pass' } }));
+  fs.writeFileSync(path.join(dir, 'report-1.md'), '# Report\\nWrote the output file the item verify checks for, and checked it exists.\\n');
+  fs.writeFileSync(path.join(dir, 'result-1.json'), JSON.stringify({ status: 'done', summary: ${JSON.stringify(summary)}, assessment: { verdict: 'pass' } }));
 }` : ''}
 console.log('[DONE]');
 `,

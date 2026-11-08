@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 // Worker-authored agent-result claims are untrusted input.  This module owns
 // their v2 shape and the worker instructions derived from that same shape; it
 // deliberately does not create proof, evidence, or a RunResult.
@@ -16,6 +18,12 @@ export const CLAIM_FIELD_RULES = Object.freeze([
   // Never checked, so a claim that carries it is exactly as valid as one that does not.
   Object.freeze({ path: 'needsWrites', description: 'an array of repo-relative paths if provided: files outside your write scope you needed to write and did not' }),
 ]);
+
+/** The report that goes with a claim: `result-<N>.json` pairs with `report-<N>.md` beside it (the agent protocol's names). */
+export function claimReportPath(claimPath) {
+  const round = /^result-(\d+)\.json$/.exec(path.basename(claimPath))?.[1] ?? '1';
+  return path.join(path.dirname(claimPath), `report-${round}.md`);
+}
 
 function nonEmptyString(value) {
   return typeof value === 'string' && value.trim() !== '';

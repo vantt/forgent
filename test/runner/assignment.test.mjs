@@ -206,14 +206,15 @@ test('renderAssignmentPrompt includes concrete result artifact paths when runDir
   const prompt = renderAssignmentPrompt(assignment, { runDir });
 
   assert.match(prompt, /Result artifact:/m);
-  assert.match(prompt, /Write structured JSON to .*agent-result\.json/m);
+  assert.match(prompt, /Write structured JSON to .*worker-output\/outbox\/result-1\.json/m);
   // validate-plan is a reviewer (read-only) operation: the companion report is REQUIRED for its
   // "done" status to count as evidenced, and the brief asks for one sentence on what was answered or done.
-  assert.match(prompt, /agent-report\.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done;/m);
+  assert.match(prompt, /report-1\.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done;/m);
   assert.match(prompt, /Do not call Work lifecycle verbs/m);
   // Both artifact paths must include the runDir
-  assert.ok(prompt.includes(path.join(runDir, 'agent-result.json')), 'prompt must contain absolute agent-result.json path');
-  assert.ok(prompt.includes(path.join(runDir, 'agent-report.md')), 'prompt must contain absolute agent-report.md path');
+  const outbox = path.join(runDir, 'worker-output', 'outbox');
+  assert.ok(prompt.includes(path.join(outbox, 'result-1.json')), 'prompt must contain the absolute result-1.json path');
+  assert.ok(prompt.includes(path.join(outbox, 'report-1.md')), 'prompt must contain the absolute report-1.md path');
 });
 
 test('a read-only prompt says the result files are still to be written: a worker read "Write scope: none" as a ban on them and wrote nothing', () => {
@@ -222,7 +223,7 @@ test('a read-only prompt says the result files are still to be written: a worker
   // so the round scored no-evidence.
   const assignment = buildAssignment({ workId: 'tsk-rd-test-ro', stage: 'planning', operation: 'validate-plan' });
   const runDir = '/tmp/fgos-asgn-rd-test-ro/runs/01';
-  const claimPath = path.join(runDir, 'worker-output', 'outbox', 'agent-result.json');
+  const claimPath = path.join(runDir, 'worker-output', 'outbox', 'result-1.json');
   const prompt = renderAssignmentPrompt(assignment, {
     runDir,
     effectiveContract: {
@@ -263,7 +264,7 @@ function unitRunAssignment({ role = 'producer', mutation = 'mutating', writes = 
 const UNIT_RUN_CONTRACT = (mutation) => ({
   contract: { id: 'effective-execution-contract', version: 1 },
   mutation,
-  resultClaim: { path: '/tmp/fgos-unit-brief/runs/01/agent-result.json' },
+  resultClaim: { path: '/tmp/fgos-unit-brief/runs/01/worker-output/outbox/result-1.json' },
   limits: { timeoutMs: 1000 },
   workspace: { writeScope: mutation === 'read-only' ? [] : ['/tmp/fgos-unit-brief/worktree'] },
   enforcementPosture: 'confined',
@@ -276,9 +277,9 @@ test('a mutating unit-run brief names the write scope, leaves the commit to the 
   });
   assert.match(prompt, /^- Write only files inside this scope \(repo-relative\):\n {2}- docs\n {2}- src\/runner\/\*\*\/\*\.mjs$/m);
   assert.match(prompt, /^- Do not run `git add` or `git commit`, even if the task above asks you to: the runner commits after the round passes, and only the files inside the scope\.$/m);
-  assert.match(prompt, /^- Your result files \(agent-result\.json and its report, named below\) are the exception: they sit outside the workspace, writing them is required, and they never go in "needsWrites"\.$/m);
+  assert.match(prompt, /^- Your result files \(the claim and its report, named below\) are the exception: they sit outside the workspace, writing them is required, and they never go in "needsWrites"\.$/m);
   assert.match(prompt, /^- The first line of "summary" is the commit subject, in conventional form: `type\(scope\): \.\.\.`\.$/m);
-  assert.match(prompt, /^- Need to write a file outside the scope\? Do not write it: list it in "needsWrites": \[<path>, \.\.\.\] in agent-result\.json and say why in "summary"\.$/m);
+  assert.match(prompt, /^- Need to write a file outside the scope\? Do not write it: list it in "needsWrites": \[<path>, \.\.\.\] in your result claim and say why in "summary"\.$/m);
   // The mount is the whole worktree; the line naming it must not read as leave to write anywhere in it.
   assert.match(prompt, /^- Write scope: docs, src\/runner\/\*\*\/\*\.mjs \(the workspace mount \/tmp\/fgos-unit-brief\/worktree is wider; write only inside the scope\)$/m);
 });
@@ -311,7 +312,7 @@ test('the claim instructions name needsWrites as an optional list of repo-relati
   assert.match(prompt, /"needsWrites" must be an array of repo-relative paths if provided/);
 });
 
-test('renderAssignmentPrompt states the real agent-result.json status enum -- tsk-5zim: dispatched actors (claude-reviewer x2, codex-cli) wrote status:"DONE"/"objection" and failed schema validation because this was never disclosed', () => {
+test('renderAssignmentPrompt states the real result claim status enum -- tsk-5zim: dispatched actors (claude-reviewer x2, codex-cli) wrote status:"DONE"/"objection" and failed schema validation because this was never disclosed', () => {
   const assignment = buildAssignment({
     workId: 'tsk-rd-test-2',
     stage: 'planning',
@@ -330,7 +331,7 @@ test('renderAssignmentPrompt still calls the companion report Optional for a mut
   });
   assert.equal(isReadOnlyAssignment(assignment), false);
   const prompt = renderAssignmentPrompt(assignment, { runDir: '/tmp/fgos-asgn-rd-test-3/runs/01' });
-  assert.match(prompt, /Optional human-readable report: .*agent-report\.md/m);
+  assert.match(prompt, /Optional human-readable report: .*report-1\.md/m);
 });
 
 test('isReadOnlyAssignment reads the stamped mutation field directly, not role/operation (ADR-006 R7)', () => {

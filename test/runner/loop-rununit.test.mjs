@@ -234,11 +234,11 @@ test('a worker claim the runner refuses after the worker ran is a failed attempt
 const prompt = process.argv.slice(3).join(' ');
 if (prompt.includes('item-bad-claim')) {
   fs.writeFileSync('output.txt', 'produced\\n');
-  const claim = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+  const claim = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
   const outbox = path.join(path.dirname(claim[1]), 'worker-output', 'outbox');
   const dir = fs.existsSync(outbox) ? outbox : path.dirname(claim[1]);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'agent-result.json'), '{"status": "done"');
+  fs.writeFileSync(path.join(dir, 'result-1.json'), '{"status": "done"');
 } else {
   fs.writeFileSync('fine.txt', 'fine\\n');
 }`);

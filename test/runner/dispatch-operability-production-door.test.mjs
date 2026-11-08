@@ -79,15 +79,16 @@ test('production assignment door writes RunResult v3, effective contract, adapte
     import path from 'node:path';
     fs.writeFileSync(${JSON.stringify(argvPath)}, JSON.stringify(process.argv.slice(2)));
     const prompt = process.argv.slice(2).join(' ');
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
     if (!match) process.exit(9);
-    const runDir = path.dirname(match[1]);
+    const outbox = path.dirname(match[1]);
+    const runDir = path.resolve(outbox, '..', '..');
     const contract = JSON.parse(fs.readFileSync(path.join(runDir, 'effective-execution-contract.json'), 'utf8'));
-    fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Dispatch Proof\\nThe production assignment door delivered the effective contract and result path.\\n');
-    fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({
+    fs.writeFileSync(path.join(outbox, 'report-1.md'), '# Dispatch Proof\\nThe production assignment door delivered the effective contract and result path.\\n');
+    fs.writeFileSync(path.join(outbox, 'result-1.json'), JSON.stringify({
       status: 'done',
       summary: 'effective contract observed',
-      evidence: [{ kind: 'file', path: 'agent-report.md' }],
+      evidence: [{ kind: 'file', path: 'report-1.md' }],
       observedContract: {
         mutation: contract.mutation,
         resultClaimPath: contract.resultClaim.path,
@@ -120,7 +121,7 @@ test('production assignment door writes RunResult v3, effective contract, adapte
   const argv = readJson(argvPath);
   assert.deepEqual(stored.contract, { id: 'assignment-run-result', version: 3 });
   assert.equal(stored.runId, result.runId);
-  assert.equal(effective.resultClaim.path, path.join(runDir, 'agent-result.json'));
+  assert.equal(effective.resultClaim.path, path.join(runDir, 'worker-output', 'outbox', 'result-1.json'));
   assert.equal(effective.limits.executorTimeoutMs, 4321);
   assert.deepEqual(argv.slice(0, 2), ['--sentinel-config-field', 'forwarded-through-adapter']);
 
@@ -138,10 +139,10 @@ test('production assignment door distinguishes reviewer findings, invalid claim,
   const findingsExecutor = writeExecutor(root, 'findings-executor', `
     import fs from 'node:fs';
     import path from 'node:path';
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.join(' '));
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(process.argv.join(' '));
     const runDir = path.dirname(match[1]);
-    fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review\\nHIGH: production proof caught a real issue.\\n');
-    fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({
+    fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Review\\nHIGH: production proof caught a real issue.\\n');
+    fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({
       contract: { id: 'agent-result-claim', version: 2 },
       status: 'failed',
       summary: 'HIGH finding',
@@ -152,10 +153,10 @@ test('production assignment door distinguishes reviewer findings, invalid claim,
   const invalidExecutor = writeExecutor(root, 'invalid-claim-executor', `
     import fs from 'node:fs';
     import path from 'node:path';
-    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(process.argv.join(' '));
+    const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(process.argv.join(' '));
     const runDir = path.dirname(match[1]);
-    fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Invalid\\nA malformed claim should be a contract failure.\\n');
-    fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'blocked', summary: '' }));
+    fs.writeFileSync(path.join(runDir, 'report-1.md'), '# Invalid\\nA malformed claim should be a contract failure.\\n');
+    fs.writeFileSync(path.join(runDir, 'result-1.json'), JSON.stringify({ status: 'blocked', summary: '' }));
   `);
   const crashExecutor = writeExecutor(root, 'crash-executor', `
     process.stderr.write('provider crashed before writing artifacts\\n');
