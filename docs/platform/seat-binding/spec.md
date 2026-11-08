@@ -264,6 +264,7 @@ Luật cứng không đạt thì từ chối ghế `independence-unsatisfiable`,
 - Ghim invocation (`family#invocation`, trong config `{executor, invocation}`) là cứng: invocation đã ghim không có thì từ chối ghế `pin-unsatisfiable` (hoặc bỏ candidate khi ghim thuộc override chạy-cả-run); không bao giờ âm thầm đổi invocation khác; `explain` in lý do. Chỉ entry không có invocation mới để transport chọn. (Một lần chạy từng thấy ghim `codex-cli-bwrap` của `code:review` bị thay bằng `codex-herdr`; điều đó thành từ chối.)
 - Ghi chú cho diff cấu hình model sau: ghim `code:review` và `code:debug` (`codex-cli-bwrap`, `claude-cli-bwrap`, cạnh `confinement: {mode: required, policy: host-write-denied}`) là ứng viên gỡ, chỉ giữ yêu cầu confinement. Invocation herdr thoả yêu cầu đó lúc bind (mục 13), kèm caveat `herdr-partial-maturity` đã ghi.
 - `fgos run --provider` giữ khoá theo executor đợt này; entry `{executor, invocation}` lo dạng ghim.
+- Ghim account (`--account pool/account`, khoá `account` của override) chỉ áp cho ghế mà lựa chọn đầu tiên đã thuộc pool đó; nó không bao giờ chuyển ghế sang pool khác, kể cả sang entry của cùng family ở pool khác. Ghế còn lại chạy không ghim và lý do `account-pin-other-pool` ghi trong provenance (quyết định 71, 3a của chủ dự án; case vàng "an account pin never moves a seat whose first choice is in another pool").
 
 ## 9. Chuyển đổi (đã xong, mã chuyển đổi đã gỡ)
 

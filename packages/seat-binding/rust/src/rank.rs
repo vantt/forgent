@@ -486,11 +486,12 @@ fn run_bases(
         }
     }
 
-    // A pinned account selects the survivors of its pool; a seat the pool does not serve runs unpinned.
+    // A pinned account applies only to a seat whose first choice is already served by its pool; it
+    // never moves a seat to another pool, and any other seat runs unpinned.
     if let Some((pool, account)) = &pin {
         if survivors
-            .iter()
-            .any(|(c, _)| c.pool.as_deref() == Some(pool))
+            .first()
+            .is_some_and(|(c, _)| c.pool.as_deref() == Some(pool))
         {
             survivors.retain(|(c, _)| c.pool.as_deref() == Some(pool));
             let pool_accounts = accounts.pools.get(pool).map(Vec::as_slice).unwrap_or(&[]);
@@ -543,7 +544,7 @@ fn run_bases(
                 executor: survivors[0].0.executor.clone(),
                 family: survivors[0].0.family.clone(),
                 reason: "account-pin-other-pool".to_string(),
-                detail: format!("account \"{pool}/{account}\" cannot be pinned: no usable entry of this seat is served by pool \"{pool}\""),
+                detail: format!("account \"{pool}/{account}\" cannot be pinned: the first choice of this seat is not served by pool \"{pool}\""),
                 config: None,
                 model: None,
                 pool: None,

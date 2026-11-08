@@ -1,7 +1,7 @@
 // test/runner/execution/account-pin.test.mjs -- an override may pin the account a seat runs on,
-// written pool/account. bind() pins it on a seat whose chosen model entry is served by that pool (it
-// selects the entry of the chosen family that is) and records where the pin came from; any other seat
-// binds unpinned, with the reason recorded. A bare or malformed id is refused.
+// written pool/account. bind() pins it on a seat whose first choice is served by that pool and records
+// where the pin came from; any other seat binds unpinned, with the reason recorded (the seat-binding
+// golden vectors own the rule that a pin never moves a seat to another pool). A bare or malformed id is refused.
 
 import '../../helpers/process-tmp-root.mjs';
 import test from 'node:test';
@@ -23,14 +23,16 @@ const agent = (family) => ({
 const tiers = (cell) => ({ nano: cell, standard: cell, advanced: cell, flagship: cell, frontier: cell });
 
 const runnerConfig = {
-  executors: { alpha: agent('alpha'), beta: agent('beta'), gamma: agent('gamma'), probe: { ...agent('alpha'), kind: 'tool' } },
+  executors: { alpha: agent('alpha'), beta: agent('beta'), delta: agent('delta'), gamma: agent('gamma'), probe: { ...agent('alpha'), kind: 'tool' } },
   modelPolicies: {
     alpha: tiers(['alpha-model', 'alpha-via-router@router']),
     beta: tiers('beta-model'),
     gamma: tiers('gamma-model'),
+    delta: tiers('delta-via-router@router'),
   },
   capabilities: {
     'docs:write': { prefer: [{ executor: 'alpha' }, { executor: 'beta' }] },
+    'docs:delta': { prefer: [{ executor: 'delta' }] },
     'docs:gamma': { prefer: [{ executor: 'gamma' }] },
     'docs:tool': { prefer: [{ executor: 'probe' }] },
   },
@@ -39,7 +41,7 @@ const runnerConfig = {
     beta: { accounts: { b1: account('b1') } },
   },
   llmAccounts: {
-    router: { r1: { credentialStore: { alpha: '/nonexistent/r1' } }, r2: { credentialStore: { alpha: '/nonexistent/r2' }, disabled: true } },
+    router: { r1: { credentialStore: { alpha: '/nonexistent/r1', delta: '/nonexistent/r1' } }, r2: { credentialStore: { alpha: '/nonexistent/r2', delta: '/nonexistent/r2' }, disabled: true } },
   },
 };
 
@@ -59,12 +61,12 @@ test('an account of the pool serving the chosen entry is pinned and its source r
   assert.deepEqual(bound.provenance.account, { value: 'alpha/a2', source: 'override:human-cli' });
 });
 
-test('the pin selects the entry of the chosen family that the pool serves', () => {
-  const bound = bind(ask([{ origin: 'human-cli', account: 'router/r1' }]), ctx);
+test('a seat whose first choice is an entry another pool serves is pinned on that pool', () => {
+  const bound = bind(ask([{ origin: 'human-cli', account: 'router/r1' }], 'docs:delta'), ctx);
   assert.equal(bound.refused, undefined, JSON.stringify(bound.refused));
-  assert.equal(bound.executor, 'alpha');
+  assert.equal(bound.executor, 'delta');
   assert.equal(bound.pool, 'router');
-  assert.equal(bound.model, 'alpha-via-router');
+  assert.equal(bound.model, 'delta-via-router');
   assert.deepEqual(bound.account, { pool: 'router', id: 'r1' });
 });
 
@@ -72,13 +74,6 @@ test('a binding without a pinned account carries no account at all', () => {
   const bound = bind(ask([{ origin: 'human-cli', reasoningEffort: undefined }]), ctx);
   assert.equal(bound.account, undefined);
   assert.equal(bound.provenance.account, undefined);
-});
-
-test('a pin selects the entries its pool serves, so it can move the seat to the family that pool belongs to', () => {
-  const bound = bind(ask([{ origin: 'human-cli', account: 'beta/b1' }]), ctx);
-  assert.equal(bound.refused, undefined);
-  assert.equal(bound.executor, 'beta');
-  assert.deepEqual(bound.account, { pool: 'beta', id: 'b1' });
 });
 
 test('a seat none of whose entries the pinned pool serves binds unpinned and says why', () => {
@@ -104,7 +99,7 @@ test('an unknown account of the seat\'s own pool is refused, naming the pool\'s 
 });
 
 test('a disabled account of the seat\'s own pool is refused', () => {
-  const bound = bind(ask([{ origin: 'human-cli', account: 'router/r2' }]), ctx);
+  const bound = bind(ask([{ origin: 'human-cli', account: 'router/r2' }], 'docs:delta'), ctx);
   assert.equal(bound.refused.reason, 'account-pin-disabled');
 });
 
@@ -141,7 +136,7 @@ test('the dispatch config of a pinned binding lists only the pinned account of i
   assert.deepEqual(Object.keys(pinned.providers.beta.accounts), ['b1'], 'other pools are untouched');
   assert.equal(runnerConfigForBinding(runnerConfig, { executor: 'alpha' }), runnerConfig, 'an unpinned binding keeps the config as it is');
 
-  const viaRouter = runnerConfigForBinding(runnerConfig, bind(ask([{ origin: 'human-cli', account: 'router/r1' }]), ctx));
+  const viaRouter = runnerConfigForBinding(runnerConfig, bind(ask([{ origin: 'human-cli', account: 'router/r1' }], 'docs:delta'), ctx));
   assert.deepEqual(Object.keys(viaRouter.llmAccounts.router), ['r1']);
 });
 

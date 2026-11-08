@@ -2503,6 +2503,81 @@
       ]
     },
     {
+      "name": "an account pin never moves a seat whose first choice is in another pool",
+      "patch": {
+        "ask": {
+          "capability": "architecture:explain",
+          "seat": "producer",
+          "role": "producer",
+          "override": {
+            "account": "openai/work"
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "claude",
+              "pool": "claude",
+              "account": "main"
+            }
+          ]
+        }
+      },
+      "skippedReasons": [
+        "tier-cell-missing",
+        "account-pin-other-pool"
+      ]
+    },
+    {
+      "name": "a lone seat whose first choice is in another pool is not pinned",
+      "patch": {
+        "ask": {
+          "capability": "code:review",
+          "seat": "reviewer",
+          "role": "reviewer",
+          "override": {
+            "account": "claude/spare"
+          }
+        },
+        "config": {
+          "capabilities": {
+            "code:review": {
+              "prefer": [
+                {
+                  "executor": "openai"
+                },
+                {
+                  "executor": "claude"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": true,
+        "ranked": {
+          "candidates": [
+            {
+              "executor": "openai",
+              "pool": "openai",
+              "account": "work"
+            }
+          ]
+        }
+      },
+      "executors": [
+        "openai",
+        "claude"
+      ],
+      "skippedReasons": [
+        "account-pin-other-pool"
+      ]
+    },
+    {
       "name": "an account pin that names no account of the pool is refused",
       "patch": {
         "ask": {
@@ -3620,6 +3695,15 @@
               }
             ]
           }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "gemini"
+              ]
+            }
+          }
         }
       },
       "expected": {
@@ -3700,6 +3784,15 @@
                 ]
               }
             ]
+          }
+        },
+        "config": {
+          "capabilities": {
+            "architecture:*": {
+              "prefer": [
+                "gemini"
+              ]
+            }
           }
         }
       },
