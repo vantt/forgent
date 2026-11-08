@@ -85,7 +85,7 @@ test('a labelled noncoding writing fixture lands its one declared file on main',
   });
   const git = (args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' }).trim();
   // Land refuses a main checkout with unfinished changes, so the run's own state is ignored the way a project's is.
-  fs.writeFileSync(path.join(dir, '.gitignore'), '.fgos/\n*.mjs\n');
+  fs.writeFileSync(path.join(dir, '.gitignore'), '.fgos/\necho-worker.mjs\n');
   git(['add', '.gitignore']);
   git(['commit', '-qm', 'ignore run state']);
   const before = git(['rev-parse', 'main']);
