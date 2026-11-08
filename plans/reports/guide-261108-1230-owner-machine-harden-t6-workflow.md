@@ -42,3 +42,16 @@ Các mục của P01 (đồng ý và biên nhận gate) và P02 (bỏ bước `i
 - **Doctor mong đợi:** không có dòng mới.
 - **Kiểm nhanh:** `fgos workflow propose --slices <file> --plan <plan> --json` trả lời trong dưới một giây.
 - **Quay lại:** revert hai commit sau cùng (thay đổi và baseline); không có thay đổi trên đĩa.
+
+
+## P05: Playbook runner gọn, ledger nhẹ, resume chạy lại lỗi hạ tầng
+
+- **Commit trên main:** xem dòng board của P05.
+- **Người dùng thấy gì:**
+  - `fgos workflow resume` chạy lại một step đã hỏng vì hạ tầng (unit không khởi động được, ghế không launch được): unit đó qua admission lại như một Unit run mới, mỗi lần gọi một lần, không tự thử lại. Unit ghi thì dùng lại worktree và branch đã ghi. Step do một phán quyết kết thúc (`findings`, bị từ chối, ghi ngoài phạm vi) bị từ chối bằng tên: `nothing-to-resume: step <id> ended <outcome>`.
+  - Unit ghi mà controller chết giữa lúc lên lịch và lúc chạy nay tiếp tục trong worktree đã ghi, không còn thất bại.
+  - Ledger mới nhỏ hơn nhiều: `unit.complete` không còn chép `runResult.evidence` (bằng chứng vẫn nằm trong Unit run trên đĩa). Không còn sự kiện `unit.account-unpinned`; lý do một ghế chạy không ghim nằm trong provenance của ghế (`account-pin-other-pool`).
+- **Lệnh trên từng workspace:** `git pull --rebase`; build, stage, kích hoạt release như thường lệ; `fgos doctor </dev/null`.
+- **Doctor mong đợi:** không có dòng mới.
+- **Kiểm nhanh:** run `--units` có ghế launch hỏng, sửa, rồi `fgos workflow resume <id>` chạy lại; run kết thúc bằng phán quyết thì `resume` bị từ chối `nothing-to-resume`.
+- **Quay lại:** release cũ đọc được ledger mới (tập con). Một run đã mở lại (`step.fail` rồi `step.start` của cùng step) bị release cũ xem là `failed`: không rollback khi một run đã mở lại đang chạy.
