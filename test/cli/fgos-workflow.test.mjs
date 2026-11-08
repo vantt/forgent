@@ -151,6 +151,7 @@ test('workflow prune is a dry run until --apply, refuses a malformed age, and a 
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '--allow-empty', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
   const workflowId = writeTrivialWorkflow(tmp);
+  // boundary: the verb door and its flag parsing (--older-than, --apply) are only observable through the real CLI.
   const invoke = (...args) => spawnSync(process.execPath, [FGOS, 'workflow', ...args, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
   const started = invoke('start', workflowId, '--foreground');
   assert.equal(started.status, 0, started.stderr);
