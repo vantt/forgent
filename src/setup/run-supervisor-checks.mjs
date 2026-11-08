@@ -20,10 +20,8 @@ import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from '../run-supervisor/protocol.
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES, SOCKET_NAME_BYTES } from '../run-supervisor/runtime-dir.mjs';
 import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
 import { GATE_KILL_GRACE_KEY, readDispatchConfig, resolveGateKillGrace, gateKillGraceProblem, CANCEL_WAIT_KEY, resolveCancelWait, cancelWaitProblem } from '../run-supervisor/gate-kill-grace.mjs';
-import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { attemptLockState } from '../runner/dispatch/visibility-session.mjs';
 import { fgosDirFromRoot } from '../runner/paths.mjs';
-import { deriveUnitState, unitDirOfAssignment } from '../runner/execution/unit-state.mjs';
 
 const ROUTES = ['supervise', 'gate', 'adopt', 'attempt-step'];
 const PROBE_TIMEOUT_MS = 15_000;
@@ -180,43 +178,46 @@ export function fixRuntimeSocketDir({ env = process.env, uid = process.getuid?.(
 // run-attempts-stuck
 // ---------------------------------------------------------------------
 
-/** Unit runs whose controller is gone and whose last attempt is closed, as the resume commands to type. */
-function unitsAwaitingResume(repoRoot, openAttempts) {
-  const fgosDir = fgosDirFromRoot(repoRoot);
-  const unitDirs = new Set();
-  for (const { assignmentId } of listAssignmentRuns(fgosDir)) {
-    const unitDir = unitDirOfAssignment(fgosDir, assignmentId);
-    if (unitDir) unitDirs.add(unitDir);
-  }
-  // An attempt that is not closed is not awaiting a resume: its controller or the next adopt still owns it.
-  const probe = (attemptDir) => ({ state: openAttempts.has(attemptDir) ? 'open' : 'closed' });
-  const waiting = [];
-  for (const unitDir of [...unitDirs].sort()) {
-    const unit = deriveUnitState(unitDir, { probe });
-    if (unit.unitState === 'awaiting-resume') waiting.push(unit.resumeCommand);
-  }
-  return waiting;
+/**
+ * Why adopt cannot finish an attempt whose envelope names a host binary or a Node payload that no longer
+ * exists, or `null`. The envelope binds the attempt's steps to the release that wrote it: the host must be
+ * that binary and the step runs that payload's `src/run-supervisor/attempt-step.mjs`. There is no fallback
+ * to the active release; the remedy is to bring back what is gone at the same paths (for a dev-door host,
+ * a host binary of the same protocol at that path and a checkout at the payload root).
+ */
+function releaseGoneReason(attemptDir) {
+  try {
+    const { hostBin, payloadRoot } = JSON.parse(fs.readFileSync(path.join(attemptDir, 'envelope.json'), 'utf8'));
+    const gone = [];
+    if (typeof hostBin === 'string' && hostBin !== '' && !fs.existsSync(hostBin)) gone.push(hostBin);
+    if (typeof payloadRoot === 'string' && payloadRoot !== '') {
+      const entry = path.join(payloadRoot, 'src', 'run-supervisor', 'attempt-step.mjs');
+      if (!fs.existsSync(entry)) gone.push(entry);
+    }
+    if (gone.length > 0) {
+      return `the release that wrote it was removed (${gone.map((p) => `${p} is gone`).join(', ')}) and the envelope binds its steps to that host and payload, so adopt cannot run them: restore them at those paths, then run "fgos run" again`;
+    }
+  } catch { /* an envelope that cannot be read is judged by adopt itself */ }
+  return null;
 }
 
 /**
- * A read-only pointer: supervised attempts with no `closed.json` whose lock nobody holds (a running attempt holds it), and
- * the unit runs awaiting `fgos run --resume`. It adopts nothing: the next `fgos run` adopts them, and
- * `fgos dispatch recover` is the manual door. Warns, never fails.
+ * A read-only pointer: supervised attempts with no `closed.json` whose lock nobody holds (a running attempt holds
+ * it). It adopts nothing: the next `fgos run` adopts them, and `fgos dispatch recover` is the manual door. An
+ * attempt whose release was removed can never be adopted and is named with what to restore. Units awaiting
+ * resume are read per run by `fgos dispatch inspect` and `show-run` (their walk costs more than the pointer cap).
+ * Warns, never fails.
  */
 export function checkRunAttemptsStuck(repoRoot) {
-  const open = listOpenAttemptDirs(assignmentsRootOf(repoRoot));
   // Only an attempt the supervisor started (an envelope) or a controller meant to start (its intent) is adopt's; a run
   // from before the supervisor has neither and nothing to adopt.
-  const supervised = open.filter((attemptDir) => ['envelope.json', 'attempt-intent.json'].some((name) => fs.existsSync(path.join(attemptDir, name))));
+  const supervised = listOpenAttemptDirs(assignmentsRootOf(repoRoot))
+    .filter((attemptDir) => ['envelope.json', 'attempt-intent.json'].some((name) => fs.existsSync(path.join(attemptDir, name))));
   const stuck = supervised.filter((attemptDir) => attemptLockState(attemptDir) !== 'held');
-  let waiting = [];
-  try {
-    waiting = unitsAwaitingResume(repoRoot, new Set(open));
-  } catch (err) {
-    return { passed: true, message: warn(`unit runs exist but could not be judged (${err.message}); run \`fgos dispatch inspect\``) };
-  }
-  if (stuck.length === 0 && waiting.length === 0) return { passed: true, message: supervised.length === 0 ? 'no attempt waits to be closed' : `${supervised.length} open attempt(s), all running` };
-  return { passed: true, message: warn(`${stuck.length} attempt(s) have no holder and no closed.json, ${waiting.length} unit run(s) await resume; the next \`fgos run\` adopts them, or run \`fgos dispatch recover\``) };
+  if (stuck.length === 0) return { passed: true, message: supervised.length === 0 ? 'no attempt waits to be closed' : `${supervised.length} open attempt(s), all running` };
+  const gone = stuck.map((attemptDir) => ({ attemptDir, reason: releaseGoneReason(attemptDir) })).filter((entry) => entry.reason);
+  const goneText = gone.length > 0 ? `; ${gone.length} cannot be closed by adopt: ${listed(gone.map(({ attemptDir, reason }) => `${attemptDir} (${reason})`))}` : '';
+  return { passed: true, message: warn(`${stuck.length} attempt(s) have no holder and no closed.json; the next \`fgos run\` adopts them, or run \`fgos dispatch recover\`${goneText}`) };
 }
 
 // ---------------------------------------------------------------------

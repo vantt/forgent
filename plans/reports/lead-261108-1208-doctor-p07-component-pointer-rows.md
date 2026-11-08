@@ -84,3 +84,11 @@ Tests miss: the moved lock-holders cases are a new 242-line file with its own sc
 
 - Accept the dropped release-removed text, or keep a cheap `envelope.json` stat in the pointer (about 1 ms per supervised attempt)?
 - Accept 299 ms cold for `run-attempts-stuck`, or drop the unit count?
+
+## Follow-up after HARDEN and MAIL decisions
+
+- **Release-removed text restored** in `run-attempts-stuck` (stat of `envelope.json` host and payload paths, remedy now says "then run `fgos run` again"); new test names the paths and checks an intact release is not blamed. The table row "attempt whose release was removed" is back: old warn -> same warn in the pointer.
+- **Unit count dropped** per the plan's cost rule (pointer prints the open-attempt count only). Condition "units awaiting resume (warn)" now lives per run in `fgos dispatch inspect` / `show-run` (`unitState`, `resumeCommand`); no aggregate row. Re-measured on the main checkout: 92 ms warm; the first call in a process is 442 ms, which includes one-time native lock-probe start-up that the other doctor rows pay anyway (before: 299 ms cold, 4 ms unit walk warm). Pointers together stay under 1 s.
+- **Mailbox row** (MAIL verdict CHANGES, accepted): an unreadable or untrusted record keeps failing (it stops delivery, so readiness): `enabled, but the mailbox record cannot be read: <code>; run \`fgos mailbox status\``. Table row "Mailbox record unreadable (fail)" -> unchanged fail, message now names the verb. Test assertion back to `passed === false`. CHANGELOG, mailbox spec and the `--strict` sentence updated (no longer lists the mailbox).
+- lock-holders constant pointer, carve-out (left for OPC), `--fix`/`--strict`: accepted as decided.
+- Gate re-run: run-supervisor-checks, registrations, checks, doctor-strict-exit, architecture, doc-health, citation-drift, sweep: 185/185 pass. Full suite from the earlier run stands for everything else (changes since are confined to these files).

@@ -234,8 +234,25 @@ test('run-attempts-stuck: an unclosed attempt with a free lock is a warning that
   const before = fs.readdirSync(dir).sort();
   const res = checkRunAttemptsStuck(root);
   assert.equal(res.passed, true, res.message);
-  assert.match(res.message, /^warning: 1 attempt\(s\) have no holder and no closed\.json, 0 unit run\(s\) await resume; the next `fgos run` adopts them, or run `fgos dispatch recover`$/);
+  assert.match(res.message, /^warning: 1 attempt\(s\) have no holder and no closed\.json; the next `fgos run` adopts them, or run `fgos dispatch recover`$/);
   assert.deepEqual(fs.readdirSync(dir).sort(), before, 'the pointer wrote nothing');
+});
+
+test('run-attempts-stuck: an attempt whose release was removed is named with what to restore, and an intact release is not blamed', () => {
+  const root = workspace('stuck-release-gone');
+  const gone = path.join(scratch, 'pruned-release', 'fgos');
+  const dir = attemptDir(root, 'gone');
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: gone }));
+  const res = checkRunAttemptsStuck(root);
+  assert.equal(res.passed, true);
+  assert.match(res.message, /^warning: 1 attempt\(s\) have no holder and no closed\.json;/);
+  assert.match(res.message, new RegExp(`1 cannot be closed by adopt: .*runs/01 \\(the release that wrote it was removed \\(${gone} is gone\\)`));
+  assert.match(res.message, /restore them at those paths, then run "fgos run" again/);
+  const checkout = path.join(scratch, 'removed-checkout');
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: HOST_BIN, payloadRoot: checkout }));
+  assert.match(checkRunAttemptsStuck(root).message, new RegExp(`${path.join(checkout, 'src', 'run-supervisor', 'attempt-step.mjs')} is gone`));
+  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: HOST_BIN }));
+  assert.doesNotMatch(checkRunAttemptsStuck(root).message, /was removed/);
 });
 
 test('run-attempts-stuck: a run from before the supervisor has no envelope or intent and is nothing to adopt', () => {
@@ -265,44 +282,6 @@ test('run-attempts-stuck: a held lock is a running attempt, not a finding', { sk
   assert.equal(res.passed, true, res.message);
   assert.equal(res.message, '1 open attempt(s), all running');
   holder.kill('SIGKILL');
-});
-
-// ─── units awaiting resume (judged by run-attempts-stuck) ───────────────
-
-/** A unit run whose only attempt is closed (no controller, no summary): it awaits resume. */
-function unitWithAttempt(root, unitRunId, { closed }) {
-  const assignmentId = `${unitRunId}/producer/1`;
-  const unitDir = path.join(root, '.fgos', 'assignments', unitRunId);
-  fs.mkdirSync(unitDir, { recursive: true });
-  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify({ bindings: { 'producer/1': [{ role: 'producer', assignmentId }] } }));
-  const run = path.join(root, '.fgos', 'assignments', assignmentId, 'runs', '01');
-  fs.mkdirSync(run, { recursive: true });
-  fs.writeFileSync(path.join(run, 'run.json'), JSON.stringify({ runId: `run-${unitRunId}`, assignmentId, status: 'running' }));
-  if (closed) fs.writeFileSync(path.join(run, 'closed.json'), '{}');
-  fs.mkdirSync(path.join(root, '.fgos', 'assignments', assignmentId, 'admission', 'generations'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.fgos', 'assignments', assignmentId, 'admission', 'generations', '0000000001.json'), JSON.stringify({ runId: `run-${unitRunId}`, attempt: 1, attemptStr: '01' }));
-  return unitDir;
-}
-
-test('run-attempts-stuck: no unit passes; a unit with a closed attempt warns with the count and never fails', () => {
-  const root = workspace('units-awaiting');
-  assert.equal(checkRunAttemptsStuck(root).message, 'no attempt waits to be closed');
-  const unitDir = unitWithAttempt(root, 'unit-closed', { closed: true });
-  const res = checkRunAttemptsStuck(root);
-  assert.equal(res.passed, true, 'information, not a failure');
-  assert.match(res.message, /^warning: 0 attempt\(s\) have no holder and no closed\.json, 1 unit run\(s\) await resume;/);
-
-  fs.writeFileSync(path.join(unitDir, 'unit-summary.json'), JSON.stringify({ outcome: 'pass' }));
-  assert.equal(checkRunAttemptsStuck(root).message, 'no attempt waits to be closed');
-});
-
-test('run-attempts-stuck: a unit whose attempt is not closed is not awaiting resume', () => {
-  const root = workspace('units-running');
-  unitWithAttempt(root, 'unit-open', { closed: false });
-  const run = path.join(root, '.fgos', 'assignments', 'unit-open/producer/1/runs/01');
-  fs.writeFileSync(path.join(run, 'attempt.lock'), '');
-  fs.writeFileSync(path.join(run, 'envelope.json'), JSON.stringify({ v: 3 }));
-  assert.doesNotMatch(checkRunAttemptsStuck(root).message, /[1-9] unit run\(s\) await resume/, 'the unit with an open attempt is running');
 });
 
 test('the cancel wait reader shares the gate kill grace merge and refuses an unusable value', () => {

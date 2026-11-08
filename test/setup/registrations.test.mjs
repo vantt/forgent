@@ -1198,8 +1198,8 @@ test('the mailbox-hook doctor row reports the record verdict from fgos mailbox s
 
     fs.chmodSync(record, 0o777);
     const broken = check.check(project);
-    assert.equal(broken.passed, true, 'an unreadable record is a pointer to the mailbox verb, never a failure');
-    assert.match(broken.message, /^warning: .*record cannot be read: record-dir-untrusted.*fgos mailbox status/);
+    assert.equal(broken.passed, false, 'an untrusted record stops delivery: readiness, not an incident');
+    assert.match(broken.message, /record cannot be read: record-dir-untrusted.*fgos mailbox status/);
   } finally {
     if (before === undefined) delete process.env.FGOS_HOST_BIN;
     else process.env.FGOS_HOST_BIN = before;

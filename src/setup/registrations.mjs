@@ -1946,7 +1946,7 @@ registerCheck({
 });
 registerCheck({
   id: 'run-attempts-stuck',
-  description: 'read-only pointer: attempts with no closed.json and no lock holder, and unit runs awaiting fgos run --resume; the next fgos run adopts them, or run fgos dispatch recover (a warning, never a failure)',
+  description: 'read-only pointer: attempts with no closed.json and no lock holder, an attempt whose release was removed named with what to restore; the next fgos run adopts them, or run fgos dispatch recover (a warning, never a failure)',
   check: (cwd) => checkRunAttemptsStuck(cwd),
 });
 registerCheck({
@@ -2092,8 +2092,8 @@ function checkMailboxHook(cwd) {
   // no .fgos), and says so in its text.
   if (!data.record) return { passed: true, message: `${enabled}; record not checked: ${data.text ?? 'no answer'}` };
   if (data.record === 'none') return { passed: true, message: `${enabled}; record: none yet (no hook has run in this project)` };
-  // A pointer, never a failure: the record verdict belongs to the mailbox's own verb.
-  if (data.record !== 'ok') return { passed: true, message: `warning: enabled, but the mailbox record cannot be read: ${data.record}; run \`fgos mailbox status\`` };
+  // An unreadable or untrusted record stops send, inbox and hook delivery: readiness, so the row fails and names the verb.
+  if (data.record !== 'ok') return { passed: false, message: `enabled, but the mailbox record cannot be read: ${data.record}; run \`fgos mailbox status\`` };
   const outcome = data.hookOutcome?.reason ? `, last hook outcome ${data.hookOutcome.reason}` : '';
   return { passed: true, message: `${enabled}; record: ok (${data.heads} head(s), ${data.signals?.queue?.pending ?? 0} pending${outcome})${crossMachineNote(data.crossMachine)}` };
 }
