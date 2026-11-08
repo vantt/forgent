@@ -3,12 +3,15 @@
 // shared generator in src/setup/skill-wrappers.mjs (tsk-1qi D7): assembles
 // canonical skills from `core/skills/` and `domains/*/skills/` into `.agents/skills/`,
 // regenerates `.claude/skills/<name>/SKILL.md` thin wrappers, and mirrors
-// dev-skills into `plugins/fgOS/skills/`.
+// dev-skills into `plugins/fgOS/skills/`, then regenerates the instruction
+// projections (the managed AGENTS.md block, the effective instruction set and the
+// projection ledger) from `core/instructions/`.
 // `npm run build:skills`. This script is what a maintainer runs after editing a
 // canonical skill under `core/skills/*` or `domains/*/skills/*`.
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { materializeInstructionProjection } from '../src/setup/instruction-projections.mjs';
 import { assembleSkills, generateAllSkillWrappers, mirrorDevSkillsIntoPlugin } from '../src/setup/skill-wrappers.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -33,3 +36,7 @@ for (const mirroredPath of mirrored) {
 }
 process.stdout.write(`${mirrored.length} plugin dev-skill(s) mirrored.\n`);
 
+const projection = materializeInstructionProjection(repoRoot);
+process.stdout.write(projection.changed
+  ? `regenerated ${projection.computed.destinationRelativePath}, ${projection.computed.effectiveSetRelativePath}, and ${projection.computed.ledgerRelativePath}\n`
+  : 'instruction projections already up to date.\n');

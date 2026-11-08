@@ -4,9 +4,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { checkDeadReferences, checkPlatformLinks, checkPlatformMetadata, governanceBaselineFields } from '../../scripts/doc-health.mjs';
+import { checkIdentityIdsUnique } from '../../scripts/identity-ids-unique.mjs';
+import { enumerateDocEntries, manifestPathFor } from '../../src/report/enduser-index-generate.mjs';
+import { buildDecisionIndexMarkdown, indexPathFor, narrativeHolderResolver } from '../../src/report/decision-index.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const BUILT_HOST = process.env.FGOS_HOST_BIN || path.join(REPO_ROOT, 'target', 'debug', 'fgos');
@@ -129,4 +132,70 @@ test('live self-check: every repository platform doc passes link, metadata and d
   assert.equal(result.status, 0, JSON.stringify(report.findings, null, 1));
   assert.ok(report.counts.files > 0, 'the repository platform population must not be empty');
   assert.deepEqual(report.findings, []);
+});
+
+// Owns the committed end-user docs index: the doc path set it lists is the one on disk.
+// Reads only the checkout (no Work history), so a clone without `.fgos` gives the same answer.
+test('the committed end-user docs index lists exactly the end-user docs on disk', () => {
+  const indexed = new Set(JSON.parse(fs.readFileSync(manifestPathFor(REPO_ROOT), 'utf8')).map((entry) => entry.docPath));
+  const onDisk = new Set(enumerateDocEntries(REPO_ROOT).map((entry) => entry.docPath));
+  assert.deepEqual({
+    missingFromIndex: [...onDisk].filter((docPath) => !indexed.has(docPath)).sort(),
+    orphanedInIndex: [...indexed].filter((docPath) => !onDisk.has(docPath)).sort(),
+  }, { missingFromIndex: [], orphanedInIndex: [] }, 'run `fgos docs-index` and commit docs/enduser-docs-index.json');
+});
+
+// Owns the committed decisions index: it is a fixpoint of the renderer over its own rows
+// (with no local state the generator reduces to the committed rows).
+test('the committed decisions index is a fixpoint of the generator over its own rows', () => {
+  const committed = fs.readFileSync(indexPathFor(REPO_ROOT), 'utf8');
+  assert.equal(buildDecisionIndexMarkdown([], committed, { holderFor: narrativeHolderResolver(REPO_ROOT) }), committed,
+    'run `fgos decision-index` and commit docs/decisions/index.md');
+});
+
+// Owns the README install pin: the tag the first-install command names was really cut.
+// CI fetches every tag; a checkout with no tags at all cannot answer, and says so by skipping.
+test('the install tag README.md pins exists in this checkout', (t) => {
+  const pinned = fs.readFileSync(path.join(REPO_ROOT, 'README.md'), 'utf8').match(/npm install -g github:[^#\s]+#(v\d+\.\d+\.\d+)/);
+  if (!pinned) return t.skip('README.md pins no tag in its install command');
+  const tags = execFileSync('git', ['tag', '-l'], { cwd: REPO_ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
+  if (tags.length === 0) return t.skip('this checkout lists no git tags (shallow clone)');
+  assert.ok(tags.includes(pinned[1]), `README.md recommends installing tag ${pinned[1]}, which does not exist: cut it per docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md or pin a tag that exists`);
+});
+
+// Owns the id registries: ids that travel between machines come from `fgos identity mint <kind>`,
+// so a repeat means one was written by hand.
+test('id registry check passes on a clean registry and names each repeated id, title clash and file number', () => {
+  const repo = fixtureRoot({
+    'docs/platform/area-a/spec.md': '### D-ADR0070 (guide and ledger) -- text\n',
+    // The same decision recorded in two areas, under the same short title, is one decision.
+    'docs/platform/area-b/decisions/narrative.md': '### D-ADR0070 (guide and ledger) -- other words\n#### Not a decision: D-ADR0071\n',
+    'docs/decisions/0001-one.md': '# one\n',
+  });
+  try {
+    const backlog = (ids) => ['| ID | Story |', '|----|-------|', ...ids.map((id) => `| ${id} | a story |`)].join('\n');
+    fs.writeFileSync(path.join(repo, 'docs/backlog.md'), backlog(['p-4f2a7qzb3x', 'STR27']));
+    const clean = checkIdentityIdsUnique(repo);
+    assert.deepEqual(clean, { passed: true, message: '2 backlog ids, 1 D-ADR numbers and 1 decision files, none repeated' });
+
+    // Relocated history may repeat a decision under another title; it is not a second definition.
+    fs.mkdirSync(path.join(repo, 'docs/platform/area-a/history'), { recursive: true });
+    fs.writeFileSync(path.join(repo, 'docs/platform/area-a/history/old.md'), '### D-ADR0070 (an older title for the decision)\n');
+    assert.deepEqual(checkIdentityIdsUnique(repo), clean);
+
+    fs.writeFileSync(path.join(repo, 'docs/backlog.md'), backlog(['p-4f2a7qzb3x', 'p-4f2a7qzb3x']));
+    fs.writeFileSync(path.join(repo, 'docs/platform/area-b/decisions/narrative.md'), '### D-ADR0070 (a different decision)\n');
+    fs.writeFileSync(path.join(repo, 'docs/decisions/0001-two.md'), '# two\n');
+    const broken = checkIdentityIdsUnique(repo);
+    assert.equal(broken.passed, false);
+    assert.match(broken.message, /backlog id p-4f2a7qzb3x is used by more than one row/);
+    assert.match(broken.message, /D-ADR0070 is headed with different titles/);
+    assert.match(broken.message, /decision file number 0001 is used by more than one file/);
+    assert.match(broken.message, /fgos identity mint/);
+  } finally { fs.rmSync(repo, { recursive: true, force: true }); }
+});
+
+test('no backlog id, D-ADR number title or decision file number is repeated in this repository', () => {
+  const result = checkIdentityIdsUnique(REPO_ROOT);
+  assert.equal(result.passed, true, result.message);
 });

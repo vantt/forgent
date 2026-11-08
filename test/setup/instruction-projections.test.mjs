@@ -3,10 +3,10 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   computeInstructionProjection,
@@ -19,7 +19,6 @@ import {
 } from '../../src/setup/instruction-projections.mjs';
 import { composeInstructionSet } from '../../src/setup/instruction-composition.mjs';
 import { compileInstructionUnit } from '../../src/setup/instruction-registry.mjs';
-import { DOCTOR_CHECKS, FIX_REGISTRATIONS } from '../../src/setup/checks.mjs';
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -40,22 +39,6 @@ function compiledUnit(root, meta, body = '# Rule\nDo the thing.') {
     rootOwner: 'core',
     knownOwners: new Set(['core']),
   });
-}
-
-function projectionCheck() {
-  return DOCTOR_CHECKS.find((entry) => entry.id === 'instruction-projections-stale');
-}
-
-function projectionFix() {
-  return FIX_REGISTRATIONS.find((entry) => entry.id === 'instruction-projections-stale');
-}
-
-function git(args, cwd) {
-  return execFileSync('git', args, {
-    cwd,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-  }).trim();
 }
 
 test('renderPortableAgentsProjection renders a deterministic managed AGENTS.md block from the effective set', () => {
@@ -164,8 +147,8 @@ test('inspectInstructionProjection detects stale generated projections and fix r
   assert.match(repaired, /Render me\./);
 });
 
-test('doctor check is read-only, skips unmaterialized projections, and fix repairs stale instruction projections', () => {
-  const root = mkTempDir('fgos-instruction-projection-doctor-');
+test('inspectInstructionProjection is read-only and reports an unmaterialized projection as passing but not materialized', () => {
+  const root = mkTempDir('fgos-instruction-projection-unmaterialized-');
   fs.writeFileSync(path.join(root, 'AGENTS.md'), '# Human content\n', 'utf8');
   writeInstructionFile(
     root,
@@ -175,32 +158,14 @@ test('doctor check is read-only, skips unmaterialized projections, and fix repai
   );
 
   const before = fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8');
-  const check = projectionCheck();
-  const fix = projectionFix();
-  assert.ok(check, 'instruction-projections-stale check must be registered');
-  assert.ok(fix, 'instruction-projections-stale fix must be registered');
-
-  const firstCheck = check.check(root);
-  assert.equal(firstCheck.passed, true);
-  assert.match(firstCheck.message, /not materialized/);
-  assert.equal(fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8'), before, 'doctor check must be read-only');
-
-  const fixed = fix.fix(root);
-  assert.equal(fixed.changed, true);
-  assert.equal(check.check(root).passed, true);
-  assert.ok(fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8').startsWith('# Human content\n\n'));
-
-  const agentsPath = path.join(root, 'AGENTS.md');
-  const stale = fs.readFileSync(agentsPath, 'utf8').replace('Render me.', 'Stale generated copy.');
-  fs.writeFileSync(agentsPath, stale, 'utf8');
-  const staleCheck = check.check(root);
-  assert.equal(staleCheck.passed, false);
-  assert.match(staleCheck.message, /managed instruction block stale/);
-  assert.equal(fix.fix(root).changed, true);
-  assert.equal(check.check(root).passed, true);
+  const inspected = inspectInstructionProjection(root);
+  assert.equal(inspected.passed, true);
+  assert.equal(inspected.materialized, false);
+  assert.equal(fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8'), before, 'inspection must not write');
+  assert.equal(fs.existsSync(path.join(root, '.fgos')), false, 'inspection must not create the workspace directory');
 });
 
-test('doctor check accepts a tracked managed AGENTS projection before workspace ledger materialization', () => {
+test('inspectInstructionProjection accepts a tracked managed AGENTS projection before workspace materialization, and still finds it stale', () => {
   const root = mkTempDir('fgos-instruction-projection-tracked-agents-');
   writeInstructionFile(
     root,
@@ -211,9 +176,7 @@ test('doctor check accepts a tracked managed AGENTS projection before workspace 
   materializeInstructionProjection(root);
   fs.rmSync(path.join(root, '.fgos'), { recursive: true, force: true });
 
-  const check = projectionCheck();
-  assert.ok(check, 'instruction-projections-stale check must be registered');
-  assert.equal(check.check(root).passed, true);
+  assert.equal(inspectInstructionProjection(root).passed, true);
 
   const agentsPath = path.join(root, 'AGENTS.md');
   fs.writeFileSync(
@@ -221,12 +184,12 @@ test('doctor check accepts a tracked managed AGENTS projection before workspace 
     fs.readFileSync(agentsPath, 'utf8').replace('Render me.', 'Stale generated copy.'),
     'utf8',
   );
-  const stale = check.check(root);
+  const stale = inspectInstructionProjection(root);
   assert.equal(stale.passed, false);
-  assert.match(stale.message, /managed instruction block stale/);
+  assert.ok(stale.problems.some((problem) => problem.includes('managed instruction block stale')));
 });
 
-test('doctor check ignores unrelated projection ledger entries', () => {
+test('inspectInstructionProjection ignores unrelated projection ledger entries', () => {
   const root = mkTempDir('fgos-instruction-projection-unrelated-ledger-');
   writeInstructionFile(
     root,
@@ -247,42 +210,19 @@ test('doctor check ignores unrelated projection ledger entries', () => {
     ],
   }, null, 2)}\n`, 'utf8');
 
-  const check = projectionCheck();
-  assert.ok(check, 'instruction-projections-stale check must be registered');
-  assert.equal(check.check(root).passed, true);
+  assert.equal(inspectInstructionProjection(root).passed, true);
 });
 
-test('doctor fix resolves a linked worktree to the main checkout projection root', () => {
-  const tmp = mkTempDir('fgos-instruction-projection-linked-');
-  const main = path.join(tmp, 'main');
-  const linked = path.join(tmp, 'linked');
-  fs.mkdirSync(main, { recursive: true });
-  git(['init'], main);
-  git(['config', 'user.email', 'fgos@example.invalid'], main);
-  git(['config', 'user.name', 'fgOS Test'], main);
-  writeInstructionFile(
-    main,
-    'law.md',
-    'id: projection-law\nkind: law\ntitle: Projection Law',
-    '# Projection Law\nRender me.',
-  );
-  git(['add', '.'], main);
-  git(['commit', '-m', 'seed instructions'], main);
-  git(['worktree', 'add', linked], main);
-
-  const fix = projectionFix();
-  const check = projectionCheck();
-  assert.ok(fix, 'instruction-projections-stale fix must be registered');
-  assert.ok(check, 'instruction-projections-stale check must be registered');
-
-  const fixed = fix.fix(linked);
-  assert.equal(fixed.changed, true);
-  assert.equal(fs.existsSync(path.join(main, 'AGENTS.md')), true);
-  assert.equal(fs.existsSync(path.join(main, '.fgos/instructions/effective/repo.json')), true);
-  assert.equal(fs.existsSync(path.join(main, PROJECTION_LEDGER_RELATIVE_PATH)), true);
-  assert.equal(fs.existsSync(path.join(linked, 'AGENTS.md')), false);
-  assert.equal(fs.existsSync(path.join(linked, '.fgos/instructions/effective/repo.json')), false);
-  assert.equal(check.check(linked).passed, true);
+// The repository's own projections: regenerated by `npm run build:skills`. The ledger is
+// per-machine state under .fgos and is not tracked, so only a ledger that exists is judged.
+test('this repository\'s tracked instruction projections are current', () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  const inspected = inspectInstructionProjection(repoRoot);
+  const problems = fs.existsSync(path.join(repoRoot, inspected.computed.ledgerRelativePath))
+    ? inspected.problems
+    : inspected.problems.filter((problem) => !problem.startsWith(inspected.computed.ledgerRelativePath));
+  assert.deepEqual(problems, [], 'run `npm run build:skills` and commit the regenerated projections');
+  assert.equal(inspected.materialized, true, 'the repository tracks its managed AGENTS.md block');
 });
 
 test('materializeInstructionProjection refuses malformed managed markers instead of overwriting user content', () => {

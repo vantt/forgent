@@ -3,12 +3,9 @@
 // enduser-index.mjs (the pure transform, zero imports, no I/O by design),
 // this module does real fs I/O: it enumerates docs/<quadrant>/ (+
 // QUADRANT_DIR_ALIASES) on disk and folds the event log via `listWork`.
-// This is the ONE generation path both `fgos docs-index`
-// (bin/fgos.mjs) and the enduser-docs-index-stale doctor check/fix
-// (src/setup/registrations.mjs) call — extracted here (tsk-1m0) so the
-// doctor check can read the same computation without duplicating it, and
-// so the doctor fix can regenerate the manifest via the same write path
-// `docs-index` already proved correct, rather than reimplementing either.
+// This is the ONE generation path of `fgos docs-index` (bin/fgos.mjs); the
+// committed index's doc path set is checked against `enumerateDocEntries` by
+// test/scripts/doc-health.test.mjs.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -105,8 +102,7 @@ export function manifestPathFor(repoRoot) {
 
 /**
  * Compute the current end-user doc index in memory, without writing
- * anything — the read-only half shared by `fgos docs-index`'s write path
- * and the enduser-docs-index-stale doctor check. `fgosDir` is the `.fgos`
+ * anything — the read-only half of `fgos docs-index`'s write path. `fgosDir` is the `.fgos`
  * directory whose Work history is read through the Event Store facade.
  * An unavailable or corrupt store throws before any manifest is overwritten.
  */

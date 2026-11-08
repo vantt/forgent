@@ -143,7 +143,7 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
     assert.ok(fs.existsSync(path.join(legacyNodeDir, 'src', 'setup', 'registrations.mjs')), 'src/ must be staged intact in legacy-node');
     assert.ok(
       fs.existsSync(path.join(legacyNodeDir, 'packages', 'convention', 'contracts', 'convention.rules.v1.json')),
-      'Convention rule data required by installed doctor must be staged in legacy-node',
+      'Convention rule data read by the installed identifier rules must be staged in legacy-node',
     );
     assert.ok(
       fs.existsSync(path.join(legacyNodeDir, 'packages', 'holder-lock', 'contracts', 'lock-registry.v1.json')),
@@ -181,33 +181,7 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
     assert.deepEqual(paths, sortedPaths, 'files[] paths must be lexicographically sorted');
 
     const conventionRulesPath = 'libexec/legacy-node/packages/convention/contracts/convention.rules.v1.json';
-    assert.ok(paths.includes(conventionRulesPath), 'manifest files[] must cover installed doctor rule data');
-
-    // The installed doctor's convention row, computed as `fgos doctor` computes each row: the
-    // staged payload's own check registry, its packaged rule data and the staged host. Only this row
-    // is run; the whole doctor on this checkout spends most of a minute on unrelated rows, and the
-    // staged door that runs the doctor verb is the one R3 drives for every route.
-    const doctorEnv = { ...process.env, FGOS_HOST_BIN: fgosBin };
-    delete doctorEnv.CLAUDE_CODE_SESSION_ID;
-    // The staged payload resolves its own manifest; the outer run's active-release pair names another payload.
-    for (const key of ACTIVE_RELEASE_KEYS) delete doctorEnv[key];
-    const doctorRow = [
-      "const { DOCTOR_CHECKS } = await import(process.argv[1]);",
-      "const entry = DOCTOR_CHECKS.find((c) => c.id === 'convention-conformance');",
-      "process.stdout.write(JSON.stringify(entry ? { id: entry.id, ...(await entry.check(process.argv[2])) } : null));",
-    ].join('\n');
-    // boundary: the staged payload runs in its own process, against its own packaged files and host.
-    const doctor = spawnSync(process.execPath, ['--input-type=module', '-e', doctorRow, pathToFileURL(path.join(legacyNodeDir, 'src', 'setup', 'checks.mjs')).href, REPO_ROOT], {
-      cwd: REPO_ROOT,
-      encoding: 'utf8',
-      env: doctorEnv,
-    });
-    assert.equal(doctor.status, 0, `staged doctor convention row failed: ${doctor.stderr}`);
-    const conventionCheck = JSON.parse(doctor.stdout);
-    assert.ok(conventionCheck, 'staged fgos doctor must list convention-conformance');
-    assert.equal(conventionCheck.passed, true);
-    assert.match(conventionCheck.message, /convention violations: \d+ pre-cutoff, 0 post-cutoff/);
-    assert.doesNotMatch(conventionCheck.message, /skipped|ENOENT/);
+    assert.ok(paths.includes(conventionRulesPath), 'manifest files[] must cover the installed convention rule data');
 
     for (const file of manifest.files) {
       assert.ok(!file.path.startsWith('/'), `Path must not be absolute: ${file.path}`);

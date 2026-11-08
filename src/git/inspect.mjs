@@ -35,3 +35,21 @@ export function gitPortOptions(repoPath, { mutation = false, inspect } = {}) {
   if (facts.notARepository) return seed;
   return { ...seed, trustedMain: facts.trustedMainRoot, writer: gitWriter(path.join(facts.trustedMainRoot, '.fgos')) };
 }
+
+/**
+ * Whether `relativePath` names an entry at `revision`. A blob larger than the
+ * read budget still exists; any other unreadable answer throws.
+ */
+export function pathExistsAt(root, revision, relativePath) {
+  const [entry] = createGitInspect(gitPortOptions(root)).pathsAtRevision({ revision, paths: [[...Buffer.from(relativePath)]], maxBlobBytes: 1 });
+  if (!entry) throw new Error(`no answer for ${relativePath}`);
+  if (entry.value.kind === 'error' && entry.value.cause !== 'blob-too-large') throw new Error(`${relativePath} at ${revision}: ${entry.value.cause}`);
+  return entry.value.kind !== 'absent';
+}
+
+/** The commit `name` resolves to; throws when it names none. */
+export function commitAt(root, name) {
+  const oid = createGitInspect(gitPortOptions(root)).resolveCommit({ name });
+  if (!oid) throw new Error(`${name} is not a commit`);
+  return oid;
+}
