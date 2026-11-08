@@ -2406,7 +2406,7 @@ export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'workflow',
     invoke: 'fgos workflow <start|status|answer|resume|close|prune|gate|propose|operations> [id]',
-    description: 'Door for planned work: a registered Workflow preset or a file of several Units run as steps (DAG ordering, human review gates, pure git integration). One task with no planning takes the other door, `fgos run "<prompt>"`. start/answer/resume advance in a detached process by default; read progress with "status", which also shows the case: milestones, routes, frame left, open gates. A guide with its own activities opens a conductor case with no process: the agent reads "status" and proposes through the doors.',
+    description: 'Door for planned work: a registered Workflow preset or a file of several Units run as steps (DAG ordering, human review gates; merging stays at the approve door). One task with no planning takes the other door, `fgos run "<prompt>"`. start/answer/resume advance in a detached process by default; read progress with "status", which also shows the case: milestones, routes, frame left, open gates. A guide with its own activities opens a conductor case with no process: the agent reads "status" and proposes through the doors.',
     subcommands: {
       start: {
         description: 'Start a run from exactly one of: a registered Workflow id (a preset such as delphi or group-cognition) or --units <file> (one step per Unit). Returns the run id at once and advances it in a detached process unless --foreground.',

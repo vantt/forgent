@@ -2,7 +2,7 @@
 // Seats read a plain-path ref themselves, live, while they run, so this is a digest at start: it shows
 // whether a document changed between the start and a later look. It is not proof of what a seat read.
 // Refs that name another run's result (`unit-run:`, `gate-answer:`) are skipped here: a unit run's report is
-// written once, and a gate answer is kept as one file per round that is never rewritten (see case-inbox.mjs).
+// written once, and a gate answer is kept as one file per round that is never rewritten (see case-runtime.mjs).
 //
 // The second half digests a milestone's subject: a declared set of artifacts, never a branch.
 

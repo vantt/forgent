@@ -49,7 +49,7 @@
       "rank": 80,
       "v3Path": "<workflowRunDir>/locks/advance.lock",
       "owner": "4.2",
-      "note": "v1 source: src/workflow/runner.mjs ADVANCE_LOCK_FILE"
+      "note": "v1 source: src/workflow/case-lock.mjs (the advance lock file under the case run directory)"
     },
     {
       "name": "reconcile",

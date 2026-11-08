@@ -18,6 +18,7 @@ import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
 import { deriveUnitState } from '../runner/execution/unit-state.mjs';
 import { unitControllerHeld } from '../runner/execution/unit-control.mjs';
 import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
+import { realpathOrNull } from '../run-supervisor/payload-root.mjs';
 
 /**
  * @param {object} params
@@ -204,8 +205,6 @@ function judgeUnitRun({ fgosDir, caseId, unitRunId, namedElsewhere }) {
   if (unitState !== 'completed' && unitState !== 'failed') return { keep: 'unsettled', blocks: true };
   return { dir: expected };
 }
-
-function realpathOrNull(p) { try { return fs.realpathSync(p); } catch { return null; } }
 
 /** Judge every Unit run a ledger names; `blocked` when any must stay with the ledger. */
 function judgeCase({ mainRoot, caseId, ledger, namedElsewhere, kept }) {

@@ -7,13 +7,13 @@ Purpose: Preserve the Workflow contract, rules, decisions and implementation poi
 Design status: Accepted at atomic cutover
 Owner: Workflow component
 Source: docs/specs/workflow.md at 947dc310396071a4d530216d5c06d05993d63bf5
-Implementation: Partial (carried source coverage: partial); the design is settled and was not re-verified at cutover
+Implementation: Installed and hardened (Node, no Rust move); sizes and budgets in section 9 were measured on 2026-11-08; the coding cutover (`wf-coding-cutover`) is not done
 Provenance: docs/specs/workflow.md at 947dc310396071a4d530216d5c06d05993d63bf5; first committed in 9ec72efbc (2026-10-19)
 Writer type: Human + agent coauthor
 Canonical for: The Workflow contract: guide, case and admission, with its rules, decisions and implementation pointers
 Use this when: Changing how a workflow guide is admitted or how a case runs, or reading the workflow decisions
 Do not use this for: Claims that every settled rule is implemented; consult the implementation pointers and tests
-Last reviewed: 2026-11-06
+Last reviewed: 2026-11-08
 Related:
 - docs/platform/component-boundary.md
 - docs/platform/work-state/contracts/knowledge-registry.md
@@ -184,11 +184,11 @@ Bản ghi mới gọi id **bằng tên**, không có trường `runId` trần: `
 
 ## 5. Ranh giới component và authority
 
-### 5.1 Hôm nay (trước cutover; xem dòng "Đã cài" ở đầu spec)
+### 5.1 Hàng của bảng ranh giới
 
-- Hàng **Workflow** ghi "Domain-neutral step & Unit DAG scheduling … Single sequencer for plans, workflows, and multi-unit tasks"; hàng **Work Lifecycle** ghi "Does not own stage or sequencing (owned by Workflow runner)"; hàng **Execution Core**: authority cho ai làm/model/persona/cơ chế, cửa chạy duy nhất, posture confinement, cổng ghi kiểm chứng được.
-- **Authority admission hôm nay không nằm ở đâu cả.** Thứ tự do vòng DAG (playbook) hoặc văn xuôi (mọi thứ khác); item coding do claim + step FSM; hook `dispatch-decide` chỉ quyết *cơ chế*.
-- Liên kết `workflow` trong `unit.json` chỉ là provenance: cửa không đọc nó để cho hay từ chối gì.
+- Hàng **Workflow** của [component-boundary.md](../component-boundary.md) ghi authority guide, ledger case, admission và binding worktree; hàng **Work Lifecycle** ghi "Does not own stage or sequencing"; hàng **Execution Core**: authority cho ai làm/model/persona/cơ chế, cửa chạy duy nhất, posture confinement, cổng ghi kiểm chứng được.
+- **Authority admission nằm ở Workflow** (mục 5.2). Item coding vẫn do claim + step FSM tới cutover coding; hook `dispatch-decide` chỉ quyết *cơ chế*.
+- Liên kết `workflow` trong `unit.json` là provenance: cửa không đọc nó để cho hay từ chối gì. Chỉ `fgos workflow prune` đọc nó, để biết một Unit run có thuộc đúng case đang dọn không (RUL-WF-39).
 
 ### 5.2 Sau (điều spec khoá)
 
@@ -203,7 +203,7 @@ Bản ghi mới gọi id **bằng tên**, không có trường `runId` trần: `
 - port được tiêm ở cửa phải **còn có mặt ở cổng ghi** (nơi kiểm lại consent gắn subject lúc hiệu ứng): spec khoá đường tiêm này, không giả định nó tự trôi qua stack; một port rơi mất trong lúc chạy ghế làm phép kiểm thứ hai thành vô hiệu;
 - admission chạy **sau khi pattern được giải, trước `bind()`**, vì trần seat launch tính từ pattern. Trần của pattern `debate` là hai bên × (một vòng, hoặc hai vòng khi `params.rebuttal` bật, mặc định) + một thẩm phán (`debateSeatLaunches`).
 
-**Pattern `debate` (CollaborationPattern, cạnh `solo`, `reviewed`, `panel`).** Hai bên lập luận từ giả định đối nghịch, rồi một thẩm phán phán quyết; dùng khi một bên phản biện không đủ (`reviewed` chỉ có người tấn công, không ai dựng phương án đối lập, không ai phán). Ghế: `thesis` và `antithesis` (producer, chỉ đọc), `judge` (chỉ đọc, ngoài process như checker). Vòng 1 chạy song song và mù: `thesis` bảo vệ lập trường Unit nêu (hoặc câu trả lời mạnh nhất hiện có), `antithesis` đảo các giả định chịu lực rồi bảo vệ phương án đối lập tốt nhất, không dựng người rơm. Vòng 2 (`params.rebuttal: false` tắt) mỗi bên chỉ nhận lập luận vòng 1 của bên kia để trả lời. Thẩm phán đọc mọi lập luận và nêu bên nào đứng vững, mệnh đề nào sụp (trích dẫn), quyết định và điều gì làm đổi nó. Họ provider khác nhau giữa hai bên là ưu tiên mềm (`preferIndependentOf`); **họ của thẩm phán phải khác cả hai bên** (`independentOf` cứng): pool không xếp nổi thì lượt chạy kết thúc bằng từ chối `independence` có tên của `bind()`, không bao giờ có thẩm phán cùng họ âm thầm; `fgos doctor` (`workflow-pools-satisfy-independence`) báo thiếu đó trước khi chạy. Resume dùng lại ghế đã `pass` theo (vai, vòng). `params.roleTasks` ghi đè nhiệm vụ từng ghế (`thesis`, `antithesis`, `thesis-rebuttal`, `antithesis-rebuttal`, `judge`). Bảng vai ngoài process nằm một chỗ, `CHECKER_ROLES` trong `bind.mjs`. `group-cognition` dùng pattern này ở bước `dialectical-inquiry`; `action-synthesis` lấy phán quyết của thẩm phán làm cơ sở cho điểm đang tranh cãi.
+**Pattern `debate` (CollaborationPattern, cạnh `solo`, `reviewed`, `panel`).** Hai bên lập luận từ giả định đối nghịch, rồi một thẩm phán phán quyết; dùng khi một bên phản biện không đủ (`reviewed` chỉ có người tấn công, không ai dựng phương án đối lập, không ai phán). Ghế: `thesis` và `antithesis` (producer, chỉ đọc), `judge` (chỉ đọc, ngoài process như checker). Vòng 1 chạy song song và mù: `thesis` bảo vệ lập trường Unit nêu (hoặc câu trả lời mạnh nhất hiện có), `antithesis` đảo các giả định chịu lực rồi bảo vệ phương án đối lập tốt nhất, không dựng người rơm. Vòng 2 (`params.rebuttal: false` tắt) mỗi bên chỉ nhận lập luận vòng 1 của bên kia để trả lời. Thẩm phán đọc mọi lập luận và nêu bên nào đứng vững, mệnh đề nào sụp (trích dẫn), quyết định và điều gì làm đổi nó. Họ provider khác nhau giữa hai bên là ưu tiên mềm (`preferIndependentOf`); **họ của thẩm phán phải khác cả hai bên** (`independentOf` cứng): pool không xếp nổi thì lượt chạy kết thúc bằng từ chối `independence` có tên của `bind()`, không bao giờ có thẩm phán cùng họ âm thầm; hàng doctor `seat-binding-dry-bind` bind thử mọi ghế của workflow và báo thiếu đó trước khi chạy. Resume dùng lại ghế đã `pass` theo (vai, vòng). `params.roleTasks` ghi đè nhiệm vụ từng ghế (`thesis`, `antithesis`, `thesis-rebuttal`, `antithesis-rebuttal`, `judge`). Bảng vai ngoài process nằm một chỗ, `CHECKER_ROLES` trong `bind.mjs`. `group-cognition` dùng pattern này ở bước `dialectical-inquiry`; `action-synthesis` lấy phán quyết của thẩm phán làm cơ sở cho điểm đang tranh cãi.
 
 Đặt admission vào Execution Core đã bị bác (cửa vừa chọn cơ chế vừa phán tính hợp lệ, trái Design Principle 7). Nới test A4 cho một module Workflow cũng bị bác (dạy Execution Core tên module Workflow, trái Design Principle 2).
 
@@ -334,6 +334,22 @@ Hôm nay `advance` giữ suốt `advanceWorkflowRun` và kiêm "lease sống" c�
 
 - **RUL-WF-33 (review độc lập đọc mảnh trước khi verified).** Trong guide coding, `review-item` chỉ cần `plan-validated`; `integrate` và các mốc sau vẫn đợi `child-verified`. Nhờ đó một review độc lập đọc được một mảnh trước khi nó verified hay land, và route review đề xuất tại `plan-validated` là route được liệt kê (`mayInstead`), không phải deviation. Hợp đồng nằm ở `domains/coding/workflows/feature.yaml`; mốc `child-verified` giữ nguyên nghĩa receipt verify.
 
+- **RUL-WF-34 (câu trả lời chỉ tới từ owner, chỉ tới một cổng đang được hỏi, không bao giờ tới mốc giao hàng).** `answer` bị từ chối khi chạy trong một worker đã dispatch (`currentDispatchDepth() > 0`, cùng câu từ chối và mã `nested-write-from-confined-worker` của port, bất kể view có ghi được hay không); bị từ chối theo tên khi step không phải cổng của guide (`gate-unknown`; cổng là `gate` của step hoặc activity mà một decision point mang `gate:` liệt kê), khi cổng chưa từng đậu (`gate-not-parked`) hoặc đã được trả lời từ lần đậu cuối (`gate-already-answered`); và không tới được mốc cần receipt verify. Bộ gom từ thư mục inbox kiểm **đúng các luật đó** dưới `advance` cho từng file round (cổng của guide, lần đậu đang mở, chế độ cổng, tên file khớp nội dung, chưa được trả lời); một round vi phạm không được gấp vào ledger, được liệt kê trong kết quả của bộ gom và không chặn cũng không thay câu trả lời thật của owner. Một mốc giữ receipt của mọi guard trên cùng subject (receipt của settle và receipt của câu trả lời cổng cùng nằm trong `receipts`). *Giới hạn nói thẳng:* một tiến trình không bị giam của chính user OS của owner vẫn có thể chạy `fgos workflow answer` ở độ sâu 0 hoặc ghi vào thư mục case; T6 làm mọi đường đó qua cùng các kiểm tra, nhưng chỉ một kênh agent không với tới (hook phía host của kế hoạch cổng hai tầng, owner 55/56, nơi "giới hạn cùng user OS" đã được chấp nhận) mới phân biệt được owner với tiến trình đó.
+
+- **RUL-WF-35 (cổng chạy đúng kiểm đã khai; tin cậy nói thẳng).** `fgos workflow gate` không có `--verify`, danh sách mảnh không có khoá `gate`; lệnh duy nhất là `capabilities.<capability>.verify` mà config khai cho `--capability` (bắt buộc), như RUL-WF-32. Người gọi vẫn chọn *capability* nào (spec chấp nhận: hoạt động `integrate` của guide không gắn capability). **Dòng tin cậy:** `verify` của một unit trong YAML project chạy trên host như `capabilities.*.verify`, và config của project chọn `verify` mà một cổng chạy; project là authority của chính nó. Máy nào chạy cổng phải khai `capabilities.code:implement.verify`. Cổng chạy dưới custody worktree (không chạy khi worktree đang bị dispatch khác giữ).
+
+- **RUL-WF-36 (Playbook không có cửa merge thứ hai).** Merge vào trunk chỉ qua approve door (coding) hoặc `landRunnerItem`; xem mục 17 "Playbook không còn bước `integrate`". `consent-before-merge` là dòng `must` do cửa approve thi hành, không phải bước Playbook.
+
+- **RUL-WF-37 (reservation được nhả khi im lặng; ghi file custody trước khi case đặt chỗ).** Lần giữ `advance` của một case trả lại reservation ghi file đã được chứng minh chết: worktree còn tồn tại, custody trống, không có bản ghi Unit run còn tiếp tục được, có hay không có inbox. Reservation chỉ đọc, không chứng minh được chết, hay của dispatch không phải Workflow thì không bao giờ bị nhả. Không còn file `reservations/*.json`; settle gỡ binding bằng event `binding` mới nhất của worktree trong ledger; binding sót do crash được case sở hữu nó sửa dưới `advance` của chính nó (`workflow-case-bindings` do Workflow đọc, `doctor --fix` chỉ ghi sentinel). `fgos run` ghi file lấy custody worktree **trước** khi case đặt chỗ nên worktree bận bị từ chối không để lại reservation. Hold đang bị giữ báo `case-advance-busy`. `advance.log` chỉ chứa tiến độ, không chứa kết quả JSON.
+
+- **RUL-WF-38 (resume chạy lại lỗi hạ tầng một lần mỗi lần gọi; phán quyết là cuối).** `fgos workflow resume` chạy lại một step hỏng vì hạ tầng (unit `execution-failure` hoặc `not-started`, không có đường ngoài phạm vi, không bị từ chối, không có ghế đã settle phán quyết) như một Unit run mới qua admission lại; unit ghi dùng lại worktree và nhánh đã ghi. Step kết thúc bằng phán quyết bị từ chối theo tên (`nothing-to-resume: step <id> ended <outcome>`). Không có retry tự động nào ngoài một lần thử lại brief mất của Execution Core. `unit.complete` không chép bằng chứng thô của ghế (nó nằm trong Unit run trên đĩa).
+
+- **RUL-WF-39 (pin account không bao giờ chuyển ghế sang pool khác).** Quy tắc thuộc Seat Binding ([spec.md](../seat-binding/spec.md) mục 8, owner 71 3a, 72): pin chỉ áp khi lựa chọn đầu của ghế do pool đó phục vụ. Ghế của một workflow có lựa chọn đầu ở pool khác chạy không pin (provenance `account-pin-other-pool`); `fgos run --account X` mà lựa chọn đầu ở họ khác bị từ chối theo tên, thêm `--provider <họ của X>` để họ đó đứng đầu. Workflow không có quy tắc pin riêng.
+
+- **RUL-WF-40 (dọn case đã xong: dry run mặc định).** `fgos workflow prune [--older-than <N>d] [--apply]` (mặc định 14 ngày; tuổi sai bị từ chối `invalid-older-than`) và một lần dọn best-effort ở tuổi mặc định sau khi một case đóng hoặc hoàn tất, sau khi nhả hold của nó. Chỉ xoá case đã `case.closed` (hoặc ledger không có event case mà run đã `completed`) quá N ngày, cùng các Unit run mà ledger của nó nêu, theo thứ tự Unit run trước, ledger sau, dưới hold của case. **Giữ** case mở hoặc `failed`, case mà một case mở hoặc một binding gọi tên, và Unit run chưa settle, đang bị controller hay custody giữ, được case khác nêu tên, là link, hoặc ghi dưới case khác (`unit.json` phải gọi tên đúng case); không theo link nào; id lấy từ ledger đi qua `assignmentDir`. Unit run của `fgos run` đứng riêng (không case) không bao giờ bị dọn: chỉ được đo.
+
+- **RUL-WF-41 (đổi pattern trong case là route unlisted; vòng phụ thuộc bị từ chối lúc nạp).** Admission của case quyết định việc đổi pattern: nó được admit như route `unlisted` (cần lý do, tính vào số lần lệch, bị từ chối tại điểm `listedRoutesOnly`); catalog pattern không tự từ chối việc đổi. Định nghĩa workflow có step chờ nhau theo vòng (`dependsOn`) bị từ chối lúc nạp và nêu tên các step.
+
 ## 7. Luồng (Behaviors)
 
 ### 7.1 Mở case
@@ -410,25 +426,23 @@ Trước `workflow start`, conductor (ví dụ `fgos-cook`) chạy `fgos workflo
 
 **Không đổi tại hai cửa:** vẫn là hai cửa thi hành duy nhất; `bind()` là bên duy nhất chọn ai/model/persona; (hợp đồng đích: [spec.md](../seat-binding/spec.md) thành authority chọn ghế agent và workflow khai `seats:` tường minh cùng `tier` khuyến nghị; code đổi cùng plan của nó, D-ADR0072 (Seat Binding: one authority for agent seat choice)); `writes` + commit do harness; approve door là authority merge; policy confinement phía đọc không đổi; flag không bị spec khoá.
 
-## 9. Kích thước rework — thông tin, không phải plan
+## 9. Component, hợp đồng và ngân sách Node (đã đo 2026-11-08, sau T6)
 
-| Phần | Xử lý |
-|---|---|
-| schema guide (`definition.mjs` 499, `steps.mjs` 86, `loader.mjs` 141) | mở rộng vừa: milestone, activity, dòng MUST gọi primitive, decision point, khung, đóng |
-| store + digest (`store.mjs` 325, `ref-digests.mjs` 49) | đổi vừa: event kind mới; fold milestone; digest phủ gate answer; **làm cứng**: fsync, bộ đọc fail closed, đường khôi phục dòng cuối |
-| vòng `advanceWorkflowRun` (~400 dòng) | **viết lại** thành Playbook proposer đề xuất qua admission; tách `src/workflow/runner.mjs` theo vai trong cùng commit |
-| admission + binding (mới, infra) | predicate, cài AdmissionPort, bản ghi binding có generation |
-| khoá, nguồn start, verb (~600 dòng) | giữ, sửa nhỏ: bỏ `--plan`; start ghi khung + binding; answer ghi file gate-answer rồi thử `advance` một lần; status/resume phân biệt conductor và playbook case; close mới. Shape C giữ nguyên cách giữ `advance` của playbook |
-| `plan-source.mjs` 134 | **xoá** (L10) cùng test và đoạn dạy trong skill |
-| `src/runner/execution/run.mjs` 1191 | khai AdmissionPort; nhận port qua options; từ chối Unit ghi file khi thiếu port; admission sau giải pattern, trước `bind()`; trần seat launch như bound |
-| confinement/adapters | env case do cửa đặt, biến kế thừa bị lọc; cấu hình tiêm cho executor không truyền env; port còn có mặt ở cổng ghi. Không đổi Rust |
-| các caller `runUnit` của đường Work (Work driver loop, chọn operation, fanout, `fgos plan --validate`) | thêm một việc: tiêm port thật ngay khi land; hành vi không đổi khi không case nào ràng worktree claim |
-| `bind`, patterns, commit, merge | không đổi |
-| 7 YAML playbook (444 dòng) | không đổi ngữ nghĩa; thêm phần đầu nêu MUST và khung |
-| `feature.yaml` (168), `content-publish.yaml` (40) | mục 10.2, 10.3 |
-| test | test A4 và test cô lập kernel giữ xanh; test runner/units nhắm lại; test playbook thảo luận pass nguyên; battery mục 11 thành test mới |
+Workflow là **Node thuần, không chuyển Rust** (mục 5.6); Playbook proposer nằm trong cùng mô hình case (mọi unit qua admission). Ngân sách là bản owner duyệt ở quyết định 71 (mục 6a); cột "Đo" là `wc -l` trên `main` sau T6, "Gốc" là trước T6. Số đo nằm trong báo cáo đóng của T6, không chép ở đây.
 
-**Tổng:** vừa và tập trung. Không có cutover Event Store, không đổi registry khoá, không đổi Rust. Phần duy nhất **không đo được** là cutover coding (R2).
+| Component | Quyết định (một authority) | Hợp đồng và port | File (`src/workflow`) | Gốc | Ngân sách | Đo |
+|---|---|---|---|---|---|---|
+| Guide | điều một guide hay định nghĩa Playbook được nói; catalog guard đóng; id và alias step; digest ref ghim | schema `guide-schema.mjs` là nơi duy nhất định nghĩa thứ tự rigor, chế độ cổng và loại guide; loader dùng một bước đi tầng | `guide-schema`, `definition`, `steps`, `loader`, `checked`, `ref-digests` | 1 345 | ≤ 1 290 | 1 216 |
+| Case ledger | ledger append-only (fsync, fail closed), fold thuần ra milestone/route/khung, file runtime, hold `advance`, đếm khung, đóng, dọn | một bộ đọc `readCaseProjection` (`retryTail` chỉ cho đuôi dở), một cửa đường dẫn run `case-run-paths` (`invalid-case-id`), ghi bền qua `replaceDurably`/`installOnce` | `store`, `case-projection`, `case-runtime`, `case-lock`, `case-frame`, `case-close` | 1 251 | ≤ 1 200; dọn ≤ 150 | 1 606 (dọn khoảng 246) |
+| Admission | lượt này có hợp lệ không; bảng MUST/SHOULD/route; reservation và settle; một binding mỗi worktree; receipt cổng | cài AdmissionPort do Execution Core sở hữu; `admitProposal` sáu guard | `case-admission`, `case-admission-port`, `case-bindings`, `case-gate` | 965 | ≤ 930 | 1 049 |
+| Conductor entry | biến mảnh thành một đề xuất cho owner; mở case dưới khung đã duyệt; nhận mốc case đã đóng; năm verb case | `fgos workflow propose|start|answer|resume|close|prune|gate|status`, một verb cho mỗi lệnh nhận `{ detached }` | `propose*`, `case-start`, `case-inherit`, `case-verbs` | 2 171 | ≤ 2 040 | 2 136 |
+| Playbook runner | thứ tự step của preset và `--units`, gate đậu, hand-off Unit, danh sách ghế | một vòng ngắn trên các bước có tên; một bộ so glob (`write-scope.mjs`); đường chạy qua cửa `fgos run` | `runner`, `unit-handoff`, `units-source`, `seats`, `seat-providers`, `dir-guard`, `index` | 1 556 | ≤ 1 300 | 1 309 |
+| Doors | phân tích đối số và advance tách tiến trình | nhánh `workflow` của `bin/fgos.mjs` (116 dòng) và `src/cli/command-registry.mjs` | — | ≈ 145 | ≤ 120 (+ `prune`) | 116 |
+| Doctor side | máy hay project cần gì để Workflow chạy | một hàng con trỏ mỗi component; hàng `workflow-case-bindings` do Workflow đọc | `src/setup/workflow-case-checks.mjs`, `workflow-definition-files.mjs` | 238 | ≤ 180 | 150 |
+
+Không function nào trong `src/workflow` dài quá 300 dòng. Phần còn của Work step-machine (`phase`, `skill`, `operations`, `transitions`, `aliases`, `statusSkills`) nằm cuối `definition.mjs` thành các normalizer có tên cho `wf-coding-cutover` và không tính vào ngân sách.
+
+**Chưa đạt ngân sách:** ba component vượt (Case ledger, Admission, Conductor entry) và Playbook runner vượt 9 dòng; lý do và việc còn lại nằm ở báo cáo đóng T6, không nằm ở spec này.
 
 ## 10. Ví dụ minh hoạ trước → sau
 
@@ -536,6 +550,8 @@ frameDefaults: { mutatingDispatches: <đặt lúc duyệt từ plan>, seatLaunch
 closure: [approved]
 ```
 
+Hai dòng cuối của `must` là: `consent-before-merge` (consent gắn digest của cây tích hợp, kiểm lại khi hiệu ứng xảy ra) và `merge-at-approve-door` (merge xảy ra ở approve door, RUL-WF-36). Approve door là bên thi hành cả hai lúc merge; không step Playbook nào merge.
+
 **Một run sau thay đổi (`fgos-cook` trên một ak plan, conductor case):** skill đọc toàn bộ plan, mở case trên `coding/feature` với khung cỡ theo plan; đề xuất `implement-item` cho con API và con docs cùng lúc (gọi tên case) — admission giữ `writes` rời nhau, ràng hai worktree, hai dispatch ghi file; cả hai chạy đồng thời; receipt con docs đưa `child-verified` lên achieved *chỉ cho đường dẫn docs*, nên commit docs không làm receipt con API thành `stale`; `review-item` trả `findings` — case ghi lại, không gì thất bại; `fix-verify-red` được admit; `integrate` tạo subject mới cần receipt riêng; `approved` là consent gắn cây đó; merge là approve door. Phase đánh số 3 chỉ phụ thuộc phase 1 chạy cạnh phase 2. Conductor thử `fgos run --writes` cho con thứ ba nhắm worktree đã ràng mà không gọi tên case → bị từ chối.
 
 **Không đổi:** taskSpec, skill, bảng status Work, approve door, tail; registry biên dịch và `domainSteps()` (discovery, exploring, planning, executing) tới cutover; kiểm operation hợp lệ của Assignment.
@@ -598,7 +614,7 @@ Test A4 xanh, không import `workflow/` từ execution/dispatch; Unit ghi file t
 | R1 | Giao thức ngữ cảnh authority đã đặc tả, chưa chứng minh: port có mặt ở cả hai cửa và cổng ghi; kiểm hội; từ chối worktree đã ràng không danh tính; lọc biến kế thừa; binding có generation sống qua crash ở mọi ranh giới; close khi attempt sống; từ chối ghi lồng từ worker bị giam; tiêm id case cho executor không truyền env; hai cách viết đường dẫn ra một binding | plan (nghĩa vụ chứng minh) |
 | R2 | Cutover coding từ Work step FSM sang ledger: hai authority trong giai đoạn chuyển nếu không xoá đường cũ cùng đợt; kích thước chưa đo được | plan sau duyệt |
 | R3 | Guide marketing và video bắt đầu với mục unenforced dài | steward domain |
-| R4 | Ledger hôm nay không fsync và bộ đọc bỏ qua dòng hỏng (có thể `seq` trùng); sửa tại chỗ trong plan | plan |
+| R4 | Ledger (lúc thiết kế) không fsync và bộ đọc bỏ qua dòng hỏng (có thể `seq` trùng); sửa tại chỗ trong plan | plan |
 | R5 | Fold projection phải tất định khi replay | plan |
 | R6 | N13–N17 và R1 đã có ba panelist, một synthesizer, một critique; ghế reviewer của critique chết vì lỗi provider; gói tập trung có một reviewer pass và hai lượt red-team | — |
 | R7 | Hạn mức khung chỉ ở đơn vị cưỡng chế được; tiền chưa bị máy giới hạn | — |
@@ -688,6 +704,22 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 
 ## 17. Lịch sử quyết định
 
+### Làm cứng T6 (owner 2026-11-08, quyết định 71 của kế hoạch HARDEN; mở rộng bởi quyết định 72) — Workflow giữ hình Node, một bộ đọc, một cửa đường dẫn, các luật câu trả lời, cổng, resume, pin và dọn đã chốt
+
+- **Trạng thái:** **Settled (owner 2026-11-08 09:34, «1a 2a 3a 4a 5b 6a 7a»; 11:37, «ok a» cho quyết định 72).** Record điều hành nằm ở kế hoạch HARDEN (`plans/261021-1118-harden-low-layers-bottom-up/plan.md`, mục 70–72); mục này là bản tóm tắt cho khu vực Workflow. Quyết định 70 giao tầng T6 (Workflow) cho vòng HARDEN.
+- **Bối cảnh:** hội đồng bốn ghế đọc code của tầng (7 288 dòng Node, hai function trên 300 dòng, một đường merge thứ hai, `propose` 4,6 s, reservation của controller chết chặn case, `resume` không chạy lại được lỗi hạ tầng, một ledger đầy bằng chứng thô, không có cơ chế dọn) và chốt hình đích; owner duyệt hình đó và sáu câu hỏi.
+- **Quyết định:**
+  1. **(1a)** `fgos workflow gate` chỉ chạy `verify` khai cho capability; `--verify` và khoá `gate` của danh sách mảnh bị bỏ (RUL-WF-35).
+  2. **(2a)** Bước `integrate` của Playbook bị xoá; merge chỉ ở approve door (RUL-WF-36, mục "Playbook không còn bước `integrate`" dưới đây).
+  3. **(3a)** Pin account không bao giờ chuyển ghế sang pool khác; ghế không phục vụ được chạy không pin và `status` hiện account của từng ghế (RUL-WF-39). **Quyết định 72:** cùng luật cho `fgos run --account`; `--provider` chọn họ chạy, `--account` chọn login trả tiền.
+  4. **(4a)** `resume` mở lại step hỏng vì hạ tầng như một Unit mới qua admission; phán quyết là cuối và bị từ chối theo tên; không thêm retry tự động (RUL-WF-38). Doctrine `core/skills/_shared/coordination-driver.md` Step 6 nói đúng luật này.
+  5. **(5b)** `fgos workflow prune --older-than <N>d` (dry run mặc định, `--apply` xoá) và dọn khi case đóng, theo các luật an toàn của RUL-WF-40.
+  6. **(6a)** Hình đích mục 9 được duyệt nguyên văn, không thêm gì khác; **(7a)** máy fg-server2 tự land từng phần khi cổng land xanh; máy owner và fg-server nhận một hướng dẫn tiếng Việt.
+- **Sự thật đã chốt kèm theo:** một bộ đọc case (`readCaseProjection`), một cửa đường dẫn run (`case-run-paths`, ở `src/runner/execution/` vì test A4 cấm Execution Core import `workflow/`), một đường ghi bền, một bộ so glob (bộ cũ của proposal coi `?` là ký tự đại diện), một nơi kiểm hình dạng mảnh; bộ gom inbox kiểm cùng luật với verb `answer`; reservation không còn là file; `unit.account-unpinned` và bằng chứng thô trong `unit.complete` bị bỏ; đổi pattern trong case do admission quyết (RUL-WF-41).
+- **Giới hạn nói thẳng (không đóng ở đây):** tiến trình không bị giam của chính user OS của owner vẫn có thể trả lời ở độ sâu 0 hoặc ghi thư mục case (RUL-WF-34). Kênh đóng được là hook phía host của kế hoạch cổng hai tầng (owner 55/56).
+- **Cái giá:** Node không giảm như dự tính (xem báo cáo đóng T6) và vài ngân sách mục 9 chưa đạt; không có cái nào đổi hành vi đã chốt.
+- **Đảo lại nếu:** cutover coding (`wf-coding-cutover`) hoặc một channel xác thực owner đổi nơi các luật câu trả lời được thi hành.
+
 ### D-ADR0074 (catalog pattern trong config; mức hợp tác chủ yếu qua params) — một catalog duy nhất cho run, unit workflow và doctor
 
 - **Trạng thái:** **Settled (owner 2026-10-23 và 2026-10-24).** Record chính thức ở "Lịch sử quyết định" của [runner decisions](../runner/decisions/h-36d872fbb0e5.md); mục này là bản tóm tắt cho khu vực Workflow.
@@ -756,5 +788,5 @@ Playbook không có cửa merge thứ hai vào trunk: loại step `kind: integra
 - Holder-lock: [../holder-lock/spec.md](../holder-lock/spec.md); Event Store: [../event-store/spec.md](../event-store/spec.md); Run Supervisor: [../run-supervisor/spec.md](../run-supervisor/spec.md); Session Identity: [../identity/spec.md](../identity/spec.md).
 - Cửa vào của conductor (mục 7.8, RUL-WF-30 đến RUL-WF-33): `src/workflow/propose.mjs`, `case-start.mjs`, `case-inherit.mjs`, `case-gate.mjs`, bảng loại mảnh `domains/coding/slice-kinds.yaml`, hợp đồng guide `domains/coding/workflows/feature.yaml`; phía skill: [`fgos-cook`](../../../core/skills/fgos-cook/SKILL.md).
 - Test phải giữ xanh: `test/architecture.test.mjs` (khối cấm import `workflow/` từ execution/dispatch), `test/state/domain-registry-compiled.test.mjs` (cô lập kernel).
-- Code hiện tại (tham khảo, không khoá): `src/workflow/` (`definition.mjs`, `steps.mjs`, `loader.mjs`, `store.mjs`, `ref-digests.mjs`, `runner.mjs`, `integrate.mjs`, `units-source.mjs`, `plan-source.mjs`), `src/runner/execution/` (`run.mjs`, `unit.mjs`, `bind.mjs`, `patterns/`), `src/runner/dispatch/` (`adapters.mjs`, `cwd-lock.mjs`, `assignment-runner.mjs`, `confinement/`), `core/workflows/*.yaml`, `domains/coding/workflows/feature.yaml`, `domains/marketing/workflows/content-publish.yaml`, `core/skills/_shared/coordination-driver.md`.
+- Code hiện tại (tham khảo, không khoá): `src/workflow/` (Guide: `guide-schema.mjs`, `definition.mjs`, `steps.mjs`, `loader.mjs`, `checked.mjs`, `ref-digests.mjs`; Case ledger: `store.mjs`, `case-projection.mjs`, `case-runtime.mjs`, `case-lock.mjs`, `case-frame.mjs`, `case-close.mjs`; Admission: `case-admission.mjs`, `case-admission-port.mjs`, `case-bindings.mjs`, `case-gate.mjs`; Playbook runner: `runner.mjs`, `unit-handoff.mjs`, `units-source.mjs`, `seats.mjs`), `src/runner/execution/` (`run.mjs`, `unit.mjs`, `bind.mjs`, `patterns/`, `case-run-paths.mjs`), `src/runner/dispatch/` (`adapters.mjs`, `cwd-lock.mjs`, `assignment-runner.mjs`, `confinement/`), `core/workflows/*.yaml`, `domains/coding/workflows/feature.yaml`, `domains/marketing/workflows/content-publish.yaml`, `core/skills/_shared/coordination-driver.md`.
 - Báo cáo: `plans/reports/brief-261018-2235-agent-workflow-model-owner-direction.md`, `plans/reports/research-261018-2239-workflow-design-intent-and-current-state.md`, `plans/reports/review-261019-0930-agent-workflow-model-ba-spec.md`, `.fgos/assignments/unit-run-1792368757620-6e4020ea/` (settled), `.fgos/assignments/unit-run-1792374387809-85a2ae93/` (reopen), `.fgos/assignments/unit-run-1792383001628-8dbde4b4/` (vòng tập trung).
