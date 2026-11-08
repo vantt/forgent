@@ -1283,18 +1283,21 @@ fn checkout_attempts_exclude_remove_and_move() {
             .unwrap();
             drop(f.lease.take());
             let result = if remove {
-                f.driver.remove_worktree(
-                    &f.repo,
-                    vec![],
-                    &f.tree,
-                    &WorktreeDelivery {
-                        expected_tip: tip.clone(),
-                        delivered_to: tip.clone(),
-                        evidence_digest: "a".repeat(64),
-                    },
-                    "fixture",
-                    "lifecycle",
-                )
+                f.driver
+                    .remove_worktree(
+                        &f.repo,
+                        vec![],
+                        &f.tree,
+                        &WorktreeDelivery {
+                            expected_tip: tip.clone(),
+                            delivered_to: tip.clone(),
+                            evidence_digest: "a".repeat(64),
+                        },
+                        "fixture",
+                        "lifecycle",
+                        IgnoredBytes::Preserve,
+                    )
+                    .map(|_| ())
             } else {
                 f.driver
                     .relocate_worktree(

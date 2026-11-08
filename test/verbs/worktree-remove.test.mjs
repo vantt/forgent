@@ -110,7 +110,7 @@ test('worktree remove takes back exactly what create provisioned and removes the
   } finally { cleanup(); }
 });
 
-test('worktree remove refuses when a worker edited a provisioned copy or left its own ignored bytes, and puts every provisioned byte back', skip, () => {
+test('worktree remove refuses when a worker edited a provisioned copy or left its own ignored bytes, puts every provisioned byte back, and discards them only when asked', skip, () => {
   const { ctx, f, worker, siblings, cleanup } = provisioningSetup();
   try {
     const edited = worker('edited');
@@ -129,6 +129,11 @@ test('worktree remove refuses when a worker edited a provisioned copy or left it
     // Once the worker's own bytes are gone the same record still removes it.
     fs.rmSync(path.join(foreign, 'skills', 'ak-one', 'refs', 'run.log'));
     assert.equal(removeWorktreeUseCase(ctx, { path: foreign, deliveredTo: 'trunk' }, f.loader).removed, true);
+    // Opting in discards the edited copy, which provisioning no longer owns, and reports it.
+    const discarded = removeWorktreeUseCase(ctx, { path: edited, deliveredTo: 'trunk', discardIgnored: true }, f.loader);
+    assert.deepEqual(discarded.discardedIgnored, { files: 1, bytes: 'worker edit'.length });
+    assert.equal(fs.existsSync(edited), false);
+    assert.deepEqual(siblings(), []);
   } finally { cleanup(); }
 });
 
@@ -137,7 +142,7 @@ test('worktree remove is registered with a required --delivered-to', () => {
   assert.deepEqual(sub.parameters.required, ['path', 'delivered-to']);
 });
 
-test('CLI adapter removes a provisioned, delivered worktree and reports a missing --delivered-to as a usage error', skip, async () => {
+test('CLI adapter removes a provisioned, delivered worktree, discards the worker\'s ignored bytes on --discard-ignored, and reports a missing --delivered-to as a usage error', skip, async () => {
   const { ensureHostBin, REPO_ROOT } = await import('../../scripts/lib/git-addon-stage.mjs');
   const f = fixture('files', true);
   try {
@@ -168,10 +173,12 @@ test('CLI adapter removes a provisioned, delivered worktree and reports a missin
     assert.notEqual(missing.status, 0);
     assert.match(missing.stdout + missing.stderr, /requires --delivered-to/);
     assert.equal(fs.existsSync(wt), true);
-    const removed = cli('remove', wt, '--delivered-to', 'trunk');
+    fs.writeFileSync(path.join(wt, 'skills', 'ak-one', 'run.log'), 'worker');
+    const removed = cli('remove', wt, '--delivered-to', 'trunk', '--discard-ignored');
     assert.equal(removed.status, 0, removed.stderr);
     const output = JSON.parse(removed.stdout);
     assert.equal(output.contract, 'fgos.v1'); assert.equal(output.data.removed, true);
+    assert.deepEqual(output.data.discardedIgnored, { files: 1, bytes: 'worker'.length });
     assert.equal(fs.existsSync(wt), false);
   } finally { f.cleanup(); }
 });

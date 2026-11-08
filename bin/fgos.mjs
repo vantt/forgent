@@ -3818,7 +3818,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'worktree': {
-      const sub = requireField(positional[0], 'worktree requires a sub-verb: create <path> | remove <path> --delivered-to <ref>');
+      const sub = requireField(positional[0], 'worktree requires a sub-verb: create <path> | remove <path> --delivered-to <ref> [--discard-ignored]');
       if (sub === 'create') {
         if (positional.length !== 2) throw new Error('usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
         const cwd = process.cwd();
@@ -3832,7 +3832,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         });
       }
       if (sub === 'remove') {
-        if (positional.length !== 2) throw new Error('usage: fgos worktree remove <path> --delivered-to <ref> [--json]');
+        if (positional.length !== 2) throw new Error('usage: fgos worktree remove <path> --delivered-to <ref> [--discard-ignored] [--json]');
         const cwd = process.cwd();
         const repoRoot = resolveMainCheckoutRoot(cwd) ?? cwd;
         const stateRoot = worktreeStateRoot({ fgosDir: path.join(repoRoot, '.fgos') }).stateRoot;
@@ -3840,6 +3840,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const { removeWorktreeUseCase } = await import('../src/verbs/worktree/remove.mjs');
         return removeWorktreeUseCase({ cwd, repoRoot, stateRoot, writer }, {
           path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),
+          discardIgnored: flags['discard-ignored'],
         });
       }
       throw new Error(`unknown worktree sub-verb: ${sub}`);

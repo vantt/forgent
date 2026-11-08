@@ -31,10 +31,13 @@ function worktreeTip(inspect, target) {
 // sha256 of the delivery statement this verb makes, so the Git operation record
 // binds the exact path, tip and delivery target the caller asserted.
 // What `worktree create` provisioned is set aside first, so the port judges
-// only the checkout's own bytes; a refusal puts it back.
+// only the checkout's own bytes; a refusal puts it back. With discardIgnored
+// the port deletes the remaining ignored bytes after every other check passed
+// and reports what it deleted.
 export function removeWorktreeUseCase(ctx, options, loaderOptions) {
   if (!options.path || typeof options.path !== 'string') throw new Error('worktree remove requires a path');
   if (!options.deliveredTo || typeof options.deliveredTo !== 'string') throw new Error('worktree remove requires --delivered-to <ref>');
+  if (options.discardIgnored !== undefined && typeof options.discardIgnored !== 'boolean') throw new Error('worktree remove --discard-ignored takes no value');
   const target = fs.realpathSync(path.resolve(ctx.cwd, options.path));
   const base = { stateRoot: ctx.stateRoot, repoPath: ctx.cwd, trustedMain: ctx.repoRoot };
   const inspect = createGitInspect(base, loaderOptions);
@@ -44,6 +47,8 @@ export function removeWorktreeUseCase(ctx, options, loaderOptions) {
     .update(JSON.stringify({ path: target, expectedTip, deliveredTo: delivered }))
     .digest('hex');
   const port = createGitWorktree({ ...base, writer: ctx.writer }, loaderOptions);
-  removeProvisioned(ctx.stateRoot, target, () => port.remove({ path: target, expectedTip, deliveredTo: delivered.oid, evidenceDigest, operationId: `worktree-${randomUUID()}` }));
-  return { removed: true, path: target, expectedTip, deliveredTo: delivered.oid, deliveredToRef: delivered.ref, evidenceDigest };
+  const removal = removeProvisioned(ctx.stateRoot, target, () => port.remove({
+    path: target, expectedTip, deliveredTo: delivered.oid, evidenceDigest, operationId: `worktree-${randomUUID()}`, discardIgnored: options.discardIgnored === true,
+  }));
+  return { removed: true, path: target, expectedTip, deliveredTo: delivered.oid, deliveredToRef: delivered.ref, evidenceDigest, discardedIgnored: removal.discardedIgnored };
 }

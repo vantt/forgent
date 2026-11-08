@@ -199,6 +199,7 @@ fn recovery_matrix_child() {
                     },
                     WRITER,
                     ID,
+                    IgnoredBytes::Preserve,
                 )
                 .unwrap();
         }

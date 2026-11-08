@@ -1563,6 +1563,7 @@ impl GitDriver {
             writer,
             &removal_id,
             if discarded { Some(id) } else { None },
+            IgnoredBytes::Preserve,
         ) {
             return Ok(vec![format!("land-cleanup-deferred: {}", e.cause)]);
         }

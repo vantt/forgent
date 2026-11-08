@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos worktree remove <path> --delivered-to <ref> --discard-ignored` deletes the git-ignored bytes of a delivered linked worktree (build output, copied skills, runtime files) and then removes it, reporting `discardedIgnored {files, bytes}`. Every other check still runs first: the main checkout, a path that is not a registered linked worktree of this repository, and a checkout with tracked or untracked changes are refused, and a symlink is removed as itself, never followed out of the worktree. Use it instead of `git clean -x`, `xargs rm` or `git worktree remove --force`; without the flag ignored bytes are still preserved.
 - `fgos workflow prune` removes a case's Unit runs only when the whole case goes: a case with one Unit run that must stay (unsettled, controlled, in custody, linked, unsafe path or record missing) now keeps every Unit run and its ledger, and the runs that would have gone are listed as `case-kept`, so a kept ledger no longer names a removed run; space of a half-finished case is freed once the case is finished and pruned whole.
 - A Unit run that finished is no longer recorded in the case as never started when another process held the case at the moment it settled: the real outcome, receipts and milestones are kept and the dispatch counts again.
 - The help text of `fgos workflow` no longer says the Workflow does "pure git integration": a Playbook has no merge step and merging happens at the approve door.

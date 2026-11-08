@@ -711,3 +711,147 @@ fn missing_owned_detached_history_keeps_its_registration_when_no_delivery_ref_ex
         "keep unique history"
     );
 }
+
+impl Fixture {
+    /// Ignore `ignored-dir/` and `*.log` in every checkout of the fixture repo.
+    fn ignore_fixture_patterns(&self) {
+        fs::write(
+            self.repo.common_dir().join("info/exclude"),
+            "ignored-dir/\n*.log\n",
+        )
+        .unwrap();
+    }
+    fn remove(&self, path: &Path, id: &str, ignored: IgnoredBytes) -> Result<DiscardedIgnored> {
+        self.driver.remove_worktree(
+            &self.repo,
+            vec![],
+            path,
+            &WorktreeDelivery {
+                expected_tip: self.tip.clone(),
+                delivered_to: self.tip.clone(),
+                evidence_digest: "a".repeat(64),
+            },
+            "fixture",
+            id,
+            ignored,
+        )
+    }
+}
+
+#[test]
+fn discarding_ignored_bytes_removes_only_them_then_the_worktree_and_reports_count_and_bytes() {
+    let f = Fixture::new();
+    f.ignore_fixture_patterns();
+    let path = f.root.join("worker");
+    f.create(&path);
+    fs::create_dir_all(path.join("ignored-dir/sub")).unwrap();
+    fs::write(path.join("ignored-dir/a"), "12345").unwrap();
+    fs::write(path.join("ignored-dir/sub/b"), "123").unwrap();
+    fs::write(path.join("x.log"), "1234").unwrap();
+    // An untracked directory holding only ignored bytes is listed with them.
+    fs::create_dir(path.join("nested")).unwrap();
+    fs::write(path.join("nested/deep.log"), "1234").unwrap();
+    // Without the opt-in the port still preserves ignored bytes.
+    assert_eq!(
+        f.remove(&path, "keep", IgnoredBytes::Preserve)
+            .unwrap_err()
+            .cause,
+        "worktree-ignored-bytes-preserved"
+    );
+    assert_eq!(fs::read(path.join("x.log")).unwrap(), b"1234");
+    let discarded = f.remove(&path, "discard", IgnoredBytes::Discard).unwrap();
+    assert_eq!(
+        discarded,
+        DiscardedIgnored {
+            files: 4,
+            bytes: 16
+        }
+    );
+    assert!(!path.exists());
+    assert!(!f.repo.common_dir().join("worktrees/worker").exists());
+}
+
+#[test]
+fn discarding_refuses_the_main_checkout_and_any_unregistered_path_and_keeps_their_bytes() {
+    let f = Fixture::new();
+    f.ignore_fixture_patterns();
+    fs::write(f.path.join("x.log"), "main").unwrap();
+    assert_eq!(
+        f.remove(&f.path, "main", IgnoredBytes::Discard)
+            .unwrap_err()
+            .cause,
+        "worktree-identity-refused"
+    );
+    assert_eq!(fs::read(f.path.join("x.log")).unwrap(), b"main");
+    // A directory inside the main checkout, a plain directory outside any
+    // repository and a separate repository are not registered linked worktrees.
+    let inside = f.path.join("ignored-dir");
+    let plain = f.root.join("plain");
+    let foreign = f.root.join("foreign");
+    git(&f.root, &["init", "-q", "foreign"]);
+    for (dir, cause) in [
+        (&inside, "worktree-identity-refused"),
+        (&plain, "untrusted-worktree"),
+        (&foreign, "untrusted-worktree"),
+    ] {
+        fs::create_dir_all(dir).unwrap();
+        fs::write(dir.join("x.log"), "keep").unwrap();
+        assert_eq!(
+            f.remove(dir, "unregistered", IgnoredBytes::Discard)
+                .unwrap_err()
+                .cause,
+            cause,
+            "{}",
+            dir.display()
+        );
+        assert_eq!(fs::read(dir.join("x.log")).unwrap(), b"keep");
+    }
+}
+
+#[test]
+fn discarding_refuses_a_worktree_with_tracked_or_untracked_changes_and_keeps_its_ignored_bytes() {
+    for change in ["tracked", "untracked"] {
+        let f = Fixture::new();
+        f.ignore_fixture_patterns();
+        let path = f.root.join("worker");
+        f.create(&path);
+        fs::write(path.join("x.log"), "keep").unwrap();
+        match change {
+            "tracked" => fs::write(path.join("binary"), "edited").unwrap(),
+            _ => fs::write(path.join("notes"), "user bytes").unwrap(),
+        }
+        assert_eq!(
+            f.remove(&path, "dirty", IgnoredBytes::Discard)
+                .unwrap_err()
+                .cause,
+            "worktree-dirty-preserved",
+            "{change}"
+        );
+        assert_eq!(fs::read(path.join("x.log")).unwrap(), b"keep");
+    }
+}
+
+#[test]
+fn discarding_removes_an_ignored_symlink_itself_and_never_what_it_points_at() {
+    let f = Fixture::new();
+    f.ignore_fixture_patterns();
+    let outside = f.root.join("outside");
+    fs::create_dir(&outside).unwrap();
+    fs::write(outside.join("keep"), "outside bytes").unwrap();
+    let path = f.root.join("worker");
+    f.create(&path);
+    fs::create_dir(path.join("ignored-dir")).unwrap();
+    symlink(&outside, path.join("ignored-dir/escape")).unwrap();
+    symlink(outside.join("keep"), path.join("escape.log")).unwrap();
+    let discarded = f.remove(&path, "symlinks", IgnoredBytes::Discard).unwrap();
+    let link_bytes = (outside.as_os_str().len() + outside.join("keep").as_os_str().len()) as u64;
+    assert_eq!(
+        discarded,
+        DiscardedIgnored {
+            files: 2,
+            bytes: link_bytes
+        }
+    );
+    assert!(!path.exists());
+    assert_eq!(fs::read(outside.join("keep")).unwrap(), b"outside bytes");
+}

@@ -311,6 +311,7 @@ fn land_candidate_excludes_worktree_lifecycle_changes() {
             },
             "fixture",
             "remove-candidate",
+            IgnoredBytes::Preserve,
         )
         .unwrap_err();
     assert_eq!(error.cause, "resource-recovery-required");

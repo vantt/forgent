@@ -91,7 +91,7 @@ run completed
 
 1. **No Run Git Authority:** A Unit run possesses zero git merge authority. Merging into the base/target branch is strictly a driver action performed outside the unit run.
 2. **Completion Before Merge:** The driver must never merge a cell branch into the target branch until the run has succeeded and reflects `status: "completed"` / `outcome: "pass"`.
-3. **Post-Close Cleanup:** After the merge commit is verified on the target branch, the cell worktree and temporary branch may be removed.
+3. **Post-Close Cleanup:** After the merge commit is verified on the target branch, the cell worktree and temporary branch may be removed. If remove refuses only because of git-ignored bytes, rerun it with `--discard-ignored`; never clean the worktree by hand: no Git clean of ignored files, no `rm` over a computed file list, no forced worktree removal.
 
 ---
 

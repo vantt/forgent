@@ -78,7 +78,14 @@ git -C "$main" branch -d "$branch"                  # only after the merge; keep
 ```
 
 `fgos worktree remove` has no force flag: it refuses a dirty checkout, a live
-process in the worktree, preserved worker state, or a tip that `$base` does
-not contain. On a refusal, read the reported reason first — an uncommitted
-worker file is evidence, not noise — record it, resolve the cause (land the
-missing commit, stop the process), and run the same remove again.
+process in the worktree, preserved worker state, git-ignored bytes, or a tip
+that `$base` does not contain. On a refusal, read the reported reason first —
+an uncommitted worker file is evidence, not noise — record it, resolve the
+cause (land the missing commit, stop the process), and run the same remove
+again. When the only refusal is `worktree-ignored-bytes-preserved` (build
+output, copied skills, runtime files), add `--discard-ignored`: the verb
+deletes those ignored bytes inside the verified linked worktree, never
+following a symlink out of it, reports their count and bytes, and still
+refuses the main checkout, an unregistered path and a dirty checkout. Never
+clean a worktree by hand: no Git clean of ignored files, no `rm` over a
+computed file list, no forced worktree removal.

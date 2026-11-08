@@ -81,16 +81,16 @@ function withSubcommands(entry) {
 
 export const COMMAND_REGISTRY = [
   withSubcommands({
-    name: 'worktree', invoke: 'fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] | fgos worktree remove <path> --delivered-to <ref>',
+    name: 'worktree', invoke: 'fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] | fgos worktree remove <path> --delivered-to <ref> [--discard-ignored]',
     description: 'Create a registered worker checkout under worktree-admin, or remove one after proving it clean, idle and delivered.',
     subcommands: { create: {
       description: 'Create a named branch or a detached checkout (the default). Dependency provisioning is a separate consumer step.',
       parameters: { type: 'object', properties: { path: { type: 'string' }, branch: { type: 'string' }, detach: { type: 'boolean' }, base: { type: 'string' } }, positional: ['path'], required: ['path'] },
       examples: ['fgos worktree create ../worker --branch task/example', 'fgos worktree create ../scratch --detach'],
     }, remove: {
-      description: 'Remove a worktree. Refuses a dirty checkout, one a process stands in, worker state to preserve, or a tip not contained in --delivered-to; there is no force flag. --delivered-to takes the same names as --base: a branch, tag or remote-tracking name, a full ref, or an object id.',
-      parameters: { type: 'object', properties: { path: { type: 'string' }, 'delivered-to': { type: 'string' } }, positional: ['path'], required: ['path', 'delivered-to'] },
-      examples: ['fgos worktree remove ../worker --delivered-to main'],
+      description: 'Remove a worktree. Refuses a dirty checkout, one a process stands in, worker state to preserve, ignored bytes, or a tip not contained in --delivered-to; there is no force flag. --delivered-to takes the same names as --base: a branch, tag or remote-tracking name, a full ref, or an object id. --discard-ignored deletes the checkout\'s git-ignored bytes once every other check passed (never following a symlink out of it) and reports their count and bytes; the main checkout, an unregistered path and a dirty checkout are still refused.',
+      parameters: { type: 'object', properties: { path: { type: 'string' }, 'delivered-to': { type: 'string' }, 'discard-ignored': { type: 'boolean' } }, positional: ['path'], required: ['path', 'delivered-to'] },
+      examples: ['fgos worktree remove ../worker --delivered-to main', 'fgos worktree remove ../worker --delivered-to main --discard-ignored'],
     } },
     examples: ['fgos worktree create ../worker --branch task/example', 'fgos worktree create ../scratch --detach', 'fgos worktree remove ../worker --delivered-to main'],
     touchesState: false, requiresExistingStore: false, externalEffect: true, paginated: false, deprecated: null,

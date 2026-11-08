@@ -12,7 +12,9 @@ mod inspect;
 mod objects;
 mod refs;
 mod worktree;
-pub use worktree::{WorktreeCreate, WorktreeDelivery, WorktreeHandle, WorktreeIssue};
+pub use worktree::{
+    DiscardedIgnored, IgnoredBytes, WorktreeCreate, WorktreeDelivery, WorktreeHandle, WorktreeIssue,
+};
 mod remote;
 mod sequence;
 pub use inspect::*;

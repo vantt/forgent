@@ -98,7 +98,13 @@ impl GitWorktree {
                     delivered_to: oid("deliveredTo")?,
                     evidence_digest: text(&args, "evidenceDigest")?.into(),
                 };
-                self.driver
+                let ignored = match args.get("discardIgnored") {
+                    None | Some(Value::Bool(false)) => IgnoredBytes::Preserve,
+                    Some(Value::Bool(true)) => IgnoredBytes::Discard,
+                    Some(_) => return Err(error("invalid discardIgnored")),
+                };
+                let discarded = self
+                    .driver
                     .remove_worktree(
                         &self.repo,
                         held,
@@ -106,9 +112,10 @@ impl GitWorktree {
                         &proof,
                         &self.writer,
                         id()?,
+                        ignored,
                     )
                     .map_err(operation)?;
-                Ok(json!({"removed":true}))
+                Ok(json!({"removed":true,"discardedIgnored":discarded}))
             }
             "relocate" => Ok(json!(self
                 .driver

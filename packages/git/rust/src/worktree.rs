@@ -99,6 +99,36 @@ pub struct WorktreeDelivery {
     pub delivered_to: Oid,
     pub evidence_digest: String,
 }
+/// What remove does with ignored bytes in the checkout. `Preserve` refuses
+/// while any exist; `Discard` deletes them once every other check has passed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IgnoredBytes {
+    Preserve,
+    Discard,
+}
+/// Ignored bytes a remove discarded: every non-directory entry (a symlink
+/// counts as itself, never its target) and the sum of their lstat sizes.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize)]
+pub struct DiscardedIgnored {
+    pub files: u64,
+    pub bytes: u64,
+}
+impl DiscardedIgnored {
+    /// Count `p` and, for a real directory, everything below it, never
+    /// following a symlink.
+    fn count(&mut self, p: &Path) -> Result<()> {
+        let metadata = fs::symlink_metadata(p).map_err(failure)?;
+        if metadata.is_dir() {
+            for entry in fs::read_dir(p).map_err(failure)? {
+                self.count(&entry.map_err(failure)?.path())?;
+            }
+        } else {
+            self.files += 1;
+            self.bytes += metadata.len();
+        }
+        Ok(())
+    }
+}
 fn text(p: &Path) -> Result<&str> {
     p.to_str().ok_or_else(|| failure("worktree-path-not-utf8"))
 }
@@ -294,6 +324,32 @@ impl GitDriver {
         })
     }
     fn worktree_clean(&self, repo: &RepoHandle, path: &Path) -> Result<()> {
+        self.worktree_clean_with(repo, path, IgnoredBytes::Preserve)
+    }
+    /// Ignored paths as Git names them: a wholly ignored directory collapsed
+    /// to `dir/`, NUL separated.
+    fn ignored_entries(&self, target: &RepoHandle) -> Result<Vec<u8>> {
+        self.checked(
+            target,
+            &[
+                "ls-files",
+                "--others",
+                "--directory",
+                "--ignored",
+                "--exclude-standard",
+                "-z",
+            ],
+            Policy::Inspect,
+        )
+    }
+    /// `IgnoredBytes::Discard` skips only the ignored-bytes refusal; every
+    /// other preservation rule still refuses.
+    fn worktree_clean_with(
+        &self,
+        repo: &RepoHandle,
+        path: &Path,
+        ignored: IgnoredBytes,
+    ) -> Result<()> {
         let target = match self.resolve_repo(path, repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => r,
             _ => return Err(recovery("worktree-registration-missing")),
@@ -329,21 +385,7 @@ impl GitDriver {
         {
             return Err(failure("worktree-dirty-preserved"));
         }
-        if !self
-            .checked(
-                &target,
-                &[
-                    "ls-files",
-                    "--others",
-                    "--directory",
-                    "--ignored",
-                    "--exclude-standard",
-                    "-z",
-                ],
-                Policy::Inspect,
-            )?
-            .is_empty()
-        {
+        if ignored == IgnoredBytes::Preserve && !self.ignored_entries(&target)?.is_empty() {
             return Err(failure("worktree-ignored-bytes-preserved"));
         }
         if !missing(&target.git_dir().join("locked"))? {
@@ -361,6 +403,72 @@ impl GitDriver {
             return Err(recovery("worktree-state-uncertain"));
         }
         Ok(())
+    }
+    /// Delete the ignored bytes of a verified linked worktree. Every listed
+    /// path must reach `path` only through real directories; a symlink is
+    /// removed as itself and never followed. Nothing is deleted unless every
+    /// listed path was counted first.
+    fn discard_ignored(&self, repo: &RepoHandle, path: &Path) -> Result<DiscardedIgnored> {
+        let target = match self.resolve_repo(path, repo.trusted_main_root())? {
+            ResolveRepo::Repository(r) => r,
+            _ => return Err(recovery("worktree-registration-missing")),
+        };
+        // The caller verified identity already; this guard keeps the delete
+        // itself from ever acting on the main checkout or another repository.
+        if path == repo.trusted_main_root()
+            || target.work_tree.as_deref() != Some(path)
+            || target.common_dir() != repo.common_dir()
+            || target.git_dir() == repo.common_dir()
+        {
+            return Err(failure("worktree-identity-refused"));
+        }
+        let listed = self.ignored_entries(&target)?;
+        let mut rels = listed
+            .split(|b| *b == 0)
+            .filter(|e| !e.is_empty())
+            .map(|entry| byte_path(entry.strip_suffix(b"/").unwrap_or(entry)))
+            .collect::<Result<Vec<_>>>()?;
+        // Git lists an untracked directory holding only ignored bytes and
+        // the ignored paths inside it; a parent sorts before its children.
+        rels.sort();
+        let mut discarded = DiscardedIgnored::default();
+        let mut doomed: Vec<PathBuf> = Vec::new();
+        for rel in rels {
+            if doomed.iter().any(|kept| path.join(&rel).starts_with(kept)) {
+                continue;
+            }
+            let parts: Vec<_> = rel.components().collect();
+            if parts.is_empty()
+                || !parts
+                    .iter()
+                    .all(|c| matches!(c, std::path::Component::Normal(_)))
+            {
+                return Err(failure("worktree-ignored-path-refused"));
+            }
+            let mut ancestor = path.to_path_buf();
+            for part in &parts[..parts.len() - 1] {
+                ancestor.push(part);
+                if !fs::symlink_metadata(&ancestor).map_err(failure)?.is_dir() {
+                    return Err(failure("worktree-ignored-path-refused"));
+                }
+            }
+            let doomed_path = path.join(&rel);
+            discarded.count(&doomed_path)?;
+            doomed.push(doomed_path);
+        }
+        for doomed_path in doomed {
+            // remove_dir_all removes a symlink inside the tree as itself.
+            if fs::symlink_metadata(&doomed_path)
+                .map_err(failure)?
+                .is_dir()
+            {
+                fs::remove_dir_all(&doomed_path)
+            } else {
+                fs::remove_file(&doomed_path)
+            }
+            .map_err(failure)?;
+        }
+        Ok(discarded)
     }
     fn worktree_custody(
         &self,
@@ -820,6 +928,10 @@ impl GitDriver {
         }
         Ok(())
     }
+    /// Remove a delivered linked worktree. With `IgnoredBytes::Discard` its
+    /// ignored bytes are deleted after every other check passed, and the
+    /// result says how many; a replayed id discards nothing again.
+    #[allow(clippy::too_many_arguments)]
     pub fn remove_worktree(
         &self,
         repo: &RepoHandle,
@@ -828,8 +940,9 @@ impl GitDriver {
         proof: &WorktreeDelivery,
         writer: &str,
         id: &str,
-    ) -> Result<()> {
-        self.remove_land_candidate(repo, held, path, proof, writer, id, None)
+        ignored: IgnoredBytes,
+    ) -> Result<DiscardedIgnored> {
+        self.remove_land_candidate(repo, held, path, proof, writer, id, None, ignored)
     }
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn remove_land_candidate(
@@ -841,7 +954,8 @@ impl GitDriver {
         writer: &str,
         id: &str,
         discarded_land: Option<&str>,
-    ) -> Result<()> {
+        ignored: IgnoredBytes,
+    ) -> Result<DiscardedIgnored> {
         let scope = self.worktree_scope(repo, held)?;
         let path = canonical_destination(path)?;
         let wal = Wal::open(repo)?;
@@ -898,7 +1012,8 @@ impl GitDriver {
                 scope.handle("worktree-admin").expect("acquired"),
                 &wal,
                 &chain,
-            );
+            )
+            .map(|()| DiscardedIgnored::default());
         }
         let path = path.canonicalize().map_err(failure)?;
         if path.parent().is_none() {
@@ -908,7 +1023,7 @@ impl GitDriver {
         let mut warned = BTreeSet::new();
         self.worktree_not_live(&path, &mut warned)?;
         self.worktree_custody(repo, &scope, &path)?;
-        self.worktree_clean(repo, &path)?;
+        self.worktree_clean_with(repo, &path, ignored)?;
         let discarded = if let Some(land_id) = discarded_land {
             let land = wal.inspect(land_id)?;
             matches!(&land.intent().kind, OperationKind::Land(p) if p.candidate.worktree == path && p.candidate.candidate == handle.tip.as_str())
@@ -943,6 +1058,16 @@ impl GitDriver {
         {
             return Err(failure("worktree-delivery-unreachable"));
         }
+        // Discard only once every proof passed, then judge the checkout again
+        // in full so nothing ignored that appeared meanwhile is lost silently.
+        let discarded_ignored = match ignored {
+            IgnoredBytes::Discard => {
+                let counted = self.discard_ignored(repo, &path)?;
+                self.worktree_clean(repo, &path)?;
+                counted
+            }
+            IgnoredBytes::Preserve => DiscardedIgnored::default(),
+        };
         let registration = text(
             handle
                 .git_dir
@@ -994,7 +1119,7 @@ impl GitDriver {
             true,
             vec![proof.evidence_digest.clone()],
         )?;
-        Ok(())
+        Ok(discarded_ignored)
     }
     #[allow(clippy::too_many_arguments)]
     pub fn relocate_worktree(
