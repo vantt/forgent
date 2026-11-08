@@ -25,7 +25,7 @@ Từ `9c35308d9` (P03, che mọi home login) tới bản sửa `ba4925e54` (đu�
 | P12 cấu trúc test, gộp dòng doctor | `cfff2aa7f..e3de56c54` | Dòng doctor `executor-posture-coverage` bị gộp vào `seat-binding-dry-bind` (cùng ba kết quả, cùng thông báo). |
 | P09 cắt Dispatch, câu trả lời một chữ | `d3c0d0562..d3ed00d67` | Việc chỉ đọc mà report chỉ có một chữ như `ok`, `yes`, `no` giờ là câu trả lời có bằng chứng (`pass`), không còn `execution-failure` (quyết định 68). Brief chỉ đọc yêu cầu một câu nói rõ đã trả lời hay làm gì. |
 
-**Chưa land:** P04 nửa B (`command`/`args` của executor chỉ ở file global) nằm trên nhánh `origin/harden/t5-p04b`, chờ anh cho phép chuyển config (mục cuối). Các việc nối tiếp về ghế không khởi động (`harden/t5-seat-start`) chưa land.
+**Đã land sau bảng này:** P04 nửa B (`command`/`args` của executor chỉ ở file global), xem mục P04 nửa B bên dưới. Các việc nối tiếp về ghế không khởi động đã land 11-06 (`dfd6233e2..2b593dbff`).
 
 ## Trước khi cập nhật (chỉ đọc, bắt buộc)
 
@@ -111,9 +111,13 @@ Mỗi invocation bị confine phải `ok` (`confined=true`), verdict `healthy`. 
 
 Release cũ đọc được mọi bản ghi release mới viết. Khi quay lại, release cũ lại gợi ý `resume-driver`/`reassign-driver` và lại áp bản login `-agent-` không qua probe (lỗ A8 mở lại cho tới khi cập nhật lại). Revert mã nguồn: revert các commit trong bảng trên main theo thứ tự ngược.
 
-## P04 nửa B: chuyển lệnh executor sang file global (**chưa làm — chờ anh cho phép**)
+## P04 nửa B: chuyển lệnh executor sang file global (đã land, `bbbf52f00..27759bb01`)
 
-Nhánh `origin/harden/t5-p04b` làm `command`, `args`, `permissionMode` của executor và invocation, `backend`/`privateHome`/`isolatedSession` của confinement launch, và `aliases` của capability thành **chỉ ở file global**. Khi nhánh đó land, mọi project còn khai các khoá này bị từ chối ở mọi lần đọc config, trên mọi máy cùng lúc. Theo quyết định 64: chuyển giá trị trước, schema land sau. **Không làm bước nào dưới đây cho tới khi anh cho phép**; em sẽ báo giờ land.
+`command`, `args`, `permissionMode` của executor và invocation, `backend`/`privateHome`/`isolatedSession` của confinement launch, và `aliases` của capability giờ **chỉ ở file global**. Project còn khai các khoá này bị từ chối ở mọi lần đọc config với mã `config-key-out-of-scope`; `prefer` của capability vẫn đặt được ở file project. Chuyển config đã xong trên fg-server2, fg-server và design-lap, và commit xoá các khoá khỏi `.fgos/config.yaml` của repo này đã nằm trong khoảng commit trên. Máy nào muốn có luật này phải kích hoạt release build từ main có khoảng commit trên.
+
+Trên design-lap, hai project `mcp-skill-hub` và `mdview` vẫn khai `command`/`args`/`invocations` của executor trong file project của chúng. Chúng sẽ bị cửa config từ chối ngay khi release có thay đổi này được kích hoạt, cho tới khi file của chúng được sửa. Anh đã chấp nhận điều đó.
+
+Các bước dưới đây giữ lại làm hướng dẫn cho project khác chưa chuyển.
 
 1. **Census, chỉ đọc**, trên từng máy và từng project dùng fgOS (in path, không in giá trị): từ gốc project chạy `npm --prefix <checkout fgOS ở nhánh harden/t5-p04b> run fgos:dev -- config check` và đọc các dòng `severity: fail` có path `runner.*`. Trên repo này nó liệt kê đúng 4 path (sau khi `prefer` của capability vẫn được khai ở project):
    - `runner.executor.command`

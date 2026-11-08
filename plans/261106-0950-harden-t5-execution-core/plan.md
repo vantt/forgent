@@ -1,7 +1,7 @@
 ---
 title: "HARDEN T5 sub-plan: Execution Core, Dispatch & Confinement, Seat Binding, Run Result"
 description: "Step 4 of the HARDEN per-layer loop for T5: the accepted findings still open after batches A-D, owner decisions 61 and 62 (Q1a, Q2b, Q3b, Q5a; additions A3, A4, A5, A7, A8) split into thirteen sub-phases with serialized hot files, net size below zero, self-landing on fg-server2 and a Vietnamese owner-machine guide."
-status: pending
+status: completed
 priority: P1
 effort: ~9d lead time (P01 0.5d; P02 0.5d; wave 2 P03 ∥ P04 ∥ P05 ∥ P07 ≈ 1.5d; wave 3 P08 ∥ P11 ≈ 1.5d; P06 1d; P09 1d; P10 1d; P12 1.5d; P13 1d)
 branch: main (plan only; each phase runs on its own track branch `harden/t5-pNN-<slug>` in its own linked worktree from origin/main)
@@ -84,7 +84,7 @@ Settled without a phase: H-T4e closed (arbitration §2: short calls stay unconfi
 | 01 | [Red proofs](phase-01-red-proofs.md) (branch only, never landed alone) **done 11-06 on `harden/t5-p01-red-proofs`** | — | — | 0 / 0 / 0 (counted where each lands) |
 | 02 | [Layering moves, A3 guard, A4 no-undef gate](phase-02-layering-moves-and-guards.md) **landed 11-06 `98e1c5824..7a4fa3654`** | 01 | — (touches import lines everywhere) | +80 / 0 / +20 |
 | 03 | [Credential and confinement doors (Q3b, A7, A8)](phase-03-credential-and-confinement-doors.md) **landed 11-06 `accc31973..51d5d02dd` after three security reviews** | 02 | 04, 05, 07 | +90 / 0 / +100 |
-| 04 | [Config tighten rule (Q2b)](phase-04-config-tighten-rule.md) **half A landed 11-06 `10a6b8425..fcdffd361`; half B done on `origin/harden/t5-p04b`, lands after the owner-made config move (decision 64)** | 02; command half: UQ-1 | 03, 05, 07 | 0 / +44 / +40 |
+| 04 | [Config tighten rule (Q2b)](phase-04-config-tighten-rule.md) **half A landed 11-06 `10a6b8425..fcdffd361`; half B landed 11-08 `bbbf52f00..27759bb01` after the owner-made config move (decision 64)** | 02; command half: UQ-1 | 03, 05, 07 | 0 / +44 / +40 |
 | 05 | [Claude private trust store (Q1a)](phase-05-claude-private-trust-store.md) **landed 11-06: codex/agy `de7454638..8f521eb2f`, claude `ca69911f6..6b5c80f9b` (decision 66)** | 02 | 03, 04, 07 | −35 / 0 / −40 |
 | 06 | [Launch failure path (R-6, H-T4f)](phase-06-launch-failure-path.md) **landed 11-06 `9d70a47cd..d481b1cf0`** | 03, 05, 08, 11 | — | +15 / +15 / +40 |
 | 07 | [Small fixes (B-7, B-8, B-13, H-T4d, D-T2-7)](phase-07-small-fixes.md) **landed 11-06 `3f81fa916..36b59f731`** | 02 | 03, 04, 05 | −310 / 0 / −50 |
@@ -93,7 +93,7 @@ Settled without a phase: H-T4e closed (arbitration §2: short calls stay unconfi
 | 10 | [Execution core cut](phase-10-execution-core-cut.md) **landed 11-06 `0029e325b..c5242df59` except the parts that need `assignment.mjs` (after P09); also the never-started seat retry** | 07, 09 | 11 (if 11 done, n/a) | −250 / 0 / −50 |
 | 11 | [Config type rules to schema](phase-11-config-to-schema.md) **landed 11-06 `68c426c31..e5ac48e88`** | 03, 04 | 08, 10 | −600 to −1 000 / 0 / −200 |
 | 12 | [Test structure and doctor fold](phase-12-test-structure-and-doctor-fold.md) **landed 11-06 `cfff2aa7f..e3de56c54`** | 10, 11 | — | −85 / 0 / −1 100 |
-| 13 | [Spec, hand-off, close, land](phase-13-spec-handoff-close-land.md) **docs landed 11-06 `57149ebe9..9251c0190`; layer close waits on owner (budgets: P14 or close as is) and on P04 half B** | 01–12 | — | 0 / 0 / 0 |
+| 13 | [Spec, hand-off, close, land](phase-13-spec-handoff-close-land.md) **docs landed 11-06 `57149ebe9..9251c0190`; layer closed 11-08 (P14 landed; P04 half B landed)** | 01–12 | — | 0 / 0 / 0 |
 | 14 | [Budget cut](phase-14-budget-cut.md) (owner decision 69): seven functions over 300 lines, `src/runner/execution` ≤ 7 000, `confinement/` ≤ 5 950, `bind.mjs` ≤ 520, `run.test.mjs` split (H-T5a); three parallel lots **landed 11-06: lot 1 `7055cf874..477f96684`, lot 3 `477f96684..dbec1f5f2`, lot 2 `dbec1f5f2..83e4cca9e`** | 09, 10, 12, 13 | lots 1 ∥ 2 ∥ 3 (disjoint files) | Node ≈ −700 / 0 / ≈ 0 (estimate) |
 
 ```

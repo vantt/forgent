@@ -225,3 +225,8 @@ Concerns/Blockers: budgets not met (open item 3) need an owner call; H-T5a and H
 ## Addendum 2026-11-06 21:5x — phase 14 (owner decision 69)
 
 Three parallel lots landed: lot 1 `7055cf874..477f96684` (confinement `authority.mjs` 1 314 → 984, `confinement/` 5 972 → 5 642; `run.test.mjs` split into four files, 78 tests unchanged), lot 3 `477f96684..dbec1f5f2` (`resolveCollaboration`, `checkCatalog`, `compileDispatchPlan`, `settleRunOutcome` each under 230 lines; −553 lines), lot 2 `dbec1f5f2..83e4cca9e` (seven execution files −584, `bind.mjs` 514). `src/runner/execution` is now 6 453 lines (budget 7 000), `confinement/` 5 642 (5 950), `bind.mjs` 514 (520); no T5 function is over 300 lines. Behaviour unchanged; each lot's full suite red only on the known V7n test. H-T5a (test split) done by HARDEN.
+
+
+## Addendum 2026-11-08 — P04 half B landed
+
+P04 half B landed on main `bbbf52f00..27759bb01` (four commits: the red proofs, the schema rule, the project file cleanup, the hook test home). A project file that sets an executor `command`, `args` or `permissionMode`, a launch `backend`, `privateHome` or `isolatedSession`, or capability `aliases` is refused with `config-key-out-of-scope`; `prefer` stays settable in the project. The config move was done on fg-server2, fg-server and design-lap before landing. On design-lap, the projects `mcp-skill-hub` and `mdview` still set executor command, args and invocations in their own project files, so the config door refuses them once a release containing this is activated, until their files are fixed; the owner accepted this. T5 is closed 2026-11-08: every phase row of the sub-plan is landed.
