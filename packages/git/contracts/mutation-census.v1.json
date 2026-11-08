@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "690ea37ad56b8ebf5f58777058386b126c12b10e8a3cee2db4e7405a4f1c6621",
+  "payloadDigest": "625caf4540b52ec49e265fae87b0a59a8ba02ec781a43ac45adb9c4aed01f62d",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -69,7 +69,7 @@
     ".agents/skills/instruction-audit/references/report-template.md": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6",
     ".agents/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
     ".githooks/pre-commit": "476f66f95261ff4c18cbd1f797bc492e638f2fafbbfb32286bf8c1ebcd2fe46b",
-    "apps/fgctl/src/main.rs": "c235c240c4fdc1cd9f9b25df2955e6e4f11140c917fba3fd5cc156c8d826aace",
+    "apps/fgctl/src/main.rs": "81e7102c55241555c7e39c9ba25046a691bab7674569728520264056cd810254",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "cb4573d686b03639e3e78baca940a2c66cf02c81d645b5d0824ea4a33ece0160",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c1bfc1a2b6992cfe70c59acf9350a6da5fcce08033bb76fc1720d2c5df1091fa",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
@@ -273,7 +273,7 @@
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
     "packages/distribution/rust/src/fetch.rs": "ae1a26554583e297ea2f52bab45be9fe115952203e0413eaec933d71b301fa00",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
-    "packages/distribution/rust/src/init.rs": "00c696e758ffff8784ad976c2139308baea1438bf0e87e222d354a841bc40307",
+    "packages/distribution/rust/src/init.rs": "810c5ff1b86a682efb2fcb92ec5573dd5eb7583ae04d1c97ba8780c9a2661ffa",
     "packages/distribution/rust/src/lib.rs": "c222b19b8830cf81c1ecdb4cbac52708204dc5645660993ad86db12a7508e33e",
     "packages/distribution/rust/src/lock.rs": "ee39bccc87c5b34a7799ee886fe3c4b9f59346f22c550c67123efa49f9681f8e",
     "packages/distribution/rust/src/manifest.rs": "fda86403e01f1488db764d7282ff87e49f5c0915fcd638543e520ff2b3dd1a8c",
@@ -285,7 +285,7 @@
     "packages/distribution/rust/tests/fetch_download.rs": "d44e41924790a7bd2cf5829d4948e7046e033fee9fd2e265bdc2b175ff4de858",
     "packages/distribution/rust/tests/install_lock_multiprocess.rs": "790f1617f49d0a1efea555767705dba32c036e30bd897e0b01b09206342088cb",
     "packages/distribution/rust/tests/native_addon.rs": "b9f51eccdd5c7ee7873eacadd6d96f90413ea4183a9faeb06c7b3fc9370d07e7",
-    "packages/distribution/rust/tests/schema_golden.rs": "4376948b1c76af9f8b899d0705efb6a913ce0d6fe57121d77be7c00bc87e2d62",
+    "packages/distribution/rust/tests/schema_golden.rs": "cc3e0f3eedd13fc7260bce0680eb59397efcb298f848baecf1c20acd89a0980b",
     "packages/durable-file/rust/src/beneath.rs": "000b825fddb954f1813e5801d4b91973c2e8c361b9e6dc158fde2f4aff08f413",
     "packages/durable-file/rust/src/lib.rs": "c9984d4a32aca5bc830bcf18d3d0e37a56ed8fee80cee441fa5085b6b19d1c47",
     "packages/durable-file/rust/tests/beneath.rs": "640a72d38f8b5360f3ba8ebf825877742b7f28c64d9c5fde4dcfd6f3bfcc4f59",
@@ -2119,23 +2119,23 @@
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 571,
+      "line": 575,
       "spawn": "Command::new",
       "binary": "bin",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/init.rs:1526"
+      "resolvedAt": "packages/distribution/rust/src/init.rs:1611"
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 571,
+      "line": 575,
       "spawn": "Command::new",
       "binary": "fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/init.rs:1526"
+      "resolvedAt": "packages/distribution/rust/src/init.rs:1611"
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 1115,
+      "line": 1199,
       "spawn": "Command::new <- packages/process/rust/src/mapped.rs:226",
       "binary": "git",
       "class": "production-sandbox-probe",
@@ -2144,7 +2144,7 @@
     },
     {
       "path": "packages/distribution/rust/src/init.rs",
-      "line": 2080,
+      "line": 2283,
       "spawn": "Command::new",
       "binary": "sh",
       "class": "rust-test"

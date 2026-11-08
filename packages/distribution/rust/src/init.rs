@@ -107,6 +107,10 @@ pub struct WorkspaceActivationBinding {
     pub shim_version: String,
     pub resolved_dependencies: serde_json::Value,
     pub pin_snapshot: serde_json::Value,
+    /// Why `fgctl init --override-pin <reason>` activated a release other than
+    /// the one `pinSnapshot` names. Absent on every other activation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pin_override_reason: Option<String>,
     pub activated_at: String,
     pub activated_by: ActivatedByInfo,
 }
@@ -638,6 +642,34 @@ fn read_tracked_pin(distribution_path: &Path) -> Result<Option<TrackedDistributi
     Ok(serde_json::from_str(&content).ok())
 }
 
+/// The release `fgctl init --override-pin` may activate: one that differs
+/// from the tracked pin and is already staged in the machine store
+/// (`releases/<digest>/`; a quarantined release has been moved out of it).
+/// The override never stages, so whatever it activates was digest-checked by
+/// `fgctl stage` or an earlier init, and is checked again by preflight.
+fn staged_pin_override_candidate(
+    store_root: &Path,
+    pin: Option<&TrackedDistributionPin>,
+    digest: &str,
+) -> Result<std::path::PathBuf, InitError> {
+    let Some(pin) = pin else {
+        return Err(InitError::Custom(
+            "pin-override-without-pin: .fgos/distribution.json holds no pin to override; run fgctl init --from <source> without --override-pin".to_string(),
+        ));
+    };
+    if pin.project_runtime.artifact_digest == digest {
+        return Err(InitError::Custom(format!(
+            "pin-override-unneeded: --from resolves to the pinned release {digest}; run fgctl init without --override-pin"
+        )));
+    }
+    if !is_release_staged(store_root, digest) {
+        return Err(InitError::Custom(format!(
+            "pin-override-unstaged: release {digest} is not staged on this machine; --override-pin activates only a staged release (fgctl stage --from <path> first)"
+        )));
+    }
+    Ok(release_dir_path(store_root, digest))
+}
+
 /// Release tags are `v`-prefixed; a pin may hold a bare semantic version (for
 /// example one copied from a release manifest), which names the same release.
 fn normalize_pin_tag(tag: &str) -> String {
@@ -653,12 +685,38 @@ fn normalize_pin_tag(tag: &str) -> String {
 /// latest GitHub release) and downloading it first when it is a URL or a
 /// release asset. The download is checksum-verified before it reaches
 /// [`init_workspace`], and its scratch copy is removed when init returns.
+///
+/// `pin_override_reason` is `fgctl init --override-pin <reason>`: recovery of
+/// a workspace whose tracked pin names a release this machine cannot activate.
+/// It takes only a local `--from` (or `FGCTL_FROM`) whose release is already
+/// staged in the machine store, runs every check a plain init runs, records
+/// the reason in the activation and never writes `.fgos/distribution.json`.
 pub fn init_workspace_resolving(
     start_dir: &Path,
     inputs: &crate::fetch::SourceInputs,
     endpoint: &crate::fetch::DownloadEndpoint,
+    pin_override_reason: Option<&str>,
 ) -> Result<(), InitError> {
     use crate::fetch::{choose_source, fetch_release, fetch_url, SourceChoice};
+
+    if let Some(reason) = pin_override_reason {
+        let reason = reason.trim();
+        if reason.is_empty() {
+            return Err(InitError::Custom(
+                "pin-override-reason-empty: --override-pin needs a reason, recorded in the activation".to_string(),
+            ));
+        }
+        // An override never downloads: it activates a release this machine
+        // already staged, named by a local path.
+        return match choose_source(inputs, true) {
+            SourceChoice::Local(path) => {
+                init_workspace_tagged(start_dir, Some(&path), None, Some(reason))
+            }
+            _ => Err(InitError::Custom(
+                "pin-override-needs-from: --override-pin needs --from <path> (or FGCTL_FROM) naming a release staged on this machine".to_string(),
+            )),
+        };
+    }
 
     // Refuse outside a repository checkout before any network traffic.
     let workspace_root = resolve_workspace_root(start_dir)?;
@@ -692,6 +750,7 @@ pub fn init_workspace_resolving(
                         start_dir,
                         Some(&downloaded.tarball),
                         downloaded.tag.as_deref(),
+                        None,
                     )
                 }
                 None => init_workspace(start_dir, None),
@@ -712,6 +771,7 @@ pub fn init_workspace_resolving(
                 start_dir,
                 Some(&downloaded.tarball),
                 downloaded.tag.as_deref(),
+                None,
             )
         }
     }
@@ -719,7 +779,7 @@ pub fn init_workspace_resolving(
 
 /// Executes `fgctl init [--from <source>]` for the current or specified workspace.
 pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<(), InitError> {
-    init_workspace_tagged(start_dir, from_source, None)
+    init_workspace_tagged(start_dir, from_source, None, None)
 }
 
 /// [`init_workspace`] plus the release tag the source was downloaded as. A new
@@ -729,6 +789,7 @@ fn init_workspace_tagged(
     start_dir: &Path,
     from_source: Option<&Path>,
     release_tag: Option<&str>,
+    pin_override_reason: Option<&str>,
 ) -> Result<(), InitError> {
     // R1: Resolve workspace root via git-common-dir parent; refuse outside git repo.
     let workspace_root = resolve_workspace_root(start_dir)?;
@@ -757,6 +818,18 @@ fn init_workspace_tagged(
 
     // Determine target release digest and candidate directory (Items 2, 3, 5).
     let (target_digest, candidate_dir) = match (&tracked_pin, from_source) {
+        // `--override-pin`: no staging and no idempotent shortcut here; the
+        // verification and the under-lock re-run check below apply as usual.
+        (pin, from) if pin_override_reason.is_some() => {
+            let from_src = from.ok_or_else(|| {
+                InitError::Custom(
+                    "pin-override-needs-from: --override-pin needs --from <path>".to_string(),
+                )
+            })?;
+            let from_digest = resolve_source_manifest_digest(from_src)?;
+            let dir = staged_pin_override_candidate(&store_root, pin.as_ref(), &from_digest)?;
+            (from_digest, dir)
+        }
         (Some(pin), Some(from_src)) => {
             let pin_digest = &pin.project_runtime.artifact_digest;
 
@@ -955,6 +1028,13 @@ fn init_workspace_tagged(
     // R6: Preflight before publish (no host-visible writes)
     preflight_candidate(&candidate_dir, &manifest)?;
 
+    if let (Some(reason), Some(pin)) = (pin_override_reason, tracked_pin.as_ref()) {
+        eprintln!(
+            "pin overridden: .fgos/distribution.json pins {}; activating staged release {} (reason: {reason}); the pin file is not changed",
+            pin.project_runtime.artifact_digest, target_digest
+        );
+    }
+
     // Acquire workspace activation lock before ANY workspace-visible write (Item 1)
     let _activation_lock = ActivationLockGuard::acquire(&workspace_root)?;
 
@@ -1018,6 +1098,7 @@ fn init_workspace_tagged(
         tracked_pin: tracked_pin.as_ref(),
         update_pin: false,
         release_tag,
+        pin_override_reason,
         _lock: &_activation_lock,
     })
 }
@@ -1034,6 +1115,9 @@ pub struct PublishArgs<'a> {
     /// Release tag the candidate was downloaded as; recorded in a newly written
     /// pin in preference to the manifest's own version.
     pub release_tag: Option<&'a str>,
+    /// Recorded in the activation when `fgctl init --override-pin` chose a
+    /// release other than the tracked pin's.
+    pub pin_override_reason: Option<&'a str>,
     pub _lock: &'a ActivationLockGuard,
 }
 
@@ -1191,6 +1275,7 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
         shim_version: "1".to_string(),
         resolved_dependencies: serde_json::json!({ "node": node_path }),
         pin_snapshot,
+        pin_override_reason: args.pin_override_reason.map(str::to_string),
         activated_at: now_str.clone(),
         activated_by: ActivatedByInfo {
             tool: "fgctl".to_string(),
@@ -1555,6 +1640,7 @@ fn upgrade_workspace_tagged(
         tracked_pin: None,
         update_pin: true,
         release_tag,
+        pin_override_reason: None,
         _lock: &lock,
     })
 }
@@ -1708,6 +1794,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
         tracked_pin: None,
         update_pin: true,
         release_tag: None,
+        pin_override_reason: None,
         _lock: &lock,
     })
 }
@@ -2061,6 +2148,122 @@ mod tests {
         assert!(msg.contains("not executable"), "{msg}");
 
         let _ = std::fs::remove_dir_all(&root);
+    }
+
+    fn pin_for(digest: &str) -> TrackedDistributionPin {
+        TrackedDistributionPin {
+            schema_version: DISTRIBUTION_PIN_SCHEMA_VERSION_V1,
+            project_runtime: ProjectRuntimePin {
+                policy: "exact-digest".to_string(),
+                artifact_digest: digest.to_string(),
+                release_version: None,
+                channel: None,
+                allow_prerelease: false,
+            },
+        }
+    }
+
+    const PINNED: &str = "sha256:1111111111111111111111111111111111111111111111111111111111111111";
+    const OTHER: &str = "sha256:2222222222222222222222222222222222222222222222222222222222222222";
+
+    #[test]
+    fn pin_override_selects_a_staged_release_that_differs_from_the_pin() {
+        let store = fresh_temp_root("pin_override_staged");
+        let staged = store.join("releases").join(OTHER);
+        std::fs::create_dir_all(&staged).unwrap();
+
+        let dir = staged_pin_override_candidate(&store, Some(&pin_for(PINNED)), OTHER).unwrap();
+        assert_eq!(dir, release_dir_path(&store, OTHER));
+
+        let _ = std::fs::remove_dir_all(&store);
+    }
+
+    #[test]
+    fn pin_override_refuses_a_release_that_is_not_staged_on_this_machine() {
+        // A quarantined release has been moved out of releases/, so it is
+        // refused here the same way as one that was never staged.
+        let store = fresh_temp_root("pin_override_unstaged");
+        std::fs::create_dir_all(store.join("quarantine").join(OTHER)).unwrap();
+
+        let err = staged_pin_override_candidate(&store, Some(&pin_for(PINNED)), OTHER).unwrap_err();
+        let msg = err.to_string();
+        assert!(msg.starts_with("pin-override-unstaged:"), "{msg}");
+        assert!(msg.contains(OTHER), "{msg}");
+        assert!(msg.contains("fgctl stage --from"), "{msg}");
+        assert!(
+            !store.join("releases").exists(),
+            "the override never stages a release"
+        );
+
+        let _ = std::fs::remove_dir_all(&store);
+    }
+
+    #[test]
+    fn pin_override_refuses_when_there_is_no_pin_or_the_release_is_the_pinned_one() {
+        let store = fresh_temp_root("pin_override_nothing_to_override");
+        std::fs::create_dir_all(store.join("releases").join(PINNED)).unwrap();
+
+        let err = staged_pin_override_candidate(&store, None, PINNED).unwrap_err();
+        assert!(
+            err.to_string().starts_with("pin-override-without-pin:"),
+            "{err}"
+        );
+        let err =
+            staged_pin_override_candidate(&store, Some(&pin_for(PINNED)), PINNED).unwrap_err();
+        assert!(
+            err.to_string().starts_with("pin-override-unneeded:"),
+            "{err}"
+        );
+
+        let _ = std::fs::remove_dir_all(&store);
+    }
+
+    #[test]
+    fn pin_override_needs_a_reason_and_a_local_source_before_touching_anything() {
+        // A start directory that does not exist: each refusal comes before the
+        // workspace, the pin or the network is read.
+        let nowhere = std::env::temp_dir().join(format!(
+            "fgos_test_pin_override_nowhere_{}",
+            std::process::id()
+        ));
+        let endpoint = crate::fetch::DownloadEndpoint::default();
+        let local = crate::fetch::SourceInputs {
+            from_flag: Some("/some/staged/release".to_string()),
+            env_from: None,
+            env_version: None,
+        };
+
+        let err = init_workspace_resolving(&nowhere, &local, &endpoint, Some("  ")).unwrap_err();
+        assert!(
+            err.to_string().starts_with("pin-override-reason-empty:"),
+            "{err}"
+        );
+
+        for inputs in [
+            crate::fetch::SourceInputs {
+                from_flag: None,
+                env_from: None,
+                env_version: Some("v1.2.3".to_string()),
+            },
+            crate::fetch::SourceInputs {
+                from_flag: Some("https://example.invalid/fgos.tar.gz".to_string()),
+                env_from: None,
+                env_version: None,
+            },
+            crate::fetch::SourceInputs {
+                from_flag: None,
+                env_from: None,
+                env_version: None,
+            },
+        ] {
+            let err = init_workspace_resolving(&nowhere, &inputs, &endpoint, Some("recovery"))
+                .unwrap_err();
+            assert!(
+                err.to_string().starts_with("pin-override-needs-from:"),
+                "{err}"
+            );
+        }
+        assert!(!nowhere.exists());
     }
 
     #[test]

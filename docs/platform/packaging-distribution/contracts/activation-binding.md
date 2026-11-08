@@ -89,6 +89,7 @@ The schema is frozen at `schemaVersion: 1`. Rust serde definition lives in `pack
 | `shimVersion` | string | Yes | Version of stable shims (`"1"` in V1). |
 | `resolvedDependencies` | object | Yes | Resolved host runtime toolpaths (e.g. `{"node": "..."}`). |
 | `pinSnapshot` | object | Yes | Snapshot of `.fgos/distribution.json` at activation time. |
+| `pinOverrideReason` | string | Optional | Present only when `fgctl init --override-pin <reason>` activated a staged release other than the one `pinSnapshot` names; holds that reason. Additive: readers that do not know it ignore it, and `schemaVersion` stays `1`. |
 | `activatedAt` | string | Yes | ISO 8601 UTC timestamp of activation. |
 | `activatedBy` | object | Yes | Identity of tool performing activation (`tool`, `version`). |
 

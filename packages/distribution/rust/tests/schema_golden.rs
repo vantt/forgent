@@ -270,6 +270,10 @@ fn test_activation_binding_full_golden_roundtrip() {
         binding.pin_snapshot["projectRuntime"]["policy"].as_str(),
         Some("exact-digest")
     );
+    assert_eq!(
+        binding.pin_override_reason.as_deref(),
+        Some("recovery after the pinned release lost its native addon")
+    );
     assert_eq!(binding.activated_at, "2026-09-14T00:00:00.000Z");
     assert_eq!(binding.activated_by.tool, "fgctl");
     assert_eq!(binding.activated_by.version, "0.1.0");
@@ -289,6 +293,7 @@ fn test_activation_binding_minimal_backward_compatible() {
 
     assert_eq!(binding.schema_version, 1);
     assert_eq!(binding.previous_artifact_digest, None);
+    assert_eq!(binding.pin_override_reason, None);
     assert_eq!(binding.status, "ready");
     assert_eq!(binding.shim_version, "1");
     assert_eq!(binding.activated_by.tool, "fgctl");

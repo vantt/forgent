@@ -8,7 +8,7 @@ import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import { REPO_ROOT, releaseOutputDir } from '../../scripts/build-rust-distribution.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, FGCTL_BIN, fixture, runFgctl, runShim, waitForProcess, withoutActiveRelease } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, FGCTL_BIN, fixture, releaseDirName, runFgctl, runShim, waitForProcess, withoutActiveRelease } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -434,3 +434,63 @@ test('Item 2: Pinned workspace reconciles with matching --from source when unsta
   }
 });
 
+// The selection rules of --override-pin (staged only, a pin to override, a reason, a local source)
+// are owned by the distribution crate's unit tests; this proves the binary wiring they cannot reach.
+test('init --override-pin activates a staged release other than the pinned one, records the reason, leaves the pin byte-identical, and still refuses a tampered release', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-override-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-override-state-'));
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-override-proj-'));
+  const pinned = `sha256:${'0'.repeat(64)}`;
+  const pinBytes = Buffer.from(`${JSON.stringify({
+    schemaVersion: 1,
+    projectRuntime: { policy: 'exact-digest', artifactDigest: pinned, releaseVersion: null, channel: null, allowPrerelease: false },
+  }, null, 2)}\n`);
+  const project = (name) => {
+    const dir = path.join(tempRoot, name);
+    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+    execFileSync('git', ['init'], { cwd: dir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: dir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
+    fs.writeFileSync(path.join(dir, '.fgos', 'distribution.json'), pinBytes);
+    return dir;
+  };
+
+  try {
+    assert.equal(runFgctl(['stage', '--from', fixture.releaseDir], { stateHome: tempState }).status, 0);
+    const staged = path.join(tempState, 'releases', releaseDirName(fixture.digest));
+    const opts = (cwd) => ({ cwd, stateHome: tempState, env: { HOME: tempHome } });
+
+    // Without the flag the pin still wins.
+    const proj = project('recovered');
+    const plain = runFgctl(['init', '--from', staged], opts(proj));
+    assert.notEqual(plain.status, 0);
+    assert.match(plain.stderr, /pin-mismatch/);
+
+    const res = runFgctl(['init', '--from', staged, '--override-pin', 'wipe recovery'], opts(proj));
+    assert.equal(res.status, 0, `override init must succeed: ${res.stderr}`);
+    assert.match(res.stderr, new RegExp(`pin overridden: .*pins ${pinned}; activating staged release ${fixture.digest} \\(reason: wipe recovery\\)`));
+    const activation = JSON.parse(fs.readFileSync(path.join(proj, '.fgos', 'installation', 'activation.json'), 'utf8'));
+    assert.equal(activation.status, 'ready');
+    assert.equal(activation.artifactDigest, fixture.digest);
+    assert.equal(activation.pinOverrideReason, 'wipe recovery');
+    assert.equal(activation.pinSnapshot.projectRuntime.artifactDigest, pinned);
+    assert.ok(fs.readFileSync(path.join(proj, '.fgos', 'distribution.json')).equals(pinBytes), 'the pin file must stay byte-identical');
+
+    // Every check a plain init runs still applies: a staged release whose bytes no longer match
+    // its manifest is refused before anything is written.
+    const manifest = JSON.parse(fs.readFileSync(path.join(staged, 'manifest.json'), 'utf8'));
+    const victim = path.join(staged, manifest.files.find((f) => f.kind === 'file' && f.path !== 'bin/fgos').path);
+    fs.chmodSync(victim, 0o644);
+    fs.appendFileSync(victim, 'tampered');
+    const other = project('tampered');
+    const refused = runFgctl(['init', '--from', staged, '--override-pin', 'wipe recovery'], opts(other));
+    assert.notEqual(refused.status, 0);
+    assert.match(refused.stderr, /preflight failed/);
+    assert.ok(!fs.existsSync(path.join(other, '.fgos', 'installation')), 'a refused override writes no activation');
+    assert.ok(fs.readFileSync(path.join(other, '.fgos', 'distribution.json')).equals(pinBytes));
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});

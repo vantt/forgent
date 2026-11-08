@@ -28,17 +28,23 @@ fgctl init --from ~/.local/state/fgos/releases/sha256:<hex>
 `fgctl init --from` must resolve to the digest in the committed
 `.fgos/distribution.json`, otherwise it refuses with `pin-mismatch`. `fgctl
 upgrade` is no use: it needs an existing activation. When the committed pin names
-a release this machine lacks or that has no addon, use the pin workaround:
+a release this machine lacks or that has no addon, override the pin for this
+activation only:
 
 ```sh
-cp .fgos/distribution.json "${TMPDIR:-/tmp}/fgos-work/distribution.pin.bak"
-# set projectRuntime.artifactDigest to the digest you chose, then:
-fgctl init --from ~/.local/state/fgos/releases/sha256:<hex>
-git checkout -- .fgos/distribution.json        # restore the committed pin
+fgctl init --from ~/.local/state/fgos/releases/sha256:<hex> --override-pin "main checkout recovery after ignored-files wipe"
 ```
 
-Never commit the temporary pin. `.fgos/distribution.json` is shared by every
-machine; changing it is a separate, owner-approved change.
+The release must already be staged (it is when `fgctl status` lists it; otherwise
+`fgctl stage --from <path>` first). Every check of a plain init still runs. The
+command prints `pin overridden: ...`, records the reason as `pinOverrideReason` in
+`.fgos/installation/activation.json`, and leaves `.fgos/distribution.json`
+untouched, so there is nothing to restore. An `fgctl` older than the flag answers
+`Unknown option: --override-pin`; build one from this checkout
+(`cargo build --release -p fgctl`, then run `fgctl` from that target's `release/`
+directory). Never edit or commit the pin to get
+past this: it is shared by every machine, and changing it is a separate,
+owner-approved change.
 
 ## 2. fgos setup
 

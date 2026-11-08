@@ -22,6 +22,7 @@
       "allowPrerelease": false
     }
   },
+  "pinOverrideReason": "recovery after the pinned release lost its native addon",
   "activatedAt": "2026-09-14T00:00:00.000Z",
   "activatedBy": {
     "tool": "fgctl",

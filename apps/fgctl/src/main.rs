@@ -14,6 +14,11 @@ fn print_usage_and_exit() -> ! {
     eprintln!("  status   Show staged releases in the machine release store");
     eprintln!("  init     Initialize and activate fgOS in a workspace");
     eprintln!("           release source: --from <path|URL> > FGCTL_FROM > FGCTL_VERSION=<tag> > project pin > latest release");
+    eprintln!("           --override-pin <reason>: recovery only; activate the release --from names, already staged");
+    eprintln!("           on this machine, although it differs from the pin. Every check still runs, the reason");
+    eprintln!(
+        "           goes into activation.json, and .fgos/distribution.json is left unchanged"
+    );
     eprintln!("  upgrade  Upgrade workspace to a new release candidate");
     eprintln!("           release source: --from <path|URL> > FGCTL_FROM > FGCTL_VERSION=<tag> > latest release");
     eprintln!("  repair   Repair or rollback workspace activation");
@@ -141,10 +146,14 @@ fn main() {
         }
         "init" => {
             let mut from_path: Option<String> = None;
+            let mut pin_override_reason: Option<String> = None;
             let mut i = 2;
             while i < args.len() {
                 if args[i] == "--from" && i + 1 < args.len() {
                     from_path = Some(args[i + 1].clone());
+                    i += 2;
+                } else if args[i] == "--override-pin" && i + 1 < args.len() {
+                    pin_override_reason = Some(args[i + 1].clone());
                     i += 2;
                 } else {
                     eprintln!("Unknown option: {}", args[i]);
@@ -162,7 +171,12 @@ fn main() {
 
             let inputs = fgos_distribution::fetch::SourceInputs::from_env(from_path);
             let endpoint = fgos_distribution::fetch::DownloadEndpoint::from_env();
-            match fgos_distribution::init_workspace_resolving(&cwd, &inputs, &endpoint) {
+            match fgos_distribution::init_workspace_resolving(
+                &cwd,
+                &inputs,
+                &endpoint,
+                pin_override_reason.as_deref(),
+            ) {
                 Ok(()) => {}
                 Err(err) => {
                     eprintln!("Error: {}", err);
