@@ -1,7 +1,7 @@
 ---
 phase: 11
 title: "Workflow doors and verbs: one verb each for start, answer and resume with a detached option, a facade of production names only, named codes for not-found, and workflow status shows the bindings judgment and each seat's account"
-status: pending
+status: landed
 depends_on: [04, 05, 09]
 parallel: "wave 3, with 10 and 12 (12's wiring step waits for this phase)"
 effort: ~1d
