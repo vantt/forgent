@@ -436,19 +436,19 @@ test('a failing post-land drift detection is reported beside a landed merge, nev
   assert.equal(execGit(cwd, ['show', 'main:produced.txt']), 'ok\n', 'the branch landed on main');
 });
 
-test('an unclassified failure while publishing claims no abandoned result: the land reports its effect unknown and doctor --fix settles it through Land recovery', async () => {
+test('an unclassified failure while publishing claims no abandoned result: the land reports its effect unknown and fgos git recover settles it through Land recovery', async () => {
   const { landRunnerItem } = await import('../../src/runner/merge.mjs');
-  const { fixGitOperationRecovery } = await import('../../src/setup/git-checks.mjs');
+  const { recoverGitOperations } = await import('../../src/git/status.mjs');
   const { cwd } = await approvableRootRepo('tsk-publish-unknown');
   const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
   // The verify edits a tracked file of the candidate, so publication refuses.
   const item = { id: 'tsk-publish-unknown', verify: `node -e "require('fs').writeFileSync('produced.txt','edited by verify')"` };
   const err = await landRunnerItem(cwd, item, { branch: 'fgw/tsk-publish-unknown', timeoutMs: 60000 }).then(() => null, (e) => e);
   assert.equal(err?.code, 'land-effect-unknown', String(err?.stack ?? err));
-  assert.match(err.message, /fgos doctor --fix/);
+  assert.match(err.message, /fgos git recover/);
   assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
-  const fixed = fixGitOperationRecovery(cwd);
-  assert.equal(fixed.changed, true, fixed.message);
+  const fixed = recoverGitOperations(cwd);
+  assert.deepEqual(fixed.recovered, [err.operationId], fixed.message);
   assert.match(fixed.message, new RegExp(`recovered interrupted Git operations: ${err.operationId}`));
 });
 

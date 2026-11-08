@@ -10,7 +10,7 @@ import { once } from 'node:events';
 import { ensureGitAddon, root } from '../../scripts/git-addon.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
 import { createGitScopedCommit, createGitSync } from '../../src/git/index.mjs';
-import { fixGitOperationRecovery } from '../../src/setup/git-checks.mjs';
+import { recoverGitOperations } from '../../src/git/status.mjs';
 const built = ensureGitAddon();
 const loader = { descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: root } };
 const pause = () => new Promise(resolve => setTimeout(resolve, 10));
@@ -67,16 +67,16 @@ for (const mode of ['commit', 'sync']) for (const rejected of [false,true]) {
         const baseline = JSON.parse(fs.readFileSync(path.join(temp, 'baseline.json')));
         const port = createGitScopedCommit(config, loader);
         assert.throws(() => port.commit({ operationId: 'death', baseline, request }, [holder]), /commit-attempt-recovery-required/);
-        // doctor --fix recovers from the main checkout's port, as doctor builds it (Rust takes the linked checkout's custody,
+        // Git recovery runs from the main checkout's port, as the door builds it (Rust takes the linked checkout's custody,
         // proved busy or gone in scoped_commit_sync.rs): kept for a writer that is not the operation's, closed (custody free
         // afterwards) for the writer that started it
         const fromMain = { ...config, repoPath: repo };
         holder.release();
-        const kept = fixGitOperationRecovery(linked, loader, { ...fromMain, writer: 'doctor' });
-        assert.equal(kept.changed, false);
+        const kept = recoverGitOperations(linked, { loaderOptions: loader, portOptions: { ...fromMain, writer: 'doctor' } });
+        assert.deepEqual(kept.recovered, []);
         assert.match(kept.message, /death \(commit-authority-mismatch; only its writer .* can recover it\)/);
-        const closed = fixGitOperationRecovery(linked, loader, fromMain);
-        assert.equal(closed.changed, true, closed.message);
+        const closed = recoverGitOperations(linked, { loaderOptions: loader, portOptions: fromMain });
+        assert.deepEqual(closed.recovered, ['death'], closed.message);
         assert.match(closed.message, /recovered interrupted Git operations: death/);
         const free = acquireSync(createLockScope(), 'dispatch-cwd', params);
         assert.equal(free.result, 'acquired');

@@ -3,7 +3,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fixture } from './land-fixture.mjs';
 import { createGitRecovery, createGitSafeRestore } from '../../src/git/index.mjs';
-import { fixGitOperationRecovery, checkGit } from '../../src/setup/git-checks.mjs';
+import { checkGit } from '../../src/setup/git-checks.mjs';
+import { recoverGitOperations } from '../../src/git/status.mjs';
 
 test('Recovery lists and inspects an interrupted Land and delegates to its existing recovery', async () => {
   const f = fixture();
@@ -27,17 +28,17 @@ test('Recovery lists and inspects an interrupted Land and delegates to its exist
     assert.throws(() => recovery.inspectOperation({operationId:'never-journalled'}), err => JSON.parse(err.message).cause === 'git-operation-unknown');
   } finally { f.close(); }
 });
-test('doctor --fix recovers an interrupted Land through the Recovery door and then has nothing left to recover', async () => {
+test('Git recovery recovers an interrupted Land through the Recovery door and then has nothing left to recover', async () => {
   const f = fixture();
   try {
     const land = f.port();
     await land.prepare({operationId:'interrupted-fix',request:f.request});
     land.close();
-    const fixed = fixGitOperationRecovery(f.repo,f.loader,f.options);
-    assert.equal(fixed.changed,true,fixed.message);
+    const fixed = recoverGitOperations(f.repo,{loaderOptions:f.loader,portOptions:f.options});
+    assert.deepEqual(fixed.recovered,['interrupted-fix'],fixed.message);
     assert.match(fixed.message,/recovered interrupted Git operations: interrupted-fix/);
     assert.equal(createGitRecovery(f.options,f.loader).inspectOperation({operationId:'interrupted-fix'}).terminal,true);
-    assert.deepEqual(fixGitOperationRecovery(f.repo,f.loader,f.options),{changed:false,message:'no interrupted Land, ScopedCommit or remote transfer operation'});
+    assert.deepEqual(recoverGitOperations(f.repo,{loaderOptions:f.loader,portOptions:f.options}),{recovered:[],kept:[],message:'no interrupted Land, ScopedCommit or remote transfer operation'});
   } finally { f.close(); }
 });
 test('the journal row warns, never fails, about a finished Land whose candidate is still retained', async () => {
@@ -50,8 +51,8 @@ test('the journal row warns, never fails, about a finished Land whose candidate 
     land.close();
     const pending = checkGit(f.repo,'git-operation-journal',f.loader,f.options);
     assert.equal(pending.passed,false);
-    assert.match(pending.message,/1 Git operation\(s\) unresolved.*git-land-recovery/);
-    fixGitOperationRecovery(f.repo,f.loader,f.options);
+    assert.match(pending.message,/1 Git operation\(s\) unresolved.*fgos git recover/);
+    recoverGitOperations(f.repo,{loaderOptions:f.loader,portOptions:f.options});
     const row = checkGit(f.repo,'git-operation-journal',f.loader,f.options);
     assert.equal(row.passed,true,row.message);
     assert.match(row.message,/^warning: retained Land candidates: retained-land \(/);

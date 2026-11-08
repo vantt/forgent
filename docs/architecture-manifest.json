@@ -28,6 +28,7 @@
     "src/verbs/worktree/create.mjs": "use-case",
     "src/verbs/worktree/remove.mjs": "use-case",
     "src/git/native.mjs": "infra",
+    "src/git/status.mjs": "infra",
     "src/native/door.mjs": "kernel",
     "src/config/facade.mjs": "kernel",
     "bin/fgos.mjs": "entry",

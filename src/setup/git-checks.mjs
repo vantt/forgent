@@ -1,11 +1,8 @@
 // Thin doctor/setup adapter: repository trust, configuration and WAL parsing stay in Rust.
-import { readConfig } from '../config/facade.mjs';
 import { randomUUID } from 'node:crypto';
 import { loadNativeAddon, nativeError } from '../git/native.mjs';
-import { createGitRecovery } from '../git/recovery.mjs';
-import { gitPortOptions } from '../git/inspect.mjs';
+import { gitFacts, listRetainedLand, recoverGitOperations } from '../git/status.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
-import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { retentionNote } from './git-retention-note.mjs';
 import { eventStoreDoctorOf, eventStoreMappingProblems } from './event-store-checks.mjs';
 import { eventStoreAddonAvailable } from '../event-store/index.mjs';
@@ -14,24 +11,9 @@ const transportRemedy = 'For actions/checkout use persist-credentials: false, re
 // A checkout kept for its owner (dirty) or locked by a still-running process is not a broken registration.
 const advisoryWorktreeReasons = new Set(['dirty-or-stale-checkout-preserved', 'locked-by-live-process']);
 
-function context(cwd, loaderOptions) {
-  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
-  // The addon first: a channel without one reports `addon not shipped` before the door-backed state root is asked.
-  const native = loadNativeAddon(loaderOptions);
-  return { root, remote: readConfig({ projectRoot: root, sections: ['eventStore'] }).value.eventStore?.remote ?? 'origin', stateRoot: resolveStateRoot().stateRoot, native };
-}
 // A row is its problems joined into one sentence, or its passing text; the facts it judged go under detail.
 const row = (problems, ok, detail, found = problems.filter(Boolean)) => found.length ? { passed: false, message: found.join('; '), detail } : { passed: true, message: ok, detail };
 
-// One inspection per distinct question: with a doctor run it is asked once and shared, without one it is asked alone.
-function gitFacts(cwd, recovery, loaderOptions, run) {
-  const inspect = () => {
-    const found = context(cwd, loaderOptions);
-    const { native, stateRoot, root, remote } = found;
-    return { ...found, facts: recovery ? native.inspectGitWorktreeRecovery(stateRoot, cwd, root) : native.inspectGit(stateRoot, cwd, root, remote) };
-  };
-  return run ? run.once(`git-${recovery ? 'worktree-recovery' : 'inspect'}:${cwd}`, inspect) : inspect();
-}
 /**
  * One Git doctor row. With a doctor `run`, rows of the run (and the Node-and-Git floor row) share one inspection of the repository for the
  * configured remote, and one worktree recovery view; the transport-config row adds one more `inspectGit` only when that remote is
@@ -81,7 +63,7 @@ export function checkGit(cwd, kind, loaderOptions, portOptions, run) {
           !journal.initialized && 'the Git WAL is not initialized; run `fgos doctor --fix` (git-wal-dir)',
           journal.initialized && !journal.complete && 'the Git WAL listing is incomplete; inspect it with `fgos doctor --json`',
           journal.errors.length && `${journal.errors.length} Git WAL error(s); inspect them with \`fgos doctor --json\``,
-          journal.pendingCount > 0 && `${journal.pendingCount} Git operation(s) unresolved; run \`fgos doctor --fix\` (git-land-recovery) for interrupted Land, ScopedCommit and remote transfer operations`,
+          journal.pendingCount > 0 && `${journal.pendingCount} Git operation(s) unresolved; run \`fgos git recover\` for interrupted Land, ScopedCommit and remote transfer operations`,
         ], notes.some(n => n.startsWith('warning:')) ? notes.join('; ') : ['the Git WAL is readable with no unresolved operation', ...notes].join('; '), { journal, retainedLand: landWarning });
         return notes.length && !verdict.passed ? { ...verdict, message: `${verdict.message}; ${notes.join('; ')}` } : verdict;
       }
@@ -99,8 +81,7 @@ export function gitFloor(cwd, loaderOptions, run) {
 }
 /** The repository as the fixes found it, or null when there is none to fix. */
 function readBefore(cwd, loaderOptions) {
-  const ctx = context(cwd, loaderOptions);
-  const before = ctx.native.inspectGit(ctx.stateRoot, cwd, ctx.root, ctx.remote);
+  const { facts: before, ...ctx } = gitFacts(cwd, false, loaderOptions);
   return before.notARepository ? null : { ...ctx, before };
 }
 const noRepository = { changed: false, message: 'not a Git repository' };
@@ -136,37 +117,17 @@ const afterDriverDirectories = (cwd, loaderOptions, fix) => {
 };
 export const fixGitWal = (cwd) => afterDriverDirectories(cwd, undefined, initializeWal);
 export const fixGitFetchMapping = (cwd, loaderOptions) => afterDriverDirectories(cwd, loaderOptions, () => installFetchMapping(cwd, loaderOptions));
-// The Recovery port is constructed with a writer even for reads.
-const recoveryPort = (cwd, loaderOptions, portOptions) => createGitRecovery(portOptions ?? gitPortOptions(resolveMainCheckoutRoot(cwd) ?? cwd, { mutation: true }), loaderOptions);
-const RECOVERABLE_KINDS = ['Land', 'ScopedCommit', 'RemoteTransfer'];
-const AUTHORITY_MISMATCH_CAUSES = ['land-authority-mismatch', 'commit-authority-mismatch', 'remote-authority-mismatch'];
-/**
- * Recover every interrupted Land, ScopedCommit and remote transfer through the one Recovery door, under each kind's own locks (Git spec §9, §10 rule 4b).
- * Rust finds a scoped commit's checkout and takes its custody without waiting, so a gone or busy checkout comes back as a
- * cause. An attempted chain is recovered only by the writer that started it. Nothing is merged, re-published or deleted.
- */
+/** The doctor fix over the one Recovery door `fgos git recover` runs (the message is the door's). */
 export function fixGitOperationRecovery(cwd, loaderOptions, portOptions) {
   return attemptFix(cwd, () => {
-    const recovery = recoveryPort(cwd, loaderOptions, portOptions);
-    const recovered = [];
-    const kept = [];
-    for (const operation of recovery.listPending().operations.filter(o => RECOVERABLE_KINDS.includes(o.kind))) {
-      try {
-        recovery.reconcile({ operationId: operation.operationId });
-        recovered.push(operation.operationId);
-      } catch (err) {
-        const { cause } = nativeError(err);
-        kept.push(`${operation.operationId} (${cause}${AUTHORITY_MISMATCH_CAUSES.includes(cause) ? `; only its writer ${operation.intent.writerIdentity} can recover it${cause === 'remote-authority-mismatch' ? ', and the next event sync settles it' : ''}` : ''})`);
-      }
-    }
-    if (!recovered.length && !kept.length) return { changed: false, message: 'no interrupted Land, ScopedCommit or remote transfer operation' };
-    return { changed: recovered.length > 0, message: [recovered.length && `recovered interrupted Git operations: ${recovered.join(', ')}`, kept.length && `warning: Git operations kept for recovery: ${kept.join('; ')}`].filter(Boolean).join('; ') };
+    const { recovered, message } = recoverGitOperations(cwd, { loaderOptions, portOptions });
+    return { changed: recovered.length > 0, message };
   });
 }
 /** Land candidates a finished Land still holds: read-only, a warning never a failure (the release sweep of a Land command frees one whose result Work recorded). */
 function retainedLandWarning(cwd, loaderOptions, portOptions, now = Date.now()) {
   let listing;
-  try { listing = recoveryPort(cwd, loaderOptions, portOptions).listRetainedLand(); }
+  try { listing = listRetainedLand(cwd, loaderOptions, portOptions); }
   catch (err) { // a failed listing must not hide the WAL findings; a missing addon keeps its own info path
     if (err.code === 'git-addon-not-shipped') throw err;
     return `warning: Land candidate scan failed: ${nativeError(err).cause}`;

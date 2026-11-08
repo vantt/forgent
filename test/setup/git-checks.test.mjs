@@ -6,7 +6,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { checkGit, compatibleGitContracts, fixGitOperationRecovery } from '../../src/setup/git-checks.mjs';
+import { checkGit, compatibleGitContracts } from '../../src/setup/git-checks.mjs';
+import { recoverGitOperations } from '../../src/git/status.mjs';
 import { retentionNote } from '../../src/setup/git-retention-note.mjs';
 import { fixture as landFixture } from '../git/land-fixture.mjs';
 import { fixture as storeFixture, installFetchMapping } from '../event-store/phase07-fixture.mjs';
@@ -169,7 +170,7 @@ test('a failing journal row still ends its message with the retained Land warnin
   const first = f.port();
   await first.prepare({ operationId: 'retained-one', request: f.request });
   first.close();
-  fixGitOperationRecovery(f.repo, f.loader, f.options);
+  recoverGitOperations(f.repo, { loaderOptions: f.loader, portOptions: f.options });
   const second = f.port();
   await second.prepare({ operationId: 'pending-two', request: f.request });
   second.close();
@@ -205,7 +206,7 @@ test('the journal row reports the retained finished operations of a real journal
   const land = f.port();
   await land.prepare({ operationId: 'finished-one', request: f.request });
   land.close();
-  fixGitOperationRecovery(f.repo, f.loader, f.options);
+  recoverGitOperations(f.repo, { loaderOptions: f.loader, portOptions: f.options });
   const row = checkGit(f.repo, 'git-operation-journal', f.loader, f.options);
   assert.equal(row.passed, true);
   // The Land chain and the candidate worktree's own chain are both finished and retained.

@@ -1,4 +1,5 @@
 import { commitAt, createGitInspect, gitPortOptions, pathExistsAt } from '../git/inspect.mjs';
+import { readMergeHead } from '../git/status.mjs';
 import { resolveHolderLiveness } from '../native/process-identity.mjs';
 import { checkGit, gitFloor, fixGitWal, fixGitFetchMapping, fixGitDriverDirectories, fixGitOperationRecovery } from './git-checks.mjs';
 import { checkWorkflowCaseBindingSentinel, checkWorkflowCaseBindings, fixWorkflowCaseBindings } from './workflow-case-checks.mjs';
@@ -2770,20 +2771,12 @@ registerCheck({ id: 'doc-topic-oversized', description: 'topic size check agains
 registerCheck({ id: 'doc-role-underused', description: 'role usage frequency check', check: checkDocRoleUnderused });
 registerCheck({ id: 'doc-source-conservation', description: 'source captures conservation check', check: checkDocSourceConservation });
 
-function getMergeHeadSha(mainCheckout) {
-  try {
-    return createGitInspect(gitPortOptions(mainCheckout)).resolveCommit({ name: 'MERGE_HEAD' }) || null;
-  } catch {
-    return null;
-  }
-}
-
 function checkNoStuckMergeAbort(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
   }
-  const sha = getMergeHeadSha(mainCheckout);
+  const sha = readMergeHead(mainCheckout);
   if (sha !== null) {
     return {
       passed: false,

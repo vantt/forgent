@@ -2342,6 +2342,21 @@ export const COMMAND_REGISTRY = [
     paginated: false,
     deprecated: null,
   },
+  withSubcommands({
+    name: 'git',
+    invoke: 'fgos git <status|recover>',
+    description: 'Open Git incidents of this repository. `status` reads every one (journal, pending and retained operations, worktree findings, native locks, a merge in progress) and changes nothing; `recover` settles interrupted Land, ScopedCommit and remote-transfer operations under their own locks and never deletes worktrees, locks or refs (`fgos init` runs the same recovery).',
+    subcommands: {
+      status: { description: 'Read every open Git incident. Top-level keys: repository, journal, pendingOperations, retainedLand, worktrees, nativeLocks, mergeInProgress. A part that cannot be read answers { error } in place.', examples: ['fgos git status --json'], parameters: { type: 'object', properties: {}, required: [] } },
+      recover: { description: 'Recover interrupted Land, ScopedCommit and remote-transfer operations; an attempted chain is recovered only by the writer that started it. Answers recovered, kept and message, and for a merge in progress the fgos main-checkout-reset command to run (never run for you).', examples: ['fgos git recover --json'], parameters: { type: 'object', properties: {}, required: [] } },
+    },
+    examples: ['fgos git status --json', 'fgos git recover --json'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  }),
   {
     name: 'resync-worktree',
     invoke: 'fgos resync-worktree',

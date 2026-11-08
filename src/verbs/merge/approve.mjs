@@ -141,7 +141,7 @@ function moveBlockedOrConflict(dir, { id, reason, role = 'system' }, { repoRoot,
  * and destination is settled under its original id, and a recorded id Land
  * never journalled (a refusal before its intent) is reused as it is; an
  * attempt whose effect is unknown refuses before another operation is
- * created, naming `fgos doctor --fix` as its recovery. A fresh id is
+ * created, naming `fgos git recover` as its recovery. A fresh id is
  * recorded as a decision before Land starts, so the publication identity
  * outlives a lost acknowledgement (Git spec §9 step 6, M4).
  */
@@ -163,8 +163,8 @@ function landOperationFor(dir, repoRoot, view, id, destination) {
     if (operation.outcome?.kind === 'land') return operationId;
     if (!operation.terminal && ['target-attempt', 'land-verified'].includes(operation.phase?.phase)) {
       throw new StoreError('precondition', `approve: Land operation ${operationId} was interrupted and requires recovery before another publication. `
-        + 'Run `fgos doctor --fix` (git-land-recovery) to recover it under its own locks, then approve again; '
-        + 'an attempted publication is recoverable only by the writer that started it, which the fix names when it refuses.');
+        + 'Run `fgos git recover` to recover it under its own locks, then approve again; '
+        + 'an attempted publication is recoverable only by the writer that started it, which the recovery names when it refuses.');
     }
   }
   const operationId = crypto.randomUUID();

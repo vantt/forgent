@@ -105,6 +105,7 @@ import { withMainCheckout } from '../src/runner/repo-locks.mjs';
 import { commitAt, gitPortOptions, gitWriter, pathExistsAt } from '../src/git/inspect.mjs';
 import { nativeError } from '../src/git/native.mjs';
 import { createGitSafeRestore } from '../src/git/restore.mjs';
+import { readGitStatus, readMergeHead, recoverGitOperations } from '../src/git/status.mjs';
 import { HolderLockError, createLockScope } from '../src/holder-lock/index.mjs';
 import { collectLockStatus } from '../src/runner/lock-status.mjs';
 import { fenceLock, parseLockParams } from '../src/runner/lock-fence.mjs';
@@ -1026,7 +1027,31 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       } catch {
         gitHeadless = true;
       }
-      return { dir, detectedHarnesses, ...(gitHeadless ? { gitHeadless: true } : {}) };
+      // Last and fail-safe like the steps above: an interrupted Land, ScopedCommit or remote transfer is recovered here, so a
+      // machine that only runs `init` on upgrade settles it without `fgos git recover` by hand.
+      let gitRecovery;
+      let gitRecoveryWarning;
+      try {
+        const { recovered, kept } = recoverGitOperations(path.dirname(dir));
+        if (recovered.length || kept.length) gitRecovery = { recovered, kept };
+      } catch (err) {
+        gitRecoveryWarning = `Git recovery refused: ${err.message}; run \`fgos git recover\``;
+      }
+      return { dir, detectedHarnesses, ...(gitHeadless ? { gitHeadless: true } : {}), ...(gitRecovery ? { gitRecovery } : {}), ...(gitRecoveryWarning ? { gitRecoveryWarning } : {}) };
+    }
+
+    case 'git': {
+      const sub = positional[0];
+      const root = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
+      if (sub === 'status') {
+        return readGitStatus(root);
+      }
+      if (sub === 'recover') {
+        const { recovered, kept, message } = recoverGitOperations(root);
+        const mergeHead = readMergeHead(root);
+        return { recovered, kept, message, ...(mergeHead ? { mergeInProgress: mergeHead, next: `fgos main-checkout-reset --sha ${mergeHead} --confirm` } : {}) };
+      }
+      throw new StoreError('validation', `unknown git sub-verb "${sub ?? ''}". Usage: fgos git <status|recover> [--dir <path>]`);
     }
 
     case 'add': {
@@ -4509,7 +4534,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|events|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|events|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|lock|lock-status|git|main-checkout-reset> ...`);
   }
 }
 
@@ -4925,7 +4950,7 @@ function opensEventStore(entry, verb, positional, flags) {
 //    case-block comments, same mechanism `approve`/`sync-root`/
 //    `promote-to-component`/`catchup`/`unclaim` already use, so a second
 //    guard here would be redundant, not additive): `setup`, `doctor`,
-//    `uninstall`.
+//    `uninstall`, `git` (writes the Git WAL, never `.fgos/` state).
 // 4. Deliberately NOT guarded, not the shared-truth hazard this guard
 //    exists for -- each writes only a local, per-checkout, gitignored
 //    artifact by design, never a shared event: `tool` (both `check`, which

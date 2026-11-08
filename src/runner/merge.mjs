@@ -1012,7 +1012,7 @@ export async function landRunnerItem(repoRoot, item, {
     // Work result is recorded, the candidate stays, and Land recovery
     // decides what happened before this id is published again.
     if (phase === 'publish') {
-      throw new MergeError(`cannot tell whether "${branch}" was published into "${target}": Land operation ${operationId} failed during publication (${err.message}). Run \`fgos doctor --fix\` (git-land-recovery) to settle it, then approve again.`, {
+      throw new MergeError(`cannot tell whether "${branch}" was published into "${target}": Land operation ${operationId} failed during publication (${err.message}). Run \`fgos git recover\` to settle it, then approve again.`, {
         branch, targetRef: target, code: 'land-effect-unknown', operationId,
       });
     }
