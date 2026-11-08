@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c2cfd89b2a5512358360779b8209f7478c971cf23d2e6b378f755b41d4f60de1",
+  "payloadDigest": "6b8874743c0ae8f9bb1ccf0b6ee7aedd3758719afcb6a25d96f25240b71b7cfb",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -9,7 +9,7 @@
     ".agents/skills/_shared/citation-format.md": "a6c834b250d83fbf68c42a0b87a93c128cb7dfeb28d07904134bae32fc93afb2",
     ".agents/skills/_shared/coding-cell-policy.md": "a40741fb21ae5c0ee158fc5bc1d0810943b4b5b18c285f223125fd8ea89381ca",
     ".agents/skills/_shared/coding-worker-contract.md": "8693dea64c22d19a0c09791d77910435cfeecba56eea387aff4854000eedafad",
-    ".agents/skills/_shared/coordination-driver.md": "c44e578da914a4e292ba854a129d1731c339ba5e445957b239e39e622ae8fe60",
+    ".agents/skills/_shared/coordination-driver.md": "bbc78068c156fb88fa689b7b762c24cd02602afe3cc0d81f128f9660c317e21f",
     ".agents/skills/_shared/decision-question.md": "59e905ab0e06d35299aed5420de2edafbe83bfb1030bc200dad423db38950393",
     ".agents/skills/_shared/executor-dispatch-fallback.md": "664ca1becb411d1659beac11706c6d1b19aadbdc70ad2e1a727938ead37ba59a",
     ".agents/skills/_shared/fgos-cli-fallback.md": "de0c928316be7ec03cee52d43974e249bbaae9fe3d90ac3fa2c175705eefc587",
@@ -120,7 +120,7 @@
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
     "core/skills/_shared/citation-format.md": "589e65ffeccaf45b3de4d1047eaec5face605265b05bbf462939c50677651fdd",
     "core/skills/_shared/coding-worker-contract.md": "e76250e9dc79a8c161f6e7e4c22e85069461e4c4b29d919b10bbff6059185185",
-    "core/skills/_shared/coordination-driver.md": "b9a31826939e6a159a7a3d9957196412d84c85afeb252cb9683430722897f900",
+    "core/skills/_shared/coordination-driver.md": "f5c28baf0bacc07d0e9b4feb90408fc6e74c2068bc215cf0a12ac79833315092",
     "core/skills/_shared/decision-question.md": "b53bfbc91ef5fbe5833c2dec5c7181df1d1b5d276248d795722095d2f1d2c8b7",
     "core/skills/_shared/executor-dispatch-fallback.md": "287c1ba5a800704340f76b4814c747ba716529b51f02f58a07cab667d5fd0d57",
     "core/skills/_shared/fgos-cli-fallback.md": "923bc223a8cd0b81bc2cd5785083e9650f304f87b40f595645f227a383797dd5",

@@ -72,7 +72,7 @@ Dispositions are recorded in the continuity artifact (Step 8).
 Based on dispositions and evidence outcomes:
 - **Revise:** Authorize and dispatch revision operations within the declared adaptation bounds.
 - **Recheck:** Every accepted finding requires an independent recheck operation to confirm remediation. A finding is never discharged by driver disposition alone.
-- **Retry / Reopen:** When transient failures occur or bounded dialogue reopening is permitted, dispatch retry or follow-up turns within protocol limits.
+- **Retry / Reopen:** `fgos workflow resume` reruns a step that failed on infrastructure (execution-failure, not-started; no settled seat verdict) once per call, as a fresh admitted Unit run (a writing unit in its recorded worktree and branch). Verdicts (findings, refusals, out-of-scope writes) are terminal: resume refuses them by name, `nothing-to-resume: step <id> ended <outcome>`. An answer never reopens a step. No automatic retry beyond the Execution Core's one lost-brief retry.
 - **Ask Human:** Only for the triggers listed in Step 3. A harness refusal is not one of them. Ask in the decision-question template (`decision-question.md`; batching per AGENTS.md priority #2) and never stall work that does not depend on the answer.
 
 ### Step 7: Explicit Close or Continue
