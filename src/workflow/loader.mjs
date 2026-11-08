@@ -10,12 +10,29 @@ import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { definitionNameOf } from '../convention/definition-names.mjs';
 import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
 
-function parseFile(filePath) {
-  const content = fs.readFileSync(filePath, 'utf8');
-  if (filePath.endsWith('.json')) {
-    return JSON.parse(content);
+/** The raw definition a workflow file's text holds: JSON for `.json`, the YAML door otherwise. */
+export function parseWorkflowText(content, filePath) {
+  return filePath.endsWith('.json') ? JSON.parse(content) : parseYaml(content, { filename: filePath });
+}
+
+/**
+ * The `workflows/` directories of one root in discovery order: core, then each domain by name.
+ * `owningDomain` is the domain whose directory it is, null for core.
+ *
+ * @returns {Array<{ dir: string, owningDomain: string|null }>}
+ */
+export function workflowDirs(root) {
+  const dirs = [];
+  const coreDir = path.join(root, 'core', 'workflows');
+  if (fs.existsSync(coreDir)) dirs.push({ dir: coreDir, owningDomain: null });
+  const domainsDir = path.join(root, 'domains');
+  if (fs.existsSync(domainsDir)) {
+    for (const d of fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const dir = path.join(domainsDir, d.name, 'workflows');
+      if (d.isDirectory() && fs.existsSync(dir)) dirs.push({ dir, owningDomain: d.name });
+    }
   }
-  return parseYaml(content, { filename: filePath });
+  return dirs;
 }
 
 /**
@@ -61,43 +78,22 @@ function scanWorkflows(options = {}) {
     if (!existing || replace) found.set(workflow.id, { workflow, source: Object.freeze(source) });
   };
 
-  // 1. Core tier: core/workflows
-  const coreDir = path.join(root, 'core', 'workflows');
-  if (fs.existsSync(coreDir)) {
-    for (const { filePath, workflowDir } of workflowFilesIn(coreDir)) {
+  // Core files replace an earlier file of their id; a domain file yields to one already found.
+  for (const { dir, owningDomain } of workflowDirs(root)) {
+    const tier = owningDomain === null ? 'core' : 'domain';
+    for (const { filePath, workflowDir, fileName } of workflowFilesIn(dir)) {
       let workflow;
       try {
-        workflow = validateWorkflow(parseFile(filePath));
-      } catch (err) {
-        throw new RunnerConfigError(`Failed to load core workflow from "${filePath}": ${err.message}`);
-      }
-      place(workflow, { sourcePath: filePath, workflowDir, owningDomain: null }, { replace: true });
-    }
-  }
-
-  // 2. Domain tier: domains/<domain>/workflows
-  const domainsDir = path.join(root, 'domains');
-  if (fs.existsSync(domainsDir)) {
-    const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
-    for (const d of domainEntries) {
-      if (!d.isDirectory()) continue;
-      const dWfDir = path.join(domainsDir, d.name, 'workflows');
-      if (!fs.existsSync(dWfDir)) continue;
-      for (const { filePath, workflowDir, fileName } of workflowFilesIn(dWfDir)) {
-        let workflow;
-        try {
-          const raw = parseFile(filePath);
-          // Default id prefix with domain if not prefixed
-          if (raw && typeof raw === 'object' && !raw.id) {
-            const baseName = workflowDir === null ? path.basename(fileName, path.extname(fileName)) : path.basename(workflowDir);
-            raw.id = `${d.name}/${baseName}`;
-          }
-          workflow = validateWorkflow(raw);
-        } catch (err) {
-          throw new RunnerConfigError(`Failed to load domain workflow from "${filePath}": ${err.message}`);
+        const raw = parseWorkflowText(fs.readFileSync(filePath, 'utf8'), filePath);
+        // A domain file without an id takes the domain's prefix.
+        if (owningDomain !== null && raw && typeof raw === 'object' && !raw.id) {
+          raw.id = `${owningDomain}/${workflowDir === null ? path.basename(fileName, path.extname(fileName)) : path.basename(workflowDir)}`;
         }
-        place(workflow, { sourcePath: filePath, workflowDir, owningDomain: d.name }, { replace: false });
+        workflow = validateWorkflow(raw);
+      } catch (err) {
+        throw new RunnerConfigError(`Failed to load ${tier} workflow from "${filePath}": ${err.message}`);
       }
+      place(workflow, { sourcePath: filePath, workflowDir, owningDomain }, { replace: owningDomain === null });
     }
   }
 

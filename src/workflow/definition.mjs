@@ -6,7 +6,8 @@
 import path from 'node:path';
 import { canonicalizeWrites } from '../runner/dispatch/write-scope.mjs';
 import { runTimeoutProblem } from '../runner/dispatch/run-timeout.mjs';
-import { GuideSchemaError, normalizeGuide } from './guide-schema.mjs';
+import { GATE_MODES, GuideSchemaError, RIGOR_ORDER, normalizeGuide } from './guide-schema.mjs';
+import { dependencyOrder } from './steps.mjs';
 
 /** Thrown for a malformed Workflow definition. Kept free of runner imports (bar the import-free
  * write-scope and run-timeout leaves) so the Work-lifecycle kernel can read step data without depending on dispatch. */
@@ -16,23 +17,28 @@ export class WorkflowDefinitionError extends Error {
     this.name = 'WorkflowDefinitionError';
   }
 }
-const DISALLOWED_G2_FIELDS = new Set([
-  'executor',
-  'provider',
-  'model',
-  'tier',
-  'invocation',
-  'prefer',
-  'overrides',
-]);
-
-const VALID_RIGORS = new Set(['low', 'standard', 'high', 'critical']);
-// Coarse role a step plays when a Work item walks the workflow: which pool a
-// reader files the item under and which step is the entry/exit of that part.
+const DISALLOWED_G2_FIELDS = Object.freeze(['executor', 'provider', 'model', 'tier', 'invocation', 'prefer', 'overrides']);
 const VALID_STEP_PHASES = new Set(['clarify', 'discover', 'plan', 'execute']);
 const VALID_OPERATION_DISPATCH = new Set(['human-only']);
-
 const INPUT_ENTRY_KEYS = new Set(['step', 'sameSeat', 'label']);
+// Where a definition comes from, as the caller that loaded it says -- never a field of the data.
+// Only a units file (`fgos workflow start --units`) is a one-off list of Units, so only its unit
+// templates may carry a soft executor `prefer`; a preset or plan is shipped to other projects
+// and keeps the G2 rule (its seats are tuned with --seats and personas instead).
+const UNITS_FILE_SOURCE = 'units-file';
+
+const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+const isText = (value) => typeof value === 'string' && value.trim().length > 0;
+const trimmedOrUndefined = (value) => (typeof value === 'string' ? value.trim() : undefined);
+const fail = (message) => { throw new WorkflowDefinitionError(message); };
+
+/** Refuse an infrastructure field on `object`: the one G2 rule for every place a definition can carry one. */
+function rejectInfraFields(object, subject, { allow, suffix = '' } = {}) {
+  for (const field of DISALLOWED_G2_FIELDS) {
+    if (field === allow) continue;
+    if (object[field] !== undefined) fail(`${subject} contains disallowed infrastructure field "${field}" (G2 constraint${suffix}).`);
+  }
+}
 
 export function normalizeContextRefs(raw = [], label = 'contextRefs') {
   if (!Array.isArray(raw) || raw.some((ref) => typeof ref !== 'string' || !ref.trim() ||
@@ -46,23 +52,13 @@ export function normalizeContextRefs(raw = [], label = 'contextRefs') {
 
 /** One `inputs` entry of a unit template: which earlier step's results the unit receives. */
 function normalizeInputEntry(raw, label) {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
-    throw new WorkflowDefinitionError(`${label} must be an object like { step: <step id> }`);
-  }
+  if (!isObject(raw)) fail(`${label} must be an object like { step: <step id> }`);
   for (const key of Object.keys(raw)) {
-    if (!INPUT_ENTRY_KEYS.has(key)) {
-      throw new WorkflowDefinitionError(`${label} has unknown key "${key}" (allowed: step, sameSeat, label)`);
-    }
+    if (!INPUT_ENTRY_KEYS.has(key)) fail(`${label} has unknown key "${key}" (allowed: step, sameSeat, label)`);
   }
-  if (typeof raw.step !== 'string' || !raw.step.trim()) {
-    throw new WorkflowDefinitionError(`${label} requires "step" (the id of an earlier step)`);
-  }
-  if (raw.sameSeat !== undefined && typeof raw.sameSeat !== 'boolean') {
-    throw new WorkflowDefinitionError(`${label} sameSeat must be true or false`);
-  }
-  if (raw.label !== undefined && (typeof raw.label !== 'string' || !raw.label.trim())) {
-    throw new WorkflowDefinitionError(`${label} label must be a non-empty string`);
-  }
+  if (!isText(raw.step)) fail(`${label} requires "step" (the id of an earlier step)`);
+  if (raw.sameSeat !== undefined && typeof raw.sameSeat !== 'boolean') fail(`${label} sameSeat must be true or false`);
+  if (raw.label !== undefined && !isText(raw.label)) fail(`${label} label must be a non-empty string`);
   return Object.freeze({
     step: raw.step.trim(),
     ...(raw.sameSeat === true ? { sameSeat: true } : {}),
@@ -70,54 +66,175 @@ function normalizeInputEntry(raw, label) {
   });
 }
 
-function normalizeOperation(raw, label) {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
-    throw new WorkflowDefinitionError(`${label} must be a non-null object`);
+function normalizeGate(raw, stepLabel) {
+  if (raw === undefined || raw === null) return null;
+  if (!isObject(raw)) fail(`${stepLabel}.gate must be an object`);
+  const mode = raw.mode !== undefined ? String(raw.mode).trim() : 'consent';
+  if (!GATE_MODES.includes(mode)) fail(`${stepLabel}.gate.mode must be ${GATE_MODES.map((m) => `"${m}"`).join(' or ')}, got "${raw.mode}"`);
+  return Object.freeze({ kind: raw.kind || 'human', mode, question: trimmedOrUndefined(raw.question), header: trimmedOrUndefined(raw.header) });
+}
+
+function normalizeWriteScope(raw, label) {
+  if (raw === undefined) return [];
+  try {
+    return canonicalizeWrites(raw);
+  } catch (err) {
+    return fail(`${label}.writes: ${err.message}`);
   }
-  if (typeof raw.id !== 'string' || !raw.id.trim()) {
-    throw new WorkflowDefinitionError(`${label} requires a non-empty string "id"`);
+}
+
+function normalizeStanceOptions(raw, label) {
+  if (raw === undefined) return undefined;
+  if (!Array.isArray(raw) || raw.some((option) => !isText(option))) fail(`${label} stanceOptions must be an array of non-empty strings`);
+  const options = raw.map((option) => option.trim());
+  if (new Set(options).size !== options.length || options.includes('other')) fail(`${label} stanceOptions must be unique; "other" is reserved`);
+  return Object.freeze(options);
+}
+
+function normalizeAcceptOutcomes(raw, label) {
+  const outcomes = raw === undefined ? ['pass'] : raw;
+  if (!Array.isArray(outcomes) || !outcomes.length
+    || outcomes.some((outcome) => !['pass', 'findings'].includes(outcome)) || new Set(outcomes).size !== outcomes.length) {
+    fail(`${label}.acceptOutcomes requires a reviewed template and unique pass/findings outcomes`);
   }
-  for (const field of DISALLOWED_G2_FIELDS) {
-    if (raw[field] !== undefined) {
-      throw new WorkflowDefinitionError(`${label} contains disallowed infrastructure field "${field}" (G2 constraint).`);
-    }
+  return outcomes;
+}
+
+/** The checks on a unit template's declared fields, throwing on the first that fails; returns the trimmed rigor. */
+function checkTemplateFields(template, label) {
+  if (!isText(template.capability)) fail(`${label} requires "capability" (e.g. domain:verb or verb)`);
+  const timeoutProblem = template.timeoutMs === undefined ? null : runTimeoutProblem(template.timeoutMs, `${label} timeoutMs`);
+  if (timeoutProblem) fail(timeoutProblem);
+  if (template.verify !== undefined && !isText(template.verify)) fail(`${label} verify must be a non-empty command string`);
+  if (template.skills !== undefined && (!Array.isArray(template.skills) || template.skills.length === 0 || template.skills.some((skill) => !isText(skill)))) {
+    fail(`${label} skills must be a non-empty array of non-empty skill names`);
   }
-  const id = raw.id.trim();
-  if (raw.dispatch !== undefined && !VALID_OPERATION_DISPATCH.has(raw.dispatch)) {
-    throw new WorkflowDefinitionError(`${label} invalid dispatch "${raw.dispatch}", must be one of [${[...VALID_OPERATION_DISPATCH].join(', ')}]`);
+  const rigor = template.rigor ? String(template.rigor).trim() : undefined;
+  if (rigor && !RIGOR_ORDER.includes(rigor)) fail(`${label} invalid rigor "${rigor}", must be one of [${RIGOR_ORDER.join(', ')}]`);
+  return rigor;
+}
+
+function checkTemplateShapes(template, label) {
+  if (template.seats !== undefined && (!Array.isArray(template.seats) || !template.seats.every(isObject))) {
+    fail(`${label}.seats must be an array of { seat, role, persona?, tier? } (checked in full by validateWorkflowChecked)`);
   }
-  if (raw.skills !== undefined && (!Array.isArray(raw.skills) || raw.skills.some((sk) => typeof sk !== 'string' || !sk.trim()))) {
-    throw new WorkflowDefinitionError(`${label}.skills must be an array of non-empty strings`);
+  if (template.params !== undefined && !isObject(template.params)) fail(`${label} params must be an object (pattern params such as roleTasks)`);
+  for (const flag of ['anonymizeInputs', 'blind']) {
+    if (template[flag] !== undefined && typeof template[flag] !== 'boolean') fail(`${label} ${flag} must be true or false`);
   }
-  let policy;
-  if (raw.policy !== undefined) {
-    if (!raw.policy || typeof raw.policy !== 'object' || Array.isArray(raw.policy)) {
-      throw new WorkflowDefinitionError(`${label}.policy must be an object`);
-    }
-    for (const field of DISALLOWED_G2_FIELDS) {
-      if (raw.policy[field] !== undefined) {
-        throw new WorkflowDefinitionError(`${label}.policy contains disallowed infrastructure field "${field}" (G2 constraint).`);
-      }
-    }
-    policy = Object.freeze({ ...raw.policy });
-  }
+  if (template.inputs !== undefined && !Array.isArray(template.inputs)) fail(`${label} inputs must be an array of { step, sameSeat?, label? } entries`);
+}
+
+function normalizeTemplate(template, label, allowPrefer) {
+  const rigor = checkTemplateFields(template, label);
+  const writes = normalizeWriteScope(template.writes, label);
+  checkTemplateShapes(template, label);
+  const stanceOptions = normalizeStanceOptions(template.stanceOptions, label);
+  const contextRefs = normalizeContextRefs(template.contextRefs, `${label}.contextRefs`);
+  const acceptOutcomes = normalizeAcceptOutcomes(template.acceptOutcomes, label);
+  const inputs = template.inputs?.map((entry, iIdx) => normalizeInputEntry(entry, `${label}.inputs[${iIdx}]`));
   return Object.freeze({
-    id,
-    ...(raw.primary === true ? { primary: true } : {}),
-    taskSpec: typeof raw.taskSpec === 'string' && raw.taskSpec.trim() ? raw.taskSpec.trim() : id,
-    ...(typeof raw.role === 'string' && raw.role.trim() ? { role: raw.role.trim() } : {}),
-    ...(typeof raw.reason === 'string' && raw.reason.trim() ? { reason: raw.reason.trim() } : {}),
-    ...(raw.dispatch ? { dispatch: raw.dispatch } : {}),
-    ...(raw.skills ? { skills: Object.freeze(raw.skills.map((sk) => sk.trim())) } : {}),
-    ...(policy ? { policy } : {}),
+    capability: template.capability.trim(),
+    objective: trimmedOrUndefined(template.objective),
+    pattern: trimmedOrUndefined(template.pattern),
+    rigor,
+    writes,
+    taskSpec: trimmedOrUndefined(template.taskSpec),
+    persona: isText(template.persona) ? template.persona.trim() : undefined,
+    ...(template.timeoutMs !== undefined ? { timeoutMs: template.timeoutMs } : {}),
+    ...(template.verify !== undefined ? { verify: template.verify.trim() } : {}),
+    ...(template.skills !== undefined ? { skills: Object.freeze([...new Set(template.skills.map((skill) => skill.trim()))]) } : {}),
+    // Shape is checked by the Unit contract (validateUnit) before a units file gets here and again at run.
+    ...(allowPrefer && template.prefer !== undefined ? { prefer: Object.freeze(structuredClone(template.prefer)) } : {}),
+    params: template.params === undefined ? undefined : structuredClone(template.params),
+    ...(template.seats !== undefined ? { seats: Object.freeze(template.seats.map((entry) => Object.freeze({ ...entry }))) } : {}),
+    contextRefs,
+    ...(template.acceptOutcomes !== undefined
+      ? { acceptOutcomes: Object.freeze([...acceptOutcomes]) }
+      : (template.pattern === 'reviewed' ? { acceptOutcomes: Object.freeze(['pass']) } : {})),
+    ...(stanceOptions === undefined ? {} : { stanceOptions }),
+    anonymizeInputs: template.anonymizeInputs === true ? true : undefined,
+    blind: template.blind === true ? true : undefined,
+    inputs: inputs ? Object.freeze(inputs) : undefined,
   });
 }
 
-// Where a definition comes from, as the caller that loaded it says -- never a field of the data.
-// Only a units file (`fgos workflow start --units`) is a one-off list of Units, so only its unit
-// templates may carry a soft executor `prefer`; a preset or plan is shipped to other projects
-// and keeps the G2 rule (its seats are tuned with --seats and personas instead).
-const UNITS_FILE_SOURCE = 'units-file';
+function normalizeUnit(u, uIdx, stepLabel, stepId, allowPrefer) {
+  const label = `${stepLabel}.units[${uIdx}]`;
+  if (!isObject(u)) fail(`${label} must be a non-null object`);
+  rejectInfraFields(u, label);
+  const template = u.template && typeof u.template === 'object' ? u.template : u;
+  rejectInfraFields(template, `${label}.template`, { allow: allowPrefer ? 'prefer' : undefined });
+  return Object.freeze({
+    id: isText(u.id) ? u.id.trim() : `${stepId}-u${uIdx + 1}`,
+    template: normalizeTemplate(template, label, allowPrefer),
+    dependsOn: Array.isArray(u.dependsOn) ? u.dependsOn.map((ud) => String(ud).trim()).filter(Boolean) : [],
+  });
+}
+
+function normalizeStep(s, i, workflowId, stepIds, allowPrefer) {
+  const label = `Workflow "${workflowId}" steps[${i}]`;
+  if (!isObject(s)) fail(`${label} must be a non-null object`);
+  rejectInfraFields(s, `${label} (id: "${s.id || i}")`);
+  if (!isText(s.id)) fail(`${label} requires a non-empty string "id"`);
+  const id = s.id.trim();
+  if (stepIds.has(id)) fail(`${label} has duplicate step id "${id}"`);
+  stepIds.add(id);
+  const dependsOn = Array.isArray(s.dependsOn)
+    ? s.dependsOn.map((d, dIdx) => (isText(d) ? d.trim() : fail(`${label}.dependsOn[${dIdx}] must be a non-empty string`)))
+    : [];
+  if (s.kind !== undefined && s.kind !== null && s.kind !== 'standard') {
+    fail(s.kind === 'integrate'
+      ? `${label} kind "integrate" is no longer a Playbook step kind: a unit's branch is merged at the approve door, not by the Playbook`
+      : `${label} unknown kind ${JSON.stringify(s.kind)}, the only step kind is "standard"`);
+  }
+  if (s.target !== undefined && s.target !== null) {
+    fail(`${label} "target" is not a Playbook step field: a unit's branch is merged at the approve door, not by the Playbook`);
+  }
+  const gate = normalizeGate(s.gate, label);
+  const stepMachine = normalizeWorkStepFields(s, label);
+  const units = Array.isArray(s.units) ? s.units.map((u, uIdx) => normalizeUnit(u, uIdx, label, id, allowPrefer)) : [];
+  return Object.freeze({
+    id,
+    title: typeof s.title === 'string' ? s.title.trim() : id,
+    dependsOn,
+    ...(stepMachine.phase ? { phase: stepMachine.phase } : {}),
+    ...(stepMachine.skill ? { skill: stepMachine.skill } : {}),
+    operations: Object.freeze(stepMachine.operations),
+    gate,
+    units: Object.freeze(units),
+  });
+}
+
+/** Declared steps must exist, not wait on themselves or in a loop; a unit's `inputs` name steps its step builds on. */
+function checkStepRefs(workflowId, steps) {
+  const stepIds = new Set(steps.map((step) => step.id));
+  for (const step of steps) {
+    for (const dep of step.dependsOn) {
+      if (!stepIds.has(dep)) fail(`Workflow "${workflowId}" step "${step.id}" depends on undeclared step "${dep}"`);
+      if (dep === step.id) fail(`Workflow "${workflowId}" step "${step.id}" cannot depend on itself`);
+    }
+  }
+  const { stuck } = dependencyOrder(steps);
+  if (stuck.length > 0) fail(`Workflow "${workflowId}" steps ${stuck.map((step) => `"${step.id}"`).join(', ')} wait on each other`);
+  const stepsById = new Map(steps.map((step) => [step.id, step]));
+  const builtOn = (stepId, seen = new Set()) => {
+    for (const dep of stepsById.get(stepId).dependsOn) {
+      if (!seen.has(dep)) builtOn(dep, seen.add(dep));
+    }
+    return seen;
+  };
+  for (const step of steps) {
+    const earlier = builtOn(step.id);
+    for (const u of step.units) {
+      (u.template.inputs ?? []).forEach((entry, iIdx) => {
+        const where = `Workflow "${workflowId}" step "${step.id}" unit "${u.id}" inputs[${iIdx}]`;
+        if (!stepIds.has(entry.step)) fail(`${where} names undeclared step "${entry.step}"`);
+        if (!earlier.has(entry.step)) fail(`${where} names step "${entry.step}", which this step does not depend on (directly or not)`);
+      });
+    }
+  }
+}
 
 /**
  * Validate a Workflow definition object.
@@ -128,375 +245,122 @@ const UNITS_FILE_SOURCE = 'units-file';
  * @returns {Readonly<object>} Frozen, normalized Workflow object, with its `guide` model (see guide-schema.mjs)
  */
 export function validateWorkflow(raw, { source } = {}) {
-  const templateAllowsPrefer = source === UNITS_FILE_SOURCE;
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
-    throw new WorkflowDefinitionError('Workflow definition must be a non-null object');
-  }
-
-  // Check top-level G2 violations
-  for (const field of DISALLOWED_G2_FIELDS) {
-    if (raw[field] !== undefined) {
-      throw new WorkflowDefinitionError(
-        `Workflow definition "${raw.id || 'unnamed'}" contains disallowed infrastructure field "${field}" (G2 constraint: Workflow is non-infrastructure).`,
-      );
-    }
-  }
-
-  if (typeof raw.id !== 'string' || !raw.id.trim()) {
-    throw new WorkflowDefinitionError('Workflow definition requires a non-empty string "id"');
-  }
-
+  if (!isObject(raw)) fail('Workflow definition must be a non-null object');
+  rejectInfraFields(raw, `Workflow definition "${raw.id || 'unnamed'}"`, { suffix: ': Workflow is non-infrastructure' });
+  if (!isText(raw.id)) fail('Workflow definition requires a non-empty string "id"');
   const id = raw.id.trim();
-  const title = typeof raw.title === 'string' ? raw.title.trim() : id;
-  const description = typeof raw.description === 'string' ? raw.description.trim() : '';
-
-  if (!Array.isArray(raw.steps) || raw.steps.length === 0) {
-    throw new WorkflowDefinitionError(`Workflow "${id}" must declare a non-empty "steps" array`);
-  }
-
+  if (!Array.isArray(raw.steps) || raw.steps.length === 0) fail(`Workflow "${id}" must declare a non-empty "steps" array`);
   const stepIds = new Set();
-  const normalizedSteps = [];
-
-  for (let i = 0; i < raw.steps.length; i++) {
-    const s = raw.steps[i];
-    const stepLabel = `Workflow "${id}" steps[${i}]`;
-
-    if (!s || typeof s !== 'object' || Array.isArray(s)) {
-      throw new WorkflowDefinitionError(`${stepLabel} must be a non-null object`);
-    }
-
-    // Check step G2 violations
-    for (const field of DISALLOWED_G2_FIELDS) {
-      if (s[field] !== undefined) {
-        throw new WorkflowDefinitionError(
-          `${stepLabel} (id: "${s.id || i}") contains disallowed infrastructure field "${field}" (G2 constraint).`,
-        );
-      }
-    }
-
-    if (typeof s.id !== 'string' || !s.id.trim()) {
-      throw new WorkflowDefinitionError(`${stepLabel} requires a non-empty string "id"`);
-    }
-
-    const sId = s.id.trim();
-    if (stepIds.has(sId)) {
-      throw new WorkflowDefinitionError(`${stepLabel} has duplicate step id "${sId}"`);
-    }
-    stepIds.add(sId);
-
-    const dependsOn = Array.isArray(s.dependsOn)
-      ? s.dependsOn.map((d, dIdx) => {
-          if (typeof d !== 'string' || !d.trim()) {
-            throw new WorkflowDefinitionError(`${stepLabel}.dependsOn[${dIdx}] must be a non-empty string`);
-          }
-          return d.trim();
-        })
-      : [];
-
-    if (s.kind !== undefined && s.kind !== null && s.kind !== 'standard') {
-      throw new WorkflowDefinitionError(s.kind === 'integrate'
-        ? `${stepLabel} kind "integrate" is no longer a Playbook step kind: a unit's branch is merged at the approve door, not by the Playbook`
-        : `${stepLabel} unknown kind ${JSON.stringify(s.kind)}, the only step kind is "standard"`);
-    }
-    if (s.target !== undefined && s.target !== null) {
-      throw new WorkflowDefinitionError(`${stepLabel} "target" is not a Playbook step field: a unit's branch is merged at the approve door, not by the Playbook`);
-    }
-
-    let gate = null;
-    if (s.gate !== undefined && s.gate !== null) {
-      if (typeof s.gate !== 'object' || Array.isArray(s.gate)) {
-        throw new WorkflowDefinitionError(`${stepLabel}.gate must be an object`);
-      }
-      const gateKind = s.gate.kind || 'human';
-      const gateMode = s.gate.mode !== undefined ? String(s.gate.mode).trim() : 'consent';
-      if (gateMode !== 'consent' && gateMode !== 'input') {
-        throw new WorkflowDefinitionError(`${stepLabel}.gate.mode must be "consent" or "input", got "${s.gate.mode}"`);
-      }
-      gate = {
-        kind: gateKind,
-        mode: gateMode,
-        question: typeof s.gate.question === 'string' ? s.gate.question.trim() : undefined,
-        header: typeof s.gate.header === 'string' ? s.gate.header.trim() : undefined,
-      };
-    }
-
-    let phase;
-    if (s.phase !== undefined) {
-      if (!VALID_STEP_PHASES.has(s.phase)) {
-        throw new WorkflowDefinitionError(`${stepLabel} unknown phase "${s.phase}", must be one of [${[...VALID_STEP_PHASES].join(', ')}]`);
-      }
-      phase = s.phase;
-    }
-    const skill = typeof s.skill === 'string' && s.skill.trim() ? s.skill.trim() : undefined;
-
-    const operations = [];
-    if (s.operations !== undefined) {
-      if (!Array.isArray(s.operations)) {
-        throw new WorkflowDefinitionError(`${stepLabel}.operations must be an array`);
-      }
-      const opIds = new Set();
-      s.operations.forEach((rawOp, oIdx) => {
-        const op = normalizeOperation(rawOp, `${stepLabel}.operations[${oIdx}]`);
-        if (opIds.has(op.id)) {
-          throw new WorkflowDefinitionError(`${stepLabel}.operations has duplicate operation id "${op.id}"`);
-        }
-        opIds.add(op.id);
-        operations.push(op);
-      });
-    }
-
-    const units = [];
-    if (Array.isArray(s.units)) {
-      for (let uIdx = 0; uIdx < s.units.length; uIdx++) {
-        const u = s.units[uIdx];
-        const unitLabel = `${stepLabel}.units[${uIdx}]`;
-
-        if (!u || typeof u !== 'object' || Array.isArray(u)) {
-          throw new WorkflowDefinitionError(`${unitLabel} must be a non-null object`);
-        }
-
-        // Check unit G2 violations
-        for (const field of DISALLOWED_G2_FIELDS) {
-          if (u[field] !== undefined) {
-            throw new WorkflowDefinitionError(`${unitLabel} contains disallowed infrastructure field "${field}" (G2 constraint).`);
-          }
-        }
-
-        const template = u.template && typeof u.template === 'object' ? u.template : u;
-        for (const field of DISALLOWED_G2_FIELDS) {
-          if (field === 'prefer' && templateAllowsPrefer) continue;
-          if (template[field] !== undefined) {
-            throw new WorkflowDefinitionError(`${unitLabel}.template contains disallowed infrastructure field "${field}" (G2 constraint).`);
-          }
-        }
-
-        const uId = typeof u.id === 'string' && u.id.trim() ? u.id.trim() : `${sId}-u${uIdx + 1}`;
-        const capability = typeof template.capability === 'string' && template.capability.trim()
-          ? template.capability.trim()
-          : undefined;
-
-        if (!capability) {
-          throw new WorkflowDefinitionError(`${unitLabel} requires "capability" (e.g. domain:verb or verb)`);
-        }
-
-        const timeoutMs = template.timeoutMs;
-        const timeoutProblem = timeoutMs === undefined ? null : runTimeoutProblem(timeoutMs, `${unitLabel} timeoutMs`);
-        if (timeoutProblem) throw new WorkflowDefinitionError(timeoutProblem);
-
-        if (template.verify !== undefined && (typeof template.verify !== 'string' || !template.verify.trim())) {
-          throw new WorkflowDefinitionError(`${unitLabel} verify must be a non-empty command string`);
-        }
-        if (template.skills !== undefined && (!Array.isArray(template.skills) || template.skills.length === 0
-          || template.skills.some((skill) => typeof skill !== 'string' || !skill.trim()))) {
-          throw new WorkflowDefinitionError(`${unitLabel} skills must be a non-empty array of non-empty skill names`);
-        }
-
-        const rigor = template.rigor ? String(template.rigor).trim() : undefined;
-        if (rigor && !VALID_RIGORS.has(rigor)) {
-          throw new WorkflowDefinitionError(`${unitLabel} invalid rigor "${rigor}", must be one of [${[...VALID_RIGORS].join(', ')}]`);
-        }
-
-        let writes = [];
-        if (template.writes !== undefined) {
-          try {
-            writes = canonicalizeWrites(template.writes);
-          } catch (err) {
-            throw new WorkflowDefinitionError(`${unitLabel}.writes: ${err.message}`);
-          }
-        }
-
-        const uDependsOn = Array.isArray(u.dependsOn)
-          ? u.dependsOn.map((ud) => String(ud).trim()).filter(Boolean)
-          : [];
-
-        if (template.seats !== undefined && (!Array.isArray(template.seats) || template.seats.some((entry) => !entry || typeof entry !== 'object' || Array.isArray(entry)))) {
-          throw new WorkflowDefinitionError(`${unitLabel}.seats must be an array of { seat, role, persona?, tier? } (checked in full by validateWorkflowChecked)`);
-        }
-        if (template.params !== undefined && (template.params === null || typeof template.params !== 'object' || Array.isArray(template.params))) {
-          throw new WorkflowDefinitionError(`${unitLabel} params must be an object (pattern params such as roleTasks)`);
-        }
-
-        let stanceOptions;
-        if (template.stanceOptions !== undefined) {
-          if (!Array.isArray(template.stanceOptions) || template.stanceOptions.some((option) => typeof option !== 'string' || !option.trim())) {
-            throw new WorkflowDefinitionError(`${unitLabel} stanceOptions must be an array of non-empty strings`);
-          }
-          stanceOptions = template.stanceOptions.map((option) => option.trim());
-          if (new Set(stanceOptions).size !== stanceOptions.length || stanceOptions.includes('other')) {
-            throw new WorkflowDefinitionError(`${unitLabel} stanceOptions must be unique; "other" is reserved`);
-          }
-        }
-        const contextRefs = normalizeContextRefs(template.contextRefs, `${unitLabel}.contextRefs`);
-        const acceptOutcomes = template.acceptOutcomes === undefined ? ['pass'] : template.acceptOutcomes;
-        if (!Array.isArray(acceptOutcomes) || !acceptOutcomes.length ||
-          acceptOutcomes.some((outcome) => !['pass', 'findings'].includes(outcome)) ||
-          new Set(acceptOutcomes).size !== acceptOutcomes.length) {
-          throw new WorkflowDefinitionError(`${unitLabel}.acceptOutcomes requires a reviewed template and unique pass/findings outcomes`);
-        }
-
-        if (template.anonymizeInputs !== undefined && typeof template.anonymizeInputs !== 'boolean') {
-          throw new WorkflowDefinitionError(`${unitLabel} anonymizeInputs must be true or false`);
-        }
-
-        if (template.blind !== undefined && typeof template.blind !== 'boolean') {
-          throw new WorkflowDefinitionError(`${unitLabel} blind must be true or false`);
-        }
-
-        let inputs;
-        if (template.inputs !== undefined) {
-          if (!Array.isArray(template.inputs)) {
-            throw new WorkflowDefinitionError(`${unitLabel} inputs must be an array of { step, sameSeat?, label? } entries`);
-          }
-          inputs = template.inputs.map((entry, iIdx) => normalizeInputEntry(entry, `${unitLabel}.inputs[${iIdx}]`));
-        }
-
-        units.push(
-          Object.freeze({
-            id: uId,
-            template: Object.freeze({
-              capability,
-              objective: typeof template.objective === 'string' ? template.objective.trim() : undefined,
-              pattern: typeof template.pattern === 'string' ? template.pattern.trim() : undefined,
-              rigor,
-              writes,
-              taskSpec: typeof template.taskSpec === 'string' ? template.taskSpec.trim() : undefined,
-              persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
-              ...(timeoutMs !== undefined ? { timeoutMs } : {}),
-              ...(template.verify !== undefined ? { verify: template.verify.trim() } : {}),
-              ...(template.skills !== undefined ? { skills: Object.freeze([...new Set(template.skills.map((skill) => skill.trim()))]) } : {}),
-              // Shape is checked by the Unit contract (validateUnit) before a units file gets here and again at run.
-              ...(templateAllowsPrefer && template.prefer !== undefined ? { prefer: Object.freeze(structuredClone(template.prefer)) } : {}),
-              params: template.params === undefined ? undefined : structuredClone(template.params),
-              ...(template.seats !== undefined ? { seats: Object.freeze(template.seats.map((entry) => Object.freeze({ ...entry }))) } : {}),
-              contextRefs,
-              ...(template.acceptOutcomes !== undefined
-                ? { acceptOutcomes: Object.freeze([...acceptOutcomes]) }
-                : (template.pattern === 'reviewed' ? { acceptOutcomes: Object.freeze(['pass']) } : {})),
-              ...(stanceOptions === undefined ? {} : { stanceOptions: Object.freeze(stanceOptions) }),
-              anonymizeInputs: template.anonymizeInputs === true ? true : undefined,
-              blind: template.blind === true ? true : undefined,
-              inputs: inputs ? Object.freeze(inputs) : undefined,
-            }),
-            dependsOn: uDependsOn,
-          }),
-        );
-      }
-    }
-
-    normalizedSteps.push(
-      Object.freeze({
-        id: sId,
-        title: typeof s.title === 'string' ? s.title.trim() : sId,
-        dependsOn,
-        ...(phase ? { phase } : {}),
-        ...(skill ? { skill } : {}),
-        operations: Object.freeze(operations),
-        gate: gate ? Object.freeze(gate) : null,
-        units: Object.freeze(units),
-      }),
-    );
-  }
-
-  // Validate step dependsOn references
-  for (const step of normalizedSteps) {
-    for (const dep of step.dependsOn) {
-      if (!stepIds.has(dep)) {
-        throw new WorkflowDefinitionError(`Workflow "${id}" step "${step.id}" depends on undeclared step "${dep}"`);
-      }
-      if (dep === step.id) {
-        throw new WorkflowDefinitionError(`Workflow "${id}" step "${step.id}" cannot depend on itself`);
-      }
-    }
-  }
-
-  // A unit's `inputs` name earlier steps: only a step this one builds on, directly or not.
-  const stepsById = new Map(normalizedSteps.map((s) => [s.id, s]));
-  const builtOn = (stepId) => {
-    const seen = new Set();
-    const walk = (id) => {
-      for (const dep of stepsById.get(id).dependsOn) {
-        if (!seen.has(dep)) {
-          seen.add(dep);
-          walk(dep);
-        }
-      }
-    };
-    walk(stepId);
-    return seen;
-  };
-  for (const step of normalizedSteps) {
-    const earlier = builtOn(step.id);
-    for (const u of step.units) {
-      (u.template.inputs ?? []).forEach((entry, iIdx) => {
-        const where = `Workflow "${id}" step "${step.id}" unit "${u.id}" inputs[${iIdx}]`;
-        if (!stepIds.has(entry.step)) throw new WorkflowDefinitionError(`${where} names undeclared step "${entry.step}"`);
-        if (!earlier.has(entry.step)) {
-          throw new WorkflowDefinitionError(`${where} names step "${entry.step}", which this step does not depend on (directly or not)`);
-        }
-      });
-    }
-  }
-
-  const transitions = [];
-  if (raw.transitions !== undefined) {
-    if (!Array.isArray(raw.transitions)) {
-      throw new WorkflowDefinitionError(`Workflow "${id}" transitions must be an array`);
-    }
-    raw.transitions.forEach((t, tIdx) => {
-      if (!t || typeof t !== 'object' || !stepIds.has(t.from) || !stepIds.has(t.to)) {
-        throw new WorkflowDefinitionError(`Workflow "${id}" transitions[${tIdx}] must name declared steps in "from" and "to"`);
-      }
-      transitions.push(Object.freeze({ from: t.from, to: t.to }));
-    });
-  }
-
-  // Names an older record may carry for a step that now has a different id.
-  const aliases = {};
-  if (raw.aliases !== undefined) {
-    if (!raw.aliases || typeof raw.aliases !== 'object' || Array.isArray(raw.aliases)) {
-      throw new WorkflowDefinitionError(`Workflow "${id}" aliases must be an object of oldName -> stepId`);
-    }
-    for (const [oldName, target] of Object.entries(raw.aliases)) {
-      if (!stepIds.has(target)) {
-        throw new WorkflowDefinitionError(`Workflow "${id}" alias "${oldName}" points at undeclared step "${target}"`);
-      }
-      aliases[oldName] = target;
-    }
-  }
-
-  // Skill/taskSpec a Work status (not a step) is handled by, e.g. retrospective.
-  const statusSkills = {};
-  if (raw.statusSkills !== undefined) {
-    if (!raw.statusSkills || typeof raw.statusSkills !== 'object' || Array.isArray(raw.statusSkills)) {
-      throw new WorkflowDefinitionError(`Workflow "${id}" statusSkills must be an object of status -> { skill, taskSpec }`);
-    }
-    for (const [status, entry] of Object.entries(raw.statusSkills)) {
-      if (!entry || typeof entry.skill !== 'string' || !entry.skill.trim()) {
-        throw new WorkflowDefinitionError(`Workflow "${id}" statusSkills.${status} requires a non-empty "skill"`);
-      }
-      statusSkills[status] = Object.freeze({
-        skill: entry.skill.trim(),
-        ...(typeof entry.taskSpec === 'string' && entry.taskSpec.trim() ? { taskSpec: entry.taskSpec.trim() } : {}),
-      });
-    }
-  }
-
+  const steps = raw.steps.map((s, i) => normalizeStep(s, i, id, stepIds, source === UNITS_FILE_SOURCE));
+  checkStepRefs(id, steps);
+  const transitions = normalizeTransitions(raw.transitions, id, stepIds);
+  const aliases = normalizeAliases(raw.aliases, id, stepIds);
+  const statusSkills = normalizeStatusSkills(raw.statusSkills, id);
   let guide;
   try {
-    guide = normalizeGuide(raw, { id, steps: normalizedSteps });
+    guide = normalizeGuide(raw, { id, steps });
   } catch (err) {
-    if (err instanceof GuideSchemaError) throw new WorkflowDefinitionError(`Workflow "${id}" guide: ${err.message}`);
+    if (err instanceof GuideSchemaError) fail(`Workflow "${id}" guide: ${err.message}`);
     throw err;
   }
-
   return Object.freeze({
     id,
-    title,
-    description,
-    steps: Object.freeze(normalizedSteps),
+    title: typeof raw.title === 'string' ? raw.title.trim() : id,
+    description: typeof raw.description === 'string' ? raw.description.trim() : '',
+    steps: Object.freeze(steps),
     transitions: Object.freeze(transitions),
     aliases: Object.freeze(aliases),
     statusSkills: Object.freeze(statusSkills),
     guide,
   });
+}
+
+// ─── Work step machine ─────────────────────────────────────────────────────────
+// Everything below serves the Work step machine (a Work item walking a workflow's steps: `phase`, `skill`,
+// `operations`, `transitions`, `aliases`, `statusSkills`) until its cutover; the guide and the Playbook read none of it.
+
+function normalizeOperation(raw, label) {
+  if (!isObject(raw)) fail(`${label} must be a non-null object`);
+  if (!isText(raw.id)) fail(`${label} requires a non-empty string "id"`);
+  rejectInfraFields(raw, label);
+  const id = raw.id.trim();
+  if (raw.dispatch !== undefined && !VALID_OPERATION_DISPATCH.has(raw.dispatch)) {
+    fail(`${label} invalid dispatch "${raw.dispatch}", must be one of [${[...VALID_OPERATION_DISPATCH].join(', ')}]`);
+  }
+  if (raw.skills !== undefined && (!Array.isArray(raw.skills) || raw.skills.some((sk) => !isText(sk)))) {
+    fail(`${label}.skills must be an array of non-empty strings`);
+  }
+  let policy;
+  if (raw.policy !== undefined) {
+    if (!isObject(raw.policy)) fail(`${label}.policy must be an object`);
+    rejectInfraFields(raw.policy, `${label}.policy`);
+    policy = Object.freeze({ ...raw.policy });
+  }
+  return Object.freeze({
+    id,
+    ...(raw.primary === true ? { primary: true } : {}),
+    taskSpec: isText(raw.taskSpec) ? raw.taskSpec.trim() : id,
+    ...(isText(raw.role) ? { role: raw.role.trim() } : {}),
+    ...(isText(raw.reason) ? { reason: raw.reason.trim() } : {}),
+    ...(raw.dispatch ? { dispatch: raw.dispatch } : {}),
+    ...(raw.skills ? { skills: Object.freeze(raw.skills.map((sk) => sk.trim())) } : {}),
+    ...(policy ? { policy } : {}),
+  });
+}
+
+/** A step's coarse `phase` (which pool a Work item sits in), its `skill`, and its `operations`. */
+function normalizeWorkStepFields(s, label) {
+  if (s.phase !== undefined && !VALID_STEP_PHASES.has(s.phase)) {
+    fail(`${label} unknown phase "${s.phase}", must be one of [${[...VALID_STEP_PHASES].join(', ')}]`);
+  }
+  const operations = [];
+  if (s.operations !== undefined) {
+    if (!Array.isArray(s.operations)) fail(`${label}.operations must be an array`);
+    const opIds = new Set();
+    s.operations.forEach((rawOp, oIdx) => {
+      const op = normalizeOperation(rawOp, `${label}.operations[${oIdx}]`);
+      if (opIds.has(op.id)) fail(`${label}.operations has duplicate operation id "${op.id}"`);
+      opIds.add(op.id);
+      operations.push(op);
+    });
+  }
+  return { phase: s.phase, skill: isText(s.skill) ? s.skill.trim() : undefined, operations };
+}
+
+function normalizeTransitions(raw, workflowId, stepIds) {
+  if (raw === undefined) return [];
+  if (!Array.isArray(raw)) fail(`Workflow "${workflowId}" transitions must be an array`);
+  return raw.map((t, tIdx) => {
+    if (!t || typeof t !== 'object' || !stepIds.has(t.from) || !stepIds.has(t.to)) {
+      fail(`Workflow "${workflowId}" transitions[${tIdx}] must name declared steps in "from" and "to"`);
+    }
+    return Object.freeze({ from: t.from, to: t.to });
+  });
+}
+
+/** Names an older record may carry for a step that now has a different id. */
+function normalizeAliases(raw, workflowId, stepIds) {
+  const aliases = {};
+  if (raw === undefined) return aliases;
+  if (!isObject(raw)) fail(`Workflow "${workflowId}" aliases must be an object of oldName -> stepId`);
+  for (const [oldName, target] of Object.entries(raw)) {
+    if (!stepIds.has(target)) fail(`Workflow "${workflowId}" alias "${oldName}" points at undeclared step "${target}"`);
+    aliases[oldName] = target;
+  }
+  return aliases;
+}
+
+/** Skill/taskSpec a Work status (not a step) is handled by, e.g. retrospective. */
+function normalizeStatusSkills(raw, workflowId) {
+  const statusSkills = {};
+  if (raw === undefined) return statusSkills;
+  if (!isObject(raw)) fail(`Workflow "${workflowId}" statusSkills must be an object of status -> { skill, taskSpec }`);
+  for (const [status, entry] of Object.entries(raw)) {
+    if (!entry || !isText(entry.skill)) fail(`Workflow "${workflowId}" statusSkills.${status} requires a non-empty "skill"`);
+    statusSkills[status] = Object.freeze({
+      skill: entry.skill.trim(),
+      ...(isText(entry.taskSpec) ? { taskSpec: entry.taskSpec.trim() } : {}),
+    });
+  }
+  return statusSkills;
 }

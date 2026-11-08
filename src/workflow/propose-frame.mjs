@@ -7,7 +7,7 @@
 // what the run door will plan. How much slack a frame carries (fix dispatches, spare dispatches) is a table
 // below, calibrated against the frames of real cases; it is data, so a calibration changes one constant.
 
-import { RIGOR_ORDER } from './case-projection.mjs';
+import { RIGOR_ORDER } from './guide-schema.mjs';
 import { resolveCollaboration } from '../runner/execution/patterns/catalog.mjs';
 
 /**

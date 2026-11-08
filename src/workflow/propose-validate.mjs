@@ -15,7 +15,7 @@ import path from 'node:path';
 
 import { registeredCapabilityOf } from '../runner/dispatch/config.mjs';
 import { canonicalizeWriteEntry } from '../runner/dispatch/write-scope.mjs';
-import { RIGOR_ORDER } from './case-projection.mjs';
+import { RIGOR_ORDER } from './guide-schema.mjs';
 import { globsMeet, normalizeWrite } from './propose-classify.mjs';
 
 /**

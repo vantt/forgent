@@ -26,7 +26,7 @@ import { spawnDetachedCli } from '../cli/detached-child.mjs';
 import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 import { assertWriteChains, workflowCheckout, workflowCommit } from './unit-handoff.mjs';
 import { inheritFrom } from './case-inherit.mjs';
-import { RIGOR_ORDER } from './case-projection.mjs';
+import { RIGOR_ORDER } from './guide-schema.mjs';
 import { bindWorktree } from './case-bindings.mjs';
 import { nestedStartRefusal } from './case-admission-port.mjs';
 import { chargeNestedCase, refundNestedCase } from './case-frame.mjs';

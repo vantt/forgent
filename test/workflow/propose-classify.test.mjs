@@ -8,7 +8,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { classifySlice, loadSliceTable } from '../../src/workflow/propose-classify.mjs';
-import { RIGOR_ORDER } from '../../src/workflow/case-projection.mjs';
+import { RIGOR_ORDER } from '../../src/workflow/guide-schema.mjs';
 import { readStandardValue } from '../../src/config/facade.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 

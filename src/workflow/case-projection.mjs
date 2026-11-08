@@ -16,8 +16,6 @@ import { seatKeyOf, isVerdictResult, isVerifyResult } from '../runner/execution/
 /** Who may name a receipt. Worker prose and a self-reported `verifiedSha` are never one. */
 export const RECEIPT_EVALUATORS = Object.freeze(['harness-verify', 'reviewer-verdict', 'gate-answer']);
 
-export const RIGOR_ORDER = Object.freeze(['low', 'standard', 'high', 'critical']);
-
 const isCount = (value) => Number.isInteger(value) && value >= 0;
 
 /** A receipt of a named evaluator that passed and says which milestone and which subject digest it covers. */

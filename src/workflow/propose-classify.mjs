@@ -16,7 +16,7 @@ import path from 'node:path';
 
 import { parseYaml } from '../util/yaml.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
-import { RIGOR_ORDER } from './case-projection.mjs';
+import { RIGOR_ORDER } from './guide-schema.mjs';
 
 const TABLE_PATH = path.resolve(import.meta.dirname, '../../domains/coding/slice-kinds.yaml');
 const TABLE_VERSION = 1;

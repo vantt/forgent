@@ -7,23 +7,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { workflowFilesIn } from '../workflow/loader.mjs';
+import { parseWorkflowText, workflowDirs, workflowFilesIn } from '../workflow/loader.mjs';
 import { unitFieldsOfTemplate } from '../workflow/steps.mjs';
-import { describeYamlError, parseYaml } from '../util/yaml.mjs';
+import { describeYamlError } from '../util/yaml.mjs';
 
 function workflowDefinitionFiles(root) {
-  const dirs = [];
-  const core = path.join(root, 'core', 'workflows');
-  if (fs.existsSync(core)) dirs.push({ dir: core, prefix: '' });
-  const domainsDir = path.join(root, 'domains');
-  if (fs.existsSync(domainsDir)) {
-    for (const d of fs.readdirSync(domainsDir, { withFileTypes: true })) {
-      const dir = path.join(domainsDir, d.name, 'workflows');
-      if (d.isDirectory() && fs.existsSync(dir)) dirs.push({ dir, prefix: `${d.name}/` });
-    }
-  }
   const files = [];
-  for (const { dir, prefix } of dirs) {
+  for (const { dir, owningDomain } of workflowDirs(root)) {
+    const prefix = owningDomain === null ? '' : `${owningDomain}/`;
     for (const { filePath, workflowDir, fileName } of workflowFilesIn(dir)) {
       const name = workflowDir === null ? fileName.replace(/\.[^.]+$/, '') : path.basename(workflowDir);
       files.push({ file: filePath, rel: path.relative(root, filePath).split(path.sep).join('/'), fileId: `${prefix}${name}` });
@@ -56,7 +47,7 @@ export function readWorkflowDefinitionFiles(roots) {
         continue;
       }
       try {
-        files.push({ fileId, rel, root, raw: file.endsWith('.json') ? JSON.parse(body) : parseYaml(body, { filename: rel }) });
+        files.push({ fileId, rel, root, raw: parseWorkflowText(body, rel) });
       } catch (err) {
         unreadable.push(`${named}: cannot be parsed: ${file.endsWith('.json') ? err.message : describeYamlError(err)}`);
       }

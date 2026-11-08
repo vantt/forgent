@@ -42,10 +42,11 @@ export const PLATFORM_GUARDS = Object.freeze([
 ]);
 
 const PLATFORM_PREFIX = 'platform:';
-const GUIDE_KINDS = Object.freeze(['playbook', 'guide']);
+export const GUIDE_KINDS = Object.freeze(['playbook', 'guide']);
 const EFFECTS = Object.freeze(['none', 'writes']);
-const GATE_MODES = Object.freeze(['consent', 'input']);
-const RIGORS = Object.freeze(['low', 'standard', 'high', 'critical']);
+export const GATE_MODES = Object.freeze(['consent', 'input']);
+/** Rigor levels from lightest to heaviest; the one vocabulary every layer reads and compares by position. */
+export const RIGOR_ORDER = Object.freeze(['low', 'standard', 'high', 'critical']);
 /** Primitives that check a milestone's subject, so their row must name the milestone. */
 const SUBJECT_GUARDS = new Set(['milestone-reached', 'human-consent', 'verify-receipt', 'independence-blind']);
 /** A frame default left for the approver to size. */
@@ -298,7 +299,7 @@ function normalizeFrameDefaults(raw) {
     out[key] = value;
   }
   const floor = raw.rigorFloor;
-  if (floor !== SET_AT_APPROVAL && !RIGORS.includes(floor)) fail(`frameDefaults.rigorFloor must be one of [${RIGORS.join(', ')}] or "${SET_AT_APPROVAL}"`);
+  if (floor !== SET_AT_APPROVAL && !RIGOR_ORDER.includes(floor)) fail(`frameDefaults.rigorFloor must be one of [${RIGOR_ORDER.join(', ')}] or "${SET_AT_APPROVAL}"`);
   out.rigorFloor = floor;
   return Object.freeze(out);
 }

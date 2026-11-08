@@ -7,7 +7,7 @@
 // that names every hard rule the proposal breaks; it is not a question for the owner.
 
 import crypto from 'node:crypto';
-import { RIGOR_ORDER } from './case-projection.mjs';
+import { RIGOR_ORDER } from './guide-schema.mjs';
 import { canonicalizeWrites, writeScopesOverlap } from '../runner/dispatch/write-scope.mjs';
 
 // The refusals that mean "what this admission stood on is no longer true". Frame, route and overlap

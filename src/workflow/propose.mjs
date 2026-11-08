@@ -17,13 +17,14 @@ import path from 'node:path';
 import { RunnerConfigError, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
-import { RIGOR_ORDER } from './case-projection.mjs';
+import { RIGOR_ORDER } from './guide-schema.mjs';
 import { guideSha256 } from './case-start.mjs';
 import { inheritFrom } from './case-inherit.mjs';
 import { readCaseProjection } from './case-projection.mjs';
 import { runsRoot } from '../runner/execution/case-run-paths.mjs';
 import { digestText } from './ref-digests.mjs';
 import { loadWorkflow } from './loader.mjs';
+import { dependencyOrder } from './steps.mjs';
 import { workflowCommit } from './unit-handoff.mjs';
 import { classifySlice, defaultSliceTable } from './propose-classify.mjs';
 import { proposeFrame, ProposeFrameError } from './propose-frame.mjs';
@@ -123,20 +124,10 @@ function checkManifest(manifest, { stat }) {
 
 /** Slices in an order that respects `dependsOn`, the list's own order otherwise; a cycle is refused. */
 function orderSlices(slices, refusals) {
-  const done = new Set();
-  const ordered = [];
-  let pending = [...slices];
-  while (pending.length > 0) {
-    const ready = pending.find((slice) => slice.dependsOn.every((dep) => done.has(dep)));
-    if (!ready) {
-      refusals.push({ code: 'slice-cycle', detail: `slices ${pending.map((s) => `"${s.id}"`).join(', ')} wait on each other` });
-      return slices;
-    }
-    ordered.push(ready);
-    done.add(ready.id);
-    pending = pending.filter((slice) => slice !== ready);
-  }
-  return ordered;
+  const { ordered, stuck } = dependencyOrder(slices);
+  if (stuck.length === 0) return ordered;
+  refusals.push({ code: 'slice-cycle', detail: `slices ${stuck.map((s) => `"${s.id}"`).join(', ')} wait on each other` });
+  return slices;
 }
 
 // ─── classification, frame and validation ──────────────────────────────────────

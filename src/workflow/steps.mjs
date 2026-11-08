@@ -9,6 +9,24 @@
 const EMPTY = Object.freeze([]);
 
 /**
+ * `nodes` ({ id, dependsOn }) in an order that respects `dependsOn`, the list's own order otherwise. Nodes
+ * that wait on each other, or on one that does, come back in `stuck`: a cycle is a refusal for the caller to name.
+ */
+export function dependencyOrder(nodes) {
+  const done = new Set();
+  const ordered = [];
+  let pending = [...nodes];
+  while (pending.length > 0) {
+    const ready = pending.find((node) => node.dependsOn.every((dep) => done.has(dep)));
+    if (!ready) return { ordered, stuck: pending };
+    ordered.push(ready);
+    done.add(ready.id);
+    pending = pending.filter((node) => node !== ready);
+  }
+  return { ordered, stuck: [] };
+}
+
+/**
  * The Unit fields a step's unit template declares: the one projection of a template into a Unit, used by
  * the runner when it starts the unit, by `--seats` and by the doctor when they bind it ahead of a run, so
  * all three bind the same seats. The caller adds what only a run knows (objective, inputs, dependsOn,
@@ -39,11 +57,6 @@ export function stepById(wf, stepId) {
 /** Steps a Work item can be "at": the ones that declare a `phase`. */
 export function walkableSteps(wf) {
   return (wf?.steps ?? EMPTY).filter((s) => s.phase !== undefined).map((s) => s.id);
-}
-
-/** The step a Work item enters first — the first walkable step. */
-export function entryStep(wf) {
-  return walkableSteps(wf)[0];
 }
 
 /** First walkable step playing `phase`, or undefined. */
