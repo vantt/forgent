@@ -275,13 +275,13 @@ test('inspection leaves WAL absent; setup and mapping use the shared Rust config
     const refspecs = addon.gitFetchMappings('origin');
     port.ensureFetchMapping({ remote: 'origin', refspecs, operationId: 'mapping-one' });
     const installed = git('config', '--get-all', 'remote.origin.fetch');
-    assert.equal(installed.split('\n').length, 3);
+    assert.equal(installed.split('\n').length, 4);
     addon.ensureGitFetchMapping(temp, repo, repo, 'origin', refspecs, 'mapping-two');
     assert.equal(git('config', '--get-all', 'remote.origin.fetch'), installed);
     assert.equal(port.fetchMappingProvenance({ remote: 'origin' }).remoteUrl, '/fixture/remote');
     const after = addon.inspectGit(temp, repo, repo);
     assert.equal(after.journal.pendingCount, 0);
-    assert.equal(after.fetchRefspecs.length, 3);
+    assert.equal(after.fetchRefspecs.length, 4);
     fs.writeFileSync(path.join(repo, 'config.lock'), 'native owner');
     assert.deepEqual(addon.inspectGit(temp, repo, repo).nativeLocks, ['config.lock']);
     assert.equal(fs.readFileSync(path.join(repo, 'config.lock'), 'utf8'), 'native owner');
