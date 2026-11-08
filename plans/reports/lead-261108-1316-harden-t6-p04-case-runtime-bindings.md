@@ -30,3 +30,6 @@ src: setup -80, workflow +121 (bindings +77: reader moved in and rebuild kept; r
 
 ## Gate
 Focused list + architecture + doc-health + citation drift: 339 tests, 2 failures fixed (custody in two fixtures), rerun green. One-door census regenerated, 0 undeclared. Full `npm test` (before the last comment move): 8609 tests, 1 fail = the known V7n addendum; suite warning about a spawn without a boundary reason fixed afterwards. Rust untouched. Baseline file (`test/suite-baseline.json`) to regenerate at landing.
+
+## Open item: settled-before-release race
+Not closed in this phase: closing it needs a real settle to win over a `not-started` one already on the ledger, which is a new settle semantic (owner decision 1: no new field or fence). Recorded as a separate item; window is two adjacent statements in `runUnit` (control release, then settle), and the settle-first order is closed.
