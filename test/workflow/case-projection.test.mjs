@@ -254,3 +254,16 @@ test('a tail that never finishes is given up on after three reads, and a corrupt
   assert.throws(() => readCaseProjection(run.repoRoot, run.caseId, { retryTail: true }), (err) => err.code === 'workflow-ledger-corrupt');
   assert.equal(reads, 1);
 });
+
+test('the fold reads the later of two settles of one reservation and counts its frame once', () => {
+  const run = openCase();
+  appendAll(run, [
+    reserve('r1', 'plan'),
+    settle('r1', { outcome: 'not-started', activity: 'plan' }),
+    settle('r1', { milestone: 'plan-ready', subjectDigest: 'sha256:plan', activity: 'plan', unitRunId: 'unit-run-1' }),
+  ]);
+  const p = projectionOf(run);
+  assert.equal(p.milestones['plan-ready'].state, 'achieved');
+  assert.equal(p.liveReservations.length, 0);
+  assert.equal(p.frameRemaining.dispatches, 7, 'the dispatch is counted once, not refunded and not doubled');
+});

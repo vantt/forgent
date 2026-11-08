@@ -10,13 +10,13 @@ import { execFileSync, spawn } from 'node:child_process';
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { createWorkflowRun, readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
-import { drainCaseInbox, recordGateAnswerRound, unconsumedGateRounds, writeSettlePending } from '../../src/workflow/case-runtime.mjs';
+import { applySettle, drainCaseInbox, recordGateAnswerRound, unconsumedGateRounds, writeSettlePending } from '../../src/workflow/case-runtime.mjs';
 import { bindWorktree, readBinding } from '../../src/workflow/case-bindings.mjs';
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { digestSubject, digestText, digestContextRefs } from '../../src/workflow/ref-digests.mjs';
 import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { appendAll, append, eventsOf, openCase, projectionOf, withHold } from '../helpers/workflow-case-fixture.mjs';
+import { appendAll, append, eventsOf, FRAME, openCase, projectionOf, settle, withHold } from '../helpers/workflow-case-fixture.mjs';
 
 function gatedRun() {
   const repoRoot = makeFixtureDir('fgos-rounds-');
@@ -217,6 +217,63 @@ test('only a reservation proven dead is released: read-only, held custody, a res
   for (const stays of ['held', 'resumable', 'garbled']) {
     assert.equal(readBinding({ mainRoot: run.repoRoot, worktree: planted[stays], caseId: run.caseId }).answer, 'bound', `${stays} keeps its binding`);
   }
+});
+
+// --- a real settle wins over a release already on the ledger ------------------------------------
+
+/** A writing reservation whose Unit run is settled with no controller left, released as not-started by the next hold. */
+function releasedAfterSettling(id) {
+  const run = openCase();
+  const planted = reserve(run, [{ id }]);
+  unitRecord(run, `unit-run-${id}`, JSON.stringify({ execution: { status: 'settled' } }));
+  acquireAdvanceLock(run.repoRoot, run.caseId).release();
+  assert.deepEqual(settledAs(run), { [id]: 'not-started' });
+  return { run, worktree: planted[id] };
+}
+const realSettle = (id) => ({ ...settle(id, { milestone: 'plan-ready', subjectDigest: 'sha256:plan', activity: 'build-a', unitRunId: `unit-run-${id}` }).payload, settledAt: 'now' });
+const settleCount = (run) => eventsOf(run).filter((e) => e.type === 'settle').length;
+
+test('a reservation released as not-started by a hold and then settled for real ends settled with the real outcome and the milestone it earned', () => {
+  const { run } = releasedAfterSettling('r1');
+  assert.equal(projectionOf(run).frameRemaining.dispatches, FRAME.dispatches, 'the release refunded the dispatch');
+
+  assert.equal(withHold(run, (hold) => applySettle({ mainRoot: run.repoRoot, caseId: run.caseId, hold, settle: realSettle('r1') })), true);
+  const projection = projectionOf(run);
+  assert.deepEqual(settledAs(run), { r1: 'pass' }, 'the later settle stands');
+  assert.equal(projection.milestones['plan-ready'].state, 'achieved');
+  assert.equal(projection.frameRemaining.dispatches, FRAME.dispatches - 1, 'the dispatch counts again');
+  assert.equal(settleCount(run), 2, 'both settles are on the ledger, in order');
+});
+
+test('a real settle that waited in the settle-pending file supersedes a release a hold made first', () => {
+  const { run } = releasedAfterSettling('r1');
+  writeSettlePending({ mainRoot: run.repoRoot, caseId: run.caseId, settle: realSettle('r1') });
+  const drained = withHold(run, (hold) => drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold }));
+  assert.equal(drained.settles, 1);
+  assert.equal(projectionOf(run).milestones['plan-ready'].state, 'achieved');
+  assert.deepEqual(settledAs(run), { r1: 'pass' });
+});
+
+test('the superseding settle leaves alone a binding another reservation took on the same worktree after the release', () => {
+  const { run, worktree } = releasedAfterSettling('r1');
+  withHold(run, (hold) => {
+    bindWorktree({ mainRoot: run.repoRoot, hold, caseId: run.caseId, worktree });
+    append(run, hold, 'reservation', { reservationId: 'r2', activity: 'build-a', writes: ['src/a'], worktree, counters: { dispatches: 1, mutatingDispatches: 1 }, unitRunId: 'unit-run-r2' });
+    applySettle({ mainRoot: run.repoRoot, caseId: run.caseId, hold, settle: realSettle('r1') });
+  });
+  assert.equal(readBinding({ mainRoot: run.repoRoot, worktree, caseId: run.caseId }).answer, 'bound', 'the newer reservation keeps its binding');
+});
+
+test('a real settle on the ledger is never followed by a release or by a second real settle', () => {
+  const run = openCase();
+  reserve(run, [{ id: 'r1' }]);
+  unitRecord(run, 'unit-run-r1', JSON.stringify({ execution: { status: 'running' } }));
+  assert.equal(withHold(run, (hold) => applySettle({ mainRoot: run.repoRoot, caseId: run.caseId, hold, settle: realSettle('r1') })), true);
+  unitRecord(run, 'unit-run-r1', JSON.stringify({ execution: { status: 'settled' } }));
+  acquireAdvanceLock(run.repoRoot, run.caseId).release();
+  assert.equal(withHold(run, (hold) => applySettle({ mainRoot: run.repoRoot, caseId: run.caseId, hold, settle: { ...realSettle('r1'), outcome: 'fail' } })), false);
+  assert.deepEqual(settledAs(run), { r1: 'pass' });
+  assert.equal(settleCount(run), 1);
 });
 
 test('subject digests: files, trees and named subjects; an unknown subject is null, never a guess', () => {
