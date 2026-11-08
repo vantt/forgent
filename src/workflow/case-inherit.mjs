@@ -8,15 +8,52 @@
 // row binds to a tree or a person. The taken-over milestones travel on `case.opened`, with where they came
 // from, so the new ledger shows what was inherited and from which case.
 
-import { readCaseProjection } from './case-projection.mjs';
-import { isDeliveryMilestone } from './case-projection.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+
+import { isDeliveryMilestone, readCaseProjection } from './case-projection.mjs';
+import { eventsFilePath, readWorkflowEvents } from './store.mjs';
+import { runsRoot } from '../runner/execution/case-run-paths.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
 /** Milestones a case may take over: produced by an activity that writes nothing, and named by no `must` row. */
-export function inheritableMilestones(guide) {
+function inheritableMilestones(guide) {
   const bound = new Set((guide?.must ?? []).map((row) => row.subject).filter(Boolean));
   const produced = new Set((guide?.activities ?? []).filter((a) => a.effects === 'none').flatMap((a) => a.produces ?? []));
   return [...produced].filter((id) => id !== 'request-received' && !bound.has(id) && !isDeliveryMilestone(guide, id));
+}
+
+// A ledger is only worth parsing when its raw bytes carry both marks of a closed case; a Playbook run,
+// the largest ledgers on disk, carries neither, and the cases it cannot be are never parsed.
+const CLOSED_CASE_MARKS = ['"type":"case.opened"', '"type":"case.closed"'];
+
+/**
+ * The cases `inheritFrom` may be asked about, newest first: those whose ledger carries `case.opened` and
+ * `case.closed`. A directory that is no case (the bindings directory, a stray one) has no such ledger.
+ *
+ * @param {string} mainRoot
+ * @returns {string[]} case ids
+ */
+export function inheritCandidates(mainRoot) {
+  let entries;
+  try {
+    entries = fs.readdirSync(runsRoot(mainRoot), { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  const closedLooking = (id) => {
+    try {
+      const bytes = fs.readFileSync(eventsFilePath(mainRoot, id));
+      return CLOSED_CASE_MARKS.every((mark) => bytes.includes(mark));
+    } catch {
+      return false;
+    }
+  };
+  return entries
+    .filter((d) => d.isDirectory() && closedLooking(d.name))
+    .map((d) => ({ id: d.name, at: fs.statSync(path.join(runsRoot(mainRoot), d.name)).mtimeMs }))
+    .sort((a, b) => b.at - a.at)
+    .map((d) => d.id);
 }
 
 const refuse = (code, detail) => new RunnerConfigError(`--inherit ${detail}`, { code });
@@ -34,21 +71,23 @@ const refuse = (code, detail) => new RunnerConfigError(`--inherit ${detail}`, { 
  *   `inherit-request-differs`, `inherit-base-differs` or `inherit-nothing`
  */
 export function inheritFrom({ mainRoot, fromCaseId, guide, guideSha256, requestDigest, baseCommit }) {
-  let source;
+  // The four conditions are read off the ledger's own events; the digests a full projection takes of a
+  // case's reports are computed only for a case that passed all four.
+  let events;
   try {
-    source = readCaseProjection(mainRoot, fromCaseId);
+    events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: fromCaseId });
   } catch {
     throw refuse('inherit-source-unknown', `names case "${fromCaseId}", which does not exist`);
   }
-  const { projection, events } = source;
   const opened = events.find((e) => e.type === 'case.opened')?.payload;
   if (!opened) throw refuse('inherit-source-unknown', `names case "${fromCaseId}", which does not exist`);
-  if (projection.open) throw refuse('inherit-source-open', `case "${fromCaseId}" is still open; close it first, so what it reached is final`);
-  if (projection.guideRef?.sha256 !== guideSha256) throw refuse('inherit-guide-differs', `case "${fromCaseId}" ran another guide or another version of it`);
+  if (!events.some((e) => e.type === 'case.closed')) throw refuse('inherit-source-open', `case "${fromCaseId}" is still open; close it first, so what it reached is final`);
+  if (opened.guide?.sha256 !== guideSha256) throw refuse('inherit-guide-differs', `case "${fromCaseId}" ran another guide or another version of it`);
   if (opened.requestDigest !== requestDigest) throw refuse('inherit-request-differs', `case "${fromCaseId}" served another request`);
   if (!baseCommit || opened.baseCommit !== baseCommit) {
     throw refuse('inherit-base-differs', `case "${fromCaseId}" started on ${opened.baseCommit ?? 'an unrecorded commit'}, this one starts on ${baseCommit ?? 'no commit'}`);
   }
+  const { projection } = readCaseProjection(mainRoot, fromCaseId);
   const milestones = inheritableMilestones(guide)
     .map((id) => ({ id, entry: projection.milestones[id] }))
     .filter(({ entry }) => entry?.state === 'achieved' && entry.digest)

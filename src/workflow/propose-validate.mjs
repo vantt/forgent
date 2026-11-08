@@ -14,15 +14,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { registeredCapabilityOf } from '../runner/dispatch/config.mjs';
-import { canonicalizeWriteEntry } from '../runner/dispatch/write-scope.mjs';
+import { globsMeet } from '../runner/dispatch/write-scope.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
-import { globsMeet, normalizeWrite } from './propose-classify.mjs';
+import { normalizeWrite } from './propose-classify.mjs';
 
 /**
  * Trees no slice may write: the repository's own bookkeeping, installed dependencies and, for a slice that
  * dispatches, the run-state store (no declared scope ever covers it, so nothing there could be committed).
  */
-export const FORBIDDEN_WRITE_ROOTS = Object.freeze(['.git', 'node_modules']);
+const FORBIDDEN_WRITE_ROOTS = Object.freeze(['.git', 'node_modules']);
 const STORE_ROOT = '.fgos';
 
 /**
@@ -69,7 +69,6 @@ function termsOfFile(file, ports) {
 function describeWrite(raw, ports, { dispatches }) {
   let normalized;
   try {
-    canonicalizeWriteEntry(raw);
     normalized = normalizeWrite(raw);
   } catch (err) {
     return { raw, problem: { code: 'write-path-invalid', detail: err.message } };
@@ -100,16 +99,6 @@ function describeWrite(raw, ports, { dispatches }) {
   return { raw, problem: { code: 'write-path-missing', detail: `"${writePath}" does not exist and neither does the directory a new file would go in` } };
 }
 
-function checkSliceShape(slice, index) {
-  const where = `slice ${index}${typeof slice?.id === 'string' ? ` "${slice.id}"` : ''}`;
-  if (!slice || typeof slice !== 'object') throw new ProposeValidateError(`${where} must be an object`, 'slice-invalid');
-  if (typeof slice.id !== 'string' || slice.id === '') throw new ProposeValidateError(`${where} needs an id`, 'slice-invalid');
-  if (!Array.isArray(slice.writes) || !slice.writes.every((write) => typeof write === 'string' && write.trim() !== '')) {
-    throw new ProposeValidateError(`${where} needs "writes", a list of paths`, 'slice-invalid');
-  }
-  if (!RIGOR_ORDER.includes(slice.rigor)) throw new ProposeValidateError(`${where} needs a rigor of ${RIGOR_ORDER.join(', ')}`, 'slice-invalid');
-}
-
 /** Existing code files a slice changes: the files it names plus every file below its directories and globs. */
 function changedCodeFiles(described, ports) {
   const files = new Set();
@@ -121,7 +110,8 @@ function changedCodeFiles(described, ports) {
 }
 
 /**
- * Check a proposal against the repository and say what is wrong with it, all at once.
+ * Check a proposal against the repository and say what is wrong with it, all at once. Slices arrive
+ * well-formed: the slice list's one shape check is `checkManifest` in `propose.mjs`.
  *
  * Each slice is the classifier's answer for its write paths plus its id and paths:
  * `{ id, writes, rigor, capability, followUp, askOwnerFirst, unresolvedScopes }`. A refusal is
@@ -141,13 +131,6 @@ function changedCodeFiles(described, ports) {
 export function validateProposal({ slices, runnerConfig, rigorFloor, ports }) {
   if (!Array.isArray(slices) || slices.length === 0) throw new ProposeValidateError('a proposal needs at least one slice', 'no-slices');
   if (rigorFloor !== undefined && !RIGOR_ORDER.includes(rigorFloor)) throw new ProposeValidateError(`rigorFloor must be one of ${RIGOR_ORDER.join(', ')}`, 'floor-invalid');
-  const ids = new Set();
-  slices.forEach((slice, index) => {
-    checkSliceShape(slice, index);
-    if (ids.has(slice.id)) throw new ProposeValidateError(`slice id "${slice.id}" appears twice`, 'slice-duplicate');
-    ids.add(slice.id);
-  });
-
   const refusals = [];
   const refuse = (code, slice, detail, extra = {}) => refusals.push({ code, slice: slice.id, detail, ...extra });
   const described = new Map();

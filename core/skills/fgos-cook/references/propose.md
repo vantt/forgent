@@ -70,11 +70,11 @@ everything is the owner's own decision, not a proposal.
 |---|---|
 | `propose-source`, `propose-slices-unreadable`, `propose-guide-missing` | Wrong call, exit 4 and stderr only: give exactly one of `--slices` or `--request`; the file must be JSON; the guide must be a conductor guide. |
 | `manifest-invalid`, `slice-invalid`, `slice-verify-missing`, `slice-cycle`, `input-missing`, `plan-missing`, `option-invalid`, `request-invalid` | The list or an option does not match this table. Fix the named field and propose again. |
-| `unresolved-scope`, `write-path-invalid`, `write-path-forbidden`, `write-path-missing`, `write-scope-empty` | A write path cannot be judged or is not allowed (outside the repository, a symlink, `.git`, `node_modules`, run state, the whole repository, a new file whose directory is absent, a glob naming nothing). Name real files or directories. |
+| `unresolved-scope`, `write-path-invalid`, `slice-write-invalid`, `write-path-forbidden`, `write-path-missing`, `write-scope-empty` | A write path cannot be judged or is not allowed (outside the repository, a symlink, `.git`, `node_modules`, run state, the whole repository, a new file whose directory is absent, a glob naming nothing). Name real files or directories. |
 | `write-overlap` | Two slices write the same path, including a test added to both. Merge them or make their paths disjoint. |
 | `test-scan-too-wide` | The slice changes so much code that its tests cannot be sized. Split it. |
 | `capability-unregistered` | A capability is not registered in the runner config. Pick one from `../../_shared/capability-catalog.md`. |
 | `rigor-below-floor`, `slice-rigor-below-table`, `slice-raise-invalid`, `slice-raise-needs-reason` | A rigor may only be raised, with a reason, to a value of `low`, `standard`, `high`, `critical`. |
 | `gate-command-missing` | Declare `capabilities.code:implement.verify` in the runner config; the final gate runs only that command. |
 | `guide-activity-missing` | The guide lacks an activity the commands need; use `coding/feature` or ask. |
-| `code-slice-below-standard`, `pattern-unresolved`, `launch-bound-unknown`, `frame-defaults-missing`, `slice-writes-missing`, `slice-write-invalid`, `slice-table-invalid` | The catalog, the table or the guide is inconsistent with the proposal. This is a blocker for the owner, not something to patch around. |
+| `code-slice-below-standard`, `pattern-unresolved`, `launch-bound-unknown`, `frame-defaults-missing`, `slice-writes-missing`, `slice-table-invalid` | The catalog, the table or the guide is inconsistent with the proposal. This is a blocker for the owner, not something to patch around. |

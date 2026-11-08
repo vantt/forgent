@@ -11,9 +11,12 @@ import { execFileSync } from 'node:child_process';
 import { readStandardValue } from '../../src/config/facade.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { loadSliceTable } from '../../src/workflow/propose-classify.mjs';
-import { CASE_PLACEHOLDER, createProposePorts, planCaseSlug, proposeFromRequest, proposeFromSlices, readPassRigor, renderProposalText } from '../../src/workflow/propose.mjs';
+import { createProposePorts, planCaseSlug, proposeFromRequest, proposeFromSlices, readPassRigor, renderProposalText } from '../../src/workflow/propose.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { appendAll, conductorWorkflow, openCase } from '../helpers/workflow-case-fixture.mjs';
+import { FRAME, append, conductorWorkflow, openCase, settle, withHold } from '../helpers/workflow-case-fixture.mjs';
+import { createWorkflowRun } from '../../src/workflow/index.mjs';
+import { guideSha256 } from '../../src/workflow/case-start.mjs';
+import { digestText } from '../../src/workflow/ref-digests.mjs';
 
 const runnerConfig = readStandardValue('runner').value;
 const shipped = shippedCatalog();
@@ -131,6 +134,13 @@ test('a proposal that does not match the repository is refused by name, with no 
     [[slice('a', ['src/a.mjs'], { inputs: ['plans/p/absent.md'] })], 'input-missing'],
     [[slice('a', ['src/a.mjs'], { objective: '--sneaky' })], 'slice-invalid'],
     [[slice('a', ['src/a.mjs,src/b.mjs'])], 'slice-invalid'],
+    [[slice('a', ['src/a.mjs']), slice('a', ['src/b.mjs'])], 'slice-invalid'],
+    [[slice('a', 'src/a.mjs')], 'slice-invalid'],
+    [[slice('a', [], { rigor: 'extreme' })], 'slice-invalid'],
+    [[slice('a', [], { pattern: 5 })], 'slice-invalid'],
+    [[slice('a', [], { capability: 5 })], 'slice-invalid'],
+    [[slice('a', ['src\\a.mjs'])], 'slice-write-invalid'],
+    [[slice('a', [':(glob)src/a.mjs'])], 'slice-write-invalid'],
   ];
   for (const [slices, code] of cases) {
     const p = propose(slices);
@@ -194,7 +204,7 @@ test('every generated line survives the shell: flags stay bare, values arrive wh
     assert.deepEqual(tokens, c.argv.map((a, i) => ((c.caseSlots ?? []).includes(i) ? 'wf-123' : a)), c.id);
   }
   const literal = p.commands.find((c) => c.id === 'slice-lit');
-  assert.equal(literal.argv[1], CASE_PLACEHOLDER, 'the objective is the text the agent wrote, even when it spells the placeholder');
+  assert.equal(literal.argv[1], '$CASE', 'the objective is the text the agent wrote, even when it spells the placeholder');
   assert.deepEqual(literal.caseSlots, [3]);
 });
 
@@ -307,27 +317,46 @@ test('proposing writes nothing: no case, no ledger event, nothing in the checkou
   assert.equal(fs.existsSync(path.join(root, '.fgos')), false, 'no workflow run directory was created');
 });
 
-test('continuing a closed case reads each ledger once and skips directories that are not cases', () => {
+/** A case that planned and closed, written as `case.opened` records it for this guide, request and commit. */
+function closedPlannedCase(root, { request, baseCommit = 'c0ffee' }) {
+  const workflow = conductorWorkflow();
+  const { workflowRunId } = createWorkflowRun({ repoRoot: root, workflowId: workflow.id, workflow });
+  const run = { repoRoot: root, caseId: workflowRunId };
+  withHold(run, (hold) => {
+    append(run, hold, 'case.opened', { caseId: workflowRunId, kind: workflow.guide.kind, guide: { id: workflow.guide.id, sha256: guideSha256(workflow.guide) }, frame: FRAME, requestDigest: digestText(request), baseCommit });
+    for (const event of [
+      { type: 'reservation', payload: { reservationId: 'r-plan', activity: 'plan', writes: [], counters: { dispatches: 1, mutatingDispatches: 0 } } },
+      settle('r-plan', { milestone: 'plan-ready', subjectDigest: 'sha256:plan', activity: 'plan' }),
+      { type: 'case.closed', payload: { closedAt: new Date().toISOString() } },
+    ]) append(run, hold, event.type, event.payload);
+  });
+  return workflowRunId;
+}
+
+test('continuing a closed case parses only the ledgers of closed cases, and a closed case of the same request and commit is found', () => {
   const root = makeFixtureDir('fgos-propose-scan-');
-  for (const requestDigest of ['sha256:one', 'sha256:two', 'sha256:three']) {
-    const run = openCase({ repoRoot: root, requestDigest });
-    appendAll(run, [{ type: 'case.closed', payload: { closedAt: new Date().toISOString() } }]);
-  }
+  const workflow = conductorWorkflow();
   fs.mkdirSync(path.join(root, '.fgos', 'workflow-runs', '.bindings'), { recursive: true });
   fs.mkdirSync(path.join(root, '.fgos', 'workflow-runs', 'stray-directory'), { recursive: true });
-  const ledgerReads = [];
-  const read = fs.readFileSync;
-  fs.readFileSync = (file, ...rest) => {
-    if (String(file).endsWith('events.jsonl')) ledgerReads.push(String(file));
-    return read.call(fs, file, ...rest);
-  };
+  createWorkflowRun({ repoRoot: root, workflowId: workflow.id, workflow });
+  openCase({ repoRoot: root });
+  const otherRequest = closedPlannedCase(root, { request: 'Another request' });
+  const ports = createProposePorts({ checkoutRoot: root, mainRoot: root });
+  const ask = { guide: workflow.guide, request: 'Ship the change', baseCommit: 'c0ffee' };
+
+  const parse = JSON.parse;
+  let parsed = 0;
+  JSON.parse = (...args) => { parsed += 1; return parse(...args); };
   let found;
   try {
-    found = createProposePorts({ checkoutRoot: root, mainRoot: root }).findInherit({ guide: conductorWorkflow().guide, request: 'Ship the change', baseCommit: 'c0ffee' });
+    found = ports.findInherit(ask);
   } finally {
-    fs.readFileSync = read;
+    JSON.parse = parse;
   }
-  assert.equal(found, null, 'no closed case served this request on this guide');
-  assert.equal(ledgerReads.length, 3, `one read per case ledger, none for a directory that is not a case: ${ledgerReads.map((f) => path.basename(path.dirname(f)))}`);
-  assert.equal(new Set(ledgerReads).size, 3, 'no ledger is read twice');
+  assert.equal(found, null, 'no closed case served this request');
+  assert.equal(parsed, 5, `only the closed case's five events are parsed, once (a run, a case still open and the directories that are no case are not): ${parsed}`);
+  assert.ok(otherRequest);
+
+  const served = closedPlannedCase(root, { request: 'Ship the change' });
+  assert.deepEqual([ports.findInherit(ask)?.fromCase, ports.findInherit(ask)?.milestones.map((m) => m.milestone)], [served, ['plan-ready']]);
 });

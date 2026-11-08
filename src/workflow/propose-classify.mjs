@@ -16,6 +16,7 @@ import path from 'node:path';
 
 import { parseYaml } from '../util/yaml.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { canonicalizeWriteEntry, globsMeet } from '../runner/dispatch/write-scope.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
 
 const TABLE_PATH = path.resolve(import.meta.dirname, '../../domains/coding/slice-kinds.yaml');
@@ -29,37 +30,6 @@ const isText = (value) => typeof value === 'string' && value.trim() !== '';
 const rigorRank = (rigor) => RIGOR_ORDER.indexOf(rigor);
 
 const hasStar = (segment) => segment.includes('*');
-const segmentRegex = (segment) => new RegExp(`^${segment.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^/]*')}$`);
-
-const compatible = (x, y) => x.startsWith(y) || y.startsWith(x);
-const compatibleEnds = (x, y) => x.endsWith(y) || y.endsWith(x);
-
-/** Can one path segment pattern and another name the same segment? Two wildcard segments are judged by their fixed ends. */
-function segmentsMeet(a, b) {
-  if (!hasStar(a) && !hasStar(b)) return a === b;
-  if (!hasStar(a)) return segmentRegex(b).test(a);
-  if (!hasStar(b)) return segmentRegex(a).test(b);
-  return compatible(a.slice(0, a.indexOf('*')), b.slice(0, b.indexOf('*')))
-    && compatibleEnds(a.slice(a.lastIndexOf('*') + 1), b.slice(b.lastIndexOf('*') + 1));
-}
-
-/** Can two path globs (segments, `**` for any number of segments) name the same file? */
-export function globsMeet(a, b) {
-  const seen = new Map();
-  const walk = (i, j) => {
-    const key = `${i}:${j}`;
-    if (seen.has(key)) return seen.get(key);
-    let result;
-    if (i === a.length && j === b.length) result = true;
-    else if (a[i] === '**') result = walk(i + 1, j) || (j < b.length && walk(i, j + 1));
-    else if (b[j] === '**') result = walk(i, j + 1) || (i < a.length && walk(i + 1, j));
-    else if (i === a.length || j === b.length) result = false;
-    else result = segmentsMeet(a[i], b[j]) && walk(i + 1, j + 1);
-    seen.set(key, result);
-    return result;
-  };
-  return walk(0, 0);
-}
 
 function validateRule(rule, index, ids) {
   const where = `slice-kinds rule ${index + 1}`;
@@ -110,22 +80,25 @@ export function loadSliceTable({ tablePath = TABLE_PATH } = {}) {
 
 let cachedTable = null;
 export const defaultSliceTable = () => (cachedTable ??= loadSliceTable());
-const defaultTable = defaultSliceTable;
+
+/** A write path read as segments: `scopeLike` when it may name a directory (or a glob), `glob` when it has a wildcard. */
+const writeOf = (segments, scopeLike = false) => ({ path: segments.join('/'), segments, glob: segments.some(hasStar), scopeLike: scopeLike || segments.some(hasStar) });
 
 /**
- * Canonical form of a write path: no `//` or `.` segments, no trailing slash. `.` is the whole repository.
- * A path that leaves the repository is refused.
+ * One write path as the write-scope reader reads it (no `//` or `.` segments, no trailing slash), so a path it
+ * would refuse is refused here by name. `.` is the whole repository, read as the glob `**`.
  */
 export function normalizeWrite(raw) {
   if (!isText(raw)) throw refuse('a slice write path must be a non-empty string', 'slice-write-invalid');
-  const trimmed = raw.trim();
-  const segments = trimmed.split('/').filter((segment) => segment !== '' && segment !== '.');
-  if (trimmed.startsWith('/') || segments.includes('..')) throw refuse(`slice write path "${raw}" must be relative and stay inside the repository`, 'slice-write-invalid');
-  const glob = segments.some(hasStar);
-  const whole = segments.length === 0;
-  const last = segments[segments.length - 1] ?? '';
-  const scopeLike = whole || glob || trimmed.endsWith('/') || !/[^.]\.[^/]+$/.test(last);
-  return { path: whole ? '**' : segments.join('/'), segments: whole ? ['**'] : segments, glob: glob || whole, scopeLike };
+  if (raw.trim().split('/').every((segment) => segment === '' || segment === '.')) return writeOf(['**']);
+  let entry;
+  try {
+    entry = canonicalizeWriteEntry(raw);
+  } catch (err) {
+    throw refuse(`slice write path "${raw}" is refused: ${err.message}`, 'slice-write-invalid');
+  }
+  const last = entry.slice(entry.lastIndexOf('/') + 1);
+  return writeOf(entry.split('/'), raw.trim().endsWith('/') || !/[^.]\.[^/]+$/.test(last));
 }
 
 /**
@@ -164,7 +137,7 @@ function classifyPath(table, write) {
  *   rigor: string, tableRigor: string, raised: { rigor: string, reason: string }|null, askOwnerFirst: boolean,
  *   dispatch: boolean, unresolvedScopes: string[], paths: Array<{ path: string, ruleId: string, byDefault: boolean }> }}
  */
-export function classifySlice({ writes, raise, listFiles, table = defaultTable() }) {
+export function classifySlice({ writes, raise, listFiles, table = defaultSliceTable() }) {
   if (!Array.isArray(writes) || writes.length === 0) throw refuse('a writing slice needs at least one write path', 'slice-writes-missing');
   const normalized = writes.map(normalizeWrite);
   const unresolvedScopes = [];
@@ -177,7 +150,7 @@ export function classifySlice({ writes, raise, listFiles, table = defaultTable()
       continue;
     }
     for (const file of listFiles(write.path === '**' ? '.' : write.path)) {
-      const member = normalizeWrite(file);
+      const member = writeOf(file.split('/'));
       judged.push({ write: member, ...classifyPath(table, member) });
     }
   }

@@ -40,21 +40,10 @@ export class ProposeFrameError extends Error {
 
 const isCount = (n) => Number.isInteger(n) && n >= 0;
 
-function checkSlice(slice, index) {
-  const where = `slice ${index}${typeof slice?.id === 'string' ? ` "${slice.id}"` : ''}`;
-  if (!slice || typeof slice !== 'object') throw new ProposeFrameError(`${where} must be an object`, 'slice-invalid');
-  if (typeof slice.id !== 'string' || slice.id === '') throw new ProposeFrameError(`${where} needs an id`, 'slice-invalid');
-  // `some` and `forEach` skip the holes of a sparse array, so the elements are walked by index.
-  const wellFormedWrites = Array.isArray(slice.writes) && Array.from({ length: slice.writes.length }, (_, i) => slice.writes[i]).every((w) => typeof w === 'string' && w !== '');
-  if (!wellFormedWrites) {
-    throw new ProposeFrameError(`${where} needs "writes", a list of paths (empty for a read-only slice)`, 'slice-invalid');
-  }
-  if (typeof slice.pattern !== 'string' || slice.pattern === '') throw new ProposeFrameError(`${where} needs a pattern`, 'slice-invalid');
-  if (!RIGOR_ORDER.includes(slice.rigor)) {
-    throw new ProposeFrameError(`${where} rigor must be one of [${RIGOR_ORDER.join(', ')}], got "${String(slice.rigor)}"`, 'slice-invalid');
-  }
+/** Code is reviewed at standard or more; only a documents slice may sit lower. */
+function checkCodeRigor(slice) {
   if (slice.writes.length > 0 && slice.kind !== DOC_KIND && RIGOR_ORDER.indexOf(slice.rigor) < RIGOR_ORDER.indexOf('standard')) {
-    throw new ProposeFrameError(`${where} writes outside documents at rigor ${slice.rigor}; code is reviewed at standard or more`, 'code-slice-below-standard');
+    throw new ProposeFrameError(`slice "${slice.id}" writes outside documents at rigor ${slice.rigor}; code is reviewed at standard or more`, 'code-slice-below-standard');
   }
 }
 
@@ -78,6 +67,8 @@ function seatLaunchesOfSlice(slice, { runnerConfig, shipped, fallbackPerSeat }) 
 
 /**
  * The frame a set of classified slices needs.
+ *
+ * Slices arrive well-formed: the slice list's one shape check is `checkManifest` in `propose.mjs`.
  *
  * A slice that writes is a writing dispatch; one that does not is a read-only dispatch. The rigor floor is the
  * lowest rigor of any slice, read-only ones included, because admission refuses a dispatch below the floor. Writing dispatches
@@ -106,13 +97,7 @@ export function proposeFrame({ slices, catalog, frameDefaults, inherit = false, 
   if (!isCount(frameDefaults?.fallbackPerSeat) || !isCount(frameDefaults?.deviationsBeforeAsk)) {
     throw new ProposeFrameError('the guide must state numeric fallbackPerSeat and deviationsBeforeAsk', 'frame-defaults-missing');
   }
-  const seen = new Set();
-  for (let i = 0; i < slices.length; i += 1) {
-    const slice = slices[i];
-    checkSlice(slice, i);
-    if (seen.has(slice.id)) throw new ProposeFrameError(`slice id "${slice.id}" appears twice`, 'slice-duplicate');
-    seen.add(slice.id);
-  }
+  slices.forEach(checkCodeRigor);
 
   const { fallbackPerSeat, deviationsBeforeAsk } = frameDefaults;
   const writing = slices.filter((s) => s.writes.length > 0);
@@ -134,12 +119,7 @@ export function proposeFrame({ slices, catalog, frameDefaults, inherit = false, 
   };
   const dispatches = mutatingDispatches + Object.values(reads).reduce((a, b) => a + b, 0);
 
-  const passes = readPasses.map((pass, index) => {
-    if (!pass || typeof pass.id !== 'string' || typeof pass.pattern !== 'string' || !RIGOR_ORDER.includes(pass.rigor)) {
-      throw new ProposeFrameError(`read pass ${index} needs an id, a pattern and a rigor of [${RIGOR_ORDER.join(', ')}]`, 'slice-invalid');
-    }
-    return { id: pass.id, pattern: pass.pattern, rigor: pass.rigor, writes: [] };
-  });
+  const passes = readPasses.map(({ id, pattern, rigor }) => ({ id, pattern, rigor, writes: [] }));
   const launches = [...slices, ...passes].map((s) => ({ id: s.id, perDispatch: seatLaunchesOfSlice(s, { ...catalog, fallbackPerSeat }) }));
   const seatLaunchesPerDispatch = Math.max(...launches.map((l) => l.perDispatch));
 

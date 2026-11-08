@@ -19,9 +19,7 @@ import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
 import { guideSha256 } from './case-start.mjs';
-import { inheritFrom } from './case-inherit.mjs';
-import { readCaseProjection } from './case-projection.mjs';
-import { runsRoot } from '../runner/execution/case-run-paths.mjs';
+import { inheritCandidates, inheritFrom } from './case-inherit.mjs';
 import { digestText } from './ref-digests.mjs';
 import { loadWorkflow } from './loader.mjs';
 import { dependencyOrder } from './steps.mjs';
@@ -59,7 +57,7 @@ export function planCaseSlug(plan) {
 const argumentSafe = (value) => typeof value === 'string' && !value.trimStart().startsWith('--');
 
 /** What the lines after `workflow start` call the case: the shell variable the person sets from the start result. */
-export const CASE_PLACEHOLDER = '$CASE';
+const CASE_PLACEHOLDER = '$CASE';
 
 const shellQuote = (arg) => {
   // A flag the command generates is bare; every value is quoted unless plain (a value never starts with "--").
@@ -111,6 +109,7 @@ function checkManifest(manifest, { stat }) {
     if (Array.isArray(writes) && writes.length === 0) {
       if (raw.raise !== undefined) refuse('slice-invalid', 'a read-only slice has no paths to raise a rigor from; give it "rigor"', raw.id);
       if (raw.rigor !== undefined && !RIGOR_ORDER.includes(raw.rigor)) refuse('slice-invalid', `"rigor" must be one of ${RIGOR_ORDER.join(', ')}`, raw.id);
+      for (const key of ['capability', 'pattern']) if (raw[key] !== undefined && !isText(raw[key])) refuse('slice-invalid', `"${key}" must be text`, raw.id);
     } else if (raw.capability !== undefined || raw.pattern !== undefined || raw.rigor !== undefined) {
       refuse('slice-invalid', 'a writing slice takes its capability, pattern and rigor from the table; raise it with "raise" and a reason', raw.id);
     }
@@ -574,25 +573,13 @@ export function proposeFromRequest({ request, writes = [], verify, ports, runner
 /** The reads a proposal needs from a checkout and the case ledgers under `mainRoot`. */
 export function createProposePorts({ checkoutRoot, mainRoot }) {
   const repo = createRepoPorts({ root: checkoutRoot });
-  const closedCaseIds = () => {
-    try {
-      return fs.readdirSync(runsRoot(mainRoot), { withFileTypes: true })
-        .filter((d) => d.isDirectory())
-        .map((d) => ({ id: d.name, at: fs.statSync(path.join(runsRoot(mainRoot), d.name)).mtimeMs }))
-        .sort((a, b) => b.at - a.at)
-        .map((d) => d.id);
-    } catch {
-      return [];
-    }
-  };
   return {
     repo,
     headCommit: () => workflowCommit(checkoutRoot, 'HEAD'),
     // The one door for what may be taken over is `inheritFrom`: a closed case is offered only when its own guards pass.
     findInherit: ({ guide, request, baseCommit }) => {
-      for (const caseId of closedCaseIds()) {
+      for (const caseId of inheritCandidates(mainRoot)) {
         try {
-          readCaseProjection(mainRoot, caseId);
           return inheritFrom({ mainRoot, fromCaseId: caseId, guide, guideSha256: guideSha256(guide), requestDigest: digestText(request), baseCommit });
         } catch { /* this case is open, another guide, another request or base: the next may fit */ }
       }

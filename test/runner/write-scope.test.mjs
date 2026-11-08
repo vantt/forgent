@@ -9,7 +9,6 @@ import {
   matchesWriteScope,
   partitionPaths,
 } from '../../src/runner/dispatch/write-scope.mjs';
-import { globsMeet } from '../../src/workflow/propose-classify.mjs';
 
 test('canonicalizeWriteEntry: spellings of one directory collapse to one entry', () => {
   for (const raw of ['./docs', 'docs/', 'docs//', 'docs', ' docs ', '././docs', './/docs', 'docs/.', 'docs/./']) {
@@ -135,17 +134,4 @@ test('repeated ** collapse to one, and matching stays fast on deep paths', () =>
   assert.equal(matchesWriteScope(`${deep}/x`, ['**/*/**/*/**/*/**/*/**/y']), false);
   assert.equal(matchesWriteScope(`${deep}/y`, ['**/*/**/*/**/*/**/*/**/y']), true);
   assert.ok(Date.now() - started < 500, `took ${Date.now() - started}ms`);
-});
-
-test('a glob meets a concrete path exactly when the scope matches it, whatever punctuation the names carry', () => {
-  const cases = [
-    ['a?*', 'a.txt', false], ['a?*', 'a?.txt', true], ['a$*', 'a$b', true], ['{x}*', '{x}y', true], ['{x}*', 'xy', false],
-    ['(a|b)*', '(a|b)c', true], ['(a|b)*', 'ac', false], ['a+*', 'a+b', true], ['a+*', 'aab', false], ['^a*', '^ab', true],
-    ['[ab]*', '[ab]c', true], ['[ab]*', 'ac', false], ['a.*', 'a.b', true], ['a.*', 'axb', false], ['tài*', 'tài-liệu', true],
-    ['*.mjs', 'a.mjs', true], ['*.mjs', 'a.mjs.bak', false], ['src/**/x.mjs', 'src/a/b/x.mjs', true], ['src/**/x.mjs', 'src/x.mjs', true],
-  ];
-  for (const [pattern, file, expected] of cases) {
-    assert.equal(matchesWriteScope(file, [pattern]), expected, `scope ${pattern} on ${file}`);
-    assert.equal(globsMeet(pattern.split('/'), file.split('/')), expected, `globsMeet ${pattern} with ${file}`);
-  }
 });

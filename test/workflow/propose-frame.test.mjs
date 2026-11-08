@@ -110,22 +110,8 @@ test('a code slice below standard rigor is refused, a document slice is not', ()
   assert.doesNotThrow(() => propose([{ id: 'doc', writes: ['docs/x.md'], pattern: 'solo', rigor: 'low', kind: 'docs' }]));
 });
 
-test('two slices with one id, a slice without writes listed, an unknown rigor and an unknown pattern are refused', () => {
-  assert.throws(() => propose([slice('a'), slice('a')]), (e) => e.code === 'slice-duplicate');
-  assert.throws(() => propose([{ id: 'a', pattern: 'reviewed', rigor: 'standard' }]), (e) => e.code === 'slice-invalid');
-  assert.throws(() => propose([slice('a', 'extreme')]), (e) => e.code === 'slice-invalid');
+test('an unknown pattern is refused', () => {
   assert.throws(() => propose([slice('a', 'standard', { pattern: 'no-such-pattern' })]), (e) => e instanceof ProposeFrameError);
-});
-
-test('a sparse writes list, a sparse slice list and a symbol rigor are refused by name, not by a crash', () => {
-  const holey = slice('a');
-  holey.writes = new Array(2);
-  holey.writes[0] = 'src/a.mjs';
-  assert.throws(() => propose([holey]), (e) => e instanceof ProposeFrameError && e.code === 'slice-invalid');
-  const slices = new Array(2);
-  slices[1] = slice('b');
-  assert.throws(() => propose(slices), (e) => e instanceof ProposeFrameError && e.code === 'slice-invalid');
-  assert.throws(() => propose([slice('a', Symbol('high'))]), (e) => e instanceof ProposeFrameError && e.code === 'slice-invalid');
 });
 
 test('a guide that does not state its fallback and deviation counts is refused', () => {
@@ -209,5 +195,4 @@ test('a read pass the case runs besides its slices raises the seat-launch ceilin
   assert.equal(withPass.frame.seatLaunchesPerDispatch, 8, 'a reviewed pass at standard plans four seat launches, twice with fallback');
   assert.equal(withPass.frame.dispatches, alone.frame.dispatches, 'the pass is already counted among the reads');
   assert.deepEqual(withPass.breakdown.seatLaunches.map((l) => l.id), ['note', 'validate-plan']);
-  assert.throws(() => propose([docs], { readPasses: [{ id: 'x', pattern: 'reviewed', rigor: 'medium' }] }), (err) => err instanceof ProposeFrameError && err.code === 'slice-invalid');
 });

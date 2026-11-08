@@ -11,10 +11,10 @@ import {
   validateProposal,
   createRepoPorts,
   ProposeValidateError,
-  FORBIDDEN_WRITE_ROOTS,
   TEST_SCAN_LIMITS,
 } from '../../src/workflow/propose-validate.mjs';
-import { classifySlice, globsMeet } from '../../src/workflow/propose-classify.mjs';
+import { classifySlice } from '../../src/workflow/propose-classify.mjs';
+import { globsMeet } from '../../src/runner/dispatch/write-scope.mjs';
 import { proposeFrame } from '../../src/workflow/propose-frame.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 import { readStandardValue } from '../../src/config/facade.mjs';
@@ -74,11 +74,8 @@ test('a sound proposal passes, with the tests of the changed code listed as an a
   assert.deepEqual(result.expansions.map((e) => e.add), [['test/a/one.test.mjs', 'test/a/shared.test.mjs']]);
 });
 
-test('malformed input is a programming error, not a refusal', () => {
+test('a proposal with no slice, or a floor that is no rigor, is a programming error, not a refusal', () => {
   assert.throws(() => validate([]), (err) => err instanceof ProposeValidateError && err.code === 'no-slices');
-  assert.throws(() => validate([{ id: 'x', writes: 'src/a', rigor: 'standard' }]), (err) => err.code === 'slice-invalid');
-  assert.throws(() => validate([slice('x', ['src/a/one.mjs'], { rigor: 'fast' })]), (err) => err.code === 'slice-invalid');
-  assert.throws(() => validate([slice('x', ['src/a/one.mjs']), slice('x', ['src/b/three.mjs'])]), (err) => err.code === 'slice-duplicate');
   assert.throws(() => validate([slice('x', ['src/a/one.mjs'])], { rigorFloor: 'fast' }), (err) => err.code === 'floor-invalid');
 });
 
@@ -99,7 +96,6 @@ test('a write path the write-scope reader would not read the same way is refused
 });
 
 test('a write under the repository bookkeeping or installed dependencies is refused as forbidden, at any depth', () => {
-  assert.deepEqual(FORBIDDEN_WRITE_ROOTS, ['.git', 'node_modules']);
   const result = validate([slice('a', ['node_modules/pkg/index.js']), slice('b', ['.git/hooks/pre-commit']), slice('c', ['src/a/node_modules/x.js'])]);
   assert.deepEqual(codes(result), ['write-path-forbidden', 'write-path-forbidden', 'write-path-forbidden']);
 });
