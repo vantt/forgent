@@ -1,7 +1,7 @@
 ---
 phase: 12
 title: "Prune finished cases: fgos workflow prune --older-than <N>d (dry run by default, --apply deletes) and pruning when a case closes, never removing what an open case, a binding, a lock, a resumable run or a standing approval still needs, never following a link"
-status: "core landed; wiring after P11"
+status: landed
 depends_on: [04, 05, "11 landed before the wiring step"]
 parallel: "wave 3, with 10 and 11 (code); wiring step after 11"
 effort: ~1.5d
