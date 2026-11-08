@@ -5,6 +5,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { runDirOf, runsRoot } from '../runner/execution/case-run-paths.mjs';
+import { installOnce } from '../native/door.mjs';
 
 // Every ledger line is written while its writer holds the run's `advance` lock. The hold is the
 // proof: a hold made by `createAdvanceHold`, for this run, not yet released. Nothing else appends.
@@ -39,13 +41,9 @@ function assertAdvanceHold(hold, workflowRunId, what) {
   }
 }
 
-function workflowRunDir(repoRoot, workflowRunId) {
-  return path.join(repoRoot, '.fgos', 'workflow-runs', workflowRunId);
-}
-
 /** The one place that names a Workflow run's own event log (a different log from the Work history). */
 export function eventsFilePath(repoRoot, workflowRunId) {
-  return path.join(workflowRunDir(repoRoot, workflowRunId), 'events.jsonl');
+  return path.join(runDirOf(repoRoot, workflowRunId), 'events.jsonl');
 }
 
 /**
@@ -64,8 +62,8 @@ export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflo
   if (!workflowId) throw new RunnerConfigError('createWorkflowRun requires workflowId');
 
   const runId = workflowRunId || `wf-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
-  const runDir = workflowRunDir(repoRoot, runId);
-  fs.mkdirSync(path.dirname(runDir), { recursive: true });
+  const runDir = runDirOf(repoRoot, runId);
+  fs.mkdirSync(runsRoot(repoRoot), { recursive: true });
   // The run directory is created exclusively: a run id is never reused, and the first line below is
   // the first thing in it.
   try {
@@ -96,9 +94,8 @@ export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflo
     },
   };
 
-  writeDurably(eventsFilePath(repoRoot, runId), JSON.stringify(startEvent) + '\n', { create: true });
-  fsyncDirectory(runDir);
-  fsyncDirectory(path.dirname(runDir));
+  if (installOnce(runDir, 'events.jsonl', JSON.stringify(startEvent) + '\n', 0o644) !== 'created') throw new RunnerConfigError(`Workflow run "${runId}" already has a ledger`);
+  fsyncDirectory(runsRoot(repoRoot));
 
   return {
     workflowRunId: runId,
@@ -108,19 +105,26 @@ export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflo
 
 /**
  * Write `text` at the end of `file` and force it to disk before returning: open, write, fsync,
- * close. `create` makes the file and fails if it exists.
+ * close. A write that stores only part of the line is finished; one that stores nothing is refused,
+ * and the partial tail it leaves is the unterminated tail the next holder of `advance` removes.
  */
-function writeDurably(file, text, { create = false } = {}) {
-  const fd = fs.openSync(file, create ? 'wx' : 'a');
+function writeDurably(file, text) {
+  const bytes = Buffer.from(text);
+  const fd = fs.openSync(file, 'a');
   try {
-    fs.writeSync(fd, text);
+    for (let written = 0; written < bytes.length;) {
+      const stored = fs.writeSync(fd, bytes, written, bytes.length - written);
+      if (stored <= 0) throw new RunnerConfigError(`Workflow ledger "${file}" stored ${written} of ${bytes.length} bytes of a line`, { code: 'ledger-short-write' });
+      written += stored;
+    }
     fs.fsyncSync(fd);
   } finally {
     fs.closeSync(fd);
   }
 }
 
-function fsyncDirectory(dir) {
+/** Force a directory's entries to disk: a file made or removed in it survives a crash. */
+export function fsyncDirectory(dir) {
   const fd = fs.openSync(dir, 'r');
   try {
     fs.fsyncSync(fd);
@@ -172,9 +176,25 @@ export function appendWorkflowEvent({ repoRoot, workflowRunId, event, hold }) {
  * @param {object} params
  * @param {string} params.repoRoot
  * @param {string} params.workflowRunId
+ * @param {boolean} [params.retryTail] a reader that does not hold `advance` can meet an append in flight: it reads
+ *   again, up to three reads with a short wait, when the only fault is an unterminated tail
  * @returns {Array<object>} Events array
  */
-export function readWorkflowEvents({ repoRoot, workflowRunId }) {
+export function readWorkflowEvents({ repoRoot, workflowRunId, retryTail = false }) {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return readLedgerOnce(repoRoot, workflowRunId);
+    } catch (err) {
+      if (!retryTail || err.code !== 'workflow-ledger-unterminated' || attempt >= TAIL_READS) throw err;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, TAIL_WAIT_MS);
+    }
+  }
+}
+
+const TAIL_READS = 3;
+const TAIL_WAIT_MS = 25;
+
+function readLedgerOnce(repoRoot, workflowRunId) {
   const file = eventsFilePath(repoRoot, workflowRunId);
   if (!fs.existsSync(file)) {
     return [];

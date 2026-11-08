@@ -14,48 +14,31 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { appendWorkflowEvent, projectWorkflowState, readWorkflowEvents } from './store.mjs';
+import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { tryAcquireAdvanceLock } from './case-lock.mjs';
 import { applySettle, drainCaseInbox, writeReservationFile, writeSettlePending } from './case-runtime.mjs';
-import { isDeliveryMilestone, projectCase, receiptsFromResults } from './case-projection.mjs';
+import { isDeliveryMilestone, projectCase, readCaseProjection, receiptsFromResults } from './case-projection.mjs';
 import { digestSubject, digestUnitRunReports } from './ref-digests.mjs';
 import { admitProposal, newReservationId, recheckReservation } from './case-admission.mjs';
 import { bindWorktree, ensureBindingsSentinel, readBinding } from './case-bindings.mjs';
-import { workflowCheckout, playbookSubjectDigests } from './unit-handoff.mjs';
+import { workflowCheckout } from './unit-handoff.mjs';
 import { CASE_ID_ENV, CASE_RESERVATION_ENV, currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 import { bindingsDir } from './case-bindings.mjs';
-
-const caseDirOf = (mainRoot, caseId) => path.join(mainRoot, '.fgos', 'workflow-runs', caseId);
+import { isCaseId, runDirOf } from '../runner/execution/case-run-paths.mjs';
 
 const worktreeFacts = workflowCheckout;
 
-/** Read the ledger, once more when an append by another process is caught half-written. */
-function readEvents(mainRoot, caseId) {
-  for (let attempt = 0; ; attempt += 1) {
-    try {
-      return readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
-    } catch (err) {
-      if (err.code !== 'workflow-ledger-unterminated' || attempt >= 3) throw err;
-    }
-  }
-}
-
-/** The case as admission sees it: the projection with the digests a playbook's subjects have now. */
-function readCase(mainRoot, caseId) {
-  const events = readEvents(mainRoot, caseId);
-  const base = projectCase(events);
-  const state = projectWorkflowState(events);
-  const currentDigests = base.kind === 'playbook' ? playbookSubjectDigests({ state, workflow: state.workflow, guide: base.guide, mainRoot }) : {};
-  return { events, projection: projectCase(events, { currentDigests }) };
-}
+/** Admission reads without `advance`, so it can meet an append in flight. */
+const readEvents = (mainRoot, caseId) => readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId, retryTail: true });
+const readCase = (mainRoot, caseId) => readCaseProjection(mainRoot, caseId, { retryTail: true });
 
 /**
  * What a case's pinned workflow snapshot says about an activity's Unit pattern and params.
  * Reads without taking advance; returns null when the case or activity has no Unit pattern.
  */
 export function activityUnitOf({ mainRoot, caseId, activity }) {
-  if (!mainRoot || !caseId || typeof mainRoot !== 'string' || typeof caseId !== 'string' || !fs.existsSync(caseDirOf(mainRoot, caseId))) {
+  if (!mainRoot || typeof mainRoot !== 'string' || !isCaseId(caseId) || !fs.existsSync(runDirOf(mainRoot, caseId))) {
     return null;
   }
   const { projection } = readCase(mainRoot, caseId);
@@ -120,8 +103,7 @@ export function caseEnvOf(env) {
   const caseId = env[CASE_ID_ENV];
   const reservationId = env[CASE_RESERVATION_ENV];
   if (caseId === undefined && reservationId === undefined) return null;
-  const idLike = (v) => typeof v === 'string' && /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(v);
-  if (!idLike(caseId) || !idLike(reservationId)) return { malformed: true };
+  if (!isCaseId(caseId) || !isCaseId(reservationId)) return { malformed: true };
   return { caseId, reservationId };
 }
 
@@ -142,7 +124,7 @@ export const confinedWriteText = (why) => `a writing dispatch from inside a conf
 /** Whether this process may write a case's ledger and bindings: a masked or read-only view cannot. */
 export function confinedWriteRefusal({ mainRoot, caseId = null }) {
   if (currentDispatchDepth() === 0) return null;
-  const dir = caseId === null ? null : path.join(mainRoot, '.fgos', 'workflow-runs', caseId);
+  const dir = caseId === null ? null : runDirOf(mainRoot, caseId);
   if (dir !== null && fs.existsSync(dir) && !writable(dir)) return 'its view of the case ledger is read-only';
   if (!fs.existsSync(path.join(bindingsDir(mainRoot), '.root'))) return 'it cannot see the real bindings directory';
   if (!writable(bindingsDir(mainRoot))) return 'its view of the bindings is read-only';
@@ -151,7 +133,7 @@ export function confinedWriteRefusal({ mainRoot, caseId = null }) {
 
 /** The case `id` as it is now, or why it cannot be named: unknown and closed are both `authority-context-invalid`. */
 function openCaseFacts(mainRoot, id, what) {
-  if (!fs.existsSync(caseDirOf(mainRoot, id))) return { refused: refusal('authority-context-invalid', `${what} names case ${id}, which does not exist`).refused };
+  if (!fs.existsSync(runDirOf(mainRoot, id))) return { refused: refusal('authority-context-invalid', `${what} names case ${id}, which does not exist`).refused };
   const { projection } = readCase(mainRoot, id);
   if (!projection.open) return { refused: refusal('authority-context-invalid', `${what} names case ${id}, which is closed`).refused };
   return { projection };
@@ -159,7 +141,7 @@ function openCaseFacts(mainRoot, id, what) {
 
 /** Whether `childId` was opened under a reservation of `parentId` (its `case.opened` names the parent). */
 function isChildOf(mainRoot, childId, parentId) {
-  if (!fs.existsSync(caseDirOf(mainRoot, childId))) return false;
+  if (!fs.existsSync(runDirOf(mainRoot, childId))) return false;
   return readEvents(mainRoot, childId).find((e) => e.type === 'case.opened')?.payload?.parent?.caseId === parentId;
 }
 

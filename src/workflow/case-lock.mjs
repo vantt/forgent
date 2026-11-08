@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { runDirOf } from '../runner/execution/case-run-paths.mjs';
 import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../holder-lock/index.mjs';
 import { createAdvanceHold, recoverWorkflowLedgerTail } from './store.mjs';
 import { drainCaseInbox } from './case-runtime.mjs';
@@ -16,12 +17,8 @@ export const ADVANCE_DETACHED_ENV = 'FGOS_WORKFLOW_ADVANCE_DETACHED';
 // The advance lock is a kernel mutex on `<runDir>/locks/advance.lock` (src/holder-lock): the kernel
 // lets one process advance a run at a time and releases it the moment that process dies, so a holder
 // killed mid-advance never leaves the run stuck.
-export function workflowRunDirOf(mainRoot, workflowRunId) {
-  return path.join(mainRoot, '.fgos', 'workflow-runs', workflowRunId);
-}
-
 function advanceLockParams(mainRoot, workflowRunId) {
-  return { fgosDir: path.join(mainRoot, '.fgos'), workflowRunDir: workflowRunDirOf(mainRoot, workflowRunId) };
+  return { fgosDir: path.join(mainRoot, '.fgos'), workflowRunDir: runDirOf(mainRoot, workflowRunId) };
 }
 
 /** Pid of a process holding the run's advance lock, or null when the kernel cannot list one. */
@@ -108,7 +105,7 @@ function tailAdvanceLog(logPath) {
 
 /** What the detached advance of a run is doing: liveness from the lock holder, plus its log tail. */
 export function advanceReport(mainRoot, workflowRunId, state, events) {
-  const runDir = workflowRunDirOf(mainRoot, workflowRunId);
+  const runDir = runDirOf(mainRoot, workflowRunId);
   const holder = liveAdvanceHolder(mainRoot, workflowRunId);
   const logPath = path.join(runDir, 'advance.log');
   const advance = { running: holder !== null, pid: holder?.pid ?? null, logPath };

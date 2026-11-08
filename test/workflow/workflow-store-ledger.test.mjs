@@ -135,6 +135,38 @@ test('recovery drops only the unfinished last line, under the advance hold, and 
   assert.ok(fs.readFileSync(run.file, 'utf8').startsWith(before), 'every finished line is untouched');
 });
 
+test('a run id that is not one case-id segment reaches no ledger path: read, append, create and the lock all refuse it by name', () => {
+  const run = freshRun();
+  const outside = path.join(run.repoRoot, '.fgos', 'x');
+  for (const bad of ['../x', '.bindings', '..']) {
+    const refused = (fn) => assert.throws(fn, (err) => err.code === 'invalid-case-id', `refused: ${bad}`);
+    refused(() => readWorkflowEvents({ repoRoot: run.repoRoot, workflowRunId: bad }));
+    refused(() => createWorkflowRun({ repoRoot: run.repoRoot, workflowRunId: bad, workflowId: WORKFLOW.id, workflow: WORKFLOW }));
+    refused(() => acquireAdvanceLock(run.repoRoot, bad));
+  }
+  assert.equal(fs.existsSync(outside), false, 'nothing was made outside the runs directory');
+  assert.equal(fs.existsSync(path.join(run.repoRoot, '.fgos', 'workflow-runs', '.bindings')), false);
+});
+
+test('a write that stores only part of a ledger line is finished, and one that stores nothing is refused', (t) => {
+  const run = freshRun();
+  const hold = acquireAdvanceLock(run.repoRoot, run.workflowRunId);
+  try {
+    const realWrite = fs.writeSync;
+    const half = t.mock.method(fs, 'writeSync', (fd, buffer, offset, length) => realWrite(fd, buffer, offset, Math.ceil(length / 2)));
+    append(run, hold, 'step.start', { stepId: 's1' });
+    half.mock.restore();
+    const events = readWorkflowEvents(run);
+    assert.deepEqual(events.map((e) => e.type), ['workflow.start', 'step.start'], 'the line is whole on disk');
+
+    const before = fs.readFileSync(run.file, 'utf8');
+    t.mock.method(fs, 'writeSync', () => 0);
+    assert.throws(() => append(run, hold, 'step.complete', { stepId: 's1', outcome: 'pass' }), (err) => err.code === 'ledger-short-write');
+    t.mock.restoreAll();
+    assert.ok(fs.readFileSync(run.file, 'utf8').startsWith(before), 'finished lines are untouched');
+  } finally { hold.release(); }
+});
+
 test('the next advance of a run whose ledger ends in an unfinished line repairs it before reading', async () => {
   const repoRoot = setupWorkflowFixtureRepo({ prefix: 'fgos-ledger-run-', readme: '# Ledger', gitName: 'Ledger Test', capabilities: [], workerBody: '' });
   const workflow = validateWorkflow({ id: 'test/ledger-gate', steps: [{ id: 'gate', gate: { kind: 'human', question: 'Go on?' } }] });
@@ -188,12 +220,12 @@ test('no code but the store names the run ledger file or writes to it, and the s
   });
   const namers = [...walk('src'), ...walk('bin')].filter((file) => {
     const source = fs.readFileSync(file, 'utf8');
-    return /['"`]events\.jsonl['"`]/.test(source) && source.includes('workflow-runs');
+    return /['"`]events\.jsonl['"`]/.test(source) && (source.includes('workflow-runs') || source.includes('runDirOf'));
   });
   assert.deepEqual(namers, [path.join('src', 'workflow', 'store.mjs')]);
 
   const store = fs.readFileSync('src/workflow/store.mjs', 'utf8');
   assert.equal(/appendFileSync|writeFileSync/.test(store), false, 'the store has no unsynced write');
-  const writeDurably = store.slice(store.indexOf('function writeDurably'), store.indexOf('function fsyncDirectory'));
+  const writeDurably = store.slice(store.indexOf('function writeDurably'), store.indexOf('export function fsyncDirectory'));
   assert.ok(writeDurably.indexOf('writeSync') < writeDurably.indexOf('fsyncSync') && writeDurably.indexOf('fsyncSync') < writeDurably.indexOf('closeSync'), 'write, then fsync, then close');
 });

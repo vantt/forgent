@@ -5,18 +5,9 @@
 // case close it by the same rules: refused while a closure milestone is stale or a consent gate is
 // parked; every binding whose attempt is quiet is released, the others are kept and named.
 
-import { appendWorkflowEvent, projectWorkflowState, readWorkflowEvents } from './store.mjs';
-import { projectCase } from './case-projection.mjs';
+import { appendWorkflowEvent } from './store.mjs';
+import { readCaseProjection } from './case-projection.mjs';
 import { unbindWorktree } from './case-bindings.mjs';
-import { playbookSubjectDigests } from './unit-handoff.mjs';
-
-/** The case as a reader sees it: the projection with the digests a playbook's subjects have now. */
-export function readCaseProjection(mainRoot, workflowRunId) {
-  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-  const state = projectWorkflowState(events);
-  const guide = projectCase(events).guide;
-  return { events, state, projection: projectCase(events, { currentDigests: playbookSubjectDigests({ state, workflow: state.workflow, guide, mainRoot }) }) };
-}
 
 /**
  * @param {object} params

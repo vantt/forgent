@@ -8,7 +8,7 @@
 // row binds to a tree or a person. The taken-over milestones travel on `case.opened`, with where they came
 // from, so the new ledger shows what was inherited and from which case.
 
-import { readCaseProjection } from './case-close.mjs';
+import { readCaseProjection } from './case-projection.mjs';
 import { isDeliveryMilestone } from './case-projection.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 

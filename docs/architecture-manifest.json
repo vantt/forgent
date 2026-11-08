@@ -294,6 +294,7 @@
     "src/runner/execution/commit-unit-work.mjs": "infra",
     "src/runner/execution/partial-writes.mjs": "infra",
     "src/runner/execution/unit-sync.mjs": "infra",
+    "src/runner/execution/case-run-paths.mjs": "infra",
     "src/runner/execution/handoff-refs.mjs": "infra",
     "src/runner/execution/unit-run-history.mjs": "infra",
     "src/runner/execution/unit-state.mjs": "infra",

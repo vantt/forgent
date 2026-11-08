@@ -18,7 +18,7 @@ import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
 import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
-import { digestUnitRunReports } from './ref-digests.mjs';
+import { stepSubjectDigest, unitRunsOf } from './ref-digests.mjs';
 
 const GATE_ANSWER_NOTE_CHARS = 200;
 
@@ -414,23 +414,6 @@ export function canResumeUnitRun(mainRoot, uState) {
   }
 }
 
-function unitRunsOf(state, stepIds) {
-  return stepIds.flatMap((stepId) => Object.values(state.steps[stepId]?.units ?? {})
-    .filter((unit) => unit.unitRunId && unit.status === 'completed')
-    .map((unit) => ({ unitRunId: unit.unitRunId, seats: [...new Set((unit.results ?? []).filter((r) => r?.runResult).map(seatKeyOf))] })));
-}
-
-/**
- * Digest of the subject a step's milestones stand for, read from the reports its Units left: the step's own
- * Units, or, for a step that is a gate or has no Units, the Units of the steps it builds on (what the gate
- * question shows is what an answer approves). Null when a report cannot be read.
- */
-export function stepSubjectDigest({ state, workflow, stepId, mainRoot }) {
-  const step = workflow.steps.find((s) => s.id === stepId);
-  const from = step && !step.gate && step.units.length > 0 ? [stepId] : (step?.dependsOn ?? []);
-  return digestUnitRunReports(unitRunsOf(state, from), mainRoot);
-}
-
 /**
  * The revisions of settled reports a fresh approval stands behind: for each human gate whose latest approval
  * is bound to the digest of what its subject is NOW, the sha256 of the bytes of each report that subject is made
@@ -457,15 +440,4 @@ export function approvedReportDigests({ events, state, workflow, mainRoot }) {
     }
   }
   return [...accepted];
-}
-
-/** The digest every milestone of a completed step has now, by milestone id: what the case recheck compares to. */
-export function playbookSubjectDigests({ state, workflow, guide, mainRoot }) {
-  const digests = {};
-  for (const activity of guide?.activities ?? []) {
-    if (state.steps[activity.id]?.status !== 'completed') continue;
-    const digest = stepSubjectDigest({ state, workflow, stepId: activity.id, mainRoot });
-    for (const id of activity.produces) digests[id] = digest;
-  }
-  return digests;
 }

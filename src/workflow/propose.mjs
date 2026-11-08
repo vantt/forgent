@@ -20,7 +20,8 @@ import { resolveGitRoots } from '../runner/execution/run.mjs';
 import { RIGOR_ORDER } from './case-projection.mjs';
 import { guideSha256 } from './case-start.mjs';
 import { inheritFrom } from './case-inherit.mjs';
-import { readCaseProjection } from './case-close.mjs';
+import { readCaseProjection } from './case-projection.mjs';
+import { runsRoot } from '../runner/execution/case-run-paths.mjs';
 import { digestText } from './ref-digests.mjs';
 import { loadWorkflow } from './loader.mjs';
 import { workflowCommit } from './unit-handoff.mjs';
@@ -584,9 +585,9 @@ export function createProposePorts({ checkoutRoot, mainRoot }) {
   const repo = createRepoPorts({ root: checkoutRoot });
   const closedCaseIds = () => {
     try {
-      return fs.readdirSync(path.join(mainRoot, '.fgos', 'workflow-runs'), { withFileTypes: true })
+      return fs.readdirSync(runsRoot(mainRoot), { withFileTypes: true })
         .filter((d) => d.isDirectory())
-        .map((d) => ({ id: d.name, at: fs.statSync(path.join(mainRoot, '.fgos', 'workflow-runs', d.name)).mtimeMs }))
+        .map((d) => ({ id: d.name, at: fs.statSync(path.join(runsRoot(mainRoot), d.name)).mtimeMs }))
         .sort((a, b) => b.at - a.at)
         .map((d) => d.id);
     } catch {

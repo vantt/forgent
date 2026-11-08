@@ -10,6 +10,7 @@ import path from 'node:path';
 
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
+import { runDirOf } from '../runner/execution/case-run-paths.mjs';
 import { projectWorkflowState, readWorkflowEvents } from './store.mjs';
 import {
   acquireAdvanceLock,
@@ -17,19 +18,18 @@ import {
   tryAcquireAdvanceLock,
   withAdvanceLock,
   withAdvanceLockSync,
-  workflowRunDirOf,
 } from './case-lock.mjs';
 import { drainCaseInbox, recordGateAnswerRound } from './case-runtime.mjs';
-import { gateOfStep } from './case-projection.mjs';
+import { gateOfStep, readCaseProjection } from './case-projection.mjs';
 import { CONFINED_WRITE_CODE, confinedWriteRefusal, confinedWriteText } from './case-admission-port.mjs';
 import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
-import { closeCaseUnderHold, readCaseProjection } from './case-close.mjs';
+import { closeCaseUnderHold } from './case-close.mjs';
 import { detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
 import { runCaseGate } from './case-gate.mjs';
 import { advanceWorkflowRun } from './runner.mjs';
 import { normalizeSeats } from './seats.mjs';
 import { seatProviders } from './seat-providers.mjs';
-import { stepSubjectDigest } from './unit-handoff.mjs';
+import { stepSubjectDigest } from './ref-digests.mjs';
 
 const isConductor = (projection) => projection.kind === 'guide';
 
@@ -259,7 +259,7 @@ export function answerWorkflowDetached(workflowRunId, params = {}) {
   const detached = spawnDetachedAdvance({
     mainRoot,
     workflowRunId,
-    runDir: workflowRunDirOf(mainRoot, workflowRunId),
+    runDir: runDirOf(mainRoot, workflowRunId),
     worktree: params.worktree ? worktreePath : undefined,
     cwd: params.cwd,
     cliPath: params.cliPath,
@@ -345,7 +345,7 @@ export function resumeWorkflowDetached(workflowRunId, options = {}) {
   const detached = spawnDetachedAdvance({
     mainRoot,
     workflowRunId,
-    runDir: workflowRunDirOf(mainRoot, workflowRunId),
+    runDir: runDirOf(mainRoot, workflowRunId),
     worktree: options.worktree ? worktreePath : undefined,
     cwd: options.cwd,
     cliPath: options.cliPath,

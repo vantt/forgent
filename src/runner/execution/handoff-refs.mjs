@@ -11,6 +11,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 import { RunnerConfigError } from '../dispatch/config.mjs';
+import { gateAnswerFile } from './case-run-paths.mjs';
 import { resolveBlindHiddenRoots, isInsideRoot } from '../dispatch/confinement/resources.mjs';
 import { readUnitRunHistory } from './unit-run-history.mjs';
 import { seatKeyOf } from './legacy-seat-read.mjs';
@@ -81,14 +82,6 @@ export function reportRefsOf(records, where) {
     if (!refs.includes(ref)) refs.push(ref);
   }
   return refs;
-}
-
-const isPathSegment = (s) => typeof s === 'string' && s !== '' && s !== '.' && s !== '..' && !/[/\\\0\s]/.test(s);
-
-/** Where the owner's answer to one gate of a Workflow run is kept, absolute; null when an id names no file there. */
-export function gateAnswerFile(mainRoot, workflowRunId, stepId) {
-  if (!isPathSegment(workflowRunId) || !isPathSegment(stepId)) return null;
-  return path.join(mainRoot, '.fgos', 'workflow-runs', workflowRunId, 'gate-answers', `${stepId}.md`);
 }
 
 function resolveGateAnswerRef(input, mainRoot) {

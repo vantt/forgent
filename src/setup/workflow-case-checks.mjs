@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { runsRoot } from '../runner/execution/case-run-paths.mjs';
 import {
   bindingsDir,
   bindingKeyOf,
@@ -31,7 +32,7 @@ function rootOf(cwd) {
 
 /** Cases whose ledger has a `binding` event: `{ caseId, events }`. A ledger that cannot be read is reported, not skipped. */
 function casesWithBindings(root) {
-  const runsDir = path.join(root, '.fgos', 'workflow-runs');
+  const runsDir = runsRoot(root);
   if (!fs.existsSync(runsDir)) return { cases: [], unreadable: [] };
   const cases = [];
   const unreadable = [];

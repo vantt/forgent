@@ -19,6 +19,7 @@ import { resolveStateRoot, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { loadLockRegistry } from '../holder-lock/registry.mjs';
 import { hotPaths, readHotRecord, judgeHotRecord } from '../state/hot-lock.mjs';
 import { fgosDirFromRoot } from '../runner/paths.mjs';
+import { runsRoot } from '../runner/execution/case-run-paths.mjs';
 import { judge } from '../native/process-identity.mjs';
 import { listAssignmentRuns } from '../runner/dispatch/assignment-layout.mjs';
 import { listOpenAttemptDirs } from '../run-supervisor/client.mjs';
@@ -222,7 +223,7 @@ const LOCK_FILES = {
   observe: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'observe.lock')),
   mailbox: ({ fgosDir }) => existing(path.join(fgosDir, LOCKS_DIR, 'mailbox.lock')),
   'dispatch-cwd': ({ fgosDir }) => filesIn(path.join(fgosDir, LOCKS_DIR), (name) => name.startsWith('dispatch-cwd--') && name.endsWith('.lock')),
-  advance: ({ fgosDir }) => subdirs(path.join(fgosDir, 'workflow-runs')).flatMap((runDir) => existing(path.join(runDir, LOCKS_DIR, 'advance.lock'))),
+  advance: ({ fgosDir }) => subdirs(runsRoot(path.dirname(fgosDir))).flatMap((runDir) => existing(path.join(runDir, LOCKS_DIR, 'advance.lock'))),
   recovery: ({ fgosDir }) => [...listAssignmentRuns(fgosDir)].flatMap(({ runDir }) => existing(path.join(runDir, LOCKS_DIR, 'recovery.lock'))),
   install: ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'install.lock')) : []),
   'full-suite': ({ lockRoot }) => (lockRoot ? existing(path.join(lockRoot, 'full-suite.lock')) : []),

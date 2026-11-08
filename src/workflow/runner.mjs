@@ -17,7 +17,7 @@ import {
 } from './store.mjs';
 import { PROGRESS_LINE_LIMIT, ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 import { drainCaseInbox } from './case-runtime.mjs';
-import { projectCase } from './case-projection.mjs';
+import { guideOfEvents, readCaseProjection } from './case-projection.mjs';
 import { openCaseOnLedger, resolveFrame, assertUnitAcceptOutcomes } from './case-start.mjs';
 import {
   approvedReportDigests,
@@ -27,14 +27,13 @@ import {
   createWorkflowWorktree,
   cleanupWorkflowWorktree,
   outOfScopeWrites,
-  playbookSubjectDigests,
   renderGateQuestion,
   settleUnitWorktrees,
   singleWriteBaseOf,
-  stepSubjectDigest,
   unitOverridesOf,
   unitPatternOf,
 } from './unit-handoff.mjs';
+import { stepSubjectDigest } from './ref-digests.mjs';
 import { runUnit, detectHerdrPresent } from '../runner/execution/run.mjs';
 import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
@@ -89,7 +88,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
   // A run recorded before cases existed is opened on its first advance, with its guide's defaults.
   {
     const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-    const guide = projectCase(events).guide;
+    const guide = guideOfEvents(events);
     openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide, frame: resolveFrame(guide, undefined), request: projectWorkflowState(events).request, hold, worktreePath, legacy: true });
   }
 
@@ -97,11 +96,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
   // while a Unit ran is on the ledger before anything acts on it.
   const reread = () => {
     const drained = drainCaseInbox({ mainRoot, caseId: workflowRunId, hold });
-    const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-    const state = projectWorkflowState(events);
-    const guide = projectCase(events).guide;
-    const projection = projectCase(events, { currentDigests: playbookSubjectDigests({ state, workflow, guide, mainRoot }) });
-    return { events, state, projection, drained };
+    return { ...readCaseProjection(mainRoot, workflowRunId), drained };
   };
   let { state } = reread();
 
@@ -400,7 +395,7 @@ export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, ma
                 if (ownsWorktree) cleanupWorkflowWorktree({ repoRoot: mainRoot, worktreePath: unitWorktree, branch: uBranch, deleteBranch: true });
                 const refused = err.refusal;
                 const approval = (refused.violations ?? []).find((v) => APPROVAL_REFUSALS.has(v.code) && v.milestone);
-                const guide = projectCase(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId })).guide;
+                const guide = guideOfEvents(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId }));
                 const gated = approval && workflow.steps.find((s) => s.gate && guide.activities.find((a) => a.id === s.id)?.produces.includes(approval.milestone));
                 if (gated) {
                   // What was approved is not what is there now: the gate asks again, for the current version.

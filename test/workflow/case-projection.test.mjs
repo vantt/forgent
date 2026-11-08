@@ -5,7 +5,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { validateWorkflow, createWorkflowRun, readWorkflowEvents } from '../../src/workflow/index.mjs';
-import { projectCase } from '../../src/workflow/case-projection.mjs';
+import fs from 'node:fs';
+import { projectCase, readCaseProjection } from '../../src/workflow/case-projection.mjs';
+import { projectWorkflowState, eventsFilePath } from '../../src/workflow/store.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { appendAll, conductorWorkflow, eventsOf, openCase, projectionOf, settle, verifyReceipt, withHold, append } from '../helpers/workflow-case-fixture.mjs';
@@ -202,4 +204,52 @@ test('a milestone reached by a settle and by a gate answer for the same subject 
   const changed = evaluatorsOf([answerEvent('sha256:old'), ...settled('r1')]);
   assert.deepEqual(changed.evaluators, ['reviewer-verdict']);
   assert.equal(changed.entry.consent, undefined);
+});
+
+test('the one reader gives the projection of the folded ledger, and no second fold of it', () => {
+  const run = openCase();
+  appendAll(run, [reserve('r1', 'plan'), settle('r1', { milestone: 'plan-ready', subjectDigest: 'sha256:plan', activity: 'plan' })]);
+  const read = readCaseProjection(run.repoRoot, run.caseId);
+  const events = eventsOf(run);
+  assert.deepEqual(read.events, events);
+  assert.deepEqual(read.state, projectWorkflowState(events));
+  assert.deepEqual(read.projection, projectCase(events));
+});
+
+test('a reader without the hold meets an append in flight once and reads whole the next time; the others see it at once', (t) => {
+  const run = openCase();
+  const file = eventsFilePath(run.repoRoot, run.caseId);
+  const whole = fs.readFileSync(file, 'utf8');
+  const tail = JSON.stringify({ seq: eventsOf(run).length + 1, ts: new Date().toISOString(), type: 'route', payload: {} }) + '\n';
+  const count = eventsOf(run).length;
+  const real = fs.readFileSync;
+  let reads = 0;
+  t.mock.method(fs, 'readFileSync', (target, ...rest) => {
+    if (target !== file) return real(target, ...rest);
+    reads += 1;
+    return reads === 1 ? whole + tail.slice(0, 20) : whole + tail;
+  });
+  assert.throws(() => readCaseProjection(run.repoRoot, run.caseId), (err) => err.code === 'workflow-ledger-unterminated');
+  assert.equal(reads, 1, 'a reader that holds advance does not wait');
+  reads = 0;
+  const read = readCaseProjection(run.repoRoot, run.caseId, { retryTail: true });
+  assert.equal(reads, 2);
+  assert.equal(read.events.length, count + 1);
+});
+
+test('a tail that never finishes is given up on after three reads, and a corrupt middle line is not retried', (t) => {
+  const run = openCase();
+  const file = eventsFilePath(run.repoRoot, run.caseId);
+  const whole = fs.readFileSync(file, 'utf8');
+  const real = fs.readFileSync;
+  let reads = 0;
+  const serve = (text) => t.mock.method(fs, 'readFileSync', (target, ...rest) => (target === file ? (reads += 1, text) : real(target, ...rest)));
+  const stub = serve(whole + '{"seq":');
+  assert.throws(() => readCaseProjection(run.repoRoot, run.caseId, { retryTail: true }), (err) => err.code === 'workflow-ledger-unterminated');
+  assert.equal(reads, 3);
+  stub.mock.restore();
+  reads = 0;
+  serve('not json\n' + whole);
+  assert.throws(() => readCaseProjection(run.repoRoot, run.caseId, { retryTail: true }), (err) => err.code === 'workflow-ledger-corrupt');
+  assert.equal(reads, 1);
 });

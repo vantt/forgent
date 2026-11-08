@@ -11,19 +11,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
-import { gateAnswerFile } from '../runner/execution/handoff-refs.mjs';
+import { gateAnswerFile, runDirOf } from '../runner/execution/case-run-paths.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { gateOfStep } from './case-projection.mjs';
 import { unbindWorktree } from './case-bindings.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
-import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
-const caseDir = (mainRoot, caseId) => path.join(mainRoot, '.fgos', 'workflow-runs', caseId);
-
-function writeJsonAtomic(file, value) {
+function writeText(file, text) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  replaceDurably(path.dirname(file), path.basename(file), JSON.stringify(value), 0o644);
+  replaceDurably(path.dirname(file), path.basename(file), text, 0o644);
 }
+
+const writeJsonAtomic = (file, value) => writeText(file, JSON.stringify(value));
 
 const readJson = (file) => {
   try {
@@ -37,7 +36,7 @@ const listJson = (dir) => (fs.existsSync(dir) ? fs.readdirSync(dir).filter((n) =
 
 // --- reservations -------------------------------------------------------------------------------
 
-const reservationsDir = (mainRoot, caseId) => path.join(caseDir(mainRoot, caseId), 'reservations');
+const reservationsDir = (mainRoot, caseId) => path.join(runDirOf(mainRoot, caseId), 'reservations');
 
 export function writeReservationFile({ mainRoot, caseId, reservation }) {
   writeJsonAtomic(path.join(reservationsDir(mainRoot, caseId), `${reservation.reservationId}.json`), reservation);
@@ -65,7 +64,7 @@ export function reservationQuiet(mainRoot, reservation) {
 
 // --- settle-pending -----------------------------------------------------------------------------
 
-const settlePendingDir = (mainRoot, caseId) => path.join(caseDir(mainRoot, caseId), 'settle-pending');
+const settlePendingDir = (mainRoot, caseId) => path.join(runDirOf(mainRoot, caseId), 'settle-pending');
 
 /** A settle that could not take `advance`: kept as a file the next holder of `advance` appends first. */
 export function writeSettlePending({ mainRoot, caseId, settle }) {
@@ -175,10 +174,7 @@ function renderGateAnswerFile(mainRoot, caseId, stepId) {
   const { file } = roundsDir(mainRoot, caseId, stepId);
   const rounds = roundsOf(mainRoot, caseId, stepId);
   if (rounds.length === 0) return;
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const tmp = `${file}.${uniqueTmpTag()}.tmp`;
-  fs.writeFileSync(tmp, renderAnswerFile(caseId, stepId, rounds));
-  fs.renameSync(tmp, file);
+  writeText(file, renderAnswerFile(caseId, stepId, rounds));
 }
 
 const roundConsumed = (events, r) => events.some((e) => e.type === 'gate.answer' && e.payload?.stepId === r.stepId
@@ -229,7 +225,7 @@ export function recordGateAnswerRound({ mainRoot, caseId, events, stepId, answer
 
 /** Rounds of any gate of the case whose `gate.answer` event is not on the ledger yet. */
 export function unconsumedGateRounds(mainRoot, caseId, events) {
-  const dir = path.join(caseDir(mainRoot, caseId), 'gate-answers');
+  const dir = path.join(runDirOf(mainRoot, caseId), 'gate-answers');
   if (!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir).filter((n) => n.endsWith('.rounds'))
     .flatMap((name) => roundsOf(mainRoot, caseId, name.slice(0, -'.rounds'.length)))
@@ -249,7 +245,7 @@ export function unconsumedGateRounds(mainRoot, caseId, events) {
  * @returns {{ settles: number, answers: number, refused: Array<{ stepId: string, occurrence: number, round: number, problem: string }> }}
  */
 export function drainCaseInbox({ mainRoot, caseId, hold }) {
-  const inbox = [settlePendingDir(mainRoot, caseId), path.join(caseDir(mainRoot, caseId), 'gate-answers')];
+  const inbox = [settlePendingDir(mainRoot, caseId), path.join(runDirOf(mainRoot, caseId), 'gate-answers')];
   if (!inbox.some((dir) => fs.existsSync(dir))) return { settles: 0, answers: 0, refused: [] };
   let events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
   const append = (event) => {

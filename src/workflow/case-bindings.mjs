@@ -18,24 +18,16 @@ import { cwdDevIno } from '../holder-lock/registry.mjs';
 import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
-import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
+import { appendWorkflowEvent, fsyncDirectory, readWorkflowEvents } from './store.mjs';
+import { runsRoot } from '../runner/execution/case-run-paths.mjs';
 
 export const SENTINEL_NAME = '.root';
 
 export function bindingsDir(mainRoot) {
-  return path.join(mainRoot, '.fgos', 'workflow-runs', '.bindings');
+  return path.join(runsRoot(mainRoot), '.bindings');
 }
 
 const recordPath = (mainRoot, key) => path.join(bindingsDir(mainRoot), `${key}.json`);
-
-function fsyncDir(dir) {
-  const fd = fs.openSync(dir, 'r');
-  try {
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-}
 
 /**
  * Write the sentinel that tells a reader it is looking at the real bindings directory. Only the host
@@ -161,7 +153,7 @@ export function unbindWorktree({ mainRoot, hold, caseId, generation, key, worktr
     event: { type: 'binding', payload: { caseId, generation, key, worktreeRoot: record.worktreeRoot, state: 'unbound' } },
   });
   fs.unlinkSync(file);
-  fsyncDir(bindingsDir(mainRoot));
+  fsyncDirectory(bindingsDir(mainRoot));
   return { unbound: true };
 }
 

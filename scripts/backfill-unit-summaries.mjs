@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { eventsFilePath } from '../src/workflow/store.mjs';
+import { runsRoot } from '../src/runner/execution/case-run-paths.mjs';
 import {
   buildUnitSummary, readStoredUnitSummary, serializeUnitSummary, unitSummarySkipReason, writeUnitSummary,
 } from '../src/runner/execution/unit-summary.mjs';
@@ -19,7 +20,7 @@ const USAGE = 'usage: node scripts/backfill-unit-summaries.mjs [--dir <repo>] [-
 /** Explicit owner completion links for legacy records, not a guessed workflow join. */
 export function readLegacyUnitCompletions(repoRoot) {
   const links = new Map();
-  const root = path.join(repoRoot, '.fgos', 'workflow-runs');
+  const root = runsRoot(repoRoot);
   if (!fs.existsSync(root)) return links;
   for (const entry of fs.readdirSync(root, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     if (!entry.isDirectory()) continue;

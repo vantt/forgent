@@ -9,11 +9,9 @@
 // always gives the same projection.
 
 import { normalizeGuide } from './guide-schema.mjs';
-import { projectWorkflowState } from './store.mjs';
+import { projectWorkflowState, readWorkflowEvents } from './store.mjs';
+import { playbookSubjectDigests } from './ref-digests.mjs';
 import { seatKeyOf, isVerdictResult, isVerifyResult } from '../runner/execution/legacy-seat-read.mjs';
-
-/** Event kinds a case adds to the ledger, beside the step events a playbook already writes. */
-export const CASE_EVENT_KINDS = Object.freeze(['case.opened', 'binding', 'route', 'reservation', 'settle', 'gate.answer', 'case.closed']);
 
 /** Who may name a receipt. Worker prose and a self-reported `verifiedSha` are never one. */
 export const RECEIPT_EVALUATORS = Object.freeze(['harness-verify', 'reviewer-verdict', 'gate-answer']);
@@ -49,12 +47,14 @@ export function isDeliveryMilestone(guide, milestoneId) {
 export function gateOfStep(events, stepId) {
   const stepGate = projectWorkflowState(events).steps[stepId]?.gate;
   if (stepGate) return { ...stepGate, mode: stepGate.mode === 'input' ? 'input' : 'consent' };
-  const guide = guideOf(events.find((e) => e.type === 'workflow.start')?.payload);
+  const guide = guideOfEvents(events);
   const point = (guide?.decisions ?? []).find((d) => d.gate && [...d.should, ...d.mayInstead].includes(stepId));
   return point ? { mode: point.gate === 'input' ? 'input' : 'consent' } : null;
 }
 
-function guideOf(startPayload) {
+/** The guide a ledger's start event carries (or its steps rebuild), null when it has none. */
+export function guideOfEvents(events) {
+  const startPayload = events.find((e) => e.type === 'workflow.start')?.payload;
   const workflow = startPayload?.workflow;
   if (!workflow) return null;
   if (workflow.guide) return workflow.guide;
@@ -83,13 +83,12 @@ function remaining(limit, used) {
  * @param {object} [options]
  * @param {Record<string, string | null>} [options.currentDigests] subject digest of a milestone as it is now;
  *   a milestone with no entry is not rechecked, one whose value is null cannot be known and fails closed
+ * @param {object} [options.state] the events already folded by `projectWorkflowState`, when the caller has them
+ * @param {object | null} [options.guide] the guide already derived by `guideOfEvents`, when the caller has it
  * @returns {object}
  */
-export function projectCase(events, { currentDigests = {} } = {}) {
-  const legacy = projectWorkflowState(events);
-  const start = events.find((e) => e.type === 'workflow.start');
+export function projectCase(events, { currentDigests = {}, state: legacy = projectWorkflowState(events), guide = guideOfEvents(events) } = {}) {
   const opened = events.find((e) => e.type === 'case.opened');
-  const guide = guideOf(start?.payload);
   const kind = opened?.payload?.kind ?? guide?.kind ?? 'playbook';
   const frame = frameOf(opened, guide);
 
@@ -285,4 +284,21 @@ export function receiptsFromResults({ unitRunId, results = [], milestone = null,
     }
   }
   return receipts;
+}
+
+/**
+ * The case as a reader sees it: the ledger, its fold, and the projection with the digests a playbook's
+ * subjects have now. A reader that does not hold `advance` asks for `retryTail`, because it can meet an
+ * append in flight; a reader that holds it never can.
+ *
+ * @param {string} mainRoot
+ * @param {string} caseId
+ * @param {{ retryTail?: boolean }} [options]
+ */
+export function readCaseProjection(mainRoot, caseId, { retryTail = false } = {}) {
+  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId, retryTail });
+  const state = projectWorkflowState(events);
+  const guide = guideOfEvents(events);
+  const currentDigests = playbookSubjectDigests({ state, workflow: state.workflow, guide, mainRoot });
+  return { events, state, projection: projectCase(events, { currentDigests, state, guide }) };
 }
