@@ -34,6 +34,8 @@ GitHub's unreachable objects keep what they saw, even after step 7. Windows sche
    **Gate: no machine sends v3 until 2b has landed and every receiver runs it.**
 3. **Upgrade every receiver.** fg-server2, fg-server (via RULE), design-lap. `fgos mailbox status` shows
    the payload version each machine accepts. Nothing is sent as v3 before all three accept it.
+   **Done 2026-11-08:** all three run main `bbbf52f00` (contains `4038fc5f2`) and print `this machine takes mail payload versions 1, 2, 3`;
+   `git-repository-config` is green on each, so no `doctor --fix` was needed for the mapping (fg-server2 release `b99f0ca2`, design-lap `0a4455cc`).
 4. **Mailbox: sender switches to v3.** (Condition: the body push is acknowledged before the event is appended; test it on the sender side.) Write the body to the body ref, push it before the event ref, keep
    v2 only for a receiver that has not been upgraded (decided by a per-remote setting, off by default).
 5. **Rotation.** Every 7 days the owner machine builds a new root with the bodies younger than 7 days and
