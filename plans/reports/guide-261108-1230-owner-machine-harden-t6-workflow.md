@@ -30,3 +30,15 @@ Các mục của P01 (đồng ý và biên nhận gate) và P02 (bỏ bước `i
 - **Kiểm nhanh:** giữ custody một worktree ở tiến trình khác, chạy `fgos run --case <id> --writes <path>` ở đó: bị từ chối, `fgos workflow status <case>` không có reservation mới.
 - **Quay lại:** revert; không có thay đổi trên đĩa. Nếu bản release của P04 đã land, revert commit release của P04 trước (nó dựa vào thứ tự này).
 
+## P07: lối vào của conductor (propose đọc mỗi ledger đã đóng một lần, một bộ so glob, một chỗ kiểm hình dạng slice)
+
+- **Commit trên main:** `a7b70d50f..bb388da2e` (commit đầu là bằng chứng đỏ, hai commit sau là thay đổi và baseline test).
+- **Người dùng thấy gì:**
+  - `fgos workflow propose` nhanh hơn rõ rệt trên checkout có nhiều ledger Playbook (55 ledger trên fg-server2: 3,9 s xuống 0,35 s cùng tải); không đổi byte nào trên đĩa.
+  - Đường ghi có dấu `\`, bắt đầu bằng `:` hoặc `**` trong tên bị từ chối ngay lúc phân loại với mã `slice-write-invalid` (trước đây `write-path-invalid`); `.` được đọc như `**` và bị từ chối vì chạm `.git`.
+  - Đường ghi có `?` không còn bị coi là ký tự đại diện khi so chồng lấn giữa các slice.
+  - Slice chỉ đọc có `capability` hoặc `pattern` sai kiểu bị từ chối `slice-invalid` thay vì làm sập propose.
+- **Lệnh trên từng workspace:** `git pull --rebase`; build, stage, kích hoạt release như thường lệ; `fgos doctor </dev/null`. Không có yêu cầu thứ tự kích hoạt.
+- **Doctor mong đợi:** không có dòng mới.
+- **Kiểm nhanh:** `fgos workflow propose --slices <file> --plan <plan> --json` trả lời trong dưới một giây.
+- **Quay lại:** revert hai commit sau cùng (thay đổi và baseline); không có thay đổi trên đĩa.
