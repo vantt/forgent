@@ -818,13 +818,69 @@ test('a unit refused by policy fails its step and the workflow; dependent steps 
   assert.equal(state.steps.second.status, 'pending');
   assert.deepEqual(state.steps.second.units, {});
 
-  // Resuming a failed run must not start the dependent step either.
-  const resumed = await resumeWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, worktree: tmp });
-  assert.equal(resumed.status, 'failed');
-  assert.equal(resumed.steps.second.status, 'pending');
-  const types = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).map((e) => e.type);
+  // A verdict is terminal: resuming refuses by name, records nothing, and never starts the dependent step.
+  const before = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).length;
+  await assert.rejects(
+    () => resumeWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, worktree: tmp }),
+    /nothing-to-resume: step first ended policy-refusal/,
+  );
+  const events = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId });
+  assert.equal(events.length, before);
+  const types = events.map((e) => e.type);
   assert.ok(!types.includes('step.complete'));
   assert.deepEqual(types.filter((t) => t === 'step.fail' || t === 'workflow.fail'), ['step.fail', 'workflow.fail']);
+});
+
+test('resume runs a unit that failed on infrastructure again as a fresh Unit run, once per call, and a second failure ends the step again', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'test/resume-infrastructure-failure',
+    steps: [
+      { id: 'first', dependsOn: [], units: [{ id: 'u1', template: { capability: 'docs:write' } }] },
+      { id: 'second', dependsOn: ['first'], units: [{ id: 'u2', template: { capability: 'docs:write' } }] },
+    ],
+  });
+  const worker = path.join(tmp, 'echo-worker.mjs');
+  const kept = fs.readFileSync(worker, 'utf8');
+  fs.rmSync(worker);
+  const failed = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(failed.status, 'failed');
+  assert.equal(failed.steps.first.units.u1.outcome, 'execution-failure');
+  const firstRunId = failed.steps.first.units.u1.unitRunId;
+
+  // Still broken: the rerun is one admitted Unit run and ends the step again; nothing retries by itself.
+  const again = await resumeWorkflow(failed.workflowRunId, { repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(again.status, 'failed');
+  const runsAfterSecondTry = fs.readdirSync(path.join(tmp, '.fgos', 'assignments')).filter((d) => d.startsWith('unit-run-'));
+  assert.equal(runsAfterSecondTry.length, 2, 'one fresh Unit run for the one resume');
+  assert.notEqual(again.steps.first.units.u1.unitRunId, firstRunId);
+
+  fs.writeFileSync(worker, kept);
+  const resumed = await resumeWorkflow(failed.workflowRunId, { repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(resumed.status, 'completed', JSON.stringify(resumed.steps));
+  assert.equal(resumed.steps.first.units.u1.outcome, 'pass');
+  assert.equal(resumed.steps.second.status, 'completed');
+  const types = readWorkflowEvents({ repoRoot: tmp, workflowRunId: failed.workflowRunId }).map((e) => e.type);
+  assert.equal(types.filter((t) => t === 'step.start').length, 4, 'first, two reopenings, then second');
+  assert.equal(types.filter((t) => t === 'unit.scheduled').length, 4, 'three attempts of u1 and one of u2');
+});
+
+test('a completed unit is recorded without the evidence of its seat results and keeps every field a reader uses', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'test/slim-ledger',
+    steps: [{ id: 'only', dependsOn: [], units: [{ id: 'u1', template: { capability: 'docs:write' } }] }],
+  });
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(state.status, 'completed');
+  const complete = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).find((e) => e.type === 'unit.complete');
+  const [result] = complete.payload.results;
+  assert.equal('evidence' in result.runResult, false);
+  assert.equal(result.runResult.agentClaim.summary, 'Done');
+  assert.equal(result.runResult.executorId, 'test-node');
+  assert.ok(result.runResult.settledAt && Array.isArray(result.runResult.settleReports));
+  assert.equal(result.binding.executor, 'test-node');
+  assert.equal(result.outcome, 'pass');
 });
 
 test('a unit that throws instead of returning fails its step and the workflow with the reason recorded', async () => {

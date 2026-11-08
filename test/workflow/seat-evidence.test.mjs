@@ -51,8 +51,28 @@ test('seat providers list who ran each seat and where a failover moved it from',
     },
   });
   assert.equal(rows.length, 2);
-  assert.deepEqual(rows[0], { step: 's1', unit: 'u1', seat: 'member-1', role: 'producer', round: 1, persona: 'p', executor: 'claude-herdr', invocation: 'i1', family: 'claude', model: 'sonnet', outcome: 'pass', movedFrom: null });
+  assert.deepEqual(rows[0], { step: 's1', unit: 'u1', seat: 'member-1', role: 'producer', round: 1, persona: 'p', executor: 'claude-herdr', invocation: 'i1', family: 'claude', model: 'sonnet', outcome: 'pass', account: null, movedFrom: null });
   assert.deepEqual(rows[1].movedFrom, { executor: 'xai', kind: 'next-candidate', reason: 'provider-limit' });
+});
+
+test('seat providers show the account a seat was pinned to, or why the pin skipped it', () => {
+  const seat = (name, binding) => ({ seat: name, role: 'producer', round: 1, outcome: 'pass', binding });
+  const rows = seatProviders({
+    steps: {
+      s: {
+        units: {
+          u: {
+            results: [
+              seat('pinned', { executor: 'a', account: { pool: 'openai', id: 'work' }, provenance: { account: { value: 'openai/work', source: 'override' } } }),
+              seat('skipped', { executor: 'b', provenance: { account: { value: null, skipped: { reason: 'account-pin-other-pool', detail: 'x' } } } }),
+              seat('free', { executor: 'c' }),
+            ],
+          },
+        },
+      },
+    },
+  });
+  assert.deepEqual(rows.map((row) => row.account), ['openai/work', 'account-pin-other-pool', null]);
   // A result written before seats existed carries only the name it was keyed by, which is its seat.
   const [legacy] = seatProviders({ steps: { s: { units: { u: { results: [{ role: 'panelist-1', round: 1, outcome: 'pass' }] } } } } });
   assert.equal(legacy.seat, 'panelist-1');

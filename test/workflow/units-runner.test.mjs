@@ -644,6 +644,46 @@ test('workflow resume preserves an unknown custody predecessor and redispatches 
   assert.equal(recovery.payload.recovery.preservedWorktree, old.worktreePath);
 });
 
+test('resume runs a writing unit that failed on infrastructure again in its own worktree and branch, and the worktrees settle again', async () => {
+  const tmp = setupRepo();
+  const file = unitsFile(tmp, [{ id: 'write', objective: 'WRITE:output.txt', capability: 'docs:write', writes: ['output.txt'] }]);
+  const worker = path.join(tmp, 'worker.mjs');
+  fs.renameSync(worker, `${worker}.off`);
+  const failed = await startWorkflow({ unitsPath: file, ...opts(tmp) });
+  assert.equal(failed.status, 'failed');
+  const old = failed.steps.write.units.write;
+  assert.equal(old.outcome, 'execution-failure');
+  assert.ok(failed.worktrees?.kept.some((k) => k.worktreePath === old.worktreePath), 'a failed unit keeps its worktree');
+
+  fs.renameSync(`${worker}.off`, worker);
+  const resumed = await resumeWorkflow(failed.workflowRunId, opts(tmp));
+  assert.equal(resumed.status, 'completed', JSON.stringify(resumed.steps));
+  const next = resumed.steps.write.units.write;
+  assert.notEqual(next.unitRunId, old.unitRunId, 'a fresh Unit run');
+  assert.equal(next.worktreePath, old.worktreePath, 'the recorded worktree is reused');
+  assert.equal(next.branch, old.branch, 'and so is its branch');
+  assert.equal(fs.readFileSync(path.join(next.worktreePath, 'output.txt'), 'utf8'), 'output.txt written\n');
+  assert.ok(resumed.worktrees, 'the end of the run settles the worktrees again');
+});
+
+test('a writing unit whose controller died between its scheduling and its Unit run is continued in the recorded worktree on resume', async () => {
+  const tmp = setupRepo();
+  const file = unitsFile(tmp, [{ id: 'write', objective: 'WRITE:output.txt', capability: 'docs:write', writes: ['output.txt'] }]);
+  const first = await startWorkflow({ unitsPath: file, ...opts(tmp) });
+  assert.equal(first.status, 'completed', JSON.stringify(first.steps));
+  const old = first.steps.write.units.write;
+  const events = readWorkflowEvents({ repoRoot: tmp, workflowRunId: first.workflowRunId });
+  const started = events.find((e) => e.type === 'unit.started');
+  const kept = events.filter((e) => e.seq < started.seq);
+  fs.writeFileSync(path.join(tmp, '.fgos', 'workflow-runs', first.workflowRunId, 'events.jsonl'), kept.map((e) => JSON.stringify(e)).join('\n') + '\n');
+
+  const resumed = await resumeWorkflow(first.workflowRunId, opts(tmp));
+  assert.equal(resumed.status, 'completed', JSON.stringify(resumed.steps));
+  const next = resumed.steps.write.units.write;
+  assert.equal(next.worktreePath, old.worktreePath, 'no second worktree on a branch that is already checked out');
+  assert.equal(next.branch, old.branch);
+});
+
 test('a unit\'s verify in a units file reaches the Unit and runs in its worktree', async () => {
   const tmp = setupRepo();
   useTwoFamilies(tmp);

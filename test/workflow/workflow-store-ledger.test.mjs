@@ -229,3 +229,75 @@ test('no code but the store names the run ledger file or writes to it, and the s
   const writeDurably = store.slice(store.indexOf('function writeDurably'), store.indexOf('export function fsyncDirectory'));
   assert.ok(writeDurably.indexOf('writeSync') < writeDurably.indexOf('fsyncSync') && writeDurably.indexOf('fsyncSync') < writeDurably.indexOf('closeSync'), 'write, then fsync, then close');
 });
+
+const foldOf = (workflow, rows) => projectWorkflowState([
+  { type: 'workflow.start', payload: { workflowRunId: 'r1', workflowId: workflow.id, workflow } },
+  ...rows.map(([type, payload]) => ({ type, payload })),
+].map((event, i) => ({ seq: i + 1, ts: '2026-11-08T00:00:00.000Z', ...event })));
+
+const TWO_UNITS = { id: 'fold/reopen', steps: [
+  { id: 's1', dependsOn: [], units: [{ id: 'a', template: {} }, { id: 'b', template: {} }] },
+  { id: 's2', dependsOn: ['s1'], units: [] },
+] };
+const FAILED_ROWS = (outcome, extraResult = {}) => [
+  ['step.start', { stepId: 's1' }],
+  ['unit.scheduled', { stepId: 's1', unitId: 'a' }],
+  ['unit.started', { stepId: 's1', unitId: 'a', unitRunId: 'run-a' }],
+  ['unit.complete', { stepId: 's1', unitId: 'a', unitRunId: 'run-a', outcome: 'pass', results: [] }],
+  ['unit.scheduled', { stepId: 's1', unitId: 'b', worktreePath: '/wt/b', branch: 'wf/r1/b', baseRef: 'HEAD', baseSha: 'abc' }],
+  ['unit.started', { stepId: 's1', unitId: 'b', unitRunId: 'run-b' }],
+  ['unit.complete', { stepId: 's1', unitId: 'b', unitRunId: 'run-b', outcome, results: [{ seat: 'producer', outcome, runResult: {}, ...extraResult }] }],
+  ['step.fail', { stepId: 's1', outcome, unitId: 'b', reason: `unit b ended ${outcome}` }],
+  ['workflow.fail', { outcome, stepId: 's1', reason: `unit b ended ${outcome}` }],
+  ['workflow.worktrees', { removed: [], kept: [{ stepId: 's1', unitId: 'b', worktreePath: '/wt/b' }] }],
+];
+
+test('a step started again after it failed on infrastructure reopens the run and only the units that did not reach a verdict, and the worktrees settle again', () => {
+  for (const outcome of ['execution-failure', 'not-started']) {
+    const failed = foldOf(TWO_UNITS, FAILED_ROWS(outcome));
+    assert.equal(failed.status, 'failed');
+    assert.equal(failed.steps.s1.units.b.rerunnable, true, `${outcome} is an infrastructure ending`);
+    assert.equal(failed.steps.s1.units.a.rerunnable, undefined, 'a unit that passed is not rerunnable');
+
+    const reopened = foldOf(TWO_UNITS, [...FAILED_ROWS(outcome), ['step.start', { stepId: 's1' }]]);
+    assert.equal(reopened.status, 'running');
+    assert.equal(reopened.outcome, null);
+    assert.equal(reopened.worktrees, null, 'a second settle is allowed');
+    assert.equal(reopened.steps.s1.status, 'running');
+    assert.equal(reopened.steps.s1.reason, undefined);
+    assert.equal(reopened.steps.s1.units.a.status, 'completed', 'the unit that passed is not run again');
+    const b = reopened.steps.s1.units.b;
+    assert.equal(b.status, 'pending');
+    assert.deepEqual([b.worktreePath, b.branch, b.baseSha, b.unitRunId], ['/wt/b', 'wf/r1/b', 'abc', 'run-b'], 'the failed attempt stays as the predecessor');
+    assert.equal(b.outcome, undefined);
+  }
+});
+
+test('a step started again after a verdict reopens nothing: refused, out-of-scope, findings and a settled seat verdict stay terminal', () => {
+  const verdicts = [
+    FAILED_ROWS('findings'),
+    FAILED_ROWS('policy-refusal'),
+    FAILED_ROWS('execution-failure', { refused: { reason: 'policy', detail: 'x' } }),
+    FAILED_ROWS('execution-failure', { seat: 'reviewer', posture: { verdict: true }, outcome: 'findings' }),
+  ];
+  for (const rows of verdicts) {
+    const state = foldOf(TWO_UNITS, [...rows, ['step.start', { stepId: 's1' }]]);
+    assert.equal(state.steps.s1.units.b.status, 'completed', JSON.stringify(rows[6]));
+    assert.notEqual(state.steps.s1.units.b.rerunnable, true);
+  }
+});
+
+test('a unit.complete written with the full seat evidence folds as before: the new ledger is a subset of the old one', () => {
+  const full = foldOf(TWO_UNITS, [
+    ['step.start', { stepId: 's1' }],
+    ['unit.scheduled', { stepId: 's1', unitId: 'a' }],
+    ['unit.complete', { stepId: 's1', unitId: 'a', outcome: 'pass', results: [{ seat: 'producer', role: 'producer', round: 1, outcome: 'pass', binding: { executor: 'e' }, runResult: { executorId: 'e', evidence: { changedFiles: ['x'] }, agentClaim: { summary: 's' }, settleReports: [] } }] }],
+  ]);
+  const slim = foldOf(TWO_UNITS, [
+    ['step.start', { stepId: 's1' }],
+    ['unit.scheduled', { stepId: 's1', unitId: 'a' }],
+    ['unit.complete', { stepId: 's1', unitId: 'a', outcome: 'pass', results: [{ seat: 'producer', role: 'producer', round: 1, outcome: 'pass', binding: { executor: 'e' }, runResult: { executorId: 'e', agentClaim: { summary: 's' }, settleReports: [] } }] }],
+  ]);
+  assert.equal(full.steps.s1.units.a.outcome, slim.steps.s1.units.a.outcome);
+  assert.equal(slim.steps.s1.units.a.results[0].runResult.agentClaim.summary, 's');
+});
