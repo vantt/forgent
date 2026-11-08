@@ -108,7 +108,7 @@ Settled without a phase: D5 (`fgos-cook` retry) closed by `b75259cbd`; W-6, W-7 
 | 15 | [Spec, measure, close](phase-15-spec-measure-close.md) | 01–14 | close | — | 0 / 0 / 0 |
 | 16 | [Size pass: `projectCase` fold table, one workflow test repository fixture](phase-16-size-pass.md) (decision 73 (a); a2 is in 18) | T6 as closed | final wave | `case-projection.mjs`, `test/helpers/workflow-fixture-repo.mjs`, `test/helpers/workflow-runner-fixture.mjs` | +25 / 0 / -40 |
 | 17 | [Settle wins](phase-17-settle-wins.md) (decision 73 (b)) | T6 as closed | final wave | `case-runtime.mjs`, `test/workflow/case-runtime.test.mjs`, `test/workflow/case-projection.test.mjs` (append) | +5 / 0 / +35 |
-| 18 | [Prune the whole case, keep reasons as one table](phase-18-prune-whole-case.md) (decision 73 (c) and (a)'s table) | T6 as closed | final wave | `case-close.mjs`, `test/workflow/case-close.test.mjs` | 0 / 0 / +25 |
+| 18 | [Prune the whole case, keep reasons as one table](phase-18-prune-whole-case.md) (decision 73 (c) and (a)'s table) (**landed** 2026-11-08 `c9aecc8e5`) | T6 as closed | final wave | `case-close.mjs`, `test/workflow/case-close.test.mjs` | 0 / 0 / +25 |
 | 19 | [Status accounts for every run](phase-19-status-accounts.md) (decision 73 (d)) | T6 as closed | final wave | `case-verbs.mjs`, `command-registry.mjs` (text), `test/workflow/units-runner.test.mjs` | 0 / 0 / +12 |
 | 20 | [Plain run retention: measure, then the owner question](phase-20-plain-run-retention.md) (decision 73 (e); **step 1 landed** 2026-11-08, the owner question waits for the numbers) | step 1 none; step 2 the owner's numbers and answer | final wave | guide only | 0 / 0 / 0 |
 

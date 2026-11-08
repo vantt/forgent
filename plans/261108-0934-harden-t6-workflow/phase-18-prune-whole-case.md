@@ -1,7 +1,7 @@
 ---
 phase: 18
 title: "Prune a whole case or none of its Unit runs: the keep reasons become one table the judge reads, and a case that must stay keeps every Unit run its ledger names"
-status: pending
+status: landed
 depends_on: ["01-15 on main (T6 as closed 2026-11-08)"]
 parallel: "final wave, with 16, 17, 19 and 20 step 1 (disjoint files); carries a2 of the size pass"
 effort: ~0.75d
