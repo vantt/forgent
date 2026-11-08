@@ -1268,12 +1268,17 @@ test('integration target: declared step target, then origin/HEAD, then the check
   assert.equal(resolveIntegrationTarget({ repoRoot: tmp, workflow: { steps: [{ kind: 'integrate', target: 'missing' }] } }), null, 'an absent declared target is explicit unknown');
 });
 
-test('a step target is accepted on integrate steps only', () => {
+test('a Playbook step of kind integrate, or a step target, is refused by name and points to the approve door', () => {
   const base = { id: 'test/target', title: 'T' };
   const unit = { id: 'u', template: { capability: 'docs:write', writes: ['a.txt'] } };
-  const ok = validateWorkflow({ ...base, steps: [{ id: 's1', units: [unit] }, { id: 'i', kind: 'integrate', dependsOn: ['s1'], target: 'release' }] });
-  assert.equal(ok.steps[1].target, 'release');
-  assert.throws(() => validateWorkflow({ ...base, steps: [{ id: 's1', target: 'release', units: [unit] }] }), /only valid on a step of kind "integrate"/);
+  assert.throws(
+    () => validateWorkflow({ ...base, steps: [{ id: 's1', units: [unit] }, { id: 'i', kind: 'integrate', dependsOn: ['s1'] }] }),
+    /step "i".*kind "integrate".*approve door/,
+  );
+  assert.throws(
+    () => validateWorkflow({ ...base, steps: [{ id: 's1', target: 'release', units: [unit] }] }),
+    /"target".*approve door/,
+  );
 });
 
 test('validateWorkflow keeps a unit template persona and params and rejects params that are not an object', () => {
