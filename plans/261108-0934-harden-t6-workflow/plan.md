@@ -1,9 +1,9 @@
 ---
 title: "HARDEN T6 sub-plan: Workflow (guide and case)"
-description: "Step 4 of the HARDEN per-layer loop for T6: the accepted findings of the T6 arbitration and owner decision 71 (1a 2a 3a 4a 5b 6a 7a) split into fifteen sub-phases with one writer per hot file, six parallel leads in the widest wave, net size below zero, self-landing on fg-server2 and a Vietnamese owner-machine guide."
+description: "Step 4 of the HARDEN per-layer loop for T6: the accepted findings of the T6 arbitration and owner decision 71 (1a 2a 3a 4a 5b 6a 7a) split into fifteen sub-phases with one writer per hot file, plus a final wave of five (16-20, owner decision 73), six parallel leads in the widest wave, net size below zero, self-landing on fg-server2 and a Vietnamese owner-machine guide."
 status: pending
 priority: P1
-effort: ~8d lead time (wave 0 ≈ 1d; P03 1d; wave 2 ≈ 2d; wave 3 ≈ 1.5d; P13 1.5d; P14 0.5d; P15 1d)
+effort: ~8d lead time (wave 0 ≈ 1d; P03 1d; wave 2 ≈ 2d; wave 3 ≈ 1.5d; P13 1.5d; P14 0.5d; P15 1d) + final wave ~1d wide (phases 16-20, five leads in parallel; 20 step 2 waits for the owner)
 branch: main (plan only; each phase runs on its own track branch `harden/t6-pNN-<slug>` in its own linked worktree from origin/main)
 tags: [harden, workflow, case-ledger, admission, playbook, guide, seat-binding, retention, tests]
 blockedBy: []
@@ -106,6 +106,11 @@ Settled without a phase: D5 (`fgos-cook` retry) closed by `b75259cbd`; W-6, W-7 
 | 13 | [Test owners and split](phase-13-test-owners-and-split.md) (**landed** 2026-11-08 `2c2a2e153..46720a519`) | 02, 05, 06, 11 | wave 4 | — | 0 / 0 / −325 |
 | 14 | [`RunnerConfigError` leaf](phase-14-runner-config-error-leaf.md) (**landed** 2026-11-08 `e9255a3e6`) | 01–13 landed; announced quiet window | wave 5 (alone) | all (one import line each) | +2 / 0 / 0 |
 | 15 | [Spec, measure, close](phase-15-spec-measure-close.md) | 01–14 | close | — | 0 / 0 / 0 |
+| 16 | [Size pass: `projectCase` fold table, one workflow test repository fixture](phase-16-size-pass.md) (decision 73 (a); a2 is in 18) | T6 as closed | final wave | `case-projection.mjs`, `test/helpers/workflow-fixture-repo.mjs`, `test/helpers/workflow-runner-fixture.mjs` | +25 / 0 / -40 |
+| 17 | [Settle wins](phase-17-settle-wins.md) (decision 73 (b)) | T6 as closed | final wave | `case-runtime.mjs`, `test/workflow/case-runtime.test.mjs`, `test/workflow/case-projection.test.mjs` (append) | +5 / 0 / +35 |
+| 18 | [Prune the whole case, keep reasons as one table](phase-18-prune-whole-case.md) (decision 73 (c) and (a)'s table) | T6 as closed | final wave | `case-close.mjs`, `test/workflow/case-close.test.mjs` | 0 / 0 / +25 |
+| 19 | [Status accounts for every run](phase-19-status-accounts.md) (decision 73 (d)) | T6 as closed | final wave | `case-verbs.mjs`, `command-registry.mjs` (text), `test/workflow/units-runner.test.mjs` | 0 / 0 / +12 |
+| 20 | [Plain run retention: measure, then the owner question](phase-20-plain-run-retention.md) (decision 73 (e)) | step 1 none; step 2 the owner's numbers and answer | final wave | guide only | 0 / 0 / 0 |
 
 ```
 wave 0:  P01 ∥ P02                    P01 edits case-verbs/-runtime/-projection only after the answer-gate branch lands
@@ -116,6 +121,8 @@ wave 3:  P10 ∥ P11 ∥ P12 (code)       P12's wiring step (case-verbs, bin arm
 wave 4:  P13
 wave 5:  P14 (alone)
 close:   P15
+final:   P16 ∥ P17 ∥ P18 ∥ P19 ∥ P20 step 1   (five leads, no shared source file; table below)
+         P20 step 2 after the owner's numbers; then the wave close (below)
 ```
 
 **First batch to start now:** P02 (step 1 is the OPC message) and P01 on its gate files (`case-gate.mjs`, `propose.mjs`, `bin` workflow arm, `command-registry.mjs`, `core/skills/fgos-cook`), its answer half as soon as `harden/t6-answer-gate` lands. P09 may start its crate work now (it touches `command-registry.mjs` only in its last step, after P01 lands, and lands only after Q-1 is answered).
@@ -171,6 +178,65 @@ Rebase-only (never a reason to serialize; regenerate or re-apply on rebase): `CH
 | new `test/workflow/case-close.test.mjs` | 12 |
 | `docs/platform/workflow/spec.md`, `docs/platform/component-boundary.md`, `packages/holder-lock/contracts/lock-registry.v1.json`, `docs/backlog.md` | 15 (each phase lists its spec lines; P15 writes them, DOC told first) |
 | `docs/platform/seat-binding/spec.md` (one line) | 09 |
+
+## Final wave (phases 16-20, owner decision 73)
+
+Source: owner decision 73 (2026-11-08 21:00, «Thu nhỏ rồi đóng» and all four ideas) on the [closing report](../reports/closing-261108-1838-harden-t6-workflow.md); the full text is the first entry of the Owner decisions list in the [HARDEN plan](../261021-1118-harden-low-layers-bottom-up/plan.md). T7 does not open before T6 closes. Main `09beb6434` re-read for every `file:line` in phases 16-20. Ledger and admission growth (closing report idea 3) waits for the coding cutover and is not in this wave.
+
+| Phase | Decision 73 | One line |
+|---|---|---|
+| 16 | (a) | `projectCase` 181 -> at most 120 by one fold per event kind; one workflow test repository fixture |
+| 17 | (b) | a real settle supersedes a `not-started` release already on the ledger |
+| 18 | (c) and (a)'s keep-reason table | a case that must stay keeps all its Unit runs; keep reasons in one table. **a2 is merged here** because it is the same file (`case-close.mjs`) |
+| 19 | (d) | `workflow status` lists each finished seat's account for every run; read from the ledger results, no new state |
+| 20 | (e) | read-only measurement recipe in the guide; the retention options as an owner question |
+
+### File ownership (one writer per hot file in this wave)
+
+| File(s) | Writer | Others |
+|---|---|---|
+| `src/workflow/case-projection.mjs` | 16 | read-only for 17 (the fold must keep letting a later settle stand) |
+| `test/workflow/case-projection.test.mjs` | 17 (append one case) | 16 runs it as the guard, does not edit |
+| `src/workflow/case-runtime.mjs`, `test/workflow/case-runtime.test.mjs` | 17 | none |
+| `src/workflow/case-close.mjs`, `test/workflow/case-close.test.mjs` | 18 | none |
+| `src/workflow/case-verbs.mjs`, `test/workflow/units-runner.test.mjs` | 19 | none (`pruneQuietly` and the prune verb are not touched by 18) |
+| `src/cli/command-registry.mjs` (the `status` description only) | 19 | none |
+| `test/helpers/workflow-fixture-repo.mjs`, `test/helpers/workflow-runner-fixture.mjs` | 16 | the 16 consumer files are read-only for everyone; 19's `units-runner.test.mjs` has its own `setupRepo` |
+| `plans/reports/guide-261108-1230-owner-machine-harden-t6-workflow.md` | 18, 19, 20 each append their own section | rebase-only (append-only, like `CHANGELOG.md`); only 18 edits wording against an existing section (a note against the P12 section) |
+| `CHANGELOG.md` | 17, 18 add a line; 19 edits the existing status line | rebase-only |
+| `docs/platform/workflow/spec.md` (RUL-WF-37, -39, -40, `:191`), section 9 sizes, section 17 decision text, `docs/backlog.md` rows | **wave close**, not the phases | each phase lists its spec lines in its file |
+| `src/runner/execution/run.mjs`, `case-admission-port.mjs`, `case-frame.mjs`, `reservationDead` / `releaseDeadReservations` | nobody | read-only evidence for 17 (the rejected swap of two statements) |
+
+No two phases write a source file or a test file; all shared writes are append-only or rebase-only files. Test fixtures read by several phases: 17 uses `test/helpers/workflow-case-fixture.mjs` (not edited by 16).
+
+### Parallel groups
+
+- **Group A, start together:** 16 ∥ 17 ∥ 18 ∥ 19 ∥ 20 step 1 (five leads, own worktree each, `harden/t6-p16-size-pass` ... `p20-plain-run-retention`).
+- **Landing order:** free. Rule: whichever of 16 and 17 lands second reruns `case-projection.test.mjs` and `case-runtime.test.mjs` after rebase. 18 lands before the first `--apply` on any machine after this wave (its dry run is the new reading of what goes).
+- **Group B, after the owner answers:** 20 step 2 closes (or opens one new phase with its own estimate if the owner picks a rule).
+- **Wave close (HARDEN lead, not a phase; like P15 for the first fifteen):** after 16-19 are on main: spec lines of 17, 18, 19; section 9 `wc -l` and function scan re-measured on the tree (`projectCase` at most 120); section 17 gets decision 73 in one paragraph; `docs/backlog.md` `p-tslryr3buq` (partly open until the owner answers 20 step 2) and the other rows; one board line; the closing report gets an addendum with the final Node/tests numbers. DOC told first (plan rule).
+
+### Size, stated plainly
+
+| Phase | Node | Rust | Tests |
+|---|---|---|---|
+| 16 | +25 | 0 | -40 |
+| 17 | +5 | 0 | +35 |
+| 18 | 0 | 0 | +25 |
+| 19 | 0 | 0 | +12 |
+| 20 | 0 | 0 | 0 |
+| **Wave** | **about +30 (range +10..+60)** | 0 | **about +30 (range 0..+60)** |
+| T6 after the wave (closing report: Node +10, tests +610) | **about +40** | +1 | **about +640** |
+
+The wave **does not** buy back the size acceptance (Node at most -300, tests at most -200): the items asked for are a function-length cut, a keep-reason table, a fixture merge and three behaviour changes; none removes a rule. The function budget (`projectCase` at most 120) is met; the component budgets of the closing report (Case ledger, Prune, Admission, Conductor entry, Playbook runner) stay as they were, with the Case ledger and Admission growth deferred to the coding cutover by decision 73. This is Q-5 below: the owner decides whether T6 closes with that gap named.
+
+### Questions for the HARDEN lead (final wave)
+
+5. **Q-5 (owner).** After the wave T6 stands at Node about +40 and tests about +640 against targets of -300 and -200. Options: (a) close T6 with the gap named in the spec's section 9 and the closing addendum, ledger/admission growth (closing report idea 3) opening with the coding cutover as decision 73 says; (b) hold T6 open for a deletion search that removes proof-backed rules (the closing report found none without dropping a rule); (c) re-set the numeric targets to what the approved behaviour needed. Recommendation: (a), as decision 73 already chose it ("Thu nhỏ rồi đóng"); stated here so closing is a choice, not a default.
+6. **Q-6 (lead, phase 18).** A removal that fails midway still leaves a kept ledger naming runs already removed (the one case the rule cannot close without a two-phase delete or a trash directory, both new mechanisms). Default: accept, state it in RUL-WF-40, the retry finishes. Say if the owner wants more.
+7. **Q-7 (lead, phase 16).** `setupTestRepo` stays as a named preset over the one fixture (42 call sites unchanged) instead of renaming every call site; the closing report's "about 90 lines" assumed the rename. Default: preset; rename only if the owner wants the name gone.
+8. **Q-8 (lead, phase 20).** The plain-run measurement is a guide recipe, not a `prune --json` field. Say if the owner wants the field (option F in the phase) even if the answer to the retention question is "nothing now".
+9. **Q-9 (coordinator).** The wave close is written as a step of the HARDEN lead, not a phase 21. Say if a phase file is wanted for it.
 
 ## Acceptance criteria (layer)
 
