@@ -204,6 +204,52 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, mdview, mcp-skil
 - **Commit trên main:** `e9255a3e6`.
 - `RunnerConfigError` nay nằm trong một file lá không import gì (`src/runner/dispatch/runner-config-error.mjs`) và mọi nơi import từ đó. Không đổi gì cho người dùng, không có thay đổi trên đĩa. Quay lại: không cần.
 
+## P20: đo run `fgos run` thường (không có case) trên máy owner, chỉ đọc
+
+- **Mục đích:** `fgos workflow prune` chỉ xoá Unit run mà một case đã đóng nhắc tới. Unit run của `fgos run` thường (không case) không ai xoá. Quyết định 73 (e) yêu cầu đo phần này trên máy owner trước khi bàn luật giữ lại. Đoạn lệnh dưới đếm số thư mục và số byte theo bốn nhóm: `case`, `plain` (run thường), `no-record` (không đọc được `unit.json`), `link` (liên kết, không đi vào trong).
+- **Chỉ đọc, không xoá gì.** Đoạn lệnh chỉ dùng `lstat`, `readdir`, `readFile`; không mở file để ghi, không theo liên kết, không gọi lệnh `fgos` nào. Chạy lại bao nhiêu lần cũng không đổi gì trên đĩa.
+- **Chạy trong thư mục gốc của project** (thay `.` bằng đường dẫn project nếu đứng chỗ khác):
+
+```sh
+node --input-type=module -e '
+import{lstatSync as L,readdirSync as D,readFileSync as R}from"node:fs";import{join as J}from"node:path";
+const dir=J(process.argv[1]||".",".fgos","assignments"),now=Date.now(),DAY=864e5;
+const size=p=>{const s=L(p);let n=0;if(s.isDirectory())for(const e of D(p))n+=size(J(p,e));else n=s.size;return n};
+const age=ms=>{const d=(now-ms)/DAY;return d<7?"<7d":d<14?"7-14d":d<30?"14-30d":">30d"};
+const z=()=>({dirs:0,bytes:0}),add=(b,n)=>{b.dirs++;b.bytes+=n};
+const B={case:z(),plain:z(),"no-record":z(),link:z()};
+const P={settled:z(),unsettled:z(),byAge:{"<7d":z(),"7-14d":z(),"14-30d":z(),">30d":z()},largest:[]};
+for(const id of D(dir)){const p=J(dir,id),s=L(p);
+ if(s.isSymbolicLink()){add(B.link,s.size);continue}
+ if(!s.isDirectory())continue;
+ const n=size(p);let u=null,m=0;
+ try{const f=J(p,"unit.json");m=L(f).mtimeMs;u=JSON.parse(R(f,"utf8"))}catch{u=null}
+ if(!u||typeof u!=="object"){add(B["no-record"],n);continue}
+ const w=u.workflow;
+ if(w&&w.caseId){add(B.case,n);continue}
+ if(w!=null){add(B["no-record"],n);continue}
+ add(B.plain,n);add(u.execution&&u.execution.status==="settled"?P.settled:P.unsettled,n);add(P.byAge[age(m)],n);
+ P.largest.push({id,bytes:n});}
+const T=Object.values(B).reduce((a,b)=>({dirs:a.dirs+b.dirs,bytes:a.bytes+b.bytes}),z());
+const pc=(x,t)=>t?Math.round(1e3*x/t)/10:0;
+const out={root:dir,total:T};
+for(const[k,b]of Object.entries(B))out[k]={...b,dirsPct:pc(b.dirs,T.dirs),bytesPct:pc(b.bytes,T.bytes)};
+out.plain={...out.plain,settled:P.settled,unsettled:P.unsettled,byAge:P.byAge,largest:P.largest.sort((a,b)=>b.bytes-a.bytes).slice(0,5)};
+console.log(JSON.stringify(out,null,2));
+' -- .
+```
+
+- **Đọc kết quả (JSON):**
+  - `total`: toàn bộ `.fgos/assignments` (số thư mục, số byte).
+  - `case`, `plain`, `no-record`, `link`: mỗi nhóm có `dirs`, `bytes`, `dirsPct` (% theo số thư mục) và `bytesPct` (% theo byte). `case` = run do một case mở (`unit.json` có `workflow.caseId`); `plain` = `workflow` rỗng; `no-record` = không có hoặc không đọc được `unit.json`; `link` = liên kết, chỉ đếm, không đi vào.
+  - `plain.settled` và `plain.unsettled`: run thường đã xong và chưa xong (chưa xong có thể còn được mở lại, không được xoá).
+  - `plain.byAge`: số run và byte của run thường theo tuổi, tính từ lần sửa cuối của `unit.json` (`<7d`, `7-14d`, `14-30d`, `>30d`).
+  - `plain.largest`: năm run thường nặng nhất (`id`, `bytes`).
+- **Gửi lại cho coordinator:** dán nguyên đầu ra vào dòng board hoặc vào câu trả lời của owner. Chạy riêng trên từng máy (máy owner và fg-server; fg-server2 do lead đo).
+- **Đã kiểm trên fg-server2 và trên cây giả:** tổng byte bằng `du -sb`; liên kết chỉ đếm vào `link`, đích của nó không bị đụng; thư mục không có `unit.json` vào `no-record`; danh sách `find -printf` trước và sau chạy giống hệt.
+- **Câu hỏi sẽ hỏi sau khi có số (chưa quyết, chưa khuyến nghị):** giữ nguyên chờ thêm; hay thêm `fgos workflow prune --plain --older-than <N>d` (chạy thử mặc định, tự gõ khi muốn); hay đưa luật tuổi đó vào dọn tự động khi đóng case; hay giới hạn dung lượng mỗi run ngay từ nguồn; hay thêm một trường `plain` vào `prune --json` để khỏi cần đoạn lệnh này. Các lựa chọn không loại trừ nhau; mỗi lựa chọn có chi phí và rủi ro, và đều không được xoá run còn controller, attempt hay custody, run chưa xong, liên kết, hay run mà case đang mở nhắc tới.
+- **Quay lại:** không có gì để quay lại, đoạn lệnh không ghi gì.
+
 ## Bảng quay lại
 
 | Phase | Release cũ đọc được dữ liệu đĩa mới? | Làm gì trước khi rollback |
@@ -221,3 +267,4 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, mdview, mcp-skil
 | P11 | Có (không đổi byte) | Không cần |
 | P12 | Có (chỉ thiếu lịch sử) | `--apply` không có rollback; đọc chạy thử trước |
 | P13, P14 | Có (không đổi byte) | Không cần |
+| P20 | Có (chỉ đọc) | Không cần |
