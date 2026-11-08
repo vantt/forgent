@@ -45,7 +45,7 @@ GitHub's unreachable objects keep what they saw, even after step 7. Windows sche
 6. **Proof on two machines.** Send, receive, rotate, show the expired state; add the numbers to the existing
    cross-machine report.
 
-7. **Delete the old mail from the event history (owner decision 2026-11-06: delete, keep nothing).** After step 4 no
+7. **CANCELLED by the owner on 2026-11-08** ("if deleting from history is too hard and too dangerous for the code, do not do it; only mail created from now on needs to expire after a few days"). Old mail stays in the event history; only new mail expires through steps 1 to 6. The original text follows for the record. **Delete the old mail from the event history (owner decision 2026-11-06: delete, keep nothing).** After step 4 no
    new body enters the event refs, so the set of old `project:mailbox` seal commits stops growing. One
    coordinated operation removes them from the three event refs (each ref also holds identity and other
    streams, which stay). It needs what the other steps do not: Event Store defines a certified truncation of a
