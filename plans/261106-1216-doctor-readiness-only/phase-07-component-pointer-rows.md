@@ -1,7 +1,7 @@
 ---
 phase: 07
 title: "Component pointer rows: Event Store, holder-lock, run supervisor, terminal control, mailbox; each judgment moves to its component's verb first"
-status: pending
+status: completed
 depends_on: [06]
 parallel: "none (registrations.mjs, bin/fgos.mjs chains)"
 owning_lane: "HARDEN (reviewers: ES for Event Store, OPC for holder-lock, MAIL for the mailbox row; run supervisor and terminal rows are HARDEN's own closed layers T4/T2)"
