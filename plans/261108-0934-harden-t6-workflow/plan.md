@@ -95,7 +95,7 @@ Settled without a phase: D5 (`fgos-cook` retry) closed by `b75259cbd`; W-6, W-7 
 | 02 | [Playbook integrate step deleted (Q2 a)](phase-02-playbook-integrate-step-deleted.md) (**landed** 2026-11-08 `37a94a335..76e8a3aa5`) | OPC's pick for the Land proof (step 1) | wave 0 | `runner.mjs`, `definition.mjs` | −130 / 0 / −250 |
 | 03 | [One case reader, one run-directory door, durable writes](phase-03-case-reader-and-path-doors.md) (**landed** 2026-11-08 `639bf6986..b353b95bf`) | 01, 02 | wave 1 (alone) | `store.mjs`, `case-verbs.mjs`, `runner.mjs` | −60 / 0 / +20 |
 | 04 | [Case runtime and bindings](phase-04-case-runtime-and-bindings.md) | 03; release commit after 08 lands | wave 2 | — | −75 / 0 / +70 |
-| 05 | [Playbook runner cut, slim ledger, resume](phase-05-playbook-runner-cut.md) | 03; dry-bind deletion after 08 lands | wave 2 | `runner.mjs`, `store.mjs`, `case-verbs.mjs` (resume only) | −105 / 0 / +35 |
+| 05 | [Playbook runner cut, slim ledger, resume](phase-05-playbook-runner-cut.md) (**landed** 2026-11-08 `e6f99f78d..2b858ca64`) | 03; dry-bind deletion after 08 lands | wave 2 | `runner.mjs`, `store.mjs`, `case-verbs.mjs` (resume only) | −105 / 0 / +35 |
 | 06 | [Guide cut](phase-06-guide-cut.md) (**landed** 2026-11-08 `35436e8a5..d07b8b3c6`) | 03 | wave 2 | `definition.mjs` | −55 / 0 / +10 |
 | 07 | [Conductor entry](phase-07-conductor-entry.md) (**landed** 2026-11-08 `a7b70d50f..bb388da2e`) | 03 | wave 2 | — | −70 / 0 / −50 |
 | 08 | [Execution Core seams](phase-08-execution-core-seams.md) (**landed** 2026-11-08 `2465e26c8`) | 03 | wave 2 | — | −20 / 0 / +15 |
