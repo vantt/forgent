@@ -2395,6 +2395,11 @@ fn sha256_hex(text: &str) -> String {
 /// sender of that payload version would; the receiver tests use it for headers a real send never
 /// leaves (a body that is not on the remote, an event ahead of its body).
 fn append_mail(cross: &Cross, id: &str, mail: &Mail<'_>) {
+    append_mail_at(cross, id, mail, &fgos_identity::text::iso_utc_now());
+}
+
+/// [`append_mail`] with the time the signed header says it was sent.
+fn append_mail_at(cross: &Cross, id: &str, mail: &Mail<'_>, sent_at: &str) {
     use fgos_event_store::{
         append::{append, AppendRequest, EventInput},
         layout::{Layout, StreamId},
@@ -2409,7 +2414,7 @@ fn append_mail(cross: &Cross, id: &str, mail: &Mail<'_>) {
         "from": { "id": from, "machine": alpha_machine },
         "to": { "id": cross.target, "machine": beta_machine },
         "kind": "message",
-        "sentAt": fgos_identity::text::iso_utc_now(),
+        "sentAt": sent_at,
     });
     let domain = match mail {
         Mail::Inline(body) => {
@@ -2458,10 +2463,15 @@ fn append_mail(cross: &Cross, id: &str, mail: &Mail<'_>) {
 
 /// `git` with `args` in `dir`, `stdin` given to it; what it printed.
 fn git_out(dir: &Path, args: &[&str], stdin: &str) -> String {
+    git_out_env(dir, args, stdin, &[])
+}
+
+fn git_out_env(dir: &Path, args: &[&str], stdin: &str, env: &[(&str, &str)]) -> String {
     let mut child = Command::new("git")
         .arg("-C")
         .arg(dir)
         .args(args)
+        .envs(env.iter().copied())
         .env("GIT_CONFIG_GLOBAL", "/dev/null")
         .env("GIT_CONFIG_NOSYSTEM", "1")
         .env("GIT_AUTHOR_NAME", "t")
@@ -2487,6 +2497,11 @@ fn git_out(dir: &Path, args: &[&str], stdin: &str) -> String {
 /// Alpha's mail-body ref becomes one commit holding `bodies`, a blob each named by its sha256, and
 /// is pushed to the shared remote: what a sender does before it appends the event.
 fn push_bodies(cross: &Cross, bodies: &[&str]) {
+    push_bodies_at(cross, bodies, None);
+}
+
+/// [`push_bodies`] with the commit dated `committed` (git's raw date, `<seconds> +0000`).
+fn push_bodies_at(cross: &Cross, bodies: &[&str], committed: Option<&str>) {
     let main = cross.alpha.main();
     let machine = fgos_identity::machine::read(&cross.alpha_root).unwrap();
     let mut entries = String::new();
@@ -2495,7 +2510,11 @@ fn push_bodies(cross: &Cross, bodies: &[&str]) {
         entries.push_str(&format!("100644 blob {blob}\t{}\n", sha256_hex(body)));
     }
     let tree = git_out(&main, &["mktree"], &entries);
-    let commit = git_out(&main, &["commit-tree", &tree, "-m", "bodies"], "");
+    let dated: Vec<(&str, &str)> = committed
+        .map(|d| ("GIT_COMMITTER_DATE", d))
+        .into_iter()
+        .collect();
+    let commit = git_out_env(&main, &["commit-tree", &tree, "-m", "bodies"], "", &dated);
     let reference = format!("refs/fgos/mail-bodies/{machine}");
     git_out(&main, &["update-ref", &reference, &commit], "");
     git_out(
@@ -2892,4 +2911,188 @@ fn two_clones_of_one_machine_sending_one_message_each_leave_both_bodies_on_the_r
             "{body}"
         );
     }
+}
+
+fn unix_now() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs()
+}
+
+const DAY: u64 = 86_400;
+
+/// Every object reachable from the remote's tip of alpha's mail-body ref, and how many commits lead
+/// to it: what a clone of the remote could still read.
+fn remote_reachable(cross: &Cross) -> (String, usize) {
+    let machine = fgos_identity::machine::read(&cross.alpha_root).unwrap();
+    let remote = cross.alpha.root.join("remote.git");
+    let reference = format!("refs/fgos/mail-bodies/{machine}");
+    let objects = git_out(&remote, &["rev-list", "--objects", &reference], "");
+    let commits = git_out(&remote, &["rev-list", "--count", &reference], "");
+    (objects, commits.parse().unwrap())
+}
+
+/// The owner machine's sync child resets its mail-body ref to a new root that holds only the bodies
+/// whose message was sent less than the lifetime ago. A body the remote holds that this clone never
+/// had, and that is young, survives (the root is built on what the fetch brought); an old body is not
+/// reachable from the ref any more; a body no message names is dropped.
+#[test]
+fn the_owner_resets_its_body_ref_to_a_new_root_holding_only_the_bodies_younger_than_the_lifetime() {
+    let cross = two_machines();
+    turn_on_body_ref(&cross);
+    let (old, young, remote_only, orphan) = (
+        "body sent eight days ago",
+        "body sent one day ago",
+        "young body only the remote holds",
+        "body no message names",
+    );
+    let now = unix_now();
+    let sent = |ago: u64| fgos_identity::text::iso_utc(now - ago, 0);
+    push_bodies_at(
+        &cross,
+        &[old, young, orphan],
+        Some(&format!("{} +0000", now - 2 * 3600)),
+    );
+    append_mail_at(&cross, "old", &Mail::BodyRef(old), &sent(8 * DAY));
+    append_mail_at(&cross, "young", &Mail::BodyRef(young), &sent(DAY));
+    append_mail_at(
+        &cross,
+        "remote-only",
+        &Mail::BodyRef(remote_only),
+        &sent(DAY),
+    );
+    // Another clone of the machine pushed one more young body; this clone's own ref lacks it.
+    let main = cross.alpha.main();
+    let machine = fgos_identity::machine::read(&cross.alpha_root).unwrap();
+    let reference = format!("refs/fgos/mail-bodies/{machine}");
+    let listed = git_out(&main, &["ls-tree", &reference], "");
+    let blob = git_out(&main, &["hash-object", "-w", "--stdin"], remote_only);
+    let tree = git_out(
+        &main,
+        &["mktree"],
+        &format!(
+            "{listed}\n100644 blob {blob}\t{}\n",
+            sha256_hex(remote_only)
+        ),
+    );
+    let ahead = git_out_env(
+        &main,
+        &["commit-tree", &tree, "-p", &reference, "-m", "ahead"],
+        "",
+        &[("GIT_COMMITTER_DATE", &format!("{} +0000", now - 3600))],
+    );
+    git_out(
+        &main,
+        &["push", "-q", "origin", &format!("{ahead}:{reference}")],
+        "",
+    );
+    let before = remote_reachable(&cross);
+    assert!(before.0.contains(&sha256_hex(old)), "{}", before.0);
+
+    sync_child(&cross.alpha);
+
+    for gone in [old, orphan] {
+        assert_eq!(remote_body(&cross, &sha256_hex(gone)), None, "{gone}");
+    }
+    for kept in [young, remote_only] {
+        assert_eq!(
+            remote_body(&cross, &sha256_hex(kept)).as_deref(),
+            Some(kept)
+        );
+    }
+    let (reachable, commits) = remote_reachable(&cross);
+    assert_eq!(commits, 1, "a new root, no history");
+    for gone in [old, orphan] {
+        assert!(
+            !reachable.contains(&sha256_hex(gone)),
+            "{gone} is still reachable: {reachable}"
+        );
+    }
+    // Nothing is left to cut: another sync changes nothing.
+    let remote = cross.alpha.root.join("remote.git");
+    let tip = git_out(&remote, &["rev-parse", &reference], "");
+    sync_child(&cross.alpha);
+    assert_eq!(git_out(&remote, &["rev-parse", &reference], ""), tip);
+}
+
+/// With `bodyRef` off nothing rotates: the ref keeps every body and its history.
+#[test]
+fn a_machine_whose_body_ref_setting_is_off_never_rotates_its_body_ref() {
+    let cross = two_machines();
+    let (old, orphan) = ("body sent eight days ago", "body no message names");
+    let now = unix_now();
+    push_bodies_at(
+        &cross,
+        &[old, orphan],
+        Some(&format!("{} +0000", now - 2 * 3600)),
+    );
+    append_mail_at(
+        &cross,
+        "old",
+        &Mail::BodyRef(old),
+        &fgos_identity::text::iso_utc(now - 8 * DAY, 0),
+    );
+    let before = remote_reachable(&cross);
+    sync_child(&cross.alpha);
+    assert_eq!(remote_reachable(&cross), before);
+    for body in [old, orphan] {
+        assert_eq!(
+            remote_body(&cross, &sha256_hex(body)).as_deref(),
+            Some(body)
+        );
+    }
+}
+
+/// `fgos mailbox status` says whether the body ref is on and how old the oldest kept body is.
+#[test]
+fn status_names_the_body_ref_setting_and_the_age_of_the_oldest_body_kept() {
+    let cross = two_machines();
+    let status = || {
+        let run = |flag: &[&str]| {
+            let mut argv = vec!["mailbox", "status"];
+            argv.extend_from_slice(flag);
+            cross
+                .alpha
+                .run(&cross.alpha.main(), Some("sender-a"), &argv, b"")
+        };
+        let json: serde_json::Value = serde_json::from_slice(&run(&["--json"]).stdout).unwrap();
+        (
+            json["data"]["crossMachine"]["bodyRef"].clone(),
+            String::from_utf8_lossy(&run(&[]).stdout).into_owned(),
+        )
+    };
+    let (data, text) = status();
+    assert_eq!(data, serde_json::json!({ "on": false }));
+    assert!(text.contains("mailbox.remote.bodyRef is off"), "{text}");
+
+    turn_on_body_ref(&cross);
+    let (data, text) = status();
+    assert_eq!(data["kept"], 0, "{data}");
+    assert!(text.contains("bodyRef is on); none kept"), "{text}");
+
+    let (older, newer) = ("the older body", "the newer body");
+    let now = unix_now();
+    push_bodies(&cross, &[older, newer]);
+    append_mail_at(
+        &cross,
+        "older",
+        &Mail::BodyRef(older),
+        &fgos_identity::text::iso_utc(now - 3 * DAY, 0),
+    );
+    append_mail_at(
+        &cross,
+        "newer",
+        &Mail::BodyRef(newer),
+        &fgos_identity::text::iso_utc(now - DAY, 0),
+    );
+    let (data, text) = status();
+    assert_eq!(data["kept"], 2, "{data}");
+    assert_eq!(data["on"], true);
+    let oldest = data["oldestSentSecs"].as_u64().unwrap();
+    assert!(oldest.abs_diff(now - 3 * DAY) <= 2, "{data}");
+    assert!(
+        text.contains("2 kept, the oldest was sent 72 h ago"),
+        "{text}"
+    );
 }

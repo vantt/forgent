@@ -302,7 +302,7 @@ fn printable(text: &str) -> String {
         .collect()
 }
 
-fn ago(secs: u64) -> String {
+pub(super) fn ago(secs: u64) -> String {
     match secs {
         0..=119 => format!("{secs} s"),
         120..=7199 => format!("{} min", secs / 60),
@@ -415,6 +415,44 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
     let skip = rows.len().saturating_sub(RECENT_SENDS);
     summary.recent = rows.split_off(skip);
     Ok(summary)
+}
+
+/// When each body this machine sent through its mail-body ref was sent: the body's hash to the time,
+/// in seconds, of the newest of this machine's own `mailbox.message-sent` events that names it. The
+/// time is the event's signed `sentAt`; an event that lacks one falls back to the store's timestamp.
+/// A hash no event names is absent. The newest send decides because the same text sent twice is one
+/// blob that both messages need.
+pub fn body_sent_times(
+    main: &Path,
+    root: &Path,
+) -> Result<std::collections::BTreeMap<String, u64>, String> {
+    let refusal = |r: Refusal| format!("{}: {}", r.reason, r.detail);
+    let machine = machine_info(root).map_err(refusal)?.id;
+    let mut times = std::collections::BTreeMap::new();
+    let Some(log) = StoreLogDoor
+        .open_store(main, &machine, STREAM)
+        .map_err(refusal)?
+    else {
+        return Ok(times);
+    };
+    let (events, own_origin) = log.envelopes().map_err(refusal)?;
+    for event in events
+        .iter()
+        .filter(|e| e.event_type == MESSAGE_SENT && e.origin == own_origin)
+    {
+        let Some(hash) = event.payload["bodyHash"].as_str() else {
+            continue;
+        };
+        let sent = event.payload["sentAt"]
+            .as_str()
+            .and_then(iso_utc_secs)
+            .or_else(|| iso_utc_secs(&event.ts));
+        // A header whose time cannot be read has no age to expire by; it is read as sent now.
+        let sent = sent.unwrap_or(u64::MAX);
+        let newest = times.entry(hash.to_owned()).or_insert(sent);
+        *newest = (*newest).max(sent);
+    }
+    Ok(times)
 }
 
 /// The machines whose key this machine pinned as seen and never confirmed: mail from them is

@@ -12,10 +12,11 @@
 //! ends with status 0 on every path: nobody waits for it.
 use super::event_store_clone;
 use super::identity_log::StoreLogDoor;
-use super::mailbox_body::{self, BodyFetch};
+use super::mailbox_body::{self, BodyFetch, Retention};
 use super::mailbox_config::{project_mailbox, CrossMachine};
 use super::mailbox_identity::{session_of, state_root};
 use super::mailbox_ingest::{self, Hold};
+use super::mailbox_remote;
 use fgos_event_store::sync::{sync, SyncRequest};
 use fgos_identity::current::machine_info;
 use fgos_identity::directory;
@@ -95,6 +96,28 @@ fn run(args: &[OsString]) {
         Ok(false) => {}
         Err(why) => eprintln!("mailbox-sync: {why}"),
     }
+    // A machine that keeps its bodies in its own mail-body ref cuts the old ones now and then; a
+    // sync that did not run to its end says nothing about what the remote holds.
+    if cross.body_ref && events_fetched {
+        if let Err(why) = rotate_bodies(&dir, &remote, &cross) {
+            eprintln!("mailbox-sync: {why}");
+        }
+    }
+}
+
+/// Resets this machine's mail-body ref when some body in it is older than the lifetime. A rotation
+/// the remote refused (it moved since the fetch) is an error here and is tried again next sync.
+fn rotate_bodies(dir: &Path, remote: &str, cross: &CrossMachine) -> Result<(), String> {
+    let Some(root) = state_root() else {
+        return Ok(());
+    };
+    let sent = mailbox_remote::body_sent_times(dir, &root)?;
+    let retention = Retention {
+        sent: &sent,
+        now_secs: now().as_millis() / 1000,
+        lifetime_secs: cross.body_lifetime_sec,
+    };
+    mailbox_body::rotate(dir, remote, &retention).map(|_| ())
 }
 
 /// Records that a child took mail now, for the hook's due test. A stamp that cannot be written

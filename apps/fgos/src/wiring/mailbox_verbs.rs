@@ -16,6 +16,7 @@
 //! write-then-finish function, and finishes only after a successful flush;
 //! the presenter then prints nothing more for it (with `--json`, only the
 //! envelope, without the text).
+use super::mailbox_body;
 use super::mailbox_config::project_mailbox;
 use super::mailbox_identity::{
     address, handle_conflicts, is_alias, session_of, state_root, Addressed,
@@ -371,6 +372,30 @@ fn status(json: bool) -> MailboxAnswer {
                     .collect::<Vec<_>>()
                     .join(", ")
             ));
+            data["crossMachine"]["bodyRef"] = json!({ "on": cross.body_ref });
+            if cross.body_ref {
+                let kept = mailbox_remote::body_sent_times(main, &root)
+                    .and_then(|sent| mailbox_body::held(main, &sent));
+                match kept {
+                    Ok(held) => {
+                        data["crossMachine"]["bodyRef"] = json!({
+                            "on": true,
+                            "kept": held.count,
+                            "unnamed": held.unnamed,
+                            "oldestSentSecs": held.oldest_sent_secs,
+                            "lifetimeSec": cross.body_lifetime_sec,
+                        });
+                        text.push_str(&format!("\n{}", held.text(secs, cross.body_lifetime_sec)));
+                    }
+                    Err(why) => text.push_str(&format!(
+                        "\ncross-machine: mail bodies are kept in this machine's mail-body ref (mailbox.remote.bodyRef is on); unavailable ({why})"
+                    )),
+                }
+            } else {
+                text.push_str(
+                    "\ncross-machine: mail bodies stay inside the signed event (mailbox.remote.bodyRef is off)",
+                );
+            }
             data["crossMachine"]["unconfirmedMachines"] = unconfirmed
                 .iter()
                 .map(|(id, _)| Value::from(id.as_str()))

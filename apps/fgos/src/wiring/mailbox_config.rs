@@ -69,6 +69,8 @@ pub struct CrossMachine {
     /// `mailbox.remote.bodyRef`: send as payload version 3, the body kept in this machine's
     /// mail-body ref.
     pub body_ref: bool,
+    /// `mailbox.remote.bodyLifetimeSec`: how long a body stays in this machine's mail-body ref.
+    pub body_lifetime_sec: u64,
     /// `eventStore.remote`; the Event Store's own default when unset.
     pub remote: String,
     /// `eventStore.sync.intervalSec`; 0 turns the scheduled sync off.
@@ -92,12 +94,17 @@ impl CrossMachine {
                 .and_then(Value::as_bool)
                 .ok_or_else(|| refused(path, "a boolean"))
         };
+        let lifetime = ["mailbox", "remote", "bodyLifetimeSec"];
         let remote = ["eventStore", "remote"];
         let interval = ["eventStore", "sync", "intervalSec"];
         Ok(Self {
             enabled: flag(&["mailbox", "crossMachine", "enabled"])?,
             require_confirmed: flag(&["mailbox", "remote", "requireConfirmed"])?,
             body_ref: flag(&["mailbox", "remote", "bodyRef"])?,
+            body_lifetime_sec: at(&lifetime)
+                .and_then(Value::as_u64)
+                .filter(|sec| *sec > 0)
+                .ok_or_else(|| refused(&lifetime, "a positive whole number"))?,
             remote: at(&remote)
                 .and_then(Value::as_str)
                 .ok_or_else(|| refused(&remote, "text"))?
@@ -223,7 +230,7 @@ mod tests {
     ) {
         let snapshot = |enabled: Value, interval: Value| {
             serde_json::json!({
-                "mailbox": { "crossMachine": { "enabled": enabled }, "remote": { "requireConfirmed": true, "bodyRef": true } },
+                "mailbox": { "crossMachine": { "enabled": enabled }, "remote": { "requireConfirmed": true, "bodyRef": true, "bodyLifetimeSec": 604800 } },
                 "eventStore": { "remote": "upstream", "sync": { "intervalSec": interval } },
             })
         };
@@ -233,11 +240,15 @@ mod tests {
                 enabled: true,
                 require_confirmed: true,
                 body_ref: true,
+                body_lifetime_sec: 604800,
                 remote: "upstream".into(),
                 sync_interval_sec: 0
             })
         );
+        let mut zero_lifetime = snapshot(true.into(), 0.into());
+        zero_lifetime["mailbox"]["remote"]["bodyLifetimeSec"] = 0.into();
         for bad in [
+            zero_lifetime,
             snapshot("yes".into(), 300.into()),
             snapshot(true.into(), "soon".into()),
             serde_json::json!({}),

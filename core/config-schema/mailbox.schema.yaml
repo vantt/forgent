@@ -304,3 +304,10 @@ properties:
         type: boolean
         x-fgos-scope: both
         x-fgos-file: config
+      bodyLifetimeSec:
+        description: "How long a body is kept in this machine's mail-body ref, counted from the sent time of the message that names it. This machine resets the ref to a new root holding only younger bodies, so an older body is gone from the remote and a receiver that has not taken it settles the message as expired. In seconds. Used only while mailbox.remote.bodyRef is on."
+        type: integer
+        minimum: 1
+        maximum: 4294967295
+        x-fgos-scope: both
+        x-fgos-file: config

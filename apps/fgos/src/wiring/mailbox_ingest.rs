@@ -539,6 +539,7 @@ mod tests {
             enabled: true,
             require_confirmed,
             body_ref: false,
+            body_lifetime_sec: 604800,
             remote: "origin".into(),
             sync_interval_sec: 60,
         }
