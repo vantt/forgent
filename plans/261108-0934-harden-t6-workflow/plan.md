@@ -91,7 +91,7 @@ Settled without a phase: D5 (`fgos-cook` retry) closed by `b75259cbd`; W-6, W-7 
 
 | # | Phase | Depends on | Group | Hot files written | Δ Node / Rust / tests (estimate) |
 |---|---|---|---|---|---|
-| 01 | [Consent and gate receipts](phase-01-consent-and-gate-receipts.md) | answer-gate branch landed (gate files may start now) | wave 0 | `case-verbs.mjs`, `bin` workflow arm | +5 / 0 / +35 |
+| 01 | [Consent and gate receipts](phase-01-consent-and-gate-receipts.md) (**landed** 2026-11-08 `1be4d59af..233ba29e7`) | answer-gate branch landed (gate files may start now) | wave 0 | `case-verbs.mjs`, `bin` workflow arm | +5 / 0 / +35 |
 | 02 | [Playbook integrate step deleted (Q2 a)](phase-02-playbook-integrate-step-deleted.md) | OPC's pick for the Land proof (step 1) | wave 0 | `runner.mjs`, `definition.mjs` | −130 / 0 / −250 |
 | 03 | [One case reader, one run-directory door, durable writes](phase-03-case-reader-and-path-doors.md) | 01, 02 | wave 1 (alone) | `store.mjs`, `case-verbs.mjs`, `runner.mjs` | −60 / 0 / +20 |
 | 04 | [Case runtime and bindings](phase-04-case-runtime-and-bindings.md) | 03; release commit after 08 lands | wave 2 | — | −75 / 0 / +70 |

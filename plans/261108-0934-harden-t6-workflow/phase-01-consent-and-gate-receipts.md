@@ -1,7 +1,7 @@
 ---
 phase: 01
 title: "Consent and gate receipts: an answer comes only from the owner to an asked gate, two receipts on one milestone are both kept, and the gate runs only the capability's declared check"
-status: pending
+status: landed
 depends_on: ["harden/t6-answer-gate landed (answer half only)"]
 parallel: "wave 0, with 02; the gate half (case-gate, propose, bin arm, registry, skills) may start now"
 effort: ~1d
