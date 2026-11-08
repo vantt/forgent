@@ -88,6 +88,13 @@ guard, and the `.fgos` deletion and worker guards accept only a staged entry
 equal to the merge parent's where that parent changed it since the merge base;
 no other data-loss guard is skipped.
 
+## Destructive cleanup
+
+Never hand-roll deletion of ignored or untracked files or directories (`git status --ignored | xargs rm`, `git clean -x`, `rm -rf` on a computed list).
+Use `fgos worktree remove --discard-ignored`, or `git -C "$W"` after asserting `$W` is a registered linked worktree (`git worktree list`).
+Never chain a destructive step after `cd` with `;` or `&&` from a failed create; the main checkout holds the active release and run history.
+If the main checkout lost ignored paths, follow `docs/how-to/recover-main-checkout-after-ignored-files-wipe.md`.
+
 ## Legacy-Node CLI Ownership Boundary
 
 Rust `fgos` is the standard door for every verb. `bin/fgos.mjs` is the
