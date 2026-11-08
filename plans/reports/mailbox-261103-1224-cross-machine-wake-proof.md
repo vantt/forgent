@@ -80,3 +80,15 @@ Setup: fg-server2 on release `93288a84b` with `mailbox.remote.bodyRef` on (set w
 Not proven on real machines: the 7-day rotation (the lifetime cannot be set below 86700 s, so it cannot be shown within a day) and the expired state a receiver settles when a blob is gone. Both are proven by tests in `apps/fgos/tests/mailbox_routes.rs` and `packages/git/rust/tests/publication.rs`. Not covered: design-lap as sender or receiver of a v3 body (it takes v3, per its own status line).
 
 Open decisions: a machine that turns `bodyRef` off keeps its last bodies on the remote until it turns it on again, because rotation runs only while the setting is on.
+
+## Mail bodies on permanently: all three machines (2026-11-09, lane MAIL)
+
+Result: `mailbox.remote.bodyRef` is on at fg-server2, fg-server and design-lap, and design-lap read a v3 message from fg-server2 in full.
+
+- Line landed in the project config as `a3eb4a15a` (owner 2026-11-08: on permanently, clear by hand when it is turned off). Before it landed, each machine confirmed by mail a build containing `2d43cdf23`, the payload line `takes mail payload versions 1, 2, 3` and a clean `fgos config check`: fg-server2 `2d43cdf23`, fg-server `d527cee16`, design-lap release `91e0e561`.
+- design-lap (06:46, after pulling main): received the v3 test message with its text; `mailbox status` there reads `mail bodies are kept in this machine's mail-body ref (bodyRef is on); none kept`.
+- fg-server could not pull main (other sessions' uncommitted changes overlap), so its owner set the same key locally with `fgos config set` (backup kept); its status reads the same line. The local line will match main when it is pulled.
+- fg-server's upgrade rejected its local project config (four executor keys became global-only) and `fgos mailbox` refused until they were removed; four sends there were recorded as `before-first-sync` refusals during that window.
+- fg-server2's two proof bodies from 2026-11-08 are still kept locally (`2 kept`); they expire with the 7-day lifetime.
+
+Still not proven on real machines: the 7-day rotation and the expired state (tests only), and design-lap or fg-server as the sender of a v3 body.
