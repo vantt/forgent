@@ -1,7 +1,7 @@
 ---
 phase: 09
 title: "Seat pin rule: an account pin applies only to a seat whose first choice is already in that pool; it never moves a seat to another family; other seats run unpinned with the reason in their provenance"
-status: pending
+status: landed
 depends_on: ["01 landed (command-registry.mjs, last step only)", "lead question Q-1 answered before landing"]
 parallel: "wave 2, with 04, 05, 06, 07, 08; crate work may start now"
 effort: ~0.5d

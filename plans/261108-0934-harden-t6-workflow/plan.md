@@ -99,7 +99,7 @@ Settled without a phase: D5 (`fgos-cook` retry) closed by `b75259cbd`; W-6, W-7 
 | 06 | [Guide cut](phase-06-guide-cut.md) | 03 | wave 2 | `definition.mjs` | −55 / 0 / +10 |
 | 07 | [Conductor entry](phase-07-conductor-entry.md) | 03 | wave 2 | — | −70 / 0 / −50 |
 | 08 | [Execution Core seams](phase-08-execution-core-seams.md) | 03 | wave 2 | — | −20 / 0 / +15 |
-| 09 | [Seat pin rule (Q3 a)](phase-09-seat-pin-rule.md) | 01 (`command-registry.mjs`); lands after Q-1 is answered | wave 2 | — | 0 / +5 / −5 |
+| 09 | [Seat pin rule (Q3 a)](phase-09-seat-pin-rule.md) (**landed** 2026-11-08 `4225e0397..3ed9a6741`) | 01 (`command-registry.mjs`); lands after Q-1 is answered | wave 2 | — | 0 / +5 / −5 |
 | 10 | [Pattern deviation at admission](phase-10-pattern-deviation-admission.md) | 04, 06, 08 | wave 3 | — (`bin` `run` arm only, if at all) | −10 / 0 / +20 |
 | 11 | [Workflow doors and verbs](phase-11-workflow-doors-and-verbs.md) | 04, 05, 09 | wave 3 | `case-verbs.mjs`, `bin` workflow arm | −80 / 0 / −30 |
 | 12 | [Prune finished cases (Q5 b)](phase-12-prune-finished-cases.md) | 04, 05; wiring step after 11 | wave 3 | `case-verbs.mjs`, `bin` workflow arm (wiring step only) | +130 / 0 / +90 |
