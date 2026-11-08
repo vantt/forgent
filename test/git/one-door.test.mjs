@@ -1,6 +1,6 @@
 // The one-door gate's owning proof (Git spec §12, V-GATE): the static scan finds a Git spawn in each
-// shape a literal `execFile('git', ['<write verb>', ...])` search misses, and doctor's
-// git-mutation-one-door refuses a census that lists a site or was not built from its payload.
+// shape a literal `execFile('git', ['<write verb>', ...])` search misses, and
+// test/setup/git-mutation-census.test.mjs refuses a census that lists a site or was not built from its payload.
 
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';

@@ -34,8 +34,8 @@
 // declaration carries its reason and retirement condition and must match exactly one raw site.
 //
 // Usage: node scripts/git-one-door-scan.mjs [--json] [--root <dir>] [--write-census]
-// The release build writes the census (packages/git/contracts/mutation-census.v1.json); doctor's
-// `git-mutation-one-door` reads it back through verifyCensus.
+// The release build writes the census (packages/git/contracts/mutation-census.v1.json);
+// test/setup/git-mutation-census.test.mjs reads it back through verifyCensus.
 
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -2761,7 +2761,7 @@ export function censusDrift(doc, root, changes) {
 // The Node payload a release ships whole; Rust sources are compiled in, so they are not on disk there.
 const NODE_PAYLOAD = /^(src|bin|scripts|core)\//;
 
-/** The `git-mutation-one-door` verdict for a census and the payload it was built from. */
+/** The one-door verdict (owned proof: test/setup/git-mutation-census.test.mjs) for a census and the payload it was built from. */
 export function verifyCensus(doc, payloadRoot) {
   if (!censusDigestMatches(doc)) return { passed: false, message: 'mutation census missing, unreadable or its digest does not match its own file list; rebuild the release' };
   const drift = [];

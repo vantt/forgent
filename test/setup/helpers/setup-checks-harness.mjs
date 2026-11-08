@@ -54,23 +54,6 @@ function fixById(id) {
   return entry;
 }
 
-// ─── enduser-docs-index-stale (tsk-1m0, docs/history/doctor-check-enduser- ──
-// docs-index-stale/CONTEXT.md): D1 count-only message, D2 one-directional
-// (missing-from-index only), D3 read-only check sharing the same
-// generation path as the fix, D5 missing-manifest is normal, D6
-// QUADRANT_DIR_ALIASES (docs/decisions -> explanation) honored.
-
-function writeEnduserDoc(tmp, quadrantDir, filename, h1) {
-  const dirPath = path.join(tmp, 'docs', quadrantDir);
-  fs.mkdirSync(dirPath, { recursive: true });
-  fs.writeFileSync(path.join(dirPath, filename), `# ${h1}\n\nbody\n`);
-}
-
-function writeEnduserManifest(tmp, entries) {
-  fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, 'docs', 'enduser-docs-index.json'), `${JSON.stringify(entries, null, 2)}\n`);
-}
-
 function withHome(homeDir, fn) {
   const prevHome = process.env.HOME;
   const prevUserProfile = process.env.USERPROFILE;
@@ -118,6 +101,4 @@ export {
   resolveMainCheckout,
   spawnSync,
   withHome,
-  writeEnduserDoc,
-  writeEnduserManifest,
 };

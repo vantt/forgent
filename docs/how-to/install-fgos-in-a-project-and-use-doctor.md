@@ -230,8 +230,6 @@ file or key in their message; the message always names the exact target.
 | `active-release-matches-checkout` | Activated Node payload matches doctor's source working tree; staged dependencies excluded | changed/missing/extra counts, up to five paths, digest and activation time | you | Use `npm run fgos:dev -- <verb>` for working-tree code, or rebuild/stage/upgrade to update plain `fgos`; no automatic fix. Skips outside source checkouts, absent activation, same-checkout dev manifests and linked worktrees whose activation belongs to main. Does not certify Rust host freshness |
 | `config-awareness` | Which config level is active (project or global) and whether the other exists | never fails | info | none |
 | `claude-plugin-marketplace` | The fgOS Claude Code plugin marketplace is registered and the plugin enabled | `fgOS Claude Code plugin not installed/enabled` | tool | `fgos doctor --fix` (needs the `claude` CLI on `PATH`) |
-| `changelog-unreleased-stale` | `CHANGELOG.md` has an `[Unreleased]` entry | `## [Unreleased] has no pending entries -- reminder only` | info | Add a line to your changelog if you keep one |
-| `readme-install-tag-exists` | The `README.md` install command pins a tag that exists | names the missing tag | info | Fix the tag in the README, if you have one |
 
 ### 4.2. Project config (written by setup or `--fix`)
 
@@ -260,7 +258,6 @@ file or key in their message; the message always names the exact target.
 | `doc-registry-enforce` | `docRegistry.enforce` is a boolean | `docRegistry section missing -- run fgos setup` | setup | `fgos setup` |
 | `main-checkout-hook-wired` | `core.hooksPath` points at `.githooks` (the main-checkout lock hook) | `core.hooksPath not wired to .githooks ... run fgos setup` | setup | `fgos setup` (never re-points a custom hooks path). Only meaningful when the project carries `.githooks` |
 | `dispatch-decide-hook-wired` | `.claude/settings.json` has the PreToolUse hook that forces `dispatch decide` before Agent/Task calls | `.claude/settings.json has no PreToolUse dispatch-decide hook wired ... run fgos setup` | setup | `fgos setup` |
-| `instruction-projections-stale` | The effective instruction projections and ledger are current | `instruction projections not materialized -- run fgos doctor --fix` | tool | `fgos doctor --fix` |
 
 ### 4.3. Agent CLIs, trust and Workflow readiness
 
@@ -335,8 +332,6 @@ This table is selective for the Event Store: it lists the one row a project owne
 
 | Id | Checks | Typical failing message | Who | Fix |
 |---|---|---|---|---|
-| `enduser-docs-index-stale` | `docs/enduser-docs-index.json` covers every end-user doc | `N/M docs in the index` | tool | `fgos doctor --fix` (same as `fgos docs-index`) |
-| `decision-index-stale` | `docs/decisions/index.md` matches the logged decisions | `... is stale` | tool | `fgos doctor --fix` |
 | `doc-registry-stale` | `docs/doc-registry.md` and `.json` are current | `docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry` | tool | `fgos doctor --fix` |
 | `doc-alias-broken` | Doc aliases point to valid paths | names the alias | you | Fix the alias target |
 | `doc-active-duplicate` | No duplicate active docs for one topic and role | names the pair | you | Retire one |

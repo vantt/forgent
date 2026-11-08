@@ -70,18 +70,13 @@ Nothing blocks a merge for a missing changelog entry, and nothing decides
 *for* you whether a change deserved one — but a real observe/remind
 mechanism now exists so a forgotten entry doesn't go unnoticed forever:
 
-- **`fgos doctor`** runs a `changelog-unreleased-stale` check: passes
-  when `## [Unreleased]` has at least one real `- ` bullet, and when
-  `CHANGELOG.md` doesn't exist at all (a project that hasn't adopted a
-  changelog yet is a normal state, never an error). It fails — reminder
-  only — when the section is present but empty:
+- **The release step** (`scripts/prepare-release.mjs`) refuses to cut a
+  release when `## [Unreleased]` has no entries to move
+  (`CHANGELOG.md has no Unreleased entries to move into the release heading`).
+  `fgos doctor` no longer carries a changelog row: that was a judgment about
+  this repository's own file, not about whether fgOS can run.
 
-  > "## [Unreleased] has no pending entries -- reminder only: add a line
-  > here when your next user-visible change merges (never blocks merge)"
-  > — real check message, `changelog-unreleased-stale`,
-  > `src/setup/registrations.mjs`
-
-- **`fgos check`** surfaces the same read as a `changelogNag` field
+- **`fgos check`** surfaces a read of the section as a `changelogNag` field
   (`{fileExists, hasEntries, deliveredCount}`), and appends one data
   point per check run to `.fgos/logs/changelog-nag-history.jsonl` — a real,
   accumulating counter, not a per-merge popup. At roughly 25 items
