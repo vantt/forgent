@@ -22,6 +22,11 @@ use fgos_mailbox::limits::{load, LimitsError, Loaded};
 use serde_json::{json, Value};
 use std::path::Path;
 
+/// The shortest `mailbox.remote.bodyLifetimeSec`: a receiver still takes a header up to
+/// `maxAgeSec + clockSkewSec` (86400 + 300) old, and a hold lasts as long, so a body must outlive
+/// that. The ingest module's own test holds this equal to its constants.
+pub const MIN_BODY_LIFETIME_SEC: u64 = 86_700;
+
 /// The config path of the section the mailbox reads.
 const SECTION: &str = "mailbox";
 
@@ -103,8 +108,8 @@ impl CrossMachine {
             body_ref: flag(&["mailbox", "remote", "bodyRef"])?,
             body_lifetime_sec: at(&lifetime)
                 .and_then(Value::as_u64)
-                .filter(|sec| *sec > 0)
-                .ok_or_else(|| refused(&lifetime, "a positive whole number"))?,
+                .filter(|sec| *sec >= MIN_BODY_LIFETIME_SEC)
+                .ok_or_else(|| refused(&lifetime, "a whole number of at least 86700"))?,
             remote: at(&remote)
                 .and_then(Value::as_str)
                 .ok_or_else(|| refused(&remote, "text"))?
@@ -245,10 +250,15 @@ mod tests {
                 sync_interval_sec: 0
             })
         );
-        let mut zero_lifetime = snapshot(true.into(), 0.into());
-        zero_lifetime["mailbox"]["remote"]["bodyLifetimeSec"] = 0.into();
+        let lifetime = |sec: u64| {
+            let mut value = snapshot(true.into(), 0.into());
+            value["mailbox"]["remote"]["bodyLifetimeSec"] = sec.into();
+            value
+        };
+        assert!(CrossMachine::read(&lifetime(86_700)).is_ok());
         for bad in [
-            zero_lifetime,
+            lifetime(0),
+            lifetime(86_699),
             snapshot("yes".into(), 300.into()),
             snapshot(true.into(), "soon".into()),
             serde_json::json!({}),

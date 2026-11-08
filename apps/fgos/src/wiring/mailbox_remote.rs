@@ -418,9 +418,12 @@ pub fn sent_summary(main: &Path, root: &Path, now_secs: u64) -> Result<SentSumma
 }
 
 /// When each body this machine sent through its mail-body ref was sent: the body's hash to the time,
-/// in seconds, of the newest of this machine's own `mailbox.message-sent` events that names it. The
-/// time is the event's signed `sentAt`; an event that lacks one falls back to the store's timestamp.
-/// A hash no event names is absent. The newest send decides because the same text sent twice is one
+/// in seconds, of the newest `mailbox.message-sent` event that names it. Every clone of a machine
+/// shares its state root and key but has its own store origin, so an event counts whatever origin
+/// holds it, provided its payload names this machine as the sender and its signature verifies under
+/// this machine's key: a header another machine or a forger wrote keeps no body alive. The time is
+/// the event's signed `sentAt`; an event that lacks one falls back to the store's timestamp. A hash
+/// no such event names is absent. The newest send decides because the same text sent twice is one
 /// blob that both messages need.
 pub fn body_sent_times(
     main: &Path,
@@ -435,15 +438,18 @@ pub fn body_sent_times(
     else {
         return Ok(times);
     };
-    let (events, own_origin) = log.envelopes().map_err(refusal)?;
-    for event in events
-        .iter()
-        .filter(|e| e.event_type == MESSAGE_SENT && e.origin == own_origin)
-    {
-        let Some(hash) = event.payload["bodyHash"].as_str() else {
+    let (events, _) = log.envelopes().map_err(refusal)?;
+    for event in events.iter().filter(|e| e.event_type == MESSAGE_SENT) {
+        let payload = &event.payload;
+        let Some(hash) = payload["bodyHash"].as_str() else {
             continue;
         };
-        let sent = event.payload["sentAt"]
+        if payload["from"]["machine"].as_str() != Some(machine.as_str())
+            || !signed_by(root, &machine, SENT_DOMAIN_BODY_REF, payload)
+        {
+            continue;
+        }
+        let sent = payload["sentAt"]
             .as_str()
             .and_then(iso_utc_secs)
             .or_else(|| iso_utc_secs(&event.ts));
@@ -453,6 +459,23 @@ pub fn body_sent_times(
         *newest = (*newest).max(sent);
     }
     Ok(times)
+}
+
+/// Whether `payload` carries a signature under `domain` made by the key of `machine`. The key of
+/// another machine is never looked at, so nothing is pinned by this check.
+fn signed_by(root: &Path, machine: &str, domain: &str, payload: &Value) -> bool {
+    let mut unsigned = payload.clone();
+    let signature: Option<Signature> = unsigned
+        .as_object_mut()
+        .and_then(|o| o.remove("sig"))
+        .and_then(|sig| serde_json::from_value(sig).ok());
+    signature
+        .filter(|sig| sig.machine_id == machine)
+        .and_then(|sig| {
+            let bytes = signed_bytes(domain, &unsigned).ok()?;
+            signing::verify(root, &bytes, &sig).ok()
+        })
+        .is_some_and(|verified| verified.machine_id == machine)
 }
 
 /// The machines whose key this machine pinned as seen and never confirmed: mail from them is

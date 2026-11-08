@@ -513,7 +513,7 @@ fn settle(
 
 #[cfg(test)]
 mod tests {
-    use super::{verify, Body, MAX_AGE_SEC};
+    use super::{verify, Body, CLOCK_SKEW_SEC, MAX_AGE_SEC};
     use crate::wiring::mailbox_config::CrossMachine;
     use crate::wiring::mailbox_remote::{
         sign_payload, SENT_DOMAIN, SENT_DOMAIN_BODY_REF, SENT_DOMAIN_WAKE,
@@ -556,6 +556,14 @@ mod tests {
 
     const TS: &str = "2026-10-29T12:00:00.000Z";
     const NOW: u64 = 1_793_275_200; // 2026-10-29T12:00:00Z
+
+    #[test]
+    fn the_shortest_body_lifetime_is_the_longest_age_at_which_a_header_is_still_taken() {
+        assert_eq!(
+            crate::wiring::mailbox_config::MIN_BODY_LIFETIME_SEC,
+            MAX_AGE_SEC + CLOCK_SKEW_SEC
+        );
+    }
 
     #[test]
     fn only_a_message_that_passes_every_check_in_order_is_taken_and_each_failure_has_its_own_counted_reason(

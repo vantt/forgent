@@ -2400,6 +2400,11 @@ fn append_mail(cross: &Cross, id: &str, mail: &Mail<'_>) {
 
 /// [`append_mail`] with the time the signed header says it was sent.
 fn append_mail_at(cross: &Cross, id: &str, mail: &Mail<'_>, sent_at: &str) {
+    append_mail_signed_by(cross, id, mail, sent_at, &cross.alpha_root);
+}
+
+/// [`append_mail_at`] signed with the key under `signer` instead of alpha's own.
+fn append_mail_signed_by(cross: &Cross, id: &str, mail: &Mail<'_>, sent_at: &str, signer: &Path) {
     use fgos_event_store::{
         append::{append, AppendRequest, EventInput},
         layout::{Layout, StreamId},
@@ -2431,8 +2436,7 @@ fn append_mail_at(cross: &Cross, id: &str, mail: &Mail<'_>, sent_at: &str) {
     };
     let canonical = fgos_canonical_json::canonical_json(&payload).unwrap();
     let signature =
-        fgos_identity::signing::sign(&cross.alpha_root, format!("{domain}{canonical}").as_bytes())
-            .unwrap();
+        fgos_identity::signing::sign(signer, format!("{domain}{canonical}").as_bytes()).unwrap();
     payload["sig"] = serde_json::to_value(signature).unwrap();
     let main = cross.alpha.main();
     let driver = GitDriver::new(&cross.alpha_root).unwrap();
@@ -3095,4 +3099,84 @@ fn status_names_the_body_ref_setting_and_the_age_of_the_oldest_body_kept() {
         text.contains("2 kept, the oldest was sent 72 h ago"),
         "{text}"
     );
+}
+
+/// Two clones of one machine share its key but each has its own store origin. The first clone's
+/// rotation counts a header the second clone sent (signed by the machine's key), so the second
+/// clone's young body stays; a header whose signature is another machine's names a body that is
+/// dropped all the same.
+#[test]
+fn a_rotation_keeps_a_young_body_that_another_clone_of_the_machine_sent_and_ignores_a_forged_header(
+) {
+    let cross = two_machines();
+    turn_on_body_ref(&cross);
+    let other = second_clone_of_alpha(&cross);
+    let (young, forged, old) = (
+        "young body sent from the other clone",
+        "body named only by a forged header",
+        "body sent eight days ago",
+    );
+    let out = other.run(
+        &other.main(),
+        Some("sender-a"),
+        &["mailbox", "send", "--to", &cross.target, young],
+        b"",
+    );
+    assert_eq!(out.status.code(), Some(0), "{out:?}");
+    sync_child(&other);
+
+    // Alpha's own clone adds an old body, a body only a forged header names, and a commit dated
+    // beyond the orphan grace on top of what the other clone pushed.
+    let now = unix_now();
+    let main = cross.alpha.main();
+    let machine = fgos_identity::machine::read(&cross.alpha_root).unwrap();
+    let reference = format!("refs/fgos/mail-bodies/{machine}");
+    git_out(
+        &main,
+        &[
+            "fetch",
+            "-q",
+            "origin",
+            &format!("+{reference}:{reference}"),
+        ],
+        "",
+    );
+    let listed = git_out(&main, &["ls-tree", &reference], "");
+    let mut entries = format!("{listed}\n");
+    for text in [forged, old] {
+        let blob = git_out(&main, &["hash-object", "-w", "--stdin"], text);
+        entries.push_str(&format!("100644 blob {blob}\t{}\n", sha256_hex(text)));
+    }
+    let tree = git_out(&main, &["mktree"], &entries);
+    let ahead = git_out_env(
+        &main,
+        &["commit-tree", &tree, "-p", &reference, "-m", "ahead"],
+        "",
+        &[("GIT_COMMITTER_DATE", &format!("{} +0000", now - 3600))],
+    );
+    git_out(&main, &["update-ref", &reference, &ahead], "");
+    git_out(
+        &main,
+        &["push", "-q", "origin", &format!("{reference}:{reference}")],
+        "",
+    );
+    let sent = |ago: u64| fgos_identity::text::iso_utc(now - ago, 0);
+    append_mail_at(&cross, "old", &Mail::BodyRef(old), &sent(8 * DAY));
+    append_mail_signed_by(
+        &cross,
+        "forged",
+        &Mail::BodyRef(forged),
+        &sent(60),
+        &cross.beta_root,
+    );
+
+    sync_child(&cross.alpha);
+
+    assert_eq!(
+        remote_body(&cross, &sha256_hex(young)).as_deref(),
+        Some(young)
+    );
+    for gone in [old, forged] {
+        assert_eq!(remote_body(&cross, &sha256_hex(gone)), None, "{gone}");
+    }
 }
