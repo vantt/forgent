@@ -15,7 +15,7 @@ import {
   VALID_COMPLETENESS,
   INSPECTION_STATUSES,
 } from '../../src/runner/dispatch/runtime-inspection.mjs';
-import { invokeDispatchInspectOperation } from '../../src/verbs/dispatch/inspect.mjs';
+import { invokeDispatchInspectOperation, inspectDispatchUseCase } from '../../src/verbs/dispatch/inspect.mjs';
 
 const fixture = () => fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-'));
 function assignment(root, id) { const dir = path.join(root, '.fgos', 'assignments', id); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'assignment.json'), JSON.stringify({ assignmentId: id })); return dir; }
@@ -45,6 +45,14 @@ test('cwd evidence absence or malformation is partial and never correlated', () 
 test('cwd selector fails closed when a bound sibling is valid but unadmitted', () => { const root = fixture(), cwd = path.join(root, 'cwd'); fs.mkdirSync(cwd); assignment(root, 'a'); assignment(root, 'b'); run(root, 'a', '01', { runId: 'good', cwd }, v1('good', 'a')); run(root, 'b', '01', { runId: 'bad', cwd }, v1('bad', 'b')); admit(root, 'a', 1, { runId: 'good', attempt: 1 }); fs.mkdirSync(path.join(root, '.fgos', 'dispatch'), { recursive: true }); fs.writeFileSync(path.join(root, '.fgos', 'dispatch.lock'), '{}'); fs.writeFileSync(path.join(root, '.fgos', 'workspace-evidence.json'), '{}'); fs.writeFileSync(path.join(root, '.fgos', 'dispatch', 'projection-conflicts.json'), '[]'); const got = inspectDispatchRuntime(root, { cwd }); assert.equal(got.inspectionStatus, 'partial'); assert.equal(got.observations[0].level, 'partial'); assert.equal(got.reconciliation.state, 'manual-required'); assert.equal(got.recoveryAuthority, undefined); });
 test('cwd not-found and concurrency-permitted active runs are distinct from conflict', () => { const root = fixture(), cwd = path.join(root, 'cwd'); fs.mkdirSync(cwd); assert.equal(inspectDispatchRuntime(root, { cwd }).inspectionStatus, 'not-found'); assignment(root, 'a'); assignment(root, 'b'); run(root, 'a', '01', { runId: 'a', cwd, concurrency: 'permitted' }); run(root, 'b', '01', { runId: 'b', cwd, concurrency: 'permitted' }); admit(root, 'a', 1, { runId: 'a' }); admit(root, 'b', 1, { runId: 'b' }); fs.mkdirSync(path.join(root, '.fgos', 'dispatch'), { recursive: true }); fs.writeFileSync(path.join(root, '.fgos', 'dispatch.lock'), '{}'); fs.writeFileSync(path.join(root, '.fgos', 'workspace-evidence.json'), '{}'); fs.writeFileSync(path.join(root, '.fgos', 'dispatch', 'projection-conflicts.json'), '[]'); assert.equal(inspectDispatchRuntime(root, { cwd }).inspectionStatus, 'resolved'); });
 test('host routing selects solely operation/effect; Dispatch alone receives selector payload', () => { const selected = []; const answer = invokeDispatchInspectOperation({ operationId: 'dispatch.runtime.inspect', effect: 'read', payload: { selector: { run: 'none' } }, ctx: { repoRoot: fixture() } }, { selectProvider: (route) => { selected.push(route); return (ctx, selector) => ({ ctx, selector }); } }); assert.deepEqual(selected, [{ operationId: 'dispatch.runtime.inspect', effect: 'read' }]); assert.deepEqual(answer.selector, { run: 'none' }); });
+test('the terminal selector answers the allocation scan and names no run; the scan itself is owned by the terminal-control client test', () => {
+  const root = fixture();
+  const terminalControl = { capabilities: () => ({ defaults: { allocationGraceMs: 60000 } }), reconcileScan: ({ olderThanMs }) => ({ result: 'scan', findings: [{ key: 'slot-a', kind: 'retain-expired', paneId: 'p1' }], olderThanMs }) };
+  const got = inspectDispatchUseCase({ repoRoot: root }, { terminal: true, terminalControl, globalConfigPath: path.join(root, 'no-global-config.json') });
+  assert.equal(got.state, 'scanned');
+  assert.deepEqual(got.findings.map((f) => [f.key, f.kind, f.paneId]), [['slot-a', 'retain-expired', 'p1']]);
+  assert.equal(got.runObservation, undefined);
+});
 test('public inspect use-case import graph cannot reach mutation/recovery/process/Git execution', () => {
   const root = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
   const seen = new Set();
@@ -76,6 +84,12 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   // probing, the scan) are not reachable from `inspect.mjs`. Same
   // identical-file, different-export carve-out as the entries above.
   //
+  // terminal-control/client.mjs: `inspect.mjs` reaches it only through `scanTerminalAllocations`, which calls the
+  // port's `capabilities` and `reconcileScan` operations. The route's scan only observes (it reads the allocation
+  // records and the panes; closing a pane is the separate `release` operation, which `scanTerminalAllocations` never
+  // calls). The file's other operations (allocate, attach, release, read) are not reachable from `inspect.mjs`.
+  // Same identical-file, different-export carve-out as the entries above.
+  //
   // The attempt view also reaches three files for one read each, verified by
   // direct reading: runner/paths.mjs `fgosDirFromRoot` (a path join);
   // dispatch/visibility-session.mjs `readVisibility` (one JSON read);
@@ -84,7 +98,7 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   // release, the visibility session) are not reachable from `inspect.mjs`.
   const isProvenLeaf = (file) => {
     const f = file.replaceAll('\\', '/');
-    return f.endsWith('/run-result.mjs') || f.endsWith('/config/facade.mjs') || f.endsWith('/provider-capacity.mjs') || f.endsWith('/run-supervisor/client.mjs')
+    return f.endsWith('/run-result.mjs') || f.endsWith('/config/facade.mjs') || f.endsWith('/provider-capacity.mjs') || f.endsWith('/run-supervisor/client.mjs') || f.endsWith('/terminal-control/client.mjs')
       || f.endsWith('/runner/paths.mjs') || f.endsWith('/run-supervisor/run-lock.mjs') || f.endsWith('/dispatch/visibility-session.mjs');
   };
   function walk(file) {

@@ -227,29 +227,14 @@ test('terminal-allocations passes when nothing is stuck', { skip: !POSIX }, () =
   assert.match(r.message, /^no slot older than 60000 ms is stuck/);
 });
 
-test('terminal-allocations warns about a slot that was allocated and never launched, and closes nothing', { skip: !POSIX }, () => {
-  // The recorded fixture of a pane that runs nothing but its shell.
-  const bareShell = path.join(scratch, 'herdr-bare-shell.sh');
-  const fixtures = path.dirname(FAKE_HERDR);
-  fs.writeFileSync(bareShell, `#!/bin/sh\nif [ "$1" = pane ] && [ "$2" = process-info ]; then cat "${fixtures}/pane-process-info-shell.json"; exit 0; fi\nexec "${FAKE_HERDR}" "$@"\n`, { mode: 0o755 });
-  const tc = realClient({ allocationGraceMs: 0 }, bareShell);
-  const slot = tc.allocate({ key: 'doctor-stuck-slot', groupKey: 'doctor-group', display: { title: 'stuck', role: 'worker' } });
-  assert.equal(slot.result, 'slot');
-  const before = fs.existsSync(log) ? fs.readFileSync(log, 'utf8') : '';
-  const root = workspace('alloc-stuck', { allocationGraceMs: 1 });
-  const r = checkTerminalAllocations(root, { globalConfigPath: noGlobal, terminalControl: tc });
-  assert.equal(r.passed, true);
-  assert.match(r.message, /^warning: 1 slot\(s\) need a person; nothing was closed: doctor-stuck-slot \(pane \S+\): a slot was allocated but never launched/);
-  const closes = (fs.readFileSync(log, 'utf8').slice(before.length).match(/pane\tclose|pane close/g) ?? []).length;
-  assert.equal(closes, 0, 'the scan must not close anything');
-});
-
-test('terminal-allocations says it did not scan when terminal mode is unsupported', { skip: !POSIX }, () => {
-  const tc = createTerminalControl({ hostBin: HOST_BIN, herdrBin: '/no/such/herdr-binary' });
-  const r = checkTerminalAllocations(workspace('alloc-unsupported'), { globalConfigPath: noGlobal, terminalControl: tc });
-  assert.equal(r.passed, true);
-  assert.match(r.message, /^(info|warning): /);
-  assert.doesNotMatch(r.message, /need a person/);
+test('terminal-allocations is a pointer: findings are counted, never listed, and the verb is named; an unscanned allocation set is said so', () => {
+  const port = (reconcileScan) => ({ capabilities: () => ({ defaults: {} }), reconcileScan });
+  const root = workspace('alloc-pointer', { allocationGraceMs: 1 });
+  const stuck = checkTerminalAllocations(root, { globalConfigPath: noGlobal, terminalControl: port(() => ({ result: 'scan', findings: [{ key: 'a', kind: 'retain-expired' }, { key: 'b', kind: 'unknown' }] })) });
+  assert.equal(stuck.passed, true);
+  assert.equal(stuck.message, 'warning: 2 slot(s) need a person; nothing was closed; run `fgos dispatch inspect --terminal`');
+  const unsupported = checkTerminalAllocations(root, { globalConfigPath: noGlobal, terminalControl: port(() => ({ result: 'unsupported', detail: 'no herdr' })) });
+  assert.equal(unsupported.message, 'info: allocations not scanned: terminal mode is unsupported here (no herdr)');
 });
 
 test('the two checks are registered and setup has no terminal directory fix', () => {

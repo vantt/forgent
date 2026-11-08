@@ -18,7 +18,7 @@ const KILL_ALLOWED = new Map([
   ['src/holder-lock/index.mjs', 'kills the process group of its own spawned lock-hold child'],
 ]);
 const PROC_ALLOWED = new Map([
-  ['src/setup/run-supervisor-checks.mjs', 'doctor check of the run supervisor'],
+  ['src/run-supervisor/runtime-dir.mjs', 'the kernel socket table, to find attempt sockets no supervisor holds'],
   ['src/runner/dispatch/confinement/probes/harness.mjs', 'confinement probe harness'],
   ['src/runner/dispatch/confinement/drivers/bwrap.mjs', 'bwrap confinement driver'],
 ]);

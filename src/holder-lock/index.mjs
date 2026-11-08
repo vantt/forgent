@@ -113,7 +113,7 @@ export class LockHandle {
   /** Close the description (hold transport: end the helper) and return how it
    * settled: `{ settled: 'released' | 'stuck' | 'closed', killed, pids }`.
    * `released`: no copy of the description is left (escaped copies were ended);
-   * `stuck`: one could not be proven gone, `pids` names it for `lock-holders`
+   * `stuck`: one could not be proven gone, `pids` names it for `lock-status`
    * and `fgos lock fence` (never thrown: release runs in `finally` blocks);
    * `closed`: nothing to settle (a lock handed to a child, the hold transport,
    * or a second call). Refused while a borrowed child is still running: a

@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fixture, append, installFetchMapping } from './phase07-fixture.mjs';
 import { statusUseCase } from '../../src/verbs/events/status.mjs';
 import { syncUseCase } from '../../src/verbs/events/sync.mjs';
@@ -26,6 +27,25 @@ test('status exposes real open counts, receipt, refs, deferred fields and linked
   const linked = path.join(f.temp, 'linked'); f.git('worktree', 'add', '-qb', 'linked', linked);
   fs.mkdirSync(path.join(linked, 'sub'));
   assert.equal(statusUseCase({ ...f.ctx, cwd: path.join(linked, 'sub') }).storeId, got.storeId);
+});
+test('status reports every incident the doctor pointer counts: unsealed age, orphan branch streams, integrity errors, skipped peer mirrors and the sync warning kept for them', t => {
+  const f = fixture(t, { remote: true });
+  installFetchMapping(f);
+  append(f.store, [{ ts: new Date(Date.now() - 3601 * 1000).toISOString() }]);
+  assert.ok(statusUseCase(f.ctx).streams.find(s => s.stream === 'project').oldestUnsealedAgeSec >= 3601);
+  fs.mkdirSync(path.join(f.repo, '.git/fgos/events/branch:gone'));
+  assert.deepEqual(statusUseCase(f.ctx).orphanBranches, ['branch:gone']);
+  fs.writeFileSync(path.join(f.repo, '.git/fgos/events/project/integrity.json'), JSON.stringify({ code: 'event-store-ref-moved', ranges: [] }));
+  assert.equal(statusUseCase(f.ctx).integrityErrors.length, 1);
+  // A peer pushed a ref whose commit is no sealed history (no seal.json).
+  const remote = (...args) => execFileSync('git', ['-C', path.join(f.temp, 'remote'), ...args], { encoding: 'utf8', input: '',
+    env: { ...process.env, GIT_AUTHOR_NAME: 'Peer', GIT_AUTHOR_EMAIL: 'peer@example.test', GIT_COMMITTER_NAME: 'Peer', GIT_COMMITTER_EMAIL: 'peer@example.test' } }).trim();
+  remote('update-ref', 'refs/fgos/events/peer-bb', remote('commit-tree', '-m', 'not a seal', remote('mktree')));
+  syncUseCase(f.ctx);
+  const got = statusUseCase(f.ctx);
+  assert.match(got.skippedMirrors.map(m => `${m.code} ${m.refName}`).join(), /event-store-gap refs\/fgos\/remotes\/origin\/events\/peer-bb/, 'the read skipped the mirror by name');
+  assert.ok(got.sync.warnings.some(w => w.startsWith('event-store-gap: ')), 'the warning the sync kept is reported');
+  assert.equal(got.lastPush.error ?? null, null);
 });
 test('status never prints the credentials of a remote URL: Git redacts userinfo and query before any verb sees it', t => {
   const f = fixture(t, { remote: true });

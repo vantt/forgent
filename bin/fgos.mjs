@@ -2706,7 +2706,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return invokeDispatchInspectOperation({
           operationId: 'dispatch.runtime.inspect', effect: 'read',
           ctx: { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch },
-          payload: { selector: { run: flags.run, assignment: flags.assignment, cwd: flags.cwd, providerCapacity: flags['provider-capacity'] === true } },
+          payload: { selector: { run: flags.run, assignment: flags.assignment, cwd: flags.cwd, providerCapacity: flags['provider-capacity'] === true, terminal: flags.terminal === true } },
         });
       }
       if (sub === 'reconcile') {
@@ -4417,13 +4417,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     case 'lock-status': {
-      const { mainCheckout, locks } = collectLockStatus({ fgosDir: dir });
+      const { mainCheckout, locks, problems } = collectLockStatus({ fgosDir: dir });
       // The commit-activity beacon is reported on its own: it is a hint the
       // pre-commit hook reads, never a lock claim/land/approve wait on.
       const beacon = readBeacon(dir);
       return {
         mainCheckout,
         locks,
+        problems,
         beacon: beacon.status === 'ok'
           ? {
             status: 'present',
@@ -4887,7 +4888,7 @@ function landsWork(verb, positional) {
 }
 // A Work command's seal is not waited for: the answer is already printed, so the pending seals go to one short detached
 // `fgos events seal` child that certifies everything open and exits. No child (spawn failed, or killed first) loses
-// nothing: the events are durable and the next command or doctor `event-store-unsealed` covers them (spec §16).
+// nothing: the events are durable and the next command or the `event-store-incidents` pointer covers them (spec §16).
 function handSealsToChild() {
   for (const { root, stream, checkpointPath } of processSealCoalescer.takeHandedOff()) {
     spawnDetachedCli({ cwd: root, args: ['events', 'seal', '--stream', stream, ...(checkpointPath ? ['--history', checkpointPath] : []), '--dir', root] });

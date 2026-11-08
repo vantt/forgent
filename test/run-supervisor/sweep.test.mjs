@@ -152,7 +152,59 @@ test('no production code reaches a home by any rule but adopt', () => {
     try { out = execFileSync('grep', ['-rln', name, 'src'], { cwd: REPO, encoding: 'utf8' }); } catch { /* no match */ }
     assert.equal(out.trim(), '', `${name} is gone from src`);
   }
-  for (const file of ['src/runner/execution/run.mjs', 'src/runner/loop.mjs', 'src/setup/run-supervisor-checks.mjs']) {
+  for (const file of ['src/runner/execution/run.mjs', 'src/runner/loop.mjs']) {
     assert.match(fs.readFileSync(path.join(REPO, file), 'utf8'), /sweepAttempts\(/, file);
   }
+});
+
+// ─── attempt sockets no supervisor holds ────────────────────────────────
+
+const UID = process.getuid?.();
+const NEEDS_SOCKET_TABLE = (UID === undefined || process.platform !== 'linux') && 'needs the Linux socket table';
+
+/** A node process that listens on `file`; killing it with SIGKILL leaves the path behind, as a killed supervisor does. */
+async function listenerOn(file) {
+  const child = spawn(process.execPath, ['-e', `require('net').createServer().listen(process.argv[1], () => process.stdout.write('up\\n'))`, file], { stdio: ['ignore', 'pipe', 'ignore'] });
+  await new Promise((resolve, reject) => {
+    child.stdout.once('data', resolve);
+    child.once('exit', () => { reject(new Error('listener exited before it bound')); });
+  });
+  return child;
+}
+const exited = (child) => new Promise((resolve) => { if (child.exitCode !== null || child.signalCode !== null) resolve(); else child.once('exit', resolve); });
+
+test('sweepAttempts removes an attempt socket whose supervisor was killed, and only that', { skip: NEEDS_SOCKET_TABLE }, async () => {
+  // Short: `<xdg>/fgos/<hash>.sock` must fit a unix socket path.
+  const xdg = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-sw-'));
+  const dir = path.join(xdg, 'fgos');
+  fs.mkdirSync(dir, { mode: 0o700 });
+  const liveFile = path.join(dir, '0123456789abcdef.sock');
+  const deadFile = path.join(dir, 'fedcba9876543210.sock');
+  const live = await listenerOn(liveFile);
+  const dead = await listenerOn(deadFile);
+  try {
+    dead.kill('SIGKILL');
+    await exited(dead);
+    fs.writeFileSync(path.join(dir, 'notes.txt'), 'not a socket');
+    fs.writeFileSync(path.join(dir, 'aaaaaaaaaaaaaaaa.sock'), 'a plain file with a socket name');
+    sweepAttempts({ socketOptions: { env: { XDG_RUNTIME_DIR: xdg } } });
+    assert.ok(!fs.existsSync(deadFile), 'the orphan is gone');
+    assert.ok(fs.existsSync(liveFile), 'the live socket stays');
+    assert.ok(fs.existsSync(path.join(dir, 'notes.txt')) && fs.existsSync(path.join(dir, 'aaaaaaaaaaaaaaaa.sock')), 'only sockets are removed');
+  } finally {
+    live.kill('SIGKILL');
+    await exited(live);
+    fs.rmSync(xdg, { recursive: true, force: true });
+  }
+});
+
+test('sweepAttempts judges no socket without the kernel socket table', { skip: UID === undefined && 'no uid on this platform' }, () => {
+  const xdg = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-sw-'));
+  try {
+    fs.mkdirSync(path.join(xdg, 'fgos'), { mode: 0o700 });
+    const file = path.join(xdg, 'fgos', '0123456789abcdef.sock');
+    fs.writeFileSync(file, '');
+    sweepAttempts({ socketOptions: { env: { XDG_RUNTIME_DIR: xdg }, procFile: path.join(xdg, 'no-such-table') } });
+    assert.ok(fs.existsSync(file));
+  } finally { fs.rmSync(xdg, { recursive: true, force: true }); }
 });

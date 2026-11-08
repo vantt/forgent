@@ -1389,7 +1389,7 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos dispatch show-run run_abc123'],
       },
       inspect: {
-        description: 'Dispatch-owned runtime inspection of a Run, an Assignment, a working directory\'s dispatch lock, or provider capacity.',
+        description: 'Dispatch-owned runtime inspection of a Run, an Assignment, a working directory\'s dispatch lock, provider capacity, or terminal allocations.',
         parameters: {
           type: 'object',
           properties: {
@@ -1397,6 +1397,7 @@ export const COMMAND_REGISTRY = [
             assignment: { type: 'string', description: 'Assignment id selector.' },
             cwd: { type: 'string', description: 'Working directory selector.' },
             'provider-capacity': { type: 'boolean', description: 'Report provider-capacity inventory/state/quarantine/leases from global config/state.' },
+            terminal: { type: 'boolean', description: 'Report terminal slots allocated but never launched and retained panes past their time; reads only, closes nothing.' },
           },
           required: [],
         },
@@ -1405,6 +1406,7 @@ export const COMMAND_REGISTRY = [
           'fgos dispatch inspect --assignment asgn_abc123',
           'fgos dispatch inspect --cwd /workspace/project',
           'fgos dispatch inspect --provider-capacity',
+          'fgos dispatch inspect --terminal',
         ],
       },
       watch: {

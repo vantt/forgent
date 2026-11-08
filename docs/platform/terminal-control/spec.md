@@ -155,7 +155,7 @@ The research's 85×20 and "at most 4" are not used; nobody measured them.
 | Check | What it does | Result |
 |---|---|---|
 | `terminal-control` | Calls the `capabilities` route and prints driver, declared capabilities and server incarnation; checks `FGOS_HERDR_ANCHOR_PANE` when set (the route answers whether the driver resolves it); then prints each `terminal.*` value with its source after the merge | herdr missing: warning "terminal mode unsupported ... direct mode unaffected" (on Windows it says herdr has no Windows build); herdr without `layout.geometry`: information (the fixed split applies); empty or unresolvable anchor pane: fail; an unreadable config, a value the core refuses (below the 40x8 floor, a limit that is not a positive integer, an unregistered policy) and the two round rules of section 9 (grace, `retainFailedPaneMs`): fail, by name |
-| `terminal-allocations` | Calls `reconcile-scan` with `olderThanMs` = `allocationGraceMs` | Findings: warning listing each key, with its pane id when the record has one; nothing is closed, a retained pane past its time is reported for a person to close |
+| `terminal-allocations` | Calls `reconcile-scan` with `olderThanMs` = `allocationGraceMs` | Findings: a read-only pointer; the row warns with the count and names `fgos dispatch inspect --terminal`, which lists each key with its pane id when the record has one; nothing is closed, a retained pane past its time is reported for a person to close |
 
 ## 10. Internal route only
 

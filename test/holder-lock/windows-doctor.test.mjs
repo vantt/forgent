@@ -20,7 +20,7 @@ const SKIP = process.platform !== 'win32'
 // Every machine lock lives under a private state root; children inherit it.
 const stateRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-windows-doctor-state-'));
 process.env.FGOS_STATE_ROOT = stateRoot;
-const { checkLockKernelSemantics, checkLockBorrowVectors, checkLockHolders, fixLockDirs } = await import('../../src/setup/holder-lock-checks.mjs');
+const { checkLockKernelSemantics, checkLockBorrowVectors, fixLockDirs } = await import('../../src/setup/holder-lock-checks.mjs');
 
 function workspace() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-windows-doctor-'));
@@ -48,18 +48,6 @@ test('lock-borrow-vectors runs on Windows and passes', { skip: SKIP }, () => {
     const res = checkLockBorrowVectors(dir);
     assert.equal(res.passed, true, res.message);
     assert.match(res.message, /^all 4 vectors and the sibling check green/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('lock-holders passes on a fresh workspace', { skip: SKIP }, () => {
-  const dir = workspace();
-  try {
-    fixLockDirs(dir);
-    const res = checkLockHolders(dir);
-    assert.equal(res.passed, true, res.message);
-    assert.doesNotMatch(res.message, /^warning:/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

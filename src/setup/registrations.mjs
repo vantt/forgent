@@ -125,7 +125,7 @@ import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { probeIdentity } from '../util/session-identity.mjs';
 import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
 import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
-import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, fixRunAttemptsStuck, checkRunSupervisorConfig } from './run-supervisor-checks.mjs';
+import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, checkRunSupervisorConfig } from './run-supervisor-checks.mjs';
 import { checkIdentityMachineId, checkIdentityMachineKey, checkIdentityProjectId, checkIdentitySharedDirectory, checkIdentitySshKeygen, fixIdentityMachineId, fixIdentityMachineKey } from './identity-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 import { checkOmpNativesPresent, ompExecutorsOf } from './omp-natives-checks.mjs';
@@ -1925,8 +1925,8 @@ registerCheck({
 });
 registerCheck({
   id: 'lock-holders',
-  description: 'every holder of a holder-lock lock is a fgOS process or a borrowed child, no predecessor domain is left running, and the state and porting-events hot records parse and their holder can be judged',
-  check: (cwd) => checkLockHolders(cwd),
+  description: 'read-only pointer: foreign lock holders, predecessor domains still running and hot records that need a person are read by fgos lock-status',
+  check: () => checkLockHolders(),
 });
 registerFix({ id: 'lock-dirs', fix: (cwd) => fixLockDirs(cwd) });
 
@@ -1946,7 +1946,7 @@ registerCheck({
 });
 registerCheck({
   id: 'run-attempts-stuck',
-  description: 'no attempt with a v3 envelope, or with the intent a controller left when it died before writing one, is left without a closed.json while its lock is free (fgos doctor --fix adopts it; an attempt whose release was removed only warns); lists unit runs awaiting fgos run --resume (a warning, never a failure)',
+  description: 'read-only pointer: attempts with no closed.json and no lock holder, and unit runs awaiting fgos run --resume; the next fgos run adopts them, or run fgos dispatch recover (a warning, never a failure)',
   check: (cwd) => checkRunAttemptsStuck(cwd),
 });
 registerCheck({
@@ -1955,7 +1955,6 @@ registerCheck({
   check: (cwd) => checkRunSupervisorConfig(cwd),
 });
 registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
-registerFix({ id: 'run-attempts-stuck', fix: (cwd) => fixRunAttemptsStuck(cwd) });
 
 // The curated capability slots. The standard (core/config-standard/runner.yaml) holds the same entries and is
 // what a run reads; this list stays as the reference the doctrine-table tests and the plan lint's registered
@@ -2093,7 +2092,8 @@ function checkMailboxHook(cwd) {
   // no .fgos), and says so in its text.
   if (!data.record) return { passed: true, message: `${enabled}; record not checked: ${data.text ?? 'no answer'}` };
   if (data.record === 'none') return { passed: true, message: `${enabled}; record: none yet (no hook has run in this project)` };
-  if (data.record !== 'ok') return { passed: false, message: `enabled, but the mailbox record cannot be read: ${data.record} (fgos mailbox status names it)` };
+  // A pointer, never a failure: the record verdict belongs to the mailbox's own verb.
+  if (data.record !== 'ok') return { passed: true, message: `warning: enabled, but the mailbox record cannot be read: ${data.record}; run \`fgos mailbox status\`` };
   const outcome = data.hookOutcome?.reason ? `, last hook outcome ${data.hookOutcome.reason}` : '';
   return { passed: true, message: `${enabled}; record: ok (${data.heads} head(s), ${data.signals?.queue?.pending ?? 0} pending${outcome})${crossMachineNote(data.crossMachine)}` };
 }
@@ -4206,10 +4206,10 @@ registerCheck({
   check: (cwd) => checkSeatBindingRoute(cwd),
 });
 
-// Event Store: one setup fix and six doctor rows. A doctor run builds one `eventStoreDoctor`
+// Event Store: one setup fix and four doctor rows (`event-store-incidents` is a read-only pointer to `fgos events status`). A doctor run builds one `eventStoreDoctor`
 // (its lazy store snapshot is read at most once) and every row asks it; a row called without a run gets a private one.
 registerFix({ id: 'event-store-lock-dirs', fix: cwd => fixEventStoreLockDirs(cwd) });
-for (const name of ['open-root', 'machine-id', 'unsealed', 'integrity', 'sync', 'legacy-layout']) {
+for (const name of ['open-root', 'machine-id', 'legacy-layout', 'incidents']) {
   const id = `event-store-${name}`;
   registerCheck({ id, description: `Event Store ${name}`, check: (cwd, run = createDoctorRun()) => eventStoreDoctorOf(cwd, run)(id) });
 }

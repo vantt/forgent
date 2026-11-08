@@ -75,36 +75,27 @@ export function checkEventStore(cwd, kind, options = {}) {
     const status = context.status();
     switch (kind) {
       case 'event-store-machine-id': return status.machineRefShared ? warn(`event-store-machine-ref-shared: ${facts.machineId}; set git config fgos.machineId <other-id> in one clone`) : pass(facts.machineId);
-      case 'event-store-unsealed': {
-        // Orphan branch streams are unsealed history nobody will seal: they warn on this row, and a failing age keeps its failure.
+      case 'event-store-incidents': {
+        // A read-only pointer: counts what `fgos events status` reports from the same snapshot, never judges or repairs.
         const age = Math.max(0, ...status.streams.map(s => s.oldestUnsealedAgeSec));
-        const tooOld = age > 3600;
-        const notes = [
-          tooOld ? `unsealed events age ${age}s exceeds 3600s` : age > 2 * config.seal.intervalSec && `unsealed events age ${age}s exceeds twice seal interval`,
-          status.orphanBranches.length > 0 && `orphan branch streams: ${status.orphanBranches.join(', ')}`,
-        ].filter(Boolean);
-        return tooOld ? fail(notes.join('; ')) : notes.length ? warn(notes.join('; ')) : pass(`oldest unsealed age ${age}s`);
-      }
-      case 'event-store-integrity': {
-        // A peer's mirror the reader or the last sync refused is history this clone does not see: it fails the row
-        // by name. A shared machine ref is the machine-id row's warning.
-        const problems = [
-          ...status.integrityErrors.map(error => JSON.stringify(error)),
-          ...status.skippedMirrors.map(m => `${m.code} ${m.refName}: ${m.detail}`),
-          ...status.sync.warnings.filter(w => !w.startsWith('event-store-machine-ref-shared:')).map(w => `sync: ${w}`),
-        ];
-        return problems.length ? fail(problems.join('; ')) : pass(`verified ${Object.keys(status.refs).length} refs; ${status.deferred.length} deferred events`);
-      }
-      case 'event-store-sync': {
-        if (!facts.remoteFact.configured) return pass('info: no remote configured');
+        const integrity = status.integrityErrors.length + status.skippedMirrors.length
+          + status.sync.warnings.filter(w => !w.startsWith('event-store-machine-ref-shared:')).length;
         const push = status.lastPush;
         const pending = status.streams.some(s => (s.stream === 'project' || s.stream.startsWith('project:')) && (s.unsealedCount || s.closedSegmentsPending));
-        if (!push?.error && !pending && status.aheadBehind.ahead === 0 && !status.sync.unpublishedSince) return pass('no unpublished events');
-        const now = Math.floor(Date.now() / 1000);
-        return !push || push.remote !== config.remote || push.error || now - push.time > 86400
-          ? warn(`last push: ${JSON.stringify(push)}; ahead/behind: ${JSON.stringify(status.aheadBehind)}`) : pass(`last push ${push.time}; ahead/behind: ${JSON.stringify(status.aheadBehind)}`);
+        const unpublished = facts.remoteFact.configured && (push?.error || pending || status.aheadBehind.ahead > 0 || status.sync.unpublishedSince)
+          && (!push || push.remote !== config.remote || push.error || Math.floor(Date.now() / 1000) - push.time > 86400);
+        const open = [
+          age > 2 * config.seal.intervalSec && `unsealed events age ${age}s`,
+          status.orphanBranches.length > 0 && `${status.orphanBranches.length} orphan branch stream(s)`,
+          integrity > 0 && `${integrity} integrity problem(s)`,
+          unpublished && 'unpublished events',
+        ].filter(Boolean);
+        return open.length > 0 ? warn(`${open.join('; ')}; run \`fgos events status\``) : pass('no unsealed backlog, integrity problem or unpublished event');
       }
       default: throw new Error(`unknown Event Store check: ${kind}`);
     }
-  } catch (error) { return fail(error.message); }
+  } catch (error) {
+    // A pointer never fails: the open-root row already fails on the same unreadable setup.
+    return kind === 'event-store-incidents' ? warn(`incidents not read: ${error.message}`) : fail(error.message);
+  }
 }

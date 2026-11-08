@@ -14,7 +14,6 @@ import {
   checkRuntimeSocketDir,
   fixRuntimeSocketDir,
   checkRunAttemptsStuck,
-  fixRunAttemptsStuck,
   checkRunSupervisorConfig,
 } from '../../src/setup/run-supervisor-checks.mjs';
 import { readGateKillGraceMs, readCancelWaitMs, DEFAULT_GATE_KILL_GRACE_MS } from '../../src/run-supervisor/gate-kill-grace.mjs';
@@ -61,7 +60,8 @@ test('the run supervisor checks and fixes are registered', () => {
   }
   for (const id of ['process-containment', 'gate-kill-grace', 'units-awaiting-resume', 'cancel-wait']) assert.ok(!ids.includes(id), `${id} is folded into another row`);
   const fixIds = FIX_REGISTRATIONS.map((fix) => fix.id);
-  for (const id of ['runtime-socket-dir', 'run-attempts-stuck']) assert.ok(fixIds.includes(id), `${id} has a fix`);
+  assert.ok(fixIds.includes('runtime-socket-dir'), 'runtime-socket-dir has a fix');
+  assert.ok(!fixIds.includes('run-attempts-stuck'), 'run-attempts-stuck is a pointer: adopt runs on the next fgos run');
 });
 
 // ─── run-supervisor-route ───────────────────────────────────────────────
@@ -119,7 +119,7 @@ test('runtime-socket-dir: missing warns, fix creates 0700, a loose mode fails an
   const env = { XDG_RUNTIME_DIR: xdg };
   const dir = path.join(xdg, 'fgos');
 
-  assert.match(checkRuntimeSocketDir({ env }).message, /^warning: .* does not exist yet \(fgos setup creates it\)$/);
+  assert.match(checkRuntimeSocketDir({ env }).message, /^warning: .* does not exist yet \(fgos doctor --fix creates it\)$/);
   const created = fixRuntimeSocketDir({ env });
   assert.equal(created.changed, true, created.message);
   assert.equal(fs.statSync(dir).mode & 0o777, 0o700);
@@ -154,65 +154,6 @@ test('runtime-socket-dir: a directory too long for a socket name fails and is no
   assert.equal(res.passed, false);
   assert.match(res.message, /leaves no room for a socket name/);
   assert.ok(!res.message.includes('--fix"'), res.message);
-});
-
-/** A node process that listens on `file`; killing it with SIGKILL leaves the path behind, as a killed supervisor does. */
-async function listenerOn(file) {
-  const child = spawn(process.execPath, ['-e', `require('net').createServer().listen(process.argv[1], () => process.stdout.write('up\\n'))`, file], { stdio: ['ignore', 'pipe', 'ignore'] });
-  children.add(child);
-  await new Promise((resolve, reject) => {
-    child.stdout.once('data', resolve);
-    child.once('exit', () => { reject(new Error('listener exited before it bound')); });
-  });
-  return child;
-}
-
-const exited = (child) => new Promise((resolve) => { if (child.exitCode !== null || child.signalCode !== null) resolve(); else child.once('exit', resolve); });
-
-test('runtime-socket-dir: a socket whose supervisor was killed is reported and removed; a live one is left alone', { skip: (UID === undefined || process.platform !== 'linux') && 'needs the Linux socket table' }, async () => {
-  const xdg = path.join(scratch, 'xdg-orphan');
-  fs.mkdirSync(xdg, { mode: 0o700 });
-  const env = { XDG_RUNTIME_DIR: xdg };
-  const dir = path.join(xdg, 'fgos');
-  assert.equal(fixRuntimeSocketDir({ env }).changed, true);
-
-  const liveFile = path.join(dir, '0123456789abcdef.sock');
-  const deadFile = path.join(dir, 'fedcba9876543210.sock');
-  const live = await listenerOn(liveFile);
-  const dead = await listenerOn(deadFile);
-  dead.kill('SIGKILL');
-  await exited(dead);
-  fs.writeFileSync(path.join(dir, 'notes.txt'), 'not a socket');
-  fs.writeFileSync(path.join(dir, 'aaaaaaaaaaaaaaaa.sock'), 'a plain file with a socket name');
-
-  const res = checkRuntimeSocketDir({ env });
-  assert.equal(res.passed, false, res.message);
-  assert.match(res.message, /1 attempt socket\(s\) in .* have no supervisor: fedcba9876543210\.sock/);
-  assert.doesNotMatch(res.message, /0123456789abcdef/);
-  assert.match(res.message, /fgos doctor --fix/);
-
-  const fixed = fixRuntimeSocketDir({ env });
-  assert.equal(fixed.changed, true, fixed.message);
-  assert.match(fixed.message, /removed 1 attempt socket\(s\) with no supervisor/);
-  assert.ok(!fs.existsSync(deadFile), 'the orphan is gone');
-  assert.ok(fs.existsSync(liveFile), 'the live socket stays');
-  assert.ok(fs.existsSync(path.join(dir, 'notes.txt')) && fs.existsSync(path.join(dir, 'aaaaaaaaaaaaaaaa.sock')), 'only sockets are removed');
-  assert.equal(checkRuntimeSocketDir({ env }).passed, true);
-  live.kill('SIGKILL');
-  await exited(live);
-});
-
-test('runtime-socket-dir: without a socket table nothing is judged or removed', { skip: UID === undefined && 'no uid on this platform' }, () => {
-  const xdg = path.join(scratch, 'xdg-no-table');
-  fs.mkdirSync(xdg, { mode: 0o700 });
-  const env = { XDG_RUNTIME_DIR: xdg };
-  fixRuntimeSocketDir({ env });
-  const file = path.join(xdg, 'fgos', '0123456789abcdef.sock');
-  fs.writeFileSync(file, '');
-  const procFile = path.join(scratch, 'no-such-table');
-  assert.match(checkRuntimeSocketDir({ env, procFile }).message, /attempt sockets are not judged on this platform/);
-  assert.equal(fixRuntimeSocketDir({ env, procFile }).changed, false);
-  assert.ok(fs.existsSync(file));
 });
 
 // ─── run-supervisor-config ──────────────────────────────────────────────
@@ -285,78 +226,29 @@ test('run-attempts-stuck: nothing open and a closed attempt pass', () => {
   assert.equal(checkRunAttemptsStuck(root).message, 'no attempt waits to be closed');
   attemptDir(root, 'done', { closed: true });
   assert.equal(checkRunAttemptsStuck(root).message, 'no attempt waits to be closed');
-  assert.equal(fixRunAttemptsStuck(root).changed, false);
 });
 
-test('run-attempts-stuck: an unclosed attempt with a free lock fails with the reason the supervisor named; probing writes nothing', () => {
-  process.env.FGOS_HOST_BIN = HOST_BIN;
+test('run-attempts-stuck: an unclosed attempt with a free lock is a warning that names the doors, never a failure; nothing is written', () => {
   const root = workspace('stuck-free');
   const dir = attemptDir(root, 'free');
   const before = fs.readdirSync(dir).sort();
   const res = checkRunAttemptsStuck(root);
-  assert.equal(res.passed, false, res.message);
-  assert.match(res.message, /1 attempt\(s\) have no holder and no closed\.json: .*runs\/01/);
-  assert.match(res.message, /fgos doctor --fix/);
-  assert.deepEqual(fs.readdirSync(dir).sort(), before, 'the probe wrote nothing');
-
-  fs.writeFileSync(path.join(dir, 'start-refused.json'), JSON.stringify({ v: 1, attemptId: 'att-free', code: 'lock-held', why: 'attempt: kernel-lock-held', at: '2026-10-18T00:00:00.000Z' }));
-  assert.match(checkRunAttemptsStuck(root).message, /runs\/01 \(start-refused:lock-held\)/);
+  assert.equal(res.passed, true, res.message);
+  assert.match(res.message, /^warning: 1 attempt\(s\) have no holder and no closed\.json, 0 unit run\(s\) await resume; the next `fgos run` adopts them, or run `fgos dispatch recover`$/);
+  assert.deepEqual(fs.readdirSync(dir).sort(), before, 'the pointer wrote nothing');
 });
 
-test('run-attempts-stuck: an unclosed terminal attempt is judged like any other', () => {
-  process.env.FGOS_HOST_BIN = HOST_BIN;
-  const root = workspace('stuck-terminal');
-  const dir = attemptDir(root, 'pane');
-  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-pane', mode: 'terminal', terminal: { socketPath: '/nonexistent/x.sock' } }));
-  const res = checkRunAttemptsStuck(root);
-  assert.equal(res.passed, false, res.message);
-  assert.match(res.message, /1 attempt\(s\) have no holder and no closed\.json: .*runs\/01/);
-});
-
-test('run-attempts-stuck: the fix sends the attempt through adopt and names what stays open', () => {
-  process.env.FGOS_HOST_BIN = HOST_BIN;
-  const root = workspace('stuck-fix');
-  attemptDir(root, 'unadoptable'); // an envelope without a digest cannot be adopted
-  const fixed = fixRunAttemptsStuck(root);
-  assert.equal(fixed.changed, false);
-  assert.match(fixed.message, /adopted 0 attempt\(s\); 1 still open: .*runs\/01/);
-});
-
-test('run-attempts-stuck: an attempt whose release was removed is named with the remedy, by the check and by the fix', () => {
-  process.env.FGOS_HOST_BIN = HOST_BIN;
-  const root = workspace('stuck-release-gone');
-  const gone = path.join(scratch, 'pruned-release', 'fgos');
-  const dir = attemptDir(root, 'gone');
-  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: gone }));
-  const res = checkRunAttemptsStuck(root);
-  assert.equal(res.passed, true, 'adopt can never close it: a warning, not a failure');
-  assert.match(res.message, /^warning: 1 attempt\(s\) cannot be closed by adopt: /);
-  assert.match(res.message, new RegExp(`runs/01 \\(the release that wrote it was removed \\(${gone} is gone\\)`));
-  assert.match(res.message, /restore them at those paths, then run "fgos doctor --fix" again/);
-  assert.match(fixRunAttemptsStuck(root).message, /1 still open: .*the release that wrote it was removed/);
-
-  // A dev-door host lives in a checkout: the payload it names is gone with it, and both are named.
-  const checkout = path.join(scratch, 'removed-checkout');
-  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: HOST_BIN, payloadRoot: checkout }));
-  assert.match(checkRunAttemptsStuck(root).message, new RegExp(`\\(${path.join(checkout, 'src', 'run-supervisor', 'attempt-step.mjs')} is gone\\)`));
-
-  // A release that is still there is not blamed: adopt's own reason stands.
-  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: HOST_BIN }));
-  const blamed = checkRunAttemptsStuck(root);
-  assert.equal(blamed.passed, false, 'a stuck attempt adopt could close still fails');
-  assert.doesNotMatch(blamed.message, /was removed/);
-
-  // Other stuck attempts keep failing, and the removed release is still named next to them.
-  fs.writeFileSync(path.join(dir, 'envelope.json'), JSON.stringify({ v: 3, attemptId: 'att-gone', hostBin: gone }));
-  attemptDir(root, 'free');
-  const mixed = checkRunAttemptsStuck(root);
-  assert.equal(mixed.passed, false, mixed.message);
-  assert.match(mixed.message, /1 attempt\(s\) have no holder and no closed\.json: .*assignments\/free\/runs\/01/);
-  assert.match(mixed.message, /1 attempt\(s\) cannot be closed by adopt: .*the release that wrote it was removed/);
+test('run-attempts-stuck: a run from before the supervisor has no envelope or intent and is nothing to adopt', () => {
+  const root = workspace('stuck-legacy');
+  const dir = path.join(root, '.fgos', 'assignments', 'legacy', 'runs', '01');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'run.json'), '{}');
+  assert.equal(checkRunAttemptsStuck(root).message, 'no attempt waits to be closed');
+  fs.writeFileSync(path.join(dir, 'attempt-intent.json'), '{}');
+  assert.match(checkRunAttemptsStuck(root).message, /^warning: 1 attempt\(s\) have no holder/, 'the intent a controller left when it died before writing an envelope counts');
 });
 
 test('run-attempts-stuck: a held lock is a running attempt, not a finding', { skip: !HAS_FLOCK && 'util-linux flock missing' }, async () => {
-  process.env.FGOS_HOST_BIN = HOST_BIN;
   const root = workspace('stuck-held');
   const dir = attemptDir(root, 'held');
   const lock = path.join(dir, 'attempt.lock');
@@ -371,7 +263,7 @@ test('run-attempts-stuck: a held lock is a running attempt, not a finding', { sk
   }
   const res = checkRunAttemptsStuck(root);
   assert.equal(res.passed, true, res.message);
-  assert.match(res.message, /1 open attempt\(s\), none stuck \(1 running\)/);
+  assert.equal(res.message, '1 open attempt(s), all running');
   holder.kill('SIGKILL');
 });
 
@@ -392,27 +284,25 @@ function unitWithAttempt(root, unitRunId, { closed }) {
   return unitDir;
 }
 
-test('run-attempts-stuck: no unit passes; a unit with a closed attempt warns with the resume command and never fails', () => {
-  process.env.FGOS_HOST_BIN = HOST_BIN;
+test('run-attempts-stuck: no unit passes; a unit with a closed attempt warns with the count and never fails', () => {
   const root = workspace('units-awaiting');
   assert.equal(checkRunAttemptsStuck(root).message, 'no attempt waits to be closed');
   const unitDir = unitWithAttempt(root, 'unit-closed', { closed: true });
   const res = checkRunAttemptsStuck(root);
   assert.equal(res.passed, true, 'information, not a failure');
-  assert.match(res.message, /^warning: 1 unit run\(s\) await resume: "fgos run --resume unit-closed"/);
+  assert.match(res.message, /^warning: 0 attempt\(s\) have no holder and no closed\.json, 1 unit run\(s\) await resume;/);
 
   fs.writeFileSync(path.join(unitDir, 'unit-summary.json'), JSON.stringify({ outcome: 'pass' }));
   assert.equal(checkRunAttemptsStuck(root).message, 'no attempt waits to be closed');
 });
 
 test('run-attempts-stuck: a unit whose attempt is not closed is not awaiting resume', () => {
-  process.env.FGOS_HOST_BIN = HOST_BIN;
   const root = workspace('units-running');
   unitWithAttempt(root, 'unit-open', { closed: false });
   const run = path.join(root, '.fgos', 'assignments', 'unit-open/producer/1/runs/01');
   fs.writeFileSync(path.join(run, 'attempt.lock'), '');
   fs.writeFileSync(path.join(run, 'envelope.json'), JSON.stringify({ v: 3 }));
-  assert.doesNotMatch(checkRunAttemptsStuck(root).message, /await resume/, 'the open attempt is judged by the same scan and the unit is running');
+  assert.doesNotMatch(checkRunAttemptsStuck(root).message, /[1-9] unit run\(s\) await resume/, 'the unit with an open attempt is running');
 });
 
 test('the cancel wait reader shares the gate kill grace merge and refuses an unusable value', () => {

@@ -8,7 +8,7 @@
 
 import path from 'node:path';
 
-import { createTerminalControl, TerminalControlError } from '../terminal-control/client.mjs';
+import { createTerminalControl, scanTerminalAllocations, TerminalControlError } from '../terminal-control/client.mjs';
 import { resolveTerminalConfig, terminalConfigProblems, terminalRouteConfig } from '../terminal-control/config.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 
@@ -81,43 +81,13 @@ export function checkTerminalControl(repoRoot, { env = process.env, platform = p
 
 const isConfigRefusal = (err) => err instanceof TerminalControlError && ['terminal-control-route-usage', 'terminal-config-below-floor'].includes(err.code);
 
-const FINDING_TEXT = {
-  'allocated-not-launched-bare-shell': 'a slot was allocated but never launched and its pane is a bare shell',
-  'retain-expired': 'a retained pane is past its retain time',
-  'stale-incarnation': 'a record belongs to a herdr server that is gone',
-  unknown: 'a record could not be judged',
-};
-
 /**
- * terminal-allocations: slots past `allocationGraceMs` that never launched,
- * retained panes past their time. Reports only; nothing is closed.
+ * terminal-allocations: a read-only pointer. Counts the slots past `allocationGraceMs` that never launched and the
+ * retained panes past their time, from the scan `fgos dispatch inspect --terminal` reports; closes nothing.
  */
 export function checkTerminalAllocations(repoRoot, { globalConfigPath, terminalControl } = {}) {
-  const tc = terminalControl ?? createTerminalControl({ herdrBin: resolveHerdrBin() });
-  let defaults;
-  try {
-    ({ defaults } = tc.capabilities());
-  } catch (err) {
-    return { passed: true, message: `warning: the terminal-control route did not answer, allocations not scanned (${err.message})` };
-  }
-  let grace;
-  try {
-    grace = resolveTerminalConfig(path.resolve(repoRoot), { globalConfigPath, defaults }).values.allocationGraceMs;
-  } catch (err) {
-    return { passed: true, message: `warning: terminal.* unreadable, allocations not scanned: ${err.message}` };
-  }
-  if (!Number.isInteger(grace) || grace < 0) {
-    return { passed: true, message: 'warning: terminal.allocationGraceMs is invalid (see terminal-control), allocations not scanned' };
-  }
-  let scan;
-  try {
-    scan = tc.reconcileScan({ olderThanMs: grace });
-  } catch (err) {
-    return { passed: true, message: `warning: the terminal-control route did not answer, allocations not scanned (${err.message})` };
-  }
-  if (scan.result === 'unsupported') return { passed: true, message: `info: allocations not scanned: terminal mode is unsupported here (${scan.detail ?? scan.capability})` };
-  if (scan.result !== 'scan') return { passed: true, message: `warning: allocation scan answered ${scan.result}${scan.reason ? ` (${scan.reason})` : ''}` };
-  if (scan.findings.length === 0) return { passed: true, message: `no slot older than ${grace} ms is stuck and no retained pane is past its time` };
-  const lines = scan.findings.map((f) => `${f.key}${f.paneId ? ` (pane ${f.paneId})` : ''}: ${FINDING_TEXT[f.kind] ?? f.kind}${f.detail ? ` (${f.detail})` : ''}`);
-  return { passed: true, message: `warning: ${scan.findings.length} slot(s) need a person; nothing was closed: ${lines.join('; ')}` };
+  const scan = scanTerminalAllocations(repoRoot, { globalConfigPath, terminalControl: terminalControl ?? createTerminalControl({ herdrBin: resolveHerdrBin() }) });
+  if (scan.state === 'not-scanned') return { passed: true, message: `${scan.level}: ${scan.reason}` };
+  if (scan.findings.length === 0) return { passed: true, message: `no slot older than ${scan.graceMs} ms is stuck and no retained pane is past its time` };
+  return { passed: true, message: `warning: ${scan.findings.length} slot(s) need a person; nothing was closed; run \`fgos dispatch inspect --terminal\`` };
 }

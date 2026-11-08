@@ -2,6 +2,8 @@ import { inspectDispatchRuntime, validateInspectionSelector, withRunsCache } fro
 import { readMachineConfig } from '../../config/facade.mjs';
 import { inspectProviderCapacity } from '../../runner/dispatch/provider-capacity.mjs';
 import { readAttemptView } from './show-run.mjs';
+import { createTerminalControl, scanTerminalAllocations } from '../../terminal-control/client.mjs';
+import { resolveHerdrBin } from '../../runner/dispatch/terminal-slot.mjs';
 import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -34,6 +36,13 @@ export function inspectDispatchUseCase(ctx, options = {}) {
           // The machine's own runner (global file, accounts layer when unconfined, standard), never a project's.
           runnerConfig: readMachineConfig({ sections: ['runner'], globalDir: options.globalConfigPath ? path.dirname(options.globalConfigPath) : undefined }).value.runner,
           runtimeDir: options.runtimeDir,
+        });
+      }
+      if (options.terminal === true) {
+        // The terminal slots and retained panes that need a person; reads only, closing stays with adopt.
+        return scanTerminalAllocations(ctx?.repoRoot ?? ctx?.cwd ?? process.cwd(), {
+          globalConfigPath: options.globalConfigPath,
+          terminalControl: options.terminalControl ?? createTerminalControl({ herdrBin: resolveHerdrBin() }),
         });
       }
       validateInspectionSelector(options);

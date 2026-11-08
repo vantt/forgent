@@ -12,8 +12,10 @@
 // two processes on one group at worst make two same-named tabs, which is
 // harmless.
 
+import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
+import { resolveTerminalConfig } from './config.mjs';
 
 const PROTOCOL = 1;
 const DEFAULT_TIMEOUT_MS = 60_000;
@@ -231,4 +233,48 @@ export function createTerminalControl({ hostBin, herdrBin, env, config, timeoutM
     },
   };
   return client;
+}
+
+const FINDING_TEXT = {
+  'allocated-not-launched-bare-shell': 'a slot was allocated but never launched and its pane is a bare shell',
+  'retain-expired': 'a retained pane is past its retain time',
+  'stale-incarnation': 'a record belongs to a herdr server that is gone',
+  unknown: 'a record could not be judged',
+};
+
+/**
+ * What the terminal-control scan finds past `terminal.allocationGraceMs`: slots allocated but never launched,
+ * retained panes past their time, records of a herdr server that is gone. Reads only; nothing is closed (the
+ * repair stays adopt). `{ state: 'scanned', graceMs, findings }` with each finding's `key`, `paneId`, `kind`,
+ * `text` and `detail`, or `{ state: 'not-scanned', level: 'warning'|'info', reason }` when the route did not
+ * answer or the terminal config cannot be read.
+ */
+export function scanTerminalAllocations(repoRoot, { globalConfigPath, terminalControl } = {}) {
+  const notScanned = (level, reason) => ({ state: 'not-scanned', level, reason });
+  let defaults;
+  try {
+    ({ defaults } = terminalControl.capabilities());
+  } catch (err) {
+    return notScanned('warning', `the terminal-control route did not answer, allocations not scanned (${err.message})`);
+  }
+  let graceMs;
+  try {
+    graceMs = resolveTerminalConfig(path.resolve(repoRoot), { globalConfigPath, defaults }).values.allocationGraceMs;
+  } catch (err) {
+    return notScanned('warning', `terminal.* unreadable, allocations not scanned: ${err.message}`);
+  }
+  if (!Number.isInteger(graceMs) || graceMs < 0) return notScanned('warning', 'terminal.allocationGraceMs is invalid (see terminal-control), allocations not scanned');
+  let scan;
+  try {
+    scan = terminalControl.reconcileScan({ olderThanMs: graceMs });
+  } catch (err) {
+    return notScanned('warning', `the terminal-control route did not answer, allocations not scanned (${err.message})`);
+  }
+  if (scan.result === 'unsupported') return notScanned('info', `allocations not scanned: terminal mode is unsupported here (${scan.detail ?? scan.capability})`);
+  if (scan.result !== 'scan') return notScanned('warning', `allocation scan answered ${scan.result}${scan.reason ? ` (${scan.reason})` : ''}`);
+  return {
+    state: 'scanned',
+    graceMs,
+    findings: scan.findings.map((f) => ({ key: f.key, paneId: f.paneId ?? null, kind: f.kind, text: FINDING_TEXT[f.kind] ?? f.kind, detail: f.detail ?? null })),
+  };
 }

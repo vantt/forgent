@@ -6,6 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { resolveHostBin } from '../util/host-bin.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL, ATTEMPT_STEP_TIMEOUT_MS, MAX_ATTEMPT_STEPS } from './protocol.mjs';
+import { removeOrphanAttemptSockets } from './runtime-dir.mjs';
 
 // Strictly above the steps one attempt can run back to back, so a slow step ends itself first.
 const ROUTE_TIMEOUT_MS = ATTEMPT_STEP_TIMEOUT_MS * MAX_ATTEMPT_STEPS + 60 * 1000;
@@ -106,10 +107,12 @@ export function adoptScan({ assignmentsRoot, probeOnly = false, ...options }) {
  * The one door that cleans up after attempts nobody finished: adopt judges every attempt directory that
  * is not closed and finishes the steps a dead supervisor left. Only adopt's finalize-home step removes a
  * private home, and only while the attempt's lock is free and its process domain is empty.
- * `assignmentsRoot` absent: no attempt directories are looked at. An adopt failure never throws.
+ * `assignmentsRoot` absent: no attempt directories are looked at. The attempt sockets no supervisor holds any
+ * more are removed too (`socketOptions` names the runtime directory's environment for a caller that owns one).
+ * An adopt or cleanup failure never throws.
  * @returns {{adopt: Array<object>|null, adoptError: string|null}}
  */
-export function sweepAttempts({ assignmentsRoot, adoptOptions = {} } = {}) {
+export function sweepAttempts({ assignmentsRoot, adoptOptions = {}, socketOptions } = {}) {
   let adopt = null;
   let adoptError = null;
   if (assignmentsRoot) {
@@ -118,6 +121,11 @@ export function sweepAttempts({ assignmentsRoot, adoptOptions = {} } = {}) {
     } catch (err) {
       adoptError = err?.code ?? String(err?.message ?? err);
     }
+  }
+  try {
+    removeOrphanAttemptSockets(socketOptions);
+  } catch {
+    // a socket that cannot be removed is harmless until an attempt reuses its name
   }
   return { adopt, adoptError };
 }

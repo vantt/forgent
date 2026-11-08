@@ -13,7 +13,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { createTerminalControl, TerminalControlError } from '../../src/terminal-control/client.mjs';
+import { createTerminalControl, scanTerminalAllocations, TerminalControlError } from '../../src/terminal-control/client.mjs';
+import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { readStandardValue } from '../../src/config/facade.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -128,6 +129,32 @@ test('unknown keys and a missing herdr come back as results, not exceptions', ()
   const absent = createTerminalControl({ hostBin: HOST_BIN, herdrBin: path.join(scratch, 'no-herdr'), env: herdrEnv });
   const refused = absent.allocate({ key: 'k-absent', groupKey: 'g-absent', display: { title: 'x' } });
   assert.equal(refused.result, 'unsupported');
+});
+
+test('the allocation scan names a slot allocated and never launched, closes nothing, and says why it did not scan', () => {
+  // The recorded fixture of a pane that runs nothing but its shell.
+  const bareShell = path.join(scratch, 'herdr-bare-shell.sh');
+  const fixtures = path.dirname(FAKE_HERDR);
+  fs.writeFileSync(bareShell, `#!/bin/sh\nif [ "$1" = pane ] && [ "$2" = process-info ]; then cat "${fixtures}/pane-process-info-shell.json"; exit 0; fi\nexec "${FAKE_HERDR}" "$@"\n`, { mode: 0o755 });
+  const tc = client({ herdrBin: bareShell, config: { allocationGraceMs: 0 } });
+  assert.equal(tc.allocate({ key: 'scan-stuck-slot', groupKey: 'scan-group', display: { title: 'stuck', role: 'worker' } }).result, 'slot');
+  const root = path.join(scratch, 'scan-workspace');
+  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  writeProjectConfig(root, { terminal: { allocationGraceMs: 1 } });
+  const noGlobal = path.join(scratch, 'no-global-config.json');
+  const closesBefore = calls().filter((c) => c.startsWith('pane close')).length;
+  const scan = scanTerminalAllocations(root, { globalConfigPath: noGlobal, terminalControl: tc });
+  assert.equal(scan.state, 'scanned');
+  assert.equal(scan.graceMs, 1);
+  const finding = scan.findings.find((f) => f.key === 'scan-stuck-slot');
+  assert.equal(finding.kind, 'allocated-not-launched-bare-shell');
+  assert.match(finding.text, /^a slot was allocated but never launched/);
+  assert.equal(calls().filter((c) => c.startsWith('pane close')).length, closesBefore, 'the scan must not close anything');
+
+  const absent = createTerminalControl({ hostBin: HOST_BIN, herdrBin: path.join(scratch, 'no-herdr'), env: herdrEnv });
+  const unscanned = scanTerminalAllocations(root, { globalConfigPath: noGlobal, terminalControl: absent });
+  assert.equal(unscanned.state, 'not-scanned');
+  assert.match(unscanned.level, /^(info|warning)$/);
 });
 
 test('a bad request or a wrong protocol throws a named error', () => {
