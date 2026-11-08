@@ -178,3 +178,28 @@ test('a gate answer never reaches a milestone whose rule needs a verify receipt,
   assert.equal(p.milestones.integrated.state, 'unreached');
   assert.equal(p.milestones['child-built'].state, 'unreached');
 });
+
+test('a milestone reached by a settle and by a gate answer for the same subject keeps both receipts and its consent, in either order', () => {
+  const verdict = { kind: 'verdict', evaluator: 'reviewer-verdict', passed: true, milestone: 'approved', subjectDigest: 'sha256:tree' };
+  const answerEvent = (digest) => ({ type: 'gate.answer', payload: { stepId: 'approve-gate', answer: 'yes', approved: true, subjectDigest: digest, answeredAt: '2026-11-08T00:00:00.000Z' } });
+  const settled = (id) => [reserve(id, 'approve-gate'), settle(id, { milestone: 'approved', subjectDigest: 'sha256:tree', receipts: [verdict], activity: 'approve-gate' })];
+  const evaluatorsOf = (events) => {
+    const run = openCase();
+    appendAll(run, events);
+    const entry = projectionOf(run).milestones.approved;
+    return { entry, evaluators: (entry.receipts ?? []).map((r) => r.evaluator) };
+  };
+
+  const answerThenSettle = evaluatorsOf([answerEvent('sha256:tree'), ...settled('r1')]);
+  assert.deepEqual(answerThenSettle.evaluators.sort(), ['gate-answer', 'reviewer-verdict']);
+  assert.equal(answerThenSettle.entry.consent, true, 'a later settle does not drop the consent a gate answer gave');
+
+  const settleThenAnswer = evaluatorsOf([...settled('r1'), answerEvent('sha256:tree')]);
+  assert.deepEqual(settleThenAnswer.evaluators.sort(), ['gate-answer', 'reviewer-verdict']);
+  assert.equal(settleThenAnswer.entry.consent, true);
+
+  // Another subject is another milestone state: nothing an earlier digest earned is carried over.
+  const changed = evaluatorsOf([answerEvent('sha256:old'), ...settled('r1')]);
+  assert.deepEqual(changed.evaluators, ['reviewer-verdict']);
+  assert.equal(changed.entry.consent, undefined);
+});

@@ -16,6 +16,7 @@ import { readWorkflowEvents } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -33,6 +34,10 @@ const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8',
 function setup() {
   const tmp = setupWorkflowFixtureRepo({ prefix: 'fgos-propose-', readme: '# Propose', gitName: 'Propose Test', capabilities: ['advise', 'review', 'code:implement', 'docs:write'], workerBody: WORKER_BODY });
   fs.appendFileSync(path.join(tmp, '.gitignore'), '.fgos/\n*.mjs\n');
+  // The project declares the command its final gate runs.
+  const cfg = readProjectConfig(tmp);
+  cfg.runner.capabilities['code:implement'].verify = 'node --version';
+  writeProjectConfig(tmp, cfg);
   fs.cpSync(path.join(REPO, 'domains', 'coding'), path.join(tmp, 'domains', 'coding'), { recursive: true });
   for (const [file, text] of Object.entries({ 'src/a.mjs': 'export const a = 1;\n', 'docs/note.md': '# note\n', 'plans/p/plan.md': '# plan\n' })) {
     fs.mkdirSync(path.dirname(path.join(tmp, file)), { recursive: true });
@@ -53,7 +58,6 @@ test('the proposal writes nothing, and the lines it generates are accepted by th
   const slices = path.join(tmp, 'slices.json');
   fs.writeFileSync(slices, JSON.stringify({
     request: 'Add the note and tweak the code',
-    gate: 'node --version',
     slices: [
       { id: 'note', objective: 'Write the note', writes: ['docs/note.md'], verify: 'node --version' },
       { id: 'code', objective: 'Change the code', writes: ['src/a.mjs'], verify: 'node --version', dependsOn: ['note'] },
@@ -112,7 +116,7 @@ test('the proposal writes nothing, and the lines it generates are accepted by th
 test('propose refuses by name and exits non-zero, with the reason in the answer', () => {
   const tmp = setup();
   const slices = path.join(tmp, 'slices.json');
-  fs.writeFileSync(slices, JSON.stringify({ gate: 'node --version', slices: [{ id: 'all', objective: 'Everything', writes: ['.'], verify: 'node --version' }] }));
+  fs.writeFileSync(slices, JSON.stringify({ slices: [{ id: 'all', objective: 'Everything', writes: ['.'], verify: 'node --version' }] }));
   const refused = fgos(tmp, ['workflow', 'propose', '--slices', slices, '--plan', 'plans/p/plan.md', '--json']);
   assert.notEqual(refused.status, 0);
   const proposal = JSON.parse(refused.stdout).data;

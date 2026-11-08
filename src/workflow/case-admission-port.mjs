@@ -134,6 +134,11 @@ const writable = (dir) => {
   }
 };
 
+export const CONFINED_WRITE_CODE = 'nested-write-from-confined-worker';
+
+/** The sentence a write from a confined worker is refused with. */
+export const confinedWriteText = (why) => `a writing dispatch from inside a confined worker is refused: ${why}; a confined worker may dispatch read-only work only`;
+
 /** Whether this process may write a case's ledger and bindings: a masked or read-only view cannot. */
 export function confinedWriteRefusal({ mainRoot, caseId = null }) {
   if (currentDispatchDepth() === 0) return null;
@@ -222,14 +227,14 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
     }
   };
 
-  const confinedRefusal = (why) => refusal('nested-write-from-confined-worker', `a writing dispatch from inside a confined worker is refused: ${why}; a confined worker may dispatch read-only work only`);
+  const confinedRefusal = (why) => refusal(CONFINED_WRITE_CODE, confinedWriteText(why));
 
   return {
     resolveBinding({ worktree, caseId: asked = null }) {
       // No case is named. A call that carries case variables, or a masked view, is not standalone.
       if (asked === null && caseId === null) {
         const confined = confinedWriteRefusal({ mainRoot });
-        if (confined) return { answer: 'nested-write-from-confined-worker', condition: confinedRefusal(confined).refused.condition };
+        if (confined) return { answer: CONFINED_WRITE_CODE, condition: confinedRefusal(confined).refused.condition };
         const claimed = caseEnvOf(env);
         if (claimed) {
           return { answer: 'authority-context-invalid', condition: claimed.malformed
@@ -243,7 +248,7 @@ export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance =
         return { answer: 'bound-worktree-requires-case-authority', ...(binding.record ? { record: binding.record } : {}), condition: `worktree ${worktree} is bound to case ${owner}; a writing run there must name it: --case ${owner} --activity <id>` };
       }
       if (binding.answer === 'binding-view-unavailable' && currentDispatchDepth() > 0) {
-        return { answer: 'nested-write-from-confined-worker', condition: confinedRefusal('it cannot see the real bindings directory').refused.condition };
+        return { answer: CONFINED_WRITE_CODE, condition: confinedRefusal('it cannot see the real bindings directory').refused.condition };
       }
       return { answer: binding.answer, ...(binding.record ? { record: binding.record } : {}) };
     },

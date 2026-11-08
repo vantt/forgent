@@ -13,6 +13,7 @@ import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
 import { gateAnswerFile } from '../runner/execution/handoff-refs.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
+import { gateOfStep } from './case-projection.mjs';
 import { unbindWorktree } from './case-bindings.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
@@ -98,10 +99,37 @@ function roundsDir(mainRoot, caseId, stepId) {
   return { file, dir: file.replace(/\.md$/, '.rounds') };
 }
 
+/** The rounds kept under the gate directory of `stepId`, each with `source`: the gate directory and file it was read from. */
 function roundsOf(mainRoot, caseId, stepId) {
   const { dir } = roundsDir(mainRoot, caseId, stepId);
-  return listJson(dir).map((name) => readJson(path.join(dir, name))).filter(Boolean)
+  return listJson(dir).map((name) => {
+    const record = readJson(path.join(dir, name));
+    return record && typeof record === 'object' ? { ...record, source: { stepId, file: name } } : null;
+  }).filter(Boolean)
     .sort((a, b) => a.occurrence - b.occurrence || a.round - b.round);
+}
+
+/**
+ * Why a round cannot be folded into the ledger now, or null. The one predicate the answer verb and the drain
+ * share: the round is a file of its own gate (directory and name agree with what it says), the step is a gate
+ * of the guide, the round answers the gate's open occurrence (asked and not settled since), it has the gate's
+ * mode. The subject it approves is not judged here: an approval of a subject that has since changed is
+ * folded and then found stale by the admission guard, which asks the gate again.
+ */
+function roundProblem({ events, round }) {
+  const { stepId, occurrence } = round;
+  if (round.source.stepId !== stepId) return `its file is kept under gate "${round.source.stepId}", not "${stepId}"`;
+  if (round.source.file !== `${occurrence}-${round.round}.json`) return `its file name ${round.source.file} disagrees with occurrence ${occurrence} round ${round.round}`;
+  const gate = gateOfStep(events, stepId);
+  if (!gate) return `"${stepId}" is no gate of the guide`;
+  if ((round.mode ?? 'consent') !== gate.mode) return `it was given in ${round.mode} mode to a ${gate.mode} gate`;
+  const parks = events.filter((e) => e.type === 'gate.park' && e.payload?.stepId === stepId);
+  if (parks.length === 0 || occurrence !== parks.length) return `it answers occurrence ${occurrence}, not the gate's open one (${parks.length})`;
+  const lastParkSeq = parks.at(-1).seq ?? 0;
+  if (events.some((e) => e.type === 'gate.answer' && e.payload?.stepId === stepId && e.seq > lastParkSeq && (gate.mode === 'input' || e.payload.approved === true))) {
+    return 'the gate is already answered and has not been asked again';
+  }
+  return null;
 }
 
 /** The text of an answer file, drawn from its rounds. A view: deleting it loses nothing. */
@@ -176,14 +204,16 @@ export function recordGateAnswerRound({ mainRoot, caseId, events, stepId, answer
   const occurrence = parks.length;
   const lastParkSeq = parks.at(-1)?.seq ?? 0;
   const settlesNow = mode === 'input' || approved === true;
-  const rounds = roundsOf(mainRoot, caseId, stepId).filter((r) => r.occurrence === occurrence);
+  const kept = roundsOf(mainRoot, caseId, stepId).filter((r) => r.occurrence === occurrence);
+  // A round the drain would refuse never reaches the ledger, so it neither settles the gate nor blocks the next answer.
+  const live = kept.filter((r) => roundConsumed(events, r) || roundProblem({ events, round: r }) === null);
   const settledInLedger = events.some((e) => e.type === 'gate.answer' && e.payload?.stepId === stepId && e.seq > lastParkSeq
     && ((e.payload.mode ?? mode) === 'input' || e.payload.approved === true));
-  if (settledInLedger || rounds.some((r) => r.settles)) {
+  if (settledInLedger || live.some((r) => r.settles)) {
     throw new RunnerConfigError(`gate "${stepId}" of "${caseId}" is already answered (an approval is never replaced); it can be answered again only when it parks again`, { code: 'gate-already-answered' });
   }
-  const last = rounds.at(-1);
-  if (last && !roundConsumed(events, last)) {
+  const last = kept.at(-1);
+  if (last && live.includes(last) && !roundConsumed(events, last)) {
     throw new RunnerConfigError(`an earlier answer to gate "${stepId}" is not yet recorded on the ledger; wait for it before answering again`, { code: 'gate-already-answered' });
   }
   const round = (last?.round ?? 0) + 1;
@@ -214,11 +244,13 @@ export function unconsumedGateRounds(mainRoot, caseId, events) {
  * take it, then gate-answer rounds nobody recorded yet. Idempotent: a settle or round already on the
  * ledger is skipped.
  *
- * @returns {{ settles: number, answers: number }}
+ * A round that fails `roundProblem` stays unfolded and is listed in `refused`.
+ *
+ * @returns {{ settles: number, answers: number, refused: Array<{ stepId: string, occurrence: number, round: number, problem: string }> }}
  */
 export function drainCaseInbox({ mainRoot, caseId, hold }) {
   const inbox = [settlePendingDir(mainRoot, caseId), path.join(caseDir(mainRoot, caseId), 'gate-answers')];
-  if (!inbox.some((dir) => fs.existsSync(dir))) return { settles: 0, answers: 0 };
+  if (!inbox.some((dir) => fs.existsSync(dir))) return { settles: 0, answers: 0, refused: [] };
   let events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId });
   const append = (event) => {
     const stored = appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId: caseId, event, hold });
@@ -237,7 +269,13 @@ export function drainCaseInbox({ mainRoot, caseId, hold }) {
   }
 
   const steps = new Set();
+  const refused = [];
   for (const round of unconsumedGateRounds(mainRoot, caseId, events)) {
+    const problem = roundProblem({ events, round });
+    if (problem) {
+      refused.push({ stepId: round.stepId, occurrence: round.occurrence, round: round.round, problem });
+      continue;
+    }
     append({
       type: 'gate.answer',
       payload: {
@@ -255,5 +293,5 @@ export function drainCaseInbox({ mainRoot, caseId, hold }) {
     answers += 1;
   }
   for (const stepId of steps) renderGateAnswerFile(mainRoot, caseId, stepId);
-  return { settles, answers };
+  return { settles, answers, refused };
 }

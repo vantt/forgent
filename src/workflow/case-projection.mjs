@@ -37,6 +37,23 @@ export function isDeliveryMilestone(guide, milestoneId) {
   return (guide?.must ?? []).some((row) => row.guard === 'verify-receipt' && row.subject === milestoneId);
 }
 
+/**
+ * The gate of the guide that `stepId` names, or null when it names none: a step of the Workflow that carries a
+ * `gate`, or an activity a guide decision point lists under a `gate:` of its own (that point's mode). Nothing
+ * else can be answered, so a worker cannot invent one.
+ *
+ * @param {Array<object>} events the ledger
+ * @param {string} stepId
+ * @returns {{ mode: 'consent' | 'input', question?: string } | null}
+ */
+export function gateOfStep(events, stepId) {
+  const stepGate = projectWorkflowState(events).steps[stepId]?.gate;
+  if (stepGate) return { ...stepGate, mode: stepGate.mode === 'input' ? 'input' : 'consent' };
+  const guide = guideOf(events.find((e) => e.type === 'workflow.start')?.payload);
+  const point = (guide?.decisions ?? []).find((d) => d.gate && [...d.should, ...d.mayInstead].includes(stepId));
+  return point ? { mode: point.gate === 'input' ? 'input' : 'consent' } : null;
+}
+
 function guideOf(startPayload) {
   const workflow = startPayload?.workflow;
   if (!workflow) return null;
@@ -78,9 +95,23 @@ export function projectCase(events, { currentDigests = {} } = {}) {
 
   const milestones = {};
   for (const m of guide?.milestones ?? []) milestones[m.id] = { state: 'unreached' };
+  // A milestone reached again for the same subject keeps what an earlier guard left on it: the receipts of a
+  // settle and of a gate answer sit side by side, and consent once given is not dropped by a later receipt.
   const achieve = (id, digest, extra = {}) => {
     if (!(id in milestones)) return;
-    milestones[id] = { state: 'achieved', digest: digest ?? null, ...extra };
+    const prior = milestones[id];
+    const same = prior.state === 'achieved' && prior.digest === (digest ?? null);
+    const { receipt, ...fields } = extra;
+    const receipts = [...(same ? prior.receipts ?? [] : []), ...(fields.receipts ?? []), ...(receipt ? [receipt] : [])];
+    const consent = (same && prior.consent === true) || fields.consent === true;
+    milestones[id] = {
+      ...(same ? prior : {}),
+      state: 'achieved',
+      digest: digest ?? null,
+      ...fields,
+      ...(receipts.length > 0 || fields.receipts !== undefined ? { receipts } : {}),
+      ...(fields.consent !== undefined || (same && prior.consent !== undefined) ? { consent } : {}),
+    };
   };
   const achieveIfUnreached = (id, digest) => {
     if (milestones[id]?.state === 'unreached') achieve(id, digest);

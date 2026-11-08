@@ -363,3 +363,33 @@ test('answer refuses by name a step that is no gate of the run, and a gate that 
   await assert.rejects(answerWorkflow(id, { ...opts(tmp), stepId: 'second', answer: 'yes', approved: true }), (err) => err.code === 'gate-not-parked' && /second/.test(err.message));
   assert.ok(!eventsOf(tmp, id).some((e) => e.type === 'gate.answer'), 'no answer reached the ledger');
 });
+
+test('answer refuses a caller inside a dispatched worker even when its views of the ledger are writable, and keeps no round', async () => {
+  const tmp = setupRepo();
+  const workflow = validateWorkflow({ id: 'answer-depth', steps: [{ id: 'first', gate: { kind: 'human', question: 'First?' } }] });
+  const { workflowRunId: id } = await startWorkflow({ workflow, ...opts(tmp) });
+  const before = process.env.FGOS_DISPATCH_DEPTH;
+  process.env.FGOS_DISPATCH_DEPTH = '1';
+  try {
+    await assert.rejects(answerWorkflow(id, { ...opts(tmp), stepId: 'first', answer: 'yes', approved: true }), (err) => err.code === 'nested-write-from-confined-worker' && /confined worker/.test(err.message));
+  } finally {
+    if (before === undefined) delete process.env.FGOS_DISPATCH_DEPTH;
+    else process.env.FGOS_DISPATCH_DEPTH = before;
+  }
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs', id, 'gate-answers')), false, 'no round file was made');
+  const answered = await answerWorkflow(id, { ...opts(tmp), stepId: 'first', answer: 'yes', approved: true });
+  assert.equal(answered.status, 'completed', 'the owner, outside any worker, can answer');
+});
+
+test('answer accepts the activity of a decision point that carries a gate, and refuses an activity no gate names', async () => {
+  const tmp = setupRepo();
+  const workflow = conductorWorkflow({ decisions: [{ at: 'integrated', mayInstead: ['approve-gate'], gate: 'consent' }] });
+  const started = await startWorkflow({ workflow, request: 'Ship the change', frame: { dispatches: 6, rigorFloor: 'standard' }, ...opts(tmp) });
+  const run = { repoRoot: tmp, caseId: started.caseId };
+  appendAll(run, [{ type: 'gate.park', payload: { stepId: 'approve-gate', question: 'Approve the integrated tree?' } }]);
+
+  await assert.rejects(answerWorkflow(run.caseId, { ...opts(tmp), stepId: 'publish', answer: 'yes', approved: true }), (err) => err.code === 'gate-unknown' && /publish/.test(err.message));
+  await answerWorkflow(run.caseId, { ...opts(tmp), stepId: 'approve-gate', answer: 'yes', approved: true });
+  const answers = eventsOf(tmp, run.caseId).filter((e) => e.type === 'gate.answer');
+  assert.deepEqual(answers.map((e) => [e.payload.stepId, e.payload.mode]), [['approve-gate', 'consent']]);
+});

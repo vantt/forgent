@@ -20,6 +20,9 @@ import {
   workflowRunDirOf,
 } from './case-lock.mjs';
 import { drainCaseInbox, recordGateAnswerRound } from './case-runtime.mjs';
+import { gateOfStep } from './case-projection.mjs';
+import { CONFINED_WRITE_CODE, confinedWriteRefusal, confinedWriteText } from './case-admission-port.mjs';
+import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { closeCaseUnderHold, readCaseProjection } from './case-close.mjs';
 import { detachedResult, openCaseOnLedger, prepareWorkflowRun, refundIfNotOpened, spawnDetachedAdvance } from './case-start.mjs';
 import { runCaseGate } from './case-gate.mjs';
@@ -168,8 +171,12 @@ export function statusWorkflow(workflowRunId, options = {}) {
 function recordAnswer(workflowRunId, params, mainRoot) {
   if (!params.stepId) throw new RunnerConfigError('answerWorkflow requires stepId');
   if (params.answer === undefined) throw new RunnerConfigError('answerWorkflow requires answer');
+  // An answer is the owner's consent: no dispatched worker gives one, whatever its views of the ledger allow.
+  if (currentDispatchDepth() > 0) {
+    throw new RunnerConfigError(confinedWriteText(confinedWriteRefusal({ mainRoot, caseId: workflowRunId }) ?? 'a gate answer is the owner\'s, never a worker\'s'), { code: CONFINED_WRITE_CODE });
+  }
   const { events, state } = readCase(mainRoot, workflowRunId);
-  const gate = state.workflow.steps.find((s) => s.id === params.stepId)?.gate;
+  const gate = gateOfStep(events, params.stepId);
   if (!gate) throw new RunnerConfigError(`step "${params.stepId}" of "${workflowRunId}" is not a gate; a gate answer needs a gate`, { code: 'gate-unknown' });
   recordGateAnswerRound({
     mainRoot,
@@ -179,7 +186,7 @@ function recordAnswer(workflowRunId, params, mainRoot) {
     answer: String(params.answer),
     approved: params.approved === true || params.approved === 'true',
     question: state.questions.find((q) => q.stepId === params.stepId)?.question ?? gate.question ?? '',
-    mode: gate.mode === 'input' ? 'input' : 'consent',
+    mode: gate.mode,
     subjectDigest: stepSubjectDigest({ state, workflow: state.workflow, stepId: params.stepId, mainRoot }),
   });
   return state;

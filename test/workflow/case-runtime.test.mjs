@@ -158,3 +158,54 @@ test('a gate that has not parked yet is refused by name and keeps no round', () 
   assert.equal(unconsumedGateRounds(twoGates.repoRoot, twoGates.caseId, eventsOf(twoGates)).length, 0, 'no round was kept');
   assert.deepEqual(answer(twoGates, { stepId: 'g1', question: 'one?' }), { stepId: 'g1', occurrence: 1, round: 1, settles: true });
 });
+
+/** Plant a round file the way a process that can write the case directory but not the ledger would. */
+function plant(run, dirStep, name, record) {
+  const dir = path.join(run.repoRoot, '.fgos', 'workflow-runs', run.caseId, 'gate-answers', `${dirStep}.rounds`);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, name), JSON.stringify({ stepId: dirStep, occurrence: 1, round: 1, answer: 'planted', approved: true, settles: true, mode: 'consent', question: 'Approve the copy?', subjectDigest: null, answeredAt: '2026-11-08T00:00:00.000Z', ...record }));
+}
+// Taking advance already drains, so a file is planted while advance is held and drained from that same hold.
+const drain = (run, planted = () => {}) => withHold(run, (hold) => {
+  planted();
+  return drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold });
+});
+const answersOf = (run) => eventsOf(run).filter((e) => e.type === 'gate.answer');
+
+test('the drain leaves a planted round unfolded and names why: not a gate, not the open occurrence, a name or directory that disagrees', () => {
+  const run = gatedRun();
+  const drained = drain(run, () => {
+    plant(run, 'a', '1-1.json', {});
+    plant(run, 'ok', '2-1.json', { occurrence: 2 });
+    plant(run, 'ok', '1-7.json', {});
+    plant(run, 'other', '1-1.json', { stepId: 'ok' });
+  });
+  assert.equal(drained.answers, 0);
+  assert.equal(answersOf(run).length, 0, 'nothing a planted file says reached the ledger');
+  assert.equal(drained.refused.length, 4);
+  assert.ok(drained.refused.some((r) => r.stepId === 'a' && /no gate of the guide/.test(r.problem)));
+  assert.ok(drained.refused.some((r) => r.occurrence === 2 && /open one/.test(r.problem)));
+  assert.ok(drained.refused.some((r) => /disagrees/.test(r.problem)));
+  assert.ok(drained.refused.some((r) => /kept under gate "other"/.test(r.problem)));
+
+  // A refused file neither settles the gate nor blocks the owner's real answer; that one is folded.
+  assert.deepEqual(answer(run, { subjectDigest: null }), { stepId: 'ok', occurrence: 1, round: 2, settles: true });
+  drain(run);
+  assert.equal(answersOf(run).length, 1);
+});
+
+test('a second settling round for a gate that is already answered is not folded until the gate parks again', () => {
+  const run = gatedRun();
+  answer(run, { subjectDigest: null });
+  drain(run);
+  assert.equal(answersOf(run).length, 1);
+
+  const again = drain(run, () => plant(run, 'ok', '1-2.json', { round: 2 }));
+  assert.equal(again.answers, 0);
+  assert.match(again.refused[0].problem, /already answered/);
+  assert.equal(answersOf(run).length, 1);
+
+  withHold(run, (hold) => append(run, hold, 'gate.park', { stepId: 'ok', question: 'Approve the new copy?' }));
+  drain(run, () => plant(run, 'ok', '2-1.json', { occurrence: 2, round: 1 }));
+  assert.equal(answersOf(run).length, 2, 'asked again, the gate takes an answer to its new occurrence');
+});
