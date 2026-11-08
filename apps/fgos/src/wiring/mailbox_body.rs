@@ -7,13 +7,13 @@
 //! The mirror is filled by [`fetch`], which the sync child runs after the Event Store sync and
 //! before ingest: events first, then bodies, so a header never waits on a body that the same sync
 //! could have brought.
-use fgos_event_store::locks::{APPEND_WAIT_MS, SEAL_NAME};
+use fgos_event_store::locks::SEAL_NAME;
 use fgos_git::{
     granted_fetch_mappings, publication_fetch_mappings, CommitInput, ExpectedTip, HolderAuthority,
     Identity, Inspect, ObjectType, Oid, PathValue, Publication, PublicationPort, PushOutcome,
     RefName, RefValue, RemoteGrant, RepoHandle, TreeEntry,
 };
-use fgos_holder_lock::{Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
+use fgos_holder_lock::{Acquire, Handle, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -115,15 +115,7 @@ fn on_body_ref<T>(
     let pinned_url = fgos_event_store::refspec::pinned_url(&clone.driver, &clone.repo, remote)
         .map_err(|e| e.to_string())?;
     let seal = clone.layout.seal_lock();
-    let mut handle = match fgos_holder_lock::acquire(
-        &Resource::new(SEAL_NAME, seal.clone()),
-        Mode::Ex,
-        Wait::Ms(APPEND_WAIT_MS),
-        DEFAULT_KILL_WAIT_MS,
-    ) {
-        Acquire::Acquired(handle) => handle,
-        other => return Err(format!("event-seal not taken: {other:?}")),
-    };
+    let mut handle = take_seal(&seal, SEAL_WAIT)?;
     let done = (|| {
         let authority = HolderAuthority::new(
             &clone.repo,
@@ -150,6 +142,27 @@ fn on_body_ref<T>(
         (Err(why), _) => Err(why),
         (Ok(value), fgos_holder_lock::Release::Released { .. }) => Ok(value),
         (Ok(_), stuck) => Err(format!("event-seal release: {stuck:?}")),
+    }
+}
+
+/// How long a body transfer waits for the `event-seal` before it gives up. The Event Store sync
+/// holds the seal across its own fetch and push, and the sync child runs the body fetch and a
+/// rotation under it in turn: on a loaded machine one such hold lasts well over the 5 s an append
+/// waits (a whole `events sync` took 6 to 12 s at load 16), and a rotation's two transfers are each
+/// bounded by [`PUSH_TIMEOUT`]. A send that lands on a sync therefore waits for it to finish
+/// instead of refusing; only a seal held past this bound refuses the transfer.
+const SEAL_WAIT: Duration = Duration::from_secs(60);
+
+/// Takes the `event-seal` at `seal`, waiting up to `wait` for another holder to release it.
+fn take_seal(seal: &Path, wait: Duration) -> Result<Handle, String> {
+    match fgos_holder_lock::acquire(
+        &Resource::new(SEAL_NAME, seal.to_path_buf()),
+        Mode::Ex,
+        Wait::Ms(u64::try_from(wait.as_millis()).unwrap_or(u64::MAX)),
+        DEFAULT_KILL_WAIT_MS,
+    ) {
+        Acquire::Acquired(handle) => Ok(handle),
+        other => Err(format!("event-seal not taken: {other:?}")),
     }
 }
 
@@ -923,6 +936,46 @@ mod tests {
         );
         drop(port);
         let _ = fgos_holder_lock::release(handle);
+        let _ = std::fs::remove_dir_all(&t);
+    }
+
+    /// A transfer waits for a seal another process holds and takes it once it is free; a seal held
+    /// past the wait is refused with the seal named.
+    #[test]
+    fn a_seal_is_waited_for_up_to_the_bound_and_refused_past_it() {
+        use super::take_seal;
+        use fgos_holder_lock::{acquire, release, Acquire, Mode, Resource, Wait};
+        use std::os::unix::fs::DirBuilderExt;
+        use std::time::Duration;
+
+        let t = std::env::temp_dir().join(format!("fgos-body-seal-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&t);
+        std::fs::DirBuilder::new().mode(0o700).create(&t).unwrap();
+        let seal = t.join("seal.lock");
+        let hold = || match acquire(
+            &Resource::new("event-seal", &seal),
+            Mode::Ex,
+            Wait::Try,
+            2_000,
+        ) {
+            Acquire::Acquired(handle) => handle,
+            other => panic!("{other:?}"),
+        };
+
+        let holder = hold();
+        let freed = std::thread::spawn(move || {
+            std::thread::sleep(Duration::from_millis(1_500));
+            let _ = release(holder);
+        });
+        let taken = take_seal(&seal, Duration::from_secs(20));
+        freed.join().unwrap();
+        let handle = taken.expect("a hold that ends within the wait is waited out");
+        let _ = release(handle);
+
+        let holder = hold();
+        let why = take_seal(&seal, Duration::from_millis(300)).unwrap_err();
+        let _ = release(holder);
+        assert!(why.starts_with("event-seal not taken: Timeout"), "{why}");
         let _ = std::fs::remove_dir_all(&t);
     }
 

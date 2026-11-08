@@ -2736,6 +2736,56 @@ fn a_body_push_the_remote_refuses_leaves_the_send_unrecorded_and_no_header_publi
     assert_eq!(cross.beta.message_states().len(), 1);
 }
 
+/// A sync of the same clone holds the event seal for as long as its fetch and push take, which on a
+/// loaded machine is longer than an append waits. A send that lands on it waits for the seal instead
+/// of refusing: the body is on the remote and the event is recorded once the seal is free.
+#[test]
+fn a_send_with_the_body_ref_on_waits_out_a_seal_held_longer_than_an_append_waits() {
+    use fgos_event_store::layout::Layout;
+    use fgos_holder_lock::{acquire, release, Acquire, Mode, Resource, Wait};
+    let cross = two_machines();
+    confirm_alpha_on_beta(&cross);
+    install_body_mapping(&cross);
+    turn_on_body_ref(&cross);
+    let layout = Layout::from_common_dir(Some(&cross.alpha.main().join(".git"))).unwrap();
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(layout.seal_lock().parent().unwrap())
+            .unwrap();
+    }
+    let holder = match acquire(
+        &Resource::new("event-seal", layout.seal_lock()),
+        Mode::Ex,
+        Wait::Try,
+        2_000,
+    ) {
+        Acquire::Acquired(handle) => handle,
+        other => panic!("{other:?}"),
+    };
+    let held = std::time::Instant::now();
+    let freed = std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_secs(8));
+        let _ = release(holder);
+    });
+    let body = "body sent while a sync holds the seal";
+    let out = alpha_send(&cross, &[body]);
+    freed.join().unwrap();
+    let text = String::from_utf8_lossy(&out.stdout).into_owned();
+    assert_eq!(out.status.code(), Some(0), "{text} {out:?}");
+    assert!(
+        held.elapsed() >= std::time::Duration::from_secs(8),
+        "the send ended before the seal was free"
+    );
+    assert_eq!(
+        remote_body(&cross, &sha256_hex(body)).as_deref(),
+        Some(body)
+    );
+    assert_eq!(sent_events(&cross.alpha_root, &cross.alpha.main()).len(), 1);
+}
+
 /// A clone without the mail-body fetch mapping cannot tell a gone body from one it never fetched, so
 /// the header is held: the origin's cursor stays before it, nothing is refused to the sender, and the
 /// mail after it is still taken, once, however often it is read again. When the mapping is installed
