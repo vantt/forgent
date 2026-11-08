@@ -63,7 +63,7 @@ Main `fd476d709` (2026-11-06 12:16 Asia/Saigon, fg-server2). Every `file:line` b
 | 01 | [Defects and red proofs](phase-01-defects-and-red-proofs.md) **landed 11-06 `26cac4ef4`** | HARDEN (ES) | — | — | −20 / +0 / +40 |
 | 02 | [Dead and duplicate rows deleted](phase-02-dead-and-duplicate-rows.md) **landed 11-06 `ff6947580`** | HARDEN (ES, CFG, OPC) | 01 | — | −420 / 0 / −250 |
 | 03 | [Repo rows to npm test and release check](phase-03-repo-rows-to-tests.md) **landed 11-08 `35d7745d1`** | HARDEN (TEST, DOC, OPC for census) | 02 | — | −300 / 0 / −100 |
-| 04 | [Git read-and-recover door](phase-04-git-status-recover-door.md) | HARDEN (OPC) | 03 | — | +120 / 0 / +40 |
+| 04 | [Git read-and-recover door](phase-04-git-status-recover-door.md) **landed 11-08 `85e081b59`** | HARDEN (OPC) | 03 | — | +120 / 0 / +40 |
 | 05 | [Knowledge rows to knowledge verbs](phase-05-knowledge-rows-to-knowledge-verbs.md) | HARDEN (DOC) | 04 | — | −120 / 0 / −60 |
 | 06 | [Git doctor cut and pointer](phase-06-git-doctor-cut.md) | HARDEN (OPC) | 04 landed and activated, 05 | — | −95 / 0 / −60 |
 | 07 | [Component pointer rows](phase-07-component-pointer-rows.md) | HARDEN (ES, OPC, MAIL) | 06 | — | −40 / 0 / −20 |
