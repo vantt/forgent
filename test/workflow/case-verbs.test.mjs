@@ -336,3 +336,17 @@ test('gate: a case that has not reached the activity entry refuses the gate thro
   await assert.rejects(gateWorkflow(id, { ...opts(tmp), writes: ['README.md'], verify: nodeExit(0) }), (err) => err.code === 'entry-milestone-unmet');
   assert.equal(statusWorkflow(id, opts(tmp)).case.milestones.integrated.state, 'unreached');
 });
+
+test('answer refuses by name a step that is no gate of the run, and a gate that is not parked', async () => {
+  const tmp = setupRepo();
+  const workflow = validateWorkflow({ id: 'answer-guard', steps: [
+    { id: 'first', gate: { kind: 'human', question: 'First?' } },
+    { id: 'second', dependsOn: ['first'], gate: { kind: 'human', question: 'Second?' } },
+  ] });
+  const state = await startWorkflow({ workflow, ...opts(tmp) });
+  assert.equal(state.status, 'parked');
+  const id = state.workflowRunId;
+  await assert.rejects(answerWorkflow(id, { ...opts(tmp), stepId: 'nowhere', answer: 'yes', approved: true }), (err) => err.code === 'gate-unknown' && /nowhere/.test(err.message));
+  await assert.rejects(answerWorkflow(id, { ...opts(tmp), stepId: 'second', answer: 'yes', approved: true }), (err) => err.code === 'gate-not-parked' && /second/.test(err.message));
+  assert.ok(!eventsOf(tmp, id).some((e) => e.type === 'gate.answer'), 'no answer reached the ledger');
+});

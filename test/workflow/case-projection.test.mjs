@@ -167,3 +167,14 @@ test('the guide of a case is the snapshot on its start event, not the file as it
   assert.equal(projectionOf(run).guide.purpose, 'first purpose');
   assert.equal(projectionOf(run).guideRef.sha256, 'sha256:guide');
 });
+
+test('a gate answer never reaches a milestone whose rule needs a verify receipt, whatever step it names', () => {
+  const run = openCase();
+  appendAll(run, [
+    { type: 'gate.answer', payload: { stepId: 'integrate', answer: 'yes', approved: true, subjectDigest: 'sha256:t' } },
+    { type: 'gate.answer', payload: { stepId: 'build-a', answer: 'yes', approved: true, subjectDigest: 'sha256:t', milestones: ['integrated'] } },
+  ]);
+  const p = projectionOf(run);
+  assert.equal(p.milestones.integrated.state, 'unreached');
+  assert.equal(p.milestones['child-built'].state, 'unreached');
+});

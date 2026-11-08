@@ -147,3 +147,14 @@ test('subject digests: files, trees and named subjects; an unknown subject is nu
   assert.equal(digestText('x'), digestText('x'));
   assert.deepEqual(digestContextRefs(['gate-answer:r/s', 'unit-run:u/producer'], root), [], 'refs to another run are immutable files and are not digested here');
 });
+
+test('a gate that has not parked yet is refused by name and keeps no round', () => {
+  const run = gatedRun();
+  const other = validateWorkflow({ id: 'two-gates', steps: [{ id: 'g1', gate: { kind: 'human', question: 'one?' } }, { id: 'g2', dependsOn: ['g1'], gate: { kind: 'human', question: 'two?' } }] });
+  const { workflowRunId } = createWorkflowRun({ repoRoot: run.repoRoot, workflowId: other.id, workflow: other });
+  const twoGates = { repoRoot: run.repoRoot, caseId: workflowRunId };
+  appendAll(twoGates, [{ type: 'gate.park', payload: { stepId: 'g1', question: 'one?' } }]);
+  assert.throws(() => answer(twoGates, { stepId: 'g2', question: 'two?' }), (err) => err.code === 'gate-not-parked' && /g2/.test(err.message));
+  assert.equal(unconsumedGateRounds(twoGates.repoRoot, twoGates.caseId, eventsOf(twoGates)).length, 0, 'no round was kept');
+  assert.deepEqual(answer(twoGates, { stepId: 'g1', question: 'one?' }), { stepId: 'g1', occurrence: 1, round: 1, settles: true });
+});
