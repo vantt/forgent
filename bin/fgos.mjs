@@ -5008,13 +5008,13 @@ function isMutatingInvocation(verb, positional, flags) {
   return predicate ? predicate(positional, flags) : false;
 }
 
-const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question', 'mailbox']);
+const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question', 'main-checkout-delete-guard', 'mailbox']);
 
 async function handleHook(rest) {
   const [kind, ...flags] = rest;
   if (!kind || kind === '--help' || kind === '-h') {
     process.stdout.write(
-      'Usage: fgos hook <dispatch-decide|decision-question|mailbox> [--format=standard|agy] [--cli <claude|codex> --event <stop|post-tool-use>]\n\n' +
+      'Usage: fgos hook <dispatch-decide|decision-question|main-checkout-delete-guard|mailbox> [--format=standard|agy] [--cli <claude|codex> --event <stop|post-tool-use>]\n\n' +
         'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi).\n',
     );
     process.exit(0);

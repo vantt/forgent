@@ -1415,7 +1415,7 @@ registerCheck({
 
 registerCheck({
   id: 'dispatch-decide-hook-wired',
-  description: '.claude/settings.json PreToolUse hook enforces dispatch.mjs decide on every Agent/Task call and decision-question template',
+  description: '.claude/settings.json PreToolUse hooks enforce dispatch.mjs decide on every Agent/Task call, the decision-question template and the main-checkout delete guard on every Bash call',
   check: (cwd) => checkDispatchDecideHookWired(cwd),
 });
 
@@ -1429,7 +1429,7 @@ registerFix({
 
 registerCheck({
   id: 'codex-hook-wired',
-  description: '.codex/hooks.json PreToolUse hook enforces dispatch.mjs decide and decision-question template',
+  description: '.codex/hooks.json PreToolUse hooks enforce dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
   check: (cwd) => checkCodexHook(cwd),
 });
 
@@ -1443,7 +1443,7 @@ registerFix({
 
 registerCheck({
   id: 'agy-hook-wired',
-  description: '.agents/hooks.json PreToolUse hook enforces dispatch.mjs decide and decision-question template',
+  description: '.agents/hooks.json PreToolUse hooks enforce dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
   check: (cwd) => checkAgyHook(cwd),
 });
 
@@ -1457,7 +1457,7 @@ registerFix({
 
 registerCheck({
   id: 'omp-hook-wired',
-  description: '.omp/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide and decision-question template',
+  description: '.omp/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
   check: (cwd) => checkOmpHook(cwd),
 });
 
@@ -1471,7 +1471,7 @@ registerFix({
 
 registerCheck({
   id: 'pi-hook-wired',
-  description: '.pi/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide and decision-question template',
+  description: '.pi/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide, the decision-question template and the main-checkout delete guard',
   check: (cwd) => checkPiHook(cwd),
 });
 

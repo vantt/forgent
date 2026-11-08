@@ -797,13 +797,13 @@ export const COMMAND_REGISTRY = [
   {
     name: 'hook',
     invoke: 'fgos hook <kind>',
-    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols. `mailbox` is the agent mailbox\'s checkpoint (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host: it registers the calling head, prints pending mail in the shape the CLI injects, and always exits 0, printing nothing on any failure.',
+    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols. `mailbox` is the agent mailbox\'s checkpoint (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host: it registers the calling head, prints pending mail in the shape the CLI injects, and always exits 0, printing nothing on any failure. `main-checkout-delete-guard` refuses a shell command that would mass-delete inside the main checkout of a fgOS project (git clean -x/-X, xargs rm, rm -r of the checkout or a top-level runtime directory, find -delete).',
     parameters: {
       type: 'object',
       properties: {
         kind: {
           type: 'string',
-          enum: ['dispatch-decide', 'decision-question', 'mailbox'],
+          enum: ['dispatch-decide', 'decision-question', 'main-checkout-delete-guard', 'mailbox'],
           description: 'The specific hook guard to execute.',
         },
         format: {
@@ -825,7 +825,7 @@ export const COMMAND_REGISTRY = [
       positional: ['kind'],
       required: ['kind'],
     },
-    examples: ['fgos hook dispatch-decide', 'fgos hook decision-question', 'fgos hook dispatch-decide --format=agy', 'fgos hook mailbox --cli claude --event post-tool-use'],
+    examples: ['fgos hook dispatch-decide', 'fgos hook decision-question', 'fgos hook main-checkout-delete-guard', 'fgos hook dispatch-decide --format=agy', 'fgos hook mailbox --cli claude --event post-tool-use'],
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: false,

@@ -24,6 +24,7 @@ export const HOOK_KINDS = {
   DECISION: 'decision-question',
   MAILBOX: 'mailbox',
   SESSION: 'session-register',
+  DELETE_GUARD: 'main-checkout-delete-guard',
 };
 
 function readJsonSafe(filePath) {
@@ -75,7 +76,12 @@ export function isShimRunnable(repoRoot, { mailboxCli = null } = {}) {
   // otherwise make the nested shim refuse and every probe read as broken.
   const env = { ...process.env };
   delete env.FGOS_RUST_HOST_RECURSION_GUARD;
-  const probes = [{ kind: HOOK_KINDS.DISPATCH, args: ['hook', 'dispatch-decide'], quietStdout: false }];
+  const probes = [
+    { kind: HOOK_KINDS.DISPATCH, args: ['hook', 'dispatch-decide'], quietStdout: false },
+    // `{}` names no shell tool: the guard allows it silently. An activated release that does not know
+    // the kind exits 1 here, so a row rendered ahead of its release is reported, not met at every call.
+    { kind: HOOK_KINDS.DELETE_GUARD, args: ['hook', HOOK_KINDS.DELETE_GUARD], quietStdout: true },
+  ];
   // The mailbox kind with benign input: `{}` is no payload of any CLI, so the hook stays quiet, opens
   // no record and writes nothing; it must exit 0 with nothing on stdout.
   if (mailboxCli) probes.push({ kind: `${HOOK_KINDS.MAILBOX} (${mailboxCli})`, args: ['hook', 'mailbox', '--cli', mailboxCli, '--event', 'post-tool-use'], quietStdout: true });
@@ -103,6 +109,13 @@ const CLAUDE_SHIM = '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"';
 const claudeMailboxCommand = (event) =>
   `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" hook mailbox --cli claude --event ${event} || true`;
 
+/** Claude Code's delete guard runs before every Bash call, so the command answers most calls in the
+ * shell: only a payload carrying a word a mass delete needs (`rm `, `xargs`, `clean`, `-delete`)
+ * reaches the shim. `rm\\` is `rm` followed by an escaped tab or newline in the JSON. A missing
+ * shim lets the call through, as the other guarded commands do; doctor reports it. */
+const CLAUDE_DELETE_GUARD_COMMAND =
+  `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; P=$(cat); case "$P" in *'rm '*|*'rm\\'*|*xargs*|*clean*|*-delete*) printf '%s' "$P" | "$S" hook ${HOOK_KINDS.DELETE_GUARD};; esac`;
+
 /** Registers the agent's session in the identity directory when the CLI starts one. The host runs
  * it, so the agent takes no step; a failure never reaches the session (`|| true`), and the verb
  * itself skips a seat the runner started. */
@@ -118,6 +131,9 @@ const SESSION_REGISTER_TIMEOUT_SEC = 10;
 const hookRows = (repoRoot) => [
   { cli: 'claude', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: 'Agent|Task', command: `${CLAUDE_SHIM} hook dispatch-decide`, legacyMarkers: ['dispatch-decide-hook.mjs'] },
   { cli: 'claude', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'AskUserQuestion', command: `${CLAUDE_SHIM} hook decision-question`, legacyMarkers: ['decision-question-hook.mjs'] },
+  // The main-checkout delete guard on every shell tool: Claude Code and Codex name it Bash (recorded
+  // payloads), Codex's older shell tools are listed too; agy names it run_command.
+  { cli: 'claude', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', matcher: 'Bash', command: CLAUDE_DELETE_GUARD_COMMAND },
   // The mailbox's checkpoints (spec §6.1), in the shapes `adapters.v1.json` recorded: Stop with no
   // matcher, PostToolUse for every tool.
   { cli: 'claude', kind: HOOK_KINDS.MAILBOX, args: '--cli claude --event stop', event: 'Stop', matcher: null, command: claudeMailboxCommand('stop'), timeout: mailboxHookTimeoutSec() },
@@ -130,6 +146,7 @@ const hookRows = (repoRoot) => [
   { cli: 'agy', kind: HOOK_KINDS.SESSION, event: 'SessionStart', group: 'fgos-session-register', flat: true, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
   { cli: 'codex', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide') },
   { cli: 'codex', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'RequestUserInput|ask.*', command: shimCommand(repoRoot, 'hook decision-question') },
+  { cli: 'codex', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', matcher: '^(Bash|shell|exec_command|local_shell)$', command: shimCommand(repoRoot, `hook ${HOOK_KINDS.DELETE_GUARD}`) },
   // Codex runs a hook command through the user's `$SHELL -c`: the plain form is exec'd into the
   // direct topology the caller check expects; a guarded form would keep the user's login shell at
   // the head position (measured at V5). A missing shim therefore shows an error on each call.
@@ -137,6 +154,7 @@ const hookRows = (repoRoot) => [
   { cli: 'codex', kind: HOOK_KINDS.MAILBOX, args: '--cli codex --event post-tool-use', event: 'PostToolUse', matcher: null, command: shimCommand(repoRoot, 'hook mailbox --cli codex --event post-tool-use'), timeout: mailboxHookTimeoutSec() },
   { cli: 'agy', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', group: 'fgos-dispatch-guard', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide --format=agy'), timeout: 10 },
   { cli: 'agy', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', group: 'fgos-decision-guard', matcher: 'ask.*|AskUserQuestion', command: shimCommand(repoRoot, 'hook decision-question --format=agy'), timeout: 10 },
+  { cli: 'agy', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', group: 'fgos-delete-guard', matcher: 'run_command', command: shimCommand(repoRoot, `hook ${HOOK_KINDS.DELETE_GUARD} --format=agy`), timeout: 10 },
 ];
 
 /** The table, read-only, for the doctor's own tests and docs. */
@@ -434,7 +452,7 @@ const MAILBOX_HANDLERS = `
 `;
 
 /**
- * The generated extension of `cli` (omp or pi): the dispatch and decision guards, and the
+ * The generated extension of `cli` (omp or pi): the dispatch, decision and delete guards, and the
  * mailbox handlers only when `mailbox` (the project opted in).
  */
 function generateInProcessExtensionSource({ cli, mailbox = false }) {
@@ -477,6 +495,15 @@ export default function (api: any) {
         });
         if (res.status === 2) {
           return { block: true, reason: res.stderr || 'Blocked by fgOS decision-question guard' };
+        }
+      } else if (toolName === 'bash') {
+        const res = spawnSync(shim, ['hook', 'main-checkout-delete-guard'], {
+          input: JSON.stringify({ tool_name: 'Bash', tool_input: { command: event?.input?.command }, cwd }),
+          encoding: 'utf8',
+          timeout: 5000,
+        });
+        if (res.status === 2) {
+          return { block: true, reason: res.stderr || 'Blocked by fgOS main-checkout delete guard' };
         }
       }
     } catch {

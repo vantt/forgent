@@ -57,14 +57,14 @@ process.exit(1);
 // 1. Claude Code
 // ---------------------------------------------------------------------------
 
-test('installClaudeHook writes canonical commands for both guards', () => {
+test('installClaudeHook writes canonical commands for every guard', () => {
   const repoRoot = mkTempDir('agent-hooks-claude-fresh-');
   const res = installClaudeHook(repoRoot);
   assert.equal(res.wired, true);
   assert.equal(res.skippedExisting, null);
 
   const settings = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8'));
-  assert.equal(settings.hooks.PreToolUse.length, 2);
+  assert.equal(settings.hooks.PreToolUse.length, 3);
   assert.equal(settings.hooks.PreToolUse[0].matcher, 'Agent|Task');
   assert.equal(
     settings.hooks.PreToolUse[0].hooks[0].command,
@@ -75,6 +75,8 @@ test('installClaudeHook writes canonical commands for both guards', () => {
     settings.hooks.PreToolUse[1].hooks[0].command,
     '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" hook decision-question',
   );
+  assert.equal(settings.hooks.PreToolUse[2].matcher, 'Bash');
+  assert.match(settings.hooks.PreToolUse[2].hooks[0].command, /"\$S" hook main-checkout-delete-guard;; esac$/);
 
   assert.equal(isClaudeHookConfigured(repoRoot), true);
 
@@ -116,8 +118,8 @@ test('installClaudeHook migrates legacy script commands in-place without duplica
   installClaudeHook(repoRoot);
   const migrated = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8'));
 
-  // dispatch-decide entry migrated, decision-question added, CustomTool untouched
-  assert.equal(migrated.hooks.PreToolUse.length, 3);
+  // dispatch-decide entry migrated, decision-question and the delete guard added, CustomTool untouched
+  assert.equal(migrated.hooks.PreToolUse.length, 4);
   assert.equal(
     migrated.hooks.PreToolUse[0].hooks[0].command,
     '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos" hook dispatch-decide',
@@ -159,10 +161,11 @@ test('installCodexHook wires .codex/hooks.json and checkCodexHook probes cleanly
   assert.equal(fs.existsSync(hooksFile), true);
 
   const config = JSON.parse(fs.readFileSync(hooksFile, 'utf8'));
-  assert.equal(config.hooks.PreToolUse.length, 2);
+  assert.equal(config.hooks.PreToolUse.length, 3);
   const shim = path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
   assert.equal(config.hooks.PreToolUse[0].hooks[0].command, `'${shim}' hook dispatch-decide`);
   assert.equal(config.hooks.PreToolUse[1].hooks[0].command, `'${shim}' hook decision-question`);
+  assert.equal(config.hooks.PreToolUse[2].hooks[0].command, `'${shim}' hook main-checkout-delete-guard`);
 
   // Without shim, check fails
   assert.equal(checkCodexHook(repoRoot).passed, false);
@@ -173,7 +176,7 @@ test('installCodexHook wires .codex/hooks.json and checkCodexHook probes cleanly
   // Idempotence test
   installCodexHook(repoRoot);
   const afterSecond = JSON.parse(fs.readFileSync(hooksFile, 'utf8'));
-  assert.equal(afterSecond.hooks.PreToolUse.length, 2);
+  assert.equal(afterSecond.hooks.PreToolUse.length, 3);
 
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
@@ -196,6 +199,7 @@ test('installAgyHook wires .agents/hooks.json with --format=agy and checkAgyHook
   const shim = path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
   assert.equal(config['fgos-dispatch-guard'].PreToolUse[0].hooks[0].command, `'${shim}' hook dispatch-decide --format=agy`);
   assert.equal(config['fgos-decision-guard'].PreToolUse[0].hooks[0].command, `'${shim}' hook decision-question --format=agy`);
+  assert.deepEqual(config['fgos-delete-guard'].PreToolUse[0], { matcher: 'run_command', hooks: [{ type: 'command', command: `'${shim}' hook main-checkout-delete-guard --format=agy`, timeout: 10 }] });
 
   // Without shim, check fails
   assert.equal(checkAgyHook(repoRoot).passed, false);
@@ -254,7 +258,7 @@ test('codex and agy hook commands run from a directory other than the project, e
   installAgyHook(repoRoot);
 
   const codex = JSON.parse(fs.readFileSync(path.join(repoRoot, '.codex', 'hooks.json'), 'utf8')).hooks.PreToolUse;
-  assert.equal(codex.length, 2, 'both codex hooks are present even though the path contains a kind name');
+  assert.equal(codex.length, 3, 'every codex guard is present even though the path contains a kind name');
   const agy = JSON.parse(fs.readFileSync(path.join(repoRoot, '.agents', 'hooks.json'), 'utf8'));
   const commands = [
     ...codex.map((e) => e.hooks[0].command),
@@ -288,6 +292,17 @@ for (const [cli, install, check] of [['omp', installOmpHook, checkOmpHook], ['pi
     assert.equal(typeof mod.default, 'function', 'the extension loads and exports its entry');
     assert.match(content, /hook', 'dispatch-decide'/);
     assert.match(content, /hook', 'decision-question'/);
+
+    // The delete guard: a bash tool call goes to the shim in the Claude Code payload shape, and an
+    // exit 2 blocks it with the shim's reason.
+    const log = path.join(repoRoot, 'guard-log');
+    fs.mkdirSync(path.dirname(getProjectShimPath(repoRoot)), { recursive: true });
+    fs.writeFileSync(getProjectShimPath(repoRoot), `#!/bin/sh\nprintf '%s\\n' "$*" >> '${log}.argv'\ncat >> '${log}.stdin'\necho refused-by-guard >&2\nexit 2\n`, { mode: 0o755 });
+    const handlers = await loadedHandlers(repoRoot, cli);
+    assert.deepEqual(await handlers.tool_call({ toolName: 'bash', input: { command: 'git clean -fdx' } }, { cwd: repoRoot }), { block: true, reason: 'refused-by-guard\n' });
+    assert.equal(fs.readFileSync(`${log}.argv`, 'utf8'), 'hook main-checkout-delete-guard\n');
+    assert.deepEqual(JSON.parse(fs.readFileSync(`${log}.stdin`, 'utf8')), { tool_name: 'Bash', tool_input: { command: 'git clean -fdx' }, cwd: repoRoot });
+    fs.rmSync(getProjectShimPath(repoRoot));
 
     assert.equal(check(repoRoot).passed, false, 'without a runnable shim the check fails');
     mockRunnableShim(repoRoot);
@@ -680,7 +695,7 @@ test('mailbox rows install only when the project opts in, and opting out removes
   const after = readFile(repoRoot, 'claude');
   assert.deepEqual(after.hooks.Stop, [{ hooks: [{ type: 'command', command: userOwn }] }]);
   assert.equal(after.hooks.PostToolUse, undefined, 'an event left empty by our removal is dropped');
-  assert.equal(after.hooks.PreToolUse.length, 2, 'the guards stay');
+  assert.equal(after.hooks.PreToolUse.length, 3, 'the guards stay');
   assert.equal(readFile(repoRoot, 'codex').hooks.Stop, undefined);
   assert.equal(checkClaudeHook(repoRoot).passed, true);
   fs.rmSync(repoRoot, { recursive: true, force: true });
@@ -698,6 +713,25 @@ test('the claude mailbox command is guarded and never execs', () => {
   const res = spawnSync('/bin/sh', ['-c', command], { env: { ...process.env, CLAUDE_PROJECT_DIR: repoRoot }, input: '{}', encoding: 'utf8' });
   assert.equal(res.status, 0);
   assert.equal(res.stdout + res.stderr, '');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+test('the claude delete guard command passes a shell call without a mass-delete word in the shell and hands the rest to the shim', () => {
+  const repoRoot = mkTempDir('agent-hooks-delete-guard-');
+  const log = path.join(repoRoot, 'guard-log');
+  fs.mkdirSync(path.dirname(getProjectShimPath(repoRoot)), { recursive: true });
+  fs.writeFileSync(getProjectShimPath(repoRoot), `#!/bin/sh\nprintf '%s\\n' "$*" >> '${log}.argv'\ncat >> '${log}.stdin'\nexit 2\n`, { mode: 0o755 });
+  const { command } = agentHookRows(repoRoot).find((r) => r.cli === 'claude' && r.kind === 'main-checkout-delete-guard');
+  const run = (shellCommand) => spawnSync('/bin/sh', ['-c', command], { input: JSON.stringify({ tool_name: 'Bash', permission_mode: 'bypassPermissions', tool_input: { command: shellCommand } }), env: { ...process.env, CLAUDE_PROJECT_DIR: repoRoot }, encoding: 'utf8' });
+  assert.equal(run('ls -la && npm test').status, 0);
+  assert.equal(fs.existsSync(`${log}.argv`), false, 'no mass-delete word: the shim never ran');
+  for (const shellCommand of ['ls | xargs rm', 'git clean -fdx', 'rm -rf .fgos', 'rm\t-rf .fgos', 'find . -delete']) {
+    assert.equal(run(shellCommand).status, 2, shellCommand);
+  }
+  assert.equal(fs.readFileSync(`${log}.argv`, 'utf8'), 'hook main-checkout-delete-guard\n'.repeat(5));
+  assert.ok(fs.readFileSync(`${log}.stdin`, 'utf8').endsWith('{"tool_name":"Bash","permission_mode":"bypassPermissions","tool_input":{"command":"find . -delete"}}'), 'the payload reaches the shim unchanged');
+  fs.rmSync(getProjectShimPath(repoRoot));
+  assert.equal(run('git clean -fdx').status, 0, 'a missing shim lets the call through; doctor reports it');
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
@@ -805,18 +839,22 @@ process.exit(0);
 `;
   fs.writeFileSync(shimPath, shim(''), { mode: 0o755 });
   assert.deepEqual(isShimRunnable(repoRoot), { runnable: true, reason: null });
-  assert.deepEqual(fs.readFileSync(log, 'utf8').trim().split('\n'), ['hook dispatch-decide'], 'without mailbox rows the probe skips the mailbox kind');
+  assert.deepEqual(fs.readFileSync(log, 'utf8').trim().split('\n'), ['hook dispatch-decide', 'hook main-checkout-delete-guard'], 'without mailbox rows the probe skips the mailbox kind');
 
   writeMailboxOptIn(repoRoot, true);
   installCodexHook(repoRoot);
   fs.rmSync(log);
   assert.equal(checkCodexHook(repoRoot).passed, true);
-  assert.deepEqual(fs.readFileSync(log, 'utf8').trim().split('\n'), ['hook dispatch-decide', 'hook mailbox --cli codex --event post-tool-use']);
+  assert.deepEqual(fs.readFileSync(log, 'utf8').trim().split('\n'), ['hook dispatch-decide', 'hook main-checkout-delete-guard', 'hook mailbox --cli codex --event post-tool-use']);
   assert.ok(!fs.existsSync(path.join(repoRoot, '.fgos', 'runtime')), 'the probe created nothing');
 
   fs.writeFileSync(shimPath, shim('{"x":1}'), { mode: 0o755 });
   const failed = checkCodexHook(repoRoot);
   assert.equal(failed.passed, false);
   assert.match(failed.message, /mailbox \(codex\): printed on stdout/);
+
+  // An activated release that does not know the delete guard kind refuses it: reported, not met at every shell call.
+  fs.writeFileSync(shimPath, `#!/bin/sh\n[ "$2" = main-checkout-delete-guard ] && exit 1\nexit 0\n`, { mode: 0o755 });
+  assert.match(checkCodexHook(repoRoot).message, /main-checkout-delete-guard: exit-1/);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });

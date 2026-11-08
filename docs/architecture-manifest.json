@@ -22,6 +22,7 @@
   "files": {
     "src/git/index.mjs": "infra",
     "src/git/inspect.mjs": "infra",
+    "src/git/main-checkout-delete-guard.mjs": "infra",
     "src/git/refs.mjs": "infra",
     "src/git/remote.mjs": "infra",
     "src/git/worktree.mjs": "infra",

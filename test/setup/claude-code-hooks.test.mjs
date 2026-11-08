@@ -137,7 +137,7 @@ test('installClaudeCodeHook also wires the AskUserQuestion decision-question hoo
   assert.equal(claudeCodeHookWired(repoRoot), false);
   installClaudeCodeHook(repoRoot);
   const settings = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude', 'settings.json'), 'utf8'));
-  assert.deepEqual(settings.hooks.PreToolUse.map((entry) => entry.matcher), ['Agent|Task', 'AskUserQuestion']);
+  assert.deepEqual(settings.hooks.PreToolUse.map((entry) => entry.matcher), ['Agent|Task', 'AskUserQuestion', 'Bash']);
   assert.match(settings.hooks.PreToolUse[1].hooks[0].command, /hook decision-question/);
   assert.equal(claudeCodeHookWired(repoRoot), true);
   fs.rmSync(repoRoot, { recursive: true, force: true });
