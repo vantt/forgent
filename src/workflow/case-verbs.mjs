@@ -152,7 +152,7 @@ function judgeBindings(mainRoot, caseId) {
  * Get current projected status of a Workflow run: its own fields, `advance: { running, pid, logPath,
  * lastLines?, hint? }` for the process that advances it, and `case`: milestones with their digests, the
  * routes (listed, and the way outside the list), what is left of the frame, open gates and live
- * reservations; `bindingsJudgment`: whether the bindings of the case's worktree agree with its ledger; and, for a seated run, `seatProviders` with each seat's account. A playbook case is `running` while someone holds `advance`; a conductor case while an
+ * reservations; `bindingsJudgment`: whether the bindings of the case's worktree agree with its ledger; and `seatProviders`: for every run, each finished seat's account. A playbook case is `running` while someone holds `advance`; a conductor case while an
  * attempt of its is still alive, and it never suggests a resume.
  *
  * @param {string} workflowRunId
@@ -164,14 +164,13 @@ function judgeBindings(mainRoot, caseId) {
 export function statusWorkflow(workflowRunId, options = {}) {
   const { mainRoot } = rootsOf(workflowRunId, options, 'statusWorkflow');
   const { events, state, projection } = readCase(mainRoot, workflowRunId);
-  // A seated run also says who actually served each seat; an unseated run's status is unchanged.
-  const served = state.seats ? { seatProviders: seatProviders(state) } : {};
+  // Every run says who actually served each finished seat, read from the bindings already on its ledger.
   let advance = advanceReport(mainRoot, workflowRunId, state, events);
   if (isConductor(projection)) {
     const { hint, ...rest } = advance;
     advance = { ...rest, running: projection.liveReservations.length > 0, pid: null };
   }
-  return { ...state, ...served, advance, case: caseBlock(projection), bindingsJudgment: judgeBindings(mainRoot, workflowRunId) };
+  return { ...state, seatProviders: seatProviders(state), advance, case: caseBlock(projection), bindingsJudgment: judgeBindings(mainRoot, workflowRunId) };
 }
 
 /** Keep the answer as a round (a file made once), with the digest of what the gate shows. */

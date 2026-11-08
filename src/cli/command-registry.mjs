@@ -2466,7 +2466,7 @@ export const COMMAND_REGISTRY = [
         ],
       },
       status: {
-        description: 'Read-only: run state plus advance: { running, pid, logPath, lastLines, hint } and case: { milestones with digests, eligible activities, listed routes and the unlisted path, frame left, open gates, live reservations, closable }, bindingsJudgment: { sound, problems } (whether the bindings of the case\'s worktree agree with its ledger; read only, nothing is repaired) and, for a seated run, seatProviders (the executor, provider, model and account that served each seat, or why a pinned account was skipped). A playbook case is running while a proposer holds advance; a conductor case while an attempt of its is alive. A case id that names no case is refused with case-not-found.',
+        description: 'Read-only: run state plus advance: { running, pid, logPath, lastLines, hint } and case: { milestones with digests, eligible activities, listed routes and the unlisted path, frame left, open gates, live reservations, closable }, bindingsJudgment: { sound, problems } (whether the bindings of the case\'s worktree agree with its ledger; read only, nothing is repaired) and seatProviders for every run (the executor, provider, model and account that served each seat, or why a pinned account was skipped). A playbook case is running while a proposer holds advance; a conductor case while an attempt of its is alive. A case id that names no case is refused with case-not-found.',
         parameters: {
           type: 'object',
           properties: {

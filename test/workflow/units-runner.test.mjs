@@ -154,6 +154,11 @@ test('a units file runs through startWorkflow, and a unit\'s prefer and persona 
   assert.deepEqual(provenance.executor, { value: 'test-node', source: 'unit-prefer' });
   assert.deepEqual(provenance.persona, { value: 'code-reviewer', source: 'unit' });
   assert.deepEqual(record.overrides, []);
+  // A run without --seats still says who served its seat, read from the binding on the ledger; no account was pinned.
+  const served = statusWorkflow(state.workflowRunId, opts(tmp)).seatProviders;
+  assert.equal(served.length, 1);
+  assert.equal(served[0].executor, 'test-node');
+  assert.equal(served[0].account, null);
 });
 
 test('an effort level outside the canonical ones is refused before any run exists', async () => {
@@ -404,6 +409,10 @@ test('workflow with two units on different providers pins account only on matchi
     // The unit the account did not reach runs unpinned and its seat's binding says why, instead of dropping the pin silently.
     assert.equal(b2.provenance.account.skipped.reason, 'account-pin-other-pool');
     assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).some((e) => e.type === 'unit.account-unpinned'), false);
+    // Status names the pinned account on the unit it reached and not on the other.
+    const rows = statusWorkflow(state.workflowRunId, opts(tmp)).seatProviders;
+    assert.equal(rows.find((r) => r.executor === 'alpha').account, 'alpha/acct-alpha');
+    assert.notEqual(rows.find((r) => r.executor === 'beta').account, 'alpha/acct-alpha');
   } finally {
     if (prevHome === undefined) delete process.env.HOME;
     else process.env.HOME = prevHome;

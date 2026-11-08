@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c52a56daee8b77434fffebd42af61e4408aae6b2e76b9c5296e75c8a30da4de5",
+  "payloadDigest": "dc50871edfd95af8d70bb700d7dc1548f4ad0bc57b712f703752a0123bab0ebe",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -898,7 +898,7 @@
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "a8ecea5b3e88edee075579ee256fae18aae2188bd87aea6d9165d89c9e587122",
-    "src/cli/command-registry.mjs": "b53e74ce81d5134a32b73b02278f18d8bf47b4e7b327068a654466c93e1c3ec9",
+    "src/cli/command-registry.mjs": "5ce7572a09fda0985ff8ff2429b90450b3f84ad82be85b88ab6bc2e4cfdaba2f",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
     "src/cli/detached-child.mjs": "e1620a059b18b4f07905e588aa1b9becb05304edc1764c0aa486637892352a36",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
@@ -1231,7 +1231,7 @@
     "src/workflow/case-projection.mjs": "c418e9756fdae9378d39a1d343131cbed90cfd8e66d405f5928b02d89e058723",
     "src/workflow/case-runtime.mjs": "4bfa66a4b63a7d8791942a2e485537c747b9057741fe607d87a014c8db56ae74",
     "src/workflow/case-start.mjs": "67a2290752f5303782fa60d7c5cc9b61757fc84ba9f1e7e17e8de985545b4b70",
-    "src/workflow/case-verbs.mjs": "a58ebb509e8c493ae08dfe5575601f60ace846144787e4c3f563818a7e2d361b",
+    "src/workflow/case-verbs.mjs": "3428e3c3da7860307171fee91b3abf285a9295d6fc876e64df1aa6b732ae7653",
     "src/workflow/checked.mjs": "ff61a4c3ecd3d492dcd4a97c91efc12250fd1ffd99ebd598b1c458691a6bc038",
     "src/workflow/definition.mjs": "f6f218dcf620ac2db6f5e2fc8e6172427b4863bd0267270acf4335648e13f992",
     "src/workflow/dir-guard.mjs": "d8224116ef0781fe57fef08bf706c1d51f25619a2b0a641c696432bdd2973044",

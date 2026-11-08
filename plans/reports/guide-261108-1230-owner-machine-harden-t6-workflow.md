@@ -258,6 +258,10 @@ console.log(JSON.stringify(out,null,2));
 - **Kiểm nhanh:** `fgos workflow prune --json` (chạy thử): không case nào trong `cases` mà cùng case đó còn Unit run `unit-run-kept`.
 - **Quay lại:** revert; những gì prune đã xoá không lấy lại được.
 
+## P19: `workflow status` hiện account cho mọi run
+
+- `fgos workflow status <id>` luôn có `seatProviders`: executor, family, model và account (hoặc lý do ghim bị bỏ qua) của từng ghế đã xong, cho cả preset, `--units` và `--seats`. Đọc từ `binding` trong kết quả đã ghi trên ledger; không có trạng thái mới trên đĩa. Run chưa có ghế nào xong, hoặc case conductor, trả mảng rỗng. Quay lại: không cần.
+
 ## Bảng quay lại
 
 | Phase | Release cũ đọc được dữ liệu đĩa mới? | Làm gì trước khi rollback |
