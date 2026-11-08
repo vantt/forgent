@@ -115,8 +115,12 @@ pub struct DiscardedIgnored {
 }
 impl DiscardedIgnored {
     /// Count `p` and, for a real directory, everything below it, never
-    /// following a symlink.
+    /// following a symlink. A nested repository (any `.git` entry) has its
+    /// own history and work, so it refuses instead of being counted.
     fn count(&mut self, p: &Path) -> Result<()> {
+        if p.file_name() == Some(std::ffi::OsStr::new(".git")) {
+            return Err(failure("worktree-ignored-repository-preserved"));
+        }
         let metadata = fs::symlink_metadata(p).map_err(failure)?;
         if metadata.is_dir() {
             for entry in fs::read_dir(p).map_err(failure)? {

@@ -29,7 +29,8 @@ function worktreeTip(inspect, target) {
 // it, its tip equals expectedTip, and that tip is an ancestor of (or equal to)
 // deliveredTo, which some non-internal ref must contain. evidenceDigest is the
 // sha256 of the delivery statement this verb makes, so the Git operation record
-// binds the exact path, tip and delivery target the caller asserted.
+// binds the exact path, tip, delivery target and ignored-bytes choice the
+// caller asserted.
 // What `worktree create` provisioned is set aside first, so the port judges
 // only the checkout's own bytes; a refusal puts it back. With discardIgnored
 // the port deletes the remaining ignored bytes after every other check passed
@@ -43,12 +44,13 @@ export function removeWorktreeUseCase(ctx, options, loaderOptions) {
   const inspect = createGitInspect(base, loaderOptions);
   const expectedTip = worktreeTip(inspect, target);
   const delivered = resolveDelivered(inspect, options.deliveredTo);
+  const discardIgnored = options.discardIgnored === true;
   const evidenceDigest = createHash('sha256')
-    .update(JSON.stringify({ path: target, expectedTip, deliveredTo: delivered }))
+    .update(JSON.stringify({ path: target, expectedTip, deliveredTo: delivered, discardIgnored }))
     .digest('hex');
   const port = createGitWorktree({ ...base, writer: ctx.writer }, loaderOptions);
   const removal = removeProvisioned(ctx.stateRoot, target, () => port.remove({
-    path: target, expectedTip, deliveredTo: delivered.oid, evidenceDigest, operationId: `worktree-${randomUUID()}`, discardIgnored: options.discardIgnored === true,
+    path: target, expectedTip, deliveredTo: delivered.oid, evidenceDigest, operationId: `worktree-${randomUUID()}`, discardIgnored,
   }));
   return { removed: true, path: target, expectedTip, deliveredTo: delivered.oid, deliveredToRef: delivered.ref, evidenceDigest, discardedIgnored: removal.discardedIgnored };
 }

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e594d0669ddd4346a6c944ef54e8b60bce8a63f77c3a51f94726298e01ff0bd5",
+  "payloadDigest": "bd63465afb1660e83f0b5674c29aa96e685e09407526f503794fd3e765f242f2",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -402,7 +402,7 @@
     "packages/git/rust/src/sequence.rs": "00ab99823a85eae69ed8acf06d1da968b016cb5ae40464394adf2aa78d015295",
     "packages/git/rust/src/sync.rs": "1eb485368c46ee609573fadeff4e9e2bb8f19c0d17956e4e0ef14f6ca8280cb2",
     "packages/git/rust/src/wal.rs": "daa876a880327f92bd7eb43f7c00f0c155c209342abca17132e8cacdebdcf6ff",
-    "packages/git/rust/src/worktree.rs": "3610977034cc299d6a78ba027325f35936de07335a9a7f67dfd8b5a59087e2c5",
+    "packages/git/rust/src/worktree.rs": "9d2b92cb0e92a6bfaa5e4e5f00aa744dfbaa9232f541efc68f80018ec752abe4",
     "packages/git/rust/tests/borrow_deadline.rs": "6a0db6afad96b62ded1253324e862a29a88129e115bd133292ee30ac5482fa07",
     "packages/git/rust/tests/contracts.rs": "d893e9b4cff68230f19dbe8624c051c318bd0bc3f7600ca7ab4b7a5713ea794d",
     "packages/git/rust/tests/head_in_listing.rs": "985434cfe8345d943e16e89188dd4202546c0b3a3e2ad69b36626e11c47adc72",
@@ -422,7 +422,7 @@
     "packages/git/rust/tests/ssh_transport.rs": "8a2cb55b09c231da46ff5bb90a9ae2b7066ee3859f9568fe2f22c97f1da680c4",
     "packages/git/rust/tests/support/land.rs": "46bec8c0928eb4b53d6db71204661638b626b6dfe199d39f4890444c1b14ac07",
     "packages/git/rust/tests/support/signing.rs": "a083733ad39ab4d35f12a600b5cd90ac08c53ae35686ce66f22147b933bf634c",
-    "packages/git/rust/tests/worktree.rs": "d5062adc0185cdbcbe8c733cf937969e9541a49fa31415d958eef1ace78c8aaa",
+    "packages/git/rust/tests/worktree.rs": "fb5ec22b72a58f049c0fd051ae2393f7e3fc7bc73bc1176c8e0e41970da32dde",
     "packages/git/write-scope/src/lib.rs": "8421603ec0e38f418bd241d0db1dc83dd7b3756d994eefa3d29c2e43a8abf9f2",
     "packages/herdr-fgos-common/rust/src/fgos.rs": "b19ae1b2833e894b1d4b424b95a95aa2e3c94fe696943f78591761283b16b486",
     "packages/herdr-fgos-common/rust/src/lib.rs": "a27bb70798915e8f27a33500b384aea536cc43554bcedba01e67623a5bbe54d1",
@@ -1219,7 +1219,7 @@
     "src/verbs/state/read.mjs": "a49ff63f71318e7b6066059078273a6c224ad7ec10c8790f25fabd13cae5cd93",
     "src/verbs/state/step.mjs": "ddebfcb5b53edfd67086ead35d886b86a1f49ad0ce18b98d7b637df239b059fb",
     "src/verbs/worktree/create.mjs": "b09413339c4594efa3261433f827ee1d8dd7080d270fc1cf28e9d68e2b4ed261",
-    "src/verbs/worktree/remove.mjs": "5cca63e96ad48377bec2ed50c11f2f75464e019ad2cf24b8384bcfdf192ea52f",
+    "src/verbs/worktree/remove.mjs": "8a4fc7440db33c221423097461070af9fddc009fea4be71179dce67eca625afb",
     "src/workflow/case-admission-port.mjs": "035d584ce55afb358d6a475fb153eb6922cab89d36f581ed0c1c02dd3d8f6945",
     "src/workflow/case-admission.mjs": "785f003695c1315f066f94f05c37acfe8c658fa565e3b8ea6ae17dcc26d6abf5",
     "src/workflow/case-bindings.mjs": "617ae78e7a0bceb84f8e4dbff40e0e002b0994113d04d4152d71b8c86bd3a50e",
@@ -2359,7 +2359,7 @@
     },
     {
       "path": "packages/git/rust/src/worktree.rs",
-      "line": 1834,
+      "line": 1838,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

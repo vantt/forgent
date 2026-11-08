@@ -30,7 +30,7 @@ test('worktree remove deletes a clean worktree whose tip is delivered and binds 
     assert.equal(result.expectedTip, f.tip);
     assert.equal(result.deliveredTo, f.tip);
     assert.equal(result.deliveredToRef, 'refs/heads/trunk');
-    const statement = { path: fs.realpathSync(f.temp) + '/clean', expectedTip: f.tip, deliveredTo: { ref: 'refs/heads/trunk', oid: f.tip } };
+    const statement = { path: fs.realpathSync(f.temp) + '/clean', expectedTip: f.tip, deliveredTo: { ref: 'refs/heads/trunk', oid: f.tip }, discardIgnored: false };
     assert.equal(result.evidenceDigest, createHash('sha256').update(JSON.stringify(statement)).digest('hex'));
     assert.equal(f.git('worktree', 'list', '--porcelain').includes('clean'), false);
     // An object id is accepted as the delivery target too.
@@ -132,6 +132,8 @@ test('worktree remove refuses when a worker edited a provisioned copy or left it
     // Opting in discards the edited copy, which provisioning no longer owns, and reports it.
     const discarded = removeWorktreeUseCase(ctx, { path: edited, deliveredTo: 'trunk', discardIgnored: true }, f.loader);
     assert.deepEqual(discarded.discardedIgnored, { files: 1, bytes: 'worker edit'.length });
+    const statement = { path: edited, expectedTip: discarded.expectedTip, deliveredTo: { ref: 'refs/heads/trunk', oid: discarded.deliveredTo }, discardIgnored: true };
+    assert.equal(discarded.evidenceDigest, createHash('sha256').update(JSON.stringify(statement)).digest('hex'));
     assert.equal(fs.existsSync(edited), false);
     assert.deepEqual(siblings(), []);
   } finally { cleanup(); }

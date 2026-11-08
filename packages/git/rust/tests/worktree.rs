@@ -855,3 +855,33 @@ fn discarding_removes_an_ignored_symlink_itself_and_never_what_it_points_at() {
     assert!(!path.exists());
     assert_eq!(fs::read(outside.join("keep")).unwrap(), b"outside bytes");
 }
+
+#[test]
+fn discarding_refuses_an_ignored_directory_that_holds_a_nested_repository_and_deletes_nothing() {
+    let f = Fixture::new();
+    f.ignore_fixture_patterns();
+    let path = f.root.join("worker");
+    f.create(&path);
+    fs::write(path.join("x.log"), "keep").unwrap();
+    fs::create_dir(path.join("ignored-dir")).unwrap();
+    git(&path.join("ignored-dir"), &["init", "-q", "nested"]);
+    fs::write(path.join("ignored-dir/nested/work"), "own history").unwrap();
+    assert_eq!(
+        f.remove(&path, "nested", IgnoredBytes::Discard)
+            .unwrap_err()
+            .cause,
+        "worktree-ignored-repository-preserved"
+    );
+    assert_eq!(fs::read(path.join("x.log")).unwrap(), b"keep");
+    assert_eq!(
+        fs::read(path.join("ignored-dir/nested/work")).unwrap(),
+        b"own history"
+    );
+    assert_eq!(
+        git(
+            &path.join("ignored-dir/nested"),
+            &["rev-parse", "--is-inside-work-tree"]
+        ),
+        "true"
+    );
+}
