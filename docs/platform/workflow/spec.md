@@ -743,6 +743,10 @@ Mỗi dòng: ai quyết, **tín hiệu quan sát được** sẽ mở lại, và
 | S1 | N1 chỉ ràng hai cửa; ghi trong phiên ngoài ledger; hook là F15 | **owner 2026-10-19** (12:20) |
 | Ý tưởng tính năng | F1–F7, F9, F11, F12 chọn (lõi của cutover); F13 sau khi lõi land; F8, F14, F15, F16 hoãn với điều kiện mở ở mục 14; F10 không thuộc cutover này | **owner 2026-10-19** (12:35, "đồng ý, chọn theo đề xuất") |
 
+### Playbook không còn bước `integrate` (owner 2026-11-08, quyết định 71 mục 2a)
+
+Playbook không có cửa merge thứ hai vào trunk: loại step `kind: integrate` và trường `target` bị xoá, một định nghĩa khai chúng bị từ chối theo tên lúc nạp (lời từ chối chỉ tới approve door). Nhánh của unit ghi chỉ vào trunk qua approve door (coding) hoặc `landRunnerItem` (proof tiêu thụ không-coding: `test/git/e2e-consumer-noncoding.test.mjs`). Dọn worktree sau run vẫn coi unit pass là đã giao khi nhánh của nó nằm trong trunk (`origin/HEAD`, không có thì nhánh đang checkout). Kind `integrate` của *activity guide* (`feature.yaml`) không đổi. Ledger cũ có sự kiện step integrate vẫn fold và in.
+
 ## 18. Pointers
 
 - Ranh giới component: [../component-boundary.md](../component-boundary.md) (hàng Workflow, Work Lifecycle, Execution Core, Holder-lock — bản sửa nháp đi cùng spec này).

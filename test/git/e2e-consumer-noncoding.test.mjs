@@ -13,6 +13,7 @@ import path from 'node:path';
 
 import { execFileSync } from 'node:child_process';
 
+import { landRunnerItem } from '../../src/runner/merge.mjs';
 import { startWorkflow, answerWorkflow, validateWorkflow } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
@@ -70,7 +71,7 @@ test('business-discussion completes in a directory that is not a repository', as
 
 test('a labelled noncoding writing fixture lands its one declared file on main', async () => {
   // Fixture, not a production route: a business capability whose Unit declares writes is committed
-  // by the runner and landed by an integrate step exactly as a coding Unit is.
+  // by the runner onto its own branch, and that branch lands through Land exactly as a coding Unit's does.
   const dir = setupWorkflowFixtureRepo({
     prefix: 'fgos-consumer-writing-',
     readme: '# Business project',
@@ -83,18 +84,25 @@ test('a labelled noncoding writing fixture lands its one declared file on main',
     `,
   });
   const git = (args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' }).trim();
+  // Land refuses a main checkout with unfinished changes, so the run's own state is ignored the way a project's is.
+  fs.writeFileSync(path.join(dir, '.gitignore'), '.fgos/\n*.mjs\n');
+  git(['add', '.gitignore']);
+  git(['commit', '-qm', 'ignore run state']);
   const before = git(['rev-parse', 'main']);
   const workflow = validateWorkflow({
     id: 'noncoding-writing-fixture',
     steps: [
       { id: 'plan', units: [{ id: 'plan', template: { capability: 'business:plan', pattern: 'reviewed', objective: 'Write the business plan.', writes: ['business-plan.md'] } }] },
-      { id: 'land', kind: 'integrate', dependsOn: ['plan'] },
     ],
   });
 
   const state = await startWorkflow({ workflow, repoRoot: dir, cwd: dir, worktree: dir });
 
   assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  const { branch } = state.steps.plan.units.plan;
+  assert.equal(git(['rev-parse', 'main']), before, 'the runner commits the unit branch and moves no trunk');
+  const landed = await landRunnerItem(dir, { id: 'plan', verify: 'true' }, { branch });
+  assert.equal(landed.outcome, 'merged', JSON.stringify(landed));
   assert.equal(git(['show', 'main:business-plan.md']), '# Business plan');
   assert.equal(git(['merge-base', '--is-ancestor', before, 'main']), '');
   assert.notEqual(git(['rev-parse', 'main']), before);
