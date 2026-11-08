@@ -191,13 +191,15 @@ test('a worktree some case binds refuses a standalone writing run through the re
   }
 });
 
-test('a Unit that names a case is admitted before custody and the unit directory, linked in unit.json, settled once after custody is released', async () => {
+test('a Unit that names a case is admitted in custody and before the unit directory, linked in unit.json, settled once after custody is released', async () => {
   const { repoRoot, worktreeDir } = setup();
   let quietAtSettle = null;
   let createdBeforeAdmit = null;
+  let custodyAtAdmit = null;
   const port = recordingPort({
     admit: () => {
-      createdBeforeAdmit = assignmentsOf(repoRoot).length + (dispatchCwdHolder(path.join(repoRoot, '.fgos'), worktreeDir) ? 1 : 0);
+      createdBeforeAdmit = assignmentsOf(repoRoot).length;
+      custodyAtAdmit = dispatchCwdHolder(path.join(repoRoot, '.fgos'), worktreeDir) !== null;
       return { admitted: true, reservationId: 'rsv-link', caseId: 'case-link', seatLaunchCeiling: null };
     },
     onSettle: () => { quietAtSettle = dispatchCwdHolder(path.join(repoRoot, '.fgos'), worktreeDir) === null; },
@@ -208,7 +210,8 @@ test('a Unit that names a case is admitted before custody and the unit directory
     onCaseAdmitted: (info) => admittedHook.push(info),
   });
   assert.equal(res.outcome, 'pass');
-  assert.equal(createdBeforeAdmit, 0, 'nothing existed when admission was asked');
+  assert.equal(createdBeforeAdmit, 0, 'no unit directory existed when admission was asked');
+  assert.equal(custodyAtAdmit, true, 'a writing run holds the worktree custody when admission is asked');
   assert.deepEqual(names(port), ['admit', 'recheckEffect', 'settle']);
   const proposal = port.calls[0][1];
   assert.equal(proposal.unitRunId, res.unitRunId, 'the reservation is for the very Unit run that follows');
@@ -244,7 +247,7 @@ test('a refusal throws with the port\'s answer before anything exists, and settl
   assert.equal(dispatchCwdHolder(path.join(repoRoot, '.fgos'), worktreeDir), null);
 });
 
-test('custody that refuses after admission gives the reservation back as not-started', async (t) => {
+test('custody that refuses a writing run is refused before admission, so no reservation exists and nothing needs settling', async () => {
   const { repoRoot, worktreeDir } = setup();
   const port = recordingPort();
   const { child, exited } = await holdLockInChild('dispatch-cwd', { fgosDir: path.join(repoRoot, '.fgos'), cwd: worktreeDir });
@@ -253,10 +256,17 @@ test('custody that refuses after admission gives the reservation back as not-sta
       unitData: WRITE_UNIT, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'build' }, repoRoot, cwd: worktreeDir, worktree: worktreeDir,
     }), { code: 'dispatch-in-flight' });
   } finally { child.kill('SIGKILL'); await exited; }
-  assert.deepEqual(names(port), ['admit', 'settle']);
-  assert.deepEqual({ outcome: port.calls[1][2].outcome, unitRunId: port.calls[1][2].unitRunId }, { outcome: 'not-started', unitRunId: null });
+  assert.deepEqual(names(port), []);
   assert.deepEqual(assignmentsOf(repoRoot), []);
-  t.diagnostic('settled once, idempotently, by name');
+});
+
+test('a refused admission of a writing run leaves the worktree custody free', async () => {
+  const { repoRoot, worktreeDir } = setup();
+  const port = recordingPort({ admit: () => ({ refused: { code: 'writes-overlap', condition: 'two writers share docs', violations: [] } }) });
+  await assert.rejects(() => runUnit({
+    unitData: WRITE_UNIT, caseAdmission: port, caseRef: { caseId: 'case-test', activity: 'build' }, repoRoot, cwd: worktreeDir, worktree: worktreeDir,
+  }), { code: 'writes-overlap' });
+  assert.equal(dispatchCwdHolder(path.join(repoRoot, '.fgos'), worktreeDir), null);
 });
 
 test('the write gate asks the same port before the commit, and a refusal commits nothing', async () => {

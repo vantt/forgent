@@ -16,3 +16,17 @@ Các mục của P01 (đồng ý và biên nhận gate) và P02 (bỏ bước `i
 - **Doctor mong đợi:** không có dòng mới; các dòng workflow-case và holder-lock `advance` đọc cùng thư mục như trước.
 - **Kiểm nhanh:** `fgos workflow status <run mới nhất>` in trạng thái; `fgos workflow close ../x` bị từ chối `invalid-case-id`.
 - **Quay lại:** revert hai commit; không có thay đổi trên đĩa nên release cũ đọc được mọi thứ release mới ghi.
+
+## P08: giữ custody worktree trước khi case đặt chỗ, ghim account của Workflow, đọc một seat
+
+- **Commit trên main:** xem dòng board "T6 P08 lands" (điền khi land).
+- **Người dùng thấy gì:**
+  - `fgos run --case` ghi vào worktree mà tiến trình khác đang giữ bị từ chối `dispatch-in-flight` ngay, trước khi case đặt chỗ; không còn reservation treo chờ trả lại `not-started`.
+  - Một account mà chỉ Workflow ghim và không seat nào của unit nhận thì unit chạy không ghim (provenance của seat ghi lý do); `fgos run --account` vẫn bị từ chối như trước.
+  - `unit-run:<id>/<seat>` chỉ đọc kết quả của đúng seat đó, không đọc cả thư mục run.
+  - Không đổi byte nào trên đĩa.
+- **Lệnh trên từng workspace:** `git pull --rebase`; build, stage, kích hoạt release như thường lệ; `fgos doctor </dev/null`. Kích hoạt khi không có `fgos run --case` nào đang chạy (một run bản cũ đang ở giữa đặt chỗ và custody sẽ để lại reservation với custody trống).
+- **Doctor mong đợi:** không có dòng mới.
+- **Kiểm nhanh:** giữ custody một worktree ở tiến trình khác, chạy `fgos run --case <id> --writes <path>` ở đó: bị từ chối, `fgos workflow status <case>` không có reservation mới.
+- **Quay lại:** revert; không có thay đổi trên đĩa. Nếu bản release của P04 đã land, revert commit release của P04 trước (nó dựa vào thứ tự này).
+

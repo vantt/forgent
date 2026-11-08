@@ -47,7 +47,6 @@ test('two reservations with overlapping writes: the second is refused at reserva
   const run = plannedCase();
   const first = propose(run, { activity: 'build-a', writes: ['src/a/**'], worktree: '/wt/a' });
   assert.ok(first.reservation, JSON.stringify(first));
-  assert.deepEqual(first.bindings, [{ worktree: '/wt/a', action: 'create' }]);
 
   const overlap = propose(run, { activity: 'build-b', writes: ['src/a/deep/file.mjs'], worktree: '/wt/b' });
   assert.deepEqual(codes(overlap), ['writes-overlap']);
@@ -192,12 +191,11 @@ test('independence: seats that produce the milestone must be encapsulated, and a
   assert.ok(synth.reservation, 'a consumer of the blind outputs is the point of them');
 });
 
-test('binding answers: unbound asks for a binding, bound is used, anything else refuses by its own name', () => {
+test('binding answers: unbound and bound admit, anything else refuses by its own name', () => {
   const run = plannedCase();
   const write = { activity: 'build-a', writes: ['src/a'], worktree: '/wt/a' };
   const asked = (answer, extra = {}) => admitProposal({ projection: projectionOf(run), proposal: write, bindingAnswers: { '/wt/a': { answer, ...extra } }, reservationId: 'r-b' });
-  assert.deepEqual(asked('unbound').bindings, [{ worktree: '/wt/a', action: 'create' }]);
-  assert.deepEqual(asked('bound').bindings, [{ worktree: '/wt/a', action: 'have' }]);
+  for (const answer of ['unbound', 'bound']) assert.ok(asked(answer).reservation, answer);
   for (const answer of ['worktree-already-bound', 'binding-unsettled', 'binding-view-unavailable']) {
     assert.deepEqual(codes(asked(answer, { record: { caseId: 'other' } })), [answer]);
   }

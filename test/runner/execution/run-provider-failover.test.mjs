@@ -143,6 +143,16 @@ test('an account of a provider no candidate of the seat belongs to is refused be
   assert.deepEqual(unitRuns(fx), []);
 });
 
+test('an account that only a Workflow run pinned and no seat takes runs the unit unpinned, where the same pin from the command line is refused', { skip: SKIP }, async () => {
+  const fx = setup({ alpha: { family: 'alpha', logins: { a1: 'live' } }, beta: { family: 'beta', logins: { b1: 'live' } } }, { prefer: ['alpha'] });
+  const res = await run(fx, solo('u-pin-workflow'), { overrides: [{ origin: 'workflow', account: 'beta/b1' }] });
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  const [attempt] = attemptsOf(fx.repoRoot, res);
+  assert.equal(attempt.binding.executor, 'alpha');
+  assert.notEqual(attempt.binding.account?.pool, 'beta');
+  await assert.rejects(run(fx, solo('u-pin-cli'), pin('beta/b1')), /applies to no seat/);
+});
+
 // A writing seat that already changed the worktree before its provider limit is not run again on top of its own
 // half-done work: the seat stops, and the attempt lists what changed (the decision itself is a case of the answer
 // table in account-rotation.test.mjs). A resume takes a new baseline, so work a person kept does not stop the next rotation.

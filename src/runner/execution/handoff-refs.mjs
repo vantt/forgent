@@ -13,7 +13,7 @@ import crypto from 'node:crypto';
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { gateAnswerFile } from './case-run-paths.mjs';
 import { resolveBlindHiddenRoots, isInsideRoot } from '../dispatch/confinement/resources.mjs';
-import { readUnitRunHistory } from './unit-run-history.mjs';
+import { readSeatHistory } from './unit-run-history.mjs';
 import { seatKeyOf } from './legacy-seat-read.mjs';
 import { seatIdProblem } from '../../convention/seat-id.mjs';
 
@@ -101,7 +101,8 @@ function resolveUnitRunRef(input, mainRoot, seat, accept) {
   const unitDir = path.resolve(assignmentsDir, unitRunId);
   if (path.dirname(unitDir) !== assignmentsDir || !fs.existsSync(unitDir)) throw fail('no-such-run');
   // The latest round counts (the history keeps only the latest fallback attempt of each round).
-  const rounds = readUnitRunHistory(unitDir).filter((r) => r.seat === wanted);
+  let rounds;
+  try { rounds = readSeatHistory(unitDir, wanted); } catch (err) { if (err?.code !== 'ENOENT' && err?.code !== 'ENOTDIR') throw err; rounds = []; }
   if (rounds.length === 0) throw fail('no-such-role');
   const latest = rounds.reduce((a, b) => (b.round > a.round ? b : a));
   try {

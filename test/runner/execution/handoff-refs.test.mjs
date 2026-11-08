@@ -128,6 +128,22 @@ test('the highest round of a role wins, and within a round the latest fallback a
   assert.deepEqual(resolveRefs(['unit-run:unit-run-b/reviewer'], root), [path.join(fallback.runDir, 'report.md')]);
 });
 
+test('a unit-run input reads the result files of the wanted seat only', (t) => {
+  const root = makeRoot();
+  const wanted = settleAttempt(root, 'unit-run-a', 'producer', '1', { report: '# done\n' });
+  settleAttempt(root, 'unit-run-a', 'reviewer', '1', { report: '# other\n' });
+  settleAttempt(root, 'unit-run-a', 'panelist-1', '1', { report: '# other\n' });
+  const read = [];
+  const original = fs.readFileSync;
+  t.mock.method(fs, 'readFileSync', (file, ...rest) => {
+    if (String(file).endsWith('result.json')) read.push(String(file));
+    return original(file, ...rest);
+  });
+  assert.deepEqual(resolveRefs(['unit-run:unit-run-a/producer'], root), [path.join(wanted.runDir, 'report.md')]);
+  assert.deepEqual(read.filter((file) => !file.includes(`${path.sep}producer${path.sep}`)), [], 'no other seat was parsed');
+  assert.ok(read.length > 0);
+});
+
 /** Write the answer file of one gate the way the Workflow runner leaves it. */
 function recordAnswer(root, workflowRunId, stepId, text = '# answer\n') {
   const dir = path.join(root, '.fgos', 'workflow-runs', workflowRunId, 'gate-answers');

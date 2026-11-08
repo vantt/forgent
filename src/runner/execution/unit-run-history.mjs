@@ -95,9 +95,16 @@ function readSeatDirectory(unitDir, seatId) {
   });
 }
 
+const settledRounds = (entries) => entries.filter((entry) => entry.final).map(({ seat, round, final }) => ({
+  seat, round, outcome: final.outcome, runResult: final.runResult,
+}));
+
 /** One final settled record per seat/round, preserving the pattern history vocabulary. */
 export function readUnitRunHistory(unitDir) {
-  return readUnitRunSeats(unitDir).filter((entry) => entry.final).map(({ seat, round, final }) => ({
-    seat, round, outcome: final.outcome, runResult: final.runResult,
-  }));
+  return settledRounds(readUnitRunSeats(unitDir));
+}
+
+/** The same records of one seat only; throws ENOENT/ENOTDIR when the seat never ran. */
+export function readSeatHistory(unitDir, seatId) {
+  return settledRounds(readSeatDirectory(unitDir, seatId));
 }

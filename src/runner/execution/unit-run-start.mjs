@@ -159,7 +159,7 @@ function requireFreeWorktree(port, worktree) {
 /**
  * Refuse, before a unit run exists, what the calling door has no authority for (accepting a dependence, a
  * tier raised by an override or its persona: no door is authorized yet) and a pinned account that no seat
- * takes, that a seat it applies to refuses, or that is quarantined now.
+ * takes (unless only a Workflow run pinned it), that a seat it applies to refuses, or that is quarantined now.
  */
 async function assertDoorChoicesBeforeRun(unit, runnerConfig, options, collaboration, herdrPresent) {
   const overrides = options.overrides ?? [];
@@ -188,6 +188,8 @@ async function assertDoorChoicesBeforeRun(unit, runnerConfig, options, collabora
   const refused = seats.find((r) => r.refused?.reason?.startsWith('account-pin'));
   if (refused) throw new RunnerConfigError(`cannot pin the account for seat "${refused.seat}": ${refused.refused.detail}`);
   if (!seats.some((r) => r.account)) {
+    // A pin that only a Workflow run set, and no seat takes, runs the unit unpinned; each seat's provenance keeps why.
+    if (objects.filter((o) => o.account !== undefined).every((o) => o.origin === 'workflow')) return;
     const why = seats.filter((r) => r.accountSkipped).map((r) => `seat "${r.seat}": ${r.accountSkipped.detail}`);
     throw new RunnerConfigError(`the pinned account applies to no seat of this unit${why.length ? ` (${why.join('; ')})` : ': no seat its override names binds here'}`);
   }
@@ -357,10 +359,12 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
   const sync = seedSync(unit, { worktree: worktreePath, mainRoot });
   const writing = writesWorktree(unit, sync);
   if (writing && options.forceSharedCwd === true) throw sharedCwdRefusal(worktreePath, unit);
-  // Admission, then custody, then the unit directory; a standalone writing run only into a free worktree.
+  // Custody of a writing run first, so a busy worktree refuses before any reservation exists; then admission, then the unit directory.
+  // A standalone writing run goes only into a free worktree.
   if ((writing || caseRef) && !port) throw portMissing();
   const unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
   if (writing && !caseRef) requireFreeWorktree(port, worktreePath);
+  if (writing) scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), worktreePath);
   let admittedCeiling = null;
   if (caseRef) {
     const reason = caseRef.reason ?? options.reason ?? options.request?.reason ?? null;
@@ -384,7 +388,6 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
     admittedCeiling = admitted.seatLaunchCeiling ?? null;
     options.onCaseAdmitted?.({ caseId: admitted.caseId, reservationId: admitted.reservationId });
   }
-  if (writing) scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), worktreePath);
   const unitDir = path.join(assignmentsDir, unitRunId);
   const personaPin = unitPersonaPin(unit.persona, mainRoot, options.personaScope);
   let resolved;
