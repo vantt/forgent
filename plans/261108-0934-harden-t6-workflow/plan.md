@@ -104,7 +104,7 @@ Settled without a phase: D5 (`fgos-cook` retry) closed by `b75259cbd`; W-6, W-7 
 | 11 | [Workflow doors and verbs](phase-11-workflow-doors-and-verbs.md) (**landed** 2026-11-08 `b9c7f3a95..f27bad4d5`) | 04, 05, 09 | wave 3 | `case-verbs.mjs`, `bin` workflow arm | −80 / 0 / −30 |
 | 12 | [Prune finished cases (Q5 b)](phase-12-prune-finished-cases.md) | 04, 05; wiring step after 11 | wave 3 | `case-verbs.mjs`, `bin` workflow arm (wiring step only) | +130 / 0 / +90 |
 | 13 | [Test owners and split](phase-13-test-owners-and-split.md) (**landed** 2026-11-08 `2c2a2e153..46720a519`) | 02, 05, 06, 11 | wave 4 | — | 0 / 0 / −325 |
-| 14 | [`RunnerConfigError` leaf](phase-14-runner-config-error-leaf.md) | 01–13 landed; announced quiet window | wave 5 (alone) | all (one import line each) | +2 / 0 / 0 |
+| 14 | [`RunnerConfigError` leaf](phase-14-runner-config-error-leaf.md) (**landed** 2026-11-08 `e9255a3e6`) | 01–13 landed; announced quiet window | wave 5 (alone) | all (one import line each) | +2 / 0 / 0 |
 | 15 | [Spec, measure, close](phase-15-spec-measure-close.md) | 01–14 | close | — | 0 / 0 / 0 |
 
 ```
