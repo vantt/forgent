@@ -1,7 +1,7 @@
 ---
 phase: 06
 title: "Git doctor cut: incident rows and `git-land-recovery` leave doctor; one `git-incidents` pointer row"
-status: pending
+status: completed
 depends_on: [04, 05]
 parallel: "none (registrations.mjs and git-checks.mjs chains)"
 owning_lane: "HARDEN (reviewer: OPC)"
