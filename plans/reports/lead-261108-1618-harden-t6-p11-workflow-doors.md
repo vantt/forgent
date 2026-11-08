@@ -1,6 +1,6 @@
 # HARDEN T6 P11 lead report: workflow doors and verbs
 
-Branch `harden/t6-p11-workflow-doors` from origin/main `282d5ad94`. Status of this draft: code commit `e4f5010a2` done, retire gate pending.
+Branch `harden/t6-p11-workflow-doors` from origin/main `282d5ad94`. Retire gate approved by the big lead with the CLI rendering condition, met in the deleting commit.
 
 ## What changed
 
@@ -15,7 +15,7 @@ Branch `harden/t6-p11-workflow-doors` from origin/main `282d5ad94`. Status of th
 
 | Retired test (title) | File | Behaviour | Owner now |
 |---|---|---|---|
-| `CLI: the detached child logs a line per step start and end, and workflow status prints the advance block` | `test/workflow/workflow-runner.test.mjs` | the detached child logs one line when a step starts and one when it ends; `status` carries `advance.running false` and the `advance.logPath` | `the detached advance child leaves progress lines in advance.log and no dump of its result` in `test/workflow/case-verbs.test.mjs`, strengthened in the same change to assert exactly two step lines (started, completed) and the advance block; the door wiring stays proven by `CLI: fgos workflow start returns the run id at once and a detached process finishes the run` |
+| `CLI: the detached child logs a line per step start and end, and workflow status prints the advance block` | `test/workflow/workflow-runner.test.mjs` | the detached child logs one line when a step starts and one when it ends; `status` carries `advance.running false` and the `advance.logPath` | `the detached advance child leaves progress lines in advance.log and no dump of its result` in `test/workflow/case-verbs.test.mjs`, strengthened in the same change to assert exactly two step lines (started, completed) and the advance block; CLI rendering of the advance block (`running`, `logPath`) -> the `workflow status` case of `test/cli/fgos-workflow.test.mjs`; the door wiring stays proven by `CLI: fgos workflow start returns the run id at once and a detached process finishes the run` |
 
 No other test is retired. The paired-function cases the plan expected do not exist as duplicates: each former `*Detached` case proves a behaviour the foreground function does not (the answer kept for a live proposer, the held refusal, the log lines, the conductor no-spawn), so they were migrated to `{ detached: true }` in place. Three CLI wiring proofs that observe the detached child (start, answer, resume) stay. No behaviour is removed. Test count: -1.
 

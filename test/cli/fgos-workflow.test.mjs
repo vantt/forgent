@@ -126,6 +126,8 @@ test('workflow status carries the case block, a finished Playbook case has close
 
   const status = JSON.parse(invoke('status', id).stdout).data;
   assert.equal(status.case.kind, 'playbook');
+  assert.equal(status.advance.running, false, 'status prints the advance block');
+  assert.ok(status.advance.logPath.endsWith('advance.log'));
   // A Playbook case that ran to a pass closed itself; the close verb agrees and says so.
   assert.equal(status.case.open, false);
   assert.equal(status.case.milestones['only-step.settled'].state, 'achieved');

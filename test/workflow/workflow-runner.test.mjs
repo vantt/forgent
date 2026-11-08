@@ -738,29 +738,6 @@ test('status shows no log tail for a completed run', async () => {
   assert.equal(advance.hint, undefined);
 });
 
-test('CLI: the detached child logs a line per step start and end, and workflow status prints the advance block', async () => {
-  const tmp = setupTestRepo();
-  const workflowId = writeTrivialWorkflow(tmp);
-
-  const wfRunId = parseCliData(
-    execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'start', workflowId, '--dir', tmp], { cwd: tmp, encoding: 'utf8' }),
-  ).workflowRunId;
-  assert.equal(await waitForStatus(wfRunId, tmp, 'completed'), 'completed');
-  const stepId = Object.keys(statusWorkflow(wfRunId, { repoRoot: tmp, cwd: tmp }).steps)[0];
-
-  const log = fs.readFileSync(path.join(tmp, '.fgos', 'workflow-runs', wfRunId, 'advance.log'), 'utf8');
-  const stepLines = log.split('\n').filter((l) => l.includes(`step ${stepId}`));
-  assert.equal(stepLines.length, 2, `one line when the step starts and one when it ends, got: ${log}`);
-  assert.match(stepLines[0], /started/);
-  assert.match(stepLines[1], /completed/);
-
-  const status = parseCliData(
-    execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'status', wfRunId, '--dir', tmp], { cwd: tmp, encoding: 'utf8' }),
-  );
-  assert.equal(status.advance.running, false);
-  assert.ok(status.advance.logPath.endsWith('advance.log'));
-});
-
 test('a foreground advance writes no log file; an explicit onLog receives the progress lines', async () => {
   const tmp = setupTestRepo();
   const lines = [];
