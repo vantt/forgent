@@ -19,6 +19,7 @@ import {
   SENTINEL_NAME,
 } from '../../src/workflow/case-bindings.mjs';
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
+import { appendWorkflowEvent } from '../../src/workflow/store.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { conductorWorkflow, eventsOf, openCase, withHold } from '../helpers/workflow-case-fixture.mjs';
 
@@ -117,7 +118,7 @@ test('masked or unmarked views answer binding-view-unavailable, never unbound', 
   });
 });
 
-test('a crash at any step of binding never reads as unbound; repair settles it from the ledger', async () => {
+test('a crash at any step of binding never reads as unbound; the case\'s own hold settles it from the ledger', async () => {
   await withDispatchDepth(undefined, async () => {
     const { repoRoot, a } = twoCases();
     const afterPending = dirIn(repoRoot, 'after-pending');
@@ -153,8 +154,9 @@ test('a crash at any step of binding never reads as unbound; repair settles it f
     assert.equal(readBinding({ mainRoot: repoRoot, worktree: garbled, caseId: a.caseId }).answer, 'binding-unsettled');
     fs.rmSync(path.join(bindingsDir(repoRoot), `${bindingKeyOf(garbled)}.json`));
 
+    // Taking the case's own hold settles what a crash left of it.
     const actions = withHold(a, () => repairCaseBindings({ mainRoot: repoRoot, caseId: a.caseId }));
-    assert.deepEqual(actions.map((x) => x.action).sort(), ['committed', 'removed']);
+    assert.deepEqual(actions, [], 'the hold had already settled them');
     assert.equal(readBinding({ mainRoot: repoRoot, worktree: afterEvent, caseId: a.caseId }).answer, 'bound', 'the event was on the ledger, so the binding stands');
     assert.equal(readBinding({ mainRoot: repoRoot, worktree: afterPending, caseId: a.caseId }).answer, 'unbound', 'no event: it never reached anything');
   });
@@ -199,5 +201,51 @@ test('only the owner of a pending record commits it', async () => {
     assert.equal(commitBinding({ mainRoot: repoRoot, key: made.key, caseId: a.caseId, generation: 9 }).committed, false);
     assert.equal(commitBinding({ mainRoot: repoRoot, key: made.key, caseId: a.caseId, generation: 1 }).committed, true);
     assert.equal(readBinding({ mainRoot: repoRoot, worktree: wt, caseId: a.caseId }).answer, 'bound');
+  });
+});
+
+const recordOf = (repoRoot, worktree) => path.join(bindingsDir(repoRoot), `${bindingKeyOf(worktree)}.json`);
+
+test('a record whose case never recorded it is removed by that case\'s next hold, not by a sweep of cases with a binding event', async () => {
+  await withDispatchDepth(undefined, () => {
+    const { repoRoot, a, b } = twoCases();
+    const wt = dirIn(repoRoot, 'never-recorded');
+    createPendingBinding({ mainRoot: repoRoot, caseId: a.caseId, generation: 1, worktree: wt });
+    assert.equal(eventsOf(a).filter((e) => e.type === 'binding').length, 0, 'the case has no binding event at all');
+
+    withHold(b, () => {});
+    assert.equal(fs.existsSync(recordOf(repoRoot, wt)), true, 'another case\'s hold leaves it alone');
+    withHold(a, () => {});
+    assert.equal(fs.existsSync(recordOf(repoRoot, wt)), false);
+  });
+});
+
+test('a committed record whose ledger already says unbound is removed by the case\'s next hold', async () => {
+  await withDispatchDepth(undefined, () => {
+    const { repoRoot, a } = twoCases();
+    const wt = dirIn(repoRoot, 'unbound-on-ledger');
+    const bound = withHold(a, (hold) => bindWorktree({ mainRoot: repoRoot, hold, caseId: a.caseId, worktree: wt }));
+    // The crash: `unbound` reached the ledger, the record file was not yet unlinked.
+    withHold(a, (hold) => appendWorkflowEvent({ repoRoot, workflowRunId: a.caseId, hold, event: { type: 'binding', payload: { caseId: a.caseId, generation: bound.generation, key: bound.key, worktreeRoot: fs.realpathSync(wt), state: 'unbound' } } }));
+    assert.equal(fs.existsSync(recordOf(repoRoot, wt)), true);
+
+    withHold(a, () => {});
+    assert.equal(fs.existsSync(recordOf(repoRoot, wt)), false);
+    assert.equal(readBinding({ mainRoot: repoRoot, worktree: wt, caseId: a.caseId }).answer, 'unbound');
+  });
+});
+
+test('a record the ledger shows as bound but that is missing is rebuilt by the open case\'s hold; another generation is never touched', async () => {
+  await withDispatchDepth(undefined, () => {
+    const { repoRoot, a } = twoCases();
+    const wt = dirIn(repoRoot, 'lost-record');
+    const bound = withHold(a, (hold) => bindWorktree({ mainRoot: repoRoot, hold, caseId: a.caseId, worktree: wt }));
+    fs.rmSync(recordOf(repoRoot, wt));
+    assert.equal(readBinding({ mainRoot: repoRoot, worktree: wt, caseId: a.caseId }).answer, 'unbound', 'without the record the worktree reads free');
+
+    const actions = withHold(a, () => repairCaseBindings({ mainRoot: repoRoot, caseId: a.caseId }));
+    assert.deepEqual(actions, [], 'the hold had already rebuilt it');
+    const record = readBinding({ mainRoot: repoRoot, worktree: wt, caseId: a.caseId });
+    assert.deepEqual([record.answer, record.record.generation], ['bound', bound.generation]);
   });
 });

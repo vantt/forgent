@@ -5,15 +5,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 
 import { validateWorkflow, createWorkflowRun, readWorkflowEvents } from '../../src/workflow/index.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
-import { drainCaseInbox, readReservationFiles, recordGateAnswerRound, unconsumedGateRounds, writeReservationFile, writeSettlePending } from '../../src/workflow/case-runtime.mjs';
+import { drainCaseInbox, recordGateAnswerRound, unconsumedGateRounds, writeSettlePending } from '../../src/workflow/case-runtime.mjs';
+import { bindWorktree, readBinding } from '../../src/workflow/case-bindings.mjs';
+import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { digestSubject, digestText, digestContextRefs } from '../../src/workflow/ref-digests.mjs';
 import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { appendAll, append, eventsOf, openCase, withHold } from '../helpers/workflow-case-fixture.mjs';
+import { appendAll, append, eventsOf, openCase, projectionOf, withHold } from '../helpers/workflow-case-fixture.mjs';
 
 function gatedRun() {
   const repoRoot = makeFixtureDir('fgos-rounds-');
@@ -101,12 +103,10 @@ test('the file the Execution Core hands to later units still resolves through ga
   assert.equal(refs[0], answerFile(run));
 });
 
-test('a settle that could not take advance is a file the next holder appends first, and its reservation file goes with it', () => {
+test('a settle that could not take advance is a file the next holder appends first and removes', () => {
   const run = openCase();
   appendAll(run, [{ type: 'reservation', payload: { reservationId: 'r-1', activity: 'plan', writes: [], worktree: null, counters: { dispatches: 1, mutatingDispatches: 0 } } }]);
-  writeReservationFile({ mainRoot: run.repoRoot, caseId: run.caseId, reservation: { reservationId: 'r-1', activity: 'plan', worktree: null } });
   writeSettlePending({ mainRoot: run.repoRoot, caseId: run.caseId, settle: { reservationId: 'r-1', outcome: 'pass', receipts: [], achieved: [], seatLaunchesUsed: 1 } });
-  assert.equal(readReservationFiles(run.repoRoot, run.caseId).length, 1);
 
   // Taking advance is the drain: the settle is on the ledger before anything else reads it.
   const hold = acquireAdvanceLock(run.repoRoot, run.caseId);
@@ -114,13 +114,100 @@ test('a settle that could not take advance is a file the next holder appends fir
   const settles = eventsOf(run).filter((e) => e.type === 'settle');
   assert.equal(settles.length, 1);
   assert.equal(settles[0].payload.reservationId, 'r-1');
-  assert.equal(readReservationFiles(run.repoRoot, run.caseId).length, 0);
   assert.equal(fs.readdirSync(path.join(run.repoRoot, '.fgos', 'workflow-runs', run.caseId, 'settle-pending')).length, 0);
 
   // Idempotent: the same settle on a ledger that has it is not appended twice.
   writeSettlePending({ mainRoot: run.repoRoot, caseId: run.caseId, settle: { reservationId: 'r-1', outcome: 'pass', receipts: [], achieved: [] } });
   acquireAdvanceLock(run.repoRoot, run.caseId).release();
   assert.equal(eventsOf(run).filter((e) => e.type === 'settle').length, 1);
+});
+
+const inboxDir = (run, name) => path.join(run.repoRoot, '.fgos', 'workflow-runs', run.caseId, name);
+
+test('a settle file naming no reservation of the case is refused and kept, never applied', () => {
+  const run = openCase();
+  writeSettlePending({ mainRoot: run.repoRoot, caseId: run.caseId, settle: { reservationId: 'r-nobody', outcome: 'pass', receipts: [], achieved: [], seatLaunchesUsed: 1 } });
+  const drained = withHold(run, (hold) => drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold }));
+  assert.equal(drained.settles, 0);
+  assert.equal(eventsOf(run).filter((e) => e.type === 'settle').length, 0);
+  assert.match(drained.skipped[0].problem, /no reservation/);
+  assert.equal(fs.readdirSync(inboxDir(run, 'settle-pending')).length, 1, 'the file stays for the owner to see');
+});
+
+test('the inbox is read as agent-written input: a pipe, a link and garbage are named and skipped, and the drain never waits on a pipe', { skip: process.platform === 'win32' }, () => {
+  const run = gatedRun();
+  const pending = inboxDir(run, 'settle-pending');
+  fs.mkdirSync(pending, { recursive: true });
+  execFileSync('mkfifo', [path.join(pending, 'pipe.json')]);
+  fs.writeFileSync(path.join(pending, 'target.txt'), '{}');
+  fs.symlinkSync(path.join(pending, 'target.txt'), path.join(pending, 'link.json'));
+  fs.writeFileSync(path.join(pending, 'garbage.json'), '{"reservationId": ');
+  const rounds = path.join(inboxDir(run, 'gate-answers'), 'ok.rounds');
+  fs.mkdirSync(rounds, { recursive: true });
+  execFileSync('mkfifo', [path.join(rounds, '1-1.json')]);
+
+  const drained = withHold(run, (hold) => drainCaseInbox({ mainRoot: run.repoRoot, caseId: run.caseId, hold }));
+  assert.deepEqual(drained.skipped.map((s) => s.file).sort(), ['gate-answers/ok.rounds/1-1.json', 'settle-pending/garbage.json', 'settle-pending/link.json', 'settle-pending/pipe.json']);
+  assert.ok(drained.skipped.every((s) => typeof s.problem === 'string' && s.problem.length > 0));
+  assert.equal(fs.readdirSync(pending).length, 4, 'nothing was removed');
+});
+
+// --- a dead controller's reservation ---------------------------------------------------------
+
+/** Put reservations on the ledger, each with its own bound worktree, under one hold so nothing releases them yet. */
+function reserve(run, specs) {
+  return withHold(run, (hold) => Object.fromEntries(specs.map(({ id, worktree = 'dir', unitRunId = `unit-run-${id}` }) => {
+    let real = null;
+    if (worktree === 'dir' || worktree === 'gone') {
+      const dir = path.join(run.repoRoot, 'wt', id);
+      fs.mkdirSync(dir, { recursive: true });
+      real = fs.realpathSync(dir);
+      if (worktree === 'dir') bindWorktree({ mainRoot: run.repoRoot, hold, caseId: run.caseId, worktree: real });
+      else fs.rmSync(dir, { recursive: true });
+    }
+    append(run, hold, 'reservation', { reservationId: id, activity: 'build-a', writes: real ? ['src/a'] : [], worktree: real, counters: { dispatches: 1, mutatingDispatches: real ? 1 : 0 }, unitRunId });
+    return [id, real];
+  })));
+}
+const unitRecord = (run, unitRunId, text) => {
+  const dir = path.join(run.repoRoot, '.fgos', 'assignments', unitRunId);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'unit.json'), text);
+};
+const settledAs = (run) => Object.fromEntries(eventsOf(run).filter((e) => e.type === 'settle').map((e) => [e.payload.reservationId, e.payload.outcome]));
+
+test('a hold releases the writing reservation of a dead controller as not-started, with no inbox directory present, and frees its binding', () => {
+  const run = openCase();
+  const { dead } = reserve(run, [{ id: 'dead' }]);
+  assert.equal(fs.existsSync(inboxDir(run, 'settle-pending')) || fs.existsSync(inboxDir(run, 'gate-answers')), false, 'no inbox directory exists');
+  assert.equal(readBinding({ mainRoot: run.repoRoot, worktree: dead, caseId: run.caseId }).answer, 'bound');
+
+  acquireAdvanceLock(run.repoRoot, run.caseId).release();
+  assert.deepEqual(settledAs(run), { dead: 'not-started' });
+  assert.equal(projectionOf(run).liveReservations.length, 0);
+  assert.equal(readBinding({ mainRoot: run.repoRoot, worktree: dead, caseId: run.caseId }).answer, 'unbound');
+});
+
+test('only a reservation proven dead is released: read-only, held custody, a resumable Unit run, a gone worktree and an unreadable record all stay', () => {
+  const run = openCase();
+  const planted = reserve(run, [
+    { id: 'no-record' }, { id: 'settled-record' }, { id: 'gate', unitRunId: 'gate-run-1' },
+    { id: 'read-only', worktree: null }, { id: 'held' }, { id: 'resumable' }, { id: 'gone', worktree: 'gone' }, { id: 'garbled' },
+  ]);
+  unitRecord(run, 'unit-run-settled-record', JSON.stringify({ execution: { status: 'settled' } }));
+  unitRecord(run, 'unit-run-resumable', JSON.stringify({ execution: { status: 'running' } }));
+  unitRecord(run, 'unit-run-garbled', '{"execution": ');
+  const custody = acquireDispatchCwdLock(path.join(run.repoRoot, '.fgos'), planted.held);
+  try {
+    acquireAdvanceLock(run.repoRoot, run.caseId).release();
+  } finally {
+    custody.release();
+  }
+  assert.deepEqual(settledAs(run), { 'no-record': 'not-started', 'settled-record': 'not-started', gate: 'not-started' });
+  assert.deepEqual(projectionOf(run).liveReservations.map((r) => r.reservationId).sort(), ['garbled', 'gone', 'held', 'read-only', 'resumable']);
+  for (const stays of ['held', 'resumable', 'garbled']) {
+    assert.equal(readBinding({ mainRoot: run.repoRoot, worktree: planted[stays], caseId: run.caseId }).answer, 'bound', `${stays} keeps its binding`);
+  }
 });
 
 test('subject digests: files, trees and named subjects; an unknown subject is null, never a guess', () => {

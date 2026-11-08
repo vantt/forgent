@@ -1,4 +1,4 @@
-// test/setup/workflow-case-checks.test.mjs — doctor: binding records agree with their ledgers; the fix settles and rebuilds
+// test/setup/workflow-case-checks.test.mjs — doctor: binding records agree with their ledgers; the fix writes the sentinel
 
 import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
@@ -24,7 +24,7 @@ function boundCase() {
 
 const recordFile = (repoRoot, key) => path.join(bindingsDir(repoRoot), `${key}.json`);
 
-test('both checks and the fix are registered', () => {
+test('both checks and the sentinel fix are registered', () => {
   const ids = DOCTOR_CHECKS.map((c) => c.id);
   assert.ok(ids.includes('workflow-case-binding-sentinel') && ids.includes('workflow-case-bindings'));
   assert.ok(FIX_REGISTRATIONS.some((f) => f.id === 'workflow-case-bindings'));
@@ -67,40 +67,34 @@ test('a record the ledger does not show, an unsettled one and a closed case stil
   assert.match(closed.message, /closed case/);
 });
 
-test('the fix rebuilds a record the ledger says exists, and settles what a crash left', () => {
+test('every binding condition is judged by the one reader: a record missing for a bound open case, an unparseable record and a ledger that cannot be read', () => {
   const { repoRoot, run, worktree, key } = boundCase();
   fs.rmSync(recordFile(repoRoot, key));
   const missing = checkWorkflowCaseBindings(repoRoot);
   assert.equal(missing.passed, false);
-  assert.match(missing.message, /has no record/);
+  assert.ok(missing.message.includes('has no record') && missing.message.includes(`fgos workflow resume ${run.caseId}`), missing.message);
 
-  const fixed = fixWorkflowCaseBindings(repoRoot);
-  assert.equal(fixed.changed, true);
-  assert.match(fixed.message, /rebuilt record/);
-  assert.equal(checkWorkflowCaseBindings(repoRoot).passed, true);
-  assert.equal(JSON.parse(fs.readFileSync(recordFile(repoRoot, key), 'utf8')).state, 'committed');
-
-  // A pending record with no event on the ledger is a crash before anything used it.
   const other = path.join(repoRoot, 'wt-crashed');
   fs.mkdirSync(other);
   createPendingBinding({ mainRoot: repoRoot, caseId: run.caseId, generation: 9, worktree: other });
-  assert.equal(fs.existsSync(recordFile(repoRoot, bindingKeyOf(other))), true);
-  fixWorkflowCaseBindings(repoRoot);
-  assert.equal(fs.existsSync(recordFile(repoRoot, bindingKeyOf(other))), false);
-  assert.equal(fs.existsSync(worktree), true);
+  fs.writeFileSync(recordFile(repoRoot, bindingKeyOf(worktree)), '{"state": "comm');
+  const broken = checkWorkflowCaseBindings(repoRoot);
+  assert.match(broken.message, /does not parse/);
+  assert.match(broken.message, /is pending \(binding-unsettled\)/);
+
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'workflow-runs', run.caseId, 'events.jsonl'), '{"seq": 1, garbage\n');
+  assert.match(checkWorkflowCaseBindings(repoRoot).message, /ledger unreadable/);
 });
 
-test('the fix does not touch a case whose advance lock is held', () => {
+test('the fix writes the sentinel only; settling and rebuilding records belongs to the case\'s own hold', () => {
   const { repoRoot, run, key } = boundCase();
-  const file = recordFile(repoRoot, key);
-  fs.rmSync(file);
-  // A live binder holds `advance`; settling or rebuilding under it would race that binder.
+  fs.rmSync(path.join(bindingsDir(repoRoot), SENTINEL_NAME));
+  fs.rmSync(recordFile(repoRoot, key));
+  const fixed = fixWorkflowCaseBindings(repoRoot);
+  assert.equal(fixed.message, 'wrote the sentinel');
+  assert.equal(fs.existsSync(recordFile(repoRoot, key)), false, 'the doctor rebuilt nothing');
+  assert.equal(fixWorkflowCaseBindings(repoRoot).changed, false);
   const held = acquireAdvanceLock(repoRoot, run.caseId);
-  try {
-    const result = fixWorkflowCaseBindings(repoRoot);
-    assert.match(result.message, /advance lock is held/);
-    assert.equal(fs.existsSync(file), false, 'nothing was rebuilt under a live binder');
-  } finally {
-    held.release();
-  }
+  held.release();
+  assert.equal(fs.existsSync(recordFile(repoRoot, key)), true, 'the case\'s own hold rebuilt it');
 });

@@ -10,8 +10,7 @@ import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { createCaseAdmissionPort, activityUnitOf } from '../../src/workflow/case-admission-port.mjs';
 import { assertCaseAdmissionPort, seatLaunchesOf } from '../../src/runner/execution/case-admission-port.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
-import { readReservationFiles } from '../../src/workflow/case-runtime.mjs';
-import { readBinding, listBindingRecords } from '../../src/workflow/case-bindings.mjs';
+import { createPendingBinding, readBinding, listBindingRecords } from '../../src/workflow/case-bindings.mjs';
 import { appendAll, FRAME, eventsOf, openCase, projectionOf, withHold, conductorWorkflow } from '../helpers/workflow-case-fixture.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
@@ -46,13 +45,12 @@ test('the port is complete: every operation the core asks is there', () => {
   assert.throws(() => assertCaseAdmissionPort({ admit() {} }), { code: 'case-admission-port-missing' });
 });
 
-test('admit records route and reservation under advance, writes the reservation file, and lets go of advance', () => {
+test('admit records route and reservation under advance, and lets go of advance', () => {
   const run = openCase();
   const port = createCaseAdmissionPort({ repoRoot: run.repoRoot });
   const answer = port.admit(proposal(run));
   assert.equal(answer.admitted, true, JSON.stringify(answer));
   assert.deepEqual(types(run).slice(-2), ['route', 'reservation']);
-  assert.equal(readReservationFiles(run.repoRoot, run.caseId).length, 1);
   assert.equal(projectionOf(run).liveReservations[0].unitRunId, 'unit-run-1');
   // The lock was taken for the section only.
   const hold = acquireAdvanceLock(run.repoRoot, run.caseId);
@@ -110,7 +108,7 @@ test('a Unit that names a case that does not exist, or another case than the pro
   assert.equal(bound.admit(proposal(run, { caseRef: { caseId: 'wf-other', activity: 'scout' } })).refused.code, 'authority-context-conflict');
 });
 
-test('settle appends once, releases the binding it created and the reservation file; a repeat changes nothing', () => {
+test('settle appends once and releases the binding its worktree holds on the ledger; a repeat changes nothing', () => {
   const run = planned();
   const port = createCaseAdmissionPort({ repoRoot: run.repoRoot });
   const wt = makeFixtureDir('fgos-port-settle-');
@@ -123,7 +121,8 @@ test('settle appends once, releases the binding it created and the reservation f
   assert.equal(settles.length, 1);
   assert.deepEqual({ outcome: settles[0].payload.outcome, used: settles[0].payload.seatLaunchesUsed, exhausted: settles[0].payload.frameExhausted, receipts: settles[0].payload.receipts.map((r) => r.kind) }, { outcome: 'pass', used: 3, exhausted: true, receipts: ['verify'] });
   assert.equal(readBinding({ mainRoot: run.repoRoot, worktree: wt, caseId: run.caseId }).answer, 'unbound');
-  assert.deepEqual(readReservationFiles(run.repoRoot, run.caseId), []);
+  assert.deepEqual(eventsOf(run).filter((e) => e.type === 'binding').map((e) => e.payload.state), ['bound', 'unbound']);
+  assert.equal(projectionOf(run).liveReservations.length, 0);
   assert.equal(projectionOf(run).frameExhausted, true, 'frame-exhausted is recorded once, on settle');
   assert.equal(listBindingRecords(run.repoRoot).length, 0);
 });
@@ -153,6 +152,42 @@ test('a Unit asked again under the same unit id keeps its live reservation inste
   assert.equal(again.reservationId, first.reservationId);
   assert.equal(projectionOf(run).liveReservations.length, 1);
   assert.equal(projectionOf(run).frameRemaining.dispatches, FRAME.dispatches - 1);
+});
+
+test('a Unit asked again after its controller died, then settled, leaves no binding behind', () => {
+  const run = planned();
+  const port = createCaseAdmissionPort({ repoRoot: run.repoRoot });
+  const wt = makeFixtureDir('fgos-port-again-');
+  // The first run left a resumable record, so the next hold does not take its reservation for dead.
+  const recordDir = path.join(run.repoRoot, '.fgos', 'assignments', 'unit-run-1');
+  fs.mkdirSync(recordDir, { recursive: true });
+  fs.writeFileSync(path.join(recordDir, 'unit.json'), JSON.stringify({ execution: { status: 'running' } }));
+  const ask = (id) => port.admit(proposal(run, { unitRunId: id, activity: 'build-a', caseRef: { caseId: run.caseId, activity: 'build-a', unitId: 'unit-a' }, writes: ['src/a'], worktree: wt, readOnly: false }));
+  const first = ask('unit-run-1');
+  assert.equal(first.admitted, true, JSON.stringify(first));
+  acquireAdvanceLock(run.repoRoot, run.caseId).release();
+  const again = ask('unit-run-2');
+  assert.equal(again.reservationId, first.reservationId);
+  assert.equal(readBinding({ mainRoot: run.repoRoot, worktree: wt, caseId: run.caseId }).answer, 'bound');
+
+  port.settle(again.reservationId, { caseId: run.caseId, outcome: 'pass', unitRunId: 'unit-run-2', results: [], seatLaunchesUsed: 1 });
+  assert.equal(readBinding({ mainRoot: run.repoRoot, worktree: wt, caseId: run.caseId }).answer, 'unbound');
+  assert.equal(listBindingRecords(run.repoRoot).length, 0);
+});
+
+test('a worktree whose record another case left unsettled is refused naming that case and the verb that settles it; its records are not touched', () => {
+  const repoRoot = makeFixtureDir('fgos-port-unsettled-');
+  const mine = openCase({ repoRoot });
+  const other = openCase({ repoRoot });
+  const wt = makeFixtureDir('fgos-port-unsettled-wt-');
+  createPendingBinding({ mainRoot: repoRoot, caseId: other.caseId, generation: 1, worktree: wt });
+  const port = createCaseAdmissionPort({ repoRoot });
+  const answer = port.admit(proposal(mine, { activity: 'build-a', caseRef: { caseId: mine.caseId, activity: 'build-a' }, writes: ['src/a'], worktree: wt, readOnly: false }));
+  assert.equal(answer.refused.code, 'binding-unsettled');
+  assert.ok(answer.refused.condition.includes(other.caseId), answer.refused.condition);
+  assert.match(answer.refused.condition, /fgos workflow resume .*or.*close/);
+  assert.equal(listBindingRecords(repoRoot).length, 1, 'the other case\'s record was left for that case to settle');
+  assert.equal(eventsOf(other).filter((e) => e.type === 'binding').length, 0);
 });
 
 test('recheckEffect refuses a reservation that is not live', () => {
