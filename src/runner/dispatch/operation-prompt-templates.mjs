@@ -27,7 +27,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { RunnerConfigError } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 import { PROTOCOL_OPERATION_STAMP_PREFIX } from './execution-contract.mjs';
 
 const THIS_DIR = path.dirname(fileURLToPath(import.meta.url));

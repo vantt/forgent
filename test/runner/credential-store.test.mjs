@@ -5,7 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { credentialStoreOf, credentialStoreProblem } from '../../src/runner/dispatch/provider-capacity.mjs';
-import { RunnerConfigError, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 import { buildConfinementRequest, validateConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 

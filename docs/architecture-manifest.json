@@ -42,6 +42,7 @@
     "src/runner/work-compat.mjs": "infra",
     "src/runner/dispatch/adapters.mjs": "infra",
     "src/runner/dispatch/config.mjs": "infra",
+    "src/runner/dispatch/runner-config-error.mjs": "infra",
     "src/runner/dispatch/confinement/policies.mjs": "infra",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
     "src/runner/dispatch/confinement/backend-registry.mjs": "infra",

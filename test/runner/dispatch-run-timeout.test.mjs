@@ -7,7 +7,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { parseRunTimeout, assertRunTimeoutMs, RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { parseRunTimeout, assertRunTimeoutMs, RUN_TIMEOUT_MAX_MS, RUN_TIMEOUT_MIN_MS } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 test('parseRunTimeout reads a whole number with one unit', () => {

@@ -17,7 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { describeYamlError, parseYaml } from '../util/yaml.mjs';
-import { RunnerConfigError } from './dispatch/config.mjs';
+import { RunnerConfigError } from './dispatch/runner-config-error.mjs';
 import { definitionFileName } from '../convention/definition-names.mjs';
 
 export const AGENT_NAME_PATTERN = /^[a-z][a-z0-9-]{0,63}$/;

@@ -17,7 +17,7 @@ import { unitFieldsOfTemplate } from '../../src/workflow/steps.mjs';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { HandoffRefError, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER } from '../../src/runner/execution/handoff-refs.mjs';
 
 const GATE = { id: 'close', gate: { kind: 'human', mode: 'input', question: 'Bring in {{report:synthesis/synthesize-recommendation:missing expertise}} or not?' } };

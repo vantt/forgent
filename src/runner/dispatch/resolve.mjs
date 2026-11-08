@@ -9,7 +9,8 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
-import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE, normalizePreferCandidates } from './config.mjs';
+import { EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, EXECUTOR_MISSING_MESSAGE, normalizePreferCandidates } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 import { credentialStoreOf } from './provider-capacity.mjs';
 
 /**

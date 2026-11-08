@@ -151,7 +151,8 @@ test('dead vocabulary guard: the project config does not contain runner.models o
 });
 
 import os from 'node:os';
-import { RunnerConfigError, validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { validateRunnerConfigShape } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 
 // A removed key has no schema node to refuse it by name, so `validateRunnerConfigShape` says what replaced it. A
 // removed key inside a capability entry is an unknown key to the schema, which refuses it

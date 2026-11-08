@@ -33,7 +33,7 @@
 import fs from 'node:fs';
 import { decideExecutorCli, runDoorHint } from '../src/runner/dispatch/cli.mjs';
 import { isConfigRefusal } from '../src/config/facade.mjs';
-import { RunnerConfigError } from '../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../src/runner/dispatch/runner-config-error.mjs';
 
 const AGENT_TOOL_NAMES = new Set(['Agent', 'Task']);
 

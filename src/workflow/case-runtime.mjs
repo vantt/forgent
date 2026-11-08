@@ -9,7 +9,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { dispatchCwdHolder } from '../run-supervisor/cwd-lock.mjs';
 import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
 import { gateAnswerFile, runDirOf } from '../runner/execution/case-run-paths.mjs';

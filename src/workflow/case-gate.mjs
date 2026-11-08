@@ -12,7 +12,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { RunnerConfigError, assertRunTimeoutMs, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
+import { assertRunTimeoutMs, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { runCommand } from '../runner/goal-check.mjs';
 import { createLockScope } from '../holder-lock/index.mjs';
 import { admitSuccessor, recordCustodyHandoff } from '../run-supervisor/cwd-lock.mjs';

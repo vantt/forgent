@@ -9,7 +9,7 @@ import path from 'node:path';
 import { nativeDoor } from '../../../src/native/door.mjs';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { snapshotRunnerConfig } from '../../../src/runner/execution/run.mjs';
-import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../../src/runner/dispatch/runner-config-error.mjs';
 import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 

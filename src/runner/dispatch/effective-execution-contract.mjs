@@ -15,7 +15,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { RunnerConfigError } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 import { resolveMutatingCwdPosture } from './execution-contract.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 import { isReadOnlyAssignment } from './assignment.mjs';

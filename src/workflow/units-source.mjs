@@ -7,7 +7,7 @@ import { parseYaml } from '../util/yaml.mjs';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { validateUnit } from '../runner/execution/unit.mjs';
-import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 
 const BRANCH_SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 

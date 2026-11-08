@@ -14,7 +14,7 @@ import { runUnit } from '../../../src/runner/execution/run.mjs';
 import { shippedCatalog } from '../../../src/runner/dispatch/shipped-catalog.mjs';
 import { runReviewed } from '../../../src/runner/execution/loops/reviewed.mjs';
 import { seatLaunchesOf, seatLaunchesUsed, briefNeverReached, noBriefDelivered, CaseAdmissionRefusedError } from '../../../src/runner/execution/case-admission-port.mjs';
-import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../../src/runner/dispatch/runner-config-error.mjs';
 import { dispatchCwdHolder } from '../../../src/run-supervisor/cwd-lock.mjs';
 import { createCaseAdmissionPort } from '../../../src/workflow/case-admission-port.mjs';
 import { createPendingBinding, commitBinding } from '../../../src/workflow/case-bindings.mjs';

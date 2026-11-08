@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { runDirOf } from '../runner/execution/case-run-paths.mjs';
 import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../holder-lock/index.mjs';
 import { createAdvanceHold, recoverWorkflowLedgerTail } from './store.mjs';

@@ -12,7 +12,7 @@ import { pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
 import { loadAgentRoster, readTaskSpecHeader } from './agent-roster.mjs';
 import { selectTemplate, hashTemplate } from './prompt-templates.mjs';
-import { RunnerConfigError } from './dispatch/config.mjs';
+import { RunnerConfigError } from './dispatch/runner-config-error.mjs';
 import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { deriveOperationCapability } from './operation-capability.mjs';

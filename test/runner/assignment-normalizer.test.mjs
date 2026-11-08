@@ -9,7 +9,7 @@ import {
   stampDeclaredAssignment,
   stampInlineAssignment,
 } from '../../src/runner/dispatch/assignment-normalizer.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 
 test('NORMALIZER_VERSION is a non-empty string', () => {
   assert.equal(typeof NORMALIZER_VERSION, 'string');

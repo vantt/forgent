@@ -6,7 +6,7 @@
 // `advance` holds are never held in one scope. Both calls are idempotent on the reservation id.
 
 import crypto from 'node:crypto';
-import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { projectCase } from './case-projection.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { tryAcquireAdvanceLock } from './case-lock.mjs';

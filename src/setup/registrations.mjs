@@ -84,7 +84,8 @@ import {
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { readOwnershipMarker, readAttemptOwnershipMarker, cleanupConfinementResource, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
-import { MODEL_POLICY_TIERS, validateGeneratedPathsShape, validateRunnerLoopsShape, RunnerConfigError, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, validateGeneratedPathsShape, validateRunnerLoopsShape, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
 import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';

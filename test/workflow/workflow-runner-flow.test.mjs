@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
 import { startWorkflow, answerWorkflow, resumeWorkflow, statusWorkflow } from '../../src/workflow/index.mjs';
 import { prepareWorkflowRun, assertUnitAcceptOutcomes } from '../../src/workflow/case-start.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { nativeDoor } from '../../src/native/door.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { withProviderFamilies } from '../helpers/provider-families.mjs';

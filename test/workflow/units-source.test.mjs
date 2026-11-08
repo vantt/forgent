@@ -9,7 +9,7 @@ import path from 'node:path';
 
 import { translateUnitsToWorkflow } from '../../src/workflow/units-source.mjs';
 import { validateWorkflow } from '../../src/workflow/definition.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 
 function unitsFile(name, content) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-units-'));

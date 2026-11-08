@@ -10,7 +10,7 @@
 
 import crypto from 'node:crypto';
 
-import { RunnerConfigError } from '../dispatch/config.mjs';
+import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 import { matchesWriteScope } from '../dispatch/write-scope.mjs';
 import { SYNC_SEAT } from './seat-resolver.mjs';
 import { commitOnBranch, finishSyncMerge, resolveSyncBase, startSyncMerge, syncMergeState } from './commit-unit-work.mjs';

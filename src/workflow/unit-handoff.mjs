@@ -14,7 +14,7 @@ import { createWorktreeCheckoutSync } from '../runner/repo-locks.mjs';
 import { removeWorktree, deleteBranchRef } from '../runner/worktree.mjs';
 import { createLockScope } from '../holder-lock/index.mjs';
 
-import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
 import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';

@@ -26,7 +26,8 @@ import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helpe
 seedFileLocalBwrapRegistry();
 // The machine's ~/.fgos/config.json must not leak executors into these runs.
 process.env.HOME = makeFixtureDir('fgos-effort-home-');
-import { assertReasoningEffort, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { assertReasoningEffort } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 
 test('renderReasoningEffortArgs puts codex effort in a config override after the exec subcommand', () => {
   const rendered = renderReasoningEffortArgs({ command: '/usr/bin/codex', args: ['exec', '--model', '{model}', '{prompt}'], effort: 'high' });

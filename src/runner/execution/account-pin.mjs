@@ -10,7 +10,7 @@
 import { inspectProviderCapacity } from '../dispatch/provider-capacity.mjs';
 import { configPinnedToAccount } from '../dispatch/provider-account-probe.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
-import { RunnerConfigError } from '../dispatch/config.mjs';
+import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 
 const refuse = (reason, detail) => ({ refused: { reason, detail } });
 

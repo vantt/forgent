@@ -1,6 +1,6 @@
 // dispatch/work-item-input.mjs -- dispatch takes generic inputs only, never a Work item.
 
-import { RunnerConfigError } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 
 // Option names that once carried a Work item (or the pieces dispatch used to read off one)
 // into dispatch. Dispatch takes generic inputs only, so a caller still passing one is refused

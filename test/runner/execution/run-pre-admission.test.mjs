@@ -9,7 +9,7 @@ import path from 'node:path';
 
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { runUnit as coreRunUnit, resolveGitRoots, assertRepositoryForWrites, snapshotRunnerConfig } from '../../../src/runner/execution/run.mjs';
-import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../../src/runner/dispatch/runner-config-error.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { holdLockInChild } from '../../helpers/hold-lock-in-child.mjs';
 import { setupGitRepo, panelSeats, withCancelHandlers } from '../../helpers/run-unit-repo-fixture.mjs';

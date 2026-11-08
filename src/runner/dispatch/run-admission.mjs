@@ -5,7 +5,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { RunnerConfigError } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 import { EFFECTIVE_EXECUTION_CONTRACT_FILE } from './effective-execution-contract.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import {

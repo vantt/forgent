@@ -6,7 +6,7 @@
 // here, by name, before a path is made from it.
 
 import path from 'node:path';
-import { RunnerConfigError } from '../dispatch/config.mjs';
+import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 
 const CASE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
 

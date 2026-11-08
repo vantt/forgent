@@ -14,7 +14,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { RunnerConfigError, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
+import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';

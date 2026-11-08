@@ -16,7 +16,7 @@ import { runUnitWithPort as runUnit, prepareActivatedGitFixture } from '../../he
 import { createGitRepositoryConfig } from '../../../src/git/index.mjs';
 import { resolveStateRoot } from '../../../src/holder-lock/index.mjs';
 import { validateUnit } from '../../../src/runner/execution/unit.mjs';
-import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../../src/runner/dispatch/runner-config-error.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { writeProjectConfig } from '../../helpers/config-fixture.mjs';

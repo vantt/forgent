@@ -14,7 +14,7 @@ import { executeAssignment as executeAssignmentRaw, commitRunSettlement, settleR
 import { bindable, bindableExecute, bindableFile } from '../helpers/work-seat-config.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/run-supervisor/run-lock.mjs';

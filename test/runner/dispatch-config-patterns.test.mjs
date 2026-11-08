@@ -8,7 +8,6 @@ import { projectConfigPath, writeGlobalConfig, writeProjectConfig, withHome } fr
 import {
   loadRunnerConfigForDir,
   checkDoorRefusalsForRetiredKeys,
-  RunnerConfigError,
   validateRunnerPatternsShape,
   validateRunnerLoopsShape,
   validateGeneratedPathsShape,
@@ -18,6 +17,7 @@ import {
   resolveOriginLocations,
   withDefaultExecutor,
 } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { readStandardValue, ConfigDoorError } from '../../src/config/facade.mjs';
 import { shippedCatalog } from '../../src/runner/dispatch/shipped-catalog.mjs';
 

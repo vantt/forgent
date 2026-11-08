@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { validateUnit, normalizeWorkflowLink } from '../../../src/runner/execution/unit.mjs';
-import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../../src/runner/dispatch/runner-config-error.mjs';
 
 test('validateUnit: accepts a minimal valid unit and returns frozen object', () => {
   const raw = {

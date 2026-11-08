@@ -43,7 +43,7 @@
 //     `buildDeclaredAssignment`'s own `mergedPolicy`).
 
 import path from 'node:path';
-import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../../src/runner/dispatch/runner-config-error.mjs';
 import { getDomain, operationsForStep } from '../../../src/state/domain-registry.mjs';
 
 function fail(reason) {

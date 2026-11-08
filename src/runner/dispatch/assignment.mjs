@@ -44,7 +44,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveTaskSpecPath } from '../paths.mjs';
 
-import { RunnerConfigError } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 import { describeYamlError, parseYaml } from '../../util/yaml.mjs';
 import { nonTextPersonaValues, projectPersona } from '../agent-definitions.mjs';
 import {

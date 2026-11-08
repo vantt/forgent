@@ -6,7 +6,8 @@
 // selector, caller, mechanism, executorId, capability, invocation, governance,
 // and reasonCodes into a canonical DispatchPlan object.
 
-import { MODEL_POLICY_TIERS, RunnerConfigError, assertReasoningEffort } from './config.mjs';
+import { MODEL_POLICY_TIERS, assertReasoningEffort } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorConfig } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { refuseWorkItemInput } from './work-item-input.mjs';

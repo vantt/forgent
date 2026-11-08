@@ -2,7 +2,8 @@
 // Architecture guard: infra layer; the kernel-level definition module stays free of runner imports.
 
 import { validateWorkflow, WorkflowDefinitionError } from './definition.mjs';
-import { RunnerConfigError, MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { checkDeclaredSeats, assertNoSeatTier } from '../runner/execution/seat-resolver.mjs';
 
 /**

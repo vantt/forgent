@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
-import { RunnerConfigError } from '../dispatch/config.mjs';
+import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 import { gateAnswerFile } from './case-run-paths.mjs';
 import { resolveBlindHiddenRoots, isInsideRoot } from '../dispatch/confinement/resources.mjs';
 import { readSeatHistory } from './unit-run-history.mjs';

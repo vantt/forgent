@@ -12,7 +12,7 @@
 //
 // The core never writes the ledger itself and never between admit and settle.
 
-import { RunnerConfigError } from '../dispatch/config.mjs';
+import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 
 // How many seat launches a Unit plans is the seat resolver's answer, so admission counts the same seats
 // the run will bind.

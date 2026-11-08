@@ -13,7 +13,7 @@ import { chooseStageOperation, executeDriverOperationChoice } from '../../src/ru
 import { runUnitWithPort as runUnit } from '../helpers/run-unit-with-port.mjs';
 import { digestPinnedInputs } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';

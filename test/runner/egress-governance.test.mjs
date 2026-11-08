@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 
 test('declared egress: glm executor keeping command "claude" but setting ANTHROPIC_BASE_URL to OpenRouter fails when allowCrossProvider is missing', () => {
   const cfg = {

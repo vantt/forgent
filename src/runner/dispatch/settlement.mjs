@@ -11,7 +11,7 @@ import { sha256FileSync, readAgentFileSync } from '../../native/proof-helpers.mj
 
 // The agent writes its claim and report: a larger file is not one.
 const MAX_AGENT_FILE_BYTES = 4 * 1024 * 1024;
-import { RunnerConfigError } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 import {
   acquireRunControl,

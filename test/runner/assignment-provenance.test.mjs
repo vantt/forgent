@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createAssignmentId, buildAssignment as buildAssignmentInDispatch } from '../../src/runner/dispatch/assignment.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { domainHarnessFor, loadHarnessModule } from '../../src/runner/work-dispatch.mjs';
 import os from 'node:os';
 

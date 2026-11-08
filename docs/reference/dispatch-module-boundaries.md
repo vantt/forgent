@@ -18,7 +18,8 @@ move + naming pass).
 
 | File | Owns |
 |---|---|
-| `dispatch/config.mjs` | the effective `runner` section (read through the config facade, `fgos config show`) load/validate (`loadRunnerConfig`, `loadRunnerConfigForDir`), the `RunnerConfigError` type, every `validate*Shape` gate, and the frozen vocabularies every other `dispatch/*` module reads. |
+| `dispatch/config.mjs` | the effective `runner` section (read through the config facade, `fgos config show`) load/validate (`loadRunnerConfig`, `loadRunnerConfigForDir`), every `validate*Shape` gate, and the frozen vocabularies every other `dispatch/*` module reads. |
+| `dispatch/runner-config-error.mjs` | the `RunnerConfigError` class, an import-free leaf every layer that raises or catches it imports directly; `config.mjs` does not re-export it. |
 | `dispatch/resolve.mjs` | Unit → executor → model/tier/command resolution: `modelForTier`, the purpose/executorId resolution chain (`resolveExecutorIdForPurpose`, `resolveExecutorAndOverrides`), `resolveExecutorConfig`. |
 | `dispatch/mechanism.mjs` | In-process / out-of-process / unavailable judgment: `decideDispatchMechanism` (Native-First Dispatch Doctrine, pure over caller-supplied booleans) and `decideExecutorDispatchMechanism` (the `executors.<id>`-specific form, D-ADR0033: config wins over `--has-live-task-access`). |
 | `dispatch/transport.mjs` | Adapter registry, attestation, command resolution: the `DispatchError` type, `captureDispatchAttestation`, `resolveExecutorCommand` (prompt/model → argv substitution + cross-provider gate), and the executor-adapter registrations: `cli-spawn` and `herdr-spawn` are registered as supervised-only, they refuse a direct call by name because an agent runs as an attempt of the run supervisor. |

@@ -10,7 +10,7 @@ import { execFileSync } from 'node:child_process';
 import { workUnitFor, workRigorFor } from '../../src/runner/work-dispatch.mjs';
 import { buildPrompt } from '../../src/runner/work-compat.mjs';
 import { validateUnit } from '../../src/runner/execution/unit.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 
 function tmpRoot() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-unit-for-'));

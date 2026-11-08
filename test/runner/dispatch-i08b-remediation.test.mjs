@@ -10,9 +10,7 @@ import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import {
-  RunnerConfigError,
-} from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import {
   resolveHerdrBin,
 } from '../../src/runner/dispatch/transport.mjs';

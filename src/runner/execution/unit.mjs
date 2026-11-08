@@ -1,7 +1,8 @@
 // src/runner/execution/unit.mjs — Unit data contract and validator
 // Architecture guard: MUST NOT import src/state/**, src/runner/coordination/**, src/runner/worktree.mjs, or src/runner/merge.mjs
 
-import { RunnerConfigError, assertRunTimeoutMs, MODEL_POLICY_TIERS } from '../dispatch/config.mjs';
+import { assertRunTimeoutMs, MODEL_POLICY_TIERS } from '../dispatch/config.mjs';
+import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';
 import { checkDeclaredSeats } from './seat-resolver.mjs';
 import { canonicalizeWriteEntry } from '../dispatch/write-scope.mjs';

@@ -4,7 +4,7 @@
 // default adapter constant, and metadata resolution. Extracted from transport.mjs
 // to cut the circular dependency between config.mjs (which validates adapter
 // names during runner config loading) and transport.mjs (which imports
-// RunnerConfigError from config.mjs).
+// RunnerConfigError from the dispatch config).
 
 import { resolveStateRoot } from '../../holder-lock/state-root.mjs';
 

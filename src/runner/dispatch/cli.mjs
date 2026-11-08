@@ -19,7 +19,8 @@ class StoreError extends Error {
 
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { projectConfigPresent } from '../../config/facade.mjs';
-import { RunnerConfigError, loadRunnerConfigForDir, registeredCapabilityOf, withDefaultExecutor } from './config.mjs';
+import { loadRunnerConfigForDir, registeredCapabilityOf, withDefaultExecutor } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 import { WORK_ITEM_KEYS, refuseWorkItemInput } from './work-item-input.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { compileDispatchPlan } from './plan.mjs';

@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createAssignmentId, renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from '../../src/runner/dispatch/assignment.mjs';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 
 test('createAssignmentId produces deterministic asgn_<safe-work>_<safe-op>_<seq> ids', () => {
   const id1 = createAssignmentId({ workId: 'tsk-abc', stage: 'planning', operation: 'validate-plan' });

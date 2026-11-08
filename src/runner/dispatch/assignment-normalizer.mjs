@@ -38,7 +38,7 @@
 // second, independently-derived role check) so the two stamps never
 // disagree for an operation this table doesn't name explicitly.
 
-import { RunnerConfigError } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 import { carriesProtocolOperationStamp } from './execution-contract.mjs';
 
 export const NORMALIZER_VERSION = '1';

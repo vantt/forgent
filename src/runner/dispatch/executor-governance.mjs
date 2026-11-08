@@ -3,7 +3,7 @@
 // that executor and provider (`disallowedProviders` / `disallowedExecutors`). Neither chooses anything:
 // the executor was decided upstream (Seat Binding for a unit seat, the caller's own pin elsewhere).
 
-import { RunnerConfigError } from './config.mjs';
+import { RunnerConfigError } from './runner-config-error.mjs';
 import { deriveProviderFamily } from './resolve.mjs';
 import { checkProviderDisallowed } from './provider-adapter.mjs';
 

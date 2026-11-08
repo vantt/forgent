@@ -5,7 +5,7 @@ import {
   enrichAndValidateContract,
   mergeHarnessPolicy,
 } from '../../domains/coding/harness/enrich-and-validate-contract.mjs';
-import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 
 function validContract(overrides = {}) {
   return {
