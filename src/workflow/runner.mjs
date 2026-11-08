@@ -26,8 +26,9 @@ import {
   workflowCommit,
   createWorkflowWorktree,
   cleanupWorkflowWorktree,
-  outOfScopeWrites,
-  renderGateQuestion,
+  foldUnitOutcome,
+  gateQuestionOf,
+  prepareUnitWorktree,
   settleUnitWorktrees,
   singleWriteBaseOf,
   unitOverridesOf,
@@ -66,471 +67,332 @@ const detachedChildLog = process.env[ADVANCE_DETACHED_ENV] === '1' ? (line) => p
 const APPROVAL_REFUSALS = new Set(['consent-stale', 'consent-missing', 'consent-subject-unknown', 'entry-milestone-stale']);
 
 /**
+ * What every step of one advance shares: the ledger writer (always under the run's `advance` hold),
+ * the reader that folds the inbox in first, and the port every Unit is admitted and settled through.
+ */
+function createRun({ workflowRunId, workflow, mainRoot, worktreePath, hold, onLog }) {
+  return {
+    workflowRunId,
+    workflow,
+    mainRoot,
+    worktreePath,
+    // The port never acquires `advance`: this proposer already holds it.
+    port: createCaseAdmissionPort({ repoRoot: mainRoot, caseId: workflowRunId, heldAdvance: hold }),
+    // Where the persona lookup of this run's Units starts: the workflow's own folder and owning domain, from its location.
+    personaScope: workflowPersonaScope(workflow.id, { packageRoot: mainRoot }),
+
+    /** Record one event; a step's start, end or park also reaches onLog as one line. */
+    emit(type, payload) {
+      const stored = appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId, event: { type, payload }, hold });
+      const line = progressLine(stored);
+      if (line && onLog) onLog(line);
+      return stored;
+    },
+
+    /** Everything a cycle reads: the inbox is folded into the ledger first, so a gate answer that arrived while a Unit ran is on the ledger before anything acts on it. */
+    reread() {
+      const drained = drainCaseInbox({ mainRoot, caseId: workflowRunId, hold });
+      return { ...readCaseProjection(mainRoot, workflowRunId), drained };
+    },
+
+    /** End a step, and the run with it, by name. */
+    failStep(step, outcome, reason, unitId) {
+      this.emit('step.fail', { stepId: step.id, outcome, ...(unitId ? { unitId } : {}), reason });
+      this.emit('workflow.fail', { outcome, stepId: step.id, reason });
+    },
+  };
+}
+
+/** A step is ready when it has not ended or parked and every step it depends on completed. */
+function isReady(step, state) {
+  const own = state.steps[step.id];
+  if (!own || ['completed', 'parked', 'failed'].includes(own.status)) return false;
+  return step.dependsOn.every((dep) => state.steps[dep]?.status === 'completed');
+}
+
+function parkGate(run, step, question, reason) {
+  run.emit('gate.park', { stepId: step.id, question, header: step.gate.header, ...(reason ? { reason } : {}) });
+}
+
+function completeStep(run, step) {
+  // What the step's milestones stand for, as the Units' reports are now.
+  const subjectDigest = stepSubjectDigest({ state: run.reread().state, workflow: run.workflow, stepId: step.id, mainRoot: run.mainRoot });
+  run.emit('step.complete', { stepId: step.id, outcome: 'pass', subjectDigest });
+}
+
+/** The ledger keeps what a reader of a result uses; the seat's raw evidence stays with its Unit run on disk. */
+function withoutEvidence(results) {
+  return results.map((result) => {
+    if (!result?.runResult || !('evidence' in result.runResult)) return result;
+    const { evidence, ...runResult } = result.runResult;
+    return { ...result, runResult };
+  });
+}
+
+/** Why a unit's step ended: a refusal names its reason, out-of-scope writes their paths, else the error or the outcome. */
+function unitFailureReason(unitId, { outcome, results, error }, outOfScope) {
+  const refusal = results.find((r) => r?.refused)?.refused;
+  if (refusal) return `${refusal.reason}: ${refusal.detail}`;
+  if (outOfScope.length > 0) return `unit ${unitId} ended ${outcome}: out-of-scope-writes: ${outOfScope.join(', ')}`;
+  return error ? `unit ${unitId} could not run: ${error}` : `unit ${unitId} ended ${outcome}`;
+}
+
+/**
+ * The overrides of one unit. A run-level account the unit's seats do not run on is dropped for that
+ * unit, and the run says so instead of dropping the pin silently.
+ */
+async function unitOverrides(run, { step, u, unitData, state, runnerConfig, loopFn }) {
+  let account = state.account ?? null;
+  const overrides = (pinned) => unitOverridesOf(u, state.seats?.personas, { effort: state.effort, timeoutMs: state.timeoutMs, account: pinned, loopOf: loopFn });
+  if (account !== null) {
+    const collaboration = resolveCollaboration({
+      unit: unitData,
+      selectors: { callerString: unitPatternOf(u.template) },
+      runnerConfig,
+      shipped: shippedCatalog(),
+    });
+    const dry = await simulateUnitBindings(
+      { ...unitData, pattern: unitPatternOf(u.template) || 'solo' },
+      runnerConfig,
+      { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: overrides(account), collaboration },
+    );
+    if (!dry.seats.some((r) => r.account)) {
+      run.emit('unit.account-unpinned', { stepId: step.id, unitId: u.id, account });
+      account = null;
+    }
+  }
+  return overrides(account);
+}
+
+/**
+ * Run one Unit through the Execution Core. A Unit whose predecessor's custody cannot be proven is run
+ * again in a new worktree and branch from the trusted base, never from commits an unproven predecessor
+ * may still be changing; the predecessor's checkout and branch are kept.
+ */
+async function runUnitWithRecovery(run, { step, u, unitData, state, base, attempt, recordScheduled }) {
+  const { mainRoot, workflowRunId, workflow } = run;
+  const started = (unitRunId) => {
+    attempt.unitRunId = unitRunId;
+    run.emit('unit.started', { stepId: step.id, unitId: u.id, unitRunId });
+  };
+  // Reports a fresh approval stands behind may be handed over although their bytes changed after
+  // settlement; an edit no approval covers is still refused by the Execution Core.
+  const fresh = run.reread();
+  const runnerConfig = loadRunnerConfigForDir(mainRoot);
+  const loopFn = (name) => loopOf(name, { effective: runnerConfig });
+  assertUnitAcceptOutcomes(workflow, step, u, runnerConfig);
+  const { prep } = attempt;
+  const runOptions = {
+    unitData,
+    acceptedReports: approvedReportDigests({ events: fresh.events, state: fresh.state, workflow, mainRoot }),
+    repoRoot: mainRoot,
+    cwd: prep.worktree,
+    worktree: prep.worktree,
+    pattern: unitPatternOf(u.template),
+    personaScope: run.personaScope,
+    workflowId: workflow.id,
+    overrides: await unitOverrides(run, { step, u, unitData, state, runnerConfig, loopFn }),
+    caseAdmission: run.port,
+    caseRef: { caseId: workflowRunId, activity: step.id, unitId: u.id },
+    onCaseAdmitted: ({ reservationId }) => recordScheduled(reservationId),
+    ...(attempt.resumeUnitRunId ? { resumeUnitRunId: attempt.resumeUnitRunId } : { onUnitRunCreated: started }),
+  };
+  try {
+    return await runUnit(runOptions);
+  } catch (err) {
+    if (err?.errorClass !== 'custody-predecessor-unknown' || unitData.writes.length === 0) throw err;
+    const baseRef = prep.baseRef ?? (base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD');
+    const baseSha = prep.baseSha ?? (baseRef ? workflowCommit(mainRoot, baseRef) : null);
+    if (!baseSha) throw err;
+    const branch = `wf/${workflowRunId}/${u.id}-recovery-${crypto.randomUUID()}`;
+    const worktree = createWorkflowWorktree({ repoRoot: mainRoot, branch, baseRef: baseSha }).worktreePath;
+    const recovery = { reason: err.errorClass, preservedWorktree: prep.worktree, preservedBranch: prep.branch };
+    Object.assign(attempt, { prep: { worktree, branch, baseRef, baseSha, owned: true, created: true, error: null }, resumeUnitRunId: null, unitRunId: null });
+    // The recovery checkout is admitted and bound by the run that starts in it.
+    run.emit('unit.scheduled', { stepId: step.id, unitId: u.id, worktreePath: worktree, branch, baseRef, baseSha, recovery });
+    return runUnit({ ...runOptions, cwd: worktree, worktree, resumeUnitRunId: undefined, onCaseAdmitted: undefined, onUnitRunCreated: started });
+  }
+}
+
+/**
+ * A Unit refused at admission was refused before anything existed: the worktree made for it goes, and the
+ * step ends by name, or, when the approval it stands on went stale, the gate asks again.
+ *
+ * @returns {'parked'|'failed'}
+ */
+function refuseUnit(run, { step, u, error, attempt }) {
+  const { mainRoot, workflowRunId, workflow } = run;
+  const refused = error.refusal;
+  let cleanupFailure = null;
+  if (attempt.prep.created) {
+    try {
+      cleanupWorkflowWorktree({ repoRoot: mainRoot, worktreePath: attempt.prep.worktree, branch: attempt.prep.branch, deleteBranch: true });
+    } catch (err) {
+      cleanupFailure = err;
+    }
+  }
+  const approval = (refused.violations ?? []).find((v) => APPROVAL_REFUSALS.has(v.code) && v.milestone);
+  const guide = guideOfEvents(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId }));
+  const gated = approval && workflow.steps.find((s) => s.gate && guide.activities.find((a) => a.id === s.id)?.produces.includes(approval.milestone));
+  if (gated && !cleanupFailure) {
+    // What was approved is not what is there now: the gate asks again, for the current version.
+    parkGate(run, gated, `${gated.gate.question || `Approve step "${gated.id}"?`}\n\n(Asked again: ${approval.condition})`, approval.code);
+    return 'parked';
+  }
+  const note = cleanupFailure ? `; its worktree could not be removed: ${cleanupFailure.message}` : '';
+  run.failStep(step, 'refused', `unit ${u.id} could not run: admission refused ${refused.code}: ${refused.condition}${note}`, u.id);
+  return 'failed';
+}
+
+/**
+ * Run one unit of a step to its recorded end.
+ *
+ * @returns {Promise<'parked'|'failed'|undefined>} how the step ended, or undefined when the unit passed and the step goes on
+ */
+async function runStepUnit(run, { step, u, state, uState }) {
+  const { mainRoot, workflowRunId, workflow } = run;
+  const handoff = buildUnitHandoff({ template: u.template, state, step, workflow });
+  const unitData = {
+    id: u.id,
+    objective: handoff.objective || `Execute unit ${u.id} in step ${step.id}`,
+    ...unitFieldsOfTemplate(u.template),
+    dependsOn: u.dependsOn || [],
+    inputs: handoff.inputs,
+    stanceOptions: state.stanceOptions?.length ? state.stanceOptions : u.template.stanceOptions,
+  };
+
+  // A unit left `running` with a recorded Unit run id was started by a controller that died: continue that run
+  // (settled seats are kept) and reuse the worktree it already has. Only when what it needs is still there:
+  // after a reboot or a temp-dir cleanup the run's worktree is gone and resuming would fail for good, where a
+  // fresh run can still work.
+  const resumeUnitRunId = uState?.status === 'running' && canResumeUnitRun(mainRoot, uState) ? uState.unitRunId : null;
+  const base = unitData.writes.length > 0 ? singleWriteBaseOf(workflow, step.id) : null;
+  const attempt = {
+    resumeUnitRunId,
+    unitRunId: null,
+    scheduled: Boolean(resumeUnitRunId),
+    prep: prepareUnitWorktree({ mainRoot, workflow, state, step, unitId: u.id, writes: unitData.writes, base, uState, resuming: Boolean(resumeUnitRunId), worktreePath: run.worktreePath, workflowRunId }),
+  };
+
+  // `unit.scheduled` is recorded the moment the Unit is admitted (or, for a Unit that could not be prepared or
+  // resumed, when it runs). Recording it again would reset the unit and lose the run id it already carries.
+  const recordScheduled = (reservationId = null) => {
+    if (attempt.scheduled) return;
+    attempt.scheduled = true;
+    const { owned, worktree, branch, baseRef, baseSha } = attempt.prep;
+    run.emit('unit.scheduled', {
+      stepId: step.id,
+      unitId: u.id,
+      ...(reservationId ? { reservationId } : {}),
+      ...(owned ? { worktreePath: worktree, branch, baseRef, baseSha } : {}),
+    });
+  };
+
+  // A throw (an unresolvable hand-off ref, a refused config) is a failed unit like any other: left uncaught it
+  // would end the advance with the run still `running` and no event saying why.
+  let result;
+  try {
+    if (attempt.prep.error) {
+      recordScheduled();
+      throw new RunnerConfigError(attempt.prep.error);
+    }
+    result = await runUnitWithRecovery(run, { step, u, unitData, state, base, attempt, recordScheduled });
+  } catch (error) {
+    if (error instanceof CaseAdmissionRefusedError) return refuseUnit(run, { step, u, error, attempt });
+    recordScheduled();
+    result = { unitRunId: attempt.resumeUnitRunId ?? attempt.unitRunId, outcome: 'execution-failure', results: [], error: String(error?.message ?? error) };
+  }
+
+  const folded = foldUnitOutcome({ mainRoot, unitData, result, state, base, branch: attempt.prep.branch, baseSha: attempt.prep.baseSha });
+  const { outOfScope, outOfScopeOnBranch } = folded;
+  run.emit('unit.complete', {
+    stepId: step.id,
+    unitId: u.id,
+    unitRunId: folded.result.unitRunId,
+    outcome: folded.result.outcome,
+    results: withoutEvidence(folded.result.results || []),
+    ...(outOfScope.length > 0 ? { outOfScope } : {}),
+    ...(outOfScopeOnBranch.length > 0 ? { outOfScopeOnBranch } : {}),
+  });
+  // The reservation was settled by the run itself, through the port; fold in anything that arrived meanwhile.
+  run.reread();
+
+  // Only explicitly accepted semantic outcomes proceed; execution failures never do.
+  if ((u.template.acceptOutcomes ?? ['pass']).includes(folded.result.outcome)) return undefined;
+  run.failStep(step, folded.result.outcome, unitFailureReason(u.id, { ...folded.result, results: folded.result.results || [] }, outOfScope), u.id);
+  return 'failed';
+}
+
+/**
+ * Take one ready step as far as it goes: park at its human gate, or run its units in the order declared.
+ *
+ * @returns {Promise<'parked'|'failed'|'completed'>}
+ */
+async function advanceStep(run, step, state) {
+  const stepState = state.steps[step.id];
+  if (step.gate?.kind === 'human' && stepState.status !== 'answered') {
+    parkGate(run, step, gateQuestionOf(step, state, run.mainRoot));
+    return 'parked';
+  }
+  if (stepState.status === 'pending' || stepState.status === 'answered') run.emit('step.start', { stepId: step.id });
+  for (const u of step.units ?? []) {
+    if (stepState.units[u.id]?.status === 'completed') continue;
+    const ended = await runStepUnit(run, { step, u, state, uState: stepState.units[u.id] });
+    if (ended) return ended;
+  }
+  completeStep(run, step);
+  return 'completed';
+}
+
+/**
  * Run loop of the Playbook proposer: advance the ready steps of a Workflow run until it completes,
  * fails, or parks, under the `advance` hold the caller took.
  */
-export async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot, worktreePath, hold, onLog = detachedChildLog }) {
-  // Every event is recorded in the event log under the run's advance hold; a step's start, end or
-  // park also reaches onLog as one line.
-  const recordEvent = (args) => {
-    const stored = appendWorkflowEvent({ ...args, hold });
-    const line = progressLine(stored);
-    if (line && onLog) onLog(line);
-    return stored;
-  };
-
-  // The one port every Unit of this run is admitted and settled through: it never acquires `advance`,
-  // because this proposer already holds it.
-  const port = createCaseAdmissionPort({ repoRoot: mainRoot, caseId: workflowRunId, heldAdvance: hold });
-  // Where the persona lookup of this run's Units starts: the workflow's own folder and owning domain, from its location.
-  const personaScope = workflowPersonaScope(workflow.id, { packageRoot: mainRoot });
+export async function advanceWorkflowRun({ workflowRunId, workflow, mainRoot, worktreePath, hold, onLog = detachedChildLog }) {
+  const run = createRun({ workflowRunId, workflow, mainRoot, worktreePath, hold, onLog });
 
   // A run recorded before cases existed is opened on its first advance, with its guide's defaults.
-  {
-    const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
-    const guide = guideOfEvents(events);
-    openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide, frame: resolveFrame(guide, undefined), request: projectWorkflowState(events).request, hold, worktreePath, legacy: true });
-  }
+  const events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
+  const guide = guideOfEvents(events);
+  openCaseOnLedger({ mainRoot, workflowRunId, workflow, guide, frame: resolveFrame(guide, undefined), request: projectWorkflowState(events).request, hold, worktreePath, legacy: true });
 
-  // Everything a cycle reads: the inbox is folded into the ledger first, so a gate answer that arrived
-  // while a Unit ran is on the ledger before anything acts on it.
-  const reread = () => {
-    const drained = drainCaseInbox({ mainRoot, caseId: workflowRunId, hold });
-    return { ...readCaseProjection(mainRoot, workflowRunId), drained };
-  };
-  let { state } = reread();
-
+  let read = run.reread();
   while (true) {
-    while (state.status === 'running') {
-      const steps = workflow.steps;
-      const completedStepIds = new Set(
-        Object.values(state.steps)
-          .filter((s) => s.status === 'completed')
-          .map((s) => s.id),
-      );
-
-      // Find ready steps that haven't started or are running
-      const readySteps = steps.filter((step) => {
-        const stepState = state.steps[step.id];
-        if (!stepState || stepState.status === 'completed' || stepState.status === 'parked' || stepState.status === 'failed') {
-          return false;
-        }
-        return step.dependsOn.every((dep) => completedStepIds.has(dep));
-      });
-
-      if (readySteps.length === 0) {
-        // Check if all steps completed
-        const allDone = steps.every((s) => state.steps[s.id]?.status === 'completed');
-        if (allDone) {
-          recordEvent({
-            repoRoot: mainRoot,
-            workflowRunId,
-            event: {
-              type: 'workflow.complete',
-              payload: { outcome: 'pass', completedAt: new Date().toISOString() },
-            },
-          });
+    while (read.state.status === 'running') {
+      const ready = workflow.steps.filter((step) => isReady(step, read.state));
+      if (ready.length === 0) {
+        if (workflow.steps.every((s) => read.state.steps[s.id]?.status === 'completed')) {
+          run.emit('workflow.complete', { outcome: 'pass' });
           // A Playbook case that ran to a pass is finished: the proposer that holds `advance` closes it by
           // the rules of `fgos workflow close`. One that cannot close (a closure milestone is stale)
           // stays open, as does every case that failed, is blocked or is parked.
           closeCaseUnderHold({ mainRoot, workflowRunId, hold, reason: 'completed' });
-          state = reread().state;
+          read = run.reread();
         }
         break;
       }
-
-      // Process ready steps
-      let stateChanged = false;
-      const completeStep = (stepId) => {
-        // What the step's milestones stand for, as the Units' reports are now.
-        const subjectDigest = stepSubjectDigest({ state: reread().state, workflow, stepId, mainRoot });
-        recordEvent({
-          repoRoot: mainRoot,
-          workflowRunId,
-          event: { type: 'step.complete', payload: { stepId, outcome: 'pass', subjectDigest, completedAt: new Date().toISOString() } },
-        });
-      };
-      for (const step of readySteps) {
-        const stepState = state.steps[step.id];
-
-        // 1. Human gate check
-        if (step.gate && step.gate.kind === 'human' && stepState.status !== 'answered') {
-          let question;
-          try {
-            question = renderGateQuestion(step, state, mainRoot);
-          } catch (error) {
-            const reason = error instanceof SyntaxError ? 'invalid JSON' : error.code || error.message;
-            question = `Cannot read settled producer "missing expertise": ${reason}. No expertise decision was inferred. Review the packet manually and answer this gate with your decision and acknowledged limitation.`;
-          }
-          recordEvent({
-            repoRoot: mainRoot,
-            workflowRunId,
-            event: {
-              type: 'gate.park',
-              payload: {
-                stepId: step.id,
-                question,
-                header: step.gate.header,
-                parkedAt: new Date().toISOString(),
-              },
-            },
-          });
-          stateChanged = true;
-          continue;
-        }
-
-        // Mark step start if pending
-        if (stepState.status === 'pending' || stepState.status === 'answered') {
-          recordEvent({
-            repoRoot: mainRoot,
-            workflowRunId,
-            event: {
-              type: 'step.start',
-              payload: { stepId: step.id, startedAt: new Date().toISOString() },
-            },
-          });
-          stateChanged = true;
-        }
-
-        // 2. Standard step with units
-        if (step.units && step.units.length > 0) {
-          let failedUnit = null;
-          let reparked = false;
-          for (const u of step.units) {
-            const uState = stepState.units[u.id];
-            if (uState && uState.status === 'completed') {
-              continue;
-            }
-
-            // Build unit object
-            const handoff = buildUnitHandoff({ template: u.template, state, step, workflow });
-            const unitData = {
-              id: u.id,
-              objective: handoff.objective || `Execute unit ${u.id} in step ${step.id}`,
-              ...unitFieldsOfTemplate(u.template),
-              dependsOn: u.dependsOn || [],
-              inputs: handoff.inputs,
-              stanceOptions: state.stanceOptions?.length ? state.stanceOptions : u.template.stanceOptions,
-            };
-
-            // A unit left `running` with a recorded Unit run id was started by a controller that died:
-            // continue that run (settled seats are kept) and reuse the worktree it already has.
-            // Only when what it needs is still there: after a reboot or a temp-dir cleanup the run's
-            // worktree is gone and resuming would fail for good, where a fresh run can still work.
-            let resumeUnitRunId = uState?.status === 'running' && canResumeUnitRun(mainRoot, uState) ? uState.unitRunId : null;
-            let startedUnitRunId = null;
-
-            // If unit has writes, prepare worktree
-            let unitWorktree = worktreePath;
-            let uBranch = null;
-            let ownsWorktree = false;
-            let baseRef = null;
-            let baseSha = null;
-            // Why a writing unit cannot get its own worktree; it then fails without running.
-            let prepError = null;
-            const base = unitData.writes.length > 0 ? singleWriteBaseOf(workflow, step.id) : null;
-            if (resumeUnitRunId) {
-              // The seats run in the worktree recorded in the Unit run; never make another one here.
-              unitWorktree = uState.worktreePath ?? worktreePath;
-              uBranch = uState.branch ?? null;
-              baseSha = uState.baseSha ?? null;
-              baseRef = uState.baseRef ?? null;
-            } else if (unitData.writes.length > 0) {
-              uBranch = `wf/${workflowRunId}/${u.id}`;
-              // A unit that builds on a writing unit starts on that unit's branch, so it sees its work.
-              baseRef = base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
-              baseSha = baseRef ? workflowCommit(mainRoot, baseRef) : null;
-              if (!baseSha) {
-                prepError = base
-                  ? `base branch "${baseRef ?? `of unit ${base.unitId}`}" of writing unit ${base.unitId} is gone; it cannot start from the work it builds on`
-                  : `cannot resolve ${baseRef} to start the unit's worktree from`;
-              } else {
-                try {
-                  unitWorktree = createWorkflowWorktree({ repoRoot: mainRoot, branch: uBranch, baseRef: baseSha }).worktreePath;
-                  ownsWorktree = true;
-                } catch (err) {
-                  // Never fall back to the shared checkout: a writer there would commit onto the caller's branch.
-                  prepError = `could not create the unit's worktree on ${uBranch}: ${err.message}`;
-                }
-              }
-            }
-
-            // Admission happens inside runUnit, through the port this proposer injects with its own
-            // `advance` hold: the Execution Core asks before it creates anything, and a refusal arrives
-            // as CaseAdmissionRefusedError. `unit.scheduled` is recorded the moment the Unit is
-            // admitted (or, for a Unit that could not be prepared or resumed, when it runs).
-            let scheduledRecorded = Boolean(resumeUnitRunId);
-            const recordScheduled = (reservationId = null) => {
-              // Recording it again would reset the unit and lose the run id it already carries.
-              if (scheduledRecorded) return;
-              scheduledRecorded = true;
-              recordEvent({
-                repoRoot: mainRoot,
-                workflowRunId,
-                event: {
-                  type: 'unit.scheduled',
-                  payload: {
-                    stepId: step.id,
-                    unitId: u.id,
-                    ...(reservationId ? { reservationId } : {}),
-                    ...(ownsWorktree ? { worktreePath: unitWorktree, branch: uBranch, baseRef, baseSha } : {}),
-                  },
-                },
-              });
-            };
-
-            // Run Unit via P1 execution door. A throw (an unresolvable hand-off ref, a refused
-            // config) is a failed unit like any other: left uncaught it would end the advance with
-            // the run still `running` and no event saying why.
-            let unitRunResult;
-            try {
-              if (prepError) {
-                recordScheduled();
-                throw new RunnerConfigError(prepError);
-              }
-              // Reports a fresh approval stands behind may be handed over although their bytes changed after
-              // settlement; an edit no approval covers is still refused by the Execution Core.
-              const fresh = reread();
-              const runnerConfig = loadRunnerConfigForDir(mainRoot);
-              const loopFn = (name) => loopOf(name, { effective: runnerConfig });
-              assertUnitAcceptOutcomes(workflow, step, u, runnerConfig);
-              const runOptions = {
-                unitData,
-                acceptedReports: approvedReportDigests({ events: fresh.events, state: fresh.state, workflow, mainRoot }),
-                repoRoot: mainRoot,
-                cwd: unitWorktree,
-                worktree: unitWorktree,
-                pattern: unitPatternOf(u.template),
-                personaScope,
-                workflowId: workflow.id,
-                overrides: await (async () => {
-                  let unitAccount = state.account ?? null;
-                  if (unitAccount !== null) {
-                    const testOverrides = unitOverridesOf(u, state.seats?.personas, {
-                      effort: state.effort,
-                      timeoutMs: state.timeoutMs,
-                      account: unitAccount,
-                      loopOf: loopFn,
-                    });
-                    const collaboration = resolveCollaboration({
-                      unit: unitData,
-                      selectors: { callerString: unitPatternOf(u.template) },
-                      runnerConfig,
-                      shipped: shippedCatalog(),
-                    });
-                    const dry = await simulateUnitBindings(
-                      { ...unitData, pattern: unitPatternOf(u.template) || 'solo' },
-                      runnerConfig,
-                      { session: { headless: true, herdrPresent: detectHerdrPresent() }, overrides: testOverrides, collaboration },
-                    );
-                    if (!dry.seats.some((r) => r.account)) {
-                      // No seat of this unit runs on the account's provider: the unit runs unpinned,
-                      // and the run says so instead of dropping the pin silently.
-                      recordEvent({
-                        repoRoot: mainRoot,
-                        workflowRunId,
-                        event: { type: 'unit.account-unpinned', payload: { stepId: step.id, unitId: u.id, account: unitAccount } },
-                      });
-                      unitAccount = null;
-                    }
-                  }
-                  return unitOverridesOf(u, state.seats?.personas, {
-                    effort: state.effort,
-                    timeoutMs: state.timeoutMs,
-                    account: unitAccount,
-                    loopOf: loopFn,
-                  });
-                })(),
-                caseAdmission: port,
-                caseRef: { caseId: workflowRunId, activity: step.id, unitId: u.id },
-                onCaseAdmitted: ({ reservationId }) => recordScheduled(reservationId),
-                ...(resumeUnitRunId ? { resumeUnitRunId } : {
-                  onUnitRunCreated: (unitRunId) => {
-                    startedUnitRunId = unitRunId;
-                    recordEvent({
-                      repoRoot: mainRoot,
-                      workflowRunId,
-                      event: { type: 'unit.started', payload: { stepId: step.id, unitId: u.id, unitRunId } },
-                    });
-                  },
-                }),
-              };
-              try {
-                unitRunResult = await runUnit(runOptions);
-              } catch (err) {
-                if (err?.errorClass !== 'custody-predecessor-unknown' || unitData.writes.length === 0) throw err;
-                // Preserve the unknown predecessor's checkout and branch. Start from the trusted
-                // base, never from commits an unproven predecessor may still be changing.
-                const preservedWorktree = unitWorktree;
-                const preservedBranch = uBranch;
-                baseRef ??= base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
-                baseSha ??= baseRef ? workflowCommit(mainRoot, baseRef) : null;
-                if (!baseSha) throw err;
-                uBranch = `wf/${workflowRunId}/${u.id}-recovery-${crypto.randomUUID()}`;
-                unitWorktree = createWorkflowWorktree({ repoRoot: mainRoot, branch: uBranch, baseRef: baseSha }).worktreePath;
-                ownsWorktree = true;
-                resumeUnitRunId = null;
-                startedUnitRunId = null;
-                // The recovery checkout is admitted and bound by the run that starts in it.
-                recordEvent({ repoRoot: mainRoot, workflowRunId, event: {
-                  type: 'unit.scheduled', payload: { stepId: step.id, unitId: u.id,
-                    worktreePath: unitWorktree, branch: uBranch, baseRef, baseSha,
-                    recovery: { reason: err.errorClass, preservedWorktree, preservedBranch } },
-                } });
-                unitRunResult = await runUnit({ ...runOptions, cwd: unitWorktree, worktree: unitWorktree,
-                  resumeUnitRunId: undefined,
-                  onCaseAdmitted: undefined,
-                  onUnitRunCreated: (unitRunId) => {
-                    startedUnitRunId = unitRunId;
-                    recordEvent({ repoRoot: mainRoot, workflowRunId, event: {
-                      type: 'unit.started', payload: { stepId: step.id, unitId: u.id, unitRunId },
-                    } });
-                  },
-                });
-              }
-            } catch (err) {
-              if (err instanceof CaseAdmissionRefusedError) {
-                // Refused before anything existed: the worktree made for the Unit goes, the step ends by name,
-                // or, when the approval it stands on went stale, the gate asks again.
-                if (ownsWorktree) cleanupWorkflowWorktree({ repoRoot: mainRoot, worktreePath: unitWorktree, branch: uBranch, deleteBranch: true });
-                const refused = err.refusal;
-                const approval = (refused.violations ?? []).find((v) => APPROVAL_REFUSALS.has(v.code) && v.milestone);
-                const guide = guideOfEvents(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId }));
-                const gated = approval && workflow.steps.find((s) => s.gate && guide.activities.find((a) => a.id === s.id)?.produces.includes(approval.milestone));
-                if (gated) {
-                  // What was approved is not what is there now: the gate asks again, for the current version.
-                  recordEvent({
-                    repoRoot: mainRoot,
-                    workflowRunId,
-                    event: {
-                      type: 'gate.park',
-                      payload: {
-                        stepId: gated.id,
-                        question: `${gated.gate.question || `Approve step "${gated.id}"?`}\n\n(Asked again: ${approval.condition})`,
-                        header: gated.gate.header,
-                        parkedAt: new Date().toISOString(),
-                        reason: approval.code,
-                      },
-                    },
-                  });
-                  reparked = true;
-                } else {
-                  failedUnit = { unitId: u.id, outcome: 'refused', results: [], error: `admission refused ${refused.code}: ${refused.condition}`, outOfScope: [] };
-                }
-                stateChanged = true;
-                break;
-              }
-              recordScheduled();
-              unitRunResult = {
-                unitRunId: resumeUnitRunId ?? startedUnitRunId,
-                outcome: 'execution-failure',
-                results: [],
-                error: String(err?.message ?? err),
-              };
-            }
-
-            // Writing outside the unit's scope is a finding: the unit does not pass, its branch is not
-            // integrated. A writer standing on a branch that itself carries such paths carries them too,
-            // so they never reach the target through it; a path left uncommitted on the base is not on
-            // its branch and holds nothing back.
-            const own = unitData.writes.length > 0 && unitRunResult.unitRunId
-              ? outOfScopeWrites(mainRoot, { unitRunId: unitRunResult.unitRunId, writes: unitData.writes, results: unitRunResult.results || [], branch: uBranch, baseSha })
-              : { all: [], onBranch: [] };
-            const inherited = base ? state.steps[base.stepId]?.units[base.unitId]?.outOfScopeOnBranch ?? [] : [];
-            const outOfScope = [...new Set([...own.all, ...inherited])].sort();
-            const outOfScopeOnBranch = [...new Set([...own.onBranch, ...inherited])].sort();
-            if (outOfScope.length > 0 && unitRunResult.outcome === 'pass') unitRunResult = { ...unitRunResult, outcome: 'findings' };
-
-            recordEvent({
-              repoRoot: mainRoot,
-              workflowRunId,
-              event: {
-                type: 'unit.complete',
-                payload: {
-                  stepId: step.id,
-                  unitId: u.id,
-                  unitRunId: unitRunResult.unitRunId,
-                  outcome: unitRunResult.outcome,
-                  results: unitRunResult.results || [],
-                  ...(outOfScope.length > 0 ? { outOfScope } : {}),
-                  ...(outOfScopeOnBranch.length > 0 ? { outOfScopeOnBranch } : {}),
-                },
-              },
-            });
-
-            // The reservation was settled by the run itself, through the port; fold in anything that arrived meanwhile.
-            reread();
-
-            stateChanged = true;
-            // Only explicitly accepted semantic outcomes proceed; execution failures never do.
-            if (!(u.template.acceptOutcomes ?? ['pass']).includes(unitRunResult.outcome)) {
-              failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [], error: unitRunResult.error, outOfScope };
-              break;
-            }
-          }
-
-          if (reparked) continue;
-          if (failedUnit) {
-            const refusal = failedUnit.results.find((r) => r?.refused)?.refused;
-            const reason = refusal
-              ? `${refusal.reason}: ${refusal.detail}`
-              : failedUnit.outOfScope.length > 0
-                ? `unit ${failedUnit.unitId} ended ${failedUnit.outcome}: out-of-scope-writes: ${failedUnit.outOfScope.join(', ')}`
-                : failedUnit.error
-                ? `unit ${failedUnit.unitId} could not run: ${failedUnit.error}`
-                : `unit ${failedUnit.unitId} ended ${failedUnit.outcome}`;
-            recordEvent({
-              repoRoot: mainRoot,
-              workflowRunId,
-              event: {
-                type: 'step.fail',
-                payload: { stepId: step.id, outcome: failedUnit.outcome, unitId: failedUnit.unitId, reason, failedAt: new Date().toISOString() },
-              },
-            });
-            recordEvent({
-              repoRoot: mainRoot,
-              workflowRunId,
-              event: {
-                type: 'workflow.fail',
-                payload: { outcome: failedUnit.outcome, stepId: step.id, reason, failedAt: new Date().toISOString() },
-              },
-            });
-            break;
-          }
-
-          completeStep(step.id);
-        } else {
-          // Step with no units
-          completeStep(step.id);
-          stateChanged = true;
-        }
+      for (const step of ready) {
+        if (await advanceStep(run, step, read.state) === 'failed') break;
       }
-
-      state = reread().state;
-
-      if (!stateChanged) {
-        break;
-      }
+      const next = run.reread();
+      const progressed = next.events.length > read.events.length;
+      read = next;
+      if (!progressed) break;
     }
 
     // One last look before leaving, bounded to a single read: an answer that arrived while this
     // proposer was finishing is on the ledger now, and if it releases a gate the run goes on.
-    const last = reread();
-    state = last.state;
-    if (last.drained.answers === 0 || state.status !== 'running') break;
+    read = run.reread();
+    if (read.drained.answers === 0 || read.state.status !== 'running') break;
   }
 
+  let { state } = read;
   if ((state.status === 'completed' || state.status === 'failed') && !state.worktrees) {
     const { removed, kept } = settleUnitWorktrees({ mainRoot, state });
     if (removed.length > 0 || kept.length > 0) {
-      recordEvent({
-        repoRoot: mainRoot,
-        workflowRunId,
-        event: { type: 'workflow.worktrees', payload: { removed, kept } },
-      });
+      run.emit('workflow.worktrees', { removed, kept });
       state = projectWorkflowState(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId }));
     }
   }
-
   return state;
 }

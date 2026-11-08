@@ -6,12 +6,19 @@ import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 // the seat to another account or another candidate), and a persona's text and the documents it was
 // given may therefore have reached a provider the owner did not expect. This reads the settled
 // results of a projected workflow state and lists, per unit and seat, the executor, the provider
-// family and the model that ran, and where a failover moved it from. Pure: it reads only the state.
+// family and the model that ran, the account the run pinned it to (or why the pin skipped it), and where a
+// failover moved it from. Pure: it reads only the state.
+
+/** The account a seat was pinned to as `pool/account`, else the reason the pin skipped it, else null (no pin). */
+function accountOf(binding) {
+  if (binding.account) return `${binding.account.pool}/${binding.account.id}`;
+  return binding.provenance?.account?.skipped?.reason ?? null;
+}
 
 /**
  * @param {{ steps?: Record<string, { units?: Record<string, { results?: object[] }> }> }} state a projected workflow state
  * @returns {Array<{ step: string, unit: string, seat: string, role: string, round: number | null, persona: string | null, executor: string | null,
- *   invocation: string | null, family: string | null, model: string | null, outcome: string | null,
+ *   invocation: string | null, family: string | null, model: string | null, outcome: string | null, account: string | null,
  *   movedFrom: { executor: string, kind: string, reason: string } | null }>}
  */
 export function seatProviders(state) {
@@ -33,6 +40,7 @@ export function seatProviders(state) {
           family: result.runResult?.policy?.providerModel ?? binding.familySpread?.value?.family ?? null,
           model: binding.model ?? null,
           outcome: result.outcome ?? null,
+          account: accountOf(binding),
           movedFrom: fallback ? { executor: fallback.executor, kind: fallback.kind, reason: fallback.reason } : null,
         });
       }

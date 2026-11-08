@@ -11,7 +11,7 @@ import path from 'node:path';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
 import { runDirOf } from '../runner/execution/case-run-paths.mjs';
-import { projectWorkflowState, readWorkflowEvents } from './store.mjs';
+import { appendWorkflowEvent, projectWorkflowState, readWorkflowEvents } from './store.mjs';
 import {
   acquireAdvanceLock,
   advanceReport,
@@ -267,9 +267,27 @@ export function answerWorkflowDetached(workflowRunId, params = {}) {
   return detachedResult({ mainRoot, workflowRunId, detached });
 }
 
-/** The run's state, refusing a resume that asks for seats the run did not start with. Read under the advance lock. */
+/**
+ * The failed step a resume runs again, null when the run did not fail. A step that failed on infrastructure
+ * (a unit that never started or whose seat could not launch) reopens; a step a verdict ended is refused by
+ * name, because running it again would only ask a verdict to change.
+ */
+function failedStepToReopen(state) {
+  if (state.status !== 'failed') return null;
+  const failed = Object.values(state.steps).find((step) => step.status === 'failed');
+  if (!failed) return null;
+  if (Object.values(failed.units).some((unit) => unit.rerunnable)) return failed.id;
+  throw new RunnerConfigError(`nothing-to-resume: step ${failed.id} ended ${failed.outcome}`, { code: 'nothing-to-resume' });
+}
+
+/**
+ * The run's state and what resuming it does, refusing a resume that asks for seats the run did not start with
+ * and one a verdict ended. Read under the advance lock.
+ *
+ * @returns {{ state: object, conductor: boolean, reopenStepId: string|null }}
+ */
 function readResumeState(workflowRunId, mainRoot, options) {
-  const { state } = readCase(mainRoot, workflowRunId);
+  const { state, projection } = readCase(mainRoot, workflowRunId);
   if (options.seats !== undefined) {
     const given = normalizeSeats(options.seats);
     const stored = state.seats?.seats ?? [];
@@ -277,7 +295,8 @@ function readResumeState(workflowRunId, mainRoot, options) {
       throw new RunnerConfigError(`Workflow run "${workflowRunId}" started with ${stored.length > 0 ? `seats "${stored.join('|')}"` : 'no --seats'}; resume refuses different --seats (given "${given.join('|')}")`);
     }
   }
-  return state;
+  const conductor = isConductor(projection);
+  return { state, conductor, reopenStepId: conductor ? null : failedStepToReopen(state) };
 }
 
 /** Whether the case has no proposer to start: read once `advance` could not be taken. */
@@ -309,9 +328,11 @@ export async function resumeWorkflow(workflowRunId, options = {}) {
     hold = acquireAdvanceLock(mainRoot, workflowRunId); // refuses, naming the holder
   }
   try {
-    const state = readResumeState(workflowRunId, mainRoot, options);
-    if (isConductor(readCase(mainRoot, workflowRunId).projection)) return conductorResult(mainRoot, workflowRunId);
-    return await advanceWorkflowRun({ repoRoot: mainRoot, workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
+    const { state, conductor, reopenStepId } = readResumeState(workflowRunId, mainRoot, options);
+    if (conductor) return conductorResult(mainRoot, workflowRunId);
+    // The only way a failed step runs again: this one reopening, which the next advance acts on once.
+    if (reopenStepId) appendWorkflowEvent({ repoRoot: mainRoot, workflowRunId, event: { type: 'step.start', payload: { stepId: reopenStepId } }, hold });
+    return await advanceWorkflowRun({ workflowRunId, workflow: state.workflow, mainRoot, worktreePath, hold });
   } finally {
     hold.release();
   }
@@ -335,8 +356,7 @@ export function resumeWorkflowDetached(workflowRunId, options = {}) {
     conductor = true;
   } else {
     try {
-      readResumeState(workflowRunId, mainRoot, options);
-      conductor = isConductor(readCase(mainRoot, workflowRunId).projection);
+      ({ conductor } = readResumeState(workflowRunId, mainRoot, options));
     } finally {
       hold.release();
     }

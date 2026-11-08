@@ -467,7 +467,7 @@ test('--account pins provider account on every unit of the workflow run, kept fo
     const unitRunId = answered.steps.s.units.u.unitRunId;
     const binding = producerAssignment(tmp, unitRunId).binding;
     assert.deepEqual(binding.account, { pool: 'node', id: 'acct-test' });
-    assert.deepEqual(binding.provenance.account, { value: 'node/acct-test', source: 'override' });
+    assert.deepEqual(binding.provenance.account, { value: 'node/acct-test', source: 'override:workflow' });
   } finally {
     if (prevHome === undefined) delete process.env.HOME;
     else process.env.HOME = prevHome;
@@ -676,6 +676,8 @@ test('a writing unit whose controller died between its scheduling and its Unit r
   const started = events.find((e) => e.type === 'unit.started');
   const kept = events.filter((e) => e.seq < started.seq);
   fs.writeFileSync(path.join(tmp, '.fgos', 'workflow-runs', first.workflowRunId, 'events.jsonl'), kept.map((e) => JSON.stringify(e)).join('\n') + '\n');
+  // The window is before any seat ran: the worktree is still at the base the unit was scheduled on.
+  git(old.worktreePath, ['reset', '--hard', old.baseSha]);
 
   const resumed = await resumeWorkflow(first.workflowRunId, opts(tmp));
   assert.equal(resumed.status, 'completed', JSON.stringify(resumed.steps));

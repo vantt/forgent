@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "15645fb60680d1c5fad7a09a2dd34ddb485db3a3650e6c5e9a0f3230f34c1ee8",
+  "payloadDigest": "f9b415c46179f9d488fe5a0cb6d492ccd42f445df1464ebcd132e75628adca27",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1230,7 +1230,7 @@
     "src/workflow/case-projection.mjs": "239ffde2fdc111babc9b80e584775fdf3087f59d7fd64db1cb5a3bf7e7d277da",
     "src/workflow/case-runtime.mjs": "4863f6f0bc7653ad754fcded4a9d947023560d9f8cc439b72d8c2f63a69b30e2",
     "src/workflow/case-start.mjs": "e9ffdbfb733ae51d00fd821d16df41a5ae8ea4d55dfdb4caae4d2897922615b6",
-    "src/workflow/case-verbs.mjs": "e4339a86a824069d5e6f684745541376970fa45ec65e6691e826fe16dd5da31f",
+    "src/workflow/case-verbs.mjs": "1141dbce1a255ccc0ed98a6a1fd6012292ab38849be2ffc9f6fc0c1f089cb2d2",
     "src/workflow/checked.mjs": "a620d840253269121e89ebb7c4cada29d38752e55f16909edb7e3a92a8dad8bf",
     "src/workflow/definition.mjs": "f6f218dcf620ac2db6f5e2fc8e6172427b4863bd0267270acf4335648e13f992",
     "src/workflow/dir-guard.mjs": "2999283b51f2d4e25d7d1428dd37b886b1d2826fa78eb02170328a35ac14ff03",
@@ -1242,12 +1242,12 @@
     "src/workflow/propose-validate.mjs": "e9ba1b3601ddbf65eed592c447b79ecb97288f48b09f5a4685e25abf4b8e51f3",
     "src/workflow/propose.mjs": "32a2dde3b6af743f206216ca1c75677282f690381b32e2ba1ec0d2d6ab885e9b",
     "src/workflow/ref-digests.mjs": "c56a9dee27b0cecf8ad18db3fa5c68eddc7875d3b1dbd7c61dabaaf2e55b0d18",
-    "src/workflow/runner.mjs": "2d9882245adb6e6770c08cf2b700f734faaaebb0faccb252c26b376da2b5625c",
-    "src/workflow/seat-providers.mjs": "ae535e2b6da7beae4ac08f695df65306f139c13ba49dc2e6217e549923f23a81",
+    "src/workflow/runner.mjs": "19d751b23aaa27e2061199edba07665d679c4fa6932548e0d429c054ac6a4004",
+    "src/workflow/seat-providers.mjs": "6562fb1390c44aa90735ee9bc08f6c1c8074498b51d7ecf51a18d75c7423f702",
     "src/workflow/seats.mjs": "1d646f5005b3118b84a407a7fecc01aa2074ee1b2aba88d65ed85063e9373c9a",
     "src/workflow/steps.mjs": "bc8a112e26d87bed526b7ca47ea991f77ca3a789b559a23f2afed7577786f4be",
-    "src/workflow/store.mjs": "c81eaaf511f3daf6bd21d5e6d3cd6fadc8aad711544a2cac8c21bca8d2c06eda",
-    "src/workflow/unit-handoff.mjs": "2d7f83727f8e0cd81d79c20e730499359460521a78dccbb294a8af9bc5febc6d",
+    "src/workflow/store.mjs": "1313a3508d640e6b9ef7bd14f2a5fa05953f37d9d7b1dd452ff427874c330adb",
+    "src/workflow/unit-handoff.mjs": "4d2664e7cfe22fac9be63297ff139d8ca553ce016a5858e9b46c59f76b8feab3",
     "src/workflow/units-source.mjs": "63fa30666c4ba9edb5174c47042a08b02007ff1bb34e95df918956029a7e37c3",
     "scripts/lib/git-one-door-declarations.v1.json": "c06a8ee8c3164c54bfd3cd4401271c3e080ae3bb86e5a469cf7532d3fd60d3e9"
   },

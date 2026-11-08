@@ -157,6 +157,19 @@ export function renderGateQuestion(step, state, mainRoot) {
 }
 
 /**
+ * The question a human gate asks now: its text with the producer's "missing expertise" quoted in. A packet
+ * that cannot be read parks the gate with a question that says so; no decision is inferred from it.
+ */
+export function gateQuestionOf(step, state, mainRoot) {
+  try {
+    return renderGateQuestion(step, state, mainRoot);
+  } catch (error) {
+    const reason = error instanceof SyntaxError ? 'invalid JSON' : error.code || error.message;
+    return `Cannot read settled producer "missing expertise": ${reason}. No expertise decision was inferred. Review the packet manually and answer this gate with your decision and acknowledged limitation.`;
+  }
+}
+
+/**
  * The pattern a template runs: its name, or the name with the template's `params` when it has
  * any -- the same `{ pattern, params }` shape the Execution Core accepts from a CLI caller.
  */
@@ -198,10 +211,11 @@ export function unitOverridesOf(unit, seatPersonas = [], options = {}) {
   const hasFallback = effort !== null || applyTimeout || account !== null;
   if (!hasFallback) return seatScoped;
 
+  // The run-level account pin carries the workflow origin, so the door can tell it from a pin a person typed.
   const fallback = {
     ...(effort !== null ? { reasoningEffort: effort } : {}),
     ...(applyTimeout ? { timeoutMs } : {}),
-    ...(account !== null ? { account } : {}),
+    ...(account !== null ? { account, origin: 'workflow' } : {}),
   };
 
   return [...seatScoped, fallback];
@@ -281,6 +295,66 @@ export function outOfScopeWrites(mainRoot, { unitRunId, writes, results, branch,
 export function singleWriteBaseOf(workflow, stepId) {
   const base = writeBaseOf(workflow, stepId);
   return base && !base.refused ? base : null;
+}
+
+/**
+ * Where a unit runs. A resumed Unit run keeps the worktree it recorded. A read-only unit shares the run's
+ * worktree. A writing unit goes on in the worktree and branch an earlier attempt recorded while both still
+ * exist (a rerun after an infrastructure failure, a controller that died after scheduling it); otherwise it
+ * gets a new branch and worktree started from the writing unit it builds on, or from HEAD. A writing unit
+ * never falls back to the shared checkout: `error` says why it has no worktree and it then fails without running.
+ *
+ * @returns {{ worktree: string, branch: string|null, baseRef: string|null, baseSha: string|null,
+ *   owned: boolean, created: boolean, error: string|null }} `owned`: the worktree is this unit's; `created`: made just now
+ */
+export function prepareUnitWorktree({ mainRoot, workflow, state, step, unitId, writes, base, uState, resuming, worktreePath, workflowRunId }) {
+  const recorded = (owned) => ({
+    worktree: uState.worktreePath ?? worktreePath, branch: uState.branch ?? null, baseRef: uState.baseRef ?? null, baseSha: uState.baseSha ?? null, owned, created: false, error: null,
+  });
+  if (resuming) return recorded(false);
+  if (writes.length === 0) return { worktree: worktreePath, branch: null, baseRef: null, baseSha: null, owned: false, created: false, error: null };
+  if (uState?.worktreePath && uState.branch && fs.existsSync(uState.worktreePath) && workflowCommit(mainRoot, uState.branch)) return recorded(true);
+
+  const branch = `wf/${workflowRunId}/${unitId}`;
+  // A unit that builds on a writing unit starts on that unit's branch, so it sees its work.
+  const baseRef = base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD';
+  const baseSha = baseRef ? workflowCommit(mainRoot, baseRef) : null;
+  const unprepared = (error) => ({ worktree: worktreePath, branch, baseRef, baseSha, owned: false, created: false, error });
+  if (!baseSha) {
+    return unprepared(base
+      ? `base branch "${baseRef ?? `of unit ${base.unitId}`}" of writing unit ${base.unitId} is gone; it cannot start from the work it builds on`
+      : `cannot resolve ${baseRef} to start the unit's worktree from`);
+  }
+  try {
+    return { worktree: createWorkflowWorktree({ repoRoot: mainRoot, branch, baseRef: baseSha }).worktreePath, branch, baseRef, baseSha, owned: true, created: true, error: null };
+  } catch (err) {
+    return unprepared(`could not create the unit's worktree on ${branch}: ${err.message}`);
+  }
+}
+
+/**
+ * What a Unit run's result is in the ledger. Writing outside the unit's scope is a finding: the unit does
+ * not pass and its branch is not integrated. A writer standing on a branch that itself carries such paths
+ * carries them too, so they never reach the target through it; a path left uncommitted on the base is not on
+ * its branch and holds nothing back. A write check that cannot run is the unit's failure, not a throw out of
+ * the run.
+ *
+ * @returns {{ result: object, outOfScope: string[], outOfScopeOnBranch: string[] }}
+ */
+export function foldUnitOutcome({ mainRoot, unitData, result, state, base, branch, baseSha }) {
+  let own = { all: [], onBranch: [] };
+  if (unitData.writes.length > 0 && result.unitRunId) {
+    try {
+      own = outOfScopeWrites(mainRoot, { unitRunId: result.unitRunId, writes: unitData.writes, results: result.results || [], branch, baseSha });
+    } catch (err) {
+      result = { ...result, outcome: result.outcome === 'pass' ? 'execution-failure' : result.outcome, error: result.error ?? `could not check the writes of the unit: ${err.message}` };
+    }
+  }
+  const inherited = base ? state.steps[base.stepId]?.units[base.unitId]?.outOfScopeOnBranch ?? [] : [];
+  const outOfScope = [...new Set([...own.all, ...inherited])].sort();
+  const outOfScopeOnBranch = [...new Set([...own.onBranch, ...inherited])].sort();
+  if (outOfScope.length > 0 && result.outcome === 'pass') result = { ...result, outcome: 'findings' };
+  return { result, outOfScope, outOfScopeOnBranch };
 }
 
 export function workflowInspect(cwd) {

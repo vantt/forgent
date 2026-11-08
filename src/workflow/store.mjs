@@ -7,6 +7,7 @@ import crypto from 'node:crypto';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { runDirOf, runsRoot } from '../runner/execution/case-run-paths.mjs';
 import { installOnce } from '../native/door.mjs';
+import { isVerdictResult } from '../runner/execution/legacy-seat-read.mjs';
 
 // Every ledger line is written while its writer holds the run's `advance` lock. The hold is the
 // proof: a hold made by `createAdvanceHold`, for this run, not yet released. Nothing else appends.
@@ -257,6 +258,127 @@ export function recoverWorkflowLedgerTail({ repoRoot, workflowRunId, hold }) {
   return { recovered: true, droppedBytes };
 }
 
+/** How a unit that failed on infrastructure ends: no seat of it reached a verdict, so `resume` may run it again. */
+const INFRASTRUCTURE_OUTCOMES = new Set(['execution-failure', 'not-started']);
+const reachedVerdict = (result) => Boolean(result?.refused) || (isVerdictResult(result) && ['pass', 'findings'].includes(result.outcome));
+const isRerunnable = (p) => INFRASTRUCTURE_OUTCOMES.has(p.outcome) && !p.outOfScope?.length && !(p.results ?? []).some(reachedVerdict);
+
+/** The unit as `unit.scheduled` records it: running, with the worktree and base a writing unit was given. */
+const scheduledUnit = (p) => ({
+  unitId: p.unitId,
+  status: 'running',
+  ...(p.worktreePath ? { worktreePath: p.worktreePath, branch: p.branch ?? null } : {}),
+  ...(p.baseRef ? { baseRef: p.baseRef, baseSha: p.baseSha ?? null } : {}),
+});
+
+/** The unit a reopened step runs again: pending, with the failed attempt's worktree, branch and run id as its predecessor. */
+function reopenedUnit(unit) {
+  const { unitId, worktreePath, branch, baseRef, baseSha, unitRunId } = unit;
+  return { unitId, status: 'pending', ...(worktreePath ? { worktreePath, branch } : {}), ...(baseRef ? { baseRef, baseSha } : {}), unitRunId };
+}
+
+const unitOf = (fold, p) => fold.steps[p.stepId]?.units[p.unitId];
+
+// One fold step per event type; each reads the event payload and changes the fold in place.
+const FOLD = {
+  'workflow.start': (fold, p) => {
+    Object.assign(fold, {
+      workflowId: p.workflowId,
+      workflowRunId: p.workflowRunId,
+      workflow: p.workflow,
+      request: p.request ?? null,
+      stanceOptions: p.stanceOptions ?? [],
+      contextRefs: p.contextRefs ?? [],
+      seats: p.seats ?? null,
+      effort: p.effort ?? null,
+      timeoutMs: p.timeoutMs ?? null,
+      account: p.account ?? null,
+    });
+    for (const s of p.workflow?.steps ?? []) {
+      fold.steps[s.id] = { id: s.id, status: 'pending', dependsOn: s.dependsOn || [], kind: s.kind || 'standard', gate: s.gate || null, units: {}, answer: null };
+    }
+  },
+
+  // A step started after it failed is a reopening (only `resume` writes one): the run and the step run
+  // again, the units that failed on infrastructure wait to run again, and the worktrees settle again.
+  'step.start': (fold, p) => {
+    const step = fold.steps[p.stepId];
+    if (!step) return;
+    if (step.status === 'failed') {
+      delete step.outcome;
+      delete step.reason;
+      for (const [id, unit] of Object.entries(step.units)) if (unit.rerunnable) step.units[id] = reopenedUnit(unit);
+      if (fold.status === 'failed') Object.assign(fold, { status: fold.questions.length > 0 ? 'parked' : 'running', outcome: null });
+      fold.worktrees = null;
+    }
+    step.status = 'running';
+  },
+
+  'unit.scheduled': (fold, p) => {
+    if (fold.steps[p.stepId]) fold.steps[p.stepId].units[p.unitId] = scheduledUnit(p);
+  },
+
+  'unit.started': (fold, p) => {
+    const unit = unitOf(fold, p);
+    if (unit) unit.unitRunId = p.unitRunId;
+  },
+
+  'unit.complete': (fold, p) => {
+    const unit = unitOf(fold, p);
+    if (!unit) return;
+    Object.assign(unit, { status: 'completed', unitRunId: p.unitRunId ?? null, outcome: p.outcome, results: p.results || [] });
+    if (p.outOfScope?.length) unit.outOfScope = p.outOfScope;
+    if (p.outOfScopeOnBranch?.length) unit.outOfScopeOnBranch = p.outOfScopeOnBranch;
+    if (isRerunnable(p)) unit.rerunnable = true;
+  },
+
+  'gate.park': (fold, p) => {
+    if (fold.steps[p.stepId]) {
+      fold.steps[p.stepId].status = 'parked';
+      if (!fold.questions.some((q) => q.stepId === p.stepId)) fold.questions.push({ stepId: p.stepId, question: p.question, header: p.header });
+    }
+    fold.status = 'parked';
+  },
+
+  'gate.answer': (fold, p) => {
+    const step = fold.steps[p.stepId];
+    if (step) {
+      const consent = !step.gate?.mode || step.gate.mode === 'consent';
+      step.answer = p.answer;
+      if (consent && p.approved !== true) {
+        // Clarification only: a consent gate stays parked and its question stays active.
+        step.status = 'parked';
+        step.lastClarification = p.answer;
+        fold.status = 'parked';
+      } else {
+        // An input gate, or a consent gate explicitly approved: it leaves the active questions.
+        step.status = 'answered';
+        step.approved = p.approved === true;
+        const at = fold.questions.findIndex((q) => q.stepId === p.stepId);
+        if (at !== -1) fold.questions.splice(at, 1);
+      }
+    }
+    if (fold.questions.length === 0 && fold.status === 'parked') fold.status = 'running';
+  },
+
+  'step.complete': (fold, p) => {
+    const step = fold.steps[p.stepId];
+    if (step) Object.assign(step, { status: 'completed', outcome: p.outcome || 'pass' });
+  },
+
+  'step.fail': (fold, p) => {
+    const step = fold.steps[p.stepId];
+    if (step) Object.assign(step, { status: 'failed', outcome: p.outcome || 'failed', reason: p.reason ?? null });
+  },
+
+  'workflow.worktrees': (fold, p) => {
+    fold.worktrees = { removed: p.removed || [], kept: p.kept || [] };
+  },
+
+  'workflow.fail': (fold, p) => Object.assign(fold, { status: 'failed', outcome: p.outcome || 'failed' }),
+  'workflow.complete': (fold, p) => Object.assign(fold, { status: 'completed', outcome: p.outcome || 'pass' }),
+};
+
 /**
  * Project current state from Workflow run events.
  *
@@ -265,170 +387,19 @@ export function recoverWorkflowLedgerTail({ repoRoot, workflowRunId, hold }) {
  */
 export function projectWorkflowState(events) {
   if (!Array.isArray(events) || events.length === 0) {
-    return {
-      status: 'not-started',
-      steps: {},
-      questions: [],
-    };
+    return { status: 'not-started', steps: {}, questions: [] };
   }
 
-  let workflowId = null;
-  let workflowRunId = null;
-  let workflow = null;
-  let request = null;
-  let stanceOptions = [];
-  let contextRefs = [];
-  let seats = null;
-  let effort = null;
-  let timeoutMs = null;
-  let account = null;
-  let status = 'running';
-  let outcome = null;
-  let worktrees = null;
-  const steps = {};
-  const questions = [];
-
-  for (const e of events) {
-    const p = e.payload || {};
-
-    switch (e.type) {
-      case 'workflow.start':
-        workflowId = p.workflowId;
-        workflowRunId = p.workflowRunId;
-        workflow = p.workflow;
-        request = p.request ?? null;
-        stanceOptions = p.stanceOptions ?? [];
-        contextRefs = p.contextRefs ?? [];
-        seats = p.seats ?? null;
-        effort = p.effort ?? null;
-        timeoutMs = p.timeoutMs ?? null;
-        account = p.account ?? null;
-        if (workflow?.steps) {
-          for (const s of workflow.steps) {
-            steps[s.id] = {
-              id: s.id,
-              status: 'pending',
-              dependsOn: s.dependsOn || [],
-              kind: s.kind || 'standard',
-              gate: s.gate || null,
-              units: {},
-              answer: null,
-            };
-          }
-        }
-        break;
-
-      case 'step.start':
-        if (steps[p.stepId]) {
-          steps[p.stepId].status = 'running';
-        }
-        break;
-
-      case 'unit.scheduled':
-        if (steps[p.stepId]) {
-          steps[p.stepId].units[p.unitId] = {
-            unitId: p.unitId,
-            status: 'running',
-            ...(p.worktreePath ? { worktreePath: p.worktreePath, branch: p.branch ?? null } : {}),
-            ...(p.baseRef ? { baseRef: p.baseRef, baseSha: p.baseSha ?? null } : {}),
-          };
-        }
-        break;
-
-      case 'unit.started':
-        if (steps[p.stepId]?.units[p.unitId]) {
-          steps[p.stepId].units[p.unitId].unitRunId = p.unitRunId;
-        }
-        break;
-
-      case 'unit.complete':
-        if (steps[p.stepId] && steps[p.stepId].units[p.unitId]) {
-          steps[p.stepId].units[p.unitId].status = 'completed';
-          steps[p.stepId].units[p.unitId].unitRunId = p.unitRunId ?? null;
-          steps[p.stepId].units[p.unitId].outcome = p.outcome;
-          steps[p.stepId].units[p.unitId].results = p.results || [];
-          if (p.outOfScope?.length) steps[p.stepId].units[p.unitId].outOfScope = p.outOfScope;
-          if (p.outOfScopeOnBranch?.length) steps[p.stepId].units[p.unitId].outOfScopeOnBranch = p.outOfScopeOnBranch;
-        }
-        break;
-
-      case 'gate.park':
-        if (steps[p.stepId]) {
-          steps[p.stepId].status = 'parked';
-          if (!questions.some((q) => q.stepId === p.stepId)) {
-            questions.push({
-              stepId: p.stepId,
-              question: p.question,
-              header: p.header,
-            });
-          }
-        }
-        status = 'parked';
-        break;
-
-      case 'gate.answer':
-        if (steps[p.stepId]) {
-          const stepGate = steps[p.stepId].gate;
-          const isConsentGate = !stepGate?.mode || stepGate.mode === 'consent';
-          const isApproved = p.approved === true;
-
-          steps[p.stepId].answer = p.answer;
-          if (isConsentGate && !isApproved) {
-            // Clarification only: consent gate stays parked, question remains active
-            steps[p.stepId].status = 'parked';
-            steps[p.stepId].lastClarification = p.answer;
-            status = 'parked';
-          } else {
-            // Either input gate or explicitly approved consent gate
-            steps[p.stepId].status = 'answered';
-            steps[p.stepId].approved = isApproved;
-            // Remove from active questions
-            const qIdx = questions.findIndex((q) => q.stepId === p.stepId);
-            if (qIdx !== -1) questions.splice(qIdx, 1);
-          }
-        }
-        if (questions.length === 0 && status === 'parked') {
-          status = 'running';
-        }
-        break;
-
-      case 'step.complete':
-        if (steps[p.stepId]) {
-          steps[p.stepId].status = 'completed';
-          steps[p.stepId].outcome = p.outcome || 'pass';
-        }
-        break;
-
-      case 'step.fail':
-        if (steps[p.stepId]) {
-          steps[p.stepId].status = 'failed';
-          steps[p.stepId].outcome = p.outcome || 'failed';
-          steps[p.stepId].reason = p.reason ?? null;
-        }
-        break;
-
-      case 'workflow.worktrees':
-        worktrees = { removed: p.removed || [], kept: p.kept || [] };
-        break;
-
-      case 'workflow.fail':
-        status = 'failed';
-        outcome = p.outcome || 'failed';
-        break;
-
-      case 'workflow.complete':
-        status = 'completed';
-        outcome = p.outcome || 'pass';
-        break;
-
-      default:
-        break;
-    }
-  }
+  const fold = {
+    workflowId: null, workflowRunId: null, workflow: null, request: null, stanceOptions: [], contextRefs: [],
+    seats: null, effort: null, timeoutMs: null, account: null,
+    status: 'running', outcome: null, worktrees: null, steps: {}, questions: [],
+  };
+  for (const e of events) FOLD[e.type]?.(fold, e.payload || {});
 
   // The branch and worktree of every unit that writes, in step order: nothing is merged into the
   // trunk for the user, who merges the branch at the end of a chain.
-  const writeBranches = Object.values(steps).flatMap((step) => Object.values(step.units)
+  const writeBranches = Object.values(fold.steps).flatMap((step) => Object.values(step.units)
     .filter((unit) => unit.branch)
     .map((unit) => ({
       stepId: step.id,
@@ -439,22 +410,23 @@ export function projectWorkflowState(events) {
       baseSha: unit.baseSha ?? null,
     })));
 
+  const { seats, effort, timeoutMs, account } = fold;
   return {
-    workflowRunId,
-    workflowId,
-    workflow,
-    request,
-    stanceOptions,
-    contextRefs,
+    workflowRunId: fold.workflowRunId,
+    workflowId: fold.workflowId,
+    workflow: fold.workflow,
+    request: fold.request,
+    stanceOptions: fold.stanceOptions,
+    contextRefs: fold.contextRefs,
     ...(seats ? { seats } : {}),
     ...(effort ? { effort } : {}),
     ...(timeoutMs ? { timeoutMs } : {}),
     ...(account ? { account } : {}),
     ...(writeBranches.length > 0 ? { writeBranches } : {}),
-    status,
-    outcome,
-    worktrees,
-    steps,
-    questions,
+    status: fold.status,
+    outcome: fold.outcome,
+    worktrees: fold.worktrees,
+    steps: fold.steps,
+    questions: fold.questions,
   };
 }

@@ -11,7 +11,7 @@ import path from 'node:path';
 
 import { execFileSync } from 'node:child_process';
 
-import { renderGateQuestion, settleUnitResult } from '../../src/workflow/unit-handoff.mjs';
+import { renderGateQuestion, foldUnitOutcome } from '../../src/workflow/unit-handoff.mjs';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
@@ -114,7 +114,7 @@ test('a unit whose write check cannot run ends as an infrastructure failure inst
   git('commit', '-m', 'initial');
   activateGitFixture(root);
 
-  const settled = settleUnitResult({
+  const settled = foldUnitOutcome({
     mainRoot: root,
     unitData: { writes: ['a.txt'] },
     result: { unitRunId: 'unit-run-x', outcome: 'pass', results: [] },

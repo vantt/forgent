@@ -57,9 +57,9 @@ const seatPersonas = [{ seat: 'member-1', name: 'sage', digest: 'd', text: 't', 
 test('the overrides a workflow start implies carry no origin that claims a person typed them', () => {
   const overrides = unitOverridesOf(unit, seatPersonas, { effort: 'high', timeoutMs: 60_000, account: 'openai/work' });
   const fallback = overrides.at(-1);
-  assert.equal(fallback.origin, undefined, 'the trailing unscoped override names no origin');
-  assert.deepEqual(fallback, { reasoningEffort: 'high', timeoutMs: 60_000, account: 'openai/work' });
+  assert.deepEqual(fallback, { reasoningEffort: 'high', timeoutMs: 60_000, account: 'openai/work', origin: 'workflow' }, 'the run-level account is marked as the workflow\'s');
   assert.equal(overrides.some((override) => override.origin === 'human-cli'), false);
+  assert.equal(unitOverridesOf(unit, [], { effort: 'high' }).at(-1).origin, undefined, 'an override without an account names no origin');
 });
 
 test('a persona chosen for a seat at the door that lifts the seat above its tier is refused by name; the other seats bind', async () => {
