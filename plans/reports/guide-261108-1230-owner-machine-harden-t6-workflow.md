@@ -19,7 +19,7 @@ Các mục của P01 (đồng ý và biên nhận gate) và P02 (bỏ bước `i
 
 ## P08: giữ custody worktree trước khi case đặt chỗ, ghim account của Workflow, đọc một seat
 
-- **Commit trên main:** xem dòng board "T6 P08 lands" (điền khi land).
+- **Commit trên main:** `2465e26c8`.
 - **Người dùng thấy gì:**
   - `fgos run --case` ghi vào worktree mà tiến trình khác đang giữ bị từ chối `dispatch-in-flight` ngay, trước khi case đặt chỗ; không còn reservation treo chờ trả lại `not-started`.
   - Một account mà chỉ Workflow ghim và không seat nào của unit nhận thì unit chạy không ghim (provenance của seat ghi lý do); `fgos run --account` vẫn bị từ chối như trước.
