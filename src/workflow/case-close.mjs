@@ -179,9 +179,21 @@ function treeBytes(dir) {
 // A summary-less run has no verdict; the probe is never asked to judge a live attempt, so such a run stays unsettled.
 const NO_PROBE = () => ({ state: 'unprobed' });
 
+// The reasons a Unit run stays, in the order they are asked (the first that fires wins). `blocks`: the case's ledger
+// and every other Unit run of it stay too, so a kept ledger never names a removed run. A run that another case owns or
+// names stays alone: nothing kept then names it from this case.
+const KEEP_REASONS = [
+  { reason: 'unit-record-missing', blocks: true, fires: ({ expected }) => !lstatOrNull(path.join(expected, 'unit.json'))?.isFile() },
+  { reason: 'names-other-case', blocks: false, fires: ({ record, caseId }) => record?.workflow?.caseId !== caseId },
+  { reason: 'named-by-other-case', blocks: false, fires: ({ unitRunId, namedElsewhere }) => namedElsewhere.has(unitRunId) },
+  { reason: 'controller-held', blocks: true, fires: ({ expected }) => unitControllerHeld(expected) },
+  { reason: 'custody-held', blocks: true, fires: ({ record, fgosDir }) => typeof record.worktree === 'string' && Boolean(dispatchCwdHolder(fgosDir, record.worktree)) },
+  { reason: 'unsettled', blocks: true, fires: ({ expected }) => { const { unitState } = deriveUnitState(expected, { probe: NO_PROBE }); return unitState !== 'completed' && unitState !== 'failed'; } },
+];
+
 /**
  * Where one named Unit run of `caseId` stands: `{ dir }` when it may go, `{ gone: true }` when there is nothing
- * to remove, `{ keep, blocks }` otherwise (`blocks`: the case's ledger must stay too).
+ * to remove, `{ keep, blocks }` otherwise. The path is checked first: it decides whether the directory may be read at all.
  */
 function judgeUnitRun({ fgosDir, caseId, unitRunId, namedElsewhere }) {
   const dir = assignmentDir(fgosDir, unitRunId);
@@ -194,19 +206,15 @@ function judgeUnitRun({ fgosDir, caseId, unitRunId, namedElsewhere }) {
   const stat = lstatOrNull(expected);
   if (stat === null) return { gone: true };
   if (stat.isSymbolicLink() || !stat.isDirectory() || realpathOrNull(expected) !== expected) return { keep: 'link', blocks: true };
-  const unitFile = path.join(expected, 'unit.json');
-  if (!lstatOrNull(unitFile)?.isFile()) return { keep: 'unit-record-missing', blocks: true };
-  const record = readJsonFile(unitFile);
-  if (record?.workflow?.caseId !== caseId) return { keep: 'names-other-case', blocks: false };
-  if (namedElsewhere.has(unitRunId)) return { keep: 'named-by-other-case', blocks: false };
-  if (unitControllerHeld(expected)) return { keep: 'controller-held', blocks: true };
-  if (typeof record.worktree === 'string' && dispatchCwdHolder(fgosDir, record.worktree)) return { keep: 'custody-held', blocks: true };
-  const { unitState } = deriveUnitState(expected, { probe: NO_PROBE });
-  if (unitState !== 'completed' && unitState !== 'failed') return { keep: 'unsettled', blocks: true };
-  return { dir: expected };
+  const facts = { fgosDir, caseId, unitRunId, namedElsewhere, expected, record: readJsonFile(path.join(expected, 'unit.json')) };
+  const row = KEEP_REASONS.find((candidate) => candidate.fires(facts));
+  return row ? { keep: row.reason, blocks: row.blocks } : { dir: expected };
 }
 
-/** Judge every Unit run a ledger names; `blocked` when any must stay with the ledger. */
+/**
+ * Judge every Unit run a ledger names. `blocked` when any must stay with the ledger: then no run of it goes, and each
+ * that would have gone is listed as `case-kept`, so a dry run and an apply say the same.
+ */
 function judgeCase({ mainRoot, caseId, ledger, namedElsewhere, kept }) {
   const fgosDir = path.join(mainRoot, '.fgos');
   const doomed = [];
@@ -218,6 +226,10 @@ function judgeCase({ mainRoot, caseId, ledger, namedElsewhere, kept }) {
       kept.push({ id: unitRunId, reason: verdict.keep });
       if (verdict.blocks) blocked = true;
     }
+  }
+  if (blocked) {
+    for (const unit of doomed) kept.push({ id: unit.id, reason: 'case-kept' });
+    return { doomed: [], blocked };
   }
   return { doomed, blocked };
 }
@@ -273,6 +285,8 @@ export function pruneFinishedCases({ mainRoot, olderThanMs, apply = false, now =
       }
       result.unitRuns.push(...removed);
       result.bytes += bytes;
+      // A removal that fails midway still leaves this ledger naming the runs already removed: deleting the ledger
+      // first would orphan the rest. The next prune finds the removed runs gone and carries on.
       if (blocked || failed) { kept.push({ id: caseId, reason: 'unit-run-kept' }); continue; }
       const runDir = runDirOf(mainRoot, caseId);
       const ledgerBytes = treeBytes(runDir);

@@ -186,7 +186,7 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, mdview, mcp-skil
   - Lệnh mới: `fgos workflow prune [--older-than <N>d] [--apply]`. Mặc định chạy thử, không xoá gì. Tuổi mặc định 14 ngày. Tuổi sai dạng bị từ chối `invalid-older-than`.
   - Sau mỗi lần close (và sau khi một hold được nhả), Workflow tự dọn theo tuổi mặc định, cố gắng hết sức, không làm hỏng close.
   - **Lưu ý:** phần tự dọn này xoá thật (không chạy thử) các case đã đóng quá 14 ngày. Muốn xem trước, chạy `fgos workflow prune --json` trên máy đó trước khi đóng case đầu tiên sau khi kích hoạt release.
-  - Xoá case đã đóng quá N ngày cùng các Unit run mà ledger của nó nêu tên (Unit run xoá trước, ledger xoá cuối, dưới hold của case).
+  - Xoá case đã đóng quá N ngày cùng các Unit run mà ledger của nó nêu tên (Unit run xoá trước, ledger xoá cuối, dưới hold của case). Từ P18: Unit run chỉ bị xoá khi cả case đi, xem P18 bên dưới.
   - Giữ lại: case chưa kết thúc hoặc không đọc được; case có binding nêu tên (`binding-held`); case mà case khác nêu tên; Unit run chưa settle, đang có controller, đang giữ custody, được nối link hoặc ghi dưới case khác.
   - Unit run của `fgos run` thường không bị động tới.
 - **Lệnh trên từng workspace:** `git pull --rebase`; build, stage, kích hoạt release như thường lệ; `fgos doctor </dev/null`. **Bước riêng:** trên mỗi máy chạy `fgos workflow prune --json` (chạy thử) trước, đọc số case và số byte, rồi mới `fgos workflow prune --apply`. **fg-server2 chỉ `--apply` sau khi big lead nói.**
@@ -250,6 +250,14 @@ console.log(JSON.stringify(out,null,2));
 - **Câu hỏi sẽ hỏi sau khi có số (chưa quyết, chưa khuyến nghị):** giữ nguyên chờ thêm; hay thêm `fgos workflow prune --plain --older-than <N>d` (chạy thử mặc định, tự gõ khi muốn); hay đưa luật tuổi đó vào dọn tự động khi đóng case; hay giới hạn dung lượng mỗi run ngay từ nguồn; hay thêm một trường `plain` vào `prune --json` để khỏi cần đoạn lệnh này. Các lựa chọn không loại trừ nhau; mỗi lựa chọn có chi phí và rủi ro, và đều không được xoá run còn controller, attempt hay custody, run chưa xong, liên kết, hay run mà case đang mở nhắc tới.
 - **Quay lại:** không có gì để quay lại, đoạn lệnh không ghi gì.
 
+## P18: dọn nguyên cả case hoặc không Unit run nào
+
+- **Người dùng thấy gì:** một case có một Unit run phải giữ (chưa settle, controller hoặc custody đang giữ, link, đường dẫn không an toàn, thiếu bản ghi) giờ giữ **mọi** Unit run của nó cùng ledger; trước đây các run đã settle bị xoá trước, ledger ở lại và gọi tên thư mục không còn. Mỗi run lẽ ra đi được nằm trong `kept` với lý do `case-kept`, cả ở chạy thử lẫn `--apply`. Dung lượng được giải phóng muộn hơn cho case dở dang: lần `prune` hay close sau khi case xong sẽ dọn nguyên cả case.
+- **Ngoại lệ còn lại:** một lần xoá lỗi giữa chừng (`delete-failed`, quyền hoặc I/O) vẫn có thể để ledger gọi tên run đã xoá; run bị xoá dở không còn đủ bản ghi nên lần dọn sau giữ nó (`unsettled` hoặc `unit-record-missing`) và cần người gỡ tay. Cây đã dọn theo luật cũ giữ nguyên tên treo, không sửa, không migrate.
+- **Lệnh trên từng workspace:** như P12; không bước riêng. Doctor: không có dòng mới.
+- **Kiểm nhanh:** `fgos workflow prune --json` (chạy thử): không case nào trong `cases` mà cùng case đó còn Unit run `unit-run-kept`.
+- **Quay lại:** revert; những gì prune đã xoá không lấy lại được.
+
 ## Bảng quay lại
 
 | Phase | Release cũ đọc được dữ liệu đĩa mới? | Làm gì trước khi rollback |
@@ -266,5 +274,6 @@ console.log(JSON.stringify(out,null,2));
 | P10 | Có (không đổi byte) | Không cần |
 | P11 | Có (không đổi byte) | Không cần |
 | P12 | Có (chỉ thiếu lịch sử) | `--apply` không có rollback; đọc chạy thử trước |
+| P18 | Có (không đổi byte) | Không cần; `--apply` vẫn không có rollback |
 | P13, P14 | Có (không đổi byte) | Không cần |
 | P20 | Có (chỉ đọc) | Không cần |

@@ -13,12 +13,33 @@ import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { acquireUnitControl } from '../../src/runner/execution/unit-control.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { isCaseId } from '../../src/runner/execution/case-run-paths.mjs';
+import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { append, openCase, withHold } from '../helpers/workflow-case-fixture.mjs';
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = Date.now();
 const iso = (daysAgo) => new Date(NOW - daysAgo * DAY).toISOString();
-const prune = (repoRoot, extra = {}) => pruneFinishedCases({ mainRoot: repoRoot, olderThanMs: 14 * DAY, now: NOW, ...extra });
+const pruneUnchecked = (repoRoot, extra = {}) => pruneFinishedCases({ mainRoot: repoRoot, olderThanMs: 14 * DAY, now: NOW, ...extra });
+/** Every Unit run a ledger on disk names, by case. A ledger that does not fold stays by rule and names nothing here. */
+function namedByLedgers(repoRoot) {
+  const root = path.join(repoRoot, '.fgos', 'workflow-runs');
+  const named = [];
+  for (const caseId of (fs.existsSync(root) ? fs.readdirSync(root) : []).filter(isCaseId)) {
+    let events = [];
+    try { events = readWorkflowEvents({ repoRoot, workflowRunId: caseId }); } catch (err) { if (err.code !== 'workflow-ledger-corrupt') throw err; }
+    for (const event of events) if (event.payload?.unitRunId) named.push({ caseId, unitRunId: event.payload.unitRunId });
+  }
+  return named;
+}
+// A ledger that stays never names a Unit run directory that is gone: a case goes whole or keeps every run it names.
+const prune = (repoRoot, extra = {}) => {
+  const result = pruneUnchecked(repoRoot, extra);
+  for (const { caseId, unitRunId } of namedByLedgers(repoRoot)) {
+    assert.equal(fs.existsSync(path.join(assignmentsOf(repoRoot), unitRunId)), true, `ledger of ${caseId} names the removed Unit run ${unitRunId}`);
+  }
+  return result;
+};
 const ids = (kept) => Object.fromEntries(kept.map((k) => [k.id, k.reason]));
 
 const assignmentsOf = (repoRoot) => path.join(repoRoot, '.fgos', 'assignments');
@@ -138,26 +159,36 @@ test('a Unit run that is unsettled, controlled or in custody stays and keeps its
   const worktree = path.join(repoRoot, 'wt');
   fs.mkdirSync(worktree);
   const cases = {
-    unsettled: caseNaming(repoRoot, ['u-unsettled'], { closedDaysAgo: 30 }),
-    controlled: caseNaming(repoRoot, ['u-controlled'], { closedDaysAgo: 30 }),
+    unsettled: caseNaming(repoRoot, ['u-unsettled', 'u-sibling'], { closedDaysAgo: 30 }),
+    controlled: caseNaming(repoRoot, ['u-controlled', 'u-both'], { closedDaysAgo: 30 }),
     custody: caseNaming(repoRoot, ['u-custody'], { closedDaysAgo: 30 }),
   };
   unitRun(repoRoot, 'u-unsettled', cases.unsettled.caseId, { settled: false });
   const controlledDir = unitRun(repoRoot, 'u-controlled', cases.controlled.caseId);
   unitRun(repoRoot, 'u-custody', cases.custody.caseId, { worktree });
+  const siblingDir = unitRun(repoRoot, 'u-sibling', cases.unsettled.caseId);
+  const bothDir = unitRun(repoRoot, 'u-both', cases.controlled.caseId, { settled: false });
   const control = acquireUnitControl(controlledDir, 'u-controlled');
+  const bothControl = acquireUnitControl(bothDir, 'u-both');
   const custody = acquireDispatchCwdLock(path.join(repoRoot, '.fgos'), worktree);
   try {
+    const dry = prune(repoRoot);
     const result = prune(repoRoot, { apply: true });
     assert.deepEqual(result.cases, []);
     assert.deepEqual(result.unitRuns, []);
+    assert.deepEqual(dry.unitRuns, []);
+    assert.deepEqual(dry.kept, result.kept);
     const kept = ids(result.kept);
     assert.equal(kept['u-unsettled'], 'unsettled');
     assert.equal(kept['u-controlled'], 'controller-held');
     assert.equal(kept['u-custody'], 'custody-held');
+    assert.equal(kept['u-both'], 'controller-held');
+    assert.equal(kept['u-sibling'], 'case-kept');
+    assert.equal(fs.existsSync(siblingDir), true);
     for (const run of Object.values(cases)) assert.equal(kept[run.caseId], 'unit-run-kept');
   } finally {
     control.release();
+    bothControl.release();
     custody.release();
   }
 });
@@ -194,14 +225,17 @@ test('a symbolic link in place of a Unit run is kept and its target is untouched
 
 test('a ledger that names a Unit run whose record names another case does not delete it', () => {
   const repoRoot = makeFixtureDir('fgos-prune-');
-  const old = caseNaming(repoRoot, ['theirs'], { closedDaysAgo: 30 });
+  const old = caseNaming(repoRoot, ['theirs', 'mine'], { closedDaysAgo: 30 });
   const theirs = unitRun(repoRoot, 'theirs', 'some-other-case');
+  const mine = unitRun(repoRoot, 'mine', old.caseId);
 
   const result = prune(repoRoot, { apply: true });
 
   assert.deepEqual(result.cases, [old.caseId]);
-  assert.deepEqual(result.unitRuns, []);
+  assert.deepEqual(result.unitRuns, ['mine']);
+  assert.equal(ids(result.kept).theirs, 'names-other-case');
   assert.equal(fs.existsSync(theirs), true);
+  assert.equal(fs.existsSync(mine), false);
 });
 
 test('a ledger that does not fold cleanly stays even when its close time is old', () => {
@@ -238,7 +272,8 @@ test('a Unit run that cannot be removed leaves the ledger to name what is still 
   const stuck = path.join(second, 'outbox');
   fs.chmodSync(stuck, 0o500);
   try {
-    const result = prune(repoRoot, { apply: true });
+    // The one residual: a removal that fails midway leaves the ledger naming the run already gone.
+    const result = pruneUnchecked(repoRoot, { apply: true });
     assert.deepEqual(result.cases, []);
     assert.equal(fs.existsSync(caseDir(old)), true);
     assert.equal(ids(result.kept)[old.caseId], 'unit-run-kept');
@@ -247,6 +282,10 @@ test('a Unit run that cannot be removed leaves the ledger to name what is still 
   } finally {
     fs.chmodSync(stuck, 0o700);
   }
+  // The retry finds the first run gone; the second lost part of its record to the failed removal, so it stays and so does the ledger.
+  const retry = pruneUnchecked(repoRoot, { apply: true });
+  assert.deepEqual(retry.cases, []);
+  assert.ok(['unsettled', 'unit-record-missing'].includes(ids(retry.kept).second));
 });
 
 test('two prunes at once remove each directory once and both finish', async () => {
