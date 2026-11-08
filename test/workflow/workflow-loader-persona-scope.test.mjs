@@ -85,3 +85,17 @@ test('a workflow resolves personas from its own folder and domain, and never fro
   assert.equal(identityFor('hr/review'), 'core:core/agents/critic');
   assert.equal(workflowPersonaScope('no-such-workflow', { packageRoot: root }), null);
 });
+
+test('a project with a package.json still finds a shipped workflow, and its own definition wins', (t) => {
+  const { root, write } = makeRoot(t);
+  write('package.json', '{}');
+  const startedIn = process.cwd();
+  process.chdir(root);
+  t.after(() => process.chdir(startedIn));
+
+  assert.ok(loadWorkflowWithSource('coding/feature', { packageRoot: root }).workflow.id === 'coding/feature');
+  assert.ok(discoverWorkflows().has('coding/feature'));
+
+  write('core/workflows/feature.yaml', workflowText('coding/feature'));
+  assert.equal(loadWorkflowWithSource('coding/feature', { packageRoot: root }).source.sourcePath, path.join(root, 'core/workflows/feature.yaml'));
+});

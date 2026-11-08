@@ -8,24 +8,7 @@ import { parseYaml } from '../util/yaml.mjs';
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { definitionNameOf } from '../convention/definition-names.mjs';
-
-function resolvePackageRoot(cwd = process.cwd()) {
-  // Find package root from cwd or fallback to nearest directory containing package.json or core/workflows
-  let cur = path.resolve(cwd);
-  while (cur !== path.dirname(cur)) {
-    if (fs.existsSync(path.join(cur, 'core', 'workflows')) || fs.existsSync(path.join(cur, 'package.json'))) {
-      return cur;
-    }
-    cur = path.dirname(cur);
-  }
-  // Final fallback: check repo root containing this file
-  const fileDir = path.dirname(new URL(import.meta.url).pathname);
-  const repoRoot = path.resolve(fileDir, '..', '..');
-  if (fs.existsSync(path.join(repoRoot, 'core', 'workflows'))) {
-    return repoRoot;
-  }
-  return path.resolve(cwd);
-}
+import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
 
 function parseFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
@@ -65,7 +48,7 @@ export function workflowFilesIn(dir) {
  * @returns {Map<string, { workflow: Readonly<object>, source: { sourcePath: string, workflowDir: string|null, owningDomain: string|null } }>}
  */
 function scanWorkflows(options = {}) {
-  const root = options.packageRoot ?? resolvePackageRoot(options.cwd ?? process.cwd());
+  const root = options.packageRoot ?? OWN_PAYLOAD_ROOT;
   const found = new Map();
 
   // One id in a packaged and a flat form is a mistake to name, not a precedence to guess. Two flat files
@@ -125,8 +108,7 @@ function scanWorkflows(options = {}) {
  * Discover all available Workflow definitions across core and domains.
  *
  * @param {object} [options]
- * @param {string} [options.packageRoot] Base root containing core/ and domains/
- * @param {string} [options.cwd] Current working directory
+ * @param {string} [options.packageRoot] Root containing core/ and domains/; the running payload when absent
  * @returns {Map<string, Readonly<object>>} Map of workflow id -> validated Workflow
  */
 export function discoverWorkflows(options = {}) {
@@ -139,8 +121,7 @@ export function discoverWorkflows(options = {}) {
  *
  * @param {string} id Workflow ID (e.g. 'coding/feature' or 'my-workflow')
  * @param {object} [options]
- * @param {string} [options.packageRoot] Base root
- * @param {string} [options.cwd] Current working directory
+ * @param {string} [options.packageRoot] Project root holding its own definitions; the running payload's shipped ones are the fallback
  * @returns {{ workflow: Readonly<object>, source: { sourcePath: string, workflowDir: string|null, owningDomain: string|null } }}
  */
 export function loadWorkflowWithSource(id, options = {}) {
@@ -151,8 +132,8 @@ export function loadWorkflowWithSource(id, options = {}) {
   let all = scanWorkflows(options);
   let found = all.get(id);
   if (!found && options.packageRoot) {
-    // If not found in target repo (e.g. temporary test worktree), check core/domains from install root
-    const fallbackAll = scanWorkflows({ cwd: process.cwd() });
+    // Not in the project: the definitions shipped with the running payload (never the project again).
+    const fallbackAll = scanWorkflows({});
     found = fallbackAll.get(id);
     if (found) {
       all = fallbackAll;
