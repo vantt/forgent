@@ -1,5 +1,5 @@
 //! The notices lane (spec §5.3): machine-made notes to the sender of a
-//! message the sweep refused. A notice goes only to the generation that
+//! message the sweep refused, or whose requested acknowledgement is overdue. A notice goes only to the generation that
 //! sent the message, never wakes, is never replied to, never counts toward
 //! the loop guard and is never offered twice.
 use crate::counters::CounterReason;
@@ -21,18 +21,64 @@ pub enum NoticeState {
     },
 }
 
+/// Why a notice was made: a refusal the sweep decided, or an acknowledgement
+/// the sender asked for that did not come in time.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum NoticeReason {
+    RecordTtl,
+    OfferCap,
+    /// The deadline passed and the recipient was never offered the message.
+    AckNotOffered,
+    /// The recipient was offered the message and did not acknowledge it in time.
+    AckOverdue,
+    /// An earlier reminder to the same recipient also went unanswered: the
+    /// sender asks its user instead of sending again.
+    AckOverdueAgain,
+}
+
+impl NoticeReason {
+    pub const fn code(self) -> &'static str {
+        match self {
+            Self::RecordTtl => "record-ttl",
+            Self::OfferCap => "offer-cap",
+            Self::AckNotOffered => "ack-not-offered",
+            Self::AckOverdue => "ack-overdue",
+            Self::AckOverdueAgain => "ack-overdue-again",
+        }
+    }
+
+    /// The refusal this notice reports, for the notices that report one.
+    pub(crate) const fn refusal(self) -> Option<RefusalReason> {
+        match self {
+            Self::RecordTtl => Some(RefusalReason::RecordTtl),
+            Self::OfferCap => Some(RefusalReason::OfferCap),
+            Self::AckNotOffered | Self::AckOverdue | Self::AckOverdueAgain => None,
+        }
+    }
+}
+
+impl From<RefusalReason> for NoticeReason {
+    fn from(reason: RefusalReason) -> Self {
+        match reason {
+            RefusalReason::RecordTtl => Self::RecordTtl,
+            RefusalReason::OfferCap => Self::OfferCap,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Notice {
     pub id: MessageId,
-    /// The sender of the refused message.
+    /// The sender of the message the notice is about.
     pub to: WriterKey,
-    /// The generation that sent the refused message.
+    /// The generation that sent that message.
     pub to_generation: Generation,
-    pub reason: RefusalReason,
-    /// The refused message.
+    pub reason: NoticeReason,
+    /// The message the notice is about.
     pub about: MessageId,
-    /// The recipient of the refused message.
+    /// The recipient of that message.
     pub about_to: WriterKey,
     pub created_at: Timestamp,
     pub state: NoticeState,
@@ -48,22 +94,18 @@ impl NoticeMark {
         self.0.split('|').next() == Some(key.as_str())
     }
 
-    fn new(to: &WriterKey, reason: RefusalReason) -> Self {
-        Self(format!(
-            "{}|{}",
-            to.as_str(),
-            CounterReason::from(reason).code()
-        ))
+    fn new(to: &WriterKey, reason: NoticeReason) -> Self {
+        Self(format!("{}|{}", to.as_str(), reason.code()))
     }
 }
 
-/// The facts of a refused message that a notice is about.
-pub(crate) struct RefusedFacts {
+/// The facts of a message that a notice is about.
+pub(crate) struct NoticeAbout {
     pub from: WriterKey,
     pub from_generation: Option<Generation>,
     pub to: WriterKey,
     pub about: MessageId,
-    pub reason: RefusalReason,
+    pub reason: NoticeReason,
 }
 
 impl MailboxState {
@@ -72,11 +114,11 @@ impl MailboxState {
         self.notices.iter()
     }
 
-    /// Creates the notice for a refused message, unless its sender cannot
-    /// receive it or got one of the same reason inside the window.
+    /// Creates the notice about a message, unless its sender cannot receive
+    /// it or got one of the same reason inside the window.
     pub(crate) fn notify(
         &mut self,
-        refused: RefusedFacts,
+        refused: NoticeAbout,
         now: Timestamp,
         limits: &Limits,
         ids: &mut dyn IdSource,

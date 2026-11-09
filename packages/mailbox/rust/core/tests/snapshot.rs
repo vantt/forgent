@@ -218,3 +218,33 @@ fn a_version_1_snapshot_reads_as_the_current_version_with_no_remote_state() {
     let written = serde_json::to_value(&state).unwrap();
     assert_eq!(written["schema_version"], SNAPSHOT_SCHEMA_VERSION);
 }
+
+/// Unflagged use must write records an older binary can still load: the ack
+/// fields exist only while a flagged message or its watch is held.
+#[test]
+fn a_snapshot_without_ack_fields_loads_and_writes_back_unchanged() {
+    let text = serde_json::to_string(&populated_state()).unwrap();
+    assert!(!text.contains("ack_watch"), "{text}");
+    assert!(!text.contains("ack_within_sec"), "{text}");
+
+    let restored: MailboxState = serde_json::from_str(&text).unwrap();
+
+    assert_eq!(serde_json::to_string(&restored).unwrap(), text);
+}
+
+#[test]
+fn a_state_holding_a_flagged_message_and_its_watch_survives_a_json_round_trip() {
+    let mut pair = common::Pair::new(t(0));
+    let mut req = plain("a", common::B_NAME, "please read");
+    req.need_ack = Some(600);
+    let id = pair.try_send(req, t(1)).unwrap().id;
+    pair.deliver("b", t(2));
+    pair.sweep(common::Pair::after(t(2), 600));
+
+    let text = serde_json::to_string(&pair.state).unwrap();
+    assert!(text.contains("\"ack_watch\"") && text.contains("\"ack_within_sec\":600"));
+    let restored: MailboxState = serde_json::from_str(&text).unwrap();
+
+    assert_eq!(restored, pair.state);
+    assert_eq!(restored.ack_watches().next().unwrap().id, id);
+}

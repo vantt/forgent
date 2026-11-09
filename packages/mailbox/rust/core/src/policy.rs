@@ -173,6 +173,7 @@ impl MailboxState {
         };
         check_not_self(&req.from, &recipient.key)?;
         self.check_reply_hint(req, from_generation, &recipient.key)?;
+        self.check_ack_on_ack(req, from_generation, &recipient.key, now, limits)?;
         check_size(req, limits)?;
         self.check_budget(account, limits)?;
         self.check_lifetime(&req.from, from_generation, limits)?;
@@ -217,6 +218,37 @@ impl MailboxState {
         } else {
             Err(Refusal::ReplyToNotOffered)
         }
+    }
+
+    /// Check 4b: a send that asks for an acknowledgement is not a reply to
+    /// a message that asked for one, whether the link is the hint or the
+    /// derived parent, so acknowledgements never ping-pong.
+    fn check_ack_on_ack(
+        &self,
+        req: &SendRequest<'_>,
+        from_generation: Option<Generation>,
+        to: &WriterKey,
+        now: Timestamp,
+        limits: &Limits,
+    ) -> Result<(), Refusal> {
+        if req.need_ack.is_none() {
+            return Ok(());
+        }
+        let parent = self
+            .derived_parent(to, &req.from, from_generation, now, limits)
+            .and_then(|i| self.messages.get(i));
+        let hinted = req
+            .reply_to
+            .as_ref()
+            .and_then(|hint| self.messages.iter().find(|h| &h.id == hint));
+        if parent
+            .into_iter()
+            .chain(hinted)
+            .any(|h| h.ack_within_sec.is_some())
+        {
+            return Err(Refusal::AckOnAck);
+        }
+        Ok(())
     }
 
     /// Check 6: attempts inside the rolling window, this one included.

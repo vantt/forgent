@@ -203,6 +203,18 @@ properties:
         maximum: 4294967295
         x-fgos-scope: both
         x-fgos-file: config
+  ack:
+    description: "Acknowledgement requests of the mailbox."
+    type: object
+    x-fgos-scope: both
+    x-fgos-file: config
+    properties:
+      replyBySec:
+        description: "How long a send that asks for an acknowledgement (--need-ack) waits for it when it names no --reply-by; the clock starts when the message is sent, and again when the recipient is first offered it. In seconds. Owner decision 2026-11-09: a mail that needs an answer needs it fast."
+        type: integer
+        minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
   stopBlock:
     description: "Limits on blocking a Stop hook."
     type: object

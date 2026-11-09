@@ -13,6 +13,7 @@
 //! any version but the current one; the store may read [`SnapshotVersion`]
 //! first to tell a newer snapshot (never used, never overwritten) from an
 //! older one.
+use crate::ack::AckWatch;
 use crate::counters::{Account, BoundedCounters};
 use crate::envelope::Header;
 use crate::ids::{MessageId, WriterKey};
@@ -117,6 +118,10 @@ pub struct MailboxState {
     /// What ingest of mail from other machines keeps.
     #[serde(default)]
     pub(crate) remote: RemoteState,
+    /// The sender's watches on messages that asked for an acknowledgement;
+    /// empty, and so absent from the snapshot, until one is sent.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub(crate) ack_watch: Vec<AckWatch>,
 }
 
 /// Ingest's own state: where it stopped reading the shared mail stream and
@@ -172,6 +177,7 @@ impl Default for MailboxState {
             exchanges: BTreeMap::new(),
             wake_lifetime: BTreeMap::new(),
             remote: RemoteState::default(),
+            ack_watch: Vec::new(),
         }
     }
 }

@@ -86,6 +86,11 @@ pub struct Header {
     /// the shared `unregistered` identity.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<Origin>,
+    /// The sender asked for an acknowledgement within this many seconds
+    /// (`--need-ack`); `None` for every unflagged message. The recipient's
+    /// frame tells it to reply in one line.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ack_within_sec: Option<u64>,
 }
 
 /// The verified origin of a message from another machine.

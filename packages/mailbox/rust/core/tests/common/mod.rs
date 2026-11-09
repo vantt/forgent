@@ -155,6 +155,7 @@ pub fn plain<'a>(from: &str, to: &str, body: &'a str) -> SendRequest<'a> {
         body,
         wake: false,
         reply_to: None,
+        need_ack: None,
         dead_keys: Default::default(),
         stop_drains: [cli("claude"), cli("codex")].into_iter().collect(),
         nudge_clis: Default::default(),

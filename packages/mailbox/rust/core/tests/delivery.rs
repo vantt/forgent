@@ -1,7 +1,9 @@
 mod common;
 
 use common::{key, plain, t, Pair, A_NAME, B_NAME};
-use fgos_mailbox_core::{AttemptToken, Checkpoint, Generation, MessageState, Refusal};
+use fgos_mailbox_core::{
+    AttemptToken, Checkpoint, Generation, MessageId, MessageState, Refusal, Timestamp,
+};
 
 const G1: Generation = Generation::FIRST;
 
@@ -528,7 +530,7 @@ fn a_step_claim_measures_a_body_it_can_see_instead_of_assuming_the_worst_case() 
 fn a_stop_claim_and_a_plain_step_claim_are_not_limited_by_a_bound() {
     let mut pair = Pair::new(t(100));
     let body = "x".repeat(pair.limits.max_body_bytes as usize);
-    let mut req = common::plain("a", B_NAME, &body);
+    let mut req = plain("a", B_NAME, &body);
     req.wake = true;
     let woke = pair.try_send(req, t(100)).unwrap().id;
     let stop = pair.state.claim(
@@ -826,4 +828,62 @@ fn a_recipient_the_caller_resolved_is_matched_on_its_exact_key_only_never_as_a_n
         pair.try_send(gone, t(102)).unwrap_err().code(),
         "unknown-name"
     );
+}
+
+/// A send of `a` to `b` that asks for an acknowledgement within 600 s.
+fn flagged(pair: &mut Pair, now: Timestamp) -> MessageId {
+    let mut req = plain("a", B_NAME, "please read");
+    req.need_ack = Some(600);
+    pair.try_send(req, now).unwrap().id
+}
+
+fn acked(pair: &Pair, id: &MessageId) -> bool {
+    pair.state
+        .ack_watches()
+        .find(|w| &w.id == id)
+        .unwrap_or_else(|| panic!("no watch on {id}"))
+        .acked
+}
+
+#[test]
+fn a_flagged_message_is_acknowledged_by_the_derived_reply_or_by_a_reply_that_names_it_and_a_hint_now_marks_its_message_answered(
+) {
+    let mut pair = Pair::new(t(0));
+
+    // Derived: the reply to the latest offered message acknowledges it.
+    let first = flagged(&mut pair, t(1));
+    assert_eq!(
+        pair.state.message(&first).unwrap().ack_within_sec,
+        Some(600)
+    );
+    assert!(!acked(&pair, &first));
+    pair.deliver("b", t(2));
+    pair.try_send(plain("b", A_NAME, "read"), t(3)).unwrap();
+    assert!(acked(&pair, &first));
+    assert!(pair.state.message(&first).unwrap().answered);
+
+    // Naming: a reply that names an older flagged message acknowledges that
+    // one, while the derived parent is the newer, unflagged message.
+    let second = flagged(&mut pair, t(10));
+    let newer = pair.send("a", B_NAME, "newer", t(11));
+    pair.deliver("b", t(12));
+    let mut reply = plain("b", A_NAME, "read, nothing to add");
+    reply.reply_to = Some(second.clone());
+    let sent = pair.try_send(reply, t(13)).unwrap();
+    assert_eq!(sent.reply_to, Some(newer.clone()));
+    assert!(acked(&pair, &second));
+    assert!(pair.state.message(&second).unwrap().answered);
+    assert!(pair.state.message(&newer).unwrap().answered);
+
+    // A hint on unflagged mail marks it answered too, and starts no watch.
+    let plain_old = pair.send("a", B_NAME, "plain", t(20));
+    pair.deliver("b", t(21));
+    pair.send("a", B_NAME, "newest", t(22));
+    pair.deliver("b", t(23));
+    let mut reply = plain("b", A_NAME, "re");
+    reply.reply_to = Some(plain_old.clone());
+    pair.try_send(reply, t(24)).unwrap();
+    assert!(pair.state.message(&plain_old).unwrap().answered);
+    assert_eq!(pair.state.ack_watches().count(), 2);
+    assert!(!pair.state.mark_acked(&plain_old, None));
 }

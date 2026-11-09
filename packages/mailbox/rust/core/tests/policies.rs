@@ -530,9 +530,13 @@ fn a_head_keyed_unregistered_keeps_its_own_account_apart_from_senders_with_no_he
 fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
     let long_key = |pair: &Pair| "k".repeat(pair.limits.frame.max_header_chars as usize + 1);
     // From a to b, with b's question offered to a, so a's send has a parent.
+    // The question asked for an acknowledgement, so a send of a that asks
+    // for one too is an acknowledgement of an acknowledgement.
     let base = || {
         let mut pair = Pair::new(t(0));
-        pair.send("b", A_NAME, "question", t(1));
+        let mut question = plain("b", A_NAME, "question");
+        question.need_ack = Some(600);
+        pair.try_send(question, t(1)).unwrap();
         pair.deliver("a", t(2));
         pair
     };
@@ -564,7 +568,8 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
         // together with `unknown-name`; this pair spans it.
         ("unknown-name", "reply-to-not-offered"),
         ("self", "reply-to-not-offered"),
-        ("reply-to-not-offered", "too-large"),
+        ("reply-to-not-offered", "ack-on-ack"),
+        ("ack-on-ack", "too-large"),
         ("too-large", "session-budget"),
         ("session-budget", "lifetime-cap"),
         ("lifetime-cap", "too-deep"),
@@ -576,6 +581,7 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
         let mut from = "a".to_string();
         let mut to = B_NAME.to_string();
         let mut hint = None;
+        let mut need_ack = None;
         let mut alias = None;
         for failing in [expected, later] {
             match failing {
@@ -588,6 +594,7 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
                 "unknown-name" => to = "nobody".to_string(),
                 "self" => to = A_NAME.to_string(),
                 "reply-to-not-offered" => hint = Some(not_offered.clone()),
+                "ack-on-ack" => need_ack = Some(600),
                 "too-large" => too_large(&mut pair),
                 "session-budget" => no_budget(&mut pair),
                 "lifetime-cap" => no_lifetime(&mut pair),
@@ -600,6 +607,7 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
         }
         let mut req = plain(&from, &to, "body");
         req.reply_to = hint;
+        req.need_ack = need_ack;
         if let Some(refusal) = alias {
             req.to = fgos_mailbox_core::Recipient::Refused(refusal);
         }
@@ -613,7 +621,7 @@ fn every_adjacent_pair_in_the_send_check_order_reports_the_earlier_check() {
         );
         checked.push(expected);
     }
-    assert_eq!(checked.len(), 14);
+    assert_eq!(checked.len(), 15);
 }
 
 /// A message that leaves the machine is held to the wire's own body cap and

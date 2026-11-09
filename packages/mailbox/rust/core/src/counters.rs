@@ -37,6 +37,8 @@ pub enum CounterReason {
     AmbiguousName,
     SelfSend,
     ReplyToNotOffered,
+    /// A send that asks for an acknowledgement answers one that asked for one.
+    AckOnAck,
     TooLarge,
     SessionBudget,
     LifetimeCap,
@@ -81,6 +83,7 @@ impl CounterReason {
             Self::AmbiguousName => "ambiguous-name",
             Self::SelfSend => "self",
             Self::ReplyToNotOffered => "reply-to-not-offered",
+            Self::AckOnAck => "ack-on-ack",
             Self::TooLarge => "too-large",
             Self::SessionBudget => "session-budget",
             Self::LifetimeCap => "lifetime-cap",

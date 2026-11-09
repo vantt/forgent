@@ -6,7 +6,7 @@
 //! frame's header escape.
 use crate::delivery::{AliasRefusal, MessageView, Refusal, SendOutcome};
 use crate::envelope::Kind;
-use crate::frame::{escape_handle, escape_header, fill, section};
+use crate::frame::{self, escape_handle, escape_header, fill, section};
 use crate::ids::{Cli, ShortName, WriterKey};
 use crate::limits::Limits;
 use crate::registry::Liveness;
@@ -65,6 +65,12 @@ pub fn delivery_report(outcome: &SendOutcome, version: &VersionClause, limits: &
             .to_string(),
         );
     }
+    if let Some(seconds) = outcome.ack_within_sec {
+        lines.push(fill(
+            section("report.ack"),
+            &[("count", &frame::ack_minutes(seconds))],
+        ));
+    }
     lines.join("\n")
 }
 
@@ -110,6 +116,7 @@ pub fn refusal_text(refusal: &Refusal, limits: &Limits) -> String {
         Refusal::Group
         | Refusal::SelfSend
         | Refusal::ReplyToNotOffered
+        | Refusal::AckOnAck
         | Refusal::SenderKeyTooLong { .. } => "refusal.argument",
     };
     let candidates = match refusal {
@@ -215,6 +222,7 @@ fn limit_text(refusal: &Refusal) -> String {
         | Refusal::AmbiguousName { .. }
         | Refusal::SelfSend
         | Refusal::ReplyToNotOffered
+        | Refusal::AckOnAck
         | Refusal::Alias(_) => Vec::new(),
     };
     pairs

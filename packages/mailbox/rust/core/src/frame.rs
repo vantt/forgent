@@ -5,9 +5,9 @@
 //! another one or imitate the trailing instruction lines. The escape lowers
 //! the risk that a model acts on forged text; it does not remove it.
 use crate::delivery::{ClaimedItem, ClaimedWhat, MailFrom, NoticeFacts};
-use crate::envelope::RefusalReason;
 use crate::limits::Limits;
 use crate::names::in_name_alphabet;
+use crate::notices::NoticeReason;
 use std::sync::OnceLock;
 
 const FRAME: &str = include_str!("../../../contracts/frame.v1.txt");
@@ -229,7 +229,17 @@ fn render_message(
             .reply_to
             .as_ref()
             .map_or_else(|| from.clone(), |name| escape_handle(name, limits));
-        fill(section("message.reply"), &[("from", &target), ("id", &id)])
+        match item.ack_within_sec {
+            Some(seconds) => fill(
+                section("message.reply.ack"),
+                &[
+                    ("from", &target),
+                    ("id", &id),
+                    ("count", &ack_minutes(seconds)),
+                ],
+            ),
+            None => fill(section("message.reply"), &[("from", &target), ("id", &id)]),
+        }
     } else {
         String::new()
     };
@@ -257,8 +267,11 @@ fn render_notice(item: &ClaimedItem, facts: &NoticeFacts, limits: &Limits) -> St
     let about = escape_header(facts.about.as_str(), limits);
     let about_to = escape_header(&facts.about_to, limits);
     let reason_section = match facts.reason {
-        RefusalReason::RecordTtl => "notice.reason.record-ttl",
-        RefusalReason::OfferCap => "notice.reason.offer-cap",
+        NoticeReason::RecordTtl => "notice.reason.record-ttl",
+        NoticeReason::OfferCap => "notice.reason.offer-cap",
+        NoticeReason::AckNotOffered => "notice.reason.ack-not-offered",
+        NoticeReason::AckOverdue => "notice.reason.ack-overdue",
+        NoticeReason::AckOverdueAgain => "notice.reason.ack-overdue-again",
     };
     let values = [("about", about.as_str()), ("about_to", about_to.as_str())];
     let reason = fill(section(reason_section), &values);
@@ -271,6 +284,12 @@ fn render_notice(item: &ClaimedItem, facts: &NoticeFacts, limits: &Limits) -> St
             ("reason", &reason),
         ],
     )
+}
+
+/// The minutes a frame or report names for an acknowledgement window of
+/// `seconds`: rounded up, never zero.
+pub(crate) fn ack_minutes(seconds: u64) -> String {
+    seconds.div_ceil(60).max(1).to_string()
 }
 
 /// The bytes a gutter and an entity can add per body byte: `&` becomes

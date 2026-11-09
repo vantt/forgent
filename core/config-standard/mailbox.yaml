@@ -64,6 +64,10 @@ mailbox:
   frame:
     # @fgos:doc Length bound of a frame header value, and so of a short name, of a writer key and of a binding's handle the core accepts. In characters. Borrowed from the longest session id Identity accepts, not yet measured. Minimum: 0. Maximum: 4294967295. Default: 200.
     maxHeaderChars: 200
+  # @fgos:doc Acknowledgement requests of the mailbox.
+  ack:
+    # @fgos:doc How long a send that asks for an acknowledgement (--need-ack) waits for it when it names no --reply-by; the clock starts when the message is sent, and again when the recipient is first offered it. In seconds. Owner decision 2026-11-09: a mail that needs an answer needs it fast. Minimum: 0. Default: 600.
+    replyBySec: 600
   # @fgos:doc Limits on blocking a Stop hook.
   stopBlock:
     # @fgos:doc Consecutive Stop blocks that were written and finished for one head generation; the count returns to zero when a Stop passes without blocking or a new turn starts. In blocks. It is the starting value of the mailbox spec (section 12), not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 3.

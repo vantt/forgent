@@ -204,6 +204,7 @@ impl Drain {
                     body,
                     wake,
                     reply_to: None,
+                    need_ack: None,
                     dead_keys: Default::default(),
                     stop_drains: self.stop_drains.clone(),
                     nudge_clis: Default::default(),

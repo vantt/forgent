@@ -1,11 +1,12 @@
 //! Send, claim, emit, finish and the read-only inbox (spec §5.2).
+use crate::ack::{AckStage, AckWatch};
 use crate::counters::CounterReason;
-use crate::envelope::{Header, Kind, MessageState, RefusalReason};
+use crate::envelope::{Header, Kind, MessageState};
 use crate::frame;
 use crate::ids::{AttemptToken, Cli, Generation, IdSource, MessageId, ShortName, WriterKey};
 use crate::limits::Limits;
 use crate::names::{self, ResolveRefusal};
-use crate::notices::{Notice, NoticeState};
+use crate::notices::{Notice, NoticeReason, NoticeState};
 use crate::registry::Liveness;
 use crate::state::MailboxState;
 use crate::time::Timestamp;
@@ -44,6 +45,10 @@ pub struct SendRequest<'a> {
     pub wake: bool,
     /// A hint only; the link is derived by the core (spec §5.4).
     pub reply_to: Option<MessageId>,
+    /// Asks the recipient to acknowledge within this many seconds. The
+    /// caller validates the number; a reply to a message that itself asked
+    /// for one cannot ask (the core refuses `ack-on-ack`).
+    pub need_ack: Option<u64>,
     /// Keys whose head the store judged `Dead`: name resolution skips them
     /// (owner decision Q2, option B). Empty when the store judged none.
     pub dead_keys: BTreeSet<WriterKey>,
@@ -119,6 +124,8 @@ pub struct SendOutcome {
     /// the outstanding one (at most one per head until the mail is seen),
     /// so this send adds none.
     pub nudge_outstanding: bool,
+    /// The acknowledgement the sender asked for, in seconds.
+    pub ack_within_sec: Option<u64>,
 }
 
 /// A refused send: answered to the sender, never recorded (spec §5.3).
@@ -134,6 +141,9 @@ pub enum Refusal {
     /// The name resolves to the sender's own key.
     SelfSend,
     ReplyToNotOffered,
+    /// The send asks for an acknowledgement of a reply to a message that
+    /// asked for one: an acknowledgement asks for nothing back.
+    AckOnAck,
     TooLarge {
         max_bytes: u64,
     },
@@ -179,6 +189,7 @@ impl Refusal {
             Self::AmbiguousName { .. } => CounterReason::AmbiguousName,
             Self::SelfSend => CounterReason::SelfSend,
             Self::ReplyToNotOffered => CounterReason::ReplyToNotOffered,
+            Self::AckOnAck => CounterReason::AckOnAck,
             Self::TooLarge { .. } => CounterReason::TooLarge,
             Self::SessionBudget { .. } => CounterReason::SessionBudget,
             Self::LifetimeCap { .. } => CounterReason::LifetimeCap,
@@ -258,6 +269,9 @@ pub struct ClaimedItem {
     /// for a notice, which is offered once.
     pub attempt: u32,
     pub what: ClaimedWhat,
+    /// For a message whose sender asked for an acknowledgement: the seconds
+    /// it gave; its frame then tells the recipient to reply in one line.
+    pub ack_within_sec: Option<u64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -302,10 +316,10 @@ impl ClaimedItem {
 /// What a claimed notice reports.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NoticeFacts {
-    pub reason: RefusalReason,
-    /// The refused message.
+    pub reason: NoticeReason,
+    /// The message the notice is about.
     pub about: MessageId,
-    /// The label of the refused message's recipient.
+    /// The label of that message's recipient.
     pub about_to: String,
 }
 
@@ -487,6 +501,20 @@ impl MailboxState {
                 parent.answered = true;
                 parent.id.clone()
             });
+        // A reply that names its message answers it, whatever the derived
+        // parent is (check 4 proved it was offered to this sender).
+        let hinted = req.reply_to.as_ref().and_then(|hint| {
+            self.messages
+                .iter_mut()
+                .find(|h| &h.id == hint)
+                .map(|hinted| {
+                    hinted.answered = true;
+                    hinted.id.clone()
+                })
+        });
+        for answered in parent.iter().chain(hinted.iter()) {
+            self.mark_acked(answered, None);
+        }
         let to_account = self.account(&admitted.to);
         let to_stop_drains = req.stop_drains.contains(&admitted.to_cli);
         let to_nudge = req.nudge_clis.contains(&admitted.to_cli);
@@ -527,6 +555,7 @@ impl MailboxState {
             answered: false,
             state: MessageState::Recorded,
             origin: None,
+            ack_within_sec: req.need_ack,
         };
         let outcome = SendOutcome {
             id: header.id.clone(),
@@ -542,7 +571,26 @@ impl MailboxState {
             to_nudge,
             to_key,
             nudge_outstanding,
+            ack_within_sec: req.need_ack,
         };
+        if let Some(reply_by_sec) = req.need_ack {
+            self.watch_ack(
+                AckWatch {
+                    id: header.id.clone(),
+                    from: header.from.clone(),
+                    from_generation,
+                    to: header.to.clone(),
+                    to_machine: None,
+                    reply_by_sec,
+                    due: now.plus_secs(reply_by_sec),
+                    offered_at: None,
+                    stage: AckStage::Waiting,
+                    acked: false,
+                    changed_at: now,
+                },
+                limits,
+            );
+        }
         self.messages.push(header);
         Ok(outcome)
     }
@@ -749,6 +797,7 @@ impl MailboxState {
             id: header.id.clone(),
             attempt,
             what: ClaimedWhat::Mail(from),
+            ack_within_sec: header.ack_within_sec,
         }
     }
 
@@ -763,6 +812,7 @@ impl MailboxState {
                 about: notice.about.clone(),
                 about_to: self.sender_label(&notice.about_to),
             }),
+            ack_within_sec: None,
         }
     }
 
@@ -814,6 +864,7 @@ impl MailboxState {
         };
         let at = self.last_now.max(now);
         let mut touched = false;
+        let mut newly_offered = Vec::new();
         for header in &mut self.messages {
             let MessageState::InFlight {
                 token: held,
@@ -830,10 +881,16 @@ impl MailboxState {
             if accepts(*claimed_by) {
                 header.state = MessageState::Offered { at };
                 header.changed_at = at;
+                if header.ack_within_sec.is_some() {
+                    newly_offered.push(header.id.clone());
+                }
                 finished.offered.push(header.id.clone());
             } else {
                 finished.ignored.push(header.id.clone());
             }
+        }
+        for id in &newly_offered {
+            self.mark_ack_offered(id, None, at);
         }
         let mut kept = Vec::with_capacity(self.notices.len());
         for notice in std::mem::take(&mut self.notices) {

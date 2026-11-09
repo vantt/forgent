@@ -646,6 +646,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 body,
                 wake: *wake,
                 reply_to: reply_to.as_deref().map(MessageId::from_text),
+                need_ack: None,
                 dead_keys: Default::default(),
                 stop_drains: TestedClis::embedded().stop_drains(),
                 nudge_clis: TestedClis::embedded().nudge_clis(),

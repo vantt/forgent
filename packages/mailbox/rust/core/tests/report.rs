@@ -28,6 +28,7 @@ fn outcome(effective_wake: bool, wake_dropped: Option<WakeDrop>) -> SendOutcome 
         to_nudge: false,
         to_key: fgos_mailbox_core::WriterKey::new("to-key").unwrap(),
         nudge_outstanding: false,
+        ack_within_sec: None,
     }
 }
 
@@ -406,5 +407,23 @@ fn list_shows_one_line_per_head_with_its_name_handle_cli_tier_and_liveness_and_t
     assert_eq!(
         list_text(&[], false, &limits),
         "No heads in this project's mailbox yet."
+    );
+}
+
+#[test]
+fn a_flagged_send_reports_its_acknowledgement_window_in_minutes_after_the_other_lines() {
+    let mut flagged = outcome(false, None);
+    flagged.ack_within_sec = Some(600);
+
+    let report = delivery_report(&flagged, &VersionClause::Tested, &spec_limits());
+
+    let plain = delivery_report(
+        &outcome(false, None),
+        &VersionClause::Tested,
+        &spec_limits(),
+    );
+    assert_eq!(
+        report,
+        format!("{plain}\nYou asked for an acknowledgement within 10 min; you are told once if none comes.")
     );
 }

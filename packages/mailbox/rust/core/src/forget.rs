@@ -29,6 +29,7 @@ impl MailboxState {
         self.messages.retain(|h| &h.from != key && &h.to != key);
         self.notices.retain(|n| &n.to != key && &n.about_to != key);
         self.notice_last.retain(|mark, _| !mark.is_of(key));
+        self.ack_watch.retain(|w| &w.from != key && &w.to != key);
         self.lifetime.retain(|k, _| !k.is_of(key, None));
         // Only the key's own counts as a sender: what other heads spent on
         // waking it is theirs and is never reset, as at a takeover.

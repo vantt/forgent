@@ -12,6 +12,7 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::print_stdout, clippy::print_stderr)]
 
+mod ack;
 mod counters;
 mod delivery;
 mod envelope;
@@ -30,6 +31,7 @@ mod sweep;
 mod time;
 mod wake;
 
+pub use ack::{AckStage, AckWatch};
 pub use counters::{Account, BoundedCounters, CounterReason, Party, PartyKey, UNREGISTERED};
 pub use delivery::{
     AliasCandidate, AliasRefusal, Checkpoint, Claim, ClaimedItem, ClaimedWhat, Finished, MailFrom,
@@ -44,11 +46,11 @@ pub use ids::{
     AttemptToken, Cli, Generation, IdSource, InvalidValue, MessageId, ShortName, WriterKey,
 };
 pub use limits::{
-    ChainLimits, CounterLimits, FrameLimits, HumanLimits, Limits, LoopLimits, NoticeLimits,
-    QueueLimits, RecordLimits, SessionLimits, WakeLimits,
+    AckLimits, ChainLimits, CounterLimits, FrameLimits, HumanLimits, Limits, LoopLimits,
+    NoticeLimits, QueueLimits, RecordLimits, SessionLimits, WakeLimits,
 };
 pub use names::{is_group, ResolveRefusal};
-pub use notices::{Notice, NoticeMark, NoticeState};
+pub use notices::{Notice, NoticeMark, NoticeReason, NoticeState};
 pub use policy::{LifetimeKey, RemoteSend};
 pub use registry::{Binding, Liveness, RegisterRefusal, RegisterRequest, Registered, StoredHead};
 pub use remote::{Ingested, RemoteDrop, RemoteMail, RemoteWake, Settlement, Unsettled};

@@ -25,6 +25,7 @@ pub struct Limits {
     pub wake: WakeLimits,
     pub notices: NoticeLimits,
     pub frame: FrameLimits,
+    pub ack: AckLimits,
 }
 
 impl Limits {
@@ -116,4 +117,12 @@ pub struct NoticeLimits {
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct FrameLimits {
     pub max_header_chars: u32,
+}
+
+/// Acknowledgement requests (`send --need-ack`).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct AckLimits {
+    /// The reply-by a send that asks for an acknowledgement gets when it names none.
+    pub reply_by_sec: u64,
 }

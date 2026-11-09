@@ -5,7 +5,7 @@ use crate::counters::CounterReason;
 use crate::envelope::{MessageState, RefusalReason};
 use crate::ids::IdSource;
 use crate::limits::Limits;
-use crate::notices::{NoticeState, RefusedFacts};
+use crate::notices::{NoticeAbout, NoticeState};
 use crate::state::MailboxState;
 use crate::time::Timestamp;
 
@@ -17,7 +17,9 @@ impl MailboxState {
         self.drop_unfinished_notices(now, limits);
         self.expire_notices(now, limits);
         self.refuse_stale_records(now, limits, ids);
+        self.judge_ack_watches(now, limits, ids);
         self.retire_settled_messages(now, limits);
+        self.retire_ack_watches(now, limits);
         self.forget_old_notice_marks(now, limits);
         self.forget_old_remote(now, limits);
     }
@@ -55,7 +57,12 @@ impl MailboxState {
             .notice_last
             .values()
             .any(|at| now.is_past(*at, limits.notices.window_sec));
-        claim_expired || stale_record || retiring || notice_due || mark_due
+        claim_expired
+            || stale_record
+            || retiring
+            || notice_due
+            || mark_due
+            || self.ack_rule_due(now, limits)
     }
 
     /// An in-flight message past its deadline returns to `recorded` (its
@@ -170,24 +177,26 @@ impl MailboxState {
 
     fn settle_refusals(
         &mut self,
-        refused: Vec<RefusedFacts>,
+        refused: Vec<NoticeAbout>,
         now: Timestamp,
         limits: &Limits,
         ids: &mut dyn IdSource,
     ) {
         for facts in refused {
-            self.count(facts.reason.into(), &facts.from, &facts.to, now, limits);
+            if let Some(reason) = facts.reason.refusal() {
+                self.count(reason.into(), &facts.from, &facts.to, now, limits);
+            }
             self.notify(facts, now, limits, ids);
         }
     }
 }
 
-fn refused_facts(header: &crate::envelope::Header, reason: RefusalReason) -> RefusedFacts {
-    RefusedFacts {
+fn refused_facts(header: &crate::envelope::Header, reason: RefusalReason) -> NoticeAbout {
+    NoticeAbout {
         from: header.from.clone(),
         from_generation: header.from_generation,
         to: header.to.clone(),
         about: header.id.clone(),
-        reason,
+        reason: reason.into(),
     }
 }

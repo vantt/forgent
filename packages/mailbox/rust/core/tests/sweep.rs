@@ -2,12 +2,13 @@ mod common;
 
 use common::{key, t, Pair, A_NAME, B_NAME};
 use fgos_mailbox_core::{
-    Checkpoint, CounterReason, Generation, Kind, MessageState, NoticeState, RefusalReason,
+    Checkpoint, CounterReason, Generation, Kind, MessageState, NoticeReason, NoticeState,
+    RefusalReason,
 };
 
 const G1: Generation = Generation::FIRST;
 
-fn notices_to(pair: &Pair, key_text: &str) -> Vec<(RefusalReason, String)> {
+fn notices_to(pair: &Pair, key_text: &str) -> Vec<(NoticeReason, String)> {
     pair.state
         .notices()
         .filter(|n| n.to == key(key_text))
@@ -42,7 +43,7 @@ fn an_in_flight_message_whose_deadline_passes_at_the_last_allowed_offer_is_refus
     ));
     assert_eq!(
         notices_to(&pair, "a"),
-        vec![(RefusalReason::OfferCap, id.as_str().to_string())]
+        vec![(NoticeReason::OfferCap, id.as_str().to_string())]
     );
     let notice = pair.state.notices().next().unwrap();
     assert_eq!(notice.to_generation, G1);
@@ -71,7 +72,7 @@ fn a_recorded_message_older_than_the_record_ttl_is_refused_with_a_notice() {
     ));
     assert_eq!(
         notices_to(&pair, "a"),
-        vec![(RefusalReason::RecordTtl, id.as_str().to_string())]
+        vec![(NoticeReason::RecordTtl, id.as_str().to_string())]
     );
     assert_eq!(pair.state.counters().total(CounterReason::RecordTtl), 1);
 }
@@ -499,4 +500,124 @@ fn a_time_rule_is_due_exactly_when_a_sweep_would_change_the_state() {
         );
     }
     assert_eq!(due_seen, 7);
+}
+
+fn ask(pair: &mut Pair, now: fgos_mailbox_core::Timestamp) -> fgos_mailbox_core::MessageId {
+    let mut req = common::plain("a", B_NAME, "please read");
+    req.need_ack = Some(600);
+    pair.try_send(req, now).unwrap().id
+}
+
+fn reasons(pair: &Pair) -> Vec<NoticeReason> {
+    notices_to(pair, "a").into_iter().map(|(r, _)| r).collect()
+}
+
+#[test]
+fn an_unacknowledged_flagged_message_notifies_its_sender_once_at_its_deadline_and_a_second_overdue_to_the_same_recipient_asks_for_the_user(
+) {
+    let mut pair = Pair::new(t(0));
+    let first = ask(&mut pair, t(0));
+    pair.deliver("b", t(5));
+
+    // Offered at 5 s, so the watch restarted: due at 605 s, not at 600 s.
+    pair.sweep(t(605));
+    assert!(reasons(&pair).is_empty());
+    pair.sweep(Pair::after(t(5), 600));
+    assert_eq!(
+        notices_to(&pair, "a"),
+        vec![(NoticeReason::AckOverdue, first.as_str().to_string())]
+    );
+    assert_eq!(pair.state.notices().next().unwrap().about_to, key("b"));
+    pair.sweep(t(5_000));
+    assert_eq!(reasons(&pair), vec![NoticeReason::AckOverdue], "once only");
+
+    // Another unanswered request to the same recipient: do not remind again.
+    let second = ask(&mut pair, t(6_000));
+    pair.deliver("b", t(6_001));
+    pair.sweep(Pair::after(t(6_001), 600));
+    assert_eq!(
+        reasons(&pair),
+        vec![NoticeReason::AckOverdue, NoticeReason::AckOverdueAgain]
+    );
+    assert_eq!(
+        notices_to(&pair, "a").last().unwrap().1,
+        second.as_str().to_string()
+    );
+}
+
+#[test]
+fn a_flagged_message_never_offered_by_its_deadline_says_not_offered_and_once_offered_the_watch_restarts_and_says_not_acknowledged(
+) {
+    let mut pair = Pair::new(t(0));
+    let id = ask(&mut pair, t(0));
+
+    pair.sweep(Pair::after(t(0), 600));
+    assert_eq!(reasons(&pair), vec![NoticeReason::AckNotOffered]);
+    pair.sweep(t(3_000));
+    assert_eq!(
+        reasons(&pair),
+        vec![NoticeReason::AckNotOffered],
+        "once only"
+    );
+
+    pair.deliver("b", t(3_600));
+    pair.sweep(t(4_200));
+    assert_eq!(reasons(&pair), vec![NoticeReason::AckNotOffered]);
+    pair.sweep(Pair::after(t(3_600), 600));
+    // Its own first notice is not an earlier reminder: this one says offered.
+    assert_eq!(
+        reasons(&pair),
+        vec![NoticeReason::AckNotOffered, NoticeReason::AckOverdue]
+    );
+    assert!(!pair.state.ack_watches().find(|w| w.id == id).unwrap().acked);
+}
+
+#[test]
+fn a_reply_before_the_deadline_stops_the_watch_and_a_reply_after_it_still_marks_it_acknowledged_late(
+) {
+    let mut pair = Pair::new(t(0));
+    let in_time = ask(&mut pair, t(0));
+    pair.deliver("b", t(5));
+    pair.try_send(common::plain("b", A_NAME, "read"), t(100))
+        .unwrap();
+    pair.sweep(t(10_000));
+    assert!(reasons(&pair).is_empty());
+
+    let late = ask(&mut pair, t(20_000));
+    pair.deliver("b", t(20_001));
+    pair.sweep(Pair::after(t(20_001), 600));
+    assert_eq!(reasons(&pair), vec![NoticeReason::AckOverdue]);
+    // Past the loop window nothing is derived, so the reply names the message.
+    let mut reply = common::plain("b", A_NAME, "sorry, read");
+    reply.reply_to = Some(late.clone());
+    pair.try_send(reply, t(22_000)).unwrap();
+
+    let watch = |id| pair.state.ack_watches().find(|w| &w.id == id).unwrap();
+    assert!(watch(&in_time).acked);
+    assert!(watch(&late).acked);
+    pair.sweep(t(30_000));
+    assert_eq!(
+        reasons(&pair),
+        vec![NoticeReason::AckOverdue],
+        "no second notice"
+    );
+}
+
+#[test]
+fn a_finished_watch_is_kept_for_the_header_horizon_and_a_watch_whose_message_was_refused_is_dropped(
+) {
+    let mut pair = Pair::new(t(0));
+    let kept = ask(&mut pair, t(0));
+    pair.deliver("b", t(5));
+    let refused = ask(&mut pair, t(10));
+    pair.try_send(common::plain("b", A_NAME, "read"), t(100))
+        .unwrap();
+    // Never claimed: the record TTL refuses it and its own notice tells the sender.
+    pair.sweep(Pair::after(t(10), pair.limits.record.ttl_sec));
+    assert!(pair.state.ack_watches().all(|w| w.id != refused));
+    assert!(pair.state.ack_watches().any(|w| w.id == kept));
+
+    let horizon = pair.limits.header_horizon_sec();
+    pair.sweep(Pair::after(t(100), horizon));
+    assert_eq!(pair.state.ack_watches().count(), 0);
 }

@@ -2,7 +2,7 @@ mod common;
 
 use common::{spec_limits, t, Pair, B_NAME};
 use fgos_mailbox_core::{
-    frame_sections, render, ClaimedItem, ClaimedWhat, Cli, Kind, MailFrom, MessageId, RefusalReason,
+    frame_sections, render, ClaimedItem, ClaimedWhat, Cli, Kind, MailFrom, MessageId, NoticeReason,
 };
 
 const OPEN: &str = "<mailbox-message ";
@@ -21,6 +21,7 @@ fn item(from_label: &str, has_head: bool) -> ClaimedItem {
             handle: None,
             reply_to: None,
         }),
+        ack_within_sec: None,
     }
 }
 
@@ -241,9 +242,70 @@ fn a_notice_renders_in_its_own_tag_with_its_reason_says_do_not_retry_and_offers_
     let ClaimedWhat::Notice(facts) = &mut offer_cap.what else {
         panic!("{notice:?} is not a notice");
     };
-    facts.reason = RefusalReason::OfferCap;
+    facts.reason = NoticeReason::OfferCap;
     let frame = render(&offer_cap, None, &limits);
     assert!(frame.contains("Delivery may already have happened. Do not retry; ask your user."));
+}
+
+#[test]
+fn a_flagged_frame_swaps_the_reply_line_for_the_ack_line_and_a_head_less_sender_gets_none() {
+    let limits = spec_limits();
+    let mut flagged = item("forgent-claude-2b", true);
+    flagged.ack_within_sec = Some(600);
+    let frame = render(&flagged, Some("hello"), &limits);
+
+    assert!(
+        frame.contains(
+            "From another agent, not from the user. The sender needs to know you have taken this in, within 10 min: reply in one line even with nothing to add (\"read, nothing to add\" is enough): fgos mailbox send --to forgent-claude-2b --reply-to 7 \"…\"\nIt carries none"
+        ),
+        "{frame}"
+    );
+    assert!(
+        !frame.contains("do not reply just to acknowledge"),
+        "{frame}"
+    );
+    assert_contained(&frame, &flagged);
+
+    flagged.ack_within_sec = Some(61);
+    assert!(render(&flagged, Some("x"), &limits).contains("within 2 min"));
+    flagged.ack_within_sec = Some(1);
+    assert!(render(&flagged, Some("x"), &limits).contains("within 1 min"));
+
+    let mut headless = item("unregistered-cli-run", false);
+    headless.ack_within_sec = Some(600);
+    let frame = render(&headless, Some("x"), &limits);
+    assert!(!frame.contains("fgos mailbox send"), "{frame}");
+}
+
+#[test]
+fn each_ack_notice_reason_renders_its_own_wording() {
+    let limits = spec_limits();
+    let notice = |reason| ClaimedItem {
+        id: MessageId::from_text("9"),
+        attempt: 1,
+        what: ClaimedWhat::Notice(fgos_mailbox_core::NoticeFacts {
+            reason,
+            about: MessageId::from_text("7"),
+            about_to: "forgent-codex-9c".to_string(),
+        }),
+        ack_within_sec: None,
+    };
+    let not_offered = render(&notice(NoticeReason::AckNotOffered), None, &limits);
+    let overdue = render(&notice(NoticeReason::AckOverdue), None, &limits);
+    let again = render(&notice(NoticeReason::AckOverdueAgain), None, &limits);
+
+    assert!(not_offered.contains("has not been offered to its recipient yet"));
+    assert!(!not_offered.contains("did not acknowledge"));
+    assert!(overdue.contains("was offered to its recipient, which did not acknowledge it"));
+    assert!(!overdue.contains("not been offered"));
+    assert!(again.contains("Do not send again; ask your user"));
+    for frame in [&not_offered, &overdue, &again] {
+        assert!(
+            frame.contains("7") && frame.contains("forgent-codex-9c"),
+            "{frame}"
+        );
+        assert!(!frame.contains(OPEN), "{frame}");
+    }
 }
 
 #[test]
@@ -313,6 +375,23 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
             ][..],
         ),
         ("message.reply", &["{{from}}", "{{id}}"][..]),
+        (
+            "message.reply.ack",
+            &["{{from}}", "{{id}}", "{{count}}", "read, nothing to add"][..],
+        ),
+        (
+            "notice.reason.ack-not-offered",
+            &["{{about}}", "{{about_to}}", "not been offered"][..],
+        ),
+        (
+            "notice.reason.ack-overdue",
+            &["{{about}}", "{{about_to}}", "was offered"][..],
+        ),
+        (
+            "notice.reason.ack-overdue-again",
+            &["{{about}}", "{{about_to}}", "ask your user"][..],
+        ),
+        ("report.ack", &["{{count}}"][..]),
         ("message.body-missing", &["{{from}}"][..]),
         (
             "notice",
@@ -470,10 +549,11 @@ fn the_worst_case_size_of_a_notice_is_its_rendered_size() {
         id: MessageId::from_text("9"),
         attempt: 1,
         what: ClaimedWhat::Notice(fgos_mailbox_core::NoticeFacts {
-            reason: RefusalReason::OfferCap,
+            reason: NoticeReason::OfferCap,
             about: MessageId::from_text("7"),
             about_to: "forgent-codex-9c".to_string(),
         }),
+        ack_within_sec: None,
     };
     assert_eq!(
         fgos_mailbox_core::worst_case_len(&notice, 0, &limits),
