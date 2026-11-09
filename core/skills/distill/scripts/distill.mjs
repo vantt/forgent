@@ -120,7 +120,11 @@ function setFrontmatterKeys(text, updates) {
 
 // ---------- shared lookups ----------
 
+const SOURCE_NAME = /^[a-z0-9][a-z0-9-]*$/;
+
 function sourcePath(root, name) {
+  if (!SOURCE_NAME.test(String(name)))
+    fail(`invalid source name "${name}"`, `the name becomes a file and a clone directory name, so it cannot contain path separators or dots`, `use lowercase letters, digits and hyphens, starting with a letter or digit`);
   return path.join(root, REFS_DIR, "sources", `${name}.md`);
 }
 
@@ -147,7 +151,10 @@ function loadTaxonomy(root) {
 }
 
 function cloneDir(root, name, meta) {
-  return path.join(root, meta.local || path.join(CLONES_DIR, name));
+  const dir = path.resolve(root, meta.local || path.join(CLONES_DIR, name));
+  if (dir !== path.resolve(root) && !dir.startsWith(path.resolve(root) + path.sep))
+    fail(`clone path of "${name}" leaves the learning area`, `a source's local path must stay inside ${root}`, `fix the "local" key in ${path.relative(root, sourcePath(root, name))}`);
+  return dir;
 }
 
 function today() {
@@ -278,13 +285,15 @@ function cmdAdd(args) {
     fail("add needs <name> --type --url", "a source file cannot be scaffolded without its identity and cursor type", `distill.mjs add beegog --type git-repo --url https://github.com/x/y`);
   if (!TYPES.includes(args.type))
     fail(`unknown type "${args.type}"`, `cursor semantics differ per type`, `use one of: ${TYPES.join(" | ")}`);
+  if (!/^(https:\/\/|ssh:\/\/|git@)/.test(args.url))
+    fail(`unsupported url "${args.url}"`, `a source url that is not https://, ssh:// or git@ could be a local path or an option for git`, `use an https://, ssh:// or git@ url`);
   const root = requireRoot(args);
   const file = sourcePath(root, name);
   if (fs.existsSync(file))
     fail(`source "${name}" already exists`, `overwriting would destroy its cursor and entries`, `edit ${path.relative(root, file)} directly, or pick another name`);
   writeAtomic(file, T.source(name, args.type, args.url));
   console.log(`Created ${path.relative(root, file)} (type: ${args.type}).`);
-  if (args.type === "git-repo") console.log(`Next: git clone ${args.url} ${CLONES_DIR}/${name} && distill.mjs delta ${name}`);
+  if (args.type === "git-repo") console.log(`Next: git clone -- ${args.url} ${CLONES_DIR}/${name} && distill.mjs delta ${name}`);
   else if (args.type === "paper") console.log(`Next: save a copy under ${CLONES_DIR}/${name}/, extract once, then "distill.mjs seal ${name}".`);
   else console.log(`Next: fetch ${args.url}, extract, then "distill.mjs seal ${name} --version <v>".`);
 }
@@ -292,7 +301,7 @@ function cmdAdd(args) {
 function deltaGitRepo(root, name, meta) {
   const repo = cloneDir(root, name, meta);
   if (!fs.existsSync(path.join(repo, ".git")))
-    fail(`clone missing at ${path.relative(root, repo)}`, `git-repo deltas are computed against a local clone`, `git clone ${meta.url} ${path.relative(root, repo)}`);
+    fail(`clone missing at ${path.relative(root, repo)}`, `git-repo deltas are computed against a local clone`, `git clone -- ${meta.url} ${path.relative(root, repo)}`);
   // The only Git write: a fast-forward pull, and only into a skill-owned clone under upstreams/.
   if (!path.resolve(repo).startsWith(path.resolve(root, CLONES_DIR) + path.sep))
     console.error(`(warn: clone is outside ${CLONES_DIR}/ — not pulled, using local state)`);

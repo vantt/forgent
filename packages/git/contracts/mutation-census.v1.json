@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "de8e41188a354d7ac03cf5256e8c73fcdd702fa0052d38d25aa741755d1bb47e",
+  "payloadDigest": "04202bafca86c1cd7129edfb415e352f7968a7433fc815bf87dd848c701b45e1",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -133,7 +133,7 @@
     "core/skills/distill/references/consult-protocol.md": "f435be045fea0a10a367d0dac428a512444694041877cff9a57991dada0a73e4",
     "core/skills/distill/references/deep-dive-protocol.md": "dc6c43de2ffdb23e581b19f2d46a72affbc2279d92f7ccb971fd567c5e7d9961",
     "core/skills/distill/references/extract-rules.md": "bd27a5dde54a78556fb4e7603dd7930217d2e6972b049bc99ea8e33402d316de",
-    "core/skills/distill/scripts/distill.mjs": "8b75131722e4b9308fb6874f0317fe9f587330b55feead59d6a1a2e001d0b5ff",
+    "core/skills/distill/scripts/distill.mjs": "264972b3cc41fea80b5678e6dd6f08f76d20478ef435e1485ea20a1116f8d1ef",
     "core/skills/distill/scripts/migrate-porting-state-backfill.mjs": "c523725488e427c51ec7544007d6a38f143d116daf55b23eced002c2c081ac6a",
     "core/skills/fgos-advise/SKILL.md": "363ec9d91ff7b7ffbb45ccc7cbb39ac94f6bd58aa8e8ba1a01d658f991e4617d",
     "core/skills/fgos-advise/references/request-kinds-and-routes.md": "d326e5acb7ad928e237a346b15b3a9114046884fef938ebe33d3a9649fc7aeb6",
@@ -2066,17 +2066,17 @@
       "binary": "git",
       "family": "spawn",
       "callers": [
-        "core/skills/distill/scripts/distill.mjs:299",
-        "core/skills/distill/scripts/distill.mjs:301",
-        "core/skills/distill/scripts/distill.mjs:304",
-        "core/skills/distill/scripts/distill.mjs:307",
-        "core/skills/distill/scripts/distill.mjs:309",
+        "core/skills/distill/scripts/distill.mjs:308",
+        "core/skills/distill/scripts/distill.mjs:310",
         "core/skills/distill/scripts/distill.mjs:313",
-        "core/skills/distill/scripts/distill.mjs:314",
-        "core/skills/distill/scripts/distill.mjs:346",
-        "core/skills/distill/scripts/distill.mjs:384",
-        "core/skills/distill/scripts/distill.mjs:388",
-        "core/skills/distill/scripts/distill.mjs:458"
+        "core/skills/distill/scripts/distill.mjs:316",
+        "core/skills/distill/scripts/distill.mjs:318",
+        "core/skills/distill/scripts/distill.mjs:322",
+        "core/skills/distill/scripts/distill.mjs:323",
+        "core/skills/distill/scripts/distill.mjs:355",
+        "core/skills/distill/scripts/distill.mjs:393",
+        "core/skills/distill/scripts/distill.mjs:397",
+        "core/skills/distill/scripts/distill.mjs:467"
       ],
       "class": "standalone-skill-script",
       "skill": "distill"
