@@ -30,3 +30,11 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, fg-server). fg-s
 - **Lệnh trên từng workspace:** máy có sửa cục bộ `.fgos/config.yaml` (máy owner, fg-server) kéo bằng `git pull --autostash` (hoặc `git stash`, `git pull`, `git stash pop`); không dùng `git reset`. Sau đó kiểm tra các dòng cục bộ của file vẫn còn.
 - **Doctor mong đợi:** không có dòng mới.
 - **Quay lại:** revert commit; worktree đã tạo giữ nguyên bản chép của nó.
+
+## P04: bộ canh bản render skill và canh trích dẫn
+
+- Commit trên `main`: `<SHA>`.
+- Người dùng thấy gì: không đổi hành vi của `fgos`. Test `fgos-mirror` giờ so mọi skill fgOS sở hữu (`distill`, `instruction-audit`, `fgos-*`), không chỉ `fgos-*`; có thêm một test kiểm `.gitignore` allowlist khớp đúng tập skill nguồn. `.gitignore` thêm dòng `!/.claude/skills/instruction-audit/`, nên bản render `.claude` của `instruction-audit` (do phase render sau này tạo) sẽ được git theo dõi. Quét trích dẫn rộng (`fgos decision --relation`) không còn đọc `.agents/skills` (104 thư mục, 19 MB); 59 mục baseline của cây này đã bỏ vì có bản sao byte-giống dưới `plugins/fgOS/skills`.
+- Lệnh: chỉ các lệnh chung ở trên. Không có cấu hình mới, không đổi `~/.fgos/config.json`.
+- Dòng doctor mong đợi: `decision-citation-drift` vẫn đạt (`no new findings`). Không có dòng doctor mới.
+- Quay lại: revert merge commit trên `main`, kích hoạt lại release trước đó ở trên, ghi SHA revert lên bảng.
