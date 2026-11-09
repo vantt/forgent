@@ -27,3 +27,8 @@ core + `-p fgos-mailbox` + `-p fgos-config`, `-p fgos --test mailbox_routes` (47
 - Behavior change for unflagged cross-machine replies: wire `reply_to` is now the origin's id instead of the raw local id.
 
 Status: DONE_WITH_CONCERNS
+
+## Review fix (OPC)
+- `remote_reply_parent` is now a read-only lookup (`&self`); the host marks the original answered with `mark_answered` only after the append succeeded, so a failed publish/open/append leaves it unanswered. Core test asserts the lookup leaves it unanswered until `mark_answered`.
+- Contract: trust unit is the machine; any session of the target machine can acknowledge (watch keyed on `to_machine` only).
+- Noted, accepted by OPC: a bad `--reply-to` hint is refused without counting an attempt, unlike local check 4.

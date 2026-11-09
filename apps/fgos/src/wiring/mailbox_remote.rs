@@ -541,8 +541,8 @@ pub fn names_remote_head(ctx: &Context<'_>, from: &WriterKey, to: &str) -> Resul
 }
 
 /// The id `machine` gave the message that `hint` names in this record, when `from` was offered it
-/// from that machine; the message is marked answered. A hint that names nothing of the kind is
-/// refused like a same-machine hint is.
+/// from that machine; nothing is marked. A hint that names nothing of the kind is refused like a
+/// same-machine hint is.
 fn reply_parent(
     ctx: &Context<'_>,
     from: &WriterKey,
@@ -553,17 +553,28 @@ fn reply_parent(
         .record
         .hold(ctx.wait, ctx.now, ctx.limits, |state, _| {
             let generation = state.binding(from).map(|binding| binding.generation);
-            let found =
-                state.remote_reply_parent(from, generation, &MessageId::from_text(hint), machine);
-            Reported {
-                changed: found.is_some(),
-                value: found,
-            }
+            Reported::unchanged(state.remote_reply_parent(
+                from,
+                generation,
+                &MessageId::from_text(hint),
+                machine,
+            ))
         })
         .map_err(|error| record_error_text(error.code()))?;
     held.value
         .value
         .ok_or_else(|| refusal_text(&MailRefusal::ReplyToNotOffered, ctx.limits))
+}
+
+/// Marks the message `hint` names answered, after the reply has left. A failure to record the mark
+/// does not undo the sent reply; the original then stays unanswered, as before.
+fn mark_answered(ctx: &Context<'_>, hint: &str) {
+    let _ = ctx
+        .record
+        .hold(ctx.wait, ctx.now, ctx.limits, |state, _| Reported {
+            changed: state.mark_answered(&MessageId::from_text(hint)),
+            value: (),
+        });
 }
 
 /// Sends `body` to the session `to` names on another machine, when one
@@ -603,7 +614,8 @@ pub fn send(
     };
     // A reply names the message it answers by this record's id; the recipient's machine knows it by
     // the id that machine gave it, which is what goes on the wire.
-    let reply_to = match reply_to {
+    let hint = reply_to;
+    let reply_to = match hint {
         None => None,
         Some(hint) => match reply_parent(ctx, from, hint, &target.machine.id) {
             Ok(origin_id) => Some(origin_id),
@@ -661,6 +673,9 @@ pub fn send(
     })();
     match appended {
         Ok(()) => {
+            if let Some(hint) = hint {
+                mark_answered(ctx, hint);
+            }
             super::mailbox_sync::spawn(main, &Paths::new(fgos_dir), &cross.remote);
             Outcome::Recorded(recorded_text(id.as_str(), &target, cross, wake))
         }

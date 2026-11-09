@@ -23,7 +23,7 @@
         "minimum": 1,
         "maximum": 86400,
         "when": "only a send that asks for an acknowledgement; it is a signed field of the version the message already has, under that version's own signing domain, so no version and no domain is added, and a send without the request is unchanged, byte for byte",
-        "receiver": "a receiver that knows the field reads an integer from minimum to maximum (the same bound as mailbox.remote.maxAgeSec), shows the recipient the line that asks for a one-line reply, and drops an event whose value is of any other type or range with the counted reason remote-malformed; the reply, a message that names the original in reply_to, is the acknowledgement",
+        "receiver": "a receiver that knows the field reads an integer from minimum to maximum (the same bound as mailbox.remote.maxAgeSec), shows the recipient the line that asks for a one-line reply, and drops an event whose value is of any other type or range with the counted reason remote-malformed; the reply, a message that names the original in reply_to, is the acknowledgement. The trust unit is the machine: a watch is keyed on the target machine only, so a verified reply from any session of that machine acknowledges it",
         "olderReaders": "a receiver that does not know the field ignores it: its shape check reads the named fields only, so it takes the message and shows the plain frame, without the line that asks for a reply; the sender then sees the message as unacknowledged at its deadline"
       },
       "wakeVersion": {

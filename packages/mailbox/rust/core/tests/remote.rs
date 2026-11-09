@@ -324,26 +324,29 @@ fn a_verified_cross_machine_reply_naming_a_watched_id_marks_it_acknowledged_once
     // A reply across machines names the original's id on its own machine, and only a message
     // the head was offered, from that machine, counts.
     let generation = pair.state.binding(&b).map(|binding| binding.generation);
-    let reply_parent = |pair: &mut Pair, hint: &MessageId, machine: &str| {
+    let reply_parent = |pair: &Pair, hint: &MessageId, machine: &str| {
         pair.state
             .remote_reply_parent(&b, generation, hint, machine)
     };
     assert_eq!(
-        reply_parent(&mut pair, &id, "peer-machine"),
+        reply_parent(&pair, &id, "peer-machine"),
         None,
         "not offered yet"
     );
     pair.deliver("b", t(2));
-    assert_eq!(reply_parent(&mut pair, &id, "other-machine"), None);
+    assert_eq!(reply_parent(&pair, &id, "other-machine"), None);
     assert_eq!(
-        reply_parent(&mut pair, &MessageId::from_text("nope"), "peer-machine"),
+        reply_parent(&pair, &MessageId::from_text("nope"), "peer-machine"),
         None
     );
     assert!(!pair.state.message(&id).unwrap().answered);
     assert_eq!(
-        reply_parent(&mut pair, &id, "peer-machine").as_deref(),
+        reply_parent(&pair, &id, "peer-machine").as_deref(),
         Some("m1")
     );
+    // The lookup marks nothing, so a send whose append then fails leaves the original unanswered.
+    assert!(!pair.state.message(&id).unwrap().answered);
+    assert!(pair.state.mark_answered(&id));
     assert!(pair.state.message(&id).unwrap().answered);
 
     // A flagged send of this record's head to a head on `peer-machine` is watched under that machine.

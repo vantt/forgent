@@ -284,25 +284,38 @@ impl MailboxState {
 
     /// Check 4 for a reply to a message from another machine: `hint` must
     /// name a message from `to_machine` that was offered to `from`'s current
-    /// generation (`from_generation`). Marks it answered and returns the id
-    /// its machine gave it, which is what the reply names on the wire.
-    /// `None` when no such message exists.
+    /// generation (`from_generation`). Returns the id its machine gave it,
+    /// which is what the reply names on the wire; `None` when no such message
+    /// exists. Changes nothing: the original is marked answered with
+    /// [`MailboxState::mark_answered`] only once the reply has left.
     pub fn remote_reply_parent(
-        &mut self,
+        &self,
         from: &WriterKey,
         from_generation: Option<Generation>,
         hint: &MessageId,
         to_machine: &str,
     ) -> Option<String> {
-        let header = self.messages.iter_mut().find(|h| {
-            &h.id == hint
-                && &h.to == from
-                && Some(h.to_generation) == from_generation
-                && matches!(h.state, MessageState::Offered { .. })
-                && h.origin.as_ref().is_some_and(|o| o.machine == to_machine)
-        })?;
-        header.answered = true;
-        header.origin.as_ref().map(|o| o.id.clone())
+        self.messages
+            .iter()
+            .find(|h| {
+                &h.id == hint
+                    && &h.to == from
+                    && Some(h.to_generation) == from_generation
+                    && matches!(h.state, MessageState::Offered { .. })
+                    && h.origin.as_ref().is_some_and(|o| o.machine == to_machine)
+            })
+            .and_then(|h| h.origin.as_ref().map(|o| o.id.clone()))
+    }
+
+    /// Marks the message `id` answered. Returns whether anything changed.
+    pub fn mark_answered(&mut self, id: &MessageId) -> bool {
+        match self.messages.iter_mut().find(|h| &h.id == id) {
+            Some(header) if !header.answered => {
+                header.answered = true;
+                true
+            }
+            _ => false,
+        }
     }
 
     /// The messages from other machines that were offered or refused since
