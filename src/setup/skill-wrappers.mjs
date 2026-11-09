@@ -20,6 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
+import { listDomainDirs } from '../util/domain-dirs.mjs';
 import { computeInstructionProjection, materializeInstructionProjection } from './instruction-projections.mjs';
 
 const FRONTMATTER_PATTERN = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
@@ -402,10 +403,9 @@ export function mirrorDevSkillsIntoPlugin(agentsSkillsRoot, pluginSkillsRoot, ow
 function skillSourceRoots(projectRoot) {
   const roots = [{ dir: path.join(projectRoot, 'core', 'skills'), authority: 'core', domain: null, label: 'core' }];
   const domainsRoot = path.join(projectRoot, 'domains');
-  if (!fs.existsSync(domainsRoot)) return roots;
-  for (const entry of fs.readdirSync(domainsRoot, { withFileTypes: true })) {
-    if (isOwnTmpFile(entry.name) || entry.name.startsWith('.') || !entry.isDirectory()) continue;
-    roots.push({ dir: path.join(domainsRoot, entry.name, 'skills'), authority: 'domain', domain: entry.name, label: `domains/${entry.name}` });
+  for (const domain of listDomainDirs(domainsRoot)) {
+    if (isOwnTmpFile(domain) || domain.startsWith('.')) continue;
+    roots.push({ dir: path.join(domainsRoot, domain, 'skills'), authority: 'domain', domain, label: `domains/${domain}` });
   }
   return roots;
 }

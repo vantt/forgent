@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describeYamlError, parseYaml } from '../src/util/yaml.mjs';
+import { listDomainDirs } from '../src/util/domain-dirs.mjs';
 import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -47,10 +48,9 @@ export function compileDomain(domainDir) {
 
 export function compileAllDomains(domainsDir = path.join(root, 'domains')) {
   const out = {};
-  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const compiled = compileDomain(path.join(domainsDir, entry.name));
-    if (compiled) out[entry.name] = compiled;
+  for (const name of listDomainDirs(domainsDir)) {
+    const compiled = compileDomain(path.join(domainsDir, name));
+    if (compiled) out[name] = compiled;
   }
   return out;
 }
@@ -63,12 +63,12 @@ function render(compiled) {
 export function checkCompiledDomains(domainsDir = path.join(root, 'domains')) {
   const problems = [];
   let checked = 0;
-  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-    const dir = path.join(domainsDir, entry.name);
-    const [yaml, json] = ['registry.yaml', 'compiled.json'].map((name) => fs.existsSync(path.join(dir, name)));
-    if (!entry.isDirectory() || !(yaml || json)) continue;
+  for (const name of listDomainDirs(domainsDir)) {
+    const dir = path.join(domainsDir, name);
+    const [yaml, json] = ['registry.yaml', 'compiled.json'].map((file) => fs.existsSync(path.join(dir, file)));
+    if (!(yaml || json)) continue;
     checked += 1;
-    const rel = `domains/${entry.name}/compiled.json`;
+    const rel = `domains/${name}/compiled.json`;
     if (!yaml) { problems.push(`${rel} has no registry.yaml — delete it or restore the YAML`); continue; }
     if (!json) { problems.push(`${rel} is missing`); continue; }
     const text = fs.readFileSync(path.join(dir, 'compiled.json'), 'utf8');

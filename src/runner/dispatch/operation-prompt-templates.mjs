@@ -28,6 +28,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { RunnerConfigError } from './runner-config-error.mjs';
+import { listDomainDirs } from '../../util/domain-dirs.mjs';
 import { PROTOCOL_OPERATION_STAMP_PREFIX } from './execution-contract.mjs';
 
 const THIS_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -218,28 +219,20 @@ export function discoverOperationPromptTemplates({ cwd = process.cwd(), packageR
 
   // 2. Domain tier
   const domainsRoot = path.join(packageRoot, 'domains');
-  if (fs.existsSync(domainsRoot)) {
-    const domainNames = fs
-      .readdirSync(domainsRoot, { withFileTypes: true })
-      .filter((e) => e.isDirectory())
-      .map((e) => e.name)
-      .sort((a, b) => a.localeCompare(b));
-
-    for (const domainName of domainNames) {
-      const domainDir = path.join(domainsRoot, domainName, DOMAIN_PROMPT_TEMPLATES_SEGMENT);
-      const entries = scanTier('domain', domainDir, `domain:${domainName}`, packageRoot);
-      for (const entry of entries) {
-        if (domainTiers.has(entry.id) && domainTiers.get(entry.id) !== domainName) {
-          throw new TemplateResolutionError(
-            'template-ambiguous',
-            `template id "${entry.id}" collides across domains "${domainTiers.get(entry.id)}" and "${domainName}"`,
-            { templateId: entry.id, domain1: domainTiers.get(entry.id), domain2: domainName },
-          );
-        }
-        domainTiers.set(entry.id, domainName);
-        if (!byId.has(entry.id)) {
-          byId.set(entry.id, entry);
-        }
+  for (const domainName of listDomainDirs(domainsRoot)) {
+    const domainDir = path.join(domainsRoot, domainName, DOMAIN_PROMPT_TEMPLATES_SEGMENT);
+    const entries = scanTier('domain', domainDir, `domain:${domainName}`, packageRoot);
+    for (const entry of entries) {
+      if (domainTiers.has(entry.id) && domainTiers.get(entry.id) !== domainName) {
+        throw new TemplateResolutionError(
+          'template-ambiguous',
+          `template id "${entry.id}" collides across domains "${domainTiers.get(entry.id)}" and "${domainName}"`,
+          { templateId: entry.id, domain1: domainTiers.get(entry.id), domain2: domainName },
+        );
+      }
+      domainTiers.set(entry.id, domainName);
+      if (!byId.has(entry.id)) {
+        byId.set(entry.id, entry);
       }
     }
   }
@@ -295,32 +288,24 @@ export function loadOperationPromptTemplate(templateId, options = {}) {
   } else {
     // If no target domain, scan all domains
     const domainsRoot = path.join(packageRoot, 'domains');
-    if (fs.existsSync(domainsRoot)) {
-      const domainNames = fs
-        .readdirSync(domainsRoot, { withFileTypes: true })
-        .filter((e) => e.isDirectory())
-        .map((e) => e.name)
-        .sort((a, b) => a.localeCompare(b));
-
-      let matchedDomainEntry = null;
-      for (const domainName of domainNames) {
-        const domainDir = path.join(domainsRoot, domainName, DOMAIN_PROMPT_TEMPLATES_SEGMENT);
-        if (!fs.existsSync(domainDir)) continue;
-        const domainEntries = scanTier('domain', domainDir, `domain:${domainName}`, packageRoot);
-        const found = domainEntries.find((e) => e.id === templateId);
-        if (found) {
-          if (matchedDomainEntry) {
-            throw new TemplateResolutionError(
-              'template-ambiguous',
-              `template id "${templateId}" collides across domains "${matchedDomainEntry.source}" and "${found.source}"`,
-              { templateId, source1: matchedDomainEntry.source, source2: found.source },
-            );
-          }
-          matchedDomainEntry = found;
+    let matchedDomainEntry = null;
+    for (const domainName of listDomainDirs(domainsRoot)) {
+      const domainDir = path.join(domainsRoot, domainName, DOMAIN_PROMPT_TEMPLATES_SEGMENT);
+      if (!fs.existsSync(domainDir)) continue;
+      const domainEntries = scanTier('domain', domainDir, `domain:${domainName}`, packageRoot);
+      const found = domainEntries.find((e) => e.id === templateId);
+      if (found) {
+        if (matchedDomainEntry) {
+          throw new TemplateResolutionError(
+            'template-ambiguous',
+            `template id "${templateId}" collides across domains "${matchedDomainEntry.source}" and "${found.source}"`,
+            { templateId, source1: matchedDomainEntry.source, source2: found.source },
+          );
         }
+        matchedDomainEntry = found;
       }
-      if (matchedDomainEntry) return matchedDomainEntry;
     }
+    if (matchedDomainEntry) return matchedDomainEntry;
   }
 
   // 3. Check core tier

@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { readAgentDefinition } from './agent-definitions.mjs';
+import { listDomainDirs } from '../util/domain-dirs.mjs';
 
 /**
  * Every real agent-type's `{name, skills}` across `core/agents/`,
@@ -44,11 +45,7 @@ export function loadAgentRoster(cwd) {
 
   scanDir(path.join(cwd, 'core', 'agents'));
   const domainsDir = path.join(cwd, 'domains');
-  if (fs.existsSync(domainsDir)) {
-    for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-      if (entry.isDirectory()) scanDir(path.join(domainsDir, entry.name, 'agents'));
-    }
-  }
+  for (const domain of listDomainDirs(domainsDir)) scanDir(path.join(domainsDir, domain, 'agents'));
   scanDir(path.join(cwd, 'agents'));
 
   const defs = [];

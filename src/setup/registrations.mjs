@@ -28,6 +28,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
+import { listDomainDirs } from '../util/domain-dirs.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
@@ -702,19 +703,16 @@ export function checkRunnerPatternsConfig(cwd, run) {
 function allTaskSpecs(cwd) {
   const specs = [];
   const root = path.join(cwd, 'domains');
-  if (fs.existsSync(root)) {
-    for (const domainEntry of fs.readdirSync(root, { withFileTypes: true })) {
-      if (!domainEntry.isDirectory()) continue;
-      const taskSpecsDir = path.join(root, domainEntry.name, 'task-specs');
-      if (!fs.existsSync(taskSpecsDir)) continue;
-      for (const file of fs.readdirSync(taskSpecsDir)) {
-        if (file.endsWith('.md')) {
-          specs.push({
-            domain: domainEntry.name,
-            specId: file.slice(0, -'.md'.length),
-            filePath: path.join(taskSpecsDir, file),
-          });
-        }
+  for (const domain of listDomainDirs(root)) {
+    const taskSpecsDir = path.join(root, domain, 'task-specs');
+    if (!fs.existsSync(taskSpecsDir)) continue;
+    for (const file of fs.readdirSync(taskSpecsDir)) {
+      if (file.endsWith('.md')) {
+        specs.push({
+          domain,
+          specId: file.slice(0, -'.md'.length),
+          filePath: path.join(taskSpecsDir, file),
+        });
       }
     }
   }
@@ -778,17 +776,12 @@ export function allAgentYamlFiles(cwd) {
     }
   }
   const domainsDir = path.join(cwd, 'domains');
-  if (fs.existsSync(domainsDir)) {
-    const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
-    for (const domainEntry of domainEntries) {
-      if (domainEntry.isDirectory()) {
-        const domainAgentsDir = path.join(domainsDir, domainEntry.name, 'agents');
-        if (fs.existsSync(domainAgentsDir)) {
-          for (const f of sortedReaddir(domainAgentsDir)) {
-            if (f.endsWith('.yaml') || f.endsWith('.yml')) {
-              files.push({ source: `domains/${domainEntry.name}/agents`, filePath: path.join(domainAgentsDir, f), fileName: f });
-            }
-          }
+  for (const domain of listDomainDirs(domainsDir)) {
+    const domainAgentsDir = path.join(domainsDir, domain, 'agents');
+    if (fs.existsSync(domainAgentsDir)) {
+      for (const f of sortedReaddir(domainAgentsDir)) {
+        if (f.endsWith('.yaml') || f.endsWith('.yml')) {
+          files.push({ source: `domains/${domain}/agents`, filePath: path.join(domainAgentsDir, f), fileName: f });
         }
       }
     }

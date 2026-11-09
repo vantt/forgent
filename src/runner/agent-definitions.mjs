@@ -17,6 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { describeYamlError, parseYaml } from '../util/yaml.mjs';
+import { listDomainDirs } from '../util/domain-dirs.mjs';
 import { RunnerConfigError } from './dispatch/runner-config-error.mjs';
 import { definitionFileName } from '../convention/definition-names.mjs';
 
@@ -41,12 +42,8 @@ export function agentTierDirs({ projectRoot, installRoot = INSTALL_ROOT }) {
 
   const domainsRoot = rootFor('domains');
   const domainsDir = path.join(domainsRoot, 'domains');
-  const domainDirs = fs.existsSync(domainsDir)
-    ? fs.readdirSync(domainsDir, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory())
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((entry) => ({ dir: path.join(domainsDir, entry.name, 'agents'), relDir: `domains/${entry.name}/agents` }))
-    : [];
+  const domainDirs = listDomainDirs(domainsDir)
+    .map((domain) => ({ dir: path.join(domainsDir, domain, 'agents'), relDir: `domains/${domain}/agents` }));
 
   return [
     { tier: 'workspace', label: TIER_LABELS.workspace, dirs: [{ dir: path.join(projectRoot, 'fgos', 'agents'), relDir: 'fgos/agents' }] },

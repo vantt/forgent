@@ -34,6 +34,7 @@ import { RIGOR_VALUES } from '../src/runner/rigor.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
 import { parseYaml } from '../src/util/yaml.mjs';
+import { listDomainDirs } from '../src/util/domain-dirs.mjs';
 import { identifierProblem } from '../src/convention/identifier-rules.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
@@ -130,13 +131,8 @@ export function findAgentYamlFiles(repoRoot) {
   scanDir(path.join(repoRoot, 'core', 'agents'), 'core/agents');
 
   const domainsDir = path.join(repoRoot, 'domains');
-  if (fs.existsSync(domainsDir)) {
-    const domainEntries = fs.readdirSync(domainsDir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
-    for (const domainEntry of domainEntries) {
-      if (domainEntry.isDirectory()) {
-        scanDir(path.join(domainsDir, domainEntry.name, 'agents'), `domains/${domainEntry.name}/agents`);
-      }
-    }
+  for (const domain of listDomainDirs(domainsDir)) {
+    scanDir(path.join(domainsDir, domain, 'agents'), `domains/${domain}/agents`);
   }
 
   scanDir(path.join(repoRoot, 'agents'), LEGACY_AGENTS_SOURCE);

@@ -15,6 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseYaml } from '../util/yaml.mjs';
+import { listDomainDirs } from '../util/domain-dirs.mjs';
 import { buildDecisionIndexMarkdown, narrativeHolderResolver } from '../report/decision-index.mjs';
 import { listWork } from '../state/store.mjs';
 
@@ -675,39 +676,36 @@ export function discoverInstructionSources(projectRoot, options = {}) {
   }
 
   // 3. Domain instructions
-  if (fs.existsSync(domainsRoot)) {
-    for (const domainEntry of fs.readdirSync(domainsRoot, { withFileTypes: true })) {
-      if (!domainEntry.isDirectory() || domainEntry.name.startsWith('.')) continue;
-      const domainName = domainEntry.name;
+  for (const domainName of listDomainDirs(domainsRoot)) {
+    if (domainName.startsWith('.')) continue;
 
-      if (!knownOwners.has(domainName)) {
-        throw new InstructionRegistryError(
-          `Unknown domain owner "${domainName}" in domains directory. Known owners are: ${[...knownOwners].sort().join(', ')}`,
-          {
-            filePath: toPosixPath(path.relative(projectRoot, path.join(domainsRoot, domainName))),
-            code: 'UNKNOWN_OWNER',
-          },
-        );
-      }
+    if (!knownOwners.has(domainName)) {
+      throw new InstructionRegistryError(
+        `Unknown domain owner "${domainName}" in domains directory. Known owners are: ${[...knownOwners].sort().join(', ')}`,
+        {
+          filePath: toPosixPath(path.relative(projectRoot, path.join(domainsRoot, domainName))),
+          code: 'UNKNOWN_OWNER',
+        },
+      );
+    }
 
-      const instructionsDir = path.join(domainsRoot, domainName, 'instructions');
-      if (fs.existsSync(instructionsDir)) {
-        const files = scanMarkdownFiles(instructionsDir, options.domainsRoot ? domainsRoot : projectRoot);
-        for (const fullPath of files) {
-          const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));
-          const content = fs.readFileSync(fullPath, 'utf8');
-          const { meta, body, rawContent } = extractInstructionFrontmatter(content, sourcePath);
-          const unit = compileInstructionUnit(meta, body, rawContent, {
-            projectRoot,
-            fullPath,
-            sourcePath,
-            rootType: 'domain',
-            rootOwner: domainName,
-            knownOwners,
-            fgosDir: options.fgosDir,
-          });
-          collected.push(unit);
-        }
+    const instructionsDir = path.join(domainsRoot, domainName, 'instructions');
+    if (fs.existsSync(instructionsDir)) {
+      const files = scanMarkdownFiles(instructionsDir, options.domainsRoot ? domainsRoot : projectRoot);
+      for (const fullPath of files) {
+        const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));
+        const content = fs.readFileSync(fullPath, 'utf8');
+        const { meta, body, rawContent } = extractInstructionFrontmatter(content, sourcePath);
+        const unit = compileInstructionUnit(meta, body, rawContent, {
+          projectRoot,
+          fullPath,
+          sourcePath,
+          rootType: 'domain',
+          rootOwner: domainName,
+          knownOwners,
+          fgosDir: options.fgosDir,
+        });
+        collected.push(unit);
       }
     }
   }
