@@ -43,6 +43,8 @@ pub enum FgctlRefreshError {
     },
     #[error("fgctl-replace-failed: {detail}; replace it by hand: {manual}")]
     ReplaceFailed { detail: String, manual: String },
+    #[error("fgctl-inside-release-store: the running fgctl {installed} is a file of a staged release, which is never written; install the release's fgctl as the machine fgctl by hand: {manual}")]
+    InsideReleaseStore { installed: PathBuf, manual: String },
     #[error("fgctl-unreadable: {path}: {source}")]
     Unreadable {
         path: PathBuf,
@@ -73,11 +75,13 @@ fn manual_command(source: &Path, installed: &Path) -> String {
 
 /// Replaces `installed` with the `fgctl` the release at `release_dir` ships,
 /// when they differ. `artifact_digest` is the activated release identity the
-/// manifest must still hash to.
+/// manifest must still hash to. Nothing under `store_root` (the machine
+/// release store) is ever written: staged releases are sealed rollback targets.
 pub fn refresh_fgctl(
     installed: &Path,
     release_dir: &Path,
     artifact_digest: &str,
+    store_root: &Path,
 ) -> Result<FgctlRefresh, FgctlRefreshError> {
     let unverified = FgctlRefreshError::Unverified;
 
@@ -122,6 +126,23 @@ pub fn refresh_fgctl(
     if sha256_hex(&old_bytes) == entry.digest {
         return Ok(FgctlRefresh::UpToDate {
             digest: entry.digest.clone(),
+        });
+    }
+
+    // `current_exe` resolves symlinks, so a machine `fgctl` linked into the store,
+    // or an older release's `fgctl` run by path, names a file of a sealed release.
+    let real_installed =
+        std::fs::canonicalize(installed).map_err(|e| FgctlRefreshError::Unreadable {
+            path: installed.to_path_buf(),
+            source: e,
+        })?;
+    if std::fs::canonicalize(store_root).is_ok_and(|store| real_installed.starts_with(store)) {
+        return Err(FgctlRefreshError::InsideReleaseStore {
+            installed: installed.to_path_buf(),
+            manual: manual_command(
+                &source,
+                Path::new("<machine fgctl path, e.g. ~/.local/bin/fgctl>"),
+            ),
         });
     }
 
@@ -204,6 +225,7 @@ pub fn refresh_fgctl_for_workspace(
         installed,
         Path::new(&activation.release_path),
         &activation.artifact_digest,
+        &crate::store::resolve_machine_release_store_root(),
     )
 }
 
@@ -337,7 +359,8 @@ mod tests {
         let (release, digest) = stage_release(&scratch.0, b"fgctl from the new release");
         let installed = install(&scratch.0, b"fgctl from an older release");
 
-        let outcome = refresh_fgctl(&installed, &release, &digest).unwrap();
+        let outcome =
+            refresh_fgctl(&installed, &release, &digest, &scratch.0.join("store")).unwrap();
 
         let previous = previous_of(&installed);
         assert_eq!(
@@ -371,7 +394,8 @@ mod tests {
         std::fs::write(release.join("bin/fgctl"), b"planted bytes").unwrap();
         let installed = install(&scratch.0, b"fgctl from an older release");
 
-        let err = refresh_fgctl(&installed, &release, &digest).unwrap_err();
+        let err =
+            refresh_fgctl(&installed, &release, &digest, &scratch.0.join("store")).unwrap_err();
 
         assert!(matches!(err, FgctlRefreshError::Unverified(_)), "got {err}");
         assert!(err.to_string().starts_with("fgctl-release-unverified: "));
@@ -388,7 +412,13 @@ mod tests {
         let (release, _) = stage_release(&scratch.0, b"fgctl from the new release");
         let installed = install(&scratch.0, b"fgctl from an older release");
 
-        let err = refresh_fgctl(&installed, &release, "sha256:another-release").unwrap_err();
+        let err = refresh_fgctl(
+            &installed,
+            &release,
+            "sha256:another-release",
+            &scratch.0.join("store"),
+        )
+        .unwrap_err();
 
         assert!(matches!(err, FgctlRefreshError::Unverified(_)), "got {err}");
         assert_eq!(machine_listing(&scratch.0), ["fgctl"]);
@@ -401,7 +431,8 @@ mod tests {
         let installed = install(&scratch.0, b"the same fgctl");
         let modified = std::fs::metadata(&installed).unwrap().modified().unwrap();
 
-        let outcome = refresh_fgctl(&installed, &release, &digest).unwrap();
+        let outcome =
+            refresh_fgctl(&installed, &release, &digest, &scratch.0.join("store")).unwrap();
 
         assert_eq!(
             outcome,
@@ -413,6 +444,38 @@ mod tests {
         assert_eq!(
             std::fs::metadata(&installed).unwrap().modified().unwrap(),
             modified
+        );
+    }
+
+    #[test]
+    fn an_fgctl_inside_the_release_store_is_refused_and_the_store_left_byte_for_byte() {
+        let scratch = Scratch::new("in_store");
+        let (release, digest) = stage_release(&scratch.0, b"fgctl from the new release");
+        let old_release_bin = scratch.0.join("store/releases/sha256-old/bin");
+        std::fs::create_dir_all(&old_release_bin).unwrap();
+        let installed = old_release_bin.join("fgctl");
+        std::fs::write(&installed, b"fgctl of a sealed older release").unwrap();
+
+        let err =
+            refresh_fgctl(&installed, &release, &digest, &scratch.0.join("store")).unwrap_err();
+
+        let message = err.to_string();
+        assert!(
+            message.starts_with("fgctl-inside-release-store: "),
+            "got {message}"
+        );
+        assert!(
+            message.contains(&release.join("bin/fgctl").display().to_string()),
+            "got {message}"
+        );
+        let listing: Vec<_> = std::fs::read_dir(&old_release_bin)
+            .unwrap()
+            .map(|e| e.unwrap().file_name())
+            .collect();
+        assert_eq!(listing, ["fgctl"]);
+        assert_eq!(
+            std::fs::read(&installed).unwrap(),
+            b"fgctl of a sealed older release"
         );
     }
 
@@ -433,7 +496,8 @@ mod tests {
         )
         .unwrap();
 
-        let err = refresh_fgctl(&installed, &release, &digest).unwrap_err();
+        let err =
+            refresh_fgctl(&installed, &release, &digest, &scratch.0.join("store")).unwrap_err();
 
         let message = err.to_string();
         assert!(message.starts_with("fgctl-not-writable: "), "got {message}");

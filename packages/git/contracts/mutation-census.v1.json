@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "03226477a5d1abf14a2b550d07543bcc51cd3edfb49036f8c582c3332197a1e3",
+  "payloadDigest": "74c967d3a0d595c88d58af53c92920dded76d62d65bb1f142cf778b69bf65111",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -69,7 +69,7 @@
     ".agents/skills/instruction-audit/references/report-template.md": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6",
     ".agents/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
     ".githooks/pre-commit": "476f66f95261ff4c18cbd1f797bc492e638f2fafbbfb32286bf8c1ebcd2fe46b",
-    "apps/fgctl/src/main.rs": "e3b922c5df1f05badaee5dde409bc1474bc97176d310e2bc297c118724dadcb3",
+    "apps/fgctl/src/main.rs": "c0a5f1114e19af469efbdcabfeb6bb61a0a36c7a7969ef3b3f96764c25f1cdb5",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "cb4573d686b03639e3e78baca940a2c66cf02c81d645b5d0824ea4a33ece0160",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c1bfc1a2b6992cfe70c59acf9350a6da5fcce08033bb76fc1720d2c5df1091fa",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
@@ -272,7 +272,7 @@
     "packages/distribution/rust/src/canonical.rs": "1ed17ee314cadcd425f25919740a7d80b7596871986c9940094fdd2cf4b7542a",
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
     "packages/distribution/rust/src/fetch.rs": "ae1a26554583e297ea2f52bab45be9fe115952203e0413eaec933d71b301fa00",
-    "packages/distribution/rust/src/fgctl_refresh.rs": "b12c88c53cedc5c53c81f8dc89d2fad810e6e74bd71c36ef73da441fcd3375d4",
+    "packages/distribution/rust/src/fgctl_refresh.rs": "2248118bf1b3896cf9d87d49f944b2dea03572e900d963ada096ca1e4a8bf8cd",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
     "packages/distribution/rust/src/init.rs": "810c5ff1b86a682efb2fcb92ec5573dd5eb7583ae04d1c97ba8780c9a2661ffa",
     "packages/distribution/rust/src/lib.rs": "80bba1316b63c341e4b2ef4539df39fe591e37b8551461c61e5741b7790543ca",

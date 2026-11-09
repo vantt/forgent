@@ -163,6 +163,13 @@ The original `.fgos/installation/activation.lock` tombstone remains intact.
    with `fgctl-not-writable` plus the manual command; both leave the binary
    untouched and exit non-zero after the activation itself stood.
 
+5. a running `fgctl` that resolves (after symlinks) to a file inside the machine
+   release store is refused with `fgctl-inside-release-store`: a staged release is
+   never written, so it stays verifiable and a rollback target.
+
+A replacement prints which project's activation chose the machine-wide `fgctl`.
+Two upgrades in workspaces with different active releases race on that one
+binary; each write is atomic and the last one wins.
 The activation record does not change in this step. `init` and `repair` do not run it.
 Source: `packages/distribution/rust/src/fgctl_refresh.rs`. Rule: packaging spec
 RUL110 (a release ships its `fgctl` and `fgctl upgrade` installs it).

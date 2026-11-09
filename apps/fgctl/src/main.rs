@@ -58,6 +58,13 @@ fn refresh_own_binary(cwd: &std::path::Path) {
                 installed.display(),
                 previous.display()
             );
+            // One fgctl serves every project on this machine; say which activation chose it.
+            let project = fgos_distribution::workspace::resolve_workspace_root(cwd)
+                .map(|root| root.display().to_string())
+                .unwrap_or_else(|_| cwd.display().to_string());
+            println!(
+                "fgctl: this is the machine-wide fgctl for every project; the release active in {project} chose it"
+            );
         }
         Err(err) => {
             eprintln!("Error: release activated, but fgctl was not updated: {err}");
