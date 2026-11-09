@@ -26,7 +26,7 @@ function runCheck(id, runner, globalRunner, setup) {
         ...runner,
       },
     });
-    setup?.(dir);
+    setup?.(dir, home);
     if (globalRunner) {
       fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
       const { llmAccounts, providers, ...rest } = globalRunner;
@@ -74,6 +74,27 @@ test('executor-skills-installed passes when the declared skill is installed and 
   const both = runCheck('executor-skills-installed', { executors: twoClis }, undefined, install(...standardDirs, '.omp/skills'));
   assert.equal(both.passed, true, both.message);
   assert.match(both.message, /not checked, no known skill directory: multi \(cli odd\)/);
+});
+
+test('executor-skills-installed accepts a user-level skill, refuses an empty skill file, and says a worktree is provisioned separately', () => {
+  const standardDirs = ['.claude/skills', '.agents/skills', '.pi/skills'];
+  const put = (base, d, text) => { fs.mkdirSync(path.join(base, d, 'ak-cook'), { recursive: true }); fs.writeFileSync(path.join(base, d, 'ak-cook', 'SKILL.md'), text); };
+  const projectOnly = (text) => (dir) => { for (const d of standardDirs) put(dir, d, text); };
+
+  const userLevel = runCheck('executor-skills-installed', {}, undefined, (dir, home) => {
+    projectOnly('# skill\n')(dir);
+    fs.rmSync(path.join(dir, '.claude/skills'), { recursive: true });
+    put(home, '.claude/skills', '# skill\n');
+  });
+  assert.equal(userLevel.passed, true, userLevel.message);
+
+  const empty = runCheck('executor-skills-installed', {}, undefined, projectOnly(''));
+  assert.equal(empty.passed, false);
+  assert.match(empty.message, /\.claude\/skills\/ak-cook\/SKILL\.md is empty/);
+
+  const missing = runCheck('executor-skills-installed', {});
+  assert.match(missing.message, /worktreeSetup provisioning/);
+  assert.match(missing.message, /not a pass in a worktree/);
 });
 
 test('model-policy-pools is quiet without a named pool and warns about a pool runner.llmAccounts lacks', () => {

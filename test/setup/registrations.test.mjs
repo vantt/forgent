@@ -17,6 +17,7 @@ import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainW
 import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 
 import { nativeDoor } from '../../src/native/door.mjs';
+import { checkAgentClaimsResolve } from '../../src/setup/registrations.mjs';
 
 // tsk-4xg: runFixes() below invokes every registered fix, including the
 // real `claude-plugin-marketplace` one, which shells out to a real,
@@ -1167,5 +1168,39 @@ test('the mailbox-hook doctor row reports the record verdict from fgos mailbox s
     if (before === undefined) delete process.env.FGOS_HOST_BIN;
     else process.env.FGOS_HOST_BIN = before;
     fs.rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('agent-claims-resolve accepts a requires-skill claim only when an agent provides it and the skill is owned', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claims-two-sided-'));
+  try {
+    const write = (rel, text) => {
+      fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
+      fs.writeFileSync(path.join(root, rel), text);
+    };
+    const claim = (skill) => write('core/task-specs/job.md', `# task-spec: job\n\ndomain: core | role: worker | requires-skill: ${skill}\n`);
+    write('core/skills/real-skill/SKILL.md', '---\nname: real-skill\ndescription: a skill\n---\n# real\n');
+    write('core/agents/worker.yaml', 'name: worker\nskills: [real-skill, dead-skill]\n');
+    const run = () => checkAgentClaimsResolve(root);
+
+    claim('dead-skill');
+    const unowned = run();
+    assert.equal(unowned.passed, false, 'an agent provides the name but no skill source owns it');
+    assert.match(unowned.message, /"dead-skill"/);
+    assert.match(unowned.message, /not an owned skill/);
+    assert.doesNotMatch(unowned.message, /no agent-type provides/);
+
+    claim('real-skill');
+    write('core/agents/worker.yaml', 'name: worker\nskills: [other]\n');
+    const unprovided = run();
+    assert.equal(unprovided.passed, false, 'the skill is owned but no agent provides it');
+    assert.match(unprovided.message, /no agent-type provides it/);
+    assert.doesNotMatch(unprovided.message, /not an owned skill/);
+
+    write('core/agents/worker.yaml', 'name: worker\nskills: [real-skill]\n');
+    const both = run();
+    assert.equal(both.passed, true, both.message);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
   }
 });
