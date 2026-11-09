@@ -1,6 +1,5 @@
 use std::io;
 use std::path::Path;
-use std::process::Command;
 use std::time::{Duration, Instant};
 
 use serde::Deserialize;
@@ -200,37 +199,17 @@ struct SlotsEnvelope {
 /// Ask the engine whether the execution lane has room before standing a
 /// worker up (D6) — `fgos slots`, the read-only face T1 exposed precisely
 /// because decision 0014 makes the CLI the only door a Rust adapter can
-/// reach the engine through. Same `node bin/fgos.mjs ... --json --dir`
-/// shape `fgos.rs`'s own fetch functions use, mirrored here rather than
-/// reused because `fgos.rs` is outside this item's footprint.
+/// reach the engine through. Built by the same `fgos_command` every
+/// `fgos.rs` fetch function uses (workspace shim or a refusal).
 ///
 /// `None` means the question could not be asked at all, which the caller
 /// treats as "no ceiling known" rather than "no room" — see
 /// `worker_slot_room`.
 fn fetch_worker_slots(root: &Path) -> Option<WorkerSlots> {
-    let fgos_bin = fgos::resolve_fgos(root).ok()?;
-    let output = if fgos::is_tier_zero(root, &fgos_bin) {
-        Command::new(&fgos_bin)
-            .args([
-                "slots",
-                "--json",
-                "--dir",
-                root.to_string_lossy().as_ref(),
-            ])
-            .output()
-            .ok()?
-    } else {
-        Command::new("node")
-            .args([
-                fgos_bin.to_string_lossy().as_ref(),
-                "slots",
-                "--json",
-                "--dir",
-                root.to_string_lossy().as_ref(),
-            ])
-            .output()
-            .ok()?
-    };
+    let output = fgos::fgos_command(root, &["slots", "--json"])
+        .ok()?
+        .output()
+        .ok()?;
     if !output.status.success() {
         return None;
     }

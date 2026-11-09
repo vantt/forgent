@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "44451b322d4c3e66ef4f12d79f01294559133f4d45707bc0fffb589005858a0e",
+  "payloadDigest": "dfadcc5b35bdfe119ac1608b1fd5922a8ef793a93594f0c2af7fbedd6c2173cf",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -183,7 +183,7 @@
     "herdr-dashboard/src/app.rs": "bb8c95fa65a18cebe52413eda1fbae4e1ddbea52dd0dc669ac187ace699a9144",
     "herdr-dashboard/src/layout.rs": "3368fb8cf97ee8a752a4098bdefcaec286e50f8a663d90209fd089056926dc4a",
     "herdr-dashboard/src/lib.rs": "229f88b132cd3f09c678e6fae506611e4f79f03797bfbd054c18f1781eaded91",
-    "herdr-dashboard/src/main.rs": "e71593e0017fce5b6bca74983b5903bd2fed438328e647a8b2709a07b682228a",
+    "herdr-dashboard/src/main.rs": "20a84f9532788ddef4f9bd1dead824d5739779b3c5ea50130f7ade8aa18432b6",
     "herdr-dashboard/src/pane_scan.rs": "7770029a8c0c34d16d302e97ba999f80f3e55236ea8a52681f18a6d18d5c54b6",
     "herdr-dashboard/src/pick.rs": "47e41bfc684fbcebb488f85b3a1a9948a911d8c01e207b37c92bf78320b42770",
     "herdr-dashboard/src/ports.rs": "db6dfc823d3697b6f35fd8632fba6ea0b8c5e256d4bdd38487fa87a935faa179",
@@ -424,7 +424,7 @@
     "packages/git/rust/tests/support/signing.rs": "a083733ad39ab4d35f12a600b5cd90ac08c53ae35686ce66f22147b933bf634c",
     "packages/git/rust/tests/worktree.rs": "fb5ec22b72a58f049c0fd051ae2393f7e3fc7bc73bc1176c8e0e41970da32dde",
     "packages/git/write-scope/src/lib.rs": "8421603ec0e38f418bd241d0db1dc83dd7b3756d994eefa3d29c2e43a8abf9f2",
-    "packages/herdr-fgos-common/rust/src/fgos.rs": "2cf07ee83c2f75c8d33f628d602a8627af9f316146d4f38408be60f7b06ad68f",
+    "packages/herdr-fgos-common/rust/src/fgos.rs": "d15379899f20a574ac6c47440a17d6801e827013410f722e5f128cadf4afeaa4",
     "packages/herdr-fgos-common/rust/src/lib.rs": "a27bb70798915e8f27a33500b384aea536cc43554bcedba01e67623a5bbe54d1",
     "packages/herdr-fgos-common/rust/src/ports.rs": "45c92b4f8a06e62a79a09655fe9c484a85dc9745049cfea6849245b886f4913f",
     "packages/herdr-fgos-common/rust/src/settings.rs": "2825ad403920455192fe52a64aa976bcc788e6cc907cf38a1df7632102b3eb97",
@@ -2096,28 +2096,28 @@
     },
     {
       "path": "herdr-dashboard/src/main.rs",
-      "line": 53,
+      "line": 52,
       "spawn": "Command::new <- herdr-dashboard/src/layout.rs:184",
       "binary": "(env HERDR_BIN_PATH)",
       "class": "configured-binary"
     },
     {
       "path": "herdr-dashboard/src/main.rs",
-      "line": 63,
+      "line": 62,
       "spawn": "Command::new <- herdr-dashboard/src/layout.rs:184",
       "binary": "(env HERDR_BIN_PATH)",
       "class": "configured-binary"
     },
     {
       "path": "herdr-dashboard/src/main.rs",
-      "line": 99,
+      "line": 98,
       "spawn": "Command::new <- herdr-dashboard/src/pick.rs:377",
       "binary": "(env HERDR_BIN_PATH)",
       "class": "configured-binary"
     },
     {
       "path": "herdr-dashboard/src/main.rs",
-      "line": 111,
+      "line": 110,
       "spawn": "Command::new <- herdr-dashboard/src/pane_scan.rs:178",
       "binary": "(env HERDR_BIN_PATH)",
       "class": "configured-binary"

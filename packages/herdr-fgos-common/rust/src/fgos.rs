@@ -370,46 +370,53 @@ fn is_confined(path: &Path, root: &Path) -> bool {
     real_path == real_root || real_path.starts_with(&real_root)
 }
 
-/// Resolves fgos binary via tier 0 (workspace shim `<root>/.fgos/installation/bin/fgos` if present, executable,
-/// and confined under the installation root) with fallback to `<root>/bin/fgos.mjs` (run via node).
-pub fn resolve_fgos(root: &Path) -> Result<PathBuf, io::Error> {
-    let tier_zero = root
-        .join(".fgos")
+fn shim_path(root: &Path) -> PathBuf {
+    root.join(".fgos")
         .join("installation")
         .join("bin")
-        .join("fgos");
+        .join("fgos")
+}
+
+/// Resolves the workspace shim `<root>/.fgos/installation/bin/fgos`: present,
+/// executable and confined under the installation root. Anything else is a
+/// named refusal -- there is no `node <root>/bin/fgos.mjs` fallback, because
+/// the direct-node channel is unsupported for the process, lock and identity
+/// verbs.
+pub fn resolve_fgos(root: &Path) -> Result<PathBuf, io::Error> {
+    let tier_zero = shim_path(root);
     let install_root = root.join(".fgos").join("installation");
     if is_executable(&tier_zero) && is_confined(&tier_zero, &install_root) {
         return Ok(tier_zero);
     }
-    Ok(root.join("bin/fgos.mjs"))
+    Err(io::Error::new(
+        io::ErrorKind::NotFound,
+        format!(
+            "no usable fgos workspace shim at {} (missing, not executable, or outside the installation root); run `fgctl init`",
+            tier_zero.display()
+        ),
+    ))
+}
+
+/// The one way to build a `fgos` command: the workspace shim with `args`, then
+/// `--dir <root>`, running in `root` with no stdin. Refuses (never falls back
+/// to node) when the shim is unusable.
+pub fn fgos_command(root: &Path, args: &[&str]) -> io::Result<Command> {
+    let shim = resolve_fgos(root)?;
+    let mut cmd = Command::new(shim);
+    cmd.args(args)
+        .arg("--dir")
+        .arg(root)
+        .current_dir(root)
+        .stdin(std::process::Stdio::null());
+    Ok(cmd)
 }
 
 pub fn is_tier_zero(root: &Path, resolved: &Path) -> bool {
-    resolved
-        == root
-            .join(".fgos")
-            .join("installation")
-            .join("bin")
-            .join("fgos")
+    resolved == shim_path(root)
 }
 
 fn run_fgos(root: &Path, args: &[&str]) -> Result<String, FgosError> {
-    let fgos_bin = resolve_fgos(root)?;
-    let output = if is_tier_zero(root, &fgos_bin) {
-        let mut cmd_args: Vec<String> = args.iter().map(|s| s.to_string()).collect();
-        cmd_args.push("--dir".to_string());
-        cmd_args.push(root.to_string_lossy().to_string());
-
-        Command::new(&fgos_bin).args(&cmd_args).output()?
-    } else {
-        let mut cmd_args: Vec<String> = vec![fgos_bin.to_string_lossy().to_string()];
-        cmd_args.extend(args.iter().map(|s| s.to_string()));
-        cmd_args.push("--dir".to_string());
-        cmd_args.push(root.to_string_lossy().to_string());
-
-        Command::new("node").args(&cmd_args).output()?
-    };
+    let output = fgos_command(root, args)?.output()?;
     if !output.status.success() {
         return Err(FgosError::ExitStatus(
             String::from_utf8_lossy(&output.stderr).to_string(),
@@ -1016,10 +1023,8 @@ mod tests {
     }
 
     fn temp_root(tag: &str) -> PathBuf {
-        let root = std::env::temp_dir().join(format!(
-            "fgos-command-test-{tag}-{}",
-            std::process::id()
-        ));
+        let root =
+            std::env::temp_dir().join(format!("fgos-command-test-{tag}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&root);
         root
     }
@@ -1040,10 +1045,18 @@ mod tests {
 
         let cmd = fgos_command(&root, &["slots", "--json"]).expect("shim present");
         assert_eq!(cmd.get_program(), shim.as_os_str());
-        let args: Vec<_> = cmd.get_args().map(|a| a.to_string_lossy().into_owned()).collect();
+        let args: Vec<_> = cmd
+            .get_args()
+            .map(|a| a.to_string_lossy().into_owned())
+            .collect();
         assert_eq!(
             args,
-            vec!["slots".to_string(), "--json".into(), "--dir".into(), root.to_string_lossy().into_owned()]
+            vec![
+                "slots".to_string(),
+                "--json".into(),
+                "--dir".into(),
+                root.to_string_lossy().into_owned()
+            ]
         );
         assert_eq!(cmd.get_current_dir(), Some(root.as_path()));
         let _ = std::fs::remove_dir_all(&root);
