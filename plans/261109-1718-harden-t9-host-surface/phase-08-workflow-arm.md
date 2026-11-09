@@ -2,8 +2,8 @@
 phase: 08
 title: "Workflow arm: frame parse, seats split and resume refusals move into the workflow use case; slug import"
 status: pending
-depends_on: ["06 landed, and 07 if approved (T5 closed; layer order)"]
-parallel: "T6 (Workflow layer); beside P09 (file-disjoint: this phase owns index.mjs and propose.mjs, P09 owns store.mjs)"
+depends_on: ["06, 20, 21, 22 landed, and 07 if approved (T5 closed; layer order; unit-handoff.mjs after 05 and 07)"]
+parallel: "T6 (Workflow layer); beside P09 and P24 (file-disjoint: this phase owns index.mjs, propose.mjs and unitOverridesOf in unit-handoff.mjs; P09 owns store.mjs, case-projection.mjs, definition.mjs; P24 owns loader.mjs and the setup readers)"
 effort: ~0.5d
 net_size: "Node: bin about -45, src about +30; Rust 0; tests about 0 (estimate)"
 ---
@@ -22,12 +22,13 @@ Reused doors: `src/workflow/index.mjs` (the entry the arm already calls), `src/w
 2. The resume refusals for `--timeout` and `--account` move into the resume path of the use case with their text verbatim.
 3. `propose.mjs` imports the shared slug leaf (P06) and deletes its private copy.
 4. The arm keeps: flags, one call per sub-verb, print. Layer rule: no new import from `src/cli` in `src/workflow`.
+5. **Authority audit AU-17.** `unitOverridesOf` (`src/workflow/unit-handoff.mjs`) calls P06's run-level fold helper from `run-request.mjs` and passes `accountPin: 'where-served'` instead of `origin: 'workflow'`; it keeps only its own seat-scoped persona entries (decision L-3). Its duplicate fill rule goes. `unit-handoff.mjs` writers in order: P05, P07, this phase, P23.
 
 ## Files
 
 **Create:** none.
 
-**Modify:** `src/workflow/index.mjs`, `src/workflow/propose.mjs`, the frame module chosen in step 1, `bin/fgos.mjs` (`:2270-2385`), `test/workflow/*` (owners of frame parse, seats split, resume refusals: find by `rg -l "resume.*account|--seats|--frame" test`), `test/cli/` workflow wiring cases (kept, one per sub-verb).
+**Modify:** `src/workflow/index.mjs`, `src/workflow/propose.mjs`, `src/workflow/unit-handoff.mjs` (`unitOverridesOf` only, AU-17), the frame module chosen in step 1, `bin/fgos.mjs` (`:2270-2385`), `test/workflow/*` (owners of frame parse, seats split, resume refusals: find by `rg -l "resume.*account|--seats|--frame" test`), `test/cli/` workflow wiring cases (kept, one per sub-verb).
 
 **Delete:** the inline parse and refusal blocks; `propose.mjs`'s private `slugOf` copy.
 

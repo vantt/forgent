@@ -2,7 +2,7 @@
 phase: 16
 title: "Close: spec and settled shapes, re-measure, Vietnamese owner-machine guide, closing report, lessons appended"
 status: pending
-depends_on: ["01-04, 06, 08, 10, 12-15 landed", "05, 07, 09, 11 landed, or handed off with their text intact"]
+depends_on: ["01-04, 06, 08, 10, 12-15, 17-24, 26 landed", "05, 07, 09, 11, 25 landed, or handed off with their text intact"]
 parallel: "none: last"
 effort: ~1d
 net_size: "0 (docs, reports, one counts recount)"

@@ -1,7 +1,7 @@
 ---
 phase: 01
 title: "Shell leaves: error leaf, registry store and landsWork fields replace five sets, lazy entry imports with an architecture guard, hook first, dead arms deleted"
-status: landed except Step 7 (the `version` arm waits for packaging P04)
+status: landed `39c0ebfbc` except Step 7 (the `version` arm waits for packaging P04)
 depends_on: []
 parallel: "starts now, beside P12-P15 and P02 (P02 reads no new field; P02's `main()` range `:5213-5223` is disjoint from P01's); the `version` arm step waits for packaging P04"
 effort: ~1d
@@ -18,7 +18,7 @@ Reused doors: `COMMAND_REGISTRY` (`src/cli/command-registry.mjs`, kernel layer, 
 
 ## Requirements
 
-1. **Error leaf.** New `src/state/store-error.mjs`, no imports: `StoreError`, `EXIT_CODES`, `OUTCOME_EXIT_CODES`, `categoryOf`, `exitCodeForOutcome` (today `src/state/store.mjs:32,52,74,90,104`). `store.mjs` re-exports them once, so every caller is untouched and there is one definition.
+1. **Error leaf.** New `src/state/store-error.mjs`, no imports: `StoreError`, `EXIT_CODES`, `categoryOf` (today `src/state/store.mjs:32,52,74,90,104`). `store.mjs` re-exports them once, so every caller is untouched and there is one definition. **As landed (authority audit AU-19):** the outcome codes did not go to `src/state`: `OUTCOME_EXIT_CODES` and `exitCodeForOutcome` live in `src/runner/execution/outcome-exit.mjs` (Execution, beside its outcome vocabulary), and the per-verb exit rule is `src/cli/verb-exit.mjs` `exitCodeOf`. P20 folds `outcome-exit.mjs` into the one Execution outcome module. The error-category map `EXIT_CODES` still sits under `src/state` (Work's directory): Step 7's follow-up commit moves it to a `src/cli/` kernel leaf, and P12's `main.rs` step makes the Rust host read the same table instead of its literal `validation = 4` (`apps/fgos/src/main.rs:218`).
 2. **Registry fields (L-4).** `requiresExistingStore` is **replaced** by `store: 'none' | 'read' | 'require' | 'write' | (positional, flags) => ...` and `landsWork: true | (positional) => boolean`. `touchesState` stays (public help manifest, `bin/fgos.mjs:4550-4582`). Work entries get values that reproduce today's behaviour exactly. The five sets and the predicate table (`STORE_MISSING_WARNING_VERBS` `:4865`, `EVENT_STORE_LIFECYCLE_VERBS` `:4872`, `MUTATING_ONLY_VERBS` `:4983`, `MUTATING_SUBCOMMAND_PREDICATES` `:4989`, the verb test in `landsWork` `:4876`) are derived from the field, then deleted; their readers in `main()` (`:5230`, `:5289`, `:5303-5305`) read the field. `requireSubVerb` reads the registry `subcommands` and replaces the hand-written lists in `KNOWN_DISPATCH_SUBVERBS` (`:2643-2652`) and the eight others (each later layer phase converts the lists of its own arms).
 3. **Dead names and arms.** Delete the dead set members `check`, `gate-bypass`, `coordination`, the double classification of `lock`, the `gate-bypass` arm and its imports (`:54`, `:72` region), and the 65-line history comment above the sets down to the invariant. The `version` arm goes in the last step (see Steps 7).
 4. **Lazy entry (L-6).** Static imports of `bin/fgos.mjs` shrink to: parser, registry, envelope, error leaf. Every shell-level cross-cutting import becomes `await import()` inside its use: `currentDispatchDepth` (`:84`, drags `transport.mjs`'s 38-module closure), `releaseRecordedLand` (`:90`, drags `merge.mjs`), `check-decision-citation-drift.mjs` (`:39`, 11 `scripts/` modules) into the `decision` arm (Work: one import line, no behaviour change, WORK told; precedent T8 L-7) and into the `preflight` arm (removed in P10). `hook` is handled before the registry loads (`main()` `:5167-5174` already branches first; the registry and the other imports must not load before it).
@@ -56,7 +56,7 @@ bin about -180 (dead arms and names -100, registry sets -45, sub-verb lists -25,
 4. Lazy imports: measure `node --cpu-prof` or `performance.now()` around the entry import before and after on a quiet machine; record in the report.
 5. `exitOf`; `main()` stops naming verbs.
 6. Delete dead arms (`gate-bypass`); route tests re-pointed.
-7. **Wait step.** `version` arm: if packaging P04 has landed, delete the arm or its call; if not, land P01 without it and open a follow-up commit of this phase when P04 lands. Never edit `:999-1004` before P04.
+7. **Wait step (open).** `version` arm: if packaging P04 has landed, delete the arm or its call; if not, land P01 without it and open a follow-up commit of this phase when P04 lands. Never edit `:999-1004` before P04. The same follow-up commit moves `EXIT_CODES` and `categoryOf` from `src/state/store-error.mjs` into a `src/cli/` kernel leaf (callers by `rg`, every one moved, the `src/state` copy deleted; AU-19) and exports the table as a versioned JSON file the Rust host reads in P12.
 8. Census report.
 
 ## Validation (focused)

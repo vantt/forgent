@@ -2,13 +2,13 @@
 phase: 12
 title: "Rust host: stop hashing the running host from inside itself, read the addon once, drop the echo provider from production"
 status: pending
-depends_on: ["`legacy_exec.rs` and `verify.rs` steps: none (start now)", "`apps/fgos/src/main.rs` step: shim-root on origin/main, then packaging P04 landed (writer chain)"]
+depends_on: ["`legacy_exec.rs` and `verify.rs` steps: none (start now)", "`apps/fgos/src/main.rs` step: shim-root on origin/main, then packaging P04 landed (writer chain); the exit-code table read also waits for P01 Step 7"]
 parallel: "host lane; file-disjoint from every Node phase; beside P13, P14, P15"
 effort: ~0.5d
 net_size: "Node 0; Rust about +11 (verify +15, echo -4); tests about 0 (estimate)"
 ---
 
-# Phase 12 - Host verify cost (T9-03 High, T9-20; L-7; decision 81 Q4 b)
+# Phase 12 - Host verify cost (T9-03 High, T9-20; L-7; decision 81 Q4 b; authority audit AU-02, AU-19)
 
 ## Context
 
@@ -23,12 +23,14 @@ T9-20: `ECHO_PROVIDER_DESCRIPTOR` is wired into the production composition (`app
 1. The host stops hashing its own binary from inside itself (per the arbitration the host file is verified at the stage, activation and host-admission boundaries that already call the verify door, `verify.rs:233-236`; step 1 confirms each before the self-hash goes); `verify_legacy_node` stops re-entering `verify_native_addon` when `verify_release_files` already covered the entry. Effect: about 26 MB per call, about -25 to -30 ms; every other check stays. A tampered **non-host** payload byte is still refused.
 2. `ECHO_PROVIDER_DESCRIPTOR` leaves the production composition once `catalog.rs` no longer needs `test.fixture.echo` in production (existing host-runtime tests keep the fixture; **`packages/host-runtime` is not edited**, decision 81 Q3).
 3. TEST (`forgent-f8`, H3) is pinged by whoever lands this.
+4. **Exit-code table (authority audit AU-19).** In the `main.rs` step, the host reads the error-category exit codes from the versioned JSON table P01's follow-up exports (from the `src/cli/` kernel leaf) instead of its literal `validation = 4` (`apps/fgos/src/main.rs:218`); `apps/fgos/src/wiring/mailbox_verbs.rs` maps its 0/1/4 through the same table. One test asserts the Node and Rust readers agree on every category. Waits for P01's Step 7 follow-up.
+5. **Activation read (AU-02).** The Rust side keeps one activation reader in `packages/distribution` (`lib.rs`); `fgctl_refresh.rs` is checked to call it, not to parse `activation.json` itself (fix there only if it does).
 
 ## Files
 
 **Create:** none.
 
-**Modify:** `apps/fgos/src/legacy_exec.rs`, `packages/distribution/rust/src/verify.rs`, `apps/fgos/src/main.rs` (echo only; writer chain: shim-root, packaging P04, this), `apps/fgos/tests/*` (the tamper test).
+**Modify:** `apps/fgos/src/legacy_exec.rs`, `packages/distribution/rust/src/verify.rs`, `apps/fgos/src/main.rs` (echo and the exit-code table read; writer chain: shim-root, packaging P04, this), `apps/fgos/src/wiring/mailbox_verbs.rs` (exit codes through the table), `apps/fgos/tests/*` (the tamper test).
 
 **Delete:** the self-hash call and the re-entry; the echo wiring lines.
 

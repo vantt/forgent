@@ -3,7 +3,7 @@ phase: 06
 title: "Run, dispatch, hook verdicts, agents and tool arms: buildRunRequest, one verdict per hook kind judged against the project dir, decide split from the assignment runner"
 status: pending
 depends_on: ["05 landed, or 04 landed if 05 is not approved"]
-parallel: "T5 layer; beside P07 (file-disjoint)"
+parallel: "T5 layer, first wave: beside P20 and P22 (file-disjoint); P21 waits for it (dispatch/cli.mjs, unit-run-start.mjs)"
 effort: ~2d
 net_size: "Node: bin about -300, src about +260, scripts about -170; Rust 0; tests about -150 (estimate)"
 ---
@@ -27,12 +27,14 @@ Reused doors: `src/runner/execution/run-request.mjs` (94 lines; extend), `src/ru
 3. **`dispatch`**: `decide` parsed once with one error shape and one stream (T9-16); `KNOWN_DISPATCH_SUBVERBS` (`:2643-2652`) read from the registry (P01); `retiredDispatchDoorMessage` (`:979-997`) moves next to the use case. `agents` (`:3970-3977`) and `tool` (`:3978-4021`): provider listing and tool validation move into their use cases; arms keep flags and print.
 4. **T9-21**: the header of `main-checkout-delete-guard.mjs` and `worktree-safety.md` name what the guard does not judge. Text only; idea F-6 (more rules) is not taken.
 5. The exit-code map stays in the shell.
+6. **Authority audit AU-17: one fold rule, and no branch on the caller.** "A run-level setting (`--effort`, `--timeout`, `--account`) becomes unscoped overrides, filling where unset" is one exported helper in `run-request.mjs`; P08 makes Workflow's `unitOverridesOf` call it. `src/runner/execution/unit-run-start.mjs` stops branching on `origin === 'workflow'` for an account pin no seat takes: the run options handed to Execution (not the Unit input, which refuses `overrides`, COOK `unit-run-result` §6) carry an explicit `accountPin: 'strict' | 'where-served'` chosen by the caller (`fgos run` passes `strict`, Workflow passes `where-served`; decisions 71 3a and 72 define both behaviours). Owning test: `test/runner/execution/run-request.test.mjs` plus the unit-run-start case that pins the refusal.
+7. **Authority audit AU-25: "am I a confined writer".** The dispatch-depth half of `confinedWriteRefusal` (`src/workflow/case-admission-port.mjs`) moves into `buildRunRequest` (Execution owns `currentDispatchDepth`); the Workflow port keeps only its own directory check, at admission. The arm stops calling a Workflow module before `fgos run --writes`.
 
 ## Files
 
 **Create:** possibly one `slugOf` home (decided in step 1; prefer an existing util module).
 
-**Modify:** `src/runner/execution/run-request.mjs`, `src/runner/dispatch/cli.mjs` (and the new split module name taken from step 1), `src/state/decision-question.mjs`, `scripts/dispatch-decide-hook.mjs`, `scripts/decision-question-hook.mjs`, `src/workflow/propose.mjs` (slug import), `src/git/main-checkout-delete-guard.mjs` (header), `worktree-safety.md` (find by `rg -l "worktree-safety" docs core`), `bin/fgos.mjs` (`:472-528`, `:979-997`, `:2639-2952`, `:3970-4021`, `:5023-5161`), `test/scripts/dispatch-decide-hook.test.mjs`, `test/scripts/decision-question-hook.test.mjs`, `test/cli/dispatch-retired-doors.test.mjs` (`:159` wiring), `test/runner/execution/run-request.test.mjs`, `test/cli/run-verb.test.mjs`, `packages/git/contracts/mutation-census.v1.json` (regenerate), `CHANGELOG.md` ("agy hooks now refuse when the project config is unusable, as Claude hooks do"; plus the `decide` error shape line if user-visible).
+**Modify:** `src/runner/execution/run-request.mjs`, `src/runner/execution/unit-run-start.mjs` (the `origin` branch, AU-17), `src/workflow/case-admission-port.mjs` (`confinedWriteRefusal` keeps its directory half, AU-25), `src/runner/dispatch/cli.mjs` (and the new split module name taken from step 1), `src/state/decision-question.mjs`, `scripts/dispatch-decide-hook.mjs`, `scripts/decision-question-hook.mjs`, `src/workflow/propose.mjs` (slug import), `src/git/main-checkout-delete-guard.mjs` (header), `worktree-safety.md` (find by `rg -l "worktree-safety" docs core`), `bin/fgos.mjs` (`:472-528`, `:979-997`, `:2639-2952`, `:3970-4021`, `:5023-5161`), `test/scripts/dispatch-decide-hook.test.mjs`, `test/scripts/decision-question-hook.test.mjs`, `test/cli/dispatch-retired-doors.test.mjs` (`:159` wiring), `test/runner/execution/run-request.test.mjs`, `test/cli/run-verb.test.mjs`, `packages/git/contracts/mutation-census.v1.json` (regenerate), `CHANGELOG.md` ("agy hooks now refuse when the project config is unusable, as Claude hooks do"; plus the `decide` error shape line if user-visible).
 
 **Delete:** the agy inline branch and its second spawn, the duplicated script bodies (about 170 lines), the three fold copies, the duplicate slug, the sub-verb lists of `dispatch`/`tool`.
 

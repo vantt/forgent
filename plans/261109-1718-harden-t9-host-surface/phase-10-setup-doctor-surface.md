@@ -2,13 +2,13 @@
 phase: 10
 title: "Setup, doctor and wire-agents arms as use cases; retire fgos preflight; one shim probe per shim per doctor run; claude plugin calls in parallel; mailbox timer names only the activated host"
 status: pending
-depends_on: ["08 landed (T6 closed; layer order)", "packaging P02, P04, P08 landed, or the arm each owns skipped (doctor arm, version/help, uninstall)"]
+depends_on: ["08 landed (T6 closed; layer order)", "17, 19, 22 landed (the component answers the three rows call)", "24 landed (workflow catalog; registrations.mjs chain)", "packaging P02, P04, P08 landed, or the arm each owns skipped (doctor arm, version/help, uninstall)"]
 parallel: "T8 layer; alone in its layer; the Rust and gateway phases run beside it"
 effort: ~1.5d
 net_size: "Node: bin about -160 (-90 if preflight were kept; it is not), src about +60; scripts 0; Rust 0; tests about -300 (estimate)"
 ---
 
-# Phase 10 - Setup, doctor, preflight (T9-11, T9-13, C9, T9-12 last import; decision 81 Q1)
+# Phase 10 - Setup, doctor, preflight (T9-11, T9-13, C9, T9-12 last import; decision 81 Q1; authority audit AU-02, AU-07)
 
 ## Context
 
@@ -29,12 +29,14 @@ Reused doors: `createDoctorRun().once`, `agent-wiring.mjs` (`planAgentWiring`/`a
 3. **Timer binary.** The timer names the activated release's host read through `hostBinFromActivation` (confined), never tiers 1-3; control characters and `%` are refused in `projectRoot`, `bin` and `remote`.
 4. **Retire `fgos preflight`** (decision 81 Q1): delete the arm, its registry entry (`src/cli/command-registry.mjs`, 4 mentions), its route (`packages/host-runtime/contracts/command-routes.json`, 2 mentions), `test/cli/fgos-preflight.test.mjs` (156 lines) and the verb's explanation page text (`docs/explanation/fgos-preflight-verb.md`: mark retired, link the script). The three checks stay as `scripts/check-decision-citation-drift.mjs`, `scripts/check-backlog-reconciliation.mjs` and `npm run build:skills`; one `package.json` script chains them for this repo. The route table drops from 82 to 81 selectors (P16 recounts). One CHANGELOG line. No change to `build:skills` or the citation script.
 5. **Version info leaf.** `cli-version-visible` stops importing from `src/cli`: the module moves to its only remaining consumer's layer (a leaf under `src/setup/` if the `version` arm is gone, else `src/util/`; step 1 decides with `test/architecture.test.mjs`); the manifest guard exception from P04 is removed.
+6. **Doctor shows, components judge (authority audit AU-07).** Three rows stop judging another component's state and call that component's answer, built by the fix phases: `identity-shared-directory` (`src/setup/identity-checks.mjs`) reads P17's identity directory judgement; `run-attempts-stuck` (`src/setup/run-supervisor-checks.mjs`) reads P19's adopt probe answer; `confinement-orphaned-resources-reaped` (`src/setup/registrations.mjs`) calls P22's confinement orphan judgement and removal (its `--fix` calls the same removal). Row ids, count and every warn/fail condition unchanged; the cases move to the component tests in those phases and doctor keeps one wiring proof per row.
+7. **Active release (AU-02).** `resolveActiveReleaseForDoctor` and `doctorDriftActivation` (`registrations.mjs`) read the activation through P02's one reader (`resolveActiveHostBin`'s activation read); the doctor-only steps 3-5 survive only as the dev-door case `fgos:dev` names. Packaging P10's pin-drift row reads the same answer.
 
 ## Files
 
 **Create:** none unless step 1 needs the moved version leaf as a new path (a `git mv`).
 
-**Modify:** `src/setup/registrations.mjs` (`createDoctorRun` consumers, `:106`, `runDoctor`; board chain after packaging P02 and P01 rows), `src/setup/agent-hooks.mjs` (probe through `run.once`, three sites), `src/setup/agent-wiring.mjs`, the `claude-plugin-marketplace` row's file, `src/setup/mailbox-sync-timer.mjs` (MAIL told), the setup composition files (`rg -l "registerFix|registerConfigDefault" src/setup`), `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-routes.json`, `bin/fgos.mjs` (`:4022-4160`, `:4232-4271`, `:4317-4389`, `renderPretty` setup/doctor parts `:4721-4864`, `main()` wire-agents branches `:5316-5318`, `:5346`), `package.json` (one script), `docs/explanation/fgos-preflight-verb.md`, `docs/architecture-manifest.json` (remove the P04 exception), `packages/git/contracts/mutation-census.v1.json` (regenerate), `CHANGELOG.md` (preflight retired; timer refuses unsafe paths).
+**Modify:** `src/setup/identity-checks.mjs`, `src/setup/run-supervisor-checks.mjs` (AU-07 rows), `src/setup/registrations.mjs` (`createDoctorRun` consumers, `:106`, `runDoctor`; board chain after packaging P02 and P01 rows), `src/setup/agent-hooks.mjs` (probe through `run.once`, three sites), `src/setup/agent-wiring.mjs`, the `claude-plugin-marketplace` row's file, `src/setup/mailbox-sync-timer.mjs` (MAIL told), the setup composition files (`rg -l "registerFix|registerConfigDefault" src/setup`), `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-routes.json`, `bin/fgos.mjs` (`:4022-4160`, `:4232-4271`, `:4317-4389`, `renderPretty` setup/doctor parts `:4721-4864`, `main()` wire-agents branches `:5316-5318`, `:5346`), `package.json` (one script), `docs/explanation/fgos-preflight-verb.md`, `docs/architecture-manifest.json` (remove the P04 exception), `packages/git/contracts/mutation-census.v1.json` (regenerate), `CHANGELOG.md` (preflight retired; timer refuses unsafe paths).
 
 **Delete:** the preflight arm and entry and route; `test/cli/fgos-preflight.test.mjs`; the doctor loop and setup composition in the arms; timer tiers 1-3.
 
