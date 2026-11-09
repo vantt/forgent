@@ -69,7 +69,7 @@
   ],
   "refusalsToSender": [
     { "reason": "remote-body-expired", "meaning": "a version 3 message whose body is no longer in the sender's mail-body ref, as found by a body fetch of this sync; the header is all that is left, so the message is not delivered" },
-    { "reason": "before-first-sync", "meaning": "the message was in the shared log before this machine's first ingest, which takes a baseline and delivers nothing older; the receiver answers it at that ingest so the sender stops waiting" }
+    { "reason": "before-first-sync", "meaning": "no longer produced by this build: a machine with no baseline now delivers mail still inside the age window at its first ingest; a record recreated within 24 h can receive young mail once more, and a redelivery fires its wake or nudge again; older logs and receivers still carry this reason" }
   ],
   "perSenderCaps": {
     "accountedBy": "verified signer machine and sender id; never the shared unregistered bucket",

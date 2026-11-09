@@ -4,9 +4,9 @@
 //! `ssh-keygen`.
 //!
 //! The stream is read whole and filtered by a cursor kept in the record, one
-//! position per store origin. The first ingest takes a baseline: what the
-//! stream holds then is never delivered, so an old log never replays into a
-//! fresh record. Each later message is verified in the contract's order
+//! position per store origin. The first ingest takes a baseline: of what the
+//! stream holds then, only mail still inside the age window is delivered, so an old log never
+//! replays into a fresh record. Each later message is verified in the contract's order
 //! (shape, the sender's session owned by its signer, signature, pin, age) and
 //! only then given to the core, which applies the same caps the same-machine
 //! mailbox has to each verified sender, takes it once by `(machine, id)` and
@@ -47,8 +47,12 @@ use std::path::Path;
 /// `mailbox.remote.maxAgeSec` and `mailbox.remote.clockSkewSec` of the wire contract.
 const MAX_AGE_SEC: u64 = 86_400;
 const CLOCK_SKEW_SEC: u64 = 300;
-/// The refusal code a sender is given for mail that was in the log before this machine's first ingest.
-const BEFORE_FIRST_SYNC: &str = "before-first-sync";
+
+/// Whether an event stamped `ts` is young enough for a record with no baseline to read: the same
+/// bound `verify` holds a message's signed `sentAt` to.
+fn within_age_window(ts: &str, now_secs: u64) -> bool {
+    iso_utc_secs(ts).is_some_and(|at| now_secs.saturating_sub(at) <= MAX_AGE_SEC + CLOCK_SKEW_SEC)
+}
 
 /// What one ingest did, for the child's stderr when something went wrong and for tests.
 #[derive(Debug, Default, PartialEq, Eq)]
@@ -270,16 +274,12 @@ pub fn ingest(
             continue;
         }
         if !baselined {
-            // The baseline delivers nothing the stream already held; a sender whose message is
-            // still young is told so, instead of waiting for a fetch that will never offer it.
-            let young = iso_utc_secs(&event.ts)
-                .is_some_and(|at| now_secs.saturating_sub(at) <= MAX_AGE_SEC);
-            if young && event.payload["to"]["machine"].as_str() == Some(machine.id.as_str()) {
-                if let Some(id) = event.payload["id"].as_str() {
-                    refusals.push((id.to_owned(), BEFORE_FIRST_SYNC));
-                }
+            // A record with no baseline reads the stream from its start: mail still inside the age
+            // window takes the normal path below, older mail is passed over without a count, so an
+            // old log is never replayed into a fresh record.
+            if !within_age_window(&event.ts, now_secs) {
+                continue;
             }
-            continue;
         }
         if event.seq <= cursor.get(&event.origin).copied().unwrap_or(0) {
             continue;
@@ -513,7 +513,7 @@ fn settle(
 
 #[cfg(test)]
 mod tests {
-    use super::{verify, Body, CLOCK_SKEW_SEC, MAX_AGE_SEC};
+    use super::{verify, within_age_window, Body, CLOCK_SKEW_SEC, MAX_AGE_SEC};
     use crate::wiring::mailbox_config::CrossMachine;
     use crate::wiring::mailbox_remote::{
         sign_payload, SENT_DOMAIN, SENT_DOMAIN_BODY_REF, SENT_DOMAIN_WAKE,
@@ -556,6 +556,24 @@ mod tests {
 
     const TS: &str = "2026-10-29T12:00:00.000Z";
     const NOW: u64 = 1_793_275_200; // 2026-10-29T12:00:00Z
+
+    /// A record with no baseline reads an event only inside the age window `verify` allows; the
+    /// first ingest is the one place mail older than that is passed over uncounted.
+    #[test]
+    fn a_baseline_less_record_reads_only_events_inside_the_age_window() {
+        let now = 1_900_000_000_u64;
+        let at = |secs: u64| fgos_identity::text::iso_utc(secs, 0);
+        assert!(within_age_window(&at(now - MAX_AGE_SEC), now));
+        assert!(within_age_window(
+            &at(now - MAX_AGE_SEC - CLOCK_SKEW_SEC),
+            now
+        ));
+        assert!(!within_age_window(
+            &at(now - MAX_AGE_SEC - CLOCK_SKEW_SEC - 1),
+            now
+        ));
+        assert!(!within_age_window("not a time", now));
+    }
 
     #[test]
     fn the_shortest_body_lifetime_is_the_longest_age_at_which_a_header_is_still_taken() {

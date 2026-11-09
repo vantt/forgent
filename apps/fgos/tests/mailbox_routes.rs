@@ -2259,19 +2259,24 @@ fn a_wake_asked_from_another_machine_is_signed_as_version_two_and_takes_effect_o
     );
 }
 
-/// Mail that was already in the shared log when a machine took its first baseline is never delivered
-/// there, and its sender is told so by a refusal it can read instead of waiting for good.
+/// A machine whose record has no baseline delivers the mail addressed to it that is still inside the
+/// age window at its first ingest, once: taking the baseline again over the same log does not deliver
+/// it a second time. The age bound itself is owned by the unit test of `within_age_window`; mail to
+/// another machine is left out by the recipient filter every ingest shares.
 #[test]
-fn mail_sent_before_the_receivers_first_sync_is_refused_to_its_sender_by_name() {
+fn a_record_with_no_baseline_delivers_young_mail_addressed_to_it_once() {
     let cross = two_machines();
     confirm_alpha_on_beta(&cross);
-    // Beta's first ingest is still to come: take back the baseline its setup syncs took.
     let snapshot_path = cross.beta.mailbox_dir().join("record/snapshot.json");
-    let mut snapshot: serde_json::Value =
-        serde_json::from_slice(&fs::read(&snapshot_path).unwrap()).unwrap();
-    snapshot["remote"]["baselined"] = false.into();
-    snapshot["remote"]["cursor"] = serde_json::json!({});
-    fs::write(&snapshot_path, serde_json::to_vec(&snapshot).unwrap()).unwrap();
+    let forget_baseline = || {
+        let mut snapshot: serde_json::Value =
+            serde_json::from_slice(&fs::read(&snapshot_path).unwrap()).unwrap();
+        snapshot["remote"]["baselined"] = false.into();
+        snapshot["remote"]["cursor"] = serde_json::json!({});
+        fs::write(&snapshot_path, serde_json::to_vec(&snapshot).unwrap()).unwrap();
+    };
+    // Beta's first ingest is still to come: take back the baseline its setup syncs took.
+    forget_baseline();
 
     let out = cross.alpha.run(
         &cross.alpha.main(),
@@ -2288,13 +2293,20 @@ fn mail_sent_before_the_receivers_first_sync_is_refused_to_its_sender_by_name() 
     assert_eq!(out.status.code(), Some(0), "{out:?}");
     sync_child(&cross.alpha);
     sync_child(&cross.beta);
-    sync_child(&cross.alpha);
-
     assert_eq!(
         cross.beta.message_states().len(),
-        0,
-        "the baseline delivers nothing older"
+        1,
+        "young mail is delivered at the first ingest"
     );
+
+    forget_baseline();
+    sync_child(&cross.beta);
+    assert_eq!(
+        cross.beta.message_states().len(),
+        1,
+        "a message the record already knows is not delivered twice"
+    );
+    sync_child(&cross.alpha);
     let status = cross.alpha.run(
         &cross.alpha.main(),
         Some("sender-a"),
@@ -2304,8 +2316,10 @@ fn mail_sent_before_the_receivers_first_sync_is_refused_to_its_sender_by_name() 
     let folded = serde_json::from_slice::<serde_json::Value>(&status.stdout).unwrap()["data"]
         ["crossMachine"]
         .clone();
-    assert_eq!(folded["refused"]["before-first-sync"], 1, "{folded}");
-    assert_eq!(folded["waiting"], 0, "{folded}");
+    assert!(
+        folded["refused"].get("before-first-sync").is_none(),
+        "{folded}"
+    );
 }
 
 /// The payloads of every `mailbox.message-sent` event the clone at `main` holds, sealed or still open.
