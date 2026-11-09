@@ -4256,17 +4256,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // worktree never carries its own .fgos/, so process.cwd() there was
       // silently checking/writing the wrong tree).
       const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
-      const { DOCTOR_CHECKS, createDoctorRun, runFixes } = await import('../src/setup/checks.mjs');
-      const fixed = flags.fix ? runFixes(repoRoot) : undefined;
-      // A check may return its result directly or as a promise (one drives promise-based runner code).
-      const checks = [];
-      // Rows of one run share what they read once (the Work view).
-      const run = createDoctorRun();
-      for (const { id, description, check } of DOCTOR_CHECKS) {
-        const { passed, message, detail } = await check(repoRoot, run);
-        checks.push({ id, description, passed, message, ...(detail !== undefined && { detail }) });
-      }
-      return fixed === undefined ? { checks } : { fixed, checks };
+      const { runDoctor } = await import('../src/setup/checks.mjs');
+      return runDoctor(repoRoot, { fix: Boolean(flags.fix) });
     }
 
     case 'unclaim': {
@@ -4729,6 +4720,9 @@ function renderPretty(verb, data) {
     }
     for (const c of data.checks) {
       lines.push(formatCheck(c.passed, c.description, c.message));
+    }
+    if (data.next?.length) {
+      lines.push('', 'Next:', ...data.next.map((cmd) => `  ${cmd}`));
     }
   } else if (verb === 'setup') {
     lines.push(bold('fgos setup'));
@@ -5335,7 +5329,7 @@ async function main() {
       && data?.outcome !== undefined
       && data?.outcome !== null;
     const isGateSettle = verb === 'workflow' && positional[0] === 'gate' && typeof data?.outcome === 'string';
-    const doctorFailed = verb === 'doctor' && flags.strict === true && data.checks.some((c) => !c.passed);
+    const doctorFailed = verb === 'doctor' && flags.strict === true && !data.ok;
 
     if (isExecutionRun && data?.outcome) {
       process.exitCode = exitCodeForOutcome(data.outcome);

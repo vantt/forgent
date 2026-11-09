@@ -54,6 +54,7 @@ export const CONFIG_CHECKS = contract.rows.map((row) => ({
 /** The doctor fixes: `{ id, fix }`, one per contract fix id; a confined session or a refused file repairs nothing and says why. */
 export const CONFIG_FIXES = contract.fixes.map((fix) => ({
   id: fixId(fix),
+  repairs: contract.rows.filter((row) => row.fix === fix).map((row) => rowId(row.id)),
   fix: (cwd) => {
     try {
       const { changed } = fixConfig({ projectRoot: cwd, ids: [fix] });

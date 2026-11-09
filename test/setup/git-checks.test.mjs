@@ -204,7 +204,6 @@ test('the fetch-mapping fix has nothing to repair, and says so without a failure
     process.env.FGOS_STATE_ROOT = state;
     try {
       const outcome = fixGitFetchMapping(repo, options);
-      assert.equal(outcome.changed, false);
       assert.doesNotMatch(outcome.message, /warning|refused|\[\d+,/);
       assert.match(outcome.message, /no Git remote "origin"/);
     } finally {

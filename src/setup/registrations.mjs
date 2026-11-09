@@ -234,8 +234,11 @@ function doctorWorkView(root, run = createDoctorRun()) {
  * registration is independent of `check`/`configDefault` (same D2 style
  * those two already follow) — a module may register any subset of the
  * three.
+ *
+ * `repairs` names the check rows this fix repairs when they do not share its id; a failing row it repairs
+ * reports `fgos doctor --fix` as its `fix`. Default: the row with the fix's own id.
  */
-export function registerFix({ id, fix }) {
+export function registerFix({ id, fix, repairs = [id] }) {
   if (typeof id !== 'string' || !id.trim()) {
     throw new Error('registerFix requires a non-empty id');
   }
@@ -245,7 +248,10 @@ export function registerFix({ id, fix }) {
   if (typeof fix !== 'function') {
     throw new Error(`registerFix("${id}") requires a fix function`);
   }
-  FIX_REGISTRATIONS.push({ id, fix });
+  if (!Array.isArray(repairs) || repairs.some((row) => typeof row !== 'string')) {
+    throw new Error(`registerFix("${id}") requires repairs to be a list of check ids`);
+  }
+  FIX_REGISTRATIONS.push({ id, fix, repairs });
 }
 
 /**
@@ -255,13 +261,54 @@ export function registerFix({ id, fix }) {
  * `{changed, message}` is reported per entry, mirroring `DOCTOR_CHECKS`'
  * per-entry `{passed, message}` report shape.
  */
-export function runFixes(cwd) {
-  return FIX_REGISTRATIONS.map(({ id, fix }) => {
+export function runFixes(cwd, fixes = FIX_REGISTRATIONS) {
+  return fixes.map(({ id, fix }) => {
     try {
       const { changed, message } = fix(cwd);
       return { id, changed, message };
     } catch (error) { return { id, changed: false, message: error.message }; }
   });
+}
+
+const DOCTOR_FIX_COMMAND = 'fgos doctor --fix';
+
+/**
+ * The level of one row: a row that says its own `status` keeps it; otherwise a failed row is `fail`, a passing row
+ * whose message opens with `warning:` is `warn` (the level convention every row module documents), and any other
+ * passing row is `ok`.
+ */
+function rowStatus({ passed, status, message }) {
+  if (status !== undefined) return status;
+  if (passed === false) return 'fail';
+  return typeof message === 'string' && message.startsWith('warning:') ? 'warn' : 'ok';
+}
+
+/**
+ * One doctor run as agents and `--pretty` read it: `{ ok, next, fixed?, checks }`. Each row keeps `{ id, description,
+ * passed, message, detail? }` and adds `status` (`ok|warn|fail|skip`) and, on a failing row, `fix` (the command that
+ * repairs it, or null when only a person can). `ok` is "no row fails"; `next` is the failing rows' fix commands, once
+ * each, in registry order. With `fix`, every registered fix runs first, so the rows are judged after the repair.
+ * The exit code is not part of this contract (`--strict` maps `ok` to it).
+ */
+export async function runDoctor(repoRoot, { fix = false, checks = DOCTOR_CHECKS, fixes = FIX_REGISTRATIONS } = {}) {
+  const fixed = fix ? runFixes(repoRoot, fixes) : undefined;
+  const repairedByDoctor = new Set(fixes.flatMap((entry) => entry.repairs ?? [entry.id]));
+  // A check may return its result directly or as a promise (one drives promise-based runner code).
+  // Rows of one run share what they read once (the Work view).
+  const run = createDoctorRun();
+  const rows = [];
+  for (const { id, description, check } of checks) {
+    const result = await check(repoRoot, run);
+    const status = rowStatus(result);
+    const repair = result.fix ?? (status === 'fail' ? (repairedByDoctor.has(id) ? DOCTOR_FIX_COMMAND : null) : undefined);
+    rows.push({
+      id, description, passed: result.passed, status, message: result.message,
+      ...(repair !== undefined && { fix: repair }),
+      ...(result.detail !== undefined && { detail: result.detail }),
+    });
+  }
+  const next = [...new Set(rows.filter((row) => row.status === 'fail' && row.fix).map((row) => row.fix))];
+  return { ok: rows.every((row) => row.status !== 'fail'), next, ...(fixed !== undefined && { fixed }), checks: rows };
 }
 
 /**
@@ -991,7 +1038,7 @@ registerCheck({
 
 registerCheck({
   id: 'cli-version-visible',
-  description: 'this build\'s own package version/commit/verb-set resolve cleanly via `fgos version` (tsk-2ej)',
+  description: 'this build\'s own package version/commit/verb-set resolve cleanly via `fgos version`',
   check: () => checkCliVersionVisible(),
 });
 
@@ -1217,13 +1264,13 @@ registerFix({
 
 registerCheck({
   id: 'tool-registry-configured',
-  description: 'tool registry posture — inactive/degraded/full (tsk-1dj)',
+  description: 'tool registry posture — inactive/degraded/full',
   check: (cwd) => checkToolRegistryConfigured(cwd),
 });
 
 registerCheck({
   id: 'agy-permissions-configured',
-  description: 'when agy is on PATH, the person\'s own agy settings.json lets headless agy run commands under a deny list; report only, fgOS never widens it (fgos wire-agents shows the edit) (tsk-1xm)',
+  description: 'when agy is on PATH, the person\'s own agy settings.json lets headless agy run commands under a deny list; report only, fgOS never widens it (fgos wire-agents shows the edit)',
   check: () => checkAgyPermissionsConfigured(),
 });
 
@@ -1438,7 +1485,7 @@ function checkWorkClassificationVocabulary(cwd, run) {
 
 registerCheck({
   id: 'work-classification-vocabulary',
-  description: "every open item's risk/kind matches its domain's declared classification vocabulary (tsk-6ax)",
+  description: "every open item's risk/kind matches its domain's declared classification vocabulary",
   check: (cwd, run) => checkWorkClassificationVocabulary(cwd, run),
 });
 
@@ -1484,7 +1531,7 @@ function checkWorkStepVocabulary(cwd, run) {
 
 registerCheck({
   id: 'work-step-vocabulary',
-  description: "every open item sits at a step its own domain's Workflow still registers — no item stranded on a retired step (tsk-64h)",
+  description: "every open item sits at a step its own domain's Workflow still registers — no item stranded on a retired step",
   check: (cwd, run) => checkWorkStepVocabulary(cwd, run),
 });
 
@@ -1514,13 +1561,13 @@ registerCheck({
 
 registerCheck({
   id: 'root-drift',
-  description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)',
+  description: 'every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge',
   check: (cwd, run) => checkRootDrift(cwd, run),
 });
 
 registerCheck({
   id: 'leaf-notify-drift',
-  description: 'every live session branch has no post-land drift against its target (tsk-1el)',
+  description: 'every live session branch has no post-land drift against its target',
   check: (cwd, run) => checkLeafNotifyDrift(cwd, run),
 });
 
@@ -1578,7 +1625,7 @@ function checkDeliveredNotOnTrunk(cwd, run) {
 
 registerCheck({
   id: 'delivered-not-on-trunk',
-  description: "every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk (tsk-1l9)",
+  description: "every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk",
   check: (cwd, run) => checkDeliveredNotOnTrunk(cwd, run),
 });
 
@@ -2615,6 +2662,7 @@ function checkRustHostBinaryPresent(cwd) {
     // here is not a failure.
     return {
       passed: true,
+      status: 'skip',
       message: 'no active fgos rust host release or dev checkout found -- rust-host-binary-present skipped',
     };
   }
@@ -2679,6 +2727,7 @@ function checkLegacyNodePayloadPresent(cwd) {
     // host release of their own.
     return {
       passed: true,
+      status: 'skip',
       message: 'no active fgos rust host release or dev checkout found -- legacy-node-payload-present skipped',
     };
   }
@@ -2733,7 +2782,7 @@ function checkActiveReleaseMatchesCheckout(dir) {
   try {
     const checkout = path.resolve(dir);
     const marker = doctorDriftPath(checkout, 'apps/fgos/Cargo.toml', true);
-    if (!marker) return { passed: true, message: 'active-release-matches-checkout skipped: outside an fgOS source checkout (apps/fgos/Cargo.toml absent)' };
+    if (!marker) return { passed: true, status: 'skip', message: 'active-release-matches-checkout skipped: outside an fgOS source checkout (apps/fgos/Cargo.toml absent)' };
     if (!fs.statSync(marker).isFile()) throw new Error(`Source checkout marker is not a file: ${marker}`);
 
     const activation = doctorDriftActivation(checkout);
@@ -2752,9 +2801,9 @@ function checkActiveReleaseMatchesCheckout(dir) {
       const main = resolveMainCheckout(checkout);
       if (main && path.resolve(main) !== checkout &&
           doctorDriftPath(main, '.fgos/installation/activation.json', true)) {
-        return { passed: true, message: `active-release-matches-checkout skipped: activation belongs to main checkout ${main}, not this linked worktree` };
+        return { passed: true, status: 'skip', message: `active-release-matches-checkout skipped: activation belongs to main checkout ${main}, not this linked worktree` };
       }
-      return { passed: true, message: 'active-release-matches-checkout skipped: no activation owned by doctor dir' };
+      return { passed: true, status: 'skip', message: 'active-release-matches-checkout skipped: no activation owned by doctor dir' };
     }
 
     const releasePath = scopedEnv.FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath;
@@ -2777,10 +2826,10 @@ function checkActiveReleaseMatchesCheckout(dir) {
     }
     const payloadRoot = doctorDriftPath(releasePath, rawRoot);
     if (rawRoot === '.' && payloadRoot === checkout) {
-      return { passed: true, message: 'active-release-matches-checkout skipped: development manifest uses this checkout directly (legacyNode.root=".")' };
+      return { passed: true, status: 'skip', message: 'active-release-matches-checkout skipped: development manifest uses this checkout directly (legacyNode.root=".")' };
     }
     if (!activation) {
-      return { passed: true, message: 'active-release-matches-checkout skipped: no activation owned by doctor dir (explicit manifest is not this checkout development payload)' };
+      return { passed: true, status: 'skip', message: 'active-release-matches-checkout skipped: no activation owned by doctor dir (explicit manifest is not this checkout development payload)' };
     }
 
     const packagePath = doctorDriftPath(checkout, 'package.json');
@@ -3410,6 +3459,7 @@ export function checkConfinementProbeFreshness() {
   if (os.platform() !== 'linux') {
     return {
       passed: true,
+      status: 'skip',
       message: `confinement probe freshness: platform "${os.platform()}" is not Linux (bwrap probes skipped)`,
     };
   }
@@ -3563,7 +3613,7 @@ export function checkConfinementHerdrMaturity(cwd) {
   try {
     runner = effectiveSection(cwd, 'runner');
   } catch (err) {
-    return { passed: true, message: `runner config not readable, herdr maturity check skipped: ${err.message}` };
+    return { passed: true, status: 'skip', message: `runner config not readable, herdr maturity check skipped: ${err.message}` };
   }
   const executors = runner?.executors || {};
   const herdrExecutors = Object.entries(executors)
@@ -3809,5 +3859,5 @@ registerCheck({
 });
 registerFix({ id: 'workflow-case-bindings', fix: (cwd) => fixWorkflowCaseBindings(cwd) });
 registerFix({ id: 'git-driver-directories', fix: fixGitDriverDirectories });
-registerFix({ id: 'git-wal-dir', fix: fixGitWal });
-registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping });
+registerFix({ id: 'git-wal-dir', fix: fixGitWal, repairs: ['git-operation-journal'] });
+registerFix({ id: 'git-publication-refspecs', fix: fixGitFetchMapping, repairs: ['git-repository-config'] });

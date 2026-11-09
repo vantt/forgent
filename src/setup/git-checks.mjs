@@ -1,13 +1,29 @@
 // Thin doctor/setup adapter: repository trust, configuration and WAL parsing stay in Rust.
 import { randomUUID } from 'node:crypto';
-import { loadNativeAddon } from '../git/native.mjs';
+import { loadNativeAddon, nativeError } from '../git/native.mjs';
 import { gitFacts, readMergeHead } from '../git/status.mjs';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { retentionNote } from './git-retention-note.mjs';
-import { eventStoreDoctorOf, eventStoreMappingProblems } from './event-store-checks.mjs';
+import { eventStoreDoctorOf, eventStoreMappingProblems, eventStoreDoctor } from './event-store-checks.mjs';
 import { eventStoreAddonAvailable } from '../event-store/index.mjs';
 
 const transportRemedy = 'For actions/checkout use persist-credentials: false, remove its repo-local http.<url>.extraheader, and configure a trusted global credential helper or GIT_CONFIG_GLOBAL-level setting. Doctor never moves credentials automatically.';
+
+/**
+ * A Git port error as one readable sentence: its cause plus the decoded stderr text. The port serializes its typed
+ * fields into the error message, and stderr travels as bytes, so the raw message would print a number array.
+ */
+export function describeGitError(err) {
+  const { cause, stderr } = nativeError(err);
+  if (typeof cause !== 'string') return String(err.message);
+  const text = Array.isArray(stderr) && stderr.length > 0 ? Buffer.from(stderr).toString('utf8').trim() : '';
+  return text ? `${cause}: ${text}` : cause;
+}
+const noRemoteFix = 'git remote add origin <url> && fgos doctor --fix';
+/** Whether the configured remote exists; facts that cannot be read count as configured, so the rows keep judging. */
+function remoteConfigured(cwd, run, loaderOptions) {
+  try { return (run ? eventStoreDoctorOf(cwd, run, { loaderOptions }) : eventStoreDoctor(cwd, { loaderOptions })).facts().remoteFact.configured; } catch { return true; }
+}
 
 // A row is its problems joined into one sentence, or its passing text; the facts it judged go under detail.
 const row = (problems, ok, detail, found = problems.filter(Boolean)) => found.length ? { passed: false, message: found.join('; '), detail } : { passed: true, message: ok, detail };
@@ -35,13 +51,16 @@ export function checkGit(cwd, kind, loaderOptions, run) {
         if (!Array.isArray(keys)) return row(['Git addon lacks transport diagnostics; upgrade the active release']);
         const reserved = facts.reservedLegacyRefs ?? [];
         const obsolete = facts.obsoleteFetchMapping || (remote !== 'origin' && native.inspectGit(stateRoot, cwd, root, 'origin').obsoleteFetchMapping);
-        return row([
+        const hasRemote = remoteConfigured(cwd, run, loaderOptions);
+        const result = row([
           keys.length && `repository-transport-config-untrusted: ${keys.join(', ')}; Publication/Remote transfers refuse these settings. ${transportRemedy}`,
-          !native.gitFetchMappings(remote).every(r => facts.fetchRefspecs.includes(r)) && 'the required fetch mapping is missing; run fgos doctor --fix (git-publication-refspecs)',
+          hasRemote && !native.gitFetchMappings(remote).every(r => facts.fetchRefspecs.includes(r)) && 'the required fetch mapping is missing; run fgos doctor --fix (git-publication-refspecs)',
           obsolete && 'obsolete exact legacy mapping breaks plain fetch when the remote has no refs/fgos/legacy; run fgos doctor --fix (git-publication-refspecs)',
           reserved.length && `reserved legacy mirror refs detected: ${reserved.join(', ')}; inspect and remove the foreign refs at their source and these mirrors`,
           ...eventStoreMappingProblems(eventStoreDoctorOf(cwd, run, { loaderOptions })),
         ], 'repository transport settings and fetch mappings are as fgOS expects', { fetchRefspecs: facts.fetchRefspecs, untrustedTransportConfig: keys, reservedLegacyRefs: reserved });
+        // Nothing to fetch from: the mappings are installed once a remote exists, so a local-only project is not red for it.
+        return hasRemote || !result.passed ? result : { ...result, status: 'skip', fix: noRemoteFix, message: `no Git remote "${remote}" configured, so there is no fetch mapping to install; add one when the project has a remote` };
       }
       case 'git-operation-journal': {
         const { journal } = facts;
@@ -67,8 +86,8 @@ export function checkGit(cwd, kind, loaderOptions, run) {
       default: throw new Error(`unknown Git check: ${kind}`);
     }
   } catch (err) {
-    if (kind === 'git-repository-config' && /repository-config-untrusted: credential\.helper/.test(err.message)) return { passed: false, message: `${err.message}; ${transportRemedy}` };
-    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel: onboard this project with `fgctl init`' : err.message };
+    if (kind === 'git-repository-config' && /repository-config-untrusted: credential\.helper/.test(err.message)) return { passed: false, message: `${describeGitError(err)}; ${transportRemedy}` };
+    return { passed: err.code === 'git-addon-not-shipped', message: err.code === 'git-addon-not-shipped' ? 'info: addon not shipped on this channel: onboard this project with `fgctl init`' : describeGitError(err) };
   }
 }
 /** The Git binary fgos-git runs and its floor verdict; Git is only ever spawned by the driver. */
@@ -92,13 +111,14 @@ const installFetchMapping = (cwd, loaderOptions) => {
   if (!found) return noRepository;
   const { root, remote, stateRoot, native, before } = found;
   const repairs = [];
-  if (!native.gitFetchMappings(remote).every(r => before.fetchRefspecs.includes(r)) || before.obsoleteFetchMapping) repairs.push(remote);
+  const hasRemote = remoteConfigured(cwd, undefined, loaderOptions);
+  if (hasRemote && (!native.gitFetchMappings(remote).every(r => before.fetchRefspecs.includes(r)) || before.obsoleteFetchMapping)) repairs.push(remote);
   if (remote !== 'origin' && native.inspectGit(stateRoot, cwd, root, 'origin').obsoleteFetchMapping) repairs.push('origin');
   for (const target of repairs) native.ensureGitFetchMapping(stateRoot, cwd, root, target, native.gitFetchMappings(target), `setup-${randomUUID()}`);
-  return { changed: repairs.length > 0, message: repairs.length ? `installed fgOS fetch mappings and repaired obsolete legacy mapping: ${repairs.join(', ')}` : 'no fetch mapping change needed' };
+  return { changed: repairs.length > 0, message: repairs.length ? `installed fgOS fetch mappings and repaired obsolete legacy mapping: ${repairs.join(', ')}` : hasRemote ? 'no fetch mapping change needed' : `no Git remote "${remote}" configured, so there is no fetch mapping to install` };
 };
 const attemptFix = (cwd, fix) => {
-  try { return fix(cwd); } catch (err) { return { changed: false, message: `warning: Git setup refused: ${err.message}` }; }
+  try { return fix(cwd); } catch (err) { return { changed: false, message: `warning: Git setup refused: ${describeGitError(err)}` }; }
 };
 export const fixGitDriverDirectories = (cwd, loaderOptions) => attemptFix(cwd, () => {
   // No config read here: the door refuses while these directories are unsafe, and this is what makes them safe.

@@ -16,6 +16,7 @@ export {
   createDoctorRun,
   registerFix,
   runFixes,
+  runDoctor,
   resolveMainCheckout,
   integrationScriptPath,
   mainCheckoutHookWired,
