@@ -98,46 +98,55 @@ pub fn project_remote_build_show_invocation() -> (HostInvocation, OperationReque
 pub fn present_remote_error(err: &ProviderError) -> GatewayError {
     match err {
         ProviderError::NoBinding(refuse) => GatewayError {
+            status: None,
             category: ErrorCategory::Precondition,
             message: format!("selection refused (no binding): {refuse}"),
             exit_code: Some(2),
         },
         ProviderError::CallerAdmissionDenied(refuse) => GatewayError {
+            status: None,
             category: ErrorCategory::Precondition,
             message: format!("admission refused: {refuse}"),
             exit_code: Some(2),
         },
         ProviderError::SelectedProviderCapabilityDenied(refuse) => GatewayError {
+            status: None,
             category: ErrorCategory::Precondition,
             message: format!("grant refused: {refuse}"),
             exit_code: Some(2),
         },
         ProviderError::AmbiguousBinding(refuse) => GatewayError {
+            status: None,
             category: ErrorCategory::Conflict,
             message: format!("selection refused (ambiguous binding): {refuse}"),
             exit_code: Some(3),
         },
         ProviderError::IncompatibleContract(msg) => GatewayError {
+            status: None,
             category: ErrorCategory::Precondition,
             message: format!("incompatible contract: {msg}"),
             exit_code: Some(2),
         },
         ProviderError::SemanticValidation(msg) => GatewayError {
+            status: None,
             category: ErrorCategory::Validation,
             message: format!("semantic validation error: {msg}"),
             exit_code: Some(4),
         },
         ProviderError::Precondition(msg) => GatewayError {
+            status: None,
             category: ErrorCategory::Precondition,
             message: format!("precondition error: {msg}"),
             exit_code: Some(2),
         },
         ProviderError::Conflict(msg) => GatewayError {
+            status: None,
             category: ErrorCategory::Conflict,
             message: format!("conflict error: {msg}"),
             exit_code: Some(3),
         },
         ProviderError::NotFound(msg) => GatewayError {
+            status: None,
             category: ErrorCategory::Validation,
             message: format!("not found: {msg}"),
             exit_code: Some(4),
