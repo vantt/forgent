@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a4254fa9477a48d0aacfb7586c953ea9b700c21e65e0cc99d4e09b81adcdbb84",
+  "payloadDigest": "d610a3e4f7a4046e0d4dcb8a436aac35be27cf305f28e6cce4d843c1b0df4b86",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -874,7 +874,6 @@
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
     "scripts/list-doc-anchors.mjs": "fe4d901d266dc9d93e8a405051b618210f17808cc10f29663d48ad55a13e253f",
     "scripts/main-checkout-delete-guard-hook.mjs": "1441b87ef8661132314d89ec1d534a6049cfcf2bc088ca789e5a50fd68ec02be",
-    "scripts/measure-coordination-baseline.mjs": "b890da1963fd4ee50ac84cd53e5e9b45aa7ce37a92d51c6a633bdb2374ec6a7a",
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
     "scripts/measure-verify-cost.mjs": "97768198548908742f0687b069fbe77dfc35839a88e4906f3813afbdd5918abc",
     "scripts/package-release-assets.mjs": "83bb62a0b665b31fd5bf127a373e0b157d7f96c3161f6c1eef1519da06c5162e",

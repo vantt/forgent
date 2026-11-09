@@ -106,13 +106,6 @@ const ALLOWED = new Map([
   ['src/run-supervisor/client.mjs: walk: readdirSync(child)', { count: 1, reason: 'attempt directories of one resolved runs directory found by that same walk' }],
   ['src/runner/dispatch/runtime-inspection.mjs: admissions: readdirSync(genDir)', { count: 1, reason: 'generation records of one resolved run' }],
   ['src/runner/dispatch/runtime-inspection.mjs: derivePhase: readdirSync(commandsDir)', { count: 1, reason: 'command queue of one resolved run' }],
-  // Maintainer script: replays a coordination measurement corpus in a scratch
-  // root. It lists the corpus's session directories (the detector sees the
-  // assignments directories next to the corpus derived from the same path)
-  // and copies its companion assignments; it never reads runs or reports run
-  // visibility.
-  ['scripts/measure-coordination-baseline.mjs: replayCorpusFromDirectory: readdirSync(corpusDir)', { count: 1, reason: 'session directories of a measurement corpus, not assignments' }],
-  ['scripts/measure-coordination-baseline.mjs: replayCorpusFromDirectory: readdirSync(companionAssignmentsDir)', { count: 1, reason: 'corpus copy into a scratch root, not a run reader' }],
   // The test runner snapshots every file of the repository's `.fgos` store
   // before and after a suite to report leaked writes. It compares file
   // contents and never interprets assignments or runs.
