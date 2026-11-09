@@ -744,7 +744,8 @@ pub(super) fn run(
     let plan = Plan::from(envelope)?;
     let mut socket = AttemptSocket::bind(&plan.socket_path).map_err(Refusal::internal)?;
     crate::terminal_slot::record_endpoint(run_dir);
-    let backend = Backend::from_env(run_dir);
+    let backend = Backend::from_env(run_dir)
+        .with_shell_ready_timeout_ms(crate::terminal_slot::shell_ready_timeout_ms(envelope));
     let core = backend.core();
     let spec = launch_spec(&plan, run_dir).map_err(Refusal::internal)?;
 

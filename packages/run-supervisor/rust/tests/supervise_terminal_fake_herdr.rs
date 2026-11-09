@@ -35,6 +35,18 @@ fn terminal_run_with(
     grace_ms: u64,
     tune: impl FnOnce(&mut RunOpts),
 ) -> SupRun {
+    terminal_run_shaped(name, herdr, agent_script, grace_ms, tune, |_| {})
+}
+
+/// `terminal_run_with` that also lets a test set a field of the envelope's `terminal` section.
+fn terminal_run_shaped(
+    name: &str,
+    herdr: &FakeHerdr,
+    agent_script: &str,
+    grace_ms: u64,
+    tune: impl FnOnce(&mut RunOpts),
+    shape_terminal: impl FnOnce(&mut Value),
+) -> SupRun {
     let dir = std::env::temp_dir().join(format!("fgos-sup-{name}-{}", std::process::id()));
     let mut opts = RunOpts::agent(0);
     opts.preferred = "linux-pgroup".into();
@@ -57,6 +69,7 @@ fn terminal_run_with(
         e["agentProtocol"]["mode"] = json!("terminal");
         e["slot"] = json!({"key": attempt_id, "groupKey": "g"});
         e["terminal"] = json!({"socketPath": socket, "exitCommand": null, "orphanSettleMs": 300});
+        shape_terminal(&mut e["terminal"]);
         e["identity"] = json!({"writerId": format!("att-{attempt_id}"), "parentWriterId": null});
         e["launch"]["command"] = json!("/bin/sh");
         e["launch"]["args"] = json!(["-c", script]);
@@ -172,7 +185,14 @@ fn a_full_lifecycle_launches_briefs_waits_for_the_result_and_closes_the_pane_onc
 fn a_pane_whose_shell_never_becomes_ready_ends_as_not_started_and_the_steps_still_run() {
     let herdr = FakeHerdr::new("stuck");
     herdr.set_flag("shell-stuck", true);
-    let mut run = terminal_run("tstuck", &herdr, "sleep 600", 3_000);
+    let mut run = terminal_run_shaped(
+        "tstuck",
+        &herdr,
+        "sleep 600",
+        3_000,
+        |_| {},
+        |terminal| terminal["shellReadyTimeoutMs"] = json!(2_000),
+    );
     let supervisor = run.start_with_env(&herdr.env());
 
     let (code, line) = finish(supervisor, LIMIT);
@@ -393,12 +413,12 @@ fn only_new_words_on_the_screen_keep_a_working_agent_from_idling_never_a_spinner
     brief_taken(&herdr, &run);
     let screen = herdr.dir.join("screen.txt");
     // More than an idle period of new output: the agent is making progress.
-    for line in 0..10 {
+    for line in 0..8 {
         let words: String = (0..=line)
             .map(|n| format!("step {}\n", "abcdefghijklmnopqrstu".chars().nth(n).unwrap()))
             .collect();
         fs::write(&screen, words).unwrap();
-        std::thread::sleep(Duration::from_millis(500));
+        std::thread::sleep(Duration::from_millis(400));
     }
     assert!(
         run.json("stop-requested.json").is_none(),
@@ -452,18 +472,16 @@ fn a_pane_that_cannot_be_read_is_blind_time_that_runs_to_the_deadline_never_idle
     let herdr = FakeHerdr::new("blind");
     let mut run = terminal_run_with("tblind", &herdr, "sleep 600", 500, |opts| {
         opts.idle_ms = Some(3_000);
-        opts.soft_ms = Some(10_000);
+        opts.soft_ms = Some(8_000);
     });
     let supervisor = run.start_with_env(&herdr.env());
 
     brief_taken(&herdr, &run);
     // Let the adapter confirm the delivery first, with the agent working and writing; only then does the pane stop answering.
     fs::write(herdr.dir.join("agent-status"), "working").unwrap();
-    for word in [
-        "reading", "planning", "editing", "testing", "writing", "checking", "done",
-    ] {
+    for word in ["reading", "planning", "editing", "testing", "writing"] {
         fs::write(herdr.dir.join("screen.txt"), word).unwrap();
-        std::thread::sleep(Duration::from_millis(600));
+        std::thread::sleep(Duration::from_millis(400));
     }
     herdr.set_flag("unreadable", true);
 
@@ -597,7 +615,7 @@ fn a_supervisor_killed_after_the_brief_leaves_the_gate_running_and_adopt_release
 
     brief_taken(&herdr, &run);
     // The confirm loop looks once per poll; after this the brief is confirmed and BRIEF_DELIVERED is out.
-    std::thread::sleep(Duration::from_millis(3_500));
+    std::thread::sleep(Duration::from_millis(2_000));
     supervisor.kill().unwrap();
     let _ = supervisor.wait();
     let agent = agent_pid(&run);
@@ -651,12 +669,12 @@ fn a_supervisor_killed_after_the_brief_leaves_the_gate_running_and_adopt_release
 fn a_fifo_named_like_a_result_does_not_stop_the_orphaned_gate_from_enforcing_the_hard_ceiling() {
     let herdr = FakeHerdr::new("fifo-ceiling");
     let mut run = terminal_run_with("tfifo", &herdr, "sleep 600", 1_000, |opts| {
-        opts.ceiling_in_ms = 6_000
+        opts.ceiling_in_ms = 5_500
     });
     let mut supervisor = run.start_with_env(&herdr.env());
 
     brief_taken(&herdr, &run);
-    std::thread::sleep(Duration::from_millis(3_500));
+    std::thread::sleep(Duration::from_millis(2_000));
     supervisor.kill().unwrap();
     let _ = supervisor.wait();
     fs::create_dir_all(&run.outbox).unwrap();

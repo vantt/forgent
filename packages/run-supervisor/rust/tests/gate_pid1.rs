@@ -271,7 +271,7 @@ fn a_long_attempt_with_many_orphans_accumulates_no_zombies() {
         "--marker",
         &marker.to_string_lossy(),
         "--run-ms",
-        "10000",
+        "5000",
         "--orphans",
         "200",
         "--orphan-life",

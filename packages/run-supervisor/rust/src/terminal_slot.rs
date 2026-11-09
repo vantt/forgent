@@ -37,6 +37,15 @@ pub fn retain_window(envelope: &Value) -> Option<u64> {
     }
 }
 
+/// How long a launch waits for the pane's shell to answer (`terminal.shellReadyTimeoutMs`): a positive
+/// number of milliseconds, absent or anything else for terminal-control's default.
+pub fn shell_ready_timeout_ms(envelope: &Value) -> u64 {
+    envelope["terminal"]["shellReadyTimeoutMs"]
+        .as_u64()
+        .filter(|ms| *ms > 0)
+        .unwrap_or(DEFAULT_SHELL_READY_TIMEOUT_MS)
+}
+
 /// The driver, policy and config a [`Core`] borrows.
 pub struct Backend {
     driver: HerdrDriver,
@@ -78,6 +87,12 @@ impl Backend {
             policy: policy_by_name(None).expect("the default placement policy always exists"),
             config,
         }
+    }
+
+    /// This backend with the shell-ready wait a launch uses set to `ms`.
+    pub fn with_shell_ready_timeout_ms(mut self, ms: u64) -> Backend {
+        self.config.shell_ready_timeout_ms = ms;
+        self
     }
 
     pub fn core(&self) -> Core<'_> {
@@ -210,6 +225,24 @@ mod tests {
         assert_eq!(
             retain_window(&json!({"terminal": {"retainFailedPaneMs": 90000}})),
             Some(90000)
+        );
+    }
+
+    #[test]
+    fn the_envelope_sets_how_long_a_launch_waits_for_the_shell() {
+        assert_eq!(
+            shell_ready_timeout_ms(&json!({"terminal": {}})),
+            DEFAULT_SHELL_READY_TIMEOUT_MS,
+            "absent means the default"
+        );
+        assert_eq!(
+            shell_ready_timeout_ms(&json!({"terminal": {"shellReadyTimeoutMs": 2500}})),
+            2500
+        );
+        assert_eq!(
+            shell_ready_timeout_ms(&json!({"terminal": {"shellReadyTimeoutMs": 0}})),
+            DEFAULT_SHELL_READY_TIMEOUT_MS,
+            "a zero wait is not a setting"
         );
     }
 
