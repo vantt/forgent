@@ -23,7 +23,7 @@ test('public worktree create use case returns path and branch through the native
     assert.equal(createWorktreeUseCase(ctx,{path:'../tagged',base:'release'},f.loader).tip,f.tip);
     const route=JSON.parse(fs.readFileSync(new URL('../../packages/host-runtime/contracts/command-routes.json',import.meta.url)));
     assert.equal(route.worktree.route_kind,'legacy-cli');
-    assert.equal(COMMAND_REGISTRY.find(v=>v.name==='worktree').requiresExistingStore,false);
+    assert.equal(COMMAND_REGISTRY.find(v=>v.name==='worktree').store,'none');
   } finally { f.cleanup(); }
 });
 

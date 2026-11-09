@@ -1606,3 +1606,116 @@ test('loops and patterns architecture manifest paths exist and all files on disk
     }
   }
 });
+
+// The shell entry loads little at start. Its static imports are the four leaves below plus the arm imports named in
+// ARM_STATIC_IMPORTS, a list that only shrinks: each layer phase that moves an arm's logic down into its owning layer
+// deletes that arm's lines here, and a new static import in bin/fgos.mjs fails this test until it is named. Anything a
+// verb needs only when it runs (dispatch depth, the Land release, the decision citation scan, the dispatch error type)
+// is loaded with `await import()` inside its use, so the hook and the help paths do not pay for it.
+const ENTRY_LEAF_IMPORTS = [
+  '../src/cli/command-registry.mjs',
+  '../src/cli/parse-args.mjs',
+  '../src/state/envelope.mjs',
+  '../src/state/store-error.mjs',
+];
+const ARM_STATIC_IMPORTS = [
+  '../src/cli/deprecation.mjs',
+  '../src/cli/detached-child.mjs',
+  '../src/cli/flag-check.mjs',
+  '../src/cli/invocation-fault-log.mjs',
+  '../src/cli/version.mjs',
+  '../src/config/facade.mjs',
+  '../src/event-store/maintenance.mjs',
+  '../src/event-store/seal-coalescing.mjs',
+  '../src/git/inspect.mjs',
+  '../src/git/native.mjs',
+  '../src/git/restore.mjs',
+  '../src/git/status.mjs',
+  '../src/holder-lock/index.mjs',
+  '../src/holder-lock/state-root.mjs',
+  '../src/install/coexist.mjs',
+  '../src/intake/classify.mjs',
+  '../src/intake/discovery.mjs',
+  '../src/intake/plan.mjs',
+  '../src/intake/verify-pattern-check.mjs',
+  '../src/report/authoritative-match.mjs',
+  '../src/report/capability-plan-lint.mjs',
+  '../src/report/context-render.mjs',
+  '../src/report/decision-index.mjs',
+  '../src/report/enduser-index-generate.mjs',
+  '../src/report/enduser-index.mjs',
+  '../src/report/frontmatter.mjs',
+  '../src/report/item-trace.mjs',
+  '../src/report/knowledge-lints.mjs',
+  '../src/report/knowledge-projection.mjs',
+  '../src/report/knowledge-resolver.mjs',
+  '../src/run-supervisor/cancel-opt-in.mjs',
+  '../src/runner/anti-loop.mjs',
+  '../src/runner/attestation-guard.mjs',
+  '../src/runner/claim-liveness.mjs',
+  '../src/runner/claim-port.mjs',
+  '../src/runner/dispatch/config.mjs',
+  '../src/runner/dispatch/runner-config-error.mjs',
+  '../src/runner/frozen-judge.mjs',
+  '../src/runner/goal-check.mjs',
+  '../src/runner/lock-fence.mjs',
+  '../src/runner/lock-status.mjs',
+  '../src/runner/main-checkout-activity.mjs',
+  '../src/runner/main-checkout-reset-guard.mjs',
+  '../src/runner/merge.mjs',
+  '../src/runner/paths.mjs',
+  '../src/runner/repo-locks.mjs',
+  '../src/runner/session.mjs',
+  '../src/runner/worker-log.mjs',
+  '../src/runner/worktree.mjs',
+  '../src/setup/ansi.mjs',
+  '../src/setup/event-store-fixes.mjs',
+  '../src/state/awaiting-context.mjs',
+  '../src/state/cleanup-harness.mjs',
+  '../src/state/cursor.mjs',
+  '../src/state/domain-registry.mjs',
+  '../src/state/event-log.mjs',
+  '../src/state/fgos-file-registry.mjs',
+  '../src/state/frontier.mjs',
+  '../src/state/impact.mjs',
+  '../src/state/knowledge-registry.mjs',
+  '../src/state/replay.mjs',
+  '../src/state/retrospective-doors.mjs',
+  '../src/state/runtime-coordination.mjs',
+  '../src/state/store.mjs',
+  '../src/state/tool-registry.mjs',
+  '../src/state/work.mjs',
+  '../src/state/work.mjs',
+  '../src/state/worker-slots.mjs',
+  '../src/util/format-lock-duration.mjs',
+  '../src/util/git-paths.mjs',
+  '../src/util/identity-mint.mjs',
+  '../src/util/normalize-path.mjs',
+  '../src/util/session-identity.mjs',
+  '../src/verbs/dispatch/inspect.mjs',
+  '../src/verbs/dispatch/reconcile.mjs',
+  '../src/verbs/dispatch/recover.mjs',
+  '../src/verbs/dispatch/show-run.mjs',
+  '../src/verbs/dispatch/watch.mjs',
+  '../src/verbs/state/edit.mjs',
+  '../src/verbs/state/move.mjs',
+  '../src/verbs/state/read.mjs',
+  '../src/workflow/dir-guard.mjs',
+];
+
+function staticImportSpecifiers(file) {
+  const code = lexSource(fs.readFileSync(path.join(root, file), 'utf8')).code;
+  return [...code.matchAll(/^import\s[^;]*?from\s*(['"])([^'"]+)\1/gms)].map((m) => m[2]);
+}
+
+test('the shell entry statically imports only its leaves and the named arm imports', () => {
+  const actual = staticImportSpecifiers('bin/fgos.mjs').filter((specifier) => !specifier.startsWith('node:')).sort();
+  assert.deepEqual(actual, [...ENTRY_LEAF_IMPORTS, ...ARM_STATIC_IMPORTS].sort());
+});
+
+test('the shell entry loads dispatch depth, the Land release and the decision citation scan only when a verb needs them', () => {
+  const eager = staticImportSpecifiers('bin/fgos.mjs').filter((s) => /dispatch\/transport|check-decision-citation-drift/.test(s));
+  assert.deepEqual(eager, []);
+  const source = fs.readFileSync(path.join(root, 'bin/fgos.mjs'), 'utf8');
+  assert.doesNotMatch(source, /^import\s[^;]*\breleaseRecordedLand\b[^;]*from/ms);
+});

@@ -31,21 +31,31 @@
 // are `false`) so a transport can read pagination support machine-readably
 // instead of guessing per verb.
 //
-// `requiresExistingStore` (tsk-4fu-2) is narrower than `touchesState`: true
-// only for a verb whose handler actually reads/writes through the CLI's own
-// `dataDir()` (the strict, cwd-resolved `.fgos/` — bin/fgos.mjs's `dir`
-// param). A verb can be `touchesState: true` without this — `session`
-// writes `.fgos/sessions.json` through its own independent, git-resolved
-// path (session.mjs, D10 symlink actor), never through `dir`, and `setup`
-// touches the shared config file/shell rc files/git hooks, never `.fgos/` at
-// all — so gating either of those on `dir`'s existence would refuse for a
-// reason that has nothing to do with what they actually do. `init` is also
-// `false` here despite being the one verb that legitimately creates
-// `.fgos/`: it gets the opposite check (refuse inside a linked worktree,
-// via `isMainWorktree`), not this one. Every entry carries this field, same
-// discipline as `paginated` above.
+// `store` says what the shell does about the verb's `.fgos/` store before the
+// handler runs, and is the one declaration the shell reads (no verb sets live
+// in bin/fgos.mjs):
+//   'none'    the verb never reads or writes through the CLI's own `dataDir()`
+//             (strict, cwd-resolved `.fgos/`). `session` writes through its own
+//             git-resolved path (session.mjs), `setup` touches the shared config
+//             and shell rc files, never `.fgos/`; gating either on `dir` would
+//             refuse for a reason that has nothing to do with what they do.
+//   'open'    the verb opens the Event Store (start and end triggers) but
+//             tolerates a missing `.fgos/`. `init` is here despite being the one
+//             verb that creates `.fgos/`: it gets the opposite check (refuse
+//             inside a linked worktree, via `isMainWorktree`).
+//   'read'    a read verb: opens the Event Store; from a linked worktree with no
+//             `.fgos/` it warns that the view may be empty because the real store
+//             lives elsewhere (an empty-looking view would pass for a real one).
+//   'require' refuses when `.fgos/` does not exist yet, so a write cannot create a
+//             phantom store (the worktree hazard); opens the Event Store.
+// `mutatesStore` (true, or `(positional, flags) => boolean` for a verb with a
+// read-only shape beside a mutating one) marks the invocations that write the
+// shared store; the disconnected-worktree guard refuses them from a linked
+// worktree carrying a frozen `.fgos/` copy. `landsWork` (true, or
+// `(positional) => boolean`) marks the verbs that run Land, so their end trigger
+// releases the candidates Work has recorded. Both default to false when absent.
+// Every entry carries `store`, same discipline as `paginated` above.
 
-//
 // `subcommands` (optional) is set on a verb whose first positional is a
 // sub-verb: {<sub>: {description, parameters, examples}}, each sub-verb's
 // `parameters` in the same JSON-Schema shape, holding only the flags that
@@ -53,6 +63,8 @@
 // it by withSubcommands(), so the sub-verb list has one source.
 // test/cli/subcommand-flag-drift.test.mjs checks each sub-verb's schema
 // against the flags its handler really reads.
+
+import { exitCodeForOutcome } from '../state/store-error.mjs';
 
 export const MANIFEST_SCHEMA_VERSION = '3.0';
 
@@ -79,6 +91,11 @@ function withSubcommands(entry) {
   };
 }
 
+/** A registry field that is `true` or a per-invocation predicate, resolved for one invocation; absent is false. */
+export function declared(field, ...args) {
+  return typeof field === 'function' ? !!field(...args) : field === true;
+}
+
 export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'worktree', invoke: 'fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] | fgos worktree remove <path> --delivered-to <ref> [--discard-ignored]',
@@ -93,7 +110,7 @@ export const COMMAND_REGISTRY = [
       examples: ['fgos worktree remove ../worker --delivered-to main', 'fgos worktree remove ../worker --delivered-to main --discard-ignored'],
     } },
     examples: ['fgos worktree create ../worker --branch task/example', 'fgos worktree create ../scratch --detach', 'fgos worktree remove ../worker --delivered-to main'],
-    touchesState: false, requiresExistingStore: false, externalEffect: true, paginated: false, deprecated: null,
+    touchesState: false, store: 'none', externalEffect: true, paginated: false, deprecated: null,
   }),
   {
     name: 'version',
@@ -108,7 +125,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos version', 'fgos version --runtime-json'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -235,7 +252,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos metrics ping', 'fgos metrics coverage', 'fgos metrics discussions --by workflow', 'fgos metrics eval list'],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -318,7 +335,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos friction ping', 'fgos friction rank --limit 10'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -387,7 +404,7 @@ export const COMMAND_REGISTRY = [
       'fgos convention check --all',
     ],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -400,7 +417,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos init'],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'open',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -451,7 +468,8 @@ export const COMMAND_REGISTRY = [
       'fgos add --title "Build CLI" --kind feature --risk medium --verify "npm test" --description "Build the CLI entry point per the locked shape"',
     ],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -490,7 +508,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos submit "Fix the flaky retry test" --async', 'fgos submit "Fix the flaky retry test" --verify "npm test"'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -520,7 +539,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos discover build-cli', 'fgos discover build-cli --verdict clear --verify "npm test"', 'fgos discover build-cli --verdict clear --verify "npm test" --force'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -547,7 +567,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos plan build-cli', 'fgos plan build-cli --verdict pass-through --reason "single-piece, no split needed"'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -573,7 +594,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos move build-cli --to doing', 'fgos move build-cli --to todo --answer "Approved" --approve'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -590,7 +612,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos retrospective'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -609,7 +632,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos cleanup build-cli'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -630,7 +654,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos compound tsk-3o3 --doc-type how-to --doc-path docs/how-to/example.md'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: 'fgos doc reserve/register/promote',
@@ -677,7 +702,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos edit build-cli --verify "npm test -- --grep cli"'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -698,7 +724,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos resolve-park-reason tsk-64h --note "Human confirmed present on main branch"'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -720,7 +747,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos ask build-cli --text "Which module owns this?"'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -745,7 +773,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos answer build-cli --text "src/cli owns it."', 'fgos answer build-cli --approve --text "Split as proposed."'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -769,7 +798,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos handoff build-cli --to reviewer --reason review'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -789,7 +819,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos handoff-return build-cli'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -827,7 +858,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos hook dispatch-decide', 'fgos hook decision-question', 'fgos hook main-checkout-delete-guard', 'fgos hook dispatch-decide --format=agy', 'fgos hook mailbox --cli claude --event post-tool-use'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -853,7 +884,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos decision --text "Use envelope wrapping at the dispatcher choke-point" --rationale "Keeps the dispatcher a pure pass-through" --relation none'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -872,13 +904,13 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos decision-index', 'fgos decision-index --check'],
     touchesState: false,
-    // requiresExistingStore stays false, mirroring docs-index's own
-    // documented reason (tsk-1wn D4): flipping it would need
+    // `store` is 'open', never 'require', mirroring docs-index's own
+    // documented reason (tsk-1wn D4): 'require' would need
     // touchesState: true too (the registry's own invariant), which is
     // false here -- listWork on a missing/uninitialized .fgos/ returns an
     // empty view gracefully (never throws), so an absent store just
     // produces the "no decisions yet" placeholder rather than an error.
-    requiresExistingStore: false,
+    store: 'open',
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -897,7 +929,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos context-render build-cli'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -919,7 +951,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos gate-approve tsk-19j --gate contextApprove --actor bypass --verify "node --test test/intake/discovery.test.mjs"'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -941,7 +974,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos list', 'fgos list --all', 'fgos list --limit 20', 'fgos list --limit 20 --cursor <token>'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: true,
     deprecated: null,
@@ -961,7 +994,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos ready', 'fgos ready --limit 20', 'fgos ready --limit 20 --cursor <token>'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: true,
     deprecated: null,
@@ -979,7 +1012,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos graph', 'fgos graph --what-if auth-3'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -991,10 +1024,11 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos gate-bypass'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    nativeOnly: true,
   },
   withSubcommands({
     name: 'identity',
@@ -1107,7 +1141,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos identity', 'fgos identity machine --json', 'fgos identity session --json', 'fgos identity project --json', 'fgos identity list --json', 'fgos identity mint work --json'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1169,7 +1203,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos mailbox send --to forgent-claude-2b "hello"', 'fgos mailbox inbox', 'fgos mailbox inbox --claim'],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1191,7 +1225,7 @@ export const COMMAND_REGISTRY = [
       'refresh-docs': { description: 'Rewrite the @fgos:doc lines that differ from what the schema and standard render, in the project file (or, with --global, the machine files); values and @fgos:why lines stay. A second run prints nothing to do.', parameters: { type: 'object', properties: { global: { type: 'boolean', description: 'Refresh the global and accounts files instead of the project file.' } }, required: [] }, examples: ['fgos config refresh-docs'] },
     },
     examples: ['fgos config show --json', 'fgos config check', 'fgos config set gateBypass.level light --reason "light gates while the audit runs"', 'fgos config migrate --dry-run'],
-    touchesState: true, requiresExistingStore: false, externalEffect: false, paginated: false, deprecated: null, nativeOnly: true,
+    touchesState: true, store: 'none', externalEffect: false, paginated: false, deprecated: null, nativeOnly: true,
   }),
   {
     name: 'gate-check',
@@ -1215,7 +1249,7 @@ export const COMMAND_REGISTRY = [
       'fgos gate-check tsk-19j --gate validateApprove --plan docs/history/tsk-19j/plan.md --children "[]" --cost REVERSIBLE',
     ],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1229,7 +1263,7 @@ export const COMMAND_REGISTRY = [
       }, required: [] },
     examples: ['fgos stale', 'fgos stale --reconcile'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1241,7 +1275,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos slots'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1262,7 +1296,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos report tsk-3dt --text "returned, verify green" --stop-reason awaiting-approval'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1274,7 +1309,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos conflicts'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1286,7 +1321,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos recheck-blocked'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1304,7 +1339,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos schedule'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1326,10 +1361,11 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos plan-lint plans/my-track/plan.md', 'fgos plan-lint plans/my-track --phase 2 --json', 'fgos plan-lint plans/my-track/plan.md --cell I18 --json'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    exitOf: (data) => (data.ok ? 0 : 1),
   },
   withSubcommands({
     name: 'merge',
@@ -1367,7 +1403,9 @@ export const COMMAND_REGISTRY = [
     // without this, a missing store (e.g. cwd is a linked worktree with no
     // --dir) folds silently into an empty-but-valid ready/waiting/conflicts
     // result instead of refusing, the false negative this item closes.
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: (positional) => positional[0] === 'next',
+    landsWork: (positional) => positional[0] === 'next',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1541,7 +1579,8 @@ export const COMMAND_REGISTRY = [
     // "reconcile"/"recover" write guard and Run state (touchesState: true);
     // "probe-account" spawns provider CLIs (externalEffect: true). A verb with
     // several sub-modes is classified by its most-privileged effect on each axis.
-    requiresExistingStore: false,
+    store: 'none',
+    mutatesStore: (positional, flags) => positional[0] === 'recover' && flags.action !== undefined,
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -1594,10 +1633,11 @@ export const COMMAND_REGISTRY = [
       'fgos run --sync main --writes docs --worktree ../wt-feature',
     ],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: true,
     paginated: false,
     deprecated: null,
+    exitOf: (data) => (data?.outcome ? exitCodeForOutcome(data.outcome) : 0),
   },
   {
     name: 'rebuild',
@@ -1606,7 +1646,8 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos rebuild'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1623,7 +1664,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos events status', 'fgos events sync --no-push', 'fgos events export --out ./export'],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'open',
+    mutatesStore: (positional) => positional[0] === 'sync',
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -1642,7 +1684,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos rollup build-cli'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1661,7 +1703,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos show build-cli', 'fgos show build-cli --json'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1683,7 +1725,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos take', 'fgos take build-cli --role session', 'fgos take build-cli --no-wait'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1705,7 +1748,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos pick', 'fgos pick build-cli', 'fgos pick build-cli --no-wait'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1731,7 +1775,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos return build-cli', 'fgos return build-cli --to blocked --reason "executor crashed"'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1752,7 +1796,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos review build-cli', 'fgos review build-cli --github'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -1780,7 +1824,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos approve build-cli', 'fgos approve build-cli --no-wait'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    landsWork: true,
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -1808,7 +1853,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos sync-root tsk-64p', 'fgos sync-root tsk-64p --no-wait'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    landsWork: true,
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -1834,7 +1880,8 @@ export const COMMAND_REGISTRY = [
       'fgos promote-to-component tsk-a,tsk-b --root-id tsk-a',
     ],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    landsWork: true,
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -1854,7 +1901,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos reject build-cli --reason "needs more work"'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1875,7 +1923,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos catchup build-cli'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1895,7 +1943,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos triage', 'fgos triage --all', 'fgos triage --limit 20', 'fgos triage --limit 20 --cursor <token>'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: true,
     deprecated: null,
@@ -1907,7 +1955,7 @@ export const COMMAND_REGISTRY = [
     parameters: { type: 'object', properties: {}, required: [] },
     examples: ['fgos docs-index'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'open',
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -1926,7 +1974,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos doc-sources docs/knowledge/how-to-check-a-root-item-s-progress-with-fgos-rollup/check-rollup-progress.md'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1949,7 +1997,7 @@ export const COMMAND_REGISTRY = [
       'fgos authoritative-match --quadrant docs/how-to --check-duplicates',
     ],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -1979,7 +2027,8 @@ export const COMMAND_REGISTRY = [
       'fgos topic rename worktree-reclaim --new-purpose-slug worktree-management',
     ],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2010,7 +2059,8 @@ export const COMMAND_REGISTRY = [
       'fgos doc promote worktree-reclaim guide',
     ],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: true,
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2029,12 +2079,13 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos knowledge status', 'fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123'],
     // tsk-28x code review finding: `status`/`attest` both call `rebuild(dir)`,
-    // which requires a real `.fgos` store -- `requiresExistingStore: false`
+    // which requires a real `.fgos` store -- `store: 'none'`
     // was wrong for both subcommands. `attest` also durably records a
     // doc.attest event -- `--capture-id` is required (§7.4), so this verb is
     // never unconditionally read-only.
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: (positional) => positional[0] === 'attest',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2052,7 +2103,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos doc-registry', 'fgos doc-registry --check'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -2097,7 +2148,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos session start', 'fgos session end <session-id>', 'fgos session list', 'fgos session gc'],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'none',
+    mutatesStore: (positional) => ['start', 'end', 'gc'].includes(positional[0]),
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2125,7 +2177,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos gateway start', 'fgos gateway status', 'fgos gateway stop'],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'none',
+    mutatesStore: (positional) => ['start', 'stop'].includes(positional[0]),
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -2153,7 +2206,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos goal set <id>', 'fgos goal show'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: (positional) => positional[0] === 'set',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2189,7 +2243,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos tool check', 'fgos tool query --capability impact-analysis --status present'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2211,7 +2265,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos agents list'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2229,7 +2283,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos setup', 'fgos setup --pretty'],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'open',
     externalEffect: false,
     paginated: false,
     deprecated: 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init downloads the latest release when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it',
@@ -2249,7 +2303,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos uninstall --yes', 'fgos uninstall --yes --remove-package', 'fgos uninstall --yes --pretty'],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2268,10 +2322,11 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos wire-agents', 'fgos wire-agents --yes', 'fgos wire-agents --json'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: true,
     paginated: false,
     deprecated: null,
+    exitOf: (data) => (data.failed?.length > 0 ? 1 : 0),
   },
   {
     name: 'doctor',
@@ -2288,10 +2343,11 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos doctor', 'fgos doctor --pretty', 'fgos doctor --fix', 'fgos doctor --strict'],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
+    exitOf: (data, { flags }) => (flags.strict === true && !data.ok ? 1 : 0),
   },
   {
     name: 'unclaim',
@@ -2306,7 +2362,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos unclaim tsk-uio'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2322,7 +2378,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos preflight'],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2350,7 +2406,8 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos lock fence main-checkout', 'fgos lock fence merge-slot --param ref=refs%2Fheads%2Fmain --yes'],
     touchesState: true,
-    requiresExistingStore: true,
+    store: 'require',
+    mutatesStore: (positional) => positional[0] === 'fence',
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -2366,7 +2423,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos lock-status'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'read',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2381,7 +2438,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos git status --json', 'fgos git recover --json'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: false,
     paginated: false,
     deprecated: null,
@@ -2400,7 +2457,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos resync-worktree', 'fgos resync-worktree --dir /path/to/main-checkout'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -2419,7 +2476,7 @@ export const COMMAND_REGISTRY = [
     },
     examples: ['fgos main-checkout-reset --sha 3a7eb10', 'fgos main-checkout-reset --sha 3a7eb10 --confirm'],
     touchesState: false,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -2609,9 +2666,18 @@ export const COMMAND_REGISTRY = [
       'fgos workflow resume wf-run-1234',
     ],
     touchesState: true,
-    requiresExistingStore: false,
+    store: 'none',
     externalEffect: true,
     paginated: false,
     deprecated: null,
+    // A foreground start/resume/answer and a gate settle exit with their outcome's code; a proposal exits 1 when it is not ok.
+    exitOf: (data, { positional, flags }) => {
+      const sub = positional[0];
+      const settled = data?.outcome !== undefined && data?.outcome !== null;
+      if (['start', 'resume', 'answer'].includes(sub) && flags.foreground === true && data?.status !== 'running' && settled) return exitCodeForOutcome(data.outcome);
+      if (sub === 'gate' && typeof data?.outcome === 'string') return exitCodeForOutcome(data.outcome);
+      if (sub === 'propose') return data.ok ? 0 : 1;
+      return 0;
+    },
   }),
 ];

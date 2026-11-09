@@ -31,12 +31,12 @@ import readline from 'node:readline';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, categoryOf, exitCodeForOutcome, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { StoreError, EXIT_CODES, categoryOf } from '../src/state/store-error.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
 import { knowledgeFindings } from '../src/report/knowledge-lints.mjs';
-import { collectWideSourceFiles, findWideCitationFindings, isDLocalId } from '../scripts/check-decision-citation-drift.mjs';
 import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decision-index.mjs';
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
 import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
@@ -51,7 +51,6 @@ import { mintMachineId, mintWorkId } from '../src/util/identity-mint.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfigForDir } from '../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../src/runner/dispatch/runner-config-error.mjs';
-import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
 import { checkDirDiffersFromCwd, attachDirWarning } from '../src/workflow/dir-guard.mjs';
@@ -81,13 +80,12 @@ import { readClaim, releaseClaim, getMainFgosDir } from '../src/state/runtime-co
 import { maintainEventStore } from '../src/event-store/maintenance.mjs';
 import { processSealCoalescer } from '../src/event-store/seal-coalescing.mjs';
 import { spawnDetachedCli } from '../src/cli/detached-child.mjs';
-import { currentDispatchDepth, DispatchError } from '../src/runner/dispatch/transport.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
 import { normalizePath } from '../src/util/normalize-path.mjs';
 import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
-import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet, readInvariantCheckCommands, releaseRecordedLand } from '../src/runner/merge.mjs';
+import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, buildOwnFileSet, readInvariantCheckCommands } from '../src/runner/merge.mjs';
 import { inspectEntries, inspectPath } from '../src/util/git-paths.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
@@ -120,7 +118,7 @@ import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
-import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
+import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY, declared } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { readConfig, initConfigFile } from '../src/config/facade.mjs';
@@ -322,6 +320,15 @@ function requireField(value, message) {
     throw new StoreError('validation', message);
   }
   return value;
+}
+
+// The sub-verb of `verb`, checked against the registry's `subcommands`: the one list of what the verb accepts.
+function requireSubVerb(verb, positional) {
+  const subs = Object.keys(COMMAND_REGISTRY.find((e) => e.name === verb).subcommands);
+  const usage = `fgos ${verb} <${subs.join('|')}>`;
+  const sub = requireField(positional[0], `${verb} requires a sub-verb: ${usage}`);
+  if (!subs.includes(sub)) throw new StoreError('validation', `unknown ${verb} sub-verb "${sub}". Usage: ${usage}`);
+  return sub;
 }
 
 // Same rule as requireField but for a flag that is legitimately optional
@@ -1990,6 +1997,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // write-time signal (D7: "fgos approve KHÔNG bị gate ở đây").
       if (relation.kind === 'supersedes') {
         const repoRoot = path.dirname(dir);
+        const { collectWideSourceFiles, findWideCitationFindings, isDLocalId } = await import('../scripts/check-decision-citation-drift.mjs');
         const sourceFiles = collectWideSourceFiles(repoRoot);
         // tsk-1lv (review-fix round, F3): a platform/--scope decision (no
         // --id) has no item id to use as the "acknowledges the new
@@ -2248,25 +2256,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // items stuck in `doing` — classifies stale-by-owner-type (human >> agent)
     // and SUGGESTS; it never moves or reclaims anything (the runner reap is the
     // only role, and it never reclaims a person's claim).
-    // Request-class per D1: a pure read, never touches state.json. Reports
-    // the configured gate-bypass level (docs/history/gate-bypass/CONTEXT.md
-    // D1-D5) — no CLI setter, mirroring .fgos/config.json's own
-    // edit-the-file-by-hand pattern.
-    case 'gate-bypass': {
-      return { level: readGateBypassLevel(dir) };
-    }
-
-    // tsk-65q: read-only wrapper around canAutoApprove/canAutoApproveMergedGate
-    // (src/state/gate-bypass.mjs) so the two skill-embedded Gate-section
-    // checks (fgos-coding-exploring/fgos-coding-validating) can resolve this
-    // computation through the CLI's own static imports -- which already
-    // resolve correctly under any install shape (global, dev-checkout, npx)
-    // because Node resolves them against bin/fgos.mjs's own file location,
-    // never the caller's cwd or repo root. The ad hoc cwd-relative resolver
-    // those two skill files used to embed inline had no such guarantee, and
-    // crashed unconditionally on a pure global npm install of fgOS onto a
-    // different project (docs/history/tsk-65q-gate-bypass-global-install-
-    // resolution/RESEARCH.md).
     case 'workflow': {
       const sub = positional[0];
       // start, answer and resume return at once with the run id and where to read progress, handing the
@@ -2664,7 +2653,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         try {
           return await runDispatchCli(rawArgv, { returnResult: true, resolveWork: resolveWorkForDispatch });
         } catch (err) {
-          if (err instanceof DispatchError || err.errorClass) {
+          if (err.errorClass) {
             process.stdout.write(`${JSON.stringify({ error: err.message, ...(err.errorClass ? { errorClass: err.errorClass } : {}) })}\n`);
           }
           throw err;
@@ -3912,7 +3901,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // nohup/tmux/systemd. AGENTS.md's own dispatch doctrine names this as
     // the mandatory entry point.
     case 'gateway': {
-      const sub = requireField(positional[0], 'gateway requires a sub-verb: fgos gateway <start|stop|status>');
+      const sub = requireSubVerb('gateway', positional);
       const repoRoot = path.dirname(dir);
       const { startGateway, stopGateway, gatewayStatus, GatewayControlError } = await import('../src/runner/gateway-control.mjs');
       try {
@@ -3925,7 +3914,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         if (sub === 'status') {
           return await gatewayStatus(dir);
         }
-        throw new StoreError('validation', `unknown gateway sub-verb "${sub}". Usage: fgos gateway <start|stop|status>`);
+        throw new StoreError('validation', `gateway sub-verb "${sub}" has no handler`);
       } catch (err) {
         if (err instanceof GatewayControlError) {
           throw new StoreError('validation', err.message);
@@ -4812,64 +4801,18 @@ function renderPretty(verb, data) {
   return `${lines.join('\n')}\n`;
 }
 
-// tsk-56t D2: the read verbs the decision names — not every
-// `requiresExistingStore: false` verb (that set also includes `session`/
-// `setup`/`doctor`, which never touch `.fgos/` at all, and `init`, which
-// gets its own opposite linked-worktree refusal above). `schedule` added
-// by tsk-3u2 (post-tsk-3c7 independent review): it reads the exact same
-// store state `conflicts` does, but was missing here — from a linked
-// worktree with no `.fgos/`, it silently returned `{waves:[],cycles:[]}`
-// (indistinguishable from "graph clean") instead of this warning.
+// What a verb does about the `.fgos/` store (refuse when missing, warn, open the Event Store, guard against a
+// disconnected snapshot, run Land) is declared once on its registry entry: `store`, `mutatesStore`, `landsWork`
+// (src/cli/command-registry.mjs). Nothing here keeps a verb list of its own.
 //
-// `gate-bypass`/`doc-sources`/`lock-status` added by tsk-3g5 (post-tsk-3u2
-// independent review, same audit gap this set has already been widened
-// twice for): all three are `requiresExistingStore: false` and share the
-// identical bug class. `gate-bypass` is the sharpest instance —
-// unwarned, it reports a CONFIDENTLY WRONG safety-policy level from a
-// worktree (verified: `"off"` from a `.fgos/`-less worktree vs the real
-// main checkout's `"standard"`) rather than an honestly-empty result, the
-// opposite direction of "looks safer than reality" a caller checking
-// bypass posture needs to be warned about. `doc-sources` silently returns
-// `count: 0` (indistinguishable from "no captures exist"); `lock-status`
-// is structurally forced to report the lock as `free` with no store to
-// read a real lock state from.
-// `evolve` added by tsk-5iv D3 (round-3 review, MEDIUM): same bug class
-// again -- `requiresExistingStore: false`, silently returns `[]` (an
-// empty-store `rankCandidates` result) from a `.fgos/`-less worktree
-// instead of its real candidate list. This is the fourth time this set
-// has been widened for the identical gap (tsk-3u2, tsk-3g5, now this).
-//
-// `docs-index` was investigated for the same fix (CONTEXT.md D3 originally
-// named it too) and found NOT to belong here: verified by reading its own
-// handler (the `docs-index` case above) -- its `docPath`/`title` entries
-// come from a real `fs.readdirSync` scan of `docs/` under `repoRoot`
-// (`path.dirname(dir)`), which is correct and complete regardless of
-// whether `.fgos/` exists, and its `sourceCaptureId` bookkeeping already
-// has its own dedicated degrade-safe guard (`storeReachable`, tsk-f31,
-// just above: preserves a doc's prior `sourceCaptureId` instead of
-// regressing it to null when the store is unreachable). Adding this
-// verb's generic "this view may be empty" warning would be actively
-// MISLEADING here -- its view is never empty or wrong from a worktree --
-// so it stays out, correcting CONTEXT.md D3's original premise for this
-// one verb with real evidence found during implementation.
-//
-// `main-checkout-reset` is deliberately NOT added here either: it is
-// destructive, not merely read-stale, and tsk-5iv D1 above gives it its
-// own hard refusal instead of a soft warning.
-const STORE_MISSING_WARNING_VERBS = new Set([
-  'list', 'ready', 'graph', 'stale', 'check', 'rollup', 'show', 'conflicts', 'triage', 'schedule',
-  'gate-bypass', 'doc-sources', 'lock-status', 'recheck-blocked',
-]);
-
-// Verbs that open the Event Store without being `requiresExistingStore` or a store-missing-warning read: they carry
-// the opportunistic seal and publish triggers of spec §16 at their start and end.
-const EVENT_STORE_LIFECYCLE_VERBS = new Set(['init', 'setup', 'rebuild', 'events', 'decision-index', 'docs-index', 'knowledge']);
-// The verbs that run Land (a `merge` sub-verb only when it lands), and so the only ones that can leave a retained
-// candidate behind. Their end trigger releases the candidates whose result Work has recorded: the sweep reads
-// Land's whole operation journal, a cost a land already dwarfs and every other command would pay for nothing.
-function landsWork(verb, positional) {
-  return verb === 'approve' || verb === 'sync-root' || verb === 'promote-to-component' || (verb === 'merge' && positional[0] === 'next');
-}
+// A worktree made outside fgOS's own lifecycle (a plain `git worktree add`, an external harness's worktree tool;
+// never `fgos pick`/`take`, which strip `.fgos/` per ADR0020, nor `fgos session start`, which symlinks it) inherits
+// a real but frozen-at-branch-point `.fgos/`. Because it exists, the `store: 'require'` refusal never fires and
+// `dataDir()`'s cwd-strict resolution accepts the snapshot as the live store. Every invocation that writes the
+// shared store says so with `mutatesStore` and is refused from there. Left unmarked on purpose: `setup`, `doctor`,
+// `uninstall` and `git` (they resolve the main checkout themselves), `tool` (writes only the local status overlay),
+// and the verbs with a worktree guard of their own (`init`, `approve`, `sync-root`, `promote-to-component`,
+// `catchup`, `unclaim`, `return`, whose own registered-session check is deliberately more permissive).
 // A Work command's seal is not waited for: the answer is already printed, so the pending seals go to one short detached
 // `fgos events seal` child that certifies everything open and exits. No child (spawn failed, or killed first) loses
 // nothing: the events are durable and the next command or the `event-store-incidents` pointer covers them (spec §16).
@@ -4883,133 +4826,13 @@ function handSealsToChild() {
 function isEventStoreChild(verb, positional, flags) {
   return verb === 'events' && (positional[0] === 'seal' || (positional[0] === 'sync' && flags.opportunistic === true));
 }
+// A verb that opens the Event Store carries the opportunistic seal and publish triggers of spec §16 at its start and end.
 function opensEventStore(entry, verb, positional, flags) {
   // The seal child does exactly one seal: no start or end trigger (no second seal sweep, no publish) around it.
   if (verb === 'events' && positional[0] === 'seal') return false;
   // The publish child does one opportunistic sync and nothing around it, or its own end trigger would start another child.
   if (verb === 'events' && positional[0] === 'sync' && flags.opportunistic) return false;
-  return !!(entry?.requiresExistingStore || STORE_MISSING_WARNING_VERBS.has(verb) || EVENT_STORE_LIFECYCLE_VERBS.has(verb));
-}
-
-// State/root-resolution investigation (docs/history/agent-coordination-state-root):
-// a worktree made OUTSIDE fgOS's own lifecycle (a plain `git worktree add`,
-// or an external harness's own worktree tool -- never `fgos pick`/`take`'s
-// `createWorktree`, which strips `.fgos/` per ADR0020, nor `fgos session
-// start`, which symlinks it) inherits a REAL, git-tracked, but
-// frozen-at-branch-point `.fgos/` snapshot. Because `.fgos/` exists there,
-// the `requiresExistingStore` ENOENT guard just above never fires, and
-// `dataDir()`'s cwd-strict resolution (D5) silently accepts that
-// disconnected snapshot as if it were the live store.
-//
-// This is a hand-verified classification, not `entry.touchesState`
-// (COMMAND_REGISTRY) alone -- RFC-review-lite round `coord_state_root_rfc_20260909`
-// found that flag too coarse for several verbs. EVERY `touchesState: true`
-// verb (44 total) was individually read in this file's own `case` block for
-// this pass -- not just the ones a reviewer happened to name -- to sort into
-// exactly one of:
-//
-// 1. `MUTATING_ONLY_VERBS` -- a single id/text argument, no subcommand
-//    branching, always mutating when it reaches its handler at all.
-// 2. `MUTATING_SUBCOMMAND_PREDICATES` -- genuinely mixed: a real read-only
-//    invocation shape exists alongside a real mutating one. Each entry is a
-//    `(positional, flags) => boolean` answering "does THIS invocation
-//    mutate", read off that verb's own case block, never guessed:
-//      - `session`: `start`/`end`/`gc` mutate, `list` reads. `repoRoot`
-//        here is raw `process.cwd()` (see the case block), not
-//        `resolveMainCheckoutRoot` -- unlike group 4 below, this one
-//        genuinely needs the guard.
-//      - `goal`: `set` mutates (`setFocus`), `show` reads (`goalFocusShow`).
-//      - `gateway`: `start`/`stop` mutate the gateway process/registry,
-//        `status` only reads it.
-//      - `knowledge`: `attest` mutates, `status` only reads (`rebuild` +
-//        filtering, no write call).
-//      - `events`: `sync` mutates, `status` and `export` read.
-//      - `rebuild`: every invocation replaces the consumer caches.
-//      - `coordination`: `run`/`launch-master-loop` dispatch and can close
-//        a session; `show`/`chain` are explicitly commented "never appends
-//        an event" in their own case block.
-//      - `merge`: `next` mutates (`mergeNext`), `list` only reads
-//        (`mergeList`) -- found during this verification, named by neither
-//        RFC-review objector.
-//      - `evolve`: contrary to the RFC-review round's own objector claim
-//        ("bare vs. `--pick`"), the case block's own D15 comment says
-//        `--submit <id>` is the ONLY mutating action on the whole
-//        evolve/Gate A surface -- bare `evolve` AND `evolve --pick` are
-//        both read-only (rank/inspect candidates, no write). Re-verified
-//        against the current code rather than trusted secondhand.
-//      - `dispatch`: `show-run`/`watch` never write; `recover` writes a
-//        Run's own controlEpoch/recovery-commands.jsonl only when --action
-//        is given (the bare observe form stays as read-only as show-run).
-// 3. Deliberately NOT guarded, already self-correcting via
-//    `resolveMainCheckoutRoot(process.cwd())` when `--dir` is omitted (own
-//    case-block comments, same mechanism `approve`/`sync-root`/
-//    `promote-to-component`/`catchup`/`unclaim` already use, so a second
-//    guard here would be redundant, not additive): `setup`, `doctor`,
-//    `uninstall`, `git` (writes the Git WAL, never `.fgos/` state).
-// 4. Deliberately NOT guarded, not the shared-truth hazard this guard
-//    exists for -- each writes only a local, per-checkout, gitignored
-//    artifact by design, never a shared event: `tool` (both `check`, which
-//    writes only `.fgos/`'s local status overlay per its own case-block
-//    comment, and `query`, pure read).
-// 5. Deliberately NOT guarded, not an `.fgos` event-log operation at all --
-//    `preflight` resolves its own root independently via `git rev-parse
-//    --show-toplevel` against `--dir`-or-cwd, never through `dir`/`state.json`.
-// 6. Already excluded, each with its own dedicated, already-tested
-//    worktree guard predating this investigation entirely: `init` (own
-//    dedicated check just below), `approve`/`sync-root`/
-//    `promote-to-component`/`catchup`/`unclaim` (own `repoRoot`, own
-//    `isMainWorktree` guard), and `return` -- found the hard way (a live
-//    regression during this verification pass, not caught by only
-//    sampling the first ~15 lines of its case block the way the other 20
-//    verbs in group 1 were confirmed safe): `return`'s own registered-
-//    session check (`insideRegisteredSession` via `listSessions` +
-//    `isMainWorktree(repoRoot)`, ~line 3862) is deliberately MORE
-//    permissive than this guard's own `isSessionWorktree` -- it exempts
-//    ANY registered session worktree, spike-proven correct there, with
-//    its own distinct refusal message an existing test
-//    (`test/cli/fgos-return.test.mjs`) already pins. A second, differently-
-//    worded guard ahead of it would only ever preempt it, never add
-//    coverage. This file's own `return` case block is ~360 lines, by far
-//    the longest of the 21 candidates -- the lesson generalized: a short
-//    block sampled at its start is reliable, a long one is not, without
-//    reading (or grepping for `isMainWorktree`/`process.cwd()`) the whole
-//    thing.
-const MUTATING_ONLY_VERBS = new Set([
-  'submit', 'take', 'pick', 'move', 'edit', 'ask', 'answer', 'gate-approve', 'reject',
-  'add', 'discover', 'plan', 'retrospective', 'cleanup', 'compound', 'resolve-park-reason',
-  'handoff', 'handoff-return', 'decision', 'report', 'topic', 'doc',
-]);
-
-const MUTATING_SUBCOMMAND_PREDICATES = {
-  session: (positional) => ['start', 'end', 'gc'].includes(positional[0]),
-  goal: (positional) => positional[0] === 'set',
-  gateway: (positional) => ['start', 'stop'].includes(positional[0]),
-  lock: (positional) => positional[0] === 'fence',
-  knowledge: (positional) => positional[0] === 'attest',
-  // `events sync` publishes the checkout's event refs; `events status` and `events export` only read.
-  events: (positional) => positional[0] === 'sync',
-  // Rebuild replaces every consumer's cache in the shared store root, so a disconnected snapshot must not run it.
-  rebuild: () => true,
-  coordination: (positional, flags) => [
-    'run', 'close', 'launch-master-loop', 'start', 'operation', 'authorize-and-dispatch',
-    'fan-out', 'contribution', 'human-turn', 'disposition', 'specialist-authorize',
-  ].includes(positional[0]) || (positional[0] === 'recover' && flags.action !== undefined),
-  merge: (positional) => positional[0] === 'next',
-  // `dispatch show-run`/`watch` never write; `dispatch recover` writes
-  // (controlEpoch bump + one recovery-commands.jsonl line) only when
-  // --action is given -- the bare observe form stays read-only.
-  dispatch: (positional, flags) => positional[0] === 'recover' && flags.action !== undefined,
-};
-
-// True iff THIS invocation (verb + already-parsed positional/flags) will
-// reach a handler that mutates `.fgos/` state -- the single predicate the
-// disconnected-worktree guard below gates on. Combines groups 1 and 2 above;
-// every other verb answers false (never reaches a mutating handler, or is
-// independently protected already, per groups 3-6).
-function isMutatingInvocation(verb, positional, flags) {
-  if (MUTATING_ONLY_VERBS.has(verb)) return true;
-  const predicate = MUTATING_SUBCOMMAND_PREDICATES[verb];
-  return predicate ? predicate(positional, flags) : false;
+  return !!entry && entry.store !== 'none';
 }
 
 const ALLOWED_HOOK_KINDS = new Set(['dispatch-decide', 'decision-question', 'main-checkout-delete-guard', 'mailbox']);
@@ -5188,6 +5011,7 @@ async function main() {
   let eventStoreLifecycle = null;
   let sweepsLand = false;
   // A dispatched worker seals inline: a detached child would leave the attempt's process domain.
+  const { currentDispatchDepth } = await import('../src/runner/dispatch/adapters.mjs');
   if (currentDispatchDepth() === 0) processSealCoalescer.handOff();
   try {
     const { flags, positional } = parseArgs(rest);
@@ -5206,7 +5030,7 @@ async function main() {
 
     faultClass = 'dir-invalid';
     dir = dataDir(flags.dir);
-    // tsk-4fu-2: a verb registered `requiresExistingStore: true`
+    // tsk-4fu-2: a verb registered `store: 'require'`
     // (command-registry.mjs) reads/writes through this `dir` — refuse
     // before ever reaching its handler when `.fgos/` isn't there yet,
     // instead of letting a write create a fresh, empty one (the worktree
@@ -5221,38 +5045,21 @@ async function main() {
       process.exit(4);
     }
     faultClass = 'store-missing';
-    if (entry?.requiresExistingStore && !fs.existsSync(dir)) {
+    if (entry?.store === 'require' && !fs.existsSync(dir)) {
       throw new StoreError(
         'validation',
         `.fgos/ not found at "${dir}" -- run "fgos init" here first, or check you are not inside a linked worktree (worktrees never carry .fgos/, per ADR0020: docs/platform/runner/decisions/h-36d872fbb0e5.md#0020--chặn-fgos-khỏi-worktree-worker-không-khóa-không-cô-lập).`,
       );
     }
-    // State/root-resolution investigation: a disconnected-snapshot hazard
-    // remains distinct from the ENOENT case just above — a worktree made
-    // outside fgOS's own lifecycle carries a real, frozen `.fgos/` copy
-    // that reads/writes here would silently target instead of the live
-    // main store. `fs.existsSync(dir)` is REQUIRED here, not implied by the
-    // ENOENT check above: that check only throws for
-    // `requiresExistingStore: true` verbs (every `MUTATING_ONLY_VERBS`
-    // member is one), but `MUTATING_SUBCOMMAND_PREDICATES` also covers
-    // `session`, whose `requiresExistingStore` is `false` BY DESIGN --
-    // `fgos session start` from inside a genuinely `.fgos/`-less
-    // ADR0020-stripped worktree is the exact legitimate case that verb
-    // exists to serve (D10: symlink `.fgos/` INTO a worktree that does not
-    // have it yet), and would be wrongly refused here without this check
-    // (found live: a real regression in
-    // `test/cli/fgos-session.test.mjs` during this pass's own full-suite
-    // verification). Skipped entirely when `--dir` was passed explicitly
-    // (tsk-56t D1's own escape hatch — the caller took responsibility for
-    // that root already, evaluating `isMainWorktree`/`isSessionWorktree`
-    // against `process.cwd()` in that case would check the wrong root).
-    // `isSessionWorktree` (never just a bare `.fgos` symlink presence check
-    // — see its own doc comment) admits the one other legitimate non-main
-    // case, an ALREADY-CREATED `fgos session start` worktree.
+    // A worktree made outside fgOS's own lifecycle carries a real, frozen `.fgos/` copy, so the missing-store refusal above
+    // never fires for it. `fs.existsSync(dir)` is required here, not implied: `fgos session start` from a `.fgos/`-less
+    // ADR0020-stripped worktree is the legitimate case that verb serves (it symlinks `.fgos/` in). Skipped when `--dir` was
+    // passed: the caller took responsibility for that root, and `isMainWorktree(process.cwd())` would check the wrong one.
+    // `isSessionWorktree` admits the one other legitimate non-main case, an already-created `fgos session start` worktree.
     faultClass = 'disconnected-worktree-store';
     if (
       flags.dir === undefined &&
-      isMutatingInvocation(verb, positional, flags) &&
+      declared(entry?.mutatesStore, positional, flags) &&
       fs.existsSync(dir) &&
       !isMainWorktree(process.cwd()) &&
       !isSessionWorktree(process.cwd())
@@ -5270,17 +5077,11 @@ async function main() {
         `"fgos init" refused inside a linked worktree ("${process.cwd()}") -- worktrees never carry .fgos/ by design (ADR0020); run "fgos init" from the main checkout instead.`,
       );
     }
-    // tsk-56t D2: these read verbs are `requiresExistingStore: false` by
-    // design (a fresh non-worktree dir with no store yet is a legitimate
-    // "not evaluated" case, not an error) — but that same tolerance means a
-    // worktree-resident session that forgets `--dir` sees a silent, real-
-    // looking empty view instead of a signal that the actual store lives
-    // elsewhere. `ready`/`triage` can return a bare array when unpaginated
-    // (paginateVerbResult), so this can never be a JSON `data` field without
-    // changing that shape only in this one runtime case — a stderr line
-    // keeps stdout's `data` shape byte-identical in every case, mirroring
-    // this file's existing stdout=data/stderr=diagnostics split above.
-    if (STORE_MISSING_WARNING_VERBS.has(verb) && !fs.existsSync(dir) && !isMainWorktree(process.cwd())) {
+    // tsk-56t D2: a `store: 'read'` verb tolerates a missing store (a fresh non-worktree dir is a legitimate "not evaluated"
+    // case), but a worktree-resident session that forgets `--dir` would then see a silent, real-looking empty view. The
+    // warning goes to stderr: `ready`/`triage` can return a bare array when unpaginated, so a JSON `data` field would change
+    // that shape in this one runtime case.
+    if (entry?.store === 'read' && !fs.existsSync(dir) && !isMainWorktree(process.cwd())) {
       process.stderr.write(
         `fgos: warning: .fgos/ not found at "${dir}" -- this view may be empty because the real store lives elsewhere (worktrees never carry .fgos/, per ADR0020); pass --dir <mainRoot> to read it.\n`,
       );
@@ -5296,7 +5097,7 @@ async function main() {
     // The main checkout is resolved (it runs git) only for a verb that opens the store; the other verbs never pay for it.
     if (opensEventStore(entry, verb, positional, flags)) {
       eventStoreLifecycle = { trustedMain: path.dirname(getMainFgosDir(dir)), dispatched: currentDispatchDepth() > 0 };
-      sweepsLand = landsWork(verb, positional);
+      sweepsLand = declared(entry.landsWork, positional);
       // `init` creates the store, so only its end trigger has anything to maintain. A command outside a dispatched worker
       // hands its seals to a child and runs the same seal-if-due policy in its end trigger, so a start trigger would only
       // repeat that work on the print path; a stale or crashed batch is sealed by that end trigger or the child.
@@ -5316,32 +5117,9 @@ async function main() {
     } else {
       process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
     }
-    // `run`, foreground `workflow` and `workflow gate` outcomes map to canonical execution exit codes
-    // (0 pass, 4 policy-refusal, 10 provider-limit, 11 execution-failure, 12 partial-writes,
-    // 13 blocked, 14 findings, RUL99).
-    // `plan-lint` is the verb whose exit code is data-dependent (0 clean, 1 a hard finding present).
-    // `doctor --strict` exits 1 when any check still fails after optional fixes ran.
-    const isExecutionRun = verb === 'run';
-    const isForegroundWorkflow = verb === 'workflow'
-      && ['start', 'resume', 'answer'].includes(positional[0])
-      && flags.foreground === true
-      && data?.status !== 'running'
-      && data?.outcome !== undefined
-      && data?.outcome !== null;
-    const isGateSettle = verb === 'workflow' && positional[0] === 'gate' && typeof data?.outcome === 'string';
-    const doctorFailed = verb === 'doctor' && flags.strict === true && !data.ok;
-
-    if (isExecutionRun && data?.outcome) {
-      process.exitCode = exitCodeForOutcome(data.outcome);
-    } else if (isForegroundWorkflow || isGateSettle) {
-      process.exitCode = exitCodeForOutcome(data.outcome);
-    } else if (verb === 'plan-lint' || (verb === 'workflow' && positional[0] === 'propose')) {
-      process.exitCode = data.ok ? 0 : 1;
-    } else if (doctorFailed || (verb === 'wire-agents' && data.failed?.length > 0)) {
-      process.exitCode = 1;
-    } else {
-      process.exitCode = 0;
-    }
+    // The exit code is the verb's own call (`exitOf` on its registry entry): outcome verbs map to the canonical execution
+    // codes (RUL99), `plan-lint` exits 1 on a hard finding, `doctor --strict` on a failing check. The default is 0.
+    process.exitCode = entry?.exitOf ? entry.exitOf(data, { positional, flags }) : 0;
   } catch (err) {
     // tsk-5z0: record before reporting, and only say the record exists when
     // one actually landed — `recordInvocationFault` returns null when the
@@ -5360,6 +5138,7 @@ async function main() {
     if (recorded) {
       process.stderr.write(`fgos: invocation fault recorded to ${recorded}\n`);
     }
+    const { DispatchError } = await import('../src/run-supervisor/dispatch-error.mjs');
     if (err instanceof DispatchError || (verb === 'dispatch' && err.errorClass && err.errorClass !== 'validation')) {
       process.exitCode = 1;
     } else {
@@ -5377,6 +5156,7 @@ async function main() {
       }
       // A dispatched worker never releases: only the clone owner's own session does (D13).
       if (sweepsLand && !eventStoreLifecycle.dispatched) {
+        const { releaseRecordedLand } = await import('../src/runner/merge.mjs');
         for (const warning of releaseRecordedLand(eventStoreLifecycle.trustedMain).warnings) process.stderr.write(`fgos: warning: Land candidate release: ${warning}\n`);
       }
     }

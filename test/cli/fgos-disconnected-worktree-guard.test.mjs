@@ -5,8 +5,8 @@
 // `createWorktree` (ADR0020-stripped) nor `fgos session start`
 // (symlinked)) can carry a real, git-tracked, but frozen-at-branch-point
 // `.fgos/` snapshot. Because that snapshot physically exists, the
-// pre-existing `requiresExistingStore` ENOENT guard never fires, and a
-// MUTATING_ONLY_VERBS verb run there without `--dir` would silently
+// pre-existing `store require` ENOENT guard never fires, and a
+// mutatesStore: true verb run there without `--dir` would silently
 // read/write that disconnected snapshot instead of the live main store.
 //
 // Five scenarios, matching this investigation's own acceptance criteria:
@@ -63,7 +63,7 @@ function addDisconnectedAdHocWorktree(cwd, branch) {
 
 // --- Scenario 1: main checkout -----------------------------------------
 
-test('disconnected-worktree guard: a MUTATING_ONLY_VERBS verb succeeds normally from the real main checkout', () => {
+test('disconnected-worktree guard: a mutatesStore: true verb succeeds normally from the real main checkout', () => {
   const cwd = initGitCwdMainWithCommittedFgos();
   const result = run(cwd, ['submit', 'a task from main', '--async']);
   assert.equal(result.status, 0, result.stderr);
@@ -71,7 +71,7 @@ test('disconnected-worktree guard: a MUTATING_ONLY_VERBS verb succeeds normally 
 
 // --- Scenario 2: linked worktree with a real disconnected .fgos/ -------
 
-test('disconnected-worktree guard: refuses a MUTATING_ONLY_VERBS verb from an ad-hoc worktree carrying a real disconnected .fgos copy', () => {
+test('disconnected-worktree guard: refuses a mutatesStore: true verb from an ad-hoc worktree carrying a real disconnected .fgos copy', () => {
   const main = initGitCwdMainWithCommittedFgos();
   const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-branch');
   try {
@@ -89,7 +89,7 @@ test('disconnected-worktree guard: refuses a MUTATING_ONLY_VERBS verb from an ad
   }
 });
 
-test('disconnected-worktree guard: a non-MUTATING_ONLY_VERBS verb (list) is unaffected by the guard from the same disconnected worktree', () => {
+test('disconnected-worktree guard: a non-mutatesStore: true verb (list) is unaffected by the guard from the same disconnected worktree', () => {
   const main = initGitCwdMainWithCommittedFgos();
   const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-branch-read');
   try {
@@ -123,7 +123,7 @@ test('disconnected-worktree guard: --dir <mainRoot> bypasses the guard and the e
 
 // --- Scenario 5: concurrent/session invocation --------------------------
 
-test('disconnected-worktree guard: a MUTATING_ONLY_VERBS verb succeeds from a genuine "fgos session start" worktree', () => {
+test('disconnected-worktree guard: a mutatesStore: true verb succeeds from a genuine "fgos session start" worktree', () => {
   const main = initGitCwdMainWithCommittedFgos();
   const sess = createSession(main, { sessionId: 'guard-test-session' });
   try {
@@ -136,7 +136,7 @@ test('disconnected-worktree guard: a MUTATING_ONLY_VERBS verb succeeds from a ge
 
 // --- `return` explicitly, since the master prompt's own acceptance
 // criteria name it by verb ("pick/return/approve") -- deliberately NOT
-// added to MUTATING_ONLY_VERBS (see that set's own doc comment): its case
+// added to mutatesStore: true (see that set's own doc comment): its case
 // block already has its own, more permissive, already-tested worktree
 // guard (registered-session-aware, ~line 3862) predating this guard
 // entirely. This test only pins that this guard's own message never fires
@@ -155,7 +155,7 @@ test('disconnected-worktree guard: "return" is unaffected by this guard (it alre
   }
 });
 
-// --- MUTATING_SUBCOMMAND_PREDICATES: per-invocation classification ------
+// --- mutatesStore predicates: per-invocation classification ------
 // Refusal happens BEFORE the verb's own handler runs (this guard sits ahead
 // of `runVerb` in main()), so the mutating-subcommand cases below are safe
 // and cheap to exercise for real even for verbs whose real handler would
@@ -245,24 +245,20 @@ test('disconnected-worktree guard: "events sync" and "rebuild" are refused, "eve
   }
 });
 
-test('disconnected-worktree guard: "coordination run"/"coordination launch-master-loop" are refused, "coordination show"/"coordination chain" are unaffected', () => {
+test('disconnected-worktree guard: "lock fence" and "dispatch recover --action" are refused, "dispatch recover" without --action is unaffected', () => {
   const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-coordination');
+  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-lock-dispatch');
   try {
-    const runResult = run(wt, ['coordination', 'run', '--file', 'does-not-matter.json']);
-    assert.equal(runResult.status, 4, runResult.stderr);
-    assert.match(runResult.stderr, /disconnected snapshot/);
+    const fenceResult = run(wt, ['lock', 'fence', 'some-lock']);
+    assert.equal(fenceResult.status, 4, fenceResult.stderr);
+    assert.match(fenceResult.stderr, /disconnected snapshot/);
 
-    const launchResult = run(wt, ['coordination', 'launch-master-loop', '--plan', 'x', '--objective', 'x', '--writer-id', 'x']);
-    assert.equal(launchResult.status, 4, launchResult.stderr);
-    assert.match(launchResult.stderr, /disconnected snapshot/);
+    const recoverResult = run(wt, ['dispatch', 'recover', 'run_does_not_exist', '--action', 'x']);
+    assert.equal(recoverResult.status, 4, recoverResult.stderr);
+    assert.match(recoverResult.stderr, /disconnected snapshot/);
 
-    // show/chain reach their real (read-only) handlers, which then fail for
-    // an ORDINARY reason (unknown id/track) -- never this guard's message.
-    const showResult = run(wt, ['coordination', 'show', 'coord_does_not_exist']);
-    assert.doesNotMatch(showResult.stderr, /disconnected snapshot/);
-    const chainResult = run(wt, ['coordination', 'chain', 'track-does-not-exist']);
-    assert.doesNotMatch(chainResult.stderr, /disconnected snapshot/);
+    // The bare observe form reaches its own read-only handler, which answers for its own reason.
+    assert.doesNotMatch(run(wt, ['dispatch', 'recover', 'run_does_not_exist']).stderr, /disconnected snapshot/);
   } finally {
     execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
   }

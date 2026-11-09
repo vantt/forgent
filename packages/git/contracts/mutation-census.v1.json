@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7878d20cda51147d5a9d40e288ad9ab5f1783a329d1a498265ca2a2c53f644d4",
+  "payloadDigest": "5f3c5f9b16dfee9ca8fd6d9824da55cfffcf6735771d01adcae3368dba46dc06",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -114,7 +114,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "94f320cbc601fcb518c7489525e1c7d692da67e1a2f285e8b12189aee2f42d1a",
-    "bin/fgos.mjs": "8ab4109d6c7e5de88a8a0cdf3b03936fa6fb7b72a0a378f67528a7cc38298eb0",
+    "bin/fgos.mjs": "02c005577c07fb6c4a892342f27df8cd7792fdb053e88335f68a8714faf647b0",
     "core/skills/_shared/ak-cook-worker-contract.md": "1e005478387f64d521153b92948d3de5bf93f99d7b5c27dd78fbcaa8e6a9bd61",
     "core/skills/_shared/capability-catalog.md": "4299584409592ac4ae9668cd0cb4dd0442edc1c78a42ccd9cfe0bae22bf11bc4",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
@@ -899,11 +899,11 @@
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
     "src/cli/approve-fault-log.mjs": "a8ecea5b3e88edee075579ee256fae18aae2188bd87aea6d9165d89c9e587122",
-    "src/cli/command-registry.mjs": "cbabd48f6482e20cb8d3e3d5467910a3d13babcea7ad3b71c879400f466dc755",
+    "src/cli/command-registry.mjs": "49440ea96d6e9c849e3ae9e828712f39f144fb8050c5c182a02f3f65ef190311",
     "src/cli/deprecation.mjs": "45e7d11ad8681fc89e4c99f4ef53b7c93a477f6b5fdd6708eddcf0b579dd3985",
     "src/cli/detached-child.mjs": "e1620a059b18b4f07905e588aa1b9becb05304edc1764c0aa486637892352a36",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
-    "src/cli/invocation-fault-log.mjs": "d082dfa9e1a4b5b053b6f2c6bcfc08f252fa5e22ccc1cffcf7e57055f88d7e91",
+    "src/cli/invocation-fault-log.mjs": "31e7f59436d240d2a519312130929af4f769d617ae890ea0bcdb299736a89ea2",
     "src/cli/parse-args.mjs": "76147fe19de53a01c72d569853e83509df2e6106411a25063a58eafd47de9076",
     "src/cli/version.mjs": "ccccc691aa2e9a844d7724cf38da60fe05b7cac96134e01e825ef2392a353146",
     "src/config/facade.mjs": "9a72e8a5bd937c64309057cbacdccc7cc6eebeaa96b3281b6e2da0cee70312c7",
@@ -1177,7 +1177,8 @@
     "src/state/runtime-coordination.mjs": "e546b13c02a8ae1c903fe5a0bb0974dcc41f85526a82111b8d82f0c925bb8ca5",
     "src/state/status-fsm.mjs": "5ce5ea8447ccdc0b4f00f13eca95de69a38effa139b788035fcd5e04b4330a1c",
     "src/state/step-fsm.mjs": "bf1e935a355d2fbb7b8a5f0927138dea21b21c6226fe5a442c22bd1875445625",
-    "src/state/store.mjs": "61f9937d95bff69cb372b5a3ff86ed6b7e17223132635edc1d58befb82e4f282",
+    "src/state/store-error.mjs": "0584ae8ee56fcdd6ee64d0d2e87b46d5aaf635775b1b851040ecacd8f9aab0d5",
+    "src/state/store.mjs": "c7111b0279932ed03921c9f284732dcd7bd7c4bba7a42036dd54af5be69d074a",
     "src/state/tool-registry.mjs": "dd93124b68c1bc5589481d3a9220d19d25ea0f0eaa3b08e2c72e2098ac5f4991",
     "src/state/work-event-store.mjs": "a1e9476269ed8da9af7defe9d4b8201232276b15d75a7619e7bbabf022cdf22e",
     "src/state/work.mjs": "e791dcc0dec278838723d7fa0ffeb4ea3eea06c6ba88c7e4ebee4a8d2f553aa8",
@@ -2045,14 +2046,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3473,
+      "line": 3462,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3617,
+      "line": 3606,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"

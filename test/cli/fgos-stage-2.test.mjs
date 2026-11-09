@@ -85,7 +85,7 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-// tsk-5iv D3 (round-3 review, MEDIUM): same STORE_MISSING_WARNING_VERBS gap
+// tsk-5iv D3 (round-3 review, MEDIUM): same read-store verbs gap
 // again, found in `evolve` -- `rankCandidates` over an empty-store view
 // silently returns `[]` instead of the real candidate list.
 

@@ -3,7 +3,7 @@
 // current checkout (no node_modules read required), closing the friction
 // found while researching the global-install stage/verb skew. Same
 // lightweight tmpCwd()/run() harness as fgos-help.test.mjs -- this verb
-// needs no `.fgos/` store (requiresExistingStore: false).
+// needs no `.fgos/` store (store is not require).
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

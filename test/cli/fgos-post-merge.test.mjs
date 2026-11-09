@@ -110,14 +110,14 @@ test('the same state verb with no --dir, from the same .fgos/-less worktree cwd,
 test('doc-sources from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent count: 0', () => {
   const { wt } = tmpLinkedWorktree();
   const result = run(wt, ['doc-sources', 'docs/some-doc.md']);
-  assert.equal(result.status, 0, 'doc-sources is requiresExistingStore:false -- it warns, never refuses');
+  assert.equal(result.status, 0, 'doc-sources has a store that is not required: -- it warns, never refuses');
   assert.match(result.stderr, /\.fgos\/ not found/);
   assert.deepEqual(envelopeData(result.stdout), { docPath: 'docs/some-doc.md', count: 0, captures: [] });
 });
 
 
 // tsk-5iv D3: docs-index was investigated for the same fix and found NOT
-// to belong in STORE_MISSING_WARNING_VERBS -- its docPath/title entries
+// to belong in read-store verbs -- its docPath/title entries
 // come from a real docs/ scan under repoRoot, correct regardless of
 // .fgos/ presence, so a "may be empty" warning would be actively
 // misleading. Pins that this stays true: same docs/ content, same
@@ -134,7 +134,7 @@ test('docs-index from a .fgos/-less linked worktree with no --dir gives the SAME
   assert.equal(mainResult.stderr, '', 'main checkout run must never warn');
 
   const wtResult = run(wt, ['docs-index']);
-  assert.equal(wtResult.status, 0, 'docs-index is requiresExistingStore:false -- it never refuses');
+  assert.equal(wtResult.status, 0, 'docs-index has a store that is not required: -- it never refuses');
   assert.equal(wtResult.stderr, '', 'docs-index must never warn -- unlike gate-bypass/evolve, its answer is not distorted by a missing .fgos/');
   assert.equal(
     envelopeData(wtResult.stdout).length,

@@ -85,7 +85,7 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-// tsk-56t D2: `list`/`ready`/etc. stay `requiresExistingStore: false` (a
+// tsk-56t D2: `list`/`ready`/etc. stay `store is not require` (a
 // fresh non-worktree dir with no store is legitimately "not evaluated",
 // not an error) — but a worktree-resident session that forgets `--dir`
 // should not read that as "no open work" with zero signal. One

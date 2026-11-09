@@ -5,7 +5,7 @@
 // which cwd (the p-af05e742 / p-4c81ca74 investigations both hit this).
 //
 // Scope is deliberately narrow. Only faults raised in `main()`'s pre-handler
-// region are recorded — unknown verb, the `requiresExistingStore` refusal,
+// region are recorded — unknown verb, the `store require` refusal,
 // the `init`-inside-worktree refusal, a bad `--dir`, and arg parsing. A
 // refusal raised inside a verb's own handler ("work X not found", an Iron Law
 // trip, a held lock) is correct behavior rather than misuse, and is never
@@ -23,7 +23,7 @@
 //       recording at all;
 //   (b) it never creates `.fgos/`. A linked worktree carries no store by
 //       design (ADR0020), and auto-vivifying one is the exact hazard the
-//       `requiresExistingStore` guard exists to close. When the resolved
+//       `store require` guard exists to close. When the resolved
 //       store is absent, the record goes to the main checkout's existing
 //       store or nowhere.
 //

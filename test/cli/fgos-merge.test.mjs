@@ -155,7 +155,7 @@ test('merge list: unknown sub-verb is rejected as validation, exit 4', () => {
   assert.equal(result.status, 4);
 });
 
-// tsk-66x: `merge` is a `requiresExistingStore: true` verb (like `submit`/
+// tsk-66x: `merge` is a `store: require` verb (like `submit`/
 // `approve`) -- a missing `.fgos/` must refuse loudly, never fold silently
 // into an empty-but-valid-looking ready/waiting/conflicts result.
 test('merge list on a directory with no .fgos/ at all is refused, exit 4, writes nothing (no auto-vivify)', () => {

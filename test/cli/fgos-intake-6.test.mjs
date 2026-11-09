@@ -85,7 +85,7 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-// tsk-4fu-2: requiresExistingStore guard (command-registry.mjs) — a
+// tsk-4fu-2: store require guard (command-registry.mjs) — a
 // state-write verb no longer silently auto-vivifies `.fgos/` via
 // creating a store itself when it's missing; it refuses instead.
 

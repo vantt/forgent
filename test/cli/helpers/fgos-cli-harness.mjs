@@ -65,13 +65,13 @@ const DEFAULT_CLI_SESSION_ID = 'fgos-cli-harness-test';
 // A fresh scratch dir with no `.fgos/` at all — never auto-inited. Only
 // the handful of tests that specifically exercise pre-init/first-init
 // behavior (the `init` verb's own tests, and tsk-4fu-2's new
-// `requiresExistingStore` guard tests) should use this directly; every
+// `store require` guard tests) should use this directly; every
 // other test wants `tmpCwd()` below.
 function rawTmpCwd() {
   return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-')));
 }
 
-// tsk-4fu-2: `fgos init` is no longer implicit — every `requiresExistingStore`
+// tsk-4fu-2: `fgos init` is no longer implicit — every `store require`
 // verb (command-registry.mjs) now refuses when `.fgos/` doesn't exist yet,
 // instead of silently auto-vivifying it. This suite's ~340 call sites all
 // want a ready-to-use store, not a test of that guard itself, so `tmpCwd()`

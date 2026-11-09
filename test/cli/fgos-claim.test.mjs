@@ -93,7 +93,7 @@ import {
 test('lock-status from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent "free"', () => {
   const { wt } = tmpLinkedWorktree();
   const result = run(wt, ['lock-status']);
-  assert.equal(result.status, 0, 'lock-status is requiresExistingStore:false -- it warns, never refuses');
+  assert.equal(result.status, 0, 'lock-status has a store that is not required: -- it warns, never refuses');
   assert.match(result.stderr, /\.fgos\/ not found/);
   assert.equal(envelopeData(result.stdout).mainCheckout.outcome, 'free', 'the structurally-forced empty-store answer, never silently trusted as a real lock read');
 });
@@ -194,7 +194,7 @@ test('main-checkout-reset forward without --confirm updates clean tracked .fgos 
 });
 
 
-test('session start inside a .fgos/-less linked worktree still succeeds (D10 symlink actor exempt from the requiresExistingStore guard)', () => {
+test('session start inside a .fgos/-less linked worktree still succeeds (D10 symlink actor exempt from the store require guard)', () => {
   const { wt } = tmpLinkedWorktree();
   assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
   const result = run(wt, ['session', 'start']);

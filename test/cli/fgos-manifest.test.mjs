@@ -59,10 +59,10 @@ test('manifest verb-name set equals the set of verbs runVerb() actually dispatch
   assert.deepEqual(registered, dispatched);
 });
 
-test('every registry entry has touchesState, externalEffect, paginated, requiresExistingStore booleans and the required keys', () => {
-  const baseKeys = ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'requiresExistingStore', 'touchesState'];
+test('every registry entry has touchesState, externalEffect, paginated booleans, a store mode and the required keys', () => {
+  const baseKeys = ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'store', 'touchesState'];
   for (const entry of COMMAND_REGISTRY) {
-    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : [])].sort();
+    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['exitOf', 'mutatesStore', 'landsWork'].filter((k) => entry[k] !== undefined)].sort();
     assert.deepEqual(
       Object.keys(entry).sort(),
       expectedKeys,
@@ -71,14 +71,14 @@ test('every registry entry has touchesState, externalEffect, paginated, requires
     assert.equal(typeof entry.touchesState, 'boolean', `entry "${entry.name}" has invalid touchesState "${entry.touchesState}"`);
     assert.equal(typeof entry.externalEffect, 'boolean', `entry "${entry.name}" has invalid externalEffect "${entry.externalEffect}"`);
     assert.equal(typeof entry.paginated, 'boolean', `entry "${entry.name}" has invalid paginated "${entry.paginated}"`);
-    assert.equal(typeof entry.requiresExistingStore, 'boolean', `entry "${entry.name}" has invalid requiresExistingStore "${entry.requiresExistingStore}"`);
-    // tsk-4fu-2: requiresExistingStore can only be true when touchesState is
+    assert.ok(['none', 'open', 'read', 'require'].includes(entry.store), `entry "${entry.name}" has invalid store "${entry.store}"`);
+    // tsk-4fu-2: a verb that requires the store can only do so when touchesState is
     // also true — a verb that never writes .fgos/ has no business requiring
     // it to pre-exist either. init is the sole, deliberate exception: it
     // legitimately writes .fgos/ (touchesState: true) but is exempt from
     // this guard because its whole job is creating that directory.
-    if (entry.requiresExistingStore) {
-      assert.ok(entry.touchesState, `entry "${entry.name}" has requiresExistingStore without touchesState`);
+    if (entry.store === 'require') {
+      assert.ok(entry.touchesState, `entry "${entry.name}" requires the store without touchesState`);
     }
     assert.equal(typeof entry.name, 'string');
     assert.ok(entry.name.length > 0);
@@ -91,6 +91,34 @@ test('every registry entry has touchesState, externalEffect, paginated, requires
   }
 });
 
+test('mutatesStore and landsWork are true or a predicate, and sit only on a verb that touches state', () => {
+  // Why no existing test proves it: the key-set test above only checks which keys exist, not their shape.
+  for (const entry of COMMAND_REGISTRY) {
+    for (const key of ['mutatesStore', 'landsWork']) {
+      if (entry[key] === undefined) continue;
+      assert.ok(entry[key] === true || typeof entry[key] === 'function', `entry "${entry.name}" has invalid ${key}`);
+      assert.ok(entry.touchesState, `entry "${entry.name}" declares ${key} without touchesState`);
+    }
+    if (entry.exitOf !== undefined) assert.equal(typeof entry.exitOf, 'function', `entry "${entry.name}" has a non-function exitOf`);
+  }
+});
+
+test('exitOf maps a result to its exit code and leaves every other verb at 0', () => {
+  const exitOf = (name) => COMMAND_REGISTRY.find((e) => e.name === name).exitOf;
+  assert.equal(exitOf('run')({ outcome: 'blocked' }), 13);
+  assert.equal(exitOf('run')({ outcome: 'pass' }), 0);
+  assert.equal(exitOf('plan-lint')({ ok: false }), 1);
+  assert.equal(exitOf('wire-agents')({ failed: ['x'] }), 1);
+  assert.equal(exitOf('wire-agents')({ failed: [] }), 0);
+  assert.equal(exitOf('doctor')({ checks: [{ passed: false }] }, { flags: { strict: true } }), 1);
+  assert.equal(exitOf('doctor')({ checks: [{ passed: false }] }, { flags: {} }), 0);
+  const workflow = exitOf('workflow');
+  assert.equal(workflow({ outcome: 'findings' }, { positional: ['start'], flags: { foreground: true } }), 14);
+  assert.equal(workflow({ outcome: 'findings', status: 'running' }, { positional: ['start'], flags: { foreground: true } }), 0);
+  assert.equal(workflow({ outcome: 'blocked' }, { positional: ['gate'], flags: {} }), 13);
+  assert.equal(workflow({ ok: false }, { positional: ['propose'], flags: {} }), 1);
+});
+
 test('docs-index registry flags reflect what the verb actually does (tsk-1wn D2/D4)', () => {
   const entry = COMMAND_REGISTRY.find((e) => e.name === 'docs-index');
   assert.ok(entry, 'docs-index entry not found in COMMAND_REGISTRY');
@@ -100,9 +128,9 @@ test('docs-index registry flags reflect what the verb actually does (tsk-1wn D2/
   // touchesState: false -- it never appends an event or overwrites
   // .fgos/state.json.
   assert.equal(entry.touchesState, false);
-  // requiresExistingStore stays false (D4): flipping it would need
+  // store stays 'open', never 'require' (D4): 'require' would need
   // touchesState: true too (the invariant above), which would be false.
-  assert.equal(entry.requiresExistingStore, false);
+  assert.equal(entry.store, 'open');
 });
 
 test('no duplicate verb names in the registry', () => {
