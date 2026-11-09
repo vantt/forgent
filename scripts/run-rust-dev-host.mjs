@@ -8,6 +8,7 @@ import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
 import { gitAddonDirectory } from './lib/git-addon-stage.mjs';
 import { processesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
 import { scan } from '../src/native/process-identity.mjs';
+import { refuseSymlink } from '../src/util/refuse-symlink.mjs';
 
 const checkoutRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -16,13 +17,7 @@ function assertLocalPath(relativePath) {
   let current = checkoutRoot;
   for (const segment of relativePath.split('/')) {
     current = path.join(current, segment);
-    try {
-      if (fs.lstatSync(current).isSymbolicLink()) {
-        throw new Error(`Refusing symlink in development artifact path: ${current}`);
-      }
-    } catch (error) {
-      if (error.code !== 'ENOENT') throw error;
-    }
+    refuseSymlink(current, 'development artifact path', { optional: true });
   }
 }
 

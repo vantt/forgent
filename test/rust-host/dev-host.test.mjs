@@ -151,7 +151,7 @@ for (const relative of ['.fgos', '.fgos/runtime', '.fgos/runtime/dev-host', 'bin
       fs.symlinkSync(outside, destination, isFile ? 'file' : 'dir');
       const result = f.run(['list', '--json'], { INIT_CWD: f.subdir });
       assert.equal(result.status, 1);
-      assert.match(result.stderr, /Refusing symlink/);
+      assert.match(result.stderr, /Symlink refused in development artifact path/);
       if (isFile) assert.equal(fs.readFileSync(outside, 'utf8'), 'untouched');
       else assert.deepEqual(fs.readdirSync(outside), []);
     } finally { f.cleanup(); }

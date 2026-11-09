@@ -888,7 +888,7 @@ test('a link in a skill source or target is refused by name and never followed',
   };
   for (const [label, makeLink] of Object.entries(cases)) {
     const root = sourceWith(makeLink);
-    assert.throws(() => assembleSkills(root), /symbolic link in a skill path/, label);
+    assert.throws(() => assembleSkills(root), /Symlink refused in a skill path/, label);
     assert.ok(!fs.existsSync(path.join(root, '.agents', 'skills', 'fgos-own', 'link.md')), label);
   }
 
@@ -897,8 +897,8 @@ test('a link in a skill source or target is refused by name and never followed',
   writeInstruction(root);
   fs.mkdirSync(path.join(root, '.agents', 'skills'), { recursive: true });
   fs.symlinkSync(outside, path.join(root, '.agents', 'skills', 'fgos-own'), 'dir');
-  assert.throws(() => assembleSkills(root), /symbolic link in a skill path/);
-  assert.throws(() => renderSkillSurfaces(root), /symbolic link in a skill path/);
+  assert.throws(() => assembleSkills(root), /Symlink refused in a skill path/);
+  assert.throws(() => renderSkillSurfaces(root), /Symlink refused in a skill path/);
   assert.deepEqual(fs.readdirSync(outside), ['secret.md'], 'nothing is written through a link');
 });
 
@@ -1024,7 +1024,7 @@ test('a package skill never overwrites a target own core skill: the copy step ta
   writeSkill(path.join(targetRoot, 'core', 'skills'), 'other-own', SAMPLE_FRONTMATTER, '# other\n');
   fs.symlinkSync(packageRoot, path.join(targetRoot, 'core', 'skills', 'other-own', 'link'), 'dir');
 
-  assert.throws(() => materializeSkillsIntoProject(packageRoot, targetRoot), /symbolic link in a skill path/);
+  assert.throws(() => materializeSkillsIntoProject(packageRoot, targetRoot), /Symlink refused in a skill path/);
 
   assert.ok(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'package-skill', 'SKILL.md')), 'the package own skill is copied');
   assert.equal(fs.existsSync(path.join(targetRoot, '.agents', 'skills', 'shared-name')), false, 'the copy step wrote a skill the package does not own');

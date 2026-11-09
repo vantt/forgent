@@ -21,6 +21,7 @@ import { repositoryDirs, repositoryFiles } from './lib/git-dir-layout.mjs';
 import { fileURLToPath } from 'node:url';
 import { releaseBinaryPath } from '../src/util/release-binary-path.mjs';
 import { releaseTargetForHost, manifestTargetForHost } from '../src/util/release-targets.mjs';
+import { refuseSymlink } from '../src/util/refuse-symlink.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -148,10 +149,7 @@ function collectSourceFiles(baseDir, relativePath, results) {
     throw new Error(`Declared release payload entry does not exist: ${relativePath}`);
   }
 
-  const stat = fs.lstatSync(fullPath);
-  if (stat.isSymbolicLink()) {
-    throw new Error(`Symlink refused in release payload: ${relativePath}`);
-  }
+  const stat = refuseSymlink(fullPath, 'release payload');
 
   if (stat.isFile()) {
     results.push(relativePath);
@@ -242,10 +240,7 @@ function stageProductionDependencies(repoRoot, pkg, legacyNodeRoot) {
       if (ent === 'node_modules' || ent === '.bin') continue;
       const src = path.join(srcDir, ent);
       const dst = path.join(dstDir, ent);
-      const stat = fs.lstatSync(src);
-      if (stat.isSymbolicLink()) {
-        throw new Error(`Symlink refused in release payload dependency: ${src}`);
-      }
+      const stat = refuseSymlink(src, 'release payload dependency');
       if (stat.isDirectory()) {
         copyTree(src, dst);
       } else if (stat.isFile()) {
@@ -367,10 +362,7 @@ export function buildRustDistribution({
   for (const rel of sourceFiles) {
     const srcFull = path.join(resolvedRepo, rel);
     const dstFull = path.join(legacyNodeRoot, rel);
-    const stat = fs.lstatSync(srcFull);
-    if (stat.isSymbolicLink()) {
-      throw new Error(`Symlink refused in release payload: ${rel}`);
-    }
+    const stat = refuseSymlink(srcFull, 'release payload');
     fs.mkdirSync(path.dirname(dstFull), { recursive: true });
     fs.copyFileSync(srcFull, dstFull);
     // Copy executable bit if set
@@ -393,10 +385,7 @@ export function buildRustDistribution({
     for (const ent of entries) {
       const full = path.join(dir, ent);
       const rel = prefix ? prefix + '/' + ent : ent;
-      const lstat = fs.lstatSync(full);
-      if (lstat.isSymbolicLink()) {
-        throw new Error(`Symlink refused in staged tree: ${rel}`);
-      }
+      const lstat = refuseSymlink(full, 'staged tree');
       if (lstat.isDirectory()) {
         collectStagedFiles(full, rel);
       } else if (lstat.isFile()) {

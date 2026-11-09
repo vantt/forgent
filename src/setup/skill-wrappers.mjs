@@ -21,6 +21,7 @@ import path from 'node:path';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
 import { listDomainDirs } from '../util/domain-dirs.mjs';
+import { refuseSymlink } from '../util/refuse-symlink.mjs';
 import { computeInstructionProjection, materializeInstructionProjection } from './instruction-projections.mjs';
 
 const FRONTMATTER_PATTERN = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
@@ -49,26 +50,13 @@ function hasWindowsTrailingDotOrSpace(segment) {
   return normalized !== normalized.replace(/[. ]+$/g, '');
 }
 
-// The one link rule of every skill copy: a symbolic link in a source or target path is refused by
-// name, never followed (a followed link copies foreign bytes or writes outside the root).
-// Returns the entry's stat, or null when the path is absent.
-function lstatPlain(entryPath) {
-  let stat;
-  try {
-    stat = fs.lstatSync(entryPath);
-  } catch (err) {
-    if (err.code === 'ENOENT') return null;
-    throw err;
-  }
-  if (stat.isSymbolicLink()) {
-    throw new Error(`refusing symbolic link in a skill path: ${entryPath} (replace it with the file or directory it points to)`);
-  }
-  return stat;
-}
+// Context named in every symlink refusal of a skill copy: a link in a source or target path is
+// refused by name, never followed.
+const SKILL_PATH = 'a skill path';
 
 function atomicCopyFileSync(sourcePath, targetPath) {
-  lstatPlain(sourcePath);
-  lstatPlain(targetPath);
+  refuseSymlink(sourcePath, SKILL_PATH, { optional: true });
+  refuseSymlink(targetPath, SKILL_PATH, { optional: true });
   if (readIfFile(targetPath)?.equals(fs.readFileSync(sourcePath))) return;
   const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   fs.copyFileSync(sourcePath, tmpPath);
@@ -168,7 +156,7 @@ function ownedSkillDirs(skillsRoot, owned, isStamped) {
   return fs.readdirSync(skillsRoot, { withFileTypes: true }).filter((entry) => {
     if (!owned.has(entry.name) || isOwnTmpFile(entry.name)) return false;
     const dir = path.join(skillsRoot, entry.name);
-    if (!lstatPlain(dir).isDirectory()) return false;
+    if (!refuseSymlink(dir, SKILL_PATH, { optional: true }).isDirectory()) return false;
     if (isStamped && !isStamped(dir) && !fs.readdirSync(dir, { withFileTypes: true, recursive: true }).every((e) => e.isDirectory())) {
       throw new Error(`refusing to write skill directory ${dir}: it carries no fgOS generated marker (remove it, or rename the other skill)`);
     }
@@ -219,7 +207,7 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { o
     const wrapperPath = path.join(wrapperDir, 'SKILL.md');
     const sourceRelativePath = path.relative(wrapperDir, sourcePath).replaceAll('\\', '/');
     const wrapperContent = generateWrapperContent(sourceContent, sourceRelativePath);
-    for (const linkable of [sourcePath, wrapperDir, wrapperPath]) lstatPlain(linkable);
+    for (const linkable of [sourcePath, wrapperDir, wrapperPath]) refuseSymlink(linkable, SKILL_PATH, { optional: true });
     if (!keep?.(wrapperPath, wrapperContent)) {
       fs.mkdirSync(wrapperDir, { recursive: true });
       if (!readIfFile(wrapperPath)?.equals(Buffer.from(wrapperContent))) fs.writeFileSync(wrapperPath, wrapperContent);
@@ -335,7 +323,7 @@ export function createProjectSkillGuard(projectRoot) {
 function copyDirRecursive(sourceDir, targetDir, copyFile = atomicCopyFileSync, keep, present) {
   const outermost = !present;
   present ??= new Set();
-  lstatPlain(targetDir);
+  refuseSymlink(targetDir, SKILL_PATH, { optional: true });
   fs.mkdirSync(targetDir, { recursive: true });
   for (const entry of fs.readdirSync(sourceDir, { withFileTypes: true })) {
     if (isOwnTmpFile(entry.name)) continue;
@@ -577,8 +565,8 @@ function copyAssembledFile(projectRoot, sourcePath, targetPath) {
     return;
   }
 
-  lstatPlain(sourcePath);
-  lstatPlain(targetPath);
+  refuseSymlink(sourcePath, SKILL_PATH, { optional: true });
+  refuseSymlink(targetPath, SKILL_PATH, { optional: true });
   const sourceRelativePath = path.relative(projectRoot, sourcePath).replaceAll('\\', '/');
   const content = withGeneratedHeader(fs.readFileSync(sourcePath, 'utf8'), sourceRelativePath);
   if (readIfFile(targetPath)?.equals(Buffer.from(content))) return;
@@ -642,7 +630,7 @@ export function assembleSkills(
     const present = new Set();
     for (const fragment of sharedFragments) {
       const targetPath = path.join(targetShared, fragment.relativeFragmentPath);
-      lstatPlain(path.dirname(targetPath));
+      refuseSymlink(path.dirname(targetPath), SKILL_PATH, { optional: true });
       fs.mkdirSync(path.dirname(targetPath), { recursive: true });
       copyAssembledFile(projectRoot, path.join(projectRoot, fragment.sourcePath), targetPath);
       present.add(targetPath);

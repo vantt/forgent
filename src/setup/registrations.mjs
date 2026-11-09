@@ -29,6 +29,7 @@ import { fileURLToPath } from 'node:url';
 
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { listDomainDirs } from '../util/domain-dirs.mjs';
+import { refuseSymlink } from '../util/refuse-symlink.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { RELEASE_TARGETS, releaseTargetForHost } from '../util/release-targets.mjs';
 import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
@@ -2757,14 +2758,7 @@ function doctorDriftPath(base, relative = '.', optional = false) {
   let current = path.parse(resolved).root;
   for (const segment of resolved.slice(current.length).split(path.sep).filter(Boolean)) {
     current = path.join(current, segment);
-    let stat;
-    try {
-      stat = fs.lstatSync(current);
-    } catch (error) {
-      if (optional && error.code === 'ENOENT') return null;
-      throw error;
-    }
-    if (stat.isSymbolicLink()) throw new Error(`Symlink refused in checkout diagnosis: ${current}`);
+    if (refuseSymlink(current, 'checkout diagnosis', { optional }) === null) return null;
   }
   return resolved;
 }
