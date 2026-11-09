@@ -60,12 +60,21 @@ does not name `--reply-to` (cross-machine mail has no derived chain today, `remo
    to_machine: Option, due, acked, overdue}`. One method `mark_acked(id, from_machine)`, two callers (local `send`,
    remote ingest). Local watches are judged by the lazy sweep; remote watches only by the sync child.
 3. **Deadline.** `--reply-by` is a duration (`90s`, `30m`, `2h`). Default from one new key
-   `mailbox.ack.replyBySec` (placeholder 3600, reader `core`). Bounds derived from existing keys, no new key:
+   `mailbox.ack.replyBySec` (default 600 = 10 min, owner 2026-11-09: a mail that needs an answer needs it fast; reader `core`). Bounds derived from existing keys, no new key:
    local min `mailbox.inFlightTtlSec`, max `header_horizon_sec()` (`core/src/limits.rs:33-38`, 1 day) so the header
    outlives its deadline; cross-machine min `eventStore.sync.intervalSec + mailbox.remote.clockSkewSec`, max
    `mailbox.remote.maxAgeSec`. Out of range is a usage error (exit usage, not counted). `--reply-by` without
    `--need-ack` is a usage error.
-4. **Clock.** Local: the record clock. Cross-machine: the sender's clock only, and a remote watch turns overdue only
+4. **Two stages, one reply-by (owner debate 2026-11-09).** Measured on fg-server2: recorded-to-offered p50 11 s but p95
+   90 min, because a recipient session sees mail only when it next runs a tool; and builders run 5-17 min between tool
+   calls. A deadline counted from send time would fire "no ack" on a recipient that was never even offered the message,
+   which is a false alarm and the commonest case seen. So: stage 1, the watch is due at `sent + reply-by`; if the message
+   was not offered by then the sender's notice says "not offered yet (recipient idle or machine offline)", not "not
+   acknowledged". Stage 2, once offered (the offered settle already flows back across machines), the watch restarts at
+   `offered + reply-by`; if still unacknowledged then, the notice says "offered, not acknowledged". Remind-once then
+   ask-your-user (decision 7) counts per watch across both stages. A short default (10 min) is therefore safe: the
+   cross-machine floor (sync interval + skew) still applies to `--reply-by`.
+   Clock. Local: the record clock. Cross-machine: the sender's clock only, and a remote watch turns overdue only
    at a sync whose event fetch **started** after `due + clockSkewSec` and succeeded (same rule as the body
    "expired" verdict, `remote.v1.json` receiverStates). A reply fetched later still flips it to "acknowledged late".
    This meets the council condition (spec line 654): no false dead letter from fetch lag.
@@ -230,13 +239,12 @@ ack; no separate `acked` event); decision history §17 (new row). Contracts (cod
 
 ## Questions for the owner
 
-1. Approve the six phases and order (receiver first, nothing flagged crosses machines until all three print the
-   capability line)?
-2. Default reply-by when `--need-ack` has no `--reply-by`: 1 h (placeholder) ok, or require `--reply-by` always?
-3. Payload: optional field in the existing versions (recommended, older receiver still delivers the content) vs a v4
-   that older receivers drop (the wake precedent)?
-4. P6 behaviour run: how many runs and which CLIs (Claude Code + Codex suggested, ~40 runs each)?
-5. Who upgrades fg-server and design-lap in P4 (RULE and LAND, as for bodies)?
+1. DECIDED 2026-11-09: six phases approved, receiver first (nothing flagged crosses machines until all three print the
+   capability line).
+2. Default reply-by when `--need-ack` has no `--reply-by`: DECIDED 2026-11-09, 10 min, two stages (see decision 4).
+3. DECIDED 2026-11-09: optional signed field in the existing versions.
+4. DECIDED 2026-11-09: P6 behaviour run Claude Code + Codex, about 40 runs each.
+5. DECIDED 2026-11-09: RULE and LAND upgrade in P4; lane MAIL messages them by mail when P3 has landed (peer mail is a request, not approval).
 
 Note: the cross-machine minimum reads `CrossMachine.sync_interval_sec`, already on the host's config struct
 (used at `mailbox_remote.rs:506`); no new door.
