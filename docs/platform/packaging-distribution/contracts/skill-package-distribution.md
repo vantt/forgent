@@ -69,7 +69,7 @@ Current build/proof surfaces:
 | Surface | Status | Evidence |
 | --- | --- | --- |
 | Assemble canonical skills from `core/skills` and `domains/*/skills` into `.agents/skills` | implemented | `src/setup/skill-wrappers.mjs`, `scripts/build-skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` |
-| Generate Claude wrapper skills from `.agents/skills` | implemented | `src/setup/skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` |
+| Generate Claude wrapper skills from `.agents/skills`; the render, the plugin mirror and `fgos setup` write only skill names assembled from fgOS sources (`ownedSkillNames`), never another kit's directory | implemented | `src/setup/skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` |
 | Mirror `fgos-*` dev skills into the fgOS plugin for plugin-only consumers | implemented | `plugins/fgOS/skills/`, `test/skills/fgos-mirror.test.mjs` |
 | Detect missing/stale plugin skill packaging through doctor/fix registry | implemented | `src/setup/registrations.mjs`, `test/skills/fgos-mirror.test.mjs`  **Status note (2026-10-14):** The retained implementation claim overstates doctor/fix coverage: `plugin-dev-skills-packaged` detects missing files only (`src/setup/registrations.mjs:3251-3276`); byte drift is checked by `test/skills/fgos-mirror.test.mjs:137`, and this check has no registered repair. |
 | Generate Gemini CLI extension package layout and commands | partial | `src/setup/skill-wrappers.mjs` (`generateGeminiSkillPackage`), `test/setup/skill-wrappers.test.mjs` |

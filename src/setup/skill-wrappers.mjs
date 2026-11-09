@@ -20,6 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createGitInspect, gitPortOptions } from '../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../util/git-paths.mjs';
+import { computeInstructionProjection, materializeInstructionProjection } from './instruction-projections.mjs';
 
 const FRONTMATTER_PATTERN = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
 
@@ -153,9 +154,38 @@ function isGeneratedWrapper(wrapperDirPath) {
 }
 
 /**
+ * The skill names fgOS owns: every skill assembled from the `core/skills` and
+ * `domains/<domain>/skills` sources of the given roots, plus the `_shared`
+ * fragment folder. Every step that writes into a skill root (wrap, mirror,
+ * setup copy) takes its names from this set, so a skill directory another kit
+ * installed there is never written, whatever its name or content.
+ */
+export function ownedSkillNames(...roots) {
+  const owned = new Set(['_shared']);
+  for (const root of new Set(roots)) {
+    for (const skill of discoverCanonicalSkills(root)) owned.add(skill.name);
+  }
+  return owned;
+}
+
+/**
+ * The directories directly under `skillsRoot` whose names are in `owned`, the
+ * one filter every skill-root write goes through. A check on the target
+ * directory itself (for example a generated-stamp refusal for a same-named
+ * folder fgOS did not write) belongs here.
+ */
+function ownedSkillDirs(skillsRoot, owned) {
+  if (!(owned instanceof Set)) throw new TypeError('ownedSkillDirs requires the owned skill name set');
+  if (!fs.existsSync(skillsRoot)) return [];
+  return fs.readdirSync(skillsRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && owned.has(entry.name) && !isOwnTmpFile(entry.name));
+}
+
+/**
  * Generate every `.claude/skills/<name>/SKILL.md` wrapper from its
  * `.agents/skills/<name>/SKILL.md` source, for every skill directory
- * found directly under `agentsSkillsRoot` -- except `_shared` (a folder
+ * found directly under `agentsSkillsRoot` whose name is in `owned` (see
+ * `ownedSkillNames`; other names are never touched) -- except `_shared` (a folder
  * of referenced fragments, not a dispatchable skill of its own; it has no
  * SKILL.md/frontmatter to wrap, and a wrapper's own redirect already
  * routes any `_shared` reference inside the source file to
@@ -165,40 +195,37 @@ function isGeneratedWrapper(wrapperDirPath) {
  * (see `createProjectSkillGuard`) names a target file to leave untouched;
  * a kept wrapper is not listed as written.
  */
-export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { keep } = {}) {
+export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { owned, keep } = {}) {
   const written = [];
   const validWrapperNames = new Set();
-  if (fs.existsSync(agentsSkillsRoot)) {
-    for (const entry of fs.readdirSync(agentsSkillsRoot, { withFileTypes: true })) {
-      if (isOwnTmpFile(entry.name)) continue;
-      if (!entry.isDirectory() || entry.name === '_shared') continue;
-      const sourcePath = path.join(agentsSkillsRoot, entry.name, 'SKILL.md');
-      if (!fs.existsSync(sourcePath)) continue;
+  for (const entry of ownedSkillDirs(agentsSkillsRoot, owned)) {
+    if (entry.name === '_shared') continue;
+    const sourcePath = path.join(agentsSkillsRoot, entry.name, 'SKILL.md');
+    if (!fs.existsSync(sourcePath)) continue;
 
-      validWrapperNames.add(entry.name);
+    validWrapperNames.add(entry.name);
 
-      const sourceContent = fs.readFileSync(sourcePath, 'utf8');
-      const wrapperDir = path.join(claudeSkillsRoot, entry.name);
-      const wrapperPath = path.join(wrapperDir, 'SKILL.md');
-      const sourceRelativePath = path.relative(wrapperDir, sourcePath).replaceAll('\\', '/');
-      const wrapperContent = generateWrapperContent(sourceContent, sourceRelativePath);
-      if (!keep?.(wrapperPath, wrapperContent)) {
-        fs.mkdirSync(wrapperDir, { recursive: true });
-        fs.writeFileSync(wrapperPath, wrapperContent);
-        written.push(wrapperPath);
-      }
+    const sourceContent = fs.readFileSync(sourcePath, 'utf8');
+    const wrapperDir = path.join(claudeSkillsRoot, entry.name);
+    const wrapperPath = path.join(wrapperDir, 'SKILL.md');
+    const sourceRelativePath = path.relative(wrapperDir, sourcePath).replaceAll('\\', '/');
+    const wrapperContent = generateWrapperContent(sourceContent, sourceRelativePath);
+    if (!keep?.(wrapperPath, wrapperContent)) {
+      fs.mkdirSync(wrapperDir, { recursive: true });
+      fs.writeFileSync(wrapperPath, wrapperContent);
+      written.push(wrapperPath);
+    }
 
-      const skillDir = path.join(agentsSkillsRoot, entry.name);
-      for (const subEntry of fs.readdirSync(skillDir, { withFileTypes: true })) {
-        if (isOwnTmpFile(subEntry.name)) continue;
-        if (subEntry.name === 'SKILL.md') continue;
-        const subSource = path.join(skillDir, subEntry.name);
-        const subTarget = path.join(wrapperDir, subEntry.name);
-        if (subEntry.isDirectory()) {
-          copyDirRecursive(subSource, subTarget, keptCopy(keep));
-        } else {
-          keptCopy(keep)(subSource, subTarget);
-        }
+    const skillDir = path.join(agentsSkillsRoot, entry.name);
+    for (const subEntry of fs.readdirSync(skillDir, { withFileTypes: true })) {
+      if (isOwnTmpFile(subEntry.name)) continue;
+      if (subEntry.name === 'SKILL.md') continue;
+      const subSource = path.join(skillDir, subEntry.name);
+      const subTarget = path.join(wrapperDir, subEntry.name);
+      if (subEntry.isDirectory()) {
+        copyDirRecursive(subSource, subTarget, keptCopy(keep));
+      } else {
+        keptCopy(keep)(subSource, subTarget);
       }
     }
   }
@@ -336,11 +363,9 @@ function isMirroredDevSkillName(name) {
  * `agentsSkillsRoot` (`.agents/skills`) into `pluginSkillsRoot`
  * (`plugins/fgOS/skills`). Returns the list of target skill directory paths written.
  */
-export function mirrorDevSkillsIntoPlugin(agentsSkillsRoot, pluginSkillsRoot) {
+export function mirrorDevSkillsIntoPlugin(agentsSkillsRoot, pluginSkillsRoot, owned) {
   const mirrored = [];
-  if (!fs.existsSync(agentsSkillsRoot)) return mirrored;
-  for (const entry of fs.readdirSync(agentsSkillsRoot, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
+  for (const entry of ownedSkillDirs(agentsSkillsRoot, owned)) {
     if (!isMirroredDevSkillName(entry.name)) continue;
     const sourceDir = path.join(agentsSkillsRoot, entry.name);
     const targetDir = path.join(pluginSkillsRoot, entry.name);
@@ -1326,6 +1351,8 @@ export function assembleSkills(
  * setup/doctor behavior in this repo already follows.
  */
 export function materializeSkillsIntoProject(packageRoot, targetRoot) {
+  // Which names fgOS may write is read from sources and decided before any write.
+  const owned = ownedSkillNames(packageRoot, targetRoot);
   try {
     assembleSkills(packageRoot);
   } catch {
@@ -1346,7 +1373,10 @@ export function materializeSkillsIntoProject(packageRoot, targetRoot) {
   const copied = path.resolve(packageRoot) !== path.resolve(targetRoot);
   const guard = copied ? createProjectSkillGuard(targetRoot) : null;
   if (copied) {
-    copyDirRecursive(sourceAgentsSkills, targetAgentsSkills, keptCopy(guard.forRoots(sourceAgentsSkills, targetAgentsSkills)));
+    const keepCopy = keptCopy(guard.forRoots(sourceAgentsSkills, targetAgentsSkills));
+    for (const entry of ownedSkillDirs(sourceAgentsSkills, owned)) {
+      copyDirRecursive(path.join(sourceAgentsSkills, entry.name), path.join(targetAgentsSkills, entry.name), keepCopy);
+    }
     // prune: false -- this call only layers targetRoot's own domain skills
     // on top of the packageRoot base skills just copied above; the base
     // skills are never derivable from targetRoot's own core/skills+domains,
@@ -1356,7 +1386,25 @@ export function materializeSkillsIntoProject(packageRoot, targetRoot) {
     assembleSkills(targetRoot, undefined, { prune: false });
   }
   const wrappersWritten = generateAllSkillWrappers(targetAgentsSkills, targetClaudeSkills, {
+    owned,
     keep: guard?.forRoots(targetAgentsSkills, targetClaudeSkills),
   });
   return { copied, wrappersWritten, skipped: guard?.skipped ?? [] };
+}
+
+/**
+ * Renders this checkout's skill surfaces (`.agents/skills`, `.claude/skills`,
+ * `plugins/fgOS/skills`) and instruction projections from their sources. The
+ * owned names and the instruction projection are computed first, so any
+ * refusal leaves the tree untouched; only then does it write.
+ */
+export function renderSkillSurfaces(root) {
+  const owned = ownedSkillNames(root);
+  computeInstructionProjection(root);
+  const agentsSkillsRoot = path.join(root, '.agents', 'skills');
+  const assembled = assembleSkills(root);
+  const written = generateAllSkillWrappers(agentsSkillsRoot, path.join(root, '.claude', 'skills'), { owned });
+  const mirrored = mirrorDevSkillsIntoPlugin(agentsSkillsRoot, path.join(root, 'plugins', 'fgOS', 'skills'), owned);
+  const projection = materializeInstructionProjection(root);
+  return { assembled, written, mirrored, projection };
 }

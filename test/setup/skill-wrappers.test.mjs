@@ -18,6 +18,8 @@ import {
   assembleSkills,
   materializeSkillsIntoProject,
   mirrorDevSkillsIntoPlugin,
+  renderSkillSurfaces,
+  ownedSkillNames,
   discoverCanonicalSkills,
   discoverSharedFragments,
   generateGeminiSkillPackage,
@@ -38,6 +40,12 @@ function writeSkill(skillsRoot, name, frontmatter, body) {
   const dir = path.join(skillsRoot, name);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'SKILL.md'), `${frontmatter}\n${body}`);
+}
+
+// Every directory of a fixture skill root counts as owned: the tests that call a render step
+// directly are about what that step does with an owned name.
+function everyNameIn(skillsRoot) {
+  return new Set(fs.existsSync(skillsRoot) ? fs.readdirSync(skillsRoot) : []);
 }
 
 const SAMPLE_FRONTMATTER = '---\nname: sample-skill\ndescription: A sample skill for testing.\n---\n';
@@ -90,7 +98,7 @@ test('generateAllSkillWrappers writes one wrapper per skill directory under agen
   writeSkill(agentsSkillsRoot, 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
   writeSkill(agentsSkillsRoot, 'skill-b', SAMPLE_FRONTMATTER, '# Body B\n');
 
-  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { owned: everyNameIn(agentsSkillsRoot) });
 
   assert.equal(written.length, 2);
   assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'skill-a', 'SKILL.md')));
@@ -104,7 +112,7 @@ test('generateAllSkillWrappers skips _shared (a fragment folder, not a dispatcha
   fs.mkdirSync(path.join(agentsSkillsRoot, '_shared'), { recursive: true });
   fs.writeFileSync(path.join(agentsSkillsRoot, '_shared', 'fragment.md'), 'referenced content\n');
 
-  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { owned: everyNameIn(agentsSkillsRoot) });
 
   assert.equal(written.length, 1);
   assert.equal(fs.existsSync(path.join(claudeSkillsRoot, '_shared')), false);
@@ -116,19 +124,19 @@ test('generateAllSkillWrappers skips a directory with no SKILL.md inside it', ()
   fs.mkdirSync(path.join(agentsSkillsRoot, 'not-a-skill'), { recursive: true });
   fs.writeFileSync(path.join(agentsSkillsRoot, 'not-a-skill', 'README.md'), 'not a skill file\n');
 
-  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { owned: everyNameIn(agentsSkillsRoot) });
   assert.equal(written.length, 0);
 });
 
 test('generateAllSkillWrappers is a no-op returning [] when agentsSkillsRoot does not exist at all', () => {
   const claudeSkillsRoot = mkTempDir('skill-wrappers-missing-claude-');
-  const written = generateAllSkillWrappers(path.join(mkTempDir('skill-wrappers-missing-'), 'does-not-exist'), claudeSkillsRoot);
+  const written = generateAllSkillWrappers(path.join(mkTempDir('skill-wrappers-missing-'), 'does-not-exist'), claudeSkillsRoot, { owned: new Set(['skill-a']) });
   assert.deepEqual(written, []);
 });
 
 test('materializeSkillsIntoProject copies .agents/skills into an external target project, then generates wrappers there', () => {
   const packageRoot = mkTempDir('skill-wrappers-materialize-pkg-');
-  writeSkill(path.join(packageRoot, '.agents', 'skills'), 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
+  writeSkill(path.join(packageRoot, 'core', 'skills'), 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
   const targetRoot = mkTempDir('skill-wrappers-materialize-target-');
 
   const { copied, wrappersWritten } = materializeSkillsIntoProject(packageRoot, targetRoot);
@@ -145,7 +153,8 @@ test('materializeSkillsIntoProject copies .agents/skills into an external target
 
 test('materializeSkillsIntoProject self-hosting: when packageRoot equals targetRoot, it regenerates wrappers in place without copying', () => {
   const root = mkTempDir('skill-wrappers-materialize-selfhost-');
-  writeSkill(path.join(root, '.agents', 'skills'), 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
+  writeSkill(path.join(root, 'core', 'skills'), 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
+  assembleSkills(root);
 
   const { copied, wrappersWritten } = materializeSkillsIntoProject(root, root);
 
@@ -157,7 +166,7 @@ test('materializeSkillsIntoProject self-hosting: when packageRoot equals targetR
 test('materializeSkillsIntoProject keeps a project skill file that is newer than the release copy or edited since HEAD, names it, and still refreshes an older clean one', () => {
   const skillMd = (version, body) => `---\nname: sample\ndescription: d\nmetadata:\n  version: "${version}"\n---\n${body}\n`;
   const packageRoot = mkTempDir('skill-wrappers-keep-pkg-');
-  const releaseSkills = path.join(packageRoot, '.agents', 'skills');
+  const releaseSkills = path.join(packageRoot, 'core', 'skills');
   for (const name of ['held', 'edited', 'stale']) {
     fs.mkdirSync(path.join(releaseSkills, name), { recursive: true });
     fs.writeFileSync(path.join(releaseSkills, name, 'SKILL.md'), skillMd('0.1', `release ${name}`));
@@ -193,7 +202,12 @@ test('materializeSkillsIntoProject keeps a project skill file that is newer than
   assert.equal(read('.claude/skills/held/SKILL.md'), skillMd('0.2', 'project held'));
   assert.equal(read('.claude/skills/held/references/guide.md'), 'project guide\n');
   assert.equal(read('.agents/skills/edited/SKILL.md'), skillMd('0.1', 'edited after commit'));
-  assert.equal(read('.agents/skills/stale/SKILL.md'), skillMd('0.1', 'release stale'), 'an older clean tracked copy is still refreshed');
+  assert.equal(
+    read('.agents/skills/stale/SKILL.md'),
+    fs.readFileSync(path.join(packageRoot, '.agents', 'skills', 'stale', 'SKILL.md'), 'utf8'),
+    'an older clean tracked copy is still refreshed',
+  );
+  assert.match(read('.agents/skills/stale/SKILL.md'), /release stale/);
   assert.deepEqual([...skipped].sort(), [
     '.agents/skills/edited/SKILL.md',
     '.claude/skills/held/SKILL.md',
@@ -212,15 +226,18 @@ test('materializeSkillsIntoProject is a no-op when packageRoot has no .agents/sk
 
 test('materializeSkillsIntoProject never throws when assembling into packageRoot fails (round-2 review finding, tsk-397) -- a real global npm install can be root-owned/read-only; the already-shipped .agents/skills still materializes into the target project', () => {
   const packageRoot = mkTempDir('skill-wrappers-materialize-readonly-pkg-');
+  writeSkill(path.join(packageRoot, 'core', 'skills'), 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
+  fs.mkdirSync(path.join(packageRoot, 'core', 'skills', 'skill-a', 'assets'));
+  fs.writeFileSync(path.join(packageRoot, 'core', 'skills', 'skill-a', 'assets', 'one.txt'), 'one\n');
+  // The shipped render already holds the skill, with a plain file where the
+  // source has a directory: assembling into packageRoot fails on it, the same
+  // "block the path with a file" I/O-failure simulation test/runner/worker-log.test.mjs
+  // uses, standing in for any real write failure (disk full, EACCES, read-only filesystem).
   writeSkill(path.join(packageRoot, '.agents', 'skills'), 'skill-a', SAMPLE_FRONTMATTER, '# Body A\n');
-  // Block core/skills with a plain file so assembleSkills' own
-  // fs.readdirSync(coreSkillsRoot, {withFileTypes:true}) throws ENOTDIR --
-  // the same "block the path with a file" I/O-failure simulation
-  // test/runner/worker-log.test.mjs already uses, standing in for any
-  // real write failure (disk full, EACCES, read-only filesystem).
-  fs.writeFileSync(path.join(packageRoot, 'core'), 'not a directory');
+  fs.writeFileSync(path.join(packageRoot, '.agents', 'skills', 'skill-a', 'assets'), 'not a directory');
   const targetRoot = mkTempDir('skill-wrappers-materialize-readonly-target-');
 
+  assert.throws(() => assembleSkills(packageRoot), /EEXIST|ENOTDIR/, 'the fixture really makes assembling fail');
   let result;
   assert.doesNotThrow(() => {
     result = materializeSkillsIntoProject(packageRoot, targetRoot);
@@ -273,8 +290,8 @@ test('materializeSkillsIntoProject never deletes packageRoot base skills it just
   // (absent from targetRoot's own core/skills+domains/*/skills) and
   // delete it, since only packageRoot ever declared those names.
   const packageRoot = mkTempDir('skill-wrappers-mat-noprune-pkg-');
-  writeSkill(path.join(packageRoot, '.agents', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# base routing\n');
-  writeSkill(path.join(packageRoot, '.agents', 'skills'), 'fgos-coding-implement', SAMPLE_FRONTMATTER, '# base implement\n');
+  writeSkill(path.join(packageRoot, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# base routing\n');
+  writeSkill(path.join(packageRoot, 'core', 'skills'), 'fgos-coding-implement', SAMPLE_FRONTMATTER, '# base implement\n');
 
   const targetRoot = mkTempDir('skill-wrappers-mat-noprune-target-');
   writeSkill(path.join(targetRoot, 'domains', 'myapp', 'skills'), 'myapp-custom-skill', SAMPLE_FRONTMATTER, '# custom\n');
@@ -392,7 +409,7 @@ test('generateAllSkillWrappers prunes orphaned wrappers from .claude/skills when
   );
   assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'skill-orphaned')));
 
-  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+  const written = generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { owned: everyNameIn(agentsSkillsRoot) });
 
   assert.equal(written.length, 1);
   assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'skill-active', 'SKILL.md')));
@@ -412,7 +429,7 @@ test('generateAllSkillWrappers never prunes a standalone skill under .claude/ski
   writeSkill(claudeSkillsRoot, 'standalone-skill', SAMPLE_FRONTMATTER, '# Real hand-authored content\n');
   fs.writeFileSync(path.join(claudeSkillsRoot, 'standalone-skill', 'tool.mjs'), 'export const real = true;\n');
 
-  generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot);
+  generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { owned: everyNameIn(agentsSkillsRoot) });
 
   assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'standalone-skill', 'SKILL.md')), 'standalone skill must survive the prune pass');
   assert.ok(fs.existsSync(path.join(claudeSkillsRoot, 'standalone-skill', 'tool.mjs')), 'standalone skill\'s real files must survive the prune pass');
@@ -427,7 +444,7 @@ test('mirrorDevSkillsIntoPlugin mirrors _shared and fgos-* dev-skills into plugi
   writeSkill(agentsSkillsRoot, 'fgos-coding-implement', SAMPLE_FRONTMATTER, '# Implement\n');
   writeSkill(agentsSkillsRoot, 'distill', SAMPLE_FRONTMATTER, '# Distill\n');
 
-  const mirrored = mirrorDevSkillsIntoPlugin(agentsSkillsRoot, pluginSkillsRoot);
+  const mirrored = mirrorDevSkillsIntoPlugin(agentsSkillsRoot, pluginSkillsRoot, everyNameIn(agentsSkillsRoot));
 
   assert.equal(mirrored.length, 3);
   assert.ok(fs.existsSync(path.join(pluginSkillsRoot, '_shared', 'SKILL.md')));
@@ -438,7 +455,7 @@ test('mirrorDevSkillsIntoPlugin mirrors _shared and fgos-* dev-skills into plugi
 
 test('mirrorDevSkillsIntoPlugin is a safe no-op returning [] when agentsSkillsRoot does not exist', () => {
   const pluginSkillsRoot = mkTempDir('skill-wrappers-mirror-noop-');
-  const mirrored = mirrorDevSkillsIntoPlugin(path.join(mkTempDir('skill-wrappers-missing-'), 'does-not-exist'), pluginSkillsRoot);
+  const mirrored = mirrorDevSkillsIntoPlugin(path.join(mkTempDir('skill-wrappers-missing-'), 'does-not-exist'), pluginSkillsRoot, new Set());
   assert.deepEqual(mirrored, []);
 });
 
@@ -774,7 +791,7 @@ test('isGeneratedAdapterTarget uses provenance and markers, never prefix alone (
   writeSkill(path.join(root, 'core', 'skills'), 'distill', SAMPLE_FRONTMATTER, '# Distill\n');
   writeSkill(path.join(root, 'plugins', 'fgOS', 'skills'), 'distill', SAMPLE_FRONTMATTER, '# Hand-placed\n');
   assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/distill/SKILL.md', root), false, 'canonical source outside the mirror name rule is not a mirrored plugin target');
-  assert.equal(mirrorDevSkillsIntoPlugin(path.join(root, 'core', 'skills'), mkTempDir('mirror-rule-check-')).some((p) => path.basename(p) === 'distill'), false, 'the mirror itself never writes distill -- classification must agree with it');
+  assert.equal(mirrorDevSkillsIntoPlugin(path.join(root, 'core', 'skills'), mkTempDir('mirror-rule-check-'), everyNameIn(path.join(root, 'core', 'skills'))).some((p) => path.basename(p) === 'distill'), false, 'the mirror itself never writes distill -- classification must agree with it');
 
   // The moment fgos-custom gains an assembled source it IS mirror-managed
   writeSkill(path.join(root, '.agents', 'skills'), 'fgos-custom', SAMPLE_FRONTMATTER, '# Now assembled\n');
@@ -817,7 +834,7 @@ test('projection tests for Codex/OpenAI and Claude surfaces verify adapter proje
   const canonicalSkills = discoverCanonicalSkills(repoRoot);
   // .claude/skills is a gitignored setup output; project it from the tracked .agents/skills here.
   const claudeSkillsRoot = path.join(mkTempDir('claude-wrapper-projection-'), '.claude', 'skills');
-  generateAllSkillWrappers(path.join(repoRoot, '.agents', 'skills'), claudeSkillsRoot);
+  generateAllSkillWrappers(path.join(repoRoot, '.agents', 'skills'), claudeSkillsRoot, { owned: ownedSkillNames(repoRoot) });
 
   for (const skill of canonicalSkills) {
     const agentsPath = path.join(repoRoot, '.agents', 'skills', skill.name, 'SKILL.md');
@@ -3732,4 +3749,114 @@ test('Phase 02 Red-Team Probe 3: Anti-Silent-Omission rejects missing or unstate
     },
     MissingExplicitTestDecisionError
   );
+});
+
+// --- Ownership: fgOS writes only the skill names it assembles from its own sources ---
+
+const FOREIGN_FILES = [
+  ['SKILL.md', `---\nname: ak-x\ndescription: another kit\n---\nforeign body\n`],
+  ['references/guide.md', 'foreign guide\n'],
+];
+
+function putForeignSkill(skillsRoot) {
+  for (const [rel, content] of FOREIGN_FILES) {
+    fs.mkdirSync(path.dirname(path.join(skillsRoot, 'ak-x', rel)), { recursive: true });
+    fs.writeFileSync(path.join(skillsRoot, 'ak-x', rel), content);
+  }
+}
+
+function assertForeignSkillUntouched(skillsRoot) {
+  for (const [rel, content] of FOREIGN_FILES) {
+    assert.equal(fs.readFileSync(path.join(skillsRoot, 'ak-x', rel), 'utf8'), content, `${skillsRoot}/ak-x/${rel}`);
+  }
+}
+
+function writeInstruction(root, id = 'sample-law') {
+  const dir = path.join(root, 'core', 'instructions');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, `${id}.md`), `---\nid: ${id}\nkind: law\ntitle: Sample\ndescription: d\n---\n\n# Sample\nText.\n`);
+}
+
+function snapshotTree(root) {
+  const out = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else out.push(`${path.relative(root, full)}:${fs.readFileSync(full, 'utf8')}`);
+    }
+  };
+  if (fs.existsSync(root)) walk(root);
+  return out.sort();
+}
+
+test('rendering a checkout leaves a skill directory of another kit byte-identical under every skill root', () => {
+  const root = mkTempDir('skill-wrappers-foreign-render-');
+  writeSkill(path.join(root, 'core', 'skills'), 'fgos-own', SAMPLE_FRONTMATTER, '# own\n');
+  writeInstruction(root);
+  for (const skillsRoot of ['.agents/skills', '.claude/skills', 'plugins/fgOS/skills']) putForeignSkill(path.join(root, skillsRoot));
+  // A foreign skill that also carries a source in .agents is still not fgOS's to wrap.
+  const result = renderSkillSurfaces(root);
+
+  assert.ok(result.written.some((file) => file.endsWith(path.join('fgos-own', 'SKILL.md'))));
+  for (const skillsRoot of ['.agents/skills', '.claude/skills', 'plugins/fgOS/skills']) assertForeignSkillUntouched(path.join(root, skillsRoot));
+  assert.ok(fs.existsSync(path.join(root, 'plugins', 'fgOS', 'skills', 'fgos-own', 'SKILL.md')), 'the owned skill is still rendered');
+});
+
+test('setup materialisation leaves another kit skill directory in the target byte-identical and never copies one from the package', () => {
+  const packageRoot = mkTempDir('skill-wrappers-foreign-pkg-');
+  writeSkill(path.join(packageRoot, 'core', 'skills'), 'fgos-own', SAMPLE_FRONTMATTER, '# own\n');
+  putForeignSkill(path.join(packageRoot, '.agents', 'skills'));
+  const targetRoot = mkTempDir('skill-wrappers-foreign-target-');
+  putForeignSkill(path.join(targetRoot, '.agents', 'skills'));
+  putForeignSkill(path.join(targetRoot, '.claude', 'skills'));
+  // The package copy of ak-x differs, so a copy would show as a byte change.
+  fs.writeFileSync(path.join(packageRoot, '.agents', 'skills', 'ak-x', 'SKILL.md'), '---\nname: ak-x\ndescription: dev checkout copy\n---\n');
+
+  const { wrappersWritten } = materializeSkillsIntoProject(packageRoot, targetRoot);
+
+  assert.deepEqual(wrappersWritten.map((file) => path.basename(path.dirname(file))), ['fgos-own']);
+  assertForeignSkillUntouched(path.join(targetRoot, '.agents', 'skills'));
+  assertForeignSkillUntouched(path.join(targetRoot, '.claude', 'skills'));
+});
+
+test('a refused instruction projection leaves every skill surface untouched', () => {
+  const root = mkTempDir('skill-wrappers-refusal-');
+  writeSkill(path.join(root, 'core', 'skills'), 'fgos-own', SAMPLE_FRONTMATTER, '# own\n');
+  fs.mkdirSync(path.join(root, 'core', 'instructions'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'core', 'instructions', 'broken.md'), '---\nkind: law\n---\n\n# no id\n');
+  const before = snapshotTree(root);
+
+  assert.throws(() => renderSkillSurfaces(root), /id/i);
+
+  assert.deepEqual(snapshotTree(root), before);
+});
+
+test('build:skills without a staged addon either completes or exits before its first write', () => {
+  const scratch = mkTempDir('skill-wrappers-script-');
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+  fs.mkdirSync(path.join(scratch, 'scripts'));
+  fs.copyFileSync(path.join(repoRoot, 'scripts', 'build-skill-wrappers.mjs'), path.join(scratch, 'scripts', 'build-skill-wrappers.mjs'));
+  // The script's imports resolve to the real modules; only the tree it renders is scratch.
+  fs.symlinkSync(path.join(repoRoot, 'src'), path.join(scratch, 'src'), 'dir');
+  fs.symlinkSync(path.join(repoRoot, 'scripts', 'lib'), path.join(scratch, 'scripts', 'lib'), 'dir');
+  fs.symlinkSync(path.join(repoRoot, 'scripts', 'build-rust-distribution.mjs'), path.join(scratch, 'scripts', 'build-rust-distribution.mjs'));
+  writeSkill(path.join(scratch, 'core', 'skills'), 'fgos-own', SAMPLE_FRONTMATTER, '# own\n');
+  writeInstruction(scratch);
+  const emptyPath = mkTempDir('skill-wrappers-script-path-');
+  const env = { ...process.env, PATH: emptyPath };
+  for (const key of Object.keys(env)) if (key.startsWith('FGOS_')) delete env[key];
+
+  let completed = true;
+  try {
+    execFileSync(process.execPath, [path.join(scratch, 'scripts', 'build-skill-wrappers.mjs')], { cwd: scratch, env, stdio: 'pipe' });
+  } catch {
+    completed = false;
+  }
+
+  if (!completed) {
+    for (const rendered of ['.agents', '.claude', 'plugins', '.fgos', 'AGENTS.md']) {
+      assert.equal(fs.existsSync(path.join(scratch, rendered)), false, `${rendered} written before the script failed`);
+    }
+  }
 });
