@@ -10,7 +10,7 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, fg-server). fg-s
 
 ## P06: dòng doctor `agent-claims-resolve` và `executor-skills-installed`
 
-- **Commit trên main:** `60101a80f..a9801b162` (sau rebase có thể đổi; board ghi dải cuối).
+- **Commit trên main:** `9309685c0..688850394`.
 - **Người dùng thấy gì:**
   - `fgos doctor` dòng `agent-claims-resolve` nghiêm hơn: một khai báo `requires-skill` của task-spec chỉ qua khi **cả hai** điều kiện đúng: có agent cung cấp skill đó **và** tên là skill fgOS sở hữu (nguồn trong `core/skills` hoặc `domains/<domain>/skills`). Thông báo nêu rõ phía nào hỏng.
   - Dòng `executor-skills-installed` nhận thư mục skill ở cấp người dùng (`~/.claude/skills`, `~/.agents/skills` cho Claude và Codex) ngoài cấp dự án. File `SKILL.md` rỗng bị từ chối. Thông báo nói rõ worktree chỉ có skill nhờ `worktreeSetup`, nên qua ở checkout chính chưa chắc qua trong worktree.
