@@ -144,6 +144,33 @@ test('a committed .fgos/installation never runs: the launcher executes only a re
   }
 });
 
+test('a state root that is not absolute is refused, so a store planted inside the project never runs', { skip: !POSIX }, () => {
+  const sb = sandbox();
+  try {
+    const launcher = writeLauncher(path.join(sb.bin, 'fgos'));
+    const clone = path.join(sb.root, 'clone');
+    // The relative fallback `.local/state/fgos` resolves inside the clone, which ships its own "release".
+    const planted = path.join(clone, '.local', 'state', 'fgos', 'releases', DIGEST_A, 'bin');
+    fs.mkdirSync(planted, { recursive: true });
+    fs.writeFileSync(path.join(planted, 'fgos'), '#!/bin/sh\necho PLANTED\n', { mode: 0o755 });
+    putActivation(clone, { status: 'ready', artifactDigest: DIGEST_A });
+    const cases = [
+      ['HOME set but empty', { HOME: '' }],
+      ['no HOME and no USERPROFILE', {}],
+      ['a relative FGOS_STATE_ROOT', { FGOS_STATE_ROOT: '.local/state/fgos', HOME: path.join(sb.root, 'home') }],
+      ['a relative XDG_STATE_HOME', { XDG_STATE_HOME: '.local/state', HOME: path.join(sb.root, 'home') }],
+    ];
+    for (const [label, env] of cases) {
+      const result = run(launcher, ['doctor'], clone, env);
+      assert.equal(result.status, 126, label);
+      assert.doesNotMatch(result.stdout, /PLANTED/, label);
+      assert.match(result.stderr, /the state root \.local\/state\/fgos is not an absolute path/, label);
+    }
+  } finally {
+    sb.cleanup();
+  }
+});
+
 test('the launcher finds the machine store from the same state-root inputs as the host, in either release directory spelling', { skip: !POSIX }, () => {
   const sb = sandbox();
   try {
@@ -264,6 +291,16 @@ test('the cmd launcher runs the store release the nearest activation names, neve
     const traversal = runCmd(['doctor'], sub);
     assert.equal(traversal.status, 126);
     assert.match(traversal.stderr, /artifactDigest is not sha256/);
+
+    // A relative state root would resolve inside the project, which can ship its own releases\.
+    putActivation(project, { status: 'ready', artifactDigest: DIGEST_A });
+    const plantedStore = path.join(sub, 'store', 'releases', `sha256-${'a'.repeat(64)}`, 'bin');
+    fs.mkdirSync(plantedStore, { recursive: true });
+    fs.copyFileSync(process.env.ComSpec || 'C:\\Windows\\System32\\cmd.exe', path.join(plantedStore, 'fgos.exe'));
+    const relative = spawnSync('cmd.exe', ['/d', '/c', launcher, '/d', '/c', 'echo', 'PLANTED'], { cwd: sub, encoding: 'utf8', env: Object.assign({}, env, { FGOS_STATE_ROOT: 'store' }) });
+    assert.equal(relative.status, 126);
+    assert.doesNotMatch(relative.stdout, /PLANTED/);
+    assert.match(relative.stderr, /the state root store is not an absolute path/);
 
     const elsewhere = path.join(sb.root, 'elsewhere');
     fs.mkdirSync(elsewhere);

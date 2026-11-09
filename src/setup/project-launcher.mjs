@@ -20,7 +20,9 @@
 // formula (packages/holder-lock/rust/src/state_root.rs `state_root_from`):
 // FGOS_STATE_ROOT, FGOS_STATE_HOME (a blank value counts as unset), then
 // XDG_STATE_HOME/fgos, HOME/.local/state/fgos, USERPROFILE/.local/state/fgos,
-// then the relative `.local/state/fgos`. The sh form runs only shell builtins.
+// then the relative `.local/state/fgos`. A root that is not absolute is refused:
+// it would resolve inside the project, which can ship its own `releases/`. The
+// sh form runs only shell builtins.
 //
 // The launcher carries a marker line so `doctor` can tell its own file from a
 // foreign `fgos` (an npm global, say) and never overwrites the latter. The
@@ -78,6 +80,7 @@ elif [ "\${HOME+set}" = set ]; then _fgos_store=\${HOME:+$HOME/}.local/state/fgo
 elif [ "\${USERPROFILE+set}" = set ]; then _fgos_store=\${USERPROFILE:+$USERPROFILE/}.local/state/fgos
 else _fgos_store=.local/state/fgos
 fi
+case $_fgos_store in /*) ;; *) _fgos_refuse "the state root $_fgos_store is not an absolute path (set HOME or FGOS_STATE_ROOT)" ;; esac
 _fgos_release=$_fgos_store/releases/$_fgos_digest
 [ -d "$_fgos_release" ] || _fgos_release=$_fgos_store/releases/sha256-$_fgos_hex
 [ -x "$_fgos_release/bin/fgos" ] || _fgos_refuse "release $_fgos_digest is not in this machine's release store $_fgos_store/releases"
@@ -129,6 +132,11 @@ const CMD_BODY = [
   'set "REST=!HEX!"',
   'for %%C in (0 1 2 3 4 5 6 7 8 9 a b c d e f) do set "REST=!REST:%%C=!"',
   'if defined REST goto refuse',
+  'set "WHY=the state root !STORE! is not an absolute path (set USERPROFILE or FGOS_STATE_ROOT)"',
+  'set "ABS="',
+  'if "!STORE:~1,2!"==":\\" set "ABS=1"',
+  'if "!STORE:~0,2!"=="\\\\" set "ABS=1"',
+  'if not defined ABS goto refuse',
   'set "ENTRY=!STORE!\\releases\\sha256-!HEX!\\bin\\fgos.exe"',
   'set "WHY=release !DIGEST! is not in this machine\'s release store !STORE!\\releases"',
   'if not exist "!ENTRY!" goto refuse',
