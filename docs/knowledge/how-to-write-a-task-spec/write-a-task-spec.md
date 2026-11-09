@@ -53,9 +53,10 @@ some agent-types/roles may exercise it (e.g. `hard-gate` for
    `core/task-specs/<id>.md` for a domain-agnostic spec).
 2. If the task owns a stage directly, add it to that domain's
    `taskSpecMap` in `src/state/workflow-stage-graphs.mjs`.
-3. Run `fgos doctor` — the `task-specs-resolve` check confirms every
-   `taskSpecMap` entry resolves to a real file, and `agent-claims-resolve`
-   confirms every agent-type's `claims` (if any) name real specs.
+3. Run `npm test` — `test/setup/packaged-definitions.test.mjs` confirms every
+   `taskSpecMap` entry resolves to a real file and every packaged task-spec
+   names agents and skills that exist. In a project, `fgos doctor`'s
+   `agent-claims-resolve` judges the task-specs that project supplies.
 
 ## What NOT to do
 

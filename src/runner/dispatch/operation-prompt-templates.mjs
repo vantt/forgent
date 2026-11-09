@@ -186,6 +186,19 @@ function scanTier(tier, dir, source, packageRoot = PACKAGE_ROOT) {
 }
 
 /**
+ * Discover and validate the templates of the project tier alone (`.fgos/prompt-templates/`).
+ * The packaged domain and core tiers are not read.
+ *
+ * @param {object} [options]
+ * @param {string} [options.cwd]
+ * @param {string} [options.packageRoot]
+ * @returns {ReadonlyArray<object>}
+ */
+export function discoverProjectPromptTemplates({ cwd = process.cwd(), packageRoot = PACKAGE_ROOT } = {}) {
+  return scanTier('project', path.join(cwd, PROJECT_PROMPT_TEMPLATES_DIR), 'project', packageRoot);
+}
+
+/**
  * Discover all operation prompt templates across project, domain, and core tiers.
  * Precedence: project > domain > core.
  *
@@ -199,9 +212,7 @@ export function discoverOperationPromptTemplates({ cwd = process.cwd(), packageR
   const domainTiers = new Map(); // templateId -> domainName for collision check across domains
 
   // 1. Project tier
-  const projectDir = path.join(cwd, PROJECT_PROMPT_TEMPLATES_DIR);
-  const projectEntries = scanTier('project', projectDir, 'project', packageRoot);
-  for (const entry of projectEntries) {
+  for (const entry of discoverProjectPromptTemplates({ cwd, packageRoot })) {
     byId.set(entry.id, entry);
   }
 

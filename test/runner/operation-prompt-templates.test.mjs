@@ -685,15 +685,6 @@ test('retry/replay attribution stability: snapshot and digests remain determinis
   }
 });
 
-test('operation-prompt-templates-valid doctor check is registered and passes on repository', () => {
-  const check = DOCTOR_CHECKS.find((c) => c.id === 'operation-prompt-templates-valid');
-  assert.ok(check, 'operation-prompt-templates-valid must be registered');
-
-  const result = check.check(process.cwd());
-  assert.equal(result.passed, true);
-  assert.match(result.message, /operation prompt template\(s\) discovered and validated cleanly/);
-});
-
 test('operation-prompt-templates-valid doctor check fails when a malformed template is present', () => {
   const check = DOCTOR_CHECKS.find((c) => c.id === 'operation-prompt-templates-valid');
   const tmpDir = createTempDir('fgos-doc-fail-');

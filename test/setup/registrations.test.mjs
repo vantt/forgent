@@ -13,7 +13,7 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, FIX_REGISTRATIONS, registerCheck, registerFix, runFixes } from '../../src/setup/checks.mjs';
-import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../../src/setup/registrations.mjs';
+import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../helpers/packaged-definitions.mjs';
 import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 
 import { nativeDoor } from '../../src/native/door.mjs';
@@ -172,28 +172,6 @@ test('cli-version-visible passes and its message embeds the resolved packageVers
   assert.ok(result.message.includes(packageVersion), `message "${result.message}" missing packageVersion "${packageVersion}"`);
 });
 
-test('task-specs-resolve doctor check passes when core/task-specs/ and domain task-specs exist', () => {
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'task-specs-resolve');
-  assert.ok(entry, 'task-specs-resolve check must be registered');
-  const result = entry.check(process.cwd());
-  assert.equal(result.passed, true, `task-specs-resolve failed: ${result.message}`);
-});
-
-test('task-spec and workflow-operation checks pass on a plain target project that carries no fgOS trees', () => {
-  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plain-target-'));
-  try {
-    assert.equal(fs.existsSync(path.join(project, 'domains')), false);
-    assert.equal(fs.existsSync(path.join(project, 'core')), false);
-    for (const id of ['task-specs-resolve', 'domain-workflow-operations-coverage']) {
-      const entry = DOCTOR_CHECKS.find((c) => c.id === id);
-      const result = entry.check(project);
-      assert.equal(result.passed, true, `${id} failed on a plain target: ${result.message}`);
-    }
-  } finally {
-    fs.rmSync(project, { recursive: true, force: true });
-  }
-});
-
 test('task-spec and workflow-operation checks still fail when the install root lacks its own task-specs', () => {
   const emptyRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-broken-install-'));
   try {
@@ -206,13 +184,6 @@ test('task-spec and workflow-operation checks still fail when the install root l
   } finally {
     fs.rmSync(emptyRoot, { recursive: true, force: true });
   }
-});
-
-test('agent-type-names-unique doctor check passes when agent-type names are unique within each tier', () => {
-  const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
-  assert.ok(entry, 'agent-type-names-unique check must be registered');
-  const result = entry.check(process.cwd());
-  assert.equal(result.passed, true, `agent-type-names-unique failed: ${result.message}`);
 });
 
 test('agent-type-names-unique doctor check fails on a duplicate within one tier and accepts a higher tier replacing a lower one', () => {
@@ -637,14 +608,6 @@ test('findWorkflowStageOperationProblems fails when a step\'s operations is not 
   const problemsNonArray = findWorkflowStageOperationProblems(mkTempDir(), asWorkflowDomains(customDomainsNonArray));
   assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.planning.operations: must be an array of operation objects')));
   assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.discovery.operations: must be an array of operation objects')));
-});
-
-test('domain-workflow-operations-coverage doctor check is registered and passes on clean repo', () => {
-  const check = DOCTOR_CHECKS.find((c) => c.id === 'domain-workflow-operations-coverage');
-  assert.ok(check, 'domain-workflow-operations-coverage doctor check must be registered');
-  const result = check.check(mkTempDir());
-  assert.equal(result.passed, true);
-  assert.match(result.message, /every step operation across domain workflows resolves/);
 });
 
 test('doctor check runner-generated-paths accepts the standard\'s empty list or a well-formed one and flags a malformed one', () => {
