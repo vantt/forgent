@@ -30,7 +30,7 @@ Superseded by: None recorded
 
 ## 1. Purpose
 
-Skill package-distribution defines how one canonical fgOS skill source is rendered into the host-specific surfaces used by Codex/OpenAI agents, Claude, Gemini, and plugin-only consumers.
+Skill package-distribution defines how one canonical fgOS skill source is rendered into the host-specific surfaces used by Codex/OpenAI agents, Claude, and plugin-only consumers.
 
 It does not define the behavioral semantics of a skill. The owning component or domain owns the skill body, examples, protocols, and execution policy.
 
@@ -44,7 +44,7 @@ It does not define the behavioral semantics of a skill. The owning component or 
 | Coding mutation, tests, worktree, commit, review/red-team policy | Coding domain |
 | Host command invocation syntax after projection exists | Host invocation / host adapter surface |
 
-Packaging-distribution owns the distribution layer because `.agents/skills`, `.claude/skills`, plugin skill bundles, and future Gemini extension files are host-visible projections of the selected runtime.
+Packaging-distribution owns the distribution layer because `.agents/skills`, `.claude/skills`, plugin skill bundles, are host-visible projections of the selected runtime.
 
 ## 3. Implemented Model
 
@@ -61,7 +61,6 @@ Current generated or assembled distribution targets:
 .agents/skills/ (assembled portable projection)
 .claude/skills/ (generated thin wrappers for canonical skills; hand-authored skills preserved)
 plugins/fgOS/skills/ (mirrored fgos-* dev skills and _shared/; hand-authored plugin skills preserved)
-.gemini/extensions/fgos/ (prototype extension package generator; partial/planned)
 ```
 
 Current build/proof surfaces:
@@ -72,7 +71,7 @@ Current build/proof surfaces:
 | Generate Claude wrapper skills from `.agents/skills`; the render, the plugin mirror and `fgos setup` write only skill names assembled from fgOS sources (`ownedSkillNames`), never another kit's directory | implemented | `src/setup/skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` |
 | Mirror `fgos-*` dev skills into the fgOS plugin for plugin-only consumers | implemented | `plugins/fgOS/skills/`, `test/skills/fgos-mirror.test.mjs` |
 | Detect missing/stale plugin skill packaging through doctor/fix registry | implemented | `src/setup/registrations.mjs`, `test/skills/fgos-mirror.test.mjs`  **Status note (2026-10-14):** The retained implementation claim overstates doctor/fix coverage: `plugin-dev-skills-packaged` detects missing files only (`src/setup/registrations.mjs:3251-3276`); byte drift is checked by `test/skills/fgos-mirror.test.mjs:137`, and this check has no registered repair. |
-| Generate Gemini CLI extension package layout and commands | partial | `src/setup/skill-wrappers.mjs` (`generateGeminiSkillPackage`), `test/setup/skill-wrappers.test.mjs` |
+| Generate a Gemini CLI extension package | not provided | removed; add it through the common render (`renderSkillSurfaces`) if a Gemini consumer appears |
 
 Generated targets are not the source of truth. They may be committed for host compatibility, but edits should flow from the canonical source through the generator. Note that host trees may be mixed: `plugins/fgOS/skills/` contains hand-authored user commands (`pick`, `submit`, `cook`, `list`, etc.) alongside mirrored `fgos-*` dev skills, and `.claude/skills/` preserves hand-authored skills (`ui-spec`, `gitnexus`) without treating them as generated wrappers.
 
@@ -91,7 +90,7 @@ The correct canonical location is determined by component authority:
 | Host adapter/wrapper only | Distribution target generated from canonical source |
 | Plugin/extension packaging metadata | Packaging-distribution owned adapter target |
 
-Do not create a second canonical copy in `.agents/skills`, `.claude/skills`, `plugins/fgOS/skills`, or a Gemini extension package.
+Do not create a second canonical copy in `.agents/skills`, `.claude/skills`, or `plugins/fgOS/skills`.
 
 ## 5. Host Adapter Targets
 
@@ -108,11 +107,11 @@ canonical skill source
 | Codex / OpenAI skills | `.agents/skills/<skill>/SKILL.md` | `$fgos-...` or implicit selection by skill description | implemented for current canonical skills |
 | Claude | `.claude/skills/<skill>/SKILL.md` plus fgOS plugin wrappers/commands where needed | existing `/fgOS:<verb>` compatibility, target lowercase alias `/fgos:<verb>` where host allows | partial |
 | Claude plugin-only consumer | `plugins/fgOS/skills/<skill>/SKILL.md` | plugin-exposed command/skill surface | implemented for current `fgos-*` dev skills |
-| Gemini CLI | extension package with `gemini-extension.json`, `GEMINI.md`, and `commands/fgos/<verb>.toml` | `/fgos:<verb>` via command directory namespace | partial (prototype generator only; release/doctor wiring planned) |
+| Gemini CLI | none | none | not provided (the unused prototype generator was removed; add through the common render if ever needed) |
 
-Claude, Gemini, and Codex are adapters. None of them should own the fgOS skill semantics.
+Claude and Codex are adapters. None of them should own the fgOS skill semantics.
 
-Self-containment rule for the Gemini package (and any future installable extension): the package must run with the fgOS source repo absent. Every `commands/fgos/<verb>.toml` names only its packaged copy (`packaged_source = "skills/<skill>/SKILL.md"`) as the thing the host reads; the canonical directory it was rendered from is recorded in `provenance` as ledger metadata only, never as a runnable reference. Shared fragments ship inside the package under `skills/_shared/`. Generated adapter classification for `plugins/fgOS/skills/` follows the mirror's own write rule plus provenance (`_shared/` or `fgos-*` **and** a canonical/assembled source), so a hand-authored `plugins/fgOS/skills/fgos-custom/` with no source stays unmanaged.
+Generated adapter classification for `plugins/fgOS/skills/`: the mirror writes only `_shared/` and `fgos-*` directories that have a canonical source, so a hand-authored `plugins/fgOS/skills/fgos-custom/` with no source stays unmanaged.
 
 ## 6. Trigger Vocabulary
 
