@@ -14,7 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { IDENTITY_ENV_KEYS } from '../helpers/identity-env.mjs';
-import { probeIdentity, resolveWriterIdentity } from '../../src/util/session-identity.mjs';
+import { identityDoor, probeIdentity, resolveWriterIdentity } from '../../src/util/session-identity.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -227,4 +227,22 @@ test('on every platform an unresolved answer names the calling Node process', (t
   requireHost(t);
   const result = inFreshProcess('return { answer: facade.resolveWriterIdentity(), pid: process.pid };');
   if (result.answer.source === 'unresolved') assert.equal(result.answer.id, result.pid);
+});
+
+test('the shared directory judgement of a clone comes from the crate through the door, null when there is no cache', (t) => {
+  requireHost(t);
+  const clone = fs.mkdtempSync(path.join(os.tmpdir(), 'identity-directory-'));
+  try {
+    fs.mkdirSync(path.join(clone, '.fgos', 'cache'), { recursive: true });
+    fs.writeFileSync(path.join(clone, '.fgos', 'project.json'), JSON.stringify({ v: 1, projectId: '0123456789abcdef0123456789abcdef', handle: 'demo', createdAt: '2026-10-24T00:00:00.000Z' }));
+    assert.equal(identityDoor().sharedDirectory(clone), null, 'no cache yet');
+    const cache = { v: 1, fetchedAt: null, entries: [], dropped: [{ reason: 'bad-signature', machineId: 'beta-bbbbbb' }], verified: [] };
+    fs.writeFileSync(path.join(clone, '.fgos', 'cache', 'identity-directory.json'), JSON.stringify(cache));
+    assert.deepEqual(identityDoor().sharedDirectory(clone), {
+      machines: 0, entries: 0, fetchedAt: null, dropped: [{ reason: 'bad-signature', machineId: 'beta-bbbbbb' }],
+      foreignEntries: 0, foreignProjectIds: [], sharedHandleMachines: [],
+    });
+  } finally {
+    fs.rmSync(clone, { recursive: true, force: true });
+  }
 });

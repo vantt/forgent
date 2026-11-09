@@ -5,7 +5,9 @@
 //! takes it first, so no module but the facade can mint a lock from an fd.
 use crate::check;
 use fgos_holder_lock::origin::{self, Holder};
-use fgos_holder_lock::{state_root, HelperExe, HoldersList, Probe, Resource, UnavailableReason};
+use fgos_holder_lock::{
+    state_root, HelperExe, HoldersList, Probe, Resource, UnavailableReason, DEFAULT_KILL_WAIT_MS,
+};
 #[cfg(unix)]
 use fgos_holder_lock::{HeldReason, Mode, NodeLock, Release, Wait};
 use napi::{bindgen_prelude::External, Error, Result};
@@ -219,6 +221,13 @@ pub fn close_handed_over(
 ) -> Result<()> {
     drop(lock.0.lock().map_err(failed)?.take());
     Ok(())
+}
+
+/// How long a dead predecessor's domain is waited on after it is killed: the one bound every caller uses.
+#[napi(namespace = "holderLock", js_name = "killWaitMs")]
+pub fn kill_wait_ms() -> Result<f64> {
+    door()?;
+    Ok(DEFAULT_KILL_WAIT_MS as f64)
 }
 
 /// The state root of `env` and the input that decided it.

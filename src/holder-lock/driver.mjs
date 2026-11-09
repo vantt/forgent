@@ -197,6 +197,8 @@ function viaDoor(call) {
 
 /** Lock the open description `fd`: `{ result, ... , lock? }`; `lock` (an acquired lock) belongs to the facade's entry for this fd. */
 export const doorLockFd = (fd, wait, killWaitMs, predecessorKinds) => viaDoor((ns, cap) => ns.lockFd(cap, fd, 'ex', wait, killWaitMs, predecessorKinds ?? []));
+/** The predecessor kill wait in milliseconds, decided once by the holder-lock crate. */
+export const doorKillWaitMs = () => viaDoor((ns) => ns.killWaitMs());
 /** The state root of `env` and what decided it: `{ stateRoot, lockRoot, source }`, the host's own formula. */
 export const doorStateRoot = (env) => viaDoor((ns) => ns.stateRoot({ ...env }));
 export const doorProbe = (lockPath) => viaDoor((ns) => ns.probe(path.resolve(lockPath)));

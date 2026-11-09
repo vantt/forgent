@@ -27,7 +27,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
-import { HolderLockError, DEFAULT_KILL_WAIT_MS, LOCK_FD_ENV, LOCK_FD_SLOT, LOCK_JOB_ENV } from './protocol.mjs';
+import { HolderLockError, LOCK_FD_ENV, LOCK_FD_SLOT, LOCK_JOB_ENV } from './protocol.mjs';
 import { resolveLock, loadLockRegistry, lockEntry } from './registry.mjs';
 import { LockScope, createLockScope, assertLockScope } from './lock-scope.mjs';
 import { resolveStateRoot, resolveLockRoot } from './state-root.mjs';
@@ -42,6 +42,7 @@ import {
   leftoverSweep,
   borrowLeadsGroup,
   doorLockFd,
+  doorKillWaitMs,
   doorProbe,
   doorDrain,
   doorClearDomain,
@@ -195,7 +196,7 @@ function prepareAcquire(scope, name, params) {
   const bin = lockTransport() === 'hold' ? hostBin({ fgosDir: params.fgosDir }) : null;
   ensureLockFile(lock);
   assertDriverUsable(lock.v3Path);
-  return { lock, bin, projectRoot, killWaitMs: DEFAULT_KILL_WAIT_MS, predecessorKinds: params.predecessorKinds, env: routeEnv() };
+  return { lock, bin, projectRoot, killWaitMs: doorKillWaitMs(), predecessorKinds: params.predecessorKinds, env: routeEnv() };
 }
 
 /** The lock file exists (created once, never removed while the resource

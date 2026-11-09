@@ -14,9 +14,6 @@ export const LOCK_FD_ENV = 'FGOS_LOCK_FD';
 /** Names a borrow job on the hold transport: `<lock name>:<job name>`. */
 export const LOCK_JOB_ENV = 'FGOS_LOCK_JOB';
 
-/** How long a dead predecessor's domain is waited on after it is killed; the one bound every caller uses. */
-export const DEFAULT_KILL_WAIT_MS = 2000;
-
 /** Raised for every failure the facade names. `code` is the stable key a
  * caller branches on; `category` follows the CLI-facing vocabulary other
  * precondition errors use (WriterIdentityError). Extra fields describe the

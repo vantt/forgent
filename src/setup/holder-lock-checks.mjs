@@ -12,8 +12,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-import { hostBin, guaranteeFor, doorTwoProcessProbe } from '../holder-lock/driver.mjs';
-import { PROTOCOL, DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
+import { hostBin, guaranteeFor, doorTwoProcessProbe, doorKillWaitMs } from '../holder-lock/driver.mjs';
+import { PROTOCOL } from '../holder-lock/protocol.mjs';
 import { resolveStateRoot, LOCKS_DIR } from '../holder-lock/state-root.mjs';
 import { fgosDirFromRoot } from '../runner/paths.mjs';
 
@@ -73,6 +73,15 @@ export function guaranteeRefusal(label, dir, guarantee) {
   return null;
 }
 
+/** The predecessor kill wait as the holder-lock crate states it; `null` when the door is not reachable (the rows above already name that). */
+function killWaitFact() {
+  try {
+    return `killWaitMs ${doorKillWaitMs()} (fixed)`;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * For `<fgosDir>/locks` and `<lockRoot>`: the driver's guarantee through
  * door, then the two-process probe on that same mount.
@@ -115,7 +124,7 @@ export async function checkLockKernelSemantics(repoRoot) {
     }
   }
   // The two fixed facts of the lock layer stay visible: the state root the locks live under and the predecessor kill wait.
-  const facts = [machine.error ? null : `stateRoot ${machine.stateRoot} (${machine.source})`, `killWaitMs ${DEFAULT_KILL_WAIT_MS} (fixed)`].filter(Boolean);
+  const facts = [machine.error ? null : `stateRoot ${machine.stateRoot} (${machine.source})`, killWaitFact()].filter(Boolean);
   const all = [...failures, ...warnings, ...passes, ...facts].join('; ');
   if (failures.length > 0) return { passed: false, message: all };
   if (warnings.length > 0) return { passed: true, message: warn(all) };

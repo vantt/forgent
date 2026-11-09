@@ -11,7 +11,7 @@ import path from 'node:path';
 import { StringDecoder } from 'node:string_decoder';
 import { spawn } from 'node:child_process';
 import { acquireSync, createLockScope, spawnWithLocks, resolveLock, resolveStateRoot } from '../holder-lock/index.mjs';
-import { DEFAULT_KILL_WAIT_MS } from '../holder-lock/protocol.mjs';
+import { doorKillWaitMs } from '../holder-lock/driver.mjs';
 import { admitSuccessor } from './cwd-lock.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 import { computeSha256Digest, openAgentFileSync, publishImmutableProof, publishMutableProjection } from '../native/proof-helpers.mjs';
@@ -269,7 +269,7 @@ export function writeSettleContext(runDir, context) {
 
 /** The kill grace and the predecessor kill wait the envelope carries. */
 export function readLaunchSettings(projectRoot) {
-  return { gateKillGraceMs: readGateKillGraceMs({ projectRoot }), killWaitMs: DEFAULT_KILL_WAIT_MS };
+  return { gateKillGraceMs: readGateKillGraceMs({ projectRoot }), killWaitMs: doorKillWaitMs() };
 }
 
 /**

@@ -15,6 +15,15 @@ pub fn resolve(fgos_dir: Option<String>) -> Result<Value> {
     serde_json::to_value(resolve_current(fgos_dir.as_deref().map(Path::new))).map_err(error)
 }
 
+/// The judgement of the shared directory of the main checkout at `main_root`, read from its cache:
+/// `{ machines, entries, fetchedAt, dropped, foreignEntries, foreignProjectIds, sharedHandleMachines }`,
+/// or `null` when the clone has no project id or no readable cache.
+#[napi(namespace = "sessionIdentity", js_name = "sharedDirectory")]
+pub fn shared_directory(main_root: String) -> Result<Value> {
+    check()?;
+    serde_json::to_value(fgos_identity::shared::judge_directory(Path::new(&main_root))).map_err(error)
+}
+
 /// `att-<attemptId>`; an unusable id fails with a message that starts with `invalid-attempt-id`.
 #[napi(namespace = "sessionIdentity", js_name = "mintAttempt")]
 pub fn mint_attempt(attempt: String) -> Result<String> {
