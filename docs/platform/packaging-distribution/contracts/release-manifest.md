@@ -99,7 +99,7 @@ The schema is frozen at `schemaVersion: 1`. Rust serde definitions live in `pack
 | `sourceRevision` | string | Optional | Git commit hash from which release was built. |
 | `createdAt` | string | Optional | ISO 8601 UTC timestamp of build. |
 | `target` | object | Yes | Target platform info (`os`, `arch`, optional `libc`). |
-| `entries` | object | Yes | Native executable entry points (`fgos`, optional `fgosRunner`). |
+| `entries` | object | Yes | Native executable entry points (`fgos`, optional `fgosRunner`, optional `fgctl`; see section 9). |
 | `components` | object | Yes | Payload component locators (see section 4). |
 | `requires` | object | Yes | System prerequisites (optional `node`, `git` semver range strings). |
 | `stateSchemas` | object | Optional | Work-state schema compatibility (`read`, `write`, `migrations`). In V1, `migrations` is reserved and must be empty. |
@@ -172,6 +172,18 @@ for linux-x64 activation. That future switch must explicitly reject missing
 
 The combined addon reports Git port/receipt/WAL and Event Store envelope contract
 versions separately from package versions; the ABI doctor row checks each.
+
+## 9. Shipped fgctl (additive V1)
+
+`entries.fgctl` is optional and omitted when absent (never `null`), so the digest of
+a release built before it is unchanged. When present it is the release-relative
+path of the release's own `fgctl` binary (`<release>/bin/fgctl`, or
+`<release>/bin/fgctl.exe` on a Windows target). It must be a canonical path (no `\`, no `:`, no empty, `.` or `..` segment) with
+a matching `kind: "file"` entry in `files[]`; that entry's `digest` is the `fgctl`
+digest. `ReleaseManifest::validate_v1_invariants` refuses a manifest that breaks
+this, at every manifest read. Staging and preflight verify the bytes like every
+other `files[]` entry. `fgctl upgrade` installs this binary as the machine's
+`fgctl` (activation-binding contract section 10; packaging spec RUL110 (a release ships its `fgctl` and `fgctl upgrade` installs it)).
 
 ## Retained Runtime Identity And Activation Source Detail
 

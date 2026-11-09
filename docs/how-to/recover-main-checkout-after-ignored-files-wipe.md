@@ -42,7 +42,11 @@ command prints `pin overridden: ...`, records the reason as `pinOverrideReason` 
 untouched, so there is nothing to restore. An `fgctl` older than the flag answers
 `Unknown option: --override-pin`; build one from this checkout
 (`cargo build --release -p fgctl`, then run `fgctl` from that target's `release/`
-directory). Never edit or commit the pin to get
+directory). `fgctl` now updates with the release: once the workspace is active
+again, `fgctl upgrade --from <the same release>` replaces an older machine `fgctl`
+with the one that release ships and keeps the old binary as `<path>.prev`; it
+prints `fgctl: up to date ...` when nothing needed replacing. Releases built before
+this change ship no `fgctl`, and the upgrade says so. Never edit or commit the pin to get
 past this: it is shared by every machine, and changing it is a separate,
 owner-approved change.
 

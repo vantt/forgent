@@ -147,6 +147,26 @@ exchange. Only Linux releases advertise `git-wal-v1` until C5 scan and fence adm
 rollback goes through the new controller and never removes the fence or WAL.
 The original `.fgos/installation/activation.lock` tombstone remains intact.
 
+## 10. fgctl refresh after upgrade
+
+`fgctl upgrade` returns success only after it has published (or re-confirmed) a
+`ready` activation. It then reads that activation's `releasePath` and
+`artifactDigest` and refreshes the running `fgctl` from the release:
+
+1. the release's `manifest.json` must still hash to `artifactDigest`, and its
+   `entries.fgctl` (release-manifest contract section 9) must pass the file verifier;
+2. the bytes read for installation must match that entry's digest;
+3. equal bytes write nothing; different bytes keep the old binary as `<path>.prev`
+   and are renamed into place (on Windows the running binary is renamed to
+   `<path>.prev` first);
+4. a failed check refuses with `fgctl-release-unverified`, an unwritable directory
+   with `fgctl-not-writable` plus the manual command; both leave the binary
+   untouched and exit non-zero after the activation itself stood.
+
+The activation record does not change in this step. `init` and `repair` do not run it.
+Source: `packages/distribution/rust/src/fgctl_refresh.rs`. Rule: packaging spec
+RUL110 (a release ships its `fgctl` and `fgctl upgrade` installs it).
+
 ## Retained Runtime Identity And Activation Source Detail
 
 Retained source material — complete source units from `docs/architect/packaging-distribution/runtime-identity-and-activation.md` at `77830ba77eb05991d95b005919776ee6254e833b`. Source design, dated status and obligations are preserved here; this carriage does not certify current implementation. Relative links retain their destination.
