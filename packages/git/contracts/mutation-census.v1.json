@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "44ab1fe968e98e16b50ab2155c79a725b2a3cf286f976c6221867ec41a09f3e7",
+  "payloadDigest": "b03133fdfff34aaa10f77d2c5d9b10add2bd21b846d1fb443a46a472e882daa4",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -92,7 +92,7 @@
     "apps/fgos/src/wiring/mailbox_config.rs": "76e56398f1ca0ccf5f794dd307729622aa247d160f2d7adaf29a8455720211cd",
     "apps/fgos/src/wiring/mailbox_hook.rs": "e58291e3e8a2cbb9a8914f56b74fcb1454565a2fb7171f3cee4dc2c68945fe53",
     "apps/fgos/src/wiring/mailbox_hook_unsupported.rs": "42f2aa9df8c530b5a1534696b2dba99e8410552598691748a6518ede830d674e",
-    "apps/fgos/src/wiring/mailbox_identity.rs": "a3a1d4a29a6de7279f8b592d930bb11ce66dec217cbd59651571e6a5318e7aa3",
+    "apps/fgos/src/wiring/mailbox_identity.rs": "27d48554c2c047fde3cbdb8299a12dccbcd753e5d9cd6612e101b781c9ca6676",
     "apps/fgos/src/wiring/mailbox_ingest.rs": "62228094287f3394f28409aec9e4951b3279ee613d01db99c23058bf6c6672c3",
     "apps/fgos/src/wiring/mailbox_remote.rs": "24f8fd221a4d179d86a925039eefbdbb7dddc65899ddba6e3a4f7e2cd15f04eb",
     "apps/fgos/src/wiring/mailbox_root.rs": "e04f92eaa95d71cd1273b529163f0f903b4f11f4a4de45daecdffb8748d9dbc6",

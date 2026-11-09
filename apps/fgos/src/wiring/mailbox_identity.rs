@@ -345,8 +345,14 @@ mod tests {
             .unwrap_or(0)
     }
 
-    /// A child process whose kernel command name is `omp`: a copy of `sleep`
-    /// under that name, killed on drop.
+    /// A child process whose kernel command name is `omp`: the shell run
+    /// through a symlink of that name (the kernel names a process after the
+    /// path it was executed by), blocked reading its stdin, killed on drop.
+    /// Never a copy of a system tool: a copy is written just before it is
+    /// executed, and a process forked by a concurrent test inherits the open
+    /// write descriptor, so the exec fails with "Text file busy"; and a
+    /// multi-call `sleep` (uutils coreutils) refuses to run under another
+    /// name and exits at once.
     struct Omp(std::process::Child, PathBuf);
 
     impl Omp {
@@ -354,8 +360,12 @@ mod tests {
             let dir = std::env::temp_dir().join(format!("mbx-omp-{tag}-{}", std::process::id()));
             std::fs::create_dir_all(&dir).unwrap();
             let bin = dir.join("omp");
-            std::fs::copy("/bin/sleep", &bin).unwrap();
-            let child = std::process::Command::new(&bin).arg("60").spawn().unwrap();
+            std::os::unix::fs::symlink("/bin/sh", &bin).unwrap();
+            let child = std::process::Command::new(&bin)
+                .args(["-c", "read _"])
+                .stdin(std::process::Stdio::piped())
+                .spawn()
+                .unwrap();
             Self(child, dir)
         }
 
