@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "670b9705772e52c50dd9a4e9f53e30dfabf1f8f55a5428beb1877b05e9dec90f",
+  "payloadDigest": "9492f2a932d96e9ecc5846cb21efc4585551a96b79e4389ce2a74a21eb7edea5",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1128,7 +1128,7 @@
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/git-retention-note.mjs": "8e4bacd772c5562a964c4beeea95d9ee808f41e122a7b6adc09fee81c96949fd",
     "src/setup/holder-lock-checks.mjs": "375664bc0ee2f362783f2d3109c83d5cc77b1c55837e715297a00294f70d9e7f",
-    "src/setup/identity-checks.mjs": "0d10905343b6d5e087802c5df2d1d9a96b2f40a1f8b97ace6e7473abc98cb7cd",
+    "src/setup/identity-checks.mjs": "bc790daf5554adae17ad03012260e1b904a3cc922501d1b111582800a623a880",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "82aaa1ec07a5d2925fcb3117a020eb4576777f901c09d054cb17c659d8c144f3",
     "src/setup/instruction-registry.mjs": "525bdc05438191f6c02b0b071b577ad84cb9f2c5cfa8e6efe0ed82f60ae9b17c",

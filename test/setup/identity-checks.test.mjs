@@ -144,4 +144,7 @@ test('shared-directory row shows the crate judgement: passes with counts, warns 
 
   fs.writeFileSync(cacheFile, 'not json');
   assert.equal(checkIdentitySharedDirectory(repo).message, 'no shared directory yet', 'an unreadable cache is rebuilt by the next read, not reported');
+
+  const unreadable = checkIdentitySharedDirectory(repo, { door: () => { throw new Error('addon missing'); } });
+  assert.equal(unreadable.message, 'warning: identity door unavailable (addon missing)', 'an unreachable door is named, not read as an empty directory');
 });

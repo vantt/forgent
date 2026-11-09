@@ -153,13 +153,13 @@ export function checkIdentityProjectId(cwd, { hostBin } = {}) {
  * on a machine shown by its id because another machine has its handle. A clone with no project id or no readable
  * cache passes: there is no shared directory yet. No fix: the owner decides what to do about a forged or misplaced entry.
  */
-export function checkIdentitySharedDirectory(cwd) {
+export function checkIdentitySharedDirectory(cwd, { door = identityDoor } = {}) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
   let judged;
   try {
-    judged = identityDoor().sharedDirectory(root);
-  } catch {
-    judged = null;
+    judged = door().sharedDirectory(root);
+  } catch (err) {
+    return { passed: true, message: `warning: identity door unavailable (${err.message})` };
   }
   if (!judged) return { passed: true, message: 'no shared directory yet' };
   const summary = `${judged.machines} machine(s), ${judged.entries} entries, fetched ${judged.fetchedAt ?? 'never'}`;

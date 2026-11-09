@@ -3,6 +3,7 @@
 Branch `harden/t9-p17-kill-wait-identity` (worktree `/home/vantt/projects/forgent-worktrees/harden-t9-p17-kill-wait-identity`), tip `05146a6b5`, pushed, rebased on origin/main. NOT landed: waits for OPC re-review (Git tree touched).
 
 ## Done
+- The doctor row names an unreachable door (`warning: identity door unavailable (<err>)`) instead of reading it as an empty directory; the wiring test covers it through an injected door.
 - Kill wait: `holderLock.killWaitMs()` added to the addon (returns the crate's `DEFAULT_KILL_WAIT_MS`); Node literal in `protocol.mjs` deleted; the three readers (`index.mjs`, `direct-launch.mjs`, `holder-lock-checks.mjs`) read `doorKillWaitMs()` from `driver.mjs`. The export name did not survive: a constant cannot be lazy, so every caller moved (L10).
 - Identity directory: `shared::judge_directory` / `Cache::judge` in `packages/identity/rust/src/shared.rs`; addon `sessionIdentity.sharedDirectory(mainRoot)`; no new verb. Addon versions `holderLock` 2 and `sessionIdentity` 2, `combinedAbiMatches` requires them (an old addon fails by name).
 - Deviation from the phase text (OPC, L10): the phase said P10 switches the doctor row; OPC asked for it in this change, so `identity-checks.mjs` now calls `identityDoor().sharedDirectory` and its cache parsing is deleted. P10 has nothing left to do for this row.
@@ -20,7 +21,7 @@ Node: about -35 in src (protocol -3, identity-checks -20, rest ~0) ; Rust +~75 (
 
 ## Authority
 - Kill wait (decision 12): was Node and Rust; now crate only, Node reads it through the addon.
-- Shared-directory judgement: was doctor row parsing the crate's private cache; now crate judges, doctor shows. Left: `src/identity/directory-store.mjs:15` still deletes the cache file in Node (a Node write to the crate's private file); belongs to the crate, not moved (not owned by this phase).
+- Shared-directory judgement: was doctor row parsing the crate's private cache; now crate judges, doctor shows. Open item for the identity crate: `FGOS_FILE.IDENTITY_DIRECTORY` now has one JS use, `src/identity/directory-store.mjs:15`, which still deletes the cache file in Node (a Node write to the crate's private file); belongs to the crate, not moved (not owned by this phase).
 - `src/runner/lock-fence.mjs` has its own `KILL_WAIT_MS = 3000` (a different bound, the fence's); not touched, worth a look by T1 owner.
 
 ## Lessons
