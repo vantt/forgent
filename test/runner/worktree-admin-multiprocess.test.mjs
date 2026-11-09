@@ -32,7 +32,7 @@ function tempRepo() {
 }
 
 /** A child that adds `count` worktrees, one `git worktree add` each, named after `tag`. */
-function addingChild(root, base, tag, count) {
+function addingChild(root, base, tag, count, children) {
   const script = `
     import { createLockScope } from ${JSON.stringify(HOLDER)};
     import { addWorktreeSync } from ${JSON.stringify(REPO_LOCKS)};
@@ -42,6 +42,7 @@ function addingChild(root, base, tag, count) {
     }
   `;
   const child = spawn(process.execPath, ['--input-type=module', '-e', script], { stdio: ['ignore', 'ignore', 'pipe'] });
+  children.push(child);
   let stderr = '';
   child.stderr.on('data', (chunk) => { stderr += chunk; });
   return new Promise((resolve) => child.once('exit', (code) => resolve({ code, stderr })));
@@ -53,11 +54,14 @@ const TEST_TIMEOUT_MS = 240000;
 // A child waits at least as long as the test itself may run, so contention under load waits instead of failing.
 const CHILD_WAIT_MS = TEST_TIMEOUT_MS;
 
-test(`8 processes adding worktrees for ${ROUNDS} rounds leave every worktree registered and intact`, { skip, timeout: TEST_TIMEOUT_MS }, async () => {
+test(`8 processes adding worktrees for ${ROUNDS} rounds leave every worktree registered and intact`, { skip, timeout: TEST_TIMEOUT_MS }, async (t) => {
   const { root, git } = tempRepo();
+  const children = [];
+  // A failed or timed-out run must not leave adding children running.
+  t.after(() => { for (const child of children) child.kill('SIGKILL'); });
   const base = path.join(root, 'wts');
   fs.mkdirSync(base);
-  const results = await Promise.all(Array.from({ length: 8 }, (_, n) => addingChild(root, base, `p${n}`, ROUNDS)));
+  const results = await Promise.all(Array.from({ length: 8 }, (_, n) => addingChild(root, base, `p${n}`, ROUNDS, children)));
   for (const r of results) assert.equal(r.code, 0, r.stderr);
   const listed = git('worktree', 'list', '--porcelain').stdout.split('\n').filter((l) => l.startsWith('worktree '));
   assert.equal(listed.length, 1 + 8 * ROUNDS);
