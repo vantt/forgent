@@ -42,15 +42,32 @@ fn null_device() -> &'static str {
     }
 }
 
-/// Same bounds as `install.sh`'s `CURL_TIMEOUT_ARGS`: a server that connects
-/// but never finishes cannot hang `fgctl init`.
-const CURL_ARGS: [&str; 5] = ["-fsSL", "--connect-timeout", "15", "--max-time", "120"];
+/// Same bounds as `install.sh`: a server that connects but never finishes
+/// cannot hang `fgctl init` and TLS below 1.2 is refused. [`check_transport`]
+/// limits the first URL before curl runs and the URL curl ended at afterwards;
+/// [`redirect_protocols`] decides where a redirect may lead.
+const CURL_ARGS: [&str; 8] = [
+    "-fsSL",
+    "--connect-timeout",
+    "15",
+    "--max-time",
+    "120",
+    "--proto",
+    "=https,http,file",
+    "--tlsv1.2",
+];
+
+/// Byte caps per download, as in `install.sh`: the fgOS release tarball is
+/// about 17 MiB, so the asset cap leaves generous headroom and still stops a
+/// server that streams without end.
+pub const MAX_ASSET_BYTES: u64 = 128 * 1024 * 1024;
+pub const MAX_CHECKSUMS_BYTES: u64 = 1024 * 1024;
 
 const CHECKSUMS_FILE: &str = "SHA256SUMS";
 
 #[derive(Debug, thiserror::Error)]
 pub enum FetchError {
-    #[error("target '{target}' is not supported. Supported targets: {supported}")]
+    #[error("target '{target}' is not supported. Supported targets: {supported}. There is no prebuilt fgctl for it; build from source: git clone https://github.com/vantt/forgent && cargo build --release -p fgctl")]
     UnsupportedTarget { target: String, supported: String },
     #[error("curl is required to download a release but was not found on PATH; install curl or pass a local --from path")]
     CurlMissing,
@@ -62,8 +79,14 @@ pub enum FetchError {
     LatestUnresolved { url: String, detail: String },
     #[error("invalid source URL '{0}': expected http://, https:// or file:// ending in a .tar.gz file name, with no query or fragment")]
     InvalidUrl(String),
+    #[error("refusing {0}: only https:// and file:// URLs are allowed, and http:// only for a loopback host (127.0.0.0/8, ::1, localhost)")]
+    InsecureUrl(String),
+    #[error("{url} is larger than the {limit} byte limit; refusing it")]
+    TooLarge { url: String, limit: u64 },
     #[error("no checksum entry found for {asset} in SHA256SUMS; refusing to use it")]
     ChecksumMissing { asset: String },
+    #[error("SHA256SUMS lists {asset} more than once; refusing to choose between the entries")]
+    ChecksumAmbiguous { asset: String },
     #[error("checksum verification failed for {asset}: SHA256SUMS says {expected}, downloaded file is {actual}")]
     ChecksumMismatch {
         asset: String,
@@ -130,6 +153,65 @@ impl DownloadEndpoint {
 
 fn non_empty(value: &Option<String>) -> Option<&str> {
     value.as_deref().map(str::trim).filter(|s| !s.is_empty())
+}
+
+/// https:// and file:// always; http:// only for a loopback host. There is no
+/// escape hatch: a mirror on plain http would let anyone on the path replace
+/// the archive and its `SHA256SUMS` together.
+fn check_transport(url: &str) -> Result<(), FetchError> {
+    let refused = || FetchError::InsecureUrl(url.to_string());
+    if url
+        .chars()
+        .any(|c| c == '\\' || c.is_whitespace() || c.is_control())
+    {
+        return Err(refused());
+    }
+    if url.starts_with("https://") || url.starts_with("file://") {
+        return Ok(());
+    }
+    let rest = url.strip_prefix("http://").ok_or_else(refused)?;
+    let authority = rest.split(['/', '?', '#']).next().unwrap_or("");
+    let host_port = authority.rsplit('@').next().unwrap_or("");
+    if is_loopback_host_port(host_port) {
+        Ok(())
+    } else {
+        Err(refused())
+    }
+}
+
+/// `host[:port]` where the host is `localhost`, `[::1]` or an address in
+/// 127.0.0.0/8 (Rust's parser refuses octal-looking octets).
+fn is_loopback_host_port(host_port: &str) -> bool {
+    let (host, port, bracketed) = match host_port.strip_prefix('[') {
+        Some(rest) => {
+            let Some((inner, after)) = rest.split_once(']') else {
+                return false;
+            };
+            match after {
+                "" => (inner, None, true),
+                _ => match after.strip_prefix(':') {
+                    Some(port) => (inner, Some(port), true),
+                    None => return false,
+                },
+            }
+        }
+        None => match host_port.split_once(':') {
+            Some((host, port)) => (host, Some(port), false),
+            None => (host_port, None, false),
+        },
+    };
+    if port.is_some_and(|p| !p.chars().all(|c| c.is_ascii_digit())) {
+        return false;
+    }
+    if bracketed {
+        return host
+            .parse::<std::net::Ipv6Addr>()
+            .is_ok_and(|ip| ip.is_loopback());
+    }
+    host == "localhost"
+        || host
+            .parse::<std::net::Ipv4Addr>()
+            .is_ok_and(|ip| ip.is_loopback())
 }
 
 pub fn is_url(value: &str) -> bool {
@@ -251,9 +333,32 @@ pub struct Downloaded {
     _scratch: ScratchDir,
 }
 
-fn run_curl(extra: &[&str], url: &str) -> Result<Vec<u8>, FetchError> {
-    let output = Command::new("curl")
+/// A redirect from an https or file URL may only lead to https; one from a
+/// loopback http URL (a local mirror) may also stay on http, which
+/// [`check_transport`] then holds to loopback.
+fn redirect_protocols(url: &str) -> &'static str {
+    if url.starts_with("http://") {
+        "=https,http"
+    } else {
+        "=https"
+    }
+}
+
+/// Runs curl against `url` after the scheme gate and returns the URL curl
+/// ended at (`-w %{url_effective}` on stdout), which is checked the same way so
+/// a redirect cannot reach plain http. `max_bytes` caps the body curl is
+/// willing to read; the caller still checks what landed on disk.
+fn run_curl(extra: &[&str], url: &str, max_bytes: Option<u64>) -> Result<Vec<u8>, FetchError> {
+    check_transport(url)?;
+    let mut command = Command::new("curl");
+    command
         .args(CURL_ARGS)
+        .args(["--proto-redir", redirect_protocols(url)])
+        .args(["-w", "%{url_effective}"]);
+    if let Some(max) = max_bytes {
+        command.arg("--max-filesize").arg(max.to_string());
+    }
+    let output = command
         .args(extra)
         .arg("--url")
         .arg(url)
@@ -266,7 +371,16 @@ fn run_curl(extra: &[&str], url: &str) -> Result<Vec<u8>, FetchError> {
             }
         })?;
     if output.status.success() {
+        let effective = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if !effective.is_empty() {
+            check_transport(&effective)?;
+        }
         Ok(output.stdout)
+    } else if let (Some(63), Some(limit)) = (output.status.code(), max_bytes) {
+        Err(FetchError::TooLarge {
+            url: url.to_string(),
+            limit,
+        })
     } else {
         let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
         let detail = match output.status.code() {
@@ -281,9 +395,22 @@ fn run_curl(extra: &[&str], url: &str) -> Result<Vec<u8>, FetchError> {
     }
 }
 
-fn curl_to_file(url: &str, dest: &Path) -> Result<(), FetchError> {
+fn curl_to_file(url: &str, dest: &Path, max_bytes: u64) -> Result<(), FetchError> {
     let dest_str = dest.to_string_lossy();
-    run_curl(&["-o", dest_str.as_ref()], url).map(|_| ())
+    run_curl(&["-o", dest_str.as_ref()], url, Some(max_bytes))?;
+    ensure_within_cap(dest, max_bytes, url)
+}
+
+/// curl enforces the cap only when the server announces a length (and not for
+/// every scheme), so what actually landed on disk is measured too.
+fn ensure_within_cap(path: &Path, limit: u64, url: &str) -> Result<(), FetchError> {
+    if std::fs::metadata(path)?.len() > limit {
+        return Err(FetchError::TooLarge {
+            url: url.to_string(),
+            limit,
+        });
+    }
+    Ok(())
 }
 
 /// Resolves the tag of the latest (non-pre-release) release by following
@@ -294,10 +421,7 @@ fn resolve_latest_tag(endpoint: &DownloadEndpoint) -> Result<String, FetchError>
         None => DEFAULT_RELEASE_REPO_URL.to_string(),
     };
     let latest_url = format!("{base}/releases/latest");
-    let out = run_curl(
-        &["-o", null_device(), "-w", "%{url_effective}"],
-        &latest_url,
-    )?;
+    let out = run_curl(&["-o", null_device()], &latest_url, None)?;
     let effective = String::from_utf8_lossy(&out).to_string();
     let effective = effective.split(['?', '#']).next().unwrap_or("");
     let tag = effective
@@ -317,19 +441,24 @@ fn resolve_latest_tag(endpoint: &DownloadEndpoint) -> Result<String, FetchError>
 
 /// Finds `asset` in a `sha256sum`-style file and returns its lowercase hex hash.
 /// The file-name field must match exactly (a leading binary-mode `*` is
-/// ignored), never a substring.
-fn find_checksum(sums: &str, asset: &str) -> Option<String> {
-    for line in sums.lines() {
+/// ignored), never a substring, and exactly one line may name the asset.
+fn find_checksum(sums: &str, asset: &str) -> Result<String, FetchError> {
+    let mut hashes = sums.lines().filter_map(|line| {
         let mut fields = line.split_whitespace();
-        let (Some(hash), Some(name)) = (fields.next(), fields.next()) else {
-            continue;
-        };
-        if name.strip_prefix('*').unwrap_or(name) == asset {
-            let valid = hash.len() == 64 && hash.chars().all(|c| c.is_ascii_hexdigit());
-            return valid.then(|| hash.to_ascii_lowercase());
-        }
+        let (hash, name) = (fields.next()?, fields.next()?);
+        (name.strip_prefix('*').unwrap_or(name) == asset).then_some(hash)
+    });
+    let missing = || FetchError::ChecksumMissing {
+        asset: asset.to_string(),
+    };
+    let hash = hashes.next().ok_or_else(missing)?;
+    if hashes.next().is_some() {
+        return Err(FetchError::ChecksumAmbiguous {
+            asset: asset.to_string(),
+        });
     }
-    None
+    let valid = hash.len() == 64 && hash.chars().all(|c| c.is_ascii_hexdigit());
+    valid.then(|| hash.to_ascii_lowercase()).ok_or_else(missing)
 }
 
 fn sha256_hex(path: &Path) -> std::io::Result<String> {
@@ -354,13 +483,15 @@ fn download_verified(base: &str, asset: &str, origin: String) -> Result<Download
     let tarball = scratch.0.join(asset);
     let sums_path = scratch.0.join(CHECKSUMS_FILE);
 
-    curl_to_file(&format!("{base}/{asset}"), &tarball)?;
-    curl_to_file(&format!("{base}/{CHECKSUMS_FILE}"), &sums_path)?;
+    curl_to_file(&format!("{base}/{asset}"), &tarball, MAX_ASSET_BYTES)?;
+    curl_to_file(
+        &format!("{base}/{CHECKSUMS_FILE}"),
+        &sums_path,
+        MAX_CHECKSUMS_BYTES,
+    )?;
 
     let sums = std::fs::read_to_string(&sums_path)?;
-    let expected = find_checksum(&sums, asset).ok_or_else(|| FetchError::ChecksumMissing {
-        asset: asset.to_string(),
-    })?;
+    let expected = find_checksum(&sums, asset)?;
     let actual = sha256_hex(&tarball)?;
     if expected != actual {
         return Err(FetchError::ChecksumMismatch {
@@ -539,12 +670,97 @@ mod tests {
         let h1 = "a".repeat(64);
         let h2 = "b".repeat(64);
         let sums = format!("{h1}  fgos-v1-t.tar.gz.sig\n{h2} *fgos-v1-t.tar.gz\n");
-        assert_eq!(find_checksum(&sums, "fgos-v1-t.tar.gz"), Some(h2));
-        assert_eq!(find_checksum(&sums, "fgos-v1.tar.gz"), None);
-        assert_eq!(
+        assert_eq!(find_checksum(&sums, "fgos-v1-t.tar.gz").unwrap(), h2);
+        assert!(matches!(
+            find_checksum(&sums, "fgos-v1.tar.gz"),
+            Err(FetchError::ChecksumMissing { .. })
+        ));
+        assert!(matches!(
             find_checksum("short  fgos-v1-t.tar.gz\n", "fgos-v1-t.tar.gz"),
-            None
-        );
+            Err(FetchError::ChecksumMissing { .. })
+        ));
+    }
+
+    #[test]
+    fn checksum_lookup_needs_exactly_one_entry_for_the_asset() {
+        let h1 = "a".repeat(64);
+        let h2 = "b".repeat(64);
+        let twice = format!("{h1}  fgos-v1-t.tar.gz\n{h2} *fgos-v1-t.tar.gz\n");
+        assert!(matches!(
+            find_checksum(&twice, "fgos-v1-t.tar.gz"),
+            Err(FetchError::ChecksumAmbiguous { .. })
+        ));
+        // The same line twice is still two entries: the file is malformed, not the asset.
+        let same_twice = format!("{h1}  fgos-v1-t.tar.gz\n{h1}  fgos-v1-t.tar.gz\n");
+        assert!(matches!(
+            find_checksum(&same_twice, "fgos-v1-t.tar.gz"),
+            Err(FetchError::ChecksumAmbiguous { .. })
+        ));
+    }
+
+    #[test]
+    fn downloads_use_https_or_file_and_http_only_for_loopback() {
+        for url in [
+            "https://github.com/vantt/forgent/releases/latest",
+            "file:///tmp/fgos/a.tar.gz",
+            "http://127.0.0.1/a.tar.gz",
+            "http://127.8.9.10:8080/a.tar.gz",
+            "http://localhost/a.tar.gz",
+            "http://[::1]/a.tar.gz",
+            "http://[::1]:8123/a.tar.gz",
+            "http://user:pw@127.0.0.1:80/a.tar.gz",
+        ] {
+            assert!(check_transport(url).is_ok(), "{url} must be allowed");
+        }
+        for url in [
+            "http://example.com/a.tar.gz",
+            "http://192.0.2.1/a.tar.gz",
+            "http://127.0.0.1.evil.example/a.tar.gz",
+            "http://127.0.0.1@evil.example/a.tar.gz",
+            "http://localhost.evil.example/a.tar.gz",
+            "http://127.0.0/a.tar.gz",
+            "http://[::2]/a.tar.gz",
+            "http://127.0.0.1:port/a.tar.gz",
+            "http://evil.example\\@127.0.0.1/a.tar.gz",
+            "http://127.0.0.1 .evil.example/a.tar.gz",
+            "ftp://127.0.0.1/a.tar.gz",
+            "HTTP://example.com/a.tar.gz",
+            "/local/a.tar.gz",
+        ] {
+            assert!(
+                matches!(check_transport(url), Err(FetchError::InsecureUrl(_))),
+                "{url} must be refused"
+            );
+        }
+    }
+
+    #[test]
+    fn a_redirect_may_leave_plain_http_only_from_a_loopback_mirror() {
+        assert_eq!(redirect_protocols("https://github.com/x"), "=https");
+        assert_eq!(redirect_protocols("file:///tmp/x"), "=https");
+        assert_eq!(redirect_protocols("http://127.0.0.1:1/x"), "=https,http");
+    }
+
+    #[test]
+    fn a_file_over_its_cap_is_refused_and_one_at_the_cap_is_kept() {
+        let dir = std::env::temp_dir()
+            .join("fgos-work")
+            .join(format!("fetch-cap-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let file = dir.join("asset");
+        std::fs::write(&file, vec![0u8; 10]).unwrap();
+        assert!(ensure_within_cap(&file, 10, "https://x/asset").is_ok());
+        assert!(matches!(
+            ensure_within_cap(&file, 9, "https://x/asset"),
+            Err(FetchError::TooLarge { limit: 9, .. })
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn unsupported_target_points_at_the_source_build() {
+        let err = detect_target(Some("aarch64-apple-darwin")).unwrap_err();
+        assert!(err.to_string().contains("cargo build --release"), "{err}");
     }
 
     #[test]

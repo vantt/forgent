@@ -2,7 +2,9 @@
 //! asset base for the happy path and the refusals, and a loopback HTTP server
 //! for the "latest release" redirect.
 
-use fgos_distribution::fetch::{fetch_release, fetch_url, DownloadEndpoint, FetchError};
+use fgos_distribution::fetch::{
+    fetch_release, fetch_url, DownloadEndpoint, FetchError, MAX_CHECKSUMS_BYTES,
+};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::io::{Read, Write};
@@ -94,6 +96,59 @@ fn missing_checksums_file_is_refused() {
 
     let err = fetch_release(&file_endpoint(&dir), Some("v1")).unwrap_err();
     assert!(matches!(err, FetchError::Download { .. }), "{err}");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn plain_http_to_a_non_loopback_host_is_refused_before_any_request() {
+    for url in ["http://192.0.2.1/a.tar.gz", "http://example.com/a.tar.gz"] {
+        let err = fetch_url(url).unwrap_err();
+        assert!(matches!(err, FetchError::InsecureUrl(_)), "{url}: {err}");
+    }
+    let endpoint = DownloadEndpoint {
+        asset_base_url: Some("http://192.0.2.1/assets".to_string()),
+        target: Some(TARGET.to_string()),
+    };
+    // An exact tag downloads from the base; "latest" asks the base for its redirect.
+    for version in [Some("v1"), None] {
+        let err = fetch_release(&endpoint, version).unwrap_err();
+        assert!(
+            matches!(err, FetchError::InsecureUrl(_)),
+            "{version:?}: {err}"
+        );
+    }
+}
+
+#[test]
+fn a_checksums_file_listing_the_asset_twice_is_refused() {
+    let dir = fresh_dir("twice");
+    let payload = b"payload";
+    write_release(&dir, "v1", payload, Some(sha256_hex(payload)));
+    let asset = asset_name("v1");
+    std::fs::write(
+        dir.join("SHA256SUMS"),
+        format!("{0}  {1}\n{0}  {1}\n", sha256_hex(payload), asset),
+    )
+    .unwrap();
+
+    let err = fetch_release(&file_endpoint(&dir), Some("v1")).unwrap_err();
+    assert!(matches!(err, FetchError::ChecksumAmbiguous { .. }), "{err}");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn an_oversized_checksums_file_is_refused() {
+    let dir = fresh_dir("bigsums");
+    let payload = b"payload";
+    write_release(&dir, "v1", payload, Some(sha256_hex(payload)));
+    std::fs::write(
+        dir.join("SHA256SUMS"),
+        vec![b'x'; MAX_CHECKSUMS_BYTES as usize + 1],
+    )
+    .unwrap();
+
+    let err = fetch_release(&file_endpoint(&dir), Some("v1")).unwrap_err();
+    assert!(matches!(err, FetchError::TooLarge { .. }), "{err}");
     let _ = std::fs::remove_dir_all(&dir);
 }
 

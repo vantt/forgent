@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "2760a24f3de7457412aef01315518fadc165260cc9925d9ac0c7655ae2f08fc8",
+  "payloadDigest": "8afb78820065b9a07bbc128226baff9806d23bb47a26f459283e78049ac61597",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -270,7 +270,7 @@
     "packages/distribution/rust/examples/print-workspace-shim.rs": "767a8d526d1b030dd4327509a63c9e194ed03fe2ae5a2a263682cd62724dc6d4",
     "packages/distribution/rust/src/canonical.rs": "1ed17ee314cadcd425f25919740a7d80b7596871986c9940094fdd2cf4b7542a",
     "packages/distribution/rust/src/extract.rs": "101e822a4d17774deba3585f7afd3a6718f847e6e2a392c980fa3dfd85b843a6",
-    "packages/distribution/rust/src/fetch.rs": "ae1a26554583e297ea2f52bab45be9fe115952203e0413eaec933d71b301fa00",
+    "packages/distribution/rust/src/fetch.rs": "371a4026f3fc9341bc939a0a738375ffad7d63fac6c0895047e866e5a45c7355",
     "packages/distribution/rust/src/fgctl_refresh.rs": "2248118bf1b3896cf9d87d49f944b2dea03572e900d963ada096ca1e4a8bf8cd",
     "packages/distribution/rust/src/git_gate.rs": "7d50addca54b78ca0b5d6b61c9d857b2de82016a1cc53faefc7c1038da163cba",
     "packages/distribution/rust/src/init.rs": "810c5ff1b86a682efb2fcb92ec5573dd5eb7583ae04d1c97ba8780c9a2661ffa",
@@ -282,7 +282,7 @@
     "packages/distribution/rust/src/verify.rs": "4d9a035a3783bb88bd8dd272fb80479d853f10ac4d8f2f2c8a9834901572c0b7",
     "packages/distribution/rust/src/workspace.rs": "fd91502f00f1de16a71d3c8bb386e5a840c46e7c10bf948a65b04ecdca6b594b",
     "packages/distribution/rust/tests/activation_lock_multiprocess.rs": "ff2818dd10b745ac29c1610effd95ac36552f4aace4525634c6b20f17f325fe0",
-    "packages/distribution/rust/tests/fetch_download.rs": "d44e41924790a7bd2cf5829d4948e7046e033fee9fd2e265bdc2b175ff4de858",
+    "packages/distribution/rust/tests/fetch_download.rs": "99609f9dbc19fc3636146b5602324db13f3eb4250aadf9b7c3cc7364c54d2af9",
     "packages/distribution/rust/tests/install_lock_multiprocess.rs": "790f1617f49d0a1efea555767705dba32c036e30bd897e0b01b09206342088cb",
     "packages/distribution/rust/tests/native_addon.rs": "b9f51eccdd5c7ee7873eacadd6d96f90413ea4183a9faeb06c7b3fc9370d07e7",
     "packages/distribution/rust/tests/schema_golden.rs": "250213594fcdc1a5594157ced09408ffc72997f32f093b3e8ca8f3e5d501f963",
