@@ -62,6 +62,23 @@ fn explain_names_the_schema_node_and_says_undescribed_for_a_key_without_one() {
 }
 
 #[test]
+fn explain_answers_a_runtime_key_and_names_the_nearest_keys_of_a_typo() {
+    with_bundle(|ctx| {
+        let wait = explain(ctx, None, &parse_path("dispatch.cancelWaitMs").unwrap());
+        assert_eq!(wait["described"], true);
+        assert_eq!(wait["runtimeKey"], true);
+        assert_eq!(wait["default"], "dispatch.gateKillGraceMs + 5000");
+        assert_eq!(wait["owner"], "run-supervisor");
+        assert_eq!(wait["minimum"], 1000);
+        let typo = explain(ctx, None, &parse_path("dispatch.cancelWaitM").unwrap());
+        assert_eq!(typo["described"], false);
+        assert_eq!(typo["didYouMean"], json!(["dispatch.cancelWaitMs"]));
+        let level = explain(ctx, None, &parse_path("gateBypass.levl").unwrap());
+        assert_eq!(level["didYouMean"], json!(["gateBypass.level"]));
+    });
+}
+
+#[test]
 fn standard_fragment_keeps_ancestors_and_doc_lines_and_validates_where_its_scope_allows() {
     with_bundle(|ctx| {
         assert_eq!(

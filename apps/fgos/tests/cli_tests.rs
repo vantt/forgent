@@ -2383,6 +2383,22 @@ fn config_set_unset_and_patch_write_through_the_transaction_and_record_the_reaso
         false
     ))
     .contains("config-comment-reason-required"));
+    // The refusal says how to fix it, and a mistyped key is refused with the nearest keys.
+    let missing = config_refusal(&config_run(
+        &sandbox,
+        &["set", "gateBypass.level", "heavy"],
+        false,
+    ));
+    assert!(missing.contains("add --reason"), "{missing}");
+    let typo = config_run(
+        &sandbox,
+        &["set", "gateBypass.levle", "light", "--reason", "mistyped on purpose"],
+        false,
+    );
+    assert_eq!(typo.status.code(), Some(65));
+    let typo = config_refusal(&typo);
+    assert!(typo.contains("config-key-unknown"), "{typo}");
+    assert!(typo.contains("did-you-mean=gateBypass.level"), "{typo}");
     // The note on the key is not dropped silently.
     let plain = config_run(
         &sandbox,

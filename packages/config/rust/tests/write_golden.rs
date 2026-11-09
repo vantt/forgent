@@ -104,6 +104,20 @@ fn write_cases() {
                         "{id}"
                     );
                 }
+                let lines: Vec<String> = found.iter().map(ToString::to_string).collect();
+                if let Some(codes) = want["all_codes"].as_array() {
+                    let got: Vec<&str> = found.iter().map(|r| r.code).collect();
+                    let codes: Vec<&str> = codes.iter().filter_map(Value::as_str).collect();
+                    assert_eq!(got, codes, "{id}: every refusal at once");
+                }
+                for part in want["messages"].as_array().into_iter().flatten() {
+                    let part = part.as_str().unwrap();
+                    assert!(lines.iter().any(|l| l.contains(part)), "{id}: {part} in {lines:?}");
+                }
+                for part in want["no_messages"].as_array().into_iter().flatten() {
+                    let part = part.as_str().unwrap();
+                    assert!(!lines.iter().any(|l| l.contains(part)), "{id}: {part} in {lines:?}");
+                }
                 assert_eq!(tree(&dir), before, "{id}: a refusal changed a file");
             }
             (Ok(result), false) => {

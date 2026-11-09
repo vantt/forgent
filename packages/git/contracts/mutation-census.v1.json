@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3f1edb81391301faa4e035af9849d984c6ba23aab7656221c488a71bf1fd8f17",
+  "payloadDigest": "a64e7e1194497c07fec369d75e42a5eacbca67e204095d18400a681ec15beed9",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -106,7 +106,7 @@
     "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "3432cb4e6ec45ff3e6ad31c282ad75e25d40a39f2ecd54af8f5989a51a0405b3",
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "1ff390fd1ebcb3529669dfd028fdf9e2aafe4035328f4a9bc76b4d132ebf332b",
-    "apps/fgos/tests/cli_tests.rs": "f794e0548d44c1499e9f1332531631bee2dcd4597333948698326cb0d56e5738",
+    "apps/fgos/tests/cli_tests.rs": "d0c7fbced9cce3be46905f2f778775ba84943269bfa3191c48e9180b589c10b5",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "c0c677f712642ba166bbe4639f46462b8ddc101b92a4fb27f5503989e5c11ad6",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
@@ -255,7 +255,7 @@
     "packages/config/rust/tests/golden_snapshot.rs": "86ab3cfbc24c4628b773ab605851a252cc010a27bef43ba2e173201a0967bd3f",
     "packages/config/rust/tests/golden_standard.rs": "3bd34618f08bf494a9866ed803997e993e625e65ce01543e14c531d93cdeec07",
     "packages/config/rust/tests/golden_validate.rs": "c424f48adb477a416b14344e6be574429c6315f5abef0eff02597682d7148ff3",
-    "packages/config/rust/tests/inspect_verbs.rs": "4f3ec6affc1ec318f53ba8336d5c9c460c59d437bebc5ebd5f462050aa66cb57",
+    "packages/config/rust/tests/inspect_verbs.rs": "583fa40b007c5be366ee7cf39f7465def49003e54d6b31a9828e1a53da673d0b",
     "packages/config/rust/tests/lock_rows.rs": "271a60b5f310401dbf8f4ea395f6a4c82a60628428c2549d3c16804d89737a41",
     "packages/config/rust/tests/machine_files.rs": "a5f68680b61a0f92b62e466689f09a9591b4014dc5ac217301fdeba4f323149d",
     "packages/config/rust/tests/machine_view.rs": "baefa400aae16b0f0380c374124685539e8c26b04bc5e4baeb3545c9a2e59102",
@@ -265,7 +265,7 @@
     "packages/config/rust/tests/session.rs": "c1416b20738cf191de4360f72c3acd64c7d72a7eda83d82a699e06cfe1a34141",
     "packages/config/rust/tests/validator_acceptance.rs": "4c6dd88dffe93ed119a2c5fab676e11278dd69a13b76ff03b0fc2ef9379a0d52",
     "packages/config/rust/tests/write_concurrency.rs": "466b6a6db77e8be51c54a29d5ed57bf3a373b85804648f9fce36dec27606d28f",
-    "packages/config/rust/tests/write_golden.rs": "7c3a16685ba06451c6a8d7edd3a28df57c6a29b82c742ebe3c2b88454b599abe",
+    "packages/config/rust/tests/write_golden.rs": "1da0dd3d502d9a85e1a4fc3d8887842ddca9f68adf8fb04d7651b9c93a268dd5",
     "packages/convention/rust/src/lib.rs": "659d829be33a7eceff3e2e1e0a804740b58374e9d5a4b9eefca4c2b9f014496b",
     "packages/convention/rust/src/operations.rs": "98d5eaa19a1fe20960e7ed8f2e35205dad2e7d470985034020a1400049230a6d",
     "packages/convention/rust/src/provider.rs": "9c7421733033e3355e94f94b6ba64d38801032cd8c53357206c161bde1b997c1",
@@ -1930,7 +1930,7 @@
     },
     {
       "path": "apps/fgos/tests/cli_tests.rs",
-      "line": 2532,
+      "line": 2548,
       "spawn": "Command::new",
       "binary": "? bin",
       "class": "rust-test"

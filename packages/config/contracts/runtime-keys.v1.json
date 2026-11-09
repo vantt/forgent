@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "about": "Keys a runtime reads with a built-in default that no section schema describes. The write door accepts them, `config check` does not report them as unknown and `config explain` answers from this list. A key that gains a section schema leaves this list in the same change.",
+  "keys": [
+    {
+      "path": "dispatch.gateKillGraceMs",
+      "type": "integer",
+      "minimum": 1000,
+      "default": "10000",
+      "owner": "run-supervisor",
+      "description": "Milliseconds between the SIGTERM and the SIGKILL of a launch gate that does not stop."
+    },
+    {
+      "path": "dispatch.cancelWaitMs",
+      "type": "integer",
+      "minimum": 1000,
+      "default": "dispatch.gateKillGraceMs + 5000",
+      "owner": "run-supervisor",
+      "description": "Milliseconds a controller stopped by Ctrl-C or SIGTERM waits for the receipts of its attempts; not shorter than the kill grace."
+    }
+  ]
+}

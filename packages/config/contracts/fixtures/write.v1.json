@@ -682,8 +682,8 @@
    }
   },
   {
-   "id": "write-undescribed-key-gets-no-doc-line",
-   "why": "spec 7: keys with no schema node get a why only",
+   "id": "write-unknown-key-is-refused-with-the-nearest-keys",
+   "why": "an undescribed key is not written; the refusal names the keys it may have meant",
    "input": {
     "files": {
      "project/.fgos/config.yaml": [
@@ -691,27 +691,188 @@
       "  count: 8"
      ]
     },
+    "writer": {
+     "session": "vantt"
+    },
+    "edits": [
+     {
+      "set": "gateBypass.levle",
+      "value": "light"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates."
+   },
+   "expect": {
+    "code": "config-key-unknown",
+    "messages": [
+     "gateBypass.levle",
+     "did-you-mean=gateBypass.level"
+    ],
+    "no_lock": true
+   }
+  },
+  {
+   "id": "write-unknown-section-is-refused-with-the-nearest-section",
+   "why": "the first segment is checked too",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "edits": [
+     {
+      "set": "gateBypas.level",
+      "value": "light"
+     }
+    ],
+    "reason": "dogfood repo, lighter gates."
+   },
+   "expect": {
+    "code": "config-key-unknown",
+    "messages": [
+     "did-you-mean=gateBypass.level"
+    ],
+    "no_lock": true
+   }
+  },
+  {
+   "id": "write-unknown-key-far-from-every-key-is-refused-without-a-guess",
+   "why": "no suggestion when nothing is close",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
     "edits": [
      {
       "set": "custom.thing",
       "value": 1
      }
     ],
-    "reason": "dogfood repo, lighter gates.",
-    "writer": {
-     "session": "vantt"
-    }
+    "reason": "dogfood repo, lighter gates."
    },
    "expect": {
+    "code": "config-key-unknown",
+    "messages": [
+     "path=custom"
+    ],
+    "no_messages": [
+     "did-you-mean"
+    ],
+    "no_lock": true
+   }
+  },
+  {
+   "id": "write-every-problem-is-reported-at-once",
+   "why": "a bad reason and two unknown keys come back together",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "edits": [
+     {
+      "set": "gateBypass.levle",
+      "value": "light"
+     },
+     {
+      "set": "limits.cuont",
+      "value": 1
+     }
+    ],
+    "reason": "update"
+   },
+   "expect": {
+    "code": "config-comment-reason-required",
+    "all_codes": [
+     "config-comment-reason-required",
+     "config-key-unknown",
+     "config-key-unknown"
+    ],
+    "no_lock": true
+   }
+  },
+  {
+   "id": "write-runtime-key-without-a-schema-is-accepted",
+   "why": "dispatch keys are read by the runtime with a default and are listed in the runtime key contract",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "edits": [
+     {
+      "set": "dispatch.cancelWaitMs",
+      "value": 20000
+     }
+    ],
+    "reason": "slow machine, longer wait."
+   },
+   "expect": {
+    "applied": [
+     [
+      "dispatch.cancelWaitMs",
+      false
+     ]
+    ],
     "files": {
      "project/.fgos/config.yaml": [
       "limits:",
       "  count: 8",
-      "custom:",
-      "  # @fgos:why [vantt] dogfood repo, lighter gates.",
-      "  thing: 1"
+      "dispatch:",
+      "  # @fgos:why [vantt] slow machine, longer wait.",
+      "  cancelWaitMs: 20000"
      ]
     }
+   }
+  },
+  {
+   "id": "write-typo-of-a-runtime-key-is-refused-with-the-key",
+   "why": "the runtime key list feeds the suggestions",
+   "input": {
+    "files": {
+     "project/.fgos/config.yaml": [
+      "limits:",
+      "  count: 8"
+     ]
+    },
+    "writer": {
+     "session": "vantt"
+    },
+    "edits": [
+     {
+      "set": "dispatch.cancelWaitM",
+      "value": 20000
+     }
+    ],
+    "reason": "slow machine, longer wait."
+   },
+   "expect": {
+    "code": "config-key-unknown",
+    "messages": [
+     "did-you-mean=dispatch.cancelWaitMs"
+    ],
+    "no_lock": true
    }
   },
   {

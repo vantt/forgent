@@ -57,6 +57,12 @@
       "meaning": "A key sits in a file its scope does not allow, or on or above a global-only path."
     },
     {
+      "id": "config-key-unknown",
+      "origin": "spec",
+      "section": "3, 6",
+      "meaning": "A write names a key that no section schema or runtime key describes; the refusal lists the nearest keys."
+    },
+    {
       "id": "config-confinement-lowered",
       "origin": "chosen",
       "section": "3, 14",
