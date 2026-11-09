@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f72a534878769ab9c2b4c31c0c7c2dc7c4c3c9c9f6978a392c7f40edc55afab2",
+  "payloadDigest": "0969686426c31ebf0fabe3e0bae0e41a548ef47e62faf5eb7c8716d9e3e83b1c",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -70,6 +70,7 @@
     ".agents/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
     ".githooks/pre-commit": "476f66f95261ff4c18cbd1f797bc492e638f2fafbbfb32286bf8c1ebcd2fe46b",
     "apps/fgctl/src/main.rs": "c0a5f1114e19af469efbdcabfeb6bb61a0a36c7a7969ef3b3f96764c25f1cdb5",
+    "apps/fgctl/tests/cli_surface.rs": "1bd605a1ded61f6c4a53f935a234fa1cb75030202108a236dc0145d1a48def6c",
     "apps/fgctl/tests/git_wal_activation_gate.rs": "cb4573d686b03639e3e78baca940a2c66cf02c81d645b5d0824ea4a33ece0160",
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c1bfc1a2b6992cfe70c59acf9350a6da5fcce08033bb76fc1720d2c5df1091fa",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
