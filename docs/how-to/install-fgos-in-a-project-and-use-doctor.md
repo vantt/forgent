@@ -408,8 +408,8 @@ check beyond `trust-store-readable`, so open it once yourself.
 
 Run `fgos workflow start ...` (and `workflow status`, `answer`, `resume`) from
 the project's root, using the project's own installed `fgos`
-(`.fgos/installation/bin/fgos`, or the `fgos` on your `PATH` that resolves to
-it). Do not run another checkout's `bin/fgos.mjs` from a different directory with
+(`.fgos/installation/bin/fgos`, or the `fgos` launcher on your `PATH`, which
+runs the release the project's activation names from the machine release store). Do not run another checkout's `bin/fgos.mjs` from a different directory with
 `--dir /path/to/project`. `--dir` only selects which `.fgos/` store is read and
 written; it does not make the project's own configuration, hooks and paths the
 ones in force, so a run started that way can silently mix two trees.

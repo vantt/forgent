@@ -201,6 +201,8 @@ R3's remote peer is the project-local gateway (current herdr, same release) — 
 
 **Transitional CLI lane:** the legacy Node lane lives in the CLI adapter, not the kernel — the kernel has exactly one input/output pair. The CLI adapter looks up `CommandRouteDescriptor[selector]`: `legacy-cli` execs the Node payload directly (argv preserved, inherited stdin/cwd/env, signal forwarding, one invocation record) without building an `OperationRequest`; `native` builds one and calls `InvocationService`. Mechanics: [Legacy CLI Transition](architecture/legacy-cli-transition.md).
 
+**Project root of a native verb (2026-11-09).** The CLI adapter resolves the project once (`resolve_target_root` in `apps/fgos/src/cli_projector.rs`): `--dir <path>` as given, else the nearest ancestor of the working directory holding `.fgos`. `<home>/.fgos` is the machine's global directory, never a project store, so the walk stops below the home directory and `--dir` naming the home directory is refused; finding no project refuses with `not inside an fgOS project` and the fix (run inside a project, pass `--dir`, or `fgctl init`), exit 1. Only the operations that read a project (observe, convention, config) consume the root, so identity, mailbox, version and gate-bypass run from anywhere. Proof: the resolver's unit tests in `cli_projector.rs`, one wiring test in `apps/fgos/tests/cli_tests.rs`.
+
 #### 5. Core Contracts
 
 The name table (§3) says what each type is; this adds the rules it has no room for.
