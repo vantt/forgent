@@ -28,6 +28,8 @@ import {
   getProjectShimPath,
   isShimRunnable,
   agentHookRows,
+  deleteGuardPrefilter,
+  extensionSourceFor,
 } from '../../src/setup/agent-hooks.mjs';
 
 function mkTempDir(prefix) {
@@ -165,7 +167,8 @@ test('installCodexHook wires .codex/hooks.json and checkCodexHook probes cleanly
   const shim = path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
   assert.equal(config.hooks.PreToolUse[0].hooks[0].command, `'${shim}' hook dispatch-decide`);
   assert.equal(config.hooks.PreToolUse[1].hooks[0].command, `'${shim}' hook decision-question`);
-  assert.equal(config.hooks.PreToolUse[2].hooks[0].command, `'${shim}' hook main-checkout-delete-guard`);
+  assert.match(config.hooks.PreToolUse[2].hooks[0].command, /^\/bin\/sh -c '.*' sh '.*\/\.fgos\/installation\/bin\/fgos'$/s, 'the delete guard answers most calls in a shell that is the same whichever shell the user has');
+  assert.ok(config.hooks.PreToolUse[2].hooks[0].command.endsWith(` sh '${shim}'`));
 
   // Without shim, check fails
   assert.equal(checkCodexHook(repoRoot).passed, false);
@@ -199,7 +202,12 @@ test('installAgyHook wires .agents/hooks.json with --format=agy and checkAgyHook
   const shim = path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
   assert.equal(config['fgos-dispatch-guard'].PreToolUse[0].hooks[0].command, `'${shim}' hook dispatch-decide --format=agy`);
   assert.equal(config['fgos-decision-guard'].PreToolUse[0].hooks[0].command, `'${shim}' hook decision-question --format=agy`);
-  assert.deepEqual(config['fgos-delete-guard'].PreToolUse[0], { matcher: 'run_command', hooks: [{ type: 'command', command: `'${shim}' hook main-checkout-delete-guard --format=agy`, timeout: 10 }] });
+  const agyGuard = config['fgos-delete-guard'].PreToolUse[0];
+  assert.equal(agyGuard.matcher, 'run_command');
+  assert.equal(agyGuard.hooks.length, 1);
+  assert.equal(agyGuard.hooks[0].timeout, 10);
+  assert.ok(agyGuard.hooks[0].command.startsWith(`/bin/sh -c '`) && agyGuard.hooks[0].command.endsWith(` sh '${shim}'`), agyGuard.hooks[0].command);
+  assert.match(agyGuard.hooks[0].command, /hook main-checkout-delete-guard --format=agy/);
 
   // Without shim, check fails
   assert.equal(checkAgyHook(repoRoot).passed, false);
@@ -234,7 +242,7 @@ test('codex and agy hooks: an old cwd-relative command is reported and replaced 
   const shim = path.join(repoRoot, '.fgos', 'installation', 'bin', 'fgos');
   const codex = JSON.parse(fs.readFileSync(codexFile, 'utf8'));
   assert.equal(codex.hooks.PreToolUse.filter((e) => e.hooks.some((h) => h.command.includes('dispatch-decide'))).length, 1, 'replaced, not duplicated');
-  assert.ok(codex.hooks.PreToolUse.every((e) => e.hooks.every((h) => h.command.startsWith(`'${shim}'`))));
+  assert.ok(codex.hooks.PreToolUse.every((e) => e.hooks.every((h) => h.command.startsWith(`'${shim}'`) || h.command.endsWith(`sh '${shim}'`))));
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
@@ -263,6 +271,7 @@ test('codex and agy hook commands run from a directory other than the project, e
   const commands = [
     ...codex.map((e) => e.hooks[0].command),
     agy['fgos-dispatch-guard'].PreToolUse[0].hooks[0].command,
+    agy['fgos-delete-guard'].PreToolUse[0].hooks[0].command,
   ];
   for (const command of commands) {
     const res = spawnSync('sh', ['-c', command], { cwd: os.tmpdir(), input: '{}', encoding: 'utf8', timeout: 5000 });
@@ -299,6 +308,8 @@ for (const [cli, install, check] of [['omp', installOmpHook, checkOmpHook], ['pi
     fs.mkdirSync(path.dirname(getProjectShimPath(repoRoot)), { recursive: true });
     fs.writeFileSync(getProjectShimPath(repoRoot), `#!/bin/sh\nprintf '%s\\n' "$*" >> '${log}.argv'\ncat >> '${log}.stdin'\necho refused-by-guard >&2\nexit 2\n`, { mode: 0o755 });
     const handlers = await loadedHandlers(repoRoot, cli);
+    assert.equal(await handlers.tool_call({ toolName: 'bash', input: { command: 'ls -la && npm test' } }, { cwd: repoRoot }), undefined);
+    assert.equal(fs.existsSync(`${log}.argv`), false, 'a command with no mass-delete word never starts the shim');
     assert.deepEqual(await handlers.tool_call({ toolName: 'bash', input: { command: 'git clean -fdx' } }, { cwd: repoRoot }), { block: true, reason: 'refused-by-guard\n' });
     assert.equal(fs.readFileSync(`${log}.argv`, 'utf8'), 'hook main-checkout-delete-guard\n');
     assert.deepEqual(JSON.parse(fs.readFileSync(`${log}.stdin`, 'utf8')), { tool_name: 'Bash', tool_input: { command: 'git clean -fdx' }, cwd: repoRoot });
@@ -732,6 +743,108 @@ test('the claude delete guard command passes a shell call without a mass-delete 
   assert.ok(fs.readFileSync(`${log}.stdin`, 'utf8').endsWith('{"tool_name":"Bash","permission_mode":"bypassPermissions","tool_input":{"command":"find . -delete"}}'), 'the payload reaches the shim unchanged');
   fs.rmSync(getProjectShimPath(repoRoot));
   assert.equal(run('git clean -fdx').status, 0, 'a missing shim lets the call through; doctor reports it');
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+});
+
+/** Runs a delete-guard row's command the way each CLI does (`sh -c`) with a shim that records its calls and refuses with exit 2. */
+function runDeleteGuardRow(repoRoot, row, shellCommand, { shim = true } = {}) {
+  const log = path.join(repoRoot, 'guard-log');
+  fs.rmSync(`${log}.argv`, { force: true });
+  const shimPath = getProjectShimPath(repoRoot);
+  if (shim) {
+    fs.mkdirSync(path.dirname(shimPath), { recursive: true });
+    fs.writeFileSync(shimPath, `#!/bin/sh\nprintf '%s\\n' "$*" >> '${log}.argv'\ncat > /dev/null\necho refused >&2\nexit 2\n`, { mode: 0o755 });
+  } else fs.rmSync(shimPath, { force: true });
+  const payload = row.cli === 'agy'
+    ? { toolCall: { name: 'run_command', args: { CommandLine: shellCommand } }, workspacePaths: [repoRoot] }
+    : { tool_name: 'Bash', permission_mode: 'bypassPermissions', tool_input: { command: shellCommand }, cwd: repoRoot };
+  const res = spawnSync('/bin/sh', ['-c', row.command], { input: JSON.stringify(payload), env: { ...process.env, CLAUDE_PROJECT_DIR: repoRoot }, encoding: 'utf8' });
+  return { status: res.status, stdout: res.stdout, stderr: res.stderr, ran: fs.existsSync(`${log}.argv`) };
+}
+
+const PREFILTER_SKIPPED = ['ls -la && npm test', 'cat docs/permission-model.md', 'git status --porcelain', 'git push origin main', 'node scripts/run-tests.mjs test/x.test.mjs', 'cargo build --release', 'echo finish'];
+const PREFILTER_STARTS_GUARD = ['rm -rf .fgos', "'rm' -rf .", 'ls | xargs rm', 'git clean -fdx', 'find . -delete', 'eval "$X"', 'bash run.sh', 'zsh -c "$X"', 'dash -c x', 'ksh -c x', 'echo hi | sh', 'ls\nsh', 'rm\t-rf .fgos', 'cd x && sh -s'];
+
+for (const cli of ['claude', 'codex', 'agy']) {
+  test(`the ${cli} delete guard command starts the shim only for a command carrying a keyword of the shared prefilter`, () => {
+    const repoRoot = mkTempDir(`agent-hooks-prefilter-${cli}-`);
+    const row = agentHookRows(repoRoot).find((r) => r.cli === cli && r.kind === 'main-checkout-delete-guard');
+    for (const command of PREFILTER_SKIPPED) {
+      const res = runDeleteGuardRow(repoRoot, row, command);
+      assert.equal(res.ran, false, `${command} must not start the shim`);
+      assert.equal(res.status, 0, command);
+      assert.equal(deleteGuardPrefilter.matches(command), false, `the predicate agrees on ${command}`);
+      if (cli === 'agy') assert.deepEqual(JSON.parse(res.stdout), { decision: 'allow' }, 'agy reads a decision on stdout even for a skipped call');
+      else assert.equal(res.stdout, '');
+    }
+    for (const command of PREFILTER_STARTS_GUARD) {
+      const res = runDeleteGuardRow(repoRoot, row, command);
+      assert.equal(res.ran, true, `${command} must start the shim`);
+      assert.equal(res.status, 2, `${command}: the shim's refusal reaches the CLI`);
+      assert.equal(deleteGuardPrefilter.matches(command), true, `the predicate agrees on ${command}`);
+    }
+    const missing = runDeleteGuardRow(repoRoot, row, 'git clean -fdx', { shim: false });
+    assert.equal(missing.status, 0, 'a missing shim lets the call through; doctor reports it');
+    if (cli === 'agy') assert.deepEqual(JSON.parse(missing.stdout), { decision: 'allow' });
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+  });
+}
+
+test('the omp and pi extensions carry the same prefilter and skip the shim for a command without a keyword', () => {
+  const repoRoot = mkTempDir('agent-hooks-extension-prefilter-');
+  const source = extensionSourceFor(repoRoot, 'omp');
+  assert.ok(source.includes(deleteGuardPrefilter.regExpSource), 'the extension embeds the shared keyword list');
+  assert.equal(source, extensionSourceFor(repoRoot, 'pi').replace("MAILBOX_CLI = 'pi'", "MAILBOX_CLI = 'omp'"), 'omp and pi render the same guard');
+  const embedded = new RegExp(deleteGuardPrefilter.regExpSource);
+  for (const command of PREFILTER_SKIPPED) assert.equal(embedded.test(command), false, command);
+  for (const command of PREFILTER_STARTS_GUARD) assert.equal(embedded.test(command), true, command);
+});
+
+test('a codex or agy delete guard in its earlier plain form, or wrapped around another shim path, is replaced and never duplicated', () => {
+  const base = mkTempDir('agent-hooks-guard-migrate-');
+  const oldRoot = path.join(base, 'old-location');
+  const repoRoot = path.join(base, 'project');
+  fs.mkdirSync(oldRoot, { recursive: true });
+  fs.mkdirSync(repoRoot, { recursive: true });
+  const oldShim = getProjectShimPath(oldRoot);
+  const guard = (root, cli) => agentHookRows(root).find((r) => r.cli === cli && r.kind === 'main-checkout-delete-guard');
+  fs.mkdirSync(path.join(repoRoot, '.codex'), { recursive: true });
+  fs.mkdirSync(path.join(repoRoot, '.agents'), { recursive: true });
+  const codexFile = path.join(repoRoot, '.codex', 'hooks.json');
+  const agyFile = path.join(repoRoot, '.agents', 'hooks.json');
+  const matcher = guard(repoRoot, 'codex').matcher;
+  fs.writeFileSync(codexFile, JSON.stringify({ hooks: { PreToolUse: [{ matcher, hooks: [{ type: 'command', command: `'${oldShim}' hook main-checkout-delete-guard` }] }] } }));
+  fs.writeFileSync(agyFile, JSON.stringify({ 'fgos-delete-guard': { enabled: true, PreToolUse: [{ matcher: 'run_command', hooks: [{ type: 'command', command: `'${oldShim}' hook main-checkout-delete-guard --format=agy`, timeout: 10 }] }] } }));
+  installCodexHook(repoRoot);
+  installAgyHook(repoRoot);
+  let codex = JSON.parse(fs.readFileSync(codexFile, 'utf8')).hooks.PreToolUse;
+  assert.equal(codex.filter((e) => e.hooks.some((h) => h.command.includes('main-checkout-delete-guard'))).length, 1);
+  assert.equal(codex.find((e) => e.matcher === matcher).hooks[0].command, guard(repoRoot, 'codex').command, 'the plain form became the prefiltered one');
+  assert.equal(JSON.parse(fs.readFileSync(agyFile, 'utf8'))['fgos-delete-guard'].PreToolUse[0].hooks[0].command, guard(repoRoot, 'agy').command);
+
+  // The project moved: the wrapped command of the old location is still ours.
+  fs.writeFileSync(codexFile, JSON.stringify({ hooks: { PreToolUse: [{ matcher, hooks: [{ type: 'command', command: guard(oldRoot, 'codex').command }] }] } }));
+  installCodexHook(repoRoot);
+  codex = JSON.parse(fs.readFileSync(codexFile, 'utf8')).hooks.PreToolUse;
+  assert.equal(codex.filter((e) => e.hooks.some((h) => h.command.includes('main-checkout-delete-guard'))).length, 1, 'replaced, not duplicated');
+  assert.equal(codex.find((e) => e.matcher === matcher).hooks[0].command, guard(repoRoot, 'codex').command);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('the claude delete guard of the earlier keyword list is replaced in place, with the user hook beside it kept', () => {
+  const repoRoot = mkTempDir('agent-hooks-claude-guard-migrate-');
+  const earlier = `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; P=$(cat); case "$P" in *'rm '*|*'rm\\'*|*xargs*|*clean*|*-delete*) printf '%s' "$P" | "$S" hook main-checkout-delete-guard;; esac`;
+  const file = path.join(repoRoot, '.claude', 'settings.json');
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, JSON.stringify({ hooks: { PreToolUse: [{ matcher: 'Bash', hooks: [{ type: 'command', command: 'echo mine' }, { type: 'command', command: earlier }] }] } }));
+  assert.equal(isClaudeHookConfigured(repoRoot), false, 'the other guards are missing');
+  mockRunnableShim(repoRoot);
+  assert.match(checkClaudeHook(repoRoot).message, /missing canonical hook\(s\):.*main-checkout-delete-guard/, 'doctor reports the earlier list as not canonical');
+  installClaudeHook(repoRoot);
+  const bash = JSON.parse(fs.readFileSync(file, 'utf8')).hooks.PreToolUse.filter((e) => e.matcher === 'Bash');
+  assert.equal(bash.length, 1, 'replaced, not duplicated');
+  assert.deepEqual(bash[0].hooks.map((h) => h.command), ['echo mine', agentHookRows(repoRoot).find((r) => r.cli === 'claude' && r.kind === 'main-checkout-delete-guard').command]);
+  assert.equal(checkClaudeHook(repoRoot).passed, true);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 

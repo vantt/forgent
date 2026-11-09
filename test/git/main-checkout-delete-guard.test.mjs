@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { judgeDeleteCommand } from '../../src/git/main-checkout-delete-guard.mjs';
+import { deleteGuardPrefilter } from '../../src/setup/agent-hooks.mjs';
 
 // The guard reads the checkout layout from the filesystem: a main checkout has a `.git` directory
 // and a `.fgos` directory, a linked worktree has a `.git` file. The fixture builds exactly that.
@@ -20,7 +21,13 @@ function layout() {
   return { base, main, worktree, plain, missing: path.join(base, 'projects', 'forgent-worktrees', 'never-created') };
 }
 
-const judge = (command, cwd, env = {}) => judgeDeleteCommand(command, { cwd, env: { HOME: '/nonexistent-home', ...env } });
+// Every refusal asserted below also has to pass the prefilter that the hook wiring runs before it
+// starts the guard: a refused command the prefilter would skip is a wipe the guard never sees.
+const judge = (command, cwd, env = {}) => {
+  const verdict = judgeDeleteCommand(command, { cwd, env: { HOME: '/nonexistent-home', ...env } });
+  if (verdict.blocked) assert.equal(deleteGuardPrefilter.matches(command), true, `the prefilter would skip a refused command: ${command}`);
+  return verdict;
+};
 
 test('the command that wiped the main checkout is refused: a failed cd chained with ; and && into xargs rm', () => {
   const { main, missing } = layout();
@@ -172,6 +179,13 @@ test('an unresolvable directory or operand in the main checkout is refused and s
   assert.match(verdict.reasons.join('\n'), /cannot be resolved/);
   assert.equal(judge('rm -rf "$DIR"', plain).blocked, false, 'outside any main checkout');
   assert.equal(judge('cd -; git clean -fdx', plain).blocked, true, 'cd - leaves the directory unknown');
+});
+
+test('a shell or eval running a computed script, and a quoted command name, are refused in the main checkout', () => {
+  const { main } = layout();
+  for (const cmd of ['eval "$X"', 'bash -c "$X"', 'dash -c "$X"', 'ksh -c "$X"', 'zsh -c "$X"', 'echo hi | sh', 'echo hi\nsh', "'rm' -rf .fgos", '"rm" -rf .', 'find . -exec sh -c "$X" {} \\;']) {
+    assert.equal(judge(cmd, main).blocked, true, cmd);
+  }
 });
 
 test('a directory outside any checkout is never judged', () => {

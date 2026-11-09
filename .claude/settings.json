@@ -114,7 +114,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; P=$(cat); case \"$P\" in *'rm '*|*'rm\\'*|*xargs*|*clean*|*-delete*) printf '%s' \"$P\" | \"$S\" hook main-checkout-delete-guard;; esac"
+            "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; P=$(cat); case \"$P\" in *\"xargs\"*|*\"clean\"*|*\"-delete\"*|*\"eval\"*|*\"bash\"*|*\"zsh\"*|*\"dash\"*|*\"ksh\"*|*[!A-Za-z0-9]rm*|*\\\\[bfnrt]rm*|*[!A-Za-z0-9]sh*|*\\\\[bfnrt]sh*) printf \"%s\" \"$P\" | \"$S\" hook main-checkout-delete-guard;; esac"
           }
         ]
       }

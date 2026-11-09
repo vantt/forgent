@@ -48,10 +48,14 @@ export function getProjectShimPath(repoRoot) {
 /** The shim as a shell command: an absolute, single-quoted path, so it runs whatever directory the
  * agent starts the hook in (agy runs it outside the project; codex uses the session directory). */
 function shimCommand(repoRoot, args) {
+  return `${shimOperand(repoRoot)} ${args}`;
+}
+
+/** The shim as one single-quoted shell word. */
+function shimOperand(repoRoot) {
   let root = path.resolve(repoRoot);
   try { root = realpathSync(root); } catch { /* not created yet: the resolved path is what there is */ }
-  const shim = getProjectShimPath(root).replace(/'/g, `'\\''`);
-  return `'${shim}' ${args}`;
+  return `'${getProjectShimPath(root).replace(/'/g, `'\\''`)}'`;
 }
 
 /** The shim path forms an fgOS hook command starts with: single-quoted absolute (the codex and agy
@@ -109,12 +113,65 @@ const CLAUDE_SHIM = '"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"';
 const claudeMailboxCommand = (event) =>
   `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" hook mailbox --cli claude --event ${event} || true`;
 
-/** Claude Code's delete guard runs before every Bash call, so the command answers most calls in the
- * shell: only a payload carrying a word a mass delete needs (`rm `, `xargs`, `clean`, `-delete`)
- * reaches the shim. `rm\\` is `rm` followed by an escaped tab or newline in the JSON. A missing
- * shim lets the call through, as the other guarded commands do; doctor reports it. */
-const CLAUDE_DELETE_GUARD_COMMAND =
-  `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; P=$(cat); case "$P" in *'rm '*|*'rm\\'*|*xargs*|*clean*|*-delete*) printf '%s' "$P" | "$S" hook ${HOOK_KINDS.DELETE_GUARD};; esac`;
+// ---------------------------------------------------------------------------
+// The delete guard's prefilter: the one keyword list every renderer reads
+// ---------------------------------------------------------------------------
+
+/** What the main-checkout delete guard judges, as text a shell or a JavaScript check can find without
+ * starting node (about 170 ms per call): `rm` (also quoted or after a path or `sudo`), `xargs`, `git
+ * clean`, `find -delete`, and a shell or `eval` that may run a computed script. The list is a superset
+ * of the guard's refusals: the guard test runs every refusal it asserts through `matches`, so a
+ * refusal the list would skip fails there. `rm` and `sh` are keywords only at the start of a word
+ * (after a character that is not a letter or digit), because they sit inside `permission_mode` and
+ * `Bash`, which every payload carries. A command name spelled with quote splits or a backslash (`r''m`, `r\m`) is the one
+ * form the list does not see. */
+const PREFILTER_SUBSTRINGS = ['xargs', 'clean', '-delete', 'eval', 'bash', 'zsh', 'dash', 'ksh'];
+const PREFILTER_WORDS = ['rm', 'sh'];
+
+const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
+const PREFILTER_SOURCE = `${PREFILTER_SUBSTRINGS.map(escapeRegExp).join('|')}|(?:^|[^A-Za-z0-9])(?:${PREFILTER_WORDS.join('|')})`;
+
+export const deleteGuardPrefilter = Object.freeze({
+  substrings: PREFILTER_SUBSTRINGS,
+  words: PREFILTER_WORDS,
+  /** The check as a JavaScript regular expression source, for the generated omp and pi extensions. */
+  regExpSource: PREFILTER_SOURCE,
+  /** Whether a shell command carries a keyword, so the guard has to judge it. */
+  matches: (command) => new RegExp(PREFILTER_SOURCE).test(command),
+  /** The same check as `case` patterns over a tool call's JSON payload: a word keyword also follows
+   * a JSON escape (`\n` before a shell on the next line). */
+  caseGlobs: [
+    ...PREFILTER_SUBSTRINGS.map((kw) => `*"${kw}"*`),
+    ...PREFILTER_WORDS.flatMap((kw) => [`*[!A-Za-z0-9]${kw}*`, `*\\\\[bfnrt]${kw}*`]),
+  ].join('|'),
+});
+
+/** The guard's shell command: a missing shim lets the call through, as the other guarded commands
+ * do (doctor reports it); only a payload with a keyword reaches the shim, and its answer and exit
+ * code pass through. `allow` is the decision JSON a CLI that reads one on stdout (agy) gets for a
+ * call the shell answered itself. */
+function deleteGuardScript(shimRef, args, allow) {
+  const pass = allow ? `printf "%s\\n" "${allow.replace(/"/g, '\\"')}"` : null;
+  return `S=${shimRef}; [ -x "$S" ] || ${pass ? `{ ${pass}; exit 0; }` : 'exit 0'}; P=$(cat); case "$P" in ${deleteGuardPrefilter.caseGlobs}) printf "%s" "$P" | "$S" hook ${args};;${pass ? ` *) ${pass};;` : ''} esac`;
+}
+
+/** Codex and agy run a hook command through a shell of the user's choosing, so the script runs under
+ * `/bin/sh` whatever that is; the shim path is its first argument, which keeps the script free of
+ * single quotes. */
+function wrappedDeleteGuard(repoRoot, args, allow) {
+  const script = deleteGuardScript('$1', args, allow);
+  if (script.includes("'")) throw new Error('the delete guard script must not contain a single quote');
+  return `/bin/sh -c '${script}' sh ${shimOperand(repoRoot)}`;
+}
+
+/** Recognises a delete guard command of an earlier keyword list or another project path as ours, so
+ * an install replaces it in place instead of adding a second guard beside it. */
+const AGY_ALLOW = '{"decision":"allow"}';
+const wrappedGuardPattern = (suffix) => new RegExp(`^/bin/sh -c '[^']* hook ${HOOK_KINDS.DELETE_GUARD}${suffix};[^']*' sh ${SHIM_PREFIX}\\s*$`);
+const CLAUDE_GUARD_PATTERN = new RegExp(`^S="\\$\\{CLAUDE_PROJECT_DIR\\}/\\.fgos/installation/bin/fgos"; \\[ -x "\\$S" \\] \\|\\| exit 0; P=\\$\\(cat\\); case "\\$P" in [^]* "\\$S" hook ${HOOK_KINDS.DELETE_GUARD};; esac$`);
+
+/** Claude Code's delete guard runs before every Bash call under `sh`, so the command is the prefiltered script itself. */
+const CLAUDE_DELETE_GUARD_COMMAND = deleteGuardScript(CLAUDE_SHIM, HOOK_KINDS.DELETE_GUARD);
 
 /** Registers the agent's session in the identity directory when the CLI starts one. The host runs
  * it, so the agent takes no step; a failure never reaches the session (`|| true`), and the verb
@@ -133,7 +190,7 @@ const hookRows = (repoRoot) => [
   { cli: 'claude', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'AskUserQuestion', command: `${CLAUDE_SHIM} hook decision-question`, legacyMarkers: ['decision-question-hook.mjs'] },
   // The main-checkout delete guard on every shell tool: Claude Code and Codex name it Bash (recorded
   // payloads), Codex's older shell tools are listed too; agy names it run_command.
-  { cli: 'claude', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', matcher: 'Bash', command: CLAUDE_DELETE_GUARD_COMMAND },
+  { cli: 'claude', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', matcher: 'Bash', command: CLAUDE_DELETE_GUARD_COMMAND, ownedPattern: CLAUDE_GUARD_PATTERN },
   // The mailbox's checkpoints (spec §6.1), in the shapes `adapters.v1.json` recorded: Stop with no
   // matcher, PostToolUse for every tool.
   { cli: 'claude', kind: HOOK_KINDS.MAILBOX, args: '--cli claude --event stop', event: 'Stop', matcher: null, command: claudeMailboxCommand('stop'), timeout: mailboxHookTimeoutSec() },
@@ -146,7 +203,7 @@ const hookRows = (repoRoot) => [
   { cli: 'agy', kind: HOOK_KINDS.SESSION, event: 'SessionStart', group: 'fgos-session-register', flat: true, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
   { cli: 'codex', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide') },
   { cli: 'codex', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', matcher: 'RequestUserInput|ask.*', command: shimCommand(repoRoot, 'hook decision-question') },
-  { cli: 'codex', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', matcher: '^(Bash|shell|exec_command|local_shell)$', command: shimCommand(repoRoot, `hook ${HOOK_KINDS.DELETE_GUARD}`) },
+  { cli: 'codex', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', matcher: '^(Bash|shell|exec_command|local_shell)$', command: wrappedDeleteGuard(repoRoot, HOOK_KINDS.DELETE_GUARD), ownedPattern: wrappedGuardPattern('') },
   // Codex runs a hook command through the user's `$SHELL -c`: the plain form is exec'd into the
   // direct topology the caller check expects; a guarded form would keep the user's login shell at
   // the head position (measured at V5). A missing shim therefore shows an error on each call.
@@ -154,7 +211,7 @@ const hookRows = (repoRoot) => [
   { cli: 'codex', kind: HOOK_KINDS.MAILBOX, args: '--cli codex --event post-tool-use', event: 'PostToolUse', matcher: null, command: shimCommand(repoRoot, 'hook mailbox --cli codex --event post-tool-use'), timeout: mailboxHookTimeoutSec() },
   { cli: 'agy', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', group: 'fgos-dispatch-guard', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide --format=agy'), timeout: 10 },
   { cli: 'agy', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', group: 'fgos-decision-guard', matcher: 'ask.*|AskUserQuestion', command: shimCommand(repoRoot, 'hook decision-question --format=agy'), timeout: 10 },
-  { cli: 'agy', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', group: 'fgos-delete-guard', matcher: 'run_command', command: shimCommand(repoRoot, `hook ${HOOK_KINDS.DELETE_GUARD} --format=agy`), timeout: 10 },
+  { cli: 'agy', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', group: 'fgos-delete-guard', matcher: 'run_command', command: wrappedDeleteGuard(repoRoot, `${HOOK_KINDS.DELETE_GUARD} --format=agy`, AGY_ALLOW), ownedPattern: wrappedGuardPattern(' --format=agy'), timeout: 10 },
 ];
 
 /** The table, read-only, for the doctor's own tests and docs. */
@@ -214,6 +271,7 @@ function isOwnedHook(hook, row) {
   if (typeof command !== 'string') return false;
   if (command === row.command) return true;
   if ((row.legacyMarkers ?? []).some((marker) => command.includes(marker))) return true;
+  if (row.ownedPattern?.test(command)) return true;
   return commandIsKind(command, row);
 }
 
@@ -461,6 +519,9 @@ function generateInProcessExtensionSource({ cli, mailbox = false }) {
 import { spawnSync } from 'node:child_process';
 ${mailbox ? "import { lstatSync } from 'node:fs';\n" : ''}import path from 'node:path';
 ${mailbox ? mailboxExtensionPart(cli) : ''}
+// A bash command with none of these keywords cannot be refused by the delete guard, so it never starts the shim.
+const DELETE_GUARD_PREFILTER = /${deleteGuardPrefilter.regExpSource}/;
+
 export default function (api: any) {
   api.on('tool_call', async (event: any, ctx: any) => {
     try {
@@ -496,7 +557,7 @@ export default function (api: any) {
         if (res.status === 2) {
           return { block: true, reason: res.stderr || 'Blocked by fgOS decision-question guard' };
         }
-      } else if (toolName === 'bash') {
+      } else if (toolName === 'bash' && !(typeof event?.input?.command === 'string' && !DELETE_GUARD_PREFILTER.test(event.input.command))) {
         const res = spawnSync(shim, ['hook', 'main-checkout-delete-guard'], {
           input: JSON.stringify({ tool_name: 'Bash', tool_input: { command: event?.input?.command }, cwd }),
           encoding: 'utf8',
