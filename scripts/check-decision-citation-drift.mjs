@@ -305,20 +305,13 @@ function loadSourceFiles(
   return sources;
 }
 
-// `.agents/skills` (tsk-12v): the canonical dev-skill source, not reached
-// by any other root before this. `.claude/skills` needs no entry of its
-// own -- its generated wrapper is byte-derived from `.agents/skills` and
-// never carries independent citation text (confirmed by direct read).
-// `plugins/fgOS/skills` stays in the roots too (it is NOT purely
-// redundant: ~35 launcher/orchestrator skills there -- deliver/submit/pick/
-// etc. -- have no `.agents/skills` counterpart at all). Its ~15 dev-skill
-// files ARE byte-identical mirrors of `.agents/skills` (CI-enforced,
-// `test/skills/fgos-mirror.test.mjs`), so a stale citation living in one
-// of those gets reported once per root -- a known, accepted duplicate
-// (never a missed detection, since the mirror's own byte-identity is
-// test-enforced) rather than added cross-root exclusion complexity for a
-// cosmetic double-count.
-const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins', 'core/skills', 'domains', '.agents/skills'];
+// The sweep reads the sources a citation is written in, never a generated
+// render of them: `.agents/skills` and `.claude/skills` are projections of
+// `core/skills` and `domains/*/skills`. `plugins/fgOS/skills` stays because it
+// also carries launcher skills that have no source under those two roots; its
+// copies of the dev-skills are byte-identical mirrors (`test/skills/fgos-mirror.test.mjs`),
+// so a stale citation in one is still found, once per root.
+const WIDE_SWEEP_ROOTS = ['docs', 'src', 'plugins', 'core/skills', 'domains'];
 const WIDE_SWEEP_EXTENSIONS = new Set(['.md', '.mjs', '.js']);
 const WIDE_SWEEP_SKIP_DIR_NAMES = new Set(['node_modules', '.git']);
 
@@ -435,7 +428,7 @@ function parseArgs(argv) {
   };
 }
 
-function runCli(argv, cwd) {
+export function runCli(argv, cwd, log = console.log) {
   const {
     decisionsDir,
     backlogPath,
@@ -472,7 +465,7 @@ function runCli(argv, cwd) {
       resolvedBaselinePath,
       JSON.stringify(baseline, null, 2) + '\n',
     );
-    console.log(
+    log(
       `check-decision-citation-drift: wrote baseline with ` +
         `${findings.length} known finding(s) across ` +
         `${Object.keys(baseline).length} file(s).`,
@@ -481,7 +474,7 @@ function runCli(argv, cwd) {
   }
 
   if (findings.length === 0) {
-    console.log(
+    log(
       'check-decision-citation-drift: no findings.',
     );
     return 0;
@@ -491,18 +484,18 @@ function runCli(argv, cwd) {
   const newFindings = findNewFindings(findings, baseline);
 
   if (newFindings.length === 0) {
-    console.log(
+    log(
       `check-decision-citation-drift: no new findings ` +
         `(${findings.length} baselined).`,
     );
     return 0;
   }
-  console.log(
+  log(
     `check-decision-citation-drift: ` +
       `${newFindings.length} finding(s):`,
   );
   for (const f of newFindings) {
-    console.log(`  - ${f.message}`);
+    log(`  - ${f.message}`);
   }
   return 1;
 }

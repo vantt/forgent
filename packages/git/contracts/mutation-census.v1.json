@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1f8d33129a055a22dce0285891f8e86d60f30283c853b5812093f56456fed578",
+  "payloadDigest": "aba216c095a0143c9155b0e796f9fe15b8b6af737ce93019a28d74e0af265416",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -806,7 +806,7 @@
     "scripts/build-rust-distribution.mjs": "9373d1e7963f0deee72517d58bae2e835bfc1416cc3250917a9468a4e23a8cad",
     "scripts/build-skill-wrappers.mjs": "8b12a9e8b2c2ab2f6757f795b5370561389d727437a5b1bdc7ba8ab450e3b943",
     "scripts/check-backlog-reconciliation.mjs": "5e7fa8b9548c34479e270ec666bbf8132f7fc7c38177dbac71f8d74848f9baad",
-    "scripts/check-decision-citation-drift.mjs": "ffa84d0e757f8fcf844c00c36e368598b30daf32c4faf78adc0086f0b013bbc5",
+    "scripts/check-decision-citation-drift.mjs": "b3c9bac4becd7fd2bb323a2ca8c2a15ed908a4bc89f9288546c4642248aa049a",
     "scripts/check-decision-codes.mjs": "c9f0ae0dbb6f6368eec818de11a785428d4517736f180359a344c73ad789571c",
     "scripts/check-decision-supersession.mjs": "1fc95bddf36b4485338125d5f902e69b95d66b6e34e5e60dc06cc822096a8f90",
     "scripts/check-glibc-ceiling.sh": "6ce52ee1a3197104aded910b937b593153f51915001a5946e2c822702df07e99",

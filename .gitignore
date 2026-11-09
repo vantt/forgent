@@ -68,6 +68,7 @@ output.txt
 /.claude/skills/*
 !/.claude/skills/fgos-*/
 !/.claude/skills/distill/
+!/.claude/skills/instruction-audit/
 !/.claude/skills/_shared/
 /.agents/*
 !/.agents/skills/

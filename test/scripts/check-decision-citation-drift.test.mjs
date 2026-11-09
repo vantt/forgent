@@ -14,8 +14,16 @@ import {
   findCitationFormatFindings,
   findNewFindings,
   baselineFromFindings,
+  runCli,
 } from
   '../../scripts/check-decision-citation-drift.mjs';
+
+// The CLI entry run in process: same arguments, same exit status, same lines.
+function runDrift(args, cwd = process.cwd()) {
+  const lines = [];
+  const status = runCli(args, cwd, (line) => lines.push(line));
+  return { status, stdout: `${lines.join('\n')}\n` };
+}
 
 // A spec file inside the scanned platform-style root: <root>/area/spec.md.
 function specFile(specsDir) {
@@ -188,19 +196,12 @@ test(
       'unrelated ADR0010 (does not apply here) mention\n',
     );
 
-    const result = spawnSync(
-      process.execPath,
-      [
-        scriptPath,
-        '--decisions-dir',
+    const result = runDrift(['--decisions-dir',
         decisionsDir,
         '--backlog',
         path.join(dir, 'backlog.md'),
         '--specs-dir',
-        specsDir,
-      ],
-      { encoding: 'utf8' },
-    );
+        specsDir]);
 
     assert.equal(result.status, 1);
     assert.match(result.stdout, /1 finding/);
@@ -240,19 +241,12 @@ test(
       'nothing relevant here\n',
     );
 
-    const result = spawnSync(
-      process.execPath,
-      [
-        scriptPath,
-        '--decisions-dir',
+    const result = runDrift(['--decisions-dir',
         decisionsDir,
         '--backlog',
         path.join(dir, 'backlog.md'),
         '--specs-dir',
-        specsDir,
-      ],
-      { encoding: 'utf8' },
-    );
+        specsDir]);
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /no findings/);
@@ -592,11 +586,7 @@ test(
     );
     const baselinePath = path.join(dir, 'baseline.json');
 
-    const write = spawnSync(
-      process.execPath,
-      [
-        scriptPath,
-        '--decisions-dir',
+    const write = runDrift(['--decisions-dir',
         decisionsDir,
         '--backlog',
         path.join(dir, 'backlog.md'),
@@ -604,28 +594,18 @@ test(
         specsDir,
         '--baseline',
         baselinePath,
-        '--write-baseline',
-      ],
-      { encoding: 'utf8' },
-    );
+        '--write-baseline']);
     assert.equal(write.status, 0);
     assert.ok(fs.existsSync(baselinePath));
 
-    const rerun = spawnSync(
-      process.execPath,
-      [
-        scriptPath,
-        '--decisions-dir',
+    const rerun = runDrift(['--decisions-dir',
         decisionsDir,
         '--backlog',
         path.join(dir, 'backlog.md'),
         '--specs-dir',
         specsDir,
         '--baseline',
-        baselinePath,
-      ],
-      { encoding: 'utf8' },
-    );
+        baselinePath]);
     assert.equal(rerun.status, 0);
     assert.match(rerun.stdout, /baselined/);
   },
@@ -651,11 +631,7 @@ test(
     );
     const baselinePath = path.join(dir, 'baseline.json');
 
-    spawnSync(
-      process.execPath,
-      [
-        scriptPath,
-        '--decisions-dir',
+    runDrift(['--decisions-dir',
         decisionsDir,
         '--backlog',
         path.join(dir, 'backlog.md'),
@@ -663,31 +639,21 @@ test(
         specsDir,
         '--baseline',
         baselinePath,
-        '--write-baseline',
-      ],
-      { encoding: 'utf8' },
-    );
+        '--write-baseline']);
 
     fs.appendFileSync(
       specFile(specsDir),
       'also see RUL42 without a gloss\n',
     );
 
-    const rerun = spawnSync(
-      process.execPath,
-      [
-        scriptPath,
-        '--decisions-dir',
+    const rerun = runDrift(['--decisions-dir',
         decisionsDir,
         '--backlog',
         path.join(dir, 'backlog.md'),
         '--specs-dir',
         specsDir,
         '--baseline',
-        baselinePath,
-      ],
-      { encoding: 'utf8' },
-    );
+        baselinePath]);
     assert.equal(rerun.status, 1);
     assert.match(rerun.stdout, /RUL42/);
   },
@@ -714,11 +680,7 @@ test(
     );
     const baselinePath = path.join(dir, 'baseline.json');
 
-    spawnSync(
-      process.execPath,
-      [
-        scriptPath,
-        '--decisions-dir',
+    runDrift(['--decisions-dir',
         decisionsDir,
         '--backlog',
         path.join(dir, 'backlog.md'),
@@ -726,10 +688,7 @@ test(
         specsDir,
         '--baseline',
         baselinePath,
-        '--write-baseline',
-      ],
-      { encoding: 'utf8' },
-    );
+        '--write-baseline']);
 
     fs.writeFileSync(
       specFile(specsDir),
@@ -737,21 +696,14 @@ test(
         'see ADR0002 for the model\n',
     );
 
-    const rerun = spawnSync(
-      process.execPath,
-      [
-        scriptPath,
-        '--decisions-dir',
+    const rerun = runDrift(['--decisions-dir',
         decisionsDir,
         '--backlog',
         path.join(dir, 'backlog.md'),
         '--specs-dir',
         specsDir,
         '--baseline',
-        baselinePath,
-      ],
-      { encoding: 'utf8' },
-    );
+        baselinePath]);
     assert.equal(
       rerun.status,
       0,
@@ -773,8 +725,7 @@ test(
     );
     const result = spawnSync(
       process.execPath,
-      [scriptPath, '--skills-dir', '.agents/skills',
-        '--skills-dir', 'plugins/fgOS/skills'],
+      [scriptPath, '--skills-dir', 'plugins/fgOS/skills'],
       { cwd: repoRoot, encoding: 'utf8' },
     );
     assert.equal(
@@ -796,9 +747,7 @@ test('CLI skips a skills directory git ignores and judges the tracked one beside
       fs.writeFileSync(skillFile(name), 'RUL104 bare citation with no gloss\n');
     }
     fs.mkdirSync(path.join(repo, 'docs/decisions'), { recursive: true });
-    const run = () => spawnSync(process.execPath,
-      [scriptPath, '--skills-dir', '.agents/skills', '--baseline', 'none.json'],
-      { cwd: repo, encoding: 'utf8' });
+    const run = () => runDrift(['--skills-dir', '.agents/skills', '--baseline', 'none.json'], repo);
     const tracked = run();
     assert.match(tracked.stdout, /fgos-own/);
     assert.doesNotMatch(tracked.stdout, /ak-foreign/);
@@ -825,7 +774,7 @@ test('default citation scan reads nested area specs and decision narratives unde
       fs.mkdirSync(path.dirname(file), { recursive: true });
       fs.writeFileSync(file, content);
     }
-    const result = spawnSync(process.execPath, [scriptPath], { cwd: dir, encoding: 'utf8' });
+    const result = runDrift([], dir);
     assert.equal(result.status, 1);
     assert.match(result.stdout, /2 finding/);
     for (const id of ['RUL902', 'RUL903']) assert.ok(result.stdout.includes(id));
