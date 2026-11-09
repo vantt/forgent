@@ -1,7 +1,7 @@
 ---
 phase: 15
 title: "One symlink-refusal leaf for the distribution build script and the skill wrappers"
-status: pending
+status: completed (landed 184d50017)
 depends_on: ["T8's writers on `src/setup/skill-wrappers.mjs` landed (T8 P01-P03, P11 are on main; re-check with `git log -S'lstatPlain' origin/main -- src/setup/skill-wrappers.mjs` before editing)"]
 parallel: "packaging leaf; file-disjoint from every phase here except `skill-wrappers.mjs`, which T8's render phase (P12) only regenerates around"
 effort: ~0.25d
