@@ -37,6 +37,7 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { INSTALL_ROOT, agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { isWithinDir } from '../runner/dispatch/assignment-layout.mjs';
+import { ownedSkillNames } from './skill-wrappers.mjs';
 import { agentRenderWarnings, listAgents } from '../runner/agent-listing.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import {
@@ -831,9 +832,9 @@ export function readAgentSkills(agentFiles) {
   return { agentSkillsMap, problems };
 }
 
-// tsk-397 D20: eligibility direction inverted -- task-spec declares agent/requires-skill,
-// agent-type declares skills. Check validates every requires-skill is provided by at least
-// one agent-type, and every pinned agent exists.
+// Task-spec declares agent/requires-skill, agent-type declares skills. A requires-skill claim
+// resolves only when both sides hold: at least one agent-type provides it and the name is a skill
+// fgOS owns (a skill source under core/skills or domains/<domain>/skills). Every pinned agent exists.
 export function checkAgentClaimsResolve(cwd) {
   const agentFiles = allAgentYamlFiles(cwd);
   const { agentSkillsMap, problems: agentFileProblems } = readAgentSkills(agentFiles);
@@ -844,6 +845,7 @@ export function checkAgentClaimsResolve(cwd) {
   }
 
   const taskSpecs = allTaskSpecs(cwd);
+  const ownedSkills = ownedSkillNames(cwd);
   const problems = [...agentFileProblems];
 
   for (const spec of taskSpecs) {
@@ -867,8 +869,11 @@ export function checkAgentClaimsResolve(cwd) {
 
     if (Array.isArray(parsed['requires-skill'])) {
       for (const reqSkill of parsed['requires-skill']) {
-        if (agentSkillsMap.size > 0 && !allProvidedSkills.has(reqSkill)) {
-          problems.push(`task-spec "${spec.specId}" requires skill "${reqSkill}" but no agent-type provides it`);
+        const unprovided = agentSkillsMap.size > 0 && !allProvidedSkills.has(reqSkill);
+        const unowned = !ownedSkills.has(reqSkill);
+        if (unprovided || unowned) {
+          const failed = [unprovided && 'no agent-type provides it', unowned && 'it is not an owned skill'].filter(Boolean).join(' and ');
+          problems.push(`task-spec "${spec.specId}" requires skill "${reqSkill}" but ${failed}`);
         }
       }
     }

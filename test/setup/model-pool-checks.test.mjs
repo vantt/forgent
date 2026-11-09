@@ -77,7 +77,7 @@ test('executor-skills-installed passes when the declared skill is installed and 
 });
 
 test('executor-skills-installed accepts a user-level skill, refuses an empty skill file, and says a worktree is provisioned separately', () => {
-  const standardDirs = ['.claude/skills', '.agents/skills', '.pi/skills'];
+  const standardDirs = ['.claude/skills', '.agents/skills', '.pi/skills', '.omp/skills'];
   const put = (base, d, text) => { fs.mkdirSync(path.join(base, d, 'ak-cook'), { recursive: true }); fs.writeFileSync(path.join(base, d, 'ak-cook', 'SKILL.md'), text); };
   const projectOnly = (text) => (dir) => { for (const d of standardDirs) put(dir, d, text); };
 

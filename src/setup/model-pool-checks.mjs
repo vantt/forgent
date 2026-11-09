@@ -10,6 +10,7 @@ import { parseTierCell, isExtendedTierCell } from '../runner/dispatch/tier-cell.
 import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
 import { isConfigRefusal, readMachineConfig } from '../config/facade.mjs';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 
@@ -44,6 +45,9 @@ export function checkExecutorFamilyUnique(cwd) {
 // Where each agent CLI reads project skills from, keyed by the invocation's command name. A CLI
 // not listed has no known skill directory here, so it is reported as not checked rather than failed.
 const CLI_SKILL_DIRS = { claude: '.claude/skills', codex: '.agents/skills', omp: '.omp/skills', pi: '.pi/skills', grok: '.grok/skills' };
+// The CLIs that also read the same directory name from the user's home. A CLI not listed here is
+// only checked at project level.
+const CLI_USER_SKILL_DIRS = { claude: '.claude/skills', codex: '.agents/skills' };
 
 function invocationCliNames(entry) {
   const commands = Array.isArray(entry.invocations) && entry.invocations.length > 0
@@ -52,15 +56,29 @@ function invocationCliNames(entry) {
   return [...new Set(commands.filter(c => typeof c === 'string' && c !== '').map(c => path.basename(c)))];
 }
 
+/** The state of one skill file: `ok` when it has content, `empty` when present with none, `missing` otherwise. */
+function skillFileState(file) {
+  let text;
+  try {
+    text = fs.readFileSync(file, 'utf8');
+  } catch {
+    return 'missing';
+  }
+  return text.trim() === '' ? 'empty' : 'ok';
+}
+
 /**
  * An executor that declares `supports.skills` is only truthful when the skill is really installed
- * in its runtime's skill directory of the main checkout (a linked worktree has no copy of it
- * until worktreeSetup provisions one). `ak:cook` lives in `ak-cook/SKILL.md`.
+ * in its runtime's skill directory, at project level or (for the CLIs that read one) the user's
+ * home, with content. This judges the main checkout only: a linked worktree gets skills from
+ * worktreeSetup provisioning alone, so a pass here is not a pass inside a worktree. Skill
+ * `vendor:name` lives in `vendor-name/SKILL.md`.
  */
 export function checkExecutorSkillsInstalled(cwd) {
   const { runnerConfig, skip } = loadOrExplain(cwd);
   if (skip) return skip;
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const home = os.homedir();
   const missing = [];
   const unchecked = [];
   let checked = 0;
@@ -72,15 +90,20 @@ export function checkExecutorSkillsInstalled(cwd) {
       if (!dir) { unchecked.push(`${id} (cli ${cli})`); continue; }
       for (const skill of skills) {
         checked += 1;
-        if (!fs.existsSync(path.join(root, dir, skill.replaceAll(':', '-'), 'SKILL.md'))) {
-          missing.push(`${id} declares ${skill} but ${dir}/${skill.replaceAll(':', '-')}/SKILL.md is missing in ${root} -- install the skill for the ${cli} CLI, or remove it from executors.${id}.supports.skills`);
-        }
+        const rel = `${dir}/${skill.replaceAll(':', '-')}/SKILL.md`;
+        const candidates = [path.join(root, rel)];
+        if (CLI_USER_SKILL_DIRS[cli]) candidates.push(path.join(home, CLI_USER_SKILL_DIRS[cli], skill.replaceAll(':', '-'), 'SKILL.md'));
+        const states = candidates.map(skillFileState);
+        if (states.includes('ok')) continue;
+        const where = candidates.length > 1 ? `${root} or ${home}` : root;
+        const problem = states.includes('empty') ? 'is empty' : 'is missing';
+        missing.push(`${id} declares ${skill} but ${rel} ${problem} in ${where} -- install the skill for the ${cli} CLI, or remove it from executors.${id}.supports.skills; a linked worktree gets skills only from worktreeSetup provisioning, so a pass in the main checkout is not a pass in a worktree`);
       }
     }
   }
   if (missing.length > 0) return { passed: false, message: missing.join('; ') };
   const note = unchecked.length > 0 ? `; not checked, no known skill directory: ${unchecked.join(', ')}` : '';
-  return { passed: true, message: `${checked} declared executor skill(s) installed${note}` };
+  return { passed: true, message: `${checked} declared executor skill(s) installed in the main checkout (a linked worktree gets skills only from worktreeSetup provisioning)${note}` };
 }
 
 /**

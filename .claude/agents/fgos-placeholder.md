@@ -3,7 +3,7 @@ name: fgos-placeholder
 description: Proof-of-mechanism placeholder -- validates the agent-definition projection pipeline. Not for real invocation.
 model: haiku
 tools: Read
-skills: [fgos-coding-implement, fgos-coding-discovering, fgos-coding-exploring, fgos-coding-planning, fgos-coding-validating, fgos-coding-compounding, fgos-coding-driving, fgos-coding-shaping, fgos-researching, fgos-routing, fgos-clarifying, fgos-unlock, fgos-fanout, fgos-indexing, distill]
+skills: [fgos-coding-implement, fgos-coding-discovering, fgos-coding-exploring, fgos-coding-planning, fgos-coding-validating, fgos-coding-knowledge, fgos-coding-driving, fgos-coding-shaping, fgos-researching, fgos-routing, fgos-clarifying, fgos-unlock, fgos-fanout, fgos-indexing, distill]
 ---
 
 # Projection pipeline placeholder
