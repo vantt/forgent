@@ -174,7 +174,7 @@ Không có bước nào cho máy owner ở phase này cho tới khi WORK land.
 
 ## Phase 10: tài liệu, số đo, đóng plan
 
-Commit main: xem dòng bảng chương trình `HARDEN: doctor P10 lands` (ghi sau khi land). Báo cáo đóng plan: [`lead-261109-0855-doctor-p10-docs-gate-measure-close.md`](lead-261109-0855-doctor-p10-docs-gate-measure-close.md) (bảng mọi dòng của audit và số đo).
+Commit main: xem dòng bảng chương trình `HARDEN: doctor P10 lands`. Báo cáo đóng plan: [`lead-261109-0855-doctor-p10-docs-gate-measure-close.md`](lead-261109-0855-doctor-p10-docs-gate-measure-close.md) (bảng mọi dòng của audit và số đo).
 
 ### Đổi gì cho người dùng
 
