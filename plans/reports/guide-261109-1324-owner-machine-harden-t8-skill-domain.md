@@ -33,7 +33,7 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, fg-server). fg-s
 
 ## P04: bộ canh bản render skill và canh trích dẫn
 
-- Commit trên `main`: `<SHA>`.
+- Commit trên `main`: `7bd1b5998..818ffd7aa`.
 - Người dùng thấy gì: không đổi hành vi của `fgos`. Test `fgos-mirror` giờ so mọi skill fgOS sở hữu (`distill`, `instruction-audit`, `fgos-*`), không chỉ `fgos-*`; có thêm một test kiểm `.gitignore` allowlist khớp đúng tập skill nguồn. `.gitignore` thêm dòng `!/.claude/skills/instruction-audit/`, nên bản render `.claude` của `instruction-audit` (do phase render sau này tạo) sẽ được git theo dõi. Quét trích dẫn rộng (`fgos decision --relation`) không còn đọc `.agents/skills` (104 thư mục, 19 MB); 59 mục baseline của cây này đã bỏ vì có bản sao byte-giống dưới `plugins/fgOS/skills`.
 - Lệnh: chỉ các lệnh chung ở trên. Không có cấu hình mới, không đổi `~/.fgos/config.json`.
 - Dòng doctor mong đợi: `decision-citation-drift` vẫn đạt (`no new findings`). Không có dòng doctor mới.
