@@ -89,7 +89,8 @@ refuses outside one).
    `SHA256SUMS`: a missing or mismatching entry stops the init before anything
    is staged. A URL given to `--from`/`FGCTL_FROM` must have a `SHA256SUMS` next
    to it; a local path is used as is. `FGCTL_ASSET_BASE_URL` points downloads at
-   a mirror. A download records its tag in `.fgos/distribution.json`
+   a mirror (the directory that holds the assets; `https://` or `file:///`, and
+   `http://` only to a loopback host). A download records its tag in `.fgos/distribution.json`
    (`projectRuntime.releaseVersion`); a teammate's plain `fgctl init` on a
    machine without that release then downloads the same tag and refuses if its
    digest is not the pinned one. A pin without a tag (digest only) still needs

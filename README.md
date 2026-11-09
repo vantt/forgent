@@ -93,7 +93,10 @@ release downloaded (and checked) without being told which one.
 Precedence: `--from` > `FGCTL_FROM` > `FGCTL_VERSION` > the project's pin > latest.
 A downloaded release is refused unless its entry in `SHA256SUMS` matches; a URL
 source needs a `SHA256SUMS` file in the same directory. A local path is used as
-is. `FGCTL_ASSET_BASE_URL` redirects downloads to a mirror, as for `install.sh`.
+is. `FGCTL_ASSET_BASE_URL` redirects downloads to a mirror, as for `install.sh`: it
+names the directory that holds the assets (so `install.sh` needs `FGCTL_VERSION` with
+it), and it must be `https://` or `file:///`; plain `http://` is refused except to a
+loopback host.
 
 `fgctl init` ends by running `fgos doctor --fix` and `fgos doctor`, which only run
 registered fixes: run `fgos setup` once in the project for the config defaults,
