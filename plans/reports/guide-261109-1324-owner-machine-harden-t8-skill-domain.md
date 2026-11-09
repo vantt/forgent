@@ -85,3 +85,12 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, fg-server). fg-s
 - Dòng doctor mong đợi: không đổi.
 - Quay lại: revert commit; một lần render sinh lại các bản sao.
 
+
+## P11: một cửa `listDomainDirs` cho danh sách thư mục domain
+
+- Commit trên `main`: xem dòng bảng HARDEN "T8 P11 lands".
+- Người dùng thấy gì: không đổi hành vi. `src/util/domain-dirs.mjs` trả tên các thư mục domain dưới `domains/` đã sắp xếp (bỏ file và link; thư mục vắng thì danh sách rỗng); các lần đọc `domains/` rải rác trong setup, runner, workflow và scripts nay gọi cửa này. Nơi trước đây đọc theo thứ tự thư mục (đăng ký instruction, dựng skill, kiểm tra task-spec) nay có thứ tự ổn định.
+- Còn lại: `src/state/domain-registry.mjs` của WORK vẫn tự lặp, đã mở mục backlog `p-bxahsop7em`.
+- Lệnh trên từng workspace: `git pull --rebase`; build, stage, kích hoạt release như thường lệ.
+- Dòng doctor mong đợi: không đổi.
+- Quay lại: revert commit.

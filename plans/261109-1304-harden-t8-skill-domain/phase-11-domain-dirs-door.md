@@ -1,7 +1,7 @@
 ---
 phase: 11
 title: "Domain-dirs door: one listDomainDirs in a src/util leaf replaces the repeated readdirSync(domains) walks in the T8, T5 and T6 callers in the same change; the WORK caller becomes a filed item"
-status: pending
+status: completed
 depends_on: [01, 02, 03, 06, 07, 08]
 parallel: "group D, alone: one import and call per caller file"
 effort: ~0.5d
@@ -91,3 +91,9 @@ One door; two matches left in `rg` (WORK's file and the leaf); WORK backlog row 
 ## Lead brief essentials
 
 One import and one call per caller; no behaviour change; do not touch WORK files. All plan.md lead rules apply.
+
+## Landed
+
+The leaf takes the `domains/` directory itself (`listDomainDirs(domainsDir)`), not the project root: three callers (`checkCompiledDomains`, `compileAllDomains`, the instruction registry's `domainsRoot` option) already receive that directory and tests pass it. After: `rg -n "readdirSync\(.*domains" src scripts bin` returns only `src/state/domain-registry.mjs` and the leaf. The doctor row's `existsSync(domains)` in `registrations.mjs` stays: it gives the "no domains/ directory" message and is not a walk. WORK item `p-bxahsop7em`.
+
+Callers that read directory order before and now get the sorted order: `skillSourceRoots` (skill-wrappers), instruction registry domain loop, `compileAllDomains` (object keyed by name), `allTaskSpecs`. The focused set over every caller passes; none asserts a directory order.
