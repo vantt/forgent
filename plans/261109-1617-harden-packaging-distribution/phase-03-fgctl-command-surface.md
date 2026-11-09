@@ -1,7 +1,7 @@
 ---
 phase: 03
 title: "fgctl command surface: --version, per-verb help that exits 0, usage errors exit 2 with a did-you-mean, task-ordered no-args help"
-status: pending
+status: completed
 depends_on: []
 parallel: "group G1 with P05 and P09; first writer of apps/fgctl/src/main.rs"
 effort: ~0.75d
@@ -61,3 +61,11 @@ Revert the merge; no state written.
 ## Closes
 
 CMD-06, CMD-08, CMD-15, CMD-16 (fgctl side); UX-03; CMD-09 partial (all progress to stderr, results to stdout, checked in step 3); CMD-12 (SHOULD).
+
+## Result
+
+Landed on the track branch `harden/pkg-p03-fgctl-surface`. Measured net lines: Rust source +290 (`help.rs` 465, `build.rs` 48, `main.rs` 311 to 237), Rust tests +152, Node 0 (one assertion moved from stdout to stderr, one retired test), against an estimate of Rust +130 and tests +60. The overshoot is the per-verb help text (about 250 lines) and the build script for the commit stamp.
+
+- Commit stamp: `build.rs` reads `FGOS_BUILD_COMMIT` (else `GITHUB_SHA`) and `SOURCE_DATE_EPOCH`; a build that states neither prints `unknown commit`. It does not run `git` (no new Git census site). The release workflow must export both for a release build (phase 11 owns `release.yml`).
+- The unrecognised-verb test in `test/rust-host/fgctl-stage.test.mjs` is retired; `apps/fgctl/tests/cli_surface.rs` owns that behaviour.
+- `fgctl upgrade`'s refresh progress lines moved to stderr (CMD-09); `test/rust-host/fgctl-upgrade.test.mjs` follows.
