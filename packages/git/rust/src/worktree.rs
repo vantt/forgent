@@ -143,6 +143,18 @@ fn missing(p: &Path) -> Result<bool> {
         Err(e) => Err(failure(e)),
     }
 }
+/// Splits one `ls-files -v -s -z` entry (`S <mode> <oid> <stage>\t<path>`).
+fn staged_entry(entry: &[u8]) -> Result<(&[u8], &[u8], &[u8])> {
+    let tab = entry
+        .iter()
+        .position(|b| *b == b'\t')
+        .ok_or_else(|| failure("worktree-index-entry-malformed"))?;
+    let mut fields = entry[..tab].split(|b| *b == b' ').skip(1);
+    match (fields.next(), fields.next()) {
+        (Some(mode), Some(oid)) => Ok((mode, oid, &entry[tab + 1..])),
+        _ => Err(failure("worktree-index-entry-malformed")),
+    }
+}
 fn canonical_destination(path: &Path) -> Result<PathBuf> {
     if !path.is_absolute()
         || path.components().any(|c| {
@@ -346,6 +358,38 @@ impl GitDriver {
             Policy::Inspect,
         )
     }
+    /// Whether `file` is a regular file whose bytes and executable bit are
+    /// exactly what the index records. Anything else (a link, a submodule, a
+    /// filtered or edited file) counts as different.
+    fn same_as_index(
+        &self,
+        target: &RepoHandle,
+        file: &Path,
+        mode: &[u8],
+        oid: &[u8],
+    ) -> Result<bool> {
+        let metadata = fs::symlink_metadata(file).map_err(failure)?;
+        if !metadata.is_file() {
+            return Ok(false);
+        }
+        #[cfg(unix)]
+        let executable = {
+            use std::os::unix::fs::PermissionsExt;
+            metadata.permissions().mode() & 0o111 != 0
+        };
+        #[cfg(not(unix))]
+        let executable = mode == b"100755";
+        let expected_mode: &[u8] = if executable { b"100755" } else { b"100644" };
+        if mode != expected_mode {
+            return Ok(false);
+        }
+        let hashed = self.checked(
+            target,
+            &["hash-object", "--no-filters", "--", text(file)?],
+            Policy::Inspect,
+        )?;
+        Ok(hashed.trim_ascii() == oid)
+    }
     /// `IgnoredBytes::Discard` skips only the ignored-bytes refusal; every
     /// other preservation rule still refuses.
     fn worktree_clean_with(
@@ -361,17 +405,22 @@ impl GitDriver {
         if !missing(&path.join(".fgos"))? {
             let tracked = self.checked(
                 &target,
-                &["ls-files", "-v", "-z", "--", ".fgos"],
+                &["ls-files", "-v", "-s", "-z", "--", ".fgos"],
                 Policy::Inspect,
             )?;
             if tracked.is_empty() {
                 return Err(failure("worktree-worker-state-preserved"));
             }
             for entry in tracked.split(|b| *b == 0).filter(|e| !e.is_empty()) {
-                if matches!(entry.first(), Some(b'S' | b's'))
-                    && !missing(&path.join(byte_path(&entry[2..])?))?
-                {
-                    return Err(failure("worktree-worker-state-preserved"));
+                if matches!(entry.first(), Some(b'S' | b's')) {
+                    let (mode, oid, rel) = staged_entry(entry)?;
+                    let file = path.join(byte_path(rel)?);
+                    // Git itself writes a skip-worktree path back when a checkout or
+                    // rebase moves HEAD across a commit that changed it. A file that
+                    // is exactly what the index records holds nothing worker-made.
+                    if !missing(&file)? && !self.same_as_index(&target, &file, mode, oid)? {
+                        return Err(failure("worktree-worker-state-preserved"));
+                    }
                 }
             }
         }

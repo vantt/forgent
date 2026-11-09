@@ -195,13 +195,40 @@ for (const changed of [false, true]) {
     } finally {f.cleanup();}
   });
 }
-test('recreated skip-worktree tracked state is preserved even with identical bytes', {skip:process.platform==='win32'},()=>{
+test('a skip-worktree path Git wrote back byte for byte is not worker state and removes with the checkout', {skip:process.platform==='win32'},()=>{
   const f=fixture('files',true); const worker=path.join(f.temp,'worker');
   try {
     f.port.createDetached({path:worker,operationId:'create'});
     fs.mkdirSync(path.join(worker,'.fgos'));
     fs.writeFileSync(path.join(worker,'.fgos','fixture'),'tracked state');
-    assert.throws(()=>f.port.remove({path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'remove'}),/worker-state-preserved/);
-    assert.equal(fs.readFileSync(path.join(worker,'.fgos','fixture'),'utf8'),'tracked state');
+    f.port.remove({path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'remove'});
+    assert.equal(fs.existsSync(worker),false);
   } finally {f.cleanup();}
 });
+test('a skip-worktree path whose bytes differ from the index is worker state and is preserved', {skip:process.platform==='win32'},()=>{
+  const f=fixture('files',true); const worker=path.join(f.temp,'worker');
+  try {
+    f.port.createDetached({path:worker,operationId:'create'});
+    fs.mkdirSync(path.join(worker,'.fgos'));
+    fs.writeFileSync(path.join(worker,'.fgos','fixture'),'tracked state, edited by a worker');
+    assert.throws(()=>f.port.remove({path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'remove'}),/worker-state-preserved/);
+    assert.equal(fs.readFileSync(path.join(worker,'.fgos','fixture'),'utf8'),'tracked state, edited by a worker');
+  } finally {f.cleanup();}
+});
+for (const [label,alter] of [
+  ['an executable bit the index does not record',(file)=>fs.chmodSync(file,0o755)],
+  ['a symlink to an identical file',(file)=>{const copy=`${file}.copy`;fs.renameSync(file,copy);fs.symlinkSync(copy,file);}],
+]) {
+  test(`a skip-worktree path with identical bytes but ${label} is preserved`, {skip:process.platform==='win32'},()=>{
+    const f=fixture('files',true); const worker=path.join(f.temp,'worker');
+    try {
+      f.port.createDetached({path:worker,operationId:'create'});
+      const file=path.join(worker,'.fgos','fixture');
+      fs.mkdirSync(path.dirname(file));
+      fs.writeFileSync(file,'tracked state');
+      alter(file);
+      assert.throws(()=>f.port.remove({path:worker,expectedTip:f.tip,deliveredTo:f.tip,evidenceDigest:'a'.repeat(64),operationId:'remove'}),/worker-state-preserved/);
+      assert.equal(fs.existsSync(worker),true);
+    } finally {f.cleanup();}
+  });
+}
