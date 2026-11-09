@@ -98,7 +98,7 @@ Open from that lead report, now in the plan: the orphan prune of `.claude` wrapp
 | 06 | [Doctor rows](phase-06-doctor-rows.md) | none | A | `registrations.mjs` (`checkAgentClaimsResolve`), `model-pool-checks.mjs` | +14 / 0 / +25 **landed** |
 | 07 | [Persona projection](phase-07-persona-projection.md) | none | A | `project-agents.mjs` | +12 / 0 / +30 **landed** |
 | 08 | [Domain build](phase-08-domain-build.md) | 06 for the `registrations.mjs` line only | B | `build-domain-registry.mjs`, `registrations.mjs` (`checkDomainRegistryCompiled`) | +10 / 0 / +10 |
-| 09 | [Small scripts](phase-09-small-scripts.md) | none | A | `measure-coordination-baseline.mjs` (deleted), `distill.mjs`, `instruction-projections.mjs` | -447 / 0 / +8 |
+| 09 | [Small scripts](phase-09-small-scripts.md) | none | A | `measure-coordination-baseline.mjs` (deleted), `distill.mjs`, `instruction-projections.mjs` | -447 / 0 / +8 **partly landed** (script, durable AGENTS.md; distill waits for the landing unit, skip-worktree refusal filed for OPC) |
 | 10 | [Worktree skill provisioning](phase-10-worktree-skill-provisioning.md) | none | A | `worktree.mjs`, `agent-skill-dirs.mjs`, `.fgos/config.yaml` (line removed) | +43 / 0 / +36 **landed** |
 | 11 | [Domain-dirs door](phase-11-domain-dirs-door.md) | 03, 06, 07, 08 landed | D (alone) | one import line per caller, new leaf | -25 / 0 / +25 |
 | 12 | [Render and census](phase-12-render-and-census.md) | 01-05, 09, 11 | E (alone) | all generated surfaces, census | 0 / 0 / 0 (generated about -4 300 with Q2 pass) |
