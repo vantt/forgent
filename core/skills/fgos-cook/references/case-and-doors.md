@@ -22,7 +22,7 @@ fgos workflow start coding/feature --request "<outcome>" \
 Slices run serially, so one linked worktree and one branch carry the whole case; the
 runner commits each slice's declared `writes` onto it after a passing round.
 `worktree create` provisions dependencies and the skill directories (so a worker that
-declares `ak:cook` finds it). `workflow start` returns the `workflowRunId`, which is the
+declares the cook skill finds it). `workflow start` returns the `workflowRunId`, which is the
 `caseId` every later line names. When a closed case with the same plan and base commit
 is continued (`--inherit`), the proposal has no judge and validate lines: that case
 already did them. The guide `coding/feature` has activities and no process: nothing
@@ -103,10 +103,11 @@ and why.
 - Several independent read-only checks may go as one bounded wave nested in the
   case: `fgos workflow start --units <file> --case <caseId>` (charged to the frame
   first). Never a wave of writers.
-- A slice to be done with `ak:cook` goes through `--unit <file>` with
-  `skills: ["ak:cook"]`, and its objective carries the brief of
+- A slice to be done with a cook skill goes through `--unit <file>` with
+  `skills: [<the cook skill id the machine config declares>]`, and its objective carries the brief of
   [`cook-worker-contract.md`](../../_shared/cook-worker-contract.md). The
-  Unit names only the skill; `bind()` still picks the executor.
+  Unit names only the skill; `bind()` still picks the executor, and refuses with
+  `skills-unavailable` when no executor in the machine config declares it.
 - Read `--json`: `data.results[-1].runResult.agentClaim.summary` and
   `data.results[-1].commit`. The outcome is one of `pass`, `findings`,
   `execution-failure`, `policy-refusal`, `provider-limit`, `blocked`.

@@ -193,9 +193,9 @@ fn this_repositorys_project_file_migrates_with_the_same_effective_value() {
     let opts = common::migrate_options(&dir, false, false);
     let writer = common::writer(&json!({"session": "vantt"}));
     let report = project(&ctx, &roots, &writer, &opts, |_| Ok(())).unwrap();
-    // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 24 values stay (the programs and tool executors are the global file's; the rest is this repository's own).
-    assert_eq!(report.kept.len(), 24);
-    assert_eq!(report.dropped_redundant.len(), 250);
+    // The one-key sections `gateway` and `lock` go, the tier ladder `$comment` converts, 30 values stay (the programs and tool executors are the global file's; the rest is this repository's own, including the six executors' cook skill declaration, which the standard no longer carries).
+    assert_eq!(report.kept.len(), 30);
+    assert_eq!(report.dropped_redundant.len(), 244);
     assert_eq!(report.dropped_retired, ["lock.predecessorKillWaitMs"]);
     // The two gateway keys, and the copies of the standard's own global-only values (executor
     // order, invocation lists) the old file carried: none holds anything the standard lacks.

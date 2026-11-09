@@ -11,8 +11,8 @@ description: >-
   reports.
   Use for "run this plan", "cook this plan", "deliver phases 1-3 of <plan>". Not
   for one ad-hoc task or a single phase to run as-is (use `fgos-run`), not the
-  `/fgOS:deliver` Work-item command, and not AgentKit's own `ak:cook`, which
-  runs inside a worker. Never edits product code itself and never merges.
+  `/fgOS:deliver` Work-item command, and not the cook skill a worker runs
+  inside its own session. Never edits product code itself and never merges.
 ---
 
 # fgos-cook

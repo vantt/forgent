@@ -42,6 +42,9 @@ function runCheck(id, runner, globalRunner, setup) {
   }
 }
 
+/** The shipped standard names no kit skill; a machine declares the cook skill for the executors that load it. */
+const declared = { executors: Object.fromEntries(['claude', 'glm', 'openai', 'gemini', 'xai', 'deepseek'].map((id) => [id, { supports: { skills: ['ak:cook'] } }])) };
+
 test('executor-family-unique passes with one executor per family and names both executors of a shared family', () => {
   // The standard alone has one executor per family.
   const one = runCheck('executor-family-unique', {});
@@ -54,10 +57,10 @@ test('executor-family-unique passes with one executor per family and names both 
 });
 
 test('executor-skills-installed passes when the declared skill is installed and fails naming the missing path', () => {
-  // The standard's executors declare the skill, one skill directory per CLI they run through.
+  // The machine's executors declare the skill, one skill directory per CLI they run through.
   const install = (...dirs) => (dir) => { for (const d of dirs) { fs.mkdirSync(path.join(dir, d, 'ak-cook'), { recursive: true }); fs.writeFileSync(path.join(dir, d, 'ak-cook', 'SKILL.md'), '# ak:cook\n'); } };
   const standardDirs = ['.claude/skills', '.agents/skills', '.pi/skills'];
-  const missing = runCheck('executor-skills-installed', {});
+  const missing = runCheck('executor-skills-installed', declared);
   assert.equal(missing.passed, false);
   assert.match(missing.message, /claude declares ak:cook but \.claude\/skills\/ak-cook\/SKILL\.md is missing/);
 
@@ -67,11 +70,11 @@ test('executor-skills-installed passes when the declared skill is installed and 
     { id: 'omp-cli', via: 'cli', adapter: 'cli-spawn', command: 'omp', args: ['{prompt}'] },
     { id: 'odd-cli', via: 'cli', adapter: 'cli-spawn', command: 'odd', args: ['{prompt}'] },
   ] } };
-  const partial = runCheck('executor-skills-installed', { executors: twoClis }, undefined, install(...standardDirs));
+  const partial = runCheck('executor-skills-installed', { executors: { ...declared.executors, ...twoClis } }, undefined, install(...standardDirs));
   assert.equal(partial.passed, false);
   assert.match(partial.message, /\.omp\/skills\/ak-cook\/SKILL\.md is missing/);
   assert.doesNotMatch(partial.message, /\.agents\/skills/);
-  const both = runCheck('executor-skills-installed', { executors: twoClis }, undefined, install(...standardDirs, '.omp/skills'));
+  const both = runCheck('executor-skills-installed', { executors: { ...declared.executors, ...twoClis } }, undefined, install(...standardDirs, '.omp/skills'));
   assert.equal(both.passed, true, both.message);
   assert.match(both.message, /not checked, no known skill directory: multi \(cli odd\)/);
 });
@@ -81,18 +84,18 @@ test('executor-skills-installed accepts a user-level skill, refuses an empty ski
   const put = (base, d, text) => { fs.mkdirSync(path.join(base, d, 'ak-cook'), { recursive: true }); fs.writeFileSync(path.join(base, d, 'ak-cook', 'SKILL.md'), text); };
   const projectOnly = (text) => (dir) => { for (const d of standardDirs) put(dir, d, text); };
 
-  const userLevel = runCheck('executor-skills-installed', {}, undefined, (dir, home) => {
+  const userLevel = runCheck('executor-skills-installed', declared, undefined, (dir, home) => {
     projectOnly('# skill\n')(dir);
     fs.rmSync(path.join(dir, '.claude/skills'), { recursive: true });
     put(home, '.claude/skills', '# skill\n');
   });
   assert.equal(userLevel.passed, true, userLevel.message);
 
-  const empty = runCheck('executor-skills-installed', {}, undefined, projectOnly(''));
+  const empty = runCheck('executor-skills-installed', declared, undefined, projectOnly(''));
   assert.equal(empty.passed, false);
   assert.match(empty.message, /\.claude\/skills\/ak-cook\/SKILL\.md is empty/);
 
-  const missing = runCheck('executor-skills-installed', {});
+  const missing = runCheck('executor-skills-installed', declared);
   assert.match(missing.message, /worktreeSetup provisioning/);
   assert.match(missing.message, /not a pass in a worktree/);
 });

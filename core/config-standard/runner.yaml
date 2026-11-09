@@ -22,7 +22,6 @@ runner:
       supports:
         providerFamilies: [claude]
         reasoningEffort: [low, medium, high]
-        skills: ["ak:cook"]
         systemPrompt: false
         toolGating: allowedTools
       invocations:
@@ -78,8 +77,6 @@ runner:
           confinement:
             backend: bwrap
       providerModel: z-ai
-      supports:
-        skills: ["ak:cook"]
     openai:
       kind: agent
       description: "OpenAI provider, 2 bins merged into one executor (2026-09-17 provider-naming pass): codex CLI (native OpenAI Codex CLI) + pi CLI (multi-provider agent, --provider omitted -- each ~/.pi/accounts/<name> dir carries exactly one provider's credentials, confirmed via real invocation test). Invocation id = <bin>-<mode>-<account>, self-descriptive regardless of which bin actually runs. Both bins now use modelPolicies like every other executor."
@@ -168,8 +165,6 @@ runner:
             - "{prompt}"
           confinement:
             backend: bwrap
-      supports:
-        skills: ["ak:cook"]
     gemini:
       kind: agent
       description: "Gemini provider via omp (oh-my-pi); Antigravity CLI (agy) invocations removed 2026-10-16 (agy not installed, owner chose omp). Invocations: omp-herdr (herdr pane), omp-cli-bwrap (headless). The confined account comes from runner.providers.gemini.accounts in the global config."
@@ -223,8 +218,6 @@ runner:
             - "{prompt}"
           confinement:
             backend: bwrap
-      supports:
-        skills: ["ak:cook"]
     xai:
       kind: agent
       description: "xai (Grok) provider via omp CLI (oh-my-pi, a pi fork); replaces the pi grok login that kept needing re-OAuth. omp reads its login through PI_CODING_AGENT_DIR like pi does. omp uses glob instead of ls/find. The account files are declared in the global config (providers.xai)."
@@ -278,8 +271,6 @@ runner:
           interactiveMode:
             exitCommand: "/exit"
             kind: omp
-      supports:
-        skills: ["ak:cook"]
     deepseek:
       kind: agent
       description: "DeepSeek provider via pi CLI, OpenRouter gateway account. --provider omitted -- account dir has a single provider (openrouter). Same account dir also serves other OpenRouter-hosted models (e.g. glm-cli's z-ai route uses a different account/mechanism); --model alone selects deepseek/* here. pi-herdr-openrouter runs the same pi account in a confined herdr pane."
@@ -329,8 +320,6 @@ runner:
           interactiveMode:
             exitCommand: "/quit"
             kind: pi
-      supports:
-        skills: ["ak:cook"]
   # @fgos:doc The capability catalog: what each capability is called, which executors serve it and how it is held.
   capabilities:
     impact-analysis:

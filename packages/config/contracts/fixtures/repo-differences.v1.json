@@ -33,7 +33,8 @@
   "tetcu",
   "/home/",
   "resourceBindings",
-  "token"
+  "token",
+  "ak:cook"
  ],
  "differences": [
   {
@@ -84,6 +85,61 @@
     "description"
    ],
    "reason": "scrubbed text: the standard description drops the login profile and home path names"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "claude",
+    "supports",
+    "skills"
+   ],
+   "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "deepseek",
+    "supports"
+   ],
+   "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "gemini",
+    "supports"
+   ],
+   "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "glm",
+    "supports"
+   ],
+   "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "openai",
+    "supports"
+   ],
+   "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
+  },
+  {
+   "path": [
+    "runner",
+    "executors",
+    "xai",
+    "supports"
+   ],
+   "reason": "the standard names no kit skill; the pinned authoring source declares the cook skill this executor loads, which a machine now declares in its own config"
   },
   {
    "path": [
