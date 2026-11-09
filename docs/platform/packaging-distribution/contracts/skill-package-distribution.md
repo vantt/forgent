@@ -9,7 +9,7 @@ Implementation status: Partial
 Canonical: Yes, after review
 Owner: Packaging-distribution
 Source type: Code/test scan plus cross-host trigger design discussion
-Last reviewed: 2026-09-18
+Last reviewed: 2026-11-09 (sections 3.1, 6 and 9 re-read against code)
 Related:
 - docs/platform/packaging-distribution/spec.md
 - docs/platform/packaging-distribution/contracts/projection-ledger.md
@@ -18,6 +18,8 @@ Related:
 - scripts/build-skill-wrappers.mjs
 - test/setup/skill-wrappers.test.mjs
 - test/skills/fgos-mirror.test.mjs
+- src/runner/worktree.mjs (skill provisioning of a new worktree)
+- plans/reports/council-261109-1000-harden-t8-arbitration.md (target shapes, approved by owner decision 79)
 Implementation: Original section-specific implementation statements retained; provenance does not certify current implementation
 Provenance: Existing area document plus source-detail carriage at 77830ba77eb05991d95b005919776ee6254e833b
 Writer type: Human + agent coauthor
@@ -75,7 +77,29 @@ Current build/proof surfaces:
 
 Generated targets are not the source of truth. They may be committed for host compatibility, but edits should flow from the canonical source through the generator. Note that host trees may be mixed: `plugins/fgOS/skills/` contains hand-authored user commands (`pick`, `submit`, `cook`, `list`, etc.) alongside mirrored `fgos-*` dev skills, and `.claude/skills/` preserves hand-authored skills (`ui-spec`, `gitnexus`) without treating them as generated wrappers.
 
-Run `npm run build:skills` in the fgOS source repo after editing canonical skill sources. Every Markdown file written by assembly carries a one-line HTML generated-from header naming its repo-relative `core/skills/...` or `domains/<domain>/skills/...` source and that rebuild command. The header follows byte-identical YAML frontmatter, or is the first line when none exists. Plugin mirrors and Claude companion/reference files inherit it through copying; Claude `SKILL.md` thin wrappers retain their generated-wrapper marker and point to the assembled projection whose header identifies the canonical source. Non-Markdown bytes and hand-authored plugin CLI-wrapper skills are unchanged.
+Run `npm run build:skills` in the fgOS source repo after editing canonical skill sources. Every Markdown file written by assembly carries a one-line HTML generated-from header naming its repo-relative `core/skills/...` or `domains/<domain>/skills/...` source and that rebuild command. The header follows byte-identical YAML frontmatter, or is the first line when none exists. Plugin mirrors inherit it through copying. A `.claude/skills/<skill>/` directory holds only its generated thin `SKILL.md`, which keeps its generated-wrapper marker and points to the assembled projection under `.agents/skills/<skill>/` whose header identifies the canonical source; references, scripts and other sibling files are read there, never from a copy under `.claude` (section 3.1). Non-Markdown bytes and hand-authored plugin CLI-wrapper skills are unchanged.
+
+### 3.1 Render rules
+
+Settled by owner decision 79 (2026-11-09; target shapes in the [T8 arbitration](../../../../plans/reports/council-261109-1000-harden-t8-arbitration.md#1-part-a-target-shapes-for-owner-approval), narrative in the [packaging-distribution decision history](../spec.md#lịch-sử-quyết-định)). All of it is Node in `src/setup/skill-wrappers.mjs`; `npm run build:skills` is `ensureAddonForScript()` plus one call to the render.
+
+| Rule | What holds | Owning proof |
+| --- | --- | --- |
+| One render door, compute first | `renderSkillSurfaces(root)` computes the owned name set and the instruction projection, then checks every target root, and only then assembles, wraps, mirrors and projects. Any refusal leaves the tree untouched. | `test/setup/skill-wrappers.test.mjs`: a refused instruction projection leaves every skill surface untouched; `build:skills` without a staged addon either completes or exits before its first write |
+| One owned-name door | `ownedSkillNames(...roots)` is every skill assembled from `core/skills` and `domains/<domain>/skills`, plus `_shared`. The render, the plugin mirror and `fgos setup` write only these names, so a skill directory another kit installed under a skill root is never read as ours or changed, whatever its name. | same file: rendering a checkout leaves a skill directory of another kit byte-identical under every skill root; setup materialisation leaves another kit skill directory in the target byte-identical |
+| Same-name refusal, anchored stamp | A directory with an owned name that holds files but carries no fgOS generated stamp is refused by name before any write (remove it, or rename the other skill). The stamp is the first line after the frontmatter (the wrapper marker under `.claude`, the assembled header under `.agents` and the plugin), so a skill that quotes it lower down is not ours and is not pruned. Both wrapper forms and the one assembled-header form an earlier release wrote are accepted; an unstamped `.agents/skills/<name>` copy a first release wrote is accepted when the sibling `.claude` wrapper is stamped. | same file: a same-name directory without a generated stamp is refused by name by render and by setup; a foreign skill that quotes a generated stamp lower down is not pruned; a skill directory carrying any form an earlier release wrote is overwritten |
+| Link refusal | One leaf (`lstatPlain`) is used at every copy site: a symbolic link in a skill source or target path is refused by name and never followed. | same file: a link in a skill source or target is refused by name and never followed |
+| Fixed point | Per owned skill directory the target ends equal to its source (files the source lacks are removed); the plugin mirror removes stamped `fgos-*` copies whose skill is gone and keeps hand-authored plugin skills; a second render writes nothing. | same file: a second render after a source deletion is a fixed point and a third render writes nothing; the plugin mirror removes only stamped `fgos-*` copies |
+| Setup copies the package only | `materializeSkillsIntoProject` copies only the package root's own skill names; a package skill never overwrites the target's own core skill of the same name. | same file: a package skill never overwrites a target own core skill |
+| `.claude` wrapper holds only `SKILL.md` | The reference copies the render used to place beside each wrapper are gone. Probe of 2026-11-09 ([report](../../../../plans/reports/research-261109-1317-harden-t8-reference-copy-probe.md)): a Claude seat run read-only in a worktree with `.claude/skills/fgos-fanout/references/` deleted opened `.claude/skills/fgos-fanout/SKILL.md`, followed its redirect and opened `.agents/skills/fgos-fanout/references/wave-dispatch-mechanics.md`; the control worktree with the copies opened the same three files. Limit: one skill, one seat shape, the open list is the seat's own report (its tool log was removed with its confinement home). | `test/setup/skill-wrappers.test.mjs`: a wrapper dir holds only its SKILL.md |
+| Guards judge owned names | The drift guard compares `.agents/skills` with the sources; `test/skills/fgos-mirror.test.mjs` compares `.claude` and the plugin mirror over the files Git tracks, for every owned name (`distill`, `instruction-audit`, `fgos-*`), and asserts every owned skill has a tracked render under both `.agents` and `.claude`. `.gitignore` keeps its per-name allowlist (it cannot compute a set) and a test proves it names exactly the owned skills. The wide citation sweep behind `fgos decision --relation` no longer reads the rendered `.agents/skills` tree. | `test/skills/fgos-mirror.test.mjs`; `test/scripts/check-decision-citation-drift.test.mjs` |
+| Gemini not provided | The Gemini package generator and adapter classifier are removed (they never had a production caller). Add a Gemini target through the common render if a consumer appears. | row removed with its tests |
+
+**Worktree provisioning is kit-agnostic.** `provisionSkillRoots` (`src/runner/worktree.mjs`, called by `provisionWorktree`) gives a new worktree every skill directory the main checkout git-ignores under the five agent skill roots (`AGENT_SKILL_DIRS` in `src/util/agent-skill-dirs.mjs`: `.claude/skills`, `.agents/skills`, `.omp/skills`, `.pi/skills`, `.grok/skills`) that the checkout lacks. "Git-ignored" is the test for "not fgOS-owned": fgOS skills are tracked or rendered into a tracked tree, so no skill set or kit is named anywhere in fgOS code or config. Ignored status is read through the Git Inspect port (a wholly ignored parent such as `.omp/` covers its children). The copy is real, never a hardlink: the probe wrote in place through a hardlink and the main checkout's file changed (a replace-style write did not; a cross-filesystem `cp -al` fails `EXDEV`). A link root or skill directory is skipped, a link inside a skill is copied as a link, an existing target is left alone so a rerun copies nothing, and a failed copy stops the worktree creation naming the directory. The provisioning record takes the copies back on `fgos worktree remove`. The cost per worktree is measured in the HARDEN T8 closing report and is the size of the foreign skill directories the machine holds, not something fgOS can reduce without naming them. Proof: `test/runner/worktree.test.mjs`: a new checkout receives every ignored skill directory of the main checkout, byte for byte, and leaves tracked skills to Git.
+
+**Trust line.** Setup and render refuse what they cannot prove they wrote: a stamp, an owned name and a plain (non-link) path are the proofs.
+
+**Limit, not closed.** A foreign directory that carries fgOS's own generated marker is treated as fgOS's, and `fgos setup` is the one door that still copies into projects; the retirement of `fgos setup` (T9) removes that surface. The two link predicates that exist (`lstatPlain` here and the source collector of `scripts/build-rust-distribution.mjs`) are one decision held twice: the T9 (Packaging) owns merging them.
 
 ## 4. Source-Of-Truth Rule
 
@@ -144,7 +168,7 @@ Adapter mapping:
 | `fgos:pick` | `$fgos-routing` (alias) | `/fgos:pick` (compat `/fgOS:pick`) | `/fgos:pick` | partial (hand-authored plugin command; canonical public-intent mapping planned) |
 | `fgos:submit` | `$fgos-clarifying` (target) | `/fgos:submit` (compat `/fgOS:submit`) | `/fgos:submit` | partial (hand-authored plugin command; canonical public-intent mapping planned) |
 
-Direct 1:1 intent-to-trigger mapping is implemented for canonical skills whose intent matches their canonical name or frontmatter `intent:` / `public-intent:`. Compatibility mapping for legacy `/fgOS:*` commands where discovery does not yet produce explicit intent aliases (e.g. `fgos:pick` vs `fgos-routing`) is partial and tracked for subsequent instruction/routing phases.
+No code derives this mapping today. The intent and trigger derivation (`mapSkillIntentToHostTriggers`, the frontmatter `intent:` / `public-intent:` fields) lived inside the removed Gemini generator and never had a production caller; a trigger works because the host reads the skill's directory name (`$fgos-routing`, `/fgos-routing`) or a hand-authored plugin command. The table above is vocabulary design, not behaviour: the Gemini column describes no shipped target, and compatibility mapping for legacy `/fgOS:*` commands (e.g. `fgos:pick` vs `fgos-routing`) is planned, not implemented.
 
 The lowercase `fgos:*` vocabulary is the desired cross-host user surface where the host supports slash commands and auto-suggest. Codex/OpenAI skills do not use slash command namespaces today, so `$fgos-*` remains the native portable trigger there.
 
@@ -196,6 +220,14 @@ Minimum checks:
 - missing plugin/extension packaging for a shipped host adapter;
 - duplicate canonical skill names across `core/skills` and `domains/*/skills`;
 - shared fragment collision across component-owned sources.
+
+Doctor rows that judge skills, after the hardening of 2026-11-09 (ids and count unchanged; each judges more than before):
+
+| Row | Judges |
+| --- | --- |
+| `agent-claims-resolve` | a task-spec `requires-skill` claim passes only when an agent provides the skill **and** the name is an owned skill (an owned source under `core/skills` or `domains/<domain>/skills`); the message names the failing side |
+| `executor-skills-installed` | every skill an executor declares in `supports.skills` is a non-empty `SKILL.md` in the project-level or user-level skill directory of each CLI the executor invokes (roots from `AGENT_SKILL_DIRS`); it judges the main checkout only, and a linked worktree gets foreign skills from provisioning (section 3.1) |
+| `domain-registry-compiled` | the same function as `npm run build:domains -- --check` (`checkCompiledDomains`): every `compiled.json` has a `registry.yaml`, equals its compile byte for byte, and no two workflow files share a key |
 
 `fgos doctor` remains read-only. `fgos doctor --fix` may regenerate generated projections through the registered fix path. Current legacy `fgos setup` may consume the same fix path while it remains implemented, but new design should not depend on it.
 

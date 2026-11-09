@@ -90,19 +90,19 @@ Open from that lead report, now in the plan: the orphan prune of `.claude` wrapp
 
 | # | Phase | Depends on | Group | Hot files written | Δ Node / Rust / tests (estimate) |
 |---|---|---|---|---|---|
-| 01 | [Render core: deletions](phase-01-render-core-deletions.md) | none | A (chain head) | `skill-wrappers.mjs`, `skill-wrappers.test.mjs`, contract `skill-package-distribution.md` | -620 / 0 / -3 030 |
+| 01 | [Render core: deletions](phase-01-render-core-deletions.md) | none | A (chain head) | `skill-wrappers.mjs`, `skill-wrappers.test.mjs`, contract `skill-package-distribution.md` | -620 / 0 / -3 030 **landed** (Node -651, tests -3 056, `381b18296`, `4f2535874`) |
 | 02 | [Render core: correctness](phase-02-render-core-correctness.md) | 01 | B (chain) | `skill-wrappers.mjs`, `skill-wrappers.test.mjs`, `build-skill-wrappers.mjs` (only if needed) | +50 / 0 / +60 **landed** |
 | 03 | [`.claude` reference copies](phase-03-claude-reference-copies.md) | probe: none; edit: 02 (and 04 on the fail branch) | A (probe), C (edit) | `skill-wrappers.mjs`, `skill-wrappers.test.mjs`, `fgos-mirror.test.mjs` (fail branch) | pass -20 / 0 / -10; fail 0 / 0 / +10 **landed** |
 | 04 | [Guards](phase-04-guards.md) | none | A | `fgos-mirror.test.mjs`, `check-decision-citation-drift.*`, `.gitignore` | -13 / 0 / +22 **landed** |
 | 05 | [Source text and doctrine](phase-05-source-text-and-doctrine.md) | none | A | `core/skills/**` text, `domains/**` text, `core/agents/*.yaml`, `domains/coding/AGENTS.md` | 0 / 0 / 0 (text -280) **landed** `adb9cc204` (landing unit, tip `1e14daec0`) |
 | 06 | [Doctor rows](phase-06-doctor-rows.md) | none | A | `registrations.mjs` (`checkAgentClaimsResolve`), `model-pool-checks.mjs` | +14 / 0 / +25 **landed** |
 | 07 | [Persona projection](phase-07-persona-projection.md) | none | A | `project-agents.mjs` | +12 / 0 / +30 **landed** |
-| 08 | [Domain build](phase-08-domain-build.md) | 06 for the `registrations.mjs` line only | B | `build-domain-registry.mjs`, `registrations.mjs` (`checkDomainRegistryCompiled`) | +10 / 0 / +10 |
+| 08 | [Domain build](phase-08-domain-build.md) | 06 for the `registrations.mjs` line only | B | `build-domain-registry.mjs`, `registrations.mjs` (`checkDomainRegistryCompiled`) | +10 / 0 / +10 **landed** `3aa200966` |
 | 09 | [Small scripts](phase-09-small-scripts.md) | none | A | `measure-coordination-baseline.mjs` (deleted), `distill.mjs`, `instruction-projections.mjs` | -447 / 0 / +8 **landed** (script, durable AGENTS.md; distill `c8325c203` in the landing unit; skip-worktree refusal filed for OPC) |
 | 10 | [Worktree skill provisioning](phase-10-worktree-skill-provisioning.md) | none | A | `worktree.mjs`, `agent-skill-dirs.mjs`, `.fgos/config.yaml` (line removed) | +43 / 0 / +36 **landed** |
-| 11 | [Domain-dirs door](phase-11-domain-dirs-door.md) | 03, 06, 07, 08 landed | D (alone) | one import line per caller, new leaf | -25 / 0 / +25 |
+| 11 | [Domain-dirs door](phase-11-domain-dirs-door.md) | 03, 06, 07, 08 landed | D (alone) | one import line per caller, new leaf | -25 / 0 / +25 **landed** `d6cc9ab76` |
 | 12 | [Render and census](phase-12-render-and-census.md) | 01-05, 09, 11 | E (alone) | all generated surfaces, census | 0 / 0 / 0 (generated -426 lines; references went in P03) **landed** `1e14daec0` |
-| 13 | [Spec, measure, close](phase-13-spec-measure-close.md) | 01-12 | close | spec, contract, guide, report | 0 / 0 / 0 |
+| 13 | [Spec, measure, close](phase-13-spec-measure-close.md) | 01-12 | close | spec, contract, guide, report | 0 / 0 / 0 **landed** (closing report `closing-261109-1752-harden-t8-skill-domain.md`; net Node -979, tests -2 438) |
 
 Sum of the Node column: about -1 040 (arbitration estimate -1 040); tests about -2 870 (estimate -2 830); Rust 0; generated text about -4 300 with the Q2 pass branch (about -900 on the fail branch). Layer total at or below zero in every language and on both Q2 branches.
 

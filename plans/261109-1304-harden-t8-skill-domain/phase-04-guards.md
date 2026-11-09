@@ -1,7 +1,7 @@
 ---
 phase: 04
 title: "Guards: the mirror test judges owned names over ownedFileSet and every owned skill has a tracked render in both trees, instruction-audit tracked under .claude, the citation guard stops sweeping .agents/skills, its CLI cases run in process"
-status: pending
+status: landed
 depends_on: []
 parallel: "group A; P03 fail branch appends to fgos-mirror.test.mjs after this lands"
 effort: ~0.5d

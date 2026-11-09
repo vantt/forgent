@@ -172,6 +172,10 @@ driver or stage skill.
 This mirrors the stage-level bundle rule: routing resolves domain doctrine once
 per session; driving resolves skill/task-spec material per stage.
 
+Doctrine is read from the payload of the running fgOS, never from the project's
+working directory, and a project has no extension path (owner decision 79 Q4 a;
+section 14).
+
 ## 8. Skill And Agent Authoring
 
 Skill authoring sources split by ownership:
@@ -303,3 +307,44 @@ The domainization material decomposes into these implementation slices:
 
 Each slice should leave existing host-facing surfaces stable unless its own
 contract explicitly says otherwise.
+
+## 14. Settled Facts (HARDEN T8, 2026-11-09)
+
+Settled by owner decision 79 (narrative in the
+[packaging-distribution decision history](../../packaging-distribution/spec.md#lịch-sử-quyết-định); the
+decision-scope table in `docs/platform/governance.md` routes skill and domain
+distribution there). Render and distribution rules are in
+`docs/platform/packaging-distribution/contracts/skill-package-distribution.md`
+section 3.1; this section holds only what is about domain data and doctrine.
+
+- **Doctrine comes from the running payload.** `domains/<domain>/AGENTS.md` is read
+  from the fgOS payload (`<root>` of `<root>/bin/fgos.mjs`, printed by the
+  `legacy-node-payload-present` row of `fgos doctor`), never from the project's
+  working directory; a project's own `domains/` folder is not read for doctrine, and
+  there is no project extension path. `fgos-routing` says so (Q4 a). No new verb was
+  needed to print the root.
+- **Doctrine is the domain's rules, not a tool's block.** `domains/coding/AGENTS.md`
+  carries no managed block of a code-intelligence tool and no prose that
+  `domains/coding/instructions/worktree-safety.md` already projects; each rule was
+  diff-checked against its owner before it left.
+- **One list of domains.** `listDomainDirs(domainsDir)` (`src/util/domain-dirs.mjs`,
+  a kernel leaf) returns the sorted names of the domain directories under a `domains/`
+  folder; an absent folder is an empty list. Setup, runner, workflow and the build
+  scripts call it. One hand-written walk remains, `loadDomainsFromDisk` in
+  `src/state/domain-registry.mjs`, owned by Work and filed as backlog item
+  `p-bxahsop7em`. Filters that belong to one caller (a dot name, a `skills/` subdirectory)
+  stay with that caller.
+- **`compiled.json` equals its compile.** `checkCompiledDomains`
+  (`scripts/build-domain-registry.mjs`) is the one judge behind
+  `npm run build:domains -- --check`, the `domain-registry-compiled` doctor row and
+  their test: every `compiled.json` has a `registry.yaml` (no orphan), equals the
+  compile of its YAML byte for byte, and no two workflow files of one domain define
+  the same key (`x.yaml` and `x.yml` make the build fail naming both).
+- **Skill names in task-specs resolve to owned skills.** A `requires-skill` claim
+  passes `agent-claims-resolve` only when an agent provides the skill and the name is
+  an owned skill source; the retired name `fgos-coding-compounding` is gone from skill
+  text, task-specs and agent definitions in favour of `fgos-coding-knowledge`.
+- **Persona projection.** `scripts/project-agents.mjs` (run by hand; it has no package
+  script) names its output after the source file stem, refuses a declared name that
+  differs and any scalar holding a newline, and skips, naming it, an existing target
+  without its generated stamp.

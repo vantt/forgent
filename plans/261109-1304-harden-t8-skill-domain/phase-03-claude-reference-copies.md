@@ -1,7 +1,7 @@
 ---
 phase: 03
 title: "The .claude reference-file copies: one live probe of whether the host needs them, then drop the copy step (pass) or keep it under a byte-compare test (fail)"
-status: pending
+status: landed
 depends_on: ["probe step: none", "edit step: 02 landed", "fail branch also after 04 landed"]
 parallel: "probe in group A (writes no file); edit in group C"
 effort: ~0.5d (+ one seat run)
