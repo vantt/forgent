@@ -572,3 +572,15 @@ fn a_machine_whose_handle_is_its_own_id_is_listed_as_shared_by_id() {
     let judged = shared::judge_directory(&clone_with(PROJECT, Some(&view))).unwrap();
     assert_eq!(judged.shared_handle_machines, [ALPHA]);
 }
+
+#[test]
+fn an_entry_that_names_no_project_is_not_counted_as_another_projects() {
+    let (alpha, viewer) = (machine(ALPHA), machine("viewer-vvvvvv"));
+    let mut open = session(ALPHA, "open", &[], "2026-10-24T01:00:00.000Z");
+    open.project_id = None;
+    let view = fold(&viewer, &[published(&alpha, &open, "alpha")], None, None);
+    let judged = shared::judge_directory(&clone_with(PROJECT, Some(&view))).unwrap();
+    assert_eq!(judged.entries, 1);
+    assert_eq!(judged.foreign_entries, 0);
+    assert!(judged.foreign_project_ids.is_empty());
+}

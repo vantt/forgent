@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9a9dabd667671b62a9b2b5b6bdf00360845a46c7f1ea032330ff4e4889a0d4d2",
+  "payloadDigest": "670b9705772e52c50dd9a4e9f53e30dfabf1f8f55a5428beb1877b05e9dec90f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -491,7 +491,7 @@
     "packages/identity/rust/src/refusal.rs": "dd0e19e7f85ce5f88fa7f8a238e97a883fbbab86273e7c186e066a1ca25ec3e0",
     "packages/identity/rust/src/resolve.rs": "c9b611f02aed198b1acfe408f24cdcfaf77d112dcb906f7290315603707c1f68",
     "packages/identity/rust/src/session.rs": "c47d0ee2bc070e02979f702a17031d48799867de27dd0688c74d6477a255c5a2",
-    "packages/identity/rust/src/shared.rs": "0405391f2e9f3ddab245b6445d934d372b7883581af335e7aa110593b1a78993",
+    "packages/identity/rust/src/shared.rs": "0af34e63b1832c74dd7f48aabca466b6ff425b93bd6c54b9206ca29f04c0d995",
     "packages/identity/rust/src/signing.rs": "103554f2b75e499663b689c8d9ea1ffe01e871be7ee19ea01c7268a7e64e546a",
     "packages/identity/rust/src/text.rs": "8fda76ecfa83419c11ab8dc456c1f76cea387e61700e997469667194c8747f91",
     "packages/identity/rust/tests/attempt_writer_id.rs": "97e308f3922b15715df4491a719a09f242f7469bb44fe7b063fec9e2e9a93ad5",
@@ -502,7 +502,7 @@
     "packages/identity/rust/tests/project.rs": "524223710900bbfff6ec6bb58774c1d75c309cfe2308e4bfffe0ea2a349535ca",
     "packages/identity/rust/tests/register_current.rs": "25d3f540487726d1e5ccb9d115c388b3187f869a27beaff68c7ad39a988189ea",
     "packages/identity/rust/tests/session.rs": "c90d501ef43f72d86b33cc357961e4f1f75886935c6a5b775e38a668cee0c5e5",
-    "packages/identity/rust/tests/shared.rs": "52b2fc92d9c03a5d471b89362285f5db26b7800d8a2557ca023f9266b0084427",
+    "packages/identity/rust/tests/shared.rs": "3c0bcb1d94d1a0486cf1fbdb382b15107b256f42fa19cbb92c551f147436bc17",
     "packages/identity/rust/tests/signing.rs": "f446d326b152189b65e11976be3bfa8902bf7f65a79db355c08514e7df3edea2",
     "packages/mailbox/rust/core/src/ack.rs": "d3b51fb0bbc5d8514f63aed9365500965fff4b0a622efb0379201b830b4f9fbc",
     "packages/mailbox/rust/core/src/counters.rs": "5a59a9908258111382df32952d8c77d5c62bcf71bdbc0cee917eaba3a3520973",
@@ -1128,7 +1128,7 @@
     "src/setup/git-hooks.mjs": "7c35308129bc8032a436107c561cefa0637cceb72b295eab1ecd2e163c0d0f66",
     "src/setup/git-retention-note.mjs": "8e4bacd772c5562a964c4beeea95d9ee808f41e122a7b6adc09fee81c96949fd",
     "src/setup/holder-lock-checks.mjs": "375664bc0ee2f362783f2d3109c83d5cc77b1c55837e715297a00294f70d9e7f",
-    "src/setup/identity-checks.mjs": "bb8ad1dea728cd8dec7334f3072940440ab6e3fc21c5533c7fb9bb2ff4cfafe3",
+    "src/setup/identity-checks.mjs": "0d10905343b6d5e087802c5df2d1d9a96b2f40a1f8b97ace6e7473abc98cb7cd",
     "src/setup/instruction-composition.mjs": "6cbefb439141620eccfc990088849627e95577a28688d51b324a4b3dfdf36331",
     "src/setup/instruction-projections.mjs": "82aaa1ec07a5d2925fcb3117a020eb4576777f901c09d054cb17c659d8c144f3",
     "src/setup/instruction-registry.mjs": "525bdc05438191f6c02b0b071b577ad84cb9f2c5cfa8e6efe0ed82f60ae9b17c",
@@ -3512,7 +3512,7 @@
     },
     {
       "path": "src/setup/identity-checks.mjs",
-      "line": 39,
+      "line": 38,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

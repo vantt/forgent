@@ -12,13 +12,12 @@
 // starts with `warning:` warns, anything else passes.
 
 import { execFileSync, spawnSync } from 'node:child_process';
-import fs from 'node:fs';
 import path from 'node:path';
 import { resolveStateRoot } from '../holder-lock/state-root.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { mintMachineId, mintMachineKey } from '../util/identity-mint.mjs';
-import { FGOS_FILE, resolveFgosFile } from '../state/fgos-file-registry.mjs';
+import { identityDoor } from '../util/session-identity.mjs';
 
 const TIMEOUT_MS = 2000;
 
@@ -148,35 +147,26 @@ export function checkIdentityProjectId(cwd, { hostBin } = {}) {
 }
 
 /**
- * Reports the shared directory from its cache only (the Rust identity crate writes it whenever a verb
- * resolves, lists or publishes; nothing is read from the store here). Passes with the counts; warns on
- * entries dropped because their signature did not hold (reason and machine id), on entries of another
- * project than this clone's, and on a machine shown by its id because another machine has its handle.
- * A missing or unreadable cache, or a clone with no project id, passes: there is no shared directory
- * yet. No fix: the owner decides what to do about a forged or misplaced entry.
+ * Shows the Identity crate's judgement of the shared directory, read from its cache only (the crate writes
+ * the cache whenever a verb resolves, lists or publishes; nothing is read from the store here). Passes with the
+ * counts; warns on dropped events (reason and machine id), on entries of another project than this clone's, and
+ * on a machine shown by its id because another machine has its handle. A clone with no project id or no readable
+ * cache passes: there is no shared directory yet. No fix: the owner decides what to do about a forged or misplaced entry.
  */
 export function checkIdentitySharedDirectory(cwd) {
-  const none = { passed: true, message: 'no shared directory yet' };
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
-  let projectId;
-  let cache;
+  let judged;
   try {
-    projectId = JSON.parse(fs.readFileSync(path.join(root, '.fgos', 'project.json'), 'utf8')).projectId;
-    cache = JSON.parse(fs.readFileSync(resolveFgosFile(path.join(root, '.fgos'), FGOS_FILE.IDENTITY_DIRECTORY), 'utf8'));
+    judged = identityDoor().sharedDirectory(root);
   } catch {
-    return none;
+    judged = null;
   }
-  if (typeof projectId !== 'string' || cache?.v !== 1 || !Array.isArray(cache.entries) || !Array.isArray(cache.dropped)) return none;
-  const machines = new Set(cache.entries.map((entry) => entry.machine?.id));
-  const summary = `${machines.size} machine(s), ${cache.entries.length} entries, fetched ${cache.fetchedAt ?? 'never'}`;
+  if (!judged) return { passed: true, message: 'no shared directory yet' };
+  const summary = `${judged.machines} machine(s), ${judged.entries} entries, fetched ${judged.fetchedAt ?? 'never'}`;
   const warnings = [];
-  if (cache.dropped.length > 0) {
-    warnings.push(`${cache.dropped.length} dropped (${cache.dropped.map((drop) => `${drop.reason} from ${drop.machineId}`).join(', ')})`);
-  }
-  const foreign = cache.entries.filter((entry) => entry.projectId !== projectId);
-  if (foreign.length > 0) warnings.push(`${foreign.length} of another project (${[...new Set(foreign.map((entry) => entry.projectId))].join(', ')})`);
-  const renamed = [...new Set(cache.entries.filter((entry) => entry.machine?.handle === entry.machine?.id).map((entry) => entry.machine.id))];
-  if (renamed.length > 0) warnings.push(`machine handle shared, shown by id: ${renamed.join(', ')} (set one apart with \`fgos identity machine --alias\`)`);
+  if (judged.dropped.length > 0) warnings.push(`${judged.dropped.length} dropped (${judged.dropped.map((drop) => `${drop.reason} from ${drop.machineId}`).join(', ')})`);
+  if (judged.foreignEntries > 0) warnings.push(`${judged.foreignEntries} of another project (${judged.foreignProjectIds.join(', ')})`);
+  if (judged.sharedHandleMachines.length > 0) warnings.push(`machine handle shared, shown by id: ${judged.sharedHandleMachines.join(', ')} (set one apart with \`fgos identity machine --alias\`)`);
   return { passed: true, message: warnings.length === 0 ? summary : `warning: ${summary}; ${warnings.join('; ')}` };
 }
 

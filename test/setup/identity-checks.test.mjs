@@ -117,21 +117,24 @@ test('project id row warns while the repository has none, passes after the expli
   assert.match(broken.message, /project-id-unreadable|not a project file/);
 });
 
-test('shared-directory row reads only the cache: passes with counts, warns on dropped, foreign and shared-handle entries', (t) => {
+// The judgement itself (dropped, another project, shared handle, counts) is owned by
+// packages/identity/rust/tests/shared.rs; this proves the row shows the crate's answer through the door.
+test('shared-directory row shows the crate judgement: passes with counts, warns on dropped, foreign and shared-handle entries', (t) => {
   const { root } = withStateRoot(t);
   const repo = path.join(root, 'shared-dir');
   fs.mkdirSync(path.join(repo, '.fgos', 'cache'), { recursive: true });
-  assert.deepEqual(checkIdentitySharedDirectory(repo), { passed: true, message: 'no shared directory yet' });
-  fs.writeFileSync(path.join(repo, '.fgos', 'project.json'), JSON.stringify({ v: 1, projectId: 'p1', handle: 'demo' }));
+  assert.deepEqual(checkIdentitySharedDirectory(repo), { passed: true, message: 'no shared directory yet' }, 'no project id');
+  const projectId = '0123456789abcdef0123456789abcdef';
+  fs.writeFileSync(path.join(repo, '.fgos', 'project.json'), JSON.stringify({ v: 1, projectId, handle: 'demo', createdAt: '2026-10-24T00:00:00.000Z' }));
   const cacheFile = path.join(repo, '.fgos', 'cache', 'identity-directory.json');
   assert.equal(checkIdentitySharedDirectory(repo).message, 'no shared directory yet', 'a clone with no cache yet');
-  const entry = (id, projectId, handle) => ({ id: `${id}/s`, projectId, machine: { id, handle } });
+  const entry = (id, project, handle) => ({ id: `${id}/s`, handle: `claude-s@${id}`, cli: 'claude', projectId: project, roles: [], registeredAt: '2026-10-24T01:00:00.000Z', machine: { id, handle }, pin: 'seen' });
   const write = (entries, dropped) => fs.writeFileSync(cacheFile, JSON.stringify({ v: 1, fetchedAt: '2026-10-24T03:00:00.000Z', entries, dropped, verified: [] }));
 
-  write([entry('alpha-aaaaaa', 'p1', 'alpha'), entry('beta-bbbbbb', 'p1', 'beta')], []);
+  write([entry('alpha-aaaaaa', projectId, 'alpha'), entry('beta-bbbbbb', projectId, 'beta')], []);
   assert.deepEqual(checkIdentitySharedDirectory(repo), { passed: true, message: '2 machine(s), 2 entries, fetched 2026-10-24T03:00:00.000Z' });
 
-  write([entry('alpha-aaaaaa', 'p2', 'alpha'), entry('beta-bbbbbb', 'p1', 'beta-bbbbbb')], [{ reason: 'key-changed', machineId: 'gamma-cccccc' }]);
+  write([entry('alpha-aaaaaa', 'p2', 'alpha'), entry('beta-bbbbbb', projectId, 'beta-bbbbbb')], [{ reason: 'key-changed', machineId: 'gamma-cccccc' }]);
   const warned = checkIdentitySharedDirectory(repo);
   assert.equal(warned.passed, true);
   assert.match(warned.message, /^warning: 2 machine\(s\), 2 entries/);

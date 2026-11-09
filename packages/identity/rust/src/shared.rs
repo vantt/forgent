@@ -302,7 +302,8 @@ pub struct DirectoryJudgement {
     pub fetched_at: Option<String>,
     /// Events dropped because their signature did not hold, with reason and machine.
     pub dropped: Vec<Dropped>,
-    /// How many entries belong to another project than the clone's.
+    /// How many entries name another project than the clone's. An entry that names no project is not
+    /// counted: the crate publishes only entries with a project id, so one without is not another project's.
     pub foreign_entries: usize,
     /// The other project ids those entries name, each once.
     pub foreign_project_ids: Vec<String>,
@@ -317,7 +318,12 @@ impl Cache {
         let foreign: Vec<&RemoteEntry> = self
             .entries
             .iter()
-            .filter(|e| e.entry.project_id.as_deref() != Some(project_id))
+            .filter(|e| {
+                e.entry
+                    .project_id
+                    .as_deref()
+                    .is_some_and(|id| id != project_id)
+            })
             .collect();
         let foreign_project_ids: BTreeSet<&str> = foreign
             .iter()
