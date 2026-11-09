@@ -508,10 +508,18 @@ fn a_clean_directory_counts_machines_and_entries_and_flags_nothing() {
         published(&alpha, &one, "alpha"),
         published(&beta, &two, "beta"),
     ];
-    let view = fold(&viewer, &events, Some("2026-10-24T03:00:00.000Z".into()), None);
+    let view = fold(
+        &viewer,
+        &events,
+        Some("2026-10-24T03:00:00.000Z".into()),
+        None,
+    );
     let judged = shared::judge_directory(&clone_with(PROJECT, Some(&view))).unwrap();
     assert_eq!((judged.machines, judged.entries), (2, 2));
-    assert_eq!(judged.fetched_at.as_deref(), Some("2026-10-24T03:00:00.000Z"));
+    assert_eq!(
+        judged.fetched_at.as_deref(),
+        Some("2026-10-24T03:00:00.000Z")
+    );
     assert!(judged.dropped.is_empty());
     assert!(judged.foreign_project_ids.is_empty());
     assert!(judged.shared_handle_machines.is_empty());
@@ -520,11 +528,19 @@ fn a_clean_directory_counts_machines_and_entries_and_flags_nothing() {
 #[test]
 fn a_dropped_event_names_its_reason_and_machine() {
     let (alpha, viewer) = (machine(ALPHA), machine("viewer-vvvvvv"));
-    let forged = published(&alpha, &session(BETA, "one", &[], "2026-10-24T01:00:00.000Z"), "beta");
+    let forged = published(
+        &alpha,
+        &session(BETA, "one", &[], "2026-10-24T01:00:00.000Z"),
+        "beta",
+    );
     let view = fold(&viewer, &[forged], None, None);
     let judged = shared::judge_directory(&clone_with(PROJECT, Some(&view))).unwrap();
     assert_eq!(
-        judged.dropped.iter().map(|d| (d.reason.as_str(), d.machine_id.as_str())).collect::<Vec<_>>(),
+        judged
+            .dropped
+            .iter()
+            .map(|d| (d.reason.as_str(), d.machine_id.as_str()))
+            .collect::<Vec<_>>(),
         [("machine-mismatch", BETA)]
     );
 }
@@ -534,7 +550,13 @@ fn entries_of_another_project_are_named_once_each() {
     let (alpha, viewer) = (machine(ALPHA), machine("viewer-vvvvvv"));
     let events: Vec<RawEvent> = ["a", "b"]
         .iter()
-        .map(|name| published(&alpha, &session(ALPHA, name, &[], "2026-10-24T01:00:00.000Z"), "alpha"))
+        .map(|name| {
+            published(
+                &alpha,
+                &session(ALPHA, name, &[], "2026-10-24T01:00:00.000Z"),
+                "alpha",
+            )
+        })
         .collect();
     let view = fold(&viewer, &events, None, None);
     let judged = shared::judge_directory(&clone_with(PROJECT, Some(&view))).unwrap();

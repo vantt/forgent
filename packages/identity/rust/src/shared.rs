@@ -336,7 +336,10 @@ impl Cache {
             dropped: self.dropped.clone(),
             foreign_entries: foreign.len(),
             foreign_project_ids: foreign_project_ids.into_iter().map(String::from).collect(),
-            shared_handle_machines: shared_handle_machines.into_iter().map(String::from).collect(),
+            shared_handle_machines: shared_handle_machines
+                .into_iter()
+                .map(String::from)
+                .collect(),
         }
     }
 }

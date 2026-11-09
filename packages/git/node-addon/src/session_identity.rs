@@ -21,7 +21,10 @@ pub fn resolve(fgos_dir: Option<String>) -> Result<Value> {
 #[napi(namespace = "sessionIdentity", js_name = "sharedDirectory")]
 pub fn shared_directory(main_root: String) -> Result<Value> {
     check()?;
-    serde_json::to_value(fgos_identity::shared::judge_directory(Path::new(&main_root))).map_err(error)
+    serde_json::to_value(fgos_identity::shared::judge_directory(Path::new(
+        &main_root,
+    )))
+    .map_err(error)
 }
 
 /// `att-<attemptId>`; an unusable id fails with a message that starts with `invalid-attempt-id`.
