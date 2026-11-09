@@ -364,7 +364,8 @@ describe('install.sh e2e installer suite', { skip: process.platform === 'win32' 
 // ---------------------------------------------------------------------------
 
 const target = 'x86_64-unknown-linux-gnu';
-const hostTools = ['id', 'uname', 'mktemp', 'tar', 'awk', 'cut', 'tr', 'rm', 'mkdir', 'cp', 'chmod', 'mv', 'wc', 'cat', 'date', 'dirname', 'basename', 'head', 'sed', 'grep', 'timeout', 'ls', 'sleep'];
+const hostTools = ['id', 'uname', 'mktemp', 'tar', 'awk', 'cut', 'tr', 'rm', 'mkdir', 'cp', 'chmod', 'mv', 'wc', 'cat', 'date', 'dirname', 'basename', 'head', 'sed', 'grep', 'timeout', 'ls', 'sleep', 'gzip'];
+const withHash = [...hostTools, 'sha256sum'];
 
 function writeFixtureTar(dir, name, entries, { transform } = {}) {
   const src = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-fx-src-'));
@@ -375,7 +376,7 @@ function writeFixtureTar(dir, name, entries, { transform } = {}) {
       fs.writeFileSync(file, content, { mode: 0o755 });
     }
     const args = ['-czf', path.join(dir, name)];
-    if (transform) args.push(`--transform=${transform}`);
+    if (transform) args.push('-P', `--transform=${transform}`);
     execFileSync('tar', [...args, ...Object.keys(entries)], { cwd: src });
   } finally {
     fs.rmSync(src, { recursive: true, force: true });
@@ -549,7 +550,7 @@ describe('install.sh safety and shape', { skip: process.platform === 'win32' ? '
   test('a tag with path characters is refused before any request', async () => {
     const made = mirror();
     await inSandbox(async ({ home, installDir }) => {
-      await withTools(hostTools, made.dir, async ({ tools, curl }) => {
+      await withTools(withHash, made.dir, async ({ tools, curl }) => {
         const res = await runSh(isolatedEnv(home, installDir, { PATH: tools, FGCTL_VERSION: '../evil' }));
         assert.notEqual(res.status, 0);
         assert.match(res.stderr, /invalid release tag/);
@@ -561,7 +562,7 @@ describe('install.sh safety and shape', { skip: process.platform === 'win32' ? '
   test('"latest" is resolved from the default repository only, and the tag it names is downloaded from there', async () => {
     const made = mirror({ version: 'v0.2.0' });
     await inSandbox(async ({ home, installDir }) => {
-      await withTools([...hostTools, 'sha256sum'], made.dir, async ({ tools, curl }) => {
+      await withTools(withHash, made.dir, async ({ tools, curl }) => {
         const res = await runSh(isolatedEnv(home, installDir, { PATH: tools }));
         assert.equal(res.status, 0, res.stderr);
         const calls = curl.log();
@@ -576,7 +577,7 @@ describe('install.sh safety and shape', { skip: process.platform === 'win32' ? '
   test('FGCTL_ASSET_BASE_URL names an asset directory, so with no version the installer asks for one instead of guessing', async () => {
     const made = mirror();
     await inSandbox(async ({ home, installDir }) => {
-      await withTools(hostTools, made.dir, async ({ tools, curl }) => {
+      await withTools(withHash, made.dir, async ({ tools, curl }) => {
         const res = await runSh(isolatedEnv(home, installDir, { PATH: tools, FGCTL_ASSET_BASE_URL: 'https://mirror.example/assets' }));
         assert.notEqual(res.status, 0);
         assert.match(res.stderr, /FGCTL_VERSION/);
@@ -600,7 +601,7 @@ describe('install.sh safety and shape', { skip: process.platform === 'win32' ? '
     ];
     for (const base of refused) {
       await inSandbox(async ({ home, installDir }) => {
-        await withTools(hostTools, made.dir, async ({ tools, curl }) => {
+        await withTools(withHash, made.dir, async ({ tools, curl }) => {
           const res = await runSh(isolatedEnv(home, installDir, { PATH: tools, FGCTL_ASSET_BASE_URL: base, FGCTL_VERSION: 'v0.2.0' }));
           assert.notEqual(res.status, 0, base);
           assert.match(res.stderr, /https/, `${base}: ${res.stderr}`);
@@ -615,7 +616,7 @@ describe('install.sh safety and shape', { skip: process.platform === 'win32' ? '
     const made = mirror({ version: 'v0.2.0' });
     for (const host of ['127.0.0.1', '127.1.2.3', 'localhost', '[::1]']) {
       await inSandbox(async ({ home, installDir }) => {
-        await withTools([...hostTools, 'sha256sum'], made.dir, async ({ tools, curl }) => {
+        await withTools(withHash, made.dir, async ({ tools, curl }) => {
           const res = await runSh(isolatedEnv(home, installDir, { PATH: tools, FGCTL_ASSET_BASE_URL: `http://${host}:8123/assets`, FGCTL_VERSION: 'v0.2.0' }));
           assert.equal(res.status, 0, `${host}: ${res.stderr}`);
           assert.ok(curl.log().includes(`http://${host}:8123/assets/fgctl-v0.2.0`), curl.log());
@@ -627,7 +628,7 @@ describe('install.sh safety and shape', { skip: process.platform === 'win32' ? '
   test('a file:// mirror needs no network tool at all', async () => {
     const made = mirror({ version: 'v0.2.0' });
     await inSandbox(async ({ home, installDir }) => {
-      const tools = toolDir([...hostTools, 'sha256sum']);
+      const tools = toolDir(withHash);
       try {
         const res = await runSh(isolatedEnv(home, installDir, { PATH: tools, FGCTL_ASSET_BASE_URL: made.url, FGCTL_VERSION: 'v0.2.0' }));
         assert.equal(res.status, 0, res.stderr);
