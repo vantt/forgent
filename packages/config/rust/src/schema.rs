@@ -21,6 +21,64 @@ pub(crate) fn annotations() -> impl Iterator<Item = &'static Value> {
     contract()["annotations"].as_array().into_iter().flatten()
 }
 
+/// The keys a runtime reads with a built-in default that no section schema describes.
+pub(crate) fn runtime_keys() -> impl Iterator<Item = &'static Value> {
+    contract!("runtime-keys.v1.json")["keys"]
+        .as_array()
+        .into_iter()
+        .flatten()
+}
+
+/// The names of a path's keys; `None` when it goes through a list index.
+fn key_names(path: &[Segment]) -> Option<Vec<&str>> {
+    path.iter()
+        .map(|s| match s {
+            Segment::Key(name) => Some(name.as_str()),
+            Segment::Index(_) => None,
+        })
+        .collect()
+}
+
+/// The runtime key row at exactly `path`.
+pub fn runtime_key(path: &[Segment]) -> Option<&'static Value> {
+    let want = key_names(path)?.join(".");
+    runtime_keys().find(|row| row["path"] == want.as_str())
+}
+
+/// Whether `path` is a runtime key or a mapping on the way to one.
+fn on_runtime_key(path: &[Segment]) -> bool {
+    key_names(path).is_some_and(|names| {
+        let own = names.join(".");
+        runtime_keys().any(|row| {
+            let full = row["path"].as_str().unwrap_or_default();
+            full == own
+                || full
+                    .strip_prefix(&own)
+                    .is_some_and(|rest| rest.starts_with('.'))
+        })
+    })
+}
+
+/// Edit distance between two names, ignoring case; small inputs only.
+fn distance(a: &str, b: &str) -> usize {
+    let b: Vec<char> = b.to_lowercase().chars().collect();
+    let mut row: Vec<usize> = (0..=b.len()).collect();
+    for (i, x) in a.to_lowercase().chars().enumerate() {
+        let mut diagonal = std::mem::replace(&mut row[0], i + 1);
+        for (j, y) in b.iter().enumerate() {
+            let above = row[j + 1];
+            row[j + 1] = (diagonal + usize::from(x != *y))
+                .min(above + 1)
+                .min(row[j] + 1);
+            diagonal = above;
+        }
+    }
+    row[b.len()]
+}
+
+/// The most suggestions an unknown key gets.
+const SUGGESTIONS: usize = 3;
+
 /// What a node states for annotation `row`: its value when it is one of the allowed ones.
 fn stated<'a>(row: &Value, node: &'a Value) -> Option<&'a str> {
     let value = node[row["name"].as_str()?].as_str()?;
@@ -340,7 +398,7 @@ impl Schemas {
     pub fn undescribed(&self, value: &Value) -> Vec<Vec<Segment>> {
         let mut out = Vec::new();
         descend(value, &mut Vec::new(), &mut |path, _| {
-            let known = self.resolve(path).is_some();
+            let known = self.resolve(path).is_some() || on_runtime_key(path);
             if !known {
                 out.push(path.to_vec());
             }
@@ -349,5 +407,64 @@ impl Schemas {
         // A JSON object keeps key order or sorts it by serde_json feature; the answer must not.
         out.sort_by_cached_key(|path| format_path(path));
         out
+    }
+
+    /// The key names a mapping at `prefix` may hold: the section names at the root, the named
+    /// properties of a schema node, and the next segment of every runtime key below it.
+    fn names_under(&self, prefix: &[Segment]) -> Vec<String> {
+        let mut names: Vec<String> = match prefix.is_empty() {
+            true => self.sections.iter().map(|s| s.name.clone()).collect(),
+            false => self.locate(prefix).map_or_else(Vec::new, |(at, _)| {
+                let named = self.children(&at).into_iter();
+                named
+                    .filter_map(|(name, _)| name.map(String::from))
+                    .collect()
+            }),
+        };
+        let held = key_names(prefix).unwrap_or_default().join(".");
+        for row in runtime_keys() {
+            let full = row["path"].as_str().unwrap_or_default();
+            let rest = match held.is_empty() {
+                true => Some(full),
+                false => full.strip_prefix(&held).and_then(|r| r.strip_prefix('.')),
+            };
+            if let Some(next) = rest.and_then(|r| r.split('.').next()) {
+                names.push(next.to_string());
+            }
+        }
+        names.sort();
+        names.dedup();
+        names
+    }
+
+    /// The nearest keys to an undescribed `path`, as full paths: the names its first unknown
+    /// segment may have meant, nearest first. Empty when nothing is close or the path holds a list index.
+    pub fn suggest(&self, path: &[Segment]) -> Vec<String> {
+        let Some(names) = key_names(path) else {
+            return Vec::new();
+        };
+        let Some(depth) = (0..path.len())
+            .find(|d| self.resolve(&path[..=*d]).is_none() && !on_runtime_key(&path[..=*d]))
+        else {
+            return Vec::new();
+        };
+        let wrong = names[depth];
+        let near = wrong.chars().count() / 3;
+        let mut close: Vec<(usize, String)> = self
+            .names_under(&path[..depth])
+            .into_iter()
+            .map(|name| (distance(wrong, &name), name))
+            .filter(|(d, _)| *d <= near.max(2))
+            .collect();
+        close.sort();
+        let parent = names[..depth].join(".");
+        close
+            .into_iter()
+            .take(SUGGESTIONS)
+            .map(|(_, name)| match parent.is_empty() {
+                true => name,
+                false => format!("{parent}.{name}"),
+            })
+            .collect()
     }
 }

@@ -2392,7 +2392,13 @@ fn config_set_unset_and_patch_write_through_the_transaction_and_record_the_reaso
     assert!(missing.contains("add --reason"), "{missing}");
     let typo = config_run(
         &sandbox,
-        &["set", "gateBypass.levle", "light", "--reason", "mistyped on purpose"],
+        &[
+            "set",
+            "gateBypass.levle",
+            "light",
+            "--reason",
+            "mistyped on purpose",
+        ],
         false,
     );
     assert_eq!(typo.status.code(), Some(65));
@@ -2426,7 +2432,7 @@ fn config_set_unset_and_patch_write_through_the_transaction_and_record_the_reaso
     let patch = sandbox.join("patch.yaml");
     fs::write(
         &patch,
-        "- set: gateBypass.level\n  value: standard\n- set: cleanup.enabled\n  value: true\n",
+        "- set: gateBypass.level\n  value: standard\n- set: cleanup.ttlDays\n  value: 14\n",
     )
     .unwrap();
     let applied = config_data(&config_run(

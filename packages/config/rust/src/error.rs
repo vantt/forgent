@@ -17,6 +17,8 @@ pub struct Detail {
     pub belongs_in: Option<String>,
     /// For a merge that cannot combine two layers: the layers that hold a value at the path.
     pub layers: Vec<&'static str>,
+    /// For an unknown key: the nearest keys the schemas and the runtime key list know, as paths.
+    pub suggest: Vec<String>,
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -91,6 +93,10 @@ impl fmt::Display for ConfigRefusal {
             (
                 "layers",
                 &Some(detail.layers.join(",")).filter(|l| !l.is_empty()),
+            ),
+            (
+                "did-you-mean",
+                &Some(detail.suggest.join(",")).filter(|s| !s.is_empty()),
             ),
         ] {
             if let Some(part) = part {

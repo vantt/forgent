@@ -277,6 +277,42 @@ pub fn commit_observed(
     Ok(result)
 }
 
+/// The check a person's `set` or `patch` passes before it reaches [`commit`]: every key the edits
+/// set must be described by a section schema or the runtime key list. The refusals name each
+/// unknown key with the nearest keys, together with the reason's own refusal when the reason is
+/// unusable, so one answer holds every problem. `unset` is never refused, so a mistyped key that
+/// was written can be removed. Migration and repair keep unknown keys of an older file and do not
+/// call this.
+pub fn refuse_unknown_keys(
+    ctx: &Context,
+    edits: &[Edit],
+    reason: &str,
+) -> Result<(), SnapshotError> {
+    let mut proposed = Value::Null;
+    for edit in edits {
+        if let Edit::Set { path, value } = edit {
+            json_put(&mut proposed, path, Some(value.clone()));
+        }
+    }
+    let mut refused: Vec<ConfigRefusal> = ctx
+        .schemas
+        .undescribed(&proposed)
+        .iter()
+        .map(|path| {
+            let mut refusal = ConfigRefusal::new("config-key-unknown").at_path(path);
+            refusal.detail_mut().suggest = ctx.schemas.suggest(path);
+            refusal
+        })
+        .collect();
+    if refused.is_empty() {
+        return Ok(());
+    }
+    if let Err(bad) = Reason::parse(reason) {
+        refused.insert(0, bad);
+    }
+    Err(SnapshotError::Refused(refused))
+}
+
 /// What a new file holds before any key: the grammar line and the header, and a blank line.
 fn header_text() -> String {
     let lines = header_lines(1)

@@ -17,7 +17,8 @@ use crate::migrate::{self, MigrateOptions, MigrationReport};
 use crate::relocate::{self, Held, MoveRequest};
 use crate::scope::SourceKind;
 use crate::snapshot::{Context, SessionClass, SnapshotError, SnapshotRequest};
-use crate::write::{commit, refresh, target_revision, Edit, WriteRequest, WriteResult};
+use crate::write::{commit, refresh, refuse_unknown_keys, target_revision};
+use crate::write::{Edit, WriteRequest, WriteResult};
 use crate::ConfigRefusal;
 
 const LOCK_WAIT_MS: u64 = 5_000;
@@ -190,7 +191,8 @@ fn write(ctx: &Context, roots: &SnapshotRequest, verb: &Verb) -> Result<Value, R
         return Err(refused(ConfigRefusal::new("config-write-confined")));
     }
     let writer = resolve_current(None);
-    let one = |kind: SourceKind, edits, reason: &str, ack| -> Result<Value, Refusal> {
+    let one = |kind: SourceKind, edits: Vec<Edit>, reason: &str, ack| -> Result<Value, Refusal> {
+        refuse_unknown_keys(ctx, &edits, reason).map_err(refused)?;
         let done =
             commit(ctx, &request(roots, kind, edits, reason, ack)?, &writer).map_err(refused)?;
         Ok(written(kind, &done))

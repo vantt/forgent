@@ -6,7 +6,7 @@ use fgos_yaml_doc::{parse, CommentLoss, Profile, Segment};
 use serde_json::{json, Value};
 
 use crate::redact::render_for_display;
-use crate::schema::json_at;
+use crate::schema::{json_at, runtime_key};
 use crate::snapshot::{AccountsState, Context, Origin, Snapshot};
 use crate::standard::StandardFile;
 use crate::ConfigRefusal;
@@ -41,7 +41,8 @@ pub fn show(ctx: &Context, snapshot: &Snapshot, path: &[Segment]) -> Value {
 
 /// The schema node of `path` (description, type, bounds, scope, file, sensitivity, owner), its
 /// standard value (never for a secret) and, when a snapshot is given, where its value comes from.
-/// A path with no node is `described: false` and still names the file that holds it.
+/// A path with no node is `described: false` and still names the file that holds it, unless it is
+/// a runtime key (answered from the runtime key list).
 pub fn explain(ctx: &Context, snapshot: Option<&Snapshot>, path: &[Segment]) -> Value {
     let resolved = ctx.schemas.resolve(path);
     let origin = snapshot.and_then(|s| s.origins.iter().find(|o| o.path == path));
@@ -51,6 +52,9 @@ pub fn explain(ctx: &Context, snapshot: Option<&Snapshot>, path: &[Segment]) -> 
         "current": origin.map(provenance),
         "file": origin.and_then(|o| o.provenance.file.clone()),
     });
+    if resolved.is_none() {
+        return explain_unlisted(ctx, path, out);
+    }
     let (Some(r), Some(map)) = (resolved, out.as_object_mut()) else {
         return out;
     };
@@ -82,6 +86,30 @@ pub fn explain(ctx: &Context, snapshot: Option<&Snapshot>, path: &[Segment]) -> 
         // A keyword the node does not state (bounds of a string, the enum of a number) is left out.
         if !value.is_null() || key == "standard" {
             map.insert(key.into(), value);
+        }
+    }
+    out
+}
+
+/// A path no schema node describes: a runtime key is answered from the runtime key list, anything
+/// else names the nearest keys it may have meant.
+fn explain_unlisted(ctx: &Context, path: &[Segment], mut out: Value) -> Value {
+    let Some(map) = out.as_object_mut() else {
+        return out;
+    };
+    match runtime_key(path) {
+        Some(row) => {
+            map.insert("described".into(), json!(true));
+            map.insert("runtimeKey".into(), json!(true));
+            for key in ["description", "type", "minimum", "default", "owner"] {
+                map.insert(key.into(), row[key].clone());
+            }
+        }
+        None => {
+            let near = ctx.schemas.suggest(path);
+            if !near.is_empty() {
+                map.insert("didYouMean".into(), json!(near));
+            }
         }
     }
     out

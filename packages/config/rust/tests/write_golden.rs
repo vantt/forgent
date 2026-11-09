@@ -13,7 +13,7 @@ use common::text;
 use fgos_config::detect::NoDetectors;
 use fgos_config::scope::SourceKind;
 use fgos_config::snapshot::{Context, SnapshotError};
-use fgos_config::write::{commit, target_revision};
+use fgos_config::write::{commit, refuse_unknown_keys, target_revision};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
@@ -81,7 +81,9 @@ fn write_cases() {
         }
         let (req, file) = common::write_request(&dir, input, roots);
         let before = tree(&dir);
-        let got = commit(&ctx, &req, &common::writer(&input["writer"]));
+        // A person's set or patch passes the unknown-key check, then the transaction.
+        let got = refuse_unknown_keys(&ctx, &req.edits, &req.reason)
+            .and_then(|()| commit(&ctx, &req, &common::writer(&input["writer"])));
         let refused = want.get("code").or(want.get("yaml")).is_some();
         match (&got, refused) {
             (Err(SnapshotError::Refused(found)), true) => {
@@ -112,11 +114,17 @@ fn write_cases() {
                 }
                 for part in want["messages"].as_array().into_iter().flatten() {
                     let part = part.as_str().unwrap();
-                    assert!(lines.iter().any(|l| l.contains(part)), "{id}: {part} in {lines:?}");
+                    assert!(
+                        lines.iter().any(|l| l.contains(part)),
+                        "{id}: {part} in {lines:?}"
+                    );
                 }
                 for part in want["no_messages"].as_array().into_iter().flatten() {
                     let part = part.as_str().unwrap();
-                    assert!(!lines.iter().any(|l| l.contains(part)), "{id}: {part} in {lines:?}");
+                    assert!(
+                        !lines.iter().any(|l| l.contains(part)),
+                        "{id}: {part} in {lines:?}"
+                    );
                 }
                 assert_eq!(tree(&dir), before, "{id}: a refusal changed a file");
             }

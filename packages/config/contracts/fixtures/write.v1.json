@@ -735,7 +735,7 @@
    "expect": {
     "code": "config-key-unknown",
     "messages": [
-     "did-you-mean=gateBypass.level"
+     "path=gateBypas did-you-mean=gateBypass"
     ],
     "no_lock": true
    }

@@ -61,10 +61,14 @@ pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
     "refresh-docs",
 ];
 /// Appended to a refusal that has a way out: the refusal id or YAML rule it answers, and the hint.
-const HINTS: [(&str, &str); 2] = [
+const HINTS: [(&str, &str); 3] = [
     (
         "config-machine-check-required",
         "\nconfirm that no release on this machine reads accounts or the gateway token from ~/.fgos/config.json, then pass --machine-checked",
+    ),
+    (
+        "config-comment-reason-required",
+        "\nadd --reason \"<why>\"",
     ),
     (
         rule::COMMENT_WOULD_BE_LOST,
