@@ -17,7 +17,7 @@ import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainW
 import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 
 import { nativeDoor } from '../../src/native/door.mjs';
-import { checkAgentClaimsResolve } from '../../src/setup/registrations.mjs';
+import { checkAgentClaimsResolve, runDoctor } from '../../src/setup/registrations.mjs';
 
 // The claude-plugin-marketplace row runs the `claude` CLI when it is on PATH.
 // FGOS_CLAUDE_COMMAND (the row's test-only seam, mirroring bin/fgos.mjs's
@@ -1198,4 +1198,50 @@ test('agent-claims-resolve accepts a requires-skill claim only when an agent pro
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('a doctor run reports a status per row, the command that repairs each failing row, and a top-level ok and deduplicated next', async () => {
+  const row = (id, result) => ({ id, description: id, check: () => result });
+  const checks = [
+    row('fine', { passed: true, message: 'all good' }),
+    row('heads-up', { passed: true, message: 'warning: a note' }),
+    row('left-out', { passed: true, status: 'skip', message: 'not applicable here' }),
+    row('own-command', { passed: false, message: 'broken', fix: 'fgos thing --yes' }),
+    row('repaired-by-fix-a', { passed: false, message: 'broken' }),
+    row('repaired-by-fix-b', { passed: false, message: 'broken' }),
+    row('needs-a-person', { passed: false, message: 'broken', detail: { why: 'x' } }),
+    { id: 'async-row', description: 'async-row', check: async () => ({ passed: true, message: 'info: fine' }) },
+  ];
+  const fixes = [
+    { id: 'repaired-by-fix-a', fix: () => ({ changed: true, message: 'done' }) },
+    { id: 'shared-fix', repairs: ['repaired-by-fix-b'], fix: () => ({ changed: false, message: 'nothing' }) },
+  ];
+  const report = await runDoctor('/unused', { checks, fixes });
+  assert.deepEqual(report.checks.map((c) => [c.id, c.status]), [
+    ['fine', 'ok'], ['heads-up', 'warn'], ['left-out', 'skip'], ['own-command', 'fail'],
+    ['repaired-by-fix-a', 'fail'], ['repaired-by-fix-b', 'fail'], ['needs-a-person', 'fail'], ['async-row', 'ok'],
+  ]);
+  const fixOf = (id) => report.checks.find((c) => c.id === id).fix;
+  assert.equal(fixOf('own-command'), 'fgos thing --yes');
+  assert.equal(fixOf('repaired-by-fix-a'), 'fgos doctor --fix');
+  assert.equal(fixOf('repaired-by-fix-b'), 'fgos doctor --fix');
+  assert.equal(fixOf('needs-a-person'), null);
+  assert.equal(fixOf('fine'), undefined);
+  assert.equal(report.ok, false);
+  assert.deepEqual(report.next, ['fgos thing --yes', 'fgos doctor --fix']);
+  assert.deepEqual(report.checks.find((c) => c.id === 'needs-a-person').detail, { why: 'x' });
+  assert.equal(report.checks.every((c) => typeof c.passed === 'boolean'), true);
+  const healthy = await runDoctor('/unused', { checks: checks.slice(0, 3), fixes });
+  assert.equal(healthy.ok, true);
+  assert.deepEqual(healthy.next, []);
+  assert.equal(healthy.fixed, undefined);
+});
+
+test('doctor --fix runs every fix before the rows, reports each fix, and judges the rows after the repair', async () => {
+  let repaired = false;
+  const checks = [{ id: 'row', description: 'row', check: () => (repaired ? { passed: true, message: 'fine' } : { passed: false, message: 'broken' }) }];
+  const fixes = [{ id: 'row', fix: () => { repaired = true; return { changed: true, message: 'repaired' }; } }];
+  const report = await runDoctor('/unused', { fix: true, checks, fixes });
+  assert.deepEqual(report.fixed, [{ id: 'row', changed: true, message: 'repaired' }]);
+  assert.equal(report.ok, true);
 });

@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { checkGit, compatibleGitContracts } from '../../src/setup/git-checks.mjs';
+import { checkGit, compatibleGitContracts, describeGitError, fixGitFetchMapping } from '../../src/setup/git-checks.mjs';
 import { retentionNote } from '../../src/setup/git-retention-note.mjs';
 import { fixture as storeFixture, installFetchMapping } from '../event-store/phase07-fixture.mjs';
 import { ensureGitAddon, root as addonRoot } from '../../scripts/git-addon.mjs';
@@ -173,4 +173,43 @@ test('the retention sentence the incidents row appends warns when finished opera
   assert.match(retentionNote(facts(3, 8), now), /^warning: 3 finished .*oldest 8\.0 days/);
   assert.match(retentionNote({ ...facts(2, 1), oldestRetainedAtMs: null }, now), /^info: 2 finished .*age unknown/);
   assert.match(retentionNote(facts(1, 1, { ledgerCapacityWarning: true }), now), /^warning: the Git WAL id ledger is at capacity/);
+});
+
+test('a Git port error reads as its cause plus the decoded stderr text, never as the raw byte array', () => {
+  const stderr = [...Buffer.from("error: No such remote 'origin'\n")];
+  const native = new Error(JSON.stringify({ code: 'git-failed', cause: 'git-config-failed', stderr, detail: null }));
+  assert.equal(describeGitError(native), "git-config-failed: error: No such remote 'origin'");
+  const bare = new Error(JSON.stringify({ code: 'recovery-required', cause: 'git-fence-missing', stderr: [] }));
+  assert.equal(describeGitError(bare), 'git-fence-missing');
+  assert.equal(describeGitError(new Error('plain failure')), 'plain failure');
+  assert.equal(describeGitError(new Error('42')), '42');
+});
+
+test('the repository-config row skips, naming the command that adds a remote, while the project has no remote to fetch from', { skip: process.platform === 'win32' }, () => {
+  withRepo('fgos-no-remote-', (repo, options) => {
+    execFileSync('git', ['init', '-q', repo], { stdio: 'ignore' });
+    const result = checkGit(repo, 'git-repository-config', options);
+    assert.equal(result.passed, true, result.message);
+    assert.equal(result.status, 'skip');
+    assert.equal(result.fix, 'git remote add origin <url> && fgos doctor --fix');
+    assert.match(result.message, /no Git remote "origin"/);
+  });
+});
+
+test('the fetch-mapping fix has nothing to repair, and says so without a failure, while the project has no remote', { skip: process.platform === 'win32' }, () => {
+  withRepo('fgos-no-remote-fix-', (repo, options) => {
+    execFileSync('git', ['init', '-q', repo], { stdio: 'ignore' });
+    const state = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-no-remote-state-'));
+    const prior = process.env.FGOS_STATE_ROOT;
+    process.env.FGOS_STATE_ROOT = state;
+    try {
+      const outcome = fixGitFetchMapping(repo, options);
+      assert.equal(outcome.changed, false);
+      assert.doesNotMatch(outcome.message, /warning|refused|\[\d+,/);
+      assert.match(outcome.message, /no Git remote "origin"/);
+    } finally {
+      if (prior === undefined) delete process.env.FGOS_STATE_ROOT; else process.env.FGOS_STATE_ROOT = prior;
+      fs.rmSync(state, { recursive: true, force: true });
+    }
+  });
 });

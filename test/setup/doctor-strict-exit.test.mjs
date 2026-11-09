@@ -54,3 +54,22 @@ test('fgos doctor --strict exits 1 when a check still fails, also after --fix ra
     fs.rmSync(project, { recursive: true, force: true });
   }
 });
+
+test('fgos doctor --json carries ok, next and a status and fix per failing row for agents that do not read the exit code', () => {
+  const project = bareGitProject();
+  try {
+    const res = runDoctor(project, []);
+    assert.equal(res.status, 0, res.stderr);
+    const { ok, next, checks } = JSON.parse(res.stdout).data;
+    assert.equal(ok, checks.every((c) => c.passed));
+    assert.ok(Array.isArray(next) && next.every((cmd) => typeof cmd === 'string'));
+    for (const check of checks) {
+      assert.ok(['ok', 'warn', 'fail', 'skip'].includes(check.status), `${check.id}: ${check.status}`);
+      assert.equal(check.status === 'fail', check.passed === false, check.id);
+      if (check.status === 'fail') assert.ok(check.fix === null || typeof check.fix === 'string', check.id);
+    }
+    for (const cmd of next) assert.ok(checks.some((c) => c.status === 'fail' && c.fix === cmd), cmd);
+  } finally {
+    fs.rmSync(project, { recursive: true, force: true });
+  }
+});
