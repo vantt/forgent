@@ -1,7 +1,7 @@
 ---
 phase: 02
 title: "Doctor result shape: per-check status and fix, top-level ok and next, and a git row that converges on a local-only project"
-status: pending
+status: completed
 depends_on: ["in-flight (2) landed", "T8-P11 landed"]
 parallel: "group G2; first writer of registrations.mjs after T8-P11"
 effort: ~1d
