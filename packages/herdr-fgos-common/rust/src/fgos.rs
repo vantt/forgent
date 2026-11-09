@@ -1015,84 +1015,82 @@ mod tests {
         let _ = std::fs::remove_dir_all(&root);
     }
 
-    #[test]
-    fn resolve_fgos_falls_back_when_tier_0_is_absent() {
+    fn temp_root(tag: &str) -> PathBuf {
         let root = std::env::temp_dir().join(format!(
-            "fgos-resolve-test-fallback-{}-{}",
-            std::process::id(),
-            line!()
+            "fgos-command-test-{tag}-{}",
+            std::process::id()
         ));
         let _ = std::fs::remove_dir_all(&root);
-        let resolved = resolve_fgos(&root).expect("resolve_fgos");
-        assert_eq!(resolved, root.join("bin/fgos.mjs"));
-        assert!(!is_tier_zero(&root, &resolved));
+        root
     }
 
     #[test]
-    #[cfg(unix)]
-    fn resolve_fgos_falls_back_when_tier_0_is_not_executable() {
-        use std::os::unix::fs::PermissionsExt;
-        let root = std::env::temp_dir().join(format!(
-            "fgos-resolve-test-noexec-{}-{}",
-            std::process::id(),
-            line!()
-        ));
-        let _ = std::fs::remove_dir_all(&root);
+    fn fgos_command_runs_the_shim_with_dir_and_project_cwd() {
+        let root = temp_root("shim");
         let bin_dir = root.join(".fgos").join("installation").join("bin");
         std::fs::create_dir_all(&bin_dir).expect("create_dir_all");
         let shim = bin_dir.join("fgos");
         std::fs::write(&shim, "#!/bin/sh\nexit 0\n").expect("write shim");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&shim, std::fs::Permissions::from_mode(0o755))
+                .expect("set_permissions");
+        }
 
-        let mut perms = std::fs::metadata(&shim).expect("metadata").permissions();
-        perms.set_mode(0o644);
-        std::fs::set_permissions(&shim, perms).expect("set_permissions");
-
-        let resolved = resolve_fgos(&root).expect("resolve_fgos");
-        assert_eq!(resolved, root.join("bin/fgos.mjs"));
-        assert!(!is_tier_zero(&root, &resolved));
+        let cmd = fgos_command(&root, &["slots", "--json"]).expect("shim present");
+        assert_eq!(cmd.get_program(), shim.as_os_str());
+        let args: Vec<_> = cmd.get_args().map(|a| a.to_string_lossy().into_owned()).collect();
+        assert_eq!(
+            args,
+            vec!["slots".to_string(), "--json".into(), "--dir".into(), root.to_string_lossy().into_owned()]
+        );
+        assert_eq!(cmd.get_current_dir(), Some(root.as_path()));
         let _ = std::fs::remove_dir_all(&root);
     }
 
-    /// Regression: an executable tier-0 shim that is itself a symlink
-    /// whose real target escapes the installation root was accepted --
-    /// `is_executable`'s `metadata()` call follows the symlink chain
-    /// transparently, with no containment check on the real target.
+    #[test]
+    fn fgos_command_refuses_naming_fgctl_init_when_no_shim() {
+        let root = temp_root("absent");
+        let err = fgos_command(&root, &["slots"]).expect_err("no shim must refuse");
+        assert!(err.to_string().contains("fgctl init"), "{err}");
+    }
+
     #[test]
     #[cfg(unix)]
-    fn resolve_fgos_falls_back_when_tier_0_is_a_symlink_escaping_the_install_root() {
-        let root = std::env::temp_dir().join(format!(
-            "fgos-resolve-test-symlink-escape-{}-{}",
-            std::process::id(),
-            line!()
-        ));
-        let _ = std::fs::remove_dir_all(&root);
+    fn fgos_command_refuses_a_shim_that_is_not_executable() {
+        use std::os::unix::fs::PermissionsExt;
+        let root = temp_root("noexec");
         let bin_dir = root.join(".fgos").join("installation").join("bin");
         std::fs::create_dir_all(&bin_dir).expect("create_dir_all");
+        let shim = bin_dir.join("fgos");
+        std::fs::write(&shim, "#!/bin/sh\nexit 0\n").expect("write shim");
+        std::fs::set_permissions(&shim, std::fs::Permissions::from_mode(0o644)).expect("chmod");
 
-        let outside_dir = std::env::temp_dir().join(format!(
-            "fgos-resolve-test-outside-{}-{}",
-            std::process::id(),
-            line!()
-        ));
-        let _ = std::fs::remove_dir_all(&outside_dir);
+        let err = fgos_command(&root, &["slots"]).expect_err("non-executable shim must refuse");
+        assert!(err.to_string().contains("fgctl init"), "{err}");
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    /// An executable shim that is a symlink whose real target escapes the
+    /// installation root is refused, never replaced by a node command.
+    #[test]
+    #[cfg(unix)]
+    fn fgos_command_refuses_a_shim_symlinked_outside_the_install_root() {
+        use std::os::unix::fs::PermissionsExt;
+        let root = temp_root("escape");
+        let bin_dir = root.join(".fgos").join("installation").join("bin");
+        std::fs::create_dir_all(&bin_dir).expect("create_dir_all");
+        let outside_dir = temp_root("escape-outside");
         std::fs::create_dir_all(&outside_dir).expect("create_dir_all outside");
         let outside_target = outside_dir.join("sh-stub");
-        std::fs::write(&outside_target, "#!/bin/sh\nexit 0\n").expect("write outside target");
-        {
-            use std::os::unix::fs::PermissionsExt;
-            let mut perms = std::fs::metadata(&outside_target)
-                .expect("metadata")
-                .permissions();
-            perms.set_mode(0o755);
-            std::fs::set_permissions(&outside_target, perms).expect("set_permissions");
-        }
+        std::fs::write(&outside_target, "#!/bin/sh\nexit 0\n").expect("write target");
+        std::fs::set_permissions(&outside_target, std::fs::Permissions::from_mode(0o755))
+            .expect("chmod");
+        std::os::unix::fs::symlink(&outside_target, bin_dir.join("fgos")).expect("symlink");
 
-        let shim = bin_dir.join("fgos");
-        std::os::unix::fs::symlink(&outside_target, &shim).expect("symlink");
-
-        let resolved = resolve_fgos(&root).expect("resolve_fgos");
-        assert_eq!(resolved, root.join("bin/fgos.mjs"));
-        assert!(!is_tier_zero(&root, &resolved));
+        let err = fgos_command(&root, &["slots"]).expect_err("unconfined shim must refuse");
+        assert!(err.to_string().contains("fgctl init"), "{err}");
         let _ = std::fs::remove_dir_all(&root);
         let _ = std::fs::remove_dir_all(&outside_dir);
     }

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "225207bfea3ad70df7ddc223e681c2b3bd4dcce8249bfd62027cc98855648b00",
+  "payloadDigest": "44451b322d4c3e66ef4f12d79f01294559133f4d45707bc0fffb589005858a0e",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -424,7 +424,7 @@
     "packages/git/rust/tests/support/signing.rs": "a083733ad39ab4d35f12a600b5cd90ac08c53ae35686ce66f22147b933bf634c",
     "packages/git/rust/tests/worktree.rs": "fb5ec22b72a58f049c0fd051ae2393f7e3fc7bc73bc1176c8e0e41970da32dde",
     "packages/git/write-scope/src/lib.rs": "8421603ec0e38f418bd241d0db1dc83dd7b3756d994eefa3d29c2e43a8abf9f2",
-    "packages/herdr-fgos-common/rust/src/fgos.rs": "b19ae1b2833e894b1d4b424b95a95aa2e3c94fe696943f78591761283b16b486",
+    "packages/herdr-fgos-common/rust/src/fgos.rs": "2cf07ee83c2f75c8d33f628d602a8627af9f316146d4f38408be60f7b06ad68f",
     "packages/herdr-fgos-common/rust/src/lib.rs": "a27bb70798915e8f27a33500b384aea536cc43554bcedba01e67623a5bbe54d1",
     "packages/herdr-fgos-common/rust/src/ports.rs": "45c92b4f8a06e62a79a09655fe9c484a85dc9745049cfea6849245b886f4913f",
     "packages/herdr-fgos-common/rust/src/settings.rs": "2825ad403920455192fe52a64aa976bcc788e6cc907cf38a1df7632102b3eb97",
