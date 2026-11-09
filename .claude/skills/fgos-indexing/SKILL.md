@@ -4,7 +4,7 @@ user-invocable: false
 description: >-
   Regenerate the machine-readable, read-by-tag index of fgOS end-user
   documents after any end-user doc is written during compound-learn. Use
-  once `fgos-coding-compounding` has stored a `docType`/`docPath`-tagged capture
+  once `fgos-coding-knowledge` has stored a `docType`/`docPath`-tagged capture
   and written its document — this skill turns the real docs on disk into
   `docs/enduser-docs-index.json`. Examples: "the end-user doc just landed,
   update the index", "regenerate the docs index", "where do I point a

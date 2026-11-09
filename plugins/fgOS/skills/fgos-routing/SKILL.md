@@ -147,7 +147,7 @@ call, not a different table:
 | `executing` | the item has already cleared discovery and shaping (or never needed either), and is ready for direct implementation | `fgos-coding-implement` (the build/verify/return path, hand-authored from a bee-inspired implement→verify→cap discipline) |
 
 `compound-learn` is retired as a stage entirely — the synthesis
-layer it used to gate (`fgos-coding-compounding`) now triggers on the status
+layer it used to gate (`fgos-coding-knowledge`) now triggers on the status
 `retrospective` instead, driven by a separate retrospective loop, not this
 stage-routing table.
 
@@ -181,6 +181,10 @@ touch.
 Once the domain resolves, read `domains/<domain>/AGENTS.md` (e.g.
 `domains/coding/AGENTS.md` when domain is `coding`) to load domain-specific
 standing doctrine before handing off to driving or loading the resolved stage skill.
+That path is relative to the running fgOS payload, never the project's working
+directory: a project's own `domains/` folder is not read for doctrine. The
+`legacy-node-payload-present` row of `fgos doctor` prints the payload entry
+(`<root>/bin/fgos.mjs`); `<root>` is where `domains/` lives.
 
 ## Precedence: the engine's verb always wins
 
@@ -231,7 +235,7 @@ lying about what's actually happening.
 1. `fgos list` / `fgos ready` to orient.
 2. `fgos take --role session [--id <id>]` to claim one item.
 3. Read the claimed item's `stage` and `domain`. Read `domains/<domain>/AGENTS.md`
-   once domain resolves, then load `fgos-coding-discovering`,
+   from the fgOS payload (not the project) once domain resolves, then load `fgos-coding-discovering`,
    `fgos-coding-exploring`, `fgos-coding-planning`, or
    `fgos-coding-validating` per the table above — or proceed
    directly if it's already at `executing`.

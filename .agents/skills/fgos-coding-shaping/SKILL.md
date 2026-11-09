@@ -18,7 +18,7 @@ description: >-
 # fgos-coding-shaping
 
 Holds a genuinely conversational design discussion — never a Socratic lock
-like `fgos-coding-exploring`/`fgos-coding-planning`/`fgos-discover` use — and keeps one
+like the skills `fgos-coding-exploring`/`fgos-coding-planning` and the `/fgOS:discover` command use — and keeps one
 living `docs/history/<feature>/DISCUSSION.md` per feature. Once the
 discussion converges, this skill's only exit is a native-first handoff into
 `fgos-coding-exploring` then `fgos-coding-planning`, the same terminal-state discipline

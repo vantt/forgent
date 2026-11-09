@@ -4,7 +4,7 @@ user-invocable: false
 description: >-
   Regenerate the machine-readable, read-by-tag index of fgOS end-user
   documents after any end-user doc is written during compound-learn. Use
-  once `fgos-coding-compounding` has stored a `docType`/`docPath`-tagged capture
+  once `fgos-coding-knowledge` has stored a `docType`/`docPath`-tagged capture
   and written its document — this skill turns the real docs on disk into
   `docs/enduser-docs-index.json`. Examples: "the end-user doc just landed,
   update the index", "regenerate the docs index", "where do I point a
@@ -14,9 +14,9 @@ description: >-
 
 # fgos-indexing
 
-Runs after `fgos-coding-compounding` has written an end-user document and stored
+Runs after `fgos-coding-knowledge` has written an end-user document and stored
 its `docType`/`docPath` on the item's capture. This skill does not classify
-or write documents itself — that stays `fgos-coding-compounding`'s job — it only
+or write documents itself — that stays `fgos-coding-knowledge`'s job — it only
 regenerates the read-by-tag catalog over whatever real documents already
 exist under `docs/<quadrant>/`.
 
@@ -30,7 +30,7 @@ worktree (ADR0020 — a worktree never carries its own `.fgos/`):
 fgos docs-index
 ```
 
-Run this once, right after step 4/5 of `fgos-coding-compounding` (the document
+Run this once, right after step 4/5 of `fgos-coding-knowledge` (the document
 is on disk and the capture's `docType`/`docPath` are confirmed). It is
 safe to re-run any time the set of end-user documents changes — it always
 regenerates the whole manifest fresh from disk (skipping the actual write
@@ -75,7 +75,7 @@ in place of a hand-maintained prose description of the four directories.
 - hand-editing `docs/enduser-docs-index.json` instead of re-running
   `fgos docs-index`
 - treating this skill as a document-writer or classifier — that is
-  `fgos-coding-compounding`'s job; this skill only indexes what already exists
+  `fgos-coding-knowledge`'s job; this skill only indexes what already exists
 - removing `reading-map.md` or any of its other entries while updating
   the end-user-docs pointer
 

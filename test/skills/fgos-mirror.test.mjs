@@ -88,6 +88,19 @@ function listFilesRecursive(dir, base = dir) {
   return files.sort();
 }
 
+test('every owned skill has a tracked .agents/skills/<name> render and a tracked .claude/skills/<name>/SKILL.md', () => {
+  assert.ok(OWNED_FILES, 'git must report the owned file set for this check');
+  const names = [...ownedSkillNames(REPO_ROOT)].filter((n) => n !== '_shared').sort();
+  assert.ok(names.length > 0, 'expected at least one owned skill');
+  const missing = [];
+  for (const name of names) {
+    for (const rel of [`.agents/skills/${name}/SKILL.md`, `.claude/skills/${name}/SKILL.md`]) {
+      if (!OWNED_FILES.has(rel)) missing.push(rel);
+    }
+  }
+  assert.deepEqual(missing, [], 'an owned skill lacks a tracked render — run npm run build:skills and add the files');
+});
+
 test('.claude/skills and .agents/skills declare the exact same set of fgos-* skill names', () => {
   const claudeNames = listFgosSkillDirs(CLAUDE_SKILLS_ROOT);
   const agentsNames = listFgosSkillDirs(AGENTS_SKILLS_ROOT);
