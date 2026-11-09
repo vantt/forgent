@@ -94,3 +94,14 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, fg-server). fg-s
 - Lệnh trên từng workspace: `git pull --rebase`; build, stage, kích hoạt release như thường lệ.
 - Dòng doctor mong đợi: không đổi.
 - Quay lại: revert commit.
+
+## P05, P09 (distill), P12: văn bản skill, tên skill cũ và một lần render
+
+- Commit trên `main`: `adb9cc204`, `c8325c203`, `1e14daec0` (ba commit liền nhau, đẩy một lần; xem dòng bảng HARDEN "T8 landing unit lands"). Ba commit phải đi cùng nhau vì phép thử drift của `skill-wrappers.test.mjs` so nguồn skill với bản render.
+- Người dùng thấy gì:
+  - `fgos-routing` bảo agent đọc doctrine `domains/<domain>/AGENTS.md` từ payload fgOS đang chạy, không đọc từ project; tên skill đã gỡ `fgos-coding-compounding` được thay bằng `fgos-coding-knowledge` trong text skill và task-spec; khối GitNexus cũ và đoạn an toàn lặp bị bỏ khỏi `domains/coding/AGENTS.md`; hai fragment dùng chung không ai gọi bị xoá.
+  - `distill` từ chối tên nguồn hoặc url thoát ra ngoài vùng learning.
+  - Render một lần: `.agents/skills`, `.claude/skills` và `plugins/fgOS/skills` được sinh lại; `.claude/skills/instruction-audit/SKILL.md` lần đầu được git theo dõi; census đã sinh lại (0 undeclared). `fgos-mirror` thêm một phép thử: mỗi skill fgOS sở hữu có bản render được theo dõi ở `.agents` và `.claude`.
+- Lệnh trên từng workspace: `git pull --rebase`; build, stage, kích hoạt release như thường lệ; `fgos doctor`. Lần `npm run build:skills` thứ hai không ghi gì.
+- Dòng doctor mong đợi: không đổi.
+- Quay lại: revert ba commit trong một lần revert, rồi kích hoạt lại release trước đó (id ghi trong dòng bảng khi người vận hành kích hoạt release mới).

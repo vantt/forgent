@@ -1,7 +1,7 @@
 ---
 phase: 05
 title: "Source text and doctrine: the dead skill name leaves every machine-read contract, two dead fragments go, the coding doctrine file loses its foreign managed block and duplicated prose, domain doctrine is read from the running payload only (Q4 a); source only, no render"
-status: pending
+status: landed
 depends_on: []
 parallel: "group A; lands only as part of the landing unit with P09's distill commit and P12"
 effort: ~1d
