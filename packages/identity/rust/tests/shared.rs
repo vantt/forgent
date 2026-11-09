@@ -468,3 +468,85 @@ fn a_cached_fold_skips_the_signature_checks_that_held_and_still_catches_a_re_key
         12
     );
 }
+
+/// Writes the project file of a clone at `root` and the cache of `view` beside it.
+fn clone_with(project_id: &str, view: Option<&shared::SharedView>) -> PathBuf {
+    let root = machine("clone-cccccc");
+    fs::create_dir_all(root.join(".fgos")).unwrap();
+    fs::write(
+        root.join(".fgos").join("project.json"),
+        json!({ "v": 1, "projectId": project_id, "handle": "demo", "createdAt": "2026-10-24T00:00:00.000Z" }).to_string(),
+    )
+    .unwrap();
+    if let Some(view) = view {
+        shared::write_cache(&shared::cache_path(&root), &view.cache()).unwrap();
+    }
+    root
+}
+
+const PROJECT: &str = "0123456789abcdef0123456789abcdef";
+
+#[test]
+fn a_clone_without_a_cache_or_a_project_id_has_no_directory_to_judge() {
+    let no_cache = clone_with(PROJECT, None);
+    assert_eq!(shared::judge_directory(&no_cache), None);
+    let viewer = machine("viewer-vvvvvv");
+    let view = fold(&viewer, &[], Some("2026-10-24T03:00:00.000Z".into()), None);
+    let no_project = machine("clone-dddddd");
+    shared::write_cache(&shared::cache_path(&no_project), &view.cache()).unwrap();
+    assert_eq!(shared::judge_directory(&no_project), None);
+}
+
+#[test]
+fn a_clean_directory_counts_machines_and_entries_and_flags_nothing() {
+    let (alpha, beta, viewer) = (machine(ALPHA), machine(BETA), machine("viewer-vvvvvv"));
+    let mut one = session(ALPHA, "one", &[], "2026-10-24T01:00:00.000Z");
+    let mut two = session(BETA, "two", &[], "2026-10-24T01:00:00.000Z");
+    one.project_id = Some(PROJECT.into());
+    two.project_id = Some(PROJECT.into());
+    let events = [
+        published(&alpha, &one, "alpha"),
+        published(&beta, &two, "beta"),
+    ];
+    let view = fold(&viewer, &events, Some("2026-10-24T03:00:00.000Z".into()), None);
+    let judged = shared::judge_directory(&clone_with(PROJECT, Some(&view))).unwrap();
+    assert_eq!((judged.machines, judged.entries), (2, 2));
+    assert_eq!(judged.fetched_at.as_deref(), Some("2026-10-24T03:00:00.000Z"));
+    assert!(judged.dropped.is_empty());
+    assert!(judged.foreign_project_ids.is_empty());
+    assert!(judged.shared_handle_machines.is_empty());
+}
+
+#[test]
+fn a_dropped_event_names_its_reason_and_machine() {
+    let (alpha, viewer) = (machine(ALPHA), machine("viewer-vvvvvv"));
+    let forged = published(&alpha, &session(BETA, "one", &[], "2026-10-24T01:00:00.000Z"), "beta");
+    let view = fold(&viewer, &[forged], None, None);
+    let judged = shared::judge_directory(&clone_with(PROJECT, Some(&view))).unwrap();
+    assert_eq!(
+        judged.dropped.iter().map(|d| (d.reason.as_str(), d.machine_id.as_str())).collect::<Vec<_>>(),
+        [("machine-mismatch", BETA)]
+    );
+}
+
+#[test]
+fn entries_of_another_project_are_named_once_each() {
+    let (alpha, viewer) = (machine(ALPHA), machine("viewer-vvvvvv"));
+    let events: Vec<RawEvent> = ["a", "b"]
+        .iter()
+        .map(|name| published(&alpha, &session(ALPHA, name, &[], "2026-10-24T01:00:00.000Z"), "alpha"))
+        .collect();
+    let view = fold(&viewer, &events, None, None);
+    let judged = shared::judge_directory(&clone_with(PROJECT, Some(&view))).unwrap();
+    assert_eq!(judged.foreign_project_ids, ["p1"]);
+}
+
+#[test]
+fn a_machine_whose_handle_is_its_own_id_is_listed_as_shared_by_id() {
+    let (alpha, viewer) = (machine(ALPHA), machine("viewer-vvvvvv"));
+    let mut one = session(ALPHA, "one", &[], "2026-10-24T01:00:00.000Z");
+    one.project_id = Some(PROJECT.into());
+    let view = fold(&viewer, &[published(&alpha, &one, ALPHA)], None, None);
+    let judged = shared::judge_directory(&clone_with(PROJECT, Some(&view))).unwrap();
+    assert_eq!(judged.shared_handle_machines, [ALPHA]);
+}

@@ -292,6 +292,64 @@ pub fn write_cache(path: &Path, cache: &Cache) -> Result<(), Refusal> {
         .map_err(|e| refuse("cache-write-failed", format!("{}: {e}", path.display())))
 }
 
+/// What the cache of a clone says about the health of its shared directory.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DirectoryJudgement {
+    /// Distinct machines with an entry.
+    pub machines: usize,
+    pub entries: usize,
+    pub fetched_at: Option<String>,
+    /// Events dropped because their signature did not hold, with reason and machine.
+    pub dropped: Vec<Dropped>,
+    /// How many entries belong to another project than the clone's.
+    pub foreign_entries: usize,
+    /// The other project ids those entries name, each once.
+    pub foreign_project_ids: Vec<String>,
+    /// Machines shown by their id because another machine has their handle.
+    pub shared_handle_machines: Vec<String>,
+}
+
+impl Cache {
+    /// The cache judged for the clone whose project id is `project_id`.
+    pub fn judge(&self, project_id: &str) -> DirectoryJudgement {
+        let machines: BTreeSet<&str> = self.entries.iter().map(|e| e.machine.id.as_str()).collect();
+        let foreign: Vec<&RemoteEntry> = self
+            .entries
+            .iter()
+            .filter(|e| e.entry.project_id.as_deref() != Some(project_id))
+            .collect();
+        let foreign_project_ids: BTreeSet<&str> = foreign
+            .iter()
+            .filter_map(|e| e.entry.project_id.as_deref())
+            .collect();
+        let shared_handle_machines: BTreeSet<&str> = self
+            .entries
+            .iter()
+            .filter(|e| e.machine.handle == e.machine.id)
+            .map(|e| e.machine.id.as_str())
+            .collect();
+        DirectoryJudgement {
+            machines: machines.len(),
+            entries: self.entries.len(),
+            fetched_at: self.fetched_at.clone(),
+            dropped: self.dropped.clone(),
+            foreign_entries: foreign.len(),
+            foreign_project_ids: foreign_project_ids.into_iter().map(String::from).collect(),
+            shared_handle_machines: shared_handle_machines.into_iter().map(String::from).collect(),
+        }
+    }
+}
+
+/// The judgement of the shared directory of the main checkout at `main_root`, read from its cache
+/// only (nothing is read from the store). `None` when the clone has no project id or no readable
+/// cache: there is no shared directory yet.
+pub fn judge_directory(main_root: &Path) -> Option<DirectoryJudgement> {
+    let project = crate::project::read(main_root).ok()?;
+    let cache = read_cache(&cache_path(main_root))?;
+    Some(cache.judge(&project.project_id))
+}
+
 /// What a signature check covers: the signed bytes and the signature itself.
 fn verified_key(payload: &Value) -> Option<String> {
     let mut unsigned = payload.clone();

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "53670f8eee101cba969cf38b44e0a52065c33a79119d21a5485ef386600d9805",
+  "payloadDigest": "0d9e719fd2a917028a65a93cf9cb5b4e1fad027f387611066b3daf4d9bd1dfd1",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -491,7 +491,7 @@
     "packages/identity/rust/src/refusal.rs": "dd0e19e7f85ce5f88fa7f8a238e97a883fbbab86273e7c186e066a1ca25ec3e0",
     "packages/identity/rust/src/resolve.rs": "c9b611f02aed198b1acfe408f24cdcfaf77d112dcb906f7290315603707c1f68",
     "packages/identity/rust/src/session.rs": "c47d0ee2bc070e02979f702a17031d48799867de27dd0688c74d6477a255c5a2",
-    "packages/identity/rust/src/shared.rs": "60d8ccc2543f56a4f368e9101ae0dea4122b832b625c857fc74063b6be1a9389",
+    "packages/identity/rust/src/shared.rs": "7b56aa923d54386e2cb26645e0acd3d39d1831cbd336aeecdefb9675198b2d9d",
     "packages/identity/rust/src/signing.rs": "103554f2b75e499663b689c8d9ea1ffe01e871be7ee19ea01c7268a7e64e546a",
     "packages/identity/rust/src/text.rs": "8fda76ecfa83419c11ab8dc456c1f76cea387e61700e997469667194c8747f91",
     "packages/identity/rust/tests/attempt_writer_id.rs": "97e308f3922b15715df4491a719a09f242f7469bb44fe7b063fec9e2e9a93ad5",
@@ -502,7 +502,7 @@
     "packages/identity/rust/tests/project.rs": "524223710900bbfff6ec6bb58774c1d75c309cfe2308e4bfffe0ea2a349535ca",
     "packages/identity/rust/tests/register_current.rs": "25d3f540487726d1e5ccb9d115c388b3187f869a27beaff68c7ad39a988189ea",
     "packages/identity/rust/tests/session.rs": "c90d501ef43f72d86b33cc357961e4f1f75886935c6a5b775e38a668cee0c5e5",
-    "packages/identity/rust/tests/shared.rs": "f84d7ef6688c24694b6fb9e21d38cacc6f61dd5890b25c6cab94168ecd7322ed",
+    "packages/identity/rust/tests/shared.rs": "c2228ea6cfbf190631d77e2034c9d8d255f1d0336996fde27634cb035b4367f1",
     "packages/identity/rust/tests/signing.rs": "f446d326b152189b65e11976be3bfa8902bf7f65a79db355c08514e7df3edea2",
     "packages/mailbox/rust/core/src/ack.rs": "d3b51fb0bbc5d8514f63aed9365500965fff4b0a622efb0379201b830b4f9fbc",
     "packages/mailbox/rust/core/src/counters.rs": "5a59a9908258111382df32952d8c77d5c62bcf71bdbc0cee917eaba3a3520973",
