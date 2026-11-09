@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-import { assetName, checksumLines } from '../../scripts/package-release-assets.mjs';
+import { assetName, checksumLines, releaseAssetNames, writeChecksums } from '../../scripts/package-release-assets.mjs';
 import { RELEASE_TARGETS } from '../../src/util/release-targets.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -39,6 +39,32 @@ test('checksum lines are sha256sum-style, one per file, sorted by name', () => {
     ]),
     `${a}  fgctl-v1-t.tar.gz\n${b}  fgos-v1-t.tar.gz\n`,
   );
+});
+
+test('SHA256SUMS covers both installers beside the archives, once each', () => {
+  const names = releaseAssetNames({ fgosAsset: 'fgos-v1-t.tar.gz', fgctlAsset: 'fgctl-v1-t.tar.gz' });
+  assert.deepEqual(names, ['fgos-v1-t.tar.gz', 'fgctl-v1-t.tar.gz', 'install.sh', 'install.ps1']);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-sums-'));
+  try {
+    for (const name of names) fs.writeFileSync(path.join(dir, name), `bytes of ${name}`);
+    writeChecksums(dir, names);
+    const lines = fs.readFileSync(path.join(dir, 'SHA256SUMS'), 'utf8').trim().split('\n');
+    assert.deepEqual(lines.map((l) => l.split('  ')[1]).sort(), [...names].sort());
+    // Each listed hash is the hash of the file's bytes, so `sha256sum --check` passes.
+    if (process.platform !== 'win32') {
+      const check = spawnSync('sha256sum', ['--check', 'SHA256SUMS'], { cwd: dir, encoding: 'utf8' });
+      assert.equal(check.status, 0, check.stdout + check.stderr);
+    }
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('the release assembly keeps one SHA256SUMS entry per file when every target lists the shared installers', () => {
+  const release = read('.github', 'workflows', 'release.yml');
+  assert.match(release, /sort -k2 \| uniq > dist\/SHA256SUMS/);
+  assert.match(release, /uniq -d/, 'a file name listed twice with different hashes must stop the release');
+  assert.ok(release.includes('grep -q "  $installer\\$" dist/SHA256SUMS'), 'both installers must have an entry before publishing');
 });
 
 test('release workflows: publishing lives only in release.yml under the tag trigger', () => {

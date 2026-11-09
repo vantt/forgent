@@ -118,13 +118,16 @@ TEMP_INSTALL_DIR="$TMP_BASE/install"
 TEMP_HOME="$TMP_BASE/home"
 mkdir -p "$TEMP_INSTALL_DIR" "$TEMP_HOME"
 
+# FGCTL_ASSET_BASE_URL names the asset directory, so the tag comes from the
+# asset's own file name (fgctl-<tag>-<target>.tar.gz).
+FGCTL_TAG="$(basename "$FGCTL_TARBALL" | sed 's/^fgctl-//; s/-x86_64-unknown-linux-gnu\.tar\.gz$//')"
 FGCTL_ASSET_BASE_URL="http://127.0.0.1:$PORT"
 FGCTL_INSTALL_DIR="$TEMP_INSTALL_DIR"
 HOME="$TEMP_HOME"
 FGCTL_ALLOW_ROOT=1
 export FGCTL_ASSET_BASE_URL FGCTL_INSTALL_DIR HOME FGCTL_ALLOW_ROOT
 
-if ! sh "$ASSETS_DIR/install.sh"; then
+if ! FGCTL_VERSION="$FGCTL_TAG" sh "$ASSETS_DIR/install.sh"; then
   echo "Step failed: install.sh execution against local asset server" >&2
   exit 1
 fi

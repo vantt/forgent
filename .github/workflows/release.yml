@@ -67,8 +67,21 @@ jobs:
           done
 
           # One SHA256SUMS covering every asset, checked against the bytes about to be published.
-          cat parts/*/SHA256SUMS | sort -k2 > dist/SHA256SUMS
+          # Each target lists the shared installers, which the loop above proved identical, so
+          # their identical lines collapse to one; a name left with two hashes stops the release.
+          cat parts/*/SHA256SUMS | sort -k2 | uniq > dist/SHA256SUMS
+          duplicated="$(awk '{ print $2 }' dist/SHA256SUMS | sort | uniq -d)"
+          if [ -n "$duplicated" ]; then
+            echo "Error: SHA256SUMS lists these files more than once: $duplicated" >&2
+            exit 1
+          fi
           (cd dist && sha256sum --check SHA256SUMS)
+          for installer in install.sh install.ps1; do
+            grep -q "  $installer\$" dist/SHA256SUMS || {
+              echo "Error: SHA256SUMS has no entry for $installer" >&2
+              exit 1
+            }
+          done
           for asset in dist/fgos-*.tar.gz dist/fgctl-*.tar.gz; do
             grep -q "  $(basename "$asset")\$" dist/SHA256SUMS || {
               echo "Error: SHA256SUMS has no entry for $(basename "$asset")" >&2

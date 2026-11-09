@@ -8,7 +8,7 @@
  *   fgos-<version>-<target>.tar.gz    the release tree (bin/, libexec/, manifest.json)
  *   fgctl-<version>-<target>.tar.gz   the fgctl binary alone
  *   install.sh, install.ps1           the installers, copied unchanged
- *   SHA256SUMS                        a sha256sum-style line per tar.gz above
+ *   SHA256SUMS                        a sha256sum-style line per file above (archives and installers)
  *
  * Usage: node scripts/package-release-assets.mjs --version <tag> [--out <dir>]
  *
@@ -27,6 +27,9 @@ import { releaseTargetForHost } from '../src/util/release-targets.mjs';
 
 const TAG_PATTERN = /^[A-Za-z0-9._+-]+$/;
 
+/** The installers, as repository paths; each is published under its base name. */
+const INSTALLERS = ['install.sh', 'scripts/install.ps1'];
+
 /** Asset file name for `kind` (`fgos` or `fgctl`), release `version` and `target`. */
 export function assetName(kind, version, target) {
   return `${kind}-${version}-${target}.tar.gz`;
@@ -38,6 +41,17 @@ export function checksumLines(files) {
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .map((f) => `${f.sha256}  ${f.name}\n`)
     .join('');
+}
+
+/** Every published file except SHA256SUMS itself, in checksum order: one list drives copying, hashing and reporting. */
+export function releaseAssetNames({ fgosAsset, fgctlAsset }) {
+  return [fgosAsset, fgctlAsset, ...INSTALLERS.map((installer) => path.basename(installer))];
+}
+
+/** Writes `<outDir>/SHA256SUMS` for the named files already in `outDir`. */
+export function writeChecksums(outDir, names) {
+  const files = names.map((name) => ({ name, sha256: sha256File(path.join(outDir, name)) }));
+  fs.writeFileSync(path.join(outDir, 'SHA256SUMS'), checksumLines(files));
 }
 
 function sha256File(file) {
@@ -95,13 +109,13 @@ export function packageReleaseAssets({ version, outDir = path.join(REPO_ROOT, 'd
   const fgctlAsset = assetName('fgctl', version, target.triple);
   tarCreate(out, fgctlAsset, toPosixRelative(out, path.dirname(fgctlBin)), [path.basename(fgctlBin)]);
 
-  for (const installer of ['install.sh', 'scripts/install.ps1']) {
+  for (const installer of INSTALLERS) {
     fs.copyFileSync(path.join(repoRoot, installer), path.join(out, path.basename(installer)));
   }
 
-  const checksummed = [fgosAsset, fgctlAsset].map((name) => ({ name, sha256: sha256File(path.join(out, name)) }));
-  fs.writeFileSync(path.join(out, 'SHA256SUMS'), checksumLines(checksummed));
-  return { outDir: out, target: target.triple, assets: [fgosAsset, fgctlAsset, 'install.sh', 'install.ps1', 'SHA256SUMS'] };
+  const assets = releaseAssetNames({ fgosAsset, fgctlAsset });
+  writeChecksums(out, assets);
+  return { outDir: out, target: target.triple, assets: [...assets, 'SHA256SUMS'] };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
