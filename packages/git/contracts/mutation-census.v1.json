@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5f3c5f9b16dfee9ca8fd6d9824da55cfffcf6735771d01adcae3368dba46dc06",
+  "payloadDigest": "5439afab8e6da1b318d4d3926c2baa6028ce127abff20706c4b19193d70ceb69",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -24,7 +24,7 @@
     ".agents/skills/fgos-advise/references/request-kinds-and-routes.md": "b72f4d13d7c44d3ed9908bb92ae5bf56a87363cfc9bd3306227996ea4c5aea37",
     ".agents/skills/fgos-architecture-panel/SKILL.md": "0e73e2b90921338641519e55d65edfa3869b1e66acd09420e614fd3cf7f24dfd",
     ".agents/skills/fgos-clarifying/SKILL.md": "88c95887ef335333223ca23f4935226a62f4a78fcc73dc51efbf3561855a60fa",
-    ".agents/skills/fgos-coding-discovering/SKILL.md": "d3f72471400100733dde1d67997578750201a1b9d925e940be8d0a2189b655da",
+    ".agents/skills/fgos-coding-discovering/SKILL.md": "41928875e3210da5a4f4aef76cfd5b727650f90108d77358023d91590a84be19",
     ".agents/skills/fgos-coding-driving/SKILL.md": "07066c5f3789392655f000f60883a8d8d432a0a9f39f1ca8f5971f3c5befa0ba",
     ".agents/skills/fgos-coding-driving/references/caller-contract.md": "dcf13fe93461eedc708bc65b496eee323c7fca421b597f296f5d4dbeb28eca6c",
     ".agents/skills/fgos-coding-driving/references/loop-mechanics.md": "c8afa92336735847e4f2486c272098898ec6017efa0a6588c274004588b307e1",
@@ -154,7 +154,7 @@
     "core/skills/instruction-audit/references/report-template.md": "c1f2f637b2ba40ec03b3a6a99c65a9ca851283d20e03140b3bec45f08f222b24",
     "core/skills/instruction-audit/scripts/instruction-audit.mjs": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490",
     "domains/coding/harness/enrich-and-validate-contract.mjs": "441fc0fab26f5231ef564df7d02c08a6ff3f1fc2c2b9af520c5784a268d45bf7",
-    "domains/coding/skills/fgos-coding-discovering/SKILL.md": "40655c4105eb9a9e81b3d1e4db9a2b7a68d110bdb0d55fe049fd6f911d14fb2e",
+    "domains/coding/skills/fgos-coding-discovering/SKILL.md": "c07a227013d348487ad0e17d47b2082c464e755822368c0d873e3259bd1e941e",
     "domains/coding/skills/fgos-coding-driving/SKILL.md": "e241360f3670b6c54d8c730ff6028f4455174c6019b426338e93312cae2d71bd",
     "domains/coding/skills/fgos-coding-driving/references/caller-contract.md": "e24b2edec6a8c260be7be810537e324c9dcf2a8be322f42531644a719c7cc418",
     "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md": "fa1d4c0f277f05e5213486db2709fda6caec91f6c4ff0e0c67028cee21275713",

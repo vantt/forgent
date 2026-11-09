@@ -45,7 +45,7 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
 ## Hard rules
 
 - Mọi lệnh `fgos <verb>` skill này gọi (`decision`, `discover`) đều
-  `requiresExistingStore: true` — resolve main checkout root giống mọi
+  `store: 'require'` — resolve main checkout root giống mọi
   skill chủ khác (`git rev-parse --path-format=absolute --git-common-dir
   | xargs dirname`) và truyền `--dir "$root"` trên từng lệnh. Session này
   có thể đang ở trong một worktree liên kết, thứ không bao giờ mang
