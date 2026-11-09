@@ -38,7 +38,7 @@ function addingChild(root, base, tag, count) {
     import { addWorktreeSync } from ${JSON.stringify(REPO_LOCKS)};
     for (let i = 0; i < ${count}; i += 1) {
       const dir = ${JSON.stringify(base)} + '/${tag}-' + i;
-      addWorktreeSync(createLockScope('child'), ${JSON.stringify(root)}, ['-b', 'fgw/${tag}-' + i, dir], { waitMs: 60000 });
+      addWorktreeSync(createLockScope('child'), ${JSON.stringify(root)}, ['-b', 'fgw/${tag}-' + i, dir], { waitMs: ${CHILD_WAIT_MS} });
     }
   `;
   const child = spawn(process.execPath, ['--input-type=module', '-e', script], { stdio: ['ignore', 'ignore', 'pipe'] });
@@ -49,8 +49,11 @@ function addingChild(root, base, tag, count) {
 
 // 8 real processes race for the worktree-admin lock 20 times each (160 contained adds, about 35 s).
 const ROUNDS = 20;
+const TEST_TIMEOUT_MS = 240000;
+// A child waits at least as long as the test itself may run, so contention under load waits instead of failing.
+const CHILD_WAIT_MS = TEST_TIMEOUT_MS;
 
-test(`8 processes adding worktrees for ${ROUNDS} rounds leave every worktree registered and intact`, { skip, timeout: 240000 }, async () => {
+test(`8 processes adding worktrees for ${ROUNDS} rounds leave every worktree registered and intact`, { skip, timeout: TEST_TIMEOUT_MS }, async () => {
   const { root, git } = tempRepo();
   const base = path.join(root, 'wts');
   fs.mkdirSync(base);

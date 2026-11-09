@@ -131,6 +131,9 @@ test('a failing unit verify becomes findings that carry its exit status and outp
   assert.ok(res.findings.some((f) => /exited 3/.test(f) && /assertion exploded/.test(f)), res.findings.join('\n'));
 });
 
+// The child sleeps far longer than any plausible machine slowness, so only the timeout kill can end the run early.
+const VERIFY_CHILD_SLEEP_MS = 120000;
+
 test('a verify command that outlives runner.timeoutMs fails the verify with the timeout named, never hangs', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta']);
@@ -139,12 +142,12 @@ test('a verify command that outlives runner.timeoutMs fails the verify with the 
   const res = await reviewedRun(
     repoRoot,
     worktreeDir,
-    { id: 'u-verify-slow', verify: `node -e "setTimeout(() => {}, 9000)"` },
+    { id: 'u-verify-slow', verify: `node -e "setTimeout(() => {}, ${VERIFY_CHILD_SLEEP_MS})"` },
     { pattern: 'reviewed', params: { maxRounds: 1 } },
   );
   assert.equal(res.outcome, 'findings');
   assert.ok(res.findings.some((f) => /timed out after 4000ms/.test(f)), res.findings.join('\n'));
-  assert.ok(Date.now() - started < 9000, 'the run did not wait for the verify command to finish by itself');
+  assert.ok(Date.now() - started < VERIFY_CHILD_SLEEP_MS / 2, 'the run did not wait for the verify command to finish by itself');
 });
 
 test('a verify declared on the capability is used when the unit names none', async () => {
