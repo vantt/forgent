@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e4d8acff4872bdb217b535d5b489bce9d5ff2cb2deb5d6d78cfc531f338d7ee7",
+  "payloadDigest": "4e69949f2326ec959dd4af77049e9471d76a1692c167aada619f6ccac2a07ad3",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -868,7 +868,7 @@
     "scripts/lib/mailbox-wake-probe.mjs": "bdba8f043335de5c70149d48ed656e3c359531426b2f98c1c4037cc0b6970085",
     "scripts/lib/sandbox-git.mjs": "c45bc75afc8e5666e13d70f9ea65c6ff4e79243aeca7bae5046d4ea3e914088f",
     "scripts/lib/test-file-cpu.mjs": "f54eb34a6f6f01607c123fbeb04d1a8be61805c7fe687f7887a0adac2068e4a7",
-    "scripts/lib/test-file-watchdog.mjs": "ed39439477ee26003c50fba1df7511317882727704518a3a9cb96952b96fbfa8",
+    "scripts/lib/test-file-watchdog.mjs": "a878715cf44b01aa338fafb9f30bd4a73852a4e3a91d5d4bd509bc42ab6e22a8",
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
     "scripts/list-doc-anchors.mjs": "fe4d901d266dc9d93e8a405051b618210f17808cc10f29663d48ad55a13e253f",
     "scripts/main-checkout-delete-guard-hook.mjs": "1441b87ef8661132314d89ec1d534a6049cfcf2bc088ca789e5a50fd68ec02be",
@@ -883,7 +883,7 @@
     "scripts/regenerate-observe-fixtures.mjs": "e1ab4a029ae9aecf5485393a3f6e967f1e338862391a6b1701ed1954c57b40ee",
     "scripts/run-rust-dev-host.mjs": "e0a0d25f322b151619cef825abca8d1e2a624c167ab2b0983d70101b02dddc4c",
     "scripts/run-test-canary.mjs": "ef25e2f8237ffefddbf707c68289c0fe00ee95bd10da6a51a80fd965b30c42ba",
-    "scripts/run-tests.mjs": "ef79b8344e01d0856cab3c80508b449a3458c275c45c2bb763632ab71f8d3858",
+    "scripts/run-tests.mjs": "32d74f198c5e8e9759229550d13010bc0af0ac0a61e66d4b78d679c6f2481f18",
     "scripts/stress-test-files.mjs": "1c9298587bae21b5971c2e1eba5effd3c2a0c85ba94372936fa5e0c1d70d4f4e",
     "scripts/test-ownership-lint.mjs": "1917bcc0ec0387e43d4e09dc3bc1e6a5923e30b4c3848cf480df9eb0c2c042e2",
     "scripts/test-proof-inventory.mjs": "77b8de2723057778114ef9457669261ca2b6d02e33dd0c9b0f7a4e88898d133c",

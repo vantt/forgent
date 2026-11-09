@@ -94,6 +94,31 @@ function isAlive(pid) {
   }
 }
 
+/**
+ * A run's own dirs after its launcher was killed: SIGKILL every process whose environment names one of
+ * `dirs` as its temp root or fixture root (only this run's tests inherit those), then remove the dirs.
+ * Another run has dirs of its own, so it is never matched. Without /proc (macOS) only the removal happens.
+ */
+export function reapRunDirs(dirs, { procRoot = '/proc' } = {}) {
+  const own = new Set(dirs);
+  let entries = [];
+  try { entries = fs.readdirSync(procRoot); } catch { /* no /proc */ }
+  for (const entry of entries) {
+    if (!/^\d+$/.test(entry) || Number(entry) === process.pid) continue;
+    let environ;
+    try { environ = fs.readFileSync(`${procRoot}/${entry}/environ`, 'utf8'); } catch { continue; }
+    const mine = environ.split('\0').some((kv) => {
+      const m = /^(TMPDIR|FGOS_TEST_FIXTURE_ROOT)=(.*)$/.exec(kv);
+      return m !== null && own.has(m[2]);
+    });
+    if (!mine) continue;
+    try { process.kill(Number(entry), 'SIGKILL'); } catch { /* already gone */ }
+  }
+  for (const dir of dirs) {
+    try { fs.rmSync(dir, { recursive: true, force: true, maxRetries: 3 }); } catch { /* best effort */ }
+  }
+}
+
 function snapshot() {
   return parsePs(execFileSync('ps', ['-A', '-o', 'pid=,ppid=,etime=,args='], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
 }
@@ -114,13 +139,20 @@ function main(argv) {
   );
   const parentPid = Number(opts.parent);
   const pollMs = Number(opts['poll-ms']);
+  // The run dirs to remove if the launcher is killed; absent when the caller keeps them.
+  const cleanDirs = opts.clean ? JSON.parse(opts.clean) : [];
+  // The launcher blocks in spawnSync and cannot run a signal handler, so this sibling does its cleanup.
+  const launcherGone = () => {
+    reapRunDirs(cleanDirs);
+    process.exit(0);
+  };
   const limits = JSON.parse(fs.readFileSync(opts.limits, 'utf8'));
   if (!Number.isInteger(parentPid) || !(pollMs > 0) || !opts.out) {
     console.error('test-file-watchdog: need --parent=<pid> --poll-ms=<n> --limits=<json> --out=<file>');
     process.exit(2);
   }
   const timer = setInterval(() => {
-    if (!isAlive(parentPid)) process.exit(0);
+    if (!isAlive(parentPid)) launcherGone();
     let procs;
     try {
       procs = snapshot();
@@ -135,10 +167,14 @@ function main(argv) {
       killTree(procs, hit.pid);
     }
   }, pollMs);
+  // The launcher stops this process with SIGTERM while it is still alive; a signal sent to the whole
+  // group (or SIGINT/SIGHUP from a terminal) also reaches here after the launcher is dead.
   process.on('SIGTERM', () => {
     clearInterval(timer);
-    process.exit(0);
+    if (isAlive(parentPid)) process.exit(0);
+    launcherGone();
   });
+  for (const signal of ['SIGINT', 'SIGHUP']) process.on(signal, () => { clearInterval(timer); launcherGone(); });
 }
 
 if (process.argv[1] && fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url))) {

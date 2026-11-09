@@ -208,7 +208,7 @@ const DEFAULT_WATCHDOG_POLL_MS = 5000;
  * itself. Returns `{ stop() -> [{file, elapsedMs, limitMs}] }`; `stop()` ends
  * the supervisor and reports every file it killed for running too long.
  */
-function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, log }) {
+function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, cleanDirs, log }) {
   if (process.platform === 'win32') {
     log('run-tests: warning: per-file time limit needs `ps`; not available on win32, running without it');
     return { stop: () => [] };
@@ -225,7 +225,7 @@ function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, log }) 
   fs.writeFileSync(outFile, '');
   const child = spawnAsync(
     process.execPath,
-    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],
+    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`, `--clean=${JSON.stringify(cleanDirs)}`],
     { env, stdio: ['ignore', 'ignore', 'inherit'] },
   );
   child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));
@@ -479,7 +479,7 @@ export function runSelectedTests(files, {
   let strayWorktrees = [];
   let strayProcesses = [];
   const supervisor = watchdog && runTemp
-    ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, log })
+    ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, cleanDirs: env[KEEP_TMP_ENV] === '1' ? [] : [runTemp, fixtureRoot].filter(Boolean), log })
     : null;
   const spawnLog = path.join(runTemp ?? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-test-spy-')), 'git-spawn-spy.jsonl');
   childEnv[GIT_SPAWN_SPY_LOG_ENV] = spawnLog;
