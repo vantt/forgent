@@ -34,8 +34,8 @@ use fgos_mailbox::nudge::SystemNudge;
 use fgos_mailbox::record::{Record, Wait};
 use fgos_mailbox::verbs;
 use fgos_mailbox_core::{
-    list_text, record_error_text, record_unavailable_text, role_holder_text, AliasRefusal, ListRow,
-    Liveness, MessageId, Recipient, SendRequest, Timestamp, WriterKey,
+    list_text, record_error_text, record_unavailable_text, role_holder_text, AliasRefusal, Kind,
+    ListRow, Liveness, MessageId, Recipient, SendRequest, Timestamp, WriterKey,
 };
 use serde_json::{json, Value};
 use std::ffi::OsString;
@@ -289,6 +289,71 @@ fn list(long: bool, json: bool) -> MailboxAnswer {
     }
 }
 
+/// Pending incoming messages shown by `status`, before "and N more".
+const INCOMING_SHOWN: usize = 5;
+
+/// The messages pending for the calling session: how many, and for the
+/// first few the sender, the age and whether it crossed machines. Read from
+/// the snapshot without the lock through the same `MailboxState::inbox` that
+/// `inbox` lists, so nothing is offered, claimed or written; no body is
+/// read. `None` when nothing is pending, the caller has no address, or the
+/// record cannot be read (the rest of the answer already says that).
+fn incoming_summary(
+    fgos_dir: &Path,
+    limits: &fgos_mailbox_core::Limits,
+    now: Timestamp,
+) -> Option<(Value, String)> {
+    let key = caller(fgos_dir)?;
+    let existing = Record::read_existing(fgos_dir, limits).ok()??;
+    let mail: Vec<_> = existing
+        .state
+        .inbox(&key)
+        .into_iter()
+        .filter(|item| item.kind == Kind::Message)
+        .collect();
+    if mail.is_empty() {
+        return None;
+    }
+    let secs = now.as_millis() / 1000;
+    let rows: Vec<(String, u64, bool)> = mail
+        .iter()
+        .map(|item| {
+            let crossed = existing
+                .state
+                .message(&item.id)
+                .is_some_and(|header| header.origin.is_some());
+            let age = secs.saturating_sub(item.recorded_at.as_millis() / 1000);
+            (item.from_label.clone(), age, crossed)
+        })
+        .collect();
+    let shown: Vec<Value> = rows
+        .iter()
+        .take(INCOMING_SHOWN)
+        .map(
+            |(from, age, crossed)| json!({ "from": from, "ageSecs": age, "crossMachine": crossed }),
+        )
+        .collect();
+    let mut line = format!(
+        "incoming: {} pending for this session (not yet offered; `fgos mailbox inbox` lists them)",
+        rows.len()
+    );
+    for (from, age, crossed) in rows.iter().take(INCOMING_SHOWN) {
+        line.push_str(&format!(
+            "\n  from {from}, {} ago{}",
+            mailbox_remote::ago(*age),
+            if *crossed {
+                ", from another machine"
+            } else {
+                ""
+            }
+        ));
+    }
+    if rows.len() > INCOMING_SHOWN {
+        line.push_str(&format!("\n  and {} more", rows.len() - INCOMING_SHOWN));
+    }
+    Some((json!({ "pending": rows.len(), "shown": shown }), line))
+}
+
 /// `status`: the record's verdict and the spec §9 signals, report-only. A
 /// project config the mailbox cannot read fails the answer and is named in
 /// it (`config`), while the record is still read under the contract's
@@ -336,6 +401,13 @@ fn status(json: bool) -> MailboxAnswer {
                 "\nhandle not unique: {} {} is also {}; reach it by its full id {}",
                 c.name, c.handle, c.other, c.id
             ));
+        }
+    }
+    // Mail waiting for this session: counted and named from the same pending read `inbox` shows, never consumed.
+    if data["record"] == "ok" {
+        if let Some((incoming, line)) = incoming_summary(&fgos_dir, &loaded.limits, now()) {
+            data["incoming"] = incoming;
+            text.push_str(&format!("\n{line}"));
         }
     }
     // Mail that crosses machines: what this machine's recent sends came to, when the project turned it on.

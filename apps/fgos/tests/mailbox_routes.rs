@@ -1496,6 +1496,37 @@ fn mailbox_list_and_status_run_natively_read_the_record_and_create_nothing() {
     let envelope: serde_json::Value = serde_json::from_slice(&status.stdout).unwrap();
     assert_eq!(envelope["data"]["record"], "ok");
     assert_eq!(envelope["data"]["heads"], 1);
+    assert!(
+        envelope["data"].get("incoming").is_none(),
+        "no pending mail, no incoming section"
+    );
+
+    // Pending mail shows in the recipient's status by sender and age, without its body, and stays pending.
+    let name = scene.head_name();
+    let sent = native(&["mailbox", "send", "--to", &name, "secret-body-text"]);
+    assert_eq!(sent.status.code(), Some(0), "{sent:?}");
+    let as_head = |args: &[&str]| scene.run(&scene.main(), Some(WRITER), args, b"");
+    let status = as_head(&["mailbox", "status"]);
+    let said = String::from_utf8_lossy(&status.stdout).into_owned();
+    assert!(
+        said.contains("incoming: 1 pending for this session")
+            && said.contains("from unregistered_sender_a"),
+        "{said}"
+    );
+    assert!(!said.contains("secret-body-text"), "{said}");
+    let status = as_head(&["mailbox", "status", "--json"]);
+    let envelope: serde_json::Value = serde_json::from_slice(&status.stdout).unwrap();
+    assert_eq!(envelope["data"]["incoming"]["pending"], 1);
+    assert_eq!(
+        envelope["data"]["incoming"]["shown"][0]["crossMachine"],
+        false
+    );
+    assert!(envelope["data"]["incoming"]["shown"][0]["ageSecs"].is_u64());
+    let inbox = as_head(&["mailbox", "inbox"]);
+    assert!(
+        String::from_utf8_lossy(&inbox.stdout).contains("state=recorded"),
+        "status left the mail pending: {inbox:?}"
+    );
     assert!(!log.exists(), "no node child ran");
 }
 
