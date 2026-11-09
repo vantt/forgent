@@ -26,11 +26,11 @@ export { recordFriction, resolveFriction };
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { readClaim, readClaims, releaseClaimTx, withMainState, getMainFgosDir, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
-import { StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, exitCodeForOutcome, categoryOf } from './store-error.mjs';
+import { StoreError, EXIT_CODES, categoryOf } from './store-error.mjs';
 
 export { FsmError, WorkValidationError, EventLogError, KnowledgeValidationError };
 
-export { StoreError, EXIT_CODES, OUTCOME_EXIT_CODES, exitCodeForOutcome, categoryOf };
+export { StoreError, EXIT_CODES, categoryOf };
 
 // Full readers are forbidden under the hot mutex. Gate callbacks use tx.view.
 function readAllEvents(dir, options) {

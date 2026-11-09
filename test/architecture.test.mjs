@@ -1615,6 +1615,7 @@ test('loops and patterns architecture manifest paths exist and all files on disk
 const ENTRY_LEAF_IMPORTS = [
   '../src/cli/command-registry.mjs',
   '../src/cli/parse-args.mjs',
+  '../src/cli/verb-exit.mjs',
   '../src/state/envelope.mjs',
   '../src/state/store-error.mjs',
 ];

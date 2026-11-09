@@ -15,9 +15,9 @@
 // assumed to be an agent — so every outcome is a categorized exit code
 // (R4), and callers should branch on the code, never on the message text.
 //
-// Exit codes (R4): The canonical exit-code table lives in src/state/store.mjs's
+// Exit codes (R4): The canonical exit-code table lives in src/state/store-error.mjs's
 // EXIT_CODES export (codes 2-5, 7-9 for store/preflight; 0=ok, 1=unexpected),
-// OUTCOME_EXIT_CODES (execution outcomes: policy-refusal=4, provider-limit=10,
+// src/runner/execution/outcome-exit.mjs (execution outcomes: policy-refusal=4, provider-limit=10,
 // execution-failure=11, partial-writes=12, blocked=13, findings=14; RUL99),
 // plus src/runner/loop.mjs's EXIT_BUSY (code 6, runner-only state).
 //
@@ -33,6 +33,7 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { StoreError, EXIT_CODES, categoryOf } from '../src/state/store-error.mjs';
+import { exitCodeOf } from '../src/cli/verb-exit.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -5117,9 +5118,9 @@ async function main() {
     } else {
       process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
     }
-    // The exit code is the verb's own call (`exitOf` on its registry entry): outcome verbs map to the canonical execution
+    // The exit code is the verb's own call (`exitCodeOf` (src/cli/verb-exit.mjs)): outcome verbs map to the canonical execution
     // codes (RUL99), `plan-lint` exits 1 on a hard finding, `doctor --strict` on a failing check. The default is 0.
-    process.exitCode = entry?.exitOf ? entry.exitOf(data, { positional, flags }) : 0;
+    process.exitCode = exitCodeOf(verb, data, { positional, flags });
   } catch (err) {
     // tsk-5z0: record before reporting, and only say the record exists when
     // one actually landed — `recordInvocationFault` returns null when the

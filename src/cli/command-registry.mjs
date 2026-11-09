@@ -64,8 +64,6 @@
 // test/cli/subcommand-flag-drift.test.mjs checks each sub-verb's schema
 // against the flags its handler really reads.
 
-import { exitCodeForOutcome } from '../state/store-error.mjs';
-
 export const MANIFEST_SCHEMA_VERSION = '3.0';
 
 // Top-level tokens the Rust host routes to the legacy-node payload as the
@@ -1365,7 +1363,6 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    exitOf: (data) => (data.ok ? 0 : 1),
   },
   withSubcommands({
     name: 'merge',
@@ -1637,7 +1634,6 @@ export const COMMAND_REGISTRY = [
     externalEffect: true,
     paginated: false,
     deprecated: null,
-    exitOf: (data) => (data?.outcome ? exitCodeForOutcome(data.outcome) : 0),
   },
   {
     name: 'rebuild',
@@ -2326,7 +2322,6 @@ export const COMMAND_REGISTRY = [
     externalEffect: true,
     paginated: false,
     deprecated: null,
-    exitOf: (data) => (data.failed?.length > 0 ? 1 : 0),
   },
   {
     name: 'doctor',
@@ -2347,7 +2342,6 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    exitOf: (data, { flags }) => (flags.strict === true && !data.ok ? 1 : 0),
   },
   {
     name: 'unclaim',
@@ -2670,14 +2664,5 @@ export const COMMAND_REGISTRY = [
     externalEffect: true,
     paginated: false,
     deprecated: null,
-    // A foreground start/resume/answer and a gate settle exit with their outcome's code; a proposal exits 1 when it is not ok.
-    exitOf: (data, { positional, flags }) => {
-      const sub = positional[0];
-      const settled = data?.outcome !== undefined && data?.outcome !== null;
-      if (['start', 'resume', 'answer'].includes(sub) && flags.foreground === true && data?.status !== 'running' && settled) return exitCodeForOutcome(data.outcome);
-      if (sub === 'gate' && typeof data?.outcome === 'string') return exitCodeForOutcome(data.outcome);
-      if (sub === 'propose') return data.ok ? 0 : 1;
-      return 0;
-    },
   }),
 ];

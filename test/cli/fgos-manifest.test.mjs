@@ -62,7 +62,7 @@ test('manifest verb-name set equals the set of verbs runVerb() actually dispatch
 test('every registry entry has touchesState, externalEffect, paginated booleans, a store mode and the required keys', () => {
   const baseKeys = ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'store', 'touchesState'];
   for (const entry of COMMAND_REGISTRY) {
-    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['exitOf', 'mutatesStore', 'landsWork'].filter((k) => entry[k] !== undefined)].sort();
+    const expectedKeys = [...baseKeys, ...(entry.nativeOnly !== undefined ? ['nativeOnly'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['mutatesStore', 'landsWork'].filter((k) => entry[k] !== undefined)].sort();
     assert.deepEqual(
       Object.keys(entry).sort(),
       expectedKeys,
@@ -99,24 +99,7 @@ test('mutatesStore and landsWork are true or a predicate, and sit only on a verb
       assert.ok(entry[key] === true || typeof entry[key] === 'function', `entry "${entry.name}" has invalid ${key}`);
       assert.ok(entry.touchesState, `entry "${entry.name}" declares ${key} without touchesState`);
     }
-    if (entry.exitOf !== undefined) assert.equal(typeof entry.exitOf, 'function', `entry "${entry.name}" has a non-function exitOf`);
   }
-});
-
-test('exitOf maps a result to its exit code and leaves every other verb at 0', () => {
-  const exitOf = (name) => COMMAND_REGISTRY.find((e) => e.name === name).exitOf;
-  assert.equal(exitOf('run')({ outcome: 'blocked' }), 13);
-  assert.equal(exitOf('run')({ outcome: 'pass' }), 0);
-  assert.equal(exitOf('plan-lint')({ ok: false }), 1);
-  assert.equal(exitOf('wire-agents')({ failed: ['x'] }), 1);
-  assert.equal(exitOf('wire-agents')({ failed: [] }), 0);
-  assert.equal(exitOf('doctor')({ checks: [{ passed: false }] }, { flags: { strict: true } }), 1);
-  assert.equal(exitOf('doctor')({ checks: [{ passed: false }] }, { flags: {} }), 0);
-  const workflow = exitOf('workflow');
-  assert.equal(workflow({ outcome: 'findings' }, { positional: ['start'], flags: { foreground: true } }), 14);
-  assert.equal(workflow({ outcome: 'findings', status: 'running' }, { positional: ['start'], flags: { foreground: true } }), 0);
-  assert.equal(workflow({ outcome: 'blocked' }, { positional: ['gate'], flags: {} }), 13);
-  assert.equal(workflow({ ok: false }, { positional: ['propose'], flags: {} }), 1);
 });
 
 test('docs-index registry flags reflect what the verb actually does (tsk-1wn D2/D4)', () => {
