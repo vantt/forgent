@@ -74,10 +74,12 @@ cleanup() {
 # backstop via the external `timeout` command when available, so the wget
 # fallback path is genuinely bounded too, not just curl's own preferred path.
 # CURL_SAFE_ARGS lets a redirect lead only to https and never below TLS 1.2.
+# curl is the hardened path: wget cannot restrict where a redirect leads, so
+# download_file lets it fetch https:// URLs only and caps its redirects.
 init_network_limits() {
   CURL_TIMEOUT_ARGS="--connect-timeout 15 --max-time 120"
   CURL_SAFE_ARGS="--proto =https,http --proto-redir =https --tlsv1.2"
-  WGET_TIMEOUT_ARGS="--timeout=120 --tries=1"
+  WGET_TIMEOUT_ARGS="--timeout=120 --tries=1 --max-redirect=5"
   HARD_TIMEOUT_CMD=""
   if command -v timeout >/dev/null 2>&1; then
     HARD_TIMEOUT_CMD="timeout 130"
@@ -240,6 +242,10 @@ download_file() {
       if command -v curl >/dev/null 2>&1; then
         $HARD_TIMEOUT_CMD curl -fsSL $CURL_TIMEOUT_ARGS $CURL_SAFE_ARGS --max-filesize "$dl_max" -o "$dl_dest" "$dl_url" || return 1
       elif command -v wget >/dev/null 2>&1; then
+        case "$dl_url" in
+          https://*) ;;
+          *) die "without curl, only https:// URLs can be downloaded safely (wget cannot limit redirects); install curl to use $dl_url" ;;
+        esac
         $HARD_TIMEOUT_CMD wget -q $WGET_TIMEOUT_ARGS -O "$dl_dest" "$dl_url" || return 1
       else
         die "curl or wget is required to download assets; install curl and run this installer again"

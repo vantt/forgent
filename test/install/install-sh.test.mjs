@@ -625,6 +625,29 @@ describe('install.sh safety and shape', { skip: process.platform === 'win32' ? '
     }
   });
 
+  test('with only wget, https downloads work and carry a redirect cap, and a loopback http URL is refused', async () => {
+    const made = mirror({ version: 'v0.2.0' });
+    await inSandbox(async ({ home, installDir }) => {
+      const tools = toolDir(withHash);
+      const log = path.join(tools, 'wget.log');
+      fs.writeFileSync(
+        path.join(tools, 'wget'),
+        `#!/bin/sh\necho "$*" >> "${log}"\nout=""; url=""\nwhile [ $# -gt 0 ]; do case "$1" in -O) out="$2"; shift ;; -*) ;; *) url="$1" ;; esac; shift; done\ncp "${made.dir}/\${url##*/}" "$out"\n`,
+        { mode: 0o755 },
+      );
+      try {
+        const ok = await runSh(isolatedEnv(home, installDir, { PATH: tools, FGCTL_ASSET_BASE_URL: 'https://mirror.example/assets', FGCTL_VERSION: 'v0.2.0' }));
+        assert.equal(ok.status, 0, ok.stderr);
+        assert.match(fs.readFileSync(log, 'utf8'), /--max-redirect=5/);
+        const refused = await runSh(isolatedEnv(home, installDir, { PATH: tools, FGCTL_ASSET_BASE_URL: 'http://127.0.0.1:8123/assets', FGCTL_VERSION: 'v0.2.0' }));
+        assert.notEqual(refused.status, 0);
+        assert.match(refused.stderr, /install curl/);
+      } finally {
+        fs.rmSync(tools, { recursive: true, force: true });
+      }
+    });
+  });
+
   test('a file:// mirror needs no network tool at all', async () => {
     const made = mirror({ version: 'v0.2.0' });
     await inSandbox(async ({ home, installDir }) => {
