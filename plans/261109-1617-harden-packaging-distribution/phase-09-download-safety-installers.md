@@ -1,7 +1,7 @@
 ---
 phase: 09
 title: "Download safety and installer shape: refuse http (loopback aside), cap asset size, installers in SHA256SUMS, install.sh runs only when whole, verifies the candidate"
-status: pending
+status: completed
 depends_on: ["P03 landed for the last step (candidate --version)"]
 parallel: "group G1 with P03 and P05; sole writer of install.sh, scripts/install.ps1, package-release-assets.mjs until P12"
 effort: ~1.25d
