@@ -36,6 +36,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { ownedFileSet } from './lib/git-ports.mjs';
 import {
   parseFrontmatter,
 } from '../src/report/frontmatter.mjs';
@@ -290,8 +291,11 @@ function loadSourceFiles(
     const file = path.relative(cwd, full).replaceAll('\\', '/');
     sources.push({ file, lines: fs.readFileSync(full, 'utf8').split('\n') });
   }
+  // Files git ignores belong to another tool (installed skill kits), not to this repository.
+  const owned = ownedFileSet(cwd);
+  const isOwned = (full) => !owned || owned.has(path.relative(cwd, full).replaceAll('\\', '/'));
   for (const dir of skillsDirs) {
-    for (const full of collectMarkdownFiles(dir)) {
+    for (const full of collectMarkdownFiles(dir).filter(isOwned)) {
       sources.push({
         file: path.relative(cwd, full).replaceAll('\\', '/'),
         lines: fs.readFileSync(full, 'utf8').split('\n'),

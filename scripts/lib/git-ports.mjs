@@ -9,6 +9,7 @@ import { createGitInspect, gitPortOptions } from '../../src/git/inspect.mjs';
 import { createGitScopedCommit } from '../../src/git/scoped-commit.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 import { ensureGitAddon } from '../git-addon.mjs';
+import { repositoryDirs, repositoryFiles } from './git-dir-layout.mjs';
 
 /** Makes the Git addon loadable for this process: the host's payload when one runs us, else this checkout's staged copy. */
 export function ensureScriptAddon(env = process.env) {
@@ -27,6 +28,12 @@ function openPort(open, env) {
 
 export function inspectRepo(cwd = process.cwd(), env = process.env) {
   return openPort(() => createGitInspect(gitPortOptions(cwd)), env);
+}
+
+/** Tracked and untracked non-ignored paths under `root`, relative to it; null outside a repository.
+ * A guard that judges only what the repository owns keeps the files in this set. */
+export function ownedFileSet(root, env = process.env) {
+  return repositoryDirs(root) ? repositoryFiles(root, inspectRepo(root, env)) : null;
 }
 
 /** ScopedCommit on the checkout at `cwd`, as the resolved session writer. */

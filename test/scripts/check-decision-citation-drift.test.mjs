@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 import {
   extractCitedIds,
   findCitationDriftFindings,
@@ -784,6 +785,27 @@ test(
     );
   },
 );
+
+test('CLI skips a skills directory git ignores and judges the tracked one beside it', () => {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'citation-ignored-skills-'));
+  try {
+    initFixtureRepo(repo, { ignore: '/.agents/skills/ak-*/\n' });
+    const skillFile = (name) => path.join(repo, '.agents/skills', name, 'SKILL.md');
+    for (const name of ['ak-foreign', 'fgos-own']) {
+      fs.mkdirSync(path.dirname(skillFile(name)), { recursive: true });
+      fs.writeFileSync(skillFile(name), 'RUL104 bare citation with no gloss\n');
+    }
+    fs.mkdirSync(path.join(repo, 'docs/decisions'), { recursive: true });
+    const run = () => spawnSync(process.execPath,
+      [scriptPath, '--skills-dir', '.agents/skills', '--baseline', 'none.json'],
+      { cwd: repo, encoding: 'utf8' });
+    const tracked = run();
+    assert.match(tracked.stdout, /fgos-own/);
+    assert.doesNotMatch(tracked.stdout, /ak-foreign/);
+  } finally {
+    fs.rmSync(repo, { recursive: true, force: true });
+  }
+});
 
 // Existing CLI fixtures prove explicit override scopes; none observes the default
 // post-cutover nested platform spec/decision read set. This is its owning proof.

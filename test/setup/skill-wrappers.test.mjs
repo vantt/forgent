@@ -28,6 +28,7 @@ import {
   mapSkillIntentToHostTriggers,
 } from '../../src/setup/skill-wrappers.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../../src/runner/paths.mjs';
+import { ownedFileSet } from '../../scripts/lib/git-ports.mjs';
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -322,8 +323,12 @@ test('assembleSkills output matches the committed .agents/skills byte-for-byte (
 
   assembleSkills(repoRoot, rendered);
 
-  const committedFiles = listFilesRecursiveSorted(committedAgentsSkills);
+  // The guard judges what this repository owns: a file git ignores that the render did not produce
+  // (an installed skill kit's directory) belongs to another tool.
   const renderedFiles = listFilesRecursiveSorted(rendered);
+  const owned = ownedFileSet(repoRoot);
+  const committedFiles = listFilesRecursiveSorted(committedAgentsSkills)
+    .filter((relPath) => !owned || owned.has(`.agents/skills/${relPath}`) || renderedFiles.includes(relPath));
   assert.deepEqual(renderedFiles, committedFiles, 'committed .agents/skills/ has a different file set than core/skills+domains/*/skills would render -- run `npm run build:skills`');
 
   for (const relPath of committedFiles) {
