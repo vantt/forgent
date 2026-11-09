@@ -128,6 +128,8 @@ fn test_release_manifest_minimal_backward_compatible() {
     assert_eq!(manifest.created_at, None);
     assert_eq!(manifest.target.libc, None);
     assert_eq!(manifest.entries.fgos_runner, None);
+    assert_eq!(manifest.entries.fgctl, None);
+    assert_eq!(manifest.fgctl_file(), Ok(None));
     assert_eq!(manifest.components.runner, None);
     assert_eq!(manifest.components.workshop, None);
     assert_eq!(manifest.requires.node, None);
@@ -227,6 +229,29 @@ fn test_release_manifest_read_boundary_rejects_unsupported_v1_semantics() {
     )
     .unwrap();
     assert!(read_manifest_from_path(&manifest_path).is_err());
+
+    // A named fgctl must be a confined path with a files[] entry carrying its digest.
+    let with_fgctl = |fgctl: &str| {
+        GOLDEN_RELEASE_MANIFEST_MINIMAL
+            .replace(
+                "\"fgos\": \"bin/fgos\"",
+                &format!("\"fgos\": \"bin/fgos\", \"fgctl\": \"{fgctl}\""),
+            )
+            .replace(
+                "\"files\": []",
+                r#""files": [{"path": "bin/fgctl", "kind": "file", "digest": "sha256:8888888888888888888888888888888888888888888888888888888888888888", "mode": "755", "class": "immutable-entry"}]"#,
+            )
+    };
+    for fgctl in ["bin/missing-fgctl", "../fgctl", "bin//fgctl", "C:/fgctl"] {
+        std::fs::write(&manifest_path, with_fgctl(fgctl)).unwrap();
+        assert!(read_manifest_from_path(&manifest_path).is_err(), "{fgctl}");
+    }
+    std::fs::write(&manifest_path, with_fgctl("bin/fgctl")).unwrap();
+    let manifest = read_manifest_from_path(&manifest_path).unwrap();
+    assert_eq!(
+        manifest.fgctl_file().unwrap().map(|f| f.digest.as_str()),
+        Some("sha256:8888888888888888888888888888888888888888888888888888888888888888")
+    );
 
     let _ = std::fs::remove_dir_all(&temp_dir);
 }
@@ -494,6 +519,7 @@ fn historical_manifest_digests_are_unchanged_without_native_addon() {
     assert!(manifest.components.native_addon.is_none());
     let mut value = serde_json::to_value(&manifest).unwrap();
     assert!(value["components"].get("nativeAddon").is_none());
+    assert!(value["entries"].get("fgctl").is_none());
     assert!(value.get("capabilities").is_none());
     value.as_object_mut().unwrap().remove("artifactDigest");
     assert_eq!(

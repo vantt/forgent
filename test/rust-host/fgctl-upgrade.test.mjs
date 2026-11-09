@@ -179,6 +179,9 @@ test('R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest wit
   // Step 3: fgctl upgrade --from B
   const upgradeRes = runFgctl(['upgrade', '--from', releaseDirB], { cwd: projDir, stateHome });
   assert.equal(upgradeRes.status, 0, `fgctl upgrade must succeed: ${upgradeRes.stderr}`);
+  // B ships the very fgctl this test runs, so the upgrade reports it current and writes nothing.
+  assert.match(upgradeRes.stdout, /^fgctl: up to date with the release \(sha256:[0-9a-f]{64}\)$/m);
+  assert.ok(!fs.existsSync(`${FGCTL_BIN}.prev`), 'an up-to-date fgctl is never moved aside');
 
   // Step 4: Verify upgraded activation
   const versionResB = runFgos(['version', '--runtime-json'], { cwd: projDir, stateHome });

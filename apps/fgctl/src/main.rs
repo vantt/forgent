@@ -1,3 +1,4 @@
+use fgos_distribution::fgctl_refresh::{refresh_fgctl_for_workspace, FgctlRefresh};
 use fgos_distribution::store::{
     list_releases, resolve_machine_release_store_root, stage_release, StageOutcome,
 };
@@ -21,9 +22,48 @@ fn print_usage_and_exit() -> ! {
     );
     eprintln!("  upgrade  Upgrade workspace to a new release candidate");
     eprintln!("           release source: --from <path|URL> > FGCTL_FROM > FGCTL_VERSION=<tag> > latest release");
+    eprintln!(
+        "           then replaces this fgctl with the one the release ships when they differ,"
+    );
+    eprintln!("           keeping the old binary as <path>.prev");
     eprintln!("  repair   Repair or rollback workspace activation");
     eprintln!("  verify   Verify active release files against manifest");
     std::process::exit(1);
+}
+
+/// After `fgctl upgrade` activated a release: make this binary the `fgctl`
+/// that release ships. A refusal exits non-zero after saying the activation
+/// itself stands.
+fn refresh_own_binary(cwd: &std::path::Path) {
+    let installed = match std::env::current_exe() {
+        Ok(path) => path,
+        Err(err) => {
+            eprintln!("Error: release activated, but fgctl cannot locate its own binary: {err}");
+            std::process::exit(1);
+        }
+    };
+    match refresh_fgctl_for_workspace(cwd, &installed) {
+        Ok(FgctlRefresh::UpToDate { digest }) => {
+            println!("fgctl: up to date with the release ({digest})");
+        }
+        Ok(FgctlRefresh::NotShipped) => {
+            println!(
+                "fgctl: the release ships no fgctl; {} left unchanged",
+                installed.display()
+            );
+        }
+        Ok(FgctlRefresh::Replaced { previous, digest }) => {
+            println!(
+                "fgctl: replaced {} with the release's fgctl ({digest}); previous binary kept at {}",
+                installed.display(),
+                previous.display()
+            );
+        }
+        Err(err) => {
+            eprintln!("Error: release activated, but fgctl was not updated: {err}");
+            std::process::exit(1);
+        }
+    }
 }
 
 fn main() {
@@ -207,13 +247,11 @@ fn main() {
 
             let inputs = fgos_distribution::fetch::SourceInputs::from_env(from_path);
             let endpoint = fgos_distribution::fetch::DownloadEndpoint::from_env();
-            match upgrade_workspace_resolving(&cwd, &inputs, &endpoint) {
-                Ok(()) => {}
-                Err(err) => {
-                    eprintln!("Error: {}", err);
-                    std::process::exit(1);
-                }
+            if let Err(err) = upgrade_workspace_resolving(&cwd, &inputs, &endpoint) {
+                eprintln!("Error: {}", err);
+                std::process::exit(1);
             }
+            refresh_own_binary(&cwd);
         }
         "repair" => {
             if let Some(arg) = args[2..].first() {

@@ -23,7 +23,6 @@ import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { REPO_ROOT, buildRustDistribution } from './build-rust-distribution.mjs';
-import { releaseBinaryPath } from '../src/util/release-binary-path.mjs';
 import { releaseTargetForHost } from '../src/util/release-targets.mjs';
 
 const TAG_PATTERN = /^[A-Za-z0-9._+-]+$/;
@@ -91,11 +90,8 @@ export function packageReleaseAssets({ version, outDir = path.join(REPO_ROOT, 'd
   const fgosAsset = assetName('fgos', version, target.triple);
   tarCreate(out, fgosAsset, 'tree', ['.']);
 
-  const releaseDir = path.join(repoRoot, 'target', 'release');
-  const fgctlBin = releaseBinaryPath(releaseDir, 'fgctl');
-  if (!fs.existsSync(fgctlBin)) {
-    throw new Error(`Compiled fgctl not found at ${fgctlBin}. Run "cargo build --release --workspace" first.`);
-  }
+  // The fgctl asset is the release tree's own fgctl, so `install.sh` and `fgctl upgrade` install the same bytes.
+  const fgctlBin = path.join(treeDir, JSON.parse(fs.readFileSync(path.join(treeDir, 'manifest.json'), 'utf8')).entries.fgctl);
   const fgctlAsset = assetName('fgctl', version, target.triple);
   tarCreate(out, fgctlAsset, toPosixRelative(out, path.dirname(fgctlBin)), [path.basename(fgctlBin)]);
 

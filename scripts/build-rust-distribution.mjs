@@ -4,6 +4,7 @@
  *
  * Stages a self-contained release tree into a disposable directory:
  * - bin/fgos (copied from target/release/fgos)
+ * - bin/fgctl (bin/fgctl.exe on Windows), copied from target/release; `fgctl upgrade` installs it
  * - bin/fgos-runner (POSIX sh shim) and, on a Windows host, bin/fgos-runner.cmd
  * - libexec/legacy-node/ (package.json files array payload)
  * - manifest.json (canonical release manifest with artifactDigest)
@@ -303,6 +304,10 @@ export function buildRustDistribution({
   if (!fs.existsSync(releaseBin)) {
     throw new Error(`Compiled Rust binary not found at ${releaseBin}. Run "cargo build --release --workspace" first.`);
   }
+  const fgctlBin = releaseBinaryPath(outputDir, 'fgctl');
+  if (!fs.existsSync(fgctlBin)) {
+    throw new Error(`Compiled fgctl not found at ${fgctlBin}. Run "cargo build --release --workspace" first.`);
+  }
 
   // Refuse a non-empty pre-existing --out: silently absorbing stale or
   // planted content into the staged tree (and its artifactDigest) breaks
@@ -325,6 +330,12 @@ export function buildRustDistribution({
   if (process.platform === 'win32') {
     fs.copyFileSync(releaseBin, path.join(stagedBinDir, 'fgos.exe'));
   }
+
+  // 1b. Stage the fgctl this release ships, so an upgrade can bring the machine's fgctl along.
+  const fgctlEntry = `bin/${path.basename(fgctlBin)}`;
+  const stagedFgctl = path.join(resolvedOut, fgctlEntry);
+  fs.copyFileSync(fgctlBin, stagedFgctl);
+  fs.chmodSync(stagedFgctl, 0o755);
 
   // 2. Stage bin/fgos-runner shim (and its .cmd form for a Windows host)
   const stagedRunner = path.join(stagedBinDir, 'fgos-runner');
@@ -447,6 +458,7 @@ export function buildRustDistribution({
     entries: {
       fgos: 'bin/fgos',
       fgosRunner: 'bin/fgos-runner',
+      fgctl: fgctlEntry,
     },
     capabilities: gitCapabilitiesForHost(),
     components: {

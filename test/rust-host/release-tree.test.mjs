@@ -14,7 +14,9 @@ import {
   canonicalJson,
   computeArtifactDigest,
   hashFile,
+  releaseOutputDir,
 } from '../../scripts/build-rust-distribution.mjs';
+import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 
 import {
   generateCoverageFloorCases,
@@ -159,6 +161,14 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
     assert.equal(manifest.artifactDigest, result.artifactDigest);
     assert.equal(manifest.entries.fgos, 'bin/fgos');
     assert.equal(manifest.entries.fgosRunner, 'bin/fgos-runner');
+    // The release ships the fgctl it was built with, its digest in files[], for `fgctl upgrade` to install.
+    const fgctlName = process.platform === 'win32' ? 'fgctl.exe' : 'fgctl';
+    assert.equal(manifest.entries.fgctl, `bin/${fgctlName}`);
+    const fgctlFile = manifest.files.find((f) => f.path === manifest.entries.fgctl);
+    assert.ok(fgctlFile, 'entries.fgctl must have a files[] entry');
+    assert.equal(fgctlFile.mode, '755');
+    assert.equal(fgctlFile.digest, hashFile(path.join(tempOut, manifest.entries.fgctl)));
+    assert.equal(fgctlFile.digest, hashFile(releaseBinaryPath(releaseOutputDir(), 'fgctl')));
     assert.equal(manifest.components.legacyNode.root, 'libexec/legacy-node');
     assert.equal(manifest.components.legacyNode.entry, 'bin/fgos.mjs');
     assert.ok(manifest.components.legacyNode.digest.startsWith('sha256:'));

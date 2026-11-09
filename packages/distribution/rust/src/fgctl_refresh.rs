@@ -79,15 +79,181 @@ pub fn refresh_fgctl(
     release_dir: &Path,
     artifact_digest: &str,
 ) -> Result<FgctlRefresh, FgctlRefreshError> {
-    let _ = (installed, release_dir, artifact_digest, FGCTL_PREVIOUS_SUFFIX);
-    let _ = (
-        sha256_hex(&[]),
-        manual_command(Path::new(""), Path::new("")),
-        read_manifest_from_dir,
-        recompute_artifact_digest,
-        verify_release_files,
-    );
-    Ok(FgctlRefresh::NotShipped)
+    let unverified = FgctlRefreshError::Unverified;
+
+    let recomputed = recompute_artifact_digest(&release_dir.join("manifest.json"))
+        .map_err(|e| unverified(format!("release manifest: {e}")))?;
+    if recomputed != artifact_digest {
+        return Err(unverified(format!(
+            "release manifest hashes to {recomputed}, the activated release is {artifact_digest}"
+        )));
+    }
+    let manifest = read_manifest_from_dir(release_dir)
+        .map_err(|e| unverified(format!("release manifest: {e}")))?;
+    let Some(entry) = manifest
+        .fgctl_file()
+        .map_err(|e| unverified(e.to_string()))?
+    else {
+        return Ok(FgctlRefresh::NotShipped);
+    };
+
+    // The existing file door refuses symlinks and escapes and checks the digest;
+    // the bytes read afterwards are checked again, since they are what gets installed.
+    let mut only_fgctl = manifest.clone();
+    only_fgctl.files.retain(|file| file.path == entry.path);
+    verify_release_files(release_dir, &only_fgctl)
+        .map_err(|e| unverified(format!("release fgctl: {e}")))?;
+    let source = release_dir.join(&entry.path);
+    let new_bytes = std::fs::read(&source).map_err(|source_err| FgctlRefreshError::Unreadable {
+        path: source.clone(),
+        source: source_err,
+    })?;
+    if sha256_hex(&new_bytes) != entry.digest {
+        return Err(unverified(format!(
+            "release fgctl changed while it was read: {}",
+            source.display()
+        )));
+    }
+
+    let old_bytes = std::fs::read(installed).map_err(|e| FgctlRefreshError::Unreadable {
+        path: installed.to_path_buf(),
+        source: e,
+    })?;
+    if sha256_hex(&old_bytes) == entry.digest {
+        return Ok(FgctlRefresh::UpToDate {
+            digest: entry.digest.clone(),
+        });
+    }
+
+    let manual = manual_command(&source, installed);
+    let (Some(dir), Some(name)) = (
+        installed.parent(),
+        installed.file_name().and_then(|n| n.to_str()),
+    ) else {
+        return Err(FgctlRefreshError::ReplaceFailed {
+            detail: format!("{} names no file in a directory", installed.display()),
+            manual,
+        });
+    };
+    let previous_name = format!("{name}{FGCTL_PREVIOUS_SUFFIX}");
+    let previous = dir.join(&previous_name);
+
+    keep_previous(installed, dir, &previous_name, &old_bytes).map_err(|e| {
+        if is_write_refusal(&e) {
+            FgctlRefreshError::NotWritable {
+                installed: installed.to_path_buf(),
+                detail: e.to_string(),
+                manual: manual.clone(),
+            }
+        } else {
+            FgctlRefreshError::ReplaceFailed {
+                detail: format!(
+                    "{} is unchanged; keeping its bytes at {} failed: {e}",
+                    installed.display(),
+                    previous.display()
+                ),
+                manual: manual.clone(),
+            }
+        }
+    })?;
+
+    if let Err(e) = fgos_durable_file::replace_durably_with_mode(dir, name, &new_bytes, 0o755) {
+        let detail = if e.installed.is_some() {
+            format!("the release fgctl is installed but not confirmed durable: {e}")
+        } else {
+            match restore_previous(&previous, installed) {
+                Ok(()) => format!("{} is unchanged: {e}", installed.display()),
+                Err(restore) => format!(
+                    "{e}; moving the old fgctl back from {} also failed ({restore}), rename it back to {}",
+                    previous.display(),
+                    installed.display()
+                ),
+            }
+        };
+        return Err(FgctlRefreshError::ReplaceFailed { detail, manual });
+    }
+    Ok(FgctlRefresh::Replaced {
+        previous,
+        digest: entry.digest.clone(),
+    })
+}
+
+/// [`refresh_fgctl`] against the release the workspace above `start_dir` has
+/// active, as `fgctl upgrade` leaves it.
+pub fn refresh_fgctl_for_workspace(
+    start_dir: &Path,
+    installed: &Path,
+) -> Result<FgctlRefresh, FgctlRefreshError> {
+    let activation = crate::workspace::resolve_workspace_root(start_dir)
+        .map_err(|e| e.to_string())
+        .and_then(|root| {
+            let path = root.join(".fgos/installation/activation.json");
+            let raw =
+                std::fs::read_to_string(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+            serde_json::from_str::<crate::init::WorkspaceActivationBinding>(&raw)
+                .map_err(|e| format!("{}: {e}", path.display()))
+        })
+        .map_err(|e| FgctlRefreshError::Unverified(format!("active release: {e}")))?;
+    if activation.status != "ready" {
+        return Err(FgctlRefreshError::Unverified(format!(
+            "the workspace activation is {}, not ready",
+            activation.status
+        )));
+    }
+    refresh_fgctl(
+        installed,
+        Path::new(&activation.release_path),
+        &activation.artifact_digest,
+    )
+}
+
+fn is_write_refusal(error: &std::io::Error) -> bool {
+    if error.kind() == std::io::ErrorKind::PermissionDenied {
+        return true;
+    }
+    #[cfg(unix)]
+    if error.raw_os_error() == Some(libc::EROFS) {
+        return true;
+    }
+    false
+}
+
+/// Keeps the installed bytes as `<name>.prev`. On Unix the bytes are copied
+/// there durably, so `installed` is replaced later by one atomic rename and is
+/// never missing. Windows cannot rename over a running executable but can
+/// rename it away, so there the running binary itself moves to `<name>.prev`.
+#[cfg(not(windows))]
+fn keep_previous(
+    _installed: &Path,
+    dir: &Path,
+    previous_name: &str,
+    old_bytes: &[u8],
+) -> std::io::Result<()> {
+    fgos_durable_file::replace_durably_with_mode(dir, previous_name, old_bytes, 0o755)
+        .map(|_| ())
+        .map_err(|e| e.source)
+}
+
+#[cfg(windows)]
+fn keep_previous(
+    installed: &Path,
+    dir: &Path,
+    previous_name: &str,
+    _old_bytes: &[u8],
+) -> std::io::Result<()> {
+    std::fs::rename(installed, dir.join(previous_name))
+}
+
+/// Undoes the Windows rename-away after a failed install; on Unix `installed`
+/// was never moved, so there is nothing to undo.
+#[cfg(not(windows))]
+fn restore_previous(_previous: &Path, _installed: &Path) -> std::io::Result<()> {
+    Ok(())
+}
+
+#[cfg(windows)]
+fn restore_previous(previous: &Path, installed: &Path) -> std::io::Result<()> {
+    std::fs::rename(previous, installed)
 }
 
 #[cfg(test)]
@@ -98,10 +264,8 @@ mod tests {
     struct Scratch(PathBuf);
     impl Scratch {
         fn new(tag: &str) -> Self {
-            let dir = std::env::temp_dir().join(format!(
-                "fgos_fgctl_refresh_{tag}_{}",
-                std::process::id()
-            ));
+            let dir = std::env::temp_dir()
+                .join(format!("fgos_fgctl_refresh_{tag}_{}", std::process::id()));
             let _ = std::fs::remove_dir_all(&dir);
             std::fs::create_dir_all(dir.join("release/bin")).unwrap();
             std::fs::create_dir_all(dir.join("machine")).unwrap();
@@ -209,10 +373,7 @@ mod tests {
 
         let err = refresh_fgctl(&installed, &release, &digest).unwrap_err();
 
-        assert!(
-            matches!(err, FgctlRefreshError::Unverified(_)),
-            "got {err}"
-        );
+        assert!(matches!(err, FgctlRefreshError::Unverified(_)), "got {err}");
         assert!(err.to_string().starts_with("fgctl-release-unverified: "));
         assert_eq!(
             std::fs::read(&installed).unwrap(),
@@ -229,10 +390,7 @@ mod tests {
 
         let err = refresh_fgctl(&installed, &release, "sha256:another-release").unwrap_err();
 
-        assert!(
-            matches!(err, FgctlRefreshError::Unverified(_)),
-            "got {err}"
-        );
+        assert!(matches!(err, FgctlRefreshError::Unverified(_)), "got {err}");
         assert_eq!(machine_listing(&scratch.0), ["fgctl"]);
     }
 
