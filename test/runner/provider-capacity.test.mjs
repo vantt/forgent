@@ -807,6 +807,12 @@ setInterval(() => {}, 1000);
 }
 
 const pidAlive = (pid) => { try { process.kill(pid, 0); return true; } catch (err) { return err.code === 'EPERM'; } };
+// The kernel closes a dying process's lock descriptor before it becomes a zombie, and under load the
+// reaper runs later still, so "the lock was freed" and "the pid is gone" are different instants. A
+// child whose lock came free is no longer parked in its sleep: it is exiting (R), a zombie (Z) or gone.
+const processState = (pid) => {
+  try { return fs.readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1][0]; } catch { return 'gone'; }
+};
 
 test('an account-lock holder killed by SIGKILL with no child frees the lock at once', { timeout: 30_000 }, async (t) => {
   const runtimeDir = mkTempDir();
@@ -833,8 +839,11 @@ test('an account-lock holder killed while its probe child still runs keeps the l
   assert.equal(tryAcquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a' }), null, 'the live child keeps the lock for its dead holder');
   // A waiting acquire gets it once the child has exited, and not before.
   const lock = await acquireAccountLock({ runtimeDir, provider: 'xai', accountId: 'a', waitMs: CHILD_MS + 5000 });
-  assert.equal(pidAlive(childPid), false, 'acquired only after the child exited');
-  lock.release();
+  try {
+    assert.ok(['R', 'Z', 'X', 'gone'].includes(processState(childPid)), `acquired only once the child left its sleep (state ${processState(childPid)})`);
+  } finally {
+    lock.release();
+  }
 });
 
 test('a process in its own PID namespace with the same pinned state root contends for the same account lock', { timeout: 30_000 }, async (t) => {
