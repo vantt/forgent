@@ -288,25 +288,28 @@ test('a Unit run that cannot be removed leaves the ledger to name what is still 
   assert.ok(['unsettled', 'unit-record-missing'].includes(ids(retry.kept).second));
 });
 
-test('two prunes at once remove each directory once and both finish', async () => {
+test('concurrent prunes remove each directory once, finish, and report no failure', async () => {
   const repoRoot = makeFixtureDir('fgos-prune-');
-  const olds = Array.from({ length: 4 }, (_, i) => caseNaming(repoRoot, [`c${i}`], { closedDaysAgo: 30 }));
+  const olds = Array.from({ length: 24 }, (_, i) => caseNaming(repoRoot, [`c${i}`], { closedDaysAgo: 30 }));
   olds.forEach((run, i) => unitRun(repoRoot, `c${i}`, run.caseId));
   const script = `
     import { pruneFinishedCases } from ${JSON.stringify(path.resolve('src/workflow/case-close.mjs'))};
     const r = pruneFinishedCases({ mainRoot: ${JSON.stringify(repoRoot)}, olderThanMs: ${14 * DAY}, apply: true });
-    console.log(JSON.stringify({ cases: r.cases, unitRuns: r.unitRuns }));`;
+    console.log(JSON.stringify({ cases: r.cases, unitRuns: r.unitRuns, kept: r.kept }));`;
   const runOne = () => new Promise((resolve) => {
     const child = spawn(process.execPath, ['--input-type=module', '-e', script], { stdio: ['ignore', 'pipe', 'inherit'] });
     let out = '';
     child.stdout.on('data', (c) => { out += c; });
     child.once('exit', (status) => resolve({ status, out: out.trim() }));
   });
-  const [a, b] = await Promise.all([runOne(), runOne()]);
-  assert.equal(a.status, 0);
-  assert.equal(b.status, 0);
-  const removed = [a, b].flatMap((r) => JSON.parse(r.out).cases);
+  const runs = await Promise.all([runOne(), runOne(), runOne(), runOne()]);
+  for (const run of runs) assert.equal(run.status, 0);
+  const results = runs.map((run) => JSON.parse(run.out));
+  const removed = results.flatMap((r) => r.cases);
   assert.deepEqual([...removed].sort(), olds.map((r) => r.caseId).sort());
+  // A case another prune holds or has just removed is that prune's to finish: it is never a failure of this one.
+  const reasons = new Set(results.flatMap((r) => r.kept.map((k) => k.reason)));
+  assert.deepEqual([...reasons].filter((reason) => reason !== 'advance-held'), []);
   for (const run of olds) assert.equal(fs.existsSync(caseDir(run)), false);
   assert.deepEqual(fs.readdirSync(assignmentsOf(repoRoot)), []);
 });

@@ -234,6 +234,12 @@ function judgeCase({ mainRoot, caseId, ledger, namedElsewhere, kept }) {
   return { doomed, blocked };
 }
 
+// A concurrent prune that reaches a case this one is deleting takes its hold first, which writes into the directory
+// under deletion, so the delete can meet a directory that is not empty. Deleting is idempotent: go on until it is empty.
+function removeCaseDir(mainRoot, caseId) {
+  fs.rmSync(runDirOf(mainRoot, caseId), { recursive: true, force: true, maxRetries: 10, retryDelay: 20 });
+}
+
 /**
  * Remove the cases that ended more than `olderThanMs` ago, with the Unit runs they name.
  *
@@ -266,7 +272,7 @@ export function pruneFinishedCases({ mainRoot, olderThanMs, apply = false, now =
         namedElsewhere = protectCandidates({ mainRoot, ledgers, candidates: fresh, kept: [] });
         if (!fresh.has(caseId)) {
           // Taking the hold of a directory a concurrent prune just removed makes an empty stub: take it away again.
-          if (!lstatOrNull(eventsFilePath(mainRoot, caseId))) fs.rmSync(runDirOf(mainRoot, caseId), { recursive: true, force: true });
+          if (!lstatOrNull(eventsFilePath(mainRoot, caseId))) removeCaseDir(mainRoot, caseId);
           else kept.push({ id: caseId, reason: 'no-longer-prunable' });
           continue;
         }
@@ -288,16 +294,17 @@ export function pruneFinishedCases({ mainRoot, olderThanMs, apply = false, now =
       // A removal that fails midway still leaves this ledger naming the runs already removed: deleting the ledger
       // first would orphan the rest. The next prune finds the removed runs gone and carries on.
       if (blocked || failed) { kept.push({ id: caseId, reason: 'unit-run-kept' }); continue; }
-      const runDir = runDirOf(mainRoot, caseId);
-      const ledgerBytes = treeBytes(runDir);
+      const ledgerBytes = treeBytes(runDirOf(mainRoot, caseId));
       if (apply) {
-        try { fs.rmSync(runDir, { recursive: true, force: true }); } catch { kept.push({ id: caseId, reason: 'delete-failed' }); continue; }
+        try { removeCaseDir(mainRoot, caseId); } catch { kept.push({ id: caseId, reason: 'delete-failed' }); continue; }
       }
       result.bytes += ledgerBytes;
       result.cases.push(caseId);
     } catch (err) {
-      // A case that vanished between listing and taking its hold went with a concurrent prune.
-      if (!(err instanceof RunnerConfigError && /not found/.test(err.message))) kept.push({ id: caseId, reason: 'error' });
+      // A case whose ledger is gone went with a concurrent prune, whether it vanished before the hold or under it:
+      // what is left of its directory is the stub that taking the hold made.
+      if (lstatOrNull(eventsFilePath(mainRoot, caseId))) kept.push({ id: caseId, reason: 'error' });
+      else { try { removeCaseDir(mainRoot, caseId); } catch { kept.push({ id: caseId, reason: 'error' }); } }
     } finally {
       try { hold?.release(); } catch { /* the directory went with the case */ }
     }
