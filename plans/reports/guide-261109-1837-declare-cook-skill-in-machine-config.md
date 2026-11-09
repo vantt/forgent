@@ -2,6 +2,8 @@
 
 Dành cho: owner, trên máy owner, fg-server và fg-server2. Người viết: COOK. Trạng thái: **đề xuất, chờ owner áp dụng hoặc cho phép COOK áp dụng**. COOK không tự sửa cấu hình của owner.
 
+> **Điều kiện trước hết:** kích hoạt bản phát hành kế tiếp trên máy của owner và trên fg-server **chỉ sau khi** các dòng khai kỹ năng cook ở dưới đã nằm trong cấu hình của máy đó. fg-server2 đã khai (18 dòng trong `~/.fgos/config.yaml`, bản sao lưu `~/.fgos/config.yaml.bak-261109-cook-skill`).
+
 ## Chuyện gì thay đổi và vì sao
 
 Cấu hình chuẩn đi kèm bản phát hành (`core/config-standard/runner.yaml`) từng khai `supports.skills: ["ak:cook"]` cho sáu executor (`claude`, `glm`, `openai`, `gemini`, `xai`, `deepseek`). Theo quyết định 79 Q5 (fgOS không cần biết có hay không `ak-cook`) và quyết định 80 Q1 (định tuyến theo máy nằm trong cấu hình của máy), bản chuẩn không còn nêu tên kỹ năng của một bộ kỹ năng bên ngoài. Máy nào dùng `ak:cook` thì tự khai nó.
