@@ -249,15 +249,18 @@ test('disconnected-worktree guard: "lock fence" and "dispatch recover --action" 
   const main = initGitCwdMainWithCommittedFgos();
   const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-lock-dispatch');
   try {
+    // boundary: the guard runs in the shell before any handler, and only a spawned call from a real disconnected worktree reaches it.
     const fenceResult = run(wt, ['lock', 'fence', 'some-lock']);
     assert.equal(fenceResult.status, 4, fenceResult.stderr);
     assert.match(fenceResult.stderr, /disconnected snapshot/);
 
+    // boundary: same guard, the mutating shape of a verb that also has a read-only shape.
     const recoverResult = run(wt, ['dispatch', 'recover', 'run_does_not_exist', '--action', 'x']);
     assert.equal(recoverResult.status, 4, recoverResult.stderr);
     assert.match(recoverResult.stderr, /disconnected snapshot/);
 
     // The bare observe form reaches its own read-only handler, which answers for its own reason.
+    // boundary: same guard, the read-only shape must not trip it.
     assert.doesNotMatch(run(wt, ['dispatch', 'recover', 'run_does_not_exist']).stderr, /disconnected snapshot/);
   } finally {
     execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
