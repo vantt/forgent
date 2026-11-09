@@ -5,7 +5,7 @@
 //! enforces recursion guard, and records invocation lifecycle.
 
 use fgos_distribution::verify::{
-    recompute_artifact_digest, verify_legacy_node, verify_release_files,
+    recompute_artifact_digest, verify_legacy_node, verify_release_files_except_running,
 };
 use fgos_distribution::ReleaseManifest;
 use fgos_host_runtime::invocation_service::LifecycleTracker;
@@ -144,7 +144,9 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
 
     recompute_artifact_digest(&manifest_path)
         .map_err(|err| format!("manifest verification failed: {}", err))?;
-    verify_release_files(Path::new(&active_release_path), &manifest)
+    let running = env::current_exe()
+        .map_err(|e| format!("cannot determine current executable path: {}", e))?;
+    verify_release_files_except_running(Path::new(&active_release_path), &manifest, &running)
         .map_err(|err| format!("manifest file verification failed: {}", err))?;
 
     let payload_path_canonical = verify_legacy_node(Path::new(&active_release_path), &manifest)

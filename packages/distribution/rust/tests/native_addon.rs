@@ -1,7 +1,10 @@
 use fgos_distribution::manifest::{
     native_addon_crate_checksums, ManifestFileEntry, NativeAddonComponent, ReleaseManifest,
 };
-use fgos_distribution::verify::{verify_legacy_node, verify_native_addon, VerificationError};
+use fgos_distribution::verify::{
+    verify_native_addon, verify_release_files, verify_release_files_except_running,
+    VerificationError,
+};
 use sha2::{Digest, Sha256};
 
 fn fixture() -> (std::path::PathBuf, ReleaseManifest) {
@@ -60,9 +63,10 @@ fn native_addon_verifies_bytes_and_abi_and_locked_provenance() {
         verify_native_addon(&root, &manifest),
         Err(VerificationError::FileDigestMismatch { .. })
     ));
-    // Existing staging, preflight and host readers use this admission door.
+    // The addon's bytes are read once, by the full file verifier that every
+    // admission boundary runs before the legacy node check.
     assert!(matches!(
-        verify_legacy_node(&root, &manifest),
+        verify_release_files(&root, &manifest),
         Err(VerificationError::FileDigestMismatch { .. })
     ));
     std::fs::remove_file(root.join("native/fgos.node")).unwrap();
@@ -125,5 +129,36 @@ fn native_addon_accepts_cross_release_toolchain_attestation_but_rejects_bad_shap
         .crate_checksums
         .insert("napi@99.0.0".into(), "bad".into());
     assert!(manifest.validate_v1_invariants().is_err());
+    std::fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn running_executable_is_not_rehashed_but_every_other_file_still_is() {
+    let (root, mut manifest) = fixture();
+    std::fs::create_dir_all(root.join("bin")).unwrap();
+    std::fs::write(root.join("bin/fgos"), b"host bytes").unwrap();
+    manifest.files.push(ManifestFileEntry {
+        path: "bin/fgos".into(),
+        digest: format!("sha256:{:x}", Sha256::digest(b"host bytes")),
+        kind: "file".into(),
+        mode: "755".into(),
+        class: "immutable-entry".into(),
+    });
+    let host = root.join("bin/fgos");
+    verify_release_files_except_running(&root, &manifest, &host).unwrap();
+
+    // The running file is the only one skipped: its own tamper is left to the
+    // boundaries that hash it, a tampered addon byte is still refused.
+    std::fs::write(&host, b"tampered host").unwrap();
+    verify_release_files_except_running(&root, &manifest, &host).unwrap();
+    assert!(matches!(
+        verify_release_files(&root, &manifest),
+        Err(VerificationError::FileDigestMismatch { .. })
+    ));
+    std::fs::write(root.join("native/fgos.node"), b"tampered").unwrap();
+    assert!(matches!(
+        verify_release_files_except_running(&root, &manifest, &host),
+        Err(VerificationError::FileDigestMismatch { .. })
+    ));
     std::fs::remove_dir_all(root).unwrap();
 }

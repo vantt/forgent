@@ -122,6 +122,27 @@ pub fn verify_release_files(
     release_root: &Path,
     manifest: &ReleaseManifest,
 ) -> Result<(), VerificationError> {
+    verify_files(release_root, manifest, None)
+}
+
+/// Same as [`verify_release_files`], except the entry that resolves to `running`
+/// (the executable doing the verifying) is checked for containment and symlinks
+/// but its bytes are not re-hashed: a binary cannot vouch for itself, and the
+/// stage, activation and admission boundaries already hash it.
+pub fn verify_release_files_except_running(
+    release_root: &Path,
+    manifest: &ReleaseManifest,
+    running: &Path,
+) -> Result<(), VerificationError> {
+    let running = std::fs::canonicalize(running).ok();
+    verify_files(release_root, manifest, running.as_deref())
+}
+
+fn verify_files(
+    release_root: &Path,
+    manifest: &ReleaseManifest,
+    running: Option<&Path>,
+) -> Result<(), VerificationError> {
     let canonical_entries = canonicalize_manifest_files(manifest)?;
 
     let release_root_canonical = if release_root.exists() {
@@ -161,6 +182,12 @@ pub fn verify_release_files(
                 return Err(VerificationError::Canonical(CanonicalError::PathTraversal(
                     entry.path.clone(),
                 )));
+            }
+        }
+
+        if let Some(running) = running {
+            if current.canonicalize()? == running {
+                continue;
             }
         }
 
@@ -222,7 +249,10 @@ pub fn verify_native_addon(
     Ok(())
 }
 
-/// Verifies the legacy node component locator and payload file:
+/// Verifies the legacy node component locator and payload file. The native addon's
+/// bytes are not read here: every caller runs `verify_release_files` first, which
+/// hashes the addon's `files[]` entry once, and the addon invariant below proves
+/// that entry exists and matches the declared digest:
 /// 1. Enforces that `components.legacyNode.root` and `entry` are valid relative locators.
 /// 2. Rejects any symlink path component in `root` or `entry` (including unlisted payload symlinks).
 /// 3. Confirms containment under `release_root`.
@@ -231,8 +261,11 @@ pub fn verify_legacy_node(
     release_root: &Path,
     manifest: &ReleaseManifest,
 ) -> Result<std::path::PathBuf, VerificationError> {
-    // Every existing stage/activation/host admission boundary calls this door.
-    verify_native_addon(release_root, manifest)?;
+    manifest
+        .validate_native_addon_invariant()
+        .map_err(|error| {
+            VerificationError::Canonical(CanonicalError::MalformedSegment(error.to_string()))
+        })?;
     manifest.validate_legacy_node_invariant().map_err(|err| {
         VerificationError::Canonical(CanonicalError::MalformedSegment(err.to_string()))
     })?;

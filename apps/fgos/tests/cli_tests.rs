@@ -9,7 +9,7 @@
 
 use sha2::{Digest, Sha256};
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn fgos_bin() -> PathBuf {
@@ -675,6 +675,78 @@ fn test_host_rejects_partial_manifest_missing_required_v1_fields() {
     );
 }
 
+fn run_host_list(release_root: &Path, manifest_path: &Path) -> std::process::Output {
+    Command::new(fgos_bin())
+        .arg("list")
+        .arg("--json")
+        .env("FGOS_ACTIVE_RELEASE_PATH", release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", manifest_path)
+        .output()
+        .expect("failed to execute fgos")
+}
+
+#[test]
+fn test_host_rejects_tampered_native_addon_byte() {
+    let temp_dir =
+        std::env::temp_dir().join(format!("fgos_test_addon_tamper_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&temp_dir);
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(release_root.join("bin")).unwrap();
+    fs::create_dir_all(release_root.join("native")).unwrap();
+    fs::copy(
+        repo_root().join("bin").join("fgos.mjs"),
+        release_root.join("bin").join("fgos.mjs"),
+    )
+    .unwrap();
+    fs::write(
+        release_root.join("native").join("fgos.node"),
+        b"tampered addon",
+    )
+    .unwrap();
+    let declared = format!("{:x}", Sha256::digest(b"addon bytes"));
+    let mut manifest = valid_dev_manifest();
+    manifest["components"]["nativeAddon"] = serde_json::json!({
+        "capabilities": ["git-wal-v1"],
+        "path": "native/fgos.node",
+        "digest": declared,
+        "target": "linux-x64",
+        "napiVersion": 8,
+        "crateChecksums": fgos_distribution::manifest::native_addon_crate_checksums(),
+    });
+    manifest["files"]
+        .as_array_mut()
+        .unwrap()
+        .push(serde_json::json!({
+            "path": "native/fgos.node",
+            "kind": "file",
+            "digest": format!("sha256:{declared}"),
+            "mode": "644",
+            "class": "immutable-runtime",
+        }));
+    manifest.as_object_mut().unwrap().remove("artifactDigest");
+    let canonical = fgos_distribution::verify::to_canonical_json(&manifest);
+    manifest["artifactDigest"] =
+        serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+    let manifest_path = temp_dir.join("manifest.json");
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let output = run_host_list(&release_root, &manifest_path);
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("file digest mismatch for native/fgos.node"),
+        "stderr must report the addon digest refusal, got: {}",
+        stderr
+    );
+
+    let _ = fs::remove_dir_all(&temp_dir);
+}
+
 #[test]
 fn test_host_rejects_full_manifest_with_mismatched_file_digest() {
     let temp_dir = std::env::temp_dir().join(format!(
@@ -715,13 +787,7 @@ fn test_host_rejects_full_manifest_with_mismatched_file_digest() {
     )
     .unwrap();
 
-    let output = Command::new(fgos_bin())
-        .arg("list")
-        .arg("--json")
-        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
-        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
-        .output()
-        .expect("failed to execute fgos");
+    let output = run_host_list(&release_root, &manifest_path);
 
     assert_ne!(output.status.code(), Some(0));
     let stderr = String::from_utf8_lossy(&output.stderr);
