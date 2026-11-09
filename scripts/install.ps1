@@ -11,7 +11,7 @@
 #                         a pre-release such as v0.2.0-rc.2 needs this set)
 #   FGCTL_INSTALL_DIR     where fgctl.exe goes (default: %LOCALAPPDATA%\fgos\bin)
 #   FGCTL_ASSET_BASE_URL  where release assets live (default: the GitHub release);
-#                         http://, https:// or file://
+#                         https:// or file://, and http:// only for a loopback host
 #   FGCTL_TARGET          release target (default: detected; only x86_64-pc-windows-msvc)
 #   FGCTL_ALLOW_ROOT=1    allow running from an elevated (Administrator) session
 
@@ -49,14 +49,38 @@ function Install-Fgctl {
         throw "target '$target' is not supported. Supported targets: $($supportedTargets -join ', ')"
     }
 
-    $baseOverride = $env:FGCTL_ASSET_BASE_URL
-    if ($baseOverride) { $baseOverride = $baseOverride.TrimEnd('/') }
+    # Per-download byte caps: the fgctl archive is a few MiB, so these leave headroom
+    # and still stop a server that streams without end.
+    $maxAssetBytes = 134217728
+    $maxChecksumsBytes = 1048576
 
-    function Get-Asset([string]$Url, [string]$Dest) {
+    # https:// and file:// always; http:// only for a loopback host. There is no escape
+    # hatch: a mirror on plain http would let anyone on the path replace the archive and
+    # its SHA256SUMS together.
+    function Assert-SafeUrl([string]$Url) {
+        $uri = $null
+        if (-not [Uri]::TryCreate($Url, [UriKind]::Absolute, [ref]$uri)) { throw "refusing ${Url}: not a valid URL" }
+        if ($uri.Scheme -eq 'https' -or $uri.Scheme -eq 'file') { return }
+        if ($uri.Scheme -eq 'http' -and $uri.IsLoopback) { return }
+        throw "refusing ${Url}: only https:// and file:// URLs are allowed (http:// for a loopback host)"
+    }
+
+    $baseOverride = $env:FGCTL_ASSET_BASE_URL
+    if ($baseOverride) {
+        $baseOverride = $baseOverride.TrimEnd('/')
+        Assert-SafeUrl $baseOverride
+    }
+
+    function Get-Asset([string]$Url, [string]$Dest, [long]$MaxBytes) {
+        Assert-SafeUrl $Url
         if ($Url -like 'file://*') {
             Copy-Item -LiteralPath ([Uri]$Url).LocalPath -Destination $Dest -Force
         } else {
             Invoke-WebRequest -Uri $Url -OutFile $Dest -UseBasicParsing -TimeoutSec 120 | Out-Null
+        }
+        if ((Get-Item -LiteralPath $Dest).Length -gt $MaxBytes) {
+            Remove-Item -LiteralPath $Dest -Force -ErrorAction SilentlyContinue
+            throw "download larger than allowed ($MaxBytes bytes): $Url"
         }
     }
 
@@ -99,21 +123,26 @@ function Install-Fgctl {
     try {
         $tarballPath = Join-Path $tmp $tarball
         $sumsPath = Join-Path $tmp 'SHA256SUMS'
-        try { Get-Asset "$assetBase/$tarball" $tarballPath } catch { throw "failed to download $tarball from ${assetBase}/${tarball}: $($_.Exception.Message)" }
-        try { Get-Asset "$assetBase/SHA256SUMS" $sumsPath } catch { throw "failed to download SHA256SUMS from ${assetBase}/SHA256SUMS: $($_.Exception.Message)" }
+        try { Get-Asset "$assetBase/$tarball" $tarballPath $maxAssetBytes } catch { throw "failed to download $tarball from ${assetBase}/${tarball}: $($_.Exception.Message)" }
+        try { Get-Asset "$assetBase/SHA256SUMS" $sumsPath $maxChecksumsBytes } catch { throw "failed to download SHA256SUMS from ${assetBase}/SHA256SUMS: $($_.Exception.Message)" }
 
         # Checksum verification against the tarball's own line in SHA256SUMS: the file
         # name field must match exactly (a leading binary-mode '*' is ignored), never a
-        # substring, so a sibling entry cannot be selected.
+        # substring, and exactly one line may name the tarball.
         $expected = $null
+        $entryCount = 0
         foreach ($line in [IO.File]::ReadAllLines($sumsPath)) {
             $fields = $line.Trim() -split '\s+'
             if ($fields.Count -lt 2) { continue }
             $name = $fields[1]
             if ($name.StartsWith('*')) { $name = $name.Substring(1) }
-            if ($name -ceq $tarball) { $expected = $fields[0]; break }
+            if ($name -ceq $tarball) {
+                $entryCount++
+                if (-not $expected) { $expected = $fields[0] }
+            }
         }
-        if (-not $expected) { throw "no checksum entry found for $tarball in SHA256SUMS" }
+        if ($entryCount -eq 0) { throw "no checksum entry found for $tarball in SHA256SUMS" }
+        if ($entryCount -gt 1) { throw "SHA256SUMS lists $tarball more than once; refusing to choose between the entries" }
         if ($expected -notmatch '^[0-9A-Fa-f]{64}$') { throw "invalid checksum entry for $tarball in SHA256SUMS" }
         $actual = (Get-FileHash -LiteralPath $tarballPath -Algorithm SHA256).Hash
         if ($actual -ine $expected) { throw "checksum verification failed for $tarball" }
@@ -132,20 +161,35 @@ function Install-Fgctl {
             if ($found) { $tarExe = $found.Source }
         }
         if (-not $tarExe) { throw 'tar is required to unpack the release but was not found (it ships with Windows 10 and later)' }
-        & $tarExe -xzf $tarballPath -C $extractDir
+
+        # List the archive before extracting anything: no link or special file, no
+        # absolute, drive-letter or `..` path, and fgctl.exe itself at the archive root.
+        $exeName = 'fgctl.exe'
+        $entries = @(& $tarExe -tzf $tarballPath)
+        if ($LASTEXITCODE -ne 0) { throw "failed to read $tarball (it is not a gzip tar archive)" }
+        $longEntries = @(& $tarExe -tzvf $tarballPath)
+        if ($LASTEXITCODE -ne 0) { throw "failed to read $tarball (it is not a gzip tar archive)" }
+        foreach ($entry in $longEntries) {
+            $type = "$entry".Substring(0, [Math]::Min(1, "$entry".Length))
+            if ($type -and $type -ne '-' -and $type -ne 'd') {
+                throw "$tarball contains a symlink, hard link or special file, which is refused"
+            }
+        }
+        $member = $null
+        foreach ($entry in $entries) {
+            if ($entry -match '^([A-Za-z]:|/|\\)' -or $entry -match '(^|[/\\])\.\.([/\\]|$)') {
+                throw "unsafe path in ${tarball}: $entry"
+            }
+            if ($entry -ceq $exeName -or $entry -ceq "./$exeName") { $member = $entry }
+        }
+        if (-not $member) { throw "$tarball has no $exeName at its root" }
+
+        & $tarExe -xzf $tarballPath -C $extractDir $member
         if ($LASTEXITCODE -ne 0) { throw "failed to extract $tarball" }
 
-        # A symlink entry would install its target's bytes instead of the binary the
-        # checksum covered; refuse one explicitly.
-        $exeName = 'fgctl.exe'
         $top = Join-Path $extractDir $exeName
-        $fgctlBin = $null
-        if (Test-Path -LiteralPath $top -PathType Leaf) {
-            $fgctlBin = Get-Item -LiteralPath $top -Force
-        } else {
-            $fgctlBin = Get-ChildItem -LiteralPath $extractDir -Recurse -File -Force -Filter $exeName | Select-Object -First 1
-        }
-        if (-not $fgctlBin) { throw "fgctl binary not found in $tarball" }
+        if (-not (Test-Path -LiteralPath $top -PathType Leaf)) { throw "$exeName in $tarball is not a regular file" }
+        $fgctlBin = Get-Item -LiteralPath $top -Force
         if ($fgctlBin.Attributes -band [IO.FileAttributes]::ReparsePoint) {
             throw "fgctl binary is a symlink, which is refused, in $tarball"
         }
@@ -185,10 +229,13 @@ function Install-Fgctl {
             Write-Host "  [Environment]::SetEnvironmentVariable('Path', `"$installClean;`" + [Environment]::GetEnvironmentVariable('Path', 'User'), 'User')"
         }
 
+        $fgctlCmd = 'fgctl'
+        if (-not $onPath) { $fgctlCmd = $finalBin }
         Write-Host ''
-        Write-Host "Installed fgctl successfully to $finalBin"
-        Write-Host 'Next step:'
-        Write-Host '  fgctl init'
+        Write-Host "Installed fgctl $version to $finalBin"
+        Write-Host 'Next, from inside your project (a git repository):'
+        Write-Host "  $fgctlCmd init"
+        Write-Host '  fgos run "<prompt>"'
     } finally {
         if ($tempBin -and (Test-Path -LiteralPath $tempBin)) { Remove-Item -LiteralPath $tempBin -Force -ErrorAction SilentlyContinue }
         Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue

@@ -38,7 +38,7 @@ function runInstaller(env) {
   });
 }
 
-function buildTarball(dir, tarballName, entries) {
+function buildTarball(dir, tarballName, entries, ...tarArgs) {
   const src = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-ps1-src-'));
   try {
     for (const [name, content] of Object.entries(entries)) {
@@ -47,7 +47,7 @@ function buildTarball(dir, tarballName, entries) {
     }
     // Relative names with the archive written from inside the directory, so a GNU tar
     // never reads a drive letter as a remote host.
-    execFileSync('tar', ['-czf', path.join('..', path.basename(dir), tarballName), ...Object.keys(entries)], { cwd: src });
+    execFileSync('tar', ['-czf', path.join('..', path.basename(dir), tarballName), ...(tarArgs.length ? ['-P', ...tarArgs] : []), ...Object.keys(entries)], { cwd: src });
   } finally {
     fs.rmSync(src, { recursive: true, force: true });
   }
@@ -146,7 +146,8 @@ describe('install.ps1 e2e installer suite', { skip: powershell ? false : 'no Pow
       assert.equal(fs.readFileSync(path.join(installDir, 'fgctl.exe'), 'utf8'), marker);
       assert.deepEqual(fs.readdirSync(installDir), ['fgctl.exe'], 'no temp file left behind');
       assert.match(res.stdout, /is not in your PATH/);
-      assert.match(res.stdout, /Next step:\s+fgctl init/);
+      assert.ok(res.stdout.includes(`${path.join(installDir, 'fgctl.exe')} init`), `fgctl by absolute path while its directory is off PATH: ${res.stdout}`);
+      assert.match(res.stdout, /fgos run "<prompt>"/);
     });
   });
 
@@ -209,6 +210,61 @@ describe('install.ps1 e2e installer suite', { skip: powershell ? false : 'no Pow
       assert.equal(res.status, 0, `stdout=${res.stdout} stderr=${res.stderr}`);
       assert.equal(fs.readFileSync(path.join(installDir, 'fgctl.exe'), 'utf8'), marker);
     });
+  });
+
+  test('plain http is refused unless the host is loopback, before any request is made', async () => {
+    for (const base of ['http://192.0.2.1/assets', 'http://example.com/assets', 'http://127.0.0.1.evil.example/assets', 'http://127.0.0.1@evil.example/assets', 'ftp://127.0.0.1/assets']) {
+      await withDirs(async ({ installDir, env }) => {
+        const res = await runInstaller({ ...env, FGCTL_ASSET_BASE_URL: base, FGCTL_VERSION: version });
+        assert.notEqual(res.status, 0, base);
+        assert.match(res.stderr, /refusing .*https/, `${base}: ${res.stderr}`);
+        assert.deepEqual(fs.readdirSync(installDir), []);
+      });
+    }
+  });
+
+  test('a SHA256SUMS that lists the tarball twice is refused', async () => {
+    await withDirs(async ({ installDir, env }) => {
+      served.sums = `${'a'.repeat(64)}  ${tarballName}\n${'b'.repeat(64)}  ${tarballName}\n`;
+      const res = await runInstaller({ ...env, FGCTL_VERSION: version });
+      assert.notEqual(res.status, 0);
+      assert.match(res.stderr, /more than once/);
+      assert.deepEqual(fs.readdirSync(installDir), []);
+    });
+  });
+
+  test('a SHA256SUMS larger than its cap is refused', async () => {
+    await withDirs(async ({ installDir, env }) => {
+      served.sums = 'x'.repeat(1024 * 1024 + 1);
+      const res = await runInstaller({ ...env, FGCTL_VERSION: version });
+      assert.notEqual(res.status, 0);
+      assert.match(res.stderr, /larger than allowed/);
+      assert.deepEqual(fs.readdirSync(installDir), []);
+    });
+  });
+
+  test('an archive with a ../ member, or without fgctl.exe at its root, is refused', async () => {
+    for (const [label, build, pattern] of [
+      ['a ../ member', (dir) => buildTarball(dir, tarballName, { 'fgctl.exe': marker, stray: 'x' }, '--transform=s,^stray$,../stray,'), /unsafe path/],
+      ['fgctl.exe below a directory', (dir) => buildTarball(dir, tarballName, { 'bin/fgctl.exe': marker }), /no fgctl\.exe at its root/],
+    ]) {
+      await withDirs(async ({ installDir, env }) => {
+        const evilDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-ps1-layout-'));
+        const original = served.tarball;
+        try {
+          const evil = build(evilDir);
+          served.tarball = evil;
+          served.sums = `${crypto.createHash('sha256').update(evil).digest('hex')}  ${tarballName}\n`;
+          const res = await runInstaller({ ...env, FGCTL_VERSION: version });
+          assert.notEqual(res.status, 0, label);
+          assert.match(res.stderr, pattern, `${label}: ${res.stderr}`);
+          assert.deepEqual(fs.readdirSync(installDir), [], label);
+        } finally {
+          served.tarball = original;
+          fs.rmSync(evilDir, { recursive: true, force: true });
+        }
+      });
+    }
   });
 
   test('a tarball whose fgctl.exe is a symlink is refused, nothing installed', { skip: process.platform === 'win32' ? 'creating a symlink needs a privilege Windows runners lack' : false }, async () => {
