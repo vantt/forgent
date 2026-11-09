@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { replaceDurably } from '../native/door.mjs';
 import { discoverInstructionSources } from './instruction-registry.mjs';
 import {
   composeInstructionSet,
@@ -336,11 +337,17 @@ export function materializeInstructionProjection(projectRoot, options = {}) {
   assertNoSymlinkPath(projectRoot, computed.ledgerRelativePath, 'Projection ledger path');
 
   let changed = false;
-  const writeIfChanged = (filePath, content) => {
+  const writeIfChanged = (filePath, content, { durable = false } = {}) => {
     const existing = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : undefined;
     if (existing === content) return;
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, content, 'utf8');
+    if (durable) {
+      // A user-owned file: keep its mode, and never leave it half written.
+      const mode = existing === undefined ? 0o644 : fs.statSync(filePath).mode & 0o7777;
+      replaceDurably(path.dirname(filePath), path.basename(filePath), content, mode);
+    } else {
+      fs.writeFileSync(filePath, content, 'utf8');
+    }
     changed = true;
   };
 
@@ -348,7 +355,7 @@ export function materializeInstructionProjection(projectRoot, options = {}) {
 
   const existingDestination = fs.existsSync(destinationPath) ? fs.readFileSync(destinationPath, 'utf8') : '';
   const nextDestination = spliceManagedProjection(existingDestination, computed.projectionContent, destinationPath);
-  writeIfChanged(destinationPath, nextDestination);
+  writeIfChanged(destinationPath, nextDestination, { durable: true });
 
   const ledger = readLedger(ledgerPath);
   const nextLedger = upsertLedgerEntry(ledger, computed.ledgerEntry);

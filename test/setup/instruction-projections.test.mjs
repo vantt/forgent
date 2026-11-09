@@ -120,6 +120,20 @@ test('materializeInstructionProjection preserves unmanaged AGENTS.md prefix byte
   assert.match(agents.slice(unmanagedPrefix.length), /<!-- fgos:instruction-projection:start -->/);
 });
 
+test('materializeInstructionProjection keeps the mode of an existing AGENTS.md and leaves no temporary file beside it', () => {
+  const root = mkTempDir('fgos-instruction-projection-durable-');
+  const agentsPath = path.join(root, 'AGENTS.md');
+  fs.writeFileSync(agentsPath, '# Notes\n', 'utf8');
+  fs.chmodSync(agentsPath, 0o640);
+  writeInstructionFile(root, 'law.md', 'id: projection-law\nkind: law\ntitle: Projection Law', '# Projection Law\nRender me.');
+
+  materializeInstructionProjection(root);
+
+  assert.equal(fs.statSync(agentsPath).mode & 0o7777, 0o640);
+  assert.match(fs.readFileSync(agentsPath, 'utf8'), /# Notes/);
+  assert.deepEqual(fs.readdirSync(root).filter((name) => name.startsWith('AGENTS.md') && name !== 'AGENTS.md'), []);
+});
+
 test('inspectInstructionProjection detects stale generated projections and fix repairs only the managed block', () => {
   const root = mkTempDir('fgos-instruction-projection-stale-');
   fs.writeFileSync(path.join(root, 'AGENTS.md'), '# Local Notes\n\nKeep this prose.\n', 'utf8');
