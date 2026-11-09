@@ -41,7 +41,7 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, fg-server). fg-s
 
 ## P08: một phép kiểm cho domain đã biên dịch
 
-- **Commit trên main:** ghi sau khi land (nhánh `harden/t8-p08-domain-build`).
+- **Commit trên main:** `3aa200966` (trước đó `d1d5156a0`).
 - **Người dùng thấy gì:**
   - `fgos doctor` dòng `domain-registry-compiled` và `npm run build:domains -- --check` dùng chung một hàm `checkCompiledDomains`, nên hai nơi luôn báo cùng một tập lỗi.
   - Một `domains/<tên>/compiled.json` mà thư mục không còn `registry.yaml` (domain mồ côi) giờ bị báo đỏ, nêu tên domain. Trước đây không ai xét.
