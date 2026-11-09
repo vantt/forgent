@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
-import {ensureHostBin, ensureGitAddon as buildAddon, gitAddonSourceDigest} from '../../scripts/lib/git-addon-stage.mjs';
+import {ensureHostBin, ensureGitAddon as buildAddon, gitAddonSourceDigest, GIT_ADDON_SOURCE_DIGEST_FILE} from '../../scripts/lib/git-addon-stage.mjs';
 import {pathToFileURL} from 'node:url';
 import {ensureGitAddon, root} from '../helpers/git-addon.mjs';
 import {buildRustDistribution, nativeAddonLibraryName, nativeAddonComponent, computeArtifactDigest, gitCapabilitiesForHost} from '../../scripts/build-rust-distribution.mjs';
@@ -110,6 +110,13 @@ fs.copyFileSync(process.env.HOST_TEST_BYTES,path.join(output,'fgos'));
       assert.equal(env.FGOS_HOST_BIN, result.hostBin);
       assert.equal(env.FGOS_ACTIVE_MANIFEST_PATH, result.manifest);
       const original = fs.readFileSync(result.manifest);
+      // A concurrent stage in the same checkout must not touch a file whose bytes did not change: the
+      // leak check of the first run reads every staged file's mtime.
+      const digestFile = path.join(path.dirname(result.addon), GIT_ADDON_SOURCE_DIGEST_FILE);
+      const settled = new Date(Date.now() - 60_000);
+      fs.utimesSync(digestFile, settled, settled);
+      buildAddon({ ...env }, repo);
+      assert.equal(fs.statSync(digestFile).mtimeMs, settled.getTime(), 'a second stage of unchanged sources leaves the source digest untouched');
       const sibling = path.join(temp, `sibling-${custom}`);
       fs.mkdirSync(sibling);
       for (const file of ['Cargo.toml', 'Cargo.lock']) fs.copyFileSync(path.join(repo, file), path.join(sibling, file));

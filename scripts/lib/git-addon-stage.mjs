@@ -65,7 +65,13 @@ export function ensureGitAddon(env = process.env, cwd = REPO_ROOT, locked = true
     fs.writeFileSync(`${manifest}.${process.pid}.tmp`, manifestBytes);
     fs.renameSync(`${manifest}.${process.pid}.tmp`, manifest);
   }
-  fs.writeFileSync(path.join(addonDir, GIT_ADDON_SOURCE_DIGEST_FILE), gitAddonSourceDigest(cwd));
+  // Written only when it changed, like the files above: a concurrent stage in this checkout must not move its mtime.
+  const digestFile = path.join(addonDir, GIT_ADDON_SOURCE_DIGEST_FILE);
+  const digest = gitAddonSourceDigest(cwd);
+  if (!fs.existsSync(digestFile) || fs.readFileSync(digestFile, 'utf8') !== digest) {
+    fs.writeFileSync(`${digestFile}.${process.pid}.tmp`, digest);
+    fs.renameSync(`${digestFile}.${process.pid}.tmp`, digestFile);
+  }
   Object.assign(env, devHostEnv({}, { fgosBin: hostBin, checkoutRoot: cwd, manifestPath: manifest }));
   return { addon, manifest, hostBin, cargoEnv };
 }
