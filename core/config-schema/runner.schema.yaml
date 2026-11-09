@@ -595,7 +595,8 @@ $defs:
         description: "Whether the worker gets an isolated session."
         type: boolean
       ownWorktree:
-        description: "Whether the worker gets its own worktree."
+        x-fgos-merge: tighten
+        description: "Whether the worker gets its own worktree. A project file may turn it on but never off over a lower layer that turned it on; to run one project without it the machine owner defines a second executor with false in the global file and the project prefers that executor."
         type: boolean
       contract:
         description: "Confinement contract reference."

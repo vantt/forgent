@@ -315,6 +315,58 @@ fn a_project_file_may_equal_or_raise_a_capability_confinement() {
     }
 }
 
+/// A project file may only turn an executor's own-worktree confinement on: it never turns off what
+/// the global file turned on, while turning it on over an off or absent lower layer, or off over
+/// nothing, is accepted. To run one project without it, the machine owner defines a second executor
+/// in the global file and the project prefers that one.
+#[test]
+fn a_project_file_may_only_turn_own_worktree_on() {
+    const OWN: &str = "runner.executors.ex.confinement.ownWorktree";
+    let file = |role: &str, value: bool| {
+        json!({role: [
+            "runner:",
+            "  executors:",
+            "    ex:",
+            "      kind: agent",
+            "      confinement:",
+            format!("        ownWorktree: {value}")
+        ]})
+    };
+    let project = "project/.fgos/config.yaml";
+    let global = "home/.fgos/config.yaml";
+    for (name, below, project_value, accepted) in [
+        ("on-over-off", Some(false), true, true),
+        ("off-over-on", Some(true), false, false),
+        ("on-over-on", Some(true), true, true),
+        ("off-over-nothing", None, false, true),
+    ] {
+        let mut files = file(project, project_value);
+        if let Some(below) = below {
+            files
+                .as_object_mut()
+                .unwrap()
+                .extend(file(global, below).as_object().unwrap().clone());
+        }
+        let (snap, dir) = bundled_snapshot(&format!("own-worktree-{name}"), files);
+        match (snap, accepted) {
+            (Ok(snap), true) => {
+                assert_eq!(at(&snap.value, OWN), Some(&json!(project_value)), "{name}")
+            }
+            (Err(SnapshotError::Refused(found)), false) => {
+                assert_eq!(found.len(), 1, "{name}: {found:?}");
+                assert_eq!(found[0].code, "config-confinement-lowered", "{name}");
+                assert_eq!(found[0].path.as_deref(), Some(OWN), "{name}");
+                assert_eq!(found[0].line, Some(6), "{name}: {:?}", found[0]);
+            }
+            (other, _) => panic!(
+                "{name}: expected accepted={accepted}, got {:?}",
+                other.map(|snap| at(&snap.value, OWN).cloned())
+            ),
+        }
+        let _ = fs::remove_dir_all(&dir);
+    }
+}
+
 /// A project file is committed by whoever can push to the repository, so a key that decides which
 /// program runs or how little it is confined belongs to the machine's own file: the project file is
 /// refused by name at its line, and the same text in the global file is accepted.

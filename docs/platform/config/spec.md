@@ -120,7 +120,28 @@ The file name before the first `.` is the top-level key (`runner.schema.yaml` an
 | `x-fgos-merge` | `deep`, `replace`, `tighten`, `leaf` | the YAML Document merge primitive's rule for this path; `tighten` merges like `replace` and in addition refuses a project value that is weaker than what the layers beneath it merge to (below) |
 | `x-fgos-absent` | `detected`, `required`, `off`; used only where the standard file holds no value for the key | `detected`: no standard value, detected at read time (section 8); `required`: no standard value, missing is a reported error; `off`: missing means the feature is off. `fgos config standard` prints `required` and `detected` keys as commented placeholders |
 
-**`x-fgos-merge: tighten`** is for a setting a project may only make firmer: a capability's `confinement` and `runner.confinement.strict`. The project value replaces the lower one like `replace`, but it may only equal or raise what the layers beneath it merge to. For a confinement entry the mode ranks `required` over `preferred` over `unconfined`; at any mode, a policy name other than the lower layer's (policy names have no order; a lower layer that names none leaves the name free) or an `allowInvocationOverride: true` the lower layer did not allow counts as lowering; `strict: true` is not lowered to `false`. A lowering is refused by name (`config-confinement-lowered`), never ignored. Where nothing lies beneath, any value is accepted. Only the project layer is judged: the global file is the machine owner's own. `runner.confinementPolicies` is `global-only`, so a project can neither define a policy nor name another one to weaken a capability; an entry of a `global-only` map whose own keys no schema describes is refused whole, at the entry.
+**`x-fgos-merge: tighten`** is for a setting a project may only make firmer: a capability's `confinement`, `runner.confinement.strict` and a launch confinement's `ownWorktree`. The project value replaces the lower one like `replace`, but it may only equal or raise what the layers beneath it merge to. For a confinement entry the mode ranks `required` over `preferred` over `unconfined`; at any mode, a policy name other than the lower layer's (policy names have no order; a lower layer that names none leaves the name free) or an `allowInvocationOverride: true` the lower layer did not allow counts as lowering; `strict: true` is not lowered to `false`, and neither is `ownWorktree: true`. A lowering is refused by name (`config-confinement-lowered`), never ignored. Where nothing lies beneath, any value is accepted. Only the project layer is judged: the global file is the machine owner's own. `runner.confinementPolicies` is `global-only`, so a project can neither define a policy nor name another one to weaken a capability; an entry of a `global-only` map whose own keys no schema describes is refused whole, at the entry.
+
+To run one project without own-worktree confinement, a project cannot set `ownWorktree: false` over a lower layer that turned it on. The machine owner defines a second executor in the global file with `ownWorktree: false`, and the project prefers that executor:
+
+```yaml
+# ~/.fgos/config.yaml (machine owner)
+runner:
+  executors:
+    claude-shared-tree:
+      kind: agent
+      command: claude
+      confinement:
+        ownWorktree: false
+```
+
+```yaml
+# .fgos/config.yaml (project)
+runner:
+  capabilities:
+    execute:
+      prefer: [claude-shared-tree]
+```
 
 The other facts the earlier annotation list carried live where JSON Schema already puts them or belong elsewhere:
 
@@ -390,3 +411,4 @@ Owner decision 2026-10-22: native door. As built:
 - **2026-11-06: the runner schema owns the runner section's type rules.** Every type, enum, range, required and unknown-key rule that `src/runner/dispatch/config.mjs` repeated now lives in `core/config-schema/runner.schema.yaml`, one golden case per moved rule (`packages/config/rust/tests/golden_validate.rs`); Node keeps only cross-field rules (section 12; `68c426c31`). Invocation-level `confinement` is closed like the executor's (`launchConfinement`), and `invocation.via` no longer lists `api`.
 - **2026-11-06: a project file no longer names programs or loosens an executor's confinement.** Owner decision (executor commands move to the global file only after each machine has moved its values; the schema change lands after that move). Red-team and the config review reproduced that a committed project file could set a program and an unconfined launch (`command`, `args`, `permissionMode: bypass`, an invocation's confinement backend and isolation flags, an `aliases` rebinding to an unconfined capability) and that the loader returned them. The keys listed in section 3 rule 4 became `x-fgos-scope: global-only`; no new mechanism, the scope judge already refuses a key, or a list or scalar above one, in the project file by name (`config-key-out-of-scope`). `confinement.ownWorktree`, `contract`, `controls`, `grants` and `networkFilter` of a launch confinement stay `both`: they narrow or describe, they do not turn confinement off.
 - **2026-11-09: `confinement.controls` becomes `global-only`.** HARDEN review of the project-settable launch confinement keys. `controls.home|session|workspace` is a second spelling of `privateHome`, `isolatedSession` and `ownWorktree` that every reader accepts, so a project could weaken a machine executor through it (and inflate an attestation claim). One `x-fgos-scope: global-only` line on the schema node, proof in the `confinement-controls` case of `packages/config/rust/tests/golden_snapshot.rs`; no config shipped or local used the form. This replaces the 2026-11-06 line's claim that `controls` stays `both`. `ownWorktree` is unchanged and waits on an owner answer; `contract`, `grants` and `networkFilter` have no enforcement effect at executor level and stay `both`.
+- **2026-11-09: `confinement.ownWorktree` becomes `tighten`.** Owner decision 79 Q6(c). A project file may turn it on but never off over a lower layer that turned it on (`config-confinement-lowered`); the existing boolean rule of `tighten` already covers it, so the change is one schema annotation, proved in `a_project_file_may_only_turn_own_worktree_on` of `packages/config/rust/tests/golden_snapshot.rs`. To run one project without it, the machine owner defines a second executor with `ownWorktree: false` in the global file and the project prefers it (section 4). This replaces the 2026-11-09 `controls` line's note that `ownWorktree` waits on an owner answer; no shipped or local config set it.
