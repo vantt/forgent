@@ -96,7 +96,7 @@ coverage: partial
 
 - `README.md` — mô tả sản phẩm + mục lục tài liệu
 - `.agents/skills/distill/SKILL.md` — định nghĩa skill distill (Node zero-dep)
-- `node .claude/skills/distill/scripts/distill.mjs check` — lệnh verify hiện hành (ghi tại `.bee/config.json`)
+- `node .agents/skills/distill/scripts/distill.mjs check` — lệnh verify hiện hành (ghi tại `.bee/config.json`)
 
 ## Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)
 

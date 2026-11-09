@@ -225,21 +225,7 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { o
       written.push(wrapperPath);
     }
 
-    const skillDir = path.join(agentsSkillsRoot, entry.name);
-    const present = new Set([wrapperPath]);
-    for (const subEntry of fs.readdirSync(skillDir, { withFileTypes: true })) {
-      if (isOwnTmpFile(subEntry.name)) continue;
-      if (subEntry.name === 'SKILL.md') continue;
-      const subSource = path.join(skillDir, subEntry.name);
-      const subTarget = path.join(wrapperDir, subEntry.name);
-      if (subEntry.isDirectory()) {
-        copyDirRecursive(subSource, subTarget, keptCopy(keep), keep, present);
-      } else {
-        keptCopy(keep)(subSource, subTarget);
-        present.add(subTarget);
-      }
-    }
-    pruneExtras(wrapperDir, present, keep);
+    pruneExtras(wrapperDir, new Set([wrapperPath]), keep);
   }
 
   if (fs.existsSync(claudeSkillsRoot)) {

@@ -415,6 +415,23 @@ test('assembleSkills prunes orphaned skills from .agents/skills when removed fro
   assert.ok(fs.existsSync(path.join(targetAgentsSkills, 'ak-cook', 'SKILL.md')));
 });
 
+test('a wrapper dir holds only its SKILL.md: sibling files of the source are not copied and a copy an earlier render wrote is removed', () => {
+  const root = mkTempDir('skill-wrappers-only-skill-md-');
+  const agentsSkillsRoot = path.join(root, '.agents', 'skills');
+  const claudeSkillsRoot = path.join(root, '.claude', 'skills');
+  writeSkill(agentsSkillsRoot, 'fgos-sample', SAMPLE_FRONTMATTER, '# body\n');
+  fs.mkdirSync(path.join(agentsSkillsRoot, 'fgos-sample', 'references'));
+  fs.writeFileSync(path.join(agentsSkillsRoot, 'fgos-sample', 'references', 'guide.md'), 'guide\n');
+  fs.mkdirSync(path.join(agentsSkillsRoot, 'fgos-sample', 'scripts'));
+  fs.writeFileSync(path.join(agentsSkillsRoot, 'fgos-sample', 'scripts', 'run.mjs'), 'run\n');
+  fs.mkdirSync(path.join(claudeSkillsRoot, 'fgos-sample', 'references'), { recursive: true });
+  fs.writeFileSync(path.join(claudeSkillsRoot, 'fgos-sample', 'references', 'guide.md'), 'copy an earlier render wrote\n');
+
+  generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot, { owned: everyNameIn(agentsSkillsRoot) });
+
+  assert.deepEqual(fs.readdirSync(path.join(claudeSkillsRoot, 'fgos-sample')), ['SKILL.md']);
+});
+
 test('generateAllSkillWrappers prunes orphaned wrappers from .claude/skills when source skill is gone', () => {
   const agentsSkillsRoot = mkTempDir('skill-wrappers-prune-claude-agents-');
   const claudeSkillsRoot = mkTempDir('skill-wrappers-prune-claude-target-');
@@ -904,7 +921,7 @@ test('a second render after a source deletion is a fixed point and a third rende
   for (const surface of ['.agents/skills', '.claude/skills', 'plugins/fgOS/skills']) {
     assert.equal(fs.existsSync(path.join(root, surface, 'fgos-gone')), false, `${surface} keeps a deleted skill`);
   }
-  for (const surface of ['.agents/skills', '.claude/skills', 'plugins/fgOS/skills']) {
+  for (const surface of ['.agents/skills', 'plugins/fgOS/skills']) {
     assert.equal(fs.existsSync(path.join(root, surface, 'fgos-own', 'references', 'old.md')), false, `${surface} keeps a deleted file`);
     assert.ok(fs.existsSync(path.join(root, surface, 'fgos-own', 'references', 'keep.md')), surface);
   }

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- The skill render no longer copies a skill's `references/`, `scripts/` or other sibling files into `.claude/skills/<name>/`: a wrapper directory holds only its `SKILL.md`, which already points at the `.agents/skills/<name>/` source where a seat reads them, and the next render removes the old copies.
 - `fgos doctor` row `domain-registry-compiled` and `npm run build:domains -- --check` now share one check: a `compiled.json` whose domain has no `registry.yaml` is reported as an orphan, and two workflow files with the same key (`x.yaml` and `x.yml`) make the build fail naming both.
 - `fgos setup` and the skill render now refuse, by name and before writing anything, a skill directory with an owned name that fgOS did not write (no generated stamp) and any symbolic link in a skill path; a render removes files and fgos-* plugin copies whose source is gone, writes nothing on a second run, and setup copies only the package's own skills.
 - The unused Gemini extension package generator is removed from the skill render (it never had a caller and no Gemini target is shipped); the skill packaging contract now says Gemini is not provided. `assembleSkills`, `discoverCanonicalSkills` and `discoverSharedFragments` always refuse duplicate names and fragment paths (the legacy `checkDuplicates` and `checkCollisions` options are gone).

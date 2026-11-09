@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e35a2b62f0f1df7d5b9db3fa3f41a5a64a6abcf0463582d4ffed9b970b96134c",
+  "payloadDigest": "a4254fa9477a48d0aacfb7586c953ea9b700c21e65e0cc99d4e09b81adcdbb84",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1143,7 +1143,7 @@
     "src/setup/runner-config-conversion.mjs": "6e2711a0a909265b82241901e7f9642889bdc3e9d1ab5a69fafd81b477a64ac6",
     "src/setup/seat-binding-checks.mjs": "31466fd0d56700e12de4b369f8592da7ecf009590c6767340cadc84efa70770f",
     "src/setup/shell-rc.mjs": "36c0eb600e6943d5c6ed94918d5d6a294d447fa8a6491076faaf525aa80807c0",
-    "src/setup/skill-wrappers.mjs": "7a6134bb2a44e1ed3eda1fc0e45d61536401a2618e4c35746b10672d16092e5f",
+    "src/setup/skill-wrappers.mjs": "b1b42f54c5b1d45d0640a2ce72f8e05d2a1491ea63fda50e299a99d384cba7d1",
     "src/setup/terminal-control-checks.mjs": "5dca8b2bf0c8bddbc55bcfad97700e65708a04822bf8065b484d5d6c251ce4aa",
     "src/setup/workflow-case-checks.mjs": "9b187678986f33683b456a75565026e0d86be858cc8281feb86e8b660a6e4ba1",
     "src/setup/workflow-definition-files.mjs": "28372084fe8b77963cfa33b2eb709e4146d6b4c87bb64e8983d743b9b0fc7320",
