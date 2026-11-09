@@ -1,7 +1,7 @@
 ---
 phase: 05
 title: "Config door ergonomics: unknown keys are refused with a did-you-mean, the reason error names the flag, explain resolves runtime keys"
-status: pending
+status: completed
 depends_on: []
 parallel: "group G1 with P03 and P09; touches only packages/config and one cli test"
 effort: ~0.5d
