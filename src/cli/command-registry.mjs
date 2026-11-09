@@ -1125,13 +1125,15 @@ export const COMMAND_REGISTRY = [
           properties: {
             to: { type: 'string', description: 'The recipient: its short name or an unambiguous prefix, or an Identity handle (`claude-5v7u@fg-server`), full session id or `lead:<LANE>` or `work:<name>` role naming a head of this project.' },
             wake: { type: 'boolean', description: 'Ask to wake the recipient at the end of its turn; the mailbox may drop the wake (its quota), and the answer says so.' },
-            'reply-to': { type: 'string', description: 'The id of the message this one answers (from the reply line under that message).' },
+            'reply-to': { type: 'string', description: 'The id of the message this one answers (from the reply line under that message). A reply that names it acknowledges that message at any time; one that does not is matched to the latest message from the recipient only within the loop window (600 s by default).' },
+            'need-ack': { type: 'boolean', description: 'Ask the recipient to acknowledge: its frame tells it to reply in one line even with nothing to add, and you get one notice when no acknowledgement comes by the deadline. Same machine only for now; a reply to a message that asked for one cannot ask again (`ack-on-ack`).' },
+            'reply-by': { type: 'string', description: 'With --need-ack: how long the recipient has, as 90s, 30m or 2h (default mailbox.ack.replyBySec, 10 min; from mailbox.inFlightTtlSec up to a day). Counted from the send, and again from when the recipient is first offered the message. Tell the recipient to answer with --reply-to <id> when the deadline is past the loop window.' },
             body: { type: 'string', description: 'The message text (positional; quote it).' },
           },
           positional: ['body'],
           required: ['to', 'body'],
         },
-        examples: ['fgos mailbox send --to forgent-claude-2b "the build is green"', 'fgos mailbox send --to forgent-codex-9c --reply-to 0a1b2c "yes" --json', 'fgos mailbox send --to forgent-claude-2b -- "--looks like a flag"'],
+        examples: ['fgos mailbox send --to forgent-claude-2b "the build is green"', 'fgos mailbox send --to forgent-codex-9c --reply-to 0a1b2c "yes" --json', 'fgos mailbox send --to forgent-claude-2b -- "--looks like a flag"', 'fgos mailbox send --to forgent-codex-9c --need-ack --reply-by 30m "please confirm you saw this"'],
       },
       inbox: {
         description: 'Read-only unless --claim: list this session\'s pending mail with each item\'s state. `--claim` consumes it instead: it prints every pending frame and finishes the claim only after a successful write, exactly as a hook drain does.',
@@ -1156,7 +1158,7 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos mailbox list', 'fgos mailbox list --long --json'],
       },
       status: {
-        description: 'Read-only report of the record: its verdict (ok, none yet, or the record error) and the health signals of spec §9 (recorded-to-offered latency, refusals per reason, offers per message, queue depth and oldest age, record size, heads with mail and no drain since, offered and never answered, the last hook outcome). No signal has a threshold yet; exit 1 only when the record cannot be read. Creates nothing.',
+        description: 'Read-only report of the record: its verdict (ok, none yet, or the record error) and the health signals of spec §9 (recorded-to-offered latency, refusals per reason, offers per message, queue depth and oldest age, record size, heads with mail and no drain since, offered and never answered, acknowledgement requests awaiting, acknowledged and overdue, the last hook outcome). No signal has a threshold yet; exit 1 only when the record cannot be read. Creates nothing.',
         parameters: {
           type: 'object',
           properties: {},

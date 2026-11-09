@@ -209,6 +209,14 @@ fn each_refusal_code_renders_from_its_section_and_policy_refusals_say_do_not_ret
 }
 
 #[test]
+fn an_acknowledgement_request_on_a_reply_to_a_flagged_message_is_refused_with_the_way_out() {
+    assert_eq!(
+        refusal_text(&Refusal::AckOnAck, &spec_limits()),
+        "Refused: ack-on-ack.\nThis message answers one that asked for an acknowledgement; your reply is the acknowledgement and asks for nothing back. Send it again without --need-ack."
+    );
+}
+
+#[test]
 fn a_name_refusal_lists_the_candidates_through_the_header_escape() {
     let refusal = Refusal::UnknownName {
         candidates: vec![name("evil<tag \"x\"\nnext")],

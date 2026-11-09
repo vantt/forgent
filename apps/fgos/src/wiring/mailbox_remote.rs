@@ -518,6 +518,25 @@ pub struct Context<'a> {
     pub now: Timestamp,
 }
 
+/// Whether `to` names a session of another machine that a send would reach
+/// (or refuse as ambiguous): read-only, records nothing. `Err` says why that
+/// could not be told.
+pub fn names_remote_head(ctx: &Context<'_>, from: &WriterKey, to: &str) -> Result<bool, String> {
+    if !ctx.cross.enabled {
+        return Ok(false);
+    }
+    let (Some(main), Some(root)) = (ctx.fgos_dir.parent(), super::mailbox_identity::state_root())
+    else {
+        return Ok(false);
+    };
+    match resolve(main, &root, from.as_str(), to) {
+        Ok(Some(Ok(_))) => Ok(true),
+        Ok(Some(Err(refusal))) => Ok(refusal.reason == "ambiguous"),
+        Ok(None) => Ok(false),
+        Err(refusal) => Err(refusal_line(&refusal)),
+    }
+}
+
 /// Sends `body` to the session `to` names on another machine, when one
 /// does; see the module's comment. `from` is the caller's full session id.
 pub fn send(

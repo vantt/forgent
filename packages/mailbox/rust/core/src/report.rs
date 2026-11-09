@@ -156,6 +156,7 @@ pub fn refusal_text(refusal: &Refusal, limits: &Limits) -> String {
         Refusal::Alias(AliasRefusal::Ambiguous { .. }) => {
             format!("{text}\n{}", section("refusal.alias.ambiguous"))
         }
+        Refusal::AckOnAck => format!("{text}\n{}", section("refusal.ack-on-ack")),
         _ => text,
     }
 }

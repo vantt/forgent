@@ -711,6 +711,178 @@ fn json_flag_wraps_the_same_answer_in_the_envelope() {
     );
 }
 
+/// The id a `recorded <id> for <name>` answer names.
+fn recorded_id(out: &Output) -> String {
+    let text = String::from_utf8_lossy(&out.stdout).into_owned();
+    text.strip_prefix("recorded ")
+        .and_then(|rest| rest.split_whitespace().next())
+        .unwrap_or_else(|| panic!("not a recorded answer: {text}"))
+        .to_string()
+}
+
+#[test]
+fn send_need_ack_to_a_local_head_shows_the_ack_line_in_the_receivers_frame_and_a_reply_marks_it_acknowledged_in_status(
+) {
+    const SENDER: &str = "00000000-0000-4000-8000-0000000000aa";
+    let scene = Scene::new("need-ack");
+    let main = scene.main();
+    scene.claude_hook("post-tool-use", &post_tool_use());
+    let _sender_head = CodexHead::start(&scene, SENDER);
+    let receiver = name_of_key(&scene, WRITER);
+    let sender = name_of_key(&scene, SENDER);
+    let ack = |scene: &Scene| status_json(scene).1["signals"]["ack"].clone();
+
+    let sent = scene.run(
+        &main,
+        Some(SENDER),
+        &[
+            "mailbox",
+            "send",
+            "--to",
+            &receiver,
+            "--need-ack",
+            "please confirm",
+        ],
+        b"",
+    );
+    assert_eq!(sent.status.code(), Some(0), "{sent:?}");
+    let report = String::from_utf8_lossy(&sent.stdout).into_owned();
+    assert!(
+        report.contains("You asked for an acknowledgement within 10 min"),
+        "{report}"
+    );
+    let id = recorded_id(&sent);
+    assert_eq!(
+        ack(&scene),
+        serde_json::json!({ "awaiting": 1, "acked": 0, "overdue": 0, "overdueIds": [] })
+    );
+
+    let frame = scene.claude_hook("post-tool-use", &post_tool_use());
+    let frame: serde_json::Value = serde_json::from_slice(&frame.stdout).unwrap();
+    let frame = frame["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap();
+    assert!(
+        frame.contains("The sender needs to know you have taken this in, within 10 min")
+            && frame.contains(&format!("--reply-to {id}")),
+        "{frame}"
+    );
+
+    // An acknowledgement asks for nothing back.
+    let refused = scene.run(
+        &main,
+        Some(WRITER),
+        &[
+            "mailbox",
+            "send",
+            "--to",
+            &sender,
+            "--reply-to",
+            &id,
+            "--need-ack",
+            "ok?",
+        ],
+        b"",
+    );
+    assert_eq!(refused.status.code(), Some(1), "{refused:?}");
+    let text = String::from_utf8_lossy(&refused.stdout).into_owned();
+    assert!(
+        text.starts_with("Refused: ack-on-ack.") && text.contains("without --need-ack"),
+        "{text}"
+    );
+
+    let replied = scene.run(
+        &main,
+        Some(WRITER),
+        &[
+            "mailbox",
+            "send",
+            "--to",
+            &sender,
+            "--reply-to",
+            &id,
+            "read, nothing to add",
+        ],
+        b"",
+    );
+    assert_eq!(replied.status.code(), Some(0), "{replied:?}");
+    assert!(
+        !String::from_utf8_lossy(&replied.stdout).contains("acknowledgement"),
+        "a reply asks for no acknowledgement"
+    );
+    assert_eq!(
+        ack(&scene),
+        serde_json::json!({ "awaiting": 0, "acked": 1, "overdue": 0, "overdueIds": [] })
+    );
+    let text = scene.run(&main, Some(SENDER), &["mailbox", "status"], b"");
+    assert!(
+        String::from_utf8_lossy(&text.stdout)
+            .contains("acknowledgement requests: awaiting=0 acknowledged=1 overdue=0"),
+        "{text:?}"
+    );
+}
+
+#[test]
+fn a_bad_or_out_of_range_reply_by_or_one_without_need_ack_is_a_usage_error_that_records_nothing() {
+    let scene = Scene::new("reply-by-usage");
+    let main = scene.main();
+    scene.claude_hook("post-tool-use", &post_tool_use());
+    let name = scene.head_name();
+    for (flags, cause) in [
+        (&["--need-ack", "--reply-by", "10"][..], "wants a duration"),
+        (
+            &["--need-ack", "--reply-by", "ten minutes"],
+            "wants a duration",
+        ),
+        (&["--need-ack", "--reply-by", "0m"], "wants a duration"),
+        (&["--need-ack", "--reply-by", "-5m"], "wants a duration"),
+        (
+            &["--need-ack", "--reply-by", "30s"],
+            "outside what a local acknowledgement can wait",
+        ),
+        (
+            &["--need-ack", "--reply-by", "9999h"],
+            "outside what a local acknowledgement can wait",
+        ),
+        (&["--reply-by", "10m"], "--reply-by needs --need-ack"),
+    ] {
+        let mut args = vec!["mailbox", "send", "--to", name.as_str()];
+        args.extend_from_slice(flags);
+        args.push("hi");
+        let out = scene.run(&main, Some("sender-a"), &args, b"");
+        assert_eq!(out.status.code(), Some(4), "{flags:?}: {out:?}");
+        assert!(out.stdout.is_empty(), "{flags:?}");
+        assert!(
+            String::from_utf8_lossy(&out.stderr).contains(cause),
+            "{flags:?}: {out:?}"
+        );
+    }
+    assert!(scene.message_states().is_empty(), "nothing was recorded");
+    let (_, status) = status_json(&scene);
+    assert_eq!(status["signals"]["refusals"], serde_json::json!({}));
+
+    let ok = scene.run(
+        &main,
+        Some("sender-a"),
+        &[
+            "mailbox",
+            "send",
+            "--to",
+            &name,
+            "--need-ack",
+            "--reply-by",
+            "30m",
+            "hi",
+        ],
+        b"",
+    );
+    assert_eq!(ok.status.code(), Some(0), "{ok:?}");
+    assert!(
+        String::from_utf8_lossy(&ok.stdout).contains("within 30 min"),
+        "{ok:?}"
+    );
+}
+
 /// A copy of `/bin/sh` named `codex`: an executable whose file name is the
 /// one the adapters contract lists for Codex's head, standing at the direct
 /// head position (the entry is its child; `; :` keeps it from exec'ing).
@@ -2170,6 +2342,29 @@ fn a_send_to_a_session_on_another_machine_appends_one_signed_event_and_reports_r
     );
 }
 
+#[test]
+fn need_ack_to_a_session_on_another_machine_is_refused_until_it_can_cross_machines() {
+    let Cross {
+        alpha,
+        alpha_root,
+        target,
+        ..
+    } = two_machines();
+    let out = alpha.run(
+        &alpha.main(),
+        Some("sender-a"),
+        &["mailbox", "send", "--to", &target, "--need-ack", "hello"],
+        b"",
+    );
+    let text = String::from_utf8_lossy(&out.stdout).into_owned();
+    assert_eq!(out.status.code(), Some(1), "{text} {out:?}");
+    assert!(text.contains("not across machines yet"), "{text}");
+    assert!(
+        sent_events(&alpha_root, &alpha.main()).is_empty(),
+        "a refused request writes no event"
+    );
+}
+
 /// Beta takes mail only from a machine whose key its owner confirmed; this is that confirmation.
 fn confirm_alpha_on_beta(cross: &Cross) {
     let alpha_machine = fgos_identity::machine::read(&cross.alpha_root).unwrap();
@@ -2433,6 +2628,16 @@ fn mail_from_a_machine_whose_key_is_not_confirmed_is_not_taken_and_the_sender_is
             .stdout
     )
     .contains("takes mail payload versions 1, 2, 3"));
+    assert_eq!(
+        counted["data"]["crossMachine"]["takesAckRequests"], true,
+        "{counted}"
+    );
+    assert!(String::from_utf8_lossy(
+        &beta
+            .run(&beta.main(), Some(WRITER), &["mailbox", "status"], b"")
+            .stdout
+    )
+    .contains("this machine takes acknowledgement requests"));
 }
 
 /// A message alpha appends for beta's head: its text inline (version 1), or only the hash and length

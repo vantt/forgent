@@ -657,6 +657,56 @@ fn status_reports_each_signal_from_a_record_seeded_through_the_stores_own_holds_
         before,
         "status wrote nothing"
     );
+    assert_eq!(
+        s["ack"],
+        serde_json::json!({ "awaiting": 0, "acked": 0, "overdue": 0, "overdueIds": [] })
+    );
+
+    // Three acknowledgement requests: one answered, one whose deadline passed
+    // unanswered, one still inside its deadline.
+    let flagged = |body: &str, secs: u64, deadline: u64| {
+        let mut req = send_req("sender-x", &name, body);
+        req.need_ack = Some(deadline);
+        record
+            .send(req, Wait::Try, at(secs), &limits())
+            .unwrap()
+            .value
+            .unwrap()
+            .id
+    };
+    let answered = flagged("answered", 70, 600);
+    let late = flagged("late", 70, 120);
+    flagged("inside", 70, 600);
+    record
+        .hold(Wait::Try, at(75), &limits(), |state, _| {
+            assert!(state.mark_acked(&answered, None));
+            Reported::changing(())
+        })
+        .unwrap();
+    let before = std::fs::read(fgos.paths().snapshot()).unwrap();
+    let answer = status(&fgos.fgos_dir(), at(70 + 130), &limits());
+    assert_eq!(
+        answer.json["signals"]["ack"],
+        serde_json::json!({
+            "awaiting": 1,
+            "acked": 1,
+            "overdue": 1,
+            "overdueIds": [late.as_str()],
+        })
+    );
+    assert!(
+        answer.text.contains(&format!(
+            "acknowledgement requests: awaiting=1 acknowledged=1 overdue=1 ({})",
+            late.as_str()
+        )),
+        "{}",
+        answer.text
+    );
+    assert_eq!(
+        std::fs::read(fgos.paths().snapshot()).unwrap(),
+        before,
+        "status judged the deadline without writing it"
+    );
 }
 
 /// A nudge that records the keys it was asked for and succeeds.

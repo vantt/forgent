@@ -115,7 +115,7 @@ test('the mailbox selector is native with send, inbox, list and status and their
   assert.deepEqual(routes.mailbox.subcommand_flags, {
     inbox: ['claim', 'dir', 'help', 'json'],
     list: ['dir', 'help', 'json', 'long'],
-    send: ['body', 'dir', 'help', 'json', 'reply-to', 'to', 'wake'],
+    send: ['body', 'dir', 'help', 'json', 'need-ack', 'reply-by', 'reply-to', 'to', 'wake'],
     status: ['dir', 'help', 'json'],
   });
 });

@@ -57,6 +57,10 @@ pub enum MailboxRequest {
         to: String,
         wake: bool,
         reply_to: Option<String>,
+        /// `--need-ack`: the sender wants to be told the message was taken in.
+        need_ack: bool,
+        /// `--reply-by`, in seconds; the key's default when `--need-ack` names none.
+        reply_by_sec: Option<u64>,
         body: String,
         json: bool,
     },
@@ -88,7 +92,8 @@ impl MailboxRequest {
     }
 }
 
-/// `fgos mailbox send --to <name> [--wake] [--reply-to <id>] [--] <body>`,
+/// `fgos mailbox send --to <name> [--wake] [--reply-to <id>] [--need-ack
+/// [--reply-by <90s|30m|2h>]] [--] <body>`,
 /// `fgos mailbox inbox [--claim]`, `fgos mailbox list [--long]`, `fgos
 /// mailbox status`; `--json` on each, `--dir` accepted and ignored (the
 /// record is always the main checkout's).
@@ -101,6 +106,8 @@ pub fn project_mailbox_request(args: &[OsString]) -> MailboxRequest {
     let mut to = None;
     let mut reply_to = None;
     let mut wake = false;
+    let mut need_ack = false;
+    let mut reply_by = None;
     let mut claim = false;
     let mut long = false;
     let mut json = false;
@@ -134,6 +141,8 @@ pub fn project_mailbox_request(args: &[OsString]) -> MailboxRequest {
             (Some("send"), "--to") => to = value(),
             (Some("send"), "--reply-to") => reply_to = value(),
             (Some("send"), "--wake") => wake = true,
+            (Some("send"), "--need-ack") => need_ack = true,
+            (Some("send"), "--reply-by") => reply_by = Some(value().unwrap_or_default()),
             (Some("inbox"), "--claim") => claim = true,
             (Some("list"), "--long") => long = true,
             (_, other) => return MailboxRequest::Usage(format!("unknown flag {other}")),
@@ -147,10 +156,26 @@ pub fn project_mailbox_request(args: &[OsString]) -> MailboxRequest {
             let [body] = positional.as_slice() else {
                 return MailboxRequest::Usage("send needs exactly one body; quote it".to_string());
             };
+            let reply_by_sec = match reply_by {
+                Some(_) if !need_ack => {
+                    return MailboxRequest::Usage("--reply-by needs --need-ack".to_string())
+                }
+                Some(text) => match parse_duration_sec(&text) {
+                    Some(secs) => Some(secs),
+                    None => {
+                        return MailboxRequest::Usage(format!(
+                            "--reply-by wants a duration such as 90s, 30m or 2h, not \"{text}\""
+                        ))
+                    }
+                },
+                None => None,
+            };
             MailboxRequest::Send {
                 to,
                 wake,
                 reply_to,
+                need_ack,
+                reply_by_sec,
                 body: body.clone(),
                 json,
             }
@@ -163,6 +188,78 @@ pub fn project_mailbox_request(args: &[OsString]) -> MailboxRequest {
             MailboxRequest::Usage(format!("{verb} takes no positional argument"))
         }
         _ => MailboxRequest::Usage("mailbox needs send, inbox, list or status".to_string()),
+    }
+}
+
+/// A duration of whole seconds, minutes or hours (`90s`, `30m`, `2h`); `None`
+/// for anything else, zero or too large to count in seconds.
+fn parse_duration_sec(text: &str) -> Option<u64> {
+    let unit = text.chars().last()?;
+    let per_unit: u64 = match unit {
+        's' => 1,
+        'm' => 60,
+        'h' => 3600,
+        _ => return None,
+    };
+    let digits = &text[..text.len() - 1];
+    if digits.is_empty() || !digits.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    digits
+        .parse::<u64>()
+        .ok()
+        .and_then(|n| n.checked_mul(per_unit))
+        .filter(|secs| *secs > 0)
+}
+
+/// The seconds an acknowledgement request waits: `--reply-by`, or the
+/// `mailbox.ack.replyBySec` default, inside what the record can keep. The
+/// floor is the in-flight lifetime (a shorter deadline fires before the
+/// message can be offered twice); the ceiling is the header horizon (the
+/// header must outlive its deadline). A reply names `--reply-to` to count
+/// after the loop window, which the help says.
+fn ack_deadline(requested: Option<u64>, limits: &fgos_mailbox_core::Limits) -> Result<u64, String> {
+    let (min, max) = (limits.in_flight_ttl_sec, limits.header_horizon_sec());
+    let secs = requested.unwrap_or(limits.ack.reply_by_sec);
+    if (min..=max).contains(&secs) {
+        return Ok(secs);
+    }
+    let source = if requested.is_some() {
+        "--reply-by"
+    } else {
+        "mailbox.ack.replyBySec"
+    };
+    Err(format!(
+        "{source} {secs}s is outside what a local acknowledgement can wait: {min}s to {max}s"
+    ))
+}
+
+/// The refusal of `--need-ack` toward a recipient of another machine, from
+/// whether `to` names one; `None` for a local recipient. When that could not
+/// be told the refusal says so instead of claiming it is remote.
+fn need_ack_remote_refusal(names_remote: Result<bool, String>, to: &str) -> Option<String> {
+    match names_remote {
+        Ok(false) => None,
+        Ok(true) => Some(
+            "not recorded: --need-ack is not across machines yet; that name is a session of another machine. Send it without --need-ack."
+                .to_string(),
+        ),
+        Err(why) => Some(format!(
+            "not recorded: could not tell whether {to} is on another machine ({why}); send without --need-ack or retry."
+        )),
+    }
+}
+
+fn usage_answer(cause: &str) -> MailboxAnswer {
+    MailboxAnswer {
+        text: String::new(),
+        data: json!({ "ok": false, "usage": cause }),
+        json: false,
+        exit: EXIT_USAGE,
+        already_written: false,
+        warning: Some(format!(
+            "fgos: mailbox: {cause}. See \"fgos mailbox --help\"."
+        )),
     }
 }
 
@@ -444,6 +541,8 @@ fn status(json: bool) -> MailboxAnswer {
                     .collect::<Vec<_>>()
                     .join(", ")
             ));
+            data["crossMachine"]["takesAckRequests"] = Value::from(true);
+            text.push_str("\ncross-machine: this machine takes acknowledgement requests");
             data["crossMachine"]["bodyRef"] = json!({ "on": cross.body_ref });
             if cross.body_ref {
                 let kept = mailbox_remote::body_sent_times(main, &root)
@@ -568,26 +667,27 @@ fn remote_answer(
 /// Runs one mailbox request.
 pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
     match request {
-        MailboxRequest::Usage(cause) => MailboxAnswer {
-            text: String::new(),
-            data: json!({ "ok": false, "usage": cause }),
-            json: false,
-            exit: EXIT_USAGE,
-            already_written: false,
-            warning: Some(format!(
-                "fgos: mailbox: {cause}. See \"fgos mailbox --help\"."
-            )),
-        },
+        MailboxRequest::Usage(cause) => usage_answer(cause),
         MailboxRequest::Send {
             to,
             wake,
             reply_to,
+            need_ack,
+            reply_by_sec,
             body,
             json,
         } => {
             let (fgos_dir, record, loaded, warning) = match open(*json) {
                 Ok(opened) => opened,
                 Err(answer) => return *answer,
+            };
+            let need_ack = if *need_ack {
+                match ack_deadline(*reply_by_sec, &loaded.limits) {
+                    Ok(secs) => Some(secs),
+                    Err(cause) => return usage_answer(&cause),
+                }
+            } else {
+                None
             };
             let Some(from) = caller(&fgos_dir) else {
                 return failed(record_error_text("caller-unknown"), *json, warning);
@@ -613,6 +713,14 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                                 wait,
                                 now: now(),
                             };
+                            if need_ack.is_some() {
+                                if let Some(text) = need_ack_remote_refusal(
+                                    mailbox_remote::names_remote_head(&ctx, &from, to),
+                                    to,
+                                ) {
+                                    return remote_answer(false, text, *json, warning);
+                                }
+                            }
                             match mailbox_remote::send(
                                 &ctx,
                                 &from,
@@ -646,7 +754,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 body,
                 wake: *wake,
                 reply_to: reply_to.as_deref().map(MessageId::from_text),
-                need_ack: None,
+                need_ack,
                 dead_keys: Default::default(),
                 stop_drains: TestedClis::embedded().stop_drains(),
                 nudge_clis: TestedClis::embedded().nudge_clis(),
@@ -791,5 +899,24 @@ impl OperationProvider for MailboxProvider {
                 Box::new(answer(request)),
             ))
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::need_ack_remote_refusal;
+
+    #[test]
+    fn a_need_ack_refusal_names_another_machine_only_when_it_is_known() {
+        assert_eq!(need_ack_remote_refusal(Ok(false), "x"), None);
+        let known = need_ack_remote_refusal(Ok(true), "x").unwrap();
+        assert!(known.contains("not across machines yet"), "{known}");
+        let unknown = need_ack_remote_refusal(Err("log-unreadable: boom".into()), "x").unwrap();
+        assert!(
+            unknown
+                .contains("could not tell whether x is on another machine (log-unreadable: boom)")
+                && !unknown.contains("session of another machine"),
+            "{unknown}"
+        );
     }
 }

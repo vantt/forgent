@@ -460,6 +460,38 @@ fn signals(state: &fgos_mailbox_core::MailboxState, now: Timestamp) -> serde_jso
             "offered": offered.len(),
             "unanswered": offered.iter().filter(|h| !h.answered).count(),
         },
+        "ack": ack_signal(state, now),
+    })
+}
+
+/// The acknowledgement requests this machine's senders made: still waiting,
+/// acknowledged (also late), and past their deadline with no acknowledgement.
+/// Read from the snapshot as the sweep left it, plus the deadlines that
+/// passed since, so `status` stays a read; a watch on a message to another
+/// machine is overdue only when its own sweep said so.
+fn ack_signal(state: &fgos_mailbox_core::MailboxState, now: Timestamp) -> serde_json::Value {
+    use fgos_mailbox_core::AckStage;
+    let (mut awaiting, mut acked) = (0u64, 0u64);
+    let mut overdue_ids = Vec::new();
+    for watch in state.ack_watches() {
+        let late = match watch.stage {
+            AckStage::Overdue => true,
+            AckStage::NotOffered => watch.offered_at.is_none() || now > watch.due,
+            AckStage::Waiting => watch.to_machine.is_none() && now > watch.due,
+        };
+        if watch.acked {
+            acked += 1;
+        } else if late {
+            overdue_ids.push(watch.id.as_str().to_string());
+        } else {
+            awaiting += 1;
+        }
+    }
+    serde_json::json!({
+        "awaiting": awaiting,
+        "acked": acked,
+        "overdue": overdue_ids.len(),
+        "overdueIds": overdue_ids,
     })
 }
 
@@ -521,10 +553,27 @@ fn status_text(json: &serde_json::Value) -> String {
             "offered and never answered: {} of {}",
             s["offeredUnanswered"]["unanswered"], s["offeredUnanswered"]["offered"]
         ),
+        ack_line(&s["ack"]),
         format!(
             "last hook outcome: {}",
             outcome["reason"].as_str().unwrap_or("none")
         ),
     ]
     .join("\n")
+}
+
+/// The acknowledgement counts as one operator line, naming the overdue ids.
+fn ack_line(ack: &serde_json::Value) -> String {
+    let mut line = format!(
+        "acknowledgement requests: awaiting={} acknowledged={} overdue={}",
+        ack["awaiting"], ack["acked"], ack["overdue"]
+    );
+    let ids: Vec<&str> = ack["overdueIds"]
+        .as_array()
+        .map(|ids| ids.iter().filter_map(|id| id.as_str()).collect())
+        .unwrap_or_default();
+    if !ids.is_empty() {
+        line.push_str(&format!(" ({})", ids.join(", ")));
+    }
+    line
 }

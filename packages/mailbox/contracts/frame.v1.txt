@@ -100,6 +100,8 @@ Refused: too-large ({{limit}}). Send a path or link instead.
 Refused: {{code}}. Candidates: {{candidates}}.
 [refusal.argument]
 Refused: {{code}}.
+[refusal.ack-on-ack]
+This message answers one that asked for an acknowledgement; your reply is the acknowledgement and asks for nothing back. Send it again without --need-ack.
 [refusal.alias.ambiguous]
 That name does not name one session; each is still reachable by its full id, the text in brackets: fgos mailbox send --to <full id> "…"
 [record.error]
