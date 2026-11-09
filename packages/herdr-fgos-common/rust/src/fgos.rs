@@ -382,7 +382,7 @@ fn shim_path(root: &Path) -> PathBuf {
 /// named refusal -- there is no `node <root>/bin/fgos.mjs` fallback, because
 /// the direct-node channel is unsupported for the process, lock and identity
 /// verbs.
-pub fn resolve_fgos(root: &Path) -> Result<PathBuf, io::Error> {
+fn resolve_fgos(root: &Path) -> Result<PathBuf, io::Error> {
     let tier_zero = shim_path(root);
     let install_root = root.join(".fgos").join("installation");
     if is_executable(&tier_zero) && is_confined(&tier_zero, &install_root) {
@@ -409,10 +409,6 @@ pub fn fgos_command(root: &Path, args: &[&str]) -> io::Result<Command> {
         .current_dir(root)
         .stdin(std::process::Stdio::null());
     Ok(cmd)
-}
-
-pub fn is_tier_zero(root: &Path, resolved: &Path) -> bool {
-    resolved == shim_path(root)
 }
 
 fn run_fgos(root: &Path, args: &[&str]) -> Result<String, FgosError> {
@@ -1018,7 +1014,6 @@ mod tests {
 
         let resolved = resolve_fgos(&root).expect("resolve_fgos");
         assert_eq!(resolved, shim);
-        assert!(is_tier_zero(&root, &resolved));
         let _ = std::fs::remove_dir_all(&root);
     }
 

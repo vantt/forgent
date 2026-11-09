@@ -41,6 +41,7 @@
 
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
+use std::time::{Duration, Instant};
 
 use rhai::{Dynamic, Engine};
 use rmcp::handler::server::router::tool::ToolRouter;
@@ -177,6 +178,16 @@ fn call_verb(gateway: &Arc<dyn VerbGateway>, args: Vec<String>) -> Result<Dynami
 /// still a working script; only the accidental-flood case needs bounding).
 const MCP_EXECUTE_MAX_OUTPUT_BYTES: usize = 256 * 1024;
 
+/// Largest string, array or map a script may build or receive. Well above any verb result
+/// (a full work list is tens of KiB), far below what a doubling loop reaches in a few steps.
+const MAX_SCRIPT_STRING_BYTES: usize = 4 * 1024 * 1024;
+const MAX_SCRIPT_COLLECTION_LEN: usize = 100_000;
+
+/// How long one `execute` may run: the longest a single verb call is allowed
+/// (`gateway::VERB_SPAWN_TIMEOUT`), so one slow verb is never cut short by the budget
+/// but a script chaining slow verbs ends after its next operation.
+const MCP_EXECUTE_WALL_CLOCK: Duration = Duration::from_secs(600);
+
 fn push_capped_output(output: &Arc<Mutex<Vec<String>>>, line: String) {
     let mut buf = output.lock().unwrap();
     let used: usize = buf.iter().map(|s| s.len()).sum();
@@ -199,7 +210,7 @@ fn reject_leading_dash(value: &str, field: &str) -> Result<(), Box<rhai::EvalAlt
 /// default — nothing beyond the functions registered below is reachable
 /// from a script, proving the "no new privilege beyond today's CLI/Bash
 /// trust model" boundary D9 promises rather than assuming it).
-fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) -> Engine {
+fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>, budget: Duration) -> Engine {
     let mut engine = Engine::new();
 
     // tsk-1qe: `Engine::new()` defaults to unlimited operations
@@ -213,6 +224,22 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     // fgos-gateway-mcp-surface/CONTEXT.md`) -- this bounds CPU time, it
     // grants or removes no capability.
     engine.set_max_operations(500_000);
+
+    // A script can still ask for more memory than any real call needs
+    // (`s += s` doubles a string per step) or load code from disk through
+    // `import`. These bound size and depth and drop the module resolver; they
+    // grant no capability and remove none a bound function offers.
+    engine.set_max_string_size(MAX_SCRIPT_STRING_BYTES);
+    engine.set_max_array_size(MAX_SCRIPT_COLLECTION_LEN);
+    engine.set_max_map_size(MAX_SCRIPT_COLLECTION_LEN);
+    engine.set_max_call_levels(32);
+    engine.set_max_expr_depths(64, 32);
+    engine.set_module_resolver(rhai::module_resolvers::DummyModuleResolver::new());
+
+    // The operation limit bounds CPU work, not time spent inside slow verb calls: stop a script
+    // that has run past its budget at the next operation.
+    let deadline = Instant::now() + budget;
+    engine.on_progress(move |_ops| (Instant::now() >= deadline).then(|| "wall-clock budget exceeded".into()));
 
     let out = output.clone();
     engine.on_print(move |s| push_capped_output(&out, s.to_string()));
@@ -370,8 +397,12 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
 /// `execute` surfaces as a tool-level error response, never a protocol
 /// failure or a crashed gateway process (Shape's own "partial failure" case).
 fn run_script(gateway: Arc<dyn VerbGateway>, script: &str) -> Result<String, String> {
+    run_script_within(gateway, script, MCP_EXECUTE_WALL_CLOCK)
+}
+
+fn run_script_within(gateway: Arc<dyn VerbGateway>, script: &str, budget: Duration) -> Result<String, String> {
     let output: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
-    let engine = build_engine(gateway, output.clone());
+    let engine = build_engine(gateway, output.clone(), budget);
 
     let eval_result = engine.eval::<Dynamic>(script);
     let printed = output.lock().unwrap().clone();
@@ -590,6 +621,49 @@ mod tests {
             result.unwrap_err().contains("Too many operations"),
             "the failure should be the operation-limit error, not some other unrelated error"
         );
+    }
+
+    #[tokio::test]
+    async fn execute_a_doubling_string_ends_in_a_script_error_not_memory_growth() {
+        let gateway = fake(Ok(json!({"ok": true})));
+        let script = r#"let s = "x"; loop { s += s; }"#;
+        let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
+        let message = result.expect_err("a doubling string must be stopped by the string size limit");
+        assert!(message.contains("too large"), "expected the size-limit error, got: {message}");
+    }
+
+    #[tokio::test]
+    async fn execute_a_doubling_array_ends_in_a_script_error() {
+        let gateway = fake(Ok(json!({"ok": true})));
+        let result =
+            tokio::task::spawn_blocking(move || run_script(gateway, "let a = [1]; loop { a += a; }")).await.unwrap();
+        assert!(result.expect_err("array growth must be bounded").contains("too large"));
+    }
+
+    #[tokio::test]
+    async fn execute_refuses_an_import_so_no_module_file_is_ever_read() {
+        let gateway = fake(Ok(json!({"ok": true})));
+        let script = r#"import "/etc/hostname" as host; 1"#;
+        let result = tokio::task::spawn_blocking(move || run_script(gateway, script)).await.unwrap();
+        assert!(result.is_err(), "an import must be refused, not resolved from disk");
+    }
+
+    #[tokio::test]
+    async fn execute_stops_a_script_that_outlives_its_wall_clock_budget() {
+        struct SlowGateway;
+        impl VerbGateway for SlowGateway {
+            fn run_verb(&self, _args: &[String]) -> Result<serde_json::Value, crate::gateway::GatewayError> {
+                std::thread::sleep(Duration::from_millis(30));
+                Ok(json!({"ok": true}))
+            }
+        }
+        let gateway: Arc<dyn VerbGateway> = Arc::new(SlowGateway);
+        let script = r#"loop { get_work("tsk-1"); }"#;
+        let result = tokio::task::spawn_blocking(move || run_script_within(gateway, script, Duration::from_millis(100)))
+            .await
+            .unwrap();
+        let message = result.expect_err("a script past its budget must be terminated");
+        assert!(message.contains("Script terminated"), "expected the terminated error, got: {message}");
     }
 
     #[tokio::test]

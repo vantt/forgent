@@ -77,7 +77,7 @@ spec states what an actor expects to be able to do, never how it is drawn.
   whenever the gateway process is running. Start and stop it with
   `fgos gateway start` and `fgos gateway stop`; it is detached from the CLI
   and **outlives the cockpit pane** — closing that pane does not stop it. Static serving defaults ON (`herdrWebDashboard.staticServing`); the gateway started with `fgos gateway start` listens on the
-  configured bind address (default reaches beyond loopback — binds 0.0.0.0 by default, bind address configurable, warns when non-loopback) and on port
+  configured bind address (binds 127.0.0.1 by default; reaching it from other machines is an explicit `gateway.bind`, which warns when non-loopback) and on port
   4170 by default (`gateway.port` overrides it).
 - **No outbound trigger exists.** Nothing notifies the person that a question
   is waiting; they have to come and look. A push/attention channel is a
@@ -236,8 +236,8 @@ leaving a reader to discover them:
 - **R4.** The token is never stored anywhere that is committed. It comes from
   the environment when set; otherwise it is generated into a local file that
   is excluded from version control and readable only by its owner.
-- **R5.** Static serving defaults ON (`herdrWebDashboard.staticServing`), while gateway lifecycle is controlled by `fgos gateway start`; its default bind reaches
-  beyond loopback (binds 0.0.0.0 by default, bind address configurable), with a warning raised when the bind is not loopback.
+- **R5.** Static serving defaults ON (`herdrWebDashboard.staticServing`), while gateway lifecycle is controlled by `fgos gateway start`; its default bind is
+  loopback (127.0.0.1); reaching it beyond this machine is an explicit `gateway.bind`, with a warning raised when the bind is not loopback. Every request that can change state records its caller (the Cloudflare Access identity or a short fingerprint of the bearer token) on the gateway's stderr, and `ask` and `answer` carry it as their `--source`.
   Its port defaults to 4170; the override is `gateway.port`.
 - **R6.** The dashboard's lifetime is independent of the cockpit's. Closing a
   cockpit pane does not stop it (it runs as a child process outliving the cockpit pane).

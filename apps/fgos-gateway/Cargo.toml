@@ -17,7 +17,7 @@ serde_json = "1.0"
 # tsk-7l9-2 D8: fgos-gateway's first async dependency -- the gateway's REST
 # surface (D1/D7) is what needs one; the TUI/orchestrator code stays fully
 # synchronous and untouched.
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "process", "net", "time", "fs"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "process", "net", "time", "fs", "sync"] }
 # tsk-7l9-3: bumped 0.7 -> 0.8 -- required by `rmcp`'s streamable-http-server
 # transport (mcp.rs), which only supports axum ^0.8. Breaking route-syntax
 # change (`:id` -> `{id}`) rewritten across every existing route in
@@ -50,7 +50,7 @@ fgos-config = { path = "../../packages/config/rust" }
 # CONTEXT.md) is not guaranteed to share origin with the gateway. Version
 # resolved by `cargo add --dry-run` against this crate's existing axum 0.8
 # dependency graph (docs/history/tsk-54y-gateway-cors-bind/plan.md).
-tower-http = { version = "0.7", features = ["cors", "fs"] }
+tower-http = { version = "0.7", features = ["cors"] }
 # tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
 # CONTEXT.md): embeds apps/fgos-gateway/web's built bundle into the binary so
 # the "máy được chọn" can serve it with no separate deploy step.
@@ -78,6 +78,8 @@ axum-embed = "0.1"
 jsonwebtoken = { version = "11", default-features = false, features = ["use_pem", "aws_lc_rs"] }
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }
 base64 = "0.23"
+# Short one-way fingerprint of the bearer token for the caller record (already in the lock via the TLS stack).
+sha2 = "0.10"
 herdr-fgos-common = { path = "../../packages/herdr-fgos-common/rust" }
 fgos-host-runtime = { path = "../../packages/host-runtime/rust" }
 fgos-distribution = { path = "../../packages/distribution/rust" }

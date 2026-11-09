@@ -48,6 +48,12 @@ const CERTS_PATH: &str = "cdn-cgi/access/certs";
 /// signing keys and keeps the previous ones live well beyond this window, so an
 /// hour bounds staleness without refetching on every request.
 const JWKS_TTL: Duration = Duration::from_secs(3600);
+/// How long a JWKS fetch may take before it is abandoned. The assertion is checked on every
+/// authenticated request that carries one, so a stalled endpoint must not hold requests open.
+const FETCH_TIMEOUT: Duration = Duration::from_secs(10);
+/// How long a failed JWKS fetch is remembered: requests inside the window fail at once instead of
+/// each waiting on (and hammering) an endpoint that just failed.
+const FETCH_FAILURE_TTL: Duration = Duration::from_secs(30);
 
 /// Why a `Cf-Access-Jwt-Assertion` was not accepted. Every variant is a hard
 /// "not authenticated" — callers treat all of them identically (fail closed).
@@ -110,6 +116,8 @@ struct CfClaims {
 struct JwksCache {
     keys: HashMap<String, DecodingKey>,
     fetched_at: Option<Instant>,
+    /// When and why the last fetch failed; cleared by the next success.
+    failed: Option<(Instant, String)>,
 }
 
 /// Verifies `Cf-Access-Jwt-Assertion` headers for one configured CF Access
@@ -137,7 +145,14 @@ impl CfAccessVerifier {
     /// Build a verifier. `team_domain` is the full origin
     /// (e.g. `https://team.cloudflareaccess.com`); `aud` is the Access
     /// Application Audience tag.
-    pub fn new(client: reqwest::Client, team_domain: String, aud: String) -> Self {
+    pub fn new(team_domain: String, aud: String) -> Self {
+        Self::with_fetch_timeout(team_domain, aud, FETCH_TIMEOUT)
+    }
+
+    fn with_fetch_timeout(team_domain: String, aud: String, timeout: Duration) -> Self {
+        // `Client::builder().build()` fails only when the TLS backend cannot initialise, the same
+        // condition under which `Client::new()` panics.
+        let client = reqwest::Client::builder().timeout(timeout).build().expect("reqwest client with the rustls backend");
         // Normalize once so the JWKS fetch and the `iss` check always agree: a
         // trailing slash on the configured domain must not let the fetch succeed
         // while the `iss` comparison silently never matches.
@@ -146,7 +161,7 @@ impl CfAccessVerifier {
             client,
             team_domain,
             aud,
-            cache: Mutex::new(JwksCache { keys: HashMap::new(), fetched_at: None }),
+            cache: Mutex::new(JwksCache { keys: HashMap::new(), fetched_at: None, failed: None }),
         }
     }
 
@@ -175,8 +190,20 @@ impl CfAccessVerifier {
                     return cache.keys.get(kid).cloned().ok_or(CfAccessError::UnknownKid);
                 }
             }
+            if let Some((at, why)) = &cache.failed {
+                if at.elapsed() < FETCH_FAILURE_TTL {
+                    return Err(CfAccessError::Fetch(why.clone()));
+                }
+            }
         }
-        let jwks = self.fetch_jwks().await?;
+        let jwks = match self.fetch_jwks().await {
+            Ok(jwks) => jwks,
+            Err(CfAccessError::Fetch(why)) => {
+                self.cache.lock().unwrap().failed = Some((Instant::now(), why.clone()));
+                return Err(CfAccessError::Fetch(why));
+            }
+            Err(other) => return Err(other),
+        };
         let mut keys = HashMap::new();
         for jwk in jwks.keys {
             if let Ok(dk) = DecodingKey::from_rsa_components(&jwk.n, &jwk.e) {
@@ -186,6 +213,7 @@ impl CfAccessVerifier {
         let mut cache = self.cache.lock().unwrap();
         cache.keys = keys;
         cache.fetched_at = Some(Instant::now());
+        cache.failed = None;
         cache.keys.get(kid).cloned().ok_or(CfAccessError::UnknownKid)
     }
 
@@ -283,7 +311,7 @@ pub(crate) fn test_verifier_with_valid_token() -> (CfAccessVerifier, String) {
     use jsonwebtoken::{encode, EncodingKey, Header};
     use std::time::{SystemTime, UNIX_EPOCH};
 
-    let verifier = CfAccessVerifier::new(reqwest::Client::new(), TEST_TEAM.to_string(), TEST_AUD.to_string());
+    let verifier = CfAccessVerifier::new(TEST_TEAM.to_string(), TEST_AUD.to_string());
     verifier.seed_test_key(TEST_KID, DecodingKey::from_rsa_components(TEST_N, TEST_E).unwrap());
 
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
@@ -517,7 +545,7 @@ mod tests {
         // An operator who configures the team domain with a trailing slash must
         // still authenticate tokens whose `iss` is the domain without the slash:
         // the JWKS fetch and the `iss` check both use the normalized value.
-        let verifier = CfAccessVerifier::new(reqwest::Client::new(), format!("{TEST_TEAM}/"), TEST_AUD.to_string());
+        let verifier = CfAccessVerifier::new(format!("{TEST_TEAM}/"), TEST_AUD.to_string());
         verifier.seed_test_key(TEST_KID, test_key());
         let token = sign(&base_claims());
         let id = verifier.verify(&token).await.unwrap();
@@ -529,7 +557,7 @@ mod tests {
         // Seed a fresh cache, then verify end-to-end. A cache hit means no JWKS
         // fetch happens, so this exercises the full async path offline and
         // proves the cache is consulted rather than refetched every call.
-        let verifier = CfAccessVerifier::new(reqwest::Client::new(), TEST_TEAM.to_string(), TEST_AUD.to_string());
+        let verifier = CfAccessVerifier::new(TEST_TEAM.to_string(), TEST_AUD.to_string());
         {
             let mut cache = verifier.cache.lock().unwrap();
             cache.keys.insert(TEST_KID.to_string(), test_key());
@@ -544,12 +572,50 @@ mod tests {
     async fn fresh_cache_missing_kid_is_unknown_kid_without_network() {
         // Fresh cache that lacks the token's kid must fail closed as UnknownKid
         // without attempting a fetch (the client points nowhere useful here).
-        let verifier = CfAccessVerifier::new(reqwest::Client::new(), TEST_TEAM.to_string(), TEST_AUD.to_string());
+        let verifier = CfAccessVerifier::new(TEST_TEAM.to_string(), TEST_AUD.to_string());
         {
             let mut cache = verifier.cache.lock().unwrap();
             cache.fetched_at = Some(Instant::now());
         }
         let token = sign(&base_claims());
         assert!(matches!(verifier.verify(&token).await, Err(CfAccessError::UnknownKid)));
+    }
+
+    /// A TCP endpoint that accepts connections and never answers, counting them.
+    async fn stalled_endpoint() -> (String, std::sync::Arc<std::sync::atomic::AtomicUsize>) {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let origin = format!("http://{}", listener.local_addr().unwrap());
+        let accepted = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let seen = accepted.clone();
+        tokio::spawn(async move {
+            let mut held = Vec::new();
+            while let Ok((socket, _)) = listener.accept().await {
+                seen.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                held.push(socket);
+            }
+        });
+        (origin, accepted)
+    }
+
+    #[tokio::test]
+    async fn a_stalled_jwks_endpoint_times_out_instead_of_holding_the_request() {
+        let (origin, _) = stalled_endpoint().await;
+        let verifier = CfAccessVerifier::with_fetch_timeout(origin, TEST_AUD.to_string(), Duration::from_millis(200));
+        let started = Instant::now();
+        let outcome = verifier.verify(&sign(&base_claims())).await;
+        assert!(matches!(outcome, Err(CfAccessError::Fetch(_))), "got {outcome:?}");
+        assert!(started.elapsed() < Duration::from_secs(5), "the fetch must give up at its own timeout");
+    }
+
+    #[tokio::test]
+    async fn a_failed_jwks_fetch_is_remembered_so_the_next_request_does_not_fetch_again() {
+        let (origin, accepted) = stalled_endpoint().await;
+        let verifier = CfAccessVerifier::with_fetch_timeout(origin, TEST_AUD.to_string(), Duration::from_millis(200));
+        let token = sign(&base_claims());
+        assert!(matches!(verifier.verify(&token).await, Err(CfAccessError::Fetch(_))));
+        let started = Instant::now();
+        assert!(matches!(verifier.verify(&token).await, Err(CfAccessError::Fetch(_))));
+        assert!(started.elapsed() < Duration::from_millis(100), "a remembered failure answers at once");
+        assert_eq!(accepted.load(std::sync::atomic::Ordering::SeqCst), 1, "only the first request reached the endpoint");
     }
 }

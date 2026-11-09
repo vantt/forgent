@@ -28,11 +28,11 @@ use axum::http::{HeaderMap, StatusCode};
 use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, get, post};
-use axum::{Json, Router};
+use axum::{Extension, Json, Router};
 use serde::Deserialize;
 use tower_http::cors::{Any, CorsLayer};
-use tower_http::services::{ServeDir, ServeFile};
 use serde_json::{json, Value};
+use tokio::sync::Semaphore;
 
 use crate::ports::VerbGateway;
 
@@ -134,7 +134,7 @@ pub fn load_gateway_config(home_dir: Option<&Path>) -> Result<GatewayConfig, Gat
     let text = |key: &str| section[key].as_str().map(str::to_string);
     let cf_access = match (text("cfAccessTeamDomain"), text("cfAccessAud")) {
         (Some(team_domain), Some(aud)) => {
-            Some(crate::cf_access::CfAccessVerifier::new(reqwest::Client::new(), team_domain, aud))
+            Some(crate::cf_access::CfAccessVerifier::new(team_domain, aud))
         }
         (None, None) => None,
         (Some(_), None) | (None, Some(_)) => return Err(GatewayConfigError::PartialCfAccess),
@@ -218,6 +218,9 @@ impl ErrorCategory {
 /// `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`'s `ErrorEnvelope` shape.
 #[derive(Debug)]
 pub struct GatewayError {
+    /// Overrides the category's own HTTP status when the failure is the
+    /// service's, not the request's (an install without a usable `fgos` shim).
+    pub status: Option<StatusCode>,
     pub category: ErrorCategory,
     pub message: String,
     pub exit_code: Option<i32>,
@@ -226,7 +229,19 @@ pub struct GatewayError {
 impl GatewayError {
     pub(crate) fn validation(message: impl Into<String>) -> Self {
         GatewayError {
+            status: None,
             category: ErrorCategory::Validation,
+            message: message.into(),
+            exit_code: None,
+        }
+    }
+
+    /// The workspace has no usable `fgos` shim: the gateway cannot serve any verb until
+    /// `fgctl init` runs, so the request is refused as unavailable, not as a bad request.
+    pub(crate) fn unavailable(message: impl Into<String>) -> Self {
+        GatewayError {
+            status: Some(StatusCode::SERVICE_UNAVAILABLE),
+            category: ErrorCategory::Precondition,
             message: message.into(),
             exit_code: None,
         }
@@ -234,6 +249,7 @@ impl GatewayError {
 
     pub(crate) fn unexpected(message: impl Into<String>) -> Self {
         GatewayError {
+            status: None,
             category: ErrorCategory::Unexpected,
             message: message.into(),
             exit_code: None,
@@ -267,7 +283,7 @@ impl GatewayError {
 
 impl IntoResponse for GatewayError {
     fn into_response(self) -> Response {
-        let status = self.category.http_status();
+        let status = self.status.unwrap_or_else(|| self.category.http_status());
         self.into_response_with_status(status)
     }
 }
@@ -333,35 +349,6 @@ fn wait_with_timeout(
     }
 }
 
-/// tsk-og6: builds the exact `Command` `spawn_fgos_verb` runs, split out so
-/// its `current_dir` is directly testable (`Command::get_current_dir`)
-/// without spawning a real `node` process. `--dir <root>` alone is not
-/// enough — `session start/end/list/gc` and `move --to delivered`'s
-/// unmerged-branch guard both resolve their own repo root from
-/// `process.cwd()` instead of reading `--dir` (`bin/fgos.mjs:4559,1497`),
-/// so the spawned child's OWN working directory has to agree with `root`
-/// too, or those two verbs silently act on wherever the gateway process
-/// happened to be launched from.
-fn build_fgos_command(root: &Path, args: &[String]) -> std::process::Command {
-    let fgos_bin = herdr_fgos_common::fgos::resolve_fgos(root).unwrap_or_else(|_| root.join("bin/fgos.mjs"));
-    if herdr_fgos_common::fgos::is_tier_zero(root, &fgos_bin) {
-        let mut cmd = std::process::Command::new(&fgos_bin);
-        cmd.args(args);
-        cmd.arg("--dir").arg(root);
-        cmd.current_dir(root).stdin(Stdio::null());
-        cmd
-    } else {
-        let mut cmd_args: Vec<String> = vec![fgos_bin.to_string_lossy().to_string()];
-        cmd_args.extend(args.iter().cloned());
-        cmd_args.push("--dir".to_string());
-        cmd_args.push(root.to_string_lossy().to_string());
-
-        let mut cmd = std::process::Command::new("node");
-        cmd.args(&cmd_args).current_dir(root).stdin(Stdio::null());
-        cmd
-    }
-}
-
 /// D7: the sole function that ever spawns `fgos <verb>` on the gateway's
 /// behalf. `args` is everything after the binary path (verb + its own
 /// flags) — `--dir <root>` is appended here, once, so no call site can
@@ -375,10 +362,15 @@ fn build_fgos_command(root: &Path, args: &[String]) -> std::process::Command {
 /// `VERB_SPAWN_TIMEOUT` via `wait_with_timeout` instead of a bare
 /// `.output()` — a wedged verb can no longer pin this thread forever.
 pub fn spawn_fgos_verb(root: &Path, args: &[String]) -> Result<Value, GatewayError> {
-    // tsk-og6 + tsk-4lf combined: build_fgos_command's own current_dir(root)
-    // still applies to the piped/spawned child wait_with_timeout needs --
-    // current_dir and the timeout wrapper are orthogonal, both required.
-    let child = build_fgos_command(root, args)
+    // `fgos_command` runs the child in `root` (verbs such as `session` and
+    // `move --to delivered` resolve their repo from the working directory,
+    // not `--dir`); the timeout wrapper below is orthogonal to that.
+    let args: Vec<&str> = args.iter().map(String::as_str).collect();
+    let child = herdr_fgos_common::fgos::fgos_command(root, &args)
+        .map_err(|err| match err.kind() {
+            std::io::ErrorKind::NotFound => GatewayError::unavailable(err.to_string()),
+            _ => GatewayError::unexpected(format!("building the fgos command failed: {err}")),
+        })?
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -386,6 +378,7 @@ pub fn spawn_fgos_verb(root: &Path, args: &[String]) -> Result<Value, GatewayErr
 
     let (status, stdout, stderr) =
         wait_with_timeout(child, VERB_SPAWN_TIMEOUT, VERB_SPAWN_POLL_INTERVAL).map_err(|()| GatewayError {
+            status: None,
             category: ErrorCategory::Busy,
             message: format!(
                 "fgos CLI did not finish within {VERB_SPAWN_TIMEOUT:?} and was killed -- try again"
@@ -397,6 +390,7 @@ pub fn spawn_fgos_verb(root: &Path, args: &[String]) -> Result<Value, GatewayErr
         let code = status.code().unwrap_or(1);
         let message = String::from_utf8_lossy(&stderr).trim().to_string();
         return Err(GatewayError {
+            status: None,
             category: ErrorCategory::from_exit_code(code),
             message: if message.is_empty() {
                 format!("fgos CLI exited with code {code}")
@@ -444,19 +438,59 @@ async fn run_verb_blocking(
 // Auth middleware (D4)
 // ---------------------------------------------------------------------------
 
+/// Who a request is, once it passed `require_token`: `cf:<identity>` for a verified Cloudflare
+/// Access assertion, `token:<fingerprint>` for the bearer token. Never the token itself.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Caller(String);
+
+impl Caller {
+    /// The `--source` value a verb that takes one records for this caller.
+    fn source(&self) -> String {
+        format!("gateway:{}", self.0)
+    }
+}
+
+/// A short, stable, one-way fingerprint of the bearer token: enough to tell two tokens apart in a
+/// record, useless for recovering the token.
+fn bearer_fingerprint(token: &str) -> String {
+    use sha2::{Digest, Sha256};
+    let digest = Sha256::digest(token.as_bytes());
+    let hex: String = digest.iter().take(6).map(|byte| format!("{byte:02x}")).collect();
+    format!("token:{hex}")
+}
+
+/// Only requests that can change state are recorded; reads are not.
+fn is_recorded_method(method: &str) -> bool {
+    !matches!(method, "GET" | "HEAD" | "OPTIONS")
+}
+
+fn caller_record_line(caller: &Caller, method: &str, path: &str) -> String {
+    format!("fgOS gateway: {} {method} {path}", caller.0)
+}
+
+/// Stamps the caller on the request (handlers read it as `Extension<Caller>`) and, for a request
+/// that can change state, writes one record line on the gateway's own stderr.
+async fn admit(caller: Caller, mut request: axum::extract::Request, next: Next) -> Response {
+    if is_recorded_method(request.method().as_str()) {
+        eprintln!("{}", caller_record_line(&caller, request.method().as_str(), request.uri().path()));
+    }
+    request.extensions_mut().insert(caller);
+    next.run(request).await
+}
+
 async fn require_token(
     State(state): State<AppState>,
     headers: HeaderMap,
     request: axum::extract::Request,
     next: Next,
 ) -> Response {
-    let bearer_ok = headers
+    let bearer = headers
         .get(axum::http::header::AUTHORIZATION)
         .and_then(|v| v.to_str().ok())
         .and_then(|v| v.strip_prefix("Bearer "))
-        .is_some_and(|token| constant_time_eq(token.as_bytes(), state.config.token.as_bytes()));
-    if bearer_ok {
-        return next.run(request).await;
+        .filter(|token| constant_time_eq(token.as_bytes(), state.config.token.as_bytes()));
+    if let Some(token) = bearer {
+        return admit(Caller(bearer_fingerprint(token)), request, next).await;
     }
 
     // tsk-6arn (D8): cf-access is an ADDITIVE alternate credential,
@@ -467,8 +501,8 @@ async fn require_token(
     // different failure response.
     if let Some(verifier) = state.config.cf_access.as_ref() {
         if let Some(assertion) = headers.get("Cf-Access-Jwt-Assertion").and_then(|v| v.to_str().ok()) {
-            if verifier.verify(assertion).await.is_ok() {
-                return next.run(request).await;
+            if let Ok(identity) = verifier.verify(assertion).await {
+                return admit(Caller(format!("cf:{identity}")), request, next).await;
             }
         }
     }
@@ -481,6 +515,7 @@ async fn require_token(
     // framing tsk-18to's original description carried from a cookie-
     // session design (tsk-k4v) that never shipped (tsk-6arn RESEARCH.md).
     GatewayError {
+        status: None,
         category: ErrorCategory::Validation,
         message: "missing or invalid Authorization: Bearer <token> (D4: one token per machine, see ~/.fgos/private/gateway-token) -- or a valid Cf-Access-Jwt-Assertion, when cf-access is configured (D8)".to_string(),
         exit_code: None,
@@ -860,7 +895,12 @@ async fn get_work_docs(State(state): State<AppState>, AxPath(id): AxPath<String>
         ));
     }
 
-    let read_optional = |name: &str| -> Option<String> { std::fs::read_to_string(resolved.join(name)).ok() };
+    // A file inside the directory can itself be a link: read what it resolves to only when that
+    // still lies under docs/history/.
+    let read_optional = |name: &str| -> Option<String> {
+        let file = resolved.join(name).canonicalize().ok()?;
+        file.starts_with(&docs_history_root).then(|| std::fs::read_to_string(file).ok()).flatten()
+    };
 
     Ok(Json(stamp(json!({
         "docsRef": docs_ref,
@@ -899,11 +939,20 @@ struct TextBody {
 
 async fn post_work_ask(
     State(state): State<AppState>,
+    Extension(caller): Extension<Caller>,
     AxPath(id): AxPath<String>,
     AppJson(body): AppJson<TextBody>,
 ) -> Result<Json<Value>, GatewayError> {
     reject_leading_dash(&id, "id")?;
-    let args = vec!["ask".to_string(), id, "--text".to_string(), body.text, "--json".to_string()];
+    let args = vec![
+        "ask".to_string(),
+        id,
+        "--text".to_string(),
+        body.text,
+        "--source".to_string(),
+        caller.source(),
+        "--json".to_string(),
+    ];
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
 }
@@ -917,6 +966,7 @@ struct AnswerWorkBody {
 
 async fn post_work_answer(
     State(state): State<AppState>,
+    Extension(caller): Extension<Caller>,
     AxPath(id): AxPath<String>,
     AppJson(body): AppJson<AnswerWorkBody>,
 ) -> Result<Json<Value>, GatewayError> {
@@ -925,6 +975,8 @@ async fn post_work_answer(
     if body.approve == Some(true) {
         args.push("--approve".to_string());
     }
+    args.push("--source".to_string());
+    args.push(caller.source());
     args.push("--json".to_string());
     let data = run_verb_blocking(state.gateway, args).await?;
     Ok(Json(data))
@@ -1096,9 +1148,9 @@ async fn get_session_slots(
 async fn post_runner_tick(State(state): State<AppState>) -> Result<Json<Value>, GatewayError> {
     let root = state.root.clone();
     let result = tokio::task::spawn_blocking(move || {
-        let host = herdr_fgos_common::fgos::resolve_fgos(&root)
-            .map_err(|err| GatewayError::unexpected(format!("resolving fgos failed: {err}")))?;
-        let shims = host.parent().map_or_else(|| root.clone(), Path::to_path_buf);
+        let host = herdr_fgos_common::fgos::fgos_command(&root, &[])
+            .map_err(|err| GatewayError::unavailable(err.to_string()))?;
+        let shims = Path::new(host.get_program()).parent().map_or_else(|| root.clone(), Path::to_path_buf);
         let output = std::process::Command::new(shims.join("fgos-runner"))
             .arg("--once")
             .current_dir(&root)
@@ -1110,6 +1162,7 @@ async fn post_runner_tick(State(state): State<AppState>) -> Result<Json<Value>, 
             let code = output.status.code().unwrap_or(1);
             let message = String::from_utf8_lossy(&output.stderr).trim().to_string();
             return Err(GatewayError {
+                status: None,
                 category: ErrorCategory::from_exit_code(code),
                 message: if message.is_empty() {
                     format!("fgos-runner exited with code {code}")
@@ -1175,6 +1228,28 @@ async fn get_contract(State(state): State<AppState>) -> Response {
 /// multi-project routing within one process is future work, not designed
 /// here).
 pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: PathBuf) -> Router {
+    build_router_with_cap(gateway, config, root, MAX_IN_FLIGHT_REQUESTS)
+}
+
+/// Authenticated requests running at once. Each verb call holds a blocking thread and a spawned
+/// `fgos` process, so a flood must be refused, not queued behind them.
+const MAX_IN_FLIGHT_REQUESTS: usize = 32;
+
+/// A request over the in-flight cap is refused as busy at once.
+async fn limit_in_flight(State(permits): State<Arc<Semaphore>>, request: Request, next: Next) -> Response {
+    let Ok(_permit) = permits.try_acquire() else {
+        return GatewayError {
+            status: None,
+            category: ErrorCategory::Busy,
+            message: "too many requests in flight -- try again".to_string(),
+            exit_code: None,
+        }
+        .into_response();
+    };
+    next.run(request).await
+}
+
+fn build_router_with_cap(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: PathBuf, cap: usize) -> Router {
     let config = Arc::new(config);
     let state = AppState {
         gateway,
@@ -1210,6 +1285,7 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
         .route("/runner/tick", post(post_runner_tick))
         .route("/runtime", get(get_runtime))
         .nest_service("/mcp", mcp_service)
+        .route_layer(middleware::from_fn_with_state(Arc::new(Semaphore::new(cap)), limit_in_flight))
         .route_layer(middleware::from_fn_with_state(state.clone(), require_token));
 
     // tsk-4uh: the contract's `servers.url` (docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml:54-59) and this file's own startup log (`run`, below) both
@@ -1261,33 +1337,26 @@ struct WebAssets;
 /// unmatched route still gets axum's own default empty-body 404 (no
 /// `.fallback()` was set on `build_router`'s own output before this
 /// wrapper existed; confirmed by reading `build_router` directly, not
-/// assumed). When `true`:
-/// an on-disk `<static_dir>/index.html` (dev override, e.g. `vite`'s dev
-/// build copied next to the binary) takes priority over the embedded
-/// bundle; otherwise the compiled-in [`WebAssets`] serves. Both branches
-/// SPA-fallback an unmatched path to `index.html` with 200, matching the
+/// assumed). When `true`: the compiled-in [`WebAssets`] serves (never a
+/// directory relative to the working directory, which would let whatever
+/// the process was launched from replace the dashboard), and an unmatched
+/// path SPA-falls back to `index.html` with 200, matching the
 /// reference implementation's own router (`herdr-gateway/src/web/mod.rs:
 /// 97-113`) this is ported from. The fallback only ever catches a route
 /// `build_router`'s own `/v1/*` tree did NOT match -- every `/v1/*` route
 /// keeps its existing `require_token` gate untouched, since `.nest("/v1",
 /// ...)` inside `build_router` already claims that whole prefix before
 /// this fallback is ever consulted.
-pub fn with_static_serving(router: Router, enabled: bool, static_dir: &Path) -> Router {
+pub fn with_static_serving(router: Router, enabled: bool) -> Router {
     if !enabled {
         return router;
     }
-    let index = static_dir.join("index.html");
-    if index.exists() {
-        let spa = ServeDir::new(static_dir).fallback(ServeFile::new(index));
-        router.fallback_service(spa)
-    } else {
-        let embedded = axum_embed::ServeEmbed::<WebAssets>::with_parameters(
-            Some("index.html".to_string()),
-            axum_embed::FallbackBehavior::Ok,
-            Some("index.html".to_string()),
-        );
-        router.fallback_service(embedded)
-    }
+    let embedded = axum_embed::ServeEmbed::<WebAssets>::with_parameters(
+        Some("index.html".to_string()),
+        axum_embed::FallbackBehavior::Ok,
+        Some("index.html".to_string()),
+    );
+    router.fallback_service(embedded)
 }
 
 /// Runs the gateway to completion (i.e. forever, until the process is
@@ -1298,8 +1367,8 @@ pub fn with_static_serving(router: Router, enabled: bool, static_dir: &Path) -> 
 pub fn run(root: PathBuf) -> std::io::Result<()> {
     let config = load_gateway_config(None).map_err(std::io::Error::other)?;
     // D7: warn, don't refuse, when the resolved bind is not loopback --
-    // this is the intended LAN/Tailscale-reachable default (DEFAULT_BIND),
-    // not a misconfiguration. `eprintln!` matches this function's own
+    // reaching the gateway from the LAN or Tailscale is an explicit
+    // `gateway.bind` choice, not a misconfiguration. `eprintln!` matches this function's own
     // existing startup-log idiom below rather than introducing a logging
     // crate this binary does not otherwise depend on.
     if !config.bind.is_loopback() {
@@ -1315,7 +1384,7 @@ pub fn run(root: PathBuf) -> std::io::Result<()> {
     // `settings::WebDashboardSettings`'s own doc comment.
     let web_settings = herdr_fgos_common::settings::read_web_dashboard_settings(&root);
     let router = build_router(gateway, config, root);
-    let router = with_static_serving(router, web_settings.static_serving, Path::new("static"));
+    let router = with_static_serving(router, web_settings.static_serving);
 
     let runtime = tokio::runtime::Runtime::new()?;
     runtime.block_on(async move {
@@ -1330,11 +1399,35 @@ mod tests {
     use super::*;
     use std::net::Ipv4Addr;
 
-    #[test]
-    fn build_fgos_command_runs_in_root_not_the_ambient_process_cwd() {
-        let root = PathBuf::from("/tmp/fgos-gateway-test-root");
-        let cmd = build_fgos_command(&root, &["list".to_string()]);
-        assert_eq!(cmd.get_current_dir(), Some(root.as_path()));
+    /// The working directory and `--dir` of a spawned verb are owned by
+    /// `fgos_command`'s own proof; here only the refusal reaching the client is
+    /// proved: no usable shim is a 503 naming `fgctl init`, never a node fallback.
+    #[tokio::test]
+    async fn a_workspace_without_a_shim_answers_503_naming_fgctl_init() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let root = std::env::temp_dir().join(format!("fgos-gateway-no-shim-{}", std::process::id()));
+        std::fs::create_dir_all(&root).unwrap();
+        let gateway: Arc<dyn VerbGateway> = Arc::new(FgosCliGateway { root: root.clone() });
+        let app = build_router(gateway, test_config(), root.clone());
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/v1/ready")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let body: Value = serde_json::from_slice(&body).unwrap();
+        assert!(body["message"].as_str().unwrap().contains("fgctl init"), "body: {body}");
+        std::fs::remove_dir_all(&root).ok();
     }
 
     #[test]
@@ -1832,15 +1925,14 @@ mod tests {
         std::fs::remove_dir_all(&home).ok();
     }
 
-    /// tsk-54y (D7): a global config with no `gateway.bind` field
-    /// must resolve to the locked default (`0.0.0.0`, reachable from other
-    /// machines), not the old hardcoded loopback-only behavior.
+    /// A global config with no `gateway.bind` field resolves to loopback:
+    /// reaching the gateway from another machine is an explicit choice.
     #[test]
-    fn load_gateway_config_resolves_default_bind_when_absent() {
+    fn load_gateway_config_resolves_loopback_bind_when_absent() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-bind-default-{}", std::process::id()));
         write_test_home_config(&home, "");
         let config = load_gateway_config(Some(&home)).expect("a token-only config must still load");
-        assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::UNSPECIFIED));
+        assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::LOCALHOST));
         std::fs::remove_dir_all(&home).ok();
     }
 
@@ -1848,9 +1940,9 @@ mod tests {
     #[test]
     fn load_gateway_config_resolves_explicit_bind_override() {
         let home = std::env::temp_dir().join(format!("fgos-gateway-bind-override-{}", std::process::id()));
-        write_test_home_config(&home, r#""bind":"127.0.0.1""#);
+        write_test_home_config(&home, r#""bind":"0.0.0.0""#);
         let config = load_gateway_config(Some(&home)).expect("a valid bind override must load");
-        assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::LOCALHOST));
+        assert_eq!(config.bind, IpAddr::V4(Ipv4Addr::UNSPECIFIED));
         std::fs::remove_dir_all(&home).ok();
     }
 
@@ -1942,9 +2034,9 @@ mod tests {
         );
     }
 
-    // tsk-48w: `with_static_serving` -- gated by the `herdrWebDashboard.
-    // staticServing` toggle (settings.rs), disabled per-test unless the
-    // test itself is about the enabled path.
+    // `with_static_serving` -- gated by the `herdrWebDashboard.staticServing`
+    // toggle (settings.rs). It serves the compiled-in bundle only, never a
+    // directory relative to the process's working directory.
 
     #[tokio::test]
     async fn static_serving_disabled_leaves_unmatched_route_as_plain_404() {
@@ -1954,7 +2046,7 @@ mod tests {
 
         let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
         let router = build_router(gateway, test_config(), PathBuf::from("/tmp"));
-        let router = with_static_serving(router, false, Path::new("static"));
+        let router = with_static_serving(router, false);
 
         let response = router
             .oneshot(Request::builder().uri("/some/unmatched/path").body(Body::empty()).unwrap())
@@ -1971,12 +2063,7 @@ mod tests {
 
         let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
         let router = build_router(gateway, test_config(), PathBuf::from("/tmp"));
-        // A static_dir with no index.html forces the embedded-bundle
-        // branch (WebAssets, compiled from apps/fgos-gateway/static/) rather
-        // than the on-disk dev-override branch.
-        let empty_dir = std::env::temp_dir().join(format!("fgos-gateway-embed-test-{}", std::process::id()));
-        std::fs::create_dir_all(&empty_dir).unwrap();
-        let router = with_static_serving(router, true, &empty_dir);
+        let router = with_static_serving(router, true);
 
         let response = router
             .oneshot(Request::builder().uri("/dashboard").body(Body::empty()).unwrap())
@@ -1987,34 +2074,6 @@ mod tests {
             StatusCode::OK,
             "SPA fallback must serve index.html (200), not 404, for an unmatched client route"
         );
-        std::fs::remove_dir_all(&empty_dir).ok();
-    }
-
-    #[tokio::test]
-    async fn static_serving_enabled_prefers_the_on_disk_override_over_the_embedded_bundle() {
-        use axum::body::Body;
-        use axum::http::Request;
-        use tower::ServiceExt;
-
-        let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
-        let router = build_router(gateway, test_config(), PathBuf::from("/tmp"));
-        let dev_dir = std::env::temp_dir().join(format!("fgos-gateway-override-test-{}", std::process::id()));
-        std::fs::create_dir_all(&dev_dir).unwrap();
-        let marker = "FGOS_DEV_OVERRIDE_MARKER_TSK_48W";
-        std::fs::write(dev_dir.join("index.html"), format!("<html>{marker}</html>")).unwrap();
-        let router = with_static_serving(router, true, &dev_dir);
-
-        let response = router
-            .oneshot(Request::builder().uri("/dashboard").body(Body::empty()).unwrap())
-            .await
-            .unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
-        assert!(
-            String::from_utf8_lossy(&body).contains(marker),
-            "an on-disk <static_dir>/index.html must override the embedded bundle, not the other way around"
-        );
-        std::fs::remove_dir_all(&dev_dir).ok();
     }
 
     #[tokio::test]
@@ -2025,7 +2084,7 @@ mod tests {
 
         let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({"items": []})) });
         let router = build_router(gateway, test_config(), PathBuf::from("/tmp"));
-        let router = with_static_serving(router, true, Path::new("static"));
+        let router = with_static_serving(router, true);
 
         // Unauthenticated -- must still be rejected by require_token, never
         // silently served the SPA fallback instead.
@@ -2255,7 +2314,16 @@ mod tests {
         assert_eq!(captured.len(), 1);
         assert_eq!(
             captured[0],
-            vec!["answer".to_string(), "tsk-123".to_string(), "--text".to_string(), "confirmed".to_string(), "--approve".to_string(), "--json".to_string()]
+            vec![
+                "answer".to_string(),
+                "tsk-123".to_string(),
+                "--text".to_string(),
+                "confirmed".to_string(),
+                "--approve".to_string(),
+                "--source".to_string(),
+                format!("gateway:{}", bearer_fingerprint("test-token")),
+                "--json".to_string()
+            ]
         );
     }
 
@@ -2286,7 +2354,15 @@ mod tests {
         assert_eq!(captured.len(), 1);
         assert_eq!(
             captured[0],
-            vec!["answer".to_string(), "tsk-123".to_string(), "--text".to_string(), "clarification only".to_string(), "--json".to_string()]
+            vec![
+                "answer".to_string(),
+                "tsk-123".to_string(),
+                "--text".to_string(),
+                "clarification only".to_string(),
+                "--source".to_string(),
+                format!("gateway:{}", bearer_fingerprint("test-token")),
+                "--json".to_string()
+            ]
         );
     }
 
@@ -2540,5 +2616,145 @@ mod tests {
             matches!(val["runtime"]["host"].as_str(), Some("rust" | "dev-source")),
             "runtime.host must identify either an activated Rust host or dev-source checkout"
         );
+    }
+
+    // ---- caller record, concurrency cap, link-safe file reads ----
+
+    async fn post_json(app: Router, uri: &str, headers: &[(&str, &str)], body: &str) -> Response {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let mut builder = Request::builder().method("POST").uri(uri).header("content-type", "application/json");
+        for (name, value) in headers {
+            builder = builder.header(*name, *value);
+        }
+        app.oneshot(builder.body(Body::from(body.to_string())).unwrap()).await.unwrap()
+    }
+
+    #[tokio::test]
+    async fn a_bearer_ask_records_a_token_fingerprint_and_never_the_token() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response =
+            post_json(app, "/v1/work/tsk-1/ask", &[("authorization", "Bearer test-token")], r#"{"text":"why"}"#).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let captured = capturing.captured.lock().unwrap();
+        let source_at = captured[0].iter().position(|a| a == "--source").expect("ask must carry --source");
+        let source = &captured[0][source_at + 1];
+        assert!(source.starts_with("gateway:token:"), "source: {source}");
+        assert!(!source.contains("test-token"), "the token itself must never be recorded: {source}");
+        assert_eq!(source.len(), "gateway:token:".len() + 12, "a short fixed-length fingerprint: {source}");
+    }
+
+    #[tokio::test]
+    async fn a_cf_access_answer_records_the_verified_identity() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let (verifier, assertion) = crate::cf_access::test_verifier_with_valid_token();
+        let mut config = test_config();
+        config.cf_access = Arc::new(Some(verifier));
+        let app = build_router(gateway, config, PathBuf::from("/tmp"));
+
+        let response =
+            post_json(app, "/v1/work/tsk-1/answer", &[("Cf-Access-Jwt-Assertion", &assertion)], r#"{"text":"ok"}"#).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let captured = capturing.captured.lock().unwrap();
+        let source_at = captured[0].iter().position(|a| a == "--source").expect("answer must carry --source");
+        assert_eq!(captured[0][source_at + 1], "gateway:cf:user@example.com");
+    }
+
+    #[test]
+    fn the_mutation_record_line_names_caller_method_and_path_only() {
+        let line = caller_record_line(&Caller("token:0123456789ab".into()), "POST", "/v1/work/tsk-1/approve");
+        assert_eq!(line, "fgOS gateway: token:0123456789ab POST /v1/work/tsk-1/approve");
+    }
+
+    #[test]
+    fn only_mutating_methods_are_recorded() {
+        for method in ["POST", "PATCH", "PUT", "DELETE"] {
+            assert!(is_recorded_method(method), "{method}");
+        }
+        for method in ["GET", "HEAD", "OPTIONS"] {
+            assert!(!is_recorded_method(method), "{method}");
+        }
+    }
+
+    /// Holds every verb call for a moment and tracks how many ran at once.
+    #[derive(Default)]
+    struct GatedGateway {
+        now: std::sync::atomic::AtomicUsize,
+        peak: std::sync::atomic::AtomicUsize,
+    }
+
+    impl VerbGateway for GatedGateway {
+        fn run_verb(&self, _args: &[String]) -> Result<Value, GatewayError> {
+            use std::sync::atomic::Ordering::SeqCst;
+            let now = self.now.fetch_add(1, SeqCst) + 1;
+            self.peak.fetch_max(now, SeqCst);
+            std::thread::sleep(Duration::from_millis(300));
+            self.now.fetch_sub(1, SeqCst);
+            Ok(json!({}))
+        }
+    }
+
+    #[tokio::test]
+    async fn a_request_flood_never_runs_more_verbs_than_the_in_flight_cap() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let gated = Arc::new(GatedGateway::default());
+        let gateway: Arc<dyn VerbGateway> = gated.clone();
+        let cap = 3;
+        let app = build_router_with_cap(gateway, test_config(), PathBuf::from("/tmp"), cap);
+
+        let mut calls = Vec::new();
+        for _ in 0..(cap + 4) {
+            let app = app.clone();
+            calls.push(tokio::spawn(async move {
+                app.oneshot(
+                    Request::builder()
+                        .uri("/v1/ready")
+                        .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                        .body(Body::empty())
+                        .unwrap(),
+                )
+                .await
+                .unwrap()
+                .status()
+            }));
+        }
+        let mut statuses = Vec::new();
+        for call in calls {
+            statuses.push(call.await.unwrap());
+        }
+        let ok = statuses.iter().filter(|s| **s == StatusCode::OK).count();
+        let busy = statuses.iter().filter(|s| **s == StatusCode::TOO_MANY_REQUESTS).count();
+        assert_eq!(ok, cap, "statuses: {statuses:?}");
+        assert_eq!(busy, 4, "the overflow is refused as busy, not queued: {statuses:?}");
+        assert_eq!(gated.peak.load(std::sync::atomic::Ordering::SeqCst), cap);
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn get_work_docs_does_not_follow_a_file_link_out_of_docs_history() {
+        let root = std::env::temp_dir().join(format!("fgos-gateway-docs-link-test-{}", std::process::id()));
+        let feature_dir = root.join("docs/history/tsk-4id-link");
+        std::fs::create_dir_all(&feature_dir).unwrap();
+        std::fs::write(root.join("outside.txt"), "outside the docs tree").unwrap();
+        std::os::unix::fs::symlink(root.join("outside.txt"), feature_dir.join("CONTEXT.md")).unwrap();
+        std::fs::write(feature_dir.join("plan.md"), "# plan\n").unwrap();
+
+        let gateway: Arc<dyn VerbGateway> =
+            Arc::new(ShowGateway { docs_ref: Some("docs/history/tsk-4id-link/".to_string()) });
+        let app = build_router(gateway, test_config(), root.clone());
+
+        let data = get_work_docs_request(app, "tsk-4id").await;
+        assert_eq!(data["data"]["contextMd"], Value::Null, "a link leaving docs/history must not be read");
+        assert_eq!(data["data"]["planMd"], "# plan\n");
+        std::fs::remove_dir_all(&root).ok();
     }
 }
