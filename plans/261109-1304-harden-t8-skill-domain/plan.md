@@ -96,7 +96,7 @@ Open from that lead report, now in the plan: the orphan prune of `.claude` wrapp
 | 04 | [Guards](phase-04-guards.md) | none | A | `fgos-mirror.test.mjs`, `check-decision-citation-drift.*`, `.gitignore` | -13 / 0 / +22 **landed** |
 | 05 | [Source text and doctrine](phase-05-source-text-and-doctrine.md) | none | A | `core/skills/**` text, `domains/**` text, `core/agents/*.yaml`, `domains/coding/AGENTS.md` | 0 / 0 / 0 (text -280) |
 | 06 | [Doctor rows](phase-06-doctor-rows.md) | none | A | `registrations.mjs` (`checkAgentClaimsResolve`), `model-pool-checks.mjs` | +14 / 0 / +25 **landed** |
-| 07 | [Persona projection](phase-07-persona-projection.md) | none | A | `project-agents.mjs` | +12 / 0 / +30 |
+| 07 | [Persona projection](phase-07-persona-projection.md) | none | A | `project-agents.mjs` | +12 / 0 / +30 **landed** |
 | 08 | [Domain build](phase-08-domain-build.md) | 06 for the `registrations.mjs` line only | B | `build-domain-registry.mjs`, `registrations.mjs` (`checkDomainRegistryCompiled`) | +10 / 0 / +10 |
 | 09 | [Small scripts](phase-09-small-scripts.md) | none | A | `measure-coordination-baseline.mjs` (deleted), `distill.mjs`, `instruction-projections.mjs` | -447 / 0 / +8 |
 | 10 | [Worktree skill provisioning](phase-10-worktree-skill-provisioning.md) | none | A | `worktree.mjs`, `agent-skill-dirs.mjs`, `.fgos/config.yaml` (line removed) | +43 / 0 / +36 **landed** |
