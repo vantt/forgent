@@ -201,6 +201,33 @@ runner:
       advanced:
         - thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive
         - deepseek/deepseek-v4.1-flash@openrouter
+      # @fgos:doc The model a family uses at one tier: a model id, model@pool, an object with model, pool and effort, or a non-empty list of those in the order they are tried. A cell is replaced whole by a higher layer, never merged. Default: deepseek/deepseek-v4-pro@openrouter.
+      # @fgos:why [6be6fc05-6e06-43af-a3f3-07eb170ce533] Owner 2026-11-09: no pro on OpenRouter for any seat; flagship/frontier councils, reviews and synthesis run deepseek and glm on flash through thehive first, OpenRouter flash as fallback; v4-pro and full glm-5.3 spent the OpenRouter credit
+      flagship:
+        - thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive
+        - deepseek/deepseek-v4.1-flash@openrouter
+      # @fgos:doc The model a family uses at one tier: a model id, model@pool, an object with model, pool and effort, or a non-empty list of those in the order they are tried. A cell is replaced whole by a higher layer, never merged. Default: deepseek/deepseek-v4-pro@openrouter.
+      # @fgos:why [6be6fc05-6e06-43af-a3f3-07eb170ce533] Owner 2026-11-09: no pro on OpenRouter for any seat; flagship/frontier councils, reviews and synthesis run deepseek and glm on flash through thehive first, OpenRouter flash as fallback; v4-pro and full glm-5.3 spent the OpenRouter credit
+      frontier:
+        - thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive
+        - deepseek/deepseek-v4.1-flash@openrouter
+    # @fgos:doc The tiers of one family; a tier it omits has no model.
+    z-ai:
+      # @fgos:doc The model a family uses at one tier: a model id, model@pool, an object with model, pool and effort, or a non-empty list of those in the order they are tried. A cell is replaced whole by a higher layer, never merged. Default: z-ai/glm-5.3@openrouter.
+      # @fgos:why [6be6fc05-6e06-43af-a3f3-07eb170ce533] Owner 2026-11-09: no pro on OpenRouter for any seat; flagship/frontier councils, reviews and synthesis run deepseek and glm on flash through thehive first, OpenRouter flash as fallback; v4-pro and full glm-5.3 spent the OpenRouter credit
+      advanced:
+        - thehive/zai-org/glm-5.3-flash@thehive
+        - z-ai/glm-5.3-flash@openrouter
+      # @fgos:doc The model a family uses at one tier: a model id, model@pool, an object with model, pool and effort, or a non-empty list of those in the order they are tried. A cell is replaced whole by a higher layer, never merged. Default: z-ai/glm-5.3@openrouter.
+      # @fgos:why [6be6fc05-6e06-43af-a3f3-07eb170ce533] Owner 2026-11-09: no pro on OpenRouter for any seat; flagship/frontier councils, reviews and synthesis run deepseek and glm on flash through thehive first, OpenRouter flash as fallback; v4-pro and full glm-5.3 spent the OpenRouter credit
+      flagship:
+        - thehive/zai-org/glm-5.3-flash@thehive
+        - z-ai/glm-5.3-flash@openrouter
+      # @fgos:doc The model a family uses at one tier: a model id, model@pool, an object with model, pool and effort, or a non-empty list of those in the order they are tried. A cell is replaced whole by a higher layer, never merged. Default: z-ai/glm-5.3@openrouter.
+      # @fgos:why [6be6fc05-6e06-43af-a3f3-07eb170ce533] Owner 2026-11-09: no pro on OpenRouter for any seat; flagship/frontier councils, reviews and synthesis run deepseek and glm on flash through thehive first, OpenRouter flash as fallback; v4-pro and full glm-5.3 spent the OpenRouter credit
+      frontier:
+        - thehive/zai-org/glm-5.3-flash@thehive
+        - z-ai/glm-5.3-flash@openrouter
 # @fgos:doc How far agent work may skip human approval gates.
 gateBypass:
   # @fgos:doc Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size. Values: off | light | standard | heavy. Default: off.
