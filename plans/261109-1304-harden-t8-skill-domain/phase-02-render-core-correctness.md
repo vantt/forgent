@@ -1,7 +1,7 @@
 ---
 phase: 02
 title: "Render core, correctness: the render is a fixed point, every copy leaf refuses a link by name, the generated stamp is anchored, a same-name directory without the stamp is refused by name (Q3 b), setup copies only the package's own owned skills (OPC note), one skillSourceRoots, the drift-guard message names the real cause"
-status: pending
+status: completed
 depends_on: [01]
 parallel: "group B, chain on skill-wrappers.mjs after 01; P03 edit follows"
 effort: ~1d

@@ -63,3 +63,16 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, fg-server). fg-s
 - **Doctor mong đợi:** không đổi.
 - **Quay lại:** revert commit merge của phase.
 
+## P02: render và setup chỉ ghi thư mục skill do fgOS viết, không đi theo link, render là điểm bất động
+
+- Commit trên `main`: xem dòng bảng HARDEN "T8 P02 lands".
+- Người dùng thấy gì:
+  - `fgos setup` và `npm run build:skills` từ chối, nêu tên thư mục và trước khi ghi bất cứ thứ gì, khi một thư mục skill trùng tên skill của fgOS nhưng không mang dấu "generated" của fgOS (thư mục rỗng thì vẫn ghi). Cách xử lý: xoá thư mục đó hoặc đổi tên skill kia. Thư mục `.agents/skills/<tên>` do bản phát hành cũ chép nguyên văn vẫn được nhận nếu wrapper `.claude/skills/<tên>` cạnh nó mang dấu của fgOS.
+  - Một symbolic link trong đường dẫn nguồn hoặc đích của skill bị từ chối, nêu tên đường dẫn; không có byte nào ghi ra ngoài thư mục gốc.
+  - Render xoá file mà nguồn không còn trong thư mục skill của fgOS, và xoá bản `fgos-*` trong `plugins/fgOS/skills` khi skill nguồn đã mất; lần render thứ hai trên cây không đổi không ghi gì. Skill viết tay của plugin không bị đụng.
+  - Dấu "generated" phải là dòng đầu sau frontmatter; một skill ngoài chỉ trích dẫn dấu ở giữa nội dung không còn bị dọn.
+  - `fgos setup` chỉ chép skill thuộc chính gói; skill của gói trùng tên skill lõi của dự án đích không đè lên nó.
+- Lệnh trên từng workspace: `git pull --rebase`; build, stage, kích hoạt release như thường lệ. Dự án đã có thư mục `.agents/skills/<tên fgOS>` hoặc `.claude/skills/<tên fgOS>` do người viết tay sẽ bị từ chối ở lần `fgos setup` kế tiếp: đổi tên hoặc xoá.
+- Dòng doctor mong đợi: không đổi.
+- Quay lại: revert merge commit; không có file nào trên đĩa đổi định dạng.
+

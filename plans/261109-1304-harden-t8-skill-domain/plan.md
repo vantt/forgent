@@ -91,7 +91,7 @@ Open from that lead report, now in the plan: the orphan prune of `.claude` wrapp
 | # | Phase | Depends on | Group | Hot files written | Δ Node / Rust / tests (estimate) |
 |---|---|---|---|---|---|
 | 01 | [Render core: deletions](phase-01-render-core-deletions.md) | none | A (chain head) | `skill-wrappers.mjs`, `skill-wrappers.test.mjs`, contract `skill-package-distribution.md` | -620 / 0 / -3 030 |
-| 02 | [Render core: correctness](phase-02-render-core-correctness.md) | 01 | B (chain) | `skill-wrappers.mjs`, `skill-wrappers.test.mjs`, `build-skill-wrappers.mjs` (only if needed) | +50 / 0 / +60 |
+| 02 | [Render core: correctness](phase-02-render-core-correctness.md) | 01 | B (chain) | `skill-wrappers.mjs`, `skill-wrappers.test.mjs`, `build-skill-wrappers.mjs` (only if needed) | +50 / 0 / +60 **landed** |
 | 03 | [`.claude` reference copies](phase-03-claude-reference-copies.md) | probe: none; edit: 02 (and 04 on the fail branch) | A (probe), C (edit) | `skill-wrappers.mjs`, `skill-wrappers.test.mjs`, `fgos-mirror.test.mjs` (fail branch) | pass -20 / 0 / -10; fail 0 / 0 / +10 |
 | 04 | [Guards](phase-04-guards.md) | none | A | `fgos-mirror.test.mjs`, `check-decision-citation-drift.*`, `.gitignore` | -13 / 0 / +22 **landed** |
 | 05 | [Source text and doctrine](phase-05-source-text-and-doctrine.md) | none | A | `core/skills/**` text, `domains/**` text, `core/agents/*.yaml`, `domains/coding/AGENTS.md` | 0 / 0 / 0 (text -280) |
