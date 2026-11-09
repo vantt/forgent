@@ -440,9 +440,9 @@ pub fn preflight_candidate(
     // 2. Canonicalize & verify files
     canonicalize_manifest_files(manifest)
         .map_err(|e| InitError::Preflight(format!("canonicalize manifest failed: {}", e)))?;
-    verify_release_files(candidate_dir, manifest)
+    let files = verify_release_files(candidate_dir, manifest)
         .map_err(|e| InitError::Preflight(format!("verify release files failed: {}", e)))?;
-    verify_legacy_node(candidate_dir, manifest)
+    verify_legacy_node(candidate_dir, manifest, files)
         .map_err(|e| InitError::Preflight(format!("verify legacy node failed: {}", e)))?;
 
     // 3. Confirm requires.node
@@ -1707,9 +1707,9 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
         })?;
         canonicalize_manifest_files(&manifest)
             .map_err(|e| format!("canonicalize manifest failed: {}", e))?;
-        verify_release_files(&candidate_dir, &manifest)
+        let files = verify_release_files(&candidate_dir, &manifest)
             .map_err(|e| format!("verify release files failed: {}", e))?;
-        verify_legacy_node(&candidate_dir, &manifest)
+        verify_legacy_node(&candidate_dir, &manifest, files)
             .map_err(|e| format!("verify candidate legacy node failed: {}", e))?;
         if manifest.artifact_digest != target_digest {
             return Err(format!(
@@ -1834,9 +1834,9 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
             .map_err(|e| format!("manifest read error: {}", e))?;
         canonicalize_manifest_files(&manifest)
             .map_err(|e| format!("canonicalize manifest failed: {}", e))?;
-        verify_release_files(&release_dir, &manifest)
+        let files = verify_release_files(&release_dir, &manifest)
             .map_err(|e| format!("file digest mismatch: {}", e))?;
-        verify_legacy_node(&release_dir, &manifest)
+        verify_legacy_node(&release_dir, &manifest, files)
             .map_err(|e| format!("legacy node verification failed: {}", e))?;
         Ok(())
     })();

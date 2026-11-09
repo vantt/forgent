@@ -146,11 +146,13 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
         .map_err(|err| format!("manifest verification failed: {}", err))?;
     let running = env::current_exe()
         .map_err(|e| format!("cannot determine current executable path: {}", e))?;
-    verify_release_files_except_running(Path::new(&active_release_path), &manifest, &running)
-        .map_err(|err| format!("manifest file verification failed: {}", err))?;
+    let files =
+        verify_release_files_except_running(Path::new(&active_release_path), &manifest, &running)
+            .map_err(|err| format!("manifest file verification failed: {}", err))?;
 
-    let payload_path_canonical = verify_legacy_node(Path::new(&active_release_path), &manifest)
-        .map_err(|err| format!("{}", err))?;
+    let payload_path_canonical =
+        verify_legacy_node(Path::new(&active_release_path), &manifest, files)
+            .map_err(|err| format!("{}", err))?;
 
     Ok(payload_path_canonical)
 }

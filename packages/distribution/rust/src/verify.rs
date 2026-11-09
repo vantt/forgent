@@ -111,6 +111,12 @@ pub fn recompute_artifact_digest(manifest_path: &Path) -> Result<String, Verific
     Ok(recomputed)
 }
 
+/// Proof that the full per-file verifier passed, including the native addon's
+/// bytes. Only the file verifiers construct it, and `verify_legacy_node` takes it,
+/// so a caller cannot reach the legacy node check without hashing the files first.
+#[derive(Debug)]
+pub struct FilesVerified(());
+
 /// Per-file verifier re-hashing each `files[]` entry's bytes at its declared path
 /// under the release root and comparing to its declared `digest`.
 ///
@@ -121,7 +127,7 @@ pub fn recompute_artifact_digest(manifest_path: &Path) -> Result<String, Verific
 pub fn verify_release_files(
     release_root: &Path,
     manifest: &ReleaseManifest,
-) -> Result<(), VerificationError> {
+) -> Result<FilesVerified, VerificationError> {
     verify_files(release_root, manifest, None)
 }
 
@@ -133,7 +139,7 @@ pub fn verify_release_files_except_running(
     release_root: &Path,
     manifest: &ReleaseManifest,
     running: &Path,
-) -> Result<(), VerificationError> {
+) -> Result<FilesVerified, VerificationError> {
     let running = std::fs::canonicalize(running).ok();
     verify_files(release_root, manifest, running.as_deref())
 }
@@ -142,7 +148,7 @@ fn verify_files(
     release_root: &Path,
     manifest: &ReleaseManifest,
     running: Option<&Path>,
-) -> Result<(), VerificationError> {
+) -> Result<FilesVerified, VerificationError> {
     let canonical_entries = canonicalize_manifest_files(manifest)?;
 
     let release_root_canonical = if release_root.exists() {
@@ -205,7 +211,7 @@ fn verify_files(
         }
     }
 
-    Ok(())
+    Ok(FilesVerified(()))
 }
 
 /// Phase-05 activation admission, independent of the installed target OS.
@@ -228,31 +234,10 @@ pub fn require_git_addon(manifest: &ReleaseManifest) -> Result<(), VerificationE
     Ok(())
 }
 
-/// Verifies a present native addon through the existing canonical file verifier.
-/// Windows remains optional until the phase-07 switch.
-pub fn verify_native_addon(
-    release_root: &Path,
-    manifest: &ReleaseManifest,
-) -> Result<(), VerificationError> {
-    manifest
-        .validate_native_addon_invariant()
-        .map_err(|error| {
-            VerificationError::Canonical(CanonicalError::MalformedSegment(error.to_string()))
-        })?;
-    if let Some(addon) = &manifest.components.native_addon {
-        let mut component_manifest = manifest.clone();
-        component_manifest
-            .files
-            .retain(|file| file.path == addon.path);
-        verify_release_files(release_root, &component_manifest)?;
-    }
-    Ok(())
-}
-
 /// Verifies the legacy node component locator and payload file. The native addon's
-/// bytes are not read here: every caller runs `verify_release_files` first, which
-/// hashes the addon's `files[]` entry once, and the addon invariant below proves
-/// that entry exists and matches the declared digest:
+/// bytes are not read here: the `FilesVerified` proof means the full file verifier
+/// already hashed the addon's `files[]` entry once, and the addon invariant below
+/// proves that entry exists and matches the declared digest:
 /// 1. Enforces that `components.legacyNode.root` and `entry` are valid relative locators.
 /// 2. Rejects any symlink path component in `root` or `entry` (including unlisted payload symlinks).
 /// 3. Confirms containment under `release_root`.
@@ -260,6 +245,7 @@ pub fn verify_native_addon(
 pub fn verify_legacy_node(
     release_root: &Path,
     manifest: &ReleaseManifest,
+    _files: FilesVerified,
 ) -> Result<std::path::PathBuf, VerificationError> {
     manifest
         .validate_native_addon_invariant()
@@ -374,8 +360,8 @@ pub fn verify_release_tree(release_root: &Path) -> Result<String, VerificationEr
     })?;
 
     canonicalize_manifest_files(&manifest)?;
-    verify_release_files(release_root, &manifest)?;
-    verify_legacy_node(release_root, &manifest)?;
+    let files = verify_release_files(release_root, &manifest)?;
+    verify_legacy_node(release_root, &manifest, files)?;
 
     Ok(digest)
 }
@@ -679,14 +665,14 @@ mod tests {
         };
 
         // 1. Success case
-        let res = verify_legacy_node(&temp_dir, &base_manifest);
+        let res = verify_legacy_node(&temp_dir, &base_manifest, FilesVerified(()));
         assert!(res.is_ok());
 
         // 2. Digest mismatch case
         let mut mismatch_manifest = base_manifest.clone();
         mismatch_manifest.components.legacy_node.digest =
             "sha256:0000000000000000000000000000000000000000000000000000000000000000".to_string();
-        let err = verify_legacy_node(&temp_dir, &mismatch_manifest).unwrap_err();
+        let err = verify_legacy_node(&temp_dir, &mismatch_manifest, FilesVerified(())).unwrap_err();
         assert!(matches!(
             err,
             VerificationError::LegacyNodeDigestMismatch { .. }
@@ -695,7 +681,7 @@ mod tests {
         // 3. Missing payload file
         let mut missing_manifest = base_manifest.clone();
         missing_manifest.components.legacy_node.entry = "bin/missing.mjs".to_string();
-        let err = verify_legacy_node(&temp_dir, &missing_manifest).unwrap_err();
+        let err = verify_legacy_node(&temp_dir, &missing_manifest, FilesVerified(())).unwrap_err();
         assert!(matches!(err, VerificationError::MissingFile { .. }));
 
         // 4. Unlisted payload file symlink
@@ -706,7 +692,7 @@ mod tests {
 
             let mut sym_manifest = base_manifest.clone();
             sym_manifest.components.legacy_node.entry = "bin/sym_entry.mjs".to_string();
-            let err = verify_legacy_node(&temp_dir, &sym_manifest).unwrap_err();
+            let err = verify_legacy_node(&temp_dir, &sym_manifest, FilesVerified(())).unwrap_err();
             assert!(matches!(err, VerificationError::SymlinkRefused { .. }));
         }
 
@@ -718,7 +704,8 @@ mod tests {
 
             let mut sym_dir_manifest = base_manifest.clone();
             sym_dir_manifest.components.legacy_node.root = "sym_libexec/legacy-node".to_string();
-            let err = verify_legacy_node(&temp_dir, &sym_dir_manifest).unwrap_err();
+            let err =
+                verify_legacy_node(&temp_dir, &sym_dir_manifest, FilesVerified(())).unwrap_err();
             assert!(matches!(err, VerificationError::SymlinkRefused { .. }));
         }
 

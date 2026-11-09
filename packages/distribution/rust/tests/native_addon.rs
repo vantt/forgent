@@ -2,8 +2,7 @@ use fgos_distribution::manifest::{
     native_addon_crate_checksums, ManifestFileEntry, NativeAddonComponent, ReleaseManifest,
 };
 use fgos_distribution::verify::{
-    verify_native_addon, verify_release_files, verify_release_files_except_running,
-    VerificationError,
+    verify_release_files, verify_release_files_except_running, VerificationError,
 };
 use sha2::{Digest, Sha256};
 
@@ -42,7 +41,7 @@ fn native_addon_verifies_bytes_and_abi_and_locked_provenance() {
     let (root, manifest) = fixture();
     assert_eq!(native_addon_crate_checksums().len(), 3);
     manifest.validate_v1_invariants().unwrap();
-    verify_native_addon(&root, &manifest).unwrap();
+    verify_release_files(&root, &manifest).unwrap();
     for field in ["target", "napi", "checksum", "path", "digest", "unlisted"] {
         let mut bad = manifest.clone();
         let addon = bad.components.native_addon.as_mut().unwrap();
@@ -56,22 +55,18 @@ fn native_addon_verifies_bytes_and_abi_and_locked_provenance() {
             _ => unreachable!(),
         }
         assert!(bad.validate_v1_invariants().is_err(), "{field}");
-        assert!(verify_native_addon(&root, &bad).is_err(), "{field}");
+        assert!(bad.validate_native_addon_invariant().is_err(), "{field}");
     }
     std::fs::write(root.join("native/fgos.node"), b"tampered").unwrap();
-    assert!(matches!(
-        verify_native_addon(&root, &manifest),
-        Err(VerificationError::FileDigestMismatch { .. })
-    ));
-    // The addon's bytes are read once, by the full file verifier that every
-    // admission boundary runs before the legacy node check.
+    // The addon's bytes are read once, by the full file verifier; the legacy node
+    // check only accepts its proof.
     assert!(matches!(
         verify_release_files(&root, &manifest),
         Err(VerificationError::FileDigestMismatch { .. })
     ));
     std::fs::remove_file(root.join("native/fgos.node")).unwrap();
     assert!(matches!(
-        verify_native_addon(&root, &manifest),
+        verify_release_files(&root, &manifest),
         Err(VerificationError::MissingFile { .. })
     ));
     std::fs::remove_dir_all(root).unwrap();
@@ -84,7 +79,7 @@ fn native_addon_refuses_file_and_directory_symlinks() {
     std::fs::rename(root.join("native/fgos.node"), root.join("real.node")).unwrap();
     std::os::unix::fs::symlink(root.join("real.node"), root.join("native/fgos.node")).unwrap();
     assert!(matches!(
-        verify_native_addon(&root, &manifest),
+        verify_release_files(&root, &manifest),
         Err(VerificationError::SymlinkRefused { .. })
     ));
     std::fs::remove_file(root.join("native/fgos.node")).unwrap();
@@ -92,7 +87,7 @@ fn native_addon_refuses_file_and_directory_symlinks() {
     std::fs::rename(root.join("native"), root.join("real")).unwrap();
     std::os::unix::fs::symlink(root.join("real"), root.join("native")).unwrap();
     assert!(matches!(
-        verify_native_addon(&root, &manifest),
+        verify_release_files(&root, &manifest),
         Err(VerificationError::SymlinkRefused { .. })
     ));
     std::fs::remove_dir_all(root).unwrap();
@@ -103,7 +98,7 @@ fn historical_release_without_addon_still_verifies() {
     let manifest: ReleaseManifest =
         serde_json::from_str(include_str!("goldens/release-manifest-minimal.json")).unwrap();
     manifest.validate_v1_invariants().unwrap();
-    verify_native_addon(std::path::Path::new("unused-old-release"), &manifest).unwrap();
+    manifest.validate_native_addon_invariant().unwrap();
 }
 
 #[test]
@@ -120,7 +115,7 @@ fn native_addon_accepts_cross_release_toolchain_attestation_but_rejects_bad_shap
         .map(|name| (name.into(), "a".repeat(64)))
         .collect();
     manifest.validate_v1_invariants().unwrap();
-    verify_native_addon(&root, &manifest).unwrap();
+    manifest.validate_native_addon_invariant().unwrap();
     manifest
         .components
         .native_addon

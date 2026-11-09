@@ -211,8 +211,8 @@ pub fn stage_release(store_root: &Path, from_path: &Path) -> Result<StageOutcome
     let verify_result = (|| -> Result<(), VerificationError> {
         recompute_artifact_digest(&manifest_path)?;
         canonicalize_manifest_files(&manifest)?;
-        verify_release_files(&temp_sibling, &manifest)?;
-        verify_legacy_node(&temp_sibling, &manifest)?;
+        let files = verify_release_files(&temp_sibling, &manifest)?;
+        verify_legacy_node(&temp_sibling, &manifest, files)?;
         Ok(())
     })();
 
