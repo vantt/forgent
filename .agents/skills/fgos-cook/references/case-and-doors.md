@@ -106,7 +106,7 @@ and why.
   first). Never a wave of writers.
 - A slice to be done with `ak:cook` goes through `--unit <file>` with
   `skills: ["ak:cook"]`, and its objective carries the brief of
-  [`ak-cook-worker-contract.md`](../../_shared/ak-cook-worker-contract.md). The
+  [`cook-worker-contract.md`](../../_shared/cook-worker-contract.md). The
   Unit names only the skill; `bind()` still picks the executor.
 - Read `--json`: `data.results[-1].runResult.agentClaim.summary` and
   `data.results[-1].commit`. The outcome is one of `pass`, `findings`,
