@@ -320,7 +320,7 @@ fn a_project_file_may_equal_or_raise_a_capability_confinement() {
 /// refused by name at its line, and the same text in the global file is accepted.
 #[test]
 fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
-    let cases: [(&str, &[&str], &str); 10] = [
+    let cases: [(&str, &[&str], &str); 11] = [
         (
             "executor-command",
             &["runner:", "  executor:", "    command: tool"],
@@ -413,6 +413,19 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
                 "        isolatedSession: false",
             ],
             "runner.executors.ex.confinement.isolatedSession",
+        ),
+        (
+            "confinement-controls",
+            &[
+                "runner:",
+                "  executors:",
+                "    ex:",
+                "      kind: agent",
+                "      confinement:",
+                "        controls:",
+                "          home: host",
+            ],
+            "runner.executors.ex.confinement.controls",
         ),
         (
             "capability-aliases",

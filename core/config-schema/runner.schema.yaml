@@ -601,6 +601,7 @@ $defs:
         description: "Confinement contract reference."
         type: string
       controls:
+        x-fgos-scope: global-only
         description: "Confinement controls by axis."
         type: object
       grants:
