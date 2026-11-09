@@ -249,12 +249,6 @@ docRegistry:
   # @fgos:doc When true a stale end-user docs index fails the gate; when false it is only reported. Default: false.
   # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
   enforce: true
-# @fgos:doc Commands every runner-created worktree runs after its dependency install.
-worktreeSetup:
-  # @fgos:doc Shell commands run in a new worktree after its dependency install; an empty list runs nothing beyond the install. Default: [].
-  # @fgos:why [9548be33-0b94-4fe0-b02c-5d5eb0240a61] [migrate] carried over from config.json, reason never recorded
-  commands:
-    - for d in .claude/skills .agents/skills .omp/skills .pi/skills .grok/skills; do [ -d "$FGOS_REPO_ROOT/$d" ] || continue; mkdir -p "$d"; for s in "$FGOS_REPO_ROOT/$d"/ak-*; do [ -d "$s" ] && cp -R "$s" "$d/"; done; done; true
 # @fgos:doc Limits of the agent mailbox, and whether a project opts in to its hooks.
 mailbox:
   # @fgos:doc Whether fgos setup and doctor --fix install the mailbox hook rows into this project's Claude Code and Codex hook files; false removes the rows they installed. On by default (owner decision 2026-10-28): a project opts out with mailbox.enabled: false. Default: true.
