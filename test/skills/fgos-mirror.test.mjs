@@ -5,7 +5,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { generateWrapperContent, extractFrontmatter } from '../../src/setup/skill-wrappers.mjs';
+import { generateWrapperContent, extractFrontmatter, ownedSkillNames } from '../../src/setup/skill-wrappers.mjs';
+import { ownedFileSet } from '../../scripts/lib/git-ports.mjs';
 
 // tsk-1qi (D5/D7, docs/history/install-setup-external-project-reliability/
 // CONTEXT.md): `.agents/skills` is the assembled, orchestrator-neutral
@@ -24,9 +25,10 @@ import { generateWrapperContent, extractFrontmatter } from '../../src/setup/skil
 // tsk-d3c: skills live flat, one per top-level directory
 // (`.claude/skills/<name>/SKILL.md`), not nested under a shared `fgos/`
 // parent — the generic project-skill scan only enumerates one level deep, so
-// a shared parent silently hides every skill beneath it. This test compares
-// by matching `fgos-*` directory names across the two roots, not by diffing
-// one shared parent.
+// a shared parent silently hides every skill beneath it. The wrapper checks
+// judge every skill name fgOS owns (`ownedSkillNames`) over the files git
+// owns (`ownedFileSet`): a render another kit left in the same root is never
+// judged, and a render of an owned skill that git does not own is named.
 //
 // tsk-32b: a third leg, `plugins/fgOS/skills/`, carries the SAME 14
 // coding-domain dev-skills so a session outside this repo (fgOS installed
@@ -41,6 +43,28 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CLAUDE_SKILLS_ROOT = path.resolve(__dirname, '../../.claude/skills');
 const AGENTS_SKILLS_ROOT = path.resolve(__dirname, '../../.agents/skills');
 const PLUGIN_SKILLS_ROOT = path.resolve(__dirname, '../../plugins/fgOS/skills');
+
+const REPO_ROOT = path.resolve(__dirname, '../..');
+const OWNED_FILES = ownedFileSet(REPO_ROOT);
+
+// Owned skill names (never `_shared`, a fragment folder) whose `<tree>/<name>/SKILL.md` git owns.
+// A render that sits on disk but is untracked or ignored fails here with the allowlist to edit.
+function trackedOwnedRenders(tree) {
+  const names = [];
+  for (const name of [...ownedSkillNames(REPO_ROOT)].filter((n) => n !== '_shared').sort()) {
+    const rel = `${tree}/${name}/SKILL.md`;
+    if (!OWNED_FILES || OWNED_FILES.has(rel)) {
+      if (fs.existsSync(path.join(REPO_ROOT, rel))) names.push(name);
+    } else {
+      assert.equal(
+        fs.existsSync(path.join(REPO_ROOT, rel)),
+        false,
+        `${rel} exists but git does not own it — add "!/${tree}/${name}/" to the .gitignore allowlist`,
+      );
+    }
+  }
+  return names;
+}
 
 function listFgosSkillDirs(root) {
   return fs
@@ -76,7 +100,7 @@ test('.claude/skills and .agents/skills declare the exact same set of fgos-* ski
 });
 
 test('every .claude/skills/<name>/SKILL.md is exactly the wrapper generateWrapperContent would produce from its .agents/skills source (proves npm run build:skills is up to date)', () => {
-  for (const name of listFgosSkillDirs(CLAUDE_SKILLS_ROOT)) {
+  for (const name of trackedOwnedRenders('.claude/skills')) {
     const wrapperPath = path.join(CLAUDE_SKILLS_ROOT, name, 'SKILL.md');
     const sourcePath = path.join(AGENTS_SKILLS_ROOT, name, 'SKILL.md');
     const actualWrapper = fs.readFileSync(wrapperPath, 'utf8').replaceAll('\r\n', '\n');
@@ -91,7 +115,7 @@ test('every .claude/skills/<name>/SKILL.md is exactly the wrapper generateWrappe
 });
 
 test('every .claude/skills/<name>/SKILL.md wrapper carries the exact same frontmatter as its .agents/skills source (name/description stay correct for Claude Code\'s own skill listing)', () => {
-  for (const name of listFgosSkillDirs(CLAUDE_SKILLS_ROOT)) {
+  for (const name of trackedOwnedRenders('.claude/skills')) {
     const wrapperContent = fs.readFileSync(path.join(CLAUDE_SKILLS_ROOT, name, 'SKILL.md'), 'utf8').replaceAll('\r\n', '\n');
     const sourceContent = fs.readFileSync(path.join(AGENTS_SKILLS_ROOT, name, 'SKILL.md'), 'utf8').replaceAll('\r\n', '\n');
     assert.equal(
@@ -103,7 +127,7 @@ test('every .claude/skills/<name>/SKILL.md wrapper carries the exact same frontm
 });
 
 test('every .claude/skills/<name>/SKILL.md wrapper is genuinely thin — much smaller than its .agents/skills source, not a stale pre-tsk-1qi full copy', () => {
-  for (const name of listFgosSkillDirs(CLAUDE_SKILLS_ROOT)) {
+  for (const name of trackedOwnedRenders('.claude/skills')) {
     const wrapperSize = fs.statSync(path.join(CLAUDE_SKILLS_ROOT, name, 'SKILL.md')).size;
     const sourceSize = fs.statSync(path.join(AGENTS_SKILLS_ROOT, name, 'SKILL.md')).size;
     assert.ok(
@@ -232,4 +256,39 @@ test('every fgos-* dev-skill mirrored into plugins/fgOS/skills also carries user
 test('distill (the one non-fgos-* skill mirrored in .agents/skills and .claude/skills) does NOT carry user-invocable: false — only the 14 dev-skills are in scope for D6', () => {
   const distillSource = fs.readFileSync(path.join(AGENTS_SKILLS_ROOT, 'distill', 'SKILL.md'), 'utf8');
   assert.doesNotMatch(extractFrontmatter(distillSource), /user-invocable/);
+});
+
+// `.gitignore` cannot compute the owned set, so its per-name allowlist is
+// kept by hand; this proves it names exactly the skills `ownedSkillNames`
+// finds, in both render trees. `fgos-*` is the one glob it carries.
+function allowlistDisagreements(gitignoreText, owned) {
+  const problems = [];
+  for (const tree of ['.agents/skills', '.claude/skills']) {
+    const lines = gitignoreText.split('\n').map((l) => l.trim());
+    const allowed = new Set(
+      lines.filter((l) => l.startsWith(`!/${tree}/`)).map((l) => l.slice(`!/${tree}/`.length).replace(/\/$/, ''))
+        .filter(Boolean),
+    );
+    for (const name of owned) {
+      if (!allowed.has(name) && !(name.startsWith('fgos-') && allowed.has('fgos-*'))) {
+        problems.push(`${tree}/${name} is an owned skill with no "!/${tree}/${name}/" allowlist line`);
+      }
+    }
+    for (const entry of allowed) {
+      if (entry !== 'fgos-*' && !owned.has(entry)) {
+        problems.push(`"!/${tree}/${entry}/" allowlists a skill no source in core/skills or domains/*/skills defines`);
+      }
+    }
+  }
+  return problems;
+}
+
+test('.gitignore allowlists exactly the owned skill names in .agents/skills and .claude/skills', () => {
+  const gitignore = fs.readFileSync(path.join(REPO_ROOT, '.gitignore'), 'utf8');
+  const owned = ownedSkillNames(REPO_ROOT);
+  assert.deepEqual(allowlistDisagreements(gitignore, owned), []);
+  const missing = allowlistDisagreements(gitignore, new Set([...owned, 'brand-new-skill']));
+  assert.equal(missing.length, 2, 'an owned skill added without allowlist lines must be reported once per tree');
+  const orphan = allowlistDisagreements(`${gitignore}\n!/.agents/skills/removed-skill/\n`, owned);
+  assert.equal(orphan.length, 1, 'an allowlist line without a source skill must be reported');
 });

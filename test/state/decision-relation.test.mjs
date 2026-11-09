@@ -162,20 +162,17 @@ test('findWideCitationFindings: D-local targetId with homeFile omitted returns [
 });
 
 test(
-  'collectWideSourceFiles: default roots reach .agents/skills, a stale ' +
-    'citation there is no longer invisible (tsk-12v)',
+  'collectWideSourceFiles: default roots reach the plugin and source skills and never the rendered .agents/skills tree',
   () => {
     const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wide-sweep-skills-')));
-    fs.mkdirSync(path.join(cwd, '.agents', 'skills', 'sample-skill'), { recursive: true });
-    fs.writeFileSync(
-      path.join(cwd, '.agents', 'skills', 'sample-skill', 'SKILL.md'),
-      '---\nname: sample-skill\n---\ncites OLDID directly\n',
-    );
-    const sources = collectWideSourceFiles(cwd);
-    const skillFile = sources.find((s) => s.file.includes('sample-skill'));
-    assert.ok(skillFile, 'default roots must reach .agents/skills');
-    const findings = findWideCitationFindings([skillFile], 'OLDID', 'tsk-new');
-    assert.equal(findings.length, 1);
+    for (const dir of ['.agents/skills/sample-skill', 'plugins/fgOS/skills/sample-skill', 'core/skills/sample-skill']) {
+      fs.mkdirSync(path.join(cwd, dir), { recursive: true });
+      fs.writeFileSync(path.join(cwd, dir, 'SKILL.md'), '---\nname: sample-skill\n---\ncites OLDID directly\n');
+    }
+    const files = collectWideSourceFiles(cwd).map((s) => s.file).sort();
+    assert.deepEqual(files, ['core/skills/sample-skill/SKILL.md', 'plugins/fgOS/skills/sample-skill/SKILL.md']);
+    const findings = findWideCitationFindings(collectWideSourceFiles(cwd), 'OLDID', 'tsk-new');
+    assert.equal(findings.length, 2);
   },
 );
 
