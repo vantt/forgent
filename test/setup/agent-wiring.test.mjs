@@ -106,6 +106,8 @@ function snapshotHome(root) {
 const CHANGING_CLAUDE_CALLS = (calls) => calls.filter((args) => args[0] === 'plugin' && ['add', 'install'].includes(args[args[1] === 'marketplace' ? 2 : 1]));
 
 function runFgos(cwd, args, env) {
+  // boundary: the claim is about what the init, setup, doctor --fix and wire-agents verbs write as whole
+  // processes under one HOME; the verb cases in bin/fgos.mjs have no use case to call in process.
   return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8', env });
 }
 
