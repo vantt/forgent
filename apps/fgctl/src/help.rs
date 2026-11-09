@@ -418,6 +418,13 @@ pub fn parse_flags(verb: &'static Verb, args: &[String]) -> Flags {
         } else {
             None
         };
+        if given.iter().any(|(seen, _)| *seen == flag.name) {
+            usage_error(
+                Some(verb),
+                &format!("{} was given more than once", flag.name),
+                None,
+            );
+        }
         given.push((flag.name, value));
     }
     Flags { verb, given }

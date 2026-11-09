@@ -129,6 +129,14 @@ fn unknown_flag_and_missing_value_exit_two_and_name_the_verb_help() {
         text(&missing.stderr)
     );
 
+    let repeated = fgctl(dir.path(), &["upgrade", "--from", "a", "--from", "b"]);
+    assert_eq!(repeated.status.code(), Some(2));
+    assert!(
+        text(&repeated.stderr).contains("more than once"),
+        "{}",
+        text(&repeated.stderr)
+    );
+
     let required = fgctl(dir.path(), &["stage"]);
     assert_eq!(required.status.code(), Some(2));
     assert!(
