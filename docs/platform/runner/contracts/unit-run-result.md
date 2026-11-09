@@ -6,7 +6,7 @@ Audience: Maintainer, implementer, agent that has only `fgos run --json`
 Purpose: Fix what the Execution layer hands up when a Unit run ends, so the Workflow layer and any caller read facts instead of re-deriving them
 Design status: Proposed. The owner has not approved it; nothing below is implemented yet
 Implementation: None. The "Today" column of each table says what exists now
-Provenance: Owner direction 2026-11-09 (three layers; lower layer must stand alone), a four-seat advisory run through `fgos run` only, HARDEN review of every "Today" cell against origin/main the same day, and the retired-engine entity map in plans/reports/researcher-report-261109-1647-retired-engine-entity-map.md
+Provenance: Owner direction 2026-11-09 (three layers; lower layer must stand alone; one authority per decision, in the lowest layer that can know it), a four-seat advisory run through `fgos run` only, HARDEN review of every "Today" cell against origin/main, HARDEN's cross-layer authority audit (plans/reports/audit-261109-1736-harden-authority-layers.md) and the retired-engine entity map (plans/reports/researcher-report-261109-1647-retired-engine-entity-map.md)
 Writer type: Agent draft writer (COOK), reviewed by HARDEN
 Canonical for: The result shape of one Unit run at the Execution to Workflow boundary, once approved
 Use this when: Writing or reading a caller of `fgos run --json`, or moving a derivation out of `src/workflow` into Execution
@@ -30,10 +30,21 @@ Three layers, named after their directories: **Execution** (`fgos run` and below
 - The lower layer executes and reports facts truthfully: whether a run started, who ran it, whether it ended on infrastructure rather than reaching a verdict, what it spent.
 - A lower layer enforces a limit it is given and never chooses it. With no upper layer the limit is `null`, meaning none, and the lower layer still runs. That is the standalone property: an agent holding only `fgos run --json` can drive several seats and read every fact it needs from this contract.
 
-## 2. The two shapes
+### Who owns the verdict
 
-1. **Attempt shape.** One supervised attempt of one seat: the existing `RunResult`, moving from version 3 to **version 4** additively. A version 3 reader stays for old records. Facts about one attempt live here, and version gating rides on `results[].runResult.contract`.
-2. **Unit shape.** What one Unit run ends with. Two forms exist and stay two: the `data` object of `fgos run --json` (the return value of `runUnit`: `unitRunId`, `outcome`, `rounds`, `results`, `findings`, never persisted whole; its readers take only `unitRunId`, `outcome` and `results`) and the persisted record `unit-summary`, which already carries `contract: { id, version }`. `data` gains the Unit-level facts of section 3 as additive fields and carries no contract id of its own. A stored form of those facts bumps `unit-summary` to version 3.
+| Decision | Owner | Reads it from |
+|---|---|---|
+| Whether a seat reached a verdict; the Unit's final outcome; the verify result; the rule "writing outside the declared writes is not a pass"; whether a failure was infrastructure | **Execution**, through one outcome module | — |
+| Whether a step passed, a milestone was achieved, a gate is parked | **Workflow**, as an acceptance decision on the facts above | `outcome`, `infrastructure`, `outOfScope[]`, `evaluations[]` of this contract |
+| The rules that decision applies (`acceptOutcomes`, `produces`, closure, delivery milestones) | **Domain**, declared as data | — |
+
+Workflow never tests which outcomes count as a verdict, never rewrites an outcome Execution settled, and never reads a Unit's private `unit.json`.
+
+## 2. The shapes
+
+1. **Attempt shape.** One supervised attempt of one seat: the existing `RunResult`, which **stays at version 3** with optional new fields (section 4). Version gating rides on `results[].runResult.contract`.
+2. **Unit shape.** What one Unit run ends with. Two forms exist and stay two: the `data` object of `fgos run --json` (the return value of `runUnit`: `unitRunId`, `outcome`, `rounds`, `results`, `findings`, never persisted whole) and the persisted record `unit-summary`, which already carries `contract: { id, version }`. `data` gains the Unit-level facts of section 3 as additive fields and carries no contract id of its own. A stored form of those facts bumps `unit-summary` to version 3, with its Rust reader first.
+3. **Port shape.** What the case admission port hands Workflow when a reservation settles. Today it is an untyped object of raw seat results that Workflow filters for `pass` and `findings`. It carries the Unit shape of section 3, including `evaluations[]`, so the port is covered by this contract and not only `fgos run --json`.
 
 Every versioned block uses one shape, `contract: { id, version }`. Today the blocks use three (`{id, version}` on RunResult and unit-summary, `contractVersion: "v1alpha1"` inside `binding`, none on the Unit input or the case ledger).
 
@@ -42,41 +53,44 @@ Every versioned block uses one shape, `contract: { id, version }`. Today the blo
 | Field | Meaning | Set by | Today |
 |---|---|---|---|
 | `unitRunId` | Run identity of the Unit | Execution | present |
-| `outcome` | One value of the closed outcome table (section 5) | Execution | present; the table is declared in five files |
+| `outcome` | One value of the closed outcome table (section 5), **final**: the scope rule, the verify round and the refund are already applied | Execution | present but not final. Workflow rewrites it after Execution has settled: an out-of-scope `pass` becomes `findings` and a check that cannot run becomes `execution-failure` (`foldUnitOutcome`, `src/workflow/unit-handoff.mjs`), so the case ledger says `pass` and the workflow ledger says `findings` for one run. `fgos run --case` never applies the scope rule |
+| `outOfScope[]`, `outOfScopeOnBranch[]` | Paths the Unit wrote outside its declared writes, and paths its branch carries outside them since its base | Execution | partial: Execution reports `commit.outOfScope` (`run.mjs`); the branch-level check is Workflow's (`outOfScopeWrites`) and reads Execution's private `unit.json`. Execution takes the base Unit's `outOfScopeOnBranch` as an input instead |
+| `evaluations[]` | One entry per evaluator result: `{ kind: "verify" or "verdict", seat, round, passed }`. Workflow binds them to milestones and digests, which is the receipt | Execution | absent; `receiptsFromResults` (`src/workflow/case-projection.mjs`) decides which results are verdicts |
 | `started` | `{ value, reason }`; `value` false when no seat was given its brief, with a named reason | Execution | absent; only implied by a settle record of `not-started` |
-| `infrastructure` | true when the Unit ended on infrastructure: its outcome is `execution-failure` or `not-started`, no path was written outside the declared scope, and no seat reached a verdict. The one fact Workflow needs to decide a rerun | Execution | absent; Workflow derives it in `isRerunnable` (`src/workflow/store.mjs`), which also requires an empty `outOfScope` and no seat that reached a verdict, so the new field carries that clause too |
+| `infrastructure` | true when the Unit ended on infrastructure: its outcome is `execution-failure` or `not-started`, no path was written outside the declared scope, and no seat reached a verdict. The one fact Workflow needs to decide a rerun | Execution | absent; Workflow derives it in `isRerunnable` (`src/workflow/store.mjs`). It is computable where Execution settles only after the scope rule above moves into Execution |
 | `refunded` | true when the case reservation was handed back because no seat was given its brief | Execution | absent as a field; today only the settle record handed to the case takes the outcome `not-started` (`run.mjs`, `settleAdmission`), while `data.outcome` is not overwritten |
 | `settled` | One flag per record settled: the case reservation and the unit record. False with `settleError` when a settle failed | Execution | absent; both settles report a failure with `console.warn` only (`run.mjs`) |
 | `launches` | `{ ceiling, used, ceilingHit }`: seat launches, not retries. `ceiling` is given to Execution through the case admission port and is `null` when there is no case; `left` is not a field because it is derived | Execution counts and enforces; the upper layer sets the ceiling | not printed by `fgos run --json`. The ceiling sits in `unit.json` as `seatLaunchCeiling`; `seatLaunchesUsed` and `frameExhausted` go to `admission.port.settle` and from there into the case ledger |
 | `results[]` | One item per attempt, in order: `seat`, `role`, `round`, `posture`, `outcome`, `runResult`, `binding`, `output` | Execution | present except `output` |
-| `warnings[]` | `{ code, message, source }`, structured; stderr is not part of the contract | Execution | absent; warnings reach stderr only |
+| `warnings[]` | `{ code, message }`, structured; stderr is not part of the contract | Execution | absent; warnings reach stderr only |
 
 The lost-brief relaunch (a seat whose brief never reached its agent is launched once more) is not part of `launches` as a ceiling; it is an attempt with its own `outcome` in `results[]`, and the case rule that no new automatic retry exists is unchanged.
 
-## 4. Attempt shape fields (RunResult version 4, additive)
+## 4. Attempt shape fields (RunResult version 3, optional fields)
+
+The new fields are optional and change no field's meaning, so every reader of version 3 keeps working and no Rust reader changes. A bump is reserved for a change of meaning, and then the number is **5**: version 4 was already used, from 073c8b6fc (2026-10-01) to d40d74ea1 (2026-11-06), and must not be reused.
 
 | Field | Meaning | Today |
 |---|---|---|
 | `binding.executor`, `binding.model`, `binding.tier`, `binding.invocation`, `binding.leaseAccount` | Who actually ran, and on which account; a caller checks seat diversity from these | present inside `binding`, which carries its own version shape |
-| `binding.family` | The provider family of the executor, so independence is observable without a lookup | **new mechanism**: absent |
+| `binding.family` | The provider family bind computed for the seat. Workflow reads it and no longer guesses it from the model string (`src/workflow/seat-providers.mjs`) | **new mechanism**: bind computes it (`bind.mjs`) but does not hand it up |
 | provenance labels | Where each value came from: one of `cli`, `unit`, `policy`, `default`, `fallback`. `bind` is the one authority that writes them | **new mechanism** for the closed list. Two authorities write labels today: `run.mjs` hands bind's own model and tier to Dispatch as `cliOverride`, so Dispatch relabels them (the `claude` seat of the 2026-11-09 run read `cliOverride` for `model` and `tier` although only `--effort` was passed) |
 | `executorRedirected` | true when fallback moved the seat to another executor | present |
-| `durationMs` | Wall time of the attempt | present, only `?? null` in `run-result.mjs`; `null` in the results checked on 2026-11-09 |
-| `usage` | Token counts | present, only `?? null`; every count `null` in the claude result checked |
-| null reasons | A field that cannot be filled is `null` together with a reason code (for example `adapter-reports-no-usage`), never a bare `null` | **new mechanism**: absent |
+| `durationMs`, `usage` | Wall time and token counts. An unknown value is `null`; the gap to close is filling them | present, only `?? null` in `run-result.mjs`; `null` in the results checked on 2026-11-09 |
 | `output` | `{ report: { path, bytes, sha256 } or null, claim, complete, incompleteReason }`, see below | **new mechanism** for `output.complete` and `incompleteReason`. A digest helper of `{ ref, sha256, bytes }` exists in `src/workflow/ref-digests.mjs`; it moves down to Execution and the Workflow copy is deleted |
 
 ### Output
 
 `output.report.path` is an absolute path chosen by Execution. A caller reads that path and never infers the run directory layout. Seats with a pane write their report under `producer/1/runs/01/outbox`; headless seats without a pane (for example `pi-cli-bwrap`) write under `worker-output/outbox`, a split made on purpose on 2026-11-08. That difference stays an adapter detail behind `output.report.path`.
 
-`output.complete` is false, with `incompleteReason`, when the report is shorter than the answer. The headless adapter writes the report from the final message, and a seat observed on 2026-11-09 left only a summary in the report while the full advice sat in `stdout.log`.
+`output.complete` is **declared** by the adapter that wrote the report, never detected afterwards. A headless report taken from the final message is `complete: false` with the reason `from-final-message`; the full answer may then sit only in `stdout.log`, as a seat observed on 2026-11-09 left it.
 
-## 5. Outcome table and unknown values
+## 5. Outcome table, unknown values and old records
 
-- One module in Execution owns the closed outcome table. The five identical copies of `VALID_OUTCOMES` in `src/runner/execution/loops/` become imports of it. The same-named set in `src/runner/dispatch/confinement/attestation-store.mjs` is a different domain and stays apart.
+- One module in Execution owns the closed outcome table. The five identical copies of `VALID_OUTCOMES` in `src/runner/execution/loops/` become imports of it. The same-named set in `src/runner/dispatch/confinement/attestation-store.mjs` is a different domain and stays apart. The same module names the two predicates that two layers hold today with different lists, `rebindsOnResume(seatOutcome)` and `infrastructure(unitResult)`.
 - A reader that meets an outcome it does not know, or none, treats the run as **no verdict**, never as a pass.
 - A reader refuses an unknown major `contract.version` with a named error and accepts unknown extra fields.
+- A record written before the new fields exist, with no `infrastructure` or no `outOfScope`, reads as **not known**, never as a pass. One legacy module applies today's derivation to such records and is deleted one release later; there is no dual-read window between machines, because all machines upgrade together. Old records on disk keep a reader.
 - Workflow reads `infrastructure`; it no longer holds its own list of infrastructure outcomes.
 
 ## 6. Unit input
@@ -85,20 +99,22 @@ No new input. The ceiling reaches Execution only through the case admission port
 
 ## 7. What each layer must do
 
-- **Execution** writes every field above, keeps one outcome table and one classifier, owns worktree custody (a door "run a command under worktree custody" that the case gate calls instead of taking the lease itself), and runs the same read-only Unit through every executor family with the same result shape as a conformance test.
-- **Workflow** reads these fields and nothing the contract does not name. The rule that a run reached a verdict lives once, in Execution. An architecture rule forbids `src/workflow` from importing `src/holder-lock` and `src/run-supervisor/cwd-lock.mjs`.
+- **Execution** writes every field above, keeps one outcome module and one classifier, applies the scope rule and the verify round before it settles, owns worktree custody (a door "run a command under worktree custody" that the case gate calls instead of taking the lease itself), and runs the same read-only Unit through every executor family with the same result shape as a conformance test.
+- **Workflow** reads these fields and nothing the contract does not name. It drops five re-derivations: the infrastructure list, `reachedVerdict` and `isRerunnable` (`store.mjs`), `foldUnitOutcome` (`unit-handoff.mjs`), the verdict test in `receiptsFromResults` (`case-projection.mjs`), the `pass`/`findings` test in the admission port, and the gate's exit-code classifier (`case-gate.mjs`). An architecture rule forbids `src/workflow` from importing the custody parts of `src/run-supervisor/cwd-lock.mjs` (admit and handoff); `case-lock.mjs` keeps its own holder-lock.
 - **A caller with only `fgos run --json`** needs nothing outside this contract to run several seats, check their independence, tell an infrastructure failure from a result, find each answer and read what each seat cost.
 
 ## 8. Acceptance proof
 
-One scenario: three seats started in parallel with `fgos run --json` only, on three different executor families, with one seat forced into an infrastructure failure. A script reads only fields named in this contract and must (1) report which executor and account ran each seat, (2) mark the failed seat as infrastructure and not as a vote, (3) find all answers by `output.report.path`, and (4) report duration and usage or the reason they are missing. If the script needs anything else, the contract is incomplete.
+One scenario: three seats started in parallel with `fgos run --json` only, on three different executor families, with one seat forced into an infrastructure failure. A script reads only fields named in this contract and must (1) report which executor and account ran each seat, (2) mark the failed seat as infrastructure and not as a vote, (3) find all answers by `output.report.path`, and (4) report duration and usage, or that they are `null`. If the script needs anything else, the contract is incomplete.
+
+Fixtures: one golden file per outcome under `packages/run-result/contracts/fixtures/`, read by both the Node and the Rust tests, as `packages/yaml-doc/contracts/fixtures/parse.v1.json` already is. Workflow tests take their results from these fixtures instead of building results by hand.
 
 ## 9. Order of work (proposed; the code split awaits the owner)
 
-1. Contract text and one fixture per outcome.
+1. Contract text and the fixtures.
 2. One outcome module; the five copies removed.
-3. Execution writes the new Unit and attempt fields (additive, RunResult version 4, version 3 reader kept).
-4. Workflow switches to `infrastructure` and the new fields, and the old derivation in `store.mjs` is deleted in the same change; every caller moves in that change.
+3. Execution writes the new Unit and attempt fields. This step includes moving the scope rule and the verify round into Execution before `settleAdmission`, because `infrastructure` and a final `outcome` cannot be computed without it.
+4. Workflow switches to the new fields, and the five re-derivations of section 7 are deleted in the same change; every caller moves in that change.
 5. The per-executor-family conformance test, then the acceptance scenario.
 
 Independent of the order above, landable on its own at any point: the custody door, the case gate moved onto it, and the import rule in `test/architecture.test.mjs`.
@@ -111,6 +127,7 @@ The engine owned execution and orchestration in one block, grew a phase at a tim
 
 ## 11. Not decided
 
+- Whether a verify that times out or cannot run counts as infrastructure, so that resume reruns it; an owner question put through HARDEN.
 - Whether a case wall-time or concurrency ceiling is added to the case frame; outside this contract.
 - Close by quorum for a council step; outside this contract.
 - Whether the Unit-level facts are also stored (which bumps `unit-summary` to version 3) or only printed in `data`.
