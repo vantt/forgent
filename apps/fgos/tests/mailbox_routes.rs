@@ -1670,10 +1670,13 @@ fn a_head_that_registered_before_the_machine_had_an_id_is_registered_with_identi
     );
 }
 
-/// Holds the scene's mailbox lock for `ms` in a thread, as a hook writing a
-/// registration does; returns once the lock is held.
-fn hold_lock(scene: &Scene, ms: u64) -> std::thread::JoinHandle<()> {
+/// Holds the scene's mailbox lock in a thread, as a hook writing a
+/// registration does, until `release` is sent (or dropped); returns once the
+/// lock is held. A refusal check releases it only after the refused process
+/// returned, so a slow process start cannot find the lock already free.
+fn hold_lock_until(scene: &Scene) -> (std::sync::mpsc::Sender<()>, std::thread::JoinHandle<()>) {
     let fgos_dir = scene.main().join(".fgos");
+    let (release, released) = std::sync::mpsc::channel::<()>();
     let (held, wait) = std::sync::mpsc::channel();
     let holder = std::thread::spawn(move || {
         let record = fgos_mailbox::record::Record::open(fgos_dir).unwrap();
@@ -1687,7 +1690,7 @@ fn hold_lock(scene: &Scene, ms: u64) -> std::thread::JoinHandle<()> {
         record
             .hold(fgos_mailbox::record::Wait::Try, now, &limits, |_, _| {
                 held.send(()).unwrap();
-                std::thread::sleep(std::time::Duration::from_millis(ms));
+                let _ = released.recv();
                 fgos_mailbox::record::Reported {
                     value: (),
                     changed: false,
@@ -1696,7 +1699,17 @@ fn hold_lock(scene: &Scene, ms: u64) -> std::thread::JoinHandle<()> {
             .unwrap();
     });
     wait.recv().unwrap();
-    holder
+    (release, holder)
+}
+
+/// Holds the lock for `ms`, as a hook that is still writing.
+fn hold_lock(scene: &Scene, ms: u64) -> std::thread::JoinHandle<()> {
+    let (release, holder) = hold_lock_until(scene);
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(ms));
+        let _ = release.send(());
+        holder.join().unwrap();
+    })
 }
 
 #[test]
@@ -1719,8 +1732,9 @@ fn a_send_racing_a_hook_that_holds_the_lock_longer_than_the_hooks_skip_budget_wa
         r#"{"mailbox":{"verbs":{"lockWaitMs":100}}}"#,
     )
     .unwrap();
-    let holder = hold_lock(&scene, 400);
+    let (release, holder) = hold_lock_until(&scene);
     let refused = scene.run(&scene.main(), Some("sender-a"), &send, b"");
+    release.send(()).unwrap();
     holder.join().unwrap();
     assert_eq!(refused.status.code(), Some(1), "{refused:?}");
     assert!(

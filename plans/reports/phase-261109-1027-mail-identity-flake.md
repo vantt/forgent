@@ -23,3 +23,12 @@ by design. No production change.
 ## Loops (compiled test binary, 40 each)
 Before: single test 9/40 fail; module 10/40; `wiring::mailbox` 17/30.
 After: single 0/40; module 0/40; `wiring::mailbox` 0/40 (18 pass).
+
+## Second flake: mailbox_routes `a_send_racing_a_hook_that_holds_the_lock_longer_...`
+Cause (test only): the refusal check held the lock for a fixed 400 ms and expected a
+100 ms-wait sender to find it busy; a sender process that started more than 300 ms late
+found the lock free and recorded (exit 0, line 1694). Reproduced 1/30 solo, 2/30 with CPU load.
+Fix: the refusal check holds the lock until the refused process has returned
+(`hold_lock_until`). The first phase (waits and records) passes whether or not the sender
+arrives before the release, so it keeps its timed hold. After: 0/30 solo, 0/30 loaded.
+Production lock wait code is unchanged: it behaves as specified.
