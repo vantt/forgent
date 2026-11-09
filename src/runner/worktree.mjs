@@ -68,6 +68,7 @@ export function resetDispatchWorktree(repo, worktree, target) { return restoreCh
 
 import { readConfig } from '../config/facade.mjs';
 import { statusPaths, inspectEntries, inspectPath } from '../util/git-paths.mjs';
+import { AGENT_SKILL_DIRS } from '../util/agent-skill-dirs.mjs';
 import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
@@ -164,6 +165,45 @@ export function runWorktreeSetupCommands(worktreePath, repoRoot) {
 }
 
 
+/**
+ * Give a new checkout the skill directories the main checkout holds that Git
+ * does not: under each agent CLI's skill root, every directory the main
+ * checkout ignores and the checkout lacks. An ignored directory is one fgOS
+ * does not own (fgOS-owned skills are tracked, or rendered into a tracked
+ * tree), so no skill set is named and an owned skill is never touched. A
+ * directory is copied for real, never hardlinked: a worker's in-place write
+ * through a hardlink would change the main checkout's file. A link is never
+ * followed: a root or skill directory that is a link is skipped, and a link
+ * inside a skill is copied as the link it is. An existing target is left
+ * alone, so a rerun copies nothing.
+ */
+export function provisionSkillRoots(worktreePath, repoRoot) {
+  const inspect = inspectGit(repoRoot);
+  // A wholly ignored directory is listed once as `dir/`, so `.omp/` covers every skill below it.
+  const ignoredDirs = inspectEntries((page) => inspect.status({ ...page, untracked: 'normal', ignored: true }))
+    .filter((entry) => entry.ignored)
+    .map((entry) => inspectPath(entry.path))
+    .filter((rel) => rel.endsWith('/'));
+  for (const root of new Set(Object.values(AGENT_SKILL_DIRS))) {
+    const source = path.join(repoRoot, root);
+    let rootStat;
+    try { rootStat = fs.lstatSync(source); } catch { continue; }
+    if (!rootStat.isDirectory()) continue;
+    for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const rel = `${root}/${entry.name}`;
+      const target = path.join(worktreePath, rel);
+      if (!ignoredDirs.some((dir) => `${rel}/`.startsWith(dir)) || fs.existsSync(target)) continue;
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      try {
+        fs.cpSync(path.join(source, entry.name), target, { recursive: true, verbatimSymlinks: true, force: false, errorOnExist: true });
+      } catch (err) {
+        throw new WorktreeError(`could not copy skill directory "${rel}" into "${worktreePath}": ${err.message}`, { worktreePath, skillDirectory: rel });
+      }
+    }
+  }
+}
+
 // The provisioning record: what `provisionWorktree` placed in one checkout,
 // so `fgos worktree remove` can take back exactly those bytes before the Git
 // port's clean check, and nothing else. One file per checkout, keyed by its
@@ -211,7 +251,7 @@ function recordPlaced(worktreePath, rel, placed) {
 
 /**
  * Provision a checkout the Git port has just created (dependency install,
- * then the project's `worktreeSetup.commands`) and record what that placed:
+ * the main checkout's ignored skill directories, then the project's `worktreeSetup.commands`) and record what that placed:
  * every new untracked or ignored path, a file with its content digest, and
  * the dependency directory `provisionDependencies` installed declared as
  * regenerable. The record is written even when a step fails, so a half
@@ -225,6 +265,7 @@ export function provisionWorktree(worktreePath, repoRoot, stateRoot, { disposabl
   const regenerable = [];
   try {
     if (provisionDependencies(worktreePath)) regenerable.push('node_modules');
+    provisionSkillRoots(worktreePath, repoRoot);
     runWorktreeSetupCommands(worktreePath, repoRoot);
   } finally {
     const placed = [];

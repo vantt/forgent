@@ -9,6 +9,7 @@ import { deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { parseTierCell, isExtendedTierCell } from '../runner/dispatch/tier-cell.mjs';
 import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
 import { isConfigRefusal, readMachineConfig } from '../config/facade.mjs';
+import { AGENT_SKILL_DIRS } from '../util/agent-skill-dirs.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -42,9 +43,7 @@ export function checkExecutorFamilyUnique(cwd) {
   return { passed: true, message: `each of ${byFamily.size} agent families has one executor` };
 }
 
-// Where each agent CLI reads project skills from, keyed by the invocation's command name. A CLI
-// not listed has no known skill directory here, so it is reported as not checked rather than failed.
-const CLI_SKILL_DIRS = { claude: '.claude/skills', codex: '.agents/skills', omp: '.omp/skills', pi: '.pi/skills', grok: '.grok/skills' };
+// A CLI absent from AGENT_SKILL_DIRS has no known skill directory, so it is reported as not checked rather than failed.
 // The CLIs that also read the same directory name from the user's home. A CLI not listed here is
 // only checked at project level.
 const CLI_USER_SKILL_DIRS = { claude: '.claude/skills', codex: '.agents/skills' };
@@ -86,7 +85,7 @@ export function checkExecutorSkillsInstalled(cwd) {
     const skills = entry?.supports?.skills;
     if (entry?.kind !== 'agent' || !Array.isArray(skills)) continue;
     for (const cli of invocationCliNames(entry)) {
-      const dir = CLI_SKILL_DIRS[cli];
+      const dir = AGENT_SKILL_DIRS[cli];
       if (!dir) { unchecked.push(`${id} (cli ${cli})`); continue; }
       for (const skill of skills) {
         checked += 1;

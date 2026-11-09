@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "268ceb7f0ac714663ec42c974895bc90b2dfe4ca743199bbfb00ee9e99aa36aa",
+  "payloadDigest": "1f8d33129a055a22dce0285891f8e86d60f30283c853b5812093f56456fed578",
   "files": {
     ".agents/skills/_shared/ak-cook-worker-contract.md": "f0cf5643d796b57cb40bb7cfd76d3adee75f8925148f2636595a8d931db02fa4",
     ".agents/skills/_shared/capability-catalog.md": "0dd3909b66525e5d26460fa4164891b09b90e7ab2aa36792db35923b0a496713",
@@ -1107,7 +1107,7 @@
     "src/runner/work-compat.mjs": "f587566545425e2cd1f20390d9474ba6e2d2935f87097e48f3fccba3a24b1352",
     "src/runner/work-dispatch.mjs": "3a86589b31ada22b0fa9ace7b3cb3d56dfbbb058f7fc800ab4509f90a2db6589",
     "src/runner/worker-log.mjs": "c5b978ff9fa7533a62213c77cf7b6241d7b10e43d9fd5cf07f15209b7335a793",
-    "src/runner/worktree.mjs": "9989552de0704ee90704269115cf15bbae544dfe8742518a9991901bce30e3fd",
+    "src/runner/worktree.mjs": "6ae79c22e27877987b74e38de8a4e71f8c0228f5e8a3a219ebcae3e439ea62d3",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "206a9ecbbc301f2c3c9688535dbeb60fabbe67052b870a62e23e7481ae82fdd8",
     "src/setup/agent-cli-trust.mjs": "d6e89dffb8312644b843029d800e5cc48bda69acc5d790a05c98c20d86cc40ef",
@@ -1134,7 +1134,7 @@
     "src/setup/mailbox-claude-accept.mjs": "0b6377d2c99d704c163b8d53db8f68c5f12ed4628843c768d0d2ddc3129bdc6c",
     "src/setup/mailbox-limits.mjs": "4d5342b6631a38e00edc30b8d8a4966f7d94f6848e2b68c45529822d4fdd9068",
     "src/setup/mailbox-sync-timer.mjs": "6628ebdd706138f32b9733bba2880b075c9d5c701695b85bf55347e47d3756ef",
-    "src/setup/model-pool-checks.mjs": "94b4a9409bba2aca2aa7d14b9ecf1f7357a6b68bb06194d68abae0541422183d",
+    "src/setup/model-pool-checks.mjs": "785804058781fa333fa2bbc89330cacc4bcc0e498073c9229236838f1d602f23",
     "src/setup/omp-natives-checks.mjs": "6f6faadb66ac09828741445c599dcbaee9462486157ab7074433e2dbcf4d9aad",
     "src/setup/project-launcher.mjs": "25a9268afc09c03a294abfdca80af2cc2e942699c9c72ab9216f3de664e295be",
     "src/setup/registrations.mjs": "719dc46d30bc09e0b83d6ab4d79e5cfd4fcc169f78a7f4893bec4163271bcd86",
@@ -1185,6 +1185,7 @@
     "src/state/worker-slots.mjs": "d76bba3e38f6b94e8307ff9d7dbe6f1e139f973e26a019bfd04dd9bd7ec13f75",
     "src/terminal-control/client.mjs": "e3904df8b75e73448363197641490813ecc6fab69aabd392d262ea4c57a49bb4",
     "src/terminal-control/config.mjs": "722271395f84821afadd1c10985a1cbadf6904aaa30173d4ec8ee1471ab18763",
+    "src/util/agent-skill-dirs.mjs": "82747166ecb7b91205ef3e5cdf469e42e8c239b41b3e548823f1615032998bf5",
     "src/util/format-bytes.mjs": "786e381e7581ddd1923305d3bb25e193aba99b84118728574c84280d5290966d",
     "src/util/format-duration.mjs": "aa3d4629659f6b635267965013716b45e71120cce5282f6b2a4503148c616ce9",
     "src/util/format-lock-duration.mjs": "87e069a71d25348768de8fe5116d2ac3759a2c1e775433a6511750491f874b3e",
@@ -3466,7 +3467,7 @@
     },
     {
       "path": "src/runner/worktree.mjs",
-      "line": 146,
+      "line": 147,
       "spawn": "execFileSync",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['worktreeSetup'] })))",
       "class": "configured-binary"

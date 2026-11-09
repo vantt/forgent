@@ -21,6 +21,7 @@ import {
   branchExists,
   reclaimOrphanedCheckout,
   provisionDependencies,
+  provisionSkillRoots,
   resyncClaimWorktree,
   resyncWorktree,
   refreshUnstartedBranch,
@@ -1198,6 +1199,41 @@ test('createWorktree and createVerifyCheckout provision a declared dependency, a
   assert.equal(fs.existsSync(path.join(verify, 'node_modules', 'fgos-test-localdep', 'package.json')), true);
   removeWorktree(repoRoot, verify, { force: true });
   assert.deepEqual(fs.readdirSync(path.dirname(verify)).filter((name) => name.includes(path.basename(verify))), []);
+});
+
+test('a new checkout receives every ignored skill directory of the main checkout, byte for byte, and leaves tracked skills to Git', () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
+  const outside = path.join(worktreeDir, 'outside-secret.txt');
+  fs.writeFileSync(outside, 'outside\n');
+  const write = (rel, text) => { fs.mkdirSync(path.dirname(path.join(repoRoot, rel)), { recursive: true }); fs.writeFileSync(path.join(repoRoot, rel), text); };
+  write('.gitignore', '/.claude/skills/*\n!/.claude/skills/fgos-owned/\n/.omp/\n');
+  write('.claude/skills/fgos-owned/SKILL.md', 'committed\n');
+  execFileSync('git', ['add', '.gitignore', '.claude/skills/fgos-owned/SKILL.md'], { cwd: repoRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'track an owned skill'], { cwd: repoRoot });
+  write('.claude/skills/fgos-owned/SKILL.md', 'edited in the main checkout only\n');
+  write('.claude/skills/kitx-foo/SKILL.md', 'foo\n');
+  write('.claude/skills/kitx-foo/references/deep/notes.md', 'notes\n');
+  fs.symlinkSync(outside, path.join(repoRoot, '.claude/skills/kitx-foo/link'));
+  write('.omp/skills/kitx-bar/SKILL.md', 'bar\n');
+  write('.claude/skills/untracked-not-ignored/SKILL.md', 'x\n');
+
+  const wt = createWorktree(repoRoot, 'item-skills', { worktreeDir });
+
+  const same = (rel) => assert.equal(fs.readFileSync(path.join(wt.path, rel), 'utf8'), fs.readFileSync(path.join(repoRoot, rel), 'utf8'), rel);
+  same('.claude/skills/kitx-foo/SKILL.md');
+  same('.claude/skills/kitx-foo/references/deep/notes.md');
+  same('.omp/skills/kitx-bar/SKILL.md');
+  assert.equal(fs.readlinkSync(path.join(wt.path, '.claude/skills/kitx-foo/link')), outside, 'a link is copied as a link, never followed');
+  assert.equal(fs.readFileSync(path.join(wt.path, '.claude/skills/fgos-owned/SKILL.md'), 'utf8'), 'committed\n', 'a tracked skill is Git\'s, not copied from the main checkout');
+
+  provisionSkillRoots(wt.path, repoRoot);
+  assert.equal(fs.existsSync(path.join(wt.path, '.claude/skills/kitx-foo/kitx-foo')), false, 'a rerun nests nothing');
+
+  const failures = [];
+  removeDispatchWorktree(repoRoot, wt.path, (line) => failures.push(line));
+  assert.deepEqual(failures, []);
+  assert.equal(fs.existsSync(wt.path), false);
 });
 
 test('removing a verify checkout also removes the ignored bytes verification produced there, while a dispatch checkout with the same unknown ignored bytes is still refused', () => {
