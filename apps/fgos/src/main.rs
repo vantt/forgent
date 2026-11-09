@@ -157,29 +157,6 @@ static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("config", fgos_config::provider::AVAILABLE_SUBCOMMANDS),
 ];
 
-fn resolve_target_root(cli_args: &[std::ffi::OsString]) -> std::path::PathBuf {
-    for i in 0..cli_args.len() {
-        if let Some(s) = cli_args[i].to_str() {
-            if s == "--dir" && i + 1 < cli_args.len() {
-                return std::path::PathBuf::from(&cli_args[i + 1]);
-            }
-            if let Some(dir) = s.strip_prefix("--dir=") {
-                return std::path::PathBuf::from(dir);
-            }
-        }
-    }
-    let cwd = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
-    let mut current = cwd.clone();
-    loop {
-        if current.join(".fgos").is_dir() {
-            return current;
-        }
-        if !current.pop() {
-            return cwd;
-        }
-    }
-}
-
 fn main() {
     let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
 
@@ -434,7 +411,9 @@ fn main() {
                 None
             };
 
-            let root = resolve_target_root(cli_args);
+            let cwd = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
+            let home = fgos_config::machine::home_dir(|key| std::env::var(key).ok());
+            let root = cli_projector::resolve_target_root(cli_args, &cwd, home.as_deref());
             let (invocation, request) =
                 cli_projector::project_cli_invocation(op_id_str, cli_args, root, stdin_data)
                     .unwrap_or_else(|err| {

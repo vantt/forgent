@@ -5,12 +5,67 @@
 
 use fgos_host_runtime::{ContractRef, HostInvocation, OperationId, OperationRequest};
 use std::ffi::OsString;
+use std::path::{Path, PathBuf};
+
+/// The project a native invocation acts on: `--dir <path>` (or `--dir=<path>`)
+/// as given, else the nearest ancestor of `cwd` holding a `.fgos` directory.
+///
+/// `<home>/.fgos` is the machine's global directory, never a project store, so
+/// the walk stops below `home` and `--dir` naming `home` is refused. Finding no
+/// project is refused too, naming the fix; only the operations that read a
+/// project consume the answer (see [`project_cli_invocation`]).
+pub fn resolve_target_root(
+    args: &[OsString],
+    cwd: &Path,
+    home: Option<&Path>,
+) -> Result<PathBuf, String> {
+    let home_canonical = home.and_then(|h| std::fs::canonicalize(h).ok());
+    let is_home = |dir: &Path| {
+        home.is_some_and(|h| dir == h) || home_canonical.as_deref().is_some_and(|h| dir == h)
+    };
+    for (i, arg) in args.iter().enumerate() {
+        let named = match arg.to_str() {
+            Some("--dir") => args.get(i + 1).map(PathBuf::from),
+            Some(s) => s.strip_prefix("--dir=").map(PathBuf::from),
+            None => None,
+        };
+        if let Some(dir) = named {
+            let canonical = std::fs::canonicalize(&dir).unwrap_or_else(|_| dir.clone());
+            if is_home(&dir) || is_home(&canonical) {
+                return Err(format!(
+                    "--dir {} is the home directory: its .fgos is the machine's global directory, never a project store; pass the project root [not-in-project]",
+                    dir.display()
+                ));
+            }
+            return Ok(dir);
+        }
+    }
+    let mut current = cwd.to_path_buf();
+    loop {
+        if is_home(&current) {
+            break;
+        }
+        if current.join(".fgos").is_dir() {
+            return Ok(current);
+        }
+        if !current.pop() {
+            break;
+        }
+    }
+    Err(format!(
+        "not inside an fgOS project: no .fgos directory above {} (the home directory's .fgos is the machine's global directory, never a project store) -- run the command inside a project, pass --dir <project root>, or run 'fgctl init' in the project [not-in-project]",
+        cwd.display()
+    ))
+}
 
 /// Projects a native CLI invocation into a `(HostInvocation, OperationRequest)` pair.
+/// `root` is the answer of [`resolve_target_root`]; only the operations that read
+/// a project (observe, convention, config) consume it, so a refusal there never
+/// stops a verb that needs no project.
 pub fn project_cli_invocation(
     operation_id_str: &str,
     args: &[OsString],
-    root: std::path::PathBuf,
+    root: Result<PathBuf, String>,
     stdin: Option<Vec<u8>>,
 ) -> Result<(HostInvocation, OperationRequest), String> {
     let operation = OperationId::parse(operation_id_str)
@@ -48,14 +103,14 @@ pub fn project_cli_invocation(
                     operation: operation_id_str.to_string(),
                     sub,
                     args: sub_args,
-                    root,
+                    root: root?,
                     stdin,
                 }),
             )
         }
         "convention.query" => (
             ContractRef::from_static("convention.query.request", "1.0.0"),
-            Box::new(project_convention_request(args, root)?),
+            Box::new(project_convention_request(args, root?)?),
         ),
         "identity.writer" => (
             ContractRef::from_static("identity.writer.request", "1.0.0"),
@@ -98,7 +153,7 @@ pub fn project_cli_invocation(
                 },
                 "1.0.0",
             ),
-            Box::new(project_config_request(args, root)?),
+            Box::new(project_config_request(args, root?)?),
         ),
         other => {
             return Err(format!(
@@ -695,6 +750,73 @@ fn project_convention_request(
 mod tests {
     use super::*;
 
+    /// A fresh directory tree for one root-walk case: `home/` holding the
+    /// global `.fgos`, and `home/work/repo/sub` with no project anywhere.
+    fn root_walk_tree(name: &str) -> PathBuf {
+        let base =
+            std::env::temp_dir().join(format!("fgos_root_walk_{}_{name}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(base.join("home/.fgos")).unwrap();
+        std::fs::create_dir_all(base.join("home/work/repo/sub")).unwrap();
+        std::fs::create_dir_all(base.join("outside/sub")).unwrap();
+        std::fs::canonicalize(base).unwrap()
+    }
+
+    fn dir_args(args: &[&str]) -> Vec<OsString> {
+        args.iter().map(OsString::from).collect()
+    }
+
+    #[test]
+    fn the_root_walk_never_takes_the_global_fgos_under_home_as_a_project() {
+        let base = root_walk_tree("global");
+        let home = base.join("home");
+        let sub = home.join("work/repo/sub");
+        for cwd in [&sub, &home] {
+            let err = resolve_target_root(&[], cwd, Some(&home)).unwrap_err();
+            assert!(err.starts_with("not inside an fgOS project"), "{err}");
+            assert!(
+                err.contains("--dir <project root>") && err.contains("fgctl init"),
+                "{err}"
+            );
+        }
+        let err = resolve_target_root(
+            &dir_args(&["--dir", home.to_str().unwrap()]),
+            &sub,
+            Some(&home),
+        )
+        .unwrap_err();
+        assert!(err.contains("is the home directory"), "{err}");
+        let spelled = format!("--dir={}/work/..", home.display());
+        assert!(resolve_target_root(&dir_args(&[&spelled]), &sub, Some(&home)).is_err());
+        // Outside home, a directory with no project above it is refused too.
+        assert!(resolve_target_root(&[], &base.join("outside/sub"), Some(&home)).is_err());
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    #[test]
+    fn the_root_walk_takes_the_nearest_project_below_home_and_dir_as_given() {
+        let base = root_walk_tree("project");
+        let home = base.join("home");
+        let repo = home.join("work/repo");
+        std::fs::create_dir_all(repo.join(".fgos")).unwrap();
+        let sub = repo.join("sub");
+        assert_eq!(
+            resolve_target_root(&[], &sub, Some(&home)),
+            Ok(repo.clone())
+        );
+        assert_eq!(resolve_target_root(&[], &repo, None), Ok(repo.clone()));
+        let other = base.join("outside");
+        assert_eq!(
+            resolve_target_root(
+                &dir_args(&["--dir", other.to_str().unwrap()]),
+                &sub,
+                Some(&home)
+            ),
+            Ok(other)
+        );
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
     #[test]
     fn identity_request_ignores_the_shell_appended_dir_flag() {
         let args: Vec<OsString> = ["identity", "--json", "--dir", "/repo", "--pid=42"]
@@ -854,11 +976,11 @@ mod tests {
     }
 
     #[test]
-    fn test_project_cli_invocation_for_version() {
+    fn test_project_cli_invocation_for_version_needs_no_project() {
         let (invocation, request) = project_cli_invocation(
             "distribution.build.show",
             &[],
-            std::path::PathBuf::from("."),
+            Err("not inside an fgOS project".to_string()),
             None,
         )
         .unwrap();
@@ -877,7 +999,7 @@ mod tests {
         let (invocation, request) = project_cli_invocation(
             "work.gate-bypass.show",
             &[],
-            std::path::PathBuf::from("."),
+            Ok(std::path::PathBuf::from(".")),
             None,
         )
         .unwrap();
@@ -897,7 +1019,7 @@ mod tests {
         let (invocation, request) = project_cli_invocation(
             "observe.metrics",
             &args,
-            std::path::PathBuf::from("/test"),
+            Ok(std::path::PathBuf::from("/test")),
             None,
         )
         .unwrap();
@@ -930,7 +1052,7 @@ mod tests {
         let (_, request) = project_cli_invocation(
             "convention.query",
             &args,
-            std::path::PathBuf::from("/repo"),
+            Ok(std::path::PathBuf::from("/repo")),
             None,
         )
         .unwrap();
@@ -962,7 +1084,7 @@ mod tests {
         let (_, request) = project_cli_invocation(
             "convention.query",
             &args,
-            std::path::PathBuf::from("/repo"),
+            Ok(std::path::PathBuf::from("/repo")),
             None,
         )
         .unwrap();
@@ -980,7 +1102,7 @@ mod tests {
         let (_, request) = project_cli_invocation(
             "convention.query",
             &all_args,
-            std::path::PathBuf::from("/repo"),
+            Ok(std::path::PathBuf::from("/repo")),
             None,
         )
         .unwrap();
@@ -995,7 +1117,7 @@ mod tests {
         assert!(project_cli_invocation(
             "convention.query",
             &no_mode,
-            std::path::PathBuf::from("/repo"),
+            Ok(std::path::PathBuf::from("/repo")),
             None,
         )
         .is_err());
@@ -1005,7 +1127,7 @@ mod tests {
         assert!(project_cli_invocation(
             "convention.query",
             &both_modes,
-            std::path::PathBuf::from("/repo"),
+            Ok(std::path::PathBuf::from("/repo")),
             None,
         )
         .is_err());

@@ -2519,3 +2519,43 @@ fn config_refresh_docs_rewrites_doc_lines_once_and_then_has_nothing_to_do() {
     );
     let _ = fs::remove_dir_all(&sandbox);
 }
+
+#[test]
+fn a_native_verb_under_home_with_no_project_is_refused_instead_of_using_the_global_fgos() {
+    let sandbox = std::env::temp_dir().join(format!("fgos_test_root_walk_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&sandbox);
+    let home = sandbox.join("home");
+    let checkout = home.join("projects/stripped-worktree");
+    fs::create_dir_all(home.join(".fgos")).unwrap();
+    fs::create_dir_all(&checkout).unwrap();
+    let run = |args: &[&str]| {
+        Command::new(fgos_bin())
+            .args(args)
+            .current_dir(&checkout)
+            .env("HOME", &home)
+            .env("FGOS_STATE_ROOT", sandbox.join("state"))
+            .output()
+            .unwrap()
+    };
+    let ping = run(&["friction", "ping", "--json"]);
+    let stderr = String::from_utf8_lossy(&ping.stderr);
+    assert_eq!(
+        ping.status.code(),
+        Some(1),
+        "stdout={} stderr={stderr}",
+        String::from_utf8_lossy(&ping.stdout)
+    );
+    assert!(
+        stderr.contains("not inside an fgOS project"),
+        "stderr={stderr}"
+    );
+    // A verb that needs no project still runs from the same place.
+    let version = run(&["version", "--json"]);
+    assert_eq!(
+        version.status.code(),
+        Some(0),
+        "stderr={}",
+        String::from_utf8_lossy(&version.stderr)
+    );
+    let _ = fs::remove_dir_all(&sandbox);
+}
