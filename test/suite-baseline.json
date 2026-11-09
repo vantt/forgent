@@ -477,7 +477,6 @@
     "test/setup/checks.test.mjs": 9.2,
     "test/setup/claude-code-hooks.test.mjs": 2.5,
     "test/setup/config-checks.test.mjs": 1.1,
-    "test/setup/config-merge.test.mjs": 0.1,
     "test/setup/confinement-doctor-checks.test.mjs": 1.4,
     "test/setup/credential-copies-retained-check.test.mjs": 0.8,
     "test/setup/curl-check.test.mjs": 0.2,

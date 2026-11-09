@@ -1069,6 +1069,15 @@
       "runtime-json"
     ]
   },
+  "wire-agents": {
+    "selector": "wire-agents",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
   "workflow": {
     "selector": "workflow",
     "route_kind": "legacy-cli",

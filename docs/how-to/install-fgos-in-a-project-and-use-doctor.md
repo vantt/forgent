@@ -210,6 +210,7 @@ Who fixes it:
 - **tool**: `fgos doctor --fix` repairs it.
 - **setup**: `fgos setup` repairs it (and `doctor --fix` does not).
 - **you**: only the project owner can, by hand. fgOS never edits those files.
+- **wire-agents**: your own agent config outside the project (the Claude config dir, `~/.gemini`). `fgos init`, `setup` and `doctor --fix` never write it. Run `fgos wire-agents` to see what it would change, then `fgos wire-agents --yes`: it acts only on agent CLIs on this machine and backs up each file first as `<file>.pre-wire-agents-<time>`. A setting that widens an agent's permissions it only shows; you decide and edit it yourself.
 - **info**: informational, or only reports. No action required unless you care.
 
 The registered checks below come from `src/setup/registrations.mjs`
@@ -229,7 +230,7 @@ file or key in their message; the message always names the exact target.
 | `legacy-node-payload-present` | The legacy Node payload named by the release manifest exists | `no active fgos rust host release or dev checkout found` | you | `fgctl repair` |
 | `active-release-matches-checkout` | Activated Node payload matches doctor's source working tree; staged dependencies excluded | changed/missing/extra counts, up to five paths, digest and activation time | you | Use `npm run fgos:dev -- <verb>` for working-tree code, or rebuild/stage/upgrade to update plain `fgos`; no automatic fix. Skips outside source checkouts, absent activation, same-checkout dev manifests and linked worktrees whose activation belongs to main. Does not certify Rust host freshness |
 | `config-awareness` | Which config level is active (project or global) and whether the other exists | never fails | info | none |
-| `claude-plugin-marketplace` | The fgOS Claude Code plugin marketplace is registered and the plugin enabled | `fgOS Claude Code plugin not installed/enabled` | tool | `fgos doctor --fix` (needs the `claude` CLI on `PATH`) |
+| `claude-plugin-marketplace` | The fgOS Claude Code plugin marketplace is registered and the plugin enabled | `fgOS Claude Code plugin not installed/enabled — run fgos wire-agents ...` | wire-agents | `fgos wire-agents --yes` (needs the `claude` CLI on `PATH`) |
 
 ### 4.2. Project config (written by setup or `--fix`)
 
@@ -271,7 +272,7 @@ manual step.
 | `trust-store-readable` | Claude's folder-trust store `~/.claude.json` is readable and has a `projects` object, so fgOS can pre-trust its own worktrees | `trust store at ~/.claude.json is unreadable: ...` or `... is not valid JSON` or `... has no usable "projects" object` | you | Start `claude` once so it creates the file; fix its permissions or its content |
 | `non-claude-trust-stores-readable` | Every codex or agy trust store named in an executor is readable | names the unreadable store | you | Fix the path in the executor config, or start that CLI once so the file exists |
 | `confined-pane-accounts` | Every confined herdr invocation with a private home has an account whose credential files exist | `no runner.providers.z-ai.accounts in the global config, so its pane starts in an empty private home, logged out` | you | Add the account under `runner.providers.<provider>.accounts` in `~/.fgos/config.json`, and log that CLI in |
-| `agy-permissions-configured` | agy's `settings.json` has a working command denylist | the message says what the settings file lacks | tool | `fgos doctor --fix` |
+| `agy-permissions-configured` | When agy is on `PATH`: your `~/.gemini/antigravity-cli/settings.json` lets headless agy run commands under a deny list | a `warning:` naming the file (it never fails) | you | `fgos wire-agents` shows the edit (`toolPermission: "always-proceed"` with a deny list); it widens agy's permissions in your own sessions too, so only you set it |
 | `agy-sub-homes-configured` | Each agy sub-HOME named by an executor has `toolPermission: always-proceed` | names the sub-HOME | tool, you | Re-run `fgos doctor --fix`; if it persists, edit that sub-HOME's `settings.json` |
 | `tool-registry-configured` | Declared tool providers (such as an impact-analysis tool) are present on this machine | `degraded -- 1/2 registered tool(s) present (1 missing, ...) run fgos tool check` | you | Install the missing tool, then `fgos tool check` to refresh the local overlay |
 | `provider-capacity-state` | Provider account leases and quarantine are reportable. Doctor never clears quarantine | `provider-capacity quarantine present (acct:quota-limit:until=...)` | you | Inspect with `fgos dispatch inspect --provider-capacity`, fix the cause, then `fgos dispatch reconcile provider-capacity clear-quarantine` |

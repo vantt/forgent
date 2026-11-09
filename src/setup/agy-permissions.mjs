@@ -1,12 +1,10 @@
-// agy-permissions.mjs — infra layer: real settings.json I/O for wiring the
-// `agy` (Antigravity Cli) executor's command-permission denylist (tsk-1xm,
-// docs/history/agy-permission-capability-allowlist/). Mirrors git-hooks.mjs's
-// two-entry-point shape:
-//   - fixAgyPermissionsConfigured: the writer, run by `fgos doctor --fix`
-//     and unconditionally by `fgos setup` (registerFix, same as every other
-//     registered fix).
-//   - checkAgyPermissionsConfigured: the read-only check, used by `fgos
-//     doctor`.
+// agy-permissions.mjs — infra layer: agy's (Antigravity Cli) command-permission settings
+// (tsk-1xm, docs/history/agy-permission-capability-allowlist/).
+//   - checkAgyPermissionsConfigured: the read-only doctor row over the person's own
+//     ~/.gemini/antigravity-cli/settings.json. fgOS never writes that file: always-proceed widens
+//     what agy may do in the person's own sessions too, so the row only reports it (as a warning)
+//     and `fgos wire-agents` shows the edit (src/setup/agent-wiring.mjs).
+//   - checkAgySubHomesConfigured: the same settings in each agy sub-HOME the executor config names.
 //
 // RESEARCH.md Round 4 (live-proven, 2026-08-18): `agy`'s `--dangerously-
 // skip-permissions` flag is NOT replaceable by a true default-deny
@@ -17,18 +15,15 @@
 // all, `toolPermission: "always-proceed"`, runs every command BY DEFAULT
 // (confirmed: an unlisted `whoami` probe succeeded) and only
 // `permissions.deny` changes that outcome (confirmed: a denied pattern was
-// refused with a named reason). This module therefore provisions a
-// DENYLIST, not an allowlist -- default-allow, explicit-deny -- which is
-// strictly narrower than today's unconditional `--dangerously-skip-
-// permissions` (zero boundary at all) but not the default-deny surface the
-// item's own framing originally assumed.
+// refused with a named reason). The settings shown are therefore a
+// DENYLIST, not an allowlist -- default-allow, explicit-deny.
 
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { mergeConfigDefaults } from './config-merge.mjs';
 import { isConfigRefusal, readConfig } from '../config/facade.mjs';
+import { firstOnPath } from './project-launcher.mjs';
 
 /**
  * Deny-rules chosen to mirror this repo's own already-documented incident
@@ -52,11 +47,8 @@ export const AGY_PERMISSIONS_DENYLIST = [
   'command(regex:^wget )',
 ];
 
-/**
- * The fill-only default shape merged into agy's settings.json
- * (`mergeConfigDefaults` semantics: a key already present -- including an
- * empty array -- is left byte-identical, never touched or topped up).
- */
+/** The settings `fgos wire-agents` shows a person who wants agy to run commands headless; fgOS
+ * never writes them into the person's own settings file. */
 export const AGY_PERMISSIONS_DEFAULT = {
   toolPermission: 'always-proceed',
   permissions: {
@@ -95,52 +87,24 @@ export function readAgySettings(homeDir = os.homedir()) {
 }
 
 /**
- * Read-only check (RUL9: doctor never writes) — passes once
- * `toolPermission` is `"always-proceed"` and `permissions.deny` is a
- * non-empty array. Does not require every `AGY_PERMISSIONS_DENYLIST`
- * entry to be present verbatim: a user who already customized the deny
- * list has made a deliberate choice `fixAgyPermissionsConfigured`'s own
- * fill-only merge would never overwrite, and re-flagging that as a
- * failure would fight the same "never touch a value the user already
- * has" contract the fix follows.
+ * Read-only doctor row over the person's own agy settings. Passes when agy is not on PATH (nothing
+ * of the person's to judge) or when `toolPermission` is `"always-proceed"` with a non-empty
+ * `permissions.deny` (a customized deny list is the person's choice). Otherwise it warns: agy run
+ * under this HOME refuses every command headless, and the only setting that changes that widens
+ * agy's permissions, which fgOS never sets for the person.
  */
-export function checkAgyPermissionsConfigured(homeDir = os.homedir()) {
+export function checkAgyPermissionsConfigured(homeDir = os.homedir(), { agyPresent = firstOnPath('agy') !== null } = {}) {
+  if (!agyPresent) return { passed: true, configured: false, message: 'agy not found on PATH — nothing to check' };
   const settings = readAgySettings(homeDir);
-  const toolPermission = settings.toolPermission;
   const denyList = settings.permissions?.deny;
-  const denyConfigured = Array.isArray(denyList) && denyList.length > 0;
-  if (toolPermission === 'always-proceed' && denyConfigured) {
-    return {
-      passed: true,
-      message: `agy settings.json: toolPermission=always-proceed, ${denyList.length} deny rule(s) configured`,
-    };
+  if (settings.toolPermission === 'always-proceed' && Array.isArray(denyList) && denyList.length > 0) {
+    return { passed: true, configured: true, message: `agy settings.json: toolPermission=always-proceed, ${denyList.length} deny rule(s) configured` };
   }
   return {
-    passed: false,
-    message:
-      'agy settings.json missing a working command denylist (toolPermission must be "always-proceed" with a non-empty permissions.deny — RESEARCH.md Round 4: "strict"/"request-review" blanket-deny every command in headless mode, and permissions.allow has no effect) — run fgos doctor --fix or fgos setup',
+    passed: true,
+    configured: false,
+    message: `warning: ${agySettingsPath(homeDir)} has no toolPermission "always-proceed" with a deny list, so agy run under this HOME refuses every command headless (RESEARCH.md Round 4). That setting widens what agy may do, so fgOS never sets it for you; \`fgos wire-agents\` shows the exact edit`,
   };
-}
-
-/**
- * Fill-only writer (RUL9: `setup` is the one write verb). Merges
- * `AGY_PERMISSIONS_DEFAULT` into whatever agy's settings.json already
- * has via the same `mergeConfigDefaults` every other config-default in
- * this repo uses — `trustedWorkspaces` and any other existing key (or an
- * already-customized `toolPermission`/`permissions.deny`) is kept
- * byte-identical. Idempotent: a second run makes no further change once
- * both keys are present.
- */
-export function fixAgyPermissionsConfigured(homeDir = os.homedir()) {
-  const settingsPath = agySettingsPath(homeDir);
-  const existing = readAgySettings(homeDir);
-  const { merged, addedKeys } = mergeConfigDefaults(existing, AGY_PERMISSIONS_DEFAULT);
-  if (addedKeys.length === 0) {
-    return { changed: false, message: 'agy settings.json already has toolPermission + permissions.deny — nothing to fix' };
-  }
-  fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
-  fs.writeFileSync(settingsPath, `${JSON.stringify(merged, null, 2)}\n`);
-  return { changed: true, message: `agy settings.json: added ${addedKeys.join(', ')}` };
 }
 
 /**

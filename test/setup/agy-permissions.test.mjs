@@ -1,9 +1,7 @@
-// agy-permissions.test.mjs -- real-CLI-subprocess coverage for tsk-1xm's
-// agy-permissions-configured doctor check/fix (src/setup/agy-permissions.mjs),
-// mirroring checks-setup-idempotent.test.mjs's own spawnSync-a-real-`fgos`
-// harness style (a mocked fs write would never prove the CLI wiring itself
-// works). Every case overrides HOME so this never touches the real machine's
-// ~/.gemini/antigravity-cli/settings.json.
+// agy-permissions.test.mjs -- tsk-1xm's agy-permissions-configured doctor row and the agy sub-HOME
+// row (src/setup/agy-permissions.mjs), in process, plus one `fgos doctor` wiring proof. Both rows
+// only read; that no fgOS verb writes the person's own agy settings is proven in
+// test/setup/agent-wiring.test.mjs. Every case overrides HOME.
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import {
@@ -15,7 +13,7 @@ import {
   path,
   spawnSync,
 } from './helpers/setup-checks-harness.mjs';
-import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, findAgySubHomes, fixAgyPermissionsConfigured } from '../../src/setup/agy-permissions.mjs';
+import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, findAgySubHomes } from '../../src/setup/agy-permissions.mjs';
 
 function agySettingsPath(homeDir) {
   return path.join(homeDir, '.gemini', 'antigravity-cli', 'settings.json');
@@ -28,61 +26,42 @@ function doctorCheck(result, id) {
   return entry;
 }
 
-test('agy-permissions-configured fails when agy has no settings.json yet', () => {
+test('agy-permissions-configured passes with nothing to check when agy is not on PATH, and only warns (never fails, never writes) when agy is there without the settings', () => {
   const homeDir = mkTemp('agy-perms-fresh-home-');
-  assert.equal(checkAgyPermissionsConfigured(homeDir).passed, false);
+  const absent = checkAgyPermissionsConfigured(homeDir, { agyPresent: false });
+  assert.equal(absent.passed, true);
+  assert.match(absent.message, /not found on PATH/);
+  const bare = checkAgyPermissionsConfigured(homeDir, { agyPresent: true });
+  assert.equal(bare.passed, true);
+  assert.equal(bare.configured, false);
+  assert.match(bare.message, /^warning: .*never sets it for you; `fgos wire-agents` shows the exact edit/);
+  assert.deepEqual(fs.readdirSync(homeDir), [], 'the check writes nothing');
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('fgos doctor --fix provisions toolPermission always-proceed + a non-empty permissions.deny, then the check passes, and reports the sub-HOME row', () => {
-  const cwd = mkTemp('agy-perms-fix-cwd-');
-  const homeDir = mkTemp('agy-perms-fix-home-');
-  const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
-
-  const fixed = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env });
-  assert.equal(fixed.status, 0, fixed.stderr);
-  const fixedCheck = doctorCheck(fixed, 'agy-permissions-configured');
-  assert.equal(fixedCheck.passed, true);
-  // The sub-HOME row is registered too; with no executor config it has nothing to check.
-  assert.equal(doctorCheck(fixed, 'agy-sub-homes-configured').passed, true);
-
-  const settings = JSON.parse(fs.readFileSync(agySettingsPath(homeDir), 'utf8'));
-  assert.equal(settings.toolPermission, 'always-proceed');
-  assert.ok(Array.isArray(settings.permissions?.deny) && settings.permissions.deny.length > 0);
-
-  fs.rmSync(cwd, { recursive: true, force: true });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('the agy permissions fix run twice does not rewrite an already-configured settings.json (fill-missing-only)', () => {
-  const homeDir = mkTemp('agy-perms-idempotent-home-');
-  assert.equal(fixAgyPermissionsConfigured(homeDir).changed, true);
-  const mtimeBefore = fs.statSync(agySettingsPath(homeDir)).mtimeMs;
-
-  assert.equal(fixAgyPermissionsConfigured(homeDir).changed, false);
-  assert.equal(fs.statSync(agySettingsPath(homeDir)).mtimeMs, mtimeBefore, 'must not rewrite a file that already has both keys');
-
-  fs.rmSync(homeDir, { recursive: true, force: true });
-});
-
-test('the agy permissions fix never touches an existing trustedWorkspaces list or an already-customized denylist', () => {
-  const homeDir = mkTemp('agy-perms-preserve-home-');
+test('agy-permissions-configured accepts always-proceed with the person\'s own customized deny list', () => {
+  const homeDir = mkTemp('agy-perms-custom-home-');
   const settingsPath = agySettingsPath(homeDir);
   fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
-  const customSettings = {
-    trustedWorkspaces: ['/home/example/my-project'],
-    toolPermission: 'always-proceed',
-    permissions: { deny: ['command(regex:^my-own-custom-rule)'] },
-  };
-  fs.writeFileSync(settingsPath, JSON.stringify(customSettings, null, 2));
+  fs.writeFileSync(settingsPath, JSON.stringify({ toolPermission: 'always-proceed', permissions: { deny: ['command(regex:^my-own-custom-rule)'] } }));
+  const result = checkAgyPermissionsConfigured(homeDir, { agyPresent: true });
+  assert.equal(result.configured, true);
+  assert.match(result.message, /1 deny rule\(s\) configured/);
+  fs.rmSync(homeDir, { recursive: true, force: true });
+});
 
-  fixAgyPermissionsConfigured(homeDir);
-  assert.equal(checkAgyPermissionsConfigured(homeDir).passed, true);
+test('fgos doctor reports the agy-permissions and agy sub-HOME rows', () => {
+  const cwd = mkTemp('agy-perms-doctor-cwd-');
+  const homeDir = mkTemp('agy-perms-doctor-home-');
+  const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
 
-  const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-  assert.deepEqual(settings.trustedWorkspaces, ['/home/example/my-project']);
-  assert.deepEqual(settings.permissions.deny, ['command(regex:^my-own-custom-rule)']);
+  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(doctorCheck(result, 'agy-permissions-configured').passed, true);
+  // With no executor config the sub-HOME row has nothing to check.
+  assert.equal(doctorCheck(result, 'agy-sub-homes-configured').passed, true);
 
+  fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 

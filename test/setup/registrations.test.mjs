@@ -19,15 +19,10 @@ import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } fr
 import { nativeDoor } from '../../src/native/door.mjs';
 import { checkAgentClaimsResolve } from '../../src/setup/registrations.mjs';
 
-// tsk-4xg: runFixes() below invokes every registered fix, including the
-// real `claude-plugin-marketplace` one, which shells out to a real,
-// mutating external CLI (`claude plugin marketplace add`/`install`) when
-// the `claude` binary is present. FGOS_CLAUDE_COMMAND (registrations.mjs's
-// own test-only seam, mirroring bin/fgos.mjs's FGOS_GH_COMMAND for `gh`)
-// points it at a path that never exists for this whole test file's process,
-// so it always sees "claude CLI not found" and no-ops that fix, never
-// touching this machine's real Claude Code config as a side effect of
-// running the test suite.
+// The claude-plugin-marketplace row runs the `claude` CLI when it is on PATH.
+// FGOS_CLAUDE_COMMAND (the row's test-only seam, mirroring bin/fgos.mjs's
+// FGOS_GH_COMMAND for `gh`) points it at a path that never exists for this
+// whole test file's process, so no test here ever runs the real `claude`.
 process.env.FGOS_CLAUDE_COMMAND = '/nonexistent/fgos-test-claude-binary';
 
 // Snapshot the real registry HERE, at module scope, before any test below

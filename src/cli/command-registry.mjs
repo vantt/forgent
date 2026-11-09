@@ -2255,6 +2255,25 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'wire-agents',
+    invoke: 'fgos wire-agents [--yes] [--json]',
+    description: 'The one opt-in command that changes your own agent config outside the project (fgos init, setup and doctor --fix write only the project and ~/.fgos). Acts only on agent CLIs found on this machine. Without --yes it prints every change and every file it would touch and writes nothing; with --yes it first copies each existing file to <file>.pre-wire-agents-<time>, then applies the changes (today: registers the fgOS Claude Code plugin marketplace and installs the plugin through the claude CLI). It never sets a permission that widens what an agent may do (agy toolPermission "always-proceed", Claude crossSessionInbound "accept"): it shows the file, the value and why, and you decide. Prints text; --json prints the envelope.',
+    parameters: {
+      type: 'object',
+      properties: {
+        yes: { type: 'boolean', description: 'Apply the printed changes after backing up each existing file. Omitted, nothing is written.' },
+        json: { type: 'boolean', description: 'Print the JSON envelope instead of text.' },
+      },
+      required: [],
+    },
+    examples: ['fgos wire-agents', 'fgos wire-agents --yes', 'fgos wire-agents --json'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'doctor',
     invoke: 'fgos doctor',
     description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/platform/packaging-distribution/spec.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',

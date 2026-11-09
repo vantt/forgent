@@ -226,21 +226,23 @@ test('wire-agents has nothing to change once the plugin is installed, and report
   const work = mkTemp('agent-wiring-claude-states-');
   const home = path.join(work, 'home');
   fs.mkdirSync(home);
-  const env = { HOME: home, PATH: '' };
+  // The fake claude is a node script; agy stays off PATH.
+  const env = { HOME: home, PATH: path.dirname(process.execPath) };
+  const claudeOf = (plan) => plan.agents.find((a) => a.agent === 'claude');
 
   const done = fakeClaude(fs.mkdtempSync(path.join(work, 'done-')), {
     marketplaces: [{ name: 'fgos-plugins', source: 'directory', path: '/dev/checkout' }],
     plugins: [{ id: 'fgOS@fgos-plugins', enabled: true }],
   });
   const settled = planAgentWiring(home, { env: { ...env, FGOS_CLAUDE_COMMAND: done.command }, home });
-  assert.deepEqual(settled.agents.map((a) => a.changes), [[]]);
+  assert.deepEqual(claudeOf(settled).changes, []);
 
   const onlyInstall = fakeClaude(fs.mkdtempSync(path.join(work, 'install-')), {
     marketplaces: [{ name: 'fgos-plugins', source: 'directory', path: '/dev/checkout' }],
     plugins: [],
   });
   const installPlan = planAgentWiring(home, { env: { ...env, FGOS_CLAUDE_COMMAND: onlyInstall.command }, home });
-  assert.deepEqual(installPlan.agents[0].changes[0].commands, ['claude plugin install fgOS@fgos-plugins'], 'an existing marketplace is never re-added');
+  assert.deepEqual(claudeOf(installPlan).changes[0].commands, ['claude plugin install fgOS@fgos-plugins'], 'an existing marketplace is never re-added');
 
   const failing = fakeClaude(fs.mkdtempSync(path.join(work, 'fail-')), { marketplaces: [], plugins: [], failInstall: true });
   const failingEnv = { ...env, FGOS_CLAUDE_COMMAND: failing.command };

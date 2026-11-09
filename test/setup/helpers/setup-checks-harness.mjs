@@ -28,14 +28,11 @@ import { initFixtureRepo } from '../../helpers/git-fixture.mjs';
 const __dirname = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
-// tsk-4xg: `doctor --fix` now runs the real `claude-plugin-marketplace` fix
-// too, which shells out to a real, mutating external CLI (`claude plugin
-// marketplace add`/`install`) when the `claude` binary is present --
-// FGOS_CLAUDE_COMMAND (registrations.mjs's own test-only seam, mirroring
+// The `claude-plugin-marketplace` doctor row runs the `claude` CLI when it is
+// on PATH. FGOS_CLAUDE_COMMAND (the row's test-only seam, mirroring
 // bin/fgos.mjs's FGOS_GH_COMMAND for `gh`) points it at a path that never
-// exists, so every `doctor --fix` spawned below sees "claude CLI not
-// found" and no-ops that fix, never touching this machine's real Claude
-// Code config as a side effect of running the test suite.
+// exists, so every `doctor` spawned below sees "claude CLI not found" and
+// never runs this machine's real `claude`.
 const NO_CLAUDE_ENV = { ...process.env, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
 
 function mkTemp(prefix) {

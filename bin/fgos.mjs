@@ -4227,6 +4227,16 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       };
     }
 
+    // The one opt-in door to a person's own agent config (src/setup/agent-wiring.mjs). Without --yes
+    // it only plans; --yes backs up each file first. Its project is the main checkout, like setup's.
+    case 'wire-agents': {
+      const repoRoot = resolveMainCheckoutRoot(process.cwd()) ?? process.cwd();
+      const { planAgentWiring, applyAgentWiring } = await import('../src/setup/agent-wiring.mjs');
+      const plan = planAgentWiring(repoRoot);
+      const result = flags.yes ? applyAgentWiring(plan) : { applied: false };
+      return { ...plan, ...result };
+    }
+
     // Diagnostic by default (D2, docs/platform/packaging-distribution/spec.md#business-rules RUL9): runs every
     // DOCTOR_CHECKS entry against the current cwd, writing nothing — no rc
     // file insertion, no config write — unless `--fix` is given.
@@ -5303,6 +5313,9 @@ async function main() {
       process.stdout.write(renderPretty(verb, data));
     } else if (verb === 'plan-lint' && !flags.json) {
       process.stdout.write(renderPlanLintReport(data));
+    } else if (verb === 'wire-agents' && !flags.json) {
+      const { renderAgentWiringText } = await import('../src/setup/agent-wiring.mjs');
+      process.stdout.write(renderAgentWiringText(data));
     } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
       const { renderProposalText } = await import('../src/workflow/propose.mjs');
       process.stdout.write(renderProposalText(data));
@@ -5330,7 +5343,7 @@ async function main() {
       process.exitCode = exitCodeForOutcome(data.outcome);
     } else if (verb === 'plan-lint' || (verb === 'workflow' && positional[0] === 'propose')) {
       process.exitCode = data.ok ? 0 : 1;
-    } else if (doctorFailed) {
+    } else if (doctorFailed || (verb === 'wire-agents' && data.failed?.length > 0)) {
       process.exitCode = 1;
     } else {
       process.exitCode = 0;
