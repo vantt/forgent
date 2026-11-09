@@ -395,6 +395,7 @@ mod tests {
             entries: EntriesInfo {
                 fgos: "bin/fgos".to_string(),
                 fgos_runner: None,
+                fgctl: None,
             },
             components: ComponentsInfo {
                 native_addon: None,
@@ -469,6 +470,7 @@ mod tests {
             entries: EntriesInfo {
                 fgos: "bin/fgos".to_string(),
                 fgos_runner: None,
+                fgctl: None,
             },
             components: ComponentsInfo {
                 native_addon: None,
@@ -622,6 +624,7 @@ mod tests {
             entries: EntriesInfo {
                 fgos: "bin/fgos".to_string(),
                 fgos_runner: None,
+                fgctl: None,
             },
             components: ComponentsInfo {
                 native_addon: None,

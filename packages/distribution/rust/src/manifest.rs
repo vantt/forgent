@@ -138,6 +138,28 @@ impl ReleaseManifest {
         Ok(())
     }
 
+    /// The `files[]` entry of the shipped `fgctl`, which carries its digest, or
+    /// `None` when the release ships none. A named `fgctl` must be a canonical
+    /// release-relative path with a matching regular-file entry.
+    pub fn fgctl_file(&self) -> Result<Option<&ManifestFileEntry>, &'static str> {
+        let Some(path) = &self.entries.fgctl else {
+            return Ok(None);
+        };
+        if path.contains('\\')
+            || path.contains(':')
+            || path
+                .split('/')
+                .any(|part| part.is_empty() || part == "." || part == "..")
+        {
+            return Err("entries.fgctl must be a canonical relative path");
+        }
+        self.files
+            .iter()
+            .find(|file| &file.path == path && file.kind == "file")
+            .map(Some)
+            .ok_or("entries.fgctl must have a matching files entry")
+    }
+
     /// Validates V1 semantics enforced at every trusted manifest read boundary.
     pub fn validate_v1_invariants(&self) -> Result<(), &'static str> {
         if self.schema_version != RELEASE_MANIFEST_SCHEMA_VERSION_V1 {
@@ -145,6 +167,7 @@ impl ReleaseManifest {
         }
         self.validate_legacy_node_invariant()?;
         self.validate_native_addon_invariant()?;
+        self.fgctl_file()?;
         if self
             .state_schemas
             .as_ref()
@@ -196,6 +219,11 @@ pub struct EntriesInfo {
     pub fgos: String,
     #[serde(default)]
     pub fgos_runner: Option<String>,
+    /// The `fgctl` binary this release ships, release-relative. Its digest is
+    /// the matching `files[]` entry. `fgctl upgrade` replaces the machine's
+    /// `fgctl` with it. Absent in releases built before `fgctl` shipped.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fgctl: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]

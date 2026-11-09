@@ -127,6 +127,7 @@ mod tests {
             entries: crate::manifest::EntriesInfo {
                 fgos: "bin/fgos".to_string(),
                 fgos_runner: None,
+                fgctl: None,
             },
             components: crate::manifest::ComponentsInfo {
                 native_addon: None,

@@ -5,6 +5,7 @@
 pub mod canonical;
 pub mod extract;
 pub mod fetch;
+pub mod fgctl_refresh;
 pub mod git_gate;
 pub mod init;
 pub mod lock;
