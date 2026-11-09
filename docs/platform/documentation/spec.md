@@ -337,7 +337,6 @@ None new in slice 1. The output format of the check command (file, line, rule id
 
 ### 11.1. Sweep needed when the rules land (known findings)
 
-- `core/skills/_shared/private-cell-worktree.md:58` tells agents to run `fgos coordination run`. That verb was removed in `2180b4e72` and the active release answers "unknown verb". The file is reached from the coding cell policy.
 - The 7 duplicated rule claims (the event-log rules numbered 1–3 and 5–8): work-state keeps them, because they are event-log and write-door rules and the holder table names work-state for them; the runner subcomponent cites them.
 - Removed or planned verbs named without a sha: `docs-lease` (holder-lock spec), `repair` (work-state spec), `evolve` (runner subcomponents) and `unlock` (runner spec). The planned `secrets` sits in an unsigned draft and is exempt.
 

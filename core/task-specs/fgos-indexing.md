@@ -13,7 +13,7 @@ domain: core | role: indexer | scope: enduser-docs | requires-skill: fgos-indexi
 
 ## Gates
 - Soft: Idempotent regeneration — skips disk write when index content is unchanged.
-- Hard: Reads `purpose`/`audience` strictly from `QUADRANT_META` in `src/report/enduser-index.mjs`; never hand-edits `docs/enduser-docs-index.json`. Does not write or classify documents itself (that belongs to `fgos-coding-compounding`).
+- Hard: Reads `purpose`/`audience` strictly from `QUADRANT_META` in `src/report/enduser-index.mjs`; never hand-edits `docs/enduser-docs-index.json`. Does not write or classify documents itself (that belongs to `fgos-coding-knowledge`).
 
 ## Verify-template
 - Verification: `node scripts/run-tests.mjs test/scripts/doc-health.test.mjs` (the committed end-user docs index covers every end-user doc).

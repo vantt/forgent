@@ -108,7 +108,7 @@ and never re-implements that skill's synthesis
    The driver resolves which skill runs synthesis through the same registry
    lookup it uses for every other position — `skillForStage(getDomain(
    item.domain), 'retrospective')`, decision record `0027` D5, which for
-   `coding` resolves to `fgos-coding-compounding` today. This skill never
+   `coding` resolves to `fgos-coding-knowledge` today. This skill never
    re-derives that mapping, and never second-guesses the classification or
    the document the resolved skill produces.
 

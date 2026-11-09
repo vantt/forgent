@@ -165,7 +165,7 @@ specifically.
 
 Once `fgos return <id>` reports the item moved to `awaiting-approval`,
 load `fgos-routing` to re-read its stage and continue — routing decides
-whether compound-learn (and `fgos-coding-compounding`) comes next; this
+whether compound-learn (and `fgos-coding-knowledge`) comes next; this
 skill's own job ends at a returned, verified item (the review handoff
 above already fired as part of that same transition — nothing further to
 do for it here).

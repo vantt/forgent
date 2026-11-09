@@ -148,8 +148,7 @@ necessary, not sufficient, when any of those moved since `testedSha`).
 ## Checkpoint identity
 
 Every checkpoint is a durable record tuple. Record it in the cell trace —
-`docs/platform/agent-coordination/verification/<track>/<cell>.md`
-(`coding-cell-policy.md` § Tested and integrated identity):
+`docs/platform/agent-coordination/verification/<track>/<cell>.md`:
 
 ```text
 phase/cell id: <phase>/<cell>
