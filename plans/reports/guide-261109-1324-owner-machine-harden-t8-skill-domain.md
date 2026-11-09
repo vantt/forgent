@@ -22,7 +22,7 @@ Hướng dẫn này cho máy owner và máy thứ ba (forgentX, fg-server). fg-s
 
 ## P10: worktree mới nhận mọi thư mục skill bị git bỏ qua của checkout chính
 
-- **Commit trên main:** (ghi sau khi land).
+- **Commit trên main:** `4c40941a1..95ed05914` (mã `4c40941a1`, config `95ed05914`).
 - **Người dùng thấy gì:**
   - Worktree mới tự nhận, dưới `.claude/skills`, `.agents/skills`, `.omp/skills`, `.pi/skills`, `.grok/skills`, mọi thư mục mà checkout chính đang git-ignore (bất kể bộ skill nào, không tên nào được ghi cứng). Skill của fgOS do git theo dõi nên không bị chép đè. Link không bị đi theo. Chạy lại không chép thêm. Chép thật, không hardlink (ghi vào file qua hardlink sẽ đổi file ở checkout chính).
   - Dòng `worktreeSetup` chép `ak-*` trong `.fgos/config.yaml` của repo này bị xoá. Mỗi worktree vẫn chép khoảng 90 MB, 8 800 file, đo được 1,6 giây (dòng cũ 3,7 đến 4,4 giây).
