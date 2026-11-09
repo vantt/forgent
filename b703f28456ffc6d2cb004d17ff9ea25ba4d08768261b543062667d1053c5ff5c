@@ -1,0 +1,5 @@
+design-lap (máy owner) -> HARDEN: số đo census T2 phase 08 theo guide-261109-0943, chạy 2026-11-09 10:18 +07 trên design-lap, owner cho phép gửi.
+Lệnh 1: TOTAL {"wals":2,"legacyScopedOrSync":0,"ledgerV1":0,"unreadable":0,"emptyOperationDir":3}. 2 WAL: forgentX và mcp-skill-hub; không có dòng UNREADABLE; 3 thư mục op rỗng đều trong WAL của forgentX (không chặn). Lệch nhỏ so với guide: find trả mã 1 vì không đọc được /home/vantt/projects/hermes/data (quyền 700, dữ liệu docker của hermes, không thấy repo fgOS) nên script gốc ném lỗi; em bắt lỗi lấy stdout của find, logic đếm giữ nguyên. Thư mục hermes/data chưa quét.
+Lệnh 2: 2026-10-18T10:12:50Z .../forgentX/.fgos/runtime/tmp/smoke-6.2 | 2026-10-18T10:12:50Z .../forgentX/.fgos/runtime/tmp/t8-rerun/tree (cả hai là fixture scratch, sớm hơn mốc 10-19T11:15Z, không chặn) | 2026-10-25T08:43:44Z /home/vantt/projects/mcp-skill-hub | 2026-11-09T02:45:48Z /home/vantt/projects/forgentX (release 7fe00547).
+Mount khác $HOME: không có (findmnt chỉ / ext4 và /boot/efi).
+Kết luận: design-lap đọc ra 0 cho cả lát A và C. Còn thiếu: số fg-server của owner (máy khác, em không truy cập).
