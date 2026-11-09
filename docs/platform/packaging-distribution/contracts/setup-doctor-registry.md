@@ -27,9 +27,9 @@ Superseded by: None recorded
 
 ## 1. Purpose
 
-The doctor/fix registry is the extension point for environment readiness. Modules register checks and fixes instead of adding one-off repair logic. Config defaults are not registered: the standard (`core/config-standard`) holds every default and the schemas (`core/config-schema`) every shape rule, read through the config door.
+The doctor/fix registry is the extension point for environment readiness: whether fgOS can run correctly on this machine and in this project (RUL109 of the spec). It is not an incident console and not a linter of the fgOS repository; section 3 says where those judgments live. Modules register checks and fixes instead of adding one-off repair logic. Config defaults are not registered: the standard (`core/config-standard`) holds every default and the schemas (`core/config-schema`) every shape rule, read through the config door.
 
-Target architecture has no separate `fgos setup` verb for workspace onboarding. `fgctl init` is the one-command workspace onboarding orchestrator; after activation it invokes active local `fgos init`, `fgos doctor --fix`, and `fgos doctor`. Legacy shell/global integration remains compatibility behavior under the explicit deprecated fallback window: 30 calendar days after preview release publication, unless a later release decision replaces that policy.
+Target architecture has no separate `fgos setup` verb for workspace onboarding. `fgctl init` is the one-command workspace onboarding orchestrator; after activation it invokes active local `fgos init`, `fgos doctor --fix`, and `fgos doctor` (the tail is unchanged). `fgos init` also recovers interrupted Git operations as its last, fail-safe step, through the function `fgos git recover` runs. Legacy shell/global integration remains compatibility behavior under the explicit deprecated fallback window: 30 calendar days after preview release publication, unless a later release decision replaces that policy.
 
 Current Node `fgos setup` remains implemented as deprecated legacy compatibility and consumes the same registry while it exists.
 
@@ -50,8 +50,28 @@ The registries are independent. A module may register only a check, only a fix, 
 
 - runs registered checks;
 - reports individual pass/fail status as a row `{id, description, passed, message, detail?}`; `detail` is an optional JSON value that holds the facts behind the row's one-sentence `message` (for example the versions and floor behind a compatibility failure) and appears only in `fgos doctor --json`;
-- does not write files by default;
-- should tell the user what command or fix path applies when a check fails.
+- does not write files by default, and in a repository with no fgOS setup writes nothing at all (no `.fgos`) and starts no child process;
+- should tell the user what command or fix path applies when a check fails;
+- answers readiness only. A live incident is read and repaired through its component's own verb; doctor keeps at most one read-only pointer row for it (below).
+
+`--fix` runs readiness fixes only: no registered fix repairs an incident.
+
+### Pointer rows
+
+A pointer row reads one component's incident count and names the verb that shows and settles it ("N open; run `<verb>`"). It passes with a `warning:` message, writes nothing and has no fix. It reads facts a readiness row already read in the same run (`createDoctorRun().once`) or costs at most 250 ms, and all pointers together at most one second; a dearer count is left out and the row prints "run `<verb>`". `mailbox-hook` is the measured exception (about 0.6 to 0.9 s on fg-server2): it asks `fgos mailbox status` for the record verdict because that verdict can fail the row. Doctor `--strict` therefore stays green over open incidents.
+
+| Pointer row | Names | Fails when |
+| --- | --- | --- |
+| `git-incidents` | `fgos git status`, `fgos git recover` | never |
+| `event-store-incidents` | `fgos events status` | integrity problems, skipped peer mirrors and their sync warnings |
+| `lock-holders` | `fgos lock-status` | never |
+| `run-attempts-stuck` | the next `fgos run` (adopts), `fgos dispatch recover` | never |
+| `terminal-allocations` | `fgos dispatch inspect --terminal` | never |
+| `mailbox-hook` | `fgos mailbox status` | the record is unreadable or untrusted |
+
+The two failing exceptions are owner decision 65 (2b) cases: a person must look at them before anything else is trusted. The Work data-drift rows and the `workflow-case-bindings` row are not yet in this form; the Work lane owns that change.
+
+### Owning proofs and verbs outside doctor
 
 Rules about the fgOS repository's own files are not doctor rows: doctor answers
 whether fgOS can run on this machine and in this project, and a repo-rule
@@ -68,10 +88,13 @@ failure says nothing about that. Each lives in the test that owns it, run by
 | The release mutation census matches its payload and lists no Git spawn outside the driver | `test/setup/git-mutation-census.test.mjs` |
 | The source repository conforms to the packaged naming and placement rules | `test/scripts/convention-conformance.test.mjs` (body: `scripts/convention-conformance.mjs`) |
 | `CHANGELOG.md` has entries to release | `scripts/prepare-release.mjs`, `test/scripts/prepare-release.test.mjs` |
+| The definitions a release ships (task specs, domain registry, agent types, operation prompt templates, workflow operations) are valid | `test/setup/packaged-definitions.test.mjs`; doctor judges only the tiers a project supplies |
 | Host and Node agree on which run directories are admissible | the shared run-layout fixture: `test/runner/assignment-layout.test.mjs`, `packages/run-result/rust/tests/layout_fixture.rs`, and the Observe crate's `metrics coverage` accounting |
 
 A project refreshes its end-user docs index and decisions index with
 `fgos docs-index` and `fgos decision-index`; doctor no longer regenerates them.
+The knowledge registry lints are read with `fgos knowledge status` (`findings`),
+and a stale registry projection is reported by `fgos doc-registry --check`.
 
 `active-release-matches-checkout` compares a source checkout's Node payload
 working-tree bytes with its own activated manifest, using the release builder's
@@ -114,7 +137,7 @@ Config merge is fill-missing-only:
 
 ## 6. Ownership Boundary
 
-Doctor/fix paths may repair environment readiness. They must not silently select a different runtime identity when a workspace activation is present. Runtime selection belongs to `fgctl` and workspace activation records.
+Doctor/fix paths may repair environment readiness only; an incident is repaired by its component's own verb (RUL109). They must not silently select a different runtime identity when a workspace activation is present. Runtime selection belongs to `fgctl` and workspace activation records.
 
 ## 7. Implementation Evidence
 

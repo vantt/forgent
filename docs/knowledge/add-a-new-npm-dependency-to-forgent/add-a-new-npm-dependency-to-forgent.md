@@ -9,45 +9,18 @@ runtime dependency (the repo had zero `dependencies`/`devDependencies`
 before it). Two real, non-obvious failures happened along the way — this
 recipe exists so the next dependency addition doesn't repeat them.
 
-## 1. Register it in the doctor-check registry
+## 1. Doctor does not check a project's installed packages
 
-`AGENTS.md`'s install/setup/doctor gate is explicit: a new infra
-dependency "must register into `fgos setup`'s config-merge and `fgos
-doctor`'s check registry (`src/setup/checks.mjs`) — not stand alone,
-undiscoverable by doctor." `checks.mjs` is a thin re-export shim; the real
-registry is `src/setup/registrations.mjs`'s `registerCheck`:
-
-```js
-function checkDependenciesInstalled(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  const root = mainCheckout ?? cwd;
-  const packageJsonPath = path.join(root, 'package.json');
-  if (!fs.existsSync(packageJsonPath)) {
-    return { passed: true, message: 'no package.json — nothing to check' };
-  }
-  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-  const deps = Object.keys(pkg.dependencies ?? {});
-  if (deps.length === 0) {
-    return { passed: true, message: 'no runtime dependencies declared — nothing to check' };
-  }
-  const nodeModulesPath = path.join(root, 'node_modules');
-  const missing = deps.filter((dep) => !fs.existsSync(path.join(nodeModulesPath, dep)));
-  if (missing.length > 0) {
-    return { passed: false, message: `missing from node_modules: ${missing.join(', ')} — run npm install` };
-  }
-  return { passed: true, message: `${deps.length} dependenc${deps.length === 1 ? 'y' : 'ies'} installed` };
-}
-
-registerCheck({
-  id: 'dependencies-installed',
-  description: 'package.json dependencies are present in node_modules',
-  check: (cwd) => checkDependenciesInstalled(cwd),
-});
-```
-
-`tsk-slq` shipped this as `dependencies-installed` — it already exists, so
-a second dependency addition needs no new check, only confirms this one
-still reports correctly.
+`tsk-slq` shipped a doctor row, `dependencies-installed`, that compared
+`package.json` dependencies with `node_modules`. It is gone: it judged the
+doctored project's own packages, and fgOS declares no runtime dependency
+(`package.json#dependencies` stays empty, RUL108 in the packaging-distribution
+spec). `AGENTS.md`'s install/setup/doctor gate now asks for a doctor readiness
+row only for a runtime dependency fgOS itself needs (a tool, file, directory or
+platform capability), registered through `registerCheck` in
+`src/setup/registrations.mjs`. A missing npm package is not that: there is
+nothing to register for it, and a second runtime dependency would first need
+the spec's rule changed.
 
 ## 2. Prepend `npm install` to any item's own `verify` command
 

@@ -1,7 +1,7 @@
 ---
 phase: 02
 title: "Dead and duplicate rows deleted, each condition proven owned elsewhere first"
-status: pending
+status: completed
 depends_on: [01]
 parallel: "none: registrations.mjs and git-checks.mjs chains (01 → 02 → 03 → 04 → …)"
 owning_lane: "HARDEN (reviewers: ES for the two Event Store rows, CFG for the config dead keys, OPC for git-repository-config)"

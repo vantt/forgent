@@ -1,7 +1,7 @@
 ---
 phase: 10
 title: "Docs gate, decision narrative, final measure, close and owner-machine guide"
-status: pending
+status: completed
 depends_on: [01, 02, 03, 04, 05, 06, 07, 08]
 parallel: "none; P09's WORK part may still be open (named on the board)"
 owning_lane: "HARDEN (reviewer: DOC)"

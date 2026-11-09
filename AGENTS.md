@@ -136,13 +136,22 @@ restaged; activation never refreshes itself merely because source was edited.
 ## Install/setup/doctor gate
 
 `docs/platform/packaging-distribution/history/distribution-vision.md` sets the direction for this repo's own
-cài đặt/setup/doctor story. Before any change is done, ask:
+cài đặt/setup/doctor story. Before any change is done, check:
 
-- Does this add a config default, env var, or infra dependency (a new
-  file it expects to exist, a tool it shells out to, a directory it
-  assumes is writable)? If yes, it must register into `fgos setup`'s
-  config-merge and `fgos doctor`'s check registry (`src/setup/checks.mjs`)
-  — not stand alone, undiscoverable by `doctor`.
+- A new config key goes into `core/config-standard` and `core/config-schema`;
+  nothing registers a default anywhere else (`fgos setup` is deprecated).
+- A new runtime dependency (a tool it shells out to, a file or directory it
+  expects, a platform capability) needs a readiness row in doctor
+  (`src/setup/registrations.mjs`), and a registered fix only when the repair
+  is safe and about readiness.
+- A new runtime state or incident class must be reportable and repairable
+  through its component's own verb, on that component's normal path, never
+  only through doctor. Doctor may carry one read-only pointer row for it
+  ("N open, run <verb>"): it warns, never repairs, and never fails except the
+  cases `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md`
+  section 3 names.
+- A rule about the fgOS repo's own files goes into `npm test`, CI, pre-commit
+  or the release check, never into doctor.
 - Never hardcode an assumption about which install level (global vs
   project) is active — per the vision doc, project config always
   overwrites global, and fgOS stays aware of both without conflict.

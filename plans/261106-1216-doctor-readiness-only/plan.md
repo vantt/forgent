@@ -1,7 +1,7 @@
 ---
 title: "HARDEN: doctor answers readiness only"
 description: "Owner decision 65 (1a 2b 3a) on the doctor audit: fgOS-repo rows move to npm test/release check, live incidents move to each component's own read-and-recover door with one read-only pointer row each, Git gets `fgos git status|recover`, dead and duplicate rows go, the three defects found in passing are fixed; ten phases, net size below zero, self-landing on fg-server2."
-status: pending
+status: in-progress
 priority: P1
 effort: ~6.5d lead time, serial (P01 0.5d; P02 0.5d; P03 1d; P04 1d; P05 1d; P06 0.5d; P07 1d; P08 0.5d; P09 0.5d HARDEN part; P10 0.5d)
 branch: main (plan only; each phase runs on its own track branch `harden/doctor-pNN-<slug>` in its own linked worktree from origin/main)
@@ -68,8 +68,8 @@ Main `fd476d709` (2026-11-06 12:16 Asia/Saigon, fg-server2). Every `file:line` b
 | 06 | [Git doctor cut and pointer](phase-06-git-doctor-cut.md) **landed 11-08** | HARDEN (OPC) | 04 landed and activated, 05 | — | −95 / 0 / −60 |
 | 07 | [Component pointer rows](phase-07-component-pointer-rows.md) **landed 11-08** | HARDEN (ES, OPC, MAIL) | 06 | — | −40 / 0 / −20 (measured −63 / 0 / −5) |
 | 08 | [Packaged definitions: release tier to tests](phase-08-packaged-definitions-split.md) **landed 11-09 `35c281e73`** | HARDEN (TEST) | 07 | — | −150 / 0 / −50 (measured −247 / 0 / −22) |
-| 09 | [WORK hand-off and Work pointer](phase-09-work-handoff.md) | WORK (rows, doors); HARDEN (board record, pointers) | 07; pointers: WORK's doors landed | WORK's part on its own schedule | HARDEN +20 / 0 / +10 |
-| 10 | [Docs gate, measure, close](phase-10-docs-gate-measure-close.md) | HARDEN (DOC) | 01–08 | — | 0 / 0 / 0 |
+| 09 | [WORK hand-off and Work pointer](phase-09-work-handoff.md) **open: WORK's six Work rows and the `work-incidents` pointer; the Workflow half landed in the Workflow layer** | WORK (rows, doors); HARDEN (board record, pointers) | 07; pointers: WORK's doors landed | WORK's part on its own schedule | HARDEN +20 / 0 / +10 |
+| 10 | [Docs gate, measure, close](phase-10-docs-gate-measure-close.md) **landed 11-09; close report [lead-261109-0855](../reports/lead-261109-0855-doctor-p10-docs-gate-measure-close.md)** | HARDEN (DOC) | 01–08 | — | 0 / 0 / 0 |
 
 ```
 P01 → P02 → P03 → P04 → P05 → P06 → P07 → P08 → P10

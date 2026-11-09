@@ -1,7 +1,7 @@
 ---
 phase: 05
 title: "Knowledge rows move to the knowledge verbs: `fgos knowledge status` reports the lints, `fgos doc-registry --check` reports staleness"
-status: pending
+status: completed
 depends_on: [04]
 parallel: "none (registrations.mjs, bin/fgos.mjs, command-registry.mjs chains)"
 owning_lane: "HARDEN (reviewer: DOC)"

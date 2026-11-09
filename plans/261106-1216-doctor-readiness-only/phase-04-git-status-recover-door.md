@@ -1,7 +1,7 @@
 ---
 phase: 04
 title: "Git read-and-recover door: `fgos git status|recover` through the host route; `fgos init` recovers; messages point at the door"
-status: pending
+status: completed
 depends_on: [03]
 parallel: "none (bin/fgos.mjs and git-checks.mjs chains)"
 owning_lane: "HARDEN (reviewer: OPC, Git reviewer role)"

@@ -1,7 +1,7 @@
 ---
 phase: 08
 title: "Packaged definitions: the release's own tiers are proven by npm test; doctor judges only the tiers a project supplies"
-status: pending
+status: completed
 depends_on: [07]
 parallel: "none (registrations.mjs chain)"
 owning_lane: "HARDEN (reviewer: TEST)"

@@ -1,7 +1,7 @@
 ---
 phase: 01
 title: "Defects found in passing: doctor writes and starts a child in a non-fgOS repo, a warning reported as a failure, a fix that does nothing"
-status: pending
+status: completed
 depends_on: []
 parallel: "wave 1, alone (registrations.mjs and bin/fgos.mjs chains start here)"
 owning_lane: "HARDEN (reviewer: ES for the lifecycle set and locks.rs)"

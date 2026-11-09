@@ -220,7 +220,6 @@
     "test('tool-scope maps exactly into the generated tools: frontmatter -- no silent add, no silent drop (D1)', () => {"
   ],
   "test/setup/checks.test.mjs": [
-    "test('dependencies-installed passes when package.json has no dependencies field (pre-tsk-slq behavior)', () => {",
     "test('enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6)', () => {",
     "test('fgos setup initializes ~/.fgos/config.json with the full default shape (tsk-1ri D1) when it does not exist', () => {",
     "test('fgos setup run twice does not rewrite an already-complete ~/.fgos/config.json (tsk-1ri D2, fill-missing-only)', () => {",

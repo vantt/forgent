@@ -1,7 +1,7 @@
 ---
 phase: 03
 title: "fgOS-repo rows move to npm test, pre-commit and the release check; the two history-derived indexes check only what the checkout has"
-status: pending
+status: completed
 depends_on: [02]
 parallel: "none (registrations.mjs and git-checks.mjs chains)"
 owning_lane: "HARDEN (reviewers: TEST for every new owning proof, DOC for the indexes, OPC for the census)"
